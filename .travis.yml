@@ -1,4 +1,10 @@
 language: generic
+matrix:
+  include:
+    - name: Test
+      env: COMMAND=test
+    - name: Analyze
+      env: COMMAND=analyze
 os:
   - linux
 sudo: false
@@ -15,7 +21,7 @@ before_script:
   - git clone https://github.com/flutter/flutter.git -b master
   - ./flutter/bin/flutter doctor
 script:
-  - ./flutter/bin/flutter test
+  - ./flutter/bin/flutter $COMMAND
 cache:
   directories:
     - $HOME/.pub-cache
