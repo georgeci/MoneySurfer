@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/georgeci/MoneySurfer.svg?branch=master)](https://travis-ci.org/georgeci/MoneySurfer)
+[![CircleCI](https://circleci.com/gh/georgeci/MoneySurfer/tree/master.svg?style=svg)](https://circleci.com/gh/georgeci/MoneySurfer/tree/master)
 
 # money_surfer
 
