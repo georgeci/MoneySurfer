@@ -1,3 +1,6 @@
+language: dart
+dart:
+  - dev
 os:
   - linux
 sudo: false
