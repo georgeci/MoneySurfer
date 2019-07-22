@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/georgeci/MoneySurfer.svg?branch=master)](https://travis-ci.org/georgeci/MoneySurfer)
+
 # money_surfer
 
 A new Flutter project.
