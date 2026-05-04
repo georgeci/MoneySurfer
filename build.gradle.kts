@@ -15,6 +15,7 @@ plugins {
     alias(libs.plugins.firebase.crashlytics) apply false
     alias(libs.plugins.kover)
     alias(libs.plugins.android.built.in1.kotlin) apply false
+    alias(libs.plugins.sonarqube)
 }
 
 apply(from = "gradle/qa.gradle.kts")
@@ -43,6 +44,15 @@ subprojects {
         "detektPlugins"(rootProject.libs.detekt.formatting)
     }
 
+    tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
+        reports {
+            xml.required.set(true)
+            html.required.set(false)
+            sarif.required.set(false)
+            md.required.set(false)
+        }
+    }
+
     tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
         compilerOptions {
             freeCompilerArgs.add("-Xexpect-actual-classes")
@@ -58,4 +68,39 @@ dependencies {
     kover(projects.syncSurfer)
     kover(projects.sync.default)
     kover(projects.uikit)
+}
+
+sonar {
+    properties {
+        property("sonar.host.url", "https://sonarcloud.io")
+        property("sonar.organization", "georgeci")
+        property("sonar.projectKey", "georgeci_MoneySurfer")
+        property("sonar.projectName", "MoneySurfer")
+
+        property(
+            "sonar.sources",
+            "src/commonMain/kotlin,src/androidMain/kotlin,src/iosMain/kotlin,src/jvmMain/kotlin",
+        )
+        property(
+            "sonar.tests",
+            "src/commonTest/kotlin,src/androidHostTest/kotlin,src/jvmTest/kotlin",
+        )
+
+        property(
+            "sonar.coverage.jacoco.xmlReportPaths",
+            "${layout.buildDirectory.get()}/reports/kover/report.xml",
+        )
+
+        property(
+            "sonar.kotlin.detekt.reportPaths",
+            subprojects.joinToString(",") {
+                "${it.projectDir}/build/reports/detekt/detekt.xml"
+            },
+        )
+
+        property(
+            "sonar.exclusions",
+            "**/build/**,**/generated/**,iosApp/**,scripts/**,md/**,docs/**,firestore-tests/**",
+        )
+    }
 }
