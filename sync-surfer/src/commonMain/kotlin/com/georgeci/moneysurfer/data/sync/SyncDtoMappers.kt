@@ -12,6 +12,9 @@ import com.georgeci.moneysurfer.data.remote.TransactionDoc
 import com.georgeci.moneysurfer.data.remote.WorkspaceDoc
 import com.georgeci.moneysurfer.data.remote.WorkspaceInviteDoc
 import com.georgeci.moneysurfer.data.remote.WorkspaceMemberDoc
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
+import kotlin.time.Instant
 
 /**
  * Shared Room ↔ Firestore-DTO mappers. Used by both the v1
@@ -95,21 +98,36 @@ fun TransactionEntity.toDoc(): TransactionDoc = TransactionDoc(
     updatedAt = updatedAt,
 )
 
-fun TransactionDoc.toEntity(id: String, workspaceId: String): TransactionEntity = TransactionEntity(
-    id = id,
-    workspaceId = workspaceId,
-    accountId = accountId,
-    amount = amount,
-    currencyCode = currencyCode,
-    categoryId = categoryId,
-    note = note,
-    operationAt = operationAt,
-    operationDate = operationDate,
-    type = type,
-    status = status,
-    createdAt = createdAt,
-    updatedAt = updatedAt,
-)
+fun TransactionDoc.toEntity(id: String, workspaceId: String): TransactionEntity {
+    // Tolerate legacy/partial Firestore docs:
+    //  - operationDate may be "" (older schema): derive ISO date from operationAt
+    //  - createdAt may be 0L (older schema): fall back to operationAt or updatedAt
+    //    so audit ordering doesn't collapse to epoch zero.
+    val resolvedOperationDate = operationDate.ifBlank {
+        Instant.fromEpochMilliseconds(operationAt)
+            .toLocalDateTime(TimeZone.currentSystemDefault())
+            .date
+            .toString()
+    }
+    val resolvedCreatedAt = if (createdAt == 0L) {
+        if (operationAt != 0L) operationAt else updatedAt
+    } else createdAt
+    return TransactionEntity(
+        id = id,
+        workspaceId = workspaceId,
+        accountId = accountId,
+        amount = amount,
+        currencyCode = currencyCode,
+        categoryId = categoryId,
+        note = note,
+        operationAt = operationAt,
+        operationDate = resolvedOperationDate,
+        type = type,
+        status = status,
+        createdAt = resolvedCreatedAt,
+        updatedAt = updatedAt,
+    )
+}
 
 fun WorkspaceMemberEntity.toDoc(): WorkspaceMemberDoc = WorkspaceMemberDoc(
     userId = userId,

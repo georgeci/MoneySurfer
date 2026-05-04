@@ -50,8 +50,7 @@ class TransactionRepositoryImpl(
         dao.getById(id.value)?.toDomain()
 
     override suspend fun insert(transaction: Transaction) {
-        val now = nowMillis()
-        val entity = transaction.toEntity().copy(createdAt = now, updatedAt = now)
+        val entity = transaction.toEntity()
         dao.insert(entity)
         enqueueUpsert(entity, MutationOperation.INSERT)
     }
@@ -119,7 +118,8 @@ private fun CategorizedTransactionEntity.toDomain() = CategorizedTransaction(
         categoryId = categoryId?.let(::CategoryId),
         note = note,
         operationAt = operationAt.toInstant(),
-        operationDate = operationDate.toLocalDate(),
+        operationDate = operationDate.toLocalDateOrNull()
+            ?: operationAt.toInstant().toLocalDateTime(TimeZone.currentSystemDefault()).date,
         type = parseType(type, amount),
         status = parseStatus(status),
         createdAt = createdAt.toInstant(),

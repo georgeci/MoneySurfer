@@ -47,7 +47,9 @@ class WorkspaceInviteRepositoryImpl(
         val existing = dao.getById(invite.id.value)
         val isNew = existing == null
         val entity = invite.toEntity().copy(
-            createdAt = existing?.createdAt ?: now,
+            // Preserve original createdAt on update; trust domain value on insert
+            // (use case already stamps it from the same clock).
+            createdAt = existing?.createdAt ?: invite.createdAt.toEpochMillis(),
             updatedAt = now,
         )
         dao.upsert(entity)

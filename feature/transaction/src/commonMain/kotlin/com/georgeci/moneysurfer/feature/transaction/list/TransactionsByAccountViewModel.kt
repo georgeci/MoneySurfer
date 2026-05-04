@@ -153,9 +153,6 @@ class TransactionsByAccountViewModel(
         )
     }
 
-    private fun dateKey(instant: Instant, zone: TimeZone): LocalDate =
-        instant.toLocalDateTime(zone).date
-
     private val CategorizedTransaction.currencyCode: CurrencyCode get() = transaction.currencyCode
     private val CategorizedTransaction.operationAt: Instant get() = transaction.operationAt
     private val CategorizedTransaction.type: TransactionType get() = transaction.type

@@ -1,7 +1,10 @@
 package com.georgeci.moneysurfer.data.repository
 
+import com.georgeci.moneysurfer.domain.primitives.Clock
 import kotlinx.datetime.LocalDate
 import kotlin.time.Instant
+
+internal fun Clock.nowMillis(): Long = now().toEpochMilliseconds()
 
 internal fun Long.toInstant(): Instant = Instant.fromEpochMilliseconds(this)
 internal fun Long?.toInstantOrNull(): Instant? = this?.let { Instant.fromEpochMilliseconds(it) }

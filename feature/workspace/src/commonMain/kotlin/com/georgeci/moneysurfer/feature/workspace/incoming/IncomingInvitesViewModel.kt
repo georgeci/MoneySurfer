@@ -3,6 +3,7 @@ package com.georgeci.moneysurfer.feature.workspace.incoming
 import arrow.optics.optics
 import co.touchlab.kermit.Logger
 import com.georgeci.moneysurfer.domain.model.WorkspaceRole
+import com.georgeci.moneysurfer.domain.primitives.Clock
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceInviteId
 import com.georgeci.moneysurfer.domain.repositories.WorkspaceRepository
 import com.georgeci.moneysurfer.domain.usecase.AcceptInviteUseCase
@@ -12,7 +13,6 @@ import com.georgeci.moneysurfer.domain.usecase.ListPendingInvitesForCurrentUserU
 import com.georgeci.moneysurfer.domain.usecase.RefreshIncomingInvitesUseCase
 import com.georgeci.moneysurfer.utils.MviViewModel
 import org.koin.core.annotation.KoinViewModel
-import kotlin.time.Clock
 
 @KoinViewModel
 class IncomingInvitesViewModel(
@@ -21,6 +21,7 @@ class IncomingInvitesViewModel(
     private val acceptInvite: AcceptInviteUseCase,
     private val declineInvite: DeclineInviteUseCase,
     private val workspaceRepository: WorkspaceRepository,
+    private val clock: Clock,
 ) : MviViewModel<IncomingInvitesState, IncomingInvitesEvent, IncomingInvitesEffect>(
     initialState = IncomingInvitesState(),
 ) {
@@ -39,7 +40,7 @@ class IncomingInvitesViewModel(
             return
         }
         log.i { "[refresh:start]" }
-        val startedAt = Clock.System.now().toEpochMilliseconds()
+        val startedAt = clock.now().toEpochMilliseconds()
         updateState { copy(refreshing = true, refreshError = null) }
         launch(
             onError = {
@@ -49,7 +50,7 @@ class IncomingInvitesViewModel(
         ) {
             refreshIncomingInvites().fold(
                 ifLeft = { error ->
-                    val took = Clock.System.now().toEpochMilliseconds() - startedAt
+                    val took = clock.now().toEpochMilliseconds() - startedAt
                     log.w { "[refresh:left] error=${error::class.simpleName} took=${took}ms" }
                     // Surface as state, not a snackbar — refresh runs on resume too,
                     // a snackbar per resume on a flaky network would be spammy. The
@@ -57,7 +58,7 @@ class IncomingInvitesViewModel(
                     updateState { copy(refreshing = false, refreshError = error) }
                 },
                 ifRight = { count ->
-                    val took = Clock.System.now().toEpochMilliseconds() - startedAt
+                    val took = clock.now().toEpochMilliseconds() - startedAt
                     log.i { "[refresh:done] pulled=$count took=${took}ms" }
                     updateState { copy(refreshing = false, refreshError = null) }
                 },
@@ -79,7 +80,7 @@ class IncomingInvitesViewModel(
         log.d { "[observe:start] subscribing to listPending" }
         launch {
             listPending().collect { invites ->
-                val now = Clock.System.now()
+                val now = clock.now()
                 val items = invites.map { invite ->
                     // workspaceName resolves only for workspaces the user is already a member of —
                     // i.e. nearly never for incoming invites, since the recipient becomes a member
@@ -116,7 +117,7 @@ class IncomingInvitesViewModel(
             return
         }
         log.i { "[accept:start] id=${id.value}" }
-        val startedAt = Clock.System.now().toEpochMilliseconds()
+        val startedAt = clock.now().toEpochMilliseconds()
         updateState { copy(busyId = id) }
         launch(
             onError = {
@@ -126,12 +127,12 @@ class IncomingInvitesViewModel(
         ) {
             acceptInvite(id).fold(
                 ifLeft = { error ->
-                    val took = Clock.System.now().toEpochMilliseconds() - startedAt
+                    val took = clock.now().toEpochMilliseconds() - startedAt
                     log.w { "[accept:left] id=${id.value} error=${error::class.simpleName} took=${took}ms" }
                     reportFailure(error)
                 },
                 ifRight = {
-                    val took = Clock.System.now().toEpochMilliseconds() - startedAt
+                    val took = clock.now().toEpochMilliseconds() - startedAt
                     log.i { "[accept:done] id=${id.value} took=${took}ms" }
                     updateState { copy(busyId = null) }
                 },
@@ -145,7 +146,7 @@ class IncomingInvitesViewModel(
             return
         }
         log.i { "[decline:start] id=${id.value}" }
-        val startedAt = Clock.System.now().toEpochMilliseconds()
+        val startedAt = clock.now().toEpochMilliseconds()
         updateState { copy(busyId = id) }
         launch(
             onError = {
@@ -155,12 +156,12 @@ class IncomingInvitesViewModel(
         ) {
             declineInvite(id).fold(
                 ifLeft = { error ->
-                    val took = Clock.System.now().toEpochMilliseconds() - startedAt
+                    val took = clock.now().toEpochMilliseconds() - startedAt
                     log.w { "[decline:left] id=${id.value} error=${error::class.simpleName} took=${took}ms" }
                     reportFailure(error)
                 },
                 ifRight = {
-                    val took = Clock.System.now().toEpochMilliseconds() - startedAt
+                    val took = clock.now().toEpochMilliseconds() - startedAt
                     log.i { "[decline:done] id=${id.value} took=${took}ms" }
                     updateState { copy(busyId = null) }
                 },

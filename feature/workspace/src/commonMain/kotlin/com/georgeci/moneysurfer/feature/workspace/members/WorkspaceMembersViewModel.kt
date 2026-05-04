@@ -7,6 +7,7 @@ import com.georgeci.moneysurfer.domain.model.WorkspaceInvite
 import com.georgeci.moneysurfer.domain.model.WorkspaceMember
 import com.georgeci.moneysurfer.domain.model.WorkspaceMemberStatus
 import com.georgeci.moneysurfer.domain.model.WorkspaceRole
+import com.georgeci.moneysurfer.domain.primitives.Clock
 import com.georgeci.moneysurfer.domain.primitives.UserId
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceInviteId
@@ -20,7 +21,6 @@ import com.georgeci.moneysurfer.utils.MviViewModel
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import org.koin.core.annotation.KoinViewModel
-import kotlin.time.Clock
 
 @KoinViewModel
 class WorkspaceMembersViewModel(
@@ -31,6 +31,7 @@ class WorkspaceMembersViewModel(
     private val inviteRepository: WorkspaceInviteRepository,
     private val leaveWorkspace: LeaveWorkspaceUseCase,
     private val cancelInvite: CancelInviteUseCase,
+    private val clock: Clock,
 ) : MviViewModel<WorkspaceMembersState, WorkspaceMembersEvent, WorkspaceMembersEffect>(
     initialState = WorkspaceMembersState.Loading(workspaceId),
 ) {
@@ -119,7 +120,7 @@ class WorkspaceMembersViewModel(
                     val pendingInvites = invites
                         .filter { it.status == InviteStatus.PENDING }
                         .sortedByDescending { it.createdAt }
-                    val now = Clock.System.now()
+                    val now = clock.now()
                     val viewerRole = activeMembers.firstOrNull { it.userId == userId }?.role
 
                     updateState {

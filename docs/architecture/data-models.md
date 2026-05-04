@@ -61,8 +61,8 @@ Rules:
   `createdAt` as tiebreaker). Group/render by local day in UI via
   `instant.toLocalDateTime(zone).date`.
 - Never group by `epochMillis / dayMs` — always go through `TimeZone`.
-- Use `currentInstant()` (in `domain/primitives`) for "now"; do not call
-  `Clock.System.now()` directly outside that abstraction.
+- Inject `domain.primitives.Clock` and call `clock.now()` for "now"; do not
+  call `kotlin.time.Clock.System.now()` directly outside that abstraction.
 - `kotlin.time.Instant` is the canonical instant type (Workspace already uses
   it). Do not introduce `kotlinx.datetime.Instant` in new code.
 <!-- AI:END -->

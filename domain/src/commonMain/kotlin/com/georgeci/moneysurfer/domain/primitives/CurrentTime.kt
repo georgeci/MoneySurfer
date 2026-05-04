@@ -12,5 +12,4 @@ import kotlin.time.Instant
 @Single
 class Clock {
     fun now(): Instant = KotlinClock.System.now()
-    fun nowMillis(): Long = now().toEpochMilliseconds()
 }
