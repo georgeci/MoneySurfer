@@ -45,9 +45,21 @@ kotlin {
                 implementation(libs.koin.core)
                 implementation(libs.koin.compose.viewmodel)
                 implementation(libs.koin.annotations)
-                implementation(projects.domain)
-                implementation(projects.uikit)
+                api(projects.domain)
+                api(projects.uikit)
                 implementation(projects.utils)
+                api(projects.dataLocal)
+                api(projects.navigation)
+                api(projects.feature.account)
+                api(projects.feature.category)
+                api(projects.feature.dashboard)
+                api(projects.feature.login)
+                api(projects.feature.settings)
+                api(projects.feature.transaction)
+                api(projects.feature.workspace)
+                implementation(libs.androidx.room.runtime)
+                implementation(libs.androidx.datastore.preferences)
+                implementation(libs.koin.compose)
                 implementation(libs.arrow.core)
                 implementation(libs.arrow.optics)
                 implementation(libs.kermit)
@@ -68,6 +80,8 @@ kotlin {
 
         androidMain {
             dependencies {
+                implementation(libs.androidx.activity.compose)
+                implementation(libs.androidx.core.ktx)
             }
         }
 
