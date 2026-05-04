@@ -11,8 +11,9 @@ import com.georgeci.moneysurfer.domain.model.InviteStatus
 import com.georgeci.moneysurfer.domain.model.User
 import com.georgeci.moneysurfer.domain.model.WorkspaceMemberStatus
 import com.georgeci.moneysurfer.domain.model.WorkspaceRole
+import com.georgeci.moneysurfer.domain.primitives.Clock
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
-import com.georgeci.moneysurfer.domain.primitives.currentInstant
+import kotlin.time.Clock as KotlinClock
 import com.georgeci.moneysurfer.domain.repositories.UserRemoteRepository
 import com.georgeci.moneysurfer.domain.repositories.WorkspaceSyncer
 import io.kotest.core.spec.style.StringSpec
@@ -42,7 +43,7 @@ class AcceptInviteUseCaseTest : StringSpec({
 
     "rejects when invite is expired" {
         val env = AcceptInviteEnv()
-        val past = currentInstant() - kotlin.time.Duration.parse("1s")
+        val past = KotlinClock.System.now() - kotlin.time.Duration.parse("1s")
         env.invites.seed(
             aWorkspaceInvite(
                 id = INV_ID,
@@ -145,7 +146,7 @@ private class AcceptInviteEnv(
         userRemoteRepository = userRemote,
         workspaceSyncer = syncer,
         session = session,
-        getCurrentTime = GetCurrentTimeUseCase(),
+        getCurrentTime = GetCurrentTimeUseCase(Clock()),
     )
 }
 

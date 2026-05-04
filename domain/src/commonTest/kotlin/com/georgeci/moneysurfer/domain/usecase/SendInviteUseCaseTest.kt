@@ -9,6 +9,7 @@ import com.georgeci.moneysurfer.domain.fixtures.workspaceId
 import com.georgeci.moneysurfer.domain.model.InviteStatus
 import com.georgeci.moneysurfer.domain.model.WorkspaceMemberStatus
 import com.georgeci.moneysurfer.domain.model.WorkspaceRole
+import com.georgeci.moneysurfer.domain.primitives.Clock
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceInviteId
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
@@ -156,7 +157,7 @@ private class SendInviteEnv(
         NoopUserRemoteRepository(),
 ) {
     val session = InMemorySessionPointers(currentUserId = currentUserId)
-    val getNow = GetCurrentTimeUseCase()
+    val getNow = GetCurrentTimeUseCase(Clock())
     fun now(): kotlin.time.Instant = getNow()
     val useCase = SendInviteUseCase(
         memberRepository = members,

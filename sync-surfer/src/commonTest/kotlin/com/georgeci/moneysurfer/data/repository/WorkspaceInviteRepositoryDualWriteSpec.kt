@@ -96,7 +96,7 @@ private fun buildInviteRig(uid: String?): InviteTestRig {
         session = InMemorySessionPointers(currentFirebaseUid = uid),
         appVersionGate = InviteFakeAppVersionGate(),
     )
-    return InviteTestRig(WorkspaceInviteRepositoryImpl(dao, enqueuer), dao, queue)
+    return InviteTestRig(WorkspaceInviteRepositoryImpl(dao, enqueuer, com.georgeci.moneysurfer.domain.primitives.Clock()), dao, queue)
 }
 
 private fun pendingInvite() = WorkspaceInvite(

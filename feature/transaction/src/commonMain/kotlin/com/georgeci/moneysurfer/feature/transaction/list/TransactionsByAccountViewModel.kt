@@ -9,7 +9,7 @@ import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
 import com.georgeci.moneysurfer.domain.primitives.Money
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
-import com.georgeci.moneysurfer.domain.primitives.currentInstant
+import com.georgeci.moneysurfer.domain.primitives.Clock
 import com.georgeci.moneysurfer.domain.repositories.TransactionRepository
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
@@ -29,6 +29,7 @@ class TransactionsByAccountViewModel(
     private val getTransactionsByAccount: GetTransactionsByAccountUseCase,
     private val getAccountById: GetAccountByIdUseCase,
     private val transactionRepository: TransactionRepository,
+    private val clock: Clock,
 ) : MviViewModel<TransactionsByAccountState, TransactionsByAccountEvent, TransactionsByAccountEffect>(
     initialState = TransactionsByAccountState.Loading(accountId = accountId),
 ) {
@@ -165,7 +166,7 @@ class TransactionsByAccountViewModel(
 
     private fun formatDateLabel(date: LocalDate, zone: TimeZone): String {
         // Best-effort relative label without dragging in full locale-aware formatting.
-        val today = currentInstant().toLocalDateTime(zone).date
+        val today = clock.now().toLocalDateTime(zone).date
         val yesterday = today.toEpochDays().let { LocalDate.fromEpochDays(it - 1) }
         return when (date) {
             today -> "Today"

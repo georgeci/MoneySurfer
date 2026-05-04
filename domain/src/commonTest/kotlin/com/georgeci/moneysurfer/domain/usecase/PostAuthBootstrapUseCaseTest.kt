@@ -3,6 +3,7 @@ package com.georgeci.moneysurfer.domain.usecase
 import arrow.core.Either
 import com.georgeci.moneysurfer.domain.auth.InMemorySessionPointers
 import com.georgeci.moneysurfer.domain.model.User
+import com.georgeci.moneysurfer.domain.primitives.Clock
 import com.georgeci.moneysurfer.domain.primitives.UserId
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 import com.georgeci.moneysurfer.domain.repositories.UserRemoteRepository
@@ -147,7 +148,7 @@ private class BootstrapEnv(
         userRemoteRepository = remote,
         workspaceSyncer = syncer,
         session = session,
-        getCurrentTime = GetCurrentTimeUseCase(),
+        getCurrentTime = GetCurrentTimeUseCase(Clock()),
     )
 }
 

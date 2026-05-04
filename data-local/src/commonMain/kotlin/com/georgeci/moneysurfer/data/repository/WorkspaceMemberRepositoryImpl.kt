@@ -11,7 +11,7 @@ import com.georgeci.moneysurfer.domain.repositories.WorkspaceMemberRepository
 import com.georgeci.moneysurfer.domain.sync.SyncEntityTypes
 import com.georgeci.moneysurfer.sync.repository.MutationOperation
 import com.georgeci.moneysurfer.sync.repository.OutboxEnqueuer
-import com.georgeci.moneysurfer.domain.primitives.currentInstant
+import com.georgeci.moneysurfer.domain.primitives.Clock
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import org.koin.core.annotation.Single
@@ -20,6 +20,7 @@ import org.koin.core.annotation.Single
 class WorkspaceMemberRepositoryImpl(
     private val dao: WorkspaceMemberDao,
     private val outboxEnqueuer: OutboxEnqueuer,
+    private val clock: Clock,
 ) : WorkspaceMemberRepository {
 
     override fun getAll(): Flow<List<WorkspaceMember>> =
@@ -74,7 +75,7 @@ class WorkspaceMemberRepositoryImpl(
         enqueueUpsert(updated, MutationOperation.UPDATE)
     }
 
-    private fun now(): Long = currentInstant().toEpochMillis()
+    private fun now(): Long = clock.nowMillis()
 
     private suspend fun enqueueUpsert(entity: WorkspaceMemberEntity, operation: MutationOperation) {
         outboxEnqueuer.enqueueUpsert(

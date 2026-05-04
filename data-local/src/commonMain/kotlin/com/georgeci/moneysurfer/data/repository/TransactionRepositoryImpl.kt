@@ -17,7 +17,7 @@ import com.georgeci.moneysurfer.domain.repositories.TransactionRepository
 import com.georgeci.moneysurfer.domain.sync.SyncEntityTypes
 import com.georgeci.moneysurfer.sync.repository.MutationOperation
 import com.georgeci.moneysurfer.sync.repository.OutboxEnqueuer
-import com.georgeci.moneysurfer.domain.primitives.currentInstant
+import com.georgeci.moneysurfer.domain.primitives.Clock
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import org.koin.core.annotation.Single
@@ -26,6 +26,7 @@ import org.koin.core.annotation.Single
 class TransactionRepositoryImpl(
     private val dao: TransactionDao,
     private val outboxEnqueuer: OutboxEnqueuer,
+    private val clock: Clock,
 ) : TransactionRepository {
 
     override fun getAll(): Flow<List<Transaction>> =
@@ -79,7 +80,7 @@ class TransactionRepositoryImpl(
         )
     }
 
-    private fun nowMillis(): Long = currentInstant().toEpochMillis()
+    private fun nowMillis(): Long = clock.nowMillis()
 }
 
 private fun TransactionEntity.toDomain() = Transaction(
@@ -142,5 +143,3 @@ private fun parseType(raw: String, amount: Long): TransactionType =
 
 private fun parseStatus(raw: String): TransactionStatus =
     runCatching { TransactionStatus.valueOf(raw) }.getOrDefault(TransactionStatus.ACTUAL)
-
-private fun nowMillis(): Long = currentInstant().toEpochMillis()

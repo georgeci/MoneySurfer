@@ -13,7 +13,7 @@ import com.georgeci.moneysurfer.domain.repositories.WorkspaceInviteRepository
 import com.georgeci.moneysurfer.domain.sync.SyncEntityTypes
 import com.georgeci.moneysurfer.sync.repository.MutationOperation
 import com.georgeci.moneysurfer.sync.repository.OutboxEnqueuer
-import com.georgeci.moneysurfer.domain.primitives.currentInstant
+import com.georgeci.moneysurfer.domain.primitives.Clock
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import org.koin.core.annotation.Single
@@ -22,6 +22,7 @@ import org.koin.core.annotation.Single
 class WorkspaceInviteRepositoryImpl(
     private val dao: WorkspaceInviteDao,
     private val outboxEnqueuer: OutboxEnqueuer,
+    private val clock: Clock,
 ) : WorkspaceInviteRepository {
 
     private val log = Logger.withTag(TAG)
@@ -89,7 +90,7 @@ class WorkspaceInviteRepositoryImpl(
         enqueueUpsert(updated, MutationOperation.UPDATE)
     }
 
-    private fun now(): Long = currentInstant().toEpochMillis()
+    private fun now(): Long = clock.nowMillis()
 
     private suspend fun enqueueUpsert(entity: WorkspaceInviteEntity, operation: MutationOperation) {
         outboxEnqueuer.enqueueUpsert(

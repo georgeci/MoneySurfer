@@ -11,8 +11,9 @@ import com.georgeci.moneysurfer.domain.model.WorkspaceRole
 import com.georgeci.moneysurfer.domain.primitives.CategoryId
 import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
 import com.georgeci.moneysurfer.domain.primitives.UserId
+import com.georgeci.moneysurfer.domain.primitives.Clock
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
-import com.georgeci.moneysurfer.domain.primitives.currentInstant
+import kotlin.time.Clock as KotlinClock
 import com.georgeci.moneysurfer.domain.repositories.CategoryRepository
 import com.georgeci.moneysurfer.domain.repositories.UserRemoteRepository
 import com.georgeci.moneysurfer.domain.repositories.WorkspaceMemberRepository
@@ -43,11 +44,11 @@ class CreateWorkspaceUseCaseTest : StringSpec({
 
     "writes workspace, member, default categories and pins it as current (no Firebase session)" {
         val env = TestEnv(currentUserId = OWNER_ID, firebaseUid = null)
-        val before = currentInstant()
+        val before = KotlinClock.System.now()
 
         val result = env.useCase(defaultParams())
 
-        val after = currentInstant()
+        val after = KotlinClock.System.now()
         result.shouldBeInstanceOf<Either.Right<WorkspaceId>>()
         val newId = result.value
 
@@ -279,7 +280,7 @@ private class TestEnv(
         userRemoteRepository = userRemoteRepo,
         workspaceSyncer = syncer,
         session = session,
-        getCurrentTime = GetCurrentTimeUseCase(),
+        getCurrentTime = GetCurrentTimeUseCase(Clock()),
     )
 }
 

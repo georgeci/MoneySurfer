@@ -103,7 +103,7 @@ private fun build(uid: String?): TestRig {
         session = InMemorySessionPointers(currentFirebaseUid = uid),
         appVersionGate = FakeAppVersionGate(),
     )
-    return TestRig(WorkspaceMemberRepositoryImpl(dao, enqueuer), dao, queue)
+    return TestRig(WorkspaceMemberRepositoryImpl(dao, enqueuer, com.georgeci.moneysurfer.domain.primitives.Clock()), dao, queue)
 }
 
 private fun ownerMember() = WorkspaceMember(
