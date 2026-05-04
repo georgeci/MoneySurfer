@@ -85,6 +85,7 @@ fun loadMaestroTestUser(rootDir: File): Map<String, String> =
         .filterKeys { it in setOf("TEST_EMAIL", "TEST_PASSWORD") }
 
 val androidMaestroAppId = "com.georgeci.moneysurfer.dev"
+val iosMaestroAppId = "com.georgeci.moneysurfer"
 
 fun buildMaestroCommand(
     rootDir: File,
@@ -92,8 +93,16 @@ fun buildMaestroCommand(
     junitOutput: File? = null,
     excludeTags: List<String> = emptyList(),
     appId: String = androidMaestroAppId,
+    platform: String? = null,
+    deviceId: String? = null,
 ): List<String> {
     val command = mutableListOf(resolveMaestroExecutable(), "test")
+    if (!platform.isNullOrBlank()) {
+        command += listOf("--platform", platform)
+    }
+    if (!deviceId.isNullOrBlank()) {
+        command += listOf("--device", deviceId)
+    }
     val env = loadMaestroTestUser(rootDir) + mapOf("APP_ID" to appId)
     env.forEach { (key, value) ->
         command += listOf("--env", "$key=$value")
@@ -180,8 +189,20 @@ val maestroLogsDir = rootProject.file("build/logs/maestro")
 val maestroDebugDir = rootProject.file("build/maestro-debug")
 val maestroArtifactsDir = rootProject.file("build/maestro-artifacts")
 val maestroAllureResultsDir = rootProject.file("build/allure-results/maestro")
+val maestroIosReportsDir = rootProject.file("build/test-results/maestro-ios")
+val maestroIosAllFlowsJunit = maestroIosReportsDir.resolve("maestro-ios-report.xml")
+val maestroIosLogsDir = rootProject.file("build/logs/maestro-ios")
+val maestroIosDebugDir = rootProject.file("build/maestro-ios-debug")
+val maestroIosArtifactsDir = rootProject.file("build/maestro-ios-artifacts")
+val maestroIosAllureResultsDir = rootProject.file("build/allure-results/maestro-ios")
 val maestroEmulatorEnv = loadMaestroTestUser(rootDir) + mapOf("APP_ID" to androidMaestroAppId)
+val maestroIosEmulatorEnv = loadMaestroTestUser(rootDir) + mapOf("APP_ID" to iosMaestroAppId)
+val iosMaestroDeviceId = providers.gradleProperty("iosSimulatorUdid").orNull
+    ?: System.getenv("IOS_SIMULATOR_UDID")
 val maestroSetupTags = listOf("setup")
+
+val iosMaestroDerivedDataDir = rootProject.file("build/ios-maestro")
+val iosMaestroAppPath = iosMaestroDerivedDataDir.resolve("Build/Products/Debug-iphonesimulator/MoneySurfer.app")
 
 val firestoreTestsDir = rootProject.file("firestore-tests")
 val firestoreReportsDir = rootProject.file("build/test-results/firestore")
@@ -192,6 +213,7 @@ val allureCommonDir = allureRootDir.resolve("common")
 val allureAndroidHostDir = allureRootDir.resolve("android-host")
 val allureAndroidDeviceDir = allureRootDir.resolve("android-device")
 val allureMaestroDir = allureRootDir.resolve("maestro")
+val allureMaestroIosDir = allureRootDir.resolve("maestro-ios")
 val allureFirestoreDir = allureRootDir.resolve("firestore")
 val allureAllDir = allureRootDir.resolve("all")
 
@@ -230,6 +252,7 @@ val androidDeviceScopeAllureSources: List<File> =
     androidDeviceScopeModules.map(::moduleAndroidDeviceResults)
 
 val maestroAllureSources: List<File> = listOf(maestroAllureResultsDir)
+val maestroIosAllureSources: List<File> = listOf(maestroIosAllureResultsDir)
 
 val firestoreAllureSources: List<File> = listOf(firestoreReportsDir)
 
@@ -413,6 +436,98 @@ tasks.register("maestroRun") {
     dependsOn("maestroRunAllAndroid")
 }
 
+tasks.register<Exec>("maestroBuildIosSimulator") {
+    group = "verification"
+    description = "Build iOS Debug simulator app with MS_USE_EMULATOR=YES for Maestro E2E tests."
+    notCompatibleWithConfigurationCache("Spawns xcodebuild.")
+    workingDir = rootDir
+    val simulatorName = providers.gradleProperty("iosSimulatorName").orNull
+        ?: System.getenv("IOS_SIMULATOR_NAME")
+        ?: "iPhone 17"
+    commandLine(
+        "xcodebuild",
+        "-project", "iosApp/iosApp.xcodeproj",
+        "-scheme", "iosApp",
+        "-configuration", "Debug",
+        "-sdk", "iphonesimulator",
+        "-destination", "platform=iOS Simulator,name=$simulatorName",
+        "-derivedDataPath", iosMaestroDerivedDataDir.absolutePath,
+        "MS_USE_EMULATOR=YES",
+        "SKIP_CRASHLYTICS_UPLOAD=YES",
+        "build",
+    )
+}
+
+tasks.register<Exec>("maestroInstallIosSimulator") {
+    group = "verification"
+    description = "Build and install the iOS simulator app on the booted Simulator."
+    notCompatibleWithConfigurationCache("Uses xcrun simctl against the currently booted simulator.")
+    dependsOn("maestroBuildIosSimulator")
+    doFirst {
+        require(iosMaestroAppPath.exists()) {
+            "iOS app not found at ${iosMaestroAppPath.absolutePath}. Run maestroBuildIosSimulator first."
+        }
+        commandLine("xcrun", "simctl", "install", "booted", iosMaestroAppPath.absolutePath)
+    }
+}
+
+tasks.register<Exec>("maestroRunAllIos") {
+    group = "verification"
+    description = "Install iOS simulator app + run all Maestro flows (Firebase Emulator must be running)."
+    dependsOn("maestroInstallIosSimulator")
+    commandLine(
+        buildMaestroCommand(
+            rootDir = rootDir,
+            target = "scripts/maestro/",
+            excludeTags = maestroSetupTags,
+            appId = iosMaestroAppId,
+            platform = "ios",
+            deviceId = iosMaestroDeviceId,
+        ),
+    )
+}
+
+tasks.register<Exec>("maestroRunAllIosJunit") {
+    group = "verification"
+    description = "Install iOS simulator app, run all flows, write JUnit XML to build/test-results/maestro-ios/maestro-ios-report.xml."
+    notCompatibleWithConfigurationCache("Wires dynamic log streams in doFirst.")
+    dependsOn("maestroInstallIosSimulator")
+    finalizedBy("allureGenerateMaestroIos")
+    isIgnoreExitValue = true
+    val stdoutLog = maestroIosLogsDir.resolve("maestroRunAllIosJunit.out.log")
+    val stderrLog = maestroIosLogsDir.resolve("maestroRunAllIosJunit.err.log")
+    doFirst {
+        maestroIosReportsDir.mkdirs()
+        maestroIosLogsDir.mkdirs()
+        maestroIosDebugDir.mkdirs()
+        maestroIosArtifactsDir.mkdirs()
+        standardOutput = FileOutputStream(stdoutLog)
+        errorOutput = FileOutputStream(stderrLog)
+        logger.lifecycle("[maestro-ios] junit: ${maestroIosAllFlowsJunit.relativeTo(rootProject.projectDir)}")
+        logger.lifecycle("[maestro-ios] logs : ${stdoutLog.relativeTo(rootProject.projectDir)}, ${stderrLog.relativeTo(rootProject.projectDir)}")
+    }
+    commandLine(
+        buildMaestroCommand(
+            rootDir = rootDir,
+            target = "scripts/maestro/",
+            junitOutput = maestroIosAllFlowsJunit,
+            excludeTags = maestroSetupTags,
+            appId = iosMaestroAppId,
+            platform = "ios",
+            deviceId = iosMaestroDeviceId,
+        ),
+    )
+    doLast {
+        val exit = executionResult.get().exitValue
+        if (exit != 0) {
+            val summary = summarizeMaestroJunit(maestroIosAllFlowsJunit)
+            throw GradleException(
+                "maestroRunAllIosJunit failed (exit=$exit). $summary Logs: ${stdoutLog.absolutePath} and ${stderrLog.absolutePath}",
+            )
+        }
+    }
+}
+
 // -- Hermetic integration-test pipeline --------------------------------------
 //
 // The :integration-test androidDeviceTest suite needs TWO emulators alive:
@@ -557,6 +672,7 @@ registerAllureGenerate("allureGenerateCommon", "common (JVM)", commonScopeAllure
 registerAllureGenerate("allureGenerateAndroidHost", "Android host", androidHostScopeAllureSources, allureAndroidHostDir)
 registerAllureGenerate("allureGenerateAndroidDevice", "Android device", androidDeviceScopeAllureSources, allureAndroidDeviceDir)
 registerAllureGenerate("allureGenerateMaestro", "Maestro", maestroAllureSources, allureMaestroDir)
+registerAllureGenerate("allureGenerateMaestroIos", "Maestro iOS", maestroIosAllureSources, allureMaestroIosDir)
 registerAllureGenerate("allureGenerateFirestore", "Firestore rules (Mocha)", firestoreAllureSources, allureFirestoreDir)
 registerAllureGenerate("allureGenerateAll", "all", allScopeAllureSources, allureAllDir)
 
@@ -582,6 +698,30 @@ tasks.register<Exec>("maestroPrepareAllureResults") {
 
 tasks.named<Exec>("allureGenerateMaestro") {
     dependsOn("maestroPrepareAllureResults")
+}
+
+tasks.register<Exec>("maestroPrepareAllureResultsIos") {
+    group = "verification"
+    description = "Convert iOS Maestro JUnit + debug artifacts into native Allure results with test steps and screenshots."
+    notCompatibleWithConfigurationCache("Produces dynamic files from test artifacts.")
+    doFirst {
+        maestroIosAllureResultsDir.mkdirs()
+        maestroIosReportsDir.mkdirs()
+    }
+    commandLine(
+        "python3",
+        rootDir.resolve("scripts/maestro/maestro_to_allure.py").absolutePath,
+        "--junit", maestroIosAllFlowsJunit.absolutePath,
+        "--debug-dir", maestroIosDebugDir.absolutePath,
+        "--artifacts-dir", maestroIosArtifactsDir.absolutePath,
+        "--out-dir", maestroIosAllureResultsDir.absolutePath,
+        "--pipeline",
+        "qaMaestroIos -> maestroInstallIosSimulator -> maestroBuildIosSimulator -> xcodebuild(Debug iphonesimulator, MS_USE_EMULATOR=YES) -> firebase emulators:exec(auth,firestore) -> scripts/firebase/seed.sh -> maestro test --format junit --debug-output --test-output-dir -> maestroPrepareAllureResultsIos -> allureGenerateMaestroIos",
+    )
+}
+
+tasks.named<Exec>("allureGenerateMaestroIos") {
+    dependsOn("maestroPrepareAllureResultsIos")
 }
 
 tasks.named<Exec>("allureGenerateAll") {
@@ -703,6 +843,64 @@ tasks.register("qaMaestro") {
     group = "verification"
     description = "Alias for qaMaestroAndroid."
     dependsOn("qaMaestroAndroid")
+}
+
+/**
+ * Boots Auth + Firestore emulators → seeds test users → runs all Maestro flows
+ * against the currently booted iOS Simulator → tears down. The Debug simulator
+ * app is built with Info.plist `MS_USE_EMULATOR=YES`, so iOS Firebase uses
+ * `localhost:8080/9099`.
+ */
+tasks.register<Exec>("qaMaestroIos") {
+    group = "verification"
+    description = "Boot Firebase Emulator, seed users, run all iOS Maestro flows, generate Allure report."
+    notCompatibleWithConfigurationCache("Spawns Firebase emulator subprocess.")
+    dependsOn("maestroInstallIosSimulator")
+    finalizedBy("allureGenerateMaestroIos")
+    isIgnoreExitValue = true
+    workingDir = rootDir
+    val maestroBin = resolveMaestroExecutable()
+    val flowsDir = rootDir.resolve("scripts/maestro/").absolutePath
+    val reportPath = maestroIosAllFlowsJunit.absolutePath
+    val debugOutputPath = maestroIosDebugDir.absolutePath
+    val testOutputPath = maestroIosArtifactsDir.absolutePath
+    val envArgs = maestroIosEmulatorEnv.flatMap { (k, v) -> listOf("--env", "$k=$v") }
+    doFirst {
+        maestroIosReportsDir.mkdirs()
+        maestroIosDebugDir.mkdirs()
+        maestroIosArtifactsDir.mkdirs()
+    }
+    commandLine(
+        listOf(
+            "firebase", "emulators:exec",
+            "--project", "demo-moneysurfer",
+            "--only", "auth,firestore",
+        ) + listOf(
+            (listOf("scripts/firebase/seed.sh", "&&", maestroBin, "test") + envArgs +
+                listOf(
+                    "--platform", "ios",
+                ) + iosMaestroDeviceId?.let { listOf("--device", it) }.orEmpty() +
+                listOf(
+                    "--format", "junit",
+                    "--output", reportPath,
+                    "--debug-output", debugOutputPath,
+                    "--test-output-dir", testOutputPath,
+                    "--flatten-debug-output",
+                    "--exclude-tags", "setup",
+                    flowsDir,
+                ))
+                .joinToString(" "),
+        ),
+    )
+    doLast {
+        val exit = executionResult.get().exitValue
+        if (exit != 0) {
+            val summary = summarizeMaestroJunit(maestroIosAllFlowsJunit)
+            throw GradleException(
+                "qaMaestroIos failed (exit=$exit). $summary JUnit: ${maestroIosAllFlowsJunit.absolutePath}",
+            )
+        }
+    }
 }
 
 tasks.register("qaAll") {
