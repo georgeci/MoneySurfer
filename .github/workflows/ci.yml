@@ -206,13 +206,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Java is required by the Firebase Emulator Suite (Firestore emulator
-      # ships as a JAR that `firebase-tools` launches).
+      # firebase-tools ≥14 requires JDK 21+ (the Firestore emulator JAR no
+      # longer runs on 17). Other CI jobs stay on 17 — only this job needs 21.
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: "17"
+          java-version: "21"
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
