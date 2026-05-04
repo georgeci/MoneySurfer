@@ -1,0 +1,77 @@
+plugins {
+    alias(libs.plugins.kotlinMultiplatform)
+    alias(libs.plugins.androidKotlinMultiplatformLibrary)
+    alias(libs.plugins.androidLint)
+    alias(libs.plugins.composeMultiplatform)
+    alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.kotlinSerialization)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.koin.compiler)
+    alias(libs.plugins.kotest.multiplatform)
+    alias(libs.plugins.kmp.lib)
+}
+
+kotlin {
+    android {
+        namespace = "com.georgeci.moneysurfer.navigation"
+    }
+
+    sourceSets {
+        commonMain {
+            dependencies {
+                implementation(libs.kotlin.stdlib)
+                implementation(libs.kotlinx.coroutinesCore)
+                implementation(libs.compose.runtime)
+                implementation(libs.compose.foundation)
+                implementation(libs.compose.material3)
+                implementation(libs.compose.ui)
+                implementation(libs.androidx.lifecycle.viewmodelCompose)
+                implementation(libs.androidx.lifecycle.runtimeCompose)
+                api(libs.jetbrains.navigation3.ui)
+                implementation(libs.navigation3.resultstate)
+                implementation(libs.kotlinx.serialization.core)
+                implementation(project.dependencies.platform(libs.koin.bom))
+                implementation(libs.koin.core)
+                implementation(libs.koin.compose)
+                implementation(libs.koin.compose.viewmodel)
+                implementation(libs.koin.annotations)
+                implementation(projects.domain)
+                implementation(projects.sync.api)
+                implementation(projects.uikit)
+                implementation(libs.kermit)
+            }
+        }
+
+        commonTest {
+            dependencies {
+                implementation(libs.kotlin.test)
+                implementation(libs.kotest.framework.engine)
+                implementation(libs.kotest.assertions.core)
+            }
+        }
+
+        jvmTest {
+            dependencies {
+                implementation(libs.kotest.runner.junit5)
+            }
+        }
+
+        getByName("androidHostTest") {
+            dependencies {
+                implementation(libs.kotest.runner.junit5)
+            }
+        }
+    }
+}
+
+koinCompiler {
+    compileSafety = false
+}
+
+tasks.withType<Test>().configureEach {
+    useJUnitPlatform()
+}
+
+tasks.named<Test>("jvmTest") {
+    useJUnitPlatform()
+}

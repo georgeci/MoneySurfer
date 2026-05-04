@@ -1,0 +1,40 @@
+appId: com.georgeci.moneysurfer.dev
+name: Account — Details and transaction filters
+---
+- runFlow: 04_add_transaction.yaml
+
+- tapOn:
+    text: "Main Bank"
+
+- assertVisible:
+    text: "Account"
+- assertVisible:
+    text: "Main Bank"
+- assertVisible:
+    text: "Transactions"
+- assertVisible:
+    text: "Test expense"
+
+- tapOn:
+    text: "Expenses"
+- assertVisible:
+    text: "Test expense"
+
+- tapOn:
+    text: "Income"
+- assertVisible:
+    text: "No transactions yet."
+
+- tapOn:
+    text: "All"
+- assertVisible:
+    text: "Test expense"
+
+- tapOn:
+    text: "See all"
+- assertVisible:
+    text: "Transactions"
+- assertVisible:
+    text: "Test expense"
+- assertVisible:
+    text: "New"

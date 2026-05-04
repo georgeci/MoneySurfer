@@ -1,0 +1,53 @@
+<resources>
+    <!-- Transactions list (by account) -->
+    <string name="transactions_list_title">Транзакции</string>
+    <string name="transactions_list_new">Новая</string>
+    <string name="transactions_list_empty">Пока нет транзакций. Добавьте первую, чтобы она появилась здесь.</string>
+    <string name="transactions_list_empty_filtered">По выбранному фильтру ничего нет.</string>
+    <string name="transactions_list_filter_all">Все</string>
+    <string name="transactions_list_filter_expenses">Расходы</string>
+    <string name="transactions_list_filter_income">Доходы</string>
+    <string name="transactions_list_summary_income">Доход</string>
+    <string name="transactions_list_summary_expenses">Расход</string>
+    <string name="transactions_list_summary_net">Сальдо</string>
+
+    <!-- Transaction creation / edit -->
+    <string name="transaction_creation_title_create">Новая транзакция</string>
+    <string name="transaction_creation_title_edit">Редактирование</string>
+    <string name="transaction_creation_expense">Расход</string>
+    <string name="transaction_creation_income">Доход</string>
+    <string name="transaction_creation_transfer">Перевод</string>
+    <string name="transaction_creation_category_all">Все категории</string>
+    <string name="transaction_creation_category_more">Ещё</string>
+    <string name="transaction_creation_datetime_label">Дата и время</string>
+    <string name="transaction_creation_datetime_placeholder">Сейчас</string>
+    <string name="transaction_creation_today">Сегодня</string>
+    <string name="transaction_creation_amount_label">Сумма</string>
+    <string name="transaction_creation_account_label">Со счёта</string>
+    <string name="transaction_creation_category_label">Категория</string>
+    <string name="transaction_creation_note_label">Заметка</string>
+    <string name="transaction_creation_save">Сохранить</string>
+    <string name="transaction_creation_update">Обновить</string>
+    <string name="transaction_creation_close_content_description">Закрыть</string>
+    <string name="transaction_creation_amount_placeholder">0,00</string>
+    <string name="transaction_creation_account_empty">Счёт не выбран</string>
+
+    <!-- Transaction details -->
+    <string name="transaction_details_title">Транзакция</string>
+    <string name="transaction_details_edit_content_description">Редактировать</string>
+    <string name="transaction_details_delete_content_description">Удалить</string>
+    <string name="transaction_details_delete_title">Удалить транзакцию?</string>
+    <string name="transaction_details_delete_message">«%1$s» будет удалено навсегда. Отменить будет нельзя.</string>
+    <string name="transaction_details_delete_message_generic">Транзакция будет удалена навсегда. Отменить будет нельзя.</string>
+    <string name="transaction_details_delete_confirm">Удалить</string>
+    <string name="transaction_details_delete_cancel">Отмена</string>
+    <string name="transaction_details_type_expense">Расход</string>
+    <string name="transaction_details_type_income">Доход</string>
+    <string name="transaction_details_account_label">Счёт</string>
+    <string name="transaction_details_date_label">Дата</string>
+    <string name="transaction_details_category_label">Категория</string>
+    <string name="transaction_details_currency_label">Валюта</string>
+    <string name="transaction_details_duplicate">Дублировать</string>
+    <string name="transaction_details_status_posted">Проведена</string>
+    <string name="transaction_details_status_planned">Запланирована</string>
+</resources>

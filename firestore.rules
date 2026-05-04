@@ -1,0 +1,223 @@
+// v1.0.0 — 2026-05-04
+rules_version = '2';
+
+// Workspace-scoped tenancy: every per-user document lives under
+// /workspaces/{wid}/... and is gated by membership. The workspace owner can
+// add/remove members. Personal user docs live under /users/{uid}.
+//
+// Soft-delete only — entity collections explicitly enumerate `create, update`
+// and omit `delete`. Clients must `update` with `deletedAt` set instead.
+// Tombstones are pulled by other devices via the cursor-based pull
+// (see sync.md §4.4).
+//
+// Server-side app-version gate: every entity write must carry a
+// `clientVersionCode` int >= MIN_CLIENT_VERSION_CODE. Rejects pushes from
+// builds older than the published cutoff so the data layer is never written
+// in a deprecated shape (see block.md §10).
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isMember(wid) {
+      return signedIn()
+        && exists(/databases/$(database)/documents/workspaces/$(wid)/members/$(request.auth.uid));
+    }
+
+    function isOwner(wid) {
+      return signedIn()
+        && get(/databases/$(database)/documents/workspaces/$(wid)).data.ownerId == request.auth.uid;
+    }
+
+    // Server-side floor for `clientVersionCode`. Static — bump in lockstep with
+    // `appConfig/mobile.minSupportedAppVersionCode` when retiring an old build.
+    // Real force-update enforcement lives client-side in `AppVersionGate`; this
+    // is a backstop that prevents pre-`MIN_CLIENT_VERSION_CODE` payloads from
+    // landing in Firestore.
+    function hasValidClientVersion() {
+      return request.resource.data.clientVersionCode is int
+        && request.resource.data.clientVersionCode >= 1;
+    }
+
+    // Personal user document — workspace pointers, profile metadata.
+    match /users/{uid} {
+      allow read: if signedIn() && request.auth.uid == uid;
+      allow create, update: if signedIn() && request.auth.uid == uid;
+
+      // Any signed-in user may append one workspace ID to `invitedWorkspaceIds`.
+      // Used by the invite sender to seed the recipient's discovery list so the
+      // recipient's next syncAll() finds the invite without a collectionGroup query.
+      //
+      // Guards:
+      //  - only `invitedWorkspaceIds` may change (affectedKeys),
+      //  - only additions are allowed — new list must contain all existing elements
+      //    (hasAll prevents a sender from removing other senders' entries),
+      //  - max one new entry per call (size cap closes list-flooding DoS),
+      //  - total list capped at 100 (guards against accumulated spam).
+      // Removals (accept / decline cleanup) go through the owner rule above.
+      allow update: if signedIn()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['invitedWorkspaceIds'])
+        && request.resource.data.invitedWorkspaceIds.hasAll(resource.data.invitedWorkspaceIds)
+        && request.resource.data.invitedWorkspaceIds.size() == resource.data.invitedWorkspaceIds.size() + 1
+        && request.resource.data.invitedWorkspaceIds.size() <= 100;
+    }
+
+    // email→uid lookup table for invite targetUserId resolution.
+    // Doc id = lowercased email. Single-doc reads only (clients call .get() on the
+    // exact email key); writes restricted to the owner of the uid being mapped AND
+    // to the email key matching that user's Firebase Auth email claim. The email-key
+    // binding closes an email-squatting hole: without it any signed-in user could
+    // pre-write `userEmails/victim@example.com → my_uid` and steal invites addressed
+    // to the victim until the victim's own login overwrote the mapping.
+    match /userEmails/{email} {
+      allow get: if signedIn();
+      allow list: if false; // prevent enumeration via collection scan
+      allow create, update: if signedIn()
+        && request.resource.data.uid == request.auth.uid
+        && request.auth.token.email is string
+        && email == request.auth.token.email.lower();
+      allow delete: if false;
+    }
+
+    // Public read-only app config (force-update gate, see block.md).
+    // Writes go through the Firebase Console.
+    match /appConfig/{docId} {
+      allow read: if true;
+    }
+
+    // Collection-group READ rules for `invites` — MUST be declared on the wildcard
+    // path. Firestore-rules quirk: nested `match /workspaces/{wid}/invites/{...}`
+    // rules do NOT enable collection-group queries; only `match /{path=**}/invites/{...}`
+    // does. Without this block, recipient self-discovery via
+    // `firestore.collectionGroup("invites").where("targetUserId", "==", uid)` fails
+    // with "No matching allow statements" — even when the nested rule is `allow read: if true`.
+    //
+    // Two independent `allow read` clauses (no OR) — Firestore analyzes each in isolation
+    // for collection-group query feasibility:
+    //  1) targetUserId match — primary path. Pure field-equality, fully provable.
+    //  2) email match — fallback for legacy invites without targetUserId. Lower-cases
+    //     both sides because some legacy docs were stored mixed-case before SendInvite
+    //     started normalizing. `is string` guards keep the rule from erroring on docs
+    //     missing the field or tokens missing the email claim.
+    //
+    // Per-doc reads inside a workspace (member roster) and ALL writes still go through
+    // the nested `match /workspaces/{wid}/invites/{inviteId}` block below.
+    match /{path=**}/invites/{inviteId} {
+      allow read: if resource.data.targetUserId == request.auth.uid;
+      allow read: if resource.data.email is string
+        && request.auth.token.email is string
+        && resource.data.email.lower() == request.auth.token.email.lower();
+    }
+
+    match /workspaces/{wid} {
+      allow get, list: if isMember(wid);
+      allow create: if signedIn()
+        && request.resource.data.ownerId == request.auth.uid
+        && hasValidClientVersion();
+      allow update: if isOwner(wid) && hasValidClientVersion();
+      // Hard-delete is denied — owners must mark `deletedAt` via update.
+
+      match /invites/{inviteId} {
+        // Per-doc + per-workspace reads — workspace members can browse the invite
+        // roster. Recipient self-discovery (which uses collection-group queries) is
+        // handled separately by the wildcard `match /{path=**}/invites/{inviteId}`
+        // block above.
+        //
+        // Invitee (non-member) read: AllUserData pull uses fetchInvitesForUser which
+        // adds `where targetUserId == uid`. That query satisfies this rule because every
+        // returned doc will have targetUserId == request.auth.uid.
+        allow read: if isMember(wid);
+        allow read: if resource.data.targetUserId == request.auth.uid;
+
+        // Create: only the owner, must persist a PENDING invite stamped with their uid.
+        allow create: if isOwner(wid)
+          && hasValidClientVersion()
+          && request.resource.data.status == "PENDING"
+          && request.resource.data.invitedByUserId == request.auth.uid;
+
+        // Update: owner can transition (PENDING → CANCELLED, etc.); the invitee can flip
+        // PENDING → ACCEPTED/DECLINED on rows that target them by email or targetUserId.
+        // Email match lower-cases both sides (legacy docs may not be normalized) and
+        // type-guards each access — `request.auth.token.email` is null for accounts
+        // without an email claim (anon, certain OAuth providers) and a raw `.lower()`
+        // on null aborts the whole rule with PERMISSION_DENIED.
+        //
+        // Idempotent re-push: invitee may also re-write the SAME terminal status they
+        // already set. Why: when the outbox retries a mutation whose first push already
+        // landed (e.g. response was lost on the way back), the local doc is still
+        // PENDING but the server is already ACCEPTED/DECLINED. Without this branch the
+        // retry would loop forever as PERMISSION_DENIED. Cannot be exploited to flip
+        // CANCELLED → ACCEPTED because we require resource.data.status to equal the
+        // request status.
+        allow update: if hasValidClientVersion() && (
+             isOwner(wid)
+          || (signedIn()
+              && (
+                   (resource.data.email is string
+                      && request.auth.token.email is string
+                      && resource.data.email.lower() == request.auth.token.email.lower())
+                || resource.data.targetUserId == request.auth.uid
+              )
+              && (
+                   (resource.data.status == "PENDING"
+                      && request.resource.data.status in ["ACCEPTED", "DECLINED"])
+                || (resource.data.status in ["ACCEPTED", "DECLINED"]
+                      && request.resource.data.status == resource.data.status)
+              ))
+        );
+        allow delete: if false;
+      }
+
+      match /members/{uid} {
+        allow read: if isMember(wid);
+        // Owner manages everyone (role, status=REMOVED, snapshots).
+        // A signed-in user may create their own row (accept invite) or
+        // soft-leave their own row (status=LEFT). Self-writes cannot
+        // change role and cannot flip status to REMOVED.
+        allow create:
+          if (isOwner(wid) || request.auth.uid == uid)
+          && hasValidClientVersion();
+        allow update:
+          if hasValidClientVersion() && (
+               isOwner(wid)
+            || (request.auth.uid == uid
+                && request.resource.data.role == resource.data.role
+                && request.resource.data.status in ["ACTIVE", "LEFT"])
+          );
+        allow delete: if false;
+      }
+
+      match /accounts/{aid} {
+        allow read: if isMember(wid);
+        allow create, update: if isMember(wid) && hasValidClientVersion();
+        allow delete: if false;
+      }
+
+      match /categories/{cid} {
+        allow read: if isMember(wid);
+        allow create, update: if isMember(wid) && hasValidClientVersion();
+        allow delete: if false;
+      }
+
+      match /transactions/{tid} {
+        allow read: if isMember(wid);
+        allow create, update: if isMember(wid) && hasValidClientVersion();
+        allow delete: if false;
+      }
+
+      match /budgets/{bid} {
+        allow read: if isMember(wid);
+        allow create, update: if isMember(wid) && hasValidClientVersion();
+        allow delete: if false;
+      }
+
+      match /recurringRules/{rid} {
+        allow read: if isMember(wid);
+        allow create, update: if isMember(wid) && hasValidClientVersion();
+        allow delete: if false;
+      }
+    }
+  }
+}

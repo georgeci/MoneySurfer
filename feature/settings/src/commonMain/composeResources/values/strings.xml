@@ -1,0 +1,219 @@
+<resources>
+    <string name="settings_title">Settings</string>
+    <string name="settings_section_workspace">Workspace</string>
+    <string name="settings_section_appearance">Appearance</string>
+    <string name="settings_section_data">Data</string>
+    <string name="settings_section_cloud">Cloud</string>
+    <string name="settings_section_personalization">Personalization</string>
+    <string name="settings_section_help">Help &amp; info</string>
+
+    <string name="settings_user_name">Kasia Nowak</string>
+    <string name="settings_user_email">kasia@georgeci.com</string>
+
+    <string name="settings_change_workspace">Change workspace</string>
+    <string name="settings_change_workspace_supporting">Currently: Family</string>
+    <string name="settings_members">Members &amp; permissions</string>
+    <string name="settings_members_count_format">%1$d members</string>
+    <string name="settings_pending_invites">Pending invitations</string>
+    <string name="settings_pending_invites_supporting_format">%1$d waiting for you</string>
+    <string name="settings_pending_invites_supporting_empty">No invitations</string>
+
+    <string name="settings_appearance_hub_title">Appearance</string>
+    <string name="settings_appearance_hub_supporting">Theme &amp; accent</string>
+    <string name="settings_appearance_hub_supporting_dynamic">Dynamic palette · system</string>
+    <string name="settings_preferences_hub_title">Preferences</string>
+    <string name="settings_preferences_hub_supporting">EUR · Monday · 24h · 1,234.56</string>
+    <string name="settings_sync_hub_title">Sync</string>
+    <string name="settings_sync_hub_supporting">Synced 4 minutes ago · iCloud</string>
+    <string name="settings_backup">Backup</string>
+    <string name="settings_backup_supporting">Last backup: today, 14:02</string>
+    <string name="settings_about">About &amp; legal</string>
+    <string name="settings_about_supporting_format">v%1$s</string>
+    <string name="settings_feedback">Send feedback</string>
+    <string name="settings_language_title">Language</string>
+    <string name="settings_language_pill">English</string>
+
+    <string name="settings_dark_theme">Dark theme</string>
+    <string name="settings_dark_theme_on">On</string>
+    <string name="settings_dark_theme_off">Off</string>
+    <string name="settings_accent_color">Accent color</string>
+    <string name="settings_accent_color_supporting">Seed: Greenery</string>
+    <string name="settings_dynamic_colors">Dynamic colors</string>
+    <string name="settings_dynamic_colors_supporting">Match system palette</string>
+
+    <string name="settings_export_csv">Export to CSV</string>
+    <string name="settings_notifications">Notifications</string>
+    <string name="settings_notifications_supporting">Budget alerts, weekly summary</string>
+
+    <string name="settings_sync">Sync with Firestore</string>
+    <string name="settings_sync_idle">Push local data, then pull remote changes</string>
+    <string name="settings_sync_in_progress">Syncing…</string>
+    <string name="settings_sync_in_progress_with_step">Syncing… %1$s</string>
+    <string name="settings_sync_no_workspace">No active workspace</string>
+    <string name="settings_sync_done">Pushed %1$d, pulled %2$d</string>
+    <string name="settings_sync_failed">Sync failed: %1$s</string>
+
+    <string name="settings_sync_step_push_workspace">pushing workspace</string>
+    <string name="settings_sync_step_push_members">pushing members</string>
+    <string name="settings_sync_step_push_invites">pushing invites</string>
+    <string name="settings_sync_step_push_accounts">pushing accounts</string>
+    <string name="settings_sync_step_push_categories">pushing categories</string>
+    <string name="settings_sync_step_push_transactions">pushing transactions</string>
+    <string name="settings_sync_step_pull_workspace">pulling workspace</string>
+    <string name="settings_sync_step_pull_members">pulling members</string>
+    <string name="settings_sync_step_pull_invites">pulling invites</string>
+    <string name="settings_sync_step_pull_accounts">pulling accounts</string>
+    <string name="settings_sync_step_pull_categories">pulling categories</string>
+    <string name="settings_sync_step_pull_transactions">pulling transactions</string>
+    <string name="settings_sync_step_clear_accounts">clearing accounts</string>
+    <string name="settings_sync_step_clear_categories">clearing categories</string>
+    <string name="settings_sync_step_clear_transactions">clearing transactions</string>
+    <string name="settings_sync_step_clear_invites">clearing invites</string>
+    <string name="settings_sync_step_clear_members">clearing members</string>
+    <string name="settings_sync_step_clear_workspace">clearing workspace</string>
+
+    <string name="settings_clear_firestore">Clear Firestore</string>
+    <string name="settings_clear_firestore_supporting">Delete remote workspace data; local copy is kept</string>
+    <string name="settings_clear_firestore_done">Deleted %1$d remote docs</string>
+    <string name="settings_clear_firestore_dialog_title">Clear Firestore?</string>
+    <string name="settings_clear_firestore_dialog_message">This deletes all docs under the active workspace on Firestore. Local Room data is untouched.</string>
+    <string name="settings_clear_firestore_dialog_confirm">Delete</string>
+    <string name="settings_clear_firestore_dialog_cancel">Cancel</string>
+
+    <string name="settings_logout">Log out</string>
+    <string name="settings_version_format">MoneySurfer · v%1$s</string>
+
+    <!-- Appearance screen -->
+    <string name="settings_appearance_title">Appearance</string>
+    <string name="settings_appearance_theme_section">Theme</string>
+    <string name="settings_appearance_theme_system">Follow system</string>
+    <string name="settings_appearance_theme_system_supporting">Match device dark mode</string>
+    <string name="settings_appearance_theme_light">Light</string>
+    <string name="settings_appearance_theme_light_supporting">Bright surfaces</string>
+    <string name="settings_appearance_theme_dark">Dark</string>
+    <string name="settings_appearance_theme_dark_supporting">Dim surfaces, less glare</string>
+    <string name="settings_appearance_color_source">Color source</string>
+    <string name="settings_appearance_dynamic_title">Dynamic colors</string>
+    <string name="settings_appearance_dynamic_supporting">Match wallpaper palette</string>
+    <string name="settings_appearance_dynamic_on">Wallpaper-derived palette is in use. Turn off to choose a fixed accent below.</string>
+    <string name="settings_appearance_dynamic_off">Use a fixed accent, or match your wallpaper automatically.</string>
+    <string name="settings_appearance_accent_section">Accent color</string>
+    <string name="settings_appearance_accent_footnote">Colors buttons, highlights, and chart accents.</string>
+    <string name="settings_appearance_accent_footnote_disabled">Disabled while Dynamic colors is on.</string>
+    <string name="settings_appearance_swatch_brand">Default</string>
+    <string name="settings_appearance_swatch_plum">Plum</string>
+    <string name="settings_appearance_swatch_sky">Sky</string>
+    <string name="settings_appearance_swatch_mint">Mint</string>
+    <string name="settings_appearance_swatch_rose">Rose</string>
+    <string name="settings_appearance_card_style_section">Card style</string>
+    <string name="settings_appearance_card_style_filled_title">Filled</string>
+    <string name="settings_appearance_card_style_filled_supporting">Solid surfaces, no border</string>
+    <string name="settings_appearance_card_style_outlined_title">Outlined</string>
+    <string name="settings_appearance_card_style_outlined_supporting">Bordered surfaces, no fill</string>
+    <string name="settings_appearance_card_style_card_title">Card</string>
+    <string name="settings_appearance_card_style_card_supporting">Elevated surfaces with shadow</string>
+    <string name="settings_appearance_live_preview_title">Live preview</string>
+    <string name="settings_appearance_live_preview_supporting">Changes apply instantly across the app</string>
+
+    <!-- Preferences screen -->
+    <string name="settings_preferences_title">Preferences</string>
+    <string name="settings_preferences_section_locale">Language &amp; region</string>
+    <string name="settings_preferences_locale_footnote">Used across menus, dates, and number formatting.</string>
+    <string name="settings_preferences_language_title">App language</string>
+    <string name="settings_preferences_language_supporting">Overrides system language for this app</string>
+    <string name="settings_preferences_language_pill">English</string>
+    <string name="settings_preferences_region_title">Region</string>
+    <string name="settings_preferences_region_supporting">Affects currency and date defaults</string>
+    <string name="settings_preferences_region_pill">Poland</string>
+    <string name="settings_preferences_section_money">Money</string>
+    <string name="settings_preferences_currency_title">Default currency</string>
+    <string name="settings_preferences_currency_supporting">Used for new accounts and totals</string>
+    <string name="settings_preferences_currency_pill">EUR · €</string>
+    <string name="settings_preferences_number_format_title">Number format</string>
+    <string name="settings_preferences_number_format_pill">1,234.56</string>
+    <string name="settings_preferences_hide_title">Hide amounts on home screen</string>
+    <string name="settings_preferences_hide_supporting">Show ••• until tapped</string>
+    <string name="settings_preferences_section_calendar">Calendar</string>
+    <string name="settings_preferences_week_title">Week starts on</string>
+    <string name="settings_preferences_week_pill">Monday</string>
+    <string name="settings_preferences_hour_title">Time format</string>
+    <string name="settings_preferences_hour_pill">24-hour</string>
+    <string name="settings_preferences_section_behavior">Behavior</string>
+    <string name="settings_preferences_behavior_footnote">These tune how the app feels day-to-day.</string>
+    <string name="settings_preferences_default_txn_title">Default new-transaction type</string>
+    <string name="settings_preferences_default_txn_pill">Expense</string>
+    <string name="settings_preferences_auto_categorize_title">Auto-categorize</string>
+    <string name="settings_preferences_auto_categorize_supporting">Suggest a category from merchant</string>
+    <string name="settings_preferences_round_up_title">Round-up savings</string>
+    <string name="settings_preferences_round_up_supporting">Round purchases up to nearest €1</string>
+
+    <!-- Sync screen -->
+    <string name="settings_sync_title">Sync</string>
+    <string name="settings_sync_hero_idle_title">Up to date</string>
+    <string name="settings_sync_hero_idle_supporting">Last sync: today, 14:02</string>
+    <string name="settings_sync_hero_progress_title">Syncing…</string>
+    <string name="settings_sync_section_account">Cloud account</string>
+    <string name="settings_sync_cloud_account_title">iCloud</string>
+    <string name="settings_sync_cloud_account_supporting">kasia@georgeci.com · 18 MB used</string>
+    <string name="settings_sync_auto_title">Auto-sync</string>
+    <string name="settings_sync_auto_supporting">Keeps every device in sync</string>
+    <string name="settings_sync_section_network">Network</string>
+    <string name="settings_sync_network_footnote">Cellular sync uses your data plan. Off by default to save data.</string>
+    <string name="settings_sync_cellular_title">Sync over cellular</string>
+    <string name="settings_sync_cellular_supporting">Off — Wi-Fi only</string>
+    <string name="settings_sync_background_title">Sync in background</string>
+    <string name="settings_sync_background_supporting">Push when app is closed</string>
+    <string name="settings_sync_action_force">Force sync now</string>
+
+    <!-- Backup screen -->
+    <string name="settings_backup_title">Backup</string>
+    <string name="settings_backup_hero_title">Last backup · today</string>
+    <string name="settings_backup_hero_supporting">14:02 · 18 MB · 2,341 transactions</string>
+    <string name="settings_backup_section_schedule">Schedule</string>
+    <string name="settings_backup_schedule_footnote">Backups are end-to-end encrypted with your account key.</string>
+    <string name="settings_backup_frequency_title">Backup frequency</string>
+    <string name="settings_backup_frequency_pill">Daily</string>
+    <string name="settings_backup_encryption_title">Encryption</string>
+    <string name="settings_backup_encryption_supporting">AES-256, end-to-end</string>
+    <string name="settings_backup_location_title">Storage location</string>
+    <string name="settings_backup_location_pill">iCloud</string>
+    <string name="settings_backup_section_manual">Manual</string>
+    <string name="settings_backup_back_up_now_title">Back up now</string>
+    <string name="settings_backup_back_up_now_supporting">Force a fresh snapshot</string>
+    <string name="settings_backup_download_title">Download a copy</string>
+    <string name="settings_backup_download_supporting">.ledger archive · 18 MB</string>
+    <string name="settings_backup_section_restore">Restore</string>
+    <string name="settings_backup_restore_title">Restore from backup</string>
+    <string name="settings_backup_restore_supporting">Replaces current data</string>
+    <string name="settings_backup_delete_title">Delete cloud backup</string>
+    <string name="settings_backup_delete_supporting">Removes all backups from iCloud</string>
+
+    <!-- About screen -->
+    <string name="settings_about_title">About &amp; legal</string>
+    <string name="settings_about_brand">MoneySurfer</string>
+    <string name="settings_about_brand_letter">M</string>
+    <string name="settings_about_version_format">v%1$s · build 2025.04 · iOS / Android</string>
+    <string name="settings_about_chip_made_by">Made by georgeci</string>
+    <string name="settings_about_chip_warsaw">Warsaw, PL</string>
+    <string name="settings_about_section_legal">Legal</string>
+    <string name="settings_about_terms_title">Terms of service</string>
+    <string name="settings_about_privacy_title">Privacy policy</string>
+    <string name="settings_about_privacy_supporting">What we collect &amp; why</string>
+    <string name="settings_about_licenses_title">Open-source licenses</string>
+    <string name="settings_about_licenses_supporting">34 packages</string>
+    <string name="settings_about_section_help">Help</string>
+    <string name="settings_about_help_center_title">Help center</string>
+    <string name="settings_about_help_center_supporting">Guides &amp; FAQ</string>
+    <string name="settings_about_contact_title">Contact support</string>
+    <string name="settings_about_contact_supporting">hello@georgeci.com</string>
+    <string name="settings_about_rate_title">Rate MoneySurfer</string>
+    <string name="settings_about_rate_supporting">On the App Store</string>
+    <string name="settings_about_section_system">System</string>
+    <string name="settings_about_region_title">Region &amp; language</string>
+    <string name="settings_about_region_pill">English (UK)</string>
+    <string name="settings_about_diagnostic_title">Diagnostic info</string>
+    <string name="settings_about_diagnostic_supporting">Tap to copy</string>
+    <string name="settings_about_copyright">© 2025 georgeci sp. z o.o. All rights reserved.\nMoneySurfer is a personal-finance tracker, not a bank or money-transmission service.</string>
+    <string name="settings_categories_title">Categories</string>
+    <string name="settings_categories_supporting">Manage your spending and income categories</string>
+</resources>

@@ -1,0 +1,41 @@
+<resources>
+    <!-- Category chooser bottom sheet -->
+    <string name="transaction_creation_category_sheet_title">Выберите категорию</string>
+    <string name="transaction_creation_category_search">Поиск категорий</string>
+    <string name="transaction_creation_category_section_expense">Расходы</string>
+    <string name="transaction_creation_category_section_income">Доходы</string>
+    <string name="transaction_creation_category_create_new">Создать категорию</string>
+    <string name="transaction_creation_category_empty">Нет категорий</string>
+
+    <!-- Category creation / edit -->
+    <string name="category_creation_title_create">Новая категория</string>
+    <string name="category_creation_title_edit">Изменить категорию</string>
+    <string name="category_creation_close_content_description">Закрыть</string>
+    <string name="category_creation_cancel">Отмена</string>
+    <string name="category_creation_save">Сохранить</string>
+    <string name="category_creation_type_label">Тип</string>
+    <string name="category_creation_type_expense">Расход</string>
+    <string name="category_creation_type_income">Доход</string>
+    <string name="category_creation_name_label">Название</string>
+    <string name="category_creation_icon_label">Иконка</string>
+    <string name="category_creation_color_label">Цвет</string>
+    <string name="category_creation_extra_label">Доп. детали</string>
+    <string name="category_creation_extra_optional">Необязательно</string>
+    <string name="category_creation_add_another">Добавить</string>
+    <string name="category_creation_field_cap">Лимит в месяц</string>
+    <string name="category_creation_field_cap_helper">Напомним, когда тратишь 80%.</string>
+    <string name="category_creation_field_parent">Родительская категория</string>
+    <string name="category_creation_field_note">Заметка</string>
+    <string name="category_creation_remove">Убрать</string>
+    <string name="category_creation_untitled">Без названия</string>
+
+    <!-- Categories management screen -->
+    <string name="categories_manage_title">Категории</string>
+    <string name="categories_manage_add">Новая категория</string>
+    <string name="categories_manage_empty">Категорий пока нет</string>
+    <string name="categories_manage_remove">Удалить</string>
+    <string name="categories_manage_delete_title">Удалить категорию?</string>
+    <string name="categories_manage_delete_message">«%1$s» будет удалена. Транзакции с ней останутся.</string>
+    <string name="categories_manage_delete_confirm">Удалить</string>
+    <string name="categories_manage_delete_cancel">Отмена</string>
+</resources>

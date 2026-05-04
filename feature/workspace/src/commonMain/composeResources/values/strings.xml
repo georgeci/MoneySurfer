@@ -1,0 +1,110 @@
+<resources>
+    <!-- Workspace selector -->
+    <string name="workspace_selector_title">Workspaces</string>
+    <string name="workspace_selector_heading_title">Choose a workspace</string>
+    <string name="workspace_selector_heading_subtitle">Each workspace has its own budgets, accounts and members.</string>
+    <string name="workspace_selector_empty">No workspaces available for this user.</string>
+    <string name="workspace_selector_create_title">New workspace</string>
+    <string name="workspace_selector_create_subtitle">For a trip, side project, or anything</string>
+    <string name="workspace_selector_edit_content_description">Edit workspace</string>
+    <string name="workspace_selector_action_edit">Edit</string>
+    <string name="workspace_selector_action_members">Members</string>
+    <string name="workspace_selector_use_workspace">Use %1$s</string>
+    <string name="workspace_selector_continue">Select workspace</string>
+
+    <!-- Workspace members -->
+    <string name="workspace_members_title_format">%1$s · Members</string>
+    <string name="workspace_members_subtitle_owner_format">%1$d people · you own this workspace</string>
+    <string name="workspace_members_subtitle_editor_format">%1$d people · you can edit data</string>
+    <string name="workspace_members_subtitle_viewer_format">%1$d people · view-only access</string>
+    <string name="workspace_members_subtitle_unknown_format">%1$d people</string>
+    <string name="workspace_members_invite_title">Invite people</string>
+    <string name="workspace_members_invite_subtitle">Send an email invitation</string>
+    <string name="workspace_members_close_content_description">Close</string>
+    <string name="workspace_members_role_owner">Owner</string>
+    <string name="workspace_members_role_editor">Editor</string>
+    <string name="workspace_members_role_viewer">Viewer</string>
+    <string name="workspace_members_tab_active_format">Active · %1$d</string>
+    <string name="workspace_members_tab_invited_format">Invited · %1$d</string>
+    <string name="workspace_members_invite_status_pending">Pending</string>
+    <string name="workspace_members_invite_status_expired">Expired</string>
+    <string name="workspace_members_invites_empty">No pending invitations</string>
+    <string name="workspace_members_view_only_hint">Only the owner can invite or change roles.</string>
+    <string name="workspace_members_invite_cancel_content_description">Cancel invite</string>
+    <string name="workspace_members_leave">Leave workspace</string>
+    <string name="workspace_members_leave_title_format">Leave %1$s?</string>
+    <string name="workspace_members_leave_message_format">You will lose access to all accounts, transactions and reports in %1$s. Re-joining requires a new invite.</string>
+    <string name="workspace_members_leave_confirm">Leave</string>
+    <string name="workspace_members_leave_cancel">Cancel</string>
+    <string name="workspace_members_role_owner_label">Owner</string>
+    <string name="workspace_members_role_editor_label">Editor</string>
+    <string name="workspace_members_role_viewer_label">Viewer</string>
+
+    <!-- Invite member screen -->
+    <string name="workspace_invite_title">Invite member</string>
+    <string name="workspace_invite_close_content_description">Close</string>
+    <string name="workspace_invite_email_label">Email</string>
+    <string name="workspace_invite_email_helper">They will get an email with a link to join.</string>
+    <string name="workspace_invite_role_label">Role</string>
+    <string name="workspace_invite_role_editor_title">Editor</string>
+    <string name="workspace_invite_role_editor_hint">Add and edit transactions</string>
+    <string name="workspace_invite_role_viewer_title">View-only</string>
+    <string name="workspace_invite_role_viewer_hint">Read-only access</string>
+    <string name="workspace_invite_send">Send invite</string>
+    <string name="workspace_invite_error_invalid">That doesn't look like a valid email.</string>
+    <string name="workspace_invite_error_already_member">This person is already a member of the workspace.</string>
+    <string name="workspace_invite_error_already_invited">An invitation is already pending for this email.</string>
+    <string name="workspace_invite_error_user_not_found">No MoneySurfer account is registered with this email.</string>
+    <string name="workspace_invite_error_not_owner">Only the owner can invite new members.</string>
+    <string name="workspace_invite_error_unknown">Couldn't send the invitation. Please try again.</string>
+
+    <!-- Member actions sheet -->
+    <string name="workspace_member_actions_role_label">Role</string>
+    <string name="workspace_member_actions_role_editor_hint">Can add and edit transactions</string>
+    <string name="workspace_member_actions_role_viewer_hint">Read-only access</string>
+    <string name="workspace_member_actions_remove">Remove from workspace</string>
+    <string name="workspace_member_actions_remove_hint">They lose access immediately</string>
+    <string name="workspace_member_actions_confirm_remove_title_format">Remove %1$s?</string>
+    <string name="workspace_member_actions_confirm_remove_message">They lose access to this workspace immediately. Their past transactions stay attributed to them.</string>
+    <string name="workspace_member_actions_confirm_remove_confirm">Remove</string>
+    <string name="workspace_member_actions_confirm_remove_cancel">Cancel</string>
+    <string name="workspace_member_actions_error_not_owner">Only the owner can change roles or remove members.</string>
+    <string name="workspace_member_actions_error_cannot_demote_owner">Cannot remove the only owner. Add another owner first.</string>
+    <string name="workspace_member_actions_error_unknown">Couldn't apply the change. Please try again.</string>
+
+    <!-- Incoming invites screen -->
+    <string name="workspace_incoming_title">Invitations</string>
+    <string name="workspace_incoming_header_title_format">You're invited to %1$d workspaces</string>
+    <string name="workspace_incoming_header_subtitle">Accepting joins the workspace and adds it to your list.</string>
+    <string name="workspace_incoming_accept">Accept</string>
+    <string name="workspace_incoming_decline">Decline</string>
+    <string name="workspace_incoming_expired">Expired</string>
+    <string name="workspace_incoming_workspace_unknown_format">Workspace %1$s…</string>
+    <string name="workspace_incoming_empty_title">No pending invitations</string>
+    <string name="workspace_incoming_empty_subtitle">You'll see invites here when someone asks you to join their workspace.</string>
+    <string name="workspace_incoming_error_unknown">Couldn't complete that. Please try again.</string>
+    <string name="workspace_incoming_refresh_failed">Couldn't refresh invitations. Showing the last loaded list.</string>
+    <string name="workspace_incoming_retry">Retry</string>
+
+    <!-- Workspace creation / edit -->
+    <string name="workspace_creation_title_create">New workspace</string>
+    <string name="workspace_creation_title_edit">Edit workspace</string>
+    <string name="workspace_creation_action_create">Create</string>
+    <string name="workspace_creation_action_update">Update</string>
+    <string name="workspace_creation_close_content_description">Close</string>
+    <string name="workspace_creation_name_label">Workspace name</string>
+    <string name="workspace_creation_description_label">Description</string>
+    <string name="workspace_creation_section_icon">Icon</string>
+    <string name="workspace_creation_section_accent">Accent</string>
+    <string name="workspace_creation_section_currency">Currency</string>
+    <string name="workspace_creation_section_members">Members</string>
+    <string name="workspace_creation_invite">Invite</string>
+    <string name="workspace_creation_members_empty">No members yet. Invite people to collaborate.</string>
+    <string name="workspace_creation_remove_member_content_description">Remove member</string>
+    <string name="workspace_creation_invite_title">Invite people</string>
+    <string name="workspace_creation_invite_subtitle">Share a link or send an email</string>
+    <string name="workspace_creation_preview_subtitle_format">Shared · %1$d members · %2$s</string>
+    <string name="workspace_creation_preview_fallback_title">New workspace</string>
+    <string name="workspace_creation_error_remote_sync">Couldn't sync the new workspace to the cloud. Check your connection and try again.</string>
+    <string name="workspace_creation_error_unknown">Couldn't create the workspace. Please try again.</string>
+</resources>

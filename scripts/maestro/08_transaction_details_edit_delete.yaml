@@ -1,0 +1,47 @@
+appId: com.georgeci.moneysurfer.dev
+name: Transaction — Details, edit and delete
+---
+- runFlow: 04_add_transaction.yaml
+
+- tapOn:
+    text: "Test expense"
+
+- assertVisible:
+    text: "Transaction"
+- assertVisible:
+    text: "Test expense"
+- assertVisible:
+    text: "Account"
+- assertVisible:
+    text: "Main Bank"
+
+- tapOn:
+    text: "Edit"
+
+- assertVisible:
+    text: "Edit transaction"
+- scrollUntilVisible:
+    element:
+      text: "Note"
+    direction: DOWN
+- tapOn:
+    text: "Note"
+- eraseText
+- inputText: "Updated expense"
+- tapOn:
+    text: "Update"
+
+- assertVisible:
+    text: "Transaction"
+- assertVisible:
+    text: "Updated expense"
+
+- tapOn:
+    text: "Delete"
+- assertVisible:
+    text: "Delete transaction?"
+- tapOn:
+    text: "Delete"
+
+- assertVisible:
+    text: "Accounts"

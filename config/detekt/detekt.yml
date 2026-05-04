@@ -1,0 +1,106 @@
+build:
+  maxIssues: 0
+
+complexity:
+  LongMethod:
+    threshold: 80
+    ignoreAnnotated:
+      - "Composable"
+  LongParameterList:
+    functionThreshold: 8
+    constructorThreshold: 10
+    ignoreAnnotated:
+      - "Composable"
+    excludes:
+      - "**/test/**"
+      - "**/Test/**"
+      - "**/src/*Test*/**"
+      - "**/*-test-fixtures/**"
+      - "**/*Test.kt"
+      - "**/*Tests.kt"
+      - "**/*Spec.kt"
+  CyclomaticComplexMethod:
+    threshold: 15
+  TooManyFunctions:
+    thresholdInFiles: 20
+    thresholdInClasses: 15
+    thresholdInInterfaces: 10
+    thresholdInObjects: 15
+    excludes:
+      - "**/db/dao/**"
+
+naming:
+  FunctionNaming:
+    ignoreAnnotated:
+      - "Composable"
+    excludes:
+      - "**/MainViewController.kt"
+      - "**/test/**"
+      - "**/Test/**"
+      - "**/*Test.kt"
+      - "**/*Tests.kt"
+      - "**/*Spec.kt"
+  TopLevelPropertyNaming:
+    constantPattern: "[A-Z][A-Za-z0-9_]*"
+  InvalidPackageDeclaration:
+    excludes:
+      - "**/test/**"
+      - "**/Test/**"
+      - "**/*Test/**"
+  MatchingDeclarationName:
+    active: false
+
+style:
+  MagicNumber:
+    ignorePropertyDeclaration: true
+    ignoreCompanionObjectPropertyDeclaration: true
+    ignoreAnnotation: true
+    ignoreHashCodeFunction: true
+    ignoreEnums: true
+    ignoreAnnotated:
+      - "Preview"
+    excludes:
+      - "**/test/**"
+      - "**/Test/**"
+      - "**/src/*Test*/**"
+      - "**/*-test-fixtures/**"
+      - "**/*Test.kt"
+      - "**/*Tests.kt"
+      - "**/*Spec.kt"
+    ignoreNumbers:
+      - "-1"
+      - "0"
+      - "1"
+      - "2"
+  WildcardImport:
+    active: false
+  MaxLineLength:
+    maxLineLength: 120
+    excludeCommentStatements: true
+  ReturnCount:
+    max: 3
+    excludeReturnFromLambda: true
+  UnusedPrivateMember:
+    ignoreAnnotated:
+      - "Preview"
+  UnusedPrivateProperty:
+    active: false
+  ForbiddenComment:
+    active: false
+
+formatting:
+  active: true
+  autoCorrect: true
+  TrailingCommaOnCallSite:
+    active: true
+    autoCorrect: true
+  TrailingCommaOnDeclarationSite:
+    active: true
+    autoCorrect: true
+  NoWildcardImports:
+    active: false
+  NoUnusedImports:
+    active: true
+    autoCorrect: true
+  MaximumLineLength:
+    active: false

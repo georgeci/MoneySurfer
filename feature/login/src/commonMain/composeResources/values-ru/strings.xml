@@ -1,0 +1,18 @@
+<resources>
+    <string name="sign_in_title">Вход</string>
+    <string name="sign_in_subtitle">Нажмите Login для входа в демо-аккаунт.</string>
+    <string name="sign_in_login">Login</string>
+    <string name="sign_in_brand">MoneySurfer</string>
+    <string name="sign_in_hero_title">Деньги без лишнего.</string>
+    <string name="sign_in_hero_subtitle">Расходы всей семьи — в одном месте. Без рекламы, без навязчивых апселлов.</string>
+    <string name="sign_in_passkey">Войти по Passkey</string>
+    <string name="sign_in_email">Войти по e-mail</string>
+    <string name="sign_in_demo_mode">Демо-режим</string>
+    <string name="sign_in_terms">Продолжая, вы принимаете Условия и Политику.</string>
+    <string name="sign_in_error_missing_credentials">Введите e-mail и пароль</string>
+    <string name="sign_in_error_invalid_credentials">Неверный e-mail или пароль</string>
+    <string name="sign_in_error_email_in_use">Этот e-mail уже используется</string>
+    <string name="sign_in_error_weak_password">Слабый пароль — минимум 6 символов</string>
+    <string name="sign_in_error_unknown">Не удалось войти</string>
+    <string name="sign_in_error_permission_denied">Нет доступа. Попробуйте ещё раз или обратитесь в поддержку.</string>
+</resources>

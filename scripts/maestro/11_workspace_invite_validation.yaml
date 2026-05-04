@@ -1,0 +1,28 @@
+appId: com.georgeci.moneysurfer.dev
+name: Workspace — Invite member validation
+---
+- runFlow: 02_workspace_create.yaml
+
+- tapOn:
+    text: "Settings"
+
+- assertVisible:
+    text: "Settings"
+- tapOn:
+    text: "Members & permissions"
+
+- assertVisible:
+    text: "Test Workspace · Members"
+- tapOn:
+    text: "Invite people"
+
+- assertVisible:
+    text: "Invite member"
+- tapOn:
+    text: "Email"
+- inputText: "not-an-email"
+- tapOn:
+    text: "Send invite"
+
+- assertVisible:
+    text: "That doesn't look like a valid email."

@@ -1,0 +1,8 @@
+# Credentials used by Gradle QA / Maestro / integration-test tasks to sign in
+# against the local Firebase Emulator. Copy this file to
+# `scripts/e2e-test-user.properties` and adjust if needed.
+#
+# These are emulator-only accounts — do not point at a real Firebase project.
+TEST_EMAIL=e2e+owner@test.local
+TEST_PASSWORD=password
+TEST_VIEWER_EMAIL=e2e+viewer@test.local

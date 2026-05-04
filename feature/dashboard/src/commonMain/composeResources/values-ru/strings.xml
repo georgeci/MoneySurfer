@@ -1,0 +1,32 @@
+<resources>
+    <string name="dashboard_toolbar_title">MoneySurfer</string>
+    <string name="dashboard_toolbar_greeting">Дашборд</string>
+    <string name="dashboard_settings_content_description">Настройки</string>
+    <string name="dashboard_add_transaction">Добавить транзакцию</string>
+    <string name="dashboard_quick_action_add">Добавить</string>
+    <string name="dashboard_quick_action_transfer">Перевод</string>
+    <string name="dashboard_balance_title">Общий баланс</string>
+    <string name="dashboard_balance_empty_text">Добавьте счёт, чтобы увидеть баланс.</string>
+    <string name="dashboard_accounts_section_title">Счета</string>
+    <string name="dashboard_accounts_manage">Управление</string>
+    <string name="dashboard_add_account">Добавить счёт</string>
+    <string name="dashboard_add_account_new">Новый</string>
+    <string name="dashboard_recent_title">Последние</string>
+    <string name="dashboard_recent_see_all">Все</string>
+    <string name="dashboard_recent_empty_title">Активности пока нет</string>
+    <string name="dashboard_recent_empty_subtitle">Новые транзакции появятся здесь.</string>
+    <string name="dashboard_budgets_title">Бюджеты</string>
+    <string name="dashboard_budgets_see_all">Все</string>
+    <string name="dashboard_budgets_empty_title">Бюджетов пока нет</string>
+    <string name="dashboard_budgets_empty_subtitle">Задайте лимит по категории, чтобы начать отслеживание.</string>
+    <string name="dashboard_goals_title">Цели</string>
+    <string name="dashboard_goals_see_all">Все</string>
+    <string name="dashboard_goals_empty_title">Целей пока нет</string>
+    <string name="dashboard_goals_empty_subtitle">Поставьте цель накоплений, чтобы видеть прогресс.</string>
+    <string name="dashboard_recurring_title">Ближайшие</string>
+    <string name="dashboard_recurring_action">Управлять</string>
+    <string name="dashboard_recurring_empty_title">Ничего не запланировано</string>
+    <string name="dashboard_recurring_empty_subtitle">Подписки и регулярные платежи появятся здесь.</string>
+    <string name="dashboard_insights_title">Подсказки</string>
+    <string name="dashboard_insights_empty_text">В этом периоде ничего особенного.</string>
+</resources>

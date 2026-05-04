@@ -1,0 +1,34 @@
+appId: com.georgeci.moneysurfer.dev
+name: Workspace — Create and select test workspace
+---
+# Chain after 00_login.yaml or run standalone with an existing session.
+
+- runFlow: 00_login.yaml
+
+- runFlow:
+    when:
+      visible: "Use Test Workspace"
+    commands:
+      - tapOn:
+          text: "Use Test Workspace"
+
+- runFlow:
+    when:
+      visible: "New workspace"
+    commands:
+      - tapOn:
+          text: "New workspace"
+      - assertVisible:
+          text: "New workspace"
+      - tapOn:
+          text: "Workspace name"
+      - inputText: "Test Workspace"
+      - hideKeyboard
+      - tapOn:
+          text: "Create"
+      - tapOn:
+          text: "Use Test Workspace"
+
+# Assert we landed on Dashboard content
+- assertVisible:
+    text: "Accounts"

@@ -1,0 +1,219 @@
+<resources>
+    <string name="settings_title">Настройки</string>
+    <string name="settings_section_workspace">Пространство</string>
+    <string name="settings_section_appearance">Внешний вид</string>
+    <string name="settings_section_data">Данные</string>
+    <string name="settings_section_personalization">Персонализация</string>
+    <string name="settings_section_help">Справка и информация</string>
+
+    <string name="settings_user_name">Kasia Nowak</string>
+    <string name="settings_user_email">kasia@georgeci.com</string>
+
+    <string name="settings_change_workspace">Сменить workspace</string>
+    <string name="settings_change_workspace_supporting">Сейчас: Family</string>
+    <string name="settings_members">Участники и права</string>
+    <string name="settings_members_count_format">%1$d участников</string>
+    <string name="settings_pending_invites">Приглашения</string>
+    <string name="settings_pending_invites_supporting_format">%1$d ожидает</string>
+    <string name="settings_pending_invites_supporting_empty">Нет приглашений</string>
+
+    <string name="settings_appearance_hub_title">Внешний вид</string>
+    <string name="settings_appearance_hub_supporting">Тема и акцент</string>
+    <string name="settings_appearance_hub_supporting_dynamic">Динамическая палитра · система</string>
+    <string name="settings_preferences_hub_title">Параметры</string>
+    <string name="settings_preferences_hub_supporting">EUR · Понедельник · 24ч · 1 234,56</string>
+    <string name="settings_sync_hub_title">Синхронизация</string>
+    <string name="settings_sync_hub_supporting">4 минуты назад · iCloud</string>
+    <string name="settings_backup">Резервная копия</string>
+    <string name="settings_backup_supporting">Последний бэкап: сегодня, 14:02</string>
+    <string name="settings_about">О приложении</string>
+    <string name="settings_about_supporting_format">v%1$s</string>
+    <string name="settings_feedback">Отправить отзыв</string>
+    <string name="settings_language_title">Язык</string>
+    <string name="settings_language_pill">Русский</string>
+
+    <string name="settings_dark_theme">Тёмная тема</string>
+    <string name="settings_dark_theme_on">Вкл</string>
+    <string name="settings_dark_theme_off">Выкл</string>
+    <string name="settings_accent_color">Акцентный цвет</string>
+    <string name="settings_accent_color_supporting">Seed: Greenery</string>
+    <string name="settings_dynamic_colors">Динамические цвета</string>
+    <string name="settings_dynamic_colors_supporting">Цвета из системной палитры</string>
+
+    <string name="settings_export_csv">Экспорт в CSV</string>
+    <string name="settings_notifications">Уведомления</string>
+    <string name="settings_notifications_supporting">Оповещения о бюджете, еженедельная сводка</string>
+
+    <string name="settings_section_cloud">Облако</string>
+    <string name="settings_sync">Синхронизация с Firestore</string>
+    <string name="settings_sync_idle">Загрузить локальное, затем подтянуть удалённое</string>
+    <string name="settings_sync_in_progress">Синхронизация…</string>
+    <string name="settings_sync_in_progress_with_step">Синхронизация… %1$s</string>
+    <string name="settings_sync_no_workspace">Нет активного workspace</string>
+    <string name="settings_sync_done">Загружено %1$d, скачано %2$d</string>
+    <string name="settings_sync_failed">Ошибка синхронизации: %1$s</string>
+
+    <string name="settings_sync_step_push_workspace">отправка workspace</string>
+    <string name="settings_sync_step_push_members">отправка участников</string>
+    <string name="settings_sync_step_push_invites">отправка приглашений</string>
+    <string name="settings_sync_step_push_accounts">отправка счетов</string>
+    <string name="settings_sync_step_push_categories">отправка категорий</string>
+    <string name="settings_sync_step_push_transactions">отправка транзакций</string>
+    <string name="settings_sync_step_pull_workspace">загрузка workspace</string>
+    <string name="settings_sync_step_pull_members">загрузка участников</string>
+    <string name="settings_sync_step_pull_invites">загрузка приглашений</string>
+    <string name="settings_sync_step_pull_accounts">загрузка счетов</string>
+    <string name="settings_sync_step_pull_categories">загрузка категорий</string>
+    <string name="settings_sync_step_pull_transactions">загрузка транзакций</string>
+    <string name="settings_sync_step_clear_accounts">очистка счетов</string>
+    <string name="settings_sync_step_clear_categories">очистка категорий</string>
+    <string name="settings_sync_step_clear_transactions">очистка транзакций</string>
+    <string name="settings_sync_step_clear_invites">очистка приглашений</string>
+    <string name="settings_sync_step_clear_members">очистка участников</string>
+    <string name="settings_sync_step_clear_workspace">очистка workspace</string>
+
+    <string name="settings_clear_firestore">Очистить Firestore</string>
+    <string name="settings_clear_firestore_supporting">Удалить удалённые данные workspace; локальная копия останется</string>
+    <string name="settings_clear_firestore_done">Удалено %1$d удалённых документов</string>
+    <string name="settings_clear_firestore_dialog_title">Очистить Firestore?</string>
+    <string name="settings_clear_firestore_dialog_message">Удалит все документы активного workspace в Firestore. Локальные данные Room сохранятся.</string>
+    <string name="settings_clear_firestore_dialog_confirm">Удалить</string>
+    <string name="settings_clear_firestore_dialog_cancel">Отмена</string>
+
+    <string name="settings_logout">Выйти</string>
+    <string name="settings_version_format">MoneySurfer · v%1$s</string>
+
+    <!-- Appearance -->
+    <string name="settings_appearance_title">Внешний вид</string>
+    <string name="settings_appearance_theme_section">Тема</string>
+    <string name="settings_appearance_theme_system">Как в системе</string>
+    <string name="settings_appearance_theme_system_supporting">Следовать тёмному режиму устройства</string>
+    <string name="settings_appearance_theme_light">Светлая</string>
+    <string name="settings_appearance_theme_light_supporting">Светлые поверхности</string>
+    <string name="settings_appearance_theme_dark">Тёмная</string>
+    <string name="settings_appearance_theme_dark_supporting">Приглушённые поверхности, меньше бликов</string>
+    <string name="settings_appearance_color_source">Источник цвета</string>
+    <string name="settings_appearance_dynamic_title">Динамические цвета</string>
+    <string name="settings_appearance_dynamic_supporting">Цвета из обоев (Android 12+)</string>
+    <string name="settings_appearance_dynamic_on">Используется палитра обоев. Отключите, чтобы выбрать акцент ниже.</string>
+    <string name="settings_appearance_dynamic_off">Используйте фиксированный акцент или подбирайте по обоям.</string>
+    <string name="settings_appearance_accent_section">Акцентный цвет</string>
+    <string name="settings_appearance_accent_footnote">Цвет кнопок, выделений и графиков.</string>
+    <string name="settings_appearance_accent_footnote_disabled">Недоступно при включённых динамических цветах.</string>
+    <string name="settings_appearance_swatch_brand">По умолчанию</string>
+    <string name="settings_appearance_swatch_plum">Слива</string>
+    <string name="settings_appearance_swatch_sky">Небо</string>
+    <string name="settings_appearance_swatch_mint">Мята</string>
+    <string name="settings_appearance_swatch_rose">Роза</string>
+    <string name="settings_appearance_card_style_section">Стиль карточки</string>
+    <string name="settings_appearance_card_style_filled_title">Заполненный</string>
+    <string name="settings_appearance_card_style_filled_supporting">Сплошной фон, без обводки</string>
+    <string name="settings_appearance_card_style_outlined_title">Обведённый</string>
+    <string name="settings_appearance_card_style_outlined_supporting">Только обводка, без заливки</string>
+    <string name="settings_appearance_card_style_card_title">Карточка</string>
+    <string name="settings_appearance_card_style_card_supporting">Приподнятая поверхность с тенью</string>
+    <string name="settings_appearance_live_preview_title">Живой предпросмотр</string>
+    <string name="settings_appearance_live_preview_supporting">Изменения применяются мгновенно</string>
+
+    <!-- Preferences -->
+    <string name="settings_preferences_title">Параметры</string>
+    <string name="settings_preferences_section_locale">Язык и регион</string>
+    <string name="settings_preferences_locale_footnote">Используется в меню, датах и форматах чисел.</string>
+    <string name="settings_preferences_language_title">Язык приложения</string>
+    <string name="settings_preferences_language_supporting">Переопределяет язык системы для приложения</string>
+    <string name="settings_preferences_language_pill">Русский</string>
+    <string name="settings_preferences_region_title">Регион</string>
+    <string name="settings_preferences_region_supporting">Влияет на валюту и формат дат</string>
+    <string name="settings_preferences_region_pill">Польша</string>
+    <string name="settings_preferences_section_money">Деньги</string>
+    <string name="settings_preferences_currency_title">Валюта по умолчанию</string>
+    <string name="settings_preferences_currency_supporting">Для новых счетов и итогов</string>
+    <string name="settings_preferences_currency_pill">EUR · €</string>
+    <string name="settings_preferences_number_format_title">Формат чисел</string>
+    <string name="settings_preferences_number_format_pill">1 234,56</string>
+    <string name="settings_preferences_hide_title">Скрывать суммы на главном</string>
+    <string name="settings_preferences_hide_supporting">Показывать ••• до тапа</string>
+    <string name="settings_preferences_section_calendar">Календарь</string>
+    <string name="settings_preferences_week_title">Начало недели</string>
+    <string name="settings_preferences_week_pill">Понедельник</string>
+    <string name="settings_preferences_hour_title">Формат времени</string>
+    <string name="settings_preferences_hour_pill">24 часа</string>
+    <string name="settings_preferences_section_behavior">Поведение</string>
+    <string name="settings_preferences_behavior_footnote">Тонкая настройка ощущения от приложения.</string>
+    <string name="settings_preferences_default_txn_title">Тип новой транзакции</string>
+    <string name="settings_preferences_default_txn_pill">Расход</string>
+    <string name="settings_preferences_auto_categorize_title">Автокатегоризация</string>
+    <string name="settings_preferences_auto_categorize_supporting">Подсказывать категорию по продавцу</string>
+    <string name="settings_preferences_round_up_title">Копилка с округления</string>
+    <string name="settings_preferences_round_up_supporting">Округлять покупки до ближайшего €1</string>
+
+    <!-- Sync -->
+    <string name="settings_sync_title">Синхронизация</string>
+    <string name="settings_sync_hero_idle_title">Всё актуально</string>
+    <string name="settings_sync_hero_idle_supporting">Последняя синхронизация: сегодня, 14:02</string>
+    <string name="settings_sync_hero_progress_title">Синхронизация…</string>
+    <string name="settings_sync_section_account">Облачный аккаунт</string>
+    <string name="settings_sync_cloud_account_title">iCloud</string>
+    <string name="settings_sync_cloud_account_supporting">kasia@georgeci.com · занято 18 МБ</string>
+    <string name="settings_sync_auto_title">Автосинхронизация</string>
+    <string name="settings_sync_auto_supporting">Держит все устройства в актуальном состоянии</string>
+    <string name="settings_sync_section_network">Сеть</string>
+    <string name="settings_sync_network_footnote">Синхронизация по сотовой сети расходует трафик. По умолчанию выключена.</string>
+    <string name="settings_sync_cellular_title">По сотовой сети</string>
+    <string name="settings_sync_cellular_supporting">Выкл — только Wi-Fi</string>
+    <string name="settings_sync_background_title">В фоне</string>
+    <string name="settings_sync_background_supporting">Передавать при закрытом приложении</string>
+    <string name="settings_sync_action_force">Синхронизировать сейчас</string>
+
+    <!-- Backup -->
+    <string name="settings_backup_title">Резервная копия</string>
+    <string name="settings_backup_hero_title">Последний бэкап · сегодня</string>
+    <string name="settings_backup_hero_supporting">14:02 · 18 МБ · 2 341 транзакция</string>
+    <string name="settings_backup_section_schedule">Расписание</string>
+    <string name="settings_backup_schedule_footnote">Бэкапы шифруются end-to-end ключом аккаунта.</string>
+    <string name="settings_backup_frequency_title">Частота</string>
+    <string name="settings_backup_frequency_pill">Ежедневно</string>
+    <string name="settings_backup_encryption_title">Шифрование</string>
+    <string name="settings_backup_encryption_supporting">AES-256, end-to-end</string>
+    <string name="settings_backup_location_title">Место хранения</string>
+    <string name="settings_backup_location_pill">iCloud</string>
+    <string name="settings_backup_section_manual">Вручную</string>
+    <string name="settings_backup_back_up_now_title">Создать сейчас</string>
+    <string name="settings_backup_back_up_now_supporting">Свежий снапшот вне расписания</string>
+    <string name="settings_backup_download_title">Скачать копию</string>
+    <string name="settings_backup_download_supporting">.ledger архив · 18 МБ</string>
+    <string name="settings_backup_section_restore">Восстановление</string>
+    <string name="settings_backup_restore_title">Восстановить из бэкапа</string>
+    <string name="settings_backup_restore_supporting">Заменит текущие данные</string>
+    <string name="settings_backup_delete_title">Удалить облачный бэкап</string>
+    <string name="settings_backup_delete_supporting">Удалит все бэкапы из iCloud</string>
+
+    <!-- About -->
+    <string name="settings_about_title">О приложении</string>
+    <string name="settings_about_brand">MoneySurfer</string>
+    <string name="settings_about_brand_letter">M</string>
+    <string name="settings_about_version_format">v%1$s · сборка 2025.04 · iOS / Android</string>
+    <string name="settings_about_chip_made_by">Сделано georgeci</string>
+    <string name="settings_about_chip_warsaw">Варшава, PL</string>
+    <string name="settings_about_section_legal">Юридическое</string>
+    <string name="settings_about_terms_title">Условия использования</string>
+    <string name="settings_about_privacy_title">Политика конфиденциальности</string>
+    <string name="settings_about_privacy_supporting">Что собираем и зачем</string>
+    <string name="settings_about_licenses_title">Open-source лицензии</string>
+    <string name="settings_about_licenses_supporting">34 пакета</string>
+    <string name="settings_about_section_help">Помощь</string>
+    <string name="settings_about_help_center_title">Центр помощи</string>
+    <string name="settings_about_help_center_supporting">Гайды и FAQ</string>
+    <string name="settings_about_contact_title">Связаться с поддержкой</string>
+    <string name="settings_about_contact_supporting">hello@georgeci.com</string>
+    <string name="settings_about_rate_title">Оценить MoneySurfer</string>
+    <string name="settings_about_rate_supporting">В App Store</string>
+    <string name="settings_about_section_system">Система</string>
+    <string name="settings_about_region_title">Регион и язык</string>
+    <string name="settings_about_region_pill">Русский (RU)</string>
+    <string name="settings_about_diagnostic_title">Диагностика</string>
+    <string name="settings_about_diagnostic_supporting">Тапните, чтобы скопировать</string>
+    <string name="settings_about_copyright">© 2025 georgeci sp. z o.o. Все права защищены.\nMoneySurfer — приложение для учёта личных финансов, не банк и не платёжный сервис.</string>
+    <string name="settings_categories_title">Категории</string>
+    <string name="settings_categories_supporting">Управление категориями расходов и доходов</string>
+</resources>

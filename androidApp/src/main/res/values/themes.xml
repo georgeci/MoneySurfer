@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Theme installed before the activity content is set; AndroidX SplashScreen
+         crossfades from this into [postSplashScreenTheme]. -->
+    <style name="Theme.MoneySurfer.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/splash_background</item>
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher_foreground</item>
+        <item name="postSplashScreenTheme">@style/Theme.MoneySurfer</item>
+    </style>
+
+    <!-- Post-splash theme: edge-to-edge transparent bars; Compose draws everything. -->
+    <style name="Theme.MoneySurfer" parent="Theme.Material3.DayNight.NoActionBar">
+<!--        <item name="android:statusBarColor">@android:color/transparent</item>-->
+<!--        <item name="android:navigationBarColor">@android:color/transparent</item>-->
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
+
+</resources>

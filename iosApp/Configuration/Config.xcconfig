@@ -1,0 +1,9 @@
+#include "../../Version.xcconfig"
+
+TEAM_ID=
+
+PRODUCT_NAME=MoneySurfer
+PRODUCT_BUNDLE_IDENTIFIER=com.georgeci.moneysurfer.MoneySurfer$(TEAM_ID)
+
+CURRENT_PROJECT_VERSION=$(APP_VERSION_CODE)
+MARKETING_VERSION=$(APP_VERSION_NAME)

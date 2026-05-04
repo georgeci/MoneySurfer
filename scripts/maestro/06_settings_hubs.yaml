@@ -1,0 +1,50 @@
+appId: com.georgeci.moneysurfer.dev
+name: Settings — Open hub screens
+---
+# Ensures the dashboard has an active workspace and at least one account.
+- runFlow: 03_dashboard_add_account.yaml
+
+- tapOn:
+    text: "Settings"
+
+- assertVisible:
+    text: "Settings"
+- assertVisible:
+    text: "Workspace"
+- assertVisible:
+    text: "Categories"
+- assertVisible:
+    text: "Appearance"
+- assertVisible:
+    text: "Sync"
+- assertVisible:
+    text: "Help & info"
+
+- tapOn:
+    text: "Appearance"
+- assertVisible:
+    text: "Theme"
+- pressKey: Back
+
+- tapOn:
+    text: "Sync"
+- assertVisible:
+    text: "Force sync now"
+- pressKey: Back
+
+- scrollUntilVisible:
+    element:
+      text: "About & legal"
+    direction: DOWN
+- tapOn:
+    text: "About & legal"
+- assertVisible:
+    text: "MoneySurfer"
+- pressKey: Back
+
+- scrollUntilVisible:
+    element:
+      text: "Log out"
+    direction: DOWN
+- assertVisible:
+    text: "Log out"

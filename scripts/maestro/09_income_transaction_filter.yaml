@@ -1,0 +1,44 @@
+appId: com.georgeci.moneysurfer.dev
+name: Transaction — Add income and filter list
+---
+- runFlow: 03_dashboard_add_account.yaml
+
+- runFlow:
+    when:
+      notVisible: "Salary"
+    commands:
+      - tapOn:
+          text: "Add"
+      - assertVisible:
+          text: "New transaction"
+      - tapOn:
+          text: "Income"
+      - tapOn:
+          text: "0.00"
+      - inputText: "150"
+      - hideKeyboard
+      - scrollUntilVisible:
+          element:
+            text: "Note"
+          direction: DOWN
+      - tapOn:
+          text: "Note"
+      - inputText: "Salary"
+      - tapOn:
+          text: "Save"
+
+- assertVisible:
+    text: "Recent"
+- assertVisible:
+    text: "Salary"
+
+- tapOn:
+    text: "See all"
+- assertVisible:
+    text: "Transactions"
+- tapOn:
+    text: "Income"
+- assertVisible:
+    text: "Salary"
+- assertVisible:
+    text: "€150.00"

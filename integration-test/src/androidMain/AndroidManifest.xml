@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Cleartext required so device tests can reach the Firebase Emulator on
+         10.0.2.2:8080 / :9099 (AVD loopback) over plain HTTP. NEVER ship this
+         in a production app — this manifest is androidDeviceTest-only. -->
+    <application android:usesCleartextTraffic="true">
+        <uses-library android:name="android.test.runner" android:required="false" />
+    </application>
+    <uses-permission android:name="android.permission.INTERNET" />
+</manifest>

@@ -1,0 +1,36 @@
+appId: com.georgeci.moneysurfer.dev
+name: Transaction — Add expense transaction
+---
+# Pre-condition: Dashboard with at least one account
+# Chain after 03_dashboard_add_account.yaml
+
+- runFlow: 03_dashboard_add_account.yaml
+
+# Create the baseline expense once and reuse it across transaction flows.
+- runFlow:
+    when:
+      notVisible: "Test expense"
+    commands:
+      - tapOn:
+          text: "Add"
+      - assertVisible:
+          text: "New transaction"
+      - tapOn:
+          text: "0.00"
+      - inputText: "50"
+      - hideKeyboard
+      - scrollUntilVisible:
+          element:
+            text: "Note"
+          direction: DOWN
+      - tapOn:
+          text: "Note"
+      - inputText: "Test expense"
+      - tapOn:
+          text: "Save"
+
+# Assert back on Dashboard and transaction appears in Recent
+- assertVisible:
+    text: "Recent"
+- assertVisible:
+    text: "Test expense"

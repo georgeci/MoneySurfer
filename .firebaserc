@@ -1,0 +1,7 @@
+{
+  "projects": {
+    "default": "moneysurfer-dev",
+    "dev":     "moneysurfer-dev",
+    "prod":    "moneysurfer-release"
+  }
+}

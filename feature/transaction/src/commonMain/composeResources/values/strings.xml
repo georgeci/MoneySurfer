@@ -1,0 +1,53 @@
+<resources>
+    <!-- Transactions list (by account) -->
+    <string name="transactions_list_title">Transactions</string>
+    <string name="transactions_list_new">New</string>
+    <string name="transactions_list_empty">No transactions yet. Log one to see it here.</string>
+    <string name="transactions_list_empty_filtered">No transactions match this filter.</string>
+    <string name="transactions_list_filter_all">All</string>
+    <string name="transactions_list_filter_expenses">Expenses</string>
+    <string name="transactions_list_filter_income">Income</string>
+    <string name="transactions_list_summary_income">Income</string>
+    <string name="transactions_list_summary_expenses">Expenses</string>
+    <string name="transactions_list_summary_net">Net</string>
+
+    <!-- Transaction creation / edit -->
+    <string name="transaction_creation_title_create">New transaction</string>
+    <string name="transaction_creation_title_edit">Edit transaction</string>
+    <string name="transaction_creation_expense">Expense</string>
+    <string name="transaction_creation_income">Income</string>
+    <string name="transaction_creation_transfer">Transfer</string>
+    <string name="transaction_creation_category_all">All categories</string>
+    <string name="transaction_creation_category_more">More</string>
+    <string name="transaction_creation_datetime_label">Date &amp; time</string>
+    <string name="transaction_creation_datetime_placeholder">Now</string>
+    <string name="transaction_creation_today">Today</string>
+    <string name="transaction_creation_amount_label">Amount</string>
+    <string name="transaction_creation_account_label">From account</string>
+    <string name="transaction_creation_category_label">Category</string>
+    <string name="transaction_creation_note_label">Note</string>
+    <string name="transaction_creation_save">Save</string>
+    <string name="transaction_creation_update">Update</string>
+    <string name="transaction_creation_close_content_description">Close</string>
+    <string name="transaction_creation_amount_placeholder">0.00</string>
+    <string name="transaction_creation_account_empty">No account selected</string>
+
+    <!-- Transaction details -->
+    <string name="transaction_details_title">Transaction</string>
+    <string name="transaction_details_edit_content_description">Edit</string>
+    <string name="transaction_details_delete_content_description">Delete</string>
+    <string name="transaction_details_delete_title">Delete transaction?</string>
+    <string name="transaction_details_delete_message">“%1$s” will be removed permanently. This can't be undone.</string>
+    <string name="transaction_details_delete_message_generic">This transaction will be removed permanently. This can't be undone.</string>
+    <string name="transaction_details_delete_confirm">Delete</string>
+    <string name="transaction_details_delete_cancel">Cancel</string>
+    <string name="transaction_details_type_expense">Expense</string>
+    <string name="transaction_details_type_income">Income</string>
+    <string name="transaction_details_account_label">Account</string>
+    <string name="transaction_details_date_label">Date</string>
+    <string name="transaction_details_category_label">Category</string>
+    <string name="transaction_details_currency_label">Currency</string>
+    <string name="transaction_details_duplicate">Duplicate</string>
+    <string name="transaction_details_status_posted">Posted</string>
+    <string name="transaction_details_status_planned">Planned</string>
+</resources>

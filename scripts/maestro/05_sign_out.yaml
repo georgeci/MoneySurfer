@@ -1,0 +1,27 @@
+appId: com.georgeci.moneysurfer.dev
+name: Settings — Sign out
+---
+# Ensure active session and dashboard state
+- runFlow: 03_dashboard_add_account.yaml
+
+# Open Settings via icon (content description "Settings")
+- tapOn:
+    text: "Settings"
+
+# Assert Settings screen opened
+- assertVisible:
+    text: "Settings"
+
+# Tap "Log out"
+- scrollUntilVisible:
+    element:
+      text: "Log out"
+    direction: DOWN
+- tapOn:
+    text: "Log out"
+
+# Assert we returned to Sign in screen
+- assertVisible:
+    text: "MoneySurfer"
+- assertVisible:
+    text: "Sign in"

@@ -1,0 +1,9 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>TooGenericExceptionThrown:CreateWorkspaceUseCaseTest.kt$FakeUserRemoteRepository$throw RuntimeException("network down")</ID>
+    <ID>TooGenericExceptionThrown:CreateWorkspaceUseCaseTest.kt$FakeWorkspaceSyncRepository$throw RuntimeException("firestore unavailable")</ID>
+    <ID>TooManyFunctions:SettingsRepository.kt$SettingsRepository</ID>
+  </CurrentIssues>
+</SmellBaseline>

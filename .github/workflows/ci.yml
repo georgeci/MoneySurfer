@@ -1,0 +1,153 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - master
+
+permissions:
+  contents: read
+
+jobs:
+  junit:
+    name: JUnit + Allure
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Install Allure CLI
+        shell: bash
+        run: |
+          set -euo pipefail
+          ALLURE_VERSION=2.34.1
+          curl -Ls "https://github.com/allure-framework/allure2/releases/download/${ALLURE_VERSION}/allure-${ALLURE_VERSION}.tgz" \
+            | tar -xz -C "${RUNNER_TEMP}"
+          echo "${RUNNER_TEMP}/allure-${ALLURE_VERSION}/bin" >> "${GITHUB_PATH}"
+
+      - name: Run JUnit tests
+        run: ./gradlew qaCommon --stacktrace
+
+      - name: Write JUnit + Allure summary
+        if: always()
+        shell: bash
+        run: |
+          python3 - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          from pathlib import Path
+          import html
+          import xml.etree.ElementTree as ET
+
+          files = sorted(Path(".").glob("*/build/test-results/jvmTest/*.xml"))
+
+          totals = {"tests": 0, "failures": 0, "errors": 0, "skipped": 0, "time": 0.0}
+          modules = {}
+          failed_cases = []
+
+          for file in files:
+              module = file.parts[0]
+              try:
+                  root = ET.parse(file).getroot()
+              except ET.ParseError:
+                  continue
+
+              tests = int(root.attrib.get("tests", 0))
+              failures = int(root.attrib.get("failures", 0))
+              errors = int(root.attrib.get("errors", 0))
+              skipped = int(root.attrib.get("skipped", 0))
+              duration = float(root.attrib.get("time", 0.0))
+
+              row = modules.setdefault(
+                  module,
+                  {"tests": 0, "failures": 0, "errors": 0, "skipped": 0, "time": 0.0},
+              )
+              for key, value in {
+                  "tests": tests,
+                  "failures": failures,
+                  "errors": errors,
+                  "skipped": skipped,
+                  "time": duration,
+              }.items():
+                  totals[key] += value
+                  row[key] += value
+
+              for case in root.findall("testcase"):
+                  has_failure = case.find("failure") is not None
+                  has_error = case.find("error") is not None
+                  if has_failure or has_error:
+                      failed_cases.append(
+                          f"{module}: {case.attrib.get('classname', '')}.{case.attrib.get('name', '')}"
+                      )
+
+          passed = totals["tests"] - totals["failures"] - totals["errors"] - totals["skipped"]
+          outcome = "✅" if totals["failures"] == 0 and totals["errors"] == 0 else "❌"
+
+          print("## JUnit + Allure summary")
+          print()
+          if not files:
+              print("No JUnit XML files found at `*/build/test-results/jvmTest/*.xml`.")
+              raise SystemExit
+
+          print("| Scope | Tests | Passed | Failed | Errors | Skipped | Time |")
+          print("|---|---:|---:|---:|---:|---:|---:|")
+          print(
+              f"| qaCommon {outcome} | {totals['tests']} | {passed} | "
+              f"{totals['failures']} | {totals['errors']} | {totals['skipped']} | "
+              f"{totals['time']:.1f}s |"
+          )
+          print()
+
+          print("| Module | Tests | Failed | Errors | Skipped | Time |")
+          print("|---|---:|---:|---:|---:|---:|")
+          for module, row in sorted(modules.items()):
+              print(
+                  f"| `{module}` | {row['tests']} | {row['failures']} | "
+                  f"{row['errors']} | {row['skipped']} | {row['time']:.1f}s |"
+              )
+
+          print()
+          print("- Allure report artifact: `allure-report-common`")
+          print("- JUnit XML artifact: `junit-results`")
+
+          if failed_cases:
+              print()
+              print("<details>")
+              print("<summary>Failed test cases</summary>")
+              print()
+              for case in failed_cases[:30]:
+                  print(f"- `{html.escape(case)}`")
+              if len(failed_cases) > 30:
+                  print(f"- ... and {len(failed_cases) - 30} more")
+              print()
+              print("</details>")
+          PY
+
+      - name: Upload Allure report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-report-common
+          path: build/reports/allure/common/
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Upload JUnit results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: junit-results
+          path: "**/build/test-results/jvmTest/**/*.xml"
+          if-no-files-found: warn
+          retention-days: 14

@@ -1,0 +1,41 @@
+<resources>
+    <!-- Category chooser bottom sheet -->
+    <string name="transaction_creation_category_sheet_title">Choose category</string>
+    <string name="transaction_creation_category_search">Search categories</string>
+    <string name="transaction_creation_category_section_expense">Expenses</string>
+    <string name="transaction_creation_category_section_income">Income</string>
+    <string name="transaction_creation_category_create_new">Create new category</string>
+    <string name="transaction_creation_category_empty">No categories</string>
+
+    <!-- Category creation / edit -->
+    <string name="category_creation_title_create">New category</string>
+    <string name="category_creation_title_edit">Edit category</string>
+    <string name="category_creation_close_content_description">Close</string>
+    <string name="category_creation_cancel">Cancel</string>
+    <string name="category_creation_save">Save</string>
+    <string name="category_creation_type_label">Type</string>
+    <string name="category_creation_type_expense">Expense</string>
+    <string name="category_creation_type_income">Income</string>
+    <string name="category_creation_name_label">Name</string>
+    <string name="category_creation_icon_label">Icon</string>
+    <string name="category_creation_color_label">Color</string>
+    <string name="category_creation_extra_label">Extra details</string>
+    <string name="category_creation_extra_optional">Optional</string>
+    <string name="category_creation_add_another">Add another</string>
+    <string name="category_creation_field_cap">Monthly cap</string>
+    <string name="category_creation_field_cap_helper">You'll get a nudge when spending hits 80%.</string>
+    <string name="category_creation_field_parent">Parent category</string>
+    <string name="category_creation_field_note">Note</string>
+    <string name="category_creation_remove">Remove</string>
+    <string name="category_creation_untitled">Untitled category</string>
+
+    <!-- Categories management screen -->
+    <string name="categories_manage_title">Categories</string>
+    <string name="categories_manage_add">New category</string>
+    <string name="categories_manage_empty">No categories yet</string>
+    <string name="categories_manage_remove">Delete</string>
+    <string name="categories_manage_delete_title">Delete category?</string>
+    <string name="categories_manage_delete_message">"%1$s" will be removed. Transactions using it won\'t be deleted.</string>
+    <string name="categories_manage_delete_confirm">Delete</string>
+    <string name="categories_manage_delete_cancel">Cancel</string>
+</resources>

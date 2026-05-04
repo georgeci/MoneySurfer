@@ -1,0 +1,110 @@
+<resources>
+    <!-- Workspace selector -->
+    <string name="workspace_selector_title">Рабочие пространства</string>
+    <string name="workspace_selector_heading_title">Выберите пространство</string>
+    <string name="workspace_selector_heading_subtitle">У каждого — свои бюджеты, счета и участники.</string>
+    <string name="workspace_selector_empty">Для пользователя нет доступных workspace.</string>
+    <string name="workspace_selector_create_title">Новое пространство</string>
+    <string name="workspace_selector_create_subtitle">Для поездки, проекта или чего-то ещё</string>
+    <string name="workspace_selector_edit_content_description">Редактировать</string>
+    <string name="workspace_selector_action_edit">Изменить</string>
+    <string name="workspace_selector_action_members">Участники</string>
+    <string name="workspace_selector_use_workspace">Выбрать %1$s</string>
+    <string name="workspace_selector_continue">Выберите пространство</string>
+
+    <!-- Workspace members -->
+    <string name="workspace_members_title_format">%1$s · Участники</string>
+    <string name="workspace_members_subtitle_owner_format">%1$d участников · вы владелец</string>
+    <string name="workspace_members_subtitle_editor_format">%1$d участников · можно редактировать</string>
+    <string name="workspace_members_subtitle_viewer_format">%1$d участников · только просмотр</string>
+    <string name="workspace_members_subtitle_unknown_format">%1$d участников</string>
+    <string name="workspace_members_invite_title">Пригласить людей</string>
+    <string name="workspace_members_invite_subtitle">Отправить приглашение по e-mail</string>
+    <string name="workspace_members_close_content_description">Закрыть</string>
+    <string name="workspace_members_role_owner">Владелец</string>
+    <string name="workspace_members_role_editor">Редактор</string>
+    <string name="workspace_members_role_viewer">Гость</string>
+    <string name="workspace_members_tab_active_format">Активные · %1$d</string>
+    <string name="workspace_members_tab_invited_format">Приглашены · %1$d</string>
+    <string name="workspace_members_invite_status_pending">Ожидает</string>
+    <string name="workspace_members_invite_status_expired">Истекло</string>
+    <string name="workspace_members_invites_empty">Нет ожидающих приглашений</string>
+    <string name="workspace_members_view_only_hint">Приглашать и менять роли может только владелец.</string>
+    <string name="workspace_members_invite_cancel_content_description">Отменить приглашение</string>
+    <string name="workspace_members_leave">Покинуть пространство</string>
+    <string name="workspace_members_leave_title_format">Покинуть %1$s?</string>
+    <string name="workspace_members_leave_message_format">Вы потеряете доступ ко всем счетам, транзакциям и отчётам в %1$s. Чтобы вернуться, понадобится новое приглашение.</string>
+    <string name="workspace_members_leave_confirm">Покинуть</string>
+    <string name="workspace_members_leave_cancel">Отмена</string>
+    <string name="workspace_members_role_owner_label">Владелец</string>
+    <string name="workspace_members_role_editor_label">Редактор</string>
+    <string name="workspace_members_role_viewer_label">Гость</string>
+
+    <!-- Invite member screen -->
+    <string name="workspace_invite_title">Пригласить участника</string>
+    <string name="workspace_invite_close_content_description">Закрыть</string>
+    <string name="workspace_invite_email_label">E-mail</string>
+    <string name="workspace_invite_email_helper">Получат e-mail со ссылкой для входа.</string>
+    <string name="workspace_invite_role_label">Роль</string>
+    <string name="workspace_invite_role_editor_title">Редактор</string>
+    <string name="workspace_invite_role_editor_hint">Добавлять и редактировать транзакции</string>
+    <string name="workspace_invite_role_viewer_title">Гость</string>
+    <string name="workspace_invite_role_viewer_hint">Только просмотр</string>
+    <string name="workspace_invite_send">Отправить приглашение</string>
+    <string name="workspace_invite_error_invalid">Это не похоже на правильный e-mail.</string>
+    <string name="workspace_invite_error_already_member">Этот участник уже в пространстве.</string>
+    <string name="workspace_invite_error_already_invited">Для этого e-mail уже отправлено приглашение.</string>
+    <string name="workspace_invite_error_user_not_found">Нет аккаунта MoneySurfer с таким e-mail.</string>
+    <string name="workspace_invite_error_not_owner">Приглашать новых участников может только владелец.</string>
+    <string name="workspace_invite_error_unknown">Не удалось отправить приглашение. Попробуйте ещё раз.</string>
+
+    <!-- Member actions sheet -->
+    <string name="workspace_member_actions_role_label">Роль</string>
+    <string name="workspace_member_actions_role_editor_hint">Может добавлять и редактировать транзакции</string>
+    <string name="workspace_member_actions_role_viewer_hint">Только просмотр</string>
+    <string name="workspace_member_actions_remove">Удалить из пространства</string>
+    <string name="workspace_member_actions_remove_hint">Доступ будет потерян немедленно</string>
+    <string name="workspace_member_actions_confirm_remove_title_format">Удалить %1$s?</string>
+    <string name="workspace_member_actions_confirm_remove_message">Доступ будет потерян немедленно. Прошлые транзакции останутся за этим участником.</string>
+    <string name="workspace_member_actions_confirm_remove_confirm">Удалить</string>
+    <string name="workspace_member_actions_confirm_remove_cancel">Отмена</string>
+    <string name="workspace_member_actions_error_not_owner">Менять роли и удалять участников может только владелец.</string>
+    <string name="workspace_member_actions_error_cannot_demote_owner">Нельзя удалить единственного владельца. Сначала назначьте другого.</string>
+    <string name="workspace_member_actions_error_unknown">Не удалось применить изменение. Попробуйте ещё раз.</string>
+
+    <!-- Incoming invites screen -->
+    <string name="workspace_incoming_title">Приглашения</string>
+    <string name="workspace_incoming_header_title_format">У вас %1$d приглашений</string>
+    <string name="workspace_incoming_header_subtitle">Принятие приглашения добавит пространство в ваш список.</string>
+    <string name="workspace_incoming_accept">Принять</string>
+    <string name="workspace_incoming_decline">Отклонить</string>
+    <string name="workspace_incoming_expired">Истекло</string>
+    <string name="workspace_incoming_workspace_unknown_format">Пространство %1$s…</string>
+    <string name="workspace_incoming_empty_title">Нет ожидающих приглашений</string>
+    <string name="workspace_incoming_empty_subtitle">Здесь появятся приглашения, когда вас позовут в чьё-то пространство.</string>
+    <string name="workspace_incoming_error_unknown">Не удалось выполнить действие. Попробуйте ещё раз.</string>
+    <string name="workspace_incoming_refresh_failed">Не удалось обновить приглашения. Показан последний загруженный список.</string>
+    <string name="workspace_incoming_retry">Повторить</string>
+
+    <!-- Workspace creation / edit -->
+    <string name="workspace_creation_title_create">Новое пространство</string>
+    <string name="workspace_creation_title_edit">Редактирование</string>
+    <string name="workspace_creation_action_create">Создать</string>
+    <string name="workspace_creation_action_update">Обновить</string>
+    <string name="workspace_creation_close_content_description">Закрыть</string>
+    <string name="workspace_creation_name_label">Название</string>
+    <string name="workspace_creation_description_label">Описание</string>
+    <string name="workspace_creation_section_icon">Иконка</string>
+    <string name="workspace_creation_section_accent">Цвет</string>
+    <string name="workspace_creation_section_currency">Валюта</string>
+    <string name="workspace_creation_section_members">Участники</string>
+    <string name="workspace_creation_invite">Пригласить</string>
+    <string name="workspace_creation_members_empty">Пока нет участников. Пригласите, чтобы работать вместе.</string>
+    <string name="workspace_creation_remove_member_content_description">Удалить участника</string>
+    <string name="workspace_creation_invite_title">Пригласить людей</string>
+    <string name="workspace_creation_invite_subtitle">Отправьте ссылку или приглашение</string>
+    <string name="workspace_creation_preview_subtitle_format">Общее · %1$d участников · %2$s</string>
+    <string name="workspace_creation_preview_fallback_title">Новое пространство</string>
+    <string name="workspace_creation_error_remote_sync">Не удалось синхронизировать пространство с облаком. Проверьте интернет и попробуйте снова.</string>
+    <string name="workspace_creation_error_unknown">Не удалось создать пространство. Попробуйте ещё раз.</string>
+</resources>

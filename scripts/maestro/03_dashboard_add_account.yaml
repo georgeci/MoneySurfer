@@ -1,0 +1,34 @@
+appId: com.georgeci.moneysurfer.dev
+name: Dashboard — Add bank account
+---
+# Pre-condition: user is on DashboardScreen with a workspace
+# Chain after 02_workspace_create.yaml or run standalone with existing session + workspace
+
+- runFlow: 02_workspace_create.yaml
+
+# Assert dashboard content is visible
+- assertVisible:
+    text: "Accounts"
+
+# Create the baseline account once and reuse it across the remaining flows.
+- runFlow:
+    when:
+      notVisible: "Main Bank"
+    commands:
+      - tapOn:
+          text: "Add account"
+      - assertVisible:
+          text: "New account"
+      - tapOn:
+          text: "Account name"
+      - inputText: "Main Bank"
+      - tapOn:
+          text: "Bank"
+      - tapOn:
+          text: "Save"
+
+# Assert back on Dashboard and account card is visible
+- assertVisible:
+    text: "Accounts"
+- assertVisible:
+    text: "Main Bank"

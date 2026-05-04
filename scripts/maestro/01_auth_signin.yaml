@@ -1,0 +1,18 @@
+appId: com.georgeci.moneysurfer.dev
+name: Auth — Sign in with test user
+---
+- runFlow: 00_login.yaml
+
+- runFlow:
+    when:
+      visible: "Choose a workspace"
+    commands:
+      - assertVisible:
+          text: "Choose a workspace"
+
+- runFlow:
+    when:
+      visible: "Accounts"
+    commands:
+      - assertVisible:
+          text: "Accounts"

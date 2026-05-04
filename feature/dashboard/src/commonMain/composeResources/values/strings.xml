@@ -1,0 +1,32 @@
+<resources>
+    <string name="dashboard_toolbar_title">MoneySurfer</string>
+    <string name="dashboard_toolbar_greeting">Dashboard</string>
+    <string name="dashboard_settings_content_description">Settings</string>
+    <string name="dashboard_add_transaction">Add transaction</string>
+    <string name="dashboard_quick_action_add">Add</string>
+    <string name="dashboard_quick_action_transfer">Transfer</string>
+    <string name="dashboard_balance_title">Total balance</string>
+    <string name="dashboard_balance_empty_text">Add your first account to see balance.</string>
+    <string name="dashboard_accounts_section_title">Accounts</string>
+    <string name="dashboard_accounts_manage">Manage</string>
+    <string name="dashboard_add_account">Add account</string>
+    <string name="dashboard_add_account_new">New</string>
+    <string name="dashboard_recent_title">Recent</string>
+    <string name="dashboard_recent_see_all">See all</string>
+    <string name="dashboard_recent_empty_title">No activity yet</string>
+    <string name="dashboard_recent_empty_subtitle">Transactions you log will show up here.</string>
+    <string name="dashboard_budgets_title">Budgets</string>
+    <string name="dashboard_budgets_see_all">See all</string>
+    <string name="dashboard_budgets_empty_title">No budgets yet</string>
+    <string name="dashboard_budgets_empty_subtitle">Set a cap on a category to start tracking.</string>
+    <string name="dashboard_goals_title">Goals</string>
+    <string name="dashboard_goals_see_all">See all</string>
+    <string name="dashboard_goals_empty_title">No goals yet</string>
+    <string name="dashboard_goals_empty_subtitle">Set a savings target to track progress here.</string>
+    <string name="dashboard_recurring_title">Upcoming</string>
+    <string name="dashboard_recurring_action">Manage</string>
+    <string name="dashboard_recurring_empty_title">Nothing scheduled</string>
+    <string name="dashboard_recurring_empty_subtitle">Subscriptions and recurring bills will appear here.</string>
+    <string name="dashboard_insights_title">Insights</string>
+    <string name="dashboard_insights_empty_text">Nothing notable this period.</string>
+</resources>

@@ -1,0 +1,27 @@
+appId: com.georgeci.moneysurfer.dev
+name: Setup — Login with reusable app state
+tags:
+  - setup
+---
+- launchApp:
+    clearState: false
+
+# TEST_EMAIL and TEST_PASSWORD are passed by the Maestro test suite from
+# scripts/e2e-test-user.properties. The same file is used by Firebase seed.
+- runFlow:
+    when:
+      visible: "Email"
+    commands:
+      - tapOn:
+          text: "Email"
+      - inputText: ${TEST_EMAIL}
+
+      - tapOn:
+          text: "Password"
+      - inputText: ${TEST_PASSWORD}
+
+      - tapOn:
+          text: "Sign in"
+
+      - assertVisible:
+          text: "Choose a workspace"

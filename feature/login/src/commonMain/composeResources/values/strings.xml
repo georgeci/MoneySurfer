@@ -1,0 +1,25 @@
+<resources>
+    <string name="sign_in_title">Sign In</string>
+    <string name="sign_in_subtitle">Tap login to continue with demo account.</string>
+    <string name="sign_in_login">Login</string>
+    <string name="sign_in_brand">MoneySurfer</string>
+    <string name="sign_in_hero_title">Money, clearly.</string>
+    <string name="sign_in_hero_subtitle">Track spending across your household in one place. No ads, no upsell.</string>
+    <string name="sign_in_passkey">Continue with Passkey</string>
+    <string name="sign_in_email">Sign in with email</string>
+    <string name="sign_in_demo_mode">Enter Demo Mode</string>
+    <string name="sign_in_anonymous">Continue as guest</string>
+    <string name="sign_in_email_label">Email</string>
+    <string name="sign_in_password_label">Password</string>
+    <string name="sign_in_submit_signin">Sign in</string>
+    <string name="sign_in_submit_signup">Create account</string>
+    <string name="sign_in_toggle_to_signup">New here? Create an account</string>
+    <string name="sign_in_toggle_to_signin">Already have an account? Sign in</string>
+    <string name="sign_in_error_missing_credentials">Enter email and password</string>
+    <string name="sign_in_error_invalid_credentials">Wrong email or password</string>
+    <string name="sign_in_error_email_in_use">That email is already in use</string>
+    <string name="sign_in_error_weak_password">Password is too weak — try at least 6 characters</string>
+    <string name="sign_in_error_unknown">Sign-in failed</string>
+    <string name="sign_in_error_permission_denied">You don't have access. Please retry or contact support.</string>
+    <string name="sign_in_terms">By continuing you agree to the Terms &amp; Privacy.</string>
+</resources>

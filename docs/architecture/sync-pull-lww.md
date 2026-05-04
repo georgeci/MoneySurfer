@@ -1,0 +1,322 @@
+# Sync v2 — Pull, LWW, Tombstones
+
+<!-- DOCS:TOC -->
+## Contents
+- [Sync v2 — Pull, LWW, Tombstones](#sync-v2-pull-lww-tombstones)
+- [TL;DR for agents](#tldr-for-agents)
+- [Rules](#rules)
+- [Cursor-based incremental pull](#cursor-based-incremental-pull)
+- [Collections in scope](#collections-in-scope)
+- [Apply per doc](#apply-per-doc)
+  - [Members — special-case userId stub](#members-special-case-userid-stub)
+- [LWW conflict resolver](#lww-conflict-resolver)
+- [Outbox bypass](#outbox-bypass)
+- [Cursor + apply atomicity](#cursor-apply-atomicity)
+- [Tombstones (soft delete)](#tombstones-soft-delete)
+- [WorkspaceInvite](#workspaceinvite)
+- [SyncMetaRepository](#syncmetarepository)
+- [Recalc placeholder](#recalc-placeholder)
+- [v1 still in the system](#v1-still-in-the-system)
+<!-- DOCS:END -->
+
+## TL;DR for agents
+
+- Pull is cursor-based on `updatedAt` per `(workspaceId, collection)`.
+- Conflict resolution is LWW; ties go to local (stable, idempotent re-pulls).
+- Pull writes go through DAOs directly — never through the outbox.
+- Tombstones land as hard local deletes; the cursor still advances past them.
+- Collections are pulled in order: members → invites → accounts → categories → transactions.
+
+READ WHEN:
+- changing pull batching, cursor, or conflict logic
+- adding a new pulled collection or a new resolver
+- modifying tombstone / soft-delete behaviour
+- editing `SyncMeta` schema or DAO
+
+<!-- AI:SECTION id=sync-pull-lww-rules task=sync,pull,lww,tombstones,cursor -->
+## Rules
+
+- Pull writes must use DAO calls directly — `OutboxEnqueuer.*` is forbidden
+  on the pull path so remote rows do not loop back as pushes.
+- Cursor advancement must monotonically use the max `updatedAt` actually
+  applied; never advance past a doc that has not been written.
+- LWW tie-break (`remoteUpdatedAt == localUpdatedAt`) is **TakeLocal** —
+  this is what makes re-pulls idempotent.
+- A pulled member doc must be preceded by an `INSERT OR IGNORE` into `users`
+  to satisfy the FK on `workspace_members.userId`.
+- `deletedAt != null` on a pulled DTO means hard local delete.
+- `SyncScope.UploadOnly` returns immediately from the pull use case.
+- Active workspace is read once (`session.currentWorkspaceId.flow.first()`);
+  if `null`, the pull is a no-op.
+<!-- AI:END -->
+
+The pull stage downloads remote changes per workspace, resolves
+conflicts, and writes the result directly to Room — bypassing the outbox
+so a remote-originated change does not loop back as a push.
+
+Source:
+[PullRemoteChangesUseCaseImpl.kt](../../sync-surfer/src/commonMain/kotlin/com/georgeci/moneysurfer/data/sync/PullRemoteChangesUseCaseImpl.kt).
+
+## Cursor-based incremental pull
+
+Per `(workspaceId, collection)`:
+
+1. `syncMeta.markAttempt(workspaceId, collection, now())` — observability.
+2. `cursor = syncMeta.cursor(workspaceId, collection)` — last successful
+   `updatedAt` we wrote, in epoch millis. `null` ⇒ first pull, treated
+   as `0`.
+3. Firestore query:
+   ```
+   workspaces/{wid}/{collection}
+     .where("updatedAt", ">", cursorMillis)
+     .orderBy("updatedAt", ASCENDING)
+     .limit(BATCH_SIZE)              // 100
+   ```
+4. Apply each doc (see below). Track `maxUpdatedAt` across the batch.
+5. After the loop:
+   - `setCursor(workspaceId, collection, maxUpdatedAt)` if it advanced.
+   - `markSuccess(workspaceId, collection, now())`.
+6. If the batch is empty, `markSuccess` is still called.
+
+`pullCollection` returns `(downloadedCount, conflictCount)`. The use case
+sums these across the collections in scope and returns `PullSummary`.
+
+The "active workspace" comes from
+`session.currentWorkspaceId.flow.first()`. If it is `null`, the use case
+returns `PullSummary(0, 0)` immediately (a freshly-logged-in user with
+no active workspace yet — the bootstrap flow handles workspace
+selection elsewhere).
+
+## Collections in scope
+
+```kotlin
+private fun collectionsInScope(scope: SyncScope) = when (scope) {
+    UploadOnly -> emptyList()
+    ActiveWorkspace, ChangedSinceLastSync, AllUserData -> listOf(
+        WORKSPACE_MEMBERS,
+        WORKSPACE_INVITES,
+        ACCOUNTS,
+        CATEGORIES,
+        TRANSACTIONS,
+    )
+}
+```
+
+The order is deliberate. Members and invites come **before** entity
+collections so a freshly-pulled workspace already has its
+`workspace_members` row by the time entity queries that gate on
+membership run. This replaces the v1 `ensureLocalOwnerMembership`
+workaround in
+[SyncCoordinatorWorkspaceSyncer.kt](../../sync-surfer/src/commonMain/kotlin/com/georgeci/moneysurfer/data/sync/SyncCoordinatorWorkspaceSyncer.kt).
+
+`SyncScope.AllUserData` collapses to the same list — there is no
+multi-workspace fan-out yet (still per-`currentWorkspaceId`).
+
+`WORKSPACES`, `WORKSPACE_REFS`, `USERS` are **not** part of the cursor
+pipeline. The user / workspace docs are still written via
+`WorkspaceSyncRepositoryImpl` (v1) and `UserRemoteRepository` directly.
+
+## Apply per doc
+
+For each `DocumentSnapshot` in the batch:
+
+1. **Tombstone check.** If the DTO has `deletedAt != null`, hard-delete
+   the local row via the matching DAO (e.g. `accountDao.delete(id)`) and
+   record `applied = true, wasConflict = false`. The cursor still
+   advances on tombstones — that is exactly how a delete propagates from
+   one device to another.
+2. **Conflict resolution.** Read the current local entity, build a
+   `ConflictMetadata`, and ask the resolver:
+   ```kotlin
+   conflictResolver.resolve(
+       local = local,
+       remote = dto.toEntity(...),
+       metadata = ConflictMetadata(
+           entityType,
+           entityId    = snap.id,
+           localUpdatedAt  = local?.updatedAt?.let(Instant::fromEpochMilliseconds),
+           remoteUpdatedAt = Instant.fromEpochMilliseconds(dto.updatedAt),
+       ),
+   )
+   ```
+3. **Apply the resolution** through `applyResolution`:
+   | Resolution        | Effect on counts             | Effect on Room |
+   |-------------------|------------------------------|----------------|
+   | `TakeRemote(v)`   | `applied++`                  | DAO upsert. |
+   | `TakeLocal(_)`    | `wasConflict++`              | None (local wins). |
+   | `Merged(v)`       | `applied++` and `wasConflict++` | DAO upsert. |
+   | `Skip`            | `wasConflict++`              | None (deferred to a future inbox). |
+
+`applied` is what flows into `PullSummary.downloadedCount` (and gates the
+`SyncStep.RecalculatingProjections` step in the coordinator).
+
+### Members — special-case userId stub
+
+Member docs hold a roster row whose `userId` is the doc id. Local
+`workspace_members.userId` is FK-bound to `users.id`, but peer users are
+not pulled into the local `users` table by the rest of the pipeline.
+Before applying a member doc the use case stubs a row:
+
+```kotlin
+userDao.insertIgnore(
+    UserEntity(id = snap.id, displayName = dto.displayName.ifEmpty { null }, isAnon = false),
+)
+```
+
+`INSERT OR IGNORE` keeps the current user's existing row intact while
+giving foreign-membership rows their FK target. See
+[PullRemoteChangesUseCaseImpl.kt](../../sync-surfer/src/commonMain/kotlin/com/georgeci/moneysurfer/data/sync/PullRemoteChangesUseCaseImpl.kt).
+
+## LWW conflict resolver
+
+Source:
+[LwwConflictResolver.kt](../../sync/default/src/commonMain/kotlin/com/georgeci/moneysurfer/sync/repository/LwwConflictResolver.kt).
+
+```kotlin
+override fun <T : Any> resolve(local: T?, remote: T, metadata: ConflictMetadata): ConflictResolution<T> {
+    if (local == null) return TakeRemote(remote)
+    val localUpdatedAt = metadata.localUpdatedAt ?: Instant.DISTANT_PAST
+    return if (metadata.remoteUpdatedAt > localUpdatedAt)
+        TakeRemote(remote)
+    else
+        TakeLocal(local)
+}
+```
+
+Tie-breaking on equal `updatedAt` favours **local** — stable, so a
+re-pull of the same remote doc has no effect.
+
+There is no per-field merge yet, no manual-resolution `Skip` (the
+resolution exists in the sealed interface but is never produced by
+`LwwConflictResolver`).
+
+`ConflictResolver` is bound by `@Single(binds = [ConflictResolver::class])`
+in `:sync-surfer`, so swapping resolvers is a one-line DI change once a
+field-level resolver lands.
+
+## Outbox bypass
+
+The pull writes directly through `*Dao` calls
+(`accountDao.upsertAll(listOf(entity))`), **never through
+`OutboxEnqueuer.enqueueUpsert`**. That is by design:
+
+- A remote row was already pushed by some peer; the local copy must
+  match without re-emitting it back to Firestore.
+- The repositories' `insert / update / delete` methods *would* enqueue —
+  the pull intentionally goes through DAOs to skip them.
+
+Operationally this means the pull and the user-write paths share
+**different Room entry points**. There is no shared `upsertWithoutOutbox`
+helper; the contract is that DAO calls are bare-DB and that anything
+calling `Repository.insert/update/delete` is a "user write" that should
+hit the outbox.
+
+## Cursor + apply atomicity
+
+The plan in
+the original sync plan (§4.3, Room schema changes) calls for cursor
+advancement and applied rows to live inside one Room transaction. **The
+current implementation does not** wrap them in `db.withTransaction { }`.
+What it does:
+
+- Each per-doc `applyResolution` calls a single DAO method (effectively
+  one Room transaction per doc).
+- Cursor advance happens **after** the per-doc loop, by a separate
+  `syncMeta.upsert(...)` call.
+
+If the process dies between applying doc `N` and advancing the cursor,
+the next pull will re-fetch from the old cursor; the repeated docs are
+harmless because LWW with equal `updatedAt` returns `TakeLocal`. Net
+effect: at-least-once apply with idempotent writes — acceptable for the
+LWW resolver.
+
+If a future resolver introduces side effects (telemetry, outbox writes),
+the cursor advancement should be moved into the same transaction. Today
+it is not necessary.
+
+## Tombstones (soft delete)
+
+DTOs in
+[SyncDtoMappers.kt](../../sync-surfer/src/commonMain/kotlin/com/georgeci/moneysurfer/data/sync/SyncDtoMappers.kt)
+all carry `deletedAt: Long? = null`. A non-null value means "this row
+has been deleted on a peer device". The current pull behaviour:
+
+- `deletedAt != null` ⇒ DAO `delete(id)` locally. **Hard delete** in
+  Room, soft delete in Firestore — the doc is preserved as a tombstone
+  so future pulls (with `cursor > deletedAt`) don't see it again.
+- The cursor still advances past tombstones — the doc has a real
+  `updatedAt`, just like any other update.
+
+The push side is symmetric for `MutationOperation.DELETE` only via
+Firestore `delete()` today (see
+[UploadPendingChangesUseCaseImpl.pushOne](../../sync-surfer/src/commonMain/kotlin/com/georgeci/moneysurfer/data/sync/UploadPendingChangesUseCaseImpl.kt)).
+The plan in the original sync plan (§4.4, Firestore schema changes) is to
+migrate to `update(deletedAt = serverTimestamp)` — that has not happened yet.
+
+Practical implication: a hard `firestore.delete()` from one device
+removes the doc; a peer pulling afterwards will not see anything (the
+doc is gone). The peer's local row stays. **This is a known gap** —
+listed in [sync-gaps.md](sync-gaps.md).
+
+## `WorkspaceInvite`
+
+Invite docs have their own status field (`PENDING / ACCEPTED / DECLINED
+/ REVOKED / EXPIRED`); `deletedAt` is kept as a defensive fallback only.
+Pull treats both signals: if `deletedAt != null`, hard-delete; otherwise
+follow conflict resolution like the other entities. See
+[PullRemoteChangesUseCaseImpl.applyInvite](../../sync-surfer/src/commonMain/kotlin/com/georgeci/moneysurfer/data/sync/PullRemoteChangesUseCaseImpl.kt).
+
+## `SyncMetaRepository`
+
+Source:
+[SyncMetaRepositoryImpl.kt](../../sync/default/src/commonMain/kotlin/com/georgeci/moneysurfer/sync/internal/repository/SyncMetaRepositoryImpl.kt),
+schema in
+[SyncMetaEntity.kt](../../sync/default/src/commonMain/kotlin/com/georgeci/moneysurfer/sync/db/entity/SyncMetaEntity.kt).
+
+Composite PK `(workspaceId, collection)`, no FK on `workspaceId`. Three
+timestamps:
+
+| Field                 | Set by | Read by |
+|------------------------|--------|---------|
+| `lastPulledAt`         | `setCursor` after a successful batch. | `cursor()` for the next pull's `WHERE updatedAt > ?`. |
+| `lastSyncSuccessAt`    | `markSuccess` on every collection that finishes (even if empty). | UI badges. |
+| `lastSyncAttemptAt`    | `markAttempt` at the start of `pullCollection`. | UI badges, freshness signal. |
+
+`clearWorkspace(workspaceId)` is the per-workspace wipe. Full table
+clear is `deleteAll()` from `SyncMetaDao`, called by
+`LocalDataResetRepositoryImpl.clearAll()` on logout.
+
+Reading is via DAO `get(workspaceId, collection)`. Updates are
+`upsert(...)` — the impl reads, copies the field, writes. The plan
+(sync plan §4.3, Room schema changes) calls these out as
+needing to live inside the same transaction as the per-batch row writes;
+they are not, today.
+
+## Recalc placeholder
+
+`RecalculateLocalProjectionsUseCase` exists but is wired to
+[NoOpRecalculateLocalProjectionsUseCase](../../sync/default/src/commonMain/kotlin/com/georgeci/moneysurfer/sync/internal/usecase/NoOpRecalculateLocalProjectionsUseCase.kt):
+
+```kotlin
+override suspend fun invoke(scope: ProjectionScope, cancelToken: SyncCancelToken):
+    SyncResult<ProjectionSummary> = ProjectionSummary(recalculatedCount = 0).right()
+```
+
+The coordinator only invokes the step when `pullSummary.downloadedCount
+> 0` (coordinator FAQ §7), so the NoOp costs nothing on
+idle cycles. Real account-balance / projection recalculation is a
+separate subsystem (depends on signed amounts, `OPENING_BALANCE`
+handling, multi-currency) and lands later — see
+[sync-gaps.md](sync-gaps.md).
+
+## v1 still in the system
+
+[SyncCoordinatorWorkspaceSyncer.kt](../../sync-surfer/src/commonMain/kotlin/com/georgeci/moneysurfer/data/sync/SyncCoordinatorWorkspaceSyncer.kt)
+is the v1 push→pull coordinator. It still owns workspace-level doc
+push/pull (the document at `workspaces/{wid}` itself) and the legacy
+manual sync pipeline.
+
+It is intentionally left running until Phase 3 finishes porting the
+workspace doc into the cursor-based pipeline — see the comment near the
+top of
+[PullRemoteChangesUseCaseImpl.kt](../../sync-surfer/src/commonMain/kotlin/com/georgeci/moneysurfer/data/sync/PullRemoteChangesUseCaseImpl.kt).

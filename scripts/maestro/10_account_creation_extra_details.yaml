@@ -1,0 +1,33 @@
+appId: com.georgeci.moneysurfer.dev
+name: Account — Create card account with extra details
+---
+- runFlow: 02_workspace_create.yaml
+
+- runFlow:
+    when:
+      notVisible: "Travel Card"
+    commands:
+      - tapOn:
+          text: "Add account"
+      - assertVisible:
+          text: "New account"
+      - tapOn:
+          text: "Card"
+      - tapOn:
+          text: "Account name"
+      - inputText: "Travel Card"
+      - tapOn:
+          text: "Opening balance"
+      - inputText: "123.45"
+      - hideKeyboard
+      - tapOn:
+          text: "IBAN"
+      - inputText: "ES9121000418450200051332"
+      - hideKeyboard
+      - tapOn:
+          text: "Save"
+
+- assertVisible:
+    text: "Accounts"
+- assertVisible:
+    text: "Travel Card"
