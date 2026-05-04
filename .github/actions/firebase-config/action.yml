@@ -1,0 +1,88 @@
+name: Decode Firebase config
+description: >
+  Decodes base64-encoded Firebase config files into the locations expected by
+  the Android and iOS builds. Pass only the secrets a given job needs — the
+  others are skipped silently. PRs from forks don't get repo secrets, so the
+  caller is responsible for guarding the job (e.g. an `if:` on
+  `pull_request.head.repo.full_name == github.repository`).
+
+inputs:
+  debug-json:
+    description: base64 of androidApp/src/debug/google-services.json
+    required: false
+    default: ""
+  release-json:
+    description: base64 of androidApp/src/release/google-services.json
+    required: false
+    default: ""
+  ios-plist:
+    description: base64 of iosApp/iosApp/GoogleService-Info.plist
+    required: false
+    default: ""
+  require-all:
+    description: >
+      If "true", fail when any of debug-json / release-json / ios-plist is
+      empty. Default "false" — decode whichever ones are provided.
+    required: false
+    default: "false"
+
+runs:
+  using: composite
+  steps:
+    - name: Decode Firebase config files
+      shell: bash
+      env:
+        DEBUG_JSON: ${{ inputs.debug-json }}
+        RELEASE_JSON: ${{ inputs.release-json }}
+        IOS_PLIST: ${{ inputs.ios-plist }}
+        REQUIRE_ALL: ${{ inputs.require-all }}
+      run: |
+        set -euo pipefail
+
+        decoded=0
+        skipped=0
+
+        decode_b64() {
+          local label="$1" value="$2" dest="$3"
+          if [ -z "$value" ]; then
+            if [ "${REQUIRE_ALL}" = "true" ]; then
+              echo "::error::$label secret is empty but require-all=true."
+              exit 1
+            fi
+            echo "  - $label: not provided, skipping"
+            skipped=$((skipped + 1))
+            return
+          fi
+          mkdir -p "$(dirname "$dest")"
+          # printf %s avoids trailing newline that would break some decoders.
+          printf '%s' "$value" | base64 -d > "$dest"
+          if [ ! -s "$dest" ]; then
+            echo "::error::Decoded $label is empty — secret is malformed."
+            exit 1
+          fi
+          echo "  - $label: decoded → $dest ($(wc -c < "$dest") bytes)"
+          decoded=$((decoded + 1))
+        }
+
+        echo "Decoding Firebase config secrets:"
+        decode_b64 "GOOGLE_SERVICES_JSON_DEBUG"   "$DEBUG_JSON"   "androidApp/src/debug/google-services.json"
+        decode_b64 "GOOGLE_SERVICES_JSON_RELEASE" "$RELEASE_JSON" "androidApp/src/release/google-services.json"
+        decode_b64 "GOOGLE_SERVICE_INFO_PLIST"    "$IOS_PLIST"    "iosApp/iosApp/GoogleService-Info.plist"
+
+        # JSON sanity-check: must parse and have a project_info block.
+        for f in androidApp/src/debug/google-services.json androidApp/src/release/google-services.json; do
+          if [ -f "$f" ]; then
+            python3 -c "import json,sys; d=json.load(open('$f')); assert 'project_info' in d, 'missing project_info'" \
+              || { echo "::error::$f is not a valid google-services.json"; exit 1; }
+          fi
+        done
+
+        # Plist sanity-check: plutil if available (always on macOS, sometimes
+        # on Linux runners), otherwise just verify it's not empty.
+        plist=iosApp/iosApp/GoogleService-Info.plist
+        if [ -f "$plist" ] && command -v plutil >/dev/null 2>&1; then
+          plutil -lint "$plist" >/dev/null \
+            || { echo "::error::$plist is not a valid plist"; exit 1; }
+        fi
+
+        echo "Done. decoded=$decoded skipped=$skipped"

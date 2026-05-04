@@ -20,6 +20,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Decode Firebase config
+        uses: ./.github/actions/firebase-config
+        with:
+          debug-json:   ${{ secrets.GOOGLE_SERVICES_JSON_DEBUG }}
+          release-json: ${{ secrets.GOOGLE_SERVICES_JSON_RELEASE }}
+          ios-plist:    ${{ secrets.GOOGLE_SERVICE_INFO_PLIST }}
+
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
@@ -151,3 +158,57 @@ jobs:
           path: "**/build/test-results/jvmTest/**/*.xml"
           if-no-files-found: warn
           retention-days: 14
+
+  android-compile:
+    name: Android debug compile
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    # PRs from forks don't get repo secrets, so the google-services step below
+    # would fail. Skip the job in that case — qaCommon already covers the PR.
+    if: >-
+      github.event_name == 'push' ||
+      github.event.pull_request.head.repo.full_name == github.repository
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Decode Firebase config
+        uses: ./.github/actions/firebase-config
+        with:
+          debug-json:   ${{ secrets.GOOGLE_SERVICES_JSON_DEBUG }}
+          release-json: ${{ secrets.GOOGLE_SERVICES_JSON_RELEASE }}
+          ios-plist:    ${{ secrets.GOOGLE_SERVICE_INFO_PLIST }}
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      # Compile-only: catches AGP/Kotlin/google-services regressions without
+      # needing the dev keystore (assembleDebug would require DEV_* secrets,
+      # see androidApp/build.gradle.kts → signingConfigs.dev).
+      - name: Compile Android debug
+        run: ./gradlew :androidApp:processDebugGoogleServices :androidApp:compileDebugSources --stacktrace
+
+  # iOS build is intentionally not wired up yet — macos-14 runners are ~10x more
+  # expensive than ubuntu-latest and the Android compile job catches most
+  # regressions in shared/composeApp/feature modules. To enable, add:
+  #   ios-build:
+  #     runs-on: macos-14
+  #     if: >-
+  #       github.event_name == 'push' ||
+  #       github.event.pull_request.head.repo.full_name == github.repository
+  #     steps:
+  #       - uses: actions/checkout@v4
+  #       - uses: ./.github/actions/firebase-config
+  #         with:
+  #           ios-plist: ${{ secrets.GOOGLE_SERVICE_INFO_PLIST }}
+  #       - uses: actions/setup-java@v4
+  #         with: { distribution: temurin, java-version: "17" }
+  #       - uses: gradle/actions/setup-gradle@v4
+  #       - run: ./gradlew :composeApp:linkPodReleaseFrameworkIosArm64
