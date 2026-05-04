@@ -312,7 +312,9 @@ tasks.register<Exec>("maestroInstallDebug") {
     group = "verification"
     description = "Build USE_EMULATOR=true debug APK and adb-install on connected device/AVD."
     dependsOn("maestroAssembleDebug")
-    commandLine(resolveAdbExecutable(rootDir), "install", "-r", debugApkPath.absolutePath)
+    doFirst {
+        commandLine(resolveAdbExecutable(rootDir), "install", "-r", debugApkPath.absolutePath)
+    }
 }
 
 tasks.register<Exec>("maestroRunAll") {
@@ -320,6 +322,12 @@ tasks.register<Exec>("maestroRunAll") {
     description = "Install APK + run all Maestro flows (Firebase Emulator must be running)."
     dependsOn("maestroInstallDebug")
     commandLine(buildMaestroCommand(rootDir, "scripts/maestro/", excludeTags = maestroSetupTags))
+}
+
+tasks.register("maestroRunAllAndroid") {
+    group = "verification"
+    description = "Android alias for maestroRunAll."
+    dependsOn("maestroRunAll")
 }
 
 tasks.register<Exec>("maestroRunOne") {
@@ -331,6 +339,12 @@ tasks.register<Exec>("maestroRunOne") {
         val flow = resolveMaestroFlow(providers.gradleProperty("maestroFlow").orNull)
         commandLine(buildMaestroCommand(rootDir, flow))
     }
+}
+
+tasks.register("maestroRunOneAndroid") {
+    group = "verification"
+    description = "Android alias for maestroRunOne. Pass -PmaestroFlow=05_sign_out.yaml."
+    dependsOn("maestroRunOne")
 }
 
 tasks.register<Exec>("maestroRunAllJunit") {
@@ -364,6 +378,12 @@ tasks.register<Exec>("maestroRunAllJunit") {
     }
 }
 
+tasks.register("maestroRunAllAndroidJunit") {
+    group = "verification"
+    description = "Android alias for maestroRunAllJunit."
+    dependsOn("maestroRunAllJunit")
+}
+
 tasks.register<Exec>("maestroRunOneJunit") {
     group = "verification"
     description = "Install APK, run one flow (Firebase Emulator must be running), write JUnit XML. Pass -PmaestroFlow=05_sign_out.yaml."
@@ -381,10 +401,16 @@ tasks.register<Exec>("maestroRunOneJunit") {
     }
 }
 
+tasks.register("maestroRunOneAndroidJunit") {
+    group = "verification"
+    description = "Android alias for maestroRunOneJunit. Pass -PmaestroFlow=05_sign_out.yaml."
+    dependsOn("maestroRunOneJunit")
+}
+
 tasks.register("maestroRun") {
     group = "verification"
-    description = "Alias for maestroRunAll."
-    dependsOn("maestroRunAll")
+    description = "Alias for maestroRunAllAndroid."
+    dependsOn("maestroRunAllAndroid")
 }
 
 // -- Hermetic integration-test pipeline --------------------------------------
@@ -550,7 +576,7 @@ tasks.register<Exec>("maestroPrepareAllureResults") {
         "--artifacts-dir", maestroArtifactsDir.absolutePath,
         "--out-dir", maestroAllureResultsDir.absolutePath,
         "--pipeline",
-        "qaMaestro -> maestroInstallDebug -> maestroAssembleDebug -> :androidApp:assembleDebug(-PuseEmulator=true) -> firebase emulators:exec(auth,firestore) -> scripts/firebase/seed.sh -> maestro test --format junit --debug-output --test-output-dir -> maestroPrepareAllureResults -> allureGenerateMaestro",
+        "qaMaestroAndroid -> maestroInstallDebug -> maestroAssembleDebug -> :androidApp:assembleDebug(-PuseEmulator=true) -> firebase emulators:exec(auth,firestore) -> scripts/firebase/seed.sh -> maestro test --format junit --debug-output --test-output-dir -> maestroPrepareAllureResults -> allureGenerateMaestro",
     )
 }
 
@@ -624,9 +650,9 @@ tasks.named<Exec>("allureGenerateAll") {
  * `firestore-tests/` and `:integration-test` EmulatorEnv). APK has
  * `BuildConfig.USE_EMULATOR=true` so it talks to `10.0.2.2:8080/9099`.
  */
-tasks.register<Exec>("qaMaestro") {
+tasks.register<Exec>("qaMaestroAndroid") {
     group = "verification"
-    description = "Boot Firebase Emulator, seed users, run all Maestro flows, generate Allure report."
+    description = "Boot Firebase Emulator, seed users, run all Android Maestro flows, generate Allure report."
     notCompatibleWithConfigurationCache("Spawns Firebase emulator subprocess.")
     dependsOn("maestroInstallDebug")
     finalizedBy("allureGenerateMaestro")
@@ -671,6 +697,12 @@ tasks.register<Exec>("qaMaestro") {
             )
         }
     }
+}
+
+tasks.register("qaMaestro") {
+    group = "verification"
+    description = "Alias for qaMaestroAndroid."
+    dependsOn("qaMaestroAndroid")
 }
 
 tasks.register("qaAll") {
