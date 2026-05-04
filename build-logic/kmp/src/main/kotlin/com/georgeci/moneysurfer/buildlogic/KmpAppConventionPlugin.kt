@@ -5,23 +5,15 @@ import org.gradle.api.JavaVersion
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.VersionCatalogsExtension
-import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.ProviderFactory
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.getByType
 import java.util.Properties
 
-abstract class MsAppExtension {
-    abstract val devKeystoreBaseDir: DirectoryProperty
-}
-
 @Suppress("unused")
 class KmpAppConventionPlugin : Plugin<Project> {
     override fun apply(target: Project): Unit = with(target) {
-        val msApp = extensions.create("msApp", MsAppExtension::class.java)
-        msApp.devKeystoreBaseDir.convention(layout.projectDirectory)
-
         val localProps = loadLocalProperties()
         val versionProps = loadVersionProperties()
         val versionCodeInt = versionProps.requireInt("APP_VERSION_CODE")
@@ -67,15 +59,18 @@ class KmpAppConventionPlugin : Plugin<Project> {
 
                 signingConfigs {
                     create("dev") {
+                        // Keystore paths in local.properties / env are always
+                        // resolved relative to the repo root, regardless of which
+                        // app module applies this convention.
                         val storePath = secrets["DEV_STORE_FILE"] ?: "keystore/dev.jks"
-                        storeFile = msApp.devKeystoreBaseDir.get().file(storePath).asFile
+                        storeFile = rootProject.file(storePath)
                         storePassword = secrets["DEV_STORE_PASSWORD"]
                         keyAlias = secrets["DEV_KEY_ALIAS"]
                         keyPassword = secrets["DEV_KEY_PASSWORD"]
                     }
                     if (hasReleaseSigning) {
                         create("release") {
-                            storeFile = file(secrets["RELEASE_STORE_FILE"]!!)
+                            storeFile = rootProject.file(secrets["RELEASE_STORE_FILE"]!!)
                             storePassword = secrets["RELEASE_STORE_PASSWORD"]
                             keyAlias = secrets["RELEASE_KEY_ALIAS"]
                             keyPassword = secrets["RELEASE_KEY_PASSWORD"]

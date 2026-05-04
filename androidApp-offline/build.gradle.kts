@@ -5,12 +5,6 @@ plugins {
     alias(libs.plugins.kmpApp)
 }
 
-msApp {
-    // Reuse androidApp's keystore — DEV_STORE_FILE in local.properties is relative
-    // to that module; resolve through it explicitly.
-    devKeystoreBaseDir = rootProject.layout.projectDirectory.dir("androidApp")
-}
-
 android {
     namespace = "com.georgeci.moneysurfer.offline"
 
