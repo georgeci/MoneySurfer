@@ -44,8 +44,12 @@ class WorkspaceInviteRepositoryImpl(
 
     override suspend fun upsert(invite: WorkspaceInvite) {
         val now = now()
-        val isNew = dao.getById(invite.id.value) == null
-        val entity = invite.toEntity().copy(updatedAt = now)
+        val existing = dao.getById(invite.id.value)
+        val isNew = existing == null
+        val entity = invite.toEntity().copy(
+            createdAt = existing?.createdAt ?: now,
+            updatedAt = now,
+        )
         dao.upsert(entity)
         log.i {
             "[upsert] id=${entity.id} wid=${entity.workspaceId} email=${entity.email} " +

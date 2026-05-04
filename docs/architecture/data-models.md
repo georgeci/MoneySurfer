@@ -191,10 +191,14 @@ Field name unified: was `addedAt` in Firestore; now `createdAt` everywhere.
 
 ### `workspaces/{wid}/transactions/{tid}` — **Transaction**
 
-`timestamp` (legacy) is gone. Three time fields now:
-- `operationAt: Instant` — when the operation happened (point-in-time, sortable
-  to second/millisecond).
-- `createdAt: Instant` — when the row was created locally.
+`timestamp` (legacy) is gone. Time fields:
+- `operationAt: Instant` — absolute moment of the operation (sortable to ms).
+- `operationDate: LocalDate` — business date the user assigned to the
+  transaction. The budget treats it as living on this day. Stored explicitly
+  so backdating intent survives timezone swings (a 23:30 entry "for yesterday"
+  doesn't drift into "today" when the device zone moves).
+- `createdAt: Instant` — when the row was created locally. Differs from
+  `operationAt` for backdated entries; serves as audit + stable tiebreaker.
 - `updatedAt: Instant` — last LWW write.
 
 | Field | Domain | Room | Firestore |
@@ -207,6 +211,7 @@ Field name unified: was `addedAt` in Firestore; now `createdAt` everywhere.
 | `currencyCode` | `CurrencyCode` | `String` | `String` |
 | `note` | `String` | `String` | `String` |
 | `operationAt` | `Instant` | `Long` | `Long` |
+| `operationDate` | `LocalDate` | `String` (ISO-8601) | `String` (ISO-8601) |
 | `type` | `TransactionType` | `String` | `String` |
 | `status` | `TransactionStatus` | `String` | `String` |
 | `createdAt` | `Instant` | `Long` | `Long` |
@@ -214,8 +219,9 @@ Field name unified: was `addedAt` in Firestore; now `createdAt` everywhere.
 | `deletedAt` | — | — | `Long?` |
 | `clientVersionCode` | — | — | `Int` |
 
-UI grouping is `(operationAt → LocalDate via TimeZone) DESC, createdAt DESC`.
-Same-day rows order by `createdAt` as tiebreaker.
+UI grouping is by `operationDate`. Sort within a group:
+`(operationDate DESC, operationAt DESC, createdAt DESC)`. `createdAt` is the
+stable tiebreaker for entries with identical `operationAt`.
 
 ### `workspaces/{wid}/budgets/{bid}` — **Budget**
 

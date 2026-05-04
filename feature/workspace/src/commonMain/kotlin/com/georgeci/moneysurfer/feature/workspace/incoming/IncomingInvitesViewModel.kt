@@ -95,7 +95,7 @@ class IncomingInvitesViewModel(
                         role = invite.role,
                         invitedByUserId = invite.invitedByUserId.value.take(USER_ID_PREFIX_LEN),
                         expired = now > invite.expiresAt,
-                        expiresAt = invite.expiresAt.toEpochMilliseconds(),
+                        expiresAt = invite.expiresAt,
                     )
                 }.sortedBy { it.expired }
                 val active = items.count { !it.expired }
@@ -199,7 +199,7 @@ data class IncomingInviteUi(
     val role: WorkspaceRole,
     val invitedByUserId: String,
     val expired: Boolean,
-    val expiresAt: Long,
+    val expiresAt: kotlin.time.Instant,
 )
 
 sealed interface IncomingInvitesEvent {

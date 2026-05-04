@@ -19,6 +19,8 @@ import com.georgeci.moneysurfer.domain.usecase.GetTransactionByIdUseCase
 import com.georgeci.moneysurfer.domain.usecase.UpdateTransactionUseCase
 import com.georgeci.moneysurfer.utils.MviViewModel
 import kotlinx.coroutines.flow.first
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import org.koin.core.annotation.KoinViewModel
 
 @KoinViewModel
@@ -167,6 +169,7 @@ class TransactionCreationViewModel(
                         timestamp = transaction.operationAt.toEpochMilliseconds(),
                         isEditMode = true,
                         editingTransactionId = transactionId,
+                        editingCreatedAt = transaction.createdAt,
                         displayCategories = buildDisplayCategories(
                             categories = categories,
                             counts = baseContent.categoryUsageCounts,
@@ -289,6 +292,9 @@ class TransactionCreationViewModel(
         val type = if (state.isExpense) TransactionType.EXPENSE else TransactionType.INCOME
 
         launch {
+            val now = getCurrentTime()
+            val zone = TimeZone.currentSystemDefault()
+            val operationAt = kotlin.time.Instant.fromEpochMilliseconds(state.timestamp)
             val transaction = Transaction(
                 id = state.editingTransactionId ?: TransactionId.uuid(),
                 workspaceId = account.workspaceId,
@@ -297,8 +303,11 @@ class TransactionCreationViewModel(
                 currencyCode = account.currencyCode,
                 categoryId = category.id,
                 note = state.note,
-                operationAt = kotlin.time.Instant.fromEpochMilliseconds(state.timestamp),
+                operationAt = operationAt,
+                operationDate = operationAt.toLocalDateTime(zone).date,
                 type = type,
+                createdAt = state.editingCreatedAt ?: now,
+                updatedAt = now,
             )
 
             if (state.isEditMode) {
@@ -357,6 +366,7 @@ sealed interface TransactionCreationState {
         val selectedCategory: Category?,
         val isEditMode: Boolean,
         val editingTransactionId: TransactionId?,
+        val editingCreatedAt: kotlin.time.Instant? = null,
         val timestamp: Long,
         val categoryUsageCounts: Map<CategoryId, Int>,
         val displayCategories: List<Category>,

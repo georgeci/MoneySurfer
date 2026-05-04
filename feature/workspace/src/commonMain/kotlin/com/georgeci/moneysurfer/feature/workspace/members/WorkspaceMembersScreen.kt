@@ -425,10 +425,10 @@ private val PreviewInvites = listOf(
         "kasia.nowak@gmail.com",
         WorkspaceRole.EDITOR,
         isExpired = false,
-        expiresAt = 0L,
+        expiresAt = kotlin.time.Instant.fromEpochMilliseconds(0),
     ),
-    InviteUi(WorkspaceInviteId("i-2"), "pavel@mail.com", WorkspaceRole.VIEWER, isExpired = false, expiresAt = 0L),
-    InviteUi(WorkspaceInviteId("i-3"), "lena@mail.com", WorkspaceRole.VIEWER, isExpired = true, expiresAt = 0L),
+    InviteUi(WorkspaceInviteId("i-2"), "pavel@mail.com", WorkspaceRole.VIEWER, isExpired = false, expiresAt = kotlin.time.Instant.fromEpochMilliseconds(0)),
+    InviteUi(WorkspaceInviteId("i-3"), "lena@mail.com", WorkspaceRole.VIEWER, isExpired = true, expiresAt = kotlin.time.Instant.fromEpochMilliseconds(0)),
 )
 
 private fun previewState(

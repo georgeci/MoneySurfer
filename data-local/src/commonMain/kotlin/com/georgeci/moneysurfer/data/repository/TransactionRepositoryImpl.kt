@@ -15,6 +15,8 @@ import com.georgeci.moneysurfer.domain.primitives.TransactionType
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 import com.georgeci.moneysurfer.domain.repositories.TransactionRepository
 import com.georgeci.moneysurfer.domain.sync.SyncEntityTypes
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import com.georgeci.moneysurfer.sync.repository.MutationOperation
 import com.georgeci.moneysurfer.sync.repository.OutboxEnqueuer
 import com.georgeci.moneysurfer.domain.primitives.Clock
@@ -48,13 +50,20 @@ class TransactionRepositoryImpl(
         dao.getById(id.value)?.toDomain()
 
     override suspend fun insert(transaction: Transaction) {
-        val entity = transaction.toEntity().copy(updatedAt = nowMillis())
+        val now = nowMillis()
+        val entity = transaction.toEntity().copy(createdAt = now, updatedAt = now)
         dao.insert(entity)
         enqueueUpsert(entity, MutationOperation.INSERT)
     }
 
     override suspend fun update(transaction: Transaction) {
-        val entity = transaction.toEntity().copy(updatedAt = nowMillis())
+        // Preserve the row's original createdAt — domain object may have been
+        // reconstructed without it (defaults to operationAt). Audit invariant.
+        val existingCreatedAt = dao.getById(transaction.id.value)?.createdAt
+        val entity = transaction.toEntity().copy(
+            createdAt = existingCreatedAt ?: transaction.toEntity().createdAt,
+            updatedAt = nowMillis(),
+        )
         dao.update(entity)
         enqueueUpsert(entity, MutationOperation.UPDATE)
     }
@@ -92,6 +101,8 @@ private fun TransactionEntity.toDomain() = Transaction(
     categoryId = categoryId?.let(::CategoryId),
     note = note,
     operationAt = operationAt.toInstant(),
+    operationDate = operationDate.toLocalDateOrNull()
+        ?: operationAt.toInstant().toLocalDateTime(TimeZone.currentSystemDefault()).date,
     type = parseType(type, amount),
     status = parseStatus(status),
     createdAt = createdAt.toInstant(),
@@ -108,6 +119,7 @@ private fun CategorizedTransactionEntity.toDomain() = CategorizedTransaction(
         categoryId = categoryId?.let(::CategoryId),
         note = note,
         operationAt = operationAt.toInstant(),
+        operationDate = operationDate.toLocalDate(),
         type = parseType(type, amount),
         status = parseStatus(status),
         createdAt = createdAt.toInstant(),
@@ -125,6 +137,7 @@ private fun Transaction.toEntity() = TransactionEntity(
     categoryId = categoryId?.value,
     note = note,
     operationAt = operationAt.toEpochMillis(),
+    operationDate = operationDate.toIsoDate(),
     type = type.name,
     status = status.name,
     createdAt = createdAt.toEpochMillis(),

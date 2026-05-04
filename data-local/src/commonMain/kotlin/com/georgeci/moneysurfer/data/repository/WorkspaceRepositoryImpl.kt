@@ -32,13 +32,18 @@ class WorkspaceRepositoryImpl(
         dao.getById(id.value)?.toDomain()
 
     override suspend fun insert(workspace: Workspace) {
-        val entity = workspace.toEntity().copy(updatedAt = clock.nowMillis())
+        val now = clock.nowMillis()
+        val entity = workspace.toEntity().copy(createdAt = now, updatedAt = now)
         dao.insert(entity)
         enqueueUpsert(entity, MutationOperation.INSERT)
     }
 
     override suspend fun update(workspace: Workspace) {
-        val entity = workspace.toEntity().copy(updatedAt = clock.nowMillis())
+        val existingCreatedAt = dao.getById(workspace.id.value)?.createdAt
+        val entity = workspace.toEntity().copy(
+            createdAt = existingCreatedAt ?: workspace.toEntity().createdAt,
+            updatedAt = clock.nowMillis(),
+        )
         dao.update(entity)
         enqueueUpsert(entity, MutationOperation.UPDATE)
     }

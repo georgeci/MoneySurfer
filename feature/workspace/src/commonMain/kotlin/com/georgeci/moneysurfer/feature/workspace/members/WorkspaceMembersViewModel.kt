@@ -155,7 +155,7 @@ private fun WorkspaceInvite.toUi(now: kotlin.time.Instant): InviteUi = InviteUi(
     email = email,
     role = role,
     isExpired = expiresAt <= now,
-    expiresAt = expiresAt.toEpochMilliseconds(),
+    expiresAt = expiresAt,
 )
 
 @optics
@@ -203,7 +203,7 @@ data class InviteUi(
     val email: String,
     val role: WorkspaceRole,
     val isExpired: Boolean,
-    val expiresAt: Long,
+    val expiresAt: kotlin.time.Instant,
 )
 
 enum class MembersTab { Active, Invited }

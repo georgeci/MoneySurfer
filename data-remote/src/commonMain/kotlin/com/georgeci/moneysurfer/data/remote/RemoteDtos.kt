@@ -72,6 +72,7 @@ data class TransactionDoc(
     val currencyCode: String = "",
     val note: String = "",
     val operationAt: Long = 0L,
+    val operationDate: String = "",
     val type: String = "",
     val status: String = "ACTUAL",
     val createdAt: Long = 0L,

@@ -91,10 +91,11 @@ class TransactionsByAccountViewModel(
         }
         val zone = TimeZone.currentSystemDefault()
         val sorted = filtered.sortedWith(
-            compareByDescending<CategorizedTransaction> { it.operationAt }
+            compareByDescending<CategorizedTransaction> { it.transaction.operationDate }
+                .thenByDescending { it.operationAt }
                 .thenByDescending { it.transaction.createdAt },
         )
-        val groups = sorted.groupBy { dateKey(it.operationAt, zone) }
+        val groups = sorted.groupBy { it.transaction.operationDate }
             .map { (key, txns) ->
                 val net = txns.fold(Money.zero()) { acc, t -> acc + t.signedMoney() }
                 val groupCurrency = txns.first().currencyCode

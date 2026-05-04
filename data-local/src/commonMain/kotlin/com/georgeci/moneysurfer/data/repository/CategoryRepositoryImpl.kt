@@ -32,13 +32,18 @@ class CategoryRepositoryImpl(
         dao.getById(id.value)?.toDomain()
 
     override suspend fun insert(category: Category) {
-        val entity = category.toEntity().copy(updatedAt = clock.nowMillis())
+        val now = clock.nowMillis()
+        val entity = category.toEntity().copy(createdAt = now, updatedAt = now)
         dao.insert(entity)
         enqueueUpsert(entity, MutationOperation.INSERT)
     }
 
     override suspend fun update(category: Category) {
-        val entity = category.toEntity().copy(updatedAt = clock.nowMillis())
+        val existingCreatedAt = dao.getById(category.id.value)?.createdAt
+        val entity = category.toEntity().copy(
+            createdAt = existingCreatedAt ?: category.toEntity().createdAt,
+            updatedAt = clock.nowMillis(),
+        )
         dao.update(entity)
         enqueueUpsert(entity, MutationOperation.UPDATE)
     }
