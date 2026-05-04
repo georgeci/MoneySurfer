@@ -35,6 +35,7 @@ plugins {
 }
 
 include(":androidApp")
+include(":androidApp-offline")
 include(":composeApp")
 include(":composeAppOffline")
 include(":domain")
