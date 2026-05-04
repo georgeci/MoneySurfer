@@ -1,4 +1,4 @@
-appId: com.georgeci.moneysurfer.dev
+appId: ${APP_ID}
 name: Settings — Sign out
 ---
 # Ensure active session and dashboard state

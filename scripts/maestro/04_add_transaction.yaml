@@ -1,4 +1,4 @@
-appId: com.georgeci.moneysurfer.dev
+appId: ${APP_ID}
 name: Transaction — Add expense transaction
 ---
 # Pre-condition: Dashboard with at least one account

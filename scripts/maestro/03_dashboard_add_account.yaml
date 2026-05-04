@@ -1,4 +1,4 @@
-appId: com.georgeci.moneysurfer.dev
+appId: ${APP_ID}
 name: Dashboard — Add bank account
 ---
 # Pre-condition: user is on DashboardScreen with a workspace
