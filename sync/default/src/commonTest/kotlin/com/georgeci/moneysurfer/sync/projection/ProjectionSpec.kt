@@ -1,5 +1,7 @@
 package com.georgeci.moneysurfer.sync.projection
 
+import com.georgeci.moneysurfer.domain.sync.ProjectionScope
+import com.georgeci.moneysurfer.domain.sync.ProjectionSummary
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 

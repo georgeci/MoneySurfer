@@ -1,4 +1,4 @@
-# QA: Tests + Kover + Allure (common, Android host, Android device, Maestro)
+# QA: Tests + Kover + Allure (common, Android host, Android device, Maestro, Firestore rules)
 
 All QA scopes follow one shape: `qa<Scope>` runs the scope's tests, attaches Kover where it applies, and **always** finalizes by generating an Allure report into a per-scope directory under `build/reports/allure/<scope>/`. Allure runs even when tests fail.
 
@@ -59,7 +59,8 @@ FIREBASE_PROJECT_ID=demo-moneysurfer scripts/firebase/start.sh
 | `./gradlew qaAndroidHost` | `testAndroidHost` | yes | `build/reports/allure/android-host/` |
 | `./gradlew qaAndroidDevice` | `testAndroidDevice` (instrumented) | — | `build/reports/allure/android-device/` |
 | `./gradlew qaMaestro` | all flows via `firebase emulators:exec` + seed | — | `build/reports/allure/maestro/` |
-| `./gradlew qaAll` | `testAllScopes` (common + Android host + Android device; no Maestro run) | yes | `build/reports/allure/all/` |
+| `./gradlew qaFirestoreRules` | Mocha (`firestore-tests/`) via `firebase emulators:exec --only firestore` | — | `build/reports/allure/firestore/` |
+| `./gradlew qaAll` | `testAllScopes` (common + Android host + Android device; no Maestro/Firestore-rules run) | yes | `build/reports/allure/all/` |
 
 ## Plain test/Maestro tasks (no Allure)
 
@@ -138,17 +139,32 @@ as `integrationAvd`. AGP generates these companion tasks off it:
 
 ## Firebase test suite (`firestore-tests`)
 
-Standalone Firestore rules suite (Mocha + `@firebase/rules-unit-testing`). Not Gradle task.
+Firestore rules suite (Mocha + `@firebase/rules-unit-testing`). Has both a
+direct npm entry point and a Gradle wrapper that emits Allure.
 
 ```bash
 cd firestore-tests
 npm install
-npm test
+npm test            # human-readable spec reporter
+npm run test:junit  # JUnit XML to ../build/test-results/firestore/firestore-report.xml
 ```
 
-`npm test` wraps `firebase emulators:exec --only firestore` with project `demo-moneysurfer` (from `firestore-tests/package.json`).
+Both scripts wrap `firebase emulators:exec --only firestore` with project
+`demo-moneysurfer`.
 
-Watch mode:
+For an Allure report on top of the JUnit XML, use the Gradle wrapper — same
+shape as `qaMaestro`:
+
+```bash
+./gradlew qaFirestoreRules
+# → build/test-results/firestore/firestore-report.xml
+# → build/reports/allure/firestore/index.html (always, even on red)
+```
+
+CI runs this on PRs that touch `firestore.rules`, `firestore.indexes.json`, or
+`firestore-tests/**` — see [.github/workflows/firestore-rules.yml](.github/workflows/firestore-rules.yml).
+
+Watch mode (no Allure):
 
 ```bash
 # terminal 1
@@ -168,6 +184,7 @@ Each can be run on its own; it consumes whatever results are already on disk and
 ./gradlew allureGenerateAndroidHost
 ./gradlew allureGenerateAndroidDevice
 ./gradlew allureGenerateMaestro
+./gradlew allureGenerateFirestore
 ./gradlew allureGenerateAll
 ```
 
@@ -178,11 +195,13 @@ Each can be run on its own; it consumes whatever results are already on disk and
 - Maestro logs (when Gradle task runs): `build/logs/maestro/maestroRunAllJunit.out.log`, `build/logs/maestro/maestroRunAllJunit.err.log`
 - Maestro debug output (hierarchy, run diagnostics): `build/maestro-debug/`
 - Maestro screenshots/artifacts: `build/maestro-artifacts/`
+- Firestore rules JUnit XML: `build/test-results/firestore/firestore-report.xml`
 - Allure (per-scope):
   - `build/reports/allure/common/index.html`
   - `build/reports/allure/android-host/index.html`
   - `build/reports/allure/android-device/index.html`
   - `build/reports/allure/maestro/index.html`
+  - `build/reports/allure/firestore/index.html`
   - `build/reports/allure/all/index.html`
 - Kover HTML coverage: `build/reports/kover/html/index.html`
 - Kover XML coverage: `build/reports/kover/report.xml`

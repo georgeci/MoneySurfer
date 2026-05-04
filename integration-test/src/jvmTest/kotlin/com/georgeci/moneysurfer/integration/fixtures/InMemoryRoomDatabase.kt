@@ -3,6 +3,7 @@ package com.georgeci.moneysurfer.integration.fixtures
 import androidx.room.Room
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import com.georgeci.moneysurfer.data.db.MoneySurferDatabase
+import com.georgeci.moneysurfer.sync.db.SyncDatabase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 
@@ -16,6 +17,12 @@ import kotlinx.coroutines.IO
  */
 fun inMemoryRoomDatabase(): MoneySurferDatabase =
     Room.inMemoryDatabaseBuilder<MoneySurferDatabase>()
+        .setDriver(BundledSQLiteDriver())
+        .setQueryCoroutineContext(Dispatchers.IO)
+        .build()
+
+fun inMemorySyncDatabase(): SyncDatabase =
+    Room.inMemoryDatabaseBuilder<SyncDatabase>()
         .setDriver(BundledSQLiteDriver())
         .setQueryCoroutineContext(Dispatchers.IO)
         .build()

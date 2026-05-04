@@ -180,17 +180,36 @@ val maestroAllureResultsDir = rootProject.file("build/allure-results/maestro")
 val maestroEmulatorEnv = loadMaestroTestUser(rootDir)
 val maestroSetupTags = listOf("setup")
 
+val firestoreTestsDir = rootProject.file("firestore-tests")
+val firestoreReportsDir = rootProject.file("build/test-results/firestore")
+val firestoreJunit = firestoreReportsDir.resolve("firestore-report.xml")
+
 val allureRootDir = rootProject.file("build/reports/allure")
 val allureCommonDir = allureRootDir.resolve("common")
 val allureAndroidHostDir = allureRootDir.resolve("android-host")
 val allureAndroidDeviceDir = allureRootDir.resolve("android-device")
 val allureMaestroDir = allureRootDir.resolve("maestro")
+val allureFirestoreDir = allureRootDir.resolve("firestore")
 val allureAllDir = allureRootDir.resolve("all")
 
-val commonScopeModules = listOf("composeApp", "shared", "domain", "data", "sync", "integration-test")
-val androidHostScopeModules = listOf("shared", "domain", "data", "sync", "uikit")
-val androidDeviceScopeModules =
-    listOf("androidApp", "shared", "domain", "data", "sync", "uikit", "integration-test")
+val commonScopeModules = listOf(
+    "composeApp", "shared", "domain",
+    "data-local", "data-remote",
+    "sync/api", "sync/default", "sync-surfer",
+    "integration-test",
+)
+val androidHostScopeModules = listOf(
+    "shared", "domain",
+    "data-local", "data-remote",
+    "sync/api", "sync/default", "sync-surfer",
+    "uikit",
+)
+val androidDeviceScopeModules = listOf(
+    "androidApp", "shared", "domain",
+    "data-local", "data-remote",
+    "sync/api", "sync/default", "sync-surfer",
+    "uikit", "integration-test",
+)
 
 fun moduleTestResults(module: String, scope: String): File =
     rootProject.file("$module/build/test-results/$scope")
@@ -209,9 +228,16 @@ val androidDeviceScopeAllureSources: List<File> =
 
 val maestroAllureSources: List<File> = listOf(maestroAllureResultsDir)
 
+val firestoreAllureSources: List<File> = listOf(firestoreReportsDir)
+
 val allScopeAllureSources: List<File> =
-    (commonScopeAllureSources + androidHostScopeAllureSources + androidDeviceScopeAllureSources + maestroAllureSources)
-        .distinct()
+    (
+        commonScopeAllureSources +
+            androidHostScopeAllureSources +
+            androidDeviceScopeAllureSources +
+            maestroAllureSources +
+            firestoreAllureSources
+        ).distinct()
 
 /**
  * Walks each source directory and returns every subdir (and the source itself)
@@ -438,16 +464,22 @@ val commonTestTasks = listOf(
     ":composeApp:jvmTest",
     ":shared:jvmTest",
     ":domain:jvmTest",
-    ":data:jvmTest",
-    ":sync:jvmTest",
+    ":data-local:jvmTest",
+    ":data-remote:jvmTest",
+    ":sync:api:jvmTest",
+    ":sync:default:jvmTest",
+    ":sync-surfer:jvmTest",
     ":integration-test:jvmTest",
 )
 
 val androidHostTestTasks = listOf(
     ":shared:testAndroidHostTest",
     ":domain:testAndroidHostTest",
-    ":data:testAndroidHostTest",
-    ":sync:testAndroidHostTest",
+    ":data-local:testAndroidHostTest",
+    ":data-remote:testAndroidHostTest",
+    ":sync:api:testAndroidHostTest",
+    ":sync:default:testAndroidHostTest",
+    ":sync-surfer:testAndroidHostTest",
     ":uikit:testAndroidHostTest",
 )
 
@@ -455,8 +487,11 @@ val androidDeviceTestTasks = listOf(
     ":androidApp:connectedDebugAndroidTest",
     ":shared:connectedAndroidTest",
     ":domain:connectedAndroidTest",
-    ":data:connectedAndroidTest",
-    ":sync:connectedAndroidTest",
+    ":data-local:connectedAndroidTest",
+    ":data-remote:connectedAndroidTest",
+    ":sync:api:connectedAndroidTest",
+    ":sync:default:connectedAndroidTest",
+    ":sync-surfer:connectedAndroidTest",
     ":uikit:connectedAndroidTest",
     // `:integration-test` uses the AGP `KotlinMultiplatformAndroidLibraryTarget`
     // which exposes `connectedAndroidDeviceTest` rather than `connectedAndroidTest`.
@@ -493,6 +528,7 @@ registerAllureGenerate("allureGenerateCommon", "common (JVM)", commonScopeAllure
 registerAllureGenerate("allureGenerateAndroidHost", "Android host", androidHostScopeAllureSources, allureAndroidHostDir)
 registerAllureGenerate("allureGenerateAndroidDevice", "Android device", androidDeviceScopeAllureSources, allureAndroidDeviceDir)
 registerAllureGenerate("allureGenerateMaestro", "Maestro", maestroAllureSources, allureMaestroDir)
+registerAllureGenerate("allureGenerateFirestore", "Firestore rules (Mocha)", firestoreAllureSources, allureFirestoreDir)
 registerAllureGenerate("allureGenerateAll", "all", allScopeAllureSources, allureAllDir)
 
 tasks.register<Exec>("maestroPrepareAllureResults") {
@@ -542,6 +578,41 @@ tasks.register("qaAndroidDevice") {
     description = "Run android device scope tests; always generate Allure report into build/reports/allure/android-device/."
     dependsOn("testAndroidDevice")
     finalizedBy("allureGenerateAndroidDevice")
+}
+
+/**
+ * Mocha-based Firestore security rules tests under `firestore-tests/`. The npm
+ * `test:junit` script wraps `firebase emulators:exec --only firestore` around
+ * `mocha`, writing JUnit XML to `build/test-results/firestore/` (relative path
+ * `../build/...` from inside `firestore-tests/`). `mocha-junit-reporter` creates
+ * the directory automatically.
+ *
+ * `isIgnoreExitValue = true` mirrors `maestroRunAllJunit` — we still want the
+ * Allure report on red runs, and we re-throw with a clearer message in `doLast`.
+ */
+tasks.register<Exec>("qaFirestoreRules") {
+    group = "verification"
+    description = "Run Mocha Firestore-rules tests (boots firestore emulator); writes JUnit XML for Allure into build/test-results/firestore/."
+    notCompatibleWithConfigurationCache("Spawns Firebase emulator subprocess.")
+    finalizedBy("allureGenerateFirestore")
+    isIgnoreExitValue = true
+    workingDir = firestoreTestsDir
+    doFirst {
+        firestoreReportsDir.mkdirs()
+    }
+    commandLine("npm", "run", "test:junit")
+    doLast {
+        val exit = executionResult.get().exitValue
+        if (exit != 0) {
+            throw GradleException(
+                "qaFirestoreRules failed (exit=$exit). JUnit: ${firestoreJunit.absolutePath}",
+            )
+        }
+    }
+}
+
+tasks.named<Exec>("allureGenerateAll") {
+    dependsOn("allureGenerateFirestore")
 }
 
 /**

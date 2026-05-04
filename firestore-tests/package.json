@@ -5,11 +5,13 @@
   "description": "Firestore security rules unit tests for the MoneySurfer project. Runs against the local Firestore emulator.",
   "scripts": {
     "test": "firebase --project=demo-moneysurfer emulators:exec --only firestore 'mocha --reporter spec --timeout 20000 test/**/*.spec.js'",
-    "test:watch": "mocha --reporter spec --timeout 20000 --watch test/**/*.spec.js"
+    "test:watch": "mocha --reporter spec --timeout 20000 --watch test/**/*.spec.js",
+    "test:junit": "firebase --project=demo-moneysurfer emulators:exec --only firestore 'mocha --reporter mocha-junit-reporter --reporter-options mochaFile=../build/test-results/firestore/firestore-report.xml,testCaseSwitchClassnameAndName=true --timeout 20000 test/**/*.spec.js'"
   },
   "devDependencies": {
     "@firebase/rules-unit-testing": "^4.0.1",
     "firebase": "^11.6.0",
-    "mocha": "^11.1.0"
+    "mocha": "^11.1.0",
+    "mocha-junit-reporter": "^2.2.1"
   }
 }

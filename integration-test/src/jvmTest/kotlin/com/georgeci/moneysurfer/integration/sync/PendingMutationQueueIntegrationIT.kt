@@ -1,10 +1,9 @@
 package com.georgeci.moneysurfer.integration.sync
 
-import com.georgeci.moneysurfer.data.sync.PendingMutationQueueImpl
-import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
+import com.georgeci.moneysurfer.domain.sync.SyncEntityTypes
 import com.georgeci.moneysurfer.integration.fixtures.IntegrationHarness
-import com.georgeci.moneysurfer.sync.api.SyncEntityType
 import com.georgeci.moneysurfer.sync.api.SyncScope
+import com.georgeci.moneysurfer.sync.internal.repository.PendingMutationQueueImpl
 import com.georgeci.moneysurfer.sync.repository.MutationOperation
 import com.georgeci.moneysurfer.sync.repository.PendingMutation
 import io.kotest.core.spec.style.StringSpec
@@ -31,7 +30,7 @@ class PendingMutationQueueIntegrationIT : StringSpec({
 
     beforeEach {
         harness = IntegrationHarness()
-        queue = PendingMutationQueueImpl(harness.database.pendingMutationDao())
+        queue = PendingMutationQueueImpl(harness.syncDatabase.pendingMutationDao())
     }
 
     afterEach {
@@ -91,11 +90,10 @@ private fun aMutation(
     createdAt: kotlin.time.Instant = Clock.System.now(),
 ): PendingMutation = PendingMutation(
     id = id,
-    entityType = SyncEntityType.TRANSACTION,
+    entityType = SyncEntityTypes.TRANSACTION,
     entityId = entityId,
     operation = MutationOperation.INSERT,
-    workspaceId = WorkspaceId("ws-1"),
-    payload = """{"hello":"world"}""",
+    scopeKey = "ws-1",
     createdAt = createdAt,
     attempts = 0,
     lastError = null,

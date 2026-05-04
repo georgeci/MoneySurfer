@@ -1,6 +1,7 @@
 package com.georgeci.moneysurfer.integration.fixtures
 
 import com.georgeci.moneysurfer.data.db.MoneySurferDatabase
+import com.georgeci.moneysurfer.sync.db.SyncDatabase
 
 /**
  * One-stop wiring of real `:data` impls for an integration test.
@@ -20,8 +21,10 @@ import com.georgeci.moneysurfer.data.db.MoneySurferDatabase
  */
 class IntegrationHarness {
     val database: MoneySurferDatabase = inMemoryRoomDatabase()
+    val syncDatabase: SyncDatabase = inMemorySyncDatabase()
 
     fun close() {
         database.close()
+        syncDatabase.close()
     }
 }
