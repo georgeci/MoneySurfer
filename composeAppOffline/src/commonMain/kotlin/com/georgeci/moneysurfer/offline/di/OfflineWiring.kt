@@ -19,4 +19,5 @@ private val offlineNoOpModule: Module = module {
  */
 val offlineWiring: List<Module> = listOf(
     offlineNoOpModule,
+    OfflineKoinApp().module(),
 )

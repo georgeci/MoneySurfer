@@ -39,6 +39,7 @@ kotlin {
             // gitlive-firebase can never end up on the offline classpath.
             api(projects.shared)
             implementation(projects.sync.api)
+            implementation(projects.sync.noOp)
 
             implementation(project.dependencies.platform(libs.koin.bom))
             implementation(libs.koin.core)
