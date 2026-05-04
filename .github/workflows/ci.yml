@@ -195,6 +195,139 @@ jobs:
       - name: Compile Android debug
         run: ./gradlew :androidApp:processDebugGoogleServices :androidApp:compileDebugSources --stacktrace
 
+  firestore-rules:
+    name: Firestore rules (Mocha + Allure)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    # Standalone: uses fake `demo-moneysurfer` project against the local
+    # Firestore emulator, so no Firebase secrets needed (runs on fork PRs too).
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Java is required by the Firebase Emulator Suite (Firestore emulator
+      # ships as a JAR that `firebase-tools` launches).
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: firestore-tests/package-lock.json
+
+      - name: Install firebase-tools
+        run: npm i -g firebase-tools
+
+      - name: Install firestore-tests deps
+        working-directory: firestore-tests
+        run: npm ci
+
+      - name: Install Allure CLI
+        shell: bash
+        run: |
+          set -euo pipefail
+          ALLURE_VERSION=2.34.1
+          curl -Ls "https://github.com/allure-framework/allure2/releases/download/${ALLURE_VERSION}/allure-${ALLURE_VERSION}.tgz" \
+            | tar -xz -C "${RUNNER_TEMP}"
+          echo "${RUNNER_TEMP}/allure-${ALLURE_VERSION}/bin" >> "${GITHUB_PATH}"
+
+      - name: Run Mocha Firestore-rules tests
+        run: ./gradlew qaFirestoreRules --stacktrace
+
+      - name: Write Mocha + Allure summary
+        if: always()
+        shell: bash
+        run: |
+          python3 - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          from pathlib import Path
+          import html
+          import xml.etree.ElementTree as ET
+
+          junit = Path("build/test-results/firestore/firestore-report.xml")
+
+          print("## Firestore rules — Mocha + Allure")
+          print()
+          if not junit.exists():
+              print(f"No JUnit XML found at `{junit}`.")
+              raise SystemExit
+
+          try:
+              root = ET.parse(junit).getroot()
+          except ET.ParseError as exc:
+              print(f"Could not parse `{junit}`: {exc}")
+              raise SystemExit
+
+          # mocha-junit-reporter wraps everything in a <testsuites> with per-describe
+          # <testsuite> children. Aggregate across all of them.
+          suites = root.findall("testsuite") or [root]
+          totals = {"tests": 0, "failures": 0, "errors": 0, "skipped": 0, "time": 0.0}
+          failed_cases = []
+          for suite in suites:
+              totals["tests"] += int(suite.attrib.get("tests", 0))
+              totals["failures"] += int(suite.attrib.get("failures", 0))
+              totals["errors"] += int(suite.attrib.get("errors", 0))
+              totals["skipped"] += int(suite.attrib.get("skipped", 0))
+              totals["time"] += float(suite.attrib.get("time", 0.0))
+              for case in suite.findall("testcase"):
+                  if case.find("failure") is not None or case.find("error") is not None:
+                      failed_cases.append(
+                          f"{case.attrib.get('classname', '')}.{case.attrib.get('name', '')}"
+                      )
+
+          passed = totals["tests"] - totals["failures"] - totals["errors"] - totals["skipped"]
+          outcome = "✅" if totals["failures"] == 0 and totals["errors"] == 0 else "❌"
+
+          print("| Suite | Tests | Passed | Failed | Errors | Skipped | Time |")
+          print("|---|---:|---:|---:|---:|---:|---:|")
+          print(
+              f"| qaFirestoreRules {outcome} | {totals['tests']} | {passed} | "
+              f"{totals['failures']} | {totals['errors']} | {totals['skipped']} | "
+              f"{totals['time']:.1f}s |"
+          )
+          print()
+          print("- Allure report artifact: `allure-report-firestore`")
+          print("- JUnit XML artifact: `firestore-junit-results`")
+
+          if failed_cases:
+              print()
+              print("<details>")
+              print("<summary>Failed test cases</summary>")
+              print()
+              for case in failed_cases[:30]:
+                  print(f"- `{html.escape(case)}`")
+              if len(failed_cases) > 30:
+                  print(f"- ... and {len(failed_cases) - 30} more")
+              print()
+              print("</details>")
+          PY
+
+      - name: Upload Allure report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-report-firestore
+          path: build/reports/allure/firestore/
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Upload JUnit results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: firestore-junit-results
+          path: build/test-results/firestore/*.xml
+          if-no-files-found: warn
+          retention-days: 14
+
   # iOS build is intentionally not wired up yet — macos-14 runners are ~10x more
   # expensive than ubuntu-latest and the Android compile job catches most
   # regressions in shared/composeApp/feature modules. To enable, add:

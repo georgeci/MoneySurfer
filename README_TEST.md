@@ -161,8 +161,8 @@ shape as `qaMaestro`:
 # → build/reports/allure/firestore/index.html (always, even on red)
 ```
 
-CI runs this on PRs that touch `firestore.rules`, `firestore.indexes.json`, or
-`firestore-tests/**` — see [.github/workflows/firestore-rules.yml](.github/workflows/firestore-rules.yml).
+CI runs this on every PR as the `firestore-rules` job in
+[.github/workflows/ci.yml](.github/workflows/ci.yml).
 
 Watch mode (no Allure):
 
