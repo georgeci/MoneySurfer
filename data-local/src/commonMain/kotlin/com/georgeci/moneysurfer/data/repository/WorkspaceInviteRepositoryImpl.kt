@@ -13,10 +13,10 @@ import com.georgeci.moneysurfer.domain.repositories.WorkspaceInviteRepository
 import com.georgeci.moneysurfer.domain.sync.SyncEntityTypes
 import com.georgeci.moneysurfer.sync.repository.MutationOperation
 import com.georgeci.moneysurfer.sync.repository.OutboxEnqueuer
+import com.georgeci.moneysurfer.domain.primitives.currentInstant
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import org.koin.core.annotation.Single
-import kotlin.time.Clock
 
 @Single(binds = [WorkspaceInviteRepository::class])
 class WorkspaceInviteRepositoryImpl(
@@ -89,7 +89,7 @@ class WorkspaceInviteRepositoryImpl(
         enqueueUpsert(updated, MutationOperation.UPDATE)
     }
 
-    private fun now(): Long = Clock.System.now().toEpochMilliseconds()
+    private fun now(): Long = currentInstant().toEpochMillis()
 
     private suspend fun enqueueUpsert(entity: WorkspaceInviteEntity, operation: MutationOperation) {
         outboxEnqueuer.enqueueUpsert(
@@ -114,10 +114,10 @@ private fun WorkspaceInviteEntity.toDomain() = WorkspaceInvite(
     role = WorkspaceRole.entries.firstOrNull { it.name == role } ?: WorkspaceRole.VIEWER,
     status = InviteStatus.entries.firstOrNull { it.name == status } ?: InviteStatus.PENDING,
     invitedByUserId = UserId(invitedByUserId),
-    createdAt = createdAt,
-    updatedAt = updatedAt,
-    expiresAt = expiresAt,
-    respondedAt = respondedAt,
+    createdAt = createdAt.toInstant(),
+    updatedAt = updatedAt.toInstant(),
+    expiresAt = expiresAt.toInstant(),
+    respondedAt = respondedAt.toInstantOrNull(),
 )
 
 private fun WorkspaceInvite.toEntity() = WorkspaceInviteEntity(
@@ -128,8 +128,8 @@ private fun WorkspaceInvite.toEntity() = WorkspaceInviteEntity(
     role = role.name,
     status = status.name,
     invitedByUserId = invitedByUserId.value,
-    createdAt = createdAt,
-    updatedAt = updatedAt,
-    expiresAt = expiresAt,
-    respondedAt = respondedAt,
+    createdAt = createdAt.toEpochMillis(),
+    updatedAt = updatedAt.toEpochMillis(),
+    expiresAt = expiresAt.toEpochMillis(),
+    respondedAt = respondedAt.toEpochMillisOrNull(),
 )

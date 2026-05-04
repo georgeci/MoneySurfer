@@ -66,7 +66,7 @@ class TransactionDetailsViewModel(
                     accountName = account?.name.orEmpty(),
                     categoryName = category?.name.orEmpty(),
                     currency = transaction.currencyCode.value,
-                    formattedDate = formatLongDate(transaction.timestamp),
+                    formattedDate = formatLongDate(transaction.operationAt.toEpochMilliseconds()),
                     isPlanned = transaction.status == TransactionStatus.PLANNED,
                     showDeleteConfirmation = false,
                 )

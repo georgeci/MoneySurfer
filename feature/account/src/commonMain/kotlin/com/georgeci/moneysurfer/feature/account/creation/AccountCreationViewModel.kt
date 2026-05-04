@@ -134,7 +134,7 @@ class AccountCreationViewModel(
                         currencyCode = currency,
                         categoryId = null,
                         note = "",
-                        timestamp = getCurrentTime(),
+                        operationAt = getCurrentTime(),
                         type = TransactionType.OPENING_BALANCE,
                     ),
                 )

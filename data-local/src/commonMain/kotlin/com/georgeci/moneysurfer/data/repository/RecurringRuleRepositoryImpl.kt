@@ -13,9 +13,7 @@ import com.georgeci.moneysurfer.domain.repositories.RecurringRuleRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.datetime.DayOfWeek
-import kotlinx.datetime.LocalDate
 import org.koin.core.annotation.Single
-import kotlin.time.Instant
 
 @Single(binds = [RecurringRuleRepository::class])
 class RecurringRuleRepositoryImpl(
@@ -55,10 +53,12 @@ private fun RecurringRuleEntity.toDomain() = RecurringRule(
         missingDayPolicy = MissingDayPolicy.entries.firstOrNull { it.name == scheduleMissingDayPolicy }
             ?: MissingDayPolicy.LAST_DAY_OF_MONTH,
     ),
-    startDate = LocalDate.parse(startDate),
-    nextRunAt = nextRunAt?.let { Instant.fromEpochMilliseconds(it) },
+    startDate = startDate.toLocalDate(),
+    nextRunAt = nextRunAt.toInstantOrNull(),
     autoCreate = autoCreate,
     isActive = isActive,
+    createdAt = createdAt.toInstant(),
+    updatedAt = updatedAt.toInstant(),
 )
 
 private fun RecurringRule.toEntity() = RecurringRuleEntity(
@@ -71,10 +71,12 @@ private fun RecurringRule.toEntity() = RecurringRuleEntity(
     scheduleDaysOfWeek = schedule.daysOfWeek.toWeekdaysStorageValue(),
     scheduleDaysOfMonth = schedule.daysOfMonth.toMonthdaysStorageValue(),
     scheduleMissingDayPolicy = schedule.missingDayPolicy.name,
-    startDate = startDate.toString(),
-    nextRunAt = nextRunAt?.toEpochMilliseconds(),
+    startDate = startDate.toIsoDate(),
+    nextRunAt = nextRunAt.toEpochMillisOrNull(),
     autoCreate = autoCreate,
     isActive = isActive,
+    createdAt = createdAt.toEpochMillis(),
+    updatedAt = updatedAt.toEpochMillis(),
 )
 
 private fun String.parseDaysOfWeek(): Set<DayOfWeek> {

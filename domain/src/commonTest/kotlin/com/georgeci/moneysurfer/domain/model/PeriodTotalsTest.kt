@@ -18,17 +18,17 @@ class PeriodTotalsTest : StringSpec({
     val from = LocalDate(2026, 4, 1)
     val to = LocalDate(2026, 4, 30)
 
-    fun atDate(year: Int, month: Int, day: Int): Long =
-        LocalDateTime(year, month, day, 12, 0).toInstant(tz).toEpochMilliseconds()
+    fun atDate(year: Int, month: Int, day: Int): kotlin.time.Instant =
+        LocalDateTime(year, month, day, 12, 0).toInstant(tz)
 
     val a = accountId()
     val ts = atDate(2026, 4, 15)
 
     "income and expense aggregate separately" {
         val list = listOf(
-            aTransaction(accountId = a, money = Money.fromMinor(300), type = TransactionType.INCOME, timestamp = ts),
-            aTransaction(accountId = a, money = Money.fromMinor(120), type = TransactionType.EXPENSE, timestamp = ts),
-            aTransaction(accountId = a, money = Money.fromMinor(80), type = TransactionType.EXPENSE, timestamp = ts),
+            aTransaction(accountId = a, money = Money.fromMinor(300), type = TransactionType.INCOME, operationAt = ts),
+            aTransaction(accountId = a, money = Money.fromMinor(120), type = TransactionType.EXPENSE, operationAt = ts),
+            aTransaction(accountId = a, money = Money.fromMinor(80), type = TransactionType.EXPENSE, operationAt = ts),
         )
         val totals = calculatePeriodTotalsFromList(list, from, to, tz)
         totals.income shouldBe Money.fromMinor(300)
@@ -42,9 +42,9 @@ class PeriodTotalsTest : StringSpec({
                 accountId = a,
                 money = Money.fromMinor(1000),
                 type = TransactionType.OPENING_BALANCE,
-                timestamp = ts,
+                operationAt = ts,
             ),
-            aTransaction(accountId = a, money = Money.fromMinor(50), type = TransactionType.EXPENSE, timestamp = ts),
+            aTransaction(accountId = a, money = Money.fromMinor(50), type = TransactionType.EXPENSE, operationAt = ts),
         )
         val totals = calculatePeriodTotalsFromList(list, from, to, tz)
         totals.income shouldBe Money.zero()
@@ -59,14 +59,14 @@ class PeriodTotalsTest : StringSpec({
                 money = Money.fromMinor(700),
                 type = TransactionType.INCOME,
                 status = TransactionStatus.PLANNED,
-                timestamp = ts,
+                operationAt = ts,
             ),
             aTransaction(
                 accountId = a,
                 money = Money.fromMinor(200),
                 type = TransactionType.EXPENSE,
                 status = TransactionStatus.PLANNED,
-                timestamp = ts,
+                operationAt = ts,
             ),
         )
         val totals = calculatePeriodTotalsFromList(list, from, to, tz)
@@ -82,19 +82,19 @@ class PeriodTotalsTest : StringSpec({
                 accountId = a,
                 money = Money.fromMinor(500),
                 type = TransactionType.INCOME,
-                timestamp = atDate(2026, 3, 31),
+                operationAt = atDate(2026, 3, 31),
             ),
             aTransaction(
                 accountId = a,
                 money = Money.fromMinor(400),
                 type = TransactionType.INCOME,
-                timestamp = atDate(2026, 5, 1),
+                operationAt = atDate(2026, 5, 1),
             ),
             aTransaction(
                 accountId = a,
                 money = Money.fromMinor(100),
                 type = TransactionType.INCOME,
-                timestamp = atDate(2026, 4, 15),
+                operationAt = atDate(2026, 4, 15),
             ),
         )
         val totals = calculatePeriodTotalsFromList(list, from, to, tz)
@@ -107,13 +107,13 @@ class PeriodTotalsTest : StringSpec({
                 accountId = a,
                 money = Money.fromMinor(10),
                 type = TransactionType.INCOME,
-                timestamp = atDate(2026, 4, 1),
+                operationAt = atDate(2026, 4, 1),
             ),
             aTransaction(
                 accountId = a,
                 money = Money.fromMinor(20),
                 type = TransactionType.INCOME,
-                timestamp = atDate(2026, 4, 30),
+                operationAt = atDate(2026, 4, 30),
             ),
         )
         val totals = calculatePeriodTotalsFromList(list, from, to, tz)
@@ -130,7 +130,7 @@ class PeriodTotalsTest : StringSpec({
                 accountId = a,
                 money = -Money.fromMinor(150),
                 type = TransactionType.EXPENSE,
-                timestamp = ts,
+                operationAt = ts,
             ),
         )
         val totals = calculatePeriodTotalsFromList(list, from, to, tz)

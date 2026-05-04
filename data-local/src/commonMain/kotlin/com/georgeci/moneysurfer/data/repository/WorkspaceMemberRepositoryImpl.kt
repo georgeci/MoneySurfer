@@ -11,10 +11,10 @@ import com.georgeci.moneysurfer.domain.repositories.WorkspaceMemberRepository
 import com.georgeci.moneysurfer.domain.sync.SyncEntityTypes
 import com.georgeci.moneysurfer.sync.repository.MutationOperation
 import com.georgeci.moneysurfer.sync.repository.OutboxEnqueuer
+import com.georgeci.moneysurfer.domain.primitives.currentInstant
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import org.koin.core.annotation.Single
-import kotlin.time.Clock
 
 @Single(binds = [WorkspaceMemberRepository::class])
 class WorkspaceMemberRepositoryImpl(
@@ -74,7 +74,7 @@ class WorkspaceMemberRepositoryImpl(
         enqueueUpsert(updated, MutationOperation.UPDATE)
     }
 
-    private fun now(): Long = Clock.System.now().toEpochMilliseconds()
+    private fun now(): Long = currentInstant().toEpochMillis()
 
     private suspend fun enqueueUpsert(entity: WorkspaceMemberEntity, operation: MutationOperation) {
         outboxEnqueuer.enqueueUpsert(
@@ -95,10 +95,10 @@ private fun WorkspaceMemberEntity.toDomain() = WorkspaceMember(
     displayName = displayName,
     email = email,
     addedByUserId = addedByUserId?.let(::UserId),
-    createdAt = createdAt,
-    updatedAt = updatedAt,
-    leftAt = leftAt,
-    removedAt = removedAt,
+    createdAt = createdAt.toInstant(),
+    updatedAt = updatedAt.toInstant(),
+    leftAt = leftAt.toInstantOrNull(),
+    removedAt = removedAt.toInstantOrNull(),
 )
 
 private fun WorkspaceMember.toEntity() = WorkspaceMemberEntity(
@@ -109,8 +109,8 @@ private fun WorkspaceMember.toEntity() = WorkspaceMemberEntity(
     displayName = displayName,
     email = email,
     addedByUserId = addedByUserId?.value,
-    createdAt = createdAt,
-    updatedAt = updatedAt,
-    leftAt = leftAt,
-    removedAt = removedAt,
+    createdAt = createdAt.toEpochMillis(),
+    updatedAt = updatedAt.toEpochMillis(),
+    leftAt = leftAt.toEpochMillisOrNull(),
+    removedAt = removedAt.toEpochMillisOrNull(),
 )

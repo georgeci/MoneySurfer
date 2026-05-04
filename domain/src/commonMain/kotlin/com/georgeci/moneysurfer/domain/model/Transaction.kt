@@ -8,6 +8,7 @@ import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.domain.primitives.TransactionStatus
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
+import kotlin.time.Instant
 
 data class Transaction(
     val id: TransactionId,
@@ -17,7 +18,9 @@ data class Transaction(
     val currencyCode: CurrencyCode,
     val categoryId: CategoryId?,
     val note: String,
-    val timestamp: Long,
+    val operationAt: Instant,
     val type: TransactionType,
     val status: TransactionStatus = TransactionStatus.ACTUAL,
+    val createdAt: Instant = operationAt,
+    val updatedAt: Instant = createdAt,
 )

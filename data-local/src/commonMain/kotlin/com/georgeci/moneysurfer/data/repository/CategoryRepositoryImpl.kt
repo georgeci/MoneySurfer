@@ -10,10 +10,10 @@ import com.georgeci.moneysurfer.domain.repositories.CategoryRepository
 import com.georgeci.moneysurfer.domain.sync.SyncEntityTypes
 import com.georgeci.moneysurfer.sync.repository.MutationOperation
 import com.georgeci.moneysurfer.sync.repository.OutboxEnqueuer
+import com.georgeci.moneysurfer.domain.primitives.currentInstant
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import org.koin.core.annotation.Single
-import kotlin.time.Clock
 
 @Single(binds = [CategoryRepository::class])
 class CategoryRepositoryImpl(
@@ -31,13 +31,13 @@ class CategoryRepositoryImpl(
         dao.getById(id.value)?.toDomain()
 
     override suspend fun insert(category: Category) {
-        val entity = category.toEntity().copy(updatedAt = Clock.System.now().toEpochMilliseconds())
+        val entity = category.toEntity().copy(updatedAt = currentInstant().toEpochMillis())
         dao.insert(entity)
         enqueueUpsert(entity, MutationOperation.INSERT)
     }
 
     override suspend fun update(category: Category) {
-        val entity = category.toEntity().copy(updatedAt = Clock.System.now().toEpochMilliseconds())
+        val entity = category.toEntity().copy(updatedAt = currentInstant().toEpochMillis())
         dao.update(entity)
         enqueueUpsert(entity, MutationOperation.UPDATE)
     }
@@ -70,7 +70,8 @@ private fun CategoryEntity.toDomain() = Category(
     name = name,
     type = runCatching { CategoryType.valueOf(type) }.getOrDefault(CategoryType.EXPENSE),
     parentId = parentId?.let { CategoryId(it) },
-    createdAt = createdAt,
+    createdAt = createdAt.toInstant(),
+    updatedAt = updatedAt.toInstant(),
 )
 
 private fun Category.toEntity() = CategoryEntity(
@@ -79,5 +80,6 @@ private fun Category.toEntity() = CategoryEntity(
     name = name,
     type = type.name,
     parentId = parentId?.value,
-    createdAt = createdAt,
+    createdAt = createdAt.toEpochMillis(),
+    updatedAt = updatedAt.toEpochMillis(),
 )

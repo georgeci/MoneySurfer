@@ -107,9 +107,9 @@ private fun pendingInvite() = WorkspaceInvite(
     role = WorkspaceRole.EDITOR,
     status = InviteStatus.PENDING,
     invitedByUserId = UserId("owner-uid"),
-    createdAt = 1_700_000_000_000L,
-    updatedAt = 1_700_000_000_000L,
-    expiresAt = 1_700_000_000_000L + 14L * 24L * 60L * 60L * 1000L,
+    createdAt = kotlin.time.Instant.fromEpochMilliseconds(1_700_000_000_000L),
+    updatedAt = kotlin.time.Instant.fromEpochMilliseconds(1_700_000_000_000L),
+    expiresAt = kotlin.time.Instant.fromEpochMilliseconds(1_700_000_000_000L + 14L * 24L * 60L * 60L * 1000L),
 )
 
 class WorkspaceInviteRepositoryDualWriteSpec : StringSpec({

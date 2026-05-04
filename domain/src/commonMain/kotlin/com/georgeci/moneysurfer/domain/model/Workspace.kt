@@ -12,5 +12,6 @@ data class Workspace(
     val baseCurrency: CurrencyCode,
     val ownerId: UserId,
     val createdAt: Instant,
+    val updatedAt: Instant = createdAt,
     val archived: Boolean = false,
 )

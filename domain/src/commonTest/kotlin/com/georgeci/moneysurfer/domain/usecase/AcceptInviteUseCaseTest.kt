@@ -12,7 +12,7 @@ import com.georgeci.moneysurfer.domain.model.User
 import com.georgeci.moneysurfer.domain.model.WorkspaceMemberStatus
 import com.georgeci.moneysurfer.domain.model.WorkspaceRole
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
-import com.georgeci.moneysurfer.domain.primitives.currentTimeMillis
+import com.georgeci.moneysurfer.domain.primitives.currentInstant
 import com.georgeci.moneysurfer.domain.repositories.UserRemoteRepository
 import com.georgeci.moneysurfer.domain.repositories.WorkspaceSyncer
 import io.kotest.core.spec.style.StringSpec
@@ -42,12 +42,12 @@ class AcceptInviteUseCaseTest : StringSpec({
 
     "rejects when invite is expired" {
         val env = AcceptInviteEnv()
-        val past = currentTimeMillis() - 1_000L
+        val past = currentInstant() - kotlin.time.Duration.parse("1s")
         env.invites.seed(
             aWorkspaceInvite(
                 id = INV_ID,
                 email = "invitee@example.com",
-                createdAt = past - 100,
+                createdAt = past - kotlin.time.Duration.parse("100ms"),
                 expiresAt = past,
             ),
         )

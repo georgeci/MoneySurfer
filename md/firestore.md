@@ -1,163 +1,105 @@
 # Firestore data model
 
-Target project: `moneysurfer-dev`. Mode: **Firestore Native**. Region: TBD —
-proposed `eur3` (Europe multi-region). Region is immutable after the database
-is created.
+Target project: `moneysurfer-dev`. Mode: **Firestore Native**. Region: `eur3`
+(Europe multi-region; immutable after creation).
 
-The model mirrors the Room entities in `:data` so the same domain `Account`,
-`Category`, `Transaction`, etc. can be hydrated from either source. Workspace
-is the tenancy boundary — every per-user document is nested under
-`workspaces/{workspaceId}` so a single security rule can gate access by
-membership.
+The model mirrors the Room entities in `data-local` 1:1 by field name so a
+Firestore document round-trips through Kotlin serialization without per-field
+mapping. Workspace is the tenancy boundary — every per-user document is
+nested under `workspaces/{wid}` and gated by membership in the security rules.
+
+> Time conventions and per-entity field tables live in
+> [docs/architecture/data-models.md](../docs/architecture/data-models.md).
+> This file documents Firestore-specific concerns: collection layout, write
+> contract, indexes, and rules sketch.
+
+## Collections
 
 ```
-users/{uid}
-  displayName        : string
-  email              : string
-  defaultWorkspaceId : string?
-  createdAt          : timestamp
+users/{uid}                                # personal user doc + workspace pointers
+userEmails/{lowercased_email}              # email → uid lookup, single-doc reads only
+appConfig/{docId}                          # public read-only config (force-update gate)
 
-workspaces/{workspaceId}
-  name         : string
-  description  : string                -- "" when empty
-  baseCurrency : string                -- ISO 4217 default for the workspace
-  ownerId      : string                -- stringified Room user id (will become Firebase uid once auth lands)
-  archived     : bool
-  createdAt    : int64                 -- epoch millis (matches Room storage)
-
-workspaces/{wid}/members/{uid}
-  role     : "OWNER" | "EDITOR" | "VIEWER"
-  joinedAt : int64
-
-workspaces/{wid}/accounts/{accountId}
-  name     : string
-  type     : "CASH" | "BANK" | "CARD" | "SAVINGS"
-  currency : string                    -- ISO 4217
-  balance  : int64                     -- minor units (cents)
-
-workspaces/{wid}/categories/{categoryId}
-  name      : string
-  type      : "EXPENSE" | "INCOME"
-  parentId  : string?                  -- self-reference under same workspace
-  createdAt : int64
-
-workspaces/{wid}/transactions/{txnId}
-  accountId    : string
-  categoryId   : string?               -- null for INITIAL_BALANCE rows
-  amount       : int64                 -- minor units; negative = expense
-  currencyCode : string                -- ISO 4217
-  note         : string
-  timestamp    : int64                 -- when the transaction occurred (epoch millis)
-  type         : "REGULAR" | "INITIAL_BALANCE"
-
-workspaces/{wid}/budgets/{budgetId}
-  name         : string
-  categoryIds  : array<string>
-  periodStart  : timestamp
-  periodEnd    : timestamp
-  capMinor     : int64
-  createdAt    : timestamp
-
-workspaces/{wid}/recurringRules/{ruleId}
-  template    : map                    -- partial transaction shape
-    accountId  : string
-    categoryId : string?
-    amountMinor: int64
-    currency   : string
-    note       : string
-  cadence     : "DAILY" | "WEEKLY" | "MONTHLY" | "YEARLY"
-  dayOfWeek   : int?                   -- 1..7, only when cadence = WEEKLY
-  dayOfMonth  : int?                   -- 1..31, only when cadence = MONTHLY/YEARLY
-  monthOfYear : int?                   -- 1..12, only when cadence = YEARLY
-  startsAt    : timestamp
-  endsAt      : timestamp?
-  active      : bool
+workspaces/{wid}                           # tenancy root
+workspaces/{wid}/members/{uid}             # membership row, doc id = userId
+workspaces/{wid}/invites/{inviteId}        # invitations, doc id = invite UUID
+workspaces/{wid}/accounts/{aid}
+workspaces/{wid}/categories/{cid}
+workspaces/{wid}/transactions/{tid}
+workspaces/{wid}/budgets/{bid}
+workspaces/{wid}/recurringRules/{rid}
 ```
+
+## Wire types
+
+- Moment-in-time fields (`createdAt`, `updatedAt`, `operationAt`,
+  `deletedAt`, `expiresAt`, `respondedAt`, `leftAt`, `removedAt`,
+  `nextRunAt`) — `int64` epoch milliseconds.
+- Calendar dates (`startDate`) — `string` ISO-8601 (`"2026-05-04"`).
+- Enums — name strings (e.g. `"OWNER"`, `"EXPENSE"`).
+- Money / amounts — `int64` minor units.
+
+Field-by-field shape: see
+[data-models.md](../docs/architecture/data-models.md#domain--room--firestore).
+
+## Sync metadata (every entity DTO)
+
+- `updatedAt: int64` — LWW key, also drives cursor-based pull.
+- `deletedAt: int64?` — soft-delete tombstone (`null` = live). Hard delete is
+  forbidden by rules.
+- `clientVersionCode: int` — app-version gate, validated server-side. See
+  [docs/architecture/app-version-gate.md](../docs/architecture/app-version-gate.md).
 
 ## Indexes (composite)
 
-Single-field equality + `timestamp DESC` covers the common list queries.
+Single-field equality + `operationAt` / `updatedAt` DESC covers the common
+list queries. Source of truth: [`firestore.indexes.json`](../firestore.indexes.json).
 
-| Collection                                | Fields                                                          | Order        |
-|-------------------------------------------|-----------------------------------------------------------------|--------------|
-| `workspaces/{wid}/transactions`           | `accountId` ASC, `timestamp` DESC                               | DESC         |
-| `workspaces/{wid}/transactions`           | `categoryId` ASC, `timestamp` DESC                              | DESC         |
-| `workspaces/{wid}/transactions`           | `type` ASC, `timestamp` DESC                                    | DESC         |
-| `workspaces/{wid}/transactions`           | `accountId` ASC, `type` ASC, `timestamp` DESC                   | DESC         |
-| `workspaces/{wid}/categories`             | `type` ASC, `name` ASC                                          | ASC          |
+| Collection                                | Fields                                                          |
+|-------------------------------------------|-----------------------------------------------------------------|
+| `transactions` (collection group)         | `accountId` ASC, `operationAt` DESC                             |
+| `transactions`                            | `categoryId` ASC, `operationAt` DESC                            |
+| `transactions`                            | `type` ASC, `operationAt` DESC                                  |
+| `transactions`                            | `accountId` ASC, `type` ASC, `operationAt` DESC                 |
+| `categories`                              | `type` ASC, `name` ASC                                          |
+| `invites`                                 | `status` ASC, `createdAt` DESC                                  |
+| `invites`                                 | `email` ASC, `status` ASC                                       |
+| `invites`                                 | `targetUserId` ASC, `status` ASC                                |
+| `invites`                                 | `targetUserId` ASC, `updatedAt` ASC                             |
 
-The selected-category preview uses an in-memory count derived from the
-transaction stream, so no additional index is needed for that.
+## Security rules
 
-## Security rules (sketch)
+Source: [`firestore.rules`](../firestore.rules). Rules bug log:
+[firestore-rules-bugs.md](../docs/architecture/firestore-rules-bugs.md).
 
-```
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{db}/documents {
+Highlights:
 
-    function signedIn() {
-      return request.auth != null;
-    }
+- Workspace tenancy — every nested write is gated by `isMember(wid)`.
+  Workspace owner alone can update the parent workspace doc.
+- Hard delete forbidden everywhere — clients must `update` with `deletedAt`.
+- `clientVersionCode` minimum is enforced via `hasValidClientVersion()` on
+  every entity write.
+- `userEmails/{email}` is `get`-only, no `list`. Writes require the email key
+  to match the requester's Firebase Auth email claim.
+- `invites` collection-group reads are declared on the wildcard
+  `match /{path=**}/invites/{inviteId}` (per-doc reads inside a workspace
+  also covered).
 
-    function isMember(wid) {
-      return signedIn()
-        && exists(/databases/$(db)/documents/workspaces/$(wid)/members/$(request.auth.uid));
-    }
+## Mapping
 
-    function isOwner(wid) {
-      return signedIn()
-        && get(/databases/$(db)/documents/workspaces/$(wid)).data.ownerUid == request.auth.uid;
-    }
-
-    match /users/{uid} {
-      allow read, write: if signedIn() && request.auth.uid == uid;
-    }
-
-    match /workspaces/{wid} {
-      allow read: if isMember(wid);
-      allow create: if signedIn() && request.resource.data.ownerUid == request.auth.uid;
-      allow update, delete: if isOwner(wid);
-
-      match /members/{uid} {
-        allow read: if isMember(wid);
-        allow write: if isOwner(wid);
-      }
-
-      match /{path=**} {
-        // accounts, categories, transactions, budgets, recurringRules
-        allow read, write: if isMember(wid);
-      }
-    }
-  }
-}
-```
-
-## Mapping from existing Room types
-
-| Room                          | Firestore                                                      |
-|-------------------------------|----------------------------------------------------------------|
-| `WorkspaceEntity`             | `workspaces/{wid}` (id is the doc id)                          |
-| `WorkspaceMemberEntity`       | `workspaces/{wid}/members/{uid}`                               |
-| `AccountEntity`               | `workspaces/{wid}/accounts/{aid}`                              |
-| `CategoryEntity`              | `workspaces/{wid}/categories/{cid}` (parentId stays string)    |
-| `TransactionEntity`           | `workspaces/{wid}/transactions/{tid}`                          |
-| `BudgetEntity`                | `workspaces/{wid}/budgets/{bid}`                               |
-| `RecurringRuleEntity`         | `workspaces/{wid}/recurringRules/{rid}`                        |
-| `UserEntity`                  | `users/{uid}`                                                  |
-
-`balance: Long` (minor units) and `amount: Long` map directly to int64. Enums
-(`AccountType`, `CategoryType`, `TransactionType`) are stored as their `name`
-strings — same convention as the Room mappers, so the existing
-`runCatching { Enum.valueOf(...) }.getOrDefault(...)` fallback applies.
-
-Numeric ids in Room are autogenerated `Long`s; Firestore documents use
-auto-id strings. The cross-source repository will own the mapping (Room
-copies are read-through cache; Firestore is the source of truth once
-remote sync lands).
+- Room ↔ Firestore DTO: [`SyncDtoMappers.kt`](../sync-surfer/src/commonMain/kotlin/com/georgeci/moneysurfer/data/sync/SyncDtoMappers.kt).
+  No field renames in this layer — Room columns and Firestore fields share
+  names character-for-character.
+- Domain ↔ Room: per-repository under
+  [`data-local/.../data/repository/`](../data-local/src/commonMain/kotlin/com/georgeci/moneysurfer/data/repository/).
+  Rich-type ↔ primitive conversion lives here.
 
 ## Sync
 
-The v1 push-then-pull copier described in earlier drafts has been replaced by sync v2 (cursor-based incremental pull, dual-write outbox, LWW conflict resolution, soft-delete, server timestamps planned). See [docs/architecture/sync.md](../docs/architecture/sync.md) and its sub-docs (`sync-architecture`, `sync-coordinator`, `sync-outbox`, `sync-pull-lww`, `sync-platform`).
+The v1 push-then-pull copier was replaced by sync v2 (cursor-based incremental
+pull, dual-write outbox, LWW conflict resolution, soft-delete). See
+[docs/architecture/sync.md](../docs/architecture/sync.md) and its sub-docs
+(`sync-architecture`, `sync-coordinator`, `sync-outbox`, `sync-pull-lww`,
+`sync-platform`).
 
-Document ids: now UUID-backed value classes from domain (no Room `Long` ids). Mapping in `sync-surfer/.../data/sync/SyncDtoMappers.kt`.
+Document IDs are UUID-backed value classes from `domain` (no Room `Long` IDs).

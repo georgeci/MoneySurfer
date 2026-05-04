@@ -79,7 +79,7 @@ class IncomingInvitesViewModel(
         log.d { "[observe:start] subscribing to listPending" }
         launch {
             listPending().collect { invites ->
-                val now = Clock.System.now().toEpochMilliseconds()
+                val now = Clock.System.now()
                 val items = invites.map { invite ->
                     // workspaceName resolves only for workspaces the user is already a member of —
                     // i.e. nearly never for incoming invites, since the recipient becomes a member
@@ -95,7 +95,7 @@ class IncomingInvitesViewModel(
                         role = invite.role,
                         invitedByUserId = invite.invitedByUserId.value.take(USER_ID_PREFIX_LEN),
                         expired = now > invite.expiresAt,
-                        expiresAt = invite.expiresAt,
+                        expiresAt = invite.expiresAt.toEpochMilliseconds(),
                     )
                 }.sortedBy { it.expired }
                 val active = items.count { !it.expired }

@@ -10,11 +10,10 @@ import com.georgeci.moneysurfer.domain.repositories.WorkspaceRepository
 import com.georgeci.moneysurfer.domain.sync.SyncEntityTypes
 import com.georgeci.moneysurfer.sync.repository.MutationOperation
 import com.georgeci.moneysurfer.sync.repository.OutboxEnqueuer
+import com.georgeci.moneysurfer.domain.primitives.currentInstant
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import org.koin.core.annotation.Single
-import kotlin.time.Clock
-import kotlin.time.Instant
 
 @Single(binds = [WorkspaceRepository::class])
 class WorkspaceRepositoryImpl(
@@ -32,13 +31,13 @@ class WorkspaceRepositoryImpl(
         dao.getById(id.value)?.toDomain()
 
     override suspend fun insert(workspace: Workspace) {
-        val entity = workspace.toEntity().copy(updatedAt = Clock.System.now().toEpochMilliseconds())
+        val entity = workspace.toEntity().copy(updatedAt = currentInstant().toEpochMillis())
         dao.insert(entity)
         enqueueUpsert(entity, MutationOperation.INSERT)
     }
 
     override suspend fun update(workspace: Workspace) {
-        val entity = workspace.toEntity().copy(updatedAt = Clock.System.now().toEpochMilliseconds())
+        val entity = workspace.toEntity().copy(updatedAt = currentInstant().toEpochMillis())
         dao.update(entity)
         enqueueUpsert(entity, MutationOperation.UPDATE)
     }
@@ -68,7 +67,8 @@ private fun WorkspaceEntity.toDomain() = Workspace(
     description = description,
     baseCurrency = CurrencyCode(baseCurrency),
     ownerId = UserId(ownerId),
-    createdAt = Instant.fromEpochMilliseconds(createdAt),
+    createdAt = createdAt.toInstant(),
+    updatedAt = updatedAt.toInstant(),
     archived = archived,
 )
 
@@ -78,6 +78,7 @@ private fun Workspace.toEntity() = WorkspaceEntity(
     description = description,
     baseCurrency = baseCurrency.value,
     ownerId = ownerId.value,
-    createdAt = createdAt.toEpochMilliseconds(),
+    createdAt = createdAt.toEpochMillis(),
     archived = archived,
+    updatedAt = updatedAt.toEpochMillis(),
 )

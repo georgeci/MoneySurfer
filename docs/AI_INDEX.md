@@ -5,7 +5,7 @@
 ## accounts-feature
 - Title: Rules
 - File: docs/features/accounts.md
-- Lines: 23-29
+- Lines: 22-28
 - Tasks: accounts, feature, balance
 
 ## adr-clean-architecture
@@ -71,13 +71,13 @@
 ## docs-maintainer-agent
 - Title: Role
 - File: ai/agents/docs-maintainer.md
-- Lines: 25-43
+- Lines: 23-41
 - Tasks: docs, agent, maintenance
 
 ## docs-structure
 - Title: Rules
 - File: ai/skills/docs-structure.md
-- Lines: 24-40
+- Lines: 21-32
 - Tasks: docs, structure, organization
 
 ## docs-validation
@@ -209,7 +209,7 @@
 ## persistence-rules
 - Title: Rules
 - File: docs/architecture/persistence.md
-- Lines: 23-31
+- Lines: 26-40
 - Tasks: persistence, room, firestore, datastore
 
 ## project-map
@@ -299,7 +299,7 @@
 ## sync-rules
 - Title: Rules
 - File: docs/architecture/sync.md
-- Lines: 24-48
+- Lines: 24-43
 - Tasks: sync, outbox, pull, lww
 
 ## sync-summary
@@ -320,8 +320,14 @@
 - Lines: 25-51
 - Tasks: testing, qa, validation
 
+## time-policy
+- Title: Time policy
+- File: docs/architecture/data-models.md
+- Lines: 45-68
+- Tasks: time, persistence, domain
+
 ## transactions-feature
 - Title: Rules
 - File: docs/features/transactions.md
-- Lines: 23-29
+- Lines: 22-28
 - Tasks: transactions, totals, feature

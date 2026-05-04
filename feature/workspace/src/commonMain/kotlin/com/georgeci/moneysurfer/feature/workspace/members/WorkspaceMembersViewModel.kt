@@ -119,7 +119,7 @@ class WorkspaceMembersViewModel(
                     val pendingInvites = invites
                         .filter { it.status == InviteStatus.PENDING }
                         .sortedByDescending { it.createdAt }
-                    val now = Clock.System.now().toEpochMilliseconds()
+                    val now = Clock.System.now()
                     val viewerRole = activeMembers.firstOrNull { it.userId == userId }?.role
 
                     updateState {
@@ -150,12 +150,12 @@ private fun WorkspaceMember.toUi(currentUserId: UserId?): MemberUi = MemberUi(
     isYou = userId == currentUserId,
 )
 
-private fun WorkspaceInvite.toUi(nowMillis: Long): InviteUi = InviteUi(
+private fun WorkspaceInvite.toUi(now: kotlin.time.Instant): InviteUi = InviteUi(
     id = id,
     email = email,
     role = role,
-    isExpired = expiresAt <= nowMillis,
-    expiresAt = expiresAt,
+    isExpired = expiresAt <= now,
+    expiresAt = expiresAt.toEpochMilliseconds(),
 )
 
 @optics

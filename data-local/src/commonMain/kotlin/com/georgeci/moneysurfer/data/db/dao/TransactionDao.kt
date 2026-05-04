@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface TransactionDao {
 
-    @Query("SELECT * FROM transactions ORDER BY timestamp DESC")
+    @Query("SELECT * FROM transactions ORDER BY operationAt DESC, createdAt DESC")
     fun getAll(): Flow<List<TransactionEntity>>
 
     @Query(
@@ -26,18 +26,19 @@ interface TransactionDao {
             transactions.categoryId,
             categories.name AS categoryName,
             transactions.note,
-            transactions.timestamp,
+            transactions.operationAt,
+            transactions.createdAt,
             transactions.type,
             transactions.status,
             transactions.updatedAt
         FROM transactions
         LEFT JOIN categories ON categories.id = transactions.categoryId
-        ORDER BY transactions.timestamp DESC
+        ORDER BY transactions.operationAt DESC, transactions.createdAt DESC
         """,
     )
     fun getAllCategorized(): Flow<List<CategorizedTransactionEntity>>
 
-    @Query("SELECT * FROM transactions WHERE accountId = :accountId ORDER BY timestamp DESC")
+    @Query("SELECT * FROM transactions WHERE accountId = :accountId ORDER BY operationAt DESC, createdAt DESC")
     fun getByAccountId(accountId: String): Flow<List<TransactionEntity>>
 
     @Query(
@@ -51,19 +52,20 @@ interface TransactionDao {
             transactions.categoryId,
             categories.name AS categoryName,
             transactions.note,
-            transactions.timestamp,
+            transactions.operationAt,
+            transactions.createdAt,
             transactions.type,
             transactions.status,
             transactions.updatedAt
         FROM transactions
         LEFT JOIN categories ON categories.id = transactions.categoryId
         WHERE transactions.accountId = :accountId
-        ORDER BY transactions.timestamp DESC
+        ORDER BY transactions.operationAt DESC, transactions.createdAt DESC
         """,
     )
     fun getByAccountIdCategorized(accountId: String): Flow<List<CategorizedTransactionEntity>>
 
-    @Query("SELECT * FROM transactions WHERE workspaceId = :workspaceId ORDER BY timestamp DESC")
+    @Query("SELECT * FROM transactions WHERE workspaceId = :workspaceId ORDER BY operationAt DESC, createdAt DESC")
     fun getByWorkspaceId(workspaceId: String): Flow<List<TransactionEntity>>
 
     @Query("SELECT * FROM transactions WHERE id = :id")

@@ -12,10 +12,10 @@ import com.georgeci.moneysurfer.domain.repositories.AccountRepository
 import com.georgeci.moneysurfer.domain.sync.SyncEntityTypes
 import com.georgeci.moneysurfer.sync.repository.MutationOperation
 import com.georgeci.moneysurfer.sync.repository.OutboxEnqueuer
+import com.georgeci.moneysurfer.domain.primitives.currentInstant
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import org.koin.core.annotation.Single
-import kotlin.time.Clock
 
 @Single(binds = [AccountRepository::class])
 class AccountRepositoryImpl(
@@ -74,7 +74,7 @@ class AccountRepositoryImpl(
         )
     }
 
-    private fun nowMillis(): Long = Clock.System.now().toEpochMilliseconds()
+    private fun nowMillis(): Long = currentInstant().toEpochMillis()
 }
 
 private fun AccountEntity.toDomain() = Account(
@@ -84,6 +84,7 @@ private fun AccountEntity.toDomain() = Account(
     type = runCatching { AccountType.valueOf(type) }.getOrDefault(AccountType.SAVINGS),
     currencyCode = CurrencyCode(currency),
     balance = Money.fromMinor(balance),
+    updatedAt = updatedAt.toInstant(),
 )
 
 private fun Account.toEntity() = AccountEntity(
@@ -93,4 +94,5 @@ private fun Account.toEntity() = AccountEntity(
     type = type.name,
     currency = currencyCode.value,
     balance = balance.minor,
+    updatedAt = updatedAt.toEpochMillis(),
 )

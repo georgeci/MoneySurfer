@@ -114,7 +114,7 @@ private fun ownerMember() = WorkspaceMember(
     displayName = "Alice",
     email = "alice@example.com",
     addedByUserId = UserId("owner-uid"),
-    createdAt = 1_700_000_000_000L,
+    createdAt = kotlin.time.Instant.fromEpochMilliseconds(1_700_000_000_000L),
 )
 
 class WorkspaceMemberRepositoryDualWriteSpec : StringSpec({

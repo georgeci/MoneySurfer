@@ -87,9 +87,10 @@ fun TransactionEntity.toDoc(): TransactionDoc = TransactionDoc(
     amount = amount,
     currencyCode = currencyCode,
     note = note,
-    timestamp = timestamp,
+    operationAt = operationAt,
     type = type,
     status = status,
+    createdAt = createdAt,
     updatedAt = updatedAt,
 )
 
@@ -101,9 +102,10 @@ fun TransactionDoc.toEntity(id: String, workspaceId: String): TransactionEntity 
     currencyCode = currencyCode,
     categoryId = categoryId,
     note = note,
-    timestamp = timestamp,
+    operationAt = operationAt,
     type = type,
     status = status,
+    createdAt = createdAt,
     updatedAt = updatedAt,
 )
 
@@ -114,7 +116,7 @@ fun WorkspaceMemberEntity.toDoc(): WorkspaceMemberDoc = WorkspaceMemberDoc(
     displayName = displayName,
     email = email,
     addedByUserId = addedByUserId,
-    addedAt = createdAt,
+    createdAt = createdAt,
     updatedAt = updatedAt,
     leftAt = leftAt,
     removedAt = removedAt,
@@ -128,7 +130,7 @@ fun WorkspaceMemberDoc.toEntity(workspaceId: String): WorkspaceMemberEntity = Wo
     displayName = displayName,
     email = email,
     addedByUserId = addedByUserId,
-    createdAt = addedAt,
+    createdAt = createdAt,
     updatedAt = updatedAt,
     leftAt = leftAt,
     removedAt = removedAt,

@@ -57,7 +57,7 @@ class TransactionCreationViewModel(
             is TransactionCreationEvent.OnDateChanged ->
                 updateState { TransactionCreationState.content.timestamp.modify(this) { event.timestamp } }
             TransactionCreationEvent.OnTodayClick ->
-                updateState { TransactionCreationState.content.timestamp.modify(this) { getCurrentTime() } }
+                updateState { TransactionCreationState.content.timestamp.modify(this) { getCurrentTime().toEpochMilliseconds() } }
             TransactionCreationEvent.OnOpenCategoryChooser -> {
                 val state = currentState as? TransactionCreationState.Content ?: return
                 postSideEffect(
@@ -123,7 +123,7 @@ class TransactionCreationViewModel(
                 selectedCategory = initialSelected,
                 isEditMode = false,
                 editingTransactionId = null,
-                timestamp = getCurrentTime(),
+                timestamp = getCurrentTime().toEpochMilliseconds(),
                 categoryUsageCounts = emptyMap(),
                 displayCategories = buildDisplayCategories(
                     categories = categories,
@@ -164,7 +164,7 @@ class TransactionCreationViewModel(
                         type = resolvedType,
                         selectedAccount = account ?: baseContent.selectedAccount,
                         selectedCategory = resolvedSelected,
-                        timestamp = transaction.timestamp,
+                        timestamp = transaction.operationAt.toEpochMilliseconds(),
                         isEditMode = true,
                         editingTransactionId = transactionId,
                         displayCategories = buildDisplayCategories(
@@ -297,7 +297,7 @@ class TransactionCreationViewModel(
                 currencyCode = account.currencyCode,
                 categoryId = category.id,
                 note = state.note,
-                timestamp = state.timestamp,
+                operationAt = kotlin.time.Instant.fromEpochMilliseconds(state.timestamp),
                 type = type,
             )
 

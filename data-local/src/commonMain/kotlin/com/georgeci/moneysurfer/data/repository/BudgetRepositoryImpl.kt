@@ -10,7 +10,6 @@ import com.georgeci.moneysurfer.domain.primitives.Money
 import com.georgeci.moneysurfer.domain.repositories.BudgetRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import kotlinx.datetime.LocalDate
 import org.koin.core.annotation.Single
 
 @Single(binds = [BudgetRepository::class])
@@ -43,9 +42,11 @@ private fun BudgetEntity.toDomain() = Budget(
     categoryIds = categoryIds.parseCategoryIds(),
     amount = Money.fromMinor(amount),
     period = BudgetPeriod.entries.firstOrNull { it.name == period } ?: BudgetPeriod.MONTHLY,
-    startDate = LocalDate.parse(startDate),
+    startDate = startDate.toLocalDate(),
     alertPercent = alertPercent,
     isActive = isActive,
+    createdAt = createdAt.toInstant(),
+    updatedAt = updatedAt.toInstant(),
 )
 
 private fun Budget.toEntity() = BudgetEntity(
@@ -54,9 +55,11 @@ private fun Budget.toEntity() = BudgetEntity(
     categoryIds = categoryIds.toStorageValue(),
     amount = amount.minor,
     period = period.name,
-    startDate = startDate.toString(),
+    startDate = startDate.toIsoDate(),
     alertPercent = alertPercent,
     isActive = isActive,
+    createdAt = createdAt.toEpochMillis(),
+    updatedAt = updatedAt.toEpochMillis(),
 )
 
 private fun String.parseCategoryIds(): List<CategoryId> {

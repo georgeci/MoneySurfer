@@ -36,8 +36,9 @@ data class TransactionEntity(
     @ColumnInfo(name = "currencyCode") val currencyCode: String,
     @ColumnInfo(name = "categoryId") val categoryId: String?,
     @ColumnInfo(name = "note") val note: String,
-    @ColumnInfo(name = "timestamp") val timestamp: Long,
+    @ColumnInfo(name = "operationAt") val operationAt: Long,
     @ColumnInfo(name = "type") val type: String,
     @ColumnInfo(name = "status", defaultValue = "ACTUAL") val status: String = "ACTUAL",
+    @ColumnInfo(name = "createdAt", defaultValue = "0") val createdAt: Long = 0L,
     @ColumnInfo(name = "updatedAt", defaultValue = "0") val updatedAt: Long = 0L,
 )

@@ -17,10 +17,10 @@ import com.georgeci.moneysurfer.domain.repositories.TransactionRepository
 import com.georgeci.moneysurfer.domain.sync.SyncEntityTypes
 import com.georgeci.moneysurfer.sync.repository.MutationOperation
 import com.georgeci.moneysurfer.sync.repository.OutboxEnqueuer
+import com.georgeci.moneysurfer.domain.primitives.currentInstant
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import org.koin.core.annotation.Single
-import kotlin.time.Clock
 
 @Single(binds = [TransactionRepository::class])
 class TransactionRepositoryImpl(
@@ -79,7 +79,7 @@ class TransactionRepositoryImpl(
         )
     }
 
-    private fun nowMillis(): Long = Clock.System.now().toEpochMilliseconds()
+    private fun nowMillis(): Long = currentInstant().toEpochMillis()
 }
 
 private fun TransactionEntity.toDomain() = Transaction(
@@ -90,9 +90,11 @@ private fun TransactionEntity.toDomain() = Transaction(
     currencyCode = CurrencyCode(currencyCode),
     categoryId = categoryId?.let(::CategoryId),
     note = note,
-    timestamp = timestamp,
+    operationAt = operationAt.toInstant(),
     type = parseType(type, amount),
     status = parseStatus(status),
+    createdAt = createdAt.toInstant(),
+    updatedAt = updatedAt.toInstant(),
 )
 
 private fun CategorizedTransactionEntity.toDomain() = CategorizedTransaction(
@@ -104,9 +106,11 @@ private fun CategorizedTransactionEntity.toDomain() = CategorizedTransaction(
         currencyCode = CurrencyCode(currencyCode),
         categoryId = categoryId?.let(::CategoryId),
         note = note,
-        timestamp = timestamp,
+        operationAt = operationAt.toInstant(),
         type = parseType(type, amount),
         status = parseStatus(status),
+        createdAt = createdAt.toInstant(),
+        updatedAt = updatedAt.toInstant(),
     ),
     categoryName = categoryName,
 )
@@ -119,9 +123,11 @@ private fun Transaction.toEntity() = TransactionEntity(
     currencyCode = currencyCode.value,
     categoryId = categoryId?.value,
     note = note,
-    timestamp = timestamp,
+    operationAt = operationAt.toEpochMillis(),
     type = type.name,
     status = status.name,
+    createdAt = createdAt.toEpochMillis(),
+    updatedAt = updatedAt.toEpochMillis(),
 )
 
 private fun parseType(raw: String, amount: Long): TransactionType =
@@ -137,4 +143,4 @@ private fun parseType(raw: String, amount: Long): TransactionType =
 private fun parseStatus(raw: String): TransactionStatus =
     runCatching { TransactionStatus.valueOf(raw) }.getOrDefault(TransactionStatus.ACTUAL)
 
-private fun nowMillis(): Long = Clock.System.now().toEpochMilliseconds()
+private fun nowMillis(): Long = currentInstant().toEpochMillis()
