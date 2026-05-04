@@ -210,7 +210,7 @@ emulator/device. See [README_TEST.md](README_TEST.md).
   members + invites as-built.
 - [docs/testing/firebase-emulator.md](docs/testing/firebase-emulator.md):
   emulator setup, Maestro wiring, JVM gap, troubleshooting.
-- [md/SyncCoordinator.md](md/SyncCoordinator.md): original coordinator design
+- [docs/architecture/sync-coordinator.md](docs/architecture/sync-coordinator.md): original coordinator design
   draft + Design Q&A appendix (anchors `#faq-1` … `#faq-20`).
 - Forward-looking drafts (still in `md/`, not yet shipped): [md/budgets.md](md/budgets.md),
   [md/members.md](md/members.md) (Phase 4–5 UI), [md/settings_module.md](md/settings_module.md),

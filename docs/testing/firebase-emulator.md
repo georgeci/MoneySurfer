@@ -45,16 +45,16 @@
 
 ## TL;DR for agents
 
-- Local stand-in for Firebase Auth + Firestore. Used for `:data` tests against the real Firestore protocol, `:integration-test` Room round-trips, and Maestro flows on seeded state.
+- Local stand-in for Firebase Auth + Firestore. Used for `:data` tests against the real Firestore protocol, `:integration-test` Room round-trips, and Maestro Android/iOS flows on seeded state.
 - Production builds never reach the emulator — switching is gated by the per-platform `MS_USE_EMULATOR` env / system property + `BuildConfig.USE_EMULATOR` flag.
 - Same `firestore.rules` are used in emulator and prod, so tests catch rules regressions alongside code regressions.
 - All emulator surfaces share `--project demo-moneysurfer` — no real GCP project, no auth checks.
-- JVM tests **cannot** drive the gitlive Firebase SDK directly (Android-only `Context` cast). REST against the emulator works; SDK-level coverage requires Maestro on Android.
+- JVM tests **cannot** drive the gitlive Firebase SDK directly (Android-only `Context` cast). REST against the emulator works; SDK-level coverage requires Maestro on Android or iOS.
 
 READ WHEN:
 - adding tests that need real Firestore protocol semantics
 - enabling the emulator on a new platform
-- editing `scripts/firebase/*` or `qaMaestroEmulator`
+- editing `scripts/firebase/*`, `qaMaestroAndroid`, or `qaMaestroIos`
 - debugging emulator boot or test connectivity
 - reviewing the JVM Firebase limitation when planning new test suites
 
@@ -127,7 +127,7 @@ There is no `test` alias — test suites only target the emulator; there has nev
 
 ### `--project demo-moneysurfer` for emulator runs
 
-Emulator runs **never** use the aliases above. Every Gradle wrapper and npm script pins `--project demo-moneysurfer` directly. The `demo-` prefix activates Firebase "demo project mode" — no real project required, auth checks skipped. The same projectId is shared across `firestore-tests/` (mocha rules suite), `:integration-test` (`EmulatorEnv.EMULATOR_PROJECT_ID`), and `qaMaestroEmulator`. All test surfaces hit one emulator namespace.
+Emulator runs **never** use the aliases above. Every Gradle wrapper and npm script pins `--project demo-moneysurfer` directly. The `demo-` prefix activates Firebase "demo project mode" — no real project required, auth checks skipped. The same projectId is shared across `firestore-tests/` (mocha rules suite), `:integration-test` (`EmulatorEnv.EMULATOR_PROJECT_ID`), `qaMaestroAndroid`, and `qaMaestroIos`. All test surfaces hit one emulator namespace.
 
 ### `firestore.rules`
 
@@ -163,10 +163,13 @@ adb shell am start -n com.georgeci.moneysurfer/.MainActivity
 ### iOS
 
 ```bash
-MS_USE_EMULATOR=true xcodebuild ...   # in practice — through scheme env var
+./gradlew maestroBuildIosSimulator
 ```
 
-iOS Simulator host is `localhost` — works directly.
+iOS Simulator host is `localhost` — works directly. The Maestro build injects
+`MS_USE_EMULATOR=YES` into `Info.plist`; `iOSApp.swift` configures Firebase with
+demo options when that flag is present, so a local `GoogleService-Info.plist` is
+not required for emulator runs.
 
 ### Tests
 
@@ -187,8 +190,8 @@ Production binding does not see the env var → `useEmulator = false` → branch
 
 ### Safety against accidental emulator-in-prod
 
-1. `FirebaseConfigImpl.defaultUseEmulator()` reads only the env var. Production release builds never have that env var set (Play Store / App Store do not propagate shell env).
-2. Productflavor (Maestro pipeline): `assembleEmulatorDebug` sets `BuildConfig.USE_EMULATOR = true`. Production tasks (`assembleRelease`) do not have this field, so `useEmulator = true` cannot accidentally compile in.
+1. `FirebaseConfigImpl.defaultUseEmulator()` reads only the env var / platform test flag. Production release builds never have that env var set (Play Store / App Store do not propagate shell env).
+2. Productflavor (Maestro pipeline): Android `maestroAssembleDebug` sets `BuildConfig.USE_EMULATOR = true`; iOS `maestroBuildIosSimulator` sets `MS_USE_EMULATOR=YES` only for Debug simulator builds.
 3. Same `firestore.rules` in emulator and prod. If a test passes against non-prod rules in the emulator, that is a config bug, not an emulator bug.
 <!-- AI:END -->
 
@@ -259,10 +262,12 @@ JVM-only KMP module (`jvm()` only) for real-impl integration tests (Room + `:dat
 The emulator is not required for `:integration-test` — Phase 3 covers Room only, see the JVM Firebase gap below.
 <!-- AI:END -->
 
-<!-- AI:SECTION id=emulator-maestro task=testing,emulator,maestro,android -->
+<!-- AI:SECTION id=emulator-maestro task=testing,emulator,maestro,android,ios -->
 ## Maestro against the emulator
 
-End-to-end coverage of user flows: real APK on Android emulator/device → real Firebase Android SDK → Firebase Emulator Suite. Bypasses the JVM gap because the code runs on Android, not on the JVM host.
+End-to-end coverage of user flows: real APK on Android emulator/device or real
+iOS Simulator app → platform Firebase SDK → Firebase Emulator Suite. Bypasses
+the JVM gap because the code runs on Android/iOS, not on the JVM host.
 
 ### Build flag
 
@@ -282,8 +287,8 @@ buildFeatures { buildConfig = true }
 Build:
 
 ```bash
-./gradlew :androidApp:assembleDebug -PuseEmulator=true   # APK with USE_EMULATOR=true
-./gradlew :androidApp:assembleDebug                      # default false (production)
+./gradlew maestroAssembleDebug       # Android APK with USE_EMULATOR=true
+./gradlew maestroBuildIosSimulator   # iOS Debug simulator app with MS_USE_EMULATOR=YES
 ```
 
 ### Wiring through `MoneySurferApplication`
@@ -307,12 +312,16 @@ In `gradle/qa.gradle.kts`:
 
 | Task                              | Purpose                                                                                                    |
 |-----------------------------------|------------------------------------------------------------------------------------------------------------|
-| `maestroAssembleDebugEmulator`    | Builds the APK with `-PuseEmulator=true` via subgradle (Gradle caches BuildConfig — without subgradle, a follow-up `assembleDebug` would return the stale cached output). |
-| `maestroInstallDebugEmulator`     | Builds the emulator APK + `adb install -r`.                                                                |
-| `qaMaestroEmulator`               | Full pipeline: install emulator APK → `firebase emulators:exec` → maestro test → tear down.                 |
+| `maestroAssembleDebug`            | Builds the Android APK with `BuildConfig.USE_EMULATOR=true`.                                               |
+| `maestroInstallDebug`             | Builds the Android emulator APK + `adb install -r`.                                                        |
+| `qaMaestroAndroid` / `qaMaestro`   | Full Android pipeline: install APK → `firebase emulators:exec` → seed → `maestro test` → tear down.         |
+| `maestroBuildIosSimulator`        | Builds iOS Debug simulator app with `MS_USE_EMULATOR=YES`; default simulator name is `iPhone 17`.          |
+| `maestroInstallIosSimulator`      | Builds and installs the iOS simulator app on the booted simulator.                                         |
+| `qaMaestroIos`                    | Full iOS pipeline: install app → `firebase emulators:exec` → seed → `maestro test --platform ios` → tear down. |
 
 ```bash
-./gradlew :qaMaestroEmulator
+./gradlew qaMaestroAndroid
+./gradlew qaMaestroIos -PiosSimulatorName="iPhone 17" -PiosSimulatorUdid=<udid>
 ```
 
 ### Seed fixtures
