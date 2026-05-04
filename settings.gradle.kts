@@ -36,6 +36,7 @@ plugins {
 
 include(":androidApp")
 include(":composeApp")
+include(":composeAppOffline")
 include(":domain")
 include(":sync:api")
 include(":sync:default")
