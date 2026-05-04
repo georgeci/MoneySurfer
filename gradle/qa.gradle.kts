@@ -84,14 +84,17 @@ fun loadMaestroTestUser(rootDir: File): Map<String, String> =
     loadKeyValueFile(rootDir.resolve("scripts/e2e-test-user.properties"))
         .filterKeys { it in setOf("TEST_EMAIL", "TEST_PASSWORD") }
 
+val androidMaestroAppId = "com.georgeci.moneysurfer.dev"
+
 fun buildMaestroCommand(
     rootDir: File,
     target: String,
     junitOutput: File? = null,
     excludeTags: List<String> = emptyList(),
+    appId: String = androidMaestroAppId,
 ): List<String> {
     val command = mutableListOf(resolveMaestroExecutable(), "test")
-    val env = loadMaestroTestUser(rootDir)
+    val env = loadMaestroTestUser(rootDir) + mapOf("APP_ID" to appId)
     env.forEach { (key, value) ->
         command += listOf("--env", "$key=$value")
     }
@@ -177,7 +180,7 @@ val maestroLogsDir = rootProject.file("build/logs/maestro")
 val maestroDebugDir = rootProject.file("build/maestro-debug")
 val maestroArtifactsDir = rootProject.file("build/maestro-artifacts")
 val maestroAllureResultsDir = rootProject.file("build/allure-results/maestro")
-val maestroEmulatorEnv = loadMaestroTestUser(rootDir)
+val maestroEmulatorEnv = loadMaestroTestUser(rootDir) + mapOf("APP_ID" to androidMaestroAppId)
 val maestroSetupTags = listOf("setup")
 
 val firestoreTestsDir = rootProject.file("firestore-tests")

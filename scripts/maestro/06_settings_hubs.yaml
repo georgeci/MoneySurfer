@@ -1,4 +1,4 @@
-appId: com.georgeci.moneysurfer.dev
+appId: ${APP_ID}
 name: Settings — Open hub screens
 ---
 # Ensures the dashboard has an active workspace and at least one account.

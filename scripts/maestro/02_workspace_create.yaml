@@ -1,4 +1,4 @@
-appId: com.georgeci.moneysurfer.dev
+appId: ${APP_ID}
 name: Workspace — Create and select test workspace
 ---
 # Chain after 00_login.yaml or run standalone with an existing session.

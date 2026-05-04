@@ -1,4 +1,4 @@
-appId: com.georgeci.moneysurfer.dev
+appId: ${APP_ID}
 name: Workspace — Invite member validation
 ---
 - runFlow: 02_workspace_create.yaml

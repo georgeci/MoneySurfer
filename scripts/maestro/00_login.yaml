@@ -1,4 +1,4 @@
-appId: com.georgeci.moneysurfer.dev
+appId: ${APP_ID}
 name: Setup — Login with reusable app state
 tags:
   - setup
