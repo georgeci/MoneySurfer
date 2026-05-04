@@ -47,6 +47,7 @@ material-kolor = "4.1.1"
 androidBuiltInKotlin = "9.1.1"
 material = "1.13.0"
 jetbrainsKotlinJvm = "2.3.20"
+sonarqube = "6.0.1.5171"
 
 [libraries]
 androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "coreSplashscreen" }
@@ -138,4 +139,5 @@ kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", versio
 koin-compiler = { id = "io.insert-koin.compiler.plugin", version.ref = "koin-plugin" }
 android-built-in1-kotlin = { id = "com.android.built-in-kotlin", version.ref = "androidBuiltInKotlin" }
 kmp-lib = { id = "kmp.lib" }
+sonarqube = { id = "org.sonarqube", version.ref = "sonarqube" }
 #kmpApp = { id = "kmp.app" }
