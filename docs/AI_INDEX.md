@@ -95,7 +95,7 @@
 ## emulator-fixtures
 - Title: Test fixtures and tagging
 - File: docs/testing/firebase-emulator.md
-- Lines: 195-260
+- Lines: 198-263
 - Tasks: testing, emulator, kotest, gradle
 
 ## emulator-install
@@ -107,14 +107,14 @@
 ## emulator-jvm-gap
 - Title: JVM Firebase gap
 - File: docs/testing/firebase-emulator.md
-- Lines: 336-366
+- Lines: 345-375
 - Tasks: testing, emulator, jvm, gitlive
 
 ## emulator-maestro
 - Title: Maestro against the emulator
 - File: docs/testing/firebase-emulator.md
-- Lines: 262-334
-- Tasks: testing, emulator, maestro, android
+- Lines: 265-343
+- Tasks: testing, emulator, maestro, android, ios
 
 ## emulator-run
 - Title: Run, reset, stop
@@ -125,13 +125,13 @@
 ## emulator-switch
 - Title: Switching the app to the emulator
 - File: docs/testing/firebase-emulator.md
-- Lines: 141-193
+- Lines: 141-196
 - Tasks: testing, emulator, configuration, build
 
 ## emulator-troubleshooting
 - Title: Troubleshooting
 - File: docs/testing/firebase-emulator.md
-- Lines: 368-421
+- Lines: 377-430
 - Tasks: testing, emulator, troubleshooting
 
 ## invites-discovery

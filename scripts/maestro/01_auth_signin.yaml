@@ -1,4 +1,4 @@
-appId: com.georgeci.moneysurfer.dev
+appId: ${APP_ID}
 name: Auth — Sign in with test user
 ---
 - runFlow: 00_login.yaml

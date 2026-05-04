@@ -1,4 +1,4 @@
-appId: com.georgeci.moneysurfer.dev
+appId: ${APP_ID}
 name: Account — Details and transaction filters
 ---
 - runFlow: 04_add_transaction.yaml
