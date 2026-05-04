@@ -4,5 +4,7 @@
 <dict>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
+	<key>MS_USE_EMULATOR</key>
+	<string>$(MS_USE_EMULATOR)</string>
 </dict>
 </plist>
