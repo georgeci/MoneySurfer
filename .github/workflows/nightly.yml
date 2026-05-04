@@ -1,0 +1,231 @@
+name: Nightly (all scopes)
+
+# Runs every scope qaAll covers: common, android-host, android-device, maestro,
+# firestore. Pushes Allure (with history) and combined Kover to gh-pages under
+# /nightly/. Skips if no new commits since the last successful nightly run.
+
+on:
+  schedule:
+    - cron: "0 3 * * *"   # 03:00 UTC daily
+  workflow_dispatch:       # manual override (always runs, no skip)
+
+permissions:
+  contents: write
+  actions: read            # needed to query `gh run list`
+
+concurrency:
+  group: nightly
+  cancel-in-progress: false
+
+jobs:
+  decide:
+    name: Skip if no changes since last successful run
+    runs-on: ubuntu-latest
+    outputs:
+      run: ${{ steps.check.outputs.run }}
+    steps:
+      - name: Check last successful nightly SHA
+        id: check
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "Manual dispatch — running unconditionally."
+            echo "run=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          # `--limit 2` because the run currently in progress (this one) shows up
+          # too on some API timings; we want the most recent already-finished one.
+          last_sha=$(gh run list \
+            --workflow=nightly.yml \
+            --branch=main \
+            --status=success \
+            --limit=2 \
+            --json headSha,databaseId \
+            --repo "${GITHUB_REPOSITORY}" \
+            --jq '[.[] | select(.databaseId != ${{ github.run_id }})][0].headSha // ""')
+          echo "last successful SHA: ${last_sha:-<none>}"
+          echo "current SHA:         ${GITHUB_SHA}"
+          if [[ -n "$last_sha" && "$last_sha" == "$GITHUB_SHA" ]]; then
+            echo "No new commits since last nightly success — skipping."
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          fi
+
+  qa-all:
+    name: qaAll (all scopes)
+    needs: decide
+    if: needs.decide.outputs.run == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Decode Firebase config
+        uses: ./.github/actions/firebase-config
+        with:
+          debug-json:   ${{ secrets.GOOGLE_SERVICES_JSON_DEBUG }}
+          release-json: ${{ secrets.GOOGLE_SERVICES_JSON_RELEASE }}
+          ios-plist:    ${{ secrets.GOOGLE_SERVICE_INFO_PLIST }}
+
+      # firebase-tools ≥14 (used by qaFirestoreRules + qaMaestro) needs JDK 21+
+      # for the Firestore emulator JAR. AGP/Kotlin happily build on 21 too, so
+      # we use a single JDK for the whole nightly job.
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: firestore-tests/package-lock.json
+
+      - name: Install firebase-tools
+        run: npm i -g firebase-tools
+
+      - name: Install firestore-tests deps
+        working-directory: firestore-tests
+        run: npm ci
+
+      - name: Install Allure CLI
+        shell: bash
+        run: |
+          set -euo pipefail
+          ALLURE_VERSION=2.34.1
+          curl -Ls "https://github.com/allure-framework/allure2/releases/download/${ALLURE_VERSION}/allure-${ALLURE_VERSION}.tgz" \
+            | tar -xz -C "${RUNNER_TEMP}"
+          echo "${RUNNER_TEMP}/allure-${ALLURE_VERSION}/bin" >> "${GITHUB_PATH}"
+
+      - name: Install Maestro CLI
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -Ls "https://get.maestro.mobile.dev" | bash
+          echo "$HOME/.maestro/bin" >> "$GITHUB_PATH"
+
+      # ubuntu-latest has nested-virt available but KVM device perms aren't set
+      # up by default — this udev rule grants r/w so the AVD can boot.
+      - name: Enable KVM
+        shell: bash
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' \
+            | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Run qaAll inside emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          arch: x86_64
+          target: google_apis
+          profile: pixel_6
+          force-avd-creation: false
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
+          disable-animations: true
+          script: ./gradlew qaAll --stacktrace
+
+      - name: Upload native Allure results (Maestro)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nightly-allure-results-maestro
+          path: build/allure-results/maestro/
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Upload Maestro debug artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nightly-maestro-debug
+          path: |
+            build/maestro-debug/
+            build/maestro-artifacts/
+            build/logs/maestro/
+          if-no-files-found: warn
+          retention-days: 14
+
+      # Stage every supported Allure input dir (JUnit XML + native JSON) into
+      # one flat tree for simple-elf to consume in the publish step below.
+      - name: Stage Allure results
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p allure-results
+          # JUnit XMLs across all scopes.
+          find . -type f -name '*.xml' \
+            \( -path '*/build/test-results/jvmTest/*' \
+            -o -path '*/build/test-results/testAndroidHostTest/*' \
+            -o -path '*/build/outputs/androidTest-results/*' \
+            -o -path '*/build/test-results/firestore/*' \) \
+            -not -path './gh-pages/*' \
+            | while read -r f; do
+              dest="allure-results/$(echo "${f#./}" | tr '/' '__')"
+              cp "$f" "$dest"
+            done
+          # Maestro: native JSON + metadata, copied verbatim.
+          if [[ -d build/allure-results/maestro ]]; then
+            cp -r build/allure-results/maestro/. allure-results/
+          fi
+          echo "Staged $(ls allure-results 2>/dev/null | wc -l) input(s)."
+
+      - name: Checkout gh-pages
+        if: always()
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          path: gh-pages
+        continue-on-error: true
+
+      - name: Ensure gh-pages dir exists
+        if: always()
+        shell: bash
+        run: mkdir -p gh-pages/nightly/allure
+
+      - name: Build Allure report (with history)
+        if: always()
+        uses: simple-elf/allure-report-action@master
+        with:
+          allure_results: allure-results
+          gh_pages: gh-pages/nightly/allure
+          allure_report: allure-report
+          allure_history: allure-history
+
+      - name: Assemble Pages payload
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p public/nightly/allure public/nightly/kover
+          if [[ -d allure-history ]]; then
+            cp -r allure-history/. public/nightly/allure/
+          fi
+          if [[ -d build/reports/kover/html ]]; then
+            cp -r build/reports/kover/html/. public/nightly/kover/
+          fi
+
+      - name: Deploy to gh-pages (/nightly/)
+        if: always()
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: ./public
+          keep_files: true
+          commit_message: "docs(ci): nightly reports for ${{ github.sha }}"

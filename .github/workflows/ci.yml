@@ -159,6 +159,15 @@ jobs:
           if-no-files-found: warn
           retention-days: 14
 
+      - name: Upload Kover HTML report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kover-html
+          path: build/reports/kover/html/
+          if-no-files-found: warn
+          retention-days: 14
+
   android-compile:
     name: Android debug compile
     runs-on: ubuntu-latest
@@ -325,6 +334,177 @@ jobs:
         with:
           name: firestore-junit-results
           path: build/test-results/firestore/*.xml
+          if-no-files-found: warn
+          retention-days: 14
+
+  publish:
+    name: Aggregate + publish to Pages
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: [junit, firestore-rules]
+    if: always()
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download JUnit (common)
+        uses: actions/download-artifact@v4
+        with:
+          name: junit-results
+          path: allure-input/common
+        continue-on-error: true
+
+      - name: Download JUnit (firestore)
+        uses: actions/download-artifact@v4
+        with:
+          name: firestore-junit-results
+          path: allure-input/firestore
+        continue-on-error: true
+
+      - name: Download Kover HTML
+        uses: actions/download-artifact@v4
+        with:
+          name: kover-html
+          path: kover-html
+        continue-on-error: true
+
+      # Flatten JUnit XMLs into a single dir so simple-elf gets a clean
+      # `allure_results` input. We keep one XML per file; nested layouts from
+      # different jobs are squashed by prefixing with their source path.
+      - name: Stage Allure results
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p allure-results
+          if compgen -G "allure-input/**/*.xml" > /dev/null; then
+            find allure-input -type f -name '*.xml' | while read -r f; do
+              # Replace path separators with '__' to keep filenames unique.
+              dest="allure-results/$(echo "${f#allure-input/}" | tr '/' '__')"
+              cp "$f" "$dest"
+            done
+          fi
+          echo "Staged $(ls allure-results 2>/dev/null | wc -l) XML(s)."
+
+      # Decide whether this run publishes to Pages. PRs (especially from forks)
+      # don't get write access to gh-pages, and the branch protection on main is
+      # the right gate for what becomes "the" public report.
+      - name: Should publish to Pages?
+        id: gate
+        shell: bash
+        run: |
+          if [[ "${{ github.event_name }}" == "push" && "${{ github.ref }}" == "refs/heads/main" ]]; then
+            echo "publish=true"  >> "$GITHUB_OUTPUT"
+          else
+            echo "publish=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      # --- Pages-only path below ---------------------------------------------
+
+      # simple-elf reads existing history from a checked-out gh-pages clone.
+      # First-ever run: branch may not exist; continue-on-error and we fall
+      # back to an empty history dir so the action still produces a report.
+      - name: Checkout gh-pages
+        if: steps.gate.outputs.publish == 'true'
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          path: gh-pages
+        continue-on-error: true
+
+      - name: Ensure gh-pages dir exists
+        if: steps.gate.outputs.publish == 'true'
+        shell: bash
+        run: mkdir -p gh-pages/allure
+
+      - name: Build Allure report (with history)
+        if: steps.gate.outputs.publish == 'true'
+        uses: simple-elf/allure-report-action@master
+        with:
+          allure_results: allure-results
+          gh_pages: gh-pages/allure
+          allure_report: allure-report
+          allure_history: allure-history
+
+      - name: Assemble Pages payload
+        if: steps.gate.outputs.publish == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p public/allure public/kover
+          # simple-elf writes the merged report+history tree into allure-history/
+          if [[ -d allure-history ]]; then
+            cp -r allure-history/. public/allure/
+          fi
+          if [[ -d kover-html ]]; then
+            cp -r kover-html/. public/kover/
+          fi
+          cat > public/index.html <<'HTML'
+          <!doctype html>
+          <html lang="en">
+          <head>
+            <meta charset="utf-8">
+            <title>MoneySurfer reports</title>
+            <style>
+              body { font-family: -apple-system, system-ui, sans-serif; max-width: 720px; margin: 4rem auto; padding: 0 1.5rem; color: #222; }
+              h1 { font-size: 1.5rem; }
+              ul { line-height: 1.9; }
+              code { background: #f3f3f3; padding: 0 .25rem; border-radius: 3px; }
+              .muted { color: #777; font-size: .9rem; }
+            </style>
+          </head>
+          <body>
+            <h1>MoneySurfer — CI reports</h1>
+            <p class="muted">Published from <code>main</code> on every push.</p>
+            <h2>Push (common + firestore)</h2>
+            <ul>
+              <li><a href="allure/">Allure</a> (with history)</li>
+              <li><a href="kover/">Kover coverage</a> (common scope)</li>
+            </ul>
+            <h2>Nightly (all five scopes)</h2>
+            <ul>
+              <li><a href="nightly/allure/">Allure</a></li>
+              <li><a href="nightly/kover/">Kover coverage</a> (combined)</li>
+            </ul>
+          </body>
+          </html>
+          HTML
+
+      # keep_files: true preserves the nightly/ subtree pushed by the nightly
+      # workflow; we only overwrite allure/, kover/, and index.html.
+      - name: Deploy to gh-pages
+        if: steps.gate.outputs.publish == 'true'
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: ./public
+          keep_files: true
+          commit_message: "docs(ci): publish push reports for ${{ github.sha }}"
+
+      # PR / non-main runs still get an artifact so reviewers can download the
+      # aggregated Allure without waiting for Pages.
+      - name: Generate aggregated Allure (artifact only)
+        if: steps.gate.outputs.publish != 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          ALLURE_VERSION=2.34.1
+          curl -Ls "https://github.com/allure-framework/allure2/releases/download/${ALLURE_VERSION}/allure-${ALLURE_VERSION}.tgz" \
+            | tar -xz -C "${RUNNER_TEMP}"
+          export PATH="${RUNNER_TEMP}/allure-${ALLURE_VERSION}/bin:$PATH"
+          if [[ -z "$(ls -A allure-results 2>/dev/null)" ]]; then
+            echo "No Allure results staged; skipping." >&2
+            exit 0
+          fi
+          mkdir -p build/reports/allure/all
+          allure generate allure-results -o build/reports/allure/all --clean
+
+      - name: Upload aggregated Allure (PR/non-main)
+        if: steps.gate.outputs.publish != 'true' && always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-report-all
+          path: build/reports/allure/all/
           if-no-files-found: warn
           retention-days: 14
 
