@@ -40,6 +40,7 @@ kotlin {
             api(projects.shared)
             implementation(projects.sync.api)
             implementation(projects.sync.noOp)
+            implementation(libs.arrow.core)
 
             implementation(project.dependencies.platform(libs.koin.bom))
             implementation(libs.koin.core)
