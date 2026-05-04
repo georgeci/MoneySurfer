@@ -68,12 +68,6 @@ kotlin {
 
         androidMain {
             dependencies {
-                // GitLive Firebase's Android variants need the matching Google Firebase
-                // SDKs on this module's compile classpath; the BOM aligns versions.
-                implementation(project.dependencies.platform(libs.firebase.bom))
-                implementation(libs.firebase.analytics)
-                implementation(libs.firebase.auth)
-                implementation(libs.firebase.firestore)
             }
         }
 
