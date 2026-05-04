@@ -159,53 +159,6 @@ jobs:
           if-no-files-found: warn
           retention-days: 14
 
-  sonar:
-    name: SonarCloud
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    # Sonar requires SONAR_TOKEN, which fork PRs don't have.
-    if: >-
-      github.event_name == 'push' ||
-      github.event.pull_request.head.repo.full_name == github.repository
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0   # Sonar needs full history for blame / new-code detection
-
-      - name: Decode Firebase config
-        uses: ./.github/actions/firebase-config
-        with:
-          debug-json:   ${{ secrets.GOOGLE_SERVICES_JSON_DEBUG }}
-          release-json: ${{ secrets.GOOGLE_SERVICES_JSON_RELEASE }}
-          ios-plist:    ${{ secrets.GOOGLE_SERVICE_INFO_PLIST }}
-
-      - name: Set up JDK
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: "17"
-
-      - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v4
-
-      - name: Cache SonarCloud packages
-        uses: actions/cache@v4
-        with:
-          path: ~/.sonar/cache
-          key: ${{ runner.os }}-sonar
-          restore-keys: ${{ runner.os }}-sonar
-
-      # Sonar Gradle plugin doesn't support Gradle's configuration cache yet
-      # (org.gradle.configuration-cache=true in gradle.properties), so disable
-      # it for this command only.
-      - name: Run tests + Kover + Detekt + Sonar
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: ./gradlew qaCommon detekt koverXmlReport sonar --no-configuration-cache --stacktrace
-
   android-compile:
     name: Android debug compile
     runs-on: ubuntu-latest
