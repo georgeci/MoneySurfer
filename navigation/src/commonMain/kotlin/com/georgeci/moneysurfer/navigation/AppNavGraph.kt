@@ -133,10 +133,13 @@ fun AppNavGraph(
         if (currentTopLevel == null) {
             navDisplay()
         } else {
+            val destinationLabels = TopLevelDestination.entries.associateWith { destination ->
+                stringResource(destination.label)
+            }
             NavigationSuiteScaffold(
                 navigationSuiteItems = {
                     TopLevelDestination.entries.forEach { destination ->
-                        val label = stringResource(destination.label)
+                        val label = destinationLabels.getValue(destination)
                         item(
                             selected = destination.matches(currentTopLevel),
                             onClick = { navigator.resetTo(destination.route) },
