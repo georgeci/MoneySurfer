@@ -6,6 +6,7 @@ on:
     branches:
       - main
       - master
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -163,11 +164,9 @@ jobs:
     name: Android debug compile
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    # PRs from forks don't get repo secrets, so the google-services step below
-    # would fail. Skip the job in that case — qaCommon already covers the PR.
-    if: >-
-      github.event_name == 'push' ||
-      github.event.pull_request.head.repo.full_name == github.repository
+    # Manual-only: Firebase-wired compile is gated on workflow_dispatch to save
+    # runner minutes. qaCommon + android-offline-debug cover regression on PRs.
+    if: github.event_name == 'workflow_dispatch'
 
     steps:
       - name: Checkout
@@ -194,6 +193,30 @@ jobs:
       # see androidApp/build.gradle.kts → signingConfigs.dev).
       - name: Compile Android debug
         run: ./gradlew :androidApp:processDebugGoogleServices :androidApp:compileDebugSources --stacktrace
+
+  android-offline-compile:
+    name: Android offline debug compile
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    # Manual-only. Offline variant has no Firebase deps, so no secrets needed
+    # — the dev keystore at keystore/dev.jks is checked into the repo.
+    if: github.event_name == 'workflow_dispatch'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Compile offline Android debug
+        run: ./gradlew :androidApp-offline:compileDebugSources --stacktrace
 
   firestore-rules:
     name: Firestore rules (Mocha + Allure)
