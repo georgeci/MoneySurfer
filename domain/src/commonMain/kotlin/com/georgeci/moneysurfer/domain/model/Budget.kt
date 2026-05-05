@@ -15,7 +15,7 @@ data class Budget(
     val startDate: LocalDate,
     val alertPercent: Int = 80,
     val isActive: Boolean = true,
-    val createdAt: Instant = Instant.fromEpochMilliseconds(0),
+    val createdAt: Instant,
     val updatedAt: Instant = createdAt,
 )
 

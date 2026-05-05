@@ -96,8 +96,7 @@ class TransactionRepositoryImpl(
         categoryId = categoryId?.let(::CategoryId),
         note = note,
         operationAt = timeFormatter.parseInstant(operationAt),
-        operationDate = timeFormatter.parseLocalDateOrNull(operationDate)
-            ?: timeFormatter.parseInstant(operationAt).toLocalDateTime(TimeZone.currentSystemDefault()).date,
+        operationDate = resolveOperationDate(operationDate, operationAt),
         type = parseType(type, amount),
         status = parseStatus(status),
         createdAt = timeFormatter.parseInstant(createdAt),
@@ -114,8 +113,7 @@ class TransactionRepositoryImpl(
             categoryId = categoryId?.let(::CategoryId),
             note = note,
             operationAt = timeFormatter.parseInstant(operationAt),
-            operationDate = timeFormatter.parseLocalDateOrNull(operationDate)
-                ?: timeFormatter.parseInstant(operationAt).toLocalDateTime(TimeZone.currentSystemDefault()).date,
+            operationDate = resolveOperationDate(operationDate, operationAt),
             type = parseType(type, amount),
             status = parseStatus(status),
             createdAt = timeFormatter.parseInstant(createdAt),
@@ -123,6 +121,9 @@ class TransactionRepositoryImpl(
         ),
         categoryName = categoryName,
     )
+
+    private fun resolveOperationDate(stored: String, operationAt: Long) =
+        resolveLegacyOperationDate(timeFormatter, stored, operationAt)
 
     private fun Transaction.toEntity() = TransactionEntity(
         id = id.value,
@@ -153,3 +154,13 @@ private fun parseType(raw: String, amount: Long): TransactionType =
 
 private fun parseStatus(raw: String): TransactionStatus =
     runCatching { TransactionStatus.valueOf(raw) }.getOrDefault(TransactionStatus.ACTUAL)
+
+// Legacy rows may have a blank `operationDate` (older schema). Resolve via UTC so the
+// same epoch maps to the same business date on every device — matches the fallback in
+// SyncDtoMappers and prevents cross-device divergence on push-back.
+internal fun resolveLegacyOperationDate(
+    timeFormatter: TimeFormatter,
+    stored: String,
+    operationAt: Long,
+) = timeFormatter.parseLocalDateOrNull(stored)
+    ?: timeFormatter.parseInstant(operationAt).toLocalDateTime(TimeZone.UTC).date
