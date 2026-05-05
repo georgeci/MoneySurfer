@@ -36,6 +36,7 @@ firebase-export-*/
 allure-report/
 allure-results/
 /androidApp/keystore/
+/keystore/
 /.claude/worktrees/
 /.claire/worktrees/
 

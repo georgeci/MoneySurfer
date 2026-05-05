@@ -6,6 +6,7 @@ on:
     branches:
       - main
       - master
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -166,6 +167,7 @@ jobs:
     # PRs from forks don't get repo secrets, so the google-services step below
     # would fail. Skip the job in that case — qaCommon already covers the PR.
     if: >-
+      github.event_name == 'workflow_dispatch' ||
       github.event_name == 'push' ||
       github.event.pull_request.head.repo.full_name == github.repository
 
@@ -194,6 +196,27 @@ jobs:
       # see androidApp/build.gradle.kts → signingConfigs.dev).
       - name: Compile Android debug
         run: ./gradlew :androidApp:processDebugGoogleServices :androidApp:compileDebugSources --stacktrace
+
+  android-offline-compile:
+    name: Android offline debug compile
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Compile offline Android debug
+        run: ./gradlew :androidApp-offline:compileDebugSources --stacktrace
 
   firestore-rules:
     name: Firestore rules (Mocha + Allure)
