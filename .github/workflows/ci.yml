@@ -160,6 +160,24 @@ jobs:
           if-no-files-found: warn
           retention-days: 14
 
+      - name: Upload coverage to Codecov
+        if: always()
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: build/reports/kover/report.xml
+          flags: unittests
+          fail_ci_if_error: false
+          disable_search: true
+
+      - name: Upload test results to Codecov
+        if: always()
+        uses: codecov/test-results-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: "**/build/test-results/jvmTest/**/*.xml"
+          flags: unittests
+
   android-compile:
     name: Android debug compile
     runs-on: ubuntu-latest
