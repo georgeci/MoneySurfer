@@ -62,12 +62,14 @@ subprojects {
 
 dependencies {
     kover(projects.composeApp)
+    kover(projects.composeAppOffline)
     kover(projects.domain)
     kover(projects.dataLocal)
     kover(projects.dataRemote)
     kover(projects.syncSurfer)
     kover(projects.sync.default)
     kover(projects.uikit)
+    kover(projects.feature.login)
 }
 
 sonar {
