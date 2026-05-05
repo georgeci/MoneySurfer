@@ -393,6 +393,63 @@ jobs:
           if-no-files-found: warn
           retention-days: 14
 
+  sonar:
+    name: SonarCloud + coverage
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    # Skip on PRs from forks (no SONAR_TOKEN access from fork secrets).
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      github.event_name == 'push' ||
+      github.event.pull_request.head.repo.full_name == github.repository
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          # Sonar needs full git history for blame/new-code detection.
+          fetch-depth: 0
+
+      - name: Decode Firebase config
+        uses: ./.github/actions/firebase-config
+        with:
+          debug-json:   ${{ secrets.GOOGLE_SERVICES_JSON_DEBUG }}
+          release-json: ${{ secrets.GOOGLE_SERVICES_JSON_RELEASE }}
+          ios-plist:    ${{ secrets.GOOGLE_SERVICE_INFO_PLIST }}
+
+      - name: Set up JDK
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Cache SonarCloud packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+
+      - name: Run detekt + Kover XML + Sonar
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        # `--continue` so a detekt violation still lets Kover + Sonar publish
+        # the analysis. Quality-gate enforcement lives on the SonarCloud side.
+        run: ./gradlew detekt koverXmlReport sonar --stacktrace --continue
+
+      - name: Upload Kover XML report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: kover-report
+          path: build/reports/kover/report.xml
+          if-no-files-found: warn
+          retention-days: 14
+
   # iOS build is intentionally not wired up yet — macos-14 runners are ~10x more
   # expensive than ubuntu-latest and the Android compile job catches most
   # regressions in shared/composeApp/feature modules. To enable, add:

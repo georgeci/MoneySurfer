@@ -203,6 +203,8 @@ emulator/device. See [README_TEST.md](README_TEST.md).
 - [README.md](README.md): KMP project basics and run commands.
 - [README_TEST.md](README_TEST.md): QA, Kover, Allure, integration tests,
   Maestro.
+- [docs/testing/sonarcloud.md](docs/testing/sonarcloud.md): SonarCloud +
+  coverage publishing (CI job, KMP source discovery, GitHub App setup).
 - [uikit/README.md](uikit/README.md): design system rules.
 - [docs/architecture/sync.AI_SUMMARY.md](docs/architecture/sync.AI_SUMMARY.md):
   quick sync entry point.
