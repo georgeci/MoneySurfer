@@ -69,6 +69,9 @@ Hard rules:
 - Prefer shared logic and UI in `commonMain`.
 - Use `expect`/`actual` for real platform APIs.
 - Add dependencies only through `gradle/libs.versions.toml`.
+- Use `implementation(...)` in `build.gradle.kts`. Do not use `api(...)` — if
+  a consumer module needs a transitive symbol, declare the dependency
+  explicitly in that module's own `build.gradle.kts`.
 - Domain IDs are UUID-backed value classes with `Companion.uuid()`.
 - ViewModel state is a sealed interface (`Loading` / `Content`) with Arrow
   optics. Use field-level optics for state updates where current code does so.
