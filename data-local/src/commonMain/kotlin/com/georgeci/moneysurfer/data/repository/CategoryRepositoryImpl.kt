@@ -5,12 +5,12 @@ import com.georgeci.moneysurfer.data.db.entity.CategoryEntity
 import com.georgeci.moneysurfer.domain.model.Category
 import com.georgeci.moneysurfer.domain.primitives.CategoryId
 import com.georgeci.moneysurfer.domain.primitives.CategoryType
+import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 import com.georgeci.moneysurfer.domain.repositories.CategoryRepository
 import com.georgeci.moneysurfer.domain.sync.SyncEntityTypes
 import com.georgeci.moneysurfer.sync.repository.MutationOperation
 import com.georgeci.moneysurfer.sync.repository.OutboxEnqueuer
-import com.georgeci.moneysurfer.domain.primitives.Clock
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import org.koin.core.annotation.Single
@@ -19,7 +19,8 @@ import org.koin.core.annotation.Single
 class CategoryRepositoryImpl(
     private val dao: CategoryDao,
     private val outboxEnqueuer: OutboxEnqueuer,
-    private val clock: Clock,
+    private val clock: ClockUseCase,
+    private val timeFormatter: TimeFormatter,
 ) : CategoryRepository {
 
     override fun getAll(): Flow<List<Category>> =
@@ -32,8 +33,7 @@ class CategoryRepositoryImpl(
         dao.getById(id.value)?.toDomain()
 
     override suspend fun insert(category: Category) {
-        val now = clock.nowMillis()
-        val entity = category.toEntity().copy(createdAt = now, updatedAt = now)
+        val entity = category.toEntity()
         dao.insert(entity)
         enqueueUpsert(entity, MutationOperation.INSERT)
     }
@@ -42,7 +42,7 @@ class CategoryRepositoryImpl(
         val existingCreatedAt = dao.getById(category.id.value)?.createdAt
         val entity = category.toEntity().copy(
             createdAt = existingCreatedAt ?: category.toEntity().createdAt,
-            updatedAt = clock.nowMillis(),
+            updatedAt = clock.now().toEpochMilliseconds(),
         )
         dao.update(entity)
         enqueueUpsert(entity, MutationOperation.UPDATE)
@@ -68,24 +68,24 @@ class CategoryRepositoryImpl(
             operation = operation,
         )
     }
+
+    private fun CategoryEntity.toDomain() = Category(
+        id = CategoryId(id),
+        workspaceId = WorkspaceId(workspaceId),
+        name = name,
+        type = runCatching { CategoryType.valueOf(type) }.getOrDefault(CategoryType.EXPENSE),
+        parentId = parentId?.let { CategoryId(it) },
+        createdAt = timeFormatter.parseInstant(createdAt),
+        updatedAt = timeFormatter.parseInstant(updatedAt),
+    )
+
+    private fun Category.toEntity() = CategoryEntity(
+        id = id.value,
+        workspaceId = workspaceId.value,
+        name = name,
+        type = type.name,
+        parentId = parentId?.value,
+        createdAt = timeFormatter.formatInstant(createdAt),
+        updatedAt = timeFormatter.formatInstant(updatedAt),
+    )
 }
-
-private fun CategoryEntity.toDomain() = Category(
-    id = CategoryId(id),
-    workspaceId = WorkspaceId(workspaceId),
-    name = name,
-    type = runCatching { CategoryType.valueOf(type) }.getOrDefault(CategoryType.EXPENSE),
-    parentId = parentId?.let { CategoryId(it) },
-    createdAt = createdAt.toInstant(),
-    updatedAt = updatedAt.toInstant(),
-)
-
-private fun Category.toEntity() = CategoryEntity(
-    id = id.value,
-    workspaceId = workspaceId.value,
-    name = name,
-    type = type.name,
-    parentId = parentId?.value,
-    createdAt = createdAt.toEpochMillis(),
-    updatedAt = updatedAt.toEpochMillis(),
-)

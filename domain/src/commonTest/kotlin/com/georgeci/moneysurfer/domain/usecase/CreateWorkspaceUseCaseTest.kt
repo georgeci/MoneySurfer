@@ -11,7 +11,7 @@ import com.georgeci.moneysurfer.domain.model.WorkspaceRole
 import com.georgeci.moneysurfer.domain.primitives.CategoryId
 import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
 import com.georgeci.moneysurfer.domain.primitives.UserId
-import com.georgeci.moneysurfer.domain.primitives.Clock
+import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 import kotlin.time.Clock as KotlinClock
 import com.georgeci.moneysurfer.domain.repositories.CategoryRepository
@@ -280,7 +280,7 @@ private class TestEnv(
         userRemoteRepository = userRemoteRepo,
         workspaceSyncer = syncer,
         session = session,
-        getCurrentTime = GetCurrentTimeUseCase(Clock()),
+        getCurrentTime = GetCurrentTimeUseCase(ClockUseCase()),
     )
 }
 

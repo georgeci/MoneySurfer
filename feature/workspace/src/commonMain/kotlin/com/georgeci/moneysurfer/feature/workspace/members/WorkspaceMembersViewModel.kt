@@ -7,7 +7,7 @@ import com.georgeci.moneysurfer.domain.model.WorkspaceInvite
 import com.georgeci.moneysurfer.domain.model.WorkspaceMember
 import com.georgeci.moneysurfer.domain.model.WorkspaceMemberStatus
 import com.georgeci.moneysurfer.domain.model.WorkspaceRole
-import com.georgeci.moneysurfer.domain.primitives.Clock
+import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
 import com.georgeci.moneysurfer.domain.primitives.UserId
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceInviteId
@@ -31,7 +31,7 @@ class WorkspaceMembersViewModel(
     private val inviteRepository: WorkspaceInviteRepository,
     private val leaveWorkspace: LeaveWorkspaceUseCase,
     private val cancelInvite: CancelInviteUseCase,
-    private val clock: Clock,
+    private val clock: ClockUseCase,
 ) : MviViewModel<WorkspaceMembersState, WorkspaceMembersEvent, WorkspaceMembersEffect>(
     initialState = WorkspaceMembersState.Loading(workspaceId),
 ) {

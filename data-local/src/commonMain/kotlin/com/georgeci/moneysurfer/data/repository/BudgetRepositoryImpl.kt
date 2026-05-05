@@ -15,6 +15,7 @@ import org.koin.core.annotation.Single
 @Single(binds = [BudgetRepository::class])
 class BudgetRepositoryImpl(
     private val dao: BudgetDao,
+    private val timeFormatter: TimeFormatter,
 ) : BudgetRepository {
 
     override fun getAll(): Flow<List<Budget>> =
@@ -34,33 +35,33 @@ class BudgetRepositoryImpl(
     override suspend fun delete(id: BudgetId) {
         dao.delete(id.value)
     }
+
+    private fun BudgetEntity.toDomain() = Budget(
+        id = BudgetId(id),
+        name = name,
+        categoryIds = categoryIds.parseCategoryIds(),
+        amount = Money.fromMinor(amount),
+        period = BudgetPeriod.entries.firstOrNull { it.name == period } ?: BudgetPeriod.MONTHLY,
+        startDate = timeFormatter.parseLocalDate(startDate),
+        alertPercent = alertPercent,
+        isActive = isActive,
+        createdAt = timeFormatter.parseInstant(createdAt),
+        updatedAt = timeFormatter.parseInstant(updatedAt),
+    )
+
+    private fun Budget.toEntity() = BudgetEntity(
+        id = id.value,
+        name = name,
+        categoryIds = categoryIds.toStorageValue(),
+        amount = amount.minor,
+        period = period.name,
+        startDate = timeFormatter.formatLocalDate(startDate),
+        alertPercent = alertPercent,
+        isActive = isActive,
+        createdAt = timeFormatter.formatInstant(createdAt),
+        updatedAt = timeFormatter.formatInstant(updatedAt),
+    )
 }
-
-private fun BudgetEntity.toDomain() = Budget(
-    id = BudgetId(id),
-    name = name,
-    categoryIds = categoryIds.parseCategoryIds(),
-    amount = Money.fromMinor(amount),
-    period = BudgetPeriod.entries.firstOrNull { it.name == period } ?: BudgetPeriod.MONTHLY,
-    startDate = startDate.toLocalDate(),
-    alertPercent = alertPercent,
-    isActive = isActive,
-    createdAt = createdAt.toInstant(),
-    updatedAt = updatedAt.toInstant(),
-)
-
-private fun Budget.toEntity() = BudgetEntity(
-    id = id.value,
-    name = name,
-    categoryIds = categoryIds.toStorageValue(),
-    amount = amount.minor,
-    period = period.name,
-    startDate = startDate.toIsoDate(),
-    alertPercent = alertPercent,
-    isActive = isActive,
-    createdAt = createdAt.toEpochMillis(),
-    updatedAt = updatedAt.toEpochMillis(),
-)
 
 private fun String.parseCategoryIds(): List<CategoryId> {
     if (isBlank()) return emptyList()

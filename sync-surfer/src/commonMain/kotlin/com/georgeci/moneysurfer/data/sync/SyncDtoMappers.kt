@@ -100,12 +100,14 @@ fun TransactionEntity.toDoc(): TransactionDoc = TransactionDoc(
 
 fun TransactionDoc.toEntity(id: String, workspaceId: String): TransactionEntity {
     // Tolerate legacy/partial Firestore docs:
-    //  - operationDate may be "" (older schema): derive ISO date from operationAt
+    //  - operationDate may be "" (older schema): derive ISO date from operationAt.
+    //    Use UTC, not the device default, so the same Firestore doc resolves to the
+    //    same operationDate on every client (avoids cross-device divergence).
     //  - createdAt may be 0L (older schema): fall back to operationAt or updatedAt
     //    so audit ordering doesn't collapse to epoch zero.
     val resolvedOperationDate = operationDate.ifBlank {
         Instant.fromEpochMilliseconds(operationAt)
-            .toLocalDateTime(TimeZone.currentSystemDefault())
+            .toLocalDateTime(TimeZone.UTC)
             .date
             .toString()
     }

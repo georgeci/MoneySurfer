@@ -10,6 +10,6 @@ import kotlin.time.Instant
  * via Koin.
  */
 @Single
-class Clock {
+class ClockUseCase {
     fun now(): Instant = KotlinClock.System.now()
 }

@@ -11,7 +11,7 @@ import com.georgeci.moneysurfer.domain.model.InviteStatus
 import com.georgeci.moneysurfer.domain.model.User
 import com.georgeci.moneysurfer.domain.model.WorkspaceMemberStatus
 import com.georgeci.moneysurfer.domain.model.WorkspaceRole
-import com.georgeci.moneysurfer.domain.primitives.Clock
+import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 import kotlin.time.Clock as KotlinClock
 import com.georgeci.moneysurfer.domain.repositories.UserRemoteRepository
@@ -146,7 +146,7 @@ private class AcceptInviteEnv(
         userRemoteRepository = userRemote,
         workspaceSyncer = syncer,
         session = session,
-        getCurrentTime = GetCurrentTimeUseCase(Clock()),
+        getCurrentTime = GetCurrentTimeUseCase(ClockUseCase()),
     )
 }
 

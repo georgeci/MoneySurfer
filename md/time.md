@@ -39,7 +39,7 @@ Domain-модели объявляют богатые типы:
 - `RecurringRule.startDate: LocalDate`, `nextRunAt: Instant?`,
   `createdAt / updatedAt: Instant`
 
-«Now»: инжектить `domain.primitives.Clock` и вызывать `clock.now()`.
+«Now»: инжектить `domain.primitives.ClockUseCase` и вызывать `clock.now()`.
 `kotlin.time.Clock.System.now()` напрямую не вызывать вне этой абстракции.
 
 ### Data (Room и Firestore)
