@@ -99,11 +99,15 @@ class AndroidIntegrationHarness(appName: String? = null) {
     val inviteRepository = WorkspaceInviteRepositoryImpl(
         dao = database.workspaceInviteDao(),
         outboxEnqueuer = outboxEnqueuer,
+        clock = com.georgeci.moneysurfer.domain.primitives.ClockUseCase(),
+        timeFormatter = com.georgeci.moneysurfer.data.repository.TimeFormatter(),
     )
 
     val memberRepository = WorkspaceMemberRepositoryImpl(
         dao = database.workspaceMemberDao(),
         outboxEnqueuer = outboxEnqueuer,
+        clock = com.georgeci.moneysurfer.domain.primitives.ClockUseCase(),
+        timeFormatter = com.georgeci.moneysurfer.data.repository.TimeFormatter(),
     )
 
     val userRemoteRepository = UserRemoteRepositoryImpl(env.firestore)

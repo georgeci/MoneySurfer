@@ -108,7 +108,7 @@ class InviteDiscoveryIT {
                     "displayName" to "IT Owner",
                     "email" to ownerEmail,
                     "addedByUserId" to ownerUid,
-                    "addedAt" to now,
+                    "createdAt" to now,
                     "updatedAt" to now,
                     "clientVersionCode" to 1,
                 ),

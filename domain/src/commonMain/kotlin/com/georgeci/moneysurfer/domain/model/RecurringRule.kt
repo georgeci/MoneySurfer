@@ -17,6 +17,8 @@ data class RecurringRule(
     val nextRunAt: Instant?,
     val autoCreate: Boolean = true,
     val isActive: Boolean = true,
+    val createdAt: Instant = Instant.fromEpochMilliseconds(0),
+    val updatedAt: Instant = createdAt,
 )
 
 data class RecurringSchedule(

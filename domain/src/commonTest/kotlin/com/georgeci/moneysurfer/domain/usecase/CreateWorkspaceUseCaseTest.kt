@@ -11,8 +11,9 @@ import com.georgeci.moneysurfer.domain.model.WorkspaceRole
 import com.georgeci.moneysurfer.domain.primitives.CategoryId
 import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
 import com.georgeci.moneysurfer.domain.primitives.UserId
+import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
-import com.georgeci.moneysurfer.domain.primitives.currentTimeMillis
+import kotlin.time.Clock as KotlinClock
 import com.georgeci.moneysurfer.domain.repositories.CategoryRepository
 import com.georgeci.moneysurfer.domain.repositories.UserRemoteRepository
 import com.georgeci.moneysurfer.domain.repositories.WorkspaceMemberRepository
@@ -43,11 +44,11 @@ class CreateWorkspaceUseCaseTest : StringSpec({
 
     "writes workspace, member, default categories and pins it as current (no Firebase session)" {
         val env = TestEnv(currentUserId = OWNER_ID, firebaseUid = null)
-        val before = currentTimeMillis()
+        val before = KotlinClock.System.now()
 
         val result = env.useCase(defaultParams())
 
-        val after = currentTimeMillis()
+        val after = KotlinClock.System.now()
         result.shouldBeInstanceOf<Either.Right<WorkspaceId>>()
         val newId = result.value
 
@@ -59,20 +60,20 @@ class CreateWorkspaceUseCaseTest : StringSpec({
         ws.baseCurrency shouldBe CurrencyCode("USD")
         ws.ownerId shouldBe OWNER_ID
         ws.archived shouldBe false
-        val createdAtMs = ws.createdAt.toEpochMilliseconds()
-        (createdAtMs in before..after) shouldBe true
+        val createdAt = ws.createdAt
+        (createdAt in before..after) shouldBe true
 
         env.memberRepo.inserted shouldHaveSize 1
         val member = env.memberRepo.inserted.single()
         member.userId shouldBe OWNER_ID
         member.workspaceId shouldBe newId
         member.role shouldBe WorkspaceRole.OWNER
-        member.createdAt shouldBe createdAtMs
+        member.createdAt shouldBe createdAt
         member.addedByUserId shouldBe OWNER_ID
 
         env.categoryRepo.inserted shouldHaveSize DEFAULT_CATEGORY_SEEDS.size
         env.categoryRepo.inserted.map { it.workspaceId }.toSet() shouldBe setOf(newId)
-        env.categoryRepo.inserted.map { it.createdAt }.toSet() shouldBe setOf(createdAtMs)
+        env.categoryRepo.inserted.map { it.createdAt }.toSet() shouldBe setOf(createdAt)
         env.categoryRepo.inserted.map { it.parentId }.toSet() shouldBe setOf(null)
         env.categoryRepo.inserted.map { it.id.value }.toSet() shouldHaveSize DEFAULT_CATEGORY_SEEDS.size
         env.categoryRepo.inserted.map { it.name to it.type } shouldContainExactlyInAnyOrder
@@ -279,7 +280,7 @@ private class TestEnv(
         userRemoteRepository = userRemoteRepo,
         workspaceSyncer = syncer,
         session = session,
-        getCurrentTime = GetCurrentTimeUseCase(),
+        getCurrentTime = GetCurrentTimeUseCase(ClockUseCase()),
     )
 }
 

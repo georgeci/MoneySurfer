@@ -3,6 +3,7 @@ package com.georgeci.moneysurfer.domain.model
 import com.georgeci.moneysurfer.domain.primitives.UserId
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceInviteId
+import kotlin.time.Instant
 
 /**
  * Email-based invitation to a [Workspace].
@@ -23,8 +24,8 @@ data class WorkspaceInvite(
     val role: WorkspaceRole,
     val status: InviteStatus,
     val invitedByUserId: UserId,
-    val createdAt: Long,
-    val updatedAt: Long,
-    val expiresAt: Long,
-    val respondedAt: Long? = null,
+    val createdAt: Instant,
+    val updatedAt: Instant,
+    val expiresAt: Instant,
+    val respondedAt: Instant? = null,
 )

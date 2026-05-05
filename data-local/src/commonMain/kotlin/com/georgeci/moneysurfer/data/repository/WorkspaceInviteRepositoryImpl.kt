@@ -6,6 +6,7 @@ import com.georgeci.moneysurfer.data.db.entity.WorkspaceInviteEntity
 import com.georgeci.moneysurfer.domain.model.InviteStatus
 import com.georgeci.moneysurfer.domain.model.WorkspaceInvite
 import com.georgeci.moneysurfer.domain.model.WorkspaceRole
+import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
 import com.georgeci.moneysurfer.domain.primitives.UserId
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceInviteId
@@ -16,12 +17,13 @@ import com.georgeci.moneysurfer.sync.repository.OutboxEnqueuer
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import org.koin.core.annotation.Single
-import kotlin.time.Clock
 
 @Single(binds = [WorkspaceInviteRepository::class])
 class WorkspaceInviteRepositoryImpl(
     private val dao: WorkspaceInviteDao,
     private val outboxEnqueuer: OutboxEnqueuer,
+    private val clock: ClockUseCase,
+    private val timeFormatter: TimeFormatter,
 ) : WorkspaceInviteRepository {
 
     private val log = Logger.withTag(TAG)
@@ -42,9 +44,13 @@ class WorkspaceInviteRepositoryImpl(
         dao.getById(id.value)?.toDomain()
 
     override suspend fun upsert(invite: WorkspaceInvite) {
-        val now = now()
-        val isNew = dao.getById(invite.id.value) == null
-        val entity = invite.toEntity().copy(updatedAt = now)
+        val now = clock.now().toEpochMilliseconds()
+        val existing = dao.getById(invite.id.value)
+        val isNew = existing == null
+        val entity = invite.toEntity().copy(
+            createdAt = existing?.createdAt ?: timeFormatter.formatInstant(invite.createdAt),
+            updatedAt = now,
+        )
         dao.upsert(entity)
         log.i {
             "[upsert] id=${entity.id} wid=${entity.workspaceId} email=${entity.email} " +
@@ -75,7 +81,7 @@ class WorkspaceInviteRepositoryImpl(
             log.w { "[transition] id=${id.value} not found locally — skipping $target" }
             return
         }
-        val now = now()
+        val now = clock.now().toEpochMilliseconds()
         val updated = current.copy(
             status = target.name,
             respondedAt = now,
@@ -89,8 +95,6 @@ class WorkspaceInviteRepositoryImpl(
         enqueueUpsert(updated, MutationOperation.UPDATE)
     }
 
-    private fun now(): Long = Clock.System.now().toEpochMilliseconds()
-
     private suspend fun enqueueUpsert(entity: WorkspaceInviteEntity, operation: MutationOperation) {
         outboxEnqueuer.enqueueUpsert(
             entityType = SyncEntityTypes.WORKSPACE_INVITE,
@@ -101,35 +105,35 @@ class WorkspaceInviteRepositoryImpl(
         log.i { "[enqueue] id=${entity.id} wid=${entity.workspaceId} op=$operation" }
     }
 
+    private fun WorkspaceInviteEntity.toDomain() = WorkspaceInvite(
+        id = WorkspaceInviteId(id),
+        workspaceId = WorkspaceId(workspaceId),
+        email = email,
+        targetUserId = targetUserId?.let(::UserId),
+        role = WorkspaceRole.entries.firstOrNull { it.name == role } ?: WorkspaceRole.VIEWER,
+        status = InviteStatus.entries.firstOrNull { it.name == status } ?: InviteStatus.PENDING,
+        invitedByUserId = UserId(invitedByUserId),
+        createdAt = timeFormatter.parseInstant(createdAt),
+        updatedAt = timeFormatter.parseInstant(updatedAt),
+        expiresAt = timeFormatter.parseInstant(expiresAt),
+        respondedAt = timeFormatter.parseInstantOrNull(respondedAt),
+    )
+
+    private fun WorkspaceInvite.toEntity() = WorkspaceInviteEntity(
+        id = id.value,
+        workspaceId = workspaceId.value,
+        email = email,
+        targetUserId = targetUserId?.value,
+        role = role.name,
+        status = status.name,
+        invitedByUserId = invitedByUserId.value,
+        createdAt = timeFormatter.formatInstant(createdAt),
+        updatedAt = timeFormatter.formatInstant(updatedAt),
+        expiresAt = timeFormatter.formatInstant(expiresAt),
+        respondedAt = timeFormatter.formatInstantOrNull(respondedAt),
+    )
+
     private companion object {
         const val TAG = "InviteRepo"
     }
 }
-
-private fun WorkspaceInviteEntity.toDomain() = WorkspaceInvite(
-    id = WorkspaceInviteId(id),
-    workspaceId = WorkspaceId(workspaceId),
-    email = email,
-    targetUserId = targetUserId?.let(::UserId),
-    role = WorkspaceRole.entries.firstOrNull { it.name == role } ?: WorkspaceRole.VIEWER,
-    status = InviteStatus.entries.firstOrNull { it.name == status } ?: InviteStatus.PENDING,
-    invitedByUserId = UserId(invitedByUserId),
-    createdAt = createdAt,
-    updatedAt = updatedAt,
-    expiresAt = expiresAt,
-    respondedAt = respondedAt,
-)
-
-private fun WorkspaceInvite.toEntity() = WorkspaceInviteEntity(
-    id = id.value,
-    workspaceId = workspaceId.value,
-    email = email,
-    targetUserId = targetUserId?.value,
-    role = role.name,
-    status = status.name,
-    invitedByUserId = invitedByUserId.value,
-    createdAt = createdAt,
-    updatedAt = updatedAt,
-    expiresAt = expiresAt,
-    respondedAt = respondedAt,
-)

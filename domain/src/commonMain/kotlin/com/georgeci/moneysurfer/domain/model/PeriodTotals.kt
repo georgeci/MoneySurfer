@@ -6,7 +6,6 @@ import com.georgeci.moneysurfer.domain.primitives.TransactionType
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import kotlin.time.Instant
 
 /**
  * Aggregate numbers for a date range. Pure domain return shape — never persisted, never
@@ -35,7 +34,7 @@ data class PeriodTotals(
  * Pure aggregation over an in-memory list of transactions. Caller decides which list to
  * pass (typically `transactionRepository.getByWorkspaceId(...)`).
  *
- * Period is computed from `transaction.timestamp` interpreted in [timeZone]. Inclusive on
+ * Period is computed from `transaction.operationAt` interpreted in [timeZone]. Inclusive on
  * both ends. Deleted transactions are absent from the local table — no extra filtering.
  */
 fun calculatePeriodTotalsFromList(
@@ -50,7 +49,7 @@ fun calculatePeriodTotalsFromList(
     var plannedExpense = 0L
 
     for (tx in transactions) {
-        val date = Instant.fromEpochMilliseconds(tx.timestamp).toLocalDateTime(timeZone).date
+        val date = tx.operationAt.toLocalDateTime(timeZone).date
         if (date < fromDate || date > toDate) continue
 
         val magnitude = tx.money.abs().minor

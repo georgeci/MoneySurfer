@@ -15,6 +15,7 @@ import com.georgeci.moneysurfer.domain.usecase.CreateTransactionUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetCurrentTimeUseCase
 import com.georgeci.moneysurfer.utils.MviViewModel
 import kotlinx.coroutines.flow.first
+import kotlinx.datetime.toLocalDateTime
 import org.koin.core.annotation.KoinViewModel
 
 @KoinViewModel
@@ -125,6 +126,8 @@ class AccountCreationViewModel(
             )
 
             if (!openingBalance.isZero()) {
+                val now = getCurrentTime()
+                val zone = kotlinx.datetime.TimeZone.currentSystemDefault()
                 createTransaction(
                     Transaction(
                         id = TransactionId.uuid(),
@@ -134,8 +137,11 @@ class AccountCreationViewModel(
                         currencyCode = currency,
                         categoryId = null,
                         note = "",
-                        timestamp = getCurrentTime(),
+                        operationAt = now,
+                        operationDate = now.toLocalDateTime(zone).date,
                         type = TransactionType.OPENING_BALANCE,
+                        createdAt = now,
+                        updatedAt = now,
                     ),
                 )
             }
