@@ -6,6 +6,8 @@ import androidx.compose.material.icons.automirrored.filled.CallSplit
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.automirrored.filled.ReceiptLong
+import androidx.compose.material.icons.filled.Dashboard
+import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material.icons.filled.AccountBalance
 import androidx.compose.material.icons.filled.AccountBalanceWallet
 import androidx.compose.material.icons.filled.Add
@@ -85,6 +87,9 @@ object SurferIcons {
     val DropDown: ImageVector get() = Icons.Filled.KeyboardArrowDown
     val ArrowDown: ImageVector get() = Icons.Filled.ArrowDownward
     val ArrowUp: ImageVector get() = Icons.Filled.ArrowUpward
+
+    val Dashboard: ImageVector get() = Icons.Filled.Dashboard
+    val SwapHoriz: ImageVector get() = Icons.Filled.SwapHoriz
 
     val Cloud: ImageVector get() = Icons.Filled.Cloud
     val LightMode: ImageVector get() = Icons.Filled.LightMode
