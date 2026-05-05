@@ -85,7 +85,17 @@ subprojects {
         )
         val mainDirs = mainCandidates.filter { file(it).isDirectory }
         val testDirs = testCandidates.filter { file(it).isDirectory }
+        // Skip android-application modules: sonarqube-gradle 6.x looks up the
+        // legacy `AppExtension` via AndroidUtils.getTestBuildType, but AGP 8
+        // only registers `ApplicationExtension`, which throws
+        // UnknownDomainObjectException at task-graph time. App modules are
+        // entry points anyway and already excluded from coverage.
+        val isAndroidApp = plugins.hasPlugin("com.android.application")
         extensions.findByType(org.sonarqube.gradle.SonarExtension::class.java)?.properties {
+            if (isAndroidApp) {
+                property("sonar.skipProject", "true")
+                return@properties
+            }
             if (mainDirs.isNotEmpty()) {
                 property("sonar.sources", mainDirs.joinToString(","))
             }
