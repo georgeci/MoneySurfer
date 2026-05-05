@@ -35,10 +35,13 @@ plugins {
 }
 
 include(":androidApp")
+include(":androidApp-offline")
 include(":composeApp")
+include(":composeAppOffline")
 include(":domain")
 include(":sync:api")
 include(":sync:default")
+include(":sync:no-op")
 include(":feature")
 include(":uikit")
 include(":shared")

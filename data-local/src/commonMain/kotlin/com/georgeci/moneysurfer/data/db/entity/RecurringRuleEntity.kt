@@ -32,4 +32,6 @@ data class RecurringRuleEntity(
     @ColumnInfo(name = "nextRunAt") val nextRunAt: Long?,
     @ColumnInfo(name = "autoCreate") val autoCreate: Boolean,
     @ColumnInfo(name = "isActive") val isActive: Boolean,
+    @ColumnInfo(name = "createdAt", defaultValue = "0") val createdAt: Long = 0L,
+    @ColumnInfo(name = "updatedAt", defaultValue = "0") val updatedAt: Long = 0L,
 )

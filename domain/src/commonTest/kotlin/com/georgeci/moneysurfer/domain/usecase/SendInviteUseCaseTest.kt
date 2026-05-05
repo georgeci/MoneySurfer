@@ -9,6 +9,7 @@ import com.georgeci.moneysurfer.domain.fixtures.workspaceId
 import com.georgeci.moneysurfer.domain.model.InviteStatus
 import com.georgeci.moneysurfer.domain.model.WorkspaceMemberStatus
 import com.georgeci.moneysurfer.domain.model.WorkspaceRole
+import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceInviteId
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
@@ -138,7 +139,7 @@ class SendInviteUseCaseTest : StringSpec({
         invite.invitedByUserId shouldBe OWNER_ID
         // 14d TTL window — anchor on `before` to keep the assertion deterministic.
         (invite.expiresAt > before).let { it shouldBe true }
-        ((invite.expiresAt - invite.createdAt) >= 13L * 24L * 60L * 60L * 1000L) shouldBe true
+        ((invite.expiresAt - invite.createdAt) >= kotlin.time.Duration.parse("13d")) shouldBe true
     }
 })
 
@@ -156,8 +157,8 @@ private class SendInviteEnv(
         NoopUserRemoteRepository(),
 ) {
     val session = InMemorySessionPointers(currentUserId = currentUserId)
-    val getNow = GetCurrentTimeUseCase()
-    fun now(): Long = getNow()
+    val getNow = GetCurrentTimeUseCase(ClockUseCase())
+    fun now(): kotlin.time.Instant = getNow()
     val useCase = SendInviteUseCase(
         memberRepository = members,
         inviteRepository = invites,

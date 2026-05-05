@@ -103,7 +103,16 @@ private fun build(uid: String?): TestRig {
         session = InMemorySessionPointers(currentFirebaseUid = uid),
         appVersionGate = FakeAppVersionGate(),
     )
-    return TestRig(WorkspaceMemberRepositoryImpl(dao, enqueuer), dao, queue)
+    return TestRig(
+        WorkspaceMemberRepositoryImpl(
+            dao,
+            enqueuer,
+            com.georgeci.moneysurfer.domain.primitives.ClockUseCase(),
+            com.georgeci.moneysurfer.data.repository.TimeFormatter(),
+        ),
+        dao,
+        queue,
+    )
 }
 
 private fun ownerMember() = WorkspaceMember(
@@ -114,7 +123,7 @@ private fun ownerMember() = WorkspaceMember(
     displayName = "Alice",
     email = "alice@example.com",
     addedByUserId = UserId("owner-uid"),
-    createdAt = 1_700_000_000_000L,
+    createdAt = kotlin.time.Instant.fromEpochMilliseconds(1_700_000_000_000L),
 )
 
 class WorkspaceMemberRepositoryDualWriteSpec : StringSpec({

@@ -72,8 +72,13 @@ Hard rules:
 - Domain IDs are UUID-backed value classes with `Companion.uuid()`.
 - ViewModel state is a sealed interface (`Loading` / `Content`) with Arrow
   optics. Use field-level optics for state updates where current code does so.
-- Storage/wire timestamps currently remain `Long epochMillis`; convert at data
-  boundaries when using `Instant`, `LocalDate`, or `TimeZone` in domain/UI.
+- Domain time types: `kotlin.time.Instant` for moments (`createdAt`,
+  `updatedAt`, `deletedAt`, `operationAt`, sync cursors); `LocalDate` for
+  calendar dates; `YearMonth` for monthly periods; `LocalDateTime` only for
+  UI input. Storage/wire keep `Long epochMillis` and ISO-8601 `String`.
+  Convert in data-layer mappers, never in `domain`. See
+  [docs/architecture/data-models.md](docs/architecture/data-models.md) and
+  [md/time.md](md/time.md).
 
 ## UI Rules
 
@@ -106,6 +111,8 @@ insufficient.
 ## Firestore Rules
 
 - Persistence overview: [docs/architecture/persistence.md](docs/architecture/persistence.md).
+- Per-entity Domain ↔ Room ↔ Firestore inventory: [docs/architecture/data-models.md](docs/architecture/data-models.md).
+- Time type policy: [md/time.md](md/time.md).
 - Firestore schema notes: [md/firestore.md](md/firestore.md).
 - Rules bug log: [docs/architecture/firestore-rules-bugs.md](docs/architecture/firestore-rules-bugs.md).
 - App-version gate: [docs/architecture/app-version-gate.md](docs/architecture/app-version-gate.md).
@@ -191,11 +198,33 @@ changes. Never skip this — it's the only way to tell which rules are deployed.
 Device integration tests need Firebase Emulator Suite and an Android
 emulator/device. See [README_TEST.md](README_TEST.md).
 
+## Git Conventions
+
+Branch names use a type prefix and a short kebab-case slug describing the
+change (≤ 4 words):
+
+- `feature/<slug>` — new functionality (e.g. `feature/adaptive-tablet-navigation`)
+- `fix/<slug>` — bug fix (e.g. `fix/sync-outbox-retry`)
+- `refactor/<slug>` — refactor without behaviour change
+- `chore/<slug>` — build, CI, tooling
+- `docs/<slug>` — documentation only
+- `test/<slug>` — tests only
+
+If the harness or a tool (Claude Code on the web, Copilot, etc.) auto-assigns
+a branch like `claude/<slug>-<id>`, rename it to match this convention before
+pushing or before opening a PR.
+
+Commit messages follow Conventional Commits with the same type vocabulary
+(`feat(navigation): …`, `fix(sync): …`, `docs(testing): …`). Keep the subject
+≤ 70 chars; put detail in the body.
+
 ## Legacy Documentation Map
 
 - [README.md](README.md): KMP project basics and run commands.
 - [README_TEST.md](README_TEST.md): QA, Kover, Allure, integration tests,
   Maestro.
+- [docs/testing/sonarcloud.md](docs/testing/sonarcloud.md): SonarCloud +
+  coverage publishing (CI job, KMP source discovery, GitHub App setup).
 - [uikit/README.md](uikit/README.md): design system rules.
 - [docs/architecture/sync.AI_SUMMARY.md](docs/architecture/sync.AI_SUMMARY.md):
   quick sync entry point.

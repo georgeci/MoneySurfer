@@ -9,6 +9,10 @@ import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.domain.primitives.TransactionStatus
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
+import kotlin.time.Instant
 
 fun aTransaction(
     id: TransactionId = transactionId(),
@@ -18,9 +22,12 @@ fun aTransaction(
     currencyCode: CurrencyCode = USD,
     categoryId: CategoryId? = categoryId(),
     note: String = "",
-    timestamp: Long = TEST_EPOCH_MILLIS,
+    operationAt: Instant = testInstant,
+    operationDate: LocalDate = operationAt.toLocalDateTime(TimeZone.UTC).date,
     type: TransactionType = TransactionType.EXPENSE,
     status: TransactionStatus = TransactionStatus.ACTUAL,
+    createdAt: Instant = operationAt,
+    updatedAt: Instant = createdAt,
 ): Transaction = Transaction(
     id = id,
     workspaceId = workspaceId,
@@ -29,7 +36,10 @@ fun aTransaction(
     currencyCode = currencyCode,
     categoryId = categoryId,
     note = note,
-    timestamp = timestamp,
+    operationAt = operationAt,
+    operationDate = operationDate,
     type = type,
     status = status,
+    createdAt = createdAt,
+    updatedAt = updatedAt,
 )

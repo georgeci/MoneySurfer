@@ -7,6 +7,7 @@ import com.georgeci.moneysurfer.domain.model.CategorizedTransaction
 import com.georgeci.moneysurfer.domain.model.Transaction
 import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.CategoryId
+import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
 import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
 import com.georgeci.moneysurfer.domain.primitives.Money
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
@@ -19,13 +20,16 @@ import com.georgeci.moneysurfer.sync.repository.MutationOperation
 import com.georgeci.moneysurfer.sync.repository.OutboxEnqueuer
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import org.koin.core.annotation.Single
-import kotlin.time.Clock
 
 @Single(binds = [TransactionRepository::class])
 class TransactionRepositoryImpl(
     private val dao: TransactionDao,
     private val outboxEnqueuer: OutboxEnqueuer,
+    private val clock: ClockUseCase,
+    private val timeFormatter: TimeFormatter,
 ) : TransactionRepository {
 
     override fun getAll(): Flow<List<Transaction>> =
@@ -47,13 +51,17 @@ class TransactionRepositoryImpl(
         dao.getById(id.value)?.toDomain()
 
     override suspend fun insert(transaction: Transaction) {
-        val entity = transaction.toEntity().copy(updatedAt = nowMillis())
+        val entity = transaction.toEntity()
         dao.insert(entity)
         enqueueUpsert(entity, MutationOperation.INSERT)
     }
 
     override suspend fun update(transaction: Transaction) {
-        val entity = transaction.toEntity().copy(updatedAt = nowMillis())
+        val existingCreatedAt = dao.getById(transaction.id.value)?.createdAt
+        val entity = transaction.toEntity().copy(
+            createdAt = existingCreatedAt ?: transaction.toEntity().createdAt,
+            updatedAt = clock.now().toEpochMilliseconds(),
+        )
         dao.update(entity)
         enqueueUpsert(entity, MutationOperation.UPDATE)
     }
@@ -79,24 +87,7 @@ class TransactionRepositoryImpl(
         )
     }
 
-    private fun nowMillis(): Long = Clock.System.now().toEpochMilliseconds()
-}
-
-private fun TransactionEntity.toDomain() = Transaction(
-    id = TransactionId(id),
-    workspaceId = WorkspaceId(workspaceId),
-    accountId = AccountId(accountId),
-    money = Money.fromMinor(amount),
-    currencyCode = CurrencyCode(currencyCode),
-    categoryId = categoryId?.let(::CategoryId),
-    note = note,
-    timestamp = timestamp,
-    type = parseType(type, amount),
-    status = parseStatus(status),
-)
-
-private fun CategorizedTransactionEntity.toDomain() = CategorizedTransaction(
-    transaction = Transaction(
+    private fun TransactionEntity.toDomain() = Transaction(
         id = TransactionId(id),
         workspaceId = WorkspaceId(workspaceId),
         accountId = AccountId(accountId),
@@ -104,25 +95,52 @@ private fun CategorizedTransactionEntity.toDomain() = CategorizedTransaction(
         currencyCode = CurrencyCode(currencyCode),
         categoryId = categoryId?.let(::CategoryId),
         note = note,
-        timestamp = timestamp,
+        operationAt = timeFormatter.parseInstant(operationAt),
+        operationDate = resolveOperationDate(operationDate, operationAt),
         type = parseType(type, amount),
         status = parseStatus(status),
-    ),
-    categoryName = categoryName,
-)
+        createdAt = timeFormatter.parseInstant(createdAt),
+        updatedAt = timeFormatter.parseInstant(updatedAt),
+    )
 
-private fun Transaction.toEntity() = TransactionEntity(
-    id = id.value,
-    workspaceId = workspaceId.value,
-    accountId = accountId.value,
-    amount = money.minor,
-    currencyCode = currencyCode.value,
-    categoryId = categoryId?.value,
-    note = note,
-    timestamp = timestamp,
-    type = type.name,
-    status = status.name,
-)
+    private fun CategorizedTransactionEntity.toDomain() = CategorizedTransaction(
+        transaction = Transaction(
+            id = TransactionId(id),
+            workspaceId = WorkspaceId(workspaceId),
+            accountId = AccountId(accountId),
+            money = Money.fromMinor(amount),
+            currencyCode = CurrencyCode(currencyCode),
+            categoryId = categoryId?.let(::CategoryId),
+            note = note,
+            operationAt = timeFormatter.parseInstant(operationAt),
+            operationDate = resolveOperationDate(operationDate, operationAt),
+            type = parseType(type, amount),
+            status = parseStatus(status),
+            createdAt = timeFormatter.parseInstant(createdAt),
+            updatedAt = timeFormatter.parseInstant(updatedAt),
+        ),
+        categoryName = categoryName,
+    )
+
+    private fun resolveOperationDate(stored: String, operationAt: Long) =
+        resolveLegacyOperationDate(timeFormatter, stored, operationAt)
+
+    private fun Transaction.toEntity() = TransactionEntity(
+        id = id.value,
+        workspaceId = workspaceId.value,
+        accountId = accountId.value,
+        amount = money.minor,
+        currencyCode = currencyCode.value,
+        categoryId = categoryId?.value,
+        note = note,
+        operationAt = timeFormatter.formatInstant(operationAt),
+        operationDate = timeFormatter.formatLocalDate(operationDate),
+        type = type.name,
+        status = status.name,
+        createdAt = timeFormatter.formatInstant(createdAt),
+        updatedAt = timeFormatter.formatInstant(updatedAt),
+    )
+}
 
 private fun parseType(raw: String, amount: Long): TransactionType =
     when (raw) {
@@ -137,4 +155,12 @@ private fun parseType(raw: String, amount: Long): TransactionType =
 private fun parseStatus(raw: String): TransactionStatus =
     runCatching { TransactionStatus.valueOf(raw) }.getOrDefault(TransactionStatus.ACTUAL)
 
-private fun nowMillis(): Long = Clock.System.now().toEpochMilliseconds()
+// Legacy rows may have a blank `operationDate` (older schema). Resolve via UTC so the
+// same epoch maps to the same business date on every device — matches the fallback in
+// SyncDtoMappers and prevents cross-device divergence on push-back.
+internal fun resolveLegacyOperationDate(
+    timeFormatter: TimeFormatter,
+    stored: String,
+    operationAt: Long,
+) = timeFormatter.parseLocalDateOrNull(stored)
+    ?: timeFormatter.parseInstant(operationAt).toLocalDateTime(TimeZone.UTC).date

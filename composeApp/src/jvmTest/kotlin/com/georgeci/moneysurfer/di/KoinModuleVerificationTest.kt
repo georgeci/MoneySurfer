@@ -41,7 +41,7 @@ class KoinModuleVerificationTest {
     @Test
     fun `app module graph resolves`() {
         val rootModule = module {
-            includes(AppModule().module(), testPlatformModule)
+            includes(AppModule().module(), OnlineKoinApp().module(), testPlatformModule)
         }
         rootModule.verify(
             extraTypes = listOf(
