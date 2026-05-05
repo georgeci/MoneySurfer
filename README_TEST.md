@@ -219,7 +219,8 @@ Each can be run on its own; it consumes whatever results are already on disk and
   - `build/reports/allure/firestore/index.html`
   - `build/reports/allure/all/index.html`
 - Kover HTML coverage: `build/reports/kover/html/index.html`
-- Kover XML coverage: `build/reports/kover/report.xml`
+- Kover XML coverage: `build/reports/kover/report.xml` (also published to
+  SonarCloud — see [docs/testing/sonarcloud.md](docs/testing/sonarcloud.md))
 
 TODO: Publish the generated Allure HTML report in GitHub without requiring artifact download.
 Candidate: GitHub Pages from `build/reports/allure/common/` on protected-branch

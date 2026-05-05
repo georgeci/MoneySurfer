@@ -40,3 +40,10 @@ dependencies {
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.crashlytics)
 }
+
+// Sonar Gradle plugin (≤6.0.x) still references the legacy AGP `AppExtension`,
+// which AGP 9 removed. Skip this thin entry-point module — its sources are just
+// the Activity host; real code analyzed via :composeApp / :feature / :domain.
+sonar {
+    isSkipProject = true
+}
