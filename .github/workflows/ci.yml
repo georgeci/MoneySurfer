@@ -391,13 +391,18 @@ jobs:
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
 
-      - name: Run detekt + Kover XML + Sonar
+      # detekt may fail (violations beyond baseline) but we still want its XML
+      # reports for Sonar to ingest, and we don't want it to block analysis
+      # publication. Quality-gate enforcement lives on the SonarCloud side.
+      - name: Run detekt
+        continue-on-error: true
+        run: ./gradlew detekt --stacktrace --continue
+
+      - name: Run Kover XML + Sonar
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        # `--continue` so a detekt violation still lets Kover + Sonar publish
-        # the analysis. Quality-gate enforcement lives on the SonarCloud side.
-        run: ./gradlew detekt koverXmlReport sonar --stacktrace --continue
+        run: ./gradlew koverXmlReport sonar --stacktrace
 
       - name: Upload Kover XML report
         if: always()
