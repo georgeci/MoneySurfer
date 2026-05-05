@@ -4,6 +4,7 @@ import com.georgeci.moneysurfer.feature.login.SignInFeatureConfig
 import org.koin.dsl.koinApplication
 import kotlin.test.AfterTest
 import kotlin.test.Test
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 /**
@@ -25,8 +26,11 @@ class OfflineSignInFeatureConfigTest {
     }
 
     @Test
-    fun `offline build resolves SignInFeatureConfig with demoOnly = true`() {
+    fun `offline build resolves SignInFeatureConfig with only demo enabled`() {
         val config = app.koin.get<SignInFeatureConfig>()
-        assertTrue(config.demoOnly, "offline build must hide non-demo auth controls")
+        assertFalse(config.emailPassword, "offline build has no remote auth backend")
+        assertFalse(config.anonymous, "offline build has no remote auth backend")
+        assertTrue(config.demo, "offline build must keep the demo entry point")
+        assertTrue(config.demoOnly, "offline build must render only the demo CTA")
     }
 }

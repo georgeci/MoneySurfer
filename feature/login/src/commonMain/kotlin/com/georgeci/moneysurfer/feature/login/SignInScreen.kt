@@ -65,7 +65,6 @@ import moneysurfer.feature.login.generated.resources.sign_in_terms
 import moneysurfer.feature.login.generated.resources.sign_in_toggle_to_signin
 import moneysurfer.feature.login.generated.resources.sign_in_toggle_to_signup
 import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
 private object SignInLayout {
@@ -96,7 +95,6 @@ private fun SignInError.localized(): String = stringResource(
 fun SignInScreen(
     onNavigateToWorkspaceSelector: () -> Unit,
     viewModel: SignInViewModel = koinViewModel(),
-    config: SignInFeatureConfig = koinInject(),
 ) {
     val state by viewModel.collectAsStateWithLifecycle()
 
@@ -108,7 +106,6 @@ fun SignInScreen(
 
     SignInContent(
         state = state,
-        config = config,
         onEvent = viewModel::onEvent,
     )
 }
@@ -116,9 +113,9 @@ fun SignInScreen(
 @Composable
 private fun SignInContent(
     state: SignInState,
-    config: SignInFeatureConfig,
     onEvent: (SignInEvent) -> Unit,
 ) {
+    val config = state.config
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
@@ -167,7 +164,7 @@ private fun SignInContent(
 
                 Spacer(Modifier.height(AppTheme.spacing.large))
 
-                if (!config.demoOnly) {
+                if (config.emailPassword) {
                     EmailPasswordForm(state = state, onEvent = onEvent)
                 }
 
@@ -182,9 +179,9 @@ private fun SignInContent(
                     )
                 }
 
-                if (!config.demoOnly) {
-                    Spacer(Modifier.height(AppTheme.spacing.medium))
+                Spacer(Modifier.height(AppTheme.spacing.medium))
 
+                if (config.emailPassword) {
                     SurferButton(
                         text = stringResource(
                             when (state.mode) {
@@ -212,7 +209,9 @@ private fun SignInContent(
                         style = SurferButtonStyle.Text,
                         enabled = !state.isLoading,
                     )
+                }
 
+                if (config.anonymous) {
                     Spacer(Modifier.height(AppTheme.spacing.large))
 
                     SurferButton(
@@ -225,18 +224,18 @@ private fun SignInContent(
                     )
 
                     Spacer(Modifier.height(AppTheme.spacing.small))
-                } else {
-                    Spacer(Modifier.height(AppTheme.spacing.medium))
                 }
 
-                SurferButton(
-                    text = stringResource(Res.string.sign_in_demo_mode),
-                    onClick = { onEvent(SignInEvent.OnLoginClick) },
-                    modifier = Modifier.fillMaxWidth(),
-                    size = if (config.demoOnly) SurferButtonSize.Biggest else SurferButtonSize.Regular,
-                    style = if (config.demoOnly) SurferButtonStyle.Filled else SurferButtonStyle.Text,
-                    enabled = !state.isLoading,
-                )
+                if (config.demo) {
+                    SurferButton(
+                        text = stringResource(Res.string.sign_in_demo_mode),
+                        onClick = { onEvent(SignInEvent.OnLoginClick) },
+                        modifier = Modifier.fillMaxWidth(),
+                        size = if (config.demoOnly) SurferButtonSize.Biggest else SurferButtonSize.Regular,
+                        style = if (config.demoOnly) SurferButtonStyle.Filled else SurferButtonStyle.Text,
+                        enabled = !state.isLoading,
+                    )
+                }
 
                 Spacer(Modifier.height(AppTheme.spacing.large))
 
@@ -363,7 +362,6 @@ private fun SignInScreenPreview() {
     AppTheme {
         SignInContent(
             state = SignInState(),
-            config = SignInFeatureConfig(),
             onEvent = {},
         )
     }
@@ -374,8 +372,13 @@ private fun SignInScreenPreview() {
 private fun SignInScreenDemoOnlyPreview() {
     AppTheme {
         SignInContent(
-            state = SignInState(),
-            config = SignInFeatureConfig(demoOnly = true),
+            state = SignInState(
+                config = SignInFeatureConfig(
+                    emailPassword = false,
+                    anonymous = false,
+                    demo = true,
+                ),
+            ),
             onEvent = {},
         )
     }

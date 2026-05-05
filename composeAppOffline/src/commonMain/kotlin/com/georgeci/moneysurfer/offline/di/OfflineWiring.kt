@@ -44,7 +44,13 @@ private val offlineNoOpModule: Module = module {
  * `feature/login`'s `LoginModule`.
  */
 private val offlineSignInModule: Module = module {
-    single<SignInFeatureConfig> { SignInFeatureConfig(demoOnly = true) }
+    single<SignInFeatureConfig> {
+        SignInFeatureConfig(
+            emailPassword = false,
+            anonymous = false,
+            demo = true,
+        )
+    }
 }
 
 /**

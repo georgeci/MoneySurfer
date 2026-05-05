@@ -15,5 +15,9 @@ import org.koin.core.annotation.Single
 class OnlineSignInModule {
 
     @Single
-    fun signInFeatureConfig(): SignInFeatureConfig = SignInFeatureConfig(demoOnly = false)
+    fun signInFeatureConfig(): SignInFeatureConfig = SignInFeatureConfig(
+        emailPassword = true,
+        anonymous = true,
+        demo = true,
+    )
 }

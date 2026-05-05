@@ -1,11 +1,20 @@
 package com.georgeci.moneysurfer.feature.login
 
 /**
- * Build-flavor switches for the sign-in screen. The online build keeps the
- * default (full email/password + anonymous + demo). The offline build
- * (`composeAppOffline`) overrides this in its Koin wiring to render only the
- * demo entry point.
+ * Per-auth-type visibility switches for the sign-in screen. The online build
+ * enables every entry point; the offline build (`composeAppOffline`) only
+ * leaves [demo] on, since it has no remote auth backend wired up.
+ *
+ * Each host registers its own instance in Koin (see `OnlineSignInModule` /
+ * `offlineSignInModule`) so the offline configuration cannot silently regress
+ * via Koin module load order.
  */
 data class SignInFeatureConfig(
-    val demoOnly: Boolean = false,
-)
+    val emailPassword: Boolean = true,
+    val anonymous: Boolean = true,
+    val demo: Boolean = true,
+) {
+    /** True when the screen should render only the demo CTA. */
+    val demoOnly: Boolean
+        get() = demo && !emailPassword && !anonymous
+}
