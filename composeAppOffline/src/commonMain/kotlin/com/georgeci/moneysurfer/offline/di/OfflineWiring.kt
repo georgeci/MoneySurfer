@@ -8,6 +8,7 @@ import com.georgeci.moneysurfer.domain.repositories.SessionShutdownGate
 import com.georgeci.moneysurfer.domain.repositories.UserRemoteRepository
 import com.georgeci.moneysurfer.domain.repositories.WorkspaceSyncer
 import com.georgeci.moneysurfer.domain.telemetry.CrashReporter
+import com.georgeci.moneysurfer.feature.login.SignInFeatureConfig
 import com.georgeci.moneysurfer.offline.noop.NoOpAppConfigRepository
 import com.georgeci.moneysurfer.offline.noop.NoOpAppVersionGate
 import com.georgeci.moneysurfer.offline.noop.NoOpAuthRemoteRepository
@@ -37,11 +38,22 @@ private val offlineNoOpModule: Module = module {
 }
 
 /**
+ * Offline build shows a single "demo" entry on the sign-in screen — no
+ * email/password or anonymous flows, since the offline build has no remote
+ * auth backend wired up. This overrides the default registered by
+ * `feature/login`'s `LoginModule`.
+ */
+private val offlineSignInModule: Module = module {
+    single<SignInFeatureConfig> { SignInFeatureConfig(demoOnly = true) }
+}
+
+/**
  * Modules layered on top of shared's `AppModule` graph for the offline build.
  * No data-remote, no sync-surfer, no sync/default — every remote-side
  * dependency is satisfied by an explicit no-op binding.
  */
 val offlineWiring: List<Module> = listOf(
     offlineNoOpModule,
+    offlineSignInModule,
     OfflineKoinApp().module(),
 )

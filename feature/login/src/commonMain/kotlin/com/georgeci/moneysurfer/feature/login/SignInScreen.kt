@@ -65,6 +65,7 @@ import moneysurfer.feature.login.generated.resources.sign_in_terms
 import moneysurfer.feature.login.generated.resources.sign_in_toggle_to_signin
 import moneysurfer.feature.login.generated.resources.sign_in_toggle_to_signup
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
 private object SignInLayout {
@@ -95,6 +96,7 @@ private fun SignInError.localized(): String = stringResource(
 fun SignInScreen(
     onNavigateToWorkspaceSelector: () -> Unit,
     viewModel: SignInViewModel = koinViewModel(),
+    config: SignInFeatureConfig = koinInject(),
 ) {
     val state by viewModel.collectAsStateWithLifecycle()
 
@@ -106,6 +108,7 @@ fun SignInScreen(
 
     SignInContent(
         state = state,
+        config = config,
         onEvent = viewModel::onEvent,
     )
 }
@@ -113,6 +116,7 @@ fun SignInScreen(
 @Composable
 private fun SignInContent(
     state: SignInState,
+    config: SignInFeatureConfig,
     onEvent: (SignInEvent) -> Unit,
 ) {
     Scaffold(
@@ -163,10 +167,65 @@ private fun SignInContent(
 
                 Spacer(Modifier.height(AppTheme.spacing.large))
 
-                EmailPasswordForm(state = state, onEvent = onEvent)
+                if (!config.demoOnly) {
+                    EmailPasswordForm(state = state, onEvent = onEvent)
 
-                if (state.error != null) {
+                    if (state.error != null) {
+                        Spacer(Modifier.height(AppTheme.spacing.small))
+                        Text(
+                            text = state.error.localized(),
+                            style = AppTheme.typography.bodySmall,
+                            color = AppTheme.materialColors.error,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    }
+
+                    Spacer(Modifier.height(AppTheme.spacing.medium))
+
+                    SurferButton(
+                        text = stringResource(
+                            when (state.mode) {
+                                AuthMode.SignIn -> Res.string.sign_in_submit_signin
+                                AuthMode.SignUp -> Res.string.sign_in_submit_signup
+                            },
+                        ),
+                        onClick = { onEvent(SignInEvent.OnSubmitClick) },
+                        modifier = Modifier.fillMaxWidth(),
+                        size = SurferButtonSize.Biggest,
+                        enabled = state.canSubmit,
+                    )
+
                     Spacer(Modifier.height(AppTheme.spacing.small))
+
+                    SurferButton(
+                        text = stringResource(
+                            when (state.mode) {
+                                AuthMode.SignIn -> Res.string.sign_in_toggle_to_signup
+                                AuthMode.SignUp -> Res.string.sign_in_toggle_to_signin
+                            },
+                        ),
+                        onClick = { onEvent(SignInEvent.OnToggleModeClick) },
+                        modifier = Modifier.fillMaxWidth(),
+                        style = SurferButtonStyle.Text,
+                        enabled = !state.isLoading,
+                    )
+
+                    Spacer(Modifier.height(AppTheme.spacing.large))
+
+                    SurferButton(
+                        text = stringResource(Res.string.sign_in_anonymous),
+                        onClick = { onEvent(SignInEvent.OnAnonymousLoginClick) },
+                        modifier = Modifier.fillMaxWidth(),
+                        style = SurferButtonStyle.Outlined,
+                        enabled = !state.isLoading,
+                        startIcon = SurferIcons.Fingerprint,
+                    )
+
+                    Spacer(Modifier.height(AppTheme.spacing.small))
+                }
+
+                if (config.demoOnly && state.error != null) {
                     Text(
                         text = state.error.localized(),
                         style = AppTheme.typography.bodySmall,
@@ -174,56 +233,15 @@ private fun SignInContent(
                         textAlign = TextAlign.Center,
                         modifier = Modifier.fillMaxWidth(),
                     )
+                    Spacer(Modifier.height(AppTheme.spacing.small))
                 }
-
-                Spacer(Modifier.height(AppTheme.spacing.medium))
-
-                SurferButton(
-                    text = stringResource(
-                        when (state.mode) {
-                            AuthMode.SignIn -> Res.string.sign_in_submit_signin
-                            AuthMode.SignUp -> Res.string.sign_in_submit_signup
-                        },
-                    ),
-                    onClick = { onEvent(SignInEvent.OnSubmitClick) },
-                    modifier = Modifier.fillMaxWidth(),
-                    size = SurferButtonSize.Biggest,
-                    enabled = state.canSubmit,
-                )
-
-                Spacer(Modifier.height(AppTheme.spacing.small))
-
-                SurferButton(
-                    text = stringResource(
-                        when (state.mode) {
-                            AuthMode.SignIn -> Res.string.sign_in_toggle_to_signup
-                            AuthMode.SignUp -> Res.string.sign_in_toggle_to_signin
-                        },
-                    ),
-                    onClick = { onEvent(SignInEvent.OnToggleModeClick) },
-                    modifier = Modifier.fillMaxWidth(),
-                    style = SurferButtonStyle.Text,
-                    enabled = !state.isLoading,
-                )
-
-                Spacer(Modifier.height(AppTheme.spacing.large))
-
-                SurferButton(
-                    text = stringResource(Res.string.sign_in_anonymous),
-                    onClick = { onEvent(SignInEvent.OnAnonymousLoginClick) },
-                    modifier = Modifier.fillMaxWidth(),
-                    style = SurferButtonStyle.Outlined,
-                    enabled = !state.isLoading,
-                    startIcon = SurferIcons.Fingerprint,
-                )
-
-                Spacer(Modifier.height(AppTheme.spacing.small))
 
                 SurferButton(
                     text = stringResource(Res.string.sign_in_demo_mode),
                     onClick = { onEvent(SignInEvent.OnLoginClick) },
                     modifier = Modifier.fillMaxWidth(),
-                    style = SurferButtonStyle.Text,
+                    size = if (config.demoOnly) SurferButtonSize.Biggest else SurferButtonSize.Regular,
+                    style = if (config.demoOnly) SurferButtonStyle.Filled else SurferButtonStyle.Text,
                     enabled = !state.isLoading,
                 )
 
@@ -352,6 +370,19 @@ private fun SignInScreenPreview() {
     AppTheme {
         SignInContent(
             state = SignInState(),
+            config = SignInFeatureConfig(),
+            onEvent = {},
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun SignInScreenDemoOnlyPreview() {
+    AppTheme {
+        SignInContent(
+            state = SignInState(),
+            config = SignInFeatureConfig(demoOnly = true),
             onEvent = {},
         )
     }
