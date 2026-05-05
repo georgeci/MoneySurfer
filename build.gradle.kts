@@ -85,17 +85,7 @@ subprojects {
         )
         val mainDirs = mainCandidates.filter { file(it).isDirectory }
         val testDirs = testCandidates.filter { file(it).isDirectory }
-        // Skip android-application modules: sonarqube-gradle 6.x looks up the
-        // legacy `AppExtension` via AndroidUtils.getTestBuildType, but AGP 8
-        // only registers `ApplicationExtension`, which throws
-        // UnknownDomainObjectException at task-graph time. App modules are
-        // entry points anyway and already excluded from coverage.
-        val isAndroidApp = plugins.hasPlugin("com.android.application")
         extensions.findByType(org.sonarqube.gradle.SonarExtension::class.java)?.properties {
-            if (isAndroidApp) {
-                property("sonar.skipProject", "true")
-                return@properties
-            }
             if (mainDirs.isNotEmpty()) {
                 property("sonar.sources", mainDirs.joinToString(","))
             }
@@ -128,13 +118,6 @@ sonar {
         // every KMP module instead of just the root.
 
         property("sonar.sourceEncoding", "UTF-8")
-
-        // sonarqube-gradle 6.x walks Android variants via the legacy
-        // `AppExtension` API, which AGP 8 no longer registers (only the new
-        // `ApplicationExtension`). Skip compile-time introspection — we lose
-        // bytecode-level Kotlin semantic analysis but keep source scanning,
-        // detekt issues, and Kover coverage.
-        property("sonar.gradle.skipCompile", "true")
 
         property(
             "sonar.coverage.jacoco.xmlReportPaths",
