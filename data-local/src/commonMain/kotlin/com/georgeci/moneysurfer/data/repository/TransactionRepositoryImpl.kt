@@ -7,6 +7,7 @@ import com.georgeci.moneysurfer.domain.model.CategorizedTransaction
 import com.georgeci.moneysurfer.domain.model.Transaction
 import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.CategoryId
+import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
 import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
 import com.georgeci.moneysurfer.domain.primitives.Money
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
@@ -15,20 +16,20 @@ import com.georgeci.moneysurfer.domain.primitives.TransactionType
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 import com.georgeci.moneysurfer.domain.repositories.TransactionRepository
 import com.georgeci.moneysurfer.domain.sync.SyncEntityTypes
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
 import com.georgeci.moneysurfer.sync.repository.MutationOperation
 import com.georgeci.moneysurfer.sync.repository.OutboxEnqueuer
-import com.georgeci.moneysurfer.domain.primitives.Clock
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import org.koin.core.annotation.Single
 
 @Single(binds = [TransactionRepository::class])
 class TransactionRepositoryImpl(
     private val dao: TransactionDao,
     private val outboxEnqueuer: OutboxEnqueuer,
-    private val clock: Clock,
+    private val clock: ClockUseCase,
+    private val timeFormatter: TimeFormatter,
 ) : TransactionRepository {
 
     override fun getAll(): Flow<List<Transaction>> =
@@ -56,12 +57,10 @@ class TransactionRepositoryImpl(
     }
 
     override suspend fun update(transaction: Transaction) {
-        // Preserve the row's original createdAt — domain object may have been
-        // reconstructed without it (defaults to operationAt). Audit invariant.
         val existingCreatedAt = dao.getById(transaction.id.value)?.createdAt
         val entity = transaction.toEntity().copy(
             createdAt = existingCreatedAt ?: transaction.toEntity().createdAt,
-            updatedAt = nowMillis(),
+            updatedAt = clock.now().toEpochMilliseconds(),
         )
         dao.update(entity)
         enqueueUpsert(entity, MutationOperation.UPDATE)
@@ -88,28 +87,7 @@ class TransactionRepositoryImpl(
         )
     }
 
-    private fun nowMillis(): Long = clock.nowMillis()
-}
-
-private fun TransactionEntity.toDomain() = Transaction(
-    id = TransactionId(id),
-    workspaceId = WorkspaceId(workspaceId),
-    accountId = AccountId(accountId),
-    money = Money.fromMinor(amount),
-    currencyCode = CurrencyCode(currencyCode),
-    categoryId = categoryId?.let(::CategoryId),
-    note = note,
-    operationAt = operationAt.toInstant(),
-    operationDate = operationDate.toLocalDateOrNull()
-        ?: operationAt.toInstant().toLocalDateTime(TimeZone.currentSystemDefault()).date,
-    type = parseType(type, amount),
-    status = parseStatus(status),
-    createdAt = createdAt.toInstant(),
-    updatedAt = updatedAt.toInstant(),
-)
-
-private fun CategorizedTransactionEntity.toDomain() = CategorizedTransaction(
-    transaction = Transaction(
+    private fun TransactionEntity.toDomain() = Transaction(
         id = TransactionId(id),
         workspaceId = WorkspaceId(workspaceId),
         accountId = AccountId(accountId),
@@ -117,32 +95,51 @@ private fun CategorizedTransactionEntity.toDomain() = CategorizedTransaction(
         currencyCode = CurrencyCode(currencyCode),
         categoryId = categoryId?.let(::CategoryId),
         note = note,
-        operationAt = operationAt.toInstant(),
-        operationDate = operationDate.toLocalDateOrNull()
-            ?: operationAt.toInstant().toLocalDateTime(TimeZone.currentSystemDefault()).date,
+        operationAt = timeFormatter.parseInstant(operationAt),
+        operationDate = timeFormatter.parseLocalDateOrNull(operationDate)
+            ?: timeFormatter.parseInstant(operationAt).toLocalDateTime(TimeZone.currentSystemDefault()).date,
         type = parseType(type, amount),
         status = parseStatus(status),
-        createdAt = createdAt.toInstant(),
-        updatedAt = updatedAt.toInstant(),
-    ),
-    categoryName = categoryName,
-)
+        createdAt = timeFormatter.parseInstant(createdAt),
+        updatedAt = timeFormatter.parseInstant(updatedAt),
+    )
 
-private fun Transaction.toEntity() = TransactionEntity(
-    id = id.value,
-    workspaceId = workspaceId.value,
-    accountId = accountId.value,
-    amount = money.minor,
-    currencyCode = currencyCode.value,
-    categoryId = categoryId?.value,
-    note = note,
-    operationAt = operationAt.toEpochMillis(),
-    operationDate = operationDate.toIsoDate(),
-    type = type.name,
-    status = status.name,
-    createdAt = createdAt.toEpochMillis(),
-    updatedAt = updatedAt.toEpochMillis(),
-)
+    private fun CategorizedTransactionEntity.toDomain() = CategorizedTransaction(
+        transaction = Transaction(
+            id = TransactionId(id),
+            workspaceId = WorkspaceId(workspaceId),
+            accountId = AccountId(accountId),
+            money = Money.fromMinor(amount),
+            currencyCode = CurrencyCode(currencyCode),
+            categoryId = categoryId?.let(::CategoryId),
+            note = note,
+            operationAt = timeFormatter.parseInstant(operationAt),
+            operationDate = timeFormatter.parseLocalDateOrNull(operationDate)
+                ?: timeFormatter.parseInstant(operationAt).toLocalDateTime(TimeZone.currentSystemDefault()).date,
+            type = parseType(type, amount),
+            status = parseStatus(status),
+            createdAt = timeFormatter.parseInstant(createdAt),
+            updatedAt = timeFormatter.parseInstant(updatedAt),
+        ),
+        categoryName = categoryName,
+    )
+
+    private fun Transaction.toEntity() = TransactionEntity(
+        id = id.value,
+        workspaceId = workspaceId.value,
+        accountId = accountId.value,
+        amount = money.minor,
+        currencyCode = currencyCode.value,
+        categoryId = categoryId?.value,
+        note = note,
+        operationAt = timeFormatter.formatInstant(operationAt),
+        operationDate = timeFormatter.formatLocalDate(operationDate),
+        type = type.name,
+        status = status.name,
+        createdAt = timeFormatter.formatInstant(createdAt),
+        updatedAt = timeFormatter.formatInstant(updatedAt),
+    )
+}
 
 private fun parseType(raw: String, amount: Long): TransactionType =
     when (raw) {

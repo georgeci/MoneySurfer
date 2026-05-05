@@ -3,7 +3,7 @@ package com.georgeci.moneysurfer.feature.workspace.incoming
 import arrow.optics.optics
 import co.touchlab.kermit.Logger
 import com.georgeci.moneysurfer.domain.model.WorkspaceRole
-import com.georgeci.moneysurfer.domain.primitives.Clock
+import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceInviteId
 import com.georgeci.moneysurfer.domain.repositories.WorkspaceRepository
 import com.georgeci.moneysurfer.domain.usecase.AcceptInviteUseCase
@@ -21,7 +21,7 @@ class IncomingInvitesViewModel(
     private val acceptInvite: AcceptInviteUseCase,
     private val declineInvite: DeclineInviteUseCase,
     private val workspaceRepository: WorkspaceRepository,
-    private val clock: Clock,
+    private val clock: ClockUseCase,
 ) : MviViewModel<IncomingInvitesState, IncomingInvitesEvent, IncomingInvitesEffect>(
     initialState = IncomingInvitesState(),
 ) {

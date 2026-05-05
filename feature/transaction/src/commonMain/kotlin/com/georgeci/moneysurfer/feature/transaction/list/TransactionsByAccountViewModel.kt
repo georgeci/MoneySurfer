@@ -9,7 +9,7 @@ import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
 import com.georgeci.moneysurfer.domain.primitives.Money
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
-import com.georgeci.moneysurfer.domain.primitives.Clock
+import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
 import com.georgeci.moneysurfer.domain.repositories.TransactionRepository
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
@@ -29,7 +29,7 @@ class TransactionsByAccountViewModel(
     private val getTransactionsByAccount: GetTransactionsByAccountUseCase,
     private val getAccountById: GetAccountByIdUseCase,
     private val transactionRepository: TransactionRepository,
-    private val clock: Clock,
+    private val clock: ClockUseCase,
 ) : MviViewModel<TransactionsByAccountState, TransactionsByAccountEvent, TransactionsByAccountEffect>(
     initialState = TransactionsByAccountState.Loading(accountId = accountId),
 ) {
