@@ -129,6 +129,13 @@ sonar {
 
         property("sonar.sourceEncoding", "UTF-8")
 
+        // sonarqube-gradle 6.x walks Android variants via the legacy
+        // `AppExtension` API, which AGP 8 no longer registers (only the new
+        // `ApplicationExtension`). Skip compile-time introspection — we lose
+        // bytecode-level Kotlin semantic analysis but keep source scanning,
+        // detekt issues, and Kover coverage.
+        property("sonar.gradle.skipCompile", "true")
+
         property(
             "sonar.coverage.jacoco.xmlReportPaths",
             "${layout.buildDirectory.get()}/reports/kover/report.xml",
