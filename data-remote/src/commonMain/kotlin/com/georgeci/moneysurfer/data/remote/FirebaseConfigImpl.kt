@@ -27,8 +27,8 @@ class FirebaseConfigImpl : FirebaseConfig {
 
 /**
  * Whether this build should target the emulator by default. Android maps to
- * `BuildConfig.USE_EMULATOR`, JVM to env var `MS_USE_EMULATOR`, iOS to a plist
- * flag (or hardcoded `false` for now).
+ * `BuildConfig.USE_EMULATOR`, JVM to env var `MS_USE_EMULATOR`, iOS to env var
+ * or Info.plist key `MS_USE_EMULATOR`.
  */
 internal expect fun defaultUseEmulator(): Boolean
 

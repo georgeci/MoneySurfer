@@ -5,6 +5,7 @@ import com.georgeci.moneysurfer.data.db.entity.AccountEntity
 import com.georgeci.moneysurfer.domain.model.Account
 import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.AccountType
+import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
 import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
 import com.georgeci.moneysurfer.domain.primitives.Money
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
@@ -15,12 +16,13 @@ import com.georgeci.moneysurfer.sync.repository.OutboxEnqueuer
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import org.koin.core.annotation.Single
-import kotlin.time.Clock
 
 @Single(binds = [AccountRepository::class])
 class AccountRepositoryImpl(
     private val dao: AccountDao,
     private val outboxEnqueuer: OutboxEnqueuer,
+    private val clock: ClockUseCase,
+    private val timeFormatter: TimeFormatter,
 ) : AccountRepository {
 
     override fun getAll(): Flow<List<Account>> =
@@ -33,13 +35,13 @@ class AccountRepositoryImpl(
         dao.getById(id.value)?.toDomain()
 
     override suspend fun insert(account: Account) {
-        val entity = account.toEntity().copy(updatedAt = nowMillis())
+        val entity = account.toEntity().copy(updatedAt = clock.now().toEpochMilliseconds())
         dao.insert(entity)
         enqueueUpsert(entity, MutationOperation.INSERT)
     }
 
     override suspend fun update(account: Account) {
-        val entity = account.toEntity().copy(updatedAt = nowMillis())
+        val entity = account.toEntity().copy(updatedAt = clock.now().toEpochMilliseconds())
         dao.update(entity)
         enqueueUpsert(entity, MutationOperation.UPDATE)
     }
@@ -58,11 +60,11 @@ class AccountRepositoryImpl(
 
     override suspend fun applyDelta(accountId: AccountId, delta: Money) {
         if (delta.isZero()) return
-        dao.applyDelta(accountId.value, delta.minor, nowMillis())
+        dao.applyDelta(accountId.value, delta.minor, clock.now().toEpochMilliseconds())
     }
 
     override suspend fun setBalance(accountId: AccountId, balance: Money) {
-        dao.setBalance(accountId.value, balance.minor, nowMillis())
+        dao.setBalance(accountId.value, balance.minor, clock.now().toEpochMilliseconds())
     }
 
     private suspend fun enqueueUpsert(entity: AccountEntity, operation: MutationOperation) {
@@ -74,23 +76,23 @@ class AccountRepositoryImpl(
         )
     }
 
-    private fun nowMillis(): Long = Clock.System.now().toEpochMilliseconds()
+    private fun AccountEntity.toDomain() = Account(
+        id = AccountId(id),
+        workspaceId = WorkspaceId(workspaceId),
+        name = name,
+        type = runCatching { AccountType.valueOf(type) }.getOrDefault(AccountType.SAVINGS),
+        currencyCode = CurrencyCode(currency),
+        balance = Money.fromMinor(balance),
+        updatedAt = timeFormatter.parseInstant(updatedAt),
+    )
+
+    private fun Account.toEntity() = AccountEntity(
+        id = id.value,
+        workspaceId = workspaceId.value,
+        name = name,
+        type = type.name,
+        currency = currencyCode.value,
+        balance = balance.minor,
+        updatedAt = timeFormatter.formatInstant(updatedAt),
+    )
 }
-
-private fun AccountEntity.toDomain() = Account(
-    id = AccountId(id),
-    workspaceId = WorkspaceId(workspaceId),
-    name = name,
-    type = runCatching { AccountType.valueOf(type) }.getOrDefault(AccountType.SAVINGS),
-    currencyCode = CurrencyCode(currency),
-    balance = Money.fromMinor(balance),
-)
-
-private fun Account.toEntity() = AccountEntity(
-    id = id.value,
-    workspaceId = workspaceId.value,
-    name = name,
-    type = type.name,
-    currency = currencyCode.value,
-    balance = balance.minor,
-)

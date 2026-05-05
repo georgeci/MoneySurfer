@@ -1,10 +1,11 @@
 package com.georgeci.moneysurfer.domain.usecase
 
-import com.georgeci.moneysurfer.domain.primitives.currentTimeMillis
+import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
 import org.koin.core.annotation.Single
+import kotlin.time.Instant
 
 @Single
-class GetCurrentTimeUseCase {
+class GetCurrentTimeUseCase(private val clock: ClockUseCase) {
 
-    operator fun invoke(): Long = currentTimeMillis()
+    operator fun invoke(): Instant = clock.now()
 }

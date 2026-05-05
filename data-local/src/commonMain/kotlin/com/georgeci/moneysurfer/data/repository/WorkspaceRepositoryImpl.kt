@@ -3,6 +3,7 @@ package com.georgeci.moneysurfer.data.repository
 import com.georgeci.moneysurfer.data.db.dao.WorkspaceDao
 import com.georgeci.moneysurfer.data.db.entity.WorkspaceEntity
 import com.georgeci.moneysurfer.domain.model.Workspace
+import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
 import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
 import com.georgeci.moneysurfer.domain.primitives.UserId
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
@@ -13,13 +14,13 @@ import com.georgeci.moneysurfer.sync.repository.OutboxEnqueuer
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import org.koin.core.annotation.Single
-import kotlin.time.Clock
-import kotlin.time.Instant
 
 @Single(binds = [WorkspaceRepository::class])
 class WorkspaceRepositoryImpl(
     private val dao: WorkspaceDao,
     private val outboxEnqueuer: OutboxEnqueuer,
+    private val clock: ClockUseCase,
+    private val timeFormatter: TimeFormatter,
 ) : WorkspaceRepository {
 
     override fun getAll(): Flow<List<Workspace>> =
@@ -32,13 +33,17 @@ class WorkspaceRepositoryImpl(
         dao.getById(id.value)?.toDomain()
 
     override suspend fun insert(workspace: Workspace) {
-        val entity = workspace.toEntity().copy(updatedAt = Clock.System.now().toEpochMilliseconds())
+        val entity = workspace.toEntity()
         dao.insert(entity)
         enqueueUpsert(entity, MutationOperation.INSERT)
     }
 
     override suspend fun update(workspace: Workspace) {
-        val entity = workspace.toEntity().copy(updatedAt = Clock.System.now().toEpochMilliseconds())
+        val existingCreatedAt = dao.getById(workspace.id.value)?.createdAt
+        val entity = workspace.toEntity().copy(
+            createdAt = existingCreatedAt ?: workspace.toEntity().createdAt,
+            updatedAt = clock.now().toEpochMilliseconds(),
+        )
         dao.update(entity)
         enqueueUpsert(entity, MutationOperation.UPDATE)
     }
@@ -60,24 +65,26 @@ class WorkspaceRepositoryImpl(
             operation = operation,
         )
     }
+
+    private fun WorkspaceEntity.toDomain() = Workspace(
+        id = WorkspaceId(id),
+        name = name,
+        description = description,
+        baseCurrency = CurrencyCode(baseCurrency),
+        ownerId = UserId(ownerId),
+        createdAt = timeFormatter.parseInstant(createdAt),
+        updatedAt = timeFormatter.parseInstant(updatedAt),
+        archived = archived,
+    )
+
+    private fun Workspace.toEntity() = WorkspaceEntity(
+        id = id.value,
+        name = name,
+        description = description,
+        baseCurrency = baseCurrency.value,
+        ownerId = ownerId.value,
+        createdAt = timeFormatter.formatInstant(createdAt),
+        archived = archived,
+        updatedAt = timeFormatter.formatInstant(updatedAt),
+    )
 }
-
-private fun WorkspaceEntity.toDomain() = Workspace(
-    id = WorkspaceId(id),
-    name = name,
-    description = description,
-    baseCurrency = CurrencyCode(baseCurrency),
-    ownerId = UserId(ownerId),
-    createdAt = Instant.fromEpochMilliseconds(createdAt),
-    archived = archived,
-)
-
-private fun Workspace.toEntity() = WorkspaceEntity(
-    id = id.value,
-    name = name,
-    description = description,
-    baseCurrency = baseCurrency.value,
-    ownerId = ownerId.value,
-    createdAt = createdAt.toEpochMilliseconds(),
-    archived = archived,
-)

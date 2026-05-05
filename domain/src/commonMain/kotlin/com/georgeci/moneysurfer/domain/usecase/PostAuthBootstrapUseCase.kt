@@ -122,7 +122,7 @@ class PostAuthBootstrapUseCase(
                         displayName = displayName,
                         email = email,
                         isAnon = isAnon,
-                        createdAt = getCurrentTime(),
+                        createdAt = getCurrentTime().toEpochMilliseconds(),
                     )
                 }
                 .onLeft { log.e(it) { "[create] users/$uid failed" } }

@@ -19,7 +19,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Decode Firebase config
         uses: ./.github/actions/firebase-config
@@ -29,13 +29,13 @@ jobs:
           ios-plist:    ${{ secrets.GOOGLE_SERVICE_INFO_PLIST }}
 
       - name: Set up JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: "17"
 
       - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v6
 
       - name: Install Allure CLI
         shell: bash
@@ -144,7 +144,7 @@ jobs:
 
       - name: Upload Allure report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: allure-report-common
           path: build/reports/allure/common/
@@ -153,7 +153,7 @@ jobs:
 
       - name: Upload JUnit results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: junit-results
           path: "**/build/test-results/jvmTest/**/*.xml"
@@ -173,7 +173,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Decode Firebase config
         uses: ./.github/actions/firebase-config
@@ -183,13 +183,13 @@ jobs:
           ios-plist:    ${{ secrets.GOOGLE_SERVICE_INFO_PLIST }}
 
       - name: Set up JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: "17"
 
       - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v6
 
       # Compile-only: catches AGP/Kotlin/google-services regressions without
       # needing the dev keystore (assembleDebug would require DEV_* secrets,
@@ -227,21 +227,21 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       # firebase-tools ≥14 requires JDK 21+ (the Firestore emulator JAR no
       # longer runs on 17). Other CI jobs stay on 17 — only this job needs 21.
       - name: Set up JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: "21"
 
       - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v6
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: "20"
           cache: npm
@@ -335,7 +335,7 @@ jobs:
 
       - name: Upload Allure report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: allure-report-firestore
           path: build/reports/allure/firestore/
@@ -344,7 +344,7 @@ jobs:
 
       - name: Upload JUnit results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: firestore-junit-results
           path: build/test-results/firestore/*.xml
@@ -360,11 +360,11 @@ jobs:
   #       github.event_name == 'push' ||
   #       github.event.pull_request.head.repo.full_name == github.repository
   #     steps:
-  #       - uses: actions/checkout@v4
+  #       - uses: actions/checkout@v6
   #       - uses: ./.github/actions/firebase-config
   #         with:
   #           ios-plist: ${{ secrets.GOOGLE_SERVICE_INFO_PLIST }}
-  #       - uses: actions/setup-java@v4
+  #       - uses: actions/setup-java@v5
   #         with: { distribution: temurin, java-version: "17" }
-  #       - uses: gradle/actions/setup-gradle@v4
+  #       - uses: gradle/actions/setup-gradle@v6
   #       - run: ./gradlew :composeApp:linkPodReleaseFrameworkIosArm64

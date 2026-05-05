@@ -53,8 +53,8 @@ class FakeInviteRepository : WorkspaceInviteRepository {
             if (inv.id == id) {
                 inv.copy(
                     status = com.georgeci.moneysurfer.domain.model.InviteStatus.CANCELLED,
-                    respondedAt = inv.updatedAt + 1,
-                    updatedAt = inv.updatedAt + 1,
+                    respondedAt = inv.updatedAt + kotlin.time.Duration.parse("1ms"),
+                    updatedAt = inv.updatedAt + kotlin.time.Duration.parse("1ms"),
                 )
             } else {
                 inv
@@ -67,8 +67,8 @@ class FakeInviteRepository : WorkspaceInviteRepository {
             if (inv.id == id) {
                 inv.copy(
                     status = com.georgeci.moneysurfer.domain.model.InviteStatus.ACCEPTED,
-                    respondedAt = inv.updatedAt + 1,
-                    updatedAt = inv.updatedAt + 1,
+                    respondedAt = inv.updatedAt + kotlin.time.Duration.parse("1ms"),
+                    updatedAt = inv.updatedAt + kotlin.time.Duration.parse("1ms"),
                 )
             } else {
                 inv
@@ -81,8 +81,8 @@ class FakeInviteRepository : WorkspaceInviteRepository {
             if (inv.id == id) {
                 inv.copy(
                     status = com.georgeci.moneysurfer.domain.model.InviteStatus.DECLINED,
-                    respondedAt = inv.updatedAt + 1,
-                    updatedAt = inv.updatedAt + 1,
+                    respondedAt = inv.updatedAt + kotlin.time.Duration.parse("1ms"),
+                    updatedAt = inv.updatedAt + kotlin.time.Duration.parse("1ms"),
                 )
             } else {
                 inv
@@ -130,8 +130,8 @@ class FakeMemberRepository : WorkspaceMemberRepository {
             if (m.userId == userId && m.workspaceId == workspaceId) {
                 m.copy(
                     status = com.georgeci.moneysurfer.domain.model.WorkspaceMemberStatus.REMOVED,
-                    removedAt = m.updatedAt + 1,
-                    updatedAt = m.updatedAt + 1,
+                    removedAt = m.updatedAt + kotlin.time.Duration.parse("1ms"),
+                    updatedAt = m.updatedAt + kotlin.time.Duration.parse("1ms"),
                 )
             } else {
                 m
@@ -144,8 +144,8 @@ class FakeMemberRepository : WorkspaceMemberRepository {
             if (m.userId == userId && m.workspaceId == workspaceId) {
                 m.copy(
                     status = com.georgeci.moneysurfer.domain.model.WorkspaceMemberStatus.LEFT,
-                    leftAt = m.updatedAt + 1,
-                    updatedAt = m.updatedAt + 1,
+                    leftAt = m.updatedAt + kotlin.time.Duration.parse("1ms"),
+                    updatedAt = m.updatedAt + kotlin.time.Duration.parse("1ms"),
                 )
             } else {
                 m

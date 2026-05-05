@@ -7,6 +7,7 @@ import com.georgeci.moneysurfer.domain.model.WorkspaceInvite
 import com.georgeci.moneysurfer.domain.model.WorkspaceMember
 import com.georgeci.moneysurfer.domain.model.WorkspaceMemberStatus
 import com.georgeci.moneysurfer.domain.model.WorkspaceRole
+import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
 import com.georgeci.moneysurfer.domain.primitives.UserId
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceInviteId
@@ -20,7 +21,6 @@ import com.georgeci.moneysurfer.utils.MviViewModel
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import org.koin.core.annotation.KoinViewModel
-import kotlin.time.Clock
 
 @KoinViewModel
 class WorkspaceMembersViewModel(
@@ -31,6 +31,7 @@ class WorkspaceMembersViewModel(
     private val inviteRepository: WorkspaceInviteRepository,
     private val leaveWorkspace: LeaveWorkspaceUseCase,
     private val cancelInvite: CancelInviteUseCase,
+    private val clock: ClockUseCase,
 ) : MviViewModel<WorkspaceMembersState, WorkspaceMembersEvent, WorkspaceMembersEffect>(
     initialState = WorkspaceMembersState.Loading(workspaceId),
 ) {
@@ -119,7 +120,7 @@ class WorkspaceMembersViewModel(
                     val pendingInvites = invites
                         .filter { it.status == InviteStatus.PENDING }
                         .sortedByDescending { it.createdAt }
-                    val now = Clock.System.now().toEpochMilliseconds()
+                    val now = clock.now()
                     val viewerRole = activeMembers.firstOrNull { it.userId == userId }?.role
 
                     updateState {
@@ -150,11 +151,11 @@ private fun WorkspaceMember.toUi(currentUserId: UserId?): MemberUi = MemberUi(
     isYou = userId == currentUserId,
 )
 
-private fun WorkspaceInvite.toUi(nowMillis: Long): InviteUi = InviteUi(
+private fun WorkspaceInvite.toUi(now: kotlin.time.Instant): InviteUi = InviteUi(
     id = id,
     email = email,
     role = role,
-    isExpired = expiresAt <= nowMillis,
+    isExpired = expiresAt <= now,
     expiresAt = expiresAt,
 )
 
@@ -203,7 +204,7 @@ data class InviteUi(
     val email: String,
     val role: WorkspaceRole,
     val isExpired: Boolean,
-    val expiresAt: Long,
+    val expiresAt: kotlin.time.Instant,
 )
 
 enum class MembersTab { Active, Invited }

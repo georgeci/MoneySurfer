@@ -5,7 +5,7 @@
 ## accounts-feature
 - Title: Rules
 - File: docs/features/accounts.md
-- Lines: 23-29
+- Lines: 22-28
 - Tasks: accounts, feature, balance
 
 ## adr-clean-architecture
@@ -71,13 +71,13 @@
 ## docs-maintainer-agent
 - Title: Role
 - File: ai/agents/docs-maintainer.md
-- Lines: 25-43
+- Lines: 23-41
 - Tasks: docs, agent, maintenance
 
 ## docs-structure
 - Title: Rules
 - File: ai/skills/docs-structure.md
-- Lines: 24-40
+- Lines: 21-32
 - Tasks: docs, structure, organization
 
 ## docs-validation
@@ -95,7 +95,7 @@
 ## emulator-fixtures
 - Title: Test fixtures and tagging
 - File: docs/testing/firebase-emulator.md
-- Lines: 195-260
+- Lines: 198-263
 - Tasks: testing, emulator, kotest, gradle
 
 ## emulator-install
@@ -107,14 +107,14 @@
 ## emulator-jvm-gap
 - Title: JVM Firebase gap
 - File: docs/testing/firebase-emulator.md
-- Lines: 336-366
+- Lines: 345-375
 - Tasks: testing, emulator, jvm, gitlive
 
 ## emulator-maestro
 - Title: Maestro against the emulator
 - File: docs/testing/firebase-emulator.md
-- Lines: 262-334
-- Tasks: testing, emulator, maestro, android
+- Lines: 265-343
+- Tasks: testing, emulator, maestro, android, ios
 
 ## emulator-run
 - Title: Run, reset, stop
@@ -125,13 +125,13 @@
 ## emulator-switch
 - Title: Switching the app to the emulator
 - File: docs/testing/firebase-emulator.md
-- Lines: 141-193
+- Lines: 141-196
 - Tasks: testing, emulator, configuration, build
 
 ## emulator-troubleshooting
 - Title: Troubleshooting
 - File: docs/testing/firebase-emulator.md
-- Lines: 368-421
+- Lines: 377-430
 - Tasks: testing, emulator, troubleshooting
 
 ## invites-discovery
@@ -209,7 +209,7 @@
 ## persistence-rules
 - Title: Rules
 - File: docs/architecture/persistence.md
-- Lines: 23-31
+- Lines: 26-40
 - Tasks: persistence, room, firestore, datastore
 
 ## project-map
@@ -299,7 +299,7 @@
 ## sync-rules
 - Title: Rules
 - File: docs/architecture/sync.md
-- Lines: 24-48
+- Lines: 24-43
 - Tasks: sync, outbox, pull, lww
 
 ## sync-summary
@@ -320,8 +320,14 @@
 - Lines: 25-51
 - Tasks: testing, qa, validation
 
+## time-policy
+- Title: Time policy
+- File: docs/architecture/data-models.md
+- Lines: 45-68
+- Tasks: time, persistence, domain
+
 ## transactions-feature
 - Title: Rules
 - File: docs/features/transactions.md
-- Lines: 23-29
+- Lines: 22-28
 - Tasks: transactions, totals, feature

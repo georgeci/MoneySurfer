@@ -72,8 +72,13 @@ Hard rules:
 - Domain IDs are UUID-backed value classes with `Companion.uuid()`.
 - ViewModel state is a sealed interface (`Loading` / `Content`) with Arrow
   optics. Use field-level optics for state updates where current code does so.
-- Storage/wire timestamps currently remain `Long epochMillis`; convert at data
-  boundaries when using `Instant`, `LocalDate`, or `TimeZone` in domain/UI.
+- Domain time types: `kotlin.time.Instant` for moments (`createdAt`,
+  `updatedAt`, `deletedAt`, `operationAt`, sync cursors); `LocalDate` for
+  calendar dates; `YearMonth` for monthly periods; `LocalDateTime` only for
+  UI input. Storage/wire keep `Long epochMillis` and ISO-8601 `String`.
+  Convert in data-layer mappers, never in `domain`. See
+  [docs/architecture/data-models.md](docs/architecture/data-models.md) and
+  [md/time.md](md/time.md).
 
 ## UI Rules
 
@@ -106,6 +111,8 @@ insufficient.
 ## Firestore Rules
 
 - Persistence overview: [docs/architecture/persistence.md](docs/architecture/persistence.md).
+- Per-entity Domain ↔ Room ↔ Firestore inventory: [docs/architecture/data-models.md](docs/architecture/data-models.md).
+- Time type policy: [md/time.md](md/time.md).
 - Firestore schema notes: [md/firestore.md](md/firestore.md).
 - Rules bug log: [docs/architecture/firestore-rules-bugs.md](docs/architecture/firestore-rules-bugs.md).
 - App-version gate: [docs/architecture/app-version-gate.md](docs/architecture/app-version-gate.md).
@@ -210,7 +217,7 @@ emulator/device. See [README_TEST.md](README_TEST.md).
   members + invites as-built.
 - [docs/testing/firebase-emulator.md](docs/testing/firebase-emulator.md):
   emulator setup, Maestro wiring, JVM gap, troubleshooting.
-- [md/SyncCoordinator.md](md/SyncCoordinator.md): original coordinator design
+- [docs/architecture/sync-coordinator.md](docs/architecture/sync-coordinator.md): original coordinator design
   draft + Design Q&A appendix (anchors `#faq-1` … `#faq-20`).
 - Forward-looking drafts (still in `md/`, not yet shipped): [md/budgets.md](md/budgets.md),
   [md/members.md](md/members.md) (Phase 4–5 UI), [md/settings_module.md](md/settings_module.md),

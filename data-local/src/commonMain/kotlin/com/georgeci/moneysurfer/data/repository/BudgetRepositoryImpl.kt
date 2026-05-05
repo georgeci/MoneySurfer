@@ -10,12 +10,12 @@ import com.georgeci.moneysurfer.domain.primitives.Money
 import com.georgeci.moneysurfer.domain.repositories.BudgetRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import kotlinx.datetime.LocalDate
 import org.koin.core.annotation.Single
 
 @Single(binds = [BudgetRepository::class])
 class BudgetRepositoryImpl(
     private val dao: BudgetDao,
+    private val timeFormatter: TimeFormatter,
 ) : BudgetRepository {
 
     override fun getAll(): Flow<List<Budget>> =
@@ -35,29 +35,33 @@ class BudgetRepositoryImpl(
     override suspend fun delete(id: BudgetId) {
         dao.delete(id.value)
     }
+
+    private fun BudgetEntity.toDomain() = Budget(
+        id = BudgetId(id),
+        name = name,
+        categoryIds = categoryIds.parseCategoryIds(),
+        amount = Money.fromMinor(amount),
+        period = BudgetPeriod.entries.firstOrNull { it.name == period } ?: BudgetPeriod.MONTHLY,
+        startDate = timeFormatter.parseLocalDate(startDate),
+        alertPercent = alertPercent,
+        isActive = isActive,
+        createdAt = timeFormatter.parseInstant(createdAt),
+        updatedAt = timeFormatter.parseInstant(updatedAt),
+    )
+
+    private fun Budget.toEntity() = BudgetEntity(
+        id = id.value,
+        name = name,
+        categoryIds = categoryIds.toStorageValue(),
+        amount = amount.minor,
+        period = period.name,
+        startDate = timeFormatter.formatLocalDate(startDate),
+        alertPercent = alertPercent,
+        isActive = isActive,
+        createdAt = timeFormatter.formatInstant(createdAt),
+        updatedAt = timeFormatter.formatInstant(updatedAt),
+    )
 }
-
-private fun BudgetEntity.toDomain() = Budget(
-    id = BudgetId(id),
-    name = name,
-    categoryIds = categoryIds.parseCategoryIds(),
-    amount = Money.fromMinor(amount),
-    period = BudgetPeriod.entries.firstOrNull { it.name == period } ?: BudgetPeriod.MONTHLY,
-    startDate = LocalDate.parse(startDate),
-    alertPercent = alertPercent,
-    isActive = isActive,
-)
-
-private fun Budget.toEntity() = BudgetEntity(
-    id = id.value,
-    name = name,
-    categoryIds = categoryIds.toStorageValue(),
-    amount = amount.minor,
-    period = period.name,
-    startDate = startDate.toString(),
-    alertPercent = alertPercent,
-    isActive = isActive,
-)
 
 private fun String.parseCategoryIds(): List<CategoryId> {
     if (isBlank()) return emptyList()
