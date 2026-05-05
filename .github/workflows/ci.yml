@@ -160,8 +160,28 @@ jobs:
           if-no-files-found: warn
           retention-days: 14
 
-      - name: Upload coverage to Codecov
+      # Codecov upload requires CODECOV_TOKEN, which fork PRs don't get and
+      # which isn't provisioned until repo admin completes the Codecov setup
+      # (see codecov.yml). Guard like the firebase-config caller pattern so a
+      # missing secret or fork PR doesn't turn `junit` red.
+      - name: Check Codecov token
         if: always()
+        id: codecov_token
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        run: |
+          if [ -n "${CODECOV_TOKEN:-}" ]; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Upload coverage to Codecov
+        if: >-
+          always() &&
+          steps.codecov_token.outputs.present == 'true' &&
+          (github.event_name != 'pull_request' ||
+           github.event.pull_request.head.repo.full_name == github.repository)
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
@@ -171,7 +191,11 @@ jobs:
           disable_search: true
 
       - name: Upload test results to Codecov
-        if: always()
+        if: >-
+          always() &&
+          steps.codecov_token.outputs.present == 'true' &&
+          (github.event_name != 'pull_request' ||
+           github.event.pull_request.head.repo.full_name == github.repository)
         uses: codecov/test-results-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
