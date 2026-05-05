@@ -169,18 +169,20 @@ private fun SignInContent(
 
                 if (!config.demoOnly) {
                     EmailPasswordForm(state = state, onEvent = onEvent)
+                }
 
-                    if (state.error != null) {
-                        Spacer(Modifier.height(AppTheme.spacing.small))
-                        Text(
-                            text = state.error.localized(),
-                            style = AppTheme.typography.bodySmall,
-                            color = AppTheme.materialColors.error,
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.fillMaxWidth(),
-                        )
-                    }
+                if (state.error != null) {
+                    Spacer(Modifier.height(AppTheme.spacing.small))
+                    Text(
+                        text = state.error.localized(),
+                        style = AppTheme.typography.bodySmall,
+                        color = AppTheme.materialColors.error,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
 
+                if (!config.demoOnly) {
                     Spacer(Modifier.height(AppTheme.spacing.medium))
 
                     SurferButton(
@@ -223,17 +225,8 @@ private fun SignInContent(
                     )
 
                     Spacer(Modifier.height(AppTheme.spacing.small))
-                }
-
-                if (config.demoOnly && state.error != null) {
-                    Text(
-                        text = state.error.localized(),
-                        style = AppTheme.typography.bodySmall,
-                        color = AppTheme.materialColors.error,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                    Spacer(Modifier.height(AppTheme.spacing.small))
+                } else {
+                    Spacer(Modifier.height(AppTheme.spacing.medium))
                 }
 
                 SurferButton(
