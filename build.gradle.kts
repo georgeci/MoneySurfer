@@ -104,5 +104,15 @@ sonar {
             "sonar.exclusions",
             "**/build/**,**/generated/**,iosApp/**,scripts/**,md/**,docs/**,firestore-tests/**",
         )
+
+        // Compose UI surfaces (`*Screen.kt`, `*Composable.kt`) and previews
+        // are excluded from coverage requirements — the project has no
+        // Compose UI test infrastructure, so requiring coverage on those
+        // would force every PR through manual exclusions on the SonarCloud
+        // website instead of having it tracked alongside the code.
+        property(
+            "sonar.coverage.exclusions",
+            "**/*Screen.kt,**/*Composable.kt,**/*Preview.kt,**/preview/**",
+        )
     }
 }

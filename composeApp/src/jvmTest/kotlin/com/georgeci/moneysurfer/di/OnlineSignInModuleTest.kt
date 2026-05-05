@@ -1,6 +1,5 @@
 package com.georgeci.moneysurfer.di
 
-import com.georgeci.moneysurfer.feature.login.SignInFeatureConfig
 import kotlin.test.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
