@@ -114,11 +114,11 @@ private fun Sparkline(
     if (points.size < 2) return
 
     val data = remember(points) { points.map { Point(it.first, it.second) } }
-    val xs = points.map { it.first }
-    val ys = points.map { it.second }
-    val xRange = xs.min()..xs.max()
-    val yMin = ys.min()
-    val yMax = ys.max()
+    val xMin = points.minOf { it.first }
+    val xMax = points.maxOf { it.first }
+    val xRange = xMin..xMax
+    val yMin = points.minOf { it.second }
+    val yMax = points.maxOf { it.second }
     val padding = ((yMax - yMin).takeIf { it > 0f } ?: 1f) * YPaddingFraction
     val yRange = (yMin - padding)..(yMax + padding)
 
@@ -159,7 +159,7 @@ private fun Sparkline(
             ),
             lineStyle = LineStyle(brush = SolidColor(color), strokeWidth = 2.dp),
             symbol = { point ->
-                if (point.x == lastPoint.x && point.y == lastPoint.y) {
+                if (point === lastPoint) {
                     Symbol(
                         size = 8.dp,
                         shape = CircleShape,
