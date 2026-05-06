@@ -383,27 +383,8 @@ private fun AccountsManageScreenViewPreview() {
         AccountsManageContent(
             state = AccountsManageState.Content(
                 isEditing = false,
-                activeAccounts = listOf(
-                    AccountManageUi(AccountId("preview-acc-1"), "Everyday", AccountType.BANK, "€2,480.32", "EUR"),
-                    AccountManageUi(
-                        AccountId("preview-acc-2"),
-                        "Emergency Fund",
-                        AccountType.SAVINGS,
-                        "€8,915.00",
-                        "EUR",
-                    ),
-                    AccountManageUi(AccountId("preview-acc-3"), "Cash wallet", AccountType.CASH, "€180.00", "EUR"),
-                ),
-                archivedAccounts = listOf(
-                    AccountManageUi(
-                        AccountId("preview-acc-4"),
-                        "Revolut (old)",
-                        AccountType.CARD,
-                        "€0.00",
-                        "EUR",
-                        archivedLabel = "Archived Nov 2024",
-                    ),
-                ),
+                activeAccounts = PreviewActiveAccountsFull,
+                archivedAccounts = PreviewArchivedAccounts,
                 formattedTotal = "€11,575.32",
             ),
             onEvent = {},
@@ -418,16 +399,7 @@ private fun AccountsManageScreenEditingPreview() {
         AccountsManageContent(
             state = AccountsManageState.Content(
                 isEditing = true,
-                activeAccounts = listOf(
-                    AccountManageUi(AccountId("preview-acc-1"), "Everyday", AccountType.BANK, "€2,480.32", "EUR"),
-                    AccountManageUi(
-                        AccountId("preview-acc-2"),
-                        "Emergency Fund",
-                        AccountType.SAVINGS,
-                        "€8,915.00",
-                        "EUR",
-                    ),
-                ),
+                activeAccounts = PreviewActiveAccountsEditing,
                 archivedAccounts = emptyList(),
                 formattedTotal = "€11,395.32",
             ),

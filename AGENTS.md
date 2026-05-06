@@ -75,6 +75,14 @@ Hard rules:
 - Domain IDs are UUID-backed value classes with `Companion.uuid()`.
 - ViewModel state is a sealed interface (`Loading` / `Content`) with Arrow
   optics. Use field-level optics for state updates where current code does so.
+- For in-flight async actions inside `Content`, use a single `inFlight: Boolean`
+  flag — not per-action booleans (`isSelecting`, `isSubmitting`, `isSaving`,
+  `isDeleting`). One flag per state cuts CPD duplication across feature
+  ViewModels and matches the one-action-at-a-time UI invariant. If two
+  concurrent actions really need distinct flags, justify it in a code comment.
+- For trivial `Loading → Content` states with no extra fields on `Loading`,
+  prefer `com.georgeci.moneysurfer.utils.AsyncState<C>` (`Loading` / `Content(value, pending)`)
+  over a hand-rolled sealed interface.
 - Domain time types: `kotlin.time.Instant` for moments (`createdAt`,
   `updatedAt`, `deletedAt`, `operationAt`, sync cursors); `LocalDate` for
   calendar dates; `YearMonth` for monthly periods; `LocalDateTime` only for
