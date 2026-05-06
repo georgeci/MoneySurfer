@@ -120,11 +120,6 @@ sonar {
         property("sonar.sourceEncoding", "UTF-8")
 
         property(
-            "sonar.coverage.jacoco.xmlReportPaths",
-            "${layout.buildDirectory.get()}/reports/kover/report.xml",
-        )
-
-        property(
             "sonar.kotlin.detekt.reportPaths",
             subprojects.joinToString(",") {
                 "${it.projectDir}/build/reports/detekt/detekt.xml"
@@ -134,23 +129,6 @@ sonar {
         property(
             "sonar.exclusions",
             "**/build/**,**/generated/**,iosApp/**,scripts/**,md/**,docs/**,firestore-tests/**",
-        )
-
-        // Coverage exclusions: generated code, Compose previews, app entry points.
-        property(
-            "sonar.coverage.exclusions",
-            listOf(
-                "**/build/**",
-                "**/generated/**",
-                "**/*Preview*.kt",
-                "**/*Previews.kt",
-                "**/di/**",
-                "**/*Module.kt",
-                "androidApp/**",
-                "androidApp-offline/**",
-                "composeApp/**/MainActivity*.kt",
-                "iosApp/**",
-            ).joinToString(","),
         )
     }
 }
