@@ -126,19 +126,44 @@ fun buildMaestroCommand(
 }
 
 /**
- * Returns the last [lines] lines of [file] for inclusion in failure messages.
- * Maestro/Firebase emulator failures often happen long before JUnit is written,
- * so the only signal is the captured stdout/stderr.
+ * Returns the last [lines] lines of [file] for inclusion in failure messages,
+ * or "" when the file is missing/empty/unreadable. Maestro/Firebase emulator
+ * failures often happen long before JUnit is written, so the only signal is
+ * the captured stdout/stderr.
+ *
+ * Uses `useLines` + a fixed-size ArrayDeque ring buffer so a multi-MB Maestro
+ * log doesn't get fully materialised into memory at the moment we're already
+ * crashing.
  */
 fun tailLogFile(file: File, lines: Int = 40): String {
-    if (!file.exists()) return "(no log at ${file.absolutePath})"
-    val all = runCatching { file.readLines() }
-        .getOrElse { return "(unable to read ${file.absolutePath}: ${it.message})" }
-    if (all.isEmpty()) return "(empty log: ${file.absolutePath})"
-    val tail = all.takeLast(lines).joinToString("\n")
-    val rel = file.relativeTo(rootProject.projectDir)
-    return "Last ${minOf(lines, all.size)} lines of $rel:\n$tail"
+    if (!file.exists() || file.length() == 0L) return ""
+    return runCatching {
+        val buffer = ArrayDeque<String>(lines)
+        file.useLines { seq ->
+            seq.forEach { line ->
+                if (buffer.size == lines) buffer.removeFirst()
+                buffer.addLast(line)
+            }
+        }
+        if (buffer.isEmpty()) {
+            ""
+        } else {
+            val rel = file.relativeTo(rootProject.projectDir)
+            "Last ${buffer.size} lines of $rel:\n${buffer.joinToString("\n")}"
+        }
+    }.getOrElse { "(unable to read ${file.absolutePath}: ${it.message})" }
 }
+
+/**
+ * Joins per-stream tails for a failure message. Includes whichever streams
+ * actually produced output — stderr is shown first because it usually carries
+ * the cause; stdout follows when present.
+ */
+fun joinLogTails(vararg files: File): String =
+    files.map(::tailLogFile)
+        .filter { it.isNotBlank() }
+        .joinToString("\n\n")
+        .ifBlank { "(no log output captured)" }
 
 fun summarizeMaestroJunit(report: File): String {
     if (!report.exists()) {
@@ -429,7 +454,7 @@ tasks.register<Exec>("maestroRunAllJunit") {
         val exit = executionResult.get().exitValue
         if (exit != 0) {
             val summary = summarizeMaestroJunit(maestroAllFlowsJunit)
-            val tail = tailLogFile(stderrLog).ifBlank { tailLogFile(stdoutLog) }
+            val tail = joinLogTails(stderrLog, stdoutLog)
             throw GradleException(
                 buildString {
                     appendLine("maestroRunAllJunit failed (exit=$exit). $summary")
@@ -563,7 +588,7 @@ tasks.register<Exec>("maestroRunAllIosJunit") {
         val exit = executionResult.get().exitValue
         if (exit != 0) {
             val summary = summarizeMaestroJunit(maestroIosAllFlowsJunit)
-            val tail = tailLogFile(stderrLog).ifBlank { tailLogFile(stdoutLog) }
+            val tail = joinLogTails(stderrLog, stdoutLog)
             throw GradleException(
                 buildString {
                     appendLine("maestroRunAllIosJunit failed (exit=$exit). $summary")

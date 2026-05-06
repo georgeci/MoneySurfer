@@ -14,10 +14,6 @@ def safe_name(name: str) -> str:
     return " ".join(name.split())
 
 
-def result_uuid(name: str) -> str:
-    return str(uuid.UUID(hashlib.md5(name.encode("utf-8")).hexdigest()))
-
-
 def map_case_status(case: ET.Element) -> str:
     status_attr = (case.attrib.get("status") or "").upper()
     if case.find("failure") is not None or case.find("error") is not None:
@@ -158,7 +154,12 @@ def main() -> int:
         for case in root.findall(".//testcase"):
             try:
                 name = safe_name(case.attrib.get("name") or case.attrib.get("classname") or "Unnamed Maestro Test")
-                uid = result_uuid(name)
+                # Result-file UUID must be globally unique: when the nightly
+                # aggregator flattens Android + iOS into one allure-results dir
+                # a deterministic name(name) hash collides across scopes and
+                # one platform overwrites the other. historyId stays
+                # deterministic so per-scope trend lines remain stable.
+                uid = uuid.uuid4().hex
 
                 status = map_case_status(case)
                 status_details = {}
