@@ -44,7 +44,7 @@ jobs:
           matrix.language != 'java-kotlin' ||
           github.event_name != 'pull_request' ||
           github.event.pull_request.head.repo.full_name == github.repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Decode Firebase config
         if: >-
@@ -62,7 +62,7 @@ jobs:
           matrix.language == 'java-kotlin' &&
           (github.event_name != 'pull_request' ||
           github.event.pull_request.head.repo.full_name == github.repository)
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: "17"
@@ -72,14 +72,14 @@ jobs:
           matrix.language == 'java-kotlin' &&
           (github.event_name != 'pull_request' ||
           github.event.pull_request.head.repo.full_name == github.repository)
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v6
 
       - name: Initialize CodeQL
         if: >-
           matrix.language != 'java-kotlin' ||
           github.event_name != 'pull_request' ||
           github.event.pull_request.head.repo.full_name == github.repository
-        uses: github/codeql-action/init@v3
+        uses: github/codeql-action/init@v4
         with:
           languages: ${{ matrix.language }}
           build-mode: ${{ matrix.build-mode }}
@@ -99,6 +99,6 @@ jobs:
           matrix.language != 'java-kotlin' ||
           github.event_name != 'pull_request' ||
           github.event.pull_request.head.repo.full_name == github.repository
-        uses: github/codeql-action/analyze@v3
+        uses: github/codeql-action/analyze@v4
         with:
           category: "/language:${{ matrix.language }}"
