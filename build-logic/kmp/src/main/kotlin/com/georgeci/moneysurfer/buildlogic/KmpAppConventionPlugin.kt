@@ -1,6 +1,7 @@
 package com.georgeci.moneysurfer.buildlogic
 
 import com.android.build.api.dsl.ApplicationExtension
+import com.project.starter.easylauncher.plugin.EasyLauncherExtension
 import org.gradle.api.JavaVersion
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -125,6 +126,23 @@ class KmpAppConventionPlugin : Plugin<Project> {
                 add("implementation", platform(libs.findLibrary("koin-bom").get()))
                 add("implementation", libs.findLibrary("koin-android").get())
                 add("implementation", libs.findLibrary("kotlin-stdlib").get())
+            }
+
+            // Overlay a "DEV" ribbon on the launcher icon for debug installs so
+            // testers can tell dev builds from release on the home screen.
+            // Release icons stay untouched.
+            pluginManager.apply("com.starter.easylauncher")
+            extensions.configure<EasyLauncherExtension> {
+                buildTypes.register("debug") {
+                    filters(
+                        customRibbon(
+                            label = "DEV",
+                            ribbonColor = "#C0FF1744",
+                            labelColor = "#FFFFFFFF",
+                            position = "bottom",
+                        ),
+                    )
+                }
             }
         }
 

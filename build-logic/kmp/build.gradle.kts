@@ -5,6 +5,11 @@ plugins {
 dependencies {
     compileOnly(libs.kmp.plugin)
     compileOnly(libs.kmp.plugin.lib)
+    // Implementation (not compileOnly) so easylauncher ends up on the
+    // convention plugin's runtime classpath — needed because the plugin is
+    // applied via pluginManager.apply("com.starter.easylauncher") rather than
+    // the consuming module declaring `alias(libs.plugins.easylauncher)`.
+    implementation(libs.easylauncher.plugin)
 //    compileOnly(libs.plugins.androidLint)
 //    compileOnly(libs.plugins.composeMultiplatform)
 //    compileOnly(libs.plugins.composeCompiler)
