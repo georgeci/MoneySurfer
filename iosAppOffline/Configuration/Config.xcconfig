@@ -3,7 +3,7 @@
 TEAM_ID=
 
 PRODUCT_NAME=MoneySurferOffline
-PRODUCT_BUNDLE_IDENTIFIER=com.georgeci.moneysurfer.offline.MoneySurferOffline$(TEAM_ID)
+PRODUCT_BUNDLE_IDENTIFIER=com.georgeci.moneysurfer.offline$(TEAM_ID)
 
 CURRENT_PROJECT_VERSION=$(APP_VERSION_CODE)
 MARKETING_VERSION=$(APP_VERSION_NAME)

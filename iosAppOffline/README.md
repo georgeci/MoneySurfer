@@ -30,8 +30,8 @@ but links the `ComposeAppOffline.framework` produced by `:composeAppOffline`
 5. **CI.** If `.github/workflows/` adds an iOS lane for `iosApp`, duplicate
    it for `iosAppOffline` (out of scope for this change).
 6. **App Store Connect.** Only needed if the offline build is shipped as a
-   public release. Bundle id `com.georgeci.moneysurfer.offline.MoneySurferOffline`
-   would need its own App Store Connect record. Not required for internal QA.
+   public release. Bundle id `com.georgeci.moneysurfer.offline` would need
+   its own App Store Connect record. Not required for internal QA.
 
 ## Verification
 
