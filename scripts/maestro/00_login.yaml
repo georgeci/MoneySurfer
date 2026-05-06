@@ -8,20 +8,25 @@ tags:
 
 # TEST_EMAIL and TEST_PASSWORD are passed by the Maestro test suite from
 # scripts/e2e-test-user.properties. The same file is used by Firebase seed.
+#
+# Selectors below target Compose `testTag` values exposed via
+# `Modifier.semantics { testTagsAsResourceId = true }` — see
+# `feature/login/.../SignInScreen.kt::SignInTestTags`.
 - runFlow:
     when:
-      visible: "Email"
+      visible:
+        id: "signIn:email"
     commands:
       - tapOn:
-          text: "Email"
+          id: "signIn:email"
       - inputText: ${TEST_EMAIL}
 
       - tapOn:
-          text: "Password"
+          id: "signIn:password"
       - inputText: ${TEST_PASSWORD}
 
       - tapOn:
-          text: "Sign in"
+          id: "signIn:submit"
 
       - assertVisible:
           text: "Choose a workspace"

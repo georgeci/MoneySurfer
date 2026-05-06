@@ -3,8 +3,11 @@
     <string name="sign_in_subtitle">Tap login to continue with demo account.</string>
     <string name="sign_in_login">Login</string>
     <string name="sign_in_brand">MoneySurfer</string>
-    <string name="sign_in_hero_title">Money, clearly.</string>
-    <string name="sign_in_hero_subtitle">Track spending across your household in one place. No ads, no upsell.</string>
+    <string name="sign_in_hero_title">Ride your money wave.</string>
+    <string name="sign_in_hero_subtitle">Track spending, share budgets, and surf through every paycheck with your household.</string>
+    <string name="sign_in_sheet_title">Get started</string>
+    <string name="sign_in_sheet_subtitle">Sign in to sync across your devices.</string>
+    <string name="sign_in_or">or</string>
     <string name="sign_in_passkey">Continue with Passkey</string>
     <string name="sign_in_email">Sign in with email</string>
     <string name="sign_in_demo_mode">Enter Demo Mode</string>
