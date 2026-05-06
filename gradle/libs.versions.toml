@@ -124,6 +124,44 @@ material-kolor = { module = "com.materialkolor:material-kolor", version.ref = "m
 kmp-plugin = { module = "org.jetbrains.kotlin.multiplatform:org.jetbrains.kotlin.multiplatform.gradle.plugin", version.ref = "kotlin" }
 kmp-plugin-lib = { module = "com.android.kotlin.multiplatform.library:com.android.kotlin.multiplatform.library.gradle.plugin", version.ref = "agp" }
 
+[bundles]
+# Compose UI + lifecycle stack used by every feature module's commonMain.
+feature-compose = [
+    "compose-runtime",
+    "compose-foundation",
+    "compose-material3",
+    "compose-ui",
+    "compose-components-resources",
+    "compose-uiToolingPreview",
+    "androidx-lifecycle-viewmodelCompose",
+    "androidx-lifecycle-runtimeCompose",
+]
+# Navigation3 runtime + result-state used by every feature module.
+feature-nav3 = [
+    "jetbrains-navigation3-ui",
+    "navigation3-resultstate",
+]
+# Koin runtime + compose VM + annotations. Note: koin-bom must still be applied
+# via `project.dependencies.platform(libs.koin.bom)` outside the bundle.
+feature-koin = [
+    "koin-core",
+    "koin-compose-viewmodel",
+    "koin-annotations",
+]
+# Arrow core + optics runtime (the KSP processor stays separate).
+feature-arrow = [
+    "arrow-core",
+    "arrow-optics",
+]
+# Common test stack for feature modules' commonTest.
+feature-test = [
+    "kotlin-test",
+    "kotest-framework-engine",
+    "kotest-assertions-core",
+    "kotlinx-coroutines-test",
+    "turbine",
+]
+
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
