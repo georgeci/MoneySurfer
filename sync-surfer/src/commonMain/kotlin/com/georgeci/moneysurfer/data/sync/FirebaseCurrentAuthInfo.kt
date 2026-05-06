@@ -1,6 +1,5 @@
 package com.georgeci.moneysurfer.data.sync
 
-import com.georgeci.moneysurfer.data.sync.CurrentAuthInfo
 import dev.gitlive.firebase.auth.FirebaseAuth
 import org.koin.core.annotation.Single
 

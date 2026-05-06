@@ -115,6 +115,7 @@ private fun SignInContent(
     state: SignInState,
     onEvent: (SignInEvent) -> Unit,
 ) {
+    val config = state.config
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
@@ -163,7 +164,9 @@ private fun SignInContent(
 
                 Spacer(Modifier.height(AppTheme.spacing.large))
 
-                EmailPasswordForm(state = state, onEvent = onEvent)
+                if (config.emailPassword) {
+                    EmailPasswordForm(state = state, onEvent = onEvent)
+                }
 
                 if (state.error != null) {
                     Spacer(Modifier.height(AppTheme.spacing.small))
@@ -178,54 +181,61 @@ private fun SignInContent(
 
                 Spacer(Modifier.height(AppTheme.spacing.medium))
 
-                SurferButton(
-                    text = stringResource(
-                        when (state.mode) {
-                            AuthMode.SignIn -> Res.string.sign_in_submit_signin
-                            AuthMode.SignUp -> Res.string.sign_in_submit_signup
-                        },
-                    ),
-                    onClick = { onEvent(SignInEvent.OnSubmitClick) },
-                    modifier = Modifier.fillMaxWidth(),
-                    size = SurferButtonSize.Biggest,
-                    enabled = state.canSubmit,
-                )
+                if (config.emailPassword) {
+                    SurferButton(
+                        text = stringResource(
+                            when (state.mode) {
+                                AuthMode.SignIn -> Res.string.sign_in_submit_signin
+                                AuthMode.SignUp -> Res.string.sign_in_submit_signup
+                            },
+                        ),
+                        onClick = { onEvent(SignInEvent.OnSubmitClick) },
+                        modifier = Modifier.fillMaxWidth(),
+                        size = SurferButtonSize.Biggest,
+                        enabled = state.canSubmit,
+                    )
 
-                Spacer(Modifier.height(AppTheme.spacing.small))
+                    Spacer(Modifier.height(AppTheme.spacing.small))
 
-                SurferButton(
-                    text = stringResource(
-                        when (state.mode) {
-                            AuthMode.SignIn -> Res.string.sign_in_toggle_to_signup
-                            AuthMode.SignUp -> Res.string.sign_in_toggle_to_signin
-                        },
-                    ),
-                    onClick = { onEvent(SignInEvent.OnToggleModeClick) },
-                    modifier = Modifier.fillMaxWidth(),
-                    style = SurferButtonStyle.Text,
-                    enabled = !state.isLoading,
-                )
+                    SurferButton(
+                        text = stringResource(
+                            when (state.mode) {
+                                AuthMode.SignIn -> Res.string.sign_in_toggle_to_signup
+                                AuthMode.SignUp -> Res.string.sign_in_toggle_to_signin
+                            },
+                        ),
+                        onClick = { onEvent(SignInEvent.OnToggleModeClick) },
+                        modifier = Modifier.fillMaxWidth(),
+                        style = SurferButtonStyle.Text,
+                        enabled = !state.isLoading,
+                    )
+                }
 
-                Spacer(Modifier.height(AppTheme.spacing.large))
+                if (config.anonymous) {
+                    Spacer(Modifier.height(AppTheme.spacing.large))
 
-                SurferButton(
-                    text = stringResource(Res.string.sign_in_anonymous),
-                    onClick = { onEvent(SignInEvent.OnAnonymousLoginClick) },
-                    modifier = Modifier.fillMaxWidth(),
-                    style = SurferButtonStyle.Outlined,
-                    enabled = !state.isLoading,
-                    startIcon = SurferIcons.Fingerprint,
-                )
+                    SurferButton(
+                        text = stringResource(Res.string.sign_in_anonymous),
+                        onClick = { onEvent(SignInEvent.OnAnonymousLoginClick) },
+                        modifier = Modifier.fillMaxWidth(),
+                        style = SurferButtonStyle.Outlined,
+                        enabled = !state.isLoading,
+                        startIcon = SurferIcons.Fingerprint,
+                    )
 
-                Spacer(Modifier.height(AppTheme.spacing.small))
+                    Spacer(Modifier.height(AppTheme.spacing.small))
+                }
 
-                SurferButton(
-                    text = stringResource(Res.string.sign_in_demo_mode),
-                    onClick = { onEvent(SignInEvent.OnLoginClick) },
-                    modifier = Modifier.fillMaxWidth(),
-                    style = SurferButtonStyle.Text,
-                    enabled = !state.isLoading,
-                )
+                if (config.demo) {
+                    SurferButton(
+                        text = stringResource(Res.string.sign_in_demo_mode),
+                        onClick = { onEvent(SignInEvent.OnLoginClick) },
+                        modifier = Modifier.fillMaxWidth(),
+                        size = if (config.demoOnly) SurferButtonSize.Biggest else SurferButtonSize.Regular,
+                        style = if (config.demoOnly) SurferButtonStyle.Filled else SurferButtonStyle.Text,
+                        enabled = !state.isLoading,
+                    )
+                }
 
                 Spacer(Modifier.height(AppTheme.spacing.large))
 
@@ -352,6 +362,23 @@ private fun SignInScreenPreview() {
     AppTheme {
         SignInContent(
             state = SignInState(),
+            onEvent = {},
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun SignInScreenDemoOnlyPreview() {
+    AppTheme {
+        SignInContent(
+            state = SignInState(
+                config = SignInFeatureConfig(
+                    emailPassword = false,
+                    anonymous = false,
+                    demo = true,
+                ),
+            ),
             onEvent = {},
         )
     }

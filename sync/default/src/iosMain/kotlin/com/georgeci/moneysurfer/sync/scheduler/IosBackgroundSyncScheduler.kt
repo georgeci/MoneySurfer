@@ -1,8 +1,6 @@
 package com.georgeci.moneysurfer.sync.scheduler
 
 import co.touchlab.kermit.Logger
-import com.georgeci.moneysurfer.sync.scheduler.BackgroundSyncScheduler
-import com.georgeci.moneysurfer.sync.scheduler.SyncConstraints
 import org.koin.core.annotation.Single
 import kotlin.time.Duration
 

@@ -36,9 +36,11 @@ firebase-export-*/
 allure-report/
 allure-results/
 /androidApp/keystore/
+/keystore/
 /.claude/worktrees/
 /.claire/worktrees/
 
 # Firebase config — provided via CI secrets, not committed
 google-services.json
 GoogleService-Info.plist
+.claude/scheduled_tasks.lock

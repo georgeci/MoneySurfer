@@ -15,4 +15,6 @@ data class BudgetEntity(
     @ColumnInfo(name = "startDate") val startDate: String,
     @ColumnInfo(name = "alertPercent") val alertPercent: Int,
     @ColumnInfo(name = "isActive") val isActive: Boolean,
+    @ColumnInfo(name = "createdAt", defaultValue = "0") val createdAt: Long = 0L,
+    @ColumnInfo(name = "updatedAt", defaultValue = "0") val updatedAt: Long = 0L,
 )

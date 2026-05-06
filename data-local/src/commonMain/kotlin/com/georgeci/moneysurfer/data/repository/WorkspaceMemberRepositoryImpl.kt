@@ -5,6 +5,7 @@ import com.georgeci.moneysurfer.data.db.entity.WorkspaceMemberEntity
 import com.georgeci.moneysurfer.domain.model.WorkspaceMember
 import com.georgeci.moneysurfer.domain.model.WorkspaceMemberStatus
 import com.georgeci.moneysurfer.domain.model.WorkspaceRole
+import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
 import com.georgeci.moneysurfer.domain.primitives.UserId
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 import com.georgeci.moneysurfer.domain.repositories.WorkspaceMemberRepository
@@ -14,12 +15,13 @@ import com.georgeci.moneysurfer.sync.repository.OutboxEnqueuer
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import org.koin.core.annotation.Single
-import kotlin.time.Clock
 
 @Single(binds = [WorkspaceMemberRepository::class])
 class WorkspaceMemberRepositoryImpl(
     private val dao: WorkspaceMemberDao,
     private val outboxEnqueuer: OutboxEnqueuer,
+    private val clock: ClockUseCase,
+    private val timeFormatter: TimeFormatter,
 ) : WorkspaceMemberRepository {
 
     override fun getAll(): Flow<List<WorkspaceMember>> =
@@ -35,13 +37,17 @@ class WorkspaceMemberRepositoryImpl(
         dao.getById(userId.value, workspaceId.value)?.toDomain()
 
     override suspend fun insert(member: WorkspaceMember) {
-        val entity = member.toEntity().copy(updatedAt = now())
+        val entity = member.toEntity()
         dao.insert(entity)
         enqueueUpsert(entity, MutationOperation.INSERT)
     }
 
     override suspend fun update(member: WorkspaceMember) {
-        val entity = member.toEntity().copy(updatedAt = now())
+        val existingCreatedAt = dao.getById(member.userId.value, member.workspaceId.value)?.createdAt
+        val entity = member.toEntity().copy(
+            createdAt = existingCreatedAt ?: member.toEntity().createdAt,
+            updatedAt = clock.now().toEpochMilliseconds(),
+        )
         dao.update(entity)
         enqueueUpsert(entity, MutationOperation.UPDATE)
     }
@@ -52,7 +58,7 @@ class WorkspaceMemberRepositoryImpl(
         removedByUserId: UserId?,
     ) {
         val current = dao.getById(userId.value, workspaceId.value) ?: return
-        val now = now()
+        val now = clock.now().toEpochMilliseconds()
         val updated = current.copy(
             status = WorkspaceMemberStatus.REMOVED.name,
             removedAt = now,
@@ -64,7 +70,7 @@ class WorkspaceMemberRepositoryImpl(
 
     override suspend fun markLeft(userId: UserId, workspaceId: WorkspaceId) {
         val current = dao.getById(userId.value, workspaceId.value) ?: return
-        val now = now()
+        val now = clock.now().toEpochMilliseconds()
         val updated = current.copy(
             status = WorkspaceMemberStatus.LEFT.name,
             leftAt = now,
@@ -74,8 +80,6 @@ class WorkspaceMemberRepositoryImpl(
         enqueueUpsert(updated, MutationOperation.UPDATE)
     }
 
-    private fun now(): Long = Clock.System.now().toEpochMilliseconds()
-
     private suspend fun enqueueUpsert(entity: WorkspaceMemberEntity, operation: MutationOperation) {
         outboxEnqueuer.enqueueUpsert(
             entityType = SyncEntityTypes.WORKSPACE_MEMBER,
@@ -84,33 +88,33 @@ class WorkspaceMemberRepositoryImpl(
             operation = operation,
         )
     }
+
+    private fun WorkspaceMemberEntity.toDomain() = WorkspaceMember(
+        userId = UserId(userId),
+        workspaceId = WorkspaceId(workspaceId),
+        role = WorkspaceRole.entries.firstOrNull { it.name == role } ?: WorkspaceRole.VIEWER,
+        status = WorkspaceMemberStatus.entries.firstOrNull { it.name == status }
+            ?: WorkspaceMemberStatus.ACTIVE,
+        displayName = displayName,
+        email = email,
+        addedByUserId = addedByUserId?.let(::UserId),
+        createdAt = timeFormatter.parseInstant(createdAt),
+        updatedAt = timeFormatter.parseInstant(updatedAt),
+        leftAt = timeFormatter.parseInstantOrNull(leftAt),
+        removedAt = timeFormatter.parseInstantOrNull(removedAt),
+    )
+
+    private fun WorkspaceMember.toEntity() = WorkspaceMemberEntity(
+        userId = userId.value,
+        workspaceId = workspaceId.value,
+        role = role.name,
+        status = status.name,
+        displayName = displayName,
+        email = email,
+        addedByUserId = addedByUserId?.value,
+        createdAt = timeFormatter.formatInstant(createdAt),
+        updatedAt = timeFormatter.formatInstant(updatedAt),
+        leftAt = timeFormatter.formatInstantOrNull(leftAt),
+        removedAt = timeFormatter.formatInstantOrNull(removedAt),
+    )
 }
-
-private fun WorkspaceMemberEntity.toDomain() = WorkspaceMember(
-    userId = UserId(userId),
-    workspaceId = WorkspaceId(workspaceId),
-    role = WorkspaceRole.entries.firstOrNull { it.name == role } ?: WorkspaceRole.VIEWER,
-    status = WorkspaceMemberStatus.entries.firstOrNull { it.name == status }
-        ?: WorkspaceMemberStatus.ACTIVE,
-    displayName = displayName,
-    email = email,
-    addedByUserId = addedByUserId?.let(::UserId),
-    createdAt = createdAt,
-    updatedAt = updatedAt,
-    leftAt = leftAt,
-    removedAt = removedAt,
-)
-
-private fun WorkspaceMember.toEntity() = WorkspaceMemberEntity(
-    userId = userId.value,
-    workspaceId = workspaceId.value,
-    role = role.name,
-    status = status.name,
-    displayName = displayName,
-    email = email,
-    addedByUserId = addedByUserId?.value,
-    createdAt = createdAt,
-    updatedAt = updatedAt,
-    leftAt = leftAt,
-    removedAt = removedAt,
-)

@@ -57,16 +57,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.georgeci.moneysurfer.domain.model.Account
 import com.georgeci.moneysurfer.domain.model.Category
 import com.georgeci.moneysurfer.domain.primitives.AccountId
-import com.georgeci.moneysurfer.domain.primitives.AccountType
 import com.georgeci.moneysurfer.domain.primitives.CategoryId
 import com.georgeci.moneysurfer.domain.primitives.CategoryType
 import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
-import com.georgeci.moneysurfer.domain.primitives.Money
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
-import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 import com.georgeci.moneysurfer.uikit.components.SurferButton
 import com.georgeci.moneysurfer.uikit.components.SurferButtonSize
 import com.georgeci.moneysurfer.uikit.components.SurferButtonStyle
@@ -700,35 +696,6 @@ private fun currencySymbol(code: CurrencyCode?): String {
     }
 }
 
-private val previewAccounts = listOf(
-    Account(
-        id = AccountId("preview-acc-1"),
-        workspaceId = WorkspaceId("preview-ws-1"),
-        name = "Everyday",
-        type = AccountType.CARD,
-        currencyCode = CurrencyCode("EUR"),
-        balance = Money.fromMajor(2480),
-    ),
-    Account(
-        id = AccountId("preview-acc-2"),
-        workspaceId = WorkspaceId("preview-ws-1"),
-        name = "Savings",
-        type = AccountType.SAVINGS,
-        currencyCode = CurrencyCode("EUR"),
-        balance = Money.fromMajor(8300),
-    ),
-)
-
-private val previewCategories = listOf(
-    Category(CategoryId("preview-cat-1"), WorkspaceId("preview-ws-1"), "Groceries", CategoryType.EXPENSE, null, 0L),
-    Category(CategoryId("preview-cat-2"), WorkspaceId("preview-ws-1"), "Transport", CategoryType.EXPENSE, null, 0L),
-    Category(CategoryId("preview-cat-3"), WorkspaceId("preview-ws-1"), "Dining", CategoryType.EXPENSE, null, 0L),
-    Category(CategoryId("preview-cat-4"), WorkspaceId("preview-ws-1"), "Home", CategoryType.EXPENSE, null, 0L),
-    Category(CategoryId("preview-cat-5"), WorkspaceId("preview-ws-1"), "Leisure", CategoryType.EXPENSE, null, 0L),
-    Category(CategoryId("preview-cat-6"), WorkspaceId("preview-ws-1"), "Health", CategoryType.EXPENSE, null, 0L),
-    Category(CategoryId("preview-cat-7"), WorkspaceId("preview-ws-1"), "Utilities", CategoryType.EXPENSE, null, 0L),
-)
-
 @Preview
 @Composable
 private fun TransactionCreationFilledPreview() {
@@ -738,15 +705,15 @@ private fun TransactionCreationFilledPreview() {
                 amount = "48.20",
                 note = "Lidl — weekly shop",
                 type = TransactionTypeUi.Expense,
-                accounts = previewAccounts,
-                categories = previewCategories,
-                selectedAccount = previewAccounts.first(),
-                selectedCategory = previewCategories.first(),
+                accounts = PreviewAccounts,
+                categories = PreviewCategories,
+                selectedAccount = PreviewAccounts.first(),
+                selectedCategory = PreviewCategories.first(),
                 isEditMode = false,
                 editingTransactionId = null,
                 timestamp = 0L,
                 categoryUsageCounts = emptyMap(),
-                displayCategories = previewCategories,
+                displayCategories = PreviewCategories,
             ),
             onEvent = {},
         )
@@ -762,15 +729,15 @@ private fun TransactionCreationTransferPreview() {
                 amount = "",
                 note = "",
                 type = TransactionTypeUi.Transfer,
-                accounts = previewAccounts,
-                categories = previewCategories,
-                selectedAccount = previewAccounts.first(),
-                selectedCategory = previewCategories.first(),
+                accounts = PreviewAccounts,
+                categories = PreviewCategories,
+                selectedAccount = PreviewAccounts.first(),
+                selectedCategory = PreviewCategories.first(),
                 isEditMode = false,
                 editingTransactionId = null,
                 timestamp = 0L,
                 categoryUsageCounts = emptyMap(),
-                displayCategories = previewCategories,
+                displayCategories = PreviewCategories,
             ),
             onEvent = {},
         )

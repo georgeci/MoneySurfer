@@ -381,7 +381,7 @@ class MembersFlowIT {
         "displayName" to "IT User",
         "email" to email,
         "addedByUserId" to uid,
-        "addedAt" to now,
+        "createdAt" to now,
         "updatedAt" to now,
         "clientVersionCode" to 1,
     )

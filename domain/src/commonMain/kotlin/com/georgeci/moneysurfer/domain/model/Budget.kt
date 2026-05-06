@@ -4,6 +4,7 @@ import com.georgeci.moneysurfer.domain.primitives.BudgetId
 import com.georgeci.moneysurfer.domain.primitives.CategoryId
 import com.georgeci.moneysurfer.domain.primitives.Money
 import kotlinx.datetime.LocalDate
+import kotlin.time.Instant
 
 data class Budget(
     val id: BudgetId = BudgetId.uuid(),
@@ -14,6 +15,8 @@ data class Budget(
     val startDate: LocalDate,
     val alertPercent: Int = 80,
     val isActive: Boolean = true,
+    val createdAt: Instant,
+    val updatedAt: Instant = createdAt,
 )
 
 enum class BudgetPeriod {

@@ -21,7 +21,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.georgeci.moneysurfer.domain.model.WorkspaceRole
 import com.georgeci.moneysurfer.domain.primitives.UserId
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
-import com.georgeci.moneysurfer.domain.primitives.WorkspaceInviteId
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
@@ -150,44 +149,6 @@ private fun roleSubtitle(role: WorkspaceRole?, memberCount: Int): String = when 
 }
 
 // ── Previews ─────────────────────────────────────────────────────────────────
-
-private val PreviewRoster = listOf(
-    MemberUi(UserId("u-1"), "Kasia M.", "kasia@mail.com", WorkspaceRole.OWNER, "K", isYou = false),
-    MemberUi(UserId("u-2"), "Julian P.", "julian@mail.com", WorkspaceRole.EDITOR, "J", isYou = true),
-    MemberUi(UserId("u-3"), "Asia W.", "asia@mail.com", WorkspaceRole.EDITOR, "A", isYou = false),
-    MemberUi(UserId("u-4"), "Tom N.", "tom@mail.com", WorkspaceRole.VIEWER, "T", isYou = false),
-)
-
-private val PreviewInvites = listOf(
-    InviteUi(
-        WorkspaceInviteId("i-1"),
-        "kasia.nowak@gmail.com",
-        WorkspaceRole.EDITOR,
-        isExpired = false,
-        expiresAt = 0L,
-    ),
-    InviteUi(WorkspaceInviteId("i-2"), "pavel@mail.com", WorkspaceRole.VIEWER, isExpired = false, expiresAt = 0L),
-    InviteUi(WorkspaceInviteId("i-3"), "lena@mail.com", WorkspaceRole.VIEWER, isExpired = true, expiresAt = 0L),
-)
-
-private fun previewState(
-    viewerRole: WorkspaceRole?,
-    tab: MembersTab = MembersTab.Active,
-    members: List<MemberUi> = PreviewRoster,
-    invites: List<InviteUi> = PreviewInvites,
-    showLeaveDialog: Boolean = false,
-    busy: Boolean = false,
-): WorkspaceMembersState.Content = WorkspaceMembersState.Content(
-    workspaceId = WorkspaceId("preview-ws-1"),
-    workspaceName = "Family",
-    currentUserId = UserId("u-2"),
-    viewerRole = viewerRole,
-    members = members,
-    pendingInvites = invites,
-    tab = tab,
-    busy = busy,
-    showLeaveDialog = showLeaveDialog,
-)
 
 @Preview
 @Composable

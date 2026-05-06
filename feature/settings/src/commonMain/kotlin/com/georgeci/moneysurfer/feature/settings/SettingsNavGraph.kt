@@ -1,15 +1,21 @@
 package com.georgeci.moneysurfer.feature.settings
 
+import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
+import androidx.compose.material3.adaptive.navigation3.ListDetailSceneStrategy
 import com.georgeci.moneysurfer.feature.settings.about.AboutScreen
 import com.georgeci.moneysurfer.feature.settings.appearance.AppearanceScreen
 import com.georgeci.moneysurfer.feature.settings.backup.BackupScreen
 import com.georgeci.moneysurfer.feature.settings.preferences.PreferencesScreen
 import com.georgeci.moneysurfer.feature.settings.sync.SyncScreen
 import com.georgeci.moneysurfer.navigation.FeatureNavGraph
+import com.georgeci.moneysurfer.navigation.NavDetailPlaceholder
 import com.georgeci.moneysurfer.navigation.Route
 
+@OptIn(ExperimentalMaterial3AdaptiveApi::class)
 val settingsNavGraph: FeatureNavGraph = { navigator ->
-    entry<Route.Settings> {
+    entry<Route.Settings>(
+        metadata = ListDetailSceneStrategy.listPane(detailPlaceholder = { NavDetailPlaceholder() }),
+    ) {
         SettingsScreen(
             onNavigateBack = { navigator.pop() },
             onNavigateToWorkspaceSelector = {
@@ -28,23 +34,33 @@ val settingsNavGraph: FeatureNavGraph = { navigator ->
         )
     }
 
-    entry<Route.SettingsAppearance> {
+    entry<Route.SettingsAppearance>(
+        metadata = ListDetailSceneStrategy.detailPane(),
+    ) {
         AppearanceScreen(onNavigateBack = { navigator.pop() })
     }
 
-    entry<Route.SettingsPreferences> {
+    entry<Route.SettingsPreferences>(
+        metadata = ListDetailSceneStrategy.detailPane(),
+    ) {
         PreferencesScreen(onNavigateBack = { navigator.pop() })
     }
 
-    entry<Route.SettingsSync> {
+    entry<Route.SettingsSync>(
+        metadata = ListDetailSceneStrategy.detailPane(),
+    ) {
         SyncScreen(onNavigateBack = { navigator.pop() })
     }
 
-    entry<Route.SettingsBackup> {
+    entry<Route.SettingsBackup>(
+        metadata = ListDetailSceneStrategy.detailPane(),
+    ) {
         BackupScreen(onNavigateBack = { navigator.pop() })
     }
 
-    entry<Route.SettingsAbout> {
+    entry<Route.SettingsAbout>(
+        metadata = ListDetailSceneStrategy.detailPane(),
+    ) {
         AboutScreen(onNavigateBack = { navigator.pop() })
     }
 }

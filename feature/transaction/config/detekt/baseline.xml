@@ -1,0 +1,14 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>CyclomaticComplexMethod:TransactionCreationViewModel.kt$TransactionCreationViewModel$override fun onEvent(event: TransactionCreationEvent)</ID>
+    <ID>MagicNumber:TransactionCreationScreen.kt$0xFF2E5AA8</ID>
+    <ID>MagicNumber:TransactionCreationScreen.kt$0xFF2F8E6E</ID>
+    <ID>MagicNumber:TransactionCreationScreen.kt$0xFFB54744</ID>
+    <ID>MagicNumber:TransactionCreationScreen.kt$3</ID>
+    <ID>MagicNumber:TransactionCreationScreen.kt$4</ID>
+    <ID>MagicNumber:TransactionDetailsViewModel.kt$TransactionDetailsViewModel$3</ID>
+    <ID>ReturnCount:TransactionCreationViewModel.kt$TransactionCreationViewModel$private fun saveTransaction()</ID>
+  </CurrentIssues>
+</SmellBaseline>

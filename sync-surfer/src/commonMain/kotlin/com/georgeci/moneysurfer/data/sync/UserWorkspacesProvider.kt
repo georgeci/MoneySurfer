@@ -7,6 +7,7 @@ package com.georgeci.moneysurfer.data.sync
  */
 interface UserWorkspacesProvider {
     suspend fun workspaceIds(): List<String>
+
     /** Workspace IDs the user has been invited to but not yet joined. */
     suspend fun invitedWorkspaceIds(): List<String>
 }

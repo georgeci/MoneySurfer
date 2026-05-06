@@ -1,23 +1,94 @@
-name: Nightly (all scopes)
+name: Nightly
 
-# Runs every scope qaAll covers: common, android-host, android-device, maestro,
-# firestore. Pushes Allure (with history) and combined Kover to gh-pages under
-# /nightly/. Skips if no new commits since the last successful nightly run.
+# Heavy / expensive jobs that don't need to gate every PR. Runs once a day
+# against the default branch and on demand via workflow_dispatch.
+#
+# Cost note: macos-14 runners are ~10x more expensive than ubuntu, which is
+# why iOS verification lives here instead of in the per-PR ci.yml.
+#
+# qa-all covers every test scope (common, android-host, android-device,
+# maestro, firestore) and publishes Allure (with history) + Kover under
+# /nightly/ on Pages. It self-skips when no commits landed since the last
+# successful nightly.
 
 on:
   schedule:
-    - cron: "0 3 * * *"   # 03:00 UTC daily
-  workflow_dispatch:       # manual override (always runs, no skip)
+    # 03:17 UTC every day. Off-peak slot, off the hour to avoid GH cron jitter
+    # piling up at :00.
+    - cron: "17 3 * * *"
+  workflow_dispatch:
 
 permissions:
-  contents: write
-  actions: read            # needed to query `gh run list`
+  contents: write    # qa-all publishes to gh-pages
+  actions: read      # decide queries `gh run list`
 
 concurrency:
   group: nightly
   cancel-in-progress: false
 
 jobs:
+  ios-build:
+    name: iOS simulator build
+    runs-on: macos-14
+    timeout-minutes: 40
+    # Lean Debug build for iOS Simulator (arm64), no code signing, no archive,
+    # no Crashlytics dSYM upload. Verifies the Kotlin framework links and the
+    # Swift code compiles end-to-end against the embedded framework.
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      # iOS build only needs the GoogleService-Info.plist — don't expose the
+      # Android secrets to this job. (Can't use require-all=true here: it
+      # validates every input, not just the ones we passed.)
+      - name: Decode Firebase config
+        uses: ./.github/actions/firebase-config
+        with:
+          ios-plist: ${{ secrets.GOOGLE_SERVICE_INFO_PLIST }}
+
+      - name: Set up JDK
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Show Xcode version
+        run: xcodebuild -version
+
+      # Pre-link the Kotlin framework for the simulator arch so the Xcode build
+      # phase has its inputs ready and SPM resolution doesn't race with Gradle
+      # on first run.
+      - name: Link Kotlin framework (iosSimulatorArm64)
+        run: ./gradlew :composeApp:linkDebugFrameworkIosSimulatorArm64 --stacktrace
+
+      - name: Build iOS app (Simulator, no signing)
+        env:
+          SKIP_CRASHLYTICS_UPLOAD: "YES"
+        run: |
+          set -eo pipefail
+          if command -v xcbeautify >/dev/null 2>&1; then
+            FORMATTER=(xcbeautify --renderer github-actions)
+          else
+            FORMATTER=(cat)
+          fi
+          # -derivedDataPath requires -scheme/-testProductsPath/-xctestrun;
+          # we use -target so let xcodebuild pick the default location.
+          xcodebuild \
+            -project iosApp/iosApp.xcodeproj \
+            -target iosApp \
+            -configuration Debug \
+            -sdk iphonesimulator \
+            -arch arm64 \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            build \
+            | "${FORMATTER[@]}"
+
   decide:
     name: Skip if no changes since last successful run
     runs-on: ubuntu-latest
@@ -36,8 +107,8 @@ jobs:
             echo "run=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          # `--limit 2` because the run currently in progress (this one) shows up
-          # too on some API timings; we want the most recent already-finished one.
+          # Most recent already-finished successful nightly. Self-exclude in
+          # case the API briefly lists this very run while it's still queued.
           last_sha=$(gh run list \
             --workflow=nightly.yml \
             --branch=main \
@@ -61,12 +132,10 @@ jobs:
     if: needs.decide.outputs.run == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 90
-    permissions:
-      contents: write
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Decode Firebase config
         uses: ./.github/actions/firebase-config
@@ -79,16 +148,16 @@ jobs:
       # for the Firestore emulator JAR. AGP/Kotlin happily build on 21 too, so
       # we use a single JDK for the whole nightly job.
       - name: Set up JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: "21"
 
       - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v6
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: "20"
           cache: npm
@@ -141,7 +210,7 @@ jobs:
 
       - name: Upload native Allure results (Maestro)
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: nightly-allure-results-maestro
           path: build/allure-results/maestro/
@@ -150,7 +219,7 @@ jobs:
 
       - name: Upload Maestro debug artifacts
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: nightly-maestro-debug
           path: |
@@ -187,7 +256,7 @@ jobs:
 
       - name: Checkout gh-pages
         if: always()
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ref: gh-pages
           path: gh-pages

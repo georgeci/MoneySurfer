@@ -19,6 +19,9 @@ import com.georgeci.moneysurfer.domain.usecase.GetTransactionByIdUseCase
 import com.georgeci.moneysurfer.domain.usecase.UpdateTransactionUseCase
 import com.georgeci.moneysurfer.utils.MviViewModel
 import kotlinx.coroutines.flow.first
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import org.koin.core.annotation.KoinViewModel
 
 @KoinViewModel
@@ -54,10 +57,15 @@ class TransactionCreationViewModel(
             is TransactionCreationEvent.OnCategoryPicked -> applyPickedCategory(event.id)
             is TransactionCreationEvent.OnAccountPicked -> applyPickedAccount(event.id)
             is TransactionCreationEvent.OnTypeChanged -> changeType(event.type)
-            is TransactionCreationEvent.OnDateChanged ->
-                updateState { TransactionCreationState.content.timestamp.modify(this) { event.timestamp } }
-            TransactionCreationEvent.OnTodayClick ->
-                updateState { TransactionCreationState.content.timestamp.modify(this) { getCurrentTime() } }
+            is TransactionCreationEvent.OnDateChanged -> updateState {
+                TransactionCreationState.content.timestamp.set(this, event.timestamp)
+                    .let { TransactionCreationState.content.pinnedOperationDate.set(it, null) }
+            }
+            TransactionCreationEvent.OnTodayClick -> updateState {
+                TransactionCreationState.content.timestamp
+                    .set(this, getCurrentTime().toEpochMilliseconds())
+                    .let { TransactionCreationState.content.pinnedOperationDate.set(it, null) }
+            }
             TransactionCreationEvent.OnOpenCategoryChooser -> {
                 val state = currentState as? TransactionCreationState.Content ?: return
                 postSideEffect(
@@ -123,7 +131,7 @@ class TransactionCreationViewModel(
                 selectedCategory = initialSelected,
                 isEditMode = false,
                 editingTransactionId = null,
-                timestamp = getCurrentTime(),
+                timestamp = getCurrentTime().toEpochMilliseconds(),
                 categoryUsageCounts = emptyMap(),
                 displayCategories = buildDisplayCategories(
                     categories = categories,
@@ -164,9 +172,11 @@ class TransactionCreationViewModel(
                         type = resolvedType,
                         selectedAccount = account ?: baseContent.selectedAccount,
                         selectedCategory = resolvedSelected,
-                        timestamp = transaction.timestamp,
+                        timestamp = transaction.operationAt.toEpochMilliseconds(),
                         isEditMode = true,
                         editingTransactionId = transactionId,
+                        editingCreatedAt = transaction.createdAt,
+                        pinnedOperationDate = transaction.operationDate,
                         displayCategories = buildDisplayCategories(
                             categories = categories,
                             counts = baseContent.categoryUsageCounts,
@@ -289,6 +299,9 @@ class TransactionCreationViewModel(
         val type = if (state.isExpense) TransactionType.EXPENSE else TransactionType.INCOME
 
         launch {
+            val now = getCurrentTime()
+            val zone = TimeZone.currentSystemDefault()
+            val operationAt = kotlin.time.Instant.fromEpochMilliseconds(state.timestamp)
             val transaction = Transaction(
                 id = state.editingTransactionId ?: TransactionId.uuid(),
                 workspaceId = account.workspaceId,
@@ -297,8 +310,12 @@ class TransactionCreationViewModel(
                 currencyCode = account.currencyCode,
                 categoryId = category.id,
                 note = state.note,
-                timestamp = state.timestamp,
+                operationAt = operationAt,
+                operationDate = state.pinnedOperationDate
+                    ?: operationAt.toLocalDateTime(zone).date,
                 type = type,
+                createdAt = state.editingCreatedAt ?: now,
+                updatedAt = now,
             )
 
             if (state.isEditMode) {
@@ -357,6 +374,12 @@ sealed interface TransactionCreationState {
         val selectedCategory: Category?,
         val isEditMode: Boolean,
         val editingTransactionId: TransactionId?,
+        val editingCreatedAt: kotlin.time.Instant? = null,
+        // Original `operationDate` from the persisted transaction. Preserved across
+        // edits unless the user explicitly picks a new date — otherwise a timezone
+        // change between the original save and the edit would silently shift the
+        // stored business date.
+        val pinnedOperationDate: LocalDate? = null,
         val timestamp: Long,
         val categoryUsageCounts: Map<CategoryId, Int>,
         val displayCategories: List<Category>,

@@ -6,6 +6,7 @@ import com.georgeci.moneysurfer.domain.primitives.BudgetId
 import com.georgeci.moneysurfer.domain.primitives.CategoryId
 import com.georgeci.moneysurfer.domain.primitives.Money
 import kotlinx.datetime.LocalDate
+import kotlin.time.Instant
 
 fun aBudget(
     id: BudgetId = budgetId(),
@@ -16,6 +17,8 @@ fun aBudget(
     startDate: LocalDate = testDate,
     alertPercent: Int = 80,
     isActive: Boolean = true,
+    createdAt: Instant = testInstant,
+    updatedAt: Instant = createdAt,
 ): Budget = Budget(
     id = id,
     name = name,
@@ -25,4 +28,6 @@ fun aBudget(
     startDate = startDate,
     alertPercent = alertPercent,
     isActive = isActive,
+    createdAt = createdAt,
+    updatedAt = updatedAt,
 )

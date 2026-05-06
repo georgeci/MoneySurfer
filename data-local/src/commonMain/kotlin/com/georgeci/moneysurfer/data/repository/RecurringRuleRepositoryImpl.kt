@@ -13,13 +13,12 @@ import com.georgeci.moneysurfer.domain.repositories.RecurringRuleRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.datetime.DayOfWeek
-import kotlinx.datetime.LocalDate
 import org.koin.core.annotation.Single
-import kotlin.time.Instant
 
 @Single(binds = [RecurringRuleRepository::class])
 class RecurringRuleRepositoryImpl(
     private val dao: RecurringRuleDao,
+    private val timeFormatter: TimeFormatter,
 ) : RecurringRuleRepository {
 
     override fun getAll(): Flow<List<RecurringRule>> =
@@ -39,43 +38,47 @@ class RecurringRuleRepositoryImpl(
     override suspend fun delete(id: RecurringRuleId) {
         dao.delete(id.value)
     }
+
+    private fun RecurringRuleEntity.toDomain() = RecurringRule(
+        id = RecurringRuleId(id),
+        title = title,
+        amount = Money.fromMinor(amount),
+        categoryId = CategoryId(categoryId),
+        schedule = RecurringSchedule(
+            frequency = RecurringFrequency.entries.firstOrNull { it.name == scheduleFrequency }
+                ?: RecurringFrequency.MONTHLY,
+            interval = scheduleInterval,
+            daysOfWeek = scheduleDaysOfWeek.parseDaysOfWeek(),
+            daysOfMonth = scheduleDaysOfMonth.parseDaysOfMonth(),
+            missingDayPolicy = MissingDayPolicy.entries.firstOrNull { it.name == scheduleMissingDayPolicy }
+                ?: MissingDayPolicy.LAST_DAY_OF_MONTH,
+        ),
+        startDate = timeFormatter.parseLocalDate(startDate),
+        nextRunAt = timeFormatter.parseInstantOrNull(nextRunAt),
+        autoCreate = autoCreate,
+        isActive = isActive,
+        createdAt = timeFormatter.parseInstant(createdAt),
+        updatedAt = timeFormatter.parseInstant(updatedAt),
+    )
+
+    private fun RecurringRule.toEntity() = RecurringRuleEntity(
+        id = id.value,
+        title = title,
+        amount = amount.minor,
+        categoryId = categoryId.value,
+        scheduleFrequency = schedule.frequency.name,
+        scheduleInterval = schedule.interval,
+        scheduleDaysOfWeek = schedule.daysOfWeek.toWeekdaysStorageValue(),
+        scheduleDaysOfMonth = schedule.daysOfMonth.toMonthdaysStorageValue(),
+        scheduleMissingDayPolicy = schedule.missingDayPolicy.name,
+        startDate = timeFormatter.formatLocalDate(startDate),
+        nextRunAt = timeFormatter.formatInstantOrNull(nextRunAt),
+        autoCreate = autoCreate,
+        isActive = isActive,
+        createdAt = timeFormatter.formatInstant(createdAt),
+        updatedAt = timeFormatter.formatInstant(updatedAt),
+    )
 }
-
-private fun RecurringRuleEntity.toDomain() = RecurringRule(
-    id = RecurringRuleId(id),
-    title = title,
-    amount = Money.fromMinor(amount),
-    categoryId = CategoryId(categoryId),
-    schedule = RecurringSchedule(
-        frequency = RecurringFrequency.entries.firstOrNull { it.name == scheduleFrequency }
-            ?: RecurringFrequency.MONTHLY,
-        interval = scheduleInterval,
-        daysOfWeek = scheduleDaysOfWeek.parseDaysOfWeek(),
-        daysOfMonth = scheduleDaysOfMonth.parseDaysOfMonth(),
-        missingDayPolicy = MissingDayPolicy.entries.firstOrNull { it.name == scheduleMissingDayPolicy }
-            ?: MissingDayPolicy.LAST_DAY_OF_MONTH,
-    ),
-    startDate = LocalDate.parse(startDate),
-    nextRunAt = nextRunAt?.let { Instant.fromEpochMilliseconds(it) },
-    autoCreate = autoCreate,
-    isActive = isActive,
-)
-
-private fun RecurringRule.toEntity() = RecurringRuleEntity(
-    id = id.value,
-    title = title,
-    amount = amount.minor,
-    categoryId = categoryId.value,
-    scheduleFrequency = schedule.frequency.name,
-    scheduleInterval = schedule.interval,
-    scheduleDaysOfWeek = schedule.daysOfWeek.toWeekdaysStorageValue(),
-    scheduleDaysOfMonth = schedule.daysOfMonth.toMonthdaysStorageValue(),
-    scheduleMissingDayPolicy = schedule.missingDayPolicy.name,
-    startDate = startDate.toString(),
-    nextRunAt = nextRunAt?.toEpochMilliseconds(),
-    autoCreate = autoCreate,
-    isActive = isActive,
-)
 
 private fun String.parseDaysOfWeek(): Set<DayOfWeek> {
     if (isBlank()) return emptySet()

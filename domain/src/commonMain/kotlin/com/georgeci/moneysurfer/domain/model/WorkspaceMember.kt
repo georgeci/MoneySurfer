@@ -2,6 +2,7 @@ package com.georgeci.moneysurfer.domain.model
 
 import com.georgeci.moneysurfer.domain.primitives.UserId
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
+import kotlin.time.Instant
 
 /**
  * Participation of a [User] in a [Workspace].
@@ -20,8 +21,8 @@ data class WorkspaceMember(
     val displayName: String = "",
     val email: String? = null,
     val addedByUserId: UserId? = null,
-    val createdAt: Long,
-    val updatedAt: Long = createdAt,
-    val leftAt: Long? = null,
-    val removedAt: Long? = null,
+    val createdAt: Instant,
+    val updatedAt: Instant = createdAt,
+    val leftAt: Instant? = null,
+    val removedAt: Instant? = null,
 )

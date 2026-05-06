@@ -1,0 +1,10 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>MagicNumber:CategoryChooserContent.kt$4</ID>
+    <ID>MagicNumber:CategoryCreationScreen.kt$6</ID>
+    <ID>MaxLineLength:CategoryCreationViewModel.kt$CategoryCreationViewModel$type = if (category.type == CategoryType.INCOME) CategoryTypeUi.Income else CategoryTypeUi.Expense</ID>
+    <ID>MaxLineLength:CategoryCreationViewModel.kt$CategoryCreationViewModel$type = if (state.type == CategoryTypeUi.Income) CategoryType.INCOME else CategoryType.EXPENSE</ID>
+  </CurrentIssues>
+</SmellBaseline>

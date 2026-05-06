@@ -1,4 +1,4 @@
-# QA: Tests + Kover + Allure (common, Android host, Android device, Maestro, Firestore rules)
+# QA: Tests + Kover + Allure (common, Android host, Android device, Maestro Android/iOS, Firestore rules)
 
 All QA scopes follow one shape: `qa<Scope>` runs the scope's tests, attaches Kover where it applies, and **always** finalizes by generating an Allure report into a per-scope directory under `build/reports/allure/<scope>/`. Allure runs even when tests fail.
 
@@ -58,13 +58,14 @@ FIREBASE_PROJECT_ID=demo-moneysurfer scripts/firebase/start.sh
 | `./gradlew qaCommon` | `testCommon` (JVM) | yes | `build/reports/allure/common/` |
 | `./gradlew qaAndroidHost` | `testAndroidHost` | yes | `build/reports/allure/android-host/` |
 | `./gradlew qaAndroidDevice` | `testAndroidDevice` (instrumented) | — | `build/reports/allure/android-device/` |
-| `./gradlew qaMaestro` | all flows via `firebase emulators:exec` + seed | — | `build/reports/allure/maestro/` |
+| `./gradlew qaMaestroAndroid` / `qaMaestro` | Android flows via `firebase emulators:exec` + seed | — | `build/reports/allure/maestro/` |
+| `./gradlew qaMaestroIos` | iOS Simulator flows via `firebase emulators:exec` + seed | — | `build/reports/allure/maestro-ios/` |
 | `./gradlew qaFirestoreRules` | Mocha (`firestore-tests/`) via `firebase emulators:exec --only firestore` | — | `build/reports/allure/firestore/` |
 | `./gradlew qaAll` | `testAllScopes` (common + Android host + Android device; no Maestro/Firestore-rules run) | yes | `build/reports/allure/all/` |
 
 ## Plain test/Maestro tasks (no Allure)
 
-> **Note**: All Maestro APK builds use `BuildConfig.USE_EMULATOR=true`. Flows always talk to the local Firebase Emulator, never to the production project. `qaMaestro` boots/tears down the emulator automatically. Standalone `maestroRunAll*` tasks require the emulator to already be running (`scripts/firebase/start.sh`).
+> **Note**: Android Maestro APK builds use `BuildConfig.USE_EMULATOR=true`; iOS Maestro simulator builds set `MS_USE_EMULATOR=YES`. Flows always talk to the local Firebase Emulator, never to the production project. `qaMaestroAndroid` / `qaMaestroIos` boot and tear down the emulator automatically. Standalone `maestroRunAll*` tasks require the emulator to already be running (`scripts/firebase/start.sh`).
 
 ```bash
 ./gradlew testCommon
@@ -76,7 +77,16 @@ FIREBASE_PROJECT_ID=demo-moneysurfer scripts/firebase/start.sh
 ./gradlew maestroRunOne -PmaestroFlow=05_sign_out.yaml
 ./gradlew maestroRunAllJunit
 ./gradlew maestroRunOneJunit -PmaestroFlow=05_sign_out.yaml
+
+./gradlew maestroRunAllAndroid
+./gradlew maestroRunOneAndroid -PmaestroFlow=05_sign_out.yaml
+./gradlew maestroRunAllIos
+./gradlew maestroRunAllIosJunit
 ```
+
+iOS defaults to simulator name `iPhone 17`. Override with
+`-PiosSimulatorName="<name>"`; pass `-PiosSimulatorUdid=<udid>` when multiple
+simulators are visible to Maestro.
 
 ## Integration tests (`:integration-test`)
 
@@ -184,27 +194,33 @@ Each can be run on its own; it consumes whatever results are already on disk and
 ./gradlew allureGenerateAndroidHost
 ./gradlew allureGenerateAndroidDevice
 ./gradlew allureGenerateMaestro
+./gradlew allureGenerateMaestroIos
 ./gradlew allureGenerateFirestore
 ./gradlew allureGenerateAll
 ```
 
 ## Report Paths
 
-- Maestro JUnit XML: `build/test-results/maestro/maestro-report.xml` (all flows), `build/test-results/maestro/maestro-<flow>.xml` (single flow)
+- Maestro Android JUnit XML: `build/test-results/maestro/maestro-report.xml` (all flows), `build/test-results/maestro/maestro-<flow>.xml` (single flow)
+- Maestro iOS JUnit XML: `build/test-results/maestro-ios/maestro-ios-report.xml`
 - Maestro native Allure results (generated from JUnit + debug artifacts): `build/allure-results/maestro/`
+- Maestro iOS native Allure results: `build/allure-results/maestro-ios/`
 - Maestro logs (when Gradle task runs): `build/logs/maestro/maestroRunAllJunit.out.log`, `build/logs/maestro/maestroRunAllJunit.err.log`
 - Maestro debug output (hierarchy, run diagnostics): `build/maestro-debug/`
 - Maestro screenshots/artifacts: `build/maestro-artifacts/`
+- Maestro iOS debug output/artifacts: `build/maestro-ios-debug/`, `build/maestro-ios-artifacts/`
 - Firestore rules JUnit XML: `build/test-results/firestore/firestore-report.xml`
 - Allure (per-scope):
   - `build/reports/allure/common/index.html`
   - `build/reports/allure/android-host/index.html`
   - `build/reports/allure/android-device/index.html`
   - `build/reports/allure/maestro/index.html`
+  - `build/reports/allure/maestro-ios/index.html`
   - `build/reports/allure/firestore/index.html`
   - `build/reports/allure/all/index.html`
 - Kover HTML coverage: `build/reports/kover/html/index.html`
-- Kover XML coverage: `build/reports/kover/report.xml`
+- Kover XML coverage: `build/reports/kover/report.xml` (also published to
+  SonarCloud — see [docs/testing/sonarcloud.md](docs/testing/sonarcloud.md))
 
 TODO: Publish the generated Allure HTML report in GitHub without requiring artifact download.
 Candidate: GitHub Pages from `build/reports/allure/common/` on protected-branch

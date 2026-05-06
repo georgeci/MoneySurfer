@@ -1,11 +1,11 @@
 package com.georgeci.moneysurfer.sync.fixtures.api
 
-import com.georgeci.moneysurfer.sync.api.SyncRequestId
-import com.georgeci.moneysurfer.sync.api.SyncSummary
 import com.georgeci.moneysurfer.domain.sync.PullProgress
 import com.georgeci.moneysurfer.domain.sync.PullSummary
 import com.georgeci.moneysurfer.domain.sync.UploadProgress
 import com.georgeci.moneysurfer.domain.sync.UploadSummary
+import com.georgeci.moneysurfer.sync.api.SyncRequestId
+import com.georgeci.moneysurfer.sync.api.SyncSummary
 
 /** Stable test ids — readable in failure output. */
 fun syncRequestId(value: String = "req-1"): SyncRequestId = SyncRequestId(value)

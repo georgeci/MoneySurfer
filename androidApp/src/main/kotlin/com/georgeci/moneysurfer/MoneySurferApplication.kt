@@ -2,6 +2,7 @@ package com.georgeci.moneysurfer
 
 import android.app.Application
 import com.georgeci.moneysurfer.di.initKoin
+import com.georgeci.moneysurfer.di.onlineWiring
 import org.koin.android.ext.koin.androidContext
 
 class MoneySurferApplication : Application() {
@@ -17,7 +18,7 @@ class MoneySurferApplication : Application() {
             System.setProperty("MS_USE_EMULATOR", "true")
         }
 
-        initKoin {
+        initKoin(extraModules = onlineWiring) {
             androidContext(this@MoneySurferApplication)
         }
     }
