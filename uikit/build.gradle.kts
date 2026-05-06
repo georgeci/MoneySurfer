@@ -27,6 +27,7 @@ kotlin {
                 implementation(libs.compose.uiToolingPreview)
                 implementation(compose.materialIconsExtended)
                 implementation(libs.material.kolor)
+                implementation(libs.koalaplot.core)
             }
         }
 

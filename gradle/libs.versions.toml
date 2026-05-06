@@ -45,6 +45,7 @@ kover = "0.9.8"
 kotlinx-serialization = "1.11.0"
 kotlinx-datetime = "0.7.1"
 material-kolor = "4.1.1"
+koalaplot = "0.11.2"
 androidBuiltInKotlin = "9.1.1"
 material = "1.13.0"
 jetbrainsKotlinJvm = "2.3.20"
@@ -120,6 +121,7 @@ gitlive-firebase-crashlytics = { module = "dev.gitlive:firebase-crashlytics", ve
 gitlive-firebase-firestore = { module = "dev.gitlive:firebase-firestore", version.ref = "gitlive-firebase" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 material-kolor = { module = "com.materialkolor:material-kolor", version.ref = "material-kolor" }
+koalaplot-core = { module = "io.github.koalaplot:koalaplot-core", version.ref = "koalaplot" }
 
 kmp-plugin = { module = "org.jetbrains.kotlin.multiplatform:org.jetbrains.kotlin.multiplatform.gradle.plugin", version.ref = "kotlin" }
 kmp-plugin-lib = { module = "com.android.kotlin.multiplatform.library:com.android.kotlin.multiplatform.library.gradle.plugin", version.ref = "agp" }
