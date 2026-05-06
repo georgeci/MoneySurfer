@@ -59,6 +59,63 @@ jobs:
             echo "run=true" >> "$GITHUB_OUTPUT"
           fi
 
+  android-compile:
+    name: Android debug compile
+    needs: decide
+    if: needs.decide.outputs.run == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    # Compile-only: catches AGP/Kotlin/google-services regressions without
+    # needing the dev keystore (assembleDebug would require DEV_* secrets,
+    # see androidApp/build.gradle.kts -> signingConfigs.dev).
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Decode Firebase config
+        uses: ./.github/actions/firebase-config
+        with:
+          debug-json:   ${{ secrets.GOOGLE_SERVICES_JSON_DEBUG }}
+          release-json: ${{ secrets.GOOGLE_SERVICES_JSON_RELEASE }}
+          ios-plist:    ${{ secrets.GOOGLE_SERVICE_INFO_PLIST }}
+
+      - name: Set up JDK
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Compile Android debug
+        run: ./gradlew :androidApp:processDebugGoogleServices :androidApp:compileDebugSources --stacktrace
+
+  android-offline-compile:
+    name: Android offline debug compile
+    needs: decide
+    if: needs.decide.outputs.run == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up JDK
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Compile offline Android debug
+        run: ./gradlew :androidApp-offline:compileDebugSources --stacktrace
+
+
   ios-build:
     name: iOS simulator build
     needs: decide

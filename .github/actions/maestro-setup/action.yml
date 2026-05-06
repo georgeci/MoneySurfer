@@ -26,9 +26,8 @@ runs:
       with:
         node-version: "20"
 
-    - name: Install firebase-tools
-      shell: bash
-      run: npm i -g firebase-tools
+    - name: Install Firebase CLI
+      uses: ./.github/actions/firebase-tools
 
     # Pinned to a specific Maestro release + sha256-verified to avoid running
     # whatever the install script serves at runtime.
