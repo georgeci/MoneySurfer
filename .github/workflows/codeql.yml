@@ -17,10 +17,43 @@ permissions:
   contents: read
 
 jobs:
+  # Same fan-out gate as ci.yml: skip CodeQL on doc-only / AI-tooling changes
+  # via job-level `if:` instead of top-level `paths-ignore`, so required
+  # status checks still report. Schedule-triggered runs always proceed.
+  changes:
+    name: Detect relevant changes
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    outputs:
+      code: ${{ steps.filter.outputs.code }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Filter paths
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            code:
+              - '**'
+              - '!**/*.md'
+              - '!.claude/**'
+              - '!.agents/**'
+              - '!ai/**'
+              - '!md/**'
+              - '!docs/**'
+              - '!.github/copilot-instructions.md'
+              - '!LICENSE'
+
   analyze:
     name: Analyze (${{ matrix.language }})
     runs-on: ubuntu-latest
     timeout-minutes: 40
+    needs: changes
+    # Run on schedule unconditionally; otherwise only when code paths changed.
+    if: >-
+      github.event_name == 'schedule' ||
+      needs.changes.outputs.code == 'true'
     permissions:
       security-events: write
       actions: read

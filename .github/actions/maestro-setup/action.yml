@@ -1,0 +1,82 @@
+name: Maestro setup
+description: >-
+  Install pinned Maestro + Allure + firebase-tools, write the
+  scripts/e2e-test-user.properties file used by qaMaestro* and seed.sh. Shared
+  between maestro-android and maestro-ios in the nightly workflow.
+
+inputs:
+  test-email:
+    description: TEST_EMAIL written to scripts/e2e-test-user.properties.
+    required: false
+    default: e2e+owner@test.local
+  test-password:
+    description: TEST_PASSWORD written to scripts/e2e-test-user.properties.
+    required: false
+    default: password
+  test-viewer-email:
+    description: TEST_VIEWER_EMAIL written to scripts/e2e-test-user.properties.
+    required: false
+    default: e2e+viewer@test.local
+
+runs:
+  using: composite
+  steps:
+    - name: Set up Node.js
+      uses: actions/setup-node@v6
+      with:
+        node-version: "20"
+
+    - name: Install firebase-tools
+      shell: bash
+      run: npm i -g firebase-tools
+
+    # Pinned to a specific Maestro release + sha256-verified to avoid running
+    # whatever the install script serves at runtime.
+    - name: Install Maestro CLI (pinned)
+      shell: bash
+      env:
+        MAESTRO_VERSION: "2.5.1"
+        MAESTRO_SHA256: "2d924bfd37cccabca438a727213648cbfe4f8bb711559ec8e9d199dc09a5ce52"
+      run: |
+        set -euo pipefail
+        url="https://github.com/mobile-dev-inc/Maestro/releases/download/cli-${MAESTRO_VERSION}/maestro.zip"
+        tmp="${RUNNER_TEMP}/maestro.zip"
+        curl -fsSL "$url" -o "$tmp"
+        if command -v sha256sum >/dev/null 2>&1; then
+          actual="$(sha256sum "$tmp" | awk '{print $1}')"
+        else
+          actual="$(shasum -a 256 "$tmp" | awk '{print $1}')"
+        fi
+        if [ "$actual" != "$MAESTRO_SHA256" ]; then
+          echo "Maestro checksum mismatch: expected $MAESTRO_SHA256, got $actual" >&2
+          exit 1
+        fi
+        unzip -q "$tmp" -d "$HOME/.maestro"
+        echo "$HOME/.maestro/maestro/bin" >> "$GITHUB_PATH"
+
+    - name: Install Allure CLI
+      shell: bash
+      env:
+        ALLURE_VERSION: "2.34.1"
+      run: |
+        set -euo pipefail
+        curl -fsSL "https://github.com/allure-framework/allure2/releases/download/${ALLURE_VERSION}/allure-${ALLURE_VERSION}.tgz" \
+          | tar -xz -C "${RUNNER_TEMP}"
+        echo "${RUNNER_TEMP}/allure-${ALLURE_VERSION}/bin" >> "${GITHUB_PATH}"
+
+    # qa.gradle.kts reads TEST_EMAIL/TEST_PASSWORD from this file and forwards
+    # them to Maestro via `--env`. seed.sh reads the same file to provision
+    # users in the Auth emulator. Defaults match seed.sh so the workflow runs
+    # without any E2E_* secrets configured.
+    - name: Write e2e test-user properties
+      shell: bash
+      env:
+        TEST_EMAIL: ${{ inputs.test-email }}
+        TEST_PASSWORD: ${{ inputs.test-password }}
+        TEST_VIEWER_EMAIL: ${{ inputs.test-viewer-email }}
+      run: |
+        cat > scripts/e2e-test-user.properties <<EOF
+        TEST_EMAIL=${TEST_EMAIL}
+        TEST_PASSWORD=${TEST_PASSWORD}
+        TEST_VIEWER_EMAIL=${TEST_VIEWER_EMAIL}
+        EOF

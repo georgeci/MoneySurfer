@@ -5,11 +5,6 @@ name: Nightly
 #
 # Cost note: macos-14 runners are ~10x more expensive than ubuntu, which is
 # why iOS verification lives here instead of in the per-PR ci.yml.
-#
-# qa-all covers every test scope (common, android-host, android-device,
-# maestro, firestore) and publishes Allure (with history) + Kover under
-# /nightly/ on Pages. It self-skips when no commits landed since the last
-# successful nightly.
 
 on:
   schedule:
@@ -19,7 +14,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write    # qa-all publishes to gh-pages
+  contents: write    # nightly-publish pushes to gh-pages
   actions: read      # decide queries `gh run list`
 
 concurrency:
@@ -27,8 +22,47 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  decide:
+    name: Skip if no changes since last successful run
+    runs-on: ubuntu-latest
+    outputs:
+      run: ${{ steps.check.outputs.run }}
+    steps:
+      - name: Check last successful nightly SHA
+        id: check
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "Manual dispatch — running unconditionally."
+            echo "run=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          # Most recent already-finished successful nightly. Self-exclude in
+          # case the API briefly lists this very run while it's still queued.
+          last_sha=$(gh run list \
+            --workflow=nightly.yml \
+            --branch=main \
+            --status=success \
+            --limit=2 \
+            --json headSha,databaseId \
+            --repo "${GITHUB_REPOSITORY}" \
+            --jq '[.[] | select(.databaseId != ${{ github.run_id }})][0].headSha // ""')
+          echo "last successful SHA: ${last_sha:-<none>}"
+          echo "current SHA:         ${GITHUB_SHA}"
+          if [[ -n "$last_sha" && "$last_sha" == "$GITHUB_SHA" ]]; then
+            echo "No new commits since last nightly success — skipping."
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          fi
+
   ios-build:
     name: iOS simulator build
+    needs: decide
+    if: needs.decide.outputs.run == 'true'
     runs-on: macos-14
     timeout-minutes: 40
     # Lean Debug build for iOS Simulator (arm64), no code signing, no archive,
@@ -89,49 +123,16 @@ jobs:
             build \
             | "${FORMATTER[@]}"
 
-  decide:
-    name: Skip if no changes since last successful run
-    runs-on: ubuntu-latest
-    outputs:
-      run: ${{ steps.check.outputs.run }}
-    steps:
-      - name: Check last successful nightly SHA
-        id: check
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            echo "Manual dispatch — running unconditionally."
-            echo "run=true" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-          # Most recent already-finished successful nightly. Self-exclude in
-          # case the API briefly lists this very run while it's still queued.
-          last_sha=$(gh run list \
-            --workflow=nightly.yml \
-            --branch=main \
-            --status=success \
-            --limit=2 \
-            --json headSha,databaseId \
-            --repo "${GITHUB_REPOSITORY}" \
-            --jq '[.[] | select(.databaseId != ${{ github.run_id }})][0].headSha // ""')
-          echo "last successful SHA: ${last_sha:-<none>}"
-          echo "current SHA:         ${GITHUB_SHA}"
-          if [[ -n "$last_sha" && "$last_sha" == "$GITHUB_SHA" ]]; then
-            echo "No new commits since last nightly success — skipping."
-            echo "run=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "run=true" >> "$GITHUB_OUTPUT"
-          fi
-
-  qa-all:
-    name: qaAll (all scopes)
+  maestro-android:
+    name: Maestro Android (E2E)
     needs: decide
     if: needs.decide.outputs.run == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 90
+    # Heavy: builds debug APK with USE_EMULATOR=true, boots AVD + Firebase
+    # Emulator (auth + firestore), seeds test users, runs all flows in
+    # scripts/maestro/, generates Allure. Lives in nightly because the AVD
+    # boot alone is ~5–8 min.
 
     steps:
       - name: Checkout
@@ -142,11 +143,9 @@ jobs:
         with:
           debug-json:   ${{ secrets.GOOGLE_SERVICES_JSON_DEBUG }}
           release-json: ${{ secrets.GOOGLE_SERVICES_JSON_RELEASE }}
-          ios-plist:    ${{ secrets.GOOGLE_SERVICE_INFO_PLIST }}
 
-      # firebase-tools ≥14 (used by qaFirestoreRules + qaMaestro) needs JDK 21+
-      # for the Firestore emulator JAR. AGP/Kotlin happily build on 21 too, so
-      # we use a single JDK for the whole nightly job.
+      # firebase-tools ≥14 ships a Firestore emulator JAR that needs JDK 21+.
+      # Same caveat as the firestore-rules job in ci.yml.
       - name: Set up JDK
         uses: actions/setup-java@v5
         with:
@@ -156,118 +155,225 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v6
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v6
+      - name: Set up Maestro + Allure + e2e creds
+        uses: ./.github/actions/maestro-setup
         with:
-          node-version: "20"
-          cache: npm
-          cache-dependency-path: firestore-tests/package-lock.json
+          test-email:        ${{ secrets.E2E_TEST_EMAIL        || 'e2e+owner@test.local' }}
+          test-password:     ${{ secrets.E2E_TEST_PASSWORD     || 'password' }}
+          test-viewer-email: ${{ secrets.E2E_TEST_VIEWER_EMAIL || 'e2e+viewer@test.local' }}
 
-      - name: Install firebase-tools
-        run: npm i -g firebase-tools
-
-      - name: Install firestore-tests deps
-        working-directory: firestore-tests
-        run: npm ci
-
-      - name: Install Allure CLI
-        shell: bash
-        run: |
-          set -euo pipefail
-          ALLURE_VERSION=2.34.1
-          curl -Ls "https://github.com/allure-framework/allure2/releases/download/${ALLURE_VERSION}/allure-${ALLURE_VERSION}.tgz" \
-            | tar -xz -C "${RUNNER_TEMP}"
-          echo "${RUNNER_TEMP}/allure-${ALLURE_VERSION}/bin" >> "${GITHUB_PATH}"
-
-      # Pin Maestro to a specific version. The install script honours
-      # MAESTRO_VERSION; without it we'd always pull `latest` and re-execute
-      # whatever the upstream script happens to be — both a reproducibility
-      # and a supply-chain concern. Bump deliberately when the qaMaestro flows
-      # need newer CLI features.
-      - name: Install Maestro CLI
-        shell: bash
-        env:
-          MAESTRO_VERSION: "2.5.1"
-        run: |
-          set -euo pipefail
-          curl -fsSL "https://get.maestro.mobile.dev" | bash
-          installed="$("$HOME/.maestro/bin/maestro" --version 2>/dev/null || true)"
-          if [[ "$installed" != *"$MAESTRO_VERSION"* ]]; then
-            echo "::error::Maestro version mismatch: wanted $MAESTRO_VERSION, got '$installed'."
-            exit 1
-          fi
-          echo "$HOME/.maestro/bin" >> "$GITHUB_PATH"
-
-      # ubuntu-latest has nested-virt available but KVM device perms aren't set
-      # up by default — this udev rule grants r/w so the AVD can boot.
+      # Hardware acceleration for the AVD. The runner image ships KVM but the
+      # default user isn't in the kvm group.
       - name: Enable KVM
-        shell: bash
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' \
             | sudo tee /etc/udev/rules.d/99-kvm4all.rules
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
 
-      - name: Run qaAll inside emulator
+      - name: Run qaMaestroAndroid
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 34
+          target: aosp_atd
           arch: x86_64
-          target: google_apis
           profile: pixel_6
-          force-avd-creation: false
-          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
+          ram-size: 4096M
           disable-animations: true
-          script: ./gradlew qaAll --stacktrace
+          emulator-options: -no-window -no-snapshot -gpu swiftshader_indirect -noaudio -no-boot-anim
+          script: ./gradlew qaMaestroAndroid --stacktrace
 
-      - name: Upload native Allure results (Maestro)
+      - name: Upload Allure report
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: nightly-allure-results-maestro
-          path: build/allure-results/maestro/
+          name: allure-report-maestro-android
+          path: build/reports/allure/maestro/
           if-no-files-found: warn
           retention-days: 14
 
-      - name: Upload Maestro debug artifacts
+      - name: Upload JUnit results
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: nightly-maestro-debug
+          name: maestro-android-junit
+          path: build/test-results/maestro/*.xml
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Upload Maestro debug + screenshots
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: maestro-android-debug
           path: |
             build/maestro-debug/
             build/maestro-artifacts/
             build/logs/maestro/
+          if-no-files-found: ignore
+          retention-days: 7
+
+  maestro-ios:
+    name: Maestro iOS (E2E)
+    needs: decide
+    if: needs.decide.outputs.run == 'true'
+    runs-on: macos-14
+    timeout-minutes: 90
+    # Same shape as maestro-android but on a macOS runner: boots an iPhone
+    # simulator, builds the Debug app with MS_USE_EMULATOR=YES, runs flows.
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Decode Firebase config
+        uses: ./.github/actions/firebase-config
+        with:
+          ios-plist: ${{ secrets.GOOGLE_SERVICE_INFO_PLIST }}
+
+      - name: Set up JDK
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Set up Maestro + Allure + e2e creds
+        uses: ./.github/actions/maestro-setup
+        with:
+          test-email:        ${{ secrets.E2E_TEST_EMAIL        || 'e2e+owner@test.local' }}
+          test-password:     ${{ secrets.E2E_TEST_PASSWORD     || 'password' }}
+          test-viewer-email: ${{ secrets.E2E_TEST_VIEWER_EMAIL || 'e2e+viewer@test.local' }}
+
+      - name: Show Xcode version
+        run: xcodebuild -version
+
+      # macos runner images can have multiple available iPhone simulators with
+      # the same name across iOS runtimes. Pick the highest-iOS device and emit
+      # both name (xcodebuild -destination uses name=...) and UDID (Maestro
+      # `--device` and `simctl boot/install`) so the build, install and run
+      # steps all target the exact same simulator.
+      - name: Boot iOS simulator
+        id: ios-sim
+        shell: bash
+        run: |
+          set -euo pipefail
+          read -r SIM_UDID SIM_NAME SIM_RUNTIME < <(xcrun simctl list devices available -j \
+            | python3 -c '
+          import json, re, sys
+          data = json.load(sys.stdin)["devices"]
+          candidates = []
+          for runtime, devices in data.items():
+              if "iOS" not in runtime:
+                  continue
+              # Sort key: iOS version tuple from the runtime identifier.
+              m = re.search(r"iOS-(\d+)-(\d+)", runtime) or re.search(r"iOS (\d+)\.(\d+)", runtime)
+              version = (int(m.group(1)), int(m.group(2))) if m else (0, 0)
+              for d in devices:
+                  if d.get("isAvailable") and d["name"].startswith("iPhone"):
+                      candidates.append((version, d["udid"], d["name"], runtime))
+          if not candidates:
+              sys.exit(0)
+          # Prefer the iPhone family closest to qa.gradle.kts default ("iPhone 17"),
+          # fall back to highest iOS version of any iPhone.
+          for prefix in ("iPhone 17", "iPhone 16", "iPhone 15"):
+              filtered = [c for c in candidates if c[2].startswith(prefix)]
+              if filtered:
+                  filtered.sort(reverse=True)
+                  v, udid, name, rt = filtered[0]
+                  print(f"{udid} {name} {rt}"); sys.exit(0)
+          candidates.sort(reverse=True)
+          v, udid, name, rt = candidates[0]
+          print(f"{udid} {name} {rt}")
+          ') || true
+          if [ -z "${SIM_UDID:-}" ]; then
+            echo "No iPhone simulator available on this runner image." >&2
+            xcrun simctl list devices available
+            exit 1
+          fi
+          echo "Using simulator: $SIM_NAME ($SIM_RUNTIME) — $SIM_UDID"
+          xcrun simctl boot "$SIM_UDID" || true
+          xcrun simctl bootstatus "$SIM_UDID" -b
+          echo "udid=$SIM_UDID" >> "$GITHUB_OUTPUT"
+          echo "name=$SIM_NAME" >> "$GITHUB_OUTPUT"
+
+      - name: Run qaMaestroIos
+        run: |
+          ./gradlew qaMaestroIos \
+            -PiosSimulatorName="${{ steps.ios-sim.outputs.name }}" \
+            -PiosSimulatorUdid="${{ steps.ios-sim.outputs.udid }}" \
+            --stacktrace
+
+      - name: Upload Allure report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: allure-report-maestro-ios
+          path: build/reports/allure/maestro-ios/
           if-no-files-found: warn
           retention-days: 14
 
-      # Stage every supported Allure input dir (JUnit XML + native JSON) into
-      # one flat tree for simple-elf to consume in the publish step below.
-      - name: Stage Allure results
+      - name: Upload JUnit results
         if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: maestro-ios-junit
+          path: build/test-results/maestro-ios/*.xml
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Upload Maestro debug + screenshots
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: maestro-ios-debug
+          path: |
+            build/maestro-ios-debug/
+            build/maestro-ios-artifacts/
+            build/logs/maestro-ios/
+          if-no-files-found: ignore
+          retention-days: 7
+
+  nightly-publish:
+    name: Aggregate + publish nightly to Pages
+    needs: [decide, maestro-android, maestro-ios]
+    if: always() && needs.decide.outputs.run == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download Maestro Android JUnit
+        uses: actions/download-artifact@v4
+        with:
+          name: maestro-android-junit
+          path: allure-input/maestro-android
+        continue-on-error: true
+
+      - name: Download Maestro iOS JUnit
+        uses: actions/download-artifact@v4
+        with:
+          name: maestro-ios-junit
+          path: allure-input/maestro-ios
+        continue-on-error: true
+
+      - name: Stage Allure results
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p allure-results
-          # JUnit XMLs across all scopes.
-          find . -type f -name '*.xml' \
-            \( -path '*/build/test-results/jvmTest/*' \
-            -o -path '*/build/test-results/testAndroidHostTest/*' \
-            -o -path '*/build/outputs/androidTest-results/*' \
-            -o -path '*/build/test-results/firestore/*' \) \
-            -not -path './gh-pages/*' \
-            | while read -r f; do
-              dest="allure-results/$(echo "${f#./}" | tr '/' '__')"
-              cp "$f" "$dest"
-            done
-          # Maestro: native JSON + metadata, copied verbatim.
-          if [[ -d build/allure-results/maestro ]]; then
-            cp -r build/allure-results/maestro/. allure-results/
-          fi
+          # find returns 0 even with no matches — let the loop body just not
+          # execute. No reliance on `shopt -s globstar`.
+          find allure-input -type f -name '*.xml' 2>/dev/null | while read -r f; do
+            dest="allure-results/$(echo "${f#allure-input/}" | tr '/' '__')"
+            cp "$f" "$dest"
+          done
           echo "Staged $(ls allure-results 2>/dev/null | wc -l) input(s)."
 
       - name: Checkout gh-pages
-        if: always()
         uses: actions/checkout@v6
         with:
           ref: gh-pages
@@ -275,12 +381,10 @@ jobs:
         continue-on-error: true
 
       - name: Ensure gh-pages dir exists
-        if: always()
         shell: bash
         run: mkdir -p gh-pages/nightly/allure
 
       - name: Build Allure report (with history)
-        if: always()
         uses: simple-elf/allure-report-action@53ebb757a2097edc77c53ecef4d454fc2f2f774c # v1.13
         with:
           allure_results: allure-results
@@ -289,20 +393,17 @@ jobs:
           allure_history: allure-history
 
       - name: Assemble Pages payload
-        if: always()
         shell: bash
         run: |
           set -euo pipefail
-          mkdir -p public/nightly/allure public/nightly/kover
+          mkdir -p public/nightly/allure
           if [[ -d allure-history ]]; then
             cp -r allure-history/. public/nightly/allure/
           fi
-          if [[ -d build/reports/kover/html ]]; then
-            cp -r build/reports/kover/html/. public/nightly/kover/
-          fi
 
+      # keep_files: true preserves the per-push /allure/ + /kover/ subtrees
+      # that the ci.yml `publish` job manages independently.
       - name: Deploy to gh-pages (/nightly/)
-        if: always()
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
