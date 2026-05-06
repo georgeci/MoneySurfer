@@ -1,0 +1,33 @@
+appId: ${APP_ID}
+name: Sync — Force sync now from Sync hub
+---
+# Pre-condition: active workspace and dashboard.
+# Settings → Sync → "Force sync now" → wait for the run to complete.
+
+- runFlow: 03_dashboard_add_account.yaml
+
+- tapOn:
+    text: "Settings"
+- assertVisible:
+    text: "Settings"
+
+- tapOn:
+    text: "Sync"
+
+# Sync screen
+- assertVisible:
+    text: "Sync"
+- assertVisible:
+    text: "Force sync now"
+
+- tapOn:
+    text: "Force sync now"
+
+# After triggering, the hero stays on screen and the action remains tappable.
+# Don't assert the in-progress label (race-y on emulator with seeded data).
+- assertVisible:
+    text: "Force sync now"
+
+- pressKey: Back
+- assertVisible:
+    text: "Settings"

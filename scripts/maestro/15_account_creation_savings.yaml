@@ -1,0 +1,38 @@
+appId: ${APP_ID}
+name: Account — Create savings account with opening balance
+---
+# Pre-condition: active workspace; baseline account already created.
+# Exercises the "Savings" account type which other flows don't cover.
+
+- runFlow: 03_dashboard_add_account.yaml
+
+- runFlow:
+    when:
+      notVisible: "Rainy Day"
+    commands:
+      - tapOn:
+          text: "Add account"
+      - assertVisible:
+          text: "New account"
+
+      - tapOn:
+          text: "Savings"
+
+      - tapOn:
+          text: "Account name"
+      - inputText: "Rainy Day"
+      - tapOn:
+          text: "Opening balance"
+      - inputText: "2500"
+      - hideKeyboard
+
+      - tapOn:
+          text: "Save"
+
+# Back on Dashboard with the new savings account visible
+- assertVisible:
+    text: "Accounts"
+- assertVisible:
+    text: "Rainy Day"
+- assertVisible:
+    text: "Main Bank"

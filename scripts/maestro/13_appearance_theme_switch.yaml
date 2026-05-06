@@ -1,0 +1,56 @@
+appId: ${APP_ID}
+name: Appearance — Switch theme between Dark, Light and System
+---
+# Pre-condition: active workspace and dashboard.
+# Settings → Appearance → tap each theme row, assert all three are visible
+# (radio rows persist regardless of selection).
+
+- runFlow: 03_dashboard_add_account.yaml
+
+- tapOn:
+    text: "Settings"
+- assertVisible:
+    text: "Settings"
+
+- tapOn:
+    text: "Appearance"
+
+# Appearance screen
+- assertVisible:
+    text: "Theme"
+- assertVisible:
+    text: "Follow system"
+- assertVisible:
+    text: "Light"
+- assertVisible:
+    text: "Dark"
+- assertVisible:
+    text: "Card style"
+
+# Switch to Dark
+- tapOn:
+    text: "Dark"
+- assertVisible:
+    text: "Dim surfaces, less glare"
+
+# Switch to Light
+- tapOn:
+    text: "Light"
+- assertVisible:
+    text: "Bright surfaces"
+
+# Restore Follow system
+- tapOn:
+    text: "Follow system"
+- assertVisible:
+    text: "Match device dark mode"
+
+# Try a different card style and back
+- tapOn:
+    text: "Outlined"
+- assertVisible:
+    text: "Bordered surfaces, no fill"
+
+- pressKey: Back
+- assertVisible:
+    text: "Settings"
