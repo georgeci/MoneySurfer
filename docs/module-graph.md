@@ -89,15 +89,6 @@ graph LR
   :sync:default --> :sync:api
   :sync:default --> :domain
   :sync:default --> :sync-test-fixtures
-  : --> :composeApp
-  : --> :composeAppOffline
-  : --> :domain
-  : --> :data-local
-  : --> :data-remote
-  : --> :sync-surfer
-  : --> :sync:default
-  : --> :uikit
-  : --> :feature:login
   :sync:no-op --> :sync:api
   :data-remote --> :domain
   :feature:login --> :domain

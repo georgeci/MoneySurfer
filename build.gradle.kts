@@ -22,6 +22,9 @@ plugins {
 moduleGraphConfig {
     readmePath.set("$rootDir/docs/module-graph.md")
     heading.set("# Module Dependency Graph")
+    // Hide root-project edges that come from `kover(...)` aggregation —
+    // those are coverage wiring, not architectural dependencies.
+    excludedConfigurationsRegex.set(".*kover.*")
 }
 
 apply(from = "gradle/qa.gradle.kts")
