@@ -23,7 +23,8 @@ internal enum class TopLevelDestination(
     ),
     Accounts(Route.AccountsManage, SurferIcons.Wallet, Res.string.nav_accounts),
     Categories(Route.CategoriesManage, SurferIcons.Category, Res.string.nav_categories),
-    Settings(Route.Settings, SurferIcons.Settings, Res.string.nav_settings);
+    Settings(Route.Settings, SurferIcons.Settings, Res.string.nav_settings),
+    ;
 
     fun matches(current: Route.TopLevel?): Boolean = when (this) {
         Dashboard -> current is Route.Dashboard
