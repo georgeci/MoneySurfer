@@ -500,13 +500,14 @@ jobs:
           else
             FORMATTER=(cat)
           fi
+          # -derivedDataPath requires -scheme/-testProductsPath/-xctestrun;
+          # we use -target so let xcodebuild pick the default location.
           xcodebuild \
             -project iosApp/iosApp.xcodeproj \
             -target iosApp \
             -configuration Debug \
             -sdk iphonesimulator \
             -arch arm64 \
-            -derivedDataPath build/ios-derived \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY="" \
