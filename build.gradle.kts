@@ -16,6 +16,7 @@ plugins {
     alias(libs.plugins.kover)
     alias(libs.plugins.android.built.in1.kotlin) apply false
     alias(libs.plugins.sonarqube)
+    alias(libs.plugins.cpd)
     alias(libs.plugins.moduleGraph)
 }
 
@@ -28,6 +29,40 @@ moduleGraphConfig {
 }
 
 apply(from = "gradle/qa.gradle.kts")
+
+// Copy-paste detection (same engine SonarCloud uses for Kotlin via PMD CPD).
+// Run locally before commit: `./gradlew cpdCheck`.
+// Reports: build/reports/cpd/cpdCheck.{xml,txt}.
+// See ai/skills/cpd-rules.md for usage rules.
+cpd {
+    language = "kotlin"
+    minimumTokenCount = 100
+    toolVersion = "7.7.0"
+}
+
+tasks.named<de.aaschmid.gradle.plugins.cpd.Cpd>("cpdCheck") {
+    description = "Detects copy-paste duplication across all Kotlin sources."
+    group = "verification"
+    // Surface duplicates without breaking the build for now. Flip to `false`
+    // once the existing duplication backlog is clean to enforce.
+    ignoreFailures = true
+    reports {
+        xml.required.set(true)
+        text.required.set(true)
+    }
+    source = fileTree(rootDir) {
+        include("**/src/**/*.kt")
+        exclude(
+            "**/build/**",
+            "**/generated/**",
+            "**/*Test*/**",
+            "iosApp/**",
+            "iosAppOffline/**",
+            "**/.gradle/**",
+            "**/.idea/**",
+        )
+    }
+}
 
 subprojects {
     apply(plugin = "io.gitlab.arturbosch.detekt")

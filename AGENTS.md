@@ -186,6 +186,17 @@ QA entry points:
 ./gradlew qaAll
 ```
 
+**Before any commit that touches Kotlin sources**, run copy-paste detection
+locally so duplication is fixed before SonarCloud flags it on the PR:
+
+```bash
+./gradlew cpdCheck
+```
+
+Read the resulting `build/reports/cpd/cpdCheck.text`. See
+[ai/skills/cpd-rules.md](ai/skills/cpd-rules.md) for how to interpret hits
+and when extracting is the right fix vs. leaving repetition alone.
+
 Firestore rules:
 
 ```bash
