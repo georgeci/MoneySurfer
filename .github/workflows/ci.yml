@@ -498,12 +498,12 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p allure-results
-          if compgen -G "allure-input/**/*.xml" > /dev/null; then
-            find allure-input -type f -name '*.xml' | while read -r f; do
-              dest="allure-results/$(echo "${f#allure-input/}" | tr '/' '__')"
-              cp "$f" "$dest"
-            done
-          fi
+          # find returns 0 even with no matches — let the loop body simply not
+          # execute. Avoids relying on `shopt -s globstar` for `**` glob support.
+          find allure-input -type f -name '*.xml' 2>/dev/null | while read -r f; do
+            dest="allure-results/$(echo "${f#allure-input/}" | tr '/' '__')"
+            cp "$f" "$dest"
+          done
           echo "Staged $(ls allure-results 2>/dev/null | wc -l) XML(s)."
 
       # Decide whether this run publishes to Pages. PRs (especially from forks)
@@ -539,7 +539,7 @@ jobs:
 
       - name: Build Allure report (with history)
         if: steps.gate.outputs.publish == 'true'
-        uses: simple-elf/allure-report-action@master
+        uses: simple-elf/allure-report-action@53ebb757a2097edc77c53ecef4d454fc2f2f774c # v1.13
         with:
           allure_results: allure-results
           gh_pages: gh-pages/allure

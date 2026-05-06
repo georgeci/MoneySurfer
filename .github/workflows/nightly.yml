@@ -179,11 +179,23 @@ jobs:
             | tar -xz -C "${RUNNER_TEMP}"
           echo "${RUNNER_TEMP}/allure-${ALLURE_VERSION}/bin" >> "${GITHUB_PATH}"
 
+      # Pin Maestro to a specific version. The install script honours
+      # MAESTRO_VERSION; without it we'd always pull `latest` and re-execute
+      # whatever the upstream script happens to be — both a reproducibility
+      # and a supply-chain concern. Bump deliberately when the qaMaestro flows
+      # need newer CLI features.
       - name: Install Maestro CLI
         shell: bash
+        env:
+          MAESTRO_VERSION: "2.5.1"
         run: |
           set -euo pipefail
-          curl -Ls "https://get.maestro.mobile.dev" | bash
+          curl -fsSL "https://get.maestro.mobile.dev" | bash
+          installed="$("$HOME/.maestro/bin/maestro" --version 2>/dev/null || true)"
+          if [[ "$installed" != *"$MAESTRO_VERSION"* ]]; then
+            echo "::error::Maestro version mismatch: wanted $MAESTRO_VERSION, got '$installed'."
+            exit 1
+          fi
           echo "$HOME/.maestro/bin" >> "$GITHUB_PATH"
 
       # ubuntu-latest has nested-virt available but KVM device perms aren't set
@@ -269,7 +281,7 @@ jobs:
 
       - name: Build Allure report (with history)
         if: always()
-        uses: simple-elf/allure-report-action@master
+        uses: simple-elf/allure-report-action@53ebb757a2097edc77c53ecef4d454fc2f2f774c # v1.13
         with:
           allure_results: allure-results
           gh_pages: gh-pages/nightly/allure
