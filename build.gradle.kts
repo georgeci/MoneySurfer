@@ -16,6 +16,12 @@ plugins {
     alias(libs.plugins.kover)
     alias(libs.plugins.android.built.in1.kotlin) apply false
     alias(libs.plugins.sonarqube)
+    alias(libs.plugins.moduleGraph)
+}
+
+moduleGraphConfig {
+    readmePath.set("$rootDir/docs/module-graph.md")
+    heading.set("# Module Dependency Graph")
 }
 
 apply(from = "gradle/qa.gradle.kts")

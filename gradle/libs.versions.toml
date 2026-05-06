@@ -49,6 +49,7 @@ androidBuiltInKotlin = "9.1.1"
 material = "1.13.0"
 jetbrainsKotlinJvm = "2.3.20"
 sonarqube = "6.0.1.5171"
+moduleGraph = "0.13.0"
 
 [libraries]
 androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "coreSplashscreen" }
@@ -144,3 +145,4 @@ android-built-in1-kotlin = { id = "com.android.built-in-kotlin", version.ref = "
 kmp-lib = { id = "kmp.lib" }
 sonarqube = { id = "org.sonarqube", version.ref = "sonarqube" }
 kmpApp = { id = "kmp.app" }
+moduleGraph = { id = "dev.iurysouza.modulegraph", version.ref = "moduleGraph" }
