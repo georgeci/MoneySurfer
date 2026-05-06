@@ -12,19 +12,27 @@ Run:
 git status --short && git diff --name-only $(git merge-base HEAD main)..HEAD
 ```
 
-Build the set of Gradle modules that contain modified `*.kt`/`*.kts` files. A module is the top-level directory containing a `build.gradle.kts` (e.g. `domain`, `feature/transaction`, `sync/default`, `data-local`). Map paths to Gradle task notation: `feature/transaction` → `:feature:transaction:detekt`.
+Build the set of Gradle modules that contain modified `*.kt`/`*.kts` files. A module is the top-level directory containing a `build.gradle.kts`. Map filesystem paths to Gradle task paths by replacing `/` with `:` and prefixing `:`, then appending `:detekt`:
+
+- `domain` → `:domain:detekt`
+- `data-local` → `:data-local:detekt`
+- `feature/transaction` → `:feature:transaction:detekt`
+- `sync/default` → `:sync:default:detekt`
 
 If no `.kt`/`.kts` files were touched, stop and report that detekt is not needed.
 
 ## 2. Run detekt with auto-correct
 
-Run in parallel for the affected modules (cap at ~6 modules per invocation; if more, do everything together with the root task):
+`--auto-correct` is a Detekt **task** option (not a Gradle CLI option), so it must follow the task path on the command line. Detekt's `formatting` plugin is wired in this repo, so this auto-fixes most style/formatting findings.
+
+Run in parallel for the affected modules (cap at ~6 modules per invocation):
 
 ```
-./gradlew <module>:detekt --auto-correct
+./gradlew :domain:detekt --auto-correct
+./gradlew :feature:transaction:detekt --auto-correct
 ```
 
-If 6+ modules are affected or the changes touch root build files, just run:
+If 6+ modules are affected or the changes touch root build files, run the aggregate task instead:
 
 ```
 ./gradlew detekt --auto-correct
