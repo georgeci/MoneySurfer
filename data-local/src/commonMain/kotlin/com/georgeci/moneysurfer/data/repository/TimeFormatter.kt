@@ -1,8 +1,8 @@
 package com.georgeci.moneysurfer.data.repository
 
 import kotlinx.datetime.LocalDate
-import kotlin.time.Instant
 import org.koin.core.annotation.Single
+import kotlin.time.Instant
 
 @Single
 class TimeFormatter {

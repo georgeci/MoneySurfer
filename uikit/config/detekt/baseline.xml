@@ -4,17 +4,22 @@
   <CurrentIssues>
     <ID>CyclomaticComplexMethod:SurferBalanceWidget.kt$@Composable fun SurferBalanceWidget( title: String, balance: String, modifier: Modifier = Modifier, size: SurferWidgetSize = LocalSurferWidgetSize.current, trendText: String? = null, emptyText: String? = null, showSparkline: Boolean = true, )</ID>
     <ID>EmptyFunctionBlock:SurferBalanceWidget.kt${ }</ID>
+    <ID>MagicNumber:SurferBudgetsWidget.kt$3</ID>
     <ID>MagicNumber:SurferCategoriesDonutWidget.kt$3</ID>
     <ID>MagicNumber:SurferCategoriesDonutWidget.kt$360f</ID>
     <ID>MagicNumber:SurferCategoriesDonutWidget.kt$5</ID>
     <ID>MagicNumber:SurferCategoriesDonutWidget.kt$90f</ID>
-    <ID>MagicNumber:SurferCategoryBottomSheet.kt$4</ID>
     <ID>MagicNumber:SurferCategoryBubble.kt$0.5f</ID>
     <ID>MagicNumber:SurferCategoryBubble.kt$SurferCategoryPalette$31</ID>
+    <ID>MagicNumber:SurferGoalsWidget.kt$100</ID>
+    <ID>MagicNumber:SurferGoalsWidget.kt$16f</ID>
+    <ID>MagicNumber:SurferGoalsWidget.kt$3f</ID>
+    <ID>MagicNumber:SurferInsightsWidget.kt$3</ID>
     <ID>MagicNumber:SurferMemberRow.kt$31</ID>
-    <ID>MagicNumber:SurferSplitAmount.kt$0.35f</ID>
+    <ID>MagicNumber:SurferRecurringWidget.kt$3</ID>
     <ID>MaxLineLength:SurferAccentColorBottomSheet.kt$color = if (isSelected) AppTheme.materialColors.onSurface else AppTheme.materialColors.onSurfaceVariant</ID>
-    <ID>MaxLineLength:SurferCategoryBottomSheet.kt$val labelColor = if (selected) AppTheme.materialColors.onSecondaryContainer else AppTheme.materialColors.onSurface</ID>
+    <ID>MaxLineLength:SurferCard.kt$tokens = if (selected) SurferFilledContainerDefaults.selected() else SurferFilledContainerDefaults.default()</ID>
+    <ID>MaxLineLength:SurferCard.kt$tokens = if (selected) SurferOutlinedContainerDefaults.selected() else SurferOutlinedContainerDefaults.default()</ID>
     <ID>UnusedParameter:SurferBalanceWidget.kt$modifier: Modifier = Modifier</ID>
   </CurrentIssues>
 </SmellBaseline>

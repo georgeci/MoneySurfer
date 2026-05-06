@@ -2,8 +2,13 @@
 <SmellBaseline>
   <ManuallySuppressedIssues/>
   <CurrentIssues>
+    <ID>EmptyFunctionBlock:ApplyTransactionChangeUseCaseTest.kt$ApplyTxEnv.&lt;no name provided&gt;${}</ID>
+    <ID>EmptyFunctionBlock:RecalculateAccountBalanceUseCaseTest.kt$RecalcEnv.&lt;no name provided&gt;${}</ID>
+    <ID>LongMethod:AcceptInviteUseCase.kt$AcceptInviteUseCase$suspend operator fun invoke(id: WorkspaceInviteId): Either&lt;InviteError, Unit&gt;</ID>
+    <ID>MaxLineLength:RemoveLeaveAndRoleTest.kt$callerId: com.georgeci.moneysurfer.domain.primitives.UserId? = if (callerRole == WorkspaceRole.OWNER) OWNER_ID else EDITOR_ID</ID>
     <ID>TooGenericExceptionThrown:CreateWorkspaceUseCaseTest.kt$FakeUserRemoteRepository$throw RuntimeException("network down")</ID>
-    <ID>TooGenericExceptionThrown:CreateWorkspaceUseCaseTest.kt$FakeWorkspaceSyncRepository$throw RuntimeException("firestore unavailable")</ID>
-    <ID>TooManyFunctions:SettingsRepository.kt$SettingsRepository</ID>
+    <ID>TooGenericExceptionThrown:CreateWorkspaceUseCaseTest.kt$FakeWorkspaceSyncer$throw RuntimeException("firestore unavailable")</ID>
+    <ID>TooGenericExceptionThrown:PostAuthBootstrapUseCaseTest.kt$BootstrapWorkspaceSyncer$throw RuntimeException("PERMISSION_DENIED: Missing or insufficient permissions")</ID>
+    <ID>TooGenericExceptionThrown:SelectWorkspaceUseCaseTest.kt$RecordingUserRemoteRepository$throw RuntimeException("network down")</ID>
   </CurrentIssues>
 </SmellBaseline>
