@@ -9,6 +9,7 @@ plugins {
     alias(libs.plugins.koin.compiler)
     alias(libs.plugins.kotest.multiplatform)
     alias(libs.plugins.kmp.lib)
+    alias(libs.plugins.kover)
 }
 
 kotlin {

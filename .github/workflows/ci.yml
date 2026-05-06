@@ -394,7 +394,7 @@ jobs:
           retention-days: 14
 
   sonar:
-    name: SonarCloud + coverage
+    name: SonarCloud
     runs-on: ubuntu-latest
     timeout-minutes: 45
     # Skip on PRs from forks (no SONAR_TOKEN access from fork secrets).
@@ -440,20 +440,11 @@ jobs:
         continue-on-error: true
         run: ./gradlew detekt --stacktrace --continue
 
-      - name: Run Kover XML + Sonar
+      - name: Run Sonar
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: ./gradlew koverXmlReport sonar --stacktrace
-
-      - name: Upload Kover XML report
-        if: always()
-        uses: actions/upload-artifact@v7
-        with:
-          name: kover-report
-          path: build/reports/kover/report.xml
-          if-no-files-found: warn
-          retention-days: 14
+        run: ./gradlew sonar --stacktrace
 
   # iOS build is intentionally not wired up yet — macos-14 runners are ~10x more
   # expensive than ubuntu-latest and the Android compile job catches most

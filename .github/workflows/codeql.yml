@@ -28,10 +28,6 @@ jobs:
     # Fork PRs can't read Firebase secrets, so the Gradle build for
     # java-kotlin would fail on processDebugGoogleServices. JS analysis
     # needs no secrets and runs on every PR.
-    if: >-
-      matrix.language != 'java-kotlin' ||
-      github.event_name != 'pull_request' ||
-      github.event.pull_request.head.repo.full_name == github.repository
 
     strategy:
       fail-fast: false
@@ -44,10 +40,17 @@ jobs:
 
     steps:
       - name: Checkout
+        if: >-
+          matrix.language != 'java-kotlin' ||
+          github.event_name != 'pull_request' ||
+          github.event.pull_request.head.repo.full_name == github.repository
         uses: actions/checkout@v4
 
       - name: Decode Firebase config
-        if: matrix.language == 'java-kotlin'
+        if: >-
+          matrix.language == 'java-kotlin' &&
+          (github.event_name != 'pull_request' ||
+          github.event.pull_request.head.repo.full_name == github.repository)
         uses: ./.github/actions/firebase-config
         with:
           debug-json:   ${{ secrets.GOOGLE_SERVICES_JSON_DEBUG }}
@@ -55,27 +58,44 @@ jobs:
           ios-plist:    ${{ secrets.GOOGLE_SERVICE_INFO_PLIST }}
 
       - name: Set up JDK
-        if: matrix.language == 'java-kotlin'
+        if: >-
+          matrix.language == 'java-kotlin' &&
+          (github.event_name != 'pull_request' ||
+          github.event.pull_request.head.repo.full_name == github.repository)
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: "17"
 
       - name: Set up Gradle
-        if: matrix.language == 'java-kotlin'
+        if: >-
+          matrix.language == 'java-kotlin' &&
+          (github.event_name != 'pull_request' ||
+          github.event.pull_request.head.repo.full_name == github.repository)
         uses: gradle/actions/setup-gradle@v4
 
       - name: Initialize CodeQL
+        if: >-
+          matrix.language != 'java-kotlin' ||
+          github.event_name != 'pull_request' ||
+          github.event.pull_request.head.repo.full_name == github.repository
         uses: github/codeql-action/init@v3
         with:
           languages: ${{ matrix.language }}
           build-mode: ${{ matrix.build-mode }}
 
       - name: Build Kotlin sources
-        if: matrix.language == 'java-kotlin'
+        if: >-
+          matrix.language == 'java-kotlin' &&
+          (github.event_name != 'pull_request' ||
+          github.event.pull_request.head.repo.full_name == github.repository)
         run: ./gradlew :androidApp:processDebugGoogleServices :androidApp:compileDebugSources --stacktrace
 
       - name: Perform CodeQL analysis
+        if: >-
+          matrix.language != 'java-kotlin' ||
+          github.event_name != 'pull_request' ||
+          github.event.pull_request.head.repo.full_name == github.repository
         uses: github/codeql-action/analyze@v3
         with:
           category: "/language:${{ matrix.language }}"
