@@ -1,6 +1,8 @@
 package com.georgeci.moneysurfer.feature.workspace
 
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
+import androidx.compose.material3.adaptive.navigation3.ListDetailSceneStrategy
 import com.georgeci.moneysurfer.domain.primitives.UserId
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 import com.georgeci.moneysurfer.feature.workspace.creation.WorkspaceCreationScreen
@@ -12,9 +14,10 @@ import com.georgeci.moneysurfer.feature.workspace.members.WorkspaceMembersBottom
 import com.georgeci.moneysurfer.feature.workspace.selector.WorkspaceSelectorScreen
 import com.georgeci.moneysurfer.navigation.BottomSheetSceneStrategy
 import com.georgeci.moneysurfer.navigation.FeatureNavGraph
+import com.georgeci.moneysurfer.navigation.NavDetailPlaceholder
 import com.georgeci.moneysurfer.navigation.Route
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3AdaptiveApi::class)
 val workspaceNavGraph: FeatureNavGraph = { navigator ->
     entry<Route.WorkspaceSelector> { key ->
         WorkspaceSelectorScreen(
@@ -59,7 +62,9 @@ val workspaceNavGraph: FeatureNavGraph = { navigator ->
         )
     }
 
-    entry<Route.WorkspaceManage> { key ->
+    entry<Route.WorkspaceManage>(
+        metadata = ListDetailSceneStrategy.listPane(detailPlaceholder = { NavDetailPlaceholder() }),
+    ) { key ->
         WorkspaceManageScreen(
             workspaceId = WorkspaceId(key.workspaceId),
             onNavigateBack = { navigator.pop() },
@@ -77,7 +82,9 @@ val workspaceNavGraph: FeatureNavGraph = { navigator ->
         )
     }
 
-    entry<Route.WorkspaceInvite> { key ->
+    entry<Route.WorkspaceInvite>(
+        metadata = ListDetailSceneStrategy.detailPane(),
+    ) { key ->
         WorkspaceInviteScreen(
             workspaceId = WorkspaceId(key.workspaceId),
             onNavigateBack = { navigator.pop() },
