@@ -113,7 +113,9 @@ fun TransactionDoc.toEntity(id: String, workspaceId: String): TransactionEntity 
     }
     val resolvedCreatedAt = if (createdAt == 0L) {
         if (operationAt != 0L) operationAt else updatedAt
-    } else createdAt
+    } else {
+        createdAt
+    }
     return TransactionEntity(
         id = id,
         workspaceId = workspaceId,

@@ -1,0 +1,7 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>CyclomaticComplexMethod:PullRemoteChangesUseCaseImpl.kt$PullRemoteChangesUseCaseImpl$override suspend fun invoke( scope: SyncScope, onProgress: suspend (PullProgress) -&gt; Unit, cancelToken: SyncCancelToken, ): SyncResult&lt;PullSummary&gt;</ID>
+  </CurrentIssues>
+</SmellBaseline>

@@ -446,20 +446,3 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: ./gradlew sonar --stacktrace
 
-  # iOS build is intentionally not wired up yet — macos-14 runners are ~10x more
-  # expensive than ubuntu-latest and the Android compile job catches most
-  # regressions in shared/composeApp/feature modules. To enable, add:
-  #   ios-build:
-  #     runs-on: macos-14
-  #     if: >-
-  #       github.event_name == 'push' ||
-  #       github.event.pull_request.head.repo.full_name == github.repository
-  #     steps:
-  #       - uses: actions/checkout@v6
-  #       - uses: ./.github/actions/firebase-config
-  #         with:
-  #           ios-plist: ${{ secrets.GOOGLE_SERVICE_INFO_PLIST }}
-  #       - uses: actions/setup-java@v5
-  #         with: { distribution: temurin, java-version: "17" }
-  #       - uses: gradle/actions/setup-gradle@v6
-  #       - run: ./gradlew :composeApp:linkPodReleaseFrameworkIosArm64

@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>MaxLineLength:TransactionDao.kt$TransactionDao$"SELECT * FROM transactions WHERE accountId = :accountId ORDER BY operationDate DESC, operationAt DESC, createdAt DESC"</ID>
+    <ID>MaxLineLength:TransactionDao.kt$TransactionDao$"SELECT * FROM transactions WHERE workspaceId = :workspaceId ORDER BY operationDate DESC, operationAt DESC, createdAt DESC"</ID>
+  </CurrentIssues>
+</SmellBaseline>

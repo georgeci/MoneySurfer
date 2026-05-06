@@ -1,5 +1,6 @@
 package com.georgeci.moneysurfer.sync.noop
 
+import arrow.core.right
 import com.georgeci.moneysurfer.sync.api.LastSyncOutcome
 import com.georgeci.moneysurfer.sync.api.SyncHandleStatus
 import com.georgeci.moneysurfer.sync.api.SyncMode
@@ -11,7 +12,6 @@ import com.georgeci.moneysurfer.sync.api.SyncStep
 import com.georgeci.moneysurfer.sync.api.SyncSummary
 import com.georgeci.moneysurfer.sync.coordinator.SyncCoordinator
 import com.georgeci.moneysurfer.sync.coordinator.SyncHandle
-import arrow.core.right
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.flow.MutableSharedFlow

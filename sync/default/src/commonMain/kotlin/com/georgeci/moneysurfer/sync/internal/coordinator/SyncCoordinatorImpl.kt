@@ -3,6 +3,12 @@ package com.georgeci.moneysurfer.sync.internal.coordinator
 import arrow.core.left
 import arrow.core.raise.either
 import arrow.core.right
+import com.georgeci.moneysurfer.domain.sync.ProjectionScope
+import com.georgeci.moneysurfer.domain.sync.PullProgress
+import com.georgeci.moneysurfer.domain.sync.PullRemoteChangesUseCase
+import com.georgeci.moneysurfer.domain.sync.RecalculateLocalProjectionsUseCase
+import com.georgeci.moneysurfer.domain.sync.UploadPendingChangesUseCase
+import com.georgeci.moneysurfer.domain.sync.UploadProgress
 import com.georgeci.moneysurfer.sync.api.CompositeCancelToken
 import com.georgeci.moneysurfer.sync.api.LastSyncOutcome
 import com.georgeci.moneysurfer.sync.api.SyncCancelToken
@@ -23,12 +29,6 @@ import com.georgeci.moneysurfer.sync.internal.SyncSummaryBuilder
 import com.georgeci.moneysurfer.sync.internal.network.NetworkWaitMode
 import com.georgeci.moneysurfer.sync.internal.network.toNetworkWaitMode
 import com.georgeci.moneysurfer.sync.network.NetworkMonitor
-import com.georgeci.moneysurfer.domain.sync.PullProgress
-import com.georgeci.moneysurfer.domain.sync.PullRemoteChangesUseCase
-import com.georgeci.moneysurfer.domain.sync.ProjectionScope
-import com.georgeci.moneysurfer.domain.sync.RecalculateLocalProjectionsUseCase
-import com.georgeci.moneysurfer.domain.sync.UploadPendingChangesUseCase
-import com.georgeci.moneysurfer.domain.sync.UploadProgress
 import com.georgeci.moneysurfer.sync.runtime.ApplicationScope
 import com.georgeci.moneysurfer.sync.telemetry.SyncTelemetry
 import com.georgeci.moneysurfer.sync.version.SyncVersionGate
