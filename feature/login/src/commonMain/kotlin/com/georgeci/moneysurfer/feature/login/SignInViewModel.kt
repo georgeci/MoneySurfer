@@ -16,8 +16,9 @@ class SignInViewModel(
     private val signup: SignupUseCase,
     private val anonymousLogin: AnonymousLoginUseCase,
     private val demoLogin: DemoLoginUseCase,
+    config: SignInFeatureConfig,
 ) : MviViewModel<SignInState, SignInEvent, SignInEffect>(
-    initialState = SignInState(),
+    initialState = SignInState(config = config),
 ) {
 
     private val log = Logger.withTag(TAG)
@@ -123,6 +124,7 @@ data class SignInState(
     val mode: AuthMode = AuthMode.SignIn,
     val isLoading: Boolean = false,
     val error: SignInError? = null,
+    val config: SignInFeatureConfig = SignInFeatureConfig(),
 ) {
     val canSubmit: Boolean
         get() = email.isNotBlank() && password.length >= 6 && !isLoading
