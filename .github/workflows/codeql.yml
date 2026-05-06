@@ -1,14 +1,35 @@
 name: CodeQL
 
+# Doc-only / AI-tooling changes don't need CodeQL — same `paths-ignore`
+# rationale as ci.yml. The weekly `schedule` trigger still picks up new
+# CodeQL queries against the latest code regardless of recent paths.
 on:
   push:
     branches:
       - main
       - master
+    paths-ignore:
+      - "**/*.md"
+      - ".claude/**"
+      - ".agents/**"
+      - "ai/**"
+      - "md/**"
+      - "docs/**"
+      - ".github/copilot-instructions.md"
+      - "LICENSE"
   pull_request:
     branches:
       - main
       - master
+    paths-ignore:
+      - "**/*.md"
+      - ".claude/**"
+      - ".agents/**"
+      - "ai/**"
+      - "md/**"
+      - "docs/**"
+      - ".github/copilot-instructions.md"
+      - "LICENSE"
   schedule:
     # Weekly run picks up new CodeQL queries even on quiet weeks.
     - cron: "23 4 * * 1"

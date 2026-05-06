@@ -1,11 +1,33 @@
 name: CI
 
+# Doc-only / AI-tooling changes shouldn't pay for a full Gradle compile.
+# `paths-ignore` skips the whole workflow when *every* changed file matches —
+# mixed PRs (docs + code) still run normally. Keep workflow files themselves
+# excluded from the ignore list so CI changes always re-validate.
 on:
   pull_request:
+    paths-ignore:
+      - "**/*.md"
+      - ".claude/**"
+      - ".agents/**"
+      - "ai/**"
+      - "md/**"
+      - "docs/**"
+      - ".github/copilot-instructions.md"
+      - "LICENSE"
   push:
     branches:
       - main
       - master
+    paths-ignore:
+      - "**/*.md"
+      - ".claude/**"
+      - ".agents/**"
+      - "ai/**"
+      - "md/**"
+      - "docs/**"
+      - ".github/copilot-instructions.md"
+      - "LICENSE"
   workflow_dispatch:
 
 permissions:
