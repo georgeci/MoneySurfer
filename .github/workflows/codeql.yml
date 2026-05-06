@@ -89,7 +89,10 @@ jobs:
           matrix.language == 'java-kotlin' &&
           (github.event_name != 'pull_request' ||
           github.event.pull_request.head.repo.full_name == github.repository)
-        run: ./gradlew :androidApp:processDebugGoogleServices :androidApp:compileDebugSources --stacktrace
+        # --rerun-tasks: CodeQL's tracer only sees compilation if it actually
+        # runs — Gradle cache hits (FROM-CACHE / UP-TO-DATE) leave the database
+        # empty and the analyze step fails with "could not process any code".
+        run: ./gradlew :androidApp:processDebugGoogleServices :androidApp:compileDebugSources --rerun-tasks --stacktrace
 
       - name: Perform CodeQL analysis
         if: >-
