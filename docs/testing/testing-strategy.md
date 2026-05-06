@@ -6,6 +6,7 @@
 - [TL;DR for agents](#tldr-for-agents)
 - [Common Commands](#common-commands)
 - [QA Entry Points](#qa-entry-points)
+- [Test tags (Compose ↔ Maestro)](#test-tags-compose--maestro)
 - [Rules](#rules)
 <!-- DOCS:END -->
 
@@ -42,6 +43,41 @@ READ WHEN:
 ./gradlew qaMaestro
 ./gradlew qaAll
 ```
+
+## Test tags (Compose ↔ Maestro)
+
+Anchor Maestro selectors to stable identifiers, not localized text. Compose
+`Modifier.testTag(...)` is the source of truth — Maestro reaches it through
+the Android resource-id bridge.
+
+**Author screens like this:**
+
+1. Declare tag constants in a `*TestTags` object next to the screen
+   (public, top-level — referenced from both production and tests).
+   Use a `screen:element` namespace (e.g. `signIn:submit`) to keep them
+   greppable.
+2. Apply `Modifier.testTag(...)` on every node a test or Maestro flow
+   needs to find: root, fields, primary actions, error/loader nodes.
+3. On the screen root, attach `Modifier.surferTestTagAsId()`
+   (from `uikit/.../modifier/SurferTestTagAsId.kt`). This enables
+   `semantics { testTagsAsResourceId = true }` on Android and is a
+   no-op on iOS/JVM. Without it Maestro cannot match by `id:`.
+
+Reference implementation: `feature/login/.../SignInScreen.kt::SignInTestTags`
+and `scripts/maestro/00_login.yaml` / `01_auth_signin.yaml`.
+
+**Maestro selector style:**
+
+```yaml
+- tapOn:
+    id: "signIn:submit"        # preferred — stable across locales/themes
+- assertVisible:
+    text: "Choose a workspace" # acceptable for screens not yet tagged
+```
+
+Prefer `id:` for everything inside a tagged screen. Fall back to `text:`
+only when the target screen has no tags yet (track that as follow-up
+work — don't sprinkle text matchers permanently).
 
 ## Rules
 
