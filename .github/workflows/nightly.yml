@@ -78,3 +78,258 @@ jobs:
             CODE_SIGN_IDENTITY="" \
             build \
             | "${FORMATTER[@]}"
+
+  maestro-android:
+    name: Maestro Android (E2E)
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    # Heavy: builds debug APK with USE_EMULATOR=true, boots AVD + Firebase
+    # Emulator (auth + firestore), seeds test users, runs all flows in
+    # scripts/maestro/, generates Allure. Lives in nightly because the AVD
+    # boot alone is ~5–8 min.
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Decode Firebase config
+        uses: ./.github/actions/firebase-config
+        with:
+          debug-json:   ${{ secrets.GOOGLE_SERVICES_JSON_DEBUG }}
+          release-json: ${{ secrets.GOOGLE_SERVICES_JSON_RELEASE }}
+
+      # firebase-tools ≥14 ships a Firestore emulator JAR that needs JDK 21+.
+      # Same caveat as the firestore-rules job in ci.yml.
+      - name: Set up JDK
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "20"
+
+      - name: Install firebase-tools
+        run: npm i -g firebase-tools
+
+      - name: Install Maestro CLI
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -Ls "https://get.maestro.mobile.dev" | bash
+          echo "$HOME/.maestro/bin" >> "$GITHUB_PATH"
+
+      - name: Install Allure CLI
+        shell: bash
+        run: |
+          set -euo pipefail
+          ALLURE_VERSION=2.34.1
+          curl -Ls "https://github.com/allure-framework/allure2/releases/download/${ALLURE_VERSION}/allure-${ALLURE_VERSION}.tgz" \
+            | tar -xz -C "${RUNNER_TEMP}"
+          echo "${RUNNER_TEMP}/allure-${ALLURE_VERSION}/bin" >> "${GITHUB_PATH}"
+
+      # qa.gradle.kts reads TEST_EMAIL/TEST_PASSWORD from this file and forwards
+      # them to Maestro via `--env`. seed.sh reads the same file to provision
+      # users in the Auth emulator. Falls back to seed.sh defaults if secrets
+      # aren't set, which matches the developer-machine experience.
+      - name: Write e2e test-user properties
+        env:
+          TEST_EMAIL:        ${{ secrets.E2E_TEST_EMAIL || 'e2e+owner@test.local' }}
+          TEST_PASSWORD:     ${{ secrets.E2E_TEST_PASSWORD || 'password' }}
+          TEST_VIEWER_EMAIL: ${{ secrets.E2E_TEST_VIEWER_EMAIL || 'e2e+viewer@test.local' }}
+        run: |
+          cat > scripts/e2e-test-user.properties <<EOF
+          TEST_EMAIL=${TEST_EMAIL}
+          TEST_PASSWORD=${TEST_PASSWORD}
+          TEST_VIEWER_EMAIL=${TEST_VIEWER_EMAIL}
+          EOF
+
+      # Hardware acceleration for the AVD. The runner image ships KVM but the
+      # default user isn't in the kvm group.
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' \
+            | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Run qaMaestroAndroid
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: aosp_atd
+          arch: x86_64
+          profile: pixel_6
+          ram-size: 4096M
+          disable-animations: true
+          emulator-options: -no-window -no-snapshot -gpu swiftshader_indirect -noaudio -no-boot-anim
+          script: ./gradlew qaMaestroAndroid --stacktrace
+
+      - name: Upload Allure report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: allure-report-maestro-android
+          path: build/reports/allure/maestro/
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Upload JUnit results
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: maestro-android-junit
+          path: build/test-results/maestro/*.xml
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Upload Maestro debug + screenshots
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: maestro-android-debug
+          path: |
+            build/maestro-debug/
+            build/maestro-artifacts/
+            build/logs/maestro/
+          if-no-files-found: ignore
+          retention-days: 7
+
+  maestro-ios:
+    name: Maestro iOS (E2E)
+    runs-on: macos-14
+    timeout-minutes: 90
+    # Same shape as maestro-android but on a macOS runner: boots an iPhone
+    # simulator, builds the Debug app with MS_USE_EMULATOR=YES, runs flows.
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Decode Firebase config
+        uses: ./.github/actions/firebase-config
+        with:
+          ios-plist: ${{ secrets.GOOGLE_SERVICE_INFO_PLIST }}
+
+      - name: Set up JDK
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "20"
+
+      - name: Install firebase-tools
+        run: npm i -g firebase-tools
+
+      - name: Install Maestro CLI
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -Ls "https://get.maestro.mobile.dev" | bash
+          echo "$HOME/.maestro/bin" >> "$GITHUB_PATH"
+
+      - name: Install Allure CLI
+        shell: bash
+        run: |
+          set -euo pipefail
+          ALLURE_VERSION=2.34.1
+          curl -Ls "https://github.com/allure-framework/allure2/releases/download/${ALLURE_VERSION}/allure-${ALLURE_VERSION}.tgz" \
+            | tar -xz -C "${RUNNER_TEMP}"
+          echo "${RUNNER_TEMP}/allure-${ALLURE_VERSION}/bin" >> "${GITHUB_PATH}"
+
+      - name: Show Xcode version
+        run: xcodebuild -version
+
+      - name: Write e2e test-user properties
+        env:
+          TEST_EMAIL:        ${{ secrets.E2E_TEST_EMAIL || 'e2e+owner@test.local' }}
+          TEST_PASSWORD:     ${{ secrets.E2E_TEST_PASSWORD || 'password' }}
+          TEST_VIEWER_EMAIL: ${{ secrets.E2E_TEST_VIEWER_EMAIL || 'e2e+viewer@test.local' }}
+        run: |
+          cat > scripts/e2e-test-user.properties <<EOF
+          TEST_EMAIL=${TEST_EMAIL}
+          TEST_PASSWORD=${TEST_PASSWORD}
+          TEST_VIEWER_EMAIL=${TEST_VIEWER_EMAIL}
+          EOF
+
+      # qaMaestroIos defaults to simulator name "iPhone 17", which isn't on the
+      # macos-14 runner image — pick whatever iPhone simulator exists and pin
+      # it via -PiosSimulatorName so the Gradle task uses the same one we boot.
+      - name: Boot iOS simulator
+        id: ios-sim
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Prefer an iPhone 15-class device; fall back to any iPhone simulator.
+          SIM_NAME="$(xcrun simctl list devices available -j \
+            | python3 -c '
+          import json, sys
+          data = json.load(sys.stdin)["devices"]
+          candidates = []
+          for runtime, devices in data.items():
+              if "iOS" not in runtime:
+                  continue
+              for d in devices:
+                  if d.get("isAvailable") and d["name"].startswith("iPhone"):
+                      candidates.append(d["name"])
+          # Prefer iPhone 15/16/17 if present, else first.
+          for prefix in ("iPhone 17", "iPhone 16", "iPhone 15"):
+              for name in candidates:
+                  if name.startswith(prefix):
+                      print(name); sys.exit(0)
+          print(candidates[0] if candidates else "")
+          ')"
+          if [ -z "$SIM_NAME" ]; then
+            echo "No iPhone simulator available on this runner image."
+            xcrun simctl list devices available
+            exit 1
+          fi
+          echo "Using simulator: $SIM_NAME"
+          xcrun simctl boot "$SIM_NAME" || true
+          xcrun simctl bootstatus "$SIM_NAME" -b
+          echo "name=$SIM_NAME" >> "$GITHUB_OUTPUT"
+
+      - name: Run qaMaestroIos
+        run: ./gradlew qaMaestroIos -PiosSimulatorName="${{ steps.ios-sim.outputs.name }}" --stacktrace
+
+      - name: Upload Allure report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: allure-report-maestro-ios
+          path: build/reports/allure/maestro-ios/
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Upload JUnit results
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: maestro-ios-junit
+          path: build/test-results/maestro-ios/*.xml
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Upload Maestro debug + screenshots
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: maestro-ios-debug
+          path: |
+            build/maestro-ios-debug/
+            build/maestro-ios-artifacts/
+            build/logs/maestro-ios/
+          if-no-files-found: ignore
+          retention-days: 7
