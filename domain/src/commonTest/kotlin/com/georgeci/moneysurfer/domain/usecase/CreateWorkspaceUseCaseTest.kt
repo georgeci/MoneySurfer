@@ -9,11 +9,10 @@ import com.georgeci.moneysurfer.domain.model.Workspace
 import com.georgeci.moneysurfer.domain.model.WorkspaceMember
 import com.georgeci.moneysurfer.domain.model.WorkspaceRole
 import com.georgeci.moneysurfer.domain.primitives.CategoryId
+import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
 import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
 import com.georgeci.moneysurfer.domain.primitives.UserId
-import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
-import kotlin.time.Clock as KotlinClock
 import com.georgeci.moneysurfer.domain.repositories.CategoryRepository
 import com.georgeci.moneysurfer.domain.repositories.UserRemoteRepository
 import com.georgeci.moneysurfer.domain.repositories.WorkspaceMemberRepository
@@ -27,6 +26,7 @@ import io.kotest.matchers.types.shouldBeInstanceOf
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
+import kotlin.time.Clock as KotlinClock
 
 class CreateWorkspaceUseCaseTest : StringSpec({
 

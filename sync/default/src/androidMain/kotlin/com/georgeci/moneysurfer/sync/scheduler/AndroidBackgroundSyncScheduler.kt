@@ -9,8 +9,6 @@ import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
-import com.georgeci.moneysurfer.sync.scheduler.BackgroundSyncScheduler
-import com.georgeci.moneysurfer.sync.scheduler.SyncConstraints
 import org.koin.core.annotation.Single
 import java.util.concurrent.TimeUnit
 import kotlin.time.Duration

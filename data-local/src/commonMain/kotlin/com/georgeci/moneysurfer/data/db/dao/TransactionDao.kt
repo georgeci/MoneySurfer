@@ -39,7 +39,9 @@ interface TransactionDao {
     )
     fun getAllCategorized(): Flow<List<CategorizedTransactionEntity>>
 
-    @Query("SELECT * FROM transactions WHERE accountId = :accountId ORDER BY operationDate DESC, operationAt DESC, createdAt DESC")
+    @Query(
+        "SELECT * FROM transactions WHERE accountId = :accountId ORDER BY operationDate DESC, operationAt DESC, createdAt DESC",
+    )
     fun getByAccountId(accountId: String): Flow<List<TransactionEntity>>
 
     @Query(
@@ -67,7 +69,9 @@ interface TransactionDao {
     )
     fun getByAccountIdCategorized(accountId: String): Flow<List<CategorizedTransactionEntity>>
 
-    @Query("SELECT * FROM transactions WHERE workspaceId = :workspaceId ORDER BY operationDate DESC, operationAt DESC, createdAt DESC")
+    @Query(
+        "SELECT * FROM transactions WHERE workspaceId = :workspaceId ORDER BY operationDate DESC, operationAt DESC, createdAt DESC",
+    )
     fun getByWorkspaceId(workspaceId: String): Flow<List<TransactionEntity>>
 
     @Query("SELECT * FROM transactions WHERE id = :id")

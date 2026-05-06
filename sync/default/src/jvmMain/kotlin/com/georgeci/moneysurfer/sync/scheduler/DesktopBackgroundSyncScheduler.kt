@@ -3,8 +3,6 @@ package com.georgeci.moneysurfer.sync.scheduler
 import com.georgeci.moneysurfer.sync.api.SyncReason
 import com.georgeci.moneysurfer.sync.coordinator.SyncCoordinator
 import com.georgeci.moneysurfer.sync.runtime.ApplicationScope
-import com.georgeci.moneysurfer.sync.scheduler.BackgroundSyncScheduler
-import com.georgeci.moneysurfer.sync.scheduler.SyncConstraints
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.invoke
