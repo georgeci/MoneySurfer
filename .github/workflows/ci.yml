@@ -464,12 +464,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
+      # iOS build only needs the GoogleService-Info.plist — don't expose the
+      # Android secrets to this job. require-all=true fails fast if the plist
+      # secret is missing or malformed instead of silently building without it.
       - name: Decode Firebase config
         uses: ./.github/actions/firebase-config
         with:
-          debug-json:   ${{ secrets.GOOGLE_SERVICES_JSON_DEBUG }}
-          release-json: ${{ secrets.GOOGLE_SERVICES_JSON_RELEASE }}
-          ios-plist:    ${{ secrets.GOOGLE_SERVICE_INFO_PLIST }}
+          ios-plist:   ${{ secrets.GOOGLE_SERVICE_INFO_PLIST }}
+          require-all: "true"
 
       - name: Set up JDK
         uses: actions/setup-java@v5
