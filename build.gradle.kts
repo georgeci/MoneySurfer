@@ -130,7 +130,7 @@ sonar {
 
         property(
             "sonar.exclusions",
-            "**/build/**,**/generated/**,iosApp/**,scripts/**,md/**,docs/**,firestore-tests/**",
+            "**/build/**,**/generated/**,iosApp/**,scripts/**,md/**,docs/**,firestore-tests/**,**/config/detekt/**",
         )
     }
 }
