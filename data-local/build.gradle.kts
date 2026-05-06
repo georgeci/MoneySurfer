@@ -29,7 +29,6 @@ kotlin {
                 implementation(libs.kermit)
                 implementation(projects.domain)
                 implementation(projects.sync.api)
-                implementation(projects.sync.default)
                 implementation(project.dependencies.platform(libs.koin.bom))
                 implementation(libs.koin.core)
                 implementation(libs.koin.annotations)
