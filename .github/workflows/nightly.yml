@@ -237,7 +237,10 @@ jobs:
           profile: pixel_6
           ram-size: 4096M
           disable-animations: true
-          emulator-options: -no-window -no-snapshot -gpu swiftshader_indirect -noaudio -no-boot-anim
+          disable-spellchecker: true
+          force-avd-creation: false
+          emulator-boot-timeout: 1200
+          emulator-options: -no-window -no-snapshot -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -camera-front none
           script: ./gradlew qaMaestroAndroid --stacktrace
 
       - name: Upload Allure report
@@ -246,6 +249,18 @@ jobs:
         with:
           name: allure-report-maestro-android
           path: build/reports/allure/maestro/
+          if-no-files-found: warn
+          retention-days: 14
+
+      # Native Allure results — JSON test bodies, screenshots, executor metadata.
+      # Consumed by the nightly-publish aggregator so the Pages report keeps
+      # Maestro's per-step screenshots instead of degrading to bare JUnit.
+      - name: Upload Allure results (native)
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: allure-results-maestro-android
+          path: build/allure-results/maestro/
           if-no-files-found: warn
           retention-days: 14
 
@@ -372,6 +387,15 @@ jobs:
           if-no-files-found: warn
           retention-days: 14
 
+      - name: Upload Allure results (native)
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: allure-results-maestro-ios
+          path: build/allure-results/maestro-ios/
+          if-no-files-found: warn
+          retention-days: 14
+
       - name: Upload JUnit results
         if: always()
         uses: actions/upload-artifact@v7
@@ -403,14 +427,33 @@ jobs:
       contents: write
 
     steps:
-      - name: Download Maestro Android JUnit
+      # Prefer the native Allure results (JSON + screenshots) so the published
+      # report keeps Maestro per-step UI evidence. Fall back to JUnit XML when
+      # the native artifact is missing — happens if the prep task crashed *and*
+      # never managed to write `executor.json` (extremely rare given the
+      # in-Gradle fallback in qa.gradle.kts → writeAllureFallbackMetadata).
+      - name: Download Maestro Android Allure results (native)
+        uses: actions/download-artifact@v4
+        with:
+          name: allure-results-maestro-android
+          path: allure-input-native/maestro-android
+        continue-on-error: true
+
+      - name: Download Maestro iOS Allure results (native)
+        uses: actions/download-artifact@v4
+        with:
+          name: allure-results-maestro-ios
+          path: allure-input-native/maestro-ios
+        continue-on-error: true
+
+      - name: Download Maestro Android JUnit (fallback)
         uses: actions/download-artifact@v4
         with:
           name: maestro-android-junit
           path: allure-input/maestro-android
         continue-on-error: true
 
-      - name: Download Maestro iOS JUnit
+      - name: Download Maestro iOS JUnit (fallback)
         uses: actions/download-artifact@v4
         with:
           name: maestro-ios-junit
@@ -422,13 +465,35 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p allure-results
-          # find returns 0 even with no matches — let the loop body just not
-          # execute. No reliance on `shopt -s globstar`.
+          # 1) Native Allure: copy *everything* (JSON test bodies, executor.json,
+          #    environment.properties, attachment binaries) verbatim. Names are
+          #    already UUID-based so the two scopes can't collide.
+          if [ -d allure-input-native ]; then
+            find allure-input-native -type f 2>/dev/null | while read -r f; do
+              cp "$f" "allure-results/$(basename "$f")"
+            done
+          fi
+          native_count=$(ls allure-results 2>/dev/null | wc -l)
+          # 2) JUnit fallback: only stage XMLs we don't already have native data
+          #    for. We treat presence of *any* `*-result.json` as "native data
+          #    is here" and skip JUnit for that scope to avoid duplicate suites.
+          have_android_native=false; have_ios_native=false
+          if compgen -G "allure-input-native/maestro-android/*-result.json" > /dev/null; then
+            have_android_native=true
+          fi
+          if compgen -G "allure-input-native/maestro-ios/*-result.json" > /dev/null; then
+            have_ios_native=true
+          fi
           find allure-input -type f -name '*.xml' 2>/dev/null | while read -r f; do
+            case "$f" in
+              allure-input/maestro-android/*) $have_android_native && continue ;;
+              allure-input/maestro-ios/*)     $have_ios_native     && continue ;;
+            esac
             dest="allure-results/$(echo "${f#allure-input/}" | tr '/' '__')"
             cp "$f" "$dest"
           done
-          echo "Staged $(ls allure-results 2>/dev/null | wc -l) input(s)."
+          total=$(ls allure-results 2>/dev/null | wc -l)
+          echo "Staged $total input(s) ($native_count native, $((total - native_count)) JUnit fallback)."
 
       - name: Checkout gh-pages
         uses: actions/checkout@v6
