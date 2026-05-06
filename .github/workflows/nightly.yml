@@ -465,18 +465,33 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p allure-results
-          # 1) Native Allure: copy *everything* (JSON test bodies, executor.json,
-          #    environment.properties, attachment binaries) verbatim. Names are
-          #    already UUID-based so the two scopes can't collide.
+          # 1) Native Allure: copy result.json bodies + attachment binaries
+          #    verbatim. Filenames are uuid4-based (per maestro_to_allure.py)
+          #    so they cannot collide across Android/iOS scopes.
+          #
+          #    `executor.json` and `environment.properties` are intentionally
+          #    skipped: the converter writes them per scope, but flattening
+          #    into one dir would silently overwrite one scope's metadata with
+          #    the other's. Per-scope copies remain available in the
+          #    `allure-results-maestro-{android,ios}` artifacts for anyone
+          #    debugging the converter output.
           if [ -d allure-input-native ]; then
             find allure-input-native -type f 2>/dev/null | while read -r f; do
-              cp "$f" "allure-results/$(basename "$f")"
+              base="$(basename "$f")"
+              case "$base" in
+                executor.json|environment.properties) continue ;;
+              esac
+              cp "$f" "allure-results/$base"
             done
           fi
           native_count=$(ls allure-results 2>/dev/null | wc -l)
-          # 2) JUnit fallback: only stage XMLs we don't already have native data
-          #    for. We treat presence of *any* `*-result.json` as "native data
-          #    is here" and skip JUnit for that scope to avoid duplicate suites.
+          # 2) JUnit fallback: only stage XMLs we don't already have native
+          #    data for. Treat presence of any `*-result.json` for a scope as
+          #    "native data is here" and skip its JUnit to avoid duplicate
+          #    suites. Guarded by `[ -d allure-input ]` because both fallback
+          #    downloads use `continue-on-error: true` and may leave the dir
+          #    absent — `find` on a missing path would otherwise abort the
+          #    whole job under `set -e`.
           have_android_native=false; have_ios_native=false
           if compgen -G "allure-input-native/maestro-android/*-result.json" > /dev/null; then
             have_android_native=true
@@ -484,14 +499,16 @@ jobs:
           if compgen -G "allure-input-native/maestro-ios/*-result.json" > /dev/null; then
             have_ios_native=true
           fi
-          find allure-input -type f -name '*.xml' 2>/dev/null | while read -r f; do
-            case "$f" in
-              allure-input/maestro-android/*) $have_android_native && continue ;;
-              allure-input/maestro-ios/*)     $have_ios_native     && continue ;;
-            esac
-            dest="allure-results/$(echo "${f#allure-input/}" | tr '/' '__')"
-            cp "$f" "$dest"
-          done
+          if [ -d allure-input ]; then
+            find allure-input -type f -name '*.xml' 2>/dev/null | while read -r f; do
+              case "$f" in
+                allure-input/maestro-android/*) $have_android_native && continue ;;
+                allure-input/maestro-ios/*)     $have_ios_native     && continue ;;
+              esac
+              dest="allure-results/$(echo "${f#allure-input/}" | tr '/' '__')"
+              cp "$f" "$dest"
+            done
+          fi
           total=$(ls allure-results 2>/dev/null | wc -l)
           echo "Staged $total input(s) ($native_count native, $((total - native_count)) JUnit fallback)."
 
