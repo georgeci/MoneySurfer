@@ -26,7 +26,7 @@ status: backlog
 
 ### A1. `composeApp/build.gradle.kts` — sync Desktop version
 
-`composeApp/build.gradle.kts:124` currently hard-codes `packageVersion = "1.0.0"`. That drifts away from Android/iOS, which read `Version.xcconfig`.
+the `nativeDistributions { ... packageVersion = "1.0.0" }` block in `composeApp/build.gradle.kts` currently hard-codes `packageVersion = "1.0.0"`. That drifts away from Android/iOS, which read `Version.xcconfig`.
 
 Add at the top of the file (next to the other `import`s):
 
@@ -38,7 +38,7 @@ val versionProperties = Properties().apply {
 }
 ```
 
-Replace `composeApp/build.gradle.kts:124`:
+Replace the `nativeDistributions { ... packageVersion = "1.0.0" }` block in `composeApp/build.gradle.kts`:
 
 ```kotlin
 packageVersion = versionProperties.getProperty("APP_VERSION_NAME").trim()
@@ -164,7 +164,9 @@ jobs:
     steps:
       - download-artifact (all)
       - softprops/action-gh-release@v2
-          tag_name: ${{ github.ref_name }}
+          # Use the resolved tag from validate-tag so both push and workflow_dispatch
+          # publish under the correct tag (github.ref_name = branch on workflow_dispatch).
+          tag_name: ${{ needs.validate-tag.outputs.tag }}
           generate_release_notes: true
           files: |
             **/*.aab
@@ -193,7 +195,7 @@ jobs:
 ## D. Critical files
 
 - `.github/workflows/release.yml` — **new**
-- `composeApp/build.gradle.kts:117-127` — fix the hard-coded version
+- `composeApp/build.gradle.kts` — fix the hard-coded `packageVersion` inside the `nativeDistributions` block
 - `iosApp/ExportOptions.plist` — **new** (Phase 3)
 - `Version.xcconfig` — bump `APP_VERSION_NAME` before each tag
 - `androidApp/build.gradle.kts:14-19,62-77` — `hasReleaseSigning` conditional block: confirm it actually activates under CI env variables
@@ -212,8 +214,9 @@ jobs:
 
 1. **Lint YAML locally**: `actionlint .github/workflows/release.yml` before pushing.
 2. **Phase 1 smoke test**:
-   - Bump `APP_VERSION_NAME` to `0.0.3` in `Version.xcconfig`.
-   - Trigger `release.yml` via `workflow_dispatch` with `tag=v0.0.3-test` (no real tag yet).
+   - Bump `APP_VERSION_NAME` to `0.0.3` in `Version.xcconfig` and merge to main.
+   - Create and push a real test tag matching the version: `git tag v0.0.3-rc1 && git push origin v0.0.3-rc1`. (`validate-tag` checks out `refs/tags/...`, so the tag must exist on the remote.)
+   - Note: the strict comparison `v$APP_VERSION_NAME == $TAG_REF` rejects suffixes. Either relax the check to `$TAG_REF == v$APP_VERSION_NAME*` for rc/beta tags, or bump `APP_VERSION_NAME` to exactly match the tag (e.g. `0.0.3-rc1`) for testing — pick one and document it on the workflow.
    - Confirm the Desktop matrix produces three artifacts (.dmg, .msi, .deb) and they show up in a draft GitHub Release.
    - Only then push the real tag: `git tag v0.0.3 && git push origin v0.0.3`.
 3. **Tag-mismatch test**: push `v9.9.9` against `APP_VERSION_NAME=0.0.3` — `validate-tag` must fail and the rest of the jobs must skip.
