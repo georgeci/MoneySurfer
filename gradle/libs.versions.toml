@@ -51,6 +51,7 @@ jetbrainsKotlinJvm = "2.3.20"
 sonarqube = "6.0.1.5171"
 cpd = "3.5"
 moduleGraph = "0.13.0"
+easylauncher = "6.4.0"
 
 [libraries]
 androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "coreSplashscreen" }
@@ -186,3 +187,4 @@ sonarqube = { id = "org.sonarqube", version.ref = "sonarqube" }
 cpd = { id = "de.aaschmid.cpd", version.ref = "cpd" }
 kmpApp = { id = "kmp.app" }
 moduleGraph = { id = "dev.iurysouza.modulegraph", version.ref = "moduleGraph" }
+easylauncher = { id = "com.starter.easylauncher", version.ref = "easylauncher" }
