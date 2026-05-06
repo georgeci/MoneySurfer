@@ -98,12 +98,14 @@ subprojects {
 
 dependencies {
     kover(projects.composeApp)
+    kover(projects.composeAppOffline)
     kover(projects.domain)
     kover(projects.dataLocal)
     kover(projects.dataRemote)
     kover(projects.syncSurfer)
     kover(projects.sync.default)
     kover(projects.uikit)
+    kover(projects.feature.login)
 }
 
 sonar {
@@ -136,14 +138,18 @@ sonar {
             "**/build/**,**/generated/**,iosApp/**,scripts/**,md/**,docs/**,firestore-tests/**",
         )
 
-        // Coverage exclusions: generated code, Compose previews, app entry points.
+        // Coverage exclusions: generated code, Compose UI surfaces (no UI test
+        // infra in the project), DI wiring, and app entry points.
         property(
             "sonar.coverage.exclusions",
             listOf(
                 "**/build/**",
                 "**/generated/**",
+                "**/*Screen.kt",
+                "**/*Composable.kt",
                 "**/*Preview*.kt",
                 "**/*Previews.kt",
+                "**/preview/**",
                 "**/di/**",
                 "**/*Module.kt",
                 "androidApp/**",
