@@ -1,43 +1,55 @@
 name: CI
 
-# Doc-only / AI-tooling changes shouldn't pay for a full Gradle compile.
-# `paths-ignore` skips the whole workflow when *every* changed file matches —
-# mixed PRs (docs + code) still run normally. Keep workflow files themselves
-# excluded from the ignore list so CI changes always re-validate.
 on:
   pull_request:
-    paths-ignore:
-      - "**/*.md"
-      - ".claude/**"
-      - ".agents/**"
-      - "ai/**"
-      - "md/**"
-      - "docs/**"
-      - ".github/copilot-instructions.md"
-      - "LICENSE"
   push:
     branches:
       - main
       - master
-    paths-ignore:
-      - "**/*.md"
-      - ".claude/**"
-      - ".agents/**"
-      - "ai/**"
-      - "md/**"
-      - "docs/**"
-      - ".github/copilot-instructions.md"
-      - "LICENSE"
   workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
+  # Cheap fan-out gate so doc-only / AI-tooling PRs don't pay for a full
+  # Gradle compile while still reporting status checks (top-level
+  # `paths-ignore` would skip the workflow entirely and stall any required
+  # check in branch protection). The ignore list lives here — single source
+  # of truth for both `pull_request` and `push`.
+  changes:
+    name: Detect relevant changes
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    outputs:
+      code: ${{ steps.filter.outputs.code }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Filter paths
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          # `**` matches everything; subsequent `!`-patterns subtract docs and
+          # AI-tooling. `code` is true iff at least one changed file remains.
+          filters: |
+            code:
+              - '**'
+              - '!**/*.md'
+              - '!.claude/**'
+              - '!.agents/**'
+              - '!ai/**'
+              - '!md/**'
+              - '!docs/**'
+              - '!.github/copilot-instructions.md'
+              - '!LICENSE'
+
   junit:
     name: JUnit + Allure
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    needs: changes
+    if: needs.changes.outputs.code == 'true' || github.event_name == 'workflow_dispatch'
 
     steps:
       - name: Checkout
@@ -228,12 +240,15 @@ jobs:
     name: Android debug compile
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    needs: changes
     # PRs from forks don't get repo secrets, so the google-services step below
     # would fail. Skip the job in that case — qaCommon already covers the PR.
+    # Also skipped on doc-only changes (see `changes` job).
     if: >-
-      github.event_name == 'workflow_dispatch' ||
-      github.event_name == 'push' ||
-      github.event.pull_request.head.repo.full_name == github.repository
+      (needs.changes.outputs.code == 'true' || github.event_name == 'workflow_dispatch') &&
+      (github.event_name == 'workflow_dispatch' ||
+       github.event_name == 'push' ||
+       github.event.pull_request.head.repo.full_name == github.repository)
 
     steps:
       - name: Checkout
@@ -265,6 +280,8 @@ jobs:
     name: Android offline debug compile
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    needs: changes
+    if: needs.changes.outputs.code == 'true' || github.event_name == 'workflow_dispatch'
 
     steps:
       - name: Checkout
@@ -286,8 +303,10 @@ jobs:
     name: Firestore rules (Mocha + Allure)
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    needs: changes
     # Standalone: uses fake `demo-moneysurfer` project against the local
     # Firestore emulator, so no Firebase secrets needed (runs on fork PRs too).
+    if: needs.changes.outputs.code == 'true' || github.event_name == 'workflow_dispatch'
 
     steps:
       - name: Checkout
@@ -419,11 +438,14 @@ jobs:
     name: SonarCloud
     runs-on: ubuntu-latest
     timeout-minutes: 45
-    # Skip on PRs from forks (no SONAR_TOKEN access from fork secrets).
+    needs: changes
+    # Skip on PRs from forks (no SONAR_TOKEN access from fork secrets) and
+    # on doc-only changes (see `changes` job).
     if: >-
-      github.event_name == 'workflow_dispatch' ||
-      github.event_name == 'push' ||
-      github.event.pull_request.head.repo.full_name == github.repository
+      (needs.changes.outputs.code == 'true' || github.event_name == 'workflow_dispatch') &&
+      (github.event_name == 'workflow_dispatch' ||
+       github.event_name == 'push' ||
+       github.event.pull_request.head.repo.full_name == github.repository)
 
     steps:
       - name: Checkout
