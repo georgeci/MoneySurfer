@@ -1,0 +1,17 @@
+name: Firebase tools
+description: Install the pinned Firebase CLI used by emulator-backed CI jobs.
+
+inputs:
+  version:
+    description: firebase-tools npm package version.
+    required: false
+    default: "14.17.0"
+
+runs:
+  using: composite
+  steps:
+    - name: Install Firebase CLI
+      shell: bash
+      env:
+        FIREBASE_TOOLS_VERSION: ${{ inputs.version }}
+      run: npm i -g "firebase-tools@${FIREBASE_TOOLS_VERSION}"
