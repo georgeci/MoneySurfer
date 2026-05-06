@@ -1,0 +1,159 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>MoneySurfer Coverage Report > WorkspaceInviteEntity</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.georgeci.moneysurfer.data.db.entity</a>
+</div>
+
+<h1>Coverage Summary for Class: WorkspaceInviteEntity (com.georgeci.moneysurfer.data.db.entity)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">WorkspaceInviteEntity</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (13/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (63/63)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.db.entity
+&nbsp;
+&nbsp;import androidx.room.ColumnInfo
+&nbsp;import androidx.room.Entity
+&nbsp;import androidx.room.Index
+&nbsp;import androidx.room.PrimaryKey
+&nbsp;
+&nbsp;// No FK on workspaceId — incoming invites address workspaces the recipient is NOT a
+&nbsp;// member of (the whole point of an invite), so the parent workspace row may not exist
+&nbsp;// in local Room when the invite is upserted from a collection-group pull. The FK
+&nbsp;// previously triggered SQLite error 787 (FOREIGN KEY constraint failed) on the
+&nbsp;// recipient device. Referential integrity for member-side invite cleanup is enforced
+&nbsp;// at the workspace-pull layer (CLEAR_INVITES step) rather than via cascade.
+<b class="fc">&nbsp;@Entity(</b>
+&nbsp;    tableName = &quot;workspace_invites&quot;,
+&nbsp;    indices = [
+&nbsp;        Index(&quot;workspaceId&quot;),
+&nbsp;        Index(&quot;email&quot;),
+&nbsp;        Index(&quot;targetUserId&quot;),
+&nbsp;        Index(&quot;status&quot;),
+&nbsp;        Index(value = [&quot;workspaceId&quot;, &quot;status&quot;]),
+&nbsp;        Index(value = [&quot;email&quot;, &quot;status&quot;]),
+&nbsp;    ],
+&nbsp;)
+&nbsp;data class WorkspaceInviteEntity(
+<b class="fc">&nbsp;    @PrimaryKey</b>
+<b class="fc">&nbsp;    @ColumnInfo(name = &quot;id&quot;) val id: String,</b>
+<b class="fc">&nbsp;    @ColumnInfo(name = &quot;workspaceId&quot;) val workspaceId: String,</b>
+<b class="fc">&nbsp;    @ColumnInfo(name = &quot;email&quot;) val email: String,</b>
+<b class="fc">&nbsp;    @ColumnInfo(name = &quot;targetUserId&quot;) val targetUserId: String? = null,</b>
+<b class="fc">&nbsp;    @ColumnInfo(name = &quot;role&quot;) val role: String,</b>
+<b class="fc">&nbsp;    @ColumnInfo(name = &quot;status&quot;) val status: String,</b>
+<b class="fc">&nbsp;    @ColumnInfo(name = &quot;invitedByUserId&quot;) val invitedByUserId: String,</b>
+<b class="fc">&nbsp;    @ColumnInfo(name = &quot;createdAt&quot;) val createdAt: Long,</b>
+<b class="fc">&nbsp;    @ColumnInfo(name = &quot;updatedAt&quot;, defaultValue = &quot;0&quot;) val updatedAt: Long = 0L,</b>
+<b class="fc">&nbsp;    @ColumnInfo(name = &quot;expiresAt&quot;) val expiresAt: Long,</b>
+<b class="fc">&nbsp;    @ColumnInfo(name = &quot;respondedAt&quot;) val respondedAt: Long? = null,</b>
+&nbsp;)
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-05-06 14:45</div>
+</div>
+</body>
+</html>

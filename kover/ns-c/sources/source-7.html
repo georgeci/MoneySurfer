@@ -1,0 +1,315 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>MoneySurfer Coverage Report > SyncDtoMappersKt</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.georgeci.moneysurfer.data.sync</a>
+</div>
+
+<h1>Coverage Summary for Class: SyncDtoMappersKt (com.georgeci.moneysurfer.data.sync)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">SyncDtoMappersKt</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/124)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/374)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.sync
+&nbsp;
+&nbsp;import com.georgeci.moneysurfer.data.db.entity.AccountEntity
+&nbsp;import com.georgeci.moneysurfer.data.db.entity.CategoryEntity
+&nbsp;import com.georgeci.moneysurfer.data.db.entity.TransactionEntity
+&nbsp;import com.georgeci.moneysurfer.data.db.entity.WorkspaceEntity
+&nbsp;import com.georgeci.moneysurfer.data.db.entity.WorkspaceInviteEntity
+&nbsp;import com.georgeci.moneysurfer.data.db.entity.WorkspaceMemberEntity
+&nbsp;import com.georgeci.moneysurfer.data.remote.AccountDoc
+&nbsp;import com.georgeci.moneysurfer.data.remote.CategoryDoc
+&nbsp;import com.georgeci.moneysurfer.data.remote.TransactionDoc
+&nbsp;import com.georgeci.moneysurfer.data.remote.WorkspaceDoc
+&nbsp;import com.georgeci.moneysurfer.data.remote.WorkspaceInviteDoc
+&nbsp;import com.georgeci.moneysurfer.data.remote.WorkspaceMemberDoc
+&nbsp;import kotlinx.datetime.TimeZone
+&nbsp;import kotlinx.datetime.toLocalDateTime
+&nbsp;import kotlin.time.Instant
+&nbsp;
+&nbsp;/**
+&nbsp; * Shared Room ↔ Firestore-DTO mappers. Used by both the v1
+&nbsp; * [com.georgeci.moneysurfer.data.repository.WorkspaceSyncRepositoryImpl] and the
+&nbsp; * Phase-1 outbox path (repo dual-writes serialize the DTO into the queue payload).
+&nbsp; *
+&nbsp; * `clientVersionCode` is set via the DTO defaults (currently `1`) — the static
+&nbsp; * Firestore rule `hasValidClientVersion()` requires `&gt;= 1`. When real version
+&nbsp; * threading is wired (AppInfo.versionCode), bump the static default or move
+&nbsp; * to a per-call parameter.
+&nbsp; */
+&nbsp;
+<b class="nc">&nbsp;fun WorkspaceEntity.toDoc(): WorkspaceDoc = WorkspaceDoc(</b>
+<b class="nc">&nbsp;    name = name,</b>
+<b class="nc">&nbsp;    description = description,</b>
+<b class="nc">&nbsp;    baseCurrency = baseCurrency,</b>
+<b class="nc">&nbsp;    ownerId = ownerId,</b>
+<b class="nc">&nbsp;    archived = archived,</b>
+<b class="nc">&nbsp;    createdAt = createdAt,</b>
+<b class="nc">&nbsp;    updatedAt = updatedAt,</b>
+&nbsp;)
+&nbsp;
+<b class="nc">&nbsp;fun WorkspaceDoc.toEntity(id: String): WorkspaceEntity = WorkspaceEntity(</b>
+<b class="nc">&nbsp;    id = id,</b>
+<b class="nc">&nbsp;    name = name,</b>
+<b class="nc">&nbsp;    description = description,</b>
+<b class="nc">&nbsp;    baseCurrency = baseCurrency,</b>
+<b class="nc">&nbsp;    ownerId = ownerId,</b>
+<b class="nc">&nbsp;    createdAt = createdAt,</b>
+<b class="nc">&nbsp;    archived = archived,</b>
+<b class="nc">&nbsp;    updatedAt = updatedAt,</b>
+&nbsp;)
+&nbsp;
+<b class="nc">&nbsp;fun AccountEntity.toDoc(): AccountDoc = AccountDoc(</b>
+<b class="nc">&nbsp;    name = name,</b>
+<b class="nc">&nbsp;    type = type,</b>
+<b class="nc">&nbsp;    currency = currency,</b>
+<b class="nc">&nbsp;    balance = balance,</b>
+<b class="nc">&nbsp;    updatedAt = updatedAt,</b>
+&nbsp;)
+&nbsp;
+<b class="nc">&nbsp;fun AccountDoc.toEntity(id: String, workspaceId: String): AccountEntity = AccountEntity(</b>
+<b class="nc">&nbsp;    id = id,</b>
+<b class="nc">&nbsp;    workspaceId = workspaceId,</b>
+<b class="nc">&nbsp;    name = name,</b>
+<b class="nc">&nbsp;    type = type,</b>
+<b class="nc">&nbsp;    currency = currency,</b>
+<b class="nc">&nbsp;    balance = balance,</b>
+<b class="nc">&nbsp;    updatedAt = updatedAt,</b>
+&nbsp;)
+&nbsp;
+<b class="nc">&nbsp;fun CategoryEntity.toDoc(): CategoryDoc = CategoryDoc(</b>
+<b class="nc">&nbsp;    name = name,</b>
+<b class="nc">&nbsp;    type = type,</b>
+<b class="nc">&nbsp;    parentId = parentId,</b>
+<b class="nc">&nbsp;    createdAt = createdAt,</b>
+<b class="nc">&nbsp;    updatedAt = updatedAt,</b>
+&nbsp;)
+&nbsp;
+<b class="nc">&nbsp;fun CategoryDoc.toEntity(id: String, workspaceId: String): CategoryEntity = CategoryEntity(</b>
+<b class="nc">&nbsp;    id = id,</b>
+<b class="nc">&nbsp;    workspaceId = workspaceId,</b>
+<b class="nc">&nbsp;    name = name,</b>
+<b class="nc">&nbsp;    type = type,</b>
+<b class="nc">&nbsp;    parentId = parentId,</b>
+<b class="nc">&nbsp;    createdAt = createdAt,</b>
+<b class="nc">&nbsp;    updatedAt = updatedAt,</b>
+&nbsp;)
+&nbsp;
+<b class="nc">&nbsp;fun TransactionEntity.toDoc(): TransactionDoc = TransactionDoc(</b>
+<b class="nc">&nbsp;    accountId = accountId,</b>
+<b class="nc">&nbsp;    categoryId = categoryId,</b>
+<b class="nc">&nbsp;    amount = amount,</b>
+<b class="nc">&nbsp;    currencyCode = currencyCode,</b>
+<b class="nc">&nbsp;    note = note,</b>
+<b class="nc">&nbsp;    operationAt = operationAt,</b>
+<b class="nc">&nbsp;    operationDate = operationDate,</b>
+<b class="nc">&nbsp;    type = type,</b>
+<b class="nc">&nbsp;    status = status,</b>
+<b class="nc">&nbsp;    createdAt = createdAt,</b>
+<b class="nc">&nbsp;    updatedAt = updatedAt,</b>
+&nbsp;)
+&nbsp;
+&nbsp;fun TransactionDoc.toEntity(id: String, workspaceId: String): TransactionEntity {
+&nbsp;    // Tolerate legacy/partial Firestore docs:
+&nbsp;    //  - operationDate may be &quot;&quot; (older schema): derive ISO date from operationAt.
+&nbsp;    //    Use UTC, not the device default, so the same Firestore doc resolves to the
+&nbsp;    //    same operationDate on every client (avoids cross-device divergence).
+&nbsp;    //  - createdAt may be 0L (older schema): fall back to operationAt or updatedAt
+&nbsp;    //    so audit ordering doesn&#39;t collapse to epoch zero.
+<b class="nc">&nbsp;    val resolvedOperationDate = operationDate.ifBlank {</b>
+<b class="nc">&nbsp;        Instant.fromEpochMilliseconds(operationAt)</b>
+<b class="nc">&nbsp;            .toLocalDateTime(TimeZone.UTC)</b>
+<b class="nc">&nbsp;            .date</b>
+<b class="nc">&nbsp;            .toString()</b>
+&nbsp;    }
+<b class="nc">&nbsp;    val resolvedCreatedAt = if (createdAt == 0L) {</b>
+<b class="nc">&nbsp;        if (operationAt != 0L) operationAt else updatedAt</b>
+&nbsp;    } else {
+<b class="nc">&nbsp;        createdAt</b>
+&nbsp;    }
+<b class="nc">&nbsp;    return TransactionEntity(</b>
+<b class="nc">&nbsp;        id = id,</b>
+<b class="nc">&nbsp;        workspaceId = workspaceId,</b>
+<b class="nc">&nbsp;        accountId = accountId,</b>
+<b class="nc">&nbsp;        amount = amount,</b>
+<b class="nc">&nbsp;        currencyCode = currencyCode,</b>
+<b class="nc">&nbsp;        categoryId = categoryId,</b>
+<b class="nc">&nbsp;        note = note,</b>
+<b class="nc">&nbsp;        operationAt = operationAt,</b>
+<b class="nc">&nbsp;        operationDate = resolvedOperationDate,</b>
+<b class="nc">&nbsp;        type = type,</b>
+<b class="nc">&nbsp;        status = status,</b>
+<b class="nc">&nbsp;        createdAt = resolvedCreatedAt,</b>
+<b class="nc">&nbsp;        updatedAt = updatedAt,</b>
+&nbsp;    )
+&nbsp;}
+&nbsp;
+<b class="nc">&nbsp;fun WorkspaceMemberEntity.toDoc(): WorkspaceMemberDoc = WorkspaceMemberDoc(</b>
+<b class="nc">&nbsp;    userId = userId,</b>
+<b class="nc">&nbsp;    role = role,</b>
+<b class="nc">&nbsp;    status = status,</b>
+<b class="nc">&nbsp;    displayName = displayName,</b>
+<b class="nc">&nbsp;    email = email,</b>
+<b class="nc">&nbsp;    addedByUserId = addedByUserId,</b>
+<b class="nc">&nbsp;    createdAt = createdAt,</b>
+<b class="nc">&nbsp;    updatedAt = updatedAt,</b>
+<b class="nc">&nbsp;    leftAt = leftAt,</b>
+<b class="nc">&nbsp;    removedAt = removedAt,</b>
+&nbsp;)
+&nbsp;
+<b class="nc">&nbsp;fun WorkspaceMemberDoc.toEntity(workspaceId: String): WorkspaceMemberEntity = WorkspaceMemberEntity(</b>
+<b class="nc">&nbsp;    userId = userId,</b>
+<b class="nc">&nbsp;    workspaceId = workspaceId,</b>
+<b class="nc">&nbsp;    role = role,</b>
+<b class="nc">&nbsp;    status = status.ifEmpty { &quot;ACTIVE&quot; },</b>
+<b class="nc">&nbsp;    displayName = displayName,</b>
+<b class="nc">&nbsp;    email = email,</b>
+<b class="nc">&nbsp;    addedByUserId = addedByUserId,</b>
+<b class="nc">&nbsp;    createdAt = createdAt,</b>
+<b class="nc">&nbsp;    updatedAt = updatedAt,</b>
+<b class="nc">&nbsp;    leftAt = leftAt,</b>
+<b class="nc">&nbsp;    removedAt = removedAt,</b>
+&nbsp;)
+&nbsp;
+<b class="nc">&nbsp;fun WorkspaceInviteEntity.toDoc(): WorkspaceInviteDoc = WorkspaceInviteDoc(</b>
+<b class="nc">&nbsp;    email = email,</b>
+<b class="nc">&nbsp;    targetUserId = targetUserId,</b>
+<b class="nc">&nbsp;    role = role,</b>
+<b class="nc">&nbsp;    status = status,</b>
+<b class="nc">&nbsp;    invitedByUserId = invitedByUserId,</b>
+<b class="nc">&nbsp;    createdAt = createdAt,</b>
+<b class="nc">&nbsp;    updatedAt = updatedAt,</b>
+<b class="nc">&nbsp;    expiresAt = expiresAt,</b>
+<b class="nc">&nbsp;    respondedAt = respondedAt,</b>
+&nbsp;)
+&nbsp;
+<b class="nc">&nbsp;fun WorkspaceInviteDoc.toEntity(id: String, workspaceId: String): WorkspaceInviteEntity = WorkspaceInviteEntity(</b>
+<b class="nc">&nbsp;    id = id,</b>
+<b class="nc">&nbsp;    workspaceId = workspaceId,</b>
+<b class="nc">&nbsp;    email = email,</b>
+<b class="nc">&nbsp;    targetUserId = targetUserId,</b>
+<b class="nc">&nbsp;    role = role,</b>
+<b class="nc">&nbsp;    status = status.ifEmpty { &quot;PENDING&quot; },</b>
+<b class="nc">&nbsp;    invitedByUserId = invitedByUserId,</b>
+<b class="nc">&nbsp;    createdAt = createdAt,</b>
+<b class="nc">&nbsp;    updatedAt = updatedAt,</b>
+<b class="nc">&nbsp;    expiresAt = expiresAt,</b>
+<b class="nc">&nbsp;    respondedAt = respondedAt,</b>
+&nbsp;)
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-05-06 14:45</div>
+</div>
+</body>
+</html>

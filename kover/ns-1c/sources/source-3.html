@@ -1,0 +1,152 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>MoneySurfer Coverage Report > NoOpAuthRemoteRepository</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.georgeci.moneysurfer.offline.noop</a>
+</div>
+
+<h1>Coverage Summary for Class: NoOpAuthRemoteRepository (com.georgeci.moneysurfer.offline.noop)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">NoOpAuthRemoteRepository</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/29)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.offline.noop
+&nbsp;
+&nbsp;import arrow.core.Either
+&nbsp;import arrow.core.left
+&nbsp;import com.georgeci.moneysurfer.domain.auth.AuthError
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.AuthRemoteRepository
+&nbsp;
+&nbsp;/**
+&nbsp; * Offline build has no Firebase Auth. Reads return empty session state; any
+&nbsp; * write call (sign-in, sign-up, sign-out) reports `Unknown` so the UI surfaces
+&nbsp; * a generic auth error rather than crashing on a missing definition.
+&nbsp; */
+<b class="nc">&nbsp;class NoOpAuthRemoteRepository : AuthRemoteRepository {</b>
+<b class="nc">&nbsp;    override fun currentUid(): String? = null</b>
+<b class="nc">&nbsp;    override fun currentEmail(): String? = null</b>
+<b class="nc">&nbsp;    override fun isCurrentUserAnonymous(): Boolean = false</b>
+&nbsp;
+&nbsp;    override suspend fun signInWithEmail(email: String, password: String): Either&lt;AuthError, String&gt; =
+<b class="nc">&nbsp;        unsupported()</b>
+&nbsp;
+&nbsp;    override suspend fun createUserWithEmail(email: String, password: String): Either&lt;AuthError, String&gt; =
+<b class="nc">&nbsp;        unsupported()</b>
+&nbsp;
+<b class="nc">&nbsp;    override suspend fun signInAnonymously(): Either&lt;AuthError, String&gt; = unsupported()</b>
+&nbsp;
+&nbsp;    override suspend fun signOut(): Either&lt;AuthError, Unit&gt; =
+<b class="nc">&nbsp;        AuthError(AuthError.Type.Unknown, &quot;Auth disabled in offline build&quot;).left()</b>
+&nbsp;
+&nbsp;    private fun unsupported(): Either&lt;AuthError, String&gt; =
+<b class="nc">&nbsp;        AuthError(AuthError.Type.Unknown, &quot;Auth disabled in offline build&quot;).left()</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-05-06 14:45</div>
+</div>
+</body>
+</html>

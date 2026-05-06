@@ -1,0 +1,197 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>MoneySurfer Coverage Report > ApplyTransactionChangeUseCase</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.georgeci.moneysurfer.domain.usecase</a>
+</div>
+
+<h1>Coverage Summary for Class: ApplyTransactionChangeUseCase (com.georgeci.moneysurfer.domain.usecase)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">ApplyTransactionChangeUseCase</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    92.9%
+  </span>
+  <span class="absValue">
+    (13/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (11/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (168/168)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ApplyTransactionChangeUseCase$invoke$1</td>
+    <td class="coverageStat"/>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    92.9%
+  </span>
+  <span class="absValue">
+    (13/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (11/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (168/168)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.usecase
+&nbsp;
+&nbsp;import com.georgeci.moneysurfer.domain.model.Transaction
+&nbsp;import com.georgeci.moneysurfer.domain.model.calculateBalanceDelta
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.AccountRepository
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.TransactionRepository
+&nbsp;import org.koin.core.annotation.Single
+&nbsp;
+&nbsp;/**
+&nbsp; * Single writer for any transaction change (create / update / delete). Computes the balance
+&nbsp; * delta against [old] and applies it to the affected accounts, then writes the new tx row
+&nbsp; * (or hard-deletes it). Outbox enqueue happens inside the repository writes.
+&nbsp; *
+&nbsp; * Sequencing: the account-balance update happens first so a partial failure leaves the
+&nbsp; * cache reflecting the intent (will be reconciled by recalc if it diverges). The Room
+&nbsp; * write path is not wrapped in a single transaction in v1 — the project accepts this risk
+&nbsp; * elsewhere; see md/totatl_calc.md §4.
+&nbsp; *
+&nbsp; * - `old == null &amp;&amp; new != null` → create
+&nbsp; * - `old != null &amp;&amp; new != null` → update (any field, including status / accountId)
+&nbsp; * - `old != null &amp;&amp; new == null` → delete (hard-delete locally)
+&nbsp; * - `old == null &amp;&amp; new == null` → no-op
+&nbsp; */
+<b class="fc">&nbsp;@Single</b>
+&nbsp;class ApplyTransactionChangeUseCase(
+<b class="fc">&nbsp;    private val transactionRepository: TransactionRepository,</b>
+<b class="fc">&nbsp;    private val accountRepository: AccountRepository,</b>
+&nbsp;) {
+&nbsp;
+&nbsp;    suspend operator fun invoke(old: Transaction?, new: Transaction?) {
+<b class="fc">&nbsp;        val delta = calculateBalanceDelta(old, new)</b>
+<b class="fc">&nbsp;        for ((accountId, money) in delta) {</b>
+<b class="fc">&nbsp;            accountRepository.applyDelta(accountId, money)</b>
+&nbsp;        }
+<b class="fc">&nbsp;        when {</b>
+<b class="fc">&nbsp;            old == null &amp;&amp; new != null -&gt; transactionRepository.insert(new)</b>
+<b class="fc">&nbsp;            old != null &amp;&amp; new != null -&gt; transactionRepository.update(new)</b>
+<b class="pc">&nbsp;            old != null &amp;&amp; new == null -&gt; transactionRepository.delete(old.id)</b>
+<b class="fc">&nbsp;            else -&gt; Unit</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-05-06 14:45</div>
+</div>
+</body>
+</html>

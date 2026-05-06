@@ -1,0 +1,168 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>MoneySurfer Coverage Report > LocalDataModule</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.georgeci.moneysurfer.data.di</a>
+</div>
+
+<h1>Coverage Summary for Class: LocalDataModule (com.georgeci.moneysurfer.data.di)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">LocalDataModule</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    10%
+  </span>
+  <span class="absValue">
+    (1/10)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    10%
+  </span>
+  <span class="absValue">
+    (1/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    10%
+  </span>
+  <span class="absValue">
+    (2/20)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.di
+&nbsp;
+&nbsp;import com.georgeci.moneysurfer.data.db.MoneySurferDatabase
+&nbsp;import com.georgeci.moneysurfer.data.db.dao.AccountDao
+&nbsp;import com.georgeci.moneysurfer.data.db.dao.BudgetDao
+&nbsp;import com.georgeci.moneysurfer.data.db.dao.CategoryDao
+&nbsp;import com.georgeci.moneysurfer.data.db.dao.RecurringRuleDao
+&nbsp;import com.georgeci.moneysurfer.data.db.dao.TransactionDao
+&nbsp;import com.georgeci.moneysurfer.data.db.dao.UserDao
+&nbsp;import com.georgeci.moneysurfer.data.db.dao.WorkspaceDao
+&nbsp;import com.georgeci.moneysurfer.data.db.dao.WorkspaceInviteDao
+&nbsp;import com.georgeci.moneysurfer.data.db.dao.WorkspaceMemberDao
+&nbsp;import org.koin.core.annotation.ComponentScan
+&nbsp;import org.koin.core.annotation.Module
+&nbsp;import org.koin.core.annotation.Single
+&nbsp;
+<b class="fc">&nbsp;@Module</b>
+&nbsp;@ComponentScan(&quot;com.georgeci.moneysurfer.data&quot;)
+&nbsp;class LocalDataModule {
+&nbsp;
+&nbsp;    @Single
+<b class="nc">&nbsp;    fun userDao(database: MoneySurferDatabase): UserDao = database.userDao()</b>
+&nbsp;
+&nbsp;    @Single
+<b class="nc">&nbsp;    fun workspaceDao(database: MoneySurferDatabase): WorkspaceDao = database.workspaceDao()</b>
+&nbsp;
+&nbsp;    @Single
+<b class="nc">&nbsp;    fun workspaceMemberDao(database: MoneySurferDatabase): WorkspaceMemberDao = database.workspaceMemberDao()</b>
+&nbsp;
+&nbsp;    @Single
+<b class="nc">&nbsp;    fun workspaceInviteDao(database: MoneySurferDatabase): WorkspaceInviteDao = database.workspaceInviteDao()</b>
+&nbsp;
+&nbsp;    @Single
+<b class="nc">&nbsp;    fun accountDao(database: MoneySurferDatabase): AccountDao = database.accountDao()</b>
+&nbsp;
+&nbsp;    @Single
+<b class="nc">&nbsp;    fun categoryDao(database: MoneySurferDatabase): CategoryDao = database.categoryDao()</b>
+&nbsp;
+&nbsp;    @Single
+<b class="nc">&nbsp;    fun transactionDao(database: MoneySurferDatabase): TransactionDao = database.transactionDao()</b>
+&nbsp;
+&nbsp;    @Single
+<b class="nc">&nbsp;    fun budgetDao(database: MoneySurferDatabase): BudgetDao = database.budgetDao()</b>
+&nbsp;
+&nbsp;    @Single
+<b class="nc">&nbsp;    fun recurringRuleDao(database: MoneySurferDatabase): RecurringRuleDao = database.recurringRuleDao()</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-05-06 14:45</div>
+</div>
+</body>
+</html>

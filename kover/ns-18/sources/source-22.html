@@ -1,0 +1,259 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>MoneySurfer Coverage Report > RemoveMemberUseCase</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.georgeci.moneysurfer.domain.usecase</a>
+</div>
+
+<h1>Coverage Summary for Class: RemoveMemberUseCase (com.georgeci.moneysurfer.domain.usecase)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">RemoveMemberUseCase</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    70%
+  </span>
+  <span class="absValue">
+    (14/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    96.7%
+  </span>
+  <span class="absValue">
+    (29/30)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    96.6%
+  </span>
+  <span class="absValue">
+    (459/475)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">RemoveMemberUseCase$Companion</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">RemoveMemberUseCase$invoke$1</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">RemoveMemberUseCase$Params</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (12/12)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    70%
+  </span>
+  <span class="absValue">
+    (14/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    97%
+  </span>
+  <span class="absValue">
+    (32/33)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    96.7%
+  </span>
+  <span class="absValue">
+    (471/487)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.usecase
+&nbsp;
+&nbsp;import arrow.core.Either
+&nbsp;import arrow.core.raise.either
+&nbsp;import arrow.core.raise.ensure
+&nbsp;import co.touchlab.kermit.Logger
+&nbsp;import com.georgeci.moneysurfer.domain.auth.SessionPointers
+&nbsp;import com.georgeci.moneysurfer.domain.model.WorkspaceMemberStatus
+&nbsp;import com.georgeci.moneysurfer.domain.model.WorkspaceRole
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.UserId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.WorkspaceMemberRepository
+&nbsp;import kotlinx.coroutines.flow.first
+&nbsp;import org.koin.core.annotation.Single
+&nbsp;
+&nbsp;/**
+&nbsp; * Owner removes another member: status → REMOVED.
+&nbsp; *
+&nbsp; * Refuses to remove the last OWNER ([InviteError.OwnerCannotLeave]) — workspace must always
+&nbsp; * have at least one owner. Transferring ownership is a separate (post-v1) flow.
+&nbsp; */
+<b class="fc">&nbsp;@Single</b>
+&nbsp;class RemoveMemberUseCase(
+<b class="fc">&nbsp;    private val memberRepository: WorkspaceMemberRepository,</b>
+<b class="fc">&nbsp;    private val session: SessionPointers,</b>
+&nbsp;) {
+<b class="fc">&nbsp;    private val log = Logger.withTag(TAG)</b>
+&nbsp;
+<b class="fc">&nbsp;    data class Params(</b>
+<b class="fc">&nbsp;        val workspaceId: WorkspaceId,</b>
+<b class="fc">&nbsp;        val targetUserId: UserId,</b>
+&nbsp;    )
+&nbsp;
+<b class="fc">&nbsp;    suspend operator fun invoke(params: Params): Either&lt;InviteError, Unit&gt; = either {</b>
+<b class="pc">&nbsp;        val callerId = session.currentUserId.flow.first()</b>
+<b class="nc">&nbsp;            ?: raise(InviteError.NoCurrentUser)</b>
+&nbsp;
+<b class="fc">&nbsp;        val members = memberRepository.getByWorkspaceId(params.workspaceId).first()</b>
+<b class="fc">&nbsp;        val callerMember = members.firstOrNull { it.userId == callerId }</b>
+<b class="pc">&nbsp;        ensure(callerMember?.role == WorkspaceRole.OWNER) { InviteError.NotOwner }</b>
+&nbsp;
+<b class="fc">&nbsp;        val target = members.firstOrNull { it.userId == params.targetUserId }</b>
+<b class="fc">&nbsp;            ?: raise(InviteError.InviteNotFound)</b>
+<b class="pc">&nbsp;        ensure(target.status == WorkspaceMemberStatus.ACTIVE) { InviteError.InviteNotPending }</b>
+&nbsp;
+<b class="fc">&nbsp;        if (target.role == WorkspaceRole.OWNER) {</b>
+<b class="fc">&nbsp;            val remainingOwners = members.count {</b>
+<b class="fc">&nbsp;                it.role == WorkspaceRole.OWNER &amp;&amp;</b>
+<b class="pc">&nbsp;                    it.status == WorkspaceMemberStatus.ACTIVE &amp;&amp;</b>
+<b class="fc">&nbsp;                    it.userId != params.targetUserId</b>
+&nbsp;            }
+<b class="pc">&nbsp;            ensure(remainingOwners &gt;= 1) { InviteError.OwnerCannotLeave }</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        Either.catch {</b>
+<b class="fc">&nbsp;            memberRepository.markRemoved(</b>
+<b class="fc">&nbsp;                userId = params.targetUserId,</b>
+<b class="fc">&nbsp;                workspaceId = params.workspaceId,</b>
+<b class="fc">&nbsp;                removedByUserId = callerId,</b>
+&nbsp;            )
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;            .onLeft { log.e(it) { &quot;[local] markRemoved failed uid=${params.targetUserId.value}&quot; } }</b>
+<b class="fc">&nbsp;            .mapLeft { InviteError.LocalWriteFailed(it) }</b>
+<b class="fc">&nbsp;            .bind()</b>
+&nbsp;
+<b class="fc">&nbsp;        log.i { &quot;[done] removed uid=${params.targetUserId.value} by=${callerId.value}&quot; }</b>
+<b class="fc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    private companion object {
+&nbsp;        const val TAG = &quot;RemoveMember&quot;
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-05-06 14:45</div>
+</div>
+</body>
+</html>

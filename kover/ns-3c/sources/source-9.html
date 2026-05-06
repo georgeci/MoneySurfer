@@ -1,0 +1,403 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>MoneySurfer Coverage Report > SurferGoalItem</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.georgeci.moneysurfer.uikit.widgets</a>
+</div>
+
+<h1>Coverage Summary for Class: SurferGoalItem (com.georgeci.moneysurfer.uikit.widgets)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">SurferGoalItem</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/32)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.widgets
+&nbsp;
+&nbsp;import androidx.compose.foundation.Canvas
+&nbsp;import androidx.compose.foundation.background
+&nbsp;import androidx.compose.foundation.clickable
+&nbsp;import androidx.compose.foundation.layout.Arrangement
+&nbsp;import androidx.compose.foundation.layout.Box
+&nbsp;import androidx.compose.foundation.layout.Column
+&nbsp;import androidx.compose.foundation.layout.Row
+&nbsp;import androidx.compose.foundation.layout.Spacer
+&nbsp;import androidx.compose.foundation.layout.fillMaxSize
+&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
+&nbsp;import androidx.compose.foundation.layout.height
+&nbsp;import androidx.compose.foundation.layout.padding
+&nbsp;import androidx.compose.foundation.layout.size
+&nbsp;import androidx.compose.foundation.shape.CircleShape
+&nbsp;import androidx.compose.foundation.shape.RoundedCornerShape
+&nbsp;import androidx.compose.material3.Icon
+&nbsp;import androidx.compose.material3.Text
+&nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.ui.Alignment
+&nbsp;import androidx.compose.ui.Modifier
+&nbsp;import androidx.compose.ui.draw.clip
+&nbsp;import androidx.compose.ui.graphics.drawscope.Stroke
+&nbsp;import androidx.compose.ui.graphics.drawscope.rotate
+&nbsp;import androidx.compose.ui.text.font.FontWeight
+&nbsp;import androidx.compose.ui.text.style.TextOverflow
+&nbsp;import androidx.compose.ui.tooling.preview.Preview
+&nbsp;import androidx.compose.ui.unit.dp
+&nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+&nbsp;import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
+&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
+&nbsp;
+<b class="nc">&nbsp;data class SurferGoalItem(</b>
+<b class="nc">&nbsp;    val id: String,</b>
+<b class="nc">&nbsp;    val name: String,</b>
+<b class="nc">&nbsp;    val savedFormatted: String,</b>
+<b class="nc">&nbsp;    val targetFormatted: String,</b>
+<b class="nc">&nbsp;    val progress: Float,</b>
+<b class="nc">&nbsp;    val captionLine: String,</b>
+&nbsp;)
+&nbsp;
+&nbsp;@Composable
+&nbsp;fun SurferGoalsWidget(
+&nbsp;    items: List&lt;SurferGoalItem&gt;,
+&nbsp;    title: String,
+&nbsp;    seeAllLabel: String,
+&nbsp;    onSeeAllClick: () -&gt; Unit,
+&nbsp;    modifier: Modifier = Modifier,
+&nbsp;    size: SurferWidgetSize = LocalSurferWidgetSize.current,
+&nbsp;    onItemClick: ((SurferGoalItem) -&gt; Unit)? = null,
+&nbsp;    emptyTitle: String? = null,
+&nbsp;    emptySubtitle: String? = null,
+&nbsp;) {
+&nbsp;    val hero = size == SurferWidgetSize.Hero
+&nbsp;    val visibleItems = if (hero) items.take(2) else items.take(1)
+&nbsp;
+&nbsp;    Column(
+&nbsp;        modifier = modifier
+&nbsp;            .clip(RoundedCornerShape(16.dp))
+&nbsp;            .background(AppTheme.materialColors.surface)
+&nbsp;            .padding(vertical = 14.dp),
+&nbsp;    ) {
+&nbsp;        Row(
+&nbsp;            modifier = Modifier
+&nbsp;                .fillMaxWidth()
+&nbsp;                .padding(horizontal = 20.dp),
+&nbsp;            verticalAlignment = Alignment.CenterVertically,
+&nbsp;        ) {
+&nbsp;            Text(
+&nbsp;                text = title,
+&nbsp;                style = AppTheme.typography.titleMedium,
+&nbsp;                color = AppTheme.materialColors.onSurface,
+&nbsp;                modifier = Modifier.weight(1f),
+&nbsp;            )
+&nbsp;            Text(
+&nbsp;                text = seeAllLabel,
+&nbsp;                style = AppTheme.typography.labelMedium,
+&nbsp;                color = AppTheme.materialColors.primary,
+&nbsp;                modifier = Modifier.clickable(onClick = onSeeAllClick),
+&nbsp;            )
+&nbsp;        }
+&nbsp;
+&nbsp;        if (items.isEmpty()) {
+&nbsp;            EmptyBox(title = emptyTitle, subtitle = emptySubtitle)
+&nbsp;            return@Column
+&nbsp;        }
+&nbsp;
+&nbsp;        Spacer(Modifier.height(8.dp))
+&nbsp;        Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
+&nbsp;            visibleItems.forEach { item -&gt;
+&nbsp;                GoalRow(
+&nbsp;                    item = item,
+&nbsp;                    onClick = onItemClick?.let { handler -&gt; { handler(item) } },
+&nbsp;                )
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun GoalRow(item: SurferGoalItem, onClick: (() -&gt; Unit)?) {
+&nbsp;    val rowModifier = if (onClick != null) {
+&nbsp;        Modifier.fillMaxWidth().clickable(onClick = onClick)
+&nbsp;    } else {
+&nbsp;        Modifier.fillMaxWidth()
+&nbsp;    }
+&nbsp;    Row(
+&nbsp;        modifier = rowModifier.padding(horizontal = 20.dp),
+&nbsp;        verticalAlignment = Alignment.CenterVertically,
+&nbsp;        horizontalArrangement = Arrangement.spacedBy(14.dp),
+&nbsp;    ) {
+&nbsp;        ProgressRing(progress = item.progress, size = 56.dp)
+&nbsp;        Column(modifier = Modifier.weight(1f)) {
+&nbsp;            Row(verticalAlignment = Alignment.CenterVertically) {
+&nbsp;                Text(
+&nbsp;                    text = item.name,
+&nbsp;                    style = AppTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium),
+&nbsp;                    color = AppTheme.materialColors.onSurface,
+&nbsp;                    maxLines = 1,
+&nbsp;                    overflow = TextOverflow.Ellipsis,
+&nbsp;                    modifier = Modifier.weight(1f),
+&nbsp;                )
+&nbsp;                Spacer(Modifier.size(8.dp))
+&nbsp;                Text(
+&nbsp;                    text = &quot;${item.savedFormatted} / ${item.targetFormatted}&quot;,
+&nbsp;                    style = AppTheme.typography.labelLarge,
+&nbsp;                    color = AppTheme.materialColors.onSurfaceVariant,
+&nbsp;                )
+&nbsp;            }
+&nbsp;            Spacer(Modifier.height(2.dp))
+&nbsp;            Text(
+&nbsp;                text = item.captionLine,
+&nbsp;                style = AppTheme.typography.bodySmall,
+&nbsp;                color = AppTheme.materialColors.onSurfaceVariant,
+&nbsp;                maxLines = 1,
+&nbsp;                overflow = TextOverflow.Ellipsis,
+&nbsp;            )
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun ProgressRing(
+&nbsp;    progress: Float,
+&nbsp;    size: androidx.compose.ui.unit.Dp,
+&nbsp;) {
+&nbsp;    val track = AppTheme.materialColors.surfaceContainerHigh
+&nbsp;    val fill = AppTheme.materialColors.primary
+&nbsp;    val percentText = &quot;${(progress.coerceIn(0f, 1f) * 100).toInt()}%&quot;
+&nbsp;    Box(modifier = Modifier.size(size), contentAlignment = Alignment.Center) {
+&nbsp;        Canvas(modifier = Modifier.size(size)) {
+&nbsp;            val stroke = (this.size.minDimension / 16f).coerceAtLeast(3f)
+&nbsp;            val inset = stroke / 2f
+&nbsp;            val box = androidx.compose.ui.geometry.Size(
+&nbsp;                this.size.width - stroke,
+&nbsp;                this.size.height - stroke,
+&nbsp;            )
+&nbsp;            val topLeft = androidx.compose.ui.geometry.Offset(inset, inset)
+&nbsp;            drawArc(
+&nbsp;                color = track,
+&nbsp;                startAngle = 0f,
+&nbsp;                sweepAngle = 360f,
+&nbsp;                useCenter = false,
+&nbsp;                topLeft = topLeft,
+&nbsp;                size = box,
+&nbsp;                style = Stroke(width = stroke),
+&nbsp;            )
+&nbsp;            rotate(degrees = -90f) {
+&nbsp;                drawArc(
+&nbsp;                    color = fill,
+&nbsp;                    startAngle = 0f,
+&nbsp;                    sweepAngle = 360f * progress.coerceIn(0f, 1f),
+&nbsp;                    useCenter = false,
+&nbsp;                    topLeft = topLeft,
+&nbsp;                    size = box,
+&nbsp;                    style = Stroke(width = stroke, cap = androidx.compose.ui.graphics.StrokeCap.Round),
+&nbsp;                )
+&nbsp;            }
+&nbsp;        }
+&nbsp;        Text(
+&nbsp;            text = percentText,
+&nbsp;            style = AppTheme.typography.labelMedium,
+&nbsp;            color = AppTheme.materialColors.onSurface,
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun EmptyBox(title: String?, subtitle: String?) {
+&nbsp;    Column(
+&nbsp;        modifier = Modifier
+&nbsp;            .fillMaxSize()
+&nbsp;            .padding(24.dp),
+&nbsp;        horizontalAlignment = Alignment.CenterHorizontally,
+&nbsp;        verticalArrangement = Arrangement.Center,
+&nbsp;    ) {
+&nbsp;        Box(
+&nbsp;            modifier = Modifier
+&nbsp;                .size(44.dp)
+&nbsp;                .clip(CircleShape)
+&nbsp;                .background(AppTheme.materialColors.surfaceContainerHighest),
+&nbsp;            contentAlignment = Alignment.Center,
+&nbsp;        ) {
+&nbsp;            Icon(
+&nbsp;                imageVector = SurferIcons.Savings,
+&nbsp;                contentDescription = null,
+&nbsp;                tint = AppTheme.materialColors.onSurfaceVariant,
+&nbsp;                modifier = Modifier.size(20.dp),
+&nbsp;            )
+&nbsp;        }
+&nbsp;        if (title != null) {
+&nbsp;            Spacer(Modifier.height(6.dp))
+&nbsp;            Text(
+&nbsp;                text = title,
+&nbsp;                style = AppTheme.typography.titleSmall,
+&nbsp;                color = AppTheme.materialColors.onSurface,
+&nbsp;            )
+&nbsp;        }
+&nbsp;        if (subtitle != null) {
+&nbsp;            Spacer(Modifier.height(2.dp))
+&nbsp;            Text(
+&nbsp;                text = subtitle,
+&nbsp;                style = AppTheme.typography.bodySmall,
+&nbsp;                color = AppTheme.materialColors.onSurfaceVariant,
+&nbsp;            )
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Preview
+&nbsp;@Composable
+&nbsp;private fun SurferGoalsWidgetHeroPreview() {
+&nbsp;    SurferComponentPreview {
+&nbsp;        Box(modifier = Modifier.padding(16.dp)) {
+&nbsp;            SurferGoalsWidget(
+&nbsp;                items = listOf(
+&nbsp;                    SurferGoalItem(
+&nbsp;                        id = &quot;1&quot;,
+&nbsp;                        name = &quot;Emergency fund&quot;,
+&nbsp;                        savedFormatted = &quot;€8,915&quot;,
+&nbsp;                        targetFormatted = &quot;€12,000&quot;,
+&nbsp;                        progress = 0.74f,
+&nbsp;                        captionLine = &quot;€3,085 left · €770/mo to hit Aug 2026&quot;,
+&nbsp;                    ),
+&nbsp;                    SurferGoalItem(
+&nbsp;                        id = &quot;2&quot;,
+&nbsp;                        name = &quot;Lisbon trip&quot;,
+&nbsp;                        savedFormatted = &quot;€1,480&quot;,
+&nbsp;                        targetFormatted = &quot;€2,400&quot;,
+&nbsp;                        progress = 0.62f,
+&nbsp;                        captionLine = &quot;€920 left · €230/mo to hit Sep 2026&quot;,
+&nbsp;                    ),
+&nbsp;                ),
+&nbsp;                title = &quot;Goals&quot;,
+&nbsp;                seeAllLabel = &quot;See all&quot;,
+&nbsp;                onSeeAllClick = {},
+&nbsp;                modifier = Modifier.fillMaxWidth(),
+&nbsp;            )
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Preview
+&nbsp;@Composable
+&nbsp;private fun SurferGoalsWidgetEmptyPreview() {
+&nbsp;    SurferComponentPreview {
+&nbsp;        Box(modifier = Modifier.padding(16.dp)) {
+&nbsp;            SurferGoalsWidget(
+&nbsp;                items = emptyList(),
+&nbsp;                title = &quot;Goals&quot;,
+&nbsp;                seeAllLabel = &quot;See all&quot;,
+&nbsp;                onSeeAllClick = {},
+&nbsp;                emptyTitle = &quot;No goals yet&quot;,
+&nbsp;                emptySubtitle = &quot;Set a savings target to track progress here.&quot;,
+&nbsp;                modifier = Modifier
+&nbsp;                    .fillMaxWidth()
+&nbsp;                    .height(180.dp),
+&nbsp;            )
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-05-06 14:45</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,206 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>MoneySurfer Coverage Report > KermitSyncTelemetry</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.georgeci.moneysurfer.sync.internal.telemetry</a>
+</div>
+
+<h1>Coverage Summary for Class: KermitSyncTelemetry (com.georgeci.moneysurfer.sync.internal.telemetry)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">KermitSyncTelemetry</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/6)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (12/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (88/88)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">KermitSyncTelemetry$Companion</td>
+    <td class="coverageStat"/>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/6)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (12/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (88/88)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.sync.internal.telemetry
+&nbsp;
+&nbsp;import co.touchlab.kermit.Logger
+&nbsp;import com.georgeci.moneysurfer.sync.api.SyncError
+&nbsp;import com.georgeci.moneysurfer.sync.api.SyncReason
+&nbsp;import com.georgeci.moneysurfer.sync.api.SyncRequestId
+&nbsp;import com.georgeci.moneysurfer.sync.api.SyncScope
+&nbsp;import com.georgeci.moneysurfer.sync.api.SyncStep
+&nbsp;import com.georgeci.moneysurfer.sync.api.SyncSummary
+&nbsp;import com.georgeci.moneysurfer.sync.telemetry.SyncTelemetry
+&nbsp;import org.koin.core.annotation.Single
+&nbsp;import kotlin.time.Duration
+&nbsp;
+&nbsp;/**
+&nbsp; * Structured logging via Kermit. Tag `SyncTelemetry`, prefix
+&nbsp; * `[req=…]` so a single sync run can be grep&#39;d across noisy logs.
+&nbsp; *
+&nbsp; * Step-level events go to debug; lifecycle (started / completed / failed /
+&nbsp; * cancelled) goes to info. Failure carries the typed [SyncError] for grepping
+&nbsp; * by class.
+&nbsp; */
+<b class="fc">&nbsp;@Single(binds = [SyncTelemetry::class])</b>
+&nbsp;class KermitSyncTelemetry : SyncTelemetry {
+&nbsp;
+<b class="fc">&nbsp;    private val log = Logger.withTag(TAG)</b>
+&nbsp;
+&nbsp;    override fun onSyncStarted(
+&nbsp;        requestId: SyncRequestId,
+&nbsp;        reasons: Set&lt;SyncReason&gt;,
+&nbsp;        scope: SyncScope,
+&nbsp;    ) {
+<b class="fc">&nbsp;        log.i { &quot;[req=${requestId.value}] started reasons=$reasons scope=$scope&quot; }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    override fun onStepEntered(requestId: SyncRequestId, step: SyncStep) {
+<b class="fc">&nbsp;        log.d { &quot;[req=${requestId.value}] step=${step::class.simpleName}&quot; }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    override fun onSyncCompleted(
+&nbsp;        requestId: SyncRequestId,
+&nbsp;        summary: SyncSummary,
+&nbsp;        duration: Duration,
+&nbsp;    ) {
+<b class="fc">&nbsp;        log.i {</b>
+<b class="fc">&nbsp;            &quot;[req=${requestId.value}] completed in $duration &quot; +</b>
+<b class="fc">&nbsp;                &quot;uploaded=${summary.uploadedCount} downloaded=${summary.downloadedCount} &quot; +</b>
+<b class="fc">&nbsp;                &quot;conflicts=${summary.conflictCount} recalculated=${summary.recalculatedCount}&quot;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    override fun onSyncFailed(requestId: SyncRequestId, error: SyncError, duration: Duration) {
+<b class="fc">&nbsp;        log.w {</b>
+<b class="fc">&nbsp;            &quot;[req=${requestId.value}] failed in $duration &quot; +</b>
+<b class="fc">&nbsp;                &quot;error=${error::class.simpleName} retryable=${error.isRetryable}&quot;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    override fun onSyncCancelled(requestId: SyncRequestId, duration: Duration) {
+<b class="fc">&nbsp;        log.i { &quot;[req=${requestId.value}] cancelled after $duration&quot; }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private companion object {
+&nbsp;        const val TAG = &quot;SyncTelemetry&quot;
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-05-06 14:45</div>
+</div>
+</body>
+</html>

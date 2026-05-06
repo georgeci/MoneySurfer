@@ -1,0 +1,97 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>MoneySurfer Coverage Report > SessionPointers</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.georgeci.moneysurfer.domain.auth</a>
+</div>
+
+<h1>Coverage Summary for Class: SessionPointers (com.georgeci.moneysurfer.domain.auth)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+</tr>
+<tr>
+  <td class="name">SessionPointers</td>
+    <td class="coverageStat"/>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.auth
+&nbsp;
+&nbsp;import com.georgeci.moneysurfer.domain.preferences.Pref
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.UserId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
+&nbsp;
+&nbsp;/**
+&nbsp; * Session-scoped pointers persisted in DataStore. See CLAUDE.md §&quot;Session pointers in DataStore&quot;
+&nbsp; * and sync.md §2.11 for the demo-flag semantics.
+&nbsp; *
+&nbsp; * - [currentUserId] — local user id; set for every flow including demo. Drives &quot;is anyone
+&nbsp; *   signed in&quot; logic.
+&nbsp; * - [currentWorkspaceId] — active workspace; drives per-workspace queries (`Get*UseCase`).
+&nbsp; * - [currentFirebaseUid] — Firebase auth uid; non-null only for Firebase-backed sessions.
+&nbsp; *   Used by `CreateWorkspaceUseCase` to decide whether to push to Firestore.
+&nbsp; * - [hasUsedDemo] — sticky flag set by `DemoLoginUseCase`, consumed by `WipeDemoDataUseCase`
+&nbsp; *   on real login/signup so demo rows never leak into the real account&#39;s outbox.
+&nbsp; */
+&nbsp;interface SessionPointers {
+&nbsp;    val currentUserId: Pref&lt;UserId?&gt;
+&nbsp;    val currentWorkspaceId: Pref&lt;WorkspaceId?&gt;
+&nbsp;    val currentFirebaseUid: Pref&lt;String?&gt;
+&nbsp;    val hasUsedDemo: Pref&lt;Boolean&gt;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-05-06 14:45</div>
+</div>
+</body>
+</html>
