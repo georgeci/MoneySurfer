@@ -124,6 +124,7 @@ material-kolor = { module = "com.materialkolor:material-kolor", version.ref = "m
 
 kmp-plugin = { module = "org.jetbrains.kotlin.multiplatform:org.jetbrains.kotlin.multiplatform.gradle.plugin", version.ref = "kotlin" }
 kmp-plugin-lib = { module = "com.android.kotlin.multiplatform.library:com.android.kotlin.multiplatform.library.gradle.plugin", version.ref = "agp" }
+easylauncher-plugin = { module = "com.project.starter:easylauncher", version.ref = "easylauncher" }
 
 [bundles]
 # Compose UI + lifecycle stack used by every feature module's commonMain.

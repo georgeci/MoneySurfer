@@ -5,7 +5,6 @@ plugins {
     alias(libs.plugins.google.services)
     alias(libs.plugins.firebase.crashlytics)
     alias(libs.plugins.kmpApp)
-    alias(libs.plugins.easylauncher)
 }
 
 android {
@@ -40,24 +39,6 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.crashlytics)
-}
-
-// Overlay a "DEV" ribbon on the launcher icon for debug installs so testers can
-// tell dev builds from release on the home screen. Release builds keep the
-// untouched icon.
-easylauncher {
-    buildTypes {
-        register("debug") {
-            filters(
-                customRibbon(
-                    label = "DEV",
-                    ribbonColor = "#C0FF1744",
-                    labelColor = "#FFFFFFFF",
-                    position = "bottom",
-                ),
-            )
-        }
-    }
 }
 
 // Sonar Gradle plugin (≤6.0.x) still references the legacy AGP `AppExtension`,
