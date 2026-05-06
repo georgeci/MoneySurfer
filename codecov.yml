@@ -14,7 +14,7 @@ coverage:
 comment:
   layout: "reach, diff, flags, files"
   behavior: default
-  require_changes: false
+  require_changes: true
 
 ignore:
   - "androidApp/**"

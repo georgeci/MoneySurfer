@@ -14,11 +14,55 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write    # nightly-publish pushes to gh-pages
+  actions: read      # decide queries `gh run list`
+
+concurrency:
+  group: nightly
+  cancel-in-progress: false
 
 jobs:
+  decide:
+    name: Skip if no changes since last successful run
+    runs-on: ubuntu-latest
+    outputs:
+      run: ${{ steps.check.outputs.run }}
+    steps:
+      - name: Check last successful nightly SHA
+        id: check
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "Manual dispatch — running unconditionally."
+            echo "run=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          # Most recent already-finished successful nightly. Self-exclude in
+          # case the API briefly lists this very run while it's still queued.
+          last_sha=$(gh run list \
+            --workflow=nightly.yml \
+            --branch=main \
+            --status=success \
+            --limit=2 \
+            --json headSha,databaseId \
+            --repo "${GITHUB_REPOSITORY}" \
+            --jq '[.[] | select(.databaseId != ${{ github.run_id }})][0].headSha // ""')
+          echo "last successful SHA: ${last_sha:-<none>}"
+          echo "current SHA:         ${GITHUB_SHA}"
+          if [[ -n "$last_sha" && "$last_sha" == "$GITHUB_SHA" ]]; then
+            echo "No new commits since last nightly success — skipping."
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          fi
+
   ios-build:
     name: iOS simulator build
+    needs: decide
+    if: needs.decide.outputs.run == 'true'
     runs-on: macos-14
     timeout-minutes: 40
     # Lean Debug build for iOS Simulator (arm64), no code signing, no archive,
@@ -81,6 +125,8 @@ jobs:
 
   maestro-android:
     name: Maestro Android (E2E)
+    needs: decide
+    if: needs.decide.outputs.run == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 90
     # Heavy: builds debug APK with USE_EMULATOR=true, boots AVD + Firebase
@@ -169,6 +215,8 @@ jobs:
 
   maestro-ios:
     name: Maestro iOS (E2E)
+    needs: decide
+    if: needs.decide.outputs.run == 'true'
     runs-on: macos-14
     timeout-minutes: 90
     # Same shape as maestro-android but on a macOS runner: boots an iPhone
@@ -287,3 +335,79 @@ jobs:
             build/logs/maestro-ios/
           if-no-files-found: ignore
           retention-days: 7
+
+  nightly-publish:
+    name: Aggregate + publish nightly to Pages
+    needs: [decide, maestro-android, maestro-ios]
+    if: always() && needs.decide.outputs.run == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download Maestro Android JUnit
+        uses: actions/download-artifact@v4
+        with:
+          name: maestro-android-junit
+          path: allure-input/maestro-android
+        continue-on-error: true
+
+      - name: Download Maestro iOS JUnit
+        uses: actions/download-artifact@v4
+        with:
+          name: maestro-ios-junit
+          path: allure-input/maestro-ios
+        continue-on-error: true
+
+      - name: Stage Allure results
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p allure-results
+          # find returns 0 even with no matches — let the loop body just not
+          # execute. No reliance on `shopt -s globstar`.
+          find allure-input -type f -name '*.xml' 2>/dev/null | while read -r f; do
+            dest="allure-results/$(echo "${f#allure-input/}" | tr '/' '__')"
+            cp "$f" "$dest"
+          done
+          echo "Staged $(ls allure-results 2>/dev/null | wc -l) input(s)."
+
+      - name: Checkout gh-pages
+        uses: actions/checkout@v6
+        with:
+          ref: gh-pages
+          path: gh-pages
+        continue-on-error: true
+
+      - name: Ensure gh-pages dir exists
+        shell: bash
+        run: mkdir -p gh-pages/nightly/allure
+
+      - name: Build Allure report (with history)
+        uses: simple-elf/allure-report-action@53ebb757a2097edc77c53ecef4d454fc2f2f774c # v1.13
+        with:
+          allure_results: allure-results
+          gh_pages: gh-pages/nightly/allure
+          allure_report: allure-report
+          allure_history: allure-history
+
+      - name: Assemble Pages payload
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p public/nightly/allure
+          if [[ -d allure-history ]]; then
+            cp -r allure-history/. public/nightly/allure/
+          fi
+
+      # keep_files: true preserves the per-push /allure/ + /kover/ subtrees
+      # that the ci.yml `publish` job manages independently.
+      - name: Deploy to gh-pages (/nightly/)
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: ./public
+          keep_files: true
+          commit_message: "docs(ci): nightly reports for ${{ github.sha }}"
