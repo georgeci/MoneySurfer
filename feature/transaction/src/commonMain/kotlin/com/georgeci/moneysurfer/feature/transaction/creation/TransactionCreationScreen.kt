@@ -720,63 +720,23 @@ private val previewAccounts = listOf(
 )
 
 private val previewCategories = listOf(
+    "Groceries",
+    "Transport",
+    "Dining",
+    "Home",
+    "Leisure",
+    "Health",
+    "Utilities",
+).mapIndexed { index, name ->
     Category(
-        CategoryId("preview-cat-1"),
+        CategoryId("preview-cat-${index + 1}"),
         WorkspaceId("preview-ws-1"),
-        "Groceries",
+        name,
         CategoryType.EXPENSE,
         null,
         kotlin.time.Instant.fromEpochMilliseconds(0),
-    ),
-    Category(
-        CategoryId("preview-cat-2"),
-        WorkspaceId("preview-ws-1"),
-        "Transport",
-        CategoryType.EXPENSE,
-        null,
-        kotlin.time.Instant.fromEpochMilliseconds(0),
-    ),
-    Category(
-        CategoryId("preview-cat-3"),
-        WorkspaceId("preview-ws-1"),
-        "Dining",
-        CategoryType.EXPENSE,
-        null,
-        kotlin.time.Instant.fromEpochMilliseconds(0),
-    ),
-    Category(
-        CategoryId("preview-cat-4"),
-        WorkspaceId("preview-ws-1"),
-        "Home",
-        CategoryType.EXPENSE,
-        null,
-        kotlin.time.Instant.fromEpochMilliseconds(0),
-    ),
-    Category(
-        CategoryId("preview-cat-5"),
-        WorkspaceId("preview-ws-1"),
-        "Leisure",
-        CategoryType.EXPENSE,
-        null,
-        kotlin.time.Instant.fromEpochMilliseconds(0),
-    ),
-    Category(
-        CategoryId("preview-cat-6"),
-        WorkspaceId("preview-ws-1"),
-        "Health",
-        CategoryType.EXPENSE,
-        null,
-        kotlin.time.Instant.fromEpochMilliseconds(0),
-    ),
-    Category(
-        CategoryId("preview-cat-7"),
-        WorkspaceId("preview-ws-1"),
-        "Utilities",
-        CategoryType.EXPENSE,
-        null,
-        kotlin.time.Instant.fromEpochMilliseconds(0),
-    ),
-)
+    )
+}
 
 @Preview
 @Composable

@@ -28,9 +28,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.georgeci.moneysurfer.domain.model.WorkspaceRole
-import com.georgeci.moneysurfer.domain.primitives.UserId
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
-import com.georgeci.moneysurfer.domain.primitives.WorkspaceInviteId
 import com.georgeci.moneysurfer.uikit.components.SurferButton
 import com.georgeci.moneysurfer.uikit.components.SurferButtonStyle
 import com.georgeci.moneysurfer.uikit.components.base.SurferSegmentedControl
@@ -411,56 +409,6 @@ private fun roleLabel(role: WorkspaceRole): String = when (role) {
 // ── Previews ─────────────────────────────────────────────────────────────────
 // Each variant exercises a different role / tab / dialog combination so changes
 // to the layout get reviewed in isolation rather than only via the running app.
-
-private val PreviewRoster = listOf(
-    MemberUi(UserId("u-1"), "Kasia M.", "kasia@mail.com", WorkspaceRole.OWNER, "K", isYou = false),
-    MemberUi(UserId("u-2"), "Julian P.", "julian@mail.com", WorkspaceRole.EDITOR, "J", isYou = true),
-    MemberUi(UserId("u-3"), "Asia W.", "asia@mail.com", WorkspaceRole.EDITOR, "A", isYou = false),
-    MemberUi(UserId("u-4"), "Tom N.", "tom@mail.com", WorkspaceRole.VIEWER, "T", isYou = false),
-)
-
-private val PreviewInvites = listOf(
-    InviteUi(
-        WorkspaceInviteId("i-1"),
-        "kasia.nowak@gmail.com",
-        WorkspaceRole.EDITOR,
-        isExpired = false,
-        expiresAt = kotlin.time.Instant.fromEpochMilliseconds(0),
-    ),
-    InviteUi(
-        WorkspaceInviteId("i-2"),
-        "pavel@mail.com",
-        WorkspaceRole.VIEWER,
-        isExpired = false,
-        expiresAt = kotlin.time.Instant.fromEpochMilliseconds(0),
-    ),
-    InviteUi(
-        WorkspaceInviteId("i-3"),
-        "lena@mail.com",
-        WorkspaceRole.VIEWER,
-        isExpired = true,
-        expiresAt = kotlin.time.Instant.fromEpochMilliseconds(0),
-    ),
-)
-
-private fun previewState(
-    viewerRole: WorkspaceRole?,
-    tab: MembersTab = MembersTab.Active,
-    members: List<MemberUi> = PreviewRoster,
-    invites: List<InviteUi> = PreviewInvites,
-    showLeaveDialog: Boolean = false,
-    busy: Boolean = false,
-): WorkspaceMembersState.Content = WorkspaceMembersState.Content(
-    workspaceId = WorkspaceId("preview-ws-1"),
-    workspaceName = "Family",
-    currentUserId = UserId("u-2"),
-    viewerRole = viewerRole,
-    members = members,
-    pendingInvites = invites,
-    tab = tab,
-    busy = busy,
-    showLeaveDialog = showLeaveDialog,
-)
 
 @Preview
 @Composable
