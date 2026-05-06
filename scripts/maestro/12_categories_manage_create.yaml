@@ -1,0 +1,53 @@
+appId: ${APP_ID}
+name: Categories — Manage and create a category
+---
+# Settings → Categories → New category → save → returns to list with new row.
+# Pre-condition: an active workspace; piggyback on the dashboard baseline.
+
+- runFlow: 03_dashboard_add_account.yaml
+
+- tapOn:
+    text: "Settings"
+
+- assertVisible:
+    text: "Settings"
+
+- scrollUntilVisible:
+    element:
+      text: "Categories"
+    direction: DOWN
+- tapOn:
+    text: "Categories"
+
+# Categories management screen
+- assertVisible:
+    text: "Categories"
+- assertVisible:
+    text: "New category"
+
+- runFlow:
+    when:
+      notVisible: "Coffee"
+    commands:
+      - tapOn:
+          text: "New category"
+
+      # Category creation screen
+      - assertVisible:
+          text: "New category"
+      - assertVisible:
+          text: "Type"
+      - tapOn:
+          text: "Name"
+      - inputText: "Coffee"
+      - hideKeyboard
+      - tapOn:
+          text: "Save"
+
+# Back on Categories list and the new category is visible
+- assertVisible:
+    text: "Categories"
+- assertVisible:
+    text: "Coffee"
+- assertVisible:
+    text: "Expense"
