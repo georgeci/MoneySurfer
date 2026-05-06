@@ -1,0 +1,80 @@
+name: Nightly
+
+# Heavy / expensive jobs that don't need to gate every PR. Runs once a day
+# against the default branch and on demand via workflow_dispatch.
+#
+# Cost note: macos-14 runners are ~10x more expensive than ubuntu, which is
+# why iOS verification lives here instead of in the per-PR ci.yml.
+
+on:
+  schedule:
+    # 03:17 UTC every day. Off-peak slot, off the hour to avoid GH cron jitter
+    # piling up at :00.
+    - cron: "17 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ios-build:
+    name: iOS simulator build
+    runs-on: macos-14
+    timeout-minutes: 40
+    # Lean Debug build for iOS Simulator (arm64), no code signing, no archive,
+    # no Crashlytics dSYM upload. Verifies the Kotlin framework links and the
+    # Swift code compiles end-to-end against the embedded framework.
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      # iOS build only needs the GoogleService-Info.plist — don't expose the
+      # Android secrets to this job. (Can't use require-all=true here: it
+      # validates every input, not just the ones we passed.)
+      - name: Decode Firebase config
+        uses: ./.github/actions/firebase-config
+        with:
+          ios-plist: ${{ secrets.GOOGLE_SERVICE_INFO_PLIST }}
+
+      - name: Set up JDK
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Show Xcode version
+        run: xcodebuild -version
+
+      # Pre-link the Kotlin framework for the simulator arch so the Xcode build
+      # phase has its inputs ready and SPM resolution doesn't race with Gradle
+      # on first run.
+      - name: Link Kotlin framework (iosSimulatorArm64)
+        run: ./gradlew :composeApp:linkDebugFrameworkIosSimulatorArm64 --stacktrace
+
+      - name: Build iOS app (Simulator, no signing)
+        env:
+          SKIP_CRASHLYTICS_UPLOAD: "YES"
+        run: |
+          set -eo pipefail
+          if command -v xcbeautify >/dev/null 2>&1; then
+            FORMATTER=(xcbeautify --renderer github-actions)
+          else
+            FORMATTER=(cat)
+          fi
+          # -derivedDataPath requires -scheme/-testProductsPath/-xctestrun;
+          # we use -target so let xcodebuild pick the default location.
+          xcodebuild \
+            -project iosApp/iosApp.xcodeproj \
+            -target iosApp \
+            -configuration Debug \
+            -sdk iphonesimulator \
+            -arch arm64 \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            build \
+            | "${FORMATTER[@]}"
