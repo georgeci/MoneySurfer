@@ -18,6 +18,7 @@ plugins {
     alias(libs.plugins.sonarqube)
     alias(libs.plugins.cpd)
     alias(libs.plugins.moduleGraph)
+    alias(libs.plugins.easylauncher) apply false
 }
 
 moduleGraphConfig {
