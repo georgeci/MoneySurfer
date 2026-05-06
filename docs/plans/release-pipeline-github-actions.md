@@ -8,7 +8,7 @@ status: backlog
 
 ## Context
 
-`money-surfer-2026` is an early-stage KMP app (Android + iOS + Desktop JVM). `Version.xcconfig` currently has `APP_VERSION_CODE=2`, `APP_VERSION_NAME=0.0.2`. The only workflow under `.github/workflows/` is `ci.yml` (running `qaCommon` tests); there is no release automation. Every build is produced by hand, which slows down beta cadence and increases the risk of mistakes (version drift, forgotten signing, lost artifacts).
+`money-surfer-2026` is an early-stage KMP app (Android + iOS + Desktop JVM). `Version.xcconfig` currently has `APP_VERSION_CODE=2`, `APP_VERSION_NAME=0.0.2`. `.github/workflows/` already contains `ci.yml` (running `qaCommon` tests), `codeql.yml`, and `nightly.yml`, but there is no tag-driven release workflow. Every build is produced by hand, which slows down beta cadence and increases the risk of mistakes (version drift, forgotten signing, lost artifacts).
 
 **Goal**: when a `vX.Y.Z` tag is pushed, automatically build release artifacts for all three platforms, publish Android to Play Console internal track, push iOS to TestFlight, and attach every binary to a GitHub Release.
 
@@ -56,7 +56,7 @@ Needed for `xcodebuild -exportArchive`. `teamID` is substituted via `envsubst` f
 <plist version="1.0">
 <dict>
   <key>method</key><string>app-store</string>
-  <key>teamID</key><string>$(APPLE_TEAM_ID)</string>
+  <key>teamID</key><string>${APPLE_TEAM_ID}</string>
   <key>signingStyle</key><string>manual</string>
   <key>uploadBitcode</key><false/>
   <key>uploadSymbols</key><true/>
@@ -89,11 +89,16 @@ permissions:
 
 jobs:
   validate-tag:                                         # ubuntu-latest
-    - checkout
+    # Resolve the tag uniformly across triggers:
+    #   - push:             TAG_REF=${{ github.ref_name }}     (e.g. "v0.0.3")
+    #   - workflow_dispatch: TAG_REF=${{ inputs.tag }}
+    # All downstream jobs use `actions/checkout` with `ref: refs/tags/${{ needs.validate-tag.outputs.tag }}`
+    # so workflow_dispatch runs build the tagged commit, not the default branch.
+    - checkout: ref: refs/tags/${{ inputs.tag || github.ref_name }}
     - parse APP_VERSION_NAME from Version.xcconfig:
         grep '^APP_VERSION_NAME' Version.xcconfig | cut -d= -f2 | xargs
-    - assert "v$NAME" == github.ref_name; otherwise fail
-    - outputs: version_name
+    - assert "v$NAME" == "$TAG_REF"; otherwise fail
+    - outputs: tag (resolved), version_name
 
   desktop:                                              # Phase 1
     needs: validate-tag
@@ -117,7 +122,8 @@ jobs:
       - echo "$RELEASE_KEYSTORE_BASE64" | base64 -d > $RELEASE_STORE_FILE
       - echo "$GOOGLE_SERVICES_JSON_BASE64" | base64 -d > androidApp/google-services.json
       - ./gradlew :androidApp:bundleRelease :androidApp:assembleRelease
-      - apksigner verify --print-certs <aab>     # fail fast if debug-signed
+      - apksigner verify --print-certs <apk>     # fail fast if debug-signed (APK only)
+      - jarsigner -verify -strict <aab>          # AAB signature check (apksigner doesn't support .aab)
       - r0adkll/upload-google-play@v1
           serviceAccountJsonPlainText: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
           packageName: com.georgeci.moneysurfer
@@ -194,7 +200,7 @@ jobs:
 
 ## E. Risks and gotchas
 
-1. **`hasReleaseSigning` (`androidApp/build.gradle.kts:14-19`)**: if any of the four env variables is missing, the release signingConfig is not created and `bundleRelease` silently falls back to debug signing → Play rejects with `INVALID_APK_SIGNATURE`. **Mitigation**: an `apksigner verify` step before `upload-google-play`.
+1. **`hasReleaseSigning` (`androidApp/build.gradle.kts:14-19`)**: if any of the four env variables is missing, the release signingConfig is not created and `bundleRelease` silently falls back to debug signing → Play rejects with `INVALID_APK_SIGNATURE`. **Mitigation**: verify the APK with `apksigner verify --print-certs` and the AAB with `jarsigner -verify -strict` before `upload-google-play` (apksigner only supports APKs).
 2. **Compose Desktop `packageVersion` validation**: jpackage requires strict semver `X.Y.Z`. `0.0.2` is valid; suffixes like `0.0.2-beta` are not allowed.
 3. **iOS provisioning profile**: must be issued under team `APPLE_TEAM_ID` and bundle id `com.georgeci.moneysurfer` (see `iosApp.xcodeproj`). Mismatches are the #1 cause of `exportArchive` failure.
 4. **`google-services.json` placement**: must live at `androidApp/google-services.json` (module root), not under `src/main/`.
