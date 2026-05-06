@@ -24,7 +24,9 @@ If no plan has been produced yet in this conversation, stop and tell the user �
 
 ## 2. Write the plan file
 
-Path: `docs/plans/<slug>.md`. If the file already exists, append a numeric suffix (`-2`, `-3`, …). Create `docs/plans/` if missing.
+Start from `docs/plans/<slug>.md`. If it already exists, append a numeric suffix (`-2`, `-3`, …) until the path is free. Create `docs/plans/` if missing.
+
+**Bind the resolved path to `PLAN_PATH`** and use that variable for every later reference (issue body, final report). Do not re-derive the path from `<slug>.md` after this step — the suffix may have changed it.
 
 Frontmatter + body:
 
@@ -62,7 +64,7 @@ gh issue create \
 <short summary — 2–4 bullets pulled from the plan>
 
 ---
-Plan: docs/plans/<slug>.md
+Plan: $PLAN_PATH
 
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 EOF
@@ -73,13 +75,14 @@ Capture the issue URL from stdout.
 
 ## 5. Add the issue to project #2 and set Status=Backlog
 
-Resolve project + field IDs once (cache them within the run):
+Resolve project + field IDs once (cache them within the run). Use `gh`'s built-in `--jq` so this works without an external `jq` binary:
 
 ```
 PROJECT_ID=$(gh project view 2 --owner georgeci --format json --jq '.id')
-STATUS_FIELD_JSON=$(gh project field-list 2 --owner georgeci --format json)
-STATUS_FIELD_ID=$(echo "$STATUS_FIELD_JSON" | jq -r '.fields[] | select(.name=="Status") | .id')
-BACKLOG_OPTION_ID=$(echo "$STATUS_FIELD_JSON" | jq -r '.fields[] | select(.name=="Status") | .options[] | select(.name=="Backlog") | .id')
+STATUS_FIELD_ID=$(gh project field-list 2 --owner georgeci --format json \
+  --jq '.fields[] | select(.name=="Status") | .id')
+BACKLOG_OPTION_ID=$(gh project field-list 2 --owner georgeci --format json \
+  --jq '.fields[] | select(.name=="Status") | .options[] | select(.name=="Backlog") | .id')
 ```
 
 Add the issue and set status:
