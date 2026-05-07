@@ -57,6 +57,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.georgeci.moneysurfer.domain.formatter.MoneyFormatter
+import com.georgeci.moneysurfer.domain.model.Account
 import com.georgeci.moneysurfer.domain.model.Category
 import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.CategoryId
@@ -89,11 +91,17 @@ import moneysurfer.feature.transaction.generated.resources.transaction_creation_
 import moneysurfer.feature.transaction.generated.resources.transaction_creation_datetime_label
 import moneysurfer.feature.transaction.generated.resources.transaction_creation_datetime_placeholder
 import moneysurfer.feature.transaction.generated.resources.transaction_creation_expense
+import moneysurfer.feature.transaction.generated.resources.transaction_creation_from_account
+import moneysurfer.feature.transaction.generated.resources.transaction_creation_from_label
 import moneysurfer.feature.transaction.generated.resources.transaction_creation_income
 import moneysurfer.feature.transaction.generated.resources.transaction_creation_note_label
+import moneysurfer.feature.transaction.generated.resources.transaction_creation_rate_hint
 import moneysurfer.feature.transaction.generated.resources.transaction_creation_save
+import moneysurfer.feature.transaction.generated.resources.transaction_creation_swap_content_description
 import moneysurfer.feature.transaction.generated.resources.transaction_creation_title_create
 import moneysurfer.feature.transaction.generated.resources.transaction_creation_title_edit
+import moneysurfer.feature.transaction.generated.resources.transaction_creation_to_account
+import moneysurfer.feature.transaction.generated.resources.transaction_creation_to_label
 import moneysurfer.feature.transaction.generated.resources.transaction_creation_today
 import moneysurfer.feature.transaction.generated.resources.transaction_creation_transfer
 import moneysurfer.feature.transaction.generated.resources.transaction_creation_update
@@ -110,7 +118,7 @@ fun TransactionCreationScreen(
     onNavigateBack: () -> Unit,
     onNavigateToCategoryChooser: (CategoryId?, CategoryType) -> Unit,
     onNavigateToCategoryCreation: () -> Unit,
-    onNavigateToAccountChooser: (AccountId?) -> Unit,
+    onNavigateToAccountChooser: (AccountId?, AccountId?) -> Unit,
     pickedCategoryId: CategoryId? = null,
     pickedAccountId: AccountId? = null,
     viewModel: TransactionCreationViewModel = koinViewModel(
@@ -129,6 +137,7 @@ fun TransactionCreationScreen(
             TransactionCreationEffect.NavigateToCategoryCreation -> onNavigateToCategoryCreation()
             is TransactionCreationEffect.NavigateToAccountChooser -> onNavigateToAccountChooser(
                 effect.selectedAccountId,
+                effect.excludeAccountId,
             )
         }
     }
@@ -258,11 +267,7 @@ private fun TransactionCreationContent(
                 .verticalScroll(rememberScrollState()),
         ) {
             val typeOptions = remember {
-                if (ShowTransferType) {
-                    listOf(TransactionTypeUi.Expense, TransactionTypeUi.Income, TransactionTypeUi.Transfer)
-                } else {
-                    listOf(TransactionTypeUi.Expense, TransactionTypeUi.Income)
-                }
+                listOf(TransactionTypeUi.Expense, TransactionTypeUi.Income, TransactionTypeUi.Transfer)
             }
             val expenseLabel = stringResource(Res.string.transaction_creation_expense)
             val incomeLabel = stringResource(Res.string.transaction_creation_income)
@@ -285,11 +290,19 @@ private fun TransactionCreationContent(
 
             Spacer(Modifier.height(AppTheme.spacing.large))
 
-            AmountHero(
-                type = state.type,
-                currencySymbol = currencySymbol(state.selectedAccount?.currencyCode),
-                amountState = amountState,
-            )
+            if (state.isTransfer) {
+                TransferAccountsBlock(
+                    state = state,
+                    fromAmountState = amountState,
+                    onEvent = onEvent,
+                )
+            } else {
+                AmountHero(
+                    type = state.type,
+                    currencySymbol = currencySymbol(state.selectedAccount?.currencyCode),
+                    amountState = amountState,
+                )
+            }
 
             Spacer(Modifier.height(AppTheme.spacing.default))
 
@@ -300,21 +313,23 @@ private fun TransactionCreationContent(
                     .padding(bottom = padding.calculateBottomPadding() + AppTheme.spacing.large),
                 verticalArrangement = Arrangement.spacedBy(AppTheme.spacing.medium),
             ) {
-                SurferPickerRow(
-                    label = stringResource(Res.string.transaction_creation_account_label),
-                    value = state.selectedAccount?.name
-                        ?: stringResource(Res.string.transaction_creation_account_empty),
-                    icon = SurferIcons.CreditCard,
-                    onClick = { onEvent(TransactionCreationEvent.OnOpenAccountChooser) },
-                )
+                if (!state.isTransfer) {
+                    SurferPickerRow(
+                        label = stringResource(Res.string.transaction_creation_account_label),
+                        value = state.selectedAccount?.name
+                            ?: stringResource(Res.string.transaction_creation_account_empty),
+                        icon = SurferIcons.CreditCard,
+                        onClick = { onEvent(TransactionCreationEvent.OnOpenAccountChooser) },
+                    )
 
-                CategoryGridSection(
-                    categories = state.displayCategories,
-                    selected = state.selectedCategory,
-                    onSelect = { onEvent(TransactionCreationEvent.OnCategorySelected(it)) },
-                    onAllClick = { onEvent(TransactionCreationEvent.OnOpenCategoryChooser) },
-                    onMoreClick = { onEvent(TransactionCreationEvent.OnOpenCategoryCreation) },
-                )
+                    CategoryGridSection(
+                        categories = state.displayCategories,
+                        selected = state.selectedCategory,
+                        onSelect = { onEvent(TransactionCreationEvent.OnCategorySelected(it)) },
+                        onAllClick = { onEvent(TransactionCreationEvent.OnOpenCategoryChooser) },
+                        onMoreClick = { onEvent(TransactionCreationEvent.OnOpenCategoryCreation) },
+                    )
+                }
 
                 OutlinedTextField(
                     value = state.note,
@@ -361,7 +376,6 @@ private fun TransactionCreationContent(
     }
 }
 
-private const val ShowTransferType = false
 private const val CATEGORY_PREVIEW_SIZE = 7
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -692,7 +706,188 @@ private fun currencySymbol(code: CurrencyCode?): String {
         "GBP" -> "£"
         "PLN" -> "zł"
         "JPY" -> "¥"
+        "RUB" -> "₽"
         else -> "$"
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun TransferAccountsBlock(
+    state: TransactionCreationState.Content,
+    fromAmountState: TextFieldState,
+    onEvent: (TransactionCreationEvent) -> Unit,
+) {
+    val crossCurrency = state.crossCurrency
+    val fromSymbol = currencySymbol(state.fromAccount?.currencyCode)
+    val toSymbol = currencySymbol(state.toAccount?.currencyCode)
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        TransferLegCard(
+            label = stringResource(Res.string.transaction_creation_from_label),
+            currencySymbol = fromSymbol,
+            amountText = fromAmountState.text.toString(),
+            amountEditable = true,
+            amountState = fromAmountState,
+            onAmountChanged = null,
+            account = state.fromAccount,
+            accountPlaceholder = stringResource(Res.string.transaction_creation_from_account),
+            onAccountClick = { onEvent(TransactionCreationEvent.OnOpenFromAccountChooser) },
+        )
+
+        Box(
+            modifier = Modifier.fillMaxWidth(),
+            contentAlignment = Alignment.Center,
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(CircleShape)
+                    .background(AppTheme.materialColors.primary)
+                    .clickable { onEvent(TransactionCreationEvent.OnSwapAccountsClick) },
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(
+                    imageVector = SurferIcons.SwapHoriz,
+                    contentDescription = stringResource(Res.string.transaction_creation_swap_content_description),
+                    tint = AppTheme.materialColors.onPrimary,
+                    modifier = Modifier.size(20.dp),
+                )
+            }
+        }
+
+        TransferLegCard(
+            label = stringResource(Res.string.transaction_creation_to_label),
+            currencySymbol = toSymbol,
+            amountText = if (crossCurrency) state.toAmount else fromAmountState.text.toString(),
+            amountEditable = crossCurrency,
+            amountState = null,
+            onAmountChanged = { onEvent(TransactionCreationEvent.OnToAmountChanged(it)) },
+            account = state.toAccount,
+            accountPlaceholder = stringResource(Res.string.transaction_creation_to_account),
+            onAccountClick = { onEvent(TransactionCreationEvent.OnOpenToAccountChooser) },
+        )
+
+        if (crossCurrency) {
+            val from = state.amount.toDoubleOrNull()?.takeIf { it > 0 }
+            val to = state.toAmount.toDoubleOrNull()?.takeIf { it > 0 }
+            if (from != null && to != null) {
+                val rate = to / from
+                Text(
+                    text = stringResource(
+                        Res.string.transaction_creation_rate_hint,
+                        fromSymbol,
+                        formatRate(rate),
+                        toSymbol,
+                    ),
+                    style = AppTheme.typography.bodySmall,
+                    color = AppTheme.materialColors.onSurfaceVariant,
+                    modifier = Modifier.padding(start = 4.dp, top = 2.dp),
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun TransferLegCard(
+    label: String,
+    currencySymbol: String,
+    amountText: String,
+    amountEditable: Boolean,
+    amountState: TextFieldState?,
+    onAmountChanged: ((String) -> Unit)?,
+    account: Account?,
+    accountPlaceholder: String,
+    onAccountClick: () -> Unit,
+) {
+    val shape = AppTheme.shapes.small
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(shape)
+            .background(AppTheme.materialColors.surfaceVariant.copy(alpha = 0.4f))
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = label,
+                style = AppTheme.typography.labelMedium,
+                color = AppTheme.materialColors.onSurfaceVariant,
+                modifier = Modifier.weight(1f),
+            )
+            Text(
+                text = currencySymbol,
+                style = AppTheme.typography.headlineMedium,
+                color = AppTheme.materialColors.onSurfaceVariant,
+            )
+            Spacer(Modifier.width(4.dp))
+            if (amountEditable && amountState != null) {
+                BasicTextField(
+                    state = amountState,
+                    inputTransformation = AmountInputTransformation,
+                    lineLimits = TextFieldLineLimits.SingleLine,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                    textStyle = LocalTextStyle.current.merge(AppTheme.typography.headlineLarge).copy(
+                        color = AppTheme.materialColors.onSurface,
+                        textAlign = TextAlign.End,
+                        fontWeight = FontWeight.Medium,
+                    ),
+                    cursorBrush = SolidColor(AppTheme.materialColors.primary),
+                )
+            } else if (amountEditable && onAmountChanged != null) {
+                BasicTextField(
+                    value = amountText,
+                    onValueChange = onAmountChanged,
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                    textStyle = LocalTextStyle.current.merge(AppTheme.typography.headlineLarge).copy(
+                        color = AppTheme.materialColors.onSurface,
+                        textAlign = TextAlign.End,
+                        fontWeight = FontWeight.Medium,
+                    ),
+                    cursorBrush = SolidColor(AppTheme.materialColors.primary),
+                )
+            } else {
+                Text(
+                    text = amountText.ifEmpty { stringResource(Res.string.transaction_creation_amount_placeholder) },
+                    style = AppTheme.typography.headlineLarge,
+                    color = AppTheme.materialColors.onSurface,
+                    fontWeight = FontWeight.Medium,
+                )
+            }
+        }
+        SurferPickerRow(
+            label = accountPlaceholder,
+            value = account?.let { acc ->
+                val balance = MoneyFormatter.format(acc.balance, acc.currencyCode)
+                "${acc.name} · $balance"
+            } ?: stringResource(Res.string.transaction_creation_account_empty),
+            icon = SurferIcons.CreditCard,
+            onClick = onAccountClick,
+        )
+    }
+}
+
+private const val RATE_DECIMAL_SCALE = 10_000.0
+
+private fun formatRate(rate: Double): String {
+    val rounded = (rate * RATE_DECIMAL_SCALE).toLong() / RATE_DECIMAL_SCALE
+    val asLong = rounded.toLong()
+    return if (rounded == asLong.toDouble()) {
+        asLong.toString()
+    } else {
+        rounded.toString()
     }
 }
 
@@ -726,8 +921,8 @@ private fun TransactionCreationTransferPreview() {
     AppTheme {
         TransactionCreationContent(
             state = TransactionCreationState.Content(
-                amount = "",
-                note = "",
+                amount = "48.20",
+                note = "Lidl — weekly shop",
                 type = TransactionTypeUi.Transfer,
                 accounts = PreviewAccounts,
                 categories = PreviewCategories,
@@ -738,6 +933,40 @@ private fun TransactionCreationTransferPreview() {
                 timestamp = 0L,
                 categoryUsageCounts = emptyMap(),
                 displayCategories = PreviewCategories,
+                fromAccount = PreviewAccounts[0],
+                toAccount = PreviewAccounts[1],
+            ),
+            onEvent = {},
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun TransactionCreationTransferCrossCurrencyPreview() {
+    AppTheme {
+        val from = PreviewAccounts[0]
+        val to = PreviewAccounts[1].copy(
+            name = "Travel USD",
+            currencyCode = com.georgeci.moneysurfer.domain.primitives.CurrencyCode("USD"),
+        )
+        TransactionCreationContent(
+            state = TransactionCreationState.Content(
+                amount = "250",
+                toAmount = "271.83",
+                note = "Lidl — weekly shop",
+                type = TransactionTypeUi.Transfer,
+                accounts = listOf(from, to),
+                categories = PreviewCategories,
+                selectedAccount = from,
+                selectedCategory = PreviewCategories.first(),
+                isEditMode = false,
+                editingTransactionId = null,
+                timestamp = 0L,
+                categoryUsageCounts = emptyMap(),
+                displayCategories = PreviewCategories,
+                fromAccount = from,
+                toAccount = to,
             ),
             onEvent = {},
         )

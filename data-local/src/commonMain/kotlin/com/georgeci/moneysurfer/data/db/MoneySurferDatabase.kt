@@ -35,7 +35,7 @@ import com.georgeci.moneysurfer.data.db.entity.WorkspaceMemberEntity
         BudgetEntity::class,
         RecurringRuleEntity::class,
     ],
-    version = 20,
+    version = 21,
 )
 @ConstructedBy(MoneySurferDatabaseConstructor::class)
 abstract class MoneySurferDatabase : RoomDatabase() {

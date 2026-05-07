@@ -4,6 +4,7 @@ import com.georgeci.moneysurfer.data.db.dao.CategoryDao
 import com.georgeci.moneysurfer.data.db.entity.CategoryEntity
 import com.georgeci.moneysurfer.domain.model.Category
 import com.georgeci.moneysurfer.domain.primitives.CategoryId
+import com.georgeci.moneysurfer.domain.primitives.CategorySystemKind
 import com.georgeci.moneysurfer.domain.primitives.CategoryType
 import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
@@ -77,6 +78,9 @@ class CategoryRepositoryImpl(
         parentId = parentId?.let { CategoryId(it) },
         createdAt = timeFormatter.parseInstant(createdAt),
         updatedAt = timeFormatter.parseInstant(updatedAt),
+        systemKind = systemKind?.let { value ->
+            runCatching { CategorySystemKind.valueOf(value) }.getOrNull()
+        },
     )
 
     private fun Category.toEntity() = CategoryEntity(
@@ -87,5 +91,6 @@ class CategoryRepositoryImpl(
         parentId = parentId?.value,
         createdAt = timeFormatter.formatInstant(createdAt),
         updatedAt = timeFormatter.formatInstant(updatedAt),
+        systemKind = systemKind?.name,
     )
 }

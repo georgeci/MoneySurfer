@@ -1,6 +1,7 @@
 package com.georgeci.moneysurfer.domain.model
 
 import com.georgeci.moneysurfer.domain.primitives.CategoryId
+import com.georgeci.moneysurfer.domain.primitives.CategorySystemKind
 import com.georgeci.moneysurfer.domain.primitives.CategoryType
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 import kotlin.time.Instant
@@ -13,4 +14,5 @@ data class Category(
     val parentId: CategoryId?,
     val createdAt: Instant,
     val updatedAt: Instant = createdAt,
+    val systemKind: CategorySystemKind? = null,
 )

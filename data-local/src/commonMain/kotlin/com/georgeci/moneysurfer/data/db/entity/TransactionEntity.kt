@@ -42,4 +42,5 @@ data class TransactionEntity(
     @ColumnInfo(name = "status", defaultValue = "ACTUAL") val status: String = "ACTUAL",
     @ColumnInfo(name = "createdAt", defaultValue = "0") val createdAt: Long = 0L,
     @ColumnInfo(name = "updatedAt", defaultValue = "0") val updatedAt: Long = 0L,
+    @ColumnInfo(name = "transferId") val transferId: String? = null,
 )

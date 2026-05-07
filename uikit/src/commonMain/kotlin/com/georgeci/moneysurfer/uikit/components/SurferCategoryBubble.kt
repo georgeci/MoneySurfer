@@ -78,8 +78,19 @@ object SurferCategoryPalette {
         SurferIcons.Tag,
     )
 
-    fun tintFor(id: String): Color = tints[nonNegativeMod(stringHash(id), tints.size)]
-    fun iconFor(id: String): ImageVector = icons[nonNegativeMod(stringHash(id), icons.size)]
+    /** Tint for the system Transfer category. Kept fixed (not hashed) so it's always recognisable. */
+    val TransferTint: Color = Color(0xFF2E5AA8)
+    val TransferIcon: ImageVector = SurferIcons.SwapHoriz
+
+    fun tintFor(id: String, systemKind: String? = null): Color {
+        if (systemKind == "TRANSFER") return TransferTint
+        return tints[nonNegativeMod(stringHash(id), tints.size)]
+    }
+
+    fun iconFor(id: String, systemKind: String? = null): ImageVector {
+        if (systemKind == "TRANSFER") return TransferIcon
+        return icons[nonNegativeMod(stringHash(id), icons.size)]
+    }
 
     fun tintForName(name: String): Color =
         if (name.isEmpty()) {

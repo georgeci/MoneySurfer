@@ -132,6 +132,7 @@ class CreateWorkspaceUseCase(
                     type = seed.type,
                     parentId = null,
                     createdAt = now,
+                    systemKind = seed.systemKind,
                 ),
             )
         }

@@ -12,6 +12,7 @@ import org.koin.core.annotation.KoinViewModel
 @KoinViewModel
 class AccountChooserViewModel(
     initialSelectedId: AccountId?,
+    private val excludeAccountId: AccountId?,
     private val getAccounts: GetAccountsUseCase,
 ) : MviViewModel<AccountChooserState, AccountChooserEvent, AccountChooserEffect>(
     initialState = AccountChooserState.Loading(selectedId = initialSelectedId),
@@ -33,7 +34,12 @@ class AccountChooserViewModel(
 
     private fun observeAccounts() {
         launch {
-            getAccounts().collect { accounts ->
+            getAccounts().collect { all ->
+                val accounts = if (excludeAccountId != null) {
+                    all.filter { it.id != excludeAccountId }
+                } else {
+                    all
+                }
                 val total = accounts.fold(0L) { acc, a -> acc + a.balance.minor }
                 val currency = accounts.firstOrNull()?.currencyCode
                 val totalFormatted = currency?.let { MoneyFormatter.format(Money(total), it) }

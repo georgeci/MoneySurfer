@@ -17,4 +17,5 @@ data class CategorizedTransactionEntity(
     @ColumnInfo(name = "status") val status: String,
     @ColumnInfo(name = "createdAt") val createdAt: Long,
     @ColumnInfo(name = "updatedAt") val updatedAt: Long,
+    @ColumnInfo(name = "transferId") val transferId: String? = null,
 )

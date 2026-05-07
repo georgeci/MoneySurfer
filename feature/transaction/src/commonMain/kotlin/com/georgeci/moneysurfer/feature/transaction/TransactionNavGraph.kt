@@ -58,8 +58,13 @@ val transactionNavGraph: FeatureNavGraph = { navigator ->
                 )
             },
             onNavigateToCategoryCreation = { navigator.push(Route.CategoryCreation()) },
-            onNavigateToAccountChooser = { selectedId ->
-                navigator.push(Route.AccountChooser(selectedAccountId = selectedId?.value))
+            onNavigateToAccountChooser = { selectedId, excludeId ->
+                navigator.push(
+                    Route.AccountChooser(
+                        selectedAccountId = selectedId?.value,
+                        excludeAccountId = excludeId?.value,
+                    ),
+                )
             },
             pickedCategoryId = pickedCategoryId,
             pickedAccountId = pickedAccountId,
