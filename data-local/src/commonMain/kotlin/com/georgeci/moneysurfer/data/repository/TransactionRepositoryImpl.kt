@@ -13,6 +13,7 @@ import com.georgeci.moneysurfer.domain.primitives.Money
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.domain.primitives.TransactionStatus
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
+import com.georgeci.moneysurfer.domain.primitives.TransferId
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 import com.georgeci.moneysurfer.domain.repositories.TransactionRepository
 import com.georgeci.moneysurfer.domain.sync.SyncEntityTypes
@@ -101,6 +102,7 @@ class TransactionRepositoryImpl(
         status = parseStatus(status),
         createdAt = timeFormatter.parseInstant(createdAt),
         updatedAt = timeFormatter.parseInstant(updatedAt),
+        transferId = transferId?.let(::TransferId),
     )
 
     private fun CategorizedTransactionEntity.toDomain() = CategorizedTransaction(
@@ -118,6 +120,7 @@ class TransactionRepositoryImpl(
             status = parseStatus(status),
             createdAt = timeFormatter.parseInstant(createdAt),
             updatedAt = timeFormatter.parseInstant(updatedAt),
+            transferId = transferId?.let(::TransferId),
         ),
         categoryName = categoryName,
     )
@@ -139,6 +142,7 @@ class TransactionRepositoryImpl(
         status = status.name,
         createdAt = timeFormatter.formatInstant(createdAt),
         updatedAt = timeFormatter.formatInstant(updatedAt),
+        transferId = transferId?.value,
     )
 }
 

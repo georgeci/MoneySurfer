@@ -31,7 +31,8 @@ interface TransactionDao {
             transactions.createdAt,
             transactions.type,
             transactions.status,
-            transactions.updatedAt
+            transactions.updatedAt,
+            transactions.transferId
         FROM transactions
         LEFT JOIN categories ON categories.id = transactions.categoryId
         ORDER BY transactions.operationDate DESC, transactions.operationAt DESC, transactions.createdAt DESC
@@ -60,7 +61,8 @@ interface TransactionDao {
             transactions.createdAt,
             transactions.type,
             transactions.status,
-            transactions.updatedAt
+            transactions.updatedAt,
+            transactions.transferId
         FROM transactions
         LEFT JOIN categories ON categories.id = transactions.categoryId
         WHERE transactions.accountId = :accountId

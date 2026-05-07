@@ -7,6 +7,7 @@ import com.georgeci.moneysurfer.domain.primitives.Money
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.domain.primitives.TransactionStatus
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
+import com.georgeci.moneysurfer.domain.primitives.TransferId
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 import kotlinx.datetime.LocalDate
 import kotlin.time.Instant
@@ -36,4 +37,5 @@ data class Transaction(
     // sort and audit semantics.
     val createdAt: Instant,
     val updatedAt: Instant,
+    val transferId: TransferId? = null,
 )

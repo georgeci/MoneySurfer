@@ -73,6 +73,7 @@ sealed interface Route : NavKey {
     @Serializable
     data class AccountChooser(
         val selectedAccountId: String? = null,
+        val excludeAccountId: String? = null,
     ) : Route
 
     @Serializable

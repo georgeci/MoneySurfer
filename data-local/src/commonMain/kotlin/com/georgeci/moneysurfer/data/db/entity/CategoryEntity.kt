@@ -31,4 +31,5 @@ data class CategoryEntity(
     @ColumnInfo(name = "parentId") val parentId: String?,
     @ColumnInfo(name = "createdAt") val createdAt: Long,
     @ColumnInfo(name = "updatedAt", defaultValue = "0") val updatedAt: Long = 0L,
+    @ColumnInfo(name = "systemKind") val systemKind: String? = null,
 )

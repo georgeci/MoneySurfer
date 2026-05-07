@@ -48,6 +48,7 @@ val accountNavGraph: FeatureNavGraph = { navigator ->
         val resultProducer = LocalNavigationResultProducer.current
         AccountChooserBottomSheet(
             selectedAccountId = key.selectedAccountId?.let { AccountId(it) },
+            excludeAccountId = key.excludeAccountId?.let { AccountId(it) },
             onDismiss = { navigator.pop() },
             onNavigateToAccountCreation = {
                 navigator.replaceTop(Route.AccountCreation())

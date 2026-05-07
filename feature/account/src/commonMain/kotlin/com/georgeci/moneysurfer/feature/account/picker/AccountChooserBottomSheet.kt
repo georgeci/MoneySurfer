@@ -26,12 +26,13 @@ import org.koin.core.parameter.parametersOf
 @Composable
 fun AccountChooserBottomSheet(
     selectedAccountId: AccountId?,
+    excludeAccountId: AccountId? = null,
     onDismiss: () -> Unit,
     onNavigateToAccountCreation: () -> Unit,
     onAccountPicked: (AccountId) -> Unit,
     viewModel: AccountChooserViewModel = koinViewModel(
-        key = selectedAccountId?.value.orEmpty(),
-    ) { parametersOf(selectedAccountId) },
+        key = "${selectedAccountId?.value.orEmpty()}|${excludeAccountId?.value.orEmpty()}",
+    ) { parametersOf(selectedAccountId, excludeAccountId) },
 ) {
     val state by viewModel.collectAsStateWithLifecycle()
 
