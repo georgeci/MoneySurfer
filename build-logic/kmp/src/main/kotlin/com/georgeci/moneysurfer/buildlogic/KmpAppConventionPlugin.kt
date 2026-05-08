@@ -1,6 +1,7 @@
 package com.georgeci.moneysurfer.buildlogic
 
 import com.android.build.api.dsl.ApplicationExtension
+import com.project.starter.easylauncher.filter.ColorRibbonFilter
 import com.project.starter.easylauncher.plugin.EasyLauncherExtension
 import org.gradle.api.JavaVersion
 import org.gradle.api.Plugin
@@ -139,7 +140,7 @@ class KmpAppConventionPlugin : Plugin<Project> {
                             label = "DEV",
                             ribbonColor = "#C0FF1744",
                             labelColor = "#FFFFFFFF",
-                            position = "bottom",
+                            gravity = ColorRibbonFilter.Gravity.BOTTOM,
                         ),
                     )
                 }
