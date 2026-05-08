@@ -135,8 +135,12 @@ private fun TransactionDetailsContent(
             Res.string.transaction_details_type_income
         },
     )
-    val categoryTint = SurferCategoryPalette.tintForName(state.categoryName)
-    val categoryIcon = SurferCategoryPalette.iconFor(state.categoryName)
+    val categoryTint = if (state.categorySystemKind == SurferCategoryPalette.SYSTEM_KIND_TRANSFER) {
+        SurferCategoryPalette.TransferTint
+    } else {
+        SurferCategoryPalette.tintForName(state.categoryName)
+    }
+    val categoryIcon = SurferCategoryPalette.iconFor(state.categoryName, state.categorySystemKind)
 
     Scaffold(
         modifier = Modifier.surferSafeInsets(),

@@ -202,6 +202,7 @@ private fun TransactionCreationContent(
     state: TransactionCreationState.Content,
     onEvent: (TransactionCreationEvent) -> Unit,
     amountState: TextFieldState = rememberTextFieldState(state.amount),
+    toAmountState: TextFieldState = rememberTextFieldState(state.toAmount),
 ) {
     LaunchedEffect(amountState) {
         snapshotFlow { amountState.text.toString() }
@@ -210,6 +211,15 @@ private fun TransactionCreationContent(
     LaunchedEffect(state.amount) {
         if (amountState.text.toString() != state.amount) {
             amountState.edit { replace(0, length, state.amount) }
+        }
+    }
+    LaunchedEffect(toAmountState) {
+        snapshotFlow { toAmountState.text.toString() }
+            .collect { onEvent(TransactionCreationEvent.OnToAmountChanged(it)) }
+    }
+    LaunchedEffect(state.toAmount) {
+        if (toAmountState.text.toString() != state.toAmount) {
+            toAmountState.edit { replace(0, length, state.toAmount) }
         }
     }
 
@@ -266,8 +276,15 @@ private fun TransactionCreationContent(
                 .padding(top = padding.calculateTopPadding())
                 .verticalScroll(rememberScrollState()),
         ) {
-            val typeOptions = remember {
-                listOf(TransactionTypeUi.Expense, TransactionTypeUi.Income, TransactionTypeUi.Transfer)
+            // Editing an existing single-leg transaction can't morph into a paired transfer in
+            // place — hide the Transfer segment to avoid silently creating a new transfer pair
+            // alongside the original row.
+            val typeOptions = remember(state.isEditMode) {
+                if (state.isEditMode) {
+                    listOf(TransactionTypeUi.Expense, TransactionTypeUi.Income)
+                } else {
+                    listOf(TransactionTypeUi.Expense, TransactionTypeUi.Income, TransactionTypeUi.Transfer)
+                }
             }
             val expenseLabel = stringResource(Res.string.transaction_creation_expense)
             val incomeLabel = stringResource(Res.string.transaction_creation_income)
@@ -294,6 +311,7 @@ private fun TransactionCreationContent(
                 TransferAccountsBlock(
                     state = state,
                     fromAmountState = amountState,
+                    toAmountState = toAmountState,
                     onEvent = onEvent,
                 )
             } else {
@@ -526,8 +544,8 @@ private fun CategoryTile(
     val bg = if (selected) AppTheme.materialColors.secondaryContainer else Color.Transparent
     val labelColor =
         if (selected) AppTheme.materialColors.onSecondaryContainer else AppTheme.materialColors.onSurface
-    val tint = SurferCategoryPalette.tintFor(category.id.value)
-    val icon: ImageVector = SurferCategoryPalette.iconFor(category.id.value)
+    val tint = SurferCategoryPalette.tintFor(category.id.value, category.systemKind?.name)
+    val icon: ImageVector = SurferCategoryPalette.iconFor(category.id.value, category.systemKind?.name)
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -716,6 +734,7 @@ private fun currencySymbol(code: CurrencyCode?): String {
 private fun TransferAccountsBlock(
     state: TransactionCreationState.Content,
     fromAmountState: TextFieldState,
+    toAmountState: TextFieldState,
     onEvent: (TransactionCreationEvent) -> Unit,
 ) {
     val crossCurrency = state.crossCurrency
@@ -734,7 +753,6 @@ private fun TransferAccountsBlock(
             amountText = fromAmountState.text.toString(),
             amountEditable = true,
             amountState = fromAmountState,
-            onAmountChanged = null,
             account = state.fromAccount,
             accountPlaceholder = stringResource(Res.string.transaction_creation_from_account),
             onAccountClick = { onEvent(TransactionCreationEvent.OnOpenFromAccountChooser) },
@@ -764,10 +782,9 @@ private fun TransferAccountsBlock(
         TransferLegCard(
             label = stringResource(Res.string.transaction_creation_to_label),
             currencySymbol = toSymbol,
-            amountText = if (crossCurrency) state.toAmount else fromAmountState.text.toString(),
+            amountText = if (crossCurrency) toAmountState.text.toString() else fromAmountState.text.toString(),
             amountEditable = crossCurrency,
-            amountState = null,
-            onAmountChanged = { onEvent(TransactionCreationEvent.OnToAmountChanged(it)) },
+            amountState = if (crossCurrency) toAmountState else null,
             account = state.toAccount,
             accountPlaceholder = stringResource(Res.string.transaction_creation_to_account),
             onAccountClick = { onEvent(TransactionCreationEvent.OnOpenToAccountChooser) },
@@ -802,7 +819,6 @@ private fun TransferLegCard(
     amountText: String,
     amountEditable: Boolean,
     amountState: TextFieldState?,
-    onAmountChanged: ((String) -> Unit)?,
     account: Account?,
     accountPlaceholder: String,
     onAccountClick: () -> Unit,
@@ -837,19 +853,6 @@ private fun TransferLegCard(
                     state = amountState,
                     inputTransformation = AmountInputTransformation,
                     lineLimits = TextFieldLineLimits.SingleLine,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                    textStyle = LocalTextStyle.current.merge(AppTheme.typography.headlineLarge).copy(
-                        color = AppTheme.materialColors.onSurface,
-                        textAlign = TextAlign.End,
-                        fontWeight = FontWeight.Medium,
-                    ),
-                    cursorBrush = SolidColor(AppTheme.materialColors.primary),
-                )
-            } else if (amountEditable && onAmountChanged != null) {
-                BasicTextField(
-                    value = amountText,
-                    onValueChange = onAmountChanged,
-                    singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     textStyle = LocalTextStyle.current.merge(AppTheme.typography.headlineLarge).copy(
                         color = AppTheme.materialColors.onSurface,

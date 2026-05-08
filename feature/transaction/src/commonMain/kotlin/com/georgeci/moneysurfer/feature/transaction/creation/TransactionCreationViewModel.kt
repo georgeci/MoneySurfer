@@ -124,6 +124,9 @@ class TransactionCreationViewModel(
 
     private fun changeType(nextType: TransactionTypeUi) = updateState {
         val content = this as? TransactionCreationState.Content ?: return@updateState this
+        // Editing an existing single-leg transaction can't morph into a paired transfer in place;
+        // ignore the switch so we don't desync the type with the row that's about to be updated.
+        if (content.isEditMode && nextType == TransactionTypeUi.Transfer) return@updateState content
         val nextCategoryType = if (nextType == TransactionTypeUi.Income) {
             CategoryType.INCOME
         } else {
@@ -407,19 +410,18 @@ class TransactionCreationViewModel(
         val toAmount: Double,
     )
 
+    @Suppress("ReturnCount") // Sequential null/range guards stay clearer than a single nested expression.
     private fun buildTransferPlan(state: TransactionCreationState.Content): TransferPlan? {
-        val from = state.fromAccount
-        val to = state.toAccount
-        val fromAmount = state.amount.toDoubleOrNull()
-        val toAmount = if (state.crossCurrency) state.toAmount.toDoubleOrNull() else fromAmount
-        val valid = from != null && to != null && from.id != to.id &&
-            fromAmount != null && fromAmount > 0 &&
-            toAmount != null && toAmount > 0
-        return if (valid) {
-            TransferPlan(from!!, to!!, fromAmount!!, toAmount!!)
+        val from = state.fromAccount ?: return null
+        val to = state.toAccount ?: return null
+        if (from.id == to.id) return null
+        val fromAmount = state.amount.toDoubleOrNull()?.takeIf { it > 0 } ?: return null
+        val toAmount = if (state.crossCurrency) {
+            state.toAmount.toDoubleOrNull()?.takeIf { it > 0 } ?: return null
         } else {
-            null
+            fromAmount
         }
+        return TransferPlan(from, to, fromAmount, toAmount)
     }
 }
 
