@@ -40,7 +40,32 @@ gh project item-list 2 --owner georgeci --format json --limit 100 \
 - Cap to **5 items max**. If there are more than 5, pick the first 5 and tell the user how many were skipped (`"N more fish wriggling in the net — run me again. Mrgl!"`).
 - Skip items where `type == "DraftIssue"` or `number == null` and warn (no real issue to point a session at).
 
-### 2. Hand each fish to a warrior
+### 2. Carve out a worktree+branch per fish
+
+For each picked item, before spawning, create a dedicated git worktree off `origin/main` so the spawned session lands ready-to-edit (no extra checkout step on the user's part).
+
+Naming:
+- **slug** = lowercase kebab from issue title, drop filler words (`add`, `the`, `update`), 2–5 words, max 40 chars. Use only `[a-z0-9-]`. Examples: `hide-backup-sync-offline`, `currency-picker-first-launch`.
+- **branch**: `wip/issue-<number>-<slug>` (the `wip/` prefix is intentional — `/ship` will rename it to a conventional prefix at PR time).
+- **worktree dir**: `.claude/worktrees/issue-<number>-<slug>` (relative to the repo root the skill is running from — find it via `git rev-parse --show-toplevel`).
+
+Run from inside the repo (use the repo root, not the current worktree):
+
+```bash
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+MAIN_ROOT="$(git -C "$REPO_ROOT" worktree list --porcelain | awk '/^worktree /{print $2; exit}')"
+git -C "$MAIN_ROOT" fetch origin main --quiet
+git -C "$MAIN_ROOT" worktree add -b wip/issue-<N>-<slug> \
+  "$MAIN_ROOT/.claude/worktrees/issue-<N>-<slug>" origin/main
+```
+
+Skip-and-warn cases (do not abort the whole run):
+- Branch `wip/issue-<N>-<slug>` already exists locally or on origin → skip the create, reuse the existing path if its worktree dir exists, else just warn `"#<N> already has a branch — handing it to the warrior anyway."` and still spawn pointing at the existing path.
+- Worktree dir already exists → reuse it.
+
+Record the resolved absolute worktree path — the spawn step needs it.
+
+### 3. Hand each fish to a warrior
 
 For each picked item, in order, call the `mcp__ccd_session__spawn_task` tool with:
 
@@ -54,6 +79,8 @@ Work on GitHub issue #<number> in the MoneySurfer2026 repository.
 Title: <title>
 URL: <url>
 Project: https://github.com/users/georgeci/projects/2/views/1 (Status: In progress)
+Worktree: <absolute path created in step 2>
+Branch: wip/issue-<number>-<slug>  (rename happens at /ship time)
 
 <full issue body, untruncated>
 
@@ -66,7 +93,14 @@ Act autonomously: locate the real paths in the repo (search if the issue gives o
 
 Each `spawn_task` returns a chip — the user must click it to actually start. Do **not** loop trying to "auto-start" them.
 
-### 3. Mark the fish as eaten
+If `spawn_task` itself errors, **also remove the worktree** you just created so we don't leak orphans:
+
+```bash
+git -C "$MAIN_ROOT" worktree remove --force "$MAIN_ROOT/.claude/worktrees/issue-<N>-<slug>"
+git -C "$MAIN_ROOT" branch -D wip/issue-<N>-<slug>
+```
+
+### 4. Mark the fish as eaten
 
 After each successful `spawn_task`, immediately move that item to In progress:
 
@@ -85,13 +119,13 @@ mutation($project:ID!,$item:ID!,$field:ID!,$opt:String!){
 
 If the mutation fails: report the failed item, **do not** retry blindly, and skip it (the chip is already out — duplicating work is worse than a status mismatch).
 
-### 4. Croak the report
+### 5. Croak the report
 
 End with a short list:
 
 ```
 🐟 Murloc Manager report — N fish hauled, M still in the swamp:
-  • #<n1> <title> → chip queued, status: In progress
+  • #<n1> <title> → wip/issue-<n1>-<slug> ready, chip queued, status: In progress
   • #<n2> ...
 ```
 
@@ -112,3 +146,5 @@ Add one murloc line at the top *and* one at the bottom of the response. Pick fro
 - **Never** change status of items you didn't successfully spawn for.
 - Status mutation goes **after** spawn, not before — if spawn fails the item stays in Ready for the next run.
 - Do not modify issues themselves (no comments, no labels, no edits) — only the project Status field.
+- Worktree creation always branches off **`origin/main`**, not the current branch. Fetch first.
+- Never create worktrees outside `.claude/worktrees/` — that is the agreed dumping ground.
