@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
 import com.georgeci.moneysurfer.domain.auth.SessionPointers
+import com.georgeci.moneysurfer.domain.firstrun.FirstRunSeeder
 import com.georgeci.moneysurfer.sync.api.SyncReason
 import com.georgeci.moneysurfer.sync.coordinator.SyncCoordinator
 import kotlinx.coroutines.delay
@@ -34,6 +35,7 @@ import kotlin.time.Duration.Companion.minutes
 class AppLaunchViewModel(
     private val session: SessionPointers,
     private val syncCoordinator: SyncCoordinator,
+    private val firstRunSeeder: FirstRunSeeder,
 ) : ViewModel() {
 
     private val log = Logger.withTag(TAG)
@@ -43,6 +45,11 @@ class AppLaunchViewModel(
 
     init {
         viewModelScope.launch {
+            // 0. First-run hook (offline build only — online binds a no-op). Runs before the
+            //    route decision so a fresh install can flip user + workspace pointers and land
+            //    directly on the Dashboard instead of bouncing through SignIn / Selector.
+            firstRunSeeder.seedIfNeeded()
+
             // 1. One-shot startup decision based on the current snapshot.
             val userId = session.currentUserId.flow.first()
             val workspaceId = session.currentWorkspaceId.flow.first()
