@@ -16,29 +16,50 @@ You are the Murloc Manager. Your tribe (the user) has a swamp full of fish (issu
 If a future user reports any of these are wrong, re-derive via:
 
 ```bash
-gh api graphql -f query='query{user(login:"georgeci"){projectV2(number:2){id}}}'
-gh project field-list 2 --owner georgeci --format json | jq '.fields[] | select(.name=="Status")'
+gh api graphql -f query='query{user(login:"georgeci"){projectV2(number:2){id}}}' \
+  --jq '.data.user.projectV2.id'
+gh project field-list 2 --owner georgeci --format json \
+  --jq '.fields[] | select(.name=="Status")'
 ```
 
 ## Steps
+
+### 0. Verify auth scopes
+
+The skill needs the `project` scope (for `gh project item-list` and the `updateProjectV2ItemFieldValue` mutation). Run:
+
+```bash
+gh auth status
+```
+
+If the output does not include `project` in the token scopes, stop and tell the user to run:
+
+```
+gh auth refresh -s project
+```
+
+Do not proceed without it — both the read and the mutation will fail otherwise.
 
 ### 1. Net the fish
 
 ```bash
 gh project item-list 2 --owner georgeci --format json --limit 100 \
-  | jq '[.items[]
+  --jq '[.items[]
       | select(.status=="Ready")
+      | select(.content.type != "DraftIssue" and .content.number != null)
       | {itemId: .id,
-         number: (.content.number // null),
+         number: .content.number,
          title: .content.title,
          body: (.content.body // ""),
-         url: (.content.url // null),
+         url: .content.url,
          type: .content.type}]'
 ```
 
-- If empty: report `"Mrglglgl... swamp is dry. No Ready items."` and stop.
-- Cap to **5 items max**. If there are more than 5, pick the first 5 and tell the user how many were skipped (`"N more fish wriggling in the net — run me again. Mrgl!"`).
-- Skip items where `type == "DraftIssue"` or `number == null` and warn (no real issue to point a session at).
+(Use `gh ... --jq` rather than piping to a standalone `jq` binary — keeps the skill working on machines without `jq` installed.)
+
+- DraftIssue and number-less items are filtered out **before** counting; warn the user about each one skipped (`"#draft <title> — no GitHub issue, can't dispatch."`).
+- After filtering: if empty, report `"Mrglglgl... swamp is dry. No Ready items."` and stop.
+- Cap the *post-filter* list to **5 items max**. If more than 5 valid items remain, pick the first 5 and tell the user how many actionable ones were skipped due to the cap (`"N more fish wriggling in the net — run me again. Mrgl!"`). The cap and the DraftIssue skip count are reported separately.
 
 ### 2. Carve out a worktree+branch per fish
 
@@ -74,7 +95,7 @@ For each picked item, in order, call the `mcp__ccd_session__spawn_task` tool wit
 - `prompt`: the template below, with `<...>` placeholders filled from the issue. Keep it self-contained — the spawned session has zero memory of this conversation.
 
 ```
-Work on GitHub issue #<number> in the MoneySurfer2026 repository.
+Work on GitHub issue #<number> in the georgeci/MoneySurfer repository.
 
 Title: <title>
 URL: <url>
