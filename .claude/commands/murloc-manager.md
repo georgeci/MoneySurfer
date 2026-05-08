@@ -80,11 +80,22 @@ git -C "$MAIN_ROOT" worktree add -b wip/issue-<N>-<slug> \
   "$MAIN_ROOT/.claude/worktrees/issue-<N>-<slug>" origin/main
 ```
 
-Skip-and-warn cases (do not abort the whole run):
-- Branch `wip/issue-<N>-<slug>` already exists locally or on origin → skip the create, reuse the existing path if its worktree dir exists, else just warn `"#<N> already has a branch — handing it to the warrior anyway."` and still spawn pointing at the existing path.
-- Worktree dir already exists → reuse it.
+Idempotency — pick exactly one of these states (do not abort the whole run, just warn and continue with the resolved path):
 
-Record the resolved absolute worktree path — the spawn step needs it.
+1. **Neither branch nor dir exists** → run the `worktree add -b ...` above. Resolved path = the dir you just created.
+2. **Dir exists** (`test -d "$MAIN_ROOT/.claude/worktrees/issue-<N>-<slug>"`) → reuse it as-is. Resolved path = that dir. Warn `"#<N> worktree already on disk — reusing."`. Do not touch the branch even if its name differs from `wip/issue-<N>-<slug>`.
+3. **Branch exists but no dir** (check `git -C "$MAIN_ROOT" rev-parse --verify wip/issue-<N>-<slug>` succeeds, but the dir is absent) → attach a new worktree to the existing branch:
+   ```bash
+   git -C "$MAIN_ROOT" worktree add \
+     "$MAIN_ROOT/.claude/worktrees/issue-<N>-<slug>" wip/issue-<N>-<slug>
+   ```
+   Resolved path = that dir. Warn `"#<N> branch already exists — attaching a fresh worktree to it."`.
+4. **Origin already has the branch but local doesn't** (`git -C "$MAIN_ROOT" ls-remote --exit-code origin wip/issue-<N>-<slug>` succeeds) → fetch it and treat as case 3:
+   ```bash
+   git -C "$MAIN_ROOT" fetch origin wip/issue-<N>-<slug>:wip/issue-<N>-<slug>
+   ```
+
+After step 2, every item has a definite **resolved absolute worktree path** — the spawn step needs it verbatim.
 
 ### 3. Hand each fish to a warrior
 
