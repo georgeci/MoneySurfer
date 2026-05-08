@@ -62,6 +62,8 @@ data class CategoryDoc(
     val updatedAt: Long = 0L,
     val deletedAt: Long? = null,
     val clientVersionCode: Int = 1,
+    /** System kind marker (e.g. "TRANSFER") for built-in categories. Null for user categories. */
+    val systemKind: String? = null,
 )
 
 @Serializable
@@ -79,6 +81,8 @@ data class TransactionDoc(
     val updatedAt: Long = 0L,
     val deletedAt: Long? = null,
     val clientVersionCode: Int = 1,
+    /** Shared id linking the two legs of a transfer. Null for non-transfer rows. */
+    val transferId: String? = null,
 )
 
 /**

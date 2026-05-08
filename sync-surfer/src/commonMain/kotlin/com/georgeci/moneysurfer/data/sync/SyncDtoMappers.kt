@@ -72,6 +72,7 @@ fun CategoryEntity.toDoc(): CategoryDoc = CategoryDoc(
     parentId = parentId,
     createdAt = createdAt,
     updatedAt = updatedAt,
+    systemKind = systemKind,
 )
 
 fun CategoryDoc.toEntity(id: String, workspaceId: String): CategoryEntity = CategoryEntity(
@@ -82,6 +83,7 @@ fun CategoryDoc.toEntity(id: String, workspaceId: String): CategoryEntity = Cate
     parentId = parentId,
     createdAt = createdAt,
     updatedAt = updatedAt,
+    systemKind = systemKind,
 )
 
 fun TransactionEntity.toDoc(): TransactionDoc = TransactionDoc(
@@ -96,6 +98,7 @@ fun TransactionEntity.toDoc(): TransactionDoc = TransactionDoc(
     status = status,
     createdAt = createdAt,
     updatedAt = updatedAt,
+    transferId = transferId,
 )
 
 fun TransactionDoc.toEntity(id: String, workspaceId: String): TransactionEntity {
@@ -130,6 +133,7 @@ fun TransactionDoc.toEntity(id: String, workspaceId: String): TransactionEntity 
         status = status,
         createdAt = resolvedCreatedAt,
         updatedAt = updatedAt,
+        transferId = transferId,
     )
 }
 
