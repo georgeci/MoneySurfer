@@ -278,12 +278,14 @@ private fun TransactionCreationContent(
         ) {
             // Editing an existing single-leg transaction can't morph into a paired transfer in
             // place — hide the Transfer segment to avoid silently creating a new transfer pair
-            // alongside the original row.
-            val typeOptions = remember(state.isEditMode) {
-                if (state.isEditMode) {
-                    listOf(TransactionTypeUi.Expense, TransactionTypeUi.Income)
-                } else {
+            // alongside the original row. The offline build also hides Transfer entirely
+            // (multi-account transfers are out of MVP scope) via `transferEnabled`.
+            val transferVisible = !state.isEditMode && state.transferEnabled
+            val typeOptions = remember(transferVisible) {
+                if (transferVisible) {
                     listOf(TransactionTypeUi.Expense, TransactionTypeUi.Income, TransactionTypeUi.Transfer)
+                } else {
+                    listOf(TransactionTypeUi.Expense, TransactionTypeUi.Income)
                 }
             }
             val expenseLabel = stringResource(Res.string.transaction_creation_expense)

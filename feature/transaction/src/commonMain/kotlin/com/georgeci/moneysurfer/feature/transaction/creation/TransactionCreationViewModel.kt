@@ -39,6 +39,7 @@ class TransactionCreationViewModel(
     private val createTransfer: CreateTransferUseCase,
     private val getCurrentTime: GetCurrentTimeUseCase,
     private val transactionRepository: TransactionRepository,
+    private val featureConfig: TransactionCreationFeatureConfig,
 ) : MviViewModel<TransactionCreationState, TransactionCreationEvent, TransactionCreationEffect>(
     initialState = TransactionCreationState.Loading,
 ) {
@@ -126,7 +127,9 @@ class TransactionCreationViewModel(
         val content = this as? TransactionCreationState.Content ?: return@updateState this
         // Editing an existing single-leg transaction can't morph into a paired transfer in place;
         // ignore the switch so we don't desync the type with the row that's about to be updated.
-        if (content.isEditMode && nextType == TransactionTypeUi.Transfer) return@updateState content
+        if (nextType == TransactionTypeUi.Transfer && (content.isEditMode || !featureConfig.transferEnabled)) {
+            return@updateState content
+        }
         val nextCategoryType = if (nextType == TransactionTypeUi.Income) {
             CategoryType.INCOME
         } else {
@@ -178,6 +181,7 @@ class TransactionCreationViewModel(
                     type = initialCategoryType,
                     selected = initialSelected,
                 ),
+                transferEnabled = featureConfig.transferEnabled,
             )
 
             if (transactionId != null) {
@@ -482,6 +486,7 @@ sealed interface TransactionCreationState {
         val fromAccount: Account? = null,
         val toAccount: Account? = null,
         val toAmount: String = "",
+        val transferEnabled: Boolean = true,
     ) : TransactionCreationState {
         val isExpense: Boolean get() = type == TransactionTypeUi.Expense
         val isTransfer: Boolean get() = type == TransactionTypeUi.Transfer
