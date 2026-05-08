@@ -1,5 +1,6 @@
 package com.georgeci.moneysurfer.offline.di
 
+import com.georgeci.moneysurfer.domain.OfflineBuildFlags
 import com.georgeci.moneysurfer.domain.repositories.AppConfigRepository
 import com.georgeci.moneysurfer.domain.repositories.AppVersionGate
 import com.georgeci.moneysurfer.domain.repositories.AuthRemoteRepository
@@ -51,6 +52,7 @@ private val offlineSignInModule: Module = module {
             demo = true,
         )
     }
+    single<OfflineBuildFlags> { OfflineBuildFlags(isOffline = true) }
 }
 
 /**
