@@ -25,5 +25,6 @@ data class AccountEntity(
     @ColumnInfo(name = "type") val type: String,
     @ColumnInfo(name = "currency") val currency: String,
     @ColumnInfo(name = "balance") val balance: Long,
+    @ColumnInfo(name = "archived", defaultValue = "0") val archived: Boolean = false,
     @ColumnInfo(name = "updatedAt", defaultValue = "0") val updatedAt: Long = 0L,
 )

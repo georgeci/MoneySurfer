@@ -15,6 +15,13 @@
     <string name="accounts_manage_remove">Удалить</string>
     <string name="accounts_manage_restore">Восстановить</string>
     <string name="accounts_manage_add_account">Добавить счёт</string>
+    <string name="accounts_manage_archive_title">Архивировать этот счёт?</string>
+    <string name="accounts_manage_archive_message">«%1$s» переедет в Архив. История сохранится, восстановить можно в любой момент.</string>
+    <string name="accounts_manage_archive_confirm">Архивировать</string>
+    <string name="accounts_manage_archive_cancel">Отмена</string>
+    <string name="accounts_manage_archived_snackbar">«%1$s» в архиве</string>
+    <string name="accounts_manage_archive_undo">Отменить</string>
+    <string name="accounts_manage_action_failed">Что-то пошло не так. Попробуйте ещё раз.</string>
     <string name="account_creation_title">Новый счёт</string>
     <string name="account_creation_name_label">Название счёта</string>
     <string name="account_creation_balance_label">Начальный баланс</string>

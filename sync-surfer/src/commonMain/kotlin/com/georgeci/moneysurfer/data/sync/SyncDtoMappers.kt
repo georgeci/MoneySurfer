@@ -53,6 +53,7 @@ fun AccountEntity.toDoc(): AccountDoc = AccountDoc(
     type = type,
     currency = currency,
     balance = balance,
+    archived = archived,
     updatedAt = updatedAt,
 )
 
@@ -63,6 +64,7 @@ fun AccountDoc.toEntity(id: String, workspaceId: String): AccountEntity = Accoun
     type = type,
     currency = currency,
     balance = balance,
+    archived = archived,
     updatedAt = updatedAt,
 )
 
