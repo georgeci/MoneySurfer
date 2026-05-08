@@ -34,10 +34,12 @@ kotlin {
                 implementation(libs.bundles.feature.arrow)
                 implementation(libs.kermit)
                 implementation(projects.domain)
+                implementation(projects.dataLocal)
                 implementation(projects.navigation)
                 implementation(projects.sync.api)
                 implementation(projects.uikit)
                 implementation(projects.utils)
+                implementation(libs.okio)
             }
         }
 
@@ -51,6 +53,7 @@ kotlin {
 
         androidMain {
             dependencies {
+                implementation(libs.androidx.activity.compose)
             }
         }
 

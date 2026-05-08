@@ -187,6 +187,9 @@
     <string name="settings_backup_restore_supporting">Заменит текущие данные</string>
     <string name="settings_backup_delete_title">Удалить облачный бэкап</string>
     <string name="settings_backup_delete_supporting">Удалит все бэкапы из iCloud</string>
+    <string name="settings_backup_restore_confirm_title">Заменить текущие данные?</string>
+    <string name="settings_backup_restore_confirm_body">Восстановление заменит все транзакции, счета и настройки на этом устройстве. После завершения приложение перезапустится.</string>
+    <string name="settings_backup_restore_confirm_confirm">Восстановить</string>
 
     <!-- About -->
     <string name="settings_about_title">О приложении</string>

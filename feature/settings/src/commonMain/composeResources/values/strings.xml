@@ -187,6 +187,9 @@
     <string name="settings_backup_restore_supporting">Replaces current data</string>
     <string name="settings_backup_delete_title">Delete cloud backup</string>
     <string name="settings_backup_delete_supporting">Removes all backups from iCloud</string>
+    <string name="settings_backup_restore_confirm_title">Replace current data?</string>
+    <string name="settings_backup_restore_confirm_body">Restoring will replace all transactions, accounts, and settings on this device. The app will restart afterwards.</string>
+    <string name="settings_backup_restore_confirm_confirm">Restore</string>
 
     <!-- About screen -->
     <string name="settings_about_title">About &amp; legal</string>
