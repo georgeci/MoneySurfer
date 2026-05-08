@@ -9,6 +9,7 @@ import com.georgeci.moneysurfer.domain.repositories.UserRemoteRepository
 import com.georgeci.moneysurfer.domain.repositories.WorkspaceSyncer
 import com.georgeci.moneysurfer.domain.telemetry.CrashReporter
 import com.georgeci.moneysurfer.feature.login.SignInFeatureConfig
+import com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationFeatureConfig
 import com.georgeci.moneysurfer.offline.noop.NoOpAppConfigRepository
 import com.georgeci.moneysurfer.offline.noop.NoOpAppVersionGate
 import com.georgeci.moneysurfer.offline.noop.NoOpAuthRemoteRepository
@@ -54,6 +55,18 @@ private val offlineSignInModule: Module = module {
 }
 
 /**
+ * Offline build hides the Transfer segment in transaction creation — multi-account
+ * transfers are out of the offline MVP scope. Same host-owned binding pattern as
+ * [offlineSignInModule] so the offline override can't regress through Koin module
+ * load order.
+ */
+private val offlineTransactionCreationModule: Module = module {
+    single<TransactionCreationFeatureConfig> {
+        TransactionCreationFeatureConfig(transferEnabled = false)
+    }
+}
+
+/**
  * Modules layered on top of shared's `AppModule` graph for the offline build.
  * No data-remote, no sync-surfer, no sync/default — every remote-side
  * dependency is satisfied by an explicit no-op binding.
@@ -61,5 +74,6 @@ private val offlineSignInModule: Module = module {
 val offlineWiring: List<Module> = listOf(
     offlineNoOpModule,
     offlineSignInModule,
+    offlineTransactionCreationModule,
     OfflineKoinApp().module(),
 )
