@@ -135,7 +135,7 @@ private fun SettingsContent(
                     onClick = { onEvent(SettingsEvent.OnChangeWorkspaceClick) },
                     trailing = { SurferSettingsChevron() },
                 )
-                if (state.currentWorkspaceId != null) {
+                if (state.showWorkspaceMembers && state.currentWorkspaceId != null) {
                     SurferSettingsRow(
                         icon = SurferIcons.Sparkle,
                         title = stringResource(Res.string.settings_members),
@@ -189,14 +189,16 @@ private fun SettingsContent(
                 )
             }
 
-            SurferSettingsGroup(title = stringResource(Res.string.settings_section_data)) {
-                SurferSettingsRow(
-                    icon = SurferIcons.Sync,
-                    title = stringResource(Res.string.settings_sync_hub_title),
-                    supportingText = stringResource(Res.string.settings_sync_hub_supporting),
-                    onClick = { onEvent(SettingsEvent.OnSyncClick) },
-                    trailing = { SurferSettingsChevron() },
-                )
+            if (state.showSyncSection) {
+                SurferSettingsGroup(title = stringResource(Res.string.settings_section_data)) {
+                    SurferSettingsRow(
+                        icon = SurferIcons.Sync,
+                        title = stringResource(Res.string.settings_sync_hub_title),
+                        supportingText = stringResource(Res.string.settings_sync_hub_supporting),
+                        onClick = { onEvent(SettingsEvent.OnSyncClick) },
+                        trailing = { SurferSettingsChevron() },
+                    )
+                }
             }
 
             SurferSettingsGroup(title = stringResource(Res.string.settings_section_help)) {
@@ -212,14 +214,16 @@ private fun SettingsContent(
                 )
             }
 
-            Spacer(Modifier.height(8.dp))
-            Box(modifier = Modifier.padding(horizontal = 16.dp)) {
-                SurferSettingsRow(
-                    icon = SurferIcons.Logout,
-                    title = stringResource(Res.string.settings_logout),
-                    danger = true,
-                    onClick = { onEvent(SettingsEvent.OnLogoutClick) },
-                )
+            if (state.showLogout) {
+                Spacer(Modifier.height(8.dp))
+                Box(modifier = Modifier.padding(horizontal = 16.dp)) {
+                    SurferSettingsRow(
+                        icon = SurferIcons.Logout,
+                        title = stringResource(Res.string.settings_logout),
+                        danger = true,
+                        onClick = { onEvent(SettingsEvent.OnLogoutClick) },
+                    )
+                }
             }
 
             Spacer(Modifier.height(AppTheme.spacing.large))

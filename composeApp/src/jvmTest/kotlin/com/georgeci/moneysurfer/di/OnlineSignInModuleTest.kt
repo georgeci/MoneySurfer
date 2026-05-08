@@ -20,4 +20,11 @@ class OnlineSignInModuleTest {
         assertTrue(config.demo)
         assertFalse(config.demoOnly)
     }
+
+    @Test
+    fun `online build registers OfflineBuildFlags with isOffline false`() {
+        val flags = OnlineSignInModule().offlineBuildFlags()
+
+        assertFalse(flags.isOffline)
+    }
 }
