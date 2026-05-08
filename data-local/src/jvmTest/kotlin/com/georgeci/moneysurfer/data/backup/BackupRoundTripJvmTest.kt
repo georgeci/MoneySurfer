@@ -1,5 +1,8 @@
 package com.georgeci.moneysurfer.data.backup
 
+import com.georgeci.moneysurfer.data.backup.fixtures.BackupTestHarness
+import com.georgeci.moneysurfer.data.backup.fixtures.openDatabaseAt
+import com.georgeci.moneysurfer.data.backup.fixtures.testAppInfo
 import com.georgeci.moneysurfer.data.db.entity.UserEntity
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.collections.shouldContainExactly
@@ -7,7 +10,6 @@ import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.flow.first
 import okio.Buffer
 import okio.FileSystem
-import okio.Path
 
 /**
  * End-to-end round-trip across [BackupExporterImpl] and [BackupImporterImpl]
@@ -19,49 +21,31 @@ import okio.Path
  */
 class BackupRoundTripJvmTest : FunSpec({
 
-    lateinit var tempDir: Path
-    lateinit var locator: TestBackupStorageLocator
+    lateinit var harness: BackupTestHarness
 
-    beforeEach {
-        tempDir = newTempDir()
-        locator = TestBackupStorageLocator(tempDir)
-    }
-
-    afterEach {
-        deleteRecursively(tempDir)
-    }
+    beforeEach { harness = BackupTestHarness() }
+    afterEach { harness.close() }
 
     test("export then import restores seeded entities + datastore + clears sync DB") {
         val originalUser = UserEntity(id = "u-original", displayName = "Alice", isAnon = false)
         val datastorePayload = "PREFS:lang=ru,theme=dark"
+        val locator = harness.locator
 
         // ---- 1. Seed source state ---------------------------------------
-        val sourceDb = openDatabaseAt(locator.moneySurferDbFile())
-        try {
-            sourceDb.userDao().insert(originalUser)
-        } finally {
-            sourceDb.close()
-        }
+        harness.database().userDao().insert(originalUser)
         FileSystem.SYSTEM.write(locator.dataStoreFile()) { writeUtf8(datastorePayload) }
         // Pre-existing sync DB the importer should sweep away.
         FileSystem.SYSTEM.write(locator.syncDbFile()) { writeUtf8("stale-sync-state") }
 
         // ---- 2. Export --------------------------------------------------
         val backup = Buffer()
-        run {
-            val db = openDatabaseAt(locator.moneySurferDbFile())
-            try {
-                BackupExporterImpl(db, locator, testAppInfo).exportTo(backup).getOrThrow()
-            } finally {
-                db.close()
-            }
-        }
+        BackupExporterImpl(harness.database(), locator, testAppInfo).exportTo(backup).getOrThrow()
         val backupCopy = Buffer().also { backup.copyTo(it) }
 
         // ---- 3. Replace local state with something completely different ----
+        harness.database().close()
         FileSystem.SYSTEM.deleteIfExists(locator.moneySurferDbFile())
         FileSystem.SYSTEM.deleteIfExists(locator.dataStoreFile())
-        // Sync DB recreated to verify import deletes it again.
         FileSystem.SYSTEM.write(locator.syncDbFile()) { writeUtf8("post-wipe-stale") }
 
         run {

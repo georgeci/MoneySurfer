@@ -1,6 +1,8 @@
-package com.georgeci.moneysurfer.data.backup
+package com.georgeci.moneysurfer.data.backup.fixtures
 
 import androidx.room.Room
+import com.georgeci.moneysurfer.data.backup.BackupManifest
+import com.georgeci.moneysurfer.data.backup.BackupStorageLocator
 import com.georgeci.moneysurfer.data.backup.zip.ZipStoredWriter
 import com.georgeci.moneysurfer.data.db.MoneySurferDatabase
 import com.georgeci.moneysurfer.data.db.getRoomDatabase
@@ -13,11 +15,43 @@ import okio.Path.Companion.toPath
 import java.nio.file.Files
 
 /**
- * Test locator that points at files under a caller-owned directory. The same
- * shape as the production locator, but with paths the test controls so we
- * can wipe state between cases without touching `tmpdir/.moneysurfer`.
+ * One-stop wiring for backup-feature tests, mirroring the shape of
+ * `IntegrationHarness` in :integration-test. Owns a per-test temp directory,
+ * a [TestBackupStorageLocator] over it, and a lazy on-disk Room handle that
+ * the test can open / close as needed.
+ *
+ * Lifecycle: `BackupTestHarness()` then `close()` (or `try/finally`) so the
+ * temp directory and any open Room resources are cleaned up.
  */
-internal class TestBackupStorageLocator(
+class BackupTestHarness {
+    val tempDir: Path = newTempDir()
+    val locator: TestBackupStorageLocator = TestBackupStorageLocator(tempDir)
+
+    private var lazyDb: MoneySurferDatabase? = null
+
+    /**
+     * Lazily opens (or returns the previously opened) Room handle at the
+     * locator path. The harness tracks the handle and closes it on [close];
+     * tests that need an independent handle (for example, to verify state
+     * after the importer closed its own copy) should call [openDatabaseAt]
+     * directly with the locator's path.
+     */
+    fun database(): MoneySurferDatabase =
+        lazyDb ?: openDatabaseAt(locator.moneySurferDbFile()).also { lazyDb = it }
+
+    fun close() {
+        // Importer success-path closes the handle on its own — runCatching
+        // makes the harness teardown idempotent.
+        runCatching { lazyDb?.close() }
+        deleteRecursively(tempDir)
+    }
+}
+
+/**
+ * Test locator that points at files under a caller-owned directory. Same
+ * shape as the production locator, but with paths the test controls.
+ */
+class TestBackupStorageLocator(
     private val rootDir: Path,
     override val platformName: String = "test",
 ) : BackupStorageLocator {
@@ -30,10 +64,10 @@ internal class TestBackupStorageLocator(
     override fun dataStoreFile(): Path = rootDir / "moneysurfer_settings.preferences_pb"
 }
 
-internal fun newTempDir(prefix: String = "backup-test"): Path =
+fun newTempDir(prefix: String = "backup-test"): Path =
     Files.createTempDirectory(prefix).toAbsolutePath().toString().toPath()
 
-internal fun deleteRecursively(root: Path) {
+fun deleteRecursively(root: Path) {
     val fs = FileSystem.SYSTEM
     if (!fs.exists(root)) return
     fs.listOrNull(root)?.forEach { child ->
@@ -43,17 +77,17 @@ internal fun deleteRecursively(root: Path) {
     fs.deleteIfExists(root)
 }
 
-internal fun openDatabaseAt(path: Path): MoneySurferDatabase =
+fun openDatabaseAt(path: Path): MoneySurferDatabase =
     getRoomDatabase(Room.databaseBuilder<MoneySurferDatabase>(path.toString()))
 
-internal val testAppInfo = AppInfo(version = "1.2.3", versionCode = 42)
+val testAppInfo: AppInfo = AppInfo(version = "1.2.3", versionCode = 42)
 
 /**
  * Hand-built archive used by importer error-path tests — bypasses
- * [BackupExporterImpl] entirely so we can craft both well-formed and malformed
- * inputs.
+ * `BackupExporterImpl` entirely so we can craft both well-formed and
+ * malformed inputs.
  */
-internal fun buildArchive(
+fun buildArchive(
     manifestJson: String,
     mainDbBytes: ByteArray = ByteArray(16) { it.toByte() },
     dataStoreBytes: ByteArray = ByteArray(8) { (it + 100).toByte() },
@@ -76,9 +110,9 @@ internal fun buildArchive(
     return sink
 }
 
-internal fun manifestJson(
+fun manifestJson(
     backupFormatVersion: Int = BackupManifest.CURRENT_FORMAT_VERSION,
-    moneySurferDbVersion: Int = 20,
+    moneySurferDbVersion: Int = MONEY_SURFER_DB_VERSION_FOR_TESTS,
     files: List<String> = listOf(
         BackupManifest.MAIN_DB_ENTRY_NAME,
         BackupManifest.DATASTORE_ENTRY_NAME,
@@ -95,3 +129,6 @@ internal fun manifestJson(
         files = files,
     ),
 )
+
+/** Mirrors `MoneySurferDatabase.@Database(version = N)` — bump in lockstep. */
+const val MONEY_SURFER_DB_VERSION_FOR_TESTS: Int = 20
