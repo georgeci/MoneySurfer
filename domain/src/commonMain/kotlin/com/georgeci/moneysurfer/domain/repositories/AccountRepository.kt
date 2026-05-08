@@ -30,4 +30,11 @@ interface AccountRepository {
      * not enqueue an outbox row.
      */
     suspend fun setBalance(accountId: AccountId, balance: Money)
+
+    /**
+     * Toggle the archived flag on [accountId]. Bumps `updatedAt` and enqueues a sync update.
+     * Archived accounts keep their transactions but are hidden from active lists and excluded
+     * from total/budget rollups. No-op if [accountId] is unknown locally.
+     */
+    suspend fun setArchived(accountId: AccountId, archived: Boolean)
 }

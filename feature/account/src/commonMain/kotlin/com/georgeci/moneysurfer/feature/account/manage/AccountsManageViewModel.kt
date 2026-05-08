@@ -7,7 +7,9 @@ import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.AccountType
 import com.georgeci.moneysurfer.domain.primitives.Money
 import com.georgeci.moneysurfer.domain.repositories.AccountRepository
+import com.georgeci.moneysurfer.domain.usecase.ArchiveAccountUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetAccountsUseCase
+import com.georgeci.moneysurfer.domain.usecase.RestoreAccountUseCase
 import com.georgeci.moneysurfer.utils.MviViewModel
 import org.koin.core.annotation.KoinViewModel
 
@@ -15,6 +17,8 @@ import org.koin.core.annotation.KoinViewModel
 class AccountsManageViewModel(
     private val getAccounts: GetAccountsUseCase,
     private val accountRepository: AccountRepository,
+    private val archiveAccount: ArchiveAccountUseCase,
+    private val restoreAccount: RestoreAccountUseCase,
 ) : MviViewModel<AccountsManageState, AccountsManageEvent, AccountsManageEffect>(
     initialState = AccountsManageState.Loading,
 ) {
@@ -27,23 +31,64 @@ class AccountsManageViewModel(
         when (event) {
             AccountsManageEvent.OnBackClick -> postSideEffect(AccountsManageEffect.NavigateBack)
             AccountsManageEvent.OnAddAccountClick -> postSideEffect(AccountsManageEffect.NavigateToAccountCreation)
-            AccountsManageEvent.OnToggleEditMode ->
-                updateState {
-                    AccountsManageState.content.isEditing.modify(this) { !it }
-                }
-            is AccountsManageEvent.OnAccountClick -> {
-                val isEditing = (currentState as? AccountsManageState.Content)?.isEditing == true
-                if (isEditing) {
-                    postSideEffect(AccountsManageEffect.NavigateToAccountEdit(event.accountId))
-                } else {
-                    postSideEffect(AccountsManageEffect.NavigateToAccountDetails(event.accountId))
-                }
-            }
-            is AccountsManageEvent.OnArchiveAccountClick -> Unit // TODO: wire when Account.archived lands
+            AccountsManageEvent.OnToggleEditMode -> toggleEditMode()
+            is AccountsManageEvent.OnAccountClick -> handleAccountClick(event.accountId)
+            is AccountsManageEvent.OnArchiveAccountClick -> requestArchive(event.accountId)
+            AccountsManageEvent.OnArchiveCancel -> dismissArchive()
+            AccountsManageEvent.OnArchiveConfirm -> confirmArchive()
+            is AccountsManageEvent.OnRestoreAccountClick -> performRestore(event.accountId)
+            AccountsManageEvent.OnUndoArchive -> currentState.lastArchivedId()?.let(::performRestore)
             is AccountsManageEvent.OnRemoveAccountClick -> requestDelete(event.accountId)
             AccountsManageEvent.OnDeleteCancel -> dismissDelete()
             AccountsManageEvent.OnDeleteConfirm -> confirmDelete()
-            is AccountsManageEvent.OnRestoreAccountClick -> Unit // TODO
+        }
+    }
+
+    private fun toggleEditMode() = updateState {
+        AccountsManageState.content.isEditing.modify(this) { !it }
+    }
+
+    private fun handleAccountClick(accountId: AccountId) {
+        val isEditing = (currentState as? AccountsManageState.Content)?.isEditing == true
+        val effect = if (isEditing) {
+            AccountsManageEffect.NavigateToAccountEdit(accountId)
+        } else {
+            AccountsManageEffect.NavigateToAccountDetails(accountId)
+        }
+        postSideEffect(effect)
+    }
+
+    private fun requestArchive(accountId: AccountId) {
+        val content = currentState as? AccountsManageState.Content ?: return
+        val target = content.activeAccounts.firstOrNull { it.id == accountId } ?: return
+        updateState {
+            AccountsManageState.content.pendingArchive.modify(this) {
+                AccountsManagePendingArchive(id = target.id, name = target.name)
+            }
+        }
+    }
+
+    private fun dismissArchive() = updateState {
+        AccountsManageState.content.pendingArchive.modify(this) { null }
+    }
+
+    private fun confirmArchive() {
+        val content = currentState as? AccountsManageState.Content ?: return
+        val target = content.pendingArchive ?: return
+        updateState { AccountsManageState.content.pendingArchive.modify(this) { null } }
+        launch {
+            archiveAccount(target.id).fold(
+                ifLeft = { postSideEffect(AccountsManageEffect.ShowError) },
+                ifRight = { postSideEffect(AccountsManageEffect.ShowArchivedSnackbar(target.id, target.name)) },
+            )
+        }
+    }
+
+    private fun performRestore(accountId: AccountId) {
+        launch {
+            restoreAccount(accountId).onLeft {
+                postSideEffect(AccountsManageEffect.ShowError)
+            }
         }
     }
 
@@ -73,18 +118,20 @@ class AccountsManageViewModel(
     private fun observeAccounts() {
         launch {
             getAccounts().collect { accounts ->
-                val active = accounts.map { it.toUi() }
-                val total = accounts.formattedTotal()
+                val active = accounts.filterNot { it.archived }.map { it.toUi() }
+                val archived = accounts.filter { it.archived }.map { it.toUi() }
+                val total = accounts.filterNot { it.archived }.formattedTotal()
                 updateState {
                     when (this) {
                         is AccountsManageState.Loading -> AccountsManageState.Content(
                             isEditing = false,
                             activeAccounts = active,
-                            archivedAccounts = emptyList(),
+                            archivedAccounts = archived,
                             formattedTotal = total,
                         )
                         is AccountsManageState.Content -> copy(
                             activeAccounts = active,
+                            archivedAccounts = archived,
                             formattedTotal = total,
                         )
                     }
@@ -107,6 +154,9 @@ class AccountsManageViewModel(
         formattedBalance = MoneyFormatter.format(balance, currencyCode),
         currency = currencyCode.value,
     )
+
+    private fun AccountsManageState.lastArchivedId(): AccountId? =
+        (this as? AccountsManageState.Content)?.archivedAccounts?.lastOrNull()?.id
 }
 
 @optics
@@ -120,6 +170,7 @@ sealed interface AccountsManageState {
         val archivedAccounts: List<AccountManageUi>,
         val formattedTotal: String?,
         val pendingDelete: AccountsManagePendingDelete? = null,
+        val pendingArchive: AccountsManagePendingArchive? = null,
     ) : AccountsManageState {
         companion object
     }
@@ -128,6 +179,11 @@ sealed interface AccountsManageState {
 }
 
 data class AccountsManagePendingDelete(
+    val id: AccountId,
+    val name: String,
+)
+
+data class AccountsManagePendingArchive(
     val id: AccountId,
     val name: String,
 )
@@ -147,10 +203,13 @@ sealed interface AccountsManageEvent {
     data object OnToggleEditMode : AccountsManageEvent
     data class OnAccountClick(val accountId: AccountId) : AccountsManageEvent
     data class OnArchiveAccountClick(val accountId: AccountId) : AccountsManageEvent
+    data object OnArchiveConfirm : AccountsManageEvent
+    data object OnArchiveCancel : AccountsManageEvent
+    data object OnUndoArchive : AccountsManageEvent
+    data class OnRestoreAccountClick(val accountId: AccountId) : AccountsManageEvent
     data class OnRemoveAccountClick(val accountId: AccountId) : AccountsManageEvent
     data object OnDeleteConfirm : AccountsManageEvent
     data object OnDeleteCancel : AccountsManageEvent
-    data class OnRestoreAccountClick(val accountId: AccountId) : AccountsManageEvent
 }
 
 sealed interface AccountsManageEffect {
@@ -158,4 +217,6 @@ sealed interface AccountsManageEffect {
     data object NavigateToAccountCreation : AccountsManageEffect
     data class NavigateToAccountDetails(val accountId: AccountId) : AccountsManageEffect
     data class NavigateToAccountEdit(val accountId: AccountId) : AccountsManageEffect
+    data class ShowArchivedSnackbar(val accountId: AccountId, val name: String) : AccountsManageEffect
+    data object ShowError : AccountsManageEffect
 }
