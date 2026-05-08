@@ -1,6 +1,7 @@
 package com.georgeci.moneysurfer.di
 
 import android.content.Context
+import com.georgeci.moneysurfer.data.backup.AndroidBackupStorageLocator
 import com.georgeci.moneysurfer.data.backup.AppRestarter
 import com.georgeci.moneysurfer.data.backup.BackupStorageLocator
 import com.georgeci.moneysurfer.data.datastore.createDataStore
@@ -24,7 +25,7 @@ actual val sharedPlatformModule: Module = module {
             versionCode = readVersionCode(context),
         )
     }
-    single { BackupStorageLocator(context = get()) }
+    single<BackupStorageLocator> { AndroidBackupStorageLocator(context = get()) }
     single { AppRestarter(context = get()) }
 }
 
