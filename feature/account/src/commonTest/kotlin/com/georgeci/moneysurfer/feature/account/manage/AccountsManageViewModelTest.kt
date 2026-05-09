@@ -102,7 +102,7 @@ class AccountsManageViewModelTest : StringSpec({
 
         viewModel.onEvent(AccountsManageEvent.OnArchiveAccountClick(active.id))
         viewModel.onEvent(AccountsManageEvent.OnArchiveConfirm)
-        viewModel.onEvent(AccountsManageEvent.OnUndoArchive)
+        viewModel.onEvent(AccountsManageEvent.OnUndoArchive(active.id))
 
         val content = viewModel.value.shouldBeInstanceOf<AccountsManageState.Content>()
         content.archivedAccounts.shouldBeEmpty()
