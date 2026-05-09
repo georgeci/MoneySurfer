@@ -48,7 +48,10 @@ class AppLaunchViewModel(
             // 0. First-run hook (offline build only — online binds a no-op). Runs before the
             //    route decision so a fresh install can flip user + workspace pointers and land
             //    directly on the Dashboard instead of bouncing through SignIn / Selector.
-            firstRunSeeder.seedIfNeeded()
+            //    Failures (e.g. local DB hiccup) must not block startup — log and fall through
+            //    to the route decision so the app always reaches a navigable state.
+            runCatching { firstRunSeeder.seedIfNeeded() }
+                .onFailure { log.w(it) { "[firstRun] seedIfNeeded threw — proceeding to route decision" } }
 
             // 1. One-shot startup decision based on the current snapshot.
             val userId = session.currentUserId.flow.first()

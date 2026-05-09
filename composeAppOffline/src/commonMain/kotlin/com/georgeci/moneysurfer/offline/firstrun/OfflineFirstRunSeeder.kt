@@ -16,8 +16,8 @@ import kotlinx.coroutines.flow.first
  * Idempotency is delegated to:
  *  - [DemoLoginUseCase] uses a deterministic local user id, so re-running it just reasserts the
  *    same row.
- *  - [SeedDefaultsUseCase] short-circuits when [SessionPointers.currentWorkspaceId] is set, so
- *    re-launches do not duplicate the workspace, account, or categories.
+ *  - [SeedDefaultsUseCase] handles both the first-run and the *repair* path (workspace pinned
+ *    but defaults missing) — we always invoke it and let it decide whether anything is needed.
  */
 class OfflineFirstRunSeeder(
     private val session: SessionPointers,
@@ -28,7 +28,6 @@ class OfflineFirstRunSeeder(
     private val log = Logger.withTag(TAG)
 
     override suspend fun seedIfNeeded() {
-        if (session.currentWorkspaceId.flow.first() != null) return
         if (session.currentUserId.flow.first() == null) {
             demoLoginUseCase().onLeft { err ->
                 log.w { "[abort] DemoLogin failed: $err" }
