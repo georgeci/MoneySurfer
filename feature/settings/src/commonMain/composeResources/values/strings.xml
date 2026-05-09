@@ -195,6 +195,8 @@
     <string name="settings_about_version_format">v%1$s · build 2025.04 · iOS / Android</string>
     <string name="settings_about_chip_made_by">Made by georgeci</string>
     <string name="settings_about_chip_warsaw">Warsaw, PL</string>
+    <string name="settings_about_chip_github">Source on GitHub</string>
+    <string name="settings_about_chip_license">MIT License</string>
     <string name="settings_about_section_legal">Legal</string>
     <string name="settings_about_terms_title">Terms of service</string>
     <string name="settings_about_privacy_title">Privacy policy</string>

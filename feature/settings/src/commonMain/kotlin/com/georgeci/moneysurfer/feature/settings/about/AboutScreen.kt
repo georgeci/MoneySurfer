@@ -1,10 +1,12 @@
 package com.georgeci.moneysurfer.feature.settings.about
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -33,6 +35,8 @@ import com.georgeci.moneysurfer.utils.HandleSideEffect
 import moneysurfer.feature.settings.generated.resources.Res
 import moneysurfer.feature.settings.generated.resources.settings_about_brand
 import moneysurfer.feature.settings.generated.resources.settings_about_brand_letter
+import moneysurfer.feature.settings.generated.resources.settings_about_chip_github
+import moneysurfer.feature.settings.generated.resources.settings_about_chip_license
 import moneysurfer.feature.settings.generated.resources.settings_about_chip_made_by
 import moneysurfer.feature.settings.generated.resources.settings_about_chip_warsaw
 import moneysurfer.feature.settings.generated.resources.settings_about_copyright
@@ -89,7 +93,10 @@ private fun AboutContent(
                 .padding(top = padding.calculateTopPadding())
                 .verticalScroll(rememberScrollState()),
         ) {
-            AppIdentityHero(version = state.appVersion)
+            AppIdentityHero(
+                version = state.appVersion,
+                onSourceClick = { onEvent(AboutEvent.OnSourceCodeClick) },
+            )
 
             Spacer(Modifier.height(8.dp))
             Text(
@@ -106,8 +113,12 @@ private fun AboutContent(
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun AppIdentityHero(version: String) {
+private fun AppIdentityHero(
+    version: String,
+    onSourceClick: () -> Unit,
+) {
     val colors = AppTheme.materialColors
     Column(
         modifier = Modifier
@@ -140,21 +151,33 @@ private fun AppIdentityHero(version: String) {
             style = AppTheme.typography.bodyMedium,
             color = colors.onSurfaceVariant,
         )
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
             HeroChip(text = stringResource(Res.string.settings_about_chip_made_by))
             HeroChip(text = stringResource(Res.string.settings_about_chip_warsaw))
+            HeroChip(
+                text = stringResource(Res.string.settings_about_chip_github),
+                onClick = onSourceClick,
+            )
+            HeroChip(text = stringResource(Res.string.settings_about_chip_license))
         }
     }
 }
 
 @Composable
-private fun HeroChip(text: String) {
+private fun HeroChip(
+    text: String,
+    onClick: (() -> Unit)? = null,
+) {
     val colors = AppTheme.materialColors
+    val base = Modifier
+        .clip(RoundedCornerShape(999.dp))
+        .background(colors.surfaceContainerHighest)
+    val modifier = if (onClick != null) base.clickable(onClick = onClick) else base
     Box(
-        modifier = Modifier
-            .clip(RoundedCornerShape(999.dp))
-            .background(colors.surfaceContainerHighest)
-            .padding(horizontal = 10.dp, vertical = 4.dp),
+        modifier = modifier.padding(horizontal = 10.dp, vertical = 4.dp),
     ) {
         Text(
             text = text,

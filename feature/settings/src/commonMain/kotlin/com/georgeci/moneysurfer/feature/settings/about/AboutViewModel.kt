@@ -18,6 +18,7 @@ class AboutViewModel(
             AboutEvent.OnTermsClick -> postSideEffect(AboutEffect.OpenUrl(URL_TERMS))
             AboutEvent.OnPrivacyClick -> postSideEffect(AboutEffect.OpenUrl(URL_PRIVACY))
             AboutEvent.OnLicensesClick -> postSideEffect(AboutEffect.NavigateToLicenses)
+            AboutEvent.OnSourceCodeClick -> postSideEffect(AboutEffect.OpenUrl(URL_SOURCE))
             AboutEvent.OnHelpCenterClick -> postSideEffect(AboutEffect.OpenUrl(URL_HELP))
             AboutEvent.OnContactClick -> postSideEffect(AboutEffect.OpenEmail(EMAIL_CONTACT))
             AboutEvent.OnRateClick -> postSideEffect(AboutEffect.OpenStoreListing)
@@ -29,6 +30,7 @@ class AboutViewModel(
     private companion object {
         const val URL_TERMS = "https://moneysurfer.app/legal/terms"
         const val URL_PRIVACY = "https://moneysurfer.app/legal/privacy"
+        const val URL_SOURCE = "https://github.com/georgeci/MoneySurfer"
         const val URL_HELP = "https://moneysurfer.app/help"
         const val EMAIL_CONTACT = "support@moneysurfer.app"
     }
@@ -43,6 +45,7 @@ sealed interface AboutEvent {
     data object OnTermsClick : AboutEvent
     data object OnPrivacyClick : AboutEvent
     data object OnLicensesClick : AboutEvent
+    data object OnSourceCodeClick : AboutEvent
     data object OnHelpCenterClick : AboutEvent
     data object OnContactClick : AboutEvent
     data object OnRateClick : AboutEvent
