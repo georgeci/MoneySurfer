@@ -9,7 +9,7 @@
     <key>signingStyle</key>
     <string>automatic</string>
     <key>teamID</key>
-    <string>92SLHZAN8L</string>
+    <string>__TEAM_ID__</string>
     <key>uploadSymbols</key>
     <true/>
     <key>stripSwiftSymbols</key>

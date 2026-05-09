@@ -15,7 +15,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		66EE562EB3C06377DC657E21 /* MoneySurfer Dev.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "MoneySurfer Dev.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		66EE562EB3C06377DC657E21 /* MoneySurfer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MoneySurfer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -63,7 +63,7 @@
 		BCF969DDAEDCCC52C7290E87 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				66EE562EB3C06377DC657E21 /* MoneySurfer Dev.app */,
+				66EE562EB3C06377DC657E21 /* MoneySurfer.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -107,7 +107,7 @@
 				F1A00000A555555555555555 /* FirebaseCrashlytics */,
 			);
 			productName = iosApp;
-			productReference = 66EE562EB3C06377DC657E21 /* MoneySurfer Dev.app */;
+			productReference = 66EE562EB3C06377DC657E21 /* MoneySurfer.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */

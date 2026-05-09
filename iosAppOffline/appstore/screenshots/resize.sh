@@ -6,6 +6,11 @@ set -euo pipefail
 # Usage: resize.sh [src_dir] [out_dir] [WIDTHxHEIGHT]
 # Defaults: raw 6_5 1242x2688
 
+if ! command -v magick >/dev/null 2>&1; then
+  echo "error: ImageMagick (magick) not found. Install with: brew install imagemagick" >&2
+  exit 1
+fi
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SRC_DIR="$SCRIPT_DIR/${1:-raw}"
 OUT_DIR="$SCRIPT_DIR/${2:-6_5}"
