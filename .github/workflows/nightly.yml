@@ -13,10 +13,6 @@ on:
     - cron: "17 3 * * *"
   workflow_dispatch:
 
-permissions:
-  contents: write    # nightly-publish pushes to gh-pages
-  actions: read      # decide queries `gh run list`
-
 concurrency:
   group: nightly
   cancel-in-progress: false
@@ -25,6 +21,9 @@ jobs:
   decide:
     name: Skip if no changes since last successful run
     runs-on: ubuntu-latest
+    permissions:
+      actions: read    # `gh run list` against this workflow
+      contents: read   # implicit checkout token scope, kept explicit
     outputs:
       run: ${{ steps.check.outputs.run }}
     steps:
@@ -65,6 +64,8 @@ jobs:
     if: needs.decide.outputs.run == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    permissions:
+      contents: read
     # Compile-only: catches AGP/Kotlin/google-services regressions without
     # needing the dev keystore (assembleDebug would require DEV_* secrets,
     # see androidApp/build.gradle.kts -> signingConfigs.dev).
@@ -98,6 +99,8 @@ jobs:
     if: needs.decide.outputs.run == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout
@@ -122,6 +125,8 @@ jobs:
     if: needs.decide.outputs.run == 'true'
     runs-on: macos-15
     timeout-minutes: 40
+    permissions:
+      contents: read
     # Lean Debug build for iOS Simulator (arm64), no code signing, no archive,
     # no Crashlytics dSYM upload. Verifies the Kotlin framework links and the
     # Swift code compiles end-to-end against the embedded framework.
@@ -186,6 +191,8 @@ jobs:
     if: needs.decide.outputs.run == 'true'
     runs-on: macos-15
     timeout-minutes: 40
+    permissions:
+      contents: read
     # Mirror of ios-build for the offline variant (composeAppOffline +
     # iosAppOffline). No Firebase plist is needed — the offline app must build
     # without any networked services baked in.
@@ -235,6 +242,8 @@ jobs:
     if: needs.decide.outputs.run == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 90
+    permissions:
+      contents: read
     # Heavy: builds debug APK with USE_EMULATOR=true, boots AVD + Firebase
     # Emulator (auth + firestore), seeds test users, runs all flows in
     # scripts/maestro/, generates Allure. Lives in nightly because the AVD
@@ -340,6 +349,8 @@ jobs:
     if: needs.decide.outputs.run == 'true'
     runs-on: macos-15
     timeout-minutes: 90
+    permissions:
+      contents: read
     # Same shape as maestro-android but on a macOS runner: boots an iPhone
     # simulator, builds the Debug app with MS_USE_EMULATOR=YES, runs flows.
 
