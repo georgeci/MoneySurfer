@@ -24,6 +24,8 @@ import com.georgeci.moneysurfer.domain.usecase.GetCategoriesUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetCurrentTimeUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetTransactionByIdUseCase
 import com.georgeci.moneysurfer.domain.usecase.UpdateTransactionUseCase
+import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -34,84 +36,80 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import kotlin.test.AfterTest
-import kotlin.test.BeforeTest
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertTrue
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class TransactionCreationViewModelTest {
+class TransactionCreationViewModelTest : StringSpec({
 
-    private val dispatcher = StandardTestDispatcher()
-
-    @BeforeTest
-    fun setUp() {
+    "Transfer is unreachable when transferEnabled flag is off" {
+        val dispatcher = StandardTestDispatcher()
         Dispatchers.setMain(dispatcher)
+        try {
+            runTest(dispatcher) {
+                val viewModel = buildViewModel(
+                    featureConfig = TransactionCreationFeatureConfig(transferEnabled = false),
+                )
+                advanceUntilIdle()
+
+                viewModel.onEvent(TransactionCreationEvent.OnTypeChanged(TransactionTypeUi.Transfer))
+                advanceUntilIdle()
+
+                val state = viewModel.first { it is TransactionCreationState.Content }
+                    as TransactionCreationState.Content
+                state.transferEnabled shouldBe false
+                state.isTransfer shouldBe false
+                state.type shouldBe TransactionTypeUi.Expense
+            }
+        } finally {
+            Dispatchers.resetMain()
+        }
     }
 
-    @AfterTest
-    fun tearDown() {
-        Dispatchers.resetMain()
+    "Transfer is reachable when transferEnabled flag is on" {
+        val dispatcher = StandardTestDispatcher()
+        Dispatchers.setMain(dispatcher)
+        try {
+            runTest(dispatcher) {
+                val viewModel = buildViewModel(
+                    featureConfig = TransactionCreationFeatureConfig(transferEnabled = true),
+                )
+                advanceUntilIdle()
+
+                viewModel.onEvent(TransactionCreationEvent.OnTypeChanged(TransactionTypeUi.Transfer))
+                advanceUntilIdle()
+
+                val state = viewModel.first { it is TransactionCreationState.Content }
+                    as TransactionCreationState.Content
+                state.transferEnabled shouldBe true
+                state.type shouldBe TransactionTypeUi.Transfer
+            }
+        } finally {
+            Dispatchers.resetMain()
+        }
     }
+})
 
-    @Test
-    fun `Transfer is unreachable when transferEnabled flag is off`() = runTest(dispatcher) {
-        val viewModel = buildViewModel(
-            featureConfig = TransactionCreationFeatureConfig(transferEnabled = false),
-        )
-        advanceUntilIdle()
-
-        viewModel.onEvent(TransactionCreationEvent.OnTypeChanged(TransactionTypeUi.Transfer))
-        advanceUntilIdle()
-
-        val state = viewModel.first { it is TransactionCreationState.Content }
-            as TransactionCreationState.Content
-        assertFalse(state.transferEnabled, "state should reflect the offline transferEnabled flag")
-        assertFalse(state.isTransfer, "Transfer mode must remain unreachable when the flag is off")
-        assertEquals(TransactionTypeUi.Expense, state.type)
-    }
-
-    @Test
-    fun `Transfer is reachable when transferEnabled flag is on`() = runTest(dispatcher) {
-        val viewModel = buildViewModel(
-            featureConfig = TransactionCreationFeatureConfig(transferEnabled = true),
-        )
-        advanceUntilIdle()
-
-        viewModel.onEvent(TransactionCreationEvent.OnTypeChanged(TransactionTypeUi.Transfer))
-        advanceUntilIdle()
-
-        val state = viewModel.first { it is TransactionCreationState.Content }
-            as TransactionCreationState.Content
-        assertTrue(state.transferEnabled)
-        assertEquals(TransactionTypeUi.Transfer, state.type)
-    }
-
-    private fun buildViewModel(
-        featureConfig: TransactionCreationFeatureConfig,
-    ): TransactionCreationViewModel {
-        val transactionRepository = EmptyTransactionRepository()
-        val accountRepository = EmptyAccountRepository()
-        val categoryRepository = EmptyCategoryRepository()
-        val session = EmptySessionPointers()
-        val getCurrentTime = GetCurrentTimeUseCase(ClockUseCase())
-        val applyChange = ApplyTransactionChangeUseCase(transactionRepository, accountRepository)
-        return TransactionCreationViewModel(
-            transactionId = null,
-            accountId = null,
-            getAccounts = GetAccountsUseCase(accountRepository, session),
-            getCategories = GetCategoriesUseCase(categoryRepository, session),
-            getTransactionById = GetTransactionByIdUseCase(transactionRepository),
-            createTransaction = CreateTransactionUseCase(applyChange),
-            updateTransaction = UpdateTransactionUseCase(transactionRepository, applyChange),
-            createTransfer = CreateTransferUseCase(categoryRepository, applyChange, getCurrentTime),
-            getCurrentTime = getCurrentTime,
-            transactionRepository = transactionRepository,
-            featureConfig = featureConfig,
-        )
-    }
+private fun buildViewModel(
+    featureConfig: TransactionCreationFeatureConfig,
+): TransactionCreationViewModel {
+    val transactionRepository = EmptyTransactionRepository()
+    val accountRepository = EmptyAccountRepository()
+    val categoryRepository = EmptyCategoryRepository()
+    val session = EmptySessionPointers()
+    val getCurrentTime = GetCurrentTimeUseCase(ClockUseCase())
+    val applyChange = ApplyTransactionChangeUseCase(transactionRepository, accountRepository)
+    return TransactionCreationViewModel(
+        transactionId = null,
+        accountId = null,
+        getAccounts = GetAccountsUseCase(accountRepository, session),
+        getCategories = GetCategoriesUseCase(categoryRepository, session),
+        getTransactionById = GetTransactionByIdUseCase(transactionRepository),
+        createTransaction = CreateTransactionUseCase(applyChange),
+        updateTransaction = UpdateTransactionUseCase(transactionRepository, applyChange),
+        createTransfer = CreateTransferUseCase(categoryRepository, applyChange, getCurrentTime),
+        getCurrentTime = getCurrentTime,
+        transactionRepository = transactionRepository,
+        featureConfig = featureConfig,
+    )
 }
 
 private class EmptyTransactionRepository : TransactionRepository {

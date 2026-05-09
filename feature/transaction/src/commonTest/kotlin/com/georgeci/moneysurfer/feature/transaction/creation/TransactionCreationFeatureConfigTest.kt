@@ -1,18 +1,15 @@
 package com.georgeci.moneysurfer.feature.transaction.creation
 
-import kotlin.test.Test
-import kotlin.test.assertFalse
-import kotlin.test.assertTrue
+import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.shouldBe
 
-class TransactionCreationFeatureConfigTest {
+class TransactionCreationFeatureConfigTest : StringSpec({
 
-    @Test
-    fun `defaults enable transfer`() {
-        assertTrue(TransactionCreationFeatureConfig().transferEnabled)
+    "defaults enable transfer" {
+        TransactionCreationFeatureConfig().transferEnabled shouldBe true
     }
 
-    @Test
-    fun `transfer can be disabled for the offline build`() {
-        assertFalse(TransactionCreationFeatureConfig(transferEnabled = false).transferEnabled)
+    "transfer can be disabled for the offline build" {
+        TransactionCreationFeatureConfig(transferEnabled = false).transferEnabled shouldBe false
     }
-}
+})

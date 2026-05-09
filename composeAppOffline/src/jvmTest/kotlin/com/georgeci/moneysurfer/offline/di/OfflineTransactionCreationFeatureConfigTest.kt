@@ -1,10 +1,9 @@
 package com.georgeci.moneysurfer.offline.di
 
 import com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationFeatureConfig
+import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.shouldBe
 import org.koin.dsl.koinApplication
-import kotlin.test.AfterTest
-import kotlin.test.Test
-import kotlin.test.assertFalse
 
 /**
  * Locks in the offline transaction-creation surface: the Transfer segment must not be
@@ -13,20 +12,14 @@ import kotlin.test.assertFalse
  * by re-adding a default binding that loads after `offlineWiring`). This test resolves
  * the binding for real and asserts it wins.
  */
-class OfflineTransactionCreationFeatureConfigTest {
+class OfflineTransactionCreationFeatureConfigTest : StringSpec({
 
-    private val app = koinApplication {
-        modules(offlineWiring)
+    "offline build resolves TransactionCreationFeatureConfig with transfer disabled" {
+        val app = koinApplication { modules(offlineWiring) }
+        try {
+            app.koin.get<TransactionCreationFeatureConfig>().transferEnabled shouldBe false
+        } finally {
+            app.close()
+        }
     }
-
-    @AfterTest
-    fun tearDown() {
-        app.close()
-    }
-
-    @Test
-    fun `offline build resolves TransactionCreationFeatureConfig with transfer disabled`() {
-        val config = app.koin.get<TransactionCreationFeatureConfig>()
-        assertFalse(config.transferEnabled, "offline build hides Transfer in transaction creation")
-    }
-}
+})
