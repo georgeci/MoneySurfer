@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # Copy the per-configuration GoogleService-Info.plist into the built .app.
 #
 # iOS has no "product flavor" notion, so dev vs prod is encoded as
@@ -6,8 +6,9 @@
 # Each configuration needs its own Firebase project, hence its own plist.
 #
 # Run from a PBXShellScriptBuildPhase in iosApp.xcodeproj. Must run
-# BEFORE the Resources phase (so Crashlytics dSYM upload at the end
-# can read GOOGLE_APP_ID from the plist embedded in the .app).
+# BEFORE the "Upload Crashlytics dSYMs" phase, which reads GOOGLE_APP_ID
+# from the plist embedded in the .app to know which Firebase project to
+# upload symbols to.
 #
 # Inputs:  iosApp/Firebase/{Dev,Prod}/GoogleService-Info.plist
 # Output:  $TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/GoogleService-Info.plist
