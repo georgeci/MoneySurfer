@@ -71,6 +71,7 @@ import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.utils.HandleSideEffect
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -85,7 +86,6 @@ fun AccountsManageScreen(
     val state by viewModel.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
-    val archivedTemplate = stringResource(Res.string.accounts_manage_archived_snackbar)
     val undoLabel = stringResource(Res.string.accounts_manage_archive_undo)
     val errorMessage = stringResource(Res.string.accounts_manage_action_failed)
 
@@ -98,13 +98,14 @@ fun AccountsManageScreen(
             is AccountsManageEffect.ShowArchivedSnackbar -> {
                 snackbarHostState.currentSnackbarData?.dismiss()
                 scope.launch {
+                    val message = getString(Res.string.accounts_manage_archived_snackbar, effect.name)
                     val result = snackbarHostState.showSnackbar(
-                        message = archivedTemplate.replace("%1\$s", effect.name),
+                        message = message,
                         actionLabel = undoLabel,
                         withDismissAction = false,
                     )
                     if (result == SnackbarResult.ActionPerformed) {
-                        viewModel.onEvent(AccountsManageEvent.OnUndoArchive)
+                        viewModel.onEvent(AccountsManageEvent.OnUndoArchive(effect.accountId))
                     }
                 }
             }

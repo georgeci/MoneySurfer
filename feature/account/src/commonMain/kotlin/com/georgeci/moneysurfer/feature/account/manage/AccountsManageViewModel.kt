@@ -37,7 +37,7 @@ class AccountsManageViewModel(
             AccountsManageEvent.OnArchiveCancel -> dismissArchive()
             AccountsManageEvent.OnArchiveConfirm -> confirmArchive()
             is AccountsManageEvent.OnRestoreAccountClick -> performRestore(event.accountId)
-            AccountsManageEvent.OnUndoArchive -> currentState.lastArchivedId()?.let(::performRestore)
+            is AccountsManageEvent.OnUndoArchive -> performRestore(event.accountId)
             is AccountsManageEvent.OnRemoveAccountClick -> requestDelete(event.accountId)
             AccountsManageEvent.OnDeleteCancel -> dismissDelete()
             AccountsManageEvent.OnDeleteConfirm -> confirmDelete()
@@ -154,9 +154,6 @@ class AccountsManageViewModel(
         formattedBalance = MoneyFormatter.format(balance, currencyCode),
         currency = currencyCode.value,
     )
-
-    private fun AccountsManageState.lastArchivedId(): AccountId? =
-        (this as? AccountsManageState.Content)?.archivedAccounts?.lastOrNull()?.id
 }
 
 @optics
@@ -205,7 +202,7 @@ sealed interface AccountsManageEvent {
     data class OnArchiveAccountClick(val accountId: AccountId) : AccountsManageEvent
     data object OnArchiveConfirm : AccountsManageEvent
     data object OnArchiveCancel : AccountsManageEvent
-    data object OnUndoArchive : AccountsManageEvent
+    data class OnUndoArchive(val accountId: AccountId) : AccountsManageEvent
     data class OnRestoreAccountClick(val accountId: AccountId) : AccountsManageEvent
     data class OnRemoveAccountClick(val accountId: AccountId) : AccountsManageEvent
     data object OnDeleteConfirm : AccountsManageEvent
