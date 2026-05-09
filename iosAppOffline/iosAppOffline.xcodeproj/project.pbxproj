@@ -259,7 +259,7 @@
 		47ED1855593E7BF20C124521 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-Dev";
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
@@ -280,7 +280,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = "$(APP_VERSION_NAME)";
-				PRODUCT_BUNDLE_IDENTIFIER = com.georgeci.moneysurfer.offline;
+				PRODUCT_BUNDLE_IDENTIFIER = com.georgeci.moneysurfer.offline.dev;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
