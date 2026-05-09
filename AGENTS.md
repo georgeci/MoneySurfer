@@ -91,6 +91,17 @@ Hard rules:
   [docs/architecture/data-models.md](docs/architecture/data-models.md) and
   [md/time.md](md/time.md).
 
+## Testing Conventions
+
+- Unit tests (`commonTest`, `jvmTest`, `androidHostTest`) use kotest with the
+  `StringSpec` style by default (`FunSpec` is acceptable when `withData` /
+  `context` blocks materially help). Assertions are kotest matchers
+  (`shouldBe`, `shouldBeInstanceOf`, etc.) — not `kotlin.test`.
+- Instrumented tests (`androidDeviceTest`, on-device integration) stay on
+  JUnit 4 (`@RunWith(AndroidJUnit4)`, `@Test`, `@Before`, `@After`) because
+  the Android instrumentation runner doesn't host kotest specs. Assertions
+  inside those tests still use kotest matchers — only the runner is JUnit.
+
 ## UI Rules
 
 Read [uikit/README.md](uikit/README.md) before UI work.
