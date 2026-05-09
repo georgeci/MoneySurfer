@@ -6,7 +6,7 @@
 # any entitlements file Xcode produced for the current configuration and fails
 # the build on hit. It is invoked from a Run Script build phase on the
 # iosAppOffline target, so it has full access to BUILT_PRODUCTS_DIR /
-# CODE_SIGN_ENTITLEMENTS / INFOPLIST_FILE.
+# INFOPLIST_PATH / CODE_SIGN_ENTITLEMENTS / SRCROOT.
 #
 # It is also safe to run standalone from CI against the source tree — in that
 # mode it falls back to the source Info.plist + any *.entitlements file under
@@ -36,7 +36,14 @@ fail() {
 check_plist_file() {
     local file="$1"
     local kind="$2"      # "info" or "entitlement"
-    [[ -f "$file" ]] || return 0
+    local require="${3:-required}"  # "required" or "optional"
+
+    if [[ ! -f "$file" ]]; then
+        if [[ "$require" == "required" ]]; then
+            fail "expected $kind file not found at: $file"
+        fi
+        return 0
+    fi
 
     local keys=()
     if [[ "$kind" == "info" ]]; then
@@ -55,21 +62,26 @@ check_plist_file() {
 }
 
 if [[ -n "${BUILT_PRODUCTS_DIR:-}" && -n "${INFOPLIST_PATH:-}" ]]; then
-    # Running inside Xcode — check the resolved/baked artifacts.
+    # Running inside Xcode — check the resolved/baked artifacts. The resolved
+    # Info.plist must exist; missing it means the script is wired in the wrong
+    # build phase order and the guard would silently no-op.
     resolved_info_plist="${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}"
-    check_plist_file "$resolved_info_plist" "info"
+    check_plist_file "$resolved_info_plist" "info" "required"
 
     if [[ -n "${CODE_SIGN_ENTITLEMENTS:-}" ]]; then
-        # CODE_SIGN_ENTITLEMENTS is relative to SRCROOT.
+        # CODE_SIGN_ENTITLEMENTS is relative to SRCROOT. If it's set, the file
+        # must exist — otherwise the entitlements check would silently pass.
         entitlements_path="${SRCROOT}/${CODE_SIGN_ENTITLEMENTS}"
-        check_plist_file "$entitlements_path" "entitlement"
+        check_plist_file "$entitlements_path" "entitlement" "required"
     fi
 else
-    # CI / standalone mode — work against the source tree.
+    # CI / standalone mode — work against the source tree. The Info.plist is
+    # required; entitlements are optional (the offline target intentionally
+    # ships without an entitlements file).
     repo_root="$(cd "$(dirname "$0")/.." && pwd)"
-    check_plist_file "${repo_root}/iosAppOffline/iosAppOffline/Info.plist" "info"
+    check_plist_file "${repo_root}/iosAppOffline/iosAppOffline/Info.plist" "info" "required"
     while IFS= read -r -d '' ent; do
-        check_plist_file "$ent" "entitlement"
+        check_plist_file "$ent" "entitlement" "optional"
     done < <(find "${repo_root}/iosAppOffline" -name '*.entitlements' -print0)
 fi
 
