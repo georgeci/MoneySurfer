@@ -123,8 +123,8 @@ private class SeedTestEnv(
         workspaceRepository = workspaceRepo,
         workspaceMemberRepository = memberRepo,
         categoryRepository = categoryRepo,
-        userRemoteRepository = NoOpUserRemoteRepo,
-        workspaceSyncer = NoOpWorkspaceSyncer,
+        userRemoteRepository = SeedFakeUserRemoteRepo,
+        workspaceSyncer = SeedFakeWorkspaceSyncer,
         session = session,
         getCurrentTime = getCurrentTime,
     )
@@ -192,9 +192,10 @@ private class FakeAccountRepo : AccountRepository {
     override suspend fun delete(id: AccountId) = error("not used")
     override suspend fun applyDelta(accountId: AccountId, delta: Money) = error("not used")
     override suspend fun setBalance(accountId: AccountId, balance: Money) = error("not used")
+    override suspend fun setArchived(accountId: AccountId, archived: Boolean) = error("not used")
 }
 
-private object NoOpUserRemoteRepo : UserRemoteRepository {
+private object SeedFakeUserRemoteRepo : UserRemoteRepository {
     override suspend fun fetch(uid: String): User? = null
     override suspend fun create(uid: String, displayName: String?, email: String?, isAnon: Boolean, createdAt: Long) =
         error("not used")
@@ -206,7 +207,7 @@ private object NoOpUserRemoteRepo : UserRemoteRepository {
     override suspend fun removeInvitedWorkspaceRef(uid: String, workspaceId: WorkspaceId) = Unit
 }
 
-private object NoOpWorkspaceSyncer : WorkspaceSyncer {
+private object SeedFakeWorkspaceSyncer : WorkspaceSyncer {
     override suspend fun pushAll() = Unit
     override suspend fun syncAll() = Unit
     override suspend fun syncWorkspace(workspaceId: WorkspaceId) = Unit
