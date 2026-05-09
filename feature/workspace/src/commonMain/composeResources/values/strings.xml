@@ -104,6 +104,7 @@
     <string name="workspace_creation_invite_title">Invite people</string>
     <string name="workspace_creation_invite_subtitle">Share a link or send an email</string>
     <string name="workspace_creation_preview_subtitle_format">Shared · %1$d members · %2$s</string>
+    <string name="workspace_creation_preview_subtitle_offline_format">%1$s</string>
     <string name="workspace_creation_preview_fallback_title">New workspace</string>
     <string name="workspace_creation_error_remote_sync">Couldn't sync the new workspace to the cloud. Check your connection and try again.</string>
     <string name="workspace_creation_error_unknown">Couldn't create the workspace. Please try again.</string>

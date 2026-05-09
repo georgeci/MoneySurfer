@@ -147,29 +147,31 @@ private fun SettingsContent(
                         trailing = { SurferSettingsChevron() },
                     )
                 }
-                SurferSettingsRow(
-                    icon = SurferIcons.Mail,
-                    title = stringResource(Res.string.settings_pending_invites),
-                    supporting = if (state.pendingInviteCount > 0) {
-                        {
-                            SurferPendingBadge(
-                                text = stringResource(
-                                    Res.string.settings_pending_invites_supporting_format,
-                                    state.pendingInviteCount,
-                                ),
-                            )
-                        }
-                    } else {
-                        null
-                    },
-                    supportingText = if (state.pendingInviteCount == 0) {
-                        stringResource(Res.string.settings_pending_invites_supporting_empty)
-                    } else {
-                        null
-                    },
-                    onClick = { onEvent(SettingsEvent.OnIncomingInvitesClick) },
-                    trailing = { SurferSettingsChevron() },
-                )
+                if (state.showPendingInvites) {
+                    SurferSettingsRow(
+                        icon = SurferIcons.Mail,
+                        title = stringResource(Res.string.settings_pending_invites),
+                        supporting = if (state.pendingInviteCount > 0) {
+                            {
+                                SurferPendingBadge(
+                                    text = stringResource(
+                                        Res.string.settings_pending_invites_supporting_format,
+                                        state.pendingInviteCount,
+                                    ),
+                                )
+                            }
+                        } else {
+                            null
+                        },
+                        supportingText = if (state.pendingInviteCount == 0) {
+                            stringResource(Res.string.settings_pending_invites_supporting_empty)
+                        } else {
+                            null
+                        },
+                        onClick = { onEvent(SettingsEvent.OnIncomingInvitesClick) },
+                        trailing = { SurferSettingsChevron() },
+                    )
+                }
             }
 
             SurferSettingsGroup(title = stringResource(Res.string.settings_section_personalization)) {

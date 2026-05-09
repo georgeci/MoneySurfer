@@ -192,9 +192,11 @@
     <string name="settings_about_title">О приложении</string>
     <string name="settings_about_brand">MoneySurfer</string>
     <string name="settings_about_brand_letter">M</string>
-    <string name="settings_about_version_format">v%1$s · сборка 2025.04 · iOS / Android</string>
-    <string name="settings_about_chip_made_by">Сделано georgeci</string>
-    <string name="settings_about_chip_warsaw">Варшава, PL</string>
+    <string name="settings_about_version_format">v%1$s</string>
+    <string name="settings_about_chip_made_by">Сделано Георгием Балабайчкиным</string>
+    <string name="settings_about_chip_license">Лицензия MIT</string>
+    <string name="settings_about_github_title">Открыть на GitHub</string>
+    <string name="settings_about_github_supporting">github.com/georgeci/MoneySurfer2026</string>
     <string name="settings_about_section_legal">Юридическое</string>
     <string name="settings_about_terms_title">Условия использования</string>
     <string name="settings_about_privacy_title">Политика конфиденциальности</string>
@@ -213,7 +215,7 @@
     <string name="settings_about_region_pill">Русский (RU)</string>
     <string name="settings_about_diagnostic_title">Диагностика</string>
     <string name="settings_about_diagnostic_supporting">Тапните, чтобы скопировать</string>
-    <string name="settings_about_copyright">© 2025 georgeci sp. z o.o. Все права защищены.\nMoneySurfer — приложение для учёта личных финансов, не банк и не платёжный сервис.</string>
+    <string name="settings_about_copyright">© 2026 Георгий Балабайчкин. Распространяется по лицензии MIT.\nMoneySurfer — приложение с открытым исходным кодом для учёта личных финансов, не банк и не платёжный сервис.</string>
     <string name="settings_categories_title">Категории</string>
     <string name="settings_categories_supporting">Управление категориями расходов и доходов</string>
 </resources>
