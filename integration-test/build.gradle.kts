@@ -85,6 +85,7 @@ kotlin {
             implementation(libs.androidx.sqlite.bundled)
 
             implementation(libs.kotlinx.coroutinesCore)
+            implementation(libs.kotlinx.datetime)
             implementation(libs.arrow.core)
         }
 
