@@ -53,8 +53,8 @@ fun CategoryChooserBottomSheet(
             CategoryPickerRow(
                 id = cat.id.value,
                 name = cat.name,
-                icon = SurferCategoryPalette.iconFor(cat.id.value),
-                tint = SurferCategoryPalette.tintFor(cat.id.value),
+                icon = SurferCategoryPalette.iconFor(cat.id.value, cat.systemKind?.name),
+                tint = SurferCategoryPalette.tintFor(cat.id.value, cat.systemKind?.name),
                 isIncome = false,
             )
         },

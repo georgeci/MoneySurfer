@@ -1,0 +1,50 @@
+coverage:
+  status:
+    project:
+      default:
+        target: auto
+        threshold: 1%
+        informational: true
+    patch:
+      default:
+        target: auto
+        threshold: 1%
+        informational: true
+
+comment:
+  layout: "reach, diff, flags, files"
+  behavior: default
+  require_changes: true
+
+ignore:
+  - "androidApp/**"
+  - "androidApp-offline/**"
+  - "iosApp/**"
+  - "build-logic/**"
+  - "**/build/**"
+  - "**/generated/**"
+  - "**/*.kts"
+  - "integration-test/**"
+  - "firestore-tests/**"
+  - "data-test-fixtures/**"
+  - "domain-test-fixtures/**"
+  - "sync-test-fixtures/**"
+  - "scripts/**"
+  - "docs/**"
+  - "md/**"
+
+flags:
+  unittests:
+    paths:
+      - composeApp/
+      - shared/
+      - domain/
+      - data-local/
+      - data-remote/
+      - sync/
+      - sync-surfer/
+      - uikit/
+      - feature/
+      - navigation/
+      - utils/
+    carryforward: true

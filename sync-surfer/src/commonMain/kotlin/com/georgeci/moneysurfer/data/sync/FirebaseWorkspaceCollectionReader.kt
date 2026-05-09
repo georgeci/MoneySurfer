@@ -1,7 +1,6 @@
 package com.georgeci.moneysurfer.data.sync
 
 import com.georgeci.moneysurfer.sync.plugin.RemoteDocument
-import com.georgeci.moneysurfer.data.sync.WorkspaceCollectionReader
 import dev.gitlive.firebase.firestore.FirebaseFirestore
 import org.koin.core.annotation.Single
 

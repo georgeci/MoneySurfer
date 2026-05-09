@@ -23,6 +23,7 @@ import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.CreditCard
 import androidx.compose.material.icons.filled.DarkMode
+import androidx.compose.material.icons.filled.Dashboard
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Edit
@@ -45,6 +46,7 @@ import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -85,6 +87,9 @@ object SurferIcons {
     val DropDown: ImageVector get() = Icons.Filled.KeyboardArrowDown
     val ArrowDown: ImageVector get() = Icons.Filled.ArrowDownward
     val ArrowUp: ImageVector get() = Icons.Filled.ArrowUpward
+
+    val Dashboard: ImageVector get() = Icons.Filled.Dashboard
+    val SwapHoriz: ImageVector get() = Icons.Filled.SwapHoriz
 
     val Cloud: ImageVector get() = Icons.Filled.Cloud
     val LightMode: ImageVector get() = Icons.Filled.LightMode

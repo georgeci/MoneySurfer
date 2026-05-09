@@ -19,6 +19,13 @@
     <string name="accounts_manage_delete_message">"%1$s" and all its transactions will be removed permanently. This can't be undone.</string>
     <string name="accounts_manage_delete_confirm">Delete</string>
     <string name="accounts_manage_delete_cancel">Cancel</string>
+    <string name="accounts_manage_archive_title">Archive this account?</string>
+    <string name="accounts_manage_archive_message">"%1$s" will move to the Archived section. Its history is kept and you can restore it any time.</string>
+    <string name="accounts_manage_archive_confirm">Archive</string>
+    <string name="accounts_manage_archive_cancel">Cancel</string>
+    <string name="accounts_manage_archived_snackbar">"%1$s" archived</string>
+    <string name="accounts_manage_archive_undo">Undo</string>
+    <string name="accounts_manage_action_failed">Something went wrong. Try again.</string>
     <string name="account_creation_title">New account</string>
     <string name="account_creation_name_label">Account name</string>
     <string name="account_creation_balance_label">Opening balance</string>
@@ -30,6 +37,7 @@
     <string name="account_creation_type_bank">Bank</string>
     <string name="account_creation_type_card">Card</string>
     <string name="account_creation_type_savings">Savings</string>
+    <string name="account_creation_currency_label">Currency</string>
     <string name="account_creation_accent_label">Accent</string>
     <string name="account_creation_extra_details_label">Extra details</string>
     <string name="account_creation_extra_details_optional">Optional</string>

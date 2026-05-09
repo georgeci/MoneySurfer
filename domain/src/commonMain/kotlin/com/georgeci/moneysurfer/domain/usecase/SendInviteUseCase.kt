@@ -16,6 +16,7 @@ import com.georgeci.moneysurfer.domain.repositories.WorkspaceInviteRepository
 import com.georgeci.moneysurfer.domain.repositories.WorkspaceMemberRepository
 import kotlinx.coroutines.flow.first
 import org.koin.core.annotation.Single
+import kotlin.time.Duration.Companion.days
 
 /**
  * Sends a workspace invitation:
@@ -87,7 +88,7 @@ class SendInviteUseCase(
             invitedByUserId = callerId,
             createdAt = now,
             updatedAt = now,
-            expiresAt = now + INVITE_TTL_MILLIS,
+            expiresAt = now + INVITE_TTL,
             respondedAt = null,
         )
 
@@ -123,7 +124,7 @@ class SendInviteUseCase(
         const val TAG = "SendInvite"
 
         /** 14 days. Matches md/members.md decision. */
-        const val INVITE_TTL_MILLIS: Long = 14L * 24L * 60L * 60L * 1000L
+        val INVITE_TTL = 14.days
     }
 }
 

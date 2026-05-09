@@ -24,6 +24,9 @@ kotlin {
                 implementation(libs.compose.runtime)
                 implementation(libs.compose.foundation)
                 implementation(libs.compose.material3)
+                implementation(libs.compose.material3.adaptive.navigation3)
+                implementation(libs.compose.material3.adaptive.navigation.suite)
+                implementation(libs.compose.components.resources)
                 implementation(libs.compose.ui)
                 implementation(libs.androidx.lifecycle.viewmodelCompose)
                 implementation(libs.androidx.lifecycle.runtimeCompose)
@@ -62,6 +65,10 @@ kotlin {
             }
         }
     }
+}
+
+compose.resources {
+    packageOfResClass = "moneysurfer.navigation.generated.resources"
 }
 
 koinCompiler {

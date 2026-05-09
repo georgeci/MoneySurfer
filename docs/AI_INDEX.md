@@ -209,7 +209,7 @@
 ## persistence-rules
 - Title: Rules
 - File: docs/architecture/persistence.md
-- Lines: 23-30
+- Lines: 26-40
 - Tasks: persistence, room, firestore, datastore
 
 ## project-map
@@ -319,6 +319,12 @@
 - File: docs/testing/testing-strategy.md
 - Lines: 25-51
 - Tasks: testing, qa, validation
+
+## time-policy
+- Title: Time policy
+- File: docs/architecture/data-models.md
+- Lines: 45-68
+- Tasks: time, persistence, domain
 
 ## transactions-feature
 - Title: Rules

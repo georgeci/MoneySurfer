@@ -367,7 +367,7 @@ class OutboxDrainAndRecoveryIT {
                     "displayName" to "Drain owner",
                     "email" to ownerEmail,
                     "addedByUserId" to ownerUid,
-                    "addedAt" to 0L,
+                    "createdAt" to 0L,
                     "updatedAt" to now,
                     "clientVersionCode" to 1,
                 ),

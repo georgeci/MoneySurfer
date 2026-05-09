@@ -1,0 +1,138 @@
+name: CodeQL
+
+on:
+  pull_request:
+    branches:
+      - main
+      - master
+  schedule:
+    # Weekly run picks up new CodeQL queries even on quiet weeks.
+    - cron: "23 4 * * 1"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  # Same fan-out gate as ci.yml: skip CodeQL on doc-only / AI-tooling changes
+  # via job-level `if:` instead of top-level `paths-ignore`, so required
+  # status checks still report. Schedule-triggered runs always proceed.
+  changes:
+    name: Detect relevant changes
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    outputs:
+      code: ${{ steps.filter.outputs.code }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Filter paths
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            code:
+              - '**'
+              - '!**/*.md'
+              - '!.claude/**'
+              - '!.agents/**'
+              - '!ai/**'
+              - '!md/**'
+              - '!docs/**'
+              - '!.github/copilot-instructions.md'
+              - '!LICENSE'
+
+  analyze:
+    name: Analyze (${{ matrix.language }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    needs: changes
+    # Run on schedule unconditionally; otherwise only when code paths changed.
+    if: >-
+      github.event_name == 'schedule' ||
+      needs.changes.outputs.code == 'true'
+    permissions:
+      security-events: write
+      actions: read
+      contents: read
+    # Fork PRs can't read Firebase secrets, so the Gradle build for
+    # java-kotlin would fail on processDebugGoogleServices. JS analysis
+    # needs no secrets and runs on every PR.
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - language: java-kotlin
+            build-mode: manual
+          - language: javascript-typescript
+            build-mode: none
+
+    steps:
+      - name: Checkout
+        if: >-
+          matrix.language != 'java-kotlin' ||
+          github.event_name != 'pull_request' ||
+          github.event.pull_request.head.repo.full_name == github.repository
+        uses: actions/checkout@v6
+
+      - name: Decode Firebase config
+        if: >-
+          matrix.language == 'java-kotlin' &&
+          (github.event_name != 'pull_request' ||
+          github.event.pull_request.head.repo.full_name == github.repository)
+        uses: ./.github/actions/firebase-config
+        with:
+          debug-json:   ${{ secrets.GOOGLE_SERVICES_JSON_DEBUG }}
+          release-json: ${{ secrets.GOOGLE_SERVICES_JSON_RELEASE }}
+          ios-plist:    ${{ secrets.GOOGLE_SERVICE_INFO_PLIST }}
+
+      - name: Set up JDK
+        if: >-
+          matrix.language == 'java-kotlin' &&
+          (github.event_name != 'pull_request' ||
+          github.event.pull_request.head.repo.full_name == github.repository)
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Gradle
+        if: >-
+          matrix.language == 'java-kotlin' &&
+          (github.event_name != 'pull_request' ||
+          github.event.pull_request.head.repo.full_name == github.repository)
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Initialize CodeQL
+        if: >-
+          matrix.language != 'java-kotlin' ||
+          github.event_name != 'pull_request' ||
+          github.event.pull_request.head.repo.full_name == github.repository
+        uses: github/codeql-action/init@v4
+        with:
+          languages: ${{ matrix.language }}
+          build-mode: ${{ matrix.build-mode }}
+
+      - name: Build Kotlin sources
+        if: >-
+          matrix.language == 'java-kotlin' &&
+          (github.event_name != 'pull_request' ||
+          github.event.pull_request.head.repo.full_name == github.repository)
+        # --rerun-tasks: CodeQL's tracer only sees compilation if it actually
+        # runs — Gradle cache hits (FROM-CACHE / UP-TO-DATE) leave the database
+        # empty and the analyze step fails with "could not process any code".
+        run: ./gradlew :androidApp:processDebugGoogleServices :androidApp:compileDebugSources --rerun-tasks --stacktrace
+
+      - name: Perform CodeQL analysis
+        if: >-
+          matrix.language != 'java-kotlin' ||
+          github.event_name != 'pull_request' ||
+          github.event.pull_request.head.repo.full_name == github.repository
+        uses: github/codeql-action/analyze@v4
+        with:
+          category: "/language:${{ matrix.language }}"

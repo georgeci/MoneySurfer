@@ -1,6 +1,8 @@
 package com.georgeci.moneysurfer.feature.account
 
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
+import androidx.compose.material3.adaptive.navigation3.ListDetailSceneStrategy
 import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.feature.account.creation.AccountCreationScreen
 import com.georgeci.moneysurfer.feature.account.details.AccountDetailsScreen
@@ -9,20 +11,25 @@ import com.georgeci.moneysurfer.feature.account.picker.AccountChooserBottomSheet
 import com.georgeci.moneysurfer.navigation.AccountPickerResultKey
 import com.georgeci.moneysurfer.navigation.BottomSheetSceneStrategy
 import com.georgeci.moneysurfer.navigation.FeatureNavGraph
+import com.georgeci.moneysurfer.navigation.NavDetailPlaceholder
 import com.georgeci.moneysurfer.navigation.Route
 import io.github.irgaly.navigation3.resultstate.LocalNavigationResultProducer
 import io.github.irgaly.navigation3.resultstate.setResult
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3AdaptiveApi::class)
 val accountNavGraph: FeatureNavGraph = { navigator ->
-    entry<Route.AccountCreation> { key ->
+    entry<Route.AccountCreation>(
+        metadata = ListDetailSceneStrategy.detailPane(),
+    ) { key ->
         AccountCreationScreen(
             onNavigateBack = { navigator.pop() },
             accountId = key.accountId?.let { AccountId(it) },
         )
     }
 
-    entry<Route.AccountsManage> {
+    entry<Route.AccountsManage>(
+        metadata = ListDetailSceneStrategy.listPane(detailPlaceholder = { NavDetailPlaceholder() }),
+    ) {
         AccountsManageScreen(
             onNavigateBack = { navigator.pop() },
             onNavigateToAccountCreation = { navigator.push(Route.AccountCreation()) },
@@ -41,6 +48,7 @@ val accountNavGraph: FeatureNavGraph = { navigator ->
         val resultProducer = LocalNavigationResultProducer.current
         AccountChooserBottomSheet(
             selectedAccountId = key.selectedAccountId?.let { AccountId(it) },
+            excludeAccountId = key.excludeAccountId?.let { AccountId(it) },
             onDismiss = { navigator.pop() },
             onNavigateToAccountCreation = {
                 navigator.replaceTop(Route.AccountCreation())
@@ -52,7 +60,9 @@ val accountNavGraph: FeatureNavGraph = { navigator ->
         )
     }
 
-    entry<Route.AccountDetails> { key ->
+    entry<Route.AccountDetails>(
+        metadata = ListDetailSceneStrategy.detailPane(),
+    ) { key ->
         AccountDetailsScreen(
             accountId = AccountId(key.accountId),
             onNavigateBack = { navigator.pop() },

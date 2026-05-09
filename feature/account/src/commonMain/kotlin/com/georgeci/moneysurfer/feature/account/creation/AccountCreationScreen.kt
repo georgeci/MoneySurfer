@@ -31,11 +31,14 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.georgeci.moneysurfer.domain.model.Currency
 import com.georgeci.moneysurfer.domain.primitives.AccountType
+import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
 import com.georgeci.moneysurfer.feature.account.generated.resources.Res
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_add_another_label
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_balance_helper
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_balance_label
+import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_currency_label
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_extra_details_label
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_extra_details_optional
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_field_bank_url
@@ -152,11 +155,19 @@ private fun AccountCreationContent(
             )
 
             if (!state.isEditMode) {
+                if (state.currencies.isNotEmpty()) {
+                    CurrencyPicker(
+                        currencies = state.currencies,
+                        selected = state.currency,
+                        onSelect = { onEvent(AccountCreationEvent.OnCurrencyChanged(it)) },
+                    )
+                }
+
                 OutlinedTextField(
                     value = state.balance,
                     onValueChange = { onEvent(AccountCreationEvent.OnBalanceChanged(it)) },
                     label = { Text(stringResource(Res.string.account_creation_balance_label)) },
-                    prefix = { Text("€") },
+                    prefix = { Text(state.currencySymbol) },
                     supportingText = { Text(stringResource(Res.string.account_creation_balance_helper)) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
@@ -198,6 +209,22 @@ private fun TypePicker(
             )
         },
         onSelect = onSelect,
+    )
+}
+
+@Composable
+private fun CurrencyPicker(
+    currencies: List<Currency>,
+    selected: CurrencyCode,
+    onSelect: (CurrencyCode) -> Unit,
+) {
+    val resolved = currencies.firstOrNull { it.code == selected } ?: currencies.first()
+    SectionLabel(stringResource(Res.string.account_creation_currency_label))
+    SurferSegmentedControl(
+        options = currencies,
+        selected = resolved,
+        label = { "${it.code.value} ${it.symbol}" },
+        onSelect = { onSelect(it.code) },
     )
 }
 
@@ -380,6 +407,13 @@ private fun AccountCreationScreenPreview() {
                 name = "Emergency fund",
                 balance = "2,480.00",
                 type = AccountType.BANK,
+                currency = CurrencyCode("EUR"),
+                currencies = listOf(
+                    Currency(CurrencyCode("EUR"), symbol = "€", displayName = "Euro"),
+                    Currency(CurrencyCode("USD"), symbol = "$", displayName = "US Dollar"),
+                    Currency(CurrencyCode("GBP"), symbol = "£", displayName = "British Pound"),
+                    Currency(CurrencyCode("PLN"), symbol = "zł", displayName = "Polish Zloty"),
+                ),
                 extraFields = listOf(
                     AccountExtraField(
                         kind = AccountExtraFieldKind.IBAN,

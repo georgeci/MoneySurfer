@@ -1,7 +1,32 @@
 appId: ${APP_ID}
 name: Auth — Sign in with test user
 ---
-- runFlow: 00_login.yaml
+# Tag-driven sign-in flow. Selectors target Compose `testTag` values from
+# `feature/login/.../SignInScreen.kt::SignInTestTags`, exposed to Maestro via
+# `Modifier.semantics { testTagsAsResourceId = true }` on the screen root.
+
+- launchApp:
+    clearState: false
+
+- assertVisible:
+    id: "signIn:root"
+- assertVisible:
+    id: "signIn:brandHeader"
+- assertVisible:
+    id: "signIn:heroTitle"
+- assertVisible:
+    id: "signIn:sheet"
+
+- tapOn:
+    id: "signIn:email"
+- inputText: ${TEST_EMAIL}
+
+- tapOn:
+    id: "signIn:password"
+- inputText: ${TEST_PASSWORD}
+
+- tapOn:
+    id: "signIn:submit"
 
 - runFlow:
     when:

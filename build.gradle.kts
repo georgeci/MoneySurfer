@@ -16,9 +16,53 @@ plugins {
     alias(libs.plugins.kover)
     alias(libs.plugins.android.built.in1.kotlin) apply false
     alias(libs.plugins.sonarqube)
+    alias(libs.plugins.cpd)
+    alias(libs.plugins.moduleGraph)
+}
+
+moduleGraphConfig {
+    readmePath.set("$rootDir/docs/module-graph.md")
+    heading.set("# Module Dependency Graph")
+    // Hide root-project edges that come from `kover(...)` aggregation —
+    // those are coverage wiring, not architectural dependencies.
+    excludedConfigurationsRegex.set(".*kover.*")
 }
 
 apply(from = "gradle/qa.gradle.kts")
+
+// Copy-paste detection (same engine SonarCloud uses for Kotlin via PMD CPD).
+// Run locally before commit: `./gradlew cpdCheck`.
+// Reports: build/reports/cpd/cpdCheck.{xml,txt}.
+// See ai/skills/cpd-rules.md for usage rules.
+cpd {
+    language = "kotlin"
+    minimumTokenCount = 100
+    toolVersion = "7.7.0"
+}
+
+tasks.named<de.aaschmid.gradle.plugins.cpd.Cpd>("cpdCheck") {
+    description = "Detects copy-paste duplication across all Kotlin sources."
+    group = "verification"
+    // Surface duplicates without breaking the build for now. Flip to `false`
+    // once the existing duplication backlog is clean to enforce.
+    ignoreFailures = true
+    reports {
+        xml.required.set(true)
+        text.required.set(true)
+    }
+    source = fileTree(rootDir) {
+        include("**/src/**/*.kt")
+        exclude(
+            "**/build/**",
+            "**/generated/**",
+            "**/*Test*/**",
+            "iosApp/**",
+            "iosAppOffline/**",
+            "**/.gradle/**",
+            "**/.idea/**",
+        )
+    }
+}
 
 subprojects {
     apply(plugin = "io.gitlab.arturbosch.detekt")
@@ -58,16 +102,54 @@ subprojects {
             freeCompilerArgs.add("-Xexpect-actual-classes")
         }
     }
+
+    // Per-module Sonar source discovery for KMP layouts. Setting `sonar.sources`
+    // only at root made SonarCloud miss subproject sources (it saw ~3 dirs).
+    afterEvaluate {
+        val mainCandidates = listOf(
+            "src/commonMain/kotlin",
+            "src/androidMain/kotlin",
+            "src/iosMain/kotlin",
+            "src/iosArm64Main/kotlin",
+            "src/iosX64Main/kotlin",
+            "src/iosSimulatorArm64Main/kotlin",
+            "src/jvmMain/kotlin",
+            "src/main/kotlin",
+            "src/main/java",
+        )
+        val testCandidates = listOf(
+            "src/commonTest/kotlin",
+            "src/androidHostTest/kotlin",
+            "src/androidUnitTest/kotlin",
+            "src/androidInstrumentedTest/kotlin",
+            "src/iosTest/kotlin",
+            "src/jvmTest/kotlin",
+            "src/test/kotlin",
+            "src/test/java",
+        )
+        val mainDirs = mainCandidates.filter { file(it).isDirectory }
+        val testDirs = testCandidates.filter { file(it).isDirectory }
+        extensions.findByType(org.sonarqube.gradle.SonarExtension::class.java)?.properties {
+            if (mainDirs.isNotEmpty()) {
+                property("sonar.sources", mainDirs.joinToString(","))
+            }
+            if (testDirs.isNotEmpty()) {
+                property("sonar.tests", testDirs.joinToString(","))
+            }
+        }
+    }
 }
 
 dependencies {
     kover(projects.composeApp)
+    kover(projects.composeAppOffline)
     kover(projects.domain)
     kover(projects.dataLocal)
     kover(projects.dataRemote)
     kover(projects.syncSurfer)
     kover(projects.sync.default)
     kover(projects.uikit)
+    kover(projects.feature.login)
 }
 
 sonar {
@@ -77,19 +159,11 @@ sonar {
         property("sonar.projectKey", "georgeci_MoneySurfer")
         property("sonar.projectName", "MoneySurfer")
 
-        property(
-            "sonar.sources",
-            "src/commonMain/kotlin,src/androidMain/kotlin,src/iosMain/kotlin,src/jvmMain/kotlin",
-        )
-        property(
-            "sonar.tests",
-            "src/commonTest/kotlin,src/androidHostTest/kotlin,src/jvmTest/kotlin",
-        )
+        // Source/test directory discovery happens per-subproject (see
+        // `subprojects { afterEvaluate { ... } }` above) so SonarCloud sees
+        // every KMP module instead of just the root.
 
-        property(
-            "sonar.coverage.jacoco.xmlReportPaths",
-            "${layout.buildDirectory.get()}/reports/kover/report.xml",
-        )
+        property("sonar.sourceEncoding", "UTF-8")
 
         property(
             "sonar.kotlin.detekt.reportPaths",
@@ -100,7 +174,7 @@ sonar {
 
         property(
             "sonar.exclusions",
-            "**/build/**,**/generated/**,iosApp/**,scripts/**,md/**,docs/**,firestore-tests/**",
+            "**/build/**,**/generated/**,iosApp/**,scripts/**,md/**,docs/**,firestore-tests/**,**/config/detekt/**",
         )
     }
 }

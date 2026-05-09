@@ -14,10 +14,6 @@ def safe_name(name: str) -> str:
     return " ".join(name.split())
 
 
-def result_uuid(name: str) -> str:
-    return str(uuid.UUID(hashlib.md5(name.encode("utf-8")).hexdigest()))
-
-
 def map_case_status(case: ET.Element) -> str:
     status_attr = (case.attrib.get("status") or "").upper()
     if case.find("failure") is not None or case.find("error") is not None:
@@ -143,74 +139,96 @@ def main() -> int:
         )
         return 0
 
-    root = ET.fromstring(junit.read_text())
-    suite = root.find("testsuite")
-    suite_name = (suite.attrib.get("name") if suite is not None else "Maestro") or "Maestro"
+    try:
+        root = ET.fromstring(junit.read_text())
+    except ET.ParseError as exc:
+        # Keep going: the final executor.json/environment.properties block below
+        # still lets `allure generate` produce a (mostly empty) report.
+        print(f"[maestro_to_allure] could not parse {junit}: {exc}", flush=True)
+        root = None
 
-    for case in root.findall(".//testcase"):
-        name = safe_name(case.attrib.get("name") or case.attrib.get("classname") or "Unnamed Maestro Test")
-        uid = result_uuid(name)
+    if root is not None:
+        suite = root.find("testsuite")
+        suite_name = (suite.attrib.get("name") if suite is not None else "Maestro") or "Maestro"
 
-        status = map_case_status(case)
-        status_details = {}
-        failure = case.find("failure")
-        if failure is not None and failure.text:
-            status_details["message"] = failure.text.strip()
-            status_details["trace"] = failure.text.strip()
+        for case in root.findall(".//testcase"):
+            try:
+                name = safe_name(case.attrib.get("name") or case.attrib.get("classname") or "Unnamed Maestro Test")
+                # Result-file UUID must be globally unique: when the nightly
+                # aggregator flattens Android + iOS into one allure-results dir
+                # a deterministic name(name) hash collides across scopes and
+                # one platform overwrites the other. historyId stays
+                # deterministic so per-scope trend lines remain stable.
+                uid = uuid.uuid4().hex
 
-        steps = []
-        for item in load_commands(debug_dir, name):
-            cmd = item.get("command") or {}
-            meta = item.get("metadata") or {}
-            start = int(meta.get("timestamp") or 0)
-            duration = int(meta.get("duration") or 0)
-            step = {
-                "name": describe_command(cmd),
-                "status": map_step_status(meta.get("status")),
-                "stage": "finished",
-                "start": start,
-                "stop": start + duration,
-                "steps": [],
-                "attachments": [],
-                "parameters": [],
-            }
-            steps.append(step)
+                status = map_case_status(case)
+                status_details = {}
+                failure = case.find("failure")
+                if failure is not None and failure.text:
+                    status_details["message"] = failure.text.strip()
+                    status_details["trace"] = failure.text.strip()
 
-        attachments = []
-        for src in collect_attachments(name, debug_dir, artifacts_dir):
-            mime, _ = mimetypes.guess_type(src.name)
-            ext = src.suffix or ".bin"
-            dst_name = f"{uuid.uuid4().hex}-attachment{ext}"
-            shutil.copy2(src, out_dir / dst_name)
-            attachments.append({
-                "name": src.name,
-                "source": dst_name,
-                "type": mime or "application/octet-stream",
-            })
+                steps = []
+                for item in load_commands(debug_dir, name):
+                    cmd = item.get("command") or {}
+                    meta = item.get("metadata") or {}
+                    start = int(meta.get("timestamp") or 0)
+                    duration = int(meta.get("duration") or 0)
+                    step = {
+                        "name": describe_command(cmd),
+                        "status": map_step_status(meta.get("status")),
+                        "stage": "finished",
+                        "start": start,
+                        "stop": start + duration,
+                        "steps": [],
+                        "attachments": [],
+                        "parameters": [],
+                    }
+                    steps.append(step)
 
-        duration_ms = int(float(case.attrib.get("time") or 0) * 1000)
-        result = {
-            "uuid": uid,
-            "historyId": hashlib.md5(f"{suite_name}:{name}".encode("utf-8")).hexdigest(),
-            "name": name,
-            "fullName": f"{suite_name}.{name}",
-            "status": status,
-            "statusDetails": status_details,
-            "stage": "finished",
-            "steps": steps,
-            "attachments": attachments,
-            "parameters": ([{"name": "qa.pipeline", "value": args.pipeline}] if args.pipeline else []),
-            "labels": [
-                {"name": "suite", "value": suite_name},
-                {"name": "framework", "value": "maestro"},
-                {"name": "language", "value": "yaml"},
-                {"name": "package", "value": "scripts/maestro"},
-            ],
-            "links": [],
-            "start": 0,
-            "stop": duration_ms,
-        }
-        (out_dir / f"{uid}-result.json").write_text(json.dumps(result, ensure_ascii=False))
+                attachments = []
+                for src in collect_attachments(name, debug_dir, artifacts_dir):
+                    try:
+                        mime, _ = mimetypes.guess_type(src.name)
+                        ext = src.suffix or ".bin"
+                        dst_name = f"{uuid.uuid4().hex}-attachment{ext}"
+                        shutil.copy2(src, out_dir / dst_name)
+                        attachments.append({
+                            "name": src.name,
+                            "source": dst_name,
+                            "type": mime or "application/octet-stream",
+                        })
+                    except OSError as exc:
+                        # One unreadable screenshot must not poison the whole report.
+                        print(f"[maestro_to_allure] skipping attachment {src}: {exc}", flush=True)
+
+                duration_ms = int(float(case.attrib.get("time") or 0) * 1000)
+                result = {
+                    "uuid": uid,
+                    "historyId": hashlib.md5(f"{suite_name}:{name}".encode("utf-8")).hexdigest(),
+                    "name": name,
+                    "fullName": f"{suite_name}.{name}",
+                    "status": status,
+                    "statusDetails": status_details,
+                    "stage": "finished",
+                    "steps": steps,
+                    "attachments": attachments,
+                    "parameters": ([{"name": "qa.pipeline", "value": args.pipeline}] if args.pipeline else []),
+                    "labels": [
+                        {"name": "suite", "value": suite_name},
+                        {"name": "framework", "value": "maestro"},
+                        {"name": "language", "value": "yaml"},
+                        {"name": "package", "value": "scripts/maestro"},
+                    ],
+                    "links": [],
+                    "start": 0,
+                    "stop": duration_ms,
+                }
+                (out_dir / f"{uid}-result.json").write_text(json.dumps(result, ensure_ascii=False))
+            except Exception as exc:  # noqa: BLE001 — best-effort per-case isolation
+                tc_name = case.attrib.get("name") or case.attrib.get("classname") or "?"
+                print(f"[maestro_to_allure] skipping case {tc_name!r}: {exc}", flush=True)
+                continue
 
     (out_dir / "executor.json").write_text(json.dumps({
         "name": "Gradle qaMaestro",

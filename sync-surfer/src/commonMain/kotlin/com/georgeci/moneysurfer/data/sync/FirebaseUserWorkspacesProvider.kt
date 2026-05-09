@@ -2,7 +2,6 @@ package com.georgeci.moneysurfer.data.sync
 
 import com.georgeci.moneysurfer.data.remote.UserDoc
 import com.georgeci.moneysurfer.domain.auth.SessionPointers
-import com.georgeci.moneysurfer.data.sync.UserWorkspacesProvider
 import dev.gitlive.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.first
 import org.koin.core.annotation.Single

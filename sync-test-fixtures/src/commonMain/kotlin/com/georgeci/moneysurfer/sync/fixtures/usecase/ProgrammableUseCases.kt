@@ -1,9 +1,6 @@
 package com.georgeci.moneysurfer.sync.fixtures.usecase
 
 import arrow.core.right
-import com.georgeci.moneysurfer.sync.api.SyncCancelToken
-import com.georgeci.moneysurfer.sync.api.SyncResult
-import com.georgeci.moneysurfer.sync.api.SyncScope
 import com.georgeci.moneysurfer.domain.sync.ProjectionScope
 import com.georgeci.moneysurfer.domain.sync.ProjectionSummary
 import com.georgeci.moneysurfer.domain.sync.PullProgress
@@ -13,6 +10,9 @@ import com.georgeci.moneysurfer.domain.sync.RecalculateLocalProjectionsUseCase
 import com.georgeci.moneysurfer.domain.sync.UploadPendingChangesUseCase
 import com.georgeci.moneysurfer.domain.sync.UploadProgress
 import com.georgeci.moneysurfer.domain.sync.UploadSummary
+import com.georgeci.moneysurfer.sync.api.SyncCancelToken
+import com.georgeci.moneysurfer.sync.api.SyncResult
+import com.georgeci.moneysurfer.sync.api.SyncScope
 
 /**
  * Use-case fakes whose behaviour is supplied as a suspend lambda.

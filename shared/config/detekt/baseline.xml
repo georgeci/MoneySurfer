@@ -1,51 +1,5 @@
 <?xml version="1.0" ?>
 <SmellBaseline>
   <ManuallySuppressedIssues/>
-  <CurrentIssues>
-    <ID>CyclomaticComplexMethod:TransactionCreationViewModel.kt$TransactionCreationViewModel$override fun onEvent(event: TransactionCreationEvent)</ID>
-    <ID>MagicNumber:AccountDetailsScreen.kt$0.07f</ID>
-    <ID>MagicNumber:AccountDetailsScreen.kt$0.14f</ID>
-    <ID>MagicNumber:AccountDetailsScreen.kt$0.21f</ID>
-    <ID>MagicNumber:AccountDetailsScreen.kt$0.25f</ID>
-    <ID>MagicNumber:AccountDetailsScreen.kt$0.28f</ID>
-    <ID>MagicNumber:AccountDetailsScreen.kt$0.30f</ID>
-    <ID>MagicNumber:AccountDetailsScreen.kt$0.32f</ID>
-    <ID>MagicNumber:AccountDetailsScreen.kt$0.35f</ID>
-    <ID>MagicNumber:AccountDetailsScreen.kt$0.36f</ID>
-    <ID>MagicNumber:AccountDetailsScreen.kt$0.38f</ID>
-    <ID>MagicNumber:AccountDetailsScreen.kt$0.43f</ID>
-    <ID>MagicNumber:AccountDetailsScreen.kt$0.44f</ID>
-    <ID>MagicNumber:AccountDetailsScreen.kt$0.50f</ID>
-    <ID>MagicNumber:AccountDetailsScreen.kt$0.52f</ID>
-    <ID>MagicNumber:AccountDetailsScreen.kt$0.55f</ID>
-    <ID>MagicNumber:AccountDetailsScreen.kt$0.57f</ID>
-    <ID>MagicNumber:AccountDetailsScreen.kt$0.62f</ID>
-    <ID>MagicNumber:AccountDetailsScreen.kt$0.64f</ID>
-    <ID>MagicNumber:AccountDetailsScreen.kt$0.65f</ID>
-    <ID>MagicNumber:AccountDetailsScreen.kt$0.68f</ID>
-    <ID>MagicNumber:AccountDetailsScreen.kt$0.72f</ID>
-    <ID>MagicNumber:AccountDetailsScreen.kt$0.75f</ID>
-    <ID>MagicNumber:AccountDetailsScreen.kt$0.78f</ID>
-    <ID>MagicNumber:AccountDetailsScreen.kt$0.79f</ID>
-    <ID>MagicNumber:AccountDetailsScreen.kt$0.86f</ID>
-    <ID>MagicNumber:AccountDetailsScreen.kt$0.93f</ID>
-    <ID>MagicNumber:AccountDetailsScreen.kt$0xFF2E9A6A</ID>
-    <ID>MagicNumber:AccountDetailsScreen.kt$0xFF2EB46A</ID>
-    <ID>MagicNumber:AccountsManageScreen.kt$1.4f</ID>
-    <ID>MagicNumber:CategoryCreationScreen.kt$6</ID>
-    <ID>MagicNumber:SignInScreen.kt$0.18f</ID>
-    <ID>MagicNumber:SignInScreen.kt$0.35f</ID>
-    <ID>MagicNumber:SignInScreen.kt$0.5f</ID>
-    <ID>MagicNumber:SignInScreen.kt$100f</ID>
-    <ID>MagicNumber:SignInScreen.kt$280f</ID>
-    <ID>MagicNumber:SignInScreen.kt$60f</ID>
-    <ID>MagicNumber:TransactionCreationScreen.kt$3</ID>
-    <ID>MagicNumber:TransactionCreationScreen.kt$4</ID>
-    <ID>MagicNumber:TransactionsByAccountScreen.kt$0xFF1F7A4F</ID>
-    <ID>MagicNumber:TransactionsByAccountViewModel.kt$TransactionsByAccountViewModel$1000</ID>
-    <ID>MagicNumber:TransactionsByAccountViewModel.kt$TransactionsByAccountViewModel$24L</ID>
-    <ID>MagicNumber:TransactionsByAccountViewModel.kt$TransactionsByAccountViewModel$60</ID>
-    <ID>MaxLineLength:TransactionCreationViewModel.kt$TransactionCreationViewModel$val resolvedType = if (transaction.money.isNegative()) TransactionTypeUi.Expense else TransactionTypeUi.Income</ID>
-    <ID>ReturnCount:TransactionCreationViewModel.kt$TransactionCreationViewModel$private fun saveTransaction()</ID>
-  </CurrentIssues>
+  <CurrentIssues/>
 </SmellBaseline>

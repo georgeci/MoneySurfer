@@ -7,8 +7,17 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
+import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
+import androidx.compose.material3.adaptive.navigation3.rememberListDetailSceneStrategy
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffoldDefaults
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -20,11 +29,13 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import androidx.savedstate.serialization.SavedStateConfiguration
+import androidx.window.core.layout.WindowSizeClass.Companion.WIDTH_DP_MEDIUM_LOWER_BOUND
 import com.georgeci.moneysurfer.navigation.util.rememberViewModelStoreNavEntryDecorator
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import io.github.irgaly.navigation3.resultstate.rememberNavigationResultNavEntryDecorator
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 private val savedStateConfig = SavedStateConfiguration {
@@ -59,13 +70,14 @@ private val savedStateConfig = SavedStateConfiguration {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3AdaptiveApi::class)
 @Composable
 fun AppNavGraph(
     featureNavGraphs: List<FeatureNavGraph>,
 ) {
     val backStack = rememberNavBackStack(savedStateConfig, Route.SignIn)
     val bottomSheetStrategy = remember { BottomSheetSceneStrategy<NavKey>() }
+    val listDetailStrategy = rememberListDetailSceneStrategy<NavKey>()
     val navigator = remember(backStack) { AppNavigator(backStack) }
     val appLaunchViewModel: AppLaunchViewModel = koinViewModel()
     val targetRoute by appLaunchViewModel.targetRoute.collectAsStateWithLifecycle()
@@ -82,13 +94,18 @@ fun AppNavGraph(
         }
     }
 
-    SyncStatusProvider {
+    val currentTopLevel by remember(backStack) {
+        derivedStateOf { backStack.lastOrNull { it is Route.TopLevel } as? Route.TopLevel }
+    }
+
+    val navDisplay: @Composable () -> Unit = {
         NavDisplay(
             modifier = Modifier.background(AppTheme.materialColors.background),
             backStack = backStack,
             onBack = { navigator.pop() },
             sceneStrategies = listOf(
                 bottomSheetStrategy,
+                listDetailStrategy,
             ),
             transitionSpec = {
                 slideInHorizontally(tween(ANIMATION_DURATION)) { it } togetherWith
@@ -114,6 +131,42 @@ fun AppNavGraph(
             ),
             entryProvider = entryProvider,
         )
+    }
+
+    SyncStatusProvider {
+        if (currentTopLevel == null) {
+            navDisplay()
+        } else {
+            val destinationLabels = TopLevelDestination.entries.associateWith { destination ->
+                stringResource(destination.label)
+            }
+            val adaptiveInfo = currentWindowAdaptiveInfo()
+            val layoutType = if (
+                adaptiveInfo.windowSizeClass.isWidthAtLeastBreakpoint(WIDTH_DP_MEDIUM_LOWER_BOUND)
+            ) {
+                NavigationSuiteScaffoldDefaults.calculateFromAdaptiveInfo(adaptiveInfo)
+            } else {
+                NavigationSuiteType.None
+            }
+            NavigationSuiteScaffold(
+                layoutType = layoutType,
+                navigationSuiteItems = {
+                    TopLevelDestination.entries.forEach { destination ->
+                        val label = destinationLabels.getValue(destination)
+                        item(
+                            selected = destination.matches(currentTopLevel),
+                            onClick = { navigator.resetTo(destination.route) },
+                            icon = {
+                                Icon(imageVector = destination.icon, contentDescription = label)
+                            },
+                            label = { Text(label) },
+                        )
+                    }
+                },
+                containerColor = AppTheme.materialColors.background,
+                content = navDisplay,
+            )
+        }
     }
 }
 

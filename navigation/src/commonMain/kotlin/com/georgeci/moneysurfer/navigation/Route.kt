@@ -5,6 +5,9 @@ import kotlinx.serialization.Serializable
 
 sealed interface Route : NavKey {
 
+    /** Marker for routes that appear as top-level destinations in the navigation suite (rail/drawer/bar). */
+    sealed interface TopLevel : Route
+
     @Serializable
     data object SignIn : Route
 
@@ -43,7 +46,7 @@ sealed interface Route : NavKey {
     data object IncomingInvites : Route
 
     @Serializable
-    data object Dashboard : Route
+    data object Dashboard : TopLevel
 
     @Serializable
     data class AccountCreation(
@@ -51,7 +54,7 @@ sealed interface Route : NavKey {
     ) : Route
 
     @Serializable
-    data object AccountsManage : Route
+    data object AccountsManage : TopLevel
 
     @Serializable
     data class CategoryCreation(
@@ -59,7 +62,7 @@ sealed interface Route : NavKey {
     ) : Route
 
     @Serializable
-    data object CategoriesManage : Route
+    data object CategoriesManage : TopLevel
 
     @Serializable
     data class CategoryChooser(
@@ -70,10 +73,11 @@ sealed interface Route : NavKey {
     @Serializable
     data class AccountChooser(
         val selectedAccountId: String? = null,
+        val excludeAccountId: String? = null,
     ) : Route
 
     @Serializable
-    data class TransactionsByAccount(val accountId: String? = null) : Route
+    data class TransactionsByAccount(val accountId: String? = null) : TopLevel
 
     @Serializable
     data class TransactionCreation(
@@ -88,7 +92,7 @@ sealed interface Route : NavKey {
     data class TransactionDetails(val transactionId: String) : Route
 
     @Serializable
-    data object Settings : Route
+    data object Settings : TopLevel
 
     @Serializable
     data object SettingsAppearance : Route

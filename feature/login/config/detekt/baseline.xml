@@ -1,0 +1,9 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>MagicNumber:SignInScreen.kt$0.18f</ID>
+    <ID>MagicNumber:SignInScreen.kt$0.35f</ID>
+    <ID>MagicNumber:SignInScreen.kt$0.5f</ID>
+  </CurrentIssues>
+</SmellBaseline>

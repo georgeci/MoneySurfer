@@ -99,7 +99,7 @@ class CreateWorkspaceUseCase(
     private suspend fun writeLocal(
         newId: WorkspaceId,
         ownerId: UserId,
-        now: Long,
+        now: Instant,
         params: Params,
     ) {
         workspaceRepository.insert(
@@ -109,7 +109,7 @@ class CreateWorkspaceUseCase(
                 description = params.description.trim(),
                 baseCurrency = params.baseCurrency,
                 ownerId = ownerId,
-                createdAt = Instant.fromEpochMilliseconds(now),
+                createdAt = now,
                 archived = false,
             ),
         )
@@ -132,6 +132,7 @@ class CreateWorkspaceUseCase(
                     type = seed.type,
                     parentId = null,
                     createdAt = now,
+                    systemKind = seed.systemKind,
                 ),
             )
         }

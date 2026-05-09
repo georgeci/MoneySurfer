@@ -23,6 +23,7 @@ class AboutViewModel(
             AboutEvent.OnRateClick -> postSideEffect(AboutEffect.OpenStoreListing)
             AboutEvent.OnRegionClick -> postSideEffect(AboutEffect.OpenRegionPicker)
             AboutEvent.OnDiagnosticClick -> postSideEffect(AboutEffect.NavigateToDiagnostic)
+            AboutEvent.OnGitHubClick -> postSideEffect(AboutEffect.OpenUrl(URL_GITHUB))
         }
     }
 
@@ -30,6 +31,7 @@ class AboutViewModel(
         const val URL_TERMS = "https://moneysurfer.app/legal/terms"
         const val URL_PRIVACY = "https://moneysurfer.app/legal/privacy"
         const val URL_HELP = "https://moneysurfer.app/help"
+        const val URL_GITHUB = "https://github.com/georgeci/MoneySurfer2026"
         const val EMAIL_CONTACT = "support@moneysurfer.app"
     }
 }
@@ -48,6 +50,7 @@ sealed interface AboutEvent {
     data object OnRateClick : AboutEvent
     data object OnRegionClick : AboutEvent
     data object OnDiagnosticClick : AboutEvent
+    data object OnGitHubClick : AboutEvent
 }
 
 sealed interface AboutEffect {

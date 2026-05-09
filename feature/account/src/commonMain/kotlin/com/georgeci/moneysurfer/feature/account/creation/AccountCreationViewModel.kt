@@ -3,6 +3,7 @@ package com.georgeci.moneysurfer.feature.account.creation
 import arrow.optics.optics
 import com.georgeci.moneysurfer.domain.auth.SessionPointers
 import com.georgeci.moneysurfer.domain.model.Account
+import com.georgeci.moneysurfer.domain.model.Currency
 import com.georgeci.moneysurfer.domain.model.Transaction
 import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.AccountType
@@ -12,9 +13,11 @@ import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
 import com.georgeci.moneysurfer.domain.repositories.AccountRepository
 import com.georgeci.moneysurfer.domain.usecase.CreateTransactionUseCase
+import com.georgeci.moneysurfer.domain.usecase.GetCurrenciesUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetCurrentTimeUseCase
 import com.georgeci.moneysurfer.utils.MviViewModel
 import kotlinx.coroutines.flow.first
+import kotlinx.datetime.toLocalDateTime
 import org.koin.core.annotation.KoinViewModel
 
 @KoinViewModel
@@ -24,6 +27,7 @@ class AccountCreationViewModel(
     private val createTransaction: CreateTransactionUseCase,
     private val session: SessionPointers,
     private val getCurrentTime: GetCurrentTimeUseCase,
+    private val getCurrencies: GetCurrenciesUseCase,
 ) : MviViewModel<AccountCreationState, AccountCreationEvent, AccountCreationEffect>(
     initialState = if (accountId != null) {
         AccountCreationState.Loading(editingAccountId = accountId)
@@ -32,14 +36,19 @@ class AccountCreationViewModel(
             name = "",
             balance = "",
             type = AccountType.SAVINGS,
+            currency = DEFAULT_CURRENCY,
+            currencies = emptyList(),
             extraFields = emptyList(),
             editingAccountId = null,
         )
     },
 ) {
 
+    private var loadedCurrencies: List<Currency> = emptyList()
+
     init {
         if (accountId != null) loadAccount(accountId)
+        loadCurrencies()
     }
 
     override fun onEvent(event: AccountCreationEvent) {
@@ -50,6 +59,8 @@ class AccountCreationViewModel(
                 updateState { AccountCreationState.content.balance.modify(this) { event.balance } }
             is AccountCreationEvent.OnTypeChanged ->
                 updateState { AccountCreationState.content.type.modify(this) { event.type } }
+            is AccountCreationEvent.OnCurrencyChanged ->
+                updateState { AccountCreationState.content.currency.modify(this) { event.currency } }
             is AccountCreationEvent.OnExtraFieldValueChanged -> updateExtraField(event.kind, event.value)
             is AccountCreationEvent.OnAddExtraField -> addExtraField(event.kind)
             is AccountCreationEvent.OnRemoveExtraField -> removeExtraField(event.kind)
@@ -66,9 +77,29 @@ class AccountCreationViewModel(
                     name = account?.name.orEmpty(),
                     balance = "",
                     type = account?.type ?: AccountType.SAVINGS,
+                    currency = account?.currencyCode ?: DEFAULT_CURRENCY,
+                    currencies = loadedCurrencies,
                     extraFields = emptyList(),
                     editingAccountId = id,
                 )
+            }
+        }
+    }
+
+    private fun loadCurrencies() {
+        launch {
+            val currencies = getCurrencies().first()
+            loadedCurrencies = currencies
+            updateState {
+                when (this) {
+                    is AccountCreationState.Loading -> this
+                    is AccountCreationState.Content -> copy(
+                        currencies = currencies,
+                        currency = currency.takeIf { code ->
+                            currencies.any { it.code == code }
+                        } ?: currencies.firstOrNull()?.code ?: currency,
+                    )
+                }
             }
         }
     }
@@ -110,7 +141,7 @@ class AccountCreationViewModel(
 
             val workspaceId = session.currentWorkspaceId.flow.first() ?: return@launch
             val balanceDouble = state.balance.toDoubleOrNull() ?: 0.0
-            val currency = CurrencyCode("EUR")
+            val currency = state.currency
             val openingBalance = Money.fromDouble(balanceDouble).abs()
             val newAccountId = AccountId.uuid()
             accountRepository.insert(
@@ -125,6 +156,8 @@ class AccountCreationViewModel(
             )
 
             if (!openingBalance.isZero()) {
+                val now = getCurrentTime()
+                val zone = kotlinx.datetime.TimeZone.currentSystemDefault()
                 createTransaction(
                     Transaction(
                         id = TransactionId.uuid(),
@@ -134,14 +167,21 @@ class AccountCreationViewModel(
                         currencyCode = currency,
                         categoryId = null,
                         note = "",
-                        timestamp = getCurrentTime(),
+                        operationAt = now,
+                        operationDate = now.toLocalDateTime(zone).date,
                         type = TransactionType.OPENING_BALANCE,
+                        createdAt = now,
+                        updatedAt = now,
                     ),
                 )
             }
 
             postSideEffect(AccountCreationEffect.NavigateBack)
         }
+    }
+
+    private companion object {
+        val DEFAULT_CURRENCY = CurrencyCode("EUR")
     }
 }
 
@@ -161,6 +201,8 @@ sealed interface AccountCreationState {
         val name: String,
         val balance: String,
         val type: AccountType,
+        val currency: CurrencyCode,
+        val currencies: List<Currency>,
         val extraFields: List<AccountExtraField>,
         override val editingAccountId: AccountId?,
     ) : AccountCreationState {
@@ -168,6 +210,9 @@ sealed interface AccountCreationState {
             get() = AccountExtraFieldKind.entries.filter { kind ->
                 extraFields.none { it.kind == kind }
             }
+
+        val currencySymbol: String
+            get() = currencies.firstOrNull { it.code == currency }?.symbol ?: currency.value
 
         companion object
     }
@@ -186,6 +231,7 @@ sealed interface AccountCreationEvent {
     data class OnNameChanged(val name: String) : AccountCreationEvent
     data class OnBalanceChanged(val balance: String) : AccountCreationEvent
     data class OnTypeChanged(val type: AccountType) : AccountCreationEvent
+    data class OnCurrencyChanged(val currency: CurrencyCode) : AccountCreationEvent
     data class OnAddExtraField(val kind: AccountExtraFieldKind) : AccountCreationEvent
     data class OnRemoveExtraField(val kind: AccountExtraFieldKind) : AccountCreationEvent
     data class OnExtraFieldValueChanged(val kind: AccountExtraFieldKind, val value: String) : AccountCreationEvent

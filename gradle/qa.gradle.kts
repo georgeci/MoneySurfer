@@ -125,9 +125,50 @@ fun buildMaestroCommand(
     return command
 }
 
+/**
+ * Returns the last [lines] lines of [file] for inclusion in failure messages,
+ * or "" when the file is missing/empty/unreadable. Maestro/Firebase emulator
+ * failures often happen long before JUnit is written, so the only signal is
+ * the captured stdout/stderr.
+ *
+ * Uses `useLines` + a fixed-size ArrayDeque ring buffer so a multi-MB Maestro
+ * log doesn't get fully materialised into memory at the moment we're already
+ * crashing.
+ */
+fun tailLogFile(file: File, lines: Int = 40): String {
+    if (!file.exists() || file.length() == 0L) return ""
+    return runCatching {
+        val buffer = ArrayDeque<String>(lines)
+        file.useLines { seq ->
+            seq.forEach { line ->
+                if (buffer.size == lines) buffer.removeFirst()
+                buffer.addLast(line)
+            }
+        }
+        if (buffer.isEmpty()) {
+            ""
+        } else {
+            val rel = file.relativeTo(rootProject.projectDir)
+            "Last ${buffer.size} lines of $rel:\n${buffer.joinToString("\n")}"
+        }
+    }.getOrElse { "(unable to read ${file.absolutePath}: ${it.message})" }
+}
+
+/**
+ * Joins per-stream tails for a failure message. Includes whichever streams
+ * actually produced output — stderr is shown first because it usually carries
+ * the cause; stdout follows when present.
+ */
+fun joinLogTails(vararg files: File): String =
+    files.map(::tailLogFile)
+        .filter { it.isNotBlank() }
+        .joinToString("\n\n")
+        .ifBlank { "(no log output captured)" }
+
 fun summarizeMaestroJunit(report: File): String {
     if (!report.exists()) {
-        return "Maestro result unavailable: JUnit report was not created."
+        return "Maestro result unavailable: JUnit report was not written at ${report.absolutePath} " +
+            "(Maestro likely crashed before any flow finished — check the emulator/seed logs above)."
     }
 
     return runCatching {
@@ -304,10 +345,24 @@ fun registerAllureGenerate(name: String, scopeLabel: String, sources: List<File>
     tasks.register<Exec>(name) {
         group = "verification"
         description = "Generate Allure report for $scopeLabel scope into ${output.relativeTo(rootProject.projectDir)}."
+        // Best-effort: a hard fail here would silently swallow the underlying
+        // test-task failure (Gradle reports the *last* task's exit code). On
+        // the green path `allure generate` returns 0 anyway; on the red path
+        // we'd rather still upload whatever HTML did make it to disk.
+        isIgnoreExitValue = true
         val args = mutableListOf<String>(resolveAllureExecutable(), "generate")
         resolveAllureInputDirs(sources).forEach { args += it.absolutePath }
         args += listOf("-o", output.absolutePath, "--clean")
         commandLine(args)
+        doLast {
+            val exit = executionResult.get().exitValue
+            if (exit != 0) {
+                logger.warn(
+                    "[allure] $name exited with $exit (scope=$scopeLabel). " +
+                        "HTML output (may be partial): ${output.absolutePath}",
+                )
+            }
+        }
     }
 }
 
@@ -336,6 +391,11 @@ tasks.register<Exec>("maestroInstallDebug") {
     description = "Build USE_EMULATOR=true debug APK and adb-install on connected device/AVD."
     dependsOn("maestroAssembleDebug")
     doFirst {
+        require(debugApkPath.exists()) {
+            "Debug APK not found at ${debugApkPath.absolutePath}. " +
+                ":androidApp:assembleDebug -PuseEmulator=true did not produce its expected output — " +
+                "check the assembleDebug log above (DEV signing, processDebugGoogleServices, USE_EMULATOR=true)."
+        }
         commandLine(resolveAdbExecutable(rootDir), "install", "-r", debugApkPath.absolutePath)
     }
 }
@@ -394,8 +454,15 @@ tasks.register<Exec>("maestroRunAllJunit") {
         val exit = executionResult.get().exitValue
         if (exit != 0) {
             val summary = summarizeMaestroJunit(maestroAllFlowsJunit)
+            val tail = joinLogTails(stderrLog, stdoutLog)
             throw GradleException(
-                "maestroRunAllJunit failed (exit=$exit). $summary Logs: ${stdoutLog.absolutePath} and ${stderrLog.absolutePath}",
+                buildString {
+                    appendLine("maestroRunAllJunit failed (exit=$exit). $summary")
+                    appendLine("Allure HTML (always generated): ${allureMaestroDir.absolutePath}")
+                    appendLine("Stdout log: ${stdoutLog.absolutePath}")
+                    appendLine("Stderr log: ${stderrLog.absolutePath}")
+                    appendLine(tail)
+                },
             )
         }
     }
@@ -521,8 +588,15 @@ tasks.register<Exec>("maestroRunAllIosJunit") {
         val exit = executionResult.get().exitValue
         if (exit != 0) {
             val summary = summarizeMaestroJunit(maestroIosAllFlowsJunit)
+            val tail = joinLogTails(stderrLog, stdoutLog)
             throw GradleException(
-                "maestroRunAllIosJunit failed (exit=$exit). $summary Logs: ${stdoutLog.absolutePath} and ${stderrLog.absolutePath}",
+                buildString {
+                    appendLine("maestroRunAllIosJunit failed (exit=$exit). $summary")
+                    appendLine("Allure HTML (always generated): ${allureMaestroIosDir.absolutePath}")
+                    appendLine("Stdout log: ${stdoutLog.absolutePath}")
+                    appendLine("Stderr log: ${stderrLog.absolutePath}")
+                    appendLine(tail)
+                },
             )
         }
     }
@@ -676,10 +750,42 @@ registerAllureGenerate("allureGenerateMaestroIos", "Maestro iOS", maestroIosAllu
 registerAllureGenerate("allureGenerateFirestore", "Firestore rules (Mocha)", firestoreAllureSources, allureFirestoreDir)
 registerAllureGenerate("allureGenerateAll", "all", allScopeAllureSources, allureAllDir)
 
+/**
+ * Writes a minimal `executor.json` + `environment.properties` so
+ * `allure generate` always has metadata to render, even when the python
+ * converter crashed (malformed JUnit, unreadable attachment, etc.). Called
+ * unconditionally in `doLast` of the prep tasks below.
+ */
+fun writeAllureFallbackMetadata(outDir: File, scope: String, pipeline: String) {
+    outDir.mkdirs()
+    val executor = outDir.resolve("executor.json")
+    if (!executor.exists()) {
+        executor.writeText(
+            """{"name":"Gradle $scope","type":"local","buildName":"$scope",""" +
+                """"buildUrl":"./gradlew $scope","reportName":"Maestro E2E ($scope)"}""",
+        )
+    }
+    val env = outDir.resolve("environment.properties")
+    if (!env.exists()) {
+        env.writeText(
+            """
+            firebase.project=demo-moneysurfer
+            firebase.mode=emulator
+            qa.scope=$scope
+            qa.pipeline=$pipeline
+            """.trimIndent() + "\n",
+        )
+    }
+}
+
 tasks.register<Exec>("maestroPrepareAllureResults") {
     group = "verification"
     description = "Convert Maestro JUnit + debug artifacts into native Allure results with test steps and screenshots."
     notCompatibleWithConfigurationCache("Produces dynamic files from test artifacts.")
+    // Prep is best-effort: a malformed JUnit or an unreadable attachment must
+    // not break the Allure HTML pipeline, otherwise CI uploads an empty report
+    // on red runs. We still log the converter's exit code in doLast.
+    isIgnoreExitValue = true
     doFirst {
         maestroAllureResultsDir.mkdirs()
         maestroReportsDir.mkdirs()
@@ -694,6 +800,20 @@ tasks.register<Exec>("maestroPrepareAllureResults") {
         "--pipeline",
         "qaMaestroAndroid -> maestroInstallDebug -> maestroAssembleDebug -> :androidApp:assembleDebug(-PuseEmulator=true) -> firebase emulators:exec(auth,firestore) -> scripts/firebase/seed.sh -> maestro test --format junit --debug-output --test-output-dir -> maestroPrepareAllureResults -> allureGenerateMaestro",
     )
+    doLast {
+        val exit = executionResult.get().exitValue
+        if (exit != 0) {
+            logger.warn(
+                "[maestro] maestro_to_allure.py exited with $exit — Allure will render with " +
+                    "whatever results were already written. JUnit: ${maestroAllFlowsJunit.absolutePath}",
+            )
+        }
+        writeAllureFallbackMetadata(
+            outDir = maestroAllureResultsDir,
+            scope = "qaMaestroAndroid",
+            pipeline = "maestroPrepareAllureResults -> allureGenerateMaestro",
+        )
+    }
 }
 
 tasks.named<Exec>("allureGenerateMaestro") {
@@ -704,6 +824,7 @@ tasks.register<Exec>("maestroPrepareAllureResultsIos") {
     group = "verification"
     description = "Convert iOS Maestro JUnit + debug artifacts into native Allure results with test steps and screenshots."
     notCompatibleWithConfigurationCache("Produces dynamic files from test artifacts.")
+    isIgnoreExitValue = true
     doFirst {
         maestroIosAllureResultsDir.mkdirs()
         maestroIosReportsDir.mkdirs()
@@ -718,6 +839,20 @@ tasks.register<Exec>("maestroPrepareAllureResultsIos") {
         "--pipeline",
         "qaMaestroIos -> maestroInstallIosSimulator -> maestroBuildIosSimulator -> xcodebuild(Debug iphonesimulator, MS_USE_EMULATOR=YES) -> firebase emulators:exec(auth,firestore) -> scripts/firebase/seed.sh -> maestro test --format junit --debug-output --test-output-dir -> maestroPrepareAllureResultsIos -> allureGenerateMaestroIos",
     )
+    doLast {
+        val exit = executionResult.get().exitValue
+        if (exit != 0) {
+            logger.warn(
+                "[maestro-ios] maestro_to_allure.py exited with $exit — Allure will render with " +
+                    "whatever results were already written. JUnit: ${maestroIosAllFlowsJunit.absolutePath}",
+            )
+        }
+        writeAllureFallbackMetadata(
+            outDir = maestroIosAllureResultsDir,
+            scope = "qaMaestroIos",
+            pipeline = "maestroPrepareAllureResultsIos -> allureGenerateMaestroIos",
+        )
+    }
 }
 
 tasks.named<Exec>("allureGenerateMaestroIos") {
@@ -833,7 +968,15 @@ tasks.register<Exec>("qaMaestroAndroid") {
         if (exit != 0) {
             val summary = summarizeMaestroJunit(maestroAllFlowsJunit)
             throw GradleException(
-                "qaMaestro failed (exit=$exit). $summary JUnit: ${maestroAllFlowsJunit.absolutePath}",
+                buildString {
+                    appendLine("qaMaestroAndroid failed (exit=$exit). $summary")
+                    appendLine("JUnit         : ${maestroAllFlowsJunit.absolutePath}")
+                    appendLine("Maestro debug : ${maestroDebugDir.absolutePath}")
+                    appendLine("Maestro shots : ${maestroArtifactsDir.absolutePath}")
+                    appendLine("Allure HTML   : ${allureMaestroDir.absolutePath} (generated unconditionally)")
+                    append("If JUnit is missing, the failure happened before any flow finished — ")
+                    append("inspect the firebase emulators:exec / seed.sh / maestro stdout above.")
+                },
             )
         }
     }
@@ -897,7 +1040,15 @@ tasks.register<Exec>("qaMaestroIos") {
         if (exit != 0) {
             val summary = summarizeMaestroJunit(maestroIosAllFlowsJunit)
             throw GradleException(
-                "qaMaestroIos failed (exit=$exit). $summary JUnit: ${maestroIosAllFlowsJunit.absolutePath}",
+                buildString {
+                    appendLine("qaMaestroIos failed (exit=$exit). $summary")
+                    appendLine("JUnit         : ${maestroIosAllFlowsJunit.absolutePath}")
+                    appendLine("Maestro debug : ${maestroIosDebugDir.absolutePath}")
+                    appendLine("Maestro shots : ${maestroIosArtifactsDir.absolutePath}")
+                    appendLine("Allure HTML   : ${allureMaestroIosDir.absolutePath} (generated unconditionally)")
+                    append("If JUnit is missing, the failure happened before any flow finished — ")
+                    append("inspect xcodebuild / firebase emulators:exec / maestro stdout above.")
+                },
             )
         }
     }

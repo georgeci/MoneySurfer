@@ -12,6 +12,7 @@ import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
 import com.georgeci.moneysurfer.domain.repositories.TransactionRepository
 import com.georgeci.moneysurfer.domain.usecase.CreateTransactionUseCase
+import com.georgeci.moneysurfer.domain.usecase.CreateTransferUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetAccountsUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetCategoriesUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetCurrentTimeUseCase
@@ -19,9 +20,14 @@ import com.georgeci.moneysurfer.domain.usecase.GetTransactionByIdUseCase
 import com.georgeci.moneysurfer.domain.usecase.UpdateTransactionUseCase
 import com.georgeci.moneysurfer.utils.MviViewModel
 import kotlinx.coroutines.flow.first
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import org.koin.core.annotation.KoinViewModel
 
+// ViewModel composes loading + creation + transfer flows; splitting now would push wiring to a holder.
 @KoinViewModel
+@Suppress("LongParameterList")
 class TransactionCreationViewModel(
     private val transactionId: TransactionId?,
     private val accountId: AccountId?,
@@ -30,8 +36,10 @@ class TransactionCreationViewModel(
     private val getTransactionById: GetTransactionByIdUseCase,
     private val createTransaction: CreateTransactionUseCase,
     private val updateTransaction: UpdateTransactionUseCase,
+    private val createTransfer: CreateTransferUseCase,
     private val getCurrentTime: GetCurrentTimeUseCase,
     private val transactionRepository: TransactionRepository,
+    private val featureConfig: TransactionCreationFeatureConfig,
 ) : MviViewModel<TransactionCreationState, TransactionCreationEvent, TransactionCreationEffect>(
     initialState = TransactionCreationState.Loading,
 ) {
@@ -41,10 +49,14 @@ class TransactionCreationViewModel(
         observeCategoryUsage()
     }
 
+    private var pendingAccountSlot: AccountSlot = AccountSlot.Single
+
     override fun onEvent(event: TransactionCreationEvent) {
         when (event) {
             is TransactionCreationEvent.OnAmountChanged ->
                 updateState { TransactionCreationState.content.amount.modify(this) { event.amount } }
+            is TransactionCreationEvent.OnToAmountChanged ->
+                updateState { TransactionCreationState.content.toAmount.modify(this) { event.amount } }
             is TransactionCreationEvent.OnNoteChanged ->
                 updateState { TransactionCreationState.content.note.modify(this) { event.note } }
             is TransactionCreationEvent.OnAccountSelected ->
@@ -54,43 +66,79 @@ class TransactionCreationViewModel(
             is TransactionCreationEvent.OnCategoryPicked -> applyPickedCategory(event.id)
             is TransactionCreationEvent.OnAccountPicked -> applyPickedAccount(event.id)
             is TransactionCreationEvent.OnTypeChanged -> changeType(event.type)
-            is TransactionCreationEvent.OnDateChanged ->
-                updateState { TransactionCreationState.content.timestamp.modify(this) { event.timestamp } }
-            TransactionCreationEvent.OnTodayClick ->
-                updateState { TransactionCreationState.content.timestamp.modify(this) { getCurrentTime() } }
-            TransactionCreationEvent.OnOpenCategoryChooser -> {
-                val state = currentState as? TransactionCreationState.Content ?: return
-                postSideEffect(
-                    TransactionCreationEffect.NavigateToCategoryChooser(
-                        selectedCategoryId = state.selectedCategory?.id,
-                        filterType = if (state.type == TransactionTypeUi.Income) {
-                            CategoryType.INCOME
-                        } else {
-                            CategoryType.EXPENSE
-                        },
-                    ),
-                )
+            is TransactionCreationEvent.OnDateChanged -> updateState {
+                TransactionCreationState.content.timestamp.set(this, event.timestamp)
+                    .let { TransactionCreationState.content.pinnedOperationDate.set(it, null) }
             }
+            TransactionCreationEvent.OnTodayClick -> updateState {
+                TransactionCreationState.content.timestamp
+                    .set(this, getCurrentTime().toEpochMilliseconds())
+                    .let { TransactionCreationState.content.pinnedOperationDate.set(it, null) }
+            }
+            TransactionCreationEvent.OnOpenCategoryChooser -> openCategoryChooser()
             TransactionCreationEvent.OnOpenCategoryCreation -> postSideEffect(
                 TransactionCreationEffect.NavigateToCategoryCreation,
             )
-            TransactionCreationEvent.OnOpenAccountChooser -> {
-                val state = currentState as? TransactionCreationState.Content ?: return
-                postSideEffect(TransactionCreationEffect.NavigateToAccountChooser(state.selectedAccount?.id))
+            TransactionCreationEvent.OnOpenAccountChooser -> openAccountChooser(AccountSlot.Single)
+            TransactionCreationEvent.OnOpenFromAccountChooser -> openAccountChooser(AccountSlot.From)
+            TransactionCreationEvent.OnOpenToAccountChooser -> openAccountChooser(AccountSlot.To)
+            TransactionCreationEvent.OnSwapAccountsClick -> updateState {
+                val c = this as? TransactionCreationState.Content ?: return@updateState this
+                c.copy(
+                    fromAccount = c.toAccount,
+                    toAccount = c.fromAccount,
+                    amount = c.toAmount,
+                    toAmount = c.amount,
+                )
             }
             TransactionCreationEvent.OnSaveClick -> saveTransaction()
             TransactionCreationEvent.OnBackClick -> postSideEffect(TransactionCreationEffect.NavigateBack)
         }
     }
 
+    private fun openCategoryChooser() {
+        val state = currentState as? TransactionCreationState.Content ?: return
+        val filter = if (state.type == TransactionTypeUi.Income) CategoryType.INCOME else CategoryType.EXPENSE
+        postSideEffect(
+            TransactionCreationEffect.NavigateToCategoryChooser(
+                selectedCategoryId = state.selectedCategory?.id,
+                filterType = filter,
+            ),
+        )
+    }
+
+    private fun openAccountChooser(slot: AccountSlot) {
+        val state = currentState as? TransactionCreationState.Content ?: return
+        pendingAccountSlot = slot
+        val (selected, excluded) = when (slot) {
+            AccountSlot.Single -> state.selectedAccount?.id to null
+            AccountSlot.From -> state.fromAccount?.id to state.toAccount?.id
+            AccountSlot.To -> state.toAccount?.id to state.fromAccount?.id
+        }
+        postSideEffect(
+            TransactionCreationEffect.NavigateToAccountChooser(
+                selectedAccountId = selected,
+                excludeAccountId = excluded,
+            ),
+        )
+    }
+
     private fun changeType(nextType: TransactionTypeUi) = updateState {
         val content = this as? TransactionCreationState.Content ?: return@updateState this
+        // Editing an existing single-leg transaction can't morph into a paired transfer in place;
+        // ignore the switch so we don't desync the type with the row that's about to be updated.
+        if (nextType == TransactionTypeUi.Transfer && (content.isEditMode || !featureConfig.transferEnabled)) {
+            return@updateState content
+        }
         val nextCategoryType = if (nextType == TransactionTypeUi.Income) {
             CategoryType.INCOME
         } else {
             CategoryType.EXPENSE
         }
         val nextSelected = pickDefaultCategory(content.categories, content.categoryUsageCounts, nextCategoryType)
+        val seededFrom = content.fromAccount ?: content.selectedAccount
+        val seededTo = content.toAccount
+            ?: content.accounts.firstOrNull { it.id != seededFrom?.id }
         content.copy(
             type = nextType,
             selectedCategory = nextSelected,
@@ -100,6 +148,8 @@ class TransactionCreationViewModel(
                 type = nextCategoryType,
                 selected = nextSelected,
             ),
+            fromAccount = if (nextType == TransactionTypeUi.Transfer) seededFrom else content.fromAccount,
+            toAccount = if (nextType == TransactionTypeUi.Transfer) seededTo else content.toAccount,
         )
     }
 
@@ -123,7 +173,7 @@ class TransactionCreationViewModel(
                 selectedCategory = initialSelected,
                 isEditMode = false,
                 editingTransactionId = null,
-                timestamp = getCurrentTime(),
+                timestamp = getCurrentTime().toEpochMilliseconds(),
                 categoryUsageCounts = emptyMap(),
                 displayCategories = buildDisplayCategories(
                     categories = categories,
@@ -131,6 +181,7 @@ class TransactionCreationViewModel(
                     type = initialCategoryType,
                     selected = initialSelected,
                 ),
+                transferEnabled = featureConfig.transferEnabled,
             )
 
             if (transactionId != null) {
@@ -164,9 +215,11 @@ class TransactionCreationViewModel(
                         type = resolvedType,
                         selectedAccount = account ?: baseContent.selectedAccount,
                         selectedCategory = resolvedSelected,
-                        timestamp = transaction.timestamp,
+                        timestamp = transaction.operationAt.toEpochMilliseconds(),
                         isEditMode = true,
                         editingTransactionId = transactionId,
+                        editingCreatedAt = transaction.createdAt,
+                        pinnedOperationDate = transaction.operationDate,
                         displayCategories = buildDisplayCategories(
                             categories = categories,
                             counts = baseContent.categoryUsageCounts,
@@ -211,9 +264,13 @@ class TransactionCreationViewModel(
 
     private fun applyPickedAccount(picked: AccountId) {
         val content = currentState as? TransactionCreationState.Content ?: return
+        val slot = pendingAccountSlot
         val match = content.accounts.find { it.id == picked }
         if (match != null) {
-            updateState { TransactionCreationState.content.selectedAccount.modify(this) { match } }
+            updateState {
+                val c = this as? TransactionCreationState.Content ?: return@updateState this
+                applyAccountToSlot(c, match, slot)
+            }
             return
         }
         launch {
@@ -221,12 +278,20 @@ class TransactionCreationViewModel(
             val newMatch = refreshed.find { it.id == picked }
             updateState {
                 val c = this as? TransactionCreationState.Content ?: return@updateState this
-                c.copy(
-                    accounts = refreshed,
-                    selectedAccount = newMatch ?: c.selectedAccount,
-                )
+                val withRefreshed = c.copy(accounts = refreshed)
+                if (newMatch != null) applyAccountToSlot(withRefreshed, newMatch, slot) else withRefreshed
             }
         }
+    }
+
+    private fun applyAccountToSlot(
+        content: TransactionCreationState.Content,
+        account: Account,
+        slot: AccountSlot,
+    ): TransactionCreationState.Content = when (slot) {
+        AccountSlot.Single -> content.copy(selectedAccount = account)
+        AccountSlot.From -> content.copy(fromAccount = account)
+        AccountSlot.To -> content.copy(toAccount = account)
     }
 
     private fun applyPickedCategory(picked: CategoryId) {
@@ -280,7 +345,10 @@ class TransactionCreationViewModel(
 
     private fun saveTransaction() {
         val state = currentState as? TransactionCreationState.Content ?: return
-        if (state.type == TransactionTypeUi.Transfer) return
+        if (state.isTransfer) {
+            saveTransfer(state)
+            return
+        }
         val account = state.selectedAccount ?: return
         val category = state.selectedCategory ?: return
         val amountDouble = state.amount.toDoubleOrNull() ?: return
@@ -289,6 +357,9 @@ class TransactionCreationViewModel(
         val type = if (state.isExpense) TransactionType.EXPENSE else TransactionType.INCOME
 
         launch {
+            val now = getCurrentTime()
+            val zone = TimeZone.currentSystemDefault()
+            val operationAt = kotlin.time.Instant.fromEpochMilliseconds(state.timestamp)
             val transaction = Transaction(
                 id = state.editingTransactionId ?: TransactionId.uuid(),
                 workspaceId = account.workspaceId,
@@ -297,8 +368,12 @@ class TransactionCreationViewModel(
                 currencyCode = account.currencyCode,
                 categoryId = category.id,
                 note = state.note,
-                timestamp = state.timestamp,
+                operationAt = operationAt,
+                operationDate = state.pinnedOperationDate
+                    ?: operationAt.toLocalDateTime(zone).date,
                 type = type,
+                createdAt = state.editingCreatedAt ?: now,
+                updatedAt = now,
             )
 
             if (state.isEditMode) {
@@ -309,6 +384,48 @@ class TransactionCreationViewModel(
 
             postSideEffect(TransactionCreationEffect.NavigateBack)
         }
+    }
+
+    private fun saveTransfer(state: TransactionCreationState.Content) {
+        val plan = buildTransferPlan(state) ?: return
+        launch {
+            val zone = TimeZone.currentSystemDefault()
+            val operationAt = kotlin.time.Instant.fromEpochMilliseconds(state.timestamp)
+            createTransfer(
+                CreateTransferUseCase.Params(
+                    from = plan.from,
+                    to = plan.to,
+                    fromMoney = Money.fromDouble(plan.fromAmount).abs(),
+                    toMoney = Money.fromDouble(plan.toAmount).abs(),
+                    note = state.note,
+                    operationAt = operationAt,
+                    operationDate = state.pinnedOperationDate
+                        ?: operationAt.toLocalDateTime(zone).date,
+                ),
+            )
+            postSideEffect(TransactionCreationEffect.NavigateBack)
+        }
+    }
+
+    private data class TransferPlan(
+        val from: Account,
+        val to: Account,
+        val fromAmount: Double,
+        val toAmount: Double,
+    )
+
+    @Suppress("ReturnCount") // Sequential null/range guards stay clearer than a single nested expression.
+    private fun buildTransferPlan(state: TransactionCreationState.Content): TransferPlan? {
+        val from = state.fromAccount ?: return null
+        val to = state.toAccount ?: return null
+        if (from.id == to.id) return null
+        val fromAmount = state.amount.toDoubleOrNull()?.takeIf { it > 0 } ?: return null
+        val toAmount = if (state.crossCurrency) {
+            state.toAmount.toDoubleOrNull()?.takeIf { it > 0 } ?: return null
+        } else {
+            fromAmount
+        }
+        return TransferPlan(from, to, fromAmount, toAmount)
     }
 }
 
@@ -357,17 +474,41 @@ sealed interface TransactionCreationState {
         val selectedCategory: Category?,
         val isEditMode: Boolean,
         val editingTransactionId: TransactionId?,
+        val editingCreatedAt: kotlin.time.Instant? = null,
+        // Original `operationDate` from the persisted transaction. Preserved across
+        // edits unless the user explicitly picks a new date — otherwise a timezone
+        // change between the original save and the edit would silently shift the
+        // stored business date.
+        val pinnedOperationDate: LocalDate? = null,
         val timestamp: Long,
         val categoryUsageCounts: Map<CategoryId, Int>,
         val displayCategories: List<Category>,
+        val fromAccount: Account? = null,
+        val toAccount: Account? = null,
+        val toAmount: String = "",
+        val transferEnabled: Boolean = true,
     ) : TransactionCreationState {
         val isExpense: Boolean get() = type == TransactionTypeUi.Expense
+        val isTransfer: Boolean get() = type == TransactionTypeUi.Transfer
+        val crossCurrency: Boolean
+            get() = isTransfer &&
+                fromAccount != null &&
+                toAccount != null &&
+                fromAccount.currencyCode != toAccount.currencyCode
         val isSaveEnabled: Boolean
-            get() = type != TransactionTypeUi.Transfer &&
+            get() = if (isTransfer) {
+                val from = amount.toDoubleOrNull()
+                val to = if (crossCurrency) toAmount.toDoubleOrNull() else from
+                from != null && from > 0 &&
+                    to != null && to > 0 &&
+                    fromAccount != null && toAccount != null &&
+                    fromAccount.id != toAccount.id
+            } else {
                 amount.toDoubleOrNull() != null &&
-                amount.toDoubleOrNull()!! > 0 &&
-                selectedAccount != null &&
-                selectedCategory != null
+                    amount.toDoubleOrNull()!! > 0 &&
+                    selectedAccount != null &&
+                    selectedCategory != null
+            }
 
         companion object
     }
@@ -377,6 +518,7 @@ sealed interface TransactionCreationState {
 
 sealed interface TransactionCreationEvent {
     data class OnAmountChanged(val amount: String) : TransactionCreationEvent
+    data class OnToAmountChanged(val amount: String) : TransactionCreationEvent
     data class OnNoteChanged(val note: String) : TransactionCreationEvent
     data class OnAccountSelected(val account: Account) : TransactionCreationEvent
     data class OnCategorySelected(val category: Category) : TransactionCreationEvent
@@ -388,6 +530,9 @@ sealed interface TransactionCreationEvent {
     data object OnOpenCategoryChooser : TransactionCreationEvent
     data object OnOpenCategoryCreation : TransactionCreationEvent
     data object OnOpenAccountChooser : TransactionCreationEvent
+    data object OnOpenFromAccountChooser : TransactionCreationEvent
+    data object OnOpenToAccountChooser : TransactionCreationEvent
+    data object OnSwapAccountsClick : TransactionCreationEvent
     data object OnSaveClick : TransactionCreationEvent
     data object OnBackClick : TransactionCreationEvent
 }
@@ -399,5 +544,10 @@ sealed interface TransactionCreationEffect {
         val filterType: CategoryType,
     ) : TransactionCreationEffect
     data object NavigateToCategoryCreation : TransactionCreationEffect
-    data class NavigateToAccountChooser(val selectedAccountId: AccountId?) : TransactionCreationEffect
+    data class NavigateToAccountChooser(
+        val selectedAccountId: AccountId?,
+        val excludeAccountId: AccountId? = null,
+    ) : TransactionCreationEffect
 }
+
+internal enum class AccountSlot { Single, From, To }

@@ -1,4 +1,4 @@
-// v1.0.0 — 2026-05-04
+// v2.0.0 — 2026-05-04
 rules_version = '2';
 
 // Workspace-scoped tenancy: every per-user document lives under

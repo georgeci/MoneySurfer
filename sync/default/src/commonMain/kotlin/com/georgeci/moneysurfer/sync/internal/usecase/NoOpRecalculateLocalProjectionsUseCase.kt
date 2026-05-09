@@ -1,11 +1,11 @@
 package com.georgeci.moneysurfer.sync.internal.usecase
 
 import arrow.core.right
-import com.georgeci.moneysurfer.sync.api.SyncCancelToken
-import com.georgeci.moneysurfer.sync.api.SyncResult
 import com.georgeci.moneysurfer.domain.sync.ProjectionScope
 import com.georgeci.moneysurfer.domain.sync.ProjectionSummary
 import com.georgeci.moneysurfer.domain.sync.RecalculateLocalProjectionsUseCase
+import com.georgeci.moneysurfer.sync.api.SyncCancelToken
+import com.georgeci.moneysurfer.sync.api.SyncResult
 import org.koin.core.annotation.Single
 
 /**

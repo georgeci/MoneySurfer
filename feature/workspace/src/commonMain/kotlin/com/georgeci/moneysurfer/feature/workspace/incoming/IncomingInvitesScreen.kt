@@ -289,7 +289,7 @@ private val PreviewIncoming = listOf(
         role = WorkspaceRole.EDITOR,
         invitedByUserId = "kasiam",
         expired = false,
-        expiresAt = 0L,
+        expiresAt = kotlin.time.Instant.fromEpochMilliseconds(0),
     ),
     IncomingInviteUi(
         id = WorkspaceInviteId("i-2"),
@@ -298,7 +298,7 @@ private val PreviewIncoming = listOf(
         role = WorkspaceRole.VIEWER,
         invitedByUserId = "marekw",
         expired = false,
-        expiresAt = 0L,
+        expiresAt = kotlin.time.Instant.fromEpochMilliseconds(0),
     ),
     IncomingInviteUi(
         id = WorkspaceInviteId("i-3"),
@@ -307,7 +307,7 @@ private val PreviewIncoming = listOf(
         role = WorkspaceRole.VIEWER,
         invitedByUserId = "lenab",
         expired = true,
-        expiresAt = 0L,
+        expiresAt = kotlin.time.Instant.fromEpochMilliseconds(0),
     ),
 )
 

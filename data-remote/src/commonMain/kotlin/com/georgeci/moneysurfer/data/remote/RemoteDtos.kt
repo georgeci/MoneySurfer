@@ -48,6 +48,7 @@ data class AccountDoc(
     val type: String = "",
     val currency: String = "",
     val balance: Long = 0L,
+    val archived: Boolean = false,
     val updatedAt: Long = 0L,
     val deletedAt: Long? = null,
     val clientVersionCode: Int = 1,
@@ -62,6 +63,8 @@ data class CategoryDoc(
     val updatedAt: Long = 0L,
     val deletedAt: Long? = null,
     val clientVersionCode: Int = 1,
+    /** System kind marker (e.g. "TRANSFER") for built-in categories. Null for user categories. */
+    val systemKind: String? = null,
 )
 
 @Serializable
@@ -71,12 +74,16 @@ data class TransactionDoc(
     val amount: Long = 0L,
     val currencyCode: String = "",
     val note: String = "",
-    val timestamp: Long = 0L,
+    val operationAt: Long = 0L,
+    val operationDate: String = "",
     val type: String = "",
     val status: String = "ACTUAL",
+    val createdAt: Long = 0L,
     val updatedAt: Long = 0L,
     val deletedAt: Long? = null,
     val clientVersionCode: Int = 1,
+    /** Shared id linking the two legs of a transfer. Null for non-transfer rows. */
+    val transferId: String? = null,
 )
 
 /**
@@ -93,7 +100,7 @@ data class WorkspaceMemberDoc(
     val displayName: String = "",
     val email: String? = null,
     val addedByUserId: String? = null,
-    val addedAt: Long = 0L,
+    val createdAt: Long = 0L,
     val updatedAt: Long = 0L,
     val leftAt: Long? = null,
     val removedAt: Long? = null,

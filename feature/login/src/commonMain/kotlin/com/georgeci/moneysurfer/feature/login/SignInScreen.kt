@@ -5,44 +5,53 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.luminance
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.georgeci.moneysurfer.uikit.components.SurferButton
-import com.georgeci.moneysurfer.uikit.components.SurferButtonSize
-import com.georgeci.moneysurfer.uikit.components.SurferButtonStyle
 import com.georgeci.moneysurfer.uikit.components.SurferFullScreenLoader
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
+import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.utils.HandleSideEffect
 import moneysurfer.feature.login.generated.resources.Res
@@ -58,7 +67,10 @@ import moneysurfer.feature.login.generated.resources.sign_in_error_unknown
 import moneysurfer.feature.login.generated.resources.sign_in_error_weak_password
 import moneysurfer.feature.login.generated.resources.sign_in_hero_subtitle
 import moneysurfer.feature.login.generated.resources.sign_in_hero_title
+import moneysurfer.feature.login.generated.resources.sign_in_or
 import moneysurfer.feature.login.generated.resources.sign_in_password_label
+import moneysurfer.feature.login.generated.resources.sign_in_sheet_subtitle
+import moneysurfer.feature.login.generated.resources.sign_in_sheet_title
 import moneysurfer.feature.login.generated.resources.sign_in_submit_signin
 import moneysurfer.feature.login.generated.resources.sign_in_submit_signup
 import moneysurfer.feature.login.generated.resources.sign_in_terms
@@ -67,17 +79,102 @@ import moneysurfer.feature.login.generated.resources.sign_in_toggle_to_signup
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
-private object SignInLayout {
-    val donutOffsetX = 80.dp
-    val donutOffsetY = 120.dp
-    val donutSize = 280.dp
-    val brandIconSize = 44.dp
-    val brandIconCornerRadius = 14.dp
-    val brandIconContentSize = 24.dp
-    const val donutHoleRadiusFraction = 160f / 280f
-    const val donutHoleOffsetXFraction = 100f / 280f
-    const val donutHoleOffsetYFraction = 60f / 280f
+object SignInTestTags {
+    const val Root = "signIn:root"
+    const val BrandHeader = "signIn:brandHeader"
+    const val HeroTitle = "signIn:heroTitle"
+    const val HeroSubtitle = "signIn:heroSubtitle"
+    const val Sheet = "signIn:sheet"
+    const val SheetTitle = "signIn:sheetTitle"
+    const val SheetSubtitle = "signIn:sheetSubtitle"
+    const val EmailField = "signIn:email"
+    const val PasswordField = "signIn:password"
+    const val SubmitButton = "signIn:submit"
+    const val ToggleModeButton = "signIn:toggleMode"
+    const val AnonymousButton = "signIn:anonymous"
+    const val DemoButton = "signIn:demo"
+    const val ErrorText = "signIn:error"
+    const val Loader = "signIn:loader"
+    const val Terms = "signIn:terms"
 }
+
+private object SignInPalette {
+    val GreenTop = Color(0xFF7ED321)
+    val GreenBottom = Color(0xFF5FB011)
+    val Ink = Color(0xFF0F2E12)
+    val OnBrand = Color(0xFFFFFFFF)
+    val OnBrandMuted = Color(0xE6FFFFFF)
+    val Sheet = Color(0xFFFFFFFF)
+    val SheetMuted = Color(0xFF445844)
+    val SheetSubtle = Color(0xFF7A8C7B)
+    val Divider = Color(0xFFD6E4D7)
+    val PrimaryDark = Color(0xFF1B5E20)
+    val WaveBack = Color(0xFF1B5E20)
+    val WaveMid = Color(0xFF2E7D32)
+    val WaveFront = Color(0xFF2E9A3E)
+}
+
+private val SheetCorner: Dp = 28.dp
+private val PrimaryButtonHeight: Dp = 52.dp
+private val WaveBandHeight: Dp = 220.dp
+private val BrandIconSize: Dp = 42.dp
+private const val BrandIconBgAlpha: Float = 0.18f
+private val BrandIconContentSize: Dp = 24.dp
+private val HeroTitleSize = 40.sp
+private val HeroTitleLineHeight = 44.sp
+private val HeroSubtitleMaxWidth: Dp = 320.dp
+private val SheetPadding: Dp = 20.dp
+private val SheetElevation: Dp = 12.dp
+private val SheetTitleSize = 18.sp
+private val FieldCorner: Dp = 14.dp
+private val PasskeyIconSize: Dp = 18.dp
+private val OrLabelSize = 11.sp
+private val PrimaryLabelSize = 15.sp
+private val ContentMaxWidth: Dp = 480.dp
+
+private const val DefaultCp1X: Float = 0.22f
+private const val DefaultCp1Y: Float = -30f
+private const val DefaultCp2X: Float = 0.42f
+private const val DefaultCp2Y: Float = 30f
+private const val DefaultMidX: Float = 0.63f
+private const val DefaultCp3X: Float = 0.78f
+private const val DefaultCp3Y: Float = -25f
+private const val DefaultCp4X: Float = 0.92f
+private const val DefaultCp4Y: Float = 15f
+
+private data class WaveCrest(
+    val startY: Float,
+    val midY: Float,
+    val endY: Float,
+    val cp1X: Float = DefaultCp1X,
+    val cp1Y: Float = DefaultCp1Y,
+    val cp2X: Float = DefaultCp2X,
+    val cp2Y: Float = DefaultCp2Y,
+    val midX: Float = DefaultMidX,
+    val cp3X: Float = DefaultCp3X,
+    val cp3Y: Float = DefaultCp3Y,
+    val cp4X: Float = DefaultCp4X,
+    val cp4Y: Float = DefaultCp4Y,
+)
+
+private val BackCrest = WaveCrest(startY = 0.40f, midY = 0.60f, endY = 0.50f)
+private val MidCrest = WaveCrest(startY = 0.60f, midY = 0.78f, endY = 0.65f)
+private const val BackCrestAlpha: Float = 0.55f
+private const val MidCrestAlpha: Float = 0.85f
+private const val FrontCrestStartY: Float = 0.82f
+private const val FrontCp1X: Float = 0.20f
+private const val FrontCp1Y: Float = 0.74f
+private const val FrontCp2X: Float = 0.45f
+private const val FrontCp2Y: Float = 0.93f
+private const val FrontMidX: Float = 0.66f
+private const val FrontMidY: Float = 0.84f
+private const val FrontCp3X: Float = 0.83f
+private const val FrontCp3Y: Float = 0.76f
+private const val FrontCp4X: Float = 0.95f
+private const val FrontCp4Y: Float = 0.88f
+private const val FrontEndY: Float = 0.82f
+private const val FrontGradientStartY: Float = 0.74f
+private const val FrontGradientAlpha: Float = 0.55f
 
 @Composable
 private fun SignInError.localized(): String = stringResource(
@@ -118,67 +215,237 @@ private fun SignInContent(
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
-            .surferSafeInsets(),
+            .surferSafeInsets()
+            .surferTestTagAsId()
+            .testTag(SignInTestTags.Root),
+        containerColor = SignInPalette.GreenTop,
     ) { innerPadding ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding),
         ) {
-            DecorativeDonut(
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .offset(x = SignInLayout.donutOffsetX, y = SignInLayout.donutOffsetY)
-                    .size(SignInLayout.donutSize),
-            )
+            SignInBackground(modifier = Modifier.fillMaxSize())
 
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
+                    .align(Alignment.TopCenter)
+                    .fillMaxHeight()
+                    .fillMaxWidth()
+                    .widthIn(max = ContentMaxWidth)
                     .padding(
-                        PaddingValues(
-                            start = AppTheme.spacing.large,
-                            end = AppTheme.spacing.large,
-                            top = AppTheme.spacing.xxxLarge,
-                            bottom = AppTheme.spacing.xLarge,
-                        ),
+                        start = AppTheme.spacing.default,
+                        end = AppTheme.spacing.default,
+                        top = AppTheme.spacing.xLarge,
+                        bottom = AppTheme.spacing.large,
                     ),
             ) {
-                BrandMark()
-
+                SignInBrandHeader()
+                Spacer(Modifier.height(AppTheme.spacing.xLarge))
+                SignInHero()
                 Spacer(Modifier.weight(1f))
-
-                Text(
-                    text = stringResource(Res.string.sign_in_hero_title),
-                    style = AppTheme.typography.displaySmall,
-                    color = AppTheme.materialColors.onSurface,
-                )
-                Spacer(Modifier.height(AppTheme.spacing.medium))
-                Text(
-                    text = stringResource(Res.string.sign_in_hero_subtitle),
-                    style = AppTheme.typography.bodyLarge,
-                    color = AppTheme.materialColors.onSurfaceVariant,
-                )
-
                 Spacer(Modifier.height(AppTheme.spacing.large))
+                SignInActionSheet(state = state, onEvent = onEvent)
+            }
 
+            if (state.isLoading) {
+                SurferFullScreenLoader(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .testTag(SignInTestTags.Loader),
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun SignInBackground(modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier.background(
+            Brush.verticalGradient(
+                colors = listOf(SignInPalette.GreenTop, SignInPalette.GreenBottom),
+            ),
+        ),
+    ) {
+        WaveDecoration(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth()
+                .height(WaveBandHeight),
+        )
+    }
+}
+
+@Composable
+private fun WaveDecoration(modifier: Modifier = Modifier) {
+    Canvas(modifier = modifier) {
+        val w = size.width
+        val h = size.height
+
+        fun crestPath(crest: WaveCrest): Path {
+            val startY = h * crest.startY
+            val midY = h * crest.midY
+            val endY = h * crest.endY
+            return Path().apply {
+                moveTo(0f, startY)
+                cubicTo(
+                    w * crest.cp1X,
+                    startY + crest.cp1Y,
+                    w * crest.cp2X,
+                    midY + crest.cp2Y,
+                    w * crest.midX,
+                    midY,
+                )
+                cubicTo(
+                    w * crest.cp3X,
+                    midY + crest.cp3Y,
+                    w * crest.cp4X,
+                    endY + crest.cp4Y,
+                    w,
+                    endY,
+                )
+                lineTo(w, h)
+                lineTo(0f, h)
+                close()
+            }
+        }
+
+        drawPath(
+            path = crestPath(BackCrest),
+            color = SignInPalette.WaveBack,
+            alpha = BackCrestAlpha,
+        )
+        drawPath(
+            path = crestPath(MidCrest),
+            color = SignInPalette.WaveMid,
+            alpha = MidCrestAlpha,
+        )
+        drawPath(
+            path = Path().apply {
+                moveTo(0f, h * FrontCrestStartY)
+                cubicTo(
+                    w * FrontCp1X,
+                    h * FrontCp1Y,
+                    w * FrontCp2X,
+                    h * FrontCp2Y,
+                    w * FrontMidX,
+                    h * FrontMidY,
+                )
+                cubicTo(
+                    w * FrontCp3X,
+                    h * FrontCp3Y,
+                    w * FrontCp4X,
+                    h * FrontCp4Y,
+                    w,
+                    h * FrontEndY,
+                )
+                lineTo(w, h)
+                lineTo(0f, h)
+                close()
+            },
+            brush = Brush.verticalGradient(
+                colors = listOf(
+                    SignInPalette.WaveFront.copy(alpha = 0f),
+                    SignInPalette.WaveFront.copy(alpha = FrontGradientAlpha),
+                ),
+                startY = h * FrontGradientStartY,
+                endY = h,
+            ),
+        )
+    }
+}
+
+@Composable
+private fun SignInBrandHeader(modifier: Modifier = Modifier) {
+    Row(
+        modifier = modifier.testTag(SignInTestTags.BrandHeader),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(AppTheme.spacing.medium),
+    ) {
+        Box(
+            modifier = Modifier
+                .size(BrandIconSize)
+                .clip(CircleShape)
+                .background(Color.White.copy(alpha = BrandIconBgAlpha)),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(
+                imageVector = SurferIcons.Wallet,
+                contentDescription = null,
+                tint = SignInPalette.OnBrand,
+                modifier = Modifier.size(BrandIconContentSize),
+            )
+        }
+        Text(
+            text = stringResource(Res.string.sign_in_brand),
+            style = AppTheme.typography.titleLarge,
+            color = SignInPalette.OnBrand,
+            fontWeight = FontWeight.Bold,
+        )
+    }
+}
+
+@Composable
+private fun SignInHero(modifier: Modifier = Modifier) {
+    Column(modifier = modifier) {
+        Text(
+            text = stringResource(Res.string.sign_in_hero_title),
+            color = SignInPalette.OnBrand,
+            fontSize = HeroTitleSize,
+            lineHeight = HeroTitleLineHeight,
+            fontWeight = FontWeight.ExtraBold,
+            modifier = Modifier.testTag(SignInTestTags.HeroTitle),
+        )
+        Spacer(Modifier.height(AppTheme.spacing.default))
+        Text(
+            text = stringResource(Res.string.sign_in_hero_subtitle),
+            color = SignInPalette.OnBrandMuted,
+            style = AppTheme.typography.bodyLarge,
+            modifier = Modifier
+                .widthIn(max = HeroSubtitleMaxWidth)
+                .testTag(SignInTestTags.HeroSubtitle),
+        )
+    }
+}
+
+@Composable
+private fun SignInActionSheet(
+    state: SignInState,
+    onEvent: (SignInEvent) -> Unit,
+) {
+    val config = state.config
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .testTag(SignInTestTags.Sheet),
+        shape = RoundedCornerShape(SheetCorner),
+        colors = CardDefaults.cardColors(
+            containerColor = SignInPalette.Sheet,
+            contentColor = SignInPalette.Ink,
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = SheetElevation),
+    ) {
+        Column(modifier = Modifier.padding(SheetPadding)) {
+            SheetHeader()
+            Spacer(Modifier.height(AppTheme.spacing.default))
+
+            if (config.emailPassword) {
                 EmailPasswordForm(state = state, onEvent = onEvent)
-
+                Spacer(Modifier.height(AppTheme.spacing.small))
                 if (state.error != null) {
-                    Spacer(Modifier.height(AppTheme.spacing.small))
                     Text(
                         text = state.error.localized(),
                         style = AppTheme.typography.bodySmall,
                         color = AppTheme.materialColors.error,
                         textAlign = TextAlign.Center,
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag(SignInTestTags.ErrorText),
                     )
+                    Spacer(Modifier.height(AppTheme.spacing.small))
                 }
-
-                Spacer(Modifier.height(AppTheme.spacing.medium))
-
-                SurferButton(
+                PrimaryFilledButton(
                     text = stringResource(
                         when (state.mode) {
                             AuthMode.SignIn -> Res.string.sign_in_submit_signin
@@ -186,63 +453,90 @@ private fun SignInContent(
                         },
                     ),
                     onClick = { onEvent(SignInEvent.OnSubmitClick) },
-                    modifier = Modifier.fillMaxWidth(),
-                    size = SurferButtonSize.Biggest,
                     enabled = state.canSubmit,
+                    modifier = Modifier.testTag(SignInTestTags.SubmitButton),
                 )
-
-                Spacer(Modifier.height(AppTheme.spacing.small))
-
-                SurferButton(
-                    text = stringResource(
-                        when (state.mode) {
-                            AuthMode.SignIn -> Res.string.sign_in_toggle_to_signup
-                            AuthMode.SignUp -> Res.string.sign_in_toggle_to_signin
-                        },
-                    ),
+                Spacer(Modifier.height(AppTheme.spacing.xSmall))
+                TextButton(
                     onClick = { onEvent(SignInEvent.OnToggleModeClick) },
-                    modifier = Modifier.fillMaxWidth(),
-                    style = SurferButtonStyle.Text,
                     enabled = !state.isLoading,
-                )
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag(SignInTestTags.ToggleModeButton),
+                ) {
+                    Text(
+                        text = stringResource(
+                            when (state.mode) {
+                                AuthMode.SignIn -> Res.string.sign_in_toggle_to_signup
+                                AuthMode.SignUp -> Res.string.sign_in_toggle_to_signin
+                            },
+                        ),
+                        color = SignInPalette.PrimaryDark,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                }
+            }
 
-                Spacer(Modifier.height(AppTheme.spacing.large))
-
-                SurferButton(
+            if (config.anonymous) {
+                if (config.emailPassword) {
+                    OrDivider()
+                }
+                PasskeyOutlinedButton(
                     text = stringResource(Res.string.sign_in_anonymous),
                     onClick = { onEvent(SignInEvent.OnAnonymousLoginClick) },
-                    modifier = Modifier.fillMaxWidth(),
-                    style = SurferButtonStyle.Outlined,
                     enabled = !state.isLoading,
-                    startIcon = SurferIcons.Fingerprint,
+                    modifier = Modifier.testTag(SignInTestTags.AnonymousButton),
                 )
+            }
 
+            if (config.demo) {
                 Spacer(Modifier.height(AppTheme.spacing.small))
-
-                SurferButton(
-                    text = stringResource(Res.string.sign_in_demo_mode),
-                    onClick = { onEvent(SignInEvent.OnLoginClick) },
-                    modifier = Modifier.fillMaxWidth(),
-                    style = SurferButtonStyle.Text,
-                    enabled = !state.isLoading,
-                )
-
-                Spacer(Modifier.height(AppTheme.spacing.large))
-
-                Text(
-                    text = stringResource(Res.string.sign_in_terms),
-                    style = AppTheme.typography.bodySmall,
-                    color = AppTheme.materialColors.onSurfaceVariant,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth(),
-                )
+                if (config.demoOnly) {
+                    PrimaryFilledButton(
+                        text = stringResource(Res.string.sign_in_demo_mode),
+                        onClick = { onEvent(SignInEvent.OnLoginClick) },
+                        enabled = !state.isLoading,
+                        modifier = Modifier.testTag(SignInTestTags.DemoButton),
+                    )
+                } else {
+                    TextButton(
+                        onClick = { onEvent(SignInEvent.OnLoginClick) },
+                        enabled = !state.isLoading,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag(SignInTestTags.DemoButton),
+                    ) {
+                        Text(
+                            text = stringResource(Res.string.sign_in_demo_mode),
+                            color = SignInPalette.PrimaryDark,
+                            fontWeight = FontWeight.SemiBold,
+                        )
+                    }
+                }
             }
 
-            if (state.isLoading) {
-                SurferFullScreenLoader(modifier = Modifier.fillMaxSize())
-            }
+            Spacer(Modifier.height(AppTheme.spacing.default))
+            SignInTerms()
         }
     }
+}
+
+@Composable
+private fun SheetHeader() {
+    Text(
+        text = stringResource(Res.string.sign_in_sheet_title),
+        color = SignInPalette.Ink,
+        fontSize = SheetTitleSize,
+        fontWeight = FontWeight.Bold,
+        modifier = Modifier.testTag(SignInTestTags.SheetTitle),
+    )
+    Spacer(Modifier.height(AppTheme.spacing.xxSmall))
+    Text(
+        text = stringResource(Res.string.sign_in_sheet_subtitle),
+        color = SignInPalette.SheetMuted,
+        style = AppTheme.typography.bodySmall,
+        modifier = Modifier.testTag(SignInTestTags.SheetSubtitle),
+    )
 }
 
 @Composable
@@ -250,6 +544,15 @@ private fun EmailPasswordForm(
     state: SignInState,
     onEvent: (SignInEvent) -> Unit,
 ) {
+    val fieldColors = OutlinedTextFieldDefaults.colors(
+        focusedBorderColor = SignInPalette.PrimaryDark,
+        unfocusedBorderColor = SignInPalette.Divider,
+        focusedLabelColor = SignInPalette.PrimaryDark,
+        unfocusedLabelColor = SignInPalette.SheetSubtle,
+        cursorColor = SignInPalette.PrimaryDark,
+        focusedTextColor = SignInPalette.Ink,
+        unfocusedTextColor = SignInPalette.Ink,
+    )
     OutlinedTextField(
         value = state.email,
         onValueChange = { onEvent(SignInEvent.OnEmailChanged(it)) },
@@ -260,11 +563,13 @@ private fun EmailPasswordForm(
             imeAction = ImeAction.Next,
         ),
         enabled = !state.isLoading,
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .testTag(SignInTestTags.EmailField),
+        shape = RoundedCornerShape(FieldCorner),
+        colors = fieldColors,
     )
-
     Spacer(Modifier.height(AppTheme.spacing.small))
-
     OutlinedTextField(
         value = state.password,
         onValueChange = { onEvent(SignInEvent.OnPasswordChanged(it)) },
@@ -276,74 +581,114 @@ private fun EmailPasswordForm(
         ),
         visualTransformation = PasswordVisualTransformation(),
         enabled = !state.isLoading,
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .testTag(SignInTestTags.PasswordField),
+        shape = RoundedCornerShape(FieldCorner),
+        colors = fieldColors,
     )
 }
 
 @Composable
-private fun BrandMark(modifier: Modifier = Modifier) {
-    Row(
-        modifier = modifier,
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(AppTheme.spacing.medium),
+private fun PrimaryFilledButton(
+    text: String,
+    onClick: () -> Unit,
+    enabled: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    Button(
+        onClick = onClick,
+        enabled = enabled,
+        modifier = modifier
+            .fillMaxWidth()
+            .height(PrimaryButtonHeight),
+        shape = RoundedCornerShape(PrimaryButtonHeight / 2),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = SignInPalette.PrimaryDark,
+            contentColor = SignInPalette.OnBrand,
+        ),
     ) {
-        Box(
-            modifier = Modifier
-                .size(SignInLayout.brandIconSize)
-                .clip(RoundedCornerShape(SignInLayout.brandIconCornerRadius))
-                .background(AppTheme.materialColors.primaryContainer),
-            contentAlignment = Alignment.Center,
-        ) {
-            Icon(
-                imageVector = SurferIcons.Wallet,
-                contentDescription = null,
-                tint = AppTheme.materialColors.onPrimaryContainer,
-                modifier = Modifier.size(SignInLayout.brandIconContentSize),
-            )
-        }
         Text(
-            text = stringResource(Res.string.sign_in_brand),
-            style = AppTheme.typography.titleMedium,
-            color = AppTheme.materialColors.onSurface,
+            text = text,
+            fontSize = PrimaryLabelSize,
+            fontWeight = FontWeight.SemiBold,
         )
     }
 }
 
 @Composable
-private fun DecorativeDonut(modifier: Modifier = Modifier) {
-    val primary = AppTheme.materialColors.primary
-    val tertiary = AppTheme.materialColors.tertiary
-    val container = AppTheme.materialColors.secondaryContainer
-    val surface = AppTheme.materialColors.surface
-
-    val isDark = AppTheme.materialColors.background.luminance() < 0.5f
-    val donutAlpha = if (isDark) 0.35f else 0.18f
-
-    Box(modifier = modifier) {
-        Canvas(modifier = Modifier.fillMaxSize()) {
-            val cx = size.width / 2f
-            val cy = size.height / 2f
-            val radius = size.minDimension / 2f
-            val sweepBrush = Brush.sweepGradient(
-                colors = listOf(primary, primary, tertiary, tertiary, container, container, primary),
-                center = Offset(cx, cy),
-            )
-            drawCircle(
-                brush = sweepBrush,
-                radius = radius,
-                center = Offset(cx, cy),
-                alpha = donutAlpha,
-            )
-            drawCircle(
-                color = surface,
-                radius = radius * SignInLayout.donutHoleRadiusFraction,
-                center = Offset(
-                    x = cx + radius * SignInLayout.donutHoleOffsetXFraction,
-                    y = cy + radius * SignInLayout.donutHoleOffsetYFraction,
-                ),
-            )
-        }
+private fun PasskeyOutlinedButton(
+    text: String,
+    onClick: () -> Unit,
+    enabled: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    OutlinedButton(
+        onClick = onClick,
+        enabled = enabled,
+        modifier = modifier
+            .fillMaxWidth()
+            .height(PrimaryButtonHeight),
+        shape = RoundedCornerShape(PrimaryButtonHeight / 2),
+        colors = ButtonDefaults.outlinedButtonColors(
+            contentColor = SignInPalette.PrimaryDark,
+        ),
+    ) {
+        Icon(
+            imageVector = SurferIcons.Fingerprint,
+            contentDescription = null,
+            modifier = Modifier.size(PasskeyIconSize),
+        )
+        Spacer(Modifier.width(AppTheme.spacing.small))
+        Text(
+            text = text,
+            fontSize = PrimaryLabelSize,
+            fontWeight = FontWeight.SemiBold,
+        )
     }
+}
+
+@Composable
+private fun OrDivider() {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = AppTheme.spacing.small),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .height(1.dp)
+                .background(SignInPalette.Divider),
+        )
+        Text(
+            text = stringResource(Res.string.sign_in_or).uppercase(),
+            color = SignInPalette.SheetSubtle,
+            fontSize = OrLabelSize,
+            fontWeight = FontWeight.Medium,
+            modifier = Modifier.padding(horizontal = AppTheme.spacing.small),
+        )
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .height(1.dp)
+                .background(SignInPalette.Divider),
+        )
+    }
+}
+
+@Composable
+private fun SignInTerms() {
+    Text(
+        text = stringResource(Res.string.sign_in_terms),
+        style = AppTheme.typography.bodySmall,
+        color = SignInPalette.SheetSubtle,
+        textAlign = TextAlign.Center,
+        modifier = Modifier
+            .fillMaxWidth()
+            .testTag(SignInTestTags.Terms),
+    )
 }
 
 @Preview
@@ -352,6 +697,23 @@ private fun SignInScreenPreview() {
     AppTheme {
         SignInContent(
             state = SignInState(),
+            onEvent = {},
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun SignInScreenDemoOnlyPreview() {
+    AppTheme {
+        SignInContent(
+            state = SignInState(
+                config = SignInFeatureConfig(
+                    emailPassword = false,
+                    anonymous = false,
+                    demo = true,
+                ),
+            ),
             onEvent = {},
         )
     }

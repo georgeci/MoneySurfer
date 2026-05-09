@@ -11,10 +11,7 @@ import com.georgeci.moneysurfer.domain.usecase.GetCategoriesUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetTransactionByIdUseCase
 import com.georgeci.moneysurfer.utils.MviViewModel
 import kotlinx.coroutines.flow.first
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
 import org.koin.core.annotation.KoinViewModel
-import kotlin.time.Instant
 
 @KoinViewModel
 class TransactionDetailsViewModel(
@@ -65,8 +62,9 @@ class TransactionDetailsViewModel(
                     note = transaction.note,
                     accountName = account?.name.orEmpty(),
                     categoryName = category?.name.orEmpty(),
+                    categorySystemKind = category?.systemKind?.name,
                     currency = transaction.currencyCode.value,
-                    formattedDate = formatLongDate(transaction.timestamp),
+                    formattedDate = formatDate(transaction.operationDate),
                     isPlanned = transaction.status == TransactionStatus.PLANNED,
                     showDeleteConfirmation = false,
                 )
@@ -74,13 +72,10 @@ class TransactionDetailsViewModel(
         }
     }
 
-    private fun formatLongDate(timestamp: Long): String {
-        val ld = Instant.fromEpochMilliseconds(timestamp)
-            .toLocalDateTime(TimeZone.currentSystemDefault())
-            .date
-        val month = ld.month.name.lowercase().replaceFirstChar { it.uppercase() }.take(3)
-        val day = ld.day.toString().padStart(2, '0')
-        return "$day $month ${ld.year}"
+    private fun formatDate(date: kotlinx.datetime.LocalDate): String {
+        val month = date.month.name.lowercase().replaceFirstChar { it.uppercase() }.take(3)
+        val day = date.day.toString().padStart(2, '0')
+        return "$day $month ${date.year}"
     }
 
     private fun handleDelete() {
@@ -108,6 +103,7 @@ sealed interface TransactionDetailsState {
         val note: String,
         val accountName: String,
         val categoryName: String,
+        val categorySystemKind: String? = null,
         val currency: String,
         val formattedDate: String,
         val isPlanned: Boolean,

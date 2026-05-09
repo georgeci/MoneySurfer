@@ -5,11 +5,11 @@ import com.georgeci.moneysurfer.domain.formatter.MoneyFormatter
 import com.georgeci.moneysurfer.domain.model.Account
 import com.georgeci.moneysurfer.domain.model.CategorizedTransaction
 import com.georgeci.moneysurfer.domain.primitives.AccountId
+import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
 import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
 import com.georgeci.moneysurfer.domain.primitives.Money
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
-import com.georgeci.moneysurfer.domain.primitives.currentTimeMillis
 import com.georgeci.moneysurfer.domain.repositories.TransactionRepository
 import com.georgeci.moneysurfer.domain.usecase.GetAccountByIdUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetTransactionsByAccountUseCase
@@ -17,7 +17,11 @@ import com.georgeci.moneysurfer.utils.MviViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import org.koin.core.annotation.KoinViewModel
+import kotlin.time.Instant
 
 @KoinViewModel
 class TransactionsByAccountViewModel(
@@ -25,6 +29,7 @@ class TransactionsByAccountViewModel(
     private val getTransactionsByAccount: GetTransactionsByAccountUseCase,
     private val getAccountById: GetAccountByIdUseCase,
     private val transactionRepository: TransactionRepository,
+    private val clock: ClockUseCase,
 ) : MviViewModel<TransactionsByAccountState, TransactionsByAccountEvent, TransactionsByAccountEffect>(
     initialState = TransactionsByAccountState.Loading(accountId = accountId),
 ) {
@@ -84,13 +89,18 @@ class TransactionsByAccountViewModel(
             TransactionTypeFilter.Expenses -> visible.filter { it.type == TransactionType.EXPENSE }
             TransactionTypeFilter.Income -> visible.filter { it.type == TransactionType.INCOME }
         }
-        val sorted = filtered.sortedByDescending { it.timestamp }
-        val groups = sorted.groupBy { dateKey(it.timestamp) }
+        val zone = TimeZone.currentSystemDefault()
+        val sorted = filtered.sortedWith(
+            compareByDescending<CategorizedTransaction> { it.transaction.operationDate }
+                .thenByDescending { it.operationAt }
+                .thenByDescending { it.transaction.createdAt },
+        )
+        val groups = sorted.groupBy { it.transaction.operationDate }
             .map { (key, txns) ->
                 val net = txns.fold(Money.zero()) { acc, t -> acc + t.signedMoney() }
                 val groupCurrency = txns.first().currencyCode
                 TransactionGroupUi(
-                    dateLabel = formatDateLabel(key),
+                    dateLabel = formatDateLabel(key, zone),
                     netFormatted = MoneyFormatter.format(net, groupCurrency),
                     netPositive = !net.isNegative(),
                     transactions = txns.map { t ->
@@ -143,12 +153,8 @@ class TransactionsByAccountViewModel(
         )
     }
 
-    private fun dateKey(timestamp: Long): Long {
-        return timestamp / DAY_MS
-    }
-
     private val CategorizedTransaction.currencyCode: CurrencyCode get() = transaction.currencyCode
-    private val CategorizedTransaction.timestamp: Long get() = transaction.timestamp
+    private val CategorizedTransaction.operationAt: Instant get() = transaction.operationAt
     private val CategorizedTransaction.type: TransactionType get() = transaction.type
 
     private fun CategorizedTransaction.signedMoney(): Money = when (transaction.type) {
@@ -156,19 +162,15 @@ class TransactionsByAccountViewModel(
         else -> transaction.money.abs()
     }
 
-    private fun formatDateLabel(dayKey: Long): String {
+    private fun formatDateLabel(date: LocalDate, zone: TimeZone): String {
         // Best-effort relative label without dragging in full locale-aware formatting.
-        // "Today" / "Yesterday" / otherwise an ISO-ish short label.
-        val todayKey = currentTimeMillis() / (DAY_MS)
-        return when (dayKey) {
-            todayKey -> "Today"
-            todayKey - 1 -> "Yesterday"
-            else -> "Day $dayKey"
+        val today = clock.now().toLocalDateTime(zone).date
+        val yesterday = today.toEpochDays().let { LocalDate.fromEpochDays(it - 1) }
+        return when (date) {
+            today -> "Today"
+            yesterday -> "Yesterday"
+            else -> date.toString()
         }
-    }
-
-    companion object {
-        const val DAY_MS = 24L * 60 * 60 * 1000
     }
 }
 

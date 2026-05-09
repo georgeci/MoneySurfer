@@ -31,6 +31,12 @@
     <string name="transaction_creation_close_content_description">Закрыть</string>
     <string name="transaction_creation_amount_placeholder">0,00</string>
     <string name="transaction_creation_account_empty">Счёт не выбран</string>
+    <string name="transaction_creation_from_label">ОТКУДА</string>
+    <string name="transaction_creation_to_label">КУДА</string>
+    <string name="transaction_creation_from_account">Со счёта</string>
+    <string name="transaction_creation_to_account">На счёт</string>
+    <string name="transaction_creation_swap_content_description">Поменять счета местами</string>
+    <string name="transaction_creation_rate_hint">1 %1$s = %2$s %3$s</string>
 
     <!-- Transaction details -->
     <string name="transaction_details_title">Транзакция</string>

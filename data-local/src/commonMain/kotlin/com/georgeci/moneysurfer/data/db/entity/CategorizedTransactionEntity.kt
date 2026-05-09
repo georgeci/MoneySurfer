@@ -11,8 +11,11 @@ data class CategorizedTransactionEntity(
     @ColumnInfo(name = "categoryId") val categoryId: String?,
     @ColumnInfo(name = "categoryName") val categoryName: String?,
     @ColumnInfo(name = "note") val note: String,
-    @ColumnInfo(name = "timestamp") val timestamp: Long,
+    @ColumnInfo(name = "operationAt") val operationAt: Long,
+    @ColumnInfo(name = "operationDate") val operationDate: String,
     @ColumnInfo(name = "type") val type: String,
     @ColumnInfo(name = "status") val status: String,
+    @ColumnInfo(name = "createdAt") val createdAt: Long,
     @ColumnInfo(name = "updatedAt") val updatedAt: Long,
+    @ColumnInfo(name = "transferId") val transferId: String? = null,
 )
