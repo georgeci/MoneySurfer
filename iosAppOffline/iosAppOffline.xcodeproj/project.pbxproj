@@ -75,6 +75,7 @@
 				C77309471BAE43DAAAF94405 /* Sources */,
 				971EFB8B3F7B8C4895EF2E61 /* Frameworks */,
 				25B56D3F8E17AFC4D358203B /* Resources */,
+				A0B1C2D3E4F50617A8B9C0D1 /* Verify Offline Build Has No Network Capability */,
 			);
 			buildRules = (
 			);
@@ -155,6 +156,25 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "if [ \"YES\" = \"$OVERRIDE_KOTLIN_BUILD_IDE_SUPPORTED\" ]; then\n  echo \"Skipping Gradle build task invocation due to OVERRIDE_KOTLIN_BUILD_IDE_SUPPORTED environment variable set to \\\"YES\\\"\"\n  exit 0\nfi\ncd \"$SRCROOT/..\"\n./gradlew :composeAppOffline:embedAndSignAppleFrameworkForXcode\n";
+		};
+		A0B1C2D3E4F50617A8B9C0D1 /* Verify Offline Build Has No Network Capability */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Verify Offline Build Has No Network Capability";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"$SRCROOT/../scripts/verify-offline-ios-no-network.sh\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
