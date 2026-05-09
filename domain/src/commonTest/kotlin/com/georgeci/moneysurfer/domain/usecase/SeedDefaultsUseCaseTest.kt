@@ -31,7 +31,7 @@ import kotlinx.coroutines.flow.flowOf
 
 class SeedDefaultsUseCaseTest : StringSpec({
 
-    "skips when a workspace is already pinned" {
+    "does not create a second workspace when one is already pinned" {
         val env = SeedTestEnv(
             currentUserId = OWNER_ID,
             currentWorkspaceId = PRE_PINNED,
@@ -40,9 +40,24 @@ class SeedDefaultsUseCaseTest : StringSpec({
         env.useCase(CurrencyCode("USD"))
 
         env.workspaceRepo.inserted shouldHaveSize 0
-        env.accountRepo.inserted shouldHaveSize 0
         env.categoryRepo.inserted shouldHaveSize 0
         env.session.currentWorkspaceId.flow.first() shouldBe PRE_PINNED
+    }
+
+    "repairs missing Cash account when workspace was pinned without one" {
+        // Simulates a previous run that died after pinning the workspace but before the Cash
+        // insert — Copilot review feedback on PR #91. Subsequent launches must heal that state.
+        val env = SeedTestEnv(
+            currentUserId = OWNER_ID,
+            currentWorkspaceId = PRE_PINNED,
+        )
+
+        env.useCase(CurrencyCode("USD"))
+
+        val account = env.accountRepo.inserted.single()
+        account.name shouldBe "Cash"
+        account.type shouldBe AccountType.CASH
+        account.workspaceId shouldBe PRE_PINNED
     }
 
     "creates workspace, default categories, and a Cash account on first run" {
@@ -116,6 +131,7 @@ private class SeedTestEnv(
     val useCase = SeedDefaultsUseCase(
         createWorkspace = createWorkspace,
         accountRepository = accountRepo,
+        workspaceRepository = workspaceRepo,
         session = session,
         getCurrentTime = getCurrentTime,
     )

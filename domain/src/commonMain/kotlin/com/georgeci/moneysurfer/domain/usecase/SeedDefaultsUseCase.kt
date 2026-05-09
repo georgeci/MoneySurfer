@@ -10,25 +10,33 @@ import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
 import com.georgeci.moneysurfer.domain.primitives.Money
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 import com.georgeci.moneysurfer.domain.repositories.AccountRepository
+import com.georgeci.moneysurfer.domain.repositories.WorkspaceRepository
 import kotlinx.coroutines.flow.first
 import org.koin.core.annotation.Single
 
 /**
- * One-shot bootstrap for an empty install: creates a "Personal" workspace (which seeds the
- * default category set via [CreateWorkspaceUseCase]) and a single "Cash" account.
+ * Bootstrap for an empty install: creates a "Personal" workspace (which seeds the default
+ * category set via [CreateWorkspaceUseCase]) and a single "Cash" account.
  *
- * Idempotency contract:
- *  - If a workspace is already pinned in [SessionPointers.currentWorkspaceId], do nothing.
- *  - If the freshly created workspace already has a "Cash" account (e.g. previous run partially
- *    completed and pinned the workspace before inserting the account), do not duplicate it.
+ * Idempotency contract — the use case is safe to call on every launch:
+ *  - If no workspace is pinned, create one + seed Cash.
+ *  - If a workspace is already pinned, *repair* missing defaults — i.e. ensure the pinned
+ *    workspace has a Cash account. This recovers from a previous run that pinned the workspace
+ *    but died before inserting the account, instead of stranding the user on a Dashboard with
+ *    no accounts forever (Copilot review feedback on PR #91).
+ *  - Existing Cash accounts are never duplicated.
  *
- * The use case is host-agnostic — the caller supplies the [CurrencyCode] for the workspace and
- * seed account so platform locale lookup stays out of the domain layer.
+ * Insert failures are caught and logged so a transient repository error doesn't block the
+ * caller (e.g. `AppLaunchViewModel`) from making a navigation decision.
+ *
+ * The use case is host-agnostic — the caller supplies the seed [CurrencyCode] so platform
+ * locale lookup stays out of the domain layer.
  */
 @Single
 class SeedDefaultsUseCase(
     private val createWorkspace: CreateWorkspaceUseCase,
     private val accountRepository: AccountRepository,
+    private val workspaceRepository: WorkspaceRepository,
     private val session: SessionPointers,
     private val getCurrentTime: GetCurrentTimeUseCase,
 ) {
@@ -37,7 +45,12 @@ class SeedDefaultsUseCase(
     suspend operator fun invoke(currency: CurrencyCode) {
         val pinned = session.currentWorkspaceId.flow.first()
         if (pinned != null) {
-            log.d { "[skip] workspace already pinned wid=${pinned.value}" }
+            // Repair path: previous run may have pinned the workspace but died before the Cash
+            // insert. Use the workspace's own baseCurrency for repair so we don't overwrite the
+            // user's currency choice with a freshly derived locale value.
+            val workspaceCurrency = runCatching { workspaceRepository.getById(pinned)?.baseCurrency }
+                .getOrNull() ?: currency
+            seedCashAccountIfMissing(pinned, workspaceCurrency)
             return
         }
         log.i { "[start] currency=${currency.value}" }
@@ -66,18 +79,21 @@ class SeedDefaultsUseCase(
             log.d { "[skip] Cash account already present wid=${workspaceId.value}" }
             return
         }
-        accountRepository.insert(
-            Account(
-                id = AccountId.uuid(),
-                workspaceId = workspaceId,
-                name = DEFAULT_ACCOUNT_NAME,
-                type = AccountType.CASH,
-                currencyCode = currency,
-                balance = Money.zero(),
-                updatedAt = getCurrentTime(),
-            ),
-        )
-        log.i { "[done] seeded Cash account wid=${workspaceId.value}" }
+        Either.catch {
+            accountRepository.insert(
+                Account(
+                    id = AccountId.uuid(),
+                    workspaceId = workspaceId,
+                    name = DEFAULT_ACCOUNT_NAME,
+                    type = AccountType.CASH,
+                    currencyCode = currency,
+                    balance = Money.zero(),
+                    updatedAt = getCurrentTime(),
+                ),
+            )
+        }
+            .onLeft { log.w(it) { "[insert] Cash account failed wid=${workspaceId.value}" } }
+            .onRight { log.i { "[done] seeded Cash account wid=${workspaceId.value}" } }
     }
 
     private companion object {
