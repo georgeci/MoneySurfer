@@ -19,11 +19,9 @@ name: Categories — Manage and create a category
 - tapOn:
     text: "Categories"
 
-# Categories management screen. The "New category" FAB is an
-# ExtendedFloatingActionButton: in this Compose version the inner Text label
-# is not propagated to the button's a11y node, so neither `text:` nor
-# `content-desc:` selectors find it. Tap by relative point — the FAB always
-# anchors to bottom-right of the Scaffold.
+# Categories management screen. The "New category" FAB has an explicit
+# contentDescription set in CategoriesManageScreen so Maestro can match it
+# by `text:` (which on Android falls back to contentDescription).
 - assertVisible:
     text: "Categories"
 
@@ -32,7 +30,7 @@ name: Categories — Manage and create a category
       notVisible: "Coffee"
     commands:
       - tapOn:
-          point: "80%, 95%"
+          text: "New category"
 
       # Category creation screen
       - assertVisible:

@@ -21,11 +21,16 @@ case "$(uname -m)" in
 esac
 SYSTEM_IMAGE="system-images;android-${API_LEVEL};aosp_atd;${ARCH}"
 
-ANDROID_HOME="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-$HOME/Library/Android/sdk}}"
+case "$(uname -s)" in
+    Darwin) DEFAULT_SDK="$HOME/Library/Android/sdk" ;;
+    Linux)  DEFAULT_SDK="$HOME/Android/Sdk" ;;
+    *)      DEFAULT_SDK="$HOME/Android/Sdk" ;;
+esac
+ANDROID_HOME="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-$DEFAULT_SDK}}"
 SDKMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
 AVDMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/avdmanager"
-[[ -x "$SDKMANAGER" ]] || { echo "sdkmanager missing at $SDKMANAGER" >&2; exit 1; }
-[[ -x "$AVDMANAGER" ]] || { echo "avdmanager missing at $AVDMANAGER" >&2; exit 1; }
+[[ -x "$SDKMANAGER" ]] || { echo "sdkmanager missing at $SDKMANAGER (set ANDROID_HOME or ANDROID_SDK_ROOT)" >&2; exit 1; }
+[[ -x "$AVDMANAGER" ]] || { echo "avdmanager missing at $AVDMANAGER (set ANDROID_HOME or ANDROID_SDK_ROOT)" >&2; exit 1; }
 
 if "$AVDMANAGER" list avd 2>/dev/null | grep -q "Name: ${AVD_NAME}\$"; then
     echo "AVD '${AVD_NAME}' already exists — skipping creation." >&2
@@ -50,14 +55,18 @@ fi
 CONFIG="$HOME/.android/avd/${AVD_NAME}.avd/config.ini"
 [[ -f "$CONFIG" ]] || { echo "config.ini not found: $CONFIG" >&2; exit 1; }
 
-# Idempotent key=value upserts. macOS sed needs the empty -i argument.
+# Idempotent key=value upserts. Done via awk + atomic rename rather than
+# `sed -i` so this works on both BSD/macOS and GNU/Linux, and so dotted keys
+# like `disk.dataPartition.size` are matched as literal strings (not regex).
 upsert() {
     local key="$1" value="$2"
-    if grep -q "^${key}=" "$CONFIG"; then
-        sed -i '' "s|^${key}=.*|${key}=${value}|" "$CONFIG"
-    else
-        echo "${key}=${value}" >>"$CONFIG"
-    fi
+    local tmp="${CONFIG}.tmp"
+    awk -F= -v key="$key" -v val="$value" '
+        BEGIN { found = 0 }
+        $1 == key { print key "=" val; found = 1; next }
+        { print }
+        END { if (!found) print key "=" val }
+    ' "$CONFIG" >"$tmp" && mv "$tmp" "$CONFIG"
 }
 
 upsert hw.keyboard yes
