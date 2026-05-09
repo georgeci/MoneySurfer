@@ -1,5 +1,6 @@
 package com.georgeci.moneysurfer.data.backup.zip
 
+import com.georgeci.moneysurfer.domain.backup.BackupError
 import okio.Buffer
 import okio.BufferedSink
 import okio.BufferedSource
@@ -39,6 +40,11 @@ internal class ZipStoredWriter(private val sink: BufferedSink) {
         val crcValue = crc.getValue()
         val size = payload.size
 
+        // Plain ZIP (no Zip64) header fields are 32-bit. Symmetry with the
+        // reader: reject before we silently truncate via `toInt()`.
+        require32Bit(size, "Entry size for $name")
+        require32Bit(bytesWritten, "Local-header offset for $name")
+
         val localHeaderOffset = bytesWritten
         bytesWritten += writeLocalFileHeader(nameBytes, crcValue, size)
         sink.writeAll(payload)
@@ -57,13 +63,21 @@ internal class ZipStoredWriter(private val sink: BufferedSink) {
         closed = true
 
         val centralDirOffset = bytesWritten
+        require32Bit(centralDirOffset, "Central-directory offset")
         var centralDirSize = 0L
         for (entry in entries) {
             centralDirSize += writeCentralDirHeader(entry)
         }
         bytesWritten += centralDirSize
+        require32Bit(centralDirSize, "Central-directory size")
         writeEndOfCentralDir(centralDirOffset, centralDirSize)
         sink.flush()
+    }
+
+    private fun require32Bit(value: Long, what: String) {
+        if (value > Int.MAX_VALUE.toLong()) {
+            throw BackupError.InvalidArchive("$what exceeds 32-bit ZIP limit: $value bytes")
+        }
     }
 
     private fun writeLocalFileHeader(nameBytes: ByteArray, crc: Long, size: Long): Long {

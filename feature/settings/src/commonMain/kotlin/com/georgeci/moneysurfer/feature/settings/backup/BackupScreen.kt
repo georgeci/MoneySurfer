@@ -21,9 +21,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -40,7 +42,6 @@ import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.utils.HandleSideEffect
-import kotlinx.coroutines.launch
 import moneysurfer.feature.settings.generated.resources.Res
 import moneysurfer.feature.settings.generated.resources.settings_backup_back_up_now_supporting
 import moneysurfer.feature.settings.generated.resources.settings_backup_back_up_now_title
@@ -86,22 +87,22 @@ fun BackupScreen(
     val state by viewModel.collectAsStateWithLifecycle()
     val appRestarter: AppRestarter = koinInject()
     val snackbarHostState = remember { SnackbarHostState() }
-    val snackbarScope = rememberCoroutineScope()
+    var pendingNotice by remember { mutableStateOf<BackupNotice?>(null) }
 
     val launcher = rememberBackupPickerLauncher(
         onSavePicked = { sink -> viewModel.onEvent(BackupEvent.OnSaveSinkChosen(sink)) },
         onOpenPicked = { source -> viewModel.onEvent(BackupEvent.OnOpenSourceChosen(source)) },
     )
 
-    val noticeMessages = NoticeStrings(
-        exportSuccess = stringResource(Res.string.settings_backup_export_success),
-        invalidArchive = stringResource(Res.string.settings_backup_notice_invalid_archive),
-        corrupted = stringResource(Res.string.settings_backup_notice_corrupted),
-        generic = stringResource(Res.string.settings_backup_notice_generic),
-        missingFileFormat = stringResource(Res.string.settings_backup_notice_missing_file),
-        formatMismatchFormat = stringResource(Res.string.settings_backup_notice_format_mismatch),
-        schemaMismatchFormat = stringResource(Res.string.settings_backup_notice_schema_mismatch),
-    )
+    // Resolve through Compose's standard format-args path so positional
+    // placeholders survive translator reordering. We snapshot at composition;
+    // the LaunchedEffect below feeds the snackbar from the resolved value.
+    val pendingNoticeText: String? = pendingNotice?.let { noticeText(it) }
+    LaunchedEffect(pendingNoticeText) {
+        val text = pendingNoticeText ?: return@LaunchedEffect
+        snackbarHostState.showSnackbar(message = text, duration = SnackbarDuration.Short)
+        pendingNotice = null
+    }
 
     viewModel.HandleSideEffect { effect ->
         when (effect) {
@@ -109,12 +110,7 @@ fun BackupScreen(
             is BackupEffect.RequestSaveFile -> launcher.launchSave(effect.suggestedName)
             BackupEffect.RequestOpenFile -> launcher.launchOpen()
             BackupEffect.RestartApp -> appRestarter.restart()
-            is BackupEffect.Notify -> {
-                val text = noticeMessages.resolve(effect.notice) ?: return@HandleSideEffect
-                snackbarScope.launch {
-                    snackbarHostState.showSnackbar(message = text, duration = SnackbarDuration.Short)
-                }
-            }
+            is BackupEffect.Notify -> { pendingNotice = effect.notice }
             BackupEffect.OpenFrequencyPicker,
             BackupEffect.OpenLocationPicker,
             BackupEffect.OpenEncryptionScreen,
@@ -130,32 +126,19 @@ fun BackupScreen(
     )
 }
 
-private data class NoticeStrings(
-    val exportSuccess: String,
-    val invalidArchive: String,
-    val corrupted: String,
-    val generic: String,
-    val missingFileFormat: String,
-    val formatMismatchFormat: String,
-    val schemaMismatchFormat: String,
-) {
-    /** Returns `null` for notices the screen intentionally swallows (e.g., user-cancelled picker). */
-    fun resolve(notice: BackupNotice): String? = when (notice) {
-        BackupNotice.ExportSuccess -> exportSuccess
-        BackupNotice.Cancelled -> null
-        BackupNotice.InvalidArchive -> invalidArchive
-        BackupNotice.Corrupted -> corrupted
-        BackupNotice.Generic -> generic
-        is BackupNotice.MissingFile -> missingFileFormat.replace("%s", notice.name)
-        is BackupNotice.FormatMismatch ->
-            formatMismatchFormat
-                .replace("%1\$d", notice.actual.toString())
-                .replace("%2\$d", notice.expected.toString())
-        is BackupNotice.SchemaMismatch ->
-            schemaMismatchFormat
-                .replace("%1\$d", notice.actual.toString())
-                .replace("%2\$d", notice.expected.toString())
-    }
+@Composable
+private fun noticeText(notice: BackupNotice): String? = when (notice) {
+    BackupNotice.ExportSuccess -> stringResource(Res.string.settings_backup_export_success)
+    BackupNotice.Cancelled -> null
+    BackupNotice.InvalidArchive -> stringResource(Res.string.settings_backup_notice_invalid_archive)
+    BackupNotice.Corrupted -> stringResource(Res.string.settings_backup_notice_corrupted)
+    BackupNotice.Generic -> stringResource(Res.string.settings_backup_notice_generic)
+    is BackupNotice.MissingFile ->
+        stringResource(Res.string.settings_backup_notice_missing_file, notice.name)
+    is BackupNotice.FormatMismatch ->
+        stringResource(Res.string.settings_backup_notice_format_mismatch, notice.actual, notice.expected)
+    is BackupNotice.SchemaMismatch ->
+        stringResource(Res.string.settings_backup_notice_schema_mismatch, notice.actual, notice.expected)
 }
 
 @Composable
