@@ -33,6 +33,7 @@ kotlin {
                 implementation(libs.bundles.feature.koin)
                 implementation(libs.bundles.feature.arrow)
                 implementation(libs.kermit)
+                implementation(libs.okio)
                 implementation(projects.domain)
                 implementation(projects.navigation)
                 implementation(projects.sync.api)
@@ -41,16 +42,17 @@ kotlin {
             }
         }
 
+        androidMain {
+            dependencies {
+                implementation(libs.androidx.activity.compose)
+            }
+        }
+
         commonTest {
             dependencies {
                 implementation(libs.bundles.feature.test)
                 implementation(projects.domainTestFixtures)
                 implementation(projects.syncTestFixtures)
-            }
-        }
-
-        androidMain {
-            dependencies {
             }
         }
 

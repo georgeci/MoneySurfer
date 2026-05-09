@@ -23,6 +23,12 @@ import com.georgeci.moneysurfer.data.db.entity.WorkspaceEntity
 import com.georgeci.moneysurfer.data.db.entity.WorkspaceInviteEntity
 import com.georgeci.moneysurfer.data.db.entity.WorkspaceMemberEntity
 
+/**
+ * Schema version of [MoneySurferDatabase]. Single source of truth so the
+ * Room annotation, the backup manifest, and tests can never drift.
+ */
+const val MONEY_SURFER_DB_VERSION: Int = 21
+
 @Database(
     entities = [
         UserEntity::class,
@@ -35,7 +41,7 @@ import com.georgeci.moneysurfer.data.db.entity.WorkspaceMemberEntity
         BudgetEntity::class,
         RecurringRuleEntity::class,
     ],
-    version = 21,
+    version = MONEY_SURFER_DB_VERSION,
 )
 @ConstructedBy(MoneySurferDatabaseConstructor::class)
 abstract class MoneySurferDatabase : RoomDatabase() {
