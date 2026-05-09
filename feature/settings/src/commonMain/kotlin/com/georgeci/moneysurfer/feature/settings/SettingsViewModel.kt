@@ -149,6 +149,7 @@ data class SettingsState(
     val showSyncSection: Boolean get() = !isOffline
     val showLogout: Boolean get() = !isOffline
     val showWorkspaceMembers: Boolean get() = !isOffline
+    val showPendingInvites: Boolean get() = !isOffline
 }
 
 sealed interface SettingsEvent {

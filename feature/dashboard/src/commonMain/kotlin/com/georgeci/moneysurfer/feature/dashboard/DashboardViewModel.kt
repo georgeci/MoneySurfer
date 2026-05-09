@@ -1,6 +1,7 @@
 package com.georgeci.moneysurfer.feature.dashboard
 
 import arrow.optics.optics
+import com.georgeci.moneysurfer.domain.OfflineBuildFlags
 import com.georgeci.moneysurfer.domain.formatter.MoneyFormatter
 import com.georgeci.moneysurfer.domain.model.Account
 import com.georgeci.moneysurfer.domain.model.Transaction
@@ -19,9 +20,12 @@ import org.koin.core.annotation.KoinViewModel
 class DashboardViewModel(
     private val getAccounts: GetAccountsUseCase,
     private val getRecentTransactions: GetRecentTransactionsUseCase,
+    offlineBuildFlags: OfflineBuildFlags,
 ) : MviViewModel<DashboardState, DashboardEvent, DashboardEffect>(
     initialState = DashboardState.Loading,
 ) {
+
+    private val isOffline: Boolean = offlineBuildFlags.isOffline
 
     init {
         observeDashboard()
@@ -65,6 +69,7 @@ class DashboardViewModel(
                     workspaceInitial = null,
                     greeting = null,
                     formattedTrendDelta = null,
+                    isOffline = isOffline,
                 )
             }.collect { newContent -> updateState { newContent } }
         }
@@ -106,6 +111,7 @@ sealed interface DashboardState {
         val workspaceInitial: String?,
         val greeting: String?,
         val formattedTrendDelta: String?,
+        val isOffline: Boolean = false,
     ) : DashboardState {
         companion object
     }

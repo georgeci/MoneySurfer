@@ -15,4 +15,4 @@ actual val sharedPlatformModule: Module = module {
 }
 
 private fun readVersionName(): String =
-    AppInfo::class.java.`package`?.implementationVersion ?: "1.0.0"
+    AppInfo::class.java.`package`?.implementationVersion ?: "0.1.0"

@@ -166,20 +166,22 @@ private fun DashboardContent(
                 )
             }
 
-            item(key = "actions") {
-                SurferQuickActionsWidget(
-                    primaryLabel = stringResource(Res.string.dashboard_quick_action_add),
-                    primaryIcon = SurferIcons.Add,
-                    onPrimaryClick = { onEvent(DashboardEvent.OnAddTransactionClick) },
-                    secondaryLabel = stringResource(Res.string.dashboard_quick_action_transfer),
-                    secondaryIcon = SurferIcons.Split,
-                    onSecondaryClick = { onEvent(DashboardEvent.OnManageAccountsClick) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 4.dp)
-                        .height(80.dp)
-                        .padding(quickActionsPadding),
-                )
+            if (!state.isOffline) {
+                item(key = "actions") {
+                    SurferQuickActionsWidget(
+                        primaryLabel = stringResource(Res.string.dashboard_quick_action_add),
+                        primaryIcon = SurferIcons.Add,
+                        onPrimaryClick = { onEvent(DashboardEvent.OnAddTransactionClick) },
+                        secondaryLabel = stringResource(Res.string.dashboard_quick_action_transfer),
+                        secondaryIcon = SurferIcons.Split,
+                        onSecondaryClick = { onEvent(DashboardEvent.OnManageAccountsClick) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 4.dp)
+                            .height(80.dp)
+                            .padding(quickActionsPadding),
+                    )
+                }
             }
 
             item(key = "accounts-header") {

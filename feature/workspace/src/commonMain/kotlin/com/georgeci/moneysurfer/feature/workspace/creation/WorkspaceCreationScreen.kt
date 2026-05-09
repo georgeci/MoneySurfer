@@ -59,6 +59,7 @@ import moneysurfer.feature.workspace.generated.resources.workspace_creation_invi
 import moneysurfer.feature.workspace.generated.resources.workspace_creation_name_label
 import moneysurfer.feature.workspace.generated.resources.workspace_creation_preview_fallback_title
 import moneysurfer.feature.workspace.generated.resources.workspace_creation_preview_subtitle_format
+import moneysurfer.feature.workspace.generated.resources.workspace_creation_preview_subtitle_offline_format
 import moneysurfer.feature.workspace.generated.resources.workspace_creation_section_currency
 import moneysurfer.feature.workspace.generated.resources.workspace_creation_section_members
 import moneysurfer.feature.workspace.generated.resources.workspace_creation_title_create
@@ -189,6 +190,7 @@ private fun WorkspaceCreationContent(
                     name = state.name,
                     memberCount = state.members.size,
                     currencyCode = state.currency,
+                    isOffline = state.isOffline,
                 )
 
                 OutlinedTextField(
@@ -199,7 +201,7 @@ private fun WorkspaceCreationContent(
                     modifier = Modifier.fillMaxWidth(),
                 )
 
-                if (state.currencies.isNotEmpty()) {
+                if (state.currencies.isNotEmpty() && !(state.isEditing && state.isOffline)) {
                     SectionLabel(stringResource(Res.string.workspace_creation_section_currency))
                     val selectedCurrency = state.currencies.firstOrNull { it.code.value == state.currency }
                         ?: state.currencies.first()
@@ -211,7 +213,7 @@ private fun WorkspaceCreationContent(
                     )
                 }
 
-                if (state.isEditing) {
+                if (state.isEditing && !state.isOffline) {
                     MembersSection(
                         members = state.members,
                         showInviteRow = true,
@@ -234,6 +236,7 @@ private fun PreviewCard(
     name: String,
     memberCount: Int,
     currencyCode: String,
+    isOffline: Boolean,
 ) {
     val initials = name.toInitials().ifBlank { "W" }
     Card(
@@ -270,11 +273,18 @@ private fun PreviewCard(
                     style = AppTheme.typography.titleLarge,
                 )
                 Text(
-                    text = stringResource(
-                        Res.string.workspace_creation_preview_subtitle_format,
-                        memberCount,
-                        currencyCode.ifBlank { "—" },
-                    ),
+                    text = if (isOffline) {
+                        stringResource(
+                            Res.string.workspace_creation_preview_subtitle_offline_format,
+                            currencyCode.ifBlank { "—" },
+                        )
+                    } else {
+                        stringResource(
+                            Res.string.workspace_creation_preview_subtitle_format,
+                            memberCount,
+                            currencyCode.ifBlank { "—" },
+                        )
+                    },
                     style = AppTheme.typography.bodySmall,
                     modifier = Modifier.padding(top = 2.dp),
                 )
