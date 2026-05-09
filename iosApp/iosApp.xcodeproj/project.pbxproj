@@ -185,6 +185,7 @@
 			inputFileListPaths = (
 			);
 			inputPaths = (
+				"$(SRCROOT)/scripts/copy-firebase-plist.sh",
 				"$(SRCROOT)/Firebase/Dev/GoogleService-Info.plist",
 				"$(SRCROOT)/Firebase/Prod/GoogleService-Info.plist",
 			);
@@ -196,7 +197,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "set -euo pipefail\n\ncase \"$CONFIGURATION\" in\n  Debug)   SRC=\"$SRCROOT/Firebase/Dev/GoogleService-Info.plist\" ;;\n  Release) SRC=\"$SRCROOT/Firebase/Prod/GoogleService-Info.plist\" ;;\n  *)       echo \"warning: unknown CONFIGURATION=$CONFIGURATION, skipping Firebase plist copy\"; exit 0 ;;\nesac\n\nif [ ! -f \"$SRC\" ]; then\n  echo \"error: Firebase plist missing at $SRC\"\n  exit 1\nfi\n\nDST=\"${BUILT_PRODUCTS_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/GoogleService-Info.plist\"\nmkdir -p \"$(dirname \"$DST\")\"\ncp \"$SRC\" \"$DST\"\n";
+			shellScript = "\"$SRCROOT/scripts/copy-firebase-plist.sh\"\n";
 		};
 		F1A000006666666666666666 /* Upload Crashlytics dSYMs */ = {
 			isa = PBXShellScriptBuildPhase;
