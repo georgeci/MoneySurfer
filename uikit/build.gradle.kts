@@ -84,3 +84,7 @@ kotlin {
 dependencies {
     "androidRuntimeClasspath"(libs.compose.uiToolingPreview)
 }
+
+compose.resources {
+    publicResClass = true
+}

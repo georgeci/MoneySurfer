@@ -39,6 +39,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -210,6 +211,39 @@ class TransactionCreationViewModelTest : StringSpec({
             fixture.accountRepository.byId[to.id]!!.balance shouldBe 92.dollars
         }
     }
+
+    "Transfer is unreachable when transferEnabled flag is off" {
+        runTest {
+            val fixture = Fixture(ws)
+            val vm = fixture.createViewModel(
+                featureConfig = TransactionCreationFeatureConfig(transferEnabled = false),
+            )
+
+            vm.onEvent(TransactionCreationEvent.OnTypeChanged(TransactionTypeUi.Transfer))
+
+            val state = vm.first { it is TransactionCreationState.Content }
+                as TransactionCreationState.Content
+            state.transferEnabled shouldBe false
+            state.isTransfer shouldBe false
+            state.type shouldBe TransactionTypeUi.Expense
+        }
+    }
+
+    "Transfer is reachable when transferEnabled flag is on" {
+        runTest {
+            val fixture = Fixture(ws)
+            val vm = fixture.createViewModel(
+                featureConfig = TransactionCreationFeatureConfig(transferEnabled = true),
+            )
+
+            vm.onEvent(TransactionCreationEvent.OnTypeChanged(TransactionTypeUi.Transfer))
+
+            val state = vm.first { it is TransactionCreationState.Content }
+                as TransactionCreationState.Content
+            state.transferEnabled shouldBe true
+            state.type shouldBe TransactionTypeUi.Transfer
+        }
+    }
 })
 
 private class Fixture(workspaceId: WorkspaceId) {
@@ -223,6 +257,7 @@ private class Fixture(workspaceId: WorkspaceId) {
     fun createViewModel(
         editingTransactionId: TransactionId? = null,
         prefillAccount: AccountId? = null,
+        featureConfig: TransactionCreationFeatureConfig = TransactionCreationFeatureConfig(transferEnabled = true),
     ) = TransactionCreationViewModel(
         transactionId = editingTransactionId,
         accountId = prefillAccount,
@@ -238,6 +273,7 @@ private class Fixture(workspaceId: WorkspaceId) {
         ),
         getCurrentTime = GetCurrentTimeUseCase(clock),
         transactionRepository = transactionRepository,
+        featureConfig = featureConfig,
     )
 
     fun pickFromAccount(vm: TransactionCreationViewModel, id: AccountId) {
@@ -283,6 +319,11 @@ private class FakeAccountRepository : AccountRepository {
     override suspend fun setBalance(accountId: AccountId, balance: Money) {
         val current = byId[accountId] ?: return
         byId[accountId] = current.copy(balance = balance)
+        byWorkspace.value = byId.values.toList()
+    }
+    override suspend fun setArchived(accountId: AccountId, archived: Boolean) {
+        val current = byId[accountId] ?: return
+        byId[accountId] = current.copy(archived = archived)
         byWorkspace.value = byId.values.toList()
     }
 }

@@ -159,7 +159,7 @@ private fun WorkspaceSelectorContent(
                             enabled = !state.isSelecting,
                             showActions = state.showActions,
                             editLabel = editLabel,
-                            membersLabel = membersLabel,
+                            membersLabel = membersLabel.takeUnless { state.isOffline },
                             onClick = { onEvent(WorkspaceSelectorEvent.OnWorkspaceClick(workspace)) },
                             onEditClick = { onEvent(WorkspaceSelectorEvent.OnEditWorkspaceClick(workspace)) },
                             onMembersClick = { onEvent(WorkspaceSelectorEvent.OnMembersClick(workspace)) },

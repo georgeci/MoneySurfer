@@ -14,5 +14,6 @@ data class Account(
     val type: AccountType,
     val currencyCode: CurrencyCode,
     val balance: Money,
+    val archived: Boolean = false,
     val updatedAt: Instant = Instant.fromEpochMilliseconds(0),
 )

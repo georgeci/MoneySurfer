@@ -1,6 +1,7 @@
 package com.georgeci.moneysurfer.feature.settings
 
 import com.georgeci.moneysurfer.domain.AppInfo
+import com.georgeci.moneysurfer.domain.OfflineBuildFlags
 import com.georgeci.moneysurfer.domain.auth.SessionPointers
 import com.georgeci.moneysurfer.domain.model.WorkspaceMemberStatus
 import com.georgeci.moneysurfer.domain.preferences.PaletteSource
@@ -22,6 +23,7 @@ import org.koin.core.annotation.KoinViewModel
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @KoinViewModel
+@Suppress("LongParameterList") // Aggregator ViewModel; offline-flag injection edges past the 10-arg threshold.
 class SettingsViewModel(
     private val session: SessionPointers,
     private val authRemoteRepository: AuthRemoteRepository,
@@ -32,8 +34,12 @@ class SettingsViewModel(
     private val memberRepository: WorkspaceMemberRepository,
     private val uiPreferences: UiPreferences,
     appInfo: AppInfo,
+    offlineBuildFlags: OfflineBuildFlags,
 ) : MviViewModel<SettingsState, SettingsEvent, SettingsEffect>(
-    initialState = SettingsState(appVersion = appInfo.version),
+    initialState = SettingsState(
+        appVersion = appInfo.version,
+        isOffline = offlineBuildFlags.isOffline,
+    ),
 ) {
 
     init {
@@ -138,7 +144,13 @@ data class SettingsState(
     val currentWorkspaceId: WorkspaceId? = null,
     val activeMemberCount: Int = 0,
     val isDynamicColorEnabled: Boolean = false,
-)
+    val isOffline: Boolean = false,
+) {
+    val showSyncSection: Boolean get() = !isOffline
+    val showLogout: Boolean get() = !isOffline
+    val showWorkspaceMembers: Boolean get() = !isOffline
+    val showPendingInvites: Boolean get() = !isOffline
+}
 
 sealed interface SettingsEvent {
     data object OnBackClick : SettingsEvent

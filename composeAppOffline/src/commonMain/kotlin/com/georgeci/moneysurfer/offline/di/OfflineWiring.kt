@@ -1,5 +1,7 @@
 package com.georgeci.moneysurfer.offline.di
 
+import com.georgeci.moneysurfer.domain.OfflineBuildFlags
+import com.georgeci.moneysurfer.domain.firstrun.FirstRunSeeder
 import com.georgeci.moneysurfer.domain.repositories.AppConfigRepository
 import com.georgeci.moneysurfer.domain.repositories.AppVersionGate
 import com.georgeci.moneysurfer.domain.repositories.AuthRemoteRepository
@@ -8,7 +10,11 @@ import com.georgeci.moneysurfer.domain.repositories.SessionShutdownGate
 import com.georgeci.moneysurfer.domain.repositories.UserRemoteRepository
 import com.georgeci.moneysurfer.domain.repositories.WorkspaceSyncer
 import com.georgeci.moneysurfer.domain.telemetry.CrashReporter
+import com.georgeci.moneysurfer.domain.usecase.DemoLoginUseCase
+import com.georgeci.moneysurfer.domain.usecase.SeedDefaultsUseCase
 import com.georgeci.moneysurfer.feature.login.SignInFeatureConfig
+import com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationFeatureConfig
+import com.georgeci.moneysurfer.offline.firstrun.OfflineFirstRunSeeder
 import com.georgeci.moneysurfer.offline.noop.NoOpAppConfigRepository
 import com.georgeci.moneysurfer.offline.noop.NoOpAppVersionGate
 import com.georgeci.moneysurfer.offline.noop.NoOpAuthRemoteRepository
@@ -38,6 +44,21 @@ private val offlineNoOpModule: Module = module {
 }
 
 /**
+ * Offline-only first-run seed: pre-creates demo user + default workspace + Cash account on a
+ * clean install so the app lands on a populated Dashboard. Online builds bind their own no-op
+ * (Firestore-backed onboarding handles empty workspaces).
+ */
+private val offlineFirstRunModule: Module = module {
+    single<FirstRunSeeder> {
+        OfflineFirstRunSeeder(
+            session = get(),
+            demoLoginUseCase = get<DemoLoginUseCase>(),
+            seedDefaultsUseCase = get<SeedDefaultsUseCase>(),
+        )
+    }
+}
+
+/**
  * Offline build shows a single "demo" entry on the sign-in screen — no
  * email/password or anonymous flows, since the offline build has no remote
  * auth backend wired up. This overrides the default registered by
@@ -51,6 +72,19 @@ private val offlineSignInModule: Module = module {
             demo = true,
         )
     }
+    single<OfflineBuildFlags> { OfflineBuildFlags(isOffline = true) }
+}
+
+/**
+ * Offline build hides the Transfer segment in transaction creation — multi-account
+ * transfers are out of the offline MVP scope. Same host-owned binding pattern as
+ * [offlineSignInModule] so the offline override can't regress through Koin module
+ * load order.
+ */
+private val offlineTransactionCreationModule: Module = module {
+    single<TransactionCreationFeatureConfig> {
+        TransactionCreationFeatureConfig(transferEnabled = false)
+    }
 }
 
 /**
@@ -61,5 +95,7 @@ private val offlineSignInModule: Module = module {
 val offlineWiring: List<Module> = listOf(
     offlineNoOpModule,
     offlineSignInModule,
+    offlineTransactionCreationModule,
+    offlineFirstRunModule,
     OfflineKoinApp().module(),
 )

@@ -14,6 +14,7 @@ fun anAccount(
     type: AccountType = AccountType.CASH,
     currencyCode: CurrencyCode = USD,
     balance: Money = Money.zero(),
+    archived: Boolean = false,
 ): Account = Account(
     id = id,
     workspaceId = workspaceId,
@@ -21,4 +22,5 @@ fun anAccount(
     type = type,
     currencyCode = currencyCode,
     balance = balance,
+    archived = archived,
 )
