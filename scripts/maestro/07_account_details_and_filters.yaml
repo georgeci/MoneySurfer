@@ -32,9 +32,11 @@ name: Account — Details and transaction filters
 
 - tapOn:
     text: "See all"
+# TransactionsByAccountScreen uses the account name as the toolbar title
+# (falls back to "Transactions" only when blank), and the "New" FAB is an
+# ExtendedFloatingActionButton whose label isn't surfaced as a11y text on
+# this Compose version. Assert on the per-account header + a tx row.
 - assertVisible:
-    text: "Transactions"
+    text: "Main Bank"
 - assertVisible:
     text: "Test expense"
-- assertVisible:
-    text: "New"

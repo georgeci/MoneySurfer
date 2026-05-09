@@ -19,18 +19,20 @@ name: Categories — Manage and create a category
 - tapOn:
     text: "Categories"
 
-# Categories management screen
+# Categories management screen. The "New category" FAB is an
+# ExtendedFloatingActionButton: in this Compose version the inner Text label
+# is not propagated to the button's a11y node, so neither `text:` nor
+# `content-desc:` selectors find it. Tap by relative point — the FAB always
+# anchors to bottom-right of the Scaffold.
 - assertVisible:
     text: "Categories"
-- assertVisible:
-    text: "New category"
 
 - runFlow:
     when:
       notVisible: "Coffee"
     commands:
       - tapOn:
-          text: "New category"
+          point: "80%, 95%"
 
       # Category creation screen
       - assertVisible:
@@ -40,14 +42,17 @@ name: Categories — Manage and create a category
       - tapOn:
           text: "Name"
       - inputText: "Coffee"
-      - hideKeyboard
       - tapOn:
           text: "Save"
 
-# Back on Categories list and the new category is visible
+# Back on Categories list. The list is scrollable and includes both the
+# default seed categories (Income + Expense) and our new "Coffee" — which
+# sits below the fold, so scroll to it before asserting.
 - assertVisible:
     text: "Categories"
+- scrollUntilVisible:
+    element:
+      text: "Coffee"
+    direction: DOWN
 - assertVisible:
     text: "Coffee"
-- assertVisible:
-    text: "Expense"

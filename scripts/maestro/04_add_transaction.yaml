@@ -18,7 +18,6 @@ name: Transaction — Add expense transaction
       - tapOn:
           text: "0.00"
       - inputText: "50"
-      - hideKeyboard
       - scrollUntilVisible:
           element:
             text: "Note"
