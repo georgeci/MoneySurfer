@@ -37,8 +37,6 @@ import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.utils.HandleSideEffect
 import moneysurfer.feature.settings.generated.resources.Res
 import moneysurfer.feature.settings.generated.resources.settings_about_brand
-import moneysurfer.uikit.generated.resources.Res as UikitRes
-import moneysurfer.uikit.generated.resources.uikit_app_icon
 import moneysurfer.feature.settings.generated.resources.settings_about_chip_license
 import moneysurfer.feature.settings.generated.resources.settings_about_chip_made_by
 import moneysurfer.feature.settings.generated.resources.settings_about_copyright
@@ -46,11 +44,11 @@ import moneysurfer.feature.settings.generated.resources.settings_about_github_su
 import moneysurfer.feature.settings.generated.resources.settings_about_github_title
 import moneysurfer.feature.settings.generated.resources.settings_about_title
 import moneysurfer.feature.settings.generated.resources.settings_about_version_format
+import moneysurfer.uikit.generated.resources.uikit_app_icon
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
-
-private const val GITHUB_URL = "https://github.com/georgeci/MoneySurfer2026"
+import moneysurfer.uikit.generated.resources.Res as UikitRes
 
 @Composable
 fun AboutScreen(
@@ -103,7 +101,7 @@ private fun AboutContent(
         ) {
             AppIdentityHero(version = state.appVersion)
 
-            GitHubLinkRow()
+            GitHubLinkRow(onClick = { onEvent(AboutEvent.OnGitHubClick) })
 
             Spacer(Modifier.height(8.dp))
             Text(
@@ -156,16 +154,15 @@ private fun AppIdentityHero(version: String) {
 }
 
 @Composable
-private fun GitHubLinkRow() {
+private fun GitHubLinkRow(onClick: () -> Unit) {
     val colors = AppTheme.materialColors
-    val uriHandler = LocalUriHandler.current
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp)
             .clip(RoundedCornerShape(16.dp))
             .background(colors.surfaceContainerHighest)
-            .clickable { uriHandler.openUri(GITHUB_URL) }
+            .clickable(onClick = onClick)
             .padding(horizontal = 16.dp, vertical = 14.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
