@@ -17,8 +17,9 @@ set -euo pipefail
 #       ASC_API_ISSUER_ID   uuid from App Store Connect → Users and Access → Keys
 #       ASC_API_KEY_PATH    path to AuthKey_<id>.p8 (relative to repo root or absolute).
 #                           Recommended: keystore/AuthKey_<id>.p8 (the keystore/ dir is gitignored).
+#       ASC_TEAM_ID         optional, default 92SLHZAN8L. Used to substitute into ExportOptions.plist.
 #     Env vars override local.properties. The .p8 is copied into
-#     ~/.appstoreconnect/private_keys/ so altool can find it.
+#     ~/.appstoreconnect/private_keys/ with mode 0600 so altool can find it.
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 
@@ -45,13 +46,28 @@ case "$target" in
     echo "Unknown target: $target (expected: main | offline)"; exit 2 ;;
 esac
 
+# Load fallbacks from local.properties (env vars take precedence). Done up
+# front so ASC_TEAM_ID can be substituted into ExportOptions.plist below.
+local_props="$REPO_ROOT/local.properties"
+read_prop() {
+  [[ -f "$local_props" ]] || return 0
+  awk -F= -v k="$1" '$1==k { sub(/^[ \t]+/,"",$2); sub(/[ \t]+$/,"",$2); print $2; exit }' "$local_props"
+}
+: "${ASC_API_KEY_ID:=$(read_prop ASC_API_KEY_ID)}"
+: "${ASC_API_ISSUER_ID:=$(read_prop ASC_API_ISSUER_ID)}"
+: "${ASC_API_KEY_PATH:=$(read_prop ASC_API_KEY_PATH)}"
+: "${ASC_TEAM_ID:=$(read_prop ASC_TEAM_ID)}"
+: "${ASC_TEAM_ID:=92SLHZAN8L}"
+
 ts="$(date +%Y%m%d-%H%M%S)"
 build_dir="$REPO_ROOT/build/ios/$scheme/$ts"
 archive_path="$build_dir/$scheme.xcarchive"
 export_dir="$build_dir/export"
-export_options="$REPO_ROOT/scripts/ios/ExportOptions.plist"
+export_options_template="$REPO_ROOT/scripts/ios/ExportOptions.plist"
+export_options="$build_dir/ExportOptions.plist"
 
 mkdir -p "$build_dir"
+sed "s/__TEAM_ID__/$ASC_TEAM_ID/" "$export_options_template" > "$export_options"
 
 echo "▸ Archiving $scheme (Release)…"
 xcodebuild \
@@ -79,16 +95,6 @@ if [[ "$upload" != true ]]; then
   exit 0
 fi
 
-# Load fallbacks from local.properties (env vars take precedence).
-local_props="$REPO_ROOT/local.properties"
-read_prop() {
-  [[ -f "$local_props" ]] || return 0
-  awk -F= -v k="$1" '$1==k { sub(/^[ \t]+/,"",$2); sub(/[ \t]+$/,"",$2); print $2; exit }' "$local_props"
-}
-: "${ASC_API_KEY_ID:=$(read_prop ASC_API_KEY_ID)}"
-: "${ASC_API_ISSUER_ID:=$(read_prop ASC_API_ISSUER_ID)}"
-: "${ASC_API_KEY_PATH:=$(read_prop ASC_API_KEY_PATH)}"
-
 : "${ASC_API_KEY_ID:?ASC_API_KEY_ID missing (set in local.properties or env)}"
 : "${ASC_API_ISSUER_ID:?ASC_API_ISSUER_ID missing (set in local.properties or env)}"
 
@@ -101,7 +107,10 @@ if [[ -n "${ASC_API_KEY_PATH:-}" ]]; then
   [[ -f "$ASC_API_KEY_PATH" ]] || { echo "ASC_API_KEY_PATH not found: $ASC_API_KEY_PATH"; exit 1; }
   keys_dir="$HOME/.appstoreconnect/private_keys"
   mkdir -p "$keys_dir"
-  cp -f "$ASC_API_KEY_PATH" "$keys_dir/AuthKey_${ASC_API_KEY_ID}.p8"
+  chmod 700 "$keys_dir"
+  dest="$keys_dir/AuthKey_${ASC_API_KEY_ID}.p8"
+  cp -f "$ASC_API_KEY_PATH" "$dest"
+  chmod 600 "$dest"
 fi
 
 echo "▸ Uploading to App Store Connect…"
