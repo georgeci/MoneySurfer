@@ -16,7 +16,6 @@ name: Transaction — Add income and filter list
       - tapOn:
           text: "0.00"
       - inputText: "150"
-      - hideKeyboard
       - scrollUntilVisible:
           element:
             text: "Note"

@@ -5,8 +5,11 @@ name: Auth — Sign in with test user
 # `feature/login/.../SignInScreen.kt::SignInTestTags`, exposed to Maestro via
 # `Modifier.semantics { testTagsAsResourceId = true }` on the screen root.
 
+# Sign-in smoke test must start logged-out — wipe app data so a leftover
+# session from an earlier flow (or a previous suite run on the same AVD)
+# can't skip the screen we want to validate.
 - launchApp:
-    clearState: false
+    clearState: true
 
 - assertVisible:
     id: "signIn:root"

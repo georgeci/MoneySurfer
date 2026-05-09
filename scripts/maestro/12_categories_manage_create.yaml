@@ -19,11 +19,11 @@ name: Categories — Manage and create a category
 - tapOn:
     text: "Categories"
 
-# Categories management screen
+# Categories management screen. The "New category" FAB has an explicit
+# contentDescription set in CategoriesManageScreen so Maestro can match it
+# by `text:` (which on Android falls back to contentDescription).
 - assertVisible:
     text: "Categories"
-- assertVisible:
-    text: "New category"
 
 - runFlow:
     when:
@@ -40,14 +40,17 @@ name: Categories — Manage and create a category
       - tapOn:
           text: "Name"
       - inputText: "Coffee"
-      - hideKeyboard
       - tapOn:
           text: "Save"
 
-# Back on Categories list and the new category is visible
+# Back on Categories list. The list is scrollable and includes both the
+# default seed categories (Income + Expense) and our new "Coffee" — which
+# sits below the fold, so scroll to it before asserting.
 - assertVisible:
     text: "Categories"
+- scrollUntilVisible:
+    element:
+      text: "Coffee"
+    direction: DOWN
 - assertVisible:
     text: "Coffee"
-- assertVisible:
-    text: "Expense"

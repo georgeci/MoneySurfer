@@ -19,6 +19,31 @@ CLI runs if you use it.
 
 If `allure`/`maestro` aren't on the Gradle daemon's PATH (common when daemon was started by an IDE), set `ALLURE_BIN` / `MAESTRO_BIN` to absolute paths or run `./gradlew --stop` and re-launch from a shell that has them. The build script also probes `/opt/homebrew/bin`, `/usr/local/bin`, `/usr/bin`.
 
+### Dedicated AVD for Maestro
+
+Maestro Android needs a clean AVD whose IME does not interfere with
+`inputText` (Gboard on Pixel images can drift into its own theme picker
+mid-flow). One-time setup creates a headless AOSP-ATD AVD that mirrors the
+image used by `reactivecircus/android-emulator-runner` in nightly CI:
+
+```bash
+# One-time: create the AVD (named MoneySurferMaestro). Idempotent.
+scripts/maestro/avd-create.sh
+
+# Before each Maestro run: boot it headless. Detached, returns once booted.
+scripts/maestro/avd-start.sh
+
+# Run flows (firebase emulator + APK install + maestro all in one).
+./gradlew qaMaestroAndroid
+```
+
+The AVD has `hw.keyboard=yes`, so `inputText` is delivered as hardware key
+events without showing a soft keyboard. Override the name/api/device with
+`MAESTRO_AVD_NAME`, `MAESTRO_AVD_API`, `MAESTRO_AVD_DEVICE` if you ever need
+a second profile — defaults match nightly CI (`pixel_6`, API 34, `aosp_atd`).
+CI does the same thing through the `reactivecircus` action, so no extra
+wiring is needed there.
+
 ## Firebase bootstrap (emulator)
 
 Bootstrap scripts live in `scripts/firebase/`:

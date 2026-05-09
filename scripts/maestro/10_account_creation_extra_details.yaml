@@ -19,11 +19,9 @@ name: Account — Create card account with extra details
       - tapOn:
           text: "Opening balance"
       - inputText: "123.45"
-      - hideKeyboard
       - tapOn:
           text: "IBAN"
       - inputText: "ES9121000418450200051332"
-      - hideKeyboard
       - tapOn:
           text: "Save"
 

@@ -23,7 +23,10 @@ name: Workspace — Create and select test workspace
       - tapOn:
           text: "Workspace name"
       - inputText: "Test Workspace"
-      - hideKeyboard
+      # Don't hideKeyboard: the AVD runs with hw.keyboard=yes, so no soft IME
+      # is shown; Maestro then falls back to a BACK keypress which dismisses
+      # the creation screen. The "Create" action lives in the TopAppBar so
+      # the (absent) keyboard never overlaps it anyway.
       - tapOn:
           text: "Create"
       - tapOn:
