@@ -15,7 +15,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		66EE562EB3C06377DC657E21 /* MoneySurfer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MoneySurfer.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		66EE562EB3C06377DC657E21 /* MoneySurfer Dev.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "MoneySurfer Dev.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -63,7 +63,7 @@
 		BCF969DDAEDCCC52C7290E87 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				66EE562EB3C06377DC657E21 /* MoneySurfer.app */,
+				66EE562EB3C06377DC657E21 /* MoneySurfer Dev.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -107,7 +107,7 @@
 				F1A00000A555555555555555 /* FirebaseCrashlytics */,
 			);
 			productName = iosApp;
-			productReference = 66EE562EB3C06377DC657E21 /* MoneySurfer.app */;
+			productReference = 66EE562EB3C06377DC657E21 /* MoneySurfer Dev.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -177,28 +177,6 @@
 			shellPath = /bin/sh;
 			shellScript = "if [ \"YES\" = \"$OVERRIDE_KOTLIN_BUILD_IDE_SUPPORTED\" ]; then\n  echo \"Skipping Gradle build task invocation due to OVERRIDE_KOTLIN_BUILD_IDE_SUPPORTED environment variable set to \\\"YES\\\"\"\n  exit 0\nfi\ncd \"$SRCROOT/..\"\n./gradlew :composeApp:embedAndSignAppleFrameworkForXcode\n";
 		};
-		F1B0000077777777CAFEBABE /* Copy Firebase plist (Dev/Prod) */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"$(SRCROOT)/scripts/copy-firebase-plist.sh",
-				"$(SRCROOT)/Firebase/Dev/GoogleService-Info.plist",
-				"$(SRCROOT)/Firebase/Prod/GoogleService-Info.plist",
-			);
-			name = "Copy Firebase plist (Dev/Prod)";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/GoogleService-Info.plist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"$SRCROOT/scripts/copy-firebase-plist.sh\"\n";
-		};
 		F1A000006666666666666666 /* Upload Crashlytics dSYMs */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -221,6 +199,28 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "if [ \"YES\" = \"$SKIP_CRASHLYTICS_UPLOAD\" ]; then\n  echo \"Skipping Crashlytics dSYM upload\"\n  exit 0\nfi\n\"${BUILD_DIR%/Build/*}/SourcePackages/checkouts/firebase-ios-sdk/Crashlytics/run\"\n";
+		};
+		F1B0000077777777CAFEBABE /* Copy Firebase plist (Dev/Prod) */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/scripts/copy-firebase-plist.sh",
+				"$(SRCROOT)/Firebase/Dev/GoogleService-Info.plist",
+				"$(SRCROOT)/Firebase/Prod/GoogleService-Info.plist",
+			);
+			name = "Copy Firebase plist (Dev/Prod)";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/GoogleService-Info.plist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"$SRCROOT/scripts/copy-firebase-plist.sh\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
