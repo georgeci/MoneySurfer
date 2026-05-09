@@ -5,6 +5,7 @@ import com.georgeci.moneysurfer.domain.backup.BackupExporter
 import com.georgeci.moneysurfer.domain.backup.BackupImporter
 import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
 import com.georgeci.moneysurfer.utils.MviViewModel
+import kotlinx.coroutines.CancellationException
 import okio.BufferedSink
 import okio.BufferedSource
 import org.koin.core.annotation.KoinViewModel
@@ -55,6 +56,9 @@ class BackupViewModel(
         updateState { copy(phase = BackupPhase.Exporting) }
         launch(
             onError = { error ->
+                // MviViewModel.launch catches Exception (including cancellation);
+                // rethrow so a cleared ViewModel doesn't surface as a fake error.
+                if (error is CancellationException) throw error
                 updateState { copy(phase = BackupPhase.Idle) }
                 postSideEffect(BackupEffect.Notify(BackupNotice.fromError(error)))
                 runCatching { sink.close() }
@@ -71,6 +75,7 @@ class BackupViewModel(
         updateState { copy(phase = BackupPhase.Importing) }
         launch(
             onError = { error ->
+                if (error is CancellationException) throw error
                 updateState { copy(phase = BackupPhase.Idle) }
                 postSideEffect(BackupEffect.Notify(BackupNotice.fromError(error)))
                 runCatching { source.close() }
