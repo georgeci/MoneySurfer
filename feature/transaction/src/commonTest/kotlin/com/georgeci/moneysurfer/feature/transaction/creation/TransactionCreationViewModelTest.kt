@@ -1,5 +1,6 @@
 package com.georgeci.moneysurfer.feature.transaction.creation
 
+import androidx.lifecycle.viewModelScope
 import com.georgeci.moneysurfer.domain.auth.InMemorySessionPointers
 import com.georgeci.moneysurfer.domain.fixtures.EUR
 import com.georgeci.moneysurfer.domain.fixtures.USD
@@ -37,6 +38,7 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
@@ -76,18 +78,23 @@ class TransactionCreationViewModelTest : StringSpec({
                 categoryRepository.seed(expenseCategory)
             }
             val vm = fixture.createViewModel(prefillAccount = acc.id)
+            try {
+                vm.awaitContent()
 
-            vm.onEvent(TransactionCreationEvent.OnAmountChanged("80"))
-            vm.onEvent(TransactionCreationEvent.OnSaveClick)
+                vm.onEvent(TransactionCreationEvent.OnAmountChanged("80"))
+                vm.onEvent(TransactionCreationEvent.OnSaveClick)
 
-            val saved = fixture.transactionRepository.inserted.single()
-            saved.type shouldBe TransactionType.EXPENSE
-            saved.money shouldBe 80.dollars
-            saved.currencyCode shouldBe USD
-            saved.accountId shouldBe acc.id
-            saved.categoryId shouldBe expenseCategory.id
+                val saved = fixture.transactionRepository.inserted.single()
+                saved.type shouldBe TransactionType.EXPENSE
+                saved.money shouldBe 80.dollars
+                saved.currencyCode shouldBe USD
+                saved.accountId shouldBe acc.id
+                saved.categoryId shouldBe expenseCategory.id
 
-            fixture.accountRepository.byId[acc.id]!!.balance shouldBe 420.dollars
+                fixture.accountRepository.byId[acc.id]!!.balance shouldBe 420.dollars
+            } finally {
+                vm.viewModelScope.cancel()
+            }
         }
     }
 
@@ -110,15 +117,20 @@ class TransactionCreationViewModelTest : StringSpec({
                 categoryRepository.seed(expenseCategory, incomeCategory)
             }
             val vm = fixture.createViewModel()
+            try {
+                vm.awaitContent()
 
-            vm.onEvent(TransactionCreationEvent.OnTypeChanged(TransactionTypeUi.Income))
-            vm.onEvent(TransactionCreationEvent.OnAmountChanged("125"))
-            vm.onEvent(TransactionCreationEvent.OnSaveClick)
+                vm.onEvent(TransactionCreationEvent.OnTypeChanged(TransactionTypeUi.Income))
+                vm.onEvent(TransactionCreationEvent.OnAmountChanged("125"))
+                vm.onEvent(TransactionCreationEvent.OnSaveClick)
 
-            val saved = fixture.transactionRepository.inserted.single()
-            saved.type shouldBe TransactionType.INCOME
-            saved.money shouldBe 125.dollars
-            saved.categoryId shouldBe incomeCategory.id
+                val saved = fixture.transactionRepository.inserted.single()
+                saved.type shouldBe TransactionType.INCOME
+                saved.money shouldBe 125.dollars
+                saved.categoryId shouldBe incomeCategory.id
+            } finally {
+                vm.viewModelScope.cancel()
+            }
         }
     }
 
@@ -146,24 +158,29 @@ class TransactionCreationViewModelTest : StringSpec({
                 categoryRepository.seed(expenseCategory)
             }
             val vm = fixture.createViewModel()
+            try {
+                vm.awaitContent()
 
-            vm.onEvent(TransactionCreationEvent.OnTypeChanged(TransactionTypeUi.Transfer))
-            vm.onEvent(TransactionCreationEvent.OnAmountChanged("150"))
-            vm.onEvent(TransactionCreationEvent.OnSaveClick)
+                vm.onEvent(TransactionCreationEvent.OnTypeChanged(TransactionTypeUi.Transfer))
+                vm.onEvent(TransactionCreationEvent.OnAmountChanged("150"))
+                vm.onEvent(TransactionCreationEvent.OnSaveClick)
 
-            val txns = fixture.transactionRepository.inserted
-            txns.size shouldBe 2
-            val expense = txns.single { it.type == TransactionType.EXPENSE }
-            val income = txns.single { it.type == TransactionType.INCOME }
-            expense.accountId shouldBe from.id
-            income.accountId shouldBe to.id
-            expense.money shouldBe 150.dollars
-            income.money shouldBe 150.dollars
-            expense.transferId shouldNotBe null
-            expense.transferId shouldBe income.transferId
+                val txns = fixture.transactionRepository.inserted
+                txns.size shouldBe 2
+                val expense = txns.single { it.type == TransactionType.EXPENSE }
+                val income = txns.single { it.type == TransactionType.INCOME }
+                expense.accountId shouldBe from.id
+                income.accountId shouldBe to.id
+                expense.money shouldBe 150.dollars
+                income.money shouldBe 150.dollars
+                expense.transferId shouldNotBe null
+                expense.transferId shouldBe income.transferId
 
-            fixture.accountRepository.byId[from.id]!!.balance shouldBe 850.dollars
-            fixture.accountRepository.byId[to.id]!!.balance shouldBe 150.dollars
+                fixture.accountRepository.byId[from.id]!!.balance shouldBe 850.dollars
+                fixture.accountRepository.byId[to.id]!!.balance shouldBe 150.dollars
+            } finally {
+                vm.viewModelScope.cancel()
+            }
         }
     }
 
@@ -191,24 +208,29 @@ class TransactionCreationViewModelTest : StringSpec({
                 categoryRepository.seed(expenseCategory)
             }
             val vm = fixture.createViewModel()
+            try {
+                vm.awaitContent()
 
-            vm.onEvent(TransactionCreationEvent.OnTypeChanged(TransactionTypeUi.Transfer))
-            // The VM may seed fromAccount=first and toAccount=second; force the order explicitly.
-            fixture.pickFromAccount(vm, from.id)
-            fixture.pickToAccount(vm, to.id)
-            vm.onEvent(TransactionCreationEvent.OnAmountChanged("100"))
-            vm.onEvent(TransactionCreationEvent.OnToAmountChanged("92"))
-            vm.onEvent(TransactionCreationEvent.OnSaveClick)
+                vm.onEvent(TransactionCreationEvent.OnTypeChanged(TransactionTypeUi.Transfer))
+                // The VM may seed fromAccount=first and toAccount=second; force the order explicitly.
+                fixture.pickFromAccount(vm, from.id)
+                fixture.pickToAccount(vm, to.id)
+                vm.onEvent(TransactionCreationEvent.OnAmountChanged("100"))
+                vm.onEvent(TransactionCreationEvent.OnToAmountChanged("92"))
+                vm.onEvent(TransactionCreationEvent.OnSaveClick)
 
-            val expense = fixture.transactionRepository.inserted.single { it.type == TransactionType.EXPENSE }
-            val income = fixture.transactionRepository.inserted.single { it.type == TransactionType.INCOME }
-            expense.money shouldBe 100.dollars
-            expense.currencyCode shouldBe USD
-            income.money shouldBe 92.dollars
-            income.currencyCode shouldBe EUR
+                val expense = fixture.transactionRepository.inserted.single { it.type == TransactionType.EXPENSE }
+                val income = fixture.transactionRepository.inserted.single { it.type == TransactionType.INCOME }
+                expense.money shouldBe 100.dollars
+                expense.currencyCode shouldBe USD
+                income.money shouldBe 92.dollars
+                income.currencyCode shouldBe EUR
 
-            fixture.accountRepository.byId[from.id]!!.balance shouldBe 400.dollars
-            fixture.accountRepository.byId[to.id]!!.balance shouldBe 92.dollars
+                fixture.accountRepository.byId[from.id]!!.balance shouldBe 400.dollars
+                fixture.accountRepository.byId[to.id]!!.balance shouldBe 92.dollars
+            } finally {
+                vm.viewModelScope.cancel()
+            }
         }
     }
 
@@ -218,14 +240,17 @@ class TransactionCreationViewModelTest : StringSpec({
             val vm = fixture.createViewModel(
                 featureConfig = TransactionCreationFeatureConfig(transferEnabled = false),
             )
+            try {
+                vm.awaitContent()
+                vm.onEvent(TransactionCreationEvent.OnTypeChanged(TransactionTypeUi.Transfer))
 
-            vm.onEvent(TransactionCreationEvent.OnTypeChanged(TransactionTypeUi.Transfer))
-
-            val state = vm.first { it is TransactionCreationState.Content }
-                as TransactionCreationState.Content
-            state.transferEnabled shouldBe false
-            state.isTransfer shouldBe false
-            state.type shouldBe TransactionTypeUi.Expense
+                val state = vm.awaitContent()
+                state.transferEnabled shouldBe false
+                state.isTransfer shouldBe false
+                state.type shouldBe TransactionTypeUi.Expense
+            } finally {
+                vm.viewModelScope.cancel()
+            }
         }
     }
 
@@ -235,16 +260,25 @@ class TransactionCreationViewModelTest : StringSpec({
             val vm = fixture.createViewModel(
                 featureConfig = TransactionCreationFeatureConfig(transferEnabled = true),
             )
+            try {
+                vm.awaitContent()
+                vm.onEvent(TransactionCreationEvent.OnTypeChanged(TransactionTypeUi.Transfer))
 
-            vm.onEvent(TransactionCreationEvent.OnTypeChanged(TransactionTypeUi.Transfer))
-
-            val state = vm.first { it is TransactionCreationState.Content }
-                as TransactionCreationState.Content
-            state.transferEnabled shouldBe true
-            state.type shouldBe TransactionTypeUi.Transfer
+                val state = vm.first {
+                    it is TransactionCreationState.Content && it.type == TransactionTypeUi.Transfer
+                } as TransactionCreationState.Content
+                state.transferEnabled shouldBe true
+            } finally {
+                vm.viewModelScope.cancel()
+            }
         }
     }
 })
+
+/** Wait until the VM finishes its async `loadData()` and exposes a `Content` state.
+ * Sending events before that point would hit the `Loading` reducers and silently no-op. */
+private suspend fun TransactionCreationViewModel.awaitContent(): TransactionCreationState.Content =
+    first { it is TransactionCreationState.Content } as TransactionCreationState.Content
 
 private class Fixture(workspaceId: WorkspaceId) {
     val accountRepository = FakeAccountRepository()

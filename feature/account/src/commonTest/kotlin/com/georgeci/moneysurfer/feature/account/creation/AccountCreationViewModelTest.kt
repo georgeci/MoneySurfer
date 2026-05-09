@@ -1,5 +1,6 @@
 package com.georgeci.moneysurfer.feature.account.creation
 
+import androidx.lifecycle.viewModelScope
 import app.cash.turbine.test
 import com.georgeci.moneysurfer.domain.auth.InMemorySessionPointers
 import com.georgeci.moneysurfer.domain.fixtures.EUR
@@ -27,8 +28,10 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -51,19 +54,24 @@ class AccountCreationViewModelTest : StringSpec({
         runTest {
             val fixture = Fixture(workspaceId = ws)
             val vm = fixture.createViewModel()
+            try {
+                vm.awaitCurrencies()
 
-            vm.onEvent(AccountCreationEvent.OnNameChanged("Wallet"))
-            vm.onEvent(AccountCreationEvent.OnCurrencyChanged(EUR))
-            vm.onEvent(AccountCreationEvent.OnSaveClick)
+                vm.onEvent(AccountCreationEvent.OnNameChanged("Wallet"))
+                vm.onEvent(AccountCreationEvent.OnCurrencyChanged(EUR))
+                vm.onEvent(AccountCreationEvent.OnSaveClick)
 
-            fixture.accountRepository.inserted.size shouldBe 1
-            val saved = fixture.accountRepository.inserted.single()
-            saved.name shouldBe "Wallet"
-            saved.currencyCode shouldBe EUR
-            saved.workspaceId shouldBe ws
-            saved.balance shouldBe Money.zero()
+                fixture.accountRepository.inserted.size shouldBe 1
+                val saved = fixture.accountRepository.inserted.single()
+                saved.name shouldBe "Wallet"
+                saved.currencyCode shouldBe EUR
+                saved.workspaceId shouldBe ws
+                saved.balance shouldBe Money.zero()
 
-            fixture.transactionRepository.inserted.shouldBeEmpty()
+                fixture.transactionRepository.inserted.shouldBeEmpty()
+            } finally {
+                vm.viewModelScope.cancel()
+            }
         }
     }
 
@@ -71,21 +79,26 @@ class AccountCreationViewModelTest : StringSpec({
         runTest {
             val fixture = Fixture(workspaceId = ws)
             val vm = fixture.createViewModel()
+            try {
+                vm.awaitCurrencies()
 
-            vm.onEvent(AccountCreationEvent.OnNameChanged("Savings"))
-            vm.onEvent(AccountCreationEvent.OnCurrencyChanged(RUB))
-            vm.onEvent(AccountCreationEvent.OnBalanceChanged("250"))
-            vm.onEvent(AccountCreationEvent.OnSaveClick)
+                vm.onEvent(AccountCreationEvent.OnNameChanged("Savings"))
+                vm.onEvent(AccountCreationEvent.OnCurrencyChanged(RUB))
+                vm.onEvent(AccountCreationEvent.OnBalanceChanged("250"))
+                vm.onEvent(AccountCreationEvent.OnSaveClick)
 
-            val savedAccount = fixture.accountRepository.inserted.single()
-            savedAccount.currencyCode shouldBe RUB
+                val savedAccount = fixture.accountRepository.inserted.single()
+                savedAccount.currencyCode shouldBe RUB
 
-            val openingTx = fixture.transactionRepository.inserted.single()
-            openingTx.type shouldBe TransactionType.OPENING_BALANCE
-            openingTx.money shouldBe Money.fromMajor(250)
-            openingTx.currencyCode shouldBe RUB
-            openingTx.accountId shouldBe savedAccount.id
-            openingTx.categoryId shouldBe null
+                val openingTx = fixture.transactionRepository.inserted.single()
+                openingTx.type shouldBe TransactionType.OPENING_BALANCE
+                openingTx.money shouldBe Money.fromMajor(250)
+                openingTx.currencyCode shouldBe RUB
+                openingTx.accountId shouldBe savedAccount.id
+                openingTx.categoryId shouldBe null
+            } finally {
+                vm.viewModelScope.cancel()
+            }
         }
     }
 
@@ -93,12 +106,17 @@ class AccountCreationViewModelTest : StringSpec({
         runTest {
             val fixture = Fixture(workspaceId = ws)
             val vm = fixture.createViewModel()
+            try {
+                vm.awaitCurrencies()
 
-            vm.onEvent(AccountCreationEvent.OnNameChanged("   "))
-            vm.onEvent(AccountCreationEvent.OnSaveClick)
+                vm.onEvent(AccountCreationEvent.OnNameChanged("   "))
+                vm.onEvent(AccountCreationEvent.OnSaveClick)
 
-            fixture.accountRepository.inserted.shouldBeEmpty()
-            fixture.transactionRepository.inserted.shouldBeEmpty()
+                fixture.accountRepository.inserted.shouldBeEmpty()
+                fixture.transactionRepository.inserted.shouldBeEmpty()
+            } finally {
+                vm.viewModelScope.cancel()
+            }
         }
     }
 
@@ -106,19 +124,28 @@ class AccountCreationViewModelTest : StringSpec({
         runTest {
             val fixture = Fixture(workspaceId = ws)
             val vm = fixture.createViewModel()
+            try {
+                val ready = vm.awaitCurrencies()
+                ready.currencies.map { it.code } shouldBe listOf(USD, EUR, RUB)
 
-            (vm.value as AccountCreationState.Content).currencies.map { it.code } shouldBe
-                listOf(USD, EUR, RUB)
-
-            vm.sideEffects.effectFlow.test {
-                vm.onEvent(AccountCreationEvent.OnNameChanged("X"))
-                vm.onEvent(AccountCreationEvent.OnSaveClick)
-                awaitItem().shouldBeInstanceOf<AccountCreationEffect.NavigateBack>()
-                cancelAndIgnoreRemainingEvents()
+                vm.sideEffects.effectFlow.test {
+                    vm.onEvent(AccountCreationEvent.OnNameChanged("X"))
+                    vm.onEvent(AccountCreationEvent.OnSaveClick)
+                    awaitItem().shouldBeInstanceOf<AccountCreationEffect.NavigateBack>()
+                    cancelAndIgnoreRemainingEvents()
+                }
+            } finally {
+                vm.viewModelScope.cancel()
             }
         }
     }
 })
+
+/** Wait until the async `loadCurrencies()` populates the currency list — the only piece of
+ * VM init that's launched in `viewModelScope`. Returns the resolved [Content] state. */
+private suspend fun AccountCreationViewModel.awaitCurrencies(): AccountCreationState.Content =
+    first { it is AccountCreationState.Content && it.currencies.isNotEmpty() }
+        as AccountCreationState.Content
 
 private fun List<*>.shouldBeEmpty() {
     if (isNotEmpty()) error("Expected empty list, got $this")

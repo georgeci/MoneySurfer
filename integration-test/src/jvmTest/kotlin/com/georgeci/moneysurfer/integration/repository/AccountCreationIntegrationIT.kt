@@ -61,10 +61,12 @@ class AccountCreationIntegrationIT : StringSpec({
         )
 
         val rows = stack.accountRepository.getByWorkspaceId(DEFAULT_WORKSPACE_ID).first()
-        rows.map { it.id.value to it.currencyCode } shouldBe listOf(
-            "a-usd" to USD,
+        // Sort: AccountDao.getByWorkspaceId does not specify an ORDER BY, so we cannot
+        // depend on Room's iteration order being stable across versions/platforms.
+        rows.map { it.id.value to it.currencyCode }.sortedBy { it.first } shouldBe listOf(
             "a-eur" to EUR,
             "a-rub" to RUB,
+            "a-usd" to USD,
         )
     }
 
