@@ -19,9 +19,11 @@ set -euo pipefail
 #       ASC_API_KEY_PATH    path to AuthKey_<id>.p8 (relative to repo root or absolute).
 #                           Recommended: keystore/AuthKey_<id>.p8 (the keystore/ dir is gitignored).
 #       ASC_TEAM_ID         optional, default 92SLHZAN8L. Used to substitute into ExportOptions.plist.
-#       ASC_BUILD_NUMBER    optional. If set, runs `agvtool new-version -all` on the project
-#                           before archiving so CFBundleVersion is unique (TestFlight rejects
-#                           duplicates). Recommended in CI: ASC_BUILD_NUMBER=$(date +%s).
+#       ASC_BUILD_NUMBER    optional. If set, passed as APP_VERSION_CODE=<n> build-setting
+#                           override to xcodebuild archive so CFBundleVersion is unique
+#                           (TestFlight rejects duplicates). Working tree is not modified —
+#                           the xcconfig variable resolves at build time. Recommended in
+#                           CI: ASC_BUILD_NUMBER=$(date +%s).
 #     Env vars override local.properties. The .p8 is copied into
 #     ~/.appstoreconnect/private_keys/ with mode 0600 so altool can find it.
 
@@ -97,9 +99,10 @@ run_target() {
   mkdir -p "$build_dir"
   sed "s/__TEAM_ID__/$ASC_TEAM_ID/" "$export_options_template" > "$export_options"
 
+  local -a version_override=()
   if [[ -n "${ASC_BUILD_NUMBER:-}" ]]; then
-    echo "▸ [$scheme] Bumping CFBundleVersion → $ASC_BUILD_NUMBER (agvtool)…"
-    ( cd "$(dirname "$project")" && xcrun agvtool new-version -all "$ASC_BUILD_NUMBER" >/dev/null )
+    echo "▸ [$scheme] Overriding APP_VERSION_CODE → $ASC_BUILD_NUMBER (xcodebuild build-setting)…"
+    version_override=("APP_VERSION_CODE=$ASC_BUILD_NUMBER")
   fi
 
   echo "▸ [$scheme] Archiving (Release)…"
@@ -110,6 +113,7 @@ run_target() {
     -destination 'generic/platform=iOS' \
     -archivePath "$archive_path" \
     -allowProvisioningUpdates \
+    ${version_override[@]+"${version_override[@]}"} \
     archive
 
   echo "▸ [$scheme] Exporting App Store .ipa…"
