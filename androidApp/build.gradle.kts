@@ -63,6 +63,11 @@ run {
         }
         defaultToAppBundles.set(true)
         track.set("internal")
+        // App is still a draft in Play Console (never published). Until the
+        // first production release goes live, all uploaded releases must have
+        // status `draft`; `completed` (the GPP default) is rejected with
+        // "Only releases with status draft may be created on draft app."
+        releaseStatus.set(com.github.triplet.gradle.androidpublisher.ReleaseStatus.DRAFT)
     }
 }
 
