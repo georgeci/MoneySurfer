@@ -1,0 +1,1 @@
+Offline personal finance tracker with budgets, goals, and no internet access.

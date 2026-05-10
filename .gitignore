@@ -5,6 +5,7 @@
 xcuserdata
 !src/**/build/
 local.properties
+play-service-account*.json
 .idea
 .DS_Store
 captures
