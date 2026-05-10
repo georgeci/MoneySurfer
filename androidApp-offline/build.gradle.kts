@@ -1,12 +1,11 @@
 import com.android.build.api.artifact.SingleArtifact
-import java.util.Properties
 
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.android.built.in1.kotlin)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.kmpApp)
-    alias(libs.plugins.playPublisher)
+    id("ms.play-publisher")
 }
 
 android {
@@ -104,32 +103,6 @@ androidComponents {
         tasks.matching { it.name in consumerNames }.configureEach {
             dependsOn(verifyTask)
         }
-    }
-}
-
-// Google Play upload via gradle-play-publisher. Mirror of :androidApp config —
-// the offline listing has its own applicationId in Play Console, so the same
-// service-account must be granted access to both packages.
-run {
-    val credsPath = providers.environmentVariable("PLAY_SERVICE_ACCOUNT_JSON").orNull
-        ?: rootProject.file("local.properties").takeIf { it.exists() }?.let { f ->
-            Properties().apply { f.inputStream().use { load(it) } }
-                .getProperty("PLAY_SERVICE_ACCOUNT_JSON")
-        }
-        ?: "play-service-account.json"
-    val credsFile = rootProject.file(credsPath)
-    play {
-        enabled.set(credsFile.exists())
-        if (credsFile.exists()) {
-            serviceAccountCredentials.set(credsFile)
-        }
-        defaultToAppBundles.set(true)
-        track.set("internal")
-        // App is still a draft in Play Console (never published). Until the
-        // first production release goes live, all uploaded releases must have
-        // status `draft`; `completed` (the GPP default) is rejected with
-        // "Only releases with status draft may be created on draft app."
-        releaseStatus.set(com.github.triplet.gradle.androidpublisher.ReleaseStatus.DRAFT)
     }
 }
 

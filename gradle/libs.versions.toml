@@ -128,6 +128,8 @@ koalaplot-core = { module = "io.github.koalaplot:koalaplot-core", version.ref = 
 kmp-plugin = { module = "org.jetbrains.kotlin.multiplatform:org.jetbrains.kotlin.multiplatform.gradle.plugin", version.ref = "kotlin" }
 kmp-plugin-lib = { module = "com.android.kotlin.multiplatform.library:com.android.kotlin.multiplatform.library.gradle.plugin", version.ref = "agp" }
 easylauncher-plugin = { module = "com.project.starter:easylauncher", version.ref = "easylauncher" }
+play-publisher-plugin = { module = "com.github.triplet.gradle:play-publisher", version.ref = "play-publisher" }
+play-publisher-android = { module = "com.github.triplet.gradle:android-publisher", version.ref = "play-publisher" }
 
 [bundles]
 # Compose UI + lifecycle stack used by every feature module's commonMain.
@@ -192,4 +194,3 @@ cpd = { id = "de.aaschmid.cpd", version.ref = "cpd" }
 kmpApp = { id = "kmp.app" }
 moduleGraph = { id = "dev.iurysouza.modulegraph", version.ref = "moduleGraph" }
 easylauncher = { id = "com.starter.easylauncher", version.ref = "easylauncher" }
-playPublisher = { id = "com.github.triplet.play", version.ref = "play-publisher" }
