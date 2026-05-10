@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.android.built.in1.kotlin)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.kmpApp)
+    id("ms.play-publisher")
 }
 
 android {
@@ -87,10 +88,17 @@ androidComponents {
         // `tasks.matching { ... }.configureEach { ... }` instead of `afterEvaluate` so
         // the wiring participates in the configuration cache. `inputs.file(mergedManifest)`
         // already pulls in `process${capitalized}Manifest` as an upstream dependency.
+        // Wire into both the user-facing aggregator tasks AND the per-step bundle
+        // pipeline. gradle-play-publisher's `publishReleaseBundle` consumes the
+        // signed bundle artifact via the AGP Variant API directly — it never
+        // invokes `bundle<Variant>`, so without `package*Bundle` / `sign*Bundle`
+        // here a Play upload would skip the permission check.
         val consumerNames = setOf(
             "assemble$capitalized",
             "bundle$capitalized",
             "install$capitalized",
+            "package${capitalized}Bundle",
+            "sign${capitalized}Bundle",
         )
         tasks.matching { it.name in consumerNames }.configureEach {
             dependsOn(verifyTask)
