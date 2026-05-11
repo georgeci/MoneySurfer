@@ -493,28 +493,28 @@ jobs:
       # never managed to write `executor.json` (extremely rare given the
       # in-Gradle fallback in qa.gradle.kts → writeAllureFallbackMetadata).
       - name: Download Maestro Android Allure results (native)
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: allure-results-maestro-android
           path: allure-input-native/maestro-android
         continue-on-error: true
 
       - name: Download Maestro iOS Allure results (native)
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: allure-results-maestro-ios
           path: allure-input-native/maestro-ios
         continue-on-error: true
 
       - name: Download Maestro Android JUnit (fallback)
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: maestro-android-junit
           path: allure-input/maestro-android
         continue-on-error: true
 
       - name: Download Maestro iOS JUnit (fallback)
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: maestro-ios-junit
           path: allure-input/maestro-ios
