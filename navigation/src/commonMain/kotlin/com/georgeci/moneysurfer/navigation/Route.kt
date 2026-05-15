@@ -12,6 +12,9 @@ sealed interface Route : NavKey {
     data object SignIn : Route
 
     @Serializable
+    data object Legal : Route
+
+    @Serializable
     data class WorkspaceSelector(
         val showActions: Boolean = false,
     ) : Route

@@ -1,17 +1,19 @@
 package com.georgeci.moneysurfer.uikit.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -21,88 +23,88 @@ import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 
 /**
- * Centered placeholder for a screen or section that has loaded successfully but has no content
- * to show (empty list, no search results, nothing scheduled). For a failure use [SurferErrorState];
- * while data is still loading use [SurferShimmerBox].
- *
- * Fills the available space and centers its content; constrain it with [modifier] (e.g. a fixed
- * height) when embedding inside a section rather than a full screen.
- *
- * @param action optional call-to-action rendered below the body (e.g. "Add account").
+ * Centered empty-state block: an icon medallion, a title, an optional subtitle and an
+ * optional call-to-action. Use it when a list or screen has no content yet — the CTA is
+ * what turns a dead end into the next step the user should take.
  */
 @Composable
 fun SurferEmptyState(
     title: String,
     modifier: Modifier = Modifier,
-    body: String? = null,
+    subtitle: String? = null,
     icon: ImageVector = SurferIcons.Info,
-    action: SurferStateAction? = null,
+    actionLabel: String? = null,
+    onActionClick: (() -> Unit)? = null,
 ) {
-    Box(
-        modifier = modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center,
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(AppTheme.spacing.large),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(AppTheme.spacing.small),
     ) {
-        Column(
+        Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(AppTheme.spacing.large),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(AppTheme.spacing.medium),
+                .size(64.dp)
+                .clip(CircleShape)
+                .background(AppTheme.materialColors.surfaceContainerHighest),
+            contentAlignment = Alignment.Center,
         ) {
             Icon(
                 imageVector = icon,
                 contentDescription = null,
                 tint = AppTheme.materialColors.onSurfaceVariant,
-                modifier = Modifier.size(56.dp),
+                modifier = Modifier.size(28.dp),
             )
+        }
+        Text(
+            text = title,
+            style = AppTheme.typography.titleMedium,
+            color = AppTheme.materialColors.onSurface,
+            textAlign = TextAlign.Center,
+        )
+        if (subtitle != null) {
             Text(
-                text = title,
-                style = AppTheme.typography.titleMedium,
-                color = AppTheme.materialColors.onSurface,
+                text = subtitle,
+                style = AppTheme.typography.bodyMedium,
+                color = AppTheme.materialColors.onSurfaceVariant,
                 textAlign = TextAlign.Center,
             )
-            if (body != null) {
-                Text(
-                    text = body,
-                    style = AppTheme.typography.bodyMedium,
-                    color = AppTheme.materialColors.onSurfaceVariant,
-                    textAlign = TextAlign.Center,
-                )
-            }
-            if (action != null) {
-                SurferButton(
-                    text = action.label,
-                    onClick = action.onClick,
-                    style = SurferButtonStyle.Tonal,
-                )
-            }
+        }
+        if (actionLabel != null && onActionClick != null) {
+            SurferButton(
+                text = actionLabel,
+                onClick = onActionClick,
+                style = SurferButtonStyle.Tonal,
+                startIcon = SurferIcons.Add,
+                modifier = Modifier.padding(top = AppTheme.spacing.xSmall),
+            )
         }
     }
 }
-
-/** Label + handler for the optional CTA in [SurferEmptyState]. */
-data class SurferStateAction(
-    val label: String,
-    val onClick: () -> Unit,
-)
 
 @Preview
 @Composable
 private fun SurferEmptyStatePreview() {
     SurferComponentPreview {
         SurferEmptyState(
-            title = "No transactions yet",
-            body = "Add your first transaction to start tracking your spending.",
+            title = "No activity yet",
+            subtitle = "Transactions you log will show up here.",
             icon = SurferIcons.Receipt,
-            action = SurferStateAction(label = "Add transaction", onClick = {}),
+            actionLabel = "Add transaction",
+            onActionClick = {},
         )
     }
 }
 
 @Preview
 @Composable
-private fun SurferEmptyStateMinimalPreview() {
+private fun SurferEmptyStateNoActionPreview() {
     SurferComponentPreview {
-        SurferEmptyState(title = "No results found")
+        SurferEmptyState(
+            title = "Nothing scheduled",
+            subtitle = "Subscriptions and recurring bills will appear here.",
+            icon = SurferIcons.Event,
+        )
     }
 }

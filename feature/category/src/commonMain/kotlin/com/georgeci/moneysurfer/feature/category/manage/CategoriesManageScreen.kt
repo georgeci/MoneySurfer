@@ -2,6 +2,7 @@ package com.georgeci.moneysurfer.feature.category.manage
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -36,6 +37,9 @@ import moneysurfer.feature.category.generated.resources.categories_manage_add
 import moneysurfer.feature.category.generated.resources.categories_manage_empty
 import moneysurfer.feature.category.generated.resources.categories_manage_remove
 import moneysurfer.feature.category.generated.resources.categories_manage_title
+import moneysurfer.feature.category.generated.resources.category_creation_type_expense
+import moneysurfer.feature.category.generated.resources.category_creation_type_income
+import moneysurfer.feature.category.generated.resources.category_creation_type_transfer
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -128,8 +132,9 @@ private fun CategoriesManageContent(
                 .fillMaxSize()
                 .padding(top = padding.calculateTopPadding()),
             contentPadding = PaddingValues(
-                top = 4.dp,
-                bottom = padding.calculateBottomPadding() + 96.dp,
+                top = AppTheme.spacing.small,
+                bottom = padding.calculateBottomPadding() +
+                    AppTheme.spacing.xxxLarge + AppTheme.spacing.xLarge,
             ),
         ) {
             items(state.categories, key = { it.id.value }) { category ->
@@ -140,7 +145,10 @@ private fun CategoriesManageContent(
                     onRemoveClick = { onEvent(CategoriesManageEvent.OnRemoveCategoryClick(category.id)) },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 5.dp),
+                        .padding(
+                            horizontal = AppTheme.spacing.default,
+                            vertical = AppTheme.spacing.xSmall,
+                        ),
                 )
             }
         }
@@ -194,9 +202,12 @@ private fun CategoryManageCard(
         modifier = modifier.fillMaxWidth(),
         onClick = onClick,
     ) {
-        androidx.compose.foundation.layout.Row(
+        Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+            modifier = Modifier.padding(
+                horizontal = AppTheme.spacing.default,
+                vertical = AppTheme.spacing.medium,
+            ),
         ) {
             Text(
                 text = name,
@@ -205,7 +216,7 @@ private fun CategoryManageCard(
                 modifier = Modifier.weight(1f),
             )
             Text(
-                text = type.name.lowercase().replaceFirstChar { it.uppercase() },
+                text = categoryTypeLabel(type),
                 style = AppTheme.typography.bodySmall,
                 color = AppTheme.materialColors.onSurfaceVariant,
             )
@@ -213,11 +224,19 @@ private fun CategoryManageCard(
                 imageVector = SurferIcons.ChevronRight,
                 contentDescription = null,
                 tint = AppTheme.materialColors.onSurfaceVariant,
-                modifier = Modifier.padding(start = 8.dp),
+                modifier = Modifier.padding(start = AppTheme.spacing.small),
             )
         }
     }
 }
+
+@Composable
+private fun categoryTypeLabel(type: CategoryType): String =
+    when (type) {
+        CategoryType.EXPENSE -> stringResource(Res.string.category_creation_type_expense)
+        CategoryType.INCOME -> stringResource(Res.string.category_creation_type_income)
+        CategoryType.TRANSFER -> stringResource(Res.string.category_creation_type_transfer)
+    }
 
 @Preview
 @Composable

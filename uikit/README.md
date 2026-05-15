@@ -28,8 +28,8 @@ Theme switch: `AppTheme(containerStyle = SurferContainerStyle.Filled | Outlined 
 Use these for the three non-content states a screen or section can be in. All three are theme-only
 (`AppTheme` tokens) and ship with `@Preview` composables.
 
-- [SurferEmptyState.kt](src/commonMain/kotlin/com/georgeci/moneysurfer/uikit/components/SurferEmptyState.kt) — **loaded, but nothing to show** (empty list, no search results). Centered `icon` + `title` + optional `body` + optional `action` (`SurferStateAction` CTA). Fills available space; constrain via `modifier`.
-- [SurferErrorState.kt](src/commonMain/kotlin/com/georgeci/moneysurfer/uikit/components/SurferErrorState.kt) — **load failed.** Same layout as the empty state with `icon` / `title` / `body`, but the icon is tinted `materialColors.error`; pass `onRetry` (and optionally `retryLabel`) to render a retry button.
-- [SurferShimmer.kt](src/commonMain/kotlin/com/georgeci/moneysurfer/uikit/components/SurferShimmer.kt) — **still loading.** `Modifier.surferShimmer(shape)` paints an animated shimmer on any node; `SurferShimmerBox(height, shape)` is a ready-made clipped skeleton block. Size skeletons to match the eventual layout.
+- [SurferEmptyState.kt](src/commonMain/kotlin/com/georgeci/moneysurfer/uikit/components/SurferEmptyState.kt) — **loaded, but nothing to show** (empty list, no search results). Icon medallion + `title` + optional `subtitle` + optional CTA (`actionLabel` / `onActionClick`).
+- [SurferErrorState.kt](src/commonMain/kotlin/com/georgeci/moneysurfer/uikit/components/SurferErrorState.kt) — **load failed.** Same layout as the empty state with `icon` / `title` / `subtitle`, but the medallion uses `errorContainer`; pass `onRetry` (and optionally `retryLabel`) to render a retry button.
+- [SurferSkeleton.kt](src/commonMain/kotlin/com/georgeci/moneysurfer/uikit/components/SurferSkeleton.kt) — **still loading.** `SurferSkeleton(shape)` is a single shimmering placeholder block; `SurferSkeletonRow()` is a ready-made list-row skeleton. Size skeletons to match the eventual layout.
 
-Decision: not loaded yet → shimmer · loaded with content → real UI · loaded empty → `SurferEmptyState` · failed → `SurferErrorState`.
+Decision: not loaded yet → `SurferSkeleton` · loaded with content → real UI · loaded empty → `SurferEmptyState` · failed → `SurferErrorState`.

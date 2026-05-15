@@ -1,6 +1,8 @@
 package com.georgeci.moneysurfer.feature.dashboard
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,6 +24,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
+import com.georgeci.moneysurfer.uikit.components.SurferEmptyState
+import com.georgeci.moneysurfer.uikit.components.SurferSkeleton
+import com.georgeci.moneysurfer.uikit.components.SurferSkeletonRow
 import com.georgeci.moneysurfer.uikit.components.base.SurferDashboardToolbar
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbarAction
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
@@ -90,14 +95,30 @@ fun DashboardScreen(
     }
 }
 
+private const val DASHBOARD_SKELETON_ROWS = 4
+
 @Composable
 private fun DashboardLoading() {
     Scaffold(
         modifier = Modifier.surferSafeInsets(),
     ) { padding ->
-        androidx.compose.foundation.layout.Box(
-            modifier = Modifier.fillMaxSize().padding(padding),
-        )
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .padding(horizontal = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            SurferSkeleton(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp)
+                    .height(180.dp),
+            )
+            repeat(DASHBOARD_SKELETON_ROWS) {
+                SurferSkeletonRow()
+            }
+        }
     }
 }
 
@@ -210,23 +231,35 @@ private fun DashboardContent(
             }
 
             item(key = "recent") {
-                val bubbleBg = AppTheme.materialColors.primaryContainer
-                val bubbleFg = AppTheme.materialColors.onPrimaryContainer
-                SurferRecentTransactionsWidget(
-                    items = state.transactions.map { it.toWidgetItem(bubbleBg, bubbleFg) },
-                    title = stringResource(Res.string.dashboard_recent_title),
-                    seeAllLabel = stringResource(Res.string.dashboard_recent_see_all),
-                    onSeeAllClick = { onEvent(DashboardEvent.OnSeeAllTransactionsClick) },
-                    onItemClick = { item ->
-                        item.transactionId()?.let { onEvent(DashboardEvent.OnTransactionClick(it)) }
-                    },
-                    emptyTitle = stringResource(Res.string.dashboard_recent_empty_title),
-                    emptySubtitle = stringResource(Res.string.dashboard_recent_empty_subtitle),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
-                        .padding(vertical = 8.dp),
-                )
+                if (state.recentTransactionsEmpty) {
+                    SurferEmptyState(
+                        title = stringResource(Res.string.dashboard_recent_empty_title),
+                        subtitle = stringResource(Res.string.dashboard_recent_empty_subtitle),
+                        icon = SurferIcons.Receipt,
+                        actionLabel = stringResource(Res.string.dashboard_add_transaction),
+                        onActionClick = { onEvent(DashboardEvent.OnAddTransactionClick) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp)
+                            .padding(vertical = 8.dp),
+                    )
+                } else {
+                    val bubbleBg = AppTheme.materialColors.primaryContainer
+                    val bubbleFg = AppTheme.materialColors.onPrimaryContainer
+                    SurferRecentTransactionsWidget(
+                        items = state.transactions.map { it.toWidgetItem(bubbleBg, bubbleFg) },
+                        title = stringResource(Res.string.dashboard_recent_title),
+                        seeAllLabel = stringResource(Res.string.dashboard_recent_see_all),
+                        onSeeAllClick = { onEvent(DashboardEvent.OnSeeAllTransactionsClick) },
+                        onItemClick = { item ->
+                            item.transactionId()?.let { onEvent(DashboardEvent.OnTransactionClick(it)) }
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp)
+                            .padding(vertical = 8.dp),
+                    )
+                }
             }
         }
     }

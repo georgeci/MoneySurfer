@@ -1,6 +1,7 @@
 package com.georgeci.moneysurfer.offline.di
 
 import com.georgeci.moneysurfer.domain.OfflineBuildFlags
+import com.georgeci.moneysurfer.domain.SyncFeatureFlag
 import com.georgeci.moneysurfer.domain.firstrun.FirstRunSeeder
 import com.georgeci.moneysurfer.domain.repositories.AppConfigRepository
 import com.georgeci.moneysurfer.domain.repositories.AppVersionGate
@@ -73,6 +74,10 @@ private val offlineSignInModule: Module = module {
         )
     }
     single<OfflineBuildFlags> { OfflineBuildFlags(isOffline = true) }
+    // Offline build has no Firestore-backed sync implementation (no sync-surfer
+    // module); bind the flag for symmetry so feature code that injects it
+    // resolves cleanly in both builds.
+    single<SyncFeatureFlag> { SyncFeatureFlag(enabled = false) }
 }
 
 /**

@@ -14,9 +14,10 @@ import kotlin.test.assertTrue
 class SettingsStateOfflineTest {
 
     @Test
-    fun `online state shows sync, logout, members and pending invites rows`() {
+    fun `online state with sync enabled shows sync, logout, members and pending invites rows`() {
         val state = SettingsState(
             isOffline = false,
+            syncEnabled = true,
             currentWorkspaceId = WorkspaceId("ws-1"),
         )
 
@@ -24,6 +25,20 @@ class SettingsStateOfflineTest {
         assertTrue(state.showLogout)
         assertTrue(state.showWorkspaceMembers)
         assertTrue(state.showPendingInvites)
+    }
+
+    @Test
+    fun `online state with sync disabled hides only the sync section`() {
+        val state = SettingsState(
+            isOffline = false,
+            syncEnabled = false,
+            currentWorkspaceId = WorkspaceId("ws-1"),
+        )
+
+        assertFalse(state.showSyncSection, "sync feature flag off hides the sync section")
+        assertTrue(state.showLogout, "logout is gated by isOffline, not the sync flag")
+        assertTrue(state.showWorkspaceMembers, "members are gated by isOffline, not the sync flag")
+        assertTrue(state.showPendingInvites, "pending invites are gated by isOffline, not the sync flag")
     }
 
     @Test
