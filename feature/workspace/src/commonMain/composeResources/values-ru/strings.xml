@@ -112,7 +112,7 @@
 
     <!-- First-run currency picker -->
     <string name="first_run_currency_title">Выберите валюту</string>
-    <string name="first_run_currency_subtitle">Все балансы и отчёты используют эту валюту. Позже её можно изменить в настройках.</string>
+    <string name="first_run_currency_subtitle">Все балансы и отчёты в этом пространстве используют эту валюту.</string>
     <string name="first_run_currency_search_placeholder">Поиск валюты</string>
     <string name="first_run_currency_confirm">Продолжить</string>
     <string name="first_run_currency_error">Не удалось сохранить валюту. Попробуйте ещё раз.</string>

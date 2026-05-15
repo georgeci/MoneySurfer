@@ -112,7 +112,7 @@
 
     <!-- First-run currency picker -->
     <string name="first_run_currency_title">Choose your currency</string>
-    <string name="first_run_currency_subtitle">All balances and reports use this currency. You can change it later in Settings.</string>
+    <string name="first_run_currency_subtitle">All balances and reports in this workspace use this currency.</string>
     <string name="first_run_currency_search_placeholder">Search currency</string>
     <string name="first_run_currency_confirm">Continue</string>
     <string name="first_run_currency_error">Couldn't save your currency. Please try again.</string>
