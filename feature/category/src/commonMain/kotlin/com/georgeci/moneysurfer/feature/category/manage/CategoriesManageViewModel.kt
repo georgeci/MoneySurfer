@@ -4,7 +4,7 @@ import arrow.optics.optics
 import com.georgeci.moneysurfer.domain.model.Category
 import com.georgeci.moneysurfer.domain.primitives.CategoryId
 import com.georgeci.moneysurfer.domain.primitives.CategoryType
-import com.georgeci.moneysurfer.domain.repositories.CategoryRepository
+import com.georgeci.moneysurfer.domain.usecase.CreateCategoryUseCase
 import com.georgeci.moneysurfer.domain.usecase.DeleteCategoryUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetCategoriesUseCase
 import com.georgeci.moneysurfer.navigation.SnackbarController
@@ -18,7 +18,7 @@ import org.koin.core.annotation.KoinViewModel
 class CategoriesManageViewModel(
     private val getCategories: GetCategoriesUseCase,
     private val deleteCategory: DeleteCategoryUseCase,
-    private val categoryRepository: CategoryRepository,
+    private val createCategory: CreateCategoryUseCase,
     private val snackbar: SnackbarController,
 ) : MviViewModel<CategoriesManageState, CategoriesManageEvent, CategoriesManageEffect>(
     initialState = CategoriesManageState.Loading,
@@ -66,7 +66,7 @@ class CategoriesManageViewModel(
                 message = Res.string.categories_manage_deleted_snackbar,
                 messageArgs = listOf(deleted.name),
                 actionLabel = Res.string.categories_manage_delete_undo,
-                onAction = { categoryRepository.insert(deleted) },
+                onAction = { createCategory(deleted) },
             )
         }
     }

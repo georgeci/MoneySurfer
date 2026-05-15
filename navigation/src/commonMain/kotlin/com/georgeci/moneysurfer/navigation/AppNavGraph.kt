@@ -157,7 +157,8 @@ fun AppNavGraph(
                     message = message,
                     actionLabel = actionLabel,
                     withDismissAction = false,
-                    duration = SnackbarDuration.Short,
+                    // Action snackbars (Undo) stay longer so the user can read and reach the button.
+                    duration = if (actionLabel != null) SnackbarDuration.Long else SnackbarDuration.Short,
                 )
                 if (result == SnackbarResult.ActionPerformed) {
                     request.onAction?.invoke()

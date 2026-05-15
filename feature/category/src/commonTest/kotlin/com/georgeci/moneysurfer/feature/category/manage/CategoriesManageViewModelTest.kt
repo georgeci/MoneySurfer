@@ -9,6 +9,7 @@ import com.georgeci.moneysurfer.domain.model.Category
 import com.georgeci.moneysurfer.domain.primitives.CategoryId
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 import com.georgeci.moneysurfer.domain.repositories.CategoryRepository
+import com.georgeci.moneysurfer.domain.usecase.CreateCategoryUseCase
 import com.georgeci.moneysurfer.domain.usecase.DeleteCategoryUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetCategoriesUseCase
 import com.georgeci.moneysurfer.navigation.SnackbarController
@@ -92,7 +93,7 @@ private fun newViewModel(
     return CategoriesManageViewModel(
         getCategories = GetCategoriesUseCase(repo, session),
         deleteCategory = DeleteCategoryUseCase(repo),
-        categoryRepository = repo,
+        createCategory = CreateCategoryUseCase(repo),
         snackbar = snackbar,
     )
 }
