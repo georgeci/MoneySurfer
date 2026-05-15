@@ -74,8 +74,9 @@ private val offlineSignInModule: Module = module {
         )
     }
     single<OfflineBuildFlags> { OfflineBuildFlags(isOffline = true) }
-    // Offline build has no sync modules on the classpath anyway; bind for symmetry
-    // so feature code that injects the flag resolves cleanly in both builds.
+    // Offline build has no Firestore-backed sync implementation (no sync-surfer
+    // module); bind the flag for symmetry so feature code that injects it
+    // resolves cleanly in both builds.
     single<SyncFeatureFlag> { SyncFeatureFlag(enabled = false) }
 }
 
