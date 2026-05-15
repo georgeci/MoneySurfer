@@ -44,6 +44,24 @@ READ WHEN:
 ./gradlew qaAll
 ```
 
+### Offline golden-path E2E
+
+`scripts/maestro/offline/offline-golden.yaml` (tagged `offline`) is the
+end-to-end gate for the offline MVP: first launch → currency picker → seed
+verified → create transaction → balance updates → Settings (no Backup/Sync/
+Logout rows). It drives the `:androidApp-offline` / `:iosAppOffline` binary,
+which makes zero network calls — so it needs **no Firebase emulator and no
+seeded users**. The online `qaMaestro*` suites skip it via `--exclude-tags
+offline`.
+
+```bash
+# Android — needs a booted emulator/device:
+./gradlew qaMaestroOfflineAndroid
+
+# iOS — needs a booted Simulator:
+./gradlew qaMaestroOfflineIos
+```
+
 ## Test tags (Compose ↔ Maestro)
 
 Anchor Maestro selectors to stable identifiers, not localized text. Compose

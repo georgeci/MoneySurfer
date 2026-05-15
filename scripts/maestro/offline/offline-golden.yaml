@@ -1,0 +1,81 @@
+appId: ${APP_ID}
+name: Offline — Golden path (first launch → currency → seed → transaction → settings)
+tags:
+  - offline
+---
+# Offline-build E2E golden path. Drives the `:androidApp-offline` / `:iosAppOffline`
+# binary, which needs no Firebase emulator: the offline first-run seeder
+# auto-creates a demo user, a "Personal" workspace and a "Cash" account, then
+# routes straight to the currency picker.
+#
+# Excluded from the online suites via `tags: [offline]`; run it with the
+# dedicated `qaMaestroOfflineAndroid` / `qaMaestroOfflineIos` Gradle tasks.
+#
+# Selectors target Compose `testTag` values exposed to Maestro via
+# `Modifier.surferTestTagAsId()` — see docs/testing/testing-strategy.md.
+
+# Fresh install: wipe state so the first-run seeder and currency picker run.
+- launchApp:
+    clearState: true
+
+# 1. First launch lands on the currency picker (seed flips `currencyChosen` false).
+- assertVisible:
+    id: "firstRunCurrency:root"
+
+# 2. Pick a currency and confirm.
+- tapOn:
+    id: "firstRunCurrency:search"
+- inputText: "EUR"
+- tapOn:
+    id: "firstRunCurrency:currency:EUR"
+- hideKeyboard
+- tapOn:
+    id: "firstRunCurrency:confirm"
+
+# 3. Seed verified — Dashboard renders with the seeded balance widget and the
+#    add-transaction FAB (only shown once the seeded "Cash" account exists).
+- assertVisible:
+    id: "dashboard:root"
+- assertVisible:
+    id: "dashboard:balance"
+- assertVisible:
+    id: "dashboard:addTransaction"
+
+# 4. Create an expense transaction.
+- tapOn:
+    id: "dashboard:addTransaction"
+- assertVisible:
+    id: "transactionCreation:root"
+- tapOn:
+    id: "transactionCreation:amount"
+- inputText: "25"
+- tapOn:
+    id: "transactionCreation:note"
+- inputText: "Maestro golden expense"
+- hideKeyboard
+- tapOn:
+    id: "transactionCreation:save"
+
+# 5. Balance updates — back on the Dashboard, the new transaction is listed.
+- assertVisible:
+    id: "dashboard:root"
+- assertVisible:
+    text: "Maestro golden expense"
+
+# 6. Settings shows the offline row set — and crucially NOT Backup / Sync /
+#    Logout. The sync and logout rows are never composed in the offline build,
+#    so `notVisible` on their stable ids is a locale-independent assertion.
+- tapOn:
+    id: "dashboard:settings"
+- assertVisible:
+    id: "settings:root"
+- assertVisible:
+    id: "settings:categoriesRow"
+- assertVisible:
+    id: "settings:appearanceRow"
+- assertVisible:
+    id: "settings:aboutRow"
+- assertNotVisible:
+    id: "settings:syncRow"
+- assertNotVisible:
+    id: "settings:logoutRow"

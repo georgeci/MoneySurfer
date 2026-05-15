@@ -15,6 +15,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -27,6 +28,7 @@ import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsGroup
 import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsRow
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
+import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.utils.HandleSideEffect
 import moneysurfer.feature.settings.generated.resources.Res
@@ -56,6 +58,21 @@ import moneysurfer.feature.settings.generated.resources.settings_user_name
 import moneysurfer.feature.settings.generated.resources.settings_version_format
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
+
+/**
+ * Stable selectors for the Settings screen — see docs/testing/testing-strategy.md.
+ *
+ * [SyncRow] and [LogoutRow] are never composed in the offline build; their absence
+ * is what the offline golden Maestro flow asserts via `notVisible`.
+ */
+object SettingsTestTags {
+    const val Root = "settings:root"
+    const val CategoriesRow = "settings:categoriesRow"
+    const val AppearanceRow = "settings:appearanceRow"
+    const val AboutRow = "settings:aboutRow"
+    const val SyncRow = "settings:syncRow"
+    const val LogoutRow = "settings:logoutRow"
+}
 
 @Composable
 fun SettingsScreen(
@@ -100,7 +117,10 @@ private fun SettingsContent(
     onEvent: (SettingsEvent) -> Unit,
 ) {
     Scaffold(
-        modifier = Modifier.surferSafeInsets(),
+        modifier = Modifier
+            .surferSafeInsets()
+            .surferTestTagAsId()
+            .testTag(SettingsTestTags.Root),
         containerColor = AppTheme.materialColors.surface,
         topBar = {
             SurferToolbar(
@@ -183,6 +203,7 @@ private fun SettingsContent(
                     supportingText = stringResource(Res.string.settings_categories_supporting),
                     onClick = { onEvent(SettingsEvent.OnCategoriesClick) },
                     trailing = { SurferSettingsChevron() },
+                    modifier = Modifier.testTag(SettingsTestTags.CategoriesRow),
                 )
                 SurferSettingsRow(
                     icon = SurferIcons.Palette,
@@ -190,6 +211,7 @@ private fun SettingsContent(
                     supportingText = appearanceSupporting(state.isDynamicColorEnabled),
                     onClick = { onEvent(SettingsEvent.OnAppearanceClick) },
                     trailing = { SurferSettingsChevron() },
+                    modifier = Modifier.testTag(SettingsTestTags.AppearanceRow),
                 )
             }
 
@@ -201,6 +223,7 @@ private fun SettingsContent(
                         supportingText = stringResource(Res.string.settings_sync_hub_supporting),
                         onClick = { onEvent(SettingsEvent.OnSyncClick) },
                         trailing = { SurferSettingsChevron() },
+                        modifier = Modifier.testTag(SettingsTestTags.SyncRow),
                     )
                 }
             }
@@ -215,6 +238,7 @@ private fun SettingsContent(
                     ),
                     onClick = { onEvent(SettingsEvent.OnAboutClick) },
                     trailing = { SurferSettingsChevron() },
+                    modifier = Modifier.testTag(SettingsTestTags.AboutRow),
                 )
             }
 
@@ -226,6 +250,7 @@ private fun SettingsContent(
                         title = stringResource(Res.string.settings_logout),
                         danger = true,
                         onClick = { onEvent(SettingsEvent.OnLogoutClick) },
+                        modifier = Modifier.testTag(SettingsTestTags.LogoutRow),
                     )
                 }
             }

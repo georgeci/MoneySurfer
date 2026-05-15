@@ -34,6 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -45,6 +46,7 @@ import com.georgeci.moneysurfer.uikit.components.SurferButtonSize
 import com.georgeci.moneysurfer.uikit.components.SurferFullScreenLoader
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
+import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.utils.HandleSideEffect
 import moneysurfer.feature.workspace.generated.resources.Res
@@ -55,6 +57,15 @@ import moneysurfer.feature.workspace.generated.resources.first_run_currency_subt
 import moneysurfer.feature.workspace.generated.resources.first_run_currency_title
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
+
+/** Stable selectors for the first-run currency picker — see docs/testing/testing-strategy.md. */
+object FirstRunCurrencyTestTags {
+    const val Root = "firstRunCurrency:root"
+    const val Search = "firstRunCurrency:search"
+    const val Confirm = "firstRunCurrency:confirm"
+
+    fun currencyRow(code: String): String = "firstRunCurrency:currency:$code"
+}
 
 @Composable
 fun FirstRunCurrencyScreen(
@@ -98,7 +109,12 @@ private fun FirstRunCurrencyContent(
     state: FirstRunCurrencyState.Content,
     onEvent: (FirstRunCurrencyEvent) -> Unit,
 ) {
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .surferTestTagAsId()
+            .testTag(FirstRunCurrencyTestTags.Root),
+    ) {
         Scaffold(
             modifier = Modifier.surferSafeInsets(),
             topBar = {
@@ -139,7 +155,8 @@ private fun FirstRunCurrencyContent(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 24.dp)
-                        .heightIn(min = 44.dp),
+                        .heightIn(min = 44.dp)
+                        .testTag(FirstRunCurrencyTestTags.Search),
                 )
                 if (state.error) {
                     ErrorBanner(modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp))
@@ -167,7 +184,8 @@ private fun FirstRunCurrencyContent(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 24.dp)
-                        .padding(bottom = padding.calculateBottomPadding() + 16.dp),
+                        .padding(bottom = padding.calculateBottomPadding() + 16.dp)
+                        .testTag(FirstRunCurrencyTestTags.Confirm),
                 )
             }
         }
@@ -188,6 +206,7 @@ private fun CurrencyRow(
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .testTag(FirstRunCurrencyTestTags.currencyRow(currency.code.value))
             .background(if (selected) highlight else Color.Transparent)
             .clickable(onClick = onClick)
             .padding(horizontal = 24.dp, vertical = 12.dp),

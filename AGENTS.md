@@ -202,6 +202,8 @@ QA entry points:
 ./gradlew qaAndroidHost
 ./gradlew qaAndroidDevice
 ./gradlew qaMaestro
+./gradlew qaMaestroOfflineAndroid   # offline golden path, Android
+./gradlew qaMaestroOfflineIos       # offline golden path, iOS Simulator
 ./gradlew qaAll
 ```
 
