@@ -16,6 +16,10 @@ import com.georgeci.moneysurfer.domain.repositories.AccountRepository
 import com.georgeci.moneysurfer.domain.usecase.CreateTransactionUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetCurrenciesUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetCurrentTimeUseCase
+import com.georgeci.moneysurfer.feature.account.generated.resources.Res
+import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_created_snackbar
+import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_updated_snackbar
+import com.georgeci.moneysurfer.navigation.SnackbarController
 import com.georgeci.moneysurfer.utils.MviViewModel
 import kotlinx.coroutines.flow.first
 import kotlinx.datetime.toLocalDateTime
@@ -30,6 +34,7 @@ class AccountCreationViewModel(
     private val session: SessionPointers,
     private val getCurrentTime: GetCurrentTimeUseCase,
     private val getCurrencies: GetCurrenciesUseCase,
+    private val snackbar: SnackbarController,
     private val offlineBuildFlags: OfflineBuildFlags,
 ) : MviViewModel<AccountCreationState, AccountCreationEvent, AccountCreationEffect>(
     initialState = if (accountId != null) {
@@ -136,15 +141,17 @@ class AccountCreationViewModel(
         if (state.name.isBlank()) return
         if (state.balanceError != null) return
         launch {
+            val trimmedName = state.name.trim()
             if (state.isEditMode) {
                 val existingId = state.editingAccountId ?: return@launch
                 val existing = accountRepository.getById(existingId) ?: return@launch
                 accountRepository.update(
                     existing.copy(
-                        name = state.name.trim(),
+                        name = trimmedName,
                         type = state.type,
                     ),
                 )
+                snackbar.show(Res.string.account_creation_updated_snackbar, listOf(trimmedName))
                 postSideEffect(AccountCreationEffect.NavigateBack)
                 return@launch
             }
@@ -158,7 +165,7 @@ class AccountCreationViewModel(
                 Account(
                     id = newAccountId,
                     workspaceId = workspaceId,
-                    name = state.name.trim(),
+                    name = trimmedName,
                     type = state.type,
                     currencyCode = currency,
                     balance = Money.zero(),
@@ -186,6 +193,7 @@ class AccountCreationViewModel(
                 )
             }
 
+            snackbar.show(Res.string.account_creation_created_snackbar, listOf(trimmedName))
             postSideEffect(AccountCreationEffect.NavigateBack)
         }
     }

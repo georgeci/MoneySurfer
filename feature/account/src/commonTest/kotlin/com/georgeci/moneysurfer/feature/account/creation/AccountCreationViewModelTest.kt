@@ -25,6 +25,9 @@ import com.georgeci.moneysurfer.domain.usecase.ApplyTransactionChangeUseCase
 import com.georgeci.moneysurfer.domain.usecase.CreateTransactionUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetCurrenciesUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetCurrentTimeUseCase
+import com.georgeci.moneysurfer.feature.account.generated.resources.Res
+import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_created_snackbar
+import com.georgeci.moneysurfer.navigation.SnackbarController
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
@@ -226,6 +229,26 @@ class AccountCreationViewModelTest : StringSpec({
             }
         }
     }
+
+    "save shows a created snackbar carrying the account name" {
+        runTest {
+            val fixture = Fixture(workspaceId = ws)
+            val vm = fixture.createViewModel()
+            try {
+                vm.awaitCurrencies()
+
+                fixture.snackbar.requests.test {
+                    vm.onEvent(AccountCreationEvent.OnNameChanged("Wallet"))
+                    vm.onEvent(AccountCreationEvent.OnSaveClick)
+                    val request = awaitItem()
+                    request.message shouldBe Res.string.account_creation_created_snackbar
+                    request.messageArgs shouldBe listOf("Wallet")
+                }
+            } finally {
+                vm.viewModelScope.cancel()
+            }
+        }
+    }
 })
 
 /** Wait until the async `loadCurrencies()` populates the currency list — the only piece of
@@ -250,6 +273,7 @@ private class Fixture(val workspaceId: WorkspaceId) {
     )
     val session = InMemorySessionPointers(currentWorkspaceId = workspaceId)
     val clock = ClockUseCase()
+    val snackbar = SnackbarController()
     val createTransaction = CreateTransactionUseCase(
         ApplyTransactionChangeUseCase(transactionRepository, accountRepository),
     )
@@ -261,6 +285,7 @@ private class Fixture(val workspaceId: WorkspaceId) {
         session = session,
         getCurrentTime = GetCurrentTimeUseCase(clock),
         getCurrencies = GetCurrenciesUseCase(currencyRepository),
+        snackbar = snackbar,
         offlineBuildFlags = OfflineBuildFlags(isOffline = offline),
     )
 }

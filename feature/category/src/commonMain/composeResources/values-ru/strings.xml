@@ -39,4 +39,10 @@
     <string name="categories_manage_delete_message">«%1$s» будет удалена. Транзакции с ней останутся.</string>
     <string name="categories_manage_delete_confirm">Удалить</string>
     <string name="categories_manage_delete_cancel">Отмена</string>
+
+    <!-- Action feedback snackbars -->
+    <string name="category_creation_created_snackbar">«%1$s» создана</string>
+    <string name="category_creation_updated_snackbar">«%1$s» обновлена</string>
+    <string name="categories_manage_deleted_snackbar">«%1$s» удалена</string>
+    <string name="categories_manage_delete_undo">Отменить</string>
 </resources>

@@ -18,11 +18,16 @@ import com.georgeci.moneysurfer.domain.usecase.GetCategoriesUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetCurrentTimeUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetTransactionByIdUseCase
 import com.georgeci.moneysurfer.domain.usecase.UpdateTransactionUseCase
+import com.georgeci.moneysurfer.navigation.SnackbarController
 import com.georgeci.moneysurfer.utils.MviViewModel
 import kotlinx.coroutines.flow.first
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import moneysurfer.feature.transaction.generated.resources.Res
+import moneysurfer.feature.transaction.generated.resources.transaction_creation_created_snackbar
+import moneysurfer.feature.transaction.generated.resources.transaction_creation_transfer_snackbar
+import moneysurfer.feature.transaction.generated.resources.transaction_creation_updated_snackbar
 import org.koin.core.annotation.KoinViewModel
 
 // ViewModel composes loading + creation + transfer flows; splitting now would push wiring to a holder.
@@ -40,6 +45,7 @@ class TransactionCreationViewModel(
     private val getCurrentTime: GetCurrentTimeUseCase,
     private val transactionRepository: TransactionRepository,
     private val featureConfig: TransactionCreationFeatureConfig,
+    private val snackbar: SnackbarController,
 ) : MviViewModel<TransactionCreationState, TransactionCreationEvent, TransactionCreationEffect>(
     initialState = TransactionCreationState.Loading,
 ) {
@@ -378,8 +384,10 @@ class TransactionCreationViewModel(
 
             if (state.isEditMode) {
                 updateTransaction(transaction)
+                snackbar.show(Res.string.transaction_creation_updated_snackbar)
             } else {
                 createTransaction(transaction)
+                snackbar.show(Res.string.transaction_creation_created_snackbar)
             }
 
             postSideEffect(TransactionCreationEffect.NavigateBack)
@@ -403,6 +411,7 @@ class TransactionCreationViewModel(
                         ?: operationAt.toLocalDateTime(zone).date,
                 ),
             )
+            snackbar.show(Res.string.transaction_creation_transfer_snackbar)
             postSideEffect(TransactionCreationEffect.NavigateBack)
         }
     }

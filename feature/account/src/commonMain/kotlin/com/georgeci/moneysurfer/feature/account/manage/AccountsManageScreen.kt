@@ -19,15 +19,9 @@ import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Snackbar
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -42,15 +36,12 @@ import com.georgeci.moneysurfer.feature.account.generated.resources.account_crea
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_type_card
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_type_cash
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_type_savings
-import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_manage_action_failed
 import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_manage_active_header
 import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_manage_add_account
 import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_manage_archive
-import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_manage_archive_undo
 import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_manage_archived_footnote
 import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_manage_archived_header
 import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_manage_archived_hint
-import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_manage_archived_snackbar
 import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_manage_done
 import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_manage_drag_to_reorder
 import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_manage_edit
@@ -73,8 +64,6 @@ import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.utils.HandleSideEffect
-import kotlinx.coroutines.launch
-import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -87,10 +76,6 @@ fun AccountsManageScreen(
     viewModel: AccountsManageViewModel = koinViewModel(),
 ) {
     val state by viewModel.collectAsStateWithLifecycle()
-    val snackbarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
-    val undoLabel = stringResource(Res.string.accounts_manage_archive_undo)
-    val errorMessage = stringResource(Res.string.accounts_manage_action_failed)
 
     viewModel.HandleSideEffect { effect ->
         when (effect) {
@@ -98,23 +83,6 @@ fun AccountsManageScreen(
             AccountsManageEffect.NavigateToAccountCreation -> onNavigateToAccountCreation()
             is AccountsManageEffect.NavigateToAccountDetails -> onNavigateToAccountDetails(effect.accountId)
             is AccountsManageEffect.NavigateToAccountEdit -> onNavigateToAccountEdit(effect.accountId)
-            is AccountsManageEffect.ShowArchivedSnackbar -> {
-                snackbarHostState.currentSnackbarData?.dismiss()
-                scope.launch {
-                    val message = getString(Res.string.accounts_manage_archived_snackbar, effect.name)
-                    val result = snackbarHostState.showSnackbar(
-                        message = message,
-                        actionLabel = undoLabel,
-                        withDismissAction = false,
-                    )
-                    if (result == SnackbarResult.ActionPerformed) {
-                        viewModel.onEvent(AccountsManageEvent.OnUndoArchive(effect.accountId))
-                    }
-                }
-            }
-            AccountsManageEffect.ShowError -> {
-                scope.launch { snackbarHostState.showSnackbar(errorMessage) }
-            }
         }
     }
 
@@ -122,7 +90,6 @@ fun AccountsManageScreen(
         AccountsManageState.Loading -> AccountsManageLoading(onEvent = viewModel::onEvent)
         is AccountsManageState.Content -> AccountsManageContent(
             state = current,
-            snackbarHostState = snackbarHostState,
             onEvent = viewModel::onEvent,
         )
     }
@@ -159,14 +126,12 @@ private const val ACCOUNTS_SKELETON_ROWS = 5
 @Composable
 private fun AccountsManageContent(
     state: AccountsManageState.Content,
-    snackbarHostState: SnackbarHostState,
     onEvent: (AccountsManageEvent) -> Unit,
 ) {
     val hasContent = state.activeAccounts.isNotEmpty() || state.archivedAccounts.isNotEmpty()
     Scaffold(
         modifier = Modifier.surferSafeInsets(),
         containerColor = AppTheme.materialColors.surface,
-        snackbarHost = { SnackbarHost(snackbarHostState) { data -> Snackbar(data) } },
         topBar = {
             SurferToolbar(
                 title = stringResource(Res.string.accounts_manage_title),
@@ -445,7 +410,6 @@ private fun AccountsManageScreenViewPreview() {
                 archivedAccounts = PreviewArchivedAccounts,
                 formattedTotal = "€11,575.32",
             ),
-            snackbarHostState = remember { SnackbarHostState() },
             onEvent = {},
         )
     }
@@ -462,7 +426,6 @@ private fun AccountsManageScreenEditingPreview() {
                 archivedAccounts = emptyList(),
                 formattedTotal = "€11,395.32",
             ),
-            snackbarHostState = remember { SnackbarHostState() },
             onEvent = {},
         )
     }
@@ -479,7 +442,6 @@ private fun AccountsManageEmptyPreview() {
                 archivedAccounts = emptyList(),
                 formattedTotal = null,
             ),
-            snackbarHostState = remember { SnackbarHostState() },
             onEvent = {},
         )
     }
