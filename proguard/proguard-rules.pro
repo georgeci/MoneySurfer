@@ -7,19 +7,25 @@
 # --- kotlinx.serialization ---
 -keepattributes *Annotation*, InnerClasses
 -dontnote kotlinx.serialization.**
-# Keep generated serializers and their Companion references.
+# Scoped to @Serializable types only — official kotlinx.serialization R8 rules.
+# Keep the Companion of @Serializable classes.
 -if @kotlinx.serialization.Serializable class **
 -keepclassmembers class <1> {
     static <1>$Companion Companion;
 }
+# Keep the companion's serializer() for @Serializable classes.
 -if @kotlinx.serialization.Serializable class ** {
     static **$* *;
 }
--keep class <1>$$serializer { *; }
--keepclassmembers class * {
-    *** Companion;
+-keepclassmembers class <2>$<3> {
+    kotlinx.serialization.KSerializer serializer(...);
 }
--keepclasseswithmembers class * {
+# Keep INSTANCE + serializer() of @Serializable objects.
+-if @kotlinx.serialization.Serializable class ** {
+    public static ** INSTANCE;
+}
+-keepclassmembers class <1> {
+    public static <1> INSTANCE;
     kotlinx.serialization.KSerializer serializer(...);
 }
 
