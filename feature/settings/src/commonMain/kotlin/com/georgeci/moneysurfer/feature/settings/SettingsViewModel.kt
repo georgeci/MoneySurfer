@@ -2,6 +2,7 @@ package com.georgeci.moneysurfer.feature.settings
 
 import com.georgeci.moneysurfer.domain.AppInfo
 import com.georgeci.moneysurfer.domain.OfflineBuildFlags
+import com.georgeci.moneysurfer.domain.SyncFeatureFlag
 import com.georgeci.moneysurfer.domain.auth.SessionPointers
 import com.georgeci.moneysurfer.domain.model.WorkspaceMemberStatus
 import com.georgeci.moneysurfer.domain.preferences.PaletteSource
@@ -33,12 +34,14 @@ class SettingsViewModel(
     private val refreshIncomingInvites: RefreshIncomingInvitesUseCase,
     private val memberRepository: WorkspaceMemberRepository,
     private val uiPreferences: UiPreferences,
+    private val syncFeatureFlag: SyncFeatureFlag,
     appInfo: AppInfo,
     offlineBuildFlags: OfflineBuildFlags,
 ) : MviViewModel<SettingsState, SettingsEvent, SettingsEffect>(
     initialState = SettingsState(
         appVersion = appInfo.version,
         isOffline = offlineBuildFlags.isOffline,
+        syncEnabled = syncFeatureFlag.enabled,
     ),
 ) {
 
@@ -67,6 +70,10 @@ class SettingsViewModel(
     }
 
     private fun observePendingCount() {
+        // Sync-feature flag off → outbox queue is irrelevant to the user (no UI surface
+        // can act on it). Skip the subscription so the badge stays at zero and we don't
+        // hold a Flow open for nothing.
+        if (!syncFeatureFlag.enabled) return
         launch {
             pendingMutationQueue.pendingCount
                 .onEach { count -> updateState { copy(pendingMutationsCount = count) } }
@@ -145,9 +152,10 @@ data class SettingsState(
     val activeMemberCount: Int = 0,
     val isDynamicColorEnabled: Boolean = false,
     val isOffline: Boolean = false,
+    val syncEnabled: Boolean = false,
 ) {
     val showProfile: Boolean get() = !isOffline
-    val showSyncSection: Boolean get() = !isOffline
+    val showSyncSection: Boolean get() = !isOffline && syncEnabled
     val showLogout: Boolean get() = !isOffline
     val showWorkspaceMembers: Boolean get() = !isOffline
     val showPendingInvites: Boolean get() = !isOffline

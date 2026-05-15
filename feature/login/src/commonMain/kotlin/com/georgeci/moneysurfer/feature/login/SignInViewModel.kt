@@ -41,6 +41,7 @@ class SignInViewModel(
             SignInEvent.OnSubmitClick -> submit()
             SignInEvent.OnAnonymousLoginClick -> runAuth("anon") { anonymousLogin() }
             SignInEvent.OnLoginClick -> runAuth("demo") { demoLogin() }
+            SignInEvent.OnTermsClick -> postSideEffect(SignInEffect.NavigateToLegal)
         }
     }
 
@@ -137,8 +138,10 @@ sealed interface SignInEvent {
     data object OnSubmitClick : SignInEvent
     data object OnLoginClick : SignInEvent
     data object OnAnonymousLoginClick : SignInEvent
+    data object OnTermsClick : SignInEvent
 }
 
 sealed interface SignInEffect {
     data object NavigateToWorkspaceSelector : SignInEffect
+    data object NavigateToLegal : SignInEffect
 }

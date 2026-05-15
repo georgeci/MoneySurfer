@@ -2,6 +2,7 @@ package com.georgeci.moneysurfer.feature.account.creation
 
 import androidx.lifecycle.viewModelScope
 import app.cash.turbine.test
+import com.georgeci.moneysurfer.domain.OfflineBuildFlags
 import com.georgeci.moneysurfer.domain.auth.InMemorySessionPointers
 import com.georgeci.moneysurfer.domain.fixtures.EUR
 import com.georgeci.moneysurfer.domain.fixtures.RUB
@@ -11,6 +12,7 @@ import com.georgeci.moneysurfer.domain.model.Account
 import com.georgeci.moneysurfer.domain.model.Currency
 import com.georgeci.moneysurfer.domain.model.Transaction
 import com.georgeci.moneysurfer.domain.primitives.AccountId
+import com.georgeci.moneysurfer.domain.primitives.AccountType
 import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
 import com.georgeci.moneysurfer.domain.primitives.Money
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
@@ -120,6 +122,91 @@ class AccountCreationViewModelTest : StringSpec({
         }
     }
 
+    "online build keeps the extra details section visible" {
+        runTest {
+            val vm = Fixture(workspaceId = ws).createViewModel(offline = false)
+            try {
+                vm.awaitCurrencies().extraDetailsEnabled shouldBe true
+            } finally {
+                vm.viewModelScope.cancel()
+            }
+        }
+    }
+
+    "offline build hides the extra details section" {
+        runTest {
+            val vm = Fixture(workspaceId = ws).createViewModel(offline = true)
+            try {
+                vm.awaitCurrencies().extraDetailsEnabled shouldBe false
+            } finally {
+                vm.viewModelScope.cancel()
+            }
+        }
+    }
+
+    "balance input strips letters and collapses extra decimal separators" {
+        runTest {
+            val vm = Fixture(workspaceId = ws).createViewModel()
+            try {
+                vm.awaitCurrencies()
+
+                vm.onEvent(AccountCreationEvent.OnBalanceChanged("1a2,3.4"))
+
+                (vm.value as AccountCreationState.Content).balance shouldBe "12.34"
+            } finally {
+                vm.viewModelScope.cancel()
+            }
+        }
+    }
+
+    "save is blocked with an inline error when a non-credit account has a negative balance" {
+        runTest {
+            val fixture = Fixture(workspaceId = ws)
+            val vm = fixture.createViewModel()
+            try {
+                vm.awaitCurrencies()
+
+                vm.onEvent(AccountCreationEvent.OnNameChanged("Wallet"))
+                vm.onEvent(AccountCreationEvent.OnTypeChanged(AccountType.CASH))
+                vm.onEvent(AccountCreationEvent.OnBalanceChanged("-50"))
+
+                val state = vm.value as AccountCreationState.Content
+                state.balanceError shouldBe InitialBalanceError.NEGATIVE_NOT_ALLOWED
+                state.canSave shouldBe false
+
+                vm.onEvent(AccountCreationEvent.OnSaveClick)
+                fixture.accountRepository.inserted.shouldBeEmpty()
+                fixture.transactionRepository.inserted.shouldBeEmpty()
+            } finally {
+                vm.viewModelScope.cancel()
+            }
+        }
+    }
+
+    "save keeps a negative opening balance for a credit (card) account" {
+        runTest {
+            val fixture = Fixture(workspaceId = ws)
+            val vm = fixture.createViewModel()
+            try {
+                vm.awaitCurrencies()
+
+                vm.onEvent(AccountCreationEvent.OnNameChanged("Credit card"))
+                vm.onEvent(AccountCreationEvent.OnTypeChanged(AccountType.CARD))
+                vm.onEvent(AccountCreationEvent.OnBalanceChanged("-50"))
+
+                (vm.value as AccountCreationState.Content).balanceError shouldBe null
+
+                vm.onEvent(AccountCreationEvent.OnSaveClick)
+
+                val openingTx = fixture.transactionRepository.inserted.single()
+                openingTx.type shouldBe TransactionType.OPENING_BALANCE
+                openingTx.money shouldBe Money.fromDouble(-50.0)
+            } finally {
+                vm.viewModelScope.cancel()
+            }
+        }
+    }
+
     "loadCurrencies populates available list and emits NavigateBack on save" {
         runTest {
             val fixture = Fixture(workspaceId = ws)
@@ -167,13 +254,14 @@ private class Fixture(val workspaceId: WorkspaceId) {
         ApplyTransactionChangeUseCase(transactionRepository, accountRepository),
     )
 
-    fun createViewModel(editing: AccountId? = null) = AccountCreationViewModel(
+    fun createViewModel(editing: AccountId? = null, offline: Boolean = false) = AccountCreationViewModel(
         accountId = editing,
         accountRepository = accountRepository,
         createTransaction = createTransaction,
         session = session,
         getCurrentTime = GetCurrentTimeUseCase(clock),
         getCurrencies = GetCurrenciesUseCase(currencyRepository),
+        offlineBuildFlags = OfflineBuildFlags(isOffline = offline),
     )
 }
 

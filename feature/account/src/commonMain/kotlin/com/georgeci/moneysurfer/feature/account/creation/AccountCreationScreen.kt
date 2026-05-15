@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
@@ -28,6 +29,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -36,6 +38,7 @@ import com.georgeci.moneysurfer.domain.primitives.AccountType
 import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
 import com.georgeci.moneysurfer.feature.account.generated.resources.Res
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_add_another_label
+import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_balance_error_negative
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_balance_helper
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_balance_label
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_currency_label
@@ -126,7 +129,7 @@ private fun AccountCreationContent(
                         icon = SurferIcons.Check,
                         text = stringResource(Res.string.account_creation_save),
                         onClick = { onEvent(AccountCreationEvent.OnSaveClick) },
-                        enabled = state.name.isNotBlank(),
+                        enabled = state.canSave,
                     )
                 },
             )
@@ -163,26 +166,39 @@ private fun AccountCreationContent(
                     )
                 }
 
+                val balanceError = state.balanceError
                 OutlinedTextField(
                     value = state.balance,
                     onValueChange = { onEvent(AccountCreationEvent.OnBalanceChanged(it)) },
                     label = { Text(stringResource(Res.string.account_creation_balance_label)) },
                     prefix = { Text(state.currencySymbol) },
-                    supportingText = { Text(stringResource(Res.string.account_creation_balance_helper)) },
+                    supportingText = {
+                        Text(
+                            if (balanceError == null) {
+                                stringResource(Res.string.account_creation_balance_helper)
+                            } else {
+                                stringResource(balanceError.messageRes())
+                            },
+                        )
+                    },
+                    isError = balanceError != null,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
                 )
             }
 
-            ExtraDetailsSection(
-                addedFields = state.extraFields,
-                availableKinds = state.availableExtraFieldKinds,
-                onValueChanged = { kind, value ->
-                    onEvent(AccountCreationEvent.OnExtraFieldValueChanged(kind, value))
-                },
-                onAdd = { onEvent(AccountCreationEvent.OnAddExtraField(it)) },
-                onRemove = { onEvent(AccountCreationEvent.OnRemoveExtraField(it)) },
-            )
+            if (state.extraDetailsEnabled) {
+                ExtraDetailsSection(
+                    addedFields = state.extraFields,
+                    availableKinds = state.availableExtraFieldKinds,
+                    onValueChanged = { kind, value ->
+                        onEvent(AccountCreationEvent.OnExtraFieldValueChanged(kind, value))
+                    },
+                    onAdd = { onEvent(AccountCreationEvent.OnAddExtraField(it)) },
+                    onRemove = { onEvent(AccountCreationEvent.OnRemoveExtraField(it)) },
+                )
+            }
 
             Spacer(Modifier.height(padding.calculateBottomPadding() + AppTheme.spacing.large))
         }
@@ -388,6 +404,10 @@ private val AccountExtraFieldKind.isMultiline: Boolean
 
 private val AccountExtraFieldKind.isMonospace: Boolean
     get() = this == AccountExtraFieldKind.IBAN || this == AccountExtraFieldKind.BIC
+
+private fun InitialBalanceError.messageRes(): StringResource = when (this) {
+    InitialBalanceError.NEGATIVE_NOT_ALLOWED -> Res.string.account_creation_balance_error_negative
+}
 
 private fun AccountExtraFieldKind.labelRes(): StringResource = when (this) {
     AccountExtraFieldKind.IBAN -> Res.string.account_creation_field_iban
