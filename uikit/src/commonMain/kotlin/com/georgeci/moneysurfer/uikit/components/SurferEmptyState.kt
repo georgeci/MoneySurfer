@@ -1,7 +1,9 @@
 package com.georgeci.moneysurfer.uikit.components
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -23,6 +25,9 @@ import com.georgeci.moneysurfer.uikit.theme.AppTheme
  * to show (empty list, no search results, nothing scheduled). For a failure use [SurferErrorState];
  * while data is still loading use [SurferShimmerBox].
  *
+ * Fills the available space and centers its content; constrain it with [modifier] (e.g. a fixed
+ * height) when embedding inside a section rather than a full screen.
+ *
  * @param action optional call-to-action rendered below the body (e.g. "Add account").
  */
 @Composable
@@ -33,44 +38,49 @@ fun SurferEmptyState(
     icon: ImageVector = SurferIcons.Info,
     action: SurferStateAction? = null,
 ) {
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(AppTheme.spacing.large),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(AppTheme.spacing.medium),
+    Box(
+        modifier = modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center,
     ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = null,
-            tint = AppTheme.materialColors.onSurfaceVariant,
-            modifier = Modifier.size(56.dp),
-        )
-        Text(
-            text = title,
-            style = AppTheme.typography.titleMedium,
-            color = AppTheme.materialColors.onSurface,
-            textAlign = TextAlign.Center,
-        )
-        if (body != null) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(AppTheme.spacing.large),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(AppTheme.spacing.medium),
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = AppTheme.materialColors.onSurfaceVariant,
+                modifier = Modifier.size(56.dp),
+            )
             Text(
-                text = body,
-                style = AppTheme.typography.bodyMedium,
-                color = AppTheme.materialColors.onSurfaceVariant,
+                text = title,
+                style = AppTheme.typography.titleMedium,
+                color = AppTheme.materialColors.onSurface,
                 textAlign = TextAlign.Center,
             )
-        }
-        if (action != null) {
-            SurferButton(
-                text = action.label,
-                onClick = action.onClick,
-                style = SurferButtonStyle.Tonal,
-            )
+            if (body != null) {
+                Text(
+                    text = body,
+                    style = AppTheme.typography.bodyMedium,
+                    color = AppTheme.materialColors.onSurfaceVariant,
+                    textAlign = TextAlign.Center,
+                )
+            }
+            if (action != null) {
+                SurferButton(
+                    text = action.label,
+                    onClick = action.onClick,
+                    style = SurferButtonStyle.Tonal,
+                )
+            }
         }
     }
 }
 
-/** Label + handler for the optional CTA in [SurferEmptyState] / [SurferErrorState]. */
+/** Label + handler for the optional CTA in [SurferEmptyState]. */
 data class SurferStateAction(
     val label: String,
     val onClick: () -> Unit,

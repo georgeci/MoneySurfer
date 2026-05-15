@@ -15,11 +15,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -50,20 +54,24 @@ fun Modifier.surferShimmer(shape: Shape = AppTheme.shapes.small): Modifier {
 
     val base = AppTheme.materialColors.surfaceVariant
     val highlight = AppTheme.materialColors.surface
-    // Travel the gradient from off-screen left to off-screen right so the band never parks.
-    val translate = progress * 2f - 1f
+
+    // Scale the travel to the measured width so the highlight band crosses the whole node
+    // regardless of how wide it lays out (skeletons routinely use fillMaxWidth).
+    var width by remember { mutableStateOf(0f) }
+    val span = width.coerceAtLeast(1f)
+    // Travel the gradient from fully off the left edge to fully off the right edge.
+    val translate = progress * 2f * span - span
     val brush = Brush.linearGradient(
         colors = listOf(base, highlight, base),
-        start = Offset(translate * SHIMMER_SPAN, 0f),
-        end = Offset((translate + 1f) * SHIMMER_SPAN, 0f),
+        start = Offset(translate, 0f),
+        end = Offset(translate + span, 0f),
     )
 
     return this
         .clip(shape)
+        .onSizeChanged { width = it.width.toFloat() }
         .background(brush)
 }
-
-private const val SHIMMER_SPAN = 600f
 
 /**
  * Ready-made shimmer skeleton block: a clipped, sized [androidx.compose.foundation.layout.Box]

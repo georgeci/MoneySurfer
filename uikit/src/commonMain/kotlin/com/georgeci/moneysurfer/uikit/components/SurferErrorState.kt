@@ -1,7 +1,9 @@
 package com.georgeci.moneysurfer.uikit.components
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -23,6 +25,9 @@ import com.georgeci.moneysurfer.uikit.theme.AppTheme
  * but tints the icon with the theme error colour and defaults the action to a retry CTA.
  * Use [SurferEmptyState] when the load succeeded but produced nothing.
  *
+ * Fills the available space and centers its content; constrain it with [modifier] (e.g. a fixed
+ * height) when embedding inside a section rather than a full screen.
+ *
  * @param onRetry when non-null, renders a "Retry" button; override [retryLabel] to relabel it.
  */
 @Composable
@@ -34,39 +39,44 @@ fun SurferErrorState(
     retryLabel: String = "Retry",
     onRetry: (() -> Unit)? = null,
 ) {
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(AppTheme.spacing.large),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(AppTheme.spacing.medium),
+    Box(
+        modifier = modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center,
     ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = null,
-            tint = AppTheme.materialColors.error,
-            modifier = Modifier.size(56.dp),
-        )
-        Text(
-            text = title,
-            style = AppTheme.typography.titleMedium,
-            color = AppTheme.materialColors.onSurface,
-            textAlign = TextAlign.Center,
-        )
-        if (body != null) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(AppTheme.spacing.large),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(AppTheme.spacing.medium),
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = AppTheme.materialColors.error,
+                modifier = Modifier.size(56.dp),
+            )
             Text(
-                text = body,
-                style = AppTheme.typography.bodyMedium,
-                color = AppTheme.materialColors.onSurfaceVariant,
+                text = title,
+                style = AppTheme.typography.titleMedium,
+                color = AppTheme.materialColors.onSurface,
                 textAlign = TextAlign.Center,
             )
-        }
-        if (onRetry != null) {
-            SurferButton(
-                text = retryLabel,
-                onClick = onRetry,
-                style = SurferButtonStyle.Tonal,
-            )
+            if (body != null) {
+                Text(
+                    text = body,
+                    style = AppTheme.typography.bodyMedium,
+                    color = AppTheme.materialColors.onSurfaceVariant,
+                    textAlign = TextAlign.Center,
+                )
+            }
+            if (onRetry != null) {
+                SurferButton(
+                    text = retryLabel,
+                    onClick = onRetry,
+                    style = SurferButtonStyle.Tonal,
+                )
+            }
         }
     }
 }
