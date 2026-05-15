@@ -56,19 +56,22 @@ class UpdateWorkspaceCurrencyUseCaseTest : StringSpec({
         }
     }
 
-    "leaves accounts on a different currency untouched" {
+    "repairs lagging accounts when the workspace currency already matches (retry path)" {
         runTest {
+            // Simulates a retry after a partial failure: the workspace write landed last time
+            // but an account write did not, so the account still trails the workspace.
             val workspaceRepo = CurrencyTestWorkspaceRepository().apply {
-                seed(aWorkspace(id = ws, baseCurrency = USD))
+                seed(aWorkspace(id = ws, baseCurrency = GBP))
             }
             val accountRepo = CurrencyTestAccountRepository().apply {
-                seed(anAccount(id = AccountId("a-eur"), workspaceId = ws, currencyCode = CurrencyCode("EUR")))
+                seed(anAccount(id = AccountId("a-cash"), workspaceId = ws, currencyCode = USD))
             }
             val useCase = UpdateWorkspaceCurrencyUseCase(workspaceRepo, accountRepo)
 
             useCase(ws, GBP).isRight() shouldBe true
 
-            accountRepo.getById(AccountId("a-eur"))!!.currencyCode shouldBe CurrencyCode("EUR")
+            accountRepo.getById(AccountId("a-cash"))!!.currencyCode shouldBe GBP
+            workspaceRepo.updateCount shouldBe 0
         }
     }
 
