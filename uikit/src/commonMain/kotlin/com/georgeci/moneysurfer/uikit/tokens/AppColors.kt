@@ -49,9 +49,12 @@ object AppColors {
     // Scrim
     val Scrim = Color(0xFF000000)
 
-    // Semantic — income/positive amounts. Material 3 has no income slot; expose via
-    // [SemanticColors] / `AppTheme.semanticColors` so screens never reach for the hex.
+    // Semantic — transaction type accents. Material 3 has no income/expense/transfer
+    // slots; expose via [SemanticColors] / `AppTheme.semanticColors` so screens never
+    // reach for the hex.
     val Income = Color(0xFF2E9A6A)
+    val Expense = Color(0xFFB54744)
+    val Transfer = Color(0xFF2E5AA8)
 
     // Dark theme overrides
     object Dark {
@@ -93,5 +96,7 @@ object AppColors {
         val Scrim = Color(0xFF000000)
 
         val Income = Color(0xFF6FCB9F)
+        val Expense = Color(0xFFE89B98)
+        val Transfer = Color(0xFF8FB0E0)
     }
 }

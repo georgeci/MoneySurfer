@@ -52,8 +52,6 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
-private val IncomeColor = Color(0xFF1F7A4F)
-
 @Composable
 fun TransactionsByAccountScreen(
     accountId: AccountId?,
@@ -168,7 +166,7 @@ private fun TransactionsByAccountContent(
                             val amountColor = if (row.isExpense) {
                                 AppTheme.materialColors.onSurface
                             } else {
-                                IncomeColor
+                                AppTheme.semanticColors.income
                             }
                             SurferTransactionLine(
                                 modifier = Modifier.padding(horizontal = 16.dp)
@@ -182,7 +180,7 @@ private fun TransactionsByAccountContent(
                                 amountPillBackground = if (row.isExpense) {
                                     null
                                 } else {
-                                    IncomeColor.copy(alpha = 0.14f)
+                                    AppTheme.semanticColors.income.copy(alpha = 0.14f)
                                 },
                                 onClick = { onEvent(TransactionsByAccountEvent.OnTransactionClick(row.id)) },
                             )
@@ -209,7 +207,7 @@ private fun SummaryStrip(
         SummaryCell(
             label = stringResource(Res.string.transactions_list_summary_income),
             value = summary.incomeFormatted,
-            valueColor = IncomeColor,
+            valueColor = AppTheme.semanticColors.income,
             modifier = Modifier.weight(1f),
         )
         SummaryDivider()
@@ -224,7 +222,7 @@ private fun SummaryStrip(
             label = stringResource(Res.string.transactions_list_summary_net),
             value = summary.netFormatted,
             valueColor = if (summary.netPositive) {
-                IncomeColor
+                AppTheme.semanticColors.income
             } else {
                 AppTheme.materialColors.onSurface
             },

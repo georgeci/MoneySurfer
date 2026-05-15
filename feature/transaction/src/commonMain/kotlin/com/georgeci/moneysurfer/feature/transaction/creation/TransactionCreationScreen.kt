@@ -473,10 +473,11 @@ private fun TypePill(type: TransactionTypeUi) {
     }
 }
 
+@Composable
 private fun typeTint(type: TransactionTypeUi): Color = when (type) {
-    TransactionTypeUi.Expense -> Color(0xFFB54744)
-    TransactionTypeUi.Income -> Color(0xFF2F8E6E)
-    TransactionTypeUi.Transfer -> Color(0xFF2E5AA8)
+    TransactionTypeUi.Expense -> AppTheme.semanticColors.expense
+    TransactionTypeUi.Income -> AppTheme.semanticColors.income
+    TransactionTypeUi.Transfer -> AppTheme.semanticColors.transfer
 }
 
 @Composable
