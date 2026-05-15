@@ -5,8 +5,9 @@ name: Workspace — Create and select test workspace
 
 - runFlow: 00_login.yaml
 
-# Workspace list copy: the selector heading is build-independent. The per-row
-# "X members" counter was dropped (issue #60) — offline workspaces are single-user.
+# Workspace list copy: the selector title "Choose a workspace" is build-independent
+# (only the subtitle has online/offline variants). The per-row "X members" counter
+# was dropped (issue #60) — offline workspaces are single-user.
 - assertVisible:
     text: "Choose a workspace"
 
