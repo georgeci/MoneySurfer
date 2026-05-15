@@ -1,6 +1,7 @@
 package com.georgeci.moneysurfer.di
 
 import com.georgeci.moneysurfer.domain.OfflineBuildFlags
+import com.georgeci.moneysurfer.domain.SyncFeatureFlag
 import com.georgeci.moneysurfer.feature.login.SignInFeatureConfig
 import org.koin.core.annotation.Module
 import org.koin.core.annotation.Single
@@ -24,4 +25,13 @@ class OnlineSignInModule {
 
     @Single
     fun offlineBuildFlags(): OfflineBuildFlags = OfflineBuildFlags(isOffline = false)
+
+    /**
+     * Sync is hidden by default in the online build — flip to `enabled = true` to
+     * expose Settings → Sync, the periodic in-process ticker, and the use-case
+     * driven sync triggers (PostAuthBootstrap, CreateWorkspace, AcceptInvite,
+     * RefreshIncomingInvites). See [SyncFeatureFlag] for the full gating surface.
+     */
+    @Single
+    fun syncFeatureFlag(): SyncFeatureFlag = SyncFeatureFlag(enabled = false)
 }
