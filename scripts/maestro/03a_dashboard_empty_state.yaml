@@ -2,7 +2,9 @@ appId: ${APP_ID}
 name: Dashboard — empty-state CTA before first transaction
 ---
 # Pre-condition: Dashboard with a workspace and one account, no transactions logged.
-# 03 creates the baseline account; this flow runs before 04 logs any transaction.
+# Numbered 03a so the full suite runs it AFTER 03 (account created) but BEFORE
+# 04_add_transaction.yaml logs the baseline "Test expense" — the empty-state
+# assertions below only hold while zero transactions exist.
 - runFlow: 03_dashboard_add_account.yaml
 
 # Golden first-run state: the Recent section shows the empty state, not a blank box.
