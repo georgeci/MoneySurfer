@@ -49,6 +49,7 @@ private val savedStateConfig = SavedStateConfiguration {
             subclass(Route.WorkspaceInvite::class, Route.WorkspaceInvite.serializer())
             subclass(Route.WorkspaceMemberActions::class, Route.WorkspaceMemberActions.serializer())
             subclass(Route.IncomingInvites::class, Route.IncomingInvites.serializer())
+            subclass(Route.FirstRunCurrency::class, Route.FirstRunCurrency.serializer())
             subclass(Route.Dashboard::class, Route.Dashboard.serializer())
             subclass(Route.AccountCreation::class, Route.AccountCreation.serializer())
             subclass(Route.AccountsManage::class, Route.AccountsManage.serializer())

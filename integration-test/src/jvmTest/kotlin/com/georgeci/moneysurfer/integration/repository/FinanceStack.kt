@@ -6,12 +6,14 @@ import com.georgeci.moneysurfer.data.repository.AccountRepositoryImpl
 import com.georgeci.moneysurfer.data.repository.CategoryRepositoryImpl
 import com.georgeci.moneysurfer.data.repository.TimeFormatter
 import com.georgeci.moneysurfer.data.repository.TransactionRepositoryImpl
+import com.georgeci.moneysurfer.data.repository.WorkspaceRepositoryImpl
 import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 import com.georgeci.moneysurfer.domain.usecase.ApplyTransactionChangeUseCase
 import com.georgeci.moneysurfer.domain.usecase.CreateTransactionUseCase
 import com.georgeci.moneysurfer.domain.usecase.CreateTransferUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetCurrentTimeUseCase
+import com.georgeci.moneysurfer.domain.usecase.UpdateWorkspaceCurrencyUseCase
 import com.georgeci.moneysurfer.integration.fixtures.IntegrationHarness
 import com.georgeci.moneysurfer.sync.repository.MutationOperation
 import com.georgeci.moneysurfer.sync.repository.OutboxEnqueuer
@@ -45,6 +47,13 @@ internal class FinanceStack(harness: IntegrationHarness) {
         timeFormatter = timeFormatter,
     )
 
+    val workspaceRepository = WorkspaceRepositoryImpl(
+        dao = harness.database.workspaceDao(),
+        outboxEnqueuer = outbox,
+        clock = clock,
+        timeFormatter = timeFormatter,
+    )
+
     private val applyTransactionChange = ApplyTransactionChangeUseCase(
         transactionRepository = transactionRepository,
         accountRepository = accountRepository,
@@ -54,6 +63,10 @@ internal class FinanceStack(harness: IntegrationHarness) {
         categoryRepository = categoryRepository,
         applyTransactionChange = applyTransactionChange,
         getCurrentTime = GetCurrentTimeUseCase(clock),
+    )
+    val updateWorkspaceCurrency = UpdateWorkspaceCurrencyUseCase(
+        workspaceRepository = workspaceRepository,
+        accountRepository = accountRepository,
     )
 }
 

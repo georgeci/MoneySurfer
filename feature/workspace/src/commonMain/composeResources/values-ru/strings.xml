@@ -108,4 +108,11 @@
     <string name="workspace_creation_preview_fallback_title">Новое пространство</string>
     <string name="workspace_creation_error_remote_sync">Не удалось синхронизировать пространство с облаком. Проверьте интернет и попробуйте снова.</string>
     <string name="workspace_creation_error_unknown">Не удалось создать пространство. Попробуйте ещё раз.</string>
+
+    <!-- First-run currency picker -->
+    <string name="first_run_currency_title">Выберите валюту</string>
+    <string name="first_run_currency_subtitle">Все балансы и отчёты используют эту валюту. Позже её можно изменить в настройках.</string>
+    <string name="first_run_currency_search_placeholder">Поиск валюты</string>
+    <string name="first_run_currency_confirm">Продолжить</string>
+    <string name="first_run_currency_error">Не удалось сохранить валюту. Попробуйте ещё раз.</string>
 </resources>

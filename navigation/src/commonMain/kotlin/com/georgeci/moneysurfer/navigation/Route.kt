@@ -45,6 +45,10 @@ sealed interface Route : NavKey {
     @Serializable
     data object IncomingInvites : Route
 
+    /** First-launch currency picker, shown once after the offline seed before Dashboard. */
+    @Serializable
+    data object FirstRunCurrency : Route
+
     @Serializable
     data object Dashboard : TopLevel
 

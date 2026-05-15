@@ -20,6 +20,9 @@ class CurrencyRepositoryImpl : CurrencyRepository {
         Currency(CurrencyCode("GBP"), symbol = "£", displayName = "British Pound"),
         Currency(CurrencyCode("PLN"), symbol = "zł", displayName = "Polish Zloty"),
         Currency(CurrencyCode("RUB"), symbol = "₽", displayName = "Russian Ruble"),
+        Currency(CurrencyCode("GEL"), symbol = "₾", displayName = "Georgian Lari"),
+        Currency(CurrencyCode("KZT"), symbol = "₸", displayName = "Kazakhstani Tenge"),
+        Currency(CurrencyCode("UAH"), symbol = "₴", displayName = "Ukrainian Hryvnia"),
     )
 
     override fun getAll(): Flow<List<Currency>> = flowOf(currencies)

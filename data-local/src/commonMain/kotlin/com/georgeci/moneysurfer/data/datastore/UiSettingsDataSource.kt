@@ -56,4 +56,14 @@ class UiSettingsDataSource(
         name = "session.has_used_demo",
         default = false,
     )
+
+    /**
+     * `true` by default — only the offline first-run seed flips it to `false` after
+     * auto-creating a workspace with a locale-derived currency. `AppLaunchViewModel`
+     * routes to the currency picker while this is `false`; the picker flips it back.
+     */
+    val currencyChosen = prefs.boolean(
+        name = "session.currency_chosen",
+        default = true,
+    )
 }
