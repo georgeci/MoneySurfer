@@ -119,12 +119,14 @@ private fun SettingsContent(
                 .padding(top = padding.calculateTopPadding())
                 .verticalScroll(rememberScrollState()),
         ) {
-            Box(modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 12.dp)) {
-                SurferNameBlock(
-                    name = stringResource(Res.string.settings_user_name),
-                    email = userEmailText(state),
-                    trailing = null,
-                )
+            if (state.showProfile) {
+                Box(modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 12.dp)) {
+                    SurferNameBlock(
+                        name = stringResource(Res.string.settings_user_name),
+                        email = userEmailText(state),
+                        trailing = null,
+                    )
+                }
             }
 
             SurferSettingsGroup(title = stringResource(Res.string.settings_section_workspace)) {

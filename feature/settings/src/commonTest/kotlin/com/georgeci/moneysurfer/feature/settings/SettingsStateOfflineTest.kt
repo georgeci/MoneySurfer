@@ -6,10 +6,10 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 /**
- * Locks in the offline-build gating for Settings. The Sync section, Logout
- * row, the Members row and the pending-invites row are remote-only entry
- * points; the offline build (no Firebase / sync) hides them via the
- * `isOffline` flag injected from `OfflineBuildFlags`.
+ * Locks in the offline-build gating for Settings. The profile/Name section,
+ * the Sync section, Logout row, the Members row and the pending-invites row
+ * are remote-only entry points; the offline build (no Firebase / sync) hides
+ * them via the `isOffline` flag injected from `OfflineBuildFlags`.
  */
 class SettingsStateOfflineTest {
 
@@ -20,6 +20,7 @@ class SettingsStateOfflineTest {
             currentWorkspaceId = WorkspaceId("ws-1"),
         )
 
+        assertTrue(state.showProfile)
         assertTrue(state.showSyncSection)
         assertTrue(state.showLogout)
         assertTrue(state.showWorkspaceMembers)
@@ -33,6 +34,7 @@ class SettingsStateOfflineTest {
             currentWorkspaceId = WorkspaceId("ws-1"),
         )
 
+        assertFalse(state.showProfile, "offline build has no auth identity to display")
         assertFalse(state.showSyncSection, "offline build has no sync backend")
         assertFalse(state.showLogout, "offline build has no auth session to log out of")
         assertFalse(state.showWorkspaceMembers, "members rely on remote membership data")

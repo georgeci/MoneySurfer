@@ -9,6 +9,9 @@ name: Settings — Open hub screens
 
 - assertVisible:
     text: "Settings"
+# Online build shows the profile/Name section; the offline build hides it.
+- assertVisible:
+    text: "Kasia Nowak"
 - assertVisible:
     text: "Workspace"
 - assertVisible:

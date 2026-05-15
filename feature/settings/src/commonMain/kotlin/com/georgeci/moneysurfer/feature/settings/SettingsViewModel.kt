@@ -146,6 +146,7 @@ data class SettingsState(
     val isDynamicColorEnabled: Boolean = false,
     val isOffline: Boolean = false,
 ) {
+    val showProfile: Boolean get() = !isOffline
     val showSyncSection: Boolean get() = !isOffline
     val showLogout: Boolean get() = !isOffline
     val showWorkspaceMembers: Boolean get() = !isOffline
