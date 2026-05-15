@@ -17,6 +17,11 @@ import org.koin.core.annotation.KoinViewModel
  * locale-derived currency; this screen lets the user confirm or change it, then persists the
  * choice on the workspace + seeded account and flips `session.currencyChosen` so the picker
  * never reappears.
+ *
+ * The user can also "Skip" — that keeps the locale-derived seed currency, flips `currencyChosen`
+ * so the picker is not forced again, and sets `onboardingSkipped` so Settings can offer a
+ * "Finish setup" entry. Confirming the picker (first run or via "Finish setup") clears
+ * `onboardingSkipped`.
  */
 @KoinViewModel
 class FirstRunCurrencyViewModel(
@@ -47,6 +52,18 @@ class FirstRunCurrencyViewModel(
                 }
             }
             FirstRunCurrencyEvent.OnConfirmClick -> confirm()
+            FirstRunCurrencyEvent.OnSkipClick -> skip()
+        }
+    }
+
+    private fun skip() {
+        val state = currentState
+        if (state is FirstRunCurrencyState.Content && state.inFlight) return
+        launch(onError = { log.w(it) { "[skip] failed" } }) {
+            session.currencyChosen.set(true)
+            session.onboardingSkipped.set(true)
+            log.i { "[skip] keeping seeded currency, onboarding skipped" }
+            postSideEffect(FirstRunCurrencyEffect.NavigateToDashboard)
         }
     }
 
@@ -92,6 +109,7 @@ class FirstRunCurrencyViewModel(
                 },
                 ifRight = {
                     session.currencyChosen.set(true)
+                    session.onboardingSkipped.set(false)
                     log.i { "[confirm] ok currency=$code wid=${wid.value}" }
                     postSideEffect(FirstRunCurrencyEffect.NavigateToDashboard)
                 },
@@ -123,6 +141,7 @@ sealed interface FirstRunCurrencyEvent {
     data class OnQueryChanged(val query: String) : FirstRunCurrencyEvent
     data class OnCurrencySelected(val code: String) : FirstRunCurrencyEvent
     data object OnConfirmClick : FirstRunCurrencyEvent
+    data object OnSkipClick : FirstRunCurrencyEvent
 }
 
 sealed interface FirstRunCurrencyEffect {

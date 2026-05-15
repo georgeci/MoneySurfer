@@ -26,6 +26,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -51,6 +52,7 @@ import moneysurfer.feature.workspace.generated.resources.Res
 import moneysurfer.feature.workspace.generated.resources.first_run_currency_confirm
 import moneysurfer.feature.workspace.generated.resources.first_run_currency_error
 import moneysurfer.feature.workspace.generated.resources.first_run_currency_search_placeholder
+import moneysurfer.feature.workspace.generated.resources.first_run_currency_skip
 import moneysurfer.feature.workspace.generated.resources.first_run_currency_subtitle
 import moneysurfer.feature.workspace.generated.resources.first_run_currency_title
 import org.jetbrains.compose.resources.stringResource
@@ -108,6 +110,17 @@ private fun FirstRunCurrencyContent(
                             text = stringResource(Res.string.first_run_currency_title),
                             style = AppTheme.typography.titleLarge,
                         )
+                    },
+                    actions = {
+                        TextButton(
+                            onClick = { onEvent(FirstRunCurrencyEvent.OnSkipClick) },
+                            enabled = !state.inFlight,
+                        ) {
+                            Text(
+                                text = stringResource(Res.string.first_run_currency_skip),
+                                color = AppTheme.materialColors.primary,
+                            )
+                        }
                     },
                 )
             },

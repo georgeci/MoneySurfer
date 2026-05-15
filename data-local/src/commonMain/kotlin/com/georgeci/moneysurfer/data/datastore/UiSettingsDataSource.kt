@@ -66,4 +66,14 @@ class UiSettingsDataSource(
         name = "session.currency_chosen",
         default = true,
     )
+
+    /**
+     * `false` by default — set to `true` when the user skips the first-run currency picker.
+     * Settings surfaces a "Finish setup" entry while this is `true`; confirming the picker
+     * clears it back to `false`.
+     */
+    val onboardingSkipped = prefs.boolean(
+        name = "session.onboarding_skipped",
+        default = false,
+    )
 }

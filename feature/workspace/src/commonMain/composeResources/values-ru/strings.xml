@@ -115,5 +115,6 @@
     <string name="first_run_currency_subtitle">Все балансы и отчёты в этом пространстве используют эту валюту.</string>
     <string name="first_run_currency_search_placeholder">Поиск валюты</string>
     <string name="first_run_currency_confirm">Продолжить</string>
+    <string name="first_run_currency_skip">Пропустить</string>
     <string name="first_run_currency_error">Не удалось сохранить валюту. Попробуйте ещё раз.</string>
 </resources>

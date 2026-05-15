@@ -12,6 +12,8 @@
 
     <string name="settings_change_workspace">Change workspace</string>
     <string name="settings_change_workspace_supporting">Currently: Family</string>
+    <string name="settings_finish_setup">Finish setup</string>
+    <string name="settings_finish_setup_supporting">Pick your workspace currency</string>
     <string name="settings_members">Members &amp; permissions</string>
     <string name="settings_members_count_format">%1$d members</string>
     <string name="settings_pending_invites">Pending invitations</string>
