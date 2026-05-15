@@ -43,8 +43,8 @@
     <string name="transaction_details_edit_content_description">Редактировать</string>
     <string name="transaction_details_delete_content_description">Удалить</string>
     <string name="transaction_details_delete_title">Удалить транзакцию?</string>
-    <string name="transaction_details_delete_message">«%1$s» будет удалено навсегда. Отменить будет нельзя.</string>
-    <string name="transaction_details_delete_message_generic">Транзакция будет удалена навсегда. Отменить будет нельзя.</string>
+    <string name="transaction_details_delete_message">«%1$s» будет удалено. Сразу после можно отменить.</string>
+    <string name="transaction_details_delete_message_generic">Транзакция будет удалена. Сразу после можно отменить.</string>
     <string name="transaction_details_delete_confirm">Удалить</string>
     <string name="transaction_details_delete_cancel">Отмена</string>
     <string name="transaction_details_type_expense">Расход</string>
@@ -56,4 +56,11 @@
     <string name="transaction_details_duplicate">Дублировать</string>
     <string name="transaction_details_status_posted">Проведена</string>
     <string name="transaction_details_status_planned">Запланирована</string>
+
+    <!-- Action feedback snackbars -->
+    <string name="transaction_creation_created_snackbar">Транзакция добавлена</string>
+    <string name="transaction_creation_updated_snackbar">Транзакция обновлена</string>
+    <string name="transaction_creation_transfer_snackbar">Перевод добавлен</string>
+    <string name="transaction_details_deleted_snackbar">Транзакция удалена</string>
+    <string name="transaction_details_delete_undo">Отменить</string>
 </resources>

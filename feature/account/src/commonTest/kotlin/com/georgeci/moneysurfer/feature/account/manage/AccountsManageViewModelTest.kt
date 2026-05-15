@@ -13,7 +13,13 @@ import com.georgeci.moneysurfer.domain.repositories.AccountRepository
 import com.georgeci.moneysurfer.domain.usecase.ArchiveAccountUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetAccountsUseCase
 import com.georgeci.moneysurfer.domain.usecase.RestoreAccountUseCase
+import com.georgeci.moneysurfer.feature.account.generated.resources.Res
+import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_manage_archive_undo
+import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_manage_archived_snackbar
+import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_manage_deleted_snackbar
+import com.georgeci.moneysurfer.navigation.SnackbarController
 import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 import kotlinx.coroutines.Dispatchers
@@ -44,19 +50,21 @@ class AccountsManageViewModelTest : StringSpec({
         repo.snapshot().single().archived shouldBe false
     }
 
-    "OnArchiveConfirm archives the account, clears pending, and posts a snackbar effect" {
+    "OnArchiveConfirm archives the account, clears pending, and shows an undo snackbar" {
         val ws = workspaceId("ws-1")
         val active = anAccount(id = accountId("a-1"), workspaceId = ws, name = "Everyday")
         val repo = FakeAccountRepository(initial = listOf(active), workspaceId = ws)
-        val viewModel = newViewModel(repo, ws)
+        val snackbar = SnackbarController()
+        val viewModel = newViewModel(repo, ws, snackbar)
 
         viewModel.onEvent(AccountsManageEvent.OnArchiveAccountClick(active.id))
 
-        viewModel.sideEffects.effectFlow.test {
+        snackbar.requests.test {
             viewModel.onEvent(AccountsManageEvent.OnArchiveConfirm)
-            val effect = awaitItem().shouldBeInstanceOf<AccountsManageEffect.ShowArchivedSnackbar>()
-            effect.accountId shouldBe active.id
-            effect.name shouldBe "Everyday"
+            val request = awaitItem()
+            request.message shouldBe Res.string.accounts_manage_archived_snackbar
+            request.messageArgs shouldBe listOf("Everyday")
+            request.actionLabel shouldBe Res.string.accounts_manage_archive_undo
         }
 
         val content = viewModel.value.shouldBeInstanceOf<AccountsManageState.Content>()
@@ -64,6 +72,25 @@ class AccountsManageViewModelTest : StringSpec({
         content.activeAccounts.shouldBeEmpty()
         content.archivedAccounts.single().id shouldBe active.id
         repo.snapshot().single().archived shouldBe true
+    }
+
+    "OnDeleteConfirm removes the account and shows a snackbar" {
+        val ws = workspaceId("ws-1")
+        val active = anAccount(id = accountId("a-1"), workspaceId = ws, name = "Everyday")
+        val repo = FakeAccountRepository(initial = listOf(active), workspaceId = ws)
+        val snackbar = SnackbarController()
+        val viewModel = newViewModel(repo, ws, snackbar)
+
+        viewModel.onEvent(AccountsManageEvent.OnRemoveAccountClick(active.id))
+
+        snackbar.requests.test {
+            viewModel.onEvent(AccountsManageEvent.OnDeleteConfirm)
+            val request = awaitItem()
+            request.message shouldBe Res.string.accounts_manage_deleted_snackbar
+            request.messageArgs shouldBe listOf("Everyday")
+        }
+
+        repo.snapshot().shouldBeEmpty()
     }
 
     "OnArchiveCancel clears the pending archive without changes" {
@@ -94,15 +121,23 @@ class AccountsManageViewModelTest : StringSpec({
         repo.snapshot().single().archived shouldBe false
     }
 
-    "OnUndoArchive restores the most recently archived account" {
+    "tapping Undo on the archive snackbar restores the account" {
         val ws = workspaceId("ws-1")
         val active = anAccount(id = accountId("a-1"), workspaceId = ws, name = "Everyday")
         val repo = FakeAccountRepository(initial = listOf(active), workspaceId = ws)
-        val viewModel = newViewModel(repo, ws)
+        val snackbar = SnackbarController()
+        val viewModel = newViewModel(repo, ws, snackbar)
 
         viewModel.onEvent(AccountsManageEvent.OnArchiveAccountClick(active.id))
-        viewModel.onEvent(AccountsManageEvent.OnArchiveConfirm)
-        viewModel.onEvent(AccountsManageEvent.OnUndoArchive(active.id))
+
+        var onUndo: (suspend () -> Unit)? = null
+        snackbar.requests.test {
+            viewModel.onEvent(AccountsManageEvent.OnArchiveConfirm)
+            onUndo = awaitItem().onAction
+        }
+        repo.snapshot().single().archived shouldBe true
+
+        onUndo.shouldNotBeNull().invoke()
 
         val content = viewModel.value.shouldBeInstanceOf<AccountsManageState.Content>()
         content.archivedAccounts.shouldBeEmpty()
@@ -114,6 +149,7 @@ class AccountsManageViewModelTest : StringSpec({
 private fun StringSpec.newViewModel(
     repo: FakeAccountRepository,
     workspaceId: WorkspaceId,
+    snackbar: SnackbarController = SnackbarController(),
 ): AccountsManageViewModel {
     val session = InMemorySessionPointers(currentWorkspaceId = workspaceId)
     return AccountsManageViewModel(
@@ -121,6 +157,7 @@ private fun StringSpec.newViewModel(
         accountRepository = repo,
         archiveAccount = ArchiveAccountUseCase(repo),
         restoreAccount = RestoreAccountUseCase(repo),
+        snackbar = snackbar,
     )
 }
 

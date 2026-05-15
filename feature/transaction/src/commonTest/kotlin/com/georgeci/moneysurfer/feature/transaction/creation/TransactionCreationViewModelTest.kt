@@ -1,6 +1,7 @@
 package com.georgeci.moneysurfer.feature.transaction.creation
 
 import androidx.lifecycle.viewModelScope
+import app.cash.turbine.test
 import com.georgeci.moneysurfer.domain.auth.InMemorySessionPointers
 import com.georgeci.moneysurfer.domain.fixtures.EUR
 import com.georgeci.moneysurfer.domain.fixtures.USD
@@ -33,6 +34,7 @@ import com.georgeci.moneysurfer.domain.usecase.GetCategoriesUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetCurrentTimeUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetTransactionByIdUseCase
 import com.georgeci.moneysurfer.domain.usecase.UpdateTransactionUseCase
+import com.georgeci.moneysurfer.navigation.SnackbarController
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
@@ -46,6 +48,8 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import moneysurfer.feature.transaction.generated.resources.Res
+import moneysurfer.feature.transaction.generated.resources.transaction_creation_created_snackbar
 
 /**
  * Save flows for `TransactionCreationViewModel`. Each test stages accounts +
@@ -92,6 +96,28 @@ class TransactionCreationViewModelTest : StringSpec({
                 saved.categoryId shouldBe expenseCategory.id
 
                 fixture.accountRepository.byId[acc.id]!!.balance shouldBe 420.dollars
+            } finally {
+                vm.viewModelScope.cancel()
+            }
+        }
+    }
+
+    "save EXPENSE shows a created snackbar" {
+        runTest {
+            val acc = anAccount(id = accountId("a-1"), workspaceId = ws, currencyCode = USD, balance = 500.dollars)
+            val expenseCategory = aCategory(id = categoryId("c-exp"), workspaceId = ws, type = CategoryType.EXPENSE)
+            val fixture = Fixture(ws).apply {
+                accountRepository.seed(acc)
+                categoryRepository.seed(expenseCategory)
+            }
+            val vm = fixture.createViewModel(prefillAccount = acc.id)
+            try {
+                vm.awaitContent()
+                fixture.snackbar.requests.test {
+                    vm.onEvent(TransactionCreationEvent.OnAmountChanged("80"))
+                    vm.onEvent(TransactionCreationEvent.OnSaveClick)
+                    awaitItem().message shouldBe Res.string.transaction_creation_created_snackbar
+                }
             } finally {
                 vm.viewModelScope.cancel()
             }
@@ -285,6 +311,7 @@ private class Fixture(workspaceId: WorkspaceId) {
     val transactionRepository = FakeTransactionRepository()
     val categoryRepository = FakeCategoryRepository()
     val session = InMemorySessionPointers(currentWorkspaceId = workspaceId)
+    val snackbar = SnackbarController()
     private val clock = ClockUseCase()
     private val applyChange = ApplyTransactionChangeUseCase(transactionRepository, accountRepository)
 
@@ -308,6 +335,7 @@ private class Fixture(workspaceId: WorkspaceId) {
         getCurrentTime = GetCurrentTimeUseCase(clock),
         transactionRepository = transactionRepository,
         featureConfig = featureConfig,
+        snackbar = snackbar,
     )
 
     fun pickFromAccount(vm: TransactionCreationViewModel, id: AccountId) {

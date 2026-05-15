@@ -10,6 +10,12 @@ import com.georgeci.moneysurfer.domain.repositories.AccountRepository
 import com.georgeci.moneysurfer.domain.usecase.ArchiveAccountUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetAccountsUseCase
 import com.georgeci.moneysurfer.domain.usecase.RestoreAccountUseCase
+import com.georgeci.moneysurfer.feature.account.generated.resources.Res
+import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_manage_action_failed
+import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_manage_archive_undo
+import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_manage_archived_snackbar
+import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_manage_deleted_snackbar
+import com.georgeci.moneysurfer.navigation.SnackbarController
 import com.georgeci.moneysurfer.utils.MviViewModel
 import org.koin.core.annotation.KoinViewModel
 
@@ -19,6 +25,7 @@ class AccountsManageViewModel(
     private val accountRepository: AccountRepository,
     private val archiveAccount: ArchiveAccountUseCase,
     private val restoreAccount: RestoreAccountUseCase,
+    private val snackbar: SnackbarController,
 ) : MviViewModel<AccountsManageState, AccountsManageEvent, AccountsManageEffect>(
     initialState = AccountsManageState.Loading,
 ) {
@@ -37,7 +44,6 @@ class AccountsManageViewModel(
             AccountsManageEvent.OnArchiveCancel -> dismissArchive()
             AccountsManageEvent.OnArchiveConfirm -> confirmArchive()
             is AccountsManageEvent.OnRestoreAccountClick -> performRestore(event.accountId)
-            is AccountsManageEvent.OnUndoArchive -> performRestore(event.accountId)
             is AccountsManageEvent.OnRemoveAccountClick -> requestDelete(event.accountId)
             AccountsManageEvent.OnDeleteCancel -> dismissDelete()
             AccountsManageEvent.OnDeleteConfirm -> confirmDelete()
@@ -78,17 +84,26 @@ class AccountsManageViewModel(
         updateState { AccountsManageState.content.pendingArchive.modify(this) { null } }
         launch {
             archiveAccount(target.id).fold(
-                ifLeft = { postSideEffect(AccountsManageEffect.ShowError) },
-                ifRight = { postSideEffect(AccountsManageEffect.ShowArchivedSnackbar(target.id, target.name)) },
+                ifLeft = { snackbar.show(Res.string.accounts_manage_action_failed) },
+                ifRight = {
+                    snackbar.show(
+                        message = Res.string.accounts_manage_archived_snackbar,
+                        messageArgs = listOf(target.name),
+                        actionLabel = Res.string.accounts_manage_archive_undo,
+                        onAction = { restoreArchived(target.id) },
+                    )
+                },
             )
         }
     }
 
     private fun performRestore(accountId: AccountId) {
-        launch {
-            restoreAccount(accountId).onLeft {
-                postSideEffect(AccountsManageEffect.ShowError)
-            }
+        launch { restoreArchived(accountId) }
+    }
+
+    private suspend fun restoreArchived(accountId: AccountId) {
+        restoreAccount(accountId).onLeft {
+            snackbar.show(Res.string.accounts_manage_action_failed)
         }
     }
 
@@ -112,7 +127,10 @@ class AccountsManageViewModel(
         val content = currentState as? AccountsManageState.Content ?: return
         val target = content.pendingDelete ?: return
         updateState { AccountsManageState.content.pendingDelete.modify(this) { null } }
-        launch { accountRepository.delete(target.id) }
+        launch {
+            accountRepository.delete(target.id)
+            snackbar.show(Res.string.accounts_manage_deleted_snackbar, listOf(target.name))
+        }
     }
 
     private fun observeAccounts() {
@@ -202,7 +220,6 @@ sealed interface AccountsManageEvent {
     data class OnArchiveAccountClick(val accountId: AccountId) : AccountsManageEvent
     data object OnArchiveConfirm : AccountsManageEvent
     data object OnArchiveCancel : AccountsManageEvent
-    data class OnUndoArchive(val accountId: AccountId) : AccountsManageEvent
     data class OnRestoreAccountClick(val accountId: AccountId) : AccountsManageEvent
     data class OnRemoveAccountClick(val accountId: AccountId) : AccountsManageEvent
     data object OnDeleteConfirm : AccountsManageEvent
@@ -214,6 +231,4 @@ sealed interface AccountsManageEffect {
     data object NavigateToAccountCreation : AccountsManageEffect
     data class NavigateToAccountDetails(val accountId: AccountId) : AccountsManageEffect
     data class NavigateToAccountEdit(val accountId: AccountId) : AccountsManageEffect
-    data class ShowArchivedSnackbar(val accountId: AccountId, val name: String) : AccountsManageEffect
-    data object ShowError : AccountsManageEffect
 }

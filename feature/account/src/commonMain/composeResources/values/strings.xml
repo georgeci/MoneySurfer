@@ -75,4 +75,9 @@
     <string name="transaction_creation_account_summary_empty">No accounts yet</string>
     <string name="transaction_creation_account_add_new">Add new account</string>
     <string name="transaction_creation_account_add_new_subtitle">Bank, savings, cash or card</string>
+
+    <!-- Action feedback snackbars -->
+    <string name="account_creation_created_snackbar">"%1$s" added</string>
+    <string name="account_creation_updated_snackbar">"%1$s" updated</string>
+    <string name="accounts_manage_deleted_snackbar">"%1$s" deleted</string>
 </resources>

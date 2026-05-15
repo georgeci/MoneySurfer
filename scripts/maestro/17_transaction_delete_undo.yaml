@@ -1,0 +1,27 @@
+appId: ${APP_ID}
+name: Transaction — Delete then Undo restores it
+---
+# Pre-condition: Dashboard with the baseline "Test expense" transaction.
+- runFlow: 04_add_transaction.yaml
+
+- tapOn:
+    text: "Test expense"
+- assertVisible:
+    text: "Transaction"
+
+- tapOn:
+    text: "Delete"
+- assertVisible:
+    text: "Delete transaction?"
+- tapOn:
+    text: "Delete"
+
+# The delete navigates back; the app-root Snackbar offers an Undo.
+- assertVisible:
+    text: "Undo"
+- tapOn:
+    text: "Undo"
+
+# Undo re-applies the deleted transaction — it reappears in Recent.
+- assertVisible:
+    text: "Test expense"

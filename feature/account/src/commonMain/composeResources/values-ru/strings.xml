@@ -70,4 +70,9 @@
     <string name="transaction_creation_account_summary_empty">Пока нет счетов</string>
     <string name="transaction_creation_account_add_new">Добавить счёт</string>
     <string name="transaction_creation_account_add_new_subtitle">Банк, накопления, наличные или карта</string>
+
+    <!-- Action feedback snackbars -->
+    <string name="account_creation_created_snackbar">«%1$s» добавлен</string>
+    <string name="account_creation_updated_snackbar">«%1$s» обновлён</string>
+    <string name="accounts_manage_deleted_snackbar">«%1$s» удалён</string>
 </resources>

@@ -6,8 +6,15 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
@@ -20,6 +27,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavEntry
@@ -33,9 +41,12 @@ import androidx.window.core.layout.WindowSizeClass.Companion.WIDTH_DP_MEDIUM_LOW
 import com.georgeci.moneysurfer.navigation.util.rememberViewModelStoreNavEntryDecorator
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import io.github.irgaly.navigation3.resultstate.rememberNavigationResultNavEntryDecorator
+import kotlinx.coroutines.launch
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
+import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
 private val savedStateConfig = SavedStateConfiguration {
@@ -133,41 +144,73 @@ fun AppNavGraph(
         )
     }
 
+    val snackbarController: SnackbarController = koinInject()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val snackbarScope = rememberCoroutineScope()
+    LaunchedEffect(snackbarController) {
+        snackbarController.requests.collect { request ->
+            snackbarHostState.currentSnackbarData?.dismiss()
+            snackbarScope.launch {
+                val message = request.resolveMessage()
+                val actionLabel = request.actionLabel?.let { getString(it) }
+                val result = snackbarHostState.showSnackbar(
+                    message = message,
+                    actionLabel = actionLabel,
+                    withDismissAction = false,
+                    duration = SnackbarDuration.Short,
+                )
+                if (result == SnackbarResult.ActionPerformed) {
+                    request.onAction?.invoke()
+                }
+            }
+        }
+    }
+
     SyncStatusProvider {
-        if (currentTopLevel == null) {
-            navDisplay()
-        } else {
-            val destinationLabels = TopLevelDestination.entries.associateWith { destination ->
-                stringResource(destination.label)
-            }
-            val adaptiveInfo = currentWindowAdaptiveInfo()
-            val layoutType = if (
-                adaptiveInfo.windowSizeClass.isWidthAtLeastBreakpoint(WIDTH_DP_MEDIUM_LOWER_BOUND)
-            ) {
-                NavigationSuiteScaffoldDefaults.calculateFromAdaptiveInfo(adaptiveInfo)
+        Scaffold(
+            containerColor = AppTheme.materialColors.background,
+            contentWindowInsets = WindowInsets(0, 0, 0, 0),
+            snackbarHost = { SnackbarHost(snackbarHostState) { data -> Snackbar(data) } },
+        ) { _ ->
+            if (currentTopLevel == null) {
+                navDisplay()
             } else {
-                NavigationSuiteType.None
+                val destinationLabels = TopLevelDestination.entries.associateWith { destination ->
+                    stringResource(destination.label)
+                }
+                val adaptiveInfo = currentWindowAdaptiveInfo()
+                val layoutType = if (
+                    adaptiveInfo.windowSizeClass.isWidthAtLeastBreakpoint(WIDTH_DP_MEDIUM_LOWER_BOUND)
+                ) {
+                    NavigationSuiteScaffoldDefaults.calculateFromAdaptiveInfo(adaptiveInfo)
+                } else {
+                    NavigationSuiteType.None
+                }
+                NavigationSuiteScaffold(
+                    layoutType = layoutType,
+                    navigationSuiteItems = {
+                        TopLevelDestination.entries.forEach { destination ->
+                            val label = destinationLabels.getValue(destination)
+                            item(
+                                selected = destination.matches(currentTopLevel),
+                                onClick = { navigator.resetTo(destination.route) },
+                                icon = {
+                                    Icon(imageVector = destination.icon, contentDescription = label)
+                                },
+                                label = { Text(label) },
+                            )
+                        }
+                    },
+                    containerColor = AppTheme.materialColors.background,
+                    content = navDisplay,
+                )
             }
-            NavigationSuiteScaffold(
-                layoutType = layoutType,
-                navigationSuiteItems = {
-                    TopLevelDestination.entries.forEach { destination ->
-                        val label = destinationLabels.getValue(destination)
-                        item(
-                            selected = destination.matches(currentTopLevel),
-                            onClick = { navigator.resetTo(destination.route) },
-                            icon = {
-                                Icon(imageVector = destination.icon, contentDescription = label)
-                            },
-                            label = { Text(label) },
-                        )
-                    }
-                },
-                containerColor = AppTheme.materialColors.background,
-                content = navDisplay,
-            )
         }
     }
 }
+
+@Suppress("SpreadOperator") // messageArgs holds 0-1 items; the array copy cost is negligible.
+private suspend fun SnackbarRequest.resolveMessage(): String =
+    getString(message, *messageArgs.toTypedArray())
 
 private const val ANIMATION_DURATION = 300

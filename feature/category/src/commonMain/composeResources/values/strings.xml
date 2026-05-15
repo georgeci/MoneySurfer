@@ -38,4 +38,10 @@
     <string name="categories_manage_delete_message">"%1$s" will be removed. Transactions using it won\'t be deleted.</string>
     <string name="categories_manage_delete_confirm">Delete</string>
     <string name="categories_manage_delete_cancel">Cancel</string>
+
+    <!-- Action feedback snackbars -->
+    <string name="category_creation_created_snackbar">"%1$s" created</string>
+    <string name="category_creation_updated_snackbar">"%1$s" updated</string>
+    <string name="categories_manage_deleted_snackbar">"%1$s" deleted</string>
+    <string name="categories_manage_delete_undo">Undo</string>
 </resources>
