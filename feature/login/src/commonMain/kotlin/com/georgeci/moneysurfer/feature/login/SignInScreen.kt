@@ -39,6 +39,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -684,17 +685,21 @@ private fun OrDivider() {
 
 @Composable
 private fun SignInTerms(onClick: () -> Unit) {
-    Text(
-        text = stringResource(Res.string.sign_in_terms),
-        style = AppTheme.typography.bodySmall,
-        color = SignInPalette.PrimaryDark,
-        textAlign = TextAlign.Center,
-        textDecoration = TextDecoration.Underline,
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .testTag(SignInTestTags.Terms),
-    )
+    Box(
+        modifier = Modifier.fillMaxWidth(),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(
+            text = stringResource(Res.string.sign_in_terms),
+            style = AppTheme.typography.bodySmall,
+            color = SignInPalette.PrimaryDark,
+            textAlign = TextAlign.Center,
+            textDecoration = TextDecoration.Underline,
+            modifier = Modifier
+                .clickable(role = Role.Button, onClick = onClick)
+                .testTag(SignInTestTags.Terms),
+        )
+    }
 }
 
 @Preview

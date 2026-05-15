@@ -14,7 +14,6 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.unit.dp
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
@@ -53,13 +52,13 @@ fun LegalScreen(onNavigateBack: () -> Unit) {
                 .fillMaxSize()
                 .padding(
                     top = padding.calculateTopPadding(),
-                    start = 24.dp,
-                    end = 24.dp,
+                    start = AppTheme.spacing.large,
+                    end = AppTheme.spacing.large,
                 )
                 .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(AppTheme.spacing.small),
         ) {
-            Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.height(AppTheme.spacing.small))
             LegalSection(
                 heading = Res.string.legal_terms_heading,
                 body = Res.string.legal_terms_body,
@@ -73,7 +72,7 @@ fun LegalScreen(onNavigateBack: () -> Unit) {
                 style = AppTheme.typography.bodySmall,
                 color = AppTheme.materialColors.onSurfaceVariant,
             )
-            Spacer(Modifier.height(padding.calculateBottomPadding() + 24.dp))
+            Spacer(Modifier.height(padding.calculateBottomPadding() + AppTheme.spacing.large))
         }
     }
 }
