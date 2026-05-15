@@ -1,0 +1,23 @@
+appId: ${APP_ID}
+name: Dashboard — empty-state CTA before first transaction
+---
+# Pre-condition: Dashboard with a workspace and one account, no transactions logged.
+# 03 creates the baseline account; this flow runs before 04 logs any transaction.
+- runFlow: 03_dashboard_add_account.yaml
+
+# Golden first-run state: the Recent section shows the empty state, not a blank box.
+- assertVisible:
+    text: "No activity yet"
+- assertVisible:
+    text: "Transactions you log will show up here."
+
+# The empty-state CTA is the next step — it opens transaction creation.
+- tapOn:
+    text: "Add transaction"
+- assertVisible:
+    text: "New transaction"
+
+# Return to Dashboard so later flows start from a known screen.
+- back
+- assertVisible:
+    text: "No activity yet"
