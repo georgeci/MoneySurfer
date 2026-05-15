@@ -154,6 +154,7 @@ data class SettingsState(
     val isOffline: Boolean = false,
     val syncEnabled: Boolean = false,
 ) {
+    val showProfile: Boolean get() = !isOffline
     val showSyncSection: Boolean get() = !isOffline && syncEnabled
     val showLogout: Boolean get() = !isOffline
     val showWorkspaceMembers: Boolean get() = !isOffline
