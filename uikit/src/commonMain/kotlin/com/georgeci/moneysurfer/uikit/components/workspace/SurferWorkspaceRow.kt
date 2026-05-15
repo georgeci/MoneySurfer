@@ -267,7 +267,7 @@ private fun SurferWorkspaceRowPreview() {
         ) {
             SurferWorkspaceRow(
                 name = "Family",
-                subtitle = "4 members · shared",
+                subtitle = "Household budget",
                 selected = true,
                 enabled = true,
                 showActions = true,

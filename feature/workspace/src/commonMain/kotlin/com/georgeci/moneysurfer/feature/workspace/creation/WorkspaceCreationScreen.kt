@@ -213,7 +213,7 @@ private fun WorkspaceCreationContent(
                     )
                 }
 
-                if (state.isEditing && !state.isOffline) {
+                if (state.showMembersSection) {
                     MembersSection(
                         members = state.members,
                         showInviteRow = true,

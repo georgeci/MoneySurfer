@@ -149,6 +149,13 @@ sealed interface WorkspaceSelectorState {
         val isSelecting: Boolean,
         override val isOffline: Boolean = false,
     ) : WorkspaceSelectorState {
+        /**
+         * The "Members" row action is remote-only — offline workspaces are always single-user,
+         * so showing it would imply collaboration the offline build doesn't support.
+         */
+        val showMemberActions: Boolean
+            get() = !isOffline
+
         val activeWorkspaceId: WorkspaceId?
             get() = pendingWorkspaceId ?: selectedWorkspaceId
 
