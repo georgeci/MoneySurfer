@@ -1,5 +1,6 @@
 package com.georgeci.moneysurfer.offline.di
 
+import com.georgeci.moneysurfer.domain.SyncFeatureFlag
 import com.georgeci.moneysurfer.feature.login.SignInFeatureConfig
 import org.koin.dsl.koinApplication
 import kotlin.test.AfterTest
@@ -32,5 +33,11 @@ class OfflineSignInFeatureConfigTest {
         assertFalse(config.anonymous, "offline build has no remote auth backend")
         assertTrue(config.demo, "offline build must keep the demo entry point")
         assertTrue(config.demoOnly, "offline build must render only the demo CTA")
+    }
+
+    @Test
+    fun `offline build resolves SyncFeatureFlag disabled`() {
+        val flag = app.koin.get<SyncFeatureFlag>()
+        assertFalse(flag.enabled, "offline build has no sync backend — flag must stay off")
     }
 }

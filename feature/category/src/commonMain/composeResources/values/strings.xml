@@ -16,6 +16,7 @@
     <string name="category_creation_type_label">Type</string>
     <string name="category_creation_type_expense">Expense</string>
     <string name="category_creation_type_income">Income</string>
+    <string name="category_creation_type_transfer">Transfer</string>
     <string name="category_creation_name_label">Name</string>
     <string name="category_creation_icon_label">Icon</string>
     <string name="category_creation_color_label">Color</string>

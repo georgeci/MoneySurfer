@@ -20,7 +20,7 @@ import io.kotest.matchers.types.shouldBeInstanceOf
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
@@ -28,15 +28,69 @@ import moneysurfer.feature.category.generated.resources.Res
 import moneysurfer.feature.category.generated.resources.categories_manage_delete_undo
 import moneysurfer.feature.category.generated.resources.categories_manage_deleted_snackbar
 
-/**
- * Delete + Undo flow for `CategoriesManageViewModel`. The VM streams categories from a fake
- * repository, so a delete and a subsequent undo are both observable in `Content` state.
- */
 @OptIn(ExperimentalCoroutinesApi::class)
 class CategoriesManageViewModelTest : StringSpec({
 
     beforeSpec { Dispatchers.setMain(UnconfinedTestDispatcher()) }
     afterSpec { Dispatchers.resetMain() }
+
+    "starts in Loading before categories are emitted" {
+        val repo = FakeCategoryRepository()
+        val viewModel = newViewModel(repo)
+
+        viewModel.value shouldBe CategoriesManageState.Loading
+    }
+
+    "transitions to Content when categories arrive" {
+        val repo = FakeCategoryRepository()
+        val viewModel = newViewModel(repo)
+
+        repo.emit(
+            listOf(
+                aCategory(id = categoryId("c-1"), name = "Food"),
+                aCategory(id = categoryId("c-2"), name = "Salary"),
+            ),
+        )
+
+        val content = viewModel.value.shouldBeInstanceOf<CategoriesManageState.Content>()
+        content.categories.map { it.name } shouldBe listOf("Food", "Salary")
+    }
+
+    "transitions to empty Content when categories are removed" {
+        val repo = FakeCategoryRepository()
+        val viewModel = newViewModel(repo)
+
+        repo.emit(listOf(aCategory(id = categoryId("c-1"), name = "Food")))
+        repo.emit(emptyList())
+
+        val content = viewModel.value.shouldBeInstanceOf<CategoriesManageState.Content>()
+        content.categories shouldBe emptyList()
+    }
+
+    "OnRemoveCategoryClick stages a pending delete" {
+        val repo = FakeCategoryRepository()
+        val viewModel = newViewModel(repo)
+        repo.emit(listOf(aCategory(id = categoryId("c-1"), name = "Food")))
+
+        viewModel.onEvent(CategoriesManageEvent.OnRemoveCategoryClick(categoryId("c-1")))
+
+        val content = viewModel.value.shouldBeInstanceOf<CategoriesManageState.Content>()
+        content.pendingDelete?.id shouldBe categoryId("c-1")
+        content.pendingDelete?.name shouldBe "Food"
+    }
+
+    "OnDeleteCancel clears pending without deleting" {
+        val repo = FakeCategoryRepository()
+        val viewModel = newViewModel(repo)
+        repo.emit(listOf(aCategory(id = categoryId("c-1"), name = "Food")))
+
+        viewModel.onEvent(CategoriesManageEvent.OnRemoveCategoryClick(categoryId("c-1")))
+        viewModel.onEvent(CategoriesManageEvent.OnDeleteCancel)
+
+        val content = viewModel.value.shouldBeInstanceOf<CategoriesManageState.Content>()
+        content.pendingDelete shouldBe null
+        repo.deleted shouldBe emptyList()
+    }
 
     "OnDeleteConfirm removes the category and shows an undo snackbar" {
         val ws = workspaceId("ws-1")
@@ -56,8 +110,10 @@ class CategoriesManageViewModelTest : StringSpec({
         }
 
         val content = viewModel.value.shouldBeInstanceOf<CategoriesManageState.Content>()
+        content.pendingDelete shouldBe null
         content.categories.shouldBeEmpty()
         repo.snapshot().shouldBeEmpty()
+        repo.deleted shouldBe listOf(category.id)
     }
 
     "tapping Undo on the delete snackbar restores the category" {
@@ -86,7 +142,7 @@ class CategoriesManageViewModelTest : StringSpec({
 
 private fun newViewModel(
     repo: FakeCategoryRepository,
-    workspaceId: WorkspaceId,
+    workspaceId: WorkspaceId = workspaceId("ws-1"),
     snackbar: SnackbarController = SnackbarController(),
 ): CategoriesManageViewModel {
     val session = InMemorySessionPointers(currentWorkspaceId = workspaceId)
@@ -102,21 +158,36 @@ private fun List<*>.shouldBeEmpty() {
     if (isNotEmpty()) error("expected empty list, got $this")
 }
 
-private class FakeCategoryRepository(initial: List<Category>) : CategoryRepository {
-    private val state = MutableStateFlow(initial)
+/**
+ * Backed by a replay-1 [MutableSharedFlow] so a fresh fake (no `initial`) leaves the VM in
+ * `Loading` until [emit] is called; passing `initial` seeds the stream up front. Writes
+ * re-emit the mutated list so the VM observes deletes and Undo re-inserts.
+ */
+private class FakeCategoryRepository(initial: List<Category>? = null) : CategoryRepository {
+    private val flow = MutableSharedFlow<List<Category>>(replay = 1)
+    private var current: List<Category> = initial ?: emptyList()
+    val deleted = mutableListOf<CategoryId>()
 
-    fun snapshot(): List<Category> = state.value
+    init {
+        if (initial != null) check(flow.tryEmit(current)) { "failed to seed categories" }
+    }
 
-    override fun getAll(): Flow<List<Category>> = state
-    override fun getByWorkspaceId(workspaceId: WorkspaceId): Flow<List<Category>> = state
-    override suspend fun getById(id: CategoryId): Category? = state.value.firstOrNull { it.id == id }
-    override suspend fun insert(category: Category) {
-        state.value = state.value + category
+    fun emit(categories: List<Category>) {
+        current = categories
+        check(flow.tryEmit(categories)) { "failed to emit categories" }
     }
-    override suspend fun update(category: Category) {
-        state.value = state.value.map { if (it.id == category.id) category else it }
-    }
+
+    fun snapshot(): List<Category> = current
+
+    override fun getAll(): Flow<List<Category>> = flow
+    override fun getByWorkspaceId(workspaceId: WorkspaceId): Flow<List<Category>> = flow
+    override suspend fun getById(id: CategoryId): Category? = current.firstOrNull { it.id == id }
+    override suspend fun insert(category: Category) = emit(current + category)
+    override suspend fun update(category: Category) =
+        emit(current.map { if (it.id == category.id) category else it })
+
     override suspend fun delete(id: CategoryId) {
-        state.value = state.value.filterNot { it.id == id }
+        deleted += id
+        emit(current.filterNot { it.id == id })
     }
 }

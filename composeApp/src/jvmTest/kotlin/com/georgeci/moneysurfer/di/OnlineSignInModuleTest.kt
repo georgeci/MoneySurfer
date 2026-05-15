@@ -27,4 +27,11 @@ class OnlineSignInModuleTest {
 
         assertFalse(flags.isOffline)
     }
+
+    @Test
+    fun `online build registers SyncFeatureFlag disabled by default`() {
+        val flag = OnlineSignInModule().syncFeatureFlag()
+
+        assertFalse(flag.enabled, "sync is hidden by default in the online build")
+    }
 }

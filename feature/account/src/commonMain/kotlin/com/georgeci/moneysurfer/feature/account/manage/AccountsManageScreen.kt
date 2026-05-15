@@ -1,6 +1,8 @@
 package com.georgeci.moneysurfer.feature.account.manage
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -50,6 +52,7 @@ import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_man
 import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_manage_stat_archived_count
 import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_manage_stat_total
 import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_manage_title
+import com.georgeci.moneysurfer.uikit.components.SurferSkeletonRow
 import com.georgeci.moneysurfer.uikit.components.account.SurferAccountManageCard
 import com.georgeci.moneysurfer.uikit.components.account.SurferArchivedAccountCard
 import com.georgeci.moneysurfer.uikit.components.account.SurferTotalBalanceCard
@@ -104,9 +107,21 @@ private fun AccountsManageLoading(onEvent: (AccountsManageEvent) -> Unit) {
             )
         },
     ) { padding ->
-        Box(modifier = Modifier.fillMaxSize().padding(padding))
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .padding(horizontal = 16.dp, vertical = 12.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp),
+        ) {
+            repeat(ACCOUNTS_SKELETON_ROWS) {
+                SurferSkeletonRow()
+            }
+        }
     }
 }
+
+private const val ACCOUNTS_SKELETON_ROWS = 5
 
 @Composable
 private fun AccountsManageContent(

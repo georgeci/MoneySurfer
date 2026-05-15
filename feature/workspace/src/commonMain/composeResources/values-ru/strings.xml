@@ -3,6 +3,7 @@
     <string name="workspace_selector_title">Рабочие пространства</string>
     <string name="workspace_selector_heading_title">Выберите пространство</string>
     <string name="workspace_selector_heading_subtitle">У каждого — свои бюджеты, счета и участники.</string>
+    <string name="workspace_selector_heading_subtitle_offline">У каждого — свои бюджеты и счета.</string>
     <string name="workspace_selector_empty">Для пользователя нет доступных workspace.</string>
     <string name="workspace_selector_create_title">Новое пространство</string>
     <string name="workspace_selector_create_subtitle">Для поездки, проекта или чего-то ещё</string>

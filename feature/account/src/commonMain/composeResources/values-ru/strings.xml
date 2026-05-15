@@ -26,6 +26,7 @@
     <string name="account_creation_name_label">Название счёта</string>
     <string name="account_creation_balance_label">Начальный баланс</string>
     <string name="account_creation_balance_helper">Изменить позднее можно в меню счёта.</string>
+    <string name="account_creation_balance_error_negative">Счёт этого типа не может иметь отрицательный начальный баланс.</string>
     <string name="account_creation_save">Сохранить</string>
     <string name="account_creation_cancel">Отмена</string>
     <string name="account_creation_type_label">Тип</string>

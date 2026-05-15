@@ -1,6 +1,7 @@
 package com.georgeci.moneysurfer.feature.settings.sync
 
 import co.touchlab.kermit.Logger
+import com.georgeci.moneysurfer.domain.SyncFeatureFlag
 import com.georgeci.moneysurfer.domain.model.SyncStep
 import com.georgeci.moneysurfer.sync.api.SyncError
 import com.georgeci.moneysurfer.sync.api.SyncReason
@@ -11,6 +12,7 @@ import org.koin.core.annotation.KoinViewModel
 @KoinViewModel
 class SyncViewModel(
     private val syncCoordinator: SyncCoordinator,
+    private val syncFeatureFlag: SyncFeatureFlag,
 ) : MviViewModel<SyncState, SyncEvent, SyncEffect>(
     initialState = SyncState(),
 ) {
@@ -25,6 +27,14 @@ class SyncViewModel(
     }
 
     private fun sync() {
+        // Defensive: SettingsScreen no longer surfaces a way here when the flag is off,
+        // but the navigation entry stays registered — bail out so a deep link or stale
+        // back stack can't trigger an actual sync against Firestore.
+        if (!syncFeatureFlag.enabled) {
+            log.i { "[sync] feature flag off — ignoring manual sync request" }
+            updateState { copy(syncStatus = SyncStatus.Idle) }
+            return
+        }
         launch {
             log.i { "[sync] requesting MANUAL sync via coordinator" }
             updateState { copy(syncStatus = SyncStatus.InProgress(step = null)) }

@@ -16,6 +16,7 @@
     <string name="category_creation_type_label">Тип</string>
     <string name="category_creation_type_expense">Расход</string>
     <string name="category_creation_type_income">Доход</string>
+    <string name="category_creation_type_transfer">Перевод</string>
     <string name="category_creation_name_label">Название</string>
     <string name="category_creation_icon_label">Иконка</string>
     <string name="category_creation_color_label">Цвет</string>

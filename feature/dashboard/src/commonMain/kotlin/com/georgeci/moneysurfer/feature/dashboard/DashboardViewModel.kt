@@ -113,6 +113,14 @@ sealed interface DashboardState {
         val formattedTrendDelta: String?,
         val isOffline: Boolean = false,
     ) : DashboardState {
+
+        /**
+         * Single source of truth for the "no transactions logged yet" decision so screens
+         * never re-derive it — keeps the empty-state vs. content choice off the composable.
+         */
+        val recentTransactionsEmpty: Boolean
+            get() = transactions.isEmpty()
+
         companion object
     }
 

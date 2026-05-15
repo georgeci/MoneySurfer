@@ -1,6 +1,7 @@
 package com.georgeci.moneysurfer.feature.account.creation
 
 import arrow.optics.optics
+import com.georgeci.moneysurfer.domain.OfflineBuildFlags
 import com.georgeci.moneysurfer.domain.auth.SessionPointers
 import com.georgeci.moneysurfer.domain.model.Account
 import com.georgeci.moneysurfer.domain.model.Currency
@@ -25,6 +26,7 @@ import kotlinx.datetime.toLocalDateTime
 import org.koin.core.annotation.KoinViewModel
 
 @KoinViewModel
+@Suppress("LongParameterList")
 class AccountCreationViewModel(
     private val accountId: AccountId?,
     private val accountRepository: AccountRepository,
@@ -33,6 +35,7 @@ class AccountCreationViewModel(
     private val getCurrentTime: GetCurrentTimeUseCase,
     private val getCurrencies: GetCurrenciesUseCase,
     private val snackbar: SnackbarController,
+    private val offlineBuildFlags: OfflineBuildFlags,
 ) : MviViewModel<AccountCreationState, AccountCreationEvent, AccountCreationEffect>(
     initialState = if (accountId != null) {
         AccountCreationState.Loading(editingAccountId = accountId)
@@ -44,6 +47,7 @@ class AccountCreationViewModel(
             currency = DEFAULT_CURRENCY,
             currencies = emptyList(),
             extraFields = emptyList(),
+            extraDetailsEnabled = !offlineBuildFlags.isOffline,
             editingAccountId = null,
         )
     },
@@ -61,7 +65,11 @@ class AccountCreationViewModel(
             is AccountCreationEvent.OnNameChanged ->
                 updateState { AccountCreationState.content.name.modify(this) { event.name } }
             is AccountCreationEvent.OnBalanceChanged ->
-                updateState { AccountCreationState.content.balance.modify(this) { event.balance } }
+                updateState {
+                    AccountCreationState.content.balance.modify(this) {
+                        InitialBalanceInput.sanitize(event.balance)
+                    }
+                }
             is AccountCreationEvent.OnTypeChanged ->
                 updateState { AccountCreationState.content.type.modify(this) { event.type } }
             is AccountCreationEvent.OnCurrencyChanged ->
@@ -85,6 +93,7 @@ class AccountCreationViewModel(
                     currency = account?.currencyCode ?: DEFAULT_CURRENCY,
                     currencies = loadedCurrencies,
                     extraFields = emptyList(),
+                    extraDetailsEnabled = !offlineBuildFlags.isOffline,
                     editingAccountId = id,
                 )
             }
@@ -130,6 +139,7 @@ class AccountCreationViewModel(
     private fun saveAccount() {
         val state = currentState as? AccountCreationState.Content ?: return
         if (state.name.isBlank()) return
+        if (state.balanceError != null) return
         launch {
             val trimmedName = state.name.trim()
             if (state.isEditMode) {
@@ -147,9 +157,9 @@ class AccountCreationViewModel(
             }
 
             val workspaceId = session.currentWorkspaceId.flow.first() ?: return@launch
-            val balanceDouble = state.balance.toDoubleOrNull() ?: 0.0
+            val balanceDouble = InitialBalanceInput.parse(state.balance) ?: 0.0
             val currency = state.currency
-            val openingBalance = Money.fromDouble(balanceDouble).abs()
+            val openingBalance = Money.fromDouble(balanceDouble)
             val newAccountId = AccountId.uuid()
             accountRepository.insert(
                 Account(
@@ -212,6 +222,7 @@ sealed interface AccountCreationState {
         val currency: CurrencyCode,
         val currencies: List<Currency>,
         val extraFields: List<AccountExtraField>,
+        val extraDetailsEnabled: Boolean = true,
         override val editingAccountId: AccountId?,
     ) : AccountCreationState {
         val availableExtraFieldKinds: List<AccountExtraFieldKind>
@@ -221,6 +232,14 @@ sealed interface AccountCreationState {
 
         val currencySymbol: String
             get() = currencies.firstOrNull { it.code == currency }?.symbol ?: currency.value
+
+        /** Inline validation error for the opening balance field, or null when it is acceptable. */
+        val balanceError: InitialBalanceError?
+            get() = InitialBalanceInput.errorFor(balance, type)
+
+        /** Whether the Save action may proceed: a name is present and the balance is valid. */
+        val canSave: Boolean
+            get() = name.isNotBlank() && balanceError == null
 
         companion object
     }
