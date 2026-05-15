@@ -109,4 +109,11 @@
     <string name="workspace_creation_preview_fallback_title">New workspace</string>
     <string name="workspace_creation_error_remote_sync">Couldn't sync the new workspace to the cloud. Check your connection and try again.</string>
     <string name="workspace_creation_error_unknown">Couldn't create the workspace. Please try again.</string>
+
+    <!-- First-run currency picker -->
+    <string name="first_run_currency_title">Choose your currency</string>
+    <string name="first_run_currency_subtitle">All balances and reports use this currency. You can change it later in Settings.</string>
+    <string name="first_run_currency_search_placeholder">Search currency</string>
+    <string name="first_run_currency_confirm">Continue</string>
+    <string name="first_run_currency_error">Couldn't save your currency. Please try again.</string>
 </resources>

@@ -34,7 +34,15 @@ class OfflineFirstRunSeeder(
                 return
             }
         }
+        // A null workspace pointer before the seed means this is a fresh install — the seed
+        // is about to create a workspace with a locale-derived currency. Flip `currencyChosen`
+        // so `AppLaunchViewModel` routes to the currency picker for explicit confirmation.
+        val freshInstall = session.currentWorkspaceId.flow.first() == null
         seedDefaultsUseCase(CurrencyDefaults.systemDefault())
+        if (freshInstall && session.currentWorkspaceId.flow.first() != null) {
+            session.currencyChosen.set(false)
+            log.i { "[seed] fresh install — currency picker pending" }
+        }
     }
 
     private companion object {

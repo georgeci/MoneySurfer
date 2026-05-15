@@ -56,11 +56,15 @@ class AppLaunchViewModel(
                 .onFailure { log.w(it) { "[firstRun] seedIfNeeded threw — proceeding to route decision" } }
 
             // 1. One-shot startup decision based on the current snapshot.
+            //    `currencyChosen` is `true` for every path except a fresh offline seed, which
+            //    flips it false so the user picks a currency before landing on Dashboard.
             val userId = session.currentUserId.flow.first()
             val workspaceId = session.currentWorkspaceId.flow.first()
+            val currencyChosen = session.currencyChosen.flow.first()
             _targetRoute.value = when {
                 userId == null -> Route.SignIn
                 workspaceId == null -> Route.WorkspaceSelector()
+                !currencyChosen -> Route.FirstRunCurrency
                 else -> Route.Dashboard
             }
 

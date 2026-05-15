@@ -28,4 +28,6 @@ class SessionPointersImpl(
     )
 
     override val hasUsedDemo: Pref<Boolean> = src.hasUsedDemo.asPref()
+
+    override val currencyChosen: Pref<Boolean> = src.currencyChosen.asPref()
 }

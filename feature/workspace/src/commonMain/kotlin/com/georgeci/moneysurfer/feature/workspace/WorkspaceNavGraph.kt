@@ -6,6 +6,7 @@ import androidx.compose.material3.adaptive.navigation3.ListDetailSceneStrategy
 import com.georgeci.moneysurfer.domain.primitives.UserId
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 import com.georgeci.moneysurfer.feature.workspace.creation.WorkspaceCreationScreen
+import com.georgeci.moneysurfer.feature.workspace.firstrun.FirstRunCurrencyScreen
 import com.georgeci.moneysurfer.feature.workspace.incoming.IncomingInvitesScreen
 import com.georgeci.moneysurfer.feature.workspace.invite.WorkspaceInviteScreen
 import com.georgeci.moneysurfer.feature.workspace.members.MemberActionsBottomSheet
@@ -103,5 +104,11 @@ val workspaceNavGraph: FeatureNavGraph = { navigator ->
 
     entry<Route.IncomingInvites> {
         IncomingInvitesScreen(onNavigateBack = { navigator.pop() })
+    }
+
+    entry<Route.FirstRunCurrency> {
+        FirstRunCurrencyScreen(
+            onNavigateToDashboard = { navigator.replaceTop(Route.Dashboard) },
+        )
     }
 }
