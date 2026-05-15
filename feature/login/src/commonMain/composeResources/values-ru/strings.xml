@@ -10,8 +10,14 @@
     <string name="sign_in_or">или</string>
     <string name="sign_in_passkey">Войти по Passkey</string>
     <string name="sign_in_email">Войти по e-mail</string>
-    <string name="sign_in_demo_mode">Демо-режим</string>
+    <string name="sign_in_demo_mode">Продолжить без аккаунта</string>
     <string name="sign_in_terms">Продолжая, вы принимаете Условия и Политику.</string>
+    <string name="legal_title">Условия и Политика</string>
+    <string name="legal_terms_heading">Условия использования</string>
+    <string name="legal_terms_body">MoneySurfer предоставляется как есть и помогает вести личный и семейный бюджет. Вы отвечаете за точность вводимых данных. Приложение не является финансовой консультацией.</string>
+    <string name="legal_privacy_heading">Конфиденциальность</string>
+    <string name="legal_privacy_body">В офлайн-режиме ваши счета, операции и бюджеты хранятся только на этом устройстве и никуда не передаются. Удаление приложения удаляет ваши данные.</string>
+    <string name="legal_updated">Обновлено: май 2026</string>
     <string name="sign_in_error_missing_credentials">Введите e-mail и пароль</string>
     <string name="sign_in_error_invalid_credentials">Неверный e-mail или пароль</string>
     <string name="sign_in_error_email_in_use">Этот e-mail уже используется</string>

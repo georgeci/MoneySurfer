@@ -2,6 +2,7 @@ package com.georgeci.moneysurfer.feature.login
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -43,6 +44,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -191,6 +193,7 @@ private fun SignInError.localized(): String = stringResource(
 @Composable
 fun SignInScreen(
     onNavigateToWorkspaceSelector: () -> Unit,
+    onNavigateToLegal: () -> Unit,
     viewModel: SignInViewModel = koinViewModel(),
 ) {
     val state by viewModel.collectAsStateWithLifecycle()
@@ -198,6 +201,7 @@ fun SignInScreen(
     viewModel.HandleSideEffect { effect ->
         when (effect) {
             SignInEffect.NavigateToWorkspaceSelector -> onNavigateToWorkspaceSelector()
+            SignInEffect.NavigateToLegal -> onNavigateToLegal()
         }
     }
 
@@ -516,7 +520,7 @@ private fun SignInActionSheet(
             }
 
             Spacer(Modifier.height(AppTheme.spacing.default))
-            SignInTerms()
+            SignInTerms(onClick = { onEvent(SignInEvent.OnTermsClick) })
         }
     }
 }
@@ -679,14 +683,16 @@ private fun OrDivider() {
 }
 
 @Composable
-private fun SignInTerms() {
+private fun SignInTerms(onClick: () -> Unit) {
     Text(
         text = stringResource(Res.string.sign_in_terms),
         style = AppTheme.typography.bodySmall,
-        color = SignInPalette.SheetSubtle,
+        color = SignInPalette.PrimaryDark,
         textAlign = TextAlign.Center,
+        textDecoration = TextDecoration.Underline,
         modifier = Modifier
             .fillMaxWidth()
+            .clickable(onClick = onClick)
             .testTag(SignInTestTags.Terms),
     )
 }
