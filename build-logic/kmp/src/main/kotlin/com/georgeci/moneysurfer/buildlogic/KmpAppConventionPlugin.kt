@@ -86,7 +86,12 @@ class KmpAppConventionPlugin : Plugin<Project> {
                         signingConfig = signingConfigs.getByName("dev")
                     }
                     getByName("release") {
-                        isMinifyEnabled = false
+                        isMinifyEnabled = true
+                        isShrinkResources = true
+                        proguardFiles(
+                            getDefaultProguardFile("proguard-android-optimize.txt"),
+                            rootProject.file("proguard/proguard-rules.pro"),
+                        )
                         ndk {
                             debugSymbolLevel = "FULL"
                         }
