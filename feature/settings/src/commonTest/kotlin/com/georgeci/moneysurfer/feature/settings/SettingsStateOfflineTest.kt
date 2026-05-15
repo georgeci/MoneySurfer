@@ -14,7 +14,7 @@ import kotlin.test.assertTrue
 class SettingsStateOfflineTest {
 
     @Test
-    fun `online state shows sync, logout, members and pending invites rows`() {
+    fun `online state shows profile, sync, logout, members and pending invites rows`() {
         val state = SettingsState(
             isOffline = false,
             currentWorkspaceId = WorkspaceId("ws-1"),
@@ -28,7 +28,7 @@ class SettingsStateOfflineTest {
     }
 
     @Test
-    fun `offline state hides sync, logout, members and pending invites rows`() {
+    fun `offline state hides profile, sync, logout, members and pending invites rows`() {
         val state = SettingsState(
             isOffline = true,
             currentWorkspaceId = WorkspaceId("ws-1"),
