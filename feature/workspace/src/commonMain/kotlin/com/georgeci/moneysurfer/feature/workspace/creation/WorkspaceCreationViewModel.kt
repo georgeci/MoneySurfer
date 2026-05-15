@@ -201,6 +201,15 @@ sealed interface WorkspaceCreationState {
         val error: WorkspaceCreationError? = null,
         val isOffline: Boolean = false,
     ) : WorkspaceCreationState {
+
+        /**
+         * The Members section (invite row + member list) is remote-only. Offline workspaces
+         * are always single-user, so the section is hidden in the offline build to avoid
+         * implying collaboration that isn't supported.
+         */
+        val showMembersSection: Boolean
+            get() = isEditing && !isOffline
+
         companion object
     }
 
