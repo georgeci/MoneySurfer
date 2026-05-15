@@ -144,28 +144,7 @@ fun AppNavGraph(
         )
     }
 
-    val snackbarController: SnackbarController = koinInject()
-    val snackbarHostState = remember { SnackbarHostState() }
-    val snackbarScope = rememberCoroutineScope()
-    LaunchedEffect(snackbarController) {
-        snackbarController.requests.collect { request ->
-            snackbarHostState.currentSnackbarData?.dismiss()
-            snackbarScope.launch {
-                val message = request.resolveMessage()
-                val actionLabel = request.actionLabel?.let { getString(it) }
-                val result = snackbarHostState.showSnackbar(
-                    message = message,
-                    actionLabel = actionLabel,
-                    withDismissAction = false,
-                    // Action snackbars (Undo) stay longer so the user can read and reach the button.
-                    duration = if (actionLabel != null) SnackbarDuration.Long else SnackbarDuration.Short,
-                )
-                if (result == SnackbarResult.ActionPerformed) {
-                    request.onAction?.invoke()
-                }
-            }
-        }
-    }
+    val snackbarHostState = rememberSnackbarHostState(koinInject())
 
     SyncStatusProvider {
         Scaffold(
@@ -173,41 +152,78 @@ fun AppNavGraph(
             contentWindowInsets = WindowInsets(0, 0, 0, 0),
             snackbarHost = { SnackbarHost(snackbarHostState) { data -> Snackbar(data) } },
         ) { _ ->
-            if (currentTopLevel == null) {
+            val topLevel = currentTopLevel
+            if (topLevel == null) {
                 navDisplay()
             } else {
-                val destinationLabels = TopLevelDestination.entries.associateWith { destination ->
-                    stringResource(destination.label)
-                }
-                val adaptiveInfo = currentWindowAdaptiveInfo()
-                val layoutType = if (
-                    adaptiveInfo.windowSizeClass.isWidthAtLeastBreakpoint(WIDTH_DP_MEDIUM_LOWER_BOUND)
-                ) {
-                    NavigationSuiteScaffoldDefaults.calculateFromAdaptiveInfo(adaptiveInfo)
-                } else {
-                    NavigationSuiteType.None
-                }
-                NavigationSuiteScaffold(
-                    layoutType = layoutType,
-                    navigationSuiteItems = {
-                        TopLevelDestination.entries.forEach { destination ->
-                            val label = destinationLabels.getValue(destination)
-                            item(
-                                selected = destination.matches(currentTopLevel),
-                                onClick = { navigator.resetTo(destination.route) },
-                                icon = {
-                                    Icon(imageVector = destination.icon, contentDescription = label)
-                                },
-                                label = { Text(label) },
-                            )
-                        }
-                    },
-                    containerColor = AppTheme.materialColors.background,
+                AppNavigationSuite(
+                    currentTopLevel = topLevel,
+                    onSelect = navigator::resetTo,
                     content = navDisplay,
                 )
             }
         }
     }
+}
+
+/** App-level [SnackbarHost] state that renders one-shot messages posted to [controller]. */
+@Composable
+private fun rememberSnackbarHostState(controller: SnackbarController): SnackbarHostState {
+    val hostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+    LaunchedEffect(controller) {
+        controller.requests.collect { request ->
+            hostState.currentSnackbarData?.dismiss()
+            scope.launch { hostState.present(request) }
+        }
+    }
+    return hostState
+}
+
+private suspend fun SnackbarHostState.present(request: SnackbarRequest) {
+    val actionLabel = request.actionLabel?.let { getString(it) }
+    val result = showSnackbar(
+        message = request.resolveMessage(),
+        actionLabel = actionLabel,
+        withDismissAction = false,
+        // Action snackbars (Undo) stay longer so the user can read and reach the button.
+        duration = if (actionLabel != null) SnackbarDuration.Long else SnackbarDuration.Short,
+    )
+    if (result == SnackbarResult.ActionPerformed) request.onAction?.invoke()
+}
+
+@OptIn(ExperimentalMaterial3AdaptiveApi::class)
+@Composable
+private fun AppNavigationSuite(
+    currentTopLevel: Route.TopLevel,
+    onSelect: (Route) -> Unit,
+    content: @Composable () -> Unit,
+) {
+    val labels = TopLevelDestination.entries.associateWith { stringResource(it.label) }
+    val adaptiveInfo = currentWindowAdaptiveInfo()
+    val layoutType = if (
+        adaptiveInfo.windowSizeClass.isWidthAtLeastBreakpoint(WIDTH_DP_MEDIUM_LOWER_BOUND)
+    ) {
+        NavigationSuiteScaffoldDefaults.calculateFromAdaptiveInfo(adaptiveInfo)
+    } else {
+        NavigationSuiteType.None
+    }
+    NavigationSuiteScaffold(
+        layoutType = layoutType,
+        navigationSuiteItems = {
+            TopLevelDestination.entries.forEach { destination ->
+                val label = labels.getValue(destination)
+                item(
+                    selected = destination.matches(currentTopLevel),
+                    onClick = { onSelect(destination.route) },
+                    icon = { Icon(imageVector = destination.icon, contentDescription = label) },
+                    label = { Text(label) },
+                )
+            }
+        },
+        containerColor = AppTheme.materialColors.background,
+        content = content,
+    )
 }
 
 @Suppress("SpreadOperator") // messageArgs holds 0-1 items; the array copy cost is negligible.
