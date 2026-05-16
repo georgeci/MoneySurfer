@@ -1080,8 +1080,11 @@ val offlineDebugApkPath = rootProject.file(
     "androidApp-offline/build/outputs/apk/debug/androidApp-offline-debug.apk",
 )
 val iosOfflineMaestroDerivedDataDir = rootProject.file("build/ios-maestro-offline")
+// The offline Xcode config (`iosAppOffline/Configuration/Config.xcconfig`) overrides
+// `PRODUCT_NAME` to `MoneySurferOffline Dev` for the Debug configuration, so the
+// `-configuration Debug` build emits a bundle under that (space-containing) name.
 val iosOfflineMaestroAppPath = iosOfflineMaestroDerivedDataDir.resolve(
-    "Build/Products/Debug-iphonesimulator/iosAppOffline.app",
+    "Build/Products/Debug-iphonesimulator/MoneySurferOffline Dev.app",
 )
 val maestroOfflineJunit = maestroReportsDir.resolve("maestro-offline-golden.xml")
 val maestroOfflineIosJunit = maestroIosReportsDir.resolve("maestro-offline-golden-ios.xml")

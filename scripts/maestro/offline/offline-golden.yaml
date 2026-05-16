@@ -62,9 +62,12 @@ tags:
 - assertVisible:
     text: "Maestro golden expense"
 
-# 6. Settings shows the offline row set — and crucially NOT Backup / Sync /
-#    Logout. The sync and logout rows are never composed in the offline build,
-#    so `notVisible` on their stable ids is a locale-independent assertion.
+# 6. Settings shows the offline row set — and crucially NOT Sync or Logout.
+#    Those rows are never composed in the offline build, so `notVisible` on
+#    their stable ids is a locale-independent assertion. There is no Backup
+#    row in the Settings screen in any build (no composable renders one), so
+#    there is nothing to assert against — if a Backup row is ever added, tag
+#    it in `SettingsTestTags` and extend the assertions below.
 - tapOn:
     id: "dashboard:settings"
 - assertVisible:
