@@ -63,7 +63,6 @@ fun LegalScreen(onNavigateBack: () -> Unit) {
                     end = AppTheme.spacing.large,
                 )
                 .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(AppTheme.spacing.small),
         ) {
             Spacer(Modifier.height(AppTheme.spacing.small))
             LegalSection(
@@ -71,13 +70,13 @@ fun LegalScreen(onNavigateBack: () -> Unit) {
                 heading = Res.string.legal_terms_heading,
                 body = Res.string.legal_terms_body,
             )
-            Spacer(Modifier.height(AppTheme.spacing.medium))
+            Spacer(Modifier.height(AppTheme.spacing.large))
             LegalSection(
                 icon = SurferIcons.Shield,
                 heading = Res.string.legal_privacy_heading,
                 body = Res.string.legal_privacy_body,
             )
-            Spacer(Modifier.height(AppTheme.spacing.medium))
+            Spacer(Modifier.height(AppTheme.spacing.large))
             Text(
                 text = stringResource(Res.string.legal_updated),
                 style = AppTheme.typography.bodySmall,
