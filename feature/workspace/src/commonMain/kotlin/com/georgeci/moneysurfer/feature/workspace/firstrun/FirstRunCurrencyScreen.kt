@@ -116,10 +116,7 @@ private fun FirstRunCurrencyContent(
                             onClick = { onEvent(FirstRunCurrencyEvent.OnSkipClick) },
                             enabled = !state.inFlight,
                         ) {
-                            Text(
-                                text = stringResource(Res.string.first_run_currency_skip),
-                                color = AppTheme.materialColors.primary,
-                            )
+                            Text(text = stringResource(Res.string.first_run_currency_skip))
                         }
                     },
                 )

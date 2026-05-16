@@ -57,11 +57,23 @@ class FirstRunCurrencyViewModel(
     }
 
     private fun skip() {
-        val state = currentState
-        if (state is FirstRunCurrencyState.Content && state.inFlight) return
-        launch(onError = { log.w(it) { "[skip] failed" } }) {
-            session.currencyChosen.set(true)
+        val state = currentState as? FirstRunCurrencyState.Content ?: return
+        if (state.inFlight) return
+        launch(
+            onError = { err ->
+                log.w(err) { "[skip] failed" }
+                updateState {
+                    if (this is FirstRunCurrencyState.Content) copy(inFlight = false, error = true) else this
+                }
+            },
+        ) {
+            updateState {
+                if (this is FirstRunCurrencyState.Content) copy(inFlight = true, error = false) else this
+            }
+            // Set `onboardingSkipped` before `currencyChosen`: if the process dies between the
+            // two writes, the worst case is the picker shows once more — not a lost recovery path.
             session.onboardingSkipped.set(true)
+            session.currencyChosen.set(true)
             log.i { "[skip] keeping seeded currency, onboarding skipped" }
             postSideEffect(FirstRunCurrencyEffect.NavigateToDashboard)
         }
