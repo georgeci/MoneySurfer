@@ -10,8 +10,8 @@
   },
   "devDependencies": {
     "@firebase/rules-unit-testing": "^5.0.1",
-    "firebase": "^12.0.0",
-    "mocha": "^11.1.0",
+    "firebase": "^12.14.0",
+    "mocha": "^11.7.6",
     "mocha-junit-reporter": "^2.2.1"
   },
   "engines": {
