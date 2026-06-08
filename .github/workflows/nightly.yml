@@ -584,7 +584,7 @@ jobs:
         run: mkdir -p gh-pages/nightly/allure
 
       - name: Build Allure report (with history)
-        uses: simple-elf/allure-report-action@53ebb757a2097edc77c53ecef4d454fc2f2f774c # v1.13
+        uses: simple-elf/allure-report-action@e463a472d3b1d750f9544369d60589ff1964c820 # v1.14
         with:
           allure_results: allure-results
           gh_pages: gh-pages/nightly/allure
