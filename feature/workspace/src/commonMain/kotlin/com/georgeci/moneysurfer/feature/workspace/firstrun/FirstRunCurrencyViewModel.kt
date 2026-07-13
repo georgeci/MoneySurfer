@@ -17,6 +17,11 @@ import org.koin.core.annotation.KoinViewModel
  * locale-derived currency; this screen lets the user confirm or change it, then persists the
  * choice on the workspace + seeded account and flips `session.currencyChosen` so the picker
  * never reappears.
+ *
+ * The user can also "Skip" — that keeps the locale-derived seed currency, flips `currencyChosen`
+ * so the picker is not forced again, and sets `onboardingSkipped` so Settings can offer a
+ * "Finish setup" entry. Confirming the picker (first run or via "Finish setup") clears
+ * `onboardingSkipped`.
  */
 @KoinViewModel
 class FirstRunCurrencyViewModel(
@@ -47,6 +52,30 @@ class FirstRunCurrencyViewModel(
                 }
             }
             FirstRunCurrencyEvent.OnConfirmClick -> confirm()
+            FirstRunCurrencyEvent.OnSkipClick -> skip()
+        }
+    }
+
+    private fun skip() {
+        val state = currentState as? FirstRunCurrencyState.Content ?: return
+        if (state.inFlight) return
+        launch(
+            onError = { err ->
+                log.w(err) { "[skip] failed" }
+                updateState {
+                    if (this is FirstRunCurrencyState.Content) copy(inFlight = false, error = true) else this
+                }
+            },
+        ) {
+            updateState {
+                if (this is FirstRunCurrencyState.Content) copy(inFlight = true, error = false) else this
+            }
+            // Set `onboardingSkipped` before `currencyChosen`: if the process dies between the
+            // two writes, the worst case is the picker shows once more — not a lost recovery path.
+            session.onboardingSkipped.set(true)
+            session.currencyChosen.set(true)
+            log.i { "[skip] keeping seeded currency, onboarding skipped" }
+            postSideEffect(FirstRunCurrencyEffect.NavigateToDashboard)
         }
     }
 
@@ -92,6 +121,7 @@ class FirstRunCurrencyViewModel(
                 },
                 ifRight = {
                     session.currencyChosen.set(true)
+                    session.onboardingSkipped.set(false)
                     log.i { "[confirm] ok currency=$code wid=${wid.value}" }
                     postSideEffect(FirstRunCurrencyEffect.NavigateToDashboard)
                 },
@@ -123,6 +153,7 @@ sealed interface FirstRunCurrencyEvent {
     data class OnQueryChanged(val query: String) : FirstRunCurrencyEvent
     data class OnCurrencySelected(val code: String) : FirstRunCurrencyEvent
     data object OnConfirmClick : FirstRunCurrencyEvent
+    data object OnSkipClick : FirstRunCurrencyEvent
 }
 
 sealed interface FirstRunCurrencyEffect {
