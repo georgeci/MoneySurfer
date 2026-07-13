@@ -2,19 +2,26 @@ package com.georgeci.moneysurfer.feature.login.legal
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.unit.dp
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
+import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import moneysurfer.feature.login.generated.resources.Res
@@ -56,17 +63,20 @@ fun LegalScreen(onNavigateBack: () -> Unit) {
                     end = AppTheme.spacing.large,
                 )
                 .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(AppTheme.spacing.small),
         ) {
             Spacer(Modifier.height(AppTheme.spacing.small))
             LegalSection(
+                icon = SurferIcons.Receipt,
                 heading = Res.string.legal_terms_heading,
                 body = Res.string.legal_terms_body,
             )
+            Spacer(Modifier.height(AppTheme.spacing.large))
             LegalSection(
+                icon = SurferIcons.Shield,
                 heading = Res.string.legal_privacy_heading,
                 body = Res.string.legal_privacy_body,
             )
+            Spacer(Modifier.height(AppTheme.spacing.large))
             Text(
                 text = stringResource(Res.string.legal_updated),
                 style = AppTheme.typography.bodySmall,
@@ -78,12 +88,24 @@ fun LegalScreen(onNavigateBack: () -> Unit) {
 }
 
 @Composable
-private fun LegalSection(heading: StringResource, body: StringResource) {
-    Text(
-        text = stringResource(heading),
-        style = AppTheme.typography.titleMedium,
-        color = AppTheme.materialColors.onSurface,
-    )
+private fun LegalSection(icon: ImageVector, heading: StringResource, body: StringResource) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(AppTheme.spacing.small),
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = AppTheme.materialColors.primary,
+            modifier = Modifier.size(24.dp),
+        )
+        Text(
+            text = stringResource(heading),
+            style = AppTheme.typography.titleMedium,
+            color = AppTheme.materialColors.onSurface,
+        )
+    }
+    Spacer(Modifier.height(AppTheme.spacing.xxSmall))
     Text(
         text = stringResource(body),
         style = AppTheme.typography.bodyMedium,

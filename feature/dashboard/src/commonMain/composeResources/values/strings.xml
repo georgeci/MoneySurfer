@@ -3,8 +3,6 @@
     <string name="dashboard_toolbar_greeting">Dashboard</string>
     <string name="dashboard_settings_content_description">Settings</string>
     <string name="dashboard_add_transaction">Add transaction</string>
-    <string name="dashboard_quick_action_add">Add</string>
-    <string name="dashboard_quick_action_transfer">Transfer</string>
     <string name="dashboard_balance_title">Total balance</string>
     <string name="dashboard_balance_empty_text">Add your first account to see balance.</string>
     <string name="dashboard_accounts_section_title">Accounts</string>

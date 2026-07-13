@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -36,7 +37,6 @@ import com.georgeci.moneysurfer.uikit.widgets.LocalSurferWidgetSize
 import com.georgeci.moneysurfer.uikit.widgets.SurferAccountItem
 import com.georgeci.moneysurfer.uikit.widgets.SurferAccountsWidget
 import com.georgeci.moneysurfer.uikit.widgets.SurferBalanceWidget
-import com.georgeci.moneysurfer.uikit.widgets.SurferQuickActionsWidget
 import com.georgeci.moneysurfer.uikit.widgets.SurferRecentTransactionItem
 import com.georgeci.moneysurfer.uikit.widgets.SurferRecentTransactionsWidget
 import com.georgeci.moneysurfer.uikit.widgets.SurferWidgetSize
@@ -49,8 +49,6 @@ import moneysurfer.feature.dashboard.generated.resources.dashboard_add_account_n
 import moneysurfer.feature.dashboard.generated.resources.dashboard_add_transaction
 import moneysurfer.feature.dashboard.generated.resources.dashboard_balance_empty_text
 import moneysurfer.feature.dashboard.generated.resources.dashboard_balance_title
-import moneysurfer.feature.dashboard.generated.resources.dashboard_quick_action_add
-import moneysurfer.feature.dashboard.generated.resources.dashboard_quick_action_transfer
 import moneysurfer.feature.dashboard.generated.resources.dashboard_recent_empty_subtitle
 import moneysurfer.feature.dashboard.generated.resources.dashboard_recent_empty_title
 import moneysurfer.feature.dashboard.generated.resources.dashboard_recent_see_all
@@ -97,6 +95,8 @@ fun DashboardScreen(
 
 private const val DASHBOARD_SKELETON_ROWS = 4
 
+private val DASHBOARD_WIDGET_MIN_HEIGHT = 180.dp
+
 @Composable
 private fun DashboardLoading() {
     Scaffold(
@@ -129,7 +129,6 @@ private fun DashboardContent(
 ) {
     val widgetSize = LocalSurferWidgetSize.current
     val heroWidgets = widgetSize == SurferWidgetSize.Hero
-    val quickActionsPadding = if (heroWidgets) 12.dp else 10.dp
     val accountsPadding = if (heroWidgets) 8.dp else 6.dp
 
     Scaffold(
@@ -183,26 +182,8 @@ private fun DashboardContent(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp)
-                        .height(180.dp),
+                        .defaultMinSize(minHeight = DASHBOARD_WIDGET_MIN_HEIGHT),
                 )
-            }
-
-            if (!state.isOffline) {
-                item(key = "actions") {
-                    SurferQuickActionsWidget(
-                        primaryLabel = stringResource(Res.string.dashboard_quick_action_add),
-                        primaryIcon = SurferIcons.Add,
-                        onPrimaryClick = { onEvent(DashboardEvent.OnAddTransactionClick) },
-                        secondaryLabel = stringResource(Res.string.dashboard_quick_action_transfer),
-                        secondaryIcon = SurferIcons.Split,
-                        onSecondaryClick = { onEvent(DashboardEvent.OnManageAccountsClick) },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 4.dp)
-                            .height(80.dp)
-                            .padding(quickActionsPadding),
-                    )
-                }
             }
 
             item(key = "accounts-header") {
@@ -226,6 +207,7 @@ private fun DashboardContent(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp)
+                        .defaultMinSize(minHeight = DASHBOARD_WIDGET_MIN_HEIGHT)
                         .padding(accountsPadding),
                 )
             }
@@ -241,6 +223,7 @@ private fun DashboardContent(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 16.dp)
+                            .defaultMinSize(minHeight = DASHBOARD_WIDGET_MIN_HEIGHT)
                             .padding(vertical = 8.dp),
                     )
                 } else {
@@ -257,6 +240,7 @@ private fun DashboardContent(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 16.dp)
+                            .defaultMinSize(minHeight = DASHBOARD_WIDGET_MIN_HEIGHT)
                             .padding(vertical = 8.dp),
                     )
                 }
