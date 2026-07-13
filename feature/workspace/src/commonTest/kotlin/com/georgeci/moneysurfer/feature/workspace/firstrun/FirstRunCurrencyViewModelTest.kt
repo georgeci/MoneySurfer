@@ -115,6 +115,52 @@ class FirstRunCurrencyViewModelTest : StringSpec({
         }
     }
 
+    "OnConfirmClick clears onboardingSkipped when resuming from a skipped setup" {
+        runTest {
+            val fixture = Fixture(ws, workspaceCurrency = USD, onboardingSkipped = true)
+            val vm = fixture.createViewModel()
+            try {
+                vm.awaitContent()
+                vm.onEvent(FirstRunCurrencyEvent.OnCurrencySelected("GBP"))
+
+                vm.sideEffects.effectFlow.test {
+                    vm.onEvent(FirstRunCurrencyEvent.OnConfirmClick)
+                    awaitItem().shouldBeInstanceOf<FirstRunCurrencyEffect.NavigateToDashboard>()
+                    cancelAndIgnoreRemainingEvents()
+                }
+
+                fixture.session.currencyChosen.flow.first() shouldBe true
+                fixture.session.onboardingSkipped.flow.first() shouldBe false
+            } finally {
+                vm.viewModelScope.cancel()
+            }
+        }
+    }
+
+    "OnSkipClick keeps the seeded currency, flips currencyChosen + onboardingSkipped, and navigates" {
+        runTest {
+            val fixture = Fixture(ws, workspaceCurrency = USD)
+            val vm = fixture.createViewModel()
+            try {
+                vm.awaitContent()
+                vm.onEvent(FirstRunCurrencyEvent.OnCurrencySelected("GBP"))
+
+                vm.sideEffects.effectFlow.test {
+                    vm.onEvent(FirstRunCurrencyEvent.OnSkipClick)
+                    awaitItem().shouldBeInstanceOf<FirstRunCurrencyEffect.NavigateToDashboard>()
+                    cancelAndIgnoreRemainingEvents()
+                }
+
+                // Skip keeps the locale-derived seed default — the GBP selection is not applied.
+                fixture.workspaceRepository.getById(ws)!!.baseCurrency shouldBe USD
+                fixture.session.currencyChosen.flow.first() shouldBe true
+                fixture.session.onboardingSkipped.flow.first() shouldBe true
+            } finally {
+                vm.viewModelScope.cancel()
+            }
+        }
+    }
+
     "OnConfirmClick surfaces an error and stays on screen when the update fails" {
         runTest {
             // No workspace row -> UpdateWorkspaceCurrencyUseCase raises WorkspaceNotFound.
@@ -143,6 +189,7 @@ private class Fixture(
     workspaceId: WorkspaceId,
     workspaceCurrency: CurrencyCode = USD,
     seedWorkspace: Boolean = true,
+    onboardingSkipped: Boolean = false,
 ) {
     val workspaceRepository = FakeWorkspaceRepository()
     val accountRepository = FakeAccountRepository()
@@ -154,7 +201,11 @@ private class Fixture(
             Currency(USD, "$", "US Dollar"),
         ),
     )
-    val session = InMemorySessionPointers(currentWorkspaceId = workspaceId, currencyChosen = false)
+    val session = InMemorySessionPointers(
+        currentWorkspaceId = workspaceId,
+        currencyChosen = false,
+        onboardingSkipped = onboardingSkipped,
+    )
 
     init {
         if (seedWorkspace) {
