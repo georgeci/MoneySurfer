@@ -25,10 +25,11 @@
     <string name="sign_in_error_unknown">Sign-in failed</string>
     <string name="sign_in_error_permission_denied">You don't have access. Please retry or contact support.</string>
     <string name="sign_in_terms">By continuing you agree to the Terms &amp; Privacy.</string>
+    <!-- TODO(#65): plain-language Terms/Privacy text — final wording pending legal review before public release. -->
     <string name="legal_title">Terms &amp; Privacy</string>
     <string name="legal_terms_heading">Terms of Use</string>
-    <string name="legal_terms_body">MoneySurfer is provided as-is to help you track personal and household budgets. You are responsible for the accuracy of the data you enter. The app is not financial advice.</string>
-    <string name="legal_privacy_heading">Privacy</string>
-    <string name="legal_privacy_body">In offline mode your accounts, transactions, and budgets stay on this device and are never sent to a server. Removing the app removes your data.</string>
+    <string name="legal_terms_body">MoneySurfer is a personal and household budgeting tool provided to you as-is, without warranties of any kind. By using the app you agree to these terms.\n\nYou are responsible for the accuracy of every account, transaction, and budget you enter. MoneySurfer does not verify your data and is not a substitute for professional financial, tax, or legal advice.\n\nThe app is intended for lawful personal use only. You may not use it to store unlawful content or to infringe the rights of others.\n\nMoneySurfer is provided free of charge and may change or stop working at any time. We are not liable for any loss arising from using, or being unable to use, the app, including loss of data stored on your device.\n\nThese terms may be updated in future releases. Continuing to use the app after an update means you accept the revised terms.</string>
+    <string name="legal_privacy_heading">Privacy Policy</string>
+    <string name="legal_privacy_body">MoneySurfer is built offline-first. In offline mode — when you use the app without an account — all of your budgeting data is stored on your device and nothing is transmitted to our servers.\n\nYour accounts, transactions, budgets, and settings then live solely in the app\'s local storage. We do not sell this data or share it with third parties.\n\nIf you sign in to enable cloud sync, your synced data is sent to our hosting provider so it can be shared across your own devices and household. Sync is optional; without an account, your budgeting data never leaves the device.\n\nThe app may collect anonymous crash reports and diagnostics to help us fix problems. It contains no advertising.\n\nUninstalling the app, or clearing its data, permanently removes everything stored on your device.</string>
     <string name="legal_updated">Last updated: May 2026</string>
 </resources>
