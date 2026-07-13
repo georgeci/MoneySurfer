@@ -32,3 +32,10 @@ name: Dashboard — Add bank account
     text: "Accounts"
 - assertVisible:
     text: "Main Bank"
+
+# The Add / Transfer quick-action buttons were removed from the Dashboard (issue #62).
+# Anchored regex so "Add account" / "Add transaction" do not satisfy the match.
+- assertNotVisible:
+    text: "^Add$"
+- assertNotVisible:
+    text: "^Transfer$"

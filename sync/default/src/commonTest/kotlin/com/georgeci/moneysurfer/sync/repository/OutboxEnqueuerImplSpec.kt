@@ -31,6 +31,8 @@ private class FakeSessionPointers(uid: String?) : SessionPointers {
     override val currentWorkspaceId: Pref<WorkspaceId?> = Pref.inMemory(null)
     override val currentFirebaseUid: Pref<String?> = Pref.inMemory(uid)
     override val hasUsedDemo: Pref<Boolean> = Pref.inMemory(false)
+    override val currencyChosen: Pref<Boolean> = Pref.inMemory(true)
+    override val onboardingSkipped: Pref<Boolean> = Pref.inMemory(false)
 }
 
 private class FakeAppVersionGate(private var allowed: Boolean) : AppVersionGate {

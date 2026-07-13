@@ -2,6 +2,7 @@ package com.georgeci.moneysurfer.feature.login
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -38,11 +39,13 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -191,6 +194,7 @@ private fun SignInError.localized(): String = stringResource(
 @Composable
 fun SignInScreen(
     onNavigateToWorkspaceSelector: () -> Unit,
+    onNavigateToLegal: () -> Unit,
     viewModel: SignInViewModel = koinViewModel(),
 ) {
     val state by viewModel.collectAsStateWithLifecycle()
@@ -198,6 +202,7 @@ fun SignInScreen(
     viewModel.HandleSideEffect { effect ->
         when (effect) {
             SignInEffect.NavigateToWorkspaceSelector -> onNavigateToWorkspaceSelector()
+            SignInEffect.NavigateToLegal -> onNavigateToLegal()
         }
     }
 
@@ -516,7 +521,7 @@ private fun SignInActionSheet(
             }
 
             Spacer(Modifier.height(AppTheme.spacing.default))
-            SignInTerms()
+            SignInTerms(onClick = { onEvent(SignInEvent.OnTermsClick) })
         }
     }
 }
@@ -679,16 +684,22 @@ private fun OrDivider() {
 }
 
 @Composable
-private fun SignInTerms() {
-    Text(
-        text = stringResource(Res.string.sign_in_terms),
-        style = AppTheme.typography.bodySmall,
-        color = SignInPalette.SheetSubtle,
-        textAlign = TextAlign.Center,
-        modifier = Modifier
-            .fillMaxWidth()
-            .testTag(SignInTestTags.Terms),
-    )
+private fun SignInTerms(onClick: () -> Unit) {
+    Box(
+        modifier = Modifier.fillMaxWidth(),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(
+            text = stringResource(Res.string.sign_in_terms),
+            style = AppTheme.typography.bodySmall,
+            color = SignInPalette.PrimaryDark,
+            textAlign = TextAlign.Center,
+            textDecoration = TextDecoration.Underline,
+            modifier = Modifier
+                .clickable(role = Role.Button, onClick = onClick)
+                .testTag(SignInTestTags.Terms),
+        )
+    }
 }
 
 @Preview

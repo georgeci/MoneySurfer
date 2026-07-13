@@ -3,7 +3,7 @@ name: Nightly
 # Heavy / expensive jobs that don't need to gate every PR. Runs once a day
 # against the default branch and on demand via workflow_dispatch.
 #
-# Cost note: macos-14 runners are ~10x more expensive than ubuntu, which is
+# Cost note: macos-15 runners are ~10x more expensive than ubuntu, which is
 # why iOS verification lives here instead of in the per-PR ci.yml.
 
 on:
@@ -13,10 +13,6 @@ on:
     - cron: "17 3 * * *"
   workflow_dispatch:
 
-permissions:
-  contents: write    # nightly-publish pushes to gh-pages
-  actions: read      # decide queries `gh run list`
-
 concurrency:
   group: nightly
   cancel-in-progress: false
@@ -25,6 +21,9 @@ jobs:
   decide:
     name: Skip if no changes since last successful run
     runs-on: ubuntu-latest
+    permissions:
+      actions: read    # `gh run list` against this workflow
+      contents: read   # implicit checkout token scope, kept explicit
     outputs:
       run: ${{ steps.check.outputs.run }}
     steps:
@@ -65,6 +64,8 @@ jobs:
     if: needs.decide.outputs.run == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    permissions:
+      contents: read
     # Compile-only: catches AGP/Kotlin/google-services regressions without
     # needing the dev keystore (assembleDebug would require DEV_* secrets,
     # see androidApp/build.gradle.kts -> signingConfigs.dev).
@@ -98,6 +99,8 @@ jobs:
     if: needs.decide.outputs.run == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout
@@ -120,8 +123,10 @@ jobs:
     name: iOS simulator build
     needs: decide
     if: needs.decide.outputs.run == 'true'
-    runs-on: macos-14
+    runs-on: macos-15
     timeout-minutes: 40
+    permissions:
+      contents: read
     # Lean Debug build for iOS Simulator (arm64), no code signing, no archive,
     # no Crashlytics dSYM upload. Verifies the Kotlin framework links and the
     # Swift code compiles end-to-end against the embedded framework.
@@ -180,12 +185,65 @@ jobs:
             build \
             | "${FORMATTER[@]}"
 
+  ios-offline-build:
+    name: iOS offline simulator build
+    needs: decide
+    if: needs.decide.outputs.run == 'true'
+    runs-on: macos-15
+    timeout-minutes: 40
+    permissions:
+      contents: read
+    # Mirror of ios-build for the offline variant (composeAppOffline +
+    # iosAppOffline). No Firebase plist is needed — the offline app must build
+    # without any networked services baked in.
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up JDK
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Show Xcode version
+        run: xcodebuild -version
+
+      - name: Link Kotlin framework (iosSimulatorArm64, offline)
+        run: ./gradlew :composeAppOffline:linkDebugFrameworkIosSimulatorArm64 --stacktrace
+
+      - name: Build iOS offline app (Simulator, no signing)
+        run: |
+          set -eo pipefail
+          if command -v xcbeautify >/dev/null 2>&1; then
+            FORMATTER=(xcbeautify --renderer github-actions)
+          else
+            FORMATTER=(cat)
+          fi
+          xcodebuild \
+            -project iosAppOffline/iosAppOffline.xcodeproj \
+            -target iosAppOffline \
+            -configuration Debug \
+            -sdk iphonesimulator \
+            -arch arm64 \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            build \
+            | "${FORMATTER[@]}"
+
   maestro-android:
     name: Maestro Android (E2E)
     needs: decide
     if: needs.decide.outputs.run == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 90
+    permissions:
+      contents: read
     # Heavy: builds debug APK with USE_EMULATOR=true, boots AVD + Firebase
     # Emulator (auth + firestore), seeds test users, runs all flows in
     # scripts/maestro/, generates Allure. Lives in nightly because the AVD
@@ -237,7 +295,10 @@ jobs:
           profile: pixel_6
           ram-size: 4096M
           disable-animations: true
-          emulator-options: -no-window -no-snapshot -gpu swiftshader_indirect -noaudio -no-boot-anim
+          disable-spellchecker: true
+          force-avd-creation: false
+          emulator-boot-timeout: 1200
+          emulator-options: -no-window -no-snapshot -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -camera-front none
           script: ./gradlew qaMaestroAndroid --stacktrace
 
       - name: Upload Allure report
@@ -246,6 +307,18 @@ jobs:
         with:
           name: allure-report-maestro-android
           path: build/reports/allure/maestro/
+          if-no-files-found: warn
+          retention-days: 14
+
+      # Native Allure results — JSON test bodies, screenshots, executor metadata.
+      # Consumed by the nightly-publish aggregator so the Pages report keeps
+      # Maestro's per-step screenshots instead of degrading to bare JUnit.
+      - name: Upload Allure results (native)
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: allure-results-maestro-android
+          path: build/allure-results/maestro/
           if-no-files-found: warn
           retention-days: 14
 
@@ -274,8 +347,10 @@ jobs:
     name: Maestro iOS (E2E)
     needs: decide
     if: needs.decide.outputs.run == 'true'
-    runs-on: macos-14
+    runs-on: macos-15
     timeout-minutes: 90
+    permissions:
+      contents: read
     # Same shape as maestro-android but on a macOS runner: boots an iPhone
     # simulator, builds the Debug app with MS_USE_EMULATOR=YES, runs flows.
 
@@ -372,6 +447,15 @@ jobs:
           if-no-files-found: warn
           retention-days: 14
 
+      - name: Upload Allure results (native)
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: allure-results-maestro-ios
+          path: build/allure-results/maestro-ios/
+          if-no-files-found: warn
+          retention-days: 14
+
       - name: Upload JUnit results
         if: always()
         uses: actions/upload-artifact@v7
@@ -403,15 +487,34 @@ jobs:
       contents: write
 
     steps:
-      - name: Download Maestro Android JUnit
-        uses: actions/download-artifact@v4
+      # Prefer the native Allure results (JSON + screenshots) so the published
+      # report keeps Maestro per-step UI evidence. Fall back to JUnit XML when
+      # the native artifact is missing — happens if the prep task crashed *and*
+      # never managed to write `executor.json` (extremely rare given the
+      # in-Gradle fallback in qa.gradle.kts → writeAllureFallbackMetadata).
+      - name: Download Maestro Android Allure results (native)
+        uses: actions/download-artifact@v8
+        with:
+          name: allure-results-maestro-android
+          path: allure-input-native/maestro-android
+        continue-on-error: true
+
+      - name: Download Maestro iOS Allure results (native)
+        uses: actions/download-artifact@v8
+        with:
+          name: allure-results-maestro-ios
+          path: allure-input-native/maestro-ios
+        continue-on-error: true
+
+      - name: Download Maestro Android JUnit (fallback)
+        uses: actions/download-artifact@v8
         with:
           name: maestro-android-junit
           path: allure-input/maestro-android
         continue-on-error: true
 
-      - name: Download Maestro iOS JUnit
-        uses: actions/download-artifact@v4
+      - name: Download Maestro iOS JUnit (fallback)
+        uses: actions/download-artifact@v8
         with:
           name: maestro-ios-junit
           path: allure-input/maestro-ios
@@ -422,13 +525,52 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p allure-results
-          # find returns 0 even with no matches — let the loop body just not
-          # execute. No reliance on `shopt -s globstar`.
-          find allure-input -type f -name '*.xml' 2>/dev/null | while read -r f; do
-            dest="allure-results/$(echo "${f#allure-input/}" | tr '/' '__')"
-            cp "$f" "$dest"
-          done
-          echo "Staged $(ls allure-results 2>/dev/null | wc -l) input(s)."
+          # 1) Native Allure: copy result.json bodies + attachment binaries
+          #    verbatim. Filenames are uuid4-based (per maestro_to_allure.py)
+          #    so they cannot collide across Android/iOS scopes.
+          #
+          #    `executor.json` and `environment.properties` are intentionally
+          #    skipped: the converter writes them per scope, but flattening
+          #    into one dir would silently overwrite one scope's metadata with
+          #    the other's. Per-scope copies remain available in the
+          #    `allure-results-maestro-{android,ios}` artifacts for anyone
+          #    debugging the converter output.
+          if [ -d allure-input-native ]; then
+            find allure-input-native -type f 2>/dev/null | while read -r f; do
+              base="$(basename "$f")"
+              case "$base" in
+                executor.json|environment.properties) continue ;;
+              esac
+              cp "$f" "allure-results/$base"
+            done
+          fi
+          native_count=$(ls allure-results 2>/dev/null | wc -l)
+          # 2) JUnit fallback: only stage XMLs we don't already have native
+          #    data for. Treat presence of any `*-result.json` for a scope as
+          #    "native data is here" and skip its JUnit to avoid duplicate
+          #    suites. Guarded by `[ -d allure-input ]` because both fallback
+          #    downloads use `continue-on-error: true` and may leave the dir
+          #    absent — `find` on a missing path would otherwise abort the
+          #    whole job under `set -e`.
+          have_android_native=false; have_ios_native=false
+          if compgen -G "allure-input-native/maestro-android/*-result.json" > /dev/null; then
+            have_android_native=true
+          fi
+          if compgen -G "allure-input-native/maestro-ios/*-result.json" > /dev/null; then
+            have_ios_native=true
+          fi
+          if [ -d allure-input ]; then
+            find allure-input -type f -name '*.xml' 2>/dev/null | while read -r f; do
+              case "$f" in
+                allure-input/maestro-android/*) $have_android_native && continue ;;
+                allure-input/maestro-ios/*)     $have_ios_native     && continue ;;
+              esac
+              dest="allure-results/$(echo "${f#allure-input/}" | tr '/' '__')"
+              cp "$f" "$dest"
+            done
+          fi
+          total=$(ls allure-results 2>/dev/null | wc -l)
+          echo "Staged $total input(s) ($native_count native, $((total - native_count)) JUnit fallback)."
 
       - name: Checkout gh-pages
         uses: actions/checkout@v6

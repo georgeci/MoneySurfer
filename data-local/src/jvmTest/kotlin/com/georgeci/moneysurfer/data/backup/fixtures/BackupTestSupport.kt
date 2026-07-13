@@ -1,6 +1,7 @@
 package com.georgeci.moneysurfer.data.backup.fixtures
 
 import androidx.room.Room
+import com.georgeci.moneysurfer.data.backup.deleteIfExists
 import com.georgeci.moneysurfer.data.backup.zip.ZipStoredWriter
 import com.georgeci.moneysurfer.data.db.MONEY_SURFER_DB_VERSION
 import com.georgeci.moneysurfer.data.db.MoneySurferDatabase

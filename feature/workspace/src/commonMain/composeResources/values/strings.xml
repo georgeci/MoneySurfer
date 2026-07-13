@@ -3,6 +3,7 @@
     <string name="workspace_selector_title">Workspaces</string>
     <string name="workspace_selector_heading_title">Choose a workspace</string>
     <string name="workspace_selector_heading_subtitle">Each workspace has its own budgets, accounts and members.</string>
+    <string name="workspace_selector_heading_subtitle_offline">Each workspace has its own budgets and accounts.</string>
     <string name="workspace_selector_empty">No workspaces available for this user.</string>
     <string name="workspace_selector_create_title">New workspace</string>
     <string name="workspace_selector_create_subtitle">For a trip, side project, or anything</string>
@@ -104,7 +105,16 @@
     <string name="workspace_creation_invite_title">Invite people</string>
     <string name="workspace_creation_invite_subtitle">Share a link or send an email</string>
     <string name="workspace_creation_preview_subtitle_format">Shared · %1$d members · %2$s</string>
+    <string name="workspace_creation_preview_subtitle_offline_format">%1$s</string>
     <string name="workspace_creation_preview_fallback_title">New workspace</string>
     <string name="workspace_creation_error_remote_sync">Couldn't sync the new workspace to the cloud. Check your connection and try again.</string>
     <string name="workspace_creation_error_unknown">Couldn't create the workspace. Please try again.</string>
+
+    <!-- First-run currency picker -->
+    <string name="first_run_currency_title">Choose your currency</string>
+    <string name="first_run_currency_subtitle">All balances and reports in this workspace use this currency.</string>
+    <string name="first_run_currency_search_placeholder">Search currency</string>
+    <string name="first_run_currency_confirm">Continue</string>
+    <string name="first_run_currency_skip">Skip</string>
+    <string name="first_run_currency_error">Couldn't save your currency. Please try again.</string>
 </resources>

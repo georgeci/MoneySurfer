@@ -28,7 +28,7 @@ actual val sharedPlatformModule: Module = module {
 
 private fun readVersionName(): String =
     NSBundle.mainBundle.objectForInfoDictionaryKey("CFBundleShortVersionString") as? String
-        ?: "1.0.0"
+        ?: "0.1.0"
 
 private fun readVersionCode(): Int =
     (NSBundle.mainBundle.objectForInfoDictionaryKey("CFBundleVersion") as? String)

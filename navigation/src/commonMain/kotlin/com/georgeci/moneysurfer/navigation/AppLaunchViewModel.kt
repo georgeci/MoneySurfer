@@ -3,7 +3,9 @@ package com.georgeci.moneysurfer.navigation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
+import com.georgeci.moneysurfer.domain.SyncFeatureFlag
 import com.georgeci.moneysurfer.domain.auth.SessionPointers
+import com.georgeci.moneysurfer.domain.firstrun.FirstRunSeeder
 import com.georgeci.moneysurfer.sync.api.SyncReason
 import com.georgeci.moneysurfer.sync.coordinator.SyncCoordinator
 import kotlinx.coroutines.delay
@@ -34,6 +36,8 @@ import kotlin.time.Duration.Companion.minutes
 class AppLaunchViewModel(
     private val session: SessionPointers,
     private val syncCoordinator: SyncCoordinator,
+    private val firstRunSeeder: FirstRunSeeder,
+    private val syncFeatureFlag: SyncFeatureFlag,
 ) : ViewModel() {
 
     private val log = Logger.withTag(TAG)
@@ -43,12 +47,24 @@ class AppLaunchViewModel(
 
     init {
         viewModelScope.launch {
+            // 0. First-run hook (offline build only — online binds a no-op). Runs before the
+            //    route decision so a fresh install can flip user + workspace pointers and land
+            //    directly on the Dashboard instead of bouncing through SignIn / Selector.
+            //    Failures (e.g. local DB hiccup) must not block startup — log and fall through
+            //    to the route decision so the app always reaches a navigable state.
+            runCatching { firstRunSeeder.seedIfNeeded() }
+                .onFailure { log.w(it) { "[firstRun] seedIfNeeded threw — proceeding to route decision" } }
+
             // 1. One-shot startup decision based on the current snapshot.
+            //    `currencyChosen` is `true` for every path except a fresh offline seed, which
+            //    flips it false so the user picks a currency before landing on Dashboard.
             val userId = session.currentUserId.flow.first()
             val workspaceId = session.currentWorkspaceId.flow.first()
+            val currencyChosen = session.currencyChosen.flow.first()
             _targetRoute.value = when {
                 userId == null -> Route.SignIn
                 workspaceId == null -> Route.WorkspaceSelector()
+                !currencyChosen -> Route.FirstRunCurrency
                 else -> Route.Dashboard
             }
 
@@ -65,17 +81,23 @@ class AppLaunchViewModel(
         //    WorkManager clamps periodic work to a 15-minute floor — we need true
         //    1-minute cadence here. `collectLatest` cancels the loop the moment the
         //    UID flips to null on logout.
-        viewModelScope.launch {
-            session.currentFirebaseUid.flow
-                .distinctUntilChanged()
-                .collectLatest { uid ->
-                    if (uid.isNullOrEmpty()) return@collectLatest
-                    log.i { "starting in-process sync ticker, interval=$PERIODIC_INTERVAL" }
-                    while (isActive) {
-                        delay(PERIODIC_INTERVAL)
-                        syncCoordinator.requestSync(SyncReason.BACKGROUND)
+        //    Gated by [SyncFeatureFlag]: when disabled, never start the ticker so the
+        //    app makes zero Firestore reads/writes on the background path.
+        if (syncFeatureFlag.enabled) {
+            viewModelScope.launch {
+                session.currentFirebaseUid.flow
+                    .distinctUntilChanged()
+                    .collectLatest { uid ->
+                        if (uid.isNullOrEmpty()) return@collectLatest
+                        log.i { "starting in-process sync ticker, interval=$PERIODIC_INTERVAL" }
+                        while (isActive) {
+                            delay(PERIODIC_INTERVAL)
+                            syncCoordinator.requestSync(SyncReason.BACKGROUND)
+                        }
                     }
-                }
+            }
+        } else {
+            log.i { "[sync] feature flag off — periodic ticker disabled" }
         }
     }
 

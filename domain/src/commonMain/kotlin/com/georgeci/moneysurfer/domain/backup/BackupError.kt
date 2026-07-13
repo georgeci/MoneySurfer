@@ -8,7 +8,8 @@ package com.georgeci.moneysurfer.domain.backup
 sealed class BackupError(message: String, cause: Throwable? = null) : RuntimeException(message, cause) {
     data object PickerCancelled : BackupError("File picker cancelled")
     data class Io(val ioCause: Throwable) : BackupError("I/O error: ${ioCause.message}", ioCause)
-    data class InvalidArchive(val reason: String) : BackupError("Invalid backup archive: $reason")
+    data class InvalidArchive(val reason: String, val parseCause: Throwable? = null) :
+        BackupError("Invalid backup archive: $reason", parseCause)
     data class FormatMismatch(val expected: Int, val actual: Int) :
         BackupError("Backup format v$actual is not supported (expected v$expected)")
     data class SchemaMismatch(val expected: Int, val actual: Int) :

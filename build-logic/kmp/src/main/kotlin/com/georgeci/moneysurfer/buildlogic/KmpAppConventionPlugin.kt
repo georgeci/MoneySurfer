@@ -86,7 +86,12 @@ class KmpAppConventionPlugin : Plugin<Project> {
                         signingConfig = signingConfigs.getByName("dev")
                     }
                     getByName("release") {
-                        isMinifyEnabled = false
+                        isMinifyEnabled = true
+                        isShrinkResources = true
+                        proguardFiles(
+                            getDefaultProguardFile("proguard-android-optimize.txt"),
+                            rootProject.file("proguard/proguard-rules.pro"),
+                        )
                         ndk {
                             debugSymbolLevel = "FULL"
                         }
@@ -129,15 +134,21 @@ class KmpAppConventionPlugin : Plugin<Project> {
                 add("implementation", libs.findLibrary("kotlin-stdlib").get())
             }
 
-            // Overlay a "DEV" ribbon on the launcher icon for debug installs so
-            // testers can tell dev builds from release on the home screen.
-            // Release icons stay untouched.
+            // Overlay a ribbon on the launcher icon for debug installs so testers
+            // can tell dev builds from release on the home screen. Offline app
+            // module gets "OFF DEV" so it's also distinguishable from the online
+            // dev build sitting next to it. Release icons stay untouched.
+            val ribbonLabel = if (project.name.contains("offline", ignoreCase = true)) {
+                "OFF DEV"
+            } else {
+                "DEV"
+            }
             pluginManager.apply("com.starter.easylauncher")
             extensions.configure<EasyLauncherExtension> {
                 buildTypes.register("debug") {
                     filters(
                         customRibbon(
-                            label = "DEV",
+                            label = ribbonLabel,
                             ribbonColor = "#C0FF1744",
                             labelColor = "#FFFFFFFF",
                             gravity = ColorRibbonFilter.Gravity.BOTTOM,

@@ -3,8 +3,6 @@
     <string name="dashboard_toolbar_greeting">Дашборд</string>
     <string name="dashboard_settings_content_description">Настройки</string>
     <string name="dashboard_add_transaction">Добавить транзакцию</string>
-    <string name="dashboard_quick_action_add">Добавить</string>
-    <string name="dashboard_quick_action_transfer">Перевод</string>
     <string name="dashboard_balance_title">Общий баланс</string>
     <string name="dashboard_balance_empty_text">Добавьте счёт, чтобы увидеть баланс.</string>
     <string name="dashboard_accounts_section_title">Счета</string>

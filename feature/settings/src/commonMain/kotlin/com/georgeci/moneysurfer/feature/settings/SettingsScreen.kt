@@ -39,6 +39,8 @@ import moneysurfer.feature.settings.generated.resources.settings_categories_supp
 import moneysurfer.feature.settings.generated.resources.settings_categories_title
 import moneysurfer.feature.settings.generated.resources.settings_change_workspace
 import moneysurfer.feature.settings.generated.resources.settings_change_workspace_supporting
+import moneysurfer.feature.settings.generated.resources.settings_finish_setup
+import moneysurfer.feature.settings.generated.resources.settings_finish_setup_supporting
 import moneysurfer.feature.settings.generated.resources.settings_logout
 import moneysurfer.feature.settings.generated.resources.settings_members
 import moneysurfer.feature.settings.generated.resources.settings_members_count_format
@@ -61,6 +63,7 @@ import org.koin.compose.viewmodel.koinViewModel
 fun SettingsScreen(
     onNavigateBack: () -> Unit,
     onNavigateToWorkspaceSelector: () -> Unit,
+    onNavigateToFinishSetup: () -> Unit,
     onNavigateToIncomingInvites: () -> Unit,
     onNavigateToMembers: (com.georgeci.moneysurfer.domain.primitives.WorkspaceId) -> Unit,
     onNavigateToCategories: () -> Unit,
@@ -77,6 +80,7 @@ fun SettingsScreen(
         when (effect) {
             SettingsEffect.NavigateBack -> onNavigateBack()
             SettingsEffect.NavigateToWorkspaceSelector -> onNavigateToWorkspaceSelector()
+            SettingsEffect.NavigateToFinishSetup -> onNavigateToFinishSetup()
             SettingsEffect.NavigateToIncomingInvites -> onNavigateToIncomingInvites()
             is SettingsEffect.NavigateToMembers -> onNavigateToMembers(effect.workspaceId)
             SettingsEffect.NavigateToCategories -> onNavigateToCategories()
@@ -119,15 +123,26 @@ private fun SettingsContent(
                 .padding(top = padding.calculateTopPadding())
                 .verticalScroll(rememberScrollState()),
         ) {
-            Box(modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 12.dp)) {
-                SurferNameBlock(
-                    name = stringResource(Res.string.settings_user_name),
-                    email = userEmailText(state),
-                    trailing = null,
-                )
+            if (state.showProfile) {
+                Box(modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 12.dp)) {
+                    SurferNameBlock(
+                        name = stringResource(Res.string.settings_user_name),
+                        email = userEmailText(state),
+                        trailing = null,
+                    )
+                }
             }
 
             SurferSettingsGroup(title = stringResource(Res.string.settings_section_workspace)) {
+                if (state.showFinishSetup) {
+                    SurferSettingsRow(
+                        icon = SurferIcons.Wallet,
+                        title = stringResource(Res.string.settings_finish_setup),
+                        supportingText = stringResource(Res.string.settings_finish_setup_supporting),
+                        onClick = { onEvent(SettingsEvent.OnFinishSetupClick) },
+                        trailing = { SurferSettingsChevron() },
+                    )
+                }
                 SurferSettingsRow(
                     icon = SurferIcons.People,
                     title = stringResource(Res.string.settings_change_workspace),
@@ -135,7 +150,7 @@ private fun SettingsContent(
                     onClick = { onEvent(SettingsEvent.OnChangeWorkspaceClick) },
                     trailing = { SurferSettingsChevron() },
                 )
-                if (state.currentWorkspaceId != null) {
+                if (state.showWorkspaceMembers && state.currentWorkspaceId != null) {
                     SurferSettingsRow(
                         icon = SurferIcons.Sparkle,
                         title = stringResource(Res.string.settings_members),
@@ -147,29 +162,31 @@ private fun SettingsContent(
                         trailing = { SurferSettingsChevron() },
                     )
                 }
-                SurferSettingsRow(
-                    icon = SurferIcons.Mail,
-                    title = stringResource(Res.string.settings_pending_invites),
-                    supporting = if (state.pendingInviteCount > 0) {
-                        {
-                            SurferPendingBadge(
-                                text = stringResource(
-                                    Res.string.settings_pending_invites_supporting_format,
-                                    state.pendingInviteCount,
-                                ),
-                            )
-                        }
-                    } else {
-                        null
-                    },
-                    supportingText = if (state.pendingInviteCount == 0) {
-                        stringResource(Res.string.settings_pending_invites_supporting_empty)
-                    } else {
-                        null
-                    },
-                    onClick = { onEvent(SettingsEvent.OnIncomingInvitesClick) },
-                    trailing = { SurferSettingsChevron() },
-                )
+                if (state.showPendingInvites) {
+                    SurferSettingsRow(
+                        icon = SurferIcons.Mail,
+                        title = stringResource(Res.string.settings_pending_invites),
+                        supporting = if (state.pendingInviteCount > 0) {
+                            {
+                                SurferPendingBadge(
+                                    text = stringResource(
+                                        Res.string.settings_pending_invites_supporting_format,
+                                        state.pendingInviteCount,
+                                    ),
+                                )
+                            }
+                        } else {
+                            null
+                        },
+                        supportingText = if (state.pendingInviteCount == 0) {
+                            stringResource(Res.string.settings_pending_invites_supporting_empty)
+                        } else {
+                            null
+                        },
+                        onClick = { onEvent(SettingsEvent.OnIncomingInvitesClick) },
+                        trailing = { SurferSettingsChevron() },
+                    )
+                }
             }
 
             SurferSettingsGroup(title = stringResource(Res.string.settings_section_personalization)) {
@@ -189,14 +206,16 @@ private fun SettingsContent(
                 )
             }
 
-            SurferSettingsGroup(title = stringResource(Res.string.settings_section_data)) {
-                SurferSettingsRow(
-                    icon = SurferIcons.Sync,
-                    title = stringResource(Res.string.settings_sync_hub_title),
-                    supportingText = stringResource(Res.string.settings_sync_hub_supporting),
-                    onClick = { onEvent(SettingsEvent.OnSyncClick) },
-                    trailing = { SurferSettingsChevron() },
-                )
+            if (state.showSyncSection) {
+                SurferSettingsGroup(title = stringResource(Res.string.settings_section_data)) {
+                    SurferSettingsRow(
+                        icon = SurferIcons.Sync,
+                        title = stringResource(Res.string.settings_sync_hub_title),
+                        supportingText = stringResource(Res.string.settings_sync_hub_supporting),
+                        onClick = { onEvent(SettingsEvent.OnSyncClick) },
+                        trailing = { SurferSettingsChevron() },
+                    )
+                }
             }
 
             SurferSettingsGroup(title = stringResource(Res.string.settings_section_help)) {
@@ -212,14 +231,16 @@ private fun SettingsContent(
                 )
             }
 
-            Spacer(Modifier.height(8.dp))
-            Box(modifier = Modifier.padding(horizontal = 16.dp)) {
-                SurferSettingsRow(
-                    icon = SurferIcons.Logout,
-                    title = stringResource(Res.string.settings_logout),
-                    danger = true,
-                    onClick = { onEvent(SettingsEvent.OnLogoutClick) },
-                )
+            if (state.showLogout) {
+                Spacer(Modifier.height(8.dp))
+                Box(modifier = Modifier.padding(horizontal = 16.dp)) {
+                    SurferSettingsRow(
+                        icon = SurferIcons.Logout,
+                        title = stringResource(Res.string.settings_logout),
+                        danger = true,
+                        onClick = { onEvent(SettingsEvent.OnLogoutClick) },
+                    )
+                }
             }
 
             Spacer(Modifier.height(AppTheme.spacing.large))

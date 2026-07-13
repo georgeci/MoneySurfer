@@ -2,6 +2,7 @@ package com.georgeci.moneysurfer.feature.workspace.creation
 
 import arrow.optics.optics
 import co.touchlab.kermit.Logger
+import com.georgeci.moneysurfer.domain.OfflineBuildFlags
 import com.georgeci.moneysurfer.domain.model.Currency
 import com.georgeci.moneysurfer.domain.model.WorkspaceRole
 import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
@@ -19,9 +20,12 @@ class WorkspaceCreationViewModel(
     private val workspaceRepository: WorkspaceRepository,
     private val createWorkspace: CreateWorkspaceUseCase,
     private val getCurrencies: GetCurrenciesUseCase,
+    offlineBuildFlags: OfflineBuildFlags,
 ) : MviViewModel<WorkspaceCreationState, WorkspaceCreationEvent, WorkspaceCreationEffect>(
     initialState = WorkspaceCreationState.Loading,
 ) {
+
+    private val isOffline: Boolean = offlineBuildFlags.isOffline
 
     private val log = Logger.withTag(TAG)
 
@@ -43,6 +47,7 @@ class WorkspaceCreationViewModel(
                         currencies = emptyList(),
                         members = PREVIEW_MEMBERS,
                         isEditing = true,
+                        isOffline = isOffline,
                     )
                     is WorkspaceCreationState.Content -> copy(
                         workspaceId = workspace.id,
@@ -94,6 +99,7 @@ class WorkspaceCreationViewModel(
                         currencies = currencies,
                         members = PREVIEW_MEMBERS,
                         isEditing = false,
+                        isOffline = isOffline,
                     )
                     is WorkspaceCreationState.Content -> copy(
                         currencies = currencies,
@@ -193,7 +199,17 @@ sealed interface WorkspaceCreationState {
         val isEditing: Boolean,
         val isSaving: Boolean = false,
         val error: WorkspaceCreationError? = null,
+        val isOffline: Boolean = false,
     ) : WorkspaceCreationState {
+
+        /**
+         * The Members section (invite row + member list) is remote-only. Offline workspaces
+         * are always single-user, so the section is hidden in the offline build to avoid
+         * implying collaboration that isn't supported.
+         */
+        val showMembersSection: Boolean
+            get() = isEditing && !isOffline
+
         companion object
     }
 

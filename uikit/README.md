@@ -22,3 +22,14 @@ Public composables (pick the right atom + add ripple on click):
 - [SurferActionCard.kt](src/commonMain/kotlin/com/georgeci/moneysurfer/uikit/atom/SurferActionCard.kt) — `SurferActionCard(onClick?)`. Wraps the dashed `SurferAddActionContainer`. Optional `onClick` adds ripple.
 
 Theme switch: `AppTheme(containerStyle = SurferContainerStyle.Filled | Outlined | Card)` — all `SurferCard` instances downstream resolve to that variant.
+
+## State placeholders
+
+Use these for the three non-content states a screen or section can be in. All three are theme-only
+(`AppTheme` tokens) and ship with `@Preview` composables.
+
+- [SurferEmptyState.kt](src/commonMain/kotlin/com/georgeci/moneysurfer/uikit/components/SurferEmptyState.kt) — **loaded, but nothing to show** (empty list, no search results). Icon medallion + `title` + optional `subtitle` + optional CTA (`actionLabel` / `onActionClick`).
+- [SurferErrorState.kt](src/commonMain/kotlin/com/georgeci/moneysurfer/uikit/components/SurferErrorState.kt) — **load failed.** Same layout as the empty state with `icon` / `title` / `subtitle`, but the medallion uses `errorContainer`; pass `onRetry` (and optionally `retryLabel`) to render a retry button.
+- [SurferSkeleton.kt](src/commonMain/kotlin/com/georgeci/moneysurfer/uikit/components/SurferSkeleton.kt) — **still loading.** `SurferSkeleton(shape)` is a single shimmering placeholder block; `SurferSkeletonRow()` is a ready-made list-row skeleton. Size skeletons to match the eventual layout.
+
+Decision: not loaded yet → `SurferSkeleton` · loaded with content → real UI · loaded empty → `SurferEmptyState` · failed → `SurferErrorState`.

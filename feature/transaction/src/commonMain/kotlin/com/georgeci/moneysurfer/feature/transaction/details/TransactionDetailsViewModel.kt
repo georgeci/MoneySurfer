@@ -5,12 +5,17 @@ import com.georgeci.moneysurfer.domain.formatter.MoneyFormatter
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.domain.primitives.TransactionStatus
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
+import com.georgeci.moneysurfer.domain.usecase.ApplyTransactionChangeUseCase
 import com.georgeci.moneysurfer.domain.usecase.DeleteTransactionUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetAccountByIdUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetCategoriesUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetTransactionByIdUseCase
+import com.georgeci.moneysurfer.navigation.SnackbarController
 import com.georgeci.moneysurfer.utils.MviViewModel
 import kotlinx.coroutines.flow.first
+import moneysurfer.feature.transaction.generated.resources.Res
+import moneysurfer.feature.transaction.generated.resources.transaction_details_delete_undo
+import moneysurfer.feature.transaction.generated.resources.transaction_details_deleted_snackbar
 import org.koin.core.annotation.KoinViewModel
 
 @KoinViewModel
@@ -20,6 +25,8 @@ class TransactionDetailsViewModel(
     private val getAccountById: GetAccountByIdUseCase,
     private val getCategories: GetCategoriesUseCase,
     private val deleteTransaction: DeleteTransactionUseCase,
+    private val applyTransactionChange: ApplyTransactionChangeUseCase,
+    private val snackbar: SnackbarController,
 ) : MviViewModel<TransactionDetailsState, TransactionDetailsEvent, TransactionDetailsEffect>(
     initialState = TransactionDetailsState.Loading(transactionId),
 ) {
@@ -80,7 +87,14 @@ class TransactionDetailsViewModel(
 
     private fun handleDelete() {
         launch {
-            deleteTransaction(currentState.transactionId)
+            val deleted = deleteTransaction(currentState.transactionId)
+            if (deleted != null) {
+                snackbar.show(
+                    message = Res.string.transaction_details_deleted_snackbar,
+                    actionLabel = Res.string.transaction_details_delete_undo,
+                    onAction = { applyTransactionChange(old = null, new = deleted) },
+                )
+            }
             postSideEffect(TransactionDetailsEffect.NavigateBack)
         }
     }

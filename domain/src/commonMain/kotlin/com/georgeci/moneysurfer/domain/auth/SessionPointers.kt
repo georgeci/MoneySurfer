@@ -15,10 +15,19 @@ import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
  *   Used by `CreateWorkspaceUseCase` to decide whether to push to Firestore.
  * - [hasUsedDemo] — sticky flag set by `DemoLoginUseCase`, consumed by `WipeDemoDataUseCase`
  *   on real login/signup so demo rows never leak into the real account's outbox.
+ * - [currencyChosen] — sticky flag, `true` by default. The offline first-run seed flips it to
+ *   `false` after auto-creating a workspace with a locale-derived currency, so `AppLaunchViewModel`
+ *   routes to the currency picker before Dashboard. The picker flips it back to `true` on confirm
+ *   *or* on skip, so a relaunch does not show the picker again.
+ * - [onboardingSkipped] — sticky flag, `false` by default. Set to `true` when the user taps
+ *   "Skip" on the first-run currency picker (keeping the locale-derived seed default). Settings
+ *   shows a "Finish setup" entry while this is `true`; confirming the picker clears it.
  */
 interface SessionPointers {
     val currentUserId: Pref<UserId?>
     val currentWorkspaceId: Pref<WorkspaceId?>
     val currentFirebaseUid: Pref<String?>
     val hasUsedDemo: Pref<Boolean>
+    val currencyChosen: Pref<Boolean>
+    val onboardingSkipped: Pref<Boolean>
 }

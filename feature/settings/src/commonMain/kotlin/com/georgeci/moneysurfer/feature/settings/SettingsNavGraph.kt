@@ -21,6 +21,7 @@ val settingsNavGraph: FeatureNavGraph = { navigator ->
             onNavigateToWorkspaceSelector = {
                 navigator.push(Route.WorkspaceSelector(showActions = true))
             },
+            onNavigateToFinishSetup = { navigator.push(Route.FirstRunCurrency) },
             onNavigateToIncomingInvites = { navigator.push(Route.IncomingInvites) },
             onNavigateToMembers = { workspaceId ->
                 navigator.push(Route.WorkspaceManage(workspaceId = workspaceId.value))

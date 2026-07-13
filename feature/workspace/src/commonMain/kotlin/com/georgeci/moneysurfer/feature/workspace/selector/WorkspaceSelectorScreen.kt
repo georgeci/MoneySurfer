@@ -39,6 +39,7 @@ import moneysurfer.feature.workspace.generated.resources.workspace_selector_crea
 import moneysurfer.feature.workspace.generated.resources.workspace_selector_create_title
 import moneysurfer.feature.workspace.generated.resources.workspace_selector_empty
 import moneysurfer.feature.workspace.generated.resources.workspace_selector_heading_subtitle
+import moneysurfer.feature.workspace.generated.resources.workspace_selector_heading_subtitle_offline
 import moneysurfer.feature.workspace.generated.resources.workspace_selector_heading_title
 import moneysurfer.feature.workspace.generated.resources.workspace_selector_use_workspace
 import org.jetbrains.compose.resources.stringResource
@@ -127,7 +128,13 @@ private fun WorkspaceSelectorContent(
             ) {
                 item(key = "header") {
                     Text(
-                        text = stringResource(Res.string.workspace_selector_heading_subtitle),
+                        text = stringResource(
+                            if (state.isOffline) {
+                                Res.string.workspace_selector_heading_subtitle_offline
+                            } else {
+                                Res.string.workspace_selector_heading_subtitle
+                            },
+                        ),
                         style = AppTheme.typography.bodyMedium,
                         color = AppTheme.materialColors.onSurfaceVariant,
                         modifier = Modifier.padding(
@@ -159,7 +166,7 @@ private fun WorkspaceSelectorContent(
                             enabled = !state.isSelecting,
                             showActions = state.showActions,
                             editLabel = editLabel,
-                            membersLabel = membersLabel,
+                            membersLabel = membersLabel.takeIf { state.showMemberActions },
                             onClick = { onEvent(WorkspaceSelectorEvent.OnWorkspaceClick(workspace)) },
                             onEditClick = { onEvent(WorkspaceSelectorEvent.OnEditWorkspaceClick(workspace)) },
                             onMembersClick = { onEvent(WorkspaceSelectorEvent.OnMembersClick(workspace)) },
@@ -281,7 +288,7 @@ private val previewWorkspaces = listOf(
     Workspace(
         id = WorkspaceId("preview-ws-2"),
         name = "Family",
-        description = "4 members · shared",
+        description = "Household budget",
         baseCurrency = CurrencyCode("EUR"),
         ownerId = UserId("preview-user-1"),
         createdAt = Instant.fromEpochMilliseconds(0),

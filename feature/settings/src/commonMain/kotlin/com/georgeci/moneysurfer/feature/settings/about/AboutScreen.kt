@@ -1,6 +1,8 @@
 package com.georgeci.moneysurfer.feature.settings.about
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,6 +16,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -23,23 +26,29 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
+import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.utils.HandleSideEffect
 import moneysurfer.feature.settings.generated.resources.Res
 import moneysurfer.feature.settings.generated.resources.settings_about_brand
-import moneysurfer.feature.settings.generated.resources.settings_about_brand_letter
+import moneysurfer.feature.settings.generated.resources.settings_about_chip_license
 import moneysurfer.feature.settings.generated.resources.settings_about_chip_made_by
-import moneysurfer.feature.settings.generated.resources.settings_about_chip_warsaw
 import moneysurfer.feature.settings.generated.resources.settings_about_copyright
+import moneysurfer.feature.settings.generated.resources.settings_about_github_supporting
+import moneysurfer.feature.settings.generated.resources.settings_about_github_title
 import moneysurfer.feature.settings.generated.resources.settings_about_title
 import moneysurfer.feature.settings.generated.resources.settings_about_version_format
+import moneysurfer.uikit.generated.resources.uikit_app_icon
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
+import moneysurfer.uikit.generated.resources.Res as UikitRes
 
 @Composable
 fun AboutScreen(
@@ -47,11 +56,12 @@ fun AboutScreen(
     viewModel: AboutViewModel = koinViewModel(),
 ) {
     val state by viewModel.collectAsStateWithLifecycle()
+    val uriHandler = LocalUriHandler.current
 
     viewModel.HandleSideEffect { effect ->
         when (effect) {
             AboutEffect.NavigateBack -> onNavigateBack()
-            is AboutEffect.OpenUrl,
+            is AboutEffect.OpenUrl -> uriHandler.openUri(effect.url)
             is AboutEffect.OpenEmail,
             AboutEffect.OpenStoreListing,
             AboutEffect.OpenRegionPicker,
@@ -91,6 +101,8 @@ private fun AboutContent(
         ) {
             AppIdentityHero(version = state.appVersion)
 
+            GitHubLinkRow(onClick = { onEvent(AboutEvent.OnGitHubClick) })
+
             Spacer(Modifier.height(8.dp))
             Text(
                 text = stringResource(Res.string.settings_about_copyright),
@@ -116,20 +128,14 @@ private fun AppIdentityHero(version: String) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
-        Box(
+        Image(
+            painter = painterResource(UikitRes.drawable.uikit_app_icon),
+            contentDescription = null,
             modifier = Modifier
                 .size(72.dp)
                 .shadow(elevation = 8.dp, shape = RoundedCornerShape(20.dp))
-                .clip(RoundedCornerShape(20.dp))
-                .background(colors.primary),
-            contentAlignment = Alignment.Center,
-        ) {
-            Text(
-                text = stringResource(Res.string.settings_about_brand_letter),
-                style = AppTheme.typography.headlineSmall,
-                color = colors.onPrimary,
-            )
-        }
+                .clip(RoundedCornerShape(20.dp)),
+        )
         Text(
             text = stringResource(Res.string.settings_about_brand),
             style = AppTheme.typography.titleLarge,
@@ -142,7 +148,41 @@ private fun AppIdentityHero(version: String) {
         )
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             HeroChip(text = stringResource(Res.string.settings_about_chip_made_by))
-            HeroChip(text = stringResource(Res.string.settings_about_chip_warsaw))
+            HeroChip(text = stringResource(Res.string.settings_about_chip_license))
+        }
+    }
+}
+
+@Composable
+private fun GitHubLinkRow(onClick: () -> Unit) {
+    val colors = AppTheme.materialColors
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
+            .clip(RoundedCornerShape(16.dp))
+            .background(colors.surfaceContainerHighest)
+            .clickable(onClick = onClick)
+            .padding(horizontal = 16.dp, vertical = 14.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        Icon(
+            imageVector = SurferIcons.Info,
+            contentDescription = null,
+            tint = colors.onSurfaceVariant,
+        )
+        Column(modifier = Modifier.fillMaxWidth()) {
+            Text(
+                text = stringResource(Res.string.settings_about_github_title),
+                style = AppTheme.typography.titleSmall,
+                color = colors.onSurface,
+            )
+            Text(
+                text = stringResource(Res.string.settings_about_github_supporting),
+                style = AppTheme.typography.bodySmall,
+                color = colors.onSurfaceVariant,
+            )
         }
     }
 }

@@ -15,9 +15,13 @@ class InMemorySessionPointers(
     currentWorkspaceId: WorkspaceId? = null,
     currentFirebaseUid: String? = null,
     hasUsedDemo: Boolean = false,
+    currencyChosen: Boolean = true,
+    onboardingSkipped: Boolean = false,
 ) : SessionPointers {
     override val currentUserId: Pref<UserId?> = Pref.inMemory(currentUserId)
     override val currentWorkspaceId: Pref<WorkspaceId?> = Pref.inMemory(currentWorkspaceId)
     override val currentFirebaseUid: Pref<String?> = Pref.inMemory(currentFirebaseUid)
     override val hasUsedDemo: Pref<Boolean> = Pref.inMemory(hasUsedDemo)
+    override val currencyChosen: Pref<Boolean> = Pref.inMemory(currencyChosen)
+    override val onboardingSkipped: Pref<Boolean> = Pref.inMemory(onboardingSkipped)
 }

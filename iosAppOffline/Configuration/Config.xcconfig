@@ -1,9 +1,11 @@
 #include "../../Version.xcconfig"
 
-TEAM_ID=
-
 PRODUCT_NAME=MoneySurferOffline
-PRODUCT_BUNDLE_IDENTIFIER=com.georgeci.moneysurfer.offline$(TEAM_ID)
 
 CURRENT_PROJECT_VERSION=$(APP_VERSION_CODE)
 MARKETING_VERSION=$(APP_VERSION_NAME)
+
+// Debug mirrors Android `.dev` flavor: home-screen name suffix. Bundle id
+// and AppIcon name are set per-target in project.pbxproj because Xcode keeps
+// them as explicit per-config build settings there, which shadow xcconfig.
+PRODUCT_NAME[config=Debug]=MoneySurferOffline Dev

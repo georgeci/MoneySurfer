@@ -13,13 +13,13 @@ internal class Crc32 {
         val end = offset + length
         var i = offset
         while (i < end) {
-            crc = (crc ushr 8) xor TABLE[(crc xor buffer[i].toInt()) and 0xFF]
+            crc = (crc ushr BITS_PER_BYTE) xor TABLE[(crc xor buffer[i].toInt()) and BYTE_MASK]
             i++
         }
         value = crc
     }
 
-    fun getValue(): Long = (value.inv().toLong() and 0xFFFFFFFFL)
+    fun getValue(): Long = (value.inv().toLong() and MASK_U32)
 
     companion object {
         private val TABLE: IntArray = IntArray(TABLE_SIZE).also { table ->
@@ -36,6 +36,8 @@ internal class Crc32 {
 
 private const val TABLE_SIZE = 256
 private const val BITS_PER_BYTE = 8
+private const val BYTE_MASK = 0xFF
+private const val MASK_U32 = 0xFFFFFFFFL
 
 @Suppress("MagicNumber")
 private const val POLY: Int = 0xEDB88320.toInt()

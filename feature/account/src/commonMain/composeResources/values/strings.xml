@@ -19,10 +19,18 @@
     <string name="accounts_manage_delete_message">"%1$s" and all its transactions will be removed permanently. This can't be undone.</string>
     <string name="accounts_manage_delete_confirm">Delete</string>
     <string name="accounts_manage_delete_cancel">Cancel</string>
+    <string name="accounts_manage_archive_title">Archive this account?</string>
+    <string name="accounts_manage_archive_message">"%1$s" will move to the Archived section. Its history is kept and you can restore it any time.</string>
+    <string name="accounts_manage_archive_confirm">Archive</string>
+    <string name="accounts_manage_archive_cancel">Cancel</string>
+    <string name="accounts_manage_archived_snackbar">"%1$s" archived</string>
+    <string name="accounts_manage_archive_undo">Undo</string>
+    <string name="accounts_manage_action_failed">Something went wrong. Try again.</string>
     <string name="account_creation_title">New account</string>
     <string name="account_creation_name_label">Account name</string>
     <string name="account_creation_balance_label">Opening balance</string>
     <string name="account_creation_balance_helper">You can adjust this later from the account menu.</string>
+    <string name="account_creation_balance_error_negative">This account type can't start with a negative balance.</string>
     <string name="account_creation_save">Save</string>
     <string name="account_creation_cancel">Cancel</string>
     <string name="account_creation_type_label">Type</string>
@@ -68,4 +76,9 @@
     <string name="transaction_creation_account_summary_empty">No accounts yet</string>
     <string name="transaction_creation_account_add_new">Add new account</string>
     <string name="transaction_creation_account_add_new_subtitle">Bank, savings, cash or card</string>
+
+    <!-- Action feedback snackbars -->
+    <string name="account_creation_created_snackbar">"%1$s" added</string>
+    <string name="account_creation_updated_snackbar">"%1$s" updated</string>
+    <string name="accounts_manage_deleted_snackbar">"%1$s" deleted</string>
 </resources>

@@ -33,7 +33,7 @@ actual val sharedPlatformModule: Module = module {
 private fun readVersionName(context: Context): String =
     runCatching {
         context.packageManager.getPackageInfo(context.packageName, 0).versionName
-    }.getOrNull() ?: "1.0.0"
+    }.getOrNull() ?: "0.1.0"
 
 @Suppress("DEPRECATION")
 private fun readVersionCode(context: Context): Int =

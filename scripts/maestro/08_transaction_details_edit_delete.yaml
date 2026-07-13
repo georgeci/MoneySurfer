@@ -24,9 +24,12 @@ name: Transaction — Details, edit and delete
     element:
       text: "Note"
     direction: DOWN
+# Tap the existing value, not the floating "Note" label — tapping the label
+# of an OutlinedTextField doesn't reliably focus the field, leaving the
+# cursor mid-string and producing garbled text after eraseText/inputText.
 - tapOn:
-    text: "Note"
-- eraseText
+    text: "Test expense"
+- eraseText: 50
 - inputText: "Updated expense"
 - tapOn:
     text: "Update"

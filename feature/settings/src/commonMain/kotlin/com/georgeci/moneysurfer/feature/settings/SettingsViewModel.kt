@@ -1,6 +1,8 @@
 package com.georgeci.moneysurfer.feature.settings
 
 import com.georgeci.moneysurfer.domain.AppInfo
+import com.georgeci.moneysurfer.domain.OfflineBuildFlags
+import com.georgeci.moneysurfer.domain.SyncFeatureFlag
 import com.georgeci.moneysurfer.domain.auth.SessionPointers
 import com.georgeci.moneysurfer.domain.model.WorkspaceMemberStatus
 import com.georgeci.moneysurfer.domain.preferences.PaletteSource
@@ -22,6 +24,7 @@ import org.koin.core.annotation.KoinViewModel
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @KoinViewModel
+@Suppress("LongParameterList") // Aggregator ViewModel; offline-flag injection edges past the 10-arg threshold.
 class SettingsViewModel(
     private val session: SessionPointers,
     private val authRemoteRepository: AuthRemoteRepository,
@@ -31,9 +34,15 @@ class SettingsViewModel(
     private val refreshIncomingInvites: RefreshIncomingInvitesUseCase,
     private val memberRepository: WorkspaceMemberRepository,
     private val uiPreferences: UiPreferences,
+    private val syncFeatureFlag: SyncFeatureFlag,
     appInfo: AppInfo,
+    offlineBuildFlags: OfflineBuildFlags,
 ) : MviViewModel<SettingsState, SettingsEvent, SettingsEffect>(
-    initialState = SettingsState(appVersion = appInfo.version),
+    initialState = SettingsState(
+        appVersion = appInfo.version,
+        isOffline = offlineBuildFlags.isOffline,
+        syncEnabled = syncFeatureFlag.enabled,
+    ),
 ) {
 
     init {
@@ -42,7 +51,16 @@ class SettingsViewModel(
         observeIncomingInvites()
         observeActiveWorkspace()
         observeDynamicColor()
+        observeOnboardingSkipped()
         refreshIncoming()
+    }
+
+    private fun observeOnboardingSkipped() {
+        launch {
+            session.onboardingSkipped.flow
+                .onEach { skipped -> updateState { copy(onboardingSkipped = skipped) } }
+                .collect()
+        }
     }
 
     private fun loadUserIdentity() {
@@ -61,6 +79,10 @@ class SettingsViewModel(
     }
 
     private fun observePendingCount() {
+        // Sync-feature flag off → outbox queue is irrelevant to the user (no UI surface
+        // can act on it). Skip the subscription so the badge stays at zero and we don't
+        // hold a Flow open for nothing.
+        if (!syncFeatureFlag.enabled) return
         launch {
             pendingMutationQueue.pendingCount
                 .onEach { count -> updateState { copy(pendingMutationsCount = count) } }
@@ -114,6 +136,7 @@ class SettingsViewModel(
                     postSideEffect(SettingsEffect.NavigateToMembers(workspaceId))
                 }
             }
+            SettingsEvent.OnFinishSetupClick -> postSideEffect(SettingsEffect.NavigateToFinishSetup)
             SettingsEvent.OnCategoriesClick -> postSideEffect(SettingsEffect.NavigateToCategories)
             SettingsEvent.OnAppearanceClick -> postSideEffect(SettingsEffect.NavigateToAppearance)
             SettingsEvent.OnPreferencesClick -> postSideEffect(SettingsEffect.NavigateToPreferences)
@@ -138,11 +161,24 @@ data class SettingsState(
     val currentWorkspaceId: WorkspaceId? = null,
     val activeMemberCount: Int = 0,
     val isDynamicColorEnabled: Boolean = false,
-)
+    val isOffline: Boolean = false,
+    val syncEnabled: Boolean = false,
+    val onboardingSkipped: Boolean = false,
+) {
+    val showProfile: Boolean get() = !isOffline
+    val showSyncSection: Boolean get() = !isOffline && syncEnabled
+    val showLogout: Boolean get() = !isOffline
+    val showWorkspaceMembers: Boolean get() = !isOffline
+    val showPendingInvites: Boolean get() = !isOffline
+
+    /** "Finish setup" re-launches the currency picker; shown only while onboarding was skipped. */
+    val showFinishSetup: Boolean get() = onboardingSkipped
+}
 
 sealed interface SettingsEvent {
     data object OnBackClick : SettingsEvent
     data object OnChangeWorkspaceClick : SettingsEvent
+    data object OnFinishSetupClick : SettingsEvent
     data object OnIncomingInvitesClick : SettingsEvent
     data object OnMembersClick : SettingsEvent
     data object OnCategoriesClick : SettingsEvent
@@ -157,6 +193,7 @@ sealed interface SettingsEvent {
 sealed interface SettingsEffect {
     data object NavigateBack : SettingsEffect
     data object NavigateToWorkspaceSelector : SettingsEffect
+    data object NavigateToFinishSetup : SettingsEffect
     data object NavigateToIncomingInvites : SettingsEffect
     data class NavigateToMembers(val workspaceId: WorkspaceId) : SettingsEffect
     data object NavigateToCategories : SettingsEffect

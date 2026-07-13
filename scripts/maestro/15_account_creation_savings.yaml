@@ -24,7 +24,6 @@ name: Account — Create savings account with opening balance
       - tapOn:
           text: "Opening balance"
       - inputText: "2500"
-      - hideKeyboard
 
       - tapOn:
           text: "Save"

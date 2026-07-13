@@ -18,11 +18,16 @@ import com.georgeci.moneysurfer.domain.usecase.GetCategoriesUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetCurrentTimeUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetTransactionByIdUseCase
 import com.georgeci.moneysurfer.domain.usecase.UpdateTransactionUseCase
+import com.georgeci.moneysurfer.navigation.SnackbarController
 import com.georgeci.moneysurfer.utils.MviViewModel
 import kotlinx.coroutines.flow.first
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import moneysurfer.feature.transaction.generated.resources.Res
+import moneysurfer.feature.transaction.generated.resources.transaction_creation_created_snackbar
+import moneysurfer.feature.transaction.generated.resources.transaction_creation_transfer_snackbar
+import moneysurfer.feature.transaction.generated.resources.transaction_creation_updated_snackbar
 import org.koin.core.annotation.KoinViewModel
 
 // ViewModel composes loading + creation + transfer flows; splitting now would push wiring to a holder.
@@ -39,6 +44,8 @@ class TransactionCreationViewModel(
     private val createTransfer: CreateTransferUseCase,
     private val getCurrentTime: GetCurrentTimeUseCase,
     private val transactionRepository: TransactionRepository,
+    private val featureConfig: TransactionCreationFeatureConfig,
+    private val snackbar: SnackbarController,
 ) : MviViewModel<TransactionCreationState, TransactionCreationEvent, TransactionCreationEffect>(
     initialState = TransactionCreationState.Loading,
 ) {
@@ -126,7 +133,9 @@ class TransactionCreationViewModel(
         val content = this as? TransactionCreationState.Content ?: return@updateState this
         // Editing an existing single-leg transaction can't morph into a paired transfer in place;
         // ignore the switch so we don't desync the type with the row that's about to be updated.
-        if (content.isEditMode && nextType == TransactionTypeUi.Transfer) return@updateState content
+        if (nextType == TransactionTypeUi.Transfer && (content.isEditMode || !featureConfig.transferEnabled)) {
+            return@updateState content
+        }
         val nextCategoryType = if (nextType == TransactionTypeUi.Income) {
             CategoryType.INCOME
         } else {
@@ -178,6 +187,7 @@ class TransactionCreationViewModel(
                     type = initialCategoryType,
                     selected = initialSelected,
                 ),
+                transferEnabled = featureConfig.transferEnabled,
             )
 
             if (transactionId != null) {
@@ -374,8 +384,10 @@ class TransactionCreationViewModel(
 
             if (state.isEditMode) {
                 updateTransaction(transaction)
+                snackbar.show(Res.string.transaction_creation_updated_snackbar)
             } else {
                 createTransaction(transaction)
+                snackbar.show(Res.string.transaction_creation_created_snackbar)
             }
 
             postSideEffect(TransactionCreationEffect.NavigateBack)
@@ -399,6 +411,7 @@ class TransactionCreationViewModel(
                         ?: operationAt.toLocalDateTime(zone).date,
                 ),
             )
+            snackbar.show(Res.string.transaction_creation_transfer_snackbar)
             postSideEffect(TransactionCreationEffect.NavigateBack)
         }
     }
@@ -482,6 +495,7 @@ sealed interface TransactionCreationState {
         val fromAccount: Account? = null,
         val toAccount: Account? = null,
         val toAmount: String = "",
+        val transferEnabled: Boolean = true,
     ) : TransactionCreationState {
         val isExpense: Boolean get() = type == TransactionTypeUi.Expense
         val isTransfer: Boolean get() = type == TransactionTypeUi.Transfer

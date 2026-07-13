@@ -43,8 +43,8 @@
     <string name="transaction_details_edit_content_description">Edit</string>
     <string name="transaction_details_delete_content_description">Delete</string>
     <string name="transaction_details_delete_title">Delete transaction?</string>
-    <string name="transaction_details_delete_message">“%1$s” will be removed permanently. This can't be undone.</string>
-    <string name="transaction_details_delete_message_generic">This transaction will be removed permanently. This can't be undone.</string>
+    <string name="transaction_details_delete_message">“%1$s” will be removed. You can undo this right after.</string>
+    <string name="transaction_details_delete_message_generic">This transaction will be removed. You can undo this right after.</string>
     <string name="transaction_details_delete_confirm">Delete</string>
     <string name="transaction_details_delete_cancel">Cancel</string>
     <string name="transaction_details_type_expense">Expense</string>
@@ -56,4 +56,11 @@
     <string name="transaction_details_duplicate">Duplicate</string>
     <string name="transaction_details_status_posted">Posted</string>
     <string name="transaction_details_status_planned">Planned</string>
+
+    <!-- Action feedback snackbars -->
+    <string name="transaction_creation_created_snackbar">Transaction added</string>
+    <string name="transaction_creation_updated_snackbar">Transaction updated</string>
+    <string name="transaction_creation_transfer_snackbar">Transfer added</string>
+    <string name="transaction_details_deleted_snackbar">Transaction deleted</string>
+    <string name="transaction_details_delete_undo">Undo</string>
 </resources>

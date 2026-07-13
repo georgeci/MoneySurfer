@@ -4,15 +4,22 @@ import arrow.optics.optics
 import com.georgeci.moneysurfer.domain.model.Category
 import com.georgeci.moneysurfer.domain.primitives.CategoryId
 import com.georgeci.moneysurfer.domain.primitives.CategoryType
+import com.georgeci.moneysurfer.domain.usecase.CreateCategoryUseCase
 import com.georgeci.moneysurfer.domain.usecase.DeleteCategoryUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetCategoriesUseCase
+import com.georgeci.moneysurfer.navigation.SnackbarController
 import com.georgeci.moneysurfer.utils.MviViewModel
+import moneysurfer.feature.category.generated.resources.Res
+import moneysurfer.feature.category.generated.resources.categories_manage_delete_undo
+import moneysurfer.feature.category.generated.resources.categories_manage_deleted_snackbar
 import org.koin.core.annotation.KoinViewModel
 
 @KoinViewModel
 class CategoriesManageViewModel(
     private val getCategories: GetCategoriesUseCase,
     private val deleteCategory: DeleteCategoryUseCase,
+    private val createCategory: CreateCategoryUseCase,
+    private val snackbar: SnackbarController,
 ) : MviViewModel<CategoriesManageState, CategoriesManageEvent, CategoriesManageEffect>(
     initialState = CategoriesManageState.Loading,
 ) {
@@ -53,7 +60,15 @@ class CategoriesManageViewModel(
         val content = currentState as? CategoriesManageState.Content ?: return
         val target = content.pendingDelete ?: return
         updateState { CategoriesManageState.content.pendingDelete.modify(this) { null } }
-        launch { deleteCategory(target.id) }
+        launch {
+            val deleted = deleteCategory(target.id) ?: return@launch
+            snackbar.show(
+                message = Res.string.categories_manage_deleted_snackbar,
+                messageArgs = listOf(deleted.name),
+                actionLabel = Res.string.categories_manage_delete_undo,
+                onAction = { createCategory(deleted) },
+            )
+        }
     }
 
     private fun observeCategories() {

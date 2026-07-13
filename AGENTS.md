@@ -91,6 +91,17 @@ Hard rules:
   [docs/architecture/data-models.md](docs/architecture/data-models.md) and
   [md/time.md](md/time.md).
 
+## Testing Conventions
+
+- Unit tests (`commonTest`, `jvmTest`, `androidHostTest`) use kotest with the
+  `StringSpec` style by default (`FunSpec` is acceptable when `withData` /
+  `context` blocks materially help). Assertions are kotest matchers
+  (`shouldBe`, `shouldBeInstanceOf`, etc.) — not `kotlin.test`.
+- Instrumented tests (`androidDeviceTest`, on-device integration) stay on
+  JUnit 4 (`@RunWith(AndroidJUnit4)`, `@Test`, `@Before`, `@After`) because
+  the Android instrumentation runner doesn't host kotest specs. Assertions
+  inside those tests still use kotest matchers — only the runner is JUnit.
+
 ## UI Rules
 
 Read [uikit/README.md](uikit/README.md) before UI work.
@@ -268,6 +279,37 @@ Commit messages follow Conventional Commits with the same type vocabulary
   [md/totatl_calc.md](md/total_calc.md), [md/time.md](md/time.md),
   [md/ui_test.md](md/ui_test.md) (Phase 2), [md/test_debt.md](md/test_debt.md),
   [md/block.md](md/block.md) (startup ordering, read-only fallback).
+
+## iOS release / TestFlight
+
+Archive + upload to App Store Connect is driven by
+[scripts/ios/release.sh](scripts/ios/release.sh):
+
+```
+scripts/ios/release.sh main       # iosApp
+scripts/ios/release.sh offline    # iosAppOffline
+scripts/ios/release.sh all        # main, then offline
+scripts/ios/release.sh main --no-upload   # archive + export only
+```
+
+The script archives Release with automatic signing
+(`-allowProvisioningUpdates`), exports an App Store `.ipa`, and uploads via
+`xcrun altool` using an App Store Connect API key. Configuration via env
+vars or `local.properties` (env wins):
+
+- `ASC_API_KEY_ID` — key id from App Store Connect → Users and Access → Keys.
+- `ASC_API_ISSUER_ID` — issuer uuid from the same page.
+- `ASC_API_KEY_PATH` — path to `AuthKey_<id>.p8`. Keep it under
+  `keystore/` (gitignored) or anywhere outside the repo.
+- `ASC_TEAM_ID` — Apple team id, defaults to `92SLHZAN8L`.
+- `ASC_BUILD_NUMBER` — optional. When set, passed to `xcodebuild archive` as
+  `APP_VERSION_CODE=<n>` so `CURRENT_PROJECT_VERSION` (defined in
+  [Version.xcconfig](Version.xcconfig)) resolves to a unique build number for
+  this archive only — the working tree is not modified. TestFlight rejects
+  duplicate build numbers; in CI use e.g. `ASC_BUILD_NUMBER=$(date +%s)`.
+
+The script is unattended-friendly (no prompts) and is the same code path
+intended for any future GitHub Actions workflow.
 
 ## Sub-Agents
 

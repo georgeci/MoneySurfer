@@ -5,6 +5,12 @@ name: Workspace — Create and select test workspace
 
 - runFlow: 00_login.yaml
 
+# Workspace list copy: the selector title "Choose a workspace" is build-independent
+# (only the subtitle has online/offline variants). The per-row "X members" counter
+# was dropped (issue #60) — offline workspaces are single-user.
+- assertVisible:
+    text: "Choose a workspace"
+
 - runFlow:
     when:
       visible: "Use Test Workspace"
@@ -23,7 +29,10 @@ name: Workspace — Create and select test workspace
       - tapOn:
           text: "Workspace name"
       - inputText: "Test Workspace"
-      - hideKeyboard
+      # Don't hideKeyboard: the AVD runs with hw.keyboard=yes, so no soft IME
+      # is shown; Maestro then falls back to a BACK keypress which dismisses
+      # the creation screen. The "Create" action lives in the TopAppBar so
+      # the (absent) keyboard never overlaps it anyway.
       - tapOn:
           text: "Create"
       - tapOn:

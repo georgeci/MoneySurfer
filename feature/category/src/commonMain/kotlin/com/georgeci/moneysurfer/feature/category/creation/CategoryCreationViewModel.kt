@@ -8,8 +8,12 @@ import com.georgeci.moneysurfer.domain.repositories.CategoryRepository
 import com.georgeci.moneysurfer.domain.usecase.CreateCategoryUseCase
 import com.georgeci.moneysurfer.domain.usecase.EditCategoryUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetCurrentTimeUseCase
+import com.georgeci.moneysurfer.navigation.SnackbarController
 import com.georgeci.moneysurfer.utils.MviViewModel
 import kotlinx.coroutines.flow.first
+import moneysurfer.feature.category.generated.resources.Res
+import moneysurfer.feature.category.generated.resources.category_creation_created_snackbar
+import moneysurfer.feature.category.generated.resources.category_creation_updated_snackbar
 import org.koin.core.annotation.KoinViewModel
 
 /** Local UI model for the category type toggle. The domain `Category` model does not yet carry
@@ -24,6 +28,7 @@ class CategoryCreationViewModel(
     private val categoryRepository: CategoryRepository,
     private val session: SessionPointers,
     private val getCurrentTime: GetCurrentTimeUseCase,
+    private val snackbar: SnackbarController,
 ) : MviViewModel<CategoryCreationState, CategoryCreationEvent, CategoryCreationEffect>(
     initialState = CategoryCreationState(),
 ) {
@@ -85,15 +90,17 @@ class CategoryCreationViewModel(
         launch {
             updateState { copy(isLoading = true) }
 
+            val trimmedName = state.name.trim()
             if (categoryId != null) {
                 val existing = categoryRepository.getById(categoryId)
                 if (existing != null) {
                     editCategory(
                         existing.copy(
-                            name = state.name.trim(),
+                            name = trimmedName,
                             type = if (state.type == CategoryTypeUi.Income) CategoryType.INCOME else CategoryType.EXPENSE,
                         ),
                     )
+                    snackbar.show(Res.string.category_creation_updated_snackbar, listOf(trimmedName))
                 }
                 postSideEffect(CategoryCreationEffect.NavigateBack)
                 return@launch
@@ -108,12 +115,13 @@ class CategoryCreationViewModel(
                 Category(
                     id = CategoryId.uuid(),
                     workspaceId = workspaceId,
-                    name = state.name.trim(),
+                    name = trimmedName,
                     type = if (state.type == CategoryTypeUi.Income) CategoryType.INCOME else CategoryType.EXPENSE,
                     parentId = null,
                     createdAt = getCurrentTime(),
                 ),
             )
+            snackbar.show(Res.string.category_creation_created_snackbar, listOf(trimmedName))
             postSideEffect(CategoryCreationEffect.NavigateBack)
         }
     }

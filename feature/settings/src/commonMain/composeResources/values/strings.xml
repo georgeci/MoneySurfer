@@ -12,6 +12,8 @@
 
     <string name="settings_change_workspace">Change workspace</string>
     <string name="settings_change_workspace_supporting">Currently: Family</string>
+    <string name="settings_finish_setup">Finish setup</string>
+    <string name="settings_finish_setup_supporting">Pick your workspace currency</string>
     <string name="settings_members">Members &amp; permissions</string>
     <string name="settings_members_count_format">%1$d members</string>
     <string name="settings_pending_invites">Pending invitations</string>
@@ -202,10 +204,11 @@
     <!-- About screen -->
     <string name="settings_about_title">About &amp; legal</string>
     <string name="settings_about_brand">MoneySurfer</string>
-    <string name="settings_about_brand_letter">M</string>
-    <string name="settings_about_version_format">v%1$s · build 2025.04 · iOS / Android</string>
-    <string name="settings_about_chip_made_by">Made by georgeci</string>
-    <string name="settings_about_chip_warsaw">Warsaw, PL</string>
+    <string name="settings_about_version_format">v%1$s</string>
+    <string name="settings_about_chip_made_by">Made by Georgy Balabaichkin</string>
+    <string name="settings_about_chip_license">MIT License</string>
+    <string name="settings_about_github_title">View on GitHub</string>
+    <string name="settings_about_github_supporting">github.com/georgeci/MoneySurfer2026</string>
     <string name="settings_about_section_legal">Legal</string>
     <string name="settings_about_terms_title">Terms of service</string>
     <string name="settings_about_privacy_title">Privacy policy</string>
@@ -224,7 +227,7 @@
     <string name="settings_about_region_pill">English (UK)</string>
     <string name="settings_about_diagnostic_title">Diagnostic info</string>
     <string name="settings_about_diagnostic_supporting">Tap to copy</string>
-    <string name="settings_about_copyright">© 2025 georgeci sp. z o.o. All rights reserved.\nMoneySurfer is a personal-finance tracker, not a bank or money-transmission service.</string>
+    <string name="settings_about_copyright">© 2026 Georgy Balabaichkin. Released under the MIT License.\nMoneySurfer is an open-source personal-finance tracker — not a bank or money-transmission service.</string>
     <string name="settings_categories_title">Categories</string>
     <string name="settings_categories_supporting">Manage your spending and income categories</string>
 </resources>

@@ -1,0 +1,20 @@
+Money Surfer Offline is a fully offline personal finance app for tracking expenses, income, accounts, budgets, and savings goals.
+
+All data is stored only on your device. The app does not require internet permission and does not connect to any server. It is designed for users who want maximum privacy and prefer to keep their financial data completely local.
+
+You can manage your money without creating an account, signing in, or using cloud services.
+
+Key features:
+
+Track income and expenses
+Manage multiple accounts
+Organize transactions by categories
+Create budgets
+Set savings goals
+Works fully offline
+No account required
+No cloud sync
+No network access
+Data stays on your device
+
+This version does not include synchronization, shared workspaces, invites, or cloud backup. Your data remains local unless you manually export or back it up.

@@ -9,6 +9,7 @@ import com.georgeci.moneysurfer.domain.backup.BackupManifest
 import com.georgeci.moneysurfer.domain.backup.BackupStorageLocator
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -16,8 +17,10 @@ import kotlinx.serialization.json.Json
 import okio.BufferedSource
 import okio.FileSystem
 import okio.Path
+import okio.SYSTEM
 import okio.blackholeSink
 import okio.buffer
+import okio.use
 import org.koin.core.annotation.Single
 
 @Single(binds = [BackupImporter::class])
@@ -56,13 +59,12 @@ class BackupImporterImpl(
         val mainDbTemp = mainDbPath.appendSuffix(SUFFIX_RESTORE_TMP)
         val dataStoreTemp = dataStorePath.appendSuffix(SUFFIX_RESTORE_TMP)
 
-        try {
-            extractRemainingEntries(reader, mainDbTemp, dataStoreTemp)
-        } catch (error: Throwable) {
-            fs.deleteIfExists(mainDbTemp)
-            fs.deleteIfExists(dataStoreTemp)
-            throw error
-        }
+        runCatching { extractRemainingEntries(reader, mainDbTemp, dataStoreTemp) }
+            .onFailure {
+                fs.deleteIfExists(mainDbTemp)
+                fs.deleteIfExists(dataStoreTemp)
+            }
+            .getOrThrow()
 
         database.close()
 
@@ -104,40 +106,42 @@ class BackupImporterImpl(
 
     private fun readManifestEntry(reader: ZipStoredReader): BackupManifest {
         val firstName = reader.nextEntryName()
-            ?: throw BackupError.InvalidArchive("Empty archive")
-        if (firstName != BackupManifest.MANIFEST_ENTRY_NAME) {
-            throw BackupError.InvalidArchive(
-                "Expected ${BackupManifest.MANIFEST_ENTRY_NAME} as first entry; got $firstName",
-            )
+        val problem = when {
+            firstName == null -> "Empty archive"
+            firstName != BackupManifest.MANIFEST_ENTRY_NAME ->
+                "Expected ${BackupManifest.MANIFEST_ENTRY_NAME} as first entry; got $firstName"
+            else -> null
+        }
+        if (problem != null) {
+            throw BackupError.InvalidArchive(problem)
         }
         val manifestJson = reader.readCurrentEntryToBuffer().readUtf8()
-        return try {
-            Json.decodeFromString(BackupManifest.serializer(), manifestJson)
-        } catch (
-            @Suppress("TooGenericExceptionCaught") error: Throwable,
-        ) {
-            throw BackupError.InvalidArchive("Manifest is not valid JSON: ${error.message}")
-        }
+        return runCatching { Json.decodeFromString(BackupManifest.serializer(), manifestJson) }
+            .getOrElse { error ->
+                throw BackupError.InvalidArchive("Manifest is not valid JSON: ${error.message}", error)
+            }
     }
 
     private fun validateManifest(manifest: BackupManifest) {
-        if (manifest.backupFormatVersion != BackupManifest.CURRENT_FORMAT_VERSION) {
-            throw BackupError.FormatMismatch(
-                expected = BackupManifest.CURRENT_FORMAT_VERSION,
-                actual = manifest.backupFormatVersion,
-            )
+        val error = when {
+            manifest.backupFormatVersion != BackupManifest.CURRENT_FORMAT_VERSION ->
+                BackupError.FormatMismatch(
+                    expected = BackupManifest.CURRENT_FORMAT_VERSION,
+                    actual = manifest.backupFormatVersion,
+                )
+            manifest.moneySurferDbVersion != MONEY_SURFER_DB_VERSION ->
+                BackupError.SchemaMismatch(
+                    expected = MONEY_SURFER_DB_VERSION,
+                    actual = manifest.moneySurferDbVersion,
+                )
+            BackupManifest.MAIN_DB_ENTRY_NAME !in manifest.files ->
+                BackupError.MissingFile(BackupManifest.MAIN_DB_ENTRY_NAME)
+            BackupManifest.DATASTORE_ENTRY_NAME !in manifest.files ->
+                BackupError.MissingFile(BackupManifest.DATASTORE_ENTRY_NAME)
+            else -> null
         }
-        if (manifest.moneySurferDbVersion != MONEY_SURFER_DB_VERSION) {
-            throw BackupError.SchemaMismatch(
-                expected = MONEY_SURFER_DB_VERSION,
-                actual = manifest.moneySurferDbVersion,
-            )
-        }
-        if (BackupManifest.MAIN_DB_ENTRY_NAME !in manifest.files) {
-            throw BackupError.MissingFile(BackupManifest.MAIN_DB_ENTRY_NAME)
-        }
-        if (BackupManifest.DATASTORE_ENTRY_NAME !in manifest.files) {
-            throw BackupError.MissingFile(BackupManifest.DATASTORE_ENTRY_NAME)
+        if (error != null) {
+            throw error
         }
     }
 

@@ -1,6 +1,7 @@
 package com.georgeci.moneysurfer.feature.workspace.selector
 
 import arrow.optics.optics
+import com.georgeci.moneysurfer.domain.OfflineBuildFlags
 import com.georgeci.moneysurfer.domain.auth.SessionPointers
 import com.georgeci.moneysurfer.domain.model.Workspace
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
@@ -16,9 +17,15 @@ class WorkspaceSelectorViewModel(
     private val session: SessionPointers,
     private val getWorkspacesForUserUseCase: GetWorkspacesForUserUseCase,
     private val selectWorkspaceUseCase: SelectWorkspaceUseCase,
+    offlineBuildFlags: OfflineBuildFlags,
 ) : MviViewModel<WorkspaceSelectorState, WorkspaceSelectorEvent, WorkspaceSelectorEffect>(
-    initialState = WorkspaceSelectorState.Loading(showActions = showActions),
+    initialState = WorkspaceSelectorState.Loading(
+        showActions = showActions,
+        isOffline = offlineBuildFlags.isOffline,
+    ),
 ) {
+
+    private val isOffline: Boolean = offlineBuildFlags.isOffline
 
     init {
         loadWorkspaces()
@@ -67,6 +74,7 @@ class WorkspaceSelectorViewModel(
                             pendingWorkspaceId = workspaceId,
                             showActions = showActions,
                             isSelecting = false,
+                            isOffline = isOffline,
                         )
                         is WorkspaceSelectorState.Content -> copy(
                             selectedWorkspaceId = workspaceId,
@@ -111,6 +119,7 @@ class WorkspaceSelectorViewModel(
                     pendingWorkspaceId = null,
                     showActions = showActions,
                     isSelecting = false,
+                    isOffline = isOffline,
                 )
                 is WorkspaceSelectorState.Content -> copy(workspaces = workspaces)
             }
@@ -121,9 +130,13 @@ class WorkspaceSelectorViewModel(
 @optics
 sealed interface WorkspaceSelectorState {
     val showActions: Boolean
+    val isOffline: Boolean
 
     @optics
-    data class Loading(override val showActions: Boolean) : WorkspaceSelectorState {
+    data class Loading(
+        override val showActions: Boolean,
+        override val isOffline: Boolean = false,
+    ) : WorkspaceSelectorState {
         companion object
     }
 
@@ -134,7 +147,15 @@ sealed interface WorkspaceSelectorState {
         val pendingWorkspaceId: WorkspaceId?,
         override val showActions: Boolean,
         val isSelecting: Boolean,
+        override val isOffline: Boolean = false,
     ) : WorkspaceSelectorState {
+        /**
+         * The "Members" row action is remote-only — offline workspaces are always single-user,
+         * so showing it would imply collaboration the offline build doesn't support.
+         */
+        val showMemberActions: Boolean
+            get() = !isOffline
+
         val activeWorkspaceId: WorkspaceId?
             get() = pendingWorkspaceId ?: selectedWorkspaceId
 

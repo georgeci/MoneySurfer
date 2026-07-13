@@ -67,6 +67,18 @@ class AccountRepositoryImpl(
         dao.setBalance(accountId.value, balance.minor, clock.now().toEpochMilliseconds())
     }
 
+    override suspend fun setArchived(accountId: AccountId, archived: Boolean) {
+        val existing = dao.getById(accountId.value) ?: return
+        if (existing.archived == archived) return
+        dao.setArchived(accountId.value, archived, clock.now().toEpochMilliseconds())
+        outboxEnqueuer.enqueueUpsert(
+            entityType = SyncEntityTypes.ACCOUNT,
+            entityId = existing.id,
+            scopeKey = existing.workspaceId,
+            operation = MutationOperation.UPDATE,
+        )
+    }
+
     private suspend fun enqueueUpsert(entity: AccountEntity, operation: MutationOperation) {
         outboxEnqueuer.enqueueUpsert(
             entityType = SyncEntityTypes.ACCOUNT,
@@ -83,6 +95,7 @@ class AccountRepositoryImpl(
         type = runCatching { AccountType.valueOf(type) }.getOrDefault(AccountType.SAVINGS),
         currencyCode = CurrencyCode(currency),
         balance = Money.fromMinor(balance),
+        archived = archived,
         updatedAt = timeFormatter.parseInstant(updatedAt),
     )
 
@@ -93,6 +106,7 @@ class AccountRepositoryImpl(
         type = type.name,
         currency = currencyCode.value,
         balance = balance.minor,
+        archived = archived,
         updatedAt = timeFormatter.formatInstant(updatedAt),
     )
 }

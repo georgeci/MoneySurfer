@@ -17,6 +17,8 @@ import org.koin.core.annotation.Module
         SyncImplModule::class,
         SyncModule::class,
         OnlineSignInModule::class,
+        OnlineTransactionCreationModule::class,
+        OnlineFirstRunModule::class,
     ],
 )
 class OnlineKoinApp

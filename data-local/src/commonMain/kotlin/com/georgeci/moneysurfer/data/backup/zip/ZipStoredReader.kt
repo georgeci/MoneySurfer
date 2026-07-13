@@ -61,35 +61,36 @@ internal class ZipStoredReader(private val source: BufferedSource) {
     private var currentHeader: LocalEntry? = null
 
     private fun readLocalFileHeader(): LocalEntry {
-        val versionNeeded = source.readShortLe().toInt() and 0xFFFF
-        val flags = source.readShortLe().toInt() and 0xFFFF
-        val method = source.readShortLe().toInt() and 0xFFFF
+        val versionNeeded = source.readShortLe().toInt() and MASK_U16
+        val flags = source.readShortLe().toInt() and MASK_U16
+        val method = source.readShortLe().toInt() and MASK_U16
         source.readShortLe()
         source.readShortLe()
-        val crc = source.readIntLe().toLong() and 0xFFFFFFFFL
-        val compressedSize = source.readIntLe().toLong() and 0xFFFFFFFFL
-        val uncompressedSize = source.readIntLe().toLong() and 0xFFFFFFFFL
-        val nameLength = source.readShortLe().toInt() and 0xFFFF
-        val extraLength = source.readShortLe().toInt() and 0xFFFF
+        val crc = source.readIntLe().toLong() and MASK_U32
+        val compressedSize = source.readIntLe().toLong() and MASK_U32
+        val uncompressedSize = source.readIntLe().toLong() and MASK_U32
+        val nameLength = source.readShortLe().toInt() and MASK_U16
+        val extraLength = source.readShortLe().toInt() and MASK_U16
 
-        if (method != COMPRESSION_METHOD_STORED) {
-            throw BackupError.InvalidArchive("Unsupported compression method: $method")
+        val problem = when {
+            method != COMPRESSION_METHOD_STORED ->
+                "Unsupported compression method: $method"
+            flags and GENERAL_PURPOSE_DATA_DESCRIPTOR_FLAG != 0 ->
+                "Data-descriptor entries are not supported"
+            versionNeeded > VERSION_NEEDED_TO_EXTRACT ->
+                "ZIP requires version $versionNeeded"
+            compressedSize != uncompressedSize ->
+                "STORED entry has mismatched sizes"
+            // The codec keeps each entry buffered as a single okio Segment chain,
+            // so anything above Int.MAX_VALUE bytes can't be addressed in the
+            // ByteArray copy loop and would silently overflow on the cast below.
+            // We don't ship multi-GB DBs, so reject up front.
+            uncompressedSize > Int.MAX_VALUE.toLong() ->
+                "Entry too large: $uncompressedSize bytes"
+            else -> null
         }
-        if (flags and GENERAL_PURPOSE_DATA_DESCRIPTOR_FLAG != 0) {
-            throw BackupError.InvalidArchive("Data-descriptor entries are not supported")
-        }
-        if (versionNeeded > VERSION_NEEDED_TO_EXTRACT) {
-            throw BackupError.InvalidArchive("ZIP requires version $versionNeeded")
-        }
-        if (compressedSize != uncompressedSize) {
-            throw BackupError.InvalidArchive("STORED entry has mismatched sizes")
-        }
-        // The codec keeps each entry buffered as a single okio Segment chain,
-        // so anything above Int.MAX_VALUE bytes can't be addressed in the
-        // ByteArray copy loop and would silently overflow on the cast below.
-        // We don't ship multi-GB DBs, so reject up front.
-        if (uncompressedSize > Int.MAX_VALUE.toLong()) {
-            throw BackupError.InvalidArchive("Entry too large: $uncompressedSize bytes")
+        if (problem != null) {
+            throw BackupError.InvalidArchive(problem)
         }
 
         val nameBytes = source.readByteArray(nameLength.toLong())
@@ -103,3 +104,5 @@ internal class ZipStoredReader(private val source: BufferedSource) {
 
 private const val GENERAL_PURPOSE_DATA_DESCRIPTOR_FLAG: Int = 1 shl 3
 private const val COPY_BUFFER_SIZE: Int = 64 * 1024
+private const val MASK_U16: Int = 0xFFFF
+private const val MASK_U32: Long = 0xFFFFFFFFL

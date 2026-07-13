@@ -12,6 +12,9 @@ sealed interface Route : NavKey {
     data object SignIn : Route
 
     @Serializable
+    data object Legal : Route
+
+    @Serializable
     data class WorkspaceSelector(
         val showActions: Boolean = false,
     ) : Route
@@ -44,6 +47,10 @@ sealed interface Route : NavKey {
 
     @Serializable
     data object IncomingInvites : Route
+
+    /** First-launch currency picker, shown once after the offline seed before Dashboard. */
+    @Serializable
+    data object FirstRunCurrency : Route
 
     @Serializable
     data object Dashboard : TopLevel

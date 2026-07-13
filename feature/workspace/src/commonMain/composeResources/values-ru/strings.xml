@@ -3,6 +3,7 @@
     <string name="workspace_selector_title">Рабочие пространства</string>
     <string name="workspace_selector_heading_title">Выберите пространство</string>
     <string name="workspace_selector_heading_subtitle">У каждого — свои бюджеты, счета и участники.</string>
+    <string name="workspace_selector_heading_subtitle_offline">У каждого — свои бюджеты и счета.</string>
     <string name="workspace_selector_empty">Для пользователя нет доступных workspace.</string>
     <string name="workspace_selector_create_title">Новое пространство</string>
     <string name="workspace_selector_create_subtitle">Для поездки, проекта или чего-то ещё</string>
@@ -104,7 +105,16 @@
     <string name="workspace_creation_invite_title">Пригласить людей</string>
     <string name="workspace_creation_invite_subtitle">Отправьте ссылку или приглашение</string>
     <string name="workspace_creation_preview_subtitle_format">Общее · %1$d участников · %2$s</string>
+    <string name="workspace_creation_preview_subtitle_offline_format">%1$s</string>
     <string name="workspace_creation_preview_fallback_title">Новое пространство</string>
     <string name="workspace_creation_error_remote_sync">Не удалось синхронизировать пространство с облаком. Проверьте интернет и попробуйте снова.</string>
     <string name="workspace_creation_error_unknown">Не удалось создать пространство. Попробуйте ещё раз.</string>
+
+    <!-- First-run currency picker -->
+    <string name="first_run_currency_title">Выберите валюту</string>
+    <string name="first_run_currency_subtitle">Все балансы и отчёты в этом пространстве используют эту валюту.</string>
+    <string name="first_run_currency_search_placeholder">Поиск валюты</string>
+    <string name="first_run_currency_confirm">Продолжить</string>
+    <string name="first_run_currency_skip">Пропустить</string>
+    <string name="first_run_currency_error">Не удалось сохранить валюту. Попробуйте ещё раз.</string>
 </resources>

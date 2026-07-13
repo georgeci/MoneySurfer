@@ -8,6 +8,7 @@ import com.georgeci.moneysurfer.utils.MviViewModel
 import kotlinx.coroutines.CancellationException
 import okio.BufferedSink
 import okio.BufferedSource
+import okio.use
 import org.koin.core.annotation.KoinViewModel
 
 @KoinViewModel
@@ -30,6 +31,22 @@ class BackupViewModel(
                 postSideEffect(BackupEffect.RequestSaveFile(suggestedFilename()))
             is BackupEvent.OnSaveSinkChosen -> handleSaveSink(event.sink)
 
+            is BackupEvent.OnOpenSourceChosen -> handleOpenSource(event.source)
+
+            BackupEvent.OnRestoreClick,
+            BackupEvent.OnRestoreDismissed,
+            BackupEvent.OnRestoreConfirmed,
+            -> onRestoreEvent(event)
+
+            BackupEvent.OnDeleteClick,
+            BackupEvent.OnDeleteDismissed,
+            BackupEvent.OnDeleteConfirmed,
+            -> onDeleteEvent(event)
+        }
+    }
+
+    private fun onRestoreEvent(event: BackupEvent) {
+        when (event) {
             BackupEvent.OnRestoreClick ->
                 updateState { copy(showRestoreConfirmation = true) }
             BackupEvent.OnRestoreDismissed ->
@@ -38,8 +55,12 @@ class BackupViewModel(
                 updateState { copy(showRestoreConfirmation = false) }
                 postSideEffect(BackupEffect.RequestOpenFile)
             }
-            is BackupEvent.OnOpenSourceChosen -> handleOpenSource(event.source)
+            else -> Unit
+        }
+    }
 
+    private fun onDeleteEvent(event: BackupEvent) {
+        when (event) {
             BackupEvent.OnDeleteClick ->
                 updateState { copy(showDeleteConfirmation = true) }
             BackupEvent.OnDeleteDismissed ->
@@ -48,6 +69,7 @@ class BackupViewModel(
                 updateState { copy(showDeleteConfirmation = false) }
                 postSideEffect(BackupEffect.NotImplemented)
             }
+            else -> Unit
         }
     }
 

@@ -6,8 +6,15 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
@@ -20,6 +27,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavEntry
@@ -33,9 +41,12 @@ import androidx.window.core.layout.WindowSizeClass.Companion.WIDTH_DP_MEDIUM_LOW
 import com.georgeci.moneysurfer.navigation.util.rememberViewModelStoreNavEntryDecorator
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import io.github.irgaly.navigation3.resultstate.rememberNavigationResultNavEntryDecorator
+import kotlinx.coroutines.launch
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
+import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
 private val savedStateConfig = SavedStateConfiguration {
@@ -49,6 +60,7 @@ private val savedStateConfig = SavedStateConfiguration {
             subclass(Route.WorkspaceInvite::class, Route.WorkspaceInvite.serializer())
             subclass(Route.WorkspaceMemberActions::class, Route.WorkspaceMemberActions.serializer())
             subclass(Route.IncomingInvites::class, Route.IncomingInvites.serializer())
+            subclass(Route.FirstRunCurrency::class, Route.FirstRunCurrency.serializer())
             subclass(Route.Dashboard::class, Route.Dashboard.serializer())
             subclass(Route.AccountCreation::class, Route.AccountCreation.serializer())
             subclass(Route.AccountsManage::class, Route.AccountsManage.serializer())
@@ -133,41 +145,90 @@ fun AppNavGraph(
         )
     }
 
+    val snackbarHostState = rememberSnackbarHostState(koinInject())
+
     SyncStatusProvider {
-        if (currentTopLevel == null) {
-            navDisplay()
-        } else {
-            val destinationLabels = TopLevelDestination.entries.associateWith { destination ->
-                stringResource(destination.label)
-            }
-            val adaptiveInfo = currentWindowAdaptiveInfo()
-            val layoutType = if (
-                adaptiveInfo.windowSizeClass.isWidthAtLeastBreakpoint(WIDTH_DP_MEDIUM_LOWER_BOUND)
-            ) {
-                NavigationSuiteScaffoldDefaults.calculateFromAdaptiveInfo(adaptiveInfo)
+        Scaffold(
+            containerColor = AppTheme.materialColors.background,
+            contentWindowInsets = WindowInsets(0, 0, 0, 0),
+            snackbarHost = { SnackbarHost(snackbarHostState) { data -> Snackbar(data) } },
+        ) { _ ->
+            val topLevel = currentTopLevel
+            if (topLevel == null) {
+                navDisplay()
             } else {
-                NavigationSuiteType.None
+                AppNavigationSuite(
+                    currentTopLevel = topLevel,
+                    onSelect = navigator::resetTo,
+                    content = navDisplay,
+                )
             }
-            NavigationSuiteScaffold(
-                layoutType = layoutType,
-                navigationSuiteItems = {
-                    TopLevelDestination.entries.forEach { destination ->
-                        val label = destinationLabels.getValue(destination)
-                        item(
-                            selected = destination.matches(currentTopLevel),
-                            onClick = { navigator.resetTo(destination.route) },
-                            icon = {
-                                Icon(imageVector = destination.icon, contentDescription = label)
-                            },
-                            label = { Text(label) },
-                        )
-                    }
-                },
-                containerColor = AppTheme.materialColors.background,
-                content = navDisplay,
-            )
         }
     }
 }
+
+/** App-level [SnackbarHost] state that renders one-shot messages posted to [controller]. */
+@Composable
+private fun rememberSnackbarHostState(controller: SnackbarController): SnackbarHostState {
+    val hostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+    LaunchedEffect(controller) {
+        controller.requests.collect { request ->
+            hostState.currentSnackbarData?.dismiss()
+            scope.launch { hostState.present(request) }
+        }
+    }
+    return hostState
+}
+
+private suspend fun SnackbarHostState.present(request: SnackbarRequest) {
+    val actionLabel = request.actionLabel?.let { getString(it) }
+    val result = showSnackbar(
+        message = request.resolveMessage(),
+        actionLabel = actionLabel,
+        withDismissAction = false,
+        // Action snackbars (Undo) stay longer so the user can read and reach the button.
+        duration = if (actionLabel != null) SnackbarDuration.Long else SnackbarDuration.Short,
+    )
+    if (result == SnackbarResult.ActionPerformed) request.onAction?.invoke()
+}
+
+@OptIn(ExperimentalMaterial3AdaptiveApi::class)
+@Composable
+private fun AppNavigationSuite(
+    currentTopLevel: Route.TopLevel,
+    onSelect: (Route) -> Unit,
+    content: @Composable () -> Unit,
+) {
+    val labels = TopLevelDestination.entries.associateWith { stringResource(it.label) }
+    val adaptiveInfo = currentWindowAdaptiveInfo()
+    val layoutType = if (
+        adaptiveInfo.windowSizeClass.isWidthAtLeastBreakpoint(WIDTH_DP_MEDIUM_LOWER_BOUND)
+    ) {
+        NavigationSuiteScaffoldDefaults.calculateFromAdaptiveInfo(adaptiveInfo)
+    } else {
+        NavigationSuiteType.None
+    }
+    NavigationSuiteScaffold(
+        layoutType = layoutType,
+        navigationSuiteItems = {
+            TopLevelDestination.entries.forEach { destination ->
+                val label = labels.getValue(destination)
+                item(
+                    selected = destination.matches(currentTopLevel),
+                    onClick = { onSelect(destination.route) },
+                    icon = { Icon(imageVector = destination.icon, contentDescription = label) },
+                    label = { Text(label) },
+                )
+            }
+        },
+        containerColor = AppTheme.materialColors.background,
+        content = content,
+    )
+}
+
+@Suppress("SpreadOperator") // messageArgs holds 0-1 items; the array copy cost is negligible.
+private suspend fun SnackbarRequest.resolveMessage(): String =
+    getString(message, *messageArgs.toTypedArray())
 
 private const val ANIMATION_DURATION = 300

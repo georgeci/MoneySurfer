@@ -48,6 +48,7 @@ data class AccountDoc(
     val type: String = "",
     val currency: String = "",
     val balance: Long = 0L,
+    val archived: Boolean = false,
     val updatedAt: Long = 0L,
     val deletedAt: Long? = null,
     val clientVersionCode: Int = 1,

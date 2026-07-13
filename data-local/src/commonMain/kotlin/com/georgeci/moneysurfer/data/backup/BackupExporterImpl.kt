@@ -1,5 +1,6 @@
 package com.georgeci.moneysurfer.data.backup
 
+import androidx.room.useWriterConnection
 import com.georgeci.moneysurfer.data.backup.zip.ZipStoredWriter
 import com.georgeci.moneysurfer.data.db.MONEY_SURFER_DB_VERSION
 import com.georgeci.moneysurfer.data.db.MoneySurferDatabase
@@ -11,6 +12,7 @@ import com.georgeci.moneysurfer.domain.backup.BackupStorageLocator
 import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -18,7 +20,9 @@ import kotlinx.serialization.json.Json
 import okio.Buffer
 import okio.BufferedSink
 import okio.FileSystem
+import okio.SYSTEM
 import okio.buffer
+import okio.use
 import org.koin.core.annotation.Single
 
 @Single(binds = [BackupExporter::class])

@@ -54,9 +54,13 @@ class ZipStoredCodecTest : FunSpec({
             writeShortLe(20)
             writeShortLe(0)
             writeShortLe(8) // DEFLATE — unsupported
-            writeShortLe(0); writeShortLe(0)
-            writeIntLe(0); writeIntLe(0); writeIntLe(0)
-            writeShortLe(1); writeShortLe(0)
+            writeShortLe(0)
+            writeShortLe(0)
+            writeIntLe(0)
+            writeIntLe(0)
+            writeIntLe(0)
+            writeShortLe(1)
+            writeShortLe(0)
             writeUtf8("a")
         }
 
