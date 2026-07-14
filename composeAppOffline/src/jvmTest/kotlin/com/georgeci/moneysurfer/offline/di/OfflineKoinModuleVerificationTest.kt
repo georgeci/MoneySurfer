@@ -6,6 +6,7 @@ import com.georgeci.moneysurfer.data.db.MoneySurferDatabase
 import com.georgeci.moneysurfer.di.AppModule
 import com.georgeci.moneysurfer.di.module
 import com.georgeci.moneysurfer.domain.AppInfo
+import com.georgeci.moneysurfer.domain.backup.BackupStorageLocator
 import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.CategoryId
 import com.georgeci.moneysurfer.domain.primitives.CategoryType
@@ -51,6 +52,7 @@ class OfflineKoinModuleVerificationTest {
 
 private val testPlatformModule = module {
     single<MoneySurferDatabase> { error("verify() must not instantiate this") }
+    single<BackupStorageLocator> { error("verify() must not instantiate this") }
     single<DataStore<Preferences>> { error("verify() must not instantiate this") }
     single { AppInfo(version = "test", versionCode = 1) }
 }

@@ -189,6 +189,17 @@
     <string name="settings_backup_restore_supporting">Replaces current data</string>
     <string name="settings_backup_delete_title">Delete cloud backup</string>
     <string name="settings_backup_delete_supporting">Removes all backups from iCloud</string>
+    <string name="settings_backup_cancel">Cancel</string>
+    <string name="settings_backup_restore_confirm_title">Replace current data?</string>
+    <string name="settings_backup_restore_confirm_body">Restoring will replace all transactions, accounts, and settings on this device. The app will restart afterwards.</string>
+    <string name="settings_backup_restore_confirm_confirm">Restore</string>
+    <string name="settings_backup_export_success">Backup saved</string>
+    <string name="settings_backup_notice_invalid_archive">Selected file is not a valid MoneySurfer backup</string>
+    <string name="settings_backup_notice_corrupted">Backup file is corrupted</string>
+    <string name="settings_backup_notice_generic">Backup operation failed</string>
+    <string name="settings_backup_notice_missing_file">Backup is missing required entry: %s</string>
+    <string name="settings_backup_notice_format_mismatch">Backup format v%1$d isn\'t supported (expected v%2$d)</string>
+    <string name="settings_backup_notice_schema_mismatch">Backup is from database v%1$d; this app uses v%2$d</string>
 
     <!-- About screen -->
     <string name="settings_about_title">About &amp; legal</string>

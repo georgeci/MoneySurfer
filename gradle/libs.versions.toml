@@ -37,6 +37,7 @@ koin-plugin = "1.0.0-RC2"
 arrow = "2.2.2.1"
 detekt = "1.23.8"
 kermit = "2.1.0"
+okio = "3.12.0"
 google-services = "4.4.2"
 firebase-crashlytics-plugin = "3.0.7"
 firebase-bom = "33.14.0"
@@ -110,6 +111,7 @@ arrow-optics = { module = "io.arrow-kt:arrow-optics", version.ref = "arrow" }
 arrow-optics-ksp = { module = "io.arrow-kt:arrow-optics-ksp-plugin", version.ref = "arrow" }
 detekt-formatting = { module = "io.gitlab.arturbosch.detekt:detekt-formatting", version.ref = "detekt" }
 kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }
+okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebase-bom" }
 firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
 firebase-auth = { module = "com.google.firebase:firebase-auth" }

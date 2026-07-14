@@ -189,6 +189,17 @@
     <string name="settings_backup_restore_supporting">Заменит текущие данные</string>
     <string name="settings_backup_delete_title">Удалить облачный бэкап</string>
     <string name="settings_backup_delete_supporting">Удалит все бэкапы из iCloud</string>
+    <string name="settings_backup_cancel">Отмена</string>
+    <string name="settings_backup_restore_confirm_title">Заменить текущие данные?</string>
+    <string name="settings_backup_restore_confirm_body">Восстановление заменит все транзакции, счета и настройки на этом устройстве. После завершения приложение перезапустится.</string>
+    <string name="settings_backup_restore_confirm_confirm">Восстановить</string>
+    <string name="settings_backup_export_success">Бэкап сохранён</string>
+    <string name="settings_backup_notice_invalid_archive">Выбранный файл не является корректным бэкапом MoneySurfer</string>
+    <string name="settings_backup_notice_corrupted">Файл бэкапа повреждён</string>
+    <string name="settings_backup_notice_generic">Операция с бэкапом не удалась</string>
+    <string name="settings_backup_notice_missing_file">В бэкапе отсутствует обязательная запись: %s</string>
+    <string name="settings_backup_notice_format_mismatch">Формат бэкапа v%1$d не поддерживается (ожидается v%2$d)</string>
+    <string name="settings_backup_notice_schema_mismatch">Бэкап из БД v%1$d; приложение использует v%2$d</string>
 
     <!-- About -->
     <string name="settings_about_title">О приложении</string>

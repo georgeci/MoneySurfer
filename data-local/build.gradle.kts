@@ -25,6 +25,8 @@ kotlin {
                 implementation(libs.androidx.datastore.preferences)
                 implementation(libs.kotlinx.coroutinesCore)
                 implementation(libs.kotlinx.serialization.core)
+                implementation(libs.kotlinx.serialization.json)
+                implementation(libs.okio)
                 implementation(libs.arrow.core)
                 implementation(libs.kermit)
                 implementation(projects.domain)

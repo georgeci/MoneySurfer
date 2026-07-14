@@ -27,6 +27,8 @@ kotlin {
                 implementation(libs.kotlinx.coroutinesCore)
                 implementation(libs.kotlinx.datetime)
                 implementation(libs.kotlinx.serialization.core)
+                implementation(libs.kotlinx.serialization.json)
+                implementation(libs.okio)
                 implementation(libs.arrow.core)
                 api(projects.sync.api)
                 implementation(libs.kermit)
