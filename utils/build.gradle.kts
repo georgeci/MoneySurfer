@@ -54,4 +54,14 @@ tasks.withType<Test>().configureEach {
 
 tasks.named<Test>("jvmTest") {
     useJUnitPlatform()
+
+    // StringResourcePlaceholderTest scans every strings.xml in the repo at
+    // runtime; declare them as inputs so editing one re-runs the gate instead
+    // of hitting UP-TO-DATE.
+    inputs.files(
+        fileTree(rootDir) {
+            include("**/strings.xml")
+            exclude("**/build/**", ".git/**")
+        },
+    ).withPathSensitivity(PathSensitivity.RELATIVE)
 }

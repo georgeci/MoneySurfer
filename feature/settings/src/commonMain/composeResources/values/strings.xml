@@ -197,7 +197,7 @@
     <string name="settings_backup_notice_invalid_archive">Selected file is not a valid MoneySurfer backup</string>
     <string name="settings_backup_notice_corrupted">Backup file is corrupted</string>
     <string name="settings_backup_notice_generic">Backup operation failed</string>
-    <string name="settings_backup_notice_missing_file">Backup is missing required entry: %s</string>
+    <string name="settings_backup_notice_missing_file">Backup is missing required entry: %1$s</string>
     <string name="settings_backup_notice_format_mismatch">Backup format v%1$d isn\'t supported (expected v%2$d)</string>
     <string name="settings_backup_notice_schema_mismatch">Backup is from database v%1$d; this app uses v%2$d</string>
 
