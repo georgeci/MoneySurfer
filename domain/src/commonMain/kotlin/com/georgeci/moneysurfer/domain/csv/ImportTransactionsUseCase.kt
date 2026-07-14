@@ -48,7 +48,7 @@ class ImportTransactionsUseCase(
     } catch (
         @Suppress("TooGenericExceptionCaught") t: Throwable,
     ) {
-        Result.failure(TransactionCsvError.Io(t))
+        Result.failure(TransactionCsvError.Unexpected(t))
     }
 
     private suspend fun runImport(source: BufferedSource): CsvImportReport {
@@ -73,7 +73,7 @@ class ImportTransactionsUseCase(
                 is RowResult.Failed -> errors.add(CsvRowError(record.rowNumber, result.issue))
                 is RowResult.Insert -> {
                     createTransaction(result.transaction)
-                    known.transactionIds.add(result.transaction.id)
+                    known.importedIds.add(result.transaction.id)
                     imported++
                 }
             }
@@ -81,19 +81,27 @@ class ImportTransactionsUseCase(
         return CsvImportReport(imported = imported, skippedDuplicates = skipped, errors = errors)
     }
 
-    private fun decodeRow(fields: List<String>, known: KnownIds): RowResult =
+    private suspend fun decodeRow(fields: List<String>, known: KnownIds): RowResult =
         when (val decoded = TransactionCsvCodec.decode(fields)) {
             is TransactionCsvDecodeResult.Rejected -> RowResult.Failed(decoded.issue)
             is TransactionCsvDecodeResult.Decoded -> {
                 val transaction = decoded.transaction
                 val referenceIssue = known.referenceIssue(transaction)
                 when {
-                    transaction.id in known.transactionIds -> RowResult.Duplicate
+                    isDuplicate(transaction.id, known) -> RowResult.Duplicate
                     referenceIssue != null -> RowResult.Failed(referenceIssue)
                     else -> RowResult.Insert(transaction)
                 }
             }
         }
+
+    /**
+     * Duplicate = already inserted from this file, or already in the database.
+     * The DB side is an indexed point lookup per row instead of prefetching
+     * every transaction id — transactions is the one table that can be large.
+     */
+    private suspend fun isDuplicate(id: TransactionId, known: KnownIds): Boolean =
+        id in known.importedIds || transactionRepository.getById(id) != null
 
     private sealed interface RowResult {
         data object Duplicate : RowResult
@@ -102,11 +110,13 @@ class ImportTransactionsUseCase(
     }
 
     private class KnownIds(
-        val transactionIds: MutableSet<TransactionId>,
         val workspaceIds: Set<WorkspaceId>,
         val accountIds: Set<AccountId>,
         val categoryIds: Set<CategoryId>,
     ) {
+        /** Ids inserted during this import run (also catches in-file duplicates). */
+        val importedIds: MutableSet<TransactionId> = mutableSetOf()
+
         fun referenceIssue(transaction: Transaction): CsvRowIssue? = when {
             transaction.workspaceId !in workspaceIds ->
                 CsvRowIssue.UnknownWorkspace(transaction.workspaceId.value)
@@ -118,8 +128,9 @@ class ImportTransactionsUseCase(
         }
     }
 
+    // Workspaces, accounts, and categories are small tables; prefetching their
+    // ids once beats a per-row lookup for each of the three references.
     private suspend fun loadKnownIds(): KnownIds = KnownIds(
-        transactionIds = transactionRepository.getAll().first().mapTo(mutableSetOf()) { it.id },
         workspaceIds = workspaceRepository.getAll().first().mapTo(mutableSetOf()) { it.id },
         accountIds = accountRepository.getAll().first().mapTo(mutableSetOf()) { it.id },
         categoryIds = categoryRepository.getAll().first().mapTo(mutableSetOf()) { it.id },

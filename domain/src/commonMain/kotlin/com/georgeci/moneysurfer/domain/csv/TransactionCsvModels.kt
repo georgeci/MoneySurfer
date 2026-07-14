@@ -24,13 +24,17 @@ sealed interface CsvRowIssue {
 
 /**
  * File-level errors from [ExportTransactionsUseCase] / [ImportTransactionsUseCase].
- * Raw I/O throwables are wrapped at this boundary per AGENTS.md so callers
- * never see platform exception types.
+ * Raw throwables (I/O and anything else that escapes the use cases) are
+ * wrapped at this boundary per AGENTS.md so callers never see platform
+ * exception types.
  */
 sealed class TransactionCsvError(message: String, cause: Throwable? = null) :
     RuntimeException(message, cause) {
-    data class Io(val ioCause: Throwable) :
-        TransactionCsvError("I/O error: ${ioCause.message}", ioCause)
+    data class Unexpected(val unexpectedCause: Throwable) : TransactionCsvError(
+        "CSV processing failed: " +
+            (unexpectedCause.message ?: unexpectedCause::class.simpleName ?: "unknown cause"),
+        unexpectedCause,
+    )
     data object EmptyFile : TransactionCsvError("CSV file has no header row")
     data object HeaderMismatch :
         TransactionCsvError("CSV header does not match the MoneySurfer transactions format")

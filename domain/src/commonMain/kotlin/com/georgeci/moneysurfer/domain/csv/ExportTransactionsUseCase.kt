@@ -27,7 +27,7 @@ class ExportTransactionsUseCase(
     } catch (
         @Suppress("TooGenericExceptionCaught") t: Throwable,
     ) {
-        Result.failure(TransactionCsvError.Io(t))
+        Result.failure(TransactionCsvError.Unexpected(t))
     }
 
     private suspend fun writeCsv(sink: BufferedSink): Int {
