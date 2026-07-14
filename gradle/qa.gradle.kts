@@ -275,7 +275,7 @@ val commonScopeModules = listOf(
     "composeApp", "shared", "domain",
     "data-local", "data-remote",
     "sync/api", "sync/default", "sync-surfer",
-    "integration-test",
+    "integration-test", "utils",
 )
 val androidHostScopeModules = listOf(
     "shared", "domain",
@@ -701,6 +701,7 @@ val commonTestTasks = listOf(
     ":sync:default:jvmTest",
     ":sync-surfer:jvmTest",
     ":integration-test:jvmTest",
+    ":utils:jvmTest",
 )
 
 val androidHostTestTasks = listOf(
