@@ -50,6 +50,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -75,6 +76,7 @@ import com.georgeci.moneysurfer.uikit.components.base.SurferSegmentedControl
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbarButtonAction
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
+import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.utils.AmountInputTransformation
 import com.georgeci.moneysurfer.utils.HandleSideEffect
@@ -110,6 +112,14 @@ import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 import kotlin.time.Clock
 import kotlin.time.Instant
+
+/** Stable selectors for the transaction creation screen — see docs/testing/testing-strategy.md. */
+object TransactionCreationTestTags {
+    const val Root = "transactionCreation:root"
+    const val Amount = "transactionCreation:amount"
+    const val Note = "transactionCreation:note"
+    const val Save = "transactionCreation:save"
+}
 
 @Composable
 fun TransactionCreationScreen(
@@ -235,7 +245,10 @@ private fun TransactionCreationContent(
     }
 
     Scaffold(
-        modifier = Modifier.surferSafeInsets(),
+        modifier = Modifier
+            .surferSafeInsets()
+            .surferTestTagAsId()
+            .testTag(TransactionCreationTestTags.Root),
         containerColor = AppTheme.materialColors.surface,
         topBar = {
             TopAppBar(
@@ -262,6 +275,7 @@ private fun TransactionCreationContent(
                         text = saveLabel,
                         onClick = { onEvent(TransactionCreationEvent.OnSaveClick) },
                         enabled = state.isSaveEnabled,
+                        modifier = Modifier.testTag(TransactionCreationTestTags.Save),
                     )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -356,7 +370,9 @@ private fun TransactionCreationContent(
                     onValueChange = { onEvent(TransactionCreationEvent.OnNoteChanged(it)) },
                     label = { Text(stringResource(Res.string.transaction_creation_note_label)) },
                     shape = AppTheme.shapes.extraSmall,
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag(TransactionCreationTestTags.Note),
                     minLines = 2,
                     maxLines = 4,
                 )
@@ -424,6 +440,7 @@ private fun AmountHero(
             val placeholderText = stringResource(Res.string.transaction_creation_amount_placeholder)
             BasicTextField(
                 state = amountState,
+                modifier = Modifier.testTag(TransactionCreationTestTags.Amount),
                 inputTransformation = AmountInputTransformation,
                 lineLimits = TextFieldLineLimits.SingleLine,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),

@@ -20,6 +20,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -32,6 +33,7 @@ import com.georgeci.moneysurfer.uikit.components.base.SurferDashboardToolbar
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbarAction
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
+import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.uikit.widgets.LocalSurferWidgetSize
 import com.georgeci.moneysurfer.uikit.widgets.SurferAccountItem
@@ -58,6 +60,14 @@ import moneysurfer.feature.dashboard.generated.resources.dashboard_toolbar_greet
 import moneysurfer.feature.dashboard.generated.resources.dashboard_toolbar_title
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
+
+/** Stable selectors for the Dashboard — see docs/testing/testing-strategy.md. */
+object DashboardTestTags {
+    const val Root = "dashboard:root"
+    const val Balance = "dashboard:balance"
+    const val Settings = "dashboard:settings"
+    const val AddTransaction = "dashboard:addTransaction"
+}
 
 @Composable
 fun DashboardScreen(
@@ -132,7 +142,10 @@ private fun DashboardContent(
     val accountsPadding = if (heroWidgets) 8.dp else 6.dp
 
     Scaffold(
-        modifier = Modifier.surferSafeInsets(),
+        modifier = Modifier
+            .surferSafeInsets()
+            .surferTestTagAsId()
+            .testTag(DashboardTestTags.Root),
         topBar = {
             val defaultTitle = stringResource(Res.string.dashboard_toolbar_title)
             val workspaceName = state.workspaceName ?: defaultTitle
@@ -146,6 +159,7 @@ private fun DashboardContent(
                         icon = SurferIcons.Settings,
                         contentDescription = stringResource(Res.string.dashboard_settings_content_description),
                         onClick = { onEvent(DashboardEvent.OnSettingsClick) },
+                        modifier = Modifier.testTag(DashboardTestTags.Settings),
                     )
                 },
             )
@@ -158,6 +172,7 @@ private fun DashboardContent(
                         Icon(imageVector = SurferIcons.Add, contentDescription = null)
                     },
                     onClick = { onEvent(DashboardEvent.OnAddTransactionClick) },
+                    modifier = Modifier.testTag(DashboardTestTags.AddTransaction),
                 )
             }
         },
@@ -182,7 +197,8 @@ private fun DashboardContent(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp)
-                        .defaultMinSize(minHeight = DASHBOARD_WIDGET_MIN_HEIGHT),
+                        .defaultMinSize(minHeight = DASHBOARD_WIDGET_MIN_HEIGHT)
+                        .testTag(DashboardTestTags.Balance),
                 )
             }
 

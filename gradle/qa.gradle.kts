@@ -87,11 +87,17 @@ fun loadMaestroTestUser(rootDir: File): Map<String, String> =
 val androidMaestroAppId = "com.georgeci.moneysurfer.dev"
 val iosMaestroAppId = "com.georgeci.moneysurfer"
 
+// Offline build, debug variant: `KmpAppConventionPlugin` appends `.dev` to the
+// `com.georgeci.moneysurfer.offline` applicationId / bundle id. Android and iOS
+// debug builds land on the same id, so a single constant covers both.
+val offlineMaestroAppId = "com.georgeci.moneysurfer.offline.dev"
+
 fun buildMaestroCommand(
     rootDir: File,
     target: String,
     junitOutput: File? = null,
     excludeTags: List<String> = emptyList(),
+    includeTags: List<String> = emptyList(),
     appId: String = androidMaestroAppId,
     platform: String? = null,
     deviceId: String? = null,
@@ -118,6 +124,9 @@ fun buildMaestroCommand(
         "--test-output-dir", testOutputDir.absolutePath,
         "--flatten-debug-output",
     )
+    includeTags.forEach { tag ->
+        command += listOf("--include-tags", tag)
+    }
     excludeTags.forEach { tag ->
         command += listOf("--exclude-tags", tag)
     }
@@ -240,7 +249,11 @@ val maestroEmulatorEnv = loadMaestroTestUser(rootDir) + mapOf("APP_ID" to androi
 val maestroIosEmulatorEnv = loadMaestroTestUser(rootDir) + mapOf("APP_ID" to iosMaestroAppId)
 val iosMaestroDeviceId = providers.gradleProperty("iosSimulatorUdid").orNull
     ?: System.getenv("IOS_SIMULATOR_UDID")
-val maestroSetupTags = listOf("setup")
+// Tags kept out of the default (online) Maestro suites:
+//  - `setup`   : reusable login fragment, not a standalone flow.
+//  - `offline` : offline-build golden path — different appId, no Firebase
+//                emulator. Run via `qaMaestroOfflineAndroid` / `qaMaestroOfflineIos`.
+val maestroSetupTags = listOf("setup", "offline")
 
 val iosMaestroDerivedDataDir = rootProject.file("build/ios-maestro")
 val iosMaestroAppPath = iosMaestroDerivedDataDir.resolve("Build/Products/Debug-iphonesimulator/MoneySurfer.app")
@@ -958,6 +971,7 @@ tasks.register<Exec>("qaMaestroAndroid") {
                     "--test-output-dir", testOutputPath,
                     "--flatten-debug-output",
                     "--exclude-tags", "setup",
+                    "--exclude-tags", "offline",
                     flowsDir,
                 ))
                 .joinToString(" "),
@@ -1030,6 +1044,7 @@ tasks.register<Exec>("qaMaestroIos") {
                     "--test-output-dir", testOutputPath,
                     "--flatten-debug-output",
                     "--exclude-tags", "setup",
+                    "--exclude-tags", "offline",
                     flowsDir,
                 ))
                 .joinToString(" "),
@@ -1051,6 +1066,123 @@ tasks.register<Exec>("qaMaestroIos") {
                 },
             )
         }
+    }
+}
+
+/**
+ * Offline-build Maestro golden path (`scripts/maestro/offline/offline-golden.yaml`,
+ * tagged `offline`). The offline app makes zero network calls, so — unlike the
+ * online suites — these tasks need no Firebase emulator and no seeded test users.
+ * They install the `.dev` debug offline binary and run only the `offline`-tagged
+ * flow via `--include-tags`.
+ */
+val offlineDebugApkPath = rootProject.file(
+    "androidApp-offline/build/outputs/apk/debug/androidApp-offline-debug.apk",
+)
+val iosOfflineMaestroDerivedDataDir = rootProject.file("build/ios-maestro-offline")
+// The offline Xcode config (`iosAppOffline/Configuration/Config.xcconfig`) overrides
+// `PRODUCT_NAME` to `MoneySurferOffline Dev` for the Debug configuration, so the
+// `-configuration Debug` build emits a bundle under that (space-containing) name.
+val iosOfflineMaestroAppPath = iosOfflineMaestroDerivedDataDir.resolve(
+    "Build/Products/Debug-iphonesimulator/MoneySurferOffline Dev.app",
+)
+val maestroOfflineJunit = maestroReportsDir.resolve("maestro-offline-golden.xml")
+val maestroOfflineIosJunit = maestroIosReportsDir.resolve("maestro-offline-golden-ios.xml")
+
+tasks.register<Exec>("maestroAssembleOfflineDebug") {
+    group = "verification"
+    description = "Build the offline debug APK for Maestro E2E tests."
+    workingDir = rootDir
+    commandLine("./gradlew", ":androidApp-offline:assembleDebug")
+}
+
+tasks.register<Exec>("maestroInstallOfflineDebug") {
+    group = "verification"
+    description = "Build the offline debug APK and adb-install it on the connected device/AVD."
+    dependsOn("maestroAssembleOfflineDebug")
+    doFirst {
+        require(offlineDebugApkPath.exists()) {
+            "Offline debug APK not found at ${offlineDebugApkPath.absolutePath}. " +
+                ":androidApp-offline:assembleDebug did not produce its expected output — " +
+                "check the assembleDebug log above."
+        }
+        commandLine(resolveAdbExecutable(rootDir), "install", "-r", offlineDebugApkPath.absolutePath)
+    }
+}
+
+tasks.register<Exec>("qaMaestroOfflineAndroid") {
+    group = "verification"
+    description = "Install the offline app + run the offline golden Maestro flow on Android (no Firebase emulator)."
+    notCompatibleWithConfigurationCache("Resolves the Maestro executable and flow path at execution time.")
+    dependsOn("maestroInstallOfflineDebug")
+    workingDir = rootDir
+    doFirst {
+        maestroReportsDir.mkdirs()
+        commandLine(
+            buildMaestroCommand(
+                rootDir = rootDir,
+                target = "scripts/maestro/",
+                junitOutput = maestroOfflineJunit,
+                includeTags = listOf("offline"),
+                appId = offlineMaestroAppId,
+            ),
+        )
+    }
+}
+
+tasks.register<Exec>("maestroBuildIosOfflineSimulator") {
+    group = "verification"
+    description = "Build the iOS offline Debug simulator app for Maestro E2E tests."
+    notCompatibleWithConfigurationCache("Spawns xcodebuild.")
+    workingDir = rootDir
+    val simulatorName = providers.gradleProperty("iosSimulatorName").orNull
+        ?: System.getenv("IOS_SIMULATOR_NAME")
+        ?: "iPhone 17"
+    commandLine(
+        "xcodebuild",
+        "-project", "iosAppOffline/iosAppOffline.xcodeproj",
+        "-scheme", "iosAppOffline",
+        "-configuration", "Debug",
+        "-sdk", "iphonesimulator",
+        "-destination", "platform=iOS Simulator,name=$simulatorName",
+        "-derivedDataPath", iosOfflineMaestroDerivedDataDir.absolutePath,
+        "build",
+    )
+}
+
+tasks.register<Exec>("maestroInstallIosOfflineSimulator") {
+    group = "verification"
+    description = "Build and install the iOS offline simulator app on the booted Simulator."
+    notCompatibleWithConfigurationCache("Uses xcrun simctl against the currently booted simulator.")
+    dependsOn("maestroBuildIosOfflineSimulator")
+    doFirst {
+        require(iosOfflineMaestroAppPath.exists()) {
+            "iOS offline app not found at ${iosOfflineMaestroAppPath.absolutePath}. " +
+                "Run maestroBuildIosOfflineSimulator first."
+        }
+        commandLine("xcrun", "simctl", "install", "booted", iosOfflineMaestroAppPath.absolutePath)
+    }
+}
+
+tasks.register<Exec>("qaMaestroOfflineIos") {
+    group = "verification"
+    description = "Install the offline app + run the offline golden Maestro flow on the booted iOS Simulator."
+    notCompatibleWithConfigurationCache("Resolves the Maestro executable and flow path at execution time.")
+    dependsOn("maestroInstallIosOfflineSimulator")
+    workingDir = rootDir
+    doFirst {
+        maestroIosReportsDir.mkdirs()
+        commandLine(
+            buildMaestroCommand(
+                rootDir = rootDir,
+                target = "scripts/maestro/",
+                junitOutput = maestroOfflineIosJunit,
+                includeTags = listOf("offline"),
+                appId = offlineMaestroAppId,
+                platform = "ios",
+                deviceId = iosMaestroDeviceId,
+            ),
+        )
     }
 }
 
