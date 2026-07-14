@@ -185,56 +185,10 @@ jobs:
             build \
             | "${FORMATTER[@]}"
 
-  ios-offline-build:
-    name: iOS offline simulator build
-    needs: decide
-    if: needs.decide.outputs.run == 'true'
-    runs-on: macos-15
-    timeout-minutes: 40
-    permissions:
-      contents: read
-    # Mirror of ios-build for the offline variant (composeAppOffline +
-    # iosAppOffline). No Firebase plist is needed — the offline app must build
-    # without any networked services baked in.
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v7
-
-      - name: Set up JDK
-        uses: actions/setup-java@v5
-        with:
-          distribution: temurin
-          java-version: "17"
-
-      - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@3f131e8634966bd73d06cc69884922b02e6faf92 # v6.2.0
-
-      - name: Show Xcode version
-        run: xcodebuild -version
-
-      - name: Link Kotlin framework (iosSimulatorArm64, offline)
-        run: ./gradlew :composeAppOffline:linkDebugFrameworkIosSimulatorArm64 --stacktrace
-
-      - name: Build iOS offline app (Simulator, no signing)
-        run: |
-          set -eo pipefail
-          if command -v xcbeautify >/dev/null 2>&1; then
-            FORMATTER=(xcbeautify --renderer github-actions)
-          else
-            FORMATTER=(cat)
-          fi
-          xcodebuild \
-            -project iosAppOffline/iosAppOffline.xcodeproj \
-            -target iosAppOffline \
-            -configuration Debug \
-            -sdk iphonesimulator \
-            -arch arm64 \
-            CODE_SIGNING_ALLOWED=NO \
-            CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGN_IDENTITY="" \
-            build \
-            | "${FORMATTER[@]}"
+  # The offline iOS variant (composeAppOffline + iosAppOffline) is covered by
+  # .github/workflows/ios-offline.yml on every PR and main push — building it
+  # again here would be pure duplication, so nightly carries no
+  # ios-offline-build job.
 
   maestro-android:
     name: Maestro Android (E2E)
@@ -382,54 +336,9 @@ jobs:
       - name: Show Xcode version
         run: xcodebuild -version
 
-      # macos runner images can have multiple available iPhone simulators with
-      # the same name across iOS runtimes. Pick the highest-iOS device and emit
-      # both name (xcodebuild -destination uses name=...) and UDID (Maestro
-      # `--device` and `simctl boot/install`) so the build, install and run
-      # steps all target the exact same simulator.
       - name: Boot iOS simulator
         id: ios-sim
-        shell: bash
-        run: |
-          set -euo pipefail
-          read -r SIM_UDID SIM_NAME SIM_RUNTIME < <(xcrun simctl list devices available -j \
-            | python3 -c '
-          import json, re, sys
-          data = json.load(sys.stdin)["devices"]
-          candidates = []
-          for runtime, devices in data.items():
-              if "iOS" not in runtime:
-                  continue
-              # Sort key: iOS version tuple from the runtime identifier.
-              m = re.search(r"iOS-(\d+)-(\d+)", runtime) or re.search(r"iOS (\d+)\.(\d+)", runtime)
-              version = (int(m.group(1)), int(m.group(2))) if m else (0, 0)
-              for d in devices:
-                  if d.get("isAvailable") and d["name"].startswith("iPhone"):
-                      candidates.append((version, d["udid"], d["name"], runtime))
-          if not candidates:
-              sys.exit(0)
-          # Prefer the iPhone family closest to qa.gradle.kts default ("iPhone 17"),
-          # fall back to highest iOS version of any iPhone.
-          for prefix in ("iPhone 17", "iPhone 16", "iPhone 15"):
-              filtered = [c for c in candidates if c[2].startswith(prefix)]
-              if filtered:
-                  filtered.sort(reverse=True)
-                  v, udid, name, rt = filtered[0]
-                  print(f"{udid} {name} {rt}"); sys.exit(0)
-          candidates.sort(reverse=True)
-          v, udid, name, rt = candidates[0]
-          print(f"{udid} {name} {rt}")
-          ') || true
-          if [ -z "${SIM_UDID:-}" ]; then
-            echo "No iPhone simulator available on this runner image." >&2
-            xcrun simctl list devices available
-            exit 1
-          fi
-          echo "Using simulator: $SIM_NAME ($SIM_RUNTIME) — $SIM_UDID"
-          xcrun simctl boot "$SIM_UDID" || true
-          xcrun simctl bootstatus "$SIM_UDID" -b
-          echo "udid=$SIM_UDID" >> "$GITHUB_OUTPUT"
-          echo "name=$SIM_NAME" >> "$GITHUB_OUTPUT"
+        uses: ./.github/actions/ios-simulator
 
       - name: Run qaMaestroIos
         run: |

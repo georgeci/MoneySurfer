@@ -1,0 +1,66 @@
+name: Boot iOS simulator
+description: >-
+  Pick the best available iPhone simulator, boot it, and expose both its
+  device name (xcodebuild -destination uses name=...) and UDID (Maestro
+  `--device` and `simctl boot/install`) so the build, install and run steps
+  all target the exact same simulator. Shared between the nightly maestro-ios
+  job and the iOS offline workflow.
+
+outputs:
+  udid:
+    description: UDID of the booted simulator.
+    value: ${{ steps.pick.outputs.udid }}
+  name:
+    description: Device name of the booted simulator.
+    value: ${{ steps.pick.outputs.name }}
+
+runs:
+  using: composite
+  steps:
+    # macos runner images can have multiple available iPhone simulators with
+    # the same name across iOS runtimes. Pick the highest-iOS device,
+    # preferring the iPhone family closest to qa.gradle.kts' default
+    # ("iPhone 17").
+    - name: Pick and boot simulator
+      id: pick
+      shell: bash
+      run: |
+        set -euo pipefail
+        read -r SIM_UDID SIM_NAME SIM_RUNTIME < <(xcrun simctl list devices available -j \
+          | python3 -c '
+        import json, re, sys
+        data = json.load(sys.stdin)["devices"]
+        candidates = []
+        for runtime, devices in data.items():
+            if "iOS" not in runtime:
+                continue
+            # Sort key: iOS version tuple from the runtime identifier.
+            m = re.search(r"iOS-(\d+)-(\d+)", runtime) or re.search(r"iOS (\d+)\.(\d+)", runtime)
+            version = (int(m.group(1)), int(m.group(2))) if m else (0, 0)
+            for d in devices:
+                if d.get("isAvailable") and d["name"].startswith("iPhone"):
+                    candidates.append((version, d["udid"], d["name"], runtime))
+        if not candidates:
+            sys.exit(0)
+        # Prefer the iPhone family closest to qa.gradle.kts default ("iPhone 17"),
+        # fall back to highest iOS version of any iPhone.
+        for prefix in ("iPhone 17", "iPhone 16", "iPhone 15"):
+            filtered = [c for c in candidates if c[2].startswith(prefix)]
+            if filtered:
+                filtered.sort(reverse=True)
+                v, udid, name, rt = filtered[0]
+                print(f"{udid} {name} {rt}"); sys.exit(0)
+        candidates.sort(reverse=True)
+        v, udid, name, rt = candidates[0]
+        print(f"{udid} {name} {rt}")
+        ') || true
+        if [ -z "${SIM_UDID:-}" ]; then
+          echo "No iPhone simulator available on this runner image." >&2
+          xcrun simctl list devices available
+          exit 1
+        fi
+        echo "Using simulator: $SIM_NAME ($SIM_RUNTIME) — $SIM_UDID"
+        xcrun simctl boot "$SIM_UDID" || true
+        xcrun simctl bootstatus "$SIM_UDID" -b
+        echo "udid=$SIM_UDID" >> "$GITHUB_OUTPUT"
+        echo "name=$SIM_NAME" >> "$GITHUB_OUTPUT"

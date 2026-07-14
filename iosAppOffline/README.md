@@ -23,8 +23,10 @@ but links the `ComposeAppOffline.framework` produced by `:composeAppOffline`
    regular `iosApp/` icon set. If you want the offline build visually
    distinguishable on the home screen when installed side-by-side, replace
    the icons here.
-4. **CI.** If `.github/workflows/` adds an iOS lane for `iosApp`, duplicate
-   it for `iosAppOffline` (out of scope for this change).
+4. **CI.** Covered: `.github/workflows/ios-offline.yml` builds `iosAppOffline`
+   on every PR and `main` push and runs the offline golden Maestro flow
+   (`scripts/maestro/offline/offline-golden.yaml`) on an iOS Simulator via
+   `./gradlew qaMaestroOfflineIos`.
 5. **App Store Connect.** Only needed if the offline build is shipped as a
    public release. Bundle id `com.georgeci.moneysurfer.offline` would need
    its own App Store Connect record. Not required for internal QA.
