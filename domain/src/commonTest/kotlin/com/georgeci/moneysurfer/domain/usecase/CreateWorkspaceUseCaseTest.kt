@@ -22,6 +22,7 @@ import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -247,6 +248,69 @@ class CreateWorkspaceUseCaseTest : StringSpec({
         env.userRemoteRepo.addRefCalls shouldHaveSize 0
         env.userRemoteRepo.setDefaultCalls shouldHaveSize 0
     }
+
+    "member insert failure returns LocalWriteFailed and skips categories, remote work and pin" {
+        val boom = RuntimeException("member insert failed")
+        val env = TestEnv(
+            currentUserId = OWNER_ID,
+            firebaseUid = FIREBASE_UID,
+            memberRepo = FakeWorkspaceMemberRepository(failOnInsert = boom),
+        )
+
+        val result = env.useCase(defaultParams())
+
+        val left = result.shouldBeInstanceOf<Either.Left<CreateWorkspaceError>>()
+        left.value.shouldBeInstanceOf<CreateWorkspaceError.LocalWriteFailed>().cause shouldBe boom
+        // Workspace row was already written before the member insert threw — kept for retry.
+        env.workspaceRepo.inserted shouldHaveSize 1
+        env.categoryRepo.inserted shouldHaveSize 0
+        env.syncer.pushAllCount shouldBe 0
+        env.userRemoteRepo.addRefCalls shouldHaveSize 0
+        env.session.currentWorkspaceId.flow.first() shouldBe null
+    }
+
+    "category seed failure returns LocalWriteFailed and skips remote work and pin" {
+        val boom = RuntimeException("category insert failed")
+        val env = TestEnv(
+            currentUserId = OWNER_ID,
+            firebaseUid = FIREBASE_UID,
+            categoryRepo = FakeCategoryRepository(failOnInsert = boom),
+        )
+
+        val result = env.useCase(defaultParams())
+
+        val left = result.shouldBeInstanceOf<Either.Left<CreateWorkspaceError>>()
+        left.value.shouldBeInstanceOf<CreateWorkspaceError.LocalWriteFailed>().cause shouldBe boom
+        env.workspaceRepo.inserted shouldHaveSize 1
+        env.memberRepo.inserted shouldHaveSize 1
+        env.syncer.pushAllCount shouldBe 0
+        env.session.currentWorkspaceId.flow.first() shouldBe null
+    }
+
+    "pushAll failure keeps all local rows so a retry can re-push them" {
+        val env = TestEnv(
+            currentUserId = OWNER_ID,
+            firebaseUid = FIREBASE_UID,
+            syncer = FakeWorkspaceSyncer(failOnSync = true),
+        )
+
+        env.useCase(defaultParams()).shouldBeInstanceOf<Either.Left<CreateWorkspaceError>>()
+
+        env.workspaceRepo.inserted shouldHaveSize 1
+        env.memberRepo.inserted shouldHaveSize 1
+        env.categoryRepo.inserted shouldHaveSize DEFAULT_CATEGORY_SEEDS.size
+    }
+
+    "each creation generates a fresh workspace id and re-pins the newest one" {
+        val env = TestEnv(currentUserId = OWNER_ID, firebaseUid = null)
+
+        val first = (env.useCase(defaultParams()) as Either.Right).value
+        val second = (env.useCase(defaultParams()) as Either.Right).value
+
+        first shouldNotBe second
+        env.workspaceRepo.inserted.map { it.id } shouldBe listOf(first, second)
+        env.session.currentWorkspaceId.flow.first() shouldBe second
+    }
 })
 
 private val OWNER_ID = UserId("owner-uuid")
@@ -299,13 +363,16 @@ private class FakeWorkspaceRepository(
     override suspend fun delete(id: WorkspaceId) = error("not used")
 }
 
-private class FakeWorkspaceMemberRepository : WorkspaceMemberRepository {
+private class FakeWorkspaceMemberRepository(
+    private val failOnInsert: Throwable? = null,
+) : WorkspaceMemberRepository {
     val inserted = mutableListOf<WorkspaceMember>()
     override fun getAll(): Flow<List<WorkspaceMember>> = flowOf(emptyList())
     override fun getByWorkspaceId(workspaceId: WorkspaceId): Flow<List<WorkspaceMember>> = flowOf(emptyList())
     override fun getByUserId(userId: UserId): Flow<List<WorkspaceMember>> = flowOf(emptyList())
     override suspend fun getById(userId: UserId, workspaceId: WorkspaceId): WorkspaceMember? = null
     override suspend fun insert(member: WorkspaceMember) {
+        failOnInsert?.let { throw it }
         inserted += member
     }
     override suspend fun update(member: WorkspaceMember) = error("not used")
@@ -317,12 +384,15 @@ private class FakeWorkspaceMemberRepository : WorkspaceMemberRepository {
     override suspend fun markLeft(userId: UserId, workspaceId: WorkspaceId) = error("not used")
 }
 
-private class FakeCategoryRepository : CategoryRepository {
+private class FakeCategoryRepository(
+    private val failOnInsert: Throwable? = null,
+) : CategoryRepository {
     val inserted = mutableListOf<Category>()
     override fun getAll(): Flow<List<Category>> = flowOf(emptyList())
     override fun getByWorkspaceId(workspaceId: WorkspaceId): Flow<List<Category>> = flowOf(emptyList())
     override suspend fun getById(id: CategoryId): Category? = inserted.firstOrNull { it.id == id }
     override suspend fun insert(category: Category) {
+        failOnInsert?.let { throw it }
         inserted += category
     }
     override suspend fun update(category: Category) = error("not used")
