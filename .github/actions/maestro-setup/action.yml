@@ -51,7 +51,8 @@ runs:
         set -euo pipefail
         url="https://github.com/mobile-dev-inc/Maestro/releases/download/cli-${MAESTRO_VERSION}/maestro.zip"
         tmp="${RUNNER_TEMP}/maestro.zip"
-        curl -fsSL "$url" -o "$tmp"
+        # --proto "=https" refuses any redirect off HTTPS (Sonar S6506).
+        curl --proto "=https" -fsSL "$url" -o "$tmp"
         if command -v sha256sum >/dev/null 2>&1; then
           actual="$(sha256sum "$tmp" | awk '{print $1}')"
         else
@@ -71,7 +72,7 @@ runs:
         ALLURE_VERSION: "2.34.1"
       run: |
         set -euo pipefail
-        curl -fsSL "https://github.com/allure-framework/allure2/releases/download/${ALLURE_VERSION}/allure-${ALLURE_VERSION}.tgz" \
+        curl --proto "=https" -fsSL "https://github.com/allure-framework/allure2/releases/download/${ALLURE_VERSION}/allure-${ALLURE_VERSION}.tgz" \
           | tar -xz -C "${RUNNER_TEMP}"
         echo "${RUNNER_TEMP}/allure-${ALLURE_VERSION}/bin" >> "${GITHUB_PATH}"
 

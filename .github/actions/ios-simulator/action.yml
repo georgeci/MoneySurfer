@@ -26,7 +26,9 @@ runs:
       shell: bash
       run: |
         set -euo pipefail
-        read -r SIM_UDID SIM_NAME SIM_RUNTIME < <(xcrun simctl list devices available -j \
+        # "|"-delimited because device names contain spaces ("iPhone 17 Pro") —
+        # whitespace splitting would truncate SIM_NAME to "iPhone".
+        IFS='|' read -r SIM_UDID SIM_NAME SIM_RUNTIME < <(xcrun simctl list devices available -j \
           | python3 -c '
         import json, re, sys
         data = json.load(sys.stdin)["devices"]
@@ -49,10 +51,10 @@ runs:
             if filtered:
                 filtered.sort(reverse=True)
                 v, udid, name, rt = filtered[0]
-                print(f"{udid} {name} {rt}"); sys.exit(0)
+                print(f"{udid}|{name}|{rt}"); sys.exit(0)
         candidates.sort(reverse=True)
         v, udid, name, rt = candidates[0]
-        print(f"{udid} {name} {rt}")
+        print(f"{udid}|{name}|{rt}")
         ') || true
         if [ -z "${SIM_UDID:-}" ]; then
           echo "No iPhone simulator available on this runner image." >&2
