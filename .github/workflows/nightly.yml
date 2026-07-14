@@ -88,7 +88,7 @@ jobs:
           java-version: "17"
 
       - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v6
+        uses: gradle/actions/setup-gradle@3f131e8634966bd73d06cc69884922b02e6faf92 # v6.2.0
 
       - name: Compile Android debug
         run: ./gradlew :androidApp:processDebugGoogleServices :androidApp:compileDebugSources --stacktrace
@@ -113,7 +113,7 @@ jobs:
           java-version: "17"
 
       - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v6
+        uses: gradle/actions/setup-gradle@3f131e8634966bd73d06cc69884922b02e6faf92 # v6.2.0
 
       - name: Compile offline Android debug
         run: ./gradlew :androidApp-offline:compileDebugSources --stacktrace
@@ -150,7 +150,7 @@ jobs:
           java-version: "17"
 
       - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v6
+        uses: gradle/actions/setup-gradle@3f131e8634966bd73d06cc69884922b02e6faf92 # v6.2.0
 
       - name: Show Xcode version
         run: xcodebuild -version
@@ -208,7 +208,7 @@ jobs:
           java-version: "17"
 
       - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v6
+        uses: gradle/actions/setup-gradle@3f131e8634966bd73d06cc69884922b02e6faf92 # v6.2.0
 
       - name: Show Xcode version
         run: xcodebuild -version
@@ -268,7 +268,7 @@ jobs:
           java-version: "21"
 
       - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v6
+        uses: gradle/actions/setup-gradle@3f131e8634966bd73d06cc69884922b02e6faf92 # v6.2.0
 
       - name: Set up Maestro + Allure + e2e creds
         uses: ./.github/actions/maestro-setup
@@ -287,7 +287,7 @@ jobs:
           sudo udevadm trigger --name-match=kvm
 
       - name: Run qaMaestroAndroid
-        uses: reactivecircus/android-emulator-runner@v2
+        uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d # v2.38.0
         with:
           api-level: 34
           target: aosp_atd
@@ -370,7 +370,7 @@ jobs:
           java-version: "21"
 
       - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v6
+        uses: gradle/actions/setup-gradle@3f131e8634966bd73d06cc69884922b02e6faf92 # v6.2.0
 
       - name: Set up Maestro + Allure + e2e creds
         uses: ./.github/actions/maestro-setup
@@ -603,7 +603,7 @@ jobs:
       # keep_files: true preserves the per-push /allure/ + /kover/ subtrees
       # that the ci.yml `publish` job manages independently.
       - name: Deploy to gh-pages (/nightly/)
-        uses: peaceiris/actions-gh-pages@v4
+        uses: peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453 # v4.1.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_branch: gh-pages
