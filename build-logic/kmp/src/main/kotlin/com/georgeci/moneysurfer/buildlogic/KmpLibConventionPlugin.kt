@@ -2,13 +2,19 @@ package com.georgeci.moneysurfer.buildlogic
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.artifacts.VersionCatalogsExtension
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.get
+import org.gradle.kotlin.dsl.getByType
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 
 @Suppress("unused")
 class KmpLibConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
+        val libs = target.extensions.getByType<VersionCatalogsExtension>().named("libs")
+        val compileSdkInt = libs.findVersion("android-compileSdk").get().requiredVersion.toInt()
+        val minSdkInt = libs.findVersion("android-minSdk").get().requiredVersion.toInt()
+
         target.extensions.configure<KotlinMultiplatformExtension> {
             jvm {
                 testRuns["test"].executionTask.configure {
@@ -20,8 +26,8 @@ class KmpLibConventionPlugin : Plugin<Project> {
                     enable = true
                 }
 
-                compileSdk = 36
-                minSdk = 24
+                compileSdk = compileSdkInt
+                minSdk = minSdkInt
 
                 packaging {
                     resources {
