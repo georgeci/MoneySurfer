@@ -30,10 +30,10 @@
     <string name="account_creation_save">Сохранить</string>
     <string name="account_creation_cancel">Отмена</string>
     <string name="account_creation_type_label">Тип</string>
-    <string name="account_creation_type_cash">Наличные</string>
-    <string name="account_creation_type_bank">Банк</string>
-    <string name="account_creation_type_card">Карта</string>
-    <string name="account_creation_type_savings">Накопления</string>
+    <string name="account_type_cash">Наличные</string>
+    <string name="account_type_bank">Банк</string>
+    <string name="account_type_card">Карта</string>
+    <string name="account_type_savings">Накопления</string>
     <string name="account_creation_accent_label">Цвет</string>
     <string name="account_creation_extra_details_label">Доп. сведения</string>
     <string name="account_creation_extra_details_optional">По желанию</string>

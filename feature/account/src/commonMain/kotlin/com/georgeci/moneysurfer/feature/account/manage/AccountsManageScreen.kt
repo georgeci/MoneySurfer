@@ -32,10 +32,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.AccountType
 import com.georgeci.moneysurfer.feature.account.generated.resources.Res
-import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_type_bank
-import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_type_card
-import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_type_cash
-import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_type_savings
 import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_manage_active_header
 import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_manage_add_account
 import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_manage_archive
@@ -52,6 +48,7 @@ import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_man
 import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_manage_stat_archived_count
 import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_manage_stat_total
 import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_manage_title
+import com.georgeci.moneysurfer.feature.account.labelRes
 import com.georgeci.moneysurfer.uikit.components.SurferSkeletonRow
 import com.georgeci.moneysurfer.uikit.components.account.SurferAccountManageCard
 import com.georgeci.moneysurfer.uikit.components.account.SurferArchivedAccountCard
@@ -375,14 +372,10 @@ private fun SectionHeader(
     }
 }
 
+@Composable
 private fun archivedSubtitle(account: AccountManageUi): String {
-    val typeLabelKey = when (account.type) {
-        AccountType.CASH -> "Cash"
-        AccountType.BANK -> "Bank"
-        AccountType.CARD -> "Card"
-        AccountType.SAVINGS -> "Savings"
-    }
-    return account.archivedLabel?.let { "$typeLabelKey · $it" } ?: typeLabelKey
+    val typeLabel = stringResource(account.type.labelRes())
+    return account.archivedLabel?.let { "$typeLabel · $it" } ?: typeLabel
 }
 
 private fun AccountType.icon(): ImageVector = when (this) {
@@ -390,13 +383,6 @@ private fun AccountType.icon(): ImageVector = when (this) {
     AccountType.BANK -> SurferIcons.Bank
     AccountType.CARD -> SurferIcons.CreditCard
     AccountType.SAVINGS -> SurferIcons.Savings
-}
-
-private fun AccountType.labelRes() = when (this) {
-    AccountType.CASH -> Res.string.account_creation_type_cash
-    AccountType.BANK -> Res.string.account_creation_type_bank
-    AccountType.CARD -> Res.string.account_creation_type_card
-    AccountType.SAVINGS -> Res.string.account_creation_type_savings
 }
 
 @Preview

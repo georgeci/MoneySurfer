@@ -55,11 +55,8 @@ import com.georgeci.moneysurfer.feature.account.generated.resources.account_crea
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_remove_content_description
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_save
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_title
-import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_type_bank
-import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_type_card
-import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_type_cash
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_type_label
-import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_type_savings
+import com.georgeci.moneysurfer.feature.account.labelRes
 import com.georgeci.moneysurfer.uikit.components.base.SurferSegmentedControl
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbarButtonAction
@@ -214,16 +211,7 @@ private fun TypePicker(
     SurferSegmentedControl(
         options = listOf(AccountType.CASH, AccountType.BANK, AccountType.CARD, AccountType.SAVINGS),
         selected = selected,
-        label = { type ->
-            stringResource(
-                when (type) {
-                    AccountType.CASH -> Res.string.account_creation_type_cash
-                    AccountType.BANK -> Res.string.account_creation_type_bank
-                    AccountType.CARD -> Res.string.account_creation_type_card
-                    AccountType.SAVINGS -> Res.string.account_creation_type_savings
-                },
-            )
-        },
+        label = { type -> stringResource(type.labelRes()) },
         onSelect = onSelect,
     )
 }
