@@ -83,8 +83,9 @@ jobs:
         with:
           online-stack: "false"
 
-      - name: Show Xcode version
-        run: xcodebuild -version
+      # Prints the selected version; replaces a bare `xcodebuild -version`.
+      - name: Select Xcode
+        uses: ./.github/actions/select-xcode
 
       # Pre-link the Kotlin framework for the simulator arch so the Xcode
       # build phase has its inputs ready and SPM resolution doesn't race with

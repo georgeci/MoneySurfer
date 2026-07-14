@@ -333,8 +333,9 @@ jobs:
           test-password:     ${{ secrets.E2E_TEST_PASSWORD     || 'password' }}
           test-viewer-email: ${{ secrets.E2E_TEST_VIEWER_EMAIL || 'e2e+viewer@test.local' }}
 
-      - name: Show Xcode version
-        run: xcodebuild -version
+      # Prints the selected version; replaces a bare `xcodebuild -version`.
+      - name: Select Xcode
+        uses: ./.github/actions/select-xcode
 
       - name: Boot iOS simulator
         id: ios-sim
