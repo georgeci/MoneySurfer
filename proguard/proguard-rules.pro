@@ -29,6 +29,28 @@
     kotlinx.serialization.KSerializer serializer(...);
 }
 
+# --- Room ---
+# `Room.databaseBuilder<T>(context, path)` without a factory lambda (see
+# data-local/src/androidMain DatabaseBuilder.android.kt) locates the generated
+# `<T>_Impl` on Android via Class.forName, so the impl class must survive both
+# shrinking and renaming. room-runtime ships this exact consumer rule, but the
+# release build must not silently regress if that artifact ever stops shipping
+# it — duplicated here on purpose.
+-keep class * extends androidx.room.RoomDatabase { void <init>(); }
+# BundledSQLiteDriver calls native code; JNI resolves callbacks by name.
+# sqlite-bundled ships consumer rules — this only silences optional-dependency
+# warnings if they ever surface in a minified build.
+-dontwarn androidx.sqlite.**
+
+# --- Koin ---
+# Koin 4.x resolution is compile-time (koin-annotations codegen + reified
+# inline get()) — no reflection over constructors, so definitions and
+# ViewModels need no keep rules. The single reflective path in koin-android,
+# KoinFragmentFactory (Class.forName over Fragment names), is unused: the app
+# is Compose-only with no Fragments. Suppress spurious missing-class warnings
+# from Koin's optional interop paths (mirrors Koin's own consumer rules).
+-dontwarn org.koin.**
+
 # --- Enums (often serialized by name) ---
 -keepclassmembers enum * {
     public static **[] values();
