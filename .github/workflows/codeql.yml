@@ -117,6 +117,11 @@ jobs:
         with:
           languages: ${{ matrix.language }}
           build-mode: ${{ matrix.build-mode }}
+          # The action's auto-sizing hands the evaluator ~14.5 GB of the
+          # runner's 16 GB; on the java-kotlin database the query evaluator
+          # then gets OOM-killed intermittently (log stops mid-evaluation
+          # with no error — see PR #145). Cap it to leave the OS headroom.
+          ram: 12288
 
       - name: Build Kotlin sources
         if: >-

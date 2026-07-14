@@ -2,9 +2,18 @@ name: Maestro setup
 description: >-
   Install pinned Maestro + Allure + firebase-tools, write the
   scripts/e2e-test-user.properties file used by qaMaestro* and seed.sh. Shared
-  between maestro-android and maestro-ios in the nightly workflow.
+  between maestro-android and maestro-ios in the nightly workflow and the
+  iOS offline workflow (with online-stack disabled).
 
 inputs:
+  online-stack:
+    description: >-
+      Install the online-suite tooling (Node + Firebase CLI, Allure CLI) and
+      write scripts/e2e-test-user.properties. Set to "false" for offline
+      Maestro lanes (qaMaestroOffline*) that need only the Maestro CLI — the
+      offline app talks to no Firebase emulator and has no test users.
+    required: false
+    default: "true"
   test-email:
     description: TEST_EMAIL written to scripts/e2e-test-user.properties.
     required: false
@@ -22,11 +31,13 @@ runs:
   using: composite
   steps:
     - name: Set up Node.js
+      if: ${{ inputs.online-stack == 'true' }}
       uses: actions/setup-node@v6
       with:
         node-version: "20"
 
     - name: Install Firebase CLI
+      if: ${{ inputs.online-stack == 'true' }}
       uses: ./.github/actions/firebase-tools
 
     # Pinned to a specific Maestro release + sha256-verified to avoid running
@@ -40,7 +51,8 @@ runs:
         set -euo pipefail
         url="https://github.com/mobile-dev-inc/Maestro/releases/download/cli-${MAESTRO_VERSION}/maestro.zip"
         tmp="${RUNNER_TEMP}/maestro.zip"
-        curl -fsSL "$url" -o "$tmp"
+        # --proto "=https" refuses any redirect off HTTPS (Sonar S6506).
+        curl --proto "=https" -fsSL "$url" -o "$tmp"
         if command -v sha256sum >/dev/null 2>&1; then
           actual="$(sha256sum "$tmp" | awk '{print $1}')"
         else
@@ -54,12 +66,13 @@ runs:
         echo "$HOME/.maestro/maestro/bin" >> "$GITHUB_PATH"
 
     - name: Install Allure CLI
+      if: ${{ inputs.online-stack == 'true' }}
       shell: bash
       env:
         ALLURE_VERSION: "2.34.1"
       run: |
         set -euo pipefail
-        curl -fsSL "https://github.com/allure-framework/allure2/releases/download/${ALLURE_VERSION}/allure-${ALLURE_VERSION}.tgz" \
+        curl --proto "=https" -fsSL "https://github.com/allure-framework/allure2/releases/download/${ALLURE_VERSION}/allure-${ALLURE_VERSION}.tgz" \
           | tar -xz -C "${RUNNER_TEMP}"
         echo "${RUNNER_TEMP}/allure-${ALLURE_VERSION}/bin" >> "${GITHUB_PATH}"
 
@@ -68,6 +81,7 @@ runs:
     # users in the Auth emulator. Defaults match seed.sh so the workflow runs
     # without any E2E_* secrets configured.
     - name: Write e2e test-user properties
+      if: ${{ inputs.online-stack == 'true' }}
       shell: bash
       env:
         TEST_EMAIL: ${{ inputs.test-email }}

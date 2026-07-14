@@ -1,0 +1,26 @@
+name: Select Xcode
+description: >-
+  Select the newest stable (non-beta) Xcode installed on the runner image.
+  macos-15 defaults to Xcode 16.4 / iOS 18.5 SDK, but the Compose
+  Multiplatform runtime references UIKit symbols that only exist in the
+  iOS 26 SDK (e.g. UIViewLayoutRegion), so the final app link fails with
+  "Undefined symbols" unless a 26.x toolchain is selected (PR #145).
+  Newest-stable instead of a hard pin so image rotations don't break us.
+
+runs:
+  using: composite
+  steps:
+    - name: Select newest stable Xcode
+      shell: bash
+      run: |
+        set -euo pipefail
+        xcode_app="$(find /Applications -maxdepth 1 -name 'Xcode_*.app' \
+          | grep -viE 'beta|rc' | sort -V | tail -1)"
+        if [ -z "$xcode_app" ]; then
+          echo "No versioned Xcode_*.app found under /Applications:" >&2
+          ls /Applications >&2
+          exit 1
+        fi
+        echo "Selecting $xcode_app"
+        sudo xcode-select -s "$xcode_app/Contents/Developer"
+        xcodebuild -version

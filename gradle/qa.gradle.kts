@@ -1092,6 +1092,7 @@ val maestroOfflineIosJunit = maestroIosReportsDir.resolve("maestro-offline-golde
 tasks.register<Exec>("maestroAssembleOfflineDebug") {
     group = "verification"
     description = "Build the offline debug APK for Maestro E2E tests."
+    notCompatibleWithConfigurationCache("Spawns a nested Gradle build.")
     workingDir = rootDir
     commandLine("./gradlew", ":androidApp-offline:assembleDebug")
 }
@@ -1099,6 +1100,7 @@ tasks.register<Exec>("maestroAssembleOfflineDebug") {
 tasks.register<Exec>("maestroInstallOfflineDebug") {
     group = "verification"
     description = "Build the offline debug APK and adb-install it on the connected device/AVD."
+    notCompatibleWithConfigurationCache("Resolves the adb executable and APK path at execution time.")
     dependsOn("maestroAssembleOfflineDebug")
     doFirst {
         require(offlineDebugApkPath.exists()) {
@@ -1121,7 +1123,11 @@ tasks.register<Exec>("qaMaestroOfflineAndroid") {
         commandLine(
             buildMaestroCommand(
                 rootDir = rootDir,
-                target = "scripts/maestro/",
+                // Target the subdirectory itself: without a workspace config
+                // Maestro only scans top-level flows, so `scripts/maestro/`
+                // never discovers `offline/offline-golden.yaml` and
+                // `--include-tags offline` matches nothing.
+                target = "scripts/maestro/offline/",
                 junitOutput = maestroOfflineJunit,
                 includeTags = listOf("offline"),
                 appId = offlineMaestroAppId,
@@ -1175,7 +1181,8 @@ tasks.register<Exec>("qaMaestroOfflineIos") {
         commandLine(
             buildMaestroCommand(
                 rootDir = rootDir,
-                target = "scripts/maestro/",
+                // Subdirectory target — same reasoning as qaMaestroOfflineAndroid.
+                target = "scripts/maestro/offline/",
                 junitOutput = maestroOfflineIosJunit,
                 includeTags = listOf("offline"),
                 appId = offlineMaestroAppId,

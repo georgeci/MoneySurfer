@@ -22,13 +22,16 @@ tags:
 - assertVisible:
     id: "firstRunCurrency:root"
 
-# 2. Pick a currency and confirm.
+# 2. Pick a currency and confirm. Enter fires the search field's IME action
+#    (ImeAction.Search → clearFocus), dismissing the keyboard so the Confirm
+#    button is reachable — Maestro's hideKeyboard is unreliable on iOS where
+#    iPhone keyboards have no dismiss key.
 - tapOn:
     id: "firstRunCurrency:search"
 - inputText: "EUR"
+- pressKey: Enter
 - tapOn:
     id: "firstRunCurrency:currency:EUR"
-- hideKeyboard
 - tapOn:
     id: "firstRunCurrency:confirm"
 
@@ -41,18 +44,22 @@ tags:
 - assertVisible:
     id: "dashboard:addTransaction"
 
-# 4. Create an expense transaction.
+# 4. Create an expense transaction. Field order avoids ever needing
+#    hideKeyboard (unreliable on iOS — iPhone keyboards have no dismiss key):
+#    the note is typed first while the screen has no keyboard covering it,
+#    then the amount (pinned at the top, never covered), then Save in the
+#    top bar. Tapping a field that sits under an open keyboard would press
+#    keyboard keys instead (this exact flow once saved "252" and no note).
 - tapOn:
     id: "dashboard:addTransaction"
 - assertVisible:
     id: "transactionCreation:root"
 - tapOn:
-    id: "transactionCreation:amount"
-- inputText: "25"
-- tapOn:
     id: "transactionCreation:note"
 - inputText: "Maestro golden expense"
-- hideKeyboard
+- tapOn:
+    id: "transactionCreation:amount"
+- inputText: "25"
 - tapOn:
     id: "transactionCreation:save"
 
