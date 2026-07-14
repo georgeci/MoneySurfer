@@ -25,7 +25,7 @@ jobs:
       code: ${{ steps.filter.outputs.code }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       - name: Filter paths
         id: filter
         uses: dorny/paths-filter@v4
@@ -53,7 +53,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Decode Firebase config
         uses: ./.github/actions/firebase-config
@@ -225,7 +225,7 @@ jobs:
           steps.codecov_token.outputs.present == 'true' &&
           (github.event_name != 'pull_request' ||
            github.event.pull_request.head.repo.full_name == github.repository)
-        uses: codecov/codecov-action@v6
+        uses: codecov/codecov-action@v7
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: build/reports/kover/report.xml
@@ -239,7 +239,7 @@ jobs:
           steps.codecov_token.outputs.present == 'true' &&
           (github.event_name != 'pull_request' ||
            github.event.pull_request.head.repo.full_name == github.repository)
-        uses: codecov/codecov-action@v6
+        uses: codecov/codecov-action@v7
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: "**/build/test-results/jvmTest/**/*.xml"
@@ -259,7 +259,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       # firebase-tools ≥14 requires JDK 21+ (the Firestore emulator JAR no
       # longer runs on 17). Other CI jobs stay on 17 — only this job needs 21.
@@ -273,7 +273,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v6
 
       - name: Set up Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           node-version: "20"
           cache: npm
@@ -397,7 +397,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           # Sonar needs full git history for blame/new-code detection.
           fetch-depth: 0
@@ -419,7 +419,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v6
 
       - name: Cache SonarCloud packages
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: ~/.sonar/cache
           key: ${{ runner.os }}-sonar
@@ -511,7 +511,7 @@ jobs:
       # back to an empty history dir so the action still produces a report.
       - name: Checkout gh-pages
         if: steps.gate.outputs.publish == 'true'
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           ref: gh-pages
           path: gh-pages
@@ -524,7 +524,7 @@ jobs:
 
       - name: Build Allure report (with history)
         if: steps.gate.outputs.publish == 'true'
-        uses: simple-elf/allure-report-action@53ebb757a2097edc77c53ecef4d454fc2f2f774c # v1.13
+        uses: simple-elf/allure-report-action@e463a472d3b1d750f9544369d60589ff1964c820 # v1.14
         with:
           allure_results: allure-results
           gh_pages: gh-pages/allure

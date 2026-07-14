@@ -72,7 +72,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Decode Firebase config
         uses: ./.github/actions/firebase-config
@@ -104,7 +104,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Set up JDK
         uses: actions/setup-java@v5
@@ -133,7 +133,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       # iOS build only needs the GoogleService-Info.plist — don't expose the
       # Android secrets to this job. (Can't use require-all=true here: it
@@ -199,7 +199,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Set up JDK
         uses: actions/setup-java@v5
@@ -251,7 +251,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Decode Firebase config
         uses: ./.github/actions/firebase-config
@@ -356,7 +356,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Decode Firebase config
         uses: ./.github/actions/firebase-config
@@ -573,7 +573,7 @@ jobs:
           echo "Staged $total input(s) ($native_count native, $((total - native_count)) JUnit fallback)."
 
       - name: Checkout gh-pages
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           ref: gh-pages
           path: gh-pages
@@ -584,7 +584,7 @@ jobs:
         run: mkdir -p gh-pages/nightly/allure
 
       - name: Build Allure report (with history)
-        uses: simple-elf/allure-report-action@53ebb757a2097edc77c53ecef4d454fc2f2f774c # v1.13
+        uses: simple-elf/allure-report-action@e463a472d3b1d750f9544369d60589ff1964c820 # v1.14
         with:
           allure_results: allure-results
           gh_pages: gh-pages/nightly/allure
