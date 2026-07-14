@@ -34,10 +34,10 @@
     <string name="account_creation_save">Save</string>
     <string name="account_creation_cancel">Cancel</string>
     <string name="account_creation_type_label">Type</string>
-    <string name="account_creation_type_cash">Cash</string>
-    <string name="account_creation_type_bank">Bank</string>
-    <string name="account_creation_type_card">Card</string>
-    <string name="account_creation_type_savings">Savings</string>
+    <string name="account_type_cash">Cash</string>
+    <string name="account_type_bank">Bank</string>
+    <string name="account_type_card">Card</string>
+    <string name="account_type_savings">Savings</string>
     <string name="account_creation_currency_label">Currency</string>
     <string name="account_creation_accent_label">Accent</string>
     <string name="account_creation_extra_details_label">Extra details</string>
