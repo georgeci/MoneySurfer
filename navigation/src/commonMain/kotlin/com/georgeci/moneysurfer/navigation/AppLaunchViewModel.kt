@@ -11,7 +11,6 @@ import com.georgeci.moneysurfer.sync.coordinator.SyncCoordinator
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
@@ -42,8 +41,8 @@ class AppLaunchViewModel(
 
     private val log = Logger.withTag(TAG)
 
-    private val _targetRoute = MutableStateFlow<Route?>(null)
-    val targetRoute: StateFlow<Route?> = _targetRoute.asStateFlow()
+    val targetRoute: StateFlow<Route?>
+        field = MutableStateFlow<Route?>(null)
 
     init {
         viewModelScope.launch {
@@ -61,7 +60,7 @@ class AppLaunchViewModel(
             val userId = session.currentUserId.flow.first()
             val workspaceId = session.currentWorkspaceId.flow.first()
             val currencyChosen = session.currencyChosen.flow.first()
-            _targetRoute.value = when {
+            targetRoute.value = when {
                 userId == null -> Route.SignIn
                 workspaceId == null -> Route.WorkspaceSelector()
                 !currencyChosen -> Route.FirstRunCurrency
@@ -73,7 +72,7 @@ class AppLaunchViewModel(
             session.currentUserId.flow
                 .drop(1)
                 .filter { it == null }
-                .collect { _targetRoute.value = Route.SignIn }
+                .collect { targetRoute.value = Route.SignIn }
         }
 
         // 3. Periodic sync while a Firebase-backed session is active. In-process loop

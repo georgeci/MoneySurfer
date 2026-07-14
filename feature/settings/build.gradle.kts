@@ -82,10 +82,6 @@ kotlin {
             }
         }
     }
-
-    compilerOptions {
-        freeCompilerArgs.add("-Xcontext-parameters")
-    }
 }
 
 // Pin the generated `Res` class package so callers can import `moneysurfer.feature.settings.generated.resources.*`

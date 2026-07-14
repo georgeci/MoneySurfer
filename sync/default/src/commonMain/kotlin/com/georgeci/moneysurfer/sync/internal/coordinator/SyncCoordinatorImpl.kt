@@ -79,11 +79,11 @@ class SyncCoordinatorImpl(
 
     private val commands = Channel<SyncCommand>(capacity = Channel.UNLIMITED)
 
-    private val _state = MutableStateFlow<SyncState>(SyncState.Idle)
-    override val state: StateFlow<SyncState> = _state.asStateFlow()
+    override val state: StateFlow<SyncState>
+        field = MutableStateFlow<SyncState>(SyncState.Idle)
 
-    private val _lastOutcome = MutableStateFlow<LastSyncOutcome>(LastSyncOutcome.None)
-    override val lastOutcome: StateFlow<LastSyncOutcome> = _lastOutcome.asStateFlow()
+    override val lastOutcome: StateFlow<LastSyncOutcome>
+        field = MutableStateFlow<LastSyncOutcome>(LastSyncOutcome.None)
 
     // Owned exclusively by actorLoop. Never read or mutated from outside the loop.
     private var pending: MergedSyncRequest? = null
@@ -358,7 +358,7 @@ class SyncCoordinatorImpl(
                 child.steps.emit(step)
                 child.status.value = SyncHandleStatus.Running(step)
             }
-        _state.value = SyncState.Running(
+        state.value = SyncState.Running(
             requestId = request.id,
             reasons = request.reasons,
             scope = request.scope,
@@ -402,7 +402,7 @@ class SyncCoordinatorImpl(
                 child.result.complete(summary.right())
             }
         val now = Clock.System.now()
-        _lastOutcome.value = LastSyncOutcome.Success(summary, now)
+        lastOutcome.value = LastSyncOutcome.Success(summary, now)
         telemetry.onSyncCompleted(request.id, summary, durationSinceStart(request.id, now))
     }
 
@@ -415,14 +415,14 @@ class SyncCoordinatorImpl(
                 child.result.complete(error.left())
             }
         val now = Clock.System.now()
-        _lastOutcome.value = LastSyncOutcome.Failed(error, now)
+        lastOutcome.value = LastSyncOutcome.Failed(error, now)
         telemetry.onSyncFailed(request.id, error, durationSinceStart(request.id, now))
     }
 
     private suspend fun completeCancelled(request: MergedSyncRequest) {
         request.childRequests.forEach { child -> finalizeCancelled(child) }
         val now = Clock.System.now()
-        _lastOutcome.value = LastSyncOutcome.Cancelled(now)
+        lastOutcome.value = LastSyncOutcome.Cancelled(now)
         telemetry.onSyncCancelled(request.id, durationSinceStart(request.id, now))
     }
 
@@ -455,7 +455,7 @@ class SyncCoordinatorImpl(
         val queuedCount = pending?.childRequests
             ?.count { !it.cancelToken.isCancelled() }
             ?: 0
-        _state.value = if (queuedCount > 0) SyncState.Queued(queuedCount) else SyncState.Idle
+        state.value = if (queuedCount > 0) SyncState.Queued(queuedCount) else SyncState.Idle
     }
 
     private fun mergedCancelToken(request: MergedSyncRequest): SyncCancelToken =
