@@ -61,7 +61,7 @@ tasks.named<Test>("jvmTest") {
     inputs.files(
         fileTree(rootDir) {
             include("**/strings.xml")
-            exclude("**/build/**", ".git/**")
+            exclude("**/build/**", "**/.git/**", "**/.gradle/**")
         },
     ).withPathSensitivity(PathSensitivity.RELATIVE)
 }

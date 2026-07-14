@@ -13,9 +13,12 @@ import java.io.File
  */
 class StringResourcePlaceholderTest : StringSpec({
 
-    // Matches `%s` / `%d` (any case) — indexed forms like `%1$s` never match
-    // because the conversion letter isn't directly after `%`.
-    val barePlaceholder = Regex("""%[sdSD]""")
+    // Matches any format specifier without a `1$`-style index: bare `%s`/`%d`
+    // as well as width/precision forms like `%02d` or `%.3s`. Indexed forms
+    // (`%1$s`, `%2$10d`) never match because `$` can't appear before the
+    // conversion letter here. Literal percent signs ("80%.") don't match
+    // because they aren't followed by a conversion letter.
+    val barePlaceholder = Regex("""%[-#+0,(]*\d*(?:\.\d+)?[a-zA-Z]""")
 
     fun repoRoot(): File {
         var dir = File(System.getProperty("user.dir")).absoluteFile
@@ -27,7 +30,7 @@ class StringResourcePlaceholderTest : StringSpec({
 
     fun stringResourceFiles(): List<File> = repoRoot()
         .walkTopDown()
-        .onEnter { it.name != "build" && it.name != ".git" }
+        .onEnter { it.name !in setOf("build", ".git", ".gradle") }
         .filter { it.isFile && it.name == "strings.xml" }
         .toList()
 
