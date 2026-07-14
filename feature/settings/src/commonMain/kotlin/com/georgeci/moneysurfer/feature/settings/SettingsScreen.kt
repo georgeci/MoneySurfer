@@ -41,6 +41,8 @@ import moneysurfer.feature.settings.generated.resources.settings_categories_supp
 import moneysurfer.feature.settings.generated.resources.settings_categories_title
 import moneysurfer.feature.settings.generated.resources.settings_change_workspace
 import moneysurfer.feature.settings.generated.resources.settings_change_workspace_supporting
+import moneysurfer.feature.settings.generated.resources.settings_csv_supporting
+import moneysurfer.feature.settings.generated.resources.settings_csv_title
 import moneysurfer.feature.settings.generated.resources.settings_finish_setup
 import moneysurfer.feature.settings.generated.resources.settings_finish_setup_supporting
 import moneysurfer.feature.settings.generated.resources.settings_logout
@@ -73,6 +75,7 @@ object SettingsTestTags {
     const val AppearanceRow = "settings:appearanceRow"
     const val AboutRow = "settings:aboutRow"
     const val SyncRow = "settings:syncRow"
+    const val CsvRow = "settings:csvRow"
     const val LogoutRow = "settings:logoutRow"
 }
 
@@ -88,6 +91,7 @@ fun SettingsScreen(
     onNavigateToPreferences: () -> Unit,
     onNavigateToSync: () -> Unit,
     onNavigateToBackup: () -> Unit,
+    onNavigateToCsvBackup: () -> Unit,
     onNavigateToAbout: () -> Unit,
     viewModel: SettingsViewModel = koinViewModel(),
 ) {
@@ -105,6 +109,7 @@ fun SettingsScreen(
             SettingsEffect.NavigateToPreferences -> onNavigateToPreferences()
             SettingsEffect.NavigateToSync -> onNavigateToSync()
             SettingsEffect.NavigateToBackup -> onNavigateToBackup()
+            SettingsEffect.NavigateToCsvBackup -> onNavigateToCsvBackup()
             SettingsEffect.NavigateToAbout -> onNavigateToAbout()
         }
     }
@@ -228,8 +233,8 @@ private fun SettingsContent(
                 )
             }
 
-            if (state.showSyncSection) {
-                SurferSettingsGroup(title = stringResource(Res.string.settings_section_data)) {
+            SurferSettingsGroup(title = stringResource(Res.string.settings_section_data)) {
+                if (state.showSyncSection) {
                     SurferSettingsRow(
                         icon = SurferIcons.Sync,
                         title = stringResource(Res.string.settings_sync_hub_title),
@@ -239,6 +244,14 @@ private fun SettingsContent(
                         modifier = Modifier.testTag(SettingsTestTags.SyncRow),
                     )
                 }
+                SurferSettingsRow(
+                    icon = SurferIcons.Download,
+                    title = stringResource(Res.string.settings_csv_title),
+                    supportingText = stringResource(Res.string.settings_csv_supporting),
+                    onClick = { onEvent(SettingsEvent.OnCsvBackupClick) },
+                    trailing = { SurferSettingsChevron() },
+                    modifier = Modifier.testTag(SettingsTestTags.CsvRow),
+                )
             }
 
             SurferSettingsGroup(title = stringResource(Res.string.settings_section_help)) {
