@@ -1121,7 +1121,11 @@ tasks.register<Exec>("qaMaestroOfflineAndroid") {
         commandLine(
             buildMaestroCommand(
                 rootDir = rootDir,
-                target = "scripts/maestro/",
+                // Target the subdirectory itself: without a workspace config
+                // Maestro only scans top-level flows, so `scripts/maestro/`
+                // never discovers `offline/offline-golden.yaml` and
+                // `--include-tags offline` matches nothing.
+                target = "scripts/maestro/offline/",
                 junitOutput = maestroOfflineJunit,
                 includeTags = listOf("offline"),
                 appId = offlineMaestroAppId,
@@ -1175,7 +1179,8 @@ tasks.register<Exec>("qaMaestroOfflineIos") {
         commandLine(
             buildMaestroCommand(
                 rootDir = rootDir,
-                target = "scripts/maestro/",
+                // Subdirectory target — same reasoning as qaMaestroOfflineAndroid.
+                target = "scripts/maestro/offline/",
                 junitOutput = maestroOfflineIosJunit,
                 includeTags = listOf("offline"),
                 appId = offlineMaestroAppId,
