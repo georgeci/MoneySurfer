@@ -64,5 +64,11 @@ runs:
         echo "Using simulator: $SIM_NAME ($SIM_RUNTIME) — $SIM_UDID"
         xcrun simctl boot "$SIM_UDID" || true
         xcrun simctl bootstatus "$SIM_UDID" -b
+        # Fresh simulators show the QuickPath "swipe to type" education sheet
+        # instead of a keyboard on the first text input; it covers the bottom
+        # half of the app and breaks Maestro's hideKeyboard and any tap under
+        # it (see PR #145). Pre-mark the intro as seen before the app runs.
+        xcrun simctl spawn "$SIM_UDID" defaults write com.apple.keyboard.preferences \
+          DidShowContinuousPathIntroduction -bool true
         echo "udid=$SIM_UDID" >> "$GITHUB_OUTPUT"
         echo "name=$SIM_NAME" >> "$GITHUB_OUTPUT"
