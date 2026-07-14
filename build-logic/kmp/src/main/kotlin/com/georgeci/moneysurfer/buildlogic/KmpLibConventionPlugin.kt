@@ -15,10 +15,6 @@ class KmpLibConventionPlugin : Plugin<Project> {
                     useJUnitPlatform()
                 }
             }
-            compilerOptions {
-                freeCompilerArgs.add("-Xcontext-parameters")
-            }
-
             extensions.configure<com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryTarget> {
                 androidResources {
                     enable = true

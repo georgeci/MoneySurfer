@@ -8,7 +8,6 @@ import com.georgeci.moneysurfer.domain.preferences.ThemeMode
 import com.georgeci.moneysurfer.domain.preferences.UiPreferences
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
@@ -19,22 +18,22 @@ class AppViewModel(
     private val uiPreferences: UiPreferences,
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(AppState())
-    val state: StateFlow<AppState> = _state.asStateFlow()
+    val state: StateFlow<AppState>
+        field = MutableStateFlow(AppState())
 
     init {
-        _state.update { it.copy(isDynamicColorAvailable = uiPreferences.isDynamicColorAvailable) }
+        state.update { it.copy(isDynamicColorAvailable = uiPreferences.isDynamicColorAvailable) }
 
         uiPreferences.paletteSource.flow
-            .onEach { source -> _state.update { it.copy(paletteSource = source) } }
+            .onEach { source -> state.update { it.copy(paletteSource = source) } }
             .launchIn(viewModelScope)
 
         uiPreferences.themeMode.flow
-            .onEach { mode -> _state.update { it.copy(themeMode = mode) } }
+            .onEach { mode -> state.update { it.copy(themeMode = mode) } }
             .launchIn(viewModelScope)
 
         uiPreferences.containerStyle.flow
-            .onEach { style -> _state.update { it.copy(containerStyle = style) } }
+            .onEach { style -> state.update { it.copy(containerStyle = style) } }
             .launchIn(viewModelScope)
     }
 }
