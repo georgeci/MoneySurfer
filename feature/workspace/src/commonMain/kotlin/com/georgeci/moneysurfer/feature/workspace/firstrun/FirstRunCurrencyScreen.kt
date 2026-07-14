@@ -19,6 +19,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -35,7 +37,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -149,12 +153,18 @@ private fun FirstRunCurrencyContent(
                     color = AppTheme.materialColors.onSurfaceVariant,
                     modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp),
                 )
+                // iOS keyboards have no dismiss key, so without an IME action
+                // the keyboard is stuck open and covers the Confirm button.
+                // "Search" commits the query and clears focus on both platforms.
+                val focusManager = LocalFocusManager.current
                 OutlinedTextField(
                     value = state.query,
                     onValueChange = { onEvent(FirstRunCurrencyEvent.OnQueryChanged(it)) },
                     placeholder = { Text(stringResource(Res.string.first_run_currency_search_placeholder)) },
                     leadingIcon = { Icon(imageVector = SurferIcons.Search, contentDescription = null) },
                     singleLine = true,
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+                    keyboardActions = KeyboardActions(onSearch = { focusManager.clearFocus() }),
                     shape = RoundedCornerShape(22.dp),
                     colors = TextFieldDefaults.colors(
                         focusedContainerColor = AppTheme.materialColors.surfaceContainerHigh,

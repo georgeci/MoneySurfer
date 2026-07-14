@@ -1092,6 +1092,7 @@ val maestroOfflineIosJunit = maestroIosReportsDir.resolve("maestro-offline-golde
 tasks.register<Exec>("maestroAssembleOfflineDebug") {
     group = "verification"
     description = "Build the offline debug APK for Maestro E2E tests."
+    notCompatibleWithConfigurationCache("Spawns a nested Gradle build.")
     workingDir = rootDir
     commandLine("./gradlew", ":androidApp-offline:assembleDebug")
 }
@@ -1099,6 +1100,7 @@ tasks.register<Exec>("maestroAssembleOfflineDebug") {
 tasks.register<Exec>("maestroInstallOfflineDebug") {
     group = "verification"
     description = "Build the offline debug APK and adb-install it on the connected device/AVD."
+    notCompatibleWithConfigurationCache("Resolves the adb executable and APK path at execution time.")
     dependsOn("maestroAssembleOfflineDebug")
     doFirst {
         require(offlineDebugApkPath.exists()) {
