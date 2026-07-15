@@ -7,9 +7,11 @@ import io.kotest.matchers.shouldBe
 
 class LoggingConfigTest : StringSpec({
 
-    // Global Kermit config is process-wide mutable state; restore the permissive
-    // default so this spec can't starve logging in specs that run after it.
-    afterSpec { Logger.setMinSeverity(Severity.Verbose) }
+    // Global Kermit config is process-wide mutable state; capture whatever the
+    // min-severity was before this spec ran and restore exactly that, so we don't
+    // clobber a value another spec relies on.
+    val originalMinSeverity = Logger.config.minSeverity
+    afterSpec { Logger.setMinSeverity(originalMinSeverity) }
 
     "release builds mute everything below Warn" {
         configureLogging(isDebug = false)
