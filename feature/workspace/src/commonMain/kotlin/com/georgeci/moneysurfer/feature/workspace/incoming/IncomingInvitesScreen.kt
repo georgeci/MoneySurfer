@@ -61,6 +61,7 @@ import moneysurfer.feature.workspace.generated.resources.workspace_incoming_work
 import moneysurfer.feature.workspace.generated.resources.workspace_members_role_editor
 import moneysurfer.feature.workspace.generated.resources.workspace_members_role_owner
 import moneysurfer.feature.workspace.generated.resources.workspace_members_role_viewer
+import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -227,7 +228,11 @@ private fun Header(activeCount: Int) {
             .padding(horizontal = AppTheme.spacing.large, vertical = AppTheme.spacing.small),
     ) {
         Text(
-            text = stringResource(Res.string.workspace_incoming_header_title_format, activeCount),
+            text = pluralStringResource(
+                Res.plurals.workspace_incoming_header_title_format,
+                activeCount,
+                activeCount,
+            ),
             style = AppTheme.typography.headlineSmall,
             color = AppTheme.materialColors.onSurface,
         )

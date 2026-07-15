@@ -14,9 +14,7 @@
     <string name="settings_finish_setup">Завершить настройку</string>
     <string name="settings_finish_setup_supporting">Выберите валюту пространства</string>
     <string name="settings_members">Участники и права</string>
-    <string name="settings_members_count_format">%1$d участников</string>
     <string name="settings_pending_invites">Приглашения</string>
-    <string name="settings_pending_invites_supporting_format">%1$d ожидает</string>
     <string name="settings_pending_invites_supporting_empty">Нет приглашений</string>
 
     <string name="settings_appearance_hub_title">Внешний вид</string>
@@ -54,7 +52,6 @@
     <string name="settings_csv_section_import">Импорт</string>
     <string name="settings_csv_import_title">Импорт из CSV</string>
     <string name="settings_csv_import_supporting">Строки добавляются; дубликаты по id пропускаются</string>
-    <string name="settings_csv_export_success">Экспортировано транзакций: %1$d</string>
     <string name="settings_csv_import_result">Импортировано %1$d · пропущено %2$d · ошибок %3$d</string>
     <string name="settings_csv_notice_invalid_file">Выбранный файл не является CSV транзакций MoneySurfer</string>
     <string name="settings_csv_notice_generic">Операция с CSV не удалась</string>

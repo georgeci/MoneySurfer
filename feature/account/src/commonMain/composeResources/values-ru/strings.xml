@@ -72,7 +72,6 @@
 
     <!-- Account chooser bottom sheet -->
     <string name="transaction_creation_account_sheet_title">Со счёта</string>
-    <string name="transaction_creation_account_summary">Всего по %1$d счетам · %2$s</string>
     <string name="transaction_creation_account_summary_empty">Пока нет счетов</string>
     <string name="transaction_creation_account_add_new">Добавить счёт</string>
     <string name="transaction_creation_account_add_new_subtitle">Банк, накопления, наличные или карта</string>

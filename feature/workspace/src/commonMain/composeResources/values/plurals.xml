@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="workspace_members_subtitle_owner_format">
+        <item quantity="one">%1$d person · you own this workspace</item>
+        <item quantity="other">%1$d people · you own this workspace</item>
+    </plurals>
+    <plurals name="workspace_members_subtitle_editor_format">
+        <item quantity="one">%1$d person · you can edit data</item>
+        <item quantity="other">%1$d people · you can edit data</item>
+    </plurals>
+    <plurals name="workspace_members_subtitle_viewer_format">
+        <item quantity="one">%1$d person · view-only access</item>
+        <item quantity="other">%1$d people · view-only access</item>
+    </plurals>
+    <plurals name="workspace_members_subtitle_unknown_format">
+        <item quantity="one">%1$d person</item>
+        <item quantity="other">%1$d people</item>
+    </plurals>
+    <plurals name="workspace_incoming_header_title_format">
+        <item quantity="one">You're invited to %1$d workspace</item>
+        <item quantity="other">You're invited to %1$d workspaces</item>
+    </plurals>
+    <plurals name="workspace_creation_preview_subtitle_format">
+        <item quantity="one">Shared · %1$d member · %2$s</item>
+        <item quantity="other">Shared · %1$d members · %2$s</item>
+    </plurals>
+</resources>
