@@ -17,45 +17,66 @@ MoneySurfer is a Kotlin Multiplatform app for Android, iOS, and Desktop (JVM)
 using Compose Multiplatform.
 
 - Package: `com.georgeci.moneysurfer`
-- Kotlin: 2.3.20
-- Compose Multiplatform: 1.10.3
-- Gradle: 8.14.3
-- Android: minSdk 24, targetSdk 36, compileSdk 36
+- Kotlin: 2.4.0
+- Compose Multiplatform: 1.11.1
+- Gradle: 9.6.0, AGP 9.1.1
+- Android: minSdk 24, targetSdk 36, compileSdk 37
+
+Versions above are a snapshot; `gradle/libs.versions.toml` and
+`gradle/wrapper/gradle-wrapper.properties` are authoritative.
 
 ## Module Map
 
 ```text
-androidApp/             Android entry point
-composeApp/             shared app shell + Compose Multiplatform host
-shared/                 feature-facing ViewModels, screens, navigation glue
+androidApp/             Android entry point (online)
+androidApp-offline/     Android entry point (offline, Firebase-free)
+composeApp/             online app shell + Compose Multiplatform host
+composeAppOffline/      offline app shell (no data-remote / sync runtime)
+shared/                 DI composition root, app theme, navigation glue
 domain/                 business interfaces, models, use cases
-data-local/             Room and local persistence implementations
+data-local/             Room, DataStore, backup implementations
 data-remote/            Firebase/Firestore remote implementations
-sync/                   SDK-free sync coordinator contracts
-sync-impl/              sync runtime implementations
+sync/api/               SDK-free sync coordinator contracts
+sync/default/           SDK-free sync runtime core (coordinator, outbox, LWW)
+sync/no-op/             no-op SyncCoordinator for offline builds
+sync-surfer/            Firestore-bound sync implementation (entity plugins)
 uikit/                  design system and reusable Compose widgets
-feature/                feature modules
-navigation/             app navigation
+feature/                feature modules (account, category, dashboard, ...)
+navigation/             app navigation (Navigation 3)
+utils/                  small shared utilities (MviViewModel, AsyncState)
+*-test-fixtures/        shared test fixtures (domain, data, sync)
 integration-test/       Firebase/Room integration tests
-firestore-tests/        Firestore rules tests
+firestore-tests/        Firestore rules tests (npm/Mocha)
 build-logic/            Gradle convention plugins
-iosApp/                 native iOS Xcode entry point
+iosApp/                 native iOS Xcode entry point (online)
+iosAppOffline/          native iOS Xcode entry point (offline)
 ```
 
 ## Dependency DAG
 
 ```text
-                  -> uikit
-androidApp -> composeApp -> shared -> domain <- data-*
-                            shared -> sync   <- sync-impl
+androidApp         -> composeApp        -> shared -> feature:* -> domain -> sync:api
+androidApp-offline -> composeAppOffline -> shared    feature:* -> {navigation, uikit, utils}
+
+composeApp        -> {data-remote, sync:default, sync-surfer}   # online wiring
+composeAppOffline -> {sync:api, sync:no-op}                     # offline wiring
+shared            -> data-local                                 # DI wiring only
+sync-surfer       -> {sync:default, data-local, data-remote}
+data-*            -> domain
 ```
 
 Hard rules:
 
-- `shared` and feature modules must not depend on `data-*`.
-- `domain` must not depend on `data-*`, `sync`, Firebase, Firestore, Room, or
-  DataStore.
-- `sync` must not depend on `data-*`, Firebase, Firestore, Room, or DataStore.
+- Feature modules must not depend on `data-*`.
+- `shared` may reference `data-local` only for DI wiring (module includes and
+  platform bindings in `di/`); no logic in `shared` may call data-layer types.
+- `domain` must not depend on `data-*`, sync implementations (`sync:default`,
+  `sync:no-op`, `sync-surfer`), Firebase, Firestore, Room, or DataStore.
+  Depending on the SDK-free `sync:api` contracts is allowed.
+- `sync:api` and `sync:no-op` must not depend on `data-*`, Firebase,
+  Firestore, Room, or DataStore. `sync:default` may use Room/WorkManager for
+  its private outbox database, but no Firebase/Firestore. Firestore-bound
+  sync code lives only in `sync-surfer`.
 - Use cases live in `domain` unless they orchestrate app/navigation concerns;
   app-level orchestration can live in `shared`.
 - External SDKs are touched only from `data-*` or platform entry modules.

@@ -215,7 +215,7 @@
 ## project-map
 - Title: Module Map
 - File: docs/PROJECT_MAP.md
-- Lines: 25-57
+- Lines: 25-77
 - Tasks: project, context, architecture
 
 ## rules-bug-1
@@ -317,7 +317,7 @@
 ## testing-strategy
 - Title: Common Commands
 - File: docs/testing/testing-strategy.md
-- Lines: 25-51
+- Lines: 26-105
 - Tasks: testing, qa, validation
 
 ## time-policy
