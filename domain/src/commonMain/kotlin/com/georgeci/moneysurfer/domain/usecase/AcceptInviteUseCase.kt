@@ -5,6 +5,8 @@ import arrow.core.raise.either
 import arrow.core.raise.ensure
 import co.touchlab.kermit.Logger
 import com.georgeci.moneysurfer.domain.auth.SessionPointers
+import com.georgeci.moneysurfer.domain.logging.redactEmail
+import com.georgeci.moneysurfer.domain.logging.redactUid
 import com.georgeci.moneysurfer.domain.model.InviteStatus
 import com.georgeci.moneysurfer.domain.model.WorkspaceMember
 import com.georgeci.moneysurfer.domain.model.WorkspaceMemberStatus
@@ -49,14 +51,14 @@ class AcceptInviteUseCase(
             ?: raise(InviteError.NoCurrentUser).also { log.w { "[reject] no current user" } }
         val caller = userRepository.getById(callerId)
             ?: raise(InviteError.NoCurrentUser).also {
-                log.w { "[reject] users.${callerId.value} not found locally" }
+                log.w { "[reject] users.${callerId.value.redactUid()} not found locally" }
             }
 
         val invite = inviteRepository.getById(id)
             ?: raise(InviteError.InviteNotFound).also { log.w { "[reject] invite ${id.value} not found" } }
         log.d {
-            "[loaded] id=${id.value} wid=${invite.workspaceId.value} email=${invite.email} " +
-                "target=${invite.targetUserId?.value} status=${invite.status} " +
+            "[loaded] id=${id.value} wid=${invite.workspaceId.value} email=${invite.email.redactEmail()} " +
+                "target=${(invite.targetUserId?.value).redactUid()} status=${invite.status} " +
                 "expiresAt=${invite.expiresAt}"
         }
 
@@ -75,11 +77,12 @@ class AcceptInviteUseCase(
         ensure(emailMatches || uidMatches) {
             log.w {
                 "[reject] caller doesn't match invite — emailMatch=$emailMatches " +
-                    "uidMatch=$uidMatches callerEmail=${caller.email} inviteEmail=${invite.email}"
+                    "uidMatch=$uidMatches callerEmail=${caller.email.redactEmail()} " +
+                    "inviteEmail=${invite.email.redactEmail()}"
             }
             InviteError.InviteNotFound
         }
-        log.d { "[validated] caller=${callerId.value} matchedBy=${if (uidMatches) "uid" else "email"}" }
+        log.d { "[validated] caller=${callerId.value.redactUid()} matchedBy=${if (uidMatches) "uid" else "email"}" }
 
         val member = WorkspaceMember(
             userId = callerId,
@@ -121,13 +124,13 @@ class AcceptInviteUseCase(
             Either.catch { userRemoteRepository.addWorkspaceRef(firebaseUid, invite.workspaceId) }
                 .onLeft {
                     log.w(it) {
-                        "[remote] addWorkspaceRef failed uid=$firebaseUid " +
+                        "[remote] addWorkspaceRef failed uid=${firebaseUid.redactUid()} " +
                             "wid=${invite.workspaceId.value} — non-fatal"
                     }
                 }
                 .onRight {
                     log.i {
-                        "[remote] addWorkspaceRef ok uid=$firebaseUid wid=${invite.workspaceId.value}"
+                        "[remote] addWorkspaceRef ok uid=${firebaseUid.redactUid()} wid=${invite.workspaceId.value}"
                     }
                 }
 
@@ -135,11 +138,14 @@ class AcceptInviteUseCase(
                 userRemoteRepository.removeInvitedWorkspaceRef(firebaseUid, invite.workspaceId)
             }.onLeft {
                 log.w(it) {
-                    "[remote] removeInvitedWorkspaceRef failed uid=$firebaseUid " +
+                    "[remote] removeInvitedWorkspaceRef failed uid=${firebaseUid.redactUid()} " +
                         "wid=${invite.workspaceId.value} — non-fatal"
                 }
             }.onRight {
-                log.i { "[remote] removeInvitedWorkspaceRef ok uid=$firebaseUid wid=${invite.workspaceId.value}" }
+                log.i {
+                    "[remote] removeInvitedWorkspaceRef ok uid=${firebaseUid.redactUid()} " +
+                        "wid=${invite.workspaceId.value}"
+                }
             }
 
             Either.catch { workspaceSyncer.syncWorkspace(invite.workspaceId) }
@@ -155,7 +161,7 @@ class AcceptInviteUseCase(
         }
 
         log.i {
-            "[done] uid=${callerId.value} wid=${invite.workspaceId.value} role=${invite.role}"
+            "[done] uid=${callerId.value.redactUid()} wid=${invite.workspaceId.value} role=${invite.role}"
         }
     }
 

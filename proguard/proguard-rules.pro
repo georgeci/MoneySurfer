@@ -1,5 +1,14 @@
 # Shared R8/ProGuard rules for :androidApp and :androidApp-offline release builds.
 
+# --- Kermit PII muting (issue #154) ---
+# We deliberately do NOT strip Kermit v/d/i via `-assumenosideeffects`: Kermit's
+# public logging API is inline (`log.i { ... }`), so the message lambda is inlined
+# into the caller and R8 can't reliably elide it. Instead the release min-severity
+# is raised to Warn at startup (domain/.../logging/LoggingConfig.configureLogging,
+# wired through di/initKoin), which short-circuits Verbose/Debug/Info *before* the
+# message lambda runs — so the PII string is never even built. Redaction
+# (domain/.../logging/PiiRedaction) is the second layer at the call sites.
+
 # --- Crash deobfuscation: keep line numbers, hide original source file name ---
 -keepattributes SourceFile,LineNumberTable
 -renamesourcefileattribute SourceFile

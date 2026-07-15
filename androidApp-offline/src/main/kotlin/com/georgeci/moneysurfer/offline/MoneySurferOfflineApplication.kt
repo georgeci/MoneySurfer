@@ -8,7 +8,7 @@ import org.koin.android.ext.koin.androidContext
 class MoneySurferOfflineApplication : Application() {
     override fun onCreate() {
         super.onCreate()
-        initKoin(extraModules = offlineWiring) {
+        initKoin(isDebug = BuildConfig.DEBUG, extraModules = offlineWiring) {
             androidContext(this@MoneySurferOfflineApplication)
         }
     }

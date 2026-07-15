@@ -5,6 +5,8 @@ import arrow.core.raise.either
 import co.touchlab.kermit.Logger
 import com.georgeci.moneysurfer.domain.auth.AuthError
 import com.georgeci.moneysurfer.domain.auth.SessionPointers
+import com.georgeci.moneysurfer.domain.logging.redactEmail
+import com.georgeci.moneysurfer.domain.logging.redactUid
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 import com.georgeci.moneysurfer.domain.repositories.UserRemoteRepository
 import com.georgeci.moneysurfer.domain.repositories.WorkspaceSyncer
@@ -44,38 +46,38 @@ class PostAuthBootstrapUseCase(
         displayName: String?,
         isAnon: Boolean,
     ): Either<AuthError, Result> = either {
-        log.i { "[start] uid=$uid isAnon=$isAnon hasEmail=${email != null}" }
+        log.i { "[start] uid=${uid.redactUid()} isAnon=$isAnon hasEmail=${email != null}" }
 
         // Backfill the email→uid mapping so future invites can resolve targetUserId for this
         // account. Best-effort — failure shouldn't block the login flow, but it does block
         // anyone from inviting this user until the next successful bootstrap retries the write.
         when {
             !email.isNullOrBlank() -> {
-                log.d { "[email-map] start uid=$uid email=$email" }
+                log.d { "[email-map] start uid=${uid.redactUid()} email=${email.redactEmail()}" }
                 Either.catch { userRemoteRepository.upsertEmailMapping(email = email, uid = uid) }
-                    .onLeft { log.w(it) { "[email-map] upsert failed uid=$uid — non-fatal" } }
-                    .onRight { log.i { "[email-map] ok uid=$uid" } }
+                    .onLeft { log.w(it) { "[email-map] upsert failed uid=${uid.redactUid()} — non-fatal" } }
+                    .onRight { log.i { "[email-map] ok uid=${uid.redactUid()}" } }
             }
-            isAnon -> log.d { "[email-map:skip] uid=$uid — anonymous account, no email" }
+            isAnon -> log.d { "[email-map:skip] uid=${uid.redactUid()} — anonymous account, no email" }
             else -> log.w {
-                "[email-map:skip] uid=$uid — non-anon account but email is blank; " +
+                "[email-map:skip] uid=${uid.redactUid()} — non-anon account but email is blank; " +
                     "Firebase Auth should have provided an email claim, this user will " +
                     "NOT be invitable until the mapping is backfilled"
             }
         }
 
-        log.d { "[fetch] users/$uid …" }
+        log.d { "[fetch] users/${uid.redactUid()} …" }
         val existing = Either.catch { userRemoteRepository.fetch(uid) }
-            .onLeft { log.e(it) { "[fetch] users/$uid failed" } }
+            .onLeft { log.e(it) { "[fetch] users/${uid.redactUid()} failed" } }
             .onRight { user ->
                 if (user != null) {
                     log.i {
-                        "[fetch] users/$uid found: workspaces=${user.workspaceIds.size} " +
+                        "[fetch] users/${uid.redactUid()} found: workspaces=${user.workspaceIds.size} " +
                             "default=${user.defaultWorkspaceId} " +
                             "isAnon=${user.isAnon} hasDisplayName=${user.displayName != null}"
                     }
                 } else {
-                    log.i { "[fetch] users/$uid not found (first-time entry)" }
+                    log.i { "[fetch] users/${uid.redactUid()} not found (first-time entry)" }
                 }
             }
             .mapLeft { it.toAuthError() }
@@ -109,12 +111,12 @@ class PostAuthBootstrapUseCase(
                 defaultWorkspaceId = resolvedDefault,
             ).also {
                 log.i {
-                    "[done] ExistingUser uid=$uid workspaces=${it.workspaceIds.size} " +
+                    "[done] ExistingUser uid=${uid.redactUid()} workspaces=${it.workspaceIds.size} " +
                         "default=${it.defaultWorkspaceId}"
                 }
             }
         } else {
-            log.i { "[create] first-time user, creating users/$uid …" }
+            log.i { "[create] first-time user, creating users/${uid.redactUid()} …" }
             Either
                 .catch {
                     userRemoteRepository.create(
@@ -125,11 +127,11 @@ class PostAuthBootstrapUseCase(
                         createdAt = getCurrentTime().toEpochMilliseconds(),
                     )
                 }
-                .onLeft { log.e(it) { "[create] users/$uid failed" } }
-                .onRight { log.i { "[create] users/$uid ok" } }
+                .onLeft { log.e(it) { "[create] users/${uid.redactUid()} failed" } }
+                .onRight { log.i { "[create] users/${uid.redactUid()} ok" } }
                 .mapLeft { it.toAuthError() }
                 .bind()
-            Result.FirstTime.also { log.i { "[done] FirstTime uid=$uid" } }
+            Result.FirstTime.also { log.i { "[done] FirstTime uid=${uid.redactUid()}" } }
         }
     }
 

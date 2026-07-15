@@ -5,6 +5,7 @@ import arrow.core.raise.either
 import arrow.core.raise.ensure
 import co.touchlab.kermit.Logger
 import com.georgeci.moneysurfer.domain.auth.SessionPointers
+import com.georgeci.moneysurfer.domain.logging.redactUid
 import com.georgeci.moneysurfer.domain.model.InviteStatus
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceInviteId
 import com.georgeci.moneysurfer.domain.repositories.UserRemoteRepository
@@ -53,7 +54,7 @@ class DeclineInviteUseCase(
             }
         }
 
-        log.i { "[done] uid=${callerId.value} id=${id.value}" }
+        log.i { "[done] uid=${callerId.value.redactUid()} id=${id.value}" }
     }
 
     private companion object {

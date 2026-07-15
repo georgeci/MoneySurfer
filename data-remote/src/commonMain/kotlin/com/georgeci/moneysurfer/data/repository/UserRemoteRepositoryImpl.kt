@@ -3,6 +3,8 @@ package com.georgeci.moneysurfer.data.repository
 import co.touchlab.kermit.Logger
 import com.georgeci.moneysurfer.data.remote.UserDoc
 import com.georgeci.moneysurfer.data.remote.UserEmailDoc
+import com.georgeci.moneysurfer.domain.logging.redactEmail
+import com.georgeci.moneysurfer.domain.logging.redactUid
 import com.georgeci.moneysurfer.domain.model.User
 import com.georgeci.moneysurfer.domain.primitives.UserId
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
@@ -70,17 +72,17 @@ class UserRemoteRepositoryImpl(
         if (key.isBlank()) return null
         val snap = firestore.collection("userEmails").document(key).get()
         if (!snap.exists) {
-            log.d { "[findByEmail] miss email=$key" }
+            log.d { "[findByEmail] miss email=${key.redactEmail()}" }
             return null
         }
         val uid = snap.data(UserEmailDoc.serializer()).uid
         return when {
             uid.isBlank() -> {
-                log.w { "[findByEmail] mapping email=$key has empty uid — ignoring" }
+                log.w { "[findByEmail] mapping email=${key.redactEmail()} has empty uid — ignoring" }
                 null
             }
             else -> {
-                log.i { "[findByEmail] hit email=$key uid=$uid" }
+                log.i { "[findByEmail] hit email=${key.redactEmail()} uid=${uid.redactUid()}" }
                 UserId(uid)
             }
         }
@@ -101,14 +103,14 @@ class UserRemoteRepositoryImpl(
     override suspend fun upsertEmailMapping(email: String, uid: String) {
         val key = email.trim().lowercase()
         if (key.isBlank() || uid.isBlank()) {
-            log.w { "[email-map:skip] email='$email' uid='$uid' — blank, skipping" }
+            log.w { "[email-map:skip] email='${email.redactEmail()}' uid='${uid.redactUid()}' — blank, skipping" }
             return
         }
         val now = Clock.System.now().toEpochMilliseconds()
         firestore.collection("userEmails").document(key).set(
             UserEmailDoc(uid = uid, updatedAt = now),
         )
-        log.i { "[email-map:upsert] email=$key uid=$uid" }
+        log.i { "[email-map:upsert] email=${key.redactEmail()} uid=${uid.redactUid()}" }
     }
 
     private companion object {

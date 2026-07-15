@@ -5,6 +5,7 @@ import arrow.core.raise.either
 import co.touchlab.kermit.Logger
 import com.georgeci.moneysurfer.domain.auth.SessionPointers
 import com.georgeci.moneysurfer.domain.constants.DEFAULT_CATEGORY_SEEDS
+import com.georgeci.moneysurfer.domain.logging.redactUid
 import com.georgeci.moneysurfer.domain.model.Category
 import com.georgeci.moneysurfer.domain.model.Workspace
 import com.georgeci.moneysurfer.domain.model.WorkspaceMember
@@ -52,7 +53,7 @@ class CreateWorkspaceUseCase(
             ?: raise(CreateWorkspaceError.NoCurrentUser)
         val newId = WorkspaceId.uuid()
         val now = getCurrentTime()
-        log.i { "[start] uid=${ownerId.value} wid=${newId.value} name='${params.name}'" }
+        log.i { "[start] uid=${ownerId.value.redactUid()} wid=${newId.value} name='${params.name}'" }
 
         Either
             .catch { writeLocal(newId, ownerId, now, params) }
@@ -81,11 +82,23 @@ class CreateWorkspaceUseCase(
             // These two are best-effort: a transient failure here doesn't invalidate the workspace,
             // it just means cross-device discovery is delayed until the next sync cycle.
             Either.catch { userRemoteRepository.addWorkspaceRef(firebaseUid, newId) }
-                .onLeft { log.w(it) { "[remote] addWorkspaceRef failed uid=$firebaseUid wid=${newId.value}" } }
-                .onRight { log.i { "[remote] addWorkspaceRef ok uid=$firebaseUid wid=${newId.value}" } }
+                .onLeft {
+                    log.w(it) {
+                        "[remote] addWorkspaceRef failed uid=${firebaseUid.redactUid()} wid=${newId.value}"
+                    }
+                }
+                .onRight {
+                    log.i { "[remote] addWorkspaceRef ok uid=${firebaseUid.redactUid()} wid=${newId.value}" }
+                }
             Either.catch { userRemoteRepository.setDefaultWorkspace(firebaseUid, newId) }
-                .onLeft { log.w(it) { "[remote] setDefaultWorkspace failed uid=$firebaseUid wid=${newId.value}" } }
-                .onRight { log.i { "[remote] setDefaultWorkspace ok uid=$firebaseUid wid=${newId.value}" } }
+                .onLeft {
+                    log.w(it) {
+                        "[remote] setDefaultWorkspace failed uid=${firebaseUid.redactUid()} wid=${newId.value}"
+                    }
+                }
+                .onRight {
+                    log.i { "[remote] setDefaultWorkspace ok uid=${firebaseUid.redactUid()} wid=${newId.value}" }
+                }
         } else {
             log.i { "[remote] skipped (no Firebase uid — local/demo session)" }
         }

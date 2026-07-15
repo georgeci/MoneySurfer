@@ -3,6 +3,8 @@ package com.georgeci.moneysurfer.data.repository
 import co.touchlab.kermit.Logger
 import com.georgeci.moneysurfer.data.db.dao.WorkspaceInviteDao
 import com.georgeci.moneysurfer.data.db.entity.WorkspaceInviteEntity
+import com.georgeci.moneysurfer.domain.logging.redactEmail
+import com.georgeci.moneysurfer.domain.logging.redactUid
 import com.georgeci.moneysurfer.domain.model.InviteStatus
 import com.georgeci.moneysurfer.domain.model.WorkspaceInvite
 import com.georgeci.moneysurfer.domain.model.WorkspaceRole
@@ -53,8 +55,8 @@ class WorkspaceInviteRepositoryImpl(
         )
         dao.upsert(entity)
         log.i {
-            "[upsert] id=${entity.id} wid=${entity.workspaceId} email=${entity.email} " +
-                "status=${entity.status} role=${entity.role} target=${entity.targetUserId} " +
+            "[upsert] id=${entity.id} wid=${entity.workspaceId} email=${entity.email.redactEmail()} " +
+                "status=${entity.status} role=${entity.role} target=${entity.targetUserId.redactUid()} " +
                 "isNew=$isNew updatedAt=${entity.updatedAt} expiresAt=${entity.expiresAt}"
         }
         enqueueUpsert(
@@ -90,7 +92,7 @@ class WorkspaceInviteRepositoryImpl(
         dao.upsert(updated)
         log.i {
             "[transition] id=${updated.id} wid=${updated.workspaceId} ${current.status}→$target " +
-                "email=${updated.email} respondedAt=${updated.respondedAt}"
+                "email=${updated.email.redactEmail()} respondedAt=${updated.respondedAt}"
         }
         enqueueUpsert(updated, MutationOperation.UPDATE)
     }
