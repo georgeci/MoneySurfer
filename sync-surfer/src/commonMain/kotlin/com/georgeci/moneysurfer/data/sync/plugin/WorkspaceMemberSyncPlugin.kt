@@ -68,7 +68,7 @@ class WorkspaceMemberSyncPlugin(
     }
 
     override suspend fun applyDoc(doc: RemoteDocument, scopeKey: String): EntityApplyResult {
-        val dto = doc.decode(WorkspaceMemberDoc.serializer())
+        val dto = doc.decodeOrNull(WorkspaceMemberDoc.serializer()) ?: return SKIPPED_APPLY_RESULT
         if (dto.deletedAt != null) {
             workspaceMemberDao.delete(userId = doc.id, workspaceId = scopeKey)
             return EntityApplyResult(applied = true, wasConflict = false)

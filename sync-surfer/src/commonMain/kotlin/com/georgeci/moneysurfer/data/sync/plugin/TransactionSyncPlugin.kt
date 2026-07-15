@@ -44,7 +44,7 @@ class TransactionSyncPlugin(
     }
 
     override suspend fun applyDoc(doc: RemoteDocument, scopeKey: String): EntityApplyResult {
-        val dto = doc.decode(TransactionDoc.serializer())
+        val dto = doc.decodeOrNull(TransactionDoc.serializer()) ?: return SKIPPED_APPLY_RESULT
         if (dto.deletedAt != null) {
             transactionDao.delete(doc.id)
             return EntityApplyResult(applied = true, wasConflict = false)

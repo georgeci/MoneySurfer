@@ -46,7 +46,7 @@ class AccountSyncPlugin(
     }
 
     override suspend fun applyDoc(doc: RemoteDocument, scopeKey: String): EntityApplyResult {
-        val dto = doc.decode(AccountDoc.serializer())
+        val dto = doc.decodeOrNull(AccountDoc.serializer()) ?: return SKIPPED_APPLY_RESULT
         if (dto.deletedAt != null) {
             transactionDao.deleteByAccountId(doc.id)
             accountDao.delete(doc.id)

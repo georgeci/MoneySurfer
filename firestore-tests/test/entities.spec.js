@@ -195,3 +195,154 @@ describe('member-gated entities (smoke for the rest)', () => {
     });
   }
 });
+
+// ── write-shape validation: poison-document guard (issue #156) ────────────────
+// A wrong-typed field on an entity write used to sail through the rules (only
+// membership + clientVersionCode were checked) and then crash every co-member's
+// pull when decode() hit the bad type. The rules now reject the malformed write.
+// Contract: a field is type-checked only WHEN PRESENT — a minimal doc that omits
+// default-valued fields must still pass — so we assert both the reject and the
+// accept side.
+describe('entity write-shape validation (issue #156)', () => {
+  let env;
+
+  before(async () => {
+    env = await getTestEnv();
+  });
+
+  after(async () => {
+    await shutdownTestEnv();
+  });
+
+  beforeEach(async () => {
+    await resetTestEnv();
+    await withAdmin(env, async (db) => {
+      await setDoc(doc(db, `workspaces/${WID}`), workspaceDoc({ ownerId: OWNER }));
+      await setDoc(
+        doc(db, `workspaces/${WID}/members/${MEMBER}`),
+        memberDoc({ role: 'EDITOR' }),
+      );
+      await setDoc(doc(db, `workspaces/${WID}/accounts/acc-1`), entityDoc());
+    });
+  });
+
+  const asMember = () => authedAs(env, MEMBER, { email: 'member@example.com' });
+
+  // AccountDoc — mirrors data-remote/.../RemoteDtos.kt
+  function accountDoc(overrides = {}) {
+    return {
+      name: 'Checking',
+      type: 'CASH',
+      currency: 'USD',
+      balance: 1000,
+      archived: false,
+      updatedAt: 1,
+      deletedAt: null,
+      clientVersionCode: CLIENT_VERSION,
+      ...overrides,
+    };
+  }
+
+  // TransactionDoc — mirrors data-remote/.../RemoteDtos.kt
+  function transactionDoc(overrides = {}) {
+    return {
+      accountId: 'acc-1',
+      amount: 500,
+      currencyCode: 'USD',
+      note: 'Groceries',
+      operationAt: 1,
+      operationDate: '2026-07-15',
+      type: 'EXPENSE',
+      status: 'ACTUAL',
+      createdAt: 1,
+      updatedAt: 1,
+      clientVersionCode: CLIENT_VERSION,
+      ...overrides,
+    };
+  }
+
+  it('accepts a fully-populated, correctly-typed account', async () => {
+    await assertSucceeds(
+      setDoc(doc(asMember(), `workspaces/${WID}/accounts/acc-ok`), accountDoc()),
+    );
+  });
+
+  it('accepts a minimal account (default-valued fields omitted)', async () => {
+    await assertSucceeds(
+      setDoc(
+        doc(asMember(), `workspaces/${WID}/accounts/acc-min`),
+        { name: 'Sparse', updatedAt: 1, clientVersionCode: CLIENT_VERSION },
+      ),
+    );
+  });
+
+  it('rejects an account whose numeric balance is a string', async () => {
+    await assertFails(
+      setDoc(
+        doc(asMember(), `workspaces/${WID}/accounts/acc-bad`),
+        accountDoc({ balance: 'lots' }),
+      ),
+    );
+  });
+
+  it('rejects an account whose boolean archived flag is a string', async () => {
+    await assertFails(
+      setDoc(
+        doc(asMember(), `workspaces/${WID}/accounts/acc-bad2`),
+        accountDoc({ archived: 'yes' }),
+      ),
+    );
+  });
+
+  it('rejects an account whose string name is a number', async () => {
+    await assertFails(
+      setDoc(
+        doc(asMember(), `workspaces/${WID}/accounts/acc-bad3`),
+        accountDoc({ name: 42 }),
+      ),
+    );
+  });
+
+  it('rejects a poison update of an existing account (balance as string)', async () => {
+    await assertFails(
+      updateDoc(doc(asMember(), `workspaces/${WID}/accounts/acc-1`), {
+        balance: 'abc',
+        updatedAt: 2,
+        clientVersionCode: CLIENT_VERSION,
+      }),
+    );
+  });
+
+  it('accepts a nullable field set explicitly to null (deletedAt)', async () => {
+    await assertSucceeds(
+      setDoc(
+        doc(asMember(), `workspaces/${WID}/accounts/acc-null`),
+        accountDoc({ deletedAt: null }),
+      ),
+    );
+  });
+
+  it('rejects a nullable field with a wrong non-null type (deletedAt as string)', async () => {
+    await assertFails(
+      setDoc(
+        doc(asMember(), `workspaces/${WID}/accounts/acc-baddel`),
+        accountDoc({ deletedAt: 'soon' }),
+      ),
+    );
+  });
+
+  it('accepts a correctly-typed transaction', async () => {
+    await assertSucceeds(
+      setDoc(doc(asMember(), `workspaces/${WID}/transactions/tx-ok`), transactionDoc()),
+    );
+  });
+
+  it('rejects the issue scenario: transaction amount as a string', async () => {
+    await assertFails(
+      setDoc(
+        doc(asMember(), `workspaces/${WID}/transactions/tx-poison`),
+        transactionDoc({ amount: 'abc' }),
+      ),
+    );
+  });
+});
