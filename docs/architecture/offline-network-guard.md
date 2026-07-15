@@ -1,5 +1,14 @@
 # Offline build network guard
 
+<!-- DOCS:TOC -->
+## Contents
+- [Offline build network guard](#offline-build-network-guard)
+- [Android](#android)
+- [iOS](#ios)
+- [Tripwire test (manual regression check)](#tripwire-test-manual-regression-check)
+- [Bypass](#bypass)
+<!-- DOCS:END -->
+
 The offline build (`androidApp-offline`, `iosAppOffline`) must never ship with
 networking capability. A transitive AAR or a Pod could silently re-introduce
 `android.permission.INTERNET` or a network entitlement, and we would only learn
