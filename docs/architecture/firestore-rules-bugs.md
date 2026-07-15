@@ -4,6 +4,10 @@
 ## Contents
 - [Firestore Rules — Bug List and Schema Gaps](#firestore-rules-bug-list-and-schema-gaps)
 - [TL;DR for agents](#tldr-for-agents)
+- [#8 — Invite-less workspace join breaks tenant isolation](#8-invite-less-workspace-join-breaks-tenant-isolation)
+  - [Problem](#problem)
+  - [Fix](#fix)
+  - [Why not a Cloud Function / deterministic invite id](#why-not-a-cloud-function-deterministic-invite-id)
 - [#3 — addWorkspaceRef after failed syncWorkspace (root cause)](#3-addworkspaceref-after-failed-syncworkspace-root-cause)
   - [Symptom](#symptom)
   - [Origin](#origin)
@@ -30,7 +34,7 @@
 
 ## TL;DR for agents
 
-- Journal of issues found while reviewing `firestore.rules`. One HIGH-severity bug (#3) is fixed; the rest are deferred low/medium hazards.
+- Journal of issues found while reviewing `firestore.rules`. Two HIGH-severity bugs (#8 invite-less join, #3 addWorkspaceRef) are fixed; the rest are deferred low/medium hazards.
 - Format per entry: **Problem → Severity → Fix → Status**.
 - Rules themselves are correct on the happy path; the gaps are missing defensive coverage for edge cases.
 - App-side bug #3 used to exploit that missing defence — now patched in `CreateWorkspaceUseCase`.
@@ -43,6 +47,49 @@ READ WHEN:
 - adding a new top-level Firestore collection
 
 Related: [app-version-gate](app-version-gate.md), [persistence](persistence.md).
+
+<!-- AI:SECTION id=rules-bug-8 task=firestore-rules,members,invites,tenant-isolation -->
+## #8 — Invite-less workspace join breaks tenant isolation
+
+**Severity:** HIGH — breaks per-workspace tenant isolation. **Status:** ✅ Fixed (issue #152, rules v2.1.0).
+
+### Problem
+
+The old `members/{uid}` create rule was:
+
+```firestore
+allow create:
+  if (isOwner(wid) || request.auth.uid == uid) && hasValidClientVersion();
+```
+
+The self-create branch (`request.auth.uid == uid`) let **any authenticated user** create their own member row in an arbitrary workspace with **no check that an invite targeting them exists**. Once the row existed, `isMember(wid)` returned true everywhere, so the intruder could read *and* write every `accounts`, `transactions`, `budgets`, `categories`, and `recurringRules` document in another household. The only barrier was knowing the (random) `wid` — which leaks via invite flows, logs (see the PII-logging issue), screenshots, and support channels — hence HIGH rather than Critical.
+
+It also defeated owner eviction: the self-`update` branch allowed `status in ["ACTIVE", "LEFT"]` regardless of the current status, so a user the owner had set to `REMOVED` could flip themselves back to `ACTIVE` and rejoin.
+
+### Fix
+
+Self-create is now gated on an **owner-issued invite that admits the caller**. Because only the owner can create an invite (see the invites block), a stranger has nothing to point at and cannot forge one.
+
+```firestore
+allow create:
+  if hasValidClientVersion() && (
+       (request.auth.uid == uid && hasJoinableInvite(wid))
+    || isOwner(wid)
+  );
+```
+
+`hasJoinableInvite(wid)` reads the invite id off the member doc (`request.resource.data.inviteId`), `exists()`-guards it, then `get()`s the invite and requires it to be `PENDING`/`ACCEPTED` **and** to address the caller by `targetUserId` or a case-insensitive email match. `PENDING`/`ACCEPTED` (not `PENDING` only) tolerates the invitee's own `PENDING → ACCEPTED` flip landing first and idempotent outbox retries; `CANCELLED`/`DECLINED` invites are excluded so a revoked invite grants nothing.
+
+The eviction bypass is closed by adding `resource.data.status != "REMOVED"` to the self-`update` branch — a `REMOVED` row can no longer self-resurrect; rejoining requires a fresh invite.
+
+Client side, `WorkspaceMemberSyncPlugin.push` stamps `inviteId` onto the pushed `WorkspaceMemberDoc` by looking up the admitting invite in local Room (`WorkspaceInviteDao.findJoinableInviteId`). No new persisted column — the id is derived at push time, so there is **no Room migration**. Owner-created rows carry a null `inviteId` and are admitted by the owner branch.
+
+Tests: `firestore-tests/test/members.spec.js` — the old "self-create succeeds with no invite" test is now "non-invited stranger CANNOT self-create", plus positive (PENDING / ACCEPTED / email-only), negative (wrong target, cancelled, dangling id), and "REMOVED cannot self-resurrect" cases.
+
+### Why not a Cloud Function / deterministic invite id
+
+The repo has no Cloud Functions deployment, and invite doc ids are random UUIDs (one email may have several), so rules cannot compute the invite path from `wid`+`uid` alone. Carrying the invite id on the member doc lets the rule verify the unforgeable owner-issued binding without a query or a function hop. `users/{uid}.invitedWorkspaceIds` was rejected as a signal — it is writable by any signed-in user (the invite-sender seeding path), so it is forgeable by the attacker.
+<!-- AI:END -->
 
 <!-- AI:SECTION id=rules-bug-3 task=firestore-rules,bootstrap,permission-denied -->
 ## #3 — `addWorkspaceRef` after failed `syncWorkspace` (root cause)
@@ -253,6 +300,7 @@ Grep the data layer — nobody should be doing top-level lists of `workspaces`. 
 
 | # | Topic | Severity | Status |
 |---|-------|----------|--------|
+| 8 | Invite-less workspace join breaks tenant isolation | HIGH | ✅ Fixed |
 | 3 | `addWorkspaceRef` after failed `syncWorkspace` | HIGH | ✅ Fixed |
 | 1 | `clientVersionCode >= 1` — fake gate | MEDIUM | ⏳ Deferred |
 | 6 | No `workspaceId` payload validation in subcollections | MEDIUM | ⏳ Deferred |

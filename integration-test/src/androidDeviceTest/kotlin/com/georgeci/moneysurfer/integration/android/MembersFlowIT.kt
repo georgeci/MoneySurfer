@@ -5,6 +5,7 @@ import arrow.core.Either
 import com.georgeci.moneysurfer.data.db.entity.UserEntity
 import com.georgeci.moneysurfer.data.db.entity.WorkspaceEntity
 import com.georgeci.moneysurfer.data.db.entity.WorkspaceMemberEntity
+import com.georgeci.moneysurfer.data.remote.WorkspaceInviteDoc
 import com.georgeci.moneysurfer.domain.primitives.UserId
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 import com.georgeci.moneysurfer.sync.api.SimpleCancelToken
@@ -152,8 +153,10 @@ class MembersFlowIT {
     // ── 2. Invitee creates own member row ─────────────────────────────────────
 
     /**
-     * Firestore rule `request.auth.uid == uid` on the members sub-collection allows the
-     * invitee to write their own member doc. This is the accept-invite happy path.
+     * Accept-invite happy path: the invitee may write their own member doc ONLY when it
+     * carries the id of an owner-issued invite that admits them. Mirrors the production
+     * push (WorkspaceMemberSyncPlugin stamps `inviteId`) and the tenant-isolation gate
+     * added for issue #152.
      */
     @Test
     fun invitee_can_create_own_member_row() = runTest {
@@ -173,20 +176,35 @@ class MembersFlowIT {
         val now = System.currentTimeMillis()
         val ownerFs = ownerHarness.env.firestore
 
-        // Owner creates workspace + own member row.
+        // Owner creates workspace + own member row + a PENDING invite for the invitee.
         ownerFs.collection("workspaces").document(workspaceId.value).set(
             workspaceMap("Members Create IT $tag", ownerUid, now),
         )
         ownerFs.collection("workspaces").document(workspaceId.value)
             .collection("members").document(ownerUid)
             .set(memberMap(ownerUid, ownerEmail, "OWNER", now))
+        val inviteId = "it-mem-create-inv-$tag"
+        ownerFs.collection("workspaces").document(workspaceId.value)
+            .collection("invites").document(inviteId).set(
+                WorkspaceInviteDoc(
+                    email = inviteeEmail,
+                    targetUserId = inviteeUid,
+                    role = "EDITOR",
+                    status = "PENDING",
+                    invitedByUserId = ownerUid,
+                    createdAt = now,
+                    updatedAt = now,
+                    expiresAt = now + 14L * 24 * 60 * 60 * 1000,
+                    clientVersionCode = 1,
+                ),
+            )
 
-        // Invitee writes their own member row (mirrors AcceptInviteUseCase).
-        // Signed-in as inviteeUid; doc id == inviteeUid → rule `request.auth.uid == uid`.
+        // Invitee writes their own member row (mirrors AcceptInviteUseCase + the plugin
+        // push). The doc must carry the admitting invite id or the rule denies it.
         val inviteeFs = memberHarness.env.firestore
         inviteeFs.collection("workspaces").document(workspaceId.value)
             .collection("members").document(inviteeUid)
-            .set(memberMap(inviteeUid, inviteeEmail, "EDITOR", now))
+            .set(memberMap(inviteeUid, inviteeEmail, "EDITOR", now, inviteId = inviteId))
 
         // Verify the row is visible to the owner (exercising isMember read rule).
         val snap = ownerFs.collection("workspaces").document(workspaceId.value)
@@ -374,7 +392,13 @@ class MembersFlowIT {
         "clientVersionCode" to 1,
     )
 
-    private fun memberMap(uid: String, email: String, role: String, now: Long) = mapOf(
+    private fun memberMap(
+        uid: String,
+        email: String,
+        role: String,
+        now: Long,
+        inviteId: String? = null,
+    ) = mapOf(
         "userId" to uid,
         "role" to role,
         "status" to "ACTIVE",
@@ -384,5 +408,6 @@ class MembersFlowIT {
         "createdAt" to now,
         "updatedAt" to now,
         "clientVersionCode" to 1,
+        "inviteId" to inviteId,
     )
 }

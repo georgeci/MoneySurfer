@@ -1,5 +1,6 @@
 package com.georgeci.moneysurfer.data.sync.plugin
 import com.georgeci.moneysurfer.data.db.dao.UserDao
+import com.georgeci.moneysurfer.data.db.dao.WorkspaceInviteDao
 import com.georgeci.moneysurfer.data.db.dao.WorkspaceMemberDao
 import com.georgeci.moneysurfer.data.db.entity.UserEntity
 import com.georgeci.moneysurfer.data.remote.WorkspaceMemberDoc
@@ -24,6 +25,7 @@ class WorkspaceMemberSyncPlugin(
     private val appInfo: AppInfo,
     private val conflictResolver: ConflictResolver,
     private val workspaceMemberDao: WorkspaceMemberDao,
+    private val workspaceInviteDao: WorkspaceInviteDao,
     private val userDao: UserDao,
 ) : SyncEntityPlugin {
 
@@ -42,7 +44,20 @@ class WorkspaceMemberSyncPlugin(
                     userId = mutation.entityId,
                     workspaceId = scopeKey,
                 ) ?: return
-                docRef.set(entity.toDoc().copy(clientVersionCode = appInfo.versionCode))
+                // Stamp the admitting invite so the rules can authorize the accept-invite
+                // self-create (issue #152). Null for owner-created rows — the owner branch
+                // in the rules does not consult it.
+                val inviteId = workspaceInviteDao.findJoinableInviteId(
+                    workspaceId = scopeKey,
+                    userId = entity.userId,
+                    email = entity.email,
+                )
+                docRef.set(
+                    entity.toDoc().copy(
+                        clientVersionCode = appInfo.versionCode,
+                        inviteId = inviteId,
+                    ),
+                )
             }
             MutationOperation.DELETE -> docRef.delete()
         }

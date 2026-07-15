@@ -106,6 +106,12 @@ data class WorkspaceMemberDoc(
     val removedAt: Long? = null,
     val deletedAt: Long? = null,
     val clientVersionCode: Int = 1,
+    // Id of the owner-issued invite this member row was created from. Firestore rules
+    // require it on self-create so they can verify an invite in this workspace admits
+    // the caller (tenant-isolation gate, issue #152). Stamped by WorkspaceMemberSyncPlugin
+    // at push time from the local invite; null for owner-created rows (owner path in the
+    // rules does not need it) and absent on legacy docs.
+    val inviteId: String? = null,
 )
 
 /**

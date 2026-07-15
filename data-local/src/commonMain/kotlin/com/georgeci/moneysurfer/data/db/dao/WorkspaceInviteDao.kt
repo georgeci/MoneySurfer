@@ -27,6 +27,27 @@ interface WorkspaceInviteDao {
     @Query("SELECT * FROM workspace_invites WHERE id = :id")
     suspend fun getById(id: String): WorkspaceInviteEntity?
 
+    // Id of a still-joinable invite in [workspaceId] that admits the given member —
+    // matched by targetUserId or, for email-only invites, a case-insensitive email
+    // match. Stamped onto the pushed member doc so Firestore rules can verify the
+    // accept-invite self-create (issue #152). PENDING is preferred over ACCEPTED so a
+    // fresh invite wins over a stale terminal one; nulls when nothing admits the member.
+    @Query(
+        """
+        SELECT id FROM workspace_invites
+        WHERE workspaceId = :workspaceId
+          AND status IN ('PENDING', 'ACCEPTED')
+          AND (targetUserId = :userId OR (:email IS NOT NULL AND lower(email) = lower(:email)))
+        ORDER BY CASE status WHEN 'PENDING' THEN 0 ELSE 1 END, updatedAt DESC
+        LIMIT 1
+        """,
+    )
+    suspend fun findJoinableInviteId(
+        workspaceId: String,
+        userId: String,
+        email: String?,
+    ): String?
+
     @Insert
     suspend fun insert(entity: WorkspaceInviteEntity)
 
