@@ -25,15 +25,34 @@ holds the Firebase config secrets and `SONAR_TOKEN`).
 
 2. **Dependency locking** ([`build.gradle.kts`](../../build.gradle.kts), the
    `allprojects { dependencyLocking { … } }` block). `lockAllConfigurations()`
-   pins every resolved transitive version. The committed `gradle.lockfile` per
-   module — plus the root `gradle.lockfile` and `settings-gradle.lockfile` (the
-   plugin/settings classpath) — is the source of truth; a build that resolves a
-   version **not** in the lock state fails with
-   `dependencies … not part of the dependency lock state`.
+   pins every resolved transitive version of each project's **dependency**
+   configurations. The committed lockfiles are the source of truth; a build that
+   resolves a version **not** in the lock state fails with
+   `dependencies … not part of the dependency lock state`:
+   - a `gradle.lockfile` per module — the app / library / test dependency graph;
+   - the root `gradle.lockfile` — the root project's tooling configurations
+     (Kover, CPD, Sonar, detekt, module-graph);
+   - `settings-gradle.lockfile` — the settings-level resolution, which here is
+     just the version catalog (`incomingCatalogForLibs0`).
 
-Locking pins **versions**, not artifact **content**: a republish under the same
-coordinate + version is not detected yet. That is what checksum verification (see
-[future work](#known-gaps--future-work)) adds on top.
+3. **Buildscript (plugin) classpath locking.** The Gradle plugins applied via the
+   `plugins { }` DSL (AGP, Kotlin, Compose, KSP, detekt, koin-compiler, the Play
+   publisher, …) resolve on the *buildscript classpath*, which
+   `lockAllConfigurations()` does not reach. Each project's classpath is pinned in
+   a separate `buildscript-gradle.lockfile` by
+   `resolutionStrategy.activateDependencyLocking()`:
+   - for **subprojects**, activated in the `allprojects { }` block;
+   - for the **root** project, activated in a top-of-file `buildscript { }` block
+     — the `allprojects { }` activation runs too late, after the root classpath
+     has already resolved, so the shared plugins (AGP, KGP, Compose, detekt) would
+     otherwise stay unpinned.
+
+   Still open: the `build-logic` included build and the settings-level plugin
+   resolution — see [future work](#known-gaps--future-work).
+
+Locking also pins **versions**, not artifact **content**: a republish under the
+same coordinate + version is not detected yet. That is what checksum verification
+(see [future work](#known-gaps--future-work)) adds on top.
 
 ## Regenerating the lockfiles
 
@@ -96,11 +115,14 @@ These were scoped out of #158's first pass and should each land as follow-ups:
    checksums but higher maintenance (trusted-key management, many unsigned
    artifacts need `<trusted-artifacts>` entries). Layer on after (1) is stable.
 
-3. **`build-logic` included build.** The convention-plugin build resolves its own
-   plugin classpath from `gradlePluginPortal()` and is a separate Gradle build,
-   so root `allprojects` locking does not reach it. Enable
-   `dependencyLocking` inside [`build-logic`](../../build-logic) and commit its
-   lockfiles too.
+3. **`build-logic` included build + settings plugin resolution.** Project
+   buildscript classpaths are locked (see above), but two plugin-resolution paths
+   are not yet covered: the `build-logic` convention-plugin build (a separate
+   Gradle build, so root `allprojects` / root `buildscript` locking does not
+   reach it — enable `dependencyLocking` inside
+   [`build-logic`](../../build-logic) and commit its lockfiles), and the
+   settings-level `pluginManagement` resolution (`foojay-resolver`), which the
+   root `buildscript { }` block does not lock.
 
 4. **Gradle wrapper + GitHub Actions pinning** is tracked separately in
    [#164](https://github.com/georgeci/MoneySurfer/issues/164) (wrapper sha256,

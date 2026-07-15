@@ -1,3 +1,13 @@
+// Lock the root buildscript classpath *before* the `plugins { }` block resolves
+// it, so the shared Gradle plugins declared here (AGP, Kotlin, Compose, detekt,
+// …) are pinned. The `allprojects { }` activation below runs too late for the
+// root project's own classpath — see docs/security/supply-chain.md.
+buildscript {
+    configurations.named("classpath") {
+        resolutionStrategy.activateDependencyLocking()
+    }
+}
+
 plugins {
     alias(libs.plugins.androidApplication) apply false
     alias(libs.plugins.androidLibrary) apply false
@@ -92,6 +102,17 @@ allprojects {
     dependencyLocking {
         lockAllConfigurations()
         ignoredDependencies.addAll(hostVariantDependencies)
+    }
+
+    // `lockAllConfigurations()` covers project dependency configurations but not
+    // the buildscript classpath — where the Gradle plugins applied via the
+    // `plugins { }` DSL (Kotlin, KSP, koin-compiler, …) actually resolve. Lock it
+    // too so a compromised plugin republish cannot float into a build. The
+    // pinned versions land in a separate `buildscript-gradle.lockfile`.
+    buildscript {
+        configurations.named("classpath") {
+            resolutionStrategy.activateDependencyLocking()
+        }
     }
 
     // `./gradlew resolveAndLockAll --write-locks --no-configuration-cache`
