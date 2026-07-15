@@ -69,6 +69,50 @@ tasks.named<de.aaschmid.gradle.plugins.cpd.Cpd>("cpdCheck") {
     }
 }
 
+// --- Supply-chain hardening: dependency locking (issue #158) -----------------
+// Pin every resolved transitive version so a mutable/republished transitive
+// (or a plugin-portal compromise that floats a version) cannot silently drift
+// into a release or CI build. Locking only enforces where a `gradle.lockfile`
+// exists; regenerate after any dependency change with:
+//   ./gradlew resolveAndLockAll --write-locks --no-configuration-cache
+// See docs/supply-chain.md for the full workflow (incl. the macOS-host iOS /
+// Android-release configs and the remaining checksum-verification follow-up).
+//
+// Desktop artifacts from Compose (`skiko`, `compose.desktop`) encode the host
+// OS + arch in their *module name* (…-macos-arm64 vs …-linux-x64). A single
+// committed lockfile must stay valid on both the macOS and Ubuntu CI runners,
+// so these host-variant families are excluded from the lock state rather than
+// pinned to whichever host generated the file.
+val hostVariantDependencies = listOf(
+    "org.jetbrains.skiko:*",
+    "org.jetbrains.compose.desktop:*",
+)
+
+allprojects {
+    dependencyLocking {
+        lockAllConfigurations()
+        ignoredDependencies.addAll(hostVariantDependencies)
+    }
+
+    // `./gradlew resolveAndLockAll --write-locks --no-configuration-cache`
+    // resolves every resolvable configuration in one pass so the lockfiles are
+    // written in a single invocation. Kept out of the configuration cache
+    // because it filters configurations at execution time.
+    tasks.register("resolveAndLockAll") {
+        notCompatibleWithConfigurationCache("Resolves configurations at execution time")
+        doFirst {
+            require(gradle.startParameter.isWriteDependencyLocks) {
+                "Run resolveAndLockAll with --write-locks to (re)generate lockfiles."
+            }
+        }
+        doLast {
+            configurations
+                .filter { it.isCanBeResolved }
+                .forEach { it.incoming.artifactView { lenient(true) }.artifacts.artifacts }
+        }
+    }
+}
+
 subprojects {
     apply(plugin = "io.gitlab.arturbosch.detekt")
 
