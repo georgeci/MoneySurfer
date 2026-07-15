@@ -46,7 +46,9 @@ class WorkspaceInviteSyncPlugin(
                 }
                 docRef.set(dto)
             }
-            MutationOperation.DELETE -> docRef.delete()
+            MutationOperation.DELETE -> docRef.pushTombstone(
+                tombstonePatchFor(mutation, clientVersionCode = appInfo.versionCode),
+            )
         }
     }
 

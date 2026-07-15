@@ -290,7 +290,7 @@ Notes:
 
 | Entity type                  | Path |
 |------------------------------|------|
-| `WORKSPACE`                  | `workspaces/{id}` directly. `INSERT` / `UPDATE` use `set(...)`, `DELETE` uses `delete()`. |
+| `WORKSPACE`                  | `workspaces/{id}` directly. `INSERT` / `UPDATE` use `set(...)`, `DELETE` writes a soft-delete tombstone (see below). |
 | `ACCOUNT`                    | `workspaces/{wid}/accounts/{id}` |
 | `CATEGORY`                   | `workspaces/{wid}/categories/{id}` |
 | `TRANSACTION`                | `workspaces/{wid}/transactions/{id}` |
@@ -305,6 +305,13 @@ field, so a row last written by an older client gets upgraded the next
 time a current build pushes any version of it. This matches the Firestore
 Rules `hasValidClientVersion()` enforcement described in
 [app-version-gate.md](app-version-gate.md).
+
+`MutationOperation.DELETE` never calls `firestore.delete()` — the rules
+deny hard deletes on every entity collection. Instead every plugin pushes
+a `TombstonePatch` (`deletedAt` + `updatedAt` + `clientVersionCode`) via
+a field-mask `update`, skipping docs that never reached Firestore. Full
+contract in
+[sync-pull-lww.md → Tombstones](sync-pull-lww.md#tombstones-soft-delete).
 
 ## Demo + version gate at the entry
 
@@ -393,7 +400,7 @@ UI tap → ViewModel → DomainUseCase
        │
        ├ pending(scope, limit)        — read up to 100 PENDING rows
        ├ markInFlight(ids)            — atomic flip
-       ├ for each: pushOne(...)       — Firestore set/delete
+       ├ for each: pushOne(...)       — Firestore set / tombstone update
        │     onProgress → coordinator → SyncStep.UploadingEntity
        ├ markCompleted(done)          — deletes rows from pending_mutations
        └ on failure: markFailed(...)  — resets to PENDING, attempts++

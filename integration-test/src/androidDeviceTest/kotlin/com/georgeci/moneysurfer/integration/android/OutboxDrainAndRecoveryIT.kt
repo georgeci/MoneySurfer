@@ -10,11 +10,11 @@ import com.georgeci.moneysurfer.data.remote.AccountDoc
 import com.georgeci.moneysurfer.domain.primitives.UserId
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 import com.georgeci.moneysurfer.domain.sync.SyncEntityTypes
+import com.georgeci.moneysurfer.domain.sync.UploadSummary
 import com.georgeci.moneysurfer.sync.api.SimpleCancelToken
 import com.georgeci.moneysurfer.sync.api.SyncScope
 import com.georgeci.moneysurfer.sync.repository.MutationOperation
 import com.georgeci.moneysurfer.sync.repository.PendingMutation
-import com.georgeci.moneysurfer.domain.sync.UploadSummary
 import io.kotest.assertions.withClue
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.ints.shouldBeGreaterThanOrEqual

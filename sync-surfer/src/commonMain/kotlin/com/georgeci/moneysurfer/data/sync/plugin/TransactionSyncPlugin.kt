@@ -37,7 +37,9 @@ class TransactionSyncPlugin(
                 val entity = transactionDao.getById(mutation.entityId) ?: return
                 docRef.set(entity.toDoc().copy(clientVersionCode = appInfo.versionCode))
             }
-            MutationOperation.DELETE -> docRef.delete()
+            MutationOperation.DELETE -> docRef.pushTombstone(
+                tombstonePatchFor(mutation, clientVersionCode = appInfo.versionCode),
+            )
         }
     }
 

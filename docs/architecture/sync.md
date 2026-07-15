@@ -28,6 +28,10 @@ READ WHEN:
 - Firestore, Room, and DataStore implementations stay outside `sync`.
 - Write path uses local persistence first, then pending mutation enqueue.
 - Pull path uses cursor-based last-write-wins and tombstones.
+- Push path replicates deletes as soft-delete tombstones (`deletedAt` +
+  `updatedAt` update) — never `firestore.delete()`; rules deny hard deletes.
+- Changes to `firestore.rules` or to the push wire shape need rules tests in
+  [`firestore-tests/`](../../firestore-tests/) (Mocha suite, `npm test`).
 - Known gaps must be checked before claiming sync is complete.
 
 ## Source Notes

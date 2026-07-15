@@ -247,16 +247,30 @@ has been deleted on a peer device". The current pull behaviour:
 - The cursor still advances past tombstones — the doc has a real
   `updatedAt`, just like any other update.
 
-The push side is symmetric for `MutationOperation.DELETE` only via
-Firestore `delete()` today (see
-[UploadPendingChangesUseCaseImpl.pushOne](../../sync-surfer/src/commonMain/kotlin/com/georgeci/moneysurfer/data/sync/UploadPendingChangesUseCaseImpl.kt)).
-The plan in the original sync plan (§4.4, Firestore schema changes) is to
-migrate to `update(deletedAt = serverTimestamp)` — that has not happened yet.
+The push side is symmetric: `MutationOperation.DELETE` writes a
+`TombstonePatch` — `deletedAt`, `updatedAt`, and `clientVersionCode`, all
+via a field-mask `update` — instead of `firestore.delete()` (see
+[TombstonePush.kt](../../sync-surfer/src/commonMain/kotlin/com/georgeci/moneysurfer/data/sync/plugin/TombstonePush.kt),
+shared by every `*SyncPlugin.push`). Firestore Rules deny hard deletes
+outright (`allow delete: if false` on every entity collection), so the
+tombstone update is the only delete shape the server accepts.
 
-Practical implication: a hard `firestore.delete()` from one device
-removes the doc; a peer pulling afterwards will not see anything (the
-doc is gone). The peer's local row stays. **This is a known gap** —
-listed in [sync-gaps.md](sync-gaps.md).
+Push-side tombstone contract:
+
+- `deletedAt` and `updatedAt` both take the mutation's **enqueue time**
+  (`PendingMutation.createdAt`), so a retried push writes an identical
+  patch (idempotent) and peers' `updatedAt > cursor` pulls fetch the
+  tombstone like any other update. Client clock, not
+  `serverTimestamp()` — the clock-skew caveat in
+  [sync-gaps.md](sync-gaps.md) applies to tombstones too.
+- A DELETE whose doc never reached Firestore (entity created and
+  deleted between two drains — the INSERT push no-ops once the Room row
+  is gone) is **skipped**: `pushTombstone` checks `get().exists` first.
+  Updating a missing doc would raise NOT_FOUND on every retry and wedge
+  the batch; a doc that never existed remotely has nothing for peers to
+  forget.
+- Tombstoned docs are never garbage-collected today — retention/GC is a
+  known gap, listed in [sync-gaps.md](sync-gaps.md).
 
 ## `WorkspaceInvite`
 

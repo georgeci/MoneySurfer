@@ -3,13 +3,13 @@ package com.georgeci.moneysurfer.integration.android
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import arrow.core.Either
 import com.georgeci.moneysurfer.data.db.entity.AccountEntity
+import com.georgeci.moneysurfer.domain.sync.PullSummary
 import com.georgeci.moneysurfer.domain.sync.SyncEntityTypes
+import com.georgeci.moneysurfer.domain.sync.UploadSummary
 import com.georgeci.moneysurfer.sync.api.SimpleCancelToken
 import com.georgeci.moneysurfer.sync.api.SyncCollection
 import com.georgeci.moneysurfer.sync.api.SyncScope
 import com.georgeci.moneysurfer.sync.repository.MutationOperation
-import com.georgeci.moneysurfer.domain.sync.PullSummary
-import com.georgeci.moneysurfer.domain.sync.UploadSummary
 import io.kotest.assertions.withClue
 import io.kotest.matchers.ints.shouldBeGreaterThanOrEqual
 import io.kotest.matchers.nulls.shouldNotBeNull
