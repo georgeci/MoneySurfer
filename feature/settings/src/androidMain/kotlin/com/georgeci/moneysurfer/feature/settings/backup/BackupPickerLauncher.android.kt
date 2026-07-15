@@ -13,6 +13,7 @@ import okio.source
 
 @Composable
 actual fun rememberBackupPickerLauncher(
+    format: BackupPickerFormat,
     onSavePicked: (BufferedSink?) -> Unit,
     onOpenPicked: (BufferedSource?) -> Unit,
 ): BackupPickerLauncher {
@@ -20,7 +21,7 @@ actual fun rememberBackupPickerLauncher(
     val resolver = context.contentResolver
 
     val saveLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.CreateDocument(MIME_TYPE_ZIP),
+        contract = ActivityResultContracts.CreateDocument(format.saveMimeType),
     ) { uri ->
         val sink = uri?.let { resolver.openOutputStream(it)?.sink()?.buffer() }
         onSavePicked(sink)
@@ -33,17 +34,14 @@ actual fun rememberBackupPickerLauncher(
         onOpenPicked(source)
     }
 
-    return remember(saveLauncher, openLauncher) {
+    return remember(saveLauncher, openLauncher, format) {
         object : BackupPickerLauncher {
             override fun launchSave(suggestedName: String) {
                 saveLauncher.launch(suggestedName)
             }
             override fun launchOpen() {
-                openLauncher.launch(arrayOf(MIME_TYPE_ZIP, MIME_TYPE_OCTET_STREAM))
+                openLauncher.launch(format.openMimeTypes.toTypedArray())
             }
         }
     }
 }
-
-private const val MIME_TYPE_ZIP = "application/zip"
-private const val MIME_TYPE_OCTET_STREAM = "application/octet-stream"

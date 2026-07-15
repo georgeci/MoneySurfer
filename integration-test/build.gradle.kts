@@ -87,6 +87,9 @@ kotlin {
             implementation(libs.kotlinx.coroutinesCore)
             implementation(libs.kotlinx.datetime)
             implementation(libs.arrow.core)
+
+            // CSV export/import use cases stream through okio sinks/sources.
+            implementation(libs.okio)
         }
 
         // ── Android device test suite ────────────────────────────────────────

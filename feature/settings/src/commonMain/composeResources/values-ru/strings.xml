@@ -43,6 +43,29 @@
     <string name="settings_dynamic_colors_supporting">Цвета из системной палитры</string>
 
     <string name="settings_export_csv">Экспорт в CSV</string>
+
+    <!-- CSV export/import screen -->
+    <string name="settings_csv_title">Экспорт и импорт CSV</string>
+    <string name="settings_csv_supporting">Сохранить или восстановить транзакции в CSV-файле</string>
+    <string name="settings_csv_hero_title">Локальный CSV-бэкап</string>
+    <string name="settings_csv_hero_supporting">Экспортируйте все транзакции в CSV-файл или добавьте ранее экспортированный файл обратно. Существующие строки пропускаются.</string>
+    <string name="settings_csv_section_export">Экспорт</string>
+    <string name="settings_csv_export_supporting">Все транзакции на этом устройстве</string>
+    <string name="settings_csv_section_import">Импорт</string>
+    <string name="settings_csv_import_title">Импорт из CSV</string>
+    <string name="settings_csv_import_supporting">Строки добавляются; дубликаты по id пропускаются</string>
+    <string name="settings_csv_export_success">Экспортировано транзакций: %1$d</string>
+    <string name="settings_csv_import_result">Импортировано %1$d · пропущено %2$d · ошибок %3$d</string>
+    <string name="settings_csv_notice_invalid_file">Выбранный файл не является CSV транзакций MoneySurfer</string>
+    <string name="settings_csv_notice_generic">Операция с CSV не удалась</string>
+    <string name="settings_csv_section_last_import">Последний импорт</string>
+    <string name="settings_csv_last_import_summary">Импортировано %1$d, пропущено дубликатов %2$d, ошибок %3$d</string>
+    <string name="settings_csv_row_error_format">Строка %1$d: %2$s</string>
+    <string name="settings_csv_issue_columns">ожидалось столбцов: %1$d, получено %2$d</string>
+    <string name="settings_csv_issue_invalid_value">неверное значение в столбце «%1$s»</string>
+    <string name="settings_csv_issue_unknown_workspace">неизвестное рабочее пространство %1$s</string>
+    <string name="settings_csv_issue_unknown_account">неизвестный счёт %1$s</string>
+    <string name="settings_csv_issue_unknown_category">неизвестная категория %1$s</string>
     <string name="settings_notifications">Уведомления</string>
     <string name="settings_notifications_supporting">Оповещения о бюджете, еженедельная сводка</string>
 

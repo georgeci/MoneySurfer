@@ -125,26 +125,31 @@ class SettingsViewModel(
 
     override fun onEvent(event: SettingsEvent) {
         when (event) {
-            SettingsEvent.OnBackClick -> postSideEffect(SettingsEffect.NavigateBack)
-            SettingsEvent.OnChangeWorkspaceClick ->
-                postSideEffect(SettingsEffect.NavigateToWorkspaceSelector)
-            SettingsEvent.OnIncomingInvitesClick ->
-                postSideEffect(SettingsEffect.NavigateToIncomingInvites)
             SettingsEvent.OnMembersClick -> {
                 val workspaceId = currentState.currentWorkspaceId
                 if (workspaceId != null) {
                     postSideEffect(SettingsEffect.NavigateToMembers(workspaceId))
                 }
             }
-            SettingsEvent.OnFinishSetupClick -> postSideEffect(SettingsEffect.NavigateToFinishSetup)
-            SettingsEvent.OnCategoriesClick -> postSideEffect(SettingsEffect.NavigateToCategories)
-            SettingsEvent.OnAppearanceClick -> postSideEffect(SettingsEffect.NavigateToAppearance)
-            SettingsEvent.OnPreferencesClick -> postSideEffect(SettingsEffect.NavigateToPreferences)
-            SettingsEvent.OnSyncClick -> postSideEffect(SettingsEffect.NavigateToSync)
-            SettingsEvent.OnBackupClick -> postSideEffect(SettingsEffect.NavigateToBackup)
-            SettingsEvent.OnAboutClick -> postSideEffect(SettingsEffect.NavigateToAbout)
             SettingsEvent.OnLogoutClick -> logout()
+            else -> navigationEffect(event)?.let(::postSideEffect)
         }
+    }
+
+    /** Plain event → destination mapping; stateful events are handled in [onEvent]. */
+    private fun navigationEffect(event: SettingsEvent): SettingsEffect? = when (event) {
+        SettingsEvent.OnBackClick -> SettingsEffect.NavigateBack
+        SettingsEvent.OnChangeWorkspaceClick -> SettingsEffect.NavigateToWorkspaceSelector
+        SettingsEvent.OnIncomingInvitesClick -> SettingsEffect.NavigateToIncomingInvites
+        SettingsEvent.OnFinishSetupClick -> SettingsEffect.NavigateToFinishSetup
+        SettingsEvent.OnCategoriesClick -> SettingsEffect.NavigateToCategories
+        SettingsEvent.OnAppearanceClick -> SettingsEffect.NavigateToAppearance
+        SettingsEvent.OnPreferencesClick -> SettingsEffect.NavigateToPreferences
+        SettingsEvent.OnSyncClick -> SettingsEffect.NavigateToSync
+        SettingsEvent.OnBackupClick -> SettingsEffect.NavigateToBackup
+        SettingsEvent.OnCsvBackupClick -> SettingsEffect.NavigateToCsvBackup
+        SettingsEvent.OnAboutClick -> SettingsEffect.NavigateToAbout
+        SettingsEvent.OnMembersClick, SettingsEvent.OnLogoutClick -> null
     }
 
     private fun logout() {
@@ -186,6 +191,7 @@ sealed interface SettingsEvent {
     data object OnPreferencesClick : SettingsEvent
     data object OnSyncClick : SettingsEvent
     data object OnBackupClick : SettingsEvent
+    data object OnCsvBackupClick : SettingsEvent
     data object OnAboutClick : SettingsEvent
     data object OnLogoutClick : SettingsEvent
 }
@@ -201,5 +207,6 @@ sealed interface SettingsEffect {
     data object NavigateToPreferences : SettingsEffect
     data object NavigateToSync : SettingsEffect
     data object NavigateToBackup : SettingsEffect
+    data object NavigateToCsvBackup : SettingsEffect
     data object NavigateToAbout : SettingsEffect
 }

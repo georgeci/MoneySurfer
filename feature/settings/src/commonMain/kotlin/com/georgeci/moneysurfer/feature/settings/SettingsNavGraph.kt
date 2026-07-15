@@ -5,6 +5,7 @@ import androidx.compose.material3.adaptive.navigation3.ListDetailSceneStrategy
 import com.georgeci.moneysurfer.feature.settings.about.AboutScreen
 import com.georgeci.moneysurfer.feature.settings.appearance.AppearanceScreen
 import com.georgeci.moneysurfer.feature.settings.backup.BackupScreen
+import com.georgeci.moneysurfer.feature.settings.csv.CsvBackupScreen
 import com.georgeci.moneysurfer.feature.settings.preferences.PreferencesScreen
 import com.georgeci.moneysurfer.feature.settings.sync.SyncScreen
 import com.georgeci.moneysurfer.navigation.FeatureNavGraph
@@ -31,6 +32,7 @@ val settingsNavGraph: FeatureNavGraph = { navigator ->
             onNavigateToPreferences = { navigator.push(Route.SettingsPreferences) },
             onNavigateToSync = { navigator.push(Route.SettingsSync) },
             onNavigateToBackup = { navigator.push(Route.SettingsBackup) },
+            onNavigateToCsvBackup = { navigator.push(Route.SettingsCsv) },
             onNavigateToAbout = { navigator.push(Route.SettingsAbout) },
         )
     }
@@ -57,6 +59,12 @@ val settingsNavGraph: FeatureNavGraph = { navigator ->
         metadata = ListDetailSceneStrategy.detailPane(),
     ) {
         BackupScreen(onNavigateBack = { navigator.pop() })
+    }
+
+    entry<Route.SettingsCsv>(
+        metadata = ListDetailSceneStrategy.detailPane(),
+    ) {
+        CsvBackupScreen(onNavigateBack = { navigator.pop() })
     }
 
     entry<Route.SettingsAbout>(

@@ -21,6 +21,7 @@ import okio.BufferedSource
  */
 @Composable
 actual fun rememberBackupPickerLauncher(
+    @Suppress("UNUSED_PARAMETER") format: BackupPickerFormat,
     onSavePicked: (BufferedSink?) -> Unit,
     onOpenPicked: (BufferedSource?) -> Unit,
 ): BackupPickerLauncher = remember(onSavePicked, onOpenPicked) {

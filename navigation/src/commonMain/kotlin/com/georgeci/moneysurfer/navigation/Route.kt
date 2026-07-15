@@ -114,5 +114,8 @@ sealed interface Route : NavKey {
     data object SettingsBackup : Route
 
     @Serializable
+    data object SettingsCsv : Route
+
+    @Serializable
     data object SettingsAbout : Route
 }

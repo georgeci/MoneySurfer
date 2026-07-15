@@ -21,6 +21,7 @@ import okio.BufferedSource
  */
 @Composable
 expect fun rememberBackupPickerLauncher(
+    format: BackupPickerFormat,
     onSavePicked: (BufferedSink?) -> Unit,
     onOpenPicked: (BufferedSource?) -> Unit,
 ): BackupPickerLauncher
@@ -28,4 +29,29 @@ expect fun rememberBackupPickerLauncher(
 interface BackupPickerLauncher {
     fun launchSave(suggestedName: String)
     fun launchOpen()
+}
+
+/**
+ * File format the picker is launched for. Only Android consumes the MIME
+ * types (SAF document contracts); JVM's `FileDialog` and the iOS stub ignore
+ * them. `application/octet-stream` stays in the open list because some
+ * providers report generic types for perfectly valid files.
+ */
+enum class BackupPickerFormat(
+    val saveMimeType: String,
+    val openMimeTypes: List<String>,
+) {
+    Zip(
+        saveMimeType = "application/zip",
+        openMimeTypes = listOf("application/zip", "application/octet-stream"),
+    ),
+    Csv(
+        saveMimeType = "text/csv",
+        openMimeTypes = listOf(
+            "text/csv",
+            "text/comma-separated-values",
+            "text/plain",
+            "application/octet-stream",
+        ),
+    ),
 }

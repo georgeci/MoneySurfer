@@ -44,6 +44,29 @@
     <string name="settings_dynamic_colors_supporting">Match system palette</string>
 
     <string name="settings_export_csv">Export to CSV</string>
+
+    <!-- CSV export/import screen -->
+    <string name="settings_csv_title">CSV export &amp; import</string>
+    <string name="settings_csv_supporting">Save or restore transactions as a CSV file</string>
+    <string name="settings_csv_hero_title">Local CSV backup</string>
+    <string name="settings_csv_hero_supporting">Export all transactions to a CSV file, or merge a previously exported file back in. Rows that already exist are skipped.</string>
+    <string name="settings_csv_section_export">Export</string>
+    <string name="settings_csv_export_supporting">All transactions on this device</string>
+    <string name="settings_csv_section_import">Import</string>
+    <string name="settings_csv_import_title">Import from CSV</string>
+    <string name="settings_csv_import_supporting">Merges rows; duplicates are skipped by id</string>
+    <string name="settings_csv_export_success">Exported %1$d transactions</string>
+    <string name="settings_csv_import_result">Imported %1$d · skipped %2$d · errors %3$d</string>
+    <string name="settings_csv_notice_invalid_file">Selected file is not a MoneySurfer transactions CSV</string>
+    <string name="settings_csv_notice_generic">CSV operation failed</string>
+    <string name="settings_csv_section_last_import">Last import</string>
+    <string name="settings_csv_last_import_summary">Imported %1$d, skipped %2$d duplicates, %3$d errors</string>
+    <string name="settings_csv_row_error_format">Row %1$d: %2$s</string>
+    <string name="settings_csv_issue_columns">expected %1$d columns, got %2$d</string>
+    <string name="settings_csv_issue_invalid_value">invalid value in column “%1$s”</string>
+    <string name="settings_csv_issue_unknown_workspace">unknown workspace %1$s</string>
+    <string name="settings_csv_issue_unknown_account">unknown account %1$s</string>
+    <string name="settings_csv_issue_unknown_category">unknown category %1$s</string>
     <string name="settings_notifications">Notifications</string>
     <string name="settings_notifications_supporting">Budget alerts, weekly summary</string>
 
