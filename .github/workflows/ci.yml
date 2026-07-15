@@ -94,8 +94,13 @@ jobs:
           path: build/reports/cpd/
           if-no-files-found: ignore
 
-      - name: Run JUnit tests
-        run: ./gradlew qaCommon --stacktrace
+      # qaCommon = common (JVM) scope; qaAndroidHost = Android host/unit scope
+      # (kotest on the JVM, no device). Host tests are cheap on ubuntu and were
+      # previously run nowhere in CI (issue #172 §5) — one invocation keeps the
+      # shared Kover report from running twice. A red test in either scope fails
+      # the job.
+      - name: Run JUnit tests (common + Android host)
+        run: ./gradlew qaCommon qaAndroidHost --stacktrace
 
       - name: Write JUnit + Allure summary
         if: always()
@@ -205,6 +210,17 @@ jobs:
         with:
           name: junit-results
           path: "**/build/test-results/jvmTest/**/*.xml"
+          if-no-files-found: warn
+          retention-days: 14
+
+      # Android host-scope JUnit lands under testAndroidHostTest/, separate from
+      # the jvmTest glob above. Kept as a standalone artifact for triage.
+      - name: Upload Android host JUnit results
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: android-host-junit
+          path: "**/build/test-results/testAndroidHostTest/**/*.xml"
           if-no-files-found: warn
           retention-days: 14
 
@@ -451,6 +467,44 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: ./gradlew sonar --stacktrace
+
+  detekt:
+    name: detekt (blocking)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: changes
+    if: needs.changes.outputs.code == 'true' || github.event_name == 'workflow_dispatch'
+    # The `sonar` job also runs detekt, but with continue-on-error so its XML
+    # still reaches SonarCloud even on violations — enforcement is delegated to
+    # the Sonar quality gate. A contributor on plain git (not the Claude
+    # /detekt workflow) can push violations that only surface at the Sonar gate
+    # (issue #172 §3). This job is the hard gate: plain `./gradlew detekt`
+    # (source-only, no type-resolution classpath, so no SDK/compile needed)
+    # blocks the PR the moment a violation lands.
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up JDK
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@3f131e8634966bd73d06cc69884922b02e6faf92 # v6.2.0
+
+      - name: Run detekt
+        run: ./gradlew detekt --stacktrace
+
+      - name: Upload detekt reports
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: detekt-reports
+          path: "**/build/reports/detekt/*.xml"
+          if-no-files-found: ignore
+          retention-days: 14
 
 
   publish:
