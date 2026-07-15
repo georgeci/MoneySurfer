@@ -181,6 +181,20 @@ class ExportImportTransactionsUseCaseTest : StringSpec({
                 .shouldBeInstanceOf<TransactionCsvError.EmptyFile>()
         }
     }
+
+    "a file larger than the import cap is rejected before it is read into memory" {
+        runTest {
+            val stack = Stack()
+            // Just over the 16 MiB cap; the guard must reject on size, not parse.
+            val chunk = "x".repeat(64 * 1024)
+            val oversized = Buffer().apply { repeat(256 + 1) { writeUtf8(chunk) } }
+
+            val error = stack.import(oversized).exceptionOrNull()
+
+            error.shouldBeInstanceOf<TransactionCsvError.FileTooLarge>()
+            stack.transactionRepository.stored() shouldBe emptyList()
+        }
+    }
 })
 
 /**
@@ -213,6 +227,8 @@ private class Stack(
     suspend fun export(buffer: Buffer) = exportUseCase(buffer)
 
     suspend fun import(csv: String) = importUseCase(Buffer().writeUtf8(csv))
+
+    suspend fun import(source: Buffer) = importUseCase(source)
 }
 
 private class FakeTransactionRepository(initial: List<Transaction>) : TransactionRepository {

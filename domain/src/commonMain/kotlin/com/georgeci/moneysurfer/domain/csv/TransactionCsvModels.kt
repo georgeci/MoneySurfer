@@ -38,4 +38,12 @@ sealed class TransactionCsvError(message: String, cause: Throwable? = null) :
     data object EmptyFile : TransactionCsvError("CSV file has no header row")
     data object HeaderMismatch :
         TransactionCsvError("CSV header does not match the MoneySurfer transactions format")
+
+    /**
+     * The picked file is larger than [ImportTransactionsUseCase] will read into
+     * memory. Guards against an accidental or hostile multi-GB "backup" that
+     * would otherwise OOM the app during import.
+     */
+    data class FileTooLarge(val limitBytes: Long) :
+        TransactionCsvError("CSV file exceeds the $limitBytes-byte import limit")
 }

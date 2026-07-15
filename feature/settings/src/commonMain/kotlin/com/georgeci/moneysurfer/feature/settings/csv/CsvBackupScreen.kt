@@ -42,6 +42,7 @@ import moneysurfer.feature.settings.generated.resources.settings_csv_issue_unkno
 import moneysurfer.feature.settings.generated.resources.settings_csv_issue_unknown_category
 import moneysurfer.feature.settings.generated.resources.settings_csv_issue_unknown_workspace
 import moneysurfer.feature.settings.generated.resources.settings_csv_last_import_summary
+import moneysurfer.feature.settings.generated.resources.settings_csv_notice_file_too_large
 import moneysurfer.feature.settings.generated.resources.settings_csv_notice_generic
 import moneysurfer.feature.settings.generated.resources.settings_csv_notice_invalid_file
 import moneysurfer.feature.settings.generated.resources.settings_csv_row_error_format
@@ -107,6 +108,7 @@ private fun noticeText(notice: CsvBackupNotice): String = when (notice) {
             notice.failed,
         )
     CsvBackupNotice.InvalidFile -> stringResource(Res.string.settings_csv_notice_invalid_file)
+    CsvBackupNotice.FileTooLarge -> stringResource(Res.string.settings_csv_notice_file_too_large)
     CsvBackupNotice.Generic -> stringResource(Res.string.settings_csv_notice_generic)
 }
 

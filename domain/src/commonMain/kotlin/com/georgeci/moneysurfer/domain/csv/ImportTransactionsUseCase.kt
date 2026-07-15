@@ -52,12 +52,26 @@ class ImportTransactionsUseCase(
     }
 
     private suspend fun runImport(source: BufferedSource): CsvImportReport {
-        val records = Csv.parseRecords(source.readUtf8())
+        val records = Csv.parseRecords(readCapped(source))
         val headerRecord = records.firstOrNull() ?: throw TransactionCsvError.EmptyFile
         if (headerRecord.fields != TransactionCsvCodec.header) {
             throw TransactionCsvError.HeaderMismatch
         }
         return importRecords(records.drop(1), loadKnownIds())
+    }
+
+    /**
+     * Reads the whole file, but bounds the read first: `request(limit + 1)`
+     * buffers at most `limit + 1` bytes, and a `true` result means the file is
+     * larger than the cap, so we reject without ever allocating the whole
+     * thing. This also caps the giant single field an unclosed quote would
+     * otherwise produce — it can never exceed the total limit.
+     */
+    private fun readCapped(source: BufferedSource): String {
+        if (source.request(MAX_IMPORT_BYTES + 1)) {
+            throw TransactionCsvError.FileTooLarge(MAX_IMPORT_BYTES)
+        }
+        return source.readUtf8()
     }
 
     private suspend fun importRecords(
@@ -135,4 +149,15 @@ class ImportTransactionsUseCase(
         accountIds = accountRepository.getAll().first().mapTo(mutableSetOf()) { it.id },
         categoryIds = categoryRepository.getAll().first().mapTo(mutableSetOf()) { it.id },
     )
+
+    private companion object {
+        /**
+         * Hard cap on the CSV we read into memory. Import buffers the whole file
+         * (see [runImport]); without a bound a multi-GB pick — accidental or a
+         * hostile "backup" shared to the user — would OOM the app. A real
+         * transactions export runs a few hundred bytes per row, so 16 MiB still
+         * covers tens of thousands of transactions.
+         */
+        private const val MAX_IMPORT_BYTES = 16L * 1024 * 1024
+    }
 }
