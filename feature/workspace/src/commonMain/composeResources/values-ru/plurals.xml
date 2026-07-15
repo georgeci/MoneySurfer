@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="workspace_members_subtitle_owner_format">
+        <item quantity="one">%1$d участник · вы владелец</item>
+        <item quantity="few">%1$d участника · вы владелец</item>
+        <item quantity="many">%1$d участников · вы владелец</item>
+        <item quantity="other">%1$d участников · вы владелец</item>
+    </plurals>
+    <plurals name="workspace_members_subtitle_editor_format">
+        <item quantity="one">%1$d участник · можно редактировать</item>
+        <item quantity="few">%1$d участника · можно редактировать</item>
+        <item quantity="many">%1$d участников · можно редактировать</item>
+        <item quantity="other">%1$d участников · можно редактировать</item>
+    </plurals>
+    <plurals name="workspace_members_subtitle_viewer_format">
+        <item quantity="one">%1$d участник · только просмотр</item>
+        <item quantity="few">%1$d участника · только просмотр</item>
+        <item quantity="many">%1$d участников · только просмотр</item>
+        <item quantity="other">%1$d участников · только просмотр</item>
+    </plurals>
+    <plurals name="workspace_members_subtitle_unknown_format">
+        <item quantity="one">%1$d участник</item>
+        <item quantity="few">%1$d участника</item>
+        <item quantity="many">%1$d участников</item>
+        <item quantity="other">%1$d участников</item>
+    </plurals>
+    <plurals name="workspace_incoming_header_title_format">
+        <item quantity="one">У вас %1$d приглашение</item>
+        <item quantity="few">У вас %1$d приглашения</item>
+        <item quantity="many">У вас %1$d приглашений</item>
+        <item quantity="other">У вас %1$d приглашений</item>
+    </plurals>
+    <plurals name="workspace_creation_preview_subtitle_format">
+        <item quantity="one">Общее · %1$d участник · %2$s</item>
+        <item quantity="few">Общее · %1$d участника · %2$s</item>
+        <item quantity="many">Общее · %1$d участников · %2$s</item>
+        <item quantity="other">Общее · %1$d участников · %2$s</item>
+    </plurals>
+</resources>

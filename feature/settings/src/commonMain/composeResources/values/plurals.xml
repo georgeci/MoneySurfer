@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="settings_members_count_format">
+        <item quantity="one">%1$d member</item>
+        <item quantity="other">%1$d members</item>
+    </plurals>
+    <plurals name="settings_pending_invites_supporting_format">
+        <item quantity="one">%1$d waiting for you</item>
+        <item quantity="other">%1$d waiting for you</item>
+    </plurals>
+    <plurals name="settings_csv_export_success">
+        <item quantity="one">Exported %1$d transaction</item>
+        <item quantity="other">Exported %1$d transactions</item>
+    </plurals>
+</resources>

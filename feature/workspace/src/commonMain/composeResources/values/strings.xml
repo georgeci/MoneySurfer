@@ -15,10 +15,6 @@
 
     <!-- Workspace members -->
     <string name="workspace_members_title_format">%1$s · Members</string>
-    <string name="workspace_members_subtitle_owner_format">%1$d people · you own this workspace</string>
-    <string name="workspace_members_subtitle_editor_format">%1$d people · you can edit data</string>
-    <string name="workspace_members_subtitle_viewer_format">%1$d people · view-only access</string>
-    <string name="workspace_members_subtitle_unknown_format">%1$d people</string>
     <string name="workspace_members_invite_title">Invite people</string>
     <string name="workspace_members_invite_subtitle">Send an email invitation</string>
     <string name="workspace_members_close_content_description">Close</string>
@@ -75,7 +71,6 @@
 
     <!-- Incoming invites screen -->
     <string name="workspace_incoming_title">Invitations</string>
-    <string name="workspace_incoming_header_title_format">You're invited to %1$d workspaces</string>
     <string name="workspace_incoming_header_subtitle">Accepting joins the workspace and adds it to your list.</string>
     <string name="workspace_incoming_accept">Accept</string>
     <string name="workspace_incoming_decline">Decline</string>
@@ -104,7 +99,6 @@
     <string name="workspace_creation_remove_member_content_description">Remove member</string>
     <string name="workspace_creation_invite_title">Invite people</string>
     <string name="workspace_creation_invite_subtitle">Share a link or send an email</string>
-    <string name="workspace_creation_preview_subtitle_format">Shared · %1$d members · %2$s</string>
     <string name="workspace_creation_preview_subtitle_offline_format">%1$s</string>
     <string name="workspace_creation_preview_fallback_title">New workspace</string>
     <string name="workspace_creation_error_remote_sync">Couldn't sync the new workspace to the cloud. Check your connection and try again.</string>
