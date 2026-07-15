@@ -13,7 +13,7 @@
         <item quantity="other">%1$d архивных</item>
     </plurals>
     <plurals name="transaction_creation_account_summary">
-        <item quantity="one">Всего по %1$d счёту · %2$s</item>
+        <item quantity="one">Всего по %1$d счету · %2$s</item>
         <item quantity="few">Всего по %1$d счетам · %2$s</item>
         <item quantity="many">Всего по %1$d счетам · %2$s</item>
         <item quantity="other">Всего по %1$d счетам · %2$s</item>
