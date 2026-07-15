@@ -99,6 +99,8 @@ allprojects {
     // written in a single invocation. Kept out of the configuration cache
     // because it filters configurations at execution time.
     tasks.register("resolveAndLockAll") {
+        group = "verification"
+        description = "Resolves every configuration to (re)write the dependency lockfiles."
         notCompatibleWithConfigurationCache("Resolves configurations at execution time")
         doFirst {
             require(gradle.startParameter.isWriteDependencyLocks) {
