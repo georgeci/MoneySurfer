@@ -44,6 +44,17 @@ private class FakeWorkspaceInviteDao : WorkspaceInviteDao {
     override suspend fun getById(id: String): WorkspaceInviteEntity? =
         rows.firstOrNull { it.id == id }
 
+    override suspend fun findJoinableInviteId(
+        workspaceId: String,
+        userId: String,
+        email: String?,
+    ): String? = rows
+        .filter { it.workspaceId == workspaceId && it.status in setOf("PENDING", "ACCEPTED") }
+        .filter { it.targetUserId == userId || (email != null && it.email.equals(email, ignoreCase = true)) }
+        .sortedWith(compareBy({ if (it.status == "PENDING") 0 else 1 }, { -it.updatedAt }))
+        .firstOrNull()
+        ?.id
+
     override suspend fun insert(entity: WorkspaceInviteEntity) { rows += entity }
     override suspend fun insertAll(entities: List<WorkspaceInviteEntity>) { rows += entities }
 
