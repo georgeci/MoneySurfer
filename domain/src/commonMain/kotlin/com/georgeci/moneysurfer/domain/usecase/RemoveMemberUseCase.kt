@@ -5,6 +5,7 @@ import arrow.core.raise.either
 import arrow.core.raise.ensure
 import co.touchlab.kermit.Logger
 import com.georgeci.moneysurfer.domain.auth.SessionPointers
+import com.georgeci.moneysurfer.domain.logging.redactUid
 import com.georgeci.moneysurfer.domain.model.WorkspaceMemberStatus
 import com.georgeci.moneysurfer.domain.model.WorkspaceRole
 import com.georgeci.moneysurfer.domain.primitives.UserId
@@ -54,11 +55,11 @@ class RemoveMemberUseCase(
                 removedByUserId = callerId,
             )
         }
-            .onLeft { log.e(it) { "[local] markRemoved failed uid=${params.targetUserId.value}" } }
+            .onLeft { log.e(it) { "[local] markRemoved failed uid=${params.targetUserId.value.redactUid()}" } }
             .mapLeft { InviteError.LocalWriteFailed(it) }
             .bind()
 
-        log.i { "[done] removed uid=${params.targetUserId.value} by=${callerId.value}" }
+        log.i { "[done] removed uid=${params.targetUserId.value.redactUid()} by=${callerId.value.redactUid()}" }
     }
 
     private companion object {

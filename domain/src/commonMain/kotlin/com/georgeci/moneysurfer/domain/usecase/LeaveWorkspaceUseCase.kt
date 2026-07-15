@@ -5,6 +5,7 @@ import arrow.core.raise.either
 import arrow.core.raise.ensure
 import co.touchlab.kermit.Logger
 import com.georgeci.moneysurfer.domain.auth.SessionPointers
+import com.georgeci.moneysurfer.domain.logging.redactUid
 import com.georgeci.moneysurfer.domain.model.WorkspaceMemberStatus
 import com.georgeci.moneysurfer.domain.model.WorkspaceRole
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
@@ -45,11 +46,11 @@ class LeaveWorkspaceUseCase(
         }
 
         Either.catch { memberRepository.markLeft(callerId, workspaceId) }
-            .onLeft { log.e(it) { "[local] markLeft failed uid=${callerId.value}" } }
+            .onLeft { log.e(it) { "[local] markLeft failed uid=${callerId.value.redactUid()}" } }
             .mapLeft { InviteError.LocalWriteFailed(it) }
             .bind()
 
-        log.i { "[done] uid=${callerId.value} wid=${workspaceId.value}" }
+        log.i { "[done] uid=${callerId.value.redactUid()} wid=${workspaceId.value}" }
     }
 
     private companion object {

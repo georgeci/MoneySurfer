@@ -1,5 +1,7 @@
 package com.georgeci.moneysurfer.data.sync
 
+import com.georgeci.moneysurfer.domain.logging.redactEmail
+import com.georgeci.moneysurfer.domain.logging.redactUid
 import dev.gitlive.firebase.auth.FirebaseAuth
 import org.koin.core.annotation.Single
 
@@ -10,7 +12,7 @@ class FirebaseCurrentAuthInfo(private val auth: FirebaseAuth) : CurrentAuthInfo 
         return if (user == null) {
             "uid=<null> NOT_SIGNED_IN"
         } else {
-            "uid=${user.uid} email=${user.email ?: "<none>"} anon=${user.isAnonymous}"
+            "uid=${user.uid.redactUid()} email=${user.email.redactEmail()} anon=${user.isAnonymous}"
         }
     }
 }

@@ -8,7 +8,8 @@ import com.georgeci.moneysurfer.di.initKoin
 import com.georgeci.moneysurfer.di.onlineWiring
 
 fun main() {
-    initKoin(extraModules = onlineWiring)
+    // Desktop is a developer-only host (no shipped release), so keep full logging.
+    initKoin(isDebug = true, extraModules = onlineWiring)
     application {
         Window(
             onCloseRequest = ::exitApplication,

@@ -5,6 +5,7 @@ import arrow.core.raise.either
 import arrow.core.raise.ensure
 import co.touchlab.kermit.Logger
 import com.georgeci.moneysurfer.domain.auth.SessionPointers
+import com.georgeci.moneysurfer.domain.logging.redactUid
 import com.georgeci.moneysurfer.domain.model.WorkspaceMemberStatus
 import com.georgeci.moneysurfer.domain.model.WorkspaceRole
 import com.georgeci.moneysurfer.domain.primitives.UserId
@@ -49,12 +50,13 @@ class ChangeMemberRoleUseCase(
         if (target.role == params.newRole) return@either
 
         Either.catch { memberRepository.update(target.copy(role = params.newRole)) }
-            .onLeft { log.e(it) { "[local] update failed uid=${params.targetUserId.value}" } }
+            .onLeft { log.e(it) { "[local] update failed uid=${params.targetUserId.value.redactUid()}" } }
             .mapLeft { InviteError.LocalWriteFailed(it) }
             .bind()
 
         log.i {
-            "[done] uid=${params.targetUserId.value} ${target.role} -> ${params.newRole} by=${callerId.value}"
+            "[done] uid=${params.targetUserId.value.redactUid()} ${target.role} -> ${params.newRole} " +
+                "by=${callerId.value.redactUid()}"
         }
     }
 

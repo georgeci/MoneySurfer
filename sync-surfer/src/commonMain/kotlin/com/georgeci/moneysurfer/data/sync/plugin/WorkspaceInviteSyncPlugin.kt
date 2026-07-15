@@ -5,6 +5,8 @@ import com.georgeci.moneysurfer.data.remote.WorkspaceInviteDoc
 import com.georgeci.moneysurfer.data.sync.toDoc
 import com.georgeci.moneysurfer.data.sync.toEntity
 import com.georgeci.moneysurfer.domain.AppInfo
+import com.georgeci.moneysurfer.domain.logging.redactEmail
+import com.georgeci.moneysurfer.domain.logging.redactUid
 import com.georgeci.moneysurfer.domain.sync.SyncEntityTypes
 import com.georgeci.moneysurfer.sync.plugin.EntityApplyResult
 import com.georgeci.moneysurfer.sync.plugin.RemoteDocument
@@ -40,8 +42,9 @@ class WorkspaceInviteSyncPlugin(
                 val entity = workspaceInviteDao.getById(mutation.entityId) ?: return
                 val dto = entity.toDoc().copy(clientVersionCode = appInfo.versionCode)
                 log.i {
-                    "[push:invite] path=${docRef.path} email=${dto.email} status=${dto.status} " +
-                        "role=${dto.role} target=${dto.targetUserId} invitedBy=${dto.invitedByUserId} " +
+                    "[push:invite] path=${docRef.path} email=${dto.email.redactEmail()} " +
+                        "status=${dto.status} role=${dto.role} " +
+                        "target=${dto.targetUserId.redactUid()} invitedBy=${dto.invitedByUserId.redactUid()} " +
                         "expiresAt=${dto.expiresAt} updatedAt=${dto.updatedAt} ver=${dto.clientVersionCode}"
                 }
                 docRef.set(dto)

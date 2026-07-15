@@ -18,7 +18,7 @@ class MoneySurferApplication : Application() {
             System.setProperty("MS_USE_EMULATOR", "true")
         }
 
-        initKoin(extraModules = onlineWiring) {
+        initKoin(isDebug = BuildConfig.DEBUG, extraModules = onlineWiring) {
             androidContext(this@MoneySurferApplication)
         }
     }

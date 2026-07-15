@@ -5,6 +5,8 @@ import arrow.core.raise.either
 import arrow.core.raise.ensure
 import co.touchlab.kermit.Logger
 import com.georgeci.moneysurfer.domain.auth.SessionPointers
+import com.georgeci.moneysurfer.domain.logging.redactEmail
+import com.georgeci.moneysurfer.domain.logging.redactUid
 import com.georgeci.moneysurfer.domain.model.InviteStatus
 import com.georgeci.moneysurfer.domain.model.WorkspaceInvite
 import com.georgeci.moneysurfer.domain.model.WorkspaceMemberStatus
@@ -67,14 +69,14 @@ class SendInviteUseCase(
         // Miss → UserNotFound (UI shows a field-level error so the inviter can correct
         // the address). Throw → RemoteSyncFailed so the caller can retry.
         val targetUserId = Either.catch { userRemoteRepository.findByEmail(normalizedEmail) }
-            .onLeft { log.e(it) { "[targetUserId:lookup] failed email=$normalizedEmail" } }
+            .onLeft { log.e(it) { "[targetUserId:lookup] failed email=${normalizedEmail.redactEmail()}" } }
             .mapLeft { InviteError.RemoteSyncFailed(it) }
             .bind()
         if (targetUserId == null) {
-            log.i { "[targetUserId] miss email=$normalizedEmail — no registered user" }
+            log.i { "[targetUserId] miss email=${normalizedEmail.redactEmail()} — no registered user" }
             raise(InviteError.UserNotFound(normalizedEmail))
         }
-        log.i { "[targetUserId] email=$normalizedEmail resolved=${targetUserId.value}" }
+        log.i { "[targetUserId] email=${normalizedEmail.redactEmail()} resolved=${targetUserId.value.redactUid()}" }
 
         val now = getCurrentTime()
         val newId = WorkspaceInviteId.uuid()
@@ -93,7 +95,12 @@ class SendInviteUseCase(
         )
 
         Either.catch { inviteRepository.upsert(invite) }
-            .onLeft { log.e(it) { "[local] upsert failed wid=${params.workspaceId.value} email=$normalizedEmail" } }
+            .onLeft {
+                log.e(it) {
+                    "[local] upsert failed wid=${params.workspaceId.value} " +
+                        "email=${normalizedEmail.redactEmail()}"
+                }
+            }
             .mapLeft { InviteError.LocalWriteFailed(it) }
             .bind()
 
@@ -107,14 +114,14 @@ class SendInviteUseCase(
                 userRemoteRepository.addInvitedWorkspaceRef(targetUserId.value, params.workspaceId)
             }.onLeft {
                 log.w(it) {
-                    "[remote] addInvitedWorkspaceRef failed uid=${targetUserId.value} " +
+                    "[remote] addInvitedWorkspaceRef failed uid=${targetUserId.value.redactUid()} " +
                         "wid=${params.workspaceId.value} — non-fatal"
                 }
             }
         }
 
         log.i {
-            "[done] wid=${params.workspaceId.value} email=$normalizedEmail role=${params.role} " +
+            "[done] wid=${params.workspaceId.value} email=${normalizedEmail.redactEmail()} role=${params.role} " +
                 "id=${newId.value} expiresAt=${invite.expiresAt}"
         }
         newId

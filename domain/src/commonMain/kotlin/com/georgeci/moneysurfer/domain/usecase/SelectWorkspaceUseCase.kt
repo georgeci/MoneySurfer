@@ -3,6 +3,7 @@ package com.georgeci.moneysurfer.domain.usecase
 import arrow.core.Either
 import co.touchlab.kermit.Logger
 import com.georgeci.moneysurfer.domain.auth.SessionPointers
+import com.georgeci.moneysurfer.domain.logging.redactUid
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 import com.georgeci.moneysurfer.domain.repositories.UserRemoteRepository
 import kotlinx.coroutines.flow.first
@@ -32,11 +33,15 @@ class SelectWorkspaceUseCase(
         if (firebaseUid != null) {
             Either.catch { userRemoteRepository.setDefaultWorkspace(firebaseUid, workspaceId) }
                 .onLeft {
-                    log.w(
-                        it,
-                    ) { "[remote] setDefaultWorkspace failed uid=$firebaseUid wid=${workspaceId.value}" }
+                    log.w(it) {
+                        "[remote] setDefaultWorkspace failed uid=${firebaseUid.redactUid()} wid=${workspaceId.value}"
+                    }
                 }
-                .onRight { log.i { "[remote] setDefaultWorkspace ok uid=$firebaseUid wid=${workspaceId.value}" } }
+                .onRight {
+                    log.i {
+                        "[remote] setDefaultWorkspace ok uid=${firebaseUid.redactUid()} wid=${workspaceId.value}"
+                    }
+                }
         } else {
             log.i { "[remote] skipped (no Firebase uid — local/demo session)" }
         }
