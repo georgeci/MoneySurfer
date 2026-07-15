@@ -15,10 +15,6 @@
 
     <!-- Workspace members -->
     <string name="workspace_members_title_format">%1$s · Участники</string>
-    <string name="workspace_members_subtitle_owner_format">%1$d участников · вы владелец</string>
-    <string name="workspace_members_subtitle_editor_format">%1$d участников · можно редактировать</string>
-    <string name="workspace_members_subtitle_viewer_format">%1$d участников · только просмотр</string>
-    <string name="workspace_members_subtitle_unknown_format">%1$d участников</string>
     <string name="workspace_members_invite_title">Пригласить людей</string>
     <string name="workspace_members_invite_subtitle">Отправить приглашение по e-mail</string>
     <string name="workspace_members_close_content_description">Закрыть</string>
@@ -75,7 +71,6 @@
 
     <!-- Incoming invites screen -->
     <string name="workspace_incoming_title">Приглашения</string>
-    <string name="workspace_incoming_header_title_format">У вас %1$d приглашений</string>
     <string name="workspace_incoming_header_subtitle">Принятие приглашения добавит пространство в ваш список.</string>
     <string name="workspace_incoming_accept">Принять</string>
     <string name="workspace_incoming_decline">Отклонить</string>
@@ -104,7 +99,6 @@
     <string name="workspace_creation_remove_member_content_description">Удалить участника</string>
     <string name="workspace_creation_invite_title">Пригласить людей</string>
     <string name="workspace_creation_invite_subtitle">Отправьте ссылку или приглашение</string>
-    <string name="workspace_creation_preview_subtitle_format">Общее · %1$d участников · %2$s</string>
     <string name="workspace_creation_preview_subtitle_offline_format">%1$s</string>
     <string name="workspace_creation_preview_fallback_title">Новое пространство</string>
     <string name="workspace_creation_error_remote_sync">Не удалось синхронизировать пространство с облаком. Проверьте интернет и попробуйте снова.</string>

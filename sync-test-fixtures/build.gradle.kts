@@ -12,6 +12,7 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(projects.domain)
+            implementation(projects.sync.api)
             implementation(projects.sync.default)
             implementation(libs.kotlinx.coroutinesCore)
             implementation(libs.arrow.core)

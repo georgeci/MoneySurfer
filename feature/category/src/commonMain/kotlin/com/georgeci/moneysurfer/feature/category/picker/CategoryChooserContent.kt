@@ -17,11 +17,8 @@ import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -36,6 +33,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.georgeci.moneysurfer.uikit.atom.SurferActionCard
 import com.georgeci.moneysurfer.uikit.components.SurferCategoryPalette
+import com.georgeci.moneysurfer.uikit.components.SurferSearchField
 import com.georgeci.moneysurfer.uikit.components.category.SurferCategoryCell
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.preview.SurferBottomSheetPreview
@@ -90,28 +88,11 @@ internal fun CategoryChooserContent(
             color = AppTheme.materialColors.onSurface,
             modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 4.dp, bottom = 12.dp),
         )
-        OutlinedTextField(
+        SurferSearchField(
             value = query,
             onValueChange = { query = it },
-            placeholder = { Text(searchPlaceholder) },
-            leadingIcon = {
-                Icon(
-                    imageVector = SurferIcons.Search,
-                    contentDescription = null,
-                )
-            },
-            singleLine = true,
-            shape = RoundedCornerShape(22.dp),
-            colors = TextFieldDefaults.colors(
-                focusedContainerColor = AppTheme.materialColors.surfaceContainerHighest,
-                unfocusedContainerColor = AppTheme.materialColors.surfaceContainerHighest,
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
-            ),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-                .heightIn(min = 44.dp),
+            placeholder = searchPlaceholder,
+            containerColor = AppTheme.materialColors.surfaceContainerHighest,
         )
 
         if (createNewLabel != null && onCreateNewClick != null) {

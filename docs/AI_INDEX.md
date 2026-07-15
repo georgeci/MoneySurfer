@@ -215,7 +215,7 @@
 ## project-map
 - Title: Module Map
 - File: docs/PROJECT_MAP.md
-- Lines: 25-57
+- Lines: 25-77
 - Tasks: project, context, architecture
 
 ## rules-bug-1

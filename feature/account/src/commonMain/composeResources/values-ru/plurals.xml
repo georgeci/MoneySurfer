@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="accounts_manage_stat_active_count">
+        <item quantity="one">%1$d активный</item>
+        <item quantity="few">%1$d активных</item>
+        <item quantity="many">%1$d активных</item>
+        <item quantity="other">%1$d активных</item>
+    </plurals>
+    <plurals name="accounts_manage_stat_archived_count">
+        <item quantity="one">%1$d архивный</item>
+        <item quantity="few">%1$d архивных</item>
+        <item quantity="many">%1$d архивных</item>
+        <item quantity="other">%1$d архивных</item>
+    </plurals>
+    <plurals name="transaction_creation_account_summary">
+        <item quantity="one">Всего по %1$d счету · %2$s</item>
+        <item quantity="few">Всего по %1$d счетам · %2$s</item>
+        <item quantity="many">Всего по %1$d счетам · %2$s</item>
+        <item quantity="other">Всего по %1$d счетам · %2$s</item>
+    </plurals>
+</resources>

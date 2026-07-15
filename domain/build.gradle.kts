@@ -30,7 +30,7 @@ kotlin {
                 implementation(libs.kotlinx.serialization.json)
                 implementation(libs.okio)
                 implementation(libs.arrow.core)
-                api(projects.sync.api)
+                implementation(projects.sync.api)
                 implementation(libs.kermit)
                 implementation(project.dependencies.platform(libs.koin.bom))
                 implementation(libs.koin.core)

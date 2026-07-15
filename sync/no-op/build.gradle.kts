@@ -21,7 +21,7 @@ kotlin {
                 implementation(project.dependencies.platform(libs.koin.bom))
                 implementation(libs.koin.core)
                 implementation(libs.koin.annotations)
-                api(projects.sync.api)
+                implementation(projects.sync.api)
             }
         }
     }

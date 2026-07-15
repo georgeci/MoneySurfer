@@ -13,6 +13,7 @@ import com.georgeci.moneysurfer.feature.account.generated.resources.transaction_
 import com.georgeci.moneysurfer.feature.account.generated.resources.transaction_creation_account_summary_empty
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.utils.HandleSideEffect
+import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -51,8 +52,9 @@ fun AccountChooserBottomSheet(
     val summary = if (accounts.isEmpty() || totalFormatted == null) {
         stringResource(Res.string.transaction_creation_account_summary_empty)
     } else {
-        stringResource(
-            Res.string.transaction_creation_account_summary,
+        pluralStringResource(
+            Res.plurals.transaction_creation_account_summary,
+            accounts.size,
             accounts.size,
             totalFormatted,
         )

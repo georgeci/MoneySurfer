@@ -1,12 +1,8 @@
 package com.georgeci.moneysurfer.feature.workspace.firstrun
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,10 +10,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -33,14 +27,11 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -48,6 +39,7 @@ import com.georgeci.moneysurfer.domain.model.Currency
 import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
 import com.georgeci.moneysurfer.uikit.components.SurferButton
 import com.georgeci.moneysurfer.uikit.components.SurferButtonSize
+import com.georgeci.moneysurfer.uikit.components.SurferCurrencyRow
 import com.georgeci.moneysurfer.uikit.components.SurferFullScreenLoader
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
@@ -189,10 +181,14 @@ private fun FirstRunCurrencyContent(
                     contentPadding = PaddingValues(bottom = 16.dp),
                 ) {
                     items(state.visibleCurrencies, key = { it.code.value }) { currency ->
-                        CurrencyRow(
-                            currency = currency,
+                        SurferCurrencyRow(
+                            symbol = currency.symbol,
+                            code = currency.code.value,
+                            name = currency.displayName,
                             selected = currency.code.value == state.selectedCode,
                             onClick = { onEvent(FirstRunCurrencyEvent.OnCurrencySelected(currency.code.value)) },
+                            modifier = Modifier.testTag(FirstRunCurrencyTestTags.currencyRow(currency.code.value)),
+                            horizontalPadding = 24.dp,
                         )
                     }
                 }
@@ -212,63 +208,6 @@ private fun FirstRunCurrencyContent(
 
         if (state.inFlight) {
             SurferFullScreenLoader(modifier = Modifier.fillMaxSize())
-        }
-    }
-}
-
-@Composable
-private fun CurrencyRow(
-    currency: Currency,
-    selected: Boolean,
-    onClick: () -> Unit,
-) {
-    val highlight = AppTheme.materialColors.primary.copy(alpha = 0.10f)
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .testTag(FirstRunCurrencyTestTags.currencyRow(currency.code.value))
-            .background(if (selected) highlight else Color.Transparent)
-            .clickable(onClick = onClick)
-            .padding(horizontal = 24.dp, vertical = 12.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(14.dp),
-    ) {
-        Box(
-            modifier = Modifier
-                .size(40.dp)
-                .clip(CircleShape)
-                .background(AppTheme.materialColors.surfaceContainerHigh),
-            contentAlignment = Alignment.Center,
-        ) {
-            Text(
-                text = currency.symbol,
-                style = AppTheme.typography.titleMedium,
-                color = AppTheme.materialColors.onSurface,
-            )
-        }
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = currency.code.value,
-                style = AppTheme.typography.titleSmall,
-                color = AppTheme.materialColors.onSurface,
-            )
-            Text(
-                text = currency.displayName,
-                style = AppTheme.typography.bodySmall,
-                color = AppTheme.materialColors.onSurfaceVariant,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-        }
-        if (selected) {
-            Icon(
-                imageVector = SurferIcons.Check,
-                contentDescription = null,
-                tint = AppTheme.materialColors.primary,
-                modifier = Modifier.size(20.dp),
-            )
-        } else {
-            Spacer(Modifier.width(20.dp))
         }
     }
 }

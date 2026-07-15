@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="settings_members_count_format">
+        <item quantity="one">%1$d участник</item>
+        <item quantity="few">%1$d участника</item>
+        <item quantity="many">%1$d участников</item>
+        <item quantity="other">%1$d участников</item>
+    </plurals>
+    <plurals name="settings_pending_invites_supporting_format">
+        <item quantity="one">%1$d ожидает</item>
+        <item quantity="few">%1$d ожидают</item>
+        <item quantity="many">%1$d ожидают</item>
+        <item quantity="other">%1$d ожидают</item>
+    </plurals>
+    <plurals name="settings_csv_export_success">
+        <item quantity="one">Экспортирована %1$d транзакция</item>
+        <item quantity="few">Экспортировано %1$d транзакции</item>
+        <item quantity="many">Экспортировано %1$d транзакций</item>
+        <item quantity="other">Экспортировано %1$d транзакций</item>
+    </plurals>
+</resources>

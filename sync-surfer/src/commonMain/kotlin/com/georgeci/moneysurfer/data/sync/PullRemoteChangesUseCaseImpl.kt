@@ -10,6 +10,7 @@ import com.georgeci.moneysurfer.sync.api.SyncCancelToken
 import com.georgeci.moneysurfer.sync.api.SyncResult
 import com.georgeci.moneysurfer.sync.api.SyncScope
 import com.georgeci.moneysurfer.sync.plugin.EntityApplyResult
+import com.georgeci.moneysurfer.sync.plugin.RemoteDocument
 import com.georgeci.moneysurfer.sync.plugin.SyncEntityPlugin
 import com.georgeci.moneysurfer.sync.repository.SyncMetaRepository
 import kotlinx.coroutines.flow.first
@@ -171,56 +172,19 @@ class PullRemoteChangesUseCaseImpl(
         collectionName: String,
         onProgress: suspend (PullProgress) -> Unit,
         cancelToken: SyncCancelToken,
-    ): Pair<Int, Int> {
-        syncMeta.markAttempt(workspaceId, collectionName, Clock.System.now())
-
-        val cursor = syncMeta.cursor(workspaceId, collectionName)
-        val cursorMillis = cursor?.toEpochMilliseconds() ?: 0L
-
-        val docs = collectionReader.fetchUpdatedSince(
+    ): Pair<Int, Int> = pullBatch(
+        workspaceId = workspaceId,
+        collectionName = collectionName,
+        plugin = plugin,
+        onProgress = onProgress,
+        cancelToken = cancelToken,
+    ) { sinceMillis ->
+        collectionReader.fetchUpdatedSince(
             workspaceId = workspaceId,
             collectionName = collectionName,
-            sinceMillis = cursorMillis,
+            sinceMillis = sinceMillis,
             limit = BATCH_SIZE,
         )
-
-        if (docs.isEmpty()) {
-            syncMeta.markSuccess(workspaceId, collectionName, Clock.System.now())
-            return 0 to 0
-        }
-
-        var downloaded = 0
-        var conflicts = 0
-        var maxUpdatedAt = cursorMillis
-
-        docs.forEachIndexed { index, doc ->
-            cancelToken.throwIfCancelled()
-            val result: EntityApplyResult = plugin.applyDoc(doc, workspaceId)
-            if (result.applied) downloaded++
-            if (result.wasConflict) conflicts++
-
-            val docUpdatedAt = doc.getLong("updatedAt") ?: 0L
-            if (docUpdatedAt > maxUpdatedAt) maxUpdatedAt = docUpdatedAt
-
-            onProgress(
-                PullProgress(
-                    collection = collectionName,
-                    current = index + 1,
-                    total = docs.size,
-                ),
-            )
-        }
-
-        if (maxUpdatedAt > cursorMillis) {
-            syncMeta.setCursor(
-                scopeKey = workspaceId,
-                collection = collectionName,
-                cursor = Instant.fromEpochMilliseconds(maxUpdatedAt),
-            )
-        }
-        syncMeta.markSuccess(workspaceId, collectionName, Clock.System.now())
-
-        return downloaded to conflicts
     }
 
     /**
@@ -234,19 +198,43 @@ class PullRemoteChangesUseCaseImpl(
         plugin: SyncEntityPlugin,
         onProgress: suspend (PullProgress) -> Unit,
         cancelToken: SyncCancelToken,
+    ): Pair<Int, Int> = pullBatch(
+        workspaceId = workspaceId,
+        collectionName = "invites",
+        plugin = plugin,
+        onProgress = onProgress,
+        cancelToken = cancelToken,
+    ) { sinceMillis ->
+        collectionReader.fetchInvitesForUser(
+            workspaceId = workspaceId,
+            uid = uid,
+            sinceMillis = sinceMillis,
+            limit = BATCH_SIZE,
+        )
+    }
+
+    /**
+     * Cursor-based batch pull shared by [pullCollection] and [pullInvitesForUser]: reads the
+     * cursor, runs [fetch] for everything updated since it, applies each doc via the [plugin],
+     * advances the cursor to `max(updatedAt)`, and records the attempt/success on [syncMeta].
+     * Only the query differs between callers, so it is supplied as [fetch].
+     *
+     * @return `downloaded to conflicts` for the batch.
+     */
+    private suspend fun pullBatch(
+        workspaceId: String,
+        collectionName: String,
+        plugin: SyncEntityPlugin,
+        onProgress: suspend (PullProgress) -> Unit,
+        cancelToken: SyncCancelToken,
+        fetch: suspend (sinceMillis: Long) -> List<RemoteDocument>,
     ): Pair<Int, Int> {
-        val collectionName = "invites"
         syncMeta.markAttempt(workspaceId, collectionName, Clock.System.now())
 
         val cursor = syncMeta.cursor(workspaceId, collectionName)
         val cursorMillis = cursor?.toEpochMilliseconds() ?: 0L
 
-        val docs = collectionReader.fetchInvitesForUser(
-            workspaceId = workspaceId,
-            uid = uid,
-            sinceMillis = cursorMillis,
-            limit = BATCH_SIZE,
-        )
+        val docs = fetch(cursorMillis)
 
         if (docs.isEmpty()) {
             syncMeta.markSuccess(workspaceId, collectionName, Clock.System.now())

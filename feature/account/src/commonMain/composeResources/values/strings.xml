@@ -4,8 +4,6 @@
     <string name="accounts_manage_edit">Edit</string>
     <string name="accounts_manage_done">Done</string>
     <string name="accounts_manage_stat_total">Total balance</string>
-    <string name="accounts_manage_stat_active_count">%1$d active</string>
-    <string name="accounts_manage_stat_archived_count">%1$d archived</string>
     <string name="accounts_manage_active_header">Active</string>
     <string name="accounts_manage_archived_header">Archived</string>
     <string name="accounts_manage_drag_to_reorder">Drag to reorder</string>
@@ -72,7 +70,6 @@
 
     <!-- Account chooser bottom sheet -->
     <string name="transaction_creation_account_sheet_title">From account</string>
-    <string name="transaction_creation_account_summary">Total across %1$d accounts · %2$s</string>
     <string name="transaction_creation_account_summary_empty">No accounts yet</string>
     <string name="transaction_creation_account_add_new">Add new account</string>
     <string name="transaction_creation_account_add_new_subtitle">Bank, savings, cash or card</string>

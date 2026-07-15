@@ -7,12 +7,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -90,7 +88,7 @@ fun SurferRecurringWidget(
         }
 
         if (items.isEmpty()) {
-            EmptyBox(
+            SurferWidgetEmptyState(
                 icon = SurferIcons.Calendar,
                 title = emptyTitle,
                 subtitle = emptySubtitle,
@@ -161,52 +159,6 @@ private fun RecurringRow(item: SurferRecurringItem, onClick: (() -> Unit)?) {
             style = AppTheme.typography.titleSmall,
             color = AppTheme.materialColors.onSurface,
         )
-    }
-}
-
-@Composable
-private fun EmptyBox(
-    icon: ImageVector,
-    title: String?,
-    subtitle: String?,
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-    ) {
-        Box(
-            modifier = Modifier
-                .size(44.dp)
-                .clip(CircleShape)
-                .background(AppTheme.materialColors.surfaceContainerHighest),
-            contentAlignment = Alignment.Center,
-        ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                tint = AppTheme.materialColors.onSurfaceVariant,
-                modifier = Modifier.size(20.dp),
-            )
-        }
-        if (title != null) {
-            Spacer(Modifier.height(6.dp))
-            Text(
-                text = title,
-                style = AppTheme.typography.titleSmall,
-                color = AppTheme.materialColors.onSurface,
-            )
-        }
-        if (subtitle != null) {
-            Spacer(Modifier.height(2.dp))
-            Text(
-                text = subtitle,
-                style = AppTheme.typography.bodySmall,
-                color = AppTheme.materialColors.onSurfaceVariant,
-            )
-        }
     }
 }
 

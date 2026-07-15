@@ -12,8 +12,8 @@ goes through Firestore.
 
 ## Stack
 
-- Kotlin **2.3.20** / Compose Multiplatform **1.10.3**
-- Gradle **8.14.3**, JDK **17**
+- Kotlin **2.4.0** / Compose Multiplatform **1.11.1**
+- Gradle **9.6.0**, JDK **17**
 - Room (local), Firestore + Firebase Auth (remote / sync)
 - Arrow (functional error handling), Coroutines, Kotlin Serialization
 

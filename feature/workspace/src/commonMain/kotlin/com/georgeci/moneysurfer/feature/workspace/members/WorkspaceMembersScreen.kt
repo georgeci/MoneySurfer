@@ -62,6 +62,7 @@ import moneysurfer.feature.workspace.generated.resources.workspace_members_tab_a
 import moneysurfer.feature.workspace.generated.resources.workspace_members_tab_invited_format
 import moneysurfer.feature.workspace.generated.resources.workspace_members_title_format
 import moneysurfer.feature.workspace.generated.resources.workspace_members_view_only_hint
+import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
 
 /**
@@ -227,10 +228,14 @@ private fun Header(
 
 @Composable
 private fun subtitleFor(role: WorkspaceRole?, memberCount: Int): String = when (role) {
-    WorkspaceRole.OWNER -> stringResource(Res.string.workspace_members_subtitle_owner_format, memberCount)
-    WorkspaceRole.EDITOR -> stringResource(Res.string.workspace_members_subtitle_editor_format, memberCount)
-    WorkspaceRole.VIEWER -> stringResource(Res.string.workspace_members_subtitle_viewer_format, memberCount)
-    null -> stringResource(Res.string.workspace_members_subtitle_unknown_format, memberCount)
+    WorkspaceRole.OWNER ->
+        pluralStringResource(Res.plurals.workspace_members_subtitle_owner_format, memberCount, memberCount)
+    WorkspaceRole.EDITOR ->
+        pluralStringResource(Res.plurals.workspace_members_subtitle_editor_format, memberCount, memberCount)
+    WorkspaceRole.VIEWER ->
+        pluralStringResource(Res.plurals.workspace_members_subtitle_viewer_format, memberCount, memberCount)
+    null ->
+        pluralStringResource(Res.plurals.workspace_members_subtitle_unknown_format, memberCount, memberCount)
 }
 
 @Composable

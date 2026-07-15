@@ -50,6 +50,7 @@ import moneysurfer.feature.settings.generated.resources.settings_csv_section_imp
 import moneysurfer.feature.settings.generated.resources.settings_csv_section_last_import
 import moneysurfer.feature.settings.generated.resources.settings_csv_title
 import moneysurfer.feature.settings.generated.resources.settings_export_csv
+import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -97,7 +98,7 @@ fun CsvBackupScreen(
 @Composable
 private fun noticeText(notice: CsvBackupNotice): String = when (notice) {
     is CsvBackupNotice.ExportSuccess ->
-        stringResource(Res.string.settings_csv_export_success, notice.count)
+        pluralStringResource(Res.plurals.settings_csv_export_success, notice.count, notice.count)
     is CsvBackupNotice.ImportFinished ->
         stringResource(
             Res.string.settings_csv_import_result,

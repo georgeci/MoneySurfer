@@ -7,12 +7,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -51,24 +49,10 @@ fun SurferInsightsWidget(
     val hero = size == SurferWidgetSize.Hero
     val visibleItems = if (hero) items.take(3) else items.take(1)
 
-    Column(
-        modifier = modifier
-            .clip(RoundedCornerShape(16.dp))
-            .background(AppTheme.materialColors.surface)
-            .padding(vertical = 14.dp),
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 20.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Text(
-                text = title,
-                style = AppTheme.typography.titleMedium,
-                color = AppTheme.materialColors.onSurface,
-                modifier = Modifier.weight(1f),
-            )
+    SurferWidgetCard(
+        title = title,
+        modifier = modifier,
+        trailing = {
             if (items.isNotEmpty() && badgeFormat != null) {
                 Text(
                     text = badgeFormat(items.size),
@@ -76,11 +60,15 @@ fun SurferInsightsWidget(
                     color = AppTheme.materialColors.primary,
                 )
             }
-        }
-
+        },
+    ) {
         if (items.isEmpty()) {
-            EmptyBox(text = emptyText)
-            return@Column
+            SurferWidgetEmptyState(
+                icon = SurferIcons.Sparkle,
+                title = null,
+                subtitle = emptyText,
+            )
+            return@SurferWidgetCard
         }
 
         Spacer(Modifier.height(10.dp))
@@ -149,40 +137,6 @@ private fun InsightCard(item: SurferInsightItem, onClick: (() -> Unit)?) {
                 text = item.body,
                 style = AppTheme.typography.bodySmall,
                 color = fg.copy(alpha = 0.85f),
-            )
-        }
-    }
-}
-
-@Composable
-private fun EmptyBox(text: String?) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-    ) {
-        Box(
-            modifier = Modifier
-                .size(44.dp)
-                .clip(CircleShape)
-                .background(AppTheme.materialColors.surfaceContainerHighest),
-            contentAlignment = Alignment.Center,
-        ) {
-            Icon(
-                imageVector = SurferIcons.Sparkle,
-                contentDescription = null,
-                tint = AppTheme.materialColors.onSurfaceVariant,
-                modifier = Modifier.size(20.dp),
-            )
-        }
-        if (text != null) {
-            Spacer(Modifier.height(6.dp))
-            Text(
-                text = text,
-                style = AppTheme.typography.bodySmall,
-                color = AppTheme.materialColors.onSurfaceVariant,
             )
         }
     }

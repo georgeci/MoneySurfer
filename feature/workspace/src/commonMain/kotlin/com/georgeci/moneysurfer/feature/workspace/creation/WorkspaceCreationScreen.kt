@@ -67,6 +67,7 @@ import moneysurfer.feature.workspace.generated.resources.workspace_creation_titl
 import moneysurfer.feature.workspace.generated.resources.workspace_members_role_editor_label
 import moneysurfer.feature.workspace.generated.resources.workspace_members_role_owner_label
 import moneysurfer.feature.workspace.generated.resources.workspace_members_role_viewer_label
+import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -279,8 +280,9 @@ private fun PreviewCard(
                             currencyCode.ifBlank { "—" },
                         )
                     } else {
-                        stringResource(
-                            Res.string.workspace_creation_preview_subtitle_format,
+                        pluralStringResource(
+                            Res.plurals.workspace_creation_preview_subtitle_format,
+                            memberCount,
                             memberCount,
                             currencyCode.ifBlank { "—" },
                         )
