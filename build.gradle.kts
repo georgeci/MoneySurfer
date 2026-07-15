@@ -1,3 +1,13 @@
+// Lock the root buildscript classpath *before* the `plugins { }` block resolves
+// it, so the shared Gradle plugins declared here (AGP, Kotlin, Compose, detekt,
+// …) are pinned. The `allprojects { }` activation below runs too late for the
+// root project's own classpath — see docs/security/supply-chain.md.
+buildscript {
+    configurations.named("classpath") {
+        resolutionStrategy.activateDependencyLocking()
+    }
+}
+
 plugins {
     alias(libs.plugins.androidApplication) apply false
     alias(libs.plugins.androidLibrary) apply false
@@ -66,6 +76,63 @@ tasks.named<de.aaschmid.gradle.plugins.cpd.Cpd>("cpdCheck") {
             // set (jvm uses NoOpCrashReporter), which isn't worth it for ~30 lines.
             "**/repository/FirebaseCrashReporter.kt",
         )
+    }
+}
+
+// --- Supply-chain hardening: dependency locking (issue #158) -----------------
+// Pin every resolved transitive version so a mutable/republished transitive
+// (or a plugin-portal compromise that floats a version) cannot silently drift
+// into a release or CI build. Locking only enforces where a `gradle.lockfile`
+// exists; regenerate after any dependency change with:
+//   ./gradlew resolveAndLockAll --write-locks --no-configuration-cache
+// See docs/supply-chain.md for the full workflow (incl. the macOS-host iOS /
+// Android-release configs and the remaining checksum-verification follow-up).
+//
+// Desktop artifacts from Compose (`skiko`, `compose.desktop`) encode the host
+// OS + arch in their *module name* (…-macos-arm64 vs …-linux-x64). A single
+// committed lockfile must stay valid on both the macOS and Ubuntu CI runners,
+// so these host-variant families are excluded from the lock state rather than
+// pinned to whichever host generated the file.
+val hostVariantDependencies = listOf(
+    "org.jetbrains.skiko:*",
+    "org.jetbrains.compose.desktop:*",
+)
+
+allprojects {
+    dependencyLocking {
+        lockAllConfigurations()
+        ignoredDependencies.addAll(hostVariantDependencies)
+    }
+
+    // `lockAllConfigurations()` covers project dependency configurations but not
+    // the buildscript classpath — where the Gradle plugins applied via the
+    // `plugins { }` DSL (Kotlin, KSP, koin-compiler, …) actually resolve. Lock it
+    // too so a compromised plugin republish cannot float into a build. The
+    // pinned versions land in a separate `buildscript-gradle.lockfile`.
+    buildscript {
+        configurations.named("classpath") {
+            resolutionStrategy.activateDependencyLocking()
+        }
+    }
+
+    // `./gradlew resolveAndLockAll --write-locks --no-configuration-cache`
+    // resolves every resolvable configuration in one pass so the lockfiles are
+    // written in a single invocation. Kept out of the configuration cache
+    // because it filters configurations at execution time.
+    tasks.register("resolveAndLockAll") {
+        group = "verification"
+        description = "Resolves every configuration to (re)write the dependency lockfiles."
+        notCompatibleWithConfigurationCache("Resolves configurations at execution time")
+        doFirst {
+            require(gradle.startParameter.isWriteDependencyLocks) {
+                "Run resolveAndLockAll with --write-locks to (re)generate lockfiles."
+            }
+        }
+        doLast {
+            configurations
+                .filter { it.isCanBeResolved }
+                .forEach { it.incoming.artifactView { lenient(true) }.artifacts.artifacts }
+        }
     }
 }
 

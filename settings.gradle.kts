@@ -18,6 +18,13 @@ pluginManagement {
 }
 
 dependencyResolutionManagement {
+    // Supply-chain hardening (issue #158): forbid subprojects from declaring
+    // their own repositories. Every dependency must resolve through the
+    // curated, group-scoped repositories below — a rogue `repositories { }`
+    // block in any module (or injected by a compromised plugin) fails the
+    // build instead of silently widening the trusted source set.
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+
     repositories {
         google {
             mavenContent {

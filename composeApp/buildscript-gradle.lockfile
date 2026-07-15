@@ -1,0 +1,16 @@
+# This is a Gradle generated file for dependency locking.
+# Manual edits can break the build and are not advised.
+# This file is expected to be part of source control.
+# To regenerate this file, run: ./gradlew dependencies --write-locks
+io.insert-koin.compiler.plugin:io.insert-koin.compiler.plugin.gradle.plugin:1.0.1=classpath
+io.insert-koin:koin-compiler-gradle-plugin:1.0.1=classpath
+org.jetbrains.kotlin:kotlin-build-tools-api:2.3.20=classpath
+org.jetbrains.kotlin:kotlin-gradle-plugin-annotations:2.3.20=classpath
+org.jetbrains.kotlin:kotlin-gradle-plugin-api:2.3.20=classpath
+org.jetbrains.kotlin:kotlin-gradle-plugins-bom:2.3.20=classpath
+org.jetbrains.kotlin:kotlin-native-utils:2.3.20=classpath
+org.jetbrains.kotlin:kotlin-stdlib:2.3.21=classpath
+org.jetbrains.kotlin:kotlin-tooling-core:2.3.20=classpath
+org.jetbrains.kotlin:kotlin-util-io:2.3.20=classpath
+org.jetbrains:annotations:13.0=classpath
+empty=
