@@ -6,7 +6,10 @@
 - [TL;DR for agents](#tldr-for-agents)
 - [Common Commands](#common-commands)
 - [QA Entry Points](#qa-entry-points)
-- [Test tags (Compose ↔ Maestro)](#test-tags-compose--maestro)
+  - [Offline golden-path E2E](#offline-golden-path-e2e)
+- [Android — needs a booted emulator/device:](#android-needs-a-booted-emulatordevice)
+- [iOS — needs a booted Simulator:](#ios-needs-a-booted-simulator)
+- [Test tags (Compose ↔ Maestro)](#test-tags-compose-maestro)
 - [Rules](#rules)
 <!-- DOCS:END -->
 
@@ -101,5 +104,11 @@ work — don't sprinkle text matchers permanently).
 
 - Use module tests for narrow changes.
 - Use integration tests for persistence/sync behavior spanning modules.
-- Use Firestore rules tests for security rules changes.
+- Use Firestore rules tests for security rules changes — they live in
+  [`firestore-tests/`](../../firestore-tests/) (Mocha +
+  `@firebase/rules-unit-testing`; `cd firestore-tests && npm test`, boots its
+  own Firestore emulator, needs JDK 21+ on PATH for firebase-tools). Any
+  change to `firestore.rules` **or** to the wire shape clients write (push
+  DTOs, tombstone patch) needs coverage there — device ITs exercise rules
+  only incidentally.
 <!-- AI:END -->

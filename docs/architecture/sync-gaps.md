@@ -79,12 +79,20 @@ a reviewer.
   because LWW tie-breaking is `TakeLocal`. If a future resolver introduces
   side effects, this contract has to tighten — see
   [sync-pull-lww.md](sync-pull-lww.md#cursor-apply-atomicity).
-- **Push-side soft delete not implemented.**
-  `MutationOperation.DELETE` calls `firestore.delete()`, not
-  `update(deletedAt = serverTimestamp)`. So a peer pulling after a hard
-  delete sees no doc at all — its local row stays. The plan
-  (sync plan §4.4, Firestore schema changes) is to migrate to
-  soft delete, then enable Firestore Rules `allow delete: if false`.
+- **Tombstone retention / GC not implemented.**
+  Push-side soft delete shipped: `MutationOperation.DELETE` writes a
+  `TombstonePatch` (`deletedAt` + `updatedAt` + `clientVersionCode`)
+  via `update`, never `firestore.delete()` — see
+  [sync-pull-lww.md](sync-pull-lww.md#tombstones-soft-delete). But
+  tombstoned docs stay in Firestore forever: no retention window, no
+  garbage collection. Fine at current volumes; a scheduled cleanup
+  (Cloud Function or owner-client sweep) is future work, and any
+  retention window must stay longer than the longest plausible
+  offline-device gap or trimmed tombstones resurrect stale rows.
+- **Tombstone `updatedAt` uses the client clock.** The tombstone stamps
+  the mutation's enqueue time. A peer whose cursor already advanced past
+  that value (possible only with clock skew between devices) misses the
+  tombstone — same root cause as the server-timestamp gap below.
 - **No server timestamps for `updatedAt`.** Push uses the client clock
   via `Clock.System.now()` set by the repository before enqueue.
   `FieldValue.serverTimestamp()` + read-back is in

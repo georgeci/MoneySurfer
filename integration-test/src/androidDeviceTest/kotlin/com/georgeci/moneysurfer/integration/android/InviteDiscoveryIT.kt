@@ -287,6 +287,7 @@ class InviteDiscoveryIT {
         // ── 10. Verify invitedWorkspaceIds was cleaned up ──────────────────────
         val userSnap = inviteeHarness.env.firestore
             .collection("users").document(inviteeUid).get()
+
         @Suppress("UNCHECKED_CAST")
         val remaining = (userSnap.get("invitedWorkspaceIds") as? List<String>).orEmpty()
         withClue("invitedWorkspaceIds should be empty after accept") {
@@ -326,6 +327,7 @@ class InviteDiscoveryIT {
 
         val snap = inviteeHarness.env.firestore
             .collection("users").document(inviteeUid).get()
+
         @Suppress("UNCHECKED_CAST")
         val remaining = (snap.get("invitedWorkspaceIds") as? List<String>).orEmpty()
         withClue("invitedWorkspaceIds should be empty after decline") {
