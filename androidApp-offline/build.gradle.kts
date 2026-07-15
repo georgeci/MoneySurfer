@@ -19,6 +19,7 @@ android {
 
 dependencies {
     implementation(projects.composeAppOffline)
+    implementation(projects.shared)
 }
 
 // Build-time guard: the offline build must never ship with networking permissions.

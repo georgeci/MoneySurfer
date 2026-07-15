@@ -29,7 +29,7 @@ kotlin {
                 implementation(libs.androidx.room.runtime)
                 implementation(libs.androidx.sqlite.bundled)
                 implementation(projects.domain)
-                api(projects.sync.api)
+                implementation(projects.sync.api)
                 implementation(libs.kotlinx.serialization.core)
             }
         }

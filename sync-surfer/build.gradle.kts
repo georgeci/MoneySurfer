@@ -30,6 +30,7 @@ kotlin {
                 implementation(libs.gitlive.firebase.auth)
                 implementation(libs.gitlive.firebase.firestore)
                 implementation(projects.domain)
+                implementation(projects.sync.api)
                 implementation(projects.sync.default)
                 implementation(projects.dataLocal)
                 implementation(projects.dataRemote)

@@ -26,34 +26,54 @@ READ WHEN:
 ## Module Map
 
 ```text
-androidApp/             Android entry point
-composeApp/             shared app shell + Compose Multiplatform host
-shared/                 feature-facing ViewModels, screens, navigation glue
+androidApp/             Android entry point (online)
+androidApp-offline/     Android entry point (offline, Firebase-free)
+composeApp/             online app shell + Compose Multiplatform host
+composeAppOffline/      offline app shell (no data-remote / sync runtime)
+shared/                 DI composition root, app theme, navigation glue
 domain/                 business interfaces, models, use cases
 data-*/                 Room, DataStore, Firebase, Firestore implementations
-sync/                   SDK-free sync coordinator contracts
-sync-impl/              sync runtime implementations
+sync/api/               SDK-free sync coordinator contracts
+sync/default/           SDK-free sync runtime core (coordinator, outbox, LWW)
+sync/no-op/             no-op SyncCoordinator for offline builds
+sync-surfer/            Firestore-bound sync implementation (entity plugins)
 uikit/                  design system and reusable Compose widgets
-feature/                feature modules
-navigation/             app navigation
+feature/                feature modules (account, category, dashboard, ...)
+navigation/             app navigation (Navigation 3)
+utils/                  small shared utilities (MviViewModel, AsyncState)
+*-test-fixtures/        shared test fixtures (domain, data, sync)
 integration-test/       Firebase/Room integration tests
 firestore-tests/        Firestore rules tests
 build-logic/            Gradle convention plugins
-iosApp/                 native iOS Xcode entry point
+iosApp/                 native iOS Xcode entry point (online)
+iosAppOffline/          native iOS Xcode entry point (offline)
 ```
 
 ## Dependency Boundaries
 
 ```text
-                  -> uikit
-androidApp -> composeApp -> shared -> domain <- data-*
-                            shared -> sync   <- sync-impl
+androidApp         -> composeApp        -> shared -> feature:* -> domain -> sync:api
+androidApp-offline -> composeAppOffline -> shared    feature:* -> {navigation, uikit, utils}
+
+composeApp        -> {data-remote, sync:default, sync-surfer}   # online wiring
+composeAppOffline -> {sync:api, sync:no-op}                     # offline wiring
+shared            -> data-local                                 # DI wiring only
+sync-surfer       -> {sync:default, data-local, data-remote}
+data-*            -> domain
 ```
 
-- `shared` and feature modules must not depend on `data-*`.
-- `domain` must not depend on `data-*`, `sync`, Firebase, Firestore, Room, or DataStore.
-- `sync` must not depend on `data-*`, Firebase, Firestore, Room, or DataStore.
-- External SDKs are touched only from `data-*` or platform entry modules.
+- Feature modules must not depend on `data-*`.
+- `shared` may reference `data-local` only for DI wiring; no logic in
+  `shared` may call data-layer types.
+- `domain` must not depend on `data-*`, sync implementations, Firebase,
+  Firestore, Room, or DataStore; the SDK-free `sync:api` contracts are
+  allowed.
+- `sync:api` and `sync:no-op` must not depend on `data-*`, Firebase,
+  Firestore, Room, or DataStore; `sync:default` may use Room/WorkManager for
+  its private outbox database. Firestore-bound sync code lives only in
+  `sync-surfer`.
+- External SDKs are touched only from `data-*`, `sync-surfer`, or platform
+  entry modules.
 <!-- AI:END -->
 
 ## Documentation Areas
