@@ -83,13 +83,32 @@ This is the highest-value/lowest-cost path to desktop E2E coverage: the ecosyste
 
 ### 2.3 Screenshot / visual regression — Roborazzi
 
-**Roborazzi is currently the only screenshot-testing library that supports Compose Desktop** (Paparazzi and standard Roborazzi/Robolectric are Android-JVM only). Support is via `roborazzi-compose-desktop` (latest stable 1.68.0, desktop support marked experimental):
+**Roborazzi is currently the only screenshot-testing library that supports Compose Desktop** (Paparazzi and standard Roborazzi/Robolectric are Android-JVM only). Support is via `roborazzi-compose-desktop` (latest stable 1.68.0, desktop support marked experimental). Wire it through the version catalog per repo convention:
+
+```toml
+# gradle/libs.versions.toml
+[versions]
+roborazzi = "1.68.0"
+
+[libraries]
+roborazzi-compose-desktop = { module = "io.github.takahirom.roborazzi:roborazzi-compose-desktop", version.ref = "roborazzi" }
+
+[plugins]
+roborazzi = { id = "io.github.takahirom.roborazzi", version.ref = "roborazzi" }
+```
 
 ```kotlin
-plugins { id("io.github.takahirom.roborazzi") }
+// module build.gradle.kts
+plugins {
+    alias(libs.plugins.roborazzi)
+}
 
-kotlin.sourceSets.jvmTest.dependencies {
-    implementation("io.github.takahirom.roborazzi:roborazzi-compose-desktop:1.68.0")
+kotlin {
+    sourceSets {
+        jvmTest.dependencies {
+            implementation(libs.roborazzi.compose.desktop)
+        }
+    }
 }
 ```
 
