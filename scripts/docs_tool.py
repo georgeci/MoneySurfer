@@ -27,6 +27,7 @@ SECTION_RE = re.compile(r"<!--\s*AI:SECTION\s+([^>]+?)\s*-->")
 END_RE = re.compile(r"<!--\s*AI:END\s*-->")
 ATTR_RE = re.compile(r"(\w+)=([^\s]+)")
 HEADING_RE = re.compile(r"^(#{1,6})\s+(.+?)\s*$")
+FENCE_RE = re.compile(r"^\s*(?:`{3,}|~{3,})")
 HTML_ANCHOR_RE = re.compile(r"<a\s+(?:[^>]*\s+)?(?:id|name)=[\"']([^\"']+)[\"']", re.IGNORECASE)
 LINK_RE = re.compile(r"!?\[[^\]]*]\(([^)]+)\)")
 TOC_START = "<!-- DOCS:TOC -->"
@@ -181,7 +182,13 @@ def slugify(text: str) -> str:
 
 def headings_from_text(text: str) -> list[tuple[int, str, str]]:
     result: list[tuple[int, str, str]] = []
+    in_fence = False
     for line in text.splitlines():
+        if FENCE_RE.match(line):
+            in_fence = not in_fence
+            continue
+        if in_fence:
+            continue
         match = HEADING_RE.match(line)
         if match:
             level = len(match.group(1))
