@@ -21,9 +21,17 @@ service cloud.firestore {
       return request.auth != null;
     }
 
+    // Membership grants read/write to every workspace subcollection, so it must track
+    // ACTIVE status — not mere row existence. Member rows are soft-deleted (status
+    // LEFT / REMOVED, never hard-deleted), so an existence check would keep granting a
+    // left or owner-evicted user full access to accounts/transactions/etc. `exists()`
+    // guards the `get()`; a missing `status` (pre-status legacy docs) defaults to ACTIVE
+    // so those keep working. Same-path get()/exists() are billed as a single read.
     function isMember(wid) {
       return signedIn()
-        && exists(/databases/$(database)/documents/workspaces/$(wid)/members/$(request.auth.uid));
+        && exists(/databases/$(database)/documents/workspaces/$(wid)/members/$(request.auth.uid))
+        && get(/databases/$(database)/documents/workspaces/$(wid)/members/$(request.auth.uid))
+             .data.get('status', 'ACTIVE') == "ACTIVE";
     }
 
     function isOwner(wid) {

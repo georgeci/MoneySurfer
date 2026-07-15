@@ -80,7 +80,7 @@ allow create:
 
 `hasJoinableInvite(wid)` reads the invite id off the member doc (`request.resource.data.inviteId`), `exists()`-guards it, then `get()`s the invite and requires it to be `PENDING`/`ACCEPTED` **and** to address the caller by `targetUserId` or a case-insensitive email match. `PENDING`/`ACCEPTED` (not `PENDING` only) tolerates the invitee's own `PENDING → ACCEPTED` flip landing first and idempotent outbox retries; `CANCELLED`/`DECLINED` invites are excluded so a revoked invite grants nothing.
 
-The eviction bypass is closed by adding `resource.data.status != "REMOVED"` to the self-`update` branch — a `REMOVED` row can no longer self-resurrect; rejoining requires a fresh invite.
+The eviction bypass is closed on two fronts. (1) `isMember(wid)` now requires the caller's member row to be `status == "ACTIVE"` rather than merely to exist — member rows are soft-deleted (`LEFT`/`REMOVED`, never hard-deleted), so an existence check kept granting a left or evicted user full read/write to every `accounts`/`transactions`/etc. subcollection. A missing `status` (pre-status legacy docs) defaults to `ACTIVE`. (2) `resource.data.status != "REMOVED"` on the self-`update` branch stops a `REMOVED` row from self-resurrecting to `ACTIVE`; rejoining requires a fresh invite.
 
 Client side, `WorkspaceMemberSyncPlugin.push` stamps `inviteId` onto the pushed `WorkspaceMemberDoc` by looking up the admitting invite in local Room (`WorkspaceInviteDao.findJoinableInviteId`). No new persisted column — the id is derived at push time, so there is **no Room migration**. Owner-created rows carry a null `inviteId` and are admitted by the owner branch.
 

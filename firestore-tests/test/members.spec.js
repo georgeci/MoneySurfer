@@ -75,6 +75,18 @@ describe('workspaces/{wid}/members/{uid}', () => {
     await assertFails(getDoc(doc(db, `workspaces/${WID}/members/${OWNER}`)));
   });
 
+  it('an evicted (REMOVED) member can no longer read the roster', async () => {
+    // isMember is ACTIVE-only, so a soft-removed row no longer counts as membership.
+    await withAdmin(env, async (db) => {
+      await setDoc(
+        doc(db, `workspaces/${WID}/members/${MEMBER}`),
+        memberDoc({ role: 'EDITOR', status: 'REMOVED' }),
+      );
+    });
+    const db = authedAs(env, MEMBER, { email: 'member@example.com' });
+    await assertFails(getDoc(doc(db, `workspaces/${WID}/members/${OWNER}`)));
+  });
+
   // ── self-create (accept invite) ─────────────────────────────────────────
   //
   // Tenant-isolation gate (issue #152): a self-created member row is accepted ONLY

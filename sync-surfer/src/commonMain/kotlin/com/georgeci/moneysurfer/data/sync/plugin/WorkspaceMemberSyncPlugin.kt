@@ -45,8 +45,10 @@ class WorkspaceMemberSyncPlugin(
                     workspaceId = scopeKey,
                 ) ?: return
                 // Stamp the admitting invite so the rules can authorize the accept-invite
-                // self-create (issue #152). Null for owner-created rows — the owner branch
-                // in the rules does not consult it.
+                // self-create (issue #152). Usually null for owner-created rows and not
+                // required for owner writes (the rules' owner branch never consults it);
+                // it may still be non-null if a joinable invite happens to target the
+                // owner, which is harmless.
                 val inviteId = workspaceInviteDao.findJoinableInviteId(
                     workspaceId = scopeKey,
                     userId = entity.userId,
