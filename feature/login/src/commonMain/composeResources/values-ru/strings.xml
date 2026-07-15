@@ -11,6 +11,13 @@
     <string name="sign_in_passkey">Войти по Passkey</string>
     <string name="sign_in_email">Войти по e-mail</string>
     <string name="sign_in_demo_mode">Продолжить без аккаунта</string>
+    <string name="sign_in_anonymous">Продолжить как гость</string>
+    <string name="sign_in_email_label">E-mail</string>
+    <string name="sign_in_password_label">Пароль</string>
+    <string name="sign_in_submit_signin">Войти</string>
+    <string name="sign_in_submit_signup">Создать аккаунт</string>
+    <string name="sign_in_toggle_to_signup">Впервые здесь? Создайте аккаунт</string>
+    <string name="sign_in_toggle_to_signin">Уже есть аккаунт? Войдите</string>
     <string name="sign_in_terms">Продолжая, вы принимаете Условия и Политику.</string>
     <!-- TODO(#65): текст Условий/Политики простым языком — финальная формулировка ожидает юридической проверки перед публичным релизом. -->
     <string name="legal_title">Условия и Политика</string>
