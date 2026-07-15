@@ -19,10 +19,10 @@ inputs:
 
 outputs:
   udid:
-    description: UDID of the booted simulator.
+    description: UDID of the picked simulator (booted unless boot=false).
     value: ${{ steps.pick.outputs.udid }}
   name:
-    description: Device name of the booted simulator.
+    description: Device name of the picked simulator (booted unless boot=false).
     value: ${{ steps.pick.outputs.name }}
 
 runs:

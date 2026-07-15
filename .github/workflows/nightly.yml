@@ -734,8 +734,7 @@ jobs:
             "**Failed jobs:**" \
             "$failed" \
             "" \
-            "_Filed automatically by nightly.yml. Reused across nights while open —" \
-            "a new comment is added each time nightly fails. Close it once green._")
+            "_Filed automatically by nightly.yml. Reused across nights while open — a new comment is added each time nightly fails. Close it once green._")
 
           # Reuse the newest open tracking issue if any; otherwise open one.
           existing=$(gh issue list --state open --label "$label" \
