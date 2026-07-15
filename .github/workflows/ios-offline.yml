@@ -1,10 +1,12 @@
 name: iOS offline
 
-# Per-PR + main lane for the offline iOS app (issue #83). Unlike the online
-# iOS jobs — which live in nightly.yml because they need the Firebase emulator
-# and the full flow suite — this lane is lean enough to gate every PR: no
-# Firebase, no seeded users, a single Maestro golden-path flow
-# (scripts/maestro/offline/offline-golden.yaml, from issue #69).
+# Per-PR + main lane for the offline iOS app (issue #83). Build-only: it links
+# the Kotlin framework and compiles iosAppOffline via xcodebuild, catching
+# Kotlin/Swift/link regressions on every PR without paying for a simulator boot
+# or a Maestro run. The actual offline golden flow
+# (scripts/maestro/offline/offline-golden.yaml, issue #69) runs in nightly.yml's
+# `maestro-ios-offline` job alongside the other E2E jobs (issue #172 §4) — E2E
+# signal on every PR isn't worth the macos-15 minutes.
 
 on:
   pull_request:
@@ -52,9 +54,9 @@ jobs:
               - '!LICENSE'
 
   ios-offline:
-    name: iOS offline build + Maestro (Simulator)
+    name: iOS offline build (Simulator)
     runs-on: macos-15
-    timeout-minutes: 60
+    timeout-minutes: 40
     needs: changes
     # `changes` is skipped on push/dispatch, so `!cancelled()` (not the
     # default success-of-needs) keeps this job eligible; the second clause
@@ -67,8 +69,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
-      # No Firebase config step on purpose: the offline app must build and
-      # run without any networked services baked in.
+      # No Firebase config step on purpose: the offline app must build without
+      # any networked services baked in. No maestro-setup either — this lane
+      # only compiles; the golden flow runs in nightly.
       - name: Set up JDK
         uses: actions/setup-java@v5
         with:
@@ -77,11 +80,6 @@ jobs:
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@3f131e8634966bd73d06cc69884922b02e6faf92 # v6.2.0
-
-      - name: Set up Maestro (offline — no Firebase/Allure)
-        uses: ./.github/actions/maestro-setup
-        with:
-          online-stack: "false"
 
       # Prints the selected version; replaces a bare `xcodebuild -version`.
       - name: Select Xcode
@@ -93,40 +91,19 @@ jobs:
       - name: Link Kotlin framework (iosSimulatorArm64, offline)
         run: ./gradlew :composeAppOffline:linkDebugFrameworkIosSimulatorArm64 --stacktrace
 
-      - name: Boot iOS simulator
+      # Resolve a valid simulator *name* for xcodebuild's `-destination name=…`
+      # without booting one (boot: false) — a build needs the device to exist,
+      # not to be running. Saves the ~1–2 min simulator boot on every PR.
+      - name: Resolve iOS simulator (no boot)
         id: ios-sim
         uses: ./.github/actions/ios-simulator
+        with:
+          boot: "false"
 
-      # Builds iosAppOffline via xcodebuild (maestroBuildIosOfflineSimulator),
-      # installs it on the booted simulator, then runs the offline golden
-      # Maestro flow. JUnit lands in
-      # build/test-results/maestro-ios/maestro-offline-golden-ios.xml.
-      - name: Run qaMaestroOfflineIos
+      # Compile iosAppOffline via xcodebuild (maestroBuildIosOfflineSimulator).
+      # Build-only: no install, no simulator run, no Maestro flow.
+      - name: Build iosAppOffline (Simulator)
         run: |
-          ./gradlew qaMaestroOfflineIos \
+          ./gradlew maestroBuildIosOfflineSimulator \
             -PiosSimulatorName="${{ steps.ios-sim.outputs.name }}" \
-            -PiosSimulatorUdid="${{ steps.ios-sim.outputs.udid }}" \
             --stacktrace
-
-      - name: Upload JUnit results
-        if: always()
-        uses: actions/upload-artifact@v7
-        with:
-          name: maestro-ios-offline-junit
-          path: build/test-results/maestro-ios/*.xml
-          if-no-files-found: warn
-          retention-days: 14
-
-      # The offline tasks use buildMaestroCommand's default debug/artifact
-      # locations (build/maestro-debug, build/maestro-artifacts) — not the
-      # -ios-suffixed dirs of the online suite.
-      - name: Upload Maestro debug + screenshots
-        if: always()
-        uses: actions/upload-artifact@v7
-        with:
-          name: maestro-ios-offline-debug
-          path: |
-            build/maestro-debug/
-            build/maestro-artifacts/
-          if-no-files-found: ignore
-          retention-days: 7
