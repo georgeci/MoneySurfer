@@ -134,6 +134,22 @@ class CsvBackupViewModelTest : StringSpec({
         }
     }
 
+    "an oversized file posts FileTooLarge and returns to Idle" {
+        runTest {
+            val vm = viewModel()
+            val chunk = "x".repeat(64 * 1024)
+            val oversized = Buffer().apply { repeat(256 + 1) { writeUtf8(chunk) } }
+
+            vm.sideEffects.effectFlow.test {
+                vm.onEvent(CsvBackupEvent.OnOpenSourceChosen(oversized))
+
+                awaitItem() shouldBe CsvBackupEffect.Notify(CsvBackupNotice.FileTooLarge)
+            }
+            vm.value.phase shouldBe CsvBackupPhase.Idle
+            vm.value.lastImportReport shouldBe null
+        }
+    }
+
     "export posts ExportSuccess with the exported count" {
         runTest {
             val vm = viewModel(

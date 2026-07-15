@@ -96,6 +96,7 @@ sealed interface CsvBackupNotice {
     data class ExportSuccess(val count: Int) : CsvBackupNotice
     data class ImportFinished(val imported: Int, val skipped: Int, val failed: Int) : CsvBackupNotice
     data object InvalidFile : CsvBackupNotice
+    data object FileTooLarge : CsvBackupNotice
     data object Generic : CsvBackupNotice
 
     companion object {
@@ -103,6 +104,7 @@ sealed interface CsvBackupNotice {
             is TransactionCsvError.EmptyFile,
             is TransactionCsvError.HeaderMismatch,
             -> InvalidFile
+            is TransactionCsvError.FileTooLarge -> FileTooLarge
             else -> Generic
         }
     }

@@ -54,6 +54,7 @@
     <string name="settings_csv_import_supporting">Строки добавляются; дубликаты по id пропускаются</string>
     <string name="settings_csv_import_result">Импортировано %1$d · пропущено %2$d · ошибок %3$d</string>
     <string name="settings_csv_notice_invalid_file">Выбранный файл не является CSV транзакций MoneySurfer</string>
+    <string name="settings_csv_notice_file_too_large">Выбранный файл слишком большой для импорта</string>
     <string name="settings_csv_notice_generic">Операция с CSV не удалась</string>
     <string name="settings_csv_section_last_import">Последний импорт</string>
     <string name="settings_csv_last_import_summary">Импортировано %1$d, пропущено дубликатов %2$d, ошибок %3$d</string>

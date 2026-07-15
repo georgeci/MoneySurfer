@@ -24,6 +24,7 @@ import com.georgeci.moneysurfer.domain.usecase.ApplyTransactionChangeUseCase
 import com.georgeci.moneysurfer.domain.usecase.CreateTransactionUseCase
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
+import io.kotest.matchers.comparables.shouldBeLessThan
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 import kotlinx.coroutines.flow.Flow
@@ -31,6 +32,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.runTest
 import okio.Buffer
+import okio.BufferedSource
+import okio.Source
+import okio.Timeout
+import okio.buffer
 
 class ExportImportTransactionsUseCaseTest : StringSpec({
 
@@ -181,7 +186,47 @@ class ExportImportTransactionsUseCaseTest : StringSpec({
                 .shouldBeInstanceOf<TransactionCsvError.EmptyFile>()
         }
     }
+
+    "an oversized source is rejected without being fully read into memory" {
+        runTest {
+            val stack = Stack()
+            // A 1 GiB stream generated lazily on demand — if the guard read it
+            // whole it would exhaust the heap. The assertions below prove it
+            // stops just past the 16 MiB cap instead.
+            val huge = CountingSource(total = 1L * 1024 * 1024 * 1024)
+
+            val error = stack.import(huge.buffer()).exceptionOrNull()
+
+            error.shouldBeInstanceOf<TransactionCsvError.FileTooLarge>()
+            stack.transactionRepository.stored() shouldBe emptyList()
+            // Read only a hair over the cap, never the full gigabyte.
+            huge.produced shouldBeLessThan 17L * 1024 * 1024
+        }
+    }
 })
+
+/**
+ * A [Source] that emits [total] bytes lazily, one chunk per read, without ever
+ * holding them all in memory. [produced] records how many it actually handed
+ * out so a test can assert the reader stopped early.
+ */
+private class CountingSource(private val total: Long) : Source {
+    var produced = 0L
+        private set
+
+    private val chunk = ByteArray(64 * 1024) { 'x'.code.toByte() }
+
+    override fun read(sink: Buffer, byteCount: Long): Long {
+        if (produced >= total) return -1L
+        val n = minOf(byteCount, chunk.size.toLong(), total - produced).toInt()
+        sink.write(chunk, 0, n)
+        produced += n
+        return n.toLong()
+    }
+
+    override fun timeout(): Timeout = Timeout.NONE
+    override fun close() = Unit
+}
 
 /**
  * Real use cases wired over in-memory fakes. Reference data (workspace,
@@ -213,6 +258,8 @@ private class Stack(
     suspend fun export(buffer: Buffer) = exportUseCase(buffer)
 
     suspend fun import(csv: String) = importUseCase(Buffer().writeUtf8(csv))
+
+    suspend fun import(source: BufferedSource) = importUseCase(source)
 }
 
 private class FakeTransactionRepository(initial: List<Transaction>) : TransactionRepository {
