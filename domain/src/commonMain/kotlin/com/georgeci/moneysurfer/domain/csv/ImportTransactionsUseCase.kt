@@ -62,10 +62,12 @@ class ImportTransactionsUseCase(
 
     /**
      * Reads the whole file, but bounds the read first: `request(limit + 1)`
-     * buffers at most `limit + 1` bytes, and a `true` result means the file is
-     * larger than the cap, so we reject without ever allocating the whole
-     * thing. This also caps the giant single field an unclosed quote would
-     * otherwise produce — it can never exceed the total limit.
+     * pulls from the source only until at least `limit + 1` bytes are buffered
+     * (Okio fills in ~8 KiB segments, so it stops within one segment of the
+     * threshold — never the whole file), and a `true` result means the file is
+     * larger than the cap, so we reject without materialising it. This also
+     * caps the giant single field an unclosed quote would otherwise produce —
+     * it can never exceed the total limit.
      */
     private fun readCapped(source: BufferedSource): String {
         if (source.request(MAX_IMPORT_BYTES + 1)) {
