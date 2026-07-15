@@ -19,6 +19,30 @@ internal object Csv {
 
     private val charsRequiringQuotes = charArrayOf(',', '"', '\n', '\r')
 
+    // Leading characters a spreadsheet reads as the start of a formula (or a
+    // DDE payload). A cell beginning with one of these is evaluated when the
+    // file is opened in Excel/LibreOffice — the CSV injection vector.
+    private val formulaTriggers = charArrayOf('=', '+', '-', '@', '\t', '\r')
+
+    /**
+     * Neutralises spreadsheet formula injection in free-text fields. A field
+     * whose first character would start a formula gets an apostrophe prefix,
+     * which forces spreadsheets to treat the whole cell as literal text. The
+     * apostrophe is itself escaped (a leading `'` is doubled) so the transform
+     * is reversible: [unguardFormula] strips exactly one leading apostrophe and
+     * recovers the original value losslessly. Applied only to attacker-supplied
+     * free text — structured columns (ids, amounts, dates) stay untouched so
+     * they still import into a spreadsheet as their proper types.
+     */
+    fun guardFormula(field: String): String {
+        val first = field.firstOrNull() ?: return field
+        return if (first == '\'' || first in formulaTriggers) "'$field" else field
+    }
+
+    /** Reverses [guardFormula]: drops one leading apostrophe if present. */
+    fun unguardFormula(field: String): String =
+        if (field.startsWith('\'')) field.substring(1) else field
+
     private fun encodeField(field: String): String =
         if (field.any { it in charsRequiringQuotes }) {
             "\"" + field.replace("\"", "\"\"") + "\""
