@@ -43,9 +43,9 @@ cpd {
 tasks.named<de.aaschmid.gradle.plugins.cpd.Cpd>("cpdCheck") {
     description = "Detects copy-paste duplication across all Kotlin sources."
     group = "verification"
-    // Surface duplicates without breaking the build for now. Flip to `false`
-    // once the existing duplication backlog is clean to enforce.
-    ignoreFailures = true
+    // Blocking gate: fail the build on new duplication. The existing backlog was
+    // refactored away (issue #134); keep it clean rather than re-muting this.
+    ignoreFailures = false
     reports {
         xml.required.set(true)
         text.required.set(true)
@@ -60,6 +60,11 @@ tasks.named<de.aaschmid.gradle.plugins.cpd.Cpd>("cpdCheck") {
             "iosAppOffline/**",
             "**/.gradle/**",
             "**/.idea/**",
+            // Platform `actual`-style twins: the android and ios FirebaseCrashReporter
+            // are byte-identical because they compile against the same GitLive
+            // multiplatform API. Sharing them needs an android+ios intermediate source
+            // set (jvm uses NoOpCrashReporter), which isn't worth it for ~30 lines.
+            "**/repository/FirebaseCrashReporter.kt",
         )
     }
 }

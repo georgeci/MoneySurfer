@@ -61,6 +61,7 @@ import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.utils.HandleSideEffect
+import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -181,14 +182,15 @@ private fun AccountsManageContent(
                 SurferTotalBalanceCard(
                     label = stringResource(Res.string.accounts_manage_stat_total),
                     formattedTotal = state.formattedTotal,
-                    activeChipText = stringResource(
-                        Res.string.accounts_manage_stat_active_count,
+                    activeChipText = pluralStringResource(
+                        Res.plurals.accounts_manage_stat_active_count,
+                        state.activeAccounts.size,
                         state.activeAccounts.size,
                     ),
                     archivedChipText = state.archivedAccounts.size
                         .takeIf { it > 0 }
                         ?.let {
-                            stringResource(Res.string.accounts_manage_stat_archived_count, it)
+                            pluralStringResource(Res.plurals.accounts_manage_stat_archived_count, it, it)
                         },
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
                 )

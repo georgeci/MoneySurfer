@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="accounts_manage_stat_active_count">
+        <item quantity="one">%1$d active</item>
+        <item quantity="other">%1$d active</item>
+    </plurals>
+    <plurals name="accounts_manage_stat_archived_count">
+        <item quantity="one">%1$d archived</item>
+        <item quantity="other">%1$d archived</item>
+    </plurals>
+    <plurals name="transaction_creation_account_summary">
+        <item quantity="one">Total across %1$d account · %2$s</item>
+        <item quantity="other">Total across %1$d accounts · %2$s</item>
+    </plurals>
+</resources>

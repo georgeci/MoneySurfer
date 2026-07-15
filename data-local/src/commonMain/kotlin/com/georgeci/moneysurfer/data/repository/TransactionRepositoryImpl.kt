@@ -105,23 +105,25 @@ class TransactionRepositoryImpl(
         transferId = transferId?.let(::TransferId),
     )
 
+    // Re-projects the flat categorized row onto [TransactionEntity] so the domain
+    // mapping in [TransactionEntity.toDomain] stays the single source of truth.
     private fun CategorizedTransactionEntity.toDomain() = CategorizedTransaction(
-        transaction = Transaction(
-            id = TransactionId(id),
-            workspaceId = WorkspaceId(workspaceId),
-            accountId = AccountId(accountId),
-            money = Money.fromMinor(amount),
-            currencyCode = CurrencyCode(currencyCode),
-            categoryId = categoryId?.let(::CategoryId),
+        transaction = TransactionEntity(
+            id = id,
+            workspaceId = workspaceId,
+            accountId = accountId,
+            amount = amount,
+            currencyCode = currencyCode,
+            categoryId = categoryId,
             note = note,
-            operationAt = timeFormatter.parseInstant(operationAt),
-            operationDate = resolveOperationDate(operationDate, operationAt),
-            type = parseType(type, amount),
-            status = parseStatus(status),
-            createdAt = timeFormatter.parseInstant(createdAt),
-            updatedAt = timeFormatter.parseInstant(updatedAt),
-            transferId = transferId?.let(::TransferId),
-        ),
+            operationAt = operationAt,
+            operationDate = operationDate,
+            type = type,
+            status = status,
+            createdAt = createdAt,
+            updatedAt = updatedAt,
+            transferId = transferId,
+        ).toDomain(),
         categoryName = categoryName,
     )
 

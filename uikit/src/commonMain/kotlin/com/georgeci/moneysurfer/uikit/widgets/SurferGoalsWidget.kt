@@ -1,26 +1,20 @@
 package com.georgeci.moneysurfer.uikit.widgets
 
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.text.font.FontWeight
@@ -55,35 +49,25 @@ fun SurferGoalsWidget(
     val hero = size == SurferWidgetSize.Hero
     val visibleItems = if (hero) items.take(2) else items.take(1)
 
-    Column(
-        modifier = modifier
-            .clip(RoundedCornerShape(16.dp))
-            .background(AppTheme.materialColors.surface)
-            .padding(vertical = 14.dp),
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 20.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Text(
-                text = title,
-                style = AppTheme.typography.titleMedium,
-                color = AppTheme.materialColors.onSurface,
-                modifier = Modifier.weight(1f),
-            )
+    SurferWidgetCard(
+        title = title,
+        modifier = modifier,
+        trailing = {
             Text(
                 text = seeAllLabel,
                 style = AppTheme.typography.labelMedium,
                 color = AppTheme.materialColors.primary,
                 modifier = Modifier.clickable(onClick = onSeeAllClick),
             )
-        }
-
+        },
+    ) {
         if (items.isEmpty()) {
-            EmptyBox(title = emptyTitle, subtitle = emptySubtitle)
-            return@Column
+            SurferWidgetEmptyState(
+                icon = SurferIcons.Savings,
+                title = emptyTitle,
+                subtitle = emptySubtitle,
+            )
+            return@SurferWidgetCard
         }
 
         Spacer(Modifier.height(8.dp))
@@ -183,48 +167,6 @@ private fun ProgressRing(
             style = AppTheme.typography.labelMedium,
             color = AppTheme.materialColors.onSurface,
         )
-    }
-}
-
-@Composable
-private fun EmptyBox(title: String?, subtitle: String?) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-    ) {
-        Box(
-            modifier = Modifier
-                .size(44.dp)
-                .clip(CircleShape)
-                .background(AppTheme.materialColors.surfaceContainerHighest),
-            contentAlignment = Alignment.Center,
-        ) {
-            Icon(
-                imageVector = SurferIcons.Savings,
-                contentDescription = null,
-                tint = AppTheme.materialColors.onSurfaceVariant,
-                modifier = Modifier.size(20.dp),
-            )
-        }
-        if (title != null) {
-            Spacer(Modifier.height(6.dp))
-            Text(
-                text = title,
-                style = AppTheme.typography.titleSmall,
-                color = AppTheme.materialColors.onSurface,
-            )
-        }
-        if (subtitle != null) {
-            Spacer(Modifier.height(2.dp))
-            Text(
-                text = subtitle,
-                style = AppTheme.typography.bodySmall,
-                color = AppTheme.materialColors.onSurfaceVariant,
-            )
-        }
     }
 }
 

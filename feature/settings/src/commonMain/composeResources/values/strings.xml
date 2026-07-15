@@ -15,9 +15,7 @@
     <string name="settings_finish_setup">Finish setup</string>
     <string name="settings_finish_setup_supporting">Pick your workspace currency</string>
     <string name="settings_members">Members &amp; permissions</string>
-    <string name="settings_members_count_format">%1$d members</string>
     <string name="settings_pending_invites">Pending invitations</string>
-    <string name="settings_pending_invites_supporting_format">%1$d waiting for you</string>
     <string name="settings_pending_invites_supporting_empty">No invitations</string>
 
     <string name="settings_appearance_hub_title">Appearance</string>
@@ -55,7 +53,6 @@
     <string name="settings_csv_section_import">Import</string>
     <string name="settings_csv_import_title">Import from CSV</string>
     <string name="settings_csv_import_supporting">Merges rows; duplicates are skipped by id</string>
-    <string name="settings_csv_export_success">Exported %1$d transactions</string>
     <string name="settings_csv_import_result">Imported %1$d · skipped %2$d · errors %3$d</string>
     <string name="settings_csv_notice_invalid_file">Selected file is not a MoneySurfer transactions CSV</string>
     <string name="settings_csv_notice_generic">CSV operation failed</string>

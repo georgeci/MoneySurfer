@@ -60,6 +60,7 @@ import moneysurfer.feature.settings.generated.resources.settings_sync_hub_title
 import moneysurfer.feature.settings.generated.resources.settings_title
 import moneysurfer.feature.settings.generated.resources.settings_user_name
 import moneysurfer.feature.settings.generated.resources.settings_version_format
+import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -179,8 +180,9 @@ private fun SettingsContent(
                     SurferSettingsRow(
                         icon = SurferIcons.Sparkle,
                         title = stringResource(Res.string.settings_members),
-                        supportingText = stringResource(
-                            Res.string.settings_members_count_format,
+                        supportingText = pluralStringResource(
+                            Res.plurals.settings_members_count_format,
+                            state.activeMemberCount,
                             state.activeMemberCount,
                         ),
                         onClick = { onEvent(SettingsEvent.OnMembersClick) },
@@ -194,8 +196,9 @@ private fun SettingsContent(
                         supporting = if (state.pendingInviteCount > 0) {
                             {
                                 SurferPendingBadge(
-                                    text = stringResource(
-                                        Res.string.settings_pending_invites_supporting_format,
+                                    text = pluralStringResource(
+                                        Res.plurals.settings_pending_invites_supporting_format,
+                                        state.pendingInviteCount,
                                         state.pendingInviteCount,
                                     ),
                                 )

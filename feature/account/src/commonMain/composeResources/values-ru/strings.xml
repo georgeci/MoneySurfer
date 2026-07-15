@@ -4,8 +4,8 @@
     <string name="accounts_manage_edit">Редактировать</string>
     <string name="accounts_manage_done">Готово</string>
     <string name="accounts_manage_stat_total">ВСЕГО</string>
-    <string name="accounts_manage_stat_active">АКТИВНЫЕ</string>
-    <string name="accounts_manage_stat_archived">АРХИВ</string>
+    <string name="accounts_manage_stat_active_count">%1$d активных</string>
+    <string name="accounts_manage_stat_archived_count">%1$d в архиве</string>
     <string name="accounts_manage_active_header">Активные</string>
     <string name="accounts_manage_archived_header">Архив</string>
     <string name="accounts_manage_drag_to_reorder">Потяните, чтобы изменить порядок</string>
@@ -22,6 +22,10 @@
     <string name="accounts_manage_archived_snackbar">«%1$s» в архиве</string>
     <string name="accounts_manage_archive_undo">Отменить</string>
     <string name="accounts_manage_action_failed">Что-то пошло не так. Попробуйте ещё раз.</string>
+    <string name="accounts_manage_delete_title">Удалить этот счёт?</string>
+    <string name="accounts_manage_delete_message">«%1$s» и все его транзакции будут удалены безвозвратно. Отменить это действие нельзя.</string>
+    <string name="accounts_manage_delete_confirm">Удалить</string>
+    <string name="accounts_manage_delete_cancel">Отмена</string>
     <string name="account_creation_title">Новый счёт</string>
     <string name="account_creation_name_label">Название счёта</string>
     <string name="account_creation_balance_label">Начальный баланс</string>
@@ -34,6 +38,7 @@
     <string name="account_type_bank">Банк</string>
     <string name="account_type_card">Карта</string>
     <string name="account_type_savings">Накопления</string>
+    <string name="account_creation_currency_label">Валюта</string>
     <string name="account_creation_accent_label">Цвет</string>
     <string name="account_creation_extra_details_label">Доп. сведения</string>
     <string name="account_creation_extra_details_optional">По желанию</string>
@@ -67,7 +72,6 @@
 
     <!-- Account chooser bottom sheet -->
     <string name="transaction_creation_account_sheet_title">Со счёта</string>
-    <string name="transaction_creation_account_summary">Всего по %1$d счетам · %2$s</string>
     <string name="transaction_creation_account_summary_empty">Пока нет счетов</string>
     <string name="transaction_creation_account_add_new">Добавить счёт</string>
     <string name="transaction_creation_account_add_new_subtitle">Банк, накопления, наличные или карта</string>
