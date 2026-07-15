@@ -38,9 +38,9 @@ class StringResourceParityTest : StringSpec({
      * file may be absent on disk — the tests below treat a missing file as an
      * empty key set, which surfaces as a parity violation rather than a skip.
      */
-    fun resourceBases(): List<Triple<File, File, File>> = repoRoot()
+    fun resourceBases(root: File): List<Triple<File, File, File>> = root
         .walkTopDown()
-        .onEnter { it.name !in setOf("build", ".git", ".gradle") }
+        .onEnter { it.name !in setOf("build", ".git", ".gradle", "node_modules") }
         .filter { it.isDirectory && it.name == "composeResources" }
         .filter { base ->
             File(File(base, "values"), "strings.xml").isFile ||
@@ -62,13 +62,16 @@ class StringResourceParityTest : StringSpec({
             emptySet()
         }
 
+    // Walk the tree once at spec construction; both tests reuse the result.
+    val root = repoRoot()
+    val bases = resourceBases(root)
+
     "localized composeResources string files are discovered" {
-        resourceBases().size shouldBeGreaterThan 0
+        bases.size shouldBeGreaterThan 0
     }
 
     "every EN string key has a RU counterpart and vice-versa" {
-        val root = repoRoot()
-        val violations = resourceBases().flatMap { (base, en, ru) ->
+        val violations = bases.flatMap { (base, en, ru) ->
             val enKeys = keysOf(en)
             val ruKeys = keysOf(ru)
             val module = base.relativeTo(root)
