@@ -1,4 +1,4 @@
-// v2.0.0 — 2026-05-04
+// v2.1.0 — 2026-07-15
 rules_version = '2';
 
 // Workspace-scoped tenancy: every per-user document lives under
@@ -21,14 +21,56 @@ service cloud.firestore {
       return request.auth != null;
     }
 
+    // Membership grants read/write to every workspace subcollection, so it must track
+    // ACTIVE status — not mere row existence. Member rows are soft-deleted (status
+    // LEFT / REMOVED, never hard-deleted), so an existence check would keep granting a
+    // left or owner-evicted user full access to accounts/transactions/etc. `exists()`
+    // guards the `get()`; a missing `status` (pre-status legacy docs) defaults to ACTIVE
+    // so those keep working. Same-path get()/exists() are billed as a single read.
     function isMember(wid) {
       return signedIn()
-        && exists(/databases/$(database)/documents/workspaces/$(wid)/members/$(request.auth.uid));
+        && exists(/databases/$(database)/documents/workspaces/$(wid)/members/$(request.auth.uid))
+        && get(/databases/$(database)/documents/workspaces/$(wid)/members/$(request.auth.uid))
+             .data.get('status', 'ACTIVE') == "ACTIVE";
     }
 
     function isOwner(wid) {
       return signedIn()
         && get(/databases/$(database)/documents/workspaces/$(wid)).data.ownerId == request.auth.uid;
+    }
+
+    // True when the member doc being created points (via its own `inviteId` field)
+    // at an owner-issued invite in the SAME workspace that admits the caller and is
+    // still joinable. This is what gates invite-less self-join (issue #152): only the
+    // workspace owner can mint an invite (see the invites block), so a stranger who
+    // merely learns a workspace id has no invite to point at and cannot fabricate one.
+    // `exists()` guards the `get()` so a missing/dangling id denies rather than errors.
+    function hasJoinableInvite(wid) {
+      return 'inviteId' in request.resource.data
+        && request.resource.data.inviteId is string
+        && exists(/databases/$(database)/documents/workspaces/$(wid)/invites/$(request.resource.data.inviteId))
+        && inviteAdmitsCaller(
+             get(/databases/$(database)/documents/workspaces/$(wid)/invites/$(request.resource.data.inviteId)).data
+           );
+    }
+
+    // An invite admits the caller when it is still joinable and addresses them.
+    //  - Joinable = PENDING, or already ACCEPTED. ACCEPTED is allowed so the member
+    //    create still passes if the invitee's own PENDING→ACCEPTED flip lands first
+    //    (push order is not guaranteed) or on an idempotent outbox retry. CANCELLED /
+    //    DECLINED invites are excluded — a revoked invite must not grant membership.
+    //  - Addresses the caller by uid (targetUserId) or, for legacy/email-only invites,
+    //    by a case-insensitive email match. Email accesses are type-guarded because a
+    //    token may carry no `email` claim (anon / Hide-My-Email) and `.lower()` on null
+    //    aborts the whole rule.
+    function inviteAdmitsCaller(invite) {
+      return invite.status in ["PENDING", "ACCEPTED"]
+        && (
+             invite.targetUserId == request.auth.uid
+          || (invite.email is string
+              && request.auth.token.email is string
+              && invite.email.lower() == request.auth.token.email.lower())
+        );
     }
 
     // Server-side floor for `clientVersionCode`. Static — bump in lockstep with
@@ -173,16 +215,29 @@ service cloud.firestore {
       match /members/{uid} {
         allow read: if isMember(wid);
         // Owner manages everyone (role, status=REMOVED, snapshots).
-        // A signed-in user may create their own row (accept invite) or
-        // soft-leave their own row (status=LEFT). Self-writes cannot
-        // change role and cannot flip status to REMOVED.
+        //
+        // Self-create is the accept-invite path: a signed-in user may create ONLY
+        // their own row, and ONLY when they can point at an owner-issued invite that
+        // admits them (`hasJoinableInvite`). Without that gate any authenticated user
+        // who learned a workspace id could write their own member row and gain full
+        // read/write access to another household's data — the tenant-isolation break
+        // in issue #152. The owner branch is evaluated last so the invitee path never
+        // needs to `get()` the (possibly not-yet-synced) parent workspace doc.
         allow create:
-          if (isOwner(wid) || request.auth.uid == uid)
-          && hasValidClientVersion();
+          if hasValidClientVersion() && (
+               (request.auth.uid == uid && hasJoinableInvite(wid))
+            || isOwner(wid)
+          );
+        // Self-writes may soft-leave (status=LEFT) or refresh profile snapshots, but
+        // cannot change role and cannot flip status to REMOVED. A member the owner has
+        // evicted (current status REMOVED) cannot self-resurrect — self-update is
+        // blocked outright once the row is REMOVED, so rejoining requires a fresh
+        // owner invite (closes the eviction-bypass called out in issue #152).
         allow update:
           if hasValidClientVersion() && (
                isOwner(wid)
             || (request.auth.uid == uid
+                && resource.data.status != "REMOVED"
                 && request.resource.data.role == resource.data.role
                 && request.resource.data.status in ["ACTIVE", "LEFT"])
           );

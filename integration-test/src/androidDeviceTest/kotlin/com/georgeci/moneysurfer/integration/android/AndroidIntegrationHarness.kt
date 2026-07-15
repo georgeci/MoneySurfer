@@ -137,6 +137,7 @@ class AndroidIntegrationHarness(appName: String? = null) {
             appInfo = appInfo,
             conflictResolver = conflictResolver,
             workspaceMemberDao = database.workspaceMemberDao(),
+            workspaceInviteDao = database.workspaceInviteDao(),
             userDao = database.userDao(),
         ),
         WorkspaceInviteSyncPlugin(

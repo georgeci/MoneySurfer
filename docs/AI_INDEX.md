@@ -221,44 +221,50 @@
 ## rules-bug-1
 - Title: #1 — clientVersionCode >= 1 is a no-op gate
 - File: docs/architecture/firestore-rules-bugs.md
-- Lines: 107-141
+- Lines: 154-188
 - Tasks: firestore-rules, app-version, client-version
 
 ## rules-bug-2
 - Title: #2 — members/{uid} create requires hasValidClientVersion()
 - File: docs/architecture/firestore-rules-bugs.md
-- Lines: 196-214
+- Lines: 243-261
 - Tasks: firestore-rules, members, invites
 
 ## rules-bug-3
 - Title: #3 — addWorkspaceRef after failed syncWorkspace (root cause)
 - File: docs/architecture/firestore-rules-bugs.md
-- Lines: 47-105
+- Lines: 94-152
 - Tasks: firestore-rules, bootstrap, permission-denied
 
 ## rules-bug-4
 - Title: #4 — users/{uid} has no payload validation
 - File: docs/architecture/firestore-rules-bugs.md
-- Lines: 169-194
+- Lines: 216-241
 - Tasks: firestore-rules, users, schema
 
 ## rules-bug-5
 - Title: #5 — workspaces collection-level list
 - File: docs/architecture/firestore-rules-bugs.md
-- Lines: 234-250
+- Lines: 281-297
 - Tasks: firestore-rules, workspaces, query
 
 ## rules-bug-6
 - Title: #6 — Subcollection writes do not validate workspaceId payload
 - File: docs/architecture/firestore-rules-bugs.md
-- Lines: 143-167
+- Lines: 190-214
 - Tasks: firestore-rules, schema, subcollections
 
 ## rules-bug-7
 - Title: #7 — Push order race on workspace creation
 - File: docs/architecture/firestore-rules-bugs.md
-- Lines: 216-232
+- Lines: 263-279
 - Tasks: firestore-rules, sync, workspace-creation
+
+## rules-bug-8
+- Title: #8 — Invite-less workspace join breaks tenant isolation
+- File: docs/architecture/firestore-rules-bugs.md
+- Lines: 51-92
+- Tasks: firestore-rules, members, invites, tenant-isolation
 
 ## security-audit-2026-07
 - Title: Verdict

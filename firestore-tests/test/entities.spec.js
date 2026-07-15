@@ -113,6 +113,49 @@ describe('member-gated entities (accounts)', () => {
     const db = authedAs(env, MEMBER, { email: 'member@example.com' });
     await assertFails(deleteDoc(doc(db, `workspaces/${WID}/accounts/acc-1`)));
   });
+
+  // ── membership is ACTIVE-only: eviction/leave revokes data access ──────────
+  // Member rows are soft-deleted, so isMember must check status — otherwise a
+  // REMOVED/LEFT user keeps full read/write to the household's data (issue #152).
+
+  it('an evicted (REMOVED) member can no longer read', async () => {
+    await withAdmin(env, async (db) => {
+      await setDoc(
+        doc(db, `workspaces/${WID}/members/${MEMBER}`),
+        memberDoc({ role: 'EDITOR', status: 'REMOVED' }),
+      );
+    });
+    const db = authedAs(env, MEMBER, { email: 'member@example.com' });
+    await assertFails(getDoc(doc(db, `workspaces/${WID}/accounts/acc-1`)));
+  });
+
+  it('an evicted (REMOVED) member can no longer write', async () => {
+    await withAdmin(env, async (db) => {
+      await setDoc(
+        doc(db, `workspaces/${WID}/members/${MEMBER}`),
+        memberDoc({ role: 'EDITOR', status: 'REMOVED' }),
+      );
+    });
+    const db = authedAs(env, MEMBER, { email: 'member@example.com' });
+    await assertFails(
+      updateDoc(doc(db, `workspaces/${WID}/accounts/acc-1`), {
+        name: 'Renamed',
+        updatedAt: 1,
+        clientVersionCode: 1,
+      }),
+    );
+  });
+
+  it('a departed (LEFT) member can no longer read', async () => {
+    await withAdmin(env, async (db) => {
+      await setDoc(
+        doc(db, `workspaces/${WID}/members/${MEMBER}`),
+        memberDoc({ role: 'EDITOR', status: 'LEFT' }),
+      );
+    });
+    const db = authedAs(env, MEMBER, { email: 'member@example.com' });
+    await assertFails(getDoc(doc(db, `workspaces/${WID}/accounts/acc-1`)));
+  });
 });
 
 describe('member-gated entities (smoke for the rest)', () => {
