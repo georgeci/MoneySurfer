@@ -34,12 +34,16 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            // Offline host pulls in the local-only graph through :shared; data-remote /
-            // sync-surfer / sync.default are intentionally absent so Firebase /
-            // gitlive-firebase can never end up on the offline classpath.
-            api(projects.shared)
+            // Offline host wires the local-only graph; data-remote / sync-surfer /
+            // sync.default are intentionally absent so Firebase / gitlive-firebase
+            // can never end up on the offline classpath.
+            implementation(projects.shared)
+            implementation(projects.domain)
+            implementation(projects.feature.login)
+            implementation(projects.feature.transaction)
             implementation(projects.sync.api)
             implementation(projects.sync.noOp)
+            implementation(libs.compose.runtime)
             implementation(libs.arrow.core)
 
             implementation(project.dependencies.platform(libs.koin.bom))
@@ -54,6 +58,7 @@ kotlin {
             implementation(libs.kotest.assertions.core)
         }
         jvmTest.dependencies {
+            implementation(projects.dataLocal)
             implementation(libs.kotest.runner.junit5)
             implementation(project.dependencies.platform(libs.koin.bom))
             implementation(libs.koin.test)
