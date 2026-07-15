@@ -36,6 +36,7 @@ android {
 
 dependencies {
     implementation(projects.composeApp)
+    implementation(projects.shared)
 
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.analytics)

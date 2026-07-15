@@ -66,6 +66,7 @@ kotlin {
 
             // Modules under test
             implementation(projects.domain)
+            implementation(projects.sync.api)
             implementation(projects.sync.default)
             implementation(projects.dataLocal)
             implementation(projects.dataRemote)
@@ -104,6 +105,7 @@ kotlin {
         getByName("androidDeviceTest").dependencies {
             // Modules under test
             implementation(projects.domain)
+            implementation(projects.sync.api)
             implementation(projects.sync.default)
             implementation(projects.dataLocal)
             implementation(projects.dataRemote)

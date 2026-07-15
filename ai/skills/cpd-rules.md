@@ -1,5 +1,14 @@
 # CPD — copy-paste detection (local)
 
+<!-- DOCS:TOC -->
+## Contents
+- [CPD — copy-paste detection (local)](#cpd-copy-paste-detection-local)
+- [When to run](#when-to-run)
+- [Reports](#reports)
+- [Configuration](#configuration)
+- [Relation to Sonar and CI](#relation-to-sonar-and-ci)
+<!-- DOCS:END -->
+
 CPD (PMD's Copy-Paste Detector) flags duplicated Kotlin blocks the same way
 SonarCloud does. It runs locally so duplication is caught **before** push,
 not after Sonar comments on the PR.

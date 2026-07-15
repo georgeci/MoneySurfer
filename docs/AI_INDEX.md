@@ -215,7 +215,7 @@
 ## project-map
 - Title: Module Map
 - File: docs/PROJECT_MAP.md
-- Lines: 25-57
+- Lines: 25-77
 - Tasks: project, context, architecture
 
 ## rules-bug-1
@@ -259,6 +259,12 @@
 - File: docs/architecture/firestore-rules-bugs.md
 - Lines: 216-232
 - Tasks: firestore-rules, sync, workspace-creation
+
+## security-audit-2026-07
+- Title: Verdict
+- File: docs/security/audit-2026-07-15.md
+- Lines: 16-63
+- Tasks: security, audit, firestore-rules
 
 ## sync-architecture-rules
 - Title: Rules
@@ -317,7 +323,7 @@
 ## testing-strategy
 - Title: Common Commands
 - File: docs/testing/testing-strategy.md
-- Lines: 25-51
+- Lines: 27-106
 - Tasks: testing, qa, validation
 
 ## time-policy

@@ -30,7 +30,7 @@ kotlin {
                 implementation(libs.compose.ui)
                 implementation(libs.androidx.lifecycle.viewmodelCompose)
                 implementation(libs.androidx.lifecycle.runtimeCompose)
-                api(libs.jetbrains.navigation3.ui)
+                implementation(libs.jetbrains.navigation3.ui)
                 implementation(libs.navigation3.resultstate)
                 implementation(libs.kotlinx.serialization.core)
                 implementation(project.dependencies.platform(libs.koin.bom))

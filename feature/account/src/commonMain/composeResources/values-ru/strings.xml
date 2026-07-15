@@ -4,8 +4,6 @@
     <string name="accounts_manage_edit">Редактировать</string>
     <string name="accounts_manage_done">Готово</string>
     <string name="accounts_manage_stat_total">ВСЕГО</string>
-    <string name="accounts_manage_stat_active_count">%1$d активных</string>
-    <string name="accounts_manage_stat_archived_count">%1$d в архиве</string>
     <string name="accounts_manage_active_header">Активные</string>
     <string name="accounts_manage_archived_header">Архив</string>
     <string name="accounts_manage_drag_to_reorder">Потяните, чтобы изменить порядок</string>

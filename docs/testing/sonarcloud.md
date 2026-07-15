@@ -1,5 +1,16 @@
 # SonarCloud + coverage publishing
 
+<!-- DOCS:TOC -->
+## Contents
+- [SonarCloud + coverage publishing](#sonarcloud-coverage-publishing)
+- [What runs in CI](#what-runs-in-ci)
+- [Source discovery (KMP layout)](#source-discovery-kmp-layout)
+- [Required setup (one-time)](#required-setup-one-time)
+- [Coverage scope](#coverage-scope)
+- [Local reproduction](#local-reproduction)
+- [Troubleshooting](#troubleshooting)
+<!-- DOCS:END -->
+
 Static analysis (Sonar + detekt) and JVM coverage (Kover) are published to
 [SonarCloud](https://sonarcloud.io/project/overview?id=georgeci_MoneySurfer)
 from the `sonar` job in [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml).

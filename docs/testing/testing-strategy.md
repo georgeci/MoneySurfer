@@ -7,8 +7,6 @@
 - [Common Commands](#common-commands)
 - [QA Entry Points](#qa-entry-points)
   - [Offline golden-path E2E](#offline-golden-path-e2e)
-- [Android — needs a booted emulator/device:](#android-needs-a-booted-emulatordevice)
-- [iOS — needs a booted Simulator:](#ios-needs-a-booted-simulator)
 - [Test tags (Compose ↔ Maestro)](#test-tags-compose-maestro)
 - [Rules](#rules)
 <!-- DOCS:END -->

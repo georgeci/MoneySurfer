@@ -1,3 +1,20 @@
+
+<!-- DOCS:TOC -->
+## Contents
+- [Release pipeline via GitHub Actions](#release-pipeline-via-github-actions)
+- [Context](#context)
+- [Phasing](#phasing)
+- [A. Code changes (outside the workflow)](#a-code-changes-outside-the-workflow)
+  - [A1. composeApp/build.gradle.kts — sync Desktop version](#a1-composeappbuildgradlekts-sync-desktop-version)
+  - [A2. iosApp/ExportOptions.plist (new)](#a2-iosappexportoptionsplist-new)
+  - [A3. secretOrEnv (androidApp/build.gradle.kts:137-140)](#a3-secretorenv-androidappbuildgradlekts137-140)
+- [B. .github/workflows/release.yml (new)](#b-githubworkflowsreleaseyml-new)
+- [C. GitHub repository secrets](#c-github-repository-secrets)
+- [D. Critical files](#d-critical-files)
+- [E. Risks and gotchas](#e-risks-and-gotchas)
+- [F. Verification](#f-verification)
+<!-- DOCS:END -->
+
 ---
 title: Release pipeline via GitHub Actions
 created: 2026-05-06

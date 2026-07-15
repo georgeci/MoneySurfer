@@ -46,11 +46,15 @@ kotlin {
             implementation(libs.firebase.firestore)
         }
         commonMain.dependencies {
-            api(projects.shared)
+            implementation(projects.shared)
+            implementation(projects.domain)
+            implementation(projects.feature.login)
+            implementation(projects.feature.transaction)
             implementation(projects.dataRemote)
             implementation(projects.syncSurfer)
             implementation(projects.sync.default)
 
+            implementation(libs.compose.runtime)
             implementation(libs.androidx.room.runtime)
             implementation(libs.androidx.sqlite.bundled)
             implementation(libs.androidx.datastore.preferences)
@@ -68,6 +72,7 @@ kotlin {
             implementation(libs.kotlinx.coroutines.test)
         }
         jvmTest.dependencies {
+            implementation(projects.dataLocal)
             implementation(libs.kotest.runner.junit5)
             implementation(libs.fixture.monkey.kotlin)
             implementation(project.dependencies.platform(libs.koin.bom))
