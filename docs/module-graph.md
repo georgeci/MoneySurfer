@@ -1,5 +1,10 @@
 # Module Dependency Graph
 
+<!-- DOCS:TOC -->
+## Contents
+- [Module Dependency Graph](#module-dependency-graph)
+<!-- DOCS:END -->
+
 ```mermaid
 %%{
   init: {

@@ -260,6 +260,12 @@
 - Lines: 216-232
 - Tasks: firestore-rules, sync, workspace-creation
 
+## security-audit-2026-07
+- Title: Verdict
+- File: docs/security/audit-2026-07-15.md
+- Lines: 16-63
+- Tasks: security, audit, firestore-rules
+
 ## sync-architecture-rules
 - Title: Rules
 - File: docs/architecture/sync-architecture.md
@@ -317,7 +323,7 @@
 ## testing-strategy
 - Title: Common Commands
 - File: docs/testing/testing-strategy.md
-- Lines: 26-105
+- Lines: 27-106
 - Tasks: testing, qa, validation
 
 ## time-policy

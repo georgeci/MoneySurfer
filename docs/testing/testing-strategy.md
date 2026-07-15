@@ -6,7 +6,8 @@
 - [TL;DR for agents](#tldr-for-agents)
 - [Common Commands](#common-commands)
 - [QA Entry Points](#qa-entry-points)
-- [Test tags (Compose ↔ Maestro)](#test-tags-compose--maestro)
+  - [Offline golden-path E2E](#offline-golden-path-e2e)
+- [Test tags (Compose ↔ Maestro)](#test-tags-compose-maestro)
 - [Rules](#rules)
 <!-- DOCS:END -->
 
