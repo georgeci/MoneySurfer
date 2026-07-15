@@ -80,6 +80,20 @@ jobs:
             | tar -xz -C "${RUNNER_TEMP}"
           echo "${RUNNER_TEMP}/allure-${ALLURE_VERSION}/bin" >> "${GITHUB_PATH}"
 
+      # Copy-paste detection gate. Fast (tokenize-only, no compile) and blocking
+      # (`ignoreFailures = false`): fails the PR on new Kotlin duplication before
+      # the slower test run. Same engine/threshold SonarCloud uses.
+      - name: Run CPD duplication gate
+        run: ./gradlew cpdCheck --stacktrace
+
+      - name: Upload CPD report
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: cpd-report
+          path: build/reports/cpd/
+          if-no-files-found: ignore
+
       - name: Run JUnit tests
         run: ./gradlew qaCommon --stacktrace
 

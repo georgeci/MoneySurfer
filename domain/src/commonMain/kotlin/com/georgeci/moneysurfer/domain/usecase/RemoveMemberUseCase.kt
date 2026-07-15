@@ -10,7 +10,6 @@ import com.georgeci.moneysurfer.domain.model.WorkspaceRole
 import com.georgeci.moneysurfer.domain.primitives.UserId
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 import com.georgeci.moneysurfer.domain.repositories.WorkspaceMemberRepository
-import kotlinx.coroutines.flow.first
 import org.koin.core.annotation.Single
 
 /**
@@ -32,16 +31,12 @@ class RemoveMemberUseCase(
     )
 
     suspend operator fun invoke(params: Params): Either<InviteError, Unit> = either {
-        val callerId = session.currentUserId.flow.first()
-            ?: raise(InviteError.NoCurrentUser)
-
-        val members = memberRepository.getByWorkspaceId(params.workspaceId).first()
-        val callerMember = members.firstOrNull { it.userId == callerId }
-        ensure(callerMember?.role == WorkspaceRole.OWNER) { InviteError.NotOwner }
-
-        val target = members.firstOrNull { it.userId == params.targetUserId }
-            ?: raise(InviteError.InviteNotFound)
-        ensure(target.status == WorkspaceMemberStatus.ACTIVE) { InviteError.InviteNotPending }
+        val (callerId, members, target) = resolveOwnerActionTarget(
+            session = session,
+            memberRepository = memberRepository,
+            workspaceId = params.workspaceId,
+            targetUserId = params.targetUserId,
+        )
 
         if (target.role == WorkspaceRole.OWNER) {
             val remainingOwners = members.count {
