@@ -1,4 +1,4 @@
-package com.georgeci.moneysurfer.data.storage
+package com.georgeci.moneysurfer.domain.storage
 
 import kotlinx.cinterop.ExperimentalForeignApi
 import platform.Foundation.NSApplicationSupportDirectory
@@ -11,6 +11,10 @@ import platform.Foundation.NSUserDomainMask
 
 /**
  * On-disk location policy for app-internal persistence (Room databases, DataStore) on iOS.
+ *
+ * This is the single source of truth for where those stores live and how they are protected; the
+ * `data-local` and `sync/default` iOS source sets both call into it (they cannot depend on each
+ * other, but both depend on `domain`).
  *
  * Files live in **Application Support**, Apple's recommended location for non-user-visible data,
  * rather than in Documents. Documents becomes user-visible in the Files app the moment
@@ -25,13 +29,9 @@ import platform.Foundation.NSUserDomainMask
  *
  * Both settings are applied at the directory level, so files created inside inherit them — including
  * Room's `-wal`/`-shm` sidecars.
- *
- * NOTE: `sync/default` keeps an intentional copy of this policy in its own `iosMain`
- * (`com.georgeci.moneysurfer.sync.storage.IosSyncAppStorage`) because it cannot depend on this module.
- * Keep the two in sync if the policy changes.
  */
 @OptIn(ExperimentalForeignApi::class)
-internal fun iosAppStorageFilePath(fileName: String, isDatabase: Boolean): String {
+public fun iosAppStorageFilePath(fileName: String, isDatabase: Boolean): String {
     val fileManager = NSFileManager.defaultManager
     val directoryUrl = requireNotNull(
         fileManager.URLForDirectory(
@@ -63,7 +63,7 @@ internal fun iosAppStorageFilePath(fileName: String, isDatabase: Boolean): Strin
  * locator) that must point at the same location without triggering migration side effects.
  */
 @OptIn(ExperimentalForeignApi::class)
-internal fun iosAppStorageDir(): String = requireNotNull(
+public fun iosAppStorageDir(): String = requireNotNull(
     NSFileManager.defaultManager.URLForDirectory(
         directory = NSApplicationSupportDirectory,
         inDomain = NSUserDomainMask,

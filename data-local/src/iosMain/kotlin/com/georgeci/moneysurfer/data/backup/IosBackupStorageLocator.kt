@@ -1,7 +1,7 @@
 package com.georgeci.moneysurfer.data.backup
 
-import com.georgeci.moneysurfer.data.storage.iosAppStorageDir
 import com.georgeci.moneysurfer.domain.backup.BackupStorageLocator
+import com.georgeci.moneysurfer.domain.storage.iosAppStorageDir
 import okio.Path
 import okio.Path.Companion.toPath
 
