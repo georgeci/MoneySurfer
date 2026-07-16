@@ -644,6 +644,17 @@ jobs:
 
       # PR / non-main runs still get an artifact so reviewers can download the
       # aggregated Allure without waiting for Pages.
+      #
+      # This job otherwise never checks out the repo (it only aggregates
+      # downloaded artifacts), but the local allure-cli composite action needs
+      # its source on disk. Fetch it here — clean: false so the already-staged
+      # allure-results/ and downloaded artifacts survive the checkout.
+      - name: Checkout (for local allure-cli action)
+        if: steps.gate.outputs.publish != 'true'
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          clean: false
+
       - name: Install Allure CLI
         if: steps.gate.outputs.publish != 'true'
         uses: ./.github/actions/allure-cli
