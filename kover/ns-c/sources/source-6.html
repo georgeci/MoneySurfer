@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SyncCoordinatorWorkspaceSyncer</title>
+  <title>MoneySurfer Coverage Report > FirestoreFactory_androidKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,15 +19,18 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.data.sync</a>
+    <a href="../index.html">com.georgeci.moneysurfer.data.remote</a>
 </div>
 
-<h1>Coverage Summary for Class: SyncCoordinatorWorkspaceSyncer (com.georgeci.moneysurfer.data.sync)</h1>
+<h1>Coverage Summary for Class: FirestoreFactory_androidKt (com.georgeci.moneysurfer.data.remote)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -46,21 +49,13 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SyncCoordinatorWorkspaceSyncer</td>
+  <td class="name">FirestoreFactory_androidKt</td>
 <td class="coverageStat">
   <span class="percent">
     0%
   </span>
   <span class="absValue">
-    (0/5)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    7.1%
-  </span>
-  <span class="absValue">
-    (1/14)
+    (0/1)
   </span>
 </td>
 <td class="coverageStat">
@@ -68,7 +63,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/21)
+    (0/4)
   </span>
 </td>
 <td class="coverageStat">
@@ -76,57 +71,27 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/176)
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/40)
   </span>
 </td>
 </tr>
-  <tr>
-    <td class="name">SyncCoordinatorWorkspaceSyncer$pushAll$1</td>
-    <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">SyncCoordinatorWorkspaceSyncer$syncAll$1</td>
-    <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">SyncCoordinatorWorkspaceSyncer$syncWorkspace$1</td>
-    <td class="coverageStat"/>
-  </tr>
-<tr>
-  <td class="name"><strong>Total</strong></td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/5)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    7.1%
-  </span>
-  <span class="absValue">
-    (1/14)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/21)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/176)
-  </span>
-</td>
-</tr>
+
 </table>
 
 <br/>
@@ -134,65 +99,25 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.sync
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.remote
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.auth.SessionPointers
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
-&nbsp;import com.georgeci.moneysurfer.domain.repositories.WorkspaceSyncer
-&nbsp;import com.georgeci.moneysurfer.sync.api.SyncError
-&nbsp;import com.georgeci.moneysurfer.sync.api.SyncReason
-&nbsp;import com.georgeci.moneysurfer.sync.coordinator.SyncCoordinator
-&nbsp;import org.koin.core.annotation.Single
+&nbsp;import android.content.Context
+&nbsp;import com.google.firebase.FirebaseApp
+&nbsp;import com.google.firebase.firestore.FirebaseFirestore
+&nbsp;import org.koin.dsl.module
 &nbsp;
-&nbsp;/**
-&nbsp; * [WorkspaceSyncer] implementation that delegates to [SyncCoordinator].
-&nbsp; *
-&nbsp; * [pushAll] uses [SyncReason.LOCAL_CHANGE] → [SyncScope.UploadOnly]: drains the outbox
-&nbsp; * without a remote workspace-list fetch. Used post-create-workspace where the new workspace
-&nbsp; * and its member row need to land on Firestore before `addWorkspaceRef` is called.
-&nbsp; *
-&nbsp; * [syncAll] uses [SyncReason.MANUAL] → [SyncScope.AllUserData]: fetches
-&nbsp; * `users/{uid}.workspaceIds` via [UserWorkspacesProvider] and runs a cursor-based pull for
-&nbsp; * every workspace, including ones not yet in the local database.
-&nbsp; *
-&nbsp; * [syncWorkspace] sets [SessionPointers.currentWorkspaceId] to the target workspace and
-&nbsp; * uses [SyncReason.SWIPE_REFRESH] → [SyncScope.ActiveWorkspace]: pulls only that workspace.
-&nbsp; * Used after accepting an invite so only the newly joined workspace is hydrated.
-&nbsp; */
-<b class="nc">&nbsp;@Single(binds = [WorkspaceSyncer::class])</b>
-&nbsp;class SyncCoordinatorWorkspaceSyncer(
-<b class="nc">&nbsp;    private val syncCoordinator: SyncCoordinator,</b>
-<b class="nc">&nbsp;    private val session: SessionPointers,</b>
-&nbsp;) : WorkspaceSyncer {
-&nbsp;
-&nbsp;    override suspend fun pushAll() {
-<b class="nc">&nbsp;        syncCoordinator.requestSync(SyncReason.LOCAL_CHANGE)</b>
-<b class="nc">&nbsp;            .result.await()</b>
-<b class="nc">&nbsp;            .fold(ifLeft = { throw it.toException() }, ifRight = { })</b>
+<b class="nc">&nbsp;val androidRemoteDataModule = module {</b>
+<b class="nc">&nbsp;    single&lt;FirebaseFirestore&gt; {</b>
+<b class="nc">&nbsp;        createFirestore(context = get())</b>
 &nbsp;    }
+&nbsp;}
 &nbsp;
-&nbsp;    override suspend fun syncAll() {
-<b class="nc">&nbsp;        syncCoordinator.requestSync(SyncReason.MANUAL)</b>
-<b class="nc">&nbsp;            .result.await()</b>
-<b class="nc">&nbsp;            .fold(ifLeft = { throw it.toException() }, ifRight = { })</b>
+&nbsp;fun createFirestore(context: Context): FirebaseFirestore {
+<b class="nc">&nbsp;    FirebaseApp.initializeApp(context)</b>
+<b class="nc">&nbsp;    check(FirebaseApp.getApps(context).isNotEmpty()) {</b>
+<b class="nc">&nbsp;        &quot;Firebase not initialized. Check androidApp/google-services.json and Google Services plugin setup.&quot;</b>
 &nbsp;    }
-&nbsp;
-&nbsp;    override suspend fun syncWorkspace(workspaceId: WorkspaceId) {
-<b class="nc">&nbsp;        session.currentWorkspaceId.set(workspaceId)</b>
-<b class="nc">&nbsp;        syncCoordinator.requestSync(SyncReason.SWIPE_REFRESH)</b>
-<b class="nc">&nbsp;            .result.await()</b>
-<b class="nc">&nbsp;            .fold(ifLeft = { throw it.toException() }, ifRight = { })</b>
-&nbsp;    }
-&nbsp;
-<b class="nc">&nbsp;    private fun SyncError.toException(): RuntimeException = when (this) {</b>
-<b class="nc">&nbsp;        SyncError.Cancelled -&gt; RuntimeException(&quot;Sync cancelled&quot;)</b>
-<b class="nc">&nbsp;        SyncError.NetworkUnavailable -&gt; RuntimeException(&quot;Network unavailable&quot;)</b>
-<b class="nc">&nbsp;        SyncError.AuthRequired -&gt; RuntimeException(&quot;Auth required&quot;)</b>
-<b class="nc">&nbsp;        SyncError.PermissionDenied -&gt; RuntimeException(&quot;PERMISSION_DENIED: workspace access denied&quot;)</b>
-<b class="nc">&nbsp;        is SyncError.UnsupportedAppVersion -&gt; RuntimeException(message)</b>
-<b class="nc">&nbsp;        is SyncError.StorageError -&gt; RuntimeException(&quot;Storage error&quot;, cause)</b>
-<b class="nc">&nbsp;        is SyncError.Unknown -&gt; RuntimeException(cause.message ?: &quot;Sync failed&quot;, cause)</b>
-&nbsp;    }
+<b class="nc">&nbsp;    return FirebaseFirestore.getInstance()</b>
 &nbsp;}
 </code>
 </pre>
@@ -217,7 +142,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-05-06 14:45</div>
+    <div style="float:right;">generated on 2026-07-16 12:42</div>
 </div>
 </body>
 </html>

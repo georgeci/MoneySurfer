@@ -1,0 +1,116 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>MoneySurfer Coverage Report > Crc32Kt</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.georgeci.moneysurfer.data.backup.zip</a>
+</div>
+
+<h1>Coverage Summary for Class: Crc32Kt (com.georgeci.moneysurfer.data.backup.zip)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+</tr>
+<tr>
+  <td class="name">Crc32Kt</td>
+    <td class="coverageStat"/>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.backup.zip
+&nbsp;
+&nbsp;/**
+&nbsp; * IEEE 802.3 CRC-32 — same polynomial as ZIP / PNG / `java.util.zip.CRC32`.
+&nbsp; *
+&nbsp; * Table-based, KMP-native (no `java.util.zip` on iOS).
+&nbsp; */
+&nbsp;internal class Crc32 {
+&nbsp;    private var value: Int = 0.inv()
+&nbsp;
+&nbsp;    fun update(buffer: ByteArray, offset: Int = 0, length: Int = buffer.size - offset) {
+&nbsp;        var crc = value
+&nbsp;        val end = offset + length
+&nbsp;        var i = offset
+&nbsp;        while (i &lt; end) {
+&nbsp;            crc = (crc ushr BITS_PER_BYTE) xor TABLE[(crc xor buffer[i].toInt()) and BYTE_MASK]
+&nbsp;            i++
+&nbsp;        }
+&nbsp;        value = crc
+&nbsp;    }
+&nbsp;
+&nbsp;    fun getValue(): Long = (value.inv().toLong() and MASK_U32)
+&nbsp;
+&nbsp;    companion object {
+&nbsp;        private val TABLE: IntArray = IntArray(TABLE_SIZE).also { table -&gt;
+&nbsp;            for (n in 0 until TABLE_SIZE) {
+&nbsp;                var c = n
+&nbsp;                repeat(BITS_PER_BYTE) {
+&nbsp;                    c = if (c and 1 != 0) (c ushr 1) xor POLY else c ushr 1
+&nbsp;                }
+&nbsp;                table[n] = c
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;private const val TABLE_SIZE = 256
+&nbsp;private const val BITS_PER_BYTE = 8
+&nbsp;private const val BYTE_MASK = 0xFF
+&nbsp;private const val MASK_U32 = 0xFFFFFFFFL
+&nbsp;
+&nbsp;@Suppress(&quot;MagicNumber&quot;)
+&nbsp;private const val POLY: Int = 0xEDB88320.toInt()
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-07-16 12:42</div>
+</div>
+</body>
+</html>

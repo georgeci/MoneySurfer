@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > UiSettingsDataSource</title>
+  <title>MoneySurfer Coverage Report > JvmAppRestarter</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.data.datastore</a>
+    <a href="../index.html">com.georgeci.moneysurfer.data.backup</a>
 </div>
 
-<h1>Coverage Summary for Class: UiSettingsDataSource (com.georgeci.moneysurfer.data.datastore)</h1>
+<h1>Coverage Summary for Class: JvmAppRestarter (com.georgeci.moneysurfer.data.backup)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">UiSettingsDataSource</td>
+  <td class="name">JvmAppRestarter</td>
 <td class="coverageStat">
   <span class="percent">
     0%
@@ -63,16 +63,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/23)
+    (0/2)
   </span>
 </td>
 <td class="coverageStat">
@@ -80,7 +71,23 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/71)
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/68)
   </span>
 </td>
 </tr>
@@ -92,64 +99,29 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.datastore
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.backup
 &nbsp;
-&nbsp;import androidx.datastore.core.DataStore
-&nbsp;import androidx.datastore.preferences.core.Preferences
-&nbsp;import com.georgeci.moneysurfer.data.datastore.core.PreferenceStore
-&nbsp;import org.koin.core.annotation.Single
+&nbsp;import com.georgeci.moneysurfer.domain.backup.AppRestarter
+&nbsp;import kotlin.system.exitProcess
 &nbsp;
-<b class="nc">&nbsp;@Single</b>
-&nbsp;class UiSettingsDataSource(
-&nbsp;    dataStore: DataStore&lt;Preferences&gt;,
-&nbsp;) {
-<b class="nc">&nbsp;    private val prefs = PreferenceStore(dataStore)</b>
-&nbsp;
-<b class="nc">&nbsp;    val currentUserId = prefs.string(</b>
-<b class="nc">&nbsp;        name = &quot;session.current_user_id&quot;,</b>
-<b class="nc">&nbsp;        default = &quot;&quot;,</b>
-&nbsp;    )
-&nbsp;
-<b class="nc">&nbsp;    val currentWorkspaceId = prefs.string(</b>
-<b class="nc">&nbsp;        name = &quot;session.current_workspace_id&quot;,</b>
-<b class="nc">&nbsp;        default = &quot;&quot;,</b>
-&nbsp;    )
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Firebase auth uid. Set when a Firebase-backed flow (login/signup/anon) succeeds, cleared
-&nbsp;     * on logout. Stays empty for local-only sessions (demo). Lets callers detect &quot;is there a
-&nbsp;     * Firebase session right now?&quot; without round-tripping through the auth SDK.
-&nbsp;     */
-<b class="nc">&nbsp;    val firebaseUid = prefs.string(</b>
-<b class="nc">&nbsp;        name = &quot;session.firebase_uid&quot;,</b>
-<b class="nc">&nbsp;        default = &quot;&quot;,</b>
-&nbsp;    )
-&nbsp;
-<b class="nc">&nbsp;    val paletteSource = prefs.string(</b>
-<b class="nc">&nbsp;        name = &quot;ui.palette_source&quot;,</b>
-<b class="nc">&nbsp;        default = &quot;BRAND&quot;,</b>
-&nbsp;    )
-&nbsp;
-<b class="nc">&nbsp;    val themeMode = prefs.string(</b>
-<b class="nc">&nbsp;        name = &quot;ui.theme_mode&quot;,</b>
-<b class="nc">&nbsp;        default = &quot;System&quot;,</b>
-&nbsp;    )
-&nbsp;
-<b class="nc">&nbsp;    val containerStyle = prefs.string(</b>
-<b class="nc">&nbsp;        name = &quot;ui.container_style&quot;,</b>
-<b class="nc">&nbsp;        default = &quot;Card&quot;,</b>
-&nbsp;    )
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Sticky flag set by `DemoLoginUseCase` and cleared by `WipeDemoDataUseCase`.
-&nbsp;     * The auth flow consults it on real login/signup to decide whether to wipe
-&nbsp;     * orphan demo data before bootstrapping the real session. Demo data must
-&nbsp;     * never reach Firestore — see sync.md §2.11.
-&nbsp;     */
-<b class="nc">&nbsp;    val hasUsedDemo = prefs.boolean(</b>
-<b class="nc">&nbsp;        name = &quot;session.has_used_demo&quot;,</b>
-<b class="nc">&nbsp;        default = false,</b>
-&nbsp;    )
+&nbsp;/**
+&nbsp; * Best-effort restart for desktop. Spawns a new JVM with the same command
+&nbsp; * line, then exits. If the command isn&#39;t recoverable we just exit and rely
+&nbsp; * on the user to relaunch.
+&nbsp; */
+<b class="nc">&nbsp;class JvmAppRestarter : AppRestarter {</b>
+&nbsp;    override fun restart() {
+<b class="nc">&nbsp;        runCatching {</b>
+<b class="nc">&nbsp;            val handle = ProcessHandle.current()</b>
+<b class="nc">&nbsp;            val info = handle.info()</b>
+<b class="nc">&nbsp;            val command = info.command().orElse(null) ?: return@runCatching</b>
+<b class="nc">&nbsp;            val args = info.arguments().orElse(emptyArray())</b>
+<b class="nc">&nbsp;            ProcessBuilder(listOf(command) + args.toList())</b>
+<b class="nc">&nbsp;                .inheritIO()</b>
+<b class="nc">&nbsp;                .start()</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        exitProcess(0)</b>
+&nbsp;    }
 &nbsp;}
 </code>
 </pre>
@@ -174,7 +146,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-05-06 14:45</div>
+    <div style="float:right;">generated on 2026-07-16 12:42</div>
 </div>
 </body>
 </html>

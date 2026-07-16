@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > DynamicColorSupport_jvmKt</title>
+  <title>MoneySurfer Coverage Report > BackupImporterImplKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.data.datastore</a>
+    <a href="../index.html">com.georgeci.moneysurfer.data.backup</a>
 </div>
 
-<h1>Coverage Summary for Class: DynamicColorSupport_jvmKt (com.georgeci.moneysurfer.data.datastore)</h1>
+<h1>Coverage Summary for Class: BackupImporterImplKt (com.georgeci.moneysurfer.data.backup)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,38 +49,45 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">DynamicColorSupport_jvmKt</td>
+  <td class="name">BackupImporterImplKt</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    50%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    57.9%
+  </span>
+  <span class="absValue">
+    (11/19)
   </span>
 </td>
 </tr>
@@ -92,9 +99,204 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.datastore
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.backup
 &nbsp;
-<b class="nc">&nbsp;internal actual val isDynamicColorAvailable: Boolean = false</b>
+&nbsp;import com.georgeci.moneysurfer.data.backup.zip.ZipStoredReader
+&nbsp;import com.georgeci.moneysurfer.data.db.MONEY_SURFER_DB_VERSION
+&nbsp;import com.georgeci.moneysurfer.data.db.MoneySurferDatabase
+&nbsp;import com.georgeci.moneysurfer.domain.backup.BackupError
+&nbsp;import com.georgeci.moneysurfer.domain.backup.BackupImporter
+&nbsp;import com.georgeci.moneysurfer.domain.backup.BackupManifest
+&nbsp;import com.georgeci.moneysurfer.domain.backup.BackupStorageLocator
+&nbsp;import kotlinx.coroutines.CancellationException
+&nbsp;import kotlinx.coroutines.Dispatchers
+&nbsp;import kotlinx.coroutines.IO
+&nbsp;import kotlinx.coroutines.sync.Mutex
+&nbsp;import kotlinx.coroutines.sync.withLock
+&nbsp;import kotlinx.coroutines.withContext
+&nbsp;import kotlinx.serialization.json.Json
+&nbsp;import okio.BufferedSource
+&nbsp;import okio.FileSystem
+&nbsp;import okio.Path
+&nbsp;import okio.SYSTEM
+&nbsp;import okio.blackholeSink
+&nbsp;import okio.buffer
+&nbsp;import okio.use
+&nbsp;import org.koin.core.annotation.Single
+&nbsp;
+&nbsp;@Single(binds = [BackupImporter::class])
+&nbsp;class BackupImporterImpl(
+&nbsp;    private val database: MoneySurferDatabase,
+&nbsp;    private val locator: BackupStorageLocator,
+&nbsp;) : BackupImporter {
+&nbsp;
+&nbsp;    private val mutex = Mutex()
+&nbsp;    private val fs: FileSystem = FileSystem.SYSTEM
+&nbsp;
+&nbsp;    override suspend fun importFrom(source: BufferedSource): Result&lt;BackupManifest&gt; = mutex.withLock {
+&nbsp;        try {
+&nbsp;            Result.success(withContext(Dispatchers.IO) { runImport(source) })
+&nbsp;        } catch (ce: CancellationException) {
+&nbsp;            throw ce
+&nbsp;        } catch (be: BackupError) {
+&nbsp;            Result.failure(be)
+&nbsp;        } catch (
+&nbsp;            @Suppress(&quot;TooGenericExceptionCaught&quot;) t: Throwable,
+&nbsp;        ) {
+&nbsp;            Result.failure(BackupError.Io(t))
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private suspend fun runImport(source: BufferedSource): BackupManifest {
+&nbsp;        val reader = ZipStoredReader(source)
+&nbsp;
+&nbsp;        val manifest = readManifestEntry(reader)
+&nbsp;        validateManifest(manifest)
+&nbsp;
+&nbsp;        val mainDbPath = locator.moneySurferDbFile()
+&nbsp;        val dataStorePath = locator.dataStoreFile()
+&nbsp;        val syncDbPath = locator.syncDbFile()
+&nbsp;
+&nbsp;        val mainDbTemp = mainDbPath.appendSuffix(SUFFIX_RESTORE_TMP)
+&nbsp;        val dataStoreTemp = dataStorePath.appendSuffix(SUFFIX_RESTORE_TMP)
+&nbsp;
+&nbsp;        runCatching { extractRemainingEntries(reader, mainDbTemp, dataStoreTemp) }
+&nbsp;            .onFailure {
+&nbsp;                fs.deleteIfExists(mainDbTemp)
+&nbsp;                fs.deleteIfExists(dataStoreTemp)
+&nbsp;            }
+&nbsp;            .getOrThrow()
+&nbsp;
+&nbsp;        database.close()
+&nbsp;
+&nbsp;        val mainDbBackup = mainDbPath.appendSuffix(SUFFIX_PRE_IMPORT)
+&nbsp;        val dataStoreBackup = dataStorePath.appendSuffix(SUFFIX_PRE_IMPORT)
+&nbsp;
+&nbsp;        try {
+&nbsp;            fs.deleteIfExists(mainDbBackup)
+&nbsp;            fs.deleteIfExists(dataStoreBackup)
+&nbsp;            if (fs.exists(mainDbPath)) fs.atomicMove(mainDbPath, mainDbBackup)
+&nbsp;            if (fs.exists(dataStorePath)) fs.atomicMove(dataStorePath, dataStoreBackup)
+&nbsp;            mainDbPath.parent?.let { fs.createDirectories(it) }
+&nbsp;            dataStorePath.parent?.let { fs.createDirectories(it) }
+&nbsp;            fs.atomicMove(mainDbTemp, mainDbPath)
+&nbsp;            fs.atomicMove(dataStoreTemp, dataStorePath)
+&nbsp;
+&nbsp;            // Wipe stale WAL/SHM next to the main DB so SQLite re-creates fresh ones.
+&nbsp;            fs.deleteIfExists(mainDbPath.appendSuffix(SUFFIX_WAL))
+&nbsp;            fs.deleteIfExists(mainDbPath.appendSuffix(SUFFIX_SHM))
+&nbsp;
+&nbsp;            // Drop sync state entirely; Room rebuilds an empty file on next start, so the
+&nbsp;            // outbox + sync_meta are clean and the next sync pulls fresh from cloud.
+&nbsp;            fs.deleteIfExists(syncDbPath)
+&nbsp;            fs.deleteIfExists(syncDbPath.appendSuffix(SUFFIX_WAL))
+&nbsp;            fs.deleteIfExists(syncDbPath.appendSuffix(SUFFIX_SHM))
+&nbsp;
+&nbsp;            fs.deleteIfExists(mainDbBackup)
+&nbsp;            fs.deleteIfExists(dataStoreBackup)
+&nbsp;        } catch (
+&nbsp;            @Suppress(&quot;TooGenericExceptionCaught&quot;) error: Throwable,
+&nbsp;        ) {
+&nbsp;            rollback(mainDbPath, mainDbBackup)
+&nbsp;            rollback(dataStorePath, dataStoreBackup)
+&nbsp;            throw error
+&nbsp;        }
+&nbsp;
+&nbsp;        return manifest
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun readManifestEntry(reader: ZipStoredReader): BackupManifest {
+&nbsp;        val firstName = reader.nextEntryName()
+&nbsp;        val problem = when {
+&nbsp;            firstName == null -&gt; &quot;Empty archive&quot;
+&nbsp;            firstName != BackupManifest.MANIFEST_ENTRY_NAME -&gt;
+&nbsp;                &quot;Expected ${BackupManifest.MANIFEST_ENTRY_NAME} as first entry; got $firstName&quot;
+&nbsp;            else -&gt; null
+&nbsp;        }
+&nbsp;        if (problem != null) {
+&nbsp;            throw BackupError.InvalidArchive(problem)
+&nbsp;        }
+&nbsp;        val manifestJson = reader.readCurrentEntryToBuffer().readUtf8()
+&nbsp;        return runCatching { Json.decodeFromString(BackupManifest.serializer(), manifestJson) }
+&nbsp;            .getOrElse { error -&gt;
+&nbsp;                throw BackupError.InvalidArchive(&quot;Manifest is not valid JSON: ${error.message}&quot;, error)
+&nbsp;            }
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun validateManifest(manifest: BackupManifest) {
+&nbsp;        val error = when {
+&nbsp;            manifest.backupFormatVersion != BackupManifest.CURRENT_FORMAT_VERSION -&gt;
+&nbsp;                BackupError.FormatMismatch(
+&nbsp;                    expected = BackupManifest.CURRENT_FORMAT_VERSION,
+&nbsp;                    actual = manifest.backupFormatVersion,
+&nbsp;                )
+&nbsp;            manifest.moneySurferDbVersion != MONEY_SURFER_DB_VERSION -&gt;
+&nbsp;                BackupError.SchemaMismatch(
+&nbsp;                    expected = MONEY_SURFER_DB_VERSION,
+&nbsp;                    actual = manifest.moneySurferDbVersion,
+&nbsp;                )
+&nbsp;            BackupManifest.MAIN_DB_ENTRY_NAME !in manifest.files -&gt;
+&nbsp;                BackupError.MissingFile(BackupManifest.MAIN_DB_ENTRY_NAME)
+&nbsp;            BackupManifest.DATASTORE_ENTRY_NAME !in manifest.files -&gt;
+&nbsp;                BackupError.MissingFile(BackupManifest.DATASTORE_ENTRY_NAME)
+&nbsp;            else -&gt; null
+&nbsp;        }
+&nbsp;        if (error != null) {
+&nbsp;            throw error
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun extractRemainingEntries(
+&nbsp;        reader: ZipStoredReader,
+&nbsp;        mainDbTemp: Path,
+&nbsp;        dataStoreTemp: Path,
+&nbsp;    ) {
+&nbsp;        var sawMainDb = false
+&nbsp;        var sawDataStore = false
+&nbsp;        while (true) {
+&nbsp;            val name = reader.nextEntryName() ?: break
+&nbsp;            when (name) {
+&nbsp;                BackupManifest.MAIN_DB_ENTRY_NAME -&gt; {
+&nbsp;                    sawMainDb = true
+&nbsp;                    writeEntryTo(reader, mainDbTemp)
+&nbsp;                }
+&nbsp;                BackupManifest.DATASTORE_ENTRY_NAME -&gt; {
+&nbsp;                    sawDataStore = true
+&nbsp;                    writeEntryTo(reader, dataStoreTemp)
+&nbsp;                }
+&nbsp;                else -&gt; {
+&nbsp;                    // Unknown entries are ignored — gives us forward-compat slack.
+&nbsp;                    blackholeSink().buffer().use { reader.readCurrentEntryTo(it) }
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;        if (!sawMainDb) throw BackupError.MissingFile(BackupManifest.MAIN_DB_ENTRY_NAME)
+&nbsp;        if (!sawDataStore) throw BackupError.MissingFile(BackupManifest.DATASTORE_ENTRY_NAME)
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun writeEntryTo(reader: ZipStoredReader, target: Path) {
+&nbsp;        target.parent?.let { fs.createDirectories(it) }
+&nbsp;        fs.deleteIfExists(target)
+&nbsp;        fs.sink(target).buffer().use { reader.readCurrentEntryTo(it) }
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun rollback(target: Path, backup: Path) {
+&nbsp;        if (fs.exists(backup)) {
+&nbsp;            runCatching { fs.deleteIfExists(target) }
+&nbsp;            runCatching { fs.atomicMove(backup, target) }
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;private fun Path.appendSuffix(suffix: String): Path {
+<b class="pc">&nbsp;    val parent = parent ?: error(&quot;Backup path must be absolute: $this&quot;)</b>
+<b class="fc">&nbsp;    return parent / &quot;$name$suffix&quot;</b>
+&nbsp;}
+&nbsp;
+&nbsp;private const val SUFFIX_RESTORE_TMP = &quot;.restore.tmp&quot;
+&nbsp;private const val SUFFIX_PRE_IMPORT = &quot;.preimport.bak&quot;
+&nbsp;private const val SUFFIX_WAL = &quot;-wal&quot;
+&nbsp;private const val SUFFIX_SHM = &quot;-shm&quot;
 </code>
 </pre>
 </div>
@@ -118,7 +320,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-05-06 14:45</div>
+    <div style="float:right;">generated on 2026-07-16 12:42</div>
 </div>
 </body>
 </html>

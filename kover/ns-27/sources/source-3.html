@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > NetworkMonitor</title>
+  <title>MoneySurfer Coverage Report > SyncSummaryBuilder</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,22 +19,70 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.sync.network</a>
+    <a href="../index.html">com.georgeci.moneysurfer.sync.internal</a>
 </div>
 
-<h1>Coverage Summary for Class: NetworkMonitor (com.georgeci.moneysurfer.sync.network)</h1>
+<h1>Coverage Summary for Class: SyncSummaryBuilder (com.georgeci.moneysurfer.sync.internal)</h1>
 
 <table class="coverageStats">
 <tr>
   <th class="name">Class</th>
 <th class="coverageStat 
 ">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
   Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
 </th>
 </tr>
 <tr>
-  <td class="name">NetworkMonitor</td>
+  <td class="name">SyncSummaryBuilder</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/6)
+  </span>
+</td>
     <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (10/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (37/37)
+  </span>
+</td>
 </tr>
 
 </table>
@@ -44,21 +92,27 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.sync.network
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.sync.internal
 &nbsp;
-&nbsp;import kotlinx.coroutines.flow.StateFlow
+&nbsp;import com.georgeci.moneysurfer.sync.api.SyncSummary
 &nbsp;
-&nbsp;/**
-&nbsp; * Reports whether the device currently has network connectivity.
-&nbsp; *
-&nbsp; * Platform implementations live in `:data` (Android `ConnectivityManager`,
-&nbsp; * iOS `NWPathMonitor`, desktop stub). Phase 0 ships only the interface;
-&nbsp; * tests use an in-memory fake.
-&nbsp; *
-&nbsp; * See SyncCoordinatorFAQ.md №9.
-&nbsp; */
-&nbsp;interface NetworkMonitor {
-&nbsp;    val online: StateFlow&lt;Boolean&gt;
+<b class="fc">&nbsp;internal class SyncSummaryBuilder {</b>
+&nbsp;    private var uploadedCount: Int = 0
+&nbsp;    private var downloadedCount: Int = 0
+&nbsp;    private var conflictCount: Int = 0
+&nbsp;    private var recalculatedCount: Int = 0
+&nbsp;
+<b class="fc">&nbsp;    fun addUpload(count: Int) { uploadedCount += count }</b>
+<b class="fc">&nbsp;    fun addDownload(count: Int) { downloadedCount += count }</b>
+<b class="fc">&nbsp;    fun addConflicts(count: Int) { conflictCount += count }</b>
+<b class="fc">&nbsp;    fun addRecalculated(count: Int) { recalculatedCount += count }</b>
+&nbsp;
+<b class="fc">&nbsp;    fun build(): SyncSummary = SyncSummary(</b>
+<b class="fc">&nbsp;        uploadedCount = uploadedCount,</b>
+<b class="fc">&nbsp;        downloadedCount = downloadedCount,</b>
+<b class="fc">&nbsp;        conflictCount = conflictCount,</b>
+<b class="fc">&nbsp;        recalculatedCount = recalculatedCount,</b>
+&nbsp;    )
 &nbsp;}
 </code>
 </pre>
@@ -83,7 +137,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-05-06 14:45</div>
+    <div style="float:right;">generated on 2026-07-16 12:42</div>
 </div>
 </body>
 </html>

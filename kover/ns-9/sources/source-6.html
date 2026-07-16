@@ -1,0 +1,167 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>MoneySurfer Coverage Report > TransactionEntity</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.georgeci.moneysurfer.data.db.entity</a>
+</div>
+
+<h1>Coverage Summary for Class: TransactionEntity (com.georgeci.moneysurfer.data.db.entity)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">TransactionEntity</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/82)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.db.entity
+&nbsp;
+&nbsp;import androidx.room.ColumnInfo
+&nbsp;import androidx.room.Entity
+&nbsp;import androidx.room.ForeignKey
+&nbsp;import androidx.room.Index
+&nbsp;import androidx.room.PrimaryKey
+&nbsp;
+<b class="nc">&nbsp;@Entity(</b>
+&nbsp;    tableName = &quot;transactions&quot;,
+&nbsp;    foreignKeys = [
+&nbsp;        ForeignKey(
+&nbsp;            entity = WorkspaceEntity::class,
+&nbsp;            parentColumns = [&quot;id&quot;],
+&nbsp;            childColumns = [&quot;workspaceId&quot;],
+&nbsp;        ),
+&nbsp;        ForeignKey(
+&nbsp;            entity = AccountEntity::class,
+&nbsp;            parentColumns = [&quot;id&quot;],
+&nbsp;            childColumns = [&quot;accountId&quot;],
+&nbsp;        ),
+&nbsp;        ForeignKey(
+&nbsp;            entity = CategoryEntity::class,
+&nbsp;            parentColumns = [&quot;id&quot;],
+&nbsp;            childColumns = [&quot;categoryId&quot;],
+&nbsp;        ),
+&nbsp;    ],
+&nbsp;    indices = [Index(&quot;workspaceId&quot;), Index(&quot;accountId&quot;), Index(&quot;categoryId&quot;)],
+&nbsp;)
+&nbsp;data class TransactionEntity(
+<b class="nc">&nbsp;    @PrimaryKey</b>
+<b class="nc">&nbsp;    @ColumnInfo(name = &quot;id&quot;) val id: String,</b>
+<b class="nc">&nbsp;    @ColumnInfo(name = &quot;workspaceId&quot;) val workspaceId: String,</b>
+<b class="nc">&nbsp;    @ColumnInfo(name = &quot;accountId&quot;) val accountId: String,</b>
+<b class="nc">&nbsp;    @ColumnInfo(name = &quot;amount&quot;) val amount: Long,</b>
+<b class="nc">&nbsp;    @ColumnInfo(name = &quot;currencyCode&quot;) val currencyCode: String,</b>
+<b class="nc">&nbsp;    @ColumnInfo(name = &quot;categoryId&quot;) val categoryId: String?,</b>
+<b class="nc">&nbsp;    @ColumnInfo(name = &quot;note&quot;) val note: String,</b>
+<b class="nc">&nbsp;    @ColumnInfo(name = &quot;operationAt&quot;) val operationAt: Long,</b>
+<b class="nc">&nbsp;    @ColumnInfo(name = &quot;operationDate&quot;, defaultValue = &quot;&quot;) val operationDate: String = &quot;&quot;,</b>
+<b class="nc">&nbsp;    @ColumnInfo(name = &quot;type&quot;) val type: String,</b>
+<b class="nc">&nbsp;    @ColumnInfo(name = &quot;status&quot;, defaultValue = &quot;ACTUAL&quot;) val status: String = &quot;ACTUAL&quot;,</b>
+<b class="nc">&nbsp;    @ColumnInfo(name = &quot;createdAt&quot;, defaultValue = &quot;0&quot;) val createdAt: Long = 0L,</b>
+<b class="nc">&nbsp;    @ColumnInfo(name = &quot;updatedAt&quot;, defaultValue = &quot;0&quot;) val updatedAt: Long = 0L,</b>
+<b class="nc">&nbsp;    @ColumnInfo(name = &quot;transferId&quot;) val transferId: String? = null,</b>
+&nbsp;)
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-07-16 12:42</div>
+</div>
+</body>
+</html>

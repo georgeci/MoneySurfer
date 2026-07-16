@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > ComGeorgeciMoneysurferDiOnlineSignInModuleModuleKt</title>
+  <title>MoneySurfer Coverage Report > PullRemoteChangesUseCaseImpl</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,30 +19,493 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.di</a>
+    <a href="../index.html">com.georgeci.moneysurfer.data.sync</a>
 </div>
 
-<h1>Coverage Summary for Class: ComGeorgeciMoneysurferDiOnlineSignInModuleModuleKt (com.georgeci.moneysurfer.di)</h1>
+<h1>Coverage Summary for Class: PullRemoteChangesUseCaseImpl (com.georgeci.moneysurfer.data.sync)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
 <th class="coverageStat 
 ">
+  Method, %
+</th>
+<th class="coverageStat 
+">
   Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
 </th>
 </tr>
 <tr>
-  <td class="name">ComGeorgeciMoneysurferDiOnlineSignInModuleModuleKt</td>
-    <td class="coverageStat"/>
+  <td class="name">PullRemoteChangesUseCaseImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (7/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    83.3%
+  </span>
+  <span class="absValue">
+    (45/54)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    97.2%
+  </span>
+  <span class="absValue">
+    (103/106)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    97.6%
+  </span>
+  <span class="absValue">
+    (1284/1315)
+  </span>
+</td>
 </tr>
-
+  <tr>
+    <td class="name">PullRemoteChangesUseCaseImpl$Companion</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">PullRemoteChangesUseCaseImpl$invoke$1</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">PullRemoteChangesUseCaseImpl$pluginsInScope$$inlined$sortedBy$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">PullRemoteChangesUseCaseImpl$pullBatch$1</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">PullRemoteChangesUseCaseImpl$pullCollection$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (21/21)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">PullRemoteChangesUseCaseImpl$pullInvitesForUser$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (21/21)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">PullRemoteChangesUseCaseImpl$WhenMappings</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">PullRemoteChangesUseCaseImpl$workspaceIdsForScope$1</td>
+    <td class="coverageStat"/>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    90%
+  </span>
+  <span class="absValue">
+    (9/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    83.3%
+  </span>
+  <span class="absValue">
+    (45/54)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    97.4%
+  </span>
+  <span class="absValue">
+    (113/116)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    97.7%
+  </span>
+  <span class="absValue">
+    (1326/1357)
+  </span>
+</td>
+</tr>
 </table>
 
 <br/>
 <br/>
 
-  <code class="sourceCode">Source code is not available<br /></code>
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.sync
+&nbsp;
+&nbsp;import arrow.core.raise.either
+&nbsp;import co.touchlab.kermit.Logger
+&nbsp;import com.georgeci.moneysurfer.domain.auth.SessionPointers
+&nbsp;import com.georgeci.moneysurfer.domain.sync.PullProgress
+&nbsp;import com.georgeci.moneysurfer.domain.sync.PullRemoteChangesUseCase
+&nbsp;import com.georgeci.moneysurfer.domain.sync.PullSummary
+&nbsp;import com.georgeci.moneysurfer.sync.api.SyncCancelToken
+&nbsp;import com.georgeci.moneysurfer.sync.api.SyncResult
+&nbsp;import com.georgeci.moneysurfer.sync.api.SyncScope
+&nbsp;import com.georgeci.moneysurfer.sync.plugin.EntityApplyResult
+&nbsp;import com.georgeci.moneysurfer.sync.plugin.RemoteDocument
+&nbsp;import com.georgeci.moneysurfer.sync.plugin.SyncEntityPlugin
+&nbsp;import com.georgeci.moneysurfer.sync.repository.SyncMetaRepository
+&nbsp;import kotlinx.coroutines.flow.first
+&nbsp;import org.koin.core.annotation.Single
+&nbsp;import kotlin.coroutines.cancellation.CancellationException
+&nbsp;import kotlin.time.Clock
+&nbsp;import kotlin.time.Instant
+&nbsp;
+&nbsp;/**
+&nbsp; * Cursor-based incremental pull. For each workspace in scope and each plugin that exposes a
+&nbsp; * [SyncEntityPlugin.firestoreCollectionName]:
+&nbsp; * 1. read cursor from [SyncMetaRepository]
+&nbsp; * 2. query `WHERE updatedAt &gt; cursor ORDER BY updatedAt LIMIT BATCH` via [WorkspaceCollectionReader]
+&nbsp; * 3. dispatch each doc to the plugin&#39;s [SyncEntityPlugin.applyDoc]
+&nbsp; * 4. advance the cursor to `max(updatedAt)` of the batch
+&nbsp; *
+&nbsp; * Scope determines which workspaces are pulled:
+&nbsp; * - [SyncScope.ActiveWorkspace] → current workspace only (`session.currentWorkspaceId`)
+&nbsp; * - [SyncScope.AllUserData] / [SyncScope.ChangedSinceLastSync] → all workspaces from
+&nbsp; *   [UserWorkspacesProvider] (fetches `users/{uid}.workspaceIds` from remote)
+&nbsp; * - [SyncScope.UploadOnly] → no pull
+&nbsp; *
+&nbsp; * Members and invites are pulled first so membership rows exist before
+&nbsp; * queries that gate on them.
+&nbsp; *
+&nbsp; * Phase 2 ([SyncScope.AllUserData] / [SyncScope.ChangedSinceLastSync] only): pulls the
+&nbsp; * `invites` collection from workspaces listed in `users/{uid}.invitedWorkspaceIds` — workspaces
+&nbsp; * the user has been invited to but has not yet joined. This replaces the previous
+&nbsp; * `collectionGroup(&quot;invites&quot;)` approach in [IncomingInviteRemoteRepository].
+&nbsp; */
+<b class="fc">&nbsp;@Single(binds = [PullRemoteChangesUseCase::class])</b>
+&nbsp;class PullRemoteChangesUseCaseImpl(
+<b class="fc">&nbsp;    private val collectionReader: WorkspaceCollectionReader,</b>
+<b class="fc">&nbsp;    private val syncMeta: SyncMetaRepository,</b>
+<b class="fc">&nbsp;    private val plugins: List&lt;SyncEntityPlugin&gt;,</b>
+<b class="fc">&nbsp;    private val session: SessionPointers,</b>
+<b class="fc">&nbsp;    private val userWorkspacesProvider: UserWorkspacesProvider,</b>
+&nbsp;) : PullRemoteChangesUseCase {
+&nbsp;
+<b class="fc">&nbsp;    private val log = Logger.withTag(&quot;PullRemoteChanges&quot;)</b>
+&nbsp;
+&nbsp;    override suspend fun invoke(
+&nbsp;        scope: SyncScope,
+&nbsp;        onProgress: suspend (PullProgress) -&gt; Unit,
+&nbsp;        cancelToken: SyncCancelToken,
+<b class="fc">&nbsp;    ): SyncResult&lt;PullSummary&gt; = either {</b>
+<b class="fc">&nbsp;        val workspaceIds = workspaceIdsForScope(scope)</b>
+&nbsp;
+<b class="fc">&nbsp;        var totalDownloaded = 0</b>
+<b class="fc">&nbsp;        var totalConflicts = 0</b>
+&nbsp;
+<b class="fc">&nbsp;        for (workspaceId in workspaceIds) {</b>
+<b class="fc">&nbsp;            for (plugin in pluginsInScope(scope)) {</b>
+<b class="fc">&nbsp;                cancelToken.throwIfCancelled()</b>
+<b class="fc">&nbsp;                val collectionName = plugin.firestoreCollectionName</b>
+&nbsp;
+<b class="fc">&nbsp;                val (downloaded, conflicts) = try {</b>
+<b class="fc">&nbsp;                    if (collectionName == null) {</b>
+&nbsp;                        // Root-doc plugin (firestoreCollectionName == null): fetch the
+&nbsp;                        // workspace root document and apply it directly. This ensures the
+&nbsp;                        // local WorkspaceEntity exists before subcollection plugins run —
+&nbsp;                        // AccountEntity / CategoryEntity / TransactionEntity all carry a
+&nbsp;                        // Room FK workspaceId → WorkspaceEntity (SQLite error 787 otherwise).
+<b class="fc">&nbsp;                        val doc = collectionReader.fetchWorkspaceDoc(workspaceId)</b>
+<b class="fc">&nbsp;                        val applied = doc != null &amp;&amp; plugin.applyDoc(doc, workspaceId).applied</b>
+<b class="fc">&nbsp;                        if (applied) 1 to 0 else 0 to 0</b>
+&nbsp;                    } else {
+<b class="fc">&nbsp;                        pullCollection(</b>
+<b class="fc">&nbsp;                            workspaceId = workspaceId,</b>
+<b class="fc">&nbsp;                            plugin = plugin,</b>
+<b class="fc">&nbsp;                            collectionName = collectionName,</b>
+<b class="fc">&nbsp;                            onProgress = onProgress,</b>
+<b class="fc">&nbsp;                            cancelToken = cancelToken,</b>
+&nbsp;                        )
+&nbsp;                    }
+&nbsp;                } catch (cancelled: CancellationException) {
+&nbsp;                    throw cancelled
+&nbsp;                } catch (
+&nbsp;                    @Suppress(&quot;TooGenericExceptionCaught&quot;)
+&nbsp;                    failure: Throwable,
+&nbsp;                ) {
+<b class="fc">&nbsp;                    log.e(throwable = failure) {</b>
+<b class="fc">&nbsp;                        &quot;[pull] failed entity=${plugin.entityType} &quot; +</b>
+<b class="pc">&nbsp;                            &quot;collection=${collectionName ?: &quot;root&quot;} wid=$workspaceId&quot;</b>
+&nbsp;                    }
+<b class="fc">&nbsp;                    raise(failure.toSyncError())</b>
+&nbsp;                }
+<b class="fc">&nbsp;                totalDownloaded += downloaded</b>
+<b class="fc">&nbsp;                totalConflicts += conflicts</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        // Phase 2: pull `invites` collection from workspaces the user is invited to but
+&nbsp;        // has not yet joined. Only for scopes that do a full user-data fetch.
+&nbsp;        // Uses fetchInvitesForUser (which adds a targetUserId filter) because the caller is
+&nbsp;        // not yet a workspace member and a general list query would be PERMISSION_DENIED.
+<b class="fc">&nbsp;        if (scope == SyncScope.AllUserData || scope == SyncScope.ChangedSinceLastSync) {</b>
+<b class="fc">&nbsp;            val uid = session.currentFirebaseUid.flow.first()</b>
+<b class="fc">&nbsp;            if (uid != null) {</b>
+<b class="fc">&nbsp;                val invitedIds = userWorkspacesProvider.invitedWorkspaceIds()</b>
+<b class="fc">&nbsp;                val invitePlugin = plugins.firstOrNull { it.firestoreCollectionName == &quot;invites&quot; }</b>
+<b class="pc">&nbsp;                if (invitePlugin != null) {</b>
+<b class="fc">&nbsp;                    for (workspaceId in invitedIds) {</b>
+<b class="fc">&nbsp;                        cancelToken.throwIfCancelled()</b>
+<b class="fc">&nbsp;                        val (downloaded, conflicts) = try {</b>
+<b class="fc">&nbsp;                            pullInvitesForUser(</b>
+<b class="fc">&nbsp;                                workspaceId = workspaceId,</b>
+<b class="fc">&nbsp;                                uid = uid,</b>
+<b class="fc">&nbsp;                                plugin = invitePlugin,</b>
+<b class="fc">&nbsp;                                onProgress = onProgress,</b>
+<b class="fc">&nbsp;                                cancelToken = cancelToken,</b>
+&nbsp;                            )
+&nbsp;                        } catch (cancelled: CancellationException) {
+&nbsp;                            throw cancelled
+&nbsp;                        } catch (
+&nbsp;                            @Suppress(&quot;TooGenericExceptionCaught&quot;)
+&nbsp;                            failure: Throwable,
+&nbsp;                        ) {
+<b class="nc">&nbsp;                            log.e(throwable = failure) {</b>
+<b class="nc">&nbsp;                                &quot;[pull] failed (phase2/invites) wid=$workspaceId&quot;</b>
+&nbsp;                            }
+<b class="nc">&nbsp;                            raise(failure.toSyncError())</b>
+&nbsp;                        }
+<b class="fc">&nbsp;                        totalDownloaded += downloaded</b>
+<b class="fc">&nbsp;                        totalConflicts += conflicts</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        PullSummary(downloadedCount = totalDownloaded, conflictCount = totalConflicts)</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    private suspend fun workspaceIdsForScope(scope: SyncScope): List&lt;String&gt; = when (scope) {</b>
+<b class="fc">&nbsp;        SyncScope.UploadOnly -&gt; emptyList()</b>
+&nbsp;        SyncScope.ActiveWorkspace -&gt; {
+<b class="pc">&nbsp;            session.currentWorkspaceId.flow.first()?.value</b>
+<b class="fc">&nbsp;                ?.let { listOf(it) } ?: emptyList()</b>
+&nbsp;        }
+<b class="fc">&nbsp;        SyncScope.AllUserData -&gt; userWorkspacesProvider.workspaceIds()</b>
+&nbsp;        SyncScope.ChangedSinceLastSync -&gt; {
+<b class="fc">&nbsp;            val ids = userWorkspacesProvider.workspaceIds()</b>
+<b class="pc">&nbsp;            ids.ifEmpty {</b>
+&nbsp;                // Fallback for incremental sync: provider returned nothing (e.g. first
+&nbsp;                // launch before workspaceIds has been pushed to Firestore). Use the
+&nbsp;                // locally-known active workspace so at least one workspace syncs.
+&nbsp;                // NOT used for AllUserData — a full sync should only pull what the
+&nbsp;                // remote says the user owns; using currentWorkspaceId for AllUserData
+&nbsp;                // causes PERMISSION_DENIED when the user is only an invitee of that wid.
+<b class="pc">&nbsp;                session.currentWorkspaceId.flow.first()?.value</b>
+<b class="fc">&nbsp;                    ?.let { listOf(it) } ?: emptyList()</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private suspend fun pullCollection(
+&nbsp;        workspaceId: String,
+&nbsp;        plugin: SyncEntityPlugin,
+&nbsp;        collectionName: String,
+&nbsp;        onProgress: suspend (PullProgress) -&gt; Unit,
+&nbsp;        cancelToken: SyncCancelToken,
+<b class="fc">&nbsp;    ): Pair&lt;Int, Int&gt; = pullBatch(</b>
+<b class="fc">&nbsp;        workspaceId = workspaceId,</b>
+<b class="fc">&nbsp;        collectionName = collectionName,</b>
+<b class="fc">&nbsp;        plugin = plugin,</b>
+<b class="fc">&nbsp;        onProgress = onProgress,</b>
+<b class="fc">&nbsp;        cancelToken = cancelToken,</b>
+&nbsp;    ) { sinceMillis -&gt;
+<b class="fc">&nbsp;        collectionReader.fetchUpdatedSince(</b>
+<b class="fc">&nbsp;            workspaceId = workspaceId,</b>
+<b class="fc">&nbsp;            collectionName = collectionName,</b>
+<b class="fc">&nbsp;            sinceMillis = sinceMillis,</b>
+<b class="fc">&nbsp;            limit = BATCH_SIZE,</b>
+&nbsp;        )
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Pulls invites from a workspace the caller is invited to but has not joined.
+&nbsp;     * Uses [WorkspaceCollectionReader.fetchInvitesForUser] which adds a `targetUserId == uid`
+&nbsp;     * filter, making the query satisfy Firestore rules for non-members.
+&nbsp;     */
+&nbsp;    private suspend fun pullInvitesForUser(
+&nbsp;        workspaceId: String,
+&nbsp;        uid: String,
+&nbsp;        plugin: SyncEntityPlugin,
+&nbsp;        onProgress: suspend (PullProgress) -&gt; Unit,
+&nbsp;        cancelToken: SyncCancelToken,
+<b class="fc">&nbsp;    ): Pair&lt;Int, Int&gt; = pullBatch(</b>
+<b class="fc">&nbsp;        workspaceId = workspaceId,</b>
+<b class="fc">&nbsp;        collectionName = &quot;invites&quot;,</b>
+<b class="fc">&nbsp;        plugin = plugin,</b>
+<b class="fc">&nbsp;        onProgress = onProgress,</b>
+<b class="fc">&nbsp;        cancelToken = cancelToken,</b>
+&nbsp;    ) { sinceMillis -&gt;
+<b class="fc">&nbsp;        collectionReader.fetchInvitesForUser(</b>
+<b class="fc">&nbsp;            workspaceId = workspaceId,</b>
+<b class="fc">&nbsp;            uid = uid,</b>
+<b class="fc">&nbsp;            sinceMillis = sinceMillis,</b>
+<b class="fc">&nbsp;            limit = BATCH_SIZE,</b>
+&nbsp;        )
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Cursor-based batch pull shared by [pullCollection] and [pullInvitesForUser]: reads the
+&nbsp;     * cursor, runs [fetch] for everything updated since it, applies each doc via the [plugin],
+&nbsp;     * advances the cursor to `max(updatedAt)`, and records the attempt/success on [syncMeta].
+&nbsp;     * Only the query differs between callers, so it is supplied as [fetch].
+&nbsp;     *
+&nbsp;     * @return `downloaded to conflicts` for the batch.
+&nbsp;     */
+&nbsp;    private suspend fun pullBatch(
+&nbsp;        workspaceId: String,
+&nbsp;        collectionName: String,
+&nbsp;        plugin: SyncEntityPlugin,
+&nbsp;        onProgress: suspend (PullProgress) -&gt; Unit,
+&nbsp;        cancelToken: SyncCancelToken,
+&nbsp;        fetch: suspend (sinceMillis: Long) -&gt; List&lt;RemoteDocument&gt;,
+&nbsp;    ): Pair&lt;Int, Int&gt; {
+<b class="fc">&nbsp;        syncMeta.markAttempt(workspaceId, collectionName, Clock.System.now())</b>
+&nbsp;
+<b class="fc">&nbsp;        val cursor = syncMeta.cursor(workspaceId, collectionName)</b>
+<b class="fc">&nbsp;        val cursorMillis = cursor?.toEpochMilliseconds() ?: 0L</b>
+&nbsp;
+<b class="fc">&nbsp;        val docs = fetch(cursorMillis)</b>
+&nbsp;
+<b class="fc">&nbsp;        if (docs.isEmpty()) {</b>
+<b class="fc">&nbsp;            syncMeta.markSuccess(workspaceId, collectionName, Clock.System.now())</b>
+<b class="fc">&nbsp;            return 0 to 0</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        var downloaded = 0</b>
+<b class="fc">&nbsp;        var conflicts = 0</b>
+<b class="fc">&nbsp;        var maxUpdatedAt = cursorMillis</b>
+&nbsp;
+<b class="fc">&nbsp;        docs.forEachIndexed { index, doc -&gt;</b>
+<b class="fc">&nbsp;            cancelToken.throwIfCancelled()</b>
+<b class="fc">&nbsp;            val result: EntityApplyResult = plugin.applyDoc(doc, workspaceId)</b>
+<b class="fc">&nbsp;            if (result.applied) downloaded++</b>
+<b class="fc">&nbsp;            if (result.wasConflict) conflicts++</b>
+&nbsp;
+<b class="pc">&nbsp;            val docUpdatedAt = doc.getLong(&quot;updatedAt&quot;) ?: 0L</b>
+<b class="fc">&nbsp;            if (docUpdatedAt &gt; maxUpdatedAt) maxUpdatedAt = docUpdatedAt</b>
+&nbsp;
+<b class="fc">&nbsp;            onProgress(</b>
+<b class="fc">&nbsp;                PullProgress(</b>
+<b class="fc">&nbsp;                    collection = collectionName,</b>
+<b class="fc">&nbsp;                    current = index + 1,</b>
+<b class="fc">&nbsp;                    total = docs.size,</b>
+&nbsp;                ),
+&nbsp;            )
+<b class="fc">&nbsp;        }</b>
+&nbsp;
+<b class="pc">&nbsp;        if (maxUpdatedAt &gt; cursorMillis) {</b>
+<b class="fc">&nbsp;            syncMeta.setCursor(</b>
+<b class="fc">&nbsp;                scopeKey = workspaceId,</b>
+<b class="fc">&nbsp;                collection = collectionName,</b>
+<b class="fc">&nbsp;                cursor = Instant.fromEpochMilliseconds(maxUpdatedAt),</b>
+&nbsp;            )
+&nbsp;        }
+<b class="fc">&nbsp;        syncMeta.markSuccess(workspaceId, collectionName, Clock.System.now())</b>
+&nbsp;
+<b class="fc">&nbsp;        return downloaded to conflicts</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns all plugins in pull order ([SyncEntityPlugin.pullPriority], lower first).
+&nbsp;     *
+&nbsp;     * Includes plugins with [SyncEntityPlugin.firestoreCollectionName] == null — those
+&nbsp;     * own workspace root documents and are dispatched via
+&nbsp;     * [WorkspaceCollectionReader.fetchWorkspaceDoc] rather than [pullCollection].
+&nbsp;     * See [SyncEntityPlugin] kdoc for tier assignments.
+&nbsp;     */
+&nbsp;    private fun pluginsInScope(scope: SyncScope): List&lt;SyncEntityPlugin&gt; {
+<b class="pc">&nbsp;        if (scope == SyncScope.UploadOnly) return emptyList()</b>
+<b class="fc">&nbsp;        return plugins.sortedBy { it.pullPriority }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private companion object {
+&nbsp;        const val BATCH_SIZE: Int = 100
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
 </div>
 
 <script type="text/javascript">
@@ -64,7 +527,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-05-06 14:45</div>
+    <div style="float:right;">generated on 2026-07-16 12:42</div>
 </div>
 </body>
 </html>

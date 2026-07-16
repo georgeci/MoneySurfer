@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SignInLayout</title>
+  <title>MoneySurfer Coverage Report > Currency</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.feature.login</a>
+    <a href="../index.html">com.georgeci.moneysurfer.domain.model</a>
 </div>
 
-<h1>Coverage Summary for Class: SignInLayout (com.georgeci.moneysurfer.feature.login)</h1>
+<h1>Coverage Summary for Class: Currency (com.georgeci.moneysurfer.domain.model)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SignInLayout</td>
+  <td class="name">Currency</td>
 <td class="coverageStat">
   <span class="percent">
     0%
@@ -63,7 +63,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/7)
+    (0/1)
   </span>
 </td>
     <td class="coverageStat"/>
@@ -72,7 +72,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/6)
+    (0/4)
   </span>
 </td>
 <td class="coverageStat">
@@ -80,7 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/36)
+    (0/17)
   </span>
 </td>
 </tr>
@@ -92,391 +92,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.login
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.model
 &nbsp;
-&nbsp;import androidx.compose.foundation.Canvas
-&nbsp;import androidx.compose.foundation.background
-&nbsp;import androidx.compose.foundation.layout.Arrangement
-&nbsp;import androidx.compose.foundation.layout.Box
-&nbsp;import androidx.compose.foundation.layout.Column
-&nbsp;import androidx.compose.foundation.layout.PaddingValues
-&nbsp;import androidx.compose.foundation.layout.Row
-&nbsp;import androidx.compose.foundation.layout.Spacer
-&nbsp;import androidx.compose.foundation.layout.fillMaxSize
-&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
-&nbsp;import androidx.compose.foundation.layout.height
-&nbsp;import androidx.compose.foundation.layout.offset
-&nbsp;import androidx.compose.foundation.layout.padding
-&nbsp;import androidx.compose.foundation.layout.size
-&nbsp;import androidx.compose.foundation.rememberScrollState
-&nbsp;import androidx.compose.foundation.shape.RoundedCornerShape
-&nbsp;import androidx.compose.foundation.text.KeyboardOptions
-&nbsp;import androidx.compose.foundation.verticalScroll
-&nbsp;import androidx.compose.material3.Icon
-&nbsp;import androidx.compose.material3.OutlinedTextField
-&nbsp;import androidx.compose.material3.Scaffold
-&nbsp;import androidx.compose.material3.Text
-&nbsp;import androidx.compose.runtime.Composable
-&nbsp;import androidx.compose.runtime.getValue
-&nbsp;import androidx.compose.ui.Alignment
-&nbsp;import androidx.compose.ui.Modifier
-&nbsp;import androidx.compose.ui.draw.clip
-&nbsp;import androidx.compose.ui.geometry.Offset
-&nbsp;import androidx.compose.ui.graphics.Brush
-&nbsp;import androidx.compose.ui.graphics.luminance
-&nbsp;import androidx.compose.ui.text.input.ImeAction
-&nbsp;import androidx.compose.ui.text.input.KeyboardType
-&nbsp;import androidx.compose.ui.text.input.PasswordVisualTransformation
-&nbsp;import androidx.compose.ui.text.style.TextAlign
-&nbsp;import androidx.compose.ui.tooling.preview.Preview
-&nbsp;import androidx.compose.ui.unit.dp
-&nbsp;import androidx.lifecycle.compose.collectAsStateWithLifecycle
-&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferButton
-&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferButtonSize
-&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferButtonStyle
-&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferFullScreenLoader
-&nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
-&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
-&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
-&nbsp;import com.georgeci.moneysurfer.utils.HandleSideEffect
-&nbsp;import moneysurfer.feature.login.generated.resources.Res
-&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_anonymous
-&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_brand
-&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_demo_mode
-&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_email_label
-&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_error_email_in_use
-&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_error_invalid_credentials
-&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_error_missing_credentials
-&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_error_permission_denied
-&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_error_unknown
-&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_error_weak_password
-&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_hero_subtitle
-&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_hero_title
-&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_password_label
-&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_submit_signin
-&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_submit_signup
-&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_terms
-&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_toggle_to_signin
-&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_toggle_to_signup
-&nbsp;import org.jetbrains.compose.resources.stringResource
-&nbsp;import org.koin.compose.viewmodel.koinViewModel
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
 &nbsp;
-&nbsp;private object SignInLayout {
-<b class="nc">&nbsp;    val donutOffsetX = 80.dp</b>
-<b class="nc">&nbsp;    val donutOffsetY = 120.dp</b>
-<b class="nc">&nbsp;    val donutSize = 280.dp</b>
-<b class="nc">&nbsp;    val brandIconSize = 44.dp</b>
-<b class="nc">&nbsp;    val brandIconCornerRadius = 14.dp</b>
-<b class="nc">&nbsp;    val brandIconContentSize = 24.dp</b>
-&nbsp;    const val donutHoleRadiusFraction = 160f / 280f
-&nbsp;    const val donutHoleOffsetXFraction = 100f / 280f
-&nbsp;    const val donutHoleOffsetYFraction = 60f / 280f
-&nbsp;}
-&nbsp;
-&nbsp;@Composable
-&nbsp;private fun SignInError.localized(): String = stringResource(
-&nbsp;    when (this) {
-&nbsp;        SignInError.MissingCredentials -&gt; Res.string.sign_in_error_missing_credentials
-&nbsp;        SignInError.InvalidCredentials -&gt; Res.string.sign_in_error_invalid_credentials
-&nbsp;        SignInError.EmailAlreadyInUse -&gt; Res.string.sign_in_error_email_in_use
-&nbsp;        SignInError.WeakPassword -&gt; Res.string.sign_in_error_weak_password
-&nbsp;        SignInError.PermissionDenied -&gt; Res.string.sign_in_error_permission_denied
-&nbsp;        SignInError.Unknown -&gt; Res.string.sign_in_error_unknown
-&nbsp;    },
+<b class="nc">&nbsp;data class Currency(</b>
+<b class="nc">&nbsp;    val code: CurrencyCode,</b>
+<b class="nc">&nbsp;    val symbol: String,</b>
+<b class="nc">&nbsp;    val displayName: String,</b>
 &nbsp;)
-&nbsp;
-&nbsp;@Composable
-&nbsp;fun SignInScreen(
-&nbsp;    onNavigateToWorkspaceSelector: () -&gt; Unit,
-&nbsp;    viewModel: SignInViewModel = koinViewModel(),
-&nbsp;) {
-&nbsp;    val state by viewModel.collectAsStateWithLifecycle()
-&nbsp;
-&nbsp;    viewModel.HandleSideEffect { effect -&gt;
-&nbsp;        when (effect) {
-&nbsp;            SignInEffect.NavigateToWorkspaceSelector -&gt; onNavigateToWorkspaceSelector()
-&nbsp;        }
-&nbsp;    }
-&nbsp;
-&nbsp;    SignInContent(
-&nbsp;        state = state,
-&nbsp;        onEvent = viewModel::onEvent,
-&nbsp;    )
-&nbsp;}
-&nbsp;
-&nbsp;@Composable
-&nbsp;private fun SignInContent(
-&nbsp;    state: SignInState,
-&nbsp;    onEvent: (SignInEvent) -&gt; Unit,
-&nbsp;) {
-&nbsp;    val config = state.config
-&nbsp;    Scaffold(
-&nbsp;        modifier = Modifier
-&nbsp;            .fillMaxSize()
-&nbsp;            .surferSafeInsets(),
-&nbsp;    ) { innerPadding -&gt;
-&nbsp;        Box(
-&nbsp;            modifier = Modifier
-&nbsp;                .fillMaxSize()
-&nbsp;                .padding(innerPadding),
-&nbsp;        ) {
-&nbsp;            DecorativeDonut(
-&nbsp;                modifier = Modifier
-&nbsp;                    .align(Alignment.TopEnd)
-&nbsp;                    .offset(x = SignInLayout.donutOffsetX, y = SignInLayout.donutOffsetY)
-&nbsp;                    .size(SignInLayout.donutSize),
-&nbsp;            )
-&nbsp;
-&nbsp;            Column(
-&nbsp;                modifier = Modifier
-&nbsp;                    .fillMaxSize()
-&nbsp;                    .verticalScroll(rememberScrollState())
-&nbsp;                    .padding(
-&nbsp;                        PaddingValues(
-&nbsp;                            start = AppTheme.spacing.large,
-&nbsp;                            end = AppTheme.spacing.large,
-&nbsp;                            top = AppTheme.spacing.xxxLarge,
-&nbsp;                            bottom = AppTheme.spacing.xLarge,
-&nbsp;                        ),
-&nbsp;                    ),
-&nbsp;            ) {
-&nbsp;                BrandMark()
-&nbsp;
-&nbsp;                Spacer(Modifier.weight(1f))
-&nbsp;
-&nbsp;                Text(
-&nbsp;                    text = stringResource(Res.string.sign_in_hero_title),
-&nbsp;                    style = AppTheme.typography.displaySmall,
-&nbsp;                    color = AppTheme.materialColors.onSurface,
-&nbsp;                )
-&nbsp;                Spacer(Modifier.height(AppTheme.spacing.medium))
-&nbsp;                Text(
-&nbsp;                    text = stringResource(Res.string.sign_in_hero_subtitle),
-&nbsp;                    style = AppTheme.typography.bodyLarge,
-&nbsp;                    color = AppTheme.materialColors.onSurfaceVariant,
-&nbsp;                )
-&nbsp;
-&nbsp;                Spacer(Modifier.height(AppTheme.spacing.large))
-&nbsp;
-&nbsp;                if (config.emailPassword) {
-&nbsp;                    EmailPasswordForm(state = state, onEvent = onEvent)
-&nbsp;                }
-&nbsp;
-&nbsp;                if (state.error != null) {
-&nbsp;                    Spacer(Modifier.height(AppTheme.spacing.small))
-&nbsp;                    Text(
-&nbsp;                        text = state.error.localized(),
-&nbsp;                        style = AppTheme.typography.bodySmall,
-&nbsp;                        color = AppTheme.materialColors.error,
-&nbsp;                        textAlign = TextAlign.Center,
-&nbsp;                        modifier = Modifier.fillMaxWidth(),
-&nbsp;                    )
-&nbsp;                }
-&nbsp;
-&nbsp;                Spacer(Modifier.height(AppTheme.spacing.medium))
-&nbsp;
-&nbsp;                if (config.emailPassword) {
-&nbsp;                    SurferButton(
-&nbsp;                        text = stringResource(
-&nbsp;                            when (state.mode) {
-&nbsp;                                AuthMode.SignIn -&gt; Res.string.sign_in_submit_signin
-&nbsp;                                AuthMode.SignUp -&gt; Res.string.sign_in_submit_signup
-&nbsp;                            },
-&nbsp;                        ),
-&nbsp;                        onClick = { onEvent(SignInEvent.OnSubmitClick) },
-&nbsp;                        modifier = Modifier.fillMaxWidth(),
-&nbsp;                        size = SurferButtonSize.Biggest,
-&nbsp;                        enabled = state.canSubmit,
-&nbsp;                    )
-&nbsp;
-&nbsp;                    Spacer(Modifier.height(AppTheme.spacing.small))
-&nbsp;
-&nbsp;                    SurferButton(
-&nbsp;                        text = stringResource(
-&nbsp;                            when (state.mode) {
-&nbsp;                                AuthMode.SignIn -&gt; Res.string.sign_in_toggle_to_signup
-&nbsp;                                AuthMode.SignUp -&gt; Res.string.sign_in_toggle_to_signin
-&nbsp;                            },
-&nbsp;                        ),
-&nbsp;                        onClick = { onEvent(SignInEvent.OnToggleModeClick) },
-&nbsp;                        modifier = Modifier.fillMaxWidth(),
-&nbsp;                        style = SurferButtonStyle.Text,
-&nbsp;                        enabled = !state.isLoading,
-&nbsp;                    )
-&nbsp;                }
-&nbsp;
-&nbsp;                if (config.anonymous) {
-&nbsp;                    Spacer(Modifier.height(AppTheme.spacing.large))
-&nbsp;
-&nbsp;                    SurferButton(
-&nbsp;                        text = stringResource(Res.string.sign_in_anonymous),
-&nbsp;                        onClick = { onEvent(SignInEvent.OnAnonymousLoginClick) },
-&nbsp;                        modifier = Modifier.fillMaxWidth(),
-&nbsp;                        style = SurferButtonStyle.Outlined,
-&nbsp;                        enabled = !state.isLoading,
-&nbsp;                        startIcon = SurferIcons.Fingerprint,
-&nbsp;                    )
-&nbsp;
-&nbsp;                    Spacer(Modifier.height(AppTheme.spacing.small))
-&nbsp;                }
-&nbsp;
-&nbsp;                if (config.demo) {
-&nbsp;                    SurferButton(
-&nbsp;                        text = stringResource(Res.string.sign_in_demo_mode),
-&nbsp;                        onClick = { onEvent(SignInEvent.OnLoginClick) },
-&nbsp;                        modifier = Modifier.fillMaxWidth(),
-&nbsp;                        size = if (config.demoOnly) SurferButtonSize.Biggest else SurferButtonSize.Regular,
-&nbsp;                        style = if (config.demoOnly) SurferButtonStyle.Filled else SurferButtonStyle.Text,
-&nbsp;                        enabled = !state.isLoading,
-&nbsp;                    )
-&nbsp;                }
-&nbsp;
-&nbsp;                Spacer(Modifier.height(AppTheme.spacing.large))
-&nbsp;
-&nbsp;                Text(
-&nbsp;                    text = stringResource(Res.string.sign_in_terms),
-&nbsp;                    style = AppTheme.typography.bodySmall,
-&nbsp;                    color = AppTheme.materialColors.onSurfaceVariant,
-&nbsp;                    textAlign = TextAlign.Center,
-&nbsp;                    modifier = Modifier.fillMaxWidth(),
-&nbsp;                )
-&nbsp;            }
-&nbsp;
-&nbsp;            if (state.isLoading) {
-&nbsp;                SurferFullScreenLoader(modifier = Modifier.fillMaxSize())
-&nbsp;            }
-&nbsp;        }
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;@Composable
-&nbsp;private fun EmailPasswordForm(
-&nbsp;    state: SignInState,
-&nbsp;    onEvent: (SignInEvent) -&gt; Unit,
-&nbsp;) {
-&nbsp;    OutlinedTextField(
-&nbsp;        value = state.email,
-&nbsp;        onValueChange = { onEvent(SignInEvent.OnEmailChanged(it)) },
-&nbsp;        label = { Text(stringResource(Res.string.sign_in_email_label)) },
-&nbsp;        singleLine = true,
-&nbsp;        keyboardOptions = KeyboardOptions(
-&nbsp;            keyboardType = KeyboardType.Email,
-&nbsp;            imeAction = ImeAction.Next,
-&nbsp;        ),
-&nbsp;        enabled = !state.isLoading,
-&nbsp;        modifier = Modifier.fillMaxWidth(),
-&nbsp;    )
-&nbsp;
-&nbsp;    Spacer(Modifier.height(AppTheme.spacing.small))
-&nbsp;
-&nbsp;    OutlinedTextField(
-&nbsp;        value = state.password,
-&nbsp;        onValueChange = { onEvent(SignInEvent.OnPasswordChanged(it)) },
-&nbsp;        label = { Text(stringResource(Res.string.sign_in_password_label)) },
-&nbsp;        singleLine = true,
-&nbsp;        keyboardOptions = KeyboardOptions(
-&nbsp;            keyboardType = KeyboardType.Password,
-&nbsp;            imeAction = ImeAction.Done,
-&nbsp;        ),
-&nbsp;        visualTransformation = PasswordVisualTransformation(),
-&nbsp;        enabled = !state.isLoading,
-&nbsp;        modifier = Modifier.fillMaxWidth(),
-&nbsp;    )
-&nbsp;}
-&nbsp;
-&nbsp;@Composable
-&nbsp;private fun BrandMark(modifier: Modifier = Modifier) {
-&nbsp;    Row(
-&nbsp;        modifier = modifier,
-&nbsp;        verticalAlignment = Alignment.CenterVertically,
-&nbsp;        horizontalArrangement = Arrangement.spacedBy(AppTheme.spacing.medium),
-&nbsp;    ) {
-&nbsp;        Box(
-&nbsp;            modifier = Modifier
-&nbsp;                .size(SignInLayout.brandIconSize)
-&nbsp;                .clip(RoundedCornerShape(SignInLayout.brandIconCornerRadius))
-&nbsp;                .background(AppTheme.materialColors.primaryContainer),
-&nbsp;            contentAlignment = Alignment.Center,
-&nbsp;        ) {
-&nbsp;            Icon(
-&nbsp;                imageVector = SurferIcons.Wallet,
-&nbsp;                contentDescription = null,
-&nbsp;                tint = AppTheme.materialColors.onPrimaryContainer,
-&nbsp;                modifier = Modifier.size(SignInLayout.brandIconContentSize),
-&nbsp;            )
-&nbsp;        }
-&nbsp;        Text(
-&nbsp;            text = stringResource(Res.string.sign_in_brand),
-&nbsp;            style = AppTheme.typography.titleMedium,
-&nbsp;            color = AppTheme.materialColors.onSurface,
-&nbsp;        )
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;@Composable
-&nbsp;private fun DecorativeDonut(modifier: Modifier = Modifier) {
-&nbsp;    val primary = AppTheme.materialColors.primary
-&nbsp;    val tertiary = AppTheme.materialColors.tertiary
-&nbsp;    val container = AppTheme.materialColors.secondaryContainer
-&nbsp;    val surface = AppTheme.materialColors.surface
-&nbsp;
-&nbsp;    val isDark = AppTheme.materialColors.background.luminance() &lt; 0.5f
-&nbsp;    val donutAlpha = if (isDark) 0.35f else 0.18f
-&nbsp;
-&nbsp;    Box(modifier = modifier) {
-&nbsp;        Canvas(modifier = Modifier.fillMaxSize()) {
-&nbsp;            val cx = size.width / 2f
-&nbsp;            val cy = size.height / 2f
-&nbsp;            val radius = size.minDimension / 2f
-&nbsp;            val sweepBrush = Brush.sweepGradient(
-&nbsp;                colors = listOf(primary, primary, tertiary, tertiary, container, container, primary),
-&nbsp;                center = Offset(cx, cy),
-&nbsp;            )
-&nbsp;            drawCircle(
-&nbsp;                brush = sweepBrush,
-&nbsp;                radius = radius,
-&nbsp;                center = Offset(cx, cy),
-&nbsp;                alpha = donutAlpha,
-&nbsp;            )
-&nbsp;            drawCircle(
-&nbsp;                color = surface,
-&nbsp;                radius = radius * SignInLayout.donutHoleRadiusFraction,
-&nbsp;                center = Offset(
-&nbsp;                    x = cx + radius * SignInLayout.donutHoleOffsetXFraction,
-&nbsp;                    y = cy + radius * SignInLayout.donutHoleOffsetYFraction,
-&nbsp;                ),
-&nbsp;            )
-&nbsp;        }
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;@Preview
-&nbsp;@Composable
-&nbsp;private fun SignInScreenPreview() {
-&nbsp;    AppTheme {
-&nbsp;        SignInContent(
-&nbsp;            state = SignInState(),
-&nbsp;            onEvent = {},
-&nbsp;        )
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;@Preview
-&nbsp;@Composable
-&nbsp;private fun SignInScreenDemoOnlyPreview() {
-&nbsp;    AppTheme {
-&nbsp;        SignInContent(
-&nbsp;            state = SignInState(
-&nbsp;                config = SignInFeatureConfig(
-&nbsp;                    emailPassword = false,
-&nbsp;                    anonymous = false,
-&nbsp;                    demo = true,
-&nbsp;                ),
-&nbsp;            ),
-&nbsp;            onEvent = {},
-&nbsp;        )
-&nbsp;    }
-&nbsp;}
 </code>
 </pre>
 </div>
@@ -500,7 +124,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-05-06 14:45</div>
+    <div style="float:right;">generated on 2026-07-16 12:42</div>
 </div>
 </body>
 </html>

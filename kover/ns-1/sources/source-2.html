@@ -80,7 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/12)
+    (0/13)
   </span>
 </td>
 </tr>
@@ -102,7 +102,8 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.di.onlineWiring
 &nbsp;
 &nbsp;fun main() {
-<b class="nc">&nbsp;    initKoin(extraModules = onlineWiring)</b>
+&nbsp;    // Desktop is a developer-only host (no shipped release), so keep full logging.
+<b class="nc">&nbsp;    initKoin(isDebug = true, extraModules = onlineWiring)</b>
 <b class="nc">&nbsp;    application {</b>
 &nbsp;        Window(
 &nbsp;            onCloseRequest = ::exitApplication,
@@ -135,7 +136,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-05-06 14:45</div>
+    <div style="float:right;">generated on 2026-07-16 12:42</div>
 </div>
 </body>
 </html>

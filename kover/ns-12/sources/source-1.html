@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > ComGeorgeciMoneysurferDomainDiDomainModuleModuleKt</title>
+  <title>MoneySurfer Coverage Report > AuthError</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,18 +19,15 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.domain.di</a>
+    <a href="../index.html">com.georgeci.moneysurfer.domain.auth</a>
 </div>
 
-<h1>Coverage Summary for Class: ComGeorgeciMoneysurferDomainDiDomainModuleModuleKt (com.georgeci.moneysurfer.domain.di)</h1>
+<h1>Coverage Summary for Class: AuthError (com.georgeci.moneysurfer.domain.auth)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
-<th class="coverageStat 
-">
-  Class, %
-</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -49,48 +46,125 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">ComGeorgeciMoneysurferDomainDiDomainModuleModuleKt</td>
+  <td class="name">AuthError</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
     <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (3/3)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1144)
+    (19/19)
   </span>
 </td>
 </tr>
-
+  <tr>
+    <td class="name">AuthError$Type</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (36/36)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (8/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (55/55)
+  </span>
+</td>
+</tr>
 </table>
 
 <br/>
 <br/>
 
-  <code class="sourceCode">Source code is not available<br /></code>
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.auth
+&nbsp;
+&nbsp;/**
+&nbsp; * Single typed failure for the auth-flow `Either`s. The data layer classifies provider-specific
+&nbsp; * exceptions (e.g. FirebaseAuth subtypes) into [Type] at the boundary so domain use cases and the
+&nbsp; * UI never need to know about Firebase types.
+&nbsp; */
+&nbsp;data class AuthError(
+<b class="fc">&nbsp;    val type: Type,</b>
+<b class="fc">&nbsp;    val message: String? = null,</b>
+<b class="fc">&nbsp;    val cause: Throwable? = null,</b>
+&nbsp;) {
+&nbsp;    enum class Type {
+<b class="fc">&nbsp;        InvalidCredentials,</b>
+<b class="fc">&nbsp;        EmailAlreadyInUse,</b>
+<b class="fc">&nbsp;        WeakPassword,</b>
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Firestore rules denied a read or write that the bootstrap relies on
+&nbsp;         * (typically `users/{uid}` or `workspaces/{wid}`). Hard failure — there
+&nbsp;         * is no recovery the UI can drive other than telling the user to retry
+&nbsp;         * after the rules / membership are corrected.
+&nbsp;         */
+<b class="fc">&nbsp;        PermissionDenied,</b>
+<b class="fc">&nbsp;        Unknown,</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
 </div>
 
 <script type="text/javascript">
@@ -112,7 +186,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-05-06 14:45</div>
+    <div style="float:right;">generated on 2026-07-16 12:42</div>
 </div>
 </body>
 </html>

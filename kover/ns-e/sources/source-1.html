@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > OnlineKoinApp</title>
+  <title>MoneySurfer Coverage Report > FirebaseCurrentAuthInfo</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.di</a>
+    <a href="../index.html">com.georgeci.moneysurfer.data.sync</a>
 </div>
 
-<h1>Coverage Summary for Class: OnlineKoinApp (com.georgeci.moneysurfer.di)</h1>
+<h1>Coverage Summary for Class: FirebaseCurrentAuthInfo (com.georgeci.moneysurfer.data.sync)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,38 +49,45 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">OnlineKoinApp</td>
+  <td class="name">FirebaseCurrentAuthInfo</td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (1/1)
+    (0/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (1/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
+    (0/2)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (2/2)
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/22)
   </span>
 </td>
 </tr>
@@ -92,28 +99,24 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.di
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.sync
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.data.di.RemoteDataModule
-&nbsp;import com.georgeci.moneysurfer.data.di.SyncImplModule
-&nbsp;import com.georgeci.moneysurfer.sync.internal.di.SyncModule
-&nbsp;import org.koin.core.annotation.KoinApplication
-&nbsp;import org.koin.core.annotation.Module
+&nbsp;import com.georgeci.moneysurfer.domain.logging.redactEmail
+&nbsp;import com.georgeci.moneysurfer.domain.logging.redactUid
+&nbsp;import dev.gitlive.firebase.auth.FirebaseAuth
+&nbsp;import org.koin.core.annotation.Single
 &nbsp;
-&nbsp;// koin-compiler generates a `.module` accessor only for `@KoinApplication` classes,
-&nbsp;// not for plain `@Module`. We need ONE accessor that pulls in the three remote/sync
-&nbsp;// modules so the host can layer them on top of the shared `AppModule` graph at
-&nbsp;// runtime, without including them in shared (which must stay Firebase-free).
-<b class="fc">&nbsp;@KoinApplication</b>
-&nbsp;@Module(
-&nbsp;    includes = [
-&nbsp;        RemoteDataModule::class,
-&nbsp;        SyncImplModule::class,
-&nbsp;        SyncModule::class,
-&nbsp;        OnlineSignInModule::class,
-&nbsp;    ],
-&nbsp;)
-&nbsp;class OnlineKoinApp
+<b class="nc">&nbsp;@Single(binds = [CurrentAuthInfo::class])</b>
+<b class="nc">&nbsp;class FirebaseCurrentAuthInfo(private val auth: FirebaseAuth) : CurrentAuthInfo {</b>
+&nbsp;    override fun diagnostics(): String {
+<b class="nc">&nbsp;        val user = auth.currentUser</b>
+<b class="nc">&nbsp;        return if (user == null) {</b>
+<b class="nc">&nbsp;            &quot;uid=&lt;null&gt; NOT_SIGNED_IN&quot;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            &quot;uid=${user.uid.redactUid()} email=${user.email.redactEmail()} anon=${user.isAnonymous}&quot;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
 </code>
 </pre>
 </div>
@@ -137,7 +140,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-05-06 14:45</div>
+    <div style="float:right;">generated on 2026-07-16 12:42</div>
 </div>
 </body>
 </html>
