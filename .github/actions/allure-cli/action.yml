@@ -1,0 +1,42 @@
+name: Allure CLI
+description: >-
+  Install the pinned Allure commandline CLI, sha256-verified before extraction.
+  Mirrors the Maestro-install pattern (maestro-setup) so the report tooling is
+  not whatever the CDN serves at runtime. Shared by every job that needs
+  `allure` on PATH (ci.yml junit / firestore-rules / publish).
+
+inputs:
+  version:
+    description: Allure commandline version.
+    required: false
+    default: "2.34.1"
+  sha256:
+    description: Expected sha256 of allure-<version>.tgz.
+    required: false
+    default: "df13c5883429edd5041a24d6d072a8944e65274d1d76a441fd45d2585511349a"
+
+runs:
+  using: composite
+  steps:
+    - name: Install Allure CLI (pinned + verified)
+      shell: bash
+      env:
+        ALLURE_VERSION: ${{ inputs.version }}
+        ALLURE_SHA256: ${{ inputs.sha256 }}
+      run: |
+        set -euo pipefail
+        url="https://github.com/allure-framework/allure2/releases/download/${ALLURE_VERSION}/allure-${ALLURE_VERSION}.tgz"
+        tmp="${RUNNER_TEMP}/allure-${ALLURE_VERSION}.tgz"
+        # --proto "=https" refuses any redirect off HTTPS (Sonar S6506).
+        curl --proto "=https" -fsSL "$url" -o "$tmp"
+        if command -v sha256sum >/dev/null 2>&1; then
+          actual="$(sha256sum "$tmp" | awk '{print $1}')"
+        else
+          actual="$(shasum -a 256 "$tmp" | awk '{print $1}')"
+        fi
+        if [ "$actual" != "$ALLURE_SHA256" ]; then
+          echo "Allure checksum mismatch: expected $ALLURE_SHA256, got $actual" >&2
+          exit 1
+        fi
+        tar -xzf "$tmp" -C "${RUNNER_TEMP}"
+        echo "${RUNNER_TEMP}/allure-${ALLURE_VERSION}/bin" >> "${GITHUB_PATH}"
