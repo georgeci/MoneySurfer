@@ -56,6 +56,12 @@
 - Lines: 23-32
 - Tasks: architecture, kmp, modules
 
+## ci-egress-hardening
+- Title: 1. step-security/harden-runner (egress audit)
+- File: docs/security/ci-egress-hardening.md
+- Lines: 19-98
+- Tasks: ci, security, supply-chain
+
 ## compose-rules
 - Title: Rules
 - File: ai/skills/compose-rules.md
@@ -272,6 +278,12 @@
 - Lines: 16-63
 - Tasks: security, audit, firestore-rules
 
+## supply-chain
+- Title: What is enforced now
+- File: docs/security/supply-chain.md
+- Lines: 17-130
+- Tasks: build, security, supply-chain
+
 ## sync-architecture-rules
 - Title: Rules
 - File: docs/architecture/sync-architecture.md
@@ -311,7 +323,7 @@
 ## sync-rules
 - Title: Rules
 - File: docs/architecture/sync.md
-- Lines: 24-43
+- Lines: 24-47
 - Tasks: sync, outbox, pull, lww
 
 ## sync-summary
@@ -329,7 +341,7 @@
 ## testing-strategy
 - Title: Common Commands
 - File: docs/testing/testing-strategy.md
-- Lines: 27-106
+- Lines: 27-112
 - Tasks: testing, qa, validation
 
 ## time-policy

@@ -71,6 +71,12 @@ jobs:
     # see androidApp/build.gradle.kts -> signingConfigs.dev).
 
     steps:
+      # Egress audit — see docs/security/ci-egress-hardening.md (issue #180).
+      - name: Harden the runner (egress audit)
+        uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920 # v2.20.0
+        with:
+          egress-policy: audit
+
       - name: Checkout
         uses: actions/checkout@v7
 
@@ -132,6 +138,13 @@ jobs:
     # Swift code compiles end-to-end against the embedded framework.
 
     steps:
+      # Egress audit — see docs/security/ci-egress-hardening.md (issue #180).
+      # macOS runner: audit mode is supported (logs egress only; no block).
+      - name: Harden the runner (egress audit)
+        uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920 # v2.20.0
+        with:
+          egress-policy: audit
+
       - name: Checkout
         uses: actions/checkout@v7
 
@@ -213,6 +226,12 @@ jobs:
     # boot alone is ~5–8 min.
 
     steps:
+      # Egress audit — see docs/security/ci-egress-hardening.md (issue #180).
+      - name: Harden the runner (egress audit)
+        uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920 # v2.20.0
+        with:
+          egress-policy: audit
+
       - name: Checkout
         uses: actions/checkout@v7
 
@@ -361,6 +380,13 @@ jobs:
     # simulator, builds the Debug app with MS_USE_EMULATOR=YES, runs flows.
 
     steps:
+      # Egress audit — see docs/security/ci-egress-hardening.md (issue #180).
+      # macOS runner: audit mode is supported (logs egress only; no block).
+      - name: Harden the runner (egress audit)
+        uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920 # v2.20.0
+        with:
+          egress-policy: audit
+
       - name: Checkout
         uses: actions/checkout@v7
 
