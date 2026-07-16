@@ -52,6 +52,47 @@ class TransactionCsvCodecTest : StringSpec({
         decoded(record.fields) shouldBe transaction
     }
 
+    "a note starting with a formula trigger is neutralised on encode" {
+        listOf("=HYPERLINK(\"http://evil\")", "+1", "-1", "@SUM(A1)", "\tcmd", "\rx").forEach { note ->
+            val encoded = TransactionCsvCodec.encode(aTransaction(note = note))
+            encoded[TransactionCsvColumn.Note.ordinal] shouldBe "'$note"
+        }
+    }
+
+    "an ordinary note is not prefixed" {
+        val encoded = TransactionCsvCodec.encode(aTransaction(note = "groceries"))
+
+        encoded[TransactionCsvColumn.Note.ordinal] shouldBe "groceries"
+    }
+
+    "dangerous notes survive a full CSV round-trip unchanged" {
+        listOf(
+            "=cmd|' /C calc'!A0",
+            "+1+1",
+            "-danger",
+            "@evil",
+            "'=already quoted",
+            "'plain apostrophe",
+            "normal note",
+        ).forEach { note ->
+            val transaction = aTransaction(note = note)
+
+            val text = Csv.encodeRecord(TransactionCsvCodec.encode(transaction))
+            val record = Csv.parseRecords(text).single()
+
+            decoded(record.fields).note shouldBe note
+        }
+    }
+
+    "a legacy note starting with a literal apostrophe decodes unchanged" {
+        // A pre-guard export (or a third-party CSV) wrote the note verbatim, so
+        // the apostrophe is real data, not a guard prefix — it must survive.
+        val fields = TransactionCsvCodec.encode(aTransaction()).toMutableList()
+        fields[TransactionCsvColumn.Note.ordinal] = "'plain apostrophe"
+
+        decoded(fields).note shouldBe "'plain apostrophe"
+    }
+
     "wrong column count is rejected with expected and actual sizes" {
         rejected(listOf("only", "three", "fields")) shouldBe
             CsvRowIssue.ColumnCountMismatch(expected = TransactionCsvCodec.header.size, actual = 3)

@@ -56,7 +56,9 @@ object TransactionCsvCodec {
             money.minor.toString(),
             currencyCode.value,
             categoryId?.value.orEmpty(),
-            note,
+            // Free text: neutralise CSV formula injection before it reaches a
+            // spreadsheet. Reversed by unguardFormula on decode.
+            Csv.guardFormula(note),
             operationAt.toString(),
             operationDate.toString(),
             createdAt.toString(),
@@ -85,7 +87,7 @@ object TransactionCsvCodec {
                     money = Money(long(TransactionCsvColumn.AmountMinor)),
                     currencyCode = CurrencyCode(required(TransactionCsvColumn.Currency)),
                     categoryId = optional(TransactionCsvColumn.CategoryId)?.let(::CategoryId),
-                    note = fields[TransactionCsvColumn.Note.ordinal],
+                    note = Csv.unguardFormula(fields[TransactionCsvColumn.Note.ordinal]),
                     operationAt = instant(TransactionCsvColumn.OperationAt),
                     operationDate = localDate(TransactionCsvColumn.OperationDate),
                     type = enum<TransactionType>(TransactionCsvColumn.Type),
