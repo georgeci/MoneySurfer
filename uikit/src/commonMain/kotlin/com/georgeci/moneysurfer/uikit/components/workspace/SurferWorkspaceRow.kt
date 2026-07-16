@@ -96,6 +96,7 @@ fun SurferCreateWorkspaceRow(
             ) {
                 Icon(
                     imageVector = SurferIcons.Add,
+                    // decorative — card title and subtitle provide the accessible label
                     contentDescription = null,
                     tint = AppTheme.materialColors.onSurfaceVariant,
                 )
@@ -198,6 +199,7 @@ private fun ActionChip(
     ) {
         Icon(
             imageVector = icon,
+            // decorative — chip label text provides the accessible label
             contentDescription = null,
             tint = AppTheme.materialColors.onSurface,
             modifier = Modifier.size(14.dp),

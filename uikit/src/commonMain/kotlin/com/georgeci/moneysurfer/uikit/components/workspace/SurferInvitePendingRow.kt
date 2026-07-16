@@ -69,6 +69,7 @@ fun SurferInvitePendingRow(
         ) {
             Icon(
                 imageVector = SurferIcons.Mail,
+                // decorative — invite-status avatar; the email address provides the accessible label
                 contentDescription = null,
                 tint = AppTheme.materialColors.onSurfaceVariant,
                 modifier = Modifier.size(18.dp),

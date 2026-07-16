@@ -42,6 +42,7 @@ fun SurferCategoryBubble(
     ) {
         Icon(
             imageVector = icon,
+            // decorative — category colour/icon indicator; the surrounding text provides the accessible label
             contentDescription = null,
             tint = tint,
             modifier = Modifier.size(size * 0.5f),

@@ -71,6 +71,7 @@ fun SurferArchivedAccountCard(
                 ) {
                     Icon(
                         imageVector = SurferIcons.Restore,
+                        // decorative — button text (restoreLabel) provides the accessible label
                         contentDescription = null,
                         modifier = Modifier.size(14.dp),
                     )

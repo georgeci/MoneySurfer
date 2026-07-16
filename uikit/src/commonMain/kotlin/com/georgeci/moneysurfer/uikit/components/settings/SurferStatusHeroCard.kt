@@ -65,6 +65,7 @@ fun SurferStatusHeroCard(
         ) {
             Icon(
                 imageVector = icon,
+                // decorative — status illustration; the title and supporting text convey the status
                 contentDescription = null,
                 tint = fg,
                 modifier = Modifier.size(24.dp),

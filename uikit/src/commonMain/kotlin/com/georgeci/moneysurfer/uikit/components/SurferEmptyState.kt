@@ -52,6 +52,7 @@ fun SurferEmptyState(
         ) {
             Icon(
                 imageVector = icon,
+                // decorative — empty-state illustration; the title/subtitle convey the message
                 contentDescription = null,
                 tint = AppTheme.materialColors.onSurfaceVariant,
                 modifier = Modifier.size(28.dp),

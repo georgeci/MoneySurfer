@@ -52,6 +52,7 @@ internal fun SurferWidgetEmptyState(
         ) {
             Icon(
                 imageVector = icon,
+                // decorative — widget empty-state illustration; title and subtitle convey the message
                 contentDescription = null,
                 tint = AppTheme.materialColors.onSurfaceVariant,
                 modifier = Modifier.size(20.dp),

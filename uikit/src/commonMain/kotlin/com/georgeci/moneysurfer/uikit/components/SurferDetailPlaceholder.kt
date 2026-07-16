@@ -39,6 +39,7 @@ fun SurferDetailPlaceholder(
         ) {
             Icon(
                 imageVector = icon,
+                // decorative — placeholder illustration; the text below conveys the message
                 contentDescription = null,
                 tint = AppTheme.materialColors.onSurfaceVariant,
                 modifier = Modifier.size(48.dp),

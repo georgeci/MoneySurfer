@@ -169,7 +169,7 @@ private fun DashboardContent(
                 ExtendedFloatingActionButton(
                     text = { Text(stringResource(Res.string.dashboard_add_transaction)) },
                     icon = {
-                        Icon(imageVector = SurferIcons.Add, contentDescription = null)
+                        Icon(imageVector = SurferIcons.Add, contentDescription = null) // decorative — FAB text label provides the accessible label
                     },
                     onClick = { onEvent(DashboardEvent.OnAddTransactionClick) },
                     modifier = Modifier.testTag(DashboardTestTags.AddTransaction),

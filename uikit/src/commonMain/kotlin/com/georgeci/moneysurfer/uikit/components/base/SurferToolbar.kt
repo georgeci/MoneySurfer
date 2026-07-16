@@ -126,6 +126,7 @@ fun SurferToolbarButtonAction(
     ) {
         Icon(
             imageVector = icon,
+            // decorative — button text label provides the accessible label
             contentDescription = null,
             modifier = Modifier.size(16.dp),
         )

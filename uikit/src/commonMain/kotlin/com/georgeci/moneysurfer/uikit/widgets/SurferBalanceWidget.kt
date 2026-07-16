@@ -101,6 +101,7 @@ fun SurferBalanceWidget(
                     trendText != null -> Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.TrendingUp,
+                            // decorative — trend direction indicator; the trendText provides the accessible label
                             contentDescription = null,
                             tint = AppTheme.materialColors.onPrimaryContainer,
                             modifier = Modifier.size(if (hero) 16.dp else 14.dp),

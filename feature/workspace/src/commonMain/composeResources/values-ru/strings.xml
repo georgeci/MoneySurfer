@@ -15,6 +15,7 @@
 
     <!-- Workspace members -->
     <string name="workspace_members_title_format">%1$s · Участники</string>
+    <string name="workspace_members_back_content_description">Назад</string>
     <string name="workspace_members_invite_title">Пригласить людей</string>
     <string name="workspace_members_invite_subtitle">Отправить приглашение по e-mail</string>
     <string name="workspace_members_close_content_description">Закрыть</string>
@@ -71,6 +72,7 @@
 
     <!-- Incoming invites screen -->
     <string name="workspace_incoming_title">Приглашения</string>
+    <string name="workspace_incoming_back_content_description">Назад</string>
     <string name="workspace_incoming_header_subtitle">Принятие приглашения добавит пространство в ваш список.</string>
     <string name="workspace_incoming_accept">Принять</string>
     <string name="workspace_incoming_decline">Отклонить</string>

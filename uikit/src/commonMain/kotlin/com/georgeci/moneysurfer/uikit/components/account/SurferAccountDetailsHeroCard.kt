@@ -94,6 +94,7 @@ fun SurferAccountDetailsHeroCard(
                 ) {
                     Icon(
                         imageVector = icon,
+                        // decorative — account type indicator; the account name provides the accessible label
                         contentDescription = null,
                         tint = AppTheme.materialColors.onPrimaryContainer,
                         modifier = Modifier.size(20.dp),

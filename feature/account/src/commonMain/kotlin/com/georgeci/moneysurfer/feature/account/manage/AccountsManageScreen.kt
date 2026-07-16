@@ -146,7 +146,7 @@ private fun AccountsManageContent(
         floatingActionButton = {
             ExtendedFloatingActionButton(
                 text = { Text(stringResource(Res.string.accounts_manage_add_account)) },
-                icon = { Icon(imageVector = SurferIcons.Add, contentDescription = null) },
+                icon = { Icon(imageVector = SurferIcons.Add, contentDescription = null) }, // decorative — FAB text label provides the accessible label
                 onClick = { onEvent(AccountsManageEvent.OnAddAccountClick) },
             )
         },
@@ -331,7 +331,7 @@ private fun EditToggleChip(
             modifier = modifier.heightIn(min = 32.dp),
             contentPadding = PaddingValues(horizontal = 14.dp, vertical = 0.dp),
         ) {
-            Icon(imageVector = icon, contentDescription = null, modifier = Modifier.size(16.dp))
+            Icon(imageVector = icon, contentDescription = null, modifier = Modifier.size(16.dp)) // decorative — button text provides the accessible label
             Spacer(Modifier.width(4.dp))
             Text(text = label, style = AppTheme.typography.labelLarge)
         }
@@ -341,7 +341,7 @@ private fun EditToggleChip(
             modifier = modifier.heightIn(min = 32.dp),
             contentPadding = PaddingValues(horizontal = 14.dp, vertical = 0.dp),
         ) {
-            Icon(imageVector = icon, contentDescription = null, modifier = Modifier.size(14.dp))
+            Icon(imageVector = icon, contentDescription = null, modifier = Modifier.size(14.dp)) // decorative — button text provides the accessible label
             Spacer(Modifier.width(4.dp))
             Text(text = label, style = AppTheme.typography.labelLarge)
         }

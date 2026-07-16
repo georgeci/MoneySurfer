@@ -36,6 +36,9 @@ fun SurferAccountCard(
     modifier: Modifier = Modifier,
     onClick: (() -> Unit)? = null,
     onAddClick: (() -> Unit)? = null,
+    /** Accessibility label for the add button. Callers that provide [onAddClick] must pass a
+     *  meaningful description (e.g. `stringResource(R.string.account_add_transaction)`). */
+    addContentDescription: String? = null,
 ) {
     Box(
         modifier = modifier
@@ -84,7 +87,7 @@ fun SurferAccountCard(
                     ) {
                         Icon(
                             imageVector = SurferIcons.Add,
-                            contentDescription = null,
+                            contentDescription = addContentDescription,
                             modifier = Modifier.size(20.dp),
                         )
                     }
@@ -104,6 +107,7 @@ private fun SurferAccountCardPreview() {
             currency = "USD",
             onClick = {},
             onAddClick = {},
+            addContentDescription = "Add transaction",
         )
     }
 }

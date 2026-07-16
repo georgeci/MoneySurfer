@@ -69,6 +69,7 @@ fun <T> SurferSegmentedControl(
                 if (isSelected) {
                     Icon(
                         imageVector = SurferIcons.Check,
+                        // decorative — selection state indicator; the segment label provides the accessible label
                         contentDescription = null,
                         tint = fg,
                         modifier = Modifier.size(16.dp),

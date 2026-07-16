@@ -137,6 +137,7 @@ fun SurferSwipeAction(
     ) {
         Icon(
             imageVector = icon,
+            // decorative — swipe-action label text directly below provides the accessible label
             contentDescription = null,
             tint = fg,
             modifier = Modifier.size(20.dp),

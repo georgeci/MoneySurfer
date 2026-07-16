@@ -27,6 +27,7 @@ import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.utils.HandleSideEffect
 import moneysurfer.feature.workspace.generated.resources.Res
+import moneysurfer.feature.workspace.generated.resources.workspace_members_back_content_description
 import moneysurfer.feature.workspace.generated.resources.workspace_members_subtitle_editor_format
 import moneysurfer.feature.workspace.generated.resources.workspace_members_subtitle_owner_format
 import moneysurfer.feature.workspace.generated.resources.workspace_members_subtitle_unknown_format
@@ -93,7 +94,7 @@ private fun WorkspaceManageScreenContent(
                     IconButton(onClick = onBack) {
                         Icon(
                             imageVector = SurferIcons.Back,
-                            contentDescription = null,
+                            contentDescription = stringResource(Res.string.workspace_members_back_content_description),
                             tint = AppTheme.materialColors.onSurface,
                         )
                     }

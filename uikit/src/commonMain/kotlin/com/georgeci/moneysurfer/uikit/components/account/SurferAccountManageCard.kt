@@ -104,6 +104,7 @@ fun AccountIconTile(
     ) {
         Icon(
             imageVector = icon,
+            // decorative — account type indicator; the account name provides the accessible label
             contentDescription = null,
             tint = fg,
             modifier = Modifier.size(22.dp),

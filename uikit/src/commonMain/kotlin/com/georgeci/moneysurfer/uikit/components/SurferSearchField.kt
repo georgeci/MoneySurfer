@@ -34,6 +34,7 @@ fun SurferSearchField(
         leadingIcon = {
             Icon(
                 imageVector = SurferIcons.Search,
+                // decorative — field placeholder provides context
                 contentDescription = null,
             )
         },

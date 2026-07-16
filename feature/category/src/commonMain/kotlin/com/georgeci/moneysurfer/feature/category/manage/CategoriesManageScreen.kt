@@ -103,7 +103,7 @@ private fun CategoriesManageContent(
             val addLabel = stringResource(Res.string.categories_manage_add)
             ExtendedFloatingActionButton(
                 text = { Text(addLabel) },
-                icon = { Icon(imageVector = SurferIcons.Add, contentDescription = null) },
+                icon = { Icon(imageVector = SurferIcons.Add, contentDescription = null) }, // decorative — FAB text label provides the accessible label
                 onClick = { onEvent(CategoriesManageEvent.OnAddCategoryClick) },
                 modifier = Modifier.semantics { contentDescription = addLabel },
             )

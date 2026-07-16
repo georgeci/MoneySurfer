@@ -46,6 +46,7 @@ fun SurferAccountStatCard(
             ) {
                 Icon(
                     imageVector = icon,
+                    // decorative — stat-type indicator; the label text provides the accessible name
                     contentDescription = null,
                     tint = iconTint,
                     modifier = Modifier.size(14.dp),

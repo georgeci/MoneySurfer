@@ -112,6 +112,7 @@ fun SurferPickerRow(
             }
             Icon(
                 imageVector = SurferIcons.DropDown,
+                // decorative — chevron indicates the row is expandable; the row label is the accessible name
                 contentDescription = null,
                 tint = AppTheme.materialColors.onSurfaceVariant,
                 modifier = Modifier.size(18.dp),
@@ -135,6 +136,7 @@ private fun SurferPickerRowIcon(
     ) {
         Icon(
             imageVector = icon,
+            // decorative — category colour/icon indicator; the row label is the accessible name
             contentDescription = null,
             tint = tint,
             modifier = Modifier.size(20.dp),

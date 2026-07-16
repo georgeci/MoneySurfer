@@ -370,7 +370,7 @@ private fun SurferAddActionContainerPreview() {
         Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
             SurferAddActionContainer(modifier = Modifier.fillMaxWidth()) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(imageVector = SurferIcons.Add, contentDescription = null)
+                    Icon(imageVector = SurferIcons.Add, contentDescription = null) // decorative — preview only; label text is adjacent
                     Spacer(Modifier.width(8.dp))
                     Text(text = "Add account", style = AppTheme.typography.labelLarge)
                 }
