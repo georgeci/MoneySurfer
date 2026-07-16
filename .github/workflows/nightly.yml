@@ -547,6 +547,11 @@ jobs:
     if: always() && needs.decide.outputs.run == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    # Share the gh-pages writer lock with ci.yml `publish` and gh-pages-prune so
+    # cross-workflow pushes serialize instead of racing into non-fast-forwards.
+    concurrency:
+      group: gh-pages-write
+      cancel-in-progress: false
     permissions:
       contents: write
 

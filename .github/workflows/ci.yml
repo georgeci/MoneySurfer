@@ -487,6 +487,12 @@ jobs:
     name: Aggregate + publish to Pages
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    # Serialize every gh-pages writer (this job, nightly-publish, gh-pages-prune)
+    # on one group so pushes never race into a non-fast-forward. Job-level so it
+    # overrides the workflow's per-PR concurrency group.
+    concurrency:
+      group: gh-pages-write
+      cancel-in-progress: false
     needs: [changes, junit, firestore-rules]
     # Skip on doc-only PRs — no fresh test results to aggregate, and we don't
     # want to overwrite gh-pages with an empty Allure for a docs change.
@@ -650,7 +656,7 @@ jobs:
             "https://github.com/allure-framework/allure2/releases/download/${ALLURE_VERSION}/allure-${ALLURE_VERSION}.tgz" \
             | tar -xz -C "${RUNNER_TEMP}"
           export PATH="${RUNNER_TEMP}/allure-${ALLURE_VERSION}/bin:$PATH"
-          if [[ -z "$(ls -A allure-results 2>/dev/null)" ]]; then
+          if [ -z "$(find allure-results -mindepth 1 -print -quit 2>/dev/null)" ]; then
             echo "No Allure results staged; skipping." >&2
             exit 0
           fi
