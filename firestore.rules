@@ -1,4 +1,4 @@
-// v2.1.0 — 2026-07-15
+// v2.2.0 — 2026-07-15
 rules_version = '2';
 
 // Workspace-scoped tenancy: every per-user document lives under
@@ -81,6 +81,82 @@ service cloud.firestore {
     function hasValidClientVersion() {
       return request.resource.data.clientVersionCode is int
         && request.resource.data.clientVersionCode >= 1;
+    }
+
+    // ── Entity write-shape validation (issue #156) ────────────────────────────
+    // Poison-document guard. Entity docs are pulled and run through
+    // kotlinx-serialization `decode()` on every co-member's device. Before this
+    // guard the write rules validated only membership + `clientVersionCode`, never
+    // field types — so any member could write a wrong-typed field (e.g.
+    // `amount: "abc"` where the DTO expects a Long). On the next pull `decode()`
+    // threw and aborted the whole batch BEFORE the cursor advanced past the doc,
+    // so every co-member re-fetched it and failed forever: a workspace-wide sync
+    // outage (poison-message crash loop). These functions reject the malformed
+    // write at the source. The client also skips-and-logs an undecodable doc as a
+    // second line of defence (see PluginHelpers.decodeOrNull) for docs written by
+    // older builds or already in the store.
+    //
+    // Contract: each field is type-checked ONLY when present. The wire format
+    // omits fields left at their DTO default (see data-remote/.../RemoteDtos.kt),
+    // so a minimal doc that carries just the fields it needs must still pass — we
+    // reject only a field that is present with the wrong type. `.get(f, <default>)`
+    // returns the typed default when the key is absent (so absence passes) and the
+    // stored null when the key is present-but-null (nullable helpers allow that).
+    // Field lists mirror the DTOs in RemoteDtos.kt — keep them in lockstep when a
+    // DTO field is added or its type changes.
+    //
+    // Note: this subsumes the deprecated tracker bug #6 (`request.resource.data.workspaceId == wid`).
+    // That check is a no-op here — the wire DTOs carry NO `workspaceId` field; the
+    // workspace id is taken from the trusted document path and injected at decode
+    // time (scopeKey), so there is nothing on the payload to spoof or validate.
+    // See docs/architecture/firestore-rules-bugs.md #6.
+    function typeIntOk(data, f)  { return data.get(f, 0) is int; }
+    function typeStrOk(data, f)  { return data.get(f, '') is string; }
+    function typeBoolOk(data, f) { return data.get(f, false) is bool; }
+    function typeNullableIntOk(data, f) {
+      return data.get(f, 0) == null || data.get(f, 0) is int;
+    }
+    function typeNullableStrOk(data, f) {
+      return data.get(f, '') == null || data.get(f, '') is string;
+    }
+
+    // AccountDoc — data-remote/.../RemoteDtos.kt
+    function hasValidAccountShape(data) {
+      return typeStrOk(data, 'name')
+        && typeStrOk(data, 'type')
+        && typeStrOk(data, 'currency')
+        && typeIntOk(data, 'balance')
+        && typeBoolOk(data, 'archived')
+        && typeIntOk(data, 'updatedAt')
+        && typeNullableIntOk(data, 'deletedAt');
+    }
+
+    // CategoryDoc — data-remote/.../RemoteDtos.kt
+    function hasValidCategoryShape(data) {
+      return typeStrOk(data, 'name')
+        && typeStrOk(data, 'type')
+        && typeNullableStrOk(data, 'parentId')
+        && typeIntOk(data, 'createdAt')
+        && typeIntOk(data, 'updatedAt')
+        && typeNullableIntOk(data, 'deletedAt')
+        && typeNullableStrOk(data, 'systemKind');
+    }
+
+    // TransactionDoc — data-remote/.../RemoteDtos.kt
+    function hasValidTransactionShape(data) {
+      return typeStrOk(data, 'accountId')
+        && typeNullableStrOk(data, 'categoryId')
+        && typeIntOk(data, 'amount')
+        && typeStrOk(data, 'currencyCode')
+        && typeStrOk(data, 'note')
+        && typeIntOk(data, 'operationAt')
+        && typeStrOk(data, 'operationDate')
+        && typeStrOk(data, 'type')
+        && typeStrOk(data, 'status')
+        && typeIntOk(data, 'createdAt')
+        && typeIntOk(data, 'updatedAt')
+        && typeNullableIntOk(data, 'deletedAt')
+        && typeNullableStrOk(data, 'transferId');
     }
 
     // Personal user document — workspace pointers, profile metadata.
@@ -246,22 +322,28 @@ service cloud.firestore {
 
       match /accounts/{aid} {
         allow read: if isMember(wid);
-        allow create, update: if isMember(wid) && hasValidClientVersion();
+        allow create, update: if isMember(wid) && hasValidClientVersion()
+          && hasValidAccountShape(request.resource.data);
         allow delete: if false;
       }
 
       match /categories/{cid} {
         allow read: if isMember(wid);
-        allow create, update: if isMember(wid) && hasValidClientVersion();
+        allow create, update: if isMember(wid) && hasValidClientVersion()
+          && hasValidCategoryShape(request.resource.data);
         allow delete: if false;
       }
 
       match /transactions/{tid} {
         allow read: if isMember(wid);
-        allow create, update: if isMember(wid) && hasValidClientVersion();
+        allow create, update: if isMember(wid) && hasValidClientVersion()
+          && hasValidTransactionShape(request.resource.data);
         allow delete: if false;
       }
 
+      // budgets / recurringRules carry no wire DTO yet (no sync plugin decodes
+      // them), so there is no schema to validate and no poison-document pull path.
+      // Add a hasValid*Shape() guard here in lockstep when their DTOs land.
       match /budgets/{bid} {
         allow read: if isMember(wid);
         allow create, update: if isMember(wid) && hasValidClientVersion();

@@ -59,7 +59,7 @@ class WorkspaceSyncPlugin(
     }
 
     override suspend fun applyDoc(doc: RemoteDocument, scopeKey: String): EntityApplyResult {
-        val dto = doc.decode(WorkspaceDoc.serializer())
+        val dto = doc.decodeOrNull(WorkspaceDoc.serializer()) ?: return SKIPPED_APPLY_RESULT
         if (dto.deletedAt != null) {
             // Soft-delete: workspace is tombstoned. Do not remove from Room —
             // the sync layer handles cleanup; just skip the upsert.
