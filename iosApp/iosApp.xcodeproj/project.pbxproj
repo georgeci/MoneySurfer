@@ -23,6 +23,7 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
+				GoogleService-Info.plist,
 			);
 			target = E5F02FEC8D9C2FBE4184FAA5 /* iosApp */;
 		};
