@@ -227,55 +227,67 @@
 ## rules-bug-1
 - Title: #1 — clientVersionCode >= 1 is a no-op gate
 - File: docs/architecture/firestore-rules-bugs.md
-- Lines: 154-188
+- Lines: 160-194
 - Tasks: firestore-rules, app-version, client-version
+
+## rules-bug-156
+- Title: #156 — Poison-document crash loop; no write-shape validation
+- File: docs/architecture/firestore-rules-bugs.md
+- Lines: 218-234
+- Tasks: firestore-rules, schema, subcollections, poison-document, sync
+
+## rules-bug-161
+- Title: #161 — userEmails email→uid existence oracle
+- File: docs/architecture/firestore-rules-bugs.md
+- Lines: 319-349
+- Tasks: firestore-rules, userEmails, invites, privacy
 
 ## rules-bug-2
 - Title: #2 — members/{uid} create requires hasValidClientVersion()
 - File: docs/architecture/firestore-rules-bugs.md
-- Lines: 243-261
+- Lines: 263-281
 - Tasks: firestore-rules, members, invites
 
 ## rules-bug-3
 - Title: #3 — addWorkspaceRef after failed syncWorkspace (root cause)
 - File: docs/architecture/firestore-rules-bugs.md
-- Lines: 94-152
+- Lines: 100-158
 - Tasks: firestore-rules, bootstrap, permission-denied
 
 ## rules-bug-4
 - Title: #4 — users/{uid} has no payload validation
 - File: docs/architecture/firestore-rules-bugs.md
-- Lines: 216-241
+- Lines: 236-261
 - Tasks: firestore-rules, users, schema
 
 ## rules-bug-5
 - Title: #5 — workspaces collection-level list
 - File: docs/architecture/firestore-rules-bugs.md
-- Lines: 281-297
+- Lines: 301-317
 - Tasks: firestore-rules, workspaces, query
 
 ## rules-bug-6
 - Title: #6 — Subcollection writes do not validate workspaceId payload
 - File: docs/architecture/firestore-rules-bugs.md
-- Lines: 190-214
+- Lines: 196-216
 - Tasks: firestore-rules, schema, subcollections
 
 ## rules-bug-7
 - Title: #7 — Push order race on workspace creation
 - File: docs/architecture/firestore-rules-bugs.md
-- Lines: 263-279
+- Lines: 283-299
 - Tasks: firestore-rules, sync, workspace-creation
 
 ## rules-bug-8
 - Title: #8 — Invite-less workspace join breaks tenant isolation
 - File: docs/architecture/firestore-rules-bugs.md
-- Lines: 51-92
+- Lines: 57-98
 - Tasks: firestore-rules, members, invites, tenant-isolation
 
 ## security-audit-2026-07
 - Title: Verdict
 - File: docs/security/audit-2026-07-15.md
-- Lines: 16-63
+- Lines: 16-68
 - Tasks: security, audit, firestore-rules
 
 ## supply-chain

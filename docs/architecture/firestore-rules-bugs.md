@@ -19,7 +19,7 @@
 - [#6 — Subcollection writes do not validate workspaceId payload](#6-subcollection-writes-do-not-validate-workspaceid-payload)
 - [#156 — Poison-document crash loop; no write-shape validation](#156-poison-document-crash-loop-no-write-shape-validation)
   - [Problem](#problem)
-  - [Fix — two layers](#fix--two-layers)
+  - [Fix — two layers](#fix-two-layers)
 - [#4 — users/{uid} has no payload validation](#4-usersuid-has-no-payload-validation)
   - [Fix](#fix)
 - [#2 — members/{uid} create requires hasValidClientVersion()](#2-membersuid-create-requires-hasvalidclientversion)
@@ -28,6 +28,10 @@
   - [Check](#check)
 - [#5 — workspaces collection-level list](#5-workspaces-collection-level-list)
   - [Check](#check)
+- [#161 — userEmails email→uid existence oracle](#161-useremails-emailuid-existence-oracle)
+  - [Problem](#problem)
+  - [Decision](#decision)
+  - [Why not a server callable](#why-not-a-server-callable)
 - [Summary](#summary)
 <!-- DOCS:END -->
 
@@ -312,6 +316,38 @@ match /workspaces/{wid} {
 Grep the data layer — nobody should be doing top-level lists of `workspaces`. Pulls always go per-`workspaceId` via `users/{uid}.workspaceIds`. Recommend blacklisting top-level scans via a unit test or kover rule.
 <!-- AI:END -->
 
+<!-- AI:SECTION id=rules-bug-161 task=firestore-rules,userEmails,invites,privacy -->
+## #161 — `userEmails` email→uid existence oracle
+
+**Severity:** LOW — account-existence / email→uid oracle. **Status:** ✅ Accepted as intended for invites (issue #161). No rules change.
+
+### Problem
+
+`match /userEmails/{email}` allows `get: if signedIn()`. Any authenticated user can `.get()` `userEmails/victim@example.com` for an **exact** address and learn whether an account exists and its `uid`. `list` is denied, so this is single-key lookup only (no table scan / bulk harvest), but it is still an oracle for any guessed address. The harvested `uid` was, before #8 (issue #152), usable in the invite-less-join attack once a `wid` was known.
+
+### Decision
+
+**Accepted as intended.** The mapping *is* the invite-targeting mechanism: `SendInviteUseCase` resolves a recipient email to a `uid` via `userEmails/{email}` (`UserRemoteRepositoryImpl.findByEmail`) and refuses to send an invite when no account exists. An owner inviting a co-member by email must be able to perform exactly this single-key lookup, so a client-side `get` on the exact key is a functional requirement, not an incidental leak.
+
+Residual risk is contained by the surrounding rules:
+
+- `allow list: if false` — no enumeration; an attacker must already know the full address to probe it, so this reveals nothing they could not also test via a password-reset / sign-up flow.
+- The write rule binds the email key to the writer's Firebase Auth email claim (`email == request.auth.token.email.lower()`), closing the email-squatting hole — a leaked `uid` is genuine, not attacker-planted.
+- The one attack that made the harvested `uid` dangerous — invite-less self-join (#8 / issue #152) — is fixed: self-`create` on `members/{uid}` now requires an owner-issued invite that admits the caller (`hasJoinableInvite`), so a `uid` alone grants nothing.
+
+Net LOW residual: single-address existence disclosure to authenticated users, no bulk harvest, no downstream escalation.
+
+### Why not a server callable
+
+The issue's alternative — move email→uid resolution behind a server callable returning only a boolean/opaque token — is **not viable without a rules-access-control change that is out of scope here**:
+
+- A callable closes the oracle only if the direct `allow get` on `userEmails/{email}` is simultaneously **denied** in `firestore.rules`. Leaving the direct read in place keeps the oracle regardless of any callable, so the callable buys nothing on its own. Removing/denying the direct read is a rules access-control change (and a rules deployment) — off-limits for this task.
+- The repo has **no Cloud Functions deployment** (`firebase.json` wires only `firestore.rules` + `firestore.indexes.json` + emulators; there is no `functions/` module). Standing one up is new infrastructure well beyond a LOW defence-in-depth item.
+- The existing client reads the mapping directly (`data-remote/.../UserRemoteRepositoryImpl.kt` `findByEmail`); routing through a callable would be a client rewrite for no isolation gain while #152 already neutralizes the escalation path.
+
+Revisit only if the app later adds a Cloud Functions backend for other reasons — at that point folding email→uid resolution behind a callable and denying the direct `get` becomes cheap and removes the last of the LOW residual.
+<!-- AI:END -->
+
 ## Summary
 
 | # | Topic | Severity | Status |
@@ -325,5 +361,6 @@ Grep the data layer — nobody should be doing top-level lists of `workspaces`. 
 | 2 | `members/{uid}` clientVersionCode requirement | LOW | ⏳ Unconfirmed |
 | 7 | Push order race on workspace creation | LOW | ⏳ Unconfirmed |
 | 5 | Top-level `workspaces` list without guard | LOW | ⏳ Preventive |
+| 161 | `userEmails` email→uid existence oracle | LOW | ✅ Accepted (intended for invites) |
 
 Overall: rules themselves are **correct** on the happy path, but lack **defensive coverage** for edge cases. App-side bug #3 exploited that lack — now fixed.

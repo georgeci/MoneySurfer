@@ -80,7 +80,9 @@ Highlights:
 - `clientVersionCode` minimum is enforced via `hasValidClientVersion()` on
   every entity write.
 - `userEmails/{email}` is `get`-only, no `list`. Writes require the email key
-  to match the requester's Firebase Auth email claim.
+  to match the requester's Firebase Auth email claim. The single-key `get` is
+  the invite email→uid lookup — an **accepted** LOW existence oracle (issue
+  #161; rationale in [firestore-rules-bugs.md](../docs/architecture/firestore-rules-bugs.md) #161).
 - `invites` collection-group reads are declared on the wildcard
   `match /{path=**}/invites/{inviteId}` (per-doc reads inside a workspace
   also covered).
