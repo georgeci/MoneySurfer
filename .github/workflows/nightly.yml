@@ -82,7 +82,7 @@ jobs:
           egress-policy: audit
 
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
       - name: Decode Firebase config
         uses: ./.github/actions/firebase-config
@@ -92,7 +92,7 @@ jobs:
           ios-plist:    ${{ secrets.GOOGLE_SERVICE_INFO_PLIST }}
 
       - name: Set up JDK
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@0f481fcb613427c0f801b606911222b5b6f3083a # v5.5.0
         with:
           distribution: temurin
           java-version: "17"
@@ -114,10 +114,10 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
       - name: Set up JDK
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@0f481fcb613427c0f801b606911222b5b6f3083a # v5.5.0
         with:
           distribution: temurin
           java-version: "17"
@@ -150,7 +150,7 @@ jobs:
           egress-policy: audit
 
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
       # iOS build only needs the GoogleService-Info.plist — don't expose the
       # Android secrets to this job. (Can't use require-all=true here: it
@@ -161,7 +161,7 @@ jobs:
           ios-plist: ${{ secrets.GOOGLE_SERVICE_INFO_PLIST }}
 
       - name: Set up JDK
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@0f481fcb613427c0f801b606911222b5b6f3083a # v5.5.0
         with:
           distribution: temurin
           java-version: "17"
@@ -237,7 +237,7 @@ jobs:
           egress-policy: audit
 
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
       - name: Decode Firebase config
         uses: ./.github/actions/firebase-config
@@ -248,7 +248,7 @@ jobs:
       # firebase-tools ≥14 ships a Firestore emulator JAR that needs JDK 21+.
       # Same caveat as the firestore-rules job in ci.yml.
       - name: Set up JDK
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@0f481fcb613427c0f801b606911222b5b6f3083a # v5.5.0
         with:
           distribution: temurin
           java-version: "21"
@@ -319,7 +319,7 @@ jobs:
 
       - name: Upload Allure report
         if: always()
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: allure-report-maestro-android
           path: build/reports/allure/maestro/
@@ -331,7 +331,7 @@ jobs:
       # Maestro's per-step screenshots instead of degrading to bare JUnit.
       - name: Upload Allure results (native)
         if: always()
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: allure-results-maestro-android
           path: build/allure-results/maestro/
@@ -340,7 +340,7 @@ jobs:
 
       - name: Upload JUnit results
         if: always()
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: maestro-android-junit
           path: build/test-results/maestro/*.xml
@@ -353,7 +353,7 @@ jobs:
       # Allure aggregate — kept as a raw-JUnit artifact for triage.
       - name: Upload Android device-test JUnit
         if: always()
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: android-device-junit
           path: "**/build/outputs/androidTest-results/**/*.xml"
@@ -362,7 +362,7 @@ jobs:
 
       - name: Upload Maestro debug + screenshots
         if: always()
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: maestro-android-debug
           path: |
@@ -392,7 +392,7 @@ jobs:
           egress-policy: audit
 
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
       - name: Decode Firebase config
         uses: ./.github/actions/firebase-config
@@ -400,7 +400,7 @@ jobs:
           ios-plist: ${{ secrets.GOOGLE_SERVICE_INFO_PLIST }}
 
       - name: Set up JDK
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@0f481fcb613427c0f801b606911222b5b6f3083a # v5.5.0
         with:
           distribution: temurin
           java-version: "21"
@@ -447,7 +447,7 @@ jobs:
 
       - name: Upload Allure report
         if: always()
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: allure-report-maestro-ios
           path: build/reports/allure/maestro-ios/
@@ -456,7 +456,7 @@ jobs:
 
       - name: Upload Allure results (native)
         if: always()
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: allure-results-maestro-ios
           path: build/allure-results/maestro-ios/
@@ -465,7 +465,7 @@ jobs:
 
       - name: Upload JUnit results
         if: always()
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: maestro-ios-junit
           path: build/test-results/maestro-ios/*.xml
@@ -474,7 +474,7 @@ jobs:
 
       - name: Upload Maestro debug + screenshots
         if: always()
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: maestro-ios-debug
           path: |
@@ -500,10 +500,10 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
       - name: Set up JDK
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@0f481fcb613427c0f801b606911222b5b6f3083a # v5.5.0
         with:
           distribution: temurin
           java-version: "17"
@@ -550,7 +550,7 @@ jobs:
 
       - name: Upload JUnit results
         if: always()
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: maestro-ios-offline-junit
           path: build/test-results/maestro-ios/*.xml
@@ -562,7 +562,7 @@ jobs:
       # dirs of the online suite.
       - name: Upload Maestro debug + screenshots
         if: always()
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: maestro-ios-offline-debug
           path: |
@@ -592,28 +592,28 @@ jobs:
       # never managed to write `executor.json` (extremely rare given the
       # in-Gradle fallback in qa.gradle.kts → writeAllureFallbackMetadata).
       - name: Download Maestro Android Allure results (native)
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: allure-results-maestro-android
           path: allure-input-native/maestro-android
         continue-on-error: true
 
       - name: Download Maestro iOS Allure results (native)
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: allure-results-maestro-ios
           path: allure-input-native/maestro-ios
         continue-on-error: true
 
       - name: Download Maestro Android JUnit (fallback)
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: maestro-android-junit
           path: allure-input/maestro-android
         continue-on-error: true
 
       - name: Download Maestro iOS JUnit (fallback)
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: maestro-ios-junit
           path: allure-input/maestro-ios
@@ -623,7 +623,7 @@ jobs:
       # so it only ever contributes JUnit XML. Its own `allure-input/…` subdir
       # means the native-data guard below never suppresses it.
       - name: Download Maestro iOS offline JUnit
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: maestro-ios-offline-junit
           path: allure-input/maestro-ios-offline
@@ -682,7 +682,7 @@ jobs:
           echo "Staged $total input(s) ($native_count native, $((total - native_count)) JUnit fallback)."
 
       - name: Checkout gh-pages
-        uses: actions/checkout@v7
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           ref: gh-pages
           path: gh-pages

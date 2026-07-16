@@ -1,0 +1,9 @@
+{
+  "name": "moneysurfer-firebase-tools",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Pinned firebase-tools CLI for emulator-backed CI jobs. Installed via `npm ci` from the committed lockfile so the full transitive tree is verified against integrity hashes instead of resolved fresh on every run.",
+  "dependencies": {
+    "firebase-tools": "14.17.0"
+  }
+}
