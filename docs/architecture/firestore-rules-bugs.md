@@ -323,7 +323,7 @@ Grep the data layer — nobody should be doing top-level lists of `workspaces`. 
 
 ### Problem
 
-`match /userEmails/{email}` allows `get: if signedIn()`. Any authenticated user can `.get()` `userEmails/victim@example.com` for an **exact** address and learn whether an account exists and its `uid`. `list` is denied, so this is single-key lookup only (no table scan / bulk harvest), but it is still an oracle for any guessed address. The harvested `uid` was, before #8 (issue #152), usable in the invite-less-join attack once a `wid` was known.
+`match /userEmails/{email}` allows `get: if signedIn()`. Any authenticated user can `.get()` `userEmails/victim@example.com` for an **exact** address and learn whether an account exists and its `uid`. `list` is denied, so this is single-key lookup only (no table scan / bulk harvest), but it is still an oracle for any guessed address. The harvested `uid` was, before rules bug #8 (issue #152), usable in the invite-less-join attack once a `wid` was known.
 
 ### Decision
 
@@ -333,7 +333,7 @@ Residual risk is contained by the surrounding rules:
 
 - `allow list: if false` — no enumeration; an attacker must already know the full address to probe it, so this reveals nothing they could not also test via a password-reset / sign-up flow.
 - The write rule binds the email key to the writer's Firebase Auth email claim (`email == request.auth.token.email.lower()`), closing the email-squatting hole — a leaked `uid` is genuine, not attacker-planted.
-- The one attack that made the harvested `uid` dangerous — invite-less self-join (#8 / issue #152) — is fixed: self-`create` on `members/{uid}` now requires an owner-issued invite that admits the caller (`hasJoinableInvite`), so a `uid` alone grants nothing.
+- The one attack that made the harvested `uid` dangerous — invite-less self-join (rules bug #8 / issue #152) — is fixed: self-`create` on `members/{uid}` now requires an owner-issued invite that admits the caller (`hasJoinableInvite`), so a `uid` alone grants nothing.
 
 Net LOW residual: single-address existence disclosure to authenticated users, no bulk harvest, no downstream escalation.
 
