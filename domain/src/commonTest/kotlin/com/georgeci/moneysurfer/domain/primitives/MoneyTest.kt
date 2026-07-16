@@ -38,6 +38,18 @@ class MoneyTest : StringSpec({
         shouldThrow<ArithmeticException> { Money(Long.MAX_VALUE) * 2 }
     }
 
+    "negating Long.MIN_VALUE via times(-1) throws instead of wrapping" {
+        shouldThrow<ArithmeticException> { Money(Long.MIN_VALUE) * -1 }
+    }
+
+    "times by zero is zero even for an out-of-cap magnitude" {
+        (Money(Long.MAX_VALUE) * 0) shouldBe Money.zero()
+    }
+
+    "minus that overflows Long on the positive side throws instead of wrapping" {
+        shouldThrow<ArithmeticException> { Money(Long.MAX_VALUE) - Money.fromMinor(-1) }
+    }
+
     "fromMajor that overflows Long throws instead of wrapping" {
         shouldThrow<ArithmeticException> { Money.fromMajor(Long.MAX_VALUE) }
         shouldThrow<ArithmeticException> { Money.fromMajor(Long.MAX_VALUE / 100, cents = 99) }
