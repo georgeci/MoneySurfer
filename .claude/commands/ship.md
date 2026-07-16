@@ -55,10 +55,13 @@ If everything is already committed, skip this step.
 
 ## 6. Push and create PR
 
-Run in parallel:
+Run these **sequentially** — `gh pr create` fails when the branch is not yet on the remote, so the push must complete first:
 
-- `git push -u origin <new-name>`
-- `gh pr create --title "<title>" --body "$(cat <<'EOF'
+1. `git push -u origin <new-name>`
+2. Only after the push succeeds:
+
+```
+gh pr create --title "<title>" --body "$(cat <<'EOF'
 ## Summary
 <bullets>
 
@@ -71,7 +74,8 @@ otherwise>
 
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 EOF
-)"`
+)"
+```
 
 PR title rules:
 - Under 70 chars.
