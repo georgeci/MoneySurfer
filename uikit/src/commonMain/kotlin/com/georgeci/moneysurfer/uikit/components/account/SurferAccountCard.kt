@@ -37,7 +37,7 @@ fun SurferAccountCard(
     onClick: (() -> Unit)? = null,
     onAddClick: (() -> Unit)? = null,
     /** Accessibility label for the add button. Callers that provide [onAddClick] must pass a
-     *  meaningful description (e.g. `stringResource(R.string.account_add_transaction)`). */
+     *  meaningful description (e.g. `stringResource(Res.string.account_add_transaction)`). */
     addContentDescription: String? = null,
 ) {
     Box(
