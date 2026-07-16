@@ -2,6 +2,12 @@ name: PR checks
 
 on:
   pull_request:
+  # Publishing Allure/Kover to gh-pages only happens on push to main (see the
+  # `publish` job's gate). Without this trigger the gate is never true and the
+  # reports on Pages freeze. The doc-only guard still applies via the `changes`
+  # job, so a Markdown-only push to main won't republish an empty report.
+  push:
+    branches: [main]
   workflow_dispatch:
 
 concurrency:
@@ -686,7 +692,6 @@ jobs:
             <h2>Nightly (all five scopes)</h2>
             <ul>
               <li><a href="nightly/allure/">Allure</a></li>
-              <li><a href="nightly/kover/">Kover coverage</a> (combined)</li>
             </ul>
           </body>
           </html>
