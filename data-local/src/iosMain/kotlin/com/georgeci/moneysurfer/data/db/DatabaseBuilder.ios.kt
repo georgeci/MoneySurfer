@@ -2,13 +2,9 @@ package com.georgeci.moneysurfer.data.db
 
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import platform.Foundation.NSDocumentDirectory
-import platform.Foundation.NSSearchPathForDirectoriesInDomains
-import platform.Foundation.NSUserDomainMask
+import com.georgeci.moneysurfer.data.storage.iosAppStorageFilePath
 
 fun getDatabaseBuilder(): RoomDatabase.Builder<MoneySurferDatabase> {
-    val docsDir = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, true)
-        .first() as String
-    val dbPath = "$docsDir/$DB_NAME"
+    val dbPath = iosAppStorageFilePath(DB_NAME, isDatabase = true)
     return Room.databaseBuilder<MoneySurferDatabase>(dbPath)
 }
