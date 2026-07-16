@@ -69,6 +69,10 @@ jobs:
     # Compile-only: catches AGP/Kotlin/google-services regressions without
     # needing the dev keystore (assembleDebug would require DEV_* secrets,
     # see androidApp/build.gradle.kts -> signingConfigs.dev).
+    #
+    # ci.yml now runs the same compile as a per-PR gate (issue #170), but that
+    # job skips fork PRs (no access to GOOGLE_SERVICES_JSON_DEBUG). This nightly
+    # copy stays as the safety net for Android breakage merged from fork PRs.
 
     steps:
       # Egress audit — see docs/security/ci-egress-hardening.md (issue #180).

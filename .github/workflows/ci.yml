@@ -494,6 +494,57 @@ jobs:
           if-no-files-found: ignore
           retention-days: 14
 
+  android-compile:
+    name: Android debug compile
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: changes
+    # Compile-only gate on the online Android target: catches AGP / Kotlin /
+    # google-services / resource regressions that the JVM-only `junit` scope
+    # (qaCommon + qaAndroidHost) can't see. Cheap on ubuntu — no device, no dev
+    # keystore (assembleDebug would need DEV_* secrets; compileDebugSources
+    # doesn't). Previously exercised only by nightly (issue #170); CodeQL builds
+    # the same task on PRs but isn't a build gate and skips fork PRs.
+    #
+    # processDebugGoogleServices needs the decoded google-services.json, which
+    # comes from repo secrets — so skip fork PRs (they can't read secrets), same
+    # guard as the `sonar` job. Fork-authored Android breakage is still caught by
+    # the nightly `android-compile` job on main, which is why that copy stays.
+    #
+    # Online-iOS framework linking (linkDebugFrameworkIosSimulatorArm64) is
+    # deliberately NOT added here: macos-15 runners cost ~10x ubuntu, so it stays
+    # in nightly (issue #170 §2). The offline iOS framework already links on
+    # every PR via ios-offline.yml.
+    if: >-
+      (needs.changes.outputs.code == 'true' || github.event_name == 'workflow_dispatch') &&
+      (github.event_name == 'workflow_dispatch' ||
+       github.event.pull_request.head.repo.full_name == github.repository)
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      # Only the debug google-services.json is needed (processDebugGoogleServices
+      # is debug-variant only) — don't decode the release JSON or iOS plist here.
+      - name: Decode Firebase config
+        uses: ./.github/actions/firebase-config
+        with:
+          debug-json: ${{ secrets.GOOGLE_SERVICES_JSON_DEBUG }}
+
+      - name: Set up JDK
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@3f131e8634966bd73d06cc69884922b02e6faf92 # v6.2.0
+
+      - name: Compile Android debug
+        run: ./gradlew :androidApp:processDebugGoogleServices :androidApp:compileDebugSources --stacktrace
+
 
   publish:
     name: Aggregate + publish to Pages
