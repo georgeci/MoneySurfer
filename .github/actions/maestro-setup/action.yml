@@ -67,14 +67,7 @@ runs:
 
     - name: Install Allure CLI
       if: ${{ inputs.online-stack == 'true' }}
-      shell: bash
-      env:
-        ALLURE_VERSION: "2.34.1"
-      run: |
-        set -euo pipefail
-        curl --proto "=https" -fsSL "https://github.com/allure-framework/allure2/releases/download/${ALLURE_VERSION}/allure-${ALLURE_VERSION}.tgz" \
-          | tar -xz -C "${RUNNER_TEMP}"
-        echo "${RUNNER_TEMP}/allure-${ALLURE_VERSION}/bin" >> "${GITHUB_PATH}"
+      uses: ./.github/actions/allure-cli
 
     # qa.gradle.kts reads TEST_EMAIL/TEST_PASSWORD from this file and forwards
     # them to Maestro via `--env`. seed.sh reads the same file to provision

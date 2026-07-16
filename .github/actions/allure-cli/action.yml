@@ -1,0 +1,26 @@
+name: Install Allure CLI
+description: >-
+  Download a pinned Allure commandline release and add it to PATH. Single source
+  of truth for ALLURE_VERSION, which was otherwise hardcoded across ci.yml
+  (junit, firestore-rules, Pages aggregation) and nightly's maestro-setup.
+
+inputs:
+  version:
+    description: Allure commandline release to install.
+    required: false
+    default: "2.34.1"
+
+runs:
+  using: composite
+  steps:
+    - name: Install Allure CLI
+      shell: bash
+      env:
+        ALLURE_VERSION: ${{ inputs.version }}
+      run: |
+        set -euo pipefail
+        # --proto "=https" refuses any redirect off HTTPS (Sonar S6506).
+        curl --proto "=https" -fsSL \
+          "https://github.com/allure-framework/allure2/releases/download/${ALLURE_VERSION}/allure-${ALLURE_VERSION}.tgz" \
+          | tar -xz -C "${RUNNER_TEMP}"
+        echo "${RUNNER_TEMP}/allure-${ALLURE_VERSION}/bin" >> "${GITHUB_PATH}"
