@@ -3,6 +3,7 @@ package com.georgeci.moneysurfer.domain.csv
 import com.georgeci.moneysurfer.domain.fixtures.aTransaction
 import com.georgeci.moneysurfer.domain.fixtures.categoryId
 import com.georgeci.moneysurfer.domain.fixtures.transactionId
+import com.georgeci.moneysurfer.domain.primitives.Money
 import com.georgeci.moneysurfer.domain.primitives.TransactionStatus
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
 import com.georgeci.moneysurfer.domain.primitives.TransferId
@@ -103,6 +104,27 @@ class TransactionCsvCodecTest : StringSpec({
         fields[TransactionCsvColumn.AmountMinor.ordinal] = "12.50"
 
         rejected(fields) shouldBe CsvRowIssue.InvalidValue("amount_minor")
+    }
+
+    "amount_minor at the domain cap is accepted" {
+        val fields = TransactionCsvCodec.encode(aTransaction()).toMutableList()
+        fields[TransactionCsvColumn.AmountMinor.ordinal] = Money.MAX_MINOR.toString()
+
+        decoded(fields).money shouldBe Money.fromMinor(Money.MAX_MINOR)
+    }
+
+    "amount_minor beyond the domain cap is rejected as invalid amount_minor" {
+        listOf(
+            (Money.MAX_MINOR + 1).toString(),
+            (-Money.MAX_MINOR - 1).toString(),
+            Long.MAX_VALUE.toString(),
+            Long.MIN_VALUE.toString(),
+        ).forEach { crafted ->
+            val fields = TransactionCsvCodec.encode(aTransaction()).toMutableList()
+            fields[TransactionCsvColumn.AmountMinor.ordinal] = crafted
+
+            rejected(fields) shouldBe CsvRowIssue.InvalidValue("amount_minor")
+        }
     }
 
     "unknown transaction type is rejected as invalid type" {
