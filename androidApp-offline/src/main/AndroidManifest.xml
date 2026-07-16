@@ -20,11 +20,13 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
+        android:taskAffinity=""
         android:theme="@style/Theme.MoneySurfer"
         android:usesCleartextTraffic="false">
         <activity
             android:exported="true"
             android:name=".MainActivity"
+            android:launchMode="singleTask"
             android:windowSoftInputMode="adjustResize"
             android:theme="@style/Theme.MoneySurfer.Splash">
             <intent-filter>
