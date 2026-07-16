@@ -12,10 +12,17 @@ runs:
     # Install into the action's own directory from the committed lockfile, then
     # put its bin dir on PATH. `npm ci` fails hard if package.json and the lock
     # drift, which is exactly the guarantee we want here.
+    #
+    # --ignore-scripts: don't run lifecycle (pre/post-install) scripts from the
+    # ~690-package transitive tree — running them would reopen the supply-chain
+    # hole this action closes (Sonar githubactions:S6505). The CLI we invoke
+    # (emulators:exec, auth/firestore) is pure JS and loads fine without them;
+    # the only install-script deps are fsevents (macOS file-watch, optional),
+    # protobufjs (pure JS) and re2 (optional, falls back to native RegExp).
     - name: Install Firebase CLI (locked)
       shell: bash
       working-directory: ${{ github.action_path }}
       run: |
         set -euo pipefail
-        npm ci --no-audit --no-fund
+        npm ci --ignore-scripts --no-audit --no-fund
         echo "${GITHUB_ACTION_PATH}/node_modules/.bin" >> "${GITHUB_PATH}"
