@@ -28,13 +28,14 @@ internal val SKIPPED_APPLY_RESULT = EntityApplyResult(applied = false, wasConfli
  *
  * Only the in-memory decode is guarded: the document is already fetched, so a throw here is always
  * a malformed payload, never a transient I/O error (those still surface and abort so they retry).
- * [CancellationException] is rethrown so coroutine cancellation is never swallowed.
+ * [CancellationException] is rethrown so coroutine cancellation is never swallowed; fatal [Error]s
+ * (OOM, linkage) propagate because we catch [Exception], not [Throwable].
  */
 internal fun <T> RemoteDocument.decodeOrNull(deserializer: DeserializationStrategy<T>): T? = try {
     decode(deserializer)
 } catch (cancelled: CancellationException) {
     throw cancelled
-} catch (@Suppress("TooGenericExceptionCaught") failure: Throwable) {
+} catch (@Suppress("TooGenericExceptionCaught") failure: Exception) {
     decodeLog.e(throwable = failure) {
         "skipping undecodable ${deserializer.descriptor.serialName} doc id=$id"
     }

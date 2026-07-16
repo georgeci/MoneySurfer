@@ -18,7 +18,7 @@ import kotlin.coroutines.cancellation.CancellationException
 class DecodeOrNullSpec : StringSpec({
 
     "returns the decoded value when the document is well-formed" {
-        val expected = AccountDoc(name = "Checking", balance = 42)
+        val expected = AccountDoc(name = "Checking", balance = 42L)
         val doc = FakeRemoteDocument { expected }
 
         doc.decodeOrNull(AccountDoc.serializer()) shouldBe expected
