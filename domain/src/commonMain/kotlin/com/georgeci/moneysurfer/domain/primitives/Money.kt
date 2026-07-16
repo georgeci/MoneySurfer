@@ -54,7 +54,9 @@ value class Money(val minor: Long) : Comparable<Money> {
             cents: Int = 0,
         ): Money {
             require(cents in 0..CENTS_RANGE_MAX)
-            return Money(units * MINOR_FACTOR + cents)
+            // Checked: fromMajor(Long.MAX_VALUE) must not silently wrap before the
+            // arithmetic operators ever run. See issue #159.
+            return Money(addExact(multiplyExact(units, MINOR_FACTOR.toLong()), cents.toLong()))
         }
 
         fun fromDouble(value: Double): Money {

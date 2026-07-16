@@ -38,6 +38,15 @@ class MoneyTest : StringSpec({
         shouldThrow<ArithmeticException> { Money(Long.MAX_VALUE) * 2 }
     }
 
+    "fromMajor that overflows Long throws instead of wrapping" {
+        shouldThrow<ArithmeticException> { Money.fromMajor(Long.MAX_VALUE) }
+        shouldThrow<ArithmeticException> { Money.fromMajor(Long.MAX_VALUE / 100, cents = 99) }
+    }
+
+    "fromMajor composes units and cents exactly" {
+        Money.fromMajor(12, cents = 34) shouldBe Money.fromMinor(1234)
+    }
+
     "arithmetic within the domain cap stays exact" {
         (Money(Money.MAX_MINOR) + Money.fromMinor(-Money.MAX_MINOR)).minor shouldBe 0L
         (Money.fromMinor(300) - Money.fromMinor(100)) shouldBe Money.fromMinor(200)
