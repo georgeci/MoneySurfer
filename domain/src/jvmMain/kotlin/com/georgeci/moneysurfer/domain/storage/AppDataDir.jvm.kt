@@ -1,4 +1,4 @@
-package com.georgeci.moneysurfer.data.storage
+package com.georgeci.moneysurfer.domain.storage
 
 import java.io.File
 import java.nio.file.Files
@@ -20,7 +20,7 @@ private const val OWNER_ONLY = "rwx------"
  * system supports POSIX permissions, so local databases and preferences are not
  * left world-readable under a shared /tmp.
  */
-internal fun appDataDir(): File {
+fun appDataDir(): File {
     val home = System.getProperty("user.home").orEmpty()
     val os = System.getProperty("os.name").orEmpty().lowercase()
     val base = when {
