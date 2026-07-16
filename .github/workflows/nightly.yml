@@ -291,7 +291,13 @@ jobs:
           emulator-boot-timeout: 1200
           emulator-options: -no-window -no-snapshot -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -camera-front none
           script: |
-            set -uo pipefail
+            # android-emulator-runner executes this `script` with /bin/sh
+            # (dash on the ubuntu runner), which rejects `set -o pipefail`
+            # ("Illegal option -o pipefail") and aborts before any gradle task
+            # runs. There are no pipelines here whose failure we'd mask, so
+            # plain `set -u` preserves the intent (fail on unset vars, keep
+            # accumulating job failures into `overall`) while staying POSIX.
+            set -u
             overall=0
 
             # 1) Online E2E suite — the dominant flake source (AVD + Firebase

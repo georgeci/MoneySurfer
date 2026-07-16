@@ -16,7 +16,14 @@ inputs:
     required: false
     default: ""
   ios-plist:
-    description: base64 of iosApp/iosApp/GoogleService-Info.plist
+    description: >
+      base64 of the Debug (.dev) GoogleService-Info.plist. Decoded to
+      iosApp/Firebase/Dev/GoogleService-Info.plist — the per-configuration
+      source the "Copy Firebase plist (Dev/Prod)" Xcode phase reads for Debug
+      builds (see iosApp/scripts/copy-firebase-plist.sh). It must NOT land in
+      the synchronized iosApp/iosApp/ folder, where Xcode 16 would auto-add it
+      as a bundle resource and collide with that phase ("Multiple commands
+      produce GoogleService-Info.plist").
     required: false
     default: ""
   require-all:
@@ -67,7 +74,7 @@ runs:
         echo "Decoding Firebase config secrets:"
         decode_b64 "GOOGLE_SERVICES_JSON_DEBUG"   "$DEBUG_JSON"   "androidApp/src/debug/google-services.json"
         decode_b64 "GOOGLE_SERVICES_JSON_RELEASE" "$RELEASE_JSON" "androidApp/src/release/google-services.json"
-        decode_b64 "GOOGLE_SERVICE_INFO_PLIST"    "$IOS_PLIST"    "iosApp/iosApp/GoogleService-Info.plist"
+        decode_b64 "GOOGLE_SERVICE_INFO_PLIST"    "$IOS_PLIST"    "iosApp/Firebase/Dev/GoogleService-Info.plist"
 
         # JSON sanity-check: must parse and have a project_info block.
         for f in androidApp/src/debug/google-services.json androidApp/src/release/google-services.json; do
@@ -79,7 +86,7 @@ runs:
 
         # Plist sanity-check: plutil if available (always on macOS, sometimes
         # on Linux runners), otherwise just verify it's not empty.
-        plist=iosApp/iosApp/GoogleService-Info.plist
+        plist=iosApp/Firebase/Dev/GoogleService-Info.plist
         if [ -f "$plist" ] && command -v plutil >/dev/null 2>&1; then
           plutil -lint "$plist" >/dev/null \
             || { echo "::error::$plist is not a valid plist"; exit 1; }
