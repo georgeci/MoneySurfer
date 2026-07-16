@@ -84,6 +84,15 @@ class TransactionCsvCodecTest : StringSpec({
         }
     }
 
+    "a legacy note starting with a literal apostrophe decodes unchanged" {
+        // A pre-guard export (or a third-party CSV) wrote the note verbatim, so
+        // the apostrophe is real data, not a guard prefix — it must survive.
+        val fields = TransactionCsvCodec.encode(aTransaction()).toMutableList()
+        fields[TransactionCsvColumn.Note.ordinal] = "'plain apostrophe"
+
+        decoded(fields).note shouldBe "'plain apostrophe"
+    }
+
     "wrong column count is rejected with expected and actual sizes" {
         rejected(listOf("only", "three", "fields")) shouldBe
             CsvRowIssue.ColumnCountMismatch(expected = TransactionCsvCodec.header.size, actual = 3)

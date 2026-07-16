@@ -24,24 +24,39 @@ internal object Csv {
     // file is opened in Excel/LibreOffice — the CSV injection vector.
     private val formulaTriggers = charArrayOf('=', '+', '-', '@', '\t', '\r')
 
+    // A leading apostrophe is a guard only when it precedes a doubled literal
+    // apostrophe or a formula trigger — the two shapes [guardFormula] emits.
+    private val guardedSecondChars = formulaTriggers + '\''
+
     /**
      * Neutralises spreadsheet formula injection in free-text fields. A field
      * whose first character would start a formula gets an apostrophe prefix,
      * which forces spreadsheets to treat the whole cell as literal text. The
      * apostrophe is itself escaped (a leading `'` is doubled) so the transform
-     * is reversible: [unguardFormula] strips exactly one leading apostrophe and
-     * recovers the original value losslessly. Applied only to attacker-supplied
-     * free text — structured columns (ids, amounts, dates) stay untouched so
-     * they still import into a spreadsheet as their proper types.
+     * is reversible: [unguardFormula] recovers the original value for anything
+     * this codec encoded. Applied only to attacker-supplied free text —
+     * structured columns (ids, amounts, dates) stay untouched so they still
+     * import into a spreadsheet as their proper types.
      */
     fun guardFormula(field: String): String {
         val first = field.firstOrNull() ?: return field
         return if (first == '\'' || first in formulaTriggers) "'$field" else field
     }
 
-    /** Reverses [guardFormula]: drops one leading apostrophe if present. */
+    /**
+     * Reverses [guardFormula]. Strips a leading apostrophe only when it is one
+     * this codec could have emitted — an apostrophe doubling an escaped literal
+     * `'`, or an apostrophe guarding a formula trigger. A note that merely
+     * starts with an apostrophe followed by ordinary text (a legacy pre-guard
+     * export, or a third-party CSV) is left untouched, so import stays lossless
+     * for those too.
+     */
     fun unguardFormula(field: String): String =
-        if (field.startsWith('\'')) field.substring(1) else field
+        if (field.length >= 2 && field[0] == '\'' && field[1] in guardedSecondChars) {
+            field.substring(1)
+        } else {
+            field
+        }
 
     private fun encodeField(field: String): String =
         if (field.any { it in charsRequiringQuotes }) {
