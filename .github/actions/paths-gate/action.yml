@@ -1,0 +1,34 @@
+name: Paths gate
+description: >-
+  Single source of truth for the doc-only / AI-tooling path filter shared by
+  ci.yml, codeql.yml and ios-offline.yml. Runs dorny/paths-filter and exposes
+  `code` = true iff at least one non-doc / non-AI-tooling file changed.
+
+  The caller job must check out the repo first (local composite action) and
+  wire `outputs.code` to this action's `code` output.
+
+outputs:
+  code:
+    description: "true iff at least one non-doc / non-AI-tooling file changed."
+    value: ${{ steps.filter.outputs.code }}
+
+runs:
+  using: composite
+  steps:
+    - name: Filter paths
+      id: filter
+      uses: dorny/paths-filter@7b450fff21473bca461d4b92ce414b9d0420d706 # v4.0.2
+      with:
+        # `**` matches everything; subsequent `!`-patterns subtract docs and
+        # AI-tooling. `code` is true iff at least one changed file remains.
+        filters: |
+          code:
+            - '**'
+            - '!**/*.md'
+            - '!.claude/**'
+            - '!.agents/**'
+            - '!ai/**'
+            - '!md/**'
+            - '!docs/**'
+            - '!.github/copilot-instructions.md'
+            - '!LICENSE'

@@ -1,5 +1,8 @@
 # MoneySurfer
 
+[![PR checks](https://github.com/georgeci/MoneySurfer/actions/workflows/ci.yml/badge.svg)](https://github.com/georgeci/MoneySurfer/actions/workflows/ci.yml)
+[![Nightly](https://github.com/georgeci/MoneySurfer/actions/workflows/nightly.yml/badge.svg)](https://github.com/georgeci/MoneySurfer/actions/workflows/nightly.yml)
+
 A Kotlin Multiplatform personal finance app for Android, iOS, and Desktop (JVM),
 built with Compose Multiplatform. Local data lives in Room; cross-device sync
 goes through Firestore.

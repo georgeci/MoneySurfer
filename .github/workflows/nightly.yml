@@ -152,6 +152,11 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@3f131e8634966bd73d06cc69884922b02e6faf92 # v6.2.0
 
+      # Cache the Kotlin/Native toolchain (~/.konan) — setup-gradle doesn't
+      # cover it, so the K/N compiler + platform libs re-download every run.
+      - name: Cache Kotlin/Native (~/.konan)
+        uses: ./.github/actions/konan-cache
+
       - name: Show Xcode version
         run: xcodebuild -version
 
@@ -373,6 +378,11 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@3f131e8634966bd73d06cc69884922b02e6faf92 # v6.2.0
 
+      # Cache the Kotlin/Native toolchain (~/.konan) that qaMaestroIos links —
+      # setup-gradle doesn't cover it. macOS runner minutes.
+      - name: Cache Kotlin/Native (~/.konan)
+        uses: ./.github/actions/konan-cache
+
       - name: Set up Maestro + Allure + e2e creds
         uses: ./.github/actions/maestro-setup
         with:
@@ -471,6 +481,11 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@3f131e8634966bd73d06cc69884922b02e6faf92 # v6.2.0
 
+      # Cache the Kotlin/Native toolchain (~/.konan) that the offline link step
+      # below pulls — setup-gradle doesn't cover it. macOS runner minutes.
+      - name: Cache Kotlin/Native (~/.konan)
+        uses: ./.github/actions/konan-cache
+
       - name: Set up Maestro (offline — no Firebase/Allure)
         uses: ./.github/actions/maestro-setup
         with:
@@ -532,6 +547,11 @@ jobs:
     if: always() && needs.decide.outputs.run == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    # Share the gh-pages writer lock with ci.yml `publish` and gh-pages-prune so
+    # cross-workflow pushes serialize instead of racing into non-fast-forwards.
+    concurrency:
+      group: gh-pages-write
+      cancel-in-progress: false
     permissions:
       contents: write
 
@@ -603,7 +623,7 @@ jobs:
               cp "$f" "allure-results/$base"
             done
           fi
-          native_count=$(ls allure-results 2>/dev/null | wc -l)
+          native_count=$(find allure-results -type f 2>/dev/null | wc -l)
           # 2) JUnit fallback: only stage XMLs we don't already have native
           #    data for. Treat presence of any `*-result.json` for a scope as
           #    "native data is here" and skip its JUnit to avoid duplicate
@@ -628,7 +648,7 @@ jobs:
               cp "$f" "$dest"
             done
           fi
-          total=$(ls allure-results 2>/dev/null | wc -l)
+          total=$(find allure-results -type f 2>/dev/null | wc -l)
           echo "Staged $total input(s) ($native_count native, $((total - native_count)) JUnit fallback)."
 
       - name: Checkout gh-pages
@@ -649,6 +669,11 @@ jobs:
           gh_pages: gh-pages/nightly/allure
           allure_report: allure-report
           allure_history: allure-history
+          # Cap the generated history payload to the 20 most recent reports.
+          # keep_files: true below never deletes already-published run-number
+          # dirs, so the weekly gh-pages-prune.yml does the actual branch
+          # trimming of the nightly/allure subtree.
+          keep_reports: 20
 
       - name: Assemble Pages payload
         shell: bash

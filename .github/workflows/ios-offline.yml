@@ -33,25 +33,14 @@ jobs:
     timeout-minutes: 2
     if: github.event_name == 'pull_request'
     outputs:
-      code: ${{ steps.filter.outputs.code }}
+      code: ${{ steps.gate.outputs.code }}
     steps:
       - name: Checkout
         uses: actions/checkout@v7
+      # Shared path filter — see .github/actions/paths-gate.
       - name: Filter paths
-        id: filter
-        uses: dorny/paths-filter@7b450fff21473bca461d4b92ce414b9d0420d706 # v4.0.2
-        with:
-          filters: |
-            code:
-              - '**'
-              - '!**/*.md'
-              - '!.claude/**'
-              - '!.agents/**'
-              - '!ai/**'
-              - '!md/**'
-              - '!docs/**'
-              - '!.github/copilot-instructions.md'
-              - '!LICENSE'
+        id: gate
+        uses: ./.github/actions/paths-gate
 
   ios-offline:
     name: iOS offline build (Simulator)
@@ -80,6 +69,11 @@ jobs:
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@3f131e8634966bd73d06cc69884922b02e6faf92 # v6.2.0
+
+      # Cache the Kotlin/Native toolchain (~/.konan) that linkDebugFramework
+      # below pulls — setup-gradle doesn't cover it. macOS runner minutes.
+      - name: Cache Kotlin/Native (~/.konan)
+        uses: ./.github/actions/konan-cache
 
       # Prints the selected version; replaces a bare `xcodebuild -version`.
       - name: Select Xcode

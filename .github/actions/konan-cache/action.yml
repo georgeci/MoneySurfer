@@ -1,0 +1,39 @@
+name: Cache Kotlin/Native (~/.konan)
+description: >-
+  Cache the Kotlin/Native toolchain and prebuilt platform dependencies under
+  ~/.konan, keyed on the Kotlin version from gradle/libs.versions.toml. Every
+  iOS job otherwise re-downloads the K/N compiler + platform libs on each run —
+  minutes of the most expensive (macos) runner line every time. setup-gradle
+  only caches Gradle's own caches, not ~/.konan.
+
+  The caller must check out the repo first (local composite action + needs
+  libs.versions.toml on disk).
+
+runs:
+  using: composite
+  steps:
+    # Read the `kotlin = "x.y.z"` line only (not kotlinStdlib / kotlinx-*): the
+    # anchored `^kotlin ` + `=` match excludes the other kotlin* keys.
+    - name: Resolve Kotlin version
+      id: kotlin
+      shell: bash
+      run: |
+        set -euo pipefail
+        version="$(sed -n 's/^kotlin[[:space:]]*=[[:space:]]*"\([^"]*\)".*/\1/p' \
+          gradle/libs.versions.toml | head -n1)"
+        if [ -z "$version" ]; then
+          echo "::error::Could not read the kotlin version from gradle/libs.versions.toml"
+          exit 1
+        fi
+        echo "Kotlin/Native cache key version: $version"
+        echo "version=$version" >> "$GITHUB_OUTPUT"
+
+    - name: Cache ~/.konan
+      uses: actions/cache@v6
+      with:
+        path: ~/.konan
+        key: ${{ runner.os }}-konan-${{ steps.kotlin.outputs.version }}
+        # Fall back to any prior konan cache for this OS so a Kotlin bump warms
+        # from the previous toolchain instead of a cold download.
+        restore-keys: |
+          ${{ runner.os }}-konan-

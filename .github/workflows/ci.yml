@@ -22,27 +22,15 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 2
     outputs:
-      code: ${{ steps.filter.outputs.code }}
+      code: ${{ steps.gate.outputs.code }}
     steps:
       - name: Checkout
         uses: actions/checkout@v7
+      # Path filter lives in .github/actions/paths-gate — shared with codeql.yml
+      # and ios-offline.yml so the ignore list has one source of truth.
       - name: Filter paths
-        id: filter
-        uses: dorny/paths-filter@7b450fff21473bca461d4b92ce414b9d0420d706 # v4.0.2
-        with:
-          # `**` matches everything; subsequent `!`-patterns subtract docs and
-          # AI-tooling. `code` is true iff at least one changed file remains.
-          filters: |
-            code:
-              - '**'
-              - '!**/*.md'
-              - '!.claude/**'
-              - '!.agents/**'
-              - '!ai/**'
-              - '!md/**'
-              - '!docs/**'
-              - '!.github/copilot-instructions.md'
-              - '!LICENSE'
+        id: gate
+        uses: ./.github/actions/paths-gate
 
   junit:
     name: JUnit + Allure
@@ -72,13 +60,7 @@ jobs:
         uses: gradle/actions/setup-gradle@3f131e8634966bd73d06cc69884922b02e6faf92 # v6.2.0
 
       - name: Install Allure CLI
-        shell: bash
-        run: |
-          set -euo pipefail
-          ALLURE_VERSION=2.34.1
-          curl -Ls "https://github.com/allure-framework/allure2/releases/download/${ALLURE_VERSION}/allure-${ALLURE_VERSION}.tgz" \
-            | tar -xz -C "${RUNNER_TEMP}"
-          echo "${RUNNER_TEMP}/allure-${ALLURE_VERSION}/bin" >> "${GITHUB_PATH}"
+        uses: ./.github/actions/allure-cli
 
       # Copy-paste detection gate. Fast (tokenize-only, no compile) and blocking
       # (`ignoreFailures = false`): fails the PR on new Kotlin duplication before
@@ -317,13 +299,7 @@ jobs:
         run: npm ci
 
       - name: Install Allure CLI
-        shell: bash
-        run: |
-          set -euo pipefail
-          ALLURE_VERSION=2.34.1
-          curl -Ls "https://github.com/allure-framework/allure2/releases/download/${ALLURE_VERSION}/allure-${ALLURE_VERSION}.tgz" \
-            | tar -xz -C "${RUNNER_TEMP}"
-          echo "${RUNNER_TEMP}/allure-${ALLURE_VERSION}/bin" >> "${GITHUB_PATH}"
+        uses: ./.github/actions/allure-cli
 
       - name: Run Mocha Firestore-rules tests
         run: ./gradlew qaFirestoreRules --stacktrace
@@ -511,6 +487,12 @@ jobs:
     name: Aggregate + publish to Pages
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    # Serialize every gh-pages writer (this job, nightly-publish, gh-pages-prune)
+    # on one group so pushes never race into a non-fast-forward. Job-level so it
+    # overrides the workflow's per-PR concurrency group.
+    concurrency:
+      group: gh-pages-write
+      cancel-in-progress: false
     needs: [changes, junit, firestore-rules]
     # Skip on doc-only PRs — no fresh test results to aggregate, and we don't
     # want to overwrite gh-pages with an empty Allure for a docs change.
@@ -557,7 +539,7 @@ jobs:
             dest="allure-results/$(echo "${f#allure-input/}" | tr '/' '__')"
             cp "$f" "$dest"
           done
-          echo "Staged $(ls allure-results 2>/dev/null | wc -l) XML(s)."
+          echo "Staged $(find allure-results -type f 2>/dev/null | wc -l) XML(s)."
 
       # Decide whether this run publishes to Pages. PRs (especially from forks)
       # don't get write access to gh-pages, and the branch protection on main is
@@ -598,6 +580,11 @@ jobs:
           gh_pages: gh-pages/allure
           allure_report: allure-report
           allure_history: allure-history
+          # Cap the generated history payload to the 20 most recent reports.
+          # This alone doesn't bound the gh-pages branch (keep_files: true below
+          # never deletes already-published run-number dirs) — the weekly
+          # gh-pages-prune.yml does the actual branch trimming.
+          keep_reports: 20
 
       - name: Assemble Pages payload
         if: steps.gate.outputs.publish == 'true'
@@ -656,16 +643,20 @@ jobs:
 
       # PR / non-main runs still get an artifact so reviewers can download the
       # aggregated Allure without waiting for Pages.
+      # This job never checks out the repo root (only gh-pages into a subdir),
+      # so the ./.github/actions/allure-cli composite isn't resolvable here —
+      # the install stays inline. Version pinned to match the composite action.
       - name: Generate aggregated Allure (artifact only)
         if: steps.gate.outputs.publish != 'true'
         shell: bash
         run: |
           set -euo pipefail
           ALLURE_VERSION=2.34.1
-          curl -Ls "https://github.com/allure-framework/allure2/releases/download/${ALLURE_VERSION}/allure-${ALLURE_VERSION}.tgz" \
+          curl --proto "=https" -fsSL \
+            "https://github.com/allure-framework/allure2/releases/download/${ALLURE_VERSION}/allure-${ALLURE_VERSION}.tgz" \
             | tar -xz -C "${RUNNER_TEMP}"
           export PATH="${RUNNER_TEMP}/allure-${ALLURE_VERSION}/bin:$PATH"
-          if [[ -z "$(ls -A allure-results 2>/dev/null)" ]]; then
+          if [ -z "$(find allure-results -mindepth 1 -print -quit 2>/dev/null)" ]; then
             echo "No Allure results staged; skipping." >&2
             exit 0
           fi
