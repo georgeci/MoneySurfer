@@ -178,7 +178,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;                    id = TransactionId(required(TransactionCsvColumn.Id)),
 &nbsp;                    workspaceId = WorkspaceId(required(TransactionCsvColumn.WorkspaceId)),
 &nbsp;                    accountId = AccountId(required(TransactionCsvColumn.AccountId)),
-&nbsp;                    money = Money(long(TransactionCsvColumn.AmountMinor)),
+&nbsp;                    money = Money(amountMinor(TransactionCsvColumn.AmountMinor)),
 &nbsp;                    currencyCode = CurrencyCode(required(TransactionCsvColumn.Currency)),
 &nbsp;                    categoryId = optional(TransactionCsvColumn.CategoryId)?.let(::CategoryId),
 &nbsp;                    note = Csv.unguardFormula(fields[TransactionCsvColumn.Note.ordinal]),
@@ -205,6 +205,19 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;
 &nbsp;        private fun long(column: TransactionCsvColumn): Long =
 &nbsp;            raw(column).toLongOrNull() ?: throw FieldRejectedException(column)
+&nbsp;
+&nbsp;        /**
+&nbsp;         * A monetary minor amount bounded to the domain cap. Rejects crafted
+&nbsp;         * out-of-range values (e.g. [Long.MIN_VALUE], whose abs() would wrap)
+&nbsp;         * before they enter a [Money] and corrupt a cached balance. See #159.
+&nbsp;         */
+&nbsp;        private fun amountMinor(column: TransactionCsvColumn): Long {
+&nbsp;            val value = long(column)
+&nbsp;            if (value &lt; -Money.MAX_MINOR || value &gt; Money.MAX_MINOR) {
+&nbsp;                throw FieldRejectedException(column)
+&nbsp;            }
+&nbsp;            return value
+&nbsp;        }
 &nbsp;
 &nbsp;        private fun instant(column: TransactionCsvColumn): Instant = try {
 &nbsp;            Instant.parse(required(column))
@@ -248,7 +261,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-16 12:42</div>
+    <div style="float:right;">generated on 2026-07-16 19:29</div>
 </div>
 </body>
 </html>

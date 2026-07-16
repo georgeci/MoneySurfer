@@ -1,0 +1,852 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>MoneySurfer Coverage Report > WaveCrest</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.login</a>
+</div>
+
+<h1>Coverage Summary for Class: WaveCrest (com.georgeci.moneysurfer.feature.login)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">WaveCrest</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/78)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.login
+&nbsp;
+&nbsp;import androidx.compose.foundation.Canvas
+&nbsp;import androidx.compose.foundation.background
+&nbsp;import androidx.compose.foundation.clickable
+&nbsp;import androidx.compose.foundation.layout.Arrangement
+&nbsp;import androidx.compose.foundation.layout.Box
+&nbsp;import androidx.compose.foundation.layout.Column
+&nbsp;import androidx.compose.foundation.layout.Row
+&nbsp;import androidx.compose.foundation.layout.Spacer
+&nbsp;import androidx.compose.foundation.layout.fillMaxHeight
+&nbsp;import androidx.compose.foundation.layout.fillMaxSize
+&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
+&nbsp;import androidx.compose.foundation.layout.height
+&nbsp;import androidx.compose.foundation.layout.padding
+&nbsp;import androidx.compose.foundation.layout.size
+&nbsp;import androidx.compose.foundation.layout.width
+&nbsp;import androidx.compose.foundation.layout.widthIn
+&nbsp;import androidx.compose.foundation.shape.CircleShape
+&nbsp;import androidx.compose.foundation.shape.RoundedCornerShape
+&nbsp;import androidx.compose.foundation.text.KeyboardOptions
+&nbsp;import androidx.compose.material3.Button
+&nbsp;import androidx.compose.material3.ButtonDefaults
+&nbsp;import androidx.compose.material3.Card
+&nbsp;import androidx.compose.material3.CardDefaults
+&nbsp;import androidx.compose.material3.Icon
+&nbsp;import androidx.compose.material3.OutlinedButton
+&nbsp;import androidx.compose.material3.OutlinedTextField
+&nbsp;import androidx.compose.material3.OutlinedTextFieldDefaults
+&nbsp;import androidx.compose.material3.Scaffold
+&nbsp;import androidx.compose.material3.Text
+&nbsp;import androidx.compose.material3.TextButton
+&nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.runtime.getValue
+&nbsp;import androidx.compose.ui.Alignment
+&nbsp;import androidx.compose.ui.Modifier
+&nbsp;import androidx.compose.ui.draw.clip
+&nbsp;import androidx.compose.ui.graphics.Brush
+&nbsp;import androidx.compose.ui.graphics.Color
+&nbsp;import androidx.compose.ui.graphics.Path
+&nbsp;import androidx.compose.ui.platform.testTag
+&nbsp;import androidx.compose.ui.semantics.Role
+&nbsp;import androidx.compose.ui.text.font.FontWeight
+&nbsp;import androidx.compose.ui.text.input.ImeAction
+&nbsp;import androidx.compose.ui.text.input.KeyboardType
+&nbsp;import androidx.compose.ui.text.input.PasswordVisualTransformation
+&nbsp;import androidx.compose.ui.text.style.TextAlign
+&nbsp;import androidx.compose.ui.text.style.TextDecoration
+&nbsp;import androidx.compose.ui.tooling.preview.Preview
+&nbsp;import androidx.compose.ui.unit.Dp
+&nbsp;import androidx.compose.ui.unit.dp
+&nbsp;import androidx.compose.ui.unit.sp
+&nbsp;import androidx.lifecycle.compose.collectAsStateWithLifecycle
+&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferFullScreenLoader
+&nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
+&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
+&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
+&nbsp;import com.georgeci.moneysurfer.utils.HandleSideEffect
+&nbsp;import moneysurfer.feature.login.generated.resources.Res
+&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_anonymous
+&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_brand
+&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_demo_mode
+&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_email_label
+&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_error_email_in_use
+&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_error_invalid_credentials
+&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_error_missing_credentials
+&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_error_permission_denied
+&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_error_unknown
+&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_error_weak_password
+&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_hero_subtitle
+&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_hero_title
+&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_or
+&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_password_label
+&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_sheet_subtitle
+&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_sheet_title
+&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_submit_signin
+&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_submit_signup
+&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_terms
+&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_toggle_to_signin
+&nbsp;import moneysurfer.feature.login.generated.resources.sign_in_toggle_to_signup
+&nbsp;import org.jetbrains.compose.resources.stringResource
+&nbsp;import org.koin.compose.viewmodel.koinViewModel
+&nbsp;
+&nbsp;object SignInTestTags {
+&nbsp;    const val Root = &quot;signIn:root&quot;
+&nbsp;    const val BrandHeader = &quot;signIn:brandHeader&quot;
+&nbsp;    const val HeroTitle = &quot;signIn:heroTitle&quot;
+&nbsp;    const val HeroSubtitle = &quot;signIn:heroSubtitle&quot;
+&nbsp;    const val Sheet = &quot;signIn:sheet&quot;
+&nbsp;    const val SheetTitle = &quot;signIn:sheetTitle&quot;
+&nbsp;    const val SheetSubtitle = &quot;signIn:sheetSubtitle&quot;
+&nbsp;    const val EmailField = &quot;signIn:email&quot;
+&nbsp;    const val PasswordField = &quot;signIn:password&quot;
+&nbsp;    const val SubmitButton = &quot;signIn:submit&quot;
+&nbsp;    const val ToggleModeButton = &quot;signIn:toggleMode&quot;
+&nbsp;    const val AnonymousButton = &quot;signIn:anonymous&quot;
+&nbsp;    const val DemoButton = &quot;signIn:demo&quot;
+&nbsp;    const val ErrorText = &quot;signIn:error&quot;
+&nbsp;    const val Loader = &quot;signIn:loader&quot;
+&nbsp;    const val Terms = &quot;signIn:terms&quot;
+&nbsp;}
+&nbsp;
+&nbsp;private object SignInPalette {
+&nbsp;    val GreenTop = Color(0xFF7ED321)
+&nbsp;    val GreenBottom = Color(0xFF5FB011)
+&nbsp;    val Ink = Color(0xFF0F2E12)
+&nbsp;    val OnBrand = Color(0xFFFFFFFF)
+&nbsp;    val OnBrandMuted = Color(0xE6FFFFFF)
+&nbsp;    val Sheet = Color(0xFFFFFFFF)
+&nbsp;    val SheetMuted = Color(0xFF445844)
+&nbsp;    val SheetSubtle = Color(0xFF7A8C7B)
+&nbsp;    val Divider = Color(0xFFD6E4D7)
+&nbsp;    val PrimaryDark = Color(0xFF1B5E20)
+&nbsp;    val WaveBack = Color(0xFF1B5E20)
+&nbsp;    val WaveMid = Color(0xFF2E7D32)
+&nbsp;    val WaveFront = Color(0xFF2E9A3E)
+&nbsp;}
+&nbsp;
+&nbsp;private val SheetCorner: Dp = 28.dp
+&nbsp;private val PrimaryButtonHeight: Dp = 52.dp
+&nbsp;private val WaveBandHeight: Dp = 220.dp
+&nbsp;private val BrandIconSize: Dp = 42.dp
+&nbsp;private const val BrandIconBgAlpha: Float = 0.18f
+&nbsp;private val BrandIconContentSize: Dp = 24.dp
+&nbsp;private val HeroTitleSize = 40.sp
+&nbsp;private val HeroTitleLineHeight = 44.sp
+&nbsp;private val HeroSubtitleMaxWidth: Dp = 320.dp
+&nbsp;private val SheetPadding: Dp = 20.dp
+&nbsp;private val SheetElevation: Dp = 12.dp
+&nbsp;private val SheetTitleSize = 18.sp
+&nbsp;private val FieldCorner: Dp = 14.dp
+&nbsp;private val PasskeyIconSize: Dp = 18.dp
+&nbsp;private val OrLabelSize = 11.sp
+&nbsp;private val PrimaryLabelSize = 15.sp
+&nbsp;private val ContentMaxWidth: Dp = 480.dp
+&nbsp;
+&nbsp;private const val DefaultCp1X: Float = 0.22f
+&nbsp;private const val DefaultCp1Y: Float = -30f
+&nbsp;private const val DefaultCp2X: Float = 0.42f
+&nbsp;private const val DefaultCp2Y: Float = 30f
+&nbsp;private const val DefaultMidX: Float = 0.63f
+&nbsp;private const val DefaultCp3X: Float = 0.78f
+&nbsp;private const val DefaultCp3Y: Float = -25f
+&nbsp;private const val DefaultCp4X: Float = 0.92f
+&nbsp;private const val DefaultCp4Y: Float = 15f
+&nbsp;
+&nbsp;private data class WaveCrest(
+<b class="nc">&nbsp;    val startY: Float,</b>
+<b class="nc">&nbsp;    val midY: Float,</b>
+<b class="nc">&nbsp;    val endY: Float,</b>
+<b class="nc">&nbsp;    val cp1X: Float = DefaultCp1X,</b>
+<b class="nc">&nbsp;    val cp1Y: Float = DefaultCp1Y,</b>
+<b class="nc">&nbsp;    val cp2X: Float = DefaultCp2X,</b>
+<b class="nc">&nbsp;    val cp2Y: Float = DefaultCp2Y,</b>
+<b class="nc">&nbsp;    val midX: Float = DefaultMidX,</b>
+<b class="nc">&nbsp;    val cp3X: Float = DefaultCp3X,</b>
+<b class="nc">&nbsp;    val cp3Y: Float = DefaultCp3Y,</b>
+<b class="nc">&nbsp;    val cp4X: Float = DefaultCp4X,</b>
+<b class="nc">&nbsp;    val cp4Y: Float = DefaultCp4Y,</b>
+&nbsp;)
+&nbsp;
+&nbsp;private val BackCrest = WaveCrest(startY = 0.40f, midY = 0.60f, endY = 0.50f)
+&nbsp;private val MidCrest = WaveCrest(startY = 0.60f, midY = 0.78f, endY = 0.65f)
+&nbsp;private const val BackCrestAlpha: Float = 0.55f
+&nbsp;private const val MidCrestAlpha: Float = 0.85f
+&nbsp;private const val FrontCrestStartY: Float = 0.82f
+&nbsp;private const val FrontCp1X: Float = 0.20f
+&nbsp;private const val FrontCp1Y: Float = 0.74f
+&nbsp;private const val FrontCp2X: Float = 0.45f
+&nbsp;private const val FrontCp2Y: Float = 0.93f
+&nbsp;private const val FrontMidX: Float = 0.66f
+&nbsp;private const val FrontMidY: Float = 0.84f
+&nbsp;private const val FrontCp3X: Float = 0.83f
+&nbsp;private const val FrontCp3Y: Float = 0.76f
+&nbsp;private const val FrontCp4X: Float = 0.95f
+&nbsp;private const val FrontCp4Y: Float = 0.88f
+&nbsp;private const val FrontEndY: Float = 0.82f
+&nbsp;private const val FrontGradientStartY: Float = 0.74f
+&nbsp;private const val FrontGradientAlpha: Float = 0.55f
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun SignInError.localized(): String = stringResource(
+&nbsp;    when (this) {
+&nbsp;        SignInError.MissingCredentials -&gt; Res.string.sign_in_error_missing_credentials
+&nbsp;        SignInError.InvalidCredentials -&gt; Res.string.sign_in_error_invalid_credentials
+&nbsp;        SignInError.EmailAlreadyInUse -&gt; Res.string.sign_in_error_email_in_use
+&nbsp;        SignInError.WeakPassword -&gt; Res.string.sign_in_error_weak_password
+&nbsp;        SignInError.PermissionDenied -&gt; Res.string.sign_in_error_permission_denied
+&nbsp;        SignInError.Unknown -&gt; Res.string.sign_in_error_unknown
+&nbsp;    },
+&nbsp;)
+&nbsp;
+&nbsp;@Composable
+&nbsp;fun SignInScreen(
+&nbsp;    onNavigateToWorkspaceSelector: () -&gt; Unit,
+&nbsp;    onNavigateToLegal: () -&gt; Unit,
+&nbsp;    viewModel: SignInViewModel = koinViewModel(),
+&nbsp;) {
+&nbsp;    val state by viewModel.collectAsStateWithLifecycle()
+&nbsp;
+&nbsp;    viewModel.HandleSideEffect { effect -&gt;
+&nbsp;        when (effect) {
+&nbsp;            SignInEffect.NavigateToWorkspaceSelector -&gt; onNavigateToWorkspaceSelector()
+&nbsp;            SignInEffect.NavigateToLegal -&gt; onNavigateToLegal()
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    SignInContent(
+&nbsp;        state = state,
+&nbsp;        onEvent = viewModel::onEvent,
+&nbsp;    )
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun SignInContent(
+&nbsp;    state: SignInState,
+&nbsp;    onEvent: (SignInEvent) -&gt; Unit,
+&nbsp;) {
+&nbsp;    Scaffold(
+&nbsp;        modifier = Modifier
+&nbsp;            .fillMaxSize()
+&nbsp;            .surferSafeInsets()
+&nbsp;            .surferTestTagAsId()
+&nbsp;            .testTag(SignInTestTags.Root),
+&nbsp;        containerColor = SignInPalette.GreenTop,
+&nbsp;    ) { innerPadding -&gt;
+&nbsp;        Box(
+&nbsp;            modifier = Modifier
+&nbsp;                .fillMaxSize()
+&nbsp;                .padding(innerPadding),
+&nbsp;        ) {
+&nbsp;            SignInBackground(modifier = Modifier.fillMaxSize())
+&nbsp;
+&nbsp;            Column(
+&nbsp;                modifier = Modifier
+&nbsp;                    .align(Alignment.TopCenter)
+&nbsp;                    .fillMaxHeight()
+&nbsp;                    .fillMaxWidth()
+&nbsp;                    .widthIn(max = ContentMaxWidth)
+&nbsp;                    .padding(
+&nbsp;                        start = AppTheme.spacing.default,
+&nbsp;                        end = AppTheme.spacing.default,
+&nbsp;                        top = AppTheme.spacing.xLarge,
+&nbsp;                        bottom = AppTheme.spacing.large,
+&nbsp;                    ),
+&nbsp;            ) {
+&nbsp;                SignInBrandHeader()
+&nbsp;                Spacer(Modifier.height(AppTheme.spacing.xLarge))
+&nbsp;                SignInHero()
+&nbsp;                Spacer(Modifier.weight(1f))
+&nbsp;                Spacer(Modifier.height(AppTheme.spacing.large))
+&nbsp;                SignInActionSheet(state = state, onEvent = onEvent)
+&nbsp;            }
+&nbsp;
+&nbsp;            if (state.isLoading) {
+&nbsp;                SurferFullScreenLoader(
+&nbsp;                    modifier = Modifier
+&nbsp;                        .fillMaxSize()
+&nbsp;                        .testTag(SignInTestTags.Loader),
+&nbsp;                )
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun SignInBackground(modifier: Modifier = Modifier) {
+&nbsp;    Box(
+&nbsp;        modifier = modifier.background(
+&nbsp;            Brush.verticalGradient(
+&nbsp;                colors = listOf(SignInPalette.GreenTop, SignInPalette.GreenBottom),
+&nbsp;            ),
+&nbsp;        ),
+&nbsp;    ) {
+&nbsp;        WaveDecoration(
+&nbsp;            modifier = Modifier
+&nbsp;                .align(Alignment.BottomCenter)
+&nbsp;                .fillMaxWidth()
+&nbsp;                .height(WaveBandHeight),
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun WaveDecoration(modifier: Modifier = Modifier) {
+&nbsp;    Canvas(modifier = modifier) {
+&nbsp;        val w = size.width
+&nbsp;        val h = size.height
+&nbsp;
+&nbsp;        fun crestPath(crest: WaveCrest): Path {
+&nbsp;            val startY = h * crest.startY
+&nbsp;            val midY = h * crest.midY
+&nbsp;            val endY = h * crest.endY
+&nbsp;            return Path().apply {
+&nbsp;                moveTo(0f, startY)
+&nbsp;                cubicTo(
+&nbsp;                    w * crest.cp1X,
+&nbsp;                    startY + crest.cp1Y,
+&nbsp;                    w * crest.cp2X,
+&nbsp;                    midY + crest.cp2Y,
+&nbsp;                    w * crest.midX,
+&nbsp;                    midY,
+&nbsp;                )
+&nbsp;                cubicTo(
+&nbsp;                    w * crest.cp3X,
+&nbsp;                    midY + crest.cp3Y,
+&nbsp;                    w * crest.cp4X,
+&nbsp;                    endY + crest.cp4Y,
+&nbsp;                    w,
+&nbsp;                    endY,
+&nbsp;                )
+&nbsp;                lineTo(w, h)
+&nbsp;                lineTo(0f, h)
+&nbsp;                close()
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        drawPath(
+&nbsp;            path = crestPath(BackCrest),
+&nbsp;            color = SignInPalette.WaveBack,
+&nbsp;            alpha = BackCrestAlpha,
+&nbsp;        )
+&nbsp;        drawPath(
+&nbsp;            path = crestPath(MidCrest),
+&nbsp;            color = SignInPalette.WaveMid,
+&nbsp;            alpha = MidCrestAlpha,
+&nbsp;        )
+&nbsp;        drawPath(
+&nbsp;            path = Path().apply {
+&nbsp;                moveTo(0f, h * FrontCrestStartY)
+&nbsp;                cubicTo(
+&nbsp;                    w * FrontCp1X,
+&nbsp;                    h * FrontCp1Y,
+&nbsp;                    w * FrontCp2X,
+&nbsp;                    h * FrontCp2Y,
+&nbsp;                    w * FrontMidX,
+&nbsp;                    h * FrontMidY,
+&nbsp;                )
+&nbsp;                cubicTo(
+&nbsp;                    w * FrontCp3X,
+&nbsp;                    h * FrontCp3Y,
+&nbsp;                    w * FrontCp4X,
+&nbsp;                    h * FrontCp4Y,
+&nbsp;                    w,
+&nbsp;                    h * FrontEndY,
+&nbsp;                )
+&nbsp;                lineTo(w, h)
+&nbsp;                lineTo(0f, h)
+&nbsp;                close()
+&nbsp;            },
+&nbsp;            brush = Brush.verticalGradient(
+&nbsp;                colors = listOf(
+&nbsp;                    SignInPalette.WaveFront.copy(alpha = 0f),
+&nbsp;                    SignInPalette.WaveFront.copy(alpha = FrontGradientAlpha),
+&nbsp;                ),
+&nbsp;                startY = h * FrontGradientStartY,
+&nbsp;                endY = h,
+&nbsp;            ),
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun SignInBrandHeader(modifier: Modifier = Modifier) {
+&nbsp;    Row(
+&nbsp;        modifier = modifier.testTag(SignInTestTags.BrandHeader),
+&nbsp;        verticalAlignment = Alignment.CenterVertically,
+&nbsp;        horizontalArrangement = Arrangement.spacedBy(AppTheme.spacing.medium),
+&nbsp;    ) {
+&nbsp;        Box(
+&nbsp;            modifier = Modifier
+&nbsp;                .size(BrandIconSize)
+&nbsp;                .clip(CircleShape)
+&nbsp;                .background(Color.White.copy(alpha = BrandIconBgAlpha)),
+&nbsp;            contentAlignment = Alignment.Center,
+&nbsp;        ) {
+&nbsp;            Icon(
+&nbsp;                imageVector = SurferIcons.Wallet,
+&nbsp;                contentDescription = null,
+&nbsp;                tint = SignInPalette.OnBrand,
+&nbsp;                modifier = Modifier.size(BrandIconContentSize),
+&nbsp;            )
+&nbsp;        }
+&nbsp;        Text(
+&nbsp;            text = stringResource(Res.string.sign_in_brand),
+&nbsp;            style = AppTheme.typography.titleLarge,
+&nbsp;            color = SignInPalette.OnBrand,
+&nbsp;            fontWeight = FontWeight.Bold,
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun SignInHero(modifier: Modifier = Modifier) {
+&nbsp;    Column(modifier = modifier) {
+&nbsp;        Text(
+&nbsp;            text = stringResource(Res.string.sign_in_hero_title),
+&nbsp;            color = SignInPalette.OnBrand,
+&nbsp;            fontSize = HeroTitleSize,
+&nbsp;            lineHeight = HeroTitleLineHeight,
+&nbsp;            fontWeight = FontWeight.ExtraBold,
+&nbsp;            modifier = Modifier.testTag(SignInTestTags.HeroTitle),
+&nbsp;        )
+&nbsp;        Spacer(Modifier.height(AppTheme.spacing.default))
+&nbsp;        Text(
+&nbsp;            text = stringResource(Res.string.sign_in_hero_subtitle),
+&nbsp;            color = SignInPalette.OnBrandMuted,
+&nbsp;            style = AppTheme.typography.bodyLarge,
+&nbsp;            modifier = Modifier
+&nbsp;                .widthIn(max = HeroSubtitleMaxWidth)
+&nbsp;                .testTag(SignInTestTags.HeroSubtitle),
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun SignInActionSheet(
+&nbsp;    state: SignInState,
+&nbsp;    onEvent: (SignInEvent) -&gt; Unit,
+&nbsp;) {
+&nbsp;    val config = state.config
+&nbsp;    Card(
+&nbsp;        modifier = Modifier
+&nbsp;            .fillMaxWidth()
+&nbsp;            .testTag(SignInTestTags.Sheet),
+&nbsp;        shape = RoundedCornerShape(SheetCorner),
+&nbsp;        colors = CardDefaults.cardColors(
+&nbsp;            containerColor = SignInPalette.Sheet,
+&nbsp;            contentColor = SignInPalette.Ink,
+&nbsp;        ),
+&nbsp;        elevation = CardDefaults.cardElevation(defaultElevation = SheetElevation),
+&nbsp;    ) {
+&nbsp;        Column(modifier = Modifier.padding(SheetPadding)) {
+&nbsp;            SheetHeader()
+&nbsp;            Spacer(Modifier.height(AppTheme.spacing.default))
+&nbsp;
+&nbsp;            if (config.emailPassword) {
+&nbsp;                EmailPasswordForm(state = state, onEvent = onEvent)
+&nbsp;                Spacer(Modifier.height(AppTheme.spacing.small))
+&nbsp;                if (state.error != null) {
+&nbsp;                    Text(
+&nbsp;                        text = state.error.localized(),
+&nbsp;                        style = AppTheme.typography.bodySmall,
+&nbsp;                        color = AppTheme.materialColors.error,
+&nbsp;                        textAlign = TextAlign.Center,
+&nbsp;                        modifier = Modifier
+&nbsp;                            .fillMaxWidth()
+&nbsp;                            .testTag(SignInTestTags.ErrorText),
+&nbsp;                    )
+&nbsp;                    Spacer(Modifier.height(AppTheme.spacing.small))
+&nbsp;                }
+&nbsp;                PrimaryFilledButton(
+&nbsp;                    text = stringResource(
+&nbsp;                        when (state.mode) {
+&nbsp;                            AuthMode.SignIn -&gt; Res.string.sign_in_submit_signin
+&nbsp;                            AuthMode.SignUp -&gt; Res.string.sign_in_submit_signup
+&nbsp;                        },
+&nbsp;                    ),
+&nbsp;                    onClick = { onEvent(SignInEvent.OnSubmitClick) },
+&nbsp;                    enabled = state.canSubmit,
+&nbsp;                    modifier = Modifier.testTag(SignInTestTags.SubmitButton),
+&nbsp;                )
+&nbsp;                Spacer(Modifier.height(AppTheme.spacing.xSmall))
+&nbsp;                TextButton(
+&nbsp;                    onClick = { onEvent(SignInEvent.OnToggleModeClick) },
+&nbsp;                    enabled = !state.isLoading,
+&nbsp;                    modifier = Modifier
+&nbsp;                        .fillMaxWidth()
+&nbsp;                        .testTag(SignInTestTags.ToggleModeButton),
+&nbsp;                ) {
+&nbsp;                    Text(
+&nbsp;                        text = stringResource(
+&nbsp;                            when (state.mode) {
+&nbsp;                                AuthMode.SignIn -&gt; Res.string.sign_in_toggle_to_signup
+&nbsp;                                AuthMode.SignUp -&gt; Res.string.sign_in_toggle_to_signin
+&nbsp;                            },
+&nbsp;                        ),
+&nbsp;                        color = SignInPalette.PrimaryDark,
+&nbsp;                        fontWeight = FontWeight.SemiBold,
+&nbsp;                    )
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+&nbsp;            if (config.anonymous) {
+&nbsp;                if (config.emailPassword) {
+&nbsp;                    OrDivider()
+&nbsp;                }
+&nbsp;                PasskeyOutlinedButton(
+&nbsp;                    text = stringResource(Res.string.sign_in_anonymous),
+&nbsp;                    onClick = { onEvent(SignInEvent.OnAnonymousLoginClick) },
+&nbsp;                    enabled = !state.isLoading,
+&nbsp;                    modifier = Modifier.testTag(SignInTestTags.AnonymousButton),
+&nbsp;                )
+&nbsp;            }
+&nbsp;
+&nbsp;            if (config.demo) {
+&nbsp;                Spacer(Modifier.height(AppTheme.spacing.small))
+&nbsp;                if (config.demoOnly) {
+&nbsp;                    PrimaryFilledButton(
+&nbsp;                        text = stringResource(Res.string.sign_in_demo_mode),
+&nbsp;                        onClick = { onEvent(SignInEvent.OnLoginClick) },
+&nbsp;                        enabled = !state.isLoading,
+&nbsp;                        modifier = Modifier.testTag(SignInTestTags.DemoButton),
+&nbsp;                    )
+&nbsp;                } else {
+&nbsp;                    TextButton(
+&nbsp;                        onClick = { onEvent(SignInEvent.OnLoginClick) },
+&nbsp;                        enabled = !state.isLoading,
+&nbsp;                        modifier = Modifier
+&nbsp;                            .fillMaxWidth()
+&nbsp;                            .testTag(SignInTestTags.DemoButton),
+&nbsp;                    ) {
+&nbsp;                        Text(
+&nbsp;                            text = stringResource(Res.string.sign_in_demo_mode),
+&nbsp;                            color = SignInPalette.PrimaryDark,
+&nbsp;                            fontWeight = FontWeight.SemiBold,
+&nbsp;                        )
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+&nbsp;            Spacer(Modifier.height(AppTheme.spacing.default))
+&nbsp;            SignInTerms(onClick = { onEvent(SignInEvent.OnTermsClick) })
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun SheetHeader() {
+&nbsp;    Text(
+&nbsp;        text = stringResource(Res.string.sign_in_sheet_title),
+&nbsp;        color = SignInPalette.Ink,
+&nbsp;        fontSize = SheetTitleSize,
+&nbsp;        fontWeight = FontWeight.Bold,
+&nbsp;        modifier = Modifier.testTag(SignInTestTags.SheetTitle),
+&nbsp;    )
+&nbsp;    Spacer(Modifier.height(AppTheme.spacing.xxSmall))
+&nbsp;    Text(
+&nbsp;        text = stringResource(Res.string.sign_in_sheet_subtitle),
+&nbsp;        color = SignInPalette.SheetMuted,
+&nbsp;        style = AppTheme.typography.bodySmall,
+&nbsp;        modifier = Modifier.testTag(SignInTestTags.SheetSubtitle),
+&nbsp;    )
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun EmailPasswordForm(
+&nbsp;    state: SignInState,
+&nbsp;    onEvent: (SignInEvent) -&gt; Unit,
+&nbsp;) {
+&nbsp;    val fieldColors = OutlinedTextFieldDefaults.colors(
+&nbsp;        focusedBorderColor = SignInPalette.PrimaryDark,
+&nbsp;        unfocusedBorderColor = SignInPalette.Divider,
+&nbsp;        focusedLabelColor = SignInPalette.PrimaryDark,
+&nbsp;        unfocusedLabelColor = SignInPalette.SheetSubtle,
+&nbsp;        cursorColor = SignInPalette.PrimaryDark,
+&nbsp;        focusedTextColor = SignInPalette.Ink,
+&nbsp;        unfocusedTextColor = SignInPalette.Ink,
+&nbsp;    )
+&nbsp;    OutlinedTextField(
+&nbsp;        value = state.email,
+&nbsp;        onValueChange = { onEvent(SignInEvent.OnEmailChanged(it)) },
+&nbsp;        label = { Text(stringResource(Res.string.sign_in_email_label)) },
+&nbsp;        singleLine = true,
+&nbsp;        keyboardOptions = KeyboardOptions(
+&nbsp;            keyboardType = KeyboardType.Email,
+&nbsp;            imeAction = ImeAction.Next,
+&nbsp;        ),
+&nbsp;        enabled = !state.isLoading,
+&nbsp;        modifier = Modifier
+&nbsp;            .fillMaxWidth()
+&nbsp;            .testTag(SignInTestTags.EmailField),
+&nbsp;        shape = RoundedCornerShape(FieldCorner),
+&nbsp;        colors = fieldColors,
+&nbsp;    )
+&nbsp;    Spacer(Modifier.height(AppTheme.spacing.small))
+&nbsp;    OutlinedTextField(
+&nbsp;        value = state.password,
+&nbsp;        onValueChange = { onEvent(SignInEvent.OnPasswordChanged(it)) },
+&nbsp;        label = { Text(stringResource(Res.string.sign_in_password_label)) },
+&nbsp;        singleLine = true,
+&nbsp;        keyboardOptions = KeyboardOptions(
+&nbsp;            keyboardType = KeyboardType.Password,
+&nbsp;            imeAction = ImeAction.Done,
+&nbsp;        ),
+&nbsp;        visualTransformation = PasswordVisualTransformation(),
+&nbsp;        enabled = !state.isLoading,
+&nbsp;        modifier = Modifier
+&nbsp;            .fillMaxWidth()
+&nbsp;            .testTag(SignInTestTags.PasswordField),
+&nbsp;        shape = RoundedCornerShape(FieldCorner),
+&nbsp;        colors = fieldColors,
+&nbsp;    )
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun PrimaryFilledButton(
+&nbsp;    text: String,
+&nbsp;    onClick: () -&gt; Unit,
+&nbsp;    enabled: Boolean,
+&nbsp;    modifier: Modifier = Modifier,
+&nbsp;) {
+&nbsp;    Button(
+&nbsp;        onClick = onClick,
+&nbsp;        enabled = enabled,
+&nbsp;        modifier = modifier
+&nbsp;            .fillMaxWidth()
+&nbsp;            .height(PrimaryButtonHeight),
+&nbsp;        shape = RoundedCornerShape(PrimaryButtonHeight / 2),
+&nbsp;        colors = ButtonDefaults.buttonColors(
+&nbsp;            containerColor = SignInPalette.PrimaryDark,
+&nbsp;            contentColor = SignInPalette.OnBrand,
+&nbsp;        ),
+&nbsp;    ) {
+&nbsp;        Text(
+&nbsp;            text = text,
+&nbsp;            fontSize = PrimaryLabelSize,
+&nbsp;            fontWeight = FontWeight.SemiBold,
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun PasskeyOutlinedButton(
+&nbsp;    text: String,
+&nbsp;    onClick: () -&gt; Unit,
+&nbsp;    enabled: Boolean,
+&nbsp;    modifier: Modifier = Modifier,
+&nbsp;) {
+&nbsp;    OutlinedButton(
+&nbsp;        onClick = onClick,
+&nbsp;        enabled = enabled,
+&nbsp;        modifier = modifier
+&nbsp;            .fillMaxWidth()
+&nbsp;            .height(PrimaryButtonHeight),
+&nbsp;        shape = RoundedCornerShape(PrimaryButtonHeight / 2),
+&nbsp;        colors = ButtonDefaults.outlinedButtonColors(
+&nbsp;            contentColor = SignInPalette.PrimaryDark,
+&nbsp;        ),
+&nbsp;    ) {
+&nbsp;        Icon(
+&nbsp;            imageVector = SurferIcons.Fingerprint,
+&nbsp;            contentDescription = null,
+&nbsp;            modifier = Modifier.size(PasskeyIconSize),
+&nbsp;        )
+&nbsp;        Spacer(Modifier.width(AppTheme.spacing.small))
+&nbsp;        Text(
+&nbsp;            text = text,
+&nbsp;            fontSize = PrimaryLabelSize,
+&nbsp;            fontWeight = FontWeight.SemiBold,
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun OrDivider() {
+&nbsp;    Row(
+&nbsp;        modifier = Modifier
+&nbsp;            .fillMaxWidth()
+&nbsp;            .padding(vertical = AppTheme.spacing.small),
+&nbsp;        verticalAlignment = Alignment.CenterVertically,
+&nbsp;    ) {
+&nbsp;        Box(
+&nbsp;            modifier = Modifier
+&nbsp;                .weight(1f)
+&nbsp;                .height(1.dp)
+&nbsp;                .background(SignInPalette.Divider),
+&nbsp;        )
+&nbsp;        Text(
+&nbsp;            text = stringResource(Res.string.sign_in_or).uppercase(),
+&nbsp;            color = SignInPalette.SheetSubtle,
+&nbsp;            fontSize = OrLabelSize,
+&nbsp;            fontWeight = FontWeight.Medium,
+&nbsp;            modifier = Modifier.padding(horizontal = AppTheme.spacing.small),
+&nbsp;        )
+&nbsp;        Box(
+&nbsp;            modifier = Modifier
+&nbsp;                .weight(1f)
+&nbsp;                .height(1.dp)
+&nbsp;                .background(SignInPalette.Divider),
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun SignInTerms(onClick: () -&gt; Unit) {
+&nbsp;    Box(
+&nbsp;        modifier = Modifier.fillMaxWidth(),
+&nbsp;        contentAlignment = Alignment.Center,
+&nbsp;    ) {
+&nbsp;        Text(
+&nbsp;            text = stringResource(Res.string.sign_in_terms),
+&nbsp;            style = AppTheme.typography.bodySmall,
+&nbsp;            color = SignInPalette.PrimaryDark,
+&nbsp;            textAlign = TextAlign.Center,
+&nbsp;            textDecoration = TextDecoration.Underline,
+&nbsp;            modifier = Modifier
+&nbsp;                .clickable(role = Role.Button, onClick = onClick)
+&nbsp;                .testTag(SignInTestTags.Terms),
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Preview
+&nbsp;@Composable
+&nbsp;private fun SignInScreenPreview() {
+&nbsp;    AppTheme {
+&nbsp;        SignInContent(
+&nbsp;            state = SignInState(),
+&nbsp;            onEvent = {},
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Preview
+&nbsp;@Composable
+&nbsp;private fun SignInScreenDemoOnlyPreview() {
+&nbsp;    AppTheme {
+&nbsp;        SignInContent(
+&nbsp;            state = SignInState(
+&nbsp;                config = SignInFeatureConfig(
+&nbsp;                    emailPassword = false,
+&nbsp;                    anonymous = false,
+&nbsp;                    demo = true,
+&nbsp;                ),
+&nbsp;            ),
+&nbsp;            onEvent = {},
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-07-16 19:29</div>
+</div>
+</body>
+</html>

@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SurferSwipeRevealRowKt</title>
+  <title>MoneySurfer Coverage Report > SurferTotalBalanceCardKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,15 +19,18 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.uikit.components.base</a>
+    <a href="../index.html">com.georgeci.moneysurfer.uikit.components.account</a>
 </div>
 
-<h1>Coverage Summary for Class: SurferSwipeRevealRowKt (com.georgeci.moneysurfer.uikit.components.base)</h1>
+<h1>Coverage Summary for Class: SurferTotalBalanceCardKt (com.georgeci.moneysurfer.uikit.components.account)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -46,7 +49,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SurferSwipeRevealRowKt</td>
+  <td class="name">SurferTotalBalanceCardKt</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
 <td class="coverageStat">
   <span class="percent">
     0%
@@ -60,7 +71,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/30)
+    (0/22)
   </span>
 </td>
 <td class="coverageStat">
@@ -68,7 +79,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/67)
+    (0/77)
   </span>
 </td>
 <td class="coverageStat">
@@ -76,108 +87,11 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/884)
+    (0/815)
   </span>
 </td>
 </tr>
-  <tr>
-    <td class="name">SurferSwipeRevealRowKt$SurferSwipeRevealRow$3$1$1</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/25)
-  </span>
-</td>
-  </tr>
-  <tr>
-    <td class="name">SurferSwipeRevealRowKt$SurferSwipeRevealRow$4$1</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/2)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/2)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/39)
-  </span>
-</td>
-  </tr>
-<tr>
-  <td class="name"><strong>Total</strong></td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/8)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/32)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/70)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/948)
-  </span>
-</td>
-</tr>
+
 </table>
 
 <br/>
@@ -185,191 +99,168 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.components.base
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.components.account
 &nbsp;
-&nbsp;import androidx.compose.animation.core.Animatable
 &nbsp;import androidx.compose.foundation.background
-&nbsp;import androidx.compose.foundation.clickable
-&nbsp;import androidx.compose.foundation.gestures.Orientation
-&nbsp;import androidx.compose.foundation.gestures.draggable
-&nbsp;import androidx.compose.foundation.gestures.rememberDraggableState
 &nbsp;import androidx.compose.foundation.layout.Arrangement
 &nbsp;import androidx.compose.foundation.layout.Box
 &nbsp;import androidx.compose.foundation.layout.Column
+&nbsp;import androidx.compose.foundation.layout.ExperimentalLayoutApi
+&nbsp;import androidx.compose.foundation.layout.FlowRow
 &nbsp;import androidx.compose.foundation.layout.Row
-&nbsp;import androidx.compose.foundation.layout.RowScope
-&nbsp;import androidx.compose.foundation.layout.fillMaxHeight
+&nbsp;import androidx.compose.foundation.layout.Spacer
+&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
+&nbsp;import androidx.compose.foundation.layout.height
 &nbsp;import androidx.compose.foundation.layout.padding
 &nbsp;import androidx.compose.foundation.layout.size
 &nbsp;import androidx.compose.foundation.layout.width
-&nbsp;import androidx.compose.foundation.shape.RoundedCornerShape
-&nbsp;import androidx.compose.material3.Icon
+&nbsp;import androidx.compose.foundation.shape.CircleShape
 &nbsp;import androidx.compose.material3.Text
 &nbsp;import androidx.compose.runtime.Composable
-&nbsp;import androidx.compose.runtime.remember
-&nbsp;import androidx.compose.runtime.rememberCoroutineScope
 &nbsp;import androidx.compose.ui.Alignment
 &nbsp;import androidx.compose.ui.Modifier
 &nbsp;import androidx.compose.ui.draw.clip
 &nbsp;import androidx.compose.ui.graphics.Color
-&nbsp;import androidx.compose.ui.graphics.vector.ImageVector
-&nbsp;import androidx.compose.ui.layout.layout
-&nbsp;import androidx.compose.ui.platform.LocalDensity
 &nbsp;import androidx.compose.ui.tooling.preview.Preview
-&nbsp;import androidx.compose.ui.unit.Dp
 &nbsp;import androidx.compose.ui.unit.dp
-&nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+&nbsp;import com.georgeci.moneysurfer.uikit.atom.SurferCard
+&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferSplitAmount
+&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferSplitAmountTier
 &nbsp;import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
 &nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
-&nbsp;import kotlinx.coroutines.launch
-&nbsp;import kotlin.math.roundToInt
 &nbsp;
 &nbsp;/**
-&nbsp; * Wraps a list-row style [content] with a horizontally-swipeable foreground that reveals an
-&nbsp; * [actions] layer pinned to the trailing edge. Used on the manage-accounts screen so each
-&nbsp; * account row can hide its destructive affordances behind a swipe.
-&nbsp; *
-&nbsp; * - [revealWidth] is the total horizontal travel — sized to fit the [actions] row&#39;s intrinsic
-&nbsp; *   width (e.g. two 72dp action buttons + 6dp gaps + 6dp padding ≈ 156dp).
-&nbsp; * - When [enabled] is false the wrapper short-circuits to plain [content] with no gesture and
-&nbsp; *   no action layer — useful while a list is in edit mode and swipe should be suppressed.
+&nbsp; * Aggregate &quot;total balance&quot; card for the manage-accounts screen. Shows a small label, an optional
+&nbsp; * period descriptor on the right (e.g. &quot;EUR · April&quot;), the hero amount, and a row of count chips
+&nbsp; * underneath. The active chip uses secondaryContainer; the optional archived chip uses
+&nbsp; * surfaceContainerHigh so archived counts read as muted.
 &nbsp; */
+&nbsp;@OptIn(ExperimentalLayoutApi::class)
 &nbsp;@Composable
-&nbsp;fun SurferSwipeRevealRow(
-&nbsp;    revealWidth: Dp,
+&nbsp;fun SurferTotalBalanceCard(
+&nbsp;    label: String,
+&nbsp;    formattedTotal: String?,
+&nbsp;    activeChipText: String,
 <b class="nc">&nbsp;    modifier: Modifier = Modifier,</b>
-<b class="nc">&nbsp;    enabled: Boolean = true,</b>
-&nbsp;    actions: @Composable RowScope.() -&gt; Unit,
-&nbsp;    content: @Composable () -&gt; Unit,
+<b class="nc">&nbsp;    archivedChipText: String? = null,</b>
+<b class="nc">&nbsp;    periodLabel: String? = null,</b>
 <b class="nc">&nbsp;) {</b>
-<b class="nc">&nbsp;    if (!enabled) {</b>
-<b class="nc">&nbsp;        Box(modifier = modifier) { content() }</b>
-&nbsp;        return
-<b class="nc">&nbsp;    }</b>
+<b class="nc">&nbsp;    SurferCard(modifier = modifier.fillMaxWidth()) {</b>
+<b class="nc">&nbsp;        Column {</b>
+<b class="nc">&nbsp;            Row(</b>
+<b class="nc">&nbsp;                modifier = Modifier.fillMaxWidth(),</b>
+<b class="nc">&nbsp;                verticalAlignment = Alignment.CenterVertically,</b>
+<b class="nc">&nbsp;                horizontalArrangement = Arrangement.SpaceBetween,</b>
+&nbsp;            ) {
+<b class="nc">&nbsp;                Text(</b>
+<b class="nc">&nbsp;                    text = label.uppercase(),</b>
+<b class="nc">&nbsp;                    style = AppTheme.typography.labelSmall,</b>
+<b class="nc">&nbsp;                    color = AppTheme.materialColors.onSurfaceVariant,</b>
+&nbsp;                )
+<b class="nc">&nbsp;                if (periodLabel != null) {</b>
+<b class="nc">&nbsp;                    Text(</b>
+<b class="nc">&nbsp;                        text = periodLabel,</b>
+<b class="nc">&nbsp;                        style = AppTheme.typography.labelSmall,</b>
+<b class="nc">&nbsp;                        color = AppTheme.materialColors.onSurfaceVariant,</b>
+&nbsp;                    )
+<b class="nc">&nbsp;                }</b>
+<b class="nc">&nbsp;            }</b>
 &nbsp;
-<b class="nc">&nbsp;    val density = LocalDensity.current</b>
-<b class="nc">&nbsp;    val revealPx = with(density) { revealWidth.toPx() }</b>
-<b class="nc">&nbsp;    val offset = remember { Animatable(0f) }</b>
-<b class="nc">&nbsp;    val scope = rememberCoroutineScope()</b>
+<b class="nc">&nbsp;            Spacer(Modifier.height(6.dp))</b>
+<b class="nc">&nbsp;            if (formattedTotal != null) {</b>
+<b class="nc">&nbsp;                SurferSplitAmount(</b>
+<b class="nc">&nbsp;                    formattedAmount = formattedTotal,</b>
+<b class="nc">&nbsp;                    tier = SurferSplitAmountTier.Hero,</b>
+<b class="nc">&nbsp;                    color = AppTheme.materialColors.onSurface,</b>
+<b class="nc">&nbsp;                    signAlpha = 0.55f,</b>
+<b class="nc">&nbsp;                    fractionAlpha = 0.5f,</b>
+&nbsp;                )
+&nbsp;            } else {
+<b class="nc">&nbsp;                Text(</b>
+<b class="nc">&nbsp;                    text = &quot;—&quot;,</b>
+<b class="nc">&nbsp;                    style = AppTheme.typography.headlineLarge,</b>
+<b class="nc">&nbsp;                    color = AppTheme.materialColors.onSurface,</b>
+&nbsp;                )
+&nbsp;            }
 &nbsp;
-<b class="nc">&nbsp;    Box(</b>
-<b class="nc">&nbsp;        modifier = modifier.draggable(</b>
-<b class="nc">&nbsp;            orientation = Orientation.Horizontal,</b>
-<b class="nc">&nbsp;            state = rememberDraggableState { delta -&gt;</b>
-<b class="nc">&nbsp;                scope.launch {</b>
-<b class="nc">&nbsp;                    offset.snapTo((offset.value + delta).coerceIn(-revealPx, 0f))</b>
-&nbsp;                }
-&nbsp;            },
-<b class="nc">&nbsp;            onDragStopped = {</b>
-<b class="nc">&nbsp;                val target = if (offset.value &lt; -revealPx / 2f) -revealPx else 0f</b>
-<b class="nc">&nbsp;                offset.animateTo(target)</b>
-&nbsp;            },
-&nbsp;        ),
-&nbsp;    ) {
-<b class="nc">&nbsp;        Row(</b>
-<b class="nc">&nbsp;            modifier = Modifier</b>
-<b class="nc">&nbsp;                .matchParentSize()</b>
-<b class="nc">&nbsp;                .padding(6.dp),</b>
-<b class="nc">&nbsp;            horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.End),</b>
-<b class="nc">&nbsp;            verticalAlignment = Alignment.CenterVertically,</b>
-&nbsp;            content = actions,
-&nbsp;        )
-<b class="nc">&nbsp;        Box(</b>
-<b class="nc">&nbsp;            modifier = Modifier.layout { measurable, constraints -&gt;</b>
-<b class="nc">&nbsp;                val placeable = measurable.measure(constraints)</b>
-<b class="nc">&nbsp;                layout(placeable.width, placeable.height) {</b>
-<b class="nc">&nbsp;                    placeable.placeRelative(offset.value.roundToInt(), 0)</b>
-&nbsp;                }
-&nbsp;            },
-&nbsp;        ) {
-<b class="nc">&nbsp;            content()</b>
+<b class="nc">&nbsp;            Spacer(Modifier.height(14.dp))</b>
+<b class="nc">&nbsp;            FlowRow(</b>
+<b class="nc">&nbsp;                horizontalArrangement = Arrangement.spacedBy(8.dp),</b>
+<b class="nc">&nbsp;                verticalArrangement = Arrangement.spacedBy(8.dp),</b>
+<b class="nc">&nbsp;            ) {</b>
+<b class="nc">&nbsp;                CountChip(</b>
+<b class="nc">&nbsp;                    text = activeChipText,</b>
+<b class="nc">&nbsp;                    background = AppTheme.materialColors.secondaryContainer,</b>
+<b class="nc">&nbsp;                    contentColor = AppTheme.materialColors.onSecondaryContainer,</b>
+<b class="nc">&nbsp;                    dotAlpha = 0.7f,</b>
+&nbsp;                )
+<b class="nc">&nbsp;                if (archivedChipText != null) {</b>
+<b class="nc">&nbsp;                    CountChip(</b>
+<b class="nc">&nbsp;                        text = archivedChipText,</b>
+<b class="nc">&nbsp;                        background = AppTheme.materialColors.surfaceContainerHigh,</b>
+<b class="nc">&nbsp;                        contentColor = AppTheme.materialColors.onSurfaceVariant,</b>
+<b class="nc">&nbsp;                        dotAlpha = 0.55f,</b>
+&nbsp;                    )
+<b class="nc">&nbsp;                }</b>
+&nbsp;            }
 <b class="nc">&nbsp;        }</b>
-<b class="nc">&nbsp;    }</b>
+&nbsp;    }
 <b class="nc">&nbsp;}</b>
 &nbsp;
-&nbsp;/**
-&nbsp; * Standard trailing action used inside [SurferSwipeRevealRow.actions]. Stacks an icon over a
-&nbsp; * label, sized to the swipe-reveal track. Pass [destructive] = true for the delete-style action
-&nbsp; * (uses the error tonal pair).
-&nbsp; */
 &nbsp;@Composable
-&nbsp;fun SurferSwipeAction(
-&nbsp;    icon: ImageVector,
-&nbsp;    label: String,
-&nbsp;    onClick: () -&gt; Unit,
-<b class="nc">&nbsp;    modifier: Modifier = Modifier,</b>
-<b class="nc">&nbsp;    destructive: Boolean = false,</b>
-<b class="nc">&nbsp;    width: Dp = 72.dp,</b>
+&nbsp;private fun CountChip(
+&nbsp;    text: String,
+&nbsp;    background: Color,
+&nbsp;    contentColor: Color,
+&nbsp;    dotAlpha: Float,
 <b class="nc">&nbsp;) {</b>
-<b class="nc">&nbsp;    val bg = if (destructive) {</b>
-<b class="nc">&nbsp;        AppTheme.materialColors.error</b>
-<b class="nc">&nbsp;    } else {</b>
-<b class="nc">&nbsp;        AppTheme.materialColors.surfaceContainerHighest</b>
-&nbsp;    }
-<b class="nc">&nbsp;    val fg = if (destructive) {</b>
-<b class="nc">&nbsp;        AppTheme.materialColors.onError</b>
-<b class="nc">&nbsp;    } else {</b>
-<b class="nc">&nbsp;        AppTheme.materialColors.onSurface</b>
-&nbsp;    }
-<b class="nc">&nbsp;    Column(</b>
-<b class="nc">&nbsp;        modifier = modifier</b>
-<b class="nc">&nbsp;            .width(width)</b>
-<b class="nc">&nbsp;            .fillMaxHeight()</b>
-<b class="nc">&nbsp;            .clip(RoundedCornerShape(12.dp))</b>
-<b class="nc">&nbsp;            .background(bg)</b>
-<b class="nc">&nbsp;            .clickable(onClick = onClick)</b>
-<b class="nc">&nbsp;            .padding(vertical = 8.dp),</b>
-<b class="nc">&nbsp;        horizontalAlignment = Alignment.CenterHorizontally,</b>
-<b class="nc">&nbsp;        verticalArrangement = Arrangement.Center,</b>
+<b class="nc">&nbsp;    Row(</b>
+<b class="nc">&nbsp;        modifier = Modifier</b>
+<b class="nc">&nbsp;            .clip(CircleShape)</b>
+<b class="nc">&nbsp;            .background(background)</b>
+<b class="nc">&nbsp;            .padding(horizontal = 10.dp, vertical = 6.dp),</b>
+<b class="nc">&nbsp;        verticalAlignment = Alignment.CenterVertically,</b>
 &nbsp;    ) {
-<b class="nc">&nbsp;        Icon(</b>
-<b class="nc">&nbsp;            imageVector = icon,</b>
-<b class="nc">&nbsp;            contentDescription = null,</b>
-<b class="nc">&nbsp;            tint = fg,</b>
-<b class="nc">&nbsp;            modifier = Modifier.size(20.dp),</b>
+<b class="nc">&nbsp;        Box(</b>
+<b class="nc">&nbsp;            modifier = Modifier</b>
+<b class="nc">&nbsp;                .size(6.dp)</b>
+<b class="nc">&nbsp;                .clip(CircleShape)</b>
+<b class="nc">&nbsp;                .background(contentColor.copy(alpha = dotAlpha)),</b>
 &nbsp;        )
+<b class="nc">&nbsp;        Spacer(Modifier.width(6.dp))</b>
 <b class="nc">&nbsp;        Text(</b>
-<b class="nc">&nbsp;            text = label,</b>
+<b class="nc">&nbsp;            text = text,</b>
 <b class="nc">&nbsp;            style = AppTheme.typography.labelMedium,</b>
-<b class="nc">&nbsp;            color = fg,</b>
+<b class="nc">&nbsp;            color = contentColor,</b>
 &nbsp;        )
 <b class="nc">&nbsp;    }</b>
 <b class="nc">&nbsp;}</b>
 &nbsp;
 &nbsp;@Preview
 &nbsp;@Composable
-<b class="nc">&nbsp;private fun SurferSwipeRevealRowPreview() {</b>
+<b class="nc">&nbsp;private fun SurferTotalBalanceCardPreview() {</b>
 <b class="nc">&nbsp;    SurferComponentPreview {</b>
-&nbsp;        SurferSwipeRevealRow(
-&nbsp;            revealWidth = 156.dp,
+&nbsp;        SurferTotalBalanceCard(
+&nbsp;            label = &quot;Total balance&quot;,
+&nbsp;            formattedTotal = &quot;€11,575.32&quot;,
+&nbsp;            activeChipText = &quot;3 active&quot;,
+&nbsp;            archivedChipText = &quot;1 archived&quot;,
+&nbsp;            periodLabel = &quot;EUR · April&quot;,
 &nbsp;            modifier = Modifier.padding(16.dp),
-&nbsp;            actions = {
-&nbsp;                SurferSwipeAction(
-&nbsp;                    icon = SurferIcons.Archive,
-&nbsp;                    label = &quot;Archive&quot;,
-&nbsp;                    onClick = {},
-&nbsp;                )
-&nbsp;                SurferSwipeAction(
-&nbsp;                    icon = SurferIcons.Delete,
-&nbsp;                    label = &quot;Delete&quot;,
-&nbsp;                    onClick = {},
-&nbsp;                    destructive = true,
-&nbsp;                )
-&nbsp;            },
-&nbsp;        ) {
-&nbsp;            Box(
-&nbsp;                modifier = Modifier
-&nbsp;                    .clip(RoundedCornerShape(18.dp))
-&nbsp;                    .background(AppTheme.materialColors.surfaceContainerLow)
-&nbsp;                    .padding(16.dp),
-&nbsp;            ) {
-&nbsp;                Text(
-&nbsp;                    text = &quot;Drag me left&quot;,
-&nbsp;                    style = AppTheme.typography.bodyLarge,
-&nbsp;                    color = Color.Unspecified,
-&nbsp;                )
-&nbsp;            }
-&nbsp;        }
+&nbsp;        )
+&nbsp;    }
+<b class="nc">&nbsp;}</b>
+&nbsp;
+&nbsp;@Preview
+&nbsp;@Composable
+<b class="nc">&nbsp;private fun SurferTotalBalanceCardEmptyPreview() {</b>
+<b class="nc">&nbsp;    SurferComponentPreview {</b>
+&nbsp;        SurferTotalBalanceCard(
+&nbsp;            label = &quot;Total balance&quot;,
+&nbsp;            formattedTotal = null,
+&nbsp;            activeChipText = &quot;0 active&quot;,
+&nbsp;            modifier = Modifier.padding(16.dp),
+&nbsp;        )
 &nbsp;    }
 <b class="nc">&nbsp;}</b>
 </code>
@@ -395,7 +286,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-16 12:42</div>
+    <div style="float:right;">generated on 2026-07-16 19:29</div>
 </div>
 </body>
 </html>

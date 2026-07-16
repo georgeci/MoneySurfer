@@ -87,7 +87,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (9/9)
+    (10/10)
   </span>
 </td>
 <td class="coverageStat">
@@ -95,7 +95,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (16/16)
+    (20/20)
   </span>
 </td>
 <td class="coverageStat">
@@ -103,7 +103,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (28/28)
+    (32/32)
   </span>
 </td>
 <td class="coverageStat">
@@ -111,7 +111,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (297/297)
+    (315/315)
   </span>
 </td>
   </tr>
@@ -147,10 +147,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
-    92.9%
+    93.3%
   </span>
   <span class="absValue">
-    (13/14)
+    (14/15)
   </span>
 </td>
 <td class="coverageStat">
@@ -158,7 +158,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (26/26)
+    (30/30)
   </span>
 </td>
 <td class="coverageStat">
@@ -166,7 +166,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (51/51)
+    (55/55)
   </span>
 </td>
 <td class="coverageStat">
@@ -174,7 +174,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (443/443)
+    (461/461)
   </span>
 </td>
 </tr>
@@ -271,7 +271,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;                    id = TransactionId(required(TransactionCsvColumn.Id)),</b>
 <b class="fc">&nbsp;                    workspaceId = WorkspaceId(required(TransactionCsvColumn.WorkspaceId)),</b>
 <b class="fc">&nbsp;                    accountId = AccountId(required(TransactionCsvColumn.AccountId)),</b>
-<b class="fc">&nbsp;                    money = Money(long(TransactionCsvColumn.AmountMinor)),</b>
+<b class="fc">&nbsp;                    money = Money(amountMinor(TransactionCsvColumn.AmountMinor)),</b>
 <b class="fc">&nbsp;                    currencyCode = CurrencyCode(required(TransactionCsvColumn.Currency)),</b>
 <b class="fc">&nbsp;                    categoryId = optional(TransactionCsvColumn.CategoryId)?.let(::CategoryId),</b>
 <b class="fc">&nbsp;                    note = Csv.unguardFormula(fields[TransactionCsvColumn.Note.ordinal]),</b>
@@ -298,6 +298,19 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;
 &nbsp;        private fun long(column: TransactionCsvColumn): Long =
 <b class="fc">&nbsp;            raw(column).toLongOrNull() ?: throw FieldRejectedException(column)</b>
+&nbsp;
+&nbsp;        /**
+&nbsp;         * A monetary minor amount bounded to the domain cap. Rejects crafted
+&nbsp;         * out-of-range values (e.g. [Long.MIN_VALUE], whose abs() would wrap)
+&nbsp;         * before they enter a [Money] and corrupt a cached balance. See #159.
+&nbsp;         */
+&nbsp;        private fun amountMinor(column: TransactionCsvColumn): Long {
+<b class="fc">&nbsp;            val value = long(column)</b>
+<b class="fc">&nbsp;            if (value &lt; -Money.MAX_MINOR || value &gt; Money.MAX_MINOR) {</b>
+<b class="fc">&nbsp;                throw FieldRejectedException(column)</b>
+&nbsp;            }
+<b class="fc">&nbsp;            return value</b>
+&nbsp;        }
 &nbsp;
 &nbsp;        private fun instant(column: TransactionCsvColumn): Instant = try {
 <b class="fc">&nbsp;            Instant.parse(required(column))</b>
@@ -341,7 +354,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-16 12:42</div>
+    <div style="float:right;">generated on 2026-07-16 19:29</div>
 </div>
 </body>
 </html>

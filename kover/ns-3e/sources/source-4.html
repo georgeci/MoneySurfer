@@ -1,0 +1,215 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>MoneySurfer Coverage Report > SurferInviteRowKt</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.georgeci.moneysurfer.uikit.components.workspace</a>
+</div>
+
+<h1>Coverage Summary for Class: SurferInviteRowKt (com.georgeci.moneysurfer.uikit.components.workspace)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">SurferInviteRowKt</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/36)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/376)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.components.workspace
+&nbsp;
+&nbsp;import androidx.compose.foundation.background
+&nbsp;import androidx.compose.foundation.layout.Arrangement
+&nbsp;import androidx.compose.foundation.layout.Box
+&nbsp;import androidx.compose.foundation.layout.Column
+&nbsp;import androidx.compose.foundation.layout.Row
+&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
+&nbsp;import androidx.compose.foundation.layout.padding
+&nbsp;import androidx.compose.foundation.layout.size
+&nbsp;import androidx.compose.foundation.shape.CircleShape
+&nbsp;import androidx.compose.material3.Icon
+&nbsp;import androidx.compose.material3.Text
+&nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.ui.Alignment
+&nbsp;import androidx.compose.ui.Modifier
+&nbsp;import androidx.compose.ui.draw.clip
+&nbsp;import androidx.compose.ui.tooling.preview.Preview
+&nbsp;import androidx.compose.ui.unit.dp
+&nbsp;import com.georgeci.moneysurfer.uikit.atom.SurferActionCard
+&nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+&nbsp;import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
+&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
+&nbsp;
+&nbsp;/**
+&nbsp; * Dashed-outline &quot;Invite people&quot; CTA. Primary-container avatar with a plus, title + subtitle,
+&nbsp; * whole row is the tap target. Backed by [SurferActionCard] so it reads as an &quot;add&quot; action
+&nbsp; * (distinct from selectable [SurferCard] rows). Used inside the Members bottom sheet and
+&nbsp; * similar invite flows.
+&nbsp; */
+&nbsp;@Composable
+&nbsp;fun SurferInviteRow(
+&nbsp;    title: String,
+&nbsp;    subtitle: String,
+&nbsp;    onClick: () -&gt; Unit,
+<b class="nc">&nbsp;    modifier: Modifier = Modifier,</b>
+<b class="nc">&nbsp;) {</b>
+<b class="nc">&nbsp;    SurferActionCard(</b>
+<b class="nc">&nbsp;        modifier = modifier.fillMaxWidth(),</b>
+<b class="nc">&nbsp;        onClick = onClick,</b>
+<b class="nc">&nbsp;    ) {</b>
+<b class="nc">&nbsp;        Row(</b>
+<b class="nc">&nbsp;            verticalAlignment = Alignment.CenterVertically,</b>
+<b class="nc">&nbsp;            horizontalArrangement = Arrangement.spacedBy(AppTheme.spacing.medium),</b>
+&nbsp;        ) {
+<b class="nc">&nbsp;            Box(</b>
+<b class="nc">&nbsp;                modifier = Modifier</b>
+<b class="nc">&nbsp;                    .size(40.dp)</b>
+<b class="nc">&nbsp;                    .clip(CircleShape)</b>
+<b class="nc">&nbsp;                    .background(AppTheme.materialColors.primaryContainer),</b>
+<b class="nc">&nbsp;                contentAlignment = Alignment.Center,</b>
+&nbsp;            ) {
+<b class="nc">&nbsp;                Icon(</b>
+<b class="nc">&nbsp;                    imageVector = SurferIcons.Add,</b>
+<b class="nc">&nbsp;                    contentDescription = null,</b>
+<b class="nc">&nbsp;                    tint = AppTheme.materialColors.onPrimaryContainer,</b>
+<b class="nc">&nbsp;                    modifier = Modifier.size(20.dp),</b>
+&nbsp;                )
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            Column(Modifier.weight(1f)) {</b>
+<b class="nc">&nbsp;                Text(</b>
+<b class="nc">&nbsp;                    text = title,</b>
+<b class="nc">&nbsp;                    style = AppTheme.typography.titleSmall,</b>
+<b class="nc">&nbsp;                    color = AppTheme.materialColors.onSurface,</b>
+&nbsp;                )
+<b class="nc">&nbsp;                Text(</b>
+<b class="nc">&nbsp;                    text = subtitle,</b>
+<b class="nc">&nbsp;                    style = AppTheme.typography.bodySmall,</b>
+<b class="nc">&nbsp;                    color = AppTheme.materialColors.onSurfaceVariant,</b>
+&nbsp;                )
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+<b class="nc">&nbsp;}</b>
+&nbsp;
+&nbsp;@Preview
+&nbsp;@Composable
+<b class="nc">&nbsp;private fun SurferInviteRowPreview() {</b>
+<b class="nc">&nbsp;    SurferComponentPreview {</b>
+&nbsp;        SurferInviteRow(
+&nbsp;            modifier = Modifier.padding(16.dp),
+&nbsp;            title = &quot;Invite people&quot;,
+&nbsp;            subtitle = &quot;Share a link or send an email&quot;,
+&nbsp;            onClick = {},
+&nbsp;        )
+&nbsp;    }
+<b class="nc">&nbsp;}</b>
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-07-16 19:29</div>
+</div>
+</body>
+</html>

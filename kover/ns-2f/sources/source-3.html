@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > RemoteDocument</title>
+  <title>MoneySurfer Coverage Report > NetworkMonitor</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.sync.plugin</a>
+    <a href="../index.html">com.georgeci.moneysurfer.sync.network</a>
 </div>
 
-<h1>Coverage Summary for Class: RemoteDocument (com.georgeci.moneysurfer.sync.plugin)</h1>
+<h1>Coverage Summary for Class: NetworkMonitor (com.georgeci.moneysurfer.sync.network)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">RemoteDocument</td>
+  <td class="name">NetworkMonitor</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -44,14 +44,21 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.sync.plugin
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.sync.network
 &nbsp;
-&nbsp;import kotlinx.serialization.DeserializationStrategy
+&nbsp;import kotlinx.coroutines.flow.StateFlow
 &nbsp;
-&nbsp;interface RemoteDocument {
-&nbsp;    val id: String
-&nbsp;    fun &lt;T&gt; decode(deserializer: DeserializationStrategy&lt;T&gt;): T
-&nbsp;    fun getLong(field: String): Long?
+&nbsp;/**
+&nbsp; * Reports whether the device currently has network connectivity.
+&nbsp; *
+&nbsp; * Platform implementations live in `:data` (Android `ConnectivityManager`,
+&nbsp; * iOS `NWPathMonitor`, desktop stub). Phase 0 ships only the interface;
+&nbsp; * tests use an in-memory fake.
+&nbsp; *
+&nbsp; * See SyncCoordinatorFAQ.md №9.
+&nbsp; */
+&nbsp;interface NetworkMonitor {
+&nbsp;    val online: StateFlow&lt;Boolean&gt;
 &nbsp;}
 </code>
 </pre>
@@ -76,7 +83,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-16 12:42</div>
+    <div style="float:right;">generated on 2026-07-16 19:29</div>
 </div>
 </body>
 </html>

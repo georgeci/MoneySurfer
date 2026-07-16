@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > OutboxEnqueuerImpl</title>
+  <title>MoneySurfer Coverage Report > SyncHandleImpl</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,15 +19,18 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.sync.repository</a>
+    <a href="../index.html">com.georgeci.moneysurfer.sync.internal.coordinator</a>
 </div>
 
-<h1>Coverage Summary for Class: OutboxEnqueuerImpl (com.georgeci.moneysurfer.sync.repository)</h1>
+<h1>Coverage Summary for Class: SyncHandleImpl (com.georgeci.moneysurfer.sync.internal.coordinator)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -46,13 +49,13 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">OutboxEnqueuerImpl</td>
+  <td class="name">SyncHandleImpl</td>
 <td class="coverageStat">
   <span class="percent">
     100%
   </span>
   <span class="absValue">
-    (5/5)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
@@ -60,7 +63,16 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (12/12)
+    (2/2)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (7/7)
   </span>
 </td>
 <td class="coverageStat">
@@ -68,65 +80,11 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (22/22)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (178/178)
+    (29/29)
   </span>
 </td>
 </tr>
-  <tr>
-    <td class="name">OutboxEnqueuerImpl$enqueueDelete$1</td>
-    <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">OutboxEnqueuerImpl$enqueueUpsert$1</td>
-    <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">OutboxEnqueuerImpl$isEnabled$1</td>
-    <td class="coverageStat"/>
-  </tr>
-<tr>
-  <td class="name"><strong>Total</strong></td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (5/5)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (12/12)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (22/22)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (178/178)
-  </span>
-</td>
-</tr>
+
 </table>
 
 <br/>
@@ -134,84 +92,28 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.sync.repository
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.sync.internal.coordinator
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.auth.SessionPointers
-&nbsp;import com.georgeci.moneysurfer.domain.repositories.AppVersionGate
-&nbsp;import kotlinx.coroutines.flow.first
-&nbsp;import org.koin.core.annotation.Single
-&nbsp;import kotlin.time.Clock
-&nbsp;import kotlin.uuid.ExperimentalUuidApi
-&nbsp;import kotlin.uuid.Uuid
+&nbsp;import com.georgeci.moneysurfer.sync.api.SyncHandleStatus
+&nbsp;import com.georgeci.moneysurfer.sync.api.SyncRequestId
+&nbsp;import com.georgeci.moneysurfer.sync.api.SyncResult
+&nbsp;import com.georgeci.moneysurfer.sync.api.SyncStep
+&nbsp;import com.georgeci.moneysurfer.sync.api.SyncSummary
+&nbsp;import com.georgeci.moneysurfer.sync.coordinator.SyncHandle
+&nbsp;import kotlinx.coroutines.Deferred
+&nbsp;import kotlinx.coroutines.flow.SharedFlow
+&nbsp;import kotlinx.coroutines.flow.StateFlow
 &nbsp;
-&nbsp;/**
-&nbsp; * Convenience wrapper for repositories: guards against demo mode and
-&nbsp; * packages the [PendingMutation] for the outbox.
-&nbsp; *
-&nbsp; * [entityType] is a string constant from [com.georgeci.moneysurfer.domain.sync.SyncEntityTypes].
-&nbsp; * [scopeKey] carries the workspace id for subcollection entities, null for root-collection entities.
-&nbsp; *
-&nbsp; * The push worker reads the entity from Room at push time — no payload serialization happens here.
-&nbsp; * See sync.md §4.3.
-&nbsp; */
-<b class="fc">&nbsp;@Single(binds = [OutboxEnqueuer::class])</b>
-&nbsp;class OutboxEnqueuerImpl(
-<b class="fc">&nbsp;    private val outbox: PendingMutationQueue,</b>
-<b class="fc">&nbsp;    private val session: SessionPointers,</b>
-<b class="fc">&nbsp;    private val appVersionGate: AppVersionGate,</b>
-&nbsp;) : OutboxEnqueuer {
-&nbsp;
-&nbsp;    override suspend fun enqueueUpsert(
-&nbsp;        entityType: String,
-&nbsp;        entityId: String,
-&nbsp;        scopeKey: String?,
-&nbsp;        operation: MutationOperation,
-&nbsp;    ) {
-<b class="fc">&nbsp;        require(operation != MutationOperation.DELETE) {</b>
-<b class="fc">&nbsp;            &quot;DELETE has no payload — call enqueueDelete instead&quot;</b>
-&nbsp;        }
-<b class="fc">&nbsp;        if (!isEnabled()) return</b>
-<b class="fc">&nbsp;        outbox.enqueue(buildMutation(entityType, entityId, scopeKey, operation))</b>
+<b class="fc">&nbsp;internal class SyncHandleImpl(</b>
+<b class="fc">&nbsp;    override val id: SyncRequestId,</b>
+<b class="fc">&nbsp;    override val status: StateFlow&lt;SyncHandleStatus&gt;,</b>
+<b class="fc">&nbsp;    override val steps: SharedFlow&lt;SyncStep&gt;,</b>
+<b class="fc">&nbsp;    override val result: Deferred&lt;SyncResult&lt;SyncSummary&gt;&gt;,</b>
+<b class="fc">&nbsp;    private val cancelAction: () -&gt; Unit,</b>
+&nbsp;) : SyncHandle {
+&nbsp;    override fun cancel() {
+<b class="fc">&nbsp;        cancelAction()</b>
 &nbsp;    }
-&nbsp;
-&nbsp;    override suspend fun enqueueDelete(
-&nbsp;        entityType: String,
-&nbsp;        entityId: String,
-&nbsp;        scopeKey: String?,
-&nbsp;    ) {
-<b class="fc">&nbsp;        if (!isEnabled()) return</b>
-<b class="fc">&nbsp;        outbox.enqueue(buildMutation(entityType, entityId, scopeKey, MutationOperation.DELETE))</b>
-&nbsp;    }
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Outbox accepts mutations only when:
-&nbsp;     * 1. The user is signed in to a real Firebase account (demo sessions
-&nbsp;     *    skip — mutations stay purely local).
-&nbsp;     * 2. The remote app-version gate is not in `Unsupported` state.
-&nbsp;     *    See block.md.
-&nbsp;     */
-&nbsp;    override suspend fun isEnabled(): Boolean {
-<b class="fc">&nbsp;        val uid = session.currentFirebaseUid.flow.first()</b>
-<b class="fc">&nbsp;        if (uid.isNullOrEmpty()) return false</b>
-<b class="fc">&nbsp;        return appVersionGate.isSyncAllowed()</b>
-&nbsp;    }
-&nbsp;
-&nbsp;    @OptIn(ExperimentalUuidApi::class)
-&nbsp;    private fun buildMutation(
-&nbsp;        entityType: String,
-&nbsp;        entityId: String,
-&nbsp;        scopeKey: String?,
-&nbsp;        operation: MutationOperation,
-<b class="fc">&nbsp;    ): PendingMutation = PendingMutation(</b>
-<b class="fc">&nbsp;        id = Uuid.random().toString(),</b>
-<b class="fc">&nbsp;        entityType = entityType,</b>
-<b class="fc">&nbsp;        entityId = entityId,</b>
-<b class="fc">&nbsp;        operation = operation,</b>
-<b class="fc">&nbsp;        scopeKey = scopeKey,</b>
-<b class="fc">&nbsp;        createdAt = Clock.System.now(),</b>
-<b class="fc">&nbsp;        attempts = 0,</b>
-<b class="fc">&nbsp;        lastError = null,</b>
-&nbsp;    )
 &nbsp;}
 </code>
 </pre>
@@ -236,7 +138,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-05-06 14:45</div>
+    <div style="float:right;">generated on 2026-07-16 19:29</div>
 </div>
 </body>
 </html>

@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > TransactionStatus</title>
+  <title>MoneySurfer Coverage Report > TransactionId</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,15 +22,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.primitives</a>
 </div>
 
-<h1>Coverage Summary for Class: TransactionStatus (com.georgeci.moneysurfer.domain.primitives)</h1>
+<h1>Coverage Summary for Class: TransactionId (com.georgeci.moneysurfer.domain.primitives)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
-<th class="coverageStat 
-">
-  Class, %
-</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -49,7 +46,16 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">TransactionStatus</td>
+  <td class="name">TransactionId</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -63,7 +69,46 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
+    (11/11)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">TransactionId$Companion</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
     (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
   </span>
 </td>
     <td class="coverageStat"/>
@@ -80,11 +125,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (18/18)
+    (15/15)
   </span>
 </td>
 </tr>
-
 </table>
 
 <br/>
@@ -94,9 +138,18 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.primitives
 &nbsp;
-&nbsp;enum class TransactionStatus {
-<b class="fc">&nbsp;    ACTUAL,</b>
-<b class="fc">&nbsp;    PLANNED,</b>
+&nbsp;import kotlinx.serialization.Serializable
+&nbsp;import kotlin.jvm.JvmInline
+&nbsp;import kotlin.uuid.ExperimentalUuidApi
+&nbsp;import kotlin.uuid.Uuid
+&nbsp;
+&nbsp;@JvmInline
+&nbsp;@Serializable
+<b class="fc">&nbsp;value class TransactionId(val value: String) {</b>
+&nbsp;    companion object {
+&nbsp;        @OptIn(ExperimentalUuidApi::class)
+<b class="fc">&nbsp;        fun uuid(): TransactionId = TransactionId(Uuid.random().toString())</b>
+&nbsp;    }
 &nbsp;}
 </code>
 </pre>
@@ -121,7 +174,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-16 12:42</div>
+    <div style="float:right;">generated on 2026-07-16 19:29</div>
 </div>
 </body>
 </html>
