@@ -247,9 +247,21 @@ Each can be run on its own; it consumes whatever results are already on disk and
 - Kover XML coverage: `build/reports/kover/report.xml` (also published to
   SonarCloud — see [docs/testing/sonarcloud.md](docs/testing/sonarcloud.md))
 
-TODO: Publish the generated Allure HTML report in GitHub without requiring artifact download.
-Candidate: GitHub Pages from `build/reports/allure/common/` on protected-branch
-pushes, once repository Pages policy is decided.
+## Published reports (GitHub Pages)
+
+The same Allure and Kover HTML is published to GitHub Pages so you can browse it
+without downloading CI artifacts: **https://georgeci.github.io/MoneySurfer/**
+
+| Path | Contents | Published by | When |
+|---|---|---|---|
+| [`/allure/`](https://georgeci.github.io/MoneySurfer/allure/) | Allure — `common` + `firestore` scopes, with history | `ci.yml` → `publish` | push to `main` |
+| [`/kover/`](https://georgeci.github.io/MoneySurfer/kover/) | Kover coverage (`common` scope) | `ci.yml` → `publish` | push to `main` |
+| [`/nightly/allure/`](https://georgeci.github.io/MoneySurfer/nightly/allure/) | Allure — all five scopes (incl. Maestro Android/iOS, offline) | `nightly.yml` → `nightly-publish` | nightly cron + `workflow_dispatch` |
+
+Both jobs push to the `gh-pages` branch with `keep_files: true`, so the per-push
+`/allure/` + `/kover/` subtrees and the `/nightly/` subtree update independently.
+PRs don't publish — they attach the aggregated Allure as a downloadable artifact
+(`allure-report-all`) instead.
 
 ## Manual CLI Equivalent
 

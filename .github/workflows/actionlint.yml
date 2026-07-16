@@ -1,0 +1,34 @@
+name: actionlint
+
+# Lint workflow YAML + the shell in `run:` blocks (actionlint bundles
+# shellcheck). Cheap ubuntu job (~30s) that only runs when something under
+# .github/** changes, so most PRs never pay for it.
+
+on:
+  pull_request:
+    paths:
+      - '.github/**'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  actionlint:
+    name: Lint workflows
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+
+      # Version-pinned by tag; the image bundles shellcheck so inline `run:`
+      # scripts get shellcheck coverage too. `-color` for readable annotations.
+      - name: Run actionlint
+        uses: docker://rhysd/actionlint:1.7.7
+        with:
+          args: -color

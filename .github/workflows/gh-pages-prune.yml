@@ -1,0 +1,89 @@
+name: Prune gh-pages history
+
+# The Allure publishers (ci.yml `publish`, nightly.yml `nightly-publish`) deploy
+# with peaceiris keep_files: true so each workflow preserves the other's subtree.
+# The cost is that keep_files never *deletes*: every run drops a new
+# run-number report dir under allure/ and nightly/allure/, and the old ones stay
+# on the branch forever. keep_reports only caps each run's generated payload, not
+# the branch. This weekly job trims each subtree back to the newest N reports so
+# the gh-pages clone (and every publish that checks it out) stays small.
+
+on:
+  schedule:
+    # Sunday 04:42 UTC — off-peak, off the hour, well clear of the nightly slot.
+    - cron: "42 4 * * 0"
+  workflow_dispatch:
+
+concurrency:
+  # Never prune while a publish is mid-push, and never overlap two prunes.
+  group: gh-pages-write
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  prune:
+    name: Trim old Allure report dirs
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      # Branch may not exist yet on a fresh repo — tolerate that and no-op.
+      - name: Checkout gh-pages
+        id: checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          ref: gh-pages
+          fetch-depth: 1
+        continue-on-error: true
+
+      - name: Prune and push
+        if: steps.checkout.outcome == 'success'
+        env:
+          # Keep a little more on the branch than keep_reports (20) so the
+          # Allure trend still has its full window of prior builds to chart.
+          KEEP: "30"
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          # Delete all but the newest $KEEP numeric (run-number) report dirs in a
+          # subtree, preserving the non-numeric history-site files (index.html,
+          # last-history/, data/, widgets/, …).
+          prune_dir() {
+            local dir="$1"
+            [ -d "$dir" ] || { echo "  $dir: absent, skipping"; return 0; }
+            local nums
+            mapfile -t nums < <(
+              find "$dir" -mindepth 1 -maxdepth 1 -type d -printf '%f\n' \
+                | grep -E '^[0-9]+$' | sort -n
+            )
+            local total=${#nums[@]}
+            if (( total <= KEEP )); then
+              echo "  $dir: $total report(s) ≤ KEEP=$KEEP, nothing to prune"
+              return 0
+            fi
+            local remove=$(( total - KEEP ))
+            echo "  $dir: $total report(s), removing oldest $remove"
+            local d
+            for d in "${nums[@]:0:remove}"; do
+              git rm -rq "$dir/$d"
+            done
+          }
+
+          echo "Pruning gh-pages report history (keep newest $KEEP):"
+          prune_dir "allure"
+          prune_dir "nightly/allure"
+
+          if git diff --cached --quiet; then
+            echo "Nothing to prune — gh-pages already within budget."
+            exit 0
+          fi
+
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -qm "chore(ci): prune Allure history on gh-pages (keep newest $KEEP)"
+          git push origin gh-pages
+          echo "Pruned and pushed."

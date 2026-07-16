@@ -17,7 +17,9 @@
   - [Fix options](#fix-options)
   - [Recommendation](#recommendation)
 - [#6 — Subcollection writes do not validate workspaceId payload](#6-subcollection-writes-do-not-validate-workspaceid-payload)
-  - [Fix](#fix)
+- [#156 — Poison-document crash loop; no write-shape validation](#156-poison-document-crash-loop-no-write-shape-validation)
+  - [Problem](#problem)
+  - [Fix — two layers](#fix--two-layers)
 - [#4 — users/{uid} has no payload validation](#4-usersuid-has-no-payload-validation)
   - [Fix](#fix)
 - [#2 — members/{uid} create requires hasValidClientVersion()](#2-membersuid-create-requires-hasvalidclientversion)
@@ -34,7 +36,7 @@
 
 ## TL;DR for agents
 
-- Journal of issues found while reviewing `firestore.rules`. Two HIGH-severity bugs (#8 invite-less join, #3 addWorkspaceRef) are fixed; the rest are deferred low/medium hazards.
+- Journal of issues found while reviewing `firestore.rules`. Two HIGH-severity bugs (#8 invite-less join, #3 addWorkspaceRef) and MEDIUM #156 (poison-document crash loop / write-shape validation) are fixed; the rest are deferred low/medium hazards. #6 turned out obsolete (subsumed by #156).
 - Format per entry: **Problem → Severity → Fix → Status**.
 - Rules themselves are correct on the happy path; the gaps are missing defensive coverage for edge cases.
 - App-side bug #3 used to exploit that missing defence — now patched in `CreateWorkspaceUseCase`.
@@ -190,17 +192,9 @@ Not critical now (force-update is client-side). When server-side enforcement is 
 <!-- AI:SECTION id=rules-bug-6 task=firestore-rules,schema,subcollections -->
 ## #6 — Subcollection writes do not validate `workspaceId` payload
 
-**Severity:** MEDIUM — schema integrity, not security. **Status:** ⏳ Deferred.
+**Severity:** MEDIUM — schema integrity, not security. **Status:** ❌ Obsolete — the premise was wrong; subsumed by #156 write-shape validation (rules v2.2.0).
 
-```firestore
-match /transactions/{tid} {
-  allow create, update: if isMember(wid) && hasValidClientVersion();
-}
-```
-
-A user who is a member of workspace `A` can POST `/workspaces/A/transactions/{tid}` with payload `{ workspaceId: "B", ... }`. A pull on the device merges the transaction into the wrong workspace locally → confusion.
-
-### Fix
+The original write-up proposed:
 
 ```firestore
 match /transactions/{tid} {
@@ -210,7 +204,29 @@ match /transactions/{tid} {
 }
 ```
 
-Apply to all subcollections: `accounts`, `categories`, `transactions`, `budgets`, `recurringRules`.
+on the theory that a member of workspace `A` could POST `/workspaces/A/transactions/{tid}` with payload `{ workspaceId: "B", ... }` and mis-file it locally on pull.
+
+**Why it's obsolete:** the wire DTOs carry **no `workspaceId` field**. Check `data-remote/.../RemoteDtos.kt` — `TransactionDoc`, `AccountDoc`, `CategoryDoc`, etc. have no such field. The workspace id is taken from the trusted document path and injected at decode time (`SyncDtoMappers.toEntity(id, workspaceId = scopeKey)` in `sync-surfer`, driven by `PullRemoteChangesUseCaseImpl`). There is nothing on the payload to spoof, and adding `request.resource.data.workspaceId == wid` would **deny every legitimate write** (the field is always absent). Do **not** add that check.
+
+The real (and confirmed) subcollection-schema gap was untyped fields, tracked and fixed under **#156** below.
+<!-- AI:END -->
+
+<!-- AI:SECTION id=rules-bug-156 task=firestore-rules,schema,subcollections,poison-document,sync -->
+## #156 — Poison-document crash loop; no write-shape validation
+
+**Severity:** MEDIUM — persistent sync outage (poison-message crash loop). **Status:** ✅ Fixed (rules v2.2.0).
+
+### Problem
+
+Entity write rules validated only membership + `clientVersionCode`; field **types** were never checked. Any member could write a document with a wrong-typed field (e.g. `amount: "abc"` where `TransactionDoc` expects a `Long`). On the next incremental pull, `doc.decode(...)` threw inside the plugin's `applyDoc`; the exception aborted the whole pull **before** the cursor advanced past the offending doc. Every co-member's pull re-fetched that same doc, failed, and retried indefinitely → sync down for the whole workspace. (No RCE/path-traversal: `workspaceId` comes from the trusted path, `doc.id` is only a Room key.)
+
+### Fix — two layers
+
+1. **Rules reject the malformed write at the source.** `firestore.rules` gains `hasValidAccountShape` / `hasValidCategoryShape` / `hasValidTransactionShape`, wired into the `accounts` / `categories` / `transactions` create+update rules. Each field is type-checked **only when present** (`data.get(f, <default>) is <type>`), because the wire format omits fields left at their DTO default — a minimal doc must still pass; only a present-but-wrong-typed field is rejected. Nullable fields also accept an explicit null. Field lists mirror `RemoteDtos.kt`; `budgets`/`recurringRules` are left unguarded — they have no wire DTO and no plugin decodes them, so no poison-pull path exists yet.
+
+2. **Client tolerates an undecodable doc.** `PluginHelpers.decodeOrNull` wraps `RemoteDocument.decode`; on any decode throw (except `CancellationException`) it logs and returns null, and the plugin returns `SKIPPED_APPLY_RESULT` (`applied = false`). A skipped doc still advances the pull cursor, so one bad row is skipped instead of wedging the batch. This heals docs already in the store and those written by older clients that the rules can't retroactively fix. All six decoding plugins (account, category, transaction, workspace, member, invite) use it.
+
+Tests: `firestore-tests/test/entities.spec.js` (write-shape accept/reject, incl. the `amount: "abc"` scenario); `sync-surfer/.../plugin/DecodeOrNullSpec.kt` (skip on malformed, rethrow on cancellation). The existing "plugin failure surfaces as a sync error" pull spec still holds — a genuine apply/DB failure (not a decode) still aborts and retries.
 <!-- AI:END -->
 
 <!-- AI:SECTION id=rules-bug-4 task=firestore-rules,users,schema -->
@@ -302,8 +318,9 @@ Grep the data layer — nobody should be doing top-level lists of `workspaces`. 
 |---|-------|----------|--------|
 | 8 | Invite-less workspace join breaks tenant isolation | HIGH | ✅ Fixed |
 | 3 | `addWorkspaceRef` after failed `syncWorkspace` | HIGH | ✅ Fixed |
+| 156 | Poison-document crash loop; no write-shape validation | MEDIUM | ✅ Fixed |
 | 1 | `clientVersionCode >= 1` — fake gate | MEDIUM | ⏳ Deferred |
-| 6 | No `workspaceId` payload validation in subcollections | MEDIUM | ⏳ Deferred |
+| 6 | No `workspaceId` payload validation in subcollections | MEDIUM | ❌ Obsolete (no such field; see #156) |
 | 4 | `users/{uid}` without payload validation | LOW | ⏳ Deferred |
 | 2 | `members/{uid}` clientVersionCode requirement | LOW | ⏳ Unconfirmed |
 | 7 | Push order race on workspace creation | LOW | ⏳ Unconfirmed |

@@ -46,7 +46,7 @@ class CategorySyncPlugin(
     }
 
     override suspend fun applyDoc(doc: RemoteDocument, scopeKey: String): EntityApplyResult {
-        val dto = doc.decode(CategoryDoc.serializer())
+        val dto = doc.decodeOrNull(CategoryDoc.serializer()) ?: return SKIPPED_APPLY_RESULT
         if (dto.deletedAt != null) {
             transactionDao.nullifyCategoryId(doc.id)
             categoryDao.delete(doc.id)
