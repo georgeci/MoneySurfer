@@ -65,6 +65,10 @@ Run in parallel:
 ## Test plan
 - [ ] <items>
 
+<Closes #N — include this line when the branch resolves a GitHub issue (the
+issue number is usually in the branch history or the task prompt); omit it
+otherwise>
+
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 EOF
 )"`
