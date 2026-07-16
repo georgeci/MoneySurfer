@@ -108,6 +108,11 @@ Discovery-only mapping. Firestore-only; no Room mirror.
 | `uid` | `String` |
 | `updatedAt` | `Long` |
 
+Single-key `get` only (`list` denied). This exact-address lookup is the invite
+email→uid resolution and is an **accepted** LOW existence oracle — see
+[firestore-rules-bugs.md](firestore-rules-bugs.md) #161 for the decision and why
+a server-callable alternative is out of scope.
+
 ### `workspaces/{wid}`
 
 | Field | Domain | Room | Firestore |

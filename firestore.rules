@@ -190,6 +190,13 @@ service cloud.firestore {
     // pre-write `userEmails/victim@example.com → my_uid` and steal invites addressed
     // to the victim until the victim's own login overwrote the mapping.
     match /userEmails/{email} {
+      // Single-key get is the invite email→uid lookup (SendInviteUseCase). This is
+      // a known, ACCEPTED LOW existence oracle (issue #161): an authed user can
+      // probe one exact address at a time. Not closed by a server callable because
+      // that would require denying this `get` — a rules-access-control change — and
+      // the repo has no Cloud Functions deployment; the escalation path is already
+      // shut by the invite-gated members create (rules bug #8 / issue #152). See
+      // docs/architecture/firestore-rules-bugs.md #161. Do NOT loosen below.
       allow get: if signedIn();
       allow list: if false; // prevent enumeration via collection scan
       allow create, update: if signedIn()
