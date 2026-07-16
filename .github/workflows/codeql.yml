@@ -73,6 +73,14 @@ jobs:
             build-mode: none
 
     steps:
+      # Egress audit — see docs/security/ci-egress-hardening.md (issue #180).
+      # The java-kotlin leg decodes Firebase config for the tracer build; run
+      # unconditionally so both matrix legs are baselined.
+      - name: Harden the runner (egress audit)
+        uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920 # v2.20.0
+        with:
+          egress-policy: audit
+
       - name: Checkout
         if: >-
           matrix.language != 'java-kotlin' ||

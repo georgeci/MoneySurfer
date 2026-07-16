@@ -52,6 +52,12 @@ jobs:
     if: needs.changes.outputs.code == 'true' || github.event_name == 'workflow_dispatch'
 
     steps:
+      # Egress audit — see docs/security/ci-egress-hardening.md (issue #180).
+      - name: Harden the runner (egress audit)
+        uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920 # v2.20.0
+        with:
+          egress-policy: audit
+
       - name: Checkout
         uses: actions/checkout@v7
 
@@ -426,6 +432,12 @@ jobs:
        github.event.pull_request.head.repo.full_name == github.repository)
 
     steps:
+      # Egress audit — see docs/security/ci-egress-hardening.md (issue #180).
+      - name: Harden the runner (egress audit)
+        uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920 # v2.20.0
+        with:
+          egress-policy: audit
+
       - name: Checkout
         uses: actions/checkout@v7
         with:
