@@ -84,7 +84,7 @@ object TransactionCsvCodec {
                     id = TransactionId(required(TransactionCsvColumn.Id)),
                     workspaceId = WorkspaceId(required(TransactionCsvColumn.WorkspaceId)),
                     accountId = AccountId(required(TransactionCsvColumn.AccountId)),
-                    money = Money(long(TransactionCsvColumn.AmountMinor)),
+                    money = Money(amountMinor(TransactionCsvColumn.AmountMinor)),
                     currencyCode = CurrencyCode(required(TransactionCsvColumn.Currency)),
                     categoryId = optional(TransactionCsvColumn.CategoryId)?.let(::CategoryId),
                     note = Csv.unguardFormula(fields[TransactionCsvColumn.Note.ordinal]),
@@ -111,6 +111,19 @@ object TransactionCsvCodec {
 
         private fun long(column: TransactionCsvColumn): Long =
             raw(column).toLongOrNull() ?: throw FieldRejectedException(column)
+
+        /**
+         * A monetary minor amount bounded to the domain cap. Rejects crafted
+         * out-of-range values (e.g. [Long.MIN_VALUE], whose abs() would wrap)
+         * before they enter a [Money] and corrupt a cached balance. See #159.
+         */
+        private fun amountMinor(column: TransactionCsvColumn): Long {
+            val value = long(column)
+            if (value < -Money.MAX_MINOR || value > Money.MAX_MINOR) {
+                throw FieldRejectedException(column)
+            }
+            return value
+        }
 
         private fun instant(column: TransactionCsvColumn): Instant = try {
             Instant.parse(required(column))
