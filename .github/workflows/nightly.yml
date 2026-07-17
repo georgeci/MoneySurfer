@@ -128,6 +128,60 @@ jobs:
       - name: Compile offline Android debug
         run: ./gradlew :androidApp-offline:compileDebugSources --stacktrace
 
+  android-release-compile:
+    name: Android release compile (R8/minify)
+    needs: decide
+    if: needs.decide.outputs.run == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    permissions:
+      contents: read
+    # The release variant is otherwise never built anywhere in CI (issue #171),
+    # so minify/R8/ProGuard and release-google-services regressions ship
+    # unnoticed until the first manual release. This nightly job assembles the
+    # release APK — which runs R8 (minifyReleaseWithR8), resource shrinking, and
+    # processReleaseGoogleServices — as the cheap "minimum" safety net.
+    #
+    # No signing secret needed: KmpAppConventionPlugin only wires a `release`
+    # signingConfig when the RELEASE_STORE_* values are present, so on CI the
+    # release build type has no signingConfig and produces an unsigned APK. The
+    # Crashlytics mapping/native-symbol *uploads* are standalone tasks that
+    # assembleRelease does not depend on, so nothing here touches the network or
+    # needs Firebase credentials beyond the local google-services.json.
+    #
+    # Scope note (issue #171): the "maximum" — signing, versioning, and Play/
+    # TestFlight upload — is deliberately out of scope. This job only compiles.
+
+    steps:
+      # Egress audit — see docs/security/ci-egress-hardening.md (issue #180).
+      - name: Harden the runner (egress audit)
+        uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920 # v2.20.0
+        with:
+          egress-policy: audit
+
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+
+      # Only the release google-services.json is needed — processReleaseGoogle-
+      # Services reads androidApp/src/release/google-services.json. Don't expose
+      # the debug JSON or iOS plist to this job.
+      - name: Decode Firebase config
+        uses: ./.github/actions/firebase-config
+        with:
+          release-json: ${{ secrets.GOOGLE_SERVICES_JSON_RELEASE }}
+
+      - name: Set up JDK
+        uses: actions/setup-java@0f481fcb613427c0f801b606911222b5b6f3083a # v5.5.0
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@3f131e8634966bd73d06cc69884922b02e6faf92 # v6.2.0
+
+      - name: Assemble Android release (R8/minify, unsigned)
+        run: ./gradlew :androidApp:assembleRelease --stacktrace
+
 
   ios-build:
     name: iOS simulator build
@@ -742,6 +796,7 @@ jobs:
       - decide
       - android-compile
       - android-offline-compile
+      - android-release-compile
       - ios-build
       - maestro-android
       - maestro-ios
