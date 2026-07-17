@@ -63,7 +63,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/3)
+    (0/4)
   </span>
 </td>
 <td class="coverageStat">
@@ -71,7 +71,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/14)
+    (0/16)
   </span>
 </td>
 <td class="coverageStat">
@@ -79,7 +79,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/48)
+    (0/54)
   </span>
 </td>
 <td class="coverageStat">
@@ -87,7 +87,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/572)
+    (0/629)
   </span>
 </td>
 </tr>
@@ -137,6 +137,9 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="nc">&nbsp;    modifier: Modifier = Modifier,</b>
 <b class="nc">&nbsp;    onClick: (() -&gt; Unit)? = null,</b>
 <b class="nc">&nbsp;    onAddClick: (() -&gt; Unit)? = null,</b>
+&nbsp;    /** Accessibility label for the add button. Callers that provide [onAddClick] must pass a
+&nbsp;     *  meaningful description (e.g. `stringResource(Res.string.account_add_transaction)`). */
+<b class="nc">&nbsp;    addContentDescription: String? = null,</b>
 <b class="nc">&nbsp;) {</b>
 <b class="nc">&nbsp;    Box(</b>
 <b class="nc">&nbsp;        modifier = modifier</b>
@@ -182,11 +185,11 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="nc">&nbsp;                            containerColor = Color.Black.copy(alpha = 0.3f),</b>
 <b class="nc">&nbsp;                            contentColor = Color.White,</b>
 &nbsp;                        ),
-&nbsp;                    ) {
-&nbsp;                        Icon(
-&nbsp;                            imageVector = SurferIcons.Add,
-&nbsp;                            contentDescription = null,
-&nbsp;                            modifier = Modifier.size(20.dp),
+<b class="nc">&nbsp;                    ) {</b>
+<b class="nc">&nbsp;                        Icon(</b>
+<b class="nc">&nbsp;                            imageVector = SurferIcons.Add,</b>
+<b class="nc">&nbsp;                            contentDescription = addContentDescription,</b>
+<b class="nc">&nbsp;                            modifier = Modifier.size(20.dp),</b>
 &nbsp;                        )
 &nbsp;                    }
 <b class="nc">&nbsp;                }</b>
@@ -205,6 +208,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;            currency = &quot;USD&quot;,
 &nbsp;            onClick = {},
 &nbsp;            onAddClick = {},
+&nbsp;            addContentDescription = &quot;Add transaction&quot;,
 &nbsp;        )
 &nbsp;    }
 <b class="nc">&nbsp;}</b>
@@ -244,7 +248,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-16 19:29</div>
+    <div style="float:right;">generated on 2026-07-17 22:14</div>
 </div>
 </body>
 </html>
