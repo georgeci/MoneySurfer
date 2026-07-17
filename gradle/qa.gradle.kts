@@ -256,7 +256,12 @@ val iosMaestroDeviceId = providers.gradleProperty("iosSimulatorUdid").orNull
 val maestroSetupTags = listOf("setup", "offline")
 
 val iosMaestroDerivedDataDir = rootProject.file("build/ios-maestro")
-val iosMaestroAppPath = iosMaestroDerivedDataDir.resolve("Build/Products/Debug-iphonesimulator/MoneySurfer.app")
+// The online Xcode config (`iosApp/Configuration/Config.xcconfig`) overrides
+// `PRODUCT_NAME` to `MoneySurfer Dev` for the Debug configuration (the `.dev`
+// flavor mirrored from Android), so the `-configuration Debug` build emits a
+// bundle under that (space-containing) name — not `MoneySurfer.app`. Same shape
+// as `iosOfflineMaestroAppPath` below.
+val iosMaestroAppPath = iosMaestroDerivedDataDir.resolve("Build/Products/Debug-iphonesimulator/MoneySurfer Dev.app")
 
 val firestoreTestsDir = rootProject.file("firestore-tests")
 val firestoreReportsDir = rootProject.file("build/test-results/firestore")

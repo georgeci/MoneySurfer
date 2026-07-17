@@ -247,14 +247,20 @@ jobs:
           else
             FORMATTER=(cat)
           fi
-          # -derivedDataPath requires -scheme/-testProductsPath/-xctestrun;
-          # we use -target so let xcodebuild pick the default location.
+          # Build via -scheme + an explicit, clean -derivedDataPath (mirrors the
+          # working maestro-ios job). With -target and the *default* DerivedData
+          # location, xcodebuild routes SwiftPM build products into the package
+          # checkouts and collides with nanopb's regular file named `build`
+          # ("File exists but is not a directory: .../checkouts/nanopb/build/
+          # EagerLinkingTBDs"). A dedicated derivedDataPath keeps intermediates
+          # out of the checkout tree and avoids the collision.
           xcodebuild \
             -project iosApp/iosApp.xcodeproj \
-            -target iosApp \
+            -scheme iosApp \
             -configuration Debug \
             -sdk iphonesimulator \
             -arch arm64 \
+            -derivedDataPath build/ios-build \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY="" \
@@ -344,38 +350,12 @@ jobs:
           force-avd-creation: false
           emulator-boot-timeout: 1200
           emulator-options: -no-window -no-snapshot -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -camera-front none
-          script: |
-            # android-emulator-runner executes this `script` with /bin/sh
-            # (dash on the ubuntu runner), which rejects `set -o pipefail`
-            # ("Illegal option -o pipefail") and aborts before any gradle task
-            # runs. There are no pipelines here whose failure we'd mask, so
-            # plain `set -u` preserves the intent (fail on unset vars, keep
-            # accumulating job failures into `overall`) while staying POSIX.
-            set -u
-            overall=0
-
-            # 1) Online E2E suite — the dominant flake source (AVD + Firebase
-            #    emulator + full flow set). Auto-retry once before giving up so
-            #    a single flaky flow doesn't cost a whole night of signal.
-            run_online() { ./gradlew qaMaestroAndroid --stacktrace; }
-            if ! run_online; then
-              echo "::warning title=E2E flake guard::qaMaestroAndroid failed — retrying once."
-              run_online || overall=1
-            fi
-
-            # 2) Offline golden flow (issue #172 §4 bonus). Cheap single flow that
-            #    otherwise ran nowhere in CI — reuse the booted AVD.
-            ./gradlew qaMaestroOfflineAndroid --stacktrace || overall=1
-
-            # 3) Instrumented device tests (issue #172 §5). `:integration-test`
-            #    needs the Firebase emulator, so wrap the whole device scope in
-            #    emulators:exec (harmless for the modules that don't use it).
-            #    Deterministic — not retried; a retry would just double a real
-            #    failure.
-            firebase emulators:exec --project demo-moneysurfer --only auth,firestore \
-              "./gradlew qaAndroidDevice --continue --stacktrace" || overall=1
-
-            exit "$overall"
+          # android-emulator-runner runs this `script` via `sh -c` — /bin/sh is
+          # dash on the ubuntu runner, which rejects `set -o pipefail` and
+          # mis-parses a multi-line inlined body ("end of file unexpected
+          # (expecting fi)"). Delegate to a committed bash script so the real
+          # logic (functions, pipefail, retries) runs in bash, not dash.
+          script: bash scripts/ci/nightly-android-e2e.sh
 
       - name: Upload Allure report
         if: always()
