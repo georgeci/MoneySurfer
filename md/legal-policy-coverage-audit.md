@@ -108,7 +108,7 @@ The four in-app rows are identical because the UI is shared code (§1).
 
 ---
 
-## 7. Handback — external checks NOT performed
+## 7. Handback: external checks NOT performed
 
 Per the task scope, the following acceptance-criteria items were **not** performed here and must be completed by the maintainer:
 
