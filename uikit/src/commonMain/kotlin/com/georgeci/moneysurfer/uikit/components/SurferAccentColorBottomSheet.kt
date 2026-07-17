@@ -166,6 +166,7 @@ private fun SwatchTile(
             ) {
                 Icon(
                     imageVector = SurferIcons.Check,
+                    // decorative — selection state indicator; the colour swatch is the visual identity
                     contentDescription = null,
                     tint = Color.White,
                     modifier = Modifier.size(18.dp),
@@ -204,6 +205,7 @@ private fun DynamicColorTile(
         ) {
             Icon(
                 imageVector = SurferIcons.Palette,
+                // decorative — tile icon identifying the dynamic-colour option; the title provides the accessible label
                 contentDescription = null,
                 tint = AppTheme.materialColors.primary,
                 modifier = Modifier.size(22.dp),

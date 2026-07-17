@@ -45,6 +45,7 @@ private fun SurferActionCardPreview() {
         ) {
             SurferActionCard(modifier = Modifier.fillMaxWidth(), onClick = {}) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
+                    // decorative — preview only; label text is adjacent
                     Icon(imageVector = SurferIcons.Add, contentDescription = null)
                     Spacer(Modifier.width(8.dp))
                     Text(text = "Add account", style = AppTheme.typography.labelLarge)
@@ -52,6 +53,7 @@ private fun SurferActionCardPreview() {
             }
             SurferActionCard(modifier = Modifier.fillMaxWidth()) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
+                    // decorative — preview only; label text is adjacent
                     Icon(imageVector = SurferIcons.Add, contentDescription = null)
                     Spacer(Modifier.width(8.dp))
                     Text(text = "Read-only (no click)", style = AppTheme.typography.labelLarge)

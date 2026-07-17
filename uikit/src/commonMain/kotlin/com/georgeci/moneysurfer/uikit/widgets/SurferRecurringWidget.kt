@@ -135,6 +135,7 @@ private fun RecurringRow(item: SurferRecurringItem, onClick: (() -> Unit)?) {
         ) {
             Icon(
                 imageVector = item.icon,
+                // decorative — recurring-item type indicator; the item name provides the accessible label
                 contentDescription = null,
                 tint = AppTheme.materialColors.onSurfaceVariant,
                 modifier = Modifier.size(20.dp),

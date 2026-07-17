@@ -91,6 +91,7 @@ fun SurferTransactionLine(
         ) {
             Icon(
                 imageVector = leadingIcon,
+                // decorative — category icon; the transaction title provides the accessible label
                 contentDescription = null,
                 tint = leadingIconTint,
                 modifier = Modifier.size(22.dp),

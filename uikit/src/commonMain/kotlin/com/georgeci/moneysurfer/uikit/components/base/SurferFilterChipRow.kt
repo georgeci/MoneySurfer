@@ -80,6 +80,7 @@ private fun SurferFilterChip(
         if (selected) {
             Icon(
                 imageVector = SurferIcons.Check,
+                // decorative — selection state indicator; the chip label provides the accessible label
                 contentDescription = null,
                 tint = fg,
                 modifier = Modifier.size(14.dp),

@@ -54,6 +54,7 @@ fun SurferErrorState(
         ) {
             Icon(
                 imageVector = icon,
+                // decorative — error illustration; the title/subtitle convey the message
                 contentDescription = null,
                 tint = AppTheme.materialColors.onErrorContainer,
                 modifier = Modifier.size(28.dp),

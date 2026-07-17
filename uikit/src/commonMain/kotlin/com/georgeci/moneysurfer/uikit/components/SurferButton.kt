@@ -116,6 +116,7 @@ private fun SurferButtonContent(
         if (startIcon != null) {
             Icon(
                 imageVector = startIcon,
+                // decorative — button text provides the accessible label
                 contentDescription = null,
             )
             Spacer(Modifier.width(AppTheme.spacing.small))
@@ -127,6 +128,7 @@ private fun SurferButtonContent(
             Spacer(Modifier.width(AppTheme.spacing.small))
             Icon(
                 imageVector = endIcon,
+                // decorative — button text provides the accessible label
                 contentDescription = null,
             )
         }

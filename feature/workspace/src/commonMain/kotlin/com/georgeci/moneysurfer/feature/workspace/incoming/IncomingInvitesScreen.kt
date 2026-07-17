@@ -47,6 +47,7 @@ import com.georgeci.moneysurfer.utils.HandleSideEffect
 import kotlinx.coroutines.launch
 import moneysurfer.feature.workspace.generated.resources.Res
 import moneysurfer.feature.workspace.generated.resources.workspace_incoming_accept
+import moneysurfer.feature.workspace.generated.resources.workspace_incoming_back_content_description
 import moneysurfer.feature.workspace.generated.resources.workspace_incoming_decline
 import moneysurfer.feature.workspace.generated.resources.workspace_incoming_empty_subtitle
 import moneysurfer.feature.workspace.generated.resources.workspace_incoming_empty_title
@@ -112,8 +113,9 @@ private fun Body(
             TopAppBar(
                 title = { Text(stringResource(Res.string.workspace_incoming_title)) },
                 navigationIcon = {
+                    val backLabel = stringResource(Res.string.workspace_incoming_back_content_description)
                     IconButton(onClick = { onEvent(IncomingInvitesEvent.OnBackClick) }) {
-                        Icon(imageVector = SurferIcons.Back, contentDescription = null)
+                        Icon(imageVector = SurferIcons.Back, contentDescription = backLabel)
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(

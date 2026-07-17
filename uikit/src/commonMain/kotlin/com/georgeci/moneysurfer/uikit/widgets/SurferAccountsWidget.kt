@@ -99,6 +99,7 @@ private fun AddAccountRow(
         ) {
             Icon(
                 imageVector = SurferIcons.Add,
+                // decorative — the label text next to it provides the accessible label
                 contentDescription = null,
                 tint = AppTheme.materialColors.onSurfaceVariant,
                 modifier = Modifier.size(18.dp),

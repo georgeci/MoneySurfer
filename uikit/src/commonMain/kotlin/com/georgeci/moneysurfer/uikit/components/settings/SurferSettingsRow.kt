@@ -72,6 +72,7 @@ fun SurferSettingsRow(
                 ) {
                     Icon(
                         imageVector = icon,
+                        // decorative — icon tile identifying the setting; the row title is the accessible label
                         contentDescription = null,
                         tint = effectiveIconTint,
                         modifier = Modifier.size(20.dp),
@@ -116,6 +117,7 @@ fun SurferSettingsChevron(
 ) {
     Icon(
         imageVector = SurferIcons.ChevronRight,
+        // decorative — navigation indicator; the row title is the accessible label
         contentDescription = null,
         tint = tint,
         modifier = modifier.size(20.dp),
@@ -140,6 +142,7 @@ fun SurferSettingsValuePill(
         )
         Icon(
             imageVector = SurferIcons.ChevronRight,
+            // decorative — navigation indicator; the value text provides the accessible label
             contentDescription = null,
             tint = AppTheme.materialColors.onSurfaceVariant,
             modifier = Modifier.size(16.dp),

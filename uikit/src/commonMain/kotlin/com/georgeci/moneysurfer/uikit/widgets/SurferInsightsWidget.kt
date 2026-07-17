@@ -121,6 +121,7 @@ private fun InsightCard(item: SurferInsightItem, onClick: (() -> Unit)?) {
         ) {
             Icon(
                 imageVector = item.icon,
+                // decorative — insight category icon; the item title provides the accessible label
                 contentDescription = null,
                 tint = fg,
                 modifier = Modifier.size(20.dp),

@@ -140,6 +140,7 @@ private fun RoleChip(label: String) {
         )
         Icon(
             imageVector = SurferIcons.DropDown,
+            // decorative — role drop-down indicator; the role label provides the accessible name
             contentDescription = null,
             tint = AppTheme.materialColors.onSurfaceVariant,
             modifier = Modifier.size(14.dp),

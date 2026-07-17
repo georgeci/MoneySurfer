@@ -80,6 +80,7 @@ fun SurferCurrencyRow(
         if (selected) {
             Icon(
                 imageVector = SurferIcons.Check,
+                // decorative — selection state indicator; the currency name provides the accessible label
                 contentDescription = null,
                 tint = AppTheme.materialColors.primary,
                 modifier = Modifier.size(20.dp),

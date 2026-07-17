@@ -71,6 +71,7 @@ fun SurferIncomingInviteCard(
                 ) {
                     Icon(
                         imageVector = SurferIcons.People,
+                        // decorative — workspace identity icon; the workspace name provides the accessible label
                         contentDescription = null,
                         tint = cs.onSurfaceVariant,
                         modifier = Modifier.size(18.dp),

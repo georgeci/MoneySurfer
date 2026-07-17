@@ -52,6 +52,7 @@ fun SurferInviteRow(
             ) {
                 Icon(
                     imageVector = SurferIcons.Add,
+                    // decorative — the card title ("Invite people") provides the accessible label
                     contentDescription = null,
                     tint = AppTheme.materialColors.onPrimaryContainer,
                     modifier = Modifier.size(20.dp),
