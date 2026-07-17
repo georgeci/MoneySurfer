@@ -237,6 +237,18 @@ jobs:
       - name: Link Kotlin framework (iosSimulatorArm64)
         run: ./gradlew :composeApp:linkDebugFrameworkIosSimulatorArm64 --stacktrace
 
+      # Resolve a valid simulator *name* without booting one (a build needs the
+      # device to exist, not to run) — same as ios-offline.yml. The named
+      # destination pins a single concrete arch (arm64 on the runner); a
+      # `generic/platform=iOS Simulator` destination instead builds every sim
+      # arch and fails on x86_64, for which the Kotlin framework isn't linked
+      # ("Unknown iOS simulator arch: 'x86_64'").
+      - name: Resolve iOS simulator (no boot)
+        id: ios-sim
+        uses: ./.github/actions/ios-simulator
+        with:
+          boot: "false"
+
       - name: Build iOS app (Simulator, no signing)
         env:
           SKIP_CRASHLYTICS_UPLOAD: "YES"
@@ -247,19 +259,20 @@ jobs:
           else
             FORMATTER=(cat)
           fi
-          # Build via -scheme + an explicit, clean -derivedDataPath (mirrors the
-          # working maestro-ios job). With -target and the *default* DerivedData
-          # location, xcodebuild routes SwiftPM build products into the package
-          # checkouts and collides with nanopb's regular file named `build`
-          # ("File exists but is not a directory: .../checkouts/nanopb/build/
-          # EagerLinkingTBDs"). A dedicated derivedDataPath keeps intermediates
-          # out of the checkout tree and avoids the collision.
+          # Build via -scheme + a named -destination + a clean -derivedDataPath,
+          # mirroring the working maestro-ios / ios-offline builds. Two traps this
+          # avoids: (1) -target with the *default* DerivedData routes SwiftPM
+          # products into the package checkouts and collides with nanopb's regular
+          # file named `build`; a dedicated derivedDataPath keeps them out. (2) A
+          # bare `-arch arm64` (no destination) leaves the SPM frameworks
+          # unresolved at link ("framework 'FirebaseAuth' not found") — the named
+          # destination gives xcodebuild the platform context SPM needs.
           xcodebuild \
             -project iosApp/iosApp.xcodeproj \
             -scheme iosApp \
             -configuration Debug \
             -sdk iphonesimulator \
-            -destination 'generic/platform=iOS Simulator' \
+            -destination "platform=iOS Simulator,name=${{ steps.ios-sim.outputs.name }}" \
             -derivedDataPath build/ios-build \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
@@ -472,6 +485,13 @@ jobs:
       # doubly costly — auto-retry the flow suite once to absorb simulator/E2E
       # flake before the run is written off.
       - name: Run qaMaestroIos
+        env:
+          # Maestro installs an XCUITest driver onto the simulator on first run;
+          # on a cold CI simulator that install+launch routinely overruns
+          # Maestro's default startup window, so the run aborts before any flow
+          # ("IOSDriverTimeoutException: iOS driver not ready in time"). Give it
+          # a generous ceiling — it's a one-time startup wait, not per-flow.
+          MAESTRO_DRIVER_STARTUP_TIMEOUT: "120000"
         run: |
           set -uo pipefail
           run_ios() {
