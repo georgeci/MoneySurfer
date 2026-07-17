@@ -25,11 +25,10 @@ If no `.kt`/`.kts` files were touched, stop and report that detekt is not needed
 
 `--auto-correct` is a Detekt **task** option (not a Gradle CLI option), so it must follow the task path on the command line. Detekt's `formatting` plugin is wired in this repo, so this auto-fixes most style/formatting findings.
 
-Run in parallel for the affected modules (cap at ~6 modules per invocation):
+Run a **single** Gradle invocation listing every affected module's task path (cap at ~6 modules per invocation). Do **not** launch several `./gradlew` processes in parallel — concurrent Gradle builds in the same project directory contend on the build lock; one invocation with multiple task paths is equivalent and safe:
 
 ```
-./gradlew :domain:detekt --auto-correct
-./gradlew :feature:transaction:detekt --auto-correct
+./gradlew :domain:detekt :feature:transaction:detekt --auto-correct
 ```
 
 If 6+ modules are affected or the changes touch root build files, run the aggregate task instead:

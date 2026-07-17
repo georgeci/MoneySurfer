@@ -56,6 +56,13 @@ Do not proceed without that scope — `gh project item-edit` will fail otherwise
 
 ## 4. Create the issue
 
+The heredoc delimiter is **quoted** (`<<'EOF'`) so nothing inside the body is
+subject to shell expansion or command substitution — this keeps any backticks
+or `$` in the plan summary literal. Because expansion is off, `$PLAN_PATH`
+would **not** expand either. So substitute the resolved `PLAN_PATH` value
+**textually** into the body before running: write the actual path (e.g.
+`docs/plans/my-plan.md`) in place of `$PLAN_PATH` below.
+
 ```
 gh issue create \
   --repo georgeci/MoneySurfer \
@@ -64,7 +71,7 @@ gh issue create \
 <short summary — 2–4 bullets pulled from the plan>
 
 ---
-Plan: $PLAN_PATH
+Plan: <resolved PLAN_PATH, written literally — not the shell variable>
 
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 EOF
