@@ -30,6 +30,16 @@ class KmpAppConventionPlugin : Plugin<Project> {
             "RELEASE_KEY_PASSWORD",
         ).all { secrets[it] != null }
 
+        // Debug is normally signed with the `dev` keystore so the `.dev` flavor
+        // keeps a stable identity across local installs. CI (and fresh forks)
+        // have neither keystore/dev.jks nor DEV_* secrets, so fall back to AGP's
+        // auto-generated debug keystore there — the same graceful degradation the
+        // `release` type gets from `hasReleaseSigning`. Without this, every
+        // debug packaging task fails with "storeFile … dev.jks … doesn't exist".
+        val devStorePath = secrets["DEV_STORE_FILE"] ?: "keystore/dev.jks"
+        val devStoreFile = rootProject.file(devStorePath)
+        val hasDevSigning = devStoreFile.exists()
+
         val libs = extensions.getByType<VersionCatalogsExtension>().named("libs")
         val compileSdkInt = libs.findVersion("android-compileSdk").get().requiredVersion.toInt()
         val minSdkInt = libs.findVersion("android-minSdk").get().requiredVersion.toInt()
@@ -60,15 +70,18 @@ class KmpAppConventionPlugin : Plugin<Project> {
                 }
 
                 signingConfigs {
-                    create("dev") {
-                        // Keystore paths in local.properties / env are always
-                        // resolved relative to the repo root, regardless of which
-                        // app module applies this convention.
-                        val storePath = secrets["DEV_STORE_FILE"] ?: "keystore/dev.jks"
-                        storeFile = rootProject.file(storePath)
-                        storePassword = secrets["DEV_STORE_PASSWORD"]
-                        keyAlias = secrets["DEV_KEY_ALIAS"]
-                        keyPassword = secrets["DEV_KEY_PASSWORD"]
+                    // Keystore paths in local.properties / env are always resolved
+                    // relative to the repo root, regardless of which app module
+                    // applies this convention (see `devStoreFile` above). Skip the
+                    // `dev` config entirely when the keystore is missing so debug
+                    // falls back to AGP's default debug signing.
+                    if (hasDevSigning) {
+                        create("dev") {
+                            storeFile = devStoreFile
+                            storePassword = secrets["DEV_STORE_PASSWORD"]
+                            keyAlias = secrets["DEV_KEY_ALIAS"]
+                            keyPassword = secrets["DEV_KEY_PASSWORD"]
+                        }
                     }
                     if (hasReleaseSigning) {
                         create("release") {
@@ -83,7 +96,11 @@ class KmpAppConventionPlugin : Plugin<Project> {
                 buildTypes {
                     getByName("debug") {
                         applicationIdSuffix = ".dev"
-                        signingConfig = signingConfigs.getByName("dev")
+                        // When the dev keystore is absent (CI/forks) leave the
+                        // default debug signingConfig in place instead.
+                        if (hasDevSigning) {
+                            signingConfig = signingConfigs.getByName("dev")
+                        }
                     }
                     getByName("release") {
                         isMinifyEnabled = true

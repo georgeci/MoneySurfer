@@ -259,7 +259,7 @@ jobs:
             -scheme iosApp \
             -configuration Debug \
             -sdk iphonesimulator \
-            -arch arm64 \
+            -destination 'generic/platform=iOS Simulator' \
             -derivedDataPath build/ios-build \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
