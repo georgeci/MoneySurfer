@@ -1,0 +1,2085 @@
+[ {
+  "command" : {
+    "runFlowCommand" : {
+      "commands" : [ {
+        "applyConfigurationCommand" : {
+          "config" : {
+            "appId" : "${APP_ID}",
+            "name" : "Workspace — Create and select test workspace"
+          },
+          "optional" : false
+        }
+      }, {
+        "runFlowCommand" : {
+          "commands" : [ {
+            "applyConfigurationCommand" : {
+              "config" : {
+                "appId" : "${APP_ID}",
+                "name" : "Setup — Login with reusable app state",
+                "tags" : [ "setup" ]
+              },
+              "optional" : false
+            }
+          }, {
+            "launchAppCommand" : {
+              "appId" : "${APP_ID}",
+              "clearState" : false,
+              "optional" : false
+            }
+          }, {
+            "runFlowCommand" : {
+              "commands" : [ {
+                "tapOnElement" : {
+                  "selector" : {
+                    "idRegex" : "signIn:email",
+                    "optional" : false
+                  },
+                  "retryIfNoChange" : false,
+                  "waitUntilVisible" : false,
+                  "longPress" : false,
+                  "optional" : false
+                }
+              }, {
+                "inputTextCommand" : {
+                  "text" : "${TEST_EMAIL}",
+                  "optional" : false
+                }
+              }, {
+                "tapOnElement" : {
+                  "selector" : {
+                    "idRegex" : "signIn:password",
+                    "optional" : false
+                  },
+                  "retryIfNoChange" : false,
+                  "waitUntilVisible" : false,
+                  "longPress" : false,
+                  "optional" : false
+                }
+              }, {
+                "inputTextCommand" : {
+                  "text" : "${TEST_PASSWORD}",
+                  "optional" : false
+                }
+              }, {
+                "tapOnElement" : {
+                  "selector" : {
+                    "idRegex" : "signIn:submit",
+                    "optional" : false
+                  },
+                  "retryIfNoChange" : false,
+                  "waitUntilVisible" : false,
+                  "longPress" : false,
+                  "optional" : false
+                }
+              }, {
+                "assertConditionCommand" : {
+                  "condition" : {
+                    "visible" : {
+                      "textRegex" : "Choose a workspace",
+                      "optional" : false
+                    }
+                  },
+                  "optional" : false
+                }
+              } ],
+              "condition" : {
+                "visible" : {
+                  "idRegex" : "signIn:email",
+                  "optional" : false
+                }
+              },
+              "optional" : false
+            }
+          } ],
+          "sourceDescription" : "00_login.yaml",
+          "config" : {
+            "appId" : "${APP_ID}",
+            "name" : "Setup — Login with reusable app state",
+            "tags" : [ "setup" ]
+          },
+          "optional" : false
+        }
+      }, {
+        "assertConditionCommand" : {
+          "condition" : {
+            "visible" : {
+              "textRegex" : "Choose a workspace",
+              "optional" : false
+            }
+          },
+          "optional" : false
+        }
+      }, {
+        "runFlowCommand" : {
+          "commands" : [ {
+            "tapOnElement" : {
+              "selector" : {
+                "textRegex" : "Use Test Workspace",
+                "optional" : false
+              },
+              "retryIfNoChange" : false,
+              "waitUntilVisible" : false,
+              "longPress" : false,
+              "optional" : false
+            }
+          } ],
+          "condition" : {
+            "visible" : {
+              "textRegex" : "Use Test Workspace",
+              "optional" : false
+            }
+          },
+          "optional" : false
+        }
+      }, {
+        "runFlowCommand" : {
+          "commands" : [ {
+            "tapOnElement" : {
+              "selector" : {
+                "textRegex" : "New workspace",
+                "optional" : false
+              },
+              "retryIfNoChange" : false,
+              "waitUntilVisible" : false,
+              "longPress" : false,
+              "optional" : false
+            }
+          }, {
+            "assertConditionCommand" : {
+              "condition" : {
+                "visible" : {
+                  "textRegex" : "New workspace",
+                  "optional" : false
+                }
+              },
+              "optional" : false
+            }
+          }, {
+            "tapOnElement" : {
+              "selector" : {
+                "textRegex" : "Workspace name",
+                "optional" : false
+              },
+              "retryIfNoChange" : false,
+              "waitUntilVisible" : false,
+              "longPress" : false,
+              "optional" : false
+            }
+          }, {
+            "inputTextCommand" : {
+              "text" : "Test Workspace",
+              "optional" : false
+            }
+          }, {
+            "tapOnElement" : {
+              "selector" : {
+                "textRegex" : "Create",
+                "optional" : false
+              },
+              "retryIfNoChange" : false,
+              "waitUntilVisible" : false,
+              "longPress" : false,
+              "optional" : false
+            }
+          }, {
+            "tapOnElement" : {
+              "selector" : {
+                "textRegex" : "Use Test Workspace",
+                "optional" : false
+              },
+              "retryIfNoChange" : false,
+              "waitUntilVisible" : false,
+              "longPress" : false,
+              "optional" : false
+            }
+          } ],
+          "condition" : {
+            "visible" : {
+              "textRegex" : "New workspace",
+              "optional" : false
+            }
+          },
+          "optional" : false
+        }
+      }, {
+        "assertConditionCommand" : {
+          "condition" : {
+            "visible" : {
+              "textRegex" : "Accounts",
+              "optional" : false
+            }
+          },
+          "optional" : false
+        }
+      } ],
+      "sourceDescription" : "02_workspace_create.yaml",
+      "config" : {
+        "appId" : "${APP_ID}",
+        "name" : "Workspace — Create and select test workspace"
+      },
+      "optional" : false
+    }
+  },
+  "metadata" : {
+    "status" : "FAILED",
+    "timestamp" : 1784324652709,
+    "duration" : 2117,
+    "error" : {
+      "message" : "Unable to launch app com.georgeci.moneysurfer",
+      "cause" : {
+        "stackTrace" : [ {
+          "classLoaderName" : "app",
+          "methodName" : "runCommand",
+          "fileName" : "CommandLineUtils.kt",
+          "lineNumber" : 50,
+          "className" : "util.CommandLineUtils",
+          "nativeMethod" : false
+        }, {
+          "classLoaderName" : "app",
+          "methodName" : "runCommand$default",
+          "fileName" : "CommandLineUtils.kt",
+          "lineNumber" : 16,
+          "className" : "util.CommandLineUtils",
+          "nativeMethod" : false
+        }, {
+          "classLoaderName" : "app",
+          "methodName" : "launch",
+          "fileName" : "LocalSimulatorUtils.kt",
+          "lineNumber" : 331,
+          "className" : "util.LocalSimulatorUtils",
+          "nativeMethod" : false
+        }, {
+          "classLoaderName" : "app",
+          "methodName" : "launch",
+          "fileName" : "SimctlIOSDevice.kt",
+          "lineNumber" : 93,
+          "className" : "device.SimctlIOSDevice",
+          "nativeMethod" : false
+        }, {
+          "classLoaderName" : "app",
+          "methodName" : "launch",
+          "fileName" : "LocalIOSDevice.kt",
+          "lineNumber" : 107,
+          "className" : "ios.LocalIOSDevice",
+          "nativeMethod" : false
+        }, {
+          "classLoaderName" : "app",
+          "methodName" : "launchApp$lambda$7",
+          "fileName" : "IOSDriver.kt",
+          "lineNumber" : 104,
+          "className" : "maestro.drivers.IOSDriver",
+          "nativeMethod" : false
+        }, {
+          "classLoaderName" : "app",
+          "methodName" : "measured",
+          "fileName" : "Metrics.kt",
+          "lineNumber" : 48,
+          "className" : "maestro.utils.Metrics",
+          "nativeMethod" : false
+        }, {
+          "classLoaderName" : "app",
+          "methodName" : "launchApp",
+          "fileName" : "IOSDriver.kt",
+          "lineNumber" : 103,
+          "className" : "maestro.drivers.IOSDriver",
+          "nativeMethod" : false
+        }, {
+          "classLoaderName" : "app",
+          "methodName" : "launchApp$lambda$2",
+          "fileName" : "Maestro.kt",
+          "lineNumber" : 75,
+          "className" : "maestro.Maestro",
+          "nativeMethod" : false
+        }, {
+          "classLoaderName" : "app",
+          "methodName" : "runInterruptibleInExpectedContext",
+          "fileName" : "Interruptible.kt",
+          "lineNumber" : 48,
+          "className" : "kotlinx.coroutines.InterruptibleKt",
+          "nativeMethod" : false
+        }, {
+          "classLoaderName" : "app",
+          "methodName" : "access$runInterruptibleInExpectedContext",
+          "fileName" : "Interruptible.kt",
+          "lineNumber" : 1,
+          "className" : "kotlinx.coroutines.InterruptibleKt",
+          "nativeMethod" : false
+        }, {
+          "classLoaderName" : "app",
+          "methodName" : "invokeSuspend",
+          "fileName" : "Interruptible.kt",
+          "lineNumber" : 40,
+          "className" : "kotlinx.coroutines.InterruptibleKt$runInterruptible$2",
+          "nativeMethod" : false
+        }, {
+          "classLoaderName" : "app",
+          "methodName" : "resumeWith",
+          "fileName" : "ContinuationImpl.kt",
+          "lineNumber" : 34,
+          "className" : "kotlin.coroutines.jvm.internal.BaseContinuationImpl",
+          "nativeMethod" : false
+        }, {
+          "classLoaderName" : "app",
+          "methodName" : "run",
+          "fileName" : "DispatchedTask.kt",
+          "lineNumber" : 100,
+          "className" : "kotlinx.coroutines.DispatchedTask",
+          "nativeMethod" : false
+        }, {
+          "classLoaderName" : "app",
+          "methodName" : "run",
+          "fileName" : "LimitedDispatcher.kt",
+          "lineNumber" : 124,
+          "className" : "kotlinx.coroutines.internal.LimitedDispatcher$Worker",
+          "nativeMethod" : false
+        }, {
+          "classLoaderName" : "app",
+          "methodName" : "run",
+          "fileName" : "Tasks.kt",
+          "lineNumber" : 89,
+          "className" : "kotlinx.coroutines.scheduling.TaskImpl",
+          "nativeMethod" : false
+        }, {
+          "classLoaderName" : "app",
+          "methodName" : "runSafely",
+          "fileName" : "CoroutineScheduler.kt",
+          "lineNumber" : 586,
+          "className" : "kotlinx.coroutines.scheduling.CoroutineScheduler",
+          "nativeMethod" : false
+        }, {
+          "classLoaderName" : "app",
+          "methodName" : "executeTask",
+          "fileName" : "CoroutineScheduler.kt",
+          "lineNumber" : 820,
+          "className" : "kotlinx.coroutines.scheduling.CoroutineScheduler$Worker",
+          "nativeMethod" : false
+        }, {
+          "classLoaderName" : "app",
+          "methodName" : "runWorker",
+          "fileName" : "CoroutineScheduler.kt",
+          "lineNumber" : 717,
+          "className" : "kotlinx.coroutines.scheduling.CoroutineScheduler$Worker",
+          "nativeMethod" : false
+        }, {
+          "classLoaderName" : "app",
+          "methodName" : "run",
+          "fileName" : "CoroutineScheduler.kt",
+          "lineNumber" : 704,
+          "className" : "kotlinx.coroutines.scheduling.CoroutineScheduler$Worker",
+          "nativeMethod" : false
+        } ],
+        "message" : "An error was encountered processing the command (domain=FBSOpenApplicationServiceErrorDomain, code=4):\nSimulator device failed to launch com.georgeci.moneysurfer.\nUnderlying error (domain=FBSOpenApplicationServiceErrorDomain, code=4):\n\tThe request to open \"com.georgeci.moneysurfer\" failed.\n",
+        "localizedMessage" : "An error was encountered processing the command (domain=FBSOpenApplicationServiceErrorDomain, code=4):\nSimulator device failed to launch com.georgeci.moneysurfer.\nUnderlying error (domain=FBSOpenApplicationServiceErrorDomain, code=4):\n\tThe request to open \"com.georgeci.moneysurfer\" failed.\n"
+      },
+      "stackTrace" : [ {
+        "classLoaderName" : "app",
+        "methodName" : "launchAppCommand",
+        "fileName" : "Orchestra.kt",
+        "lineNumber" : 1161,
+        "className" : "maestro.orchestra.Orchestra",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "access$launchAppCommand",
+        "fileName" : "Orchestra.kt",
+        "lineNumber" : 126,
+        "className" : "maestro.orchestra.Orchestra",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "invokeSuspend",
+        "fileName" : "Orchestra.kt",
+        "lineNumber" : -1,
+        "className" : "maestro.orchestra.Orchestra$launchAppCommand$1",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "resumeWith",
+        "fileName" : "ContinuationImpl.kt",
+        "lineNumber" : 34,
+        "className" : "kotlin.coroutines.jvm.internal.BaseContinuationImpl",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "run",
+        "fileName" : "DispatchedTask.kt",
+        "lineNumber" : 98,
+        "className" : "kotlinx.coroutines.DispatchedTask",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "processNextEvent",
+        "fileName" : "EventLoop.common.kt",
+        "lineNumber" : 263,
+        "className" : "kotlinx.coroutines.EventLoopImplBase",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "joinBlocking",
+        "fileName" : "Builders.kt",
+        "lineNumber" : 94,
+        "className" : "kotlinx.coroutines.BlockingCoroutine",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "runBlocking",
+        "fileName" : "Builders.kt",
+        "lineNumber" : 70,
+        "className" : "kotlinx.coroutines.BuildersKt__BuildersKt",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "runBlocking",
+        "lineNumber" : 1,
+        "className" : "kotlinx.coroutines.BuildersKt",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "runBlocking$default",
+        "fileName" : "Builders.kt",
+        "lineNumber" : 48,
+        "className" : "kotlinx.coroutines.BuildersKt__BuildersKt",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "runBlocking$default",
+        "lineNumber" : 1,
+        "className" : "kotlinx.coroutines.BuildersKt",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "runShardSuite$lambda$10",
+        "fileName" : "TestCommand.kt",
+        "lineNumber" : 501,
+        "className" : "maestro.cli.command.TestCommand",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "newSession",
+        "fileName" : "MaestroSessionManager.kt",
+        "lineNumber" : 132,
+        "className" : "maestro.cli.session.MaestroSessionManager",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "newSession$default",
+        "fileName" : "MaestroSessionManager.kt",
+        "lineNumber" : 66,
+        "className" : "maestro.cli.session.MaestroSessionManager",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "runShardSuite",
+        "fileName" : "TestCommand.kt",
+        "lineNumber" : 476,
+        "className" : "maestro.cli.command.TestCommand",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "access$runShardSuite",
+        "fileName" : "TestCommand.kt",
+        "lineNumber" : 80,
+        "className" : "maestro.cli.command.TestCommand",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "invokeSuspend",
+        "fileName" : "TestCommand.kt",
+        "lineNumber" : 435,
+        "className" : "maestro.cli.command.TestCommand$handleSessions$1$results$1$1",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "resumeWith",
+        "fileName" : "ContinuationImpl.kt",
+        "lineNumber" : 34,
+        "className" : "kotlin.coroutines.jvm.internal.BaseContinuationImpl",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "run",
+        "fileName" : "DispatchedTask.kt",
+        "lineNumber" : 100,
+        "className" : "kotlinx.coroutines.DispatchedTask",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "run",
+        "fileName" : "LimitedDispatcher.kt",
+        "lineNumber" : 124,
+        "className" : "kotlinx.coroutines.internal.LimitedDispatcher$Worker",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "run",
+        "fileName" : "Tasks.kt",
+        "lineNumber" : 89,
+        "className" : "kotlinx.coroutines.scheduling.TaskImpl",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "runSafely",
+        "fileName" : "CoroutineScheduler.kt",
+        "lineNumber" : 586,
+        "className" : "kotlinx.coroutines.scheduling.CoroutineScheduler",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "executeTask",
+        "fileName" : "CoroutineScheduler.kt",
+        "lineNumber" : 820,
+        "className" : "kotlinx.coroutines.scheduling.CoroutineScheduler$Worker",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "runWorker",
+        "fileName" : "CoroutineScheduler.kt",
+        "lineNumber" : 717,
+        "className" : "kotlinx.coroutines.scheduling.CoroutineScheduler$Worker",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "run",
+        "fileName" : "CoroutineScheduler.kt",
+        "lineNumber" : 704,
+        "className" : "kotlinx.coroutines.scheduling.CoroutineScheduler$Worker",
+        "nativeMethod" : false
+      } ],
+      "localizedMessage" : "Unable to launch app com.georgeci.moneysurfer"
+    },
+    "sequenceNumber" : 4
+  }
+}, {
+  "command" : {
+    "runFlowCommand" : {
+      "commands" : [ {
+        "applyConfigurationCommand" : {
+          "config" : {
+            "appId" : "${APP_ID}",
+            "name" : "Dashboard — Add bank account"
+          },
+          "optional" : false
+        }
+      }, {
+        "runFlowCommand" : {
+          "commands" : [ {
+            "applyConfigurationCommand" : {
+              "config" : {
+                "appId" : "${APP_ID}",
+                "name" : "Workspace — Create and select test workspace"
+              },
+              "optional" : false
+            }
+          }, {
+            "runFlowCommand" : {
+              "commands" : [ {
+                "applyConfigurationCommand" : {
+                  "config" : {
+                    "appId" : "${APP_ID}",
+                    "name" : "Setup — Login with reusable app state",
+                    "tags" : [ "setup" ]
+                  },
+                  "optional" : false
+                }
+              }, {
+                "launchAppCommand" : {
+                  "appId" : "${APP_ID}",
+                  "clearState" : false,
+                  "optional" : false
+                }
+              }, {
+                "runFlowCommand" : {
+                  "commands" : [ {
+                    "tapOnElement" : {
+                      "selector" : {
+                        "idRegex" : "signIn:email",
+                        "optional" : false
+                      },
+                      "retryIfNoChange" : false,
+                      "waitUntilVisible" : false,
+                      "longPress" : false,
+                      "optional" : false
+                    }
+                  }, {
+                    "inputTextCommand" : {
+                      "text" : "${TEST_EMAIL}",
+                      "optional" : false
+                    }
+                  }, {
+                    "tapOnElement" : {
+                      "selector" : {
+                        "idRegex" : "signIn:password",
+                        "optional" : false
+                      },
+                      "retryIfNoChange" : false,
+                      "waitUntilVisible" : false,
+                      "longPress" : false,
+                      "optional" : false
+                    }
+                  }, {
+                    "inputTextCommand" : {
+                      "text" : "${TEST_PASSWORD}",
+                      "optional" : false
+                    }
+                  }, {
+                    "tapOnElement" : {
+                      "selector" : {
+                        "idRegex" : "signIn:submit",
+                        "optional" : false
+                      },
+                      "retryIfNoChange" : false,
+                      "waitUntilVisible" : false,
+                      "longPress" : false,
+                      "optional" : false
+                    }
+                  }, {
+                    "assertConditionCommand" : {
+                      "condition" : {
+                        "visible" : {
+                          "textRegex" : "Choose a workspace",
+                          "optional" : false
+                        }
+                      },
+                      "optional" : false
+                    }
+                  } ],
+                  "condition" : {
+                    "visible" : {
+                      "idRegex" : "signIn:email",
+                      "optional" : false
+                    }
+                  },
+                  "optional" : false
+                }
+              } ],
+              "sourceDescription" : "00_login.yaml",
+              "config" : {
+                "appId" : "${APP_ID}",
+                "name" : "Setup — Login with reusable app state",
+                "tags" : [ "setup" ]
+              },
+              "optional" : false
+            }
+          }, {
+            "assertConditionCommand" : {
+              "condition" : {
+                "visible" : {
+                  "textRegex" : "Choose a workspace",
+                  "optional" : false
+                }
+              },
+              "optional" : false
+            }
+          }, {
+            "runFlowCommand" : {
+              "commands" : [ {
+                "tapOnElement" : {
+                  "selector" : {
+                    "textRegex" : "Use Test Workspace",
+                    "optional" : false
+                  },
+                  "retryIfNoChange" : false,
+                  "waitUntilVisible" : false,
+                  "longPress" : false,
+                  "optional" : false
+                }
+              } ],
+              "condition" : {
+                "visible" : {
+                  "textRegex" : "Use Test Workspace",
+                  "optional" : false
+                }
+              },
+              "optional" : false
+            }
+          }, {
+            "runFlowCommand" : {
+              "commands" : [ {
+                "tapOnElement" : {
+                  "selector" : {
+                    "textRegex" : "New workspace",
+                    "optional" : false
+                  },
+                  "retryIfNoChange" : false,
+                  "waitUntilVisible" : false,
+                  "longPress" : false,
+                  "optional" : false
+                }
+              }, {
+                "assertConditionCommand" : {
+                  "condition" : {
+                    "visible" : {
+                      "textRegex" : "New workspace",
+                      "optional" : false
+                    }
+                  },
+                  "optional" : false
+                }
+              }, {
+                "tapOnElement" : {
+                  "selector" : {
+                    "textRegex" : "Workspace name",
+                    "optional" : false
+                  },
+                  "retryIfNoChange" : false,
+                  "waitUntilVisible" : false,
+                  "longPress" : false,
+                  "optional" : false
+                }
+              }, {
+                "inputTextCommand" : {
+                  "text" : "Test Workspace",
+                  "optional" : false
+                }
+              }, {
+                "tapOnElement" : {
+                  "selector" : {
+                    "textRegex" : "Create",
+                    "optional" : false
+                  },
+                  "retryIfNoChange" : false,
+                  "waitUntilVisible" : false,
+                  "longPress" : false,
+                  "optional" : false
+                }
+              }, {
+                "tapOnElement" : {
+                  "selector" : {
+                    "textRegex" : "Use Test Workspace",
+                    "optional" : false
+                  },
+                  "retryIfNoChange" : false,
+                  "waitUntilVisible" : false,
+                  "longPress" : false,
+                  "optional" : false
+                }
+              } ],
+              "condition" : {
+                "visible" : {
+                  "textRegex" : "New workspace",
+                  "optional" : false
+                }
+              },
+              "optional" : false
+            }
+          }, {
+            "assertConditionCommand" : {
+              "condition" : {
+                "visible" : {
+                  "textRegex" : "Accounts",
+                  "optional" : false
+                }
+              },
+              "optional" : false
+            }
+          } ],
+          "sourceDescription" : "02_workspace_create.yaml",
+          "config" : {
+            "appId" : "${APP_ID}",
+            "name" : "Workspace — Create and select test workspace"
+          },
+          "optional" : false
+        }
+      }, {
+        "assertConditionCommand" : {
+          "condition" : {
+            "visible" : {
+              "textRegex" : "Accounts",
+              "optional" : false
+            }
+          },
+          "optional" : false
+        }
+      }, {
+        "runFlowCommand" : {
+          "commands" : [ {
+            "tapOnElement" : {
+              "selector" : {
+                "textRegex" : "Add account",
+                "optional" : false
+              },
+              "retryIfNoChange" : false,
+              "waitUntilVisible" : false,
+              "longPress" : false,
+              "optional" : false
+            }
+          }, {
+            "assertConditionCommand" : {
+              "condition" : {
+                "visible" : {
+                  "textRegex" : "New account",
+                  "optional" : false
+                }
+              },
+              "optional" : false
+            }
+          }, {
+            "tapOnElement" : {
+              "selector" : {
+                "textRegex" : "Account name",
+                "optional" : false
+              },
+              "retryIfNoChange" : false,
+              "waitUntilVisible" : false,
+              "longPress" : false,
+              "optional" : false
+            }
+          }, {
+            "inputTextCommand" : {
+              "text" : "Main Bank",
+              "optional" : false
+            }
+          }, {
+            "tapOnElement" : {
+              "selector" : {
+                "textRegex" : "Bank",
+                "optional" : false
+              },
+              "retryIfNoChange" : false,
+              "waitUntilVisible" : false,
+              "longPress" : false,
+              "optional" : false
+            }
+          }, {
+            "tapOnElement" : {
+              "selector" : {
+                "textRegex" : "Save",
+                "optional" : false
+              },
+              "retryIfNoChange" : false,
+              "waitUntilVisible" : false,
+              "longPress" : false,
+              "optional" : false
+            }
+          } ],
+          "condition" : {
+            "notVisible" : {
+              "textRegex" : "Main Bank",
+              "optional" : false
+            }
+          },
+          "optional" : false
+        }
+      }, {
+        "assertConditionCommand" : {
+          "condition" : {
+            "visible" : {
+              "textRegex" : "Accounts",
+              "optional" : false
+            }
+          },
+          "optional" : false
+        }
+      }, {
+        "assertConditionCommand" : {
+          "condition" : {
+            "visible" : {
+              "textRegex" : "Main Bank",
+              "optional" : false
+            }
+          },
+          "optional" : false
+        }
+      }, {
+        "assertConditionCommand" : {
+          "condition" : {
+            "notVisible" : {
+              "textRegex" : "^Add$",
+              "optional" : false
+            }
+          },
+          "optional" : false
+        }
+      }, {
+        "assertConditionCommand" : {
+          "condition" : {
+            "notVisible" : {
+              "textRegex" : "^Transfer$",
+              "optional" : false
+            }
+          },
+          "optional" : false
+        }
+      } ],
+      "sourceDescription" : "03_dashboard_add_account.yaml",
+      "config" : {
+        "appId" : "${APP_ID}",
+        "name" : "Dashboard — Add bank account"
+      },
+      "optional" : false
+    }
+  },
+  "metadata" : {
+    "status" : "FAILED",
+    "timestamp" : 1784324652706,
+    "duration" : 2120,
+    "error" : {
+      "message" : "Unable to launch app com.georgeci.moneysurfer",
+      "cause" : {
+        "stackTrace" : [ {
+          "classLoaderName" : "app",
+          "methodName" : "runCommand",
+          "fileName" : "CommandLineUtils.kt",
+          "lineNumber" : 50,
+          "className" : "util.CommandLineUtils",
+          "nativeMethod" : false
+        }, {
+          "classLoaderName" : "app",
+          "methodName" : "runCommand$default",
+          "fileName" : "CommandLineUtils.kt",
+          "lineNumber" : 16,
+          "className" : "util.CommandLineUtils",
+          "nativeMethod" : false
+        }, {
+          "classLoaderName" : "app",
+          "methodName" : "launch",
+          "fileName" : "LocalSimulatorUtils.kt",
+          "lineNumber" : 331,
+          "className" : "util.LocalSimulatorUtils",
+          "nativeMethod" : false
+        }, {
+          "classLoaderName" : "app",
+          "methodName" : "launch",
+          "fileName" : "SimctlIOSDevice.kt",
+          "lineNumber" : 93,
+          "className" : "device.SimctlIOSDevice",
+          "nativeMethod" : false
+        }, {
+          "classLoaderName" : "app",
+          "methodName" : "launch",
+          "fileName" : "LocalIOSDevice.kt",
+          "lineNumber" : 107,
+          "className" : "ios.LocalIOSDevice",
+          "nativeMethod" : false
+        }, {
+          "classLoaderName" : "app",
+          "methodName" : "launchApp$lambda$7",
+          "fileName" : "IOSDriver.kt",
+          "lineNumber" : 104,
+          "className" : "maestro.drivers.IOSDriver",
+          "nativeMethod" : false
+        }, {
+          "classLoaderName" : "app",
+          "methodName" : "measured",
+          "fileName" : "Metrics.kt",
+          "lineNumber" : 48,
+          "className" : "maestro.utils.Metrics",
+          "nativeMethod" : false
+        }, {
+          "classLoaderName" : "app",
+          "methodName" : "launchApp",
+          "fileName" : "IOSDriver.kt",
+          "lineNumber" : 103,
+          "className" : "maestro.drivers.IOSDriver",
+          "nativeMethod" : false
+        }, {
+          "classLoaderName" : "app",
+          "methodName" : "launchApp$lambda$2",
+          "fileName" : "Maestro.kt",
+          "lineNumber" : 75,
+          "className" : "maestro.Maestro",
+          "nativeMethod" : false
+        }, {
+          "classLoaderName" : "app",
+          "methodName" : "runInterruptibleInExpectedContext",
+          "fileName" : "Interruptible.kt",
+          "lineNumber" : 48,
+          "className" : "kotlinx.coroutines.InterruptibleKt",
+          "nativeMethod" : false
+        }, {
+          "classLoaderName" : "app",
+          "methodName" : "access$runInterruptibleInExpectedContext",
+          "fileName" : "Interruptible.kt",
+          "lineNumber" : 1,
+          "className" : "kotlinx.coroutines.InterruptibleKt",
+          "nativeMethod" : false
+        }, {
+          "classLoaderName" : "app",
+          "methodName" : "invokeSuspend",
+          "fileName" : "Interruptible.kt",
+          "lineNumber" : 40,
+          "className" : "kotlinx.coroutines.InterruptibleKt$runInterruptible$2",
+          "nativeMethod" : false
+        }, {
+          "classLoaderName" : "app",
+          "methodName" : "resumeWith",
+          "fileName" : "ContinuationImpl.kt",
+          "lineNumber" : 34,
+          "className" : "kotlin.coroutines.jvm.internal.BaseContinuationImpl",
+          "nativeMethod" : false
+        }, {
+          "classLoaderName" : "app",
+          "methodName" : "run",
+          "fileName" : "DispatchedTask.kt",
+          "lineNumber" : 100,
+          "className" : "kotlinx.coroutines.DispatchedTask",
+          "nativeMethod" : false
+        }, {
+          "classLoaderName" : "app",
+          "methodName" : "run",
+          "fileName" : "LimitedDispatcher.kt",
+          "lineNumber" : 124,
+          "className" : "kotlinx.coroutines.internal.LimitedDispatcher$Worker",
+          "nativeMethod" : false
+        }, {
+          "classLoaderName" : "app",
+          "methodName" : "run",
+          "fileName" : "Tasks.kt",
+          "lineNumber" : 89,
+          "className" : "kotlinx.coroutines.scheduling.TaskImpl",
+          "nativeMethod" : false
+        }, {
+          "classLoaderName" : "app",
+          "methodName" : "runSafely",
+          "fileName" : "CoroutineScheduler.kt",
+          "lineNumber" : 586,
+          "className" : "kotlinx.coroutines.scheduling.CoroutineScheduler",
+          "nativeMethod" : false
+        }, {
+          "classLoaderName" : "app",
+          "methodName" : "executeTask",
+          "fileName" : "CoroutineScheduler.kt",
+          "lineNumber" : 820,
+          "className" : "kotlinx.coroutines.scheduling.CoroutineScheduler$Worker",
+          "nativeMethod" : false
+        }, {
+          "classLoaderName" : "app",
+          "methodName" : "runWorker",
+          "fileName" : "CoroutineScheduler.kt",
+          "lineNumber" : 717,
+          "className" : "kotlinx.coroutines.scheduling.CoroutineScheduler$Worker",
+          "nativeMethod" : false
+        }, {
+          "classLoaderName" : "app",
+          "methodName" : "run",
+          "fileName" : "CoroutineScheduler.kt",
+          "lineNumber" : 704,
+          "className" : "kotlinx.coroutines.scheduling.CoroutineScheduler$Worker",
+          "nativeMethod" : false
+        } ],
+        "message" : "An error was encountered processing the command (domain=FBSOpenApplicationServiceErrorDomain, code=4):\nSimulator device failed to launch com.georgeci.moneysurfer.\nUnderlying error (domain=FBSOpenApplicationServiceErrorDomain, code=4):\n\tThe request to open \"com.georgeci.moneysurfer\" failed.\n",
+        "localizedMessage" : "An error was encountered processing the command (domain=FBSOpenApplicationServiceErrorDomain, code=4):\nSimulator device failed to launch com.georgeci.moneysurfer.\nUnderlying error (domain=FBSOpenApplicationServiceErrorDomain, code=4):\n\tThe request to open \"com.georgeci.moneysurfer\" failed.\n"
+      },
+      "stackTrace" : [ {
+        "classLoaderName" : "app",
+        "methodName" : "launchAppCommand",
+        "fileName" : "Orchestra.kt",
+        "lineNumber" : 1161,
+        "className" : "maestro.orchestra.Orchestra",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "access$launchAppCommand",
+        "fileName" : "Orchestra.kt",
+        "lineNumber" : 126,
+        "className" : "maestro.orchestra.Orchestra",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "invokeSuspend",
+        "fileName" : "Orchestra.kt",
+        "lineNumber" : -1,
+        "className" : "maestro.orchestra.Orchestra$launchAppCommand$1",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "resumeWith",
+        "fileName" : "ContinuationImpl.kt",
+        "lineNumber" : 34,
+        "className" : "kotlin.coroutines.jvm.internal.BaseContinuationImpl",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "run",
+        "fileName" : "DispatchedTask.kt",
+        "lineNumber" : 98,
+        "className" : "kotlinx.coroutines.DispatchedTask",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "processNextEvent",
+        "fileName" : "EventLoop.common.kt",
+        "lineNumber" : 263,
+        "className" : "kotlinx.coroutines.EventLoopImplBase",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "joinBlocking",
+        "fileName" : "Builders.kt",
+        "lineNumber" : 94,
+        "className" : "kotlinx.coroutines.BlockingCoroutine",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "runBlocking",
+        "fileName" : "Builders.kt",
+        "lineNumber" : 70,
+        "className" : "kotlinx.coroutines.BuildersKt__BuildersKt",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "runBlocking",
+        "lineNumber" : 1,
+        "className" : "kotlinx.coroutines.BuildersKt",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "runBlocking$default",
+        "fileName" : "Builders.kt",
+        "lineNumber" : 48,
+        "className" : "kotlinx.coroutines.BuildersKt__BuildersKt",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "runBlocking$default",
+        "lineNumber" : 1,
+        "className" : "kotlinx.coroutines.BuildersKt",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "runShardSuite$lambda$10",
+        "fileName" : "TestCommand.kt",
+        "lineNumber" : 501,
+        "className" : "maestro.cli.command.TestCommand",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "newSession",
+        "fileName" : "MaestroSessionManager.kt",
+        "lineNumber" : 132,
+        "className" : "maestro.cli.session.MaestroSessionManager",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "newSession$default",
+        "fileName" : "MaestroSessionManager.kt",
+        "lineNumber" : 66,
+        "className" : "maestro.cli.session.MaestroSessionManager",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "runShardSuite",
+        "fileName" : "TestCommand.kt",
+        "lineNumber" : 476,
+        "className" : "maestro.cli.command.TestCommand",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "access$runShardSuite",
+        "fileName" : "TestCommand.kt",
+        "lineNumber" : 80,
+        "className" : "maestro.cli.command.TestCommand",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "invokeSuspend",
+        "fileName" : "TestCommand.kt",
+        "lineNumber" : 435,
+        "className" : "maestro.cli.command.TestCommand$handleSessions$1$results$1$1",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "resumeWith",
+        "fileName" : "ContinuationImpl.kt",
+        "lineNumber" : 34,
+        "className" : "kotlin.coroutines.jvm.internal.BaseContinuationImpl",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "run",
+        "fileName" : "DispatchedTask.kt",
+        "lineNumber" : 100,
+        "className" : "kotlinx.coroutines.DispatchedTask",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "run",
+        "fileName" : "LimitedDispatcher.kt",
+        "lineNumber" : 124,
+        "className" : "kotlinx.coroutines.internal.LimitedDispatcher$Worker",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "run",
+        "fileName" : "Tasks.kt",
+        "lineNumber" : 89,
+        "className" : "kotlinx.coroutines.scheduling.TaskImpl",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "runSafely",
+        "fileName" : "CoroutineScheduler.kt",
+        "lineNumber" : 586,
+        "className" : "kotlinx.coroutines.scheduling.CoroutineScheduler",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "executeTask",
+        "fileName" : "CoroutineScheduler.kt",
+        "lineNumber" : 820,
+        "className" : "kotlinx.coroutines.scheduling.CoroutineScheduler$Worker",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "runWorker",
+        "fileName" : "CoroutineScheduler.kt",
+        "lineNumber" : 717,
+        "className" : "kotlinx.coroutines.scheduling.CoroutineScheduler$Worker",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "run",
+        "fileName" : "CoroutineScheduler.kt",
+        "lineNumber" : 704,
+        "className" : "kotlinx.coroutines.scheduling.CoroutineScheduler$Worker",
+        "nativeMethod" : false
+      } ],
+      "localizedMessage" : "Unable to launch app com.georgeci.moneysurfer"
+    },
+    "sequenceNumber" : 2
+  }
+}, {
+  "command" : {
+    "runFlowCommand" : {
+      "commands" : [ {
+        "applyConfigurationCommand" : {
+          "config" : {
+            "appId" : "${APP_ID}",
+            "name" : "Setup — Login with reusable app state",
+            "tags" : [ "setup" ]
+          },
+          "optional" : false
+        }
+      }, {
+        "launchAppCommand" : {
+          "appId" : "${APP_ID}",
+          "clearState" : false,
+          "optional" : false
+        }
+      }, {
+        "runFlowCommand" : {
+          "commands" : [ {
+            "tapOnElement" : {
+              "selector" : {
+                "idRegex" : "signIn:email",
+                "optional" : false
+              },
+              "retryIfNoChange" : false,
+              "waitUntilVisible" : false,
+              "longPress" : false,
+              "optional" : false
+            }
+          }, {
+            "inputTextCommand" : {
+              "text" : "${TEST_EMAIL}",
+              "optional" : false
+            }
+          }, {
+            "tapOnElement" : {
+              "selector" : {
+                "idRegex" : "signIn:password",
+                "optional" : false
+              },
+              "retryIfNoChange" : false,
+              "waitUntilVisible" : false,
+              "longPress" : false,
+              "optional" : false
+            }
+          }, {
+            "inputTextCommand" : {
+              "text" : "${TEST_PASSWORD}",
+              "optional" : false
+            }
+          }, {
+            "tapOnElement" : {
+              "selector" : {
+                "idRegex" : "signIn:submit",
+                "optional" : false
+              },
+              "retryIfNoChange" : false,
+              "waitUntilVisible" : false,
+              "longPress" : false,
+              "optional" : false
+            }
+          }, {
+            "assertConditionCommand" : {
+              "condition" : {
+                "visible" : {
+                  "textRegex" : "Choose a workspace",
+                  "optional" : false
+                }
+              },
+              "optional" : false
+            }
+          } ],
+          "condition" : {
+            "visible" : {
+              "idRegex" : "signIn:email",
+              "optional" : false
+            }
+          },
+          "optional" : false
+        }
+      } ],
+      "sourceDescription" : "00_login.yaml",
+      "config" : {
+        "appId" : "${APP_ID}",
+        "name" : "Setup — Login with reusable app state",
+        "tags" : [ "setup" ]
+      },
+      "optional" : false
+    }
+  },
+  "metadata" : {
+    "status" : "FAILED",
+    "timestamp" : 1784324652711,
+    "duration" : 2115,
+    "error" : {
+      "message" : "Unable to launch app com.georgeci.moneysurfer",
+      "cause" : {
+        "stackTrace" : [ {
+          "classLoaderName" : "app",
+          "methodName" : "runCommand",
+          "fileName" : "CommandLineUtils.kt",
+          "lineNumber" : 50,
+          "className" : "util.CommandLineUtils",
+          "nativeMethod" : false
+        }, {
+          "classLoaderName" : "app",
+          "methodName" : "runCommand$default",
+          "fileName" : "CommandLineUtils.kt",
+          "lineNumber" : 16,
+          "className" : "util.CommandLineUtils",
+          "nativeMethod" : false
+        }, {
+          "classLoaderName" : "app",
+          "methodName" : "launch",
+          "fileName" : "LocalSimulatorUtils.kt",
+          "lineNumber" : 331,
+          "className" : "util.LocalSimulatorUtils",
+          "nativeMethod" : false
+        }, {
+          "classLoaderName" : "app",
+          "methodName" : "launch",
+          "fileName" : "SimctlIOSDevice.kt",
+          "lineNumber" : 93,
+          "className" : "device.SimctlIOSDevice",
+          "nativeMethod" : false
+        }, {
+          "classLoaderName" : "app",
+          "methodName" : "launch",
+          "fileName" : "LocalIOSDevice.kt",
+          "lineNumber" : 107,
+          "className" : "ios.LocalIOSDevice",
+          "nativeMethod" : false
+        }, {
+          "classLoaderName" : "app",
+          "methodName" : "launchApp$lambda$7",
+          "fileName" : "IOSDriver.kt",
+          "lineNumber" : 104,
+          "className" : "maestro.drivers.IOSDriver",
+          "nativeMethod" : false
+        }, {
+          "classLoaderName" : "app",
+          "methodName" : "measured",
+          "fileName" : "Metrics.kt",
+          "lineNumber" : 48,
+          "className" : "maestro.utils.Metrics",
+          "nativeMethod" : false
+        }, {
+          "classLoaderName" : "app",
+          "methodName" : "launchApp",
+          "fileName" : "IOSDriver.kt",
+          "lineNumber" : 103,
+          "className" : "maestro.drivers.IOSDriver",
+          "nativeMethod" : false
+        }, {
+          "classLoaderName" : "app",
+          "methodName" : "launchApp$lambda$2",
+          "fileName" : "Maestro.kt",
+          "lineNumber" : 75,
+          "className" : "maestro.Maestro",
+          "nativeMethod" : false
+        }, {
+          "classLoaderName" : "app",
+          "methodName" : "runInterruptibleInExpectedContext",
+          "fileName" : "Interruptible.kt",
+          "lineNumber" : 48,
+          "className" : "kotlinx.coroutines.InterruptibleKt",
+          "nativeMethod" : false
+        }, {
+          "classLoaderName" : "app",
+          "methodName" : "access$runInterruptibleInExpectedContext",
+          "fileName" : "Interruptible.kt",
+          "lineNumber" : 1,
+          "className" : "kotlinx.coroutines.InterruptibleKt",
+          "nativeMethod" : false
+        }, {
+          "classLoaderName" : "app",
+          "methodName" : "invokeSuspend",
+          "fileName" : "Interruptible.kt",
+          "lineNumber" : 40,
+          "className" : "kotlinx.coroutines.InterruptibleKt$runInterruptible$2",
+          "nativeMethod" : false
+        }, {
+          "classLoaderName" : "app",
+          "methodName" : "resumeWith",
+          "fileName" : "ContinuationImpl.kt",
+          "lineNumber" : 34,
+          "className" : "kotlin.coroutines.jvm.internal.BaseContinuationImpl",
+          "nativeMethod" : false
+        }, {
+          "classLoaderName" : "app",
+          "methodName" : "run",
+          "fileName" : "DispatchedTask.kt",
+          "lineNumber" : 100,
+          "className" : "kotlinx.coroutines.DispatchedTask",
+          "nativeMethod" : false
+        }, {
+          "classLoaderName" : "app",
+          "methodName" : "run",
+          "fileName" : "LimitedDispatcher.kt",
+          "lineNumber" : 124,
+          "className" : "kotlinx.coroutines.internal.LimitedDispatcher$Worker",
+          "nativeMethod" : false
+        }, {
+          "classLoaderName" : "app",
+          "methodName" : "run",
+          "fileName" : "Tasks.kt",
+          "lineNumber" : 89,
+          "className" : "kotlinx.coroutines.scheduling.TaskImpl",
+          "nativeMethod" : false
+        }, {
+          "classLoaderName" : "app",
+          "methodName" : "runSafely",
+          "fileName" : "CoroutineScheduler.kt",
+          "lineNumber" : 586,
+          "className" : "kotlinx.coroutines.scheduling.CoroutineScheduler",
+          "nativeMethod" : false
+        }, {
+          "classLoaderName" : "app",
+          "methodName" : "executeTask",
+          "fileName" : "CoroutineScheduler.kt",
+          "lineNumber" : 820,
+          "className" : "kotlinx.coroutines.scheduling.CoroutineScheduler$Worker",
+          "nativeMethod" : false
+        }, {
+          "classLoaderName" : "app",
+          "methodName" : "runWorker",
+          "fileName" : "CoroutineScheduler.kt",
+          "lineNumber" : 717,
+          "className" : "kotlinx.coroutines.scheduling.CoroutineScheduler$Worker",
+          "nativeMethod" : false
+        }, {
+          "classLoaderName" : "app",
+          "methodName" : "run",
+          "fileName" : "CoroutineScheduler.kt",
+          "lineNumber" : 704,
+          "className" : "kotlinx.coroutines.scheduling.CoroutineScheduler$Worker",
+          "nativeMethod" : false
+        } ],
+        "message" : "An error was encountered processing the command (domain=FBSOpenApplicationServiceErrorDomain, code=4):\nSimulator device failed to launch com.georgeci.moneysurfer.\nUnderlying error (domain=FBSOpenApplicationServiceErrorDomain, code=4):\n\tThe request to open \"com.georgeci.moneysurfer\" failed.\n",
+        "localizedMessage" : "An error was encountered processing the command (domain=FBSOpenApplicationServiceErrorDomain, code=4):\nSimulator device failed to launch com.georgeci.moneysurfer.\nUnderlying error (domain=FBSOpenApplicationServiceErrorDomain, code=4):\n\tThe request to open \"com.georgeci.moneysurfer\" failed.\n"
+      },
+      "stackTrace" : [ {
+        "classLoaderName" : "app",
+        "methodName" : "launchAppCommand",
+        "fileName" : "Orchestra.kt",
+        "lineNumber" : 1161,
+        "className" : "maestro.orchestra.Orchestra",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "access$launchAppCommand",
+        "fileName" : "Orchestra.kt",
+        "lineNumber" : 126,
+        "className" : "maestro.orchestra.Orchestra",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "invokeSuspend",
+        "fileName" : "Orchestra.kt",
+        "lineNumber" : -1,
+        "className" : "maestro.orchestra.Orchestra$launchAppCommand$1",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "resumeWith",
+        "fileName" : "ContinuationImpl.kt",
+        "lineNumber" : 34,
+        "className" : "kotlin.coroutines.jvm.internal.BaseContinuationImpl",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "run",
+        "fileName" : "DispatchedTask.kt",
+        "lineNumber" : 98,
+        "className" : "kotlinx.coroutines.DispatchedTask",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "processNextEvent",
+        "fileName" : "EventLoop.common.kt",
+        "lineNumber" : 263,
+        "className" : "kotlinx.coroutines.EventLoopImplBase",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "joinBlocking",
+        "fileName" : "Builders.kt",
+        "lineNumber" : 94,
+        "className" : "kotlinx.coroutines.BlockingCoroutine",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "runBlocking",
+        "fileName" : "Builders.kt",
+        "lineNumber" : 70,
+        "className" : "kotlinx.coroutines.BuildersKt__BuildersKt",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "runBlocking",
+        "lineNumber" : 1,
+        "className" : "kotlinx.coroutines.BuildersKt",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "runBlocking$default",
+        "fileName" : "Builders.kt",
+        "lineNumber" : 48,
+        "className" : "kotlinx.coroutines.BuildersKt__BuildersKt",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "runBlocking$default",
+        "lineNumber" : 1,
+        "className" : "kotlinx.coroutines.BuildersKt",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "runShardSuite$lambda$10",
+        "fileName" : "TestCommand.kt",
+        "lineNumber" : 501,
+        "className" : "maestro.cli.command.TestCommand",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "newSession",
+        "fileName" : "MaestroSessionManager.kt",
+        "lineNumber" : 132,
+        "className" : "maestro.cli.session.MaestroSessionManager",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "newSession$default",
+        "fileName" : "MaestroSessionManager.kt",
+        "lineNumber" : 66,
+        "className" : "maestro.cli.session.MaestroSessionManager",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "runShardSuite",
+        "fileName" : "TestCommand.kt",
+        "lineNumber" : 476,
+        "className" : "maestro.cli.command.TestCommand",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "access$runShardSuite",
+        "fileName" : "TestCommand.kt",
+        "lineNumber" : 80,
+        "className" : "maestro.cli.command.TestCommand",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "invokeSuspend",
+        "fileName" : "TestCommand.kt",
+        "lineNumber" : 435,
+        "className" : "maestro.cli.command.TestCommand$handleSessions$1$results$1$1",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "resumeWith",
+        "fileName" : "ContinuationImpl.kt",
+        "lineNumber" : 34,
+        "className" : "kotlin.coroutines.jvm.internal.BaseContinuationImpl",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "run",
+        "fileName" : "DispatchedTask.kt",
+        "lineNumber" : 100,
+        "className" : "kotlinx.coroutines.DispatchedTask",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "run",
+        "fileName" : "LimitedDispatcher.kt",
+        "lineNumber" : 124,
+        "className" : "kotlinx.coroutines.internal.LimitedDispatcher$Worker",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "run",
+        "fileName" : "Tasks.kt",
+        "lineNumber" : 89,
+        "className" : "kotlinx.coroutines.scheduling.TaskImpl",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "runSafely",
+        "fileName" : "CoroutineScheduler.kt",
+        "lineNumber" : 586,
+        "className" : "kotlinx.coroutines.scheduling.CoroutineScheduler",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "executeTask",
+        "fileName" : "CoroutineScheduler.kt",
+        "lineNumber" : 820,
+        "className" : "kotlinx.coroutines.scheduling.CoroutineScheduler$Worker",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "runWorker",
+        "fileName" : "CoroutineScheduler.kt",
+        "lineNumber" : 717,
+        "className" : "kotlinx.coroutines.scheduling.CoroutineScheduler$Worker",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "run",
+        "fileName" : "CoroutineScheduler.kt",
+        "lineNumber" : 704,
+        "className" : "kotlinx.coroutines.scheduling.CoroutineScheduler$Worker",
+        "nativeMethod" : false
+      } ],
+      "localizedMessage" : "Unable to launch app com.georgeci.moneysurfer"
+    },
+    "sequenceNumber" : 6
+  }
+}, {
+  "command" : {
+    "applyConfigurationCommand" : {
+      "config" : {
+        "appId" : "${APP_ID}",
+        "name" : "Dashboard — Add bank account"
+      },
+      "optional" : false
+    }
+  },
+  "metadata" : {
+    "status" : "COMPLETED",
+    "timestamp" : 1784324652708,
+    "duration" : 1,
+    "sequenceNumber" : 3
+  }
+}, {
+  "command" : {
+    "applyConfigurationCommand" : {
+      "config" : {
+        "appId" : "${APP_ID}",
+        "name" : "Workspace — Create and select test workspace"
+      },
+      "optional" : false
+    }
+  },
+  "metadata" : {
+    "status" : "COMPLETED",
+    "timestamp" : 1784324652710,
+    "duration" : 1,
+    "sequenceNumber" : 5
+  }
+}, {
+  "command" : {
+    "applyConfigurationCommand" : {
+      "config" : {
+        "appId" : "${APP_ID}",
+        "name" : "Account — Create savings account with opening balance"
+      },
+      "optional" : false
+    }
+  },
+  "metadata" : {
+    "status" : "COMPLETED",
+    "timestamp" : 1784324652628,
+    "duration" : 78,
+    "sequenceNumber" : 1
+  }
+}, {
+  "command" : {
+    "defineVariablesCommand" : {
+      "env" : {
+        "TEST_EMAIL" : "e2e+owner@test.local",
+        "TEST_PASSWORD" : "password",
+        "APP_ID" : "com.georgeci.moneysurfer",
+        "MAESTRO_FILENAME" : "15_account_creation_savings",
+        "MAESTRO_DEVICE_UDID" : "D013632B-84FA-4166-AE16-78E2633847B7",
+        "MAESTRO_SHARD_ID" : "1",
+        "MAESTRO_SHARD_INDEX" : "0"
+      },
+      "optional" : false
+    }
+  },
+  "metadata" : {
+    "status" : "COMPLETED",
+    "timestamp" : 1784324652627,
+    "duration" : 1,
+    "sequenceNumber" : 0
+  }
+}, {
+  "command" : {
+    "applyConfigurationCommand" : {
+      "config" : {
+        "appId" : "${APP_ID}",
+        "name" : "Setup — Login with reusable app state",
+        "tags" : [ "setup" ]
+      },
+      "optional" : false
+    }
+  },
+  "metadata" : {
+    "status" : "COMPLETED",
+    "timestamp" : 1784324652717,
+    "duration" : 2,
+    "sequenceNumber" : 7
+  }
+}, {
+  "command" : {
+    "launchAppCommand" : {
+      "appId" : "${APP_ID}",
+      "clearState" : false,
+      "optional" : false
+    }
+  },
+  "metadata" : {
+    "status" : "FAILED",
+    "timestamp" : 1784324652721,
+    "duration" : 1667,
+    "error" : {
+      "message" : "Unable to launch app com.georgeci.moneysurfer",
+      "cause" : {
+        "stackTrace" : [ {
+          "classLoaderName" : "app",
+          "methodName" : "runCommand",
+          "fileName" : "CommandLineUtils.kt",
+          "lineNumber" : 50,
+          "className" : "util.CommandLineUtils",
+          "nativeMethod" : false
+        }, {
+          "classLoaderName" : "app",
+          "methodName" : "runCommand$default",
+          "fileName" : "CommandLineUtils.kt",
+          "lineNumber" : 16,
+          "className" : "util.CommandLineUtils",
+          "nativeMethod" : false
+        }, {
+          "classLoaderName" : "app",
+          "methodName" : "launch",
+          "fileName" : "LocalSimulatorUtils.kt",
+          "lineNumber" : 331,
+          "className" : "util.LocalSimulatorUtils",
+          "nativeMethod" : false
+        }, {
+          "classLoaderName" : "app",
+          "methodName" : "launch",
+          "fileName" : "SimctlIOSDevice.kt",
+          "lineNumber" : 93,
+          "className" : "device.SimctlIOSDevice",
+          "nativeMethod" : false
+        }, {
+          "classLoaderName" : "app",
+          "methodName" : "launch",
+          "fileName" : "LocalIOSDevice.kt",
+          "lineNumber" : 107,
+          "className" : "ios.LocalIOSDevice",
+          "nativeMethod" : false
+        }, {
+          "classLoaderName" : "app",
+          "methodName" : "launchApp$lambda$7",
+          "fileName" : "IOSDriver.kt",
+          "lineNumber" : 104,
+          "className" : "maestro.drivers.IOSDriver",
+          "nativeMethod" : false
+        }, {
+          "classLoaderName" : "app",
+          "methodName" : "measured",
+          "fileName" : "Metrics.kt",
+          "lineNumber" : 48,
+          "className" : "maestro.utils.Metrics",
+          "nativeMethod" : false
+        }, {
+          "classLoaderName" : "app",
+          "methodName" : "launchApp",
+          "fileName" : "IOSDriver.kt",
+          "lineNumber" : 103,
+          "className" : "maestro.drivers.IOSDriver",
+          "nativeMethod" : false
+        }, {
+          "classLoaderName" : "app",
+          "methodName" : "launchApp$lambda$2",
+          "fileName" : "Maestro.kt",
+          "lineNumber" : 75,
+          "className" : "maestro.Maestro",
+          "nativeMethod" : false
+        }, {
+          "classLoaderName" : "app",
+          "methodName" : "runInterruptibleInExpectedContext",
+          "fileName" : "Interruptible.kt",
+          "lineNumber" : 48,
+          "className" : "kotlinx.coroutines.InterruptibleKt",
+          "nativeMethod" : false
+        }, {
+          "classLoaderName" : "app",
+          "methodName" : "access$runInterruptibleInExpectedContext",
+          "fileName" : "Interruptible.kt",
+          "lineNumber" : 1,
+          "className" : "kotlinx.coroutines.InterruptibleKt",
+          "nativeMethod" : false
+        }, {
+          "classLoaderName" : "app",
+          "methodName" : "invokeSuspend",
+          "fileName" : "Interruptible.kt",
+          "lineNumber" : 40,
+          "className" : "kotlinx.coroutines.InterruptibleKt$runInterruptible$2",
+          "nativeMethod" : false
+        }, {
+          "classLoaderName" : "app",
+          "methodName" : "resumeWith",
+          "fileName" : "ContinuationImpl.kt",
+          "lineNumber" : 34,
+          "className" : "kotlin.coroutines.jvm.internal.BaseContinuationImpl",
+          "nativeMethod" : false
+        }, {
+          "classLoaderName" : "app",
+          "methodName" : "run",
+          "fileName" : "DispatchedTask.kt",
+          "lineNumber" : 100,
+          "className" : "kotlinx.coroutines.DispatchedTask",
+          "nativeMethod" : false
+        }, {
+          "classLoaderName" : "app",
+          "methodName" : "run",
+          "fileName" : "LimitedDispatcher.kt",
+          "lineNumber" : 124,
+          "className" : "kotlinx.coroutines.internal.LimitedDispatcher$Worker",
+          "nativeMethod" : false
+        }, {
+          "classLoaderName" : "app",
+          "methodName" : "run",
+          "fileName" : "Tasks.kt",
+          "lineNumber" : 89,
+          "className" : "kotlinx.coroutines.scheduling.TaskImpl",
+          "nativeMethod" : false
+        }, {
+          "classLoaderName" : "app",
+          "methodName" : "runSafely",
+          "fileName" : "CoroutineScheduler.kt",
+          "lineNumber" : 586,
+          "className" : "kotlinx.coroutines.scheduling.CoroutineScheduler",
+          "nativeMethod" : false
+        }, {
+          "classLoaderName" : "app",
+          "methodName" : "executeTask",
+          "fileName" : "CoroutineScheduler.kt",
+          "lineNumber" : 820,
+          "className" : "kotlinx.coroutines.scheduling.CoroutineScheduler$Worker",
+          "nativeMethod" : false
+        }, {
+          "classLoaderName" : "app",
+          "methodName" : "runWorker",
+          "fileName" : "CoroutineScheduler.kt",
+          "lineNumber" : 717,
+          "className" : "kotlinx.coroutines.scheduling.CoroutineScheduler$Worker",
+          "nativeMethod" : false
+        }, {
+          "classLoaderName" : "app",
+          "methodName" : "run",
+          "fileName" : "CoroutineScheduler.kt",
+          "lineNumber" : 704,
+          "className" : "kotlinx.coroutines.scheduling.CoroutineScheduler$Worker",
+          "nativeMethod" : false
+        } ],
+        "message" : "An error was encountered processing the command (domain=FBSOpenApplicationServiceErrorDomain, code=4):\nSimulator device failed to launch com.georgeci.moneysurfer.\nUnderlying error (domain=FBSOpenApplicationServiceErrorDomain, code=4):\n\tThe request to open \"com.georgeci.moneysurfer\" failed.\n",
+        "localizedMessage" : "An error was encountered processing the command (domain=FBSOpenApplicationServiceErrorDomain, code=4):\nSimulator device failed to launch com.georgeci.moneysurfer.\nUnderlying error (domain=FBSOpenApplicationServiceErrorDomain, code=4):\n\tThe request to open \"com.georgeci.moneysurfer\" failed.\n"
+      },
+      "stackTrace" : [ {
+        "classLoaderName" : "app",
+        "methodName" : "launchAppCommand",
+        "fileName" : "Orchestra.kt",
+        "lineNumber" : 1161,
+        "className" : "maestro.orchestra.Orchestra",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "access$launchAppCommand",
+        "fileName" : "Orchestra.kt",
+        "lineNumber" : 126,
+        "className" : "maestro.orchestra.Orchestra",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "invokeSuspend",
+        "fileName" : "Orchestra.kt",
+        "lineNumber" : -1,
+        "className" : "maestro.orchestra.Orchestra$launchAppCommand$1",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "resumeWith",
+        "fileName" : "ContinuationImpl.kt",
+        "lineNumber" : 34,
+        "className" : "kotlin.coroutines.jvm.internal.BaseContinuationImpl",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "run",
+        "fileName" : "DispatchedTask.kt",
+        "lineNumber" : 98,
+        "className" : "kotlinx.coroutines.DispatchedTask",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "processNextEvent",
+        "fileName" : "EventLoop.common.kt",
+        "lineNumber" : 263,
+        "className" : "kotlinx.coroutines.EventLoopImplBase",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "joinBlocking",
+        "fileName" : "Builders.kt",
+        "lineNumber" : 94,
+        "className" : "kotlinx.coroutines.BlockingCoroutine",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "runBlocking",
+        "fileName" : "Builders.kt",
+        "lineNumber" : 70,
+        "className" : "kotlinx.coroutines.BuildersKt__BuildersKt",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "runBlocking",
+        "lineNumber" : 1,
+        "className" : "kotlinx.coroutines.BuildersKt",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "runBlocking$default",
+        "fileName" : "Builders.kt",
+        "lineNumber" : 48,
+        "className" : "kotlinx.coroutines.BuildersKt__BuildersKt",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "runBlocking$default",
+        "lineNumber" : 1,
+        "className" : "kotlinx.coroutines.BuildersKt",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "runShardSuite$lambda$10",
+        "fileName" : "TestCommand.kt",
+        "lineNumber" : 501,
+        "className" : "maestro.cli.command.TestCommand",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "newSession",
+        "fileName" : "MaestroSessionManager.kt",
+        "lineNumber" : 132,
+        "className" : "maestro.cli.session.MaestroSessionManager",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "newSession$default",
+        "fileName" : "MaestroSessionManager.kt",
+        "lineNumber" : 66,
+        "className" : "maestro.cli.session.MaestroSessionManager",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "runShardSuite",
+        "fileName" : "TestCommand.kt",
+        "lineNumber" : 476,
+        "className" : "maestro.cli.command.TestCommand",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "access$runShardSuite",
+        "fileName" : "TestCommand.kt",
+        "lineNumber" : 80,
+        "className" : "maestro.cli.command.TestCommand",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "invokeSuspend",
+        "fileName" : "TestCommand.kt",
+        "lineNumber" : 435,
+        "className" : "maestro.cli.command.TestCommand$handleSessions$1$results$1$1",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "resumeWith",
+        "fileName" : "ContinuationImpl.kt",
+        "lineNumber" : 34,
+        "className" : "kotlin.coroutines.jvm.internal.BaseContinuationImpl",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "run",
+        "fileName" : "DispatchedTask.kt",
+        "lineNumber" : 100,
+        "className" : "kotlinx.coroutines.DispatchedTask",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "run",
+        "fileName" : "LimitedDispatcher.kt",
+        "lineNumber" : 124,
+        "className" : "kotlinx.coroutines.internal.LimitedDispatcher$Worker",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "run",
+        "fileName" : "Tasks.kt",
+        "lineNumber" : 89,
+        "className" : "kotlinx.coroutines.scheduling.TaskImpl",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "runSafely",
+        "fileName" : "CoroutineScheduler.kt",
+        "lineNumber" : 586,
+        "className" : "kotlinx.coroutines.scheduling.CoroutineScheduler",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "executeTask",
+        "fileName" : "CoroutineScheduler.kt",
+        "lineNumber" : 820,
+        "className" : "kotlinx.coroutines.scheduling.CoroutineScheduler$Worker",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "runWorker",
+        "fileName" : "CoroutineScheduler.kt",
+        "lineNumber" : 717,
+        "className" : "kotlinx.coroutines.scheduling.CoroutineScheduler$Worker",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "run",
+        "fileName" : "CoroutineScheduler.kt",
+        "lineNumber" : 704,
+        "className" : "kotlinx.coroutines.scheduling.CoroutineScheduler$Worker",
+        "nativeMethod" : false
+      } ],
+      "localizedMessage" : "Unable to launch app com.georgeci.moneysurfer"
+    },
+    "sequenceNumber" : 8
+  }
+} ]

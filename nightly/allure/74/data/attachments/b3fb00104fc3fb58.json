@@ -1,0 +1,197 @@
+[ {
+  "command" : {
+    "applyConfigurationCommand" : {
+      "config" : {
+        "appId" : "${APP_ID}",
+        "name" : "Auth — Sign in rejects wrong credentials"
+      },
+      "optional" : false
+    }
+  },
+  "metadata" : {
+    "status" : "COMPLETED",
+    "timestamp" : 1784324643836,
+    "duration" : 283,
+    "sequenceNumber" : 1
+  }
+}, {
+  "command" : {
+    "defineVariablesCommand" : {
+      "env" : {
+        "TEST_EMAIL" : "e2e+owner@test.local",
+        "TEST_PASSWORD" : "password",
+        "APP_ID" : "com.georgeci.moneysurfer",
+        "MAESTRO_FILENAME" : "16_signin_invalid_credentials",
+        "MAESTRO_DEVICE_UDID" : "D013632B-84FA-4166-AE16-78E2633847B7",
+        "MAESTRO_SHARD_ID" : "1",
+        "MAESTRO_SHARD_INDEX" : "0"
+      },
+      "optional" : false
+    }
+  },
+  "metadata" : {
+    "status" : "COMPLETED",
+    "timestamp" : 1784324643822,
+    "duration" : 2,
+    "sequenceNumber" : 0
+  }
+}, {
+  "command" : {
+    "launchAppCommand" : {
+      "appId" : "${APP_ID}",
+      "clearState" : true,
+      "optional" : false
+    }
+  },
+  "metadata" : {
+    "status" : "FAILED",
+    "timestamp" : 1784324644122,
+    "duration" : 2072,
+    "error" : {
+      "message" : "Failed to get app binary directory for bundle com.georgeci.moneysurfer on device D013632B-84FA-4166-AE16-78E2633847B7: An error was encountered processing the command (domain=NSPOSIXErrorDomain, code=2):\nThe operation couldn’t be completed. No such file or directory\nNo such file or directory",
+      "stackTrace" : [ {
+        "classLoaderName" : "app",
+        "methodName" : "getAppBinaryDirectory",
+        "fileName" : "LocalSimulatorUtils.kt",
+        "lineNumber" : 306,
+        "className" : "util.LocalSimulatorUtils",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "reinstallApp",
+        "fileName" : "LocalSimulatorUtils.kt",
+        "lineNumber" : 255,
+        "className" : "util.LocalSimulatorUtils",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "clearAppState",
+        "fileName" : "LocalSimulatorUtils.kt",
+        "lineNumber" : 287,
+        "className" : "util.LocalSimulatorUtils",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "clearAppState",
+        "fileName" : "SimctlIOSDevice.kt",
+        "lineNumber" : 79,
+        "className" : "device.SimctlIOSDevice",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "clearAppState",
+        "fileName" : "LocalIOSDevice.kt",
+        "lineNumber" : 96,
+        "className" : "ios.LocalIOSDevice",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "clearAppState$lambda$10",
+        "fileName" : "IOSDriver.kt",
+        "lineNumber" : 124,
+        "className" : "maestro.drivers.IOSDriver",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "measured",
+        "fileName" : "Metrics.kt",
+        "lineNumber" : 48,
+        "className" : "maestro.utils.Metrics",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "clearAppState",
+        "fileName" : "IOSDriver.kt",
+        "lineNumber" : 123,
+        "className" : "maestro.drivers.IOSDriver",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "clearAppState$lambda$5",
+        "fileName" : "Maestro.kt",
+        "lineNumber" : 93,
+        "className" : "maestro.Maestro",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "runInterruptibleInExpectedContext",
+        "fileName" : "Interruptible.kt",
+        "lineNumber" : 48,
+        "className" : "kotlinx.coroutines.InterruptibleKt",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "access$runInterruptibleInExpectedContext",
+        "fileName" : "Interruptible.kt",
+        "lineNumber" : 1,
+        "className" : "kotlinx.coroutines.InterruptibleKt",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "invokeSuspend",
+        "fileName" : "Interruptible.kt",
+        "lineNumber" : 40,
+        "className" : "kotlinx.coroutines.InterruptibleKt$runInterruptible$2",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "resumeWith",
+        "fileName" : "ContinuationImpl.kt",
+        "lineNumber" : 34,
+        "className" : "kotlin.coroutines.jvm.internal.BaseContinuationImpl",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "run",
+        "fileName" : "DispatchedTask.kt",
+        "lineNumber" : 100,
+        "className" : "kotlinx.coroutines.DispatchedTask",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "run",
+        "fileName" : "LimitedDispatcher.kt",
+        "lineNumber" : 124,
+        "className" : "kotlinx.coroutines.internal.LimitedDispatcher$Worker",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "run",
+        "fileName" : "Tasks.kt",
+        "lineNumber" : 89,
+        "className" : "kotlinx.coroutines.scheduling.TaskImpl",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "runSafely",
+        "fileName" : "CoroutineScheduler.kt",
+        "lineNumber" : 586,
+        "className" : "kotlinx.coroutines.scheduling.CoroutineScheduler",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "executeTask",
+        "fileName" : "CoroutineScheduler.kt",
+        "lineNumber" : 820,
+        "className" : "kotlinx.coroutines.scheduling.CoroutineScheduler$Worker",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "runWorker",
+        "fileName" : "CoroutineScheduler.kt",
+        "lineNumber" : 717,
+        "className" : "kotlinx.coroutines.scheduling.CoroutineScheduler$Worker",
+        "nativeMethod" : false
+      }, {
+        "classLoaderName" : "app",
+        "methodName" : "run",
+        "fileName" : "CoroutineScheduler.kt",
+        "lineNumber" : 704,
+        "className" : "kotlinx.coroutines.scheduling.CoroutineScheduler$Worker",
+        "nativeMethod" : false
+      } ],
+      "localizedMessage" : "Failed to get app binary directory for bundle com.georgeci.moneysurfer on device D013632B-84FA-4166-AE16-78E2633847B7: An error was encountered processing the command (domain=NSPOSIXErrorDomain, code=2):\nThe operation couldn’t be completed. No such file or directory\nNo such file or directory"
+    },
+    "sequenceNumber" : 2
+  }
+} ]
