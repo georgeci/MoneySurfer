@@ -121,7 +121,10 @@ private fun TransactionsByAccountContent(
         floatingActionButton = {
             ExtendedFloatingActionButton(
                 text = { Text(stringResource(Res.string.transactions_list_new)) },
-                icon = { Icon(imageVector = SurferIcons.Add, contentDescription = null) }, // decorative — FAB text label provides the accessible label
+                icon = {
+                    // decorative — FAB text label provides the accessible label
+                    Icon(imageVector = SurferIcons.Add, contentDescription = null)
+                },
                 onClick = { onEvent(TransactionsByAccountEvent.OnAddTransactionClick) },
             )
         },
