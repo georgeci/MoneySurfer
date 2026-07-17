@@ -113,8 +113,9 @@ private fun Body(
             TopAppBar(
                 title = { Text(stringResource(Res.string.workspace_incoming_title)) },
                 navigationIcon = {
+                    val backLabel = stringResource(Res.string.workspace_incoming_back_content_description)
                     IconButton(onClick = { onEvent(IncomingInvitesEvent.OnBackClick) }) {
-                        Icon(imageVector = SurferIcons.Back, contentDescription = stringResource(Res.string.workspace_incoming_back_content_description))
+                        Icon(imageVector = SurferIcons.Back, contentDescription = backLabel)
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
