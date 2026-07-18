@@ -249,36 +249,18 @@ jobs:
         with:
           boot: "false"
 
-      - name: Build iOS app (Simulator, no signing)
-        env:
-          SKIP_CRASHLYTICS_UPLOAD: "YES"
+      # Reuse the exact build the maestro-ios job drives (qa.gradle.kts →
+      # maestroBuildIosSimulator: -scheme iosApp, named -destination, a clean
+      # -derivedDataPath, SKIP_CRASHLYTICS_UPLOAD=YES). Hand-rolling xcodebuild
+      # here kept diverging from that proven recipe — nanopb build-dir collision,
+      # x86_64 arch, and finally CODE_SIGNING_ALLOWED=NO breaking SwiftPM
+      # framework linking ("framework 'FirebaseAuth' not found"). The gradle task
+      # already links Firebase cleanly every night, so just call it.
+      - name: Build iOS app (Simulator)
         run: |
-          set -eo pipefail
-          if command -v xcbeautify >/dev/null 2>&1; then
-            FORMATTER=(xcbeautify --renderer github-actions)
-          else
-            FORMATTER=(cat)
-          fi
-          # Build via -scheme + a named -destination + a clean -derivedDataPath,
-          # mirroring the working maestro-ios / ios-offline builds. Two traps this
-          # avoids: (1) -target with the *default* DerivedData routes SwiftPM
-          # products into the package checkouts and collides with nanopb's regular
-          # file named `build`; a dedicated derivedDataPath keeps them out. (2) A
-          # bare `-arch arm64` (no destination) leaves the SPM frameworks
-          # unresolved at link ("framework 'FirebaseAuth' not found") — the named
-          # destination gives xcodebuild the platform context SPM needs.
-          xcodebuild \
-            -project iosApp/iosApp.xcodeproj \
-            -scheme iosApp \
-            -configuration Debug \
-            -sdk iphonesimulator \
-            -destination "platform=iOS Simulator,name=${{ steps.ios-sim.outputs.name }}" \
-            -derivedDataPath build/ios-build \
-            CODE_SIGNING_ALLOWED=NO \
-            CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGN_IDENTITY="" \
-            build \
-            | "${FORMATTER[@]}"
+          ./gradlew maestroBuildIosSimulator \
+            -PiosSimulatorName="${{ steps.ios-sim.outputs.name }}" \
+            --stacktrace
 
   # The offline iOS variant (composeAppOffline + iosAppOffline) is covered by
   # .github/workflows/ios-offline.yml on every PR and main push — building it
