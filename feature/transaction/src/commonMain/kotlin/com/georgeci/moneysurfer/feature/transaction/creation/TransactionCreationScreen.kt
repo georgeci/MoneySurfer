@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -24,19 +23,14 @@ import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -80,18 +74,16 @@ import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.utils.AmountInputTransformation
 import com.georgeci.moneysurfer.utils.HandleSideEffect
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
 import moneysurfer.feature.transaction.generated.resources.Res
 import moneysurfer.feature.transaction.generated.resources.transaction_creation_account_empty
 import moneysurfer.feature.transaction.generated.resources.transaction_creation_account_label
+import moneysurfer.feature.transaction.generated.resources.transaction_creation_amount_error_format
+import moneysurfer.feature.transaction.generated.resources.transaction_creation_amount_error_zero
 import moneysurfer.feature.transaction.generated.resources.transaction_creation_amount_placeholder
 import moneysurfer.feature.transaction.generated.resources.transaction_creation_category_all
 import moneysurfer.feature.transaction.generated.resources.transaction_creation_category_label
 import moneysurfer.feature.transaction.generated.resources.transaction_creation_category_more
 import moneysurfer.feature.transaction.generated.resources.transaction_creation_close_content_description
-import moneysurfer.feature.transaction.generated.resources.transaction_creation_datetime_label
-import moneysurfer.feature.transaction.generated.resources.transaction_creation_datetime_placeholder
 import moneysurfer.feature.transaction.generated.resources.transaction_creation_expense
 import moneysurfer.feature.transaction.generated.resources.transaction_creation_from_account
 import moneysurfer.feature.transaction.generated.resources.transaction_creation_from_label
@@ -107,11 +99,10 @@ import moneysurfer.feature.transaction.generated.resources.transaction_creation_
 import moneysurfer.feature.transaction.generated.resources.transaction_creation_today
 import moneysurfer.feature.transaction.generated.resources.transaction_creation_transfer
 import moneysurfer.feature.transaction.generated.resources.transaction_creation_update
+import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
-import kotlin.time.Clock
-import kotlin.time.Instant
 
 /** Stable selectors for the transaction creation screen — see docs/testing/testing-strategy.md. */
 object TransactionCreationTestTags {
@@ -335,6 +326,7 @@ private fun TransactionCreationContent(
                     type = state.type,
                     currencySymbol = currencySymbol(state.selectedAccount?.currencyCode),
                     amountState = amountState,
+                    error = state.amountError,
                 )
             }
 
@@ -420,6 +412,7 @@ private fun AmountHero(
     type: TransactionTypeUi,
     currencySymbol: String,
     amountState: TextFieldState,
+    error: TransactionAmountError?,
 ) {
     Column(
         modifier = Modifier
@@ -464,7 +457,28 @@ private fun AmountHero(
                 },
             )
         }
+        if (error != null) {
+            Spacer(Modifier.height(AppTheme.spacing.xSmall))
+            AmountErrorText(error)
+        }
     }
+}
+
+@Composable
+private fun AmountErrorText(
+    error: TransactionAmountError,
+    modifier: Modifier = Modifier,
+) {
+    val messageRes: StringResource = when (error) {
+        TransactionAmountError.INVALID_FORMAT -> Res.string.transaction_creation_amount_error_format
+        TransactionAmountError.NOT_POSITIVE -> Res.string.transaction_creation_amount_error_zero
+    }
+    Text(
+        text = stringResource(messageRes),
+        style = AppTheme.typography.bodySmall,
+        color = AppTheme.materialColors.error,
+        modifier = modifier,
+    )
 }
 
 @Composable
@@ -643,100 +657,6 @@ private fun MoreTile(onClick: () -> Unit) {
     }
 }
 
-@Composable
-private fun DateTimeField(
-    timestamp: Long?,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    val fieldShape = AppTheme.shapes.extraSmall
-    Row(
-        modifier = modifier
-            .heightIn(min = 56.dp)
-            .clip(fieldShape)
-            .border(1.dp, AppTheme.materialColors.outline, fieldShape)
-            .clickable(onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 14.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-        Icon(
-            imageVector = SurferIcons.Event,
-            contentDescription = null,
-            tint = AppTheme.materialColors.onSurfaceVariant,
-            modifier = Modifier.size(20.dp),
-        )
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = stringResource(Res.string.transaction_creation_datetime_label),
-                style = AppTheme.typography.bodySmall,
-                color = AppTheme.materialColors.onSurfaceVariant,
-            )
-            Text(
-                text = timestamp?.let(::formatShortDate)
-                    ?: stringResource(Res.string.transaction_creation_datetime_placeholder),
-                style = AppTheme.typography.bodyLarge,
-                color = AppTheme.materialColors.onSurface,
-            )
-        }
-        Icon(
-            imageVector = SurferIcons.DropDown,
-            contentDescription = null,
-            tint = AppTheme.materialColors.onSurfaceVariant,
-            modifier = Modifier.size(18.dp),
-        )
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun TransactionDatePickerDialog(
-    initialTimestamp: Long?,
-    onDismiss: () -> Unit,
-    onConfirm: (Long) -> Unit,
-) {
-    val now = remember { Clock.System.now().toEpochMilliseconds() }
-    val nowYear = remember(now) {
-        Instant.fromEpochMilliseconds(now)
-            .toLocalDateTime(TimeZone.currentSystemDefault())
-            .year
-    }
-    val notFuture = remember(now, nowYear) {
-        object : SelectableDates {
-            override fun isSelectableDate(utcTimeMillis: Long): Boolean = utcTimeMillis <= now
-            override fun isSelectableYear(year: Int): Boolean = year <= nowYear
-        }
-    }
-    val state = rememberDatePickerState(
-        initialSelectedDateMillis = initialTimestamp,
-        selectableDates = notFuture,
-    )
-    DatePickerDialog(
-        onDismissRequest = onDismiss,
-        confirmButton = {
-            TextButton(
-                onClick = { state.selectedDateMillis?.let(onConfirm) },
-                enabled = state.selectedDateMillis != null,
-            ) { Text(stringResource(Res.string.transaction_creation_save)) }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text(stringResource(Res.string.transaction_creation_close_content_description))
-            }
-        },
-    ) {
-        DatePicker(state = state)
-    }
-}
-
-private fun formatShortDate(timestamp: Long): String {
-    val instant = Instant.fromEpochMilliseconds(timestamp)
-    val ld = instant.toLocalDateTime(TimeZone.currentSystemDefault()).date
-    val month = ld.month.name.lowercase().replaceFirstChar { it.uppercase() }.take(3)
-    val day = ld.day.toString().padStart(2, '0')
-    return "$day $month ${ld.year}"
-}
-
 private fun currencySymbol(code: CurrencyCode?): String {
     val value = code?.value ?: return "$"
     return when (value) {
@@ -778,6 +698,10 @@ private fun TransferAccountsBlock(
             onAccountClick = { onEvent(TransactionCreationEvent.OnOpenFromAccountChooser) },
         )
 
+        state.amountError?.let { error ->
+            AmountErrorText(error, modifier = Modifier.padding(start = 4.dp))
+        }
+
         Box(
             modifier = Modifier.fillMaxWidth(),
             contentAlignment = Alignment.Center,
@@ -809,6 +733,10 @@ private fun TransferAccountsBlock(
             accountPlaceholder = stringResource(Res.string.transaction_creation_to_account),
             onAccountClick = { onEvent(TransactionCreationEvent.OnOpenToAccountChooser) },
         )
+
+        state.toAmountError?.let { error ->
+            AmountErrorText(error, modifier = Modifier.padding(start = 4.dp))
+        }
 
         if (crossCurrency) {
             val from = state.amount.toDoubleOrNull()?.takeIf { it > 0 }

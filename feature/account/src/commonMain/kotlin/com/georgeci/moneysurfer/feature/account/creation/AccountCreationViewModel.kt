@@ -63,7 +63,10 @@ class AccountCreationViewModel(
     override fun onEvent(event: AccountCreationEvent) {
         when (event) {
             is AccountCreationEvent.OnNameChanged ->
-                updateState { AccountCreationState.content.name.modify(this) { event.name } }
+                updateState {
+                    val content = this as? AccountCreationState.Content ?: return@updateState this
+                    content.copy(name = event.name, nameTouched = true)
+                }
             is AccountCreationEvent.OnBalanceChanged ->
                 updateState {
                     AccountCreationState.content.balance.modify(this) {
@@ -224,6 +227,9 @@ sealed interface AccountCreationState {
         val extraFields: List<AccountExtraField>,
         val extraDetailsEnabled: Boolean = true,
         override val editingAccountId: AccountId?,
+        /** Whether the user has edited the name field — gates the required-name inline error
+         *  so a pristine screen doesn't open covered in red. */
+        val nameTouched: Boolean = false,
     ) : AccountCreationState {
         val availableExtraFieldKinds: List<AccountExtraFieldKind>
             get() = AccountExtraFieldKind.entries.filter { kind ->
@@ -232,6 +238,10 @@ sealed interface AccountCreationState {
 
         val currencySymbol: String
             get() = currencies.firstOrNull { it.code == currency }?.symbol ?: currency.value
+
+        /** Whether to show the required-name inline error: the field was edited and left blank. */
+        val nameMissing: Boolean
+            get() = nameTouched && name.isBlank()
 
         /** Inline validation error for the opening balance field, or null when it is acceptable. */
         val balanceError: InitialBalanceError?

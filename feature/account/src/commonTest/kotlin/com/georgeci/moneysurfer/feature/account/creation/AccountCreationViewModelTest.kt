@@ -125,6 +125,30 @@ class AccountCreationViewModelTest : StringSpec({
         }
     }
 
+    "the name required error appears only after the field was touched and left blank" {
+        runTest {
+            val fixture = Fixture(workspaceId = ws)
+            val vm = fixture.createViewModel()
+            try {
+                val pristine = vm.awaitCurrencies()
+                pristine.nameMissing shouldBe false
+
+                vm.onEvent(AccountCreationEvent.OnNameChanged("Wallet"))
+                (vm.value as AccountCreationState.Content).nameMissing shouldBe false
+
+                vm.onEvent(AccountCreationEvent.OnNameChanged(""))
+                val cleared = vm.value as AccountCreationState.Content
+                cleared.nameMissing shouldBe true
+                cleared.canSave shouldBe false
+
+                vm.onEvent(AccountCreationEvent.OnSaveClick)
+                fixture.accountRepository.inserted.shouldBeEmpty()
+            } finally {
+                vm.viewModelScope.cancel()
+            }
+        }
+    }
+
     "online build keeps the extra details section visible" {
         runTest {
             val vm = Fixture(workspaceId = ws).createViewModel(offline = false)

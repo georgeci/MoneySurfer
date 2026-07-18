@@ -56,6 +56,8 @@ import moneysurfer.feature.category.generated.resources.category_creation_field_
 import moneysurfer.feature.category.generated.resources.category_creation_field_note
 import moneysurfer.feature.category.generated.resources.category_creation_field_parent
 import moneysurfer.feature.category.generated.resources.category_creation_icon_label
+import moneysurfer.feature.category.generated.resources.category_creation_name_counter
+import moneysurfer.feature.category.generated.resources.category_creation_name_error_required
 import moneysurfer.feature.category.generated.resources.category_creation_name_label
 import moneysurfer.feature.category.generated.resources.category_creation_remove
 import moneysurfer.feature.category.generated.resources.category_creation_save
@@ -164,6 +166,24 @@ private fun CategoryCreationContent(
                 onValueChange = { onEvent(CategoryCreationEvent.OnNameChanged(it)) },
                 label = { Text(stringResource(Res.string.category_creation_name_label)) },
                 singleLine = true,
+                isError = state.nameMissing,
+                supportingText = when {
+                    state.nameMissing -> {
+                        { Text(stringResource(Res.string.category_creation_name_error_required)) }
+                    }
+                    state.showNameCounter -> {
+                        {
+                            Text(
+                                stringResource(
+                                    Res.string.category_creation_name_counter,
+                                    state.name.length,
+                                    CategoryCreationState.NAME_MAX_LENGTH,
+                                ),
+                            )
+                        }
+                    }
+                    else -> null
+                },
                 modifier = Modifier.fillMaxWidth(),
             )
 

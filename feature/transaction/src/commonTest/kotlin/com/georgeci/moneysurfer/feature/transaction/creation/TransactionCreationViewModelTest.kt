@@ -160,6 +160,84 @@ class TransactionCreationViewModelTest : StringSpec({
         }
     }
 
+    "a zero amount blocks save and exposes an inline error" {
+        runTest {
+            val acc = anAccount(id = accountId("a-1"), workspaceId = ws, currencyCode = USD, balance = 500.dollars)
+            val expenseCategory = aCategory(id = categoryId("c-exp"), workspaceId = ws, type = CategoryType.EXPENSE)
+            val fixture = Fixture(ws).apply {
+                accountRepository.seed(acc)
+                categoryRepository.seed(expenseCategory)
+            }
+            val vm = fixture.createViewModel(prefillAccount = acc.id)
+            try {
+                vm.awaitContent()
+
+                vm.onEvent(TransactionCreationEvent.OnAmountChanged("0"))
+
+                val state = vm.awaitContent()
+                state.amountError shouldBe TransactionAmountError.NOT_POSITIVE
+                state.isSaveEnabled shouldBe false
+
+                vm.onEvent(TransactionCreationEvent.OnSaveClick)
+                fixture.transactionRepository.inserted.size shouldBe 0
+            } finally {
+                vm.viewModelScope.cancel()
+            }
+        }
+    }
+
+    "an amount with two decimal separators blocks save and exposes an inline error" {
+        runTest {
+            val acc = anAccount(id = accountId("a-1"), workspaceId = ws, currencyCode = USD, balance = 500.dollars)
+            val expenseCategory = aCategory(id = categoryId("c-exp"), workspaceId = ws, type = CategoryType.EXPENSE)
+            val fixture = Fixture(ws).apply {
+                accountRepository.seed(acc)
+                categoryRepository.seed(expenseCategory)
+            }
+            val vm = fixture.createViewModel(prefillAccount = acc.id)
+            try {
+                vm.awaitContent()
+
+                vm.onEvent(TransactionCreationEvent.OnAmountChanged("1.2.3"))
+
+                val state = vm.awaitContent()
+                state.amountError shouldBe TransactionAmountError.INVALID_FORMAT
+                state.isSaveEnabled shouldBe false
+
+                vm.onEvent(TransactionCreationEvent.OnSaveClick)
+                fixture.transactionRepository.inserted.size shouldBe 0
+            } finally {
+                vm.viewModelScope.cancel()
+            }
+        }
+    }
+
+    "a comma decimal separator is accepted and the parsed amount is persisted" {
+        runTest {
+            val acc = anAccount(id = accountId("a-1"), workspaceId = ws, currencyCode = USD, balance = 500.dollars)
+            val expenseCategory = aCategory(id = categoryId("c-exp"), workspaceId = ws, type = CategoryType.EXPENSE)
+            val fixture = Fixture(ws).apply {
+                accountRepository.seed(acc)
+                categoryRepository.seed(expenseCategory)
+            }
+            val vm = fixture.createViewModel(prefillAccount = acc.id)
+            try {
+                vm.awaitContent()
+
+                vm.onEvent(TransactionCreationEvent.OnAmountChanged("12,50"))
+
+                val state = vm.awaitContent()
+                state.amountError shouldBe null
+                state.isSaveEnabled shouldBe true
+
+                vm.onEvent(TransactionCreationEvent.OnSaveClick)
+                fixture.transactionRepository.inserted.single().money shouldBe Money.fromDouble(12.50)
+            } finally {
+                vm.viewModelScope.cancel()
+            }
+        }
+    }
+
     "same-currency transfer creates two paired legs with equal amounts" {
         runTest {
             val from = anAccount(

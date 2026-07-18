@@ -75,6 +75,61 @@ class CategoryCreationViewModelTest : StringSpec({
         }
     }
 
+    "the name required error appears only after the field was touched and left blank" {
+        runTest {
+            val fixture = Fixture(workspaceId = ws)
+            val vm = fixture.createViewModel()
+            try {
+                vm.currentState.nameMissing shouldBe false
+
+                vm.onEvent(CategoryCreationEvent.OnNameChanged("Food"))
+                vm.currentState.nameMissing shouldBe false
+
+                vm.onEvent(CategoryCreationEvent.OnNameChanged(""))
+                vm.currentState.nameMissing shouldBe true
+                vm.currentState.canSave shouldBe false
+            } finally {
+                vm.viewModelScope.cancel()
+            }
+        }
+    }
+
+    "name input is truncated at the max length" {
+        runTest {
+            val fixture = Fixture(workspaceId = ws)
+            val vm = fixture.createViewModel()
+            try {
+                vm.onEvent(
+                    CategoryCreationEvent.OnNameChanged("x".repeat(CategoryCreationState.NAME_MAX_LENGTH + 10)),
+                )
+
+                vm.currentState.name.length shouldBe CategoryCreationState.NAME_MAX_LENGTH
+            } finally {
+                vm.viewModelScope.cancel()
+            }
+        }
+    }
+
+    "the character counter appears once the name reaches the threshold" {
+        runTest {
+            val fixture = Fixture(workspaceId = ws)
+            val vm = fixture.createViewModel()
+            try {
+                vm.onEvent(
+                    CategoryCreationEvent.OnNameChanged("x".repeat(CategoryCreationState.NAME_COUNTER_THRESHOLD - 1)),
+                )
+                vm.currentState.showNameCounter shouldBe false
+
+                vm.onEvent(
+                    CategoryCreationEvent.OnNameChanged("x".repeat(CategoryCreationState.NAME_COUNTER_THRESHOLD)),
+                )
+                vm.currentState.showNameCounter shouldBe true
+            } finally {
+                vm.viewModelScope.cancel()
+            }
+        }
+    }
+
     "save creates an expense category in the current workspace and trims the name" {
         runTest {
             val fixture = Fixture(workspaceId = ws)
