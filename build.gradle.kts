@@ -75,11 +75,6 @@ tasks.named<de.aaschmid.gradle.plugins.cpd.Cpd>("cpdCheck") {
             // multiplatform API. Sharing them needs an android+ios intermediate source
             // set (jvm uses NoOpCrashReporter), which isn't worth it for ~30 lines.
             "**/repository/FirebaseCrashReporter.kt",
-            // Same story: the android and jvm BackupCrypto actuals are byte-identical
-            // because both back the expect onto the same `javax.crypto` / JCA API
-            // (only the iOS actual differs, using CommonCrypto). Deduping needs a
-            // jvm+android intermediate source set — not worth it for ~30 lines.
-            "**/backup/crypto/BackupCrypto.android.kt",
         )
     }
 }
@@ -191,6 +186,7 @@ subprojects {
             "src/iosX64Main/kotlin",
             "src/iosSimulatorArm64Main/kotlin",
             "src/jvmMain/kotlin",
+            "src/jvmAndroidMain/kotlin",
             "src/main/kotlin",
             "src/main/java",
         )
