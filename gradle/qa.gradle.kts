@@ -85,7 +85,12 @@ fun loadMaestroTestUser(rootDir: File): Map<String, String> =
         .filterKeys { it in setOf("TEST_EMAIL", "TEST_PASSWORD") }
 
 val androidMaestroAppId = "com.georgeci.moneysurfer.dev"
-val iosMaestroAppId = "com.georgeci.moneysurfer"
+// iOS Debug mirrors the Android `.dev` flavor (project.pbxproj sets
+// PRODUCT_BUNDLE_IDENTIFIER=com.georgeci.moneysurfer.dev for the Debug config),
+// so the installed simulator app — the one qaMaestroIos builds — carries the
+// `.dev` suffix too. Launching the un-suffixed id fails every flow with
+// "Unable to launch app com.georgeci.moneysurfer".
+val iosMaestroAppId = "com.georgeci.moneysurfer.dev"
 
 // Offline build, debug variant: `KmpAppConventionPlugin` appends `.dev` to the
 // `com.georgeci.moneysurfer.offline` applicationId / bundle id. Android and iOS
@@ -256,7 +261,12 @@ val iosMaestroDeviceId = providers.gradleProperty("iosSimulatorUdid").orNull
 val maestroSetupTags = listOf("setup", "offline")
 
 val iosMaestroDerivedDataDir = rootProject.file("build/ios-maestro")
-val iosMaestroAppPath = iosMaestroDerivedDataDir.resolve("Build/Products/Debug-iphonesimulator/MoneySurfer.app")
+// The online Xcode config (`iosApp/Configuration/Config.xcconfig`) overrides
+// `PRODUCT_NAME` to `MoneySurfer Dev` for the Debug configuration (the `.dev`
+// flavor mirrored from Android), so the `-configuration Debug` build emits a
+// bundle under that (space-containing) name — not `MoneySurfer.app`. Same shape
+// as `iosOfflineMaestroAppPath` below.
+val iosMaestroAppPath = iosMaestroDerivedDataDir.resolve("Build/Products/Debug-iphonesimulator/MoneySurfer Dev.app")
 
 val firestoreTestsDir = rootProject.file("firestore-tests")
 val firestoreReportsDir = rootProject.file("build/test-results/firestore")
@@ -402,6 +412,9 @@ tasks.register<Exec>("maestroAssembleDebug") {
 tasks.register<Exec>("maestroInstallDebug") {
     group = "verification"
     description = "Build USE_EMULATOR=true debug APK and adb-install on connected device/AVD."
+    // Resolves the adb path and the install command in doFirst (script-level
+    // helpers), same as the maestroRun* tasks below — not config-cache safe.
+    notCompatibleWithConfigurationCache("Resolves adb + install args at execution time.")
     dependsOn("maestroAssembleDebug")
     doFirst {
         require(debugApkPath.exists()) {
