@@ -27,30 +27,25 @@ READ WHEN:
 ## Add Compose screen
 
 Read:
-- `AGENTS.md`
+- `AGENTS.md` — UI Rules, Testing Conventions
 - `docs/PROJECT_MAP.md`
 - `docs/architecture/navigation.AI_SUMMARY.md`
-- `ai/skills/compose-rules.md`
-- `ai/skills/testing-rules.md`
+- `uikit/README.md`
 
 ## Change sync logic
 
 Read:
-- `AGENTS.md`
+- `AGENTS.md` — Dependency DAG, Sync Rules, Testing Conventions
 - `docs/PROJECT_MAP.md`
 - `docs/architecture/sync.AI_SUMMARY.md`
 - `docs/adr/ADR-003-sync-strategy.md`
-- `ai/skills/kmp-rules.md`
-- `ai/skills/testing-rules.md`
 
 ## Change persistence or Firestore rules
 
 Read:
-- `AGENTS.md`
+- `AGENTS.md` — Dependency DAG, Firestore Rules, Testing Conventions
 - `docs/PROJECT_MAP.md`
 - `docs/architecture/persistence.md`
-- `ai/skills/kmp-rules.md`
-- `ai/skills/testing-rules.md`
 
 ## Update documentation
 

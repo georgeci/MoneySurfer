@@ -3,28 +3,13 @@
 <!-- DOCS:TOC -->
 ## Contents
 - [Skill - Navigation Rules](#skill---navigation-rules)
-- [TL;DR for agents](#tldr-for-agents)
-- [Rules](#rules)
 <!-- DOCS:END -->
 
-## TL;DR for agents
+Canonical rules live in
+[docs/architecture/navigation.AI_SUMMARY.md](../../docs/architecture/navigation.AI_SUMMARY.md)
+(events out of leaf UI, route ownership, back-stack validation); use the full
+[docs/architecture/navigation.md](../../docs/architecture/navigation.md) when
+route ownership is unclear.
 
-- Keep global flow policy outside leaf UI.
-- Follow existing route patterns.
-- Validate changed back stack behavior.
-- Read this before navigation work.
-
-READ WHEN:
-- adding screen
-- adding route
-- changing back stack logic
-- adding deep links
-
-<!-- AI:SECTION id=navigation-skill task=navigation,screen,backstack -->
-## Rules
-
-- Screens emit events; navigation host performs navigation.
-- Do not duplicate route definitions.
-- Keep route arguments consistent with existing patterns.
-- Treat back behavior as user-visible behavior that needs targeted validation.
-<!-- AI:END -->
+This file is intentionally a pointer, not a copy. Do not restate rules here —
+copies drift.

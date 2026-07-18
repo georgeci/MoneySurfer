@@ -3,28 +3,13 @@
 <!-- DOCS:TOC -->
 ## Contents
 - [Skill - KMP Rules](#skill---kmp-rules)
-- [TL;DR for agents](#tldr-for-agents)
-- [Rules](#rules)
 <!-- DOCS:END -->
 
-## TL;DR for agents
+Canonical rules live in
+[AGENTS.md → Dependency DAG](../../AGENTS.md#dependency-dag) (module
+boundaries, SDK-free `domain`/`sync:api`) and
+[AGENTS.md → Kotlin/KMP Conventions](../../AGENTS.md#kotlinkmp-conventions)
+(`commonMain` first, `expect`/`actual`, dependency policy).
 
-- Keep platform-specific APIs behind `expect`/`actual` or platform modules.
-- Prefer shared logic in common source sets.
-- Do not leak platform SDK types into domain.
-- Read this before KMP architecture changes.
-
-READ WHEN:
-- adding platform APIs
-- changing commonMain code
-- editing module dependencies
-- adding dependencies
-
-<!-- AI:SECTION id=kmp-rules task=kmp,architecture,platform -->
-## Rules
-
-- Prefer shared logic and UI in `commonMain`.
-- Use `expect`/`actual` for real platform APIs.
-- Platform entry modules may touch platform SDKs.
-- Domain and sync contracts remain SDK-free.
-<!-- AI:END -->
+This file is intentionally a pointer, not a copy. Do not restate rules here —
+copies drift.

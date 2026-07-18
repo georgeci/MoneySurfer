@@ -62,22 +62,16 @@
 - Lines: 19-98
 - Tasks: ci, security, supply-chain
 
-## compose-rules
-- Title: Rules
-- File: ai/skills/compose-rules.md
-- Lines: 23-30
-- Tasks: ui, screen, compose
-
 ## context-packs
 - Title: Add Compose screen
 - File: docs/CONTEXT_PACKS.md
-- Lines: 26-64
+- Lines: 26-59
 - Tasks: context, docs, agent
 
 ## docs-maintainer-agent
 - Title: Role
 - File: ai/agents/docs-maintainer.md
-- Lines: 23-41
+- Lines: 22-39
 - Tasks: docs, agent, maintenance
 
 ## docs-structure
@@ -152,18 +146,6 @@
 - Lines: 87-113
 - Tasks: invites, domain, kotlin
 
-## kmp-rules
-- Title: Rules
-- File: ai/skills/kmp-rules.md
-- Lines: 23-30
-- Tasks: kmp, architecture, platform
-
-## kotlin-style
-- Title: Rules
-- File: ai/skills/kotlin-style.md
-- Lines: 23-30
-- Tasks: kotlin, domain, viewmodel
-
 ## markdown-rules
 - Title: Rules
 - File: ai/skills/markdown-rules.md
@@ -197,12 +179,6 @@
 ## navigation-rules
 - Title: Rules
 - File: docs/architecture/navigation.md
-- Lines: 23-30
-- Tasks: navigation, screen, backstack
-
-## navigation-skill
-- Title: Rules
-- File: ai/skills/navigation-rules.md
 - Lines: 23-30
 - Tasks: navigation, screen, backstack
 
@@ -343,12 +319,6 @@
 - File: docs/architecture/sync.AI_SUMMARY.md
 - Lines: 23-30
 - Tasks: sync, outbox, pull, summary
-
-## testing-rules
-- Title: Rules
-- File: ai/skills/testing-rules.md
-- Lines: 23-30
-- Tasks: testing, qa, validation
 
 ## testing-strategy
 - Title: Common Commands
