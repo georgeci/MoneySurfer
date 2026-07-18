@@ -8,6 +8,7 @@ import com.georgeci.moneysurfer.domain.primitives.Money
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.domain.primitives.TransactionStatus
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
+import com.georgeci.moneysurfer.domain.primitives.TransferId
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
@@ -28,6 +29,7 @@ fun aTransaction(
     status: TransactionStatus = TransactionStatus.ACTUAL,
     createdAt: Instant = operationAt,
     updatedAt: Instant = createdAt,
+    transferId: TransferId? = null,
 ): Transaction = Transaction(
     id = id,
     workspaceId = workspaceId,
@@ -42,4 +44,5 @@ fun aTransaction(
     status = status,
     createdAt = createdAt,
     updatedAt = updatedAt,
+    transferId = transferId,
 )

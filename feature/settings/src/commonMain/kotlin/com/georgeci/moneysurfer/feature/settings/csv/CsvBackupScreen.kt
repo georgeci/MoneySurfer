@@ -36,11 +36,15 @@ import moneysurfer.feature.settings.generated.resources.settings_csv_hero_title
 import moneysurfer.feature.settings.generated.resources.settings_csv_import_result
 import moneysurfer.feature.settings.generated.resources.settings_csv_import_supporting
 import moneysurfer.feature.settings.generated.resources.settings_csv_import_title
+import moneysurfer.feature.settings.generated.resources.settings_csv_issue_account_workspace_mismatch
+import moneysurfer.feature.settings.generated.resources.settings_csv_issue_category_workspace_mismatch
 import moneysurfer.feature.settings.generated.resources.settings_csv_issue_columns
+import moneysurfer.feature.settings.generated.resources.settings_csv_issue_currency_mismatch
 import moneysurfer.feature.settings.generated.resources.settings_csv_issue_invalid_value
 import moneysurfer.feature.settings.generated.resources.settings_csv_issue_unknown_account
 import moneysurfer.feature.settings.generated.resources.settings_csv_issue_unknown_category
 import moneysurfer.feature.settings.generated.resources.settings_csv_issue_unknown_workspace
+import moneysurfer.feature.settings.generated.resources.settings_csv_issue_unpaired_transfer
 import moneysurfer.feature.settings.generated.resources.settings_csv_last_import_summary
 import moneysurfer.feature.settings.generated.resources.settings_csv_notice_file_too_large
 import moneysurfer.feature.settings.generated.resources.settings_csv_notice_generic
@@ -202,4 +206,24 @@ private fun issueText(issue: CsvRowIssue): String = when (issue) {
         stringResource(Res.string.settings_csv_issue_unknown_account, issue.accountId)
     is CsvRowIssue.UnknownCategory ->
         stringResource(Res.string.settings_csv_issue_unknown_category, issue.categoryId)
+    is CsvRowIssue.AccountWorkspaceMismatch ->
+        stringResource(
+            Res.string.settings_csv_issue_account_workspace_mismatch,
+            issue.accountId,
+            issue.workspaceId,
+        )
+    is CsvRowIssue.CategoryWorkspaceMismatch ->
+        stringResource(
+            Res.string.settings_csv_issue_category_workspace_mismatch,
+            issue.categoryId,
+            issue.workspaceId,
+        )
+    is CsvRowIssue.CurrencyMismatch ->
+        stringResource(
+            Res.string.settings_csv_issue_currency_mismatch,
+            issue.currency,
+            issue.accountCurrency,
+        )
+    is CsvRowIssue.UnpairedTransfer ->
+        stringResource(Res.string.settings_csv_issue_unpaired_transfer, issue.transferId)
 }

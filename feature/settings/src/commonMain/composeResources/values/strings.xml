@@ -65,6 +65,10 @@
     <string name="settings_csv_issue_unknown_workspace">unknown workspace %1$s</string>
     <string name="settings_csv_issue_unknown_account">unknown account %1$s</string>
     <string name="settings_csv_issue_unknown_category">unknown category %1$s</string>
+    <string name="settings_csv_issue_account_workspace_mismatch">account %1$s does not belong to workspace %2$s</string>
+    <string name="settings_csv_issue_category_workspace_mismatch">category %1$s does not belong to workspace %2$s</string>
+    <string name="settings_csv_issue_currency_mismatch">currency %1$s does not match account currency %2$s</string>
+    <string name="settings_csv_issue_unpaired_transfer">transfer %1$s is missing a matching pair row</string>
     <string name="settings_notifications">Notifications</string>
     <string name="settings_notifications_supporting">Budget alerts, weekly summary</string>
 
