@@ -1,6 +1,8 @@
 package com.georgeci.moneysurfer.data.backup.fixtures
 
 import androidx.room.Room
+import androidx.sqlite.driver.bundled.BundledSQLiteDriver
+import androidx.sqlite.execSQL
 import com.georgeci.moneysurfer.data.backup.deleteIfExists
 import com.georgeci.moneysurfer.data.backup.zip.ZipStoredWriter
 import com.georgeci.moneysurfer.data.db.MONEY_SURFER_DB_VERSION
@@ -86,13 +88,37 @@ val testAppInfo: AppInfo = AppInfo(version = "1.2.3", versionCode = 42)
 val testClock: ClockUseCase = ClockUseCase()
 
 /**
+ * Bytes of a small but structurally valid SQLite database — the importer now
+ * runs `PRAGMA integrity_check` on the restored file, so archives that are
+ * meant to import successfully need a real database payload.
+ */
+fun validSqliteDbBytes(): ByteArray = cachedValidSqliteDb.copyOf()
+
+private val cachedValidSqliteDb: ByteArray by lazy {
+    val dir = newTempDir("seed-db")
+    try {
+        val path = dir / "seed.db"
+        val connection = BundledSQLiteDriver().open(path.toString())
+        try {
+            connection.execSQL("CREATE TABLE seed (id INTEGER PRIMARY KEY, name TEXT)")
+            connection.execSQL("INSERT INTO seed (name) VALUES ('ok')")
+        } finally {
+            connection.close()
+        }
+        FileSystem.SYSTEM.read(path) { readByteArray() }
+    } finally {
+        deleteRecursively(dir)
+    }
+}
+
+/**
  * Hand-built archive used by importer error-path tests — bypasses
  * `BackupExporterImpl` entirely so we can craft both well-formed and
  * malformed inputs.
  */
 fun buildArchive(
     manifestJson: String,
-    mainDbBytes: ByteArray = ByteArray(16) { it.toByte() },
+    mainDbBytes: ByteArray = validSqliteDbBytes(),
     dataStoreBytes: ByteArray = ByteArray(8) { (it + 100).toByte() },
     includeMainDb: Boolean = true,
     includeDataStore: Boolean = true,

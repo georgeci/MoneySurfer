@@ -26,6 +26,10 @@ internal class ZipStoredReader(private val source: BufferedSource) {
         return currentHeader?.name
     }
 
+    /** Declared size of the most-recent entry, or `null` outside an entry. */
+    val currentEntrySize: Long?
+        get() = currentHeader?.size?.toLong()
+
     /**
      * Streams the body of the most-recent entry into [out] and verifies the CRC32.
      * Throws [BackupError.CrcMismatch] on mismatch.

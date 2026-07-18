@@ -1,10 +1,12 @@
 package com.georgeci.moneysurfer.data.backup
 
 import androidx.room.useWriterConnection
+import com.georgeci.moneysurfer.data.backup.crypto.EncryptedBackupCodec
 import com.georgeci.moneysurfer.data.backup.zip.ZipStoredWriter
 import com.georgeci.moneysurfer.data.db.MONEY_SURFER_DB_VERSION
 import com.georgeci.moneysurfer.data.db.MoneySurferDatabase
 import com.georgeci.moneysurfer.domain.AppInfo
+import com.georgeci.moneysurfer.domain.backup.BackupEncryptionInfo
 import com.georgeci.moneysurfer.domain.backup.BackupError
 import com.georgeci.moneysurfer.domain.backup.BackupExporter
 import com.georgeci.moneysurfer.domain.backup.BackupManifest
@@ -36,23 +38,31 @@ class BackupExporterImpl(
     private val mutex = Mutex()
     private val fs: FileSystem = FileSystem.SYSTEM
 
-    override suspend fun exportTo(sink: BufferedSink): Result<BackupManifest> = mutex.withLock {
-        try {
-            Result.success(withContext(Dispatchers.IO) { runExport(sink) })
-        } catch (ce: CancellationException) {
-            throw ce
-        } catch (be: BackupError) {
-            Result.failure(be)
-        } catch (
-            @Suppress("TooGenericExceptionCaught") t: Throwable,
-        ) {
-            Result.failure(BackupError.Io(t))
+    override suspend fun exportTo(sink: BufferedSink, passphrase: String?): Result<BackupManifest> =
+        mutex.withLock {
+            try {
+                Result.success(withContext(Dispatchers.IO) { runExport(sink, passphrase) })
+            } catch (ce: CancellationException) {
+                throw ce
+            } catch (be: BackupError) {
+                Result.failure(be)
+            } catch (
+                @Suppress("TooGenericExceptionCaught") t: Throwable,
+            ) {
+                Result.failure(BackupError.Io(t))
+            }
+        }
+
+    private suspend fun runExport(sink: BufferedSink, passphrase: String?): BackupManifest {
+        checkpointMainDatabase()
+        return if (passphrase.isNullOrEmpty()) {
+            writePlainArchive(sink, buildManifest())
+        } else {
+            writeEncryptedArchive(sink, passphrase)
         }
     }
 
-    private suspend fun runExport(sink: BufferedSink): BackupManifest {
-        checkpointMainDatabase()
-        val manifest = buildManifest()
+    private fun writePlainArchive(sink: BufferedSink, manifest: BackupManifest): BackupManifest {
         val zip = ZipStoredWriter(sink)
         zip.writeEntry(BackupManifest.MANIFEST_ENTRY_NAME, manifestSource(manifest))
         fs.source(locator.moneySurferDbFile()).buffer().use {
@@ -63,6 +73,29 @@ class BackupExporterImpl(
         }
         zip.finish()
         return manifest
+    }
+
+    /**
+     * The outer container stays a valid plain ZIP (same `.zip` extension and
+     * MIME type): a readable manifest that flags the encryption scheme, plus a
+     * single sealed `payload.enc` entry. Inside the sealed blob sits a full
+     * plain backup archive — including its own manifest, which is the
+     * authenticated copy the importer trusts after decryption.
+     */
+    private fun writeEncryptedArchive(sink: BufferedSink, passphrase: String): BackupManifest {
+        val innerZip = Buffer()
+        val innerManifest = writePlainArchive(innerZip, buildManifest())
+        val sealed = EncryptedBackupCodec.seal(innerZip.readByteArray(), passphrase)
+
+        val outerManifest = innerManifest.copy(
+            files = listOf(BackupManifest.ENCRYPTED_PAYLOAD_ENTRY_NAME),
+            encryption = BackupEncryptionInfo(BackupEncryptionInfo.SCHEME_V1),
+        )
+        val zip = ZipStoredWriter(sink)
+        zip.writeEntry(BackupManifest.MANIFEST_ENTRY_NAME, manifestSource(outerManifest))
+        zip.writeEntry(BackupManifest.ENCRYPTED_PAYLOAD_ENTRY_NAME, Buffer().apply { write(sealed) })
+        zip.finish()
+        return outerManifest
     }
 
     private suspend fun checkpointMainDatabase() {
