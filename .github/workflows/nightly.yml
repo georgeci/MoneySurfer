@@ -228,8 +228,13 @@ jobs:
       - name: Cache Kotlin/Native (~/.konan)
         uses: ./.github/actions/konan-cache
 
-      - name: Show Xcode version
-        run: xcodebuild -version
+      # Select the same Xcode the maestro-ios / ios-offline jobs use. The default
+      # runner Xcode (16.4) ships an SDK too old for the Firebase SPM binary
+      # frameworks + the app's newer-SDK symbols, so linking failed with
+      # "framework 'FirebaseAuth' not found" / undefined _UIViewLayoutRegion. A
+      # bare `xcodebuild -version` didn't pin the toolchain; select-xcode does.
+      - name: Select Xcode
+        uses: ./.github/actions/select-xcode
 
       # Pre-link the Kotlin framework for the simulator arch so the Xcode build
       # phase has its inputs ready and SPM resolution doesn't race with Gradle
