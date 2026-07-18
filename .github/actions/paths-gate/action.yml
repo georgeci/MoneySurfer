@@ -11,6 +11,13 @@ outputs:
   code:
     description: "true iff at least one non-doc / non-AI-tooling file changed."
     value: ${{ steps.filter.outputs.code }}
+  docs:
+    description: >-
+      true iff a file covered by `scripts/docs_tool.py check` changed (docs/,
+      ai/, the link-checked root docs, or the tool itself). Independent of
+      `code` — the doc paths excluded there are exactly the ones that matter
+      here, so gating a docs check on `code` would never run it.
+    value: ${{ steps.filter.outputs.docs }}
 
 runs:
   using: composite
@@ -32,3 +39,12 @@ runs:
             - '!docs/**'
             - '!.github/copilot-instructions.md'
             - '!LICENSE'
+          # Inputs of `scripts/docs_tool.py check`: docs/ + ai/ markdown, the
+          # extra root files it link-checks, and the tool itself.
+          docs:
+            - 'docs/**'
+            - 'ai/**'
+            - 'AGENTS.md'
+            - '.claude/CLAUDE.md'
+            - '.github/copilot-instructions.md'
+            - 'scripts/docs_tool.py'

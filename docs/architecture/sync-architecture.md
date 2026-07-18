@@ -2,12 +2,12 @@
 
 <!-- DOCS:TOC -->
 ## Contents
-- [Sync v2 — Architecture](#sync-v2-architecture)
+- [Sync v2 — Architecture](#sync-v2--architecture)
 - [TL;DR for agents](#tldr-for-agents)
 - [Rules](#rules)
 - [Modules and DAG](#modules-and-dag)
-- [File layout — :sync](#file-layout-sync)
-- [File layout — :sync-surfer/sync](#file-layout-sync-surfersync)
+- [File layout — :sync](#file-layout--sync)
+- [File layout — :sync-surfer/sync](#file-layout--sync-surfersync)
 - [DI](#di)
 - [Error-handling convention](#error-handling-convention)
 - [Reading order for new contributors](#reading-order-for-new-contributors)

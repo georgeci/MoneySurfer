@@ -176,8 +176,9 @@ def slugify(text: str) -> str:
     text = clean_heading(text).lower()
     text = re.sub(r"<[^>]+>", "", text)
     text = re.sub(r"[^\w\s-]", "", text, flags=re.UNICODE)
-    text = re.sub(r"\s+", "-", text.strip())
-    return text
+    # GitHub's slugger turns each space into its own hyphen — no collapsing:
+    # "Foo — Bar" drops the em-dash and yields "foo--bar", not "foo-bar".
+    return re.sub(r"\s", "-", text)
 
 
 def headings_from_text(text: str) -> list[tuple[int, str, str]]:

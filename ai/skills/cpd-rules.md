@@ -2,7 +2,7 @@
 
 <!-- DOCS:TOC -->
 ## Contents
-- [CPD — copy-paste detection (local)](#cpd-copy-paste-detection-local)
+- [CPD — copy-paste detection (local)](#cpd--copy-paste-detection-local)
 - [When to run](#when-to-run)
 - [Reports](#reports)
 - [Configuration](#configuration)

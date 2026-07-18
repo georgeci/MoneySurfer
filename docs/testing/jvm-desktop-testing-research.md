@@ -1,5 +1,19 @@
 # JVM (Desktop) Testing Research
 
+<!-- DOCS:TOC -->
+## Contents
+- [JVM (Desktop) Testing Research](#jvm-desktop-testing-research)
+- [1. Where we are today](#1-where-we-are-today)
+- [2. The testing options for Compose Desktop (state of the art)](#2-the-testing-options-for-compose-desktop-state-of-the-art)
+  - [2.1 Compose UI tests in-process (recommended core)](#21-compose-ui-tests-in-process-recommended-core)
+  - [2.2 Gray-box "E2E" of the real App() (recommended for critical journeys)](#22-gray-box-e2e-of-the-real-app-recommended-for-critical-journeys)
+  - [2.3 Screenshot / visual regression — Roborazzi](#23-screenshot--visual-regression--roborazzi)
+  - [2.4 Black-box E2E of the packaged app — thin ecosystem, keep minimal](#24-black-box-e2e-of-the-packaged-app--thin-ecosystem-keep-minimal)
+- [3. CI considerations](#3-ci-considerations)
+- [4. Proposed roadmap](#4-proposed-roadmap)
+- [5. Sources](#5-sources)
+<!-- DOCS:END -->
+
 *Research date: 2026-07-15. Stack at time of writing: Kotlin 2.4.0, Compose Multiplatform 1.11.1, Kotest 6.2.1, Koin 4.2.2, Room 2.8.4.*
 
 ## 1. Where we are today

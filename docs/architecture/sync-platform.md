@@ -2,14 +2,14 @@
 
 <!-- DOCS:TOC -->
 ## Contents
-- [Sync v2 — Platform Layer](#sync-v2-platform-layer)
+- [Sync v2 — Platform Layer](#sync-v2--platform-layer)
 - [TL;DR for agents](#tldr-for-agents)
 - [Rules](#rules)
 - [BackgroundSyncScheduler](#backgroundsyncscheduler)
-  - [Android — WorkManager](#android-workmanager)
-  - [iOS — placeholder](#ios-placeholder)
-  - [Desktop — coroutine loop](#desktop-coroutine-loop)
-  - [Important — the periodic loop in AppLaunchViewModel](#important-the-periodic-loop-in-applaunchviewmodel)
+  - [Android — WorkManager](#android--workmanager)
+  - [iOS — placeholder](#ios--placeholder)
+  - [Desktop — coroutine loop](#desktop--coroutine-loop)
+  - [Important — the periodic loop in AppLaunchViewModel](#important--the-periodic-loop-in-applaunchviewmodel)
 - [NetworkMonitor](#networkmonitor)
   - [NetworkWaitMode](#networkwaitmode)
 - [SyncTelemetry](#synctelemetry)
