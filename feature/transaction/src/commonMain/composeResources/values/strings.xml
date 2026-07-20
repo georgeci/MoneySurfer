@@ -30,6 +30,8 @@
     <string name="transaction_creation_update">Update</string>
     <string name="transaction_creation_close_content_description">Close</string>
     <string name="transaction_creation_amount_placeholder">0.00</string>
+    <string name="transaction_creation_amount_error_format">Enter a valid amount.</string>
+    <string name="transaction_creation_amount_error_zero">Amount must be greater than zero.</string>
     <string name="transaction_creation_account_empty">No account selected</string>
     <string name="transaction_creation_from_label">FROM</string>
     <string name="transaction_creation_to_label">TO</string>

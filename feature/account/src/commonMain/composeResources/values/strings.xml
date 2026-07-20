@@ -26,6 +26,7 @@
     <string name="accounts_manage_action_failed">Something went wrong. Try again.</string>
     <string name="account_creation_title">New account</string>
     <string name="account_creation_name_label">Account name</string>
+    <string name="account_creation_name_error_required">Account name is required.</string>
     <string name="account_creation_balance_label">Opening balance</string>
     <string name="account_creation_balance_helper">You can adjust this later from the account menu.</string>
     <string name="account_creation_balance_error_negative">This account type can't start with a negative balance.</string>

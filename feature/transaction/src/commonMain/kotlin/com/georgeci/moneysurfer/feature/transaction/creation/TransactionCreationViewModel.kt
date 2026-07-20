@@ -357,7 +357,7 @@ class TransactionCreationViewModel(
         }
         val account = state.selectedAccount ?: return
         val category = state.selectedCategory ?: return
-        val amountDouble = state.amount.toDoubleOrNull() ?: return
+        val amountDouble = TransactionAmountInput.parse(state.amount)?.takeIf { it > 0 } ?: return
 
         val money = Money.fromDouble(amountDouble).abs()
         val type = if (state.isExpense) TransactionType.EXPENSE else TransactionType.INCOME
@@ -428,9 +428,9 @@ class TransactionCreationViewModel(
         val from = state.fromAccount ?: return null
         val to = state.toAccount ?: return null
         if (from.id == to.id) return null
-        val fromAmount = state.amount.toDoubleOrNull()?.takeIf { it > 0 } ?: return null
+        val fromAmount = TransactionAmountInput.parse(state.amount)?.takeIf { it > 0 } ?: return null
         val toAmount = if (state.crossCurrency) {
-            state.toAmount.toDoubleOrNull()?.takeIf { it > 0 } ?: return null
+            TransactionAmountInput.parse(state.toAmount)?.takeIf { it > 0 } ?: return null
         } else {
             fromAmount
         }
@@ -504,17 +504,23 @@ sealed interface TransactionCreationState {
                 fromAccount != null &&
                 toAccount != null &&
                 fromAccount.currencyCode != toAccount.currencyCode
+
+        /** Inline validation error for the (from) amount field, or null when it is acceptable. */
+        val amountError: TransactionAmountError?
+            get() = TransactionAmountInput.errorFor(amount)
+
+        /** Inline validation error for the cross-currency "to" amount, or null when it is acceptable. */
+        val toAmountError: TransactionAmountError?
+            get() = if (crossCurrency) TransactionAmountInput.errorFor(toAmount) else null
+
         val isSaveEnabled: Boolean
             get() = if (isTransfer) {
-                val from = amount.toDoubleOrNull()
-                val to = if (crossCurrency) toAmount.toDoubleOrNull() else from
-                from != null && from > 0 &&
-                    to != null && to > 0 &&
+                TransactionAmountInput.isValid(amount) &&
+                    (!crossCurrency || TransactionAmountInput.isValid(toAmount)) &&
                     fromAccount != null && toAccount != null &&
                     fromAccount.id != toAccount.id
             } else {
-                amount.toDoubleOrNull() != null &&
-                    amount.toDoubleOrNull()!! > 0 &&
+                TransactionAmountInput.isValid(amount) &&
                     selectedAccount != null &&
                     selectedCategory != null
             }

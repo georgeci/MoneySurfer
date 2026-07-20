@@ -50,6 +50,7 @@ import com.georgeci.moneysurfer.feature.account.generated.resources.account_crea
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_field_card_last4
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_field_description
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_field_iban
+import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_name_error_required
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_name_label
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_remove
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_remove_content_description
@@ -151,6 +152,12 @@ private fun AccountCreationContent(
                 onValueChange = { onEvent(AccountCreationEvent.OnNameChanged(it)) },
                 label = { Text(stringResource(Res.string.account_creation_name_label)) },
                 singleLine = true,
+                isError = state.nameMissing,
+                supportingText = if (state.nameMissing) {
+                    { Text(stringResource(Res.string.account_creation_name_error_required)) }
+                } else {
+                    null
+                },
                 modifier = Modifier.fillMaxWidth(),
             )
 

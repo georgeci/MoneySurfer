@@ -39,7 +39,12 @@ class CategoryCreationViewModel(
 
     override fun onEvent(event: CategoryCreationEvent) {
         when (event) {
-            is CategoryCreationEvent.OnNameChanged -> updateState { copy(name = event.name) }
+            is CategoryCreationEvent.OnNameChanged -> updateState {
+                copy(
+                    name = event.name.take(CategoryCreationState.NAME_MAX_LENGTH),
+                    nameTouched = true,
+                )
+            }
             is CategoryCreationEvent.OnTypeChanged -> updateState { copy(type = event.type) }
             is CategoryCreationEvent.OnIconSelected -> updateState { copy(selectedIconIndex = event.index) }
             is CategoryCreationEvent.OnColorSelected -> updateState { copy(selectedColorIndex = event.index) }
@@ -141,8 +146,25 @@ data class CategoryCreationState(
     val parent: String = "",
     val note: String = "",
     val isLoading: Boolean = false,
+    /** Whether the user has edited the name field — gates the required-name inline error
+     *  so a pristine screen doesn't open covered in red. */
+    val nameTouched: Boolean = false,
 ) {
     val canSave: Boolean get() = name.isNotBlank() && !isLoading
+
+    /** Whether to show the required-name inline error: the field was edited and left blank. */
+    val nameMissing: Boolean get() = nameTouched && name.isBlank()
+
+    /** Whether the name is long enough that the character counter should appear. */
+    val showNameCounter: Boolean get() = name.length >= NAME_COUNTER_THRESHOLD
+
+    companion object {
+        /** Hard cap on the category name — longer input is truncated in the reducer. */
+        const val NAME_MAX_LENGTH = 50
+
+        /** Name length at which the "n/max" character counter becomes visible. */
+        const val NAME_COUNTER_THRESHOLD = 40
+    }
 }
 
 sealed interface CategoryCreationEvent {

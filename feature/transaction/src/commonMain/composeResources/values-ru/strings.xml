@@ -30,6 +30,8 @@
     <string name="transaction_creation_update">Обновить</string>
     <string name="transaction_creation_close_content_description">Закрыть</string>
     <string name="transaction_creation_amount_placeholder">0,00</string>
+    <string name="transaction_creation_amount_error_format">Введите корректную сумму.</string>
+    <string name="transaction_creation_amount_error_zero">Сумма должна быть больше нуля.</string>
     <string name="transaction_creation_account_empty">Счёт не выбран</string>
     <string name="transaction_creation_from_label">ОТКУДА</string>
     <string name="transaction_creation_to_label">КУДА</string>
