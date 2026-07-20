@@ -166,14 +166,12 @@ insufficient.
 - [docs/](docs/): authoritative documentation.
 - [md/](md/): discussions, drafts, audits, and notes before promotion to
   `docs/`.
-- [ai/](ai/): agent roles, documentation skills, and task prompts.
+- [ai/](ai/): agent roles and documentation skills.
 - [docs/PROJECT_MAP.md](docs/PROJECT_MAP.md): short project map; read first
   when choosing context.
 - [docs/CONTEXT_PACKS.md](docs/CONTEXT_PACKS.md): task-oriented reading sets.
 - [docs/AI_INDEX.md](docs/AI_INDEX.md): generated index of addressable
   `AI:SECTION` blocks.
-- [.agents/](.agents/): existing app-specific agent profiles. Do not migrate or
-  edit this folder unless the user explicitly asks.
 
 Documentation commands:
 
@@ -364,23 +362,10 @@ intended for any future GitHub Actions workflow.
 
 ## Sub-Agents
 
-Use `.agents/` profiles when delegating or structuring AI work:
-
-- [.agents/code-agent.md](.agents/code-agent.md): feature/code changes.
-- [.agents/test-agent.md](.agents/test-agent.md): tests and QA.
-- [.agents/research-agent.md](.agents/research-agent.md): research and
-  architecture investigation.
-- [.agents/tech-docs-agent.md](.agents/tech-docs-agent.md): technical docs.
-
-Use `.agents/skills/` for app-specific task packs:
-
-- KMP architecture boundaries.
-- Compose/uikit UI.
-- Sync v2 and outbox.
-- Firestore rules.
-- QA and test strategy.
-- Domain feature implementation.
-
 Use [ai/agents/docs-maintainer.md](ai/agents/docs-maintainer.md) and
 [ai/skills/docs-structure.md](ai/skills/docs-structure.md) for documentation
-work.
+work. For task-oriented reading sets, use
+[docs/CONTEXT_PACKS.md](docs/CONTEXT_PACKS.md).
+
+The legacy `.agents/` profile directory was retired (issue #194); the rules
+those profiles duplicated live in this file and in `docs/`.

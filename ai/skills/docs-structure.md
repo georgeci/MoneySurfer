@@ -10,7 +10,7 @@
 ## TL;DR for agents
 
 - `docs/` is authoritative documentation.
-- `ai/` contains agent roles, skills, and prompts.
+- `ai/` contains agent roles and skills.
 - Read this before creating or reorganizing documentation.
 
 READ WHEN:
