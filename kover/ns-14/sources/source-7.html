@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > Category</title>
+  <title>MoneySurfer Coverage Report > AppRestarter</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,70 +19,22 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.domain.model</a>
+    <a href="../index.html">com.georgeci.moneysurfer.domain.backup</a>
 </div>
 
-<h1>Coverage Summary for Class: Category (com.georgeci.moneysurfer.domain.model)</h1>
+<h1>Coverage Summary for Class: AppRestarter (com.georgeci.moneysurfer.domain.backup)</h1>
 
 <table class="coverageStats">
 <tr>
   <th class="name">Class</th>
 <th class="coverageStat 
 ">
-  Class, %
-</th>
-<th class="coverageStat 
-">
-  Method, %
-</th>
-<th class="coverageStat 
-">
   Branch, %
-</th>
-<th class="coverageStat 
-">
-  Line, %
-</th>
-<th class="coverageStat 
-">
-  Instruction, %
 </th>
 </tr>
 <tr>
-  <td class="name">Category</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
+  <td class="name">AppRestarter</td>
     <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (8/8)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (53/53)
-  </span>
-</td>
 </tr>
 
 </table>
@@ -92,22 +44,31 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.model
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.backup
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryId
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryType
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
-&nbsp;import kotlin.time.Instant
+&nbsp;import okio.Path
 &nbsp;
-<b class="fc">&nbsp;data class Category(</b>
-<b class="fc">&nbsp;    val id: CategoryId,</b>
-<b class="fc">&nbsp;    val workspaceId: WorkspaceId,</b>
-<b class="fc">&nbsp;    val name: String,</b>
-<b class="fc">&nbsp;    val type: CategoryType,</b>
-<b class="fc">&nbsp;    val parentId: CategoryId?,</b>
-<b class="fc">&nbsp;    val createdAt: Instant,</b>
-<b class="fc">&nbsp;    val updatedAt: Instant = createdAt,</b>
-&nbsp;)
+&nbsp;/**
+&nbsp; * Locates the on-disk files that participate in a backup, per platform.
+&nbsp; * Implementations live in `:data-local` (`{Android,Ios,Jvm}BackupStorageLocator`)
+&nbsp; * and are bound to this interface in `SharedPlatformModule`.
+&nbsp; */
+&nbsp;interface BackupStorageLocator {
+&nbsp;    val platformName: String
+&nbsp;    fun moneySurferDbFile(): Path
+&nbsp;    fun syncDbFile(): Path
+&nbsp;    fun dataStoreFile(): Path
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * Restarts the host process so newly-imported on-disk state is observed.
+&nbsp; *
+&nbsp; * iOS implementations cannot relaunch programmatically; they exit cleanly
+&nbsp; * and the calling layer surfaces a &quot;please reopen&quot; message.
+&nbsp; */
+&nbsp;interface AppRestarter {
+&nbsp;    fun restart()
+&nbsp;}
 </code>
 </pre>
 </div>
@@ -131,7 +92,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-05-06 14:45</div>
+    <div style="float:right;">generated on 2026-07-20 16:21</div>
 </div>
 </body>
 </html>

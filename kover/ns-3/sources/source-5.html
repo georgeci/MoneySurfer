@@ -101,9 +101,11 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.backup
 &nbsp;
+&nbsp;import com.georgeci.moneysurfer.data.backup.crypto.EncryptedBackupCodec
 &nbsp;import com.georgeci.moneysurfer.data.backup.zip.ZipStoredReader
 &nbsp;import com.georgeci.moneysurfer.data.db.MONEY_SURFER_DB_VERSION
 &nbsp;import com.georgeci.moneysurfer.data.db.MoneySurferDatabase
+&nbsp;import com.georgeci.moneysurfer.domain.backup.BackupEncryptionInfo
 &nbsp;import com.georgeci.moneysurfer.domain.backup.BackupError
 &nbsp;import com.georgeci.moneysurfer.domain.backup.BackupImporter
 &nbsp;import com.georgeci.moneysurfer.domain.backup.BackupManifest
@@ -115,6 +117,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import kotlinx.coroutines.sync.withLock
 &nbsp;import kotlinx.coroutines.withContext
 &nbsp;import kotlinx.serialization.json.Json
+&nbsp;import okio.Buffer
 &nbsp;import okio.BufferedSource
 &nbsp;import okio.FileSystem
 &nbsp;import okio.Path
@@ -133,9 +136,19 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    private val mutex = Mutex()
 &nbsp;    private val fs: FileSystem = FileSystem.SYSTEM
 &nbsp;
-&nbsp;    override suspend fun importFrom(source: BufferedSource): Result&lt;BackupManifest&gt; = mutex.withLock {
+&nbsp;    override suspend fun isPassphraseProtected(source: BufferedSource): Boolean =
+&nbsp;        withContext(Dispatchers.IO) {
+&nbsp;            runCatching {
+&nbsp;                readManifestEntry(ZipStoredReader(source.peek())).encryption != null
+&nbsp;            }.getOrDefault(false)
+&nbsp;        }
+&nbsp;
+&nbsp;    override suspend fun importFrom(
+&nbsp;        source: BufferedSource,
+&nbsp;        passphrase: String?,
+&nbsp;    ): Result&lt;BackupManifest&gt; = mutex.withLock {
 &nbsp;        try {
-&nbsp;            Result.success(withContext(Dispatchers.IO) { runImport(source) })
+&nbsp;            Result.success(withContext(Dispatchers.IO) { runImport(source, passphrase) })
 &nbsp;        } catch (ce: CancellationException) {
 &nbsp;            throw ce
 &nbsp;        } catch (be: BackupError) {
@@ -147,10 +160,53 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;        }
 &nbsp;    }
 &nbsp;
-&nbsp;    private suspend fun runImport(source: BufferedSource): BackupManifest {
+&nbsp;    private fun runImport(source: BufferedSource, passphrase: String?): BackupManifest {
 &nbsp;        val reader = ZipStoredReader(source)
-&nbsp;
 &nbsp;        val manifest = readManifestEntry(reader)
+&nbsp;        return if (manifest.encryption != null) {
+&nbsp;            importEncrypted(reader, manifest, passphrase)
+&nbsp;        } else {
+&nbsp;            importPlain(reader, manifest)
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Unwraps an encrypted backup: the outer manifest only advertises the
+&nbsp;     * scheme; the sealed `payload.enc` entry holds a complete plain archive
+&nbsp;     * whose own manifest is the authenticated one (the codec&#39;s MAC covers it),
+&nbsp;     * so the plain path re-validates everything after decryption.
+&nbsp;     */
+&nbsp;    private fun importEncrypted(
+&nbsp;        reader: ZipStoredReader,
+&nbsp;        outerManifest: BackupManifest,
+&nbsp;        passphrase: String?,
+&nbsp;    ): BackupManifest {
+&nbsp;        val scheme = outerManifest.encryption?.scheme
+&nbsp;        val error = when {
+&nbsp;            scheme != BackupEncryptionInfo.SCHEME_V1 -&gt;
+&nbsp;                BackupError.InvalidArchive(&quot;Unsupported encryption scheme: $scheme&quot;)
+&nbsp;            passphrase.isNullOrEmpty() -&gt; BackupError.PassphraseRequired
+&nbsp;            else -&gt; null
+&nbsp;        }
+&nbsp;        if (error != null) {
+&nbsp;            throw error
+&nbsp;        }
+&nbsp;        // Fail fast on the (unauthenticated) outer version fields before the
+&nbsp;        // costly key derivation; the inner manifest is re-checked afterwards.
+&nbsp;        validateVersions(outerManifest)
+&nbsp;
+&nbsp;        val sealed = readEntry(reader, BackupManifest.ENCRYPTED_PAYLOAD_ENTRY_NAME)
+&nbsp;        val innerZip = EncryptedBackupCodec.open(sealed.readByteArray(), checkNotNull(passphrase))
+&nbsp;
+&nbsp;        val innerReader = ZipStoredReader(Buffer().apply { write(innerZip) })
+&nbsp;        val innerManifest = readManifestEntry(innerReader)
+&nbsp;        if (innerManifest.encryption != null) {
+&nbsp;            throw BackupError.InvalidArchive(&quot;Nested encrypted payloads are not supported&quot;)
+&nbsp;        }
+&nbsp;        return importPlain(innerReader, innerManifest)
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun importPlain(reader: ZipStoredReader, manifest: BackupManifest): BackupManifest {
 &nbsp;        validateManifest(manifest)
 &nbsp;
 &nbsp;        val mainDbPath = locator.moneySurferDbFile()
@@ -160,11 +216,11 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;        val mainDbTemp = mainDbPath.appendSuffix(SUFFIX_RESTORE_TMP)
 &nbsp;        val dataStoreTemp = dataStorePath.appendSuffix(SUFFIX_RESTORE_TMP)
 &nbsp;
-&nbsp;        runCatching { extractRemainingEntries(reader, mainDbTemp, dataStoreTemp) }
-&nbsp;            .onFailure {
-&nbsp;                fs.deleteIfExists(mainDbTemp)
-&nbsp;                fs.deleteIfExists(dataStoreTemp)
-&nbsp;            }
+&nbsp;        runCatching {
+&nbsp;            extractRemainingEntries(reader, mainDbTemp, dataStoreTemp)
+&nbsp;            RestoredDatabaseVerifier.verify(fs, mainDbTemp)
+&nbsp;        }
+&nbsp;            .onFailure { cleanUpTempFiles(mainDbTemp, dataStoreTemp) }
 &nbsp;            .getOrThrow()
 &nbsp;
 &nbsp;        database.close()
@@ -205,12 +261,22 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;        return manifest
 &nbsp;    }
 &nbsp;
+&nbsp;    private fun cleanUpTempFiles(mainDbTemp: Path, dataStoreTemp: Path) {
+&nbsp;        fs.deleteIfExists(mainDbTemp)
+&nbsp;        fs.deleteIfExists(dataStoreTemp)
+&nbsp;        // Side files a WAL-mode open of the temp DB may have left behind.
+&nbsp;        fs.deleteIfExists(mainDbTemp.appendSuffix(SUFFIX_WAL))
+&nbsp;        fs.deleteIfExists(mainDbTemp.appendSuffix(SUFFIX_SHM))
+&nbsp;    }
+&nbsp;
 &nbsp;    private fun readManifestEntry(reader: ZipStoredReader): BackupManifest {
 &nbsp;        val firstName = reader.nextEntryName()
 &nbsp;        val problem = when {
 &nbsp;            firstName == null -&gt; &quot;Empty archive&quot;
 &nbsp;            firstName != BackupManifest.MANIFEST_ENTRY_NAME -&gt;
 &nbsp;                &quot;Expected ${BackupManifest.MANIFEST_ENTRY_NAME} as first entry; got $firstName&quot;
+&nbsp;            (reader.currentEntrySize ?: 0L) &gt; MAX_MANIFEST_BYTES -&gt;
+&nbsp;                &quot;Manifest entry too large: ${reader.currentEntrySize} bytes&quot;
 &nbsp;            else -&gt; null
 &nbsp;        }
 &nbsp;        if (problem != null) {
@@ -223,7 +289,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;            }
 &nbsp;    }
 &nbsp;
-&nbsp;    private fun validateManifest(manifest: BackupManifest) {
+&nbsp;    private fun validateVersions(manifest: BackupManifest) {
 &nbsp;        val error = when {
 &nbsp;            manifest.backupFormatVersion != BackupManifest.CURRENT_FORMAT_VERSION -&gt;
 &nbsp;                BackupError.FormatMismatch(
@@ -235,6 +301,16 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;                    expected = MONEY_SURFER_DB_VERSION,
 &nbsp;                    actual = manifest.moneySurferDbVersion,
 &nbsp;                )
+&nbsp;            else -&gt; null
+&nbsp;        }
+&nbsp;        if (error != null) {
+&nbsp;            throw error
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun validateManifest(manifest: BackupManifest) {
+&nbsp;        validateVersions(manifest)
+&nbsp;        val error = when {
 &nbsp;            BackupManifest.MAIN_DB_ENTRY_NAME !in manifest.files -&gt;
 &nbsp;                BackupError.MissingFile(BackupManifest.MAIN_DB_ENTRY_NAME)
 &nbsp;            BackupManifest.DATASTORE_ENTRY_NAME !in manifest.files -&gt;
@@ -244,6 +320,18 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;        if (error != null) {
 &nbsp;            throw error
 &nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /** Reads the single entry named [name], skipping unknown entries. */
+&nbsp;    private fun readEntry(reader: ZipStoredReader, name: String): Buffer {
+&nbsp;        while (true) {
+&nbsp;            val entryName = reader.nextEntryName() ?: break
+&nbsp;            if (entryName == name) {
+&nbsp;                return reader.readCurrentEntryToBuffer()
+&nbsp;            }
+&nbsp;            blackholeSink().buffer().use { reader.readCurrentEntryTo(it) }
+&nbsp;        }
+&nbsp;        throw BackupError.MissingFile(name)
 &nbsp;    }
 &nbsp;
 &nbsp;    private fun extractRemainingEntries(
@@ -297,6 +385,9 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;private const val SUFFIX_PRE_IMPORT = &quot;.preimport.bak&quot;
 &nbsp;private const val SUFFIX_WAL = &quot;-wal&quot;
 &nbsp;private const val SUFFIX_SHM = &quot;-shm&quot;
+&nbsp;
+&nbsp;/** A manifest is a small JSON object; anything bigger is hostile or corrupt. */
+&nbsp;private const val MAX_MANIFEST_BYTES = 1L * 1024 * 1024
 </code>
 </pre>
 </div>
@@ -320,7 +411,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-17 22:14</div>
+    <div style="float:right;">generated on 2026-07-20 16:21</div>
 </div>
 </body>
 </html>

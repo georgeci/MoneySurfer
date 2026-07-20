@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > ComposableSingletons</title>
+  <title>MoneySurfer Coverage Report > AccountActionError</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.feature.login</a>
+    <a href="../index.html">com.georgeci.moneysurfer.domain.usecase</a>
 </div>
 
-<h1>Coverage Summary for Class: ComposableSingletons (com.georgeci.moneysurfer.feature.login)</h1>
+<h1>Coverage Summary for Class: AccountActionError (com.georgeci.moneysurfer.domain.usecase)</h1>
 
 <table class="coverageStats">
 
@@ -46,13 +46,41 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
   <tr>
-    <td class="name">ComposableSingletons$SignInScreenKt</td>
+    <td class="name">AccountActionError$AccountNotFound</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">AccountActionError$LocalWriteFailed</td>
 <td class="coverageStat">
   <span class="percent">
     0%
   </span>
   <span class="absValue">
-    (0/8)
+    (0/1)
   </span>
 </td>
     <td class="coverageStat"/>
@@ -61,7 +89,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/19)
+    (0/1)
   </span>
 </td>
 <td class="coverageStat">
@@ -69,7 +97,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/214)
+    (0/7)
   </span>
 </td>
   </tr>
@@ -77,27 +105,27 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    50%
   </span>
   <span class="absValue">
-    (0/8)
+    (1/2)
   </span>
 </td>
     <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    50%
   </span>
   <span class="absValue">
-    (0/19)
+    (1/2)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    22.2%
   </span>
   <span class="absValue">
-    (0/214)
+    (2/9)
   </span>
 </td>
 </tr>
@@ -106,7 +134,16 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <br/>
 <br/>
 
-  <code class="sourceCode">Source code is not available<br /></code>
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.usecase
+&nbsp;
+&nbsp;sealed interface AccountActionError {
+<b class="fc">&nbsp;    data object AccountNotFound : AccountActionError</b>
+<b class="nc">&nbsp;    data class LocalWriteFailed(val cause: Throwable) : AccountActionError</b>
+&nbsp;}
+</code>
+</pre>
 </div>
 
 <script type="text/javascript">
@@ -128,7 +165,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-17 22:14</div>
+    <div style="float:right;">generated on 2026-07-20 16:21</div>
 </div>
 </body>
 </html>

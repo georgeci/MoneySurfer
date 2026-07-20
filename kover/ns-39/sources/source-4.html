@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SurferAccountManageCardKt</title>
+  <title>MoneySurfer Coverage Report > SurferBottomSheetContentKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.uikit.components.account</a>
+    <a href="../index.html">com.georgeci.moneysurfer.uikit.components</a>
 </div>
 
-<h1>Coverage Summary for Class: SurferAccountManageCardKt (com.georgeci.moneysurfer.uikit.components.account)</h1>
+<h1>Coverage Summary for Class: SurferBottomSheetContentKt (com.georgeci.moneysurfer.uikit.components)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SurferAccountManageCardKt</td>
+  <td class="name">SurferBottomSheetContentKt</td>
 <td class="coverageStat">
   <span class="percent">
     0%
@@ -63,7 +63,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/5)
+    (0/1)
   </span>
 </td>
 <td class="coverageStat">
@@ -71,7 +71,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/24)
+    (0/14)
   </span>
 </td>
 <td class="coverageStat">
@@ -79,7 +79,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/63)
+    (0/35)
   </span>
 </td>
 <td class="coverageStat">
@@ -87,7 +87,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/766)
+    (0/463)
   </span>
 </td>
 </tr>
@@ -99,152 +99,70 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.components.account
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.components
 &nbsp;
-&nbsp;import androidx.compose.foundation.background
-&nbsp;import androidx.compose.foundation.layout.Box
+&nbsp;import androidx.compose.foundation.layout.Arrangement
 &nbsp;import androidx.compose.foundation.layout.Column
-&nbsp;import androidx.compose.foundation.layout.Row
+&nbsp;import androidx.compose.foundation.layout.ColumnScope
+&nbsp;import androidx.compose.foundation.layout.PaddingValues
 &nbsp;import androidx.compose.foundation.layout.Spacer
 &nbsp;import androidx.compose.foundation.layout.fillMaxWidth
+&nbsp;import androidx.compose.foundation.layout.height
 &nbsp;import androidx.compose.foundation.layout.padding
-&nbsp;import androidx.compose.foundation.layout.size
-&nbsp;import androidx.compose.foundation.layout.width
-&nbsp;import androidx.compose.foundation.shape.CircleShape
-&nbsp;import androidx.compose.material3.Icon
 &nbsp;import androidx.compose.material3.Text
 &nbsp;import androidx.compose.runtime.Composable
-&nbsp;import androidx.compose.ui.Alignment
 &nbsp;import androidx.compose.ui.Modifier
-&nbsp;import androidx.compose.ui.draw.clip
-&nbsp;import androidx.compose.ui.graphics.vector.ImageVector
-&nbsp;import androidx.compose.ui.text.style.TextOverflow
-&nbsp;import androidx.compose.ui.tooling.preview.Preview
 &nbsp;import androidx.compose.ui.unit.dp
-&nbsp;import com.georgeci.moneysurfer.uikit.atom.SurferCard
-&nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
-&nbsp;import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
 &nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
 &nbsp;
 &nbsp;/**
-&nbsp; * Active-account row for the manage-accounts screen. A single line: tonal icon tile, name +
-&nbsp; * subtitle, then the formatted balance and an optional [trailing] slot. The slot is used to
-&nbsp; * surface a drag handle while the screen is in edit mode; archive / delete affordances live
-&nbsp; * outside the card and are revealed by the surrounding swipe gesture.
+&nbsp; * Inner scaffold for a navigation-driven bottom sheet entry: a title, an optional subtitle, a
+&nbsp; * body slot, and an optional action slot pinned at the bottom. The surrounding
+&nbsp; * [androidx.compose.material3.ModalBottomSheet] (handle, container, scrim) is the caller&#39;s
+&nbsp; * responsibility — typically provided by the navigation scene strategy.
 &nbsp; */
 &nbsp;@Composable
-&nbsp;fun SurferAccountManageCard(
-&nbsp;    name: String,
-&nbsp;    subtitle: String,
-&nbsp;    icon: ImageVector,
-&nbsp;    formattedBalance: String,
+&nbsp;fun SurferBottomSheetContent(
+&nbsp;    title: String,
 <b class="nc">&nbsp;    modifier: Modifier = Modifier,</b>
-<b class="nc">&nbsp;    onClick: (() -&gt; Unit)? = null,</b>
-<b class="nc">&nbsp;    trailing: (@Composable () -&gt; Unit)? = null,</b>
+<b class="nc">&nbsp;    subtitle: String? = null,</b>
+<b class="nc">&nbsp;    contentPadding: PaddingValues = PaddingValues(horizontal = 20.dp),</b>
+<b class="nc">&nbsp;    button: @Composable (() -&gt; Unit)? = null,</b>
+&nbsp;    content: @Composable ColumnScope.() -&gt; Unit = {},
 <b class="nc">&nbsp;) {</b>
-<b class="nc">&nbsp;    SurferCard(modifier = modifier.fillMaxWidth(), onClick = onClick) {</b>
-<b class="nc">&nbsp;        Row(verticalAlignment = Alignment.CenterVertically) {</b>
-<b class="nc">&nbsp;            AccountIconTile(icon = icon)</b>
-<b class="nc">&nbsp;            Spacer(Modifier.width(12.dp))</b>
-<b class="nc">&nbsp;            Column(modifier = Modifier.weight(1f)) {</b>
-<b class="nc">&nbsp;                Text(</b>
-<b class="nc">&nbsp;                    text = name,</b>
-<b class="nc">&nbsp;                    style = AppTheme.typography.titleSmall,</b>
-<b class="nc">&nbsp;                    color = AppTheme.materialColors.onSurface,</b>
-<b class="nc">&nbsp;                    maxLines = 1,</b>
-<b class="nc">&nbsp;                    overflow = TextOverflow.Ellipsis,</b>
-&nbsp;                )
+<b class="nc">&nbsp;    Column(</b>
+<b class="nc">&nbsp;        modifier = modifier</b>
+<b class="nc">&nbsp;            .fillMaxWidth()</b>
+<b class="nc">&nbsp;            .padding(bottom = 16.dp),</b>
+&nbsp;    ) {
+<b class="nc">&nbsp;        Column(modifier = Modifier.padding(contentPadding)) {</b>
+<b class="nc">&nbsp;            Text(</b>
+<b class="nc">&nbsp;                text = title,</b>
+<b class="nc">&nbsp;                style = AppTheme.typography.titleMedium,</b>
+<b class="nc">&nbsp;                color = AppTheme.materialColors.onSurface,</b>
+&nbsp;            )
+<b class="nc">&nbsp;            if (subtitle != null) {</b>
+<b class="nc">&nbsp;                Spacer(Modifier.height(4.dp))</b>
 <b class="nc">&nbsp;                Text(</b>
 <b class="nc">&nbsp;                    text = subtitle,</b>
 <b class="nc">&nbsp;                    style = AppTheme.typography.bodySmall,</b>
 <b class="nc">&nbsp;                    color = AppTheme.materialColors.onSurfaceVariant,</b>
-<b class="nc">&nbsp;                    maxLines = 1,</b>
-<b class="nc">&nbsp;                    overflow = TextOverflow.Ellipsis,</b>
 &nbsp;                )
 <b class="nc">&nbsp;            }</b>
-<b class="nc">&nbsp;            Spacer(Modifier.width(8.dp))</b>
-<b class="nc">&nbsp;            Text(</b>
-<b class="nc">&nbsp;                text = formattedBalance,</b>
-<b class="nc">&nbsp;                style = AppTheme.typography.titleMedium,</b>
-<b class="nc">&nbsp;                color = AppTheme.materialColors.onSurface,</b>
-&nbsp;            )
-<b class="nc">&nbsp;            if (trailing != null) {</b>
-<b class="nc">&nbsp;                Spacer(Modifier.width(6.dp))</b>
-<b class="nc">&nbsp;                trailing()</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        Spacer(Modifier.height(12.dp))</b>
+<b class="nc">&nbsp;        Column(</b>
+<b class="nc">&nbsp;            modifier = Modifier.fillMaxWidth(),</b>
+<b class="nc">&nbsp;            verticalArrangement = Arrangement.spacedBy(8.dp),</b>
+<b class="nc">&nbsp;            content = content,</b>
+&nbsp;        )
+<b class="nc">&nbsp;        if (button != null) {</b>
+<b class="nc">&nbsp;            Spacer(Modifier.height(16.dp))</b>
+<b class="nc">&nbsp;            Column(modifier = Modifier.padding(contentPadding)) {</b>
+<b class="nc">&nbsp;                button()</b>
 <b class="nc">&nbsp;            }</b>
 <b class="nc">&nbsp;        }</b>
-&nbsp;    }
-<b class="nc">&nbsp;}</b>
-&nbsp;
-&nbsp;/**
-&nbsp; * Tonal icon tile used in the identity row of [SurferAccountManageCard]. Public so feature code
-&nbsp; * can reuse the same swatch in archived rows or one-off layouts.
-&nbsp; */
-&nbsp;@Composable
-&nbsp;fun AccountIconTile(
-&nbsp;    icon: ImageVector,
-<b class="nc">&nbsp;    modifier: Modifier = Modifier,</b>
-<b class="nc">&nbsp;    muted: Boolean = false,</b>
-<b class="nc">&nbsp;) {</b>
-<b class="nc">&nbsp;    val bg = if (muted) {</b>
-<b class="nc">&nbsp;        AppTheme.materialColors.surfaceContainerHigh</b>
-<b class="nc">&nbsp;    } else {</b>
-<b class="nc">&nbsp;        AppTheme.materialColors.primaryContainer</b>
-&nbsp;    }
-<b class="nc">&nbsp;    val fg = if (muted) {</b>
-<b class="nc">&nbsp;        AppTheme.materialColors.onSurfaceVariant</b>
-<b class="nc">&nbsp;    } else {</b>
-<b class="nc">&nbsp;        AppTheme.materialColors.onPrimaryContainer</b>
-&nbsp;    }
-<b class="nc">&nbsp;    Box(</b>
-<b class="nc">&nbsp;        modifier = modifier</b>
-<b class="nc">&nbsp;            .size(40.dp)</b>
-<b class="nc">&nbsp;            .clip(CircleShape)</b>
-<b class="nc">&nbsp;            .background(bg),</b>
-<b class="nc">&nbsp;        contentAlignment = Alignment.Center,</b>
-&nbsp;    ) {
-<b class="nc">&nbsp;        Icon(</b>
-<b class="nc">&nbsp;            imageVector = icon,</b>
-&nbsp;            // decorative — account type indicator; the account name provides the accessible label
-<b class="nc">&nbsp;            contentDescription = null,</b>
-<b class="nc">&nbsp;            tint = fg,</b>
-<b class="nc">&nbsp;            modifier = Modifier.size(22.dp),</b>
-&nbsp;        )
 <b class="nc">&nbsp;    }</b>
-<b class="nc">&nbsp;}</b>
-&nbsp;
-&nbsp;@Preview
-&nbsp;@Composable
-<b class="nc">&nbsp;private fun SurferAccountManageCardViewPreview() {</b>
-<b class="nc">&nbsp;    SurferComponentPreview {</b>
-&nbsp;        Box(modifier = Modifier.padding(16.dp)) {
-&nbsp;            SurferAccountManageCard(
-&nbsp;                name = &quot;Everyday&quot;,
-&nbsp;                subtitle = &quot;Bank · •• 1234&quot;,
-&nbsp;                icon = SurferIcons.Bank,
-&nbsp;                formattedBalance = &quot;€2,480.32&quot;,
-&nbsp;                onClick = {},
-&nbsp;            )
-&nbsp;        }
-&nbsp;    }
-<b class="nc">&nbsp;}</b>
-&nbsp;
-&nbsp;@Preview
-&nbsp;@Composable
-<b class="nc">&nbsp;private fun SurferAccountManageCardEditingPreview() {</b>
-<b class="nc">&nbsp;    SurferComponentPreview {</b>
-&nbsp;        Box(modifier = Modifier.padding(16.dp)) {
-&nbsp;            SurferAccountManageCard(
-&nbsp;                name = &quot;Emergency Fund&quot;,
-&nbsp;                subtitle = &quot;Savings&quot;,
-&nbsp;                icon = SurferIcons.Savings,
-&nbsp;                formattedBalance = &quot;€8,915.00&quot;,
-&nbsp;                trailing = {
-&nbsp;                    Box(modifier = Modifier.size(width = 24.dp, height = 32.dp))
-&nbsp;                },
-&nbsp;            )
-&nbsp;        }
-&nbsp;    }
 <b class="nc">&nbsp;}</b>
 </code>
 </pre>
@@ -269,7 +187,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-17 22:14</div>
+    <div style="float:right;">generated on 2026-07-20 16:21</div>
 </div>
 </body>
 </html>

@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > AuthRemoteRepositoryImpl</title>
+  <title>MoneySurfer Coverage Report > FirebaseConfigImpl_jvmKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,15 +19,18 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.data.repository</a>
+    <a href="../index.html">com.georgeci.moneysurfer.data.remote</a>
 </div>
 
-<h1>Coverage Summary for Class: AuthRemoteRepositoryImpl (com.georgeci.moneysurfer.data.repository)</h1>
+<h1>Coverage Summary for Class: FirebaseConfigImpl_jvmKt (com.georgeci.moneysurfer.data.remote)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -46,13 +49,13 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">AuthRemoteRepositoryImpl</td>
+  <td class="name">FirebaseConfigImpl_jvmKt</td>
 <td class="coverageStat">
   <span class="percent">
     0%
   </span>
   <span class="absValue">
-    (0/8)
+    (0/1)
   </span>
 </td>
 <td class="coverageStat">
@@ -60,7 +63,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/12)
+    (0/2)
   </span>
 </td>
 <td class="coverageStat">
@@ -68,7 +71,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/12)
+    (0/4)
   </span>
 </td>
 <td class="coverageStat">
@@ -76,34 +79,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/181)
-  </span>
-</td>
-</tr>
-  <tr>
-    <td class="name">AuthRemoteRepositoryImpl$createUserWithEmail$1</td>
-    <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">AuthRemoteRepositoryImpl$signInAnonymously$1</td>
-    <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">AuthRemoteRepositoryImpl$signInWithEmail$1</td>
-    <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">AuthRemoteRepositoryImpl$signOut$1</td>
-    <td class="coverageStat"/>
-  </tr>
-<tr>
-  <td class="name"><strong>Total</strong></td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/8)
+    (0/2)
   </span>
 </td>
 <td class="coverageStat">
@@ -111,26 +87,11 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/12)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/12)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/181)
+    (0/16)
   </span>
 </td>
 </tr>
+
 </table>
 
 <br/>
@@ -138,56 +99,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.repository
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.remote
 &nbsp;
-&nbsp;import arrow.core.Either
-&nbsp;import com.georgeci.moneysurfer.domain.auth.AuthError
-&nbsp;import com.georgeci.moneysurfer.domain.repositories.AuthRemoteRepository
-&nbsp;import dev.gitlive.firebase.auth.FirebaseAuth
-&nbsp;import dev.gitlive.firebase.auth.FirebaseAuthInvalidCredentialsException
-&nbsp;import dev.gitlive.firebase.auth.FirebaseAuthInvalidUserException
-&nbsp;import dev.gitlive.firebase.auth.FirebaseAuthUserCollisionException
-&nbsp;import dev.gitlive.firebase.auth.FirebaseAuthWeakPasswordException
-&nbsp;import org.koin.core.annotation.Single
+<b class="nc">&nbsp;internal actual fun defaultEmulatorHost(): String = &quot;localhost&quot;</b>
 &nbsp;
-<b class="nc">&nbsp;@Single(binds = [AuthRemoteRepository::class])</b>
-&nbsp;class AuthRemoteRepositoryImpl(
-<b class="nc">&nbsp;    private val auth: FirebaseAuth,</b>
-&nbsp;) : AuthRemoteRepository {
-&nbsp;
-<b class="nc">&nbsp;    override fun currentUid(): String? = auth.currentUser?.uid</b>
-&nbsp;
-<b class="nc">&nbsp;    override fun currentEmail(): String? = auth.currentUser?.email</b>
-&nbsp;
-<b class="nc">&nbsp;    override fun isCurrentUserAnonymous(): Boolean = auth.currentUser?.isAnonymous == true</b>
-&nbsp;
-&nbsp;    override suspend fun signInWithEmail(email: String, password: String): Either&lt;AuthError, String&gt; =
-<b class="nc">&nbsp;        Either.catch { auth.signInWithEmailAndPassword(email.trim(), password).user!!.uid }</b>
-<b class="nc">&nbsp;            .mapLeft { it.toAuthError() }</b>
-&nbsp;
-&nbsp;    override suspend fun createUserWithEmail(email: String, password: String): Either&lt;AuthError, String&gt; =
-<b class="nc">&nbsp;        Either.catch { auth.createUserWithEmailAndPassword(email.trim(), password).user!!.uid }</b>
-<b class="nc">&nbsp;            .mapLeft { it.toAuthError() }</b>
-&nbsp;
-&nbsp;    override suspend fun signInAnonymously(): Either&lt;AuthError, String&gt; =
-<b class="nc">&nbsp;        Either.catch { auth.currentUser?.uid ?: auth.signInAnonymously().user!!.uid }</b>
-<b class="nc">&nbsp;            .mapLeft { it.toAuthError() }</b>
-&nbsp;
-&nbsp;    override suspend fun signOut(): Either&lt;AuthError, Unit&gt; =
-<b class="nc">&nbsp;        Either.catch { auth.signOut() }.mapLeft { it.toAuthError() }</b>
-&nbsp;}
-&nbsp;
-&nbsp;/** Classify Firebase auth exceptions into the typed [AuthError.Type] domain enum. */
-&nbsp;private fun Throwable.toAuthError(): AuthError {
-&nbsp;    val type = when (this) {
-&nbsp;        is FirebaseAuthWeakPasswordException -&gt; AuthError.Type.WeakPassword
-&nbsp;        is FirebaseAuthUserCollisionException -&gt; AuthError.Type.EmailAlreadyInUse
-&nbsp;        is FirebaseAuthInvalidCredentialsException -&gt; AuthError.Type.InvalidCredentials
-&nbsp;        is FirebaseAuthInvalidUserException -&gt; AuthError.Type.InvalidCredentials
-&nbsp;        else -&gt; AuthError.Type.Unknown
-&nbsp;    }
-&nbsp;    return AuthError(type = type, message = message, cause = this)
-&nbsp;}
+&nbsp;internal actual fun defaultUseEmulator(): Boolean =
+<b class="nc">&nbsp;    System.getenv(&quot;MS_USE_EMULATOR&quot;)?.equals(&quot;true&quot;, ignoreCase = true) == true</b>
 </code>
 </pre>
 </div>
@@ -211,7 +128,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-17 22:14</div>
+    <div style="float:right;">generated on 2026-07-20 16:21</div>
 </div>
 </body>
 </html>

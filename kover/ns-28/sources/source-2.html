@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SyncErrorClassifierKt</title>
+  <title>MoneySurfer Coverage Report > SyncMetaEntity</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.sync.internal</a>
+    <a href="../index.html">com.georgeci.moneysurfer.sync.db.entity</a>
 </div>
 
-<h1>Coverage Summary for Class: SyncErrorClassifierKt (com.georgeci.moneysurfer.sync.internal)</h1>
+<h1>Coverage Summary for Class: SyncMetaEntity (com.georgeci.moneysurfer.sync.db.entity)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SyncErrorClassifierKt</td>
+  <td class="name">SyncMetaEntity</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -66,12 +66,13 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     (1/1)
   </span>
 </td>
+    <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
     100%
   </span>
   <span class="absValue">
-    (4/4)
+    (6/6)
   </span>
 </td>
 <td class="coverageStat">
@@ -79,15 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (4/4)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (22/22)
+    (27/27)
   </span>
 </td>
 </tr>
@@ -99,17 +92,30 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.sync.internal
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.sync.db.entity
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.sync.api.SyncError
-&nbsp;import kotlinx.serialization.SerializationException
-&nbsp;import kotlin.coroutines.cancellation.CancellationException
+&nbsp;import androidx.room.ColumnInfo
+&nbsp;import androidx.room.Entity
 &nbsp;
-<b class="fc">&nbsp;internal fun Throwable.toSyncError(): SyncError = when (this) {</b>
-<b class="fc">&nbsp;    is CancellationException -&gt; SyncError.Cancelled</b>
-<b class="fc">&nbsp;    is SerializationException -&gt; SyncError.Unknown(this)</b>
-<b class="fc">&nbsp;    else -&gt; SyncError.Unknown(this)</b>
-&nbsp;}
+&nbsp;/**
+&nbsp; * Per-(workspace, collection) cursor + last-sync timestamps.
+&nbsp; *
+&nbsp; * No FK on [workspaceId] — sync_meta may exist for a workspace that has been
+&nbsp; * deleted locally (the cursor will be reused once the workspace is re-pulled).
+&nbsp; *
+&nbsp; * See sync.md §4.3.
+&nbsp; */
+<b class="fc">&nbsp;@Entity(</b>
+&nbsp;    tableName = &quot;sync_meta&quot;,
+&nbsp;    primaryKeys = [&quot;workspaceId&quot;, &quot;collection&quot;],
+&nbsp;)
+&nbsp;data class SyncMetaEntity(
+<b class="fc">&nbsp;    @ColumnInfo(name = &quot;workspaceId&quot;) val workspaceId: String,</b>
+<b class="fc">&nbsp;    @ColumnInfo(name = &quot;collection&quot;) val collection: String,</b>
+<b class="fc">&nbsp;    @ColumnInfo(name = &quot;lastPulledAt&quot;) val lastPulledAt: Long?,</b>
+<b class="fc">&nbsp;    @ColumnInfo(name = &quot;lastSyncSuccessAt&quot;) val lastSyncSuccessAt: Long?,</b>
+<b class="fc">&nbsp;    @ColumnInfo(name = &quot;lastSyncAttemptAt&quot;) val lastSyncAttemptAt: Long?,</b>
+&nbsp;)
 </code>
 </pre>
 </div>
@@ -133,7 +139,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-17 22:14</div>
+    <div style="float:right;">generated on 2026-07-20 16:21</div>
 </div>
 </body>
 </html>

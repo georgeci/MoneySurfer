@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SessionShutdownGateImpl</title>
+  <title>MoneySurfer Coverage Report > PendingMutationEntity</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,18 +19,15 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.sync.internal</a>
+    <a href="../index.html">com.georgeci.moneysurfer.sync.db.entity</a>
 </div>
 
-<h1>Coverage Summary for Class: SessionShutdownGateImpl (com.georgeci.moneysurfer.sync.internal)</h1>
+<h1>Coverage Summary for Class: PendingMutationEntity (com.georgeci.moneysurfer.sync.db.entity)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
-<th class="coverageStat 
-">
-  Class, %
-</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -49,7 +46,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SessionShutdownGateImpl</td>
+  <td class="name">PendingMutationEntity</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -58,12 +55,36 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     (1/1)
   </span>
 </td>
+    <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
     100%
   </span>
   <span class="absValue">
-    (2/2)
+    (10/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (47/47)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">PendingMutationEntity$Companion</td>
+    <td class="coverageStat"/>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
   </span>
 </td>
     <td class="coverageStat"/>
@@ -72,7 +93,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (5/5)
+    (10/10)
   </span>
 </td>
 <td class="coverageStat">
@@ -80,11 +101,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (15/15)
+    (47/47)
   </span>
 </td>
 </tr>
-
 </table>
 
 <br/>
@@ -92,32 +112,44 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.sync.internal
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.sync.db.entity
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.repositories.SessionShutdownGate
-&nbsp;import com.georgeci.moneysurfer.sync.coordinator.SyncCoordinator
-&nbsp;import com.georgeci.moneysurfer.sync.scheduler.BackgroundSyncScheduler
-&nbsp;import org.koin.core.annotation.Single
+&nbsp;import androidx.room.Entity
+&nbsp;import androidx.room.Index
+&nbsp;import androidx.room.PrimaryKey
 &nbsp;
 &nbsp;/**
-&nbsp; * Order matters:
-&nbsp; * 1. Cancel queued / running sync first so no in-flight push/pull races
-&nbsp; *    with the upcoming local data wipe.
-&nbsp; * 2. Cancel background schedules so they don&#39;t fire after wipe and re-upload
-&nbsp; *    nothing or hit `AuthRequired` because the session is gone.
+&nbsp; * Outbox row — one queued local mutation awaiting push.
 &nbsp; *
-&nbsp; * Both [SyncCoordinator.cancelAll] and [BackgroundSyncScheduler.cancelAll]
-&nbsp; * are idempotent — safe to call multiple times.
+&nbsp; * No FK constraints intentionally: the outbox is an independent ledger that
+&nbsp; * must outlive the row it references (e.g. for DELETE operations the entity
+&nbsp; * is already gone from its primary table).
+&nbsp; *
+&nbsp; * Schema mirrors `sync.md §4.3`.
 &nbsp; */
-<b class="fc">&nbsp;@Single(binds = [SessionShutdownGate::class])</b>
-&nbsp;class SessionShutdownGateImpl(
-<b class="fc">&nbsp;    private val coordinator: SyncCoordinator,</b>
-<b class="fc">&nbsp;    private val scheduler: BackgroundSyncScheduler,</b>
-&nbsp;) : SessionShutdownGate {
-&nbsp;
-&nbsp;    override suspend fun shutdown() {
-<b class="fc">&nbsp;        coordinator.cancelAll()</b>
-<b class="fc">&nbsp;        scheduler.cancelAll()</b>
+<b class="fc">&nbsp;@Entity(</b>
+&nbsp;    tableName = &quot;pending_mutations&quot;,
+&nbsp;    indices = [
+&nbsp;        Index(&quot;status&quot;),
+&nbsp;        Index(&quot;workspaceId&quot;),
+&nbsp;        Index(&quot;createdAt&quot;),
+&nbsp;    ],
+&nbsp;)
+&nbsp;data class PendingMutationEntity(
+<b class="fc">&nbsp;    @PrimaryKey val id: String,</b>
+<b class="fc">&nbsp;    val entityType: String,</b>
+<b class="fc">&nbsp;    val entityId: String,</b>
+<b class="fc">&nbsp;    val operation: String,</b>
+<b class="fc">&nbsp;    val workspaceId: String?,</b>
+<b class="fc">&nbsp;    val createdAt: Long,</b>
+<b class="fc">&nbsp;    val attempts: Int,</b>
+<b class="fc">&nbsp;    val status: String,</b>
+<b class="fc">&nbsp;    val lastError: String?,</b>
+&nbsp;) {
+&nbsp;    companion object {
+&nbsp;        const val STATUS_PENDING: String = &quot;PENDING&quot;
+&nbsp;        const val STATUS_IN_FLIGHT: String = &quot;IN_FLIGHT&quot;
+&nbsp;        const val STATUS_FAILED: String = &quot;FAILED&quot;
 &nbsp;    }
 &nbsp;}
 </code>
@@ -143,7 +175,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-17 22:14</div>
+    <div style="float:right;">generated on 2026-07-20 16:21</div>
 </div>
 </body>
 </html>

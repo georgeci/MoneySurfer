@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > BudgetId</title>
+  <title>MoneySurfer Coverage Report > CsvRecord</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,15 +19,18 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.domain.primitives</a>
+    <a href="../index.html">com.georgeci.moneysurfer.domain.csv</a>
 </div>
 
-<h1>Coverage Summary for Class: BudgetId (com.georgeci.moneysurfer.domain.primitives)</h1>
+<h1>Coverage Summary for Class: CsvRecord (com.georgeci.moneysurfer.domain.csv)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -46,89 +49,42 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">BudgetId</td>
+  <td class="name">CsvRecord</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
   </span>
 </td>
     <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/11)
+    (12/12)
   </span>
 </td>
 </tr>
-  <tr>
-    <td class="name">BudgetId$Companion</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/4)
-  </span>
-</td>
-  </tr>
-<tr>
-  <td class="name"><strong>Total</strong></td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/2)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/2)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/15)
-  </span>
-</td>
-</tr>
+
 </table>
 
 <br/>
@@ -136,19 +92,140 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.primitives
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.csv
 &nbsp;
-&nbsp;import kotlinx.serialization.Serializable
-&nbsp;import kotlin.jvm.JvmInline
-&nbsp;import kotlin.uuid.ExperimentalUuidApi
-&nbsp;import kotlin.uuid.Uuid
+&nbsp;/**
+&nbsp; * One parsed CSV record. [rowNumber] is the 1-based record index in the file
+&nbsp; * (the header is row 1), counting logical records — a quoted field with an
+&nbsp; * embedded newline still advances the row number by one.
+&nbsp; */
+<b class="fc">&nbsp;data class CsvRecord(val rowNumber: Int, val fields: List&lt;String&gt;)</b>
 &nbsp;
-&nbsp;@JvmInline
-&nbsp;@Serializable
-<b class="nc">&nbsp;value class BudgetId(val value: String) {</b>
-&nbsp;    companion object {
-&nbsp;        @OptIn(ExperimentalUuidApi::class)
-<b class="nc">&nbsp;        fun uuid(): BudgetId = BudgetId(Uuid.random().toString())</b>
+&nbsp;/**
+&nbsp; * Minimal RFC 4180-style CSV codec. Fields containing commas, quotes, or
+&nbsp; * newlines are quoted on write; quotes are doubled. The parser accepts LF and
+&nbsp; * CRLF line endings, a leading UTF-8 BOM, and skips fully blank records.
+&nbsp; */
+&nbsp;internal object Csv {
+&nbsp;
+&nbsp;    fun encodeRecord(fields: List&lt;String&gt;): String =
+&nbsp;        fields.joinToString(separator = &quot;,&quot;, transform = ::encodeField)
+&nbsp;
+&nbsp;    private val charsRequiringQuotes = charArrayOf(&#39;,&#39;, &#39;&quot;&#39;, &#39;\n&#39;, &#39;\r&#39;)
+&nbsp;
+&nbsp;    // Leading characters a spreadsheet reads as the start of a formula (or a
+&nbsp;    // DDE payload). A cell beginning with one of these is evaluated when the
+&nbsp;    // file is opened in Excel/LibreOffice — the CSV injection vector.
+&nbsp;    private val formulaTriggers = charArrayOf(&#39;=&#39;, &#39;+&#39;, &#39;-&#39;, &#39;@&#39;, &#39;\t&#39;, &#39;\r&#39;)
+&nbsp;
+&nbsp;    // A leading apostrophe is a guard only when it precedes a doubled literal
+&nbsp;    // apostrophe or a formula trigger — the two shapes [guardFormula] emits.
+&nbsp;    private val guardedSecondChars = formulaTriggers + &#39;\&#39;&#39;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Neutralises spreadsheet formula injection in free-text fields. A field
+&nbsp;     * whose first character would start a formula gets an apostrophe prefix,
+&nbsp;     * which forces spreadsheets to treat the whole cell as literal text. The
+&nbsp;     * apostrophe is itself escaped (a leading `&#39;` is doubled) so the transform
+&nbsp;     * is reversible: [unguardFormula] recovers the original value for anything
+&nbsp;     * this codec encoded. Applied only to attacker-supplied free text —
+&nbsp;     * structured columns (ids, amounts, dates) stay untouched so they still
+&nbsp;     * import into a spreadsheet as their proper types.
+&nbsp;     */
+&nbsp;    fun guardFormula(field: String): String {
+&nbsp;        val first = field.firstOrNull() ?: return field
+&nbsp;        return if (first == &#39;\&#39;&#39; || first in formulaTriggers) &quot;&#39;$field&quot; else field
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Reverses [guardFormula]. Strips a leading apostrophe only when it is one
+&nbsp;     * this codec could have emitted — an apostrophe doubling an escaped literal
+&nbsp;     * `&#39;`, or an apostrophe guarding a formula trigger. A note that merely
+&nbsp;     * starts with an apostrophe followed by ordinary text (a legacy pre-guard
+&nbsp;     * export, or a third-party CSV) is left untouched, so import stays lossless
+&nbsp;     * for those too.
+&nbsp;     */
+&nbsp;    fun unguardFormula(field: String): String =
+&nbsp;        if (field.length &gt;= 2 &amp;&amp; field[0] == &#39;\&#39;&#39; &amp;&amp; field[1] in guardedSecondChars) {
+&nbsp;            field.substring(1)
+&nbsp;        } else {
+&nbsp;            field
+&nbsp;        }
+&nbsp;
+&nbsp;    private fun encodeField(field: String): String =
+&nbsp;        if (field.any { it in charsRequiringQuotes }) {
+&nbsp;            &quot;\&quot;&quot; + field.replace(&quot;\&quot;&quot;, &quot;\&quot;\&quot;&quot;) + &quot;\&quot;&quot;
+&nbsp;        } else {
+&nbsp;            field
+&nbsp;        }
+&nbsp;
+&nbsp;    fun parseRecords(text: String): List&lt;CsvRecord&gt; =
+&nbsp;        RecordParser(text.removePrefix(&quot;\uFEFF&quot;)).parse()
+&nbsp;
+&nbsp;    private class RecordParser(private val text: String) {
+&nbsp;        private val records = mutableListOf&lt;CsvRecord&gt;()
+&nbsp;        private val fields = mutableListOf&lt;String&gt;()
+&nbsp;        private val field = StringBuilder()
+&nbsp;        private var rowNumber = 1
+&nbsp;        private var index = 0
+&nbsp;
+&nbsp;        fun parse(): List&lt;CsvRecord&gt; {
+&nbsp;            while (index &lt; text.length) {
+&nbsp;                if (inQuotes()) consumeQuoted() else consumePlain()
+&nbsp;            }
+&nbsp;            if (field.isNotEmpty() || fields.isNotEmpty()) endRecord()
+&nbsp;            return records
+&nbsp;        }
+&nbsp;
+&nbsp;        private var quoted = false
+&nbsp;        private fun inQuotes(): Boolean = quoted
+&nbsp;
+&nbsp;        private fun consumeQuoted() {
+&nbsp;            val char = text[index]
+&nbsp;            when {
+&nbsp;                char != &#39;&quot;&#39; -&gt; {
+&nbsp;                    field.append(char)
+&nbsp;                    index++
+&nbsp;                }
+&nbsp;                index + 1 &lt; text.length &amp;&amp; text[index + 1] == &#39;&quot;&#39; -&gt; {
+&nbsp;                    field.append(&#39;&quot;&#39;)
+&nbsp;                    index += 2
+&nbsp;                }
+&nbsp;                else -&gt; {
+&nbsp;                    quoted = false
+&nbsp;                    index++
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        private fun consumePlain() {
+&nbsp;            when (val char = text[index]) {
+&nbsp;                &#39;&quot;&#39; -&gt; quoted = true
+&nbsp;                &#39;,&#39; -&gt; endField()
+&nbsp;                &#39;\n&#39; -&gt; endRecord()
+&nbsp;                &#39;\r&#39; -&gt; {
+&nbsp;                    if (index + 1 &lt; text.length &amp;&amp; text[index + 1] == &#39;\n&#39;) index++
+&nbsp;                    endRecord()
+&nbsp;                }
+&nbsp;                else -&gt; field.append(char)
+&nbsp;            }
+&nbsp;            index++
+&nbsp;        }
+&nbsp;
+&nbsp;        private fun endField() {
+&nbsp;            fields.add(field.toString())
+&nbsp;            field.clear()
+&nbsp;        }
+&nbsp;
+&nbsp;        private fun endRecord() {
+&nbsp;            endField()
+&nbsp;            // A record whose only field is empty is a blank line, not data.
+&nbsp;            if (fields.size &gt; 1 || fields.single().isNotEmpty()) {
+&nbsp;                records.add(CsvRecord(rowNumber, fields.toList()))
+&nbsp;            }
+&nbsp;            fields.clear()
+&nbsp;            rowNumber++
+&nbsp;        }
 &nbsp;    }
 &nbsp;}
 </code>
@@ -174,7 +251,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-05-06 14:45</div>
+    <div style="float:right;">generated on 2026-07-20 16:21</div>
 </div>
 </body>
 </html>

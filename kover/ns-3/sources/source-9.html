@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > JvmBackupStorageLocatorKt</title>
+  <title>MoneySurfer Coverage Report > RestoredDatabaseVerifier</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,19 +22,74 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.data.backup</a>
 </div>
 
-<h1>Coverage Summary for Class: JvmBackupStorageLocatorKt (com.georgeci.moneysurfer.data.backup)</h1>
+<h1>Coverage Summary for Class: RestoredDatabaseVerifier (com.georgeci.moneysurfer.data.backup)</h1>
 
 <table class="coverageStats">
 <tr>
   <th class="name">Class</th>
 <th class="coverageStat 
 ">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
   Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
 </th>
 </tr>
 <tr>
-  <td class="name">JvmBackupStorageLocatorKt</td>
-    <td class="coverageStat"/>
+  <td class="name">RestoredDatabaseVerifier</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    62.5%
+  </span>
+  <span class="absValue">
+    (5/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    93.8%
+  </span>
+  <span class="absValue">
+    (15/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    90%
+  </span>
+  <span class="absValue">
+    (117/130)
+  </span>
+</td>
 </tr>
 
 </table>
@@ -46,24 +101,68 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.backup
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.backup.BackupStorageLocator
+&nbsp;import androidx.sqlite.SQLiteConnection
+&nbsp;import androidx.sqlite.driver.bundled.BundledSQLiteDriver
+&nbsp;import androidx.sqlite.driver.bundled.SQLITE_OPEN_READONLY
+&nbsp;import com.georgeci.moneysurfer.domain.backup.BackupError
+&nbsp;import okio.FileSystem
 &nbsp;import okio.Path
-&nbsp;import okio.Path.Companion.toPath
-&nbsp;import java.io.File
 &nbsp;
-&nbsp;private const val MAIN_DB_FILE = &quot;moneysurfer.db&quot;
-&nbsp;private const val SYNC_DB_FILE = &quot;moneysurfer_sync.db&quot;
-&nbsp;private const val DATASTORE_FILE = &quot;moneysurfer_settings.preferences_pb&quot;
-&nbsp;private const val APP_DIR = &quot;.moneysurfer&quot;
+&nbsp;/**
+&nbsp; * Rejects a restored SQLite file before it ever replaces the live one:
+&nbsp; * header magic first (cheap, avoids handing arbitrary bytes to the SQLite
+&nbsp; * parser), then `PRAGMA integrity_check` through the bundled (current)
+&nbsp; * SQLite build on a read-only connection.
+&nbsp; */
+&nbsp;internal object RestoredDatabaseVerifier {
 &nbsp;
-&nbsp;class JvmBackupStorageLocator : BackupStorageLocator {
-&nbsp;    override val platformName: String = &quot;jvm&quot;
-&nbsp;    override fun moneySurferDbFile(): Path = appFile(MAIN_DB_FILE).toPath()
-&nbsp;    override fun syncDbFile(): Path = appFile(SYNC_DB_FILE).toPath()
-&nbsp;    override fun dataStoreFile(): Path = appFile(DATASTORE_FILE).toPath()
+&nbsp;    fun verify(fs: FileSystem, path: Path) {
+<b class="fc">&nbsp;        if (!hasSqliteMagic(fs, path)) {</b>
+<b class="fc">&nbsp;            throw BackupError.CorruptDatabase(&quot;not an SQLite database file&quot;)</b>
+&nbsp;        }
+<b class="fc">&nbsp;        val verdict = runIntegrityCheck(path)</b>
+<b class="pc">&nbsp;        if (verdict != INTEGRITY_OK) {</b>
+<b class="nc">&nbsp;            throw BackupError.CorruptDatabase(verdict.take(MAX_REASON_LENGTH))</b>
+&nbsp;        }
+&nbsp;    }
 &nbsp;
-&nbsp;    private fun appFile(name: String): String =
-&nbsp;        File(System.getProperty(&quot;java.io.tmpdir&quot;), &quot;$APP_DIR/$name&quot;).absolutePath
+<b class="fc">&nbsp;    private fun hasSqliteMagic(fs: FileSystem, path: Path): Boolean = runCatching {</b>
+<b class="fc">&nbsp;        fs.read(path) { readByteArray(SQLITE_MAGIC.size.toLong()) }.contentEquals(SQLITE_MAGIC)</b>
+<b class="pc">&nbsp;    }.getOrDefault(false)</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the first `PRAGMA integrity_check` result row (&quot;ok&quot; for a
+&nbsp;     * healthy file); any SQLite-level failure to open or query the file is
+&nbsp;     * itself a corruption verdict.
+&nbsp;     */
+&nbsp;    private fun runIntegrityCheck(path: Path): String = try {
+<b class="fc">&nbsp;        val connection = BundledSQLiteDriver().open(path.toString(), SQLITE_OPEN_READONLY)</b>
+&nbsp;        try {
+<b class="fc">&nbsp;            firstIntegrityRow(connection)</b>
+&nbsp;        } finally {
+<b class="fc">&nbsp;            connection.close()</b>
+&nbsp;        }
+&nbsp;    } catch (
+&nbsp;        @Suppress(&quot;TooGenericExceptionCaught&quot;) t: Throwable,
+&nbsp;    ) {
+<b class="fc">&nbsp;        throw BackupError.CorruptDatabase(&quot;integrity_check failed: ${t.message}&quot;, t)</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun firstIntegrityRow(connection: SQLiteConnection): String {
+<b class="fc">&nbsp;        val statement = connection.prepare(PRAGMA_INTEGRITY_CHECK)</b>
+&nbsp;        return try {
+<b class="pc">&nbsp;            if (statement.step()) statement.getText(0) else &quot;integrity_check returned no result&quot;</b>
+&nbsp;        } finally {
+<b class="fc">&nbsp;            statement.close()</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private const val PRAGMA_INTEGRITY_CHECK = &quot;PRAGMA integrity_check&quot;
+&nbsp;    private const val INTEGRITY_OK = &quot;ok&quot;
+&nbsp;    private const val MAX_REASON_LENGTH = 200
+&nbsp;
+&nbsp;    /** First 16 bytes of every SQLite 3 database file. */
+<b class="fc">&nbsp;    private val SQLITE_MAGIC: ByteArray = &quot;SQLite format 3\u0000&quot;.encodeToByteArray()</b>
 &nbsp;}
 </code>
 </pre>
@@ -88,7 +187,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-17 22:14</div>
+    <div style="float:right;">generated on 2026-07-20 16:21</div>
 </div>
 </body>
 </html>

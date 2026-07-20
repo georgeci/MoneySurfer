@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > AppVersionGateImpl</title>
+  <title>MoneySurfer Coverage Report > FirebaseConfigImpl_androidKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,15 +19,18 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.data.repository</a>
+    <a href="../index.html">com.georgeci.moneysurfer.data.remote</a>
 </div>
 
-<h1>Coverage Summary for Class: AppVersionGateImpl (com.georgeci.moneysurfer.data.repository)</h1>
+<h1>Coverage Summary for Class: FirebaseConfigImpl_androidKt (com.georgeci.moneysurfer.data.remote)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -46,7 +49,31 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">AppVersionGateImpl</td>
+  <td class="name">FirebaseConfigImpl_androidKt</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
 <td class="coverageStat">
   <span class="percent">
     0%
@@ -60,65 +87,11 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/16)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/22)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/104)
+    (0/39)
   </span>
 </td>
 </tr>
-  <tr>
-    <td class="name">AppVersionGateImpl$refresh$1</td>
-    <td class="coverageStat"/>
-  </tr>
-<tr>
-  <td class="name"><strong>Total</strong></td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/4)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/16)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/22)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/104)
-  </span>
-</td>
-</tr>
+
 </table>
 
 <br/>
@@ -126,54 +99,33 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.repository
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.remote
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.AppInfo
-&nbsp;import com.georgeci.moneysurfer.domain.model.AppVersionStatus
-&nbsp;import com.georgeci.moneysurfer.domain.model.RemoteAppConfig
-&nbsp;import com.georgeci.moneysurfer.domain.repositories.AppConfigRepository
-&nbsp;import com.georgeci.moneysurfer.domain.repositories.AppVersionGate
-&nbsp;import kotlinx.coroutines.flow.MutableStateFlow
-&nbsp;import kotlinx.coroutines.flow.StateFlow
-&nbsp;import kotlinx.coroutines.flow.asStateFlow
-&nbsp;import org.koin.core.annotation.Single
+&nbsp;/**
+&nbsp; * On Android the host machine running the emulator suite is reachable via
+&nbsp; * `10.0.2.2` from within the Android emulator (the special-purpose alias the
+&nbsp; * AVD assigns to the host loopback). Real-device runs against an emulator
+&nbsp; * suite would need a LAN IP — out of scope here.
+&nbsp; */
+<b class="nc">&nbsp;internal actual fun defaultEmulatorHost(): String = &quot;10.0.2.2&quot;</b>
 &nbsp;
-&nbsp;private const val DEFAULT_UNSUPPORTED_MESSAGE: String =
-&nbsp;    &quot;This app version is no longer supported. Please update.&quot;
-&nbsp;
-<b class="nc">&nbsp;@Single(binds = [AppVersionGate::class])</b>
-&nbsp;class AppVersionGateImpl(
-<b class="nc">&nbsp;    private val appConfigRepository: AppConfigRepository,</b>
-<b class="nc">&nbsp;    private val appInfo: AppInfo,</b>
-&nbsp;) : AppVersionGate {
-&nbsp;
-<b class="nc">&nbsp;    private val _status = MutableStateFlow&lt;AppVersionStatus?&gt;(null)</b>
-<b class="nc">&nbsp;    override val status: StateFlow&lt;AppVersionStatus?&gt; = _status.asStateFlow()</b>
-&nbsp;
-&nbsp;    override suspend fun refresh(): AppVersionStatus {
-<b class="nc">&nbsp;        val config = appConfigRepository.fetch()</b>
-<b class="nc">&nbsp;        val resolved = if (config == null) AppVersionStatus.Supported else evaluate(config)</b>
-<b class="nc">&nbsp;        _status.value = resolved</b>
-<b class="nc">&nbsp;        return resolved</b>
-&nbsp;    }
-&nbsp;
-<b class="nc">&nbsp;    override fun isSyncAllowed(): Boolean = when (status.value) {</b>
-<b class="nc">&nbsp;        null,</b>
-<b class="nc">&nbsp;        AppVersionStatus.Supported,</b>
-<b class="nc">&nbsp;        is AppVersionStatus.UpdateAvailable,</b>
-<b class="nc">&nbsp;        -&gt; true</b>
-<b class="nc">&nbsp;        is AppVersionStatus.Unsupported -&gt; false</b>
-&nbsp;    }
-&nbsp;
-<b class="nc">&nbsp;    private fun evaluate(config: RemoteAppConfig): AppVersionStatus = when {</b>
-<b class="nc">&nbsp;        appInfo.versionCode &lt; config.minSupportedAppVersionCode || config.forceUpdate -&gt;</b>
-<b class="nc">&nbsp;            AppVersionStatus.Unsupported(</b>
-<b class="nc">&nbsp;                message = config.message ?: DEFAULT_UNSUPPORTED_MESSAGE,</b>
-&nbsp;            )
-<b class="nc">&nbsp;        appInfo.versionCode &lt; config.latestAppVersionCode -&gt;</b>
-<b class="nc">&nbsp;            AppVersionStatus.UpdateAvailable(message = config.message)</b>
-<b class="nc">&nbsp;        else -&gt; AppVersionStatus.Supported</b>
-&nbsp;    }
+&nbsp;/**
+&nbsp; * Two-channel toggle:
+&nbsp; *
+&nbsp; * 1. **System property** `MS_USE_EMULATOR=true` — set by `MoneySurferApplication`
+&nbsp; *    when `BuildConfig.USE_EMULATOR == true` (compile-time flag from
+&nbsp; *    `-PuseEmulator=true` Gradle property). Standard path for emulator
+&nbsp; *    debug builds installed on an AVD.
+&nbsp; * 2. **Env var** `MS_USE_EMULATOR=true` — fallback for direct `gradlew run`-style
+&nbsp; *    invocations or instrumentation tests where there&#39;s no Application class
+&nbsp; *    to set the system property.
+&nbsp; *
+&nbsp; * Production APKs never see either set, so `defaultUseEmulator() == false`.
+&nbsp; */
+&nbsp;internal actual fun defaultUseEmulator(): Boolean {
+<b class="nc">&nbsp;    val sysProp = System.getProperty(&quot;MS_USE_EMULATOR&quot;)?.equals(&quot;true&quot;, ignoreCase = true) == true</b>
+<b class="nc">&nbsp;    val envVar = System.getenv(&quot;MS_USE_EMULATOR&quot;)?.equals(&quot;true&quot;, ignoreCase = true) == true</b>
+<b class="nc">&nbsp;    return sysProp || envVar</b>
 &nbsp;}
 </code>
 </pre>
@@ -198,7 +150,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-17 22:14</div>
+    <div style="float:right;">generated on 2026-07-20 16:21</div>
 </div>
 </body>
 </html>

@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SyncEntityTypes</title>
+  <title>MoneySurfer Coverage Report > ClockUseCase</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,22 +19,70 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.domain.sync</a>
+    <a href="../index.html">com.georgeci.moneysurfer.domain.primitives</a>
 </div>
 
-<h1>Coverage Summary for Class: SyncEntityTypes (com.georgeci.moneysurfer.domain.sync)</h1>
+<h1>Coverage Summary for Class: ClockUseCase (com.georgeci.moneysurfer.domain.primitives)</h1>
 
 <table class="coverageStats">
 <tr>
   <th class="name">Class</th>
 <th class="coverageStat 
 ">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
   Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
 </th>
 </tr>
 <tr>
-  <td class="name">SyncEntityTypes</td>
+  <td class="name">ClockUseCase</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
     <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
 </tr>
 
 </table>
@@ -44,21 +92,20 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.sync
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.primitives
+&nbsp;
+&nbsp;import org.koin.core.annotation.Single
+&nbsp;import kotlin.time.Instant
+&nbsp;import kotlin.time.Clock as KotlinClock
 &nbsp;
 &nbsp;/**
-&nbsp; * Opaque entity-type strings that flow through the sync outbox.
-&nbsp; * Values are stable — they are persisted in the local database as [PendingMutation.entityType].
+&nbsp; * Domain-level clock abstraction. Wraps [kotlin.time.Clock.System] so callers don&#39;t
+&nbsp; * scatter direct `Clock.System.now()` references and so tests can substitute a fake
+&nbsp; * via Koin.
 &nbsp; */
-&nbsp;object SyncEntityTypes {
-&nbsp;    const val USER = &quot;USER&quot;
-&nbsp;    const val WORKSPACE = &quot;WORKSPACE&quot;
-&nbsp;    const val WORKSPACE_MEMBER = &quot;WORKSPACE_MEMBER&quot;
-&nbsp;    const val WORKSPACE_INVITE = &quot;WORKSPACE_INVITE&quot;
-&nbsp;    const val WORKSPACE_REF = &quot;WORKSPACE_REF&quot;
-&nbsp;    const val ACCOUNT = &quot;ACCOUNT&quot;
-&nbsp;    const val CATEGORY = &quot;CATEGORY&quot;
-&nbsp;    const val TRANSACTION = &quot;TRANSACTION&quot;
+<b class="fc">&nbsp;@Single</b>
+&nbsp;class ClockUseCase {
+<b class="fc">&nbsp;    fun now(): Instant = KotlinClock.System.now()</b>
 &nbsp;}
 </code>
 </pre>
@@ -83,7 +130,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-16 12:42</div>
+    <div style="float:right;">generated on 2026-07-20 16:21</div>
 </div>
 </body>
 </html>

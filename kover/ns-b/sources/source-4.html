@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > UiPreferencesImplKt</title>
+  <title>MoneySurfer Coverage Report > LocalDataModule</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.data.preferences</a>
+    <a href="../index.html">com.georgeci.moneysurfer.data.di</a>
 </div>
 
-<h1>Coverage Summary for Class: UiPreferencesImplKt (com.georgeci.moneysurfer.data.preferences)</h1>
+<h1>Coverage Summary for Class: LocalDataModule (com.georgeci.moneysurfer.data.di)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,45 +49,38 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">UiPreferencesImplKt</td>
+  <td class="name">LocalDataModule</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    10%
   </span>
   <span class="absValue">
-    (0/3)
+    (1/10)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    10%
+  </span>
+  <span class="absValue">
+    (1/10)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    10%
   </span>
   <span class="absValue">
-    (0/14)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/12)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/102)
+    (2/20)
   </span>
 </td>
 </tr>
@@ -99,64 +92,52 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.preferences
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.di
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.data.datastore.UiSettingsDataSource
-&nbsp;import com.georgeci.moneysurfer.domain.preferences.AccentSeed
-&nbsp;import com.georgeci.moneysurfer.domain.preferences.ContainerStyle
-&nbsp;import com.georgeci.moneysurfer.domain.preferences.PaletteSource
-&nbsp;import com.georgeci.moneysurfer.domain.preferences.Pref
-&nbsp;import com.georgeci.moneysurfer.domain.preferences.ThemeMode
-&nbsp;import com.georgeci.moneysurfer.domain.preferences.UiPreferences
+&nbsp;import com.georgeci.moneysurfer.data.db.MoneySurferDatabase
+&nbsp;import com.georgeci.moneysurfer.data.db.dao.AccountDao
+&nbsp;import com.georgeci.moneysurfer.data.db.dao.BudgetDao
+&nbsp;import com.georgeci.moneysurfer.data.db.dao.CategoryDao
+&nbsp;import com.georgeci.moneysurfer.data.db.dao.RecurringRuleDao
+&nbsp;import com.georgeci.moneysurfer.data.db.dao.TransactionDao
+&nbsp;import com.georgeci.moneysurfer.data.db.dao.UserDao
+&nbsp;import com.georgeci.moneysurfer.data.db.dao.WorkspaceDao
+&nbsp;import com.georgeci.moneysurfer.data.db.dao.WorkspaceInviteDao
+&nbsp;import com.georgeci.moneysurfer.data.db.dao.WorkspaceMemberDao
+&nbsp;import org.koin.core.annotation.ComponentScan
+&nbsp;import org.koin.core.annotation.Module
 &nbsp;import org.koin.core.annotation.Single
-&nbsp;import com.georgeci.moneysurfer.data.datastore.isDynamicColorAvailable as platformIsDynamicColorAvailable
 &nbsp;
-&nbsp;@Single(binds = [UiPreferences::class])
-&nbsp;class UiPreferencesImpl(
-&nbsp;    src: UiSettingsDataSource,
-&nbsp;) : UiPreferences {
+<b class="fc">&nbsp;@Module</b>
+&nbsp;@ComponentScan(&quot;com.georgeci.moneysurfer.data&quot;)
+&nbsp;class LocalDataModule {
 &nbsp;
-&nbsp;    override val isDynamicColorAvailable: Boolean = platformIsDynamicColorAvailable
+&nbsp;    @Single
+<b class="nc">&nbsp;    fun userDao(database: MoneySurferDatabase): UserDao = database.userDao()</b>
 &nbsp;
-&nbsp;    override val paletteSource: Pref&lt;PaletteSource&gt; = src.paletteSource.asPref(
-&nbsp;        fromStored = ::decodePaletteSource,
-&nbsp;        toStored = ::encodePaletteSource,
-&nbsp;    )
+&nbsp;    @Single
+<b class="nc">&nbsp;    fun workspaceDao(database: MoneySurferDatabase): WorkspaceDao = database.workspaceDao()</b>
 &nbsp;
-&nbsp;    override val themeMode: Pref&lt;ThemeMode&gt; = src.themeMode.asPref(
-&nbsp;        fromStored = { stored -&gt; runCatching { ThemeMode.valueOf(stored) }.getOrDefault(ThemeMode.System) },
-&nbsp;        toStored = { mode -&gt; mode.name },
-&nbsp;    )
+&nbsp;    @Single
+<b class="nc">&nbsp;    fun workspaceMemberDao(database: MoneySurferDatabase): WorkspaceMemberDao = database.workspaceMemberDao()</b>
 &nbsp;
-&nbsp;    override val containerStyle: Pref&lt;ContainerStyle&gt; = src.containerStyle.asPref(
-&nbsp;        fromStored = { stored -&gt; runCatching { ContainerStyle.valueOf(stored) }.getOrDefault(ContainerStyle.Card) },
-&nbsp;        toStored = { style -&gt; style.name },
-&nbsp;    )
-&nbsp;}
+&nbsp;    @Single
+<b class="nc">&nbsp;    fun workspaceInviteDao(database: MoneySurferDatabase): WorkspaceInviteDao = database.workspaceInviteDao()</b>
 &nbsp;
-&nbsp;/**
-&nbsp; * Encoding format:
-&nbsp; *  - &quot;BRAND&quot;
-&nbsp; *  - &quot;PRESET:&lt;seedName&gt;&quot;   e.g. &quot;PRESET:Plum&quot;
-&nbsp; *  - &quot;DYNAMIC&quot;
-&nbsp; */
-<b class="nc">&nbsp;private fun encodePaletteSource(source: PaletteSource): String = when (source) {</b>
-<b class="nc">&nbsp;    PaletteSource.Brand -&gt; &quot;BRAND&quot;</b>
-<b class="nc">&nbsp;    PaletteSource.Dynamic -&gt; &quot;DYNAMIC&quot;</b>
-<b class="nc">&nbsp;    is PaletteSource.Preset -&gt; &quot;PRESET:${source.seed.name}&quot;</b>
-&nbsp;}
+&nbsp;    @Single
+<b class="nc">&nbsp;    fun accountDao(database: MoneySurferDatabase): AccountDao = database.accountDao()</b>
 &nbsp;
-<b class="nc">&nbsp;private fun decodePaletteSource(stored: String): PaletteSource = when (stored) {</b>
-<b class="nc">&nbsp;    &quot;BRAND&quot; -&gt; PaletteSource.Brand</b>
-<b class="nc">&nbsp;    &quot;DYNAMIC&quot; -&gt; PaletteSource.Dynamic</b>
-<b class="nc">&nbsp;    else -&gt; decodePresetPaletteSource(stored)</b>
-&nbsp;}
+&nbsp;    @Single
+<b class="nc">&nbsp;    fun categoryDao(database: MoneySurferDatabase): CategoryDao = database.categoryDao()</b>
 &nbsp;
-&nbsp;private fun decodePresetPaletteSource(stored: String): PaletteSource {
-<b class="nc">&nbsp;    val parts = stored.split(&#39;:&#39;, limit = 2)</b>
-<b class="nc">&nbsp;    if (parts.size != 2 || parts[0] != &quot;PRESET&quot;) return PaletteSource.DEFAULT</b>
-<b class="nc">&nbsp;    val seed = runCatching { AccentSeed.valueOf(parts[1]) }.getOrDefault(AccentSeed.Plum)</b>
-<b class="nc">&nbsp;    return PaletteSource.Preset(seed)</b>
+&nbsp;    @Single
+<b class="nc">&nbsp;    fun transactionDao(database: MoneySurferDatabase): TransactionDao = database.transactionDao()</b>
+&nbsp;
+&nbsp;    @Single
+<b class="nc">&nbsp;    fun budgetDao(database: MoneySurferDatabase): BudgetDao = database.budgetDao()</b>
+&nbsp;
+&nbsp;    @Single
+<b class="nc">&nbsp;    fun recurringRuleDao(database: MoneySurferDatabase): RecurringRuleDao = database.recurringRuleDao()</b>
 &nbsp;}
 </code>
 </pre>
@@ -181,7 +162,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-17 22:14</div>
+    <div style="float:right;">generated on 2026-07-20 16:21</div>
 </div>
 </body>
 </html>

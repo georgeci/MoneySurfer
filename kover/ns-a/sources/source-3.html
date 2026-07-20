@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > ComGeorgeciMoneysurferDataDiSyncImplModuleModuleKt</title>
+  <title>MoneySurfer Coverage Report > CategorizedTransactionEntity</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.data.di</a>
+    <a href="../index.html">com.georgeci.moneysurfer.data.db.entity</a>
 </div>
 
-<h1>Coverage Summary for Class: ComGeorgeciMoneysurferDataDiSyncImplModuleModuleKt (com.georgeci.moneysurfer.data.di)</h1>
+<h1>Coverage Summary for Class: CategorizedTransactionEntity (com.georgeci.moneysurfer.data.db.entity)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">ComGeorgeciMoneysurferDataDiSyncImplModuleModuleKt</td>
+  <td class="name">CategorizedTransactionEntity</td>
 <td class="coverageStat">
   <span class="percent">
     0%
@@ -63,7 +63,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/2)
+    (0/1)
   </span>
 </td>
     <td class="coverageStat"/>
@@ -72,7 +72,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/1)
+    (0/15)
   </span>
 </td>
 <td class="coverageStat">
@@ -80,7 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/463)
+    (0/77)
   </span>
 </td>
 </tr>
@@ -90,7 +90,31 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <br/>
 <br/>
 
-  <code class="sourceCode">Source code is not available<br /></code>
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.db.entity
+&nbsp;
+&nbsp;import androidx.room.ColumnInfo
+&nbsp;
+&nbsp;data class CategorizedTransactionEntity(
+<b class="nc">&nbsp;    @ColumnInfo(name = &quot;id&quot;) val id: String,</b>
+<b class="nc">&nbsp;    @ColumnInfo(name = &quot;workspaceId&quot;) val workspaceId: String,</b>
+<b class="nc">&nbsp;    @ColumnInfo(name = &quot;accountId&quot;) val accountId: String,</b>
+<b class="nc">&nbsp;    @ColumnInfo(name = &quot;amount&quot;) val amount: Long,</b>
+<b class="nc">&nbsp;    @ColumnInfo(name = &quot;currencyCode&quot;) val currencyCode: String,</b>
+<b class="nc">&nbsp;    @ColumnInfo(name = &quot;categoryId&quot;) val categoryId: String?,</b>
+<b class="nc">&nbsp;    @ColumnInfo(name = &quot;categoryName&quot;) val categoryName: String?,</b>
+<b class="nc">&nbsp;    @ColumnInfo(name = &quot;note&quot;) val note: String,</b>
+<b class="nc">&nbsp;    @ColumnInfo(name = &quot;operationAt&quot;) val operationAt: Long,</b>
+<b class="nc">&nbsp;    @ColumnInfo(name = &quot;operationDate&quot;) val operationDate: String,</b>
+<b class="nc">&nbsp;    @ColumnInfo(name = &quot;type&quot;) val type: String,</b>
+<b class="nc">&nbsp;    @ColumnInfo(name = &quot;status&quot;) val status: String,</b>
+<b class="nc">&nbsp;    @ColumnInfo(name = &quot;createdAt&quot;) val createdAt: Long,</b>
+<b class="nc">&nbsp;    @ColumnInfo(name = &quot;updatedAt&quot;) val updatedAt: Long,</b>
+<b class="nc">&nbsp;    @ColumnInfo(name = &quot;transferId&quot;) val transferId: String? = null,</b>
+&nbsp;)
+</code>
+</pre>
 </div>
 
 <script type="text/javascript">
@@ -112,7 +136,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-17 22:14</div>
+    <div style="float:right;">generated on 2026-07-20 16:21</div>
 </div>
 </body>
 </html>
