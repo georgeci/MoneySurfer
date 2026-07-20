@@ -64,6 +64,10 @@
     <string name="settings_csv_issue_unknown_workspace">неизвестное рабочее пространство %1$s</string>
     <string name="settings_csv_issue_unknown_account">неизвестный счёт %1$s</string>
     <string name="settings_csv_issue_unknown_category">неизвестная категория %1$s</string>
+    <string name="settings_csv_issue_account_workspace_mismatch">счёт %1$s не принадлежит рабочему пространству %2$s</string>
+    <string name="settings_csv_issue_category_workspace_mismatch">категория %1$s не принадлежит рабочему пространству %2$s</string>
+    <string name="settings_csv_issue_currency_mismatch">валюта %1$s не совпадает с валютой счёта %2$s</string>
+    <string name="settings_csv_issue_unpaired_transfer">у перевода %1$s нет парной строки</string>
     <string name="settings_notifications">Уведомления</string>
     <string name="settings_notifications_supporting">Оповещения о бюджете, еженедельная сводка</string>
 

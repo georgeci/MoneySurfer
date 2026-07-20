@@ -20,6 +20,10 @@ sealed interface CsvRowIssue {
     data class UnknownWorkspace(val workspaceId: String) : CsvRowIssue
     data class UnknownAccount(val accountId: String) : CsvRowIssue
     data class UnknownCategory(val categoryId: String) : CsvRowIssue
+    data class AccountWorkspaceMismatch(val accountId: String, val workspaceId: String) : CsvRowIssue
+    data class CategoryWorkspaceMismatch(val categoryId: String, val workspaceId: String) : CsvRowIssue
+    data class CurrencyMismatch(val currency: String, val accountCurrency: String) : CsvRowIssue
+    data class UnpairedTransfer(val transferId: String) : CsvRowIssue
 }
 
 /**
