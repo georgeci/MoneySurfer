@@ -186,6 +186,7 @@ subprojects {
             "src/iosX64Main/kotlin",
             "src/iosSimulatorArm64Main/kotlin",
             "src/jvmMain/kotlin",
+            "src/jvmAndroidMain/kotlin",
             "src/main/kotlin",
             "src/main/java",
         )

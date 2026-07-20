@@ -225,6 +225,17 @@
     <string name="settings_backup_notice_missing_file">Backup is missing required entry: %1$s</string>
     <string name="settings_backup_notice_format_mismatch">Backup format v%1$d isn\'t supported (expected v%2$d)</string>
     <string name="settings_backup_notice_schema_mismatch">Backup is from database v%1$d; this app uses v%2$d</string>
+    <string name="settings_backup_notice_passphrase_required">This backup is encrypted — a passphrase is required</string>
+    <string name="settings_backup_notice_wrong_passphrase">Wrong passphrase, or the backup file is corrupted</string>
+    <string name="settings_backup_export_warning">Without a passphrase the file is saved unencrypted — anyone who gets hold of it can read all your financial data.</string>
+    <string name="settings_backup_export_passphrase_label">Passphrase (optional)</string>
+    <string name="settings_backup_export_passphrase_confirm_label">Confirm passphrase</string>
+    <string name="settings_backup_export_passphrase_mismatch">Passphrases don\'t match</string>
+    <string name="settings_backup_export_confirm">Download</string>
+    <string name="settings_backup_import_passphrase_title">Encrypted backup</string>
+    <string name="settings_backup_import_passphrase_body">This backup is protected by a passphrase. Enter it to restore your data.</string>
+    <string name="settings_backup_import_passphrase_label">Passphrase</string>
+    <string name="settings_backup_import_passphrase_confirm">Restore</string>
 
     <!-- About screen -->
     <string name="settings_about_title">About &amp; legal</string>

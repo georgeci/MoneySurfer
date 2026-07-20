@@ -18,6 +18,12 @@ class BackupViewModel(
     private val clock: ClockUseCase,
 ) : MviViewModel<BackupState, BackupEvent, BackupEffect>(initialState = BackupState()) {
 
+    /** Passphrase chosen in the export dialog, held until the save picker returns a sink. */
+    private var pendingExportPassphrase: String? = null
+
+    /** Picked source of an encrypted backup, held while the passphrase prompt is up. */
+    private var pendingImportSource: BufferedSource? = null
+
     override fun onEvent(event: BackupEvent) {
         when (event) {
             BackupEvent.OnBackClick -> postSideEffect(BackupEffect.NavigateBack)
@@ -27,11 +33,16 @@ class BackupViewModel(
             BackupEvent.OnEncryptionClick -> postSideEffect(BackupEffect.OpenEncryptionScreen)
             BackupEvent.OnBackUpNowClick -> postSideEffect(BackupEffect.NotImplemented)
 
-            BackupEvent.OnDownloadClick ->
-                postSideEffect(BackupEffect.RequestSaveFile(suggestedFilename()))
-            is BackupEvent.OnSaveSinkChosen -> handleSaveSink(event.sink)
+            BackupEvent.OnDownloadClick,
+            BackupEvent.OnExportOptionsDismissed,
+            is BackupEvent.OnExportOptionsConfirmed,
+            is BackupEvent.OnSaveSinkChosen,
+            -> onExportEvent(event)
 
-            is BackupEvent.OnOpenSourceChosen -> handleOpenSource(event.source)
+            is BackupEvent.OnOpenSourceChosen,
+            BackupEvent.OnImportPassphraseDismissed,
+            is BackupEvent.OnImportPassphraseSubmitted,
+            -> onImportEvent(event)
 
             BackupEvent.OnRestoreClick,
             BackupEvent.OnRestoreDismissed,
@@ -42,6 +53,46 @@ class BackupViewModel(
             BackupEvent.OnDeleteDismissed,
             BackupEvent.OnDeleteConfirmed,
             -> onDeleteEvent(event)
+        }
+    }
+
+    override fun onCleared() {
+        clearPendingImportSource()
+        super.onCleared()
+    }
+
+    private fun onExportEvent(event: BackupEvent) {
+        when (event) {
+            BackupEvent.OnDownloadClick ->
+                updateState { copy(showExportOptions = true) }
+            BackupEvent.OnExportOptionsDismissed -> {
+                pendingExportPassphrase = null
+                updateState { copy(showExportOptions = false) }
+            }
+            is BackupEvent.OnExportOptionsConfirmed -> {
+                pendingExportPassphrase = event.passphrase?.takeIf { it.isNotEmpty() }
+                updateState { copy(showExportOptions = false) }
+                postSideEffect(BackupEffect.RequestSaveFile(suggestedFilename()))
+            }
+            is BackupEvent.OnSaveSinkChosen -> handleSaveSink(event.sink)
+            else -> Unit
+        }
+    }
+
+    private fun onImportEvent(event: BackupEvent) {
+        when (event) {
+            is BackupEvent.OnOpenSourceChosen -> handleOpenSource(event.source)
+            BackupEvent.OnImportPassphraseDismissed -> {
+                clearPendingImportSource()
+                updateState { copy(showImportPassphrase = false) }
+            }
+            is BackupEvent.OnImportPassphraseSubmitted -> {
+                val source = pendingImportSource
+                pendingImportSource = null
+                updateState { copy(showImportPassphrase = false) }
+                if (source != null) runImport(source, event.passphrase)
+            }
+            else -> Unit
         }
     }
 
@@ -74,6 +125,8 @@ class BackupViewModel(
     }
 
     private fun handleSaveSink(sink: BufferedSink?) {
+        val passphrase = pendingExportPassphrase
+        pendingExportPassphrase = null
         if (sink == null) return
         updateState { copy(phase = BackupPhase.Exporting) }
         launch(
@@ -86,7 +139,7 @@ class BackupViewModel(
                 runCatching { sink.close() }
             },
         ) {
-            sink.use { exporter.exportTo(it).getOrThrow() }
+            sink.use { exporter.exportTo(it, passphrase).getOrThrow() }
             updateState { copy(phase = BackupPhase.Idle) }
             postSideEffect(BackupEffect.Notify(BackupNotice.ExportSuccess))
         }
@@ -94,6 +147,23 @@ class BackupViewModel(
 
     private fun handleOpenSource(source: BufferedSource?) {
         if (source == null) return
+        launch(
+            onError = { error ->
+                if (error is CancellationException) throw error
+                postSideEffect(BackupEffect.Notify(BackupNotice.fromError(error)))
+                runCatching { source.close() }
+            },
+        ) {
+            if (importer.isPassphraseProtected(source)) {
+                pendingImportSource = source
+                updateState { copy(showImportPassphrase = true) }
+            } else {
+                runImport(source, passphrase = null)
+            }
+        }
+    }
+
+    private fun runImport(source: BufferedSource, passphrase: String?) {
         updateState { copy(phase = BackupPhase.Importing) }
         launch(
             onError = { error ->
@@ -103,9 +173,14 @@ class BackupViewModel(
                 runCatching { source.close() }
             },
         ) {
-            source.use { importer.importFrom(it).getOrThrow() }
+            source.use { importer.importFrom(it, passphrase).getOrThrow() }
             postSideEffect(BackupEffect.RestartApp)
         }
+    }
+
+    private fun clearPendingImportSource() {
+        pendingImportSource?.let { source -> runCatching { source.close() } }
+        pendingImportSource = null
     }
 
     private fun suggestedFilename(): String {
@@ -117,6 +192,8 @@ class BackupViewModel(
 data class BackupState(
     val showDeleteConfirmation: Boolean = false,
     val showRestoreConfirmation: Boolean = false,
+    val showExportOptions: Boolean = false,
+    val showImportPassphrase: Boolean = false,
     val phase: BackupPhase = BackupPhase.Idle,
 )
 
@@ -135,6 +212,8 @@ sealed interface BackupNotice {
     data object InvalidArchive : BackupNotice
     data class MissingFile(val name: String) : BackupNotice
     data object Corrupted : BackupNotice
+    data object PassphraseRequired : BackupNotice
+    data object WrongPassphrase : BackupNotice
     data object Generic : BackupNotice
 
     companion object {
@@ -145,6 +224,9 @@ sealed interface BackupNotice {
             is BackupError.InvalidArchive -> InvalidArchive
             is BackupError.MissingFile -> MissingFile(error.name)
             is BackupError.CrcMismatch -> Corrupted
+            is BackupError.CorruptDatabase -> Corrupted
+            is BackupError.PassphraseRequired -> PassphraseRequired
+            is BackupError.WrongPassphrase -> WrongPassphrase
             else -> Generic
         }
     }
@@ -157,11 +239,15 @@ sealed interface BackupEvent {
     data object OnEncryptionClick : BackupEvent
     data object OnBackUpNowClick : BackupEvent
     data object OnDownloadClick : BackupEvent
+    data object OnExportOptionsDismissed : BackupEvent
+    data class OnExportOptionsConfirmed(val passphrase: String?) : BackupEvent
     data class OnSaveSinkChosen(val sink: BufferedSink?) : BackupEvent
     data object OnRestoreClick : BackupEvent
     data object OnRestoreConfirmed : BackupEvent
     data object OnRestoreDismissed : BackupEvent
     data class OnOpenSourceChosen(val source: BufferedSource?) : BackupEvent
+    data object OnImportPassphraseDismissed : BackupEvent
+    data class OnImportPassphraseSubmitted(val passphrase: String) : BackupEvent
     data object OnDeleteClick : BackupEvent
     data object OnDeleteConfirmed : BackupEvent
     data object OnDeleteDismissed : BackupEvent

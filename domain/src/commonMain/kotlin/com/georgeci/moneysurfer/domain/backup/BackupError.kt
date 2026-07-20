@@ -16,4 +16,8 @@ sealed class BackupError(message: String, cause: Throwable? = null) : RuntimeExc
         BackupError("Backup was made with database schema v$actual; this app uses v$expected")
     data class MissingFile(val name: String) : BackupError("Backup is missing required entry: $name")
     data class CrcMismatch(val name: String) : BackupError("CRC32 mismatch for entry: $name")
+    data object PassphraseRequired : BackupError("Backup is encrypted; a passphrase is required")
+    data object WrongPassphrase : BackupError("Wrong passphrase, or the encrypted backup is corrupted")
+    data class CorruptDatabase(val reason: String, val checkCause: Throwable? = null) :
+        BackupError("Restored database failed integrity check: $reason", checkCause)
 }

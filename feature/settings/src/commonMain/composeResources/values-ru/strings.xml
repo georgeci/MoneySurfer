@@ -225,6 +225,17 @@
     <string name="settings_backup_notice_missing_file">В бэкапе отсутствует обязательная запись: %1$s</string>
     <string name="settings_backup_notice_format_mismatch">Формат бэкапа v%1$d не поддерживается (ожидается v%2$d)</string>
     <string name="settings_backup_notice_schema_mismatch">Бэкап из БД v%1$d; приложение использует v%2$d</string>
+    <string name="settings_backup_notice_passphrase_required">Бэкап зашифрован — нужен пароль</string>
+    <string name="settings_backup_notice_wrong_passphrase">Неверный пароль или файл бэкапа повреждён</string>
+    <string name="settings_backup_export_warning">Без пароля файл сохраняется в незашифрованном виде — любой, у кого он окажется, сможет прочитать все ваши финансовые данные.</string>
+    <string name="settings_backup_export_passphrase_label">Пароль (необязательно)</string>
+    <string name="settings_backup_export_passphrase_confirm_label">Повторите пароль</string>
+    <string name="settings_backup_export_passphrase_mismatch">Пароли не совпадают</string>
+    <string name="settings_backup_export_confirm">Скачать</string>
+    <string name="settings_backup_import_passphrase_title">Зашифрованный бэкап</string>
+    <string name="settings_backup_import_passphrase_body">Бэкап защищён паролем. Введите его, чтобы восстановить данные.</string>
+    <string name="settings_backup_import_passphrase_label">Пароль</string>
+    <string name="settings_backup_import_passphrase_confirm">Восстановить</string>
 
     <!-- About -->
     <string name="settings_about_title">О приложении</string>

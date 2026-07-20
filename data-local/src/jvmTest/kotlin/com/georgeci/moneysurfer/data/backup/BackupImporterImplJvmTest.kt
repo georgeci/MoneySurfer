@@ -3,14 +3,18 @@ package com.georgeci.moneysurfer.data.backup
 import com.georgeci.moneysurfer.data.backup.fixtures.BackupTestHarness
 import com.georgeci.moneysurfer.data.backup.fixtures.buildArchive
 import com.georgeci.moneysurfer.data.backup.fixtures.manifestJson
+import com.georgeci.moneysurfer.data.backup.fixtures.validSqliteDbBytes
 import com.georgeci.moneysurfer.data.backup.zip.ZipStoredWriter
+import com.georgeci.moneysurfer.data.db.entity.UserEntity
 import com.georgeci.moneysurfer.domain.backup.BackupError
 import com.georgeci.moneysurfer.domain.backup.BackupManifest
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.types.shouldBeInstanceOf
 import okio.Buffer
+import okio.FileSystem
 
 /**
  * Importer error-path coverage: every [BackupError] subtype is reachable via
@@ -125,10 +129,63 @@ class BackupImporterImplJvmTest : FunSpec({
         ZipStoredWriter(sink).apply {
             writeEntry(BackupManifest.MANIFEST_ENTRY_NAME, Buffer().apply { writeUtf8(manifestJson()) })
             writeEntry("future/unknown.bin", Buffer().apply { writeUtf8("ignored") })
-            writeEntry(BackupManifest.MAIN_DB_ENTRY_NAME, Buffer().apply { writeUtf8("main-db") })
+            writeEntry(BackupManifest.MAIN_DB_ENTRY_NAME, Buffer().apply { write(validSqliteDbBytes()) })
             writeEntry(BackupManifest.DATASTORE_ENTRY_NAME, Buffer().apply { writeUtf8("ds") })
             finish()
         }
         importer.importFrom(sink).getOrThrow().shouldBeInstanceOf<BackupManifest>()
+    }
+
+    test("main DB payload without the SQLite header surfaces CorruptDatabase") {
+        val archive = buildArchive(manifestJson(), mainDbBytes = ByteArray(64) { 7 })
+        val error = shouldThrow<BackupError.CorruptDatabase> {
+            importer.importFrom(archive).getOrThrow()
+        }
+        error.reason shouldContain "not an SQLite database"
+    }
+
+    test("SQLite header with a corrupted structure fails the integrity check") {
+        // Keep the 16-byte magic intact but break the page-size field (bytes
+        // 16-17, big-endian; must be a power of two) so SQLite rejects the file.
+        val corrupted = validSqliteDbBytes().also {
+            it[16] = 0x00
+            it[17] = 0x03
+        }
+        val archive = buildArchive(manifestJson(), mainDbBytes = corrupted)
+        shouldThrow<BackupError.CorruptDatabase> {
+            importer.importFrom(archive).getOrThrow()
+        }
+    }
+
+    test("rejected payload never replaces the live DB and leaves no temp files") {
+        val fs = FileSystem.SYSTEM
+        val mainDbPath = harness.locator.moneySurferDbFile()
+        // Room creates the file lazily — force it into existence first.
+        harness.database().userDao().insert(
+            UserEntity(id = "u-live", displayName = "Live", isAnon = false),
+        )
+        val liveBytes = fs.read(mainDbPath) { readByteArray() }
+
+        val archive = buildArchive(manifestJson(), mainDbBytes = ByteArray(64) { 7 })
+        shouldThrow<BackupError.CorruptDatabase> {
+            importer.importFrom(archive).getOrThrow()
+        }
+
+        fs.read(mainDbPath) { readByteArray() } shouldBe liveBytes
+        val leftovers = fs.list(harness.tempDir).filter { ".restore.tmp" in it.name }
+        leftovers shouldBe emptyList()
+    }
+
+    test("oversized manifest entry is rejected before parsing") {
+        val hugeManifest = "x".repeat(2 * 1024 * 1024)
+        val sink = Buffer()
+        ZipStoredWriter(sink).apply {
+            writeEntry(BackupManifest.MANIFEST_ENTRY_NAME, Buffer().apply { writeUtf8(hugeManifest) })
+            finish()
+        }
+        val error = shouldThrow<BackupError.InvalidArchive> {
+            importer.importFrom(sink).getOrThrow()
+        }
+        error.reason shouldContain "too large"
     }
 })

@@ -1,8 +1,10 @@
 package com.georgeci.moneysurfer.data.backup
 
+import com.georgeci.moneysurfer.data.backup.crypto.EncryptedBackupCodec
 import com.georgeci.moneysurfer.data.backup.zip.ZipStoredReader
 import com.georgeci.moneysurfer.data.db.MONEY_SURFER_DB_VERSION
 import com.georgeci.moneysurfer.data.db.MoneySurferDatabase
+import com.georgeci.moneysurfer.domain.backup.BackupEncryptionInfo
 import com.georgeci.moneysurfer.domain.backup.BackupError
 import com.georgeci.moneysurfer.domain.backup.BackupImporter
 import com.georgeci.moneysurfer.domain.backup.BackupManifest
@@ -14,6 +16,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
+import okio.Buffer
 import okio.BufferedSource
 import okio.FileSystem
 import okio.Path
@@ -32,9 +35,19 @@ class BackupImporterImpl(
     private val mutex = Mutex()
     private val fs: FileSystem = FileSystem.SYSTEM
 
-    override suspend fun importFrom(source: BufferedSource): Result<BackupManifest> = mutex.withLock {
+    override suspend fun isPassphraseProtected(source: BufferedSource): Boolean =
+        withContext(Dispatchers.IO) {
+            runCatching {
+                readManifestEntry(ZipStoredReader(source.peek())).encryption != null
+            }.getOrDefault(false)
+        }
+
+    override suspend fun importFrom(
+        source: BufferedSource,
+        passphrase: String?,
+    ): Result<BackupManifest> = mutex.withLock {
         try {
-            Result.success(withContext(Dispatchers.IO) { runImport(source) })
+            Result.success(withContext(Dispatchers.IO) { runImport(source, passphrase) })
         } catch (ce: CancellationException) {
             throw ce
         } catch (be: BackupError) {
@@ -46,10 +59,53 @@ class BackupImporterImpl(
         }
     }
 
-    private suspend fun runImport(source: BufferedSource): BackupManifest {
+    private fun runImport(source: BufferedSource, passphrase: String?): BackupManifest {
         val reader = ZipStoredReader(source)
-
         val manifest = readManifestEntry(reader)
+        return if (manifest.encryption != null) {
+            importEncrypted(reader, manifest, passphrase)
+        } else {
+            importPlain(reader, manifest)
+        }
+    }
+
+    /**
+     * Unwraps an encrypted backup: the outer manifest only advertises the
+     * scheme; the sealed `payload.enc` entry holds a complete plain archive
+     * whose own manifest is the authenticated one (the codec's MAC covers it),
+     * so the plain path re-validates everything after decryption.
+     */
+    private fun importEncrypted(
+        reader: ZipStoredReader,
+        outerManifest: BackupManifest,
+        passphrase: String?,
+    ): BackupManifest {
+        val scheme = outerManifest.encryption?.scheme
+        val error = when {
+            scheme != BackupEncryptionInfo.SCHEME_V1 ->
+                BackupError.InvalidArchive("Unsupported encryption scheme: $scheme")
+            passphrase.isNullOrEmpty() -> BackupError.PassphraseRequired
+            else -> null
+        }
+        if (error != null) {
+            throw error
+        }
+        // Fail fast on the (unauthenticated) outer version fields before the
+        // costly key derivation; the inner manifest is re-checked afterwards.
+        validateVersions(outerManifest)
+
+        val sealed = readEntry(reader, BackupManifest.ENCRYPTED_PAYLOAD_ENTRY_NAME)
+        val innerZip = EncryptedBackupCodec.open(sealed.readByteArray(), checkNotNull(passphrase))
+
+        val innerReader = ZipStoredReader(Buffer().apply { write(innerZip) })
+        val innerManifest = readManifestEntry(innerReader)
+        if (innerManifest.encryption != null) {
+            throw BackupError.InvalidArchive("Nested encrypted payloads are not supported")
+        }
+        return importPlain(innerReader, innerManifest)
+    }
+
+    private fun importPlain(reader: ZipStoredReader, manifest: BackupManifest): BackupManifest {
         validateManifest(manifest)
 
         val mainDbPath = locator.moneySurferDbFile()
@@ -59,11 +115,11 @@ class BackupImporterImpl(
         val mainDbTemp = mainDbPath.appendSuffix(SUFFIX_RESTORE_TMP)
         val dataStoreTemp = dataStorePath.appendSuffix(SUFFIX_RESTORE_TMP)
 
-        runCatching { extractRemainingEntries(reader, mainDbTemp, dataStoreTemp) }
-            .onFailure {
-                fs.deleteIfExists(mainDbTemp)
-                fs.deleteIfExists(dataStoreTemp)
-            }
+        runCatching {
+            extractRemainingEntries(reader, mainDbTemp, dataStoreTemp)
+            RestoredDatabaseVerifier.verify(fs, mainDbTemp)
+        }
+            .onFailure { cleanUpTempFiles(mainDbTemp, dataStoreTemp) }
             .getOrThrow()
 
         database.close()
@@ -104,12 +160,22 @@ class BackupImporterImpl(
         return manifest
     }
 
+    private fun cleanUpTempFiles(mainDbTemp: Path, dataStoreTemp: Path) {
+        fs.deleteIfExists(mainDbTemp)
+        fs.deleteIfExists(dataStoreTemp)
+        // Side files a WAL-mode open of the temp DB may have left behind.
+        fs.deleteIfExists(mainDbTemp.appendSuffix(SUFFIX_WAL))
+        fs.deleteIfExists(mainDbTemp.appendSuffix(SUFFIX_SHM))
+    }
+
     private fun readManifestEntry(reader: ZipStoredReader): BackupManifest {
         val firstName = reader.nextEntryName()
         val problem = when {
             firstName == null -> "Empty archive"
             firstName != BackupManifest.MANIFEST_ENTRY_NAME ->
                 "Expected ${BackupManifest.MANIFEST_ENTRY_NAME} as first entry; got $firstName"
+            (reader.currentEntrySize ?: 0L) > MAX_MANIFEST_BYTES ->
+                "Manifest entry too large: ${reader.currentEntrySize} bytes"
             else -> null
         }
         if (problem != null) {
@@ -122,7 +188,7 @@ class BackupImporterImpl(
             }
     }
 
-    private fun validateManifest(manifest: BackupManifest) {
+    private fun validateVersions(manifest: BackupManifest) {
         val error = when {
             manifest.backupFormatVersion != BackupManifest.CURRENT_FORMAT_VERSION ->
                 BackupError.FormatMismatch(
@@ -134,6 +200,16 @@ class BackupImporterImpl(
                     expected = MONEY_SURFER_DB_VERSION,
                     actual = manifest.moneySurferDbVersion,
                 )
+            else -> null
+        }
+        if (error != null) {
+            throw error
+        }
+    }
+
+    private fun validateManifest(manifest: BackupManifest) {
+        validateVersions(manifest)
+        val error = when {
             BackupManifest.MAIN_DB_ENTRY_NAME !in manifest.files ->
                 BackupError.MissingFile(BackupManifest.MAIN_DB_ENTRY_NAME)
             BackupManifest.DATASTORE_ENTRY_NAME !in manifest.files ->
@@ -143,6 +219,18 @@ class BackupImporterImpl(
         if (error != null) {
             throw error
         }
+    }
+
+    /** Reads the single entry named [name], skipping unknown entries. */
+    private fun readEntry(reader: ZipStoredReader, name: String): Buffer {
+        while (true) {
+            val entryName = reader.nextEntryName() ?: break
+            if (entryName == name) {
+                return reader.readCurrentEntryToBuffer()
+            }
+            blackholeSink().buffer().use { reader.readCurrentEntryTo(it) }
+        }
+        throw BackupError.MissingFile(name)
     }
 
     private fun extractRemainingEntries(
@@ -196,3 +284,6 @@ private const val SUFFIX_RESTORE_TMP = ".restore.tmp"
 private const val SUFFIX_PRE_IMPORT = ".preimport.bak"
 private const val SUFFIX_WAL = "-wal"
 private const val SUFFIX_SHM = "-shm"
+
+/** A manifest is a small JSON object; anything bigger is hostile or corrupt. */
+private const val MAX_MANIFEST_BYTES = 1L * 1024 * 1024

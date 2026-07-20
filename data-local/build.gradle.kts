@@ -15,7 +15,25 @@ kotlin {
         namespace = "com.georgeci.moneysurfer.data.local"
     }
 
+    // Adding the manual jvm+android edge below opts out of the auto-applied
+    // source-set hierarchy, so re-apply the default template explicitly to keep
+    // the iOS (native) intermediates wired to commonMain.
+    applyDefaultHierarchyTemplate()
+
     sourceSets {
+        // JVM and Android share the same javax.crypto / JCA backend, so the
+        // BackupCrypto actual lives once in this intermediate set rather than
+        // as two byte-identical twins. Only the iOS actual (CommonCrypto) differs.
+        val jvmAndroidMain by creating {
+            dependsOn(commonMain.get())
+        }
+        jvmMain {
+            dependsOn(jvmAndroidMain)
+        }
+        androidMain {
+            dependsOn(jvmAndroidMain)
+        }
+
         commonMain {
             dependencies {
                 implementation(libs.kotlin.stdlib)

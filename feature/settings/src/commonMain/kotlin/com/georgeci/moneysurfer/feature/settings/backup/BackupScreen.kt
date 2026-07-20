@@ -1,10 +1,14 @@
 package com.georgeci.moneysurfer.feature.settings.backup
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -16,6 +20,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.georgeci.moneysurfer.domain.backup.AppRestarter
@@ -39,11 +45,20 @@ import moneysurfer.feature.settings.generated.resources.settings_backup_download
 import moneysurfer.feature.settings.generated.resources.settings_backup_download_title
 import moneysurfer.feature.settings.generated.resources.settings_backup_encryption_supporting
 import moneysurfer.feature.settings.generated.resources.settings_backup_encryption_title
+import moneysurfer.feature.settings.generated.resources.settings_backup_export_confirm
+import moneysurfer.feature.settings.generated.resources.settings_backup_export_passphrase_confirm_label
+import moneysurfer.feature.settings.generated.resources.settings_backup_export_passphrase_label
+import moneysurfer.feature.settings.generated.resources.settings_backup_export_passphrase_mismatch
 import moneysurfer.feature.settings.generated.resources.settings_backup_export_success
+import moneysurfer.feature.settings.generated.resources.settings_backup_export_warning
 import moneysurfer.feature.settings.generated.resources.settings_backup_frequency_pill
 import moneysurfer.feature.settings.generated.resources.settings_backup_frequency_title
 import moneysurfer.feature.settings.generated.resources.settings_backup_hero_supporting
 import moneysurfer.feature.settings.generated.resources.settings_backup_hero_title
+import moneysurfer.feature.settings.generated.resources.settings_backup_import_passphrase_body
+import moneysurfer.feature.settings.generated.resources.settings_backup_import_passphrase_confirm
+import moneysurfer.feature.settings.generated.resources.settings_backup_import_passphrase_label
+import moneysurfer.feature.settings.generated.resources.settings_backup_import_passphrase_title
 import moneysurfer.feature.settings.generated.resources.settings_backup_location_pill
 import moneysurfer.feature.settings.generated.resources.settings_backup_location_title
 import moneysurfer.feature.settings.generated.resources.settings_backup_notice_corrupted
@@ -51,7 +66,9 @@ import moneysurfer.feature.settings.generated.resources.settings_backup_notice_f
 import moneysurfer.feature.settings.generated.resources.settings_backup_notice_generic
 import moneysurfer.feature.settings.generated.resources.settings_backup_notice_invalid_archive
 import moneysurfer.feature.settings.generated.resources.settings_backup_notice_missing_file
+import moneysurfer.feature.settings.generated.resources.settings_backup_notice_passphrase_required
 import moneysurfer.feature.settings.generated.resources.settings_backup_notice_schema_mismatch
+import moneysurfer.feature.settings.generated.resources.settings_backup_notice_wrong_passphrase
 import moneysurfer.feature.settings.generated.resources.settings_backup_restore_confirm_body
 import moneysurfer.feature.settings.generated.resources.settings_backup_restore_confirm_confirm
 import moneysurfer.feature.settings.generated.resources.settings_backup_restore_confirm_title
@@ -120,6 +137,10 @@ private fun noticeText(notice: BackupNotice): String? = when (notice) {
     BackupNotice.Cancelled -> null
     BackupNotice.InvalidArchive -> stringResource(Res.string.settings_backup_notice_invalid_archive)
     BackupNotice.Corrupted -> stringResource(Res.string.settings_backup_notice_corrupted)
+    BackupNotice.PassphraseRequired ->
+        stringResource(Res.string.settings_backup_notice_passphrase_required)
+    BackupNotice.WrongPassphrase ->
+        stringResource(Res.string.settings_backup_notice_wrong_passphrase)
     BackupNotice.Generic -> stringResource(Res.string.settings_backup_notice_generic)
     is BackupNotice.MissingFile ->
         stringResource(Res.string.settings_backup_notice_missing_file, notice.name)
@@ -145,6 +166,18 @@ private fun BackupContent(
         RestoreBackupDialog(
             onConfirm = { onEvent(BackupEvent.OnRestoreConfirmed) },
             onDismiss = { onEvent(BackupEvent.OnRestoreDismissed) },
+        )
+    }
+    if (state.showExportOptions) {
+        ExportBackupDialog(
+            onConfirm = { passphrase -> onEvent(BackupEvent.OnExportOptionsConfirmed(passphrase)) },
+            onDismiss = { onEvent(BackupEvent.OnExportOptionsDismissed) },
+        )
+    }
+    if (state.showImportPassphrase) {
+        ImportPassphraseDialog(
+            onConfirm = { passphrase -> onEvent(BackupEvent.OnImportPassphraseSubmitted(passphrase)) },
+            onDismiss = { onEvent(BackupEvent.OnImportPassphraseDismissed) },
         )
     }
 
@@ -232,6 +265,117 @@ private fun BackupContent(
         }
         Spacer(Modifier.height(padding.calculateBottomPadding() + 32.dp))
     }
+}
+
+/**
+ * Pre-export options: warns that a plain export is readable by anyone holding
+ * the file, and offers an optional passphrase (with confirmation to guard
+ * against a typo locking the user out of their own backup).
+ */
+@Composable
+private fun ExportBackupDialog(
+    onConfirm: (String?) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    var passphrase by remember { mutableStateOf("") }
+    var confirmation by remember { mutableStateOf("") }
+    val mismatch = passphrase.isNotEmpty() && confirmation != passphrase
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(Res.string.settings_backup_download_title)) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Text(stringResource(Res.string.settings_backup_export_warning))
+                OutlinedTextField(
+                    value = passphrase,
+                    onValueChange = { passphrase = it },
+                    label = { Text(stringResource(Res.string.settings_backup_export_passphrase_label)) },
+                    singleLine = true,
+                    visualTransformation = PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                )
+                if (passphrase.isNotEmpty()) {
+                    OutlinedTextField(
+                        value = confirmation,
+                        onValueChange = { confirmation = it },
+                        label = {
+                            Text(
+                                stringResource(
+                                    Res.string.settings_backup_export_passphrase_confirm_label,
+                                ),
+                            )
+                        },
+                        singleLine = true,
+                        visualTransformation = PasswordVisualTransformation(),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                        isError = mismatch,
+                        supportingText = {
+                            if (mismatch) {
+                                Text(
+                                    stringResource(
+                                        Res.string.settings_backup_export_passphrase_mismatch,
+                                    ),
+                                )
+                            }
+                        },
+                    )
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(
+                enabled = !mismatch,
+                onClick = { onConfirm(passphrase.takeIf { it.isNotEmpty() }) },
+            ) {
+                Text(stringResource(Res.string.settings_backup_export_confirm))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(Res.string.settings_backup_cancel))
+            }
+        },
+    )
+}
+
+@Composable
+private fun ImportPassphraseDialog(
+    onConfirm: (String) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    var passphrase by remember { mutableStateOf("") }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(Res.string.settings_backup_import_passphrase_title)) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Text(stringResource(Res.string.settings_backup_import_passphrase_body))
+                OutlinedTextField(
+                    value = passphrase,
+                    onValueChange = { passphrase = it },
+                    label = { Text(stringResource(Res.string.settings_backup_import_passphrase_label)) },
+                    singleLine = true,
+                    visualTransformation = PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(
+                enabled = passphrase.isNotEmpty(),
+                onClick = { onConfirm(passphrase) },
+            ) {
+                Text(stringResource(Res.string.settings_backup_import_passphrase_confirm))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(Res.string.settings_backup_cancel))
+            }
+        },
+    )
 }
 
 @Composable
