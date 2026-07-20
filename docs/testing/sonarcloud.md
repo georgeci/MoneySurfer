@@ -2,7 +2,7 @@
 
 <!-- DOCS:TOC -->
 ## Contents
-- [SonarCloud + coverage publishing](#sonarcloud-coverage-publishing)
+- [SonarCloud + coverage publishing](#sonarcloud--coverage-publishing)
 - [What runs in CI](#what-runs-in-ci)
 - [Source discovery (KMP layout)](#source-discovery-kmp-layout)
 - [Required setup (one-time)](#required-setup-one-time)

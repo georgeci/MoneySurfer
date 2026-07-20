@@ -2,22 +2,22 @@
 
 <!-- DOCS:TOC -->
 ## Contents
-- [Sync v2 — Outbox](#sync-v2-outbox)
+- [Sync v2 — Outbox](#sync-v2--outbox)
 - [TL;DR for agents](#tldr-for-agents)
 - [Rules](#rules)
 - [Why an outbox](#why-an-outbox)
 - [Files](#files)
 - [Schema](#schema)
 - [PendingMutationQueue interface](#pendingmutationqueue-interface)
-- [OutboxEnqueuer — the dual-write helper](#outboxenqueuer-the-dual-write-helper)
+- [OutboxEnqueuer — the dual-write helper](#outboxenqueuer--the-dual-write-helper)
   - [Atomicity caveat](#atomicity-caveat)
-- [Drain cycle — UploadPendingChangesUseCaseImpl](#drain-cycle-uploadpendingchangesusecaseimpl)
-  - [pushOne — entity-type dispatch](#pushone-entity-type-dispatch)
-- [Demo + version gate at the entry](#demo-version-gate-at-the-entry)
+- [Drain cycle — UploadPendingChangesUseCaseImpl](#drain-cycle--uploadpendingchangesusecaseimpl)
+  - [pushOne — entity-type dispatch](#pushone--entity-type-dispatch)
+- [Demo + version gate at the entry](#demo--version-gate-at-the-entry)
 - [Lifecycle interactions](#lifecycle-interactions)
 - [What "scope" means for the outbox today](#what-scope-means-for-the-outbox-today)
 - [What's not (yet) in the outbox](#whats-not-yet-in-the-outbox)
-- [Mental model — write path summary](#mental-model-write-path-summary)
+- [Mental model — write path summary](#mental-model--write-path-summary)
 <!-- DOCS:END -->
 
 ## TL;DR for agents

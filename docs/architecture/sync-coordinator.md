@@ -2,7 +2,7 @@
 
 <!-- DOCS:TOC -->
 ## Contents
-- [Sync v2 — Coordinator](#sync-v2-coordinator)
+- [Sync v2 — Coordinator](#sync-v2--coordinator)
 - [TL;DR for agents](#tldr-for-agents)
 - [Rules](#rules)
 - [Public surface](#public-surface)
@@ -11,7 +11,7 @@
 - [Lifecycle of a single sync run](#lifecycle-of-a-single-sync-run)
 - [Cancel tokens](#cancel-tokens)
 - [State emission](#state-emission)
-- [Lifetime — ApplicationScope](#lifetime-applicationscope)
+- [Lifetime — ApplicationScope](#lifetime--applicationscope)
 - [Scope mapping](#scope-mapping)
 - [Telemetry hooks](#telemetry-hooks)
 <!-- DOCS:END -->

@@ -2,16 +2,16 @@
 
 <!-- DOCS:TOC -->
 ## Contents
-- [Sync v2 — Pull, LWW, Tombstones](#sync-v2-pull-lww-tombstones)
+- [Sync v2 — Pull, LWW, Tombstones](#sync-v2--pull-lww-tombstones)
 - [TL;DR for agents](#tldr-for-agents)
 - [Rules](#rules)
 - [Cursor-based incremental pull](#cursor-based-incremental-pull)
 - [Collections in scope](#collections-in-scope)
 - [Apply per doc](#apply-per-doc)
-  - [Members — special-case userId stub](#members-special-case-userid-stub)
+  - [Members — special-case userId stub](#members--special-case-userid-stub)
 - [LWW conflict resolver](#lww-conflict-resolver)
 - [Outbox bypass](#outbox-bypass)
-- [Cursor + apply atomicity](#cursor-apply-atomicity)
+- [Cursor + apply atomicity](#cursor--apply-atomicity)
 - [Tombstones (soft delete)](#tombstones-soft-delete)
 - [WorkspaceInvite](#workspaceinvite)
 - [SyncMetaRepository](#syncmetarepository)

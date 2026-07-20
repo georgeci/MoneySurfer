@@ -7,7 +7,7 @@
 - [Common Commands](#common-commands)
 - [QA Entry Points](#qa-entry-points)
   - [Offline golden-path E2E](#offline-golden-path-e2e)
-- [Test tags (Compose ↔ Maestro)](#test-tags-compose-maestro)
+- [Test tags (Compose ↔ Maestro)](#test-tags-compose--maestro)
 - [Rules](#rules)
 <!-- DOCS:END -->
 

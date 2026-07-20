@@ -2,7 +2,7 @@
 
 <!-- DOCS:TOC -->
 ## Contents
-- [Sync v2 — Known Gaps and Divergences](#sync-v2-known-gaps-and-divergences)
+- [Sync v2 — Known Gaps and Divergences](#sync-v2--known-gaps-and-divergences)
 - [TL;DR for agents](#tldr-for-agents)
 - [Rules](#rules)
 - [Outbox](#outbox)
@@ -10,7 +10,7 @@
 - [Conflict resolver](#conflict-resolver)
 - [Network](#network)
 - [Background scheduler](#background-scheduler)
-- [Recalc / projections](#recalc-projections)
+- [Recalc / projections](#recalc--projections)
 - [Demo migration](#demo-migration)
 - [Telemetry](#telemetry)
 - [Persistence of lastOutcome](#persistence-of-lastoutcome)
@@ -78,7 +78,7 @@ a reviewer.
   end of the loop in a separate DAO call. At-least-once apply works only
   because LWW tie-breaking is `TakeLocal`. If a future resolver introduces
   side effects, this contract has to tighten — see
-  [sync-pull-lww.md](sync-pull-lww.md#cursor-apply-atomicity).
+  [sync-pull-lww.md](sync-pull-lww.md#cursor--apply-atomicity).
 - **Tombstone retention / GC not implemented.**
   Push-side soft delete shipped: `MutationOperation.DELETE` writes a
   `TombstonePatch` (`deletedAt` + `updatedAt` + `clientVersionCode`)

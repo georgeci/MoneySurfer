@@ -5,7 +5,7 @@
 - [Context](#context)
 - [Phasing](#phasing)
 - [A. Code changes (outside the workflow)](#a-code-changes-outside-the-workflow)
-  - [A1. composeApp/build.gradle.kts — sync Desktop version](#a1-composeappbuildgradlekts-sync-desktop-version)
+  - [A1. composeApp/build.gradle.kts — sync Desktop version](#a1-composeappbuildgradlekts--sync-desktop-version)
   - [A2. iosApp/ExportOptions.plist (new)](#a2-iosappexportoptionsplist-new)
   - [A3. secretOrEnv (androidApp/build.gradle.kts:137-140)](#a3-secretorenv-androidappbuildgradlekts137-140)
 - [B. .github/workflows/release.yml (new)](#b-githubworkflowsreleaseyml-new)

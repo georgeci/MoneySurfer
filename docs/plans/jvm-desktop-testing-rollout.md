@@ -1,3 +1,14 @@
+
+<!-- DOCS:TOC -->
+## Contents
+- [JVM desktop testing — compose.uiTest spike + rollout roadmap](#jvm-desktop-testing--composeuitest-spike--rollout-roadmap)
+- [Chosen approach](#chosen-approach)
+- [Roadmap](#roadmap)
+- [Spike details (step 1)](#spike-details-step-1)
+- [Known limitations (accepted)](#known-limitations-accepted)
+- [Out of scope](#out-of-scope)
+<!-- DOCS:END -->
+
 ---
 title: JVM desktop testing — compose.uiTest spike + rollout roadmap
 created: 2026-07-15

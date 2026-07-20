@@ -29,6 +29,7 @@ jobs:
     timeout-minutes: 2
     outputs:
       code: ${{ steps.gate.outputs.code }}
+      docs: ${{ steps.gate.outputs.docs }}
     steps:
       - name: Checkout
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
@@ -37,6 +38,24 @@ jobs:
       - name: Filter paths
         id: gate
         uses: ./.github/actions/paths-gate
+
+  # Validates AI:SECTION markers, the generated docs/AI_INDEX.md, TOC anchors,
+  # and local markdown links (issue #193 — `main` went red with nothing in CI
+  # noticing). Deliberately gated on the `docs` filter, NOT on `code`: docs-only
+  # PRs are exactly the ones `code` excludes, so this check must not hide
+  # behind it. Stdlib-only Python, runs in about a second.
+  docs-check:
+    name: Docs check (docs_tool)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    needs: changes
+    if: needs.changes.outputs.docs == 'true' || github.event_name == 'workflow_dispatch'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+
+      - name: Run docs_tool check
+        run: python3 scripts/docs_tool.py check
 
   junit:
     name: JUnit + Allure

@@ -2,10 +2,10 @@
 
 <!-- DOCS:TOC -->
 ## Contents
-- [CI egress hardening — harden-runner + secret scanning](#ci-egress-hardening-harden-runner-secret-scanning)
+- [CI egress hardening — harden-runner + secret scanning](#ci-egress-hardening--harden-runner--secret-scanning)
 - [1. step-security/harden-runner (egress audit)](#1-step-securityharden-runner-egress-audit)
-  - [Rollout: audit → block](#rollout-audit-block)
-- [2. Secret scanning + push protection (manual — repo settings)](#2-secret-scanning-push-protection-manual-repo-settings)
+  - [Rollout: audit → block](#rollout-audit--block)
+- [2. Secret scanning + push protection (manual — repo settings)](#2-secret-scanning--push-protection-manual--repo-settings)
 <!-- DOCS:END -->
 
 Tracks [#180](https://github.com/georgeci/MoneySurfer/issues/180). Follow-up to
