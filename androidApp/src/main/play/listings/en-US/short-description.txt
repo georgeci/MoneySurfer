@@ -1,0 +1,1 @@
+Personal finance tracker with budgets, goals, shared workspaces, and cloud sync.

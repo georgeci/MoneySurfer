@@ -118,4 +118,7 @@ sealed interface Route : NavKey {
 
     @Serializable
     data object SettingsAbout : Route
+
+    @Serializable
+    data object SettingsLicenses : Route
 }

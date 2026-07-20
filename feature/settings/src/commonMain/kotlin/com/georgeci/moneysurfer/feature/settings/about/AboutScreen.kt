@@ -31,6 +31,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
+import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsChevron
+import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsGroup
+import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsRow
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
@@ -39,9 +42,18 @@ import moneysurfer.feature.settings.generated.resources.Res
 import moneysurfer.feature.settings.generated.resources.settings_about_brand
 import moneysurfer.feature.settings.generated.resources.settings_about_chip_license
 import moneysurfer.feature.settings.generated.resources.settings_about_chip_made_by
+import moneysurfer.feature.settings.generated.resources.settings_about_contact_supporting
+import moneysurfer.feature.settings.generated.resources.settings_about_contact_title
 import moneysurfer.feature.settings.generated.resources.settings_about_copyright
 import moneysurfer.feature.settings.generated.resources.settings_about_github_supporting
 import moneysurfer.feature.settings.generated.resources.settings_about_github_title
+import moneysurfer.feature.settings.generated.resources.settings_about_licenses_supporting
+import moneysurfer.feature.settings.generated.resources.settings_about_licenses_title
+import moneysurfer.feature.settings.generated.resources.settings_about_privacy_supporting
+import moneysurfer.feature.settings.generated.resources.settings_about_privacy_title
+import moneysurfer.feature.settings.generated.resources.settings_about_section_help
+import moneysurfer.feature.settings.generated.resources.settings_about_section_legal
+import moneysurfer.feature.settings.generated.resources.settings_about_terms_title
 import moneysurfer.feature.settings.generated.resources.settings_about_title
 import moneysurfer.feature.settings.generated.resources.settings_about_version_format
 import moneysurfer.uikit.generated.resources.uikit_app_icon
@@ -53,6 +65,7 @@ import moneysurfer.uikit.generated.resources.Res as UikitRes
 @Composable
 fun AboutScreen(
     onNavigateBack: () -> Unit,
+    onNavigateToLicenses: () -> Unit,
     viewModel: AboutViewModel = koinViewModel(),
 ) {
     val state by viewModel.collectAsStateWithLifecycle()
@@ -62,10 +75,10 @@ fun AboutScreen(
         when (effect) {
             AboutEffect.NavigateBack -> onNavigateBack()
             is AboutEffect.OpenUrl -> uriHandler.openUri(effect.url)
-            is AboutEffect.OpenEmail,
+            is AboutEffect.OpenEmail -> uriHandler.openUri("mailto:${effect.address}")
+            AboutEffect.NavigateToLicenses -> onNavigateToLicenses()
             AboutEffect.OpenStoreListing,
             AboutEffect.OpenRegionPicker,
-            AboutEffect.NavigateToLicenses,
             AboutEffect.NavigateToDiagnostic,
             -> Unit
         }
@@ -102,6 +115,41 @@ private fun AboutContent(
             AppIdentityHero(version = state.appVersion)
 
             GitHubLinkRow(onClick = { onEvent(AboutEvent.OnGitHubClick) })
+
+            Spacer(Modifier.height(20.dp))
+
+            SurferSettingsGroup(title = stringResource(Res.string.settings_about_section_legal)) {
+                SurferSettingsRow(
+                    icon = SurferIcons.Receipt,
+                    title = stringResource(Res.string.settings_about_terms_title),
+                    onClick = { onEvent(AboutEvent.OnTermsClick) },
+                    trailing = { SurferSettingsChevron() },
+                )
+                SurferSettingsRow(
+                    icon = SurferIcons.Shield,
+                    title = stringResource(Res.string.settings_about_privacy_title),
+                    supportingText = stringResource(Res.string.settings_about_privacy_supporting),
+                    onClick = { onEvent(AboutEvent.OnPrivacyClick) },
+                    trailing = { SurferSettingsChevron() },
+                )
+                SurferSettingsRow(
+                    icon = SurferIcons.Code,
+                    title = stringResource(Res.string.settings_about_licenses_title),
+                    supportingText = stringResource(Res.string.settings_about_licenses_supporting),
+                    onClick = { onEvent(AboutEvent.OnLicensesClick) },
+                    trailing = { SurferSettingsChevron() },
+                )
+            }
+
+            SurferSettingsGroup(title = stringResource(Res.string.settings_about_section_help)) {
+                SurferSettingsRow(
+                    icon = SurferIcons.Mail,
+                    title = stringResource(Res.string.settings_about_contact_title),
+                    supportingText = stringResource(Res.string.settings_about_contact_supporting),
+                    onClick = { onEvent(AboutEvent.OnContactClick) },
+                    trailing = { SurferSettingsChevron() },
+                )
+            }
 
             Spacer(Modifier.height(8.dp))
             Text(
