@@ -118,4 +118,8 @@ sealed interface Route : NavKey {
 
     @Serializable
     data object SettingsAbout : Route
+
+    /** Online-only user-account deletion flow (issue #213). */
+    @Serializable
+    data object SettingsDeleteAccount : Route
 }

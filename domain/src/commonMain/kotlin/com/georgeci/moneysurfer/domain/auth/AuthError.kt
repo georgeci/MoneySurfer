@@ -22,6 +22,12 @@ data class AuthError(
          * after the rules / membership are corrected.
          */
         PermissionDenied,
+
+        /**
+         * The provider refused a destructive call (account deletion) because the session's
+         * last sign-in is too old — a fresh re-authentication is required first.
+         */
+        RequiresRecentLogin,
         Unknown,
     }
 }

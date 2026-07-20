@@ -43,6 +43,7 @@ import moneysurfer.feature.settings.generated.resources.settings_change_workspac
 import moneysurfer.feature.settings.generated.resources.settings_change_workspace_supporting
 import moneysurfer.feature.settings.generated.resources.settings_csv_supporting
 import moneysurfer.feature.settings.generated.resources.settings_csv_title
+import moneysurfer.feature.settings.generated.resources.settings_delete_account
 import moneysurfer.feature.settings.generated.resources.settings_finish_setup
 import moneysurfer.feature.settings.generated.resources.settings_finish_setup_supporting
 import moneysurfer.feature.settings.generated.resources.settings_logout
@@ -67,8 +68,8 @@ import org.koin.compose.viewmodel.koinViewModel
 /**
  * Stable selectors for the Settings screen — see docs/testing/testing-strategy.md.
  *
- * [SyncRow] and [LogoutRow] are never composed in the offline build; their absence
- * is what the offline golden Maestro flow asserts via `notVisible`.
+ * [SyncRow], [LogoutRow] and [DeleteAccountRow] are never composed in the offline build;
+ * their absence is what the offline golden Maestro flow asserts via `notVisible`.
  */
 object SettingsTestTags {
     const val Root = "settings:root"
@@ -78,6 +79,7 @@ object SettingsTestTags {
     const val SyncRow = "settings:syncRow"
     const val CsvRow = "settings:csvRow"
     const val LogoutRow = "settings:logoutRow"
+    const val DeleteAccountRow = "settings:deleteAccountRow"
 }
 
 @Composable
@@ -94,6 +96,7 @@ fun SettingsScreen(
     onNavigateToBackup: () -> Unit,
     onNavigateToCsvBackup: () -> Unit,
     onNavigateToAbout: () -> Unit,
+    onNavigateToDeleteAccount: () -> Unit,
     viewModel: SettingsViewModel = koinViewModel(),
 ) {
     val state by viewModel.collectAsStateWithLifecycle()
@@ -112,6 +115,7 @@ fun SettingsScreen(
             SettingsEffect.NavigateToBackup -> onNavigateToBackup()
             SettingsEffect.NavigateToCsvBackup -> onNavigateToCsvBackup()
             SettingsEffect.NavigateToAbout -> onNavigateToAbout()
+            SettingsEffect.NavigateToDeleteAccount -> onNavigateToDeleteAccount()
         }
     }
 
@@ -280,6 +284,19 @@ private fun SettingsContent(
                         danger = true,
                         onClick = { onEvent(SettingsEvent.OnLogoutClick) },
                         modifier = Modifier.testTag(SettingsTestTags.LogoutRow),
+                    )
+                }
+            }
+
+            if (state.showDeleteAccount) {
+                Spacer(Modifier.height(8.dp))
+                Box(modifier = Modifier.padding(horizontal = 16.dp)) {
+                    SurferSettingsRow(
+                        icon = SurferIcons.Delete,
+                        title = stringResource(Res.string.settings_delete_account),
+                        danger = true,
+                        onClick = { onEvent(SettingsEvent.OnDeleteAccountClick) },
+                        modifier = Modifier.testTag(SettingsTestTags.DeleteAccountRow),
                     )
                 }
             }

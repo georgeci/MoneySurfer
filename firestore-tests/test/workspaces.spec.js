@@ -129,8 +129,20 @@ describe('workspaces/{wid}', () => {
     );
   });
 
-  it('hard-delete is denied (soft-delete via deletedAt update only)', async () => {
+  // Hard-delete is owner-only — the account-deletion purge path (issue #213).
+  // Regular flows still soft-delete via a `deletedAt` update.
+  it('owner can hard-delete the workspace doc (account-deletion purge)', async () => {
     const db = authedAs(env, OWNER, { email: 'owner@example.com' });
+    await assertSucceeds(deleteDoc(doc(db, `workspaces/${WID}`)));
+  });
+
+  it('non-owner member cannot hard-delete the workspace doc', async () => {
+    const db = authedAs(env, MEMBER, { email: 'member@example.com' });
+    await assertFails(deleteDoc(doc(db, `workspaces/${WID}`)));
+  });
+
+  it('stranger cannot hard-delete the workspace doc', async () => {
+    const db = authedAs(env, STRANGER, { email: 'stranger@example.com' });
     await assertFails(deleteDoc(doc(db, `workspaces/${WID}`)));
   });
 

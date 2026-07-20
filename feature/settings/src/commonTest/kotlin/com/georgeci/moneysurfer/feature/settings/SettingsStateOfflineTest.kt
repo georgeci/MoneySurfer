@@ -26,6 +26,7 @@ class SettingsStateOfflineTest {
         assertTrue(state.showLogout)
         assertTrue(state.showWorkspaceMembers)
         assertTrue(state.showPendingInvites)
+        assertTrue(state.showDeleteAccount)
     }
 
     @Test
@@ -55,5 +56,6 @@ class SettingsStateOfflineTest {
         assertFalse(state.showLogout, "offline build has no auth session to log out of")
         assertFalse(state.showWorkspaceMembers, "members rely on remote membership data")
         assertFalse(state.showPendingInvites, "incoming invites flow needs the remote backend")
+        assertFalse(state.showDeleteAccount, "offline build has no remote account to delete")
     }
 }

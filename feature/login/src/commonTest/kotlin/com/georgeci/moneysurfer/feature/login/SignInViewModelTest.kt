@@ -116,4 +116,6 @@ private object StubAuthRemoteRepository : AuthRemoteRepository {
     override suspend fun createUserWithEmail(email: String, password: String) = error(UNUSED)
     override suspend fun signInAnonymously() = error(UNUSED)
     override suspend fun signOut() = error(UNUSED)
+    override suspend fun reauthenticateWithEmail(email: String, password: String) = error(UNUSED)
+    override suspend fun deleteCurrentUser() = error(UNUSED)
 }

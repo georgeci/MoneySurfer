@@ -29,4 +29,16 @@ interface AuthRemoteRepository {
 
     /** Signs the active session out. No-op if there is no active session. */
     suspend fun signOut(): Either<AuthError, Unit>
+
+    /**
+     * Refreshes the current session's credential with the email/password provider. Required
+     * before destructive operations ([deleteCurrentUser]) when the last sign-in is not recent.
+     */
+    suspend fun reauthenticateWithEmail(email: String, password: String): Either<AuthError, Unit>
+
+    /**
+     * Permanently deletes the current Firebase Auth user. Fails with
+     * [AuthError.Type.RequiresRecentLogin] when the provider demands a fresh credential first.
+     */
+    suspend fun deleteCurrentUser(): Either<AuthError, Unit>
 }

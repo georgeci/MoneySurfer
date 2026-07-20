@@ -115,7 +115,11 @@ describe('userEmails/{email}', () => {
     );
   });
 
-  it('hard-delete is denied', async () => {
+  // Delete is allowed only when the stored uid is the caller's own — the
+  // account-deletion cleanup path (issue #213). Gate is the stored uid, not the
+  // email claim, so a user whose auth email changed can still clean up the old
+  // mapping.
+  it('user can delete the mapping pointing at their own uid', async () => {
     await withAdmin(env, async (db) => {
       await setDoc(doc(db, 'userEmails/known@example.com'), {
         uid: 'known-uid',
@@ -123,6 +127,17 @@ describe('userEmails/{email}', () => {
       });
     });
     const db = authedAs(env, 'known-uid', { email: 'known@example.com' });
+    await assertSucceeds(deleteDoc(doc(db, 'userEmails/known@example.com')));
+  });
+
+  it('user cannot delete a mapping pointing at another uid', async () => {
+    await withAdmin(env, async (db) => {
+      await setDoc(doc(db, 'userEmails/known@example.com'), {
+        uid: 'known-uid',
+        updatedAt: 0,
+      });
+    });
+    const db = authedAs(env, 'other-uid', { email: 'other@example.com' });
     await assertFails(deleteDoc(doc(db, 'userEmails/known@example.com')));
   });
 });

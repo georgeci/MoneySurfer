@@ -468,8 +468,14 @@ describe('invites — update / delete', () => {
     );
   });
 
-  it('hard-delete is denied for everyone (including owner)', async () => {
+  // Hard-delete is owner-only — the account-deletion purge path (issue #213).
+  it('owner can hard-delete an invite (account-deletion purge)', async () => {
     const db = authedAs(env, OWNER, { email: 'owner@example.com' });
+    await assertSucceeds(deleteDoc(doc(db, `workspaces/${WID}/invites/inv-1`)));
+  });
+
+  it('non-owner cannot hard-delete an invite', async () => {
+    const db = authedAs(env, INVITEE, { email: INVITEE_EMAIL });
     await assertFails(deleteDoc(doc(db, `workspaces/${WID}/invites/inv-1`)));
   });
 });

@@ -78,6 +78,7 @@ private val savedStateConfig = SavedStateConfiguration {
             subclass(Route.SettingsSync::class, Route.SettingsSync.serializer())
             subclass(Route.SettingsBackup::class, Route.SettingsBackup.serializer())
             subclass(Route.SettingsAbout::class, Route.SettingsAbout.serializer())
+            subclass(Route.SettingsDeleteAccount::class, Route.SettingsDeleteAccount.serializer())
         }
     }
 }

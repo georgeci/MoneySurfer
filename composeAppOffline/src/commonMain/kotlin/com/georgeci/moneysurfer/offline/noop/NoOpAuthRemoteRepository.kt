@@ -26,6 +26,12 @@ class NoOpAuthRemoteRepository : AuthRemoteRepository {
     override suspend fun signOut(): Either<AuthError, Unit> =
         AuthError(AuthError.Type.Unknown, "Auth disabled in offline build").left()
 
+    override suspend fun reauthenticateWithEmail(email: String, password: String): Either<AuthError, Unit> =
+        AuthError(AuthError.Type.Unknown, "Auth disabled in offline build").left()
+
+    override suspend fun deleteCurrentUser(): Either<AuthError, Unit> =
+        AuthError(AuthError.Type.Unknown, "Auth disabled in offline build").left()
+
     private fun unsupported(): Either<AuthError, String> =
         AuthError(AuthError.Type.Unknown, "Auth disabled in offline build").left()
 }

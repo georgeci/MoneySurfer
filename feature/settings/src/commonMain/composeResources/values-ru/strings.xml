@@ -266,4 +266,29 @@
     <string name="settings_about_copyright">© 2026 Георгий Балабайчкин. Распространяется по лицензии MIT.\nMoneySurfer — приложение с открытым исходным кодом для учёта личных финансов, не банк и не платёжный сервис.</string>
     <string name="settings_categories_title">Категории</string>
     <string name="settings_categories_supporting">Управление категориями расходов и доходов</string>
+
+    <!-- Удаление аккаунта пользователя (issue #213) — формулировки синхронизированы со
+         страницей georgeci.github.io/account-deletion.html. -->
+    <string name="settings_delete_account">Удалить аккаунт</string>
+    <string name="settings_delete_account_title">Удаление аккаунта</string>
+    <string name="settings_delete_account_intro">Аккаунт Money Surfer и облачные данные будут удалены навсегда. Это действие нельзя отменить.</string>
+    <string name="settings_delete_account_deleted_section">Что будет удалено</string>
+    <string name="settings_delete_account_deleted_workspaces">Личные пространства со всеми счетами, операциями, категориями и бюджетами</string>
+    <string name="settings_delete_account_deleted_memberships">Ваше участие в совместных пространствах</string>
+    <string name="settings_delete_account_deleted_sync">Данные синхронизации и учётные данные для входа</string>
+    <string name="settings_delete_account_kept_section">Что останется</string>
+    <string name="settings_delete_account_kept_shared">Записи, созданные вами в совместных пространствах, останутся видимыми остальным участникам</string>
+    <string name="settings_delete_account_kept_local">Данные на других устройствах хранятся локально, пока приложение там не удалено</string>
+    <string name="settings_delete_account_password_label">Подтвердите пароль</string>
+    <string name="settings_delete_account_password_missing">Введите пароль, чтобы продолжить</string>
+    <string name="settings_delete_account_button">Удалить мой аккаунт</string>
+    <string name="settings_delete_account_confirm_title">Удалить аккаунт?</string>
+    <string name="settings_delete_account_confirm_message">Аккаунт и облачные данные будут удалены навсегда. Это действие нельзя отменить.</string>
+    <string name="settings_delete_account_confirm_confirm">Удалить навсегда</string>
+    <string name="settings_delete_account_confirm_cancel">Отмена</string>
+    <string name="settings_delete_account_notice_wrong_password">Неверный пароль</string>
+    <string name="settings_delete_account_notice_recent_login">В целях безопасности выйдите из аккаунта, войдите снова и повторите попытку</string>
+    <string name="settings_delete_account_notice_cleanup_failed">Не удалось удалить облачные данные. Проверьте подключение и попробуйте ещё раз</string>
+    <string name="settings_delete_account_notice_auth_failed">Данные удалены, но учётную запись не удалось удалить. Попробуйте ещё раз</string>
+    <string name="settings_delete_account_notice_generic">Не удалось удалить аккаунт. Попробуйте ещё раз</string>
 </resources>

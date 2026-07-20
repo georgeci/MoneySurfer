@@ -149,6 +149,7 @@ class SettingsViewModel(
         SettingsEvent.OnBackupClick -> SettingsEffect.NavigateToBackup
         SettingsEvent.OnCsvBackupClick -> SettingsEffect.NavigateToCsvBackup
         SettingsEvent.OnAboutClick -> SettingsEffect.NavigateToAbout
+        SettingsEvent.OnDeleteAccountClick -> SettingsEffect.NavigateToDeleteAccount
         SettingsEvent.OnMembersClick, SettingsEvent.OnLogoutClick -> null
     }
 
@@ -173,6 +174,9 @@ data class SettingsState(
     val showProfile: Boolean get() = !isOffline
     val showSyncSection: Boolean get() = !isOffline && syncEnabled
     val showLogout: Boolean get() = !isOffline
+
+    /** Account deletion targets the remote account — offline builds have none (issue #213). */
+    val showDeleteAccount: Boolean get() = !isOffline
     val showWorkspaceMembers: Boolean get() = !isOffline
     val showPendingInvites: Boolean get() = !isOffline
 
@@ -194,6 +198,7 @@ sealed interface SettingsEvent {
     data object OnCsvBackupClick : SettingsEvent
     data object OnAboutClick : SettingsEvent
     data object OnLogoutClick : SettingsEvent
+    data object OnDeleteAccountClick : SettingsEvent
 }
 
 sealed interface SettingsEffect {
@@ -209,4 +214,5 @@ sealed interface SettingsEffect {
     data object NavigateToBackup : SettingsEffect
     data object NavigateToCsvBackup : SettingsEffect
     data object NavigateToAbout : SettingsEffect
+    data object NavigateToDeleteAccount : SettingsEffect
 }
