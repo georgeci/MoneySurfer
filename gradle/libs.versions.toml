@@ -54,6 +54,7 @@ cpd = "3.5"
 moduleGraph = "0.13.0"
 easylauncher = "6.4.0"
 play-publisher = "4.0.0"
+aboutlibraries = "15.0.4"
 
 [libraries]
 androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "coreSplashscreen" }
@@ -195,3 +196,4 @@ cpd = { id = "de.aaschmid.cpd", version.ref = "cpd" }
 kmpApp = { id = "kmp.app" }
 moduleGraph = { id = "dev.iurysouza.modulegraph", version.ref = "moduleGraph" }
 easylauncher = { id = "com.starter.easylauncher", version.ref = "easylauncher" }
+aboutlibraries = { id = "com.mikepenz.aboutlibraries.plugin", version.ref = "aboutlibraries" }

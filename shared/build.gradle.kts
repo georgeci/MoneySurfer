@@ -9,6 +9,20 @@ plugins {
     alias(libs.plugins.koin.compiler)
     alias(libs.plugins.kotest.multiplatform)
     alias(libs.plugins.kmp.lib)
+    alias(libs.plugins.aboutlibraries)
+}
+
+// OSS-licenses metadata for the Settings → About → Open-source licenses screen.
+// `shared` sees the full common dependency graph, so the export runs here; the
+// JSON lands in feature:settings resources where the Licenses screen reads it.
+// Regenerate with: ./gradlew :shared:exportLibraryDefinitions
+aboutLibraries {
+    export {
+        outputFile = file(
+            "../feature/settings/src/commonMain/composeResources/files/aboutlibraries.json",
+        )
+        excludeFields.addAll("funding", "scm")
+    }
 }
 
 kotlin {
