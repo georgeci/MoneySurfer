@@ -3,6 +3,7 @@ package com.georgeci.moneysurfer.feature.settings
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.navigation3.ListDetailSceneStrategy
 import com.georgeci.moneysurfer.feature.settings.about.AboutScreen
+import com.georgeci.moneysurfer.feature.settings.about.licenses.LicensesScreen
 import com.georgeci.moneysurfer.feature.settings.account.DeleteUserAccountScreen
 import com.georgeci.moneysurfer.feature.settings.appearance.AppearanceScreen
 import com.georgeci.moneysurfer.feature.settings.backup.BackupScreen
@@ -72,7 +73,16 @@ val settingsNavGraph: FeatureNavGraph = { navigator ->
     entry<Route.SettingsAbout>(
         metadata = ListDetailSceneStrategy.detailPane(),
     ) {
-        AboutScreen(onNavigateBack = { navigator.pop() })
+        AboutScreen(
+            onNavigateBack = { navigator.pop() },
+            onNavigateToLicenses = { navigator.push(Route.SettingsLicenses) },
+        )
+    }
+
+    entry<Route.SettingsLicenses>(
+        metadata = ListDetailSceneStrategy.detailPane(),
+    ) {
+        LicensesScreen(onNavigateBack = { navigator.pop() })
     }
 
     entry<Route.SettingsDeleteAccount>(

@@ -25,7 +25,6 @@
     <string name="sign_in_error_unknown">Sign-in failed</string>
     <string name="sign_in_error_permission_denied">You don't have access. Please retry or contact support.</string>
     <string name="sign_in_terms">By continuing you agree to the Terms &amp; Privacy.</string>
-    <!-- TODO(#65): plain-language Terms/Privacy text — final wording pending legal review before public release. -->
     <string name="legal_title">Terms &amp; Privacy</string>
     <string name="legal_terms_heading">Terms of Use</string>
     <string name="legal_terms_body">MoneySurfer is a personal and household budgeting tool provided to you as-is, without warranties of any kind. By using the app you agree to these terms.\n\nYou are responsible for the accuracy of every account, transaction, and budget you enter. MoneySurfer does not verify your data and is not a substitute for professional financial, tax, or legal advice.\n\nThe app is intended for lawful personal use only. You may not use it to store unlawful content or to infringe the rights of others.\n\nMoneySurfer is provided free of charge and may change or stop working at any time. We are not liable for any loss arising from using, or being unable to use, the app, including loss of data stored on your device.\n\nThese terms may be updated in future releases. Continuing to use the app after an update means you accept the revised terms.</string>

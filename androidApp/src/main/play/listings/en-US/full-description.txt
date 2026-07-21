@@ -1,0 +1,22 @@
+Money Surfer is a personal finance app for tracking expenses, income, accounts, budgets, and savings goals — on your own or together with your family.
+
+Sign in to sync your data across devices and share a workspace with the people you manage money with. Invite family members, assign roles, and keep a single view of your shared finances.
+
+Key features:
+
+Track income and expenses
+Manage multiple accounts
+Organize transactions by categories
+Create budgets
+Set savings goals
+Sync across devices with cloud backup
+Share workspaces with family members
+Invite members and manage their roles
+Export your transactions to CSV
+
+Your financial data is entered by you and synced securely to the cloud so it is available on every device you sign in on. We do not sell your personal or financial data.
+
+Prefer to keep everything on the device? Try Money Surfer Offline — the fully local version with no account and no network access.
+
+Money Surfer is open source: https://github.com/georgeci/MoneySurfer
+Privacy policy: https://georgeci.github.io/privacy-policy.html

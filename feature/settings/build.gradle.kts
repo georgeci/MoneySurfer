@@ -26,6 +26,7 @@ kotlin {
                 implementation(libs.kotlin.stdlib)
                 implementation(libs.kotlinx.datetime)
                 implementation(libs.kotlinx.serialization.core)
+                implementation(libs.kotlinx.serialization.json)
                 implementation(libs.bundles.feature.compose)
                 implementation(libs.compose.material3.adaptive.navigation3)
                 implementation(libs.bundles.feature.nav3)
