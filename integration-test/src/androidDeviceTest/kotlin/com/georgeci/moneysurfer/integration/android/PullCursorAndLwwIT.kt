@@ -96,9 +96,12 @@ class PullCursorAndLwwIT {
         val firstOk = withClue("first pull should succeed") {
             firstPull.shouldBeInstanceOf<Either.Right<PullSummary>>()
         }
-        // Members(1) + Invites(0) + Accounts(1) + Categories(1) + Transactions(1) = 4 applied.
+        // Workspace root(1) + Members(1) + Invites(0) + Accounts(1) + Categories(1) +
+        // Transactions(1) = 5 applied. The workspace root doc is applied on every pull
+        // (see [WORKSPACE_ROOT_DOCS_PER_PULL]); the four subcollection rows are the
+        // first-pull delta.
         withClue("first pull applied count: ${firstOk.value}") {
-            firstOk.value.downloadedCount shouldBe 4
+            firstOk.value.downloadedCount shouldBe WORKSPACE_ROOT_DOCS_PER_PULL + 4
         }
         withClue("no conflicts on first pull: ${firstOk.value}") {
             firstOk.value.conflictCount shouldBe 0
@@ -148,7 +151,8 @@ class PullCursorAndLwwIT {
         }
 
         // ── Second pull ─────────────────────────────────────────────────────
-        // Cursor sits at seedUpdatedAt; `WHERE updatedAt > cursor` matches nothing.
+        // Every subcollection cursor sits at seedUpdatedAt; `WHERE updatedAt > cursor`
+        // matches nothing. Only the always-applied workspace root doc is re-counted.
         val secondPull = harness.pullRemoteChanges(
             scope = SyncScope.ActiveWorkspace,
             onProgress = {},
@@ -157,8 +161,8 @@ class PullCursorAndLwwIT {
         val secondOk = withClue("second pull should succeed") {
             secondPull.shouldBeInstanceOf<Either.Right<PullSummary>>()
         }
-        withClue("cursor blocks already-seen docs: ${secondOk.value}") {
-            secondOk.value.downloadedCount shouldBe 0
+        withClue("cursor blocks already-seen subcollection docs; only the workspace root re-counts: ${secondOk.value}") {
+            secondOk.value.downloadedCount shouldBe WORKSPACE_ROOT_DOCS_PER_PULL
         }
         withClue("no conflicts on idle re-pull: ${secondOk.value}") {
             secondOk.value.conflictCount shouldBe 0

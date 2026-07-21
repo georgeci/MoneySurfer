@@ -49,38 +49,48 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
-private val savedStateConfig = SavedStateConfiguration {
-    serializersModule = SerializersModule {
-        polymorphic(NavKey::class) {
-            subclass(Route.SignIn::class, Route.SignIn.serializer())
-            subclass(Route.WorkspaceSelector::class, Route.WorkspaceSelector.serializer())
-            subclass(Route.WorkspaceCreation::class, Route.WorkspaceCreation.serializer())
-            subclass(Route.WorkspaceMembers::class, Route.WorkspaceMembers.serializer())
-            subclass(Route.WorkspaceManage::class, Route.WorkspaceManage.serializer())
-            subclass(Route.WorkspaceInvite::class, Route.WorkspaceInvite.serializer())
-            subclass(Route.WorkspaceMemberActions::class, Route.WorkspaceMemberActions.serializer())
-            subclass(Route.IncomingInvites::class, Route.IncomingInvites.serializer())
-            subclass(Route.FirstRunCurrency::class, Route.FirstRunCurrency.serializer())
-            subclass(Route.Dashboard::class, Route.Dashboard.serializer())
-            subclass(Route.AccountCreation::class, Route.AccountCreation.serializer())
-            subclass(Route.AccountsManage::class, Route.AccountsManage.serializer())
-            subclass(Route.CategoryCreation::class, Route.CategoryCreation.serializer())
-            subclass(Route.CategoriesManage::class, Route.CategoriesManage.serializer())
-            subclass(Route.CategoryChooser::class, Route.CategoryChooser.serializer())
-            subclass(Route.AccountChooser::class, Route.AccountChooser.serializer())
-            subclass(Route.TransactionsByAccount::class, Route.TransactionsByAccount.serializer())
-            subclass(Route.TransactionCreation::class, Route.TransactionCreation.serializer())
-            subclass(Route.AccountDetails::class, Route.AccountDetails.serializer())
-            subclass(Route.TransactionDetails::class, Route.TransactionDetails.serializer())
-            subclass(Route.Settings::class, Route.Settings.serializer())
-            subclass(Route.SettingsAppearance::class, Route.SettingsAppearance.serializer())
-            subclass(Route.SettingsPreferences::class, Route.SettingsPreferences.serializer())
-            subclass(Route.SettingsSync::class, Route.SettingsSync.serializer())
-            subclass(Route.SettingsBackup::class, Route.SettingsBackup.serializer())
-            subclass(Route.SettingsAbout::class, Route.SettingsAbout.serializer())
-            subclass(Route.SettingsDeleteAccount::class, Route.SettingsDeleteAccount.serializer())
-        }
+/**
+ * Polymorphic registry for every [Route] that can appear in a saved back stack. Missing an entry
+ * here silently breaks saved-state restoration for that route (serializer-not-found at restore
+ * time), so [com.georgeci.moneysurfer.navigation.RouteSerializerRegistryTest] guards it against
+ * drift from [Route].
+ */
+internal val navKeySerializersModule = SerializersModule {
+    polymorphic(NavKey::class) {
+        subclass(Route.SignIn::class, Route.SignIn.serializer())
+        subclass(Route.Legal::class, Route.Legal.serializer())
+        subclass(Route.WorkspaceSelector::class, Route.WorkspaceSelector.serializer())
+        subclass(Route.WorkspaceCreation::class, Route.WorkspaceCreation.serializer())
+        subclass(Route.WorkspaceMembers::class, Route.WorkspaceMembers.serializer())
+        subclass(Route.WorkspaceManage::class, Route.WorkspaceManage.serializer())
+        subclass(Route.WorkspaceInvite::class, Route.WorkspaceInvite.serializer())
+        subclass(Route.WorkspaceMemberActions::class, Route.WorkspaceMemberActions.serializer())
+        subclass(Route.IncomingInvites::class, Route.IncomingInvites.serializer())
+        subclass(Route.FirstRunCurrency::class, Route.FirstRunCurrency.serializer())
+        subclass(Route.Dashboard::class, Route.Dashboard.serializer())
+        subclass(Route.AccountCreation::class, Route.AccountCreation.serializer())
+        subclass(Route.AccountsManage::class, Route.AccountsManage.serializer())
+        subclass(Route.CategoryCreation::class, Route.CategoryCreation.serializer())
+        subclass(Route.CategoriesManage::class, Route.CategoriesManage.serializer())
+        subclass(Route.CategoryChooser::class, Route.CategoryChooser.serializer())
+        subclass(Route.AccountChooser::class, Route.AccountChooser.serializer())
+        subclass(Route.TransactionsByAccount::class, Route.TransactionsByAccount.serializer())
+        subclass(Route.TransactionCreation::class, Route.TransactionCreation.serializer())
+        subclass(Route.AccountDetails::class, Route.AccountDetails.serializer())
+        subclass(Route.TransactionDetails::class, Route.TransactionDetails.serializer())
+        subclass(Route.Settings::class, Route.Settings.serializer())
+        subclass(Route.SettingsAppearance::class, Route.SettingsAppearance.serializer())
+        subclass(Route.SettingsPreferences::class, Route.SettingsPreferences.serializer())
+        subclass(Route.SettingsSync::class, Route.SettingsSync.serializer())
+        subclass(Route.SettingsBackup::class, Route.SettingsBackup.serializer())
+        subclass(Route.SettingsCsv::class, Route.SettingsCsv.serializer())
+        subclass(Route.SettingsAbout::class, Route.SettingsAbout.serializer())
+        subclass(Route.SettingsDeleteAccount::class, Route.SettingsDeleteAccount.serializer())
     }
+}
+
+private val savedStateConfig = SavedStateConfiguration {
+    serializersModule = navKeySerializersModule
 }
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3AdaptiveApi::class)

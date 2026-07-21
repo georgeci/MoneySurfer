@@ -18,11 +18,21 @@ import dev.gitlive.firebase.firestore.firestore
  *  - Emulator host is `10.0.2.2` (AVD's view of the developer host machine).
  *  - Default ports: Firestore `8080`, Auth `9099`. Match `firebase.json` →
  *    `emulators.firestore.port` / `emulators.auth.port`.
- *  - When [appName] is `null` (default), uses the *default* `FirebaseApp`.
- *    When non-null, initialises (or reuses) a *named* `FirebaseApp` so two
- *    `EmulatorEnv` instances in the same process can host independent
- *    Firestore + Auth clients — required for multi-client convergence tests
- *    where each side needs its own auth session.
+ *  - A *named* `FirebaseApp` is always used — never the default one. When
+ *    [appName] is `null` a shared [DEFAULT_APP_NAME] is used; when non-null that
+ *    exact name is used so two `EmulatorEnv` instances in the same process can
+ *    host independent Firestore + Auth clients — required for multi-client
+ *    convergence tests where each side needs its own auth session.
+ *
+ *    Why never the default app: initialising the *default* `FirebaseApp` eagerly
+ *    runs `FirebaseApp.initializeAllApis()`, which pulls in Crashlytics and
+ *    throws `IllegalStateException: The Crashlytics build ID is missing` in the
+ *    instrumentation build (the Crashlytics SDK is on the classpath but its
+ *    Gradle plugin — which injects the build-id resource — is not). That threw
+ *    from `EmulatorEnv.<init>` in every `@Before` that re-initialised the default
+ *    app after a prior test's `delete()`, failing the harness before any
+ *    assertion ran. Named/secondary apps skip `initializeAllApis`, so they never
+ *    touch Crashlytics.
  *  - `useEmulator()` MUST be called before the first SDK operation. A second
  *    call is a no-op once the SDK has locked the endpoint, so re-construction
  *    inside the same process tolerates re-init.
@@ -31,12 +41,18 @@ import dev.gitlive.firebase.firestore.firestore
  * needed, [delete] in `@After` so the next test gets a clean Firebase state.
  */
 class EmulatorEnv(
-    private val appName: String? = null,
+    appName: String? = null,
     firestoreHost: String = "10.0.2.2",
     firestorePort: Int = 8080,
     authHost: String = "10.0.2.2",
     authPort: Int = 9099,
 ) {
+    /**
+     * The FirebaseApp name to use. Always non-null (never the default app) so
+     * `initializeAllApis()`/Crashlytics is never triggered — see the class kdoc.
+     */
+    private val effectiveAppName: String = appName ?: DEFAULT_APP_NAME
+
     private val nativeApp: FirebaseApp = run {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val options = FirebaseOptions.Builder()
@@ -44,16 +60,8 @@ class EmulatorEnv(
             .setProjectId(EMULATOR_PROJECT_ID)
             .setApiKey("emulator-api-key") // ditto
             .build()
-        if (appName == null) {
-            runCatching { FirebaseApp.getInstance() }.getOrNull()
-                ?: FirebaseApp.initializeApp(context, options)
-        } else {
-            // Local val captures the smart-cast — the compiler won't propagate
-            // a non-null smart-cast on a constructor-property through a closure.
-            val name = appName
-            runCatching { FirebaseApp.getInstance(name) }.getOrNull()
-                ?: FirebaseApp.initializeApp(context, options, name)
-        }
+        runCatching { FirebaseApp.getInstance(effectiveAppName) }.getOrNull()
+            ?: FirebaseApp.initializeApp(context, options, effectiveAppName)
     }
 
     /**
@@ -62,13 +70,7 @@ class EmulatorEnv(
      * close in `@After`) and the gitlive wrapper for `Firebase.firestore(app)`
      * / `Firebase.auth(app)` accessor lookup.
      */
-    private val gitliveApp: dev.gitlive.firebase.FirebaseApp = run {
-        // Local val so the smart-cast to non-null reaches the call site —
-        // the compiler doesn't propagate a smart-cast through a property's
-        // backing field into a sibling property's initializer.
-        val name = appName
-        if (name == null) Firebase.app else Firebase.app(name)
-    }
+    private val gitliveApp: dev.gitlive.firebase.FirebaseApp = Firebase.app(effectiveAppName)
 
     val firestore: FirebaseFirestore = run {
         // Disable offline persistence so every read/write goes to the emulator server
@@ -107,5 +109,9 @@ class EmulatorEnv(
         // `firestore-tests/package.json` — we share the same demo id so a single
         // emulator process can serve both Mocha and androidDeviceTest suites).
         const val EMULATOR_PROJECT_ID = "demo-moneysurfer"
+
+        // Shared name for the single-client harness's FirebaseApp. Any non-default
+        // name works; multi-client tests pass their own per-side names instead.
+        const val DEFAULT_APP_NAME = "it-default"
     }
 }

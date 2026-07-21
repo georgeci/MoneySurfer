@@ -228,7 +228,23 @@ def insert_toc(path: Path) -> bool:
     toc = render_toc(without)
 
     insert_at = 0
-    if lines and lines[0].startswith("# "):
+    if lines and lines[0] == "---":
+        # Leading YAML frontmatter: place the TOC after the closing fence so
+        # frontmatter parsing/rendering is preserved.
+        for idx in range(1, len(lines)):
+            if lines[idx] == "---":
+                insert_at = idx + 1
+                break
+        # Keep the blank lines after the frontmatter, then step past a leading
+        # level-1 heading if one follows so the TOC sits under it.
+        heading_at = insert_at
+        while heading_at < len(lines) and lines[heading_at] == "":
+            heading_at += 1
+        if heading_at < len(lines) and lines[heading_at].startswith("# "):
+            insert_at = heading_at + 1
+        while insert_at < len(lines) and lines[insert_at] == "":
+            del lines[insert_at]
+    elif lines and lines[0].startswith("# "):
         insert_at = 1
         while insert_at < len(lines) and lines[insert_at] == "":
             del lines[insert_at]

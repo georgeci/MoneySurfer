@@ -159,8 +159,10 @@ class MultiClientConflictIT {
         val peerPullOk = withClue("peer pull succeeds") {
             peerPull.shouldBeInstanceOf<Either.Right<PullSummary>>()
         }
-        withClue("peer pulls own echo and TakeLocal — nothing applied: ${peerPullOk.value}") {
-            peerPullOk.value.downloadedCount shouldBe 0
+        // The account echo is TakeLocal (equal ts → local wins, not applied). Only the
+        // always-applied workspace root doc is counted — see [WORKSPACE_ROOT_DOCS_PER_PULL].
+        withClue("peer echo: account TakeLocal (not applied), only workspace root counts: ${peerPullOk.value}") {
+            peerPullOk.value.downloadedCount shouldBe WORKSPACE_ROOT_DOCS_PER_PULL
         }
         withClue("TakeLocal counts as a (no-op) conflict: ${peerPullOk.value}") {
             peerPullOk.value.conflictCount shouldBeGreaterThanOrEqual 1
@@ -317,8 +319,10 @@ class MultiClientConflictIT {
         val firstOk = withClue("peer first pull") {
             firstPull.shouldBeInstanceOf<Either.Right<PullSummary>>()
         }
-        withClue("TakeLocal does not apply remote: ${firstOk.value}") {
-            firstOk.value.downloadedCount shouldBe 0
+        // Account is TakeLocal (equal ts → not applied). Only the always-applied
+        // workspace root doc is counted — see [WORKSPACE_ROOT_DOCS_PER_PULL].
+        withClue("TakeLocal does not apply the account; only workspace root counts: ${firstOk.value}") {
+            firstOk.value.downloadedCount shouldBe WORKSPACE_ROOT_DOCS_PER_PULL
         }
         withClue("TakeLocal counts as conflict: ${firstOk.value}") {
             firstOk.value.conflictCount shouldBeGreaterThanOrEqual 1
@@ -340,7 +344,11 @@ class MultiClientConflictIT {
         val secondOk = withClue("peer second pull") {
             secondPull.shouldBeInstanceOf<Either.Right<PullSummary>>()
         }
-        withClue("stable: nothing changes on re-pull") { secondOk.value.downloadedCount shouldBe 0 }
+        // Account cursor is at sharedTs → no account delta on re-pull. The workspace root
+        // doc is still re-applied and counted (see [WORKSPACE_ROOT_DOCS_PER_PULL]).
+        withClue("stable: no subcollection delta, only workspace root re-counts: ${secondOk.value}") {
+            secondOk.value.downloadedCount shouldBe WORKSPACE_ROOT_DOCS_PER_PULL
+        }
         withClue("stable: no second-round conflict") { secondOk.value.conflictCount shouldBe 0 }
         withClue("peer content unchanged across re-pulls") {
             peerHarness.database.accountDao().getById(ctx.accountId)!!.name shouldBe "peer-eq"
