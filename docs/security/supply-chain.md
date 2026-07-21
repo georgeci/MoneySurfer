@@ -73,6 +73,24 @@ If CI ever fails on a lock mismatch after a legitimate upgrade, that is the
 control working: regenerate, commit, and the diff shows exactly which transitive
 versions moved.
 
+### Dependabot PRs always need this
+
+Dependabot edits `gradle/libs.versions.toml` and nothing else, so **every**
+Gradle PR it opens arrives red — the lock state still pins the old versions and
+the build stops with `Dependency version enforced by Dependency Locking`. This
+is expected, not a broken bump.
+
+To fix one, dispatch the [`Relock dependencies`](../../.github/workflows/relock.yml)
+workflow with the PR number (Actions → Relock dependencies → Run workflow). It
+rebases the branch onto `main`, runs `resolveAndLockAll` on a `macos-15` runner,
+and force-pushes the regenerated lockfiles back to the dependabot branch.
+
+It is dispatch-only on purpose. `resolveAndLockAll` configures the whole build,
+which means it *executes* the plugin versions the PR proposes; running that
+automatically under `pull_request_target` would hand a write-scoped
+`GITHUB_TOKEN` to code that arrived with the bump — the exact hole the lock
+state exists to close. A human reads the version diff first, then dispatches.
+
 ## Why skiko / compose.desktop are excluded from the lock state
 
 `compose.desktop.currentOs` (used in `:composeApp` `jvmMain`) resolves Compose's

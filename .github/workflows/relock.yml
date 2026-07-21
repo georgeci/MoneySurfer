@@ -1,0 +1,116 @@
+name: Relock dependencies
+
+# Every Gradle dependency bump shifts resolved versions, and the committed
+# `*.lockfile`s (see docs/security/supply-chain.md) then reject the build with
+# "Dependency version enforced by Dependency Locking". Dependabot only edits
+# gradle/libs.versions.toml, so *every* Gradle PR it opens is red on arrival.
+# This workflow regenerates the lock state on top of such a PR and pushes the
+# result back to its branch.
+#
+# Deliberately `workflow_dispatch` only — NOT an automatic trigger on
+# dependabot PRs. `resolveAndLockAll` resolves and configures the whole build,
+# which executes the very plugin versions the PR proposes. Wiring that to
+# `pull_request_target` would hand a write-scoped GITHUB_TOKEN to code that
+# arrived with the bump, which is exactly the supply-chain hole the lockfiles
+# exist to close. A human reviews the version diff, then dispatches this.
+#
+# Runs on macOS on purpose: a Linux-only run omits the `ios*` klib entries and
+# produces a lockfile that fails the macOS lanes.
+
+on:
+  workflow_dispatch:
+    inputs:
+      pr:
+        description: "PR number to regenerate lockfiles on"
+        required: true
+        type: string
+      rebase:
+        description: "Rebase the branch onto main before relocking"
+        required: false
+        default: true
+        type: boolean
+
+concurrency:
+  group: relock-${{ inputs.pr }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  pull-requests: read
+
+jobs:
+  relock:
+    name: Regenerate lockfiles
+    runs-on: macos-15
+    timeout-minutes: 60
+
+    steps:
+      # Egress audit — see docs/security/ci-egress-hardening.md (issue #180).
+      - name: Harden the runner (egress audit)
+        uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920 # v2.20.0
+        with:
+          egress-policy: audit
+
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          fetch-depth: 0
+
+      # `gh pr checkout` resolves the head ref for us and, unlike a raw
+      # refs/pull/N/head fetch, leaves a branch that can be pushed back.
+      # PR_NUMBER goes through the environment, never interpolated into the
+      # script body: a `${{ }}` expression is pasted in before the shell runs,
+      # so a crafted dispatch input would execute as code (Sonar S7630).
+      - name: Check out the PR branch
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ inputs.pr }}
+        run: |
+          gh pr checkout "$PR_NUMBER"
+          git log --oneline -1
+
+      - name: Rebase onto main
+        if: inputs.rebase
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rebase origin/main
+
+      - name: Set up JDK
+        uses: actions/setup-java@0f481fcb613427c0f801b606911222b5b6f3083a # v5.5.0
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@3f131e8634966bd73d06cc69884922b02e6faf92 # v6.2.0
+
+      # resolveAndLockAll touches the native configurations, so the Kotlin/Native
+      # toolchain gets pulled here the same way the iOS lane pulls it.
+      - name: Cache Kotlin/Native (~/.konan)
+        uses: ./.github/actions/konan-cache
+
+      # --no-configuration-cache is required: --write-locks mutates resolution
+      # state that the configuration cache refuses to serialize.
+      - name: Regenerate lockfiles
+        run: ./gradlew resolveAndLockAll --write-locks --no-configuration-cache
+
+      - name: Commit and push
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ inputs.pr }}
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          if git diff --quiet -- '*.lockfile'; then
+            echo "::notice::Lock state already matches the manifest — nothing to push."
+            exit 0
+          fi
+
+          git add '*.lockfile'
+          git commit -m "build(deps): regenerate Gradle lockfiles for #${PR_NUMBER}"
+
+          # Rebasing rewrites the dependabot commit, so the push is a
+          # force-with-lease against the branch we just checked out.
+          git push --force-with-lease origin "HEAD:$(git rev-parse --abbrev-ref HEAD)"
