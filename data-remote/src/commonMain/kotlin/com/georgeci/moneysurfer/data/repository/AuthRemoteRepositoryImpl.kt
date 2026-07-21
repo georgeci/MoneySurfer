@@ -58,7 +58,7 @@ private fun Throwable.toAuthError(): AuthError {
 
 // FIRAuth error-code names that all mean "the supplied credentials don't match a
 // user" — spelled identically to Android's FirebaseAuthException.getErrorCode().
-private val InvalidCredentialErrorCodes = listOf(
+private val INVALID_CREDENTIAL_ERROR_CODES = listOf(
     "ERROR_USER_NOT_FOUND",
     "ERROR_WRONG_PASSWORD",
     "ERROR_INVALID_CREDENTIAL",
@@ -75,7 +75,7 @@ private val InvalidCredentialErrorCodes = listOf(
 internal fun classifyAuthErrorByMessage(message: String?): AuthError.Type? {
     if (message == null) return null
     return when {
-        InvalidCredentialErrorCodes.any { message.contains(it, ignoreCase = true) } ->
+        INVALID_CREDENTIAL_ERROR_CODES.any { message.contains(it, ignoreCase = true) } ->
             AuthError.Type.InvalidCredentials
         message.contains("ERROR_EMAIL_ALREADY_IN_USE", ignoreCase = true) ->
             AuthError.Type.EmailAlreadyInUse
