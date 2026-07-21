@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > AuthRemoteRepository</title>
+  <title>MoneySurfer Coverage Report > SessionShutdownGate</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.repositories</a>
 </div>
 
-<h1>Coverage Summary for Class: AuthRemoteRepository (com.georgeci.moneysurfer.domain.repositories)</h1>
+<h1>Coverage Summary for Class: SessionShutdownGate (com.georgeci.moneysurfer.domain.repositories)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">AuthRemoteRepository</td>
+  <td class="name">SessionShutdownGate</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -46,35 +46,17 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.repositories
 &nbsp;
-&nbsp;import arrow.core.Either
-&nbsp;import com.georgeci.moneysurfer.domain.auth.AuthError
-&nbsp;
 &nbsp;/**
-&nbsp; * Auth-provider gateway. The data-layer implementation wraps Firebase Auth and classifies
-&nbsp; * provider-specific exceptions into [AuthError.Type] before crossing the module boundary, so
-&nbsp; * the domain stays free of any third-party auth SDK types.
+&nbsp; * Tears down everything that should not survive across logout: in-flight
+&nbsp; * sync, queued sync, scheduled background runs.
+&nbsp; *
+&nbsp; * Lives in `:domain` so use cases (e.g. `LogoutUseCase`) can call it
+&nbsp; * without taking a direct dependency on `:sync`. Implementation lives in
+&nbsp; * `:data` and delegates to `SyncCoordinator.cancelAll()` plus
+&nbsp; * `BackgroundSyncScheduler.cancelAll()`.
 &nbsp; */
-&nbsp;interface AuthRemoteRepository {
-&nbsp;    /** Returns the uid of the already-signed-in user, or null when no session is active. */
-&nbsp;    fun currentUid(): String?
-&nbsp;
-&nbsp;    /** Returns current user&#39;s email, or null if unavailable (for example anonymous session). */
-&nbsp;    fun currentEmail(): String?
-&nbsp;
-&nbsp;    /** True when current Firebase session is anonymous. */
-&nbsp;    fun isCurrentUserAnonymous(): Boolean
-&nbsp;
-&nbsp;    /** Sign in with the email/password provider. Returns the resulting uid. */
-&nbsp;    suspend fun signInWithEmail(email: String, password: String): Either&lt;AuthError, String&gt;
-&nbsp;
-&nbsp;    /** Create a new account via the email/password provider. Returns the resulting uid. */
-&nbsp;    suspend fun createUserWithEmail(email: String, password: String): Either&lt;AuthError, String&gt;
-&nbsp;
-&nbsp;    /** Anonymous sign-in for &quot;guest&quot; mode. Idempotent: returns the existing uid if any. */
-&nbsp;    suspend fun signInAnonymously(): Either&lt;AuthError, String&gt;
-&nbsp;
-&nbsp;    /** Signs the active session out. No-op if there is no active session. */
-&nbsp;    suspend fun signOut(): Either&lt;AuthError, Unit&gt;
+&nbsp;interface SessionShutdownGate {
+&nbsp;    suspend fun shutdown()
 &nbsp;}
 </code>
 </pre>
@@ -99,7 +81,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-21 15:21</div>
+    <div style="float:right;">generated on 2026-07-21 15:55</div>
 </div>
 </body>
 </html>

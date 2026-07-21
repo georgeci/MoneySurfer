@@ -1,0 +1,122 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>MoneySurfer Coverage Report > AppVersionGateImplKt</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.georgeci.moneysurfer.data.repository</a>
+</div>
+
+<h1>Coverage Summary for Class: AppVersionGateImplKt (com.georgeci.moneysurfer.data.repository)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+</tr>
+<tr>
+  <td class="name">AppVersionGateImplKt</td>
+    <td class="coverageStat"/>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.repository
+&nbsp;
+&nbsp;import com.georgeci.moneysurfer.domain.AppInfo
+&nbsp;import com.georgeci.moneysurfer.domain.model.AppVersionStatus
+&nbsp;import com.georgeci.moneysurfer.domain.model.RemoteAppConfig
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.AppConfigRepository
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.AppVersionGate
+&nbsp;import kotlinx.coroutines.flow.MutableStateFlow
+&nbsp;import kotlinx.coroutines.flow.StateFlow
+&nbsp;import kotlinx.coroutines.flow.asStateFlow
+&nbsp;import org.koin.core.annotation.Single
+&nbsp;
+&nbsp;private const val DEFAULT_UNSUPPORTED_MESSAGE: String =
+&nbsp;    &quot;This app version is no longer supported. Please update.&quot;
+&nbsp;
+&nbsp;@Single(binds = [AppVersionGate::class])
+&nbsp;class AppVersionGateImpl(
+&nbsp;    private val appConfigRepository: AppConfigRepository,
+&nbsp;    private val appInfo: AppInfo,
+&nbsp;) : AppVersionGate {
+&nbsp;
+&nbsp;    private val _status = MutableStateFlow&lt;AppVersionStatus?&gt;(null)
+&nbsp;    override val status: StateFlow&lt;AppVersionStatus?&gt; = _status.asStateFlow()
+&nbsp;
+&nbsp;    override suspend fun refresh(): AppVersionStatus {
+&nbsp;        val config = appConfigRepository.fetch()
+&nbsp;        val resolved = if (config == null) AppVersionStatus.Supported else evaluate(config)
+&nbsp;        _status.value = resolved
+&nbsp;        return resolved
+&nbsp;    }
+&nbsp;
+&nbsp;    override fun isSyncAllowed(): Boolean = when (status.value) {
+&nbsp;        null,
+&nbsp;        AppVersionStatus.Supported,
+&nbsp;        is AppVersionStatus.UpdateAvailable,
+&nbsp;        -&gt; true
+&nbsp;        is AppVersionStatus.Unsupported -&gt; false
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun evaluate(config: RemoteAppConfig): AppVersionStatus = when {
+&nbsp;        appInfo.versionCode &lt; config.minSupportedAppVersionCode || config.forceUpdate -&gt;
+&nbsp;            AppVersionStatus.Unsupported(
+&nbsp;                message = config.message ?: DEFAULT_UNSUPPORTED_MESSAGE,
+&nbsp;            )
+&nbsp;        appInfo.versionCode &lt; config.latestAppVersionCode -&gt;
+&nbsp;            AppVersionStatus.UpdateAvailable(message = config.message)
+&nbsp;        else -&gt; AppVersionStatus.Supported
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-07-21 15:55</div>
+</div>
+</body>
+</html>

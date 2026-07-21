@@ -71,6 +71,14 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
     (0/8)
   </span>
 </td>
@@ -79,15 +87,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/7)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/31)
+    (0/36)
   </span>
 </td>
 </tr>
@@ -104,9 +104,11 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import arrow.core.Either
 &nbsp;import com.georgeci.moneysurfer.domain.auth.AuthError
 &nbsp;import com.georgeci.moneysurfer.domain.repositories.AuthRemoteRepository
+&nbsp;import dev.gitlive.firebase.auth.EmailAuthProvider
 &nbsp;import dev.gitlive.firebase.auth.FirebaseAuth
 &nbsp;import dev.gitlive.firebase.auth.FirebaseAuthInvalidCredentialsException
 &nbsp;import dev.gitlive.firebase.auth.FirebaseAuthInvalidUserException
+&nbsp;import dev.gitlive.firebase.auth.FirebaseAuthRecentLoginRequiredException
 &nbsp;import dev.gitlive.firebase.auth.FirebaseAuthUserCollisionException
 &nbsp;import dev.gitlive.firebase.auth.FirebaseAuthWeakPasswordException
 &nbsp;import org.koin.core.annotation.Single
@@ -136,11 +138,24 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;
 &nbsp;    override suspend fun signOut(): Either&lt;AuthError, Unit&gt; =
 &nbsp;        Either.catch { auth.signOut() }.mapLeft { it.toAuthError() }
+&nbsp;
+&nbsp;    override suspend fun reauthenticateWithEmail(email: String, password: String): Either&lt;AuthError, Unit&gt; =
+&nbsp;        Either.catch {
+&nbsp;            val user = auth.currentUser ?: error(&quot;No active session to re-authenticate&quot;)
+&nbsp;            user.reauthenticate(EmailAuthProvider.credential(email.trim(), password))
+&nbsp;        }.mapLeft { it.toAuthError() }
+&nbsp;
+&nbsp;    override suspend fun deleteCurrentUser(): Either&lt;AuthError, Unit&gt; =
+&nbsp;        Either.catch {
+&nbsp;            val user = auth.currentUser ?: error(&quot;No active session to delete&quot;)
+&nbsp;            user.delete()
+&nbsp;        }.mapLeft { it.toAuthError() }
 &nbsp;}
 &nbsp;
 &nbsp;/** Classify Firebase auth exceptions into the typed [AuthError.Type] domain enum. */
 &nbsp;private fun Throwable.toAuthError(): AuthError {
 <b class="nc">&nbsp;    val type = when (this) {</b>
+<b class="nc">&nbsp;        is FirebaseAuthRecentLoginRequiredException -&gt; AuthError.Type.RequiresRecentLogin</b>
 <b class="nc">&nbsp;        is FirebaseAuthWeakPasswordException -&gt; AuthError.Type.WeakPassword</b>
 <b class="nc">&nbsp;        is FirebaseAuthUserCollisionException -&gt; AuthError.Type.EmailAlreadyInUse</b>
 <b class="nc">&nbsp;        is FirebaseAuthInvalidCredentialsException -&gt; AuthError.Type.InvalidCredentials</b>
@@ -172,7 +187,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-21 15:21</div>
+    <div style="float:right;">generated on 2026-07-21 15:55</div>
 </div>
 </body>
 </html>

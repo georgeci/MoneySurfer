@@ -52,7 +52,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/8)
+    (0/10)
   </span>
 </td>
 <td class="coverageStat">
@@ -60,7 +60,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/12)
+    (0/16)
   </span>
 </td>
 <td class="coverageStat">
@@ -68,7 +68,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/12)
+    (0/20)
   </span>
 </td>
 <td class="coverageStat">
@@ -76,12 +76,20 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/181)
+    (0/278)
   </span>
 </td>
 </tr>
   <tr>
     <td class="name">AuthRemoteRepositoryImpl$createUserWithEmail$1</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">AuthRemoteRepositoryImpl$deleteCurrentUser$1</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">AuthRemoteRepositoryImpl$reauthenticateWithEmail$1</td>
     <td class="coverageStat"/>
   </tr>
   <tr>
@@ -103,7 +111,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/8)
+    (0/10)
   </span>
 </td>
 <td class="coverageStat">
@@ -111,7 +119,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/12)
+    (0/16)
   </span>
 </td>
 <td class="coverageStat">
@@ -119,7 +127,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/12)
+    (0/20)
   </span>
 </td>
 <td class="coverageStat">
@@ -127,7 +135,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/181)
+    (0/278)
   </span>
 </td>
 </tr>
@@ -143,9 +151,11 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import arrow.core.Either
 &nbsp;import com.georgeci.moneysurfer.domain.auth.AuthError
 &nbsp;import com.georgeci.moneysurfer.domain.repositories.AuthRemoteRepository
+&nbsp;import dev.gitlive.firebase.auth.EmailAuthProvider
 &nbsp;import dev.gitlive.firebase.auth.FirebaseAuth
 &nbsp;import dev.gitlive.firebase.auth.FirebaseAuthInvalidCredentialsException
 &nbsp;import dev.gitlive.firebase.auth.FirebaseAuthInvalidUserException
+&nbsp;import dev.gitlive.firebase.auth.FirebaseAuthRecentLoginRequiredException
 &nbsp;import dev.gitlive.firebase.auth.FirebaseAuthUserCollisionException
 &nbsp;import dev.gitlive.firebase.auth.FirebaseAuthWeakPasswordException
 &nbsp;import org.koin.core.annotation.Single
@@ -175,11 +185,24 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;
 &nbsp;    override suspend fun signOut(): Either&lt;AuthError, Unit&gt; =
 <b class="nc">&nbsp;        Either.catch { auth.signOut() }.mapLeft { it.toAuthError() }</b>
+&nbsp;
+&nbsp;    override suspend fun reauthenticateWithEmail(email: String, password: String): Either&lt;AuthError, Unit&gt; =
+<b class="nc">&nbsp;        Either.catch {</b>
+<b class="nc">&nbsp;            val user = auth.currentUser ?: error(&quot;No active session to re-authenticate&quot;)</b>
+<b class="nc">&nbsp;            user.reauthenticate(EmailAuthProvider.credential(email.trim(), password))</b>
+<b class="nc">&nbsp;        }.mapLeft { it.toAuthError() }</b>
+&nbsp;
+&nbsp;    override suspend fun deleteCurrentUser(): Either&lt;AuthError, Unit&gt; =
+<b class="nc">&nbsp;        Either.catch {</b>
+<b class="nc">&nbsp;            val user = auth.currentUser ?: error(&quot;No active session to delete&quot;)</b>
+<b class="nc">&nbsp;            user.delete()</b>
+<b class="nc">&nbsp;        }.mapLeft { it.toAuthError() }</b>
 &nbsp;}
 &nbsp;
 &nbsp;/** Classify Firebase auth exceptions into the typed [AuthError.Type] domain enum. */
 &nbsp;private fun Throwable.toAuthError(): AuthError {
 &nbsp;    val type = when (this) {
+&nbsp;        is FirebaseAuthRecentLoginRequiredException -&gt; AuthError.Type.RequiresRecentLogin
 &nbsp;        is FirebaseAuthWeakPasswordException -&gt; AuthError.Type.WeakPassword
 &nbsp;        is FirebaseAuthUserCollisionException -&gt; AuthError.Type.EmailAlreadyInUse
 &nbsp;        is FirebaseAuthInvalidCredentialsException -&gt; AuthError.Type.InvalidCredentials
@@ -211,7 +234,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-21 15:21</div>
+    <div style="float:right;">generated on 2026-07-21 15:55</div>
 </div>
 </body>
 </html>

@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > GetAccountByIdUseCase</title>
+  <title>MoneySurfer Coverage Report > EditCategoryUseCase</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.usecase</a>
 </div>
 
-<h1>Coverage Summary for Class: GetAccountByIdUseCase (com.georgeci.moneysurfer.domain.usecase)</h1>
+<h1>Coverage Summary for Class: EditCategoryUseCase (com.georgeci.moneysurfer.domain.usecase)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">GetAccountByIdUseCase</td>
+  <td class="name">EditCategoryUseCase</td>
 <td class="coverageStat">
   <span class="percent">
     0%
@@ -94,17 +94,18 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.usecase
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.model.Account
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.AccountId
-&nbsp;import com.georgeci.moneysurfer.domain.repositories.AccountRepository
+&nbsp;import com.georgeci.moneysurfer.domain.model.Category
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.CategoryRepository
 &nbsp;import org.koin.core.annotation.Single
 &nbsp;
 <b class="nc">&nbsp;@Single</b>
-&nbsp;class GetAccountByIdUseCase(
-<b class="nc">&nbsp;    private val accountRepository: AccountRepository,</b>
+&nbsp;class EditCategoryUseCase(
+<b class="nc">&nbsp;    private val categoryRepository: CategoryRepository,</b>
 &nbsp;) {
 &nbsp;
-<b class="nc">&nbsp;    suspend operator fun invoke(id: AccountId): Account? = accountRepository.getById(id)</b>
+&nbsp;    suspend operator fun invoke(category: Category) {
+<b class="nc">&nbsp;        categoryRepository.update(category)</b>
+&nbsp;    }
 &nbsp;}
 </code>
 </pre>
@@ -129,7 +130,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-21 15:21</div>
+    <div style="float:right;">generated on 2026-07-21 15:55</div>
 </div>
 </body>
 </html>

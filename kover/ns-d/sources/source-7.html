@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > TransactionDoc</title>
+  <title>MoneySurfer Coverage Report > FirestoreFactory_androidKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,12 +22,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.data.remote</a>
 </div>
 
-<h1>Coverage Summary for Class: TransactionDoc (com.georgeci.moneysurfer.data.remote)</h1>
+<h1>Coverage Summary for Class: FirestoreFactory_androidKt (com.georgeci.moneysurfer.data.remote)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -46,103 +49,49 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">TransactionDoc</td>
+  <td class="name">FirestoreFactory_androidKt</td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (1/1)
+    (0/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    45.7%
+    0%
   </span>
   <span class="absValue">
-    (43/94)
+    (0/4)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (15/15)
+    (0/2)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    76.6%
+    0%
   </span>
   <span class="absValue">
-    (415/542)
-  </span>
-</td>
-</tr>
-  <tr>
-    <td class="name">TransactionDoc$Companion</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
+    (0/7)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (4/4)
-  </span>
-</td>
-  </tr>
-<tr>
-  <td class="name"><strong>Total</strong></td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (2/2)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    45.7%
-  </span>
-  <span class="absValue">
-    (43/94)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (16/16)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    76.7%
-  </span>
-  <span class="absValue">
-    (419/546)
+    (0/40)
   </span>
 </td>
 </tr>
+
 </table>
 
 <br/>
@@ -152,137 +101,24 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.remote
 &nbsp;
-&nbsp;import kotlinx.serialization.Serializable
+&nbsp;import android.content.Context
+&nbsp;import com.google.firebase.FirebaseApp
+&nbsp;import com.google.firebase.firestore.FirebaseFirestore
+&nbsp;import org.koin.dsl.module
 &nbsp;
-&nbsp;/**
-&nbsp; * Firestore wire-format DTOs. Field names mirror Room entities 1:1 so a Firestore document
-&nbsp; * can round-trip through Kotlin serialization without a custom mapping layer.
-&nbsp; */
+<b class="nc">&nbsp;val androidRemoteDataModule = module {</b>
+<b class="nc">&nbsp;    single&lt;FirebaseFirestore&gt; {</b>
+<b class="nc">&nbsp;        createFirestore(context = get())</b>
+&nbsp;    }
+&nbsp;}
 &nbsp;
-&nbsp;@Serializable
-&nbsp;data class UserDoc(
-&nbsp;    val displayName: String? = null,
-&nbsp;    val email: String? = null,
-&nbsp;    val isAnon: Boolean = false,
-&nbsp;    val createdAt: Long = 0L,
-&nbsp;    val workspaceIds: List&lt;String&gt; = emptyList(),
-&nbsp;    val defaultWorkspaceId: String? = null,
-&nbsp;    val invitedWorkspaceIds: List&lt;String&gt; = emptyList(),
-&nbsp;)
-&nbsp;
-&nbsp;/**
-&nbsp; * Email→uid mapping for invite recipient discovery. Doc id is the lowercased email.
-&nbsp; * Kept as a separate collection (rather than exposing `users.email` via list rules) so the
-&nbsp; * security rule is a tight `signedIn()` read on a single field with no other PII leakage.
-&nbsp; */
-&nbsp;@Serializable
-&nbsp;data class UserEmailDoc(
-&nbsp;    val uid: String = &quot;&quot;,
-&nbsp;    val updatedAt: Long = 0L,
-&nbsp;)
-&nbsp;
-&nbsp;@Serializable
-&nbsp;data class WorkspaceDoc(
-&nbsp;    val name: String = &quot;&quot;,
-&nbsp;    val description: String = &quot;&quot;,
-&nbsp;    val baseCurrency: String = &quot;&quot;,
-&nbsp;    val ownerId: String = &quot;&quot;,
-&nbsp;    val archived: Boolean = false,
-&nbsp;    val createdAt: Long = 0L,
-&nbsp;    val updatedAt: Long = 0L,
-&nbsp;    val deletedAt: Long? = null,
-&nbsp;    val clientVersionCode: Int = 1,
-&nbsp;)
-&nbsp;
-&nbsp;@Serializable
-&nbsp;data class AccountDoc(
-&nbsp;    val name: String = &quot;&quot;,
-&nbsp;    val type: String = &quot;&quot;,
-&nbsp;    val currency: String = &quot;&quot;,
-&nbsp;    val balance: Long = 0L,
-&nbsp;    val archived: Boolean = false,
-&nbsp;    val updatedAt: Long = 0L,
-&nbsp;    val deletedAt: Long? = null,
-&nbsp;    val clientVersionCode: Int = 1,
-&nbsp;)
-&nbsp;
-&nbsp;@Serializable
-&nbsp;data class CategoryDoc(
-&nbsp;    val name: String = &quot;&quot;,
-&nbsp;    val type: String = &quot;&quot;,
-&nbsp;    val parentId: String? = null,
-&nbsp;    val createdAt: Long = 0L,
-&nbsp;    val updatedAt: Long = 0L,
-&nbsp;    val deletedAt: Long? = null,
-&nbsp;    val clientVersionCode: Int = 1,
-&nbsp;    /** System kind marker (e.g. &quot;TRANSFER&quot;) for built-in categories. Null for user categories. */
-&nbsp;    val systemKind: String? = null,
-&nbsp;)
-&nbsp;
-<b class="pc">&nbsp;@Serializable</b>
-&nbsp;data class TransactionDoc(
-<b class="fc">&nbsp;    val accountId: String = &quot;&quot;,</b>
-<b class="fc">&nbsp;    val categoryId: String? = null,</b>
-<b class="fc">&nbsp;    val amount: Long = 0L,</b>
-<b class="fc">&nbsp;    val currencyCode: String = &quot;&quot;,</b>
-<b class="fc">&nbsp;    val note: String = &quot;&quot;,</b>
-<b class="fc">&nbsp;    val operationAt: Long = 0L,</b>
-<b class="fc">&nbsp;    val operationDate: String = &quot;&quot;,</b>
-<b class="fc">&nbsp;    val type: String = &quot;&quot;,</b>
-<b class="fc">&nbsp;    val status: String = &quot;ACTUAL&quot;,</b>
-<b class="fc">&nbsp;    val createdAt: Long = 0L,</b>
-<b class="fc">&nbsp;    val updatedAt: Long = 0L,</b>
-<b class="fc">&nbsp;    val deletedAt: Long? = null,</b>
-<b class="fc">&nbsp;    val clientVersionCode: Int = 1,</b>
-&nbsp;    /** Shared id linking the two legs of a transfer. Null for non-transfer rows. */
-<b class="fc">&nbsp;    val transferId: String? = null,</b>
-&nbsp;)
-&nbsp;
-&nbsp;/**
-&nbsp; * Member doc lives at `workspaces/{wid}/members/{uid}`. Doc id = userId.
-&nbsp; *
-&nbsp; * Soft-delete via `status` (`ACTIVE` / `LEFT` / `REMOVED`) — `deletedAt` is kept for
-&nbsp; * back-compat with old docs and as a tombstone fallback for clients pulling members.
-&nbsp; */
-&nbsp;@Serializable
-&nbsp;data class WorkspaceMemberDoc(
-&nbsp;    val userId: String = &quot;&quot;,
-&nbsp;    val role: String = &quot;&quot;,
-&nbsp;    val status: String = &quot;ACTIVE&quot;,
-&nbsp;    val displayName: String = &quot;&quot;,
-&nbsp;    val email: String? = null,
-&nbsp;    val addedByUserId: String? = null,
-&nbsp;    val createdAt: Long = 0L,
-&nbsp;    val updatedAt: Long = 0L,
-&nbsp;    val leftAt: Long? = null,
-&nbsp;    val removedAt: Long? = null,
-&nbsp;    val deletedAt: Long? = null,
-&nbsp;    val clientVersionCode: Int = 1,
-&nbsp;    // Id of the owner-issued invite this member row was created from. Firestore rules
-&nbsp;    // require it on self-create so they can verify an invite in this workspace admits
-&nbsp;    // the caller (tenant-isolation gate, issue #152). Stamped by WorkspaceMemberSyncPlugin
-&nbsp;    // at push time from the local invite; null for owner-created rows (owner path in the
-&nbsp;    // rules does not need it) and absent on legacy docs.
-&nbsp;    val inviteId: String? = null,
-&nbsp;)
-&nbsp;
-&nbsp;/**
-&nbsp; * Invite doc lives at `workspaces/{wid}/invites/{inviteId}`. Doc id = invite UUID.
-&nbsp; */
-&nbsp;@Serializable
-&nbsp;data class WorkspaceInviteDoc(
-&nbsp;    val email: String = &quot;&quot;,
-&nbsp;    val targetUserId: String? = null,
-&nbsp;    val role: String = &quot;&quot;,
-&nbsp;    val status: String = &quot;PENDING&quot;,
-&nbsp;    val invitedByUserId: String = &quot;&quot;,
-&nbsp;    val createdAt: Long = 0L,
-&nbsp;    val updatedAt: Long = 0L,
-&nbsp;    val expiresAt: Long = 0L,
-&nbsp;    val respondedAt: Long? = null,
-&nbsp;    val deletedAt: Long? = null,
-&nbsp;    val clientVersionCode: Int = 1,
-&nbsp;)
+&nbsp;fun createFirestore(context: Context): FirebaseFirestore {
+<b class="nc">&nbsp;    FirebaseApp.initializeApp(context)</b>
+<b class="nc">&nbsp;    check(FirebaseApp.getApps(context).isNotEmpty()) {</b>
+<b class="nc">&nbsp;        &quot;Firebase not initialized. Check androidApp/google-services.json and Google Services plugin setup.&quot;</b>
+&nbsp;    }
+<b class="nc">&nbsp;    return FirebaseFirestore.getInstance()</b>
+&nbsp;}
 </code>
 </pre>
 </div>
@@ -306,7 +142,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-21 15:21</div>
+    <div style="float:right;">generated on 2026-07-21 15:55</div>
 </div>
 </body>
 </html>
