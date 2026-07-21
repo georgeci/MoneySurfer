@@ -1,24 +1,31 @@
 appId: ${APP_ID}
 name: Settings — Sign out
 ---
-# Ensure active session and dashboard state
-- runFlow: 03_dashboard_add_account.yaml
+# Ensure active session and dashboard state.
+#
+# Chain 02, not 03: signing out needs a session and a selected workspace, not an
+# account. Depending on 03 dragged in its create-if-missing guard, which races
+# the Firestore account stream — when the row arrived late the guard re-created
+# "Main Bank", duplicate-name validation pinned the form open, and this flow
+# failed on a dashboard assertion that had nothing to do with sign-out (#219).
+- runFlow: 02_workspace_create.yaml
 
-# Open Settings via icon (content description "Settings")
+# Open Settings via its testTag — the gear is an icon button with no label
+# Maestro can select on iOS (#219).
 - tapOn:
-    text: "Settings"
+    id: "dashboard:settings"
 
 # Assert Settings screen opened
 - assertVisible:
-    text: "Settings"
+    id: "settings:root"
 
 # Tap "Log out"
 - scrollUntilVisible:
     element:
-      text: "Log out"
+      id: "settings:logoutRow"
     direction: DOWN
 - tapOn:
-    text: "Log out"
+    id: "settings:logoutRow"
 
 # Assert we returned to Sign in screen
 - assertVisible:

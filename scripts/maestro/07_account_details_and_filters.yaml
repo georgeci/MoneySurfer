@@ -22,8 +22,11 @@ name: Account — Details and transaction filters
 
 - tapOn:
     text: "Income"
-- assertVisible:
-    text: "No transactions yet."
+# Assert the filter *excludes* the expense rather than that the list is empty:
+# 09_income_transaction_filter logs a "Salary" income against this same account,
+# and Maestro gives no ordering guarantee between the two flows (#219).
+- assertNotVisible:
+    text: "Test expense"
 
 - tapOn:
     text: "All"

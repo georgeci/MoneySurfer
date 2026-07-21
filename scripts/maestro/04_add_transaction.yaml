@@ -11,22 +11,26 @@ name: Transaction — Add expense transaction
     when:
       notVisible: "Test expense"
     commands:
+      # Drive this screen by testTag, not by label: the dashboard FAB exposes no
+      # accessibility text on iOS (only `dashboard:addTransaction`), so a `text`
+      # selector finds nothing once the empty-state CTA is gone (issue #219).
       - tapOn:
-          text: "Add"
+          id: "dashboard:addTransaction"
       - assertVisible:
-          text: "New transaction"
+          id: "transactionCreation:root"
+      # Fill the note *before* the amount. The amount field raises a numeric
+      # keypad that covers the note field, so tapping the note afterwards lands
+      # on the keypad instead — silently appending a digit to the amount (50 →
+      # 501) and leaving the note empty. The amount field and Save both sit
+      # above the keyboard, so they stay reachable in this order.
       - tapOn:
-          text: "0.00"
-      - inputText: "50"
-      - scrollUntilVisible:
-          element:
-            text: "Note"
-          direction: DOWN
-      - tapOn:
-          text: "Note"
+          id: "transactionCreation:note"
       - inputText: "Test expense"
       - tapOn:
-          text: "Save"
+          id: "transactionCreation:amount"
+      - inputText: "50"
+      - tapOn:
+          id: "transactionCreation:save"
 
 # Assert back on Dashboard and transaction appears in Recent
 - assertVisible:

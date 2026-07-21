@@ -422,13 +422,9 @@ jobs:
     name: Maestro iOS (E2E)
     needs: decide
     if: needs.decide.outputs.run == 'true'
-    # QUARANTINED (issue #219): the 18 online flows have never passed in CI. The
-    # build/appId/driver blockers are fixed and the flows now run, but all 18
-    # fail sign-in against the Firebase emulator ("Choose a workspace" never
-    # appears) — a never-validated E2E setup that needs dedicated work. Keep it
-    # running for signal, but don't let it gate the nightly. Remove once #219 is
-    # green.
-    continue-on-error: true
+    # Gating as of issue #219: the online suite (17 flows — 18 minus the
+    # sync-tagged one, whose feature is disabled) now passes end to end, so a
+    # failure here is real signal and blocks the nightly.
     runs-on: macos-15
     timeout-minutes: 90
     permissions:

@@ -1,11 +1,69 @@
 appId: ${APP_ID}
 name: Dashboard — empty-state CTA before first transaction
 ---
-# Pre-condition: Dashboard with a workspace and one account, no transactions logged.
-# Numbered 03a so the full suite runs it AFTER 03 (account created) but BEFORE
-# 04_add_transaction.yaml logs the baseline "Test expense" — the empty-state
-# assertions below only hold while zero transactions exist.
-- runFlow: 03_dashboard_add_account.yaml
+# Pre-condition: a workspace whose Recent list is still empty.
+#
+# The `03a` prefix used to be the whole mechanism: it assumed the suite would run
+# this after 03 (account created) but before 04 logged the baseline "Test
+# expense". Maestro gives no such ordering guarantee — it discovered 04 before
+# 03a on the very run this was written for — so the empty-state assertions raced
+# whichever transaction flow happened to go first (issue #219).
+#
+# Instead, carve out a workspace that no other flow writes to. `Empty Workspace`
+# is created on first run and simply re-selected afterwards, so the Recent list
+# is empty no matter what order the suite runs in.
+- runFlow: 02_workspace_create.yaml
+
+- tapOn:
+    id: "dashboard:settings"
+- assertVisible:
+    id: "settings:root"
+- tapOn:
+    text: "Change workspace"
+
+- assertVisible:
+    text: "Choose a workspace"
+# Branch on the row, then select-and-confirm — see the note in
+# 02_workspace_create.yaml.
+- runFlow:
+    when:
+      notVisible: "Empty Workspace"
+    commands:
+      - tapOn:
+          text: "New workspace"
+      - tapOn:
+          text: "Workspace name"
+      - inputText: "Empty Workspace"
+      - tapOn:
+          text: "Create"
+- tapOn:
+    text: "Empty Workspace"
+- tapOn:
+    text: "Use Empty Workspace"
+
+# Same precondition as before — one account, zero transactions. The dashboard
+# only offers the "add transaction" affordance once an account exists. Let the
+# list stream in first, so a slow read can't trigger a duplicate create (see
+# 03_dashboard_add_account.yaml).
+- extendedWaitUntil:
+    visible: "Empty Bank"
+    timeout: 20000
+    optional: true
+- runFlow:
+    when:
+      notVisible: "Empty Bank"
+    commands:
+      - tapOn:
+          text: "Add account"
+      - assertVisible:
+          text: "New account"
+      - tapOn:
+          text: "Account name"
+      - inputText: "Empty Bank"
+      - tapOn:
+          text: "Bank"
+      - tapOn:
+          text: "Save"
 
 # Golden first-run state: the Recent section shows the empty state, not a blank box.
 - assertVisible:
@@ -15,11 +73,26 @@ name: Dashboard — empty-state CTA before first transaction
 
 # The empty-state CTA is the next step — it opens transaction creation.
 - tapOn:
-    text: "Add transaction"
+    id: "dashboard:addTransaction"
 - assertVisible:
-    text: "New transaction"
+    id: "transactionCreation:root"
 
-# Return to Dashboard so later flows start from a known screen.
-- back
+# Leave without saving, and hand the suite back its shared workspace so later
+# flows don't inherit the empty one.
+- tapOn:
+    text: "Close"
 - assertVisible:
     text: "No activity yet"
+
+- tapOn:
+    id: "dashboard:settings"
+- tapOn:
+    text: "Change workspace"
+- assertVisible:
+    text: "Choose a workspace"
+- tapOn:
+    text: "Test Workspace"
+- tapOn:
+    text: "Use Test Workspace"
+- assertVisible:
+    text: "Accounts"

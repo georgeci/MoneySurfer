@@ -7,24 +7,22 @@ name: Transaction — Add income and filter list
     when:
       notVisible: "Salary"
     commands:
+      # testTag selectors + note-before-amount ordering — see the rationale in
+      # 04_add_transaction.yaml.
       - tapOn:
-          text: "Add"
+          id: "dashboard:addTransaction"
       - assertVisible:
-          text: "New transaction"
+          id: "transactionCreation:root"
       - tapOn:
           text: "Income"
       - tapOn:
-          text: "0.00"
-      - inputText: "150"
-      - scrollUntilVisible:
-          element:
-            text: "Note"
-          direction: DOWN
-      - tapOn:
-          text: "Note"
+          id: "transactionCreation:note"
       - inputText: "Salary"
       - tapOn:
-          text: "Save"
+          id: "transactionCreation:amount"
+      - inputText: "150"
+      - tapOn:
+          id: "transactionCreation:save"
 
 - assertVisible:
     text: "Recent"
@@ -39,5 +37,9 @@ name: Transaction — Add income and filter list
     text: "Income"
 - assertVisible:
     text: "Salary"
+# Locale-agnostic: the simulator's region decides both the decimal separator and
+# whether the symbol leads or trails ("€150.00" vs "150,00 €"). The `.*` wrappers
+# are required because Maestro's iOS driver matches the pattern against the whole
+# element label, not as a substring (#219).
 - assertVisible:
-    text: "€150.00"
+    text: ".*150[.,]00.*"

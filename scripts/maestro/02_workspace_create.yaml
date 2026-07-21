@@ -17,16 +17,13 @@ name: Workspace — Create and select test workspace
     when:
       visible: "Choose a workspace"
     commands:
+      # Branch on the workspace *row*, not on the confirm button: that button is
+      # labelled after whichever workspace is currently highlighted ("Use Empty
+      # Workspace" when 03a's fixture is active), so keying off it would create a
+      # duplicate "Test Workspace" on every such run (#219).
       - runFlow:
           when:
-            visible: "Use Test Workspace"
-          commands:
-            - tapOn:
-                text: "Use Test Workspace"
-
-      - runFlow:
-          when:
-            visible: "New workspace"
+            notVisible: "Test Workspace"
           commands:
             - tapOn:
                 text: "New workspace"
@@ -41,8 +38,13 @@ name: Workspace — Create and select test workspace
             # the (absent) keyboard never overlaps it anyway.
             - tapOn:
                 text: "Create"
-            - tapOn:
-                text: "Use Test Workspace"
+
+      # Select the row, then confirm — the picker only enables the confirm
+      # button for the highlighted workspace.
+      - tapOn:
+          text: "Test Workspace"
+      - tapOn:
+          text: "Use Test Workspace"
 
 # Assert we landed on Dashboard content
 - assertVisible:
