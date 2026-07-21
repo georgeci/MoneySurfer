@@ -44,7 +44,43 @@ private fun Throwable.toAuthError(): AuthError {
         is FirebaseAuthUserCollisionException -> AuthError.Type.EmailAlreadyInUse
         is FirebaseAuthInvalidCredentialsException -> AuthError.Type.InvalidCredentials
         is FirebaseAuthInvalidUserException -> AuthError.Type.InvalidCredentials
-        else -> AuthError.Type.Unknown
+        // gitlive's iOS SDK surfaces every FIRAuthErrorDomain failure as the base
+        // FirebaseAuthException rather than the typed subclasses matched above, so
+        // wrong-password / no-such-user sign-ins fall through here and would show a
+        // generic "Sign-in failed" instead of "Wrong email or password" (issue
+        // #219). Recover the classification from the server error-code name carried
+        // in the message. Android throws the typed subclasses and is matched above,
+        // so this fallback only ever runs on iOS.
+        else -> classifyAuthErrorByMessage(message) ?: AuthError.Type.Unknown
     }
     return AuthError(type = type, message = message, cause = this)
+}
+
+// FIRAuth error-code names that all mean "the supplied credentials don't match a
+// user" — spelled identically to Android's FirebaseAuthException.getErrorCode().
+private val InvalidCredentialErrorCodes = listOf(
+    "ERROR_USER_NOT_FOUND",
+    "ERROR_WRONG_PASSWORD",
+    "ERROR_INVALID_CREDENTIAL",
+    "ERROR_INVALID_LOGIN_CREDENTIALS",
+)
+
+/**
+ * Fallback classifier keyed off the Firebase error-code name embedded in a
+ * [dev.gitlive.firebase.auth.FirebaseAuthException] message. Needed only for
+ * gitlive's iOS SDK, which does not throw the typed exception subclasses (see
+ * [toAuthError]). Returns null when no known code is present so the caller falls
+ * back to [AuthError.Type.Unknown].
+ */
+internal fun classifyAuthErrorByMessage(message: String?): AuthError.Type? {
+    if (message == null) return null
+    return when {
+        InvalidCredentialErrorCodes.any { message.contains(it, ignoreCase = true) } ->
+            AuthError.Type.InvalidCredentials
+        message.contains("ERROR_EMAIL_ALREADY_IN_USE", ignoreCase = true) ->
+            AuthError.Type.EmailAlreadyInUse
+        message.contains("ERROR_WEAK_PASSWORD", ignoreCase = true) ->
+            AuthError.Type.WeakPassword
+        else -> null
+    }
 }
