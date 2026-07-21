@@ -276,11 +276,21 @@ jobs:
     name: Maestro Android (E2E)
     needs: decide
     if: needs.decide.outputs.run == 'true'
-    # QUARANTINED (issue #220): this E2E + device-test suite has never passed in
-    # CI. The build/infra blockers are fixed, but the flows/device tests surface
-    # real, never-validated E2E failures (sync-count assertions, emulator wiring)
-    # that need dedicated stabilization. Keep it running for signal, but don't
-    # let it gate the nightly. Remove once #220 is green.
+    # QUARANTINED (issue #220): still partially red. Progress so far:
+    #   - qaAndroidDevice (instrumented sync tests): GREEN. The off-by-one
+    #     sync-count expectations were stale (they never accounted for the
+    #     workspace root doc, which every pull re-applies) and the harness threw
+    #     in @Before when it initialised the *default* FirebaseApp (Crashlytics
+    #     build-id missing in the instrumentation build). Both fixed in #220.
+    #   - qaMaestroOfflineAndroid (offline golden flow): GREEN.
+    #   - qaMaestroAndroid (online E2E): STILL RED. 15/18 flows fail right after
+    #     sign-in — the app never reaches the "Choose a workspace" screen. The
+    #     Firebase Auth emulator + seeded creds are valid (a direct
+    #     signInWithPassword succeeds), so this is an app-side E2E sign-in issue,
+    #     the same never-validated class as the iOS suite (#219), not a device or
+    #     seed problem. Needs dedicated E2E-wiring work before the job is green.
+    # Keep it running for signal, but don't let it gate the nightly. Remove this
+    # once the online Maestro suite is green too (see #219).
     continue-on-error: true
     runs-on: ubuntu-latest
     # 120 (was 90): one AVD boot now hosts three workloads — online E2E (with a
