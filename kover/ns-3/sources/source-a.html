@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > JvmBackupStorageLocatorKt</title>
+  <title>MoneySurfer Coverage Report > AndroidBackupStorageLocatorKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.data.backup</a>
 </div>
 
-<h1>Coverage Summary for Class: JvmBackupStorageLocatorKt (com.georgeci.moneysurfer.data.backup)</h1>
+<h1>Coverage Summary for Class: AndroidBackupStorageLocatorKt (com.georgeci.moneysurfer.data.backup)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">JvmBackupStorageLocatorKt</td>
+  <td class="name">AndroidBackupStorageLocatorKt</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -46,24 +46,21 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.backup
 &nbsp;
+&nbsp;import android.content.Context
 &nbsp;import com.georgeci.moneysurfer.domain.backup.BackupStorageLocator
 &nbsp;import okio.Path
 &nbsp;import okio.Path.Companion.toPath
-&nbsp;import java.io.File
 &nbsp;
 &nbsp;private const val MAIN_DB_FILE = &quot;moneysurfer.db&quot;
 &nbsp;private const val SYNC_DB_FILE = &quot;moneysurfer_sync.db&quot;
 &nbsp;private const val DATASTORE_FILE = &quot;moneysurfer_settings.preferences_pb&quot;
-&nbsp;private const val APP_DIR = &quot;.moneysurfer&quot;
 &nbsp;
-&nbsp;class JvmBackupStorageLocator : BackupStorageLocator {
-&nbsp;    override val platformName: String = &quot;jvm&quot;
-&nbsp;    override fun moneySurferDbFile(): Path = appFile(MAIN_DB_FILE).toPath()
-&nbsp;    override fun syncDbFile(): Path = appFile(SYNC_DB_FILE).toPath()
-&nbsp;    override fun dataStoreFile(): Path = appFile(DATASTORE_FILE).toPath()
-&nbsp;
-&nbsp;    private fun appFile(name: String): String =
-&nbsp;        File(System.getProperty(&quot;java.io.tmpdir&quot;), &quot;$APP_DIR/$name&quot;).absolutePath
+&nbsp;class AndroidBackupStorageLocator(private val context: Context) : BackupStorageLocator {
+&nbsp;    override val platformName: String = &quot;android&quot;
+&nbsp;    override fun moneySurferDbFile(): Path = context.getDatabasePath(MAIN_DB_FILE).absolutePath.toPath()
+&nbsp;    override fun syncDbFile(): Path = context.getDatabasePath(SYNC_DB_FILE).absolutePath.toPath()
+&nbsp;    override fun dataStoreFile(): Path =
+&nbsp;        context.filesDir.resolve(DATASTORE_FILE).absolutePath.toPath()
 &nbsp;}
 </code>
 </pre>
@@ -88,7 +85,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-21 15:15</div>
+    <div style="float:right;">generated on 2026-07-21 15:21</div>
 </div>
 </body>
 </html>

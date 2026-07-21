@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > AppVersionGate</title>
+  <title>MoneySurfer Coverage Report > TransactionRepository</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.repositories</a>
 </div>
 
-<h1>Coverage Summary for Class: AppVersionGate (com.georgeci.moneysurfer.domain.repositories)</h1>
+<h1>Coverage Summary for Class: TransactionRepository (com.georgeci.moneysurfer.domain.repositories)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">AppVersionGate</td>
+  <td class="name">TransactionRepository</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -46,29 +46,23 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.repositories
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.model.AppVersionStatus
-&nbsp;import kotlinx.coroutines.flow.StateFlow
+&nbsp;import com.georgeci.moneysurfer.domain.model.CategorizedTransaction
+&nbsp;import com.georgeci.moneysurfer.domain.model.Transaction
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.AccountId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
+&nbsp;import kotlinx.coroutines.flow.Flow
 &nbsp;
-&nbsp;/**
-&nbsp; * Cached snapshot of the remote app-version gate. Refreshed on demand by
-&nbsp; * [refresh] (typically called from `AppStartupCoordinator`); subsequent
-&nbsp; * read paths (sync coordinator, write-usecases) consult [status] without
-&nbsp; * blocking on the network.
-&nbsp; *
-&nbsp; * Treats `null` from [com.georgeci.moneysurfer.domain.repositories.AppConfigRepository]
-&nbsp; * (missing doc / fetch failure) as [AppVersionStatus.Supported] — fail-open
-&nbsp; * so the gate doesn&#39;t lock users out on a transient Firestore hiccup.
-&nbsp; *
-&nbsp; * See block.md.
-&nbsp; */
-&nbsp;interface AppVersionGate {
-&nbsp;    /** `null` until the first successful [refresh]. */
-&nbsp;    val status: StateFlow&lt;AppVersionStatus?&gt;
-&nbsp;
-&nbsp;    suspend fun refresh(): AppVersionStatus
-&nbsp;
-&nbsp;    /** Convenience read for write-paths — assumes [refresh] has run. */
-&nbsp;    fun isSyncAllowed(): Boolean
+&nbsp;interface TransactionRepository {
+&nbsp;    fun getAll(): Flow&lt;List&lt;Transaction&gt;&gt;
+&nbsp;    fun getAllCategorized(): Flow&lt;List&lt;CategorizedTransaction&gt;&gt;
+&nbsp;    fun getByAccountId(accountId: AccountId): Flow&lt;List&lt;Transaction&gt;&gt;
+&nbsp;    fun getByAccountIdCategorized(accountId: AccountId): Flow&lt;List&lt;CategorizedTransaction&gt;&gt;
+&nbsp;    fun getByWorkspaceId(workspaceId: WorkspaceId): Flow&lt;List&lt;Transaction&gt;&gt;
+&nbsp;    suspend fun getById(id: TransactionId): Transaction?
+&nbsp;    suspend fun insert(transaction: Transaction)
+&nbsp;    suspend fun update(transaction: Transaction)
+&nbsp;    suspend fun delete(id: TransactionId)
 &nbsp;}
 </code>
 </pre>
@@ -93,7 +87,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-21 15:15</div>
+    <div style="float:right;">generated on 2026-07-21 15:21</div>
 </div>
 </body>
 </html>
