@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > AppConfigRepository</title>
+  <title>MoneySurfer Coverage Report > TransactionRepository</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.repositories</a>
 </div>
 
-<h1>Coverage Summary for Class: AppConfigRepository (com.georgeci.moneysurfer.domain.repositories)</h1>
+<h1>Coverage Summary for Class: TransactionRepository (com.georgeci.moneysurfer.domain.repositories)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">AppConfigRepository</td>
+  <td class="name">TransactionRepository</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -46,17 +46,23 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.repositories
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.model.RemoteAppConfig
+&nbsp;import com.georgeci.moneysurfer.domain.model.CategorizedTransaction
+&nbsp;import com.georgeci.moneysurfer.domain.model.Transaction
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.AccountId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
+&nbsp;import kotlinx.coroutines.flow.Flow
 &nbsp;
-&nbsp;/**
-&nbsp; * Reads the `appConfig/mobile` Firestore document. Implementations should
-&nbsp; * tolerate a missing doc / network failure and return `null` rather than
-&nbsp; * throwing — the gate treats `null` as &quot;unknown, default to Supported&quot;.
-&nbsp; *
-&nbsp; * See block.md.
-&nbsp; */
-&nbsp;interface AppConfigRepository {
-&nbsp;    suspend fun fetch(): RemoteAppConfig?
+&nbsp;interface TransactionRepository {
+&nbsp;    fun getAll(): Flow&lt;List&lt;Transaction&gt;&gt;
+&nbsp;    fun getAllCategorized(): Flow&lt;List&lt;CategorizedTransaction&gt;&gt;
+&nbsp;    fun getByAccountId(accountId: AccountId): Flow&lt;List&lt;Transaction&gt;&gt;
+&nbsp;    fun getByAccountIdCategorized(accountId: AccountId): Flow&lt;List&lt;CategorizedTransaction&gt;&gt;
+&nbsp;    fun getByWorkspaceId(workspaceId: WorkspaceId): Flow&lt;List&lt;Transaction&gt;&gt;
+&nbsp;    suspend fun getById(id: TransactionId): Transaction?
+&nbsp;    suspend fun insert(transaction: Transaction)
+&nbsp;    suspend fun update(transaction: Transaction)
+&nbsp;    suspend fun delete(id: TransactionId)
 &nbsp;}
 </code>
 </pre>
@@ -81,7 +87,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-20 16:21</div>
+    <div style="float:right;">generated on 2026-07-21 14:23</div>
 </div>
 </body>
 </html>

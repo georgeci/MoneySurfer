@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > UserDao</title>
+  <title>MoneySurfer Coverage Report > BudgetDao</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.data.db.dao</a>
 </div>
 
-<h1>Coverage Summary for Class: UserDao (com.georgeci.moneysurfer.data.db.dao)</h1>
+<h1>Coverage Summary for Class: BudgetDao (com.georgeci.moneysurfer.data.db.dao)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">UserDao</td>
+  <td class="name">BudgetDao</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -48,46 +48,30 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;
 &nbsp;import androidx.room.Dao
 &nbsp;import androidx.room.Insert
-&nbsp;import androidx.room.OnConflictStrategy
 &nbsp;import androidx.room.Query
 &nbsp;import androidx.room.Update
-&nbsp;import androidx.room.Upsert
-&nbsp;import com.georgeci.moneysurfer.data.db.entity.UserEntity
+&nbsp;import com.georgeci.moneysurfer.data.db.entity.BudgetEntity
 &nbsp;import kotlinx.coroutines.flow.Flow
 &nbsp;
 &nbsp;@Dao
-&nbsp;interface UserDao {
+&nbsp;interface BudgetDao {
 &nbsp;
-&nbsp;    @Query(&quot;SELECT * FROM users&quot;)
-&nbsp;    fun getAll(): Flow&lt;List&lt;UserEntity&gt;&gt;
+&nbsp;    @Query(&quot;SELECT * FROM budgets&quot;)
+&nbsp;    fun getAll(): Flow&lt;List&lt;BudgetEntity&gt;&gt;
 &nbsp;
-&nbsp;    @Query(&quot;SELECT * FROM users WHERE id = :id&quot;)
-&nbsp;    suspend fun getById(id: String): UserEntity?
-&nbsp;
-&nbsp;    @Insert
-&nbsp;    suspend fun insert(entity: UserEntity)
+&nbsp;    @Query(&quot;SELECT * FROM budgets WHERE id = :id&quot;)
+&nbsp;    suspend fun getById(id: String): BudgetEntity?
 &nbsp;
 &nbsp;    @Insert
-&nbsp;    suspend fun insertAll(entities: List&lt;UserEntity&gt;)
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Stub-insert for foreign user ids that show up via workspace members during a
-&nbsp;     * pull. Skips the row if the id is already present so the local user&#39;s
-&nbsp;     * `displayName` / `isAnon` fields are not overwritten with peer placeholders.
-&nbsp;     */
-&nbsp;    @Insert(onConflict = OnConflictStrategy.IGNORE)
-&nbsp;    suspend fun insertIgnore(entity: UserEntity)
+&nbsp;    suspend fun insert(entity: BudgetEntity)
 &nbsp;
 &nbsp;    @Update
-&nbsp;    suspend fun update(entity: UserEntity)
+&nbsp;    suspend fun update(entity: BudgetEntity)
 &nbsp;
-&nbsp;    @Upsert
-&nbsp;    suspend fun upsert(entity: UserEntity)
-&nbsp;
-&nbsp;    @Query(&quot;DELETE FROM users WHERE id = :id&quot;)
+&nbsp;    @Query(&quot;DELETE FROM budgets WHERE id = :id&quot;)
 &nbsp;    suspend fun delete(id: String)
 &nbsp;
-&nbsp;    @Query(&quot;DELETE FROM users&quot;)
+&nbsp;    @Query(&quot;DELETE FROM budgets&quot;)
 &nbsp;    suspend fun deleteAll()
 &nbsp;}
 </code>
@@ -113,7 +97,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-20 16:21</div>
+    <div style="float:right;">generated on 2026-07-21 14:23</div>
 </div>
 </body>
 </html>
