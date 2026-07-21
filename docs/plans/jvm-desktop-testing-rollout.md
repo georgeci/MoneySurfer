@@ -1,3 +1,10 @@
+---
+title: JVM desktop testing — compose.uiTest spike + rollout roadmap
+created: 2026-07-15
+status: backlog
+---
+
+# JVM desktop testing — compose.uiTest spike + rollout roadmap
 
 <!-- DOCS:TOC -->
 ## Contents
@@ -8,14 +15,6 @@
 - [Known limitations (accepted)](#known-limitations-accepted)
 - [Out of scope](#out-of-scope)
 <!-- DOCS:END -->
-
----
-title: JVM desktop testing — compose.uiTest spike + rollout roadmap
-created: 2026-07-15
-status: backlog
----
-
-# JVM desktop testing — compose.uiTest spike + rollout roadmap
 
 Full research: [docs/testing/jvm-desktop-testing-research.md](../testing/jvm-desktop-testing-research.md)
 (stack at time of research: Kotlin 2.4.0, Compose Multiplatform 1.11.1, Kotest 6.2.1).

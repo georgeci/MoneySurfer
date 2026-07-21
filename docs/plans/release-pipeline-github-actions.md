@@ -1,3 +1,10 @@
+---
+title: Release pipeline via GitHub Actions
+created: 2026-05-06
+status: backlog
+---
+
+# Release pipeline via GitHub Actions
 
 <!-- DOCS:TOC -->
 ## Contents
@@ -14,14 +21,6 @@
 - [E. Risks and gotchas](#e-risks-and-gotchas)
 - [F. Verification](#f-verification)
 <!-- DOCS:END -->
-
----
-title: Release pipeline via GitHub Actions
-created: 2026-05-06
-status: backlog
----
-
-# Release pipeline via GitHub Actions
 
 ## Context
 
