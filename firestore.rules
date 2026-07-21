@@ -17,6 +17,27 @@ rules_version = '2';
 // app only exercises this for workspaces with no other ACTIVE member; the
 // regular sync path still writes tombstones, never deletes.
 //
+// Known asymmetry, accepted deliberately — read before loosening or tightening:
+//  1. The "no other ACTIVE member" condition lives ONLY in the client
+//     (UserAccountDeletionRepositoryImpl). It is not expressible here: rules
+//     can `get()`/`exists()` a known document path but cannot query or count a
+//     collection, so "does any OTHER member row have status ACTIVE" has no
+//     rules-side formulation at any price.
+//  2. A hard-delete leaves no tombstone, so it does NOT propagate — a device
+//     holding a replica never learns the doc is gone (it just stops being
+//     pulled). That is harmless for the flow the app performs: a purge only
+//     targets a workspace where nobody else is ACTIVE, and a LEFT/REMOVED
+//     member already fails isMember() and cannot read the workspace at all, so
+//     no live replica is left to go stale. The deleting user's own other
+//     devices keep their local copy by design (stated on the hosted
+//     account-deletion page).
+//  3. Residual risk is therefore a MODIFIED client hard-deleting a genuinely
+//     shared workspace it owns: co-members' replicas would keep rows the
+//     server no longer has. Bounded by ownership — other households are
+//     untouchable — and no worse in reach than the `deletedAt` mass-update an
+//     owner could always perform. Closing it properly needs a server-side
+//     deletion path (Cloud Functions); revisit if one is ever deployed.
+//
 // Server-side app-version gate: every entity write must carry a
 // `clientVersionCode` int >= MIN_CLIENT_VERSION_CODE. Rejects pushes from
 // builds older than the published cutoff so the data layer is never written
