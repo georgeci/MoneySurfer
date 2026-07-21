@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SyncMetaRepository</title>
+  <title>MoneySurfer Coverage Report > ConflictResolver</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.sync.repository</a>
 </div>
 
-<h1>Coverage Summary for Class: SyncMetaRepository (com.georgeci.moneysurfer.sync.repository)</h1>
+<h1>Coverage Summary for Class: ConflictResolver (com.georgeci.moneysurfer.sync.repository)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SyncMetaRepository</td>
+  <td class="name">ConflictResolver</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -46,38 +46,39 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.sync.repository
 &nbsp;
-&nbsp;import kotlinx.coroutines.flow.Flow
 &nbsp;import kotlin.time.Instant
 &nbsp;
 &nbsp;/**
-&nbsp; * Per-(scopeKey, collection) sync metadata.
+&nbsp; * Strategy for combining a local and a remote version of the same entity.
 &nbsp; *
-&nbsp; * - [cursor] — `lastPulledAt` value used as `WHERE updatedAt &gt; cursor` filter
-&nbsp; *   in the next pull. Updated only when remote rows are successfully written
-&nbsp; *   to local Room within the same transaction.
-&nbsp; * - [lastSyncSuccessAt] / [lastSyncAttemptAt] — timestamps for the UI badge.
+&nbsp; * Phase 2 ships only LWW (last-write-wins) by `updatedAt`. Future strategies
+&nbsp; * (`Skip` for blocking inbox, `Merged` for field-level merges) plug in here.
 &nbsp; *
-&nbsp; * [scopeKey] is typically a workspace id string. [collection] is an opaque
-&nbsp; * Firestore collection name string (e.g. &quot;accounts&quot;, &quot;transactions&quot;).
-&nbsp; *
-&nbsp; * See SyncCoordinatorFAQ.md №14, sync.md §4.3.
+&nbsp; * See SyncCoordinatorFAQ.md №5, sync.md §4.2.
 &nbsp; */
-&nbsp;interface SyncMetaRepository {
-&nbsp;    suspend fun cursor(scopeKey: String, collection: String): Instant?
-&nbsp;    suspend fun setCursor(scopeKey: String, collection: String, cursor: Instant)
-&nbsp;    suspend fun markAttempt(scopeKey: String, collection: String, at: Instant)
-&nbsp;    suspend fun markSuccess(scopeKey: String, collection: String, at: Instant)
-&nbsp;    suspend fun clearScope(scopeKey: String)
-&nbsp;    fun observe(scopeKey: String): Flow&lt;List&lt;SyncMeta&gt;&gt;
+&nbsp;interface ConflictResolver {
+&nbsp;    fun &lt;T : Any&gt; resolve(
+&nbsp;        local: T?,
+&nbsp;        remote: T,
+&nbsp;        metadata: ConflictMetadata,
+&nbsp;    ): ConflictResolution&lt;T&gt;
 &nbsp;}
 &nbsp;
-&nbsp;data class SyncMeta(
-&nbsp;    val scopeKey: String,
-&nbsp;    val collection: String,
-&nbsp;    val lastPulledAt: Instant?,
-&nbsp;    val lastSyncSuccessAt: Instant?,
-&nbsp;    val lastSyncAttemptAt: Instant?,
+&nbsp;data class ConflictMetadata(
+&nbsp;    val entityType: String,
+&nbsp;    val entityId: String,
+&nbsp;    val localUpdatedAt: Instant?,
+&nbsp;    val remoteUpdatedAt: Instant,
 &nbsp;)
+&nbsp;
+&nbsp;sealed interface ConflictResolution&lt;out T&gt; {
+&nbsp;    data class TakeRemote&lt;T&gt;(val value: T) : ConflictResolution&lt;T&gt;
+&nbsp;    data class TakeLocal&lt;T&gt;(val value: T) : ConflictResolution&lt;T&gt;
+&nbsp;    data class Merged&lt;T&gt;(val value: T) : ConflictResolution&lt;T&gt;
+&nbsp;
+&nbsp;    /** Defer decision to a manual-resolution inbox (not implemented in Phase 2). */
+&nbsp;    data object Skip : ConflictResolution&lt;Nothing&gt;
+&nbsp;}
 </code>
 </pre>
 </div>
@@ -101,7 +102,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-21 15:05</div>
+    <div style="float:right;">generated on 2026-07-21 15:15</div>
 </div>
 </body>
 </html>

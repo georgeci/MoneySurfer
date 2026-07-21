@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > FirebaseConfig</title>
+  <title>MoneySurfer Coverage Report > TransactionRepository</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.repositories</a>
 </div>
 
-<h1>Coverage Summary for Class: FirebaseConfig (com.georgeci.moneysurfer.domain.repositories)</h1>
+<h1>Coverage Summary for Class: TransactionRepository (com.georgeci.moneysurfer.domain.repositories)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">FirebaseConfig</td>
+  <td class="name">TransactionRepository</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -46,24 +46,23 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.repositories
 &nbsp;
-&nbsp;/**
-&nbsp; * Toggle for the Firebase Emulator Suite. Bound by `:data` per platform; tests
-&nbsp; * override with a fixture that always returns `useEmulator = true`.
-&nbsp; *
-&nbsp; * - [useEmulator] — when `true`, the SDK is redirected to a local Firestore + Auth
-&nbsp; *   emulator BEFORE the first read/write. Production builds keep this `false`.
-&nbsp; * - [emulatorHost] — Android emulator reaches the host machine via `10.0.2.2`,
-&nbsp; *   iOS simulator and Desktop via `localhost`. Implementations resolve this
-&nbsp; *   per-platform.
-&nbsp; * - [authPort] / [firestorePort] — match `firebase.json` (defaults 9099 / 8080).
-&nbsp; *
-&nbsp; * See md/sync.md emulator section.
-&nbsp; */
-&nbsp;interface FirebaseConfig {
-&nbsp;    val useEmulator: Boolean
-&nbsp;    val emulatorHost: String
-&nbsp;    val authPort: Int
-&nbsp;    val firestorePort: Int
+&nbsp;import com.georgeci.moneysurfer.domain.model.CategorizedTransaction
+&nbsp;import com.georgeci.moneysurfer.domain.model.Transaction
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.AccountId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
+&nbsp;import kotlinx.coroutines.flow.Flow
+&nbsp;
+&nbsp;interface TransactionRepository {
+&nbsp;    fun getAll(): Flow&lt;List&lt;Transaction&gt;&gt;
+&nbsp;    fun getAllCategorized(): Flow&lt;List&lt;CategorizedTransaction&gt;&gt;
+&nbsp;    fun getByAccountId(accountId: AccountId): Flow&lt;List&lt;Transaction&gt;&gt;
+&nbsp;    fun getByAccountIdCategorized(accountId: AccountId): Flow&lt;List&lt;CategorizedTransaction&gt;&gt;
+&nbsp;    fun getByWorkspaceId(workspaceId: WorkspaceId): Flow&lt;List&lt;Transaction&gt;&gt;
+&nbsp;    suspend fun getById(id: TransactionId): Transaction?
+&nbsp;    suspend fun insert(transaction: Transaction)
+&nbsp;    suspend fun update(transaction: Transaction)
+&nbsp;    suspend fun delete(id: TransactionId)
 &nbsp;}
 </code>
 </pre>
@@ -88,7 +87,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-21 15:05</div>
+    <div style="float:right;">generated on 2026-07-21 15:15</div>
 </div>
 </body>
 </html>
