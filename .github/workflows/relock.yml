@@ -58,11 +58,15 @@ jobs:
 
       # `gh pr checkout` resolves the head ref for us and, unlike a raw
       # refs/pull/N/head fetch, leaves a branch that can be pushed back.
+      # PR_NUMBER goes through the environment, never interpolated into the
+      # script body: a `${{ }}` expression is pasted in before the shell runs,
+      # so a crafted dispatch input would execute as code (Sonar S7630).
       - name: Check out the PR branch
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ inputs.pr }}
         run: |
-          gh pr checkout "${{ inputs.pr }}"
+          gh pr checkout "$PR_NUMBER"
           git log --oneline -1
 
       - name: Rebase onto main
@@ -94,6 +98,7 @@ jobs:
       - name: Commit and push
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ inputs.pr }}
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -104,7 +109,7 @@ jobs:
           fi
 
           git add '*.lockfile'
-          git commit -m "build(deps): regenerate Gradle lockfiles for #${{ inputs.pr }}"
+          git commit -m "build(deps): regenerate Gradle lockfiles for #${PR_NUMBER}"
 
           # Rebasing rewrites the dependabot commit, so the push is a
           # force-with-lease against the branch we just checked out.
