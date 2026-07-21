@@ -105,6 +105,8 @@ private fun AuthError.toSignInError(): SignInError = when (type) {
     AuthError.Type.EmailAlreadyInUse -> SignInError.EmailAlreadyInUse
     AuthError.Type.InvalidCredentials -> SignInError.InvalidCredentials
     AuthError.Type.PermissionDenied -> SignInError.PermissionDenied
+    // Only the account-deletion flow can produce this; a sign-in never does.
+    AuthError.Type.RequiresRecentLogin -> SignInError.Unknown
     AuthError.Type.Unknown -> SignInError.Unknown
 }
 

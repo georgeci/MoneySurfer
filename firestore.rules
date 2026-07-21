@@ -1,4 +1,4 @@
-// v2.2.0 — 2026-07-15
+// v2.3.0 — 2026-07-20
 rules_version = '2';
 
 // Workspace-scoped tenancy: every per-user document lives under
@@ -9,6 +9,34 @@ rules_version = '2';
 // and omit `delete`. Clients must `update` with `deletedAt` set instead.
 // Tombstones are pulled by other devices via the cursor-based pull
 // (see sync.md §4.4).
+//
+// The ONE exception is account deletion (issue #213): the repo has no Cloud
+// Functions, so the client itself must be able to purge the user's remote
+// footprint. Owners may hard-delete workspace docs + subcollection docs, and
+// a user may hard-delete their own /users/{uid} and userEmails mapping. The
+// app only exercises this for workspaces with no other ACTIVE member; the
+// regular sync path still writes tombstones, never deletes.
+//
+// Known asymmetry, accepted deliberately — read before loosening or tightening:
+//  1. The "no other ACTIVE member" condition lives ONLY in the client
+//     (UserAccountDeletionRepositoryImpl). It is not expressible here: rules
+//     can `get()`/`exists()` a known document path but cannot query or count a
+//     collection, so "does any OTHER member row have status ACTIVE" has no
+//     rules-side formulation at any price.
+//  2. A hard-delete leaves no tombstone, so it does NOT propagate — a device
+//     holding a replica never learns the doc is gone (it just stops being
+//     pulled). That is harmless for the flow the app performs: a purge only
+//     targets a workspace where nobody else is ACTIVE, and a LEFT/REMOVED
+//     member already fails isMember() and cannot read the workspace at all, so
+//     no live replica is left to go stale. The deleting user's own other
+//     devices keep their local copy by design (stated on the hosted
+//     account-deletion page).
+//  3. Residual risk is therefore a MODIFIED client hard-deleting a genuinely
+//     shared workspace it owns: co-members' replicas would keep rows the
+//     server no longer has. Bounded by ownership — other households are
+//     untouchable — and no worse in reach than the `deletedAt` mass-update an
+//     owner could always perform. Closing it properly needs a server-side
+//     deletion path (Cloud Functions); revisit if one is ever deployed.
 //
 // Server-side app-version gate: every entity write must carry a
 // `clientVersionCode` int >= MIN_CLIENT_VERSION_CODE. Rejects pushes from
@@ -163,6 +191,9 @@ service cloud.firestore {
     match /users/{uid} {
       allow read: if signedIn() && request.auth.uid == uid;
       allow create, update: if signedIn() && request.auth.uid == uid;
+      // Self-delete only — the last remote write of the account-deletion flow
+      // before the Firebase Auth user itself is deleted (issue #213).
+      allow delete: if signedIn() && request.auth.uid == uid;
 
       // Any signed-in user may append one workspace ID to `invitedWorkspaceIds`.
       // Used by the invite sender to seed the recipient's discovery list so the
@@ -203,7 +234,11 @@ service cloud.firestore {
         && request.resource.data.uid == request.auth.uid
         && request.auth.token.email is string
         && email == request.auth.token.email.lower();
-      allow delete: if false;
+      // Account deletion (issue #213): a user may remove the mapping that points at
+      // their own uid. Gating on the stored uid (not the email claim) keeps a user
+      // whose auth email changed able to clean up the old mapping, while still
+      // preventing anyone from deleting another user's row.
+      allow delete: if signedIn() && resource.data.uid == request.auth.uid;
     }
 
     // Public read-only app config (force-update gate, see block.md).
@@ -242,7 +277,12 @@ service cloud.firestore {
         && request.resource.data.ownerId == request.auth.uid
         && hasValidClientVersion();
       allow update: if isOwner(wid) && hasValidClientVersion();
-      // Hard-delete is denied — owners must mark `deletedAt` via update.
+      // Regular flows must mark `deletedAt` via update (tombstone). The owner
+      // hard-delete below exists ONLY for account deletion (issue #213); the
+      // client purges all subcollection docs first, then this root doc — the
+      // subcollection delete rules read this doc via isOwner(), so it must
+      // outlive them.
+      allow delete: if isOwner(wid);
 
       match /invites/{inviteId} {
         // Per-doc + per-workspace reads — workspace members can browse the invite
@@ -292,7 +332,8 @@ service cloud.firestore {
                       && request.resource.data.status == resource.data.status)
               ))
         );
-        allow delete: if false;
+        // Owner-only hard-delete — account-deletion purge path (issue #213).
+        allow delete: if isOwner(wid);
       }
 
       match /members/{uid} {
@@ -324,28 +365,33 @@ service cloud.firestore {
                 && request.resource.data.role == resource.data.role
                 && request.resource.data.status in ["ACTIVE", "LEFT"])
           );
-        allow delete: if false;
+        // Owner-only hard-delete — account-deletion purge path (issue #213).
+        // Members leaving still soft-delete via status=LEFT above.
+        allow delete: if isOwner(wid);
       }
 
       match /accounts/{aid} {
         allow read: if isMember(wid);
         allow create, update: if isMember(wid) && hasValidClientVersion()
           && hasValidAccountShape(request.resource.data);
-        allow delete: if false;
+        // Owner-only hard-delete — account-deletion purge path (issue #213).
+        allow delete: if isOwner(wid);
       }
 
       match /categories/{cid} {
         allow read: if isMember(wid);
         allow create, update: if isMember(wid) && hasValidClientVersion()
           && hasValidCategoryShape(request.resource.data);
-        allow delete: if false;
+        // Owner-only hard-delete — account-deletion purge path (issue #213).
+        allow delete: if isOwner(wid);
       }
 
       match /transactions/{tid} {
         allow read: if isMember(wid);
         allow create, update: if isMember(wid) && hasValidClientVersion()
           && hasValidTransactionShape(request.resource.data);
-        allow delete: if false;
+        // Owner-only hard-delete — account-deletion purge path (issue #213).
+        allow delete: if isOwner(wid);
       }
 
       // budgets / recurringRules carry no wire DTO yet (no sync plugin decodes
@@ -354,13 +400,15 @@ service cloud.firestore {
       match /budgets/{bid} {
         allow read: if isMember(wid);
         allow create, update: if isMember(wid) && hasValidClientVersion();
-        allow delete: if false;
+        // Owner-only hard-delete — account-deletion purge path (issue #213).
+        allow delete: if isOwner(wid);
       }
 
       match /recurringRules/{rid} {
         allow read: if isMember(wid);
         allow create, update: if isMember(wid) && hasValidClientVersion();
-        allow delete: if false;
+        // Owner-only hard-delete — account-deletion purge path (issue #213).
+        allow delete: if isOwner(wid);
       }
     }
   }

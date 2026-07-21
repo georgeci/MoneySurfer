@@ -308,8 +308,15 @@ describe('workspaces/{wid}/members/{uid}', () => {
 
   // ── delete ─────────────────────────────────────────────────────────────
 
-  it('hard-delete is denied (soft-delete via status=REMOVED)', async () => {
+  // Hard-delete is owner-only — the account-deletion purge path (issue #213).
+  // Eviction and leaving still soft-delete via status=REMOVED / LEFT.
+  it('owner can hard-delete a member row (account-deletion purge)', async () => {
     const db = authedAs(env, OWNER, { email: 'owner@example.com' });
+    await assertSucceeds(deleteDoc(doc(db, `workspaces/${WID}/members/${MEMBER}`)));
+  });
+
+  it('member cannot hard-delete a member row (not even their own)', async () => {
+    const db = authedAs(env, MEMBER, { email: 'member@example.com' });
     await assertFails(deleteDoc(doc(db, `workspaces/${WID}/members/${MEMBER}`)));
   });
 

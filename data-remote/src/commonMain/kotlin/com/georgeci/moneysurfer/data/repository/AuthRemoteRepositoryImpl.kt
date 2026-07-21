@@ -3,9 +3,11 @@ package com.georgeci.moneysurfer.data.repository
 import arrow.core.Either
 import com.georgeci.moneysurfer.domain.auth.AuthError
 import com.georgeci.moneysurfer.domain.repositories.AuthRemoteRepository
+import dev.gitlive.firebase.auth.EmailAuthProvider
 import dev.gitlive.firebase.auth.FirebaseAuth
 import dev.gitlive.firebase.auth.FirebaseAuthInvalidCredentialsException
 import dev.gitlive.firebase.auth.FirebaseAuthInvalidUserException
+import dev.gitlive.firebase.auth.FirebaseAuthRecentLoginRequiredException
 import dev.gitlive.firebase.auth.FirebaseAuthUserCollisionException
 import dev.gitlive.firebase.auth.FirebaseAuthWeakPasswordException
 import org.koin.core.annotation.Single
@@ -35,11 +37,24 @@ class AuthRemoteRepositoryImpl(
 
     override suspend fun signOut(): Either<AuthError, Unit> =
         Either.catch { auth.signOut() }.mapLeft { it.toAuthError() }
+
+    override suspend fun reauthenticateWithEmail(email: String, password: String): Either<AuthError, Unit> =
+        Either.catch {
+            val user = auth.currentUser ?: error("No active session to re-authenticate")
+            user.reauthenticate(EmailAuthProvider.credential(email.trim(), password))
+        }.mapLeft { it.toAuthError() }
+
+    override suspend fun deleteCurrentUser(): Either<AuthError, Unit> =
+        Either.catch {
+            val user = auth.currentUser ?: error("No active session to delete")
+            user.delete()
+        }.mapLeft { it.toAuthError() }
 }
 
 /** Classify Firebase auth exceptions into the typed [AuthError.Type] domain enum. */
 private fun Throwable.toAuthError(): AuthError {
     val type = when (this) {
+        is FirebaseAuthRecentLoginRequiredException -> AuthError.Type.RequiresRecentLogin
         is FirebaseAuthWeakPasswordException -> AuthError.Type.WeakPassword
         is FirebaseAuthUserCollisionException -> AuthError.Type.EmailAlreadyInUse
         is FirebaseAuthInvalidCredentialsException -> AuthError.Type.InvalidCredentials

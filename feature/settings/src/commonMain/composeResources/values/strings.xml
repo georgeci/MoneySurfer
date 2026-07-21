@@ -269,4 +269,29 @@
     <string name="settings_about_copyright">© 2026 Georgy Balabaichkin. Released under the MIT License.\nMoneySurfer is an open-source personal-finance tracker — not a bank or money-transmission service.</string>
     <string name="settings_categories_title">Categories</string>
     <string name="settings_categories_supporting">Manage your spending and income categories</string>
+
+    <!-- User-account deletion flow (issue #213) — wording must stay in sync with the hosted
+         account-deletion page (georgeci.github.io/account-deletion.html). -->
+    <string name="settings_delete_account">Delete account</string>
+    <string name="settings_delete_account_title">Delete account</string>
+    <string name="settings_delete_account_intro">Permanently deletes your Money Surfer account and cloud data. This cannot be undone.</string>
+    <string name="settings_delete_account_deleted_section">What will be deleted</string>
+    <string name="settings_delete_account_deleted_workspaces">Personal workspaces with all accounts, transactions, categories and budgets</string>
+    <string name="settings_delete_account_deleted_memberships">Your memberships in shared workspaces</string>
+    <string name="settings_delete_account_deleted_sync">Cloud sync data and your sign-in credentials</string>
+    <string name="settings_delete_account_kept_section">What stays</string>
+    <string name="settings_delete_account_kept_shared">Records you created in workspaces shared with other people remain visible to the remaining members</string>
+    <string name="settings_delete_account_kept_local">Data stored locally on your other devices stays until the app is removed there</string>
+    <string name="settings_delete_account_password_label">Confirm your password</string>
+    <string name="settings_delete_account_password_missing">Enter your password to continue</string>
+    <string name="settings_delete_account_button">Delete my account</string>
+    <string name="settings_delete_account_confirm_title">Delete account?</string>
+    <string name="settings_delete_account_confirm_message">Your account and cloud data will be permanently deleted. This cannot be undone.</string>
+    <string name="settings_delete_account_confirm_confirm">Delete forever</string>
+    <string name="settings_delete_account_confirm_cancel">Cancel</string>
+    <string name="settings_delete_account_notice_wrong_password">Incorrect password</string>
+    <string name="settings_delete_account_notice_recent_login">For security, please sign out, sign in again, and retry</string>
+    <string name="settings_delete_account_notice_cleanup_failed">Couldn\'t delete your cloud data. Check your connection and try again</string>
+    <string name="settings_delete_account_notice_auth_failed">Your data was removed, but the sign-in account couldn\'t be deleted. Please try again</string>
+    <string name="settings_delete_account_notice_generic">Account deletion failed. Please try again</string>
 </resources>

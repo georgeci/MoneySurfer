@@ -1,5 +1,5 @@
 const { assertSucceeds, assertFails } = require('@firebase/rules-unit-testing');
-const { arrayUnion, doc, getDoc, setDoc, updateDoc } = require('firebase/firestore');
+const { arrayUnion, deleteDoc, doc, getDoc, setDoc, updateDoc } = require('firebase/firestore');
 
 const {
   getTestEnv,
@@ -82,6 +82,22 @@ describe('users/{uid}', () => {
     await assertFails(
       updateDoc(doc(db, 'users/alice-uid'), { displayName: 'pwned' }),
     );
+  });
+
+  // Self-delete — the last remote write of the account-deletion flow (issue #213).
+  it('user can delete their own document', async () => {
+    const db = authedAs(env, 'alice-uid', { email: 'alice@example.com' });
+    await assertSucceeds(deleteDoc(doc(db, 'users/alice-uid')));
+  });
+
+  it('user cannot delete another user\'s document', async () => {
+    const db = authedAs(env, 'bob-uid', { email: 'bob@example.com' });
+    await assertFails(deleteDoc(doc(db, 'users/alice-uid')));
+  });
+
+  it('unauthenticated user cannot delete a user document', async () => {
+    const db = unauthed(env);
+    await assertFails(deleteDoc(doc(db, 'users/alice-uid')));
   });
 });
 
