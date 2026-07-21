@@ -21,8 +21,8 @@ node_modules/
 scripts/maestro/.env
 scripts/e2e-test-user.properties
 
-# Local Claude Code settings (personal allowlist, contains absolute paths)
-.claude/settings.json
+# Personal Claude Code settings (machine-specific allowlist, absolute paths).
+# The shared .claude/settings.json is tracked — keep secrets out of it.
 .claude/settings.local.json
 
 # Firebase Emulator Suite
