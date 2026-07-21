@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > WorkspaceDao</title>
+  <title>MoneySurfer Coverage Report > RecurringRuleDao</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.data.db.dao</a>
 </div>
 
-<h1>Coverage Summary for Class: WorkspaceDao (com.georgeci.moneysurfer.data.db.dao)</h1>
+<h1>Coverage Summary for Class: RecurringRuleDao (com.georgeci.moneysurfer.data.db.dao)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">WorkspaceDao</td>
+  <td class="name">RecurringRuleDao</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -50,45 +50,28 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import androidx.room.Insert
 &nbsp;import androidx.room.Query
 &nbsp;import androidx.room.Update
-&nbsp;import androidx.room.Upsert
-&nbsp;import com.georgeci.moneysurfer.data.db.entity.WorkspaceEntity
+&nbsp;import com.georgeci.moneysurfer.data.db.entity.RecurringRuleEntity
 &nbsp;import kotlinx.coroutines.flow.Flow
 &nbsp;
 &nbsp;@Dao
-&nbsp;interface WorkspaceDao {
+&nbsp;interface RecurringRuleDao {
 &nbsp;
-&nbsp;    @Query(&quot;SELECT * FROM workspaces&quot;)
-&nbsp;    fun getAll(): Flow&lt;List&lt;WorkspaceEntity&gt;&gt;
+&nbsp;    @Query(&quot;SELECT * FROM recurring_rules&quot;)
+&nbsp;    fun getAll(): Flow&lt;List&lt;RecurringRuleEntity&gt;&gt;
 &nbsp;
-&nbsp;    @Query(
-&nbsp;        &quot;&quot;&quot;
-&nbsp;        SELECT w.*
-&nbsp;        FROM workspaces w
-&nbsp;        INNER JOIN workspace_members wm ON wm.workspaceId = w.id
-&nbsp;        WHERE wm.userId = :userId
-&nbsp;        &quot;&quot;&quot;,
-&nbsp;    )
-&nbsp;    fun getByUserId(userId: String): Flow&lt;List&lt;WorkspaceEntity&gt;&gt;
-&nbsp;
-&nbsp;    @Query(&quot;SELECT * FROM workspaces WHERE id = :id&quot;)
-&nbsp;    suspend fun getById(id: String): WorkspaceEntity?
+&nbsp;    @Query(&quot;SELECT * FROM recurring_rules WHERE id = :id&quot;)
+&nbsp;    suspend fun getById(id: String): RecurringRuleEntity?
 &nbsp;
 &nbsp;    @Insert
-&nbsp;    suspend fun insert(entity: WorkspaceEntity)
-&nbsp;
-&nbsp;    @Insert
-&nbsp;    suspend fun insertAll(entities: List&lt;WorkspaceEntity&gt;)
+&nbsp;    suspend fun insert(entity: RecurringRuleEntity)
 &nbsp;
 &nbsp;    @Update
-&nbsp;    suspend fun update(entity: WorkspaceEntity)
+&nbsp;    suspend fun update(entity: RecurringRuleEntity)
 &nbsp;
-&nbsp;    @Upsert
-&nbsp;    suspend fun upsertAll(entities: List&lt;WorkspaceEntity&gt;)
-&nbsp;
-&nbsp;    @Query(&quot;DELETE FROM workspaces WHERE id = :id&quot;)
+&nbsp;    @Query(&quot;DELETE FROM recurring_rules WHERE id = :id&quot;)
 &nbsp;    suspend fun delete(id: String)
 &nbsp;
-&nbsp;    @Query(&quot;DELETE FROM workspaces&quot;)
+&nbsp;    @Query(&quot;DELETE FROM recurring_rules&quot;)
 &nbsp;    suspend fun deleteAll()
 &nbsp;}
 </code>
@@ -114,7 +97,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-21 14:23</div>
+    <div style="float:right;">generated on 2026-07-21 15:05</div>
 </div>
 </body>
 </html>

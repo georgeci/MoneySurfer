@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > TransactionDao</title>
+  <title>MoneySurfer Coverage Report > UserDao</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.data.db.dao</a>
 </div>
 
-<h1>Coverage Summary for Class: TransactionDao (com.georgeci.moneysurfer.data.db.dao)</h1>
+<h1>Coverage Summary for Class: UserDao (com.georgeci.moneysurfer.data.db.dao)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">TransactionDao</td>
+  <td class="name">UserDao</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -48,105 +48,46 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;
 &nbsp;import androidx.room.Dao
 &nbsp;import androidx.room.Insert
+&nbsp;import androidx.room.OnConflictStrategy
 &nbsp;import androidx.room.Query
 &nbsp;import androidx.room.Update
 &nbsp;import androidx.room.Upsert
-&nbsp;import com.georgeci.moneysurfer.data.db.entity.CategorizedTransactionEntity
-&nbsp;import com.georgeci.moneysurfer.data.db.entity.TransactionEntity
+&nbsp;import com.georgeci.moneysurfer.data.db.entity.UserEntity
 &nbsp;import kotlinx.coroutines.flow.Flow
 &nbsp;
 &nbsp;@Dao
-&nbsp;interface TransactionDao {
+&nbsp;interface UserDao {
 &nbsp;
-&nbsp;    @Query(&quot;SELECT * FROM transactions ORDER BY operationDate DESC, operationAt DESC, createdAt DESC&quot;)
-&nbsp;    fun getAll(): Flow&lt;List&lt;TransactionEntity&gt;&gt;
+&nbsp;    @Query(&quot;SELECT * FROM users&quot;)
+&nbsp;    fun getAll(): Flow&lt;List&lt;UserEntity&gt;&gt;
 &nbsp;
-&nbsp;    @Query(
-&nbsp;        &quot;&quot;&quot;
-&nbsp;        SELECT
-&nbsp;            transactions.id,
-&nbsp;            transactions.workspaceId,
-&nbsp;            transactions.accountId,
-&nbsp;            transactions.amount,
-&nbsp;            transactions.currencyCode,
-&nbsp;            transactions.categoryId,
-&nbsp;            categories.name AS categoryName,
-&nbsp;            transactions.note,
-&nbsp;            transactions.operationAt,
-&nbsp;            transactions.operationDate,
-&nbsp;            transactions.createdAt,
-&nbsp;            transactions.type,
-&nbsp;            transactions.status,
-&nbsp;            transactions.updatedAt,
-&nbsp;            transactions.transferId
-&nbsp;        FROM transactions
-&nbsp;        LEFT JOIN categories ON categories.id = transactions.categoryId
-&nbsp;        ORDER BY transactions.operationDate DESC, transactions.operationAt DESC, transactions.createdAt DESC
-&nbsp;        &quot;&quot;&quot;,
-&nbsp;    )
-&nbsp;    fun getAllCategorized(): Flow&lt;List&lt;CategorizedTransactionEntity&gt;&gt;
-&nbsp;
-&nbsp;    @Query(
-&nbsp;        &quot;SELECT * FROM transactions WHERE accountId = :accountId ORDER BY operationDate DESC, operationAt DESC, createdAt DESC&quot;,
-&nbsp;    )
-&nbsp;    fun getByAccountId(accountId: String): Flow&lt;List&lt;TransactionEntity&gt;&gt;
-&nbsp;
-&nbsp;    @Query(
-&nbsp;        &quot;&quot;&quot;
-&nbsp;        SELECT
-&nbsp;            transactions.id,
-&nbsp;            transactions.workspaceId,
-&nbsp;            transactions.accountId,
-&nbsp;            transactions.amount,
-&nbsp;            transactions.currencyCode,
-&nbsp;            transactions.categoryId,
-&nbsp;            categories.name AS categoryName,
-&nbsp;            transactions.note,
-&nbsp;            transactions.operationAt,
-&nbsp;            transactions.operationDate,
-&nbsp;            transactions.createdAt,
-&nbsp;            transactions.type,
-&nbsp;            transactions.status,
-&nbsp;            transactions.updatedAt,
-&nbsp;            transactions.transferId
-&nbsp;        FROM transactions
-&nbsp;        LEFT JOIN categories ON categories.id = transactions.categoryId
-&nbsp;        WHERE transactions.accountId = :accountId
-&nbsp;        ORDER BY transactions.operationDate DESC, transactions.operationAt DESC, transactions.createdAt DESC
-&nbsp;        &quot;&quot;&quot;,
-&nbsp;    )
-&nbsp;    fun getByAccountIdCategorized(accountId: String): Flow&lt;List&lt;CategorizedTransactionEntity&gt;&gt;
-&nbsp;
-&nbsp;    @Query(
-&nbsp;        &quot;SELECT * FROM transactions WHERE workspaceId = :workspaceId ORDER BY operationDate DESC, operationAt DESC, createdAt DESC&quot;,
-&nbsp;    )
-&nbsp;    fun getByWorkspaceId(workspaceId: String): Flow&lt;List&lt;TransactionEntity&gt;&gt;
-&nbsp;
-&nbsp;    @Query(&quot;SELECT * FROM transactions WHERE id = :id&quot;)
-&nbsp;    suspend fun getById(id: String): TransactionEntity?
+&nbsp;    @Query(&quot;SELECT * FROM users WHERE id = :id&quot;)
+&nbsp;    suspend fun getById(id: String): UserEntity?
 &nbsp;
 &nbsp;    @Insert
-&nbsp;    suspend fun insert(entity: TransactionEntity)
+&nbsp;    suspend fun insert(entity: UserEntity)
 &nbsp;
 &nbsp;    @Insert
-&nbsp;    suspend fun insertAll(entities: List&lt;TransactionEntity&gt;)
+&nbsp;    suspend fun insertAll(entities: List&lt;UserEntity&gt;)
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Stub-insert for foreign user ids that show up via workspace members during a
+&nbsp;     * pull. Skips the row if the id is already present so the local user&#39;s
+&nbsp;     * `displayName` / `isAnon` fields are not overwritten with peer placeholders.
+&nbsp;     */
+&nbsp;    @Insert(onConflict = OnConflictStrategy.IGNORE)
+&nbsp;    suspend fun insertIgnore(entity: UserEntity)
 &nbsp;
 &nbsp;    @Update
-&nbsp;    suspend fun update(entity: TransactionEntity)
+&nbsp;    suspend fun update(entity: UserEntity)
 &nbsp;
 &nbsp;    @Upsert
-&nbsp;    suspend fun upsertAll(entities: List&lt;TransactionEntity&gt;)
+&nbsp;    suspend fun upsert(entity: UserEntity)
 &nbsp;
-&nbsp;    @Query(&quot;DELETE FROM transactions WHERE id = :id&quot;)
+&nbsp;    @Query(&quot;DELETE FROM users WHERE id = :id&quot;)
 &nbsp;    suspend fun delete(id: String)
 &nbsp;
-&nbsp;    @Query(&quot;DELETE FROM transactions WHERE accountId = :accountId&quot;)
-&nbsp;    suspend fun deleteByAccountId(accountId: String)
-&nbsp;
-&nbsp;    @Query(&quot;UPDATE transactions SET categoryId = NULL WHERE categoryId = :categoryId&quot;)
-&nbsp;    suspend fun nullifyCategoryId(categoryId: String)
-&nbsp;
-&nbsp;    @Query(&quot;DELETE FROM transactions&quot;)
+&nbsp;    @Query(&quot;DELETE FROM users&quot;)
 &nbsp;    suspend fun deleteAll()
 &nbsp;}
 </code>
@@ -172,7 +113,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-21 14:23</div>
+    <div style="float:right;">generated on 2026-07-21 15:05</div>
 </div>
 </body>
 </html>

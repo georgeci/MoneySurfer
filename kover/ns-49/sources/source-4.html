@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > RecurringRuleRepository</title>
+  <title>MoneySurfer Coverage Report > RemoteDataResetRepository</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.repositories</a>
 </div>
 
-<h1>Coverage Summary for Class: RecurringRuleRepository (com.georgeci.moneysurfer.domain.repositories)</h1>
+<h1>Coverage Summary for Class: RemoteDataResetRepository (com.georgeci.moneysurfer.domain.repositories)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">RecurringRuleRepository</td>
+  <td class="name">RemoteDataResetRepository</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -46,16 +46,17 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.repositories
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.model.RecurringRule
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.RecurringRuleId
-&nbsp;import kotlinx.coroutines.flow.Flow
-&nbsp;
-&nbsp;interface RecurringRuleRepository {
-&nbsp;    fun getAll(): Flow&lt;List&lt;RecurringRule&gt;&gt;
-&nbsp;    suspend fun getById(id: RecurringRuleId): RecurringRule?
-&nbsp;    suspend fun insert(rule: RecurringRule)
-&nbsp;    suspend fun update(rule: RecurringRule)
-&nbsp;    suspend fun delete(id: RecurringRuleId)
+&nbsp;/**
+&nbsp; * Wipes the sync-side ledgers (pending_mutations, sync_meta) so a fresh
+&nbsp; * post-logout session doesn&#39;t reattempt the previous user&#39;s outbox or
+&nbsp; * resume from their cursor positions.
+&nbsp; *
+&nbsp; * Lives separately from [LocalDataResetRepository] so the offline build
+&nbsp; * can stay unaware of the sync database — it provides a no-op binding
+&nbsp; * while still satisfying [LogoutUseCase]&#39;s contract.
+&nbsp; */
+&nbsp;interface RemoteDataResetRepository {
+&nbsp;    suspend fun clearAll()
 &nbsp;}
 </code>
 </pre>
@@ -80,7 +81,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-21 14:23</div>
+    <div style="float:right;">generated on 2026-07-21 15:05</div>
 </div>
 </body>
 </html>
