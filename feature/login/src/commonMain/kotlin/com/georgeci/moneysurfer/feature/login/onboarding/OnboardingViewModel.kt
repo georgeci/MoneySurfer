@@ -2,6 +2,7 @@ package com.georgeci.moneysurfer.feature.login.onboarding
 
 import co.touchlab.kermit.Logger
 import com.georgeci.moneysurfer.domain.OfflineBuildFlags
+import com.georgeci.moneysurfer.domain.firstrun.FirstRunSeeder
 import com.georgeci.moneysurfer.domain.preferences.UiPreferences
 import com.georgeci.moneysurfer.domain.primitives.AccountType
 import com.georgeci.moneysurfer.utils.MviViewModel
@@ -12,9 +13,9 @@ import org.koin.core.annotation.KoinViewModel
  * adapted 03 "С чего начнём?").
  *
  * The offline build gets both steps: after the value pitch the user picks what their first
- * account looks like, and that choice pre-fills the account creation screen (its workspace was
- * already seeded by `FirstRunSeeder` at launch). The online build has nothing to pick yet —
- * accounts live inside a workspace that only exists after sign-in — so it stops at the value
+ * account looks like, and that choice pre-fills the account creation screen — whose workspace
+ * this view model seeds on the way out via [FirstRunSeeder]. The online build has nothing to pick
+ * yet (accounts live inside a workspace that only exists after sign-in), so it stops at the value
  * step and continues into sign-in.
  *
  * `onboardingCompleted` is persisted before navigating, so a process death right after the tap
@@ -23,6 +24,7 @@ import org.koin.core.annotation.KoinViewModel
 @KoinViewModel
 class OnboardingViewModel(
     private val uiPreferences: UiPreferences,
+    private val firstRunSeeder: FirstRunSeeder,
     offlineBuildFlags: OfflineBuildFlags,
 ) : MviViewModel<OnboardingState, OnboardingEvent, OnboardingEffect>(
     initialState = OnboardingState(isOffline = offlineBuildFlags.isOffline),
@@ -56,17 +58,22 @@ class OnboardingViewModel(
         if (state.inFlight) return
         launch(
             onError = { err ->
-                log.w(err) { "[finish] failed to persist the onboarding flag" }
+                log.w(err) { "[finish] failed — onboarding not marked complete, user can retry" }
                 updateState { copy(inFlight = false) }
             },
         ) {
             updateState { copy(inFlight = true) }
-            uiPreferences.onboardingCompleted.set(true)
             val effect = if (state.isOffline) {
+                // The offline first-account screen needs a pinned workspace, so the seed runs
+                // here rather than at launch — the app introduces itself before writing anything.
+                firstRunSeeder.seedIfNeeded()
                 OnboardingEffect.NavigateToFirstAccount(state.selectedAccountKind.accountType)
             } else {
                 OnboardingEffect.NavigateToSignIn
             }
+            // Flag last: if the seed above threw, the onboarding replays on the next launch
+            // instead of dropping the user on a screen with no workspace behind it.
+            uiPreferences.onboardingCompleted.set(true)
             log.i { "[finish] ok -> $effect" }
             postSideEffect(effect)
         }

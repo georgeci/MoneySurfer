@@ -37,7 +37,7 @@ class UiSettingsDataSource(
      * exactly when the onboarding should show again.
      */
     val onboardingCompleted = prefs.boolean(
-        name = "onboarding.completed",
+        name = "ui.onboarding_completed",
         default = false,
     )
 

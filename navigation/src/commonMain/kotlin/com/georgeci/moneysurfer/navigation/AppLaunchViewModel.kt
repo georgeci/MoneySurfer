@@ -8,6 +8,8 @@ import com.georgeci.moneysurfer.domain.SyncFeatureFlag
 import com.georgeci.moneysurfer.domain.auth.SessionPointers
 import com.georgeci.moneysurfer.domain.firstrun.FirstRunSeeder
 import com.georgeci.moneysurfer.domain.preferences.UiPreferences
+import com.georgeci.moneysurfer.domain.primitives.UserId
+import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 import com.georgeci.moneysurfer.domain.usecase.GetAccountsUseCase
 import com.georgeci.moneysurfer.sync.api.SyncReason
 import com.georgeci.moneysurfer.sync.coordinator.SyncCoordinator
@@ -53,31 +55,33 @@ class AppLaunchViewModel(
 
     init {
         viewModelScope.launch {
-            // 0. First-run hook (offline build only — online binds a no-op). Runs before the
-            //    route decision so a fresh install can flip user + workspace pointers and land
-            //    directly on the Dashboard instead of bouncing through SignIn / Selector.
-            //    Failures (e.g. local DB hiccup) must not block startup — log and fall through
-            //    to the route decision so the app always reaches a navigable state.
-            runCatching { firstRunSeeder.seedIfNeeded() }
-                .onFailure { log.w(it) { "[firstRun] seedIfNeeded threw — proceeding to route decision" } }
+            // 0. Onboarding gates everything else (issue #173): nothing is seeded and no session
+            //    state is inspected until the user has been introduced to the app. The splash
+            //    therefore clears as soon as this one preference read returns.
+            //    `OnboardingViewModel` runs the first-run seed itself when the user continues.
+            if (!uiPreferences.onboardingCompleted.flow.first()) {
+                targetRoute.value = Route.Onboarding
+            } else {
+                // 1. Returning user: give the first-run seed a chance to repair a half-finished
+                //    install (offline build only — online binds a no-op), then decide the route.
+                //    Failures (e.g. local DB hiccup) must not block startup — log and fall through
+                //    so the app always reaches a navigable state.
+                runCatching { firstRunSeeder.seedIfNeeded() }
+                    .onFailure { log.w(it) { "[firstRun] seedIfNeeded threw — proceeding to route decision" } }
 
-            // 1. One-shot startup decision based on the current snapshot.
-            //    Onboarding comes first: it is device-scoped and gates both builds. The offline
-            //    "no accounts yet" branch covers a process death on the first-run account screen —
-            //    the offline seed no longer inserts a placeholder account.
-            val onboardingCompleted = uiPreferences.onboardingCompleted.flow.first()
-            val userId = session.currentUserId.flow.first()
-            val workspaceId = session.currentWorkspaceId.flow.first()
-            targetRoute.value = when {
-                !onboardingCompleted -> Route.Onboarding
-                userId == null -> Route.SignIn
-                workspaceId == null -> Route.WorkspaceSelector()
-                offlineBuildFlags.isOffline && getAccounts().first().isEmpty() ->
-                    Route.AccountCreation(firstRun = true)
-                else -> Route.Dashboard
+                // 2. One-shot startup decision based on the current snapshot.
+                val userId = session.currentUserId.flow.first()
+                val workspaceId = session.currentWorkspaceId.flow.first()
+                targetRoute.value = resolveStartRoute(
+                    userId = userId,
+                    workspaceId = workspaceId,
+                    isOffline = offlineBuildFlags.isOffline,
+                    // Only the offline branch consults it, so don't query accounts otherwise.
+                    hasAccounts = { getAccounts().first().isNotEmpty() },
+                )
             }
 
-            // 2. Only react to the user becoming null afterwards — drop the seed value first
+            // 3. Only react to the user becoming null afterwards — drop the seed value first
             //    so the initial emission isn't double-counted.
             session.currentUserId.flow
                 .drop(1)
@@ -85,7 +89,7 @@ class AppLaunchViewModel(
                 .collect { targetRoute.value = Route.SignIn }
         }
 
-        // 3. Periodic sync while a Firebase-backed session is active. In-process loop
+        // 4. Periodic sync while a Firebase-backed session is active. In-process loop
         //    instead of `BackgroundSyncScheduler.schedulePeriodic` because Android's
         //    WorkManager clamps periodic work to a 15-minute floor — we need true
         //    1-minute cadence here. `collectLatest` cancels the loop the moment the
@@ -114,4 +118,24 @@ class AppLaunchViewModel(
         const val TAG = "AppLaunchVM"
         val PERIODIC_INTERVAL = 1.minutes
     }
+}
+
+/**
+ * Start route for a user who has already been through the onboarding — the policy on its own, so
+ * it can be tested without a view model scope. Onboarding itself is decided before this is called.
+ *
+ * The offline "no accounts yet" branch covers a process death on the first-run account screen:
+ * the offline seed pins a workspace but no longer inserts a placeholder account, so an empty
+ * workspace means the user never finished creating their first one.
+ */
+internal suspend fun resolveStartRoute(
+    userId: UserId?,
+    workspaceId: WorkspaceId?,
+    isOffline: Boolean,
+    hasAccounts: suspend () -> Boolean,
+): Route = when {
+    userId == null -> Route.SignIn
+    workspaceId == null -> Route.WorkspaceSelector()
+    isOffline && !hasAccounts() -> Route.AccountCreation(firstRun = true)
+    else -> Route.Dashboard
 }

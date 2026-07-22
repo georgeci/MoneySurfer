@@ -27,6 +27,7 @@
     <string name="account_creation_title">New account</string>
     <string name="account_creation_first_run_title">Your first account</string>
     <string name="account_creation_first_run_subtitle">Add the account you use most — cash, a card, or savings. You can add more later.</string>
+    <string name="account_creation_currency_failed_snackbar">Account saved, but the workspace currency could not be updated</string>
     <string name="account_creation_name_label">Account name</string>
     <string name="account_creation_name_error_required">Account name is required.</string>
     <string name="account_creation_balance_label">Opening balance</string>
