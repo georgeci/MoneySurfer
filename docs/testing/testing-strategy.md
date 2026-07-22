@@ -4,6 +4,7 @@
 ## Contents
 - [Testing Strategy](#testing-strategy)
 - [TL;DR for agents](#tldr-for-agents)
+- [Test layers](#test-layers)
 - [Common Commands](#common-commands)
 - [QA Entry Points](#qa-entry-points)
   - [Offline golden-path E2E](#offline-golden-path-e2e)
@@ -11,6 +12,11 @@
 - [Test tags (Compose ↔ Maestro)](#test-tags-compose--maestro)
 - [Rules](#rules)
 <!-- DOCS:END -->
+
+The entry point for everything about testing MoneySurfer: which layers exist,
+which one a given change belongs in, and how to run them. Operational detail —
+tool install, per-scope QA tasks, report and artifact paths — lives in the
+[QA runbook](qa-runbook.md).
 
 ## TL;DR for agents
 
@@ -27,6 +33,21 @@ READ WHEN:
 - adding Compose desktop UI tests
 
 <!-- AI:SECTION id=testing-strategy task=testing,qa,validation -->
+## Test layers
+
+| Layer | Where | Needs | What it covers |
+|---|---|---|---|
+| Unit | `commonTest`, `jvmTest`, `androidHostTest` | nothing | Pure logic: domain rules, mappers, ViewModel state. kotest `StringSpec`. |
+| Desktop UI | `:composeApp:jvmTest` | nothing (headless) | Screen logic through the semantics tree — see [below](#desktop-ui-tests-compose-jvmtest). |
+| Integration | `:integration-test` `jvmTest` | nothing | Room round-trips across domain → data. |
+| Device integration | `:integration-test` `connectedAndroidDeviceTest` | Android device + Firebase emulator | Real Firebase SDK against Firestore/Auth emulators. |
+| Firestore rules | `firestore-tests/` | Node + JDK 21 | Security rules, per-role access. Mocha, not Gradle. |
+| E2E | `scripts/maestro/` | device/simulator + emulator | Full user journeys on Android and iOS. |
+
+Pick the cheapest layer that can catch the regression. A rule of thumb: if it
+can be a unit test, it should be; reach for a device or Maestro layer only when
+the behaviour genuinely depends on the platform.
+
 ## Common Commands
 
 ```bash
