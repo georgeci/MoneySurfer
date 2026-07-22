@@ -15,10 +15,12 @@ import androidx.room.PrimaryKey
  */
 @Entity(
     tableName = "pending_mutations",
+    // (status, createdAt) as one composite: the drain query is
+    // `WHERE status = 'PENDING' ... ORDER BY createdAt ASC LIMIT n`, so the index
+    // serves both the filter and the ordering, replacing the two single-column ones.
     indices = [
-        Index("status"),
+        Index(value = ["status", "createdAt"]),
         Index("workspaceId"),
-        Index("createdAt"),
     ],
 )
 data class PendingMutationEntity(

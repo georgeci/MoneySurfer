@@ -1,8 +1,8 @@
 {
   "formatVersion": 1,
   "database": {
-    "version": 23,
-    "identityHash": "8a259ee0d3a9aa9a9208925e9937fbc7",
+    "version": 24,
+    "identityHash": "5717e9f0505921413a920e6bc6849b2e",
     "entities": [
       {
         "tableName": "users",
@@ -735,13 +735,20 @@
       },
       {
         "tableName": "budgets",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `name` TEXT NOT NULL, `categoryIds` TEXT NOT NULL, `amount` INTEGER NOT NULL, `period` TEXT NOT NULL, `startDate` TEXT NOT NULL, `alertPercent` INTEGER NOT NULL, `isActive` INTEGER NOT NULL, `createdAt` INTEGER NOT NULL DEFAULT 0, `updatedAt` INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `workspaceId` TEXT NOT NULL DEFAULT '', `name` TEXT NOT NULL, `categoryIds` TEXT NOT NULL, `amount` INTEGER NOT NULL, `period` TEXT NOT NULL, `startDate` TEXT NOT NULL, `alertPercent` INTEGER NOT NULL, `isActive` INTEGER NOT NULL, `rollover` INTEGER NOT NULL DEFAULT 0, `createdAt` INTEGER NOT NULL DEFAULT 0, `updatedAt` INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(`id`), FOREIGN KEY(`workspaceId`) REFERENCES `workspaces`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
         "fields": [
           {
             "fieldPath": "id",
             "columnName": "id",
             "affinity": "TEXT",
             "notNull": true
+          },
+          {
+            "fieldPath": "workspaceId",
+            "columnName": "workspaceId",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
           },
           {
             "fieldPath": "name",
@@ -786,6 +793,13 @@
             "notNull": true
           },
           {
+            "fieldPath": "rollover",
+            "columnName": "rollover",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
             "fieldPath": "createdAt",
             "columnName": "createdAt",
             "affinity": "INTEGER",
@@ -805,7 +819,31 @@
           "columnNames": [
             "id"
           ]
-        }
+        },
+        "indices": [
+          {
+            "name": "index_budgets_workspaceId",
+            "unique": false,
+            "columnNames": [
+              "workspaceId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_budgets_workspaceId` ON `${TABLE_NAME}` (`workspaceId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "workspaces",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "workspaceId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
       },
       {
         "tableName": "recurring_rules",
@@ -937,7 +975,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '8a259ee0d3a9aa9a9208925e9937fbc7')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '5717e9f0505921413a920e6bc6849b2e')"
     ]
   }
 }
