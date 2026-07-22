@@ -93,9 +93,20 @@ working one, and testers would notice the gap long after the misconfiguration.
 
 ## Notes on the build
 
-- `versionCode` / `versionName` come from `Version.xcconfig`, so consecutive
-  nightlies share a version. App Distribution allows this — each upload is a
-  separate release.
+- The version is `major.minor.build`. `major` / `minor` are edited by hand in
+  [`Version.xcconfig`](../../Version.xcconfig); `build` is this workflow's
+  `github.run_number`, passed to Gradle as `APP_BUILD_NUMBER`, so every
+  distributed build carries a distinct `0.1.<run>` and shows up as its own
+  version in App Distribution. Local builds fall back to `APP_BUILD_NUMBER`
+  from the file (`0`).
+- `versionCode` is derived as `major * 100000 + minor * 1000 + build` — two
+  digits for minor, three for the build. The build number is taken `mod 1000`
+  so it can never carry into `minor`; the build fails only on a hand-edited
+  `major > 20999` (Play's own ceiling) or `minor > 99`.
+- The wrap is worth knowing about: run 1000 comes back as build `0`, i.e. a
+  **lower** `versionCode` than run 999. App Distribution doesn't care, but Play
+  rejects a non-increasing code — bump `APP_VERSION_MINOR` before the counter
+  wraps if the same versioning ever feeds a Play upload.
 - The release build is minified/shrunk (R8). Crashlytics mapping and native
   symbol uploads are separate Gradle tasks and are **not** run here.
 - The APK is also kept as a run artifact (`androidApp-release-apk`, 14 days).

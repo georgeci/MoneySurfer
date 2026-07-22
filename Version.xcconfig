@@ -1,3 +1,15 @@
 // Shared app version. Android Gradle and iOS Xcode both read this file.
-APP_VERSION_CODE = 3
-APP_VERSION_NAME = 0.1.0
+//
+// The version is `major.minor.build`. Only the first two are edited by hand —
+// `build` is the CI run number, injected through the APP_BUILD_NUMBER env var
+// so every distributed build is distinguishable. Local builds keep the default
+// below.
+APP_VERSION_MAJOR = 0
+APP_VERSION_MINOR = 1
+APP_BUILD_NUMBER = 0
+
+// Xcode interpolates these; the Android convention plugin derives its own
+// versionName / versionCode from the three parts above (xcconfig has no
+// arithmetic, and Java's Properties parser doesn't expand `$(...)`).
+APP_VERSION_NAME = $(APP_VERSION_MAJOR).$(APP_VERSION_MINOR).$(APP_BUILD_NUMBER)
+APP_VERSION_CODE = $(APP_BUILD_NUMBER)

@@ -18,10 +18,20 @@ class KmpAppConventionPlugin : Plugin<Project> {
     override fun apply(target: Project): Unit = with(target) {
         val localProps = loadLocalProperties()
         val versionProps = loadVersionProperties()
-        val versionCodeInt = versionProps.requireInt("APP_VERSION_CODE")
-        val versionNameStr = versionProps.requireString("APP_VERSION_NAME")
 
         val secrets = Secrets(localProps, providers)
+
+        // major.minor come from Version.xcconfig; the build number is whatever
+        // CI injects (APP_BUILD_NUMBER=<run number>), falling back to the file
+        // for local builds.
+        val major = versionProps.requireInt("APP_VERSION_MAJOR")
+        val minor = versionProps.requireInt("APP_VERSION_MINOR")
+        val build = (
+            secrets["APP_BUILD_NUMBER"]?.trim()?.toIntOrNull()
+                ?: versionProps.requireInt("APP_BUILD_NUMBER")
+            ).mod(BUILD_NUMBER_RANGE)
+        val versionNameStr = "$major.$minor.$build"
+        val versionCodeInt = appVersionCode(major, minor, build)
 
         val hasReleaseSigning = listOf(
             "RELEASE_STORE_FILE",
@@ -213,3 +223,24 @@ private fun Properties.requireString(name: String): String =
 private fun Properties.requireInt(name: String): Int =
     requireString(name).toIntOrNull()
         ?: error("Version property $name must be an integer")
+
+/** Build numbers are taken modulo this, so they can never carry into `minor`. */
+private const val BUILD_NUMBER_RANGE = 1_000
+
+/**
+ * `major * 100000 + minor * 1000 + build` — a versionCode derived from
+ * `major.minor.build`: two digits for minor, three for the build number.
+ *
+ * The layout only holds inside those digit widths; an overflowing component
+ * carries into the next one and the code stops being ordered. `build` can't
+ * overflow — it arrives already reduced modulo [BUILD_NUMBER_RANGE]. `major`
+ * and `minor` are hand-edited in `Version.xcconfig`, so they are checked
+ * instead, `major` against Play's own `versionCode` ceiling of 2100000000.
+ */
+private fun appVersionCode(major: Int, minor: Int, build: Int): Int {
+    require(major in 0..20_999 && minor in 0..99) {
+        "Version $major.$minor is out of range for versionCode " +
+            "(major <= 20999, minor <= 99)"
+    }
+    return major * 100_000 + minor * 1_000 + build
+}
