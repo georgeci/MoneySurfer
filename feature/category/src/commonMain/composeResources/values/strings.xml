@@ -50,7 +50,6 @@
     <string name="category_details_stat_per_transaction">Per txn</string>
     <string name="category_details_trend_title">Last 6 months</string>
     <string name="category_details_subcategories">Subcategories</string>
-    <string name="category_details_subcategories_manage">Manage</string>
     <string name="category_details_subcategories_empty">No subcategories. Everything here is booked straight to this category.</string>
     <string name="category_details_share_percent">%1$d%%</string>
     <string name="category_details_recent">Recent</string>

@@ -1,6 +1,5 @@
 package com.georgeci.moneysurfer.feature.category.details
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -57,7 +56,6 @@ import moneysurfer.feature.category.generated.resources.category_details_stat_pe
 import moneysurfer.feature.category.generated.resources.category_details_stat_transactions
 import moneysurfer.feature.category.generated.resources.category_details_subcategories
 import moneysurfer.feature.category.generated.resources.category_details_subcategories_empty
-import moneysurfer.feature.category.generated.resources.category_details_subcategories_manage
 import moneysurfer.feature.category.generated.resources.category_details_title
 import moneysurfer.feature.category.generated.resources.category_details_transaction_untitled
 import moneysurfer.feature.category.generated.resources.category_details_trend_title
@@ -84,7 +82,6 @@ fun CategoryDetailsScreen(
     onNavigateBack: () -> Unit,
     onNavigateToCategoryEdit: (CategoryId) -> Unit = {},
     onNavigateToCategoryDetails: (CategoryId) -> Unit = {},
-    onNavigateToCategoriesManage: () -> Unit = {},
     onNavigateToTransactionCreation: () -> Unit = {},
     onNavigateToTransactionDetails: (TransactionId) -> Unit = {},
     viewModel: CategoryDetailsViewModel =
@@ -96,7 +93,6 @@ fun CategoryDetailsScreen(
         when (effect) {
             CategoryDetailsEffect.NavigateBack -> onNavigateBack()
             CategoryDetailsEffect.NavigateToTransactionCreation -> onNavigateToTransactionCreation()
-            CategoryDetailsEffect.NavigateToCategoriesManage -> onNavigateToCategoriesManage()
             is CategoryDetailsEffect.NavigateToCategoryEdit -> onNavigateToCategoryEdit(effect.categoryId)
             is CategoryDetailsEffect.NavigateToCategoryDetails ->
                 onNavigateToCategoryDetails(effect.categoryId)
@@ -271,12 +267,7 @@ private fun CategoryDetailsContent(
             }
 
             item(key = "subcategories-header") {
-                SectionHeader(
-                    title = stringResource(Res.string.category_details_subcategories),
-                    action = stringResource(Res.string.category_details_subcategories_manage)
-                        .takeIf { !state.isLeaf },
-                    onActionClick = { onEvent(CategoryDetailsEvent.OnManageSubcategoriesClick) },
-                )
+                SectionHeader(title = stringResource(Res.string.category_details_subcategories))
             }
 
             if (state.isLeaf) {
@@ -299,8 +290,7 @@ private fun CategoryDetailsContent(
                         hue = child.hue,
                     )
                     SurferCategoryBreakdownRow(
-                        icon = childVisual.icon,
-                        tint = childVisual.tint,
+                        visual = childVisual,
                         name = child.name,
                         formattedAmount = child.formattedAmount,
                         sharePercentLabel = stringResource(
@@ -352,34 +342,15 @@ private fun CategoryDetailsContent(
 }
 
 @Composable
-private fun SectionHeader(
-    title: String,
-    action: String? = null,
-    onActionClick: () -> Unit = {},
-) {
-    Row(
+private fun SectionHeader(title: String) {
+    Text(
+        text = title,
+        style = AppTheme.typography.titleSmall,
+        color = AppTheme.materialColors.onSurfaceVariant,
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = AppTheme.spacing.small, vertical = AppTheme.spacing.xSmall),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(
-            text = title,
-            style = AppTheme.typography.titleSmall,
-            color = AppTheme.materialColors.onSurfaceVariant,
-            modifier = Modifier.weight(1f),
-        )
-        if (action != null) {
-            Text(
-                text = action,
-                style = AppTheme.typography.labelLarge,
-                color = AppTheme.materialColors.primary,
-                modifier = Modifier
-                    .clickable(onClick = onActionClick)
-                    .padding(start = AppTheme.spacing.small),
-            )
-        }
-    }
+    )
 }
 
 private fun heroLabelFor(type: CategoryType) = when (type) {

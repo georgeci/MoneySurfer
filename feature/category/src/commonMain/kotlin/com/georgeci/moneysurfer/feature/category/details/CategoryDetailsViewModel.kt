@@ -41,8 +41,6 @@ class CategoryDetailsViewModel(
                 postSideEffect(CategoryDetailsEffect.NavigateToCategoryEdit(currentState.categoryId))
             CategoryDetailsEvent.OnAddTransactionClick ->
                 postSideEffect(CategoryDetailsEffect.NavigateToTransactionCreation)
-            CategoryDetailsEvent.OnManageSubcategoriesClick ->
-                postSideEffect(CategoryDetailsEffect.NavigateToCategoriesManage)
             is CategoryDetailsEvent.OnSubcategoryClick ->
                 postSideEffect(CategoryDetailsEffect.NavigateToCategoryDetails(event.categoryId))
             is CategoryDetailsEvent.OnTransactionClick ->
@@ -213,7 +211,6 @@ sealed interface CategoryDetailsEvent {
     data object OnBackClick : CategoryDetailsEvent
     data object OnEditClick : CategoryDetailsEvent
     data object OnAddTransactionClick : CategoryDetailsEvent
-    data object OnManageSubcategoriesClick : CategoryDetailsEvent
     data class OnSubcategoryClick(val categoryId: CategoryId) : CategoryDetailsEvent
     data class OnTransactionClick(val transactionId: TransactionId) : CategoryDetailsEvent
 }
@@ -221,7 +218,6 @@ sealed interface CategoryDetailsEvent {
 sealed interface CategoryDetailsEffect {
     data object NavigateBack : CategoryDetailsEffect
     data object NavigateToTransactionCreation : CategoryDetailsEffect
-    data object NavigateToCategoriesManage : CategoryDetailsEffect
     data class NavigateToCategoryEdit(val categoryId: CategoryId) : CategoryDetailsEffect
     data class NavigateToCategoryDetails(val categoryId: CategoryId) : CategoryDetailsEffect
     data class NavigateToTransactionDetails(val transactionId: TransactionId) : CategoryDetailsEffect

@@ -15,14 +15,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.georgeci.moneysurfer.uikit.atom.SurferCard
 import com.georgeci.moneysurfer.uikit.components.SurferCategoryBubble
 import com.georgeci.moneysurfer.uikit.components.SurferCategoryPalette
+import com.georgeci.moneysurfer.uikit.components.SurferCategoryVisual
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
@@ -33,11 +32,13 @@ import com.georgeci.moneysurfer.uikit.theme.AppTheme
  * [share] is the fraction of the parent's total this child accounts for, already computed by the
  * caller — the row draws one child and has no view of its siblings. Values outside `0..1` are
  * clamped rather than trusted, so a rounding artefact cannot paint a bar past the track.
+ *
+ * Takes the resolved [SurferCategoryVisual] rather than a loose icon/tint pair: every call site
+ * gets one from [SurferCategoryPalette.visualFor] anyway, and the two always travel together.
  */
 @Composable
 fun SurferCategoryBreakdownRow(
-    icon: ImageVector,
-    tint: Color,
+    visual: SurferCategoryVisual,
     name: String,
     formattedAmount: String,
     sharePercentLabel: String,
@@ -51,7 +52,7 @@ fun SurferCategoryBreakdownRow(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             modifier = Modifier.padding(horizontal = 14.dp, vertical = 12.dp),
         ) {
-            SurferCategoryBubble(icon = icon, tint = tint, size = 36.dp)
+            SurferCategoryBubble(icon = visual.icon, tint = visual.tint, size = 36.dp)
 
             Column(modifier = Modifier.weight(1f)) {
                 Text(
@@ -67,14 +68,14 @@ fun SurferCategoryBreakdownRow(
                         .fillMaxWidth()
                         .height(TrackHeight)
                         .clip(AppTheme.shapes.extraSmall)
-                        .background(tint.copy(alpha = TrackAlpha)),
+                        .background(visual.tint.copy(alpha = TrackAlpha)),
                 ) {
                     Box(
                         modifier = Modifier
                             .fillMaxWidth(share.coerceIn(0f, 1f))
                             .fillMaxHeight()
                             .clip(AppTheme.shapes.extraSmall)
-                            .background(tint),
+                            .background(visual.tint),
                     )
                 }
             }
@@ -108,16 +109,14 @@ private fun SurferCategoryBreakdownRowPreview() {
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             SurferCategoryBreakdownRow(
-                icon = SurferIcons.Receipt,
-                tint = SurferCategoryPalette.tints[5],
+                visual = SurferCategoryVisual(SurferIcons.Receipt, SurferCategoryPalette.tints[5]),
                 name = "Delivery",
                 formattedAmount = "€106.15",
                 sharePercentLabel = "63%",
                 share = 0.63f,
             )
             SurferCategoryBreakdownRow(
-                icon = SurferIcons.Cash,
-                tint = SurferCategoryPalette.tints[5],
+                visual = SurferCategoryVisual(SurferIcons.Cash, SurferCategoryPalette.tints[5]),
                 name = "Coffee",
                 formattedAmount = "€62.40",
                 sharePercentLabel = "37%",

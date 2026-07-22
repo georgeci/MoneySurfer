@@ -57,7 +57,6 @@ val categoryNavGraph: FeatureNavGraph = { navigator ->
             onNavigateToCategoryDetails = { categoryId ->
                 navigator.push(Route.CategoryDetails(categoryId = categoryId.value))
             },
-            onNavigateToCategoriesManage = { navigator.pop() },
             onNavigateToTransactionCreation = { navigator.push(Route.TransactionCreation()) },
             onNavigateToTransactionDetails = { transactionId ->
                 navigator.push(Route.TransactionDetails(transactionId.value))
