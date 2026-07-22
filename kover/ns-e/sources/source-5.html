@@ -207,9 +207,45 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;        is FirebaseAuthUserCollisionException -&gt; AuthError.Type.EmailAlreadyInUse
 &nbsp;        is FirebaseAuthInvalidCredentialsException -&gt; AuthError.Type.InvalidCredentials
 &nbsp;        is FirebaseAuthInvalidUserException -&gt; AuthError.Type.InvalidCredentials
-&nbsp;        else -&gt; AuthError.Type.Unknown
+&nbsp;        // gitlive&#39;s iOS SDK surfaces every FIRAuthErrorDomain failure as the base
+&nbsp;        // FirebaseAuthException rather than the typed subclasses matched above, so
+&nbsp;        // wrong-password / no-such-user sign-ins fall through here and would show a
+&nbsp;        // generic &quot;Sign-in failed&quot; instead of &quot;Wrong email or password&quot; (issue
+&nbsp;        // #219). Recover the classification from the server error-code name carried
+&nbsp;        // in the message. Android throws the typed subclasses and is matched above,
+&nbsp;        // so this fallback only ever runs on iOS.
+&nbsp;        else -&gt; classifyAuthErrorByMessage(message) ?: AuthError.Type.Unknown
 &nbsp;    }
 &nbsp;    return AuthError(type = type, message = message, cause = this)
+&nbsp;}
+&nbsp;
+&nbsp;// FIRAuth error-code names that all mean &quot;the supplied credentials don&#39;t match a
+&nbsp;// user&quot; — spelled identically to Android&#39;s FirebaseAuthException.getErrorCode().
+&nbsp;private val INVALID_CREDENTIAL_ERROR_CODES = listOf(
+&nbsp;    &quot;ERROR_USER_NOT_FOUND&quot;,
+&nbsp;    &quot;ERROR_WRONG_PASSWORD&quot;,
+&nbsp;    &quot;ERROR_INVALID_CREDENTIAL&quot;,
+&nbsp;    &quot;ERROR_INVALID_LOGIN_CREDENTIALS&quot;,
+&nbsp;)
+&nbsp;
+&nbsp;/**
+&nbsp; * Fallback classifier keyed off the Firebase error-code name embedded in a
+&nbsp; * [dev.gitlive.firebase.auth.FirebaseAuthException] message. Needed only for
+&nbsp; * gitlive&#39;s iOS SDK, which does not throw the typed exception subclasses (see
+&nbsp; * [toAuthError]). Returns null when no known code is present so the caller falls
+&nbsp; * back to [AuthError.Type.Unknown].
+&nbsp; */
+&nbsp;internal fun classifyAuthErrorByMessage(message: String?): AuthError.Type? {
+&nbsp;    if (message == null) return null
+&nbsp;    return when {
+&nbsp;        INVALID_CREDENTIAL_ERROR_CODES.any { message.contains(it, ignoreCase = true) } -&gt;
+&nbsp;            AuthError.Type.InvalidCredentials
+&nbsp;        message.contains(&quot;ERROR_EMAIL_ALREADY_IN_USE&quot;, ignoreCase = true) -&gt;
+&nbsp;            AuthError.Type.EmailAlreadyInUse
+&nbsp;        message.contains(&quot;ERROR_WEAK_PASSWORD&quot;, ignoreCase = true) -&gt;
+&nbsp;            AuthError.Type.WeakPassword
+&nbsp;        else -&gt; null
+&nbsp;    }
 &nbsp;}
 </code>
 </pre>
@@ -234,7 +270,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-21 15:55</div>
+    <div style="float:right;">generated on 2026-07-22 13:38</div>
 </div>
 </body>
 </html>

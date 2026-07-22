@@ -52,42 +52,42 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   <td class="name">AuthRemoteRepositoryImplKt</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    66.7%
   </span>
   <span class="absValue">
-    (0/1)
+    (2/3)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    40%
   </span>
   <span class="absValue">
-    (0/10)
+    (8/20)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    63.6%
   </span>
   <span class="absValue">
-    (0/8)
+    (14/22)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    58.4%
   </span>
   <span class="absValue">
-    (0/36)
+    (59/101)
   </span>
 </td>
 </tr>
@@ -160,9 +160,45 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="nc">&nbsp;        is FirebaseAuthUserCollisionException -&gt; AuthError.Type.EmailAlreadyInUse</b>
 <b class="nc">&nbsp;        is FirebaseAuthInvalidCredentialsException -&gt; AuthError.Type.InvalidCredentials</b>
 <b class="nc">&nbsp;        is FirebaseAuthInvalidUserException -&gt; AuthError.Type.InvalidCredentials</b>
-<b class="nc">&nbsp;        else -&gt; AuthError.Type.Unknown</b>
+&nbsp;        // gitlive&#39;s iOS SDK surfaces every FIRAuthErrorDomain failure as the base
+&nbsp;        // FirebaseAuthException rather than the typed subclasses matched above, so
+&nbsp;        // wrong-password / no-such-user sign-ins fall through here and would show a
+&nbsp;        // generic &quot;Sign-in failed&quot; instead of &quot;Wrong email or password&quot; (issue
+&nbsp;        // #219). Recover the classification from the server error-code name carried
+&nbsp;        // in the message. Android throws the typed subclasses and is matched above,
+&nbsp;        // so this fallback only ever runs on iOS.
+<b class="nc">&nbsp;        else -&gt; classifyAuthErrorByMessage(message) ?: AuthError.Type.Unknown</b>
 &nbsp;    }
 <b class="nc">&nbsp;    return AuthError(type = type, message = message, cause = this)</b>
+&nbsp;}
+&nbsp;
+&nbsp;// FIRAuth error-code names that all mean &quot;the supplied credentials don&#39;t match a
+&nbsp;// user&quot; — spelled identically to Android&#39;s FirebaseAuthException.getErrorCode().
+<b class="fc">&nbsp;private val INVALID_CREDENTIAL_ERROR_CODES = listOf(</b>
+<b class="fc">&nbsp;    &quot;ERROR_USER_NOT_FOUND&quot;,</b>
+<b class="fc">&nbsp;    &quot;ERROR_WRONG_PASSWORD&quot;,</b>
+<b class="fc">&nbsp;    &quot;ERROR_INVALID_CREDENTIAL&quot;,</b>
+<b class="fc">&nbsp;    &quot;ERROR_INVALID_LOGIN_CREDENTIALS&quot;,</b>
+&nbsp;)
+&nbsp;
+&nbsp;/**
+&nbsp; * Fallback classifier keyed off the Firebase error-code name embedded in a
+&nbsp; * [dev.gitlive.firebase.auth.FirebaseAuthException] message. Needed only for
+&nbsp; * gitlive&#39;s iOS SDK, which does not throw the typed exception subclasses (see
+&nbsp; * [toAuthError]). Returns null when no known code is present so the caller falls
+&nbsp; * back to [AuthError.Type.Unknown].
+&nbsp; */
+&nbsp;internal fun classifyAuthErrorByMessage(message: String?): AuthError.Type? {
+<b class="fc">&nbsp;    if (message == null) return null</b>
+<b class="fc">&nbsp;    return when {</b>
+<b class="fc">&nbsp;        INVALID_CREDENTIAL_ERROR_CODES.any { message.contains(it, ignoreCase = true) } -&gt;</b>
+<b class="fc">&nbsp;            AuthError.Type.InvalidCredentials</b>
+<b class="fc">&nbsp;        message.contains(&quot;ERROR_EMAIL_ALREADY_IN_USE&quot;, ignoreCase = true) -&gt;</b>
+<b class="fc">&nbsp;            AuthError.Type.EmailAlreadyInUse</b>
+<b class="fc">&nbsp;        message.contains(&quot;ERROR_WEAK_PASSWORD&quot;, ignoreCase = true) -&gt;</b>
+<b class="fc">&nbsp;            AuthError.Type.WeakPassword</b>
+<b class="fc">&nbsp;        else -&gt; null</b>
+&nbsp;    }
 &nbsp;}
 </code>
 </pre>
@@ -187,7 +223,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-21 15:55</div>
+    <div style="float:right;">generated on 2026-07-22 13:38</div>
 </div>
 </body>
 </html>

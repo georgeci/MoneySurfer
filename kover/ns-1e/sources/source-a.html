@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > RecalculateLocalProjectionsUseCase</title>
+  <title>MoneySurfer Coverage Report > PullRemoteChangesUseCase</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.sync</a>
 </div>
 
-<h1>Coverage Summary for Class: RecalculateLocalProjectionsUseCase (com.georgeci.moneysurfer.domain.sync)</h1>
+<h1>Coverage Summary for Class: PullRemoteChangesUseCase (com.georgeci.moneysurfer.domain.sync)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">RecalculateLocalProjectionsUseCase</td>
+  <td class="name">PullRemoteChangesUseCase</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -48,21 +48,33 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;
 &nbsp;import com.georgeci.moneysurfer.sync.api.SyncCancelToken
 &nbsp;import com.georgeci.moneysurfer.sync.api.SyncResult
+&nbsp;import com.georgeci.moneysurfer.sync.api.SyncScope
 &nbsp;
 &nbsp;/**
-&nbsp; * Recalculates derived stored values (account balances, aggregates) for the
-&nbsp; * given [ProjectionScope].
+&nbsp; * Pulls remote changes since the last cursor, applies them locally, and resolves
+&nbsp; * conflicts inline (LWW by default).
 &nbsp; *
-&nbsp; * Called both from the sync pipeline (after pull writes) and from local
-&nbsp; * mutation paths (after dual-write to outbox). The same use case is reused
-&nbsp; * to avoid drift between paths. See SyncCoordinatorFAQ.md №6, №7.
+&nbsp; * Pull-applied writes MUST bypass the outbox to avoid push echo.
+&nbsp; * See SyncCoordinatorFAQ.md №5, §4.3.
 &nbsp; */
-&nbsp;interface RecalculateLocalProjectionsUseCase {
+&nbsp;interface PullRemoteChangesUseCase {
 &nbsp;    suspend operator fun invoke(
-&nbsp;        scope: ProjectionScope,
+&nbsp;        scope: SyncScope,
+&nbsp;        onProgress: suspend (PullProgress) -&gt; Unit,
 &nbsp;        cancelToken: SyncCancelToken,
-&nbsp;    ): SyncResult&lt;ProjectionSummary&gt;
+&nbsp;    ): SyncResult&lt;PullSummary&gt;
 &nbsp;}
+&nbsp;
+&nbsp;data class PullProgress(
+&nbsp;    val collection: String,
+&nbsp;    val current: Int,
+&nbsp;    val total: Int,
+&nbsp;)
+&nbsp;
+&nbsp;data class PullSummary(
+&nbsp;    val downloadedCount: Int,
+&nbsp;    val conflictCount: Int,
+&nbsp;)
 </code>
 </pre>
 </div>
@@ -86,7 +98,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-21 15:55</div>
+    <div style="float:right;">generated on 2026-07-22 13:38</div>
 </div>
 </body>
 </html>

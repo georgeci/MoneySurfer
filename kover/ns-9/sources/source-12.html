@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > BudgetDao</title>
+  <title>MoneySurfer Coverage Report > RecurringRuleDao</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.data.db.dao</a>
 </div>
 
-<h1>Coverage Summary for Class: BudgetDao (com.georgeci.moneysurfer.data.db.dao)</h1>
+<h1>Coverage Summary for Class: RecurringRuleDao (com.georgeci.moneysurfer.data.db.dao)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">BudgetDao</td>
+  <td class="name">RecurringRuleDao</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -50,28 +50,28 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import androidx.room.Insert
 &nbsp;import androidx.room.Query
 &nbsp;import androidx.room.Update
-&nbsp;import com.georgeci.moneysurfer.data.db.entity.BudgetEntity
+&nbsp;import com.georgeci.moneysurfer.data.db.entity.RecurringRuleEntity
 &nbsp;import kotlinx.coroutines.flow.Flow
 &nbsp;
 &nbsp;@Dao
-&nbsp;interface BudgetDao {
+&nbsp;interface RecurringRuleDao {
 &nbsp;
-&nbsp;    @Query(&quot;SELECT * FROM budgets&quot;)
-&nbsp;    fun getAll(): Flow&lt;List&lt;BudgetEntity&gt;&gt;
+&nbsp;    @Query(&quot;SELECT * FROM recurring_rules&quot;)
+&nbsp;    fun getAll(): Flow&lt;List&lt;RecurringRuleEntity&gt;&gt;
 &nbsp;
-&nbsp;    @Query(&quot;SELECT * FROM budgets WHERE id = :id&quot;)
-&nbsp;    suspend fun getById(id: String): BudgetEntity?
+&nbsp;    @Query(&quot;SELECT * FROM recurring_rules WHERE id = :id&quot;)
+&nbsp;    suspend fun getById(id: String): RecurringRuleEntity?
 &nbsp;
 &nbsp;    @Insert
-&nbsp;    suspend fun insert(entity: BudgetEntity)
+&nbsp;    suspend fun insert(entity: RecurringRuleEntity)
 &nbsp;
 &nbsp;    @Update
-&nbsp;    suspend fun update(entity: BudgetEntity)
+&nbsp;    suspend fun update(entity: RecurringRuleEntity)
 &nbsp;
-&nbsp;    @Query(&quot;DELETE FROM budgets WHERE id = :id&quot;)
+&nbsp;    @Query(&quot;DELETE FROM recurring_rules WHERE id = :id&quot;)
 &nbsp;    suspend fun delete(id: String)
 &nbsp;
-&nbsp;    @Query(&quot;DELETE FROM budgets&quot;)
+&nbsp;    @Query(&quot;DELETE FROM recurring_rules&quot;)
 &nbsp;    suspend fun deleteAll()
 &nbsp;}
 </code>
@@ -97,7 +97,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-21 15:55</div>
+    <div style="float:right;">generated on 2026-07-22 13:38</div>
 </div>
 </body>
 </html>
