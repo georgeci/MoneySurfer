@@ -546,32 +546,7 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        # TEMPORARY (issue #272 verification, reverted before merge): --info surfaces
-        # the JaCoCo importer sensor, which is the only direct proof that Sonar
-        # actually read the coverage report. Sensor messages are INFO-level, so the
-        # default lifecycle log says nothing either way.
-        run: |
-          set -euo pipefail
-          ./gradlew sonar --stacktrace --info 2>&1 | tee /tmp/sonar-info.log | grep -vE "^\s*$" | tail -5 || true
-          echo "=== JaCoCo import evidence (3 lines of context per sensor) ==="
-          grep -A3 "JaCoCo XML Report Importer \[jacoco\]$" /tmp/sonar-info.log | head -40 || true
-          echo "=== import / no-import verdict lines ==="
-          grep -iE "Importing .*report|No report imported|Coverage report|cannot be found|No coverage" /tmp/sonar-info.log | sort | uniq -c | head -20 || echo "NONE FOUND"
-          echo "=== SyncCoordinatorImpl (the probe file) ==="
-          grep -n "SyncCoordinatorImpl" /tmp/sonar-info.log | head -20 || echo "NOT MENTIONED AT ALL"
-          echo "=== indexed file counts ==="
-          grep -iE "[0-9]+ files indexed|Indexing files|Sensor JaCoCo XML Report Importer \[jacoco\]$|^Project [a-z]|Base dir:|Source paths:" /tmp/sonar-info.log | head -60 || true
-
-      # TEMPORARY (issue #272 verification, reverted before merge): the full --info
-      # log is the only place that says which files the coverage importer matched.
-      - name: Upload Sonar info log
-        if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-        with:
-          name: sonar-info-log
-          path: /tmp/sonar-info.log
-          if-no-files-found: warn
-          retention-days: 3
+        run: ./gradlew sonar --stacktrace
 
   detekt:
     name: detekt (blocking)

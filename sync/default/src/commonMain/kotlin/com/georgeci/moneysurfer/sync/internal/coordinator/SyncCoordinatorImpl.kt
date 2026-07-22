@@ -99,18 +99,18 @@ class SyncCoordinatorImpl(
     // -------------------------------------------------------------------------
 
     override fun requestSync(reason: SyncReason, mode: SyncMode): SyncHandle {
-        val syncRequest = SyncRequest(id = newRequestId(), reason = reason)
+        val request = SyncRequest(id = newRequestId(), reason = reason)
 
-        commands.trySend(SyncCommand.Enqueue(syncRequest, mode))
+        commands.trySend(SyncCommand.Enqueue(request, mode))
 
         return SyncHandleImpl(
-            id = syncRequest.id,
-            status = syncRequest.status.asStateFlow(),
-            steps = syncRequest.steps,
-            result = syncRequest.result,
+            id = request.id,
+            status = request.status.asStateFlow(),
+            steps = request.steps,
+            result = request.result,
             cancelAction = {
-                syncRequest.cancelToken.cancel()
-                commands.trySend(SyncCommand.CancelHandle(syncRequest.id))
+                request.cancelToken.cancel()
+                commands.trySend(SyncCommand.CancelHandle(request.id))
             },
         )
     }
