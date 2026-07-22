@@ -76,6 +76,7 @@ import moneysurfer.feature.category.generated.resources.month_short_september
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
+import kotlin.math.roundToInt
 
 @Composable
 fun CategoryDetailsScreen(
@@ -304,7 +305,7 @@ private fun CategoryDetailsContent(
                         formattedAmount = child.formattedAmount,
                         sharePercentLabel = stringResource(
                             Res.string.category_details_share_percent,
-                            (child.share * PercentScale).toInt(),
+                            (child.share * PercentScale).roundToInt(),
                         ),
                         share = child.share,
                         onClick = { onEvent(CategoryDetailsEvent.OnSubcategoryClick(child.id)) },
@@ -341,6 +342,7 @@ private fun CategoryDetailsContent(
                         } else {
                             AppTheme.semanticColors.income
                         },
+                        onClick = { onEvent(CategoryDetailsEvent.OnTransactionClick(txn.id)) },
                         modifier = Modifier.fillMaxWidth(),
                     )
                 }

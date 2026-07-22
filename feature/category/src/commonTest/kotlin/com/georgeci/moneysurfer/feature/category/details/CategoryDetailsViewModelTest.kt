@@ -148,6 +148,16 @@ class CategoryDetailsViewModelTest : StringSpec({
         }
     }
 
+    "OnTransactionClick opens the transaction it was raised for" {
+        val food = aCategory(id = categoryId("food"))
+        val viewModel = Env(categories = listOf(food)).newViewModel(food.id)
+
+        viewModel.sideEffects.effectFlow.test {
+            viewModel.onEvent(CategoryDetailsEvent.OnTransactionClick(transactionId("t-1")))
+            awaitItem() shouldBe CategoryDetailsEffect.NavigateToTransactionDetails(transactionId("t-1"))
+        }
+    }
+
     "OnSubcategoryClick drills into the child rather than replacing this screen" {
         val food = aCategory(id = categoryId("food"))
         val groceries = aCategory(id = categoryId("groceries"), parentId = food.id)

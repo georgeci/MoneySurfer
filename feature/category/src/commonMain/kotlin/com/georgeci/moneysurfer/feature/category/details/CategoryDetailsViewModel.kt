@@ -80,8 +80,9 @@ class CategoryDetailsViewModel(
         history: CategorySpendHistory,
         transactions: List<Transaction>,
     ): CategoryDetailsState.Content {
-        // Currency follows the transactions actually booked here; the workspace's own currency
-        // is the fallback for a category that has none yet.
+        // Currency follows the transactions actually booked here. A category with none yet has
+        // nothing to read it from, so it falls back to USD — the same placeholder Account
+        // Details uses, and it is replaced as soon as the first transaction lands.
         val currency = transactions.firstOrNull()?.currencyCode ?: DefaultCurrency
         val byId = categories.associateBy { it.id }
         val parentTotal = history.currentMonth

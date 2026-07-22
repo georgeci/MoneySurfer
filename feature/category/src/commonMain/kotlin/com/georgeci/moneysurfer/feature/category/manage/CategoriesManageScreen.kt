@@ -194,8 +194,9 @@ private fun CategoryManageRow(
 ) {
     SurferSwipeRevealRow(
         // Two actions now that tapping the row opens the detail screen instead of the editor —
-        // edit has to stay reachable from the list itself.
-        revealWidth = 176.dp,
+        // edit has to stay reachable from the list itself. 156dp is what two 72dp actions plus
+        // the gaps measure, matching AccountsManage.
+        revealWidth = 156.dp,
         modifier = modifier,
         actions = {
             SurferSwipeAction(
