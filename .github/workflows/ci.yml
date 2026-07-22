@@ -553,8 +553,10 @@ jobs:
         run: |
           set -euo pipefail
           ./gradlew sonar --stacktrace --info 2>&1 | tee /tmp/sonar-info.log | grep -vE "^\s*$" | tail -5 || true
-          echo "=== JaCoCo import evidence ==="
-          grep -iE "JaCoCo|coverage" /tmp/sonar-info.log | grep -iE "sensor|import|Read|report" | head -20 || echo "NO JACOCO SENSOR LINES FOUND"
+          echo "=== JaCoCo import evidence (3 lines of context per sensor) ==="
+          grep -A3 "JaCoCo XML Report Importer \[jacoco\]$" /tmp/sonar-info.log | head -40 || true
+          echo "=== import / no-import verdict lines ==="
+          grep -iE "Importing .*report|No report imported|Coverage report|cannot be found|No coverage" /tmp/sonar-info.log | sort | uniq -c | head -20 || echo "NONE FOUND"
 
   detekt:
     name: detekt (blocking)
