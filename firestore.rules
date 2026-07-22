@@ -1,4 +1,4 @@
-// v2.4.0 — 2026-07-22
+// v2.5.0 — 2026-07-22
 rules_version = '2';
 
 // Workspace-scoped tenancy: every per-user document lives under
@@ -201,6 +201,34 @@ service cloud.firestore {
         && typeIntOk(data, 'alertPercent')
         && typeBoolOk(data, 'isActive')
         && typeBoolOk(data, 'rollover')
+        && typeIntOk(data, 'createdAt')
+        && typeIntOk(data, 'updatedAt')
+        && typeNullableIntOk(data, 'deletedAt');
+    }
+
+    // GoalDoc — data-remote/.../RemoteDtos.kt
+    function hasValidGoalShape(data) {
+      return typeStrOk(data, 'title')
+        && typeStrOk(data, 'emoji')
+        && typeIntOk(data, 'hue')
+        && typeIntOk(data, 'target')
+        && typeStrOk(data, 'currencyCode')
+        && typeStrOk(data, 'startDate')
+        && typeNullableStrOk(data, 'targetDate')
+        && typeNullableStrOk(data, 'accountId')
+        && typeStrOk(data, 'status')
+        && typeIntOk(data, 'createdAt')
+        && typeIntOk(data, 'updatedAt')
+        && typeNullableIntOk(data, 'deletedAt');
+    }
+
+    // GoalContributionDoc — data-remote/.../RemoteDtos.kt
+    function hasValidGoalContributionShape(data) {
+      return typeStrOk(data, 'goalId')
+        && typeIntOk(data, 'amount')
+        && typeStrOk(data, 'occurredOn')
+        && typeStrOk(data, 'note')
+        && typeNullableStrOk(data, 'transferId')
         && typeIntOk(data, 'createdAt')
         && typeIntOk(data, 'updatedAt')
         && typeNullableIntOk(data, 'deletedAt');
@@ -409,6 +437,25 @@ service cloud.firestore {
         allow read: if isMember(wid);
         allow create, update: if isMember(wid) && hasValidClientVersion()
           && hasValidTransactionShape(request.resource.data);
+        // Owner-only hard-delete — account-deletion purge path (issue #213).
+        allow delete: if isOwner(wid);
+      }
+
+      match /goals/{gid} {
+        allow read: if isMember(wid);
+        allow create, update: if isMember(wid) && hasValidClientVersion()
+          && hasValidGoalShape(request.resource.data);
+        // Owner-only hard-delete — account-deletion purge path (issue #213).
+        allow delete: if isOwner(wid);
+      }
+
+      // Flat workspace-level collection, not a sub-collection of the goal — the pull
+      // path reads workspace sub-collections by cursor. Deleting a goal does NOT
+      // cascade here; the client enqueues a tombstone per contribution.
+      match /goalContributions/{cid} {
+        allow read: if isMember(wid);
+        allow create, update: if isMember(wid) && hasValidClientVersion()
+          && hasValidGoalContributionShape(request.resource.data);
         // Owner-only hard-delete — account-deletion purge path (issue #213).
         allow delete: if isOwner(wid);
       }

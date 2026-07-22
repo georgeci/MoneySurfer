@@ -14,6 +14,8 @@ package com.georgeci.moneysurfer.data.sync.plugin
  *  40  transactions — FK: accountId, categoryId  ← must be > accounts and categories
  *  50  budgets     — FK: workspaceId; references category ids in a CSV column (no Room FK),
  *                    so running after categories is ordering hygiene, not a hard constraint
+ *  60  goals       — FK: workspaceId, accountId (nullable)  ← must be > accounts
+ *  70  goalContributions — FK: workspaceId, goalId (cascade)  ← must be > goals
  * 100  (default)   — no ordering constraint
  */
 internal object SyncPullPriorities {
@@ -24,5 +26,7 @@ internal object SyncPullPriorities {
     const val CATEGORIES = 30
     const val TRANSACTIONS = 40
     const val BUDGETS = 50
+    const val GOALS = 60
+    const val GOAL_CONTRIBUTIONS = 70
     const val DEFAULT = 100
 }

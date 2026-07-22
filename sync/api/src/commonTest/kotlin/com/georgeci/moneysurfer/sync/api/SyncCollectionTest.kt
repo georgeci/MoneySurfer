@@ -26,5 +26,7 @@ class SyncCollectionTest : StringSpec({
         SyncCollection.TRANSACTIONS shouldBe "transactions"
         SyncCollection.BUDGETS shouldBe "budgets"
         SyncCollection.RECURRING_RULES shouldBe "recurringRules"
+        SyncCollection.GOALS shouldBe "goals"
+        SyncCollection.GOAL_CONTRIBUTIONS shouldBe "goalContributions"
     }
 })
