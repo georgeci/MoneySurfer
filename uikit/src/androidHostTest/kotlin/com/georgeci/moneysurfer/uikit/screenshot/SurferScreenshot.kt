@@ -1,6 +1,7 @@
 package com.georgeci.moneysurfer.uikit.screenshot
 
 import androidx.compose.runtime.Composable
+import com.dropbox.differ.SimpleImageComparator
 import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
 import com.github.takahirom.roborazzi.ExperimentalRoborazziApi
 import com.github.takahirom.roborazzi.RoborazziComposeOptions
@@ -26,14 +27,31 @@ const val ScreenshotQualifiers: String = "w411dp-h891dp-normal-long-notround-any
 private const val GalleryWidthDp = 411
 
 /**
- * Pixel budget before a capture counts as a regression. 0.1% of the frame absorbs
- * nothing meaningful — a one-pixel border or a colour-token change trips it — while
- * still tolerating the sub-pixel antialiasing jitter that differs between JDK builds.
+ * Per-pixel colour tolerance, as a normalised RGB distance.
+ *
+ * Alpha compositing rounds differently on the macOS and Linux Skia builds: capturing
+ * the same component on both hosts yields images where up to ~13% of pixels differ by
+ * exactly 1–2 of 255 per channel (measured on `surfer_category_components_dark`, whose
+ * low-alpha tint washes are the worst case — peak distance 0.0136). Without a tolerance
+ * those count as changes and the suite is red on CI while green locally.
+ *
+ * 0.02 sits comfortably above that noise floor and far below a real regression: a
+ * changed colour token or a moved border shifts pixels by an order of magnitude more.
+ */
+private const val MaxPixelDistance = 0.02f
+
+/**
+ * Share of pixels that may exceed [MaxPixelDistance] before the capture counts as a
+ * regression. 0.1% of the frame absorbs nothing meaningful — a one-pixel border still
+ * trips it.
  */
 private const val ChangeThreshold = 0.001f
 
 private val screenshotOptions = RoborazziOptions(
-    compareOptions = RoborazziOptions.CompareOptions(changeThreshold = ChangeThreshold),
+    compareOptions = RoborazziOptions.CompareOptions(
+        changeThreshold = ChangeThreshold,
+        imageComparator = SimpleImageComparator(maxDistance = MaxPixelDistance),
+    ),
 )
 
 /**

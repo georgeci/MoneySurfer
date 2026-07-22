@@ -77,9 +77,20 @@ Robolectric SDK level and the device qualifiers (density, font scale, width).
 Changing either re-renders everything, so treat it as a deliberate, reviewed
 change followed by a full re-record.
 
-The comparison threshold is 0.1% of the frame. That absorbs the sub-pixel
-antialiasing jitter that differs between JDK builds, while still tripping on a
-one-pixel border or a colour-token change.
+The comparison has two knobs, both in `SurferScreenshot.kt`:
+
+- **Per-pixel tolerance** (`maxDistance = 0.02`, a normalised RGBA distance).
+  Alpha compositing rounds differently on the macOS and Linux Skia builds — the
+  same component captured on both hosts yields images where up to ~13% of pixels
+  differ by 1–2 of 255 per channel (worst case measured on
+  `surfer_category_components_dark`, peak distance 0.0136). Without this, the
+  suite is green locally and red on CI. 0.02 sits above that noise floor and an
+  order of magnitude below a real regression.
+- **Change threshold** (0.1% of the frame): the share of pixels allowed to
+  exceed the tolerance. A one-pixel border still trips it.
+
+Consequence worth knowing: references recorded on macOS verify fine on the
+Linux CI runner, so you do not need a Linux host to re-record.
 
 ## Reviewing a failure
 

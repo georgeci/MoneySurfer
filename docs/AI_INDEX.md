@@ -263,7 +263,7 @@
 ## screenshot-tests
 - Title: Where the reference images live
 - File: docs/testing/screenshot-tests.md
-- Lines: 29-124
+- Lines: 29-135
 - Tasks: testing, uikit, screenshot, roborazzi
 
 ## security-audit-2026-07
