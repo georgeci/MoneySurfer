@@ -91,9 +91,10 @@ fun CategoryDoc.toEntity(id: String, workspaceId: String): CategoryEntity = Cate
 )
 
 /**
- * Room stores `categoryIds` as a CSV column while the wire DTO carries a real list, so the
- * budget mappers are the only place that splits/joins it. Blank segments are dropped so a
- * legacy `""` or a trailing comma decodes to an empty list rather than a blank id.
+ * Room stores `categoryIds` as a CSV column while the wire DTO carries a real list, so these
+ * mappers convert on the entity↔wire boundary. (`BudgetRepositoryImpl` does the same conversion
+ * on the entity↔domain boundary — two boundaries, same CSV encoding.) Blank segments are dropped
+ * so a legacy `""` or a trailing comma decodes to an empty list rather than a blank id.
  */
 fun BudgetEntity.toDoc(): BudgetDoc = BudgetDoc(
     name = name,
