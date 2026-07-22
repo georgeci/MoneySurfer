@@ -87,6 +87,30 @@ data class TransactionDoc(
 )
 
 /**
+ * Budget doc lives at `workspaces/{wid}/budgets/{bid}`.
+ *
+ * `categoryIds` is a real list on the wire even though Room stores it as a CSV column —
+ * a list is the natural Firestore shape and the mapper converts. An empty list means
+ * "every expense category".
+ */
+@Serializable
+data class BudgetDoc(
+    val name: String = "",
+    val categoryIds: List<String> = emptyList(),
+    val amount: Long = 0L,
+    val period: String = "",
+    /** ISO-8601 local date (`yyyy-MM-dd`) the period anchoring counts from. */
+    val startDate: String = "",
+    val alertPercent: Int = 0,
+    val isActive: Boolean = true,
+    val rollover: Boolean = false,
+    val createdAt: Long = 0L,
+    val updatedAt: Long = 0L,
+    val deletedAt: Long? = null,
+    val clientVersionCode: Int = 1,
+)
+
+/**
  * Member doc lives at `workspaces/{wid}/members/{uid}`. Doc id = userId.
  *
  * Soft-delete via `status` (`ACTIVE` / `LEFT` / `REMOVED`) — `deletedAt` is kept for

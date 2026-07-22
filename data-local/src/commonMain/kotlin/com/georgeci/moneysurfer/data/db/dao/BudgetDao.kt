@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
+import androidx.room.Upsert
 import com.georgeci.moneysurfer.data.db.entity.BudgetEntity
 import kotlinx.coroutines.flow.Flow
 
@@ -13,6 +14,9 @@ interface BudgetDao {
     @Query("SELECT * FROM budgets")
     fun getAll(): Flow<List<BudgetEntity>>
 
+    @Query("SELECT * FROM budgets WHERE workspaceId = :workspaceId")
+    fun getByWorkspaceId(workspaceId: String): Flow<List<BudgetEntity>>
+
     @Query("SELECT * FROM budgets WHERE id = :id")
     suspend fun getById(id: String): BudgetEntity?
 
@@ -21,6 +25,9 @@ interface BudgetDao {
 
     @Update
     suspend fun update(entity: BudgetEntity)
+
+    @Upsert
+    suspend fun upsertAll(entities: List<BudgetEntity>)
 
     @Query("DELETE FROM budgets WHERE id = :id")
     suspend fun delete(id: String)

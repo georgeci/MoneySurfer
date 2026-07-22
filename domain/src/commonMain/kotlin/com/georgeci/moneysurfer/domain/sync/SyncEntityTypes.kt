@@ -13,4 +13,5 @@ object SyncEntityTypes {
     const val ACCOUNT = "ACCOUNT"
     const val CATEGORY = "CATEGORY"
     const val TRANSACTION = "TRANSACTION"
+    const val BUDGET = "BUDGET"
 }
