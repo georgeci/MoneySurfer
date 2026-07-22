@@ -64,7 +64,7 @@ data class SurferCategoryVisual(
  *
  * [iconKeys] and [hues] are positionally paired with [icons] and [tints] and must stay in
  * lockstep with `CategoryAppearance` in the domain module — uikit deliberately does not depend
- * on domain, so `CategoryPaletteParitySpec` in feature/category asserts the two agree.
+ * on domain, so `CategoryPaletteParityTest` in feature/category asserts the two agree.
  */
 object SurferCategoryPalette {
     val tints: List<Color> = listOf(
