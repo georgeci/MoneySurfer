@@ -18,10 +18,17 @@ class KmpAppConventionPlugin : Plugin<Project> {
     override fun apply(target: Project): Unit = with(target) {
         val localProps = loadLocalProperties()
         val versionProps = loadVersionProperties()
-        val versionCodeInt = versionProps.requireInt("APP_VERSION_CODE")
-        val versionNameStr = versionProps.requireString("APP_VERSION_NAME")
 
         val secrets = Secrets(localProps, providers)
+
+        // major.minor come from Version.xcconfig; the build number is whatever
+        // CI injects (APP_BUILD_NUMBER=<run number>), falling back to the file
+        // for local builds.
+        val major = versionProps.requireInt("APP_VERSION_MAJOR")
+        val minor = versionProps.requireInt("APP_VERSION_MINOR")
+        val build = buildNumber(secrets["APP_BUILD_NUMBER"], versionProps)
+        val versionNameStr = "$major.$minor.$build"
+        val versionCodeInt = appVersionCode(major, minor, build)
 
         val hasReleaseSigning = listOf(
             "RELEASE_STORE_FILE",
@@ -213,3 +220,41 @@ private fun Properties.requireString(name: String): String =
 private fun Properties.requireInt(name: String): Int =
     requireString(name).toIntOrNull()
         ?: error("Version property $name must be an integer")
+
+/** Build numbers are taken modulo this, so they can never carry into `minor`. */
+private const val BUILD_NUMBER_RANGE = 1_000L
+
+/**
+ * The build number to stamp: whatever the `APP_BUILD_NUMBER` override carries
+ * (CI passes the run number), else the `Version.xcconfig` default, reduced
+ * modulo [BUILD_NUMBER_RANGE].
+ *
+ * A present-but-unparseable override fails the build instead of quietly
+ * falling back — a typo'd or truncated CI value would otherwise stamp two
+ * different commits with the same version. Parsing is `Long` so a run counter
+ * past `Int.MAX_VALUE` still wraps correctly rather than being rejected.
+ */
+private fun buildNumber(override: String?, versionProps: Properties): Int {
+    val raw = override?.trim()?.takeIf { it.isNotEmpty() }
+        ?.let { it.toLongOrNull() ?: error("APP_BUILD_NUMBER must be an integer, got \"$it\"") }
+        ?: versionProps.requireInt("APP_BUILD_NUMBER").toLong()
+    return raw.mod(BUILD_NUMBER_RANGE).toInt()
+}
+
+/**
+ * `major * 100000 + minor * 1000 + build` — a versionCode derived from
+ * `major.minor.build`: two digits for minor, three for the build number.
+ *
+ * The layout only holds inside those digit widths; an overflowing component
+ * carries into the next one and the code stops being ordered. `build` can't
+ * overflow — it arrives already reduced modulo [BUILD_NUMBER_RANGE]. `major`
+ * and `minor` are hand-edited in `Version.xcconfig`, so they are checked
+ * instead, `major` against Play's own `versionCode` ceiling of 2100000000.
+ */
+private fun appVersionCode(major: Int, minor: Int, build: Int): Int {
+    require(major in 0..20_999 && minor in 0..99) {
+        "Version $major.$minor is out of range for versionCode " +
+            "(major <= 20999, minor <= 99)"
+    }
+    return major * 100_000 + minor * 1_000 + build
+}
