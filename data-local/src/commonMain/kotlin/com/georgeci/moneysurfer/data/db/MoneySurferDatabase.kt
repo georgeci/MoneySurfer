@@ -22,6 +22,7 @@ import com.georgeci.moneysurfer.data.db.entity.GoalContributionEntity
 import com.georgeci.moneysurfer.data.db.entity.GoalEntity
 import com.georgeci.moneysurfer.data.db.entity.RecurringRuleEntity
 import com.georgeci.moneysurfer.data.db.entity.TransactionEntity
+import com.georgeci.moneysurfer.data.db.entity.TransactionFtsEntity
 import com.georgeci.moneysurfer.data.db.entity.UserEntity
 import com.georgeci.moneysurfer.data.db.entity.WorkspaceEntity
 import com.georgeci.moneysurfer.data.db.entity.WorkspaceInviteEntity
@@ -31,7 +32,7 @@ import com.georgeci.moneysurfer.data.db.entity.WorkspaceMemberEntity
  * Schema version of [MoneySurferDatabase]. Single source of truth so the
  * Room annotation, the backup manifest, and tests can never drift.
  */
-const val MONEY_SURFER_DB_VERSION: Int = 23
+const val MONEY_SURFER_DB_VERSION: Int = 24
 
 @Database(
     entities = [
@@ -42,6 +43,7 @@ const val MONEY_SURFER_DB_VERSION: Int = 23
         AccountEntity::class,
         CategoryEntity::class,
         TransactionEntity::class,
+        TransactionFtsEntity::class,
         BudgetEntity::class,
         RecurringRuleEntity::class,
         GoalEntity::class,
