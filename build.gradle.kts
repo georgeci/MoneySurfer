@@ -85,7 +85,7 @@ tasks.named<de.aaschmid.gradle.plugins.cpd.Cpd>("cpdCheck") {
 // into a release or CI build. Locking only enforces where a `gradle.lockfile`
 // exists; regenerate after any dependency change with:
 //   ./gradlew resolveAndLockAll --write-locks --no-configuration-cache
-// See docs/supply-chain.md for the full workflow (incl. the macOS-host iOS /
+// See docs/security/supply-chain.md for the full workflow (incl. the macOS-host iOS /
 // Android-release configs and the remaining checksum-verification follow-up).
 //
 // Desktop artifacts from Compose (`skiko`, `compose.desktop`) encode the host
@@ -102,6 +102,28 @@ allprojects {
     dependencyLocking {
         lockAllConfigurations()
         ignoredDependencies.addAll(hostVariantDependencies)
+    }
+
+    // KGP 2.4's ABI-validation support declares its compat classpath with a
+    // *version range* rather than the Kotlin version the build is on:
+    //   kotlin-build-tools-impl:{strictly [2.4.0-Beta2, 2.5.0)}
+    // Gradle resolves that to the highest published version in the range —
+    // prereleases included — so the whole compat classpath (build-tools-impl,
+    // compiler-embeddable, daemon-client, script-runtime, tooling-core, …)
+    // floats on its own and rewrites ~25 lockfiles on an unrelated relock,
+    // burying the lines a reviewer actually needs to check. A prerelease Kotlin
+    // drifting into the build classpath is precisely what locking exists to stop.
+    //
+    // ABI validation is not used here (no `abiValidation { }`, no `.api` dumps),
+    // but `enabled` already defaults to false and the configuration is created
+    // and resolved regardless — so disabling it changes nothing. Pin the range
+    // to the catalog's Kotlin version instead; `strictly` still holds because
+    // that version lies inside the declared range. Everything else on the
+    // classpath is transitive through `-impl` and follows it back down.
+    // See docs/security/supply-chain.md for the full rationale.
+    configurations.matching { it.name == "kotlinAbiValidationCompatClasspath" }.configureEach {
+        val kotlinVersion = rootProject.libs.versions.kotlin.get()
+        resolutionStrategy.force("org.jetbrains.kotlin:kotlin-build-tools-impl:$kotlinVersion")
     }
 
     // `lockAllConfigurations()` covers project dependency configurations but not
