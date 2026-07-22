@@ -37,6 +37,7 @@ import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.utils.HandleSideEffect
 import moneysurfer.feature.category.generated.resources.Res
 import moneysurfer.feature.category.generated.resources.categories_manage_add
+import moneysurfer.feature.category.generated.resources.categories_manage_edit
 import moneysurfer.feature.category.generated.resources.categories_manage_empty
 import moneysurfer.feature.category.generated.resources.categories_manage_remove
 import moneysurfer.feature.category.generated.resources.categories_manage_title
@@ -54,6 +55,7 @@ fun CategoriesManageScreen(
     onNavigateBack: () -> Unit,
     onNavigateToCategoryCreation: () -> Unit,
     onNavigateToCategoryEdit: (CategoryId) -> Unit,
+    onNavigateToCategoryDetails: (CategoryId) -> Unit = {},
     viewModel: CategoriesManageViewModel = koinViewModel(),
 ) {
     val state by viewModel.collectAsStateWithLifecycle()
@@ -62,6 +64,8 @@ fun CategoriesManageScreen(
         when (effect) {
             CategoriesManageEffect.NavigateBack -> onNavigateBack()
             CategoriesManageEffect.NavigateToCategoryCreation -> onNavigateToCategoryCreation()
+            is CategoriesManageEffect.NavigateToCategoryDetails ->
+                onNavigateToCategoryDetails(effect.categoryId)
             is CategoriesManageEffect.NavigateToCategoryEdit -> onNavigateToCategoryEdit(effect.categoryId)
         }
     }
@@ -150,7 +154,9 @@ private fun CategoriesManageContent(
                 CategoryManageRow(
                     category = category,
                     deleteLabel = stringResource(Res.string.categories_manage_remove),
+                    editLabel = stringResource(Res.string.categories_manage_edit),
                     onClick = { onEvent(CategoriesManageEvent.OnCategoryClick(category.id)) },
+                    onEditClick = { onEvent(CategoriesManageEvent.OnEditCategoryClick(category.id)) },
                     onRemoveClick = { onEvent(CategoriesManageEvent.OnRemoveCategoryClick(category.id)) },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -180,14 +186,23 @@ private fun CategoriesManageContent(
 private fun CategoryManageRow(
     category: CategoryManageUi,
     deleteLabel: String,
+    editLabel: String,
     onClick: () -> Unit,
+    onEditClick: () -> Unit,
     onRemoveClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     SurferSwipeRevealRow(
-        revealWidth = 88.dp,
+        // Two actions now that tapping the row opens the detail screen instead of the editor —
+        // edit has to stay reachable from the list itself.
+        revealWidth = 176.dp,
         modifier = modifier,
         actions = {
+            SurferSwipeAction(
+                icon = SurferIcons.Edit,
+                label = editLabel,
+                onClick = onEditClick,
+            )
             SurferSwipeAction(
                 icon = SurferIcons.Delete,
                 label = deleteLabel,
