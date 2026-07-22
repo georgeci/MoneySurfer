@@ -2,6 +2,21 @@
 
 [![PR checks](https://github.com/georgeci/MoneySurfer/actions/workflows/ci.yml/badge.svg)](https://github.com/georgeci/MoneySurfer/actions/workflows/ci.yml)
 [![Nightly](https://github.com/georgeci/MoneySurfer/actions/workflows/nightly.yml/badge.svg)](https://github.com/georgeci/MoneySurfer/actions/workflows/nightly.yml)
+[![iOS offline](https://github.com/georgeci/MoneySurfer/actions/workflows/ios-offline.yml/badge.svg)](https://github.com/georgeci/MoneySurfer/actions/workflows/ios-offline.yml)
+[![CodeQL](https://github.com/georgeci/MoneySurfer/actions/workflows/codeql.yml/badge.svg)](https://github.com/georgeci/MoneySurfer/actions/workflows/codeql.yml)
+
+[![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=georgeci_MoneySurfer&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=georgeci_MoneySurfer)
+[![Coverage](https://codecov.io/gh/georgeci/MoneySurfer/branch/main/graph/badge.svg)](https://codecov.io/gh/georgeci/MoneySurfer)
+[![Maintainability](https://sonarcloud.io/api/project_badges/measure?project=georgeci_MoneySurfer&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=georgeci_MoneySurfer)
+[![Reliability](https://sonarcloud.io/api/project_badges/measure?project=georgeci_MoneySurfer&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=georgeci_MoneySurfer)
+[![Security](https://sonarcloud.io/api/project_badges/measure?project=georgeci_MoneySurfer&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=georgeci_MoneySurfer)
+[![Tech debt](https://sonarcloud.io/api/project_badges/measure?project=georgeci_MoneySurfer&metric=sqale_index)](https://sonarcloud.io/summary/new_code?id=georgeci_MoneySurfer)
+[![Code smells](https://sonarcloud.io/api/project_badges/measure?project=georgeci_MoneySurfer&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=georgeci_MoneySurfer)
+[![Duplication](https://sonarcloud.io/api/project_badges/measure?project=georgeci_MoneySurfer&metric=duplicated_lines_density)](https://sonarcloud.io/summary/new_code?id=georgeci_MoneySurfer)
+
+[![Kotlin](https://img.shields.io/badge/Kotlin-2.4.0-7F52FF?logo=kotlin&logoColor=white)](https://kotlinlang.org)
+[![Compose Multiplatform](https://img.shields.io/badge/Compose%20Multiplatform-1.11.1-4285F4?logo=jetpackcompose&logoColor=white)](https://www.jetbrains.com/compose-multiplatform/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 A Kotlin Multiplatform personal finance app for Android, iOS, and Desktop (JVM),
 built with Compose Multiplatform. Local data lives in Room; cross-device sync
@@ -119,6 +134,18 @@ Firestore rules tests:
 cd firestore-tests
 npm test
 ```
+
+## Reports
+
+Every push to `main` republishes the aggregated CI reports to GitHub Pages
+(see the `publish` job in [ci.yml](.github/workflows/ci.yml)):
+
+- [Reports index](https://georgeci.github.io/MoneySurfer/)
+- [Allure](https://georgeci.github.io/MoneySurfer/allure/) — common + Firestore rules tests, with history
+- [Kover coverage](https://georgeci.github.io/MoneySurfer/kover/) — HTML report, common scope
+- [Allure (nightly)](https://georgeci.github.io/MoneySurfer/nightly/allure/) — all five nightly scopes
+- [Codecov](https://codecov.io/gh/georgeci/MoneySurfer) — coverage trend and PR diff
+- [SonarCloud](https://sonarcloud.io/summary/new_code?id=georgeci_MoneySurfer) — quality gate, detekt findings, duplication
 
 ## Documentation
 
