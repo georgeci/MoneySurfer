@@ -15,7 +15,8 @@ import androidx.room.PrimaryKey
     tableName = "workspace_invites",
     // Single-column workspaceId / email indices are omitted: they are leftmost
     // prefixes of the composites below, which SQLite uses for prefix-only lookups
-    // too. A standalone `status` index is pointless at three distinct values.
+    // too. A standalone `status` index is dropped as well — no query filters on
+    // status alone, and it is far less selective than the columns it pairs with.
     indices = [
         Index("targetUserId"),
         Index(value = ["workspaceId", "status"]),

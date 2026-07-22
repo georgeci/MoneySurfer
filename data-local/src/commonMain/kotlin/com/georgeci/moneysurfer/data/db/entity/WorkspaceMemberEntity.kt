@@ -23,8 +23,8 @@ import androidx.room.Index
         ),
     ],
     // No index on userId — the composite primary key (userId, workspaceId) already
-    // indexes it as its leftmost column. No index on status either: two values, and
-    // no query filters on it.
+    // indexes it as its leftmost column. No index on status either: nothing in
+    // WorkspaceMemberDao filters on it, and it is low-cardinality besides.
     indices = [Index("workspaceId")],
 )
 data class WorkspaceMemberEntity(
