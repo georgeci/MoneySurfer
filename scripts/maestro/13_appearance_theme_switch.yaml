@@ -7,13 +7,15 @@ name: Appearance — Switch theme between Dark, Light and System
 
 - runFlow: 03_dashboard_add_account.yaml
 
+# Navigate by testTag: the dashboard gear and the Settings rows are icon/row
+# composables whose labels aren't reliable Maestro selectors on iOS (#219).
 - tapOn:
-    text: "Settings"
+    id: "dashboard:settings"
 - assertVisible:
-    text: "Settings"
+    id: "settings:root"
 
 - tapOn:
-    text: "Appearance"
+    id: "settings:appearanceRow"
 
 # Appearance screen
 - assertVisible:
@@ -51,6 +53,7 @@ name: Appearance — Switch theme between Dark, Light and System
 - assertVisible:
     text: "Bordered surfaces, no fill"
 
-- pressKey: Back
+- tapOn:
+    text: "Back"
 - assertVisible:
-    text: "Settings"
+    id: "settings:root"

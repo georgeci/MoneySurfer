@@ -6,12 +6,33 @@ tags:
 - launchApp:
     clearState: false
 
+# Firebase restores a persisted Auth session asynchronously on cold start, so
+# the sign-in screen flashes for ~1–2s before the app auto-navigates to the
+# workspace picker. Wait out that restore window before deciding whether a
+# manual sign-in is needed: otherwise the `when visible signIn:email` guard
+# below catches the flash, starts typing, and races the auto-navigation —
+# tapping a screen that's already vanishing (issue #219). `optional: true` lets
+# a genuinely logged-out launch fall straight through to the sign-in branch.
+- extendedWaitUntil:
+    visible:
+      text: "Choose a workspace"
+    timeout: 12000
+    optional: true
+
 # TEST_EMAIL and TEST_PASSWORD are passed by the Maestro test suite from
 # scripts/e2e-test-user.properties. The same file is used by Firebase seed.
 #
 # Selectors below target Compose `testTag` values exposed via
 # `Modifier.semantics { testTagsAsResourceId = true }` — see
 # `feature/login/.../SignInScreen.kt::SignInTestTags`.
+#
+# Field advancing is driven by the on-screen keyboard, not by tapping each
+# field: on the iOS Simulator the password field and submit button sit behind
+# the keyboard raised by the email field, so a `tapOn` there lands on the
+# keyboard and the text/tap is lost (issue #219). Instead we ride the fields'
+# IME actions — email is `ImeAction.Next` (Enter moves focus to password),
+# password is `ImeAction.Done` (Enter dismisses the keyboard) — then tap the
+# now-visible submit button. Both actions behave identically on Android Compose.
 - runFlow:
     when:
       visible:
@@ -20,10 +41,10 @@ tags:
       - tapOn:
           id: "signIn:email"
       - inputText: ${TEST_EMAIL}
+      - pressKey: Enter
 
-      - tapOn:
-          id: "signIn:password"
       - inputText: ${TEST_PASSWORD}
+      - pressKey: Enter
 
       - tapOn:
           id: "signIn:submit"

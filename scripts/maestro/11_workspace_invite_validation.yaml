@@ -3,11 +3,12 @@ name: Workspace — Invite member validation
 ---
 - runFlow: 02_workspace_create.yaml
 
+# Settings gear by testTag — no selectable label on iOS (#219).
 - tapOn:
-    text: "Settings"
+    id: "dashboard:settings"
 
 - assertVisible:
-    text: "Settings"
+    id: "settings:root"
 - tapOn:
     text: "Members & permissions"
 
@@ -21,6 +22,9 @@ name: Workspace — Invite member validation
 - tapOn:
     text: "Email"
 - inputText: "not-an-email"
+# Dismiss the keyboard first: "Send invite" sits behind it, so tapping straight
+# away lands on the keyboard and the invite is never submitted (#219).
+- pressKey: Enter
 - tapOn:
     text: "Send invite"
 

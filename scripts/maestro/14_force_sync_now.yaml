@@ -1,18 +1,27 @@
 appId: ${APP_ID}
 name: Sync — Force sync now from Sync hub
+tags:
+  - sync
 ---
 # Pre-condition: active workspace and dashboard.
 # Settings → Sync → "Force sync now" → wait for the run to complete.
+#
+# EXCLUDED from the default online suite (tag `sync`). Sync has been gated off
+# since #110: `OnlineSignInModule` binds `SyncFeatureFlag(enabled = false)` and
+# `SettingsState.showSyncSection` hides the row, so there is no Sync hub to open
+# in the shipped online build and this flow cannot pass (issue #219). Re-include
+# it — drop the tag from `maestroSyncTags` in gradle/qa.gradle.kts — once the
+# flag is flipped on.
 
 - runFlow: 03_dashboard_add_account.yaml
 
 - tapOn:
-    text: "Settings"
+    id: "dashboard:settings"
 - assertVisible:
-    text: "Settings"
+    id: "settings:root"
 
 - tapOn:
-    text: "Sync"
+    id: "settings:syncRow"
 
 # Sync screen
 - assertVisible:
@@ -28,6 +37,7 @@ name: Sync — Force sync now from Sync hub
 - assertVisible:
     text: "Force sync now"
 
-- pressKey: Back
+- tapOn:
+    text: "Back"
 - assertVisible:
-    text: "Settings"
+    id: "settings:root"

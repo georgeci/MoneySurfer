@@ -5,36 +5,44 @@ name: Workspace — Create and select test workspace
 
 - runFlow: 00_login.yaml
 
+# A restored session lands on either the workspace picker or — once a workspace
+# has been selected on a prior run, since the app persists the active workspace
+# across launches — straight on the dashboard. Only drive the picker when it's
+# actually shown; otherwise we're already on the dashboard (issue #219).
+#
 # Workspace list copy: the selector title "Choose a workspace" is build-independent
 # (only the subtitle has online/offline variants). The per-row "X members" counter
 # was dropped (issue #60) — offline workspaces are single-user.
-- assertVisible:
-    text: "Choose a workspace"
-
 - runFlow:
     when:
-      visible: "Use Test Workspace"
+      visible: "Choose a workspace"
     commands:
-      - tapOn:
-          text: "Use Test Workspace"
+      # Branch on the workspace *row*, not on the confirm button: that button is
+      # labelled after whichever workspace is currently highlighted ("Use Empty
+      # Workspace" when 03a's fixture is active), so keying off it would create a
+      # duplicate "Test Workspace" on every such run (#219).
+      - runFlow:
+          when:
+            notVisible: "Test Workspace"
+          commands:
+            - tapOn:
+                text: "New workspace"
+            - assertVisible:
+                text: "New workspace"
+            - tapOn:
+                text: "Workspace name"
+            - inputText: "Test Workspace"
+            # Don't hideKeyboard: the AVD runs with hw.keyboard=yes, so no soft IME
+            # is shown; Maestro then falls back to a BACK keypress which dismisses
+            # the creation screen. The "Create" action lives in the TopAppBar so
+            # the (absent) keyboard never overlaps it anyway.
+            - tapOn:
+                text: "Create"
 
-- runFlow:
-    when:
-      visible: "New workspace"
-    commands:
+      # Select the row, then confirm — the picker only enables the confirm
+      # button for the highlighted workspace.
       - tapOn:
-          text: "New workspace"
-      - assertVisible:
-          text: "New workspace"
-      - tapOn:
-          text: "Workspace name"
-      - inputText: "Test Workspace"
-      # Don't hideKeyboard: the AVD runs with hw.keyboard=yes, so no soft IME
-      # is shown; Maestro then falls back to a BACK keypress which dismisses
-      # the creation screen. The "Create" action lives in the TopAppBar so
-      # the (absent) keyboard never overlaps it anyway.
-      - tapOn:
-          text: "Create"
+          text: "Test Workspace"
       - tapOn:
           text: "Use Test Workspace"
 

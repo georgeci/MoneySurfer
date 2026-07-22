@@ -11,6 +11,20 @@ name: Dashboard — Add bank account
     text: "Accounts"
 
 # Create the baseline account once and reuse it across the remaining flows.
+#
+# Wait for the account list to arrive before deciding. "Accounts" above is just
+# the section header — it renders before Firestore has streamed the rows, so on
+# a slow read the guard below would fire against an already-populated workspace,
+# and the duplicate-name validation then leaves the create form stuck (#219).
+#
+# 20s, not 10s: this is a cold-launch read (00_login relaunches the app), and
+# late in a full suite run the emulator has been slow enough to blow a 10s
+# budget. The wait is optional, so a workspace that genuinely has no account
+# still costs the full timeout exactly once.
+- extendedWaitUntil:
+    visible: "Main Bank"
+    timeout: 20000
+    optional: true
 - runFlow:
     when:
       notVisible: "Main Bank"

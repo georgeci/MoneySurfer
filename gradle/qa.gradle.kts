@@ -258,7 +258,10 @@ val iosMaestroDeviceId = providers.gradleProperty("iosSimulatorUdid").orNull
 //  - `setup`   : reusable login fragment, not a standalone flow.
 //  - `offline` : offline-build golden path — different appId, no Firebase
 //                emulator. Run via `qaMaestroOfflineAndroid` / `qaMaestroOfflineIos`.
-val maestroSetupTags = listOf("setup", "offline")
+//  - `sync`    : needs the Sync hub, which `SyncFeatureFlag(enabled = false)`
+//                hides in the shipped online build (gated off since #110). Drop
+//                this tag once the flag is flipped on — see 14_force_sync_now.yaml.
+val maestroSetupTags = listOf("setup", "offline", "sync")
 
 val iosMaestroDerivedDataDir = rootProject.file("build/ios-maestro")
 // The online Xcode config (`iosApp/Configuration/Config.xcconfig`) overrides
@@ -984,8 +987,8 @@ tasks.register<Exec>("qaMaestroAndroid") {
                     "--debug-output", debugOutputPath,
                     "--test-output-dir", testOutputPath,
                     "--flatten-debug-output",
-                    "--exclude-tags", "setup",
-                    "--exclude-tags", "offline",
+                ) + maestroSetupTags.flatMap { listOf("--exclude-tags", it) } +
+                listOf(
                     flowsDir,
                 ))
                 .joinToString(" "),
@@ -1057,8 +1060,8 @@ tasks.register<Exec>("qaMaestroIos") {
                     "--debug-output", debugOutputPath,
                     "--test-output-dir", testOutputPath,
                     "--flatten-debug-output",
-                    "--exclude-tags", "setup",
-                    "--exclude-tags", "offline",
+                ) + maestroSetupTags.flatMap { listOf("--exclude-tags", it) } +
+                listOf(
                     flowsDir,
                 ))
                 .joinToString(" "),

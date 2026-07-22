@@ -10,7 +10,14 @@ class AppDelegate: NSObject, UIApplicationDelegate {
                 googleAppID: "1:000000000000:ios:0000000000000000",
                 gcmSenderID: "000000000000"
             )
-            options.apiKey = "fake-api-key"
+            // FirebaseInstallations (started via Analytics during configureCore)
+            // validates the API key format and throws an uncaught
+            // `com.firebase.installations` NSException on launch when it doesn't
+            // match — the key must be exactly 39 chars and start with "A". A
+            // literal "fake-api-key" crashed every E2E flow before the sign-in
+            // screen ever appeared (issue #219). The emulator ignores the key's
+            // value, so any format-valid dummy works.
+            options.apiKey = "AIzaSyDUMMYKEY0000000000000000000000000"
             options.projectID = "demo-moneysurfer"
             options.bundleID = Bundle.main.bundleIdentifier ?? "com.georgeci.moneysurfer"
             FirebaseApp.configure(options: options)
