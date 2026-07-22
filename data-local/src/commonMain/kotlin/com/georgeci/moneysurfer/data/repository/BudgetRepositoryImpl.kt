@@ -114,10 +114,8 @@ class BudgetRepositoryImpl(
     )
 }
 
-private fun String.parseCategoryIds(): List<CategoryId> {
-    if (isBlank()) return emptyList()
-    return split(',').filter { it.isNotBlank() }.map(::CategoryId)
-}
+private fun String.parseCategoryIds(): List<CategoryId> =
+    parseCsvColumn().map(::CategoryId)
 
 private fun List<CategoryId>.toStorageValue(): String =
-    joinToString(",") { categoryId -> categoryId.value }
+    map { categoryId -> categoryId.value }.toCsvColumn()

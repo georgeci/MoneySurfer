@@ -1,4 +1,4 @@
-// v2.5.0 — 2026-07-22
+// v2.6.0 — 2026-07-22
 rules_version = '2';
 
 // Workspace-scoped tenancy: every per-user document lives under
@@ -178,6 +178,11 @@ service cloud.firestore {
         && typeIntOk(data, 'amount')
         && typeStrOk(data, 'currencyCode')
         && typeStrOk(data, 'note')
+        && typeStrOk(data, 'merchant')
+        // `tags` is a list on the wire (Room stores it as CSV) — same as budgets.categoryIds,
+        // we check only that it IS a list; element types are not reachable from rules and a
+        // non-string element is contained by the client-side decodeOrNull() skip.
+        && typeListOk(data, 'tags')
         && typeIntOk(data, 'operationAt')
         && typeStrOk(data, 'operationDate')
         && typeStrOk(data, 'type')
@@ -185,7 +190,8 @@ service cloud.firestore {
         && typeIntOk(data, 'createdAt')
         && typeIntOk(data, 'updatedAt')
         && typeNullableIntOk(data, 'deletedAt')
-        && typeNullableStrOk(data, 'transferId');
+        && typeNullableStrOk(data, 'transferId')
+        && typeNullableStrOk(data, 'recurringRuleId');
     }
 
     // BudgetDoc — data-remote/.../RemoteDtos.kt

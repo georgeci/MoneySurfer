@@ -445,4 +445,57 @@ describe('entity write-shape validation (issue #156)', () => {
       ),
     );
   });
+
+  // The base transactionDoc() above omits merchant/tags/recurringRuleId entirely, so the
+  // passing 'accepts a correctly-typed transaction' case already proves the guard tolerates
+  // their absence — that is what keeps clients on the previous build syncing. These cover
+  // the populated shape and the type checks.
+  it('accepts a transaction with merchant, tags and recurringRuleId', async () => {
+    await assertSucceeds(
+      setDoc(
+        doc(asMember(), `workspaces/${WID}/transactions/tx-rich`),
+        transactionDoc({
+          merchant: 'Starbucks',
+          tags: ['coffee', 'work'],
+          recurringRuleId: 'rule-1',
+        }),
+      ),
+    );
+  });
+
+  it('accepts a null recurringRuleId', async () => {
+    await assertSucceeds(
+      setDoc(
+        doc(asMember(), `workspaces/${WID}/transactions/tx-manual`),
+        transactionDoc({ recurringRuleId: null }),
+      ),
+    );
+  });
+
+  it('rejects a non-string transaction merchant', async () => {
+    await assertFails(
+      setDoc(
+        doc(asMember(), `workspaces/${WID}/transactions/tx-bad-merchant`),
+        transactionDoc({ merchant: 42 }),
+      ),
+    );
+  });
+
+  it('rejects transaction tags sent as a string instead of a list', async () => {
+    await assertFails(
+      setDoc(
+        doc(asMember(), `workspaces/${WID}/transactions/tx-bad-tags`),
+        transactionDoc({ tags: 'coffee,work' }),
+      ),
+    );
+  });
+
+  it('rejects a non-string transaction recurringRuleId', async () => {
+    await assertFails(
+      setDoc(
+        doc(asMember(), `workspaces/${WID}/transactions/tx-bad-rule`),
+        transactionDoc({ recurringRuleId: 7 }),
+      ),
+    );
+  });
 });
