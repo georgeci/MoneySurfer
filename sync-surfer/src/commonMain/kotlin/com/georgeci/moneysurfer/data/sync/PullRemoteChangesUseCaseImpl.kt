@@ -7,6 +7,7 @@ import com.georgeci.moneysurfer.domain.sync.PullProgress
 import com.georgeci.moneysurfer.domain.sync.PullRemoteChangesUseCase
 import com.georgeci.moneysurfer.domain.sync.PullSummary
 import com.georgeci.moneysurfer.sync.api.SyncCancelToken
+import com.georgeci.moneysurfer.sync.api.SyncCollection
 import com.georgeci.moneysurfer.sync.api.SyncResult
 import com.georgeci.moneysurfer.sync.api.SyncScope
 import com.georgeci.moneysurfer.sync.plugin.EntityApplyResult
@@ -111,7 +112,9 @@ class PullRemoteChangesUseCaseImpl(
             val uid = session.currentFirebaseUid.flow.first()
             if (uid != null) {
                 val invitedIds = userWorkspacesProvider.invitedWorkspaceIds()
-                val invitePlugin = plugins.firstOrNull { it.firestoreCollectionName == "invites" }
+                val invitePlugin = plugins.firstOrNull {
+                    it.firestoreCollectionName == SyncCollection.WORKSPACE_INVITES
+                }
                 if (invitePlugin != null) {
                     for (workspaceId in invitedIds) {
                         cancelToken.throwIfCancelled()
@@ -200,7 +203,7 @@ class PullRemoteChangesUseCaseImpl(
         cancelToken: SyncCancelToken,
     ): Pair<Int, Int> = pullBatch(
         workspaceId = workspaceId,
-        collectionName = "invites",
+        collectionName = SyncCollection.WORKSPACE_INVITES,
         plugin = plugin,
         onProgress = onProgress,
         cancelToken = cancelToken,

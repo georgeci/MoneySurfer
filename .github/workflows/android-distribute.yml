@@ -169,6 +169,9 @@ jobs:
           RELEASE_STORE_PASSWORD: ${{ secrets.ANDROID_RELEASE_STORE_PASSWORD }}
           RELEASE_KEY_ALIAS: ${{ secrets.ANDROID_RELEASE_KEY_ALIAS }}
           RELEASE_KEY_PASSWORD: ${{ secrets.ANDROID_RELEASE_KEY_PASSWORD }}
+          # Build number of `major.minor.build` — see Version.xcconfig. Scoped
+          # to this workflow's own counter, so it only ever grows.
+          APP_BUILD_NUMBER: ${{ github.run_number }}
         run: ./gradlew :androidApp:assembleRelease --stacktrace
 
       - name: Locate and verify the APK
@@ -250,7 +253,7 @@ jobs:
           if [ -z "$notes" ]; then
             notes="$(git log -1 --pretty=%s)"
           fi
-          notes="${notes}"$'\n\n'"commit ${GITHUB_SHA}"$'\n'"${RUN_URL}"
+          notes="${notes}"$'\n\n'"build ${GITHUB_RUN_NUMBER}"$'\n'"commit ${GITHUB_SHA}"$'\n'"${RUN_URL}"
 
           # Scheduled runs carry no inputs, so they take the default group. A
           # manually cleared `groups` input uploads the release without handing

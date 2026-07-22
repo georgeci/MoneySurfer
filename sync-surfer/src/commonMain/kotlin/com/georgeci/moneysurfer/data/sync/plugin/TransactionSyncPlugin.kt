@@ -5,6 +5,7 @@ import com.georgeci.moneysurfer.data.sync.toDoc
 import com.georgeci.moneysurfer.data.sync.toEntity
 import com.georgeci.moneysurfer.domain.AppInfo
 import com.georgeci.moneysurfer.domain.sync.SyncEntityTypes
+import com.georgeci.moneysurfer.sync.api.SyncCollection
 import com.georgeci.moneysurfer.sync.plugin.EntityApplyResult
 import com.georgeci.moneysurfer.sync.plugin.RemoteDocument
 import com.georgeci.moneysurfer.sync.plugin.SyncEntityPlugin
@@ -25,7 +26,7 @@ class TransactionSyncPlugin(
 ) : SyncEntityPlugin {
 
     override val entityType: String = SyncEntityTypes.TRANSACTION
-    override val firestoreCollectionName: String = "transactions"
+    override val firestoreCollectionName: String = SyncCollection.TRANSACTIONS
     override val pullPriority: Int = SyncPullPriorities.TRANSACTIONS
 
     override suspend fun push(mutation: PendingMutation) {
@@ -64,5 +65,5 @@ class TransactionSyncPlugin(
     }
 
     private fun workspaceCollection(workspaceId: String) =
-        firestore.collection("workspaces").document(workspaceId).collection("transactions")
+        firestore.collection("workspaces").document(workspaceId).collection(SyncCollection.TRANSACTIONS)
 }
