@@ -158,6 +158,40 @@ allprojects {
     }
 }
 
+// Modules with no test sources of their own, plus test scaffolding. They are
+// deliberately absent from the `kover(...)` aggregation below, so Sonar receives
+// no coverage data for them; without an explicit exclusion that reads as a real
+// 0% and drags the headline number down (issue #272).
+//
+// Applied per-module in `subprojects { afterEvaluate { ... } }` rather than as a
+// single root `sonar.coverage.exclusions`: coverage exclusion patterns are matched
+// against each file's path *relative to its own module's baseDir*, and the root
+// property is inherited by every submodule — so a root-level `feature/dashboard/**`
+// would be matched against `src/commonMain/kotlin/...` inside that module and never
+// hit anything. `**/*` scoped to the module itself is unambiguous.
+//
+// This list is a TODO, not a target state: as a module gains tests, add it to
+// `kover(...)` and delete it from here.
+val coverageExcludedProjects = setOf(
+    ":shared",
+    ":sync:no-op",
+    ":feature",
+    ":feature:dashboard",
+    ":feature:settings",
+    ":feature:transaction",
+    ":feature:account",
+    ":feature:category",
+    ":feature:workspace",
+    ":androidApp",
+    ":androidApp-offline",
+    ":sync-test-fixtures",
+    ":domain-test-fixtures",
+    ":data-test-fixtures",
+    // Test-only module: aggregated into Kover so its integration tests credit the
+    // modules they exercise, but its own sources aren't production code to cover.
+    ":integration-test",
+)
+
 subprojects {
     apply(plugin = "io.gitlab.arturbosch.detekt")
 
@@ -231,10 +265,22 @@ subprojects {
             if (testDirs.isNotEmpty()) {
                 property("sonar.tests", testDirs.joinToString(","))
             }
+            if (path in coverageExcludedProjects) {
+                property("sonar.coverage.exclusions", "**/*")
+            }
         }
     }
 }
 
+// Kover aggregation — the merged report at build/reports/kover/report.xml feeds
+// Codecov, the Pages HTML report, and SonarCloud's coverage import (issue #272).
+//
+// Every module that owns test sources belongs here. A module with tests that is
+// *missing* from this list contributes no coverage at all, which SonarCloud then
+// reports as 0% on any new code in it — that was one of the three causes behind
+// the permanent "0.0% Coverage on New Code" (issue #272). Untested production
+// modules are deliberately left out and named in `sonar.coverage.exclusions`
+// below instead, so their absence is explicit rather than silent.
 dependencies {
     kover(projects.composeApp)
     kover(projects.composeAppOffline)
@@ -242,10 +288,17 @@ dependencies {
     kover(projects.dataLocal)
     kover(projects.dataRemote)
     kover(projects.syncSurfer)
+    kover(projects.sync.api)
     kover(projects.sync.default)
     kover(projects.uikit)
     kover(projects.feature.login)
     kover(projects.feature.goal)
+    kover(projects.utils)
+    kover(projects.navigation)
+    // Test-only module: contributes no production classes of its own, but its
+    // integration tests exercise the modules above, so its coverage data must be
+    // merged in or that exercise is invisible to the report.
+    kover(projects.integrationTest)
 }
 
 sonar {
@@ -272,5 +325,29 @@ sonar {
             "sonar.exclusions",
             "**/build/**,**/generated/**,iosApp/**,scripts/**,md/**,docs/**,firestore-tests/**,**/config/detekt/**",
         )
+
+        // Coverage import (issue #272). Kover emits a JaCoCo-format XML — verified:
+        // the merged report carries <sourcefile>/<line> elements, which is what
+        // Sonar's JaCoCo sensor actually reads (a report with only <class>/<method>
+        // counters would import nothing).
+        //
+        // The path MUST be absolute. This property is inherited by every Sonar
+        // submodule, and a relative path re-resolves against each module's own
+        // baseDir — so `build/reports/kover/report.xml` would be looked up as
+        // `<module>/build/reports/kover/report.xml`, which does not exist for any
+        // module. Every module then reports 0%. Point them all at the one merged
+        // report at the root instead.
+        //
+        // The report is produced by the `junit` CI job (`qaCommon qaAndroidHost`
+        // → koverXmlReport) and handed to the `sonar` job as the `kover-xml`
+        // artifact — see .github/workflows/ci.yml. Locally: ./gradlew koverXmlReport.
+        property(
+            "sonar.coverage.jacoco.xmlReportPaths",
+            rootProject.layout.buildDirectory.file("reports/kover/report.xml").get().asFile.absolutePath,
+        )
+
+        // Coverage exclusions for untested modules are set per-module in the
+        // `subprojects { afterEvaluate { ... } }` block above — see the comment on
+        // `coverageExcludedProjects` for why they cannot live here.
     }
 }

@@ -6,7 +6,11 @@ import androidx.room.Fts4
 import androidx.room.FtsOptions
 
 /**
- * Full-text index over [TransactionEntity.note].
+ * Full-text index over [TransactionEntity.note] and [TransactionEntity.merchant].
+ *
+ * Both columns are indexed because a bare `MATCH` spans every column of the virtual table,
+ * so "starbucks" finds a transaction whether the user typed it as the merchant or buried it
+ * in the note — which is the whole point of splitting the two fields apart.
  *
  * External-content table (`contentEntity`): the note text is not duplicated — the
  * virtual table stores only the inverted index and Room generates the triggers that
@@ -26,4 +30,5 @@ import androidx.room.FtsOptions
 @Entity(tableName = "transactions_fts")
 data class TransactionFtsEntity(
     @ColumnInfo(name = "note") val note: String,
+    @ColumnInfo(name = "merchant") val merchant: String,
 )

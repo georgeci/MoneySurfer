@@ -578,8 +578,14 @@ private fun CategoryTile(
     val bg = if (selected) AppTheme.materialColors.secondaryContainer else Color.Transparent
     val labelColor =
         if (selected) AppTheme.materialColors.onSecondaryContainer else AppTheme.materialColors.onSurface
-    val tint = SurferCategoryPalette.tintFor(category.id.value, category.systemKind?.name)
-    val icon: ImageVector = SurferCategoryPalette.iconFor(category.id.value, category.systemKind?.name)
+    val visual = SurferCategoryPalette.visualFor(
+        id = category.id.value,
+        iconKey = category.iconKey,
+        hue = category.hue,
+        systemKind = category.systemKind?.name,
+    )
+    val tint = visual.tint
+    val icon: ImageVector = visual.icon
     Column(
         modifier = Modifier
             .fillMaxWidth()

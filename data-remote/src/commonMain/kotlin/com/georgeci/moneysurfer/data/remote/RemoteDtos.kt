@@ -65,6 +65,13 @@ data class CategoryDoc(
     val clientVersionCode: Int = 1,
     /** System kind marker (e.g. "TRANSFER") for built-in categories. Null for user categories. */
     val systemKind: String? = null,
+    /**
+     * Semantic icon key. Empty when written by a client that predates the field; the reader
+     * resolves that back to the deterministic default rather than rendering nothing.
+     */
+    val iconKey: String = "",
+    /** Hue in degrees, 0 until 360. `-1` is the same "not written" sentinel as a blank [iconKey]. */
+    val hue: Int = -1,
 )
 
 @Serializable
@@ -74,6 +81,12 @@ data class TransactionDoc(
     val amount: Long = 0L,
     val currencyCode: String = "",
     val note: String = "",
+    val merchant: String = "",
+    /**
+     * A real list on the wire even though Room stores it as a CSV column — same split as
+     * [BudgetDoc.categoryIds], and the mapper converts on the entity↔wire boundary.
+     */
+    val tags: List<String> = emptyList(),
     val operationAt: Long = 0L,
     val operationDate: String = "",
     val type: String = "",
@@ -84,6 +97,8 @@ data class TransactionDoc(
     val clientVersionCode: Int = 1,
     /** Shared id linking the two legs of a transfer. Null for non-transfer rows. */
     val transferId: String? = null,
+    /** Rule that generated this row. Null for manual entries. */
+    val recurringRuleId: String? = null,
 )
 
 /**

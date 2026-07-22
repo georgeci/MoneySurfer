@@ -1,4 +1,4 @@
-// v2.5.0 — 2026-07-22
+// v2.6.0 — 2026-07-22
 rules_version = '2';
 
 // Workspace-scoped tenancy: every per-user document lives under
@@ -168,7 +168,12 @@ service cloud.firestore {
         && typeIntOk(data, 'createdAt')
         && typeIntOk(data, 'updatedAt')
         && typeNullableIntOk(data, 'deletedAt')
-        && typeNullableStrOk(data, 'systemKind');
+        && typeNullableStrOk(data, 'systemKind')
+        // Optional, like every other field here: a client that predates iconKey/hue omits
+        // them and must keep validating, or deploying this rule breaks category sync for
+        // everyone still on the old build.
+        && typeStrOk(data, 'iconKey')
+        && typeIntOk(data, 'hue');
     }
 
     // TransactionDoc — data-remote/.../RemoteDtos.kt
@@ -178,6 +183,11 @@ service cloud.firestore {
         && typeIntOk(data, 'amount')
         && typeStrOk(data, 'currencyCode')
         && typeStrOk(data, 'note')
+        && typeStrOk(data, 'merchant')
+        // `tags` is a list on the wire (Room stores it as CSV) — same as budgets.categoryIds,
+        // we check only that it IS a list; element types are not reachable from rules and a
+        // non-string element is contained by the client-side decodeOrNull() skip.
+        && typeListOk(data, 'tags')
         && typeIntOk(data, 'operationAt')
         && typeStrOk(data, 'operationDate')
         && typeStrOk(data, 'type')
@@ -185,7 +195,8 @@ service cloud.firestore {
         && typeIntOk(data, 'createdAt')
         && typeIntOk(data, 'updatedAt')
         && typeNullableIntOk(data, 'deletedAt')
-        && typeNullableStrOk(data, 'transferId');
+        && typeNullableStrOk(data, 'transferId')
+        && typeNullableStrOk(data, 'recurringRuleId');
     }
 
     // BudgetDoc — data-remote/.../RemoteDtos.kt

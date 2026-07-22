@@ -18,6 +18,7 @@ import com.georgeci.moneysurfer.data.remote.TransactionDoc
 import com.georgeci.moneysurfer.data.remote.WorkspaceDoc
 import com.georgeci.moneysurfer.data.remote.WorkspaceInviteDoc
 import com.georgeci.moneysurfer.data.remote.WorkspaceMemberDoc
+import com.georgeci.moneysurfer.domain.model.TransactionTags
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Instant
@@ -81,6 +82,8 @@ fun CategoryEntity.toDoc(): CategoryDoc = CategoryDoc(
     createdAt = createdAt,
     updatedAt = updatedAt,
     systemKind = systemKind,
+    iconKey = iconKey,
+    hue = hue,
 )
 
 fun CategoryDoc.toEntity(id: String, workspaceId: String): CategoryEntity = CategoryEntity(
@@ -92,6 +95,8 @@ fun CategoryDoc.toEntity(id: String, workspaceId: String): CategoryEntity = Cate
     createdAt = createdAt,
     updatedAt = updatedAt,
     systemKind = systemKind,
+    iconKey = iconKey,
+    hue = hue,
 )
 
 /**
@@ -134,6 +139,9 @@ fun TransactionEntity.toDoc(): TransactionDoc = TransactionDoc(
     amount = amount,
     currencyCode = currencyCode,
     note = note,
+    merchant = merchant,
+    // Same CSV-column↔wire-list conversion as BudgetEntity.categoryIds above.
+    tags = tags.split(',').filter { it.isNotBlank() },
     operationAt = operationAt,
     operationDate = operationDate,
     type = type,
@@ -141,6 +149,7 @@ fun TransactionEntity.toDoc(): TransactionDoc = TransactionDoc(
     createdAt = createdAt,
     updatedAt = updatedAt,
     transferId = transferId,
+    recurringRuleId = recurringRuleId,
 )
 
 fun TransactionDoc.toEntity(id: String, workspaceId: String): TransactionEntity {
@@ -169,6 +178,10 @@ fun TransactionDoc.toEntity(id: String, workspaceId: String): TransactionEntity 
         currencyCode = currencyCode,
         categoryId = categoryId,
         note = note,
+        merchant = merchant,
+        // Normalized, not just joined: a remote tag carrying the CSV separator would come
+        // back from Room as two tags, and this doc may come from a client we do not control.
+        tags = TransactionTags.normalize(tags).joinToString(","),
         operationAt = operationAt,
         operationDate = resolvedOperationDate,
         type = type,
@@ -176,6 +189,7 @@ fun TransactionDoc.toEntity(id: String, workspaceId: String): TransactionEntity 
         createdAt = resolvedCreatedAt,
         updatedAt = updatedAt,
         transferId = transferId,
+        recurringRuleId = recurringRuleId,
     )
 }
 

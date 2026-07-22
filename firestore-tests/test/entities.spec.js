@@ -437,11 +437,134 @@ describe('entity write-shape validation (issue #156)', () => {
     );
   });
 
+  // CategoryDoc — mirrors data-remote/.../RemoteDtos.kt
+  function categoryDoc(overrides = {}) {
+    return {
+      name: 'Groceries',
+      type: 'EXPENSE',
+      parentId: null,
+      createdAt: 1,
+      updatedAt: 1,
+      deletedAt: null,
+      systemKind: null,
+      iconKey: 'cash',
+      hue: 162,
+      clientVersionCode: CLIENT_VERSION,
+      ...overrides,
+    };
+  }
+
+  it('accepts a category carrying the new iconKey + hue fields', async () => {
+    await assertSucceeds(
+      setDoc(doc(asMember(), `workspaces/${WID}/categories/cat-ok`), categoryDoc()),
+    );
+  });
+
+  // The compatibility case the deploy ordering hangs on: a client that predates iconKey/hue
+  // omits both, and its writes must keep validating after the rules ship.
+  it('accepts a category from an older client that omits iconKey and hue', async () => {
+    const { iconKey, hue, ...legacy } = categoryDoc();
+    await assertSucceeds(
+      setDoc(doc(asMember(), `workspaces/${WID}/categories/cat-legacy`), legacy),
+    );
+  });
+
+  it('rejects a category whose hue is a string', async () => {
+    await assertFails(
+      setDoc(
+        doc(asMember(), `workspaces/${WID}/categories/cat-hue`),
+        categoryDoc({ hue: 'teal' }),
+      ),
+    );
+  });
+
+  it('rejects a category whose iconKey is a number', async () => {
+    await assertFails(
+      setDoc(
+        doc(asMember(), `workspaces/${WID}/categories/cat-icon`),
+        categoryDoc({ iconKey: 3 }),
+      ),
+    );
+  });
+
+  it('accepts a category nested under a parent', async () => {
+    await assertSucceeds(
+      setDoc(
+        doc(asMember(), `workspaces/${WID}/categories/cat-child`),
+        categoryDoc({ parentId: 'cat-ok' }),
+      ),
+    );
+  });
+
+  it('rejects a poison update of an existing category (hue as string)', async () => {
+    await setDoc(doc(asMember(), `workspaces/${WID}/categories/cat-poison`), categoryDoc());
+    await assertFails(
+      updateDoc(doc(asMember(), `workspaces/${WID}/categories/cat-poison`), {
+        hue: 'teal',
+        updatedAt: 2,
+        clientVersionCode: CLIENT_VERSION,
+      }),
+    );
+  });
+
   it('rejects the issue scenario: transaction amount as a string', async () => {
     await assertFails(
       setDoc(
         doc(asMember(), `workspaces/${WID}/transactions/tx-poison`),
         transactionDoc({ amount: 'abc' }),
+      ),
+    );
+  });
+
+  // The base transactionDoc() above omits merchant/tags/recurringRuleId entirely, so the
+  // passing 'accepts a correctly-typed transaction' case already proves the guard tolerates
+  // their absence — that is what keeps clients on the previous build syncing. These cover
+  // the populated shape and the type checks.
+  it('accepts a transaction with merchant, tags and recurringRuleId', async () => {
+    await assertSucceeds(
+      setDoc(
+        doc(asMember(), `workspaces/${WID}/transactions/tx-rich`),
+        transactionDoc({
+          merchant: 'Starbucks',
+          tags: ['coffee', 'work'],
+          recurringRuleId: 'rule-1',
+        }),
+      ),
+    );
+  });
+
+  it('accepts a null recurringRuleId', async () => {
+    await assertSucceeds(
+      setDoc(
+        doc(asMember(), `workspaces/${WID}/transactions/tx-manual`),
+        transactionDoc({ recurringRuleId: null }),
+      ),
+    );
+  });
+
+  it('rejects a non-string transaction merchant', async () => {
+    await assertFails(
+      setDoc(
+        doc(asMember(), `workspaces/${WID}/transactions/tx-bad-merchant`),
+        transactionDoc({ merchant: 42 }),
+      ),
+    );
+  });
+
+  it('rejects transaction tags sent as a string instead of a list', async () => {
+    await assertFails(
+      setDoc(
+        doc(asMember(), `workspaces/${WID}/transactions/tx-bad-tags`),
+        transactionDoc({ tags: 'coffee,work' }),
+      ),
+    );
+  });
+
+  it('rejects a non-string transaction recurringRuleId', async () => {
+    await assertFails(
+      setDoc(
+        doc(asMember(), `workspaces/${WID}/transactions/tx-bad-rule`),
+        transactionDoc({ recurringRuleId: 7 }),
       ),
     );
   });

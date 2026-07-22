@@ -50,11 +50,17 @@ fun CategoryChooserBottomSheet(
         title = stringResource(Res.string.transaction_creation_category_sheet_title),
         searchPlaceholder = stringResource(Res.string.transaction_creation_category_search),
         categories = categories.map { cat ->
+            val visual = SurferCategoryPalette.visualFor(
+                id = cat.id.value,
+                iconKey = cat.iconKey,
+                hue = cat.hue,
+                systemKind = cat.systemKind?.name,
+            )
             CategoryPickerRow(
                 id = cat.id.value,
                 name = cat.name,
-                icon = SurferCategoryPalette.iconFor(cat.id.value, cat.systemKind?.name),
-                tint = SurferCategoryPalette.tintFor(cat.id.value, cat.systemKind?.name),
+                icon = visual.icon,
+                tint = visual.tint,
                 isIncome = false,
             )
         },

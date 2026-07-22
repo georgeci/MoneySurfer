@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.first
  * Exercises the `transactions_fts` virtual table against the real bundled SQLite:
  *   - the external-content triggers Room generates keep the index in sync on
  *     insert / update / delete without any manual maintenance,
+ *   - both indexed columns (`note` and `merchant`) are reachable from one MATCH,
  *   - the `unicode61` tokenizer actually splits Cyrillic (the whole reason the
  *     default `simple` tokenizer is not used),
  *   - [FtsQuery] output is valid MATCH syntax for adversarial user input.
@@ -26,7 +27,7 @@ class TransactionFtsIntegrationIT : StringSpec({
     suspend fun search(raw: String): List<String> {
         val query = FtsQuery.fromUserInput(raw) ?: return emptyList()
         return harness.database.transactionDao()
-            .searchByNote(workspaceId = "ws-1", query = query)
+            .searchByText(workspaceId = "ws-1", query = query)
             .first()
             .map { it.id }
     }
@@ -154,6 +155,29 @@ class TransactionFtsIntegrationIT : StringSpec({
         search("shared") shouldBe listOf("t-1")
     }
 
+    "matches the merchant column, not just the note" {
+        harness.database.transactionDao().insertAll(
+            listOf(
+                transaction(id = "t-1", note = "morning fix", merchant = "Starbucks"),
+                transaction(id = "t-2", note = "lunch", merchant = "Pret"),
+            ),
+        )
+
+        search("starbucks") shouldBe listOf("t-1")
+        // One MATCH spans both indexed columns, so a query may straddle them.
+        search("starbucks morning") shouldBe listOf("t-1")
+    }
+
+    "merchant edits follow the content table like note edits do" {
+        val dao = harness.database.transactionDao()
+        dao.insert(transaction(id = "t-1", note = "coffee", merchant = "Starbucks"))
+
+        dao.update(transaction(id = "t-1", note = "coffee", merchant = "Pret"))
+
+        search("starbucks").shouldBeEmpty()
+        search("pret") shouldBe listOf("t-1")
+    }
+
     "operator keywords and quotes from user input do not break MATCH" {
         harness.database.transactionDao().insertAll(
             listOf(
@@ -175,6 +199,7 @@ private const val NOW: Long = 1_700_000_000_000L
 private fun transaction(
     id: String,
     note: String,
+    merchant: String = "",
     workspaceId: String = "ws-1",
     accountId: String = "acc-1",
     operationDate: String = "2026-02-01",
@@ -186,6 +211,7 @@ private fun transaction(
     currencyCode = "USD",
     categoryId = null,
     note = note,
+    merchant = merchant,
     operationAt = NOW,
     operationDate = operationDate,
     type = "EXPENSE",

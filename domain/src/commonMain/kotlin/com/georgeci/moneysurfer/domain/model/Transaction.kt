@@ -4,6 +4,7 @@ import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.CategoryId
 import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
 import com.georgeci.moneysurfer.domain.primitives.Money
+import com.georgeci.moneysurfer.domain.primitives.RecurringRuleId
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.domain.primitives.TransactionStatus
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
@@ -27,6 +28,17 @@ data class Transaction(
     val currencyCode: CurrencyCode,
     val categoryId: CategoryId?,
     val note: String,
+    /**
+     * Who the money went to or came from ("Starbucks"), kept separate from [note] so the
+     * details screen can show both and search can weight them independently. Empty means
+     * "not recorded" — there is no null state to distinguish.
+     */
+    val merchant: String = "",
+    /**
+     * Free-form labels, normalized through [TransactionTags.normalize] before it gets here.
+     * Order is the user's; duplicates and commas are already gone.
+     */
+    val tags: List<String> = emptyList(),
     val operationAt: Instant,
     val operationDate: LocalDate,
     val type: TransactionType,
@@ -38,4 +50,15 @@ data class Transaction(
     val createdAt: Instant,
     val updatedAt: Instant,
     val transferId: TransferId? = null,
+    /**
+     * The rule that generated this row, or null for a manually entered one. A link rather
+     * than an `isRecurring` boolean: the schedule already lives on [RecurringRule], and a
+     * flag would be a second copy of that fact free to drift from it. "Recurring only"
+     * filters on `recurringRuleId != null`; the details screen resolves the rule to show
+     * its cadence.
+     *
+     * Deliberately not a Room foreign key — `recurring_rules` is not synced yet, so a pulled
+     * transaction can legitimately arrive before (or without) the rule it names.
+     */
+    val recurringRuleId: RecurringRuleId? = null,
 )
