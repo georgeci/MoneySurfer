@@ -338,6 +338,99 @@ describe('entity write-shape validation (issue #156)', () => {
     );
   });
 
+  // BudgetDoc — mirrors data-remote/.../RemoteDtos.kt
+  function budgetDoc(overrides = {}) {
+    return {
+      name: 'Groceries',
+      categoryIds: ['cat-1', 'cat-2'],
+      amount: 50000,
+      period: 'MONTHLY',
+      startDate: '2026-07-01',
+      alertPercent: 80,
+      isActive: true,
+      rollover: false,
+      createdAt: 1,
+      updatedAt: 1,
+      deletedAt: null,
+      clientVersionCode: CLIENT_VERSION,
+      ...overrides,
+    };
+  }
+
+  it('accepts a fully-populated, correctly-typed budget', async () => {
+    await assertSucceeds(
+      setDoc(doc(asMember(), `workspaces/${WID}/budgets/b-ok`), budgetDoc()),
+    );
+  });
+
+  // Empty categoryIds means "all expense categories" — a legitimate budget, not a malformed one.
+  it('accepts a budget with an empty categoryIds list', async () => {
+    await assertSucceeds(
+      setDoc(
+        doc(asMember(), `workspaces/${WID}/budgets/b-all`),
+        budgetDoc({ categoryIds: [] }),
+      ),
+    );
+  });
+
+  it('rejects a budget whose categoryIds is a CSV string instead of a list', async () => {
+    await assertFails(
+      setDoc(
+        doc(asMember(), `workspaces/${WID}/budgets/b-csv`),
+        budgetDoc({ categoryIds: 'cat-1,cat-2' }),
+      ),
+    );
+  });
+
+  it('rejects a budget whose amount is a string', async () => {
+    await assertFails(
+      setDoc(
+        doc(asMember(), `workspaces/${WID}/budgets/b-amount`),
+        budgetDoc({ amount: 'lots' }),
+      ),
+    );
+  });
+
+  it('rejects a budget whose rollover flag is a string', async () => {
+    await assertFails(
+      setDoc(
+        doc(asMember(), `workspaces/${WID}/budgets/b-rollover`),
+        budgetDoc({ rollover: 'yes' }),
+      ),
+    );
+  });
+
+  it('rejects a budget whose startDate is a number', async () => {
+    await assertFails(
+      setDoc(
+        doc(asMember(), `workspaces/${WID}/budgets/b-start`),
+        budgetDoc({ startDate: 20260701 }),
+      ),
+    );
+  });
+
+  it('accepts a budget tombstone update (deletedAt set)', async () => {
+    await setDoc(doc(asMember(), `workspaces/${WID}/budgets/b-tomb`), budgetDoc());
+    await assertSucceeds(
+      updateDoc(doc(asMember(), `workspaces/${WID}/budgets/b-tomb`), {
+        deletedAt: 2,
+        updatedAt: 2,
+        clientVersionCode: CLIENT_VERSION,
+      }),
+    );
+  });
+
+  it('rejects a poison update of an existing budget (alertPercent as string)', async () => {
+    await setDoc(doc(asMember(), `workspaces/${WID}/budgets/b-poison`), budgetDoc());
+    await assertFails(
+      updateDoc(doc(asMember(), `workspaces/${WID}/budgets/b-poison`), {
+        alertPercent: 'eighty',
+        updatedAt: 2,
+        clientVersionCode: CLIENT_VERSION,
+      }),
+    );
+  });
+
   it('accepts a correctly-typed transaction', async () => {
     await assertSucceeds(
       setDoc(doc(asMember(), `workspaces/${WID}/transactions/tx-ok`), transactionDoc()),

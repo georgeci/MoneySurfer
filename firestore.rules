@@ -1,4 +1,4 @@
-// v2.4.0 — 2026-07-22
+// v2.5.0 — 2026-07-22
 rules_version = '2';
 
 // Workspace-scoped tenancy: every per-user document lives under
@@ -141,6 +141,7 @@ service cloud.firestore {
     function typeIntOk(data, f)  { return data.get(f, 0) is int; }
     function typeStrOk(data, f)  { return data.get(f, '') is string; }
     function typeBoolOk(data, f) { return data.get(f, false) is bool; }
+    function typeListOk(data, f) { return data.get(f, []) is list; }
     function typeNullableIntOk(data, f) {
       return data.get(f, 0) == null || data.get(f, 0) is int;
     }
@@ -185,6 +186,24 @@ service cloud.firestore {
         && typeIntOk(data, 'updatedAt')
         && typeNullableIntOk(data, 'deletedAt')
         && typeNullableStrOk(data, 'transferId');
+    }
+
+    // BudgetDoc — data-remote/.../RemoteDtos.kt
+    // `categoryIds` is a list on the wire (Room stores it as CSV); we check only that it IS a
+    // list — element types are not reachable from a rules expression, and a non-string element
+    // is contained by the client-side decodeOrNull() skip.
+    function hasValidBudgetShape(data) {
+      return typeStrOk(data, 'name')
+        && typeListOk(data, 'categoryIds')
+        && typeIntOk(data, 'amount')
+        && typeStrOk(data, 'period')
+        && typeStrOk(data, 'startDate')
+        && typeIntOk(data, 'alertPercent')
+        && typeBoolOk(data, 'isActive')
+        && typeBoolOk(data, 'rollover')
+        && typeIntOk(data, 'createdAt')
+        && typeIntOk(data, 'updatedAt')
+        && typeNullableIntOk(data, 'deletedAt');
     }
 
     // GoalDoc — data-remote/.../RemoteDtos.kt
@@ -441,16 +460,17 @@ service cloud.firestore {
         allow delete: if isOwner(wid);
       }
 
-      // budgets / recurringRules carry no wire DTO yet (no sync plugin decodes
-      // them), so there is no schema to validate and no poison-document pull path.
-      // Add a hasValid*Shape() guard here in lockstep when their DTOs land.
       match /budgets/{bid} {
         allow read: if isMember(wid);
-        allow create, update: if isMember(wid) && hasValidClientVersion();
+        allow create, update: if isMember(wid) && hasValidClientVersion()
+          && hasValidBudgetShape(request.resource.data);
         // Owner-only hard-delete — account-deletion purge path (issue #213).
         allow delete: if isOwner(wid);
       }
 
+      // recurringRules carry no wire DTO yet (no sync plugin decodes them), so there is
+      // no schema to validate and no poison-document pull path. Add a hasValid*Shape()
+      // guard here in lockstep when the DTO lands.
       match /recurringRules/{rid} {
         allow read: if isMember(wid);
         allow create, update: if isMember(wid) && hasValidClientVersion();

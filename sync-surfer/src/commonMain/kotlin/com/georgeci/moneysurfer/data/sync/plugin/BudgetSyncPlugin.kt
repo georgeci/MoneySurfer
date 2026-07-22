@@ -1,7 +1,6 @@
 package com.georgeci.moneysurfer.data.sync.plugin
-import com.georgeci.moneysurfer.data.db.dao.AccountDao
-import com.georgeci.moneysurfer.data.db.dao.TransactionDao
-import com.georgeci.moneysurfer.data.remote.AccountDoc
+import com.georgeci.moneysurfer.data.db.dao.BudgetDao
+import com.georgeci.moneysurfer.data.remote.BudgetDoc
 import com.georgeci.moneysurfer.data.sync.toDoc
 import com.georgeci.moneysurfer.data.sync.toEntity
 import com.georgeci.moneysurfer.domain.AppInfo
@@ -19,17 +18,16 @@ import org.koin.core.annotation.Single
 import kotlin.time.Instant
 
 @Single(binds = [SyncEntityPlugin::class])
-class AccountSyncPlugin(
+class BudgetSyncPlugin(
     private val firestore: FirebaseFirestore,
     private val appInfo: AppInfo,
     private val conflictResolver: ConflictResolver,
-    private val accountDao: AccountDao,
-    private val transactionDao: TransactionDao,
+    private val budgetDao: BudgetDao,
 ) : SyncEntityPlugin {
 
-    override val entityType: String = SyncEntityTypes.ACCOUNT
-    override val firestoreCollectionName: String = SyncCollection.ACCOUNTS
-    override val pullPriority: Int = SyncPullPriorities.ACCOUNTS
+    override val entityType: String = SyncEntityTypes.BUDGET
+    override val firestoreCollectionName: String = SyncCollection.BUDGETS
+    override val pullPriority: Int = SyncPullPriorities.BUDGETS
 
     override suspend fun push(mutation: PendingMutation) {
         val docRef = workspaceCollection(mutation.scopeKey!!).document(mutation.entityId)
@@ -37,7 +35,7 @@ class AccountSyncPlugin(
             MutationOperation.INSERT,
             MutationOperation.UPDATE,
             -> {
-                val entity = accountDao.getById(mutation.entityId) ?: return
+                val entity = budgetDao.getById(mutation.entityId) ?: return
                 docRef.set(entity.toDoc().copy(clientVersionCode = appInfo.versionCode))
             }
             MutationOperation.DELETE -> docRef.pushTombstone(
@@ -47,26 +45,26 @@ class AccountSyncPlugin(
     }
 
     override suspend fun applyDoc(doc: RemoteDocument, scopeKey: String): EntityApplyResult {
-        val dto = doc.decodeOrNull(AccountDoc.serializer()) ?: return SKIPPED_APPLY_RESULT
+        val dto = doc.decodeOrNull(BudgetDoc.serializer()) ?: return SKIPPED_APPLY_RESULT
         if (dto.deletedAt != null) {
-            transactionDao.deleteByAccountId(doc.id)
-            accountDao.delete(doc.id)
+            budgetDao.delete(doc.id)
             return EntityApplyResult(applied = true, wasConflict = false)
         }
-        val local = accountDao.getById(doc.id)
+        val local = budgetDao.getById(doc.id)
         val resolution = conflictResolver.resolve(
             local = local,
             remote = dto.toEntity(id = doc.id, workspaceId = scopeKey),
             metadata = ConflictMetadata(
-                entityType = SyncEntityTypes.ACCOUNT,
+                entityType = SyncEntityTypes.BUDGET,
                 entityId = doc.id,
                 localUpdatedAt = local?.updatedAt?.let(Instant::fromEpochMilliseconds),
                 remoteUpdatedAt = Instant.fromEpochMilliseconds(dto.updatedAt),
             ),
         )
-        return applyResolution(resolution) { accountDao.upsertAll(listOf(it)) }
+        return applyResolution(resolution) { budgetDao.upsertAll(listOf(it)) }
     }
 
     private fun workspaceCollection(workspaceId: String) =
-        firestore.collection("workspaces").document(workspaceId).collection(SyncCollection.ACCOUNTS)
+        firestore.collection("workspaces").document(workspaceId)
+            .collection(SyncCollection.BUDGETS)
 }
