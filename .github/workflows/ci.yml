@@ -546,7 +546,15 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: ./gradlew sonar --stacktrace
+        # TEMPORARY (issue #272 verification, reverted before merge): --info surfaces
+        # the JaCoCo importer sensor, which is the only direct proof that Sonar
+        # actually read the coverage report. Sensor messages are INFO-level, so the
+        # default lifecycle log says nothing either way.
+        run: |
+          set -euo pipefail
+          ./gradlew sonar --stacktrace --info 2>&1 | tee /tmp/sonar-info.log | grep -vE "^\s*$" | tail -5 || true
+          echo "=== JaCoCo import evidence ==="
+          grep -iE "JaCoCo|coverage" /tmp/sonar-info.log | grep -iE "sensor|import|Read|report" | head -20 || echo "NO JACOCO SENSOR LINES FOUND"
 
   detekt:
     name: detekt (blocking)
