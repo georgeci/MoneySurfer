@@ -360,6 +360,14 @@ vars or `local.properties` (env wins):
 The script is unattended-friendly (no prompts) and is the same code path
 intended for any future GitHub Actions workflow.
 
+## Android tester builds / Firebase App Distribution
+
+[.github/workflows/android-distribute.yml](.github/workflows/android-distribute.yml)
+builds the signed release APK of `:androidApp` (online only) and uploads it to
+Firebase App Distribution — on the `workflow_dispatch` button and nightly at
+03:47 UTC. Secrets, service-account setup and tester groups:
+[docs/ci/app-distribution.md](docs/ci/app-distribution.md).
+
 ## Sub-Agents
 
 Use [ai/agents/docs-maintainer.md](ai/agents/docs-maintainer.md) and
