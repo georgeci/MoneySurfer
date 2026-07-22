@@ -260,6 +260,12 @@
 - Lines: 57-98
 - Tasks: firestore-rules, members, invites, tenant-isolation
 
+## screenshot-tests
+- Title: Where the reference images live
+- File: docs/testing/screenshot-tests.md
+- Lines: 29-124
+- Tasks: testing, uikit, screenshot, roborazzi
+
 ## security-audit-2026-07
 - Title: Verdict
 - File: docs/security/audit-2026-07-15.md
@@ -323,7 +329,7 @@
 ## testing-strategy
 - Title: Common Commands
 - File: docs/testing/testing-strategy.md
-- Lines: 27-112
+- Lines: 27-116
 - Tasks: testing, qa, validation
 
 ## time-policy

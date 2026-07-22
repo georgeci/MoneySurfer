@@ -109,4 +109,8 @@ work — don't sprinkle text matchers permanently).
   change to `firestore.rules` **or** to the wire shape clients write (push
   DTOs, tombstone patch) needs coverage there — device ITs exercise rules
   only incidentally.
+- Changing a `:uikit` component re-renders its committed reference screenshots.
+  `./gradlew qaAndroidHost` fails on the visual diff; re-record and commit the
+  PNGs in the same commit as the UI change — see
+  [Screenshot tests (Roborazzi)](screenshot-tests.md).
 <!-- AI:END -->
