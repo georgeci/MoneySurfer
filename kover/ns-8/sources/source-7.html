@@ -49,27 +49,27 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   <td class="name">MoneySurferDatabase_Impl</td>
 <td class="coverageStat">
   <span class="percent">
-    33.3%
+    28.6%
   </span>
   <span class="absValue">
-    (8/24)
+    (8/28)
   </span>
 </td>
     <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    67.3%
+    64.9%
   </span>
   <span class="absValue">
-    (33/49)
+    (37/57)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    74.5%
+    72.9%
   </span>
   <span class="absValue">
-    (210/282)
+    (242/332)
   </span>
 </td>
 </tr>
@@ -88,23 +88,23 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/20)
+    (0/24)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    13.1%
+    12.7%
   </span>
   <span class="absValue">
-    (33/251)
+    (39/307)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    4.7%
+    4.5%
   </span>
   <span class="absValue">
-    (99/2107)
+    (117/2595)
   </span>
 </td>
   </tr>
@@ -112,10 +112,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
-    37.5%
+    33.3%
   </span>
   <span class="absValue">
-    (12/32)
+    (12/36)
   </span>
 </td>
 <td class="coverageStat">
@@ -123,23 +123,23 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/20)
+    (0/24)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    22%
+    20.9%
   </span>
   <span class="absValue">
-    (66/300)
+    (76/364)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    12.9%
+    12.3%
   </span>
   <span class="absValue">
-    (309/2389)
+    (359/2927)
   </span>
 </td>
 </tr>
@@ -167,6 +167,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.`data`.db.dao.BudgetDao_Impl
 &nbsp;import com.georgeci.moneysurfer.`data`.db.dao.CategoryDao
 &nbsp;import com.georgeci.moneysurfer.`data`.db.dao.CategoryDao_Impl
+&nbsp;import com.georgeci.moneysurfer.`data`.db.dao.GoalContributionDao
+&nbsp;import com.georgeci.moneysurfer.`data`.db.dao.GoalContributionDao_Impl
+&nbsp;import com.georgeci.moneysurfer.`data`.db.dao.GoalDao
+&nbsp;import com.georgeci.moneysurfer.`data`.db.dao.GoalDao_Impl
 &nbsp;import com.georgeci.moneysurfer.`data`.db.dao.RecurringRuleDao
 &nbsp;import com.georgeci.moneysurfer.`data`.db.dao.RecurringRuleDao_Impl
 &nbsp;import com.georgeci.moneysurfer.`data`.db.dao.TransactionDao
@@ -235,8 +239,16 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="nc">&nbsp;    RecurringRuleDao_Impl(this)</b>
 &nbsp;  }
 &nbsp;
+<b class="fc">&nbsp;  private val _goalDao: Lazy&lt;GoalDao&gt; = lazy {</b>
+<b class="nc">&nbsp;    GoalDao_Impl(this)</b>
+&nbsp;  }
+&nbsp;
+<b class="fc">&nbsp;  private val _goalContributionDao: Lazy&lt;GoalContributionDao&gt; = lazy {</b>
+<b class="nc">&nbsp;    GoalContributionDao_Impl(this)</b>
+&nbsp;  }
+&nbsp;
 &nbsp;  protected override fun createOpenDelegate(): RoomOpenDelegate {
-<b class="fc">&nbsp;    val _openDelegate: RoomOpenDelegate = object : RoomOpenDelegate(24, &quot;5717e9f0505921413a920e6bc6849b2e&quot;, &quot;9662ac27919a0eb3644c6c4bb918867b&quot;) {</b>
+<b class="fc">&nbsp;    val _openDelegate: RoomOpenDelegate = object : RoomOpenDelegate(25, &quot;dc6fc092733075b5dd03d8d4fbc6490c&quot;, &quot;7f771fde4ce56177708d1237e4269238&quot;) {</b>
 &nbsp;      public override fun createAllTables(connection: SQLiteConnection) {
 <b class="fc">&nbsp;        connection.execSQL(&quot;CREATE TABLE IF NOT EXISTS `users` (`id` TEXT NOT NULL, `displayName` TEXT, `isAnon` INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(`id`))&quot;)</b>
 <b class="fc">&nbsp;        connection.execSQL(&quot;CREATE TABLE IF NOT EXISTS `workspaces` (`id` TEXT NOT NULL, `name` TEXT NOT NULL, `description` TEXT NOT NULL DEFAULT &#39;&#39;, `baseCurrency` TEXT NOT NULL, `ownerId` TEXT NOT NULL, `createdAt` INTEGER NOT NULL, `archived` INTEGER NOT NULL, `updatedAt` INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(`id`), FOREIGN KEY(`ownerId`) REFERENCES `users`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )&quot;)</b>
@@ -265,8 +277,14 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;        connection.execSQL(&quot;CREATE INDEX IF NOT EXISTS `index_budgets_workspaceId` ON `budgets` (`workspaceId`)&quot;)</b>
 <b class="fc">&nbsp;        connection.execSQL(&quot;CREATE TABLE IF NOT EXISTS `recurring_rules` (`id` TEXT NOT NULL, `title` TEXT NOT NULL, `amount` INTEGER NOT NULL, `categoryId` TEXT NOT NULL, `scheduleFrequency` TEXT NOT NULL, `scheduleInterval` INTEGER NOT NULL, `scheduleDaysOfWeek` TEXT NOT NULL, `scheduleDaysOfMonth` TEXT NOT NULL, `scheduleMissingDayPolicy` TEXT NOT NULL, `startDate` TEXT NOT NULL, `nextRunAt` INTEGER, `autoCreate` INTEGER NOT NULL, `isActive` INTEGER NOT NULL, `createdAt` INTEGER NOT NULL DEFAULT 0, `updatedAt` INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(`id`), FOREIGN KEY(`categoryId`) REFERENCES `categories`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )&quot;)</b>
 <b class="fc">&nbsp;        connection.execSQL(&quot;CREATE INDEX IF NOT EXISTS `index_recurring_rules_categoryId` ON `recurring_rules` (`categoryId`)&quot;)</b>
+<b class="fc">&nbsp;        connection.execSQL(&quot;CREATE TABLE IF NOT EXISTS `goals` (`id` TEXT NOT NULL, `workspaceId` TEXT NOT NULL, `title` TEXT NOT NULL, `emoji` TEXT NOT NULL, `hue` INTEGER NOT NULL, `target` INTEGER NOT NULL, `currencyCode` TEXT NOT NULL, `startDate` TEXT NOT NULL, `targetDate` TEXT, `accountId` TEXT, `status` TEXT NOT NULL, `createdAt` INTEGER NOT NULL DEFAULT 0, `updatedAt` INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(`id`), FOREIGN KEY(`workspaceId`) REFERENCES `workspaces`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`accountId`) REFERENCES `accounts`(`id`) ON UPDATE NO ACTION ON DELETE SET NULL )&quot;)</b>
+<b class="fc">&nbsp;        connection.execSQL(&quot;CREATE INDEX IF NOT EXISTS `index_goals_workspaceId` ON `goals` (`workspaceId`)&quot;)</b>
+<b class="fc">&nbsp;        connection.execSQL(&quot;CREATE INDEX IF NOT EXISTS `index_goals_accountId` ON `goals` (`accountId`)&quot;)</b>
+<b class="fc">&nbsp;        connection.execSQL(&quot;CREATE TABLE IF NOT EXISTS `goal_contributions` (`id` TEXT NOT NULL, `workspaceId` TEXT NOT NULL, `goalId` TEXT NOT NULL, `amount` INTEGER NOT NULL, `occurredOn` TEXT NOT NULL, `note` TEXT NOT NULL, `transferId` TEXT, `createdAt` INTEGER NOT NULL DEFAULT 0, `updatedAt` INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(`id`), FOREIGN KEY(`workspaceId`) REFERENCES `workspaces`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`goalId`) REFERENCES `goals`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )&quot;)</b>
+<b class="fc">&nbsp;        connection.execSQL(&quot;CREATE INDEX IF NOT EXISTS `index_goal_contributions_workspaceId` ON `goal_contributions` (`workspaceId`)&quot;)</b>
+<b class="fc">&nbsp;        connection.execSQL(&quot;CREATE INDEX IF NOT EXISTS `index_goal_contributions_goalId` ON `goal_contributions` (`goalId`)&quot;)</b>
 <b class="fc">&nbsp;        connection.execSQL(&quot;CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)&quot;)</b>
-<b class="fc">&nbsp;        connection.execSQL(&quot;INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, &#39;5717e9f0505921413a920e6bc6849b2e&#39;)&quot;)</b>
+<b class="fc">&nbsp;        connection.execSQL(&quot;INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, &#39;dc6fc092733075b5dd03d8d4fbc6490c&#39;)&quot;)</b>
 &nbsp;      }
 &nbsp;
 &nbsp;      public override fun dropAllTables(connection: SQLiteConnection) {
@@ -280,6 +298,8 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="nc">&nbsp;        connection.execSQL(&quot;DROP TABLE IF EXISTS `transactions_fts`&quot;)</b>
 <b class="nc">&nbsp;        connection.execSQL(&quot;DROP TABLE IF EXISTS `budgets`&quot;)</b>
 <b class="nc">&nbsp;        connection.execSQL(&quot;DROP TABLE IF EXISTS `recurring_rules`&quot;)</b>
+<b class="nc">&nbsp;        connection.execSQL(&quot;DROP TABLE IF EXISTS `goals`&quot;)</b>
+<b class="nc">&nbsp;        connection.execSQL(&quot;DROP TABLE IF EXISTS `goal_contributions`&quot;)</b>
 &nbsp;      }
 &nbsp;
 &nbsp;      public override fun onCreate(connection: SQLiteConnection) {
@@ -554,6 +574,64 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;              | Found:
 <b class="nc">&nbsp;              |&quot;&quot;&quot;.trimMargin() + _existingRecurringRules)</b>
 &nbsp;        }
+<b class="nc">&nbsp;        val _columnsGoals: MutableMap&lt;String, TableInfo.Column&gt; = mutableMapOf()</b>
+<b class="nc">&nbsp;        _columnsGoals.put(&quot;id&quot;, TableInfo.Column(&quot;id&quot;, &quot;TEXT&quot;, true, 1, null, TableInfo.CREATED_FROM_ENTITY))</b>
+<b class="nc">&nbsp;        _columnsGoals.put(&quot;workspaceId&quot;, TableInfo.Column(&quot;workspaceId&quot;, &quot;TEXT&quot;, true, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
+<b class="nc">&nbsp;        _columnsGoals.put(&quot;title&quot;, TableInfo.Column(&quot;title&quot;, &quot;TEXT&quot;, true, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
+<b class="nc">&nbsp;        _columnsGoals.put(&quot;emoji&quot;, TableInfo.Column(&quot;emoji&quot;, &quot;TEXT&quot;, true, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
+<b class="nc">&nbsp;        _columnsGoals.put(&quot;hue&quot;, TableInfo.Column(&quot;hue&quot;, &quot;INTEGER&quot;, true, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
+<b class="nc">&nbsp;        _columnsGoals.put(&quot;target&quot;, TableInfo.Column(&quot;target&quot;, &quot;INTEGER&quot;, true, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
+<b class="nc">&nbsp;        _columnsGoals.put(&quot;currencyCode&quot;, TableInfo.Column(&quot;currencyCode&quot;, &quot;TEXT&quot;, true, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
+<b class="nc">&nbsp;        _columnsGoals.put(&quot;startDate&quot;, TableInfo.Column(&quot;startDate&quot;, &quot;TEXT&quot;, true, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
+<b class="nc">&nbsp;        _columnsGoals.put(&quot;targetDate&quot;, TableInfo.Column(&quot;targetDate&quot;, &quot;TEXT&quot;, false, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
+<b class="nc">&nbsp;        _columnsGoals.put(&quot;accountId&quot;, TableInfo.Column(&quot;accountId&quot;, &quot;TEXT&quot;, false, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
+<b class="nc">&nbsp;        _columnsGoals.put(&quot;status&quot;, TableInfo.Column(&quot;status&quot;, &quot;TEXT&quot;, true, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
+<b class="nc">&nbsp;        _columnsGoals.put(&quot;createdAt&quot;, TableInfo.Column(&quot;createdAt&quot;, &quot;INTEGER&quot;, true, 0, &quot;0&quot;, TableInfo.CREATED_FROM_ENTITY))</b>
+<b class="nc">&nbsp;        _columnsGoals.put(&quot;updatedAt&quot;, TableInfo.Column(&quot;updatedAt&quot;, &quot;INTEGER&quot;, true, 0, &quot;0&quot;, TableInfo.CREATED_FROM_ENTITY))</b>
+<b class="nc">&nbsp;        val _foreignKeysGoals: MutableSet&lt;TableInfo.ForeignKey&gt; = mutableSetOf()</b>
+<b class="nc">&nbsp;        _foreignKeysGoals.add(TableInfo.ForeignKey(&quot;workspaces&quot;, &quot;NO ACTION&quot;, &quot;NO ACTION&quot;, listOf(&quot;workspaceId&quot;), listOf(&quot;id&quot;)))</b>
+<b class="nc">&nbsp;        _foreignKeysGoals.add(TableInfo.ForeignKey(&quot;accounts&quot;, &quot;SET NULL&quot;, &quot;NO ACTION&quot;, listOf(&quot;accountId&quot;), listOf(&quot;id&quot;)))</b>
+<b class="nc">&nbsp;        val _indicesGoals: MutableSet&lt;TableInfo.Index&gt; = mutableSetOf()</b>
+<b class="nc">&nbsp;        _indicesGoals.add(TableInfo.Index(&quot;index_goals_workspaceId&quot;, false, listOf(&quot;workspaceId&quot;), listOf(&quot;ASC&quot;)))</b>
+<b class="nc">&nbsp;        _indicesGoals.add(TableInfo.Index(&quot;index_goals_accountId&quot;, false, listOf(&quot;accountId&quot;), listOf(&quot;ASC&quot;)))</b>
+<b class="nc">&nbsp;        val _infoGoals: TableInfo = TableInfo(&quot;goals&quot;, _columnsGoals, _foreignKeysGoals, _indicesGoals)</b>
+<b class="nc">&nbsp;        val _existingGoals: TableInfo = tableInfoRead(connection, &quot;goals&quot;)</b>
+<b class="nc">&nbsp;        if (!_infoGoals.equals(_existingGoals)) {</b>
+<b class="nc">&nbsp;          return RoomOpenDelegate.ValidationResult(false, &quot;&quot;&quot;</b>
+&nbsp;              |goals(com.georgeci.moneysurfer.data.db.entity.GoalEntity).
+&nbsp;              | Expected:
+<b class="nc">&nbsp;              |&quot;&quot;&quot;.trimMargin() + _infoGoals + &quot;&quot;&quot;</b>
+&nbsp;              |
+&nbsp;              | Found:
+<b class="nc">&nbsp;              |&quot;&quot;&quot;.trimMargin() + _existingGoals)</b>
+&nbsp;        }
+<b class="nc">&nbsp;        val _columnsGoalContributions: MutableMap&lt;String, TableInfo.Column&gt; = mutableMapOf()</b>
+<b class="nc">&nbsp;        _columnsGoalContributions.put(&quot;id&quot;, TableInfo.Column(&quot;id&quot;, &quot;TEXT&quot;, true, 1, null, TableInfo.CREATED_FROM_ENTITY))</b>
+<b class="nc">&nbsp;        _columnsGoalContributions.put(&quot;workspaceId&quot;, TableInfo.Column(&quot;workspaceId&quot;, &quot;TEXT&quot;, true, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
+<b class="nc">&nbsp;        _columnsGoalContributions.put(&quot;goalId&quot;, TableInfo.Column(&quot;goalId&quot;, &quot;TEXT&quot;, true, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
+<b class="nc">&nbsp;        _columnsGoalContributions.put(&quot;amount&quot;, TableInfo.Column(&quot;amount&quot;, &quot;INTEGER&quot;, true, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
+<b class="nc">&nbsp;        _columnsGoalContributions.put(&quot;occurredOn&quot;, TableInfo.Column(&quot;occurredOn&quot;, &quot;TEXT&quot;, true, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
+<b class="nc">&nbsp;        _columnsGoalContributions.put(&quot;note&quot;, TableInfo.Column(&quot;note&quot;, &quot;TEXT&quot;, true, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
+<b class="nc">&nbsp;        _columnsGoalContributions.put(&quot;transferId&quot;, TableInfo.Column(&quot;transferId&quot;, &quot;TEXT&quot;, false, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
+<b class="nc">&nbsp;        _columnsGoalContributions.put(&quot;createdAt&quot;, TableInfo.Column(&quot;createdAt&quot;, &quot;INTEGER&quot;, true, 0, &quot;0&quot;, TableInfo.CREATED_FROM_ENTITY))</b>
+<b class="nc">&nbsp;        _columnsGoalContributions.put(&quot;updatedAt&quot;, TableInfo.Column(&quot;updatedAt&quot;, &quot;INTEGER&quot;, true, 0, &quot;0&quot;, TableInfo.CREATED_FROM_ENTITY))</b>
+<b class="nc">&nbsp;        val _foreignKeysGoalContributions: MutableSet&lt;TableInfo.ForeignKey&gt; = mutableSetOf()</b>
+<b class="nc">&nbsp;        _foreignKeysGoalContributions.add(TableInfo.ForeignKey(&quot;workspaces&quot;, &quot;NO ACTION&quot;, &quot;NO ACTION&quot;, listOf(&quot;workspaceId&quot;), listOf(&quot;id&quot;)))</b>
+<b class="nc">&nbsp;        _foreignKeysGoalContributions.add(TableInfo.ForeignKey(&quot;goals&quot;, &quot;CASCADE&quot;, &quot;NO ACTION&quot;, listOf(&quot;goalId&quot;), listOf(&quot;id&quot;)))</b>
+<b class="nc">&nbsp;        val _indicesGoalContributions: MutableSet&lt;TableInfo.Index&gt; = mutableSetOf()</b>
+<b class="nc">&nbsp;        _indicesGoalContributions.add(TableInfo.Index(&quot;index_goal_contributions_workspaceId&quot;, false, listOf(&quot;workspaceId&quot;), listOf(&quot;ASC&quot;)))</b>
+<b class="nc">&nbsp;        _indicesGoalContributions.add(TableInfo.Index(&quot;index_goal_contributions_goalId&quot;, false, listOf(&quot;goalId&quot;), listOf(&quot;ASC&quot;)))</b>
+<b class="nc">&nbsp;        val _infoGoalContributions: TableInfo = TableInfo(&quot;goal_contributions&quot;, _columnsGoalContributions, _foreignKeysGoalContributions, _indicesGoalContributions)</b>
+<b class="nc">&nbsp;        val _existingGoalContributions: TableInfo = tableInfoRead(connection, &quot;goal_contributions&quot;)</b>
+<b class="nc">&nbsp;        if (!_infoGoalContributions.equals(_existingGoalContributions)) {</b>
+<b class="nc">&nbsp;          return RoomOpenDelegate.ValidationResult(false, &quot;&quot;&quot;</b>
+&nbsp;              |goal_contributions(com.georgeci.moneysurfer.data.db.entity.GoalContributionEntity).
+&nbsp;              | Expected:
+<b class="nc">&nbsp;              |&quot;&quot;&quot;.trimMargin() + _infoGoalContributions + &quot;&quot;&quot;</b>
+&nbsp;              |
+&nbsp;              | Found:
+<b class="nc">&nbsp;              |&quot;&quot;&quot;.trimMargin() + _existingGoalContributions)</b>
+&nbsp;        }
 <b class="nc">&nbsp;        return RoomOpenDelegate.ValidationResult(true, null)</b>
 &nbsp;      }
 &nbsp;    }
@@ -564,11 +642,11 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;    val _shadowTablesMap: MutableMap&lt;String, String&gt; = mutableMapOf()</b>
 <b class="fc">&nbsp;    _shadowTablesMap.put(&quot;transactions_fts&quot;, &quot;transactions&quot;)</b>
 <b class="fc">&nbsp;    val _viewTables: MutableMap&lt;String, Set&lt;String&gt;&gt; = mutableMapOf()</b>
-<b class="fc">&nbsp;    return InvalidationTracker(this, _shadowTablesMap, _viewTables, &quot;users&quot;, &quot;workspaces&quot;, &quot;workspace_members&quot;, &quot;workspace_invites&quot;, &quot;accounts&quot;, &quot;categories&quot;, &quot;transactions&quot;, &quot;transactions_fts&quot;, &quot;budgets&quot;, &quot;recurring_rules&quot;)</b>
+<b class="fc">&nbsp;    return InvalidationTracker(this, _shadowTablesMap, _viewTables, &quot;users&quot;, &quot;workspaces&quot;, &quot;workspace_members&quot;, &quot;workspace_invites&quot;, &quot;accounts&quot;, &quot;categories&quot;, &quot;transactions&quot;, &quot;transactions_fts&quot;, &quot;budgets&quot;, &quot;recurring_rules&quot;, &quot;goals&quot;, &quot;goal_contributions&quot;)</b>
 &nbsp;  }
 &nbsp;
 &nbsp;  public override fun clearAllTables() {
-<b class="fc">&nbsp;    super.performClear(true, &quot;workspaces&quot;, &quot;workspace_members&quot;, &quot;users&quot;, &quot;workspace_invites&quot;, &quot;transactions&quot;, &quot;accounts&quot;, &quot;categories&quot;, &quot;transactions_fts&quot;, &quot;budgets&quot;, &quot;recurring_rules&quot;)</b>
+<b class="fc">&nbsp;    super.performClear(true, &quot;workspaces&quot;, &quot;workspace_members&quot;, &quot;users&quot;, &quot;workspace_invites&quot;, &quot;transactions&quot;, &quot;accounts&quot;, &quot;categories&quot;, &quot;transactions_fts&quot;, &quot;budgets&quot;, &quot;recurring_rules&quot;, &quot;goals&quot;, &quot;goal_contributions&quot;)</b>
 <b class="fc">&nbsp;  }</b>
 <b class="fc">&nbsp;</b>
 <b class="fc">&nbsp;  protected override fun getRequiredTypeConverterClasses(): Map&lt;KClass&lt;*&gt;, List&lt;KClass&lt;*&gt;&gt;&gt; {</b>
@@ -579,9 +657,11 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;    _typeConvertersMap.put(WorkspaceInviteDao::class, WorkspaceInviteDao_Impl.getRequiredConverters())</b>
 <b class="fc">&nbsp;    _typeConvertersMap.put(AccountDao::class, AccountDao_Impl.getRequiredConverters())</b>
 <b class="fc">&nbsp;    _typeConvertersMap.put(CategoryDao::class, CategoryDao_Impl.getRequiredConverters())</b>
-&nbsp;    _typeConvertersMap.put(TransactionDao::class, TransactionDao_Impl.getRequiredConverters())
-&nbsp;    _typeConvertersMap.put(BudgetDao::class, BudgetDao_Impl.getRequiredConverters())
+<b class="fc">&nbsp;    _typeConvertersMap.put(TransactionDao::class, TransactionDao_Impl.getRequiredConverters())</b>
+<b class="fc">&nbsp;    _typeConvertersMap.put(BudgetDao::class, BudgetDao_Impl.getRequiredConverters())</b>
 &nbsp;    _typeConvertersMap.put(RecurringRuleDao::class, RecurringRuleDao_Impl.getRequiredConverters())
+&nbsp;    _typeConvertersMap.put(GoalDao::class, GoalDao_Impl.getRequiredConverters())
+&nbsp;    _typeConvertersMap.put(GoalContributionDao::class, GoalContributionDao_Impl.getRequiredConverters())
 <b class="fc">&nbsp;    return _typeConvertersMap</b>
 <b class="fc">&nbsp;  }</b>
 &nbsp;
@@ -609,9 +689,13 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;
 <b class="nc">&nbsp;  public override fun transactionDao(): TransactionDao = _transactionDao.value</b>
 &nbsp;
-&nbsp;  public override fun budgetDao(): BudgetDao = _budgetDao.value
+<b class="nc">&nbsp;  public override fun budgetDao(): BudgetDao = _budgetDao.value</b>
 &nbsp;
-&nbsp;  public override fun recurringRuleDao(): RecurringRuleDao = _recurringRuleDao.value
+<b class="nc">&nbsp;  public override fun recurringRuleDao(): RecurringRuleDao = _recurringRuleDao.value</b>
+&nbsp;
+&nbsp;  public override fun goalDao(): GoalDao = _goalDao.value
+&nbsp;
+&nbsp;  public override fun goalContributionDao(): GoalContributionDao = _goalContributionDao.value
 &nbsp;}
 </code>
 </pre>
@@ -636,7 +720,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 15:43</div>
+    <div style="float:right;">generated on 2026-07-22 16:22</div>
 </div>
 </body>
 </html>

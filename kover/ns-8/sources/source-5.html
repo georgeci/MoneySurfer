@@ -101,6 +101,8 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.data.db.dao.AccountDao
 &nbsp;import com.georgeci.moneysurfer.data.db.dao.BudgetDao
 &nbsp;import com.georgeci.moneysurfer.data.db.dao.CategoryDao
+&nbsp;import com.georgeci.moneysurfer.data.db.dao.GoalContributionDao
+&nbsp;import com.georgeci.moneysurfer.data.db.dao.GoalDao
 &nbsp;import com.georgeci.moneysurfer.data.db.dao.RecurringRuleDao
 &nbsp;import com.georgeci.moneysurfer.data.db.dao.TransactionDao
 &nbsp;import com.georgeci.moneysurfer.data.db.dao.UserDao
@@ -110,6 +112,8 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.data.db.entity.AccountEntity
 &nbsp;import com.georgeci.moneysurfer.data.db.entity.BudgetEntity
 &nbsp;import com.georgeci.moneysurfer.data.db.entity.CategoryEntity
+&nbsp;import com.georgeci.moneysurfer.data.db.entity.GoalContributionEntity
+&nbsp;import com.georgeci.moneysurfer.data.db.entity.GoalEntity
 &nbsp;import com.georgeci.moneysurfer.data.db.entity.RecurringRuleEntity
 &nbsp;import com.georgeci.moneysurfer.data.db.entity.TransactionEntity
 &nbsp;import com.georgeci.moneysurfer.data.db.entity.TransactionFtsEntity
@@ -122,7 +126,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp; * Schema version of [MoneySurferDatabase]. Single source of truth so the
 &nbsp; * Room annotation, the backup manifest, and tests can never drift.
 &nbsp; */
-&nbsp;const val MONEY_SURFER_DB_VERSION: Int = 24
+&nbsp;const val MONEY_SURFER_DB_VERSION: Int = 25
 &nbsp;
 <b class="fc">&nbsp;@Database(</b>
 &nbsp;    entities = [
@@ -136,6 +140,8 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;        TransactionFtsEntity::class,
 &nbsp;        BudgetEntity::class,
 &nbsp;        RecurringRuleEntity::class,
+&nbsp;        GoalEntity::class,
+&nbsp;        GoalContributionEntity::class,
 &nbsp;    ],
 &nbsp;    version = MONEY_SURFER_DB_VERSION,
 &nbsp;)
@@ -150,6 +156,8 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    abstract fun transactionDao(): TransactionDao
 &nbsp;    abstract fun budgetDao(): BudgetDao
 &nbsp;    abstract fun recurringRuleDao(): RecurringRuleDao
+&nbsp;    abstract fun goalDao(): GoalDao
+&nbsp;    abstract fun goalContributionDao(): GoalContributionDao
 &nbsp;}
 &nbsp;
 &nbsp;@Suppress(&quot;KotlinNoActualForExpect&quot;)
@@ -179,7 +187,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 15:43</div>
+    <div style="float:right;">generated on 2026-07-22 16:22</div>
 </div>
 </body>
 </html>

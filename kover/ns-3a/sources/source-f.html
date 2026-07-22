@@ -52,42 +52,42 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   <td class="name">SurferDropdownKt</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    66.7%
   </span>
   <span class="absValue">
-    (0/9)
+    (6/9)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    27.8%
   </span>
   <span class="absValue">
-    (0/18)
+    (5/18)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    75.9%
   </span>
   <span class="absValue">
-    (0/29)
+    (22/29)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    78.5%
   </span>
   <span class="absValue">
-    (0/543)
+    (426/543)
   </span>
 </td>
 </tr>
@@ -122,29 +122,29 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    label: String,
 &nbsp;    itemName: (T) -&gt; String,
 &nbsp;    onItemSelected: (T) -&gt; Unit,
-<b class="nc">&nbsp;    modifier: Modifier = Modifier,</b>
-<b class="nc">&nbsp;) {</b>
-<b class="nc">&nbsp;    val expanded = remember { mutableStateOf(false) }</b>
+<b class="fc">&nbsp;    modifier: Modifier = Modifier,</b>
+<b class="pc">&nbsp;) {</b>
+<b class="fc">&nbsp;    val expanded = remember { mutableStateOf(false) }</b>
 &nbsp;
-<b class="nc">&nbsp;    ExposedDropdownMenuBox(</b>
-<b class="nc">&nbsp;        expanded = expanded.value,</b>
-<b class="nc">&nbsp;        onExpandedChange = { expanded.value = it },</b>
-<b class="nc">&nbsp;        modifier = modifier,</b>
-<b class="nc">&nbsp;    ) {</b>
-<b class="nc">&nbsp;        OutlinedTextField(</b>
-<b class="nc">&nbsp;            value = selected?.let(itemName).orEmpty(),</b>
-<b class="nc">&nbsp;            onValueChange = {},</b>
-<b class="nc">&nbsp;            readOnly = true,</b>
-<b class="nc">&nbsp;            label = { Text(label) },</b>
-<b class="nc">&nbsp;            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded.value) },</b>
-<b class="nc">&nbsp;            modifier = Modifier</b>
-<b class="nc">&nbsp;                .fillMaxWidth()</b>
-<b class="nc">&nbsp;                .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),</b>
+<b class="fc">&nbsp;    ExposedDropdownMenuBox(</b>
+<b class="fc">&nbsp;        expanded = expanded.value,</b>
+<b class="fc">&nbsp;        onExpandedChange = { expanded.value = it },</b>
+<b class="fc">&nbsp;        modifier = modifier,</b>
+<b class="fc">&nbsp;    ) {</b>
+<b class="fc">&nbsp;        OutlinedTextField(</b>
+<b class="pc">&nbsp;            value = selected?.let(itemName).orEmpty(),</b>
+<b class="fc">&nbsp;            onValueChange = {},</b>
+<b class="fc">&nbsp;            readOnly = true,</b>
+<b class="fc">&nbsp;            label = { Text(label) },</b>
+<b class="fc">&nbsp;            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded.value) },</b>
+<b class="fc">&nbsp;            modifier = Modifier</b>
+<b class="fc">&nbsp;                .fillMaxWidth()</b>
+<b class="fc">&nbsp;                .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),</b>
 &nbsp;        )
-<b class="nc">&nbsp;        ExposedDropdownMenu(</b>
-<b class="nc">&nbsp;            expanded = expanded.value,</b>
-<b class="nc">&nbsp;            onDismissRequest = { expanded.value = false },</b>
-<b class="nc">&nbsp;        ) {</b>
+<b class="fc">&nbsp;        ExposedDropdownMenu(</b>
+<b class="fc">&nbsp;            expanded = expanded.value,</b>
+<b class="fc">&nbsp;            onDismissRequest = { expanded.value = false },</b>
+<b class="fc">&nbsp;        ) {</b>
 <b class="nc">&nbsp;            items.forEach { item -&gt;</b>
 <b class="nc">&nbsp;                DropdownMenuItem(</b>
 <b class="nc">&nbsp;                    text = { Text(itemName(item)) },</b>
@@ -156,7 +156,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="nc">&nbsp;            }</b>
 &nbsp;        }
 &nbsp;    }
-<b class="nc">&nbsp;}</b>
+<b class="fc">&nbsp;}</b>
 </code>
 </pre>
 </div>
@@ -180,7 +180,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 15:43</div>
+    <div style="float:right;">generated on 2026-07-22 16:22</div>
 </div>
 </body>
 </html>

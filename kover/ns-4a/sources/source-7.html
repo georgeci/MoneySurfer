@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > WorkspaceSyncer</title>
+  <title>MoneySurfer Coverage Report > AccountRepository</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.repositories</a>
 </div>
 
-<h1>Coverage Summary for Class: WorkspaceSyncer (com.georgeci.moneysurfer.domain.repositories)</h1>
+<h1>Coverage Summary for Class: AccountRepository (com.georgeci.moneysurfer.domain.repositories)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">WorkspaceSyncer</td>
+  <td class="name">AccountRepository</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -46,30 +46,43 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.repositories
 &nbsp;
+&nbsp;import com.georgeci.moneysurfer.domain.model.Account
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.AccountId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
+&nbsp;import kotlinx.coroutines.flow.Flow
 &nbsp;
-&nbsp;/**
-&nbsp; * Triggers sync operations without exposing the sync infrastructure to domain use cases.
-&nbsp; *
-&nbsp; * [pushAll] drains the outbox (push-only, no remote discovery).
-&nbsp; * [syncAll] fetches the authoritative workspace list from the remote user doc and
-&nbsp; * runs a full cursor-based pull for every workspace — including ones not yet local.
-&nbsp; * [syncWorkspace] pulls a single specific workspace; used after accepting an invite so
-&nbsp; * only the newly joined workspace is hydrated without re-syncing everything.
-&nbsp; */
-&nbsp;interface WorkspaceSyncer {
-&nbsp;    /** Push all pending outbox mutations. Throws on error. */
-&nbsp;    suspend fun pushAll()
-&nbsp;
-&nbsp;    /** Push outbox + pull all user workspaces (including undiscovered ones). Throws on error. */
-&nbsp;    suspend fun syncAll()
+&nbsp;interface AccountRepository {
+&nbsp;    fun getAll(): Flow&lt;List&lt;Account&gt;&gt;
+&nbsp;    fun getByWorkspaceId(workspaceId: WorkspaceId): Flow&lt;List&lt;Account&gt;&gt;
+&nbsp;    suspend fun getById(id: AccountId): Account?
+&nbsp;    suspend fun insert(account: Account)
+&nbsp;    suspend fun update(account: Account)
+&nbsp;    suspend fun delete(id: AccountId)
 &nbsp;
 &nbsp;    /**
-&nbsp;     * Push outbox + pull a single workspace by [workspaceId].
-&nbsp;     * Sets the active workspace to [workspaceId] for the duration of the sync so
-&nbsp;     * [SyncScope.ActiveWorkspace] targets the correct workspace.
+&nbsp;     * Increment the cached `balance` of [accountId] by [delta]. Used by total-calc to keep
+&nbsp;     * `Account.balance` in sync with transaction changes without rewriting the whole row.
+&nbsp;     *
+&nbsp;     * Negative delta is allowed (subtracts). The repository writes the result and bumps
+&nbsp;     * `updatedAt`. Does NOT enqueue an outbox row — balance is a derived projection that
+&nbsp;     * Firestore recomputes server-side from its own tx state (see md/totatl_calc.md §6).
 &nbsp;     */
-&nbsp;    suspend fun syncWorkspace(workspaceId: WorkspaceId)
+&nbsp;    suspend fun applyDelta(accountId: AccountId, delta: Money)
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Overwrite the cached balance with [balance]. Used by `RecalculateAccountBalanceUseCase`
+&nbsp;     * to repair the cache from authoritative transaction history. Like [applyDelta], does
+&nbsp;     * not enqueue an outbox row.
+&nbsp;     */
+&nbsp;    suspend fun setBalance(accountId: AccountId, balance: Money)
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Toggle the archived flag on [accountId]. Bumps `updatedAt` and enqueues a sync update.
+&nbsp;     * Archived accounts keep their transactions but are hidden from active lists and excluded
+&nbsp;     * from total/budget rollups. No-op if [accountId] is unknown locally.
+&nbsp;     */
+&nbsp;    suspend fun setArchived(accountId: AccountId, archived: Boolean)
 &nbsp;}
 </code>
 </pre>
@@ -94,7 +107,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 15:43</div>
+    <div style="float:right;">generated on 2026-07-22 16:22</div>
 </div>
 </body>
 </html>

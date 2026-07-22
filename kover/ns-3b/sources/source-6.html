@@ -52,42 +52,42 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   <td class="name">SurferArchivedAccountCardKt</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    80%
   </span>
   <span class="absValue">
-    (0/5)
+    (4/5)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    37.5%
   </span>
   <span class="absValue">
-    (0/8)
+    (3/8)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    92.5%
   </span>
   <span class="absValue">
-    (0/40)
+    (37/40)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    88.2%
   </span>
   <span class="absValue">
-    (0/484)
+    (427/484)
   </span>
 </td>
 </tr>
@@ -141,51 +141,51 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    icon: ImageVector,
 &nbsp;    restoreLabel: String,
 &nbsp;    onRestoreClick: () -&gt; Unit,
-<b class="nc">&nbsp;    modifier: Modifier = Modifier,</b>
-<b class="nc">&nbsp;) {</b>
-<b class="nc">&nbsp;    SurferActionCard(modifier = modifier.fillMaxWidth()) {</b>
-<b class="nc">&nbsp;        CompositionLocalProvider(LocalContentColor provides AppTheme.materialColors.onSurface) {</b>
-<b class="nc">&nbsp;            Row(verticalAlignment = Alignment.CenterVertically) {</b>
-<b class="nc">&nbsp;                AccountIconTile(icon = icon, muted = true)</b>
-<b class="nc">&nbsp;                Spacer(Modifier.width(12.dp))</b>
-<b class="nc">&nbsp;                Column(modifier = Modifier.weight(1f)) {</b>
-<b class="nc">&nbsp;                    Text(</b>
-<b class="nc">&nbsp;                        text = name,</b>
-<b class="nc">&nbsp;                        style = AppTheme.typography.titleSmall,</b>
-<b class="nc">&nbsp;                        color = AppTheme.materialColors.onSurface,</b>
-<b class="nc">&nbsp;                        maxLines = 1,</b>
-<b class="nc">&nbsp;                        overflow = TextOverflow.Ellipsis,</b>
+<b class="fc">&nbsp;    modifier: Modifier = Modifier,</b>
+<b class="pc">&nbsp;) {</b>
+<b class="fc">&nbsp;    SurferActionCard(modifier = modifier.fillMaxWidth()) {</b>
+<b class="fc">&nbsp;        CompositionLocalProvider(LocalContentColor provides AppTheme.materialColors.onSurface) {</b>
+<b class="fc">&nbsp;            Row(verticalAlignment = Alignment.CenterVertically) {</b>
+<b class="fc">&nbsp;                AccountIconTile(icon = icon, muted = true)</b>
+<b class="fc">&nbsp;                Spacer(Modifier.width(12.dp))</b>
+<b class="fc">&nbsp;                Column(modifier = Modifier.weight(1f)) {</b>
+<b class="fc">&nbsp;                    Text(</b>
+<b class="fc">&nbsp;                        text = name,</b>
+<b class="fc">&nbsp;                        style = AppTheme.typography.titleSmall,</b>
+<b class="fc">&nbsp;                        color = AppTheme.materialColors.onSurface,</b>
+<b class="fc">&nbsp;                        maxLines = 1,</b>
+<b class="fc">&nbsp;                        overflow = TextOverflow.Ellipsis,</b>
 &nbsp;                    )
-<b class="nc">&nbsp;                    Text(</b>
-<b class="nc">&nbsp;                        text = subtitle,</b>
-<b class="nc">&nbsp;                        style = AppTheme.typography.bodySmall,</b>
-<b class="nc">&nbsp;                        color = AppTheme.materialColors.onSurfaceVariant,</b>
-<b class="nc">&nbsp;                        maxLines = 1,</b>
-<b class="nc">&nbsp;                        overflow = TextOverflow.Ellipsis,</b>
+<b class="fc">&nbsp;                    Text(</b>
+<b class="fc">&nbsp;                        text = subtitle,</b>
+<b class="fc">&nbsp;                        style = AppTheme.typography.bodySmall,</b>
+<b class="fc">&nbsp;                        color = AppTheme.materialColors.onSurfaceVariant,</b>
+<b class="fc">&nbsp;                        maxLines = 1,</b>
+<b class="fc">&nbsp;                        overflow = TextOverflow.Ellipsis,</b>
 &nbsp;                    )
-<b class="nc">&nbsp;                }</b>
-<b class="nc">&nbsp;                OutlinedButton(</b>
-<b class="nc">&nbsp;                    onClick = onRestoreClick,</b>
-<b class="nc">&nbsp;                    modifier = Modifier.height(32.dp),</b>
-<b class="nc">&nbsp;                    contentPadding = PaddingValues(horizontal = 14.dp, vertical = 0.dp),</b>
-<b class="nc">&nbsp;                    shape = RoundedCornerShape(16.dp),</b>
-<b class="nc">&nbsp;                ) {</b>
-<b class="nc">&nbsp;                    Icon(</b>
-<b class="nc">&nbsp;                        imageVector = SurferIcons.Restore,</b>
+<b class="fc">&nbsp;                }</b>
+<b class="fc">&nbsp;                OutlinedButton(</b>
+<b class="fc">&nbsp;                    onClick = onRestoreClick,</b>
+<b class="fc">&nbsp;                    modifier = Modifier.height(32.dp),</b>
+<b class="fc">&nbsp;                    contentPadding = PaddingValues(horizontal = 14.dp, vertical = 0.dp),</b>
+<b class="fc">&nbsp;                    shape = RoundedCornerShape(16.dp),</b>
+<b class="fc">&nbsp;                ) {</b>
+<b class="fc">&nbsp;                    Icon(</b>
+<b class="fc">&nbsp;                        imageVector = SurferIcons.Restore,</b>
 &nbsp;                        // decorative — button text (restoreLabel) provides the accessible label
-<b class="nc">&nbsp;                        contentDescription = null,</b>
-<b class="nc">&nbsp;                        modifier = Modifier.size(14.dp),</b>
+<b class="fc">&nbsp;                        contentDescription = null,</b>
+<b class="fc">&nbsp;                        modifier = Modifier.size(14.dp),</b>
 &nbsp;                    )
-<b class="nc">&nbsp;                    Spacer(Modifier.width(6.dp))</b>
-<b class="nc">&nbsp;                    Text(</b>
-<b class="nc">&nbsp;                        text = restoreLabel,</b>
-<b class="nc">&nbsp;                        style = AppTheme.typography.labelMedium,</b>
+<b class="fc">&nbsp;                    Spacer(Modifier.width(6.dp))</b>
+<b class="fc">&nbsp;                    Text(</b>
+<b class="fc">&nbsp;                        text = restoreLabel,</b>
+<b class="fc">&nbsp;                        style = AppTheme.typography.labelMedium,</b>
 &nbsp;                    )
 &nbsp;                }
-<b class="nc">&nbsp;            }</b>
+<b class="fc">&nbsp;            }</b>
 &nbsp;        }
 &nbsp;    }
-<b class="nc">&nbsp;}</b>
+<b class="fc">&nbsp;}</b>
 &nbsp;
 &nbsp;@Preview
 &nbsp;@Composable
@@ -229,7 +229,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 15:43</div>
+    <div style="float:right;">generated on 2026-07-22 16:22</div>
 </div>
 </body>
 </html>

@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > UserEntity</title>
+  <title>MoneySurfer Coverage Report > TransactionEntity</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.data.db.entity</a>
 </div>
 
-<h1>Coverage Summary for Class: UserEntity (com.georgeci.moneysurfer.data.db.entity)</h1>
+<h1>Coverage Summary for Class: TransactionEntity (com.georgeci.moneysurfer.data.db.entity)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,38 +49,38 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">UserEntity</td>
+  <td class="name">TransactionEntity</td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (1/1)
+    (0/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (2/2)
+    (0/2)
   </span>
 </td>
     <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (5/5)
+    (0/16)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (17/17)
+    (0/82)
   </span>
 </td>
 </tr>
@@ -96,14 +96,63 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;
 &nbsp;import androidx.room.ColumnInfo
 &nbsp;import androidx.room.Entity
+&nbsp;import androidx.room.ForeignKey
+&nbsp;import androidx.room.Index
 &nbsp;import androidx.room.PrimaryKey
 &nbsp;
-<b class="fc">&nbsp;@Entity(tableName = &quot;users&quot;)</b>
-&nbsp;data class UserEntity(
-<b class="fc">&nbsp;    @PrimaryKey</b>
-<b class="fc">&nbsp;    @ColumnInfo(name = &quot;id&quot;) val id: String,</b>
-<b class="fc">&nbsp;    @ColumnInfo(name = &quot;displayName&quot;) val displayName: String?,</b>
-<b class="fc">&nbsp;    @ColumnInfo(name = &quot;isAnon&quot;, defaultValue = &quot;0&quot;) val isAnon: Boolean,</b>
+<b class="nc">&nbsp;@Entity(</b>
+&nbsp;    tableName = &quot;transactions&quot;,
+&nbsp;    foreignKeys = [
+&nbsp;        ForeignKey(
+&nbsp;            entity = WorkspaceEntity::class,
+&nbsp;            parentColumns = [&quot;id&quot;],
+&nbsp;            childColumns = [&quot;workspaceId&quot;],
+&nbsp;        ),
+&nbsp;        ForeignKey(
+&nbsp;            entity = AccountEntity::class,
+&nbsp;            parentColumns = [&quot;id&quot;],
+&nbsp;            childColumns = [&quot;accountId&quot;],
+&nbsp;        ),
+&nbsp;        ForeignKey(
+&nbsp;            entity = CategoryEntity::class,
+&nbsp;            parentColumns = [&quot;id&quot;],
+&nbsp;            childColumns = [&quot;categoryId&quot;],
+&nbsp;        ),
+&nbsp;    ],
+&nbsp;    // Composite indices for the workspace- and account-scoped list queries in
+&nbsp;    // TransactionDao: their ORDER BY matches the index, so SQLite walks it instead of
+&nbsp;    // building a temp B-tree per Flow emission. (The unscoped getAll* queries sort the
+&nbsp;    // whole table and cannot use an index whose leftmost column they don&#39;t filter on.)
+&nbsp;    // Each starts with the FK column, which also satisfies Room&#39;s FK-index requirement
+&nbsp;    // — no separate single-column index on workspaceId / accountId is needed.
+&nbsp;    indices = [
+&nbsp;        Index(
+&nbsp;            value = [&quot;workspaceId&quot;, &quot;operationDate&quot;, &quot;operationAt&quot;, &quot;createdAt&quot;],
+&nbsp;            orders = [Index.Order.ASC, Index.Order.DESC, Index.Order.DESC, Index.Order.DESC],
+&nbsp;        ),
+&nbsp;        Index(
+&nbsp;            value = [&quot;accountId&quot;, &quot;operationDate&quot;, &quot;operationAt&quot;, &quot;createdAt&quot;],
+&nbsp;            orders = [Index.Order.ASC, Index.Order.DESC, Index.Order.DESC, Index.Order.DESC],
+&nbsp;        ),
+&nbsp;        Index(&quot;categoryId&quot;),
+&nbsp;    ],
+&nbsp;)
+&nbsp;data class TransactionEntity(
+<b class="nc">&nbsp;    @PrimaryKey</b>
+<b class="nc">&nbsp;    @ColumnInfo(name = &quot;id&quot;) val id: String,</b>
+<b class="nc">&nbsp;    @ColumnInfo(name = &quot;workspaceId&quot;) val workspaceId: String,</b>
+<b class="nc">&nbsp;    @ColumnInfo(name = &quot;accountId&quot;) val accountId: String,</b>
+<b class="nc">&nbsp;    @ColumnInfo(name = &quot;amount&quot;) val amount: Long,</b>
+<b class="nc">&nbsp;    @ColumnInfo(name = &quot;currencyCode&quot;) val currencyCode: String,</b>
+<b class="nc">&nbsp;    @ColumnInfo(name = &quot;categoryId&quot;) val categoryId: String?,</b>
+<b class="nc">&nbsp;    @ColumnInfo(name = &quot;note&quot;) val note: String,</b>
+<b class="nc">&nbsp;    @ColumnInfo(name = &quot;operationAt&quot;) val operationAt: Long,</b>
+<b class="nc">&nbsp;    @ColumnInfo(name = &quot;operationDate&quot;, defaultValue = &quot;&quot;) val operationDate: String = &quot;&quot;,</b>
+<b class="nc">&nbsp;    @ColumnInfo(name = &quot;type&quot;) val type: String,</b>
+<b class="nc">&nbsp;    @ColumnInfo(name = &quot;status&quot;, defaultValue = &quot;ACTUAL&quot;) val status: String = &quot;ACTUAL&quot;,</b>
+<b class="nc">&nbsp;    @ColumnInfo(name = &quot;createdAt&quot;, defaultValue = &quot;0&quot;) val createdAt: Long = 0L,</b>
+<b class="nc">&nbsp;    @ColumnInfo(name = &quot;updatedAt&quot;, defaultValue = &quot;0&quot;) val updatedAt: Long = 0L,</b>
+<b class="nc">&nbsp;    @ColumnInfo(name = &quot;transferId&quot;) val transferId: String? = null,</b>
 &nbsp;)
 </code>
 </pre>
@@ -128,7 +177,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 15:43</div>
+    <div style="float:right;">generated on 2026-07-22 16:22</div>
 </div>
 </body>
 </html>

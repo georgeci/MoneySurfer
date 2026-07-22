@@ -52,42 +52,42 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   <td class="name">SurferToolbarKt</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    50%
   </span>
   <span class="absValue">
-    (0/18)
+    (9/18)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    24.4%
   </span>
   <span class="absValue">
-    (0/78)
+    (19/78)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    62.5%
   </span>
   <span class="absValue">
-    (0/112)
+    (70/112)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    59.5%
   </span>
   <span class="absValue">
-    (0/1949)
+    (1159/1949)
   </span>
 </td>
 </tr>
@@ -138,51 +138,51 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;@Composable
 <b class="nc">&nbsp;fun SurferToolbar(</b>
 &nbsp;    title: String,
-<b class="nc">&nbsp;    modifier: Modifier = Modifier,</b>
-<b class="nc">&nbsp;    onBack: (() -&gt; Unit)? = null,</b>
-<b class="nc">&nbsp;    navigationIcon: (@Composable () -&gt; Unit)? = null,</b>
-<b class="nc">&nbsp;    colors: TopAppBarColors = TopAppBarDefaults.topAppBarColors(),</b>
+<b class="fc">&nbsp;    modifier: Modifier = Modifier,</b>
+<b class="fc">&nbsp;    onBack: (() -&gt; Unit)? = null,</b>
+<b class="fc">&nbsp;    navigationIcon: (@Composable () -&gt; Unit)? = null,</b>
+<b class="fc">&nbsp;    colors: TopAppBarColors = TopAppBarDefaults.topAppBarColors(),</b>
 &nbsp;    actions: @Composable RowScope.() -&gt; Unit = {},
-<b class="nc">&nbsp;) {</b>
-<b class="nc">&nbsp;    SurferToolbar(</b>
-<b class="nc">&nbsp;        modifier = modifier,</b>
-<b class="nc">&nbsp;        navigationIcon = {</b>
-<b class="nc">&nbsp;            when {</b>
-<b class="nc">&nbsp;                onBack != null -&gt; IconButton(onClick = onBack) {</b>
+<b class="pc">&nbsp;) {</b>
+<b class="fc">&nbsp;    SurferToolbar(</b>
+<b class="fc">&nbsp;        modifier = modifier,</b>
+<b class="fc">&nbsp;        navigationIcon = {</b>
+<b class="fc">&nbsp;            when {</b>
+<b class="pc">&nbsp;                onBack != null -&gt; IconButton(onClick = onBack) {</b>
 &nbsp;                    Icon(
 &nbsp;                        imageVector = SurferIcons.Back,
 &nbsp;                        contentDescription = stringResource(Res.string.uikit_back),
 &nbsp;                    )
 &nbsp;                }
 <b class="nc">&nbsp;                navigationIcon != null -&gt; navigationIcon()</b>
-<b class="nc">&nbsp;            }</b>
+<b class="fc">&nbsp;            }</b>
 &nbsp;        },
-<b class="nc">&nbsp;        colors = colors,</b>
-<b class="nc">&nbsp;        actions = actions,</b>
-<b class="nc">&nbsp;        title = { Text(title) },</b>
+<b class="fc">&nbsp;        colors = colors,</b>
+<b class="fc">&nbsp;        actions = actions,</b>
+<b class="fc">&nbsp;        title = { Text(title) },</b>
 &nbsp;    )
-<b class="nc">&nbsp;}</b>
+<b class="fc">&nbsp;}</b>
 &nbsp;
 &nbsp;@OptIn(ExperimentalMaterial3Api::class)
 &nbsp;@Composable
 <b class="nc">&nbsp;fun SurferToolbar(</b>
-<b class="nc">&nbsp;    modifier: Modifier = Modifier,</b>
+<b class="fc">&nbsp;    modifier: Modifier = Modifier,</b>
 &nbsp;    navigationIcon: @Composable () -&gt; Unit = {},
-<b class="nc">&nbsp;    colors: TopAppBarColors = TopAppBarDefaults.topAppBarColors(),</b>
+<b class="fc">&nbsp;    colors: TopAppBarColors = TopAppBarDefaults.topAppBarColors(),</b>
 &nbsp;    actions: @Composable RowScope.() -&gt; Unit = {},
 &nbsp;    title: @Composable () -&gt; Unit,
-<b class="nc">&nbsp;) {</b>
-<b class="nc">&nbsp;    TopAppBar(</b>
-<b class="nc">&nbsp;        title = title,</b>
-<b class="nc">&nbsp;        modifier = modifier,</b>
-<b class="nc">&nbsp;        navigationIcon = navigationIcon,</b>
-<b class="nc">&nbsp;        actions = {</b>
-<b class="nc">&nbsp;            SurferSyncStatusBadge()</b>
-<b class="nc">&nbsp;            actions()</b>
+<b class="pc">&nbsp;) {</b>
+<b class="fc">&nbsp;    TopAppBar(</b>
+<b class="fc">&nbsp;        title = title,</b>
+<b class="fc">&nbsp;        modifier = modifier,</b>
+<b class="fc">&nbsp;        navigationIcon = navigationIcon,</b>
+<b class="fc">&nbsp;        actions = {</b>
+<b class="fc">&nbsp;            SurferSyncStatusBadge()</b>
+<b class="fc">&nbsp;            actions()</b>
 &nbsp;        },
-<b class="nc">&nbsp;        colors = colors,</b>
+<b class="fc">&nbsp;        colors = colors,</b>
 &nbsp;    )
-<b class="nc">&nbsp;}</b>
+<b class="fc">&nbsp;}</b>
 &nbsp;
 &nbsp;/**
 &nbsp; * Icon action for the trailing edge of [SurferToolbar] / [SurferDashboardToolbar]. Wraps
@@ -194,17 +194,17 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    icon: ImageVector,
 &nbsp;    contentDescription: String?,
 &nbsp;    onClick: () -&gt; Unit,
-<b class="nc">&nbsp;    modifier: Modifier = Modifier,</b>
-<b class="nc">&nbsp;    tint: Color = AppTheme.materialColors.onSurface,</b>
-<b class="nc">&nbsp;) {</b>
-<b class="nc">&nbsp;    IconButton(onClick = onClick, modifier = modifier) {</b>
-<b class="nc">&nbsp;        Icon(</b>
-<b class="nc">&nbsp;            imageVector = icon,</b>
-<b class="nc">&nbsp;            contentDescription = contentDescription,</b>
-<b class="nc">&nbsp;            tint = tint,</b>
+<b class="fc">&nbsp;    modifier: Modifier = Modifier,</b>
+<b class="fc">&nbsp;    tint: Color = AppTheme.materialColors.onSurface,</b>
+<b class="pc">&nbsp;) {</b>
+<b class="fc">&nbsp;    IconButton(onClick = onClick, modifier = modifier) {</b>
+<b class="fc">&nbsp;        Icon(</b>
+<b class="fc">&nbsp;            imageVector = icon,</b>
+<b class="fc">&nbsp;            contentDescription = contentDescription,</b>
+<b class="fc">&nbsp;            tint = tint,</b>
 &nbsp;        )
 &nbsp;    }
-<b class="nc">&nbsp;}</b>
+<b class="fc">&nbsp;}</b>
 &nbsp;
 &nbsp;/**
 &nbsp; * Pill-shaped tonal button with a leading icon and a label, sized for the trailing edge of
@@ -247,48 +247,48 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    letter: String,
 &nbsp;    primaryText: String,
 &nbsp;    secondaryText: String,
-<b class="nc">&nbsp;    modifier: Modifier = Modifier,</b>
-<b class="nc">&nbsp;    letterBackgroundColor: Color = AppTheme.materialColors.primaryContainer,</b>
-<b class="nc">&nbsp;    letterContentColor: Color = AppTheme.materialColors.onPrimaryContainer,</b>
-<b class="nc">&nbsp;    colors: TopAppBarColors = TopAppBarDefaults.topAppBarColors(),</b>
+<b class="fc">&nbsp;    modifier: Modifier = Modifier,</b>
+<b class="fc">&nbsp;    letterBackgroundColor: Color = AppTheme.materialColors.primaryContainer,</b>
+<b class="fc">&nbsp;    letterContentColor: Color = AppTheme.materialColors.onPrimaryContainer,</b>
+<b class="fc">&nbsp;    colors: TopAppBarColors = TopAppBarDefaults.topAppBarColors(),</b>
 &nbsp;    actions: @Composable RowScope.() -&gt; Unit = {},
-<b class="nc">&nbsp;) {</b>
-<b class="nc">&nbsp;    SurferToolbar(</b>
-<b class="nc">&nbsp;        modifier = modifier,</b>
-<b class="nc">&nbsp;        navigationIcon = {</b>
-<b class="nc">&nbsp;            Box(</b>
-<b class="nc">&nbsp;                modifier = Modifier</b>
-<b class="nc">&nbsp;                    .padding(start = 12.dp)</b>
-<b class="nc">&nbsp;                    .size(40.dp)</b>
-<b class="nc">&nbsp;                    .clip(CircleShape)</b>
-<b class="nc">&nbsp;                    .background(letterBackgroundColor),</b>
-<b class="nc">&nbsp;                contentAlignment = Alignment.Center,</b>
+<b class="pc">&nbsp;) {</b>
+<b class="fc">&nbsp;    SurferToolbar(</b>
+<b class="fc">&nbsp;        modifier = modifier,</b>
+<b class="fc">&nbsp;        navigationIcon = {</b>
+<b class="fc">&nbsp;            Box(</b>
+<b class="fc">&nbsp;                modifier = Modifier</b>
+<b class="fc">&nbsp;                    .padding(start = 12.dp)</b>
+<b class="fc">&nbsp;                    .size(40.dp)</b>
+<b class="fc">&nbsp;                    .clip(CircleShape)</b>
+<b class="fc">&nbsp;                    .background(letterBackgroundColor),</b>
+<b class="fc">&nbsp;                contentAlignment = Alignment.Center,</b>
 &nbsp;            ) {
-<b class="nc">&nbsp;                Text(</b>
-<b class="nc">&nbsp;                    text = letter,</b>
-<b class="nc">&nbsp;                    style = AppTheme.typography.titleSmall,</b>
-<b class="nc">&nbsp;                    color = letterContentColor,</b>
+<b class="fc">&nbsp;                Text(</b>
+<b class="fc">&nbsp;                    text = letter,</b>
+<b class="fc">&nbsp;                    style = AppTheme.typography.titleSmall,</b>
+<b class="fc">&nbsp;                    color = letterContentColor,</b>
 &nbsp;                )
-<b class="nc">&nbsp;            }</b>
+<b class="fc">&nbsp;            }</b>
 &nbsp;        },
-<b class="nc">&nbsp;        colors = colors,</b>
-<b class="nc">&nbsp;        actions = actions,</b>
-<b class="nc">&nbsp;        title = {</b>
-<b class="nc">&nbsp;            Column {</b>
-<b class="nc">&nbsp;                Text(</b>
-<b class="nc">&nbsp;                    text = primaryText,</b>
-<b class="nc">&nbsp;                    style = AppTheme.typography.labelMedium,</b>
-<b class="nc">&nbsp;                    color = AppTheme.materialColors.onSurfaceVariant,</b>
+<b class="fc">&nbsp;        colors = colors,</b>
+<b class="fc">&nbsp;        actions = actions,</b>
+<b class="fc">&nbsp;        title = {</b>
+<b class="fc">&nbsp;            Column {</b>
+<b class="fc">&nbsp;                Text(</b>
+<b class="fc">&nbsp;                    text = primaryText,</b>
+<b class="fc">&nbsp;                    style = AppTheme.typography.labelMedium,</b>
+<b class="fc">&nbsp;                    color = AppTheme.materialColors.onSurfaceVariant,</b>
 &nbsp;                )
-<b class="nc">&nbsp;                Text(</b>
-<b class="nc">&nbsp;                    text = secondaryText,</b>
-<b class="nc">&nbsp;                    style = AppTheme.typography.titleSmall,</b>
-<b class="nc">&nbsp;                    color = AppTheme.materialColors.onSurface,</b>
+<b class="fc">&nbsp;                Text(</b>
+<b class="fc">&nbsp;                    text = secondaryText,</b>
+<b class="fc">&nbsp;                    style = AppTheme.typography.titleSmall,</b>
+<b class="fc">&nbsp;                    color = AppTheme.materialColors.onSurface,</b>
 &nbsp;                )
-<b class="nc">&nbsp;            }</b>
+<b class="fc">&nbsp;            }</b>
 &nbsp;        },
 &nbsp;    )
-<b class="nc">&nbsp;}</b>
+<b class="fc">&nbsp;}</b>
 &nbsp;
 &nbsp;@OptIn(ExperimentalMaterial3Api::class)
 &nbsp;@Preview
@@ -434,7 +434,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 15:43</div>
+    <div style="float:right;">generated on 2026-07-22 16:22</div>
 </div>
 </body>
 </html>

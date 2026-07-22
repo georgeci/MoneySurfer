@@ -52,42 +52,42 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   <td class="name">SurferCategoryPalette</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    91.7%
   </span>
   <span class="absValue">
-    (0/12)
+    (11/12)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    37.5%
   </span>
   <span class="absValue">
-    (0/8)
+    (3/8)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    83.3%
   </span>
   <span class="absValue">
-    (0/36)
+    (30/36)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    81.9%
   </span>
   <span class="absValue">
-    (0/227)
+    (186/227)
   </span>
 </td>
 </tr>
@@ -158,43 +158,43 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp; * consistently until proper icon/hue fields land on the domain model.
 &nbsp; */
 &nbsp;object SurferCategoryPalette {
-<b class="nc">&nbsp;    val tints: List&lt;Color&gt; = listOf(</b>
-<b class="nc">&nbsp;        Color(0xFF2F8E6E), // mint   — hue 162</b>
-<b class="nc">&nbsp;        Color(0xFFB5533B), // amber  — hue  35</b>
-<b class="nc">&nbsp;        Color(0xFF2E5AA8), // indigo — hue 258</b>
-<b class="nc">&nbsp;        Color(0xFFA06A1E), // citrus — hue  68</b>
-<b class="nc">&nbsp;        Color(0xFF6B4E99), // plum   — hue 303</b>
-<b class="nc">&nbsp;        Color(0xFFB54A6B), // rose   — hue 340</b>
-<b class="nc">&nbsp;        Color(0xFFB54744), // clay   — hue   8</b>
-<b class="nc">&nbsp;        Color(0xFF6B7D3D), // moss   — hue  90</b>
+<b class="fc">&nbsp;    val tints: List&lt;Color&gt; = listOf(</b>
+<b class="fc">&nbsp;        Color(0xFF2F8E6E), // mint   — hue 162</b>
+<b class="fc">&nbsp;        Color(0xFFB5533B), // amber  — hue  35</b>
+<b class="fc">&nbsp;        Color(0xFF2E5AA8), // indigo — hue 258</b>
+<b class="fc">&nbsp;        Color(0xFFA06A1E), // citrus — hue  68</b>
+<b class="fc">&nbsp;        Color(0xFF6B4E99), // plum   — hue 303</b>
+<b class="fc">&nbsp;        Color(0xFFB54A6B), // rose   — hue 340</b>
+<b class="fc">&nbsp;        Color(0xFFB54744), // clay   — hue   8</b>
+<b class="fc">&nbsp;        Color(0xFF6B7D3D), // moss   — hue  90</b>
 &nbsp;    )
 &nbsp;
-<b class="nc">&nbsp;    val icons: List&lt;ImageVector&gt; = listOf(</b>
-<b class="nc">&nbsp;        SurferIcons.Category,</b>
-<b class="nc">&nbsp;        SurferIcons.CreditCard,</b>
-<b class="nc">&nbsp;        SurferIcons.Savings,</b>
-<b class="nc">&nbsp;        SurferIcons.Cash,</b>
-<b class="nc">&nbsp;        SurferIcons.Wallet,</b>
-<b class="nc">&nbsp;        SurferIcons.Receipt,</b>
-<b class="nc">&nbsp;        SurferIcons.Event,</b>
-<b class="nc">&nbsp;        SurferIcons.Tag,</b>
+<b class="fc">&nbsp;    val icons: List&lt;ImageVector&gt; = listOf(</b>
+<b class="fc">&nbsp;        SurferIcons.Category,</b>
+<b class="fc">&nbsp;        SurferIcons.CreditCard,</b>
+<b class="fc">&nbsp;        SurferIcons.Savings,</b>
+<b class="fc">&nbsp;        SurferIcons.Cash,</b>
+<b class="fc">&nbsp;        SurferIcons.Wallet,</b>
+<b class="fc">&nbsp;        SurferIcons.Receipt,</b>
+<b class="fc">&nbsp;        SurferIcons.Event,</b>
+<b class="fc">&nbsp;        SurferIcons.Tag,</b>
 &nbsp;    )
 &nbsp;
 &nbsp;    /** Marker for the seeded system Transfer category — matches `CategorySystemKind.TRANSFER.name`. */
 &nbsp;    const val SYSTEM_KIND_TRANSFER: String = &quot;TRANSFER&quot;
 &nbsp;
 &nbsp;    /** Tint for the system Transfer category. Kept fixed (not hashed) so it&#39;s always recognisable. */
-<b class="nc">&nbsp;    val TransferTint: Color = Color(0xFF2E5AA8)</b>
-<b class="nc">&nbsp;    val TransferIcon: ImageVector = SurferIcons.SwapHoriz</b>
+<b class="fc">&nbsp;    val TransferTint: Color = Color(0xFF2E5AA8)</b>
+<b class="fc">&nbsp;    val TransferIcon: ImageVector = SurferIcons.SwapHoriz</b>
 &nbsp;
-<b class="nc">&nbsp;    fun tintFor(id: String, systemKind: String? = null): Color {</b>
-<b class="nc">&nbsp;        if (systemKind == SYSTEM_KIND_TRANSFER) return TransferTint</b>
-<b class="nc">&nbsp;        return tints[nonNegativeMod(stringHash(id), tints.size)]</b>
+<b class="fc">&nbsp;    fun tintFor(id: String, systemKind: String? = null): Color {</b>
+<b class="pc">&nbsp;        if (systemKind == SYSTEM_KIND_TRANSFER) return TransferTint</b>
+<b class="fc">&nbsp;        return tints[nonNegativeMod(stringHash(id), tints.size)]</b>
 &nbsp;    }
 &nbsp;
-<b class="nc">&nbsp;    fun iconFor(id: String, systemKind: String? = null): ImageVector {</b>
-<b class="nc">&nbsp;        if (systemKind == SYSTEM_KIND_TRANSFER) return TransferIcon</b>
-<b class="nc">&nbsp;        return icons[nonNegativeMod(stringHash(id), icons.size)]</b>
+<b class="fc">&nbsp;    fun iconFor(id: String, systemKind: String? = null): ImageVector {</b>
+<b class="pc">&nbsp;        if (systemKind == SYSTEM_KIND_TRANSFER) return TransferIcon</b>
+<b class="fc">&nbsp;        return icons[nonNegativeMod(stringHash(id), icons.size)]</b>
 &nbsp;    }
 &nbsp;
 &nbsp;    fun tintForName(name: String): Color =
@@ -210,13 +210,13 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;        }
 &nbsp;
 &nbsp;    private fun nonNegativeMod(value: Long, size: Int): Int {
-<b class="nc">&nbsp;        val s = size.toLong()</b>
-<b class="nc">&nbsp;        val r = value % s</b>
-<b class="nc">&nbsp;        return ((if (r &lt; 0) r + s else r)).toInt()</b>
+<b class="fc">&nbsp;        val s = size.toLong()</b>
+<b class="fc">&nbsp;        val r = value % s</b>
+<b class="pc">&nbsp;        return ((if (r &lt; 0) r + s else r)).toInt()</b>
 &nbsp;    }
 &nbsp;
 &nbsp;    private fun stringHash(value: String): Long =
-<b class="nc">&nbsp;        value.fold(0L) { acc, c -&gt; acc * 31 + c.code }</b>
+<b class="fc">&nbsp;        value.fold(0L) { acc, c -&gt; acc * 31 + c.code }</b>
 &nbsp;}
 &nbsp;
 &nbsp;@Preview
@@ -286,7 +286,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 15:43</div>
+    <div style="float:right;">generated on 2026-07-22 16:22</div>
 </div>
 </body>
 </html>

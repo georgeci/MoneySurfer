@@ -263,6 +263,51 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;)
 &nbsp;
 &nbsp;/**
+&nbsp; * Savings goal doc at `workspaces/{wid}/goals/{gid}`.
+&nbsp; *
+&nbsp; * There is no `current` / `saved` field by design — the amount saved is always
+&nbsp; * `SUM(goalContributions.amount)` for the goal, so no wire field can drift.
+&nbsp; */
+&nbsp;@Serializable
+&nbsp;data class GoalDoc(
+&nbsp;    val title: String = &quot;&quot;,
+&nbsp;    val emoji: String = &quot;&quot;,
+&nbsp;    val hue: Int = 0,
+&nbsp;    val target: Long = 0L,
+&nbsp;    val currencyCode: String = &quot;&quot;,
+&nbsp;    val startDate: String = &quot;&quot;,
+&nbsp;    val targetDate: String? = null,
+&nbsp;    val accountId: String? = null,
+&nbsp;    val status: String = &quot;ACTIVE&quot;,
+&nbsp;    val createdAt: Long = 0L,
+&nbsp;    val updatedAt: Long = 0L,
+&nbsp;    val deletedAt: Long? = null,
+&nbsp;    val clientVersionCode: Int = 1,
+&nbsp;)
+&nbsp;
+&nbsp;/**
+&nbsp; * Contribution doc at `workspaces/{wid}/goalContributions/{cid}`.
+&nbsp; *
+&nbsp; * A flat workspace-level collection rather than a sub-collection of the goal:
+&nbsp; * the pull path reads workspace sub-collections by cursor, and nesting a level
+&nbsp; * deeper would need a collection-group query and a second cursor.
+&nbsp; */
+&nbsp;@Serializable
+&nbsp;data class GoalContributionDoc(
+&nbsp;    val goalId: String = &quot;&quot;,
+&nbsp;    /** Signed minor units — negative is a withdrawal. */
+&nbsp;    val amount: Long = 0L,
+&nbsp;    val occurredOn: String = &quot;&quot;,
+&nbsp;    val note: String = &quot;&quot;,
+&nbsp;    /** Always null in v1 — reserved for the money-backed model. */
+&nbsp;    val transferId: String? = null,
+&nbsp;    val createdAt: Long = 0L,
+&nbsp;    val updatedAt: Long = 0L,
+&nbsp;    val deletedAt: Long? = null,
+&nbsp;    val clientVersionCode: Int = 1,
+&nbsp;)
+&nbsp;
+&nbsp;/**
 &nbsp; * Member doc lives at `workspaces/{wid}/members/{uid}`. Doc id = userId.
 &nbsp; *
 &nbsp; * Soft-delete via `status` (`ACTIVE` / `LEFT` / `REMOVED`) — `deletedAt` is kept for
@@ -330,7 +375,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 15:43</div>
+    <div style="float:right;">generated on 2026-07-22 16:22</div>
 </div>
 </body>
 </html>
