@@ -75,6 +75,9 @@ kotlin {
             implementation(projects.dataLocal)
             implementation(projects.feature.login)
             implementation(libs.compose.uiTest)
+            // KoinModuleVerificationTest lists the `parametersOf` types, some of
+            // which are navigation-level (goal contribution mode).
+            implementation(projects.navigation)
             implementation(libs.kotest.runner.junit5)
             implementation(libs.fixture.monkey.kotlin)
             implementation(project.dependencies.platform(libs.koin.bom))

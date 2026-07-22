@@ -7,6 +7,7 @@
 - [Regenerating the lockfiles](#regenerating-the-lockfiles)
   - [Dependabot PRs always need this](#dependabot-prs-always-need-this)
 - [Why skiko / compose.desktop are excluded from the lock state](#why-skiko--composedesktop-are-excluded-from-the-lock-state)
+- [Why kotlinAbiValidationCompatClasspath is pinned by hand](#why-kotlinabivalidationcompatclasspath-is-pinned-by-hand)
 - [Known gaps / future work](#known-gaps--future-work)
 <!-- DOCS:END -->
 
@@ -111,6 +112,41 @@ common, and the Mac-only `ios*` klibs) is host-neutral and stays locked.
 > containing `-macos-`, `-linux-`, `-windows-`, `-mingw-`), a lockfile generated
 > on one host will break the other runner. Add that family to
 > `ignoredDependencies` (or generate + merge lockfiles on both hosts).
+
+## Why `kotlinAbiValidationCompatClasspath` is pinned by hand
+
+KGP 2.4 ships ABI validation, and it declares that feature's compat classpath
+with a **version range** instead of the Kotlin version the build is on:
+
+```
+org.jetbrains.kotlin:kotlin-build-tools-impl:{strictly [2.4.0-Beta2, 2.5.0)}
+```
+
+Gradle resolves a range to the highest published version in it — **prereleases
+included**. So `kotlin-build-tools-impl` and everything transitive through it
+(`-api`, `-cri-impl`, `compiler-embeddable`, `compiler-runner`, `daemon-client`,
+`daemon-embeddable`, `script-runtime`, `tooling-core`, `stdlib`) tracked
+`2.4.20-Beta1`, then moved to `-Beta2` on its own — with no change on our side.
+
+Two reasons that is not acceptable here:
+
+1. It made every relock a ~25-file diff of churn unrelated to the change that
+   triggered it, burying the lines a reviewer actually has to check — which
+   defeats the point of committing the lock state at all.
+2. A *prerelease* Kotlin floating into the build classpath is exactly the drift
+   dependency locking exists to stop.
+
+ABI validation is not used in this repo (no `abiValidation { }` block, no `.api`
+dumps), but turning it off is not the fix: `enabled` already defaults to `false`
+and KGP creates and resolves the configuration regardless. So `build.gradle.kts`
+forces `kotlin-build-tools-impl` on that one configuration to the `kotlin`
+version from `gradle/libs.versions.toml`. `strictly` is still satisfied because
+that version lies inside the declared range, and the rest of the classpath is
+transitive through `-impl` and follows it back down to the same version.
+
+> If a Kotlin upgrade ever moves the catalog version outside the range KGP
+> declares, resolution fails loudly rather than silently floating — check the
+> range in the KGP release and widen the pin deliberately.
 
 ## Known gaps / future work
 

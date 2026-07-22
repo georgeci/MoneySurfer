@@ -112,6 +112,8 @@ class UserAccountDeletionRepositoryImpl(
             "invites",
             "budgets",
             "recurringRules",
+            "goalContributions",
+            "goals",
         )
     }
 }

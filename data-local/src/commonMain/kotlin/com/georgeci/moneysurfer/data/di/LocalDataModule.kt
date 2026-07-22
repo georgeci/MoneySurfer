@@ -4,6 +4,8 @@ import com.georgeci.moneysurfer.data.db.MoneySurferDatabase
 import com.georgeci.moneysurfer.data.db.dao.AccountDao
 import com.georgeci.moneysurfer.data.db.dao.BudgetDao
 import com.georgeci.moneysurfer.data.db.dao.CategoryDao
+import com.georgeci.moneysurfer.data.db.dao.GoalContributionDao
+import com.georgeci.moneysurfer.data.db.dao.GoalDao
 import com.georgeci.moneysurfer.data.db.dao.RecurringRuleDao
 import com.georgeci.moneysurfer.data.db.dao.TransactionDao
 import com.georgeci.moneysurfer.data.db.dao.UserDao
@@ -44,4 +46,10 @@ class LocalDataModule {
 
     @Single
     fun recurringRuleDao(database: MoneySurferDatabase): RecurringRuleDao = database.recurringRuleDao()
+
+    @Single
+    fun goalDao(database: MoneySurferDatabase): GoalDao = database.goalDao()
+
+    @Single
+    fun goalContributionDao(database: MoneySurferDatabase): GoalContributionDao = database.goalContributionDao()
 }

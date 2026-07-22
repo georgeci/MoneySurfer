@@ -25,6 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.georgeci.moneysurfer.domain.primitives.AccountId
+import com.georgeci.moneysurfer.domain.primitives.GoalId
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.uikit.components.SurferEmptyState
 import com.georgeci.moneysurfer.uikit.components.SurferSkeleton
@@ -39,6 +40,8 @@ import com.georgeci.moneysurfer.uikit.widgets.LocalSurferWidgetSize
 import com.georgeci.moneysurfer.uikit.widgets.SurferAccountItem
 import com.georgeci.moneysurfer.uikit.widgets.SurferAccountsWidget
 import com.georgeci.moneysurfer.uikit.widgets.SurferBalanceWidget
+import com.georgeci.moneysurfer.uikit.widgets.SurferGoalItem
+import com.georgeci.moneysurfer.uikit.widgets.SurferGoalsWidget
 import com.georgeci.moneysurfer.uikit.widgets.SurferRecentTransactionItem
 import com.georgeci.moneysurfer.uikit.widgets.SurferRecentTransactionsWidget
 import com.georgeci.moneysurfer.uikit.widgets.SurferWidgetSize
@@ -51,6 +54,10 @@ import moneysurfer.feature.dashboard.generated.resources.dashboard_add_account_n
 import moneysurfer.feature.dashboard.generated.resources.dashboard_add_transaction
 import moneysurfer.feature.dashboard.generated.resources.dashboard_balance_empty_text
 import moneysurfer.feature.dashboard.generated.resources.dashboard_balance_title
+import moneysurfer.feature.dashboard.generated.resources.dashboard_goals_empty_subtitle
+import moneysurfer.feature.dashboard.generated.resources.dashboard_goals_empty_title
+import moneysurfer.feature.dashboard.generated.resources.dashboard_goals_see_all
+import moneysurfer.feature.dashboard.generated.resources.dashboard_goals_title
 import moneysurfer.feature.dashboard.generated.resources.dashboard_recent_empty_subtitle
 import moneysurfer.feature.dashboard.generated.resources.dashboard_recent_empty_title
 import moneysurfer.feature.dashboard.generated.resources.dashboard_recent_see_all
@@ -78,6 +85,8 @@ fun DashboardScreen(
     onNavigateToTransactionDetails: (TransactionId) -> Unit,
     onNavigateToSettings: () -> Unit,
     onNavigateToTransactionsList: () -> Unit,
+    onNavigateToGoals: () -> Unit,
+    onNavigateToGoalDetails: (GoalId) -> Unit,
     viewModel: DashboardViewModel = koinViewModel(),
 ) {
     val state by viewModel.collectAsStateWithLifecycle()
@@ -91,6 +100,8 @@ fun DashboardScreen(
             is DashboardEffect.NavigateToTransactionCreation -> onNavigateToTransactionCreation(effect.accountId)
             DashboardEffect.NavigateToSettings -> onNavigateToSettings()
             DashboardEffect.NavigateToTransactionsList -> onNavigateToTransactionsList()
+            DashboardEffect.NavigateToGoals -> onNavigateToGoals()
+            is DashboardEffect.NavigateToGoalDetails -> onNavigateToGoalDetails(effect.goalId)
         }
     }
 
@@ -229,6 +240,23 @@ private fun DashboardContent(
                 )
             }
 
+            item(key = "goals") {
+                SurferGoalsWidget(
+                    items = state.goals.map { it.toWidgetItem() },
+                    title = stringResource(Res.string.dashboard_goals_title),
+                    seeAllLabel = stringResource(Res.string.dashboard_goals_see_all),
+                    onSeeAllClick = { onEvent(DashboardEvent.OnSeeAllGoalsClick) },
+                    onItemClick = { item -> onEvent(DashboardEvent.OnGoalClick(GoalId(item.id))) },
+                    emptyTitle = stringResource(Res.string.dashboard_goals_empty_title),
+                    emptySubtitle = stringResource(Res.string.dashboard_goals_empty_subtitle),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                        .defaultMinSize(minHeight = DASHBOARD_WIDGET_MIN_HEIGHT)
+                        .padding(vertical = 8.dp),
+                )
+            }
+
             item(key = "recent") {
                 if (state.recentTransactionsEmpty) {
                     SurferEmptyState(
@@ -303,6 +331,16 @@ private fun AccountUi.toWidgetItem(): SurferAccountItem = SurferAccountItem(
     name = name,
     subtitle = currency,
     balance = formattedBalance,
+)
+
+/** The widget's caption line stays empty in v1 — the ETA copy ships with the forecast work. */
+private fun GoalUi.toWidgetItem(): SurferGoalItem = SurferGoalItem(
+    id = id.value,
+    name = name,
+    savedFormatted = formattedSaved,
+    targetFormatted = formattedTarget,
+    progress = progress,
+    captionLine = "",
 )
 
 private fun SurferAccountItem.accountId(): AccountId? =

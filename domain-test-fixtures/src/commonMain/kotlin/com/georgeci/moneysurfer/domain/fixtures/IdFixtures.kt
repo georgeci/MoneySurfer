@@ -3,6 +3,8 @@ package com.georgeci.moneysurfer.domain.fixtures
 import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.BudgetId
 import com.georgeci.moneysurfer.domain.primitives.CategoryId
+import com.georgeci.moneysurfer.domain.primitives.GoalContributionId
+import com.georgeci.moneysurfer.domain.primitives.GoalId
 import com.georgeci.moneysurfer.domain.primitives.RecurringRuleId
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.domain.primitives.UserId
@@ -20,6 +22,8 @@ fun accountId(value: String = "a-1"): AccountId = AccountId(value)
 fun categoryId(value: String = "c-1"): CategoryId = CategoryId(value)
 fun transactionId(value: String = "t-1"): TransactionId = TransactionId(value)
 fun budgetId(value: String = "b-1"): BudgetId = BudgetId(value)
+fun goalId(value: String = "g-1"): GoalId = GoalId(value)
+fun goalContributionId(value: String = "gc-1"): GoalContributionId = GoalContributionId(value)
 fun recurringRuleId(value: String = "r-1"): RecurringRuleId = RecurringRuleId(value)
 
 /** Sequential id generator — useful when a test needs N distinct ids of one type. */

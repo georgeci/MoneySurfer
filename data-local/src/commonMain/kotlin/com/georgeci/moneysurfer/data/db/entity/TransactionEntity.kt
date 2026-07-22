@@ -52,6 +52,11 @@ data class TransactionEntity(
     @ColumnInfo(name = "currencyCode") val currencyCode: String,
     @ColumnInfo(name = "categoryId") val categoryId: String?,
     @ColumnInfo(name = "note") val note: String,
+    @ColumnInfo(name = "merchant", defaultValue = "") val merchant: String = "",
+    // Tags live in one CSV column, matching BudgetEntity.categoryIds. See TransactionTags
+    // for why the list is embedded rather than normalized into a join table, and why a tag
+    // can never contain the separator.
+    @ColumnInfo(name = "tags", defaultValue = "") val tags: String = "",
     @ColumnInfo(name = "operationAt") val operationAt: Long,
     @ColumnInfo(name = "operationDate", defaultValue = "") val operationDate: String = "",
     @ColumnInfo(name = "type") val type: String,
@@ -59,4 +64,9 @@ data class TransactionEntity(
     @ColumnInfo(name = "createdAt", defaultValue = "0") val createdAt: Long = 0L,
     @ColumnInfo(name = "updatedAt", defaultValue = "0") val updatedAt: Long = 0L,
     @ColumnInfo(name = "transferId") val transferId: String? = null,
+    // No ForeignKey to recurring_rules and no index: the rules table is not synced yet, so a
+    // pulled transaction can name a rule this device has never seen — an FK would reject the
+    // row outright. An index would also be dead weight, since the "Recurring only" filter runs
+    // inside a workspace scan already served by the composite indices above.
+    @ColumnInfo(name = "recurringRuleId") val recurringRuleId: String? = null,
 )

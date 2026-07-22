@@ -26,13 +26,16 @@ interface TransactionDao {
             transactions.categoryId,
             categories.name AS categoryName,
             transactions.note,
+            transactions.merchant,
+            transactions.tags,
             transactions.operationAt,
             transactions.operationDate,
             transactions.createdAt,
             transactions.type,
             transactions.status,
             transactions.updatedAt,
-            transactions.transferId
+            transactions.transferId,
+            transactions.recurringRuleId
         FROM transactions
         LEFT JOIN categories ON categories.id = transactions.categoryId
         ORDER BY transactions.operationDate DESC, transactions.operationAt DESC, transactions.createdAt DESC
@@ -56,13 +59,16 @@ interface TransactionDao {
             transactions.categoryId,
             categories.name AS categoryName,
             transactions.note,
+            transactions.merchant,
+            transactions.tags,
             transactions.operationAt,
             transactions.operationDate,
             transactions.createdAt,
             transactions.type,
             transactions.status,
             transactions.updatedAt,
-            transactions.transferId
+            transactions.transferId,
+            transactions.recurringRuleId
         FROM transactions
         LEFT JOIN categories ON categories.id = transactions.categoryId
         WHERE transactions.accountId = :accountId
@@ -80,7 +86,10 @@ interface TransactionDao {
     suspend fun getById(id: String): TransactionEntity?
 
     /**
-     * Full-text search over notes within a workspace, newest first.
+     * Full-text search over notes and merchants within a workspace, newest first.
+     *
+     * A bare `MATCH` against the virtual table spans both indexed columns, so this needs no
+     * per-column syntax — see [com.georgeci.moneysurfer.data.db.entity.TransactionFtsEntity].
      *
      * [query] is raw FTS4 MATCH syntax, never user input — build it with
      * [com.georgeci.moneysurfer.data.db.FtsQuery.fromUserInput], which escapes
@@ -94,7 +103,7 @@ interface TransactionDao {
         ORDER BY transactions.operationDate DESC, transactions.operationAt DESC, transactions.createdAt DESC
         """,
     )
-    fun searchByNote(workspaceId: String, query: String): Flow<List<TransactionEntity>>
+    fun searchByText(workspaceId: String, query: String): Flow<List<TransactionEntity>>
 
     @Insert
     suspend fun insert(entity: TransactionEntity)

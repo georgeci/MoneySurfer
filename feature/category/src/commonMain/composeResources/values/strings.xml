@@ -22,14 +22,8 @@
     <string name="category_creation_name_counter">%1$d/%2$d</string>
     <string name="category_creation_icon_label">Icon</string>
     <string name="category_creation_color_label">Color</string>
-    <string name="category_creation_extra_label">Extra details</string>
-    <string name="category_creation_extra_optional">Optional</string>
-    <string name="category_creation_add_another">Add another</string>
-    <string name="category_creation_field_cap">Monthly cap</string>
-    <string name="category_creation_field_cap_helper">You'll get a nudge when spending hits 80%.</string>
     <string name="category_creation_field_parent">Parent category</string>
-    <string name="category_creation_field_note">Note</string>
-    <string name="category_creation_remove">Remove</string>
+    <string name="category_creation_parent_none">None</string>
     <string name="category_creation_untitled">Untitled category</string>
 
     <!-- Categories management screen -->
@@ -39,6 +33,7 @@
     <string name="categories_manage_remove">Delete</string>
     <string name="categories_manage_delete_title">Delete category?</string>
     <string name="categories_manage_delete_message">"%1$s" will be removed. Transactions using it won\'t be deleted.</string>
+    <string name="categories_manage_delete_children">Its %1$d subcategories will move to the top level.</string>
     <string name="categories_manage_delete_confirm">Delete</string>
     <string name="categories_manage_delete_cancel">Cancel</string>
 
