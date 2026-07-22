@@ -5,11 +5,13 @@ import com.georgeci.moneysurfer.data.db.entity.CategorizedTransactionEntity
 import com.georgeci.moneysurfer.data.db.entity.TransactionEntity
 import com.georgeci.moneysurfer.domain.model.CategorizedTransaction
 import com.georgeci.moneysurfer.domain.model.Transaction
+import com.georgeci.moneysurfer.domain.model.TransactionTags
 import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.CategoryId
 import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
 import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
 import com.georgeci.moneysurfer.domain.primitives.Money
+import com.georgeci.moneysurfer.domain.primitives.RecurringRuleId
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.domain.primitives.TransactionStatus
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
@@ -96,6 +98,8 @@ class TransactionRepositoryImpl(
         currencyCode = CurrencyCode(currencyCode),
         categoryId = categoryId?.let(::CategoryId),
         note = note,
+        merchant = merchant,
+        tags = tags.parseCsvColumn(),
         operationAt = timeFormatter.parseInstant(operationAt),
         operationDate = resolveOperationDate(operationDate, operationAt),
         type = parseType(type, amount),
@@ -103,6 +107,7 @@ class TransactionRepositoryImpl(
         createdAt = timeFormatter.parseInstant(createdAt),
         updatedAt = timeFormatter.parseInstant(updatedAt),
         transferId = transferId?.let(::TransferId),
+        recurringRuleId = recurringRuleId?.let(::RecurringRuleId),
     )
 
     // Re-projects the flat categorized row onto [TransactionEntity] so the domain
@@ -116,6 +121,8 @@ class TransactionRepositoryImpl(
             currencyCode = currencyCode,
             categoryId = categoryId,
             note = note,
+            merchant = merchant,
+            tags = tags,
             operationAt = operationAt,
             operationDate = operationDate,
             type = type,
@@ -123,6 +130,7 @@ class TransactionRepositoryImpl(
             createdAt = createdAt,
             updatedAt = updatedAt,
             transferId = transferId,
+            recurringRuleId = recurringRuleId,
         ).toDomain(),
         categoryName = categoryName,
     )
@@ -138,6 +146,10 @@ class TransactionRepositoryImpl(
         currencyCode = currencyCode.value,
         categoryId = categoryId?.value,
         note = note,
+        merchant = merchant,
+        // Normalized here rather than trusted from the caller: this is the last point before
+        // the CSV column, and a tag carrying the separator would come back as two tags.
+        tags = TransactionTags.normalize(tags).toCsvColumn(),
         operationAt = timeFormatter.formatInstant(operationAt),
         operationDate = timeFormatter.formatLocalDate(operationDate),
         type = type.name,
@@ -145,6 +157,7 @@ class TransactionRepositoryImpl(
         createdAt = timeFormatter.formatInstant(createdAt),
         updatedAt = timeFormatter.formatInstant(updatedAt),
         transferId = transferId?.value,
+        recurringRuleId = recurringRuleId?.value,
     )
 }
 

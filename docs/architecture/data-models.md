@@ -215,18 +215,44 @@ Field name unified: was `addedAt` in Firestore; now `createdAt` everywhere.
 | `money` (`amount`) | `Money` | `Long` (col `amount`) | `Long` (col `amount`) |
 | `currencyCode` | `CurrencyCode` | `String` | `String` |
 | `note` | `String` | `String` | `String` |
+| `merchant` | `String` | `String` | `String` |
+| `tags` | `List<String>` | `String` (CSV col) | `List<String>` |
 | `operationAt` | `Instant` | `Long` | `Long` |
 | `operationDate` | `LocalDate` | `String` (ISO-8601) | `String` (ISO-8601) |
 | `type` | `TransactionType` | `String` | `String` |
 | `status` | `TransactionStatus` | `String` | `String` |
 | `createdAt` | `Instant` | `Long` | `Long` |
 | `updatedAt` | `Instant` | `Long` | `Long` |
+| `transferId` | `TransferId?` | `String?` | `String?` |
+| `recurringRuleId` | `RecurringRuleId?` | `String?` | `String?` |
 | `deletedAt` | — | — | `Long?` |
 | `clientVersionCode` | — | — | `Int` |
 
 UI grouping is by `operationDate`. Sort within a group:
 `(operationDate DESC, operationAt DESC, createdAt DESC)`. `createdAt` is the
 stable tiebreaker for entries with identical `operationAt`.
+
+Detail fields (issue #260):
+
+- `merchant` — who the money went to, kept apart from `note` so both can be
+  shown and searched. Indexed in `transactions_fts` alongside `note`, so one
+  `MATCH` covers either.
+- `tags` — an embedded list in one CSV column, same shape as
+  `Budget.categoryIds`. Not a join table: tags have no identity of their own
+  yet (nothing renames, merges or counts them across transactions). Normalize
+  through `TransactionTags.normalize` before storing — a tag carrying the
+  separator would otherwise read back as two.
+- `recurringRuleId` — a link to `RecurringRule`, deliberately not an
+  `isRecurring` boolean, which would be a second copy of a fact the rule
+  already owns. Not a Room FK: `recurring_rules` is not synced yet, so a
+  pulled transaction can name a rule this device has never seen.
+- `reference` (`TX-8A13`) is **derived**, not stored — see
+  `TransactionReference.kt`. It is a display label, not a key. A
+  bank-supplied reference surviving a statement import would be a separate,
+  stored field.
+- Receipt attachments are **out of scope** for this model. Attachment storage
+  is its own epic (blob storage, quotas, offline cache); no boolean stands in
+  for it here.
 
 ### `workspaces/{wid}/budgets/{bid}` — **Budget**
 
