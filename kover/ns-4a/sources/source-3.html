@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > WorkspaceSyncer</title>
+  <title>MoneySurfer Coverage Report > ColorKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,22 +19,70 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.domain.repositories</a>
+    <a href="../index.html">com.georgeci.moneysurfer.uikit.theme</a>
 </div>
 
-<h1>Coverage Summary for Class: WorkspaceSyncer (com.georgeci.moneysurfer.domain.repositories)</h1>
+<h1>Coverage Summary for Class: ColorKt (com.georgeci.moneysurfer.uikit.theme)</h1>
 
 <table class="coverageStats">
 <tr>
   <th class="name">Class</th>
 <th class="coverageStat 
 ">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
   Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
 </th>
 </tr>
 <tr>
-  <td class="name">WorkspaceSyncer</td>
+  <td class="name">ColorKt</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
     <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (60/60)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (282/282)
+  </span>
+</td>
 </tr>
 
 </table>
@@ -44,33 +92,75 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.repositories
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.theme
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
+&nbsp;import androidx.compose.material3.darkColorScheme
+&nbsp;import androidx.compose.material3.lightColorScheme
+&nbsp;import com.georgeci.moneysurfer.uikit.tokens.AppColors
 &nbsp;
-&nbsp;/**
-&nbsp; * Triggers sync operations without exposing the sync infrastructure to domain use cases.
-&nbsp; *
-&nbsp; * [pushAll] drains the outbox (push-only, no remote discovery).
-&nbsp; * [syncAll] fetches the authoritative workspace list from the remote user doc and
-&nbsp; * runs a full cursor-based pull for every workspace — including ones not yet local.
-&nbsp; * [syncWorkspace] pulls a single specific workspace; used after accepting an invite so
-&nbsp; * only the newly joined workspace is hydrated without re-syncing everything.
-&nbsp; */
-&nbsp;interface WorkspaceSyncer {
-&nbsp;    /** Push all pending outbox mutations. Throws on error. */
-&nbsp;    suspend fun pushAll()
+<b class="fc">&nbsp;internal val LightColorScheme = lightColorScheme(</b>
+<b class="fc">&nbsp;    primary = AppColors.Primary,</b>
+<b class="fc">&nbsp;    onPrimary = AppColors.OnPrimary,</b>
+<b class="fc">&nbsp;    primaryContainer = AppColors.PrimaryContainer,</b>
+<b class="fc">&nbsp;    onPrimaryContainer = AppColors.OnPrimaryContainer,</b>
+<b class="fc">&nbsp;    secondary = AppColors.Secondary,</b>
+<b class="fc">&nbsp;    onSecondary = AppColors.OnSecondary,</b>
+<b class="fc">&nbsp;    secondaryContainer = AppColors.SecondaryContainer,</b>
+<b class="fc">&nbsp;    onSecondaryContainer = AppColors.OnSecondaryContainer,</b>
+<b class="fc">&nbsp;    tertiary = AppColors.Tertiary,</b>
+<b class="fc">&nbsp;    onTertiary = AppColors.OnTertiary,</b>
+<b class="fc">&nbsp;    tertiaryContainer = AppColors.TertiaryContainer,</b>
+<b class="fc">&nbsp;    onTertiaryContainer = AppColors.OnTertiaryContainer,</b>
+<b class="fc">&nbsp;    error = AppColors.Error,</b>
+<b class="fc">&nbsp;    onError = AppColors.OnError,</b>
+<b class="fc">&nbsp;    errorContainer = AppColors.ErrorContainer,</b>
+<b class="fc">&nbsp;    onErrorContainer = AppColors.OnErrorContainer,</b>
+<b class="fc">&nbsp;    background = AppColors.Background,</b>
+<b class="fc">&nbsp;    onBackground = AppColors.OnBackground,</b>
+<b class="fc">&nbsp;    surface = AppColors.Surface,</b>
+<b class="fc">&nbsp;    onSurface = AppColors.OnSurface,</b>
+<b class="fc">&nbsp;    surfaceVariant = AppColors.SurfaceVariant,</b>
+<b class="fc">&nbsp;    onSurfaceVariant = AppColors.OnSurfaceVariant,</b>
+<b class="fc">&nbsp;    surfaceTint = AppColors.SurfaceTint,</b>
+<b class="fc">&nbsp;    outline = AppColors.Outline,</b>
+<b class="fc">&nbsp;    outlineVariant = AppColors.OutlineVariant,</b>
+<b class="fc">&nbsp;    inverseSurface = AppColors.InverseSurface,</b>
+<b class="fc">&nbsp;    inverseOnSurface = AppColors.InverseOnSurface,</b>
+<b class="fc">&nbsp;    inversePrimary = AppColors.InversePrimary,</b>
+<b class="fc">&nbsp;    scrim = AppColors.Scrim,</b>
+&nbsp;)
 &nbsp;
-&nbsp;    /** Push outbox + pull all user workspaces (including undiscovered ones). Throws on error. */
-&nbsp;    suspend fun syncAll()
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Push outbox + pull a single workspace by [workspaceId].
-&nbsp;     * Sets the active workspace to [workspaceId] for the duration of the sync so
-&nbsp;     * [SyncScope.ActiveWorkspace] targets the correct workspace.
-&nbsp;     */
-&nbsp;    suspend fun syncWorkspace(workspaceId: WorkspaceId)
-&nbsp;}
+<b class="fc">&nbsp;internal val DarkColorScheme = darkColorScheme(</b>
+<b class="fc">&nbsp;    primary = AppColors.Dark.Primary,</b>
+<b class="fc">&nbsp;    onPrimary = AppColors.Dark.OnPrimary,</b>
+<b class="fc">&nbsp;    primaryContainer = AppColors.Dark.PrimaryContainer,</b>
+<b class="fc">&nbsp;    onPrimaryContainer = AppColors.Dark.OnPrimaryContainer,</b>
+<b class="fc">&nbsp;    secondary = AppColors.Dark.Secondary,</b>
+<b class="fc">&nbsp;    onSecondary = AppColors.Dark.OnSecondary,</b>
+<b class="fc">&nbsp;    secondaryContainer = AppColors.Dark.SecondaryContainer,</b>
+<b class="fc">&nbsp;    onSecondaryContainer = AppColors.Dark.OnSecondaryContainer,</b>
+<b class="fc">&nbsp;    tertiary = AppColors.Dark.Tertiary,</b>
+<b class="fc">&nbsp;    onTertiary = AppColors.Dark.OnTertiary,</b>
+<b class="fc">&nbsp;    tertiaryContainer = AppColors.Dark.TertiaryContainer,</b>
+<b class="fc">&nbsp;    onTertiaryContainer = AppColors.Dark.OnTertiaryContainer,</b>
+<b class="fc">&nbsp;    error = AppColors.Dark.Error,</b>
+<b class="fc">&nbsp;    onError = AppColors.Dark.OnError,</b>
+<b class="fc">&nbsp;    errorContainer = AppColors.Dark.ErrorContainer,</b>
+<b class="fc">&nbsp;    onErrorContainer = AppColors.Dark.OnErrorContainer,</b>
+<b class="fc">&nbsp;    background = AppColors.Dark.Background,</b>
+<b class="fc">&nbsp;    onBackground = AppColors.Dark.OnBackground,</b>
+<b class="fc">&nbsp;    surface = AppColors.Dark.Surface,</b>
+<b class="fc">&nbsp;    onSurface = AppColors.Dark.OnSurface,</b>
+<b class="fc">&nbsp;    surfaceVariant = AppColors.Dark.SurfaceVariant,</b>
+<b class="fc">&nbsp;    onSurfaceVariant = AppColors.Dark.OnSurfaceVariant,</b>
+<b class="fc">&nbsp;    surfaceTint = AppColors.Dark.SurfaceTint,</b>
+<b class="fc">&nbsp;    outline = AppColors.Dark.Outline,</b>
+<b class="fc">&nbsp;    outlineVariant = AppColors.Dark.OutlineVariant,</b>
+<b class="fc">&nbsp;    inverseSurface = AppColors.Dark.InverseSurface,</b>
+<b class="fc">&nbsp;    inverseOnSurface = AppColors.Dark.InverseOnSurface,</b>
+<b class="fc">&nbsp;    inversePrimary = AppColors.Dark.InversePrimary,</b>
+<b class="fc">&nbsp;    scrim = AppColors.Dark.Scrim,</b>
+&nbsp;)
 </code>
 </pre>
 </div>
@@ -94,7 +184,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 16:22</div>
+    <div style="float:right;">generated on 2026-07-22 20:32</div>
 </div>
 </body>
 </html>

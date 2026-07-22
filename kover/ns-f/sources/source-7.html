@@ -322,13 +322,11 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    )
 &nbsp;}
 &nbsp;
-&nbsp;private fun String.parseCategoryIds(): List&lt;CategoryId&gt; {
-&nbsp;    if (isBlank()) return emptyList()
-&nbsp;    return split(&#39;,&#39;).filter { it.isNotBlank() }.map(::CategoryId)
-&nbsp;}
+&nbsp;private fun String.parseCategoryIds(): List&lt;CategoryId&gt; =
+&nbsp;    parseCsvColumn().map(::CategoryId)
 &nbsp;
 &nbsp;private fun List&lt;CategoryId&gt;.toStorageValue(): String =
-&nbsp;    joinToString(&quot;,&quot;) { categoryId -&gt; categoryId.value }
+&nbsp;    map { categoryId -&gt; categoryId.value }.toCsvColumn()
 </code>
 </pre>
 </div>
@@ -352,7 +350,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 17:13</div>
+    <div style="float:right;">generated on 2026-07-22 20:32</div>
 </div>
 </body>
 </html>

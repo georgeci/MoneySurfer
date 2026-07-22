@@ -233,6 +233,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    val amount: Long = 0L,
 &nbsp;    val currencyCode: String = &quot;&quot;,
 &nbsp;    val note: String = &quot;&quot;,
+&nbsp;    val merchant: String = &quot;&quot;,
+&nbsp;    /**
+&nbsp;     * A real list on the wire even though Room stores it as a CSV column — same split as
+&nbsp;     * [BudgetDoc.categoryIds], and the mapper converts on the entity↔wire boundary.
+&nbsp;     */
+&nbsp;    val tags: List&lt;String&gt; = emptyList(),
 &nbsp;    val operationAt: Long = 0L,
 &nbsp;    val operationDate: String = &quot;&quot;,
 &nbsp;    val type: String = &quot;&quot;,
@@ -243,6 +249,8 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    val clientVersionCode: Int = 1,
 &nbsp;    /** Shared id linking the two legs of a transfer. Null for non-transfer rows. */
 &nbsp;    val transferId: String? = null,
+&nbsp;    /** Rule that generated this row. Null for manual entries. */
+&nbsp;    val recurringRuleId: String? = null,
 &nbsp;)
 &nbsp;
 &nbsp;/**
@@ -382,7 +390,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 17:13</div>
+    <div style="float:right;">generated on 2026-07-22 20:32</div>
 </div>
 </body>
 </html>

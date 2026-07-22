@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > ComposableSingletons</title>
+  <title>MoneySurfer Coverage Report > ApplicationScope</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,15 +19,18 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.uikit.atom</a>
+    <a href="../index.html">com.georgeci.moneysurfer.sync.runtime</a>
 </div>
 
-<h1>Coverage Summary for Class: ComposableSingletons (com.georgeci.moneysurfer.uikit.atom)</h1>
+<h1>Coverage Summary for Class: ApplicationScope (com.georgeci.moneysurfer.sync.runtime)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -45,124 +48,73 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   Instruction, %
 </th>
 </tr>
-  <tr>
-    <td class="name">ComposableSingletons$SurferActionCardKt</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/5)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/17)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/224)
-  </span>
-</td>
-  </tr>
-  <tr>
-    <td class="name">ComposableSingletons$SurferCardKt</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/7)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/12)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/81)
-  </span>
-</td>
-  </tr>
-  <tr>
-    <td class="name">ComposableSingletons$SurferContainerKt</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/12)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/45)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/435)
-  </span>
-</td>
-  </tr>
 <tr>
-  <td class="name"><strong>Total</strong></td>
+  <td class="name">ApplicationScope</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/24)
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
   </span>
 </td>
     <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/74)
+    (2/2)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/740)
+    (14/14)
   </span>
 </td>
 </tr>
+
 </table>
 
 <br/>
 <br/>
 
-  <code class="sourceCode">Source code is not available<br /></code>
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.sync.runtime
+&nbsp;
+&nbsp;import kotlinx.coroutines.CoroutineScope
+&nbsp;import kotlinx.coroutines.Dispatchers
+&nbsp;import kotlinx.coroutines.SupervisorJob
+&nbsp;import org.koin.core.annotation.Single
+&nbsp;
+&nbsp;/**
+&nbsp; * Process-bound coroutine scope for the sync subsystem. Lives for the lifetime
+&nbsp; * of the app process, never cancelled in the normal flow.
+&nbsp; *
+&nbsp; * Uses [SupervisorJob] so a failure in one child does not cancel sibling
+&nbsp; * collectors of `state` / `lastOutcome`.
+&nbsp; *
+&nbsp; * Tests substitute this via constructor injection (pass a `TestScope` as `delegate`).
+&nbsp; * See SyncCoordinatorFAQ.md №17.
+&nbsp; */
+<b class="fc">&nbsp;@Single</b>
+&nbsp;class ApplicationScope(
+<b class="fc">&nbsp;    private val delegate: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default),</b>
+&nbsp;) : CoroutineScope by delegate
+</code>
+</pre>
 </div>
 
 <script type="text/javascript">
@@ -184,7 +136,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 17:13</div>
+    <div style="float:right;">generated on 2026-07-22 20:32</div>
 </div>
 </body>
 </html>

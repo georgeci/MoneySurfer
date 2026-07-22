@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > ActualResourceCollectorsKt</title>
+  <title>MoneySurfer Coverage Report > SurferSafeInsetsKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">moneysurfer.feature.login.generated.resources</a>
+    <a href="../index.html">com.georgeci.moneysurfer.uikit.modifier</a>
 </div>
 
-<h1>Coverage Summary for Class: ActualResourceCollectorsKt (moneysurfer.feature.login.generated.resources)</h1>
+<h1>Coverage Summary for Class: SurferSafeInsetsKt (com.georgeci.moneysurfer.uikit.modifier)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">ActualResourceCollectorsKt</td>
+  <td class="name">SurferSafeInsetsKt</td>
 <td class="coverageStat">
   <span class="percent">
     0%
@@ -63,7 +63,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/10)
+    (0/1)
   </span>
 </td>
     <td class="coverageStat"/>
@@ -72,7 +72,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/16)
+    (0/3)
   </span>
 </td>
 <td class="coverageStat">
@@ -80,7 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/72)
+    (0/27)
   </span>
 </td>
 </tr>
@@ -92,44 +92,22 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;@file:OptIn(org.jetbrains.compose.resources.InternalResourceApi::class)
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.modifier
 &nbsp;
-&nbsp;package moneysurfer.feature.login.generated.resources
+&nbsp;import androidx.compose.foundation.layout.WindowInsets
+&nbsp;import androidx.compose.foundation.layout.WindowInsetsSides
+&nbsp;import androidx.compose.foundation.layout.only
+&nbsp;import androidx.compose.foundation.layout.safeDrawing
+&nbsp;import androidx.compose.foundation.layout.windowInsetsPadding
+&nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.ui.Modifier
 &nbsp;
-&nbsp;import kotlin.OptIn
-&nbsp;import kotlin.String
-&nbsp;import kotlin.collections.Map
-&nbsp;import org.jetbrains.compose.resources.DrawableResource
-&nbsp;import org.jetbrains.compose.resources.FontResource
-&nbsp;import org.jetbrains.compose.resources.PluralStringResource
-&nbsp;import org.jetbrains.compose.resources.StringArrayResource
-&nbsp;import org.jetbrains.compose.resources.StringResource
-&nbsp;
-<b class="nc">&nbsp;internal actual val Res.allDrawableResources: Map&lt;String, DrawableResource&gt; by lazy {</b>
-<b class="nc">&nbsp;  val map = mutableMapOf&lt;String, DrawableResource&gt;()</b>
-<b class="nc">&nbsp;  return@lazy map</b>
-&nbsp;}
-&nbsp;
-<b class="nc">&nbsp;internal actual val Res.allStringResources: Map&lt;String, StringResource&gt; by lazy {</b>
-<b class="nc">&nbsp;  val map = mutableMapOf&lt;String, StringResource&gt;()</b>
-<b class="nc">&nbsp;  _collectCommonMainString0Resources(map)</b>
-<b class="nc">&nbsp;  return@lazy map</b>
-&nbsp;}
-&nbsp;
-<b class="nc">&nbsp;internal actual val Res.allStringArrayResources: Map&lt;String, StringArrayResource&gt; by lazy {</b>
-<b class="nc">&nbsp;  val map = mutableMapOf&lt;String, StringArrayResource&gt;()</b>
-<b class="nc">&nbsp;  return@lazy map</b>
-&nbsp;}
-&nbsp;
-<b class="nc">&nbsp;internal actual val Res.allPluralStringResources: Map&lt;String, PluralStringResource&gt; by lazy {</b>
-<b class="nc">&nbsp;  val map = mutableMapOf&lt;String, PluralStringResource&gt;()</b>
-<b class="nc">&nbsp;  return@lazy map</b>
-&nbsp;}
-&nbsp;
-<b class="nc">&nbsp;internal actual val Res.allFontResources: Map&lt;String, FontResource&gt; by lazy {</b>
-<b class="nc">&nbsp;  val map = mutableMapOf&lt;String, FontResource&gt;()</b>
-<b class="nc">&nbsp;  return@lazy map</b>
-&nbsp;}
+&nbsp;@Composable
+<b class="nc">&nbsp;fun Modifier.surferSafeInsets(): Modifier = windowInsetsPadding(</b>
+<b class="nc">&nbsp;    WindowInsets.safeDrawing.only(</b>
+<b class="nc">&nbsp;        WindowInsetsSides.Top + WindowInsetsSides.Horizontal,</b>
+&nbsp;    ),
+&nbsp;)
 </code>
 </pre>
 </div>
@@ -153,7 +131,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 17:13</div>
+    <div style="float:right;">generated on 2026-07-22 20:32</div>
 </div>
 </body>
 </html>

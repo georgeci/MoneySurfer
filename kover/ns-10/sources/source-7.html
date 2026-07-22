@@ -60,34 +60,34 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    22.2%
+    33.3%
   </span>
   <span class="absValue">
-    (4/18)
+    (6/18)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    37.5%
+    50%
   </span>
   <span class="absValue">
-    (6/16)
+    (8/16)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    21.8%
+    38.9%
   </span>
   <span class="absValue">
-    (44/202)
+    (81/208)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    23.9%
+    42.1%
   </span>
   <span class="absValue">
-    (171/716)
+    (340/808)
   </span>
 </td>
 </tr>
@@ -119,6 +119,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.data.remote.WorkspaceDoc
 &nbsp;import com.georgeci.moneysurfer.data.remote.WorkspaceInviteDoc
 &nbsp;import com.georgeci.moneysurfer.data.remote.WorkspaceMemberDoc
+&nbsp;import com.georgeci.moneysurfer.domain.model.TransactionTags
 &nbsp;import kotlinx.datetime.TimeZone
 &nbsp;import kotlinx.datetime.toLocalDateTime
 &nbsp;import kotlin.time.Instant
@@ -233,19 +234,23 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="nc">&nbsp;    updatedAt = updatedAt,</b>
 &nbsp;)
 &nbsp;
-<b class="nc">&nbsp;fun TransactionEntity.toDoc(): TransactionDoc = TransactionDoc(</b>
-<b class="nc">&nbsp;    accountId = accountId,</b>
-<b class="nc">&nbsp;    categoryId = categoryId,</b>
-<b class="nc">&nbsp;    amount = amount,</b>
-<b class="nc">&nbsp;    currencyCode = currencyCode,</b>
-<b class="nc">&nbsp;    note = note,</b>
-<b class="nc">&nbsp;    operationAt = operationAt,</b>
-<b class="nc">&nbsp;    operationDate = operationDate,</b>
-<b class="nc">&nbsp;    type = type,</b>
-<b class="nc">&nbsp;    status = status,</b>
-<b class="nc">&nbsp;    createdAt = createdAt,</b>
-<b class="nc">&nbsp;    updatedAt = updatedAt,</b>
-<b class="nc">&nbsp;    transferId = transferId,</b>
+<b class="fc">&nbsp;fun TransactionEntity.toDoc(): TransactionDoc = TransactionDoc(</b>
+<b class="fc">&nbsp;    accountId = accountId,</b>
+<b class="fc">&nbsp;    categoryId = categoryId,</b>
+<b class="fc">&nbsp;    amount = amount,</b>
+<b class="fc">&nbsp;    currencyCode = currencyCode,</b>
+<b class="fc">&nbsp;    note = note,</b>
+<b class="fc">&nbsp;    merchant = merchant,</b>
+&nbsp;    // Same CSV-column↔wire-list conversion as BudgetEntity.categoryIds above.
+<b class="fc">&nbsp;    tags = tags.split(&#39;,&#39;).filter { it.isNotBlank() },</b>
+<b class="fc">&nbsp;    operationAt = operationAt,</b>
+<b class="fc">&nbsp;    operationDate = operationDate,</b>
+<b class="fc">&nbsp;    type = type,</b>
+<b class="fc">&nbsp;    status = status,</b>
+<b class="fc">&nbsp;    createdAt = createdAt,</b>
+<b class="fc">&nbsp;    updatedAt = updatedAt,</b>
+<b class="fc">&nbsp;    transferId = transferId,</b>
+<b class="fc">&nbsp;    recurringRuleId = recurringRuleId,</b>
 &nbsp;)
 &nbsp;
 &nbsp;fun TransactionDoc.toEntity(id: String, workspaceId: String): TransactionEntity {
@@ -255,32 +260,37 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    //    same operationDate on every client (avoids cross-device divergence).
 &nbsp;    //  - createdAt may be 0L (older schema): fall back to operationAt or updatedAt
 &nbsp;    //    so audit ordering doesn&#39;t collapse to epoch zero.
-<b class="nc">&nbsp;    val resolvedOperationDate = operationDate.ifBlank {</b>
+<b class="pc">&nbsp;    val resolvedOperationDate = operationDate.ifBlank {</b>
 <b class="nc">&nbsp;        Instant.fromEpochMilliseconds(operationAt)</b>
 <b class="nc">&nbsp;            .toLocalDateTime(TimeZone.UTC)</b>
 <b class="nc">&nbsp;            .date</b>
 <b class="nc">&nbsp;            .toString()</b>
 &nbsp;    }
-<b class="nc">&nbsp;    val resolvedCreatedAt = if (createdAt == 0L) {</b>
+<b class="pc">&nbsp;    val resolvedCreatedAt = if (createdAt == 0L) {</b>
 <b class="nc">&nbsp;        if (operationAt != 0L) operationAt else updatedAt</b>
 &nbsp;    } else {
-<b class="nc">&nbsp;        createdAt</b>
+<b class="fc">&nbsp;        createdAt</b>
 &nbsp;    }
-<b class="nc">&nbsp;    return TransactionEntity(</b>
-<b class="nc">&nbsp;        id = id,</b>
-<b class="nc">&nbsp;        workspaceId = workspaceId,</b>
-<b class="nc">&nbsp;        accountId = accountId,</b>
-<b class="nc">&nbsp;        amount = amount,</b>
-<b class="nc">&nbsp;        currencyCode = currencyCode,</b>
-<b class="nc">&nbsp;        categoryId = categoryId,</b>
-<b class="nc">&nbsp;        note = note,</b>
-<b class="nc">&nbsp;        operationAt = operationAt,</b>
-<b class="nc">&nbsp;        operationDate = resolvedOperationDate,</b>
-<b class="nc">&nbsp;        type = type,</b>
-<b class="nc">&nbsp;        status = status,</b>
-<b class="nc">&nbsp;        createdAt = resolvedCreatedAt,</b>
-<b class="nc">&nbsp;        updatedAt = updatedAt,</b>
-<b class="nc">&nbsp;        transferId = transferId,</b>
+<b class="fc">&nbsp;    return TransactionEntity(</b>
+<b class="fc">&nbsp;        id = id,</b>
+<b class="fc">&nbsp;        workspaceId = workspaceId,</b>
+<b class="fc">&nbsp;        accountId = accountId,</b>
+<b class="fc">&nbsp;        amount = amount,</b>
+<b class="fc">&nbsp;        currencyCode = currencyCode,</b>
+<b class="fc">&nbsp;        categoryId = categoryId,</b>
+<b class="fc">&nbsp;        note = note,</b>
+<b class="fc">&nbsp;        merchant = merchant,</b>
+&nbsp;        // Normalized, not just joined: a remote tag carrying the CSV separator would come
+&nbsp;        // back from Room as two tags, and this doc may come from a client we do not control.
+<b class="fc">&nbsp;        tags = TransactionTags.normalize(tags).joinToString(&quot;,&quot;),</b>
+<b class="fc">&nbsp;        operationAt = operationAt,</b>
+<b class="fc">&nbsp;        operationDate = resolvedOperationDate,</b>
+<b class="fc">&nbsp;        type = type,</b>
+<b class="fc">&nbsp;        status = status,</b>
+<b class="fc">&nbsp;        createdAt = resolvedCreatedAt,</b>
+<b class="fc">&nbsp;        updatedAt = updatedAt,</b>
+<b class="fc">&nbsp;        transferId = transferId,</b>
+<b class="fc">&nbsp;        recurringRuleId = recurringRuleId,</b>
 &nbsp;    )
 &nbsp;}
 &nbsp;
@@ -416,7 +426,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 17:13</div>
+    <div style="float:right;">generated on 2026-07-22 20:32</div>
 </div>
 </body>
 </html>

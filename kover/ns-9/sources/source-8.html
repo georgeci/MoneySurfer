@@ -49,10 +49,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   <td class="name">UserDao_Impl</td>
 <td class="coverageStat">
   <span class="percent">
-    36.8%
+    47.4%
   </span>
   <span class="absValue">
-    (7/19)
+    (9/19)
   </span>
 </td>
 <td class="coverageStat">
@@ -65,18 +65,18 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    72.4%
+    75%
   </span>
   <span class="absValue">
-    (55/76)
+    (57/76)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    62.6%
+    67.8%
   </span>
   <span class="absValue">
-    (229/366)
+    (248/366)
   </span>
 </td>
 </tr>
@@ -119,34 +119,34 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <td class="name">UserDao_Impl$2</td>
 <td class="coverageStat">
   <span class="percent">
-    33.3%
+    100%
   </span>
   <span class="absValue">
-    (1/3)
+    (3/3)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    50%
   </span>
   <span class="absValue">
-    (0/2)
+    (1/2)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    11.1%
+    88.9%
   </span>
   <span class="absValue">
-    (1/9)
+    (8/9)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    6.7%
+    86.7%
   </span>
   <span class="absValue">
-    (2/30)
+    (26/30)
   </span>
 </td>
   </tr>
@@ -287,34 +287,34 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
-    42.9%
+    54.3%
   </span>
   <span class="absValue">
-    (15/35)
+    (19/35)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    33.3%
+    38.9%
   </span>
   <span class="absValue">
-    (6/18)
+    (7/18)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    54.8%
+    62.1%
   </span>
   <span class="absValue">
-    (68/124)
+    (77/124)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    50.1%
+    58.3%
   </span>
   <span class="absValue">
-    (264/527)
+    (307/527)
   </span>
 </td>
 </tr>
@@ -380,18 +380,18 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;      }
 &nbsp;    }
 <b class="fc">&nbsp;    this.__insertAdapterOfUserEntity_1 = object : EntityInsertAdapter&lt;UserEntity&gt;() {</b>
-<b class="nc">&nbsp;      protected override fun createQuery(): String = &quot;INSERT OR IGNORE INTO `users` (`id`,`displayName`,`isAnon`) VALUES (?,?,?)&quot;</b>
+<b class="fc">&nbsp;      protected override fun createQuery(): String = &quot;INSERT OR IGNORE INTO `users` (`id`,`displayName`,`isAnon`) VALUES (?,?,?)&quot;</b>
 &nbsp;
 &nbsp;      protected override fun bind(statement: SQLiteStatement, entity: UserEntity) {
-<b class="nc">&nbsp;        statement.bindText(1, entity.id)</b>
-<b class="nc">&nbsp;        val _tmpDisplayName: String? = entity.displayName</b>
-<b class="nc">&nbsp;        if (_tmpDisplayName == null) {</b>
-<b class="nc">&nbsp;          statement.bindNull(2)</b>
+<b class="fc">&nbsp;        statement.bindText(1, entity.id)</b>
+<b class="fc">&nbsp;        val _tmpDisplayName: String? = entity.displayName</b>
+<b class="pc">&nbsp;        if (_tmpDisplayName == null) {</b>
+<b class="fc">&nbsp;          statement.bindNull(2)</b>
 &nbsp;        } else {
 <b class="nc">&nbsp;          statement.bindText(2, _tmpDisplayName)</b>
 &nbsp;        }
-<b class="nc">&nbsp;        val _tmp: Int = if (entity.isAnon) 1 else 0</b>
-<b class="nc">&nbsp;        statement.bindLong(3, _tmp.toLong())</b>
+<b class="fc">&nbsp;        val _tmp: Int = if (entity.isAnon) 1 else 0</b>
+<b class="fc">&nbsp;        statement.bindLong(3, _tmp.toLong())</b>
 &nbsp;      }
 &nbsp;    }
 <b class="fc">&nbsp;    this.__updateAdapterOfUserEntity = object : EntityDeleteOrUpdateAdapter&lt;UserEntity&gt;() {</b>
@@ -450,8 +450,8 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="nc">&nbsp;    __insertAdapterOfUserEntity.insert(_connection, entities)</b>
 &nbsp;  }
 &nbsp;
-<b class="nc">&nbsp;  public override suspend fun insertIgnore(entity: UserEntity): Unit = performSuspending(__db, false, true) { _connection -&gt;</b>
-<b class="nc">&nbsp;    __insertAdapterOfUserEntity_1.insert(_connection, entity)</b>
+<b class="fc">&nbsp;  public override suspend fun insertIgnore(entity: UserEntity): Unit = performSuspending(__db, false, true) { _connection -&gt;</b>
+<b class="fc">&nbsp;    __insertAdapterOfUserEntity_1.insert(_connection, entity)</b>
 &nbsp;  }
 &nbsp;
 <b class="nc">&nbsp;  public override suspend fun update(entity: UserEntity): Unit = performSuspending(__db, false, true) { _connection -&gt;</b>
@@ -583,7 +583,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 17:13</div>
+    <div style="float:right;">generated on 2026-07-22 20:32</div>
 </div>
 </body>
 </html>

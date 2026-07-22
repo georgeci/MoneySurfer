@@ -52,35 +52,35 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   <td class="name">CategoryEntity</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/2)
+    (2/2)
   </span>
 </td>
     <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/12)
+    (12/12)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/60)
+    (60/60)
   </span>
 </td>
 </tr>
@@ -100,7 +100,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import androidx.room.Index
 &nbsp;import androidx.room.PrimaryKey
 &nbsp;
-<b class="nc">&nbsp;@Entity(</b>
+<b class="fc">&nbsp;@Entity(</b>
 &nbsp;    tableName = &quot;categories&quot;,
 &nbsp;    foreignKeys = [
 &nbsp;        ForeignKey(
@@ -117,23 +117,23 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    indices = [Index(&quot;workspaceId&quot;), Index(&quot;parentId&quot;)],
 &nbsp;)
 &nbsp;data class CategoryEntity(
-<b class="nc">&nbsp;    @PrimaryKey</b>
-<b class="nc">&nbsp;    @ColumnInfo(name = &quot;id&quot;) val id: String,</b>
-<b class="nc">&nbsp;    @ColumnInfo(name = &quot;workspaceId&quot;) val workspaceId: String,</b>
-<b class="nc">&nbsp;    @ColumnInfo(name = &quot;name&quot;) val name: String,</b>
-<b class="nc">&nbsp;    @ColumnInfo(name = &quot;type&quot;) val type: String,</b>
-<b class="nc">&nbsp;    @ColumnInfo(name = &quot;parentId&quot;) val parentId: String?,</b>
-<b class="nc">&nbsp;    @ColumnInfo(name = &quot;createdAt&quot;) val createdAt: Long,</b>
-<b class="nc">&nbsp;    @ColumnInfo(name = &quot;updatedAt&quot;, defaultValue = &quot;0&quot;) val updatedAt: Long = 0L,</b>
-<b class="nc">&nbsp;    @ColumnInfo(name = &quot;systemKind&quot;) val systemKind: String? = null,</b>
+<b class="fc">&nbsp;    @PrimaryKey</b>
+<b class="fc">&nbsp;    @ColumnInfo(name = &quot;id&quot;) val id: String,</b>
+<b class="fc">&nbsp;    @ColumnInfo(name = &quot;workspaceId&quot;) val workspaceId: String,</b>
+<b class="fc">&nbsp;    @ColumnInfo(name = &quot;name&quot;) val name: String,</b>
+<b class="fc">&nbsp;    @ColumnInfo(name = &quot;type&quot;) val type: String,</b>
+<b class="fc">&nbsp;    @ColumnInfo(name = &quot;parentId&quot;) val parentId: String?,</b>
+<b class="fc">&nbsp;    @ColumnInfo(name = &quot;createdAt&quot;) val createdAt: Long,</b>
+<b class="fc">&nbsp;    @ColumnInfo(name = &quot;updatedAt&quot;, defaultValue = &quot;0&quot;) val updatedAt: Long = 0L,</b>
+<b class="fc">&nbsp;    @ColumnInfo(name = &quot;systemKind&quot;) val systemKind: String? = null,</b>
 &nbsp;    /**
 &nbsp;     * Semantic icon key. Blank means &quot;never stored&quot; — a row added by the additive v26 backfill
 &nbsp;     * always carries a value, but a row pushed by an older client can still arrive empty, and
 &nbsp;     * the domain mapper resolves that back to the deterministic default.
 &nbsp;     */
-<b class="nc">&nbsp;    @ColumnInfo(name = &quot;iconKey&quot;, defaultValue = &quot;&#39;&#39;&quot;) val iconKey: String = &quot;&quot;,</b>
+<b class="fc">&nbsp;    @ColumnInfo(name = &quot;iconKey&quot;, defaultValue = &quot;&#39;&#39;&quot;) val iconKey: String = &quot;&quot;,</b>
 &nbsp;    /** Hue in degrees, 0 until 360. `-1` is the same &quot;never stored&quot; sentinel as a blank [iconKey]. */
-<b class="nc">&nbsp;    @ColumnInfo(name = &quot;hue&quot;, defaultValue = &quot;-1&quot;) val hue: Int = -1,</b>
+<b class="fc">&nbsp;    @ColumnInfo(name = &quot;hue&quot;, defaultValue = &quot;-1&quot;) val hue: Int = -1,</b>
 &nbsp;)
 </code>
 </pre>
@@ -158,7 +158,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 17:13</div>
+    <div style="float:right;">generated on 2026-07-22 20:32</div>
 </div>
 </body>
 </html>

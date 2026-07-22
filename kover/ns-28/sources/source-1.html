@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SyncDatabase</title>
+  <title>MoneySurfer Coverage Report > OfflineKoinApp</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.sync.db</a>
+    <a href="../index.html">com.georgeci.moneysurfer.offline.di</a>
 </div>
 
-<h1>Coverage Summary for Class: SyncDatabase (com.georgeci.moneysurfer.sync.db)</h1>
+<h1>Coverage Summary for Class: OfflineKoinApp (com.georgeci.moneysurfer.offline.di)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,38 +49,38 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SyncDatabase</td>
+  <td class="name">OfflineKoinApp</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
     <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/2)
+    (2/2)
   </span>
 </td>
 </tr>
@@ -92,36 +92,25 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.sync.db
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.offline.di
 &nbsp;
-&nbsp;import androidx.room.ConstructedBy
-&nbsp;import androidx.room.Database
-&nbsp;import androidx.room.RoomDatabase
-&nbsp;import androidx.room.RoomDatabaseConstructor
-&nbsp;import com.georgeci.moneysurfer.sync.db.dao.PendingMutationDao
-&nbsp;import com.georgeci.moneysurfer.sync.db.dao.SyncMetaDao
-&nbsp;import com.georgeci.moneysurfer.sync.db.entity.PendingMutationEntity
-&nbsp;import com.georgeci.moneysurfer.sync.db.entity.SyncMetaEntity
+&nbsp;import com.georgeci.moneysurfer.sync.noop.di.SyncNoOpModule
+&nbsp;import org.koin.core.annotation.KoinApplication
+&nbsp;import org.koin.core.annotation.Module
 &nbsp;
-<b class="nc">&nbsp;@Database(</b>
-&nbsp;    entities = [
-&nbsp;        SyncMetaEntity::class,
-&nbsp;        PendingMutationEntity::class,
+&nbsp;/**
+&nbsp; * Mirrors `:composeApp`&#39;s `OnlineKoinApp`: koin-compiler generates a `.module`
+&nbsp; * accessor only for `@KoinApplication`-annotated classes, so we need one
+&nbsp; * aggregator that pulls in every offline-only Koin module before they can be
+&nbsp; * layered on top of shared&#39;s `AppModule` graph.
+&nbsp; */
+<b class="fc">&nbsp;@KoinApplication</b>
+&nbsp;@Module(
+&nbsp;    includes = [
+&nbsp;        SyncNoOpModule::class,
 &nbsp;    ],
-&nbsp;    // v2: pending_mutations dropped the separate status / createdAt indices for one
-&nbsp;    // composite. Destructive fallback is fine here — the outbox is transient.
-&nbsp;    version = 2,
 &nbsp;)
-&nbsp;@ConstructedBy(SyncDatabaseConstructor::class)
-&nbsp;abstract class SyncDatabase : RoomDatabase() {
-&nbsp;    abstract fun syncMetaDao(): SyncMetaDao
-&nbsp;    abstract fun pendingMutationDao(): PendingMutationDao
-&nbsp;}
-&nbsp;
-&nbsp;@Suppress(&quot;KotlinNoActualForExpect&quot;)
-&nbsp;expect object SyncDatabaseConstructor : RoomDatabaseConstructor&lt;SyncDatabase&gt; {
-&nbsp;    override fun initialize(): SyncDatabase
-&nbsp;}
+&nbsp;class OfflineKoinApp
 </code>
 </pre>
 </div>
@@ -145,7 +134,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 17:13</div>
+    <div style="float:right;">generated on 2026-07-22 20:32</div>
 </div>
 </body>
 </html>

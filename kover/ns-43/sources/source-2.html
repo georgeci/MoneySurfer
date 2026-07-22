@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SurferTestTagAsId_androidKt</title>
+  <title>MoneySurfer Coverage Report > SurferCategoryCellKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.uikit.modifier</a>
+    <a href="../index.html">com.georgeci.moneysurfer.uikit.components.category</a>
 </div>
 
-<h1>Coverage Summary for Class: SurferTestTagAsId_androidKt (com.georgeci.moneysurfer.uikit.modifier)</h1>
+<h1>Coverage Summary for Class: SurferCategoryCellKt (com.georgeci.moneysurfer.uikit.components.category)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,38 +49,45 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SurferTestTagAsId_androidKt</td>
+  <td class="name">SurferCategoryCellKt</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    50%
   </span>
   <span class="absValue">
-    (0/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
+    (1/2)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    50%
   </span>
   <span class="absValue">
-    (0/10)
+    (9/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    91.9%
+  </span>
+  <span class="absValue">
+    (34/37)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    84.6%
+  </span>
+  <span class="absValue">
+    (368/435)
   </span>
 </td>
 </tr>
@@ -92,16 +99,114 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.modifier
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.components.category
 &nbsp;
-&nbsp;import androidx.compose.ui.ExperimentalComposeUiApi
+&nbsp;import androidx.compose.foundation.background
+&nbsp;import androidx.compose.foundation.clickable
+&nbsp;import androidx.compose.foundation.layout.Arrangement
+&nbsp;import androidx.compose.foundation.layout.Box
+&nbsp;import androidx.compose.foundation.layout.Column
+&nbsp;import androidx.compose.foundation.layout.Row
+&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
+&nbsp;import androidx.compose.foundation.layout.padding
+&nbsp;import androidx.compose.foundation.layout.size
+&nbsp;import androidx.compose.foundation.shape.CircleShape
+&nbsp;import androidx.compose.foundation.shape.RoundedCornerShape
+&nbsp;import androidx.compose.material3.Text
+&nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.ui.Alignment
 &nbsp;import androidx.compose.ui.Modifier
-&nbsp;import androidx.compose.ui.semantics.semantics
-&nbsp;import androidx.compose.ui.semantics.testTagsAsResourceId
+&nbsp;import androidx.compose.ui.draw.clip
+&nbsp;import androidx.compose.ui.graphics.Color
+&nbsp;import androidx.compose.ui.graphics.vector.ImageVector
+&nbsp;import androidx.compose.ui.text.style.TextAlign
+&nbsp;import androidx.compose.ui.text.style.TextOverflow
+&nbsp;import androidx.compose.ui.tooling.preview.Preview
+&nbsp;import androidx.compose.ui.unit.dp
+&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferCategoryBubble
+&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferCategoryPalette
+&nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+&nbsp;import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
+&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
 &nbsp;
-&nbsp;@OptIn(ExperimentalComposeUiApi::class)
-&nbsp;actual fun Modifier.surferTestTagAsId(): Modifier =
-<b class="nc">&nbsp;    semantics { testTagsAsResourceId = true }</b>
+&nbsp;/**
+&nbsp; * Grid cell for the category picker / creation screens. Renders a [SurferCategoryBubble] over
+&nbsp; * a centered label. Selection promotes the bubble&#39;s surrounding ring to the primary color and
+&nbsp; * tints the label with the secondaryContainer palette so the cell reads as the active choice.
+&nbsp; */
+&nbsp;@Composable
+&nbsp;fun SurferCategoryCell(
+&nbsp;    name: String,
+&nbsp;    icon: ImageVector,
+&nbsp;    tint: Color,
+&nbsp;    selected: Boolean,
+&nbsp;    onClick: () -&gt; Unit,
+<b class="fc">&nbsp;    modifier: Modifier = Modifier,</b>
+<b class="pc">&nbsp;) {</b>
+<b class="fc">&nbsp;    val bg = if (selected) AppTheme.materialColors.secondaryContainer else Color.Transparent</b>
+<b class="fc">&nbsp;    val labelColor = if (selected) {</b>
+<b class="fc">&nbsp;        AppTheme.materialColors.onSecondaryContainer</b>
+<b class="fc">&nbsp;    } else {</b>
+<b class="fc">&nbsp;        AppTheme.materialColors.onSurface</b>
+&nbsp;    }
+<b class="fc">&nbsp;    Column(</b>
+<b class="fc">&nbsp;        modifier = modifier</b>
+<b class="fc">&nbsp;            .fillMaxWidth()</b>
+<b class="fc">&nbsp;            .clip(RoundedCornerShape(14.dp))</b>
+<b class="fc">&nbsp;            .background(bg)</b>
+<b class="fc">&nbsp;            .clickable(onClick = onClick)</b>
+<b class="fc">&nbsp;            .padding(vertical = 8.dp),</b>
+<b class="fc">&nbsp;        horizontalAlignment = Alignment.CenterHorizontally,</b>
+<b class="fc">&nbsp;        verticalArrangement = Arrangement.spacedBy(6.dp),</b>
+&nbsp;    ) {
+<b class="fc">&nbsp;        Box(</b>
+<b class="fc">&nbsp;            modifier = Modifier</b>
+<b class="fc">&nbsp;                .size(48.dp)</b>
+<b class="fc">&nbsp;                .clip(CircleShape)</b>
+<b class="fc">&nbsp;                .background(if (selected) AppTheme.materialColors.primary else Color.Transparent),</b>
+<b class="fc">&nbsp;            contentAlignment = Alignment.Center,</b>
+&nbsp;        ) {
+<b class="fc">&nbsp;            SurferCategoryBubble(icon = icon, tint = tint, size = 44.dp)</b>
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;        Text(</b>
+<b class="fc">&nbsp;            text = name,</b>
+<b class="fc">&nbsp;            style = AppTheme.typography.labelMedium,</b>
+<b class="fc">&nbsp;            color = labelColor,</b>
+<b class="fc">&nbsp;            textAlign = TextAlign.Center,</b>
+<b class="fc">&nbsp;            maxLines = 1,</b>
+<b class="fc">&nbsp;            overflow = TextOverflow.Ellipsis,</b>
+<b class="fc">&nbsp;            modifier = Modifier.padding(horizontal = 2.dp),</b>
+&nbsp;        )
+<b class="fc">&nbsp;    }</b>
+<b class="fc">&nbsp;}</b>
+&nbsp;
+&nbsp;@Preview
+&nbsp;@Composable
+<b class="nc">&nbsp;private fun SurferCategoryCellPreview() {</b>
+<b class="nc">&nbsp;    SurferComponentPreview {</b>
+&nbsp;        Row(
+&nbsp;            modifier = Modifier.padding(16.dp),
+&nbsp;            horizontalArrangement = Arrangement.spacedBy(12.dp),
+&nbsp;        ) {
+&nbsp;            SurferCategoryCell(
+&nbsp;                name = &quot;Salary&quot;,
+&nbsp;                icon = SurferIcons.Cash,
+&nbsp;                tint = SurferCategoryPalette.tints[1],
+&nbsp;                selected = false,
+&nbsp;                onClick = {},
+&nbsp;                modifier = Modifier.size(width = 80.dp, height = 96.dp),
+&nbsp;            )
+&nbsp;            SurferCategoryCell(
+&nbsp;                name = &quot;Salary&quot;,
+&nbsp;                icon = SurferIcons.Cash,
+&nbsp;                tint = SurferCategoryPalette.tints[1],
+&nbsp;                selected = true,
+&nbsp;                onClick = {},
+&nbsp;                modifier = Modifier.size(width = 80.dp, height = 96.dp),
+&nbsp;            )
+&nbsp;        }
+&nbsp;    }
+<b class="nc">&nbsp;}</b>
 </code>
 </pre>
 </div>
@@ -125,7 +230,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 17:13</div>
+    <div style="float:right;">generated on 2026-07-22 20:32</div>
 </div>
 </body>
 </html>

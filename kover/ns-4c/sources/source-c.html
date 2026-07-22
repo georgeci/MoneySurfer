@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > ComGeorgeciMoneysurferDiOnlineTransactionCreationModuleModuleKt</title>
+  <title>MoneySurfer Coverage Report > SurferInsightTone</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,22 +19,70 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">org.koin.plugin.hints</a>
+    <a href="../index.html">com.georgeci.moneysurfer.uikit.widgets</a>
 </div>
 
-<h1>Coverage Summary for Class: ComGeorgeciMoneysurferDiOnlineTransactionCreationModuleModuleKt (org.koin.plugin.hints)</h1>
+<h1>Coverage Summary for Class: SurferInsightTone (com.georgeci.moneysurfer.uikit.widgets)</h1>
 
 <table class="coverageStats">
 <tr>
   <th class="name">Class</th>
 <th class="coverageStat 
 ">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
   Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
 </th>
 </tr>
 <tr>
-  <td class="name">ComGeorgeciMoneysurferDiOnlineTransactionCreationModuleModuleKt</td>
+  <td class="name">SurferInsightTone</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
     <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
 </tr>
 
 </table>
@@ -42,7 +90,201 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <br/>
 <br/>
 
-  <code class="sourceCode">Source code is not available<br /></code>
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.widgets
+&nbsp;
+&nbsp;import androidx.compose.foundation.background
+&nbsp;import androidx.compose.foundation.clickable
+&nbsp;import androidx.compose.foundation.layout.Arrangement
+&nbsp;import androidx.compose.foundation.layout.Box
+&nbsp;import androidx.compose.foundation.layout.Column
+&nbsp;import androidx.compose.foundation.layout.Row
+&nbsp;import androidx.compose.foundation.layout.Spacer
+&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
+&nbsp;import androidx.compose.foundation.layout.height
+&nbsp;import androidx.compose.foundation.layout.padding
+&nbsp;import androidx.compose.foundation.layout.size
+&nbsp;import androidx.compose.foundation.shape.RoundedCornerShape
+&nbsp;import androidx.compose.material3.Icon
+&nbsp;import androidx.compose.material3.Text
+&nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.ui.Alignment
+&nbsp;import androidx.compose.ui.Modifier
+&nbsp;import androidx.compose.ui.draw.clip
+&nbsp;import androidx.compose.ui.graphics.Color
+&nbsp;import androidx.compose.ui.graphics.vector.ImageVector
+&nbsp;import androidx.compose.ui.tooling.preview.Preview
+&nbsp;import androidx.compose.ui.unit.dp
+&nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+&nbsp;import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
+&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
+&nbsp;
+<b class="nc">&nbsp;enum class SurferInsightTone { Good, Warn, Neutral }</b>
+&nbsp;
+&nbsp;data class SurferInsightItem(
+&nbsp;    val id: String,
+&nbsp;    val tone: SurferInsightTone,
+&nbsp;    val icon: ImageVector,
+&nbsp;    val title: String,
+&nbsp;    val body: String,
+&nbsp;)
+&nbsp;
+&nbsp;@Composable
+&nbsp;fun SurferInsightsWidget(
+&nbsp;    items: List&lt;SurferInsightItem&gt;,
+&nbsp;    title: String,
+&nbsp;    modifier: Modifier = Modifier,
+&nbsp;    size: SurferWidgetSize = LocalSurferWidgetSize.current,
+&nbsp;    onItemClick: ((SurferInsightItem) -&gt; Unit)? = null,
+&nbsp;    badgeFormat: ((Int) -&gt; String)? = null,
+&nbsp;    emptyText: String? = null,
+&nbsp;) {
+&nbsp;    val hero = size == SurferWidgetSize.Hero
+&nbsp;    val visibleItems = if (hero) items.take(3) else items.take(1)
+&nbsp;
+&nbsp;    SurferWidgetCard(
+&nbsp;        title = title,
+&nbsp;        modifier = modifier,
+&nbsp;        trailing = {
+&nbsp;            if (items.isNotEmpty() &amp;&amp; badgeFormat != null) {
+&nbsp;                Text(
+&nbsp;                    text = badgeFormat(items.size),
+&nbsp;                    style = AppTheme.typography.labelMedium,
+&nbsp;                    color = AppTheme.materialColors.primary,
+&nbsp;                )
+&nbsp;            }
+&nbsp;        },
+&nbsp;    ) {
+&nbsp;        if (items.isEmpty()) {
+&nbsp;            SurferWidgetEmptyState(
+&nbsp;                icon = SurferIcons.Sparkle,
+&nbsp;                title = null,
+&nbsp;                subtitle = emptyText,
+&nbsp;            )
+&nbsp;            return@SurferWidgetCard
+&nbsp;        }
+&nbsp;
+&nbsp;        Spacer(Modifier.height(10.dp))
+&nbsp;        Column(
+&nbsp;            modifier = Modifier.padding(horizontal = 14.dp),
+&nbsp;            verticalArrangement = Arrangement.spacedBy(8.dp),
+&nbsp;        ) {
+&nbsp;            visibleItems.forEach { item -&gt;
+&nbsp;                InsightCard(
+&nbsp;                    item = item,
+&nbsp;                    onClick = onItemClick?.let { handler -&gt; { handler(item) } },
+&nbsp;                )
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun InsightCard(item: SurferInsightItem, onClick: (() -&gt; Unit)?) {
+&nbsp;    val (bg, fg) = when (item.tone) {
+&nbsp;        SurferInsightTone.Good -&gt;
+&nbsp;            AppTheme.materialColors.tertiaryContainer to
+&nbsp;                AppTheme.materialColors.onTertiaryContainer
+&nbsp;        SurferInsightTone.Warn -&gt;
+&nbsp;            AppTheme.materialColors.errorContainer to
+&nbsp;                AppTheme.materialColors.onErrorContainer
+&nbsp;        SurferInsightTone.Neutral -&gt;
+&nbsp;            AppTheme.materialColors.surfaceContainerHigh to
+&nbsp;                AppTheme.materialColors.onSurface
+&nbsp;    }
+&nbsp;    val rowModifier = if (onClick != null) {
+&nbsp;        Modifier.fillMaxWidth().clickable(onClick = onClick)
+&nbsp;    } else {
+&nbsp;        Modifier.fillMaxWidth()
+&nbsp;    }
+&nbsp;    Row(
+&nbsp;        modifier = rowModifier
+&nbsp;            .clip(RoundedCornerShape(14.dp))
+&nbsp;            .background(bg)
+&nbsp;            .padding(12.dp),
+&nbsp;        horizontalArrangement = Arrangement.spacedBy(12.dp),
+&nbsp;        verticalAlignment = Alignment.Top,
+&nbsp;    ) {
+&nbsp;        Box(
+&nbsp;            modifier = Modifier
+&nbsp;                .size(36.dp)
+&nbsp;                .clip(RoundedCornerShape(12.dp))
+&nbsp;                .background(Color.White.copy(alpha = 0.25f)),
+&nbsp;            contentAlignment = Alignment.Center,
+&nbsp;        ) {
+&nbsp;            Icon(
+&nbsp;                imageVector = item.icon,
+&nbsp;                // decorative — insight category icon; the item title provides the accessible label
+&nbsp;                contentDescription = null,
+&nbsp;                tint = fg,
+&nbsp;                modifier = Modifier.size(20.dp),
+&nbsp;            )
+&nbsp;        }
+&nbsp;        Column(modifier = Modifier.weight(1f)) {
+&nbsp;            Text(
+&nbsp;                text = item.title,
+&nbsp;                style = AppTheme.typography.titleSmall,
+&nbsp;                color = fg,
+&nbsp;            )
+&nbsp;            Spacer(Modifier.height(2.dp))
+&nbsp;            Text(
+&nbsp;                text = item.body,
+&nbsp;                style = AppTheme.typography.bodySmall,
+&nbsp;                color = fg.copy(alpha = 0.85f),
+&nbsp;            )
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Preview
+&nbsp;@Composable
+&nbsp;private fun SurferInsightsWidgetHeroPreview() {
+&nbsp;    SurferComponentPreview {
+&nbsp;        Box(modifier = Modifier.padding(16.dp)) {
+&nbsp;            SurferInsightsWidget(
+&nbsp;                items = listOf(
+&nbsp;                    SurferInsightItem(
+&nbsp;                        id = &quot;1&quot;,
+&nbsp;                        tone = SurferInsightTone.Warn,
+&nbsp;                        icon = SurferIcons.ArrowUp,
+&nbsp;                        title = &quot;Dining is up 28%&quot;,
+&nbsp;                        body = &quot;€162 spent — €35 above your usual €127 / month.&quot;,
+&nbsp;                    ),
+&nbsp;                    SurferInsightItem(
+&nbsp;                        id = &quot;2&quot;,
+&nbsp;                        tone = SurferInsightTone.Good,
+&nbsp;                        icon = SurferIcons.Sparkle,
+&nbsp;                        title = &quot;On track to save €420&quot;,
+&nbsp;                        body = &quot;You spent 21% less on Leisure than last month.&quot;,
+&nbsp;                    ),
+&nbsp;                ),
+&nbsp;                title = &quot;Insights&quot;,
+&nbsp;                badgeFormat = { &quot;$it new&quot; },
+&nbsp;                modifier = Modifier.fillMaxWidth(),
+&nbsp;            )
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Preview
+&nbsp;@Composable
+&nbsp;private fun SurferInsightsWidgetEmptyPreview() {
+&nbsp;    SurferComponentPreview {
+&nbsp;        Box(modifier = Modifier.padding(16.dp)) {
+&nbsp;            SurferInsightsWidget(
+&nbsp;                items = emptyList(),
+&nbsp;                title = &quot;Insights&quot;,
+&nbsp;                emptyText = &quot;Nothing notable this period.&quot;,
+&nbsp;                modifier = Modifier
+&nbsp;                    .fillMaxWidth()
+&nbsp;                    .height(140.dp),
+&nbsp;            )
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
 </div>
 
 <script type="text/javascript">
@@ -64,7 +306,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 17:13</div>
+    <div style="float:right;">generated on 2026-07-22 20:32</div>
 </div>
 </body>
 </html>

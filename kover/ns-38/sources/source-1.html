@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SyncVersionStatus</title>
+  <title>MoneySurfer Coverage Report > EntityApplyResult</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,15 +19,18 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.sync.version</a>
+    <a href="../index.html">com.georgeci.moneysurfer.sync.plugin</a>
 </div>
 
-<h1>Coverage Summary for Class: SyncVersionStatus (com.georgeci.moneysurfer.sync.version)</h1>
+<h1>Coverage Summary for Class: EntityApplyResult (com.georgeci.moneysurfer.sync.plugin)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -45,70 +48,22 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   Instruction, %
 </th>
 </tr>
-  <tr>
-    <td class="name">SyncVersionStatus$Allowed</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (2/2)
-  </span>
-</td>
-  </tr>
-  <tr>
-    <td class="name">SyncVersionStatus$Blocked</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (7/7)
-  </span>
-</td>
-  </tr>
 <tr>
-  <td class="name"><strong>Total</strong></td>
+  <td class="name">EntityApplyResult</td>
 <td class="coverageStat">
   <span class="percent">
     100%
   </span>
   <span class="absValue">
-    (2/2)
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
   </span>
 </td>
     <td class="coverageStat"/>
@@ -117,7 +72,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (2/2)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
@@ -125,10 +80,11 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (9/9)
+    (12/12)
   </span>
 </td>
 </tr>
+
 </table>
 
 <br/>
@@ -136,23 +92,38 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.sync.version
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.sync.plugin
+&nbsp;
+&nbsp;import com.georgeci.moneysurfer.sync.repository.PendingMutation
 &nbsp;
 &nbsp;/**
-&nbsp; * Version gate decoupled from domain. `:sync` checks this; `:sync-impl` provides the
-&nbsp; * adapter that reads from [com.georgeci.moneysurfer.domain.repositories.AppVersionGate].
+&nbsp; * Self-contained per-entity sync adapter.
 &nbsp; *
-&nbsp; * See block.md.
+&nbsp; * [UploadPendingChangesUseCaseImpl] calls [push] for mutations whose
+&nbsp; * [entityType] matches. [PullRemoteChangesUseCaseImpl] calls [applyDoc]
+&nbsp; * for each document in the plugin&#39;s [firestoreCollectionName].
+&nbsp; *
+&nbsp; * [firestoreCollectionName] is null for entities that are not pulled via the
+&nbsp; * subcollection cursor path (e.g. workspace root docs, users).
+&nbsp; *
+&nbsp; * [pullPriority] controls the pull order within a workspace. Lower values run
+&nbsp; * first. Plugins that have Room FK dependencies on other plugins must declare a
+&nbsp; * higher (later) priority than the plugins they depend on. Defaults to 0
+&nbsp; * (no ordering preference). Concrete values are defined in each plugin
+&nbsp; * implementation inside `:sync-surfer`.
 &nbsp; */
-&nbsp;interface SyncVersionGate {
-&nbsp;    suspend fun refresh(): SyncVersionStatus
-&nbsp;    fun isSyncAllowed(): Boolean
+&nbsp;interface SyncEntityPlugin {
+&nbsp;    val entityType: String
+&nbsp;    val firestoreCollectionName: String?
+&nbsp;
+&nbsp;    /** Pull order within a workspace. Lower = pulled first. Default: 100. */
+&nbsp;    val pullPriority: Int get() = 100
+&nbsp;
+&nbsp;    suspend fun push(mutation: PendingMutation)
+&nbsp;    suspend fun applyDoc(doc: RemoteDocument, scopeKey: String): EntityApplyResult
 &nbsp;}
 &nbsp;
-&nbsp;sealed interface SyncVersionStatus {
-<b class="fc">&nbsp;    data object Allowed : SyncVersionStatus</b>
-<b class="fc">&nbsp;    data class Blocked(val message: String) : SyncVersionStatus</b>
-&nbsp;}
+<b class="fc">&nbsp;data class EntityApplyResult(val applied: Boolean, val wasConflict: Boolean)</b>
 </code>
 </pre>
 </div>
@@ -176,7 +147,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 17:13</div>
+    <div style="float:right;">generated on 2026-07-22 20:32</div>
 </div>
 </body>
 </html>

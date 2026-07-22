@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > UserRepositoryImplKt</title>
+  <title>MoneySurfer Coverage Report > UserRepositoryImpl</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,15 +22,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.data.repository</a>
 </div>
 
-<h1>Coverage Summary for Class: UserRepositoryImplKt (com.georgeci.moneysurfer.data.repository)</h1>
+<h1>Coverage Summary for Class: UserRepositoryImpl (com.georgeci.moneysurfer.data.repository)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
-<th class="coverageStat 
-">
-  Class, %
-</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -49,13 +46,13 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">UserRepositoryImplKt</td>
+  <td class="name">UserRepositoryImpl</td>
 <td class="coverageStat">
   <span class="percent">
     0%
   </span>
   <span class="absValue">
-    (0/1)
+    (0/7)
   </span>
 </td>
 <td class="coverageStat">
@@ -66,13 +63,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     (0/2)
   </span>
 </td>
-    <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
     0%
   </span>
   <span class="absValue">
-    (0/9)
+    (0/8)
   </span>
 </td>
 <td class="coverageStat">
@@ -80,11 +76,81 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/25)
+    (0/56)
   </span>
 </td>
 </tr>
-
+  <tr>
+    <td class="name">UserRepositoryImpl$getAll$$inlined$map$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">UserRepositoryImpl$getAll$$inlined$map$1$1</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">UserRepositoryImpl$getAll$$inlined$map$1$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">UserRepositoryImpl$getAll$$inlined$map$1$2$1</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">UserRepositoryImpl$getById$1</td>
+    <td class="coverageStat"/>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/56)
+  </span>
+</td>
+</tr>
 </table>
 
 <br/>
@@ -103,48 +169,48 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import kotlinx.coroutines.flow.map
 &nbsp;import org.koin.core.annotation.Single
 &nbsp;
-&nbsp;@Single(binds = [UserRepository::class])
+<b class="nc">&nbsp;@Single(binds = [UserRepository::class])</b>
 &nbsp;class UserRepositoryImpl(
-&nbsp;    private val dao: UserDao,
+<b class="nc">&nbsp;    private val dao: UserDao,</b>
 &nbsp;) : UserRepository {
 &nbsp;
 &nbsp;    override fun getAll(): Flow&lt;List&lt;User&gt;&gt; =
-&nbsp;        dao.getAll().map { list -&gt; list.map { it.toDomain() } }
+<b class="nc">&nbsp;        dao.getAll().map { list -&gt; list.map { it.toDomain() } }</b>
 &nbsp;
 &nbsp;    override suspend fun getById(id: UserId): User? =
-&nbsp;        dao.getById(id.value)?.toDomain()
+<b class="nc">&nbsp;        dao.getById(id.value)?.toDomain()</b>
 &nbsp;
 &nbsp;    override suspend fun insert(user: User) {
-&nbsp;        dao.insert(user.toEntity())
+<b class="nc">&nbsp;        dao.insert(user.toEntity())</b>
 &nbsp;    }
 &nbsp;
 &nbsp;    override suspend fun update(user: User) {
-&nbsp;        dao.update(user.toEntity())
+<b class="nc">&nbsp;        dao.update(user.toEntity())</b>
 &nbsp;    }
 &nbsp;
 &nbsp;    override suspend fun upsert(user: User) {
-&nbsp;        dao.upsert(user.toEntity())
+<b class="nc">&nbsp;        dao.upsert(user.toEntity())</b>
 &nbsp;    }
 &nbsp;
 &nbsp;    override suspend fun delete(id: UserId) {
-&nbsp;        dao.delete(id.value)
+<b class="nc">&nbsp;        dao.delete(id.value)</b>
 &nbsp;    }
 &nbsp;}
 &nbsp;
 &nbsp;// Local Room storage only persists id/displayName/isAnon. The remote-only fields (email,
 &nbsp;// workspaceIds, defaultWorkspaceId) default to empty/null on read — the Firestore record
 &nbsp;// owns those values, the local row is just a cache + FK target.
-<b class="nc">&nbsp;private fun UserEntity.toDomain() = User(</b>
-<b class="nc">&nbsp;    id = UserId(id),</b>
-<b class="nc">&nbsp;    displayName = displayName,</b>
-<b class="nc">&nbsp;    email = null,</b>
-<b class="nc">&nbsp;    isAnon = isAnon,</b>
+&nbsp;private fun UserEntity.toDomain() = User(
+&nbsp;    id = UserId(id),
+&nbsp;    displayName = displayName,
+&nbsp;    email = null,
+&nbsp;    isAnon = isAnon,
 &nbsp;)
 &nbsp;
-<b class="nc">&nbsp;private fun User.toEntity() = UserEntity(</b>
-<b class="nc">&nbsp;    id = id.value,</b>
-<b class="nc">&nbsp;    displayName = displayName,</b>
-<b class="nc">&nbsp;    isAnon = isAnon,</b>
+&nbsp;private fun User.toEntity() = UserEntity(
+&nbsp;    id = id.value,
+&nbsp;    displayName = displayName,
+&nbsp;    isAnon = isAnon,
 &nbsp;)
 </code>
 </pre>
@@ -169,7 +235,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 17:13</div>
+    <div style="float:right;">generated on 2026-07-22 20:32</div>
 </div>
 </body>
 </html>

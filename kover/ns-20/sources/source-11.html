@@ -49,34 +49,34 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   <td class="name">DeleteCategoryUseCase</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/2)
+    (2/2)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    50%
   </span>
   <span class="absValue">
-    (0/2)
+    (1/2)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/9)
+    (9/9)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    98.6%
   </span>
   <span class="absValue">
-    (0/146)
+    (144/146)
   </span>
 </td>
 </tr>
@@ -88,34 +88,34 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/2)
+    (2/2)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    50%
   </span>
   <span class="absValue">
-    (0/2)
+    (1/2)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/9)
+    (9/9)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    98.6%
   </span>
   <span class="absValue">
-    (0/146)
+    (144/146)
   </span>
 </td>
 </tr>
@@ -144,9 +144,9 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    val reparentedChildren: List&lt;Category&gt;,
 &nbsp;)
 &nbsp;
-<b class="nc">&nbsp;@Single</b>
+<b class="fc">&nbsp;@Single</b>
 &nbsp;class DeleteCategoryUseCase(
-<b class="nc">&nbsp;    private val categoryRepository: CategoryRepository,</b>
+<b class="fc">&nbsp;    private val categoryRepository: CategoryRepository,</b>
 &nbsp;) {
 &nbsp;
 &nbsp;    /**
@@ -159,13 +159,13 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;     * would be rejected by SQLite.
 &nbsp;     */
 &nbsp;    suspend operator fun invoke(id: CategoryId): CategoryDeletion? {
-<b class="nc">&nbsp;        val existing = categoryRepository.getById(id) ?: return null</b>
-<b class="nc">&nbsp;        val children = CategoryTree.childrenOf(categoryRepository.getAll().first(), id)</b>
-<b class="nc">&nbsp;        children.forEach { child -&gt;</b>
-<b class="nc">&nbsp;            categoryRepository.update(child.copy(parentId = null))</b>
-<b class="nc">&nbsp;        }</b>
-<b class="nc">&nbsp;        categoryRepository.delete(id)</b>
-<b class="nc">&nbsp;        return CategoryDeletion(category = existing, reparentedChildren = children)</b>
+<b class="pc">&nbsp;        val existing = categoryRepository.getById(id) ?: return null</b>
+<b class="fc">&nbsp;        val children = CategoryTree.childrenOf(categoryRepository.getAll().first(), id)</b>
+<b class="fc">&nbsp;        children.forEach { child -&gt;</b>
+<b class="fc">&nbsp;            categoryRepository.update(child.copy(parentId = null))</b>
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;        categoryRepository.delete(id)</b>
+<b class="fc">&nbsp;        return CategoryDeletion(category = existing, reparentedChildren = children)</b>
 &nbsp;    }
 &nbsp;}
 </code>
@@ -191,7 +191,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 17:13</div>
+    <div style="float:right;">generated on 2026-07-22 20:32</div>
 </div>
 </body>
 </html>

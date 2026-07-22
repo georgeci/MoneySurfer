@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > ComGeorgeciMoneysurferSyncInternalDiSyncModuleModuleKt</title>
+  <title>MoneySurfer Coverage Report > SyncDatabase</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.sync.internal.di</a>
+    <a href="../index.html">com.georgeci.moneysurfer.sync.db</a>
 </div>
 
-<h1>Coverage Summary for Class: ComGeorgeciMoneysurferSyncInternalDiSyncModuleModuleKt (com.georgeci.moneysurfer.sync.internal.di)</h1>
+<h1>Coverage Summary for Class: SyncDatabase (com.georgeci.moneysurfer.sync.db)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,38 +49,38 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">ComGeorgeciMoneysurferSyncInternalDiSyncModuleModuleKt</td>
+  <td class="name">SyncDatabase</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
     <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/226)
+    (2/2)
   </span>
 </td>
 </tr>
@@ -90,7 +90,40 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <br/>
 <br/>
 
-  <code class="sourceCode">Source code is not available<br /></code>
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.sync.db
+&nbsp;
+&nbsp;import androidx.room.ConstructedBy
+&nbsp;import androidx.room.Database
+&nbsp;import androidx.room.RoomDatabase
+&nbsp;import androidx.room.RoomDatabaseConstructor
+&nbsp;import com.georgeci.moneysurfer.sync.db.dao.PendingMutationDao
+&nbsp;import com.georgeci.moneysurfer.sync.db.dao.SyncMetaDao
+&nbsp;import com.georgeci.moneysurfer.sync.db.entity.PendingMutationEntity
+&nbsp;import com.georgeci.moneysurfer.sync.db.entity.SyncMetaEntity
+&nbsp;
+<b class="fc">&nbsp;@Database(</b>
+&nbsp;    entities = [
+&nbsp;        SyncMetaEntity::class,
+&nbsp;        PendingMutationEntity::class,
+&nbsp;    ],
+&nbsp;    // v2: pending_mutations dropped the separate status / createdAt indices for one
+&nbsp;    // composite. Destructive fallback is fine here — the outbox is transient.
+&nbsp;    version = 2,
+&nbsp;)
+&nbsp;@ConstructedBy(SyncDatabaseConstructor::class)
+&nbsp;abstract class SyncDatabase : RoomDatabase() {
+&nbsp;    abstract fun syncMetaDao(): SyncMetaDao
+&nbsp;    abstract fun pendingMutationDao(): PendingMutationDao
+&nbsp;}
+&nbsp;
+&nbsp;@Suppress(&quot;KotlinNoActualForExpect&quot;)
+&nbsp;expect object SyncDatabaseConstructor : RoomDatabaseConstructor&lt;SyncDatabase&gt; {
+&nbsp;    override fun initialize(): SyncDatabase
+&nbsp;}
+</code>
+</pre>
 </div>
 
 <script type="text/javascript">
@@ -112,7 +145,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 17:13</div>
+    <div style="float:right;">generated on 2026-07-22 20:32</div>
 </div>
 </body>
 </html>

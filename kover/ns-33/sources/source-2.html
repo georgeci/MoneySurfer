@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SyncEntityPlugin</title>
+  <title>MoneySurfer Coverage Report > NetworkWaitModeKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.sync.plugin</a>
+    <a href="../index.html">com.georgeci.moneysurfer.sync.internal.network</a>
 </div>
 
-<h1>Coverage Summary for Class: SyncEntityPlugin (com.georgeci.moneysurfer.sync.plugin)</h1>
+<h1>Coverage Summary for Class: NetworkWaitModeKt (com.georgeci.moneysurfer.sync.internal.network)</h1>
 
 <table class="coverageStats">
 
@@ -46,86 +46,76 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SyncEntityPlugin</td>
+  <td class="name">NetworkWaitModeKt</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
+    (2/2)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (8/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (9/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (67/67)
   </span>
 </td>
 </tr>
   <tr>
-    <td class="name">SyncEntityPlugin$DefaultImpls</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
-  </span>
-</td>
+    <td class="name">NetworkWaitModeKt$WhenMappings</td>
     <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/2)
-  </span>
-</td>
   </tr>
 <tr>
   <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/2)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/2)
+    (2/2)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/3)
+    (8/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (9/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (67/67)
   </span>
 </td>
 </tr>
@@ -136,38 +126,48 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.sync.plugin
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.sync.internal.network
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.sync.repository.PendingMutation
+&nbsp;import com.georgeci.moneysurfer.sync.api.SyncReason
+&nbsp;import kotlin.time.Duration
+&nbsp;import kotlin.time.Duration.Companion.minutes
+&nbsp;import kotlin.time.Duration.Companion.seconds
 &nbsp;
 &nbsp;/**
-&nbsp; * Self-contained per-entity sync adapter.
+&nbsp; * Policy for how long the coordinator should wait for the network to come back
+&nbsp; * before failing with [com.georgeci.moneysurfer.sync.api.SyncError.NetworkUnavailable].
 &nbsp; *
-&nbsp; * [UploadPendingChangesUseCaseImpl] calls [push] for mutations whose
-&nbsp; * [entityType] matches. [PullRemoteChangesUseCaseImpl] calls [applyDoc]
-&nbsp; * for each document in the plugin&#39;s [firestoreCollectionName].
+&nbsp; * - [Indefinite] — wait forever; the user can cancel via [com.georgeci.moneysurfer.sync.coordinator.SyncHandle.cancel].
+&nbsp; * - [Bounded] — fail after `timeout` elapses.
 &nbsp; *
-&nbsp; * [firestoreCollectionName] is null for entities that are not pulled via the
-&nbsp; * subcollection cursor path (e.g. workspace root docs, users).
-&nbsp; *
-&nbsp; * [pullPriority] controls the pull order within a workspace. Lower values run
-&nbsp; * first. Plugins that have Room FK dependencies on other plugins must declare a
-&nbsp; * higher (later) priority than the plugins they depend on. Defaults to 0
-&nbsp; * (no ordering preference). Concrete values are defined in each plugin
-&nbsp; * implementation inside `:sync-surfer`.
+&nbsp; * See SyncCoordinatorFAQ.md №9.
 &nbsp; */
-&nbsp;interface SyncEntityPlugin {
-&nbsp;    val entityType: String
-&nbsp;    val firestoreCollectionName: String?
-&nbsp;
-&nbsp;    /** Pull order within a workspace. Lower = pulled first. Default: 100. */
-<b class="nc">&nbsp;    val pullPriority: Int get() = 100</b>
-&nbsp;
-&nbsp;    suspend fun push(mutation: PendingMutation)
-&nbsp;    suspend fun applyDoc(doc: RemoteDocument, scopeKey: String): EntityApplyResult
+&nbsp;sealed interface NetworkWaitMode {
+&nbsp;    data object Indefinite : NetworkWaitMode
+&nbsp;    data class Bounded(val timeout: Duration) : NetworkWaitMode
 &nbsp;}
 &nbsp;
-&nbsp;data class EntityApplyResult(val applied: Boolean, val wasConflict: Boolean)
+<b class="fc">&nbsp;fun SyncReason.toNetworkWaitMode(): NetworkWaitMode = when (this) {</b>
+<b class="fc">&nbsp;    SyncReason.BACKGROUND -&gt; NetworkWaitMode.Bounded(5.minutes)</b>
+<b class="fc">&nbsp;    SyncReason.APP_START -&gt; NetworkWaitMode.Bounded(30.seconds)</b>
+&nbsp;    SyncReason.FOREGROUND,
+&nbsp;    SyncReason.MANUAL,
+&nbsp;    SyncReason.SWIPE_REFRESH,
+&nbsp;    SyncReason.LOCAL_CHANGE,
+<b class="fc">&nbsp;    -&gt; NetworkWaitMode.Indefinite</b>
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * Merges wait modes from a set of reasons (when multiple sync requests are merged):
+&nbsp; * picks the strictest (smallest) bounded timeout, otherwise [Indefinite].
+&nbsp; */
+&nbsp;fun Set&lt;SyncReason&gt;.toNetworkWaitMode(): NetworkWaitMode {
+<b class="fc">&nbsp;    val boundedMin = this</b>
+<b class="fc">&nbsp;        .map { it.toNetworkWaitMode() }</b>
+<b class="fc">&nbsp;        .filterIsInstance&lt;NetworkWaitMode.Bounded&gt;()</b>
+<b class="fc">&nbsp;        .minByOrNull { it.timeout.inWholeMilliseconds }</b>
+<b class="fc">&nbsp;    return boundedMin ?: NetworkWaitMode.Indefinite</b>
+&nbsp;}
 </code>
 </pre>
 </div>
@@ -191,7 +191,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 17:13</div>
+    <div style="float:right;">generated on 2026-07-22 20:32</div>
 </div>
 </body>
 </html>

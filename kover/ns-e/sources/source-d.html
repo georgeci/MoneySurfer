@@ -57,10 +57,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    45.7%
+    45.6%
   </span>
   <span class="absValue">
-    (43/94)
+    (52/114)
   </span>
 </td>
 <td class="coverageStat">
@@ -68,15 +68,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (15/15)
+    (18/18)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    76.6%
+    79%
   </span>
   <span class="absValue">
-    (415/542)
+    (583/738)
   </span>
 </td>
 </tr>
@@ -120,10 +120,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    45.7%
+    45.6%
   </span>
   <span class="absValue">
-    (43/94)
+    (52/114)
   </span>
 </td>
 <td class="coverageStat">
@@ -131,15 +131,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (16/16)
+    (19/19)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    76.7%
+    79.1%
   </span>
   <span class="absValue">
-    (419/546)
+    (587/742)
   </span>
 </td>
 </tr>
@@ -233,6 +233,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;    val amount: Long = 0L,</b>
 <b class="fc">&nbsp;    val currencyCode: String = &quot;&quot;,</b>
 <b class="fc">&nbsp;    val note: String = &quot;&quot;,</b>
+<b class="fc">&nbsp;    val merchant: String = &quot;&quot;,</b>
+&nbsp;    /**
+&nbsp;     * A real list on the wire even though Room stores it as a CSV column — same split as
+&nbsp;     * [BudgetDoc.categoryIds], and the mapper converts on the entity↔wire boundary.
+&nbsp;     */
+<b class="fc">&nbsp;    val tags: List&lt;String&gt; = emptyList(),</b>
 <b class="fc">&nbsp;    val operationAt: Long = 0L,</b>
 <b class="fc">&nbsp;    val operationDate: String = &quot;&quot;,</b>
 <b class="fc">&nbsp;    val type: String = &quot;&quot;,</b>
@@ -243,6 +249,8 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;    val clientVersionCode: Int = 1,</b>
 &nbsp;    /** Shared id linking the two legs of a transfer. Null for non-transfer rows. */
 <b class="fc">&nbsp;    val transferId: String? = null,</b>
+&nbsp;    /** Rule that generated this row. Null for manual entries. */
+<b class="fc">&nbsp;    val recurringRuleId: String? = null,</b>
 &nbsp;)
 &nbsp;
 &nbsp;/**
@@ -382,7 +390,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 17:13</div>
+    <div style="float:right;">generated on 2026-07-22 20:32</div>
 </div>
 </body>
 </html>
