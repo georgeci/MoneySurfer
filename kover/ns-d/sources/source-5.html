@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > FirebaseConfigImpl_androidKt</title>
+  <title>MoneySurfer Coverage Report > FirebaseConfigImpl</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,15 +22,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.data.remote</a>
 </div>
 
-<h1>Coverage Summary for Class: FirebaseConfigImpl_androidKt (com.georgeci.moneysurfer.data.remote)</h1>
+<h1>Coverage Summary for Class: FirebaseConfigImpl (com.georgeci.moneysurfer.data.remote)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
-<th class="coverageStat 
-">
-  Class, %
-</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -49,7 +46,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">FirebaseConfigImpl_androidKt</td>
+  <td class="name">FirebaseConfigImpl</td>
 <td class="coverageStat">
   <span class="percent">
     0%
@@ -58,12 +55,13 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     (0/1)
   </span>
 </td>
+    <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
     0%
   </span>
   <span class="absValue">
-    (0/2)
+    (0/5)
   </span>
 </td>
 <td class="coverageStat">
@@ -71,27 +69,42 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/10)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/4)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/39)
+    (0/22)
   </span>
 </td>
 </tr>
-
+  <tr>
+    <td class="name">FirebaseConfigImpl$Companion</td>
+    <td class="coverageStat"/>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/22)
+  </span>
+</td>
+</tr>
 </table>
 
 <br/>
@@ -101,32 +114,43 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.remote
 &nbsp;
-&nbsp;/**
-&nbsp; * On Android the host machine running the emulator suite is reachable via
-&nbsp; * `10.0.2.2` from within the Android emulator (the special-purpose alias the
-&nbsp; * AVD assigns to the host loopback). Real-device runs against an emulator
-&nbsp; * suite would need a LAN IP — out of scope here.
-&nbsp; */
-<b class="nc">&nbsp;internal actual fun defaultEmulatorHost(): String = &quot;10.0.2.2&quot;</b>
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.FirebaseConfig
+&nbsp;import org.koin.core.annotation.Single
 &nbsp;
 &nbsp;/**
-&nbsp; * Two-channel toggle:
+&nbsp; * Default `FirebaseConfig` binding. The toggle [useEmulator] is sourced from
+&nbsp; * [defaultUseEmulator] (per-platform `expect/actual`) — Android pulls
+&nbsp; * `BuildConfig.USE_EMULATOR`, JVM/iOS read an env var. Tests bind their own
+&nbsp; * `FirebaseConfig` instead of using this one.
 &nbsp; *
-&nbsp; * 1. **System property** `MS_USE_EMULATOR=true` — set by `MoneySurferApplication`
-&nbsp; *    when `BuildConfig.USE_EMULATOR == true` (compile-time flag from
-&nbsp; *    `-PuseEmulator=true` Gradle property). Standard path for emulator
-&nbsp; *    debug builds installed on an AVD.
-&nbsp; * 2. **Env var** `MS_USE_EMULATOR=true` — fallback for direct `gradlew run`-style
-&nbsp; *    invocations or instrumentation tests where there&#39;s no Application class
-&nbsp; *    to set the system property.
-&nbsp; *
-&nbsp; * Production APKs never see either set, so `defaultUseEmulator() == false`.
+&nbsp; * Ports are static (matching `firebase.json`); the host is platform-specific
+&nbsp; * (`10.0.2.2` for Android emulator, `localhost` elsewhere).
 &nbsp; */
-&nbsp;internal actual fun defaultUseEmulator(): Boolean {
-<b class="nc">&nbsp;    val sysProp = System.getProperty(&quot;MS_USE_EMULATOR&quot;)?.equals(&quot;true&quot;, ignoreCase = true) == true</b>
-<b class="nc">&nbsp;    val envVar = System.getenv(&quot;MS_USE_EMULATOR&quot;)?.equals(&quot;true&quot;, ignoreCase = true) == true</b>
-<b class="nc">&nbsp;    return sysProp || envVar</b>
+<b class="nc">&nbsp;@Single(binds = [FirebaseConfig::class])</b>
+&nbsp;class FirebaseConfigImpl : FirebaseConfig {
+<b class="nc">&nbsp;    override val useEmulator: Boolean = defaultUseEmulator()</b>
+<b class="nc">&nbsp;    override val emulatorHost: String = defaultEmulatorHost()</b>
+<b class="nc">&nbsp;    override val authPort: Int = DEFAULT_AUTH_PORT</b>
+<b class="nc">&nbsp;    override val firestorePort: Int = DEFAULT_FIRESTORE_PORT</b>
+&nbsp;
+&nbsp;    private companion object {
+&nbsp;        const val DEFAULT_AUTH_PORT: Int = 9099
+&nbsp;        const val DEFAULT_FIRESTORE_PORT: Int = 8080
+&nbsp;    }
 &nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * Whether this build should target the emulator by default. Android maps to
+&nbsp; * `BuildConfig.USE_EMULATOR`, JVM to env var `MS_USE_EMULATOR`, iOS to env var
+&nbsp; * or Info.plist key `MS_USE_EMULATOR`.
+&nbsp; */
+&nbsp;internal expect fun defaultUseEmulator(): Boolean
+&nbsp;
+&nbsp;/**
+&nbsp; * The hostname over which the host machine is reachable from this platform&#39;s
+&nbsp; * runtime. Android emulator: `10.0.2.2`. iOS simulator + Desktop: `localhost`.
+&nbsp; */
+&nbsp;internal expect fun defaultEmulatorHost(): String
 </code>
 </pre>
 </div>
@@ -150,7 +174,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 15:22</div>
+    <div style="float:right;">generated on 2026-07-22 15:43</div>
 </div>
 </body>
 </html>

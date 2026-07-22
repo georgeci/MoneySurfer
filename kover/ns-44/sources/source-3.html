@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > AppSpacing</title>
+  <title>MoneySurfer Coverage Report > ColorKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.uikit.tokens</a>
+    <a href="../index.html">com.georgeci.moneysurfer.uikit.theme</a>
 </div>
 
-<h1>Coverage Summary for Class: AppSpacing (com.georgeci.moneysurfer.uikit.tokens)</h1>
+<h1>Coverage Summary for Class: ColorKt (com.georgeci.moneysurfer.uikit.theme)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">AppSpacing</td>
+  <td class="name">ColorKt</td>
 <td class="coverageStat">
   <span class="percent">
     0%
@@ -63,7 +63,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/11)
+    (0/3)
   </span>
 </td>
     <td class="coverageStat"/>
@@ -72,7 +72,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/10)
+    (0/60)
   </span>
 </td>
 <td class="coverageStat">
@@ -80,7 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/60)
+    (0/282)
   </span>
 </td>
 </tr>
@@ -92,23 +92,75 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.tokens
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.theme
 &nbsp;
-&nbsp;import androidx.compose.ui.unit.Dp
-&nbsp;import androidx.compose.ui.unit.dp
+&nbsp;import androidx.compose.material3.darkColorScheme
+&nbsp;import androidx.compose.material3.lightColorScheme
+&nbsp;import com.georgeci.moneysurfer.uikit.tokens.AppColors
 &nbsp;
-&nbsp;object AppSpacing {
-<b class="nc">&nbsp;    val None: Dp = 0.dp</b>
-<b class="nc">&nbsp;    val XXSmall: Dp = 2.dp</b>
-<b class="nc">&nbsp;    val XSmall: Dp = 4.dp</b>
-<b class="nc">&nbsp;    val Small: Dp = 8.dp</b>
-<b class="nc">&nbsp;    val Medium: Dp = 12.dp</b>
-<b class="nc">&nbsp;    val Default: Dp = 16.dp</b>
-<b class="nc">&nbsp;    val Large: Dp = 24.dp</b>
-<b class="nc">&nbsp;    val XLarge: Dp = 32.dp</b>
-<b class="nc">&nbsp;    val XXLarge: Dp = 48.dp</b>
-<b class="nc">&nbsp;    val XXXLarge: Dp = 64.dp</b>
-&nbsp;}
+<b class="nc">&nbsp;internal val LightColorScheme = lightColorScheme(</b>
+<b class="nc">&nbsp;    primary = AppColors.Primary,</b>
+<b class="nc">&nbsp;    onPrimary = AppColors.OnPrimary,</b>
+<b class="nc">&nbsp;    primaryContainer = AppColors.PrimaryContainer,</b>
+<b class="nc">&nbsp;    onPrimaryContainer = AppColors.OnPrimaryContainer,</b>
+<b class="nc">&nbsp;    secondary = AppColors.Secondary,</b>
+<b class="nc">&nbsp;    onSecondary = AppColors.OnSecondary,</b>
+<b class="nc">&nbsp;    secondaryContainer = AppColors.SecondaryContainer,</b>
+<b class="nc">&nbsp;    onSecondaryContainer = AppColors.OnSecondaryContainer,</b>
+<b class="nc">&nbsp;    tertiary = AppColors.Tertiary,</b>
+<b class="nc">&nbsp;    onTertiary = AppColors.OnTertiary,</b>
+<b class="nc">&nbsp;    tertiaryContainer = AppColors.TertiaryContainer,</b>
+<b class="nc">&nbsp;    onTertiaryContainer = AppColors.OnTertiaryContainer,</b>
+<b class="nc">&nbsp;    error = AppColors.Error,</b>
+<b class="nc">&nbsp;    onError = AppColors.OnError,</b>
+<b class="nc">&nbsp;    errorContainer = AppColors.ErrorContainer,</b>
+<b class="nc">&nbsp;    onErrorContainer = AppColors.OnErrorContainer,</b>
+<b class="nc">&nbsp;    background = AppColors.Background,</b>
+<b class="nc">&nbsp;    onBackground = AppColors.OnBackground,</b>
+<b class="nc">&nbsp;    surface = AppColors.Surface,</b>
+<b class="nc">&nbsp;    onSurface = AppColors.OnSurface,</b>
+<b class="nc">&nbsp;    surfaceVariant = AppColors.SurfaceVariant,</b>
+<b class="nc">&nbsp;    onSurfaceVariant = AppColors.OnSurfaceVariant,</b>
+<b class="nc">&nbsp;    surfaceTint = AppColors.SurfaceTint,</b>
+<b class="nc">&nbsp;    outline = AppColors.Outline,</b>
+<b class="nc">&nbsp;    outlineVariant = AppColors.OutlineVariant,</b>
+<b class="nc">&nbsp;    inverseSurface = AppColors.InverseSurface,</b>
+<b class="nc">&nbsp;    inverseOnSurface = AppColors.InverseOnSurface,</b>
+<b class="nc">&nbsp;    inversePrimary = AppColors.InversePrimary,</b>
+<b class="nc">&nbsp;    scrim = AppColors.Scrim,</b>
+&nbsp;)
+&nbsp;
+<b class="nc">&nbsp;internal val DarkColorScheme = darkColorScheme(</b>
+<b class="nc">&nbsp;    primary = AppColors.Dark.Primary,</b>
+<b class="nc">&nbsp;    onPrimary = AppColors.Dark.OnPrimary,</b>
+<b class="nc">&nbsp;    primaryContainer = AppColors.Dark.PrimaryContainer,</b>
+<b class="nc">&nbsp;    onPrimaryContainer = AppColors.Dark.OnPrimaryContainer,</b>
+<b class="nc">&nbsp;    secondary = AppColors.Dark.Secondary,</b>
+<b class="nc">&nbsp;    onSecondary = AppColors.Dark.OnSecondary,</b>
+<b class="nc">&nbsp;    secondaryContainer = AppColors.Dark.SecondaryContainer,</b>
+<b class="nc">&nbsp;    onSecondaryContainer = AppColors.Dark.OnSecondaryContainer,</b>
+<b class="nc">&nbsp;    tertiary = AppColors.Dark.Tertiary,</b>
+<b class="nc">&nbsp;    onTertiary = AppColors.Dark.OnTertiary,</b>
+<b class="nc">&nbsp;    tertiaryContainer = AppColors.Dark.TertiaryContainer,</b>
+<b class="nc">&nbsp;    onTertiaryContainer = AppColors.Dark.OnTertiaryContainer,</b>
+<b class="nc">&nbsp;    error = AppColors.Dark.Error,</b>
+<b class="nc">&nbsp;    onError = AppColors.Dark.OnError,</b>
+<b class="nc">&nbsp;    errorContainer = AppColors.Dark.ErrorContainer,</b>
+<b class="nc">&nbsp;    onErrorContainer = AppColors.Dark.OnErrorContainer,</b>
+<b class="nc">&nbsp;    background = AppColors.Dark.Background,</b>
+<b class="nc">&nbsp;    onBackground = AppColors.Dark.OnBackground,</b>
+<b class="nc">&nbsp;    surface = AppColors.Dark.Surface,</b>
+<b class="nc">&nbsp;    onSurface = AppColors.Dark.OnSurface,</b>
+<b class="nc">&nbsp;    surfaceVariant = AppColors.Dark.SurfaceVariant,</b>
+<b class="nc">&nbsp;    onSurfaceVariant = AppColors.Dark.OnSurfaceVariant,</b>
+<b class="nc">&nbsp;    surfaceTint = AppColors.Dark.SurfaceTint,</b>
+<b class="nc">&nbsp;    outline = AppColors.Dark.Outline,</b>
+<b class="nc">&nbsp;    outlineVariant = AppColors.Dark.OutlineVariant,</b>
+<b class="nc">&nbsp;    inverseSurface = AppColors.Dark.InverseSurface,</b>
+<b class="nc">&nbsp;    inverseOnSurface = AppColors.Dark.InverseOnSurface,</b>
+<b class="nc">&nbsp;    inversePrimary = AppColors.Dark.InversePrimary,</b>
+<b class="nc">&nbsp;    scrim = AppColors.Dark.Scrim,</b>
+&nbsp;)
 </code>
 </pre>
 </div>
@@ -132,7 +184,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 15:22</div>
+    <div style="float:right;">generated on 2026-07-22 15:43</div>
 </div>
 </body>
 </html>

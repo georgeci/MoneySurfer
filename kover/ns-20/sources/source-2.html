@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > ComposableSingletons</title>
+  <title>MoneySurfer Coverage Report > BudgetPeriodWindowKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.feature.login</a>
+    <a href="../index.html">com.georgeci.moneysurfer.domain.util</a>
 </div>
 
-<h1>Coverage Summary for Class: ComposableSingletons (com.georgeci.moneysurfer.feature.login)</h1>
+<h1>Coverage Summary for Class: BudgetPeriodWindowKt (com.georgeci.moneysurfer.domain.util)</h1>
 
 <table class="coverageStats">
 
@@ -45,59 +45,77 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   Instruction, %
 </th>
 </tr>
+<tr>
+  <td class="name">BudgetPeriodWindowKt</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    91.7%
+  </span>
+  <span class="absValue">
+    (11/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (14/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    95.9%
+  </span>
+  <span class="absValue">
+    (118/123)
+  </span>
+</td>
+</tr>
   <tr>
-    <td class="name">ComposableSingletons$SignInScreenKt</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/8)
-  </span>
-</td>
+    <td class="name">BudgetPeriodWindowKt$WhenMappings</td>
     <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/19)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/214)
-  </span>
-</td>
   </tr>
 <tr>
   <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/8)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/19)
+    (5/5)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    91.7%
   </span>
   <span class="absValue">
-    (0/214)
+    (11/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (14/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    95.9%
+  </span>
+  <span class="absValue">
+    (118/123)
   </span>
 </td>
 </tr>
@@ -106,7 +124,85 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <br/>
 <br/>
 
-  <code class="sourceCode">Source code is not available<br /></code>
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.util
+&nbsp;
+&nbsp;import com.georgeci.moneysurfer.domain.model.Budget
+&nbsp;import com.georgeci.moneysurfer.domain.model.BudgetPeriod
+&nbsp;import kotlinx.datetime.DateTimeUnit
+&nbsp;import kotlinx.datetime.LocalDate
+&nbsp;import kotlinx.datetime.daysUntil
+&nbsp;import kotlinx.datetime.minus
+&nbsp;import kotlinx.datetime.monthsUntil
+&nbsp;import kotlinx.datetime.plus
+&nbsp;import kotlinx.datetime.yearsUntil
+&nbsp;
+&nbsp;private const val DAYS_PER_WEEK = 7
+&nbsp;
+&nbsp;/**
+&nbsp; * A single half-open budget period: `[startInclusive, endExclusive)`.
+&nbsp; *
+&nbsp; * Half-open so consecutive windows tile the timeline without overlapping —
+&nbsp; * a transaction on a boundary date belongs to exactly one window.
+&nbsp; */
+&nbsp;data class BudgetPeriodWindow(
+&nbsp;    val startInclusive: LocalDate,
+&nbsp;    val endExclusive: LocalDate,
+&nbsp;) {
+&nbsp;    operator fun contains(date: LocalDate): Boolean = date &gt;= startInclusive &amp;&amp; date &lt; endExclusive
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * The window that contains [today]. Pure — the caller supplies the date, so there is
+&nbsp; * no `Clock` dependency and the maths stays trivially testable.
+&nbsp; */
+<b class="fc">&nbsp;fun Budget.currentWindow(today: LocalDate): BudgetPeriodWindow = windowContaining(today)</b>
+&nbsp;
+&nbsp;/**
+&nbsp; * The window containing [date], counting whole periods from [Budget.startDate].
+&nbsp; *
+&nbsp; * Windows extend backwards before `startDate` too — [previousWindow] relies on that to
+&nbsp; * compute a rollover carry for the very first period.
+&nbsp; */
+&nbsp;fun Budget.windowContaining(date: LocalDate): BudgetPeriodWindow {
+<b class="fc">&nbsp;    var index = estimatedIndexOf(date)</b>
+<b class="fc">&nbsp;    while (anchorAt(index) &gt; date) index--</b>
+<b class="fc">&nbsp;    while (anchorAt(index + 1) &lt;= date) index++</b>
+<b class="fc">&nbsp;    return BudgetPeriodWindow(anchorAt(index), anchorAt(index + 1))</b>
+&nbsp;}
+&nbsp;
+&nbsp;/** The window immediately preceding [window] — the source of a rollover carry. */
+&nbsp;fun Budget.previousWindow(window: BudgetPeriodWindow): BudgetPeriodWindow =
+<b class="fc">&nbsp;    windowContaining(window.startInclusive.minus(1, DateTimeUnit.DAY))</b>
+&nbsp;
+&nbsp;/**
+&nbsp; * The period boundary [index] whole periods after [Budget.startDate], negative index
+&nbsp; * counting backwards.
+&nbsp; *
+&nbsp; * Every anchor is derived from `startDate` itself rather than from the previous anchor, so
+&nbsp; * short-month clamping never accumulates: a budget anchored on the 31st yields Jan 31 →
+&nbsp; * Feb 28 → Mar 31, not Jan 31 → Feb 28 → Mar 28. `LocalDate.plus` clamps a month/year step
+&nbsp; * to the last valid day of the target month, which is exactly the anchoring rule we want
+&nbsp; * (including Feb 29 → Feb 28 for a yearly budget in a non-leap year).
+&nbsp; */
+<b class="fc">&nbsp;private fun Budget.anchorAt(index: Int): LocalDate = when (period) {</b>
+<b class="fc">&nbsp;    BudgetPeriod.WEEKLY -&gt; startDate.plus(index * DAYS_PER_WEEK, DateTimeUnit.DAY)</b>
+<b class="fc">&nbsp;    BudgetPeriod.MONTHLY -&gt; startDate.plus(index, DateTimeUnit.MONTH)</b>
+<b class="fc">&nbsp;    BudgetPeriod.YEARLY -&gt; startDate.plus(index, DateTimeUnit.YEAR)</b>
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * A cheap first guess at the index whose window holds [date]. Clamping and truncation make it
+&nbsp; * off by at most one period, which the correction loops in [windowContaining] walk off.
+&nbsp; */
+<b class="fc">&nbsp;private fun Budget.estimatedIndexOf(date: LocalDate): Int = when (period) {</b>
+<b class="pc">&nbsp;    BudgetPeriod.WEEKLY -&gt; startDate.daysUntil(date).floorDiv(DAYS_PER_WEEK)</b>
+<b class="fc">&nbsp;    BudgetPeriod.MONTHLY -&gt; startDate.monthsUntil(date)</b>
+<b class="fc">&nbsp;    BudgetPeriod.YEARLY -&gt; startDate.yearsUntil(date)</b>
+&nbsp;}
+</code>
+</pre>
 </div>
 
 <script type="text/javascript">
@@ -128,7 +224,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 15:22</div>
+    <div style="float:right;">generated on 2026-07-22 15:43</div>
 </div>
 </body>
 </html>

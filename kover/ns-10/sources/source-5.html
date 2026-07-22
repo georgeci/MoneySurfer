@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > TombstonePushKt</title>
+  <title>MoneySurfer Coverage Report > TombstonePatch</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.data.sync.plugin</a>
 </div>
 
-<h1>Coverage Summary for Class: TombstonePushKt (com.georgeci.moneysurfer.data.sync.plugin)</h1>
+<h1>Coverage Summary for Class: TombstonePatch (com.georgeci.moneysurfer.data.sync.plugin)</h1>
 
 <table class="coverageStats">
 
@@ -46,13 +46,13 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">TombstonePushKt</td>
+  <td class="name">TombstonePatch</td>
 <td class="coverageStat">
   <span class="percent">
-    50%
+    100%
   </span>
   <span class="absValue">
-    (1/2)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
@@ -65,33 +65,57 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    71.4%
+    100%
   </span>
   <span class="absValue">
-    (5/7)
+    (4/4)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    27.8%
+    71.4%
   </span>
   <span class="absValue">
-    (10/36)
+    (40/56)
   </span>
 </td>
 </tr>
   <tr>
-    <td class="name">TombstonePushKt$pushTombstone$1</td>
+    <td class="name">TombstonePatch$Companion</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
     <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
   </tr>
 <tr>
   <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
-    50%
+    100%
   </span>
   <span class="absValue">
-    (1/2)
+    (2/2)
   </span>
 </td>
 <td class="coverageStat">
@@ -104,18 +128,18 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    71.4%
+    100%
   </span>
   <span class="absValue">
-    (5/7)
+    (5/5)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    27.8%
+    73.3%
   </span>
   <span class="absValue">
-    (10/36)
+    (44/60)
   </span>
 </td>
 </tr>
@@ -142,11 +166,11 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp; * row, and their `updatedAt &gt; cursor` pull picks the tombstone up
 &nbsp; * (see sync-pull-lww.md → Tombstones).
 &nbsp; */
-&nbsp;@Serializable
+<b class="pc">&nbsp;@Serializable</b>
 &nbsp;internal data class TombstonePatch(
-&nbsp;    val deletedAt: Long,
-&nbsp;    val updatedAt: Long,
-&nbsp;    val clientVersionCode: Int,
+<b class="fc">&nbsp;    val deletedAt: Long,</b>
+<b class="fc">&nbsp;    val updatedAt: Long,</b>
+<b class="fc">&nbsp;    val clientVersionCode: Int,</b>
 &nbsp;)
 &nbsp;
 &nbsp;/**
@@ -158,11 +182,11 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    mutation: PendingMutation,
 &nbsp;    clientVersionCode: Int,
 &nbsp;): TombstonePatch {
-<b class="fc">&nbsp;    val deletedAtMillis = mutation.createdAt.toEpochMilliseconds()</b>
-<b class="fc">&nbsp;    return TombstonePatch(</b>
-<b class="fc">&nbsp;        deletedAt = deletedAtMillis,</b>
-<b class="fc">&nbsp;        updatedAt = deletedAtMillis,</b>
-<b class="fc">&nbsp;        clientVersionCode = clientVersionCode,</b>
+&nbsp;    val deletedAtMillis = mutation.createdAt.toEpochMilliseconds()
+&nbsp;    return TombstonePatch(
+&nbsp;        deletedAt = deletedAtMillis,
+&nbsp;        updatedAt = deletedAtMillis,
+&nbsp;        clientVersionCode = clientVersionCode,
 &nbsp;    )
 &nbsp;}
 &nbsp;
@@ -174,8 +198,8 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp; * A doc that never existed remotely has nothing for peers to forget.
 &nbsp; */
 &nbsp;internal suspend fun DocumentReference.pushTombstone(patch: TombstonePatch) {
-<b class="nc">&nbsp;    if (!get().exists) return</b>
-<b class="nc">&nbsp;    update(patch)</b>
+&nbsp;    if (!get().exists) return
+&nbsp;    update(patch)
 &nbsp;}
 </code>
 </pre>
@@ -200,7 +224,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 15:22</div>
+    <div style="float:right;">generated on 2026-07-22 15:43</div>
 </div>
 </body>
 </html>

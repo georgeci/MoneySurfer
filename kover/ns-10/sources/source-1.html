@@ -142,6 +142,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.data.sync.toEntity
 &nbsp;import com.georgeci.moneysurfer.domain.AppInfo
 &nbsp;import com.georgeci.moneysurfer.domain.sync.SyncEntityTypes
+&nbsp;import com.georgeci.moneysurfer.sync.api.SyncCollection
 &nbsp;import com.georgeci.moneysurfer.sync.plugin.EntityApplyResult
 &nbsp;import com.georgeci.moneysurfer.sync.plugin.RemoteDocument
 &nbsp;import com.georgeci.moneysurfer.sync.plugin.SyncEntityPlugin
@@ -163,7 +164,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;) : SyncEntityPlugin {
 &nbsp;
 <b class="nc">&nbsp;    override val entityType: String = SyncEntityTypes.ACCOUNT</b>
-<b class="nc">&nbsp;    override val firestoreCollectionName: String = &quot;accounts&quot;</b>
+<b class="nc">&nbsp;    override val firestoreCollectionName: String = SyncCollection.ACCOUNTS</b>
 <b class="nc">&nbsp;    override val pullPriority: Int = SyncPullPriorities.ACCOUNTS</b>
 &nbsp;
 &nbsp;    override suspend fun push(mutation: PendingMutation) {
@@ -203,7 +204,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    }
 &nbsp;
 &nbsp;    private fun workspaceCollection(workspaceId: String) =
-<b class="nc">&nbsp;        firestore.collection(&quot;workspaces&quot;).document(workspaceId).collection(&quot;accounts&quot;)</b>
+<b class="nc">&nbsp;        firestore.collection(&quot;workspaces&quot;).document(workspaceId).collection(SyncCollection.ACCOUNTS)</b>
 &nbsp;}
 </code>
 </pre>
@@ -228,7 +229,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 15:22</div>
+    <div style="float:right;">generated on 2026-07-22 15:43</div>
 </div>
 </body>
 </html>

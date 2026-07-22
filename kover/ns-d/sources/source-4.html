@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > FirebaseConfigImpl</title>
+  <title>MoneySurfer Coverage Report > FirebaseAccountDeletionRemoteSource</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.data.remote</a>
 </div>
 
-<h1>Coverage Summary for Class: FirebaseConfigImpl (com.georgeci.moneysurfer.data.remote)</h1>
+<h1>Coverage Summary for Class: FirebaseAccountDeletionRemoteSource (com.georgeci.moneysurfer.data.remote)</h1>
 
 <table class="coverageStats">
 
@@ -46,22 +46,13 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">FirebaseConfigImpl</td>
+  <td class="name">FirebaseAccountDeletionRemoteSource</td>
 <td class="coverageStat">
   <span class="percent">
     0%
   </span>
   <span class="absValue">
-    (0/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/5)
+    (0/15)
   </span>
 </td>
 <td class="coverageStat">
@@ -69,12 +60,68 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/22)
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/45)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/688)
   </span>
 </td>
 </tr>
   <tr>
-    <td class="name">FirebaseConfigImpl$Companion</td>
+    <td class="name">FirebaseAccountDeletionRemoteSource$Companion</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">FirebaseAccountDeletionRemoteSource$deleteAllDocs$1</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">FirebaseAccountDeletionRemoteSource$deleteEmailMapping$1</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">FirebaseAccountDeletionRemoteSource$deleteUserDoc$1</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">FirebaseAccountDeletionRemoteSource$deleteWorkspace$1</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">FirebaseAccountDeletionRemoteSource$deleteWorkspaceCollection$1</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">FirebaseAccountDeletionRemoteSource$fetchEmailMappingUid$1</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">FirebaseAccountDeletionRemoteSource$fetchMembers$1</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">FirebaseAccountDeletionRemoteSource$fetchWorkspaceIds$1</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">FirebaseAccountDeletionRemoteSource$fetchWorkspaceOwnerId$1</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">FirebaseAccountDeletionRemoteSource$markMemberLeft$1</td>
     <td class="coverageStat"/>
   </tr>
 <tr>
@@ -84,16 +131,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/5)
+    (0/15)
   </span>
 </td>
 <td class="coverageStat">
@@ -101,7 +139,23 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/22)
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/45)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/688)
   </span>
 </td>
 </tr>
@@ -114,43 +168,113 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.remote
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.repositories.FirebaseConfig
+&nbsp;import com.georgeci.moneysurfer.domain.model.WorkspaceMemberStatus
+&nbsp;import dev.gitlive.firebase.firestore.CollectionReference
+&nbsp;import dev.gitlive.firebase.firestore.DocumentReference
+&nbsp;import dev.gitlive.firebase.firestore.FirebaseFirestore
+&nbsp;import dev.gitlive.firebase.firestore.FirebaseFirestoreException
 &nbsp;import org.koin.core.annotation.Single
 &nbsp;
 &nbsp;/**
-&nbsp; * Default `FirebaseConfig` binding. The toggle [useEmulator] is sourced from
-&nbsp; * [defaultUseEmulator] (per-platform `expect/actual`) — Android pulls
-&nbsp; * `BuildConfig.USE_EMULATOR`, JVM/iOS read an env var. Tests bind their own
-&nbsp; * `FirebaseConfig` instead of using this one.
-&nbsp; *
-&nbsp; * Ports are static (matching `firebase.json`); the host is platform-specific
-&nbsp; * (`10.0.2.2` for Android emulator, `localhost` elsewhere).
+&nbsp; * The only Firebase-aware part of the account-deletion purge: maps [AccountDeletionRemoteSource]
+&nbsp; * primitives onto Firestore document paths, DTOs and write batches. Deliberately free of
+&nbsp; * decision logic — what gets purged versus left is decided in
+&nbsp; * [UserAccountDeletionRepositoryImpl][com.georgeci.moneysurfer.data.repository.UserAccountDeletionRepositoryImpl].
 &nbsp; */
-<b class="nc">&nbsp;@Single(binds = [FirebaseConfig::class])</b>
-&nbsp;class FirebaseConfigImpl : FirebaseConfig {
-<b class="nc">&nbsp;    override val useEmulator: Boolean = defaultUseEmulator()</b>
-<b class="nc">&nbsp;    override val emulatorHost: String = defaultEmulatorHost()</b>
-<b class="nc">&nbsp;    override val authPort: Int = DEFAULT_AUTH_PORT</b>
-<b class="nc">&nbsp;    override val firestorePort: Int = DEFAULT_FIRESTORE_PORT</b>
+<b class="nc">&nbsp;@Single(binds = [AccountDeletionRemoteSource::class])</b>
+&nbsp;class FirebaseAccountDeletionRemoteSource(
+<b class="nc">&nbsp;    private val firestore: FirebaseFirestore,</b>
+&nbsp;) : AccountDeletionRemoteSource {
+&nbsp;
+<b class="nc">&nbsp;    override suspend fun fetchWorkspaceIds(uid: String): List&lt;String&gt; = denyingAware {</b>
+<b class="nc">&nbsp;        val snap = userRef(uid).get()</b>
+<b class="nc">&nbsp;        if (!snap.exists) emptyList() else snap.data(UserDoc.serializer()).workspaceIds.distinct()</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    override suspend fun fetchWorkspaceOwnerId(workspaceId: String): String? = denyingAware {</b>
+<b class="nc">&nbsp;        val snap = workspaceRef(workspaceId).get()</b>
+<b class="nc">&nbsp;        if (!snap.exists) null else snap.data(WorkspaceDoc.serializer()).ownerId</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    override suspend fun fetchMembers(workspaceId: String): List&lt;RemoteMemberRef&gt; = denyingAware {</b>
+<b class="nc">&nbsp;        workspaceRef(workspaceId).collection(MEMBERS).get().documents.map { snap -&gt;</b>
+<b class="nc">&nbsp;            RemoteMemberRef(</b>
+<b class="nc">&nbsp;                uid = snap.id,</b>
+<b class="nc">&nbsp;                status = snap.data(WorkspaceMemberDoc.serializer()).status.toMemberStatus(),</b>
+<b class="nc">&nbsp;            )</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    override suspend fun deleteWorkspaceCollection(workspaceId: String, collectionName: String) =
+<b class="nc">&nbsp;        denyingAware { deleteAllDocs(workspaceRef(workspaceId).collection(collectionName)) }</b>
+&nbsp;
+<b class="nc">&nbsp;    override suspend fun deleteWorkspace(workspaceId: String) = denyingAware {</b>
+<b class="nc">&nbsp;        workspaceRef(workspaceId).delete()</b>
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+<b class="nc">&nbsp;    override suspend fun markMemberLeft(workspaceId: String, uid: String, nowMillis: Long) = denyingAware {</b>
+<b class="nc">&nbsp;        workspaceRef(workspaceId).collection(MEMBERS).document(uid).update(</b>
+<b class="nc">&nbsp;            &quot;status&quot; to WorkspaceMemberStatus.LEFT.name,</b>
+<b class="nc">&nbsp;            &quot;leftAt&quot; to nowMillis,</b>
+<b class="nc">&nbsp;            &quot;updatedAt&quot; to nowMillis,</b>
+<b class="nc">&nbsp;            &quot;clientVersionCode&quot; to CLIENT_VERSION_CODE,</b>
+&nbsp;        )
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+<b class="nc">&nbsp;    override suspend fun fetchEmailMappingUid(emailKey: String): String? = denyingAware {</b>
+<b class="nc">&nbsp;        val snap = firestore.collection(USER_EMAILS).document(emailKey).get()</b>
+<b class="nc">&nbsp;        if (!snap.exists) null else snap.data(UserEmailDoc.serializer()).uid</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    override suspend fun deleteEmailMapping(emailKey: String) = denyingAware {</b>
+<b class="nc">&nbsp;        firestore.collection(USER_EMAILS).document(emailKey).delete()</b>
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+<b class="nc">&nbsp;    override suspend fun deleteUserDoc(uid: String) = denyingAware { userRef(uid).delete() }</b>
+&nbsp;
+&nbsp;    private fun userRef(uid: String): DocumentReference =
+<b class="nc">&nbsp;        firestore.collection(USERS).document(uid)</b>
+&nbsp;
+&nbsp;    private fun workspaceRef(workspaceId: String): DocumentReference =
+<b class="nc">&nbsp;        firestore.collection(WORKSPACES).document(workspaceId)</b>
+&nbsp;
+&nbsp;    /** Firestore caps a write batch at 500 operations; chunk well below that. */
+&nbsp;    private suspend fun deleteAllDocs(collection: CollectionReference) {
+<b class="nc">&nbsp;        collection.get().documents.chunked(MAX_BATCH_SIZE).forEach { chunk -&gt;</b>
+<b class="nc">&nbsp;            val batch = firestore.batch()</b>
+<b class="nc">&nbsp;            chunk.forEach { snap -&gt; batch.delete(snap.reference) }</b>
+<b class="nc">&nbsp;            batch.commit()</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /** Unknown / absent statuses on legacy docs are treated as ACTIVE, matching firestore.rules. */
+&nbsp;    private fun String.toMemberStatus(): WorkspaceMemberStatus =
+<b class="nc">&nbsp;        WorkspaceMemberStatus.entries.firstOrNull { it.name == this } ?: WorkspaceMemberStatus.ACTIVE</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Translates Firestore&#39;s PERMISSION_DENIED into the SDK-free [RemoteAccessDeniedException] so
+&nbsp;     * callers never import a Firebase type. Mirrors SyncErrorClassifier: gitlive exposes no
+&nbsp;     * cross-platform code enum, so the message is what we can inspect.
+&nbsp;     */
+&nbsp;    private inline fun &lt;T&gt; denyingAware(block: () -&gt; T): T =
+&nbsp;        try {
+<b class="nc">&nbsp;            block()</b>
+&nbsp;        } catch (e: FirebaseFirestoreException) {
+<b class="nc">&nbsp;            if (e.message?.lowercase()?.contains(&quot;permission&quot;) == true) {</b>
+<b class="nc">&nbsp;                throw RemoteAccessDeniedException(e.message, e)</b>
+&nbsp;            }
+<b class="nc">&nbsp;            throw e</b>
+&nbsp;        }
 &nbsp;
 &nbsp;    private companion object {
-&nbsp;        const val DEFAULT_AUTH_PORT: Int = 9099
-&nbsp;        const val DEFAULT_FIRESTORE_PORT: Int = 8080
+&nbsp;        const val USERS = &quot;users&quot;
+&nbsp;        const val USER_EMAILS = &quot;userEmails&quot;
+&nbsp;        const val WORKSPACES = &quot;workspaces&quot;
+&nbsp;        const val MEMBERS = &quot;members&quot;
+&nbsp;        const val CLIENT_VERSION_CODE = 1
+&nbsp;        const val MAX_BATCH_SIZE = 400
 &nbsp;    }
 &nbsp;}
-&nbsp;
-&nbsp;/**
-&nbsp; * Whether this build should target the emulator by default. Android maps to
-&nbsp; * `BuildConfig.USE_EMULATOR`, JVM to env var `MS_USE_EMULATOR`, iOS to env var
-&nbsp; * or Info.plist key `MS_USE_EMULATOR`.
-&nbsp; */
-&nbsp;internal expect fun defaultUseEmulator(): Boolean
-&nbsp;
-&nbsp;/**
-&nbsp; * The hostname over which the host machine is reachable from this platform&#39;s
-&nbsp; * runtime. Android emulator: `10.0.2.2`. iOS simulator + Desktop: `localhost`.
-&nbsp; */
-&nbsp;internal expect fun defaultEmulatorHost(): String
 </code>
 </pre>
 </div>
@@ -174,7 +298,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 15:22</div>
+    <div style="float:right;">generated on 2026-07-22 15:43</div>
 </div>
 </body>
 </html>

@@ -52,35 +52,35 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   <td class="name">BudgetPeriod</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
     <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/3)
+    (3/3)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/24)
+    (24/24)
   </span>
 </td>
 </tr>
@@ -97,26 +97,31 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.BudgetId
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryId
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 &nbsp;import kotlinx.datetime.LocalDate
 &nbsp;import kotlin.time.Instant
 &nbsp;
 &nbsp;data class Budget(
 &nbsp;    val id: BudgetId = BudgetId.uuid(),
+&nbsp;    val workspaceId: WorkspaceId,
 &nbsp;    val name: String,
+&nbsp;    /** Empty = every expense category. Income categories are never counted. */
 &nbsp;    val categoryIds: List&lt;CategoryId&gt;,
 &nbsp;    val amount: Money,
 &nbsp;    val period: BudgetPeriod = BudgetPeriod.MONTHLY,
 &nbsp;    val startDate: LocalDate,
 &nbsp;    val alertPercent: Int = 80,
 &nbsp;    val isActive: Boolean = true,
+&nbsp;    /** Carry the previous period&#39;s unspent remainder into the next period&#39;s limit. */
+&nbsp;    val rollover: Boolean = false,
 &nbsp;    val createdAt: Instant,
 &nbsp;    val updatedAt: Instant = createdAt,
 &nbsp;)
 &nbsp;
 &nbsp;enum class BudgetPeriod {
-<b class="nc">&nbsp;    WEEKLY,</b>
-<b class="nc">&nbsp;    MONTHLY,</b>
-<b class="nc">&nbsp;    YEARLY,</b>
+<b class="fc">&nbsp;    WEEKLY,</b>
+<b class="fc">&nbsp;    MONTHLY,</b>
+<b class="fc">&nbsp;    YEARLY,</b>
 &nbsp;}
 </code>
 </pre>
@@ -141,7 +146,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 15:22</div>
+    <div style="float:right;">generated on 2026-07-22 15:43</div>
 </div>
 </body>
 </html>

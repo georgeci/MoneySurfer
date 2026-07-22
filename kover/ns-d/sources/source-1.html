@@ -239,6 +239,30 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;)
 &nbsp;
 &nbsp;/**
+&nbsp; * Budget doc lives at `workspaces/{wid}/budgets/{bid}`.
+&nbsp; *
+&nbsp; * `categoryIds` is a real list on the wire even though Room stores it as a CSV column —
+&nbsp; * a list is the natural Firestore shape and the mapper converts. An empty list means
+&nbsp; * &quot;every expense category&quot;.
+&nbsp; */
+&nbsp;@Serializable
+&nbsp;data class BudgetDoc(
+&nbsp;    val name: String = &quot;&quot;,
+&nbsp;    val categoryIds: List&lt;String&gt; = emptyList(),
+&nbsp;    val amount: Long = 0L,
+&nbsp;    val period: String = &quot;&quot;,
+&nbsp;    /** ISO-8601 local date (`yyyy-MM-dd`) the period anchoring counts from. */
+&nbsp;    val startDate: String = &quot;&quot;,
+&nbsp;    val alertPercent: Int = 0,
+&nbsp;    val isActive: Boolean = true,
+&nbsp;    val rollover: Boolean = false,
+&nbsp;    val createdAt: Long = 0L,
+&nbsp;    val updatedAt: Long = 0L,
+&nbsp;    val deletedAt: Long? = null,
+&nbsp;    val clientVersionCode: Int = 1,
+&nbsp;)
+&nbsp;
+&nbsp;/**
 &nbsp; * Member doc lives at `workspaces/{wid}/members/{uid}`. Doc id = userId.
 &nbsp; *
 &nbsp; * Soft-delete via `status` (`ACTIVE` / `LEFT` / `REMOVED`) — `deletedAt` is kept for
@@ -306,7 +330,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 15:22</div>
+    <div style="float:right;">generated on 2026-07-22 15:43</div>
 </div>
 </body>
 </html>

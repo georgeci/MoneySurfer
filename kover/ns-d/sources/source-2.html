@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > CategoryDoc</title>
+  <title>MoneySurfer Coverage Report > BudgetDoc</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.data.remote</a>
 </div>
 
-<h1>Coverage Summary for Class: CategoryDoc (com.georgeci.moneysurfer.data.remote)</h1>
+<h1>Coverage Summary for Class: BudgetDoc (com.georgeci.moneysurfer.data.remote)</h1>
 
 <table class="coverageStats">
 
@@ -46,65 +46,65 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">CategoryDoc</td>
+  <td class="name">BudgetDoc</td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (1/1)
+    (0/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    43.1%
+    0%
   </span>
   <span class="absValue">
-    (25/58)
+    (0/80)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (9/9)
+    (0/13)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    75.3%
+    0%
   </span>
   <span class="absValue">
-    (241/320)
+    (0/523)
   </span>
 </td>
 </tr>
   <tr>
-    <td class="name">CategoryDoc$Companion</td>
+    <td class="name">BudgetDoc$Companion</td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (1/1)
+    (0/1)
   </span>
 </td>
     <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (1/1)
+    (0/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (4/4)
+    (0/4)
   </span>
 </td>
   </tr>
@@ -112,34 +112,34 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (2/2)
+    (0/2)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    43.1%
+    0%
   </span>
   <span class="absValue">
-    (25/58)
+    (0/80)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (10/10)
+    (0/14)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    75.6%
+    0%
   </span>
   <span class="absValue">
-    (245/324)
+    (0/527)
   </span>
 </td>
 </tr>
@@ -206,17 +206,17 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    val clientVersionCode: Int = 1,
 &nbsp;)
 &nbsp;
-<b class="pc">&nbsp;@Serializable</b>
+&nbsp;@Serializable
 &nbsp;data class CategoryDoc(
-<b class="fc">&nbsp;    val name: String = &quot;&quot;,</b>
-<b class="fc">&nbsp;    val type: String = &quot;&quot;,</b>
-<b class="fc">&nbsp;    val parentId: String? = null,</b>
-<b class="fc">&nbsp;    val createdAt: Long = 0L,</b>
-<b class="fc">&nbsp;    val updatedAt: Long = 0L,</b>
-<b class="fc">&nbsp;    val deletedAt: Long? = null,</b>
-<b class="fc">&nbsp;    val clientVersionCode: Int = 1,</b>
+&nbsp;    val name: String = &quot;&quot;,
+&nbsp;    val type: String = &quot;&quot;,
+&nbsp;    val parentId: String? = null,
+&nbsp;    val createdAt: Long = 0L,
+&nbsp;    val updatedAt: Long = 0L,
+&nbsp;    val deletedAt: Long? = null,
+&nbsp;    val clientVersionCode: Int = 1,
 &nbsp;    /** System kind marker (e.g. &quot;TRANSFER&quot;) for built-in categories. Null for user categories. */
-<b class="fc">&nbsp;    val systemKind: String? = null,</b>
+&nbsp;    val systemKind: String? = null,
 &nbsp;)
 &nbsp;
 &nbsp;@Serializable
@@ -236,6 +236,30 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    val clientVersionCode: Int = 1,
 &nbsp;    /** Shared id linking the two legs of a transfer. Null for non-transfer rows. */
 &nbsp;    val transferId: String? = null,
+&nbsp;)
+&nbsp;
+&nbsp;/**
+&nbsp; * Budget doc lives at `workspaces/{wid}/budgets/{bid}`.
+&nbsp; *
+&nbsp; * `categoryIds` is a real list on the wire even though Room stores it as a CSV column —
+&nbsp; * a list is the natural Firestore shape and the mapper converts. An empty list means
+&nbsp; * &quot;every expense category&quot;.
+&nbsp; */
+<b class="nc">&nbsp;@Serializable</b>
+&nbsp;data class BudgetDoc(
+<b class="nc">&nbsp;    val name: String = &quot;&quot;,</b>
+<b class="nc">&nbsp;    val categoryIds: List&lt;String&gt; = emptyList(),</b>
+<b class="nc">&nbsp;    val amount: Long = 0L,</b>
+<b class="nc">&nbsp;    val period: String = &quot;&quot;,</b>
+&nbsp;    /** ISO-8601 local date (`yyyy-MM-dd`) the period anchoring counts from. */
+<b class="nc">&nbsp;    val startDate: String = &quot;&quot;,</b>
+<b class="nc">&nbsp;    val alertPercent: Int = 0,</b>
+<b class="nc">&nbsp;    val isActive: Boolean = true,</b>
+<b class="nc">&nbsp;    val rollover: Boolean = false,</b>
+<b class="nc">&nbsp;    val createdAt: Long = 0L,</b>
+<b class="nc">&nbsp;    val updatedAt: Long = 0L,</b>
+<b class="nc">&nbsp;    val deletedAt: Long? = null,</b>
+<b class="nc">&nbsp;    val clientVersionCode: Int = 1,</b>
 &nbsp;)
 &nbsp;
 &nbsp;/**
@@ -306,7 +330,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 15:22</div>
+    <div style="float:right;">generated on 2026-07-22 15:43</div>
 </div>
 </body>
 </html>

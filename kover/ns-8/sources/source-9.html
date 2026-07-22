@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > WorkspaceDefaultsKt</title>
+  <title>MoneySurfer Coverage Report > MoneySurferDatabaseKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.data.db</a>
 </div>
 
-<h1>Coverage Summary for Class: WorkspaceDefaultsKt (com.georgeci.moneysurfer.data.db)</h1>
+<h1>Coverage Summary for Class: MoneySurferDatabaseKt (com.georgeci.moneysurfer.data.db)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">WorkspaceDefaultsKt</td>
+  <td class="name">MoneySurferDatabaseKt</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -46,9 +46,68 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.db
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.constants.PREFILLED_DEFAULT_USER_ID
+&nbsp;import androidx.room.ConstructedBy
+&nbsp;import androidx.room.Database
+&nbsp;import androidx.room.RoomDatabase
+&nbsp;import androidx.room.RoomDatabaseConstructor
+&nbsp;import com.georgeci.moneysurfer.data.db.dao.AccountDao
+&nbsp;import com.georgeci.moneysurfer.data.db.dao.BudgetDao
+&nbsp;import com.georgeci.moneysurfer.data.db.dao.CategoryDao
+&nbsp;import com.georgeci.moneysurfer.data.db.dao.RecurringRuleDao
+&nbsp;import com.georgeci.moneysurfer.data.db.dao.TransactionDao
+&nbsp;import com.georgeci.moneysurfer.data.db.dao.UserDao
+&nbsp;import com.georgeci.moneysurfer.data.db.dao.WorkspaceDao
+&nbsp;import com.georgeci.moneysurfer.data.db.dao.WorkspaceInviteDao
+&nbsp;import com.georgeci.moneysurfer.data.db.dao.WorkspaceMemberDao
+&nbsp;import com.georgeci.moneysurfer.data.db.entity.AccountEntity
+&nbsp;import com.georgeci.moneysurfer.data.db.entity.BudgetEntity
+&nbsp;import com.georgeci.moneysurfer.data.db.entity.CategoryEntity
+&nbsp;import com.georgeci.moneysurfer.data.db.entity.RecurringRuleEntity
+&nbsp;import com.georgeci.moneysurfer.data.db.entity.TransactionEntity
+&nbsp;import com.georgeci.moneysurfer.data.db.entity.TransactionFtsEntity
+&nbsp;import com.georgeci.moneysurfer.data.db.entity.UserEntity
+&nbsp;import com.georgeci.moneysurfer.data.db.entity.WorkspaceEntity
+&nbsp;import com.georgeci.moneysurfer.data.db.entity.WorkspaceInviteEntity
+&nbsp;import com.georgeci.moneysurfer.data.db.entity.WorkspaceMemberEntity
 &nbsp;
-&nbsp;internal const val DEFAULT_USER_ID: String = PREFILLED_DEFAULT_USER_ID
+&nbsp;/**
+&nbsp; * Schema version of [MoneySurferDatabase]. Single source of truth so the
+&nbsp; * Room annotation, the backup manifest, and tests can never drift.
+&nbsp; */
+&nbsp;const val MONEY_SURFER_DB_VERSION: Int = 24
+&nbsp;
+&nbsp;@Database(
+&nbsp;    entities = [
+&nbsp;        UserEntity::class,
+&nbsp;        WorkspaceEntity::class,
+&nbsp;        WorkspaceMemberEntity::class,
+&nbsp;        WorkspaceInviteEntity::class,
+&nbsp;        AccountEntity::class,
+&nbsp;        CategoryEntity::class,
+&nbsp;        TransactionEntity::class,
+&nbsp;        TransactionFtsEntity::class,
+&nbsp;        BudgetEntity::class,
+&nbsp;        RecurringRuleEntity::class,
+&nbsp;    ],
+&nbsp;    version = MONEY_SURFER_DB_VERSION,
+&nbsp;)
+&nbsp;@ConstructedBy(MoneySurferDatabaseConstructor::class)
+&nbsp;abstract class MoneySurferDatabase : RoomDatabase() {
+&nbsp;    abstract fun userDao(): UserDao
+&nbsp;    abstract fun workspaceDao(): WorkspaceDao
+&nbsp;    abstract fun workspaceMemberDao(): WorkspaceMemberDao
+&nbsp;    abstract fun workspaceInviteDao(): WorkspaceInviteDao
+&nbsp;    abstract fun accountDao(): AccountDao
+&nbsp;    abstract fun categoryDao(): CategoryDao
+&nbsp;    abstract fun transactionDao(): TransactionDao
+&nbsp;    abstract fun budgetDao(): BudgetDao
+&nbsp;    abstract fun recurringRuleDao(): RecurringRuleDao
+&nbsp;}
+&nbsp;
+&nbsp;@Suppress(&quot;KotlinNoActualForExpect&quot;)
+&nbsp;expect object MoneySurferDatabaseConstructor : RoomDatabaseConstructor&lt;MoneySurferDatabase&gt; {
+&nbsp;    override fun initialize(): MoneySurferDatabase
+&nbsp;}
 </code>
 </pre>
 </div>
@@ -72,7 +131,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 15:22</div>
+    <div style="float:right;">generated on 2026-07-22 15:43</div>
 </div>
 </body>
 </html>

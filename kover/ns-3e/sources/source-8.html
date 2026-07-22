@@ -1,0 +1,235 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>MoneySurfer Coverage Report > SurferStatusHeroTone</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.georgeci.moneysurfer.uikit.components.settings</a>
+</div>
+
+<h1>Coverage Summary for Class: SurferStatusHeroTone (com.georgeci.moneysurfer.uikit.components.settings)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">SurferStatusHeroTone</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.components.settings
+&nbsp;
+&nbsp;import androidx.compose.foundation.background
+&nbsp;import androidx.compose.foundation.layout.Arrangement
+&nbsp;import androidx.compose.foundation.layout.Box
+&nbsp;import androidx.compose.foundation.layout.Column
+&nbsp;import androidx.compose.foundation.layout.Row
+&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
+&nbsp;import androidx.compose.foundation.layout.padding
+&nbsp;import androidx.compose.foundation.layout.size
+&nbsp;import androidx.compose.foundation.shape.CircleShape
+&nbsp;import androidx.compose.foundation.shape.RoundedCornerShape
+&nbsp;import androidx.compose.material3.Icon
+&nbsp;import androidx.compose.material3.Text
+&nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.ui.Alignment
+&nbsp;import androidx.compose.ui.Modifier
+&nbsp;import androidx.compose.ui.draw.clip
+&nbsp;import androidx.compose.ui.draw.shadow
+&nbsp;import androidx.compose.ui.graphics.Color
+&nbsp;import androidx.compose.ui.graphics.vector.ImageVector
+&nbsp;import androidx.compose.ui.tooling.preview.Preview
+&nbsp;import androidx.compose.ui.unit.dp
+&nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+&nbsp;import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
+&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
+&nbsp;
+<b class="nc">&nbsp;enum class SurferStatusHeroTone { Primary, Secondary, Tertiary }</b>
+&nbsp;
+&nbsp;/**
+&nbsp; * Tinted hero card with a circular icon, title, and optional supporting line.
+&nbsp; * Generic enough to power sync status, last-backup, and similar surfaces.
+&nbsp; */
+&nbsp;@Composable
+&nbsp;fun SurferStatusHeroCard(
+&nbsp;    title: String,
+&nbsp;    icon: ImageVector,
+&nbsp;    modifier: Modifier = Modifier,
+&nbsp;    supporting: String? = null,
+&nbsp;    tone: SurferStatusHeroTone = SurferStatusHeroTone.Tertiary,
+&nbsp;) {
+&nbsp;    val colors = AppTheme.materialColors
+&nbsp;    val (bg, fg) = when (tone) {
+&nbsp;        SurferStatusHeroTone.Primary -&gt; colors.primaryContainer to colors.onPrimaryContainer
+&nbsp;        SurferStatusHeroTone.Secondary -&gt; colors.secondaryContainer to colors.onSecondaryContainer
+&nbsp;        SurferStatusHeroTone.Tertiary -&gt; colors.tertiaryContainer to colors.onTertiaryContainer
+&nbsp;    }
+&nbsp;    val shape = RoundedCornerShape(20.dp)
+&nbsp;    Row(
+&nbsp;        modifier = modifier
+&nbsp;            .fillMaxWidth()
+&nbsp;            .shadow(elevation = 2.dp, shape = shape)
+&nbsp;            .clip(shape)
+&nbsp;            .background(bg)
+&nbsp;            .padding(18.dp),
+&nbsp;        verticalAlignment = Alignment.CenterVertically,
+&nbsp;        horizontalArrangement = Arrangement.spacedBy(14.dp),
+&nbsp;    ) {
+&nbsp;        Box(
+&nbsp;            modifier = Modifier
+&nbsp;                .size(48.dp)
+&nbsp;                .clip(CircleShape)
+&nbsp;                .background(Color.White.copy(alpha = 0.2f)),
+&nbsp;            contentAlignment = Alignment.Center,
+&nbsp;        ) {
+&nbsp;            Icon(
+&nbsp;                imageVector = icon,
+&nbsp;                // decorative — status illustration; the title and supporting text convey the status
+&nbsp;                contentDescription = null,
+&nbsp;                tint = fg,
+&nbsp;                modifier = Modifier.size(24.dp),
+&nbsp;            )
+&nbsp;        }
+&nbsp;        Column(modifier = Modifier.weight(1f)) {
+&nbsp;            Text(
+&nbsp;                text = title,
+&nbsp;                style = AppTheme.typography.titleMedium,
+&nbsp;                color = fg,
+&nbsp;            )
+&nbsp;            if (supporting != null) {
+&nbsp;                Text(
+&nbsp;                    text = supporting,
+&nbsp;                    style = AppTheme.typography.bodySmall,
+&nbsp;                    color = fg.copy(alpha = 0.85f),
+&nbsp;                    modifier = Modifier.padding(top = 2.dp),
+&nbsp;                )
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Preview
+&nbsp;@Composable
+&nbsp;private fun SurferStatusHeroCardPreview() {
+&nbsp;    SurferComponentPreview {
+&nbsp;        Column(
+&nbsp;            verticalArrangement = Arrangement.spacedBy(10.dp),
+&nbsp;            modifier = Modifier.padding(16.dp),
+&nbsp;        ) {
+&nbsp;            SurferStatusHeroCard(
+&nbsp;                title = &quot;Up to date&quot;,
+&nbsp;                supporting = &quot;Last sync: today, 14:02&quot;,
+&nbsp;                icon = SurferIcons.Sync,
+&nbsp;                tone = SurferStatusHeroTone.Tertiary,
+&nbsp;            )
+&nbsp;            SurferStatusHeroCard(
+&nbsp;                title = &quot;Last backup · today&quot;,
+&nbsp;                supporting = &quot;14:02 · 18 MB · 2,341 transactions&quot;,
+&nbsp;                icon = SurferIcons.Cloud,
+&nbsp;                tone = SurferStatusHeroTone.Primary,
+&nbsp;            )
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-07-22 15:43</div>
+</div>
+</body>
+</html>

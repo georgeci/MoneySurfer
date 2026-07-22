@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > ComGeorgeciMoneysurferDataDiSyncImplModuleModuleKt</title>
+  <title>MoneySurfer Coverage Report > AccountRepository</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">org.koin.plugin.hints</a>
+    <a href="../index.html">com.georgeci.moneysurfer.domain.repositories</a>
 </div>
 
-<h1>Coverage Summary for Class: ComGeorgeciMoneysurferDataDiSyncImplModuleModuleKt (org.koin.plugin.hints)</h1>
+<h1>Coverage Summary for Class: AccountRepository (com.georgeci.moneysurfer.domain.repositories)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">ComGeorgeciMoneysurferDataDiSyncImplModuleModuleKt</td>
+  <td class="name">AccountRepository</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -42,7 +42,50 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <br/>
 <br/>
 
-  <code class="sourceCode">Source code is not available<br /></code>
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.repositories
+&nbsp;
+&nbsp;import com.georgeci.moneysurfer.domain.model.Account
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.AccountId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
+&nbsp;import kotlinx.coroutines.flow.Flow
+&nbsp;
+&nbsp;interface AccountRepository {
+&nbsp;    fun getAll(): Flow&lt;List&lt;Account&gt;&gt;
+&nbsp;    fun getByWorkspaceId(workspaceId: WorkspaceId): Flow&lt;List&lt;Account&gt;&gt;
+&nbsp;    suspend fun getById(id: AccountId): Account?
+&nbsp;    suspend fun insert(account: Account)
+&nbsp;    suspend fun update(account: Account)
+&nbsp;    suspend fun delete(id: AccountId)
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Increment the cached `balance` of [accountId] by [delta]. Used by total-calc to keep
+&nbsp;     * `Account.balance` in sync with transaction changes without rewriting the whole row.
+&nbsp;     *
+&nbsp;     * Negative delta is allowed (subtracts). The repository writes the result and bumps
+&nbsp;     * `updatedAt`. Does NOT enqueue an outbox row — balance is a derived projection that
+&nbsp;     * Firestore recomputes server-side from its own tx state (see md/totatl_calc.md §6).
+&nbsp;     */
+&nbsp;    suspend fun applyDelta(accountId: AccountId, delta: Money)
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Overwrite the cached balance with [balance]. Used by `RecalculateAccountBalanceUseCase`
+&nbsp;     * to repair the cache from authoritative transaction history. Like [applyDelta], does
+&nbsp;     * not enqueue an outbox row.
+&nbsp;     */
+&nbsp;    suspend fun setBalance(accountId: AccountId, balance: Money)
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Toggle the archived flag on [accountId]. Bumps `updatedAt` and enqueues a sync update.
+&nbsp;     * Archived accounts keep their transactions but are hidden from active lists and excluded
+&nbsp;     * from total/budget rollups. No-op if [accountId] is unknown locally.
+&nbsp;     */
+&nbsp;    suspend fun setArchived(accountId: AccountId, archived: Boolean)
+&nbsp;}
+</code>
+</pre>
 </div>
 
 <script type="text/javascript">
@@ -64,7 +107,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 15:22</div>
+    <div style="float:right;">generated on 2026-07-22 15:43</div>
 </div>
 </body>
 </html>

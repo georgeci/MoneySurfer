@@ -68,7 +68,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     97.2%
   </span>
   <span class="absValue">
-    (103/106)
+    (104/107)
   </span>
 </td>
 <td class="coverageStat">
@@ -191,7 +191,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     97.4%
   </span>
   <span class="absValue">
-    (113/116)
+    (114/117)
   </span>
 </td>
 <td class="coverageStat">
@@ -219,6 +219,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.domain.sync.PullRemoteChangesUseCase
 &nbsp;import com.georgeci.moneysurfer.domain.sync.PullSummary
 &nbsp;import com.georgeci.moneysurfer.sync.api.SyncCancelToken
+&nbsp;import com.georgeci.moneysurfer.sync.api.SyncCollection
 &nbsp;import com.georgeci.moneysurfer.sync.api.SyncResult
 &nbsp;import com.georgeci.moneysurfer.sync.api.SyncScope
 &nbsp;import com.georgeci.moneysurfer.sync.plugin.EntityApplyResult
@@ -323,7 +324,9 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;            val uid = session.currentFirebaseUid.flow.first()</b>
 <b class="fc">&nbsp;            if (uid != null) {</b>
 <b class="fc">&nbsp;                val invitedIds = userWorkspacesProvider.invitedWorkspaceIds()</b>
-<b class="fc">&nbsp;                val invitePlugin = plugins.firstOrNull { it.firestoreCollectionName == &quot;invites&quot; }</b>
+<b class="fc">&nbsp;                val invitePlugin = plugins.firstOrNull {</b>
+<b class="fc">&nbsp;                    it.firestoreCollectionName == SyncCollection.WORKSPACE_INVITES</b>
+&nbsp;                }
 <b class="pc">&nbsp;                if (invitePlugin != null) {</b>
 <b class="fc">&nbsp;                    for (workspaceId in invitedIds) {</b>
 <b class="fc">&nbsp;                        cancelToken.throwIfCancelled()</b>
@@ -412,7 +415,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;        cancelToken: SyncCancelToken,
 <b class="fc">&nbsp;    ): Pair&lt;Int, Int&gt; = pullBatch(</b>
 <b class="fc">&nbsp;        workspaceId = workspaceId,</b>
-<b class="fc">&nbsp;        collectionName = &quot;invites&quot;,</b>
+<b class="fc">&nbsp;        collectionName = SyncCollection.WORKSPACE_INVITES,</b>
 <b class="fc">&nbsp;        plugin = plugin,</b>
 <b class="fc">&nbsp;        onProgress = onProgress,</b>
 <b class="fc">&nbsp;        cancelToken = cancelToken,</b>
@@ -527,7 +530,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 15:22</div>
+    <div style="float:right;">generated on 2026-07-22 15:43</div>
 </div>
 </body>
 </html>

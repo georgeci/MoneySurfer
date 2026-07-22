@@ -158,8 +158,13 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.domain.model.BudgetPeriod
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.BudgetId
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 &nbsp;import com.georgeci.moneysurfer.domain.repositories.BudgetRepository
+&nbsp;import com.georgeci.moneysurfer.domain.sync.SyncEntityTypes
+&nbsp;import com.georgeci.moneysurfer.sync.repository.MutationOperation
+&nbsp;import com.georgeci.moneysurfer.sync.repository.OutboxEnqueuer
 &nbsp;import kotlinx.coroutines.flow.Flow
 &nbsp;import kotlinx.coroutines.flow.map
 &nbsp;import org.koin.core.annotation.Single
@@ -167,29 +172,72 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;@Single(binds = [BudgetRepository::class])
 &nbsp;class BudgetRepositoryImpl(
 &nbsp;    private val dao: BudgetDao,
+&nbsp;    private val outboxEnqueuer: OutboxEnqueuer,
+&nbsp;    private val clock: ClockUseCase,
 &nbsp;    private val timeFormatter: TimeFormatter,
 &nbsp;) : BudgetRepository {
 &nbsp;
 &nbsp;    override fun getAll(): Flow&lt;List&lt;Budget&gt;&gt; =
 &nbsp;        dao.getAll().map { list -&gt; list.map { it.toDomain() } }
 &nbsp;
+&nbsp;    override fun getByWorkspaceId(workspaceId: WorkspaceId): Flow&lt;List&lt;Budget&gt;&gt; =
+&nbsp;        dao.getByWorkspaceId(workspaceId.value).map { list -&gt; list.map { it.toDomain() } }
+&nbsp;
 &nbsp;    override suspend fun getById(id: BudgetId): Budget? =
 &nbsp;        dao.getById(id.value)?.toDomain()
 &nbsp;
 &nbsp;    override suspend fun insert(budget: Budget) {
-&nbsp;        dao.insert(budget.toEntity())
+&nbsp;        val entity = budget.toEntity()
+&nbsp;        dao.insert(entity)
+&nbsp;        enqueueUpsert(entity, MutationOperation.INSERT)
 &nbsp;    }
 &nbsp;
 &nbsp;    override suspend fun update(budget: Budget) {
-&nbsp;        dao.update(budget.toEntity())
+&nbsp;        val existingCreatedAt = dao.getById(budget.id.value)?.createdAt
+&nbsp;        val entity = budget.toEntity().let { mapped -&gt;
+&nbsp;            mapped.copy(
+&nbsp;                createdAt = existingCreatedAt ?: mapped.createdAt,
+&nbsp;                updatedAt = clock.now().toEpochMilliseconds(),
+&nbsp;            )
+&nbsp;        }
+&nbsp;        dao.update(entity)
+&nbsp;        enqueueUpsert(entity, MutationOperation.UPDATE)
+&nbsp;    }
+&nbsp;
+&nbsp;    override suspend fun setActive(id: BudgetId, isActive: Boolean) {
+&nbsp;        val existing = dao.getById(id.value) ?: return
+&nbsp;        val entity = existing.copy(
+&nbsp;            isActive = isActive,
+&nbsp;            updatedAt = clock.now().toEpochMilliseconds(),
+&nbsp;        )
+&nbsp;        dao.update(entity)
+&nbsp;        enqueueUpsert(entity, MutationOperation.UPDATE)
 &nbsp;    }
 &nbsp;
 &nbsp;    override suspend fun delete(id: BudgetId) {
+&nbsp;        val existing = dao.getById(id.value)
 &nbsp;        dao.delete(id.value)
+&nbsp;        if (existing != null) {
+&nbsp;            outboxEnqueuer.enqueueDelete(
+&nbsp;                entityType = SyncEntityTypes.BUDGET,
+&nbsp;                entityId = existing.id,
+&nbsp;                scopeKey = existing.workspaceId,
+&nbsp;            )
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private suspend fun enqueueUpsert(entity: BudgetEntity, operation: MutationOperation) {
+&nbsp;        outboxEnqueuer.enqueueUpsert(
+&nbsp;            entityType = SyncEntityTypes.BUDGET,
+&nbsp;            entityId = entity.id,
+&nbsp;            scopeKey = entity.workspaceId,
+&nbsp;            operation = operation,
+&nbsp;        )
 &nbsp;    }
 &nbsp;
 &nbsp;    private fun BudgetEntity.toDomain() = Budget(
 &nbsp;        id = BudgetId(id),
+&nbsp;        workspaceId = WorkspaceId(workspaceId),
 &nbsp;        name = name,
 &nbsp;        categoryIds = categoryIds.parseCategoryIds(),
 &nbsp;        amount = Money.fromMinor(amount),
@@ -197,12 +245,14 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;        startDate = timeFormatter.parseLocalDate(startDate),
 &nbsp;        alertPercent = alertPercent,
 &nbsp;        isActive = isActive,
+&nbsp;        rollover = rollover,
 &nbsp;        createdAt = timeFormatter.parseInstant(createdAt),
 &nbsp;        updatedAt = timeFormatter.parseInstant(updatedAt),
 &nbsp;    )
 &nbsp;
 &nbsp;    private fun Budget.toEntity() = BudgetEntity(
 &nbsp;        id = id.value,
+&nbsp;        workspaceId = workspaceId.value,
 &nbsp;        name = name,
 &nbsp;        categoryIds = categoryIds.toStorageValue(),
 &nbsp;        amount = amount.minor,
@@ -210,6 +260,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;        startDate = timeFormatter.formatLocalDate(startDate),
 &nbsp;        alertPercent = alertPercent,
 &nbsp;        isActive = isActive,
+&nbsp;        rollover = rollover,
 &nbsp;        createdAt = timeFormatter.formatInstant(createdAt),
 &nbsp;        updatedAt = timeFormatter.formatInstant(updatedAt),
 &nbsp;    )
@@ -245,7 +296,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 15:22</div>
+    <div style="float:right;">generated on 2026-07-22 15:43</div>
 </div>
 </body>
 </html>

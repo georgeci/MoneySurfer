@@ -63,7 +63,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/12)
+    (0/14)
   </span>
 </td>
 <td class="coverageStat">
@@ -79,7 +79,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/130)
+    (0/154)
   </span>
 </td>
 <td class="coverageStat">
@@ -87,7 +87,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/387)
+    (0/537)
   </span>
 </td>
 </tr>
@@ -102,12 +102,14 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.sync
 &nbsp;
 &nbsp;import com.georgeci.moneysurfer.data.db.entity.AccountEntity
+&nbsp;import com.georgeci.moneysurfer.data.db.entity.BudgetEntity
 &nbsp;import com.georgeci.moneysurfer.data.db.entity.CategoryEntity
 &nbsp;import com.georgeci.moneysurfer.data.db.entity.TransactionEntity
 &nbsp;import com.georgeci.moneysurfer.data.db.entity.WorkspaceEntity
 &nbsp;import com.georgeci.moneysurfer.data.db.entity.WorkspaceInviteEntity
 &nbsp;import com.georgeci.moneysurfer.data.db.entity.WorkspaceMemberEntity
 &nbsp;import com.georgeci.moneysurfer.data.remote.AccountDoc
+&nbsp;import com.georgeci.moneysurfer.data.remote.BudgetDoc
 &nbsp;import com.georgeci.moneysurfer.data.remote.CategoryDoc
 &nbsp;import com.georgeci.moneysurfer.data.remote.TransactionDoc
 &nbsp;import com.georgeci.moneysurfer.data.remote.WorkspaceDoc
@@ -187,6 +189,40 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="nc">&nbsp;    createdAt = createdAt,</b>
 <b class="nc">&nbsp;    updatedAt = updatedAt,</b>
 <b class="nc">&nbsp;    systemKind = systemKind,</b>
+&nbsp;)
+&nbsp;
+&nbsp;/**
+&nbsp; * Room stores `categoryIds` as a CSV column while the wire DTO carries a real list, so these
+&nbsp; * mappers convert on the entity↔wire boundary. (`BudgetRepositoryImpl` does the same conversion
+&nbsp; * on the entity↔domain boundary — two boundaries, same CSV encoding.) Blank segments are dropped
+&nbsp; * so a legacy `&quot;&quot;` or a trailing comma decodes to an empty list rather than a blank id.
+&nbsp; */
+<b class="nc">&nbsp;fun BudgetEntity.toDoc(): BudgetDoc = BudgetDoc(</b>
+<b class="nc">&nbsp;    name = name,</b>
+<b class="nc">&nbsp;    categoryIds = categoryIds.split(&#39;,&#39;).filter { it.isNotBlank() },</b>
+<b class="nc">&nbsp;    amount = amount,</b>
+<b class="nc">&nbsp;    period = period,</b>
+<b class="nc">&nbsp;    startDate = startDate,</b>
+<b class="nc">&nbsp;    alertPercent = alertPercent,</b>
+<b class="nc">&nbsp;    isActive = isActive,</b>
+<b class="nc">&nbsp;    rollover = rollover,</b>
+<b class="nc">&nbsp;    createdAt = createdAt,</b>
+<b class="nc">&nbsp;    updatedAt = updatedAt,</b>
+&nbsp;)
+&nbsp;
+<b class="nc">&nbsp;fun BudgetDoc.toEntity(id: String, workspaceId: String): BudgetEntity = BudgetEntity(</b>
+<b class="nc">&nbsp;    id = id,</b>
+<b class="nc">&nbsp;    workspaceId = workspaceId,</b>
+<b class="nc">&nbsp;    name = name,</b>
+<b class="nc">&nbsp;    categoryIds = categoryIds.filter { it.isNotBlank() }.joinToString(&quot;,&quot;),</b>
+<b class="nc">&nbsp;    amount = amount,</b>
+<b class="nc">&nbsp;    period = period,</b>
+<b class="nc">&nbsp;    startDate = startDate,</b>
+<b class="nc">&nbsp;    alertPercent = alertPercent,</b>
+<b class="nc">&nbsp;    isActive = isActive,</b>
+<b class="nc">&nbsp;    rollover = rollover,</b>
+<b class="nc">&nbsp;    createdAt = createdAt,</b>
+<b class="nc">&nbsp;    updatedAt = updatedAt,</b>
 &nbsp;)
 &nbsp;
 <b class="nc">&nbsp;fun TransactionEntity.toDoc(): TransactionDoc = TransactionDoc(</b>
@@ -315,7 +351,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 15:22</div>
+    <div style="float:right;">generated on 2026-07-22 15:43</div>
 </div>
 </body>
 </html>

@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > RemoteMemberRef</title>
+  <title>MoneySurfer Coverage Report > RemoteAccessDeniedException</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.data.remote</a>
 </div>
 
-<h1>Coverage Summary for Class: RemoteMemberRef (com.georgeci.moneysurfer.data.remote)</h1>
+<h1>Coverage Summary for Class: RemoteAccessDeniedException (com.georgeci.moneysurfer.data.remote)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">RemoteMemberRef</td>
+  <td class="name">RemoteAccessDeniedException</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -72,7 +72,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (3/3)
+    (2/2)
   </span>
 </td>
 <td class="coverageStat">
@@ -80,7 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (12/12)
+    (4/4)
   </span>
 </td>
 </tr>
@@ -142,9 +142,9 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;}
 &nbsp;
 &nbsp;/** Member row reduced to what the purge decision needs. */
-<b class="fc">&nbsp;data class RemoteMemberRef(</b>
-<b class="fc">&nbsp;    val uid: String,</b>
-<b class="fc">&nbsp;    val status: WorkspaceMemberStatus,</b>
+&nbsp;data class RemoteMemberRef(
+&nbsp;    val uid: String,
+&nbsp;    val status: WorkspaceMemberStatus,
 &nbsp;)
 &nbsp;
 &nbsp;/**
@@ -153,8 +153,8 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp; */
 &nbsp;class RemoteAccessDeniedException(
 &nbsp;    message: String?,
-&nbsp;    cause: Throwable? = null,
-&nbsp;) : Exception(message, cause)
+<b class="fc">&nbsp;    cause: Throwable? = null,</b>
+<b class="fc">&nbsp;) : Exception(message, cause)</b>
 </code>
 </pre>
 </div>
@@ -178,7 +178,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 15:22</div>
+    <div style="float:right;">generated on 2026-07-22 15:43</div>
 </div>
 </body>
 </html>

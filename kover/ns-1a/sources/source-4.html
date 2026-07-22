@@ -52,35 +52,35 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   <td class="name">Budget</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
     <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/11)
+    (13/13)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/96)
+    (114/114)
   </span>
 </td>
 </tr>
@@ -97,20 +97,25 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.BudgetId
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryId
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 &nbsp;import kotlinx.datetime.LocalDate
 &nbsp;import kotlin.time.Instant
 &nbsp;
-<b class="nc">&nbsp;data class Budget(</b>
-<b class="nc">&nbsp;    val id: BudgetId = BudgetId.uuid(),</b>
-<b class="nc">&nbsp;    val name: String,</b>
-<b class="nc">&nbsp;    val categoryIds: List&lt;CategoryId&gt;,</b>
-<b class="nc">&nbsp;    val amount: Money,</b>
-<b class="nc">&nbsp;    val period: BudgetPeriod = BudgetPeriod.MONTHLY,</b>
-<b class="nc">&nbsp;    val startDate: LocalDate,</b>
-<b class="nc">&nbsp;    val alertPercent: Int = 80,</b>
-<b class="nc">&nbsp;    val isActive: Boolean = true,</b>
-<b class="nc">&nbsp;    val createdAt: Instant,</b>
-<b class="nc">&nbsp;    val updatedAt: Instant = createdAt,</b>
+<b class="fc">&nbsp;data class Budget(</b>
+<b class="fc">&nbsp;    val id: BudgetId = BudgetId.uuid(),</b>
+<b class="fc">&nbsp;    val workspaceId: WorkspaceId,</b>
+<b class="fc">&nbsp;    val name: String,</b>
+&nbsp;    /** Empty = every expense category. Income categories are never counted. */
+<b class="fc">&nbsp;    val categoryIds: List&lt;CategoryId&gt;,</b>
+<b class="fc">&nbsp;    val amount: Money,</b>
+<b class="fc">&nbsp;    val period: BudgetPeriod = BudgetPeriod.MONTHLY,</b>
+<b class="fc">&nbsp;    val startDate: LocalDate,</b>
+<b class="fc">&nbsp;    val alertPercent: Int = 80,</b>
+<b class="fc">&nbsp;    val isActive: Boolean = true,</b>
+&nbsp;    /** Carry the previous period&#39;s unspent remainder into the next period&#39;s limit. */
+<b class="fc">&nbsp;    val rollover: Boolean = false,</b>
+<b class="fc">&nbsp;    val createdAt: Instant,</b>
+<b class="fc">&nbsp;    val updatedAt: Instant = createdAt,</b>
 &nbsp;)
 &nbsp;
 &nbsp;enum class BudgetPeriod {
@@ -141,7 +146,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 15:22</div>
+    <div style="float:right;">generated on 2026-07-22 15:43</div>
 </div>
 </body>
 </html>
