@@ -11,6 +11,7 @@ import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 import com.georgeci.moneysurfer.domain.repositories.CategoryRepository
 import com.georgeci.moneysurfer.domain.usecase.CreateCategoryUseCase
 import com.georgeci.moneysurfer.domain.usecase.DeleteCategoryUseCase
+import com.georgeci.moneysurfer.domain.usecase.EditCategoryUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetCategoriesUseCase
 import com.georgeci.moneysurfer.navigation.SnackbarController
 import io.kotest.core.spec.style.StringSpec
@@ -138,6 +139,85 @@ class CategoriesManageViewModelTest : StringSpec({
         val content = viewModel.value.shouldBeInstanceOf<CategoriesManageState.Content>()
         content.categories.single().id shouldBe category.id
     }
+
+    // ── tree rendering and parent deletes (issue #247) ────────────────────────────────────
+
+    "children are listed directly under their parent, one level deep" {
+        val parent = aCategory(id = categoryId("c-parent"), name = "Food")
+        val child = aCategory(id = categoryId("c-child"), name = "Groceries", parentId = parent.id)
+        val unrelated = aCategory(id = categoryId("c-other"), name = "Transport")
+        val repo = FakeCategoryRepository()
+        val viewModel = newViewModel(repo)
+
+        // Deliberately out of tree order — flattening, not input order, is what places the row.
+        repo.emit(listOf(child, unrelated, parent))
+
+        val content = viewModel.value.shouldBeInstanceOf<CategoriesManageState.Content>()
+        content.categories.map { it.name to it.depth } shouldBe listOf(
+            "Transport" to 0,
+            "Food" to 0,
+            "Groceries" to 1,
+        )
+    }
+
+    "staging a delete counts the children the confirmation has to warn about" {
+        val parent = aCategory(id = categoryId("c-parent"), name = "Food")
+        val child = aCategory(id = categoryId("c-child"), name = "Groceries", parentId = parent.id)
+        val repo = FakeCategoryRepository()
+        val viewModel = newViewModel(repo)
+        repo.emit(listOf(parent, child))
+
+        viewModel.onEvent(CategoriesManageEvent.OnRemoveCategoryClick(parent.id))
+
+        val content = viewModel.value.shouldBeInstanceOf<CategoriesManageState.Content>()
+        content.pendingDelete?.childCount shouldBe 1
+    }
+
+    "deleting a parent keeps its children, moved up to the root" {
+        val ws = workspaceId("ws-1")
+        val parent = aCategory(id = categoryId("c-parent"), workspaceId = ws, name = "Food")
+        val child = aCategory(
+            id = categoryId("c-child"),
+            workspaceId = ws,
+            name = "Groceries",
+            parentId = parent.id,
+        )
+        val repo = FakeCategoryRepository(initial = listOf(parent, child))
+        val viewModel = newViewModel(repo, ws)
+
+        viewModel.onEvent(CategoriesManageEvent.OnRemoveCategoryClick(parent.id))
+        viewModel.onEvent(CategoriesManageEvent.OnDeleteConfirm)
+
+        repo.snapshot().map { it.id to it.parentId } shouldBe listOf(child.id to null)
+    }
+
+    "undoing a parent delete re-attaches the children it had" {
+        val ws = workspaceId("ws-1")
+        val parent = aCategory(id = categoryId("c-parent"), workspaceId = ws, name = "Food")
+        val child = aCategory(
+            id = categoryId("c-child"),
+            workspaceId = ws,
+            name = "Groceries",
+            parentId = parent.id,
+        )
+        val repo = FakeCategoryRepository(initial = listOf(parent, child))
+        val snackbar = SnackbarController()
+        val viewModel = newViewModel(repo, ws, snackbar)
+
+        viewModel.onEvent(CategoriesManageEvent.OnRemoveCategoryClick(parent.id))
+
+        var onUndo: (suspend () -> Unit)? = null
+        snackbar.requests.test {
+            viewModel.onEvent(CategoriesManageEvent.OnDeleteConfirm)
+            onUndo = awaitItem().onAction
+        }
+
+        onUndo.shouldNotBeNull().invoke()
+
+        repo.snapshot().first { it.id == child.id }.parentId shouldBe parent.id
+        val content = viewModel.value.shouldBeInstanceOf<CategoriesManageState.Content>()
+        content.categories.map { it.name to it.depth } shouldBe listOf("Food" to 0, "Groceries" to 1)
+    }
 })
 
 private fun newViewModel(
@@ -150,6 +230,7 @@ private fun newViewModel(
         getCategories = GetCategoriesUseCase(repo, session),
         deleteCategory = DeleteCategoryUseCase(repo),
         createCategory = CreateCategoryUseCase(repo),
+        editCategory = EditCategoryUseCase(repo),
         snackbar = snackbar,
     )
 }
@@ -164,7 +245,10 @@ private fun List<*>.shouldBeEmpty() {
  * re-emit the mutated list so the VM observes deletes and Undo re-inserts.
  */
 private class FakeCategoryRepository(initial: List<Category>? = null) : CategoryRepository {
-    private val flow = MutableSharedFlow<List<Category>>(replay = 1)
+    // Extra buffer beyond the replay slot: deleting a parent writes more than once (reparent
+    // each child, then delete), and a zero-capacity replay flow refuses the second tryEmit
+    // while a collector is still catching up.
+    private val flow = MutableSharedFlow<List<Category>>(replay = 1, extraBufferCapacity = 16)
     private var current: List<Category> = initial ?: emptyList()
     val deleted = mutableListOf<CategoryId>()
 

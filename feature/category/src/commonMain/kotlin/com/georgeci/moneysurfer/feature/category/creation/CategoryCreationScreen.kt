@@ -14,24 +14,28 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -47,19 +51,13 @@ import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.utils.HandleSideEffect
 import moneysurfer.feature.category.generated.resources.Res
-import moneysurfer.feature.category.generated.resources.category_creation_add_another
 import moneysurfer.feature.category.generated.resources.category_creation_color_label
-import moneysurfer.feature.category.generated.resources.category_creation_extra_label
-import moneysurfer.feature.category.generated.resources.category_creation_extra_optional
-import moneysurfer.feature.category.generated.resources.category_creation_field_cap
-import moneysurfer.feature.category.generated.resources.category_creation_field_cap_helper
-import moneysurfer.feature.category.generated.resources.category_creation_field_note
 import moneysurfer.feature.category.generated.resources.category_creation_field_parent
 import moneysurfer.feature.category.generated.resources.category_creation_icon_label
 import moneysurfer.feature.category.generated.resources.category_creation_name_counter
 import moneysurfer.feature.category.generated.resources.category_creation_name_error_required
 import moneysurfer.feature.category.generated.resources.category_creation_name_label
-import moneysurfer.feature.category.generated.resources.category_creation_remove
+import moneysurfer.feature.category.generated.resources.category_creation_parent_none
 import moneysurfer.feature.category.generated.resources.category_creation_save
 import moneysurfer.feature.category.generated.resources.category_creation_title_create
 import moneysurfer.feature.category.generated.resources.category_creation_title_edit
@@ -70,7 +68,12 @@ import moneysurfer.feature.category.generated.resources.category_creation_untitl
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
-// TODO refactor: lots of magic numbers
+
+private val SectionSpacing = 24.dp
+private val GridCellCorner = 14.dp
+private val GridGap = 8.dp
+private const val ICON_GRID_COLUMNS = 4
+
 @Composable
 fun CategoryCreationScreen(
     categoryId: CategoryId? = null,
@@ -100,10 +103,13 @@ private fun CategoryCreationContent(
     isEditing: Boolean,
     onEvent: (CategoryCreationEvent) -> Unit,
 ) {
-    val icons = SurferCategoryPalette.icons
-    val tints = SurferCategoryPalette.tints
-    val selectedIcon = icons[state.selectedIconIndex.coerceIn(0, icons.lastIndex)]
-    val selectedTint = tints[state.selectedColorIndex.coerceIn(0, tints.lastIndex)]
+    // Same resolver every other category bubble in the app goes through, so the preview card
+    // shows exactly what the manage list and transaction screens will show once saved.
+    val visual = SurferCategoryPalette.visualFor(
+        id = "",
+        iconKey = state.iconKey,
+        hue = state.hue,
+    )
 
     Scaffold(
         modifier = Modifier.surferSafeInsets(),
@@ -134,9 +140,9 @@ private fun CategoryCreationContent(
                 .fillMaxSize()
                 .padding(top = padding.calculateTopPadding())
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 24.dp)
-                .padding(top = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(24.dp),
+                .padding(horizontal = SectionSpacing)
+                .padding(top = AppTheme.spacing.small),
+            verticalArrangement = Arrangement.spacedBy(SectionSpacing),
         ) {
             PreviewCard(
                 name = state.name.ifBlank { stringResource(Res.string.category_creation_untitled) },
@@ -147,13 +153,8 @@ private fun CategoryCreationContent(
                         Res.string.category_creation_type_expense
                     },
                 ),
-                extraSuffix = if (state.showMonthlyCap && state.monthlyCap.isNotBlank()) {
-                    " · Capped at ${state.monthlyCap}"
-                } else {
-                    ""
-                },
-                icon = selectedIcon,
-                tint = selectedTint,
+                icon = visual.icon,
+                tint = visual.tint,
             )
 
             TypeSelector(
@@ -187,28 +188,24 @@ private fun CategoryCreationContent(
                 modifier = Modifier.fillMaxWidth(),
             )
 
-            if (ShowIconPicker) {
-                IconGrid(
-                    icons = icons,
-                    selectedIndex = state.selectedIconIndex,
-                    tint = selectedTint,
-                    onSelect = { onEvent(CategoryCreationEvent.OnIconSelected(it)) },
-                )
-            }
+            IconGrid(
+                selectedKey = state.iconKey,
+                tint = visual.tint,
+                onSelect = { onEvent(CategoryCreationEvent.OnIconSelected(it)) },
+            )
 
-            if (ShowColorPicker) {
-                ColorGrid(
-                    tints = tints,
-                    selectedIndex = state.selectedColorIndex,
-                    onSelect = { onEvent(CategoryCreationEvent.OnColorSelected(it)) },
-                )
-            }
+            ColorGrid(
+                selectedHue = state.hue,
+                onSelect = { onEvent(CategoryCreationEvent.OnColorSelected(it)) },
+            )
 
-            if (ShowExtraDetails) {
-                ExtraDetails(state = state, onEvent = onEvent)
-            }
+            ParentPicker(
+                selectedName = state.selectedParentName,
+                options = state.parentOptions,
+                onSelect = { onEvent(CategoryCreationEvent.OnParentSelected(it)) },
+            )
 
-            Spacer(Modifier.height(padding.calculateBottomPadding() + 24.dp))
+            Spacer(Modifier.height(padding.calculateBottomPadding() + SectionSpacing))
         }
     }
 }
@@ -217,8 +214,7 @@ private fun CategoryCreationContent(
 private fun PreviewCard(
     name: String,
     typeLabel: String,
-    extraSuffix: String,
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    icon: ImageVector,
     tint: Color,
 ) {
     Card(
@@ -229,7 +225,7 @@ private fun PreviewCard(
         shape = RoundedCornerShape(20.dp),
     ) {
         Row(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(AppTheme.spacing.default),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(14.dp),
         ) {
@@ -243,7 +239,7 @@ private fun PreviewCard(
                     overflow = TextOverflow.Ellipsis,
                 )
                 Text(
-                    text = typeLabel + extraSuffix,
+                    text = typeLabel,
                     style = AppTheme.typography.bodySmall,
                     color = AppTheme.materialColors.onSurfaceVariant,
                 )
@@ -258,12 +254,8 @@ private fun TypeSelector(
     onChange: (CategoryTypeUi) -> Unit,
 ) {
     Column {
-        Text(
-            text = stringResource(Res.string.category_creation_type_label),
-            style = AppTheme.typography.labelLarge,
-            color = AppTheme.materialColors.onSurfaceVariant,
-        )
-        Spacer(Modifier.height(8.dp))
+        SectionLabel(stringResource(Res.string.category_creation_type_label))
+        Spacer(Modifier.height(AppTheme.spacing.small))
         SurferSegmentedControl(
             options = listOf(CategoryTypeUi.Expense, CategoryTypeUi.Income),
             selected = selected,
@@ -282,48 +274,29 @@ private fun TypeSelector(
 
 @Composable
 private fun IconGrid(
-    icons: List<androidx.compose.ui.graphics.vector.ImageVector>,
-    selectedIndex: Int,
+    selectedKey: String,
     tint: Color,
-    onSelect: (Int) -> Unit,
+    onSelect: (String) -> Unit,
 ) {
     Column {
-        Text(
-            text = stringResource(Res.string.category_creation_icon_label),
-            style = AppTheme.typography.labelLarge,
-            color = AppTheme.materialColors.onSurfaceVariant,
-        )
+        SectionLabel(stringResource(Res.string.category_creation_icon_label))
         Spacer(Modifier.height(10.dp))
-        val rows = icons.chunked(6)
-        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            rows.forEachIndexed { rowIndex, row ->
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    row.forEachIndexed { colIndex, icon ->
-                        val index = rowIndex * 6 + colIndex
-                        val selected = index == selectedIndex
-                        Box(
-                            modifier = Modifier
-                                .weight(1f)
-                                .aspectRatio(1f)
-                                .clip(RoundedCornerShape(14.dp))
-                                .background(if (selected) tint.copy(alpha = 0.15f) else Color.Transparent)
-                                .border(
-                                    if (selected) 2.dp else 1.dp,
-                                    if (selected) tint else AppTheme.materialColors.outlineVariant,
-                                    RoundedCornerShape(14.dp),
-                                )
-                                .clickable { onSelect(index) },
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            Icon(
-                                imageVector = icon,
-                                contentDescription = null,
-                                tint = if (selected) tint else AppTheme.materialColors.onSurfaceVariant,
-                                modifier = Modifier.size(22.dp),
-                            )
-                        }
+        // Zipped rather than indexed by position: the key is what gets stored, so the grid
+        // never has to agree with the palette on what slot 3 means.
+        val entries = SurferCategoryPalette.iconKeys.zip(SurferCategoryPalette.icons)
+        Column(verticalArrangement = Arrangement.spacedBy(GridGap)) {
+            entries.chunked(ICON_GRID_COLUMNS).forEach { row ->
+                Row(horizontalArrangement = Arrangement.spacedBy(GridGap)) {
+                    row.forEach { (key, icon) ->
+                        IconGridCell(
+                            icon = icon,
+                            selected = key == selectedKey,
+                            tint = tint,
+                            onClick = { onSelect(key) },
+                            modifier = Modifier.weight(1f),
+                        )
                     }
-                    repeat(6 - row.size) {
+                    repeat(ICON_GRID_COLUMNS - row.size) {
                         Box(modifier = Modifier.weight(1f))
                     }
                 }
@@ -333,22 +306,48 @@ private fun IconGrid(
 }
 
 @Composable
+private fun IconGridCell(
+    icon: ImageVector,
+    selected: Boolean,
+    tint: Color,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Box(
+        modifier = modifier
+            .aspectRatio(1f)
+            .clip(RoundedCornerShape(GridCellCorner))
+            .background(if (selected) tint.copy(alpha = 0.15f) else Color.Transparent)
+            .border(
+                if (selected) 2.dp else 1.dp,
+                if (selected) tint else AppTheme.materialColors.outlineVariant,
+                RoundedCornerShape(GridCellCorner),
+            )
+            .clickable(onClick = onClick),
+        contentAlignment = Alignment.Center,
+    ) {
+        Icon(
+            imageVector = icon,
+            // decorative — the surrounding picker label describes the control
+            contentDescription = null,
+            tint = if (selected) tint else AppTheme.materialColors.onSurfaceVariant,
+            modifier = Modifier.size(22.dp),
+        )
+    }
+}
+
+@Composable
 private fun ColorGrid(
-    tints: List<Color>,
-    selectedIndex: Int,
+    selectedHue: Int,
     onSelect: (Int) -> Unit,
 ) {
     Column {
-        Text(
-            text = stringResource(Res.string.category_creation_color_label),
-            style = AppTheme.typography.labelLarge,
-            color = AppTheme.materialColors.onSurfaceVariant,
-        )
+        SectionLabel(stringResource(Res.string.category_creation_color_label))
         Spacer(Modifier.height(10.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-            tints.forEachIndexed { index, color ->
-                val selected = index == selectedIndex
-                val border = if (selected) {
+            SurferCategoryPalette.hues.zip(SurferCategoryPalette.tints).forEach { (hue, color) ->
+                val selected = hue == selectedHue
+                val ring = if (selected) {
                     Modifier
                         .border(3.dp, AppTheme.materialColors.surface, CircleShape)
                         .border(5.dp, color, CircleShape)
@@ -361,8 +360,8 @@ private fun ColorGrid(
                         .aspectRatio(1f)
                         .clip(CircleShape)
                         .background(color.copy(alpha = 0.18f))
-                        .then(border)
-                        .clickable { onSelect(index) },
+                        .then(ring)
+                        .clickable { onSelect(hue) },
                     contentAlignment = Alignment.Center,
                 ) {
                     if (selected) {
@@ -379,104 +378,67 @@ private fun ColorGrid(
     }
 }
 
+/**
+ * Real picker over the eligible parents the ViewModel computed — the category itself, its
+ * descendants, system rows and the wrong type are already gone from [options], so anything
+ * offered here is safe to save.
+ */
 @Composable
-private fun ExtraDetails(
-    state: CategoryCreationState,
-    onEvent: (CategoryCreationEvent) -> Unit,
+private fun ParentPicker(
+    selectedName: String?,
+    options: List<CategoryParentOption>,
+    onSelect: (CategoryId?) -> Unit,
 ) {
-    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(
-                text = stringResource(Res.string.category_creation_extra_label),
-                style = AppTheme.typography.labelLarge,
-                color = AppTheme.materialColors.onSurfaceVariant,
-                modifier = Modifier.weight(1f),
-            )
-            Text(
-                text = stringResource(Res.string.category_creation_extra_optional),
-                style = AppTheme.typography.labelSmall,
-                color = AppTheme.materialColors.onSurfaceVariant,
-            )
-        }
+    var expanded by remember { mutableStateOf(false) }
+    val noneLabel = stringResource(Res.string.category_creation_parent_none)
 
-        if (state.showMonthlyCap) {
-            FieldWithRemove(
-                onRemove = {
-                    onEvent(
-                        CategoryCreationEvent.OnToggleExtraField(CategoryCreationExtraField.MonthlyCap, false),
-                    )
-                },
+    Column {
+        SectionLabel(stringResource(Res.string.category_creation_field_parent))
+        Spacer(Modifier.height(AppTheme.spacing.small))
+        Box {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(GridCellCorner))
+                    .border(1.dp, AppTheme.materialColors.outlineVariant, RoundedCornerShape(GridCellCorner))
+                    .clickable(enabled = options.isNotEmpty()) { expanded = true }
+                    .padding(horizontal = AppTheme.spacing.default, vertical = 14.dp),
+                verticalAlignment = Alignment.CenterVertically,
             ) {
-                OutlinedTextField(
-                    value = state.monthlyCap,
-                    onValueChange = { onEvent(CategoryCreationEvent.OnMonthlyCapChanged(it)) },
-                    label = { Text(stringResource(Res.string.category_creation_field_cap)) },
-                    supportingText = { Text(stringResource(Res.string.category_creation_field_cap_helper)) },
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth(),
-                )
-            }
-        }
-        if (state.showParent) {
-            FieldWithRemove(
-                onRemove = {
-                    onEvent(
-                        CategoryCreationEvent.OnToggleExtraField(CategoryCreationExtraField.Parent, false),
-                    )
-                },
-            ) {
-                OutlinedTextField(
-                    value = state.parent,
-                    onValueChange = { onEvent(CategoryCreationEvent.OnParentChanged(it)) },
-                    label = { Text(stringResource(Res.string.category_creation_field_parent)) },
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth(),
-                )
-            }
-        }
-        if (state.showNote) {
-            FieldWithRemove(
-                onRemove = {
-                    onEvent(
-                        CategoryCreationEvent.OnToggleExtraField(CategoryCreationExtraField.Note, false),
-                    )
-                },
-            ) {
-                OutlinedTextField(
-                    value = state.note,
-                    onValueChange = { onEvent(CategoryCreationEvent.OnNoteChanged(it)) },
-                    label = { Text(stringResource(Res.string.category_creation_field_note)) },
-                    minLines = 2,
-                    maxLines = 4,
-                    modifier = Modifier.fillMaxWidth(),
-                )
-            }
-        }
-
-        val availableChips = buildList {
-            if (!state.showMonthlyCap) {
-                add(
-                    CategoryCreationExtraField.MonthlyCap to Res.string.category_creation_field_cap,
-                )
-            }
-            if (!state.showParent) add(CategoryCreationExtraField.Parent to Res.string.category_creation_field_parent)
-            if (!state.showNote) add(CategoryCreationExtraField.Note to Res.string.category_creation_field_note)
-        }
-        if (availableChips.isNotEmpty()) {
-            Column {
                 Text(
-                    text = stringResource(Res.string.category_creation_add_another),
-                    style = AppTheme.typography.labelMedium,
-                    color = AppTheme.materialColors.onSurfaceVariant,
+                    text = selectedName ?: noneLabel,
+                    style = AppTheme.typography.bodyLarge,
+                    color = if (selectedName == null) {
+                        AppTheme.materialColors.onSurfaceVariant
+                    } else {
+                        AppTheme.materialColors.onSurface
+                    },
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f),
                 )
-                Spacer(Modifier.height(8.dp))
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    availableChips.forEach { (field, labelRes) ->
-                        AddChip(
-                            label = stringResource(labelRes),
-                            onClick = { onEvent(CategoryCreationEvent.OnToggleExtraField(field, true)) },
-                        )
-                    }
+                Icon(
+                    imageVector = SurferIcons.ChevronRight,
+                    contentDescription = null,
+                    tint = AppTheme.materialColors.onSurfaceVariant,
+                )
+            }
+            DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                DropdownMenuItem(
+                    text = { Text(noneLabel) },
+                    onClick = {
+                        expanded = false
+                        onSelect(null)
+                    },
+                )
+                options.forEach { option ->
+                    DropdownMenuItem(
+                        text = { Text(option.name) },
+                        onClick = {
+                            expanded = false
+                            onSelect(option.id)
+                        },
+                    )
                 }
             }
         }
@@ -484,50 +446,12 @@ private fun ExtraDetails(
 }
 
 @Composable
-private fun FieldWithRemove(
-    onRemove: () -> Unit,
-    content: @Composable () -> Unit,
-) {
-    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.End,
-        ) {
-            TextButton(
-                onClick = onRemove,
-                contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 10.dp, vertical = 0.dp),
-            ) {
-                Icon(
-                    imageVector = SurferIcons.Close,
-                    contentDescription = null,
-                    modifier = Modifier.size(14.dp),
-                )
-                Spacer(Modifier.width(4.dp))
-                Text(stringResource(Res.string.category_creation_remove), style = AppTheme.typography.labelMedium)
-            }
-        }
-        content()
-    }
-}
-
-@Composable
-private fun AddChip(label: String, onClick: () -> Unit) {
-    Row(
-        modifier = Modifier
-            .clip(RoundedCornerShape(16.dp))
-            .border(1.dp, AppTheme.materialColors.outline, RoundedCornerShape(16.dp))
-            .clickable(onClick = onClick)
-            .padding(horizontal = 12.dp, vertical = 6.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(6.dp),
-    ) {
-        Icon(
-            imageVector = SurferIcons.Add,
-            contentDescription = null,
-            modifier = Modifier.size(14.dp),
-        )
-        Text(label, style = AppTheme.typography.labelMedium)
-    }
+private fun SectionLabel(text: String) {
+    Text(
+        text = text,
+        style = AppTheme.typography.labelLarge,
+        color = AppTheme.materialColors.onSurfaceVariant,
+    )
 }
 
 @Preview
@@ -535,13 +459,15 @@ private fun AddChip(label: String, onClick: () -> Unit) {
 private fun CategoryCreationPreview() {
     AppTheme {
         CategoryCreationContent(
-            state = CategoryCreationState(name = "Coffee", showMonthlyCap = true, monthlyCap = "120.00"),
+            state = CategoryCreationState(
+                name = "Coffee",
+                iconKey = SurferCategoryPalette.iconKeys[1],
+                hue = SurferCategoryPalette.hues[1],
+                parentOptions = listOf(CategoryParentOption(CategoryId("c-1"), "Dining")),
+                parentId = CategoryId("c-1"),
+            ),
             isEditing = false,
             onEvent = {},
         )
     }
 }
-
-private const val ShowIconPicker = false
-private const val ShowColorPicker = false
-private const val ShowExtraDetails = false
