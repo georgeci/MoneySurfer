@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > UpdateWorkspaceCurrencyError</title>
+  <title>MoneySurfer Coverage Report > RecordGoalContributionKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.usecase</a>
 </div>
 
-<h1>Coverage Summary for Class: UpdateWorkspaceCurrencyError (com.georgeci.moneysurfer.domain.usecase)</h1>
+<h1>Coverage Summary for Class: RecordGoalContributionKt (com.georgeci.moneysurfer.domain.usecase)</h1>
 
 <table class="coverageStats">
 
@@ -45,25 +45,8 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   Instruction, %
 </th>
 </tr>
-  <tr>
-    <td class="name">UpdateWorkspaceCurrencyError$WorkspaceNotFound</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
+<tr>
+  <td class="name">RecordGoalContributionKt</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -72,60 +55,67 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     (2/2)
   </span>
 </td>
-  </tr>
+<td class="coverageStat">
+  <span class="percent">
+    92.9%
+  </span>
+  <span class="absValue">
+    (13/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (24/24)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (356/356)
+  </span>
+</td>
+</tr>
   <tr>
-    <td class="name">UpdateWorkspaceCurrencyError$WriteFailed</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
-  </span>
-</td>
+    <td class="name">RecordGoalContributionKt$recordContribution$1</td>
     <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/7)
-  </span>
-</td>
   </tr>
 <tr>
   <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
-    50%
+    100%
   </span>
   <span class="absValue">
-    (1/2)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    50%
-  </span>
-  <span class="absValue">
-    (1/2)
+    (2/2)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    22.2%
+    92.9%
   </span>
   <span class="absValue">
-    (2/9)
+    (13/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (24/24)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (356/356)
   </span>
 </td>
 </tr>
@@ -139,69 +129,66 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.usecase
 &nbsp;
 &nbsp;import arrow.core.Either
-&nbsp;import arrow.core.raise.either
-&nbsp;import co.touchlab.kermit.Logger
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
-&nbsp;import com.georgeci.moneysurfer.domain.repositories.AccountRepository
-&nbsp;import com.georgeci.moneysurfer.domain.repositories.WorkspaceRepository
-&nbsp;import kotlinx.coroutines.flow.first
-&nbsp;import org.koin.core.annotation.Single
+&nbsp;import arrow.core.raise.Raise
+&nbsp;import arrow.core.raise.ensure
+&nbsp;import com.georgeci.moneysurfer.domain.model.GoalContribution
+&nbsp;import com.georgeci.moneysurfer.domain.model.GoalStatus
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.GoalId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.GoalContributionRepository
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.SavingsGoalRepository
+&nbsp;import kotlinx.datetime.LocalDate
 &nbsp;
 &nbsp;/**
-&nbsp; * Typed failure for [UpdateWorkspaceCurrencyUseCase].
+&nbsp; * The one write path for both [AddContributionUseCase] and [WithdrawFromGoalUseCase] —
+&nbsp; * a withdrawal is a contribution with a negative amount (decision 3 in md/goals.md), so
+&nbsp; * the invariants, the insert and the ACTIVE ↔ COMPLETED flip are checked in one place.
 &nbsp; */
-&nbsp;sealed interface UpdateWorkspaceCurrencyError {
-&nbsp;    /** No workspace exists for the supplied id — caller should not have reached the picker. */
-<b class="fc">&nbsp;    data object WorkspaceNotFound : UpdateWorkspaceCurrencyError</b>
-&nbsp;
-&nbsp;    /** A Room write failed mid-update. The workspace currency may be partially applied. */
-<b class="nc">&nbsp;    data class WriteFailed(val cause: Throwable) : UpdateWorkspaceCurrencyError</b>
-&nbsp;}
-&nbsp;
-&nbsp;/**
-&nbsp; * Brings the workspace and every account it owns onto [currency], so the Dashboard total —
-&nbsp; * which reads `Account.currencyCode` — reflects the user&#39;s choice. Used by the first-run
-&nbsp; * currency picker; the offline seed creates exactly one &quot;Cash&quot; account, so in practice this
-&nbsp; * updates that single row.
-&nbsp; *
-&nbsp; * Each step is idempotent and reconciles against the *target* currency rather than the
-&nbsp; * workspace&#39;s previous value: a retry after a partial failure (workspace updated but an
-&nbsp; * account write failed) still repairs the lagging accounts instead of short-circuiting on
-&nbsp; * the already-migrated workspace.
-&nbsp; */
-&nbsp;@Single
-&nbsp;class UpdateWorkspaceCurrencyUseCase(
-&nbsp;    private val workspaceRepository: WorkspaceRepository,
-&nbsp;    private val accountRepository: AccountRepository,
-&nbsp;) {
-&nbsp;    private val log = Logger.withTag(TAG)
-&nbsp;
-&nbsp;    suspend operator fun invoke(
-&nbsp;        workspaceId: WorkspaceId,
-&nbsp;        currency: CurrencyCode,
-&nbsp;    ): Either&lt;UpdateWorkspaceCurrencyError, Unit&gt; = either {
-&nbsp;        val workspace = workspaceRepository.getById(workspaceId)
-&nbsp;            ?: raise(UpdateWorkspaceCurrencyError.WorkspaceNotFound)
-&nbsp;        Either
-&nbsp;            .catch {
-&nbsp;                if (workspace.baseCurrency != currency) {
-&nbsp;                    workspaceRepository.update(workspace.copy(baseCurrency = currency))
-&nbsp;                }
-&nbsp;                accountRepository.getByWorkspaceId(workspaceId).first()
-&nbsp;                    .filter { it.currencyCode != currency }
-&nbsp;                    .forEach { accountRepository.update(it.copy(currencyCode = currency)) }
-&nbsp;            }
-&nbsp;            .onLeft { log.e(it) { &quot;[update] failed wid=${workspaceId.value}&quot; } }
-&nbsp;            .mapLeft { UpdateWorkspaceCurrencyError.WriteFailed(it) }
-&nbsp;            .bind()
-&nbsp;        log.i { &quot;[done] wid=${workspaceId.value} currency=${currency.value}&quot; }
+&nbsp;@Suppress(&quot;LongParameterList&quot;)
+&nbsp;internal suspend fun Raise&lt;GoalActionError&gt;.recordContribution(
+&nbsp;    goalRepository: SavingsGoalRepository,
+&nbsp;    contributionRepository: GoalContributionRepository,
+&nbsp;    clock: ClockUseCase,
+&nbsp;    goalId: GoalId,
+&nbsp;    signedAmount: Money,
+&nbsp;    occurredOn: LocalDate,
+&nbsp;    note: String,
+&nbsp;): GoalContribution {
+<b class="fc">&nbsp;    ensure(!signedAmount.isZero()) { GoalActionError.InvalidAmount }</b>
+<b class="fc">&nbsp;    val goal = goalRepository.getById(goalId) ?: raise(GoalActionError.GoalNotFound)</b>
+<b class="fc">&nbsp;    val saved = contributionRepository.savedAmount(goalId)</b>
+<b class="fc">&nbsp;    if (signedAmount.isPositive()) {</b>
+<b class="fc">&nbsp;        ensure(goal.status.acceptsContributions) { GoalActionError.GoalNotAcceptingContributions }</b>
+&nbsp;    } else {
+<b class="fc">&nbsp;        ensure(saved + signedAmount &gt;= Money.zero()) { GoalActionError.WithdrawalBelowZero }</b>
 &nbsp;    }
 &nbsp;
-&nbsp;    private companion object {
-&nbsp;        const val TAG = &quot;UpdateWorkspaceCurrency&quot;
+<b class="fc">&nbsp;    val now = clock.now()</b>
+<b class="fc">&nbsp;    val contribution = GoalContribution(</b>
+<b class="fc">&nbsp;        workspaceId = goal.workspaceId,</b>
+<b class="fc">&nbsp;        goalId = goalId,</b>
+<b class="fc">&nbsp;        amount = signedAmount,</b>
+<b class="fc">&nbsp;        occurredOn = occurredOn,</b>
+<b class="fc">&nbsp;        note = note,</b>
+<b class="fc">&nbsp;        createdAt = now,</b>
+&nbsp;    )
+<b class="fc">&nbsp;    Either.catch { contributionRepository.insert(contribution) }</b>
+<b class="fc">&nbsp;        .mapLeft { GoalActionError.LocalWriteFailed(it) }</b>
+<b class="fc">&nbsp;        .bind()</b>
+&nbsp;
+<b class="fc">&nbsp;    val resolved = goal.status.afterProgressChange((saved + signedAmount) &gt;= goal.target)</b>
+<b class="fc">&nbsp;    if (resolved != goal.status) {</b>
+<b class="fc">&nbsp;        Either.catch { goalRepository.update(goal.copy(status = resolved)) }</b>
+<b class="fc">&nbsp;            .mapLeft { GoalActionError.LocalWriteFailed(it) }</b>
+<b class="fc">&nbsp;            .bind()</b>
 &nbsp;    }
+<b class="fc">&nbsp;    return contribution</b>
 &nbsp;}
+&nbsp;
+&nbsp;/** PAUSED and ARCHIVED goals take no new money; a withdrawal is still allowed. */
+&nbsp;internal val GoalStatus.acceptsContributions: Boolean
+<b class="pc">&nbsp;    get() = this == GoalStatus.ACTIVE || this == GoalStatus.COMPLETED</b>
 </code>
 </pre>
 </div>
@@ -225,7 +212,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 20:32</div>
+    <div style="float:right;">generated on 2026-07-22 21:54</div>
 </div>
 </body>
 </html>

@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > ComposableSingletons</title>
+  <title>MoneySurfer Coverage Report > SyncVersionStatus</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.uikit.components.category</a>
+    <a href="../index.html">com.georgeci.moneysurfer.sync.version</a>
 </div>
 
-<h1>Coverage Summary for Class: ComposableSingletons (com.georgeci.moneysurfer.uikit.components.category)</h1>
+<h1>Coverage Summary for Class: SyncVersionStatus (com.georgeci.moneysurfer.sync.version)</h1>
 
 <table class="coverageStats">
 
@@ -46,30 +46,58 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
   <tr>
-    <td class="name">ComposableSingletons$SurferCategoryCellKt</td>
+    <td class="name">SyncVersionStatus$Allowed</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/4)
+    (1/1)
   </span>
 </td>
     <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/19)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/132)
+    (2/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">SyncVersionStatus$Blocked</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (7/7)
   </span>
 </td>
   </tr>
@@ -77,27 +105,27 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/4)
+    (2/2)
   </span>
 </td>
     <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/19)
+    (2/2)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/132)
+    (9/9)
   </span>
 </td>
 </tr>
@@ -106,7 +134,27 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <br/>
 <br/>
 
-  <code class="sourceCode">Source code is not available<br /></code>
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.sync.version
+&nbsp;
+&nbsp;/**
+&nbsp; * Version gate decoupled from domain. `:sync` checks this; `:sync-impl` provides the
+&nbsp; * adapter that reads from [com.georgeci.moneysurfer.domain.repositories.AppVersionGate].
+&nbsp; *
+&nbsp; * See block.md.
+&nbsp; */
+&nbsp;interface SyncVersionGate {
+&nbsp;    suspend fun refresh(): SyncVersionStatus
+&nbsp;    fun isSyncAllowed(): Boolean
+&nbsp;}
+&nbsp;
+&nbsp;sealed interface SyncVersionStatus {
+<b class="fc">&nbsp;    data object Allowed : SyncVersionStatus</b>
+<b class="fc">&nbsp;    data class Blocked(val message: String) : SyncVersionStatus</b>
+&nbsp;}
+</code>
+</pre>
 </div>
 
 <script type="text/javascript">
@@ -128,7 +176,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 20:32</div>
+    <div style="float:right;">generated on 2026-07-22 21:54</div>
 </div>
 </body>
 </html>

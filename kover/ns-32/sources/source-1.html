@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > ComGeorgeciMoneysurferSyncInternalDiSyncModuleModuleKt</title>
+  <title>MoneySurfer Coverage Report > SyncCoordinator</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,18 +19,15 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.sync.internal.di</a>
+    <a href="../index.html">com.georgeci.moneysurfer.sync.coordinator</a>
 </div>
 
-<h1>Coverage Summary for Class: ComGeorgeciMoneysurferSyncInternalDiSyncModuleModuleKt (com.georgeci.moneysurfer.sync.internal.di)</h1>
+<h1>Coverage Summary for Class: SyncCoordinator (com.georgeci.moneysurfer.sync.coordinator)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
-<th class="coverageStat 
-">
-  Class, %
-</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -49,48 +46,114 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">ComGeorgeciMoneysurferSyncInternalDiSyncModuleModuleKt</td>
+  <td class="name">SyncCoordinator</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
     <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/226)
+    (2/2)
   </span>
 </td>
 </tr>
-
+  <tr>
+    <td class="name">SyncCoordinator$DefaultImpls</td>
+    <td class="coverageStat"/>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+</tr>
 </table>
 
 <br/>
 <br/>
 
-  <code class="sourceCode">Source code is not available<br /></code>
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.sync.coordinator
+&nbsp;
+&nbsp;import com.georgeci.moneysurfer.sync.api.LastSyncOutcome
+&nbsp;import com.georgeci.moneysurfer.sync.api.SyncMode
+&nbsp;import com.georgeci.moneysurfer.sync.api.SyncReason
+&nbsp;import com.georgeci.moneysurfer.sync.api.SyncState
+&nbsp;import kotlinx.coroutines.flow.StateFlow
+&nbsp;
+&nbsp;/**
+&nbsp; * Single entry point for sync.
+&nbsp; *
+&nbsp; * UI and feature code never talk to Firestore directly — they go through
+&nbsp; * [requestSync]. The coordinator merges concurrent requests, runs at most
+&nbsp; * one physical sync at a time, and emits progress through [SyncHandle].
+&nbsp; *
+&nbsp; * - [state] reflects only live activity (Idle / Queued / Running). Terminal
+&nbsp; *   results live in [lastOutcome].
+&nbsp; * - Lives in `:sync/runtime/ApplicationScope`, not in any `viewModelScope`.
+&nbsp; *
+&nbsp; * See SyncCoordinator.md and SyncCoordinatorFAQ.md (especially №10, №19) for
+&nbsp; * the full design rationale.
+&nbsp; */
+&nbsp;interface SyncCoordinator {
+&nbsp;    val state: StateFlow&lt;SyncState&gt;
+&nbsp;    val lastOutcome: StateFlow&lt;LastSyncOutcome&gt;
+&nbsp;
+&nbsp;    fun requestSync(
+&nbsp;        reason: SyncReason,
+<b class="fc">&nbsp;        mode: SyncMode = SyncMode.Enqueue,</b>
+&nbsp;    ): SyncHandle
+&nbsp;
+&nbsp;    /** Cancels the currently running sync, leaves queued requests in place. */
+&nbsp;    fun cancelCurrent()
+&nbsp;
+&nbsp;    /** Cancels all queued requests, leaves the running sync in place. */
+&nbsp;    fun cancelAllQueued()
+&nbsp;
+&nbsp;    /** Atomically cancels current + queued. */
+&nbsp;    fun cancelAll()
+&nbsp;}
+</code>
+</pre>
 </div>
 
 <script type="text/javascript">
@@ -112,7 +175,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 20:32</div>
+    <div style="float:right;">generated on 2026-07-22 21:54</div>
 </div>
 </body>
 </html>

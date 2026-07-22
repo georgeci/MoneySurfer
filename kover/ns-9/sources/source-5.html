@@ -52,7 +52,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/17)
+    (0/19)
   </span>
 </td>
 <td class="coverageStat">
@@ -60,7 +60,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/18)
+    (0/24)
   </span>
 </td>
 <td class="coverageStat">
@@ -68,7 +68,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/186)
+    (0/240)
   </span>
 </td>
 <td class="coverageStat">
@@ -76,7 +76,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/758)
+    (0/963)
   </span>
 </td>
 </tr>
@@ -252,10 +252,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
-    3.3%
+    3.1%
   </span>
   <span class="absValue">
-    (1/30)
+    (1/32)
   </span>
 </td>
 <td class="coverageStat">
@@ -263,15 +263,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/34)
+    (0/40)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0.4%
+    0.3%
   </span>
   <span class="absValue">
-    (1/273)
+    (1/327)
   </span>
 </td>
 <td class="coverageStat">
@@ -279,7 +279,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0.1%
   </span>
   <span class="absValue">
-    (1/1109)
+    (1/1314)
   </span>
 </td>
 </tr>
@@ -657,6 +657,73 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    }
 &nbsp;  }
 &nbsp;
+&nbsp;  public override fun observeById(id: String): Flow&lt;GoalEntity?&gt; {
+<b class="nc">&nbsp;    val _sql: String = &quot;SELECT * FROM goals WHERE id = ?&quot;</b>
+<b class="nc">&nbsp;    return createFlow(__db, false, arrayOf(&quot;goals&quot;)) { _connection -&gt;</b>
+<b class="nc">&nbsp;      val _stmt: SQLiteStatement = _connection.prepare(_sql)</b>
+&nbsp;      try {
+<b class="nc">&nbsp;        var _argIndex: Int = 1</b>
+<b class="nc">&nbsp;        _stmt.bindText(_argIndex, id)</b>
+<b class="nc">&nbsp;        val _columnIndexOfId: Int = getColumnIndexOrThrow(_stmt, &quot;id&quot;)</b>
+<b class="nc">&nbsp;        val _columnIndexOfWorkspaceId: Int = getColumnIndexOrThrow(_stmt, &quot;workspaceId&quot;)</b>
+<b class="nc">&nbsp;        val _columnIndexOfTitle: Int = getColumnIndexOrThrow(_stmt, &quot;title&quot;)</b>
+<b class="nc">&nbsp;        val _columnIndexOfEmoji: Int = getColumnIndexOrThrow(_stmt, &quot;emoji&quot;)</b>
+<b class="nc">&nbsp;        val _columnIndexOfHue: Int = getColumnIndexOrThrow(_stmt, &quot;hue&quot;)</b>
+<b class="nc">&nbsp;        val _columnIndexOfTarget: Int = getColumnIndexOrThrow(_stmt, &quot;target&quot;)</b>
+<b class="nc">&nbsp;        val _columnIndexOfCurrencyCode: Int = getColumnIndexOrThrow(_stmt, &quot;currencyCode&quot;)</b>
+<b class="nc">&nbsp;        val _columnIndexOfStartDate: Int = getColumnIndexOrThrow(_stmt, &quot;startDate&quot;)</b>
+<b class="nc">&nbsp;        val _columnIndexOfTargetDate: Int = getColumnIndexOrThrow(_stmt, &quot;targetDate&quot;)</b>
+<b class="nc">&nbsp;        val _columnIndexOfAccountId: Int = getColumnIndexOrThrow(_stmt, &quot;accountId&quot;)</b>
+<b class="nc">&nbsp;        val _columnIndexOfStatus: Int = getColumnIndexOrThrow(_stmt, &quot;status&quot;)</b>
+<b class="nc">&nbsp;        val _columnIndexOfCreatedAt: Int = getColumnIndexOrThrow(_stmt, &quot;createdAt&quot;)</b>
+<b class="nc">&nbsp;        val _columnIndexOfUpdatedAt: Int = getColumnIndexOrThrow(_stmt, &quot;updatedAt&quot;)</b>
+<b class="nc">&nbsp;        val _result: GoalEntity?</b>
+<b class="nc">&nbsp;        if (_stmt.step()) {</b>
+<b class="nc">&nbsp;          val _tmpId: String</b>
+<b class="nc">&nbsp;          _tmpId = _stmt.getText(_columnIndexOfId)</b>
+<b class="nc">&nbsp;          val _tmpWorkspaceId: String</b>
+<b class="nc">&nbsp;          _tmpWorkspaceId = _stmt.getText(_columnIndexOfWorkspaceId)</b>
+<b class="nc">&nbsp;          val _tmpTitle: String</b>
+<b class="nc">&nbsp;          _tmpTitle = _stmt.getText(_columnIndexOfTitle)</b>
+<b class="nc">&nbsp;          val _tmpEmoji: String</b>
+<b class="nc">&nbsp;          _tmpEmoji = _stmt.getText(_columnIndexOfEmoji)</b>
+<b class="nc">&nbsp;          val _tmpHue: Int</b>
+<b class="nc">&nbsp;          _tmpHue = _stmt.getLong(_columnIndexOfHue).toInt()</b>
+<b class="nc">&nbsp;          val _tmpTarget: Long</b>
+<b class="nc">&nbsp;          _tmpTarget = _stmt.getLong(_columnIndexOfTarget)</b>
+<b class="nc">&nbsp;          val _tmpCurrencyCode: String</b>
+<b class="nc">&nbsp;          _tmpCurrencyCode = _stmt.getText(_columnIndexOfCurrencyCode)</b>
+<b class="nc">&nbsp;          val _tmpStartDate: String</b>
+<b class="nc">&nbsp;          _tmpStartDate = _stmt.getText(_columnIndexOfStartDate)</b>
+<b class="nc">&nbsp;          val _tmpTargetDate: String?</b>
+<b class="nc">&nbsp;          if (_stmt.isNull(_columnIndexOfTargetDate)) {</b>
+<b class="nc">&nbsp;            _tmpTargetDate = null</b>
+&nbsp;          } else {
+<b class="nc">&nbsp;            _tmpTargetDate = _stmt.getText(_columnIndexOfTargetDate)</b>
+&nbsp;          }
+<b class="nc">&nbsp;          val _tmpAccountId: String?</b>
+<b class="nc">&nbsp;          if (_stmt.isNull(_columnIndexOfAccountId)) {</b>
+<b class="nc">&nbsp;            _tmpAccountId = null</b>
+&nbsp;          } else {
+<b class="nc">&nbsp;            _tmpAccountId = _stmt.getText(_columnIndexOfAccountId)</b>
+&nbsp;          }
+<b class="nc">&nbsp;          val _tmpStatus: String</b>
+<b class="nc">&nbsp;          _tmpStatus = _stmt.getText(_columnIndexOfStatus)</b>
+<b class="nc">&nbsp;          val _tmpCreatedAt: Long</b>
+<b class="nc">&nbsp;          _tmpCreatedAt = _stmt.getLong(_columnIndexOfCreatedAt)</b>
+<b class="nc">&nbsp;          val _tmpUpdatedAt: Long</b>
+<b class="nc">&nbsp;          _tmpUpdatedAt = _stmt.getLong(_columnIndexOfUpdatedAt)</b>
+<b class="nc">&nbsp;          _result = GoalEntity(_tmpId,_tmpWorkspaceId,_tmpTitle,_tmpEmoji,_tmpHue,_tmpTarget,_tmpCurrencyCode,_tmpStartDate,_tmpTargetDate,_tmpAccountId,_tmpStatus,_tmpCreatedAt,_tmpUpdatedAt)</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;          _result = null</b>
+&nbsp;        }
+<b class="nc">&nbsp;        _result</b>
+&nbsp;      } finally {
+<b class="nc">&nbsp;        _stmt.close()</b>
+&nbsp;      }
+&nbsp;    }
+&nbsp;  }
+&nbsp;
 &nbsp;  public override suspend fun delete(id: String) {
 <b class="nc">&nbsp;    val _sql: String = &quot;DELETE FROM goals WHERE id = ?&quot;</b>
 <b class="nc">&nbsp;    return performSuspending(__db, false, true) { _connection -&gt;</b>
@@ -710,7 +777,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 20:32</div>
+    <div style="float:right;">generated on 2026-07-22 21:54</div>
 </div>
 </body>
 </html>

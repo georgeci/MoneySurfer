@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > UserDao</title>
+  <title>MoneySurfer Coverage Report > AccountDao</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.data.db.dao</a>
 </div>
 
-<h1>Coverage Summary for Class: UserDao (com.georgeci.moneysurfer.data.db.dao)</h1>
+<h1>Coverage Summary for Class: AccountDao (com.georgeci.moneysurfer.data.db.dao)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">UserDao</td>
+  <td class="name">AccountDao</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -48,47 +48,50 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;
 &nbsp;import androidx.room.Dao
 &nbsp;import androidx.room.Insert
-&nbsp;import androidx.room.OnConflictStrategy
 &nbsp;import androidx.room.Query
 &nbsp;import androidx.room.Update
 &nbsp;import androidx.room.Upsert
-&nbsp;import com.georgeci.moneysurfer.data.db.entity.UserEntity
+&nbsp;import com.georgeci.moneysurfer.data.db.entity.AccountEntity
 &nbsp;import kotlinx.coroutines.flow.Flow
 &nbsp;
 &nbsp;@Dao
-&nbsp;interface UserDao {
+&nbsp;interface AccountDao {
 &nbsp;
-&nbsp;    @Query(&quot;SELECT * FROM users&quot;)
-&nbsp;    fun getAll(): Flow&lt;List&lt;UserEntity&gt;&gt;
+&nbsp;    @Query(&quot;SELECT * FROM accounts&quot;)
+&nbsp;    fun getAll(): Flow&lt;List&lt;AccountEntity&gt;&gt;
 &nbsp;
-&nbsp;    @Query(&quot;SELECT * FROM users WHERE id = :id&quot;)
-&nbsp;    suspend fun getById(id: String): UserEntity?
+&nbsp;    @Query(&quot;SELECT * FROM accounts WHERE workspaceId = :workspaceId&quot;)
+&nbsp;    fun getByWorkspaceId(workspaceId: String): Flow&lt;List&lt;AccountEntity&gt;&gt;
+&nbsp;
+&nbsp;    @Query(&quot;SELECT * FROM accounts WHERE id = :id&quot;)
+&nbsp;    suspend fun getById(id: String): AccountEntity?
 &nbsp;
 &nbsp;    @Insert
-&nbsp;    suspend fun insert(entity: UserEntity)
+&nbsp;    suspend fun insert(entity: AccountEntity)
 &nbsp;
 &nbsp;    @Insert
-&nbsp;    suspend fun insertAll(entities: List&lt;UserEntity&gt;)
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Stub-insert for foreign user ids that show up via workspace members during a
-&nbsp;     * pull. Skips the row if the id is already present so the local user&#39;s
-&nbsp;     * `displayName` / `isAnon` fields are not overwritten with peer placeholders.
-&nbsp;     */
-&nbsp;    @Insert(onConflict = OnConflictStrategy.IGNORE)
-&nbsp;    suspend fun insertIgnore(entity: UserEntity)
+&nbsp;    suspend fun insertAll(entities: List&lt;AccountEntity&gt;)
 &nbsp;
 &nbsp;    @Update
-&nbsp;    suspend fun update(entity: UserEntity)
+&nbsp;    suspend fun update(entity: AccountEntity)
 &nbsp;
 &nbsp;    @Upsert
-&nbsp;    suspend fun upsert(entity: UserEntity)
+&nbsp;    suspend fun upsertAll(entities: List&lt;AccountEntity&gt;)
 &nbsp;
-&nbsp;    @Query(&quot;DELETE FROM users WHERE id = :id&quot;)
+&nbsp;    @Query(&quot;DELETE FROM accounts WHERE id = :id&quot;)
 &nbsp;    suspend fun delete(id: String)
 &nbsp;
-&nbsp;    @Query(&quot;DELETE FROM users&quot;)
+&nbsp;    @Query(&quot;DELETE FROM accounts&quot;)
 &nbsp;    suspend fun deleteAll()
+&nbsp;
+&nbsp;    @Query(&quot;UPDATE accounts SET balance = balance + :delta, updatedAt = :updatedAt WHERE id = :id&quot;)
+&nbsp;    suspend fun applyDelta(id: String, delta: Long, updatedAt: Long)
+&nbsp;
+&nbsp;    @Query(&quot;UPDATE accounts SET balance = :balance, updatedAt = :updatedAt WHERE id = :id&quot;)
+&nbsp;    suspend fun setBalance(id: String, balance: Long, updatedAt: Long)
+&nbsp;
+&nbsp;    @Query(&quot;UPDATE accounts SET archived = :archived, updatedAt = :updatedAt WHERE id = :id&quot;)
+&nbsp;    suspend fun setArchived(id: String, archived: Boolean, updatedAt: Long)
 &nbsp;}
 </code>
 </pre>
@@ -113,7 +116,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 20:32</div>
+    <div style="float:right;">generated on 2026-07-22 21:54</div>
 </div>
 </body>
 </html>

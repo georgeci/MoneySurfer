@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SelectWorkspaceUseCase</title>
+  <title>MoneySurfer Coverage Report > LogoutUseCase</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.usecase</a>
 </div>
 
-<h1>Coverage Summary for Class: SelectWorkspaceUseCase (com.georgeci.moneysurfer.domain.usecase)</h1>
+<h1>Coverage Summary for Class: LogoutUseCase (com.georgeci.moneysurfer.domain.usecase)</h1>
 
 <table class="coverageStats">
 
@@ -46,80 +46,62 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SelectWorkspaceUseCase</td>
+  <td class="name">LogoutUseCase</td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (2/2)
+    (0/2)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (2/2)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (17/17)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (121/121)
+    (0/99)
   </span>
 </td>
 </tr>
   <tr>
-    <td class="name">SelectWorkspaceUseCase$Companion</td>
-    <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">SelectWorkspaceUseCase$invoke$1</td>
+    <td class="name">LogoutUseCase$invoke$1</td>
     <td class="coverageStat"/>
   </tr>
 <tr>
   <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (2/2)
+    (0/2)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (2/2)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (17/17)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (121/121)
+    (0/99)
   </span>
 </td>
 </tr>
@@ -132,55 +114,32 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.usecase
 &nbsp;
-&nbsp;import arrow.core.Either
-&nbsp;import co.touchlab.kermit.Logger
 &nbsp;import com.georgeci.moneysurfer.domain.auth.SessionPointers
-&nbsp;import com.georgeci.moneysurfer.domain.logging.redactUid
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
-&nbsp;import com.georgeci.moneysurfer.domain.repositories.UserRemoteRepository
-&nbsp;import kotlinx.coroutines.flow.first
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.AuthRemoteRepository
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.LocalDataResetRepository
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.RemoteDataResetRepository
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.SessionShutdownGate
 &nbsp;import org.koin.core.annotation.Single
 &nbsp;
-&nbsp;/**
-&nbsp; * Pins [workspaceId] as the active workspace.
-&nbsp; *
-&nbsp; *  1. Local: writes `session.currentWorkspaceId` (DataStore). This is what `Get*UseCase`s
-&nbsp; *     observe; the active screens repaint immediately.
-&nbsp; *  2. Remote (best-effort): pushes `users/{uid}.defaultWorkspaceId` so a fresh device after
-&nbsp; *     re-login lands on the same workspace without prompting the selector. Skipped for the
-&nbsp; *     local/demo session (no Firebase uid). Network failures are swallowed — the local
-&nbsp; *     pointer remains source of truth for the running session.
-&nbsp; */
-<b class="fc">&nbsp;@Single</b>
-&nbsp;class SelectWorkspaceUseCase(
-<b class="fc">&nbsp;    private val session: SessionPointers,</b>
-<b class="fc">&nbsp;    private val userRemoteRepository: UserRemoteRepository,</b>
+<b class="nc">&nbsp;@Single</b>
+&nbsp;class LogoutUseCase(
+<b class="nc">&nbsp;    private val sessionShutdownGate: SessionShutdownGate,</b>
+<b class="nc">&nbsp;    private val authRemoteRepository: AuthRemoteRepository,</b>
+<b class="nc">&nbsp;    private val localDataResetRepository: LocalDataResetRepository,</b>
+<b class="nc">&nbsp;    private val remoteDataResetRepository: RemoteDataResetRepository,</b>
+<b class="nc">&nbsp;    private val session: SessionPointers,</b>
 &nbsp;) {
-<b class="fc">&nbsp;    private val log = Logger.withTag(TAG)</b>
-&nbsp;
-&nbsp;    suspend operator fun invoke(workspaceId: WorkspaceId) {
-<b class="fc">&nbsp;        session.currentWorkspaceId.set(workspaceId)</b>
-&nbsp;
-<b class="fc">&nbsp;        val firebaseUid = session.currentFirebaseUid.flow.first()</b>
-<b class="fc">&nbsp;        if (firebaseUid != null) {</b>
-<b class="fc">&nbsp;            Either.catch { userRemoteRepository.setDefaultWorkspace(firebaseUid, workspaceId) }</b>
-<b class="fc">&nbsp;                .onLeft {</b>
-<b class="fc">&nbsp;                    log.w(it) {</b>
-<b class="fc">&nbsp;                        &quot;[remote] setDefaultWorkspace failed uid=${firebaseUid.redactUid()} wid=${workspaceId.value}&quot;</b>
-&nbsp;                    }
-<b class="fc">&nbsp;                }</b>
-<b class="fc">&nbsp;                .onRight {</b>
-<b class="fc">&nbsp;                    log.i {</b>
-<b class="fc">&nbsp;                        &quot;[remote] setDefaultWorkspace ok uid=${firebaseUid.redactUid()} wid=${workspaceId.value}&quot;</b>
-&nbsp;                    }
-<b class="fc">&nbsp;                }</b>
-&nbsp;        } else {
-<b class="fc">&nbsp;            log.i { &quot;[remote] skipped (no Firebase uid — local/demo session)&quot; }</b>
-&nbsp;        }
-&nbsp;    }
-&nbsp;
-&nbsp;    private companion object {
-&nbsp;        const val TAG = &quot;SelectWorkspace&quot;
+&nbsp;    suspend operator fun invoke() {
+&nbsp;        // Stop sync work BEFORE wiping local data — otherwise an in-flight
+&nbsp;        // pull could re-populate Room mid-wipe and produce ghost rows.
+<b class="nc">&nbsp;        sessionShutdownGate.shutdown()</b>
+<b class="nc">&nbsp;        session.currentUserId.set(null)</b>
+<b class="nc">&nbsp;        session.currentWorkspaceId.set(null)</b>
+<b class="nc">&nbsp;        session.currentFirebaseUid.set(null)</b>
+<b class="nc">&nbsp;        localDataResetRepository.clearAll()</b>
+<b class="nc">&nbsp;        remoteDataResetRepository.clearAll()</b>
+&nbsp;        // Best-effort: a failed signOut shouldn&#39;t keep the user pinned in the local session.
+<b class="nc">&nbsp;        authRemoteRepository.signOut()</b>
 &nbsp;    }
 &nbsp;}
 </code>
@@ -206,7 +165,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 20:32</div>
+    <div style="float:right;">generated on 2026-07-22 21:54</div>
 </div>
 </body>
 </html>

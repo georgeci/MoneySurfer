@@ -49,10 +49,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   <td class="name">SavingsGoalRepositoryImpl</td>
 <td class="coverageStat">
   <span class="percent">
-    66.7%
+    60%
   </span>
   <span class="absValue">
-    (6/9)
+    (6/10)
   </span>
 </td>
 <td class="coverageStat">
@@ -65,18 +65,18 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    74.2%
+    73%
   </span>
   <span class="absValue">
-    (46/62)
+    (46/63)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    67.7%
+    66.9%
   </span>
   <span class="absValue">
-    (417/616)
+    (417/623)
   </span>
 </td>
 </tr>
@@ -125,6 +125,38 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <td class="coverageStat"/>
   </tr>
   <tr>
+    <td class="name">SavingsGoalRepositoryImpl$observeById-wYBBLD8$$inlined$map$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">SavingsGoalRepositoryImpl$observeById-wYBBLD8$$inlined$map$1$1</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">SavingsGoalRepositoryImpl$observeById-wYBBLD8$$inlined$map$1$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">SavingsGoalRepositoryImpl$observeById-wYBBLD8$$inlined$map$1$2$1</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
     <td class="name">SavingsGoalRepositoryImpl$update$1</td>
     <td class="coverageStat"/>
   </tr>
@@ -132,10 +164,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
-    50%
+    37.5%
   </span>
   <span class="absValue">
-    (6/12)
+    (6/16)
   </span>
 </td>
 <td class="coverageStat">
@@ -148,18 +180,18 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    74.2%
+    73%
   </span>
   <span class="absValue">
-    (46/62)
+    (46/63)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    67.7%
+    66.9%
   </span>
   <span class="absValue">
-    (417/616)
+    (417/623)
   </span>
 </td>
 </tr>
@@ -205,6 +237,9 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;
 &nbsp;    override suspend fun getById(id: GoalId): SavingsGoal? =
 <b class="nc">&nbsp;        dao.getById(id.value)?.toDomain()</b>
+&nbsp;
+&nbsp;    override fun observeById(id: GoalId): Flow&lt;SavingsGoal?&gt; =
+<b class="nc">&nbsp;        dao.observeById(id.value).map { it?.toDomain() }</b>
 &nbsp;
 &nbsp;    override suspend fun insert(goal: SavingsGoal) {
 <b class="fc">&nbsp;        val entity = goal.toEntity()</b>
@@ -309,7 +344,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 20:32</div>
+    <div style="float:right;">generated on 2026-07-22 21:54</div>
 </div>
 </body>
 </html>

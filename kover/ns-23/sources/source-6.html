@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > NoOpPendingMutationQueue</title>
+  <title>MoneySurfer Coverage Report > GoalContributionViewModel</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,18 +19,15 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.offline.noop</a>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.goal.contribution</a>
 </div>
 
-<h1>Coverage Summary for Class: NoOpPendingMutationQueue (com.georgeci.moneysurfer.offline.noop)</h1>
+<h1>Coverage Summary for Class: GoalContributionViewModel (com.georgeci.moneysurfer.feature.goal.contribution)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
-<th class="coverageStat 
-">
-  Class, %
-</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -49,42 +46,149 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">NoOpPendingMutationQueue</td>
+  <td class="name">GoalContributionViewModel</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (6/6)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    59.1%
   </span>
   <span class="absValue">
-    (0/6)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/7)
+    (13/22)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    94.1%
   </span>
   <span class="absValue">
-    (0/14)
+    (32/34)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    83.1%
+  </span>
+  <span class="absValue">
+    (216/260)
   </span>
 </td>
 </tr>
-
+  <tr>
+    <td class="name">GoalContributionViewModel$loadGoal$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (1/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (8/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    97.4%
+  </span>
+  <span class="absValue">
+    (74/76)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">GoalContributionViewModel$save$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    66.7%
+  </span>
+  <span class="absValue">
+    (4/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    94.1%
+  </span>
+  <span class="absValue">
+    (16/17)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    97.6%
+  </span>
+  <span class="absValue">
+    (201/206)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">GoalContributionViewModel$save$2$WhenMappings</td>
+    <td class="coverageStat"/>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (9/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    60%
+  </span>
+  <span class="absValue">
+    (18/30)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    94.9%
+  </span>
+  <span class="absValue">
+    (56/59)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    90.6%
+  </span>
+  <span class="absValue">
+    (491/542)
+  </span>
+</td>
+</tr>
 </table>
 
 <br/>
@@ -92,26 +196,156 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.offline.noop
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.goal.contribution
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.sync.api.SyncScope
-&nbsp;import com.georgeci.moneysurfer.sync.repository.PendingMutation
-&nbsp;import com.georgeci.moneysurfer.sync.repository.PendingMutationQueue
-&nbsp;import kotlinx.coroutines.flow.Flow
-&nbsp;import kotlinx.coroutines.flow.flowOf
+&nbsp;import com.georgeci.moneysurfer.domain.formatter.MoneyFormatter
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.GoalId
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.GoalContributionRepository
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.SavingsGoalRepository
+&nbsp;import com.georgeci.moneysurfer.domain.usecase.AddContributionUseCase
+&nbsp;import com.georgeci.moneysurfer.domain.usecase.GetCurrentTimeUseCase
+&nbsp;import com.georgeci.moneysurfer.domain.usecase.GoalActionError
+&nbsp;import com.georgeci.moneysurfer.domain.usecase.WithdrawFromGoalUseCase
+&nbsp;import com.georgeci.moneysurfer.feature.goal.GoalAmountInput
+&nbsp;import com.georgeci.moneysurfer.navigation.GoalContributionMode
+&nbsp;import com.georgeci.moneysurfer.navigation.SnackbarController
+&nbsp;import com.georgeci.moneysurfer.utils.MviViewModel
+&nbsp;import kotlinx.datetime.LocalDate
+&nbsp;import kotlinx.datetime.TimeZone
+&nbsp;import kotlinx.datetime.toLocalDateTime
+&nbsp;import moneysurfer.feature.goal.generated.resources.Res
+&nbsp;import moneysurfer.feature.goal.generated.resources.goal_contribution_added_snackbar
+&nbsp;import moneysurfer.feature.goal.generated.resources.goal_contribution_error_amount
+&nbsp;import moneysurfer.feature.goal.generated.resources.goal_contribution_error_below_zero
+&nbsp;import moneysurfer.feature.goal.generated.resources.goal_contribution_error_generic
+&nbsp;import moneysurfer.feature.goal.generated.resources.goal_contribution_error_paused
+&nbsp;import moneysurfer.feature.goal.generated.resources.goal_contribution_withdrawn_snackbar
+&nbsp;import org.jetbrains.compose.resources.StringResource
+&nbsp;import org.koin.core.annotation.KoinViewModel
 &nbsp;
 &nbsp;/**
-&nbsp; * Offline build never enqueues outbox mutations — every queue read is empty
-&nbsp; * and every write is dropped. `pendingCount` emits a constant zero so any
-&nbsp; * UI badge stays hidden.
+&nbsp; * Add money / withdraw. One screen, one view model — [mode] only flips which use case runs
+&nbsp; * and which strings show, because a withdrawal is the same entity with the sign turned around.
 &nbsp; */
-<b class="nc">&nbsp;class NoOpPendingMutationQueue : PendingMutationQueue {</b>
-<b class="nc">&nbsp;    override suspend fun enqueue(mutation: PendingMutation) = Unit</b>
-<b class="nc">&nbsp;    override suspend fun pending(scope: SyncScope, limit: Int): List&lt;PendingMutation&gt; = emptyList()</b>
-<b class="nc">&nbsp;    override suspend fun markInFlight(ids: List&lt;String&gt;) = Unit</b>
-<b class="nc">&nbsp;    override suspend fun markCompleted(ids: List&lt;String&gt;) = Unit</b>
-<b class="nc">&nbsp;    override suspend fun markFailed(id: String, error: String) = Unit</b>
-<b class="nc">&nbsp;    override val pendingCount: Flow&lt;Int&gt; = flowOf(0)</b>
+<b class="fc">&nbsp;@KoinViewModel</b>
+&nbsp;class GoalContributionViewModel(
+<b class="fc">&nbsp;    private val goalId: GoalId,</b>
+<b class="fc">&nbsp;    private val mode: GoalContributionMode,</b>
+<b class="fc">&nbsp;    private val addContribution: AddContributionUseCase,</b>
+<b class="fc">&nbsp;    private val withdrawFromGoal: WithdrawFromGoalUseCase,</b>
+<b class="fc">&nbsp;    private val goalRepository: SavingsGoalRepository,</b>
+<b class="fc">&nbsp;    private val contributionRepository: GoalContributionRepository,</b>
+<b class="fc">&nbsp;    private val getCurrentTime: GetCurrentTimeUseCase,</b>
+<b class="fc">&nbsp;    private val snackbar: SnackbarController,</b>
+&nbsp;) : MviViewModel&lt;GoalContributionState, GoalContributionEvent, GoalContributionEffect&gt;(
+<b class="fc">&nbsp;    initialState = GoalContributionState(mode = mode),</b>
+&nbsp;) {
+&nbsp;
+<b class="fc">&nbsp;    init {</b>
+<b class="fc">&nbsp;        loadGoal()</b>
+<b class="fc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    override fun onEvent(event: GoalContributionEvent) {
+<b class="fc">&nbsp;        when (event) {</b>
+<b class="fc">&nbsp;            is GoalContributionEvent.OnAmountChanged -&gt; updateState {</b>
+<b class="fc">&nbsp;                copy(amount = GoalAmountInput.sanitize(event.amount), error = null)</b>
+&nbsp;            }
+&nbsp;
+<b class="pc">&nbsp;            is GoalContributionEvent.OnNoteChanged -&gt; updateState { copy(note = event.note) }</b>
+<b class="pc">&nbsp;            is GoalContributionEvent.OnDateChanged -&gt; updateState { copy(occurredOn = event.date) }</b>
+<b class="pc">&nbsp;            GoalContributionEvent.OnDatePickerOpen -&gt; updateState { copy(showDatePicker = true) }</b>
+<b class="pc">&nbsp;            GoalContributionEvent.OnDatePickerDismiss -&gt; updateState { copy(showDatePicker = false) }</b>
+<b class="pc">&nbsp;            GoalContributionEvent.OnBackClick -&gt; postSideEffect(GoalContributionEffect.NavigateBack)</b>
+<b class="fc">&nbsp;            GoalContributionEvent.OnSaveClick -&gt; save()</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun loadGoal() {
+<b class="fc">&nbsp;        launch {</b>
+<b class="pc">&nbsp;            val goal = goalRepository.getById(goalId) ?: return@launch</b>
+<b class="fc">&nbsp;            val saved = contributionRepository.savedAmount(goalId)</b>
+<b class="fc">&nbsp;            val today = getCurrentTime().toLocalDateTime(TimeZone.currentSystemDefault()).date</b>
+<b class="fc">&nbsp;            updateState {</b>
+<b class="fc">&nbsp;                copy(</b>
+<b class="fc">&nbsp;                    goalTitle = goal.title,</b>
+<b class="fc">&nbsp;                    savedLabel = MoneyFormatter.format(saved, goal.currencyCode),</b>
+<b class="fc">&nbsp;                    occurredOn = today,</b>
+&nbsp;                )
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun save() {
+<b class="fc">&nbsp;        val state = currentState</b>
+<b class="fc">&nbsp;        val amount = GoalAmountInput.parse(state.amount)</b>
+<b class="fc">&nbsp;        val occurredOn = state.occurredOn</b>
+<b class="pc">&nbsp;        if (amount == null || occurredOn == null) {</b>
+<b class="nc">&nbsp;            updateState { copy(error = Res.string.goal_contribution_error_amount) }</b>
+&nbsp;            return
+&nbsp;        }
+<b class="fc">&nbsp;        launch {</b>
+<b class="fc">&nbsp;            updateState { copy(inFlight = true) }</b>
+<b class="fc">&nbsp;            val result = when (mode) {</b>
+<b class="fc">&nbsp;                GoalContributionMode.ADD -&gt; addContribution(goalId, amount, occurredOn, state.note.trim())</b>
+<b class="fc">&nbsp;                GoalContributionMode.WITHDRAW -&gt; withdrawFromGoal(goalId, amount, occurredOn, state.note.trim())</b>
+&nbsp;            }
+<b class="fc">&nbsp;            result.fold(</b>
+<b class="fc">&nbsp;                ifLeft = { error -&gt; updateState { copy(inFlight = false, error = error.messageRes()) } },</b>
+&nbsp;                ifRight = { contribution -&gt;
+<b class="pc">&nbsp;                    val currency = goalRepository.getById(goalId)?.currencyCode</b>
+<b class="fc">&nbsp;                    if (currency != null) {</b>
+<b class="fc">&nbsp;                        snackbar.show(</b>
+<b class="pc">&nbsp;                            message = when (mode) {</b>
+<b class="fc">&nbsp;                                GoalContributionMode.ADD -&gt; Res.string.goal_contribution_added_snackbar</b>
+<b class="nc">&nbsp;                                GoalContributionMode.WITHDRAW -&gt; Res.string.goal_contribution_withdrawn_snackbar</b>
+&nbsp;                            },
+<b class="fc">&nbsp;                            messageArgs = listOf(</b>
+<b class="fc">&nbsp;                                MoneyFormatter.format(contribution.amount.abs(), currency),</b>
+<b class="fc">&nbsp;                                state.goalTitle,</b>
+&nbsp;                            ),
+&nbsp;                        )
+&nbsp;                    }
+<b class="fc">&nbsp;                    postSideEffect(GoalContributionEffect.NavigateBack)</b>
+<b class="fc">&nbsp;                },</b>
+&nbsp;            )
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    private fun GoalActionError.messageRes(): StringResource = when (this) {</b>
+<b class="pc">&nbsp;        GoalActionError.InvalidAmount -&gt; Res.string.goal_contribution_error_amount</b>
+<b class="fc">&nbsp;        GoalActionError.WithdrawalBelowZero -&gt; Res.string.goal_contribution_error_below_zero</b>
+<b class="pc">&nbsp;        GoalActionError.GoalNotAcceptingContributions -&gt; Res.string.goal_contribution_error_paused</b>
+<b class="nc">&nbsp;        else -&gt; Res.string.goal_contribution_error_generic</b>
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;data class GoalContributionState(
+&nbsp;    val mode: GoalContributionMode,
+&nbsp;    val goalTitle: String = &quot;&quot;,
+&nbsp;    val savedLabel: String = &quot;&quot;,
+&nbsp;    val amount: String = &quot;&quot;,
+&nbsp;    val note: String = &quot;&quot;,
+&nbsp;    val occurredOn: LocalDate? = null,
+&nbsp;    val showDatePicker: Boolean = false,
+&nbsp;    val inFlight: Boolean = false,
+&nbsp;    val error: StringResource? = null,
+&nbsp;) {
+&nbsp;    val canSave: Boolean
+&nbsp;        get() = GoalAmountInput.parse(amount) != null &amp;&amp; occurredOn != null &amp;&amp; !inFlight
+&nbsp;}
+&nbsp;
+&nbsp;sealed interface GoalContributionEvent {
+&nbsp;    data class OnAmountChanged(val amount: String) : GoalContributionEvent
+&nbsp;    data class OnNoteChanged(val note: String) : GoalContributionEvent
+&nbsp;    data class OnDateChanged(val date: LocalDate) : GoalContributionEvent
+&nbsp;    data object OnDatePickerOpen : GoalContributionEvent
+&nbsp;    data object OnDatePickerDismiss : GoalContributionEvent
+&nbsp;    data object OnBackClick : GoalContributionEvent
+&nbsp;    data object OnSaveClick : GoalContributionEvent
+&nbsp;}
+&nbsp;
+&nbsp;sealed interface GoalContributionEffect {
+&nbsp;    data object NavigateBack : GoalContributionEffect
 &nbsp;}
 </code>
 </pre>
@@ -136,7 +370,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-16 12:42</div>
+    <div style="float:right;">generated on 2026-07-22 21:54</div>
 </div>
 </body>
 </html>

@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > AccountRepository</title>
+  <title>MoneySurfer Coverage Report > SurferSyncStatusKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,24 +19,106 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.domain.repositories</a>
+    <a href="../index.html">com.georgeci.moneysurfer.uikit.components.base</a>
 </div>
 
-<h1>Coverage Summary for Class: AccountRepository (com.georgeci.moneysurfer.domain.repositories)</h1>
+<h1>Coverage Summary for Class: SurferSyncStatusKt (com.georgeci.moneysurfer.uikit.components.base)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
 <th class="coverageStat 
 ">
+  Method, %
+</th>
+<th class="coverageStat 
+">
   Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
 </th>
 </tr>
 <tr>
-  <td class="name">AccountRepository</td>
-    <td class="coverageStat"/>
+  <td class="name">SurferSyncStatusKt</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    20%
+  </span>
+  <span class="absValue">
+    (4/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    21.4%
+  </span>
+  <span class="absValue">
+    (6/28)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    42.5%
+  </span>
+  <span class="absValue">
+    (130/306)
+  </span>
+</td>
 </tr>
-
+  <tr>
+    <td class="name">SurferSyncStatusKt$WhenMappings</td>
+    <td class="coverageStat"/>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    20%
+  </span>
+  <span class="absValue">
+    (4/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    21.4%
+  </span>
+  <span class="absValue">
+    (6/28)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    42.5%
+  </span>
+  <span class="absValue">
+    (130/306)
+  </span>
+</td>
+</tr>
 </table>
 
 <br/>
@@ -44,46 +126,74 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.repositories
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.components.base
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.model.Account
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.AccountId
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
-&nbsp;import kotlinx.coroutines.flow.Flow
+&nbsp;import androidx.compose.foundation.background
+&nbsp;import androidx.compose.foundation.layout.Box
+&nbsp;import androidx.compose.foundation.layout.padding
+&nbsp;import androidx.compose.foundation.layout.size
+&nbsp;import androidx.compose.foundation.shape.CircleShape
+&nbsp;import androidx.compose.material3.CircularProgressIndicator
+&nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.runtime.compositionLocalOf
+&nbsp;import androidx.compose.ui.Alignment
+&nbsp;import androidx.compose.ui.Modifier
+&nbsp;import androidx.compose.ui.draw.clip
+&nbsp;import androidx.compose.ui.unit.dp
+&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
 &nbsp;
-&nbsp;interface AccountRepository {
-&nbsp;    fun getAll(): Flow&lt;List&lt;Account&gt;&gt;
-&nbsp;    fun getByWorkspaceId(workspaceId: WorkspaceId): Flow&lt;List&lt;Account&gt;&gt;
-&nbsp;    suspend fun getById(id: AccountId): Account?
-&nbsp;    suspend fun insert(account: Account)
-&nbsp;    suspend fun update(account: Account)
-&nbsp;    suspend fun delete(id: AccountId)
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Increment the cached `balance` of [accountId] by [delta]. Used by total-calc to keep
-&nbsp;     * `Account.balance` in sync with transaction changes without rewriting the whole row.
-&nbsp;     *
-&nbsp;     * Negative delta is allowed (subtracts). The repository writes the result and bumps
-&nbsp;     * `updatedAt`. Does NOT enqueue an outbox row — balance is a derived projection that
-&nbsp;     * Firestore recomputes server-side from its own tx state (see md/totatl_calc.md §6).
-&nbsp;     */
-&nbsp;    suspend fun applyDelta(accountId: AccountId, delta: Money)
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Overwrite the cached balance with [balance]. Used by `RecalculateAccountBalanceUseCase`
-&nbsp;     * to repair the cache from authoritative transaction history. Like [applyDelta], does
-&nbsp;     * not enqueue an outbox row.
-&nbsp;     */
-&nbsp;    suspend fun setBalance(accountId: AccountId, balance: Money)
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Toggle the archived flag on [accountId]. Bumps `updatedAt` and enqueues a sync update.
-&nbsp;     * Archived accounts keep their transactions but are hidden from active lists and excluded
-&nbsp;     * from total/budget rollups. No-op if [accountId] is unknown locally.
-&nbsp;     */
-&nbsp;    suspend fun setArchived(accountId: AccountId, archived: Boolean)
+&nbsp;/**
+&nbsp; * Decoupled UI status fed into [SurferToolbar] / [SurferDashboardToolbar] via
+&nbsp; * [LocalSurferSyncStatus]. The uikit module knows nothing about the sync layer —
+&nbsp; * a higher-level provider (in `:shared`) maps `SyncCoordinator` state to this enum
+&nbsp; * and pushes the value through composition once for the whole app, so screens never
+&nbsp; * have to forward sync state into the toolbar.
+&nbsp; */
+&nbsp;enum class SurferSyncStatus {
+&nbsp;    Hidden,
+&nbsp;    Syncing,
+&nbsp;    Synced,
+&nbsp;    Failed,
 &nbsp;}
+&nbsp;
+<b class="fc">&nbsp;val LocalSurferSyncStatus = compositionLocalOf { SurferSyncStatus.Hidden }</b>
+&nbsp;
+&nbsp;@Composable
+<b class="nc">&nbsp;internal fun SurferSyncStatusBadge(</b>
+<b class="fc">&nbsp;    modifier: Modifier = Modifier,</b>
+<b class="fc">&nbsp;    status: SurferSyncStatus = LocalSurferSyncStatus.current,</b>
+<b class="pc">&nbsp;) {</b>
+<b class="pc">&nbsp;    if (status == SurferSyncStatus.Hidden) return</b>
+&nbsp;
+<b class="nc">&nbsp;    val color = when (status) {</b>
+<b class="nc">&nbsp;        SurferSyncStatus.Failed -&gt; AppTheme.materialColors.error</b>
+<b class="nc">&nbsp;        else -&gt; AppTheme.materialColors.primary</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    Box(</b>
+<b class="nc">&nbsp;        modifier = modifier</b>
+<b class="nc">&nbsp;            .padding(horizontal = 8.dp)</b>
+<b class="nc">&nbsp;            .size(20.dp),</b>
+<b class="nc">&nbsp;        contentAlignment = Alignment.Center,</b>
+&nbsp;    ) {
+<b class="nc">&nbsp;        when (status) {</b>
+<b class="nc">&nbsp;            SurferSyncStatus.Syncing -&gt; CircularProgressIndicator(</b>
+<b class="nc">&nbsp;                modifier = Modifier.size(16.dp),</b>
+<b class="nc">&nbsp;                color = color,</b>
+<b class="nc">&nbsp;                strokeWidth = 2.dp,</b>
+&nbsp;            )
+&nbsp;            SurferSyncStatus.Synced,
+&nbsp;            SurferSyncStatus.Failed,
+<b class="nc">&nbsp;            -&gt; Box(</b>
+<b class="nc">&nbsp;                modifier = Modifier</b>
+<b class="nc">&nbsp;                    .size(8.dp)</b>
+<b class="nc">&nbsp;                    .clip(CircleShape)</b>
+<b class="nc">&nbsp;                    .background(color),</b>
+&nbsp;            )
+<b class="nc">&nbsp;            SurferSyncStatus.Hidden -&gt; Unit</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;    }</b>
+<b class="fc">&nbsp;}</b>
 </code>
 </pre>
 </div>
@@ -107,7 +217,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-17 22:14</div>
+    <div style="float:right;">generated on 2026-07-22 21:54</div>
 </div>
 </body>
 </html>

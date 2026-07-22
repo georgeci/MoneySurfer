@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > PeriodTotalsKt</title>
+  <title>MoneySurfer Coverage Report > PeriodTotals</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.model</a>
 </div>
 
-<h1>Coverage Summary for Class: PeriodTotalsKt (com.georgeci.moneysurfer.domain.model)</h1>
+<h1>Coverage Summary for Class: PeriodTotals (com.georgeci.moneysurfer.domain.model)</h1>
 
 <table class="coverageStats">
 
@@ -46,7 +46,44 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">PeriodTotalsKt</td>
+  <td class="name">PeriodTotals</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (12/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (42/42)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">PeriodTotals$Companion</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -57,32 +94,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    92.9%
-  </span>
-  <span class="absValue">
-    (13/14)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
     100%
   </span>
   <span class="absValue">
-    (21/21)
+    (1/1)
   </span>
 </td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (111/111)
-  </span>
-</td>
-</tr>
-  <tr>
-    <td class="name">PeriodTotalsKt$WhenMappings</td>
-    <td class="coverageStat"/>
   </tr>
 <tr>
   <td class="name"><strong>Total</strong></td>
@@ -91,15 +108,16 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (1/1)
+    (3/3)
   </span>
 </td>
+    <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    92.9%
+    100%
   </span>
   <span class="absValue">
-    (13/14)
+    (13/13)
   </span>
 </td>
 <td class="coverageStat">
@@ -107,15 +125,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (21/21)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (111/111)
+    (43/43)
   </span>
 </td>
 </tr>
@@ -140,20 +150,20 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp; * serialized, never pushed. byCategory / byAccount are intentionally omitted; those are
 &nbsp; * separate use cases (charts, accounts breakdown).
 &nbsp; */
-&nbsp;data class PeriodTotals(
-&nbsp;    val income: Money,
-&nbsp;    val expense: Money,
-&nbsp;    val net: Money,
-&nbsp;    val plannedIncome: Money,
-&nbsp;    val plannedExpense: Money,
+<b class="fc">&nbsp;data class PeriodTotals(</b>
+<b class="fc">&nbsp;    val income: Money,</b>
+<b class="fc">&nbsp;    val expense: Money,</b>
+<b class="fc">&nbsp;    val net: Money,</b>
+<b class="fc">&nbsp;    val plannedIncome: Money,</b>
+<b class="fc">&nbsp;    val plannedExpense: Money,</b>
 &nbsp;) {
 &nbsp;    companion object {
-&nbsp;        val Empty = PeriodTotals(
-&nbsp;            income = Money.zero(),
-&nbsp;            expense = Money.zero(),
-&nbsp;            net = Money.zero(),
-&nbsp;            plannedIncome = Money.zero(),
-&nbsp;            plannedExpense = Money.zero(),
+<b class="fc">&nbsp;        val Empty = PeriodTotals(</b>
+<b class="fc">&nbsp;            income = Money.zero(),</b>
+<b class="fc">&nbsp;            expense = Money.zero(),</b>
+<b class="fc">&nbsp;            net = Money.zero(),</b>
+<b class="fc">&nbsp;            plannedIncome = Money.zero(),</b>
+<b class="fc">&nbsp;            plannedExpense = Money.zero(),</b>
 &nbsp;        )
 &nbsp;    }
 &nbsp;}
@@ -171,36 +181,36 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    toDate: LocalDate,
 &nbsp;    timeZone: TimeZone,
 &nbsp;): PeriodTotals {
-<b class="fc">&nbsp;    var income = 0L</b>
-<b class="fc">&nbsp;    var expense = 0L</b>
-<b class="fc">&nbsp;    var plannedIncome = 0L</b>
-<b class="fc">&nbsp;    var plannedExpense = 0L</b>
+&nbsp;    var income = 0L
+&nbsp;    var expense = 0L
+&nbsp;    var plannedIncome = 0L
+&nbsp;    var plannedExpense = 0L
 &nbsp;
-<b class="fc">&nbsp;    for (tx in transactions) {</b>
-<b class="fc">&nbsp;        val date = tx.operationAt.toLocalDateTime(timeZone).date</b>
-<b class="fc">&nbsp;        if (date &lt; fromDate || date &gt; toDate) continue</b>
+&nbsp;    for (tx in transactions) {
+&nbsp;        val date = tx.operationAt.toLocalDateTime(timeZone).date
+&nbsp;        if (date &lt; fromDate || date &gt; toDate) continue
 &nbsp;
-<b class="fc">&nbsp;        val magnitude = tx.money.abs().minor</b>
-<b class="fc">&nbsp;        when (tx.status) {</b>
-<b class="fc">&nbsp;            TransactionStatus.ACTUAL -&gt; when (tx.type) {</b>
-<b class="fc">&nbsp;                TransactionType.INCOME -&gt; income += magnitude</b>
-<b class="fc">&nbsp;                TransactionType.EXPENSE -&gt; expense += magnitude</b>
+&nbsp;        val magnitude = tx.money.abs().minor
+&nbsp;        when (tx.status) {
+&nbsp;            TransactionStatus.ACTUAL -&gt; when (tx.type) {
+&nbsp;                TransactionType.INCOME -&gt; income += magnitude
+&nbsp;                TransactionType.EXPENSE -&gt; expense += magnitude
 &nbsp;                TransactionType.OPENING_BALANCE -&gt; Unit
 &nbsp;            }
-<b class="pc">&nbsp;            TransactionStatus.PLANNED -&gt; when (tx.type) {</b>
-<b class="fc">&nbsp;                TransactionType.INCOME -&gt; plannedIncome += magnitude</b>
-<b class="fc">&nbsp;                TransactionType.EXPENSE -&gt; plannedExpense += magnitude</b>
+&nbsp;            TransactionStatus.PLANNED -&gt; when (tx.type) {
+&nbsp;                TransactionType.INCOME -&gt; plannedIncome += magnitude
+&nbsp;                TransactionType.EXPENSE -&gt; plannedExpense += magnitude
 &nbsp;                TransactionType.OPENING_BALANCE -&gt; Unit
 &nbsp;            }
 &nbsp;        }
 &nbsp;    }
 &nbsp;
-<b class="fc">&nbsp;    return PeriodTotals(</b>
-<b class="fc">&nbsp;        income = Money.fromMinor(income),</b>
-<b class="fc">&nbsp;        expense = Money.fromMinor(expense),</b>
-<b class="fc">&nbsp;        net = Money.fromMinor(income - expense),</b>
-<b class="fc">&nbsp;        plannedIncome = Money.fromMinor(plannedIncome),</b>
-<b class="fc">&nbsp;        plannedExpense = Money.fromMinor(plannedExpense),</b>
+&nbsp;    return PeriodTotals(
+&nbsp;        income = Money.fromMinor(income),
+&nbsp;        expense = Money.fromMinor(expense),
+&nbsp;        net = Money.fromMinor(income - expense),
+&nbsp;        plannedIncome = Money.fromMinor(plannedIncome),
+&nbsp;        plannedExpense = Money.fromMinor(plannedExpense),
 &nbsp;    )
 &nbsp;}
 </code>
@@ -226,7 +236,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 20:32</div>
+    <div style="float:right;">generated on 2026-07-22 21:54</div>
 </div>
 </body>
 </html>

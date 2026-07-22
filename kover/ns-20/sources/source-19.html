@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > GetCurrenciesUseCase</title>
+  <title>MoneySurfer Coverage Report > GetAccountByIdUseCase</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.usecase</a>
 </div>
 
-<h1>Coverage Summary for Class: GetCurrenciesUseCase (com.georgeci.moneysurfer.domain.usecase)</h1>
+<h1>Coverage Summary for Class: GetAccountByIdUseCase (com.georgeci.moneysurfer.domain.usecase)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">GetCurrenciesUseCase</td>
+  <td class="name">GetAccountByIdUseCase</td>
 <td class="coverageStat">
   <span class="percent">
     0%
@@ -80,7 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/8)
+    (0/10)
   </span>
 </td>
 </tr>
@@ -94,16 +94,17 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.usecase
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.model.Currency
-&nbsp;import com.georgeci.moneysurfer.domain.repositories.CurrencyRepository
-&nbsp;import kotlinx.coroutines.flow.Flow
+&nbsp;import com.georgeci.moneysurfer.domain.model.Account
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.AccountId
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.AccountRepository
 &nbsp;import org.koin.core.annotation.Single
 &nbsp;
 <b class="nc">&nbsp;@Single</b>
-&nbsp;class GetCurrenciesUseCase(
-<b class="nc">&nbsp;    private val currencyRepository: CurrencyRepository,</b>
+&nbsp;class GetAccountByIdUseCase(
+<b class="nc">&nbsp;    private val accountRepository: AccountRepository,</b>
 &nbsp;) {
-<b class="nc">&nbsp;    operator fun invoke(): Flow&lt;List&lt;Currency&gt;&gt; = currencyRepository.getAll()</b>
+&nbsp;
+<b class="nc">&nbsp;    suspend operator fun invoke(id: AccountId): Account? = accountRepository.getById(id)</b>
 &nbsp;}
 </code>
 </pre>
@@ -128,7 +129,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 20:32</div>
+    <div style="float:right;">generated on 2026-07-22 21:54</div>
 </div>
 </body>
 </html>

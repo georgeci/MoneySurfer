@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SurferSpentMonthWidgetKt</title>
+  <title>MoneySurfer Coverage Report > SurferFullScreenLoaderKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.uikit.widgets</a>
+    <a href="../index.html">com.georgeci.moneysurfer.uikit.components</a>
 </div>
 
-<h1>Coverage Summary for Class: SurferSpentMonthWidgetKt (com.georgeci.moneysurfer.uikit.widgets)</h1>
+<h1>Coverage Summary for Class: SurferFullScreenLoaderKt (com.georgeci.moneysurfer.uikit.components)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SurferSpentMonthWidgetKt</td>
+  <td class="name">SurferFullScreenLoaderKt</td>
 <td class="coverageStat">
   <span class="percent">
     0%
@@ -63,7 +63,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/4)
+    (0/2)
   </span>
 </td>
 <td class="coverageStat">
@@ -71,7 +71,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/48)
+    (0/10)
   </span>
 </td>
 <td class="coverageStat">
@@ -79,7 +79,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/69)
+    (0/22)
   </span>
 </td>
 <td class="coverageStat">
@@ -87,7 +87,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/927)
+    (0/282)
   </span>
 </td>
 </tr>
@@ -99,22 +99,19 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.widgets
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.components
 &nbsp;
 &nbsp;import androidx.compose.foundation.background
-&nbsp;import androidx.compose.foundation.layout.Arrangement
+&nbsp;import androidx.compose.foundation.clickable
+&nbsp;import androidx.compose.foundation.interaction.MutableInteractionSource
 &nbsp;import androidx.compose.foundation.layout.Box
-&nbsp;import androidx.compose.foundation.layout.Column
-&nbsp;import androidx.compose.foundation.layout.Row
-&nbsp;import androidx.compose.foundation.layout.fillMaxSize
-&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
-&nbsp;import androidx.compose.foundation.layout.height
-&nbsp;import androidx.compose.foundation.layout.padding
-&nbsp;import androidx.compose.foundation.shape.RoundedCornerShape
-&nbsp;import androidx.compose.material3.Text
+&nbsp;import androidx.compose.foundation.layout.size
+&nbsp;import androidx.compose.material3.CircularProgressIndicator
+&nbsp;import androidx.compose.material3.Surface
 &nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.runtime.remember
+&nbsp;import androidx.compose.ui.Alignment
 &nbsp;import androidx.compose.ui.Modifier
-&nbsp;import androidx.compose.ui.draw.clip
 &nbsp;import androidx.compose.ui.graphics.Color
 &nbsp;import androidx.compose.ui.tooling.preview.Preview
 &nbsp;import androidx.compose.ui.unit.dp
@@ -122,122 +119,44 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
 &nbsp;
 &nbsp;@Composable
-<b class="nc">&nbsp;fun SurferSpentMonthWidget(</b>
-&nbsp;    title: String,
-&nbsp;    spent: String,
+<b class="nc">&nbsp;fun SurferFullScreenLoader(</b>
 <b class="nc">&nbsp;    modifier: Modifier = Modifier,</b>
-<b class="nc">&nbsp;    size: SurferWidgetSize = LocalSurferWidgetSize.current,</b>
-<b class="nc">&nbsp;    progress: Float = 0f,</b>
-<b class="nc">&nbsp;    caption: String? = null,</b>
-<b class="nc">&nbsp;    trailingLabel: String? = null,</b>
-<b class="nc">&nbsp;    trailingLabelColor: Color? = null,</b>
-<b class="nc">&nbsp;) {</b>
-<b class="nc">&nbsp;    val hero = size == SurferWidgetSize.Hero</b>
-<b class="nc">&nbsp;    val clampedProgress = progress.coerceIn(0f, 1f)</b>
-&nbsp;
-<b class="nc">&nbsp;    Column(</b>
-<b class="nc">&nbsp;        modifier = modifier</b>
-<b class="nc">&nbsp;            .clip(RoundedCornerShape(20.dp))</b>
-<b class="nc">&nbsp;            .background(AppTheme.materialColors.surfaceContainerHigh)</b>
-<b class="nc">&nbsp;            .fillMaxSize()</b>
-<b class="nc">&nbsp;            .padding(if (hero) 20.dp else 14.dp),</b>
-<b class="nc">&nbsp;        verticalArrangement = Arrangement.spacedBy(if (hero) 14.dp else 10.dp),</b>
-&nbsp;    ) {
-<b class="nc">&nbsp;        Text(</b>
-<b class="nc">&nbsp;            text = title,</b>
-<b class="nc">&nbsp;            style = if (hero) AppTheme.typography.labelLarge else AppTheme.typography.labelMedium,</b>
-<b class="nc">&nbsp;            color = AppTheme.materialColors.onSurfaceVariant,</b>
-&nbsp;        )
-<b class="nc">&nbsp;        Text(</b>
-<b class="nc">&nbsp;            text = spent,</b>
-<b class="nc">&nbsp;            style = if (hero) AppTheme.typography.displaySmall else AppTheme.typography.headlineSmall,</b>
-<b class="nc">&nbsp;            color = AppTheme.materialColors.onSurface,</b>
-&nbsp;        )
-<b class="nc">&nbsp;        ProgressTrack(</b>
-<b class="nc">&nbsp;            progress = clampedProgress,</b>
-<b class="nc">&nbsp;            modifier = Modifier.fillMaxWidth(),</b>
-&nbsp;        )
-<b class="nc">&nbsp;        if (caption != null || trailingLabel != null) {</b>
-<b class="nc">&nbsp;            Row(</b>
-<b class="nc">&nbsp;                modifier = Modifier.fillMaxWidth(),</b>
-<b class="nc">&nbsp;                horizontalArrangement = Arrangement.SpaceBetween,</b>
-&nbsp;            ) {
-<b class="nc">&nbsp;                Text(</b>
-<b class="nc">&nbsp;                    text = caption.orEmpty(),</b>
-<b class="nc">&nbsp;                    style = AppTheme.typography.bodySmall,</b>
-<b class="nc">&nbsp;                    color = AppTheme.materialColors.onSurfaceVariant,</b>
-&nbsp;                )
-<b class="nc">&nbsp;                if (trailingLabel != null) {</b>
-<b class="nc">&nbsp;                    Text(</b>
-<b class="nc">&nbsp;                        text = trailingLabel,</b>
-<b class="nc">&nbsp;                        style = AppTheme.typography.labelSmall,</b>
-<b class="nc">&nbsp;                        color = trailingLabelColor ?: AppTheme.materialColors.primary,</b>
-&nbsp;                    )
-<b class="nc">&nbsp;                }</b>
-<b class="nc">&nbsp;            }</b>
-<b class="nc">&nbsp;        }</b>
-<b class="nc">&nbsp;    }</b>
-<b class="nc">&nbsp;}</b>
-&nbsp;
-&nbsp;@Composable
-&nbsp;private fun ProgressTrack(
-&nbsp;    progress: Float,
-<b class="nc">&nbsp;    modifier: Modifier = Modifier,</b>
+<b class="nc">&nbsp;    scrimColor: Color = AppTheme.materialColors.scrim.copy(alpha = 0.32f),</b>
 <b class="nc">&nbsp;) {</b>
 <b class="nc">&nbsp;    Box(</b>
 <b class="nc">&nbsp;        modifier = modifier</b>
-<b class="nc">&nbsp;            .height(8.dp)</b>
-<b class="nc">&nbsp;            .clip(RoundedCornerShape(4.dp))</b>
-<b class="nc">&nbsp;            .background(AppTheme.materialColors.surfaceContainerHighest),</b>
+<b class="nc">&nbsp;            .background(scrimColor)</b>
+<b class="nc">&nbsp;            .clickable(</b>
+<b class="nc">&nbsp;                interactionSource = remember { MutableInteractionSource() },</b>
+<b class="nc">&nbsp;                indication = null,</b>
+<b class="nc">&nbsp;                onClick = {},</b>
+&nbsp;            ),
+<b class="nc">&nbsp;        contentAlignment = Alignment.Center,</b>
 &nbsp;    ) {
-<b class="nc">&nbsp;        if (progress &gt; 0f) {</b>
-<b class="nc">&nbsp;            Box(</b>
-<b class="nc">&nbsp;                modifier = Modifier</b>
-<b class="nc">&nbsp;                    .fillMaxWidth(progress)</b>
-<b class="nc">&nbsp;                    .fillMaxSize()</b>
-<b class="nc">&nbsp;                    .clip(RoundedCornerShape(4.dp))</b>
-<b class="nc">&nbsp;                    .background(AppTheme.materialColors.primary),</b>
-&nbsp;            )
-<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        Surface(</b>
+<b class="nc">&nbsp;            shape = AppTheme.shapes.large,</b>
+<b class="nc">&nbsp;            color = AppTheme.materialColors.surface,</b>
+<b class="nc">&nbsp;            tonalElevation = 6.dp,</b>
+<b class="nc">&nbsp;            shadowElevation = 8.dp,</b>
+&nbsp;        ) {
+&nbsp;            Box(
+&nbsp;                modifier = Modifier.size(72.dp),
+&nbsp;                contentAlignment = Alignment.Center,
+&nbsp;            ) {
+&nbsp;                CircularProgressIndicator(
+&nbsp;                    color = AppTheme.materialColors.primary,
+&nbsp;                    trackColor = AppTheme.materialColors.surfaceVariant,
+&nbsp;                )
+&nbsp;            }
+&nbsp;        }
 <b class="nc">&nbsp;    }</b>
 <b class="nc">&nbsp;}</b>
 &nbsp;
 &nbsp;@Preview
 &nbsp;@Composable
-<b class="nc">&nbsp;private fun SurferSpentMonthWidgetHeroPreview() {</b>
+<b class="nc">&nbsp;private fun SurferFullScreenLoaderPreview() {</b>
 <b class="nc">&nbsp;    SurferComponentPreview {</b>
-&nbsp;        Box(modifier = Modifier.padding(16.dp)) {
-&nbsp;            SurferSpentMonthWidget(
-&nbsp;                title = &quot;Spent this month&quot;,
-&nbsp;                spent = &quot;€1,173.69&quot;,
-&nbsp;                progress = 1173.69f / 1800f,
-&nbsp;                caption = &quot;of €1,800 budget&quot;,
-&nbsp;                trailingLabel = &quot;−18% vs last&quot;,
-&nbsp;                trailingLabelColor = Color(0xFF1F7A4F),
-&nbsp;                modifier = Modifier
-&nbsp;                    .fillMaxWidth()
-&nbsp;                    .height(160.dp),
-&nbsp;            )
-&nbsp;        }
-&nbsp;    }
-<b class="nc">&nbsp;}</b>
-&nbsp;
-&nbsp;@Preview
-&nbsp;@Composable
-<b class="nc">&nbsp;private fun SurferSpentMonthWidgetEmptyPreview() {</b>
-<b class="nc">&nbsp;    SurferComponentPreview {</b>
-&nbsp;        Box(modifier = Modifier.padding(16.dp)) {
-&nbsp;            SurferSpentMonthWidget(
-&nbsp;                title = &quot;Spent this month&quot;,
-&nbsp;                spent = &quot;€0.00&quot;,
-&nbsp;                progress = 0f,
-&nbsp;                caption = &quot;No budget set&quot;,
-&nbsp;                trailingLabel = &quot;Set budget&quot;,
-&nbsp;                modifier = Modifier
-&nbsp;                    .fillMaxWidth()
-&nbsp;                    .height(160.dp),
-&nbsp;            )
-&nbsp;        }
+&nbsp;        SurferFullScreenLoader(modifier = Modifier.size(width = 240.dp, height = 360.dp))
 &nbsp;    }
 <b class="nc">&nbsp;}</b>
 </code>
@@ -263,7 +182,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 16:22</div>
+    <div style="float:right;">generated on 2026-07-22 21:54</div>
 </div>
 </body>
 </html>

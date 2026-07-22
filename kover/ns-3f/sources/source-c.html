@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SurferOutlinedContainerTokens</title>
+  <title>MoneySurfer Coverage Report > ConflictResolver</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,70 +19,22 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.uikit.atom</a>
+    <a href="../index.html">com.georgeci.moneysurfer.sync.repository</a>
 </div>
 
-<h1>Coverage Summary for Class: SurferOutlinedContainerTokens (com.georgeci.moneysurfer.uikit.atom)</h1>
+<h1>Coverage Summary for Class: ConflictResolver (com.georgeci.moneysurfer.sync.repository)</h1>
 
 <table class="coverageStats">
 <tr>
   <th class="name">Class</th>
 <th class="coverageStat 
 ">
-  Class, %
-</th>
-<th class="coverageStat 
-">
-  Method, %
-</th>
-<th class="coverageStat 
-">
   Branch, %
-</th>
-<th class="coverageStat 
-">
-  Line, %
-</th>
-<th class="coverageStat 
-">
-  Instruction, %
 </th>
 </tr>
 <tr>
-  <td class="name">SurferOutlinedContainerTokens</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
-  </span>
-</td>
+  <td class="name">ConflictResolver</td>
     <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/7)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/32)
-  </span>
-</td>
 </tr>
 
 </table>
@@ -92,402 +44,40 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.atom
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.sync.repository
 &nbsp;
-&nbsp;import androidx.compose.foundation.BorderStroke
-&nbsp;import androidx.compose.foundation.background
-&nbsp;import androidx.compose.foundation.border
-&nbsp;import androidx.compose.foundation.layout.Arrangement
-&nbsp;import androidx.compose.foundation.layout.Box
-&nbsp;import androidx.compose.foundation.layout.Column
-&nbsp;import androidx.compose.foundation.layout.PaddingValues
-&nbsp;import androidx.compose.foundation.layout.Row
-&nbsp;import androidx.compose.foundation.layout.Spacer
-&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
-&nbsp;import androidx.compose.foundation.layout.padding
-&nbsp;import androidx.compose.foundation.layout.width
-&nbsp;import androidx.compose.foundation.shape.RoundedCornerShape
-&nbsp;import androidx.compose.material3.Icon
-&nbsp;import androidx.compose.material3.LocalContentColor
-&nbsp;import androidx.compose.material3.Text
-&nbsp;import androidx.compose.runtime.Composable
-&nbsp;import androidx.compose.runtime.CompositionLocalProvider
-&nbsp;import androidx.compose.runtime.Immutable
-&nbsp;import androidx.compose.runtime.ReadOnlyComposable
-&nbsp;import androidx.compose.ui.Alignment
-&nbsp;import androidx.compose.ui.Modifier
-&nbsp;import androidx.compose.ui.draw.clip
-&nbsp;import androidx.compose.ui.draw.drawBehind
-&nbsp;import androidx.compose.ui.draw.shadow
-&nbsp;import androidx.compose.ui.geometry.CornerRadius
-&nbsp;import androidx.compose.ui.geometry.Offset
-&nbsp;import androidx.compose.ui.geometry.Size
-&nbsp;import androidx.compose.ui.graphics.Color
-&nbsp;import androidx.compose.ui.graphics.PathEffect
-&nbsp;import androidx.compose.ui.graphics.Shape
-&nbsp;import androidx.compose.ui.graphics.compositeOver
-&nbsp;import androidx.compose.ui.graphics.drawscope.Stroke
-&nbsp;import androidx.compose.ui.tooling.preview.Preview
-&nbsp;import androidx.compose.ui.unit.Dp
-&nbsp;import androidx.compose.ui.unit.dp
-&nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
-&nbsp;import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
-&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
+&nbsp;import kotlin.time.Instant
 &nbsp;
-&nbsp;// ─── Filled ──────────────────────────────────────────────────────────
+&nbsp;/**
+&nbsp; * Strategy for combining a local and a remote version of the same entity.
+&nbsp; *
+&nbsp; * Phase 2 ships only LWW (last-write-wins) by `updatedAt`. Future strategies
+&nbsp; * (`Skip` for blocking inbox, `Merged` for field-level merges) plug in here.
+&nbsp; *
+&nbsp; * See SyncCoordinatorFAQ.md №5, sync.md §4.2.
+&nbsp; */
+&nbsp;interface ConflictResolver {
+&nbsp;    fun &lt;T : Any&gt; resolve(
+&nbsp;        local: T?,
+&nbsp;        remote: T,
+&nbsp;        metadata: ConflictMetadata,
+&nbsp;    ): ConflictResolution&lt;T&gt;
+&nbsp;}
 &nbsp;
-&nbsp;@Immutable
-&nbsp;internal data class SurferFilledContainerTokens(
-&nbsp;    val background: Color,
-&nbsp;    val contentColor: Color,
-&nbsp;    val shape: Shape,
-&nbsp;    val contentPadding: PaddingValues,
+&nbsp;data class ConflictMetadata(
+&nbsp;    val entityType: String,
+&nbsp;    val entityId: String,
+&nbsp;    val localUpdatedAt: Instant?,
+&nbsp;    val remoteUpdatedAt: Instant,
 &nbsp;)
 &nbsp;
-&nbsp;internal object SurferFilledContainerDefaults {
-&nbsp;    @Composable
-&nbsp;    @ReadOnlyComposable
-&nbsp;    fun default(): SurferFilledContainerTokens = SurferFilledContainerTokens(
-&nbsp;        background = AppTheme.materialColors.surfaceContainer,
-&nbsp;        contentColor = AppTheme.materialColors.onSurface,
-&nbsp;        shape = AppTheme.shapes.large,
-&nbsp;        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 14.dp),
-&nbsp;    )
+&nbsp;sealed interface ConflictResolution&lt;out T&gt; {
+&nbsp;    data class TakeRemote&lt;T&gt;(val value: T) : ConflictResolution&lt;T&gt;
+&nbsp;    data class TakeLocal&lt;T&gt;(val value: T) : ConflictResolution&lt;T&gt;
+&nbsp;    data class Merged&lt;T&gt;(val value: T) : ConflictResolution&lt;T&gt;
 &nbsp;
-&nbsp;    @Composable
-&nbsp;    @ReadOnlyComposable
-&nbsp;    fun selected(): SurferFilledContainerTokens = SurferFilledContainerTokens(
-&nbsp;        background = AppTheme.materialColors.primary,
-&nbsp;        contentColor = Color.White,
-&nbsp;        shape = AppTheme.shapes.large,
-&nbsp;        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 14.dp),
-&nbsp;    )
-&nbsp;}
-&nbsp;
-&nbsp;@Composable
-&nbsp;internal fun SurferFilledContainer(
-&nbsp;    modifier: Modifier = Modifier,
-&nbsp;    interactionModifier: Modifier = Modifier,
-&nbsp;    tokens: SurferFilledContainerTokens = SurferFilledContainerDefaults.default(),
-&nbsp;    content: @Composable () -&gt; Unit,
-&nbsp;) {
-&nbsp;    Box(
-&nbsp;        modifier = modifier
-&nbsp;            .clip(tokens.shape)
-&nbsp;            .then(interactionModifier)
-&nbsp;            .background(tokens.background)
-&nbsp;            .padding(tokens.contentPadding),
-&nbsp;    ) {
-&nbsp;        CompositionLocalProvider(LocalContentColor provides tokens.contentColor) {
-&nbsp;            content()
-&nbsp;        }
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;// ─── Outlined ────────────────────────────────────────────────────────
-&nbsp;
-<b class="nc">&nbsp;@Immutable</b>
-&nbsp;internal data class SurferOutlinedContainerTokens(
-<b class="nc">&nbsp;    val background: Color,</b>
-<b class="nc">&nbsp;    val stroke: Color,</b>
-<b class="nc">&nbsp;    val strokeWidth: Dp,</b>
-<b class="nc">&nbsp;    val contentColor: Color,</b>
-<b class="nc">&nbsp;    val shape: Shape,</b>
-<b class="nc">&nbsp;    val contentPadding: PaddingValues,</b>
-&nbsp;)
-&nbsp;
-&nbsp;internal object SurferOutlinedContainerDefaults {
-&nbsp;    @Composable
-&nbsp;    @ReadOnlyComposable
-&nbsp;    fun default(): SurferOutlinedContainerTokens = SurferOutlinedContainerTokens(
-&nbsp;        background = Color.Transparent,
-&nbsp;        stroke = AppTheme.materialColors.outlineVariant,
-&nbsp;        strokeWidth = 1.dp,
-&nbsp;        contentColor = AppTheme.materialColors.onSurface,
-&nbsp;        shape = AppTheme.shapes.large,
-&nbsp;        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 13.dp),
-&nbsp;    )
-&nbsp;
-&nbsp;    @Composable
-&nbsp;    @ReadOnlyComposable
-&nbsp;    fun selected(): SurferOutlinedContainerTokens {
-&nbsp;        val cs = AppTheme.materialColors
-&nbsp;        return SurferOutlinedContainerTokens(
-&nbsp;            background = cs.primary.copy(alpha = 0.08f).compositeOver(cs.surface),
-&nbsp;            stroke = cs.primary,
-&nbsp;            strokeWidth = 1.dp,
-&nbsp;            contentColor = cs.onSurface,
-&nbsp;            shape = AppTheme.shapes.large,
-&nbsp;            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 13.dp),
-&nbsp;        )
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;@Composable
-&nbsp;internal fun SurferOutlinedContainer(
-&nbsp;    modifier: Modifier = Modifier,
-&nbsp;    interactionModifier: Modifier = Modifier,
-&nbsp;    tokens: SurferOutlinedContainerTokens = SurferOutlinedContainerDefaults.default(),
-&nbsp;    content: @Composable () -&gt; Unit,
-&nbsp;) {
-&nbsp;    Box(
-&nbsp;        modifier = modifier
-&nbsp;            .clip(tokens.shape)
-&nbsp;            .then(interactionModifier)
-&nbsp;            .background(tokens.background)
-&nbsp;            .border(BorderStroke(tokens.strokeWidth, tokens.stroke), shape = tokens.shape)
-&nbsp;            .padding(tokens.contentPadding),
-&nbsp;    ) {
-&nbsp;        CompositionLocalProvider(LocalContentColor provides tokens.contentColor) {
-&nbsp;            content()
-&nbsp;        }
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;// ─── Card ────────────────────────────────────────────────────────────
-&nbsp;
-&nbsp;@Immutable
-&nbsp;internal data class SurferContainerTokens(
-&nbsp;    val background: Color,
-&nbsp;    val stroke: Color,
-&nbsp;    val strokeWidth: Dp,
-&nbsp;    val shadowElevation: Dp,
-&nbsp;    val contentColor: Color,
-&nbsp;    val shape: Shape,
-&nbsp;    val contentPadding: PaddingValues,
-&nbsp;)
-&nbsp;
-&nbsp;internal object SurferContainerDefaults {
-&nbsp;    @Composable
-&nbsp;    @ReadOnlyComposable
-&nbsp;    fun default(): SurferContainerTokens = SurferContainerTokens(
-&nbsp;        background = AppTheme.materialColors.surfaceContainerLowest,
-&nbsp;        stroke = Color.Transparent,
-&nbsp;        strokeWidth = 0.dp,
-&nbsp;        shadowElevation = 2.dp,
-&nbsp;        contentColor = AppTheme.materialColors.onSurface,
-&nbsp;        shape = AppTheme.shapes.large,
-&nbsp;        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 14.dp),
-&nbsp;    )
-&nbsp;
-&nbsp;    @Composable
-&nbsp;    @ReadOnlyComposable
-&nbsp;    fun selected(): SurferContainerTokens = SurferContainerTokens(
-&nbsp;        background = AppTheme.materialColors.surfaceContainerLowest,
-&nbsp;        stroke = AppTheme.materialColors.primary,
-&nbsp;        strokeWidth = 1.dp,
-&nbsp;        shadowElevation = 8.dp,
-&nbsp;        contentColor = AppTheme.materialColors.onSurface,
-&nbsp;        shape = AppTheme.shapes.large,
-&nbsp;        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 13.dp),
-&nbsp;    )
-&nbsp;}
-&nbsp;
-&nbsp;@Composable
-&nbsp;internal fun SurferContainer(
-&nbsp;    modifier: Modifier = Modifier,
-&nbsp;    interactionModifier: Modifier = Modifier,
-&nbsp;    tokens: SurferContainerTokens = SurferContainerDefaults.default(),
-&nbsp;    content: @Composable () -&gt; Unit,
-&nbsp;) {
-&nbsp;    Box(
-&nbsp;        modifier = modifier
-&nbsp;            .shadow(elevation = tokens.shadowElevation, shape = tokens.shape)
-&nbsp;            .clip(tokens.shape)
-&nbsp;            .then(interactionModifier)
-&nbsp;            .background(tokens.background)
-&nbsp;            .border(BorderStroke(tokens.strokeWidth, tokens.stroke), shape = tokens.shape)
-&nbsp;            .padding(tokens.contentPadding),
-&nbsp;    ) {
-&nbsp;        CompositionLocalProvider(LocalContentColor provides tokens.contentColor) {
-&nbsp;            content()
-&nbsp;        }
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;// ─── AddAction ───────────────────────────────────────────────────────
-&nbsp;
-&nbsp;@Immutable
-&nbsp;internal data class SurferAddActionContainerTokens(
-&nbsp;    val background: Color,
-&nbsp;    val stroke: Color,
-&nbsp;    val strokeWidth: Dp,
-&nbsp;    val dashLength: Dp,
-&nbsp;    val dashGap: Dp,
-&nbsp;    val contentColor: Color,
-&nbsp;    val shape: Shape,
-&nbsp;    val contentPadding: PaddingValues,
-&nbsp;)
-&nbsp;
-&nbsp;internal object SurferAddActionContainerDefaults {
-&nbsp;    @Composable
-&nbsp;    @ReadOnlyComposable
-&nbsp;    fun default(): SurferAddActionContainerTokens {
-&nbsp;        val cs = AppTheme.materialColors
-&nbsp;        return SurferAddActionContainerTokens(
-&nbsp;            background = Color.Transparent,
-&nbsp;            stroke = cs.outline,
-&nbsp;            strokeWidth = 1.5.dp,
-&nbsp;            dashLength = 6.dp,
-&nbsp;            dashGap = 4.dp,
-&nbsp;            contentColor = cs.primary,
-&nbsp;            shape = AppTheme.shapes.large,
-&nbsp;            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 14.dp),
-&nbsp;        )
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;@Composable
-&nbsp;internal fun SurferAddActionContainer(
-&nbsp;    modifier: Modifier = Modifier,
-&nbsp;    interactionModifier: Modifier = Modifier,
-&nbsp;    tokens: SurferAddActionContainerTokens = SurferAddActionContainerDefaults.default(),
-&nbsp;    content: @Composable () -&gt; Unit,
-&nbsp;) {
-&nbsp;    Box(
-&nbsp;        modifier = modifier
-&nbsp;            .clip(tokens.shape)
-&nbsp;            .then(interactionModifier)
-&nbsp;            .background(tokens.background)
-&nbsp;            .dashedBorder(
-&nbsp;                color = tokens.stroke,
-&nbsp;                strokeWidth = tokens.strokeWidth,
-&nbsp;                dashLength = tokens.dashLength,
-&nbsp;                dashGap = tokens.dashGap,
-&nbsp;                shape = tokens.shape,
-&nbsp;            )
-&nbsp;            .padding(tokens.contentPadding),
-&nbsp;    ) {
-&nbsp;        CompositionLocalProvider(LocalContentColor provides tokens.contentColor) {
-&nbsp;            content()
-&nbsp;        }
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;private fun Modifier.dashedBorder(
-&nbsp;    color: Color,
-&nbsp;    strokeWidth: Dp,
-&nbsp;    dashLength: Dp,
-&nbsp;    dashGap: Dp,
-&nbsp;    shape: Shape,
-&nbsp;): Modifier = this.drawBehind {
-&nbsp;    val stroke = strokeWidth.toPx()
-&nbsp;    val inset = stroke / 2f
-&nbsp;    val cornerRadius = when (shape) {
-&nbsp;        is RoundedCornerShape -&gt; shape.topStart.toPx(Size(size.width, size.height), this)
-&nbsp;        else -&gt; 0f
-&nbsp;    }
-&nbsp;    drawRoundRect(
-&nbsp;        color = color,
-&nbsp;        topLeft = Offset(inset, inset),
-&nbsp;        size = Size(size.width - stroke, size.height - stroke),
-&nbsp;        cornerRadius = CornerRadius(cornerRadius - inset, cornerRadius - inset),
-&nbsp;        style = Stroke(
-&nbsp;            width = stroke,
-&nbsp;            pathEffect = PathEffect.dashPathEffect(
-&nbsp;                floatArrayOf(dashLength.toPx(), dashGap.toPx()),
-&nbsp;                0f,
-&nbsp;            ),
-&nbsp;        ),
-&nbsp;    )
-&nbsp;}
-&nbsp;
-&nbsp;// ─── Previews ────────────────────────────────────────────────────────
-&nbsp;
-&nbsp;@Preview
-&nbsp;@Composable
-&nbsp;private fun SurferFilledContainerPreview() {
-&nbsp;    SurferComponentPreview {
-&nbsp;        Column(
-&nbsp;            verticalArrangement = Arrangement.spacedBy(8.dp),
-&nbsp;            modifier = Modifier.fillMaxWidth().padding(16.dp),
-&nbsp;        ) {
-&nbsp;            SurferFilledContainer(modifier = Modifier.fillMaxWidth()) {
-&nbsp;                PreviewRowBody(&quot;Main account&quot;, &quot;Checking · ••4218&quot;, &quot;$4,210.55&quot;)
-&nbsp;            }
-&nbsp;            SurferFilledContainer(
-&nbsp;                modifier = Modifier.fillMaxWidth(),
-&nbsp;                tokens = SurferFilledContainerDefaults.selected(),
-&nbsp;            ) {
-&nbsp;                PreviewRowBody(&quot;Savings&quot;, &quot;High-yield · 4.5%&quot;, &quot;$12,840.00&quot;)
-&nbsp;            }
-&nbsp;        }
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;@Preview
-&nbsp;@Composable
-&nbsp;private fun SurferOutlinedContainerPreview() {
-&nbsp;    SurferComponentPreview {
-&nbsp;        Column(
-&nbsp;            verticalArrangement = Arrangement.spacedBy(8.dp),
-&nbsp;            modifier = Modifier.fillMaxWidth().padding(16.dp),
-&nbsp;        ) {
-&nbsp;            SurferOutlinedContainer(modifier = Modifier.fillMaxWidth()) {
-&nbsp;                PreviewRowBody(&quot;Main account&quot;, &quot;Checking · ••4218&quot;, &quot;$4,210.55&quot;)
-&nbsp;            }
-&nbsp;            SurferOutlinedContainer(
-&nbsp;                modifier = Modifier.fillMaxWidth(),
-&nbsp;                tokens = SurferOutlinedContainerDefaults.selected(),
-&nbsp;            ) {
-&nbsp;                PreviewRowBody(&quot;Savings&quot;, &quot;High-yield · 4.5%&quot;, &quot;$12,840.00&quot;)
-&nbsp;            }
-&nbsp;        }
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;@Preview
-&nbsp;@Composable
-&nbsp;private fun SurferContainerPreview() {
-&nbsp;    SurferComponentPreview {
-&nbsp;        Column(
-&nbsp;            verticalArrangement = Arrangement.spacedBy(10.dp),
-&nbsp;            modifier = Modifier.fillMaxWidth().padding(16.dp),
-&nbsp;        ) {
-&nbsp;            SurferContainer(modifier = Modifier.fillMaxWidth()) {
-&nbsp;                PreviewRowBody(&quot;Main account&quot;, &quot;Checking · ••4218&quot;, &quot;$4,210.55&quot;)
-&nbsp;            }
-&nbsp;            SurferContainer(
-&nbsp;                modifier = Modifier.fillMaxWidth(),
-&nbsp;                tokens = SurferContainerDefaults.selected(),
-&nbsp;            ) {
-&nbsp;                PreviewRowBody(&quot;Savings&quot;, &quot;High-yield · 4.5%&quot;, &quot;$12,840.00&quot;)
-&nbsp;            }
-&nbsp;        }
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;@Preview
-&nbsp;@Composable
-&nbsp;private fun SurferAddActionContainerPreview() {
-&nbsp;    SurferComponentPreview {
-&nbsp;        Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
-&nbsp;            SurferAddActionContainer(modifier = Modifier.fillMaxWidth()) {
-&nbsp;                Row(verticalAlignment = Alignment.CenterVertically) {
-&nbsp;                    // decorative — preview only; label text is adjacent
-&nbsp;                    Icon(imageVector = SurferIcons.Add, contentDescription = null)
-&nbsp;                    Spacer(Modifier.width(8.dp))
-&nbsp;                    Text(text = &quot;Add account&quot;, style = AppTheme.typography.labelLarge)
-&nbsp;                }
-&nbsp;            }
-&nbsp;        }
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;@Composable
-&nbsp;private fun PreviewRowBody(label: String, hint: String, amount: String) {
-&nbsp;    Row(verticalAlignment = Alignment.CenterVertically) {
-&nbsp;        Column(modifier = Modifier.weight(1f)) {
-&nbsp;            Text(text = label, style = AppTheme.typography.titleSmall)
-&nbsp;            Spacer(Modifier.padding(top = 2.dp))
-&nbsp;            Text(
-&nbsp;                text = hint,
-&nbsp;                style = AppTheme.typography.bodySmall,
-&nbsp;                color = LocalContentColor.current.copy(alpha = 0.7f),
-&nbsp;            )
-&nbsp;        }
-&nbsp;        Text(text = amount, style = AppTheme.typography.titleSmall)
-&nbsp;    }
+&nbsp;    /** Defer decision to a manual-resolution inbox (not implemented in Phase 2). */
+&nbsp;    data object Skip : ConflictResolution&lt;Nothing&gt;
 &nbsp;}
 </code>
 </pre>
@@ -512,7 +102,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 20:32</div>
+    <div style="float:right;">generated on 2026-07-22 21:54</div>
 </div>
 </body>
 </html>

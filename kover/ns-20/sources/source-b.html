@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > CreateCategoryUseCase</title>
+  <title>MoneySurfer Coverage Report > CheckAppVersionUseCase</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.usecase</a>
 </div>
 
-<h1>Coverage Summary for Class: CreateCategoryUseCase (com.georgeci.moneysurfer.domain.usecase)</h1>
+<h1>Coverage Summary for Class: CheckAppVersionUseCase (com.georgeci.moneysurfer.domain.usecase)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">CreateCategoryUseCase</td>
+  <td class="name">CheckAppVersionUseCase</td>
 <td class="coverageStat">
   <span class="percent">
     0%
@@ -80,7 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/10)
+    (0/9)
   </span>
 </td>
 </tr>
@@ -94,18 +94,20 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.usecase
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.model.Category
-&nbsp;import com.georgeci.moneysurfer.domain.repositories.CategoryRepository
+&nbsp;import com.georgeci.moneysurfer.domain.model.AppVersionStatus
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.AppVersionGate
 &nbsp;import org.koin.core.annotation.Single
 &nbsp;
+&nbsp;/**
+&nbsp; * Refreshes the remote app-version gate. Invoke at app start, before
+&nbsp; * `BootstrapSessionUseCase` and `BackgroundSyncScheduler.schedulePeriodic` —
+&nbsp; * see block.md &quot;Порядок запуска приложения&quot;.
+&nbsp; */
 <b class="nc">&nbsp;@Single</b>
-&nbsp;class CreateCategoryUseCase(
-<b class="nc">&nbsp;    private val categoryRepository: CategoryRepository,</b>
+&nbsp;class CheckAppVersionUseCase(
+<b class="nc">&nbsp;    private val gate: AppVersionGate,</b>
 &nbsp;) {
-&nbsp;
-&nbsp;    suspend operator fun invoke(category: Category) {
-<b class="nc">&nbsp;        categoryRepository.insert(category)</b>
-&nbsp;    }
+<b class="nc">&nbsp;    suspend operator fun invoke(): AppVersionStatus = gate.refresh()</b>
 &nbsp;}
 </code>
 </pre>
@@ -130,7 +132,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 20:32</div>
+    <div style="float:right;">generated on 2026-07-22 21:54</div>
 </div>
 </body>
 </html>

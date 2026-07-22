@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > AppSpacing</title>
+  <title>MoneySurfer Coverage Report > SurferPendingBadgeKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.uikit.tokens</a>
+    <a href="../index.html">com.georgeci.moneysurfer.uikit.components.settings</a>
 </div>
 
-<h1>Coverage Summary for Class: AppSpacing (com.georgeci.moneysurfer.uikit.tokens)</h1>
+<h1>Coverage Summary for Class: SurferPendingBadgeKt (com.georgeci.moneysurfer.uikit.components.settings)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">AppSpacing</td>
+  <td class="name">SurferPendingBadgeKt</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -60,27 +60,34 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    90.9%
+    50%
   </span>
   <span class="absValue">
-    (10/11)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (10/10)
+    (1/2)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    50%
   </span>
   <span class="absValue">
-    (60/60)
+    (2/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    87.5%
+  </span>
+  <span class="absValue">
+    (21/24)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    79.8%
+  </span>
+  <span class="absValue">
+    (197/247)
   </span>
 </td>
 </tr>
@@ -92,23 +99,69 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.tokens
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.components.settings
 &nbsp;
-&nbsp;import androidx.compose.ui.unit.Dp
+&nbsp;import androidx.compose.foundation.background
+&nbsp;import androidx.compose.foundation.layout.Arrangement
+&nbsp;import androidx.compose.foundation.layout.Box
+&nbsp;import androidx.compose.foundation.layout.Row
+&nbsp;import androidx.compose.foundation.layout.padding
+&nbsp;import androidx.compose.foundation.layout.size
+&nbsp;import androidx.compose.foundation.shape.CircleShape
+&nbsp;import androidx.compose.foundation.shape.RoundedCornerShape
+&nbsp;import androidx.compose.material3.Text
+&nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.ui.Alignment
+&nbsp;import androidx.compose.ui.Modifier
+&nbsp;import androidx.compose.ui.draw.clip
+&nbsp;import androidx.compose.ui.tooling.preview.Preview
 &nbsp;import androidx.compose.ui.unit.dp
+&nbsp;import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
+&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
 &nbsp;
-&nbsp;object AppSpacing {
-<b class="fc">&nbsp;    val None: Dp = 0.dp</b>
-<b class="fc">&nbsp;    val XXSmall: Dp = 2.dp</b>
-<b class="fc">&nbsp;    val XSmall: Dp = 4.dp</b>
-<b class="fc">&nbsp;    val Small: Dp = 8.dp</b>
-<b class="fc">&nbsp;    val Medium: Dp = 12.dp</b>
-<b class="fc">&nbsp;    val Default: Dp = 16.dp</b>
-<b class="fc">&nbsp;    val Large: Dp = 24.dp</b>
-<b class="fc">&nbsp;    val XLarge: Dp = 32.dp</b>
-<b class="fc">&nbsp;    val XXLarge: Dp = 48.dp</b>
-<b class="fc">&nbsp;    val XXXLarge: Dp = 64.dp</b>
-&nbsp;}
+&nbsp;/** Inline pill used inside `supporting` slots to flag attention items (e.g. &quot;2 pending&quot;). */
+&nbsp;@Composable
+&nbsp;fun SurferPendingBadge(
+&nbsp;    text: String,
+<b class="fc">&nbsp;    modifier: Modifier = Modifier,</b>
+<b class="pc">&nbsp;) {</b>
+<b class="fc">&nbsp;    val colors = AppTheme.materialColors</b>
+<b class="fc">&nbsp;    Row(</b>
+<b class="fc">&nbsp;        modifier = modifier</b>
+<b class="fc">&nbsp;            .clip(RoundedCornerShape(999.dp))</b>
+<b class="fc">&nbsp;            .background(colors.primaryContainer)</b>
+<b class="fc">&nbsp;            .padding(horizontal = 10.dp, vertical = 2.dp),</b>
+<b class="fc">&nbsp;        verticalAlignment = Alignment.CenterVertically,</b>
+<b class="fc">&nbsp;        horizontalArrangement = Arrangement.spacedBy(6.dp),</b>
+&nbsp;    ) {
+<b class="fc">&nbsp;        Box(</b>
+<b class="fc">&nbsp;            modifier = Modifier</b>
+<b class="fc">&nbsp;                .size(6.dp)</b>
+<b class="fc">&nbsp;                .clip(CircleShape)</b>
+<b class="fc">&nbsp;                .background(colors.primary),</b>
+&nbsp;        )
+<b class="fc">&nbsp;        Text(</b>
+<b class="fc">&nbsp;            text = text,</b>
+<b class="fc">&nbsp;            style = AppTheme.typography.labelMedium,</b>
+<b class="fc">&nbsp;            color = colors.onPrimaryContainer,</b>
+&nbsp;        )
+<b class="fc">&nbsp;    }</b>
+<b class="fc">&nbsp;}</b>
+&nbsp;
+&nbsp;@Preview
+&nbsp;@Composable
+<b class="nc">&nbsp;private fun SurferPendingBadgePreview() {</b>
+<b class="nc">&nbsp;    SurferComponentPreview {</b>
+&nbsp;        Row(
+&nbsp;            modifier = Modifier.padding(16.dp),
+&nbsp;            horizontalArrangement = Arrangement.spacedBy(8.dp),
+&nbsp;        ) {
+&nbsp;            SurferPendingBadge(&quot;2 pending&quot;)
+&nbsp;            SurferPendingBadge(&quot;New&quot;)
+&nbsp;            SurferPendingBadge(&quot;Action required&quot;)
+&nbsp;        }
+&nbsp;    }
+<b class="nc">&nbsp;}</b>
 </code>
 </pre>
 </div>
@@ -132,7 +185,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 20:32</div>
+    <div style="float:right;">generated on 2026-07-22 21:54</div>
 </div>
 </body>
 </html>

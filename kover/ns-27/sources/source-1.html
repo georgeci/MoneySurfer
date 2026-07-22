@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > NavEntryViewModelStoreHolder</title>
+  <title>MoneySurfer Coverage Report > ComposableSingletons</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.navigation.util</a>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.goal.list</a>
 </div>
 
-<h1>Coverage Summary for Class: NavEntryViewModelStoreHolder (com.georgeci.moneysurfer.navigation.util)</h1>
+<h1>Coverage Summary for Class: ComposableSingletons (com.georgeci.moneysurfer.feature.goal.list)</h1>
 
 <table class="coverageStats">
 
@@ -45,8 +45,8 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   Instruction, %
 </th>
 </tr>
-<tr>
-  <td class="name">NavEntryViewModelStoreHolder</td>
+  <tr>
+    <td class="name">ComposableSingletons$GoalsScreenKt</td>
 <td class="coverageStat">
   <span class="percent">
     0%
@@ -55,48 +55,13 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     (0/4)
   </span>
 </td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/2)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/7)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/47)
-  </span>
-</td>
-</tr>
-  <tr>
-    <td class="name">NavEntryViewModelStoreHolder$getOrCreate$1</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
-  </span>
-</td>
     <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
     0%
   </span>
   <span class="absValue">
-    (0/2)
+    (0/17)
   </span>
 </td>
 <td class="coverageStat">
@@ -104,7 +69,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/7)
+    (0/80)
   </span>
 </td>
   </tr>
@@ -115,7 +80,16 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/5)
+    (0/4)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
   </span>
 </td>
 <td class="coverageStat">
@@ -123,23 +97,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/2)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/9)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/54)
+    (0/80)
   </span>
 </td>
 </tr>
@@ -148,68 +106,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <br/>
 <br/>
 
-
-<pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.navigation.util
-&nbsp;
-&nbsp;import androidx.compose.runtime.Composable
-&nbsp;import androidx.compose.runtime.CompositionLocalProvider
-&nbsp;import androidx.compose.runtime.DisposableEffect
-&nbsp;import androidx.compose.runtime.remember
-&nbsp;import androidx.lifecycle.ViewModelStore
-&nbsp;import androidx.lifecycle.ViewModelStoreOwner
-&nbsp;import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
-&nbsp;import androidx.navigation3.runtime.NavEntryDecorator
-&nbsp;
-<b class="nc">&nbsp;class NavEntryViewModelStoreHolder {</b>
-&nbsp;
-<b class="nc">&nbsp;    private val stores = mutableMapOf&lt;Any, ViewModelStore&gt;()</b>
-&nbsp;
-&nbsp;    fun getOrCreate(key: Any): ViewModelStoreOwner {
-<b class="nc">&nbsp;        val store = stores.getOrPut(key) { ViewModelStore() }</b>
-<b class="nc">&nbsp;        return object : ViewModelStoreOwner {</b>
-<b class="nc">&nbsp;            override val viewModelStore: ViewModelStore = store</b>
-&nbsp;        }
-&nbsp;    }
-&nbsp;
-&nbsp;    fun clear(key: Any) {
-<b class="nc">&nbsp;        stores.remove(key)?.clear()</b>
-&nbsp;    }
-&nbsp;
-&nbsp;    fun clearAll() {
-<b class="nc">&nbsp;        stores.values.forEach { it.clear() }</b>
-<b class="nc">&nbsp;        stores.clear()</b>
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;@Composable
-&nbsp;fun &lt;T : Any&gt; rememberViewModelStoreNavEntryDecorator(
-&nbsp;    vmStoreHolder: NavEntryViewModelStoreHolder = remember { NavEntryViewModelStoreHolder() },
-&nbsp;): NavEntryDecorator&lt;T&gt; {
-&nbsp;    return remember(vmStoreHolder) {
-&nbsp;        ViewModelStoreNavEntryDecorator(vmStoreHolder)
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;class ViewModelStoreNavEntryDecorator&lt;T : Any&gt;(
-&nbsp;    vmStoreHolder: NavEntryViewModelStoreHolder,
-&nbsp;) : NavEntryDecorator&lt;T&gt;(
-&nbsp;    decorate = { entry -&gt;
-&nbsp;        val owner = remember(entry.contentKey) { vmStoreHolder.getOrCreate(entry.contentKey) }
-&nbsp;
-&nbsp;        DisposableEffect(entry.contentKey) {
-&nbsp;            onDispose { vmStoreHolder.clear(entry.contentKey) }
-&nbsp;        }
-&nbsp;
-&nbsp;        CompositionLocalProvider(
-&nbsp;            LocalViewModelStoreOwner provides owner,
-&nbsp;        ) {
-&nbsp;            entry.Content()
-&nbsp;        }
-&nbsp;    },
-&nbsp;)
-</code>
-</pre>
+  <code class="sourceCode">Source code is not available<br /></code>
 </div>
 
 <script type="text/javascript">
@@ -231,7 +128,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 20:32</div>
+    <div style="float:right;">generated on 2026-07-22 21:54</div>
 </div>
 </body>
 </html>

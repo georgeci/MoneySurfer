@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > NoOpRecalculateLocalProjectionsUseCase</title>
+  <title>MoneySurfer Coverage Report > SessionShutdownGateImpl</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.sync.internal.usecase</a>
+    <a href="../index.html">com.georgeci.moneysurfer.sync.internal</a>
 </div>
 
-<h1>Coverage Summary for Class: NoOpRecalculateLocalProjectionsUseCase (com.georgeci.moneysurfer.sync.internal.usecase)</h1>
+<h1>Coverage Summary for Class: SessionShutdownGateImpl (com.georgeci.moneysurfer.sync.internal)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">NoOpRecalculateLocalProjectionsUseCase</td>
+  <td class="name">SessionShutdownGateImpl</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -72,7 +72,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (2/2)
+    (5/5)
   </span>
 </td>
 <td class="coverageStat">
@@ -80,7 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (7/7)
+    (15/15)
   </span>
 </td>
 </tr>
@@ -92,35 +92,33 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.sync.internal.usecase
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.sync.internal
 &nbsp;
-&nbsp;import arrow.core.right
-&nbsp;import com.georgeci.moneysurfer.domain.sync.ProjectionScope
-&nbsp;import com.georgeci.moneysurfer.domain.sync.ProjectionSummary
-&nbsp;import com.georgeci.moneysurfer.domain.sync.RecalculateLocalProjectionsUseCase
-&nbsp;import com.georgeci.moneysurfer.sync.api.SyncCancelToken
-&nbsp;import com.georgeci.moneysurfer.sync.api.SyncResult
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.SessionShutdownGate
+&nbsp;import com.georgeci.moneysurfer.sync.coordinator.SyncCoordinator
+&nbsp;import com.georgeci.moneysurfer.sync.scheduler.BackgroundSyncScheduler
 &nbsp;import org.koin.core.annotation.Single
 &nbsp;
 &nbsp;/**
-&nbsp; * Placeholder kept until the real projection subsystem is implemented (Phase 5+).
+&nbsp; * Order matters:
+&nbsp; * 1. Cancel queued / running sync first so no in-flight push/pull races
+&nbsp; *    with the upcoming local data wipe.
+&nbsp; * 2. Cancel background schedules so they don&#39;t fire after wipe and re-upload
+&nbsp; *    nothing or hit `AuthRequired` because the session is gone.
 &nbsp; *
-&nbsp; * Real account-balance / aggregate recalculation depends on the project&#39;s
-&nbsp; * balance computation rules (signed amounts, INITIAL_BALANCE handling,
-&nbsp; * multi-currency). It will be implemented as a dedicated subsystem in Phase 5+
-&nbsp; * alongside projections / derived views work, then wired up here as the
-&nbsp; * no-op replacement.
-&nbsp; *
-&nbsp; * The contract is preserved: the coordinator only invokes this step when
-&nbsp; * `pullSummary.downloadedCount &gt; 0` (FAQ №7), so a NoOp here costs nothing
-&nbsp; * on idle cycles.
+&nbsp; * Both [SyncCoordinator.cancelAll] and [BackgroundSyncScheduler.cancelAll]
+&nbsp; * are idempotent — safe to call multiple times.
 &nbsp; */
-<b class="fc">&nbsp;@Single(binds = [RecalculateLocalProjectionsUseCase::class])</b>
-&nbsp;internal class NoOpRecalculateLocalProjectionsUseCase : RecalculateLocalProjectionsUseCase {
-&nbsp;    override suspend fun invoke(
-&nbsp;        scope: ProjectionScope,
-&nbsp;        cancelToken: SyncCancelToken,
-<b class="fc">&nbsp;    ): SyncResult&lt;ProjectionSummary&gt; = ProjectionSummary(recalculatedCount = 0).right()</b>
+<b class="fc">&nbsp;@Single(binds = [SessionShutdownGate::class])</b>
+&nbsp;class SessionShutdownGateImpl(
+<b class="fc">&nbsp;    private val coordinator: SyncCoordinator,</b>
+<b class="fc">&nbsp;    private val scheduler: BackgroundSyncScheduler,</b>
+&nbsp;) : SessionShutdownGate {
+&nbsp;
+&nbsp;    override suspend fun shutdown() {
+<b class="fc">&nbsp;        coordinator.cancelAll()</b>
+<b class="fc">&nbsp;        scheduler.cancelAll()</b>
+&nbsp;    }
 &nbsp;}
 </code>
 </pre>
@@ -145,7 +143,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 20:32</div>
+    <div style="float:right;">generated on 2026-07-22 21:54</div>
 </div>
 </body>
 </html>

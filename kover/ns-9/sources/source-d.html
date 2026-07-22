@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > TransactionDao</title>
+  <title>MoneySurfer Coverage Report > GoalContributionDao</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.data.db.dao</a>
 </div>
 
-<h1>Coverage Summary for Class: TransactionDao (com.georgeci.moneysurfer.data.db.dao)</h1>
+<h1>Coverage Summary for Class: GoalContributionDao (com.georgeci.moneysurfer.data.db.dao)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">TransactionDao</td>
+  <td class="name">GoalContributionDao</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -51,128 +51,45 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import androidx.room.Query
 &nbsp;import androidx.room.Update
 &nbsp;import androidx.room.Upsert
-&nbsp;import com.georgeci.moneysurfer.data.db.entity.CategorizedTransactionEntity
-&nbsp;import com.georgeci.moneysurfer.data.db.entity.TransactionEntity
+&nbsp;import com.georgeci.moneysurfer.data.db.entity.GoalContributionEntity
 &nbsp;import kotlinx.coroutines.flow.Flow
 &nbsp;
 &nbsp;@Dao
-&nbsp;interface TransactionDao {
+&nbsp;interface GoalContributionDao {
 &nbsp;
-&nbsp;    @Query(&quot;SELECT * FROM transactions ORDER BY operationDate DESC, operationAt DESC, createdAt DESC&quot;)
-&nbsp;    fun getAll(): Flow&lt;List&lt;TransactionEntity&gt;&gt;
+&nbsp;    @Query(&quot;SELECT * FROM goal_contributions WHERE workspaceId = :workspaceId ORDER BY occurredOn DESC&quot;)
+&nbsp;    fun getByWorkspaceId(workspaceId: String): Flow&lt;List&lt;GoalContributionEntity&gt;&gt;
 &nbsp;
-&nbsp;    @Query(
-&nbsp;        &quot;&quot;&quot;
-&nbsp;        SELECT
-&nbsp;            transactions.id,
-&nbsp;            transactions.workspaceId,
-&nbsp;            transactions.accountId,
-&nbsp;            transactions.amount,
-&nbsp;            transactions.currencyCode,
-&nbsp;            transactions.categoryId,
-&nbsp;            categories.name AS categoryName,
-&nbsp;            transactions.note,
-&nbsp;            transactions.merchant,
-&nbsp;            transactions.tags,
-&nbsp;            transactions.operationAt,
-&nbsp;            transactions.operationDate,
-&nbsp;            transactions.createdAt,
-&nbsp;            transactions.type,
-&nbsp;            transactions.status,
-&nbsp;            transactions.updatedAt,
-&nbsp;            transactions.transferId,
-&nbsp;            transactions.recurringRuleId
-&nbsp;        FROM transactions
-&nbsp;        LEFT JOIN categories ON categories.id = transactions.categoryId
-&nbsp;        ORDER BY transactions.operationDate DESC, transactions.operationAt DESC, transactions.createdAt DESC
-&nbsp;        &quot;&quot;&quot;,
-&nbsp;    )
-&nbsp;    fun getAllCategorized(): Flow&lt;List&lt;CategorizedTransactionEntity&gt;&gt;
+&nbsp;    @Query(&quot;SELECT * FROM goal_contributions WHERE goalId = :goalId ORDER BY occurredOn DESC, createdAt DESC&quot;)
+&nbsp;    fun getByGoalId(goalId: String): Flow&lt;List&lt;GoalContributionEntity&gt;&gt;
 &nbsp;
-&nbsp;    @Query(
-&nbsp;        &quot;SELECT * FROM transactions WHERE accountId = :accountId ORDER BY operationDate DESC, operationAt DESC, createdAt DESC&quot;,
-&nbsp;    )
-&nbsp;    fun getByAccountId(accountId: String): Flow&lt;List&lt;TransactionEntity&gt;&gt;
+&nbsp;    /** Rows of a goal as a one-shot read — the outbox needs them before a cascade drops them. */
+&nbsp;    @Query(&quot;SELECT * FROM goal_contributions WHERE goalId = :goalId&quot;)
+&nbsp;    suspend fun listByGoalId(goalId: String): List&lt;GoalContributionEntity&gt;
 &nbsp;
-&nbsp;    @Query(
-&nbsp;        &quot;&quot;&quot;
-&nbsp;        SELECT
-&nbsp;            transactions.id,
-&nbsp;            transactions.workspaceId,
-&nbsp;            transactions.accountId,
-&nbsp;            transactions.amount,
-&nbsp;            transactions.currencyCode,
-&nbsp;            transactions.categoryId,
-&nbsp;            categories.name AS categoryName,
-&nbsp;            transactions.note,
-&nbsp;            transactions.merchant,
-&nbsp;            transactions.tags,
-&nbsp;            transactions.operationAt,
-&nbsp;            transactions.operationDate,
-&nbsp;            transactions.createdAt,
-&nbsp;            transactions.type,
-&nbsp;            transactions.status,
-&nbsp;            transactions.updatedAt,
-&nbsp;            transactions.transferId,
-&nbsp;            transactions.recurringRuleId
-&nbsp;        FROM transactions
-&nbsp;        LEFT JOIN categories ON categories.id = transactions.categoryId
-&nbsp;        WHERE transactions.accountId = :accountId
-&nbsp;        ORDER BY transactions.operationDate DESC, transactions.operationAt DESC, transactions.createdAt DESC
-&nbsp;        &quot;&quot;&quot;,
-&nbsp;    )
-&nbsp;    fun getByAccountIdCategorized(accountId: String): Flow&lt;List&lt;CategorizedTransactionEntity&gt;&gt;
+&nbsp;    /** A goal&#39;s saved amount. Signed sum, so withdrawals subtract; 0 when there are no rows. */
+&nbsp;    @Query(&quot;SELECT COALESCE(SUM(amount), 0) FROM goal_contributions WHERE goalId = :goalId&quot;)
+&nbsp;    fun observeTotalByGoalId(goalId: String): Flow&lt;Long&gt;
 &nbsp;
-&nbsp;    @Query(
-&nbsp;        &quot;SELECT * FROM transactions WHERE workspaceId = :workspaceId ORDER BY operationDate DESC, operationAt DESC, createdAt DESC&quot;,
-&nbsp;    )
-&nbsp;    fun getByWorkspaceId(workspaceId: String): Flow&lt;List&lt;TransactionEntity&gt;&gt;
+&nbsp;    @Query(&quot;SELECT COALESCE(SUM(amount), 0) FROM goal_contributions WHERE goalId = :goalId&quot;)
+&nbsp;    suspend fun totalByGoalId(goalId: String): Long
 &nbsp;
-&nbsp;    @Query(&quot;SELECT * FROM transactions WHERE id = :id&quot;)
-&nbsp;    suspend fun getById(id: String): TransactionEntity?
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Full-text search over notes and merchants within a workspace, newest first.
-&nbsp;     *
-&nbsp;     * A bare `MATCH` against the virtual table spans both indexed columns, so this needs no
-&nbsp;     * per-column syntax — see [com.georgeci.moneysurfer.data.db.entity.TransactionFtsEntity].
-&nbsp;     *
-&nbsp;     * [query] is raw FTS4 MATCH syntax, never user input — build it with
-&nbsp;     * [com.georgeci.moneysurfer.data.db.FtsQuery.fromUserInput], which escapes
-&nbsp;     * operators and adds prefix wildcards.
-&nbsp;     */
-&nbsp;    @Query(
-&nbsp;        &quot;&quot;&quot;
-&nbsp;        SELECT transactions.* FROM transactions
-&nbsp;        JOIN transactions_fts ON transactions_fts.rowid = transactions.rowid
-&nbsp;        WHERE transactions.workspaceId = :workspaceId AND transactions_fts MATCH :query
-&nbsp;        ORDER BY transactions.operationDate DESC, transactions.operationAt DESC, transactions.createdAt DESC
-&nbsp;        &quot;&quot;&quot;,
-&nbsp;    )
-&nbsp;    fun searchByText(workspaceId: String, query: String): Flow&lt;List&lt;TransactionEntity&gt;&gt;
+&nbsp;    @Query(&quot;SELECT * FROM goal_contributions WHERE id = :id&quot;)
+&nbsp;    suspend fun getById(id: String): GoalContributionEntity?
 &nbsp;
 &nbsp;    @Insert
-&nbsp;    suspend fun insert(entity: TransactionEntity)
-&nbsp;
-&nbsp;    @Insert
-&nbsp;    suspend fun insertAll(entities: List&lt;TransactionEntity&gt;)
+&nbsp;    suspend fun insert(entity: GoalContributionEntity)
 &nbsp;
 &nbsp;    @Update
-&nbsp;    suspend fun update(entity: TransactionEntity)
+&nbsp;    suspend fun update(entity: GoalContributionEntity)
 &nbsp;
 &nbsp;    @Upsert
-&nbsp;    suspend fun upsertAll(entities: List&lt;TransactionEntity&gt;)
+&nbsp;    suspend fun upsertAll(entities: List&lt;GoalContributionEntity&gt;)
 &nbsp;
-&nbsp;    @Query(&quot;DELETE FROM transactions WHERE id = :id&quot;)
+&nbsp;    @Query(&quot;DELETE FROM goal_contributions WHERE id = :id&quot;)
 &nbsp;    suspend fun delete(id: String)
 &nbsp;
-&nbsp;    @Query(&quot;DELETE FROM transactions WHERE accountId = :accountId&quot;)
-&nbsp;    suspend fun deleteByAccountId(accountId: String)
-&nbsp;
-&nbsp;    @Query(&quot;UPDATE transactions SET categoryId = NULL WHERE categoryId = :categoryId&quot;)
-&nbsp;    suspend fun nullifyCategoryId(categoryId: String)
-&nbsp;
-&nbsp;    @Query(&quot;DELETE FROM transactions&quot;)
+&nbsp;    @Query(&quot;DELETE FROM goal_contributions&quot;)
 &nbsp;    suspend fun deleteAll()
 &nbsp;}
 </code>
@@ -198,7 +115,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 20:32</div>
+    <div style="float:right;">generated on 2026-07-22 21:54</div>
 </div>
 </body>
 </html>

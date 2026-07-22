@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > AccountDao</title>
+  <title>MoneySurfer Coverage Report > WorkspaceInviteDao</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.data.db.dao</a>
 </div>
 
-<h1>Coverage Summary for Class: AccountDao (com.georgeci.moneysurfer.data.db.dao)</h1>
+<h1>Coverage Summary for Class: WorkspaceInviteDao (com.georgeci.moneysurfer.data.db.dao)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">AccountDao</td>
+  <td class="name">WorkspaceInviteDao</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -51,47 +51,66 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import androidx.room.Query
 &nbsp;import androidx.room.Update
 &nbsp;import androidx.room.Upsert
-&nbsp;import com.georgeci.moneysurfer.data.db.entity.AccountEntity
+&nbsp;import com.georgeci.moneysurfer.data.db.entity.WorkspaceInviteEntity
 &nbsp;import kotlinx.coroutines.flow.Flow
 &nbsp;
 &nbsp;@Dao
-&nbsp;interface AccountDao {
+&nbsp;@Suppress(&quot;TooManyFunctions&quot;)
+&nbsp;interface WorkspaceInviteDao {
 &nbsp;
-&nbsp;    @Query(&quot;SELECT * FROM accounts&quot;)
-&nbsp;    fun getAll(): Flow&lt;List&lt;AccountEntity&gt;&gt;
+&nbsp;    @Query(&quot;SELECT * FROM workspace_invites&quot;)
+&nbsp;    fun getAll(): Flow&lt;List&lt;WorkspaceInviteEntity&gt;&gt;
 &nbsp;
-&nbsp;    @Query(&quot;SELECT * FROM accounts WHERE workspaceId = :workspaceId&quot;)
-&nbsp;    fun getByWorkspaceId(workspaceId: String): Flow&lt;List&lt;AccountEntity&gt;&gt;
+&nbsp;    @Query(&quot;SELECT * FROM workspace_invites WHERE workspaceId = :workspaceId&quot;)
+&nbsp;    fun getByWorkspaceId(workspaceId: String): Flow&lt;List&lt;WorkspaceInviteEntity&gt;&gt;
 &nbsp;
-&nbsp;    @Query(&quot;SELECT * FROM accounts WHERE id = :id&quot;)
-&nbsp;    suspend fun getById(id: String): AccountEntity?
+&nbsp;    @Query(&quot;SELECT * FROM workspace_invites WHERE email = :email&quot;)
+&nbsp;    fun getByEmail(email: String): Flow&lt;List&lt;WorkspaceInviteEntity&gt;&gt;
+&nbsp;
+&nbsp;    @Query(&quot;SELECT * FROM workspace_invites WHERE targetUserId = :userId&quot;)
+&nbsp;    fun getByTargetUserId(userId: String): Flow&lt;List&lt;WorkspaceInviteEntity&gt;&gt;
+&nbsp;
+&nbsp;    @Query(&quot;SELECT * FROM workspace_invites WHERE id = :id&quot;)
+&nbsp;    suspend fun getById(id: String): WorkspaceInviteEntity?
+&nbsp;
+&nbsp;    // Id of a still-joinable invite in [workspaceId] that admits the given member —
+&nbsp;    // matched by targetUserId or, for email-only invites, a case-insensitive email
+&nbsp;    // match. Stamped onto the pushed member doc so Firestore rules can verify the
+&nbsp;    // accept-invite self-create (issue #152). PENDING is preferred over ACCEPTED so a
+&nbsp;    // fresh invite wins over a stale terminal one; nulls when nothing admits the member.
+&nbsp;    @Query(
+&nbsp;        &quot;&quot;&quot;
+&nbsp;        SELECT id FROM workspace_invites
+&nbsp;        WHERE workspaceId = :workspaceId
+&nbsp;          AND status IN (&#39;PENDING&#39;, &#39;ACCEPTED&#39;)
+&nbsp;          AND (targetUserId = :userId OR (:email IS NOT NULL AND lower(email) = lower(:email)))
+&nbsp;        ORDER BY CASE status WHEN &#39;PENDING&#39; THEN 0 ELSE 1 END, updatedAt DESC
+&nbsp;        LIMIT 1
+&nbsp;        &quot;&quot;&quot;,
+&nbsp;    )
+&nbsp;    suspend fun findJoinableInviteId(
+&nbsp;        workspaceId: String,
+&nbsp;        userId: String,
+&nbsp;        email: String?,
+&nbsp;    ): String?
 &nbsp;
 &nbsp;    @Insert
-&nbsp;    suspend fun insert(entity: AccountEntity)
+&nbsp;    suspend fun insert(entity: WorkspaceInviteEntity)
 &nbsp;
 &nbsp;    @Insert
-&nbsp;    suspend fun insertAll(entities: List&lt;AccountEntity&gt;)
+&nbsp;    suspend fun insertAll(entities: List&lt;WorkspaceInviteEntity&gt;)
 &nbsp;
 &nbsp;    @Update
-&nbsp;    suspend fun update(entity: AccountEntity)
+&nbsp;    suspend fun update(entity: WorkspaceInviteEntity)
 &nbsp;
 &nbsp;    @Upsert
-&nbsp;    suspend fun upsertAll(entities: List&lt;AccountEntity&gt;)
+&nbsp;    suspend fun upsert(entity: WorkspaceInviteEntity)
 &nbsp;
-&nbsp;    @Query(&quot;DELETE FROM accounts WHERE id = :id&quot;)
+&nbsp;    @Query(&quot;DELETE FROM workspace_invites WHERE id = :id&quot;)
 &nbsp;    suspend fun delete(id: String)
 &nbsp;
-&nbsp;    @Query(&quot;DELETE FROM accounts&quot;)
+&nbsp;    @Query(&quot;DELETE FROM workspace_invites&quot;)
 &nbsp;    suspend fun deleteAll()
-&nbsp;
-&nbsp;    @Query(&quot;UPDATE accounts SET balance = balance + :delta, updatedAt = :updatedAt WHERE id = :id&quot;)
-&nbsp;    suspend fun applyDelta(id: String, delta: Long, updatedAt: Long)
-&nbsp;
-&nbsp;    @Query(&quot;UPDATE accounts SET balance = :balance, updatedAt = :updatedAt WHERE id = :id&quot;)
-&nbsp;    suspend fun setBalance(id: String, balance: Long, updatedAt: Long)
-&nbsp;
-&nbsp;    @Query(&quot;UPDATE accounts SET archived = :archived, updatedAt = :updatedAt WHERE id = :id&quot;)
-&nbsp;    suspend fun setArchived(id: String, archived: Boolean, updatedAt: Long)
 &nbsp;}
 </code>
 </pre>
@@ -116,7 +135,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 20:32</div>
+    <div style="float:right;">generated on 2026-07-22 21:54</div>
 </div>
 </body>
 </html>

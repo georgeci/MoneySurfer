@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SyncMeta</title>
+  <title>MoneySurfer Coverage Report > NoOpPendingMutationQueue</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.sync.repository</a>
+    <a href="../index.html">com.georgeci.moneysurfer.offline.noop</a>
 </div>
 
-<h1>Coverage Summary for Class: SyncMeta (com.georgeci.moneysurfer.sync.repository)</h1>
+<h1>Coverage Summary for Class: NoOpPendingMutationQueue (com.georgeci.moneysurfer.offline.noop)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,38 +49,38 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SyncMeta</td>
+  <td class="name">NoOpPendingMutationQueue</td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (1/1)
+    (0/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (1/1)
+    (0/6)
   </span>
 </td>
     <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (6/6)
+    (0/7)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (27/27)
+    (0/14)
   </span>
 </td>
 </tr>
@@ -92,40 +92,27 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.sync.repository
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.offline.noop
 &nbsp;
+&nbsp;import com.georgeci.moneysurfer.sync.api.SyncScope
+&nbsp;import com.georgeci.moneysurfer.sync.repository.PendingMutation
+&nbsp;import com.georgeci.moneysurfer.sync.repository.PendingMutationQueue
 &nbsp;import kotlinx.coroutines.flow.Flow
-&nbsp;import kotlin.time.Instant
+&nbsp;import kotlinx.coroutines.flow.flowOf
 &nbsp;
 &nbsp;/**
-&nbsp; * Per-(scopeKey, collection) sync metadata.
-&nbsp; *
-&nbsp; * - [cursor] — `lastPulledAt` value used as `WHERE updatedAt &gt; cursor` filter
-&nbsp; *   in the next pull. Updated only when remote rows are successfully written
-&nbsp; *   to local Room within the same transaction.
-&nbsp; * - [lastSyncSuccessAt] / [lastSyncAttemptAt] — timestamps for the UI badge.
-&nbsp; *
-&nbsp; * [scopeKey] is typically a workspace id string. [collection] is an opaque
-&nbsp; * Firestore collection name string (e.g. &quot;accounts&quot;, &quot;transactions&quot;).
-&nbsp; *
-&nbsp; * See SyncCoordinatorFAQ.md №14, sync.md §4.3.
+&nbsp; * Offline build never enqueues outbox mutations — every queue read is empty
+&nbsp; * and every write is dropped. `pendingCount` emits a constant zero so any
+&nbsp; * UI badge stays hidden.
 &nbsp; */
-&nbsp;interface SyncMetaRepository {
-&nbsp;    suspend fun cursor(scopeKey: String, collection: String): Instant?
-&nbsp;    suspend fun setCursor(scopeKey: String, collection: String, cursor: Instant)
-&nbsp;    suspend fun markAttempt(scopeKey: String, collection: String, at: Instant)
-&nbsp;    suspend fun markSuccess(scopeKey: String, collection: String, at: Instant)
-&nbsp;    suspend fun clearScope(scopeKey: String)
-&nbsp;    fun observe(scopeKey: String): Flow&lt;List&lt;SyncMeta&gt;&gt;
+<b class="nc">&nbsp;class NoOpPendingMutationQueue : PendingMutationQueue {</b>
+<b class="nc">&nbsp;    override suspend fun enqueue(mutation: PendingMutation) = Unit</b>
+<b class="nc">&nbsp;    override suspend fun pending(scope: SyncScope, limit: Int): List&lt;PendingMutation&gt; = emptyList()</b>
+<b class="nc">&nbsp;    override suspend fun markInFlight(ids: List&lt;String&gt;) = Unit</b>
+<b class="nc">&nbsp;    override suspend fun markCompleted(ids: List&lt;String&gt;) = Unit</b>
+<b class="nc">&nbsp;    override suspend fun markFailed(id: String, error: String) = Unit</b>
+<b class="nc">&nbsp;    override val pendingCount: Flow&lt;Int&gt; = flowOf(0)</b>
 &nbsp;}
-&nbsp;
-<b class="fc">&nbsp;data class SyncMeta(</b>
-<b class="fc">&nbsp;    val scopeKey: String,</b>
-<b class="fc">&nbsp;    val collection: String,</b>
-<b class="fc">&nbsp;    val lastPulledAt: Instant?,</b>
-<b class="fc">&nbsp;    val lastSyncSuccessAt: Instant?,</b>
-<b class="fc">&nbsp;    val lastSyncAttemptAt: Instant?,</b>
-&nbsp;)
 </code>
 </pre>
 </div>
@@ -149,7 +136,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-16 12:42</div>
+    <div style="float:right;">generated on 2026-07-22 21:54</div>
 </div>
 </body>
 </html>

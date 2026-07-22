@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > EntityApplyResult</title>
+  <title>MoneySurfer Coverage Report > ComGeorgeciMoneysurferSyncInternalDiSyncModuleModuleKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.sync.plugin</a>
+    <a href="../index.html">com.georgeci.moneysurfer.sync.internal.di</a>
 </div>
 
-<h1>Coverage Summary for Class: EntityApplyResult (com.georgeci.moneysurfer.sync.plugin)</h1>
+<h1>Coverage Summary for Class: ComGeorgeciMoneysurferSyncInternalDiSyncModuleModuleKt (com.georgeci.moneysurfer.sync.internal.di)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,38 +49,38 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">EntityApplyResult</td>
+  <td class="name">ComGeorgeciMoneysurferSyncInternalDiSyncModuleModuleKt</td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (1/1)
+    (0/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (1/1)
+    (0/1)
   </span>
 </td>
     <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (1/1)
+    (0/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (12/12)
+    (0/226)
   </span>
 </td>
 </tr>
@@ -90,42 +90,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <br/>
 <br/>
 
-
-<pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.sync.plugin
-&nbsp;
-&nbsp;import com.georgeci.moneysurfer.sync.repository.PendingMutation
-&nbsp;
-&nbsp;/**
-&nbsp; * Self-contained per-entity sync adapter.
-&nbsp; *
-&nbsp; * [UploadPendingChangesUseCaseImpl] calls [push] for mutations whose
-&nbsp; * [entityType] matches. [PullRemoteChangesUseCaseImpl] calls [applyDoc]
-&nbsp; * for each document in the plugin&#39;s [firestoreCollectionName].
-&nbsp; *
-&nbsp; * [firestoreCollectionName] is null for entities that are not pulled via the
-&nbsp; * subcollection cursor path (e.g. workspace root docs, users).
-&nbsp; *
-&nbsp; * [pullPriority] controls the pull order within a workspace. Lower values run
-&nbsp; * first. Plugins that have Room FK dependencies on other plugins must declare a
-&nbsp; * higher (later) priority than the plugins they depend on. Defaults to 0
-&nbsp; * (no ordering preference). Concrete values are defined in each plugin
-&nbsp; * implementation inside `:sync-surfer`.
-&nbsp; */
-&nbsp;interface SyncEntityPlugin {
-&nbsp;    val entityType: String
-&nbsp;    val firestoreCollectionName: String?
-&nbsp;
-&nbsp;    /** Pull order within a workspace. Lower = pulled first. Default: 100. */
-&nbsp;    val pullPriority: Int get() = 100
-&nbsp;
-&nbsp;    suspend fun push(mutation: PendingMutation)
-&nbsp;    suspend fun applyDoc(doc: RemoteDocument, scopeKey: String): EntityApplyResult
-&nbsp;}
-&nbsp;
-<b class="fc">&nbsp;data class EntityApplyResult(val applied: Boolean, val wasConflict: Boolean)</b>
-</code>
-</pre>
+  <code class="sourceCode">Source code is not available<br /></code>
 </div>
 
 <script type="text/javascript">
@@ -147,7 +112,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 20:32</div>
+    <div style="float:right;">generated on 2026-07-22 21:54</div>
 </div>
 </body>
 </html>

@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > CategoryDeletion</title>
+  <title>MoneySurfer Coverage Report > CancelInviteUseCase</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,15 +22,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.usecase</a>
 </div>
 
-<h1>Coverage Summary for Class: CategoryDeletion (com.georgeci.moneysurfer.domain.usecase)</h1>
+<h1>Coverage Summary for Class: CancelInviteUseCase (com.georgeci.moneysurfer.domain.usecase)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
-<th class="coverageStat 
-">
-  Class, %
-</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -49,42 +46,83 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">CategoryDeletion</td>
+  <td class="name">CancelInviteUseCase</td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (1/1)
+    (0/2)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (1/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (3/3)
+    (0/12)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (12/12)
+    (0/19)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/398)
   </span>
 </td>
 </tr>
-
+  <tr>
+    <td class="name">CancelInviteUseCase$Companion</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">CancelInviteUseCase$invoke$1</td>
+    <td class="coverageStat"/>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/19)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/398)
+  </span>
+</td>
+</tr>
 </table>
 
 <br/>
@@ -94,44 +132,52 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.usecase
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.model.Category
-&nbsp;import com.georgeci.moneysurfer.domain.model.CategoryTree
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryId
-&nbsp;import com.georgeci.moneysurfer.domain.repositories.CategoryRepository
+&nbsp;import arrow.core.Either
+&nbsp;import arrow.core.raise.either
+&nbsp;import arrow.core.raise.ensure
+&nbsp;import co.touchlab.kermit.Logger
+&nbsp;import com.georgeci.moneysurfer.domain.auth.SessionPointers
+&nbsp;import com.georgeci.moneysurfer.domain.logging.redactUid
+&nbsp;import com.georgeci.moneysurfer.domain.model.InviteStatus
+&nbsp;import com.georgeci.moneysurfer.domain.model.WorkspaceRole
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceInviteId
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.WorkspaceInviteRepository
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.WorkspaceMemberRepository
 &nbsp;import kotlinx.coroutines.flow.first
 &nbsp;import org.koin.core.annotation.Single
 &nbsp;
 &nbsp;/**
-&nbsp; * What a delete removed, in enough detail to undo it: the category itself plus its children
-&nbsp; * **as they were before**, still pointing at the deleted parent.
+&nbsp; * Owner cancels a pending invitation before the recipient responds. Owner-only.
 &nbsp; */
-<b class="fc">&nbsp;data class CategoryDeletion(</b>
-<b class="fc">&nbsp;    val category: Category,</b>
-<b class="fc">&nbsp;    val reparentedChildren: List&lt;Category&gt;,</b>
-&nbsp;)
-&nbsp;
-&nbsp;@Single
-&nbsp;class DeleteCategoryUseCase(
-&nbsp;    private val categoryRepository: CategoryRepository,
+<b class="nc">&nbsp;@Single</b>
+&nbsp;class CancelInviteUseCase(
+<b class="nc">&nbsp;    private val inviteRepository: WorkspaceInviteRepository,</b>
+<b class="nc">&nbsp;    private val memberRepository: WorkspaceMemberRepository,</b>
+<b class="nc">&nbsp;    private val session: SessionPointers,</b>
 &nbsp;) {
+<b class="nc">&nbsp;    private val log = Logger.withTag(TAG)</b>
 &nbsp;
-&nbsp;    /**
-&nbsp;     * Deletes the category and returns what was removed so callers can offer an Undo.
-&nbsp;     *
-&nbsp;     * Deleting a parent moves its children up to the root rather than removing them with it —
-&nbsp;     * the alternative, refusing the delete while children exist, makes the user dismantle a
-&nbsp;     * tree from the bottom for no gain. The reparenting also has to happen *first*: the
-&nbsp;     * `parentId` foreign key declares no cascade, so deleting a row that still has children
-&nbsp;     * would be rejected by SQLite.
-&nbsp;     */
-&nbsp;    suspend operator fun invoke(id: CategoryId): CategoryDeletion? {
-&nbsp;        val existing = categoryRepository.getById(id) ?: return null
-&nbsp;        val children = CategoryTree.childrenOf(categoryRepository.getAll().first(), id)
-&nbsp;        children.forEach { child -&gt;
-&nbsp;            categoryRepository.update(child.copy(parentId = null))
-&nbsp;        }
-&nbsp;        categoryRepository.delete(id)
-&nbsp;        return CategoryDeletion(category = existing, reparentedChildren = children)
+<b class="nc">&nbsp;    suspend operator fun invoke(id: WorkspaceInviteId): Either&lt;InviteError, Unit&gt; = either {</b>
+<b class="nc">&nbsp;        val callerId = session.currentUserId.flow.first()</b>
+<b class="nc">&nbsp;            ?: raise(InviteError.NoCurrentUser)</b>
+&nbsp;
+<b class="nc">&nbsp;        val invite = inviteRepository.getById(id)</b>
+<b class="nc">&nbsp;            ?: raise(InviteError.InviteNotFound)</b>
+<b class="nc">&nbsp;        ensure(invite.status == InviteStatus.PENDING) { InviteError.InviteNotPending }</b>
+&nbsp;
+<b class="nc">&nbsp;        val callerMember = memberRepository.getById(callerId, invite.workspaceId)</b>
+<b class="nc">&nbsp;        ensure(callerMember?.role == WorkspaceRole.OWNER) { InviteError.NotOwner }</b>
+&nbsp;
+<b class="nc">&nbsp;        Either.catch { inviteRepository.cancel(id) }</b>
+<b class="nc">&nbsp;            .onLeft { log.e(it) { &quot;[local] cancel failed id=${id.value}&quot; } }</b>
+<b class="nc">&nbsp;            .mapLeft { InviteError.LocalWriteFailed(it) }</b>
+<b class="nc">&nbsp;            .bind()</b>
+&nbsp;
+<b class="nc">&nbsp;        log.i { &quot;[done] uid=${callerId.value.redactUid()} id=${id.value}&quot; }</b>
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    private companion object {
+&nbsp;        const val TAG = &quot;CancelInvite&quot;
 &nbsp;    }
 &nbsp;}
 </code>
@@ -157,7 +203,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 20:32</div>
+    <div style="float:right;">generated on 2026-07-22 21:54</div>
 </div>
 </body>
 </html>

@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > GetRecentTransactionsUseCase</title>
+  <title>MoneySurfer Coverage Report > GetCategoriesUseCase</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.usecase</a>
 </div>
 
-<h1>Coverage Summary for Class: GetRecentTransactionsUseCase (com.georgeci.moneysurfer.domain.usecase)</h1>
+<h1>Coverage Summary for Class: GetCategoriesUseCase (com.georgeci.moneysurfer.domain.usecase)</h1>
 
 <table class="coverageStats">
 
@@ -46,7 +46,47 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">GetRecentTransactionsUseCase</td>
+  <td class="name">GetCategoriesUseCase</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">GetCategoriesUseCase$invoke$$inlined$flatMapLatest$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
     0%
@@ -61,7 +101,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/5)
+    (0/4)
   </span>
 </td>
 <td class="coverageStat">
@@ -69,83 +109,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/24)
-  </span>
-</td>
-</tr>
-  <tr>
-    <td class="name">GetRecentTransactionsUseCase$Companion</td>
-    <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">GetRecentTransactionsUseCase$invoke$$inlined$flatMapLatest$1</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">GetRecentTransactionsUseCase$invoke$lambda$0$$inlined$map$1</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/2)
-  </span>
-</td>
-    <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">GetRecentTransactionsUseCase$invoke$lambda$0$$inlined$map$1$1</td>
-    <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">GetRecentTransactionsUseCase$invoke$lambda$0$$inlined$map$1$2</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">GetRecentTransactionsUseCase$invoke$lambda$0$$inlined$map$1$2$1</td>
-    <td class="coverageStat"/>
-  </tr>
-<tr>
-  <td class="name"><strong>Total</strong></td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/7)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/5)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/24)
+    (0/15)
   </span>
 </td>
 </tr>
@@ -159,33 +123,25 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.usecase
 &nbsp;
 &nbsp;import com.georgeci.moneysurfer.domain.auth.SessionPointers
-&nbsp;import com.georgeci.moneysurfer.domain.model.Transaction
-&nbsp;import com.georgeci.moneysurfer.domain.repositories.TransactionRepository
+&nbsp;import com.georgeci.moneysurfer.domain.model.Category
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.CategoryRepository
 &nbsp;import kotlinx.coroutines.ExperimentalCoroutinesApi
 &nbsp;import kotlinx.coroutines.flow.Flow
 &nbsp;import kotlinx.coroutines.flow.flatMapLatest
 &nbsp;import kotlinx.coroutines.flow.flowOf
-&nbsp;import kotlinx.coroutines.flow.map
 &nbsp;import org.koin.core.annotation.Single
 &nbsp;
 <b class="nc">&nbsp;@Single</b>
 &nbsp;@OptIn(ExperimentalCoroutinesApi::class)
-&nbsp;class GetRecentTransactionsUseCase(
-<b class="nc">&nbsp;    private val transactionRepository: TransactionRepository,</b>
+&nbsp;class GetCategoriesUseCase(
+<b class="nc">&nbsp;    private val categoryRepository: CategoryRepository,</b>
 <b class="nc">&nbsp;    private val session: SessionPointers,</b>
 &nbsp;) {
 &nbsp;
-<b class="nc">&nbsp;    operator fun invoke(limit: Int = DEFAULT_LIMIT): Flow&lt;List&lt;Transaction&gt;&gt; =</b>
+&nbsp;    operator fun invoke(): Flow&lt;List&lt;Category&gt;&gt; =
 <b class="nc">&nbsp;        session.currentWorkspaceId.flow.flatMapLatest { workspaceId -&gt;</b>
-&nbsp;            workspaceId
-&nbsp;                ?.let(transactionRepository::getByWorkspaceId)
-&nbsp;                ?.map { it.take(limit) }
-&nbsp;                ?: flowOf(emptyList())
+&nbsp;            workspaceId?.let(categoryRepository::getByWorkspaceId) ?: flowOf(emptyList())
 &nbsp;        }
-&nbsp;
-&nbsp;    companion object {
-&nbsp;        const val DEFAULT_LIMIT = 20
-&nbsp;    }
 &nbsp;}
 </code>
 </pre>
@@ -210,7 +166,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 20:32</div>
+    <div style="float:right;">generated on 2026-07-22 21:54</div>
 </div>
 </body>
 </html>

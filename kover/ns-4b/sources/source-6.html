@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > CategoryRepository</title>
+  <title>MoneySurfer Coverage Report > SurferSettingsTogglesKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,22 +19,77 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.domain.repositories</a>
+    <a href="../index.html">com.georgeci.moneysurfer.uikit.components.settings</a>
 </div>
 
-<h1>Coverage Summary for Class: CategoryRepository (com.georgeci.moneysurfer.domain.repositories)</h1>
+<h1>Coverage Summary for Class: SurferSettingsTogglesKt (com.georgeci.moneysurfer.uikit.components.settings)</h1>
 
 <table class="coverageStats">
 <tr>
   <th class="name">Class</th>
 <th class="coverageStat 
 ">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
   Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
 </th>
 </tr>
 <tr>
-  <td class="name">CategoryRepository</td>
-    <td class="coverageStat"/>
+  <td class="name">SurferSettingsTogglesKt</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (2/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    45.5%
+  </span>
+  <span class="absValue">
+    (10/22)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    93.5%
+  </span>
+  <span class="absValue">
+    (43/46)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    87.3%
+  </span>
+  <span class="absValue">
+    (433/496)
+  </span>
+</td>
 </tr>
 
 </table>
@@ -44,21 +99,112 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.repositories
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.components.settings
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.model.Category
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryId
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
-&nbsp;import kotlinx.coroutines.flow.Flow
+&nbsp;import androidx.compose.animation.core.Spring
+&nbsp;import androidx.compose.animation.core.animateDpAsState
+&nbsp;import androidx.compose.animation.core.spring
+&nbsp;import androidx.compose.foundation.background
+&nbsp;import androidx.compose.foundation.border
+&nbsp;import androidx.compose.foundation.clickable
+&nbsp;import androidx.compose.foundation.layout.Arrangement
+&nbsp;import androidx.compose.foundation.layout.Box
+&nbsp;import androidx.compose.foundation.layout.Row
+&nbsp;import androidx.compose.foundation.layout.offset
+&nbsp;import androidx.compose.foundation.layout.padding
+&nbsp;import androidx.compose.foundation.layout.size
+&nbsp;import androidx.compose.foundation.shape.CircleShape
+&nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.runtime.getValue
+&nbsp;import androidx.compose.ui.Alignment
+&nbsp;import androidx.compose.ui.Modifier
+&nbsp;import androidx.compose.ui.draw.clip
+&nbsp;import androidx.compose.ui.draw.shadow
+&nbsp;import androidx.compose.ui.graphics.Color
+&nbsp;import androidx.compose.ui.tooling.preview.Preview
+&nbsp;import androidx.compose.ui.unit.dp
+&nbsp;import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
+&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
 &nbsp;
-&nbsp;interface CategoryRepository {
-&nbsp;    fun getAll(): Flow&lt;List&lt;Category&gt;&gt;
-&nbsp;    fun getByWorkspaceId(workspaceId: WorkspaceId): Flow&lt;List&lt;Category&gt;&gt;
-&nbsp;    suspend fun getById(id: CategoryId): Category?
-&nbsp;    suspend fun insert(category: Category)
-&nbsp;    suspend fun update(category: Category)
-&nbsp;    suspend fun delete(id: CategoryId)
-&nbsp;}
+&nbsp;/**
+&nbsp; * iOS-style pill toggle: 51x31 track, 27dp white knob with subtle shadow. Used as the trailing
+&nbsp; * slot on [SurferSettingsRow]. Matches the design&#39;s preference for a clean toggle without M3&#39;s
+&nbsp; * inline icon clutter — fill + position carries the state.
+&nbsp; */
+&nbsp;@Composable
+&nbsp;fun SurferSettingsSwitch(
+&nbsp;    checked: Boolean,
+&nbsp;    onCheckedChange: (Boolean) -&gt; Unit,
+<b class="fc">&nbsp;    modifier: Modifier = Modifier,</b>
+<b class="pc">&nbsp;) {</b>
+<b class="fc">&nbsp;    val colors = AppTheme.materialColors</b>
+<b class="fc">&nbsp;    val trackColor = if (checked) colors.primary else colors.surfaceContainerHighest</b>
+<b class="fc">&nbsp;    val knobOffset by animateDpAsState(</b>
+<b class="fc">&nbsp;        targetValue = if (checked) 20.dp else 0.dp,</b>
+<b class="fc">&nbsp;        animationSpec = spring(stiffness = Spring.StiffnessMediumLow),</b>
+&nbsp;    )
+<b class="fc">&nbsp;    Box(</b>
+<b class="fc">&nbsp;        modifier = modifier</b>
+<b class="fc">&nbsp;            .size(width = 51.dp, height = 31.dp)</b>
+<b class="fc">&nbsp;            .clip(CircleShape)</b>
+<b class="fc">&nbsp;            .background(trackColor)</b>
+<b class="fc">&nbsp;            .clickable { onCheckedChange(!checked) }</b>
+<b class="fc">&nbsp;            .padding(2.dp),</b>
+<b class="fc">&nbsp;        contentAlignment = Alignment.CenterStart,</b>
+&nbsp;    ) {
+<b class="fc">&nbsp;        Box(</b>
+<b class="fc">&nbsp;            modifier = Modifier</b>
+<b class="fc">&nbsp;                .offset(x = knobOffset)</b>
+<b class="fc">&nbsp;                .size(27.dp)</b>
+<b class="fc">&nbsp;                .shadow(elevation = 2.dp, shape = CircleShape)</b>
+<b class="fc">&nbsp;                .clip(CircleShape)</b>
+<b class="fc">&nbsp;                .background(Color.White),</b>
+&nbsp;        )
+<b class="fc">&nbsp;    }</b>
+<b class="fc">&nbsp;}</b>
+&nbsp;
+&nbsp;/** Round radio dot — used in radio-list rows (e.g. theme picker). */
+&nbsp;@Composable
+&nbsp;fun SurferSettingsRadio(
+&nbsp;    selected: Boolean,
+<b class="fc">&nbsp;    modifier: Modifier = Modifier,</b>
+<b class="pc">&nbsp;) {</b>
+<b class="fc">&nbsp;    val colors = AppTheme.materialColors</b>
+<b class="pc">&nbsp;    val ring = if (selected) colors.primary else colors.outline</b>
+<b class="fc">&nbsp;    Box(</b>
+<b class="fc">&nbsp;        modifier = modifier</b>
+<b class="fc">&nbsp;            .size(22.dp)</b>
+<b class="fc">&nbsp;            .clip(CircleShape)</b>
+<b class="fc">&nbsp;            .border(2.dp, ring, CircleShape),</b>
+<b class="fc">&nbsp;        contentAlignment = Alignment.Center,</b>
+&nbsp;    ) {
+<b class="pc">&nbsp;        if (selected) {</b>
+<b class="fc">&nbsp;            Box(</b>
+<b class="fc">&nbsp;                modifier = Modifier</b>
+<b class="fc">&nbsp;                    .size(10.dp)</b>
+<b class="fc">&nbsp;                    .clip(CircleShape)</b>
+<b class="fc">&nbsp;                    .background(colors.primary),</b>
+&nbsp;            )
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;    }</b>
+<b class="fc">&nbsp;}</b>
+&nbsp;
+&nbsp;@Preview
+&nbsp;@Composable
+<b class="nc">&nbsp;private fun SurferSettingsSwitchPreview() {</b>
+<b class="nc">&nbsp;    SurferComponentPreview {</b>
+&nbsp;        Row(
+&nbsp;            modifier = Modifier.padding(16.dp),
+&nbsp;            horizontalArrangement = Arrangement.spacedBy(16.dp),
+&nbsp;            verticalAlignment = Alignment.CenterVertically,
+&nbsp;        ) {
+&nbsp;            SurferSettingsSwitch(checked = true, onCheckedChange = {})
+&nbsp;            SurferSettingsSwitch(checked = false, onCheckedChange = {})
+&nbsp;            SurferSettingsRadio(selected = true)
+&nbsp;            SurferSettingsRadio(selected = false)
+&nbsp;        }
+&nbsp;    }
+<b class="nc">&nbsp;}</b>
 </code>
 </pre>
 </div>
@@ -82,7 +228,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 17:13</div>
+    <div style="float:right;">generated on 2026-07-22 21:54</div>
 </div>
 </body>
 </html>
