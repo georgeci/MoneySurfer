@@ -118,6 +118,12 @@ Hard rules:
   `StringSpec` style by default (`FunSpec` is acceptable when `withData` /
   `context` blocks materially help). Assertions are kotest matchers
   (`shouldBe`, `shouldBeInstanceOf`, etc.) — not `kotlin.test`.
+- Desktop UI tests (`:composeApp` `jvmTest`) use `runComposeUiTest` from
+  `androidx.compose.ui.test.v2` inside ordinary kotest `StringSpec` blocks — no
+  JUnit rule, no `kotlin.test` carve-out. They render headless, mount the
+  screen's stateless content composable with an injected state, and address
+  nodes through the existing `*TestTags` objects. See
+  [docs/plans/jvm-desktop-testing-rollout.md](docs/plans/jvm-desktop-testing-rollout.md).
 - Instrumented tests (`androidDeviceTest`, on-device integration) stay on
   JUnit 4 (`@RunWith(AndroidJUnit4)`, `@Test`, `@Before`, `@After`) because
   the Android instrumentation runner doesn't host kotest specs. Assertions

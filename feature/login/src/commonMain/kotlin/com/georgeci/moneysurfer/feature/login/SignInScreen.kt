@@ -212,8 +212,12 @@ fun SignInScreen(
     )
 }
 
+/**
+ * Stateless body of the sign-in screen. Public so screen-state UI tests can mount it with an
+ * injected [SignInState] instead of standing up a Koin-backed [SignInViewModel].
+ */
 @Composable
-private fun SignInContent(
+fun SignInContent(
     state: SignInState,
     onEvent: (SignInEvent) -> Unit,
 ) {

@@ -1,7 +1,7 @@
 ---
 title: JVM desktop testing — compose.uiTest spike + rollout roadmap
 created: 2026-07-15
-status: backlog
+status: in-progress
 ---
 
 # JVM desktop testing — compose.uiTest spike + rollout roadmap
@@ -45,16 +45,37 @@ Roborazzi (screenshots) and packaging smoke are worthwhile follow-ups, stages 2�
 
 | # | Step | Scope | Value |
 |---|------|-------|-------|
-| 1 | Spike: `compose.uiTest` in `:composeApp` (or one `feature/*` module), 1–2 tests; verify kotest `StringSpec` + `runComposeUiTest` v2 works, verify headless on CI | S | Unblocks everything below; settles the kotest-vs-kotlin.test convention |
+| 1 | ✅ Spike: `compose.uiTest` in `:composeApp`, `SignInContent` screen-state tests; kotest `StringSpec` + `runComposeUiTest` v2 confirmed, headless confirmed | S | Unblocks everything below; settles the kotest-vs-kotlin.test convention |
 | 2 | Screen-state UI tests for `feature/*` (commonTest where possible — they'd also run on Android/iOS later) | M | Regression net for UI logic, runs in existing `qaCommon` |
 | 3 | Gray-box journeys: `App()` + offline wiring + `InMemoryRoomDatabase`, 3–5 critical flows (create workspace, add transaction, transfer, undo delete) | M | Desktop "E2E" without new infra; reuses integration-test fixtures |
 | 4 | Roborazzi `roborazzi-compose-desktop` for `:uikit` + key screens; Git LFS for baselines; `verifyRoborazziJvm` in CI | M | Visual regression; the only screenshot option for desktop |
 | 5 | Nightly packaging smoke: `packageDistributionForCurrentOS` + launch smoke on macos/windows/ubuntu | S | Catches packaging/startup breakage the in-process tests can't see |
 | 6 | Update AGENTS.md Testing Conventions + `docs/testing/testing-strategy.md` with the desktop UI-test style decided in step 1 | S | Keeps conventions authoritative |
 
-## Spike details (step 1)
+## Spike details (step 1) — done
 
-Two questions to answer with 1–2 tests:
+**Answers (spike landed in `composeApp/src/jvmTest/.../ui/SignInScreenStateTest.kt`, 7 tests):**
+
+- **kotest works.** `androidx.compose.ui.test.v2.runComposeUiTest` runs fine inside a
+  `StringSpec` block — no JUnit rule, no dispatcher or thread-ownership conflict with the kotest
+  engine. The `kotlin.test` fallback is **not** needed: desktop UI tests follow the normal
+  AGENTS.md convention (kotest `StringSpec` + kotest matchers).
+- **Headless works.** No display, no `xvfb`. `jvmTest` now sets
+  `systemProperty("java.awt.headless", "true")` so developer machines exercise the same path CI
+  does, and one test asserts `GraphicsEnvironment.isHeadless()` so a regression fails loudly
+  instead of silently depending on a display.
+- **Dependency is declared, not accessed.** `compose.uiTest` is deprecated in CMP 1.11
+  ("Specify dependency directly") and fails Kotlin script compilation without an opt-in, so the
+  artifact is a normal catalog entry: `compose-uiTest = org.jetbrains.compose.ui:ui-test`.
+- **Screens need a stateless entry point.** `SignInScreen` resolves its ViewModel via
+  `koinViewModel()`; the test mounts the now-public `SignInContent(state, onEvent)` instead. Each
+  screen pulled into step 2 needs the same treatment — publish the stateless content composable.
+- **Lockfiles.** Adding the dependency needs a relock. Scope it
+  (`./gradlew :composeApp:resolveAndLockAll --write-locks --no-configuration-cache`) — the
+  repo-wide `resolveAndLockAll` also drags in unrelated floating-version drift across all 28
+  lockfiles.
+
+Original questions:
 
 - Does `runComposeUiTest` v2 (`androidx.compose.ui.test.v2.runComposeUiTest`) work inside a
   kotest `StringSpec` block? It is rule-free (the known kotest incompatibility only applies to
@@ -67,16 +88,22 @@ Two questions to answer with 1–2 tests:
 Migration gotcha to bake into the first tests: CMP 1.11 defaults to `StandardTestDispatcher` —
 coroutines launched in composition don't run eagerly; use `waitForIdle()` / `waitUntil {}`.
 
-Setup:
+Setup (as landed):
 
 ```kotlin
 kotlin {
     sourceSets {
-        commonTest.dependencies {
-            implementation(compose.uiTest) // org.jetbrains.compose.ui:ui-test:1.11.1
+        jvmTest.dependencies {
+            implementation(projects.feature.login)
+            implementation(libs.compose.uiTest) // org.jetbrains.compose.ui:ui-test:1.11.1
         }
         // :composeApp jvmMain already has compose.desktop.currentOs
     }
+}
+
+tasks.named<Test>("jvmTest") {
+    useJUnitPlatform()
+    systemProperty("java.awt.headless", "true")
 }
 ```
 

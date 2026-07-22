@@ -73,6 +73,8 @@ kotlin {
         }
         jvmTest.dependencies {
             implementation(projects.dataLocal)
+            implementation(projects.feature.login)
+            implementation(libs.compose.uiTest)
             implementation(libs.kotest.runner.junit5)
             implementation(libs.fixture.monkey.kotlin)
             implementation(project.dependencies.platform(libs.koin.bom))
@@ -96,6 +98,10 @@ koinCompiler {
 
 tasks.named<Test>("jvmTest") {
     useJUnitPlatform()
+    // Compose desktop UI tests (`runComposeUiTest`) render offscreen through Skiko, so they must
+    // not need a display. Forcing headless mode here keeps that true on developer machines too,
+    // instead of only being exercised on CI's display-less `ubuntu-latest`.
+    systemProperty("java.awt.headless", "true")
 }
 
 compose.desktop {
