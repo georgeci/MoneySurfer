@@ -1,0 +1,73 @@
+{
+  "cleanupPeriodDays": 30,
+  "permissions": {
+    "allow": [
+      "Bash(./gradlew :*:compileKotlinJvm)",
+      "Bash(./gradlew :*:compileCommonMainKotlinMetadata)",
+      "Bash(./gradlew :*:compileKotlinIosArm64)",
+      "Bash(./gradlew :*:compileKotlinIosSimulatorArm64)",
+      "Bash(./gradlew :*:compileDebugKotlinAndroid)",
+      "Bash(./gradlew :*:compileAndroidMain)",
+      "Bash(./gradlew :*:compileTestKotlinJvm)",
+      "Bash(./gradlew :*:jvmTest)",
+      "Bash(./gradlew :*:testDebugUnitTest)",
+      "Bash(./gradlew :*:testAndroidHostTest)",
+      "Bash(./gradlew :*:allTests)",
+      "Bash(./gradlew :*:tasks)",
+      "Bash(./gradlew :*:dependencies)",
+      "Bash(./gradlew qa*)",
+      "Bash(./gradlew projects)",
+      "Bash(./gradlew tasks)",
+      "Bash(./gradlew buildEnvironment)",
+      "Bash(python3 scripts/docs_tool.py:*)",
+      "Bash(xmllint --noout:*)",
+      "WebFetch(domain:insert-koin.io)",
+      "WebFetch(domain:developer.android.com)",
+      "WebFetch(domain:kotlinlang.org)",
+      "WebFetch(domain:firebase.google.com)"
+    ],
+    "ask": [
+      "Bash(./scripts/deploy-firestore-rules.sh:*)",
+      "Bash(firebase deploy*)"
+    ],
+    "deny": [
+      "Bash(git push --force*)",
+      "Bash(git push --force-if-includes*)",
+      "Bash(git push --force-with-lease*)",
+      "Bash(git push -f*)"
+    ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "printf '%s · %s changes' \"$(git -C \"$CLAUDE_PROJECT_DIR\" branch --show-current 2>/dev/null)\" \"$(git -C \"$CLAUDE_PROJECT_DIR\" status --porcelain 2>/dev/null | wc -l | tr -d ' ')\""
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.file_path // empty' | { read -r path; case \"$path\" in *firestore.rules) old=$(git -C \"$CLAUDE_PROJECT_DIR\" show HEAD:firestore.rules 2>/dev/null | head -1); new=$(head -1 \"$CLAUDE_PROJECT_DIR/firestore.rules\" 2>/dev/null); [ -n \"$new\" ] && [ \"$old\" = \"$new\" ] && echo \"⚠ firestore.rules edited but version line unchanged — bump // vX.Y.Z — YYYY-MM-DD on line 1\" >&2 ;; esac; exit 0; }"
+          },
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.file_path // empty' | { read -r path; case \"$path\" in */docs/AI_INDEX.md) ;; */docs/*.md|*/docs/*/*.md|*/docs/*/*/*.md) echo \"ℹ docs/ edited — run: python3 scripts/docs_tool.py all\" >&2 ;; esac; exit 0; }"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "c=$(jq -r \"(.tool_input.command // empty)\"); seg=$(printf \"%s\\n\" \"$c\" | sed -E \"s/(&&|\\|\\||;|\\|)/\\n/g\" | sed -E \"s/^[[:space:]]+//\" | grep -E \"^git([[:space:]]+-c[[:space:]]+[^[:space:]]+)*[[:space:]]+push([[:space:]]|$)\"); [ -n \"$seg\" ] || exit 0; printf \"%s\" \"$seg\" | grep -Eq -- \"(--force|--force-with-lease|--force-if-includes|--no-verify|(^|[[:space:]])-[A-Za-z]*f([[:space:]]|$)|[[:space:]][+][A-Za-z0-9_./^~-]+:)\" || exit 0; printf \"%s\" \"{\\\"hookSpecificOutput\\\":{\\\"hookEventName\\\":\\\"PreToolUse\\\",\\\"permissionDecision\\\":\\\"deny\\\",\\\"permissionDecisionReason\\\":\\\"Force push is forbidden in this repo under any circumstances. Never force push (--force, -f, --force-with-lease, --force-if-includes, +refspec) and never bypass hooks with --no-verify. If history really must be rewritten, ask the user to do it manually.\\\"}}\"; exit 0",
+            "statusMessage": "Checking for force push"
+          }
+        ]
+      }
+    ]
+  }
+}
