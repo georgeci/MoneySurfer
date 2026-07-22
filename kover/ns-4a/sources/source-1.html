@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > RecurringRuleRepository</title>
+  <title>MoneySurfer Coverage Report > FirstRunSeeder</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.domain.repositories</a>
+    <a href="../index.html">com.georgeci.moneysurfer.domain.firstrun</a>
 </div>
 
-<h1>Coverage Summary for Class: RecurringRuleRepository (com.georgeci.moneysurfer.domain.repositories)</h1>
+<h1>Coverage Summary for Class: FirstRunSeeder (com.georgeci.moneysurfer.domain.firstrun)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">RecurringRuleRepository</td>
+  <td class="name">FirstRunSeeder</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -44,18 +44,20 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.repositories
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.firstrun
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.model.RecurringRule
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.RecurringRuleId
-&nbsp;import kotlinx.coroutines.flow.Flow
-&nbsp;
-&nbsp;interface RecurringRuleRepository {
-&nbsp;    fun getAll(): Flow&lt;List&lt;RecurringRule&gt;&gt;
-&nbsp;    suspend fun getById(id: RecurringRuleId): RecurringRule?
-&nbsp;    suspend fun insert(rule: RecurringRule)
-&nbsp;    suspend fun update(rule: RecurringRule)
-&nbsp;    suspend fun delete(id: RecurringRuleId)
+&nbsp;/**
+&nbsp; * Host-owned bootstrap that runs once at app launch, after the user is known but before the
+&nbsp; * workspace selector is shown. Online builds bind a no-op (Firestore-backed onboarding handles
+&nbsp; * empty workspaces); the offline build seeds a &quot;Personal&quot; workspace, default categories, and a
+&nbsp; * &quot;Cash&quot; account so a fresh install lands on a populated Dashboard instead of an empty selector.
+&nbsp; *
+&nbsp; * Implementations must be idempotent — relaunch must not duplicate workspace/account/category
+&nbsp; * rows. The session pointer flipping `currentWorkspaceId` from null → set is the durable
+&nbsp; * &quot;first-run completed&quot; flag (no separate boolean needed).
+&nbsp; */
+&nbsp;fun interface FirstRunSeeder {
+&nbsp;    suspend fun seedIfNeeded()
 &nbsp;}
 </code>
 </pre>
@@ -80,7 +82,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 16:22</div>
+    <div style="float:right;">generated on 2026-07-22 17:13</div>
 </div>
 </body>
 </html>

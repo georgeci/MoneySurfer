@@ -1,0 +1,153 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>MoneySurfer Coverage Report > TimeFormatter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.georgeci.moneysurfer.data.repository</a>
+</div>
+
+<h1>Coverage Summary for Class: TimeFormatter (com.georgeci.moneysurfer.data.repository)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">TimeFormatter</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (8/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (8/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (8/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (76/76)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.repository
+&nbsp;
+&nbsp;import kotlinx.datetime.LocalDate
+&nbsp;import org.koin.core.annotation.Single
+&nbsp;import kotlin.time.Instant
+&nbsp;
+<b class="fc">&nbsp;@Single</b>
+&nbsp;class TimeFormatter {
+&nbsp;
+<b class="fc">&nbsp;    fun parseInstant(epochMillis: Long): Instant = Instant.fromEpochMilliseconds(epochMillis)</b>
+&nbsp;
+&nbsp;    fun parseInstantOrNull(epochMillis: Long?): Instant? =
+<b class="fc">&nbsp;        epochMillis?.let { Instant.fromEpochMilliseconds(it) }</b>
+&nbsp;
+<b class="fc">&nbsp;    fun parseLocalDate(iso: String): LocalDate = LocalDate.parse(iso)</b>
+&nbsp;
+&nbsp;    fun parseLocalDateOrNull(iso: String): LocalDate? =
+<b class="fc">&nbsp;        if (iso.isBlank()) null else runCatching { LocalDate.parse(iso) }.getOrNull()</b>
+&nbsp;
+<b class="fc">&nbsp;    fun formatInstant(instant: Instant): Long = instant.toEpochMilliseconds()</b>
+&nbsp;
+<b class="fc">&nbsp;    fun formatInstantOrNull(instant: Instant?): Long? = instant?.toEpochMilliseconds()</b>
+&nbsp;
+<b class="fc">&nbsp;    fun formatLocalDate(date: LocalDate): String = date.toString()</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-07-22 17:13</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,314 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>MoneySurfer Coverage Report > UserAccountDeletionRepositoryImpl</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.georgeci.moneysurfer.data.repository</a>
+</div>
+
+<h1>Coverage Summary for Class: UserAccountDeletionRepositoryImpl (com.georgeci.moneysurfer.data.repository)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">UserAccountDeletionRepositoryImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (7/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    83.3%
+  </span>
+  <span class="absValue">
+    (20/24)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (42/42)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    99%
+  </span>
+  <span class="absValue">
+    (566/572)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">UserAccountDeletionRepositoryImpl$Companion</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">UserAccountDeletionRepositoryImpl$deleteEmailMapping$1</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">UserAccountDeletionRepositoryImpl$deleteRemoteUserData$1</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">UserAccountDeletionRepositoryImpl$disposeWorkspace$1</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">UserAccountDeletionRepositoryImpl$purgeWorkspace$1</td>
+    <td class="coverageStat"/>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    87.5%
+  </span>
+  <span class="absValue">
+    (7/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    83.3%
+  </span>
+  <span class="absValue">
+    (20/24)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    97.7%
+  </span>
+  <span class="absValue">
+    (42/43)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    98.8%
+  </span>
+  <span class="absValue">
+    (566/573)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.repository
+&nbsp;
+&nbsp;import arrow.core.Either
+&nbsp;import co.touchlab.kermit.Logger
+&nbsp;import com.georgeci.moneysurfer.data.remote.AccountDeletionRemoteSource
+&nbsp;import com.georgeci.moneysurfer.data.remote.RemoteAccessDeniedException
+&nbsp;import com.georgeci.moneysurfer.domain.auth.AccountDeletionError
+&nbsp;import com.georgeci.moneysurfer.domain.logging.redactUid
+&nbsp;import com.georgeci.moneysurfer.domain.model.WorkspaceMemberStatus
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.UserAccountDeletionRepository
+&nbsp;import org.koin.core.annotation.Single
+&nbsp;
+&nbsp;/**
+&nbsp; * Remote cleanup for account deletion (issue #213). Every step is idempotent — a retry after a
+&nbsp; * part-way failure re-runs against whatever documents are left. The caller
+&nbsp; * ([DeleteUserAccountUseCase][com.georgeci.moneysurfer.domain.usecase.DeleteUserAccountUseCase])
+&nbsp; * guarantees sync is shut down first, so nothing re-creates docs behind the purge.
+&nbsp; *
+&nbsp; * Deletion semantics mirror the hosted account-deletion page: workspaces that are effectively
+&nbsp; * personal (owned, no other ACTIVE member) are hard-deleted; in workspaces shared with other
+&nbsp; * people the user&#39;s member row flips to LEFT and the content stays for the remaining members.
+&nbsp; *
+&nbsp; * All Firestore specifics sit behind [AccountDeletionRemoteSource], so this class holds only the
+&nbsp; * decision logic and is unit-tested against a fake.
+&nbsp; */
+<b class="fc">&nbsp;@Single(binds = [UserAccountDeletionRepository::class])</b>
+&nbsp;class UserAccountDeletionRepositoryImpl(
+<b class="fc">&nbsp;    private val remote: AccountDeletionRemoteSource,</b>
+<b class="fc">&nbsp;    private val clock: ClockUseCase,</b>
+&nbsp;) : UserAccountDeletionRepository {
+&nbsp;
+<b class="fc">&nbsp;    private val log = Logger.withTag(TAG)</b>
+&nbsp;
+&nbsp;    override suspend fun deleteRemoteUserData(
+&nbsp;        uid: String,
+&nbsp;        email: String?,
+<b class="fc">&nbsp;    ): Either&lt;AccountDeletionError, Unit&gt; = Either.catch {</b>
+<b class="fc">&nbsp;        val workspaceIds = remote.fetchWorkspaceIds(uid)</b>
+<b class="fc">&nbsp;        log.i { &quot;[delete] start uid=${uid.redactUid()} workspaces=${workspaceIds.size}&quot; }</b>
+&nbsp;
+<b class="fc">&nbsp;        workspaceIds.forEach { workspaceId -&gt;</b>
+&nbsp;            try {
+<b class="fc">&nbsp;                disposeWorkspace(workspaceId, uid)</b>
+&nbsp;            } catch (e: RemoteAccessDeniedException) {
+&nbsp;                // A stale ref in users/{uid}.workspaceIds (left / evicted earlier) is denied —
+&nbsp;                // there is nothing of the user&#39;s left to clean up there.
+<b class="fc">&nbsp;                log.w(e) { &quot;[delete] no access to workspace=$workspaceId — skipping stale ref&quot; }</b>
+&nbsp;            }
+<b class="fc">&nbsp;        }</b>
+&nbsp;
+<b class="fc">&nbsp;        deleteEmailMapping(email, uid)</b>
+<b class="fc">&nbsp;        remote.deleteUserDoc(uid)</b>
+<b class="fc">&nbsp;        log.i { &quot;[delete] remote data cleared uid=${uid.redactUid()}&quot; }</b>
+<b class="fc">&nbsp;    }.mapLeft { AccountDeletionError.RemoteDataCleanupFailed(cause = it) }</b>
+&nbsp;
+&nbsp;    private suspend fun disposeWorkspace(workspaceId: String, uid: String) {
+<b class="fc">&nbsp;        val ownerId = remote.fetchWorkspaceOwnerId(workspaceId) ?: return</b>
+<b class="fc">&nbsp;        val members = remote.fetchMembers(workspaceId)</b>
+<b class="fc">&nbsp;        val hasOtherActiveMembers = members.any {</b>
+<b class="fc">&nbsp;            it.uid != uid &amp;&amp; it.status == WorkspaceMemberStatus.ACTIVE</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        if (ownerId == uid &amp;&amp; !hasOtherActiveMembers) {</b>
+<b class="fc">&nbsp;            log.i { &quot;[delete] purging personal workspace=$workspaceId&quot; }</b>
+<b class="fc">&nbsp;            purgeWorkspace(workspaceId)</b>
+&nbsp;        } else {
+<b class="fc">&nbsp;            log.i { &quot;[delete] leaving shared workspace=$workspaceId&quot; }</b>
+<b class="pc">&nbsp;            leaveWorkspace(workspaceId, uid, members.firstOrNull { it.uid == uid }?.status)</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Hard-delete of a personal workspace. Members go last among subcollections (listing the
+&nbsp;     * others requires an ACTIVE membership row) and the root doc goes after everything — the
+&nbsp;     * subcollection delete rules read it via `isOwner()`, so it must outlive them.
+&nbsp;     */
+&nbsp;    private suspend fun purgeWorkspace(workspaceId: String) {
+<b class="fc">&nbsp;        ENTITY_COLLECTIONS.forEach { name -&gt; remote.deleteWorkspaceCollection(workspaceId, name) }</b>
+<b class="fc">&nbsp;        remote.deleteWorkspaceCollection(workspaceId, &quot;members&quot;)</b>
+<b class="fc">&nbsp;        remote.deleteWorkspace(workspaceId)</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Marks the user&#39;s own member row LEFT instead of deleting it — profile snapshots stay
+&nbsp;     * visible to remaining members, matching the retention promise on the hosted page. A row the
+&nbsp;     * owner already flipped to REMOVED is left alone (rules deny self-updates on it), as is a
+&nbsp;     * workspace the user has no row in.
+&nbsp;     */
+&nbsp;    private suspend fun leaveWorkspace(workspaceId: String, uid: String, status: WorkspaceMemberStatus?) {
+<b class="fc">&nbsp;        if (status != WorkspaceMemberStatus.ACTIVE) return</b>
+<b class="fc">&nbsp;        remote.markMemberLeft(workspaceId, uid, clock.now().toEpochMilliseconds())</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /** Removes the email→uid lookup row, but only when it still points at the deleted user. */
+&nbsp;    private suspend fun deleteEmailMapping(email: String?, uid: String) {
+<b class="pc">&nbsp;        val key = email?.trim()?.lowercase().orEmpty()</b>
+<b class="fc">&nbsp;        if (key.isEmpty()) return</b>
+<b class="fc">&nbsp;        if (remote.fetchEmailMappingUid(key) == uid) {</b>
+<b class="fc">&nbsp;            remote.deleteEmailMapping(key)</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private companion object {
+&nbsp;        const val TAG = &quot;AccountDeletion&quot;
+&nbsp;
+&nbsp;        /** Workspace subcollections purged before members + root doc. */
+<b class="pc">&nbsp;        val ENTITY_COLLECTIONS = listOf(</b>
+<b class="fc">&nbsp;            &quot;accounts&quot;,</b>
+<b class="fc">&nbsp;            &quot;categories&quot;,</b>
+<b class="fc">&nbsp;            &quot;transactions&quot;,</b>
+<b class="fc">&nbsp;            &quot;invites&quot;,</b>
+<b class="fc">&nbsp;            &quot;budgets&quot;,</b>
+<b class="fc">&nbsp;            &quot;recurringRules&quot;,</b>
+<b class="fc">&nbsp;            &quot;goalContributions&quot;,</b>
+<b class="fc">&nbsp;            &quot;goals&quot;,</b>
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-07-22 17:13</div>
+</div>
+</body>
+</html>

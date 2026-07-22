@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > BackupManifest</title>
+  <title>MoneySurfer Coverage Report > SessionPointers</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,130 +19,24 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.domain.backup</a>
+    <a href="../index.html">com.georgeci.moneysurfer.domain.auth</a>
 </div>
 
-<h1>Coverage Summary for Class: BackupManifest (com.georgeci.moneysurfer.domain.backup)</h1>
+<h1>Coverage Summary for Class: SessionPointers (com.georgeci.moneysurfer.domain.auth)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
 <th class="coverageStat 
 ">
-  Method, %
-</th>
-<th class="coverageStat 
-">
   Branch, %
 </th>
-<th class="coverageStat 
-">
-  Line, %
-</th>
-<th class="coverageStat 
-">
-  Instruction, %
-</th>
 </tr>
 <tr>
-  <td class="name">BackupManifest</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (2/2)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    80%
-  </span>
-  <span class="absValue">
-    (8/10)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (10/10)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    96.5%
-  </span>
-  <span class="absValue">
-    (191/198)
-  </span>
-</td>
-</tr>
-  <tr>
-    <td class="name">BackupManifest$Companion</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
+  <td class="name">SessionPointers</td>
     <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (4/4)
-  </span>
-</td>
-  </tr>
-<tr>
-  <td class="name"><strong>Total</strong></td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (3/3)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    80%
-  </span>
-  <span class="absValue">
-    (8/10)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (11/11)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    96.5%
-  </span>
-  <span class="absValue">
-    (195/202)
-  </span>
-</td>
 </tr>
+
 </table>
 
 <br/>
@@ -150,46 +44,38 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.backup
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.auth
 &nbsp;
-&nbsp;import kotlinx.serialization.Serializable
-&nbsp;
-&nbsp;/**
-&nbsp; * Self-describing header of a backup ZIP — written as the first entry
-&nbsp; * (`manifest.json`) and read before any file extraction so the importer can
-&nbsp; * reject incompatible payloads up front.
-&nbsp; */
-<b class="pc">&nbsp;@Serializable</b>
-&nbsp;data class BackupManifest(
-<b class="fc">&nbsp;    val backupFormatVersion: Int,</b>
-<b class="fc">&nbsp;    val moneySurferDbVersion: Int,</b>
-<b class="fc">&nbsp;    val appVersion: String,</b>
-<b class="fc">&nbsp;    val appVersionCode: Int,</b>
-<b class="fc">&nbsp;    val sourcePlatform: String,</b>
-<b class="fc">&nbsp;    val createdAtEpochMillis: Long,</b>
-<b class="fc">&nbsp;    val files: List&lt;String&gt;,</b>
-<b class="fc">&nbsp;    val encryption: BackupEncryptionInfo? = null,</b>
-&nbsp;) {
-<b class="fc">&nbsp;    companion object {</b>
-&nbsp;        const val CURRENT_FORMAT_VERSION: Int = 1
-&nbsp;        const val MANIFEST_ENTRY_NAME: String = &quot;manifest.json&quot;
-&nbsp;        const val MAIN_DB_ENTRY_NAME: String = &quot;moneysurfer.db&quot;
-&nbsp;        const val DATASTORE_ENTRY_NAME: String = &quot;moneysurfer_settings.preferences_pb&quot;
-&nbsp;        const val ENCRYPTED_PAYLOAD_ENTRY_NAME: String = &quot;payload.enc&quot;
-&nbsp;    }
-&nbsp;}
+&nbsp;import com.georgeci.moneysurfer.domain.preferences.Pref
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.UserId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 &nbsp;
 &nbsp;/**
-&nbsp; * Marks a backup whose data entries live inside an encrypted `payload.enc`
-&nbsp; * instead of as plain ZIP entries. Absent (`null`) on unencrypted backups —
-&nbsp; * and omitted from the JSON, so older app versions still parse plain backups.
+&nbsp; * Session-scoped pointers persisted in DataStore. See CLAUDE.md §&quot;Session pointers in DataStore&quot;
+&nbsp; * and sync.md §2.11 for the demo-flag semantics.
+&nbsp; *
+&nbsp; * - [currentUserId] — local user id; set for every flow including demo. Drives &quot;is anyone
+&nbsp; *   signed in&quot; logic.
+&nbsp; * - [currentWorkspaceId] — active workspace; drives per-workspace queries (`Get*UseCase`).
+&nbsp; * - [currentFirebaseUid] — Firebase auth uid; non-null only for Firebase-backed sessions.
+&nbsp; *   Used by `CreateWorkspaceUseCase` to decide whether to push to Firestore.
+&nbsp; * - [hasUsedDemo] — sticky flag set by `DemoLoginUseCase`, consumed by `WipeDemoDataUseCase`
+&nbsp; *   on real login/signup so demo rows never leak into the real account&#39;s outbox.
+&nbsp; * - [currencyChosen] — sticky flag, `true` by default. The offline first-run seed flips it to
+&nbsp; *   `false` after auto-creating a workspace with a locale-derived currency, so `AppLaunchViewModel`
+&nbsp; *   routes to the currency picker before Dashboard. The picker flips it back to `true` on confirm
+&nbsp; *   *or* on skip, so a relaunch does not show the picker again.
+&nbsp; * - [onboardingSkipped] — sticky flag, `false` by default. Set to `true` when the user taps
+&nbsp; *   &quot;Skip&quot; on the first-run currency picker (keeping the locale-derived seed default). Settings
+&nbsp; *   shows a &quot;Finish setup&quot; entry while this is `true`; confirming the picker clears it.
 &nbsp; */
-&nbsp;@Serializable
-&nbsp;data class BackupEncryptionInfo(val scheme: String) {
-&nbsp;    companion object {
-&nbsp;        /** PBKDF2-HMAC-SHA256 key derivation, AES-256-CTR + HMAC-SHA256 encrypt-then-MAC. */
-&nbsp;        const val SCHEME_V1: String = &quot;PBKDF2-AES256CTR-HMACSHA256-v1&quot;
-&nbsp;    }
+&nbsp;interface SessionPointers {
+&nbsp;    val currentUserId: Pref&lt;UserId?&gt;
+&nbsp;    val currentWorkspaceId: Pref&lt;WorkspaceId?&gt;
+&nbsp;    val currentFirebaseUid: Pref&lt;String?&gt;
+&nbsp;    val hasUsedDemo: Pref&lt;Boolean&gt;
+&nbsp;    val currencyChosen: Pref&lt;Boolean&gt;
+&nbsp;    val onboardingSkipped: Pref&lt;Boolean&gt;
 &nbsp;}
 </code>
 </pre>
@@ -214,7 +100,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 16:22</div>
+    <div style="float:right;">generated on 2026-07-22 17:13</div>
 </div>
 </body>
 </html>

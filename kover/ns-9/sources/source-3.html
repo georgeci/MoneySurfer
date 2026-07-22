@@ -68,7 +68,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/143)
+    (0/161)
   </span>
 </td>
 <td class="coverageStat">
@@ -76,7 +76,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/610)
+    (0/679)
   </span>
 </td>
 </tr>
@@ -103,7 +103,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/16)
+    (0/18)
   </span>
 </td>
 <td class="coverageStat">
@@ -111,7 +111,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/59)
+    (0/70)
   </span>
 </td>
   </tr>
@@ -138,7 +138,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/17)
+    (0/19)
   </span>
 </td>
 <td class="coverageStat">
@@ -146,7 +146,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/64)
+    (0/75)
   </span>
 </td>
   </tr>
@@ -173,7 +173,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/16)
+    (0/18)
   </span>
 </td>
 <td class="coverageStat">
@@ -181,7 +181,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/59)
+    (0/70)
   </span>
 </td>
   </tr>
@@ -208,7 +208,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/17)
+    (0/19)
   </span>
 </td>
 <td class="coverageStat">
@@ -216,7 +216,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/64)
+    (0/75)
   </span>
 </td>
   </tr>
@@ -268,10 +268,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0.5%
+    0.4%
   </span>
   <span class="absValue">
-    (1/210)
+    (1/236)
   </span>
 </td>
 <td class="coverageStat">
@@ -279,7 +279,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0.1%
   </span>
   <span class="absValue">
-    (1/857)
+    (1/970)
   </span>
 </td>
 </tr>
@@ -328,7 +328,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="nc">&nbsp;  init {</b>
 <b class="nc">&nbsp;    this.__db = __db</b>
 <b class="nc">&nbsp;    this.__insertAdapterOfCategoryEntity = object : EntityInsertAdapter&lt;CategoryEntity&gt;() {</b>
-<b class="nc">&nbsp;      protected override fun createQuery(): String = &quot;INSERT OR ABORT INTO `categories` (`id`,`workspaceId`,`name`,`type`,`parentId`,`createdAt`,`updatedAt`,`systemKind`) VALUES (?,?,?,?,?,?,?,?)&quot;</b>
+<b class="nc">&nbsp;      protected override fun createQuery(): String = &quot;INSERT OR ABORT INTO `categories` (`id`,`workspaceId`,`name`,`type`,`parentId`,`createdAt`,`updatedAt`,`systemKind`,`iconKey`,`hue`) VALUES (?,?,?,?,?,?,?,?,?,?)&quot;</b>
 &nbsp;
 &nbsp;      protected override fun bind(statement: SQLiteStatement, entity: CategoryEntity) {
 <b class="nc">&nbsp;        statement.bindText(1, entity.id)</b>
@@ -349,10 +349,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;        } else {
 <b class="nc">&nbsp;          statement.bindText(8, _tmpSystemKind)</b>
 &nbsp;        }
+<b class="nc">&nbsp;        statement.bindText(9, entity.iconKey)</b>
+<b class="nc">&nbsp;        statement.bindLong(10, entity.hue.toLong())</b>
 &nbsp;      }
 &nbsp;    }
 <b class="nc">&nbsp;    this.__updateAdapterOfCategoryEntity = object : EntityDeleteOrUpdateAdapter&lt;CategoryEntity&gt;() {</b>
-<b class="nc">&nbsp;      protected override fun createQuery(): String = &quot;UPDATE OR ABORT `categories` SET `id` = ?,`workspaceId` = ?,`name` = ?,`type` = ?,`parentId` = ?,`createdAt` = ?,`updatedAt` = ?,`systemKind` = ? WHERE `id` = ?&quot;</b>
+<b class="nc">&nbsp;      protected override fun createQuery(): String = &quot;UPDATE OR ABORT `categories` SET `id` = ?,`workspaceId` = ?,`name` = ?,`type` = ?,`parentId` = ?,`createdAt` = ?,`updatedAt` = ?,`systemKind` = ?,`iconKey` = ?,`hue` = ? WHERE `id` = ?&quot;</b>
 &nbsp;
 &nbsp;      protected override fun bind(statement: SQLiteStatement, entity: CategoryEntity) {
 <b class="nc">&nbsp;        statement.bindText(1, entity.id)</b>
@@ -373,11 +375,13 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;        } else {
 <b class="nc">&nbsp;          statement.bindText(8, _tmpSystemKind)</b>
 &nbsp;        }
-<b class="nc">&nbsp;        statement.bindText(9, entity.id)</b>
+<b class="nc">&nbsp;        statement.bindText(9, entity.iconKey)</b>
+<b class="nc">&nbsp;        statement.bindLong(10, entity.hue.toLong())</b>
+<b class="nc">&nbsp;        statement.bindText(11, entity.id)</b>
 &nbsp;      }
 &nbsp;    }
 <b class="nc">&nbsp;    this.__upsertAdapterOfCategoryEntity = EntityUpsertAdapter&lt;CategoryEntity&gt;(object : EntityInsertAdapter&lt;CategoryEntity&gt;() {</b>
-<b class="nc">&nbsp;      protected override fun createQuery(): String = &quot;INSERT INTO `categories` (`id`,`workspaceId`,`name`,`type`,`parentId`,`createdAt`,`updatedAt`,`systemKind`) VALUES (?,?,?,?,?,?,?,?)&quot;</b>
+<b class="nc">&nbsp;      protected override fun createQuery(): String = &quot;INSERT INTO `categories` (`id`,`workspaceId`,`name`,`type`,`parentId`,`createdAt`,`updatedAt`,`systemKind`,`iconKey`,`hue`) VALUES (?,?,?,?,?,?,?,?,?,?)&quot;</b>
 &nbsp;
 &nbsp;      protected override fun bind(statement: SQLiteStatement, entity: CategoryEntity) {
 <b class="nc">&nbsp;        statement.bindText(1, entity.id)</b>
@@ -398,9 +402,11 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;        } else {
 <b class="nc">&nbsp;          statement.bindText(8, _tmpSystemKind)</b>
 &nbsp;        }
+<b class="nc">&nbsp;        statement.bindText(9, entity.iconKey)</b>
+<b class="nc">&nbsp;        statement.bindLong(10, entity.hue.toLong())</b>
 &nbsp;      }
 <b class="nc">&nbsp;    }, object : EntityDeleteOrUpdateAdapter&lt;CategoryEntity&gt;() {</b>
-<b class="nc">&nbsp;      protected override fun createQuery(): String = &quot;UPDATE `categories` SET `id` = ?,`workspaceId` = ?,`name` = ?,`type` = ?,`parentId` = ?,`createdAt` = ?,`updatedAt` = ?,`systemKind` = ? WHERE `id` = ?&quot;</b>
+<b class="nc">&nbsp;      protected override fun createQuery(): String = &quot;UPDATE `categories` SET `id` = ?,`workspaceId` = ?,`name` = ?,`type` = ?,`parentId` = ?,`createdAt` = ?,`updatedAt` = ?,`systemKind` = ?,`iconKey` = ?,`hue` = ? WHERE `id` = ?&quot;</b>
 &nbsp;
 &nbsp;      protected override fun bind(statement: SQLiteStatement, entity: CategoryEntity) {
 <b class="nc">&nbsp;        statement.bindText(1, entity.id)</b>
@@ -421,7 +427,9 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;        } else {
 <b class="nc">&nbsp;          statement.bindText(8, _tmpSystemKind)</b>
 &nbsp;        }
-<b class="nc">&nbsp;        statement.bindText(9, entity.id)</b>
+<b class="nc">&nbsp;        statement.bindText(9, entity.iconKey)</b>
+<b class="nc">&nbsp;        statement.bindLong(10, entity.hue.toLong())</b>
+<b class="nc">&nbsp;        statement.bindText(11, entity.id)</b>
 &nbsp;      }
 &nbsp;    })
 <b class="nc">&nbsp;  }</b>
@@ -455,6 +463,8 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="nc">&nbsp;        val _columnIndexOfCreatedAt: Int = getColumnIndexOrThrow(_stmt, &quot;createdAt&quot;)</b>
 <b class="nc">&nbsp;        val _columnIndexOfUpdatedAt: Int = getColumnIndexOrThrow(_stmt, &quot;updatedAt&quot;)</b>
 <b class="nc">&nbsp;        val _columnIndexOfSystemKind: Int = getColumnIndexOrThrow(_stmt, &quot;systemKind&quot;)</b>
+<b class="nc">&nbsp;        val _columnIndexOfIconKey: Int = getColumnIndexOrThrow(_stmt, &quot;iconKey&quot;)</b>
+<b class="nc">&nbsp;        val _columnIndexOfHue: Int = getColumnIndexOrThrow(_stmt, &quot;hue&quot;)</b>
 <b class="nc">&nbsp;        val _result: MutableList&lt;CategoryEntity&gt; = mutableListOf()</b>
 <b class="nc">&nbsp;        while (_stmt.step()) {</b>
 <b class="nc">&nbsp;          val _item: CategoryEntity</b>
@@ -482,7 +492,11 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;          } else {
 <b class="nc">&nbsp;            _tmpSystemKind = _stmt.getText(_columnIndexOfSystemKind)</b>
 &nbsp;          }
-<b class="nc">&nbsp;          _item = CategoryEntity(_tmpId,_tmpWorkspaceId,_tmpName,_tmpType,_tmpParentId,_tmpCreatedAt,_tmpUpdatedAt,_tmpSystemKind)</b>
+<b class="nc">&nbsp;          val _tmpIconKey: String</b>
+<b class="nc">&nbsp;          _tmpIconKey = _stmt.getText(_columnIndexOfIconKey)</b>
+<b class="nc">&nbsp;          val _tmpHue: Int</b>
+<b class="nc">&nbsp;          _tmpHue = _stmt.getLong(_columnIndexOfHue).toInt()</b>
+<b class="nc">&nbsp;          _item = CategoryEntity(_tmpId,_tmpWorkspaceId,_tmpName,_tmpType,_tmpParentId,_tmpCreatedAt,_tmpUpdatedAt,_tmpSystemKind,_tmpIconKey,_tmpHue)</b>
 <b class="nc">&nbsp;          _result.add(_item)</b>
 &nbsp;        }
 <b class="nc">&nbsp;        _result</b>
@@ -507,6 +521,8 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="nc">&nbsp;        val _columnIndexOfCreatedAt: Int = getColumnIndexOrThrow(_stmt, &quot;createdAt&quot;)</b>
 <b class="nc">&nbsp;        val _columnIndexOfUpdatedAt: Int = getColumnIndexOrThrow(_stmt, &quot;updatedAt&quot;)</b>
 <b class="nc">&nbsp;        val _columnIndexOfSystemKind: Int = getColumnIndexOrThrow(_stmt, &quot;systemKind&quot;)</b>
+<b class="nc">&nbsp;        val _columnIndexOfIconKey: Int = getColumnIndexOrThrow(_stmt, &quot;iconKey&quot;)</b>
+<b class="nc">&nbsp;        val _columnIndexOfHue: Int = getColumnIndexOrThrow(_stmt, &quot;hue&quot;)</b>
 <b class="nc">&nbsp;        val _result: MutableList&lt;CategoryEntity&gt; = mutableListOf()</b>
 <b class="nc">&nbsp;        while (_stmt.step()) {</b>
 <b class="nc">&nbsp;          val _item: CategoryEntity</b>
@@ -534,7 +550,11 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;          } else {
 <b class="nc">&nbsp;            _tmpSystemKind = _stmt.getText(_columnIndexOfSystemKind)</b>
 &nbsp;          }
-<b class="nc">&nbsp;          _item = CategoryEntity(_tmpId,_tmpWorkspaceId,_tmpName,_tmpType,_tmpParentId,_tmpCreatedAt,_tmpUpdatedAt,_tmpSystemKind)</b>
+<b class="nc">&nbsp;          val _tmpIconKey: String</b>
+<b class="nc">&nbsp;          _tmpIconKey = _stmt.getText(_columnIndexOfIconKey)</b>
+<b class="nc">&nbsp;          val _tmpHue: Int</b>
+<b class="nc">&nbsp;          _tmpHue = _stmt.getLong(_columnIndexOfHue).toInt()</b>
+<b class="nc">&nbsp;          _item = CategoryEntity(_tmpId,_tmpWorkspaceId,_tmpName,_tmpType,_tmpParentId,_tmpCreatedAt,_tmpUpdatedAt,_tmpSystemKind,_tmpIconKey,_tmpHue)</b>
 <b class="nc">&nbsp;          _result.add(_item)</b>
 &nbsp;        }
 <b class="nc">&nbsp;        _result</b>
@@ -559,6 +579,8 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="nc">&nbsp;        val _columnIndexOfCreatedAt: Int = getColumnIndexOrThrow(_stmt, &quot;createdAt&quot;)</b>
 <b class="nc">&nbsp;        val _columnIndexOfUpdatedAt: Int = getColumnIndexOrThrow(_stmt, &quot;updatedAt&quot;)</b>
 <b class="nc">&nbsp;        val _columnIndexOfSystemKind: Int = getColumnIndexOrThrow(_stmt, &quot;systemKind&quot;)</b>
+<b class="nc">&nbsp;        val _columnIndexOfIconKey: Int = getColumnIndexOrThrow(_stmt, &quot;iconKey&quot;)</b>
+<b class="nc">&nbsp;        val _columnIndexOfHue: Int = getColumnIndexOrThrow(_stmt, &quot;hue&quot;)</b>
 <b class="nc">&nbsp;        val _result: CategoryEntity?</b>
 <b class="nc">&nbsp;        if (_stmt.step()) {</b>
 <b class="nc">&nbsp;          val _tmpId: String</b>
@@ -585,7 +607,11 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;          } else {
 <b class="nc">&nbsp;            _tmpSystemKind = _stmt.getText(_columnIndexOfSystemKind)</b>
 &nbsp;          }
-<b class="nc">&nbsp;          _result = CategoryEntity(_tmpId,_tmpWorkspaceId,_tmpName,_tmpType,_tmpParentId,_tmpCreatedAt,_tmpUpdatedAt,_tmpSystemKind)</b>
+<b class="nc">&nbsp;          val _tmpIconKey: String</b>
+<b class="nc">&nbsp;          _tmpIconKey = _stmt.getText(_columnIndexOfIconKey)</b>
+<b class="nc">&nbsp;          val _tmpHue: Int</b>
+<b class="nc">&nbsp;          _tmpHue = _stmt.getLong(_columnIndexOfHue).toInt()</b>
+<b class="nc">&nbsp;          _result = CategoryEntity(_tmpId,_tmpWorkspaceId,_tmpName,_tmpType,_tmpParentId,_tmpCreatedAt,_tmpUpdatedAt,_tmpSystemKind,_tmpIconKey,_tmpHue)</b>
 &nbsp;        } else {
 <b class="nc">&nbsp;          _result = null</b>
 &nbsp;        }
@@ -649,7 +675,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 16:22</div>
+    <div style="float:right;">generated on 2026-07-22 17:13</div>
 </div>
 </body>
 </html>

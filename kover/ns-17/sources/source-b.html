@@ -1,0 +1,316 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>MoneySurfer Coverage Report > TransactionCsvError</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.georgeci.moneysurfer.domain.csv</a>
+</div>
+
+<h1>Coverage Summary for Class: TransactionCsvError (com.georgeci.moneysurfer.domain.csv)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">TransactionCsvError</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">TransactionCsvError$EmptyFile</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/6)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">TransactionCsvError$FileTooLarge</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (12/12)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">TransactionCsvError$HeaderMismatch</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/6)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">TransactionCsvError$Unexpected</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/23)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    80%
+  </span>
+  <span class="absValue">
+    (4/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    70%
+  </span>
+  <span class="absValue">
+    (7/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    54.9%
+  </span>
+  <span class="absValue">
+    (28/51)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.csv
+&nbsp;
+&nbsp;/**
+&nbsp; * Outcome of a CSV import. Rows that failed stay in [errors] with their
+&nbsp; * 1-based CSV row number (header is row 1, first data row is row 2) so the
+&nbsp; * user can locate them in a spreadsheet editor.
+&nbsp; */
+&nbsp;data class CsvImportReport(
+&nbsp;    val imported: Int,
+&nbsp;    val skippedDuplicates: Int,
+&nbsp;    val errors: List&lt;CsvRowError&gt;,
+&nbsp;)
+&nbsp;
+&nbsp;data class CsvRowError(val rowNumber: Int, val issue: CsvRowIssue)
+&nbsp;
+&nbsp;/** Why a single CSV row could not be imported. Localised in the UI layer. */
+&nbsp;sealed interface CsvRowIssue {
+&nbsp;    data class ColumnCountMismatch(val expected: Int, val actual: Int) : CsvRowIssue
+&nbsp;    data class InvalidValue(val column: String) : CsvRowIssue
+&nbsp;    data class UnknownWorkspace(val workspaceId: String) : CsvRowIssue
+&nbsp;    data class UnknownAccount(val accountId: String) : CsvRowIssue
+&nbsp;    data class UnknownCategory(val categoryId: String) : CsvRowIssue
+&nbsp;    data class AccountWorkspaceMismatch(val accountId: String, val workspaceId: String) : CsvRowIssue
+&nbsp;    data class CategoryWorkspaceMismatch(val categoryId: String, val workspaceId: String) : CsvRowIssue
+&nbsp;    data class CurrencyMismatch(val currency: String, val accountCurrency: String) : CsvRowIssue
+&nbsp;    data class UnpairedTransfer(val transferId: String) : CsvRowIssue
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * File-level errors from [ExportTransactionsUseCase] / [ImportTransactionsUseCase].
+&nbsp; * Raw throwables (I/O and anything else that escapes the use cases) are
+&nbsp; * wrapped at this boundary per AGENTS.md so callers never see platform
+&nbsp; * exception types.
+&nbsp; */
+<b class="fc">&nbsp;sealed class TransactionCsvError(message: String, cause: Throwable? = null) :</b>
+<b class="fc">&nbsp;    RuntimeException(message, cause) {</b>
+<b class="nc">&nbsp;    data class Unexpected(val unexpectedCause: Throwable) : TransactionCsvError(</b>
+&nbsp;        &quot;CSV processing failed: &quot; +
+<b class="nc">&nbsp;            (unexpectedCause.message ?: unexpectedCause::class.simpleName ?: &quot;unknown cause&quot;),</b>
+<b class="nc">&nbsp;        unexpectedCause,</b>
+&nbsp;    )
+<b class="fc">&nbsp;    data object EmptyFile : TransactionCsvError(&quot;CSV file has no header row&quot;)</b>
+<b class="fc">&nbsp;    data object HeaderMismatch :</b>
+<b class="fc">&nbsp;        TransactionCsvError(&quot;CSV header does not match the MoneySurfer transactions format&quot;)</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The picked file is larger than [ImportTransactionsUseCase] will read into
+&nbsp;     * memory. Guards against an accidental or hostile multi-GB &quot;backup&quot; that
+&nbsp;     * would otherwise OOM the app during import.
+&nbsp;     */
+<b class="fc">&nbsp;    data class FileTooLarge(val limitBytes: Long) :</b>
+<b class="fc">&nbsp;        TransactionCsvError(&quot;CSV file exceeds the $limitBytes-byte import limit&quot;)</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-07-22 17:13</div>
+</div>
+</body>
+</html>

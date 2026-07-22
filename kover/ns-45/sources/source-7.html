@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SurferCategoriesDonutWidgetKt</title>
+  <title>MoneySurfer Coverage Report > SemanticColors</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.uikit.widgets</a>
+    <a href="../index.html">com.georgeci.moneysurfer.uikit.theme</a>
 </div>
 
-<h1>Coverage Summary for Class: SurferCategoriesDonutWidgetKt (com.georgeci.moneysurfer.uikit.widgets)</h1>
+<h1>Coverage Summary for Class: SemanticColors (com.georgeci.moneysurfer.uikit.theme)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,45 +49,38 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SurferCategoriesDonutWidgetKt</td>
+  <td class="name">SemanticColors</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/6)
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/64)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/125)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1491)
+    (44/44)
   </span>
 </td>
 </tr>
@@ -99,234 +92,31 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.widgets
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.theme
 &nbsp;
-&nbsp;import androidx.compose.foundation.Canvas
-&nbsp;import androidx.compose.foundation.background
-&nbsp;import androidx.compose.foundation.layout.Arrangement
-&nbsp;import androidx.compose.foundation.layout.Box
-&nbsp;import androidx.compose.foundation.layout.Column
-&nbsp;import androidx.compose.foundation.layout.Row
-&nbsp;import androidx.compose.foundation.layout.fillMaxSize
-&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
-&nbsp;import androidx.compose.foundation.layout.height
-&nbsp;import androidx.compose.foundation.layout.padding
-&nbsp;import androidx.compose.foundation.layout.size
-&nbsp;import androidx.compose.foundation.shape.CircleShape
-&nbsp;import androidx.compose.foundation.shape.RoundedCornerShape
-&nbsp;import androidx.compose.material3.Text
-&nbsp;import androidx.compose.runtime.Composable
-&nbsp;import androidx.compose.ui.Alignment
-&nbsp;import androidx.compose.ui.Modifier
-&nbsp;import androidx.compose.ui.draw.clip
-&nbsp;import androidx.compose.ui.geometry.Offset
-&nbsp;import androidx.compose.ui.geometry.Size
+&nbsp;import androidx.compose.runtime.staticCompositionLocalOf
 &nbsp;import androidx.compose.ui.graphics.Color
-&nbsp;import androidx.compose.ui.text.style.TextOverflow
-&nbsp;import androidx.compose.ui.tooling.preview.Preview
-&nbsp;import androidx.compose.ui.unit.dp
-&nbsp;import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
-&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
+&nbsp;import com.georgeci.moneysurfer.uikit.tokens.AppColors
 &nbsp;
-&nbsp;data class SurferDonutSegment(
-&nbsp;    val label: String,
-&nbsp;    val percent: Float,
-&nbsp;    val color: Color,
+<b class="fc">&nbsp;data class SemanticColors(</b>
+<b class="fc">&nbsp;    val income: Color = AppColors.Income,</b>
+<b class="fc">&nbsp;    val expense: Color = AppColors.Expense,</b>
+<b class="fc">&nbsp;    val transfer: Color = AppColors.Transfer,</b>
 &nbsp;)
 &nbsp;
-&nbsp;@Composable
-<b class="nc">&nbsp;fun SurferCategoriesDonutWidget(</b>
-&nbsp;    segments: List&lt;SurferDonutSegment&gt;,
-<b class="nc">&nbsp;    modifier: Modifier = Modifier,</b>
-<b class="nc">&nbsp;    size: SurferWidgetSize = LocalSurferWidgetSize.current,</b>
-<b class="nc">&nbsp;    centerLabel: String? = null,</b>
-<b class="nc">&nbsp;    centerValue: String? = null,</b>
-<b class="nc">&nbsp;    emptyCenterText: String? = null,</b>
-<b class="nc">&nbsp;    emptyLegendText: String? = null,</b>
-<b class="nc">&nbsp;) {</b>
-<b class="nc">&nbsp;    val hero = size == SurferWidgetSize.Hero</b>
-<b class="nc">&nbsp;    val donutSize = if (hero) 140.dp else 84.dp</b>
-<b class="nc">&nbsp;    val legendItems = if (hero) 5 else 3</b>
-<b class="nc">&nbsp;    val isEmpty = segments.isEmpty()</b>
+&nbsp;internal val LightSemanticColors = SemanticColors(
+&nbsp;    income = AppColors.Income,
+&nbsp;    expense = AppColors.Expense,
+&nbsp;    transfer = AppColors.Transfer,
+&nbsp;)
 &nbsp;
-<b class="nc">&nbsp;    Row(</b>
-<b class="nc">&nbsp;        modifier = modifier</b>
-<b class="nc">&nbsp;            .clip(RoundedCornerShape(20.dp))</b>
-<b class="nc">&nbsp;            .background(AppTheme.materialColors.surfaceContainerHigh)</b>
-<b class="nc">&nbsp;            .padding(if (hero) 20.dp else 14.dp),</b>
-<b class="nc">&nbsp;        horizontalArrangement = Arrangement.spacedBy(if (hero) 20.dp else 12.dp),</b>
-<b class="nc">&nbsp;        verticalAlignment = Alignment.CenterVertically,</b>
-&nbsp;    ) {
-<b class="nc">&nbsp;        Donut(</b>
-<b class="nc">&nbsp;            segments = segments,</b>
-<b class="nc">&nbsp;            hero = hero,</b>
-<b class="nc">&nbsp;            centerLabel = centerLabel,</b>
-<b class="nc">&nbsp;            centerValue = centerValue,</b>
-<b class="nc">&nbsp;            emptyCenterText = emptyCenterText,</b>
-<b class="nc">&nbsp;            modifier = Modifier.size(donutSize),</b>
-&nbsp;        )
-<b class="nc">&nbsp;        Column(</b>
-<b class="nc">&nbsp;            modifier = Modifier.weight(1f),</b>
-<b class="nc">&nbsp;            verticalArrangement = Arrangement.spacedBy(if (hero) 8.dp else 4.dp),</b>
-&nbsp;        ) {
-<b class="nc">&nbsp;            if (isEmpty) {</b>
-<b class="nc">&nbsp;                if (emptyLegendText != null) {</b>
-<b class="nc">&nbsp;                    Text(</b>
-<b class="nc">&nbsp;                        text = emptyLegendText,</b>
-<b class="nc">&nbsp;                        style = AppTheme.typography.bodyMedium,</b>
-<b class="nc">&nbsp;                        color = AppTheme.materialColors.onSurfaceVariant,</b>
-&nbsp;                    )
-<b class="nc">&nbsp;                }</b>
-<b class="nc">&nbsp;            } else {</b>
-<b class="nc">&nbsp;                segments.take(legendItems).forEach { seg -&gt;</b>
-<b class="nc">&nbsp;                    LegendRow(seg = seg, hero = hero)</b>
-<b class="nc">&nbsp;                }</b>
-&nbsp;            }
-<b class="nc">&nbsp;        }</b>
-<b class="nc">&nbsp;    }</b>
-<b class="nc">&nbsp;}</b>
+&nbsp;internal val DarkSemanticColors = SemanticColors(
+&nbsp;    income = AppColors.Dark.Income,
+&nbsp;    expense = AppColors.Dark.Expense,
+&nbsp;    transfer = AppColors.Dark.Transfer,
+&nbsp;)
 &nbsp;
-&nbsp;@Composable
-&nbsp;private fun Donut(
-&nbsp;    segments: List&lt;SurferDonutSegment&gt;,
-&nbsp;    hero: Boolean,
-&nbsp;    centerLabel: String?,
-&nbsp;    centerValue: String?,
-&nbsp;    emptyCenterText: String?,
-<b class="nc">&nbsp;    modifier: Modifier = Modifier,</b>
-<b class="nc">&nbsp;) {</b>
-<b class="nc">&nbsp;    val trackColor = AppTheme.materialColors.surfaceContainerHighest</b>
-<b class="nc">&nbsp;    val innerBg = AppTheme.materialColors.surfaceContainerHigh</b>
-<b class="nc">&nbsp;    val innerInset = if (hero) 18.dp else 10.dp</b>
-&nbsp;
-<b class="nc">&nbsp;    Box(modifier = modifier, contentAlignment = Alignment.Center) {</b>
-<b class="nc">&nbsp;        Canvas(modifier = Modifier.fillMaxSize()) {</b>
-<b class="nc">&nbsp;            if (segments.isEmpty()) {</b>
-<b class="nc">&nbsp;                drawCircle(color = trackColor)</b>
-&nbsp;            } else {
-<b class="nc">&nbsp;                var startDeg = -90f</b>
-<b class="nc">&nbsp;                segments.forEach { seg -&gt;</b>
-<b class="nc">&nbsp;                    val sweep = seg.percent * 360f</b>
-<b class="nc">&nbsp;                    drawArc(</b>
-<b class="nc">&nbsp;                        color = seg.color,</b>
-<b class="nc">&nbsp;                        startAngle = startDeg,</b>
-<b class="nc">&nbsp;                        sweepAngle = sweep,</b>
-<b class="nc">&nbsp;                        useCenter = true,</b>
-<b class="nc">&nbsp;                        topLeft = Offset.Zero,</b>
-<b class="nc">&nbsp;                        size = Size(size.width, size.height),</b>
-&nbsp;                    )
-<b class="nc">&nbsp;                    startDeg += sweep</b>
-<b class="nc">&nbsp;                }</b>
-&nbsp;            }
-<b class="nc">&nbsp;            val insetPx = innerInset.toPx()</b>
-<b class="nc">&nbsp;            drawCircle(</b>
-<b class="nc">&nbsp;                color = innerBg,</b>
-<b class="nc">&nbsp;                radius = (size.minDimension / 2f) - insetPx,</b>
-<b class="nc">&nbsp;                center = Offset(size.width / 2f, size.height / 2f),</b>
-&nbsp;            )
-&nbsp;        }
-<b class="nc">&nbsp;        Column(horizontalAlignment = Alignment.CenterHorizontally) {</b>
-<b class="nc">&nbsp;            if (segments.isEmpty()) {</b>
-<b class="nc">&nbsp;                Text(</b>
-<b class="nc">&nbsp;                    text = emptyCenterText.orEmpty(),</b>
-<b class="nc">&nbsp;                    style = AppTheme.typography.labelSmall,</b>
-<b class="nc">&nbsp;                    color = AppTheme.materialColors.onSurfaceVariant,</b>
-<b class="nc">&nbsp;                    maxLines = 2,</b>
-<b class="nc">&nbsp;                    overflow = TextOverflow.Ellipsis,</b>
-<b class="nc">&nbsp;                    modifier = Modifier.padding(horizontal = 8.dp),</b>
-&nbsp;                )
-<b class="nc">&nbsp;            } else {</b>
-<b class="nc">&nbsp;                if (centerLabel != null) {</b>
-<b class="nc">&nbsp;                    Text(</b>
-<b class="nc">&nbsp;                        text = centerLabel,</b>
-<b class="nc">&nbsp;                        style = AppTheme.typography.labelSmall,</b>
-<b class="nc">&nbsp;                        color = AppTheme.materialColors.onSurfaceVariant,</b>
-&nbsp;                    )
-<b class="nc">&nbsp;                }</b>
-<b class="nc">&nbsp;                if (centerValue != null) {</b>
-<b class="nc">&nbsp;                    Text(</b>
-<b class="nc">&nbsp;                        text = centerValue,</b>
-<b class="nc">&nbsp;                        style = if (hero) AppTheme.typography.titleMedium else AppTheme.typography.titleSmall,</b>
-<b class="nc">&nbsp;                        color = AppTheme.materialColors.onSurface,</b>
-<b class="nc">&nbsp;                        maxLines = 1,</b>
-<b class="nc">&nbsp;                        overflow = TextOverflow.Ellipsis,</b>
-&nbsp;                    )
-<b class="nc">&nbsp;                }</b>
-&nbsp;            }
-<b class="nc">&nbsp;        }</b>
-<b class="nc">&nbsp;    }</b>
-<b class="nc">&nbsp;}</b>
-&nbsp;
-&nbsp;@Composable
-<b class="nc">&nbsp;private fun LegendRow(seg: SurferDonutSegment, hero: Boolean) {</b>
-<b class="nc">&nbsp;    Row(</b>
-<b class="nc">&nbsp;        modifier = Modifier.fillMaxWidth(),</b>
-<b class="nc">&nbsp;        verticalAlignment = Alignment.CenterVertically,</b>
-<b class="nc">&nbsp;        horizontalArrangement = Arrangement.spacedBy(8.dp),</b>
-&nbsp;    ) {
-<b class="nc">&nbsp;        Box(</b>
-<b class="nc">&nbsp;            modifier = Modifier</b>
-<b class="nc">&nbsp;                .size(10.dp)</b>
-<b class="nc">&nbsp;                .clip(CircleShape)</b>
-<b class="nc">&nbsp;                .background(seg.color),</b>
-&nbsp;        )
-<b class="nc">&nbsp;        Text(</b>
-<b class="nc">&nbsp;            text = seg.label,</b>
-<b class="nc">&nbsp;            style = if (hero) AppTheme.typography.bodyMedium else AppTheme.typography.bodySmall,</b>
-<b class="nc">&nbsp;            color = AppTheme.materialColors.onSurface,</b>
-<b class="nc">&nbsp;            maxLines = 1,</b>
-<b class="nc">&nbsp;            overflow = TextOverflow.Ellipsis,</b>
-<b class="nc">&nbsp;            modifier = Modifier.weight(1f),</b>
-&nbsp;        )
-<b class="nc">&nbsp;        Text(</b>
-<b class="nc">&nbsp;            text = &quot;${(seg.percent * 100).toInt()}%&quot;,</b>
-<b class="nc">&nbsp;            style = if (hero) AppTheme.typography.labelMedium else AppTheme.typography.labelSmall,</b>
-<b class="nc">&nbsp;            color = AppTheme.materialColors.onSurfaceVariant,</b>
-&nbsp;        )
-<b class="nc">&nbsp;    }</b>
-<b class="nc">&nbsp;}</b>
-&nbsp;
-&nbsp;@Preview
-&nbsp;@Composable
-<b class="nc">&nbsp;private fun SurferCategoriesDonutHeroPreview() {</b>
-<b class="nc">&nbsp;    SurferComponentPreview {</b>
-&nbsp;        Box(modifier = Modifier.padding(16.dp)) {
-&nbsp;            SurferCategoriesDonutWidget(
-&nbsp;                segments = listOf(
-&nbsp;                    SurferDonutSegment(&quot;Rent&quot;, 0.45f, Color(0xFF8E6BB8)),
-&nbsp;                    SurferDonutSegment(&quot;Groceries&quot;, 0.22f, Color(0xFF4D9075)),
-&nbsp;                    SurferDonutSegment(&quot;Dining&quot;, 0.12f, Color(0xFFC07856)),
-&nbsp;                    SurferDonutSegment(&quot;Transport&quot;, 0.08f, Color(0xFF5F7DC9)),
-&nbsp;                    SurferDonutSegment(&quot;Utilities&quot;, 0.06f, Color(0xFFB58752)),
-&nbsp;                    SurferDonutSegment(&quot;Leisure&quot;, 0.04f, Color(0xFFC5708F)),
-&nbsp;                    SurferDonutSegment(&quot;Health&quot;, 0.03f, Color(0xFFC46D67)),
-&nbsp;                ),
-&nbsp;                centerLabel = &quot;Top&quot;,
-&nbsp;                centerValue = &quot;Rent&quot;,
-&nbsp;                modifier = Modifier
-&nbsp;                    .fillMaxWidth()
-&nbsp;                    .height(220.dp),
-&nbsp;            )
-&nbsp;        }
-&nbsp;    }
-<b class="nc">&nbsp;}</b>
-&nbsp;
-&nbsp;@Preview
-&nbsp;@Composable
-<b class="nc">&nbsp;private fun SurferCategoriesDonutEmptyPreview() {</b>
-<b class="nc">&nbsp;    SurferComponentPreview {</b>
-&nbsp;        Box(modifier = Modifier.padding(16.dp)) {
-&nbsp;            SurferCategoriesDonutWidget(
-&nbsp;                segments = emptyList(),
-&nbsp;                emptyCenterText = &quot;No data&quot;,
-&nbsp;                emptyLegendText = &quot;No expenses tracked yet.&quot;,
-&nbsp;                modifier = Modifier
-&nbsp;                    .fillMaxWidth()
-&nbsp;                    .height(220.dp),
-&nbsp;            )
-&nbsp;        }
-&nbsp;    }
-<b class="nc">&nbsp;}</b>
+&nbsp;val LocalSemanticColors = staticCompositionLocalOf { LightSemanticColors }
 </code>
 </pre>
 </div>
@@ -350,7 +140,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 15:22</div>
+    <div style="float:right;">generated on 2026-07-22 17:13</div>
 </div>
 </body>
 </html>

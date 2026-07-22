@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > ComGeorgeciMoneysurferDiOnlineKoinAppModuleKt</title>
+  <title>MoneySurfer Coverage Report > TombstonePushKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,30 +19,166 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.di</a>
+    <a href="../index.html">com.georgeci.moneysurfer.data.sync.plugin</a>
 </div>
 
-<h1>Coverage Summary for Class: ComGeorgeciMoneysurferDiOnlineKoinAppModuleKt (com.georgeci.moneysurfer.di)</h1>
+<h1>Coverage Summary for Class: TombstonePushKt (com.georgeci.moneysurfer.data.sync.plugin)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
 <th class="coverageStat 
 ">
+  Method, %
+</th>
+<th class="coverageStat 
+">
   Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
 </th>
 </tr>
 <tr>
-  <td class="name">ComGeorgeciMoneysurferDiOnlineKoinAppModuleKt</td>
-    <td class="coverageStat"/>
+  <td class="name">TombstonePushKt</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (1/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    71.4%
+  </span>
+  <span class="absValue">
+    (5/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    27.8%
+  </span>
+  <span class="absValue">
+    (10/36)
+  </span>
+</td>
 </tr>
-
+  <tr>
+    <td class="name">TombstonePushKt$pushTombstone$1</td>
+    <td class="coverageStat"/>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (1/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    71.4%
+  </span>
+  <span class="absValue">
+    (5/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    27.8%
+  </span>
+  <span class="absValue">
+    (10/36)
+  </span>
+</td>
+</tr>
 </table>
 
 <br/>
 <br/>
 
-  <code class="sourceCode">Source code is not available<br /></code>
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.sync.plugin
+&nbsp;
+&nbsp;import com.georgeci.moneysurfer.sync.repository.PendingMutation
+&nbsp;import dev.gitlive.firebase.firestore.DocumentReference
+&nbsp;import kotlinx.serialization.Serializable
+&nbsp;
+&nbsp;/**
+&nbsp; * Wire-format patch pushed for [com.georgeci.moneysurfer.sync.repository.MutationOperation.DELETE].
+&nbsp; *
+&nbsp; * Firestore rules deny hard deletes on every entity collection
+&nbsp; * (`allow delete: if false`, firestore.rules v2.0.0), so a local delete
+&nbsp; * replicates as a soft-delete `update`. Field names must match the entity DTOs
+&nbsp; * in RemoteDtos.kt: peers decode `deletedAt != null` and hard-delete the local
+&nbsp; * row, and their `updatedAt &gt; cursor` pull picks the tombstone up
+&nbsp; * (see sync-pull-lww.md → Tombstones).
+&nbsp; */
+&nbsp;@Serializable
+&nbsp;internal data class TombstonePatch(
+&nbsp;    val deletedAt: Long,
+&nbsp;    val updatedAt: Long,
+&nbsp;    val clientVersionCode: Int,
+&nbsp;)
+&nbsp;
+&nbsp;/**
+&nbsp; * [TombstonePatch.deletedAt] and [TombstonePatch.updatedAt] both take the
+&nbsp; * mutation&#39;s enqueue time, so a retried push writes an identical patch —
+&nbsp; * matching the idempotent re-push contract the rest of the outbox relies on.
+&nbsp; */
+&nbsp;internal fun tombstonePatchFor(
+&nbsp;    mutation: PendingMutation,
+&nbsp;    clientVersionCode: Int,
+&nbsp;): TombstonePatch {
+<b class="fc">&nbsp;    val deletedAtMillis = mutation.createdAt.toEpochMilliseconds()</b>
+<b class="fc">&nbsp;    return TombstonePatch(</b>
+<b class="fc">&nbsp;        deletedAt = deletedAtMillis,</b>
+<b class="fc">&nbsp;        updatedAt = deletedAtMillis,</b>
+<b class="fc">&nbsp;        clientVersionCode = clientVersionCode,</b>
+&nbsp;    )
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * Writes [patch] onto the remote doc, skipping docs that never reached
+&nbsp; * Firestore: an entity created and deleted between two drains leaves the
+&nbsp; * INSERT push a no-op (the Room row is already gone), and updating the
+&nbsp; * missing doc would raise NOT_FOUND on every retry, wedging the batch.
+&nbsp; * A doc that never existed remotely has nothing for peers to forget.
+&nbsp; */
+&nbsp;internal suspend fun DocumentReference.pushTombstone(patch: TombstonePatch) {
+<b class="nc">&nbsp;    if (!get().exists) return</b>
+<b class="nc">&nbsp;    update(patch)</b>
+&nbsp;}
+</code>
+</pre>
 </div>
 
 <script type="text/javascript">
@@ -64,7 +200,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 16:22</div>
+    <div style="float:right;">generated on 2026-07-22 17:13</div>
 </div>
 </body>
 </html>

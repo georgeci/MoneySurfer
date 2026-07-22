@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > RecurringRuleRepositoryImpl</title>
+  <title>MoneySurfer Coverage Report > UserEmailDoc</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.data.repository</a>
+    <a href="../index.html">com.georgeci.moneysurfer.data.remote</a>
 </div>
 
-<h1>Coverage Summary for Class: RecurringRuleRepositoryImpl (com.georgeci.moneysurfer.data.repository)</h1>
+<h1>Coverage Summary for Class: UserEmailDoc (com.georgeci.moneysurfer.data.remote)</h1>
 
 <table class="coverageStats">
 
@@ -46,13 +46,13 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">RecurringRuleRepositoryImpl</td>
+  <td class="name">UserEmailDoc</td>
 <td class="coverageStat">
   <span class="percent">
     0%
   </span>
   <span class="absValue">
-    (0/8)
+    (0/1)
   </span>
 </td>
 <td class="coverageStat">
@@ -60,7 +60,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/6)
+    (0/14)
   </span>
 </td>
 <td class="coverageStat">
@@ -68,7 +68,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/43)
+    (0/3)
   </span>
 </td>
 <td class="coverageStat">
@@ -76,28 +76,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/238)
+    (0/87)
   </span>
 </td>
 </tr>
   <tr>
-    <td class="name">RecurringRuleRepositoryImpl$getAll$$inlined$map$1</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/2)
-  </span>
-</td>
-    <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">RecurringRuleRepositoryImpl$getAll$$inlined$map$1$1</td>
-    <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">RecurringRuleRepositoryImpl$getAll$$inlined$map$1$2</td>
+    <td class="name">UserEmailDoc$Companion</td>
 <td class="coverageStat">
   <span class="percent">
     0%
@@ -107,14 +91,22 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   </span>
 </td>
     <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">RecurringRuleRepositoryImpl$getAll$$inlined$map$1$2$1</td>
-    <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">RecurringRuleRepositoryImpl$getById$1</td>
-    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
   </tr>
 <tr>
   <td class="name"><strong>Total</strong></td>
@@ -123,7 +115,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/11)
+    (0/2)
   </span>
 </td>
 <td class="coverageStat">
@@ -131,7 +123,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/6)
+    (0/14)
   </span>
 </td>
 <td class="coverageStat">
@@ -139,7 +131,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/43)
+    (0/4)
   </span>
 </td>
 <td class="coverageStat">
@@ -147,7 +139,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/238)
+    (0/91)
   </span>
 </td>
 </tr>
@@ -158,105 +150,215 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.repository
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.remote
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.data.db.dao.RecurringRuleDao
-&nbsp;import com.georgeci.moneysurfer.data.db.entity.RecurringRuleEntity
-&nbsp;import com.georgeci.moneysurfer.domain.model.MissingDayPolicy
-&nbsp;import com.georgeci.moneysurfer.domain.model.RecurringFrequency
-&nbsp;import com.georgeci.moneysurfer.domain.model.RecurringRule
-&nbsp;import com.georgeci.moneysurfer.domain.model.RecurringSchedule
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryId
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.RecurringRuleId
-&nbsp;import com.georgeci.moneysurfer.domain.repositories.RecurringRuleRepository
-&nbsp;import kotlinx.coroutines.flow.Flow
-&nbsp;import kotlinx.coroutines.flow.map
-&nbsp;import kotlinx.datetime.DayOfWeek
-&nbsp;import org.koin.core.annotation.Single
+&nbsp;import kotlinx.serialization.Serializable
 &nbsp;
-<b class="nc">&nbsp;@Single(binds = [RecurringRuleRepository::class])</b>
-&nbsp;class RecurringRuleRepositoryImpl(
-<b class="nc">&nbsp;    private val dao: RecurringRuleDao,</b>
-<b class="nc">&nbsp;    private val timeFormatter: TimeFormatter,</b>
-&nbsp;) : RecurringRuleRepository {
+&nbsp;/**
+&nbsp; * Firestore wire-format DTOs. Field names mirror Room entities 1:1 so a Firestore document
+&nbsp; * can round-trip through Kotlin serialization without a custom mapping layer.
+&nbsp; */
 &nbsp;
-&nbsp;    override fun getAll(): Flow&lt;List&lt;RecurringRule&gt;&gt; =
-<b class="nc">&nbsp;        dao.getAll().map { list -&gt; list.map { it.toDomain() } }</b>
+&nbsp;@Serializable
+&nbsp;data class UserDoc(
+&nbsp;    val displayName: String? = null,
+&nbsp;    val email: String? = null,
+&nbsp;    val isAnon: Boolean = false,
+&nbsp;    val createdAt: Long = 0L,
+&nbsp;    val workspaceIds: List&lt;String&gt; = emptyList(),
+&nbsp;    val defaultWorkspaceId: String? = null,
+&nbsp;    val invitedWorkspaceIds: List&lt;String&gt; = emptyList(),
+&nbsp;)
 &nbsp;
-&nbsp;    override suspend fun getById(id: RecurringRuleId): RecurringRule? =
-<b class="nc">&nbsp;        dao.getById(id.value)?.toDomain()</b>
+&nbsp;/**
+&nbsp; * Email→uid mapping for invite recipient discovery. Doc id is the lowercased email.
+&nbsp; * Kept as a separate collection (rather than exposing `users.email` via list rules) so the
+&nbsp; * security rule is a tight `signedIn()` read on a single field with no other PII leakage.
+&nbsp; */
+<b class="nc">&nbsp;@Serializable</b>
+&nbsp;data class UserEmailDoc(
+<b class="nc">&nbsp;    val uid: String = &quot;&quot;,</b>
+<b class="nc">&nbsp;    val updatedAt: Long = 0L,</b>
+&nbsp;)
 &nbsp;
-&nbsp;    override suspend fun insert(rule: RecurringRule) {
-<b class="nc">&nbsp;        dao.insert(rule.toEntity())</b>
-&nbsp;    }
+&nbsp;@Serializable
+&nbsp;data class WorkspaceDoc(
+&nbsp;    val name: String = &quot;&quot;,
+&nbsp;    val description: String = &quot;&quot;,
+&nbsp;    val baseCurrency: String = &quot;&quot;,
+&nbsp;    val ownerId: String = &quot;&quot;,
+&nbsp;    val archived: Boolean = false,
+&nbsp;    val createdAt: Long = 0L,
+&nbsp;    val updatedAt: Long = 0L,
+&nbsp;    val deletedAt: Long? = null,
+&nbsp;    val clientVersionCode: Int = 1,
+&nbsp;)
 &nbsp;
-&nbsp;    override suspend fun update(rule: RecurringRule) {
-<b class="nc">&nbsp;        dao.update(rule.toEntity())</b>
-&nbsp;    }
+&nbsp;@Serializable
+&nbsp;data class AccountDoc(
+&nbsp;    val name: String = &quot;&quot;,
+&nbsp;    val type: String = &quot;&quot;,
+&nbsp;    val currency: String = &quot;&quot;,
+&nbsp;    val balance: Long = 0L,
+&nbsp;    val archived: Boolean = false,
+&nbsp;    val updatedAt: Long = 0L,
+&nbsp;    val deletedAt: Long? = null,
+&nbsp;    val clientVersionCode: Int = 1,
+&nbsp;)
 &nbsp;
-&nbsp;    override suspend fun delete(id: RecurringRuleId) {
-<b class="nc">&nbsp;        dao.delete(id.value)</b>
-&nbsp;    }
+&nbsp;@Serializable
+&nbsp;data class CategoryDoc(
+&nbsp;    val name: String = &quot;&quot;,
+&nbsp;    val type: String = &quot;&quot;,
+&nbsp;    val parentId: String? = null,
+&nbsp;    val createdAt: Long = 0L,
+&nbsp;    val updatedAt: Long = 0L,
+&nbsp;    val deletedAt: Long? = null,
+&nbsp;    val clientVersionCode: Int = 1,
+&nbsp;    /** System kind marker (e.g. &quot;TRANSFER&quot;) for built-in categories. Null for user categories. */
+&nbsp;    val systemKind: String? = null,
+&nbsp;    /**
+&nbsp;     * Semantic icon key. Empty when written by a client that predates the field; the reader
+&nbsp;     * resolves that back to the deterministic default rather than rendering nothing.
+&nbsp;     */
+&nbsp;    val iconKey: String = &quot;&quot;,
+&nbsp;    /** Hue in degrees, 0 until 360. `-1` is the same &quot;not written&quot; sentinel as a blank [iconKey]. */
+&nbsp;    val hue: Int = -1,
+&nbsp;)
 &nbsp;
-<b class="nc">&nbsp;    private fun RecurringRuleEntity.toDomain() = RecurringRule(</b>
-<b class="nc">&nbsp;        id = RecurringRuleId(id),</b>
-<b class="nc">&nbsp;        title = title,</b>
-<b class="nc">&nbsp;        amount = Money.fromMinor(amount),</b>
-<b class="nc">&nbsp;        categoryId = CategoryId(categoryId),</b>
-<b class="nc">&nbsp;        schedule = RecurringSchedule(</b>
-<b class="nc">&nbsp;            frequency = RecurringFrequency.entries.firstOrNull { it.name == scheduleFrequency }</b>
-<b class="nc">&nbsp;                ?: RecurringFrequency.MONTHLY,</b>
-<b class="nc">&nbsp;            interval = scheduleInterval,</b>
-<b class="nc">&nbsp;            daysOfWeek = scheduleDaysOfWeek.parseDaysOfWeek(),</b>
-<b class="nc">&nbsp;            daysOfMonth = scheduleDaysOfMonth.parseDaysOfMonth(),</b>
-<b class="nc">&nbsp;            missingDayPolicy = MissingDayPolicy.entries.firstOrNull { it.name == scheduleMissingDayPolicy }</b>
-<b class="nc">&nbsp;                ?: MissingDayPolicy.LAST_DAY_OF_MONTH,</b>
-&nbsp;        ),
-<b class="nc">&nbsp;        startDate = timeFormatter.parseLocalDate(startDate),</b>
-<b class="nc">&nbsp;        nextRunAt = timeFormatter.parseInstantOrNull(nextRunAt),</b>
-<b class="nc">&nbsp;        autoCreate = autoCreate,</b>
-<b class="nc">&nbsp;        isActive = isActive,</b>
-<b class="nc">&nbsp;        createdAt = timeFormatter.parseInstant(createdAt),</b>
-<b class="nc">&nbsp;        updatedAt = timeFormatter.parseInstant(updatedAt),</b>
-&nbsp;    )
+&nbsp;@Serializable
+&nbsp;data class TransactionDoc(
+&nbsp;    val accountId: String = &quot;&quot;,
+&nbsp;    val categoryId: String? = null,
+&nbsp;    val amount: Long = 0L,
+&nbsp;    val currencyCode: String = &quot;&quot;,
+&nbsp;    val note: String = &quot;&quot;,
+&nbsp;    val operationAt: Long = 0L,
+&nbsp;    val operationDate: String = &quot;&quot;,
+&nbsp;    val type: String = &quot;&quot;,
+&nbsp;    val status: String = &quot;ACTUAL&quot;,
+&nbsp;    val createdAt: Long = 0L,
+&nbsp;    val updatedAt: Long = 0L,
+&nbsp;    val deletedAt: Long? = null,
+&nbsp;    val clientVersionCode: Int = 1,
+&nbsp;    /** Shared id linking the two legs of a transfer. Null for non-transfer rows. */
+&nbsp;    val transferId: String? = null,
+&nbsp;)
 &nbsp;
-<b class="nc">&nbsp;    private fun RecurringRule.toEntity() = RecurringRuleEntity(</b>
-<b class="nc">&nbsp;        id = id.value,</b>
-<b class="nc">&nbsp;        title = title,</b>
-<b class="nc">&nbsp;        amount = amount.minor,</b>
-<b class="nc">&nbsp;        categoryId = categoryId.value,</b>
-<b class="nc">&nbsp;        scheduleFrequency = schedule.frequency.name,</b>
-<b class="nc">&nbsp;        scheduleInterval = schedule.interval,</b>
-<b class="nc">&nbsp;        scheduleDaysOfWeek = schedule.daysOfWeek.toWeekdaysStorageValue(),</b>
-<b class="nc">&nbsp;        scheduleDaysOfMonth = schedule.daysOfMonth.toMonthdaysStorageValue(),</b>
-<b class="nc">&nbsp;        scheduleMissingDayPolicy = schedule.missingDayPolicy.name,</b>
-<b class="nc">&nbsp;        startDate = timeFormatter.formatLocalDate(startDate),</b>
-<b class="nc">&nbsp;        nextRunAt = timeFormatter.formatInstantOrNull(nextRunAt),</b>
-<b class="nc">&nbsp;        autoCreate = autoCreate,</b>
-<b class="nc">&nbsp;        isActive = isActive,</b>
-<b class="nc">&nbsp;        createdAt = timeFormatter.formatInstant(createdAt),</b>
-<b class="nc">&nbsp;        updatedAt = timeFormatter.formatInstant(updatedAt),</b>
-&nbsp;    )
-&nbsp;}
+&nbsp;/**
+&nbsp; * Budget doc lives at `workspaces/{wid}/budgets/{bid}`.
+&nbsp; *
+&nbsp; * `categoryIds` is a real list on the wire even though Room stores it as a CSV column —
+&nbsp; * a list is the natural Firestore shape and the mapper converts. An empty list means
+&nbsp; * &quot;every expense category&quot;.
+&nbsp; */
+&nbsp;@Serializable
+&nbsp;data class BudgetDoc(
+&nbsp;    val name: String = &quot;&quot;,
+&nbsp;    val categoryIds: List&lt;String&gt; = emptyList(),
+&nbsp;    val amount: Long = 0L,
+&nbsp;    val period: String = &quot;&quot;,
+&nbsp;    /** ISO-8601 local date (`yyyy-MM-dd`) the period anchoring counts from. */
+&nbsp;    val startDate: String = &quot;&quot;,
+&nbsp;    val alertPercent: Int = 0,
+&nbsp;    val isActive: Boolean = true,
+&nbsp;    val rollover: Boolean = false,
+&nbsp;    val createdAt: Long = 0L,
+&nbsp;    val updatedAt: Long = 0L,
+&nbsp;    val deletedAt: Long? = null,
+&nbsp;    val clientVersionCode: Int = 1,
+&nbsp;)
 &nbsp;
-&nbsp;private fun String.parseDaysOfWeek(): Set&lt;DayOfWeek&gt; {
-&nbsp;    if (isBlank()) return emptySet()
-&nbsp;    return split(&#39;,&#39;).mapNotNull { value -&gt;
-&nbsp;        DayOfWeek.entries.firstOrNull { day -&gt; day.name == value }
-&nbsp;    }.toSet()
-&nbsp;}
+&nbsp;/**
+&nbsp; * Savings goal doc at `workspaces/{wid}/goals/{gid}`.
+&nbsp; *
+&nbsp; * There is no `current` / `saved` field by design — the amount saved is always
+&nbsp; * `SUM(goalContributions.amount)` for the goal, so no wire field can drift.
+&nbsp; */
+&nbsp;@Serializable
+&nbsp;data class GoalDoc(
+&nbsp;    val title: String = &quot;&quot;,
+&nbsp;    val emoji: String = &quot;&quot;,
+&nbsp;    val hue: Int = 0,
+&nbsp;    val target: Long = 0L,
+&nbsp;    val currencyCode: String = &quot;&quot;,
+&nbsp;    val startDate: String = &quot;&quot;,
+&nbsp;    val targetDate: String? = null,
+&nbsp;    val accountId: String? = null,
+&nbsp;    val status: String = &quot;ACTIVE&quot;,
+&nbsp;    val createdAt: Long = 0L,
+&nbsp;    val updatedAt: Long = 0L,
+&nbsp;    val deletedAt: Long? = null,
+&nbsp;    val clientVersionCode: Int = 1,
+&nbsp;)
 &nbsp;
-&nbsp;private fun String.parseDaysOfMonth(): Set&lt;Int&gt; {
-&nbsp;    if (isBlank()) return emptySet()
-&nbsp;    return split(&#39;,&#39;).mapNotNull { it.toIntOrNull() }.toSet()
-&nbsp;}
+&nbsp;/**
+&nbsp; * Contribution doc at `workspaces/{wid}/goalContributions/{cid}`.
+&nbsp; *
+&nbsp; * A flat workspace-level collection rather than a sub-collection of the goal:
+&nbsp; * the pull path reads workspace sub-collections by cursor, and nesting a level
+&nbsp; * deeper would need a collection-group query and a second cursor.
+&nbsp; */
+&nbsp;@Serializable
+&nbsp;data class GoalContributionDoc(
+&nbsp;    val goalId: String = &quot;&quot;,
+&nbsp;    /** Signed minor units — negative is a withdrawal. */
+&nbsp;    val amount: Long = 0L,
+&nbsp;    val occurredOn: String = &quot;&quot;,
+&nbsp;    val note: String = &quot;&quot;,
+&nbsp;    /** Always null in v1 — reserved for the money-backed model. */
+&nbsp;    val transferId: String? = null,
+&nbsp;    val createdAt: Long = 0L,
+&nbsp;    val updatedAt: Long = 0L,
+&nbsp;    val deletedAt: Long? = null,
+&nbsp;    val clientVersionCode: Int = 1,
+&nbsp;)
 &nbsp;
-&nbsp;private fun Set&lt;DayOfWeek&gt;.toWeekdaysStorageValue(): String =
-&nbsp;    joinToString(&quot;,&quot;) { it.name }
+&nbsp;/**
+&nbsp; * Member doc lives at `workspaces/{wid}/members/{uid}`. Doc id = userId.
+&nbsp; *
+&nbsp; * Soft-delete via `status` (`ACTIVE` / `LEFT` / `REMOVED`) — `deletedAt` is kept for
+&nbsp; * back-compat with old docs and as a tombstone fallback for clients pulling members.
+&nbsp; */
+&nbsp;@Serializable
+&nbsp;data class WorkspaceMemberDoc(
+&nbsp;    val userId: String = &quot;&quot;,
+&nbsp;    val role: String = &quot;&quot;,
+&nbsp;    val status: String = &quot;ACTIVE&quot;,
+&nbsp;    val displayName: String = &quot;&quot;,
+&nbsp;    val email: String? = null,
+&nbsp;    val addedByUserId: String? = null,
+&nbsp;    val createdAt: Long = 0L,
+&nbsp;    val updatedAt: Long = 0L,
+&nbsp;    val leftAt: Long? = null,
+&nbsp;    val removedAt: Long? = null,
+&nbsp;    val deletedAt: Long? = null,
+&nbsp;    val clientVersionCode: Int = 1,
+&nbsp;    // Id of the owner-issued invite this member row was created from. Firestore rules
+&nbsp;    // require it on self-create so they can verify an invite in this workspace admits
+&nbsp;    // the caller (tenant-isolation gate, issue #152). Stamped by WorkspaceMemberSyncPlugin
+&nbsp;    // at push time from the local invite; null for owner-created rows (owner path in the
+&nbsp;    // rules does not need it) and absent on legacy docs.
+&nbsp;    val inviteId: String? = null,
+&nbsp;)
 &nbsp;
-&nbsp;private fun Set&lt;Int&gt;.toMonthdaysStorageValue(): String =
-&nbsp;    joinToString(&quot;,&quot;) { it.toString() }
+&nbsp;/**
+&nbsp; * Invite doc lives at `workspaces/{wid}/invites/{inviteId}`. Doc id = invite UUID.
+&nbsp; */
+&nbsp;@Serializable
+&nbsp;data class WorkspaceInviteDoc(
+&nbsp;    val email: String = &quot;&quot;,
+&nbsp;    val targetUserId: String? = null,
+&nbsp;    val role: String = &quot;&quot;,
+&nbsp;    val status: String = &quot;PENDING&quot;,
+&nbsp;    val invitedByUserId: String = &quot;&quot;,
+&nbsp;    val createdAt: Long = 0L,
+&nbsp;    val updatedAt: Long = 0L,
+&nbsp;    val expiresAt: Long = 0L,
+&nbsp;    val respondedAt: Long? = null,
+&nbsp;    val deletedAt: Long? = null,
+&nbsp;    val clientVersionCode: Int = 1,
+&nbsp;)
 </code>
 </pre>
 </div>
@@ -280,7 +382,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 16:22</div>
+    <div style="float:right;">generated on 2026-07-22 17:13</div>
 </div>
 </body>
 </html>

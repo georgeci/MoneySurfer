@@ -1,0 +1,231 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>MoneySurfer Coverage Report > UpdateWorkspaceCurrencyError</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.georgeci.moneysurfer.domain.usecase</a>
+</div>
+
+<h1>Coverage Summary for Class: UpdateWorkspaceCurrencyError (com.georgeci.moneysurfer.domain.usecase)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+  <tr>
+    <td class="name">UpdateWorkspaceCurrencyError$WorkspaceNotFound</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">UpdateWorkspaceCurrencyError$WriteFailed</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (1/2)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (1/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    22.2%
+  </span>
+  <span class="absValue">
+    (2/9)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.usecase
+&nbsp;
+&nbsp;import arrow.core.Either
+&nbsp;import arrow.core.raise.either
+&nbsp;import co.touchlab.kermit.Logger
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.AccountRepository
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.WorkspaceRepository
+&nbsp;import kotlinx.coroutines.flow.first
+&nbsp;import org.koin.core.annotation.Single
+&nbsp;
+&nbsp;/**
+&nbsp; * Typed failure for [UpdateWorkspaceCurrencyUseCase].
+&nbsp; */
+&nbsp;sealed interface UpdateWorkspaceCurrencyError {
+&nbsp;    /** No workspace exists for the supplied id — caller should not have reached the picker. */
+<b class="fc">&nbsp;    data object WorkspaceNotFound : UpdateWorkspaceCurrencyError</b>
+&nbsp;
+&nbsp;    /** A Room write failed mid-update. The workspace currency may be partially applied. */
+<b class="nc">&nbsp;    data class WriteFailed(val cause: Throwable) : UpdateWorkspaceCurrencyError</b>
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * Brings the workspace and every account it owns onto [currency], so the Dashboard total —
+&nbsp; * which reads `Account.currencyCode` — reflects the user&#39;s choice. Used by the first-run
+&nbsp; * currency picker; the offline seed creates exactly one &quot;Cash&quot; account, so in practice this
+&nbsp; * updates that single row.
+&nbsp; *
+&nbsp; * Each step is idempotent and reconciles against the *target* currency rather than the
+&nbsp; * workspace&#39;s previous value: a retry after a partial failure (workspace updated but an
+&nbsp; * account write failed) still repairs the lagging accounts instead of short-circuiting on
+&nbsp; * the already-migrated workspace.
+&nbsp; */
+&nbsp;@Single
+&nbsp;class UpdateWorkspaceCurrencyUseCase(
+&nbsp;    private val workspaceRepository: WorkspaceRepository,
+&nbsp;    private val accountRepository: AccountRepository,
+&nbsp;) {
+&nbsp;    private val log = Logger.withTag(TAG)
+&nbsp;
+&nbsp;    suspend operator fun invoke(
+&nbsp;        workspaceId: WorkspaceId,
+&nbsp;        currency: CurrencyCode,
+&nbsp;    ): Either&lt;UpdateWorkspaceCurrencyError, Unit&gt; = either {
+&nbsp;        val workspace = workspaceRepository.getById(workspaceId)
+&nbsp;            ?: raise(UpdateWorkspaceCurrencyError.WorkspaceNotFound)
+&nbsp;        Either
+&nbsp;            .catch {
+&nbsp;                if (workspace.baseCurrency != currency) {
+&nbsp;                    workspaceRepository.update(workspace.copy(baseCurrency = currency))
+&nbsp;                }
+&nbsp;                accountRepository.getByWorkspaceId(workspaceId).first()
+&nbsp;                    .filter { it.currencyCode != currency }
+&nbsp;                    .forEach { accountRepository.update(it.copy(currencyCode = currency)) }
+&nbsp;            }
+&nbsp;            .onLeft { log.e(it) { &quot;[update] failed wid=${workspaceId.value}&quot; } }
+&nbsp;            .mapLeft { UpdateWorkspaceCurrencyError.WriteFailed(it) }
+&nbsp;            .bind()
+&nbsp;        log.i { &quot;[done] wid=${workspaceId.value} currency=${currency.value}&quot; }
+&nbsp;    }
+&nbsp;
+&nbsp;    private companion object {
+&nbsp;        const val TAG = &quot;UpdateWorkspaceCurrency&quot;
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-07-22 17:13</div>
+</div>
+</body>
+</html>
