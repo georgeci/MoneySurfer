@@ -11,7 +11,7 @@ status: in-progress
 - [JVM desktop testing — compose.uiTest spike + rollout roadmap](#jvm-desktop-testing--composeuitest-spike--rollout-roadmap)
 - [Chosen approach](#chosen-approach)
 - [Roadmap](#roadmap)
-- [Spike details (step 1)](#spike-details-step-1)
+- [Spike details (step 1) — done](#spike-details-step-1--done)
 - [Known limitations (accepted)](#known-limitations-accepted)
 - [Out of scope](#out-of-scope)
 <!-- DOCS:END -->
