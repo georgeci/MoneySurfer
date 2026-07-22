@@ -22,14 +22,8 @@
     <string name="category_creation_name_counter">%1$d/%2$d</string>
     <string name="category_creation_icon_label">Иконка</string>
     <string name="category_creation_color_label">Цвет</string>
-    <string name="category_creation_extra_label">Доп. детали</string>
-    <string name="category_creation_extra_optional">Необязательно</string>
-    <string name="category_creation_add_another">Добавить</string>
-    <string name="category_creation_field_cap">Лимит в месяц</string>
-    <string name="category_creation_field_cap_helper">Напомним, когда тратишь 80%.</string>
     <string name="category_creation_field_parent">Родительская категория</string>
-    <string name="category_creation_field_note">Заметка</string>
-    <string name="category_creation_remove">Убрать</string>
+    <string name="category_creation_parent_none">Без родителя</string>
     <string name="category_creation_untitled">Без названия</string>
 
     <!-- Categories management screen -->
@@ -39,6 +33,7 @@
     <string name="categories_manage_remove">Удалить</string>
     <string name="categories_manage_delete_title">Удалить категорию?</string>
     <string name="categories_manage_delete_message">«%1$s» будет удалена. Транзакции с ней останутся.</string>
+    <string name="categories_manage_delete_children">Подкатегорий переедет на верхний уровень: %1$d.</string>
     <string name="categories_manage_delete_confirm">Удалить</string>
     <string name="categories_manage_delete_cancel">Отмена</string>
 

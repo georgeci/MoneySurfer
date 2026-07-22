@@ -22,9 +22,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.georgeci.moneysurfer.domain.model.CategoryTree
 import com.georgeci.moneysurfer.domain.primitives.CategoryId
 import com.georgeci.moneysurfer.domain.primitives.CategoryType
 import com.georgeci.moneysurfer.uikit.atom.SurferCard
+import com.georgeci.moneysurfer.uikit.components.SurferCategoryBubble
+import com.georgeci.moneysurfer.uikit.components.SurferCategoryPalette
 import com.georgeci.moneysurfer.uikit.components.base.SurferSwipeAction
 import com.georgeci.moneysurfer.uikit.components.base.SurferSwipeRevealRow
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
@@ -42,6 +45,9 @@ import moneysurfer.feature.category.generated.resources.category_creation_type_i
 import moneysurfer.feature.category.generated.resources.category_creation_type_transfer
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
+
+/** Extra leading inset per nesting level. One level is all [CategoryTree.MAX_DEPTH] allows. */
+private val ChildIndent = 24.dp
 
 @Composable
 fun CategoriesManageScreen(
@@ -149,9 +155,12 @@ private fun CategoriesManageContent(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(
-                            horizontal = AppTheme.spacing.default,
-                            vertical = AppTheme.spacing.xSmall,
-                        ),
+                            // Children are indented under the parent they follow — the list is
+                            // already in tree order, so the indent is all the nesting needs.
+                            start = AppTheme.spacing.default + ChildIndent * category.depth,
+                            end = AppTheme.spacing.default,
+                        )
+                        .padding(vertical = AppTheme.spacing.xSmall),
                 )
             }
         }
@@ -160,6 +169,7 @@ private fun CategoriesManageContent(
     state.pendingDelete?.let { pending ->
         DeleteCategoryDialog(
             categoryName = pending.name,
+            childCount = pending.childCount,
             onConfirm = { onEvent(CategoriesManageEvent.OnDeleteConfirm) },
             onDismiss = { onEvent(CategoriesManageEvent.OnDeleteCancel) },
         )
@@ -187,8 +197,7 @@ private fun CategoryManageRow(
         },
     ) {
         CategoryManageCard(
-            name = category.name,
-            type = category.type,
+            category = category,
             onClick = onClick,
         )
     }
@@ -196,11 +205,16 @@ private fun CategoryManageRow(
 
 @Composable
 private fun CategoryManageCard(
-    name: String,
-    type: CategoryType,
+    category: CategoryManageUi,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val visual = SurferCategoryPalette.visualFor(
+        id = category.id.value,
+        iconKey = category.iconKey,
+        hue = category.hue,
+        systemKind = category.systemKind,
+    )
     SurferCard(
         modifier = modifier.fillMaxWidth(),
         onClick = onClick,
@@ -212,14 +226,20 @@ private fun CategoryManageCard(
                 vertical = AppTheme.spacing.medium,
             ),
         ) {
+            SurferCategoryBubble(
+                icon = visual.icon,
+                tint = visual.tint,
+                size = 36.dp,
+                modifier = Modifier.padding(end = AppTheme.spacing.medium),
+            )
             Text(
-                text = name,
+                text = category.name,
                 style = AppTheme.typography.titleSmall,
                 color = AppTheme.materialColors.onSurface,
                 modifier = Modifier.weight(1f),
             )
             Text(
-                text = categoryTypeLabel(type),
+                text = categoryTypeLabel(category.type),
                 style = AppTheme.typography.bodySmall,
                 color = AppTheme.materialColors.onSurfaceVariant,
             )
@@ -249,7 +269,13 @@ private fun CategoriesManageContentPreview() {
             state = CategoriesManageState.Content(
                 categories = listOf(
                     CategoryManageUi(CategoryId("1"), "Food", CategoryType.EXPENSE),
-                    CategoryManageUi(CategoryId("2"), "Transport", CategoryType.EXPENSE),
+                    CategoryManageUi(
+                        id = CategoryId("2"),
+                        name = "Groceries",
+                        type = CategoryType.EXPENSE,
+                        parentId = CategoryId("1"),
+                        depth = 1,
+                    ),
                     CategoryManageUi(CategoryId("3"), "Salary", CategoryType.INCOME),
                 ),
             ),

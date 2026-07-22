@@ -168,7 +168,12 @@ service cloud.firestore {
         && typeIntOk(data, 'createdAt')
         && typeIntOk(data, 'updatedAt')
         && typeNullableIntOk(data, 'deletedAt')
-        && typeNullableStrOk(data, 'systemKind');
+        && typeNullableStrOk(data, 'systemKind')
+        // Optional, like every other field here: a client that predates iconKey/hue omits
+        // them and must keep validating, or deploying this rule breaks category sync for
+        // everyone still on the old build.
+        && typeStrOk(data, 'iconKey')
+        && typeIntOk(data, 'hue');
     }
 
     // TransactionDoc — data-remote/.../RemoteDtos.kt

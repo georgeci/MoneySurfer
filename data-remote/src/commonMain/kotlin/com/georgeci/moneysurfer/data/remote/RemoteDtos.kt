@@ -65,6 +65,13 @@ data class CategoryDoc(
     val clientVersionCode: Int = 1,
     /** System kind marker (e.g. "TRANSFER") for built-in categories. Null for user categories. */
     val systemKind: String? = null,
+    /**
+     * Semantic icon key. Empty when written by a client that predates the field; the reader
+     * resolves that back to the deterministic default rather than rendering nothing.
+     */
+    val iconKey: String = "",
+    /** Hue in degrees, 0 until 360. `-1` is the same "not written" sentinel as a blank [iconKey]. */
+    val hue: Int = -1,
 )
 
 @Serializable

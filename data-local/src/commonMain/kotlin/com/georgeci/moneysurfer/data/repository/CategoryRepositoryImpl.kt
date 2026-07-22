@@ -3,6 +3,7 @@ package com.georgeci.moneysurfer.data.repository
 import com.georgeci.moneysurfer.data.db.dao.CategoryDao
 import com.georgeci.moneysurfer.data.db.entity.CategoryEntity
 import com.georgeci.moneysurfer.domain.model.Category
+import com.georgeci.moneysurfer.domain.model.CategoryAppearance
 import com.georgeci.moneysurfer.domain.primitives.CategoryId
 import com.georgeci.moneysurfer.domain.primitives.CategorySystemKind
 import com.georgeci.moneysurfer.domain.primitives.CategoryType
@@ -70,18 +71,28 @@ class CategoryRepositoryImpl(
         )
     }
 
-    private fun CategoryEntity.toDomain() = Category(
-        id = CategoryId(id),
-        workspaceId = WorkspaceId(workspaceId),
-        name = name,
-        type = runCatching { CategoryType.valueOf(type) }.getOrDefault(CategoryType.EXPENSE),
-        parentId = parentId?.let { CategoryId(it) },
-        createdAt = timeFormatter.parseInstant(createdAt),
-        updatedAt = timeFormatter.parseInstant(updatedAt),
-        systemKind = systemKind?.let { value ->
+    private fun CategoryEntity.toDomain(): Category {
+        val kind = systemKind?.let { value ->
             runCatching { CategorySystemKind.valueOf(value) }.getOrNull()
-        },
-    )
+        }
+        return Category(
+            id = CategoryId(id),
+            workspaceId = WorkspaceId(workspaceId),
+            name = name,
+            type = runCatching { CategoryType.valueOf(type) }.getOrDefault(CategoryType.EXPENSE),
+            parentId = parentId?.let { CategoryId(it) },
+            createdAt = timeFormatter.parseInstant(createdAt),
+            updatedAt = timeFormatter.parseInstant(updatedAt),
+            systemKind = kind,
+            // The v26 backfill fills every local row, but a row pulled from a client that
+            // predates the fields still arrives on the sentinels — resolve those here so the
+            // rest of the app never has to know an unset appearance exists.
+            iconKey = iconKey.takeIf(CategoryAppearance::isStoredIconKey)
+                ?: CategoryAppearance.defaultIconKey(id, kind),
+            hue = hue.takeIf(CategoryAppearance::isStoredHue)
+                ?: CategoryAppearance.defaultHue(id, kind),
+        )
+    }
 
     private fun Category.toEntity() = CategoryEntity(
         id = id.value,
@@ -92,5 +103,7 @@ class CategoryRepositoryImpl(
         createdAt = timeFormatter.formatInstant(createdAt),
         updatedAt = timeFormatter.formatInstant(updatedAt),
         systemKind = systemKind?.name,
+        iconKey = iconKey,
+        hue = hue,
     )
 }

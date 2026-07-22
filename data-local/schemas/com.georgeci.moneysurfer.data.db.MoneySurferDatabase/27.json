@@ -1,8 +1,8 @@
 {
   "formatVersion": 1,
   "database": {
-    "version": 26,
-    "identityHash": "58a35046d33c4508129207a033eb10a2",
+    "version": 27,
+    "identityHash": "055053d9b3786bbacb4bd270950d9b71",
     "entities": [
       {
         "tableName": "users",
@@ -536,7 +536,7 @@
       },
       {
         "tableName": "transactions",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `workspaceId` TEXT NOT NULL, `accountId` TEXT NOT NULL, `amount` INTEGER NOT NULL, `currencyCode` TEXT NOT NULL, `categoryId` TEXT, `note` TEXT NOT NULL, `operationAt` INTEGER NOT NULL, `operationDate` TEXT NOT NULL DEFAULT '', `type` TEXT NOT NULL, `status` TEXT NOT NULL DEFAULT 'ACTUAL', `createdAt` INTEGER NOT NULL DEFAULT 0, `updatedAt` INTEGER NOT NULL DEFAULT 0, `transferId` TEXT, PRIMARY KEY(`id`), FOREIGN KEY(`workspaceId`) REFERENCES `workspaces`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`accountId`) REFERENCES `accounts`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`categoryId`) REFERENCES `categories`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `workspaceId` TEXT NOT NULL, `accountId` TEXT NOT NULL, `amount` INTEGER NOT NULL, `currencyCode` TEXT NOT NULL, `categoryId` TEXT, `note` TEXT NOT NULL, `merchant` TEXT NOT NULL DEFAULT '', `tags` TEXT NOT NULL DEFAULT '', `operationAt` INTEGER NOT NULL, `operationDate` TEXT NOT NULL DEFAULT '', `type` TEXT NOT NULL, `status` TEXT NOT NULL DEFAULT 'ACTUAL', `createdAt` INTEGER NOT NULL DEFAULT 0, `updatedAt` INTEGER NOT NULL DEFAULT 0, `transferId` TEXT, `recurringRuleId` TEXT, PRIMARY KEY(`id`), FOREIGN KEY(`workspaceId`) REFERENCES `workspaces`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`accountId`) REFERENCES `accounts`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`categoryId`) REFERENCES `categories`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
         "fields": [
           {
             "fieldPath": "id",
@@ -578,6 +578,20 @@
             "columnName": "note",
             "affinity": "TEXT",
             "notNull": true
+          },
+          {
+            "fieldPath": "merchant",
+            "columnName": "merchant",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
+          },
+          {
+            "fieldPath": "tags",
+            "columnName": "tags",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
           },
           {
             "fieldPath": "operationAt",
@@ -622,6 +636,11 @@
           {
             "fieldPath": "transferId",
             "columnName": "transferId",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "recurringRuleId",
+            "columnName": "recurringRuleId",
             "affinity": "TEXT"
           }
         ],
@@ -714,11 +733,17 @@
       },
       {
         "tableName": "transactions_fts",
-        "createSql": "CREATE VIRTUAL TABLE IF NOT EXISTS `${TABLE_NAME}` USING FTS4(`note` TEXT NOT NULL, tokenize=unicode61 `remove_diacritics=1`, content=`transactions`)",
+        "createSql": "CREATE VIRTUAL TABLE IF NOT EXISTS `${TABLE_NAME}` USING FTS4(`note` TEXT NOT NULL, `merchant` TEXT NOT NULL, tokenize=unicode61 `remove_diacritics=1`, content=`transactions`)",
         "fields": [
           {
             "fieldPath": "note",
             "columnName": "note",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "merchant",
+            "columnName": "merchant",
             "affinity": "TEXT",
             "notNull": true
           }
@@ -743,8 +768,8 @@
         "contentSyncTriggers": [
           "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_transactions_fts_BEFORE_UPDATE BEFORE UPDATE ON `transactions` BEGIN DELETE FROM `transactions_fts` WHERE `docid`=OLD.`rowid`; END",
           "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_transactions_fts_BEFORE_DELETE BEFORE DELETE ON `transactions` BEGIN DELETE FROM `transactions_fts` WHERE `docid`=OLD.`rowid`; END",
-          "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_transactions_fts_AFTER_UPDATE AFTER UPDATE ON `transactions` BEGIN INSERT INTO `transactions_fts`(`docid`, `note`) VALUES (NEW.`rowid`, NEW.`note`); END",
-          "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_transactions_fts_AFTER_INSERT AFTER INSERT ON `transactions` BEGIN INSERT INTO `transactions_fts`(`docid`, `note`) VALUES (NEW.`rowid`, NEW.`note`); END"
+          "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_transactions_fts_AFTER_UPDATE AFTER UPDATE ON `transactions` BEGIN INSERT INTO `transactions_fts`(`docid`, `note`, `merchant`) VALUES (NEW.`rowid`, NEW.`note`, NEW.`merchant`); END",
+          "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_transactions_fts_AFTER_INSERT AFTER INSERT ON `transactions` BEGIN INSERT INTO `transactions_fts`(`docid`, `note`, `merchant`) VALUES (NEW.`rowid`, NEW.`note`, NEW.`merchant`); END"
         ]
       },
       {
@@ -1234,7 +1259,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '58a35046d33c4508129207a033eb10a2')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '055053d9b3786bbacb4bd270950d9b71')"
     ]
   }
 }

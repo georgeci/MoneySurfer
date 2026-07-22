@@ -2,6 +2,7 @@ package com.georgeci.moneysurfer.feature.transaction.details
 
 import arrow.optics.optics
 import com.georgeci.moneysurfer.domain.formatter.MoneyFormatter
+import com.georgeci.moneysurfer.domain.model.CategoryAppearance
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.domain.primitives.TransactionStatus
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
@@ -70,6 +71,9 @@ class TransactionDetailsViewModel(
                     accountName = account?.name.orEmpty(),
                     categoryName = category?.name.orEmpty(),
                     categorySystemKind = category?.systemKind?.name,
+                    categoryId = category?.id?.value.orEmpty(),
+                    categoryIconKey = category?.iconKey.orEmpty(),
+                    categoryHue = category?.hue ?: CategoryAppearance.UNSET_HUE,
                     currency = transaction.currencyCode.value,
                     formattedDate = formatDate(transaction.operationDate),
                     isPlanned = transaction.status == TransactionStatus.PLANNED,
@@ -118,6 +122,10 @@ sealed interface TransactionDetailsState {
         val accountName: String,
         val categoryName: String,
         val categorySystemKind: String? = null,
+        /** Stored appearance of the transaction's category, fed to the shared bubble resolver. */
+        val categoryId: String = "",
+        val categoryIconKey: String = "",
+        val categoryHue: Int = CategoryAppearance.UNSET_HUE,
         val currency: String,
         val formattedDate: String,
         val isPlanned: Boolean,
