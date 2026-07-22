@@ -113,6 +113,25 @@ iOS defaults to simulator name `iPhone 17`. Override with
 `-PiosSimulatorName="<name>"`; pass `-PiosSimulatorUdid=<udid>` when multiple
 simulators are visible to Maestro.
 
+## Desktop UI tests (`:composeApp:jvmTest`)
+
+Compose screen-state tests that render the real composables in-process via
+`runComposeUiTest` (CMP 1.11 v2 API) inside kotest `StringSpec` blocks. They are
+**headless** — no window, no display, no `xvfb` — so they run anywhere, including
+display-less CI runners.
+
+```bash
+./gradlew :composeApp:jvmTest
+```
+
+Result XMLs land at `composeApp/build/test-results/jvmTest/*.xml`. No separate QA
+entry point: `qaCommon` already includes this module, so Kover and Allure pick
+them up automatically.
+
+Conventions for writing them (mount the stateless content composable, address
+nodes by `*TestTags`, mind the `StandardTestDispatcher` default) are in
+[docs/testing/testing-strategy.md](docs/testing/testing-strategy.md#desktop-ui-tests-compose-jvmtest).
+
 ## Integration tests (`:integration-test`)
 
 Module that exercises the full **domain → sync → data → Firebase** stack against

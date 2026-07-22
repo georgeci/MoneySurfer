@@ -7,6 +7,7 @@
 - [Common Commands](#common-commands)
 - [QA Entry Points](#qa-entry-points)
   - [Offline golden-path E2E](#offline-golden-path-e2e)
+- [Desktop UI tests (Compose, jvmTest)](#desktop-ui-tests-compose-jvmtest)
 - [Test tags (Compose ↔ Maestro)](#test-tags-compose--maestro)
 - [Rules](#rules)
 <!-- DOCS:END -->
@@ -23,6 +24,7 @@ READ WHEN:
 - choosing validation
 - changing sync or persistence
 - touching Android UI flows
+- adding Compose desktop UI tests
 
 <!-- AI:SECTION id=testing-strategy task=testing,qa,validation -->
 ## Common Commands
@@ -63,11 +65,45 @@ offline`.
 ./gradlew qaMaestroOfflineIos
 ```
 
+## Desktop UI tests (Compose, `jvmTest`)
+
+Screen-state UI tests run in-process on the JVM through
+`androidx.compose.ui.test.v2.runComposeUiTest`, inside ordinary kotest
+`StringSpec` blocks — no JUnit rule, no `kotlin.test` carve-out. They render
+**headless** (offscreen Skiko), so they need no display and no `xvfb`, and they
+ride along in `qaCommon` (→ `testCommon` → `:composeApp:jvmTest`) with zero
+extra CI wiring. Kover and Allure pick them up automatically.
+
+```bash
+./gradlew :composeApp:jvmTest
+```
+
+Rules for writing them:
+
+- Mount the screen's **stateless content composable** with an injected state —
+  not the `*Screen()` entry point, which resolves its ViewModel via
+  `koinViewModel()`. Publish that composable if it is still `private`
+  (`SignInContent` is the reference).
+- Address nodes through the screen's `*TestTags` object (see below) — the same
+  constants Maestro uses. Never match on localized text.
+- CMP 1.11 defaults to `StandardTestDispatcher`: coroutines launched in
+  composition do **not** run eagerly. Use `waitForIdle()` / `waitUntil {}`
+  after anything that emits asynchronously.
+- `jvmTest` forces `java.awt.headless=true`, so a test that accidentally needs
+  a display fails locally instead of only on CI.
+
+Reference implementation:
+`composeApp/src/jvmTest/.../ui/SignInScreenStateTest.kt`. Rollout status and
+the follow-up steps (gray-box journeys, Roborazzi screenshots, packaging
+smoke) live in
+[docs/plans/jvm-desktop-testing-rollout.md](../plans/jvm-desktop-testing-rollout.md).
+
 ## Test tags (Compose ↔ Maestro)
 
-Anchor Maestro selectors to stable identifiers, not localized text. Compose
-`Modifier.testTag(...)` is the source of truth — Maestro reaches it through
-the Android resource-id bridge.
+Anchor Maestro selectors and desktop UI tests to stable identifiers, not
+localized text. Compose `Modifier.testTag(...)` is the source of truth —
+Maestro reaches it through the Android resource-id bridge, and
+`runComposeUiTest` reads it straight off the semantics tree.
 
 **Author screens like this:**
 

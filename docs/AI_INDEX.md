@@ -323,7 +323,7 @@
 ## testing-strategy
 - Title: Common Commands
 - File: docs/testing/testing-strategy.md
-- Lines: 27-112
+- Lines: 29-148
 - Tasks: testing, qa, validation
 
 ## time-policy
