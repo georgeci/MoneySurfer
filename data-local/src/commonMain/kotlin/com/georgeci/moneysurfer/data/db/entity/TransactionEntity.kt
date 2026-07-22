@@ -25,7 +25,21 @@ import androidx.room.PrimaryKey
             childColumns = ["categoryId"],
         ),
     ],
-    indices = [Index("workspaceId"), Index("accountId"), Index("categoryId")],
+    // Composite indices mirror the ORDER BY of every list query in TransactionDao, so
+    // SQLite walks the index instead of building a temp B-tree per Flow emission. Both
+    // start with the FK column, which also satisfies Room's FK-index requirement — no
+    // separate single-column index on workspaceId / accountId is needed.
+    indices = [
+        Index(
+            value = ["workspaceId", "operationDate", "operationAt", "createdAt"],
+            orders = [Index.Order.ASC, Index.Order.DESC, Index.Order.DESC, Index.Order.DESC],
+        ),
+        Index(
+            value = ["accountId", "operationDate", "operationAt", "createdAt"],
+            orders = [Index.Order.ASC, Index.Order.DESC, Index.Order.DESC, Index.Order.DESC],
+        ),
+        Index("categoryId"),
+    ],
 )
 data class TransactionEntity(
     @PrimaryKey

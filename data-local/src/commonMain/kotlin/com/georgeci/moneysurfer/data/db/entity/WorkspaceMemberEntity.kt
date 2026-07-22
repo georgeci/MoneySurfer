@@ -22,7 +22,10 @@ import androidx.room.Index
             childColumns = ["userId"],
         ),
     ],
-    indices = [Index("userId"), Index("workspaceId"), Index("status")],
+    // No index on userId — the composite primary key (userId, workspaceId) already
+    // indexes it as its leftmost column. No index on status either: two values, and
+    // no query filters on it.
+    indices = [Index("workspaceId")],
 )
 data class WorkspaceMemberEntity(
     @ColumnInfo(name = "userId") val userId: String,

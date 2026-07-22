@@ -14,7 +14,9 @@ import com.georgeci.moneysurfer.sync.db.entity.SyncMetaEntity
         SyncMetaEntity::class,
         PendingMutationEntity::class,
     ],
-    version = 1,
+    // v2: pending_mutations dropped the separate status / createdAt indices for one
+    // composite. Destructive fallback is fine here — the outbox is transient.
+    version = 2,
 )
 @ConstructedBy(SyncDatabaseConstructor::class)
 abstract class SyncDatabase : RoomDatabase() {
