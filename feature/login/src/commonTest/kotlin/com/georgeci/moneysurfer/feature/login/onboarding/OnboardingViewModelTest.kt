@@ -11,6 +11,7 @@ import com.georgeci.moneysurfer.domain.preferences.UiPreferences
 import com.georgeci.moneysurfer.domain.primitives.AccountType
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
@@ -163,6 +164,25 @@ class OnboardingViewModelTest : StringSpec({
         }
     }
 
+    "a double tap on the CTA only finishes the onboarding once" {
+        runTest {
+            val seeder = GatedSeeder()
+            val viewModel = OnboardingViewModel(
+                FakeUiPreferences(),
+                seeder,
+                OfflineBuildFlags(isOffline = true),
+            )
+
+            viewModel.onEvent(OnboardingEvent.OnContinueClick)
+            // Suspends inside the seed, so the screen is in flight when the second tap lands.
+            viewModel.onEvent(OnboardingEvent.OnContinueClick)
+            viewModel.onEvent(OnboardingEvent.OnContinueClick)
+            seeder.release()
+
+            seeder.calls shouldBe 1
+        }
+    }
+
     "cash is the recommended starting point" {
         OnboardingAccountKind.entries.filter { it.recommended } shouldBe listOf(OnboardingAccountKind.Cash)
     }
@@ -174,6 +194,21 @@ private class RecordingSeeder : FirstRunSeeder {
 
     override suspend fun seedIfNeeded() {
         calls++
+    }
+}
+
+/** Seeds only when [release] is called, so a test can hold the flow in its in-flight state. */
+private class GatedSeeder : FirstRunSeeder {
+    private val gate = CompletableDeferred<Unit>()
+
+    var calls = 0
+        private set
+
+    fun release() = gate.complete(Unit)
+
+    override suspend fun seedIfNeeded() {
+        calls++
+        gate.await()
     }
 }
 

@@ -74,8 +74,9 @@ class AccountCreationViewModel(
         when (event) {
             is AccountCreationEvent.OnNameChanged ->
                 updateState {
-                    val content = this as? AccountCreationState.Content ?: return@updateState this
-                    content.copy(name = event.name, nameTouched = true)
+                    AccountCreationState.content.modify(this) {
+                        it.copy(name = event.name, nameTouched = true)
+                    }
                 }
             is AccountCreationEvent.OnBalanceChanged ->
                 updateState {
