@@ -8,6 +8,7 @@ import com.georgeci.moneysurfer.domain.AppInfo
 import com.georgeci.moneysurfer.domain.logging.redactEmail
 import com.georgeci.moneysurfer.domain.logging.redactUid
 import com.georgeci.moneysurfer.domain.sync.SyncEntityTypes
+import com.georgeci.moneysurfer.sync.api.SyncCollection
 import com.georgeci.moneysurfer.sync.plugin.EntityApplyResult
 import com.georgeci.moneysurfer.sync.plugin.RemoteDocument
 import com.georgeci.moneysurfer.sync.plugin.SyncEntityPlugin
@@ -28,7 +29,7 @@ class WorkspaceInviteSyncPlugin(
 ) : SyncEntityPlugin {
 
     override val entityType: String = SyncEntityTypes.WORKSPACE_INVITE
-    override val firestoreCollectionName: String = "invites"
+    override val firestoreCollectionName: String = SyncCollection.WORKSPACE_INVITES
     override val pullPriority: Int = SyncPullPriorities.INVITES
 
     private val log = Logger.withTag("WorkspaceInvitePlugin")
@@ -76,5 +77,5 @@ class WorkspaceInviteSyncPlugin(
     }
 
     private fun workspaceCollection(workspaceId: String) =
-        firestore.collection("workspaces").document(workspaceId).collection("invites")
+        firestore.collection("workspaces").document(workspaceId).collection(SyncCollection.WORKSPACE_INVITES)
 }
