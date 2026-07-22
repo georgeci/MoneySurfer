@@ -1,397 +1,181 @@
-# 2. Budgets / Бюджеты — Implementation Plan
+# Budgets — Implementation Plan
 
-## Сценарии (user-facing)
+Rewritten 2026-07-21 against the actual codebase. The previous revision (May 2026) was
+written for a module layout and sync design that no longer exist; every path and every
+sync-related step in it was wrong. See "What changed since the May revision" at the end.
 
-- Create budget on single category
-- Create budget across multiple categories
-- Create general budget (no category filter — all expenses)
-- View budget progress (spent / limit / %)
-- View remaining amount
-- Get warning at `alertPercent` threshold (default 80%)
-- Drill into transactions inside budget window
-- Edit limit
-- Toggle rollover (carry leftover to next period)
-- Disable / archive budget
+Design source: `Budgets.html` in the Claude Design project — inventory mirrored in
+[design/README.md](design/README.md).
 
-## Экраны
+## Scenarios (user-facing)
 
-- `BudgetsScreen` — list, per-row progress
-- `BudgetDetailsScreen` — header with progress ring + transaction list
+- Create a budget on one category, several categories, or all expenses (general budget)
+- See progress: spent / limit / %, remaining, days left
+- See daily average and end-of-period forecast
+- Get a warning at `alertPercent` (default 80%) and an over-budget state
+- Drill into the transactions inside the budget window
+- Edit limit, period, categories, alert threshold
+- Toggle rollover (carry leftover into the next period)
+- Archive a budget (hidden from the main list, kept in the DB)
+
+## Screens
+
+- `BudgetsScreen` — list of budget cards
+- `BudgetDetailsScreen` — progress ring, stat tiles, alert banner, transaction list
 - `EditBudgetScreen` — create / edit form
 
 ## Decisions (locked)
 
 | # | Question | Decision |
 |---|---|---|
-| 1 | Workspace scope | **Per-workspace**, like categories/transactions. Budget belongs to one workspace, dual-written + synced. |
-| 2 | Currency | **Workspace base currency only** for v1. Mixed-currency tx converted with `Workspace.baseCurrency` rate at calc time — out of scope; v1 simply sums tx whose `currencyCode == workspace.baseCurrency`, skips rest with a "mixed currency" badge. |
-| 3 | Category filter shape | **`categoryIds: List<CategoryId>`** in domain (not `List<String>`). Empty list = "all expense categories" (general budget). Income categories never counted. |
-| 4 | "Spent" definition | Sum of `Transaction.money` where `type == REGULAR`, `category ∈ budget.categoryIds` (or any expense if empty), `timestamp ∈ [periodStart, periodEnd)`, in workspace base currency. Transfers excluded. |
-| 5 | Period boundaries | Computed client-side from `startDate + period`. WEEKLY = startDate.dayOfWeek as anchor. MONTHLY = `startDate.dayOfMonth` as anchor (clamped on short months). YEARLY = (month, day) anchor. Period rolls forward automatically — no stored `endDate`. |
-| 6 | Rollover semantics | Leftover (limit − spent, if positive) added to next period's effective limit. Stored as derived state, NOT a separate ledger entity. Computed from history of tx in prior periods at read time. |
-| 7 | Soft-delete vs archive | **`isActive: Boolean`** stays — archived budgets hidden from main list, kept in db (no physical delete). Mirrors Firestore `delete: false` rule (rules already in place at `firestore.rules:126`). |
-| 8 | Alert mechanism | Pure UI signal in v1. No push, no scheduled work. ViewModel emits `Effect.AlertCrossed(budgetId)` once per session when computed `progress >= alertPercent`. |
-| 9 | `createdAt` / `updatedAt` | Stored as `Long` epoch-ms (codebase convention — see [WorkspaceMember](domain/src/commonMain/kotlin/com/georgeci/moneysurfer/domain/model/WorkspaceMember.kt), [Category](domain/src/commonMain/kotlin/com/georgeci/moneysurfer/domain/model/Category.kt)). User draft used `Instant` — rejected for consistency. |
-| 10 | Rollover persistence | New field `rollover: Boolean` (default `false`), additive Room migration. |
+| 1 | Workspace scope | Per-workspace, like categories/transactions. Dual-written + synced. |
+| 2 | Currency | Workspace base currency only for v1. Transactions in other currencies are skipped and surfaced with a "mixed currency" badge. No conversion. |
+| 3 | Category filter | `categoryIds: List<CategoryId>`, stored as CSV. Empty = all expense categories. Income categories never counted. |
+| 4 | "Spent" definition | Sum of `Transaction.money` where `type == EXPENSE`, `transferId == null`, `status == ACTUAL`, `currencyCode == workspace.baseCurrency`, `categoryId ∈ budget.categoryIds` (or any expense category when the list is empty), and `operationDate ∈ [windowStart, windowEnd)`. |
+| 5 | Period boundaries | Computed client-side from `startDate + period`; no stored `endDate`. WEEKLY anchors on `startDate.dayOfWeek`, MONTHLY on `startDate.dayOfMonth` (clamped on short months), YEARLY on (month, day). |
+| 6 | Rollover | Leftover (`limit − spent`, when positive) is added to the next period's effective limit. Derived at read time from the previous window, not a stored ledger entity. |
+| 7 | Archive vs delete | `isActive: Boolean` for archive. `delete()` stays as a real delete for the account-purge path — `firestore.rules` allows delete only for the workspace owner. |
+| 8 | Alerts | Pure UI signal in v1. No push, no scheduled work. |
+| 9 | Timestamps | Domain keeps `Instant`, entity keeps `Long` epoch-ms — exactly what `Category` does today. **The May revision's decision to switch the domain to `Long` was wrong** and is dropped. |
+| 10 | Forecast in v1 | **In scope.** The mockup's stat tiles (daily average, projected end-of-period total, per-day remaining) ship in v1. |
+| 11 | Sync timing | **Sync lands in the same batch as the feature**, not as a follow-up. |
 
-Implication: scope = workspace-scoped CRUD with dual-write + sync, base-currency arithmetic, in-app progress + threshold UI. Multi-currency conversion, push notifications, predictive forecasts deferred.
+## Status quo
 
----
-
-## Status quo (audit)
-
-Domain model + Room layer exist as scaffolding; everything else missing.
-
-| Layer | State | Files |
+| Layer | State | File |
 |---|---|---|
-| Domain model | ⚠️ partial — missing `workspaceId`, `createdAt`, `updatedAt`, `rollover` | [domain/.../model/Budget.kt](domain/src/commonMain/kotlin/com/georgeci/moneysurfer/domain/model/Budget.kt) |
-| Domain ID | ✅ `BudgetId` value class with `Companion.uuid()` | [domain/.../primitives/BudgetId.kt](domain/src/commonMain/kotlin/com/georgeci/moneysurfer/domain/primitives/BudgetId.kt) |
-| Domain repo iface | ⚠️ no `getByWorkspaceId`, no soft-delete (`setActive`) | [domain/.../repositories/BudgetRepository.kt](domain/src/commonMain/kotlin/com/georgeci/moneysurfer/domain/repositories/BudgetRepository.kt) |
-| Domain errors | ❌ | — |
-| Use cases | ❌ all of CRUD + GetBudgetProgress + GetBudgetTransactions | [domain/.../usecase/](domain/src/commonMain/kotlin/com/georgeci/moneysurfer/domain/usecase/) |
-| Period helpers | ❌ no `BudgetPeriodWindow` util | — |
-| Room entity | ⚠️ no `workspaceId`, no FK, no `updatedAt`, no `rollover`, no indices | [data/.../entity/BudgetEntity.kt](data/src/commonMain/kotlin/com/georgeci/moneysurfer/data/db/entity/BudgetEntity.kt) |
-| Room DAO | ⚠️ no `getByWorkspaceId`, no `upsertAll` | [data/.../dao/BudgetDao.kt](data/src/commonMain/kotlin/com/georgeci/moneysurfer/data/db/dao/BudgetDao.kt) |
-| DB version | 14 → bump to 15 (additive migration) | [data/.../db/MoneySurferDatabase.kt](data/src/commonMain/kotlin/com/georgeci/moneysurfer/data/db/MoneySurferDatabase.kt) |
-| Repo impl | ⚠️ NO outbox dual-write — pure DAO calls | [data/.../repository/BudgetRepositoryImpl.kt](data/src/commonMain/kotlin/com/georgeci/moneysurfer/data/repository/BudgetRepositoryImpl.kt) |
-| Sync DTO | ❌ `BudgetDoc` | [data/.../sync/SyncDtos.kt](data/src/commonMain/kotlin/com/georgeci/moneysurfer/data/sync/SyncDtos.kt) |
-| Sync mappers | ❌ `toDoc` / `toEntity` | [data/.../sync/SyncDtoMappers.kt](data/src/commonMain/kotlin/com/georgeci/moneysurfer/data/sync/SyncDtoMappers.kt) |
-| `SyncEntityType` | ❌ `BUDGET` enum value (explicitly excluded — see comment lines 4-8) | [sync/.../api/SyncEntityType.kt](sync/src/commonMain/kotlin/com/georgeci/moneysurfer/sync/api/SyncEntityType.kt) |
-| Sync steps | ❌ `PUSH_BUDGETS`, `PULL_BUDGETS`, `CLEAR_BUDGETS` | [domain/.../model/SyncProgress.kt](domain/src/commonMain/kotlin/com/georgeci/moneysurfer/domain/model/SyncProgress.kt) |
-| Sync push/pull | ❌ in `WorkspaceSyncRepositoryImpl` | [data/.../repository/WorkspaceSyncRepositoryImpl.kt](data/src/commonMain/kotlin/com/georgeci/moneysurfer/data/repository/WorkspaceSyncRepositoryImpl.kt) |
-| Outbox upload | ❌ `WORKSPACE_INVITE`-style branch | [data/.../sync/UploadPendingChangesUseCaseImpl.kt](data/src/commonMain/kotlin/com/georgeci/moneysurfer/data/sync/UploadPendingChangesUseCaseImpl.kt) |
-| Pull integration | ❌ in `PullRemoteChangesUseCaseImpl` | [data/.../sync/PullRemoteChangesUseCaseImpl.kt](data/src/commonMain/kotlin/com/georgeci/moneysurfer/data/sync/PullRemoteChangesUseCaseImpl.kt) |
-| Firestore rules | ✅ `/budgets/{bid}` already wired (lines 126-130) | [firestore.rules](firestore.rules) |
-| Firestore indexes | ❌ | [firestore.indexes.json](firestore.indexes.json) |
-| Shared (feature) layer | ❌ no screens, VMs, navigation | [shared/.../](shared/src/commonMain/kotlin/com/georgeci/moneysurfer/shared/) |
-| UIKit components | ❌ no `SurferBudgetRow`, `SurferProgressBar`, `SurferBudgetCard` | [uikit/.../components/](uikit/src/commonMain/kotlin/com/georgeci/moneysurfer/uikit/components/) |
-| Dual-write spec | ❌ | — |
+| Domain model | partial — no `workspaceId`, no `rollover` | [Budget.kt](../domain/src/commonMain/kotlin/com/georgeci/moneysurfer/domain/model/Budget.kt) |
+| Domain ID | done | [BudgetId.kt](../domain/src/commonMain/kotlin/com/georgeci/moneysurfer/domain/primitives/BudgetId.kt) |
+| Domain repo | partial — no `getByWorkspaceId`, no `setActive` | [BudgetRepository.kt](../domain/src/commonMain/kotlin/com/georgeci/moneysurfer/domain/repositories/BudgetRepository.kt) |
+| Use cases | missing — all of them | — |
+| Period helpers | missing | — |
+| Room entity | partial — no `workspaceId`, no FK, no index, no `rollover` | [BudgetEntity.kt](../data-local/src/commonMain/kotlin/com/georgeci/moneysurfer/data/db/entity/BudgetEntity.kt) |
+| Room DAO | partial — no `getByWorkspaceId`, no `upsertAll` | [BudgetDao.kt](../data-local/src/commonMain/kotlin/com/georgeci/moneysurfer/data/db/dao/BudgetDao.kt) |
+| Repo impl | no outbox dual-write — plain DAO calls | [BudgetRepositoryImpl.kt](../data-local/src/commonMain/kotlin/com/georgeci/moneysurfer/data/repository/BudgetRepositoryImpl.kt) |
+| `SyncCollection.BUDGETS` | **already exists** | [SyncCollection.kt](../sync/api/src/commonMain/kotlin/com/georgeci/moneysurfer/sync/api/SyncCollection.kt) |
+| `SyncEntityTypes.BUDGET` | missing | [SyncEntityTypes.kt](../domain/src/commonMain/kotlin/com/georgeci/moneysurfer/domain/sync/SyncEntityTypes.kt) |
+| `BudgetDoc` wire DTO | missing | [RemoteDtos.kt](../data-remote/src/commonMain/kotlin/com/georgeci/moneysurfer/data/remote/RemoteDtos.kt) |
+| DTO mappers | missing | [SyncDtoMappers.kt](../sync-surfer/src/commonMain/kotlin/com/georgeci/moneysurfer/data/sync/SyncDtoMappers.kt) |
+| `BudgetSyncPlugin` | missing | `sync-surfer/.../data/sync/plugin/` |
+| Firestore rules | collection wired, but **no shape guard** | [firestore.rules](../firestore.rules) around line 397 |
+| Feature module | missing entirely — no `feature/budget` | — |
+| Navigation routes | missing | `navigation/` |
+| UIKit components | `SurferBudgetsWidget` exists but is unused and does not match the design — **delete it** | [SurferBudgetsWidget.kt](../uikit/src/commonMain/kotlin/com/georgeci/moneysurfer/uikit/widgets/SurferBudgetsWidget.kt) |
 
 ---
 
-## Phase 0 — Domain model upgrade
+## Phase 0 — Domain + Room
 
-Goal: align `Budget` with workspace-scoped + dual-write conventions before touching sync.
+`Budget` gains `workspaceId: WorkspaceId` and `rollover: Boolean = false`; timestamps stay
+`Instant`. New `domain/util/BudgetPeriodWindow.kt`:
 
-### domain
-- [domain/src/commonMain/kotlin/com/georgeci/moneysurfer/domain/model/Budget.kt](domain/src/commonMain/kotlin/com/georgeci/moneysurfer/domain/model/Budget.kt) — add fields:
-  ```kotlin
-  data class Budget(
-      val id: BudgetId = BudgetId.uuid(),
-      val workspaceId: WorkspaceId,
-      val name: String,
-      val categoryIds: List<CategoryId>,   // empty = all expense categories
-      val amount: Money,                   // limit per period, in workspace base currency
-      val period: BudgetPeriod = BudgetPeriod.MONTHLY,
-      val startDate: LocalDate,
-      val rollover: Boolean = false,
-      val alertPercent: Int = 80,
-      val isActive: Boolean = true,
-      val createdAt: Long,
-      val updatedAt: Long,
-  )
-  ```
-- New file `domain/util/BudgetPeriodWindow.kt`:
-  ```kotlin
-  data class BudgetPeriodWindow(val startInclusive: LocalDate, val endExclusive: LocalDate)
-  fun Budget.currentWindow(today: LocalDate): BudgetPeriodWindow
-  fun Budget.windowContaining(date: LocalDate): BudgetPeriodWindow
-  fun Budget.previousWindow(window: BudgetPeriodWindow): BudgetPeriodWindow
-  ```
-  Anchor day = `startDate.dayOfMonth` for MONTHLY, clamp to `min(anchor, lastDayOfMonth)`. WEEKLY uses `startDate.dayOfWeek`. Pure functions, no `Clock` dep.
-
-### data
-- [data/src/commonMain/kotlin/com/georgeci/moneysurfer/data/db/entity/BudgetEntity.kt](data/src/commonMain/kotlin/com/georgeci/moneysurfer/data/db/entity/BudgetEntity.kt) — extend:
-  ```kotlin
-  @Entity(
-      tableName = "budgets",
-      foreignKeys = [ForeignKey(WorkspaceEntity, parentColumns=["id"], childColumns=["workspaceId"])],
-      indices = [Index("workspaceId")],
-  )
-  data class BudgetEntity(
-      @PrimaryKey @ColumnInfo("id") val id: String,
-      @ColumnInfo("workspaceId") val workspaceId: String,
-      @ColumnInfo("name") val name: String,
-      @ColumnInfo("categoryIds") val categoryIds: String,   // CSV
-      @ColumnInfo("amount") val amount: Long,
-      @ColumnInfo("period") val period: String,
-      @ColumnInfo("startDate") val startDate: String,        // ISO LocalDate
-      @ColumnInfo("rollover", defaultValue = "0") val rollover: Boolean = false,
-      @ColumnInfo("alertPercent") val alertPercent: Int,
-      @ColumnInfo("isActive") val isActive: Boolean,
-      @ColumnInfo("createdAt", defaultValue = "0") val createdAt: Long = 0L,
-      @ColumnInfo("updatedAt", defaultValue = "0") val updatedAt: Long = 0L,
-  )
-  ```
-- [data/.../db/dao/BudgetDao.kt](data/src/commonMain/kotlin/com/georgeci/moneysurfer/data/db/dao/BudgetDao.kt) — add:
-  - `fun getByWorkspaceId(wid: String): Flow<List<BudgetEntity>>`
-  - `@Upsert suspend fun upsertAll(entities: List<BudgetEntity>)`
-- [data/.../db/MoneySurferDatabase.kt](data/src/commonMain/kotlin/com/georgeci/moneysurfer/data/db/MoneySurferDatabase.kt) — bump `version = 15`, add additive `Migration(14, 15)` (add `workspaceId` NOT NULL with default '' for existing rows — orphan rows stay queryable but won't match any workspace; document as intended for the dev-only state).
-
-### tests
-- New `domain/src/commonTest/.../util/BudgetPeriodWindowTest.kt`:
-  - month-anchor clamp on Feb of leap vs non-leap years
-  - YEARLY anchor on Feb 29
-  - week boundary across DST (period anchored to dayOfWeek, not absolute hours)
-  - `previousWindow` returns previous month/week/year correctly
-
----
-
-## Phase 1 — Sync wiring
-
-Goal: get `BUDGET` into the sync pipeline mirroring `CATEGORY`.
-
-### sync api
-- [sync/.../api/SyncEntityType.kt](sync/src/commonMain/kotlin/com/georgeci/moneysurfer/sync/api/SyncEntityType.kt) — add `BUDGET` (delete the explicit-omission comment for budgets, leave it for `RECURRING_RULE`):
-  ```kotlin
-  enum class SyncEntityType {
-      USER, WORKSPACE, WORKSPACE_MEMBER, WORKSPACE_INVITE,
-      WORKSPACE_REF, ACCOUNT, CATEGORY, TRANSACTION, BUDGET,
-  }
-  ```
-  Find every `when (type)` over the enum (push dispatch in [UploadPendingChangesUseCaseImpl](data/src/commonMain/kotlin/com/georgeci/moneysurfer/data/sync/UploadPendingChangesUseCaseImpl.kt), pull dispatch in [PullRemoteChangesUseCaseImpl](data/src/commonMain/kotlin/com/georgeci/moneysurfer/data/sync/PullRemoteChangesUseCaseImpl.kt), any per-type rate limiter / metrics) — exhaustive `when` will fail compile, fix each.
-
-### sync DTO
-- [data/.../sync/SyncDtos.kt](data/src/commonMain/kotlin/com/georgeci/moneysurfer/data/sync/SyncDtos.kt) — append:
-  ```kotlin
-  @Serializable
-  internal data class BudgetDoc(
-      val name: String = "",
-      val categoryIds: List<String> = emptyList(),    // proper array, not CSV
-      val amount: Long = 0L,                          // minor units
-      val period: String = "MONTHLY",
-      val startDate: String = "",                     // ISO LocalDate
-      val rollover: Boolean = false,
-      val alertPercent: Int = 80,
-      val isActive: Boolean = true,
-      val createdAt: Long = 0L,
-      val updatedAt: Long = 0L,
-      val deletedAt: Long? = null,
-      val clientVersionCode: Int = 1,
-  )
-  ```
-  Note: `categoryIds` is a Firestore array — do NOT carry the Room CSV form across the wire.
-
-### sync mappers
-- [data/.../sync/SyncDtoMappers.kt](data/src/commonMain/kotlin/com/georgeci/moneysurfer/data/sync/SyncDtoMappers.kt) — append `BudgetEntity.toDoc()` and `BudgetDoc.toEntity(id, workspaceId)` (CSV ↔ List<String> conversion happens inside the mappers).
-
-### sync steps
-- [domain/.../model/SyncProgress.kt](domain/src/commonMain/kotlin/com/georgeci/moneysurfer/domain/model/SyncProgress.kt) — extend `SyncStep` enum with `PUSH_BUDGETS`, `PULL_BUDGETS`, `CLEAR_BUDGETS`. Order:
-  ```
-  PUSH_TRANSACTIONS, PUSH_BUDGETS,
-  ...
-  PULL_TRANSACTIONS, PULL_BUDGETS,
-  ...
-  CLEAR_TRANSACTIONS, CLEAR_BUDGETS, CLEAR_INVITES, CLEAR_MEMBERS, CLEAR_WORKSPACE
-  ```
-  Budgets after transactions = read-side correctness: progress UI prefers fresh tx over fresh budgets if a partial pull happens. No FK gating either direction (budget references categories but Firestore rules don't enforce, and orphaned categoryIds are tolerated by spent-calc).
-- [domain/src/commonTest/.../model/SyncStepOrderTest.kt](domain/src/commonTest/kotlin/com/georgeci/moneysurfer/domain/model/SyncStepOrderTest.kt) — update golden order, add the three new entries.
-
-### sync push/pull
-- [data/.../repository/WorkspaceSyncRepositoryImpl.kt](data/src/commonMain/kotlin/com/georgeci/moneysurfer/data/repository/WorkspaceSyncRepositoryImpl.kt):
-  - DI: add `private val budgetDao: BudgetDao` to ctor.
-  - In `syncWorkspace`: emit + run `PUSH_BUDGETS` after `PUSH_TRANSACTIONS`, `PULL_BUDGETS` after `PULL_TRANSACTIONS`.
-  - In `clearWorkspace`: emit + run `CLEAR_BUDGETS` between `CLEAR_TRANSACTIONS` and `CLEAR_INVITES`.
-  - Implementations mirror `pushCategories` / `pullCategories` / `deleteCollection(wid, "budgets")`. Firestore path: `workspaces/{wid}/budgets/{bid}`.
-
-### outbox + pull integration
-- [UploadPendingChangesUseCaseImpl](data/src/commonMain/kotlin/com/georgeci/moneysurfer/data/sync/UploadPendingChangesUseCaseImpl.kt) — add `BUDGET` branch (deserialize `BudgetDoc`, write to `workspaces/{wid}/budgets/{id}`).
-- [PullRemoteChangesUseCaseImpl](data/src/commonMain/kotlin/com/georgeci/moneysurfer/data/sync/PullRemoteChangesUseCaseImpl.kt) — add `BUDGET` branch (read `budgets` subcollection, decode `BudgetDoc`, upsert `budgetDao`).
-
-### firestore.indexes.json
-Add composites — only what queries actually need:
-- `budgets`: `workspaceId ASC, isActive ASC, startDate DESC` (list active budgets in a workspace, newest first).
-
-Skip `(workspaceId, period)` and per-category composites until a query that needs them lands. v1 reads all budgets per workspace and filters client-side.
-
-### firestore.rules
-**No change** — existing block at [firestore.rules:126](firestore.rules) already gates `/budgets/{bid}` correctly:
-```
-allow read: if isMember(wid);
-allow create, update: if isMember(wid) && hasValidClientVersion();
-allow delete: if false;
+```kotlin
+data class BudgetPeriodWindow(val startInclusive: LocalDate, val endExclusive: LocalDate)
+fun Budget.currentWindow(today: LocalDate): BudgetPeriodWindow
+fun Budget.windowContaining(date: LocalDate): BudgetPeriodWindow
+fun Budget.previousWindow(window: BudgetPeriodWindow): BudgetPeriodWindow
 ```
 
----
+Pure functions, no `Clock` dependency — `today` is passed in.
 
-## Phase 2 — Repo dual-write
+`BudgetEntity` mirrors `CategoryEntity`: add `workspaceId: String` with a `ForeignKey` to
+`WorkspaceEntity` and `Index("workspaceId")`, plus `rollover: Boolean` with
+`defaultValue = "0"`. `createdAt` / `updatedAt` are already `Long` — leave them.
 
-Goal: every mutating call writes Room then enqueues outbox, mirroring [CategoryRepositoryImpl](data/src/commonMain/kotlin/com/georgeci/moneysurfer/data/repository/CategoryRepositoryImpl.kt).
+`BudgetDao` adds `getByWorkspaceId(wid: String): Flow<List<BudgetEntity>>` and
+`@Upsert suspend fun upsertAll(entities: List<BudgetEntity>)`.
 
-### domain repo iface
-- [domain/.../repositories/BudgetRepository.kt](domain/src/commonMain/kotlin/com/georgeci/moneysurfer/domain/repositories/BudgetRepository.kt) — extend:
-  ```kotlin
-  fun getAll(): Flow<List<Budget>>
-  fun getByWorkspaceId(wid: WorkspaceId): Flow<List<Budget>>
-  suspend fun getById(id: BudgetId): Budget?
-  suspend fun insert(budget: Budget)
-  suspend fun update(budget: Budget)
-  suspend fun setActive(id: BudgetId, active: Boolean)   // archive / restore
-  suspend fun delete(id: BudgetId)                       // local-only purge, no remote (rules forbid)
-  ```
-  v1 keeps `delete` for the wipe-demo path and tests; production UI calls `setActive(false)` instead.
+DB: bump `MONEY_SURFER_DB_VERSION`, additive migration. Existing rows get `workspaceId = ''`
+— they belong to no workspace and will not appear in any list. Acceptable: budgets have
+never been reachable from the UI, so no user has any.
 
-### data repo impl
-- [data/.../repository/BudgetRepositoryImpl.kt](data/src/commonMain/kotlin/com/georgeci/moneysurfer/data/repository/BudgetRepositoryImpl.kt) — rewrite:
-  ```kotlin
-  @Single(binds = [BudgetRepository::class])
-  class BudgetRepositoryImpl(
-      private val dao: BudgetDao,
-      private val outboxEnqueuer: OutboxEnqueuer,
-  ) : BudgetRepository {
-      override suspend fun insert(budget: Budget) {
-          val entity = budget.toEntity().copy(updatedAt = Clock.System.now().toEpochMilliseconds())
-          dao.insert(entity)
-          enqueueUpsert(entity, MutationOperation.INSERT)
-      }
-      override suspend fun update(budget: Budget) { ... INSERT → UPDATE }
-      override suspend fun setActive(id: BudgetId, active: Boolean) {
-          val existing = dao.getById(id.value) ?: return
-          val updated = existing.copy(isActive = active, updatedAt = now())
-          dao.update(updated)
-          enqueueUpsert(updated, MutationOperation.UPDATE)
-      }
-      override suspend fun delete(id: BudgetId) {
-          val existing = dao.getById(id.value) ?: return
-          dao.delete(id.value)
-          // No outbox — Firestore rule denies delete. Local-only purge is dev/test only.
-      }
-      private suspend fun enqueueUpsert(entity: BudgetEntity, op: MutationOperation) { ... }
-  }
-  ```
-  CSV ↔ `List<CategoryId>` conversion stays in the entity-↔-domain mappers (bottom of file, already there).
+## Phase 1 — Repository dual-write
 
-### tests
-- New `data/src/commonTest/.../repository/BudgetRepositoryDualWriteSpec.kt` cloned from [WorkspaceMemberRepositoryDualWriteSpec.kt](data/src/commonTest/kotlin/com/georgeci/moneysurfer/data/repository/WorkspaceMemberRepositoryDualWriteSpec.kt). Cases:
-  - `insert` → DAO row + outbox INSERT with payload JSON shape
-  - `update` → DAO row updated + outbox UPDATE
-  - `setActive(false)` → DAO row flipped + outbox UPDATE
-  - `delete` → DAO row gone + NO outbox row (rules forbid)
-  - demo session (outbox disabled) → DAO write only, no enqueue
+`BudgetRepository` adds `getByWorkspaceId(workspaceId: WorkspaceId): Flow<List<Budget>>` and
+`setActive(id: BudgetId, isActive: Boolean)`.
 
----
+`BudgetRepositoryImpl` is rewritten to mirror
+[CategoryRepositoryImpl](../data-local/src/commonMain/kotlin/com/georgeci/moneysurfer/data/repository/CategoryRepositoryImpl.kt)
+one-to-one: inject `OutboxEnqueuer` + `ClockUseCase`, call `enqueueUpsert` after every
+insert/update, `enqueueDelete` after delete, preserve `createdAt` on update and stamp
+`updatedAt = clock.now()`.
 
-## Phase 3 — Domain use cases
+## Phase 2 — Sync
 
-Files under `domain/src/commonMain/kotlin/com/georgeci/moneysurfer/domain/usecase/`. Pattern: `Either<BudgetError, T>` with `arrow.core.raise.either`.
+Everything here follows the plugin architecture, using
+[CategorySyncPlugin](../sync-surfer/src/commonMain/kotlin/com/georgeci/moneysurfer/data/sync/plugin/CategorySyncPlugin.kt)
+as the reference implementation.
 
-### errors
-- `usecase/BudgetError.kt`:
-  ```kotlin
-  sealed interface BudgetError {
-      data object NoCurrentWorkspace : BudgetError
-      data object NameBlank : BudgetError
-      data object AmountNotPositive : BudgetError
-      data class AlertPercentOutOfRange(val value: Int) : BudgetError    // not in 1..100
-      data class StartDateInvalid(val date: LocalDate) : BudgetError      // future-dated > 1y, or pre-1970
-      data object BudgetNotFound : BudgetError
-      data class LocalWriteFailed(val cause: Throwable) : BudgetError
-  }
-  ```
+1. `SyncEntityTypes.BUDGET = "BUDGET"`.
+2. `SyncPullPriorities.BUDGETS = 50` — after `CATEGORIES` (30), since budgets reference
+   category ids. There is no Room FK on `categoryIds` (it is a CSV column), so this is
+   ordering hygiene rather than a hard constraint.
+3. `BudgetDoc` in `RemoteDtos.kt`: `name`, `categoryIds` (list), `amount`, `period`,
+   `startDate`, `rollover`, `alertPercent`, `isActive`, `createdAt`, `updatedAt`,
+   `deletedAt`, `clientVersionCode`. Note the wire shape uses a real list for
+   `categoryIds` even though Room stores CSV — the mapper converts.
+4. `toDoc()` / `toEntity()` in `SyncDtoMappers.kt`.
+5. `BudgetSyncPlugin`, annotated `@Single(binds = [SyncEntityPlugin::class])`, with
+   `entityType = SyncEntityTypes.BUDGET`, `firestoreCollectionName = SyncCollection.BUDGETS`,
+   tombstone push on delete, and LWW conflict resolution through `ConflictResolver`.
+6. `firestore.rules`: add `hasValidBudgetShape()` and wire it into `/budgets/{bid}` for
+   create/update. Delete the stale comment above that block stating budgets have no wire DTO.
+7. Rules tests in `firestore-tests/` (`npm test`, needs JDK 21 on PATH).
+8. `firestore.indexes.json` — add an index only if a query demands one.
 
-### use cases
-- `CreateBudgetUseCase` — `Params(name, categoryIds, amount, period, startDate, alertPercent, rollover)`. Reads `currentWorkspaceId` from `SessionPointers`, validates inputs, builds `Budget` with `id = BudgetId.uuid()`, `createdAt = now`, calls `repo.insert`. Returns `Right(BudgetId)`.
-- `UpdateBudgetUseCase` — `Params(id, …same fields…)`. Validates, `getById` → not-found error, copies fields, `repo.update`.
-- `SetBudgetActiveUseCase` — `Params(id, active)`. Owner-or-editor check via `viewerRoleFor(wid)`; viewers blocked.
-- `DeleteBudgetUseCase` — local purge only (dev/test). Not exposed in UI.
-- `GetBudgetsForWorkspaceUseCase` — wraps `repo.getByWorkspaceId(currentWid)` (`isActive == true` filter optional flag).
-- `GetBudgetByIdUseCase` — `repo.getById`.
-- `GetBudgetProgressUseCase` — pure-domain calc. Takes `Budget`, `today: LocalDate`, `transactions: Flow<List<Transaction>>` (from `TransactionRepository.getByWorkspaceId`). Returns `Flow<BudgetProgress>`:
-  ```kotlin
-  data class BudgetProgress(
-      val budget: Budget,
-      val window: BudgetPeriodWindow,
-      val effectiveLimit: Money,    // amount + rollover-from-previous (if rollover && prevWindow.leftover > 0)
-      val spent: Money,
-      val remaining: Money,         // can be negative
-      val percent: Int,             // (spent / effectiveLimit) * 100, clamped 0..999
-      val mixedCurrencyTxCount: Int, // transactions skipped due to base-currency mismatch
-  )
-  ```
-  Filtering: `tx.type == REGULAR && tx.timestamp ∈ window` (timestamp converted to LocalDate via workspace tz, v1 = system default), `tx.categoryId ∈ budget.categoryIds || budget.categoryIds.isEmpty() && tx.categoryType == EXPENSE`, `tx.currencyCode == workspace.baseCurrency`.
-- `GetBudgetTransactionsUseCase` — `Params(budgetId)`. Returns `Flow<List<Transaction>>` filtered to current period for the details screen.
+## Phase 3 — Use cases
 
-### tests (`domain/src/commonTest/.../usecase/`)
-- Per use case: happy path + each error variant. New `BudgetFixtures.kt` in [domain-test-fixtures](domain-test-fixtures/src/commonMain/kotlin/com/georgeci/moneysurfer/domain/fixtures/) — factory for `Budget`, `BudgetProgress`.
-- `GetBudgetProgressUseCaseTest` cases: empty tx → 0%; partial → linear %; over-limit → percent > 100, remaining negative; rollover with leftover → effectiveLimit boosted; rollover with overspend → effectiveLimit clamped to base amount (negative leftover not subtracted); mixed-currency tx → counted in `mixedCurrencyTxCount`, not in `spent`; transfers (`type != REGULAR`) excluded; income tx in expense budget excluded.
+`domain/usecase/`: create, update, delete, archive, `GetBudgetsUseCase`,
+`GetBudgetProgressUseCase`, `GetBudgetTransactionsUseCase`.
 
----
+`BudgetProgress` carries: `spent`, `effectiveLimit` (limit + rollover carry), `remaining`,
+`percent`, `state` (`OK` / `WARN` / `OVER`), `daysLeft`, `dailyAverage`,
+`projectedTotal`, `perDayRemaining`, `hasMixedCurrency`.
 
-## Phase 4 — Shared (feature) layer
+Forecast maths, per the mockup: `dailyAverage = spent / elapsedDays`,
+`projectedTotal = dailyAverage * periodDays`, `perDayRemaining = remaining / daysLeft`.
+`periodDays` is WEEKLY 7 / MONTHLY 30 / YEARLY 365. Guard every division against zero.
 
-Module path: `shared/src/commonMain/kotlin/com/georgeci/moneysurfer/shared/budgets/`.
+Rollover reads the previous window's leftover via the same progress calculation.
 
-### list — `BudgetsScreen` + `BudgetsViewModel`
-- State `sealed interface BudgetsState` with `@optics`:
-  - `Loading(workspaceId)`
-  - `Content(workspaceId, budgets: List<BudgetUi>, includeArchived: Boolean, busy: Boolean)`
-- `BudgetUi(id, name, percent, spentMajor, limitMajor, currency, isActive, isAlert)` — flat record consumed by row composable.
-- `observeBudgets()`: `combine(GetBudgetsForWorkspaceUseCase(wid), TransactionRepository.getByWorkspaceId(wid), Workspace.baseCurrency)` → for each budget run `GetBudgetProgressUseCase` synchronously (cheap, list size small) and project to `BudgetUi`.
-- Events: `OnAddClick`, `OnRowClick(id)`, `OnToggleArchived`.
-- Effects: `OpenEdit(id?)`, `OpenDetails(id)`, `ShowError(BudgetError)`, `AlertCrossed(BudgetId)` (emitted once per session per budget when threshold crossed in this collect cycle — tracked in a `MutableSet<BudgetId>` inside the VM).
+## Phase 4 — `feature/budget` module
 
-### details — `BudgetDetailsScreen` + `BudgetDetailsViewModel`
-- State: `Loading(id)` / `Content(progress: BudgetProgress, transactions: List<Transaction>)` / `NotFound`.
-- `combine(GetBudgetByIdUseCase, GetBudgetProgressUseCase, GetBudgetTransactionsUseCase)`.
-- Events: `OnEdit`, `OnArchive`, `OnRestore`, `OnTransactionClick(txId)`.
-
-### edit — `EditBudgetScreen` + `EditBudgetViewModel`
-- State: `Editing(form: BudgetForm, busy: Boolean, error: BudgetError?)`.
-- `BudgetForm(name, selectedCategoryIds: Set<CategoryId>, amountInput: String, period, startDate, rollover, alertPercent)`.
-- Events: `OnNameChange`, `OnAmountChange`, `OnCategoryToggle(id)`, `OnPeriodChange`, `OnStartDateChange`, `OnRolloverToggle`, `OnAlertPercentChange`, `OnSubmit`, `OnCancel`.
-- On `OnSubmit`: route through `CreateBudgetUseCase` (id == null) or `UpdateBudgetUseCase`. On `Right` → `Effect.Saved(BudgetId)` and pop.
-
-### navigation
-- Find existing nav graph (search `NavHost`/`composable(`/`Route` in `shared/`) — register routes:
-  - `budgets/list`
-  - `budgets/details/{budgetId}`
-  - `budgets/edit?budgetId={budgetId}` (null = create)
-- Wire bottom-nav / dashboard tile → `budgets/list`.
-
-### MVI
-- Follow existing `MviViewModel<State, Event, Effect>` base — see [WorkspaceMembersViewModel](shared/src/commonMain/kotlin/com/georgeci/moneysurfer/shared/workspace/members/WorkspaceMembersViewModel.kt) for the canonical shape (`@optics`, `updateState`, `postSideEffect`, `launch(onError = …)`). Annotate with `@KoinViewModel`.
-
-### tests
-- VM tests mirror the convention of `domain/src/commonTest/.../usecase/`. Drive use cases with fakes; assert state transitions + emitted effects.
-
----
+New Gradle module, modelled on `feature/account`. Screens + MVI view models for list,
+details, and edit. Navigation routes in `navigation/`: `Budgets`, `BudgetDetails(id)`,
+`BudgetCreation`, `BudgetEdit(id)`.
 
 ## Phase 5 — UIKit components
 
-Add under `uikit/src/commonMain/kotlin/com/georgeci/moneysurfer/uikit/components/`:
+Delete `SurferBudgetsWidget.kt` — unused, and its row layout does not match the design.
+Add, per the mockup:
 
-- `SurferProgressBar.kt` — linear progress, 4 color states: ok (<alertPercent), warn (≥alertPercent, <100), over (≥100), inactive (archived).
-- `SurferBudgetRow.kt` — name, spent / limit, % chip, progress bar, archived badge. Trailing chevron.
-- `SurferBudgetCard.kt` — details-screen header: large progress ring, period range label (`Apr 1 – Apr 30`), remaining amount, alert badge.
-- `SurferCategoryMultiSelect.kt` — multi-pick variant of [SurferCategoryBottomSheet](uikit/src/commonMain/kotlin/com/georgeci/moneysurfer/uikit/components/SurferCategoryBottomSheet.kt) with chips + "All expense categories" toggle.
-- `SurferPeriodSelector.kt` — segmented control for `BudgetPeriod`.
-- `SurferDatePickerField.kt` — only if not already present; otherwise reuse.
+- `SurferBudgetProgressBar` — fill capped at 100%, tick at `alertPercent`
+- `SurferBudgetRing` — donut, same status colours
+- `SurferBudgetCard` — stacked category bubbles (max 3, then `+N`), status pill, `spent of limit`, remaining, progress, footer
+- `SurferPeriodSegmented`, `SurferCategoryChipGrid` (with an "All categories" chip)
+- `SurferPercentStepper` (50..100, step 5), `SurferStatTile`, `SurferAlertBanner`
 
-Strings (shared `composeResources/values/strings.xml`) — add labels for create/edit/details/archive/rollover/alert-percent.
+Status colours: OK → `primary`; WARN → amber; OVER → `error`.
 
----
+## Phase 6 — Strings and tests
 
-## Sequencing
-
-| Order | Phase | Reason |
-|---|---|---|
-| 1 | Phase 0 | model + Room migration unblock everything; pure-additive, no behavior change |
-| 2 | Phase 1 | sync wiring needs Phase 0's `workspaceId` field on entity |
-| 3 | Phase 2 | repo dual-write needs Phase 1's `SyncEntityType.BUDGET` |
-| 4 | Phase 3 | use cases need Phase 2's repo; pure-domain, no UI needed |
-| 5 | Phase 4 | feature layer needs Phase 3 use cases |
-| 6 | Phase 5 | uikit parallelizable with Phase 4 |
-
-Each phase = own PR. `BudgetRepositoryDualWriteSpec` MUST be green before merging Phase 2. `SyncStepOrderTest` MUST be green before merging Phase 1.
+All user-facing strings ship in Russian and English from the start. Unit tests are kotest
+`StringSpec`; period-window and progress maths get the heaviest coverage (short months,
+leap years, zero-length windows, rollover chains).
 
 ---
 
-## Out of scope (post-v1)
+## What changed since the May revision
 
-- **Multi-currency conversion** — v1 skips foreign-currency tx. When FX rates land, swap `currencyCode == base` filter for `convertTo(base, rate)` in `GetBudgetProgressUseCase`.
-- **Push notifications on threshold cross** — needs background job + token plumbing. Today the alert is a one-shot UI effect.
-- **Predictive forecasts** — "at current spend rate you will exceed by X". Easy add atop `GetBudgetProgressUseCase` once UX wants it.
-- **Recurring budgets with end date** — current model auto-rolls forever. End-date support = additive nullable `endDate: LocalDate?` field.
-- **Per-budget currency override** — design space exists (BudgetDoc has no `currencyCode`); add later as additive nullable.
-- **Owner-only mutation gating** — Firestore rules let any member create/update budgets. If product wants role-gated budgets (editor minimum), tighten the rule + add `viewerRole` check in use cases.
-- **Hard delete via tombstone** — not supported; rules forbid client deletes. Future cleanup needs a Cloud Function.
+- Module `data/` no longer exists — it is `data-local/`, with `data-remote/` and
+  `sync-surfer/` split out.
+- `sync/.../api/SyncEntityType.kt` and the `PUSH_BUDGETS` / `PULL_BUDGETS` sync-step
+  enums never existed in the current tree. Sync is plugin-based: implement
+  `SyncEntityPlugin`, register it with Koin, done.
+- The DB version is the constant `MONEY_SURFER_DB_VERSION`, not a literal.
+- Decision 4 was written against `TransactionType.REGULAR`. The enum is
+  `INCOME | EXPENSE | OPENING_BALANCE`. Transfers are not a type — they are pairs of
+  transactions sharing a `transferId`, so budget spend must exclude `transferId != null`.
+- Decision 9 (domain timestamps → `Long`) contradicted `Category`, which uses `Instant`
+  in the domain and `Long` in the entity. Dropped.
+- Forecast tiles moved from post-v1 into v1.
