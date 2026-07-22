@@ -2,12 +2,16 @@ package com.georgeci.moneysurfer.data.sync
 
 import com.georgeci.moneysurfer.data.db.entity.AccountEntity
 import com.georgeci.moneysurfer.data.db.entity.CategoryEntity
+import com.georgeci.moneysurfer.data.db.entity.GoalContributionEntity
+import com.georgeci.moneysurfer.data.db.entity.GoalEntity
 import com.georgeci.moneysurfer.data.db.entity.TransactionEntity
 import com.georgeci.moneysurfer.data.db.entity.WorkspaceEntity
 import com.georgeci.moneysurfer.data.db.entity.WorkspaceInviteEntity
 import com.georgeci.moneysurfer.data.db.entity.WorkspaceMemberEntity
 import com.georgeci.moneysurfer.data.remote.AccountDoc
 import com.georgeci.moneysurfer.data.remote.CategoryDoc
+import com.georgeci.moneysurfer.data.remote.GoalContributionDoc
+import com.georgeci.moneysurfer.data.remote.GoalDoc
 import com.georgeci.moneysurfer.data.remote.TransactionDoc
 import com.georgeci.moneysurfer.data.remote.WorkspaceDoc
 import com.georgeci.moneysurfer.data.remote.WorkspaceInviteDoc
@@ -138,6 +142,61 @@ fun TransactionDoc.toEntity(id: String, workspaceId: String): TransactionEntity 
         transferId = transferId,
     )
 }
+
+fun GoalEntity.toDoc(): GoalDoc = GoalDoc(
+    title = title,
+    emoji = emoji,
+    hue = hue,
+    target = target,
+    currencyCode = currencyCode,
+    startDate = startDate,
+    targetDate = targetDate,
+    accountId = accountId,
+    status = status,
+    createdAt = createdAt,
+    updatedAt = updatedAt,
+)
+
+fun GoalDoc.toEntity(id: String, workspaceId: String): GoalEntity = GoalEntity(
+    id = id,
+    workspaceId = workspaceId,
+    title = title,
+    emoji = emoji,
+    hue = hue,
+    target = target,
+    currencyCode = currencyCode,
+    startDate = startDate,
+    targetDate = targetDate,
+    accountId = accountId,
+    // Legacy/partial docs may omit `status`; the DTO default already lands on ACTIVE,
+    // but an explicitly-empty string would store an unparseable enum name.
+    status = status.ifBlank { "ACTIVE" },
+    createdAt = createdAt,
+    updatedAt = updatedAt,
+)
+
+fun GoalContributionEntity.toDoc(): GoalContributionDoc = GoalContributionDoc(
+    goalId = goalId,
+    amount = amount,
+    occurredOn = occurredOn,
+    note = note,
+    transferId = transferId,
+    createdAt = createdAt,
+    updatedAt = updatedAt,
+)
+
+fun GoalContributionDoc.toEntity(id: String, workspaceId: String): GoalContributionEntity =
+    GoalContributionEntity(
+        id = id,
+        workspaceId = workspaceId,
+        goalId = goalId,
+        amount = amount,
+        occurredOn = occurredOn,
+        note = note,
+        transferId = transferId,
+        createdAt = createdAt,
+        updatedAt = updatedAt,
+    )
 
 fun WorkspaceMemberEntity.toDoc(): WorkspaceMemberDoc = WorkspaceMemberDoc(
     userId = userId,

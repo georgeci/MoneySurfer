@@ -87,6 +87,51 @@ data class TransactionDoc(
 )
 
 /**
+ * Savings goal doc at `workspaces/{wid}/goals/{gid}`.
+ *
+ * There is no `current` / `saved` field by design — the amount saved is always
+ * `SUM(goalContributions.amount)` for the goal, so no wire field can drift.
+ */
+@Serializable
+data class GoalDoc(
+    val title: String = "",
+    val emoji: String = "",
+    val hue: Int = 0,
+    val target: Long = 0L,
+    val currencyCode: String = "",
+    val startDate: String = "",
+    val targetDate: String? = null,
+    val accountId: String? = null,
+    val status: String = "ACTIVE",
+    val createdAt: Long = 0L,
+    val updatedAt: Long = 0L,
+    val deletedAt: Long? = null,
+    val clientVersionCode: Int = 1,
+)
+
+/**
+ * Contribution doc at `workspaces/{wid}/goalContributions/{cid}`.
+ *
+ * A flat workspace-level collection rather than a sub-collection of the goal:
+ * the pull path reads workspace sub-collections by cursor, and nesting a level
+ * deeper would need a collection-group query and a second cursor.
+ */
+@Serializable
+data class GoalContributionDoc(
+    val goalId: String = "",
+    /** Signed minor units — negative is a withdrawal. */
+    val amount: Long = 0L,
+    val occurredOn: String = "",
+    val note: String = "",
+    /** Always null in v1 — reserved for the money-backed model. */
+    val transferId: String? = null,
+    val createdAt: Long = 0L,
+    val updatedAt: Long = 0L,
+    val deletedAt: Long? = null,
+    val clientVersionCode: Int = 1,
+)
+
+/**
  * Member doc lives at `workspaces/{wid}/members/{uid}`. Doc id = userId.
  *
  * Soft-delete via `status` (`ACTIVE` / `LEFT` / `REMOVED`) — `deletedAt` is kept for

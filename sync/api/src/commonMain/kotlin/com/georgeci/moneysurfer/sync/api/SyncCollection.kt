@@ -17,4 +17,6 @@ object SyncCollection {
     const val TRANSACTIONS = "transactions"
     const val BUDGETS = "budgets"
     const val RECURRING_RULES = "recurringRules"
+    const val GOALS = "goals"
+    const val GOAL_CONTRIBUTIONS = "goalContributions"
 }

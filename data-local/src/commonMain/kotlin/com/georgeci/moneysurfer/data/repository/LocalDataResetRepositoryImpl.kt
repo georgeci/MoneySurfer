@@ -1,40 +1,31 @@
 package com.georgeci.moneysurfer.data.repository
 
-import com.georgeci.moneysurfer.data.db.dao.AccountDao
-import com.georgeci.moneysurfer.data.db.dao.BudgetDao
-import com.georgeci.moneysurfer.data.db.dao.CategoryDao
-import com.georgeci.moneysurfer.data.db.dao.RecurringRuleDao
-import com.georgeci.moneysurfer.data.db.dao.TransactionDao
-import com.georgeci.moneysurfer.data.db.dao.UserDao
-import com.georgeci.moneysurfer.data.db.dao.WorkspaceDao
-import com.georgeci.moneysurfer.data.db.dao.WorkspaceInviteDao
-import com.georgeci.moneysurfer.data.db.dao.WorkspaceMemberDao
+import com.georgeci.moneysurfer.data.db.MoneySurferDatabase
 import com.georgeci.moneysurfer.domain.repositories.LocalDataResetRepository
 import org.koin.core.annotation.Single
 
+/**
+ * Takes the database rather than one DAO per table — the parameter list grew
+ * with every new table and bought nothing, since this class only ever fans out
+ * `deleteAll()`.
+ */
 @Single(binds = [LocalDataResetRepository::class])
 class LocalDataResetRepositoryImpl(
-    private val recurringRuleDao: RecurringRuleDao,
-    private val budgetDao: BudgetDao,
-    private val transactionDao: TransactionDao,
-    private val accountDao: AccountDao,
-    private val categoryDao: CategoryDao,
-    private val workspaceInviteDao: WorkspaceInviteDao,
-    private val workspaceMemberDao: WorkspaceMemberDao,
-    private val workspaceDao: WorkspaceDao,
-    private val userDao: UserDao,
+    private val database: MoneySurferDatabase,
 ) : LocalDataResetRepository {
 
     // FK-safe order: leaf tables first, then parents.
     override suspend fun clearAll() {
-        recurringRuleDao.deleteAll()
-        budgetDao.deleteAll()
-        transactionDao.deleteAll()
-        accountDao.deleteAll()
-        categoryDao.deleteAll()
-        workspaceInviteDao.deleteAll()
-        workspaceMemberDao.deleteAll()
-        workspaceDao.deleteAll()
-        userDao.deleteAll()
+        database.goalContributionDao().deleteAll()
+        database.goalDao().deleteAll()
+        database.recurringRuleDao().deleteAll()
+        database.budgetDao().deleteAll()
+        database.transactionDao().deleteAll()
+        database.accountDao().deleteAll()
+        database.categoryDao().deleteAll()
+        database.workspaceInviteDao().deleteAll()
+        database.workspaceMemberDao().deleteAll()
+        database.workspaceDao().deleteAll()
+        database.userDao().deleteAll()
     }
 }

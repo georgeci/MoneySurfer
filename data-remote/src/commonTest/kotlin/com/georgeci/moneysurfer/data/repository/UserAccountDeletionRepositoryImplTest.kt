@@ -36,6 +36,8 @@ class UserAccountDeletionRepositoryImplTest : StringSpec({
             "deleteCollection:$WS/invites",
             "deleteCollection:$WS/budgets",
             "deleteCollection:$WS/recurringRules",
+            "deleteCollection:$WS/goalContributions",
+            "deleteCollection:$WS/goals",
             "deleteCollection:$WS/members",
             "deleteWorkspace:$WS",
             "deleteEmailMapping:$EMAIL",
