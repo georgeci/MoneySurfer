@@ -1,4 +1,27 @@
 <resources>
+    <string name="onboarding_step_format">Шаг %1$d из %2$d</string>
+    <string name="onboarding_skip">Пропустить</string>
+    <string name="onboarding_value_title">Финансы и экономия — в одном месте</string>
+    <string name="onboarding_value_subtitle">Планируйте бюджет, отслеживайте траты и находите, где можно сэкономить — без таблиц и лишних приложений.</string>
+    <string name="onboarding_value_feature_track_title">Все траты вместе</string>
+    <string name="onboarding_value_feature_track_body">Счета и карты в одной ленте</string>
+    <string name="onboarding_value_feature_together_title">Бюджет вместе</string>
+    <string name="onboarding_value_feature_together_body">Общее пространство для всей семьи</string>
+    <string name="onboarding_value_feature_offline_title">Всё на устройстве</string>
+    <string name="onboarding_value_feature_offline_body">Работает без сети и без аккаунта</string>
+    <string name="onboarding_value_cta">Начать</string>
+    <string name="onboarding_value_note_offline">Аккаунт не нужен — данные остаются на устройстве</string>
+    <string name="onboarding_value_note_online">Войдите, чтобы данные синхронизировались между устройствами</string>
+    <string name="onboarding_start_title">С чего начнём?</string>
+    <string name="onboarding_start_subtitle">Добавьте счёт, которым пользуетесь чаще всего. Остальные можно добавить в любой момент.</string>
+    <string name="onboarding_start_recommended">Рекомендуем</string>
+    <string name="onboarding_start_cash_title">Наличные</string>
+    <string name="onboarding_start_cash_body">Деньги в кошельке, которые можно пересчитать</string>
+    <string name="onboarding_start_card_title">Карта</string>
+    <string name="onboarding_start_card_body">Дебетовая или кредитная карта для оплаты</string>
+    <string name="onboarding_start_savings_title">Накопления</string>
+    <string name="onboarding_start_savings_body">Деньги, отложенные на цель</string>
+    <string name="onboarding_start_cta">Создать счёт</string>
     <string name="sign_in_title">Вход</string>
     <string name="sign_in_subtitle">Нажмите Login для входа в демо-аккаунт.</string>
     <string name="sign_in_login">Login</string>

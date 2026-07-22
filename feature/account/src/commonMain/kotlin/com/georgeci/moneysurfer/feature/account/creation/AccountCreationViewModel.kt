@@ -16,6 +16,7 @@ import com.georgeci.moneysurfer.domain.repositories.AccountRepository
 import com.georgeci.moneysurfer.domain.usecase.CreateTransactionUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetCurrenciesUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetCurrentTimeUseCase
+import com.georgeci.moneysurfer.domain.usecase.UpdateWorkspaceCurrencyUseCase
 import com.georgeci.moneysurfer.feature.account.generated.resources.Res
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_created_snackbar
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_updated_snackbar
@@ -29,11 +30,14 @@ import org.koin.core.annotation.KoinViewModel
 @Suppress("LongParameterList")
 class AccountCreationViewModel(
     private val accountId: AccountId?,
+    private val firstRun: Boolean,
+    initialType: AccountType,
     private val accountRepository: AccountRepository,
     private val createTransaction: CreateTransactionUseCase,
     private val session: SessionPointers,
     private val getCurrentTime: GetCurrentTimeUseCase,
     private val getCurrencies: GetCurrenciesUseCase,
+    private val updateWorkspaceCurrency: UpdateWorkspaceCurrencyUseCase,
     private val snackbar: SnackbarController,
     private val offlineBuildFlags: OfflineBuildFlags,
 ) : MviViewModel<AccountCreationState, AccountCreationEvent, AccountCreationEffect>(
@@ -43,7 +47,9 @@ class AccountCreationViewModel(
         AccountCreationState.Content(
             name = "",
             balance = "",
-            type = AccountType.SAVINGS,
+            // Onboarding passes the kind the user picked; every other entry point falls back
+            // to the screen's own default.
+            type = initialType,
             currency = DEFAULT_CURRENCY,
             currencies = emptyList(),
             extraFields = emptyList(),
@@ -197,7 +203,15 @@ class AccountCreationViewModel(
             }
 
             snackbar.show(Res.string.account_creation_created_snackbar, listOf(trimmedName))
-            postSideEffect(AccountCreationEffect.NavigateBack)
+
+            if (firstRun) {
+                // First-launch step: the currency picked here becomes the workspace base
+                // currency, so the Dashboard total speaks the user's currency from day one.
+                updateWorkspaceCurrency(workspaceId, currency)
+                postSideEffect(AccountCreationEffect.NavigateToDashboard)
+            } else {
+                postSideEffect(AccountCreationEffect.NavigateBack)
+            }
         }
     }
 
@@ -278,4 +292,7 @@ sealed interface AccountCreationEvent {
 
 sealed interface AccountCreationEffect {
     data object NavigateBack : AccountCreationEffect
+
+    /** First-launch only: the first account is in place, continue into the app. */
+    data object NavigateToDashboard : AccountCreationEffect
 }

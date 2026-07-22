@@ -8,6 +8,10 @@ sealed interface Route : NavKey {
     /** Marker for routes that appear as top-level destinations in the navigation suite (rail/drawer/bar). */
     sealed interface TopLevel : Route
 
+    /** First-launch welcome screen, shown once before sign-in / first-account setup. */
+    @Serializable
+    data object Onboarding : Route
+
     @Serializable
     data object SignIn : Route
 
@@ -48,16 +52,21 @@ sealed interface Route : NavKey {
     @Serializable
     data object IncomingInvites : Route
 
-    /** First-launch currency picker, shown once after the offline seed before Dashboard. */
-    @Serializable
-    data object FirstRunCurrency : Route
-
     @Serializable
     data object Dashboard : TopLevel
 
+    /**
+     * [firstRun] marks the offline first-launch step: the screen creates the very first account,
+     * adopts its currency as the workspace base currency, and lands on Dashboard instead of
+     * popping back. [accountType] pre-selects the type the onboarding asked about — it is the
+     * `AccountType` enum name, kept as a String so `navigation` stays free of domain enums in
+     * its saved back stack.
+     */
     @Serializable
     data class AccountCreation(
         val accountId: String? = null,
+        val firstRun: Boolean = false,
+        val accountType: String? = null,
     ) : Route
 
     @Serializable

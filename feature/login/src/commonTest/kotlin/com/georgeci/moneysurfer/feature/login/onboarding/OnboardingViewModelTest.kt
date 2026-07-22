@@ -1,0 +1,139 @@
+package com.georgeci.moneysurfer.feature.login.onboarding
+
+import app.cash.turbine.test
+import com.georgeci.moneysurfer.domain.OfflineBuildFlags
+import com.georgeci.moneysurfer.domain.preferences.ContainerStyle
+import com.georgeci.moneysurfer.domain.preferences.PaletteSource
+import com.georgeci.moneysurfer.domain.preferences.Pref
+import com.georgeci.moneysurfer.domain.preferences.ThemeMode
+import com.georgeci.moneysurfer.domain.preferences.UiPreferences
+import com.georgeci.moneysurfer.domain.primitives.AccountType
+import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
+
+/**
+ * The onboarding flow from the `Onboarding` design: a value pitch for both builds, plus an
+ * offline-only "what does your first account look like?" step whose answer pre-fills account
+ * creation. The online build has no workspace yet, so it stops after the pitch.
+ */
+@OptIn(ExperimentalCoroutinesApi::class)
+class OnboardingViewModelTest : StringSpec({
+
+    beforeSpec { Dispatchers.setMain(UnconfinedTestDispatcher()) }
+    afterSpec { Dispatchers.resetMain() }
+
+    "online build is a single step that continues into sign-in and marks onboarding completed" {
+        runTest {
+            val prefs = FakeUiPreferences()
+            val viewModel = OnboardingViewModel(prefs, OfflineBuildFlags(isOffline = false))
+
+            viewModel.currentState.totalSteps shouldBe 1
+            viewModel.currentState.showProgress shouldBe false
+            viewModel.currentState.showSkip shouldBe false
+
+            viewModel.sideEffects.effectFlow.test {
+                viewModel.onEvent(OnboardingEvent.OnContinueClick)
+                awaitItem() shouldBe OnboardingEffect.NavigateToSignIn
+            }
+            prefs.onboardingCompleted.flow.first() shouldBe true
+        }
+    }
+
+    "offline build advances to the first-account step before finishing" {
+        runTest {
+            val prefs = FakeUiPreferences()
+            val viewModel = OnboardingViewModel(prefs, OfflineBuildFlags(isOffline = true))
+
+            viewModel.currentState.totalSteps shouldBe 2
+            viewModel.currentState.showSkip shouldBe true
+
+            viewModel.onEvent(OnboardingEvent.OnContinueClick)
+
+            viewModel.currentState.step shouldBe OnboardingStep.FirstAccount
+            viewModel.currentState.stepNumber shouldBe 2
+            // The commit step owns the CTA, so there is nothing left to skip past.
+            viewModel.currentState.showSkip shouldBe false
+            // Nothing is persisted until the flow actually finishes.
+            prefs.onboardingCompleted.flow.first() shouldBe false
+        }
+    }
+
+    "the picked account kind is handed to account creation" {
+        runTest {
+            val prefs = FakeUiPreferences()
+            val viewModel = OnboardingViewModel(prefs, OfflineBuildFlags(isOffline = true))
+
+            viewModel.onEvent(OnboardingEvent.OnContinueClick)
+            viewModel.onEvent(OnboardingEvent.OnAccountKindSelected(OnboardingAccountKind.Card))
+
+            viewModel.sideEffects.effectFlow.test {
+                viewModel.onEvent(OnboardingEvent.OnContinueClick)
+                awaitItem() shouldBe OnboardingEffect.NavigateToFirstAccount(AccountType.CARD)
+            }
+            prefs.onboardingCompleted.flow.first() shouldBe true
+        }
+    }
+
+    "skipping keeps the recommended cash default and still completes the onboarding" {
+        runTest {
+            val prefs = FakeUiPreferences()
+            val viewModel = OnboardingViewModel(prefs, OfflineBuildFlags(isOffline = true))
+
+            viewModel.sideEffects.effectFlow.test {
+                viewModel.onEvent(OnboardingEvent.OnSkipClick)
+                awaitItem() shouldBe OnboardingEffect.NavigateToFirstAccount(AccountType.CASH)
+            }
+            prefs.onboardingCompleted.flow.first() shouldBe true
+        }
+    }
+
+    "back returns from the first-account step to the value step" {
+        runTest {
+            val viewModel = OnboardingViewModel(FakeUiPreferences(), OfflineBuildFlags(isOffline = true))
+
+            viewModel.onEvent(OnboardingEvent.OnContinueClick)
+            viewModel.onEvent(OnboardingEvent.OnBackClick)
+
+            viewModel.currentState.step shouldBe OnboardingStep.Value
+        }
+    }
+
+    "a failed flag write leaves the screen retryable instead of navigating on" {
+        runTest {
+            val viewModel = OnboardingViewModel(FailingUiPreferences(), OfflineBuildFlags(isOffline = false))
+
+            // `inFlight` is cleared and no navigation effect is posted — the user stays on the
+            // screen and can retry instead of landing in a half-set-up app.
+            viewModel.onEvent(OnboardingEvent.OnContinueClick)
+
+            viewModel.currentState.inFlight shouldBe false
+        }
+    }
+
+    "cash is the recommended starting point" {
+        OnboardingAccountKind.entries.filter { it.recommended } shouldBe listOf(OnboardingAccountKind.Cash)
+    }
+})
+
+private open class FakeUiPreferences : UiPreferences {
+    override val isDynamicColorAvailable: Boolean = false
+    override val onboardingCompleted: Pref<Boolean> = Pref.inMemory(false)
+    override val paletteSource: Pref<PaletteSource> = Pref.inMemory(PaletteSource.DEFAULT)
+    override val themeMode: Pref<ThemeMode> = Pref.inMemory(ThemeMode.System)
+    override val containerStyle: Pref<ContainerStyle> = Pref.inMemory(ContainerStyle.Card)
+}
+
+private class FailingUiPreferences : FakeUiPreferences() {
+    override val onboardingCompleted: Pref<Boolean> = object : Pref<Boolean> {
+        override val flow = flowOf(false)
+        override suspend fun set(value: Boolean) = error("simulated DataStore write failure")
+    }
+}

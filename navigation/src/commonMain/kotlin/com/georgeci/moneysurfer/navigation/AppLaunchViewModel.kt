@@ -3,9 +3,12 @@ package com.georgeci.moneysurfer.navigation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
+import com.georgeci.moneysurfer.domain.OfflineBuildFlags
 import com.georgeci.moneysurfer.domain.SyncFeatureFlag
 import com.georgeci.moneysurfer.domain.auth.SessionPointers
 import com.georgeci.moneysurfer.domain.firstrun.FirstRunSeeder
+import com.georgeci.moneysurfer.domain.preferences.UiPreferences
+import com.georgeci.moneysurfer.domain.usecase.GetAccountsUseCase
 import com.georgeci.moneysurfer.sync.api.SyncReason
 import com.georgeci.moneysurfer.sync.coordinator.SyncCoordinator
 import kotlinx.coroutines.delay
@@ -32,11 +35,15 @@ import kotlin.time.Duration.Companion.minutes
  * disappeared" navigation.
  */
 @KoinViewModel
+@Suppress("LongParameterList")
 class AppLaunchViewModel(
     private val session: SessionPointers,
     private val syncCoordinator: SyncCoordinator,
     private val firstRunSeeder: FirstRunSeeder,
     private val syncFeatureFlag: SyncFeatureFlag,
+    private val uiPreferences: UiPreferences,
+    private val offlineBuildFlags: OfflineBuildFlags,
+    private val getAccounts: GetAccountsUseCase,
 ) : ViewModel() {
 
     private val log = Logger.withTag(TAG)
@@ -55,15 +62,18 @@ class AppLaunchViewModel(
                 .onFailure { log.w(it) { "[firstRun] seedIfNeeded threw — proceeding to route decision" } }
 
             // 1. One-shot startup decision based on the current snapshot.
-            //    `currencyChosen` is `true` for every path except a fresh offline seed, which
-            //    flips it false so the user picks a currency before landing on Dashboard.
+            //    Onboarding comes first: it is device-scoped and gates both builds. The offline
+            //    "no accounts yet" branch covers a process death on the first-run account screen —
+            //    the offline seed no longer inserts a placeholder account.
+            val onboardingCompleted = uiPreferences.onboardingCompleted.flow.first()
             val userId = session.currentUserId.flow.first()
             val workspaceId = session.currentWorkspaceId.flow.first()
-            val currencyChosen = session.currencyChosen.flow.first()
             targetRoute.value = when {
+                !onboardingCompleted -> Route.Onboarding
                 userId == null -> Route.SignIn
                 workspaceId == null -> Route.WorkspaceSelector()
-                !currencyChosen -> Route.FirstRunCurrency
+                offlineBuildFlags.isOffline && getAccounts().first().isEmpty() ->
+                    Route.AccountCreation(firstRun = true)
                 else -> Route.Dashboard
             }
 
