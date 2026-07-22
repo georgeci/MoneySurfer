@@ -5,6 +5,7 @@
 - [Supply-chain hardening — Gradle dependencies](#supply-chain-hardening--gradle-dependencies)
 - [What is enforced now](#what-is-enforced-now)
 - [Regenerating the lockfiles](#regenerating-the-lockfiles)
+  - [Dependabot PRs always need this](#dependabot-prs-always-need-this)
 - [Why skiko / compose.desktop are excluded from the lock state](#why-skiko--composedesktop-are-excluded-from-the-lock-state)
 - [Known gaps / future work](#known-gaps--future-work)
 <!-- DOCS:END -->

@@ -6,6 +6,10 @@ xcuserdata
 !src/**/build/
 local.properties
 play-service-account*.json
+# GCP service-account keys land in the repo root with their generated name
+# (<project>-<keyid>.json) when downloaded from the console / gcloud.
+moneysurfer-*-*.json
+*service-account*.json
 .idea
 .DS_Store
 captures
