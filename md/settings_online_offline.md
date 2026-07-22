@@ -15,13 +15,13 @@ wiring gaps. This doc is only about **variant coverage**.
 | | Online | Offline |
 |---|---|---|
 | Gradle module | `:composeApp` | `:composeAppOffline` |
-| Flag binding | [`OnlineSignInModule.kt:27`](composeApp/src/commonMain/kotlin/com/georgeci/moneysurfer/di/OnlineSignInModule.kt#L27) — `isOffline = false` | [`OfflineWiring.kt:79`](composeAppOffline/src/commonMain/kotlin/com/georgeci/moneysurfer/offline/di/OfflineWiring.kt#L79) — `isOffline = true` |
+| Flag binding | [`OnlineSignInModule.kt:27`](../composeApp/src/commonMain/kotlin/com/georgeci/moneysurfer/di/OnlineSignInModule.kt#L27) — `isOffline = false` | [`OfflineWiring.kt:79`](../composeAppOffline/src/commonMain/kotlin/com/georgeci/moneysurfer/offline/di/OfflineWiring.kt#L79) — `isOffline = true` |
 | Remote deps | Firebase auth + Firestore | `NoOp*` bindings, no network |
 | E2E | `scripts/maestro/0*.yaml` | `scripts/maestro/offline/offline-golden.yaml` |
 
 Both variants render the **same** `SettingsScreen`; the difference is six
 derived booleans on `SettingsState`
-([`SettingsViewModel.kt:174-181`](feature/settings/src/commonMain/kotlin/com/georgeci/moneysurfer/feature/settings/SettingsViewModel.kt#L174-L181)):
+([`SettingsViewModel.kt:174-181`](../feature/settings/src/commonMain/kotlin/com/georgeci/moneysurfer/feature/settings/SettingsViewModel.kt#L174-L181)):
 
 ```
 showProfile          = !isOffline
@@ -72,7 +72,7 @@ Legend: ✅ present · ❌ absent by design/gating · ⚠️ defect.
 ### 1. Two orphaned destinations (both variants)
 
 `Route.SettingsPreferences` and `Route.SettingsBackup` are registered in
-[`SettingsNavGraph.kt:49,63`](feature/settings/src/commonMain/kotlin/com/georgeci/moneysurfer/feature/settings/SettingsNavGraph.kt#L49),
+[`SettingsNavGraph.kt:49,63`](../feature/settings/src/commonMain/kotlin/com/georgeci/moneysurfer/feature/settings/SettingsNavGraph.kt#L49),
 `SettingsScreen` accepts `onNavigateToPreferences` / `onNavigateToBackup`, and
 `SettingsViewModel` maps `OnPreferencesClick` / `OnBackupClick` to effects — but
 **no composable in `SettingsScreen.kt` emits either event**. `PreferencesScreen`,
@@ -103,7 +103,7 @@ by either the design or the Maestro suites.
 
 ### 4. Offline binary still compiles the online-only screens
 
-`settingsNavGraph` is shared via [`shared/App.kt:57`](shared/src/commonMain/kotlin/com/georgeci/moneysurfer/App.kt#L57),
+`settingsNavGraph` is shared via [`shared/App.kt:57`](../shared/src/commonMain/kotlin/com/georgeci/moneysurfer/App.kt#L57),
 so `SyncScreen` and `DeleteUserAccountScreen` ship inside `:composeAppOffline`,
 backed by `NoOpPendingMutationQueue` / `NoOpUserAccountDeletionRepository`. They
 are unreachable through the UI, so this is size/clarity debt rather than a
@@ -117,7 +117,7 @@ correctness problem — but any future deep link would land on a dead screen.
   with `trailing = null` and no `onClick` — and shows the hard-coded
   `settings_user_name` string instead of the real display name.
 - **`userEmailText` returns the literal `"anon"`**
-  ([`SettingsScreen.kt:327-332`](feature/settings/src/commonMain/kotlin/com/georgeci/moneysurfer/feature/settings/SettingsScreen.kt#L327-L332)) —
+  ([`SettingsScreen.kt:327-332`](../feature/settings/src/commonMain/kotlin/com/georgeci/moneysurfer/feature/settings/SettingsScreen.kt#L327-L332)) —
   unlocalized, and it is the *fallback* branch too, so a signed-in user with no
   email also reads "anon". Only reachable online (`showProfile` is false offline).
 - **Hub supporting text is static.** The design derives every supporting line
