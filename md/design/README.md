@@ -1,7 +1,7 @@
 # Design mirror — Budgets & Goals
 
-Local partial mirror of the **MoneySurfer** Claude Design project
-(`claude.ai/design/p/019dd9e9-bcad-78f3-a4b9-49cde06a75ac`), pulled 2026-07-21.
+Local partial mirror of the **MoneySurfer** Claude Design project, pulled 2026-07-21:
+<https://claude.ai/design/p/019dd9e9-bcad-78f3-a4b9-49cde06a75ac>
 
 ## What's here
 

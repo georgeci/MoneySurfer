@@ -1,9 +1,13 @@
 # Savings Goals — Implementation Plan
 
-Written 2026-07-21. Nothing exists yet: a grep for `SavingsGoal`, `savingGoal` and `Goal`
-across every `.kt` in the repo returns zero files. There is no domain model, no table, no
-prior note. The Claude Design project is the only specification — inventory mirrored in
-[design/README.md](design/README.md).
+Written 2026-07-21. There is no `SavingsGoal` domain model, no table, no repository and no
+prior note — the Claude Design project is the only specification, with the inventory mirrored
+in [design/README.md](design/README.md).
+
+One piece of goals code does exist:
+[SurferGoalsWidget.kt](../uikit/src/commonMain/kotlin/com/georgeci/moneysurfer/uikit/widgets/SurferGoalsWidget.kt)
+in `uikit`, with a `SurferGoalItem` view model and a `ProgressRing`. It is referenced nowhere
+outside its own previews. See Phase 5 — it is not a blank slate there.
 
 Structure follows [budgets.md](budgets.md); read that first, since Goals reuses the same
 sync, dual-write and module conventions.
@@ -163,7 +167,13 @@ and contribution. Navigation routes: `Goals`, `GoalDetails(id)`, `GoalCreation`,
 
 ## Phase 5 — UIKit components
 
-Per the mockup:
+Start by triaging the existing `SurferGoalsWidget`. It is unused, but unlike the budgets
+widget it is not obviously wrong: its `ProgressRing` is close to what the details hero needs,
+and `SurferGoalItem` already models the saved/target/progress triple. Decide reuse versus
+delete before writing the ring a second time — and note it is a compact dashboard row, not a
+list card, so the card work is genuinely new either way.
+
+Then, per the mockup:
 
 - `SurferGoalIcon` — squircle `32% / 38%`, emoji centred on a hue-tinted fill
 - `SurferGoalStatusPill` — ACTIVE (outlined + dot) / COMPLETED (filled + check) / PAUSED / ARCHIVED (neutral)
