@@ -1,12 +1,14 @@
 package com.georgeci.moneysurfer.data.sync
 
 import com.georgeci.moneysurfer.data.db.entity.AccountEntity
+import com.georgeci.moneysurfer.data.db.entity.BudgetEntity
 import com.georgeci.moneysurfer.data.db.entity.CategoryEntity
 import com.georgeci.moneysurfer.data.db.entity.TransactionEntity
 import com.georgeci.moneysurfer.data.db.entity.WorkspaceEntity
 import com.georgeci.moneysurfer.data.db.entity.WorkspaceInviteEntity
 import com.georgeci.moneysurfer.data.db.entity.WorkspaceMemberEntity
 import com.georgeci.moneysurfer.data.remote.AccountDoc
+import com.georgeci.moneysurfer.data.remote.BudgetDoc
 import com.georgeci.moneysurfer.data.remote.CategoryDoc
 import com.georgeci.moneysurfer.data.remote.TransactionDoc
 import com.georgeci.moneysurfer.data.remote.WorkspaceDoc
@@ -86,6 +88,40 @@ fun CategoryDoc.toEntity(id: String, workspaceId: String): CategoryEntity = Cate
     createdAt = createdAt,
     updatedAt = updatedAt,
     systemKind = systemKind,
+)
+
+/**
+ * Room stores `categoryIds` as a CSV column while the wire DTO carries a real list, so these
+ * mappers convert on the entity↔wire boundary. (`BudgetRepositoryImpl` does the same conversion
+ * on the entity↔domain boundary — two boundaries, same CSV encoding.) Blank segments are dropped
+ * so a legacy `""` or a trailing comma decodes to an empty list rather than a blank id.
+ */
+fun BudgetEntity.toDoc(): BudgetDoc = BudgetDoc(
+    name = name,
+    categoryIds = categoryIds.split(',').filter { it.isNotBlank() },
+    amount = amount,
+    period = period,
+    startDate = startDate,
+    alertPercent = alertPercent,
+    isActive = isActive,
+    rollover = rollover,
+    createdAt = createdAt,
+    updatedAt = updatedAt,
+)
+
+fun BudgetDoc.toEntity(id: String, workspaceId: String): BudgetEntity = BudgetEntity(
+    id = id,
+    workspaceId = workspaceId,
+    name = name,
+    categoryIds = categoryIds.filter { it.isNotBlank() }.joinToString(","),
+    amount = amount,
+    period = period,
+    startDate = startDate,
+    alertPercent = alertPercent,
+    isActive = isActive,
+    rollover = rollover,
+    createdAt = createdAt,
+    updatedAt = updatedAt,
 )
 
 fun TransactionEntity.toDoc(): TransactionDoc = TransactionDoc(
