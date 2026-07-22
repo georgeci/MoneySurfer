@@ -25,11 +25,11 @@ built keeps working as-is.
 |---|---|
 | Storage requires the Blaze plan | Not needed — Firestore free tier |
 | No `storage.rules`, no Storage emulator, no rules tests | Rules go into the existing `firestore.rules`, tests into `firestore-tests/` |
-| Outbox carries JSON mutations, not blobs | A document is a document — plain `enqueueUpsert` |
+| Blobs need their own resumable upload queue — the outbox stores no payload, it queues `(entityType, entityId)` and the push worker re-reads the row from Room | The image is a field on the row the push worker already re-reads — plain `enqueueUpsert` |
 | Dangling references (doc pushed before the file lands) | Image lives *inside* the document — atomic |
 | LWW does not apply to blobs | Applies — ordinary `updatedAt` |
 | Soft-delete vs hard-delete, orphaned objects | Tombstones, same as every other entity |
-| Account deletion does not purge Storage objects | `UserAccountDeletionRepositoryImpl` already purges subcollections |
+| Account deletion does not purge Storage objects (no Cloud Functions to do it server-side) | Purged by the existing Firestore path — but `ENTITY_COLLECTIONS` in `UserAccountDeletionRepositoryImpl` is a fixed list, so `receipts` must be added to it or the docs are left behind |
 | `firebase-storage` dependency + expect/actual `File`/`NSURL` | No new dependency; common code sees `ByteArray`/`String` |
 | `firestore.get()` billed on every image fetch in Storage rules | Not applicable |
 
@@ -41,7 +41,9 @@ Implementation is essentially a copy of `SavingsGoalSyncPlugin.kt` with an
 1. **Firestore document limit is 1 MiB.** base64 adds ~33%, so the JPEG must
    be **≤ ~700 KB**. Not a real limit for a receipt: 1280px on the long edge
    at quality 70–75 gives 100–250 KB. Client-side resize is mandatory and the
-   cap must be enforced in the rules (`imageBase64.size() < 900000`).
+   cap must be enforced in the rules, type-guarded like every other field:
+   `request.resource.data.imageBase64 is string &&
+   request.resource.data.imageBase64.size() < 900000`.
 2. **Receipts must not ride the ordinary cursor pull** — every sync would drag
    megabytes. Either a dedicated low-priority plugin with lazy fetch (download
    when the transaction is opened) or `pullPriority` at the very end with small
@@ -76,6 +78,8 @@ transaction — below it Firestore, above it Storage.
 - [ ] `firestore.rules`: membership gate, write-shape validation for
       `ReceiptDoc`, and the size cap.
 - [ ] `firestore-tests/`: rules tests for membership, size cap, and write shape.
+- [ ] Add `SyncCollection.RECEIPTS` to `ENTITY_COLLECTIONS` in
+      `UserAccountDeletionRepositoryImpl` so account deletion purges receipts.
 - [ ] Platform image capture (Android Photo Picker, iOS PHPicker) behind a
       common `expect` API, plus EXIF orientation handling and HEIC → JPEG.
 - [ ] Client-side downscale + compression to the agreed budget.
