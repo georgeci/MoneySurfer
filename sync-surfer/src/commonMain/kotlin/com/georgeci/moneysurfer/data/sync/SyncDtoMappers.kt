@@ -81,6 +81,8 @@ fun CategoryEntity.toDoc(): CategoryDoc = CategoryDoc(
     createdAt = createdAt,
     updatedAt = updatedAt,
     systemKind = systemKind,
+    iconKey = iconKey,
+    hue = hue,
 )
 
 fun CategoryDoc.toEntity(id: String, workspaceId: String): CategoryEntity = CategoryEntity(
@@ -92,6 +94,8 @@ fun CategoryDoc.toEntity(id: String, workspaceId: String): CategoryEntity = Cate
     createdAt = createdAt,
     updatedAt = updatedAt,
     systemKind = systemKind,
+    iconKey = iconKey,
+    hue = hue,
 )
 
 /**

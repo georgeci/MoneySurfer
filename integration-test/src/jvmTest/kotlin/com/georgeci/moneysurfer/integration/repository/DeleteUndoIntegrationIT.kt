@@ -8,6 +8,7 @@ import com.georgeci.moneysurfer.domain.fixtures.anAccount
 import com.georgeci.moneysurfer.domain.fixtures.categoryId
 import com.georgeci.moneysurfer.domain.fixtures.dollars
 import com.georgeci.moneysurfer.domain.fixtures.transactionId
+import com.georgeci.moneysurfer.domain.model.CategoryAppearance
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
 import com.georgeci.moneysurfer.domain.usecase.ApplyTransactionChangeUseCase
 import com.georgeci.moneysurfer.domain.usecase.DeleteCategoryUseCase
@@ -78,11 +79,49 @@ class DeleteUndoIntegrationIT : StringSpec({
 
         val deleted = deleteCategory(categoryId("c-1"))
         deleted.shouldNotBeNull()
-        deleted.name shouldBe "Food"
+        deleted.category.name shouldBe "Food"
         stack.categoryRepository.getById(categoryId("c-1")) shouldBe null
 
-        stack.categoryRepository.insert(deleted)
+        stack.categoryRepository.insert(deleted.category)
 
         stack.categoryRepository.getById(categoryId("c-1")).shouldNotBeNull()
+    }
+
+    // Against the real Room stack, not a fake: the parentId foreign key has no cascade, so a
+    // delete that did not move the children out of the way first would be rejected outright.
+    "deleting a parent category moves its children to the root, and undo re-attaches them" {
+        val deleteCategory = DeleteCategoryUseCase(stack.categoryRepository)
+        val parent = aCategory(id = categoryId("c-parent"), workspaceId = DEFAULT_WORKSPACE_ID, name = "Food")
+        val child = aCategory(
+            id = categoryId("c-child"),
+            workspaceId = DEFAULT_WORKSPACE_ID,
+            name = "Groceries",
+            parentId = parent.id,
+        )
+        stack.categoryRepository.insert(parent)
+        stack.categoryRepository.insert(child)
+
+        val deleted = deleteCategory(parent.id)
+
+        deleted.shouldNotBeNull()
+        deleted.reparentedChildren.map { it.id } shouldBe listOf(child.id)
+        stack.categoryRepository.getById(parent.id) shouldBe null
+        stack.categoryRepository.getById(child.id)!!.parentId shouldBe null
+
+        stack.categoryRepository.insert(deleted.category)
+        deleted.reparentedChildren.forEach { stack.categoryRepository.update(it) }
+
+        stack.categoryRepository.getById(child.id)!!.parentId shouldBe parent.id
+    }
+
+    "a category's icon and colour survive a round-trip through Room" {
+        val category = aCategory(id = categoryId("c-look"), workspaceId = DEFAULT_WORKSPACE_ID)
+            .copy(iconKey = CategoryAppearance.ICON_KEYS.last(), hue = CategoryAppearance.HUES.last())
+        stack.categoryRepository.insert(category)
+
+        val loaded = stack.categoryRepository.getById(category.id).shouldNotBeNull()
+
+        loaded.iconKey shouldBe CategoryAppearance.ICON_KEYS.last()
+        loaded.hue shouldBe CategoryAppearance.HUES.last()
     }
 })

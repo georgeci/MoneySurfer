@@ -15,4 +15,12 @@ data class Category(
     val createdAt: Instant,
     val updatedAt: Instant = createdAt,
     val systemKind: CategorySystemKind? = null,
+    /**
+     * Semantic icon key from [CategoryAppearance.ICON_KEYS] — not a palette index, so the
+     * picker grid can be reordered without re-icing every saved category. Defaults to the
+     * deterministic choice for this id, which is also what the backfill writes.
+     */
+    val iconKey: String = CategoryAppearance.defaultIconKey(id.value, systemKind),
+    /** Hue in degrees, 0 until 360. Resolved to the nearest palette tint at render time. */
+    val hue: Int = CategoryAppearance.defaultHue(id.value, systemKind),
 )

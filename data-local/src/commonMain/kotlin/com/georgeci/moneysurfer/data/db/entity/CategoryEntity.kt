@@ -32,4 +32,12 @@ data class CategoryEntity(
     @ColumnInfo(name = "createdAt") val createdAt: Long,
     @ColumnInfo(name = "updatedAt", defaultValue = "0") val updatedAt: Long = 0L,
     @ColumnInfo(name = "systemKind") val systemKind: String? = null,
+    /**
+     * Semantic icon key. Blank means "never stored" — a row added by the additive v26 backfill
+     * always carries a value, but a row pushed by an older client can still arrive empty, and
+     * the domain mapper resolves that back to the deterministic default.
+     */
+    @ColumnInfo(name = "iconKey", defaultValue = "''") val iconKey: String = "",
+    /** Hue in degrees, 0 until 360. `-1` is the same "never stored" sentinel as a blank [iconKey]. */
+    @ColumnInfo(name = "hue", defaultValue = "-1") val hue: Int = -1,
 )

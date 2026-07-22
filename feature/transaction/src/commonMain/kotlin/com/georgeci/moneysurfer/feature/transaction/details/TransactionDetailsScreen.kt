@@ -135,12 +135,14 @@ private fun TransactionDetailsContent(
             Res.string.transaction_details_type_income
         },
     )
-    val categoryTint = if (state.categorySystemKind == SurferCategoryPalette.SYSTEM_KIND_TRANSFER) {
-        SurferCategoryPalette.TransferTint
-    } else {
-        SurferCategoryPalette.tintForName(state.categoryName)
-    }
-    val categoryIcon = SurferCategoryPalette.iconFor(state.categoryName, state.categorySystemKind)
+    // Was hashing the category *name* — two categories renamed to the same word shared a colour
+    // and a rename silently repainted the screen. Now it reads the category's stored choice.
+    val categoryVisual = SurferCategoryPalette.visualFor(
+        id = state.categoryId,
+        iconKey = state.categoryIconKey,
+        hue = state.categoryHue,
+        systemKind = state.categorySystemKind,
+    )
 
     Scaffold(
         modifier = Modifier.surferSafeInsets(),
@@ -178,8 +180,8 @@ private fun TransactionDetailsContent(
             ) {
                 HeroCard(
                     categoryName = state.categoryName,
-                    categoryTint = categoryTint,
-                    categoryIcon = categoryIcon,
+                    categoryTint = categoryVisual.tint,
+                    categoryIcon = categoryVisual.icon,
                     typeLabel = typeLabel.uppercase(),
                     formattedAmount = state.formattedAmount,
                     note = state.note,
