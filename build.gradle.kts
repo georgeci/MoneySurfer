@@ -245,6 +245,7 @@ dependencies {
     kover(projects.sync.default)
     kover(projects.uikit)
     kover(projects.feature.login)
+    kover(projects.feature.goal)
 }
 
 sonar {
