@@ -108,7 +108,9 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;        SyncMetaEntity::class,
 &nbsp;        PendingMutationEntity::class,
 &nbsp;    ],
-&nbsp;    version = 1,
+&nbsp;    // v2: pending_mutations dropped the separate status / createdAt indices for one
+&nbsp;    // composite. Destructive fallback is fine here — the outbox is transient.
+&nbsp;    version = 2,
 &nbsp;)
 &nbsp;@ConstructedBy(SyncDatabaseConstructor::class)
 &nbsp;abstract class SyncDatabase : RoomDatabase() {
@@ -143,7 +145,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 13:38</div>
+    <div style="float:right;">generated on 2026-07-22 15:22</div>
 </div>
 </body>
 </html>

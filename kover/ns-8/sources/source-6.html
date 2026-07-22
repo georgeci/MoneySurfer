@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > MoneySurferDatabase_Impl</title>
+  <title>MoneySurfer Coverage Report > MoneySurferDatabaseConstructor</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,12 +22,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.data.db</a>
 </div>
 
-<h1>Coverage Summary for Class: MoneySurferDatabase_Impl (com.georgeci.moneysurfer.data.db)</h1>
+<h1>Coverage Summary for Class: MoneySurferDatabaseConstructor (com.georgeci.moneysurfer.data.db)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -46,41 +49,30 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">MoneySurferDatabase_Impl</td>
+  <td class="name">MoneySurferDatabaseConstructor</td>
 <td class="coverageStat">
   <span class="percent">
-    33.3%
+    0%
   </span>
   <span class="absValue">
-    (8/24)
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
   </span>
 </td>
     <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    66.7%
+    0%
   </span>
   <span class="absValue">
-    (32/48)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    73.6%
-  </span>
-  <span class="absValue">
-    (201/273)
-  </span>
-</td>
-</tr>
-  <tr>
-    <td class="name">MoneySurferDatabase_Impl$createOpenDelegate$_openDelegate$1</td>
-<td class="coverageStat">
-  <span class="percent">
-    50%
-  </span>
-  <span class="absValue">
-    (4/8)
+    (0/1)
   </span>
 </td>
 <td class="coverageStat">
@@ -88,61 +80,11 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/18)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    13.4%
-  </span>
-  <span class="absValue">
-    (32/239)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    4.8%
-  </span>
-  <span class="absValue">
-    (96/1990)
-  </span>
-</td>
-  </tr>
-<tr>
-  <td class="name"><strong>Total</strong></td>
-<td class="coverageStat">
-  <span class="percent">
-    37.5%
-  </span>
-  <span class="absValue">
-    (12/32)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/18)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    22.3%
-  </span>
-  <span class="absValue">
-    (64/287)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    13.1%
-  </span>
-  <span class="absValue">
-    (297/2263)
+    (0/4)
   </span>
 </td>
 </tr>
+
 </table>
 
 <br/>
@@ -152,445 +94,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.`data`.db
 &nbsp;
-&nbsp;import androidx.room.InvalidationTracker
-&nbsp;import androidx.room.RoomOpenDelegate
-&nbsp;import androidx.room.migration.AutoMigrationSpec
-&nbsp;import androidx.room.migration.Migration
-&nbsp;import androidx.room.util.TableInfo
-&nbsp;import androidx.room.util.TableInfo.Companion.read
-&nbsp;import androidx.room.util.dropFtsSyncTriggers
-&nbsp;import androidx.sqlite.SQLiteConnection
-&nbsp;import androidx.sqlite.execSQL
-&nbsp;import com.georgeci.moneysurfer.`data`.db.dao.AccountDao
-&nbsp;import com.georgeci.moneysurfer.`data`.db.dao.AccountDao_Impl
-&nbsp;import com.georgeci.moneysurfer.`data`.db.dao.BudgetDao
-&nbsp;import com.georgeci.moneysurfer.`data`.db.dao.BudgetDao_Impl
-&nbsp;import com.georgeci.moneysurfer.`data`.db.dao.CategoryDao
-&nbsp;import com.georgeci.moneysurfer.`data`.db.dao.CategoryDao_Impl
-&nbsp;import com.georgeci.moneysurfer.`data`.db.dao.RecurringRuleDao
-&nbsp;import com.georgeci.moneysurfer.`data`.db.dao.RecurringRuleDao_Impl
-&nbsp;import com.georgeci.moneysurfer.`data`.db.dao.TransactionDao
-&nbsp;import com.georgeci.moneysurfer.`data`.db.dao.TransactionDao_Impl
-&nbsp;import com.georgeci.moneysurfer.`data`.db.dao.UserDao
-&nbsp;import com.georgeci.moneysurfer.`data`.db.dao.UserDao_Impl
-&nbsp;import com.georgeci.moneysurfer.`data`.db.dao.WorkspaceDao
-&nbsp;import com.georgeci.moneysurfer.`data`.db.dao.WorkspaceDao_Impl
-&nbsp;import com.georgeci.moneysurfer.`data`.db.dao.WorkspaceInviteDao
-&nbsp;import com.georgeci.moneysurfer.`data`.db.dao.WorkspaceInviteDao_Impl
-&nbsp;import com.georgeci.moneysurfer.`data`.db.dao.WorkspaceMemberDao
-&nbsp;import com.georgeci.moneysurfer.`data`.db.dao.WorkspaceMemberDao_Impl
-&nbsp;import javax.`annotation`.processing.Generated
-&nbsp;import kotlin.Lazy
-&nbsp;import kotlin.String
-&nbsp;import kotlin.Suppress
-&nbsp;import kotlin.collections.List
-&nbsp;import kotlin.collections.Map
-&nbsp;import kotlin.collections.MutableList
-&nbsp;import kotlin.collections.MutableMap
-&nbsp;import kotlin.collections.MutableSet
-&nbsp;import kotlin.collections.Set
-&nbsp;import kotlin.collections.mutableListOf
-&nbsp;import kotlin.collections.mutableMapOf
-&nbsp;import kotlin.collections.mutableSetOf
-&nbsp;import kotlin.reflect.KClass
+&nbsp;import androidx.room.RoomDatabaseConstructor
 &nbsp;
-<b class="fc">&nbsp;@Generated(value = [&quot;androidx.room.RoomProcessor&quot;])</b>
-&nbsp;@Suppress(names = [&quot;UNCHECKED_CAST&quot;, &quot;DEPRECATION&quot;, &quot;REDUNDANT_PROJECTION&quot;, &quot;REMOVAL&quot;])
-&nbsp;public class MoneySurferDatabase_Impl : MoneySurferDatabase() {
-<b class="fc">&nbsp;  private val _userDao: Lazy&lt;UserDao&gt; = lazy {</b>
-<b class="fc">&nbsp;    UserDao_Impl(this)</b>
-&nbsp;  }
-&nbsp;
-<b class="fc">&nbsp;  private val _workspaceDao: Lazy&lt;WorkspaceDao&gt; = lazy {</b>
-<b class="nc">&nbsp;    WorkspaceDao_Impl(this)</b>
-&nbsp;  }
-&nbsp;
-<b class="fc">&nbsp;  private val _workspaceMemberDao: Lazy&lt;WorkspaceMemberDao&gt; = lazy {</b>
-<b class="nc">&nbsp;    WorkspaceMemberDao_Impl(this)</b>
-&nbsp;  }
-&nbsp;
-<b class="fc">&nbsp;  private val _workspaceInviteDao: Lazy&lt;WorkspaceInviteDao&gt; = lazy {</b>
-<b class="nc">&nbsp;    WorkspaceInviteDao_Impl(this)</b>
-&nbsp;  }
-&nbsp;
-<b class="fc">&nbsp;  private val _accountDao: Lazy&lt;AccountDao&gt; = lazy {</b>
-<b class="nc">&nbsp;    AccountDao_Impl(this)</b>
-&nbsp;  }
-&nbsp;
-<b class="fc">&nbsp;  private val _categoryDao: Lazy&lt;CategoryDao&gt; = lazy {</b>
-<b class="nc">&nbsp;    CategoryDao_Impl(this)</b>
-&nbsp;  }
-&nbsp;
-<b class="fc">&nbsp;  private val _transactionDao: Lazy&lt;TransactionDao&gt; = lazy {</b>
-<b class="nc">&nbsp;    TransactionDao_Impl(this)</b>
-&nbsp;  }
-&nbsp;
-<b class="fc">&nbsp;  private val _budgetDao: Lazy&lt;BudgetDao&gt; = lazy {</b>
-<b class="nc">&nbsp;    BudgetDao_Impl(this)</b>
-&nbsp;  }
-&nbsp;
-<b class="fc">&nbsp;  private val _recurringRuleDao: Lazy&lt;RecurringRuleDao&gt; = lazy {</b>
-<b class="nc">&nbsp;    RecurringRuleDao_Impl(this)</b>
-&nbsp;  }
-&nbsp;
-&nbsp;  protected override fun createOpenDelegate(): RoomOpenDelegate {
-<b class="fc">&nbsp;    val _openDelegate: RoomOpenDelegate = object : RoomOpenDelegate(22, &quot;8e0573768642bfdd881aced41916f3d1&quot;, &quot;85b8677c63ce63dec9a44ae9cd314e23&quot;) {</b>
-&nbsp;      public override fun createAllTables(connection: SQLiteConnection) {
-<b class="fc">&nbsp;        connection.execSQL(&quot;CREATE TABLE IF NOT EXISTS `users` (`id` TEXT NOT NULL, `displayName` TEXT, `isAnon` INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(`id`))&quot;)</b>
-<b class="fc">&nbsp;        connection.execSQL(&quot;CREATE TABLE IF NOT EXISTS `workspaces` (`id` TEXT NOT NULL, `name` TEXT NOT NULL, `description` TEXT NOT NULL DEFAULT &#39;&#39;, `baseCurrency` TEXT NOT NULL, `ownerId` TEXT NOT NULL, `createdAt` INTEGER NOT NULL, `archived` INTEGER NOT NULL, `updatedAt` INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(`id`), FOREIGN KEY(`ownerId`) REFERENCES `users`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )&quot;)</b>
-<b class="fc">&nbsp;        connection.execSQL(&quot;CREATE INDEX IF NOT EXISTS `index_workspaces_ownerId` ON `workspaces` (`ownerId`)&quot;)</b>
-<b class="fc">&nbsp;        connection.execSQL(&quot;CREATE TABLE IF NOT EXISTS `workspace_members` (`userId` TEXT NOT NULL, `workspaceId` TEXT NOT NULL, `role` TEXT NOT NULL, `status` TEXT NOT NULL DEFAULT &#39;ACTIVE&#39;, `displayName` TEXT NOT NULL DEFAULT &#39;&#39;, `email` TEXT, `addedByUserId` TEXT, `createdAt` INTEGER NOT NULL DEFAULT 0, `updatedAt` INTEGER NOT NULL DEFAULT 0, `leftAt` INTEGER, `removedAt` INTEGER, PRIMARY KEY(`userId`, `workspaceId`), FOREIGN KEY(`userId`) REFERENCES `users`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )&quot;)</b>
-<b class="fc">&nbsp;        connection.execSQL(&quot;CREATE INDEX IF NOT EXISTS `index_workspace_members_userId` ON `workspace_members` (`userId`)&quot;)</b>
-<b class="fc">&nbsp;        connection.execSQL(&quot;CREATE INDEX IF NOT EXISTS `index_workspace_members_workspaceId` ON `workspace_members` (`workspaceId`)&quot;)</b>
-<b class="fc">&nbsp;        connection.execSQL(&quot;CREATE INDEX IF NOT EXISTS `index_workspace_members_status` ON `workspace_members` (`status`)&quot;)</b>
-<b class="fc">&nbsp;        connection.execSQL(&quot;CREATE TABLE IF NOT EXISTS `workspace_invites` (`id` TEXT NOT NULL, `workspaceId` TEXT NOT NULL, `email` TEXT NOT NULL, `targetUserId` TEXT, `role` TEXT NOT NULL, `status` TEXT NOT NULL, `invitedByUserId` TEXT NOT NULL, `createdAt` INTEGER NOT NULL, `updatedAt` INTEGER NOT NULL DEFAULT 0, `expiresAt` INTEGER NOT NULL, `respondedAt` INTEGER, PRIMARY KEY(`id`))&quot;)</b>
-<b class="fc">&nbsp;        connection.execSQL(&quot;CREATE INDEX IF NOT EXISTS `index_workspace_invites_workspaceId` ON `workspace_invites` (`workspaceId`)&quot;)</b>
-<b class="fc">&nbsp;        connection.execSQL(&quot;CREATE INDEX IF NOT EXISTS `index_workspace_invites_email` ON `workspace_invites` (`email`)&quot;)</b>
-<b class="fc">&nbsp;        connection.execSQL(&quot;CREATE INDEX IF NOT EXISTS `index_workspace_invites_targetUserId` ON `workspace_invites` (`targetUserId`)&quot;)</b>
-<b class="fc">&nbsp;        connection.execSQL(&quot;CREATE INDEX IF NOT EXISTS `index_workspace_invites_status` ON `workspace_invites` (`status`)&quot;)</b>
-<b class="fc">&nbsp;        connection.execSQL(&quot;CREATE INDEX IF NOT EXISTS `index_workspace_invites_workspaceId_status` ON `workspace_invites` (`workspaceId`, `status`)&quot;)</b>
-<b class="fc">&nbsp;        connection.execSQL(&quot;CREATE INDEX IF NOT EXISTS `index_workspace_invites_email_status` ON `workspace_invites` (`email`, `status`)&quot;)</b>
-<b class="fc">&nbsp;        connection.execSQL(&quot;CREATE TABLE IF NOT EXISTS `accounts` (`id` TEXT NOT NULL, `workspaceId` TEXT NOT NULL, `name` TEXT NOT NULL, `type` TEXT NOT NULL, `currency` TEXT NOT NULL, `balance` INTEGER NOT NULL, `archived` INTEGER NOT NULL DEFAULT 0, `updatedAt` INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(`id`), FOREIGN KEY(`workspaceId`) REFERENCES `workspaces`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )&quot;)</b>
-<b class="fc">&nbsp;        connection.execSQL(&quot;CREATE INDEX IF NOT EXISTS `index_accounts_workspaceId` ON `accounts` (`workspaceId`)&quot;)</b>
-<b class="fc">&nbsp;        connection.execSQL(&quot;CREATE TABLE IF NOT EXISTS `categories` (`id` TEXT NOT NULL, `workspaceId` TEXT NOT NULL, `name` TEXT NOT NULL, `type` TEXT NOT NULL, `parentId` TEXT, `createdAt` INTEGER NOT NULL, `updatedAt` INTEGER NOT NULL DEFAULT 0, `systemKind` TEXT, PRIMARY KEY(`id`), FOREIGN KEY(`workspaceId`) REFERENCES `workspaces`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`parentId`) REFERENCES `categories`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )&quot;)</b>
-<b class="fc">&nbsp;        connection.execSQL(&quot;CREATE INDEX IF NOT EXISTS `index_categories_workspaceId` ON `categories` (`workspaceId`)&quot;)</b>
-<b class="fc">&nbsp;        connection.execSQL(&quot;CREATE INDEX IF NOT EXISTS `index_categories_parentId` ON `categories` (`parentId`)&quot;)</b>
-<b class="fc">&nbsp;        connection.execSQL(&quot;CREATE TABLE IF NOT EXISTS `transactions` (`id` TEXT NOT NULL, `workspaceId` TEXT NOT NULL, `accountId` TEXT NOT NULL, `amount` INTEGER NOT NULL, `currencyCode` TEXT NOT NULL, `categoryId` TEXT, `note` TEXT NOT NULL, `operationAt` INTEGER NOT NULL, `operationDate` TEXT NOT NULL DEFAULT &#39;&#39;, `type` TEXT NOT NULL, `status` TEXT NOT NULL DEFAULT &#39;ACTUAL&#39;, `createdAt` INTEGER NOT NULL DEFAULT 0, `updatedAt` INTEGER NOT NULL DEFAULT 0, `transferId` TEXT, PRIMARY KEY(`id`), FOREIGN KEY(`workspaceId`) REFERENCES `workspaces`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`accountId`) REFERENCES `accounts`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`categoryId`) REFERENCES `categories`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )&quot;)</b>
-<b class="fc">&nbsp;        connection.execSQL(&quot;CREATE INDEX IF NOT EXISTS `index_transactions_workspaceId` ON `transactions` (`workspaceId`)&quot;)</b>
-<b class="fc">&nbsp;        connection.execSQL(&quot;CREATE INDEX IF NOT EXISTS `index_transactions_accountId` ON `transactions` (`accountId`)&quot;)</b>
-<b class="fc">&nbsp;        connection.execSQL(&quot;CREATE INDEX IF NOT EXISTS `index_transactions_categoryId` ON `transactions` (`categoryId`)&quot;)</b>
-<b class="fc">&nbsp;        connection.execSQL(&quot;CREATE TABLE IF NOT EXISTS `budgets` (`id` TEXT NOT NULL, `name` TEXT NOT NULL, `categoryIds` TEXT NOT NULL, `amount` INTEGER NOT NULL, `period` TEXT NOT NULL, `startDate` TEXT NOT NULL, `alertPercent` INTEGER NOT NULL, `isActive` INTEGER NOT NULL, `createdAt` INTEGER NOT NULL DEFAULT 0, `updatedAt` INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(`id`))&quot;)</b>
-<b class="fc">&nbsp;        connection.execSQL(&quot;CREATE TABLE IF NOT EXISTS `recurring_rules` (`id` TEXT NOT NULL, `title` TEXT NOT NULL, `amount` INTEGER NOT NULL, `categoryId` TEXT NOT NULL, `scheduleFrequency` TEXT NOT NULL, `scheduleInterval` INTEGER NOT NULL, `scheduleDaysOfWeek` TEXT NOT NULL, `scheduleDaysOfMonth` TEXT NOT NULL, `scheduleMissingDayPolicy` TEXT NOT NULL, `startDate` TEXT NOT NULL, `nextRunAt` INTEGER, `autoCreate` INTEGER NOT NULL, `isActive` INTEGER NOT NULL, `createdAt` INTEGER NOT NULL DEFAULT 0, `updatedAt` INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(`id`), FOREIGN KEY(`categoryId`) REFERENCES `categories`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )&quot;)</b>
-<b class="fc">&nbsp;        connection.execSQL(&quot;CREATE INDEX IF NOT EXISTS `index_recurring_rules_categoryId` ON `recurring_rules` (`categoryId`)&quot;)</b>
-<b class="fc">&nbsp;        connection.execSQL(&quot;CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)&quot;)</b>
-<b class="fc">&nbsp;        connection.execSQL(&quot;INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, &#39;8e0573768642bfdd881aced41916f3d1&#39;)&quot;)</b>
-&nbsp;      }
-&nbsp;
-&nbsp;      public override fun dropAllTables(connection: SQLiteConnection) {
-<b class="nc">&nbsp;        connection.execSQL(&quot;DROP TABLE IF EXISTS `users`&quot;)</b>
-<b class="nc">&nbsp;        connection.execSQL(&quot;DROP TABLE IF EXISTS `workspaces`&quot;)</b>
-<b class="nc">&nbsp;        connection.execSQL(&quot;DROP TABLE IF EXISTS `workspace_members`&quot;)</b>
-<b class="nc">&nbsp;        connection.execSQL(&quot;DROP TABLE IF EXISTS `workspace_invites`&quot;)</b>
-<b class="nc">&nbsp;        connection.execSQL(&quot;DROP TABLE IF EXISTS `accounts`&quot;)</b>
-<b class="nc">&nbsp;        connection.execSQL(&quot;DROP TABLE IF EXISTS `categories`&quot;)</b>
-<b class="nc">&nbsp;        connection.execSQL(&quot;DROP TABLE IF EXISTS `transactions`&quot;)</b>
-<b class="nc">&nbsp;        connection.execSQL(&quot;DROP TABLE IF EXISTS `budgets`&quot;)</b>
-<b class="nc">&nbsp;        connection.execSQL(&quot;DROP TABLE IF EXISTS `recurring_rules`&quot;)</b>
-&nbsp;      }
-&nbsp;
-&nbsp;      public override fun onCreate(connection: SQLiteConnection) {
-<b class="fc">&nbsp;      }</b>
-&nbsp;
-&nbsp;      public override fun onOpen(connection: SQLiteConnection) {
-<b class="fc">&nbsp;        connection.execSQL(&quot;PRAGMA foreign_keys = ON&quot;)</b>
-<b class="fc">&nbsp;        internalInitInvalidationTracker(connection)</b>
-&nbsp;      }
-&nbsp;
-&nbsp;      public override fun onPreMigrate(connection: SQLiteConnection) {
-<b class="nc">&nbsp;        dropFtsSyncTriggers(connection)</b>
-&nbsp;      }
-&nbsp;
-&nbsp;      public override fun onPostMigrate(connection: SQLiteConnection) {
-<b class="nc">&nbsp;      }</b>
-&nbsp;
-&nbsp;      public override fun onValidateSchema(connection: SQLiteConnection): RoomOpenDelegate.ValidationResult {
-<b class="nc">&nbsp;        val _columnsUsers: MutableMap&lt;String, TableInfo.Column&gt; = mutableMapOf()</b>
-<b class="nc">&nbsp;        _columnsUsers.put(&quot;id&quot;, TableInfo.Column(&quot;id&quot;, &quot;TEXT&quot;, true, 1, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsUsers.put(&quot;displayName&quot;, TableInfo.Column(&quot;displayName&quot;, &quot;TEXT&quot;, false, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsUsers.put(&quot;isAnon&quot;, TableInfo.Column(&quot;isAnon&quot;, &quot;INTEGER&quot;, true, 0, &quot;0&quot;, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        val _foreignKeysUsers: MutableSet&lt;TableInfo.ForeignKey&gt; = mutableSetOf()</b>
-<b class="nc">&nbsp;        val _indicesUsers: MutableSet&lt;TableInfo.Index&gt; = mutableSetOf()</b>
-<b class="nc">&nbsp;        val _infoUsers: TableInfo = TableInfo(&quot;users&quot;, _columnsUsers, _foreignKeysUsers, _indicesUsers)</b>
-<b class="nc">&nbsp;        val _existingUsers: TableInfo = read(connection, &quot;users&quot;)</b>
-<b class="nc">&nbsp;        if (!_infoUsers.equals(_existingUsers)) {</b>
-<b class="nc">&nbsp;          return RoomOpenDelegate.ValidationResult(false, &quot;&quot;&quot;</b>
-&nbsp;              |users(com.georgeci.moneysurfer.data.db.entity.UserEntity).
-&nbsp;              | Expected:
-<b class="nc">&nbsp;              |&quot;&quot;&quot;.trimMargin() + _infoUsers + &quot;&quot;&quot;</b>
-&nbsp;              |
-&nbsp;              | Found:
-<b class="nc">&nbsp;              |&quot;&quot;&quot;.trimMargin() + _existingUsers)</b>
-&nbsp;        }
-<b class="nc">&nbsp;        val _columnsWorkspaces: MutableMap&lt;String, TableInfo.Column&gt; = mutableMapOf()</b>
-<b class="nc">&nbsp;        _columnsWorkspaces.put(&quot;id&quot;, TableInfo.Column(&quot;id&quot;, &quot;TEXT&quot;, true, 1, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsWorkspaces.put(&quot;name&quot;, TableInfo.Column(&quot;name&quot;, &quot;TEXT&quot;, true, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsWorkspaces.put(&quot;description&quot;, TableInfo.Column(&quot;description&quot;, &quot;TEXT&quot;, true, 0, &quot;&#39;&#39;&quot;, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsWorkspaces.put(&quot;baseCurrency&quot;, TableInfo.Column(&quot;baseCurrency&quot;, &quot;TEXT&quot;, true, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsWorkspaces.put(&quot;ownerId&quot;, TableInfo.Column(&quot;ownerId&quot;, &quot;TEXT&quot;, true, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsWorkspaces.put(&quot;createdAt&quot;, TableInfo.Column(&quot;createdAt&quot;, &quot;INTEGER&quot;, true, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsWorkspaces.put(&quot;archived&quot;, TableInfo.Column(&quot;archived&quot;, &quot;INTEGER&quot;, true, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsWorkspaces.put(&quot;updatedAt&quot;, TableInfo.Column(&quot;updatedAt&quot;, &quot;INTEGER&quot;, true, 0, &quot;0&quot;, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        val _foreignKeysWorkspaces: MutableSet&lt;TableInfo.ForeignKey&gt; = mutableSetOf()</b>
-<b class="nc">&nbsp;        _foreignKeysWorkspaces.add(TableInfo.ForeignKey(&quot;users&quot;, &quot;NO ACTION&quot;, &quot;NO ACTION&quot;, listOf(&quot;ownerId&quot;), listOf(&quot;id&quot;)))</b>
-<b class="nc">&nbsp;        val _indicesWorkspaces: MutableSet&lt;TableInfo.Index&gt; = mutableSetOf()</b>
-<b class="nc">&nbsp;        _indicesWorkspaces.add(TableInfo.Index(&quot;index_workspaces_ownerId&quot;, false, listOf(&quot;ownerId&quot;), listOf(&quot;ASC&quot;)))</b>
-<b class="nc">&nbsp;        val _infoWorkspaces: TableInfo = TableInfo(&quot;workspaces&quot;, _columnsWorkspaces, _foreignKeysWorkspaces, _indicesWorkspaces)</b>
-<b class="nc">&nbsp;        val _existingWorkspaces: TableInfo = read(connection, &quot;workspaces&quot;)</b>
-<b class="nc">&nbsp;        if (!_infoWorkspaces.equals(_existingWorkspaces)) {</b>
-<b class="nc">&nbsp;          return RoomOpenDelegate.ValidationResult(false, &quot;&quot;&quot;</b>
-&nbsp;              |workspaces(com.georgeci.moneysurfer.data.db.entity.WorkspaceEntity).
-&nbsp;              | Expected:
-<b class="nc">&nbsp;              |&quot;&quot;&quot;.trimMargin() + _infoWorkspaces + &quot;&quot;&quot;</b>
-&nbsp;              |
-&nbsp;              | Found:
-<b class="nc">&nbsp;              |&quot;&quot;&quot;.trimMargin() + _existingWorkspaces)</b>
-&nbsp;        }
-<b class="nc">&nbsp;        val _columnsWorkspaceMembers: MutableMap&lt;String, TableInfo.Column&gt; = mutableMapOf()</b>
-<b class="nc">&nbsp;        _columnsWorkspaceMembers.put(&quot;userId&quot;, TableInfo.Column(&quot;userId&quot;, &quot;TEXT&quot;, true, 1, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsWorkspaceMembers.put(&quot;workspaceId&quot;, TableInfo.Column(&quot;workspaceId&quot;, &quot;TEXT&quot;, true, 2, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsWorkspaceMembers.put(&quot;role&quot;, TableInfo.Column(&quot;role&quot;, &quot;TEXT&quot;, true, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsWorkspaceMembers.put(&quot;status&quot;, TableInfo.Column(&quot;status&quot;, &quot;TEXT&quot;, true, 0, &quot;&#39;ACTIVE&#39;&quot;, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsWorkspaceMembers.put(&quot;displayName&quot;, TableInfo.Column(&quot;displayName&quot;, &quot;TEXT&quot;, true, 0, &quot;&#39;&#39;&quot;, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsWorkspaceMembers.put(&quot;email&quot;, TableInfo.Column(&quot;email&quot;, &quot;TEXT&quot;, false, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsWorkspaceMembers.put(&quot;addedByUserId&quot;, TableInfo.Column(&quot;addedByUserId&quot;, &quot;TEXT&quot;, false, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsWorkspaceMembers.put(&quot;createdAt&quot;, TableInfo.Column(&quot;createdAt&quot;, &quot;INTEGER&quot;, true, 0, &quot;0&quot;, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsWorkspaceMembers.put(&quot;updatedAt&quot;, TableInfo.Column(&quot;updatedAt&quot;, &quot;INTEGER&quot;, true, 0, &quot;0&quot;, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsWorkspaceMembers.put(&quot;leftAt&quot;, TableInfo.Column(&quot;leftAt&quot;, &quot;INTEGER&quot;, false, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsWorkspaceMembers.put(&quot;removedAt&quot;, TableInfo.Column(&quot;removedAt&quot;, &quot;INTEGER&quot;, false, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        val _foreignKeysWorkspaceMembers: MutableSet&lt;TableInfo.ForeignKey&gt; = mutableSetOf()</b>
-<b class="nc">&nbsp;        _foreignKeysWorkspaceMembers.add(TableInfo.ForeignKey(&quot;users&quot;, &quot;NO ACTION&quot;, &quot;NO ACTION&quot;, listOf(&quot;userId&quot;), listOf(&quot;id&quot;)))</b>
-<b class="nc">&nbsp;        val _indicesWorkspaceMembers: MutableSet&lt;TableInfo.Index&gt; = mutableSetOf()</b>
-<b class="nc">&nbsp;        _indicesWorkspaceMembers.add(TableInfo.Index(&quot;index_workspace_members_userId&quot;, false, listOf(&quot;userId&quot;), listOf(&quot;ASC&quot;)))</b>
-<b class="nc">&nbsp;        _indicesWorkspaceMembers.add(TableInfo.Index(&quot;index_workspace_members_workspaceId&quot;, false, listOf(&quot;workspaceId&quot;), listOf(&quot;ASC&quot;)))</b>
-<b class="nc">&nbsp;        _indicesWorkspaceMembers.add(TableInfo.Index(&quot;index_workspace_members_status&quot;, false, listOf(&quot;status&quot;), listOf(&quot;ASC&quot;)))</b>
-<b class="nc">&nbsp;        val _infoWorkspaceMembers: TableInfo = TableInfo(&quot;workspace_members&quot;, _columnsWorkspaceMembers, _foreignKeysWorkspaceMembers, _indicesWorkspaceMembers)</b>
-<b class="nc">&nbsp;        val _existingWorkspaceMembers: TableInfo = read(connection, &quot;workspace_members&quot;)</b>
-<b class="nc">&nbsp;        if (!_infoWorkspaceMembers.equals(_existingWorkspaceMembers)) {</b>
-<b class="nc">&nbsp;          return RoomOpenDelegate.ValidationResult(false, &quot;&quot;&quot;</b>
-&nbsp;              |workspace_members(com.georgeci.moneysurfer.data.db.entity.WorkspaceMemberEntity).
-&nbsp;              | Expected:
-<b class="nc">&nbsp;              |&quot;&quot;&quot;.trimMargin() + _infoWorkspaceMembers + &quot;&quot;&quot;</b>
-&nbsp;              |
-&nbsp;              | Found:
-<b class="nc">&nbsp;              |&quot;&quot;&quot;.trimMargin() + _existingWorkspaceMembers)</b>
-&nbsp;        }
-<b class="nc">&nbsp;        val _columnsWorkspaceInvites: MutableMap&lt;String, TableInfo.Column&gt; = mutableMapOf()</b>
-<b class="nc">&nbsp;        _columnsWorkspaceInvites.put(&quot;id&quot;, TableInfo.Column(&quot;id&quot;, &quot;TEXT&quot;, true, 1, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsWorkspaceInvites.put(&quot;workspaceId&quot;, TableInfo.Column(&quot;workspaceId&quot;, &quot;TEXT&quot;, true, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsWorkspaceInvites.put(&quot;email&quot;, TableInfo.Column(&quot;email&quot;, &quot;TEXT&quot;, true, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsWorkspaceInvites.put(&quot;targetUserId&quot;, TableInfo.Column(&quot;targetUserId&quot;, &quot;TEXT&quot;, false, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsWorkspaceInvites.put(&quot;role&quot;, TableInfo.Column(&quot;role&quot;, &quot;TEXT&quot;, true, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsWorkspaceInvites.put(&quot;status&quot;, TableInfo.Column(&quot;status&quot;, &quot;TEXT&quot;, true, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsWorkspaceInvites.put(&quot;invitedByUserId&quot;, TableInfo.Column(&quot;invitedByUserId&quot;, &quot;TEXT&quot;, true, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsWorkspaceInvites.put(&quot;createdAt&quot;, TableInfo.Column(&quot;createdAt&quot;, &quot;INTEGER&quot;, true, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsWorkspaceInvites.put(&quot;updatedAt&quot;, TableInfo.Column(&quot;updatedAt&quot;, &quot;INTEGER&quot;, true, 0, &quot;0&quot;, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsWorkspaceInvites.put(&quot;expiresAt&quot;, TableInfo.Column(&quot;expiresAt&quot;, &quot;INTEGER&quot;, true, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsWorkspaceInvites.put(&quot;respondedAt&quot;, TableInfo.Column(&quot;respondedAt&quot;, &quot;INTEGER&quot;, false, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        val _foreignKeysWorkspaceInvites: MutableSet&lt;TableInfo.ForeignKey&gt; = mutableSetOf()</b>
-<b class="nc">&nbsp;        val _indicesWorkspaceInvites: MutableSet&lt;TableInfo.Index&gt; = mutableSetOf()</b>
-<b class="nc">&nbsp;        _indicesWorkspaceInvites.add(TableInfo.Index(&quot;index_workspace_invites_workspaceId&quot;, false, listOf(&quot;workspaceId&quot;), listOf(&quot;ASC&quot;)))</b>
-<b class="nc">&nbsp;        _indicesWorkspaceInvites.add(TableInfo.Index(&quot;index_workspace_invites_email&quot;, false, listOf(&quot;email&quot;), listOf(&quot;ASC&quot;)))</b>
-<b class="nc">&nbsp;        _indicesWorkspaceInvites.add(TableInfo.Index(&quot;index_workspace_invites_targetUserId&quot;, false, listOf(&quot;targetUserId&quot;), listOf(&quot;ASC&quot;)))</b>
-<b class="nc">&nbsp;        _indicesWorkspaceInvites.add(TableInfo.Index(&quot;index_workspace_invites_status&quot;, false, listOf(&quot;status&quot;), listOf(&quot;ASC&quot;)))</b>
-<b class="nc">&nbsp;        _indicesWorkspaceInvites.add(TableInfo.Index(&quot;index_workspace_invites_workspaceId_status&quot;, false, listOf(&quot;workspaceId&quot;, &quot;status&quot;), listOf(&quot;ASC&quot;, &quot;ASC&quot;)))</b>
-<b class="nc">&nbsp;        _indicesWorkspaceInvites.add(TableInfo.Index(&quot;index_workspace_invites_email_status&quot;, false, listOf(&quot;email&quot;, &quot;status&quot;), listOf(&quot;ASC&quot;, &quot;ASC&quot;)))</b>
-<b class="nc">&nbsp;        val _infoWorkspaceInvites: TableInfo = TableInfo(&quot;workspace_invites&quot;, _columnsWorkspaceInvites, _foreignKeysWorkspaceInvites, _indicesWorkspaceInvites)</b>
-<b class="nc">&nbsp;        val _existingWorkspaceInvites: TableInfo = read(connection, &quot;workspace_invites&quot;)</b>
-<b class="nc">&nbsp;        if (!_infoWorkspaceInvites.equals(_existingWorkspaceInvites)) {</b>
-<b class="nc">&nbsp;          return RoomOpenDelegate.ValidationResult(false, &quot;&quot;&quot;</b>
-&nbsp;              |workspace_invites(com.georgeci.moneysurfer.data.db.entity.WorkspaceInviteEntity).
-&nbsp;              | Expected:
-<b class="nc">&nbsp;              |&quot;&quot;&quot;.trimMargin() + _infoWorkspaceInvites + &quot;&quot;&quot;</b>
-&nbsp;              |
-&nbsp;              | Found:
-<b class="nc">&nbsp;              |&quot;&quot;&quot;.trimMargin() + _existingWorkspaceInvites)</b>
-&nbsp;        }
-<b class="nc">&nbsp;        val _columnsAccounts: MutableMap&lt;String, TableInfo.Column&gt; = mutableMapOf()</b>
-<b class="nc">&nbsp;        _columnsAccounts.put(&quot;id&quot;, TableInfo.Column(&quot;id&quot;, &quot;TEXT&quot;, true, 1, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsAccounts.put(&quot;workspaceId&quot;, TableInfo.Column(&quot;workspaceId&quot;, &quot;TEXT&quot;, true, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsAccounts.put(&quot;name&quot;, TableInfo.Column(&quot;name&quot;, &quot;TEXT&quot;, true, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsAccounts.put(&quot;type&quot;, TableInfo.Column(&quot;type&quot;, &quot;TEXT&quot;, true, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsAccounts.put(&quot;currency&quot;, TableInfo.Column(&quot;currency&quot;, &quot;TEXT&quot;, true, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsAccounts.put(&quot;balance&quot;, TableInfo.Column(&quot;balance&quot;, &quot;INTEGER&quot;, true, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsAccounts.put(&quot;archived&quot;, TableInfo.Column(&quot;archived&quot;, &quot;INTEGER&quot;, true, 0, &quot;0&quot;, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsAccounts.put(&quot;updatedAt&quot;, TableInfo.Column(&quot;updatedAt&quot;, &quot;INTEGER&quot;, true, 0, &quot;0&quot;, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        val _foreignKeysAccounts: MutableSet&lt;TableInfo.ForeignKey&gt; = mutableSetOf()</b>
-<b class="nc">&nbsp;        _foreignKeysAccounts.add(TableInfo.ForeignKey(&quot;workspaces&quot;, &quot;NO ACTION&quot;, &quot;NO ACTION&quot;, listOf(&quot;workspaceId&quot;), listOf(&quot;id&quot;)))</b>
-<b class="nc">&nbsp;        val _indicesAccounts: MutableSet&lt;TableInfo.Index&gt; = mutableSetOf()</b>
-<b class="nc">&nbsp;        _indicesAccounts.add(TableInfo.Index(&quot;index_accounts_workspaceId&quot;, false, listOf(&quot;workspaceId&quot;), listOf(&quot;ASC&quot;)))</b>
-<b class="nc">&nbsp;        val _infoAccounts: TableInfo = TableInfo(&quot;accounts&quot;, _columnsAccounts, _foreignKeysAccounts, _indicesAccounts)</b>
-<b class="nc">&nbsp;        val _existingAccounts: TableInfo = read(connection, &quot;accounts&quot;)</b>
-<b class="nc">&nbsp;        if (!_infoAccounts.equals(_existingAccounts)) {</b>
-<b class="nc">&nbsp;          return RoomOpenDelegate.ValidationResult(false, &quot;&quot;&quot;</b>
-&nbsp;              |accounts(com.georgeci.moneysurfer.data.db.entity.AccountEntity).
-&nbsp;              | Expected:
-<b class="nc">&nbsp;              |&quot;&quot;&quot;.trimMargin() + _infoAccounts + &quot;&quot;&quot;</b>
-&nbsp;              |
-&nbsp;              | Found:
-<b class="nc">&nbsp;              |&quot;&quot;&quot;.trimMargin() + _existingAccounts)</b>
-&nbsp;        }
-<b class="nc">&nbsp;        val _columnsCategories: MutableMap&lt;String, TableInfo.Column&gt; = mutableMapOf()</b>
-<b class="nc">&nbsp;        _columnsCategories.put(&quot;id&quot;, TableInfo.Column(&quot;id&quot;, &quot;TEXT&quot;, true, 1, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsCategories.put(&quot;workspaceId&quot;, TableInfo.Column(&quot;workspaceId&quot;, &quot;TEXT&quot;, true, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsCategories.put(&quot;name&quot;, TableInfo.Column(&quot;name&quot;, &quot;TEXT&quot;, true, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsCategories.put(&quot;type&quot;, TableInfo.Column(&quot;type&quot;, &quot;TEXT&quot;, true, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsCategories.put(&quot;parentId&quot;, TableInfo.Column(&quot;parentId&quot;, &quot;TEXT&quot;, false, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsCategories.put(&quot;createdAt&quot;, TableInfo.Column(&quot;createdAt&quot;, &quot;INTEGER&quot;, true, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsCategories.put(&quot;updatedAt&quot;, TableInfo.Column(&quot;updatedAt&quot;, &quot;INTEGER&quot;, true, 0, &quot;0&quot;, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsCategories.put(&quot;systemKind&quot;, TableInfo.Column(&quot;systemKind&quot;, &quot;TEXT&quot;, false, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        val _foreignKeysCategories: MutableSet&lt;TableInfo.ForeignKey&gt; = mutableSetOf()</b>
-<b class="nc">&nbsp;        _foreignKeysCategories.add(TableInfo.ForeignKey(&quot;workspaces&quot;, &quot;NO ACTION&quot;, &quot;NO ACTION&quot;, listOf(&quot;workspaceId&quot;), listOf(&quot;id&quot;)))</b>
-<b class="nc">&nbsp;        _foreignKeysCategories.add(TableInfo.ForeignKey(&quot;categories&quot;, &quot;NO ACTION&quot;, &quot;NO ACTION&quot;, listOf(&quot;parentId&quot;), listOf(&quot;id&quot;)))</b>
-<b class="nc">&nbsp;        val _indicesCategories: MutableSet&lt;TableInfo.Index&gt; = mutableSetOf()</b>
-<b class="nc">&nbsp;        _indicesCategories.add(TableInfo.Index(&quot;index_categories_workspaceId&quot;, false, listOf(&quot;workspaceId&quot;), listOf(&quot;ASC&quot;)))</b>
-<b class="nc">&nbsp;        _indicesCategories.add(TableInfo.Index(&quot;index_categories_parentId&quot;, false, listOf(&quot;parentId&quot;), listOf(&quot;ASC&quot;)))</b>
-<b class="nc">&nbsp;        val _infoCategories: TableInfo = TableInfo(&quot;categories&quot;, _columnsCategories, _foreignKeysCategories, _indicesCategories)</b>
-<b class="nc">&nbsp;        val _existingCategories: TableInfo = read(connection, &quot;categories&quot;)</b>
-<b class="nc">&nbsp;        if (!_infoCategories.equals(_existingCategories)) {</b>
-<b class="nc">&nbsp;          return RoomOpenDelegate.ValidationResult(false, &quot;&quot;&quot;</b>
-&nbsp;              |categories(com.georgeci.moneysurfer.data.db.entity.CategoryEntity).
-&nbsp;              | Expected:
-<b class="nc">&nbsp;              |&quot;&quot;&quot;.trimMargin() + _infoCategories + &quot;&quot;&quot;</b>
-&nbsp;              |
-&nbsp;              | Found:
-<b class="nc">&nbsp;              |&quot;&quot;&quot;.trimMargin() + _existingCategories)</b>
-&nbsp;        }
-<b class="nc">&nbsp;        val _columnsTransactions: MutableMap&lt;String, TableInfo.Column&gt; = mutableMapOf()</b>
-<b class="nc">&nbsp;        _columnsTransactions.put(&quot;id&quot;, TableInfo.Column(&quot;id&quot;, &quot;TEXT&quot;, true, 1, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsTransactions.put(&quot;workspaceId&quot;, TableInfo.Column(&quot;workspaceId&quot;, &quot;TEXT&quot;, true, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsTransactions.put(&quot;accountId&quot;, TableInfo.Column(&quot;accountId&quot;, &quot;TEXT&quot;, true, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsTransactions.put(&quot;amount&quot;, TableInfo.Column(&quot;amount&quot;, &quot;INTEGER&quot;, true, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsTransactions.put(&quot;currencyCode&quot;, TableInfo.Column(&quot;currencyCode&quot;, &quot;TEXT&quot;, true, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsTransactions.put(&quot;categoryId&quot;, TableInfo.Column(&quot;categoryId&quot;, &quot;TEXT&quot;, false, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsTransactions.put(&quot;note&quot;, TableInfo.Column(&quot;note&quot;, &quot;TEXT&quot;, true, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsTransactions.put(&quot;operationAt&quot;, TableInfo.Column(&quot;operationAt&quot;, &quot;INTEGER&quot;, true, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsTransactions.put(&quot;operationDate&quot;, TableInfo.Column(&quot;operationDate&quot;, &quot;TEXT&quot;, true, 0, &quot;&#39;&#39;&quot;, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsTransactions.put(&quot;type&quot;, TableInfo.Column(&quot;type&quot;, &quot;TEXT&quot;, true, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsTransactions.put(&quot;status&quot;, TableInfo.Column(&quot;status&quot;, &quot;TEXT&quot;, true, 0, &quot;&#39;ACTUAL&#39;&quot;, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsTransactions.put(&quot;createdAt&quot;, TableInfo.Column(&quot;createdAt&quot;, &quot;INTEGER&quot;, true, 0, &quot;0&quot;, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsTransactions.put(&quot;updatedAt&quot;, TableInfo.Column(&quot;updatedAt&quot;, &quot;INTEGER&quot;, true, 0, &quot;0&quot;, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsTransactions.put(&quot;transferId&quot;, TableInfo.Column(&quot;transferId&quot;, &quot;TEXT&quot;, false, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        val _foreignKeysTransactions: MutableSet&lt;TableInfo.ForeignKey&gt; = mutableSetOf()</b>
-<b class="nc">&nbsp;        _foreignKeysTransactions.add(TableInfo.ForeignKey(&quot;workspaces&quot;, &quot;NO ACTION&quot;, &quot;NO ACTION&quot;, listOf(&quot;workspaceId&quot;), listOf(&quot;id&quot;)))</b>
-<b class="nc">&nbsp;        _foreignKeysTransactions.add(TableInfo.ForeignKey(&quot;accounts&quot;, &quot;NO ACTION&quot;, &quot;NO ACTION&quot;, listOf(&quot;accountId&quot;), listOf(&quot;id&quot;)))</b>
-<b class="nc">&nbsp;        _foreignKeysTransactions.add(TableInfo.ForeignKey(&quot;categories&quot;, &quot;NO ACTION&quot;, &quot;NO ACTION&quot;, listOf(&quot;categoryId&quot;), listOf(&quot;id&quot;)))</b>
-<b class="nc">&nbsp;        val _indicesTransactions: MutableSet&lt;TableInfo.Index&gt; = mutableSetOf()</b>
-<b class="nc">&nbsp;        _indicesTransactions.add(TableInfo.Index(&quot;index_transactions_workspaceId&quot;, false, listOf(&quot;workspaceId&quot;), listOf(&quot;ASC&quot;)))</b>
-<b class="nc">&nbsp;        _indicesTransactions.add(TableInfo.Index(&quot;index_transactions_accountId&quot;, false, listOf(&quot;accountId&quot;), listOf(&quot;ASC&quot;)))</b>
-<b class="nc">&nbsp;        _indicesTransactions.add(TableInfo.Index(&quot;index_transactions_categoryId&quot;, false, listOf(&quot;categoryId&quot;), listOf(&quot;ASC&quot;)))</b>
-<b class="nc">&nbsp;        val _infoTransactions: TableInfo = TableInfo(&quot;transactions&quot;, _columnsTransactions, _foreignKeysTransactions, _indicesTransactions)</b>
-<b class="nc">&nbsp;        val _existingTransactions: TableInfo = read(connection, &quot;transactions&quot;)</b>
-<b class="nc">&nbsp;        if (!_infoTransactions.equals(_existingTransactions)) {</b>
-<b class="nc">&nbsp;          return RoomOpenDelegate.ValidationResult(false, &quot;&quot;&quot;</b>
-&nbsp;              |transactions(com.georgeci.moneysurfer.data.db.entity.TransactionEntity).
-&nbsp;              | Expected:
-<b class="nc">&nbsp;              |&quot;&quot;&quot;.trimMargin() + _infoTransactions + &quot;&quot;&quot;</b>
-&nbsp;              |
-&nbsp;              | Found:
-<b class="nc">&nbsp;              |&quot;&quot;&quot;.trimMargin() + _existingTransactions)</b>
-&nbsp;        }
-<b class="nc">&nbsp;        val _columnsBudgets: MutableMap&lt;String, TableInfo.Column&gt; = mutableMapOf()</b>
-<b class="nc">&nbsp;        _columnsBudgets.put(&quot;id&quot;, TableInfo.Column(&quot;id&quot;, &quot;TEXT&quot;, true, 1, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsBudgets.put(&quot;name&quot;, TableInfo.Column(&quot;name&quot;, &quot;TEXT&quot;, true, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsBudgets.put(&quot;categoryIds&quot;, TableInfo.Column(&quot;categoryIds&quot;, &quot;TEXT&quot;, true, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsBudgets.put(&quot;amount&quot;, TableInfo.Column(&quot;amount&quot;, &quot;INTEGER&quot;, true, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsBudgets.put(&quot;period&quot;, TableInfo.Column(&quot;period&quot;, &quot;TEXT&quot;, true, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsBudgets.put(&quot;startDate&quot;, TableInfo.Column(&quot;startDate&quot;, &quot;TEXT&quot;, true, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsBudgets.put(&quot;alertPercent&quot;, TableInfo.Column(&quot;alertPercent&quot;, &quot;INTEGER&quot;, true, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsBudgets.put(&quot;isActive&quot;, TableInfo.Column(&quot;isActive&quot;, &quot;INTEGER&quot;, true, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsBudgets.put(&quot;createdAt&quot;, TableInfo.Column(&quot;createdAt&quot;, &quot;INTEGER&quot;, true, 0, &quot;0&quot;, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsBudgets.put(&quot;updatedAt&quot;, TableInfo.Column(&quot;updatedAt&quot;, &quot;INTEGER&quot;, true, 0, &quot;0&quot;, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        val _foreignKeysBudgets: MutableSet&lt;TableInfo.ForeignKey&gt; = mutableSetOf()</b>
-<b class="nc">&nbsp;        val _indicesBudgets: MutableSet&lt;TableInfo.Index&gt; = mutableSetOf()</b>
-<b class="nc">&nbsp;        val _infoBudgets: TableInfo = TableInfo(&quot;budgets&quot;, _columnsBudgets, _foreignKeysBudgets, _indicesBudgets)</b>
-<b class="nc">&nbsp;        val _existingBudgets: TableInfo = read(connection, &quot;budgets&quot;)</b>
-<b class="nc">&nbsp;        if (!_infoBudgets.equals(_existingBudgets)) {</b>
-<b class="nc">&nbsp;          return RoomOpenDelegate.ValidationResult(false, &quot;&quot;&quot;</b>
-&nbsp;              |budgets(com.georgeci.moneysurfer.data.db.entity.BudgetEntity).
-&nbsp;              | Expected:
-<b class="nc">&nbsp;              |&quot;&quot;&quot;.trimMargin() + _infoBudgets + &quot;&quot;&quot;</b>
-&nbsp;              |
-&nbsp;              | Found:
-<b class="nc">&nbsp;              |&quot;&quot;&quot;.trimMargin() + _existingBudgets)</b>
-&nbsp;        }
-<b class="nc">&nbsp;        val _columnsRecurringRules: MutableMap&lt;String, TableInfo.Column&gt; = mutableMapOf()</b>
-<b class="nc">&nbsp;        _columnsRecurringRules.put(&quot;id&quot;, TableInfo.Column(&quot;id&quot;, &quot;TEXT&quot;, true, 1, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsRecurringRules.put(&quot;title&quot;, TableInfo.Column(&quot;title&quot;, &quot;TEXT&quot;, true, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsRecurringRules.put(&quot;amount&quot;, TableInfo.Column(&quot;amount&quot;, &quot;INTEGER&quot;, true, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsRecurringRules.put(&quot;categoryId&quot;, TableInfo.Column(&quot;categoryId&quot;, &quot;TEXT&quot;, true, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsRecurringRules.put(&quot;scheduleFrequency&quot;, TableInfo.Column(&quot;scheduleFrequency&quot;, &quot;TEXT&quot;, true, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsRecurringRules.put(&quot;scheduleInterval&quot;, TableInfo.Column(&quot;scheduleInterval&quot;, &quot;INTEGER&quot;, true, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsRecurringRules.put(&quot;scheduleDaysOfWeek&quot;, TableInfo.Column(&quot;scheduleDaysOfWeek&quot;, &quot;TEXT&quot;, true, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsRecurringRules.put(&quot;scheduleDaysOfMonth&quot;, TableInfo.Column(&quot;scheduleDaysOfMonth&quot;, &quot;TEXT&quot;, true, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsRecurringRules.put(&quot;scheduleMissingDayPolicy&quot;, TableInfo.Column(&quot;scheduleMissingDayPolicy&quot;, &quot;TEXT&quot;, true, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsRecurringRules.put(&quot;startDate&quot;, TableInfo.Column(&quot;startDate&quot;, &quot;TEXT&quot;, true, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsRecurringRules.put(&quot;nextRunAt&quot;, TableInfo.Column(&quot;nextRunAt&quot;, &quot;INTEGER&quot;, false, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsRecurringRules.put(&quot;autoCreate&quot;, TableInfo.Column(&quot;autoCreate&quot;, &quot;INTEGER&quot;, true, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsRecurringRules.put(&quot;isActive&quot;, TableInfo.Column(&quot;isActive&quot;, &quot;INTEGER&quot;, true, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsRecurringRules.put(&quot;createdAt&quot;, TableInfo.Column(&quot;createdAt&quot;, &quot;INTEGER&quot;, true, 0, &quot;0&quot;, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsRecurringRules.put(&quot;updatedAt&quot;, TableInfo.Column(&quot;updatedAt&quot;, &quot;INTEGER&quot;, true, 0, &quot;0&quot;, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        val _foreignKeysRecurringRules: MutableSet&lt;TableInfo.ForeignKey&gt; = mutableSetOf()</b>
-<b class="nc">&nbsp;        _foreignKeysRecurringRules.add(TableInfo.ForeignKey(&quot;categories&quot;, &quot;NO ACTION&quot;, &quot;NO ACTION&quot;, listOf(&quot;categoryId&quot;), listOf(&quot;id&quot;)))</b>
-<b class="nc">&nbsp;        val _indicesRecurringRules: MutableSet&lt;TableInfo.Index&gt; = mutableSetOf()</b>
-<b class="nc">&nbsp;        _indicesRecurringRules.add(TableInfo.Index(&quot;index_recurring_rules_categoryId&quot;, false, listOf(&quot;categoryId&quot;), listOf(&quot;ASC&quot;)))</b>
-<b class="nc">&nbsp;        val _infoRecurringRules: TableInfo = TableInfo(&quot;recurring_rules&quot;, _columnsRecurringRules, _foreignKeysRecurringRules, _indicesRecurringRules)</b>
-<b class="nc">&nbsp;        val _existingRecurringRules: TableInfo = read(connection, &quot;recurring_rules&quot;)</b>
-<b class="nc">&nbsp;        if (!_infoRecurringRules.equals(_existingRecurringRules)) {</b>
-<b class="nc">&nbsp;          return RoomOpenDelegate.ValidationResult(false, &quot;&quot;&quot;</b>
-&nbsp;              |recurring_rules(com.georgeci.moneysurfer.data.db.entity.RecurringRuleEntity).
-&nbsp;              | Expected:
-<b class="nc">&nbsp;              |&quot;&quot;&quot;.trimMargin() + _infoRecurringRules + &quot;&quot;&quot;</b>
-&nbsp;              |
-&nbsp;              | Found:
-<b class="nc">&nbsp;              |&quot;&quot;&quot;.trimMargin() + _existingRecurringRules)</b>
-&nbsp;        }
-<b class="nc">&nbsp;        return RoomOpenDelegate.ValidationResult(true, null)</b>
-&nbsp;      }
-&nbsp;    }
-<b class="fc">&nbsp;    return _openDelegate</b>
-&nbsp;  }
-&nbsp;
-&nbsp;  protected override fun createInvalidationTracker(): InvalidationTracker {
-<b class="fc">&nbsp;    val _shadowTablesMap: MutableMap&lt;String, String&gt; = mutableMapOf()</b>
-<b class="fc">&nbsp;    val _viewTables: MutableMap&lt;String, Set&lt;String&gt;&gt; = mutableMapOf()</b>
-<b class="fc">&nbsp;    return InvalidationTracker(this, _shadowTablesMap, _viewTables, &quot;users&quot;, &quot;workspaces&quot;, &quot;workspace_members&quot;, &quot;workspace_invites&quot;, &quot;accounts&quot;, &quot;categories&quot;, &quot;transactions&quot;, &quot;budgets&quot;, &quot;recurring_rules&quot;)</b>
-&nbsp;  }
-&nbsp;
-&nbsp;  public override fun clearAllTables() {
-<b class="fc">&nbsp;    super.performClear(true, &quot;workspaces&quot;, &quot;workspace_members&quot;, &quot;users&quot;, &quot;workspace_invites&quot;, &quot;transactions&quot;, &quot;accounts&quot;, &quot;recurring_rules&quot;, &quot;categories&quot;, &quot;budgets&quot;)</b>
-<b class="fc">&nbsp;  }</b>
-<b class="fc">&nbsp;</b>
-<b class="fc">&nbsp;  protected override fun getRequiredTypeConverterClasses(): Map&lt;KClass&lt;*&gt;, List&lt;KClass&lt;*&gt;&gt;&gt; {</b>
-<b class="fc">&nbsp;    val _typeConvertersMap: MutableMap&lt;KClass&lt;*&gt;, List&lt;KClass&lt;*&gt;&gt;&gt; = mutableMapOf()</b>
-<b class="fc">&nbsp;    _typeConvertersMap.put(UserDao::class, UserDao_Impl.getRequiredConverters())</b>
-<b class="fc">&nbsp;    _typeConvertersMap.put(WorkspaceDao::class, WorkspaceDao_Impl.getRequiredConverters())</b>
-<b class="fc">&nbsp;    _typeConvertersMap.put(WorkspaceMemberDao::class, WorkspaceMemberDao_Impl.getRequiredConverters())</b>
-<b class="fc">&nbsp;    _typeConvertersMap.put(WorkspaceInviteDao::class, WorkspaceInviteDao_Impl.getRequiredConverters())</b>
-<b class="fc">&nbsp;    _typeConvertersMap.put(AccountDao::class, AccountDao_Impl.getRequiredConverters())</b>
-<b class="fc">&nbsp;    _typeConvertersMap.put(CategoryDao::class, CategoryDao_Impl.getRequiredConverters())</b>
-&nbsp;    _typeConvertersMap.put(TransactionDao::class, TransactionDao_Impl.getRequiredConverters())
-&nbsp;    _typeConvertersMap.put(BudgetDao::class, BudgetDao_Impl.getRequiredConverters())
-&nbsp;    _typeConvertersMap.put(RecurringRuleDao::class, RecurringRuleDao_Impl.getRequiredConverters())
-<b class="fc">&nbsp;    return _typeConvertersMap</b>
-<b class="fc">&nbsp;  }</b>
-&nbsp;
-&nbsp;  public override fun getRequiredAutoMigrationSpecClasses(): Set&lt;KClass&lt;out AutoMigrationSpec&gt;&gt; {
-&nbsp;    val _autoMigrationSpecsSet: MutableSet&lt;KClass&lt;out AutoMigrationSpec&gt;&gt; = mutableSetOf()
-<b class="fc">&nbsp;    return _autoMigrationSpecsSet</b>
-<b class="fc">&nbsp;  }</b>
-&nbsp;
-&nbsp;  public override fun createAutoMigrations(autoMigrationSpecs: Map&lt;KClass&lt;out AutoMigrationSpec&gt;, AutoMigrationSpec&gt;): List&lt;Migration&gt; {
-<b class="fc">&nbsp;    val _autoMigrations: MutableList&lt;Migration&gt; = mutableListOf()</b>
-&nbsp;    return _autoMigrations
-<b class="nc">&nbsp;  }</b>
-&nbsp;
-<b class="nc">&nbsp;  public override fun userDao(): UserDao = _userDao.value</b>
-&nbsp;
-<b class="nc">&nbsp;  public override fun workspaceDao(): WorkspaceDao = _workspaceDao.value</b>
-&nbsp;
-<b class="nc">&nbsp;  public override fun workspaceMemberDao(): WorkspaceMemberDao = _workspaceMemberDao.value</b>
-&nbsp;
-<b class="nc">&nbsp;  public override fun workspaceInviteDao(): WorkspaceInviteDao = _workspaceInviteDao.value</b>
-&nbsp;
-<b class="nc">&nbsp;  public override fun accountDao(): AccountDao = _accountDao.value</b>
-&nbsp;
-<b class="nc">&nbsp;  public override fun categoryDao(): CategoryDao = _categoryDao.value</b>
-&nbsp;
-<b class="nc">&nbsp;  public override fun transactionDao(): TransactionDao = _transactionDao.value</b>
-&nbsp;
-&nbsp;  public override fun budgetDao(): BudgetDao = _budgetDao.value
-&nbsp;
-&nbsp;  public override fun recurringRuleDao(): RecurringRuleDao = _recurringRuleDao.value
+&nbsp;public actual object MoneySurferDatabaseConstructor : RoomDatabaseConstructor&lt;MoneySurferDatabase&gt; {
+<b class="nc">&nbsp;  actual override fun initialize(): MoneySurferDatabase = com.georgeci.moneysurfer.`data`.db.MoneySurferDatabase_Impl()</b>
 &nbsp;}
 </code>
 </pre>
@@ -615,7 +122,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 13:38</div>
+    <div style="float:right;">generated on 2026-07-22 15:22</div>
 </div>
 </body>
 </html>

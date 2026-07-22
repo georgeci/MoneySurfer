@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > WorkspaceInviteDoc</title>
+  <title>MoneySurfer Coverage Report > WorkspaceMemberEntity</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,15 +19,18 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.data.remote</a>
+    <a href="../index.html">com.georgeci.moneysurfer.data.db.entity</a>
 </div>
 
-<h1>Coverage Summary for Class: WorkspaceInviteDoc (com.georgeci.moneysurfer.data.remote)</h1>
+<h1>Coverage Summary for Class: WorkspaceMemberEntity (com.georgeci.moneysurfer.data.db.entity)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -46,103 +49,42 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">WorkspaceInviteDoc</td>
+  <td class="name">WorkspaceMemberEntity</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/76)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/12)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/431)
-  </span>
-</td>
-</tr>
-  <tr>
-    <td class="name">WorkspaceInviteDoc$Companion</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
     <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (12/12)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/4)
-  </span>
-</td>
-  </tr>
-<tr>
-  <td class="name"><strong>Total</strong></td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/2)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/76)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/13)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/435)
+    (71/71)
   </span>
 </td>
 </tr>
+
 </table>
 
 <br/>
@@ -150,127 +92,47 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.remote
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.db.entity
 &nbsp;
-&nbsp;import kotlinx.serialization.Serializable
+&nbsp;import androidx.room.ColumnInfo
+&nbsp;import androidx.room.Entity
+&nbsp;import androidx.room.ForeignKey
+&nbsp;import androidx.room.Index
 &nbsp;
-&nbsp;/**
-&nbsp; * Firestore wire-format DTOs. Field names mirror Room entities 1:1 so a Firestore document
-&nbsp; * can round-trip through Kotlin serialization without a custom mapping layer.
-&nbsp; */
-&nbsp;
-&nbsp;@Serializable
-&nbsp;data class UserDoc(
-&nbsp;    val displayName: String? = null,
-&nbsp;    val email: String? = null,
-&nbsp;    val isAnon: Boolean = false,
-&nbsp;    val createdAt: Long = 0L,
-&nbsp;    val workspaceIds: List&lt;String&gt; = emptyList(),
-&nbsp;    val defaultWorkspaceId: String? = null,
-&nbsp;    val invitedWorkspaceIds: List&lt;String&gt; = emptyList(),
+&nbsp;// No FK on workspaceId — accepting an incoming invite inserts a member row BEFORE the
+&nbsp;// recipient has synced the workspace locally (the workspace pull is triggered after the
+&nbsp;// member row exists, since `users.workspaceIds` doesn&#39;t include the new workspace until
+&nbsp;// then). The previous FK triggered SQLite error 787 on accept. Same trade-off as
+&nbsp;// `workspace_invites`: referential integrity loss is fine because workspaces are never
+&nbsp;// hard-deleted; member rows for purged workspaces are cleaned up by the sync layer
+&nbsp;// (CLEAR_MEMBERS step in WorkspaceSyncRepositoryImpl) rather than by FK cascade.
+<b class="fc">&nbsp;@Entity(</b>
+&nbsp;    tableName = &quot;workspace_members&quot;,
+&nbsp;    primaryKeys = [&quot;userId&quot;, &quot;workspaceId&quot;],
+&nbsp;    foreignKeys = [
+&nbsp;        ForeignKey(
+&nbsp;            entity = UserEntity::class,
+&nbsp;            parentColumns = [&quot;id&quot;],
+&nbsp;            childColumns = [&quot;userId&quot;],
+&nbsp;        ),
+&nbsp;    ],
+&nbsp;    // No index on userId — the composite primary key (userId, workspaceId) already
+&nbsp;    // indexes it as its leftmost column. No index on status either: nothing in
+&nbsp;    // WorkspaceMemberDao filters on it, and it is low-cardinality besides.
+&nbsp;    indices = [Index(&quot;workspaceId&quot;)],
 &nbsp;)
-&nbsp;
-&nbsp;/**
-&nbsp; * Email→uid mapping for invite recipient discovery. Doc id is the lowercased email.
-&nbsp; * Kept as a separate collection (rather than exposing `users.email` via list rules) so the
-&nbsp; * security rule is a tight `signedIn()` read on a single field with no other PII leakage.
-&nbsp; */
-&nbsp;@Serializable
-&nbsp;data class UserEmailDoc(
-&nbsp;    val uid: String = &quot;&quot;,
-&nbsp;    val updatedAt: Long = 0L,
-&nbsp;)
-&nbsp;
-&nbsp;@Serializable
-&nbsp;data class WorkspaceDoc(
-&nbsp;    val name: String = &quot;&quot;,
-&nbsp;    val description: String = &quot;&quot;,
-&nbsp;    val baseCurrency: String = &quot;&quot;,
-&nbsp;    val ownerId: String = &quot;&quot;,
-&nbsp;    val archived: Boolean = false,
-&nbsp;    val createdAt: Long = 0L,
-&nbsp;    val updatedAt: Long = 0L,
-&nbsp;    val deletedAt: Long? = null,
-&nbsp;    val clientVersionCode: Int = 1,
-&nbsp;)
-&nbsp;
-&nbsp;@Serializable
-&nbsp;data class AccountDoc(
-&nbsp;    val name: String = &quot;&quot;,
-&nbsp;    val type: String = &quot;&quot;,
-&nbsp;    val currency: String = &quot;&quot;,
-&nbsp;    val balance: Long = 0L,
-&nbsp;    val updatedAt: Long = 0L,
-&nbsp;    val deletedAt: Long? = null,
-&nbsp;    val clientVersionCode: Int = 1,
-&nbsp;)
-&nbsp;
-&nbsp;@Serializable
-&nbsp;data class CategoryDoc(
-&nbsp;    val name: String = &quot;&quot;,
-&nbsp;    val type: String = &quot;&quot;,
-&nbsp;    val parentId: String? = null,
-&nbsp;    val createdAt: Long = 0L,
-&nbsp;    val updatedAt: Long = 0L,
-&nbsp;    val deletedAt: Long? = null,
-&nbsp;    val clientVersionCode: Int = 1,
-&nbsp;)
-&nbsp;
-&nbsp;@Serializable
-&nbsp;data class TransactionDoc(
-&nbsp;    val accountId: String = &quot;&quot;,
-&nbsp;    val categoryId: String? = null,
-&nbsp;    val amount: Long = 0L,
-&nbsp;    val currencyCode: String = &quot;&quot;,
-&nbsp;    val note: String = &quot;&quot;,
-&nbsp;    val operationAt: Long = 0L,
-&nbsp;    val operationDate: String = &quot;&quot;,
-&nbsp;    val type: String = &quot;&quot;,
-&nbsp;    val status: String = &quot;ACTUAL&quot;,
-&nbsp;    val createdAt: Long = 0L,
-&nbsp;    val updatedAt: Long = 0L,
-&nbsp;    val deletedAt: Long? = null,
-&nbsp;    val clientVersionCode: Int = 1,
-&nbsp;)
-&nbsp;
-&nbsp;/**
-&nbsp; * Member doc lives at `workspaces/{wid}/members/{uid}`. Doc id = userId.
-&nbsp; *
-&nbsp; * Soft-delete via `status` (`ACTIVE` / `LEFT` / `REMOVED`) — `deletedAt` is kept for
-&nbsp; * back-compat with old docs and as a tombstone fallback for clients pulling members.
-&nbsp; */
-&nbsp;@Serializable
-&nbsp;data class WorkspaceMemberDoc(
-&nbsp;    val userId: String = &quot;&quot;,
-&nbsp;    val role: String = &quot;&quot;,
-&nbsp;    val status: String = &quot;ACTIVE&quot;,
-&nbsp;    val displayName: String = &quot;&quot;,
-&nbsp;    val email: String? = null,
-&nbsp;    val addedByUserId: String? = null,
-&nbsp;    val createdAt: Long = 0L,
-&nbsp;    val updatedAt: Long = 0L,
-&nbsp;    val leftAt: Long? = null,
-&nbsp;    val removedAt: Long? = null,
-&nbsp;    val deletedAt: Long? = null,
-&nbsp;    val clientVersionCode: Int = 1,
-&nbsp;)
-&nbsp;
-&nbsp;/**
-&nbsp; * Invite doc lives at `workspaces/{wid}/invites/{inviteId}`. Doc id = invite UUID.
-&nbsp; */
-<b class="nc">&nbsp;@Serializable</b>
-&nbsp;data class WorkspaceInviteDoc(
-<b class="nc">&nbsp;    val email: String = &quot;&quot;,</b>
-<b class="nc">&nbsp;    val targetUserId: String? = null,</b>
-<b class="nc">&nbsp;    val role: String = &quot;&quot;,</b>
-<b class="nc">&nbsp;    val status: String = &quot;PENDING&quot;,</b>
-<b class="nc">&nbsp;    val invitedByUserId: String = &quot;&quot;,</b>
-<b class="nc">&nbsp;    val createdAt: Long = 0L,</b>
-<b class="nc">&nbsp;    val updatedAt: Long = 0L,</b>
-<b class="nc">&nbsp;    val expiresAt: Long = 0L,</b>
-<b class="nc">&nbsp;    val respondedAt: Long? = null,</b>
-<b class="nc">&nbsp;    val deletedAt: Long? = null,</b>
-<b class="nc">&nbsp;    val clientVersionCode: Int = 1,</b>
+&nbsp;data class WorkspaceMemberEntity(
+<b class="fc">&nbsp;    @ColumnInfo(name = &quot;userId&quot;) val userId: String,</b>
+<b class="fc">&nbsp;    @ColumnInfo(name = &quot;workspaceId&quot;) val workspaceId: String,</b>
+<b class="fc">&nbsp;    @ColumnInfo(name = &quot;role&quot;) val role: String,</b>
+<b class="fc">&nbsp;    @ColumnInfo(name = &quot;status&quot;, defaultValue = &quot;ACTIVE&quot;) val status: String = &quot;ACTIVE&quot;,</b>
+<b class="fc">&nbsp;    @ColumnInfo(name = &quot;displayName&quot;, defaultValue = &quot;&quot;) val displayName: String = &quot;&quot;,</b>
+<b class="fc">&nbsp;    @ColumnInfo(name = &quot;email&quot;) val email: String? = null,</b>
+<b class="fc">&nbsp;    @ColumnInfo(name = &quot;addedByUserId&quot;) val addedByUserId: String? = null,</b>
+<b class="fc">&nbsp;    @ColumnInfo(name = &quot;createdAt&quot;, defaultValue = &quot;0&quot;) val createdAt: Long,</b>
+<b class="fc">&nbsp;    @ColumnInfo(name = &quot;updatedAt&quot;, defaultValue = &quot;0&quot;) val updatedAt: Long = 0L,</b>
+<b class="fc">&nbsp;    @ColumnInfo(name = &quot;leftAt&quot;) val leftAt: Long? = null,</b>
+<b class="fc">&nbsp;    @ColumnInfo(name = &quot;removedAt&quot;) val removedAt: Long? = null,</b>
 &nbsp;)
 </code>
 </pre>
@@ -295,7 +157,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-05-06 14:45</div>
+    <div style="float:right;">generated on 2026-07-22 15:22</div>
 </div>
 </body>
 </html>

@@ -96,7 +96,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/50)
+    (0/48)
   </span>
 </td>
 <td class="coverageStat">
@@ -104,7 +104,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/339)
+    (0/346)
   </span>
 </td>
   </tr>
@@ -131,7 +131,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/70)
+    (0/68)
   </span>
 </td>
 <td class="coverageStat">
@@ -139,7 +139,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/437)
+    (0/444)
   </span>
 </td>
 </tr>
@@ -192,15 +192,14 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;  }
 &nbsp;
 &nbsp;  protected override fun createOpenDelegate(): RoomOpenDelegate {
-<b class="nc">&nbsp;    val _openDelegate: RoomOpenDelegate = object : RoomOpenDelegate(1, &quot;2c31045a37ab51b6e593372426ede508&quot;, &quot;102c65f8ccbc7e1817674ef2552bdc15&quot;) {</b>
+<b class="nc">&nbsp;    val _openDelegate: RoomOpenDelegate = object : RoomOpenDelegate(2, &quot;3c40e51c3a3a86fe99dc49f5501ccc5d&quot;, &quot;49f98b8a1936f530e32d1ff0ad92e412&quot;) {</b>
 &nbsp;      public override fun createAllTables(connection: SQLiteConnection) {
 <b class="nc">&nbsp;        connection.execSQL(&quot;CREATE TABLE IF NOT EXISTS `sync_meta` (`workspaceId` TEXT NOT NULL, `collection` TEXT NOT NULL, `lastPulledAt` INTEGER, `lastSyncSuccessAt` INTEGER, `lastSyncAttemptAt` INTEGER, PRIMARY KEY(`workspaceId`, `collection`))&quot;)</b>
 <b class="nc">&nbsp;        connection.execSQL(&quot;CREATE TABLE IF NOT EXISTS `pending_mutations` (`id` TEXT NOT NULL, `entityType` TEXT NOT NULL, `entityId` TEXT NOT NULL, `operation` TEXT NOT NULL, `workspaceId` TEXT, `createdAt` INTEGER NOT NULL, `attempts` INTEGER NOT NULL, `status` TEXT NOT NULL, `lastError` TEXT, PRIMARY KEY(`id`))&quot;)</b>
-<b class="nc">&nbsp;        connection.execSQL(&quot;CREATE INDEX IF NOT EXISTS `index_pending_mutations_status` ON `pending_mutations` (`status`)&quot;)</b>
+<b class="nc">&nbsp;        connection.execSQL(&quot;CREATE INDEX IF NOT EXISTS `index_pending_mutations_status_createdAt` ON `pending_mutations` (`status`, `createdAt`)&quot;)</b>
 <b class="nc">&nbsp;        connection.execSQL(&quot;CREATE INDEX IF NOT EXISTS `index_pending_mutations_workspaceId` ON `pending_mutations` (`workspaceId`)&quot;)</b>
-<b class="nc">&nbsp;        connection.execSQL(&quot;CREATE INDEX IF NOT EXISTS `index_pending_mutations_createdAt` ON `pending_mutations` (`createdAt`)&quot;)</b>
 <b class="nc">&nbsp;        connection.execSQL(&quot;CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)&quot;)</b>
-<b class="nc">&nbsp;        connection.execSQL(&quot;INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, &#39;2c31045a37ab51b6e593372426ede508&#39;)&quot;)</b>
+<b class="nc">&nbsp;        connection.execSQL(&quot;INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, &#39;3c40e51c3a3a86fe99dc49f5501ccc5d&#39;)&quot;)</b>
 &nbsp;      }
 &nbsp;
 &nbsp;      public override fun dropAllTables(connection: SQLiteConnection) {
@@ -254,9 +253,8 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="nc">&nbsp;        _columnsPendingMutations.put(&quot;lastError&quot;, TableInfo.Column(&quot;lastError&quot;, &quot;TEXT&quot;, false, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
 <b class="nc">&nbsp;        val _foreignKeysPendingMutations: MutableSet&lt;TableInfo.ForeignKey&gt; = mutableSetOf()</b>
 <b class="nc">&nbsp;        val _indicesPendingMutations: MutableSet&lt;TableInfo.Index&gt; = mutableSetOf()</b>
-<b class="nc">&nbsp;        _indicesPendingMutations.add(TableInfo.Index(&quot;index_pending_mutations_status&quot;, false, listOf(&quot;status&quot;), listOf(&quot;ASC&quot;)))</b>
+<b class="nc">&nbsp;        _indicesPendingMutations.add(TableInfo.Index(&quot;index_pending_mutations_status_createdAt&quot;, false, listOf(&quot;status&quot;, &quot;createdAt&quot;), listOf(&quot;ASC&quot;, &quot;ASC&quot;)))</b>
 <b class="nc">&nbsp;        _indicesPendingMutations.add(TableInfo.Index(&quot;index_pending_mutations_workspaceId&quot;, false, listOf(&quot;workspaceId&quot;), listOf(&quot;ASC&quot;)))</b>
-<b class="nc">&nbsp;        _indicesPendingMutations.add(TableInfo.Index(&quot;index_pending_mutations_createdAt&quot;, false, listOf(&quot;createdAt&quot;), listOf(&quot;ASC&quot;)))</b>
 <b class="nc">&nbsp;        val _infoPendingMutations: TableInfo = TableInfo(&quot;pending_mutations&quot;, _columnsPendingMutations, _foreignKeysPendingMutations, _indicesPendingMutations)</b>
 <b class="nc">&nbsp;        val _existingPendingMutations: TableInfo = read(connection, &quot;pending_mutations&quot;)</b>
 <b class="nc">&nbsp;        if (!_infoPendingMutations.equals(_existingPendingMutations)) {</b>
@@ -324,7 +322,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 13:38</div>
+    <div style="float:right;">generated on 2026-07-22 15:22</div>
 </div>
 </body>
 </html>

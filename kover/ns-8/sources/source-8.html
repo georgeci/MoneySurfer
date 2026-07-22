@@ -64,6 +64,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.data.db.entity.CategoryEntity
 &nbsp;import com.georgeci.moneysurfer.data.db.entity.RecurringRuleEntity
 &nbsp;import com.georgeci.moneysurfer.data.db.entity.TransactionEntity
+&nbsp;import com.georgeci.moneysurfer.data.db.entity.TransactionFtsEntity
 &nbsp;import com.georgeci.moneysurfer.data.db.entity.UserEntity
 &nbsp;import com.georgeci.moneysurfer.data.db.entity.WorkspaceEntity
 &nbsp;import com.georgeci.moneysurfer.data.db.entity.WorkspaceInviteEntity
@@ -73,7 +74,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp; * Schema version of [MoneySurferDatabase]. Single source of truth so the
 &nbsp; * Room annotation, the backup manifest, and tests can never drift.
 &nbsp; */
-&nbsp;const val MONEY_SURFER_DB_VERSION: Int = 22
+&nbsp;const val MONEY_SURFER_DB_VERSION: Int = 23
 &nbsp;
 &nbsp;@Database(
 &nbsp;    entities = [
@@ -84,6 +85,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;        AccountEntity::class,
 &nbsp;        CategoryEntity::class,
 &nbsp;        TransactionEntity::class,
+&nbsp;        TransactionFtsEntity::class,
 &nbsp;        BudgetEntity::class,
 &nbsp;        RecurringRuleEntity::class,
 &nbsp;    ],
@@ -129,7 +131,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 13:38</div>
+    <div style="float:right;">generated on 2026-07-22 15:22</div>
 </div>
 </body>
 </html>

@@ -52,7 +52,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/29)
+    (0/31)
   </span>
 </td>
 <td class="coverageStat">
@@ -60,7 +60,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/40)
+    (0/46)
   </span>
 </td>
 <td class="coverageStat">
@@ -68,7 +68,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/393)
+    (0/454)
   </span>
 </td>
 <td class="coverageStat">
@@ -76,7 +76,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/1509)
+    (0/1742)
   </span>
 </td>
 </tr>
@@ -252,10 +252,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
-    2.4%
+    2.3%
   </span>
   <span class="absValue">
-    (1/42)
+    (1/44)
   </span>
 </td>
 <td class="coverageStat">
@@ -263,7 +263,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/56)
+    (0/62)
   </span>
 </td>
 <td class="coverageStat">
@@ -271,15 +271,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0.2%
   </span>
   <span class="absValue">
-    (1/484)
+    (1/545)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0.1%
+    0%
   </span>
   <span class="absValue">
-    (1/1876)
+    (1/2109)
   </span>
 </td>
 </tr>
@@ -942,6 +942,85 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    }
 &nbsp;  }
 &nbsp;
+&nbsp;  public override fun searchByNote(workspaceId: String, query: String): Flow&lt;List&lt;TransactionEntity&gt;&gt; {
+<b class="nc">&nbsp;    val _sql: String = &quot;&quot;&quot;</b>
+&nbsp;        |
+&nbsp;        |        SELECT transactions.* FROM transactions
+&nbsp;        |        JOIN transactions_fts ON transactions_fts.rowid = transactions.rowid
+&nbsp;        |        WHERE transactions.workspaceId = ? AND transactions_fts MATCH ?
+&nbsp;        |        ORDER BY transactions.operationDate DESC, transactions.operationAt DESC, transactions.createdAt DESC
+&nbsp;        |        
+<b class="nc">&nbsp;        &quot;&quot;&quot;.trimMargin()</b>
+<b class="nc">&nbsp;    return createFlow(__db, false, arrayOf(&quot;transactions&quot;, &quot;transactions_fts&quot;)) { _connection -&gt;</b>
+<b class="nc">&nbsp;      val _stmt: SQLiteStatement = _connection.prepare(_sql)</b>
+&nbsp;      try {
+<b class="nc">&nbsp;        var _argIndex: Int = 1</b>
+<b class="nc">&nbsp;        _stmt.bindText(_argIndex, workspaceId)</b>
+<b class="nc">&nbsp;        _argIndex = 2</b>
+<b class="nc">&nbsp;        _stmt.bindText(_argIndex, query)</b>
+<b class="nc">&nbsp;        val _columnIndexOfId: Int = getColumnIndexOrThrow(_stmt, &quot;id&quot;)</b>
+<b class="nc">&nbsp;        val _columnIndexOfWorkspaceId: Int = getColumnIndexOrThrow(_stmt, &quot;workspaceId&quot;)</b>
+<b class="nc">&nbsp;        val _columnIndexOfAccountId: Int = getColumnIndexOrThrow(_stmt, &quot;accountId&quot;)</b>
+<b class="nc">&nbsp;        val _columnIndexOfAmount: Int = getColumnIndexOrThrow(_stmt, &quot;amount&quot;)</b>
+<b class="nc">&nbsp;        val _columnIndexOfCurrencyCode: Int = getColumnIndexOrThrow(_stmt, &quot;currencyCode&quot;)</b>
+<b class="nc">&nbsp;        val _columnIndexOfCategoryId: Int = getColumnIndexOrThrow(_stmt, &quot;categoryId&quot;)</b>
+<b class="nc">&nbsp;        val _columnIndexOfNote: Int = getColumnIndexOrThrow(_stmt, &quot;note&quot;)</b>
+<b class="nc">&nbsp;        val _columnIndexOfOperationAt: Int = getColumnIndexOrThrow(_stmt, &quot;operationAt&quot;)</b>
+<b class="nc">&nbsp;        val _columnIndexOfOperationDate: Int = getColumnIndexOrThrow(_stmt, &quot;operationDate&quot;)</b>
+<b class="nc">&nbsp;        val _columnIndexOfType: Int = getColumnIndexOrThrow(_stmt, &quot;type&quot;)</b>
+<b class="nc">&nbsp;        val _columnIndexOfStatus: Int = getColumnIndexOrThrow(_stmt, &quot;status&quot;)</b>
+<b class="nc">&nbsp;        val _columnIndexOfCreatedAt: Int = getColumnIndexOrThrow(_stmt, &quot;createdAt&quot;)</b>
+<b class="nc">&nbsp;        val _columnIndexOfUpdatedAt: Int = getColumnIndexOrThrow(_stmt, &quot;updatedAt&quot;)</b>
+<b class="nc">&nbsp;        val _columnIndexOfTransferId: Int = getColumnIndexOrThrow(_stmt, &quot;transferId&quot;)</b>
+<b class="nc">&nbsp;        val _result: MutableList&lt;TransactionEntity&gt; = mutableListOf()</b>
+<b class="nc">&nbsp;        while (_stmt.step()) {</b>
+<b class="nc">&nbsp;          val _item: TransactionEntity</b>
+<b class="nc">&nbsp;          val _tmpId: String</b>
+<b class="nc">&nbsp;          _tmpId = _stmt.getText(_columnIndexOfId)</b>
+<b class="nc">&nbsp;          val _tmpWorkspaceId: String</b>
+<b class="nc">&nbsp;          _tmpWorkspaceId = _stmt.getText(_columnIndexOfWorkspaceId)</b>
+<b class="nc">&nbsp;          val _tmpAccountId: String</b>
+<b class="nc">&nbsp;          _tmpAccountId = _stmt.getText(_columnIndexOfAccountId)</b>
+<b class="nc">&nbsp;          val _tmpAmount: Long</b>
+<b class="nc">&nbsp;          _tmpAmount = _stmt.getLong(_columnIndexOfAmount)</b>
+<b class="nc">&nbsp;          val _tmpCurrencyCode: String</b>
+<b class="nc">&nbsp;          _tmpCurrencyCode = _stmt.getText(_columnIndexOfCurrencyCode)</b>
+<b class="nc">&nbsp;          val _tmpCategoryId: String?</b>
+<b class="nc">&nbsp;          if (_stmt.isNull(_columnIndexOfCategoryId)) {</b>
+<b class="nc">&nbsp;            _tmpCategoryId = null</b>
+&nbsp;          } else {
+<b class="nc">&nbsp;            _tmpCategoryId = _stmt.getText(_columnIndexOfCategoryId)</b>
+&nbsp;          }
+<b class="nc">&nbsp;          val _tmpNote: String</b>
+<b class="nc">&nbsp;          _tmpNote = _stmt.getText(_columnIndexOfNote)</b>
+<b class="nc">&nbsp;          val _tmpOperationAt: Long</b>
+<b class="nc">&nbsp;          _tmpOperationAt = _stmt.getLong(_columnIndexOfOperationAt)</b>
+<b class="nc">&nbsp;          val _tmpOperationDate: String</b>
+<b class="nc">&nbsp;          _tmpOperationDate = _stmt.getText(_columnIndexOfOperationDate)</b>
+<b class="nc">&nbsp;          val _tmpType: String</b>
+<b class="nc">&nbsp;          _tmpType = _stmt.getText(_columnIndexOfType)</b>
+<b class="nc">&nbsp;          val _tmpStatus: String</b>
+<b class="nc">&nbsp;          _tmpStatus = _stmt.getText(_columnIndexOfStatus)</b>
+<b class="nc">&nbsp;          val _tmpCreatedAt: Long</b>
+<b class="nc">&nbsp;          _tmpCreatedAt = _stmt.getLong(_columnIndexOfCreatedAt)</b>
+<b class="nc">&nbsp;          val _tmpUpdatedAt: Long</b>
+<b class="nc">&nbsp;          _tmpUpdatedAt = _stmt.getLong(_columnIndexOfUpdatedAt)</b>
+<b class="nc">&nbsp;          val _tmpTransferId: String?</b>
+<b class="nc">&nbsp;          if (_stmt.isNull(_columnIndexOfTransferId)) {</b>
+<b class="nc">&nbsp;            _tmpTransferId = null</b>
+&nbsp;          } else {
+<b class="nc">&nbsp;            _tmpTransferId = _stmt.getText(_columnIndexOfTransferId)</b>
+&nbsp;          }
+<b class="nc">&nbsp;          _item = TransactionEntity(_tmpId,_tmpWorkspaceId,_tmpAccountId,_tmpAmount,_tmpCurrencyCode,_tmpCategoryId,_tmpNote,_tmpOperationAt,_tmpOperationDate,_tmpType,_tmpStatus,_tmpCreatedAt,_tmpUpdatedAt,_tmpTransferId)</b>
+<b class="nc">&nbsp;          _result.add(_item)</b>
+&nbsp;        }
+<b class="nc">&nbsp;        _result</b>
+&nbsp;      } finally {
+<b class="nc">&nbsp;        _stmt.close()</b>
+&nbsp;      }
+&nbsp;    }
+&nbsp;  }
+&nbsp;
 &nbsp;  public override suspend fun delete(id: String) {
 <b class="nc">&nbsp;    val _sql: String = &quot;DELETE FROM transactions WHERE id = ?&quot;</b>
 <b class="nc">&nbsp;    return performSuspending(__db, false, true) { _connection -&gt;</b>
@@ -1023,7 +1102,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 13:38</div>
+    <div style="float:right;">generated on 2026-07-22 15:22</div>
 </div>
 </body>
 </html>

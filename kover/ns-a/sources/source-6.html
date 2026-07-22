@@ -119,7 +119,23 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;            childColumns = [&quot;categoryId&quot;],
 &nbsp;        ),
 &nbsp;    ],
-&nbsp;    indices = [Index(&quot;workspaceId&quot;), Index(&quot;accountId&quot;), Index(&quot;categoryId&quot;)],
+&nbsp;    // Composite indices for the workspace- and account-scoped list queries in
+&nbsp;    // TransactionDao: their ORDER BY matches the index, so SQLite walks it instead of
+&nbsp;    // building a temp B-tree per Flow emission. (The unscoped getAll* queries sort the
+&nbsp;    // whole table and cannot use an index whose leftmost column they don&#39;t filter on.)
+&nbsp;    // Each starts with the FK column, which also satisfies Room&#39;s FK-index requirement
+&nbsp;    // — no separate single-column index on workspaceId / accountId is needed.
+&nbsp;    indices = [
+&nbsp;        Index(
+&nbsp;            value = [&quot;workspaceId&quot;, &quot;operationDate&quot;, &quot;operationAt&quot;, &quot;createdAt&quot;],
+&nbsp;            orders = [Index.Order.ASC, Index.Order.DESC, Index.Order.DESC, Index.Order.DESC],
+&nbsp;        ),
+&nbsp;        Index(
+&nbsp;            value = [&quot;accountId&quot;, &quot;operationDate&quot;, &quot;operationAt&quot;, &quot;createdAt&quot;],
+&nbsp;            orders = [Index.Order.ASC, Index.Order.DESC, Index.Order.DESC, Index.Order.DESC],
+&nbsp;        ),
+&nbsp;        Index(&quot;categoryId&quot;),
+&nbsp;    ],
 &nbsp;)
 &nbsp;data class TransactionEntity(
 <b class="nc">&nbsp;    @PrimaryKey</b>
@@ -161,7 +177,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 13:38</div>
+    <div style="float:right;">generated on 2026-07-22 15:22</div>
 </div>
 </body>
 </html>

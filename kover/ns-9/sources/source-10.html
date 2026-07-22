@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > TransactionDao</title>
+  <title>MoneySurfer Coverage Report > RecurringRuleDao</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.data.db.dao</a>
 </div>
 
-<h1>Coverage Summary for Class: TransactionDao (com.georgeci.moneysurfer.data.db.dao)</h1>
+<h1>Coverage Summary for Class: RecurringRuleDao (com.georgeci.moneysurfer.data.db.dao)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">TransactionDao</td>
+  <td class="name">RecurringRuleDao</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -50,103 +50,28 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import androidx.room.Insert
 &nbsp;import androidx.room.Query
 &nbsp;import androidx.room.Update
-&nbsp;import androidx.room.Upsert
-&nbsp;import com.georgeci.moneysurfer.data.db.entity.CategorizedTransactionEntity
-&nbsp;import com.georgeci.moneysurfer.data.db.entity.TransactionEntity
+&nbsp;import com.georgeci.moneysurfer.data.db.entity.RecurringRuleEntity
 &nbsp;import kotlinx.coroutines.flow.Flow
 &nbsp;
 &nbsp;@Dao
-&nbsp;interface TransactionDao {
+&nbsp;interface RecurringRuleDao {
 &nbsp;
-&nbsp;    @Query(&quot;SELECT * FROM transactions ORDER BY operationDate DESC, operationAt DESC, createdAt DESC&quot;)
-&nbsp;    fun getAll(): Flow&lt;List&lt;TransactionEntity&gt;&gt;
+&nbsp;    @Query(&quot;SELECT * FROM recurring_rules&quot;)
+&nbsp;    fun getAll(): Flow&lt;List&lt;RecurringRuleEntity&gt;&gt;
 &nbsp;
-&nbsp;    @Query(
-&nbsp;        &quot;&quot;&quot;
-&nbsp;        SELECT
-&nbsp;            transactions.id,
-&nbsp;            transactions.workspaceId,
-&nbsp;            transactions.accountId,
-&nbsp;            transactions.amount,
-&nbsp;            transactions.currencyCode,
-&nbsp;            transactions.categoryId,
-&nbsp;            categories.name AS categoryName,
-&nbsp;            transactions.note,
-&nbsp;            transactions.operationAt,
-&nbsp;            transactions.operationDate,
-&nbsp;            transactions.createdAt,
-&nbsp;            transactions.type,
-&nbsp;            transactions.status,
-&nbsp;            transactions.updatedAt,
-&nbsp;            transactions.transferId
-&nbsp;        FROM transactions
-&nbsp;        LEFT JOIN categories ON categories.id = transactions.categoryId
-&nbsp;        ORDER BY transactions.operationDate DESC, transactions.operationAt DESC, transactions.createdAt DESC
-&nbsp;        &quot;&quot;&quot;,
-&nbsp;    )
-&nbsp;    fun getAllCategorized(): Flow&lt;List&lt;CategorizedTransactionEntity&gt;&gt;
-&nbsp;
-&nbsp;    @Query(
-&nbsp;        &quot;SELECT * FROM transactions WHERE accountId = :accountId ORDER BY operationDate DESC, operationAt DESC, createdAt DESC&quot;,
-&nbsp;    )
-&nbsp;    fun getByAccountId(accountId: String): Flow&lt;List&lt;TransactionEntity&gt;&gt;
-&nbsp;
-&nbsp;    @Query(
-&nbsp;        &quot;&quot;&quot;
-&nbsp;        SELECT
-&nbsp;            transactions.id,
-&nbsp;            transactions.workspaceId,
-&nbsp;            transactions.accountId,
-&nbsp;            transactions.amount,
-&nbsp;            transactions.currencyCode,
-&nbsp;            transactions.categoryId,
-&nbsp;            categories.name AS categoryName,
-&nbsp;            transactions.note,
-&nbsp;            transactions.operationAt,
-&nbsp;            transactions.operationDate,
-&nbsp;            transactions.createdAt,
-&nbsp;            transactions.type,
-&nbsp;            transactions.status,
-&nbsp;            transactions.updatedAt,
-&nbsp;            transactions.transferId
-&nbsp;        FROM transactions
-&nbsp;        LEFT JOIN categories ON categories.id = transactions.categoryId
-&nbsp;        WHERE transactions.accountId = :accountId
-&nbsp;        ORDER BY transactions.operationDate DESC, transactions.operationAt DESC, transactions.createdAt DESC
-&nbsp;        &quot;&quot;&quot;,
-&nbsp;    )
-&nbsp;    fun getByAccountIdCategorized(accountId: String): Flow&lt;List&lt;CategorizedTransactionEntity&gt;&gt;
-&nbsp;
-&nbsp;    @Query(
-&nbsp;        &quot;SELECT * FROM transactions WHERE workspaceId = :workspaceId ORDER BY operationDate DESC, operationAt DESC, createdAt DESC&quot;,
-&nbsp;    )
-&nbsp;    fun getByWorkspaceId(workspaceId: String): Flow&lt;List&lt;TransactionEntity&gt;&gt;
-&nbsp;
-&nbsp;    @Query(&quot;SELECT * FROM transactions WHERE id = :id&quot;)
-&nbsp;    suspend fun getById(id: String): TransactionEntity?
+&nbsp;    @Query(&quot;SELECT * FROM recurring_rules WHERE id = :id&quot;)
+&nbsp;    suspend fun getById(id: String): RecurringRuleEntity?
 &nbsp;
 &nbsp;    @Insert
-&nbsp;    suspend fun insert(entity: TransactionEntity)
-&nbsp;
-&nbsp;    @Insert
-&nbsp;    suspend fun insertAll(entities: List&lt;TransactionEntity&gt;)
+&nbsp;    suspend fun insert(entity: RecurringRuleEntity)
 &nbsp;
 &nbsp;    @Update
-&nbsp;    suspend fun update(entity: TransactionEntity)
+&nbsp;    suspend fun update(entity: RecurringRuleEntity)
 &nbsp;
-&nbsp;    @Upsert
-&nbsp;    suspend fun upsertAll(entities: List&lt;TransactionEntity&gt;)
-&nbsp;
-&nbsp;    @Query(&quot;DELETE FROM transactions WHERE id = :id&quot;)
+&nbsp;    @Query(&quot;DELETE FROM recurring_rules WHERE id = :id&quot;)
 &nbsp;    suspend fun delete(id: String)
 &nbsp;
-&nbsp;    @Query(&quot;DELETE FROM transactions WHERE accountId = :accountId&quot;)
-&nbsp;    suspend fun deleteByAccountId(accountId: String)
-&nbsp;
-&nbsp;    @Query(&quot;UPDATE transactions SET categoryId = NULL WHERE categoryId = :categoryId&quot;)
-&nbsp;    suspend fun nullifyCategoryId(categoryId: String)
-&nbsp;
-&nbsp;    @Query(&quot;DELETE FROM transactions&quot;)
+&nbsp;    @Query(&quot;DELETE FROM recurring_rules&quot;)
 &nbsp;    suspend fun deleteAll()
 &nbsp;}
 </code>
@@ -172,7 +97,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 13:38</div>
+    <div style="float:right;">generated on 2026-07-22 15:22</div>
 </div>
 </body>
 </html>

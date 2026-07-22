@@ -129,10 +129,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp; */
 <b class="fc">&nbsp;@Entity(</b>
 &nbsp;    tableName = &quot;pending_mutations&quot;,
+&nbsp;    // (status, createdAt) as one composite: the drain query is
+&nbsp;    // `WHERE status = &#39;PENDING&#39; ... ORDER BY createdAt ASC LIMIT n`, so the index
+&nbsp;    // serves both the filter and the ordering, replacing the two single-column ones.
 &nbsp;    indices = [
-&nbsp;        Index(&quot;status&quot;),
+&nbsp;        Index(value = [&quot;status&quot;, &quot;createdAt&quot;]),
 &nbsp;        Index(&quot;workspaceId&quot;),
-&nbsp;        Index(&quot;createdAt&quot;),
 &nbsp;    ],
 &nbsp;)
 &nbsp;data class PendingMutationEntity(
@@ -175,7 +177,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 13:38</div>
+    <div style="float:right;">generated on 2026-07-22 15:22</div>
 </div>
 </body>
 </html>
