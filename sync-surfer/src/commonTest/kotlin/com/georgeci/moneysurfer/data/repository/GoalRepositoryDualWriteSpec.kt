@@ -93,6 +93,9 @@ private class FakeGoalDao(private val contributions: FakeGoalContributionDao) : 
 
     override suspend fun getById(id: String): GoalEntity? = rows.firstOrNull { it.id == id }
 
+    override fun observeById(id: String): Flow<GoalEntity?> =
+        MutableStateFlow(rows.firstOrNull { it.id == id }).asStateFlow()
+
     override suspend fun insert(entity: GoalEntity) { rows += entity }
 
     override suspend fun update(entity: GoalEntity) {

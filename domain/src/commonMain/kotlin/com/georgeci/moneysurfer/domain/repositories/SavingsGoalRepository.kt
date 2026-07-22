@@ -8,6 +8,9 @@ import kotlinx.coroutines.flow.Flow
 interface SavingsGoalRepository {
     fun getByWorkspaceId(workspaceId: WorkspaceId): Flow<List<SavingsGoal>>
     suspend fun getById(id: GoalId): SavingsGoal?
+
+    /** Emits `null` once the goal is deleted. */
+    fun observeById(id: GoalId): Flow<SavingsGoal?>
     suspend fun insert(goal: SavingsGoal)
     suspend fun update(goal: SavingsGoal)
 

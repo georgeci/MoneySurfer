@@ -4,12 +4,15 @@ import arrow.optics.optics
 import com.georgeci.moneysurfer.domain.OfflineBuildFlags
 import com.georgeci.moneysurfer.domain.formatter.MoneyFormatter
 import com.georgeci.moneysurfer.domain.model.Account
+import com.georgeci.moneysurfer.domain.model.SavingsGoalSummary
 import com.georgeci.moneysurfer.domain.model.Transaction
 import com.georgeci.moneysurfer.domain.primitives.AccountId
+import com.georgeci.moneysurfer.domain.primitives.GoalId
 import com.georgeci.moneysurfer.domain.primitives.Money
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
 import com.georgeci.moneysurfer.domain.usecase.GetAccountsUseCase
+import com.georgeci.moneysurfer.domain.usecase.GetGoalsUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetRecentTransactionsUseCase
 import com.georgeci.moneysurfer.utils.MviViewModel
 import kotlinx.coroutines.flow.combine
@@ -20,6 +23,7 @@ import org.koin.core.annotation.KoinViewModel
 class DashboardViewModel(
     private val getAccounts: GetAccountsUseCase,
     private val getRecentTransactions: GetRecentTransactionsUseCase,
+    private val getGoals: GetGoalsUseCase,
     offlineBuildFlags: OfflineBuildFlags,
 ) : MviViewModel<DashboardState, DashboardEvent, DashboardEffect>(
     initialState = DashboardState.Loading,
@@ -49,6 +53,8 @@ class DashboardViewModel(
                 postSideEffect(DashboardEffect.NavigateToTransactionCreation(accountId = event.accountId))
             DashboardEvent.OnManageAccountsClick -> postSideEffect(DashboardEffect.NavigateToAccountsManage)
             DashboardEvent.OnSettingsClick -> postSideEffect(DashboardEffect.NavigateToSettings)
+            DashboardEvent.OnSeeAllGoalsClick -> postSideEffect(DashboardEffect.NavigateToGoals)
+            is DashboardEvent.OnGoalClick -> postSideEffect(DashboardEffect.NavigateToGoalDetails(event.goalId))
         }
     }
 
@@ -57,7 +63,8 @@ class DashboardViewModel(
             combine(
                 getAccounts().onStart { emit(emptyList()) },
                 getRecentTransactions(),
-            ) { accounts, transactions ->
+                getGoals(),
+            ) { accounts, transactions, goals ->
                 DashboardState.Content(
                     accounts = accounts.map { it.toUi() },
                     transactions = transactions
@@ -69,6 +76,7 @@ class DashboardViewModel(
                     workspaceInitial = null,
                     greeting = null,
                     formattedTrendDelta = null,
+                    goals = goals.take(DASHBOARD_GOALS_LIMIT).map { it.toUi() },
                     isOffline = isOffline,
                 )
             }.collect { newContent -> updateState { newContent } }
@@ -87,6 +95,14 @@ class DashboardViewModel(
         name = name,
         formattedBalance = MoneyFormatter.format(balance, currencyCode),
         currency = currencyCode.value,
+    )
+
+    private fun SavingsGoalSummary.toUi() = GoalUi(
+        id = goal.id,
+        name = goal.title,
+        formattedSaved = MoneyFormatter.format(progress.saved, goal.currencyCode),
+        formattedTarget = MoneyFormatter.format(progress.target, goal.currencyCode),
+        progress = progress.percent.toFloat(),
     )
 
     private fun Transaction.toUi() = TransactionUi(
@@ -111,6 +127,7 @@ sealed interface DashboardState {
         val workspaceInitial: String?,
         val greeting: String?,
         val formattedTrendDelta: String?,
+        val goals: List<GoalUi> = emptyList(),
         val isOffline: Boolean = false,
     ) : DashboardState {
 
@@ -134,6 +151,14 @@ data class AccountUi(
     val currency: String,
 )
 
+data class GoalUi(
+    val id: GoalId,
+    val name: String,
+    val formattedSaved: String,
+    val formattedTarget: String,
+    val progress: Float,
+)
+
 data class TransactionUi(
     val id: TransactionId,
     val title: String,
@@ -151,6 +176,8 @@ sealed interface DashboardEvent {
     data class OnAddTransactionForAccountClick(val accountId: AccountId) : DashboardEvent
     data object OnManageAccountsClick : DashboardEvent
     data object OnSettingsClick : DashboardEvent
+    data object OnSeeAllGoalsClick : DashboardEvent
+    data class OnGoalClick(val goalId: GoalId) : DashboardEvent
 }
 
 sealed interface DashboardEffect {
@@ -161,6 +188,11 @@ sealed interface DashboardEffect {
     data class NavigateToTransactionCreation(val accountId: AccountId?) : DashboardEffect
     data object NavigateToSettings : DashboardEffect
     data object NavigateToTransactionsList : DashboardEffect
+    data object NavigateToGoals : DashboardEffect
+    data class NavigateToGoalDetails(val goalId: GoalId) : DashboardEffect
 }
 
 private const val RECENT_TRANSACTIONS_LIMIT = 5
+
+/** The widget shows two rows at most; reading more of the list would be wasted work. */
+private const val DASHBOARD_GOALS_LIMIT = 2

@@ -21,6 +21,16 @@ Public composables (pick the right atom + add ripple on click):
 - [SurferCard.kt](src/commonMain/kotlin/com/georgeci/moneysurfer/uikit/atom/SurferCard.kt) — `SurferCard(selected, onClick?)`. Picks the variant based on `AppTheme.containerStyle` and `selected`. Optional `onClick` adds a ripple-bounded click area.
 - [SurferActionCard.kt](src/commonMain/kotlin/com/georgeci/moneysurfer/uikit/atom/SurferActionCard.kt) — `SurferActionCard(onClick?)`. Wraps the dashed `SurferAddActionContainer`. Optional `onClick` adds ripple.
 
+Savings goals ([components/goal](src/commonMain/kotlin/com/georgeci/moneysurfer/uikit/components/goal)) — the
+one part of the system where emoji are allowed alongside workspace icons:
+
+- `SurferGoalIcon` — emoji on a hue-tinted squircle; `goalTileColor(hue)` / `goalAccentColor(hue)` derive both tints per theme.
+- `SurferGoalStatusPill` — `SurferGoalStatus.Active` (outlined + dot) / `Completed` (filled + check) / `Paused` / `Archived` (neutral). Label text comes from the caller; uikit does not depend on `domain`.
+- `SurferGoalProgressBar`, `SurferGoalProgressRing`, `SurferGoalRingArc` — the arc is shared with the dashboard `SurferGoalsWidget` so the two rings cannot drift.
+- `SurferGoalCard` — list card; dims to 70% for `Paused` / `Archived`.
+- `SurferGoalContributionRow` — history line; `automatic = true` styles a future autopay row.
+- `SurferEmojiPicker` + `SurferGoalHueRow` — icon and tint input for the goal editor.
+
 Theme switch: `AppTheme(containerStyle = SurferContainerStyle.Filled | Outlined | Card)` — all `SurferCard` instances downstream resolve to that variant.
 
 ## State placeholders

@@ -2,6 +2,8 @@ package com.georgeci.moneysurfer.feature.dashboard
 
 import com.georgeci.moneysurfer.domain.OfflineBuildFlags
 import com.georgeci.moneysurfer.domain.auth.InMemorySessionPointers
+import com.georgeci.moneysurfer.domain.fixtures.FakeGoalContributionRepository
+import com.georgeci.moneysurfer.domain.fixtures.FakeSavingsGoalRepository
 import com.georgeci.moneysurfer.domain.fixtures.aTransaction
 import com.georgeci.moneysurfer.domain.fixtures.accountId
 import com.georgeci.moneysurfer.domain.fixtures.anAccount
@@ -18,6 +20,7 @@ import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 import com.georgeci.moneysurfer.domain.repositories.AccountRepository
 import com.georgeci.moneysurfer.domain.repositories.TransactionRepository
 import com.georgeci.moneysurfer.domain.usecase.GetAccountsUseCase
+import com.georgeci.moneysurfer.domain.usecase.GetGoalsUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetRecentTransactionsUseCase
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
@@ -98,6 +101,7 @@ private fun newViewModel(
     return DashboardViewModel(
         getAccounts = GetAccountsUseCase(accounts, session),
         getRecentTransactions = GetRecentTransactionsUseCase(transactions, session),
+        getGoals = GetGoalsUseCase(FakeSavingsGoalRepository(), FakeGoalContributionRepository(), session),
         offlineBuildFlags = OfflineBuildFlags(isOffline = false),
     )
 }

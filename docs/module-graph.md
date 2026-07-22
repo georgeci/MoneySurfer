@@ -14,6 +14,7 @@
 
 graph LR
   subgraph :feature
+    :feature:goal["goal"]
     :feature:account["account"]
     :feature:settings["settings"]
     :feature:workspace["workspace"]
@@ -27,6 +28,13 @@ graph LR
     :sync:default["default"]
     :sync:no-op["no-op"]
   end
+  :feature:goal --> :domain
+  :feature:goal --> :navigation
+  :feature:goal --> :sync:api
+  :feature:goal --> :uikit
+  :feature:goal --> :utils
+  :feature:goal --> :domain-test-fixtures
+  :feature:goal --> :sync-test-fixtures
   :feature:account --> :domain
   :feature:account --> :navigation
   :feature:account --> :sync:api
@@ -35,6 +43,7 @@ graph LR
   :feature:account --> :domain-test-fixtures
   :feature:account --> :sync-test-fixtures
   :sync-surfer --> :domain
+  :sync-surfer --> :sync:api
   :sync-surfer --> :sync:default
   :sync-surfer --> :data-local
   :sync-surfer --> :data-remote
@@ -58,21 +67,24 @@ graph LR
   :feature:workspace --> :domain-test-fixtures
   :feature:workspace --> :sync-test-fixtures
   :androidApp-offline --> :composeAppOffline
+  :androidApp-offline --> :shared
   :shared --> :domain
   :shared --> :uikit
+  :shared --> :utils
   :shared --> :data-local
   :shared --> :navigation
   :shared --> :feature:account
   :shared --> :feature:category
   :shared --> :feature:dashboard
+  :shared --> :feature:goal
   :shared --> :feature:login
   :shared --> :feature:settings
   :shared --> :feature:transaction
   :shared --> :feature:workspace
-  :shared --> :utils
   :shared --> :domain-test-fixtures
   :shared --> :sync-test-fixtures
   :integration-test --> :domain
+  :integration-test --> :sync:api
   :integration-test --> :sync:default
   :integration-test --> :data-local
   :integration-test --> :data-remote
@@ -81,9 +93,14 @@ graph LR
   :integration-test --> :sync-test-fixtures
   :integration-test --> :data-test-fixtures
   :androidApp --> :composeApp
+  :androidApp --> :shared
   :composeAppOffline --> :shared
+  :composeAppOffline --> :domain
+  :composeAppOffline --> :feature:login
+  :composeAppOffline --> :feature:transaction
   :composeAppOffline --> :sync:api
   :composeAppOffline --> :sync:no-op
+  :composeAppOffline --> :data-local
   :feature:transaction --> :domain
   :feature:transaction --> :navigation
   :feature:transaction --> :sync:api
@@ -91,8 +108,8 @@ graph LR
   :feature:transaction --> :utils
   :feature:transaction --> :domain-test-fixtures
   :feature:transaction --> :sync-test-fixtures
-  :sync:default --> :sync:api
   :sync:default --> :domain
+  :sync:default --> :sync:api
   :sync:default --> :sync-test-fixtures
   :sync:no-op --> :sync:api
   :data-remote --> :domain
@@ -118,9 +135,29 @@ graph LR
   :navigation --> :uikit
   :domain-test-fixtures --> :domain
   :composeApp --> :shared
+  :composeApp --> :domain
+  :composeApp --> :feature:login
+  :composeApp --> :feature:transaction
   :composeApp --> :data-remote
   :composeApp --> :sync-surfer
   :composeApp --> :sync:default
+  :composeApp --> :data-local
+  :composeApp --> :composeAppOffline
+  :composeApp --> :data-test-fixtures
+  :composeApp --> :domain-test-fixtures
+  :composeApp --> :integration-test
+  :composeApp --> :navigation
+  :composeApp --> :sync-test-fixtures
+  :composeApp --> :uikit
+  :composeApp --> :utils
+  :composeApp --> :feature:account
+  :composeApp --> :feature:category
+  :composeApp --> :feature:dashboard
+  :composeApp --> :feature:goal
+  :composeApp --> :feature:settings
+  :composeApp --> :feature:workspace
+  :composeApp --> :sync:api
+  :composeApp --> :sync:no-op
   :feature:dashboard --> :domain
   :feature:dashboard --> :navigation
   :feature:dashboard --> :sync:api
@@ -129,5 +166,6 @@ graph LR
   :feature:dashboard --> :domain-test-fixtures
   :feature:dashboard --> :sync-test-fixtures
   :sync-test-fixtures --> :domain
+  :sync-test-fixtures --> :sync:api
   :sync-test-fixtures --> :sync:default
 ```

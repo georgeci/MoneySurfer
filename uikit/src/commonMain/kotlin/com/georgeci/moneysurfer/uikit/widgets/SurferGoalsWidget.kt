@@ -1,6 +1,5 @@
 package com.georgeci.moneysurfer.uikit.widgets
 
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,12 +14,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.georgeci.moneysurfer.uikit.components.goal.SurferGoalRingArc
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
@@ -124,44 +123,18 @@ private fun GoalRow(item: SurferGoalItem, onClick: (() -> Unit)?) {
     }
 }
 
+/**
+ * The compact dashboard variant of the details-screen hero: same arc, percent only.
+ * The arc itself lives in `components/goal` so the two rings cannot drift apart.
+ */
 @Composable
 private fun ProgressRing(
     progress: Float,
-    size: androidx.compose.ui.unit.Dp,
+    size: Dp,
 ) {
-    val track = AppTheme.materialColors.surfaceContainerHigh
-    val fill = AppTheme.materialColors.primary
-    val percentText = "${(progress.coerceIn(0f, 1f) * 100).toInt()}%"
+    val percentText = "${(progress.coerceIn(0f, 1f) * PERCENT_SCALE).toInt()}%"
     Box(modifier = Modifier.size(size), contentAlignment = Alignment.Center) {
-        Canvas(modifier = Modifier.size(size)) {
-            val stroke = (this.size.minDimension / 16f).coerceAtLeast(3f)
-            val inset = stroke / 2f
-            val box = androidx.compose.ui.geometry.Size(
-                this.size.width - stroke,
-                this.size.height - stroke,
-            )
-            val topLeft = androidx.compose.ui.geometry.Offset(inset, inset)
-            drawArc(
-                color = track,
-                startAngle = 0f,
-                sweepAngle = 360f,
-                useCenter = false,
-                topLeft = topLeft,
-                size = box,
-                style = Stroke(width = stroke),
-            )
-            rotate(degrees = -90f) {
-                drawArc(
-                    color = fill,
-                    startAngle = 0f,
-                    sweepAngle = 360f * progress.coerceIn(0f, 1f),
-                    useCenter = false,
-                    topLeft = topLeft,
-                    size = box,
-                    style = Stroke(width = stroke, cap = androidx.compose.ui.graphics.StrokeCap.Round),
-                )
-            }
-        }
+        SurferGoalRingArc(progress = progress, size = size)
         Text(
             text = percentText,
             style = AppTheme.typography.labelMedium,
@@ -169,6 +142,8 @@ private fun ProgressRing(
         )
     }
 }
+
+private const val PERCENT_SCALE = 100
 
 @Preview
 @Composable

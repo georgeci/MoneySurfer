@@ -20,6 +20,10 @@ interface GoalDao {
     @Query("SELECT * FROM goals WHERE id = :id")
     suspend fun getById(id: String): GoalEntity?
 
+    /** Emits `null` once the goal is deleted, so the details screen can close itself. */
+    @Query("SELECT * FROM goals WHERE id = :id")
+    fun observeById(id: String): Flow<GoalEntity?>
+
     @Insert
     suspend fun insert(entity: GoalEntity)
 

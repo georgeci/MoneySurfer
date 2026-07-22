@@ -1,0 +1,71 @@
+<resources>
+    <!-- Goals list -->
+    <string name="goals_title">Цели</string>
+    <string name="goals_add">Новая цель</string>
+    <string name="goals_empty_title">Целей пока нет</string>
+    <string name="goals_empty_subtitle">Задайте сумму и следите, как она накапливается.</string>
+    <string name="goals_card_deadline">до %1$s</string>
+    <string name="goals_card_no_deadline">Без срока</string>
+
+    <!-- Goal status -->
+    <string name="goal_status_active">Активна</string>
+    <string name="goal_status_completed">Достигнута</string>
+    <string name="goal_status_paused">На паузе</string>
+    <string name="goal_status_archived">В архиве</string>
+
+    <!-- Goal details -->
+    <string name="goal_details_of_target">из %1$s</string>
+    <string name="goal_details_remaining">осталось %1$s</string>
+    <string name="goal_details_reached">Цель достигнута</string>
+    <string name="goal_details_add">Пополнить</string>
+    <string name="goal_details_withdraw">Снять</string>
+    <string name="goal_details_history">История</string>
+    <string name="goal_details_history_empty">Пока пусто. Пополните цель, чтобы начать историю.</string>
+    <string name="goal_details_actions">Действия с целью</string>
+    <string name="goal_details_edit">Изменить цель</string>
+    <string name="goal_details_pause">Поставить на паузу</string>
+    <string name="goal_details_resume">Возобновить</string>
+    <string name="goal_details_archive">В архив</string>
+    <string name="goal_details_unarchive">Вернуть из архива</string>
+    <string name="goal_details_delete">Удалить цель</string>
+    <string name="goal_details_delete_title">Удалить цель?</string>
+    <string name="goal_details_delete_message">«%1$s» и вся история пополнений будут удалены. Отменить это нельзя.</string>
+    <string name="goal_details_delete_confirm">Удалить</string>
+    <string name="goal_details_delete_cancel">Отмена</string>
+    <string name="goal_details_deleted_snackbar">«%1$s» удалена</string>
+    <string name="goal_details_linked_account">Откладываю на «%1$s»</string>
+    <string name="goal_details_linked_account_note">Это просто заметка о том, где лежат деньги — баланс не проверяется.</string>
+
+    <!-- Goal creation / edit -->
+    <string name="goal_edit_title_create">Новая цель</string>
+    <string name="goal_edit_title_edit">Изменить цель</string>
+    <string name="goal_edit_name_label">Название</string>
+    <string name="goal_edit_name_error_required">Введите название цели</string>
+    <string name="goal_edit_icon_label">Значок</string>
+    <string name="goal_edit_color_label">Цвет</string>
+    <string name="goal_edit_target_label">Сумма цели</string>
+    <string name="goal_edit_target_error">Введите сумму больше нуля</string>
+    <string name="goal_edit_target_date_label">Срок</string>
+    <string name="goal_edit_target_date_placeholder">Без срока</string>
+    <string name="goal_edit_target_date_clear">Убрать срок</string>
+    <string name="goal_edit_save">Сохранить</string>
+    <string name="goal_edit_cancel">Отмена</string>
+    <string name="goal_edit_created_snackbar">Цель «%1$s» создана</string>
+    <string name="goal_edit_updated_snackbar">Цель «%1$s» обновлена</string>
+
+    <!-- Contribution -->
+    <string name="goal_contribution_title_add">Пополнение</string>
+    <string name="goal_contribution_title_withdraw">Снятие</string>
+    <string name="goal_contribution_amount_label">Сумма</string>
+    <string name="goal_contribution_note_label">Заметка</string>
+    <string name="goal_contribution_date_label">Дата</string>
+    <string name="goal_contribution_save">Сохранить</string>
+    <string name="goal_contribution_saved_label">Накоплено: %1$s</string>
+    <string name="goal_contribution_error_amount">Введите сумму больше нуля</string>
+    <string name="goal_contribution_error_below_zero">Столько на цели нет</string>
+    <string name="goal_contribution_error_paused">Снимите цель с паузы, чтобы пополнить</string>
+    <string name="goal_contribution_error_generic">Не удалось сохранить. Попробуйте ещё раз.</string>
+    <string name="goal_contribution_added_snackbar">%1$s добавлено в «%2$s»</string>
+    <string name="goal_contribution_withdrawn_snackbar">%1$s снято с «%2$s»</string>
+    <string name="goal_contribution_note_manual">Вручную</string>
+</resources>
