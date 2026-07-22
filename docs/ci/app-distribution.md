@@ -51,7 +51,7 @@ before it reaches Firebase.
 Upload them (values are read from stdin, never from argv):
 
 ```bash
-base64 -i keystore/release.jks | gh secret set ANDROID_RELEASE_KEYSTORE_BASE64
+base64 < keystore/release.jks | gh secret set ANDROID_RELEASE_KEYSTORE_BASE64
 ```
 
 ```bash
@@ -86,6 +86,10 @@ A non-existent alias is a hard error, and the groups API answers `404` until
 App Distribution has been opened once for the project. Bootstrap path: run the
 workflow manually with an **empty** `groups` input — the release is uploaded but
 not handed to anyone — then create the group in the console and run again.
+
+Scheduled runs always use `testers` and fail loudly if it doesn't exist. That is
+deliberate: a nightly that quietly uploads to nobody looks identical to a
+working one, and testers would notice the gap long after the misconfiguration.
 
 ## Notes on the build
 

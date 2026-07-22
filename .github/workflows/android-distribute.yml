@@ -184,15 +184,16 @@ jobs:
           fi
           # Guard against a silently unsigned build: the convention plugin drops
           # the `release` signingConfig when any RELEASE_* value is missing, and
-          # App Distribution rejects unsigned APKs with an opaque error.
+          # App Distribution rejects unsigned APKs with an opaque error. A
+          # missing apksigner is itself a failure — shipping an unverified
+          # artifact to testers is exactly what this step exists to prevent.
           apksigner=$(find "${ANDROID_HOME:-/usr/local/lib/android/sdk}/build-tools" -name apksigner -type f | sort -V | tail -1)
-          if [ -n "$apksigner" ]; then
-            "$apksigner" verify --print-certs "$apk" > /dev/null \
-              || { echo "::error::$apk is not signed."; exit 1; }
-          else
-            unzip -l "$apk" | grep -qE 'META-INF/.*\.(RSA|EC|DSA)' \
-              || echo "::warning::apksigner not found and no v1 signature block — signature unverified."
+          if [ -z "$apksigner" ]; then
+            echo "::error::apksigner not found under ANDROID_HOME — cannot verify the signature."
+            exit 1
           fi
+          "$apksigner" verify --print-certs "$apk" > /dev/null \
+            || { echo "::error::$apk is not signed."; exit 1; }
           echo "path=$apk" >> "$GITHUB_OUTPUT"
           echo "APK: $apk ($(du -h "$apk" | cut -f1))"
 
@@ -229,7 +230,12 @@ jobs:
           SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
           APK: ${{ steps.apk.outputs.path }}
           APP_ID: ${{ steps.appid.outputs.id }}
-          TESTER_GROUPS: ${{ inputs.groups || 'testers' }}
+          # Not `inputs.groups || 'testers'`: an intentionally cleared input is
+          # an empty string, which is falsy in GitHub expressions and would
+          # silently fall back to the default. Resolve the default in bash
+          # instead, where "unset" (schedule) and "empty" (cleared by hand) are
+          # distinguishable.
+          GROUPS_INPUT: ${{ inputs.groups }}
           NOTES_INPUT: ${{ inputs.notes }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         shell: bash
@@ -246,10 +252,16 @@ jobs:
           fi
           notes="${notes}"$'\n\n'"commit ${GITHUB_SHA}"$'\n'"${RUN_URL}"
 
-          # An empty `groups` input uploads the release without handing it to
-          # anyone — the bootstrap path for a project where App Distribution
-          # has no tester groups yet (`--groups <missing alias>` is a hard
-          # error). Passing an empty --groups is not the same and would fail.
+          # Scheduled runs carry no inputs, so they take the default group. A
+          # manually cleared `groups` input uploads the release without handing
+          # it to anyone — the bootstrap path for a project where App
+          # Distribution has no tester groups yet (`--groups <missing alias>`
+          # is a hard error, and passing an empty --groups fails too).
+          if [ "${GITHUB_EVENT_NAME}" = "workflow_dispatch" ]; then
+            TESTER_GROUPS="$GROUPS_INPUT"
+          else
+            TESTER_GROUPS="testers"
+          fi
           group_args=()
           if [ -n "$TESTER_GROUPS" ]; then
             group_args=(--groups "$TESTER_GROUPS")
