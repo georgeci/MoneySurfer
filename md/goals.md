@@ -197,3 +197,32 @@ and v1 ships without all of it. The list and detail screens will look noticeably
 than the design. Worth deciding, before Phase 4 starts, whether the layout should be
 adjusted for the missing chips or left with the gaps so the deferred work drops straight
 in later.
+
+---
+
+## As built (phases 3–6, issue #245)
+
+Decisions taken while implementing, that the plan left open:
+
+- **`SurferGoalsWidget`: kept, not deleted.** Its `ProgressRing` moved into
+  `components/goal` as the public `SurferGoalRingArc`, which the widget and the details-hero
+  `SurferGoalProgressRing` now share — one arc, two framings. The widget itself stays the
+  compact dashboard row it always was.
+- **Entry point: the dashboard, not the nav suite.** The nav bar already carries five
+  top-level destinations; `Route.Goals` is a plain route reached from the (previously unused)
+  goals widget's "See all", which is also what artboard 01 implies. The widget is now wired to
+  `GetGoalsUseCase` and shows the top two goals.
+- **Layout with the deferred chips left out.** No filler was invented for the missing
+  forecast / ETA / sparkline: the card and the hero are laid out for what v1 has, and the
+  widget's `captionLine` is passed empty. The deferred work adds rows rather than reflowing
+  existing ones.
+- **Emoji + hue live together.** The plan only named `SurferEmojiPicker`; the goal model also
+  carries `hue`, so `SurferGoalHueRow` ships beside it, sharing the curated
+  `SurferGoalEmojis` set.
+- **COMPLETED is not settable by hand.** `SetGoalStatusUseCase` rejects it and derives it
+  instead, so pause/resume on an over-target goal lands on COMPLETED rather than ACTIVE.
+- **Withdrawals are allowed on a PAUSED or ARCHIVED goal.** Only *new money* is refused —
+  the plan's invariant is about contributions, and blocking a withdrawal would trap funds in
+  an archived goal.
+- **`SavingsGoalRepository.observeById`** was added (with a matching `GoalDao` query) so the
+  details screen closes itself when the goal is deleted here or by a sync from another device.

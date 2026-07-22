@@ -73,6 +73,9 @@ kotlin {
         }
         jvmTest.dependencies {
             implementation(projects.dataLocal)
+            // KoinModuleVerificationTest lists the `parametersOf` types, some of
+            // which are navigation-level (goal contribution mode).
+            implementation(projects.navigation)
             implementation(libs.kotest.runner.junit5)
             implementation(libs.fixture.monkey.kotlin)
             implementation(project.dependencies.platform(libs.koin.bom))

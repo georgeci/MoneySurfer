@@ -98,6 +98,26 @@ sealed interface Route : NavKey {
     @Serializable
     data class TransactionDetails(val transactionId: String) : Route
 
+    /** Savings goals list. Reached from the dashboard's goals widget, not from the nav suite. */
+    @Serializable
+    data object Goals : Route
+
+    @Serializable
+    data class GoalDetails(val goalId: String) : Route
+
+    @Serializable
+    data object GoalCreation : Route
+
+    @Serializable
+    data class GoalEdit(val goalId: String) : Route
+
+    /** [mode] is a [GoalContributionMode] name — add money or take it back out. */
+    @Serializable
+    data class GoalContribution(
+        val goalId: String,
+        val mode: String = GoalContributionMode.ADD.name,
+    ) : Route
+
     @Serializable
     data object Settings : TopLevel
 

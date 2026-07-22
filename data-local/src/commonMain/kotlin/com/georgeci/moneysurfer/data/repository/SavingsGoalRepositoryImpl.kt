@@ -34,6 +34,9 @@ class SavingsGoalRepositoryImpl(
     override suspend fun getById(id: GoalId): SavingsGoal? =
         dao.getById(id.value)?.toDomain()
 
+    override fun observeById(id: GoalId): Flow<SavingsGoal?> =
+        dao.observeById(id.value).map { it?.toDomain() }
+
     override suspend fun insert(goal: SavingsGoal) {
         val entity = goal.toEntity()
         dao.insert(entity)

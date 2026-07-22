@@ -82,38 +82,49 @@ private class FakeGoalContributionDao : GoalContributionDao {
     override suspend fun deleteAll() { rows.clear() }
 }
 
-/** Mirrors Room's `ON DELETE CASCADE`: deleting a goal drops its contribution rows. */
+/**
+ * Mirrors Room's `ON DELETE CASCADE`: deleting a goal drops its contribution rows.
+ *
+ * Backed by a [MutableStateFlow] rather than a plain list so the observing queries
+ * re-emit after every write, the way Room's do — a snapshot flow would silently pass
+ * tests for code that depends on seeing a goal disappear.
+ */
 private class FakeGoalDao(private val contributions: FakeGoalContributionDao) : GoalDao {
-    val rows: MutableList<GoalEntity> = mutableListOf()
+    private val state = MutableStateFlow<List<GoalEntity>>(emptyList())
 
-    override fun getAll(): Flow<List<GoalEntity>> = MutableStateFlow(rows.toList()).asStateFlow()
+    val rows: List<GoalEntity> get() = state.value
+
+    override fun getAll(): Flow<List<GoalEntity>> = state
 
     override fun getByWorkspaceId(workspaceId: String): Flow<List<GoalEntity>> =
-        MutableStateFlow(rows.filter { it.workspaceId == workspaceId }).asStateFlow()
+        state.map { all -> all.filter { it.workspaceId == workspaceId } }
 
-    override suspend fun getById(id: String): GoalEntity? = rows.firstOrNull { it.id == id }
+    override suspend fun getById(id: String): GoalEntity? = state.value.firstOrNull { it.id == id }
 
-    override suspend fun insert(entity: GoalEntity) { rows += entity }
+    override fun observeById(id: String): Flow<GoalEntity?> =
+        state.map { all -> all.firstOrNull { it.id == id } }
+
+    override suspend fun insert(entity: GoalEntity) {
+        state.value = state.value + entity
+    }
 
     override suspend fun update(entity: GoalEntity) {
-        val idx = rows.indexOfFirst { it.id == entity.id }
-        if (idx >= 0) rows[idx] = entity
+        state.value = state.value.map { if (it.id == entity.id) entity else it }
     }
 
     override suspend fun upsertAll(entities: List<GoalEntity>) {
-        entities.forEach { entity ->
-            val idx = rows.indexOfFirst { it.id == entity.id }
-            if (idx >= 0) rows[idx] = entity else rows += entity
-        }
+        val byId = entities.associateBy { it.id }
+        val updated = state.value.map { byId[it.id] ?: it }
+        state.value = updated + entities.filterNot { new -> state.value.any { it.id == new.id } }
     }
 
     override suspend fun delete(id: String) {
-        rows.removeAll { it.id == id }
+        state.value = state.value.filterNot { it.id == id }
         contributions.rows.removeAll { it.goalId == id }
     }
 
     override suspend fun deleteAll() {
-        rows.clear()
+        state.value = emptyList()
         contributions.rows.clear()
     }
 }

@@ -9,10 +9,12 @@ import com.georgeci.moneysurfer.domain.backup.BackupStorageLocator
 import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.CategoryId
 import com.georgeci.moneysurfer.domain.primitives.CategoryType
+import com.georgeci.moneysurfer.domain.primitives.GoalId
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.domain.primitives.UserId
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceInviteId
+import com.georgeci.moneysurfer.navigation.GoalContributionMode
 import com.georgeci.moneysurfer.sync.db.SyncDatabase
 import org.koin.core.annotation.KoinExperimentalAPI
 import org.koin.dsl.module
@@ -56,6 +58,10 @@ class KoinModuleVerificationTest {
                 CategoryId::class,
                 TransactionId::class,
                 CategoryType::class,
+                // Goal screens pass the goal id, and the contribution screen its
+                // add/withdraw mode, via parametersOf.
+                GoalId::class,
+                GoalContributionMode::class,
                 // WorkspaceSelectorScreen passes a Boolean (`showActions`) via parametersOf.
                 Boolean::class,
             ),

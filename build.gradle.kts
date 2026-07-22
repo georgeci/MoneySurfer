@@ -292,6 +292,7 @@ dependencies {
     kover(projects.sync.default)
     kover(projects.uikit)
     kover(projects.feature.login)
+    kover(projects.feature.goal)
     kover(projects.utils)
     kover(projects.navigation)
     // Test-only module: contributes no production classes of its own, but its
