@@ -155,6 +155,14 @@ private fun GoalEditContent(
                 },
             )
 
+            state.error?.let { error ->
+                Text(
+                    text = stringResource(error),
+                    style = AppTheme.typography.bodyMedium,
+                    color = AppTheme.materialColors.error,
+                )
+            }
+
             SectionLabel(stringResource(Res.string.goal_edit_icon_label))
             SurferEmojiPicker(
                 selected = state.emoji,

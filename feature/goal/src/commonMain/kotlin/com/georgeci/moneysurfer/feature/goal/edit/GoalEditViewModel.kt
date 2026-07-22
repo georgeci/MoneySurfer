@@ -7,6 +7,7 @@ import com.georgeci.moneysurfer.domain.repositories.SavingsGoalRepository
 import com.georgeci.moneysurfer.domain.repositories.WorkspaceRepository
 import com.georgeci.moneysurfer.domain.usecase.CreateSavingsGoalUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetCurrentTimeUseCase
+import com.georgeci.moneysurfer.domain.usecase.GoalActionError
 import com.georgeci.moneysurfer.domain.usecase.UpdateSavingsGoalUseCase
 import com.georgeci.moneysurfer.feature.goal.GoalAmountInput
 import com.georgeci.moneysurfer.navigation.SnackbarController
@@ -18,7 +19,11 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import moneysurfer.feature.goal.generated.resources.Res
 import moneysurfer.feature.goal.generated.resources.goal_edit_created_snackbar
+import moneysurfer.feature.goal.generated.resources.goal_edit_error_currency
+import moneysurfer.feature.goal.generated.resources.goal_edit_error_generic
+import moneysurfer.feature.goal.generated.resources.goal_edit_target_error
 import moneysurfer.feature.goal.generated.resources.goal_edit_updated_snackbar
+import org.jetbrains.compose.resources.StringResource
 import org.koin.core.annotation.KoinViewModel
 
 /**
@@ -84,7 +89,7 @@ class GoalEditViewModel(
         val target = GoalAmountInput.parse(state.target) ?: return
         if (state.title.isBlank()) return
         launch {
-            updateState { copy(inFlight = true) }
+            updateState { copy(inFlight = true, error = null) }
             val title = state.title.trim()
             val existing = goalId?.let { goalRepository.getById(it) }
             if (existing != null) {
@@ -96,15 +101,20 @@ class GoalEditViewModel(
                         target = target,
                         targetDate = state.targetDate,
                     ),
-                ).onRight { snackbar.show(Res.string.goal_edit_updated_snackbar, listOf(title)) }
-                finish()
+                ).fold(
+                    ifLeft = ::fail,
+                    ifRight = {
+                        snackbar.show(Res.string.goal_edit_updated_snackbar, listOf(title))
+                        finish()
+                    },
+                )
                 return@launch
             }
 
             val workspaceId = session.currentWorkspaceId.flow.first()
             val workspace = workspaceId?.let { workspaceRepository.getById(it) }
             if (workspace == null) {
-                updateState { copy(inFlight = false) }
+                fail(GoalActionError.WorkspaceNotFound)
                 return@launch
             }
             val now = getCurrentTime()
@@ -120,14 +130,30 @@ class GoalEditViewModel(
                     targetDate = state.targetDate,
                     createdAt = now,
                 ),
-            ).onRight { snackbar.show(Res.string.goal_edit_created_snackbar, listOf(title)) }
-            finish()
+            ).fold(
+                ifLeft = ::fail,
+                ifRight = {
+                    snackbar.show(Res.string.goal_edit_created_snackbar, listOf(title))
+                    finish()
+                },
+            )
         }
     }
 
     private fun finish() {
         updateState { copy(inFlight = false) }
         postSideEffect(GoalEditEffect.NavigateBack)
+    }
+
+    /** Stay on the screen with the user's input intact — navigating back would lose it. */
+    private fun fail(error: GoalActionError) {
+        updateState { copy(inFlight = false, error = error.messageRes()) }
+    }
+
+    private fun GoalActionError.messageRes(): StringResource = when (this) {
+        GoalActionError.InvalidTarget -> Res.string.goal_edit_target_error
+        GoalActionError.CurrencyMismatch -> Res.string.goal_edit_error_currency
+        else -> Res.string.goal_edit_error_generic
     }
 
     private companion object {
@@ -145,6 +171,7 @@ data class GoalEditState(
     val targetDate: LocalDate? = null,
     val showDatePicker: Boolean = false,
     val inFlight: Boolean = false,
+    val error: StringResource? = null,
     val titleTouched: Boolean = false,
     val targetTouched: Boolean = false,
 ) {

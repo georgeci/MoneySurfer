@@ -48,6 +48,8 @@
     <string name="goal_edit_target_date_label">Срок</string>
     <string name="goal_edit_target_date_placeholder">Без срока</string>
     <string name="goal_edit_target_date_clear">Убрать срок</string>
+    <string name="goal_edit_error_currency">Цель может быть только в валюте пространства.</string>
+    <string name="goal_edit_error_generic">Не удалось сохранить цель. Попробуйте ещё раз.</string>
     <string name="goal_edit_save">Сохранить</string>
     <string name="goal_edit_cancel">Отмена</string>
     <string name="goal_edit_created_snackbar">Цель «%1$s» создана</string>

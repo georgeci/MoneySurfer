@@ -48,6 +48,8 @@
     <string name="goal_edit_target_date_label">Target date</string>
     <string name="goal_edit_target_date_placeholder">No deadline</string>
     <string name="goal_edit_target_date_clear">Clear date</string>
+    <string name="goal_edit_error_currency">A goal can only use the workspace currency.</string>
+    <string name="goal_edit_error_generic">Could not save the goal. Try again.</string>
     <string name="goal_edit_save">Save</string>
     <string name="goal_edit_cancel">Cancel</string>
     <string name="goal_edit_created_snackbar">"%1$s" created</string>

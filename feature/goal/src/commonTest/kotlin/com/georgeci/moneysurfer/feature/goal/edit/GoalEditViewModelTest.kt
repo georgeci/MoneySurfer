@@ -22,6 +22,8 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import moneysurfer.feature.goal.generated.resources.Res
+import moneysurfer.feature.goal.generated.resources.goal_edit_error_generic
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class GoalEditViewModelTest : StringSpec({
@@ -83,6 +85,26 @@ class GoalEditViewModelTest : StringSpec({
         }
     }
 
+    "a rejected save keeps the user on the screen with their input" {
+        runTest {
+            // No workspace behind the session pointer — the save cannot go through.
+            val fixture = Fixture(seedWorkspace = false)
+            val vm = fixture.viewModel()
+            try {
+                vm.onEvent(GoalEditEvent.OnTitleChanged("Lisbon trip"))
+                vm.onEvent(GoalEditEvent.OnTargetChanged("2400"))
+                vm.onEvent(GoalEditEvent.OnSaveClick)
+
+                fixture.goals.rows shouldBe emptyList()
+                vm.currentState.error shouldBe Res.string.goal_edit_error_generic
+                vm.currentState.inFlight shouldBe false
+                vm.currentState.title shouldBe "Lisbon trip"
+            } finally {
+                vm.viewModelScope.cancel()
+            }
+        }
+    }
+
     "a blank title never reaches the repository" {
         runTest {
             val fixture = Fixture()
@@ -101,11 +123,12 @@ class GoalEditViewModelTest : StringSpec({
     }
 })
 
-private class Fixture {
+private class Fixture(seedWorkspace: Boolean = true) {
     val workspace = aWorkspace(id = workspaceId())
     val goals = FakeSavingsGoalRepository()
     val contributions = FakeGoalContributionRepository()
-    private val workspaces = FakeGoalWorkspaceRepository(listOf(workspace))
+    private val workspaces =
+        FakeGoalWorkspaceRepository(if (seedWorkspace) listOf(workspace) else emptyList())
     private val session = InMemorySessionPointers(currentWorkspaceId = workspace.id)
 
     fun viewModel() = GoalEditViewModel(
