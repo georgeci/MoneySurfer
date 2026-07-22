@@ -114,10 +114,11 @@ jobs:
         with:
           languages: ${{ matrix.language }}
           build-mode: ${{ matrix.build-mode }}
-          # The action's auto-sizing hands the evaluator ~14.5 GB of the
-          # runner's 16 GB; on the java-kotlin database the query evaluator
-          # then gets OOM-killed intermittently (log stops mid-evaluation
-          # with no error — see PR #145). Cap it to leave the OS headroom.
+          # CodeQL sizes `ram` against the runner's *total* 16 GB, not what is
+          # actually free, and the Gradle + Kotlin daemons are still resident
+          # here (see the daemon-stop step below). This cap leaves the OS
+          # headroom but is not on its own sufficient — 12288 still flaked on
+          # PR #240 until the daemons were stopped before analysis.
           ram: 12288
 
       - name: Build Kotlin sources
@@ -129,6 +130,25 @@ jobs:
         # runs — Gradle cache hits (FROM-CACHE / UP-TO-DATE) leave the database
         # empty and the analyze step fails with "could not process any code".
         run: ./gradlew :androidApp:processDebugGoogleServices :androidApp:compileDebugSources --rerun-tasks --stacktrace
+
+      # Both daemons outlive the build step: setup-gradle only stops them in its
+      # post-job step, which runs *after* the analysis. Between them they can
+      # hold ~12 GB (org.gradle.jvmargs / kotlin.daemon.jvmargs are -Xmx6144M
+      # each in gradle.properties), and CodeQL then asks for 12 GB more on a
+      # 16 GB runner. The overcommit is what actually kills the job — either the
+      # VM dies mid-evaluation ("runner has received a shutdown signal") or it
+      # thrashes swap until the 40-minute timeout. Reclaim the heap first.
+      - name: Stop Gradle and Kotlin daemons
+        if: >-
+          matrix.language == 'java-kotlin' &&
+          (github.event_name != 'pull_request' ||
+          github.event.pull_request.head.repo.full_name == github.repository)
+        run: |
+          ./gradlew --stop
+          # --stop only reaps Gradle's own daemon; the Kotlin compile daemon is
+          # a separate process that would otherwise idle on for another 3h.
+          pkill -f KotlinCompileDaemon || true
+          free -h
 
       - name: Perform CodeQL analysis
         if: >-
