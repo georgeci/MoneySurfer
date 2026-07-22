@@ -85,6 +85,10 @@ dependencies {
     "androidRuntimeClasspath"(libs.compose.uiToolingPreview)
 }
 
+// Roborazzi screenshot tests for the design-system components.
+// See docs/testing/screenshot-tests.md.
+apply(from = rootProject.file("gradle/screenshot-tests.gradle.kts"))
+
 compose.resources {
     publicResClass = true
 }

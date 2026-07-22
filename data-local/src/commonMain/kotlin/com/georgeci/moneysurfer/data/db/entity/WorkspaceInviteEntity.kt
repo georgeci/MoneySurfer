@@ -13,11 +13,12 @@ import androidx.room.PrimaryKey
 // at the workspace-pull layer (CLEAR_INVITES step) rather than via cascade.
 @Entity(
     tableName = "workspace_invites",
+    // Single-column workspaceId / email indices are omitted: they are leftmost
+    // prefixes of the composites below, which SQLite uses for prefix-only lookups
+    // too. A standalone `status` index is dropped as well — no query filters on
+    // status alone, and it is far less selective than the columns it pairs with.
     indices = [
-        Index("workspaceId"),
-        Index("email"),
         Index("targetUserId"),
-        Index("status"),
         Index(value = ["workspaceId", "status"]),
         Index(value = ["email", "status"]),
     ],

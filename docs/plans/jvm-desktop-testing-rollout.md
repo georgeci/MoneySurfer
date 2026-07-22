@@ -48,7 +48,7 @@ Roborazzi (screenshots) and packaging smoke are worthwhile follow-ups, stages 2�
 | 1 | ✅ Spike: `compose.uiTest` in `:composeApp`, `SignInContent` screen-state tests; kotest `StringSpec` + `runComposeUiTest` v2 confirmed, headless confirmed | S | Unblocks everything below; settles the kotest-vs-kotlin.test convention |
 | 2 | Screen-state UI tests for `feature/*` (commonTest where possible — they'd also run on Android/iOS later) | M | Regression net for UI logic, runs in existing `qaCommon` |
 | 3 | Gray-box journeys: `App()` + offline wiring + `InMemoryRoomDatabase`, 3–5 critical flows (create workspace, add transaction, transfer, undo delete) | M | Desktop "E2E" without new infra; reuses integration-test fixtures |
-| 4 | Roborazzi `roborazzi-compose-desktop` for `:uikit` + key screens; Git LFS for baselines; `verifyRoborazziJvm` in CI | M | Visual regression; the only screenshot option for desktop |
+| 4 | ✅ (differently) Roborazzi for `:uikit` — landed in #256 as Robolectric `androidHostTest`, PNGs committed plainly (no Git LFS), gated by the existing `qaAndroidHost`. Not the `roborazzi-compose-desktop` / `verifyRoborazziJvm` route planned here. Key *screens* are still uncovered | M | Visual regression; see [screenshot-tests](../testing/screenshot-tests.md) |
 | 5 | Nightly packaging smoke: `packageDistributionForCurrentOS` + launch smoke on macos/windows/ubuntu | S | Catches packaging/startup breakage the in-process tests can't see |
 | 6 | Update AGENTS.md Testing Conventions + `docs/testing/testing-strategy.md` with the desktop UI-test style decided in step 1 | S | Keeps conventions authoritative |
 

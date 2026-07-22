@@ -79,6 +79,23 @@ interface TransactionDao {
     @Query("SELECT * FROM transactions WHERE id = :id")
     suspend fun getById(id: String): TransactionEntity?
 
+    /**
+     * Full-text search over notes within a workspace, newest first.
+     *
+     * [query] is raw FTS4 MATCH syntax, never user input — build it with
+     * [com.georgeci.moneysurfer.data.db.FtsQuery.fromUserInput], which escapes
+     * operators and adds prefix wildcards.
+     */
+    @Query(
+        """
+        SELECT transactions.* FROM transactions
+        JOIN transactions_fts ON transactions_fts.rowid = transactions.rowid
+        WHERE transactions.workspaceId = :workspaceId AND transactions_fts MATCH :query
+        ORDER BY transactions.operationDate DESC, transactions.operationAt DESC, transactions.createdAt DESC
+        """,
+    )
+    fun searchByNote(workspaceId: String, query: String): Flow<List<TransactionEntity>>
+
     @Insert
     suspend fun insert(entity: TransactionEntity)
 

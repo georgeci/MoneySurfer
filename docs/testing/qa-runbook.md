@@ -41,7 +41,8 @@ READ WHEN:
 - wiring a new scope into Allure/Kover
 
 Related: [testing-strategy](testing-strategy.md),
-[firebase-emulator](firebase-emulator.md), [sonarcloud](sonarcloud.md).
+[firebase-emulator](firebase-emulator.md), [screenshot-tests](screenshot-tests.md),
+[sonarcloud](sonarcloud.md).
 
 <!-- AI:SECTION id=qa-runbook task=testing,qa,reports,tooling -->
 ## Setup

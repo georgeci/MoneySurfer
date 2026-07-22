@@ -203,7 +203,7 @@
 ## qa-runbook
 - Title: Setup
 - File: docs/testing/qa-runbook.md
-- Lines: 46-317
+- Lines: 47-318
 - Tasks: testing, qa, reports, tooling
 
 ## rules-bug-1
@@ -265,6 +265,12 @@
 - File: docs/architecture/firestore-rules-bugs.md
 - Lines: 57-98
 - Tasks: firestore-rules, members, invites, tenant-isolation
+
+## screenshot-tests
+- Title: Where the reference images live
+- File: docs/testing/screenshot-tests.md
+- Lines: 29-135
+- Tasks: testing, uikit, screenshot, roborazzi
 
 ## security-audit-2026-07
 - Title: Verdict
@@ -329,7 +335,7 @@
 ## testing-strategy
 - Title: Test layers
 - File: docs/testing/testing-strategy.md
-- Lines: 35-169
+- Lines: 35-174
 - Tasks: testing, qa, validation
 
 ## time-policy

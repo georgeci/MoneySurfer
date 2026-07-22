@@ -39,6 +39,7 @@ READ WHEN:
 |---|---|---|---|
 | Unit | `commonTest`, `jvmTest`, `androidHostTest` | nothing | Pure logic: domain rules, mappers, ViewModel state. kotest `StringSpec`. |
 | Desktop UI | `:composeApp:jvmTest` | nothing (headless) | Screen logic through the semantics tree — see [below](#desktop-ui-tests-compose-jvmtest). |
+| Screenshot | `:uikit` `androidHostTest` | nothing (Robolectric) | Visual regression of design-system components — see [screenshot-tests](screenshot-tests.md). |
 | Integration | `:integration-test` `jvmTest` | nothing | Room round-trips across domain → data. |
 | Device integration | `:integration-test` `connectedAndroidDeviceTest` | Android device + Firebase emulator | Real Firebase SDK against Firestore/Auth emulators. |
 | Firestore rules | `firestore-tests/` | Node + JDK 21 | Security rules, per-role access. Mocha, not Gradle. |
@@ -166,4 +167,8 @@ work — don't sprinkle text matchers permanently).
   change to `firestore.rules` **or** to the wire shape clients write (push
   DTOs, tombstone patch) needs coverage there — device ITs exercise rules
   only incidentally.
+- Changing a `:uikit` component re-renders its committed reference screenshots.
+  `./gradlew qaAndroidHost` fails on the visual diff; re-record and commit the
+  PNGs in the same commit as the UI change — see
+  [Screenshot tests (Roborazzi)](screenshot-tests.md).
 <!-- AI:END -->
