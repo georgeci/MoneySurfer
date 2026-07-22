@@ -42,7 +42,6 @@ class KmpLibConventionPlugin : Plugin<Project> {
                     // compose-multiplatform `Res` bundle is missing and every string renders
                     // blank. Harmless for modules with no screenshot tests.
                     isIncludeAndroidResources = true
-                    isReturnDefaultValues = true
                 }
 
                 withDeviceTestBuilder {
