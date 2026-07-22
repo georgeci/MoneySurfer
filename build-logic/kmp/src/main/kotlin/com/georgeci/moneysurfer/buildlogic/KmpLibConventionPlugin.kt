@@ -36,6 +36,12 @@ class KmpLibConventionPlugin : Plugin<Project> {
                 }
 
                 withHostTestBuilder {
+                }.configure {
+                    // Robolectric (and therefore Roborazzi screenshot tests) needs the merged
+                    // Android resources/assets on the host-test classpath — without this the
+                    // compose-multiplatform `Res` bundle is missing and every string renders
+                    // blank. Harmless for modules with no screenshot tests.
+                    isIncludeAndroidResources = true
                 }
 
                 withDeviceTestBuilder {
