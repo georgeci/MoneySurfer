@@ -26,10 +26,7 @@ class KmpAppConventionPlugin : Plugin<Project> {
         // for local builds.
         val major = versionProps.requireInt("APP_VERSION_MAJOR")
         val minor = versionProps.requireInt("APP_VERSION_MINOR")
-        val build = (
-            secrets["APP_BUILD_NUMBER"]?.trim()?.toIntOrNull()
-                ?: versionProps.requireInt("APP_BUILD_NUMBER")
-            ).mod(BUILD_NUMBER_RANGE)
+        val build = buildNumber(secrets["APP_BUILD_NUMBER"], versionProps)
         val versionNameStr = "$major.$minor.$build"
         val versionCodeInt = appVersionCode(major, minor, build)
 
@@ -225,7 +222,24 @@ private fun Properties.requireInt(name: String): Int =
         ?: error("Version property $name must be an integer")
 
 /** Build numbers are taken modulo this, so they can never carry into `minor`. */
-private const val BUILD_NUMBER_RANGE = 1_000
+private const val BUILD_NUMBER_RANGE = 1_000L
+
+/**
+ * The build number to stamp: whatever the `APP_BUILD_NUMBER` override carries
+ * (CI passes the run number), else the `Version.xcconfig` default, reduced
+ * modulo [BUILD_NUMBER_RANGE].
+ *
+ * A present-but-unparseable override fails the build instead of quietly
+ * falling back — a typo'd or truncated CI value would otherwise stamp two
+ * different commits with the same version. Parsing is `Long` so a run counter
+ * past `Int.MAX_VALUE` still wraps correctly rather than being rejected.
+ */
+private fun buildNumber(override: String?, versionProps: Properties): Int {
+    val raw = override?.trim()?.takeIf { it.isNotEmpty() }
+        ?.let { it.toLongOrNull() ?: error("APP_BUILD_NUMBER must be an integer, got \"$it\"") }
+        ?: versionProps.requireInt("APP_BUILD_NUMBER").toLong()
+    return raw.mod(BUILD_NUMBER_RANGE).toInt()
+}
 
 /**
  * `major * 100000 + minor * 1000 + build` — a versionCode derived from

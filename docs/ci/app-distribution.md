@@ -98,11 +98,15 @@ working one, and testers would notice the gap long after the misconfiguration.
   `github.run_number`, passed to Gradle as `APP_BUILD_NUMBER`, so every
   distributed build carries a distinct `0.1.<run>` and shows up as its own
   version in App Distribution. Local builds fall back to `APP_BUILD_NUMBER`
-  from the file (`0`).
+  from the file (`3`) — that default doubles as the local iOS
+  `CURRENT_PROJECT_VERSION`, so lowering it would block installing over an app
+  already on a device.
 - `versionCode` is derived as `major * 100000 + minor * 1000 + build` — two
   digits for minor, three for the build. The build number is taken `mod 1000`
   so it can never carry into `minor`; the build fails only on a hand-edited
-  `major > 20999` (Play's own ceiling) or `minor > 99`.
+  `major > 20999` (Play's own ceiling), `minor > 99`, or an `APP_BUILD_NUMBER`
+  override that isn't a number (a truncated CI value must not silently reuse
+  the default and stamp two commits with the same version).
 - The wrap is worth knowing about: run 1000 comes back as build `0`, i.e. a
   **lower** `versionCode` than run 999. App Distribution doesn't care, but Play
   rejects a non-increasing code — bump `APP_VERSION_MINOR` before the counter
