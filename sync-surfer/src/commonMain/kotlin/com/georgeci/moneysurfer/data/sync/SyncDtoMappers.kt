@@ -167,7 +167,9 @@ fun GoalDoc.toEntity(id: String, workspaceId: String): GoalEntity = GoalEntity(
     currencyCode = currencyCode,
     startDate = startDate,
     targetDate = targetDate,
-    accountId = accountId,
+    // A blank accountId passes the rules' nullable-string guard but is no account,
+    // and storing it would violate the Room FK. Absent means null.
+    accountId = accountId?.takeIf { it.isNotBlank() },
     // Legacy/partial docs may omit `status`; the DTO default already lands on ACTIVE,
     // but an explicitly-empty string would store an unparseable enum name.
     status = status.ifBlank { "ACTIVE" },

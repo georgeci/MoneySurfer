@@ -1,5 +1,7 @@
 package com.georgeci.moneysurfer.data.sync.plugin
+import com.georgeci.moneysurfer.data.db.dao.AccountDao
 import com.georgeci.moneysurfer.data.db.dao.GoalDao
+import com.georgeci.moneysurfer.data.db.entity.GoalEntity
 import com.georgeci.moneysurfer.data.remote.GoalDoc
 import com.georgeci.moneysurfer.data.sync.toDoc
 import com.georgeci.moneysurfer.data.sync.toEntity
@@ -23,6 +25,7 @@ class SavingsGoalSyncPlugin(
     private val appInfo: AppInfo,
     private val conflictResolver: ConflictResolver,
     private val goalDao: GoalDao,
+    private val accountDao: AccountDao,
 ) : SyncEntityPlugin {
 
     override val entityType: String = SyncEntityTypes.GOAL
@@ -55,7 +58,7 @@ class SavingsGoalSyncPlugin(
         val local = goalDao.getById(doc.id)
         val resolution = conflictResolver.resolve(
             local = local,
-            remote = dto.toEntity(id = doc.id, workspaceId = scopeKey),
+            remote = dto.toEntity(id = doc.id, workspaceId = scopeKey).withResolvableAccount(),
             metadata = ConflictMetadata(
                 entityType = SyncEntityTypes.GOAL,
                 entityId = doc.id,
@@ -64,6 +67,22 @@ class SavingsGoalSyncPlugin(
             ),
         )
         return applyResolution(resolution) { goalDao.upsertAll(listOf(it)) }
+    }
+
+    /**
+     * Drops an `accountId` that points at an account this device does not have.
+     *
+     * The FK is soft in spirit — the pointer is decorative — but hard in SQLite, so
+     * a goal referencing an account that was never pulled here (or was deleted
+     * before this doc arrived) would fail the insert and abort the batch BEFORE the
+     * cursor advanced, wedging every later pull. Accounts pull first (priority 20 <
+     * 60), so this only fires for a genuinely absent account. The goal keeps every
+     * field that carries meaning; only the decoration is lost, and a later edit that
+     * re-points it syncs the pointer back.
+     */
+    private suspend fun GoalEntity.withResolvableAccount(): GoalEntity {
+        val id = accountId ?: return this
+        return if (accountDao.getById(id) == null) copy(accountId = null) else this
     }
 
     private fun workspaceCollection(workspaceId: String) =

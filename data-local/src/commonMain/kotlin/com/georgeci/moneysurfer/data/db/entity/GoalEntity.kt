@@ -19,10 +19,16 @@ import androidx.room.PrimaryKey
             parentColumns = ["id"],
             childColumns = ["workspaceId"],
         ),
+        // SET NULL, not the default NO ACTION: the pointer is decorative, and an
+        // account is hard-deleted whenever its tombstone is pulled
+        // (AccountSyncPlugin). Under NO ACTION that delete would fail while any
+        // goal still referenced the account, aborting the pull batch before the
+        // cursor advanced. The goal simply loses a pointer it never relied on.
         ForeignKey(
             entity = AccountEntity::class,
             parentColumns = ["id"],
             childColumns = ["accountId"],
+            onDelete = ForeignKey.SET_NULL,
         ),
     ],
     indices = [Index("workspaceId"), Index("accountId")],
