@@ -39,6 +39,7 @@ import androidx.navigation3.ui.NavDisplay
 import androidx.savedstate.serialization.SavedStateConfiguration
 import androidx.window.core.layout.WindowSizeClass.Companion.WIDTH_DP_MEDIUM_LOWER_BOUND
 import com.georgeci.moneysurfer.navigation.util.rememberViewModelStoreNavEntryDecorator
+import com.georgeci.moneysurfer.uikit.components.SurferSplash
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import io.github.irgaly.navigation3.resultstate.rememberNavigationResultNavEntryDecorator
 import kotlinx.coroutines.launch
@@ -57,6 +58,7 @@ import org.koin.compose.viewmodel.koinViewModel
  */
 internal val navKeySerializersModule = SerializersModule {
     polymorphic(NavKey::class) {
+        subclass(Route.Onboarding::class, Route.Onboarding.serializer())
         subclass(Route.SignIn::class, Route.SignIn.serializer())
         subclass(Route.Legal::class, Route.Legal.serializer())
         subclass(Route.WorkspaceSelector::class, Route.WorkspaceSelector.serializer())
@@ -66,7 +68,6 @@ internal val navKeySerializersModule = SerializersModule {
         subclass(Route.WorkspaceInvite::class, Route.WorkspaceInvite.serializer())
         subclass(Route.WorkspaceMemberActions::class, Route.WorkspaceMemberActions.serializer())
         subclass(Route.IncomingInvites::class, Route.IncomingInvites.serializer())
-        subclass(Route.FirstRunCurrency::class, Route.FirstRunCurrency.serializer())
         subclass(Route.Dashboard::class, Route.Dashboard.serializer())
         subclass(Route.AccountCreation::class, Route.AccountCreation.serializer())
         subclass(Route.AccountsManage::class, Route.AccountsManage.serializer())
@@ -171,7 +172,11 @@ fun AppNavGraph(
             snackbarHost = { SnackbarHost(snackbarHostState) { data -> Snackbar(data) } },
         ) { _ ->
             val topLevel = currentTopLevel
-            if (topLevel == null) {
+            if (targetRoute == null) {
+                // Launch decision still pending — hold on the splash instead of flashing the
+                // bootstrap route (`Route.SignIn`) at an already signed-in user.
+                SurferSplash()
+            } else if (topLevel == null) {
                 navDisplay()
             } else {
                 AppNavigationSuite(

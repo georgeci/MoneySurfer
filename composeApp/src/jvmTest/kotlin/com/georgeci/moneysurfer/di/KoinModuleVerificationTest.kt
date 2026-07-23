@@ -7,6 +7,7 @@ import com.georgeci.moneysurfer.domain.AppInfo
 import com.georgeci.moneysurfer.domain.backup.AppRestarter
 import com.georgeci.moneysurfer.domain.backup.BackupStorageLocator
 import com.georgeci.moneysurfer.domain.primitives.AccountId
+import com.georgeci.moneysurfer.domain.primitives.AccountType
 import com.georgeci.moneysurfer.domain.primitives.CategoryId
 import com.georgeci.moneysurfer.domain.primitives.CategoryType
 import com.georgeci.moneysurfer.domain.primitives.GoalId
@@ -64,6 +65,8 @@ class KoinModuleVerificationTest {
                 GoalContributionMode::class,
                 // WorkspaceSelectorScreen passes a Boolean (`showActions`) via parametersOf.
                 Boolean::class,
+                // AccountCreationScreen passes the onboarding's pre-selected AccountType.
+                AccountType::class,
             ),
         )
     }

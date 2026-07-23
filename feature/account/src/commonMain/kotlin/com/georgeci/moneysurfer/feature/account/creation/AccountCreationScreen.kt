@@ -50,6 +50,8 @@ import com.georgeci.moneysurfer.feature.account.generated.resources.account_crea
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_field_card_last4
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_field_description
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_field_iban
+import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_first_run_subtitle
+import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_first_run_title
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_name_error_required
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_name_label
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_remove
@@ -72,37 +74,49 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun AccountCreationScreen(
     onNavigateBack: () -> Unit,
+    onNavigateToDashboard: () -> Unit = {},
     accountId: com.georgeci.moneysurfer.domain.primitives.AccountId? = null,
+    firstRun: Boolean = false,
+    initialType: AccountType = AccountType.SAVINGS,
     viewModel: AccountCreationViewModel = koinViewModel(
         key = accountId?.value.orEmpty(),
-    ) { org.koin.core.parameter.parametersOf(accountId) },
+    ) { org.koin.core.parameter.parametersOf(accountId, firstRun, initialType) },
 ) {
     val state by viewModel.collectAsStateWithLifecycle()
 
     viewModel.HandleSideEffect { effect ->
         when (effect) {
             AccountCreationEffect.NavigateBack -> onNavigateBack()
+            AccountCreationEffect.NavigateToDashboard -> onNavigateToDashboard()
         }
     }
 
     when (val current = state) {
-        is AccountCreationState.Loading -> AccountCreationLoading(onEvent = viewModel::onEvent)
+        is AccountCreationState.Loading -> AccountCreationLoading(
+            firstRun = firstRun,
+            onEvent = viewModel::onEvent,
+        )
         is AccountCreationState.Content -> AccountCreationContent(
             state = current,
+            firstRun = firstRun,
             onEvent = viewModel::onEvent,
         )
     }
 }
 
 @Composable
-private fun AccountCreationLoading(onEvent: (AccountCreationEvent) -> Unit) {
+private fun AccountCreationLoading(
+    firstRun: Boolean,
+    onEvent: (AccountCreationEvent) -> Unit,
+) {
     Scaffold(
         modifier = Modifier.surferSafeInsets(),
         containerColor = AppTheme.materialColors.surface,
         topBar = {
             SurferToolbar(
-                title = stringResource(Res.string.account_creation_title),
-                onBack = { onEvent(AccountCreationEvent.OnBackClick) },
+                title = stringResource(accountCreationTitle(firstRun)),
+                // No way back out of the first-launch step — there is nowhere to go yet.
+                onBack = if (firstRun) null else ({ onEvent(AccountCreationEvent.OnBackClick) }),
             )
         },
     ) { padding ->
@@ -113,6 +127,7 @@ private fun AccountCreationLoading(onEvent: (AccountCreationEvent) -> Unit) {
 @Composable
 private fun AccountCreationContent(
     state: AccountCreationState.Content,
+    firstRun: Boolean,
     onEvent: (AccountCreationEvent) -> Unit,
 ) {
     Scaffold(
@@ -120,8 +135,8 @@ private fun AccountCreationContent(
         containerColor = AppTheme.materialColors.surface,
         topBar = {
             SurferToolbar(
-                title = stringResource(Res.string.account_creation_title),
-                onBack = { onEvent(AccountCreationEvent.OnBackClick) },
+                title = stringResource(accountCreationTitle(firstRun)),
+                onBack = if (firstRun) null else ({ onEvent(AccountCreationEvent.OnBackClick) }),
                 actions = {
                     SurferToolbarButtonAction(
                         icon = SurferIcons.Check,
@@ -142,6 +157,14 @@ private fun AccountCreationContent(
                 .padding(top = AppTheme.spacing.small),
             verticalArrangement = Arrangement.spacedBy(AppTheme.spacing.large),
         ) {
+            if (firstRun) {
+                Text(
+                    text = stringResource(Res.string.account_creation_first_run_subtitle),
+                    style = AppTheme.typography.bodyMedium,
+                    color = AppTheme.materialColors.onSurfaceVariant,
+                )
+            }
+
             TypePicker(
                 selected = state.type,
                 onSelect = { onEvent(AccountCreationEvent.OnTypeChanged(it)) },
@@ -404,6 +427,10 @@ private fun InitialBalanceError.messageRes(): StringResource = when (this) {
     InitialBalanceError.NEGATIVE_NOT_ALLOWED -> Res.string.account_creation_balance_error_negative
 }
 
+/** First launch gets a welcoming title; every other entry keeps the plain screen title. */
+private fun accountCreationTitle(firstRun: Boolean): StringResource =
+    if (firstRun) Res.string.account_creation_first_run_title else Res.string.account_creation_title
+
 private fun AccountExtraFieldKind.labelRes(): StringResource = when (this) {
     AccountExtraFieldKind.IBAN -> Res.string.account_creation_field_iban
     AccountExtraFieldKind.DESCRIPTION -> Res.string.account_creation_field_description
@@ -441,6 +468,7 @@ private fun AccountCreationScreenPreview() {
                 ),
                 editingAccountId = null,
             ),
+            firstRun = false,
             onEvent = {},
         )
     }

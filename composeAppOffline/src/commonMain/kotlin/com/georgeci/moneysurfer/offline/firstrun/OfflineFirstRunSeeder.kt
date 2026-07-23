@@ -11,13 +11,16 @@ import kotlinx.coroutines.flow.first
 /**
  * Offline-build first-run seed. Pre-seeds an anonymous "demo" user so that [SeedDefaultsUseCase]
  * (which requires `currentUserId`) can run without the user having to tap a button on the
- * sign-in screen. The result: a clean install lands directly on a populated Dashboard.
+ * sign-in screen, plus the workspace + default categories the rest of the app needs.
+ *
+ * Accounts are deliberately *not* seeded: after onboarding the user creates the first account
+ * themselves (`Route.AccountCreation(firstRun = true)`), and the currency they pick there becomes
+ * the workspace base currency.
  *
  * Idempotency is delegated to:
  *  - [DemoLoginUseCase] uses a deterministic local user id, so re-running it just reasserts the
  *    same row.
- *  - [SeedDefaultsUseCase] handles both the first-run and the *repair* path (workspace pinned
- *    but defaults missing) — we always invoke it and let it decide whether anything is needed.
+ *  - [SeedDefaultsUseCase] is a no-op once a workspace is pinned.
  */
 class OfflineFirstRunSeeder(
     private val session: SessionPointers,
@@ -34,15 +37,9 @@ class OfflineFirstRunSeeder(
                 return
             }
         }
-        // A null workspace pointer before the seed means this is a fresh install — the seed
-        // is about to create a workspace with a locale-derived currency. Flip `currencyChosen`
-        // so `AppLaunchViewModel` routes to the currency picker for explicit confirmation.
-        val freshInstall = session.currentWorkspaceId.flow.first() == null
-        seedDefaultsUseCase(CurrencyDefaults.systemDefault())
-        if (freshInstall && session.currentWorkspaceId.flow.first() != null) {
-            session.currencyChosen.set(false)
-            log.i { "[seed] fresh install — currency picker pending" }
-        }
+        // The locale-derived currency is only a placeholder for the workspace: the first-run
+        // account screen overwrites it with whatever the user picks there.
+        seedDefaultsUseCase(CurrencyDefaults.systemDefault(), seedCashAccount = false)
     }
 
     private companion object {

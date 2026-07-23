@@ -4,6 +4,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.navigation3.ListDetailSceneStrategy
 import com.georgeci.moneysurfer.domain.primitives.AccountId
+import com.georgeci.moneysurfer.domain.primitives.AccountType
 import com.georgeci.moneysurfer.feature.account.creation.AccountCreationScreen
 import com.georgeci.moneysurfer.feature.account.details.AccountDetailsScreen
 import com.georgeci.moneysurfer.feature.account.manage.AccountsManageScreen
@@ -23,7 +24,11 @@ val accountNavGraph: FeatureNavGraph = { navigator ->
     ) { key ->
         AccountCreationScreen(
             onNavigateBack = { navigator.pop() },
+            // First-launch step has nothing below it on the stack — reset instead of popping.
+            onNavigateToDashboard = { navigator.resetTo(Route.Dashboard) },
             accountId = key.accountId?.let { AccountId(it) },
+            firstRun = key.firstRun,
+            initialType = key.accountType?.toAccountType() ?: DefaultAccountType,
         )
     }
 
@@ -81,3 +86,10 @@ val accountNavGraph: FeatureNavGraph = { navigator ->
         )
     }
 }
+
+/** Type the creation screen opens on when the caller has no opinion. */
+private val DefaultAccountType = AccountType.SAVINGS
+
+/** Unknown names can only come from a hand-edited saved stack — fall back instead of crashing. */
+private fun String.toAccountType(): AccountType? =
+    AccountType.entries.firstOrNull { it.name == this }
