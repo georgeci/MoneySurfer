@@ -73,6 +73,7 @@ internal val navKeySerializersModule = SerializersModule {
         subclass(Route.AccountsManage::class, Route.AccountsManage.serializer())
         subclass(Route.CategoryCreation::class, Route.CategoryCreation.serializer())
         subclass(Route.CategoriesManage::class, Route.CategoriesManage.serializer())
+        subclass(Route.CategoryDetails::class, Route.CategoryDetails.serializer())
         subclass(Route.CategoryChooser::class, Route.CategoryChooser.serializer())
         subclass(Route.AccountChooser::class, Route.AccountChooser.serializer())
         subclass(Route.TransactionsByAccount::class, Route.TransactionsByAccount.serializer())

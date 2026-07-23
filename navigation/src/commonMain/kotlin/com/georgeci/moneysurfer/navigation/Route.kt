@@ -81,6 +81,9 @@ sealed interface Route : NavKey {
     data object CategoriesManage : TopLevel
 
     @Serializable
+    data class CategoryDetails(val categoryId: String) : Route
+
+    @Serializable
     data class CategoryChooser(
         val selectedCategoryId: String? = null,
         val filterType: String? = null,

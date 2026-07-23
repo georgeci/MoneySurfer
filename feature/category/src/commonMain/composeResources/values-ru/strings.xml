@@ -31,11 +31,46 @@
     <string name="categories_manage_add">Новая категория</string>
     <string name="categories_manage_empty">Категорий пока нет</string>
     <string name="categories_manage_remove">Удалить</string>
+    <string name="categories_manage_edit">Изменить</string>
     <string name="categories_manage_delete_title">Удалить категорию?</string>
     <string name="categories_manage_delete_message">«%1$s» будет удалена. Транзакции с ней останутся.</string>
     <string name="categories_manage_delete_children">Подкатегорий переедет на верхний уровень: %1$d.</string>
     <string name="categories_manage_delete_confirm">Удалить</string>
     <string name="categories_manage_delete_cancel">Отмена</string>
+
+    <!-- Category details screen -->
+    <string name="category_details_title">Категория</string>
+    <string name="category_details_edit_content_description">Редактировать категорию</string>
+    <string name="category_details_missing">Эта категория больше недоступна.</string>
+    <string name="category_details_hero_label_expense">Расходы за %1$s</string>
+    <string name="category_details_hero_label_income">Доходы · %1$s</string>
+    <string name="category_details_hero_label_transfer">Перевод · %1$s</string>
+    <string name="category_details_stat_average">В среднем / мес.</string>
+    <string name="category_details_stat_transactions">Операций</string>
+    <string name="category_details_stat_per_transaction">За операцию</string>
+    <string name="category_details_trend_title">Последние 6 месяцев</string>
+    <string name="category_details_subcategories">Подкатегории</string>
+    <string name="category_details_subcategories_empty">Подкатегорий нет. Всё учитывается прямо в этой категории.</string>
+    <string name="category_details_share_percent">%1$d%%</string>
+    <string name="category_details_recent">Недавние</string>
+    <string name="category_details_recent_empty">В этой категории пока нет операций.</string>
+    <string name="category_details_transaction_untitled">Без описания</string>
+    <string name="category_details_log_expense">Добавить расход</string>
+    <string name="category_details_log_income">Добавить доход</string>
+
+    <!-- Abbreviated month names for the spend trend axis -->
+    <string name="month_short_january">янв.</string>
+    <string name="month_short_february">февр.</string>
+    <string name="month_short_march">март</string>
+    <string name="month_short_april">апр.</string>
+    <string name="month_short_may">май</string>
+    <string name="month_short_june">июнь</string>
+    <string name="month_short_july">июль</string>
+    <string name="month_short_august">авг.</string>
+    <string name="month_short_september">сент.</string>
+    <string name="month_short_october">окт.</string>
+    <string name="month_short_november">нояб.</string>
+    <string name="month_short_december">дек.</string>
 
     <!-- Action feedback snackbars -->
     <string name="category_creation_created_snackbar">«%1$s» создана</string>
