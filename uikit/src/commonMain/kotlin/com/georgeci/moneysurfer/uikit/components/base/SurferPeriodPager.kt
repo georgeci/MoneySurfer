@@ -33,23 +33,30 @@ private val ArrowIconSize = 18.dp
 private const val DISABLED_ARROW_ALPHA = 0.4f
 
 /**
+ * One pager arrow's behaviour: what tapping it does, whether it is live, and its a11y label.
+ * Bundling the three keeps [SurferPeriodPager]'s own parameter list readable rather than fanning
+ * every arrow property out into a `previousX` / `nextX` pair.
+ */
+data class SurferPeriodArrow(
+    val onClick: () -> Unit,
+    val enabled: Boolean = true,
+    val contentDescription: String? = null,
+)
+
+/**
  * Compact pager pill for stepping through a period: `‹ March 2025 ›`.
  *
- * Stateless — the caller advances via [onPrevious] / [onNext]. [sublabel] is the smaller trailing
+ * Stateless — the caller advances via [previous] / [next]. [sublabel] is the smaller trailing
  * caption (the year, an ISO week, "No date filter"); [onLabelClick] makes the centre tappable for
  * callers that hang a period-mode menu off it.
  */
 @Composable
 fun SurferPeriodPager(
     label: String,
-    onPrevious: () -> Unit,
-    onNext: () -> Unit,
+    previous: SurferPeriodArrow,
+    next: SurferPeriodArrow,
     modifier: Modifier = Modifier,
     sublabel: String? = null,
-    previousEnabled: Boolean = true,
-    nextEnabled: Boolean = true,
-    previousContentDescription: String? = null,
-    nextContentDescription: String? = null,
     onLabelClick: (() -> Unit)? = null,
 ) {
     Row(
@@ -64,9 +71,9 @@ fun SurferPeriodPager(
     ) {
         PagerArrow(
             icon = SurferIcons.ChevronLeft,
-            contentDescription = previousContentDescription,
-            enabled = previousEnabled,
-            onClick = onPrevious,
+            contentDescription = previous.contentDescription,
+            enabled = previous.enabled,
+            onClick = previous.onClick,
         )
         Row(
             modifier = Modifier
@@ -93,9 +100,9 @@ fun SurferPeriodPager(
         }
         PagerArrow(
             icon = SurferIcons.ChevronRight,
-            contentDescription = nextContentDescription,
-            enabled = nextEnabled,
-            onClick = onNext,
+            contentDescription = next.contentDescription,
+            enabled = next.enabled,
+            onClick = next.onClick,
         )
     }
 }
@@ -131,8 +138,8 @@ private fun SurferPeriodPagerPreview() {
             modifier = Modifier.padding(all = 16.dp),
             label = "March",
             sublabel = "2025",
-            onPrevious = {},
-            onNext = {},
+            previous = SurferPeriodArrow(onClick = {}),
+            next = SurferPeriodArrow(onClick = {}),
         )
     }
 }
@@ -145,10 +152,8 @@ private fun SurferPeriodPagerAllTimePreview() {
             modifier = Modifier.padding(all = 16.dp),
             label = "All time",
             sublabel = "No date filter",
-            onPrevious = {},
-            onNext = {},
-            previousEnabled = false,
-            nextEnabled = false,
+            previous = SurferPeriodArrow(onClick = {}, enabled = false),
+            next = SurferPeriodArrow(onClick = {}, enabled = false),
         )
     }
 }

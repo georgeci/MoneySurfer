@@ -41,6 +41,7 @@ import com.georgeci.moneysurfer.domain.preferences.TransactionPeriodMode
 import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.uikit.components.base.SurferFilterChipRow
+import com.georgeci.moneysurfer.uikit.components.base.SurferPeriodArrow
 import com.georgeci.moneysurfer.uikit.components.base.SurferPeriodPager
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
 import com.georgeci.moneysurfer.uikit.components.transaction.SurferTransactionLine
@@ -261,12 +262,16 @@ private fun PeriodPager(
         SurferPeriodPager(
             label = state.period.label(),
             sublabel = state.period.sublabel(),
-            onPrevious = { onEvent(TransactionsByAccountEvent.OnPreviousPeriodClick) },
-            onNext = { onEvent(TransactionsByAccountEvent.OnNextPeriodClick) },
-            previousEnabled = state.canGoToPreviousPeriod,
-            nextEnabled = state.canGoToNextPeriod,
-            previousContentDescription = stringResource(Res.string.transactions_list_period_previous),
-            nextContentDescription = stringResource(Res.string.transactions_list_period_next),
+            previous = SurferPeriodArrow(
+                onClick = { onEvent(TransactionsByAccountEvent.OnPreviousPeriodClick) },
+                enabled = state.canGoToPreviousPeriod,
+                contentDescription = stringResource(Res.string.transactions_list_period_previous),
+            ),
+            next = SurferPeriodArrow(
+                onClick = { onEvent(TransactionsByAccountEvent.OnNextPeriodClick) },
+                enabled = state.canGoToNextPeriod,
+                contentDescription = stringResource(Res.string.transactions_list_period_next),
+            ),
             onLabelClick = { menuExpanded = true },
         )
         DropdownMenu(
