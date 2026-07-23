@@ -1,6 +1,7 @@
 package com.georgeci.moneysurfer.feature.account.creation
 
 import arrow.optics.optics
+import co.touchlab.kermit.Logger
 import com.georgeci.moneysurfer.domain.OfflineBuildFlags
 import com.georgeci.moneysurfer.domain.auth.SessionPointers
 import com.georgeci.moneysurfer.domain.model.Account
@@ -16,8 +17,10 @@ import com.georgeci.moneysurfer.domain.repositories.AccountRepository
 import com.georgeci.moneysurfer.domain.usecase.CreateTransactionUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetCurrenciesUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetCurrentTimeUseCase
+import com.georgeci.moneysurfer.domain.usecase.UpdateWorkspaceCurrencyUseCase
 import com.georgeci.moneysurfer.feature.account.generated.resources.Res
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_created_snackbar
+import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_currency_failed_snackbar
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_updated_snackbar
 import com.georgeci.moneysurfer.navigation.SnackbarController
 import com.georgeci.moneysurfer.utils.MviViewModel
@@ -29,11 +32,14 @@ import org.koin.core.annotation.KoinViewModel
 @Suppress("LongParameterList")
 class AccountCreationViewModel(
     private val accountId: AccountId?,
+    private val firstRun: Boolean,
+    initialType: AccountType,
     private val accountRepository: AccountRepository,
     private val createTransaction: CreateTransactionUseCase,
     private val session: SessionPointers,
     private val getCurrentTime: GetCurrentTimeUseCase,
     private val getCurrencies: GetCurrenciesUseCase,
+    private val updateWorkspaceCurrency: UpdateWorkspaceCurrencyUseCase,
     private val snackbar: SnackbarController,
     private val offlineBuildFlags: OfflineBuildFlags,
 ) : MviViewModel<AccountCreationState, AccountCreationEvent, AccountCreationEffect>(
@@ -43,7 +49,9 @@ class AccountCreationViewModel(
         AccountCreationState.Content(
             name = "",
             balance = "",
-            type = AccountType.SAVINGS,
+            // Onboarding passes the kind the user picked; every other entry point falls back
+            // to the screen's own default.
+            type = initialType,
             currency = DEFAULT_CURRENCY,
             currencies = emptyList(),
             extraFields = emptyList(),
@@ -52,6 +60,8 @@ class AccountCreationViewModel(
         )
     },
 ) {
+
+    private val log = Logger.withTag(TAG)
 
     private var loadedCurrencies: List<Currency> = emptyList()
 
@@ -64,8 +74,9 @@ class AccountCreationViewModel(
         when (event) {
             is AccountCreationEvent.OnNameChanged ->
                 updateState {
-                    val content = this as? AccountCreationState.Content ?: return@updateState this
-                    content.copy(name = event.name, nameTouched = true)
+                    AccountCreationState.content.modify(this) {
+                        it.copy(name = event.name, nameTouched = true)
+                    }
                 }
             is AccountCreationEvent.OnBalanceChanged ->
                 updateState {
@@ -197,11 +208,26 @@ class AccountCreationViewModel(
             }
 
             snackbar.show(Res.string.account_creation_created_snackbar, listOf(trimmedName))
-            postSideEffect(AccountCreationEffect.NavigateBack)
+
+            if (firstRun) {
+                // First-launch step: the currency picked here becomes the workspace base
+                // currency, so the Dashboard total speaks the user's currency from day one.
+                // The account itself is already saved, so a failure here is reported and the
+                // user still moves on — the workspace currency is fixable from settings, and
+                // stranding them on the first-run screen would invite a duplicate account.
+                updateWorkspaceCurrency(workspaceId, currency).onLeft { err ->
+                    log.w { "[firstRun] workspace currency not applied -> $err" }
+                    snackbar.show(Res.string.account_creation_currency_failed_snackbar)
+                }
+                postSideEffect(AccountCreationEffect.NavigateToDashboard)
+            } else {
+                postSideEffect(AccountCreationEffect.NavigateBack)
+            }
         }
     }
 
     private companion object {
+        const val TAG = "AccountCreationVM"
         val DEFAULT_CURRENCY = CurrencyCode("EUR")
     }
 }
@@ -278,4 +304,7 @@ sealed interface AccountCreationEvent {
 
 sealed interface AccountCreationEffect {
     data object NavigateBack : AccountCreationEffect
+
+    /** First-launch only: the first account is in place, continue into the app. */
+    data object NavigateToDashboard : AccountCreationEffect
 }

@@ -11,8 +11,6 @@
 
     <string name="settings_change_workspace">Сменить workspace</string>
     <string name="settings_change_workspace_supporting">Сейчас: Family</string>
-    <string name="settings_finish_setup">Завершить настройку</string>
-    <string name="settings_finish_setup_supporting">Выберите валюту пространства</string>
     <string name="settings_members">Участники и права</string>
     <string name="settings_pending_invites">Приглашения</string>
     <string name="settings_pending_invites_supporting_empty">Нет приглашений</string>

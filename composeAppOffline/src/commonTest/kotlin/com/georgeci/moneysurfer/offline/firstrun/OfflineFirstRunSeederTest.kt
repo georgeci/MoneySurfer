@@ -9,7 +9,6 @@ import com.georgeci.moneysurfer.domain.model.User
 import com.georgeci.moneysurfer.domain.model.Workspace
 import com.georgeci.moneysurfer.domain.model.WorkspaceMember
 import com.georgeci.moneysurfer.domain.primitives.AccountId
-import com.georgeci.moneysurfer.domain.primitives.AccountType
 import com.georgeci.moneysurfer.domain.primitives.CategoryId
 import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
 import com.georgeci.moneysurfer.domain.primitives.Money
@@ -39,7 +38,7 @@ import kotlinx.coroutines.test.runTest
  * The offline build's first-run bootstrap. Unlike [SeedDefaultsUseCase] (tested separately), the
  * seeder adds three offline-specific behaviours we cover here:
  *  - pre-seed an anonymous demo user when none is pinned, so the seed can run without a sign-in tap;
- *  - flip `currencyChosen` off on a *fresh* install so the app routes to the currency picker;
+ *  - seed the workspace but *no* account — the user creates the first one after onboarding;
  *  - abort cleanly when the demo login fails, leaving no partially-seeded state behind.
  *
  * The real [SeedDefaultsUseCase] + [DemoLoginUseCase] run against in-memory fakes so the test
@@ -47,7 +46,7 @@ import kotlinx.coroutines.test.runTest
  */
 class OfflineFirstRunSeederTest : StringSpec({
 
-    "first run pins a demo user, seeds Personal + Cash, and defers the currency choice" {
+    "first run pins a demo user and seeds Personal without any account" {
         runTest {
             val env = SeederEnv()
 
@@ -58,18 +57,13 @@ class OfflineFirstRunSeederTest : StringSpec({
 
             val workspace = env.workspaceRepo.inserted.single()
             workspace.name shouldBe "Personal"
-            val account = env.accountRepo.inserted.single()
-            account.name shouldBe "Cash"
-            account.type shouldBe AccountType.CASH
-            account.workspaceId shouldBe workspace.id
-
             env.session.currentWorkspaceId.flow.first() shouldBe workspace.id
-            // Fresh install → the seed picked a locale-derived currency, so the picker is pending.
-            env.session.currencyChosen.flow.first() shouldBe false
+            // The first account is created by the user on the first-run account screen.
+            env.accountRepo.inserted shouldHaveSize 0
         }
     }
 
-    "relaunch is idempotent — no duplicate workspace or Cash account" {
+    "relaunch is idempotent — no duplicate workspace and still no seeded account" {
         runTest {
             val env = SeederEnv()
 
@@ -77,11 +71,11 @@ class OfflineFirstRunSeederTest : StringSpec({
             env.seeder.seedIfNeeded()
 
             env.workspaceRepo.inserted shouldHaveSize 1
-            env.accountRepo.inserted shouldHaveSize 1
+            env.accountRepo.inserted shouldHaveSize 0
         }
     }
 
-    "existing install with a pinned workspace keeps the user's currency choice and does not re-login" {
+    "existing install with a pinned workspace is left alone and does not re-login" {
         runTest {
             val env = SeederEnv(
                 currentUserId = OWNER_ID,
@@ -90,9 +84,8 @@ class OfflineFirstRunSeederTest : StringSpec({
 
             env.seeder.seedIfNeeded()
 
-            // Workspace already pinned before the seed → not a fresh install, so the choice stands.
-            env.session.currencyChosen.flow.first() shouldBe true
             env.workspaceRepo.inserted shouldHaveSize 0
+            env.accountRepo.inserted shouldHaveSize 0
             // A user was already present, so the demo login path never ran.
             env.userRepo.upserts shouldHaveSize 0
         }

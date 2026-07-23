@@ -6,6 +6,7 @@ import androidx.room.Query
 import androidx.room.Update
 import androidx.room.Upsert
 import com.georgeci.moneysurfer.data.db.entity.CategorizedTransactionEntity
+import com.georgeci.moneysurfer.data.db.entity.CategoryMonthlyTotalEntity
 import com.georgeci.moneysurfer.data.db.entity.TransactionEntity
 import kotlinx.coroutines.flow.Flow
 
@@ -104,6 +105,45 @@ interface TransactionDao {
         """,
     )
     fun searchByText(workspaceId: String, query: String): Flow<List<TransactionEntity>>
+
+    /**
+     * Per-month totals for [categoryIds] within a workspace, for one transaction type.
+     *
+     * Grouped in SQLite rather than in memory: the category detail screen wants six months of
+     * history for a whole subtree, and streaming every matching row up to the domain just to sum
+     * it would scale with transaction volume instead of with the twenty-odd cells it draws.
+     *
+     * The window is compared against `operationDate`, an ISO `YYYY-MM-DD` string, so a plain
+     * string range is a correct date range. Rows predating the column carry `''`, which sorts
+     * below every real date and is excluded by [fromDate] without a special case.
+     *
+     * [toDateExclusive] is the first day of the month *after* the last month wanted — half-open
+     * so the caller never has to know how long the final month is.
+     */
+    @Query(
+        """
+        SELECT
+            transactions.categoryId AS categoryId,
+            substr(transactions.operationDate, 1, 7) AS month,
+            SUM(ABS(transactions.amount)) AS totalMinor,
+            COUNT(*) AS transactionCount
+        FROM transactions
+        WHERE transactions.workspaceId = :workspaceId
+            AND transactions.categoryId IN (:categoryIds)
+            AND transactions.type = :type
+            AND transactions.status = 'ACTUAL'
+            AND transactions.operationDate >= :fromDate
+            AND transactions.operationDate < :toDateExclusive
+        GROUP BY transactions.categoryId, month
+        """,
+    )
+    fun getMonthlyTotalsByCategory(
+        workspaceId: String,
+        categoryIds: List<String>,
+        type: String,
+        fromDate: String,
+        toDateExclusive: String,
+    ): Flow<List<CategoryMonthlyTotalEntity>>
 
     @Insert
     suspend fun insert(entity: TransactionEntity)

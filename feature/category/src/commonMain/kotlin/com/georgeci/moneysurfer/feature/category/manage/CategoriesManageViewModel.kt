@@ -38,6 +38,8 @@ class CategoriesManageViewModel(
                 CategoriesManageEffect.NavigateToCategoryCreation,
             )
             is CategoriesManageEvent.OnCategoryClick ->
+                postSideEffect(CategoriesManageEffect.NavigateToCategoryDetails(event.categoryId))
+            is CategoriesManageEvent.OnEditCategoryClick ->
                 postSideEffect(CategoriesManageEffect.NavigateToCategoryEdit(event.categoryId))
             is CategoriesManageEvent.OnRemoveCategoryClick -> requestDelete(event.categoryId)
             CategoriesManageEvent.OnDeleteCancel -> dismissDelete()
@@ -150,6 +152,7 @@ sealed interface CategoriesManageEvent {
     data object OnBackClick : CategoriesManageEvent
     data object OnAddCategoryClick : CategoriesManageEvent
     data class OnCategoryClick(val categoryId: CategoryId) : CategoriesManageEvent
+    data class OnEditCategoryClick(val categoryId: CategoryId) : CategoriesManageEvent
     data class OnRemoveCategoryClick(val categoryId: CategoryId) : CategoriesManageEvent
     data object OnDeleteConfirm : CategoriesManageEvent
     data object OnDeleteCancel : CategoriesManageEvent
@@ -158,5 +161,6 @@ sealed interface CategoriesManageEvent {
 sealed interface CategoriesManageEffect {
     data object NavigateBack : CategoriesManageEffect
     data object NavigateToCategoryCreation : CategoriesManageEffect
+    data class NavigateToCategoryDetails(val categoryId: CategoryId) : CategoriesManageEffect
     data class NavigateToCategoryEdit(val categoryId: CategoryId) : CategoriesManageEffect
 }

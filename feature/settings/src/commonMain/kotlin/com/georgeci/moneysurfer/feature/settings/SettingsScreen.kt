@@ -46,8 +46,6 @@ import moneysurfer.feature.settings.generated.resources.settings_change_workspac
 import moneysurfer.feature.settings.generated.resources.settings_csv_supporting
 import moneysurfer.feature.settings.generated.resources.settings_csv_title
 import moneysurfer.feature.settings.generated.resources.settings_delete_account
-import moneysurfer.feature.settings.generated.resources.settings_finish_setup
-import moneysurfer.feature.settings.generated.resources.settings_finish_setup_supporting
 import moneysurfer.feature.settings.generated.resources.settings_logout
 import moneysurfer.feature.settings.generated.resources.settings_members
 import moneysurfer.feature.settings.generated.resources.settings_members_count_format
@@ -92,7 +90,6 @@ object SettingsTestTags {
 fun SettingsScreen(
     onNavigateBack: () -> Unit,
     onNavigateToWorkspaceSelector: () -> Unit,
-    onNavigateToFinishSetup: () -> Unit,
     onNavigateToIncomingInvites: () -> Unit,
     onNavigateToMembers: (com.georgeci.moneysurfer.domain.primitives.WorkspaceId) -> Unit,
     onNavigateToCategories: () -> Unit,
@@ -112,7 +109,6 @@ fun SettingsScreen(
         when (effect) {
             SettingsEffect.NavigateBack -> onNavigateBack()
             SettingsEffect.NavigateToWorkspaceSelector -> onNavigateToWorkspaceSelector()
-            SettingsEffect.NavigateToFinishSetup -> onNavigateToFinishSetup()
             SettingsEffect.NavigateToIncomingInvites -> onNavigateToIncomingInvites()
             is SettingsEffect.NavigateToMembers -> onNavigateToMembers(effect.workspaceId)
             SettingsEffect.NavigateToCategories -> onNavigateToCategories()
@@ -172,15 +168,6 @@ private fun SettingsContent(
             }
 
             SurferSettingsGroup(title = stringResource(Res.string.settings_section_workspace)) {
-                if (state.showFinishSetup) {
-                    SurferSettingsRow(
-                        icon = SurferIcons.Wallet,
-                        title = stringResource(Res.string.settings_finish_setup),
-                        supportingText = stringResource(Res.string.settings_finish_setup_supporting),
-                        onClick = { onEvent(SettingsEvent.OnFinishSetupClick) },
-                        trailing = { SurferSettingsChevron() },
-                    )
-                }
                 SurferSettingsRow(
                     icon = SurferIcons.People,
                     title = stringResource(Res.string.settings_change_workspace),

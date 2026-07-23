@@ -1,4 +1,27 @@
 <resources>
+    <string name="onboarding_step_format">Step %1$d of %2$d</string>
+    <string name="onboarding_skip">Skip</string>
+    <string name="onboarding_value_title">Your money and your savings, in one place</string>
+    <string name="onboarding_value_subtitle">Plan a budget, follow where the money goes and spot what you can cut — no spreadsheets, no extra apps.</string>
+    <string name="onboarding_value_feature_track_title">Every expense together</string>
+    <string name="onboarding_value_feature_track_body">Accounts and cards in a single feed</string>
+    <string name="onboarding_value_feature_together_title">Budget together</string>
+    <string name="onboarding_value_feature_together_body">Share a workspace with your household</string>
+    <string name="onboarding_value_feature_offline_title">Stays on your device</string>
+    <string name="onboarding_value_feature_offline_body">Works with no network and no account</string>
+    <string name="onboarding_value_cta">Get started</string>
+    <string name="onboarding_value_note_offline">No account needed — everything stays on this device</string>
+    <string name="onboarding_value_note_online">Sign in to keep your data in sync across devices</string>
+    <string name="onboarding_start_title">Where do we start?</string>
+    <string name="onboarding_start_subtitle">Add the account you use most. You can add the rest at any time.</string>
+    <string name="onboarding_start_recommended">Recommended</string>
+    <string name="onboarding_start_cash_title">Cash</string>
+    <string name="onboarding_start_cash_body">Wallet money you can count right now</string>
+    <string name="onboarding_start_card_title">Card</string>
+    <string name="onboarding_start_card_body">A debit or credit card you pay with</string>
+    <string name="onboarding_start_savings_title">Savings</string>
+    <string name="onboarding_start_savings_body">Money set aside for a goal</string>
+    <string name="onboarding_start_cta">Create account</string>
     <string name="sign_in_title">Sign In</string>
     <string name="sign_in_subtitle">Tap login to continue with demo account.</string>
     <string name="sign_in_login">Login</string>

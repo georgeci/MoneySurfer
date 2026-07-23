@@ -14,6 +14,7 @@
 
 graph LR
   subgraph :feature
+    :feature:goal["goal"]
     :feature:account["account"]
     :feature:settings["settings"]
     :feature:workspace["workspace"]
@@ -28,6 +29,13 @@ graph LR
     :sync:default["default"]
     :sync:no-op["no-op"]
   end
+  :feature:goal --> :domain
+  :feature:goal --> :navigation
+  :feature:goal --> :sync:api
+  :feature:goal --> :uikit
+  :feature:goal --> :utils
+  :feature:goal --> :domain-test-fixtures
+  :feature:goal --> :sync-test-fixtures
   :feature:account --> :domain
   :feature:account --> :navigation
   :feature:account --> :sync:api
@@ -70,6 +78,7 @@ graph LR
   :shared --> :feature:budget
   :shared --> :feature:category
   :shared --> :feature:dashboard
+  :shared --> :feature:goal
   :shared --> :feature:login
   :shared --> :feature:settings
   :shared --> :feature:transaction
@@ -94,6 +103,7 @@ graph LR
   :composeAppOffline --> :sync:api
   :composeAppOffline --> :sync:no-op
   :composeAppOffline --> :data-local
+  :composeAppOffline --> :navigation
   :feature:budget --> :domain
   :feature:budget --> :navigation
   :feature:budget --> :sync:api
@@ -142,11 +152,11 @@ graph LR
   :composeApp --> :sync-surfer
   :composeApp --> :sync:default
   :composeApp --> :data-local
+  :composeApp --> :navigation
   :composeApp --> :composeAppOffline
   :composeApp --> :data-test-fixtures
   :composeApp --> :domain-test-fixtures
   :composeApp --> :integration-test
-  :composeApp --> :navigation
   :composeApp --> :sync-test-fixtures
   :composeApp --> :uikit
   :composeApp --> :utils
@@ -154,6 +164,7 @@ graph LR
   :composeApp --> :feature:budget
   :composeApp --> :feature:category
   :composeApp --> :feature:dashboard
+  :composeApp --> :feature:goal
   :composeApp --> :feature:settings
   :composeApp --> :feature:workspace
   :composeApp --> :sync:api
