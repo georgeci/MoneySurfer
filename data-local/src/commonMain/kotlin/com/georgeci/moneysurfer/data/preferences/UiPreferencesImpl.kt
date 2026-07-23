@@ -18,6 +18,8 @@ class UiPreferencesImpl(
 
     override val isDynamicColorAvailable: Boolean = platformIsDynamicColorAvailable
 
+    override val onboardingCompleted: Pref<Boolean> = src.onboardingCompleted.asPref()
+
     override val paletteSource: Pref<PaletteSource> = src.paletteSource.asPref(
         fromStored = ::decodePaletteSource,
         toStored = ::encodePaletteSource,

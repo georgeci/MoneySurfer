@@ -1,0 +1,65 @@
+appId: ${APP_ID}
+name: Goals — Create a goal and add money
+---
+# Dashboard → Goals widget "See all" → New goal → save → open it → Add money.
+# Pre-condition: an active workspace; piggyback on the dashboard baseline.
+
+- runFlow: 03_dashboard_add_account.yaml
+
+# The goals widget sits below the accounts widget on the dashboard.
+- scrollUntilVisible:
+    element:
+      text: "Goals"
+    direction: DOWN
+- tapOn:
+    text: "See all"
+    index: 0
+
+- assertVisible:
+    text: "Savings goals"
+
+# Create the goal once; a re-run of the suite finds it already there.
+- runFlow:
+    when:
+      notVisible: "Lisbon trip"
+    commands:
+      # Both the FAB and the empty-state CTA read "New goal"; either is fine.
+      - tapOn:
+          text: "New goal"
+      - assertVisible:
+          text: "Title"
+      - tapOn:
+          text: "Title"
+      - inputText: "Lisbon trip"
+      - tapOn:
+          text: "Target"
+      - inputText: "2400"
+      - hideKeyboard
+      - tapOn:
+          text: "Save"
+
+- assertVisible:
+    text: "Lisbon trip"
+
+# Details screen → add a contribution.
+- tapOn:
+    text: "Lisbon trip"
+- assertVisible:
+    text: "Add money"
+- tapOn:
+    text: "Add money"
+
+- assertVisible:
+    text: "Amount"
+- tapOn:
+    text: "Amount"
+- inputText: "250"
+- hideKeyboard
+- tapOn:
+    text: "Save"
+
+# Back on the details screen: the history now has the contribution, and the
+# ring reflects 250 of 2400.
+- assertVisible:
+    text: "History"
+- assertVisible: "10%"

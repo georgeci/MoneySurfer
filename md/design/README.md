@@ -1,16 +1,19 @@
-# Design mirror
+# Design mirror — Budgets, Goals, Settings & Transactions
 
-Local partial mirror of the **MoneySurfer** Claude Design project, pulled 2026-07-21
-(transactions chrome added 2026-07-22):
+Local partial mirror of the **MoneySurfer** Claude Design project:
 <https://claude.ai/design/p/019dd9e9-bcad-78f3-a4b9-49cde06a75ac>
 
 ## What's here
 
-| File | Source path in design project |
-|---|---|
-| `budget-data.jsx` | `budget-data.jsx` — seed budgets + per-budget tx |
-| `goals-data.jsx` | `goals-data.jsx` — seed goals, contributions, status/forecast tone maps |
-| `screen-chrome.jsx` | `design-system/components/_lib/screen-chrome.jsx` — **excerpt**: `PeriodPager` + `SummaryStrip` |
+| File | Source path in design project | Pulled |
+|---|---|---|
+| `budget-data.jsx` | `budget-data.jsx` — seed budgets + per-budget tx | 2026-07-21 |
+| `goals-data.jsx` | `goals-data.jsx` — seed goals, contributions, status/forecast tone maps | 2026-07-21 |
+| `settings-screens.jsx` | `settings-screens.jsx` — the 8 Settings screens, row-by-row | 2026-07-22 |
+| `screen-chrome.jsx` | `design-system/components/_lib/screen-chrome.jsx` — **excerpt**: `PeriodPager` + `SummaryStrip` | 2026-07-22 |
+
+Settings has no `*-data.jsx`: the row inventory *is* the model, so the screen file is
+mirrored instead. `settings-components.jsx` is summarised below rather than copied.
 
 ## What's NOT here (and why)
 
@@ -132,3 +135,47 @@ that its numbers now come from a SQL aggregation over the selected period rather
 the whole loaded history.
 
 The design's search field and filter badge (`txn-screens.jsx` lines 642–680) are **not** built yet.
+
+---
+
+## Settings — screen inventory (from `Settings.html`)
+
+`Settings.html` loads `design-canvas.jsx`, `android-frame.jsx`, `tokens.jsx`, `icons.jsx`,
+`data.jsx`, `components.jsx`, `settings-components.jsx`, `screen-chrome.jsx`,
+`settings-screens.jsx`. Only the Android frame is rendered (`Pair` drops the iOS device) —
+there is **no iOS variant** of these mockups.
+
+| # | Artboard | Component |
+|---|---|---|
+| 01 | Settings (hub) | `SettingsHubScreen` |
+| 01b | User profile | `UserProfileScreen` |
+| 02 | Appearance | `AppearanceScreen` |
+| 03 | Preferences | `PreferencesScreen` |
+| 04 | Sync | `SyncScreen` |
+| 04b | Sync — in progress | `SyncScreen syncing` |
+| 05 | Backup | `BackupScreen` |
+| 06 | About & legal | `AboutLegalScreen` |
+
+`BackupSyncScreen` is a back-compat alias for `SyncScreen`.
+
+### Settings components (`settings-components.jsx`)
+
+- `SettingsGroup` — primary-tinted section title + gap-stacked cards + optional `footnote`
+- `SettingsRow` — 36 px icon tile (radius 10) · title · supporting · trailing slot;
+  `danger` recolors title+icon to `error`; `divider` is a **no-op** (separation is the 8 px gap)
+- Trailing controls: `SettingsSwitch` (51×31 pill, iOS-style knob), `SettingsRadio` (22 px),
+  `SettingsChevron` (rotated `I.Back`), `SettingsValuePill` (value text + chevron)
+- `NameBlock` — `primaryContainer` hero: 56 px avatar initial, name, email, trailing chevron
+- `ColorPicker` — 5-column seed swatch grid, check on selected, dims + `pointerEvents:none`
+  when `disabled` (i.e. while Dynamic colors is on)
+- `StatusHeroCard` — tinted 48 px icon + title + supporting; `tone` = primary/secondary/tertiary
+- `SyncStatusCard` — `StatusHeroCard` wrapper, two states: "Up to date" / "Syncing…"
+- `LiveSchemePreview` — Appearance preview tile, primary/secondary/tertiary dots
+- `PendingBadge` — dot + label pill for attention items ("2 pending")
+
+Card radii: rows 16, heroes 20, profile hero 28. Shadow is uniform
+`0 2px 6px rgba(16,24,40,.05), 0 1px 2px rgba(16,24,40,.04)`.
+
+The design assumes a **single, online, signed-in app**. See
+[../settings_online_offline.md](../settings_online_offline.md) for the mapping onto the
+repo's two build variants (`:composeApp` vs `:composeAppOffline`).

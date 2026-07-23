@@ -51,16 +51,7 @@ class SettingsViewModel(
         observeIncomingInvites()
         observeActiveWorkspace()
         observeDynamicColor()
-        observeOnboardingSkipped()
         refreshIncoming()
-    }
-
-    private fun observeOnboardingSkipped() {
-        launch {
-            session.onboardingSkipped.flow
-                .onEach { skipped -> updateState { copy(onboardingSkipped = skipped) } }
-                .collect()
-        }
     }
 
     private fun loadUserIdentity() {
@@ -141,7 +132,6 @@ class SettingsViewModel(
         SettingsEvent.OnBackClick -> SettingsEffect.NavigateBack
         SettingsEvent.OnChangeWorkspaceClick -> SettingsEffect.NavigateToWorkspaceSelector
         SettingsEvent.OnIncomingInvitesClick -> SettingsEffect.NavigateToIncomingInvites
-        SettingsEvent.OnFinishSetupClick -> SettingsEffect.NavigateToFinishSetup
         SettingsEvent.OnCategoriesClick -> SettingsEffect.NavigateToCategories
         SettingsEvent.OnAppearanceClick -> SettingsEffect.NavigateToAppearance
         SettingsEvent.OnPreferencesClick -> SettingsEffect.NavigateToPreferences
@@ -169,7 +159,6 @@ data class SettingsState(
     val isDynamicColorEnabled: Boolean = false,
     val isOffline: Boolean = false,
     val syncEnabled: Boolean = false,
-    val onboardingSkipped: Boolean = false,
 ) {
     val showProfile: Boolean get() = !isOffline
     val showSyncSection: Boolean get() = !isOffline && syncEnabled
@@ -179,15 +168,11 @@ data class SettingsState(
     val showDeleteAccount: Boolean get() = !isOffline
     val showWorkspaceMembers: Boolean get() = !isOffline
     val showPendingInvites: Boolean get() = !isOffline
-
-    /** "Finish setup" re-launches the currency picker; shown only while onboarding was skipped. */
-    val showFinishSetup: Boolean get() = onboardingSkipped
 }
 
 sealed interface SettingsEvent {
     data object OnBackClick : SettingsEvent
     data object OnChangeWorkspaceClick : SettingsEvent
-    data object OnFinishSetupClick : SettingsEvent
     data object OnIncomingInvitesClick : SettingsEvent
     data object OnMembersClick : SettingsEvent
     data object OnCategoriesClick : SettingsEvent
@@ -204,7 +189,6 @@ sealed interface SettingsEvent {
 sealed interface SettingsEffect {
     data object NavigateBack : SettingsEffect
     data object NavigateToWorkspaceSelector : SettingsEffect
-    data object NavigateToFinishSetup : SettingsEffect
     data object NavigateToIncomingInvites : SettingsEffect
     data class NavigateToMembers(val workspaceId: WorkspaceId) : SettingsEffect
     data object NavigateToCategories : SettingsEffect

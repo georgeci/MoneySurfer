@@ -16,7 +16,7 @@ import org.koin.core.annotation.Single
 
 /**
  * Bootstrap for an empty install: creates a "Personal" workspace (which seeds the default
- * category set via [CreateWorkspaceUseCase]) and a single "Cash" account.
+ * category set via [CreateWorkspaceUseCase]) and, when asked for, a single "Cash" account.
  *
  * Idempotency contract — the use case is safe to call on every launch:
  *  - If no workspace is pinned, create one + seed Cash.
@@ -25,6 +25,11 @@ import org.koin.core.annotation.Single
  *    but died before inserting the account, instead of stranding the user on a Dashboard with
  *    no accounts forever (Copilot review feedback on PR #91).
  *  - Existing Cash accounts are never duplicated.
+ *
+ * `seedCashAccount = false` skips both the seed and the repair: the offline first launch lets
+ * the user create their first account explicitly (onboarding → account creation), so an
+ * auto-inserted "Cash" row would just be noise. `AppLaunchViewModel` covers the crash window
+ * by routing back to the first-run account screen while the workspace has no accounts.
  *
  * Insert failures are caught and logged so a transient repository error doesn't block the
  * caller (e.g. `AppLaunchViewModel`) from making a navigation decision.
@@ -42,9 +47,10 @@ class SeedDefaultsUseCase(
 ) {
     private val log = Logger.withTag(TAG)
 
-    suspend operator fun invoke(currency: CurrencyCode) {
+    suspend operator fun invoke(currency: CurrencyCode, seedCashAccount: Boolean = true) {
         val pinned = session.currentWorkspaceId.flow.first()
         if (pinned != null) {
+            if (!seedCashAccount) return
             // Repair path: previous run may have pinned the workspace but died before the Cash
             // insert. Use the workspace's own baseCurrency for repair so we don't overwrite the
             // user's currency choice with a freshly derived locale value.
@@ -67,7 +73,7 @@ class SeedDefaultsUseCase(
             },
             ifRight = { it },
         )
-        seedCashAccountIfMissing(newId, currency)
+        if (seedCashAccount) seedCashAccountIfMissing(newId, currency)
     }
 
     private suspend fun seedCashAccountIfMissing(workspaceId: WorkspaceId, currency: CurrencyCode) {

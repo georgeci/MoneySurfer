@@ -5,6 +5,7 @@ import com.georgeci.moneysurfer.domain.di.DomainModule
 import com.georgeci.moneysurfer.feature.account.di.AccountModule
 import com.georgeci.moneysurfer.feature.category.di.CategoryModule
 import com.georgeci.moneysurfer.feature.dashboard.di.DashboardModule
+import com.georgeci.moneysurfer.feature.goal.di.GoalModule
 import com.georgeci.moneysurfer.feature.login.di.LoginModule
 import com.georgeci.moneysurfer.feature.settings.di.SettingsModule
 import com.georgeci.moneysurfer.feature.transaction.di.TransactionModule
@@ -33,6 +34,7 @@ import org.koin.core.annotation.Module
         WorkspaceModule::class,
         CategoryModule::class,
         AccountModule::class,
+        GoalModule::class,
     ],
 )
 @ComponentScan("com.georgeci.moneysurfer")

@@ -8,12 +8,15 @@ import com.georgeci.moneysurfer.di.module
 import com.georgeci.moneysurfer.domain.AppInfo
 import com.georgeci.moneysurfer.domain.backup.BackupStorageLocator
 import com.georgeci.moneysurfer.domain.primitives.AccountId
+import com.georgeci.moneysurfer.domain.primitives.AccountType
 import com.georgeci.moneysurfer.domain.primitives.CategoryId
 import com.georgeci.moneysurfer.domain.primitives.CategoryType
+import com.georgeci.moneysurfer.domain.primitives.GoalId
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.domain.primitives.UserId
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceInviteId
+import com.georgeci.moneysurfer.navigation.GoalContributionMode
 import org.koin.core.annotation.KoinExperimentalAPI
 import org.koin.dsl.module
 import org.koin.test.verify.verify
@@ -44,7 +47,13 @@ class OfflineKoinModuleVerificationTest {
                 CategoryId::class,
                 TransactionId::class,
                 CategoryType::class,
+                // Goal screens pass the goal id, and the contribution screen its
+                // add/withdraw mode, via parametersOf.
+                GoalId::class,
+                GoalContributionMode::class,
                 Boolean::class,
+                // AccountCreationScreen passes the onboarding's pre-selected AccountType.
+                AccountType::class,
             ),
         )
     }

@@ -383,6 +383,7 @@ private object SingleAccountRepository : AccountRepository {
 
 private class FakeUiPreferences : UiPreferences {
     override val isDynamicColorAvailable: Boolean = false
+    override val onboardingCompleted: Pref<Boolean> = Pref.inMemory(true)
     override val paletteSource: Pref<PaletteSource> = Pref.inMemory(PaletteSource.Brand)
     override val themeMode: Pref<ThemeMode> = Pref.inMemory(ThemeMode.System)
     override val containerStyle: Pref<ContainerStyle> = Pref.inMemory(ContainerStyle.Card)

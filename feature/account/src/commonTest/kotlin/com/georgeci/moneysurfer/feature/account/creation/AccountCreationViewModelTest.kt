@@ -7,24 +7,29 @@ import com.georgeci.moneysurfer.domain.auth.InMemorySessionPointers
 import com.georgeci.moneysurfer.domain.fixtures.EUR
 import com.georgeci.moneysurfer.domain.fixtures.RUB
 import com.georgeci.moneysurfer.domain.fixtures.USD
+import com.georgeci.moneysurfer.domain.fixtures.aWorkspace
 import com.georgeci.moneysurfer.domain.fixtures.workspaceId
 import com.georgeci.moneysurfer.domain.model.Account
 import com.georgeci.moneysurfer.domain.model.Currency
 import com.georgeci.moneysurfer.domain.model.Transaction
+import com.georgeci.moneysurfer.domain.model.Workspace
 import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.AccountType
 import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
 import com.georgeci.moneysurfer.domain.primitives.Money
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
+import com.georgeci.moneysurfer.domain.primitives.UserId
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 import com.georgeci.moneysurfer.domain.repositories.AccountRepository
 import com.georgeci.moneysurfer.domain.repositories.CurrencyRepository
 import com.georgeci.moneysurfer.domain.repositories.TransactionRepository
+import com.georgeci.moneysurfer.domain.repositories.WorkspaceRepository
 import com.georgeci.moneysurfer.domain.usecase.ApplyTransactionChangeUseCase
 import com.georgeci.moneysurfer.domain.usecase.CreateTransactionUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetCurrenciesUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetCurrentTimeUseCase
+import com.georgeci.moneysurfer.domain.usecase.UpdateWorkspaceCurrencyUseCase
 import com.georgeci.moneysurfer.domain.util.TransactionPeriodWindow
 import com.georgeci.moneysurfer.feature.account.generated.resources.Res
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_created_snackbar
@@ -255,6 +260,64 @@ class AccountCreationViewModelTest : StringSpec({
         }
     }
 
+    "first-run save adopts the picked currency as the workspace base currency and lands on Dashboard" {
+        runTest {
+            val fixture = Fixture(workspaceId = ws)
+            val vm = fixture.createViewModel(firstRun = true)
+            try {
+                vm.awaitCurrencies()
+
+                vm.sideEffects.effectFlow.test {
+                    vm.onEvent(AccountCreationEvent.OnNameChanged("Cash"))
+                    vm.onEvent(AccountCreationEvent.OnCurrencyChanged(RUB))
+                    vm.onEvent(AccountCreationEvent.OnSaveClick)
+                    awaitItem().shouldBeInstanceOf<AccountCreationEffect.NavigateToDashboard>()
+                    cancelAndIgnoreRemainingEvents()
+                }
+
+                fixture.accountRepository.inserted.single().currencyCode shouldBe RUB
+                fixture.workspaceRepository.getById(ws)?.baseCurrency shouldBe RUB
+            } finally {
+                vm.viewModelScope.cancel()
+            }
+        }
+    }
+
+    "a regular save leaves the workspace base currency untouched" {
+        runTest {
+            val fixture = Fixture(workspaceId = ws)
+            val vm = fixture.createViewModel()
+            try {
+                vm.awaitCurrencies()
+
+                vm.onEvent(AccountCreationEvent.OnNameChanged("Cash"))
+                vm.onEvent(AccountCreationEvent.OnCurrencyChanged(RUB))
+                vm.onEvent(AccountCreationEvent.OnSaveClick)
+
+                fixture.workspaceRepository.getById(ws)?.baseCurrency shouldBe USD
+            } finally {
+                vm.viewModelScope.cancel()
+            }
+        }
+    }
+
+    "the onboarding's pre-selected type is what the screen opens on" {
+        runTest {
+            val fixture = Fixture(workspaceId = ws)
+            val vm = fixture.createViewModel(firstRun = true, initialType = AccountType.CASH)
+            try {
+                vm.awaitCurrencies().type shouldBe AccountType.CASH
+
+                vm.onEvent(AccountCreationEvent.OnNameChanged("Wallet"))
+                vm.onEvent(AccountCreationEvent.OnSaveClick)
+
+                fixture.accountRepository.inserted.single().type shouldBe AccountType.CASH
+            } finally {
+                vm.viewModelScope.cancel()
+            }
+        }
+    }
+
     "save shows a created snackbar carrying the account name" {
         runTest {
             val fixture = Fixture(workspaceId = ws)
@@ -296,6 +359,7 @@ private class Fixture(val workspaceId: WorkspaceId) {
             Currency(RUB, "₽", "Russian Ruble"),
         ),
     )
+    val workspaceRepository = FakeWorkspaceRepository(aWorkspace(id = workspaceId, baseCurrency = USD))
     val session = InMemorySessionPointers(currentWorkspaceId = workspaceId)
     val clock = ClockUseCase()
     val snackbar = SnackbarController()
@@ -303,13 +367,21 @@ private class Fixture(val workspaceId: WorkspaceId) {
         ApplyTransactionChangeUseCase(transactionRepository, accountRepository),
     )
 
-    fun createViewModel(editing: AccountId? = null, offline: Boolean = false) = AccountCreationViewModel(
+    fun createViewModel(
+        editing: AccountId? = null,
+        offline: Boolean = false,
+        firstRun: Boolean = false,
+        initialType: AccountType = AccountType.SAVINGS,
+    ) = AccountCreationViewModel(
         accountId = editing,
+        firstRun = firstRun,
+        initialType = initialType,
         accountRepository = accountRepository,
         createTransaction = createTransaction,
         session = session,
         getCurrentTime = GetCurrentTimeUseCase(clock),
         getCurrencies = GetCurrenciesUseCase(currencyRepository),
+        updateWorkspaceCurrency = UpdateWorkspaceCurrencyUseCase(workspaceRepository, accountRepository),
         snackbar = snackbar,
         offlineBuildFlags = OfflineBuildFlags(isOffline = offline),
     )
@@ -380,6 +452,23 @@ private class FakeTransactionRepository : TransactionRepository {
     override suspend fun delete(id: TransactionId) {
         byId.remove(id)
         all.value = byId.values.toList()
+    }
+}
+
+private class FakeWorkspaceRepository(workspace: Workspace) : WorkspaceRepository {
+    private val byId = mutableMapOf(workspace.id to workspace)
+
+    override fun getAll(): Flow<List<Workspace>> = MutableStateFlow(byId.values.toList())
+    override fun getByUserId(userId: UserId): Flow<List<Workspace>> = MutableStateFlow(byId.values.toList())
+    override suspend fun getById(id: WorkspaceId): Workspace? = byId[id]
+    override suspend fun insert(workspace: Workspace) {
+        byId[workspace.id] = workspace
+    }
+    override suspend fun update(workspace: Workspace) {
+        byId[workspace.id] = workspace
+    }
+    override suspend fun delete(id: WorkspaceId) {
+        byId.remove(id)
     }
 }
 
