@@ -4,24 +4,21 @@ import com.georgeci.moneysurfer.domain.model.BudgetPeriod
 import com.georgeci.moneysurfer.domain.model.BudgetStatus
 import com.georgeci.moneysurfer.domain.primitives.BudgetId
 
-/** Sample data for `@Preview`s only — never referenced from a screen at runtime. */
-@Suppress("LongParameterList")
+/**
+ * Sample data for `@Preview`s only — never referenced from a screen at runtime. Takes only the
+ * fields the previews actually vary; everything else is fixed here.
+ */
 internal fun previewBudget(
-    id: String = "b-1",
     name: String = "Groceries",
     status: BudgetStatus = BudgetStatus.WARN,
-    spent: String = "€312.40",
-    limit: String = "€400.00",
-    remainder: String = "€87.60",
     progress: Float = 0.78f,
-    isActive: Boolean = true,
 ): BudgetUi = BudgetUi(
-    id = BudgetId(id),
+    id = BudgetId("b-1"),
     name = name,
     status = status,
-    spentFormatted = spent,
-    limitFormatted = limit,
-    remainderFormatted = remainder,
+    spentFormatted = "€312.40",
+    limitFormatted = "€400.00",
+    remainderFormatted = "€87.60",
     isOver = status == BudgetStatus.OVER,
     progress = progress,
     alertFraction = 0.8f,
@@ -32,7 +29,7 @@ internal fun previewBudget(
     daysLeft = 12,
     elapsedDays = 18,
     categories = emptyList(),
-    isActive = isActive,
+    isActive = true,
     hasMixedCurrency = false,
     rolloverCarryFormatted = null,
     dailyAverageFormatted = "€17.35",

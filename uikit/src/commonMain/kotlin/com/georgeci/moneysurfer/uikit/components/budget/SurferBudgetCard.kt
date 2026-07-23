@@ -37,22 +37,28 @@ data class SurferBudgetCategoryVisual(
 )
 
 /**
- * A budget row on the list screen. Everything numeric arrives pre-formatted — uikit knows
- * nothing about `Money` or currencies.
+ * The pre-formatted numbers on a budget card. Grouped so the card stays a slot component with a
+ * short parameter list — uikit knows nothing about `Money` or currencies, only these strings.
+ */
+data class SurferBudgetCardMetrics(
+    val spentOfLimit: String,
+    val remaining: String,
+    val progress: Float,
+    val footer: String,
+    val alertFraction: Float? = null,
+)
+
+/**
+ * A budget row on the list screen. Everything numeric arrives pre-formatted via [metrics].
  */
 @Composable
-@Suppress("LongParameterList")
 fun SurferBudgetCard(
     name: String,
     statusLabel: String,
     status: SurferBudgetStatus,
-    spentOfLimit: String,
-    remaining: String,
-    progress: Float,
-    footer: String,
+    metrics: SurferBudgetCardMetrics,
     modifier: Modifier = Modifier,
     categories: List<SurferBudgetCategoryVisual> = emptyList(),
-    alertFraction: Float? = null,
     onClick: (() -> Unit)? = null,
 ) {
     SurferCard(modifier = modifier.fillMaxWidth(), onClick = onClick) {
@@ -76,13 +82,13 @@ fun SurferBudgetCard(
 
             Row(verticalAlignment = Alignment.Bottom) {
                 Text(
-                    text = spentOfLimit,
+                    text = metrics.spentOfLimit,
                     style = AppTheme.typography.bodyMedium,
                     color = AppTheme.materialColors.onSurface,
                 )
                 Spacer(Modifier.weight(1f))
                 Text(
-                    text = remaining,
+                    text = metrics.remaining,
                     style = AppTheme.typography.bodySmall,
                     color = if (status == SurferBudgetStatus.Over) {
                         AppTheme.materialColors.error
@@ -93,13 +99,13 @@ fun SurferBudgetCard(
             }
 
             SurferBudgetProgressBar(
-                progress = progress,
+                progress = metrics.progress,
                 status = status,
-                alertFraction = alertFraction,
+                alertFraction = metrics.alertFraction,
             )
 
             Text(
-                text = footer,
+                text = metrics.footer,
                 style = AppTheme.typography.bodySmall,
                 color = AppTheme.materialColors.onSurfaceVariant,
             )
@@ -173,11 +179,13 @@ private fun SurferBudgetCardPreview() {
                 name = "Groceries",
                 statusLabel = "Near limit",
                 status = SurferBudgetStatus.Warn,
-                spentOfLimit = "€312.40 of €400.00",
-                remaining = "€87.60 left",
-                progress = 0.78f,
-                alertFraction = 0.8f,
-                footer = "Monthly · Apr 1 – Apr 30 · 12 days left",
+                metrics = SurferBudgetCardMetrics(
+                    spentOfLimit = "€312.40 of €400.00",
+                    remaining = "€87.60 left",
+                    progress = 0.78f,
+                    footer = "Monthly · Apr 1 – Apr 30 · 12 days left",
+                    alertFraction = 0.8f,
+                ),
                 categories = listOf(
                     SurferBudgetCategoryVisual(SurferIcons.Receipt, SurferCategoryPalette.tints[0]),
                 ),
@@ -187,11 +195,13 @@ private fun SurferBudgetCardPreview() {
                 name = "Transport & fuel",
                 statusLabel = "Over",
                 status = SurferBudgetStatus.Over,
-                spentOfLimit = "€245.10 of €220.00",
-                remaining = "€25.10 over",
-                progress = 1.11f,
-                alertFraction = 0.75f,
-                footer = "Monthly · Apr 1 – Apr 30 · 12 days left",
+                metrics = SurferBudgetCardMetrics(
+                    spentOfLimit = "€245.10 of €220.00",
+                    remaining = "€25.10 over",
+                    progress = 1.11f,
+                    footer = "Monthly · Apr 1 – Apr 30 · 12 days left",
+                    alertFraction = 0.75f,
+                ),
                 categories = listOf(
                     SurferBudgetCategoryVisual(SurferIcons.Cash, SurferCategoryPalette.tints[1]),
                     SurferBudgetCategoryVisual(SurferIcons.Wallet, SurferCategoryPalette.tints[2]),
@@ -204,11 +214,13 @@ private fun SurferBudgetCardPreview() {
                 name = "Total monthly cap",
                 statusLabel = "On track",
                 status = SurferBudgetStatus.Ok,
-                spentOfLimit = "€1,408.30 of €2,200.00",
-                remaining = "€791.70 left",
-                progress = 0.64f,
-                alertFraction = 0.8f,
-                footer = "Monthly · all categories · 12 days left",
+                metrics = SurferBudgetCardMetrics(
+                    spentOfLimit = "€1,408.30 of €2,200.00",
+                    remaining = "€791.70 left",
+                    progress = 0.64f,
+                    footer = "Monthly · all categories · 12 days left",
+                    alertFraction = 0.8f,
+                ),
                 onClick = {},
             )
         }

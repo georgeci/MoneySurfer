@@ -35,6 +35,7 @@ import com.georgeci.moneysurfer.uikit.components.base.SurferSwipeAction
 import com.georgeci.moneysurfer.uikit.components.base.SurferSwipeRevealRow
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
 import com.georgeci.moneysurfer.uikit.components.budget.SurferBudgetCard
+import com.georgeci.moneysurfer.uikit.components.budget.SurferBudgetCardMetrics
 import com.georgeci.moneysurfer.uikit.components.budget.SurferBudgetCategoryVisual
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
@@ -258,22 +259,24 @@ private fun BudgetRow(
             name = budget.name,
             statusLabel = budgetStatusLabel(budget.status),
             status = budget.status.toUi(),
-            spentOfLimit = stringResource(
-                Res.string.budget_spent_of_format,
-                budget.spentFormatted,
-                budget.limitFormatted,
-            ),
-            remaining = if (budget.isOver) {
-                stringResource(Res.string.budget_over_format, budget.remainderFormatted)
-            } else {
-                stringResource(Res.string.budget_remaining_format, budget.remainderFormatted)
-            },
-            progress = budget.progress,
-            alertFraction = budget.alertFraction,
-            footer = stringResource(
-                Res.string.budget_footer_format,
-                budgetPeriodLabel(budget.period),
-                pluralStringResource(Res.plurals.budget_days_left, budget.daysLeft, budget.daysLeft),
+            metrics = SurferBudgetCardMetrics(
+                spentOfLimit = stringResource(
+                    Res.string.budget_spent_of_format,
+                    budget.spentFormatted,
+                    budget.limitFormatted,
+                ),
+                remaining = if (budget.isOver) {
+                    stringResource(Res.string.budget_over_format, budget.remainderFormatted)
+                } else {
+                    stringResource(Res.string.budget_remaining_format, budget.remainderFormatted)
+                },
+                progress = budget.progress,
+                footer = stringResource(
+                    Res.string.budget_footer_format,
+                    budgetPeriodLabel(budget.period),
+                    pluralStringResource(Res.plurals.budget_days_left, budget.daysLeft, budget.daysLeft),
+                ),
+                alertFraction = budget.alertFraction,
             ),
             categories = budget.categories.map { category ->
                 val visual = SurferCategoryPalette.visualFor(
