@@ -1,33 +1,29 @@
-# Design mirror — Budgets, Goals, Settings & Transactions
+# Design notes — Budgets, Goals, Settings, Transactions & Accounts
 
-Local partial mirror of the **MoneySurfer** Claude Design project:
+Notes taken from the **MoneySurfer** Claude Design project:
 <https://claude.ai/design/p/019dd9e9-bcad-78f3-a4b9-49cde06a75ac>
 
-## What's here
+## No design sources in this repo
 
-| File | Source path in design project | Pulled |
-|---|---|---|
-| `budget-data.jsx` | `budget-data.jsx` — seed budgets + per-budget tx | 2026-07-21 |
-| `goals-data.jsx` | `goals-data.jsx` — seed goals, contributions, status/forecast tone maps | 2026-07-21 |
-| `settings-screens.jsx` | `settings-screens.jsx` — the 8 Settings screens, row-by-row | 2026-07-22 |
-| `screen-chrome.jsx` | `design-system/components/_lib/screen-chrome.jsx` — **excerpt**: `PeriodPager` + `SummaryStrip` | 2026-07-22 |
+Source files from the design project — `*.jsx`, `*.html`, exported assets — are **not
+committed here**. They are someone else's authored content, they are large, and they go
+stale the moment the design moves. `md/design/*.jsx` and `*.html` are gitignored.
 
-Settings has no `*-data.jsx`: the row inventory *is* the model, so the screen file is
-mirrored instead. `settings-components.jsx` is summarised below rather than copied.
+What lives in this folder is our own reading of the mockups: screen inventories, component
+behaviour, and the implied domain model — enough to implement against without opening the
+canvas, and small enough to review in a diff.
 
-## What's NOT here (and why)
-
-The screen files (`Budgets.html`, `Goals.html`) are React-UMD pages that load a shared
-runtime: `design-canvas.jsx`, `android-frame.jsx`, `tokens.jsx`, `icons.jsx`, `data.jsx`,
-`components.jsx`, `shared-components.jsx`, `screens-1.jsx`, plus the per-domain
-`budget-components.jsx` / `screens-budgets.jsx` / `goals-components.jsx` / `screens-goals.jsx`.
-
-The MCP only reads one file at a time, so mirroring all 13 is expensive. To render locally,
-export the project as a zip from the web UI, drop it in this folder, then:
+To work with the sources, pull them into an untracked scratch folder (the design MCP reads
+one file at a time), or export the project as a zip from the web UI and serve it:
 
 ```
 python3 -m http.server 8000   # file:// won't work — babel fetches the .jsx over XHR
 ```
+
+The screens are React-UMD pages over a shared runtime: `design-canvas.jsx`,
+`android-frame.jsx`, `tokens.jsx`, `icons.jsx`, `data.jsx`, `components.jsx`,
+`shared-components.jsx`, `screens-1.jsx`, plus the per-domain `*-components.jsx` /
+`*-data.jsx` / `screens-*.jsx`.
 
 Artboard width in the mockups is 412×892 (`AndroidDevice`), scaled 0.78 on the canvas.
 
@@ -179,3 +175,40 @@ Card radii: rows 16, heroes 20, profile hero 28. Shadow is uniform
 The design assumes a **single, online, signed-in app**. See
 [../settings_online_offline.md](../settings_online_offline.md) for the mapping onto the
 repo's two build variants (`:composeApp` vs `:composeAppOffline`).
+
+---
+
+## Accounts — screen inventory (from `Accounts.html`)
+
+Screens live in `screens-1.jsx` (creation + manage) and `screens-2.jsx` (details + chooser),
+with rows in `account-components.jsx` and seed data in `account-data.jsx`.
+
+| # | Artboard | Component |
+|---|---|---|
+| 01 | New account | `AccountCreationScreen` |
+| 02 | Manage accounts — edit mode | `AccountManageScreen editing` |
+| 03 | Manage accounts — view mode | `AccountManageScreen` |
+| 04 | Account details | `AccountDetailsScreen` |
+| 05 | Account chooser sheet | `AccountChooserSheetScreen` |
+| 06 | Delete confirm alert | `DeleteAccountDialog` |
+
+### Account components
+
+- `ACCOUNT_TYPE_META` — CASH → "Cash"/hue 162, BANK → "Bank"/258, CARD → "Card"/303,
+  SAVINGS → "Savings"/68; drives icon tile tint everywhere
+- `AccountRowCompact` — 40 dp squircle (`32% / 38%`) tile, name, `{type} · •• {last4} · {ccy}`,
+  flexible trailing slot; `selected` fills `secondaryContainer`
+- `AccountRowLarge` — hero card, 24 dp radius, hue-tinted fill, uppercase eyebrow, big
+  `SplitAmount`, optional footer slot
+- `DeleteAccountDialog` — M3 basic dialog, error-tinted trash badge, Cancel / Delete
+
+### Fields the mockups render that the domain model does not have
+
+`Account(id, workspaceId, name, type, currencyCode, balance, archived, updatedAt)` has no
+`icon`, `kind` ("Current"/"Credit", which duplicates and contradicts `type`), `last4`,
+`archivedAt`, sort order, per-account sync state, or the "Extra details" set
+(IBAN, description, BIC, card last 4, bank URL, branch phone, custom fields).
+
+The creation screen collects those extra details and nothing ever persists or displays them.
+Full gap analysis and the design-alignment prompt:
+[../../docs/plans/accounts-design-alignment.md](../../docs/plans/accounts-design-alignment.md).
