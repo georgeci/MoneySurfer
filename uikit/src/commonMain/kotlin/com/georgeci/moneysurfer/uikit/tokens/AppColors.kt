@@ -56,6 +56,13 @@ object AppColors {
     val Expense = Color(0xFFB54744)
     val Transfer = Color(0xFF2E5AA8)
 
+    /**
+     * Amber "approaching the limit" accent. M3 has no warning slot, and `error` is already
+     * spoken for by the over-budget state, so a budget nearing its cap needs a third colour
+     * that reads as caution rather than failure. Mirrors the mockup's `oklch(56% 0.13 68)`.
+     */
+    val Warning = Color(0xFFA97110)
+
     // Dark theme overrides
     object Dark {
         val Primary = Color(0xFF6EDD72)
@@ -98,5 +105,8 @@ object AppColors {
         val Income = Color(0xFF6FCB9F)
         val Expense = Color(0xFFE89B98)
         val Transfer = Color(0xFF8FB0E0)
+
+        /** Same amber, lifted to the mockup's dark-scheme lightness (`oklch(78% 0.13 68)`). */
+        val Warning = Color(0xFFE9B45E)
     }
 }

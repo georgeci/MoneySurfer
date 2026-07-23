@@ -1,0 +1,63 @@
+<resources>
+    <string name="budgets_title">Бюджеты</string>
+    <string name="budgets_add">Новый бюджет</string>
+    <string name="budgets_empty">Бюджетов пока нет. Задайте лимит по категории, чтобы следить за тратами.</string>
+    <string name="budgets_active_header">Активные</string>
+    <string name="budgets_archived_header">В архиве</string>
+    <string name="budgets_archive">В архив</string>
+    <string name="budgets_restore">Вернуть</string>
+    <string name="budgets_delete">Удалить</string>
+    <string name="budgets_archived_snackbar">«%1$s» в архиве</string>
+    <string name="budgets_archive_undo">Отменить</string>
+    <string name="budgets_deleted_snackbar">«%1$s» удалён</string>
+    <string name="budgets_all_categories">Все категории</string>
+    <string name="budgets_delete_title">Удалить бюджет?</string>
+    <string name="budgets_delete_message">«%1$s» будет удалён навсегда. Операции останутся на месте.</string>
+    <string name="budgets_delete_cancel">Отмена</string>
+
+    <string name="budget_status_ok">В норме</string>
+    <string name="budget_status_warn">Близко к лимиту</string>
+    <string name="budget_status_over">Превышен</string>
+    <string name="budget_spent_of_format">%1$s из %2$s</string>
+    <string name="budget_remaining_format">осталось %1$s</string>
+    <string name="budget_over_format">перерасход %1$s</string>
+    <string name="budget_footer_format">%1$s · %2$s</string>
+    <string name="budget_period_weekly">Неделя</string>
+    <string name="budget_period_monthly">Месяц</string>
+    <string name="budget_period_yearly">Год</string>
+    <string name="budget_mixed_currency">Траты в других валютах не учитываются.</string>
+
+    <string name="budget_details_title">Бюджет</string>
+    <string name="budget_details_edit">Изменить</string>
+    <string name="budget_details_of_limit_format">из %1$s</string>
+    <string name="budget_details_stat_daily_average">В среднем в день</string>
+    <string name="budget_details_stat_projected">Прогноз</string>
+    <string name="budget_details_stat_per_day">Можно в день</string>
+    <string name="budget_details_rollover_carry_format">Включая %1$s с прошлого периода</string>
+    <string name="budget_details_transactions_header">Операции за период</string>
+    <string name="budget_details_transactions_empty">За этот период трат ещё нет.</string>
+    <string name="budget_details_alert_warn_format">Потрачено %1$d%% лимита</string>
+    <string name="budget_details_alert_warn_message_format">Порог оповещения — %1$d%%.</string>
+    <string name="budget_details_alert_over_format">Перерасход %1$s</string>
+    <string name="budget_details_alert_over_message">Траты превысили лимит этого периода.</string>
+    <string name="budget_details_not_found">Такого бюджета больше нет.</string>
+
+    <string name="budget_edit_title_create">Новый бюджет</string>
+    <string name="budget_edit_title_edit">Изменить бюджет</string>
+    <string name="budget_edit_name_label">Название</string>
+    <string name="budget_edit_name_required">Укажите название бюджета</string>
+    <string name="budget_edit_amount_label">Лимит</string>
+    <string name="budget_edit_amount_required">Лимит должен быть больше нуля</string>
+    <string name="budget_edit_period_label">Период</string>
+    <string name="budget_edit_start_date_label">Начало</string>
+    <string name="budget_edit_categories_label">Категории</string>
+    <string name="budget_edit_categories_hint">Оставьте «Все категории» для общего лимита.</string>
+    <string name="budget_edit_alert_label">Оповестить при</string>
+    <string name="budget_edit_alert_decrease">Уменьшить порог оповещения</string>
+    <string name="budget_edit_alert_increase">Увеличить порог оповещения</string>
+    <string name="budget_edit_rollover_label">Переносить остаток</string>
+    <string name="budget_edit_rollover_supporting">Неистраченное добавится к лимиту следующего периода.</string>
+    <string name="budget_edit_save">Сохранить</string>
+    <string name="budget_edit_created_snackbar">«%1$s» создан</string>
+    <string name="budget_edit_updated_snackbar">«%1$s» обновлён</string>
+</resources>

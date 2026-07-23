@@ -165,6 +165,24 @@ leap years, zero-length windows, rollover chains).
 
 ---
 
+## What actually shipped in phases 3–6 (issue #243)
+
+Deltas from the plan above, all deliberate:
+
+- **One create/edit route, not two.** `Route.BudgetCreation(budgetId: String?)` covers both,
+  matching `AccountCreation` / `CategoryCreation`. A separate `BudgetEdit(id)` would have been
+  a second serializer entry pointing at the same screen.
+- **No `SurferPeriodSegmented`.** `SurferSegmentedControl` already does exactly this; the edit
+  screen passes it `BudgetPeriod.entries`.
+- **Entry point is Settings → Budgets.** The navigation suite already carries five top-level
+  destinations, so `Route.Budgets` is a pushed route rather than a sixth tab.
+- **`BudgetProgress` also carries `rolloverCarry` and `currency`** — the carry so the details
+  screen can say where the extra headroom came from, the currency so the UI formats money
+  without a second workspace lookup.
+- **Rollover is one window deep.** Chaining every window back to `startDate` would make opening
+  the list cost more as a budget ages, for a number the user stopped tracking periods ago.
+- **Amber warn colour** lives in `AppColors.Warning` / `SemanticColors.warning`, light and dark.
+
 ## What changed since the May revision
 
 - Module `data/` no longer exists — it is `data-local/`, with `data-remote/` and

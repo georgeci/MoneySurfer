@@ -18,6 +18,7 @@ graph LR
     :feature:account["account"]
     :feature:settings["settings"]
     :feature:workspace["workspace"]
+    :feature:budget["budget"]
     :feature:category["category"]
     :feature:dashboard["dashboard"]
     :feature:login["login"]
@@ -74,6 +75,7 @@ graph LR
   :shared --> :data-local
   :shared --> :navigation
   :shared --> :feature:account
+  :shared --> :feature:budget
   :shared --> :feature:category
   :shared --> :feature:dashboard
   :shared --> :feature:goal
@@ -101,6 +103,14 @@ graph LR
   :composeAppOffline --> :sync:api
   :composeAppOffline --> :sync:no-op
   :composeAppOffline --> :data-local
+  :composeAppOffline --> :navigation
+  :feature:budget --> :domain
+  :feature:budget --> :navigation
+  :feature:budget --> :sync:api
+  :feature:budget --> :uikit
+  :feature:budget --> :utils
+  :feature:budget --> :domain-test-fixtures
+  :feature:budget --> :sync-test-fixtures
   :feature:transaction --> :domain
   :feature:transaction --> :navigation
   :feature:transaction --> :sync:api
@@ -142,15 +152,16 @@ graph LR
   :composeApp --> :sync-surfer
   :composeApp --> :sync:default
   :composeApp --> :data-local
+  :composeApp --> :navigation
   :composeApp --> :composeAppOffline
   :composeApp --> :data-test-fixtures
   :composeApp --> :domain-test-fixtures
   :composeApp --> :integration-test
-  :composeApp --> :navigation
   :composeApp --> :sync-test-fixtures
   :composeApp --> :uikit
   :composeApp --> :utils
   :composeApp --> :feature:account
+  :composeApp --> :feature:budget
   :composeApp --> :feature:category
   :composeApp --> :feature:dashboard
   :composeApp --> :feature:goal
