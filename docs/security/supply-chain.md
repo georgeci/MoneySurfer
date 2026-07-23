@@ -7,6 +7,7 @@
 - [Regenerating the lockfiles](#regenerating-the-lockfiles)
   - [Dependabot PRs always need this](#dependabot-prs-always-need-this)
 - [Why skiko / compose.desktop are excluded from the lock state](#why-skiko--composedesktop-are-excluded-from-the-lock-state)
+- [Why kotlinAbiValidationCompatClasspath is pinned by hand](#why-kotlinabivalidationcompatclasspath-is-pinned-by-hand)
 - [Known gaps / future work](#known-gaps--future-work)
 <!-- DOCS:END -->
 

@@ -744,7 +744,7 @@ val androidDeviceTestTasks = listOf(
     // `:integration-test` uses the AGP `KotlinMultiplatformAndroidLibraryTarget`
     // which exposes `connectedAndroidDeviceTest` rather than `connectedAndroidTest`.
     // Pre-req: Firebase Emulator Suite (firestore + auth) must be running on the
-    // host before this task — see README_TEST.md "Integration tests" section.
+    // host before this task — see docs/testing/qa-runbook.md "Integration tests".
     ":integration-test:connectedAndroidDeviceTest",
 )
 

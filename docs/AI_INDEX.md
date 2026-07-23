@@ -200,6 +200,12 @@
 - Lines: 25-77
 - Tasks: project, context, architecture
 
+## qa-runbook
+- Title: Setup
+- File: docs/testing/qa-runbook.md
+- Lines: 47-318
+- Tasks: testing, qa, reports, tooling
+
 ## rules-bug-1
 - Title: #1 — clientVersionCode >= 1 is a no-op gate
 - File: docs/architecture/firestore-rules-bugs.md
@@ -275,7 +281,7 @@
 ## supply-chain
 - Title: What is enforced now
 - File: docs/security/supply-chain.md
-- Lines: 18-184
+- Lines: 19-185
 - Tasks: build, security, supply-chain
 
 ## sync-architecture-rules
@@ -327,9 +333,9 @@
 - Tasks: sync, outbox, pull, summary
 
 ## testing-strategy
-- Title: Common Commands
+- Title: Test layers
 - File: docs/testing/testing-strategy.md
-- Lines: 27-116
+- Lines: 35-174
 - Tasks: testing, qa, validation
 
 ## time-policy

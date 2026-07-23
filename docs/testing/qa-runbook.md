@@ -1,7 +1,50 @@
-# QA: Tests + Kover + Allure (common, Android host, Android device, Maestro Android/iOS, Firestore rules)
+# QA Runbook
 
-All QA scopes follow one shape: `qa<Scope>` runs the scope's tests, attaches Kover where it applies, and **always** finalizes by generating an Allure report into a per-scope directory under `build/reports/allure/<scope>/`. Allure runs even when tests fail.
+<!-- DOCS:TOC -->
+## Contents
+- [QA Runbook](#qa-runbook)
+- [TL;DR for agents](#tldr-for-agents)
+- [Setup](#setup)
+  - [Dedicated AVD for Maestro](#dedicated-avd-for-maestro)
+- [Firebase bootstrap (emulator)](#firebase-bootstrap-emulator)
+- [QA tasks](#qa-tasks)
+- [Plain test/Maestro tasks (no Allure)](#plain-testmaestro-tasks-no-allure)
+- [Desktop UI tests (:composeApp:jvmTest)](#desktop-ui-tests-composeappjvmtest)
+- [Integration tests (:integration-test)](#integration-tests-integration-test)
+  - [Running locally](#running-locally)
+  - [Hermetic single-shot runs](#hermetic-single-shot-runs)
+- [Firebase test suite (firestore-tests)](#firebase-test-suite-firestore-tests)
+- [Standalone Allure generators](#standalone-allure-generators)
+- [Report Paths](#report-paths)
+- [Published reports (GitHub Pages)](#published-reports-github-pages)
+- [Manual CLI Equivalent](#manual-cli-equivalent)
+<!-- DOCS:END -->
 
+The operational half of testing: how to install the tooling, run each QA scope,
+and find the resulting reports. For *what to test and in which layer*, read
+[testing-strategy](testing-strategy.md) first — it is the entry point.
+
+## TL;DR for agents
+
+- All QA scopes follow one shape: `qa<Scope>` runs the scope's tests, attaches
+  Kover where it applies, and **always** finalizes by generating an Allure
+  report into `build/reports/allure/<scope>/` — even when tests fail.
+- `qaCommon` is the JVM scope and needs no device and no emulator; everything
+  Maestro or device-related does.
+- Don't run broad scopes by default — pick the narrowest one covering the
+  edited module.
+
+READ WHEN:
+- running or debugging a QA task locally
+- looking for a test report, log, or artifact path
+- setting up Maestro, Allure, or the dedicated AVD
+- wiring a new scope into Allure/Kover
+
+Related: [testing-strategy](testing-strategy.md),
+[firebase-emulator](firebase-emulator.md), [screenshot-tests](screenshot-tests.md),
+[sonarcloud](sonarcloud.md).
+
+<!-- AI:SECTION id=qa-runbook task=testing,qa,reports,tooling -->
 ## Setup
 
 ```bash
@@ -46,31 +89,15 @@ wiring is needed there.
 
 ## Firebase bootstrap (emulator)
 
-Bootstrap scripts live in `scripts/firebase/`:
+Full reference — install, configuration, per-platform switching, troubleshooting
+— is in [firebase-emulator](firebase-emulator.md). Bootstrap scripts live in
+`scripts/firebase/` (`start.sh`, `stop.sh`, `reset.sh`, `seed.sh`).
 
-```bash
-# Start emulator (foreground)
-scripts/firebase/start.sh
-
-# Start emulator (background)
-scripts/firebase/start.sh --background
-
-# Reset emulator state (Auth users + Firestore docs)
-scripts/firebase/reset.sh
-
-# Seed test users for Maestro/device IT
-scripts/firebase/seed.sh
-
-# Stop background emulator
-scripts/firebase/stop.sh
-```
-
-Project id note:
-
-- `qaIntegrationDeviceEmulator` / `qaIntegrationDeviceHermetic` and `firestore-tests` use `demo-moneysurfer`.
-- `scripts/firebase/start.sh` / `reset.sh` default to `moneysurfer-test` unless `FIREBASE_PROJECT_ID` is set.
-
-If you need one shared namespace for all Firebase test flows, run bootstrap scripts with:
+One gotcha worth repeating here, because it bites when mixing entry points: the
+Gradle wrappers and `firestore-tests` pin `--project demo-moneysurfer`, but
+`scripts/firebase/start.sh` / `reset.sh` default to `moneysurfer-test` unless
+`FIREBASE_PROJECT_ID` is set — so state seeded through the scripts lands in a
+different emulator namespace than the tests read. For one shared namespace:
 
 ```bash
 FIREBASE_PROJECT_ID=demo-moneysurfer scripts/firebase/start.sh
@@ -112,6 +139,25 @@ FIREBASE_PROJECT_ID=demo-moneysurfer scripts/firebase/start.sh
 iOS defaults to simulator name `iPhone 17`. Override with
 `-PiosSimulatorName="<name>"`; pass `-PiosSimulatorUdid=<udid>` when multiple
 simulators are visible to Maestro.
+
+## Desktop UI tests (`:composeApp:jvmTest`)
+
+Compose screen-state tests that render the real composables in-process via
+`runComposeUiTest` (CMP 1.11 v2 API) inside kotest `StringSpec` blocks. They are
+**headless** — no window, no display, no `xvfb` — so they run anywhere, including
+display-less CI runners.
+
+```bash
+./gradlew :composeApp:jvmTest
+```
+
+Result XMLs land at `composeApp/build/test-results/jvmTest/*.xml`. No separate QA
+entry point: `qaCommon` already includes this module, so Kover and Allure pick
+them up automatically.
+
+Conventions for writing them (mount the stateless content composable, address
+nodes by `*TestTags`, mind the `StandardTestDispatcher` default) are in
+[testing-strategy](testing-strategy.md#desktop-ui-tests-compose-jvmtest).
 
 ## Integration tests (`:integration-test`)
 
@@ -165,7 +211,7 @@ so you don't have to keep a long-running emulator process. Both pin
 ./gradlew qaIntegrationDeviceHermetic
 ```
 
-The managed AVD is declared in [integration-test/build.gradle.kts](integration-test/build.gradle.kts)
+The managed AVD is declared in [integration-test/build.gradle.kts](../../integration-test/build.gradle.kts)
 as `integrationAvd`. AGP generates these companion tasks off it:
 
 - `:integration-test:integrationAvdAndroidDeviceTest` — runs the suite
@@ -197,7 +243,7 @@ shape as `qaMaestro`:
 ```
 
 CI runs this on every PR as the `firestore-rules` job in
-[.github/workflows/ci.yml](.github/workflows/ci.yml).
+[.github/workflows/ci.yml](../../.github/workflows/ci.yml).
 
 Watch mode (no Allure):
 
@@ -245,7 +291,7 @@ Each can be run on its own; it consumes whatever results are already on disk and
   - `build/reports/allure/all/index.html`
 - Kover HTML coverage: `build/reports/kover/html/index.html`
 - Kover XML coverage: `build/reports/kover/report.xml` (also published to
-  SonarCloud — see [docs/testing/sonarcloud.md](docs/testing/sonarcloud.md))
+  SonarCloud — see [sonarcloud](sonarcloud.md))
 
 ## Published reports (GitHub Pages)
 
@@ -269,3 +315,4 @@ PRs don't publish — they attach the aggregated Allure as a downloadable artifa
 maestro test scripts/maestro/ --exclude-tags setup --format junit --output build/test-results/maestro/maestro-report.xml
 allure generate build -o build/reports/allure/maestro --clean
 ```
+<!-- AI:END -->

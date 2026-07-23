@@ -115,12 +115,17 @@ To build for Android or iOS:
    real release.
 
 For local development and tests you can skip the real project entirely and
-use the Firebase Emulator Suite — see [README_TEST.md](README_TEST.md).
+use the Firebase Emulator Suite — see
+[docs/testing/firebase-emulator.md](docs/testing/firebase-emulator.md).
 
 ## Testing
 
-QA entry points and the Firebase Emulator setup are documented in
-[README_TEST.md](README_TEST.md). Common commands:
+Testing is documented in
+[docs/testing/testing-strategy.md](docs/testing/testing-strategy.md) — which test
+layers exist and which one a change belongs in. QA task reference, tooling setup
+and report paths are in the [QA runbook](docs/testing/qa-runbook.md).
+
+Common commands:
 
 ```shell
 ./gradlew qaCommon          # JVM unit tests across all common modules
@@ -153,6 +158,7 @@ Every push to `main` republishes the aggregated CI reports to GitHub Pages
 - [docs/architecture/overview.md](docs/architecture/overview.md) — architecture overview
 - [docs/architecture/sync.md](docs/architecture/sync.md) — sync model (Room + Firestore)
 - [docs/architecture/persistence.md](docs/architecture/persistence.md) — persistence
+- [docs/testing/testing-strategy.md](docs/testing/testing-strategy.md) — testing: layers, conventions, commands
 - [uikit/README.md](uikit/README.md) — design system rules
 - [AGENTS.md](AGENTS.md) — conventions, module DAG, AI tooling instructions
 

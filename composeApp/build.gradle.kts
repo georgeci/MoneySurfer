@@ -73,6 +73,8 @@ kotlin {
         }
         jvmTest.dependencies {
             implementation(projects.dataLocal)
+            implementation(projects.feature.login)
+            implementation(libs.compose.uiTest)
             // KoinModuleVerificationTest lists the `parametersOf` types, some of
             // which are navigation-level (goal contribution mode).
             implementation(projects.navigation)
@@ -99,6 +101,10 @@ koinCompiler {
 
 tasks.named<Test>("jvmTest") {
     useJUnitPlatform()
+    // Compose desktop UI tests (`runComposeUiTest`) render offscreen through Skiko, so they must
+    // not need a display. Forcing headless mode here keeps that true on developer machines too,
+    // instead of only being exercised on CI's display-less `ubuntu-latest`.
+    systemProperty("java.awt.headless", "true")
 }
 
 compose.desktop {

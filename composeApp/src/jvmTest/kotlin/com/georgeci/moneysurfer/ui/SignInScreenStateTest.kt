@@ -1,0 +1,129 @@
+package com.georgeci.moneysurfer.ui
+
+import androidx.compose.ui.test.ExperimentalTestApi
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsEnabled
+import androidx.compose.ui.test.assertIsNotEnabled
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.v2.runComposeUiTest
+import com.georgeci.moneysurfer.feature.login.AuthMode
+import com.georgeci.moneysurfer.feature.login.SignInContent
+import com.georgeci.moneysurfer.feature.login.SignInError
+import com.georgeci.moneysurfer.feature.login.SignInEvent
+import com.georgeci.moneysurfer.feature.login.SignInState
+import com.georgeci.moneysurfer.feature.login.SignInTestTags
+import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.collections.shouldContainExactly
+import io.kotest.matchers.shouldBe
+import java.awt.GraphicsEnvironment
+
+/**
+ * Spike for the JVM desktop UI-testing rollout (docs/plans/jvm-desktop-testing-rollout.md).
+ *
+ * Answers step 1's two questions: `runComposeUiTest` runs inside a kotest [StringSpec] block, and
+ * it renders headless (offscreen Skiko) with no display attached.
+ */
+@OptIn(ExperimentalTestApi::class)
+class SignInScreenStateTest : StringSpec({
+
+    "submit button is disabled until email and password are filled" {
+        runComposeUiTest {
+            setContent {
+                SignInContent(state = SignInState(), onEvent = {})
+            }
+
+            onNodeWithTag(SignInTestTags.Root).assertIsDisplayed()
+            onNodeWithTag(SignInTestTags.SubmitButton).assertIsNotEnabled()
+        }
+    }
+
+    "submit button is enabled once the state can be submitted" {
+        runComposeUiTest {
+            setContent {
+                SignInContent(
+                    state = SignInState(email = "surfer@example.com", password = "secret1"),
+                    onEvent = {},
+                )
+            }
+
+            onNodeWithTag(SignInTestTags.SubmitButton).assertIsEnabled()
+        }
+    }
+
+    "loading state shows the full screen loader and blocks the mode toggle" {
+        runComposeUiTest {
+            setContent {
+                SignInContent(
+                    state = SignInState(
+                        email = "surfer@example.com",
+                        password = "secret1",
+                        isLoading = true,
+                    ),
+                    onEvent = {},
+                )
+            }
+
+            onNodeWithTag(SignInTestTags.Loader).assertIsDisplayed()
+            onNodeWithTag(SignInTestTags.SubmitButton).assertIsNotEnabled()
+            onNodeWithTag(SignInTestTags.ToggleModeButton).assertIsNotEnabled()
+        }
+    }
+
+    "error state renders the error text" {
+        runComposeUiTest {
+            setContent {
+                SignInContent(
+                    state = SignInState(error = SignInError.InvalidCredentials),
+                    onEvent = {},
+                )
+            }
+
+            onNodeWithTag(SignInTestTags.ErrorText).assertIsDisplayed()
+        }
+    }
+
+    "no error state renders no error text" {
+        runComposeUiTest {
+            setContent {
+                SignInContent(state = SignInState(), onEvent = {})
+            }
+
+            onNodeWithTag(SignInTestTags.ErrorText).assertDoesNotExist()
+        }
+    }
+
+    "clicking submit and toggle emits the matching events" {
+        runComposeUiTest {
+            val events = mutableListOf<SignInEvent>()
+            setContent {
+                SignInContent(
+                    state = SignInState(
+                        email = "surfer@example.com",
+                        password = "secret1",
+                        mode = AuthMode.SignIn,
+                    ),
+                    onEvent = { events += it },
+                )
+            }
+
+            onNodeWithTag(SignInTestTags.SubmitButton).performClick()
+            onNodeWithTag(SignInTestTags.ToggleModeButton).performClick()
+            waitForIdle()
+
+            events shouldContainExactly listOf(SignInEvent.OnSubmitClick, SignInEvent.OnToggleModeClick)
+        }
+    }
+
+    "composition renders with no display attached" {
+        GraphicsEnvironment.isHeadless() shouldBe true
+
+        runComposeUiTest {
+            setContent {
+                SignInContent(state = SignInState(), onEvent = {})
+            }
+
+            onNodeWithTag(SignInTestTags.Root).assertIsDisplayed()
+        }
+    }
+})

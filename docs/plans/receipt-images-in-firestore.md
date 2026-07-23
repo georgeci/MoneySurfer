@@ -6,6 +6,16 @@ status: backlog
 
 # Receipt images as base64 in a dedicated Firestore subcollection
 
+<!-- DOCS:TOC -->
+## Contents
+- [Receipt images as base64 in a dedicated Firestore subcollection](#receipt-images-as-base64-in-a-dedicated-firestore-subcollection)
+- [Decision](#decision)
+- [Constraints to accept deliberately](#constraints-to-accept-deliberately)
+- [When Firebase Storage becomes the right call](#when-firebase-storage-becomes-the-right-call)
+- [Rejected alternatives](#rejected-alternatives)
+- [Implementation outline](#implementation-outline)
+<!-- DOCS:END -->
+
 Attach a photo of a receipt to a transaction and replicate it across the
 devices of a workspace, **without introducing Firebase Storage**.
 
