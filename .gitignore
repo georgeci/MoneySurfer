@@ -49,3 +49,8 @@ allure-results/
 google-services.json
 GoogleService-Info.plist
 .claude/scheduled_tasks.lock
+
+# Claude Design sources — mirrored locally when needed, never committed.
+# md/design/ holds our own notes on the mockups; see md/design/README.md
+md/design/*.jsx
+md/design/*.html
