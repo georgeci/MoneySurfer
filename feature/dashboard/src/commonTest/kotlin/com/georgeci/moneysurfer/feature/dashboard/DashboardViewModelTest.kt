@@ -10,6 +10,7 @@ import com.georgeci.moneysurfer.domain.fixtures.workspaceId
 import com.georgeci.moneysurfer.domain.model.Account
 import com.georgeci.moneysurfer.domain.model.CategorizedTransaction
 import com.georgeci.moneysurfer.domain.model.Transaction
+import com.georgeci.moneysurfer.domain.model.TransactionTotal
 import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.Money
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
@@ -19,6 +20,7 @@ import com.georgeci.moneysurfer.domain.repositories.AccountRepository
 import com.georgeci.moneysurfer.domain.repositories.TransactionRepository
 import com.georgeci.moneysurfer.domain.usecase.GetAccountsUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetRecentTransactionsUseCase
+import com.georgeci.moneysurfer.domain.util.TransactionPeriodWindow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
@@ -108,10 +110,16 @@ private class FakeTransactionRepository(
     private val state = MutableStateFlow(initial)
 
     override fun getAll(): Flow<List<Transaction>> = state
-    override fun getAllCategorized(): Flow<List<CategorizedTransaction>> = flowOf(emptyList())
     override fun getByAccountId(accountId: AccountId): Flow<List<Transaction>> = state
-    override fun getByAccountIdCategorized(accountId: AccountId): Flow<List<CategorizedTransaction>> =
-        flowOf(emptyList())
+    override fun getCategorizedWindow(
+        accountId: AccountId?,
+        window: TransactionPeriodWindow,
+        limit: Int,
+    ): Flow<List<CategorizedTransaction>> = flowOf(emptyList())
+    override fun getTotals(
+        accountId: AccountId?,
+        window: TransactionPeriodWindow,
+    ): Flow<List<TransactionTotal>> = flowOf(emptyList())
     override fun getByWorkspaceId(workspaceId: WorkspaceId): Flow<List<Transaction>> = state
     override suspend fun getById(id: TransactionId): Transaction? =
         state.value.firstOrNull { it.id == id }

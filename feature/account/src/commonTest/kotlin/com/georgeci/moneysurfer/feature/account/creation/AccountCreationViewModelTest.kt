@@ -25,6 +25,7 @@ import com.georgeci.moneysurfer.domain.usecase.ApplyTransactionChangeUseCase
 import com.georgeci.moneysurfer.domain.usecase.CreateTransactionUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetCurrenciesUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetCurrentTimeUseCase
+import com.georgeci.moneysurfer.domain.util.TransactionPeriodWindow
 import com.georgeci.moneysurfer.feature.account.generated.resources.Res
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_created_snackbar
 import com.georgeci.moneysurfer.navigation.SnackbarController
@@ -358,9 +359,13 @@ private class FakeTransactionRepository : TransactionRepository {
     private val all = MutableStateFlow<List<Transaction>>(emptyList())
 
     override fun getAll(): Flow<List<Transaction>> = all
-    override fun getAllCategorized() = error("not used")
     override fun getByAccountId(accountId: AccountId): Flow<List<Transaction>> = all
-    override fun getByAccountIdCategorized(accountId: AccountId) = error("not used")
+    override fun getCategorizedWindow(
+        accountId: AccountId?,
+        window: TransactionPeriodWindow,
+        limit: Int,
+    ) = error("not used")
+    override fun getTotals(accountId: AccountId?, window: TransactionPeriodWindow) = error("not used")
     override fun getByWorkspaceId(workspaceId: WorkspaceId): Flow<List<Transaction>> = all
     override suspend fun getById(id: TransactionId): Transaction? = byId[id]
     override suspend fun insert(transaction: Transaction) {

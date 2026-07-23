@@ -15,6 +15,7 @@ import com.georgeci.moneysurfer.domain.model.Account
 import com.georgeci.moneysurfer.domain.model.CategorizedTransaction
 import com.georgeci.moneysurfer.domain.model.Category
 import com.georgeci.moneysurfer.domain.model.Transaction
+import com.georgeci.moneysurfer.domain.model.TransactionTotal
 import com.georgeci.moneysurfer.domain.model.Workspace
 import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.CategoryId
@@ -29,6 +30,7 @@ import com.georgeci.moneysurfer.domain.repositories.TransactionRepository
 import com.georgeci.moneysurfer.domain.repositories.WorkspaceRepository
 import com.georgeci.moneysurfer.domain.usecase.ApplyTransactionChangeUseCase
 import com.georgeci.moneysurfer.domain.usecase.CreateTransactionUseCase
+import com.georgeci.moneysurfer.domain.util.TransactionPeriodWindow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
@@ -200,10 +202,16 @@ private class SimpleTransactionRepository(initial: List<Transaction>) : Transact
     private var store = initial.associateBy { it.id }
 
     override fun getAll(): Flow<List<Transaction>> = flowOf(store.values.toList())
-    override fun getAllCategorized(): Flow<List<CategorizedTransaction>> = flowOf(emptyList())
     override fun getByAccountId(accountId: AccountId): Flow<List<Transaction>> = flowOf(emptyList())
-    override fun getByAccountIdCategorized(accountId: AccountId): Flow<List<CategorizedTransaction>> =
-        flowOf(emptyList())
+    override fun getCategorizedWindow(
+        accountId: AccountId?,
+        window: TransactionPeriodWindow,
+        limit: Int,
+    ): Flow<List<CategorizedTransaction>> = flowOf(emptyList())
+    override fun getTotals(
+        accountId: AccountId?,
+        window: TransactionPeriodWindow,
+    ): Flow<List<TransactionTotal>> = flowOf(emptyList())
     override fun getByWorkspaceId(workspaceId: WorkspaceId): Flow<List<Transaction>> = flowOf(emptyList())
     override suspend fun getById(id: TransactionId): Transaction? = store[id]
     override suspend fun insert(transaction: Transaction) {

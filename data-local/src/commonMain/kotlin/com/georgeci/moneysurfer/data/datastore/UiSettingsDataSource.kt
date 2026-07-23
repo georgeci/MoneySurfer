@@ -46,6 +46,12 @@ class UiSettingsDataSource(
         default = "Card",
     )
 
+    /** Name of a `TransactionPeriodMode` — the window the transactions list opens on. */
+    val transactionsPeriodMode = prefs.string(
+        name = "ui.transactions_period_mode",
+        default = "Month",
+    )
+
     /**
      * Sticky flag set by `DemoLoginUseCase` and cleared by `WipeDemoDataUseCase`.
      * The auth flow consults it on real login/signup to decide whether to wipe
