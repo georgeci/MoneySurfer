@@ -12,6 +12,7 @@ import com.georgeci.moneysurfer.domain.model.Account
 import com.georgeci.moneysurfer.domain.model.CategorizedTransaction
 import com.georgeci.moneysurfer.domain.model.Category
 import com.georgeci.moneysurfer.domain.model.Transaction
+import com.georgeci.moneysurfer.domain.model.TransactionTotal
 import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.CategoryId
 import com.georgeci.moneysurfer.domain.primitives.CategorySystemKind
@@ -25,6 +26,7 @@ import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 import com.georgeci.moneysurfer.domain.repositories.AccountRepository
 import com.georgeci.moneysurfer.domain.repositories.CategoryRepository
 import com.georgeci.moneysurfer.domain.repositories.TransactionRepository
+import com.georgeci.moneysurfer.domain.util.TransactionPeriodWindow
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldHaveSize
@@ -135,11 +137,17 @@ private class TransferEnv(seedCategories: List<Category>) {
 
     private val txRepo = object : TransactionRepository {
         override fun getAll(): Flow<List<Transaction>> = flowOf(txStore.values.toList())
-        override fun getAllCategorized(): Flow<List<CategorizedTransaction>> = flowOf(emptyList())
         override fun getByAccountId(accountId: AccountId): Flow<List<Transaction>> =
             flowOf(txStore.values.filter { it.accountId == accountId })
-        override fun getByAccountIdCategorized(accountId: AccountId): Flow<List<CategorizedTransaction>> =
-            flowOf(emptyList())
+        override fun getCategorizedWindow(
+            accountId: AccountId?,
+            window: TransactionPeriodWindow,
+            limit: Int,
+        ): Flow<List<CategorizedTransaction>> = flowOf(emptyList())
+        override fun getTotals(
+            accountId: AccountId?,
+            window: TransactionPeriodWindow,
+        ): Flow<List<TransactionTotal>> = flowOf(emptyList())
         override fun getByWorkspaceId(workspaceId: WorkspaceId): Flow<List<Transaction>> =
             flowOf(txStore.values.filter { it.workspaceId == workspaceId })
         override suspend fun getById(id: TransactionId): Transaction? = txStore[id]

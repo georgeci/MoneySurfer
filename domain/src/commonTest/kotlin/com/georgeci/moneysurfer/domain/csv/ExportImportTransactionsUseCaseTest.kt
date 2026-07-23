@@ -13,6 +13,7 @@ import com.georgeci.moneysurfer.domain.model.Account
 import com.georgeci.moneysurfer.domain.model.CategorizedTransaction
 import com.georgeci.moneysurfer.domain.model.Category
 import com.georgeci.moneysurfer.domain.model.Transaction
+import com.georgeci.moneysurfer.domain.model.TransactionTotal
 import com.georgeci.moneysurfer.domain.model.Workspace
 import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.CategoryId
@@ -28,6 +29,7 @@ import com.georgeci.moneysurfer.domain.repositories.TransactionRepository
 import com.georgeci.moneysurfer.domain.repositories.WorkspaceRepository
 import com.georgeci.moneysurfer.domain.usecase.ApplyTransactionChangeUseCase
 import com.georgeci.moneysurfer.domain.usecase.CreateTransactionUseCase
+import com.georgeci.moneysurfer.domain.util.TransactionPeriodWindow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.comparables.shouldBeLessThan
@@ -452,12 +454,17 @@ private class FakeTransactionRepository(initial: List<Transaction>) : Transactio
     fun stored(): List<Transaction> = store.value.values.toList()
 
     override fun getAll(): Flow<List<Transaction>> = store.map { it.values.toList() }
-    override fun getAllCategorized(): Flow<List<CategorizedTransaction>> =
-        error("not used in CSV tests")
     override fun getByAccountId(accountId: AccountId): Flow<List<Transaction>> =
         store.map { all -> all.values.filter { it.accountId == accountId } }
-    override fun getByAccountIdCategorized(accountId: AccountId): Flow<List<CategorizedTransaction>> =
-        error("not used in CSV tests")
+    override fun getCategorizedWindow(
+        accountId: AccountId?,
+        window: TransactionPeriodWindow,
+        limit: Int,
+    ): Flow<List<CategorizedTransaction>> = error("not used in CSV tests")
+    override fun getTotals(
+        accountId: AccountId?,
+        window: TransactionPeriodWindow,
+    ): Flow<List<TransactionTotal>> = error("not used in CSV tests")
     override fun getByWorkspaceId(workspaceId: WorkspaceId): Flow<List<Transaction>> =
         store.map { all -> all.values.filter { it.workspaceId == workspaceId } }
     override suspend fun getById(id: TransactionId): Transaction? = store.value[id]

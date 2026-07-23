@@ -3,6 +3,7 @@ package com.georgeci.moneysurfer.uikit.icons
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.CallSplit
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.automirrored.filled.ReceiptLong
@@ -53,6 +54,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 
 object SurferIcons {
     val Back: ImageVector get() = Icons.AutoMirrored.Filled.ArrowBack
+    val ChevronLeft: ImageVector get() = Icons.AutoMirrored.Filled.KeyboardArrowLeft
     val ChevronRight: ImageVector get() = Icons.AutoMirrored.Filled.KeyboardArrowRight
     val Close: ImageVector get() = Icons.Filled.Close
     val Settings: ImageVector get() = Icons.Filled.Settings

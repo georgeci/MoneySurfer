@@ -10,6 +10,73 @@
     <string name="transactions_list_summary_income">Доход</string>
     <string name="transactions_list_summary_expenses">Расход</string>
     <string name="transactions_list_summary_net">Сальдо</string>
+    <string name="transactions_list_untitled">Транзакция</string>
+
+    <!-- Transactions list — period pager -->
+    <string name="transactions_list_period_all_time">Всё время</string>
+    <string name="transactions_list_period_all_time_sub">Без фильтра по дате</string>
+    <!-- ISO week number and its week-based year, e.g. "W13 · 2025" -->
+    <string name="transactions_list_period_week_sub">Н%1$d · %2$d</string>
+    <!-- Inclusive day range inside one week, e.g. "Mar 25 – 31" -->
+    <string name="transactions_list_period_week_range">%2$d – %3$d %1$s</string>
+    <!-- Same, when the week straddles two months, e.g. "Mar 30 – Apr 5" -->
+    <string name="transactions_list_period_week_range_cross_month">%2$d %1$s – %4$d %3$s</string>
+    <string name="transactions_list_period_previous">Предыдущий период</string>
+    <string name="transactions_list_period_next">Следующий период</string>
+    <string name="transactions_list_period_mode_month">Месяц</string>
+    <string name="transactions_list_period_mode_week">Неделя</string>
+    <string name="transactions_list_period_mode_all_time">Всё время</string>
+    <string name="transactions_list_date_today">Сегодня</string>
+    <string name="transactions_list_date_yesterday">Вчера</string>
+    <!-- Day-group header for any other date, e.g. "25 марта 2025" -->
+    <string name="transactions_list_date_full">%1$d %2$s %3$d</string>
+
+    <!-- Nominative — the pager label stands alone ("Март") -->
+    <string-array name="transactions_list_months">
+        <item>Январь</item>
+        <item>Февраль</item>
+        <item>Март</item>
+        <item>Апрель</item>
+        <item>Май</item>
+        <item>Июнь</item>
+        <item>Июль</item>
+        <item>Август</item>
+        <item>Сентябрь</item>
+        <item>Октябрь</item>
+        <item>Ноябрь</item>
+        <item>Декабрь</item>
+    </string-array>
+
+    <!-- Genitive — these read as part of "25 марта 2025" in the day-group header -->
+    <string-array name="transactions_list_months_genitive">
+        <item>января</item>
+        <item>февраля</item>
+        <item>марта</item>
+        <item>апреля</item>
+        <item>мая</item>
+        <item>июня</item>
+        <item>июля</item>
+        <item>августа</item>
+        <item>сентября</item>
+        <item>октября</item>
+        <item>ноября</item>
+        <item>декабря</item>
+    </string-array>
+
+    <string-array name="transactions_list_months_short">
+        <item>янв</item>
+        <item>фев</item>
+        <item>мар</item>
+        <item>апр</item>
+        <item>мая</item>
+        <item>июн</item>
+        <item>июл</item>
+        <item>авг</item>
+        <item>сен</item>
+        <item>окт</item>
+        <item>ноя</item>
+        <item>дек</item>
+    </string-array>
 
     <!-- Transaction creation / edit -->
     <string name="transaction_creation_title_create">Новая транзакция</string>

@@ -12,13 +12,22 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -28,26 +37,49 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.georgeci.moneysurfer.domain.preferences.TransactionPeriodMode
 import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.uikit.components.base.SurferFilterChipRow
+import com.georgeci.moneysurfer.uikit.components.base.SurferPeriodArrow
+import com.georgeci.moneysurfer.uikit.components.base.SurferPeriodPager
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
 import com.georgeci.moneysurfer.uikit.components.transaction.SurferTransactionLine
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.utils.HandleSideEffect
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.number
 import moneysurfer.feature.transaction.generated.resources.Res
+import moneysurfer.feature.transaction.generated.resources.transactions_list_date_full
+import moneysurfer.feature.transaction.generated.resources.transactions_list_date_today
+import moneysurfer.feature.transaction.generated.resources.transactions_list_date_yesterday
 import moneysurfer.feature.transaction.generated.resources.transactions_list_empty
 import moneysurfer.feature.transaction.generated.resources.transactions_list_empty_filtered
 import moneysurfer.feature.transaction.generated.resources.transactions_list_filter_all
 import moneysurfer.feature.transaction.generated.resources.transactions_list_filter_expenses
 import moneysurfer.feature.transaction.generated.resources.transactions_list_filter_income
+import moneysurfer.feature.transaction.generated.resources.transactions_list_months
+import moneysurfer.feature.transaction.generated.resources.transactions_list_months_genitive
+import moneysurfer.feature.transaction.generated.resources.transactions_list_months_short
 import moneysurfer.feature.transaction.generated.resources.transactions_list_new
+import moneysurfer.feature.transaction.generated.resources.transactions_list_period_all_time
+import moneysurfer.feature.transaction.generated.resources.transactions_list_period_all_time_sub
+import moneysurfer.feature.transaction.generated.resources.transactions_list_period_mode_all_time
+import moneysurfer.feature.transaction.generated.resources.transactions_list_period_mode_month
+import moneysurfer.feature.transaction.generated.resources.transactions_list_period_mode_week
+import moneysurfer.feature.transaction.generated.resources.transactions_list_period_next
+import moneysurfer.feature.transaction.generated.resources.transactions_list_period_previous
+import moneysurfer.feature.transaction.generated.resources.transactions_list_period_week_range
+import moneysurfer.feature.transaction.generated.resources.transactions_list_period_week_range_cross_month
+import moneysurfer.feature.transaction.generated.resources.transactions_list_period_week_sub
 import moneysurfer.feature.transaction.generated.resources.transactions_list_summary_expenses
 import moneysurfer.feature.transaction.generated.resources.transactions_list_summary_income
 import moneysurfer.feature.transaction.generated.resources.transactions_list_summary_net
 import moneysurfer.feature.transaction.generated.resources.transactions_list_title
+import moneysurfer.feature.transaction.generated.resources.transactions_list_untitled
+import org.jetbrains.compose.resources.stringArrayResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -109,6 +141,7 @@ private fun TransactionsByAccountContent(
 ) {
     val titleFallback = stringResource(Res.string.transactions_list_title)
     val title = state.accountName.ifBlank { titleFallback }
+    val untitled = stringResource(Res.string.transactions_list_untitled)
     Scaffold(
         modifier = Modifier.surferSafeInsets(),
         containerColor = AppTheme.materialColors.surface,
@@ -134,6 +167,14 @@ private fun TransactionsByAccountContent(
                 .fillMaxSize()
                 .padding(top = padding.calculateTopPadding()),
         ) {
+            PeriodPager(
+                state = state,
+                onEvent = onEvent,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 4.dp),
+            )
+
             SummaryStrip(
                 summary = state.summary,
                 modifier = Modifier
@@ -156,12 +197,20 @@ private fun TransactionsByAccountContent(
                 return@Scaffold
             }
 
+            val listState = rememberLazyListState()
+            LoadMoreOnScrollToEnd(
+                listState = listState,
+                enabled = state.canLoadMore,
+                onLoadMore = { onEvent(TransactionsByAccountEvent.OnLoadMore) },
+            )
+
             LazyColumn(
+                state = listState,
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(bottom = padding.calculateBottomPadding()),
             ) {
                 state.groups.forEach { group ->
-                    item(key = "h-${group.dateLabel}") {
+                    item(key = "h-${group.date}") {
                         DateHeader(group = group)
                     }
                     group.transactions.forEach { row ->
@@ -175,7 +224,7 @@ private fun TransactionsByAccountContent(
                                 modifier = Modifier.padding(horizontal = 16.dp)
                                     .padding(bottom = 12.dp),
                                 icon = if (row.isExpense) SurferIcons.Receipt else SurferIcons.Wallet,
-                                title = row.title,
+                                title = row.title.ifBlank { untitled },
                                 formattedAmount = row.formattedAmount,
                                 categoryHueSeed = row.categoryHueSeed,
                                 meta = row.subtitle.takeIf { it.isNotEmpty() },
@@ -194,6 +243,140 @@ private fun TransactionsByAccountContent(
         }
     }
 }
+
+/**
+ * The design's `PeriodPager`, plus a menu on the label: the design never drew a mode switcher, and
+ * the pill is the only place on the screen where the period is already the subject.
+ *
+ * In all-time mode the arrows are disabled rather than the pager hidden (the design's
+ * `All time · arrows disabled` variant) — hiding it would strand the user with no way back.
+ */
+@Composable
+private fun PeriodPager(
+    state: TransactionsByAccountState.Content,
+    onEvent: (TransactionsByAccountEvent) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    var menuExpanded by remember { mutableStateOf(false) }
+    Box(modifier = modifier) {
+        SurferPeriodPager(
+            label = state.period.label(),
+            sublabel = state.period.sublabel(),
+            previous = SurferPeriodArrow(
+                onClick = { onEvent(TransactionsByAccountEvent.OnPreviousPeriodClick) },
+                enabled = state.canGoToPreviousPeriod,
+                contentDescription = stringResource(Res.string.transactions_list_period_previous),
+            ),
+            next = SurferPeriodArrow(
+                onClick = { onEvent(TransactionsByAccountEvent.OnNextPeriodClick) },
+                enabled = state.canGoToNextPeriod,
+                contentDescription = stringResource(Res.string.transactions_list_period_next),
+            ),
+            onLabelClick = { menuExpanded = true },
+        )
+        DropdownMenu(
+            expanded = menuExpanded,
+            onDismissRequest = { menuExpanded = false },
+        ) {
+            TransactionPeriodMode.entries.forEach { mode ->
+                DropdownMenuItem(
+                    text = { Text(mode.label()) },
+                    onClick = {
+                        menuExpanded = false
+                        onEvent(TransactionsByAccountEvent.OnPeriodModeChanged(mode))
+                    },
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun TransactionPeriodMode.label(): String = stringResource(
+    when (this) {
+        TransactionPeriodMode.Month -> Res.string.transactions_list_period_mode_month
+        TransactionPeriodMode.Week -> Res.string.transactions_list_period_mode_week
+        TransactionPeriodMode.AllTime -> Res.string.transactions_list_period_mode_all_time
+    },
+)
+
+@Composable
+private fun TransactionPeriodUi.label(): String = when (this) {
+    is TransactionPeriodUi.Month -> monthNames()[monthNumber - 1]
+    is TransactionPeriodUi.Week -> weekRangeLabel(from, to)
+    TransactionPeriodUi.AllTime -> stringResource(Res.string.transactions_list_period_all_time)
+}
+
+@Composable
+private fun TransactionPeriodUi.sublabel(): String = when (this) {
+    is TransactionPeriodUi.Month -> year.toString()
+    is TransactionPeriodUi.Week ->
+        stringResource(Res.string.transactions_list_period_week_sub, weekNumber, weekYear)
+    TransactionPeriodUi.AllTime -> stringResource(Res.string.transactions_list_period_all_time_sub)
+}
+
+/** `Mar 25 – 31`, or `Mar 30 – Apr 5` when the week straddles two months. */
+@Composable
+private fun weekRangeLabel(from: LocalDate, to: LocalDate): String {
+    val shortMonths = stringArrayResource(Res.array.transactions_list_months_short)
+    val fromMonth = shortMonths[from.month.number - 1]
+    return if (from.month == to.month) {
+        stringResource(Res.string.transactions_list_period_week_range, fromMonth, from.day, to.day)
+    } else {
+        stringResource(
+            Res.string.transactions_list_period_week_range_cross_month,
+            fromMonth,
+            from.day,
+            shortMonths[to.month.number - 1],
+            to.day,
+        )
+    }
+}
+
+/** Standalone month names — the pager label is a sentence of its own. */
+@Composable
+private fun monthNames(): List<String> = stringArrayResource(Res.array.transactions_list_months)
+
+@Composable
+private fun TransactionDateUi.label(): String = when (this) {
+    TransactionDateUi.Today -> stringResource(Res.string.transactions_list_date_today)
+    TransactionDateUi.Yesterday -> stringResource(Res.string.transactions_list_date_yesterday)
+    // Genitive, not the pager's nominative: Russian reads "25 марта", never "25 Март".
+    is TransactionDateUi.Exact -> stringResource(
+        Res.string.transactions_list_date_full,
+        date.day,
+        stringArrayResource(Res.array.transactions_list_months_genitive)[date.month.number - 1],
+        date.year,
+    )
+}
+
+/**
+ * Asks for the next page once the list is within [LOAD_MORE_THRESHOLD] rows of the end, so the
+ * fetch overlaps the remaining scroll instead of stalling at the bottom.
+ */
+@Composable
+private fun LoadMoreOnScrollToEnd(
+    listState: LazyListState,
+    enabled: Boolean,
+    onLoadMore: () -> Unit,
+) {
+    val shouldLoadMore by remember(enabled) {
+        derivedStateOf {
+            val layoutInfo = listState.layoutInfo
+            // Guard the pre-measurement frame: before the list is laid out, totalItemsCount is 0
+            // and there are no visible items, which would otherwise satisfy `0 >= 0 - threshold`
+            // and fire a page load with no scroll behind it.
+            val lastVisible = layoutInfo.visibleItemsInfo.lastOrNull()?.index
+            enabled && lastVisible != null &&
+                lastVisible >= layoutInfo.totalItemsCount - LOAD_MORE_THRESHOLD
+        }
+    }
+    LaunchedEffect(shouldLoadMore) {
+        if (shouldLoadMore) onLoadMore()
+    }
+}
+
+private const val LOAD_MORE_THRESHOLD = 10
 
 @Composable
 private fun SummaryStrip(
@@ -328,7 +511,7 @@ private fun DateHeader(group: TransactionGroupUi) {
         verticalAlignment = Alignment.Bottom,
     ) {
         Text(
-            text = group.dateLabel,
+            text = group.dateLabel.label(),
             style = AppTheme.typography.titleSmall.copy(fontWeight = FontWeight.SemiBold),
             color = AppTheme.materialColors.onSurface,
             modifier = Modifier.weight(1f),
@@ -351,7 +534,8 @@ private fun TransactionsByAccountPreview() {
                 accountName = "Everyday",
                 groups = listOf(
                     TransactionGroupUi(
-                        dateLabel = "Today",
+                        date = LocalDate(2025, 3, 26),
+                        dateLabel = TransactionDateUi.Today,
                         netFormatted = "−€72.70",
                         netPositive = false,
                         transactions = listOf(
@@ -374,7 +558,8 @@ private fun TransactionsByAccountPreview() {
                         ),
                     ),
                     TransactionGroupUi(
-                        dateLabel = "Yesterday",
+                        date = LocalDate(2025, 3, 25),
+                        dateLabel = TransactionDateUi.Yesterday,
                         netFormatted = "+€3,200.00",
                         netPositive = true,
                         transactions = listOf(
@@ -397,6 +582,11 @@ private fun TransactionsByAccountPreview() {
                 ),
                 typeFilter = TransactionTypeFilter.All,
                 isFiltered = false,
+                periodMode = TransactionPeriodMode.Month,
+                period = TransactionPeriodUi.Month(monthNumber = 3, year = 2025),
+                canGoToPreviousPeriod = true,
+                canGoToNextPeriod = false,
+                canLoadMore = false,
             ),
             onEvent = {},
         )
@@ -420,6 +610,16 @@ private fun TransactionsByAccountEmptyPreview() {
                 ),
                 typeFilter = TransactionTypeFilter.All,
                 isFiltered = false,
+                periodMode = TransactionPeriodMode.Week,
+                period = TransactionPeriodUi.Week(
+                    from = LocalDate(2025, 3, 25),
+                    to = LocalDate(2025, 3, 31),
+                    weekNumber = 13,
+                    weekYear = 2025,
+                ),
+                canGoToPreviousPeriod = true,
+                canGoToNextPeriod = true,
+                canLoadMore = false,
             ),
             onEvent = {},
         )

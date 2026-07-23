@@ -6,6 +6,7 @@ import com.georgeci.moneysurfer.domain.fixtures.anAccount
 import com.georgeci.moneysurfer.domain.fixtures.transactionId
 import com.georgeci.moneysurfer.domain.model.TransactionTags
 import com.georgeci.moneysurfer.domain.primitives.RecurringRuleId
+import com.georgeci.moneysurfer.domain.util.TransactionPeriodWindow
 import com.georgeci.moneysurfer.integration.fixtures.IntegrationHarness
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldBeEmpty
@@ -107,7 +108,9 @@ class TransactionDetailFieldsIntegrationIT : StringSpec({
     "the categorized list query carries the new fields too" {
         store(id = "t-1", merchant = "Starbucks", tags = listOf("coffee"), rule = RecurringRuleId("rule-1"))
 
-        val listed = stack.transactionRepository.getAllCategorized().first().single().transaction
+        val listed = stack.transactionRepository
+            .getCategorizedWindow(accountId = null, window = TransactionPeriodWindow.Unbounded, limit = 10)
+            .first().single().transaction
 
         listed.merchant shouldBe "Starbucks"
         listed.tags shouldBe listOf("coffee")

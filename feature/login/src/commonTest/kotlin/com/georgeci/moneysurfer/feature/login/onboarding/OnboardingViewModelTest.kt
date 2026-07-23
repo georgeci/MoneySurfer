@@ -7,6 +7,7 @@ import com.georgeci.moneysurfer.domain.preferences.ContainerStyle
 import com.georgeci.moneysurfer.domain.preferences.PaletteSource
 import com.georgeci.moneysurfer.domain.preferences.Pref
 import com.georgeci.moneysurfer.domain.preferences.ThemeMode
+import com.georgeci.moneysurfer.domain.preferences.TransactionPeriodMode
 import com.georgeci.moneysurfer.domain.preferences.UiPreferences
 import com.georgeci.moneysurfer.domain.primitives.AccountType
 import io.kotest.core.spec.style.StringSpec
@@ -222,6 +223,8 @@ private open class FakeUiPreferences : UiPreferences {
     override val paletteSource: Pref<PaletteSource> = Pref.inMemory(PaletteSource.DEFAULT)
     override val themeMode: Pref<ThemeMode> = Pref.inMemory(ThemeMode.System)
     override val containerStyle: Pref<ContainerStyle> = Pref.inMemory(ContainerStyle.Card)
+    override val transactionsPeriodMode: Pref<TransactionPeriodMode> =
+        Pref.inMemory(TransactionPeriodMode.DEFAULT)
 }
 
 private class FailingUiPreferences : FakeUiPreferences() {

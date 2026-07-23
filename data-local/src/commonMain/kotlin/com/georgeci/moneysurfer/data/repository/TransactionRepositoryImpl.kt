@@ -3,9 +3,11 @@ package com.georgeci.moneysurfer.data.repository
 import com.georgeci.moneysurfer.data.db.dao.TransactionDao
 import com.georgeci.moneysurfer.data.db.entity.CategorizedTransactionEntity
 import com.georgeci.moneysurfer.data.db.entity.TransactionEntity
+import com.georgeci.moneysurfer.data.db.entity.TransactionTotalEntity
 import com.georgeci.moneysurfer.domain.model.CategorizedTransaction
 import com.georgeci.moneysurfer.domain.model.Transaction
 import com.georgeci.moneysurfer.domain.model.TransactionTags
+import com.georgeci.moneysurfer.domain.model.TransactionTotal
 import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.CategoryId
 import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
@@ -19,6 +21,7 @@ import com.georgeci.moneysurfer.domain.primitives.TransferId
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 import com.georgeci.moneysurfer.domain.repositories.TransactionRepository
 import com.georgeci.moneysurfer.domain.sync.SyncEntityTypes
+import com.georgeci.moneysurfer.domain.util.TransactionPeriodWindow
 import com.georgeci.moneysurfer.sync.repository.MutationOperation
 import com.georgeci.moneysurfer.sync.repository.OutboxEnqueuer
 import kotlinx.coroutines.flow.Flow
@@ -38,14 +41,28 @@ class TransactionRepositoryImpl(
     override fun getAll(): Flow<List<Transaction>> =
         dao.getAll().map { list -> list.map { it.toDomain() } }
 
-    override fun getAllCategorized(): Flow<List<CategorizedTransaction>> =
-        dao.getAllCategorized().map { list -> list.map { it.toDomain() } }
-
     override fun getByAccountId(accountId: AccountId): Flow<List<Transaction>> =
         dao.getByAccountId(accountId.value).map { list -> list.map { it.toDomain() } }
 
-    override fun getByAccountIdCategorized(accountId: AccountId): Flow<List<CategorizedTransaction>> =
-        dao.getByAccountIdCategorized(accountId.value).map { list -> list.map { it.toDomain() } }
+    override fun getCategorizedWindow(
+        accountId: AccountId?,
+        window: TransactionPeriodWindow,
+        limit: Int,
+    ): Flow<List<CategorizedTransaction>> = dao.getCategorizedWindow(
+        accountId = accountId?.value,
+        from = window.from?.toString(),
+        to = window.to?.toString(),
+        limit = limit,
+    ).map { list -> list.map { it.toDomain() } }
+
+    override fun getTotals(
+        accountId: AccountId?,
+        window: TransactionPeriodWindow,
+    ): Flow<List<TransactionTotal>> = dao.getTotals(
+        accountId = accountId?.value,
+        from = window.from?.toString(),
+        to = window.to?.toString(),
+    ).map { rows -> rows.toDomainTotals() }
 
     override fun getByWorkspaceId(workspaceId: WorkspaceId): Flow<List<Transaction>> =
         dao.getByWorkspaceId(workspaceId.value).map { list -> list.map { it.toDomain() } }
@@ -160,6 +177,21 @@ class TransactionRepositoryImpl(
         recurringRuleId = recurringRuleId?.value,
     )
 }
+
+/**
+ * Folds the raw aggregation rows onto the domain types, merging the buckets that only exist
+ * because the SQL had to keep the amount sign separate to resolve the legacy `REGULAR` spelling
+ * (see [parseType]). Opening balances are already excluded by the query.
+ */
+private fun List<TransactionTotalEntity>.toDomainTotals(): List<TransactionTotal> = this
+    .groupingBy { row ->
+        parseType(row.type, if (row.isNegative) -1L else 1L) to CurrencyCode(row.currencyCode)
+    }
+    .fold(0L) { acc, row -> acc + row.total }
+    .map { (key, total) ->
+        val (type, currency) = key
+        TransactionTotal(type = type, currencyCode = currency, total = Money.fromMinor(total))
+    }
 
 private fun parseType(raw: String, amount: Long): TransactionType =
     when (raw) {
