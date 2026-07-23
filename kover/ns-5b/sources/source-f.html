@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > CategorySpendRepository</title>
+  <title>MoneySurfer Coverage Report > FirebaseConfig</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.repositories</a>
 </div>
 
-<h1>Coverage Summary for Class: CategorySpendRepository (com.georgeci.moneysurfer.domain.repositories)</h1>
+<h1>Coverage Summary for Class: FirebaseConfig (com.georgeci.moneysurfer.domain.repositories)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">CategorySpendRepository</td>
+  <td class="name">FirebaseConfig</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -46,37 +46,24 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.repositories
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.model.CategoryMonthlyTotal
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryId
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionType
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
-&nbsp;import kotlinx.coroutines.flow.Flow
-&nbsp;import kotlinx.datetime.YearMonth
-&nbsp;
 &nbsp;/**
-&nbsp; * Read-only aggregates over transactions grouped by category and month.
+&nbsp; * Toggle for the Firebase Emulator Suite. Bound by `:data` per platform; tests
+&nbsp; * override with a fixture that always returns `useEmulator = true`.
 &nbsp; *
-&nbsp; * Separate from [TransactionRepository] on purpose: that interface hands back whole transactions,
-&nbsp; * and a six-month trend over a busy category would mean loading every row just to sum it in
-&nbsp; * memory on every emission. This one is answered by a `GROUP BY` in SQLite, so the amount of
-&nbsp; * data crossing the boundary is one row per category per month regardless of volume.
+&nbsp; * - [useEmulator] — when `true`, the SDK is redirected to a local Firestore + Auth
+&nbsp; *   emulator BEFORE the first read/write. Production builds keep this `false`.
+&nbsp; * - [emulatorHost] — Android emulator reaches the host machine via `10.0.2.2`,
+&nbsp; *   iOS simulator and Desktop via `localhost`. Implementations resolve this
+&nbsp; *   per-platform.
+&nbsp; * - [authPort] / [firestorePort] — match `firebase.json` (defaults 9099 / 8080).
+&nbsp; *
+&nbsp; * See md/sync.md emulator section.
 &nbsp; */
-&nbsp;interface CategorySpendRepository {
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Per-month totals for [categoryIds], over the months [fromMonth]..[toMonth] inclusive.
-&nbsp;     *
-&nbsp;     * Only `ACTUAL` transactions of [type] count — a planned transaction is not spend that
-&nbsp;     * happened, and mixing income into an expense trend would net the two out to nonsense.
-&nbsp;     * Months a category booked nothing in are simply absent from the result.
-&nbsp;     */
-&nbsp;    fun monthlyTotals(
-&nbsp;        workspaceId: WorkspaceId,
-&nbsp;        categoryIds: List&lt;CategoryId&gt;,
-&nbsp;        type: TransactionType,
-&nbsp;        fromMonth: YearMonth,
-&nbsp;        toMonth: YearMonth,
-&nbsp;    ): Flow&lt;List&lt;CategoryMonthlyTotal&gt;&gt;
+&nbsp;interface FirebaseConfig {
+&nbsp;    val useEmulator: Boolean
+&nbsp;    val emulatorHost: String
+&nbsp;    val authPort: Int
+&nbsp;    val firestorePort: Int
 &nbsp;}
 </code>
 </pre>
@@ -101,7 +88,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-23 10:32</div>
+    <div style="float:right;">generated on 2026-07-23 11:11</div>
 </div>
 </body>
 </html>

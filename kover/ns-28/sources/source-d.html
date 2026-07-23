@@ -52,35 +52,35 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   <td class="name">WaveCrest</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
     <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/12)
+    (12/12)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/78)
+    (78/78)
   </span>
 </td>
 </tr>
@@ -240,18 +240,18 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;private const val DefaultCp4Y: Float = 15f
 &nbsp;
 &nbsp;private data class WaveCrest(
-<b class="nc">&nbsp;    val startY: Float,</b>
-<b class="nc">&nbsp;    val midY: Float,</b>
-<b class="nc">&nbsp;    val endY: Float,</b>
-<b class="nc">&nbsp;    val cp1X: Float = DefaultCp1X,</b>
-<b class="nc">&nbsp;    val cp1Y: Float = DefaultCp1Y,</b>
-<b class="nc">&nbsp;    val cp2X: Float = DefaultCp2X,</b>
-<b class="nc">&nbsp;    val cp2Y: Float = DefaultCp2Y,</b>
-<b class="nc">&nbsp;    val midX: Float = DefaultMidX,</b>
-<b class="nc">&nbsp;    val cp3X: Float = DefaultCp3X,</b>
-<b class="nc">&nbsp;    val cp3Y: Float = DefaultCp3Y,</b>
-<b class="nc">&nbsp;    val cp4X: Float = DefaultCp4X,</b>
-<b class="nc">&nbsp;    val cp4Y: Float = DefaultCp4Y,</b>
+<b class="fc">&nbsp;    val startY: Float,</b>
+<b class="fc">&nbsp;    val midY: Float,</b>
+<b class="fc">&nbsp;    val endY: Float,</b>
+<b class="fc">&nbsp;    val cp1X: Float = DefaultCp1X,</b>
+<b class="fc">&nbsp;    val cp1Y: Float = DefaultCp1Y,</b>
+<b class="fc">&nbsp;    val cp2X: Float = DefaultCp2X,</b>
+<b class="fc">&nbsp;    val cp2Y: Float = DefaultCp2Y,</b>
+<b class="fc">&nbsp;    val midX: Float = DefaultMidX,</b>
+<b class="fc">&nbsp;    val cp3X: Float = DefaultCp3X,</b>
+<b class="fc">&nbsp;    val cp3Y: Float = DefaultCp3Y,</b>
+<b class="fc">&nbsp;    val cp4X: Float = DefaultCp4X,</b>
+<b class="fc">&nbsp;    val cp4Y: Float = DefaultCp4Y,</b>
 &nbsp;)
 &nbsp;
 &nbsp;private val BackCrest = WaveCrest(startY = 0.40f, midY = 0.60f, endY = 0.50f)
@@ -306,8 +306,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    )
 &nbsp;}
 &nbsp;
+&nbsp;/**
+&nbsp; * Stateless body of the sign-in screen. Public so screen-state UI tests can mount it with an
+&nbsp; * injected [SignInState] instead of standing up a Koin-backed [SignInViewModel].
+&nbsp; */
 &nbsp;@Composable
-&nbsp;private fun SignInContent(
+&nbsp;fun SignInContent(
 &nbsp;    state: SignInState,
 &nbsp;    onEvent: (SignInEvent) -&gt; Unit,
 &nbsp;) {
@@ -846,7 +850,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-23 10:32</div>
+    <div style="float:right;">generated on 2026-07-23 11:11</div>
 </div>
 </body>
 </html>

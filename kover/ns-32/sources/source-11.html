@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SyncErrorKt</title>
+  <title>MoneySurfer Coverage Report > SyncCollection</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.sync.api</a>
 </div>
 
-<h1>Coverage Summary for Class: SyncErrorKt (com.georgeci.moneysurfer.sync.api)</h1>
+<h1>Coverage Summary for Class: SyncCollection (com.georgeci.moneysurfer.sync.api)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SyncErrorKt</td>
+  <td class="name">SyncCollection</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -46,50 +46,26 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.sync.api
 &nbsp;
-&nbsp;import arrow.core.Either
-&nbsp;
 &nbsp;/**
-&nbsp; * Standalone sync error type — NOT nested under any common `AppError`.
-&nbsp; * See SyncCoordinatorFAQ.md №11, №12.
+&nbsp; * Canonical Firestore sub-collection name constants.
+&nbsp; *
+&nbsp; * These are the string keys used as the `collection` parameter in
+&nbsp; * [com.georgeci.moneysurfer.sync.repository.SyncMetaRepository] calls and as
+&nbsp; * [com.georgeci.moneysurfer.sync.plugin.SyncEntityPlugin.firestoreCollectionName]
+&nbsp; * values in the sync plugins. Keeping them in one place avoids magic strings
+&nbsp; * scattered across tests and production code.
 &nbsp; */
-&nbsp;sealed interface SyncError {
-&nbsp;    val isRetryable: Boolean
-&nbsp;
-&nbsp;    data object Cancelled : SyncError {
-&nbsp;        override val isRetryable: Boolean = false
-&nbsp;    }
-&nbsp;
-&nbsp;    data object NetworkUnavailable : SyncError {
-&nbsp;        override val isRetryable: Boolean = true
-&nbsp;    }
-&nbsp;
-&nbsp;    data object AuthRequired : SyncError {
-&nbsp;        override val isRetryable: Boolean = false
-&nbsp;    }
-&nbsp;
-&nbsp;    data object PermissionDenied : SyncError {
-&nbsp;        override val isRetryable: Boolean = false
-&nbsp;    }
-&nbsp;
-&nbsp;    /**
-&nbsp;     * The local app build is older than `appConfig/mobile.minSupportedAppVersionCode`.
-&nbsp;     * UI must direct the user to the store; sync stays disabled until the
-&nbsp;     * app is upgraded. See block.md.
-&nbsp;     */
-&nbsp;    data class UnsupportedAppVersion(val message: String) : SyncError {
-&nbsp;        override val isRetryable: Boolean = false
-&nbsp;    }
-&nbsp;
-&nbsp;    data class StorageError(val cause: Throwable) : SyncError {
-&nbsp;        override val isRetryable: Boolean = false
-&nbsp;    }
-&nbsp;
-&nbsp;    data class Unknown(val cause: Throwable) : SyncError {
-&nbsp;        override val isRetryable: Boolean = true
-&nbsp;    }
+&nbsp;object SyncCollection {
+&nbsp;    const val WORKSPACE_MEMBERS = &quot;members&quot;
+&nbsp;    const val WORKSPACE_INVITES = &quot;invites&quot;
+&nbsp;    const val ACCOUNTS = &quot;accounts&quot;
+&nbsp;    const val CATEGORIES = &quot;categories&quot;
+&nbsp;    const val TRANSACTIONS = &quot;transactions&quot;
+&nbsp;    const val BUDGETS = &quot;budgets&quot;
+&nbsp;    const val RECURRING_RULES = &quot;recurringRules&quot;
+&nbsp;    const val GOALS = &quot;goals&quot;
+&nbsp;    const val GOAL_CONTRIBUTIONS = &quot;goalContributions&quot;
 &nbsp;}
-&nbsp;
-&nbsp;typealias SyncResult&lt;T&gt; = Either&lt;SyncError, T&gt;
 </code>
 </pre>
 </div>
@@ -113,7 +89,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-23 10:32</div>
+    <div style="float:right;">generated on 2026-07-23 11:11</div>
 </div>
 </body>
 </html>

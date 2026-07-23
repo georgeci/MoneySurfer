@@ -258,8 +258,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    )
 &nbsp;}
 &nbsp;
+&nbsp;/**
+&nbsp; * Stateless body of the sign-in screen. Public so screen-state UI tests can mount it with an
+&nbsp; * injected [SignInState] instead of standing up a Koin-backed [SignInViewModel].
+&nbsp; */
 &nbsp;@Composable
-&nbsp;private fun SignInContent(
+&nbsp;fun SignInContent(
 &nbsp;    state: SignInState,
 &nbsp;    onEvent: (SignInEvent) -&gt; Unit,
 &nbsp;) {
@@ -798,7 +802,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-23 10:32</div>
+    <div style="float:right;">generated on 2026-07-23 11:11</div>
 </div>
 </body>
 </html>

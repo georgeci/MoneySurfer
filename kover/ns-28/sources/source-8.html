@@ -52,35 +52,35 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   <td class="name">SignInPalette</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/13)
+    (13/13)
   </span>
 </td>
     <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/13)
+    (13/13)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/52)
+    (52/52)
   </span>
 </td>
 </tr>
@@ -196,19 +196,19 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;}
 &nbsp;
 &nbsp;private object SignInPalette {
-<b class="nc">&nbsp;    val GreenTop = Color(0xFF7ED321)</b>
-<b class="nc">&nbsp;    val GreenBottom = Color(0xFF5FB011)</b>
-<b class="nc">&nbsp;    val Ink = Color(0xFF0F2E12)</b>
-<b class="nc">&nbsp;    val OnBrand = Color(0xFFFFFFFF)</b>
-<b class="nc">&nbsp;    val OnBrandMuted = Color(0xE6FFFFFF)</b>
-<b class="nc">&nbsp;    val Sheet = Color(0xFFFFFFFF)</b>
-<b class="nc">&nbsp;    val SheetMuted = Color(0xFF445844)</b>
-<b class="nc">&nbsp;    val SheetSubtle = Color(0xFF7A8C7B)</b>
-<b class="nc">&nbsp;    val Divider = Color(0xFFD6E4D7)</b>
-<b class="nc">&nbsp;    val PrimaryDark = Color(0xFF1B5E20)</b>
-<b class="nc">&nbsp;    val WaveBack = Color(0xFF1B5E20)</b>
-<b class="nc">&nbsp;    val WaveMid = Color(0xFF2E7D32)</b>
-<b class="nc">&nbsp;    val WaveFront = Color(0xFF2E9A3E)</b>
+<b class="fc">&nbsp;    val GreenTop = Color(0xFF7ED321)</b>
+<b class="fc">&nbsp;    val GreenBottom = Color(0xFF5FB011)</b>
+<b class="fc">&nbsp;    val Ink = Color(0xFF0F2E12)</b>
+<b class="fc">&nbsp;    val OnBrand = Color(0xFFFFFFFF)</b>
+<b class="fc">&nbsp;    val OnBrandMuted = Color(0xE6FFFFFF)</b>
+<b class="fc">&nbsp;    val Sheet = Color(0xFFFFFFFF)</b>
+<b class="fc">&nbsp;    val SheetMuted = Color(0xFF445844)</b>
+<b class="fc">&nbsp;    val SheetSubtle = Color(0xFF7A8C7B)</b>
+<b class="fc">&nbsp;    val Divider = Color(0xFFD6E4D7)</b>
+<b class="fc">&nbsp;    val PrimaryDark = Color(0xFF1B5E20)</b>
+<b class="fc">&nbsp;    val WaveBack = Color(0xFF1B5E20)</b>
+<b class="fc">&nbsp;    val WaveMid = Color(0xFF2E7D32)</b>
+<b class="fc">&nbsp;    val WaveFront = Color(0xFF2E9A3E)</b>
 &nbsp;}
 &nbsp;
 &nbsp;private val SheetCorner: Dp = 28.dp
@@ -306,8 +306,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    )
 &nbsp;}
 &nbsp;
+&nbsp;/**
+&nbsp; * Stateless body of the sign-in screen. Public so screen-state UI tests can mount it with an
+&nbsp; * injected [SignInState] instead of standing up a Koin-backed [SignInViewModel].
+&nbsp; */
 &nbsp;@Composable
-&nbsp;private fun SignInContent(
+&nbsp;fun SignInContent(
 &nbsp;    state: SignInState,
 &nbsp;    onEvent: (SignInEvent) -&gt; Unit,
 &nbsp;) {
@@ -846,7 +850,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-23 10:32</div>
+    <div style="float:right;">generated on 2026-07-23 11:11</div>
 </div>
 </body>
 </html>
