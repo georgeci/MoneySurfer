@@ -84,10 +84,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    87.5%
+    88.9%
   </span>
   <span class="absValue">
-    (28/32)
+    (32/36)
   </span>
 </td>
 </tr>
@@ -104,6 +104,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import androidx.room.RoomDatabase
 &nbsp;import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 &nbsp;import com.georgeci.moneysurfer.data.db.migration.MIGRATION_25_26
+&nbsp;import com.georgeci.moneysurfer.data.db.migration.MIGRATION_27_28
 &nbsp;import kotlinx.coroutines.Dispatchers
 &nbsp;import kotlinx.coroutines.IO
 &nbsp;
@@ -115,7 +116,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;        .setQueryCoroutineContext(Dispatchers.IO)</b>
 &nbsp;        // Declared migrations run first; the destructive fallback below only catches the
 &nbsp;        // older versions that have no path forward.
-<b class="fc">&nbsp;        .addMigrations(MIGRATION_25_26)</b>
+<b class="fc">&nbsp;        .addMigrations(MIGRATION_25_26, MIGRATION_27_28)</b>
 &nbsp;        // Schema bumped from Long PKs to UUID Strings — no migration path is feasible.
 &nbsp;        // Local data is wiped on app upgrade; remote data lives in Firestore.
 <b class="fc">&nbsp;        .fallbackToDestructiveMigration(dropAllTables = true)</b>
@@ -147,7 +148,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-23 11:11</div>
+    <div style="float:right;">generated on 2026-07-23 14:37</div>
 </div>
 </body>
 </html>

@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > WorkspaceInviteEntity</title>
+  <title>MoneySurfer Coverage Report > WorkspaceEntity</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.data.db.entity</a>
 </div>
 
-<h1>Coverage Summary for Class: WorkspaceInviteEntity (com.georgeci.moneysurfer.data.db.entity)</h1>
+<h1>Coverage Summary for Class: WorkspaceEntity (com.georgeci.moneysurfer.data.db.entity)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">WorkspaceInviteEntity</td>
+  <td class="name">WorkspaceEntity</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -72,7 +72,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (13/13)
+    (10/10)
   </span>
 </td>
 <td class="coverageStat">
@@ -80,7 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (63/63)
+    (44/44)
   </span>
 </td>
 </tr>
@@ -96,40 +96,31 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;
 &nbsp;import androidx.room.ColumnInfo
 &nbsp;import androidx.room.Entity
+&nbsp;import androidx.room.ForeignKey
 &nbsp;import androidx.room.Index
 &nbsp;import androidx.room.PrimaryKey
 &nbsp;
-&nbsp;// No FK on workspaceId — incoming invites address workspaces the recipient is NOT a
-&nbsp;// member of (the whole point of an invite), so the parent workspace row may not exist
-&nbsp;// in local Room when the invite is upserted from a collection-group pull. The FK
-&nbsp;// previously triggered SQLite error 787 (FOREIGN KEY constraint failed) on the
-&nbsp;// recipient device. Referential integrity for member-side invite cleanup is enforced
-&nbsp;// at the workspace-pull layer (CLEAR_INVITES step) rather than via cascade.
 <b class="fc">&nbsp;@Entity(</b>
-&nbsp;    tableName = &quot;workspace_invites&quot;,
-&nbsp;    // Single-column workspaceId / email indices are omitted: they are leftmost
-&nbsp;    // prefixes of the composites below, which SQLite uses for prefix-only lookups
-&nbsp;    // too. A standalone `status` index is dropped as well — no query filters on
-&nbsp;    // status alone, and it is far less selective than the columns it pairs with.
-&nbsp;    indices = [
-&nbsp;        Index(&quot;targetUserId&quot;),
-&nbsp;        Index(value = [&quot;workspaceId&quot;, &quot;status&quot;]),
-&nbsp;        Index(value = [&quot;email&quot;, &quot;status&quot;]),
+&nbsp;    tableName = &quot;workspaces&quot;,
+&nbsp;    foreignKeys = [
+&nbsp;        ForeignKey(
+&nbsp;            entity = UserEntity::class,
+&nbsp;            parentColumns = [&quot;id&quot;],
+&nbsp;            childColumns = [&quot;ownerId&quot;],
+&nbsp;        ),
 &nbsp;    ],
+&nbsp;    indices = [Index(&quot;ownerId&quot;)],
 &nbsp;)
-&nbsp;data class WorkspaceInviteEntity(
+&nbsp;data class WorkspaceEntity(
 <b class="fc">&nbsp;    @PrimaryKey</b>
 <b class="fc">&nbsp;    @ColumnInfo(name = &quot;id&quot;) val id: String,</b>
-<b class="fc">&nbsp;    @ColumnInfo(name = &quot;workspaceId&quot;) val workspaceId: String,</b>
-<b class="fc">&nbsp;    @ColumnInfo(name = &quot;email&quot;) val email: String,</b>
-<b class="fc">&nbsp;    @ColumnInfo(name = &quot;targetUserId&quot;) val targetUserId: String? = null,</b>
-<b class="fc">&nbsp;    @ColumnInfo(name = &quot;role&quot;) val role: String,</b>
-<b class="fc">&nbsp;    @ColumnInfo(name = &quot;status&quot;) val status: String,</b>
-<b class="fc">&nbsp;    @ColumnInfo(name = &quot;invitedByUserId&quot;) val invitedByUserId: String,</b>
+<b class="fc">&nbsp;    @ColumnInfo(name = &quot;name&quot;) val name: String,</b>
+<b class="fc">&nbsp;    @ColumnInfo(name = &quot;description&quot;, defaultValue = &quot;&quot;) val description: String,</b>
+<b class="fc">&nbsp;    @ColumnInfo(name = &quot;baseCurrency&quot;) val baseCurrency: String,</b>
+<b class="fc">&nbsp;    @ColumnInfo(name = &quot;ownerId&quot;) val ownerId: String,</b>
 <b class="fc">&nbsp;    @ColumnInfo(name = &quot;createdAt&quot;) val createdAt: Long,</b>
+<b class="fc">&nbsp;    @ColumnInfo(name = &quot;archived&quot;) val archived: Boolean,</b>
 <b class="fc">&nbsp;    @ColumnInfo(name = &quot;updatedAt&quot;, defaultValue = &quot;0&quot;) val updatedAt: Long = 0L,</b>
-<b class="fc">&nbsp;    @ColumnInfo(name = &quot;expiresAt&quot;) val expiresAt: Long,</b>
-<b class="fc">&nbsp;    @ColumnInfo(name = &quot;respondedAt&quot;) val respondedAt: Long? = null,</b>
 &nbsp;)
 </code>
 </pre>
@@ -154,7 +145,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-23 11:11</div>
+    <div style="float:right;">generated on 2026-07-23 14:37</div>
 </div>
 </body>
 </html>

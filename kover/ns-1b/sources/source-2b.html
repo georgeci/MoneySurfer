@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > WorkspaceRole</title>
+  <title>MoneySurfer Coverage Report > WorkspaceMemberStatus</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.model</a>
 </div>
 
-<h1>Coverage Summary for Class: WorkspaceRole (com.georgeci.moneysurfer.domain.model)</h1>
+<h1>Coverage Summary for Class: WorkspaceMemberStatus (com.georgeci.moneysurfer.domain.model)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">WorkspaceRole</td>
+  <td class="name">WorkspaceMemberStatus</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -94,10 +94,21 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.model
 &nbsp;
-&nbsp;enum class WorkspaceRole {
-<b class="fc">&nbsp;    OWNER,</b>
-<b class="fc">&nbsp;    EDITOR,</b>
-<b class="fc">&nbsp;    VIEWER,</b>
+&nbsp;/**
+&nbsp; * Lifecycle of a [WorkspaceMember] row.
+&nbsp; *
+&nbsp; * Soft-delete only — Firestore rules forbid hard deletes, so a row&#39;s terminal state
+&nbsp; * is encoded in `status` + a matching `*At` timestamp. Pending invitees do NOT have
+&nbsp; * a member row; pending state lives on `WorkspaceInvite.status = PENDING` instead.
+&nbsp; *
+&nbsp; * - [ACTIVE] — current participant.
+&nbsp; * - [LEFT] — voluntarily left via `LeaveWorkspaceUseCase`. `WorkspaceMember.leftAt` set.
+&nbsp; * - [REMOVED] — kicked by an owner via `RemoveMemberUseCase`. `WorkspaceMember.removedAt` set.
+&nbsp; */
+&nbsp;enum class WorkspaceMemberStatus {
+<b class="fc">&nbsp;    ACTIVE,</b>
+<b class="fc">&nbsp;    LEFT,</b>
+<b class="fc">&nbsp;    REMOVED,</b>
 &nbsp;}
 </code>
 </pre>
@@ -122,7 +133,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-23 11:11</div>
+    <div style="float:right;">generated on 2026-07-23 14:37</div>
 </div>
 </body>
 </html>

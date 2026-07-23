@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > TransactionDao</title>
+  <title>MoneySurfer Coverage Report > WorkspaceInviteDao</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.data.db.dao</a>
 </div>
 
-<h1>Coverage Summary for Class: TransactionDao (com.georgeci.moneysurfer.data.db.dao)</h1>
+<h1>Coverage Summary for Class: WorkspaceInviteDao (com.georgeci.moneysurfer.data.db.dao)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">TransactionDao</td>
+  <td class="name">WorkspaceInviteDao</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -51,168 +51,65 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import androidx.room.Query
 &nbsp;import androidx.room.Update
 &nbsp;import androidx.room.Upsert
-&nbsp;import com.georgeci.moneysurfer.data.db.entity.CategorizedTransactionEntity
-&nbsp;import com.georgeci.moneysurfer.data.db.entity.CategoryMonthlyTotalEntity
-&nbsp;import com.georgeci.moneysurfer.data.db.entity.TransactionEntity
+&nbsp;import com.georgeci.moneysurfer.data.db.entity.WorkspaceInviteEntity
 &nbsp;import kotlinx.coroutines.flow.Flow
 &nbsp;
 &nbsp;@Dao
-&nbsp;interface TransactionDao {
+&nbsp;@Suppress(&quot;TooManyFunctions&quot;)
+&nbsp;interface WorkspaceInviteDao {
 &nbsp;
-&nbsp;    @Query(&quot;SELECT * FROM transactions ORDER BY operationDate DESC, operationAt DESC, createdAt DESC&quot;)
-&nbsp;    fun getAll(): Flow&lt;List&lt;TransactionEntity&gt;&gt;
+&nbsp;    @Query(&quot;SELECT * FROM workspace_invites&quot;)
+&nbsp;    fun getAll(): Flow&lt;List&lt;WorkspaceInviteEntity&gt;&gt;
 &nbsp;
+&nbsp;    @Query(&quot;SELECT * FROM workspace_invites WHERE workspaceId = :workspaceId&quot;)
+&nbsp;    fun getByWorkspaceId(workspaceId: String): Flow&lt;List&lt;WorkspaceInviteEntity&gt;&gt;
+&nbsp;
+&nbsp;    @Query(&quot;SELECT * FROM workspace_invites WHERE email = :email&quot;)
+&nbsp;    fun getByEmail(email: String): Flow&lt;List&lt;WorkspaceInviteEntity&gt;&gt;
+&nbsp;
+&nbsp;    @Query(&quot;SELECT * FROM workspace_invites WHERE targetUserId = :userId&quot;)
+&nbsp;    fun getByTargetUserId(userId: String): Flow&lt;List&lt;WorkspaceInviteEntity&gt;&gt;
+&nbsp;
+&nbsp;    @Query(&quot;SELECT * FROM workspace_invites WHERE id = :id&quot;)
+&nbsp;    suspend fun getById(id: String): WorkspaceInviteEntity?
+&nbsp;
+&nbsp;    // Id of a still-joinable invite in [workspaceId] that admits the given member —
+&nbsp;    // matched by targetUserId or, for email-only invites, a case-insensitive email
+&nbsp;    // match. Stamped onto the pushed member doc so Firestore rules can verify the
+&nbsp;    // accept-invite self-create (issue #152). PENDING is preferred over ACCEPTED so a
+&nbsp;    // fresh invite wins over a stale terminal one; nulls when nothing admits the member.
 &nbsp;    @Query(
 &nbsp;        &quot;&quot;&quot;
-&nbsp;        SELECT
-&nbsp;            transactions.id,
-&nbsp;            transactions.workspaceId,
-&nbsp;            transactions.accountId,
-&nbsp;            transactions.amount,
-&nbsp;            transactions.currencyCode,
-&nbsp;            transactions.categoryId,
-&nbsp;            categories.name AS categoryName,
-&nbsp;            transactions.note,
-&nbsp;            transactions.merchant,
-&nbsp;            transactions.tags,
-&nbsp;            transactions.operationAt,
-&nbsp;            transactions.operationDate,
-&nbsp;            transactions.createdAt,
-&nbsp;            transactions.type,
-&nbsp;            transactions.status,
-&nbsp;            transactions.updatedAt,
-&nbsp;            transactions.transferId,
-&nbsp;            transactions.recurringRuleId
-&nbsp;        FROM transactions
-&nbsp;        LEFT JOIN categories ON categories.id = transactions.categoryId
-&nbsp;        ORDER BY transactions.operationDate DESC, transactions.operationAt DESC, transactions.createdAt DESC
+&nbsp;        SELECT id FROM workspace_invites
+&nbsp;        WHERE workspaceId = :workspaceId
+&nbsp;          AND status IN (&#39;PENDING&#39;, &#39;ACCEPTED&#39;)
+&nbsp;          AND (targetUserId = :userId OR (:email IS NOT NULL AND lower(email) = lower(:email)))
+&nbsp;        ORDER BY CASE status WHEN &#39;PENDING&#39; THEN 0 ELSE 1 END, updatedAt DESC
+&nbsp;        LIMIT 1
 &nbsp;        &quot;&quot;&quot;,
 &nbsp;    )
-&nbsp;    fun getAllCategorized(): Flow&lt;List&lt;CategorizedTransactionEntity&gt;&gt;
-&nbsp;
-&nbsp;    @Query(
-&nbsp;        &quot;SELECT * FROM transactions WHERE accountId = :accountId ORDER BY operationDate DESC, operationAt DESC, createdAt DESC&quot;,
-&nbsp;    )
-&nbsp;    fun getByAccountId(accountId: String): Flow&lt;List&lt;TransactionEntity&gt;&gt;
-&nbsp;
-&nbsp;    @Query(
-&nbsp;        &quot;&quot;&quot;
-&nbsp;        SELECT
-&nbsp;            transactions.id,
-&nbsp;            transactions.workspaceId,
-&nbsp;            transactions.accountId,
-&nbsp;            transactions.amount,
-&nbsp;            transactions.currencyCode,
-&nbsp;            transactions.categoryId,
-&nbsp;            categories.name AS categoryName,
-&nbsp;            transactions.note,
-&nbsp;            transactions.merchant,
-&nbsp;            transactions.tags,
-&nbsp;            transactions.operationAt,
-&nbsp;            transactions.operationDate,
-&nbsp;            transactions.createdAt,
-&nbsp;            transactions.type,
-&nbsp;            transactions.status,
-&nbsp;            transactions.updatedAt,
-&nbsp;            transactions.transferId,
-&nbsp;            transactions.recurringRuleId
-&nbsp;        FROM transactions
-&nbsp;        LEFT JOIN categories ON categories.id = transactions.categoryId
-&nbsp;        WHERE transactions.accountId = :accountId
-&nbsp;        ORDER BY transactions.operationDate DESC, transactions.operationAt DESC, transactions.createdAt DESC
-&nbsp;        &quot;&quot;&quot;,
-&nbsp;    )
-&nbsp;    fun getByAccountIdCategorized(accountId: String): Flow&lt;List&lt;CategorizedTransactionEntity&gt;&gt;
-&nbsp;
-&nbsp;    @Query(
-&nbsp;        &quot;SELECT * FROM transactions WHERE workspaceId = :workspaceId ORDER BY operationDate DESC, operationAt DESC, createdAt DESC&quot;,
-&nbsp;    )
-&nbsp;    fun getByWorkspaceId(workspaceId: String): Flow&lt;List&lt;TransactionEntity&gt;&gt;
-&nbsp;
-&nbsp;    @Query(&quot;SELECT * FROM transactions WHERE id = :id&quot;)
-&nbsp;    suspend fun getById(id: String): TransactionEntity?
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Full-text search over notes and merchants within a workspace, newest first.
-&nbsp;     *
-&nbsp;     * A bare `MATCH` against the virtual table spans both indexed columns, so this needs no
-&nbsp;     * per-column syntax — see [com.georgeci.moneysurfer.data.db.entity.TransactionFtsEntity].
-&nbsp;     *
-&nbsp;     * [query] is raw FTS4 MATCH syntax, never user input — build it with
-&nbsp;     * [com.georgeci.moneysurfer.data.db.FtsQuery.fromUserInput], which escapes
-&nbsp;     * operators and adds prefix wildcards.
-&nbsp;     */
-&nbsp;    @Query(
-&nbsp;        &quot;&quot;&quot;
-&nbsp;        SELECT transactions.* FROM transactions
-&nbsp;        JOIN transactions_fts ON transactions_fts.rowid = transactions.rowid
-&nbsp;        WHERE transactions.workspaceId = :workspaceId AND transactions_fts MATCH :query
-&nbsp;        ORDER BY transactions.operationDate DESC, transactions.operationAt DESC, transactions.createdAt DESC
-&nbsp;        &quot;&quot;&quot;,
-&nbsp;    )
-&nbsp;    fun searchByText(workspaceId: String, query: String): Flow&lt;List&lt;TransactionEntity&gt;&gt;
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Per-month totals for [categoryIds] within a workspace, for one transaction type.
-&nbsp;     *
-&nbsp;     * Grouped in SQLite rather than in memory: the category detail screen wants six months of
-&nbsp;     * history for a whole subtree, and streaming every matching row up to the domain just to sum
-&nbsp;     * it would scale with transaction volume instead of with the twenty-odd cells it draws.
-&nbsp;     *
-&nbsp;     * The window is compared against `operationDate`, an ISO `YYYY-MM-DD` string, so a plain
-&nbsp;     * string range is a correct date range. Rows predating the column carry `&#39;&#39;`, which sorts
-&nbsp;     * below every real date and is excluded by [fromDate] without a special case.
-&nbsp;     *
-&nbsp;     * [toDateExclusive] is the first day of the month *after* the last month wanted — half-open
-&nbsp;     * so the caller never has to know how long the final month is.
-&nbsp;     */
-&nbsp;    @Query(
-&nbsp;        &quot;&quot;&quot;
-&nbsp;        SELECT
-&nbsp;            transactions.categoryId AS categoryId,
-&nbsp;            substr(transactions.operationDate, 1, 7) AS month,
-&nbsp;            SUM(ABS(transactions.amount)) AS totalMinor,
-&nbsp;            COUNT(*) AS transactionCount
-&nbsp;        FROM transactions
-&nbsp;        WHERE transactions.workspaceId = :workspaceId
-&nbsp;            AND transactions.categoryId IN (:categoryIds)
-&nbsp;            AND transactions.type = :type
-&nbsp;            AND transactions.status = &#39;ACTUAL&#39;
-&nbsp;            AND transactions.operationDate &gt;= :fromDate
-&nbsp;            AND transactions.operationDate &lt; :toDateExclusive
-&nbsp;        GROUP BY transactions.categoryId, month
-&nbsp;        &quot;&quot;&quot;,
-&nbsp;    )
-&nbsp;    fun getMonthlyTotalsByCategory(
+&nbsp;    suspend fun findJoinableInviteId(
 &nbsp;        workspaceId: String,
-&nbsp;        categoryIds: List&lt;String&gt;,
-&nbsp;        type: String,
-&nbsp;        fromDate: String,
-&nbsp;        toDateExclusive: String,
-&nbsp;    ): Flow&lt;List&lt;CategoryMonthlyTotalEntity&gt;&gt;
+&nbsp;        userId: String,
+&nbsp;        email: String?,
+&nbsp;    ): String?
 &nbsp;
 &nbsp;    @Insert
-&nbsp;    suspend fun insert(entity: TransactionEntity)
+&nbsp;    suspend fun insert(entity: WorkspaceInviteEntity)
 &nbsp;
 &nbsp;    @Insert
-&nbsp;    suspend fun insertAll(entities: List&lt;TransactionEntity&gt;)
+&nbsp;    suspend fun insertAll(entities: List&lt;WorkspaceInviteEntity&gt;)
 &nbsp;
 &nbsp;    @Update
-&nbsp;    suspend fun update(entity: TransactionEntity)
+&nbsp;    suspend fun update(entity: WorkspaceInviteEntity)
 &nbsp;
 &nbsp;    @Upsert
-&nbsp;    suspend fun upsertAll(entities: List&lt;TransactionEntity&gt;)
+&nbsp;    suspend fun upsert(entity: WorkspaceInviteEntity)
 &nbsp;
-&nbsp;    @Query(&quot;DELETE FROM transactions WHERE id = :id&quot;)
+&nbsp;    @Query(&quot;DELETE FROM workspace_invites WHERE id = :id&quot;)
 &nbsp;    suspend fun delete(id: String)
 &nbsp;
-&nbsp;    @Query(&quot;DELETE FROM transactions WHERE accountId = :accountId&quot;)
-&nbsp;    suspend fun deleteByAccountId(accountId: String)
-&nbsp;
-&nbsp;    @Query(&quot;UPDATE transactions SET categoryId = NULL WHERE categoryId = :categoryId&quot;)
-&nbsp;    suspend fun nullifyCategoryId(categoryId: String)
-&nbsp;
-&nbsp;    @Query(&quot;DELETE FROM transactions&quot;)
+&nbsp;    @Query(&quot;DELETE FROM workspace_invites&quot;)
 &nbsp;    suspend fun deleteAll()
 &nbsp;}
 </code>
@@ -238,7 +135,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-23 11:11</div>
+    <div style="float:right;">generated on 2026-07-23 14:37</div>
 </div>
 </body>
 </html>

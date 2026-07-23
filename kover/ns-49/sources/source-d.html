@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SessionShutdownGate</title>
+  <title>MoneySurfer Coverage Report > SurferToolbarKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,22 +19,77 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.domain.repositories</a>
+    <a href="../index.html">com.georgeci.moneysurfer.uikit.components.base</a>
 </div>
 
-<h1>Coverage Summary for Class: SessionShutdownGate (com.georgeci.moneysurfer.domain.repositories)</h1>
+<h1>Coverage Summary for Class: SurferToolbarKt (com.georgeci.moneysurfer.uikit.components.base)</h1>
 
 <table class="coverageStats">
 <tr>
   <th class="name">Class</th>
 <th class="coverageStat 
 ">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
   Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
 </th>
 </tr>
 <tr>
-  <td class="name">SessionShutdownGate</td>
-    <td class="coverageStat"/>
+  <td class="name">SurferToolbarKt</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (9/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    24.4%
+  </span>
+  <span class="absValue">
+    (19/78)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    62.5%
+  </span>
+  <span class="absValue">
+    (70/112)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    59.5%
+  </span>
+  <span class="absValue">
+    (1159/1949)
+  </span>
+</td>
 </tr>
 
 </table>
@@ -44,20 +99,318 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.repositories
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.components.base
+&nbsp;
+&nbsp;import androidx.compose.foundation.background
+&nbsp;import androidx.compose.foundation.layout.Box
+&nbsp;import androidx.compose.foundation.layout.Column
+&nbsp;import androidx.compose.foundation.layout.RowScope
+&nbsp;import androidx.compose.foundation.layout.Spacer
+&nbsp;import androidx.compose.foundation.layout.padding
+&nbsp;import androidx.compose.foundation.layout.size
+&nbsp;import androidx.compose.foundation.layout.width
+&nbsp;import androidx.compose.foundation.shape.CircleShape
+&nbsp;import androidx.compose.foundation.shape.RoundedCornerShape
+&nbsp;import androidx.compose.material3.ExperimentalMaterial3Api
+&nbsp;import androidx.compose.material3.FilledTonalButton
+&nbsp;import androidx.compose.material3.Icon
+&nbsp;import androidx.compose.material3.IconButton
+&nbsp;import androidx.compose.material3.Text
+&nbsp;import androidx.compose.material3.TopAppBar
+&nbsp;import androidx.compose.material3.TopAppBarColors
+&nbsp;import androidx.compose.material3.TopAppBarDefaults
+&nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.ui.Alignment
+&nbsp;import androidx.compose.ui.Modifier
+&nbsp;import androidx.compose.ui.draw.clip
+&nbsp;import androidx.compose.ui.graphics.Color
+&nbsp;import androidx.compose.ui.graphics.vector.ImageVector
+&nbsp;import androidx.compose.ui.tooling.preview.Preview
+&nbsp;import androidx.compose.ui.unit.dp
+&nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+&nbsp;import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
+&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
+&nbsp;import moneysurfer.uikit.generated.resources.Res
+&nbsp;import moneysurfer.uikit.generated.resources.uikit_back
+&nbsp;import org.jetbrains.compose.resources.stringResource
+&nbsp;
+&nbsp;@OptIn(ExperimentalMaterial3Api::class)
+&nbsp;@Composable
+<b class="nc">&nbsp;fun SurferToolbar(</b>
+&nbsp;    title: String,
+<b class="fc">&nbsp;    modifier: Modifier = Modifier,</b>
+<b class="fc">&nbsp;    onBack: (() -&gt; Unit)? = null,</b>
+<b class="fc">&nbsp;    navigationIcon: (@Composable () -&gt; Unit)? = null,</b>
+<b class="fc">&nbsp;    colors: TopAppBarColors = TopAppBarDefaults.topAppBarColors(),</b>
+&nbsp;    actions: @Composable RowScope.() -&gt; Unit = {},
+<b class="pc">&nbsp;) {</b>
+<b class="fc">&nbsp;    SurferToolbar(</b>
+<b class="fc">&nbsp;        modifier = modifier,</b>
+<b class="fc">&nbsp;        navigationIcon = {</b>
+<b class="fc">&nbsp;            when {</b>
+<b class="pc">&nbsp;                onBack != null -&gt; IconButton(onClick = onBack) {</b>
+&nbsp;                    Icon(
+&nbsp;                        imageVector = SurferIcons.Back,
+&nbsp;                        contentDescription = stringResource(Res.string.uikit_back),
+&nbsp;                    )
+&nbsp;                }
+<b class="nc">&nbsp;                navigationIcon != null -&gt; navigationIcon()</b>
+<b class="fc">&nbsp;            }</b>
+&nbsp;        },
+<b class="fc">&nbsp;        colors = colors,</b>
+<b class="fc">&nbsp;        actions = actions,</b>
+<b class="fc">&nbsp;        title = { Text(title) },</b>
+&nbsp;    )
+<b class="fc">&nbsp;}</b>
+&nbsp;
+&nbsp;@OptIn(ExperimentalMaterial3Api::class)
+&nbsp;@Composable
+<b class="nc">&nbsp;fun SurferToolbar(</b>
+<b class="fc">&nbsp;    modifier: Modifier = Modifier,</b>
+&nbsp;    navigationIcon: @Composable () -&gt; Unit = {},
+<b class="fc">&nbsp;    colors: TopAppBarColors = TopAppBarDefaults.topAppBarColors(),</b>
+&nbsp;    actions: @Composable RowScope.() -&gt; Unit = {},
+&nbsp;    title: @Composable () -&gt; Unit,
+<b class="pc">&nbsp;) {</b>
+<b class="fc">&nbsp;    TopAppBar(</b>
+<b class="fc">&nbsp;        title = title,</b>
+<b class="fc">&nbsp;        modifier = modifier,</b>
+<b class="fc">&nbsp;        navigationIcon = navigationIcon,</b>
+<b class="fc">&nbsp;        actions = {</b>
+<b class="fc">&nbsp;            SurferSyncStatusBadge()</b>
+<b class="fc">&nbsp;            actions()</b>
+&nbsp;        },
+<b class="fc">&nbsp;        colors = colors,</b>
+&nbsp;    )
+<b class="fc">&nbsp;}</b>
 &nbsp;
 &nbsp;/**
-&nbsp; * Tears down everything that should not survive across logout: in-flight
-&nbsp; * sync, queued sync, scheduled background runs.
-&nbsp; *
-&nbsp; * Lives in `:domain` so use cases (e.g. `LogoutUseCase`) can call it
-&nbsp; * without taking a direct dependency on `:sync`. Implementation lives in
-&nbsp; * `:data` and delegates to `SyncCoordinator.cancelAll()` plus
-&nbsp; * `BackgroundSyncScheduler.cancelAll()`.
+&nbsp; * Icon action for the trailing edge of [SurferToolbar] / [SurferDashboardToolbar]. Wraps
+&nbsp; * [IconButton] so every toolbar action gets the same 48dp tap target, tint, and content-
+&nbsp; * description handling without repeating boilerplate at every call site.
 &nbsp; */
-&nbsp;interface SessionShutdownGate {
-&nbsp;    suspend fun shutdown()
-&nbsp;}
+&nbsp;@Composable
+<b class="nc">&nbsp;fun SurferToolbarAction(</b>
+&nbsp;    icon: ImageVector,
+&nbsp;    contentDescription: String?,
+&nbsp;    onClick: () -&gt; Unit,
+<b class="fc">&nbsp;    modifier: Modifier = Modifier,</b>
+<b class="fc">&nbsp;    tint: Color = AppTheme.materialColors.onSurface,</b>
+<b class="pc">&nbsp;) {</b>
+<b class="fc">&nbsp;    IconButton(onClick = onClick, modifier = modifier) {</b>
+<b class="fc">&nbsp;        Icon(</b>
+<b class="fc">&nbsp;            imageVector = icon,</b>
+<b class="fc">&nbsp;            contentDescription = contentDescription,</b>
+<b class="fc">&nbsp;            tint = tint,</b>
+&nbsp;        )
+&nbsp;    }
+<b class="fc">&nbsp;}</b>
+&nbsp;
+&nbsp;/**
+&nbsp; * Pill-shaped tonal button with a leading icon and a label, sized for the trailing edge of
+&nbsp; * [SurferToolbar]. Use for primary commit-style toolbar actions (&quot;Save&quot;, &quot;Update&quot;) that need
+&nbsp; * more weight than a [SurferToolbarAction] icon.
+&nbsp; */
+&nbsp;@Composable
+&nbsp;fun SurferToolbarButtonAction(
+&nbsp;    icon: ImageVector,
+&nbsp;    text: String,
+&nbsp;    onClick: () -&gt; Unit,
+<b class="nc">&nbsp;    modifier: Modifier = Modifier,</b>
+<b class="nc">&nbsp;    enabled: Boolean = true,</b>
+<b class="nc">&nbsp;) {</b>
+<b class="nc">&nbsp;    FilledTonalButton(</b>
+<b class="nc">&nbsp;        onClick = onClick,</b>
+<b class="nc">&nbsp;        enabled = enabled,</b>
+<b class="nc">&nbsp;        shape = RoundedCornerShape(18.dp),</b>
+<b class="nc">&nbsp;        modifier = modifier.padding(end = 8.dp),</b>
+<b class="nc">&nbsp;    ) {</b>
+<b class="nc">&nbsp;        Icon(</b>
+<b class="nc">&nbsp;            imageVector = icon,</b>
+&nbsp;            // decorative — button text label provides the accessible label
+<b class="nc">&nbsp;            contentDescription = null,</b>
+<b class="nc">&nbsp;            modifier = Modifier.size(16.dp),</b>
+&nbsp;        )
+<b class="nc">&nbsp;        Spacer(Modifier.width(6.dp))</b>
+<b class="nc">&nbsp;        Text(text = text, style = AppTheme.typography.labelLarge)</b>
+&nbsp;    }
+<b class="nc">&nbsp;}</b>
+&nbsp;
+&nbsp;/**
+&nbsp; * Dashboard-flavoured top app bar: a colored letter bubble on the left, a two-line title
+&nbsp; * (small label + larger headline), and trailing actions. Use for the home/dashboard screen
+&nbsp; * where the toolbar needs to identify the active workspace.
+&nbsp; */
+&nbsp;@OptIn(ExperimentalMaterial3Api::class)
+&nbsp;@Composable
+<b class="nc">&nbsp;fun SurferDashboardToolbar(</b>
+&nbsp;    letter: String,
+&nbsp;    primaryText: String,
+&nbsp;    secondaryText: String,
+<b class="fc">&nbsp;    modifier: Modifier = Modifier,</b>
+<b class="fc">&nbsp;    letterBackgroundColor: Color = AppTheme.materialColors.primaryContainer,</b>
+<b class="fc">&nbsp;    letterContentColor: Color = AppTheme.materialColors.onPrimaryContainer,</b>
+<b class="fc">&nbsp;    colors: TopAppBarColors = TopAppBarDefaults.topAppBarColors(),</b>
+&nbsp;    actions: @Composable RowScope.() -&gt; Unit = {},
+<b class="pc">&nbsp;) {</b>
+<b class="fc">&nbsp;    SurferToolbar(</b>
+<b class="fc">&nbsp;        modifier = modifier,</b>
+<b class="fc">&nbsp;        navigationIcon = {</b>
+<b class="fc">&nbsp;            Box(</b>
+<b class="fc">&nbsp;                modifier = Modifier</b>
+<b class="fc">&nbsp;                    .padding(start = 12.dp)</b>
+<b class="fc">&nbsp;                    .size(40.dp)</b>
+<b class="fc">&nbsp;                    .clip(CircleShape)</b>
+<b class="fc">&nbsp;                    .background(letterBackgroundColor),</b>
+<b class="fc">&nbsp;                contentAlignment = Alignment.Center,</b>
+&nbsp;            ) {
+<b class="fc">&nbsp;                Text(</b>
+<b class="fc">&nbsp;                    text = letter,</b>
+<b class="fc">&nbsp;                    style = AppTheme.typography.titleSmall,</b>
+<b class="fc">&nbsp;                    color = letterContentColor,</b>
+&nbsp;                )
+<b class="fc">&nbsp;            }</b>
+&nbsp;        },
+<b class="fc">&nbsp;        colors = colors,</b>
+<b class="fc">&nbsp;        actions = actions,</b>
+<b class="fc">&nbsp;        title = {</b>
+<b class="fc">&nbsp;            Column {</b>
+<b class="fc">&nbsp;                Text(</b>
+<b class="fc">&nbsp;                    text = primaryText,</b>
+<b class="fc">&nbsp;                    style = AppTheme.typography.labelMedium,</b>
+<b class="fc">&nbsp;                    color = AppTheme.materialColors.onSurfaceVariant,</b>
+&nbsp;                )
+<b class="fc">&nbsp;                Text(</b>
+<b class="fc">&nbsp;                    text = secondaryText,</b>
+<b class="fc">&nbsp;                    style = AppTheme.typography.titleSmall,</b>
+<b class="fc">&nbsp;                    color = AppTheme.materialColors.onSurface,</b>
+&nbsp;                )
+<b class="fc">&nbsp;            }</b>
+&nbsp;        },
+&nbsp;    )
+<b class="fc">&nbsp;}</b>
+&nbsp;
+&nbsp;@OptIn(ExperimentalMaterial3Api::class)
+&nbsp;@Preview
+&nbsp;@Composable
+<b class="nc">&nbsp;private fun SurferToolbarPreview() {</b>
+<b class="nc">&nbsp;    SurferComponentPreview {</b>
+&nbsp;        SurferToolbar(title = &quot;Screen Title&quot;)
+&nbsp;    }
+<b class="nc">&nbsp;}</b>
+&nbsp;
+&nbsp;@OptIn(ExperimentalMaterial3Api::class)
+&nbsp;@Preview
+&nbsp;@Composable
+<b class="nc">&nbsp;private fun SurferToolbarWithBackPreview() {</b>
+<b class="nc">&nbsp;    SurferComponentPreview {</b>
+&nbsp;        SurferToolbar(
+&nbsp;            title = &quot;Details with back&quot;,
+&nbsp;//            onBack = {},
+&nbsp;        )
+&nbsp;    }
+<b class="nc">&nbsp;}</b>
+&nbsp;
+&nbsp;@OptIn(ExperimentalMaterial3Api::class)
+&nbsp;@Preview
+&nbsp;@Composable
+<b class="nc">&nbsp;private fun SurferToolbarWithActionsPreview() {</b>
+<b class="nc">&nbsp;    SurferComponentPreview {</b>
+&nbsp;        SurferToolbar(
+&nbsp;            title = &quot;Dashboard&quot;,
+&nbsp;            actions = {
+&nbsp;                SurferToolbarAction(
+&nbsp;                    icon = SurferIcons.Settings,
+&nbsp;                    contentDescription = &quot;Settings&quot;,
+&nbsp;                    onClick = {},
+&nbsp;                )
+&nbsp;            },
+&nbsp;        )
+&nbsp;    }
+<b class="nc">&nbsp;}</b>
+&nbsp;
+&nbsp;@OptIn(ExperimentalMaterial3Api::class)
+&nbsp;@Preview
+&nbsp;@Composable
+<b class="nc">&nbsp;private fun SurferToolbarFullPreview() {</b>
+<b class="nc">&nbsp;    SurferComponentPreview {</b>
+&nbsp;        SurferToolbar(
+&nbsp;            title = &quot;Edit Account&quot;,
+&nbsp;            onBack = {},
+&nbsp;            actions = {
+&nbsp;                SurferToolbarAction(
+&nbsp;                    icon = SurferIcons.Delete,
+&nbsp;                    contentDescription = &quot;Delete&quot;,
+&nbsp;                    onClick = {},
+&nbsp;                )
+&nbsp;            },
+&nbsp;        )
+&nbsp;    }
+<b class="nc">&nbsp;}</b>
+&nbsp;
+&nbsp;@OptIn(ExperimentalMaterial3Api::class)
+&nbsp;@Preview
+&nbsp;@Composable
+<b class="nc">&nbsp;private fun SurferToolbarWithButtonActionPreview() {</b>
+<b class="nc">&nbsp;    SurferComponentPreview {</b>
+&nbsp;        SurferToolbar(
+&nbsp;            title = &quot;New transaction&quot;,
+&nbsp;            onBack = {},
+&nbsp;            actions = {
+&nbsp;                SurferToolbarButtonAction(
+&nbsp;                    icon = SurferIcons.Check,
+&nbsp;                    text = &quot;Save&quot;,
+&nbsp;                    onClick = {},
+&nbsp;                )
+&nbsp;            },
+&nbsp;        )
+&nbsp;    }
+<b class="nc">&nbsp;}</b>
+&nbsp;
+&nbsp;@OptIn(ExperimentalMaterial3Api::class)
+&nbsp;@Preview
+&nbsp;@Composable
+<b class="nc">&nbsp;private fun SurferToolbarWithButtonActionDisabledPreview() {</b>
+<b class="nc">&nbsp;    SurferComponentPreview {</b>
+&nbsp;        SurferToolbar(
+&nbsp;            title = &quot;Edit account&quot;,
+&nbsp;            onBack = {},
+&nbsp;            actions = {
+&nbsp;                SurferToolbarButtonAction(
+&nbsp;                    icon = SurferIcons.Check,
+&nbsp;                    text = &quot;Update&quot;,
+&nbsp;                    onClick = {},
+&nbsp;                    enabled = false,
+&nbsp;                )
+&nbsp;            },
+&nbsp;        )
+&nbsp;    }
+<b class="nc">&nbsp;}</b>
+&nbsp;
+&nbsp;@OptIn(ExperimentalMaterial3Api::class)
+&nbsp;@Preview
+&nbsp;@Composable
+<b class="nc">&nbsp;private fun SurferDashboardToolbarPreview() {</b>
+<b class="nc">&nbsp;    SurferComponentPreview {</b>
+&nbsp;        SurferDashboardToolbar(
+&nbsp;            letter = &quot;F&quot;,
+&nbsp;            primaryText = &quot;Family&quot;,
+&nbsp;            secondaryText = &quot;Good evening, Kasia&quot;,
+&nbsp;            actions = {
+&nbsp;                SurferToolbarAction(
+&nbsp;                    icon = SurferIcons.Notifications,
+&nbsp;                    contentDescription = &quot;Notifications&quot;,
+&nbsp;                    onClick = {},
+&nbsp;                )
+&nbsp;                SurferToolbarAction(
+&nbsp;                    icon = SurferIcons.Settings,
+&nbsp;                    contentDescription = &quot;Settings&quot;,
+&nbsp;                    onClick = {},
+&nbsp;                )
+&nbsp;            },
+&nbsp;        )
+&nbsp;    }
+<b class="nc">&nbsp;}</b>
 </code>
 </pre>
 </div>
@@ -81,7 +434,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 15:22</div>
+    <div style="float:right;">generated on 2026-07-23 14:37</div>
 </div>
 </body>
 </html>

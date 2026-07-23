@@ -63,7 +63,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/3)
+    (0/4)
   </span>
 </td>
     <td class="coverageStat"/>
@@ -72,7 +72,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/4)
+    (0/5)
   </span>
 </td>
 <td class="coverageStat">
@@ -80,7 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/13)
+    (0/20)
   </span>
 </td>
 </tr>
@@ -96,8 +96,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;
 &nbsp;import com.georgeci.moneysurfer.domain.model.CategorizedTransaction
 &nbsp;import com.georgeci.moneysurfer.domain.model.Transaction
+&nbsp;import com.georgeci.moneysurfer.domain.model.TransactionTotal
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.AccountId
 &nbsp;import com.georgeci.moneysurfer.domain.repositories.TransactionRepository
+&nbsp;import com.georgeci.moneysurfer.domain.util.TransactionPeriodWindow
 &nbsp;import kotlinx.coroutines.flow.Flow
 &nbsp;import org.koin.core.annotation.Single
 &nbsp;
@@ -109,8 +111,23 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    operator fun invoke(accountId: AccountId): Flow&lt;List&lt;Transaction&gt;&gt; =
 <b class="nc">&nbsp;        transactionRepository.getByAccountId(accountId)</b>
 &nbsp;
-&nbsp;    fun categorized(accountId: AccountId): Flow&lt;List&lt;CategorizedTransaction&gt;&gt; =
-<b class="nc">&nbsp;        transactionRepository.getByAccountIdCategorized(accountId)</b>
+&nbsp;    /**
+&nbsp;     * Newest-first page inside [window]. A `null` [accountId] spans every account, which is what
+&nbsp;     * the transactions list uses when it is opened outside an account.
+&nbsp;     */
+&nbsp;    fun window(
+&nbsp;        accountId: AccountId?,
+&nbsp;        window: TransactionPeriodWindow,
+&nbsp;        limit: Int,
+&nbsp;    ): Flow&lt;List&lt;CategorizedTransaction&gt;&gt; =
+<b class="nc">&nbsp;        transactionRepository.getCategorizedWindow(accountId, window, limit)</b>
+&nbsp;
+&nbsp;    /** Per-type, per-currency sums over the whole [window] — see [TransactionRepository.getTotals]. */
+&nbsp;    fun totals(
+&nbsp;        accountId: AccountId?,
+&nbsp;        window: TransactionPeriodWindow,
+&nbsp;    ): Flow&lt;List&lt;TransactionTotal&gt;&gt; =
+<b class="nc">&nbsp;        transactionRepository.getTotals(accountId, window)</b>
 &nbsp;}
 </code>
 </pre>
@@ -135,7 +152,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-23 11:11</div>
+    <div style="float:right;">generated on 2026-07-23 14:37</div>
 </div>
 </body>
 </html>

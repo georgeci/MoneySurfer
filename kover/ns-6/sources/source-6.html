@@ -72,7 +72,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/26)
+    (0/29)
   </span>
 </td>
 <td class="coverageStat">
@@ -80,7 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/80)
+    (0/89)
   </span>
 </td>
 </tr>
@@ -150,6 +150,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="nc">&nbsp;        default = &quot;Card&quot;,</b>
 &nbsp;    )
 &nbsp;
+&nbsp;    /** Name of a `TransactionPeriodMode` — the window the transactions list opens on. */
+<b class="nc">&nbsp;    val transactionsPeriodMode = prefs.string(</b>
+<b class="nc">&nbsp;        name = &quot;ui.transactions_period_mode&quot;,</b>
+<b class="nc">&nbsp;        default = &quot;Month&quot;,</b>
+&nbsp;    )
+&nbsp;
 &nbsp;    /**
 &nbsp;     * Sticky flag set by `DemoLoginUseCase` and cleared by `WipeDemoDataUseCase`.
 &nbsp;     * The auth flow consults it on real login/signup to decide whether to wipe
@@ -184,7 +190,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-23 11:11</div>
+    <div style="float:right;">generated on 2026-07-23 14:37</div>
 </div>
 </body>
 </html>
