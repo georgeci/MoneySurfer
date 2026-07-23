@@ -27,7 +27,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.GoalId
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
-import com.georgeci.moneysurfer.uikit.components.SurferEmptyState
 import com.georgeci.moneysurfer.uikit.components.SurferSkeleton
 import com.georgeci.moneysurfer.uikit.components.SurferSkeletonRow
 import com.georgeci.moneysurfer.uikit.components.base.SurferDashboardToolbar
@@ -118,6 +117,9 @@ private const val DASHBOARD_SKELETON_ROWS = 4
 
 private val DASHBOARD_WIDGET_MIN_HEIGHT = 180.dp
 
+/** Bottom scroll inset that keeps the last row clear of the extended "Add transaction" FAB. */
+private val DASHBOARD_FAB_CLEARANCE = 88.dp
+
 @Composable
 private fun DashboardLoading() {
     Scaffold(
@@ -189,11 +191,14 @@ private fun DashboardContent(
             }
         },
     ) { padding ->
+        // Clear the extended FAB so the last transactions can scroll above it instead of
+        // being hidden behind it; only reserve the space when the FAB is actually shown.
+        val fabClearance = if (state.accounts.isNotEmpty()) DASHBOARD_FAB_CLEARANCE else 0.dp
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(top = padding.calculateTopPadding()),
-            contentPadding = PaddingValues(bottom = padding.calculateBottomPadding()),
+            contentPadding = PaddingValues(bottom = padding.calculateBottomPadding() + fabClearance),
         ) {
             item(key = "balance") {
                 SurferBalanceWidget(
@@ -205,11 +210,9 @@ private fun DashboardContent(
                         null
                     },
                     trendText = state.formattedTrendDelta,
-                    showSparkline = false,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp)
-                        .defaultMinSize(minHeight = DASHBOARD_WIDGET_MIN_HEIGHT)
                         .testTag(DashboardTestTags.Balance),
                 )
             }
@@ -219,7 +222,7 @@ private fun DashboardContent(
                     title = stringResource(Res.string.dashboard_accounts_section_title),
                     action = stringResource(Res.string.dashboard_accounts_manage),
                     onActionClick = { onEvent(DashboardEvent.OnManageAccountsClick) },
-                    modifier = Modifier.padding(horizontal = 24.dp),
+                    modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 8.dp),
                 )
             }
 
@@ -235,8 +238,7 @@ private fun DashboardContent(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp)
-                        .defaultMinSize(minHeight = DASHBOARD_WIDGET_MIN_HEIGHT)
-                        .padding(accountsPadding),
+                        .padding(vertical = accountsPadding),
                 )
             }
 
@@ -251,44 +253,30 @@ private fun DashboardContent(
                     emptySubtitle = stringResource(Res.string.dashboard_goals_empty_subtitle),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
                         .defaultMinSize(minHeight = DASHBOARD_WIDGET_MIN_HEIGHT)
                         .padding(vertical = 8.dp),
                 )
             }
 
             item(key = "recent") {
-                if (state.recentTransactionsEmpty) {
-                    SurferEmptyState(
-                        title = stringResource(Res.string.dashboard_recent_empty_title),
-                        subtitle = stringResource(Res.string.dashboard_recent_empty_subtitle),
-                        icon = SurferIcons.Receipt,
-                        actionLabel = stringResource(Res.string.dashboard_add_transaction),
-                        onActionClick = { onEvent(DashboardEvent.OnAddTransactionClick) },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp)
-                            .defaultMinSize(minHeight = DASHBOARD_WIDGET_MIN_HEIGHT)
-                            .padding(vertical = 8.dp),
-                    )
-                } else {
-                    val bubbleBg = AppTheme.materialColors.primaryContainer
-                    val bubbleFg = AppTheme.materialColors.onPrimaryContainer
-                    SurferRecentTransactionsWidget(
-                        items = state.transactions.map { it.toWidgetItem(bubbleBg, bubbleFg) },
-                        title = stringResource(Res.string.dashboard_recent_title),
-                        seeAllLabel = stringResource(Res.string.dashboard_recent_see_all),
-                        onSeeAllClick = { onEvent(DashboardEvent.OnSeeAllTransactionsClick) },
-                        onItemClick = { item ->
-                            item.transactionId()?.let { onEvent(DashboardEvent.OnTransactionClick(it)) }
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp)
-                            .defaultMinSize(minHeight = DASHBOARD_WIDGET_MIN_HEIGHT)
-                            .padding(vertical = 8.dp),
-                    )
-                }
+                val bubbleBg = AppTheme.materialColors.primaryContainer
+                val bubbleFg = AppTheme.materialColors.onPrimaryContainer
+                SurferRecentTransactionsWidget(
+                    items = state.transactions.map { it.toWidgetItem(bubbleBg, bubbleFg) },
+                    title = stringResource(Res.string.dashboard_recent_title),
+                    seeAllLabel = stringResource(Res.string.dashboard_recent_see_all),
+                    onSeeAllClick = { onEvent(DashboardEvent.OnSeeAllTransactionsClick) },
+                    onItemClick = { item ->
+                        item.transactionId()?.let { onEvent(DashboardEvent.OnTransactionClick(it)) }
+                    },
+                    emptyTitle = stringResource(Res.string.dashboard_recent_empty_title),
+                    emptySubtitle = stringResource(Res.string.dashboard_recent_empty_subtitle),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                        .defaultMinSize(minHeight = DASHBOARD_WIDGET_MIN_HEIGHT)
+                        .padding(vertical = 8.dp),
+                )
             }
         }
     }

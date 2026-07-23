@@ -287,6 +287,10 @@
     <string name="settings_delete_account_confirm_message">Your account and cloud data will be permanently deleted. This cannot be undone.</string>
     <string name="settings_delete_account_confirm_confirm">Delete forever</string>
     <string name="settings_delete_account_confirm_cancel">Cancel</string>
+    <string name="settings_logout_guest_warning_title">Log out as guest?</string>
+    <string name="settings_logout_guest_warning_message">You\'re signed in as a guest. Logging out permanently deletes all data on this device — your accounts, transactions and goals can\'t be recovered.</string>
+    <string name="settings_logout_guest_warning_confirm">Log out &amp; delete</string>
+    <string name="settings_logout_guest_warning_cancel">Cancel</string>
     <string name="settings_delete_account_notice_wrong_password">Incorrect password</string>
     <string name="settings_delete_account_notice_recent_login">For security, please sign out, sign in again, and retry</string>
     <string name="settings_delete_account_notice_cleanup_failed">Couldn\'t delete your cloud data. Check your connection and try again</string>

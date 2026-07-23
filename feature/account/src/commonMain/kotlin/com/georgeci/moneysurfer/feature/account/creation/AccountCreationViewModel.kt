@@ -22,6 +22,7 @@ import com.georgeci.moneysurfer.feature.account.generated.resources.Res
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_created_snackbar
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_currency_failed_snackbar
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_updated_snackbar
+import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_manage_action_failed
 import com.georgeci.moneysurfer.navigation.SnackbarController
 import com.georgeci.moneysurfer.utils.MviViewModel
 import kotlinx.coroutines.flow.first
@@ -154,7 +155,14 @@ class AccountCreationViewModel(
         val state = currentState as? AccountCreationState.Content ?: return
         if (state.name.isBlank()) return
         if (state.balanceError != null) return
-        launch {
+        launch(
+            // A save must never fail silently: MviViewModel.launch swallows exceptions by
+            // default, which turns any repository/session failure into a dead Save button.
+            onError = { e ->
+                log.e(e) { "[save] failed" }
+                snackbar.show(Res.string.accounts_manage_action_failed)
+            },
+        ) {
             val trimmedName = state.name.trim()
             if (state.isEditMode) {
                 val existingId = state.editingAccountId ?: return@launch
@@ -170,7 +178,11 @@ class AccountCreationViewModel(
                 return@launch
             }
 
-            val workspaceId = session.currentWorkspaceId.flow.first() ?: return@launch
+            val workspaceId = session.currentWorkspaceId.flow.first() ?: run {
+                log.w { "[save] no current workspace pinned — cannot create account" }
+                snackbar.show(Res.string.accounts_manage_action_failed)
+                return@launch
+            }
             val balanceDouble = InitialBalanceInput.parse(state.balance) ?: 0.0
             val currency = state.currency
             val openingBalance = Money.fromDouble(balanceDouble)
