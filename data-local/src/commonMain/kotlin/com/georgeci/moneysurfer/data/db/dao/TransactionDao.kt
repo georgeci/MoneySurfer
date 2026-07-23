@@ -8,6 +8,7 @@ import androidx.room.Upsert
 import com.georgeci.moneysurfer.data.db.entity.CategorizedTransactionEntity
 import com.georgeci.moneysurfer.data.db.entity.CategoryMonthlyTotalEntity
 import com.georgeci.moneysurfer.data.db.entity.TransactionEntity
+import com.georgeci.moneysurfer.data.db.entity.TransactionTotalEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -17,38 +18,27 @@ interface TransactionDao {
     fun getAll(): Flow<List<TransactionEntity>>
 
     @Query(
-        """
-        SELECT
-            transactions.id,
-            transactions.workspaceId,
-            transactions.accountId,
-            transactions.amount,
-            transactions.currencyCode,
-            transactions.categoryId,
-            categories.name AS categoryName,
-            transactions.note,
-            transactions.merchant,
-            transactions.tags,
-            transactions.operationAt,
-            transactions.operationDate,
-            transactions.createdAt,
-            transactions.type,
-            transactions.status,
-            transactions.updatedAt,
-            transactions.transferId,
-            transactions.recurringRuleId
-        FROM transactions
-        LEFT JOIN categories ON categories.id = transactions.categoryId
-        ORDER BY transactions.operationDate DESC, transactions.operationAt DESC, transactions.createdAt DESC
-        """,
-    )
-    fun getAllCategorized(): Flow<List<CategorizedTransactionEntity>>
-
-    @Query(
         "SELECT * FROM transactions WHERE accountId = :accountId ORDER BY operationDate DESC, operationAt DESC, createdAt DESC",
     )
     fun getByAccountId(accountId: String): Flow<List<TransactionEntity>>
 
+    /**
+     * Newest-first page of categorized rows inside an optional `[from, to]` date window, for one
+     * account or — when [accountId] is null — every account.
+     *
+     * One query covers all four combinations via nullable bounds, which keeps a single execution
+     * plan in Room's cache instead of four near-identical statements. `operationDate` is ISO
+     * `YYYY-MM-DD` text, so `>=` / `<=` compare correctly, and the composite
+     * `(accountId, operationDate DESC, ...)` index on [TransactionEntity] serves both the filter
+     * and the ORDER BY for the account-scoped case.
+     *
+     * Opening balances are excluded here rather than in the caller — they are an account
+     * artefact, never a list row. Both the current and the legacy spelling are named because
+     * `TransactionRepositoryImpl.parseType` still maps `INITIAL_BALANCE` onto the same type.
+     *
+     * [limit] is mandatory: paging grows the limit rather than offsetting, so rows inserted while
+     * the user scrolls cannot shift the already-visible prefix.
+     */
     @Query(
         """
         SELECT
@@ -72,11 +62,50 @@ interface TransactionDao {
             transactions.recurringRuleId
         FROM transactions
         LEFT JOIN categories ON categories.id = transactions.categoryId
-        WHERE transactions.accountId = :accountId
+        WHERE (:accountId IS NULL OR transactions.accountId = :accountId)
+          AND (:from IS NULL OR transactions.operationDate >= :from)
+          AND (:to IS NULL OR transactions.operationDate <= :to)
+          AND transactions.type NOT IN ('OPENING_BALANCE', 'INITIAL_BALANCE')
         ORDER BY transactions.operationDate DESC, transactions.operationAt DESC, transactions.createdAt DESC
+        LIMIT :limit
         """,
     )
-    fun getByAccountIdCategorized(accountId: String): Flow<List<CategorizedTransactionEntity>>
+    fun getCategorizedWindow(
+        accountId: String?,
+        from: String?,
+        to: String?,
+        limit: Int,
+    ): Flow<List<CategorizedTransactionEntity>>
+
+    /**
+     * Per-type, per-currency magnitude sums over the whole window described by
+     * [getCategorizedWindow] — unaffected by that query's `LIMIT`, so a summary built from these
+     * stays correct while pages load.
+     *
+     * Also grouped by the amount's sign: the legacy `REGULAR` type is resolved to income/expense
+     * from the sign (see `TransactionRepositoryImpl.parseType`), which is only possible if rows
+     * of either sign are not already summed together.
+     */
+    @Query(
+        """
+        SELECT
+            transactions.type AS type,
+            transactions.currencyCode AS currencyCode,
+            (transactions.amount < 0) AS isNegative,
+            SUM(ABS(transactions.amount)) AS total
+        FROM transactions
+        WHERE (:accountId IS NULL OR transactions.accountId = :accountId)
+          AND (:from IS NULL OR transactions.operationDate >= :from)
+          AND (:to IS NULL OR transactions.operationDate <= :to)
+          AND transactions.type NOT IN ('OPENING_BALANCE', 'INITIAL_BALANCE')
+        GROUP BY transactions.type, transactions.currencyCode, isNegative
+        """,
+    )
+    fun getTotals(
+        accountId: String?,
+        from: String?,
+        to: String?,
+    ): Flow<List<TransactionTotalEntity>>
 
     @Query(
         "SELECT * FROM transactions WHERE workspaceId = :workspaceId ORDER BY operationDate DESC, operationAt DESC, createdAt DESC",

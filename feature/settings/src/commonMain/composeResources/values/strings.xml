@@ -267,6 +267,8 @@
     <string name="settings_about_copyright">© 2026 Georgy Balabaichkin. Released under the MIT License.\nMoneySurfer is an open-source personal-finance tracker — not a bank or money-transmission service.</string>
     <string name="settings_categories_title">Categories</string>
     <string name="settings_categories_supporting">Manage your spending and income categories</string>
+    <string name="settings_budgets_title">Budgets</string>
+    <string name="settings_budgets_supporting">Set limits and watch what you spend against them</string>
 
     <!-- User-account deletion flow (issue #213) — wording must stay in sync with the hosted
          account-deletion page (georgeci.github.io/account-deletion.html). -->

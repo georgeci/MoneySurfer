@@ -6,6 +6,7 @@ import com.georgeci.moneysurfer.domain.fixtures.transactionId
 import com.georgeci.moneysurfer.domain.model.Account
 import com.georgeci.moneysurfer.domain.model.CategorizedTransaction
 import com.georgeci.moneysurfer.domain.model.Transaction
+import com.georgeci.moneysurfer.domain.model.TransactionTotal
 import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.Money
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
@@ -14,6 +15,7 @@ import com.georgeci.moneysurfer.domain.primitives.TransactionType
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 import com.georgeci.moneysurfer.domain.repositories.AccountRepository
 import com.georgeci.moneysurfer.domain.repositories.TransactionRepository
+import com.georgeci.moneysurfer.domain.util.TransactionPeriodWindow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.flow.Flow
@@ -82,11 +84,17 @@ private class RecalcEnv(rows: List<Transaction>) {
 
     private val txRepo = object : TransactionRepository {
         override fun getAll(): Flow<List<Transaction>> = flowOf(rows)
-        override fun getAllCategorized(): Flow<List<CategorizedTransaction>> = flowOf(emptyList())
         override fun getByAccountId(accountId: AccountId): Flow<List<Transaction>> =
             flowOf(rows.filter { it.accountId == accountId })
-        override fun getByAccountIdCategorized(accountId: AccountId): Flow<List<CategorizedTransaction>> =
-            flowOf(emptyList())
+        override fun getCategorizedWindow(
+            accountId: AccountId?,
+            window: TransactionPeriodWindow,
+            limit: Int,
+        ): Flow<List<CategorizedTransaction>> = flowOf(emptyList())
+        override fun getTotals(
+            accountId: AccountId?,
+            window: TransactionPeriodWindow,
+        ): Flow<List<TransactionTotal>> = flowOf(emptyList())
         override fun getByWorkspaceId(workspaceId: WorkspaceId): Flow<List<Transaction>> = flowOf(rows)
         override suspend fun getById(id: TransactionId): Transaction? = rows.find { it.id == id }
         override suspend fun insert(transaction: Transaction) {}

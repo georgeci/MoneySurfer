@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="budget_days_left">
+        <item quantity="one">остался %1$d день</item>
+        <item quantity="few">осталось %1$d дня</item>
+        <item quantity="many">осталось %1$d дней</item>
+        <item quantity="other">осталось %1$d дней</item>
+    </plurals>
+    <plurals name="budget_days_elapsed">
+        <item quantity="one">прошёл %1$d день</item>
+        <item quantity="few">прошло %1$d дня</item>
+        <item quantity="many">прошло %1$d дней</item>
+        <item quantity="other">прошло %1$d дней</item>
+    </plurals>
+</resources>

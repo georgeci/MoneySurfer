@@ -12,7 +12,6 @@ import com.georgeci.moneysurfer.domain.fixtures.categoryId
 import com.georgeci.moneysurfer.domain.fixtures.dollars
 import com.georgeci.moneysurfer.domain.fixtures.workspaceId
 import com.georgeci.moneysurfer.domain.model.Account
-import com.georgeci.moneysurfer.domain.model.CategorizedTransaction
 import com.georgeci.moneysurfer.domain.model.Category
 import com.georgeci.moneysurfer.domain.model.Transaction
 import com.georgeci.moneysurfer.domain.primitives.AccountId
@@ -34,6 +33,7 @@ import com.georgeci.moneysurfer.domain.usecase.GetCategoriesUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetCurrentTimeUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetTransactionByIdUseCase
 import com.georgeci.moneysurfer.domain.usecase.UpdateTransactionUseCase
+import com.georgeci.moneysurfer.domain.util.TransactionPeriodWindow
 import com.georgeci.moneysurfer.navigation.SnackbarController
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
@@ -474,9 +474,13 @@ private class FakeTransactionRepository : TransactionRepository {
     private val all = MutableStateFlow<List<Transaction>>(emptyList())
 
     override fun getAll(): Flow<List<Transaction>> = all
-    override fun getAllCategorized(): Flow<List<CategorizedTransaction>> = error("not used")
     override fun getByAccountId(accountId: AccountId): Flow<List<Transaction>> = all
-    override fun getByAccountIdCategorized(accountId: AccountId) = error("not used")
+    override fun getCategorizedWindow(
+        accountId: AccountId?,
+        window: TransactionPeriodWindow,
+        limit: Int,
+    ) = error("not used")
+    override fun getTotals(accountId: AccountId?, window: TransactionPeriodWindow) = error("not used")
     override fun getByWorkspaceId(workspaceId: WorkspaceId): Flow<List<Transaction>> = all
     override suspend fun getById(id: TransactionId): Transaction? = byId[id]
     override suspend fun insert(transaction: Transaction) {

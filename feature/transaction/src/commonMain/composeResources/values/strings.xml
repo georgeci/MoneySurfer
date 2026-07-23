@@ -10,6 +10,73 @@
     <string name="transactions_list_summary_income">Income</string>
     <string name="transactions_list_summary_expenses">Expenses</string>
     <string name="transactions_list_summary_net">Net</string>
+    <string name="transactions_list_untitled">Transaction</string>
+
+    <!-- Transactions list — period pager -->
+    <string name="transactions_list_period_all_time">All time</string>
+    <string name="transactions_list_period_all_time_sub">No date filter</string>
+    <!-- ISO week number and its week-based year, e.g. "W13 · 2025" -->
+    <string name="transactions_list_period_week_sub">W%1$d · %2$d</string>
+    <!-- Inclusive day range inside one week, e.g. "Mar 25 – 31" -->
+    <string name="transactions_list_period_week_range">%1$s %2$d – %3$d</string>
+    <!-- Same, when the week straddles two months, e.g. "Mar 30 – Apr 5" -->
+    <string name="transactions_list_period_week_range_cross_month">%1$s %2$d – %3$s %4$d</string>
+    <string name="transactions_list_period_previous">Previous period</string>
+    <string name="transactions_list_period_next">Next period</string>
+    <string name="transactions_list_period_mode_month">Month</string>
+    <string name="transactions_list_period_mode_week">Week</string>
+    <string name="transactions_list_period_mode_all_time">All time</string>
+    <string name="transactions_list_date_today">Today</string>
+    <string name="transactions_list_date_yesterday">Yesterday</string>
+    <!-- Day-group header for any other date, e.g. "25 March 2025" -->
+    <string name="transactions_list_date_full">%1$d %2$s %3$d</string>
+
+    <!-- Nominative — the pager label stands alone ("March") -->
+    <string-array name="transactions_list_months">
+        <item>January</item>
+        <item>February</item>
+        <item>March</item>
+        <item>April</item>
+        <item>May</item>
+        <item>June</item>
+        <item>July</item>
+        <item>August</item>
+        <item>September</item>
+        <item>October</item>
+        <item>November</item>
+        <item>December</item>
+    </string-array>
+
+    <!-- English needs no case distinction; kept as a separate array because Russian does -->
+    <string-array name="transactions_list_months_genitive">
+        <item>January</item>
+        <item>February</item>
+        <item>March</item>
+        <item>April</item>
+        <item>May</item>
+        <item>June</item>
+        <item>July</item>
+        <item>August</item>
+        <item>September</item>
+        <item>October</item>
+        <item>November</item>
+        <item>December</item>
+    </string-array>
+
+    <string-array name="transactions_list_months_short">
+        <item>Jan</item>
+        <item>Feb</item>
+        <item>Mar</item>
+        <item>Apr</item>
+        <item>May</item>
+        <item>Jun</item>
+        <item>Jul</item>
+        <item>Aug</item>
+        <item>Sep</item>
+        <item>Oct</item>
+        <item>Nov</item>
+        <item>Dec</item>
+    </string-array>
 
     <!-- Transaction creation / edit -->
     <string name="transaction_creation_title_create">New transaction</string>

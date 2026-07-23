@@ -10,6 +10,7 @@ import com.georgeci.moneysurfer.domain.preferences.ContainerStyle
 import com.georgeci.moneysurfer.domain.preferences.PaletteSource
 import com.georgeci.moneysurfer.domain.preferences.ThemeMode
 import com.georgeci.moneysurfer.feature.account.accountNavGraph
+import com.georgeci.moneysurfer.feature.budget.budgetNavGraph
 import com.georgeci.moneysurfer.feature.category.categoryNavGraph
 import com.georgeci.moneysurfer.feature.dashboard.dashboardNavGraph
 import com.georgeci.moneysurfer.feature.goal.goalNavGraph
@@ -54,6 +55,7 @@ fun App(
                 dashboardNavGraph,
                 accountNavGraph,
                 categoryNavGraph,
+                budgetNavGraph,
                 goalNavGraph,
                 transactionNavGraph,
                 settingsNavGraph,

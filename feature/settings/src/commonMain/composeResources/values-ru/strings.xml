@@ -267,6 +267,8 @@
     <string name="settings_about_copyright">© 2026 Георгий Балабайчкин. Распространяется по лицензии MIT.\nMoneySurfer — приложение с открытым исходным кодом для учёта личных финансов, не банк и не платёжный сервис.</string>
     <string name="settings_categories_title">Категории</string>
     <string name="settings_categories_supporting">Управление категориями расходов и доходов</string>
+    <string name="settings_budgets_title">Бюджеты</string>
+    <string name="settings_budgets_supporting">Лимиты трат и прогресс по ним</string>
 
     <!-- Удаление аккаунта пользователя (issue #213) — формулировки синхронизированы со
          страницей georgeci.github.io/account-deletion.html. -->

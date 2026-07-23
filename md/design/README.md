@@ -1,4 +1,4 @@
-# Design mirror — Budgets, Goals & Settings
+# Design mirror — Budgets, Goals, Settings & Transactions
 
 Local partial mirror of the **MoneySurfer** Claude Design project:
 <https://claude.ai/design/p/019dd9e9-bcad-78f3-a4b9-49cde06a75ac>
@@ -10,6 +10,7 @@ Local partial mirror of the **MoneySurfer** Claude Design project:
 | `budget-data.jsx` | `budget-data.jsx` — seed budgets + per-budget tx | 2026-07-21 |
 | `goals-data.jsx` | `goals-data.jsx` — seed goals, contributions, status/forecast tone maps | 2026-07-21 |
 | `settings-screens.jsx` | `settings-screens.jsx` — the 8 Settings screens, row-by-row | 2026-07-22 |
+| `screen-chrome.jsx` | `design-system/components/_lib/screen-chrome.jsx` — **excerpt**: `PeriodPager` + `SummaryStrip` | 2026-07-22 |
 
 Settings has no `*-data.jsx`: the row inventory *is* the model, so the screen file is
 mirrored instead. `settings-components.jsx` is summarised below rather than copied.
@@ -102,6 +103,38 @@ Contribution: id, goalId, amount, date, note, auto: Boolean
 
 Note `forecast` / `etaLabel` are **derived**, not stored — they need a pace calculation
 (elapsed vs saved vs remaining days) that does not exist anywhere in the codebase yet.
+
+---
+
+## Transactions — period pager (`screen-chrome.jsx`, `period-pager.html`)
+
+Reference for [issue #261](https://github.com/georgeci/MoneySurfer/issues/261): the transactions
+list gained a period pager and a period-scoped summary strip. Shipped as
+`uikit/.../components/base/SurferPeriodPager.kt`.
+
+`PeriodPager` — a 40dp pill on `surfaceContainerLow`, radius 20, 6dp horizontal padding, with
+32dp circular arrow slots tinted `onSurfaceVariant` (40% alpha when disabled) and a centred
+`titleSmall`/600 label plus a `labelSmall`/400 sub-label, baseline-aligned, 6dp apart.
+
+| Mode | Label | Sub-label | Arrows |
+|---|---|---|---|
+| Month | `March` | `2025` | both |
+| Week | `Mar 25 – 31` | `W13 · 2025` | both |
+| All time | `All time` | `No date filter` | disabled |
+
+Two deliberate departures from the design in the shipped screen:
+
+- `TransactionsScreen` **hides** the pager in all-time mode; the app keeps it visible with
+  disabled arrows (the `period-pager.html` all-time variant) because the pill's label is also
+  the period-mode menu — hiding it would strand the user with no way back.
+- The design never drew a mode switcher at all. Tapping the label opens a `DropdownMenu`
+  (Month / Week / All time); the choice persists via `UiPreferences.transactionsPeriodMode`.
+
+`SummaryStrip` is the existing Income · Expenses · Net strip, unchanged visually — the change is
+that its numbers now come from a SQL aggregation over the selected period rather than a fold over
+the whole loaded history.
+
+The design's search field and filter badge (`txn-screens.jsx` lines 642–680) are **not** built yet.
 
 ---
 

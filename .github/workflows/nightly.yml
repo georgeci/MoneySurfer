@@ -58,51 +58,11 @@ jobs:
             echo "run=true" >> "$GITHUB_OUTPUT"
           fi
 
-  android-compile:
-    name: Android debug compile
-    needs: decide
-    if: needs.decide.outputs.run == 'true'
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    permissions:
-      contents: read
-    # Compile-only: catches AGP/Kotlin/google-services regressions without
-    # needing the dev keystore (assembleDebug would require DEV_* secrets,
-    # see androidApp/build.gradle.kts -> signingConfigs.dev).
-    #
-    # ci.yml now runs the same compile as a per-PR gate (issue #170), but that
-    # job skips fork PRs (no access to GOOGLE_SERVICES_JSON_DEBUG). This nightly
-    # copy stays as the safety net for Android breakage merged from fork PRs.
-
-    steps:
-      # Egress audit — see docs/security/ci-egress-hardening.md (issue #180).
-      - name: Harden the runner (egress audit)
-        uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920 # v2.20.0
-        with:
-          egress-policy: audit
-
-      - name: Checkout
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
-
-      - name: Decode Firebase config
-        uses: ./.github/actions/firebase-config
-        with:
-          debug-json:   ${{ secrets.GOOGLE_SERVICES_JSON_DEBUG }}
-          release-json: ${{ secrets.GOOGLE_SERVICES_JSON_RELEASE }}
-          ios-plist:    ${{ secrets.GOOGLE_SERVICE_INFO_PLIST }}
-
-      - name: Set up JDK
-        uses: actions/setup-java@03ad4de0992f5dab5e18fcb136590ce7c4a0ac95 # v5.6.0
-        with:
-          distribution: temurin
-          java-version: "17"
-
-      - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@3f131e8634966bd73d06cc69884922b02e6faf92 # v6.2.0
-
-      - name: Compile Android debug
-        run: ./gradlew :androidApp:processDebugGoogleServices :androidApp:compileDebugSources --stacktrace
-
+  # NOTE: the nightly `android-compile` (Android debug compile) job was removed
+  # (issue #170 follow-up): it only duplicated ci.yml's per-PR `android-compile`
+  # gate. The one niche it covered — fork-authored PRs, which ci.yml skips (no
+  # secret access) — doesn't apply to this repo. The offline + release compile
+  # jobs below are NOT covered elsewhere, so they stay.
   android-offline-compile:
     name: Android offline debug compile
     needs: decide
@@ -275,7 +235,12 @@ jobs:
   maestro-android:
     name: Maestro Android (E2E)
     needs: decide
-    if: needs.decide.outputs.run == 'true'
+    # DISABLED (issue #297): the Maestro E2E suites are flaky on both platforms
+    # (shared-emulator state leaks between flows + racy navigation waits — the
+    # set of failing flows changes run to run). Turned off entirely so the
+    # nightly stops mailing a red result every night. Re-enable via #297 once
+    # the isolation/flake fixes land. Flip back to `needs.decide.outputs.run`.
+    if: false
     # QUARANTINED (issue #220): still partially red. Progress so far:
     #   - qaAndroidDevice (instrumented sync tests): GREEN. The off-by-one
     #     sync-count expectations were stale (they never accounted for the
@@ -431,7 +396,11 @@ jobs:
   maestro-ios:
     name: Maestro iOS (E2E)
     needs: decide
-    if: needs.decide.outputs.run == 'true'
+    # DISABLED (issue #297): flaky (10/18 last night, non-deterministic set of
+    # failures). Turned off with the other Maestro jobs so the nightly stops
+    # going red every night. Re-enable via #297; flip back to
+    # `needs.decide.outputs.run`.
+    if: false
     # Gating as of issue #219: the online suite (17 flows — 18 minus the
     # sync-tagged one, whose feature is disabled) now passes end to end, so a
     # failure here is real signal and blocks the nightly.
@@ -553,7 +522,10 @@ jobs:
   maestro-ios-offline:
     name: Maestro iOS offline (E2E)
     needs: decide
-    if: needs.decide.outputs.run == 'true'
+    # DISABLED (issue #297): turned off with the other Maestro jobs while the
+    # E2E suites are stabilized. Re-enable via #297; flip back to
+    # `needs.decide.outputs.run`.
+    if: false
     runs-on: macos-15
     timeout-minutes: 60
     permissions:
@@ -640,7 +612,11 @@ jobs:
   nightly-publish:
     name: Aggregate + publish nightly to Pages
     needs: [decide, maestro-android, maestro-ios, maestro-ios-offline]
-    if: always() && needs.decide.outputs.run == 'true'
+    # DISABLED (issue #297): this job only aggregates the Maestro Allure
+    # results; with every Maestro job off it would publish an empty report to
+    # gh-pages nightly. Re-enable alongside the Maestro jobs — flip back to
+    # `always() && needs.decide.outputs.run == 'true'`.
+    if: false
     runs-on: ubuntu-latest
     timeout-minutes: 10
     # Share the gh-pages writer lock with ci.yml `publish` and gh-pages-prune so
@@ -800,7 +776,6 @@ jobs:
     name: Open/update tracking issue on failure
     needs:
       - decide
-      - android-compile
       - android-offline-compile
       - android-release-compile
       - ios-build

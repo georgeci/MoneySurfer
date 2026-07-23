@@ -1,0 +1,67 @@
+appId: ${APP_ID}
+name: Budgets — Create a budget and see it on the list
+---
+# Settings → Budgets → New budget → name + limit → save → the card is on the list.
+# Pre-condition: an active workspace; piggyback on the dashboard baseline.
+
+- runFlow: 03_dashboard_add_account.yaml
+
+- tapOn:
+    text: "Settings"
+
+- assertVisible:
+    text: "Settings"
+
+- scrollUntilVisible:
+    element:
+      text: "Budgets"
+    direction: DOWN
+- tapOn:
+    text: "Budgets"
+
+# Budgets list. The "New budget" FAB carries an explicit contentDescription
+# (BudgetsScreen), which Maestro matches by `text:` on Android.
+- assertVisible:
+    id: "budgets:root"
+
+- runFlow:
+    when:
+      notVisible: "Coffee cap"
+    commands:
+      - tapOn:
+          id: "budgets:add"
+
+      # Create screen: name, limit, then save. Period defaults to Monthly and
+      # the category chips default to "All categories", so a general budget
+      # needs nothing else filled in.
+      - assertVisible:
+          text: "New budget"
+      - assertVisible:
+          text: "All categories"
+      - tapOn:
+          id: "budgetEdit:name"
+      - inputText: "Coffee cap"
+      - tapOn:
+          id: "budgetEdit:amount"
+      - inputText: "150"
+      - hideKeyboard
+      - tapOn:
+          id: "budgetEdit:save"
+
+# Back on the list with the new card, showing its spend against the limit.
+- assertVisible:
+    id: "budgets:root"
+- scrollUntilVisible:
+    element:
+      text: "Coffee cap"
+    direction: DOWN
+- assertVisible:
+    text: "Coffee cap"
+
+# Open it: the details hero shows the ring and the forecast tiles.
+- tapOn:
+    text: "Coffee cap"
+- assertVisible:
+    id: "budgetDetails:root"
+- assertVisible:
+    text: "Daily average"

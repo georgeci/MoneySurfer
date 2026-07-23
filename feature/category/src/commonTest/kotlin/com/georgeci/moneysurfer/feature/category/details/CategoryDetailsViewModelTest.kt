@@ -12,6 +12,7 @@ import com.georgeci.moneysurfer.domain.model.Category
 import com.georgeci.moneysurfer.domain.model.CategoryMonthlyTotal
 import com.georgeci.moneysurfer.domain.model.CategorySpendHistory
 import com.georgeci.moneysurfer.domain.model.Transaction
+import com.georgeci.moneysurfer.domain.model.TransactionTotal
 import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.CategoryId
 import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
@@ -25,6 +26,7 @@ import com.georgeci.moneysurfer.domain.repositories.TransactionRepository
 import com.georgeci.moneysurfer.domain.usecase.GetCategoriesUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetCategorySpendHistoryUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetTransactionsByCategoryUseCase
+import com.georgeci.moneysurfer.domain.util.TransactionPeriodWindow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
@@ -34,6 +36,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
@@ -274,17 +277,25 @@ private class FakeTransactionRepository(
     private val flow = MutableStateFlow(transactions)
 
     override fun getAll(): Flow<List<Transaction>> = flow
-    override fun getAllCategorized(): Flow<List<CategorizedTransaction>> =
-        flow.map { list -> list.map { CategorizedTransaction(it, categoryName = null) } }
 
     override fun getByAccountId(accountId: AccountId): Flow<List<Transaction>> =
         flow.map { list -> list.filter { it.accountId == accountId } }
 
-    override fun getByAccountIdCategorized(accountId: AccountId): Flow<List<CategorizedTransaction>> =
-        flow.map { list ->
-            list.filter { it.accountId == accountId }
-                .map { CategorizedTransaction(it, categoryName = null) }
-        }
+    override fun getCategorizedWindow(
+        accountId: AccountId?,
+        window: TransactionPeriodWindow,
+        limit: Int,
+    ): Flow<List<CategorizedTransaction>> = flow.map { list ->
+        list.filter { accountId == null || it.accountId == accountId }
+            .filter { it.operationDate in window }
+            .take(limit)
+            .map { CategorizedTransaction(it, categoryName = null) }
+    }
+
+    override fun getTotals(
+        accountId: AccountId?,
+        window: TransactionPeriodWindow,
+    ): Flow<List<TransactionTotal>> = flowOf(emptyList())
 
     override fun getByWorkspaceId(workspaceId: WorkspaceId): Flow<List<Transaction>> = flow
     override suspend fun getById(id: TransactionId): Transaction? = flow.value.firstOrNull { it.id == id }

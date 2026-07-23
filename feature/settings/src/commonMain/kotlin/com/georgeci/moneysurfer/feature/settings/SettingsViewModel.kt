@@ -140,12 +140,26 @@ class SettingsViewModel(
         }
     }
 
-    /** Plain event → destination mapping; stateful events are handled in [onEvent]. */
-    private fun navigationEffect(event: SettingsEvent): SettingsEffect? = when (event) {
+    /**
+     * Plain event → destination mapping; stateful events are handled in [onEvent].
+     *
+     * Split along the screen's own sections rather than kept as one long `when`, so adding a
+     * settings row stays a one-line change instead of tipping a single mapper over the
+     * complexity limit.
+     */
+    private fun navigationEffect(event: SettingsEvent): SettingsEffect? =
+        workspaceNavigationEffect(event) ?: appNavigationEffect(event)
+
+    private fun workspaceNavigationEffect(event: SettingsEvent): SettingsEffect? = when (event) {
         SettingsEvent.OnBackClick -> SettingsEffect.NavigateBack
         SettingsEvent.OnChangeWorkspaceClick -> SettingsEffect.NavigateToWorkspaceSelector
         SettingsEvent.OnIncomingInvitesClick -> SettingsEffect.NavigateToIncomingInvites
         SettingsEvent.OnCategoriesClick -> SettingsEffect.NavigateToCategories
+        SettingsEvent.OnBudgetsClick -> SettingsEffect.NavigateToBudgets
+        else -> null
+    }
+
+    private fun appNavigationEffect(event: SettingsEvent): SettingsEffect? = when (event) {
         SettingsEvent.OnAppearanceClick -> SettingsEffect.NavigateToAppearance
         SettingsEvent.OnPreferencesClick -> SettingsEffect.NavigateToPreferences
         SettingsEvent.OnSyncClick -> SettingsEffect.NavigateToSync
@@ -153,11 +167,7 @@ class SettingsViewModel(
         SettingsEvent.OnCsvBackupClick -> SettingsEffect.NavigateToCsvBackup
         SettingsEvent.OnAboutClick -> SettingsEffect.NavigateToAbout
         SettingsEvent.OnDeleteAccountClick -> SettingsEffect.NavigateToDeleteAccount
-        SettingsEvent.OnMembersClick,
-        SettingsEvent.OnLogoutClick,
-        SettingsEvent.OnGuestLogoutDismissed,
-        SettingsEvent.OnGuestLogoutConfirmed,
-        -> null
+        else -> null
     }
 
     private fun logout() {
@@ -194,6 +204,7 @@ sealed interface SettingsEvent {
     data object OnIncomingInvitesClick : SettingsEvent
     data object OnMembersClick : SettingsEvent
     data object OnCategoriesClick : SettingsEvent
+    data object OnBudgetsClick : SettingsEvent
     data object OnAppearanceClick : SettingsEvent
     data object OnPreferencesClick : SettingsEvent
     data object OnSyncClick : SettingsEvent
@@ -212,6 +223,7 @@ sealed interface SettingsEffect {
     data object NavigateToIncomingInvites : SettingsEffect
     data class NavigateToMembers(val workspaceId: WorkspaceId) : SettingsEffect
     data object NavigateToCategories : SettingsEffect
+    data object NavigateToBudgets : SettingsEffect
     data object NavigateToAppearance : SettingsEffect
     data object NavigateToPreferences : SettingsEffect
     data object NavigateToSync : SettingsEffect

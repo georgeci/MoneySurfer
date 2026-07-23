@@ -3,6 +3,7 @@ package com.georgeci.moneysurfer.di
 import com.georgeci.moneysurfer.data.di.LocalDataModule
 import com.georgeci.moneysurfer.domain.di.DomainModule
 import com.georgeci.moneysurfer.feature.account.di.AccountModule
+import com.georgeci.moneysurfer.feature.budget.di.BudgetModule
 import com.georgeci.moneysurfer.feature.category.di.CategoryModule
 import com.georgeci.moneysurfer.feature.dashboard.di.DashboardModule
 import com.georgeci.moneysurfer.feature.goal.di.GoalModule
@@ -34,6 +35,7 @@ import org.koin.core.annotation.Module
         WorkspaceModule::class,
         CategoryModule::class,
         AccountModule::class,
+        BudgetModule::class,
         GoalModule::class,
     ],
 )

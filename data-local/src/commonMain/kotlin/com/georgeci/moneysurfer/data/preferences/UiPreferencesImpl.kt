@@ -6,6 +6,7 @@ import com.georgeci.moneysurfer.domain.preferences.ContainerStyle
 import com.georgeci.moneysurfer.domain.preferences.PaletteSource
 import com.georgeci.moneysurfer.domain.preferences.Pref
 import com.georgeci.moneysurfer.domain.preferences.ThemeMode
+import com.georgeci.moneysurfer.domain.preferences.TransactionPeriodMode
 import com.georgeci.moneysurfer.domain.preferences.UiPreferences
 import org.koin.core.annotation.Single
 import com.georgeci.moneysurfer.data.datastore.isDynamicColorAvailable as platformIsDynamicColorAvailable
@@ -32,6 +33,13 @@ class UiPreferencesImpl(
     override val containerStyle: Pref<ContainerStyle> = src.containerStyle.asPref(
         fromStored = { stored -> runCatching { ContainerStyle.valueOf(stored) }.getOrDefault(ContainerStyle.Card) },
         toStored = { style -> style.name },
+    )
+
+    override val transactionsPeriodMode: Pref<TransactionPeriodMode> = src.transactionsPeriodMode.asPref(
+        fromStored = { stored ->
+            runCatching { TransactionPeriodMode.valueOf(stored) }.getOrDefault(TransactionPeriodMode.DEFAULT)
+        },
+        toStored = { mode -> mode.name },
     )
 }
 
