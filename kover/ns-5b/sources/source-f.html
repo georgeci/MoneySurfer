@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > WorkspaceSyncer</title>
+  <title>MoneySurfer Coverage Report > SavingsGoalRepository</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.repositories</a>
 </div>
 
-<h1>Coverage Summary for Class: WorkspaceSyncer (com.georgeci.moneysurfer.domain.repositories)</h1>
+<h1>Coverage Summary for Class: SavingsGoalRepository (com.georgeci.moneysurfer.domain.repositories)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">WorkspaceSyncer</td>
+  <td class="name">SavingsGoalRepository</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -46,30 +46,26 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.repositories
 &nbsp;
+&nbsp;import com.georgeci.moneysurfer.domain.model.SavingsGoal
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.GoalId
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
+&nbsp;import kotlinx.coroutines.flow.Flow
 &nbsp;
-&nbsp;/**
-&nbsp; * Triggers sync operations without exposing the sync infrastructure to domain use cases.
-&nbsp; *
-&nbsp; * [pushAll] drains the outbox (push-only, no remote discovery).
-&nbsp; * [syncAll] fetches the authoritative workspace list from the remote user doc and
-&nbsp; * runs a full cursor-based pull for every workspace — including ones not yet local.
-&nbsp; * [syncWorkspace] pulls a single specific workspace; used after accepting an invite so
-&nbsp; * only the newly joined workspace is hydrated without re-syncing everything.
-&nbsp; */
-&nbsp;interface WorkspaceSyncer {
-&nbsp;    /** Push all pending outbox mutations. Throws on error. */
-&nbsp;    suspend fun pushAll()
+&nbsp;interface SavingsGoalRepository {
+&nbsp;    fun getByWorkspaceId(workspaceId: WorkspaceId): Flow&lt;List&lt;SavingsGoal&gt;&gt;
+&nbsp;    suspend fun getById(id: GoalId): SavingsGoal?
 &nbsp;
-&nbsp;    /** Push outbox + pull all user workspaces (including undiscovered ones). Throws on error. */
-&nbsp;    suspend fun syncAll()
+&nbsp;    /** Emits `null` once the goal is deleted. */
+&nbsp;    fun observeById(id: GoalId): Flow&lt;SavingsGoal?&gt;
+&nbsp;    suspend fun insert(goal: SavingsGoal)
+&nbsp;    suspend fun update(goal: SavingsGoal)
 &nbsp;
 &nbsp;    /**
-&nbsp;     * Push outbox + pull a single workspace by [workspaceId].
-&nbsp;     * Sets the active workspace to [workspaceId] for the duration of the sync so
-&nbsp;     * [SyncScope.ActiveWorkspace] targets the correct workspace.
+&nbsp;     * Hard-deletes the goal and, through Room&#39;s cascade, its contributions.
+&nbsp;     * Contribution deletes are enqueued on the outbox explicitly — Firestore has
+&nbsp;     * no cascade, so silently dropped local rows would leave remote orphans.
 &nbsp;     */
-&nbsp;    suspend fun syncWorkspace(workspaceId: WorkspaceId)
+&nbsp;    suspend fun delete(id: GoalId)
 &nbsp;}
 </code>
 </pre>
@@ -94,7 +90,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-23 14:37</div>
+    <div style="float:right;">generated on 2026-07-23 14:54</div>
 </div>
 </body>
 </html>

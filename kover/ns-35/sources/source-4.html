@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > PendingMutationDao</title>
+  <title>MoneySurfer Coverage Report > SyncMetaDao</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.sync.db.dao</a>
 </div>
 
-<h1>Coverage Summary for Class: PendingMutationDao (com.georgeci.moneysurfer.sync.db.dao)</h1>
+<h1>Coverage Summary for Class: SyncMetaDao (com.georgeci.moneysurfer.sync.db.dao)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">PendingMutationDao</td>
+  <td class="name">SyncMetaDao</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -47,49 +47,32 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.sync.db.dao
 &nbsp;
 &nbsp;import androidx.room.Dao
-&nbsp;import androidx.room.Insert
 &nbsp;import androidx.room.Query
-&nbsp;import com.georgeci.moneysurfer.sync.db.entity.PendingMutationEntity
+&nbsp;import androidx.room.Upsert
+&nbsp;import com.georgeci.moneysurfer.sync.db.entity.SyncMetaEntity
 &nbsp;import kotlinx.coroutines.flow.Flow
 &nbsp;
 &nbsp;@Dao
-&nbsp;interface PendingMutationDao {
-&nbsp;
-&nbsp;    @Insert
-&nbsp;    suspend fun insert(entity: PendingMutationEntity)
+&nbsp;interface SyncMetaDao {
 &nbsp;
 &nbsp;    @Query(
 &nbsp;        &quot;&quot;&quot;
-&nbsp;        SELECT * FROM pending_mutations
-&nbsp;        WHERE status = &#39;PENDING&#39;
-&nbsp;          AND (:workspaceId IS NULL OR workspaceId = :workspaceId OR workspaceId IS NULL)
-&nbsp;        ORDER BY createdAt ASC
-&nbsp;        LIMIT :limit
+&nbsp;        SELECT * FROM sync_meta
+&nbsp;        WHERE workspaceId = :workspaceId AND collection = :collection
 &nbsp;        &quot;&quot;&quot;,
 &nbsp;    )
-&nbsp;    suspend fun pending(workspaceId: String?, limit: Int): List&lt;PendingMutationEntity&gt;
+&nbsp;    suspend fun get(workspaceId: String, collection: String): SyncMetaEntity?
 &nbsp;
-&nbsp;    @Query(&quot;UPDATE pending_mutations SET status = &#39;IN_FLIGHT&#39; WHERE id IN (:ids)&quot;)
-&nbsp;    suspend fun markInFlight(ids: List&lt;String&gt;)
+&nbsp;    @Upsert
+&nbsp;    suspend fun upsert(entity: SyncMetaEntity)
 &nbsp;
-&nbsp;    @Query(&quot;DELETE FROM pending_mutations WHERE id IN (:ids)&quot;)
-&nbsp;    suspend fun deleteByIds(ids: List&lt;String&gt;)
+&nbsp;    @Query(&quot;SELECT * FROM sync_meta WHERE workspaceId = :workspaceId&quot;)
+&nbsp;    fun observeByWorkspace(workspaceId: String): Flow&lt;List&lt;SyncMetaEntity&gt;&gt;
 &nbsp;
-&nbsp;    @Query(
-&nbsp;        &quot;&quot;&quot;
-&nbsp;        UPDATE pending_mutations
-&nbsp;        SET status = &#39;PENDING&#39;,
-&nbsp;            attempts = attempts + 1,
-&nbsp;            lastError = :error
-&nbsp;        WHERE id = :id
-&nbsp;        &quot;&quot;&quot;,
-&nbsp;    )
-&nbsp;    suspend fun markFailed(id: String, error: String)
+&nbsp;    @Query(&quot;DELETE FROM sync_meta WHERE workspaceId = :workspaceId&quot;)
+&nbsp;    suspend fun deleteByWorkspace(workspaceId: String)
 &nbsp;
-&nbsp;    @Query(&quot;SELECT COUNT(*) FROM pending_mutations WHERE status != &#39;IN_FLIGHT&#39;&quot;)
-&nbsp;    fun pendingCount(): Flow&lt;Int&gt;
-&nbsp;
-&nbsp;    @Query(&quot;DELETE FROM pending_mutations&quot;)
+&nbsp;    @Query(&quot;DELETE FROM sync_meta&quot;)
 &nbsp;    suspend fun deleteAll()
 &nbsp;}
 </code>
@@ -115,7 +98,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-23 14:37</div>
+    <div style="float:right;">generated on 2026-07-23 14:54</div>
 </div>
 </body>
 </html>
