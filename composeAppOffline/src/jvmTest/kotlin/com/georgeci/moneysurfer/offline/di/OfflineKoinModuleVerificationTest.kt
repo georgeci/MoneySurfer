@@ -8,6 +8,7 @@ import com.georgeci.moneysurfer.di.module
 import com.georgeci.moneysurfer.domain.AppInfo
 import com.georgeci.moneysurfer.domain.backup.BackupStorageLocator
 import com.georgeci.moneysurfer.domain.primitives.AccountId
+import com.georgeci.moneysurfer.domain.primitives.BudgetId
 import com.georgeci.moneysurfer.domain.primitives.AccountType
 import com.georgeci.moneysurfer.domain.primitives.CategoryId
 import com.georgeci.moneysurfer.domain.primitives.CategoryType
@@ -47,6 +48,8 @@ class OfflineKoinModuleVerificationTest {
                 CategoryId::class,
                 TransactionId::class,
                 CategoryType::class,
+                // Budget details/edit screens pass the budget id via parametersOf.
+                BudgetId::class,
                 // Goal screens pass the goal id, and the contribution screen its
                 // add/withdraw mode, via parametersOf.
                 GoalId::class,
