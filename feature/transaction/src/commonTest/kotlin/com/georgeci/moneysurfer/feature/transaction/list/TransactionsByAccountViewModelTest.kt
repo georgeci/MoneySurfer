@@ -1,5 +1,7 @@
 package com.georgeci.moneysurfer.feature.transaction.list
 
+import com.georgeci.moneysurfer.domain.fixtures.EUR
+import com.georgeci.moneysurfer.domain.fixtures.USD
 import com.georgeci.moneysurfer.domain.fixtures.aTransaction
 import com.georgeci.moneysurfer.domain.fixtures.accountId
 import com.georgeci.moneysurfer.domain.fixtures.anAccount
@@ -17,6 +19,7 @@ import com.georgeci.moneysurfer.domain.preferences.TransactionPeriodMode
 import com.georgeci.moneysurfer.domain.preferences.UiPreferences
 import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
+import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
 import com.georgeci.moneysurfer.domain.primitives.Money
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
@@ -270,6 +273,22 @@ class TransactionsByAccountViewModelTest : StringSpec({
             state.summary.expenseFormatted shouldBe "−$40.00"
         }
     }
+
+    "the all-accounts summary currency is the dominant one, not the newest row's" {
+        runTest {
+            val env = Env(
+                transactions = listOf(
+                    // Newest, but the smaller total: it must not decide the summary currency.
+                    expense(id = "usd", date = LocalDate(2025, 3, 20), amount = 10, currency = USD),
+                    expense(id = "eur", date = LocalDate(2025, 3, 1), amount = 30, currency = EUR),
+                ),
+            )
+
+            val summary = env.viewModel(accountId = null).content().summary
+
+            summary.expenseFormatted shouldBe "−€30.00"
+        }
+    }
 })
 
 private const val PAGE_SIZE = 200
@@ -277,11 +296,18 @@ private const val PAGE_SIZE = 200
 private val WORKSPACE = WorkspaceId("ws-1")
 private val ACCOUNT = accountId("acc-1")
 
-private fun expense(id: String, date: LocalDate = TODAY, amount: Int): Transaction = aTransaction(
+private fun expense(
+    id: String,
+    date: LocalDate = TODAY,
+    amount: Int,
+    currency: CurrencyCode = USD,
+    account: AccountId = ACCOUNT,
+): Transaction = aTransaction(
     id = transactionId(id),
     workspaceId = WORKSPACE,
-    accountId = ACCOUNT,
+    accountId = account,
     money = amount.dollars,
+    currencyCode = currency,
     operationDate = date,
     operationAt = date.atStartOfDayIn(TimeZone.UTC),
     type = TransactionType.EXPENSE,
@@ -299,13 +325,14 @@ private class Env(transactions: List<Transaction> = emptyList()) {
     val repository = WindowingTransactionRepository(transactions)
     val preferences = FakeUiPreferences()
 
-    fun viewModel(): TransactionsByAccountViewModel = TransactionsByAccountViewModel(
-        accountId = ACCOUNT,
-        getTransactionsByAccount = GetTransactionsByAccountUseCase(repository),
-        getAccountById = GetAccountByIdUseCase(SingleAccountRepository),
-        uiPreferences = preferences,
-        clock = ClockUseCase(FixedClock(TODAY.atStartOfDayIn(TimeZone.UTC))),
-    )
+    fun viewModel(accountId: AccountId? = ACCOUNT): TransactionsByAccountViewModel =
+        TransactionsByAccountViewModel(
+            accountId = accountId,
+            getTransactionsByAccount = GetTransactionsByAccountUseCase(repository),
+            getAccountById = GetAccountByIdUseCase(SingleAccountRepository),
+            uiPreferences = preferences,
+            clock = ClockUseCase(FixedClock(TODAY.atStartOfDayIn(TimeZone.UTC))),
+        )
 }
 
 private class FixedClock(private val instant: Instant) : Clock {

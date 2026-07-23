@@ -357,12 +357,13 @@ private fun LoadMoreOnScrollToEnd(
 ) {
     val shouldLoadMore by remember(enabled) {
         derivedStateOf {
-            if (!enabled) {
-                false
-            } else {
-                val lastVisible = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
-                lastVisible >= listState.layoutInfo.totalItemsCount - LOAD_MORE_THRESHOLD
-            }
+            val layoutInfo = listState.layoutInfo
+            // Guard the pre-measurement frame: before the list is laid out, totalItemsCount is 0
+            // and there are no visible items, which would otherwise satisfy `0 >= 0 - threshold`
+            // and fire a page load with no scroll behind it.
+            val lastVisible = layoutInfo.visibleItemsInfo.lastOrNull()?.index
+            enabled && lastVisible != null &&
+                lastVisible >= layoutInfo.totalItemsCount - LOAD_MORE_THRESHOLD
         }
     }
     LaunchedEffect(shouldLoadMore) {

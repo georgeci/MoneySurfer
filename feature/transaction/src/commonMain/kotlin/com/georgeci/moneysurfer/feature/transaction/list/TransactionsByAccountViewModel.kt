@@ -147,9 +147,7 @@ class TransactionsByAccountViewModel(
     ): TransactionsByAccountState.Content {
         val canLoadMore = page.rows.size > page.limit
         val visible = page.rows.take(page.limit)
-        val currency = visible.firstOrNull()?.currencyCode
-            ?: account?.currencyCode
-            ?: CurrencyCode("USD")
+        val currency = summaryCurrency(account, totals)
 
         val filtered = when (filter) {
             TransactionTypeFilter.All -> visible
@@ -198,6 +196,21 @@ class TransactionsByAccountViewModel(
             canLoadMore = canLoadMore,
         )
     }
+
+    /**
+     * The single currency the summary strip renders in.
+     *
+     * Scoped to an account it is simply that account's currency. In the all-accounts view there is
+     * no one right answer, so the currency with the largest total magnitude is chosen — a
+     * deterministic, recency-independent pick, so a newly-added transaction in another currency
+     * cannot flip the strip the way keying off the newest visible row did. Amounts in the other
+     * currencies are still excluded from the total (see [buildSummary]); a per-currency summary
+     * would be a larger design change than this screen owns.
+     */
+    private fun summaryCurrency(account: Account?, totals: List<TransactionTotal>): CurrencyCode =
+        account?.currencyCode
+            ?: totals.maxByOrNull { it.total.minor }?.currencyCode
+            ?: CurrencyCode("USD")
 
     /**
      * Summary of the whole period, not of the loaded page: [totals] come straight from the
