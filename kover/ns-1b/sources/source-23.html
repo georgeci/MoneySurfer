@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > WorkspaceInvite</title>
+  <title>MoneySurfer Coverage Report > Transaction</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.model</a>
 </div>
 
-<h1>Coverage Summary for Class: WorkspaceInvite (com.georgeci.moneysurfer.domain.model)</h1>
+<h1>Coverage Summary for Class: Transaction (com.georgeci.moneysurfer.domain.model)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">WorkspaceInvite</td>
+  <td class="name">Transaction</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -72,7 +72,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (12/12)
+    (18/18)
   </span>
 </td>
 <td class="coverageStat">
@@ -80,7 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (77/77)
+    (137/137)
   </span>
 </td>
 </tr>
@@ -94,34 +94,67 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.model
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.UserId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.AccountId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.RecurringRuleId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionStatus
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionType
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransferId
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceInviteId
+&nbsp;import kotlinx.datetime.LocalDate
 &nbsp;import kotlin.time.Instant
 &nbsp;
 &nbsp;/**
-&nbsp; * Email-based invitation to a [Workspace].
-&nbsp; *
-&nbsp; * Lives at `workspaces/{workspaceId}/invites/{id}` in Firestore. The invitee discovers
-&nbsp; * pending invites in-app via [email] match (no email delivery — see md/members.md decision 4).
-&nbsp; *
-&nbsp; * - [targetUserId] is populated lazily (null when first invited unknown email; resolved on
-&nbsp; *   accept). Faster lookup for return users.
-&nbsp; * - Expiration is checked client-side: status PENDING + `now &gt; expiresAt` ⇒ display as EXPIRED.
-&nbsp; *   Persisted EXPIRED only on explicit transition.
+&nbsp; * `operationAt` is the absolute moment of the operation (sortable). `operationDate` is
+&nbsp; * the business date the user assigned the transaction to — what the budget treats it as.
+&nbsp; * Storing both explicitly avoids re-deriving the date at every read site (timezone
+&nbsp; * boundaries can flip the day) and keeps backdating intent explicit (`operationDate`
+&nbsp; * stays as picked even if the user enters at midnight in a different zone).
 &nbsp; */
-<b class="fc">&nbsp;data class WorkspaceInvite(</b>
-<b class="fc">&nbsp;    val id: WorkspaceInviteId,</b>
+<b class="fc">&nbsp;data class Transaction(</b>
+<b class="fc">&nbsp;    val id: TransactionId,</b>
 <b class="fc">&nbsp;    val workspaceId: WorkspaceId,</b>
-<b class="fc">&nbsp;    val email: String,</b>
-<b class="fc">&nbsp;    val targetUserId: UserId?,</b>
-<b class="fc">&nbsp;    val role: WorkspaceRole,</b>
-<b class="fc">&nbsp;    val status: InviteStatus,</b>
-<b class="fc">&nbsp;    val invitedByUserId: UserId,</b>
+<b class="fc">&nbsp;    val accountId: AccountId,</b>
+<b class="fc">&nbsp;    val money: Money,</b>
+<b class="fc">&nbsp;    val currencyCode: CurrencyCode,</b>
+<b class="fc">&nbsp;    val categoryId: CategoryId?,</b>
+<b class="fc">&nbsp;    val note: String,</b>
+&nbsp;    /**
+&nbsp;     * Who the money went to or came from (&quot;Starbucks&quot;), kept separate from [note] so the
+&nbsp;     * details screen can show both and search can weight them independently. Empty means
+&nbsp;     * &quot;not recorded&quot; — there is no null state to distinguish.
+&nbsp;     */
+<b class="fc">&nbsp;    val merchant: String = &quot;&quot;,</b>
+&nbsp;    /**
+&nbsp;     * Free-form labels, normalized through [TransactionTags.normalize] before it gets here.
+&nbsp;     * Order is the user&#39;s; duplicates and commas are already gone.
+&nbsp;     */
+<b class="fc">&nbsp;    val tags: List&lt;String&gt; = emptyList(),</b>
+<b class="fc">&nbsp;    val operationAt: Instant,</b>
+<b class="fc">&nbsp;    val operationDate: LocalDate,</b>
+<b class="fc">&nbsp;    val type: TransactionType,</b>
+<b class="fc">&nbsp;    val status: TransactionStatus = TransactionStatus.ACTUAL,</b>
+&nbsp;    // Required: technical timestamps — they intentionally differ from operationAt for
+&nbsp;    // backdated entries. createdAt is the local-row creation moment, NOT the operation
+&nbsp;    // moment. Aliasing them silently breaks (operationDate, operationAt, createdAt)
+&nbsp;    // sort and audit semantics.
 <b class="fc">&nbsp;    val createdAt: Instant,</b>
 <b class="fc">&nbsp;    val updatedAt: Instant,</b>
-<b class="fc">&nbsp;    val expiresAt: Instant,</b>
-<b class="fc">&nbsp;    val respondedAt: Instant? = null,</b>
+<b class="fc">&nbsp;    val transferId: TransferId? = null,</b>
+&nbsp;    /**
+&nbsp;     * The rule that generated this row, or null for a manually entered one. A link rather
+&nbsp;     * than an `isRecurring` boolean: the schedule already lives on [RecurringRule], and a
+&nbsp;     * flag would be a second copy of that fact free to drift from it. &quot;Recurring only&quot;
+&nbsp;     * filters on `recurringRuleId != null`; the details screen resolves the rule to show
+&nbsp;     * its cadence.
+&nbsp;     *
+&nbsp;     * Deliberately not a Room foreign key — `recurring_rules` is not synced yet, so a pulled
+&nbsp;     * transaction can legitimately arrive before (or without) the rule it names.
+&nbsp;     */
+<b class="fc">&nbsp;    val recurringRuleId: RecurringRuleId? = null,</b>
 &nbsp;)
 </code>
 </pre>
@@ -146,7 +179,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 21:54</div>
+    <div style="float:right;">generated on 2026-07-23 10:32</div>
 </div>
 </body>
 </html>

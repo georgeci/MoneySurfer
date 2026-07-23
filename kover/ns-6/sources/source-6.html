@@ -72,7 +72,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/29)
+    (0/26)
   </span>
 </td>
 <td class="coverageStat">
@@ -80,7 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/89)
+    (0/80)
   </span>
 </td>
 </tr>
@@ -125,6 +125,16 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="nc">&nbsp;        default = &quot;&quot;,</b>
 &nbsp;    )
 &nbsp;
+&nbsp;    /**
+&nbsp;     * `false` until the user finishes the first-launch onboarding screen. Device-scoped, not
+&nbsp;     * session-scoped: it survives logout and is only reset by reinstall / clear-data, which is
+&nbsp;     * exactly when the onboarding should show again.
+&nbsp;     */
+<b class="nc">&nbsp;    val onboardingCompleted = prefs.boolean(</b>
+<b class="nc">&nbsp;        name = &quot;ui.onboarding_completed&quot;,</b>
+<b class="nc">&nbsp;        default = false,</b>
+&nbsp;    )
+&nbsp;
 <b class="nc">&nbsp;    val paletteSource = prefs.string(</b>
 <b class="nc">&nbsp;        name = &quot;ui.palette_source&quot;,</b>
 <b class="nc">&nbsp;        default = &quot;BRAND&quot;,</b>
@@ -148,26 +158,6 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;     */
 <b class="nc">&nbsp;    val hasUsedDemo = prefs.boolean(</b>
 <b class="nc">&nbsp;        name = &quot;session.has_used_demo&quot;,</b>
-<b class="nc">&nbsp;        default = false,</b>
-&nbsp;    )
-&nbsp;
-&nbsp;    /**
-&nbsp;     * `true` by default — only the offline first-run seed flips it to `false` after
-&nbsp;     * auto-creating a workspace with a locale-derived currency. `AppLaunchViewModel`
-&nbsp;     * routes to the currency picker while this is `false`; the picker flips it back.
-&nbsp;     */
-<b class="nc">&nbsp;    val currencyChosen = prefs.boolean(</b>
-<b class="nc">&nbsp;        name = &quot;session.currency_chosen&quot;,</b>
-<b class="nc">&nbsp;        default = true,</b>
-&nbsp;    )
-&nbsp;
-&nbsp;    /**
-&nbsp;     * `false` by default — set to `true` when the user skips the first-run currency picker.
-&nbsp;     * Settings surfaces a &quot;Finish setup&quot; entry while this is `true`; confirming the picker
-&nbsp;     * clears it back to `false`.
-&nbsp;     */
-<b class="nc">&nbsp;    val onboardingSkipped = prefs.boolean(</b>
-<b class="nc">&nbsp;        name = &quot;session.onboarding_skipped&quot;,</b>
 <b class="nc">&nbsp;        default = false,</b>
 &nbsp;    )
 &nbsp;}
@@ -194,7 +184,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 21:54</div>
+    <div style="float:right;">generated on 2026-07-23 10:32</div>
 </div>
 </body>
 </html>

@@ -48,6 +48,13 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;
 &nbsp;interface UiPreferences {
 &nbsp;    val isDynamicColorAvailable: Boolean
+&nbsp;
+&nbsp;    /**
+&nbsp;     * `false` until the first-launch onboarding screen is finished. Device-scoped — survives
+&nbsp;     * logout, reset only by reinstall / clear-data.
+&nbsp;     */
+&nbsp;    val onboardingCompleted: Pref&lt;Boolean&gt;
+&nbsp;
 &nbsp;    val paletteSource: Pref&lt;PaletteSource&gt;
 &nbsp;    val themeMode: Pref&lt;ThemeMode&gt;
 &nbsp;    val containerStyle: Pref&lt;ContainerStyle&gt;
@@ -75,7 +82,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 21:54</div>
+    <div style="float:right;">generated on 2026-07-23 10:32</div>
 </div>
 </body>
 </html>

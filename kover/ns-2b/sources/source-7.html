@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > CategoryPickerResultKt</title>
+  <title>MoneySurfer Coverage Report > OnboardingStep</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.navigation</a>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.login.onboarding</a>
 </div>
 
-<h1>Coverage Summary for Class: CategoryPickerResultKt (com.georgeci.moneysurfer.navigation)</h1>
+<h1>Coverage Summary for Class: OnboardingStep (com.georgeci.moneysurfer.feature.login.onboarding)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,38 +49,38 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">CategoryPickerResultKt</td>
+  <td class="name">OnboardingStep</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/2)
+    (1/1)
   </span>
 </td>
     <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/4)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/8)
+    (18/18)
   </span>
 </td>
 </tr>
@@ -92,16 +92,146 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.navigation
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.login.onboarding
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryId
-&nbsp;import io.github.irgaly.navigation3.resultstate.SerializableNavigationResultKey
+&nbsp;import co.touchlab.kermit.Logger
+&nbsp;import com.georgeci.moneysurfer.domain.OfflineBuildFlags
+&nbsp;import com.georgeci.moneysurfer.domain.firstrun.FirstRunSeeder
+&nbsp;import com.georgeci.moneysurfer.domain.preferences.UiPreferences
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.AccountType
+&nbsp;import com.georgeci.moneysurfer.utils.MviViewModel
+&nbsp;import org.koin.core.annotation.KoinViewModel
 &nbsp;
-<b class="nc">&nbsp;val CategoryPickerResultKey: SerializableNavigationResultKey&lt;CategoryId&gt; =</b>
-<b class="nc">&nbsp;    SerializableNavigationResultKey(</b>
-<b class="nc">&nbsp;        serializer = CategoryId.serializer(),</b>
-<b class="nc">&nbsp;        resultKey = &quot;CategoryPickerResult&quot;,</b>
-&nbsp;    )
+&nbsp;/**
+&nbsp; * First-launch welcome flow, modelled on the `Onboarding` design (screens 01 &quot;Ценность&quot; and an
+&nbsp; * adapted 03 &quot;С чего начнём?&quot;).
+&nbsp; *
+&nbsp; * The offline build gets both steps: after the value pitch the user picks what their first
+&nbsp; * account looks like, and that choice pre-fills the account creation screen — whose workspace
+&nbsp; * this view model seeds on the way out via [FirstRunSeeder]. The online build has nothing to pick
+&nbsp; * yet (accounts live inside a workspace that only exists after sign-in), so it stops at the value
+&nbsp; * step and continues into sign-in.
+&nbsp; *
+&nbsp; * `onboardingCompleted` is persisted before navigating, so a process death right after the tap
+&nbsp; * doesn&#39;t replay the onboarding. Skipping completes it too, keeping the default selection.
+&nbsp; */
+&nbsp;@KoinViewModel
+&nbsp;class OnboardingViewModel(
+&nbsp;    private val uiPreferences: UiPreferences,
+&nbsp;    private val firstRunSeeder: FirstRunSeeder,
+&nbsp;    offlineBuildFlags: OfflineBuildFlags,
+&nbsp;) : MviViewModel&lt;OnboardingState, OnboardingEvent, OnboardingEffect&gt;(
+&nbsp;    initialState = OnboardingState(isOffline = offlineBuildFlags.isOffline),
+&nbsp;) {
+&nbsp;
+&nbsp;    private val log = Logger.withTag(TAG)
+&nbsp;
+&nbsp;    override fun onEvent(event: OnboardingEvent) {
+&nbsp;        when (event) {
+&nbsp;            OnboardingEvent.OnContinueClick -&gt; advance()
+&nbsp;            OnboardingEvent.OnSkipClick -&gt; finish()
+&nbsp;            OnboardingEvent.OnBackClick -&gt; updateState { copy(step = OnboardingStep.Value) }
+&nbsp;            is OnboardingEvent.OnAccountKindSelected -&gt;
+&nbsp;                updateState { copy(selectedAccountKind = event.kind) }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /** Value step moves on to the offline picker when there is one; otherwise it finishes. */
+&nbsp;    private fun advance() {
+&nbsp;        val state = currentState
+&nbsp;        if (state.inFlight) return
+&nbsp;        if (state.step == OnboardingStep.Value &amp;&amp; state.isOffline) {
+&nbsp;            updateState { copy(step = OnboardingStep.FirstAccount) }
+&nbsp;        } else {
+&nbsp;            finish()
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun finish() {
+&nbsp;        val state = currentState
+&nbsp;        if (state.inFlight) return
+&nbsp;        launch(
+&nbsp;            onError = { err -&gt;
+&nbsp;                log.w(err) { &quot;[finish] failed — onboarding not marked complete, user can retry&quot; }
+&nbsp;                updateState { copy(inFlight = false) }
+&nbsp;            },
+&nbsp;        ) {
+&nbsp;            updateState { copy(inFlight = true) }
+&nbsp;            val effect = if (state.isOffline) {
+&nbsp;                // The offline first-account screen needs a pinned workspace, so the seed runs
+&nbsp;                // here rather than at launch — the app introduces itself before writing anything.
+&nbsp;                firstRunSeeder.seedIfNeeded()
+&nbsp;                OnboardingEffect.NavigateToFirstAccount(state.selectedAccountKind.accountType)
+&nbsp;            } else {
+&nbsp;                OnboardingEffect.NavigateToSignIn
+&nbsp;            }
+&nbsp;            // Flag last: if the seed above threw, the onboarding replays on the next launch
+&nbsp;            // instead of dropping the user on a screen with no workspace behind it.
+&nbsp;            uiPreferences.onboardingCompleted.set(true)
+&nbsp;            log.i { &quot;[finish] ok -&gt; $effect&quot; }
+&nbsp;            postSideEffect(effect)
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private companion object {
+&nbsp;        const val TAG = &quot;OnboardingVM&quot;
+&nbsp;    }
+&nbsp;}
+&nbsp;
+<b class="fc">&nbsp;enum class OnboardingStep { Value, FirstAccount }</b>
+&nbsp;
+&nbsp;/**
+&nbsp; * The three starting points offered on the offline picker, in design order. [recommended] drives
+&nbsp; * the &quot;Рекомендуем&quot; badge — cash is the one every user can fill in without looking anything up.
+&nbsp; */
+&nbsp;enum class OnboardingAccountKind(
+&nbsp;    val accountType: AccountType,
+&nbsp;    val recommended: Boolean = false,
+&nbsp;) {
+&nbsp;    Cash(AccountType.CASH, recommended = true),
+&nbsp;    Card(AccountType.CARD),
+&nbsp;    Savings(AccountType.SAVINGS),
+&nbsp;}
+&nbsp;
+&nbsp;data class OnboardingState(
+&nbsp;    val isOffline: Boolean = false,
+&nbsp;    val step: OnboardingStep = OnboardingStep.Value,
+&nbsp;    val selectedAccountKind: OnboardingAccountKind = OnboardingAccountKind.Cash,
+&nbsp;    val inFlight: Boolean = false,
+&nbsp;) {
+&nbsp;    /** Offline walks value → first account; online stops at the value pitch. */
+&nbsp;    val totalSteps: Int get() = if (isOffline) OFFLINE_STEPS else ONLINE_STEPS
+&nbsp;
+&nbsp;    val stepNumber: Int get() = when (step) {
+&nbsp;        OnboardingStep.Value -&gt; 1
+&nbsp;        OnboardingStep.FirstAccount -&gt; 2
+&nbsp;    }
+&nbsp;
+&nbsp;    /** A single-step flow has no progress to report. */
+&nbsp;    val showProgress: Boolean get() = totalSteps &gt; ONLINE_STEPS
+&nbsp;
+&nbsp;    /** The last step&#39;s CTA commits, so &quot;skip&quot; would be the same button twice. */
+&nbsp;    val showSkip: Boolean get() = step == OnboardingStep.Value &amp;&amp; showProgress
+&nbsp;
+&nbsp;    private companion object {
+&nbsp;        const val ONLINE_STEPS = 1
+&nbsp;        const val OFFLINE_STEPS = 2
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;sealed interface OnboardingEvent {
+&nbsp;    data object OnContinueClick : OnboardingEvent
+&nbsp;    data object OnSkipClick : OnboardingEvent
+&nbsp;    data object OnBackClick : OnboardingEvent
+&nbsp;    data class OnAccountKindSelected(val kind: OnboardingAccountKind) : OnboardingEvent
+&nbsp;}
+&nbsp;
+&nbsp;sealed interface OnboardingEffect {
+&nbsp;    data object NavigateToSignIn : OnboardingEffect
+&nbsp;
+&nbsp;    /** Offline: continue into account creation, pre-filled with the picked [accountType]. */
+&nbsp;    data class NavigateToFirstAccount(val accountType: AccountType) : OnboardingEffect
+&nbsp;}
 </code>
 </pre>
 </div>
@@ -125,7 +255,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 21:54</div>
+    <div style="float:right;">generated on 2026-07-23 10:32</div>
 </div>
 </body>
 </html>

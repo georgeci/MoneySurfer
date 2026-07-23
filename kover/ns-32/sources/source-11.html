@@ -1,0 +1,119 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>MoneySurfer Coverage Report > SyncErrorKt</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.georgeci.moneysurfer.sync.api</a>
+</div>
+
+<h1>Coverage Summary for Class: SyncErrorKt (com.georgeci.moneysurfer.sync.api)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+</tr>
+<tr>
+  <td class="name">SyncErrorKt</td>
+    <td class="coverageStat"/>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.sync.api
+&nbsp;
+&nbsp;import arrow.core.Either
+&nbsp;
+&nbsp;/**
+&nbsp; * Standalone sync error type — NOT nested under any common `AppError`.
+&nbsp; * See SyncCoordinatorFAQ.md №11, №12.
+&nbsp; */
+&nbsp;sealed interface SyncError {
+&nbsp;    val isRetryable: Boolean
+&nbsp;
+&nbsp;    data object Cancelled : SyncError {
+&nbsp;        override val isRetryable: Boolean = false
+&nbsp;    }
+&nbsp;
+&nbsp;    data object NetworkUnavailable : SyncError {
+&nbsp;        override val isRetryable: Boolean = true
+&nbsp;    }
+&nbsp;
+&nbsp;    data object AuthRequired : SyncError {
+&nbsp;        override val isRetryable: Boolean = false
+&nbsp;    }
+&nbsp;
+&nbsp;    data object PermissionDenied : SyncError {
+&nbsp;        override val isRetryable: Boolean = false
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The local app build is older than `appConfig/mobile.minSupportedAppVersionCode`.
+&nbsp;     * UI must direct the user to the store; sync stays disabled until the
+&nbsp;     * app is upgraded. See block.md.
+&nbsp;     */
+&nbsp;    data class UnsupportedAppVersion(val message: String) : SyncError {
+&nbsp;        override val isRetryable: Boolean = false
+&nbsp;    }
+&nbsp;
+&nbsp;    data class StorageError(val cause: Throwable) : SyncError {
+&nbsp;        override val isRetryable: Boolean = false
+&nbsp;    }
+&nbsp;
+&nbsp;    data class Unknown(val cause: Throwable) : SyncError {
+&nbsp;        override val isRetryable: Boolean = true
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;typealias SyncResult&lt;T&gt; = Either&lt;SyncError, T&gt;
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-07-23 10:32</div>
+</div>
+</body>
+</html>

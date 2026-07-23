@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > RemoteDataResetRepositoryImpl</title>
+  <title>MoneySurfer Coverage Report > SyncCancelledException</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,15 +19,18 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.sync.repository</a>
+    <a href="../index.html">com.georgeci.moneysurfer.sync.api</a>
 </div>
 
-<h1>Coverage Summary for Class: RemoteDataResetRepositoryImpl (com.georgeci.moneysurfer.sync.repository)</h1>
+<h1>Coverage Summary for Class: SyncCancelledException (com.georgeci.moneysurfer.sync.api)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -46,13 +49,21 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">RemoteDataResetRepositoryImpl</td>
+  <td class="name">SyncCancelledException</td>
 <td class="coverageStat">
   <span class="percent">
     100%
   </span>
   <span class="absValue">
-    (2/2)
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
   </span>
 </td>
     <td class="coverageStat"/>
@@ -61,7 +72,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (5/5)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
@@ -69,42 +80,11 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (29/29)
+    (3/3)
   </span>
 </td>
 </tr>
-  <tr>
-    <td class="name">RemoteDataResetRepositoryImpl$clearAll$1</td>
-    <td class="coverageStat"/>
-  </tr>
-<tr>
-  <td class="name"><strong>Total</strong></td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (2/2)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (5/5)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (29/29)
-  </span>
-</td>
-</tr>
+
 </table>
 
 <br/>
@@ -112,23 +92,48 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.sync.repository
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.sync.api
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.repositories.RemoteDataResetRepository
-&nbsp;import com.georgeci.moneysurfer.sync.db.dao.PendingMutationDao
-&nbsp;import com.georgeci.moneysurfer.sync.db.dao.SyncMetaDao
-&nbsp;import org.koin.core.annotation.Single
+&nbsp;import kotlin.concurrent.atomics.AtomicBoolean
+&nbsp;import kotlin.concurrent.atomics.ExperimentalAtomicApi
+&nbsp;import kotlin.coroutines.cancellation.CancellationException
 &nbsp;
-<b class="fc">&nbsp;@Single(binds = [RemoteDataResetRepository::class])</b>
-&nbsp;class RemoteDataResetRepositoryImpl(
-<b class="fc">&nbsp;    private val pendingMutationDao: PendingMutationDao,</b>
-<b class="fc">&nbsp;    private val syncMetaDao: SyncMetaDao,</b>
-&nbsp;) : RemoteDataResetRepository {
-&nbsp;    override suspend fun clearAll() {
-<b class="fc">&nbsp;        pendingMutationDao.deleteAll()</b>
-<b class="fc">&nbsp;        syncMetaDao.deleteAll()</b>
+&nbsp;/**
+&nbsp; * Cancellation token for sync operations.
+&nbsp; *
+&nbsp; * Usage: inside long-running steps (upload, pull) call `throwIfCancelled()`
+&nbsp; * between major sub-operations. See SyncCoordinatorFAQ.md №2.
+&nbsp; */
+&nbsp;abstract class SyncCancelToken {
+&nbsp;    abstract fun isCancelled(): Boolean
+&nbsp;    abstract fun cancel()
+&nbsp;
+&nbsp;    fun throwIfCancelled() {
+&nbsp;        if (isCancelled()) throw SyncCancelledException()
 &nbsp;    }
 &nbsp;}
+&nbsp;
+&nbsp;@OptIn(ExperimentalAtomicApi::class)
+&nbsp;class SimpleCancelToken : SyncCancelToken() {
+&nbsp;    private val flag = AtomicBoolean(false)
+&nbsp;    override fun isCancelled(): Boolean = flag.load()
+&nbsp;    override fun cancel() { flag.store(true) }
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * Token wrapping a set of child tokens with `all` semantics:
+&nbsp; * considered cancelled only when ALL children are cancelled.
+&nbsp; * Required for merged sync requests — cancelling one child does not abort the rest.
+&nbsp; * See SyncCoordinatorFAQ.md №2, №4.
+&nbsp; */
+&nbsp;class CompositeCancelToken(
+&nbsp;    private val children: List&lt;SyncCancelToken&gt;,
+&nbsp;) : SyncCancelToken() {
+&nbsp;    override fun isCancelled(): Boolean = children.all { it.isCancelled() }
+&nbsp;    override fun cancel() { children.forEach { it.cancel() } }
+&nbsp;}
+&nbsp;
+<b class="fc">&nbsp;class SyncCancelledException : CancellationException(&quot;Sync cancelled&quot;)</b>
 </code>
 </pre>
 </div>
@@ -152,7 +157,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 15:22</div>
+    <div style="float:right;">generated on 2026-07-23 10:32</div>
 </div>
 </body>
 </html>

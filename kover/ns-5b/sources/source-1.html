@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > Koin_hints_com_georgeci_moneysurfer_sync_internal_di_SyncModuleKt</title>
+  <title>MoneySurfer Coverage Report > WorkspaceSyncer</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">org.koin.plugin.hints</a>
+    <a href="../index.html">com.georgeci.moneysurfer.domain.repositories</a>
 </div>
 
-<h1>Coverage Summary for Class: Koin_hints_com_georgeci_moneysurfer_sync_internal_di_SyncModuleKt (org.koin.plugin.hints)</h1>
+<h1>Coverage Summary for Class: WorkspaceSyncer (com.georgeci.moneysurfer.domain.repositories)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">Koin_hints_com_georgeci_moneysurfer_sync_internal_di_SyncModuleKt</td>
+  <td class="name">WorkspaceSyncer</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -42,7 +42,37 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <br/>
 <br/>
 
-  <code class="sourceCode">Source code is not available<br /></code>
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.repositories
+&nbsp;
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
+&nbsp;
+&nbsp;/**
+&nbsp; * Triggers sync operations without exposing the sync infrastructure to domain use cases.
+&nbsp; *
+&nbsp; * [pushAll] drains the outbox (push-only, no remote discovery).
+&nbsp; * [syncAll] fetches the authoritative workspace list from the remote user doc and
+&nbsp; * runs a full cursor-based pull for every workspace — including ones not yet local.
+&nbsp; * [syncWorkspace] pulls a single specific workspace; used after accepting an invite so
+&nbsp; * only the newly joined workspace is hydrated without re-syncing everything.
+&nbsp; */
+&nbsp;interface WorkspaceSyncer {
+&nbsp;    /** Push all pending outbox mutations. Throws on error. */
+&nbsp;    suspend fun pushAll()
+&nbsp;
+&nbsp;    /** Push outbox + pull all user workspaces (including undiscovered ones). Throws on error. */
+&nbsp;    suspend fun syncAll()
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Push outbox + pull a single workspace by [workspaceId].
+&nbsp;     * Sets the active workspace to [workspaceId] for the duration of the sync so
+&nbsp;     * [SyncScope.ActiveWorkspace] targets the correct workspace.
+&nbsp;     */
+&nbsp;    suspend fun syncWorkspace(workspaceId: WorkspaceId)
+&nbsp;}
+</code>
+</pre>
 </div>
 
 <script type="text/javascript">
@@ -64,7 +94,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 21:54</div>
+    <div style="float:right;">generated on 2026-07-23 10:32</div>
 </div>
 </body>
 </html>

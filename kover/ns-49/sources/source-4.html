@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > String0_commonMainKt</title>
+  <title>MoneySurfer Coverage Report > SurferFilterChipRowKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">moneysurfer.uikit.generated.resources</a>
+    <a href="../index.html">com.georgeci.moneysurfer.uikit.components.base</a>
 </div>
 
-<h1>Coverage Summary for Class: String0_commonMainKt (moneysurfer.uikit.generated.resources)</h1>
+<h1>Coverage Summary for Class: SurferFilterChipRowKt (com.georgeci.moneysurfer.uikit.components.base)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">String0_commonMainKt</td>
+  <td class="name">SurferFilterChipRowKt</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -60,27 +60,34 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    55.6%
+    66.7%
   </span>
   <span class="absValue">
-    (5/9)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    35%
-  </span>
-  <span class="absValue">
-    (7/20)
+    (2/3)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    34.4%
+    53.6%
   </span>
   <span class="absValue">
-    (66/192)
+    (15/28)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    93.8%
+  </span>
+  <span class="absValue">
+    (45/48)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    89.9%
+  </span>
+  <span class="absValue">
+    (552/614)
   </span>
 </td>
 </tr>
@@ -92,60 +99,115 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;@file:OptIn(InternalResourceApi::class)
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.components.base
 &nbsp;
-&nbsp;package moneysurfer.uikit.generated.resources
+&nbsp;import androidx.compose.foundation.background
+&nbsp;import androidx.compose.foundation.border
+&nbsp;import androidx.compose.foundation.clickable
+&nbsp;import androidx.compose.foundation.layout.Arrangement
+&nbsp;import androidx.compose.foundation.layout.Row
+&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
+&nbsp;import androidx.compose.foundation.layout.height
+&nbsp;import androidx.compose.foundation.layout.padding
+&nbsp;import androidx.compose.foundation.layout.size
+&nbsp;import androidx.compose.foundation.shape.RoundedCornerShape
+&nbsp;import androidx.compose.material3.Icon
+&nbsp;import androidx.compose.material3.Text
+&nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.ui.Alignment
+&nbsp;import androidx.compose.ui.Modifier
+&nbsp;import androidx.compose.ui.draw.clip
+&nbsp;import androidx.compose.ui.graphics.Color
+&nbsp;import androidx.compose.ui.tooling.preview.Preview
+&nbsp;import androidx.compose.ui.unit.dp
+&nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+&nbsp;import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
+&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
 &nbsp;
-&nbsp;import kotlin.OptIn
-&nbsp;import kotlin.String
-&nbsp;import kotlin.collections.MutableMap
-&nbsp;import org.jetbrains.compose.resources.InternalResourceApi
-&nbsp;import org.jetbrains.compose.resources.LanguageQualifier
-&nbsp;import org.jetbrains.compose.resources.ResourceContentHash
-&nbsp;import org.jetbrains.compose.resources.ResourceItem
-&nbsp;import org.jetbrains.compose.resources.StringResource
+&nbsp;/**
+&nbsp; * Row of mutually-exclusive filter chips. Each chip is a 32dp pill with a 10dp corner; the
+&nbsp; * selected one fills with `secondaryContainer` and shows a leading check, the rest stay
+&nbsp; * outline-only. Caller maps the picked option however it likes — the row is stateless.
+&nbsp; */
+&nbsp;@Composable
+&nbsp;fun &lt;T&gt; SurferFilterChipRow(
+&nbsp;    options: List&lt;T&gt;,
+&nbsp;    selected: T,
+&nbsp;    label: @Composable (T) -&gt; String,
+&nbsp;    onSelect: (T) -&gt; Unit,
+<b class="fc">&nbsp;    modifier: Modifier = Modifier,</b>
+<b class="pc">&nbsp;) {</b>
+<b class="fc">&nbsp;    Row(</b>
+<b class="fc">&nbsp;        modifier = modifier.fillMaxWidth(),</b>
+<b class="fc">&nbsp;        horizontalArrangement = Arrangement.spacedBy(AppTheme.spacing.small),</b>
+&nbsp;    ) {
+<b class="fc">&nbsp;        options.forEach { option -&gt;</b>
+<b class="fc">&nbsp;            SurferFilterChip(</b>
+<b class="fc">&nbsp;                selected = option == selected,</b>
+<b class="fc">&nbsp;                label = label(option),</b>
+<b class="fc">&nbsp;                onClick = { onSelect(option) },</b>
+&nbsp;            )
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;    }</b>
+<b class="fc">&nbsp;}</b>
 &nbsp;
-&nbsp;private const val MD: String = &quot;composeResources/moneysurfer.uikit.generated.resources/&quot;
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(-190_044_963)
-<b class="fc">&nbsp;public val Res.string.uikit_back: StringResource by lazy {</b>
-<b class="fc">&nbsp;      StringResource(&quot;string:uikit_back&quot;, &quot;uikit_back&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 10, 34),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 10, 26),</b>
-&nbsp;      ))
+&nbsp;@Composable
+&nbsp;private fun SurferFilterChip(
+&nbsp;    selected: Boolean,
+&nbsp;    label: String,
+&nbsp;    onClick: () -&gt; Unit,
+<b class="pc">&nbsp;) {</b>
+<b class="fc">&nbsp;    val bg = if (selected) AppTheme.materialColors.secondaryContainer else Color.Transparent</b>
+<b class="fc">&nbsp;    val fg = if (selected) {</b>
+<b class="fc">&nbsp;        AppTheme.materialColors.onSecondaryContainer</b>
+<b class="fc">&nbsp;    } else {</b>
+<b class="fc">&nbsp;        AppTheme.materialColors.onSurface</b>
 &nbsp;    }
+<b class="fc">&nbsp;    Row(</b>
+<b class="fc">&nbsp;        modifier = Modifier</b>
+<b class="fc">&nbsp;            .height(32.dp)</b>
+<b class="fc">&nbsp;            .clip(RoundedCornerShape(10.dp))</b>
+<b class="fc">&nbsp;            .background(bg)</b>
+<b class="fc">&nbsp;            .border(</b>
+<b class="fc">&nbsp;                width = 1.dp,</b>
+<b class="fc">&nbsp;                color = if (selected) Color.Transparent else AppTheme.materialColors.outline,</b>
+<b class="fc">&nbsp;                shape = RoundedCornerShape(10.dp),</b>
+&nbsp;            )
+<b class="fc">&nbsp;            .clickable(onClick = onClick)</b>
+<b class="fc">&nbsp;            .padding(horizontal = 12.dp),</b>
+<b class="fc">&nbsp;        verticalAlignment = Alignment.CenterVertically,</b>
+<b class="fc">&nbsp;        horizontalArrangement = Arrangement.spacedBy(4.dp),</b>
+&nbsp;    ) {
+<b class="fc">&nbsp;        if (selected) {</b>
+<b class="fc">&nbsp;            Icon(</b>
+<b class="fc">&nbsp;                imageVector = SurferIcons.Check,</b>
+&nbsp;                // decorative — selection state indicator; the chip label provides the accessible label
+<b class="fc">&nbsp;                contentDescription = null,</b>
+<b class="fc">&nbsp;                tint = fg,</b>
+<b class="fc">&nbsp;                modifier = Modifier.size(14.dp),</b>
+&nbsp;            )
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;        Text(</b>
+<b class="fc">&nbsp;            text = label,</b>
+<b class="fc">&nbsp;            style = AppTheme.typography.labelLarge,</b>
+<b class="fc">&nbsp;            color = fg,</b>
+&nbsp;        )
+<b class="fc">&nbsp;    }</b>
+<b class="fc">&nbsp;}</b>
 &nbsp;
-&nbsp;@delegate:ResourceContentHash(-538_194_959)
-<b class="fc">&nbsp;public val Res.string.uikit_close: StringResource by lazy {</b>
-<b class="nc">&nbsp;      StringResource(&quot;string:uikit_close&quot;, &quot;uikit_close&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 45, 39),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 37, 27),</b>
-&nbsp;      ))
+&nbsp;@Preview
+&nbsp;@Composable
+<b class="nc">&nbsp;private fun SurferFilterChipRowPreview() {</b>
+<b class="nc">&nbsp;    SurferComponentPreview {</b>
+&nbsp;        SurferFilterChipRow(
+&nbsp;            modifier = Modifier.padding(all = 16.dp),
+&nbsp;            options = listOf(&quot;All&quot;, &quot;Expenses&quot;, &quot;Income&quot;),
+&nbsp;            selected = &quot;All&quot;,
+&nbsp;            label = { it },
+&nbsp;            onSelect = {},
+&nbsp;        )
 &nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(1_930_263_220)
-<b class="fc">&nbsp;public val Res.string.uikit_done: StringResource by lazy {</b>
-<b class="nc">&nbsp;      StringResource(&quot;string:uikit_done&quot;, &quot;uikit_done&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 85, 34),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 65, 26),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@delegate:ResourceContentHash(1_985_367_554)
-<b class="fc">&nbsp;public val Res.string.uikit_retry: StringResource by lazy {</b>
-<b class="nc">&nbsp;      StringResource(&quot;string:uikit_retry&quot;, &quot;uikit_retry&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 120, 43),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 92, 27),</b>
-&nbsp;      ))
-&nbsp;    }
-&nbsp;
-&nbsp;@InternalResourceApi
-&nbsp;internal fun _collectCommonMainString0Resources(map: MutableMap&lt;String, StringResource&gt;) {
-<b class="nc">&nbsp;  map.put(&quot;uikit_back&quot;, Res.string.uikit_back)</b>
-<b class="nc">&nbsp;  map.put(&quot;uikit_close&quot;, Res.string.uikit_close)</b>
-<b class="nc">&nbsp;  map.put(&quot;uikit_done&quot;, Res.string.uikit_done)</b>
-<b class="nc">&nbsp;  map.put(&quot;uikit_retry&quot;, Res.string.uikit_retry)</b>
-&nbsp;}
+<b class="nc">&nbsp;}</b>
 </code>
 </pre>
 </div>
@@ -169,7 +231,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 17:13</div>
+    <div style="float:right;">generated on 2026-07-23 10:32</div>
 </div>
 </body>
 </html>

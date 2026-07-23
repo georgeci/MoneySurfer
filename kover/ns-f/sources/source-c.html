@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > FirebaseCrashReporter</title>
+  <title>MoneySurfer Coverage Report > CurrencyRepositoryImpl</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.data.repository</a>
 </div>
 
-<h1>Coverage Summary for Class: FirebaseCrashReporter (com.georgeci.moneysurfer.data.repository)</h1>
+<h1>Coverage Summary for Class: CurrencyRepositoryImpl (com.georgeci.moneysurfer.data.repository)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">FirebaseCrashReporter</td>
+  <td class="name">CurrencyRepositoryImpl</td>
 <td class="coverageStat">
   <span class="percent">
     0%
@@ -63,23 +63,16 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/7)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
     (0/2)
   </span>
 </td>
+    <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
     0%
   </span>
   <span class="absValue">
-    (0/8)
+    (0/11)
   </span>
 </td>
 <td class="coverageStat">
@@ -87,7 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/36)
+    (0/100)
   </span>
 </td>
 </tr>
@@ -101,37 +94,32 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.repository
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.telemetry.CrashReporter
-&nbsp;import dev.gitlive.firebase.Firebase
-&nbsp;import dev.gitlive.firebase.crashlytics.crashlytics
+&nbsp;import com.georgeci.moneysurfer.domain.model.Currency
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.CurrencyRepository
+&nbsp;import kotlinx.coroutines.flow.Flow
+&nbsp;import kotlinx.coroutines.flow.flowOf
+&nbsp;import org.koin.core.annotation.Single
 &nbsp;
-<b class="nc">&nbsp;class FirebaseCrashReporter : CrashReporter {</b>
+&nbsp;/**
+&nbsp; * Static currency catalogue. Swap the in-memory list for a datastore/backend feed when the
+&nbsp; * product grows beyond this short set.
+&nbsp; */
+<b class="nc">&nbsp;@Single(binds = [CurrencyRepository::class])</b>
+&nbsp;class CurrencyRepositoryImpl : CurrencyRepository {
 &nbsp;
-<b class="nc">&nbsp;    private val crashlytics = Firebase.crashlytics</b>
+<b class="nc">&nbsp;    private val currencies: List&lt;Currency&gt; = listOf(</b>
+<b class="nc">&nbsp;        Currency(CurrencyCode(&quot;EUR&quot;), symbol = &quot;€&quot;, displayName = &quot;Euro&quot;),</b>
+<b class="nc">&nbsp;        Currency(CurrencyCode(&quot;USD&quot;), symbol = &quot;$&quot;, displayName = &quot;US Dollar&quot;),</b>
+<b class="nc">&nbsp;        Currency(CurrencyCode(&quot;GBP&quot;), symbol = &quot;£&quot;, displayName = &quot;British Pound&quot;),</b>
+<b class="nc">&nbsp;        Currency(CurrencyCode(&quot;PLN&quot;), symbol = &quot;zł&quot;, displayName = &quot;Polish Zloty&quot;),</b>
+<b class="nc">&nbsp;        Currency(CurrencyCode(&quot;RUB&quot;), symbol = &quot;₽&quot;, displayName = &quot;Russian Ruble&quot;),</b>
+<b class="nc">&nbsp;        Currency(CurrencyCode(&quot;GEL&quot;), symbol = &quot;₾&quot;, displayName = &quot;Georgian Lari&quot;),</b>
+<b class="nc">&nbsp;        Currency(CurrencyCode(&quot;KZT&quot;), symbol = &quot;₸&quot;, displayName = &quot;Kazakhstani Tenge&quot;),</b>
+<b class="nc">&nbsp;        Currency(CurrencyCode(&quot;UAH&quot;), symbol = &quot;₴&quot;, displayName = &quot;Ukrainian Hryvnia&quot;),</b>
+&nbsp;    )
 &nbsp;
-&nbsp;    override fun log(message: String) {
-<b class="nc">&nbsp;        crashlytics.log(message)</b>
-&nbsp;    }
-&nbsp;
-&nbsp;    override fun record(error: Throwable) {
-<b class="nc">&nbsp;        crashlytics.recordException(error)</b>
-&nbsp;    }
-&nbsp;
-&nbsp;    override fun setUserId(userId: String?) {
-<b class="nc">&nbsp;        crashlytics.setUserId(userId.orEmpty())</b>
-&nbsp;    }
-&nbsp;
-&nbsp;    override fun setKey(key: String, value: String) {
-<b class="nc">&nbsp;        crashlytics.setCustomKey(key, value)</b>
-&nbsp;    }
-&nbsp;
-&nbsp;    override fun setKey(key: String, value: Boolean) {
-<b class="nc">&nbsp;        crashlytics.setCustomKey(key, value)</b>
-&nbsp;    }
-&nbsp;
-&nbsp;    override fun setCollectionEnabled(enabled: Boolean) {
-<b class="nc">&nbsp;        crashlytics.setCrashlyticsCollectionEnabled(enabled)</b>
-&nbsp;    }
+<b class="nc">&nbsp;    override fun getAll(): Flow&lt;List&lt;Currency&gt;&gt; = flowOf(currencies)</b>
 &nbsp;}
 </code>
 </pre>
@@ -156,7 +144,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 21:54</div>
+    <div style="float:right;">generated on 2026-07-23 10:32</div>
 </div>
 </body>
 </html>

@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > GetGoalContributionsUseCase</title>
+  <title>MoneySurfer Coverage Report > GetCurrenciesUseCase</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.usecase</a>
 </div>
 
-<h1>Coverage Summary for Class: GetGoalContributionsUseCase (com.georgeci.moneysurfer.domain.usecase)</h1>
+<h1>Coverage Summary for Class: GetCurrenciesUseCase (com.georgeci.moneysurfer.domain.usecase)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">GetGoalContributionsUseCase</td>
+  <td class="name">GetCurrenciesUseCase</td>
 <td class="coverageStat">
   <span class="percent">
     0%
@@ -80,7 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/9)
+    (0/8)
   </span>
 </td>
 </tr>
@@ -94,20 +94,16 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.usecase
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.model.GoalContribution
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.GoalId
-&nbsp;import com.georgeci.moneysurfer.domain.repositories.GoalContributionRepository
+&nbsp;import com.georgeci.moneysurfer.domain.model.Currency
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.CurrencyRepository
 &nbsp;import kotlinx.coroutines.flow.Flow
 &nbsp;import org.koin.core.annotation.Single
 &nbsp;
-&nbsp;/** A goal&#39;s contribution history, newest first. */
 <b class="nc">&nbsp;@Single</b>
-&nbsp;class GetGoalContributionsUseCase(
-<b class="nc">&nbsp;    private val contributionRepository: GoalContributionRepository,</b>
+&nbsp;class GetCurrenciesUseCase(
+<b class="nc">&nbsp;    private val currencyRepository: CurrencyRepository,</b>
 &nbsp;) {
-&nbsp;
-&nbsp;    operator fun invoke(goalId: GoalId): Flow&lt;List&lt;GoalContribution&gt;&gt; =
-<b class="nc">&nbsp;        contributionRepository.getByGoalId(goalId)</b>
+<b class="nc">&nbsp;    operator fun invoke(): Flow&lt;List&lt;Currency&gt;&gt; = currencyRepository.getAll()</b>
 &nbsp;}
 </code>
 </pre>
@@ -132,7 +128,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 21:54</div>
+    <div style="float:right;">generated on 2026-07-23 10:32</div>
 </div>
 </body>
 </html>

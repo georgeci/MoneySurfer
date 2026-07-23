@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > ActualResourceCollectorsKt</title>
+  <title>MoneySurfer Coverage Report > AmountInputTransformation</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">moneysurfer.feature.goal.generated.resources</a>
+    <a href="../index.html">com.georgeci.moneysurfer.utils</a>
 </div>
 
-<h1>Coverage Summary for Class: ActualResourceCollectorsKt (moneysurfer.feature.goal.generated.resources)</h1>
+<h1>Coverage Summary for Class: AmountInputTransformation (com.georgeci.moneysurfer.utils)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,38 +49,45 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">ActualResourceCollectorsKt</td>
+  <td class="name">AmountInputTransformation</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    66.7%
   </span>
   <span class="absValue">
-    (0/10)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/16)
+    (2/3)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    66.7%
   </span>
   <span class="absValue">
-    (0/72)
+    (12/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (7/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    75.4%
+  </span>
+  <span class="absValue">
+    (86/114)
   </span>
 </td>
 </tr>
@@ -92,43 +99,51 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;@file:OptIn(org.jetbrains.compose.resources.InternalResourceApi::class)
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.utils
 &nbsp;
-&nbsp;package moneysurfer.feature.goal.generated.resources
+&nbsp;import androidx.compose.foundation.text.input.InputTransformation
+&nbsp;import androidx.compose.foundation.text.input.TextFieldBuffer
 &nbsp;
-&nbsp;import kotlin.OptIn
-&nbsp;import kotlin.String
-&nbsp;import kotlin.collections.Map
-&nbsp;import org.jetbrains.compose.resources.DrawableResource
-&nbsp;import org.jetbrains.compose.resources.FontResource
-&nbsp;import org.jetbrains.compose.resources.PluralStringResource
-&nbsp;import org.jetbrains.compose.resources.StringArrayResource
-&nbsp;import org.jetbrains.compose.resources.StringResource
+&nbsp;object AmountInputTransformation : InputTransformation {
 &nbsp;
-<b class="nc">&nbsp;internal actual val Res.allDrawableResources: Map&lt;String, DrawableResource&gt; by lazy {</b>
-<b class="nc">&nbsp;  val map = mutableMapOf&lt;String, DrawableResource&gt;()</b>
-<b class="nc">&nbsp;  return@lazy map</b>
-&nbsp;}
+&nbsp;    override fun TextFieldBuffer.transformInput() {
+<b class="nc">&nbsp;        val text = asCharSequence().toString()</b>
 &nbsp;
-<b class="nc">&nbsp;internal actual val Res.allStringResources: Map&lt;String, StringResource&gt; by lazy {</b>
-<b class="nc">&nbsp;  val map = mutableMapOf&lt;String, StringResource&gt;()</b>
-<b class="nc">&nbsp;  _collectCommonMainString0Resources(map)</b>
-<b class="nc">&nbsp;  return@lazy map</b>
-&nbsp;}
+<b class="nc">&nbsp;        if (text.isEmpty()) return</b>
 &nbsp;
-<b class="nc">&nbsp;internal actual val Res.allStringArrayResources: Map&lt;String, StringArrayResource&gt; by lazy {</b>
-<b class="nc">&nbsp;  val map = mutableMapOf&lt;String, StringArrayResource&gt;()</b>
-<b class="nc">&nbsp;  return@lazy map</b>
-&nbsp;}
+<b class="nc">&nbsp;        val result = validateAndNormalize(text)</b>
+<b class="nc">&nbsp;        if (result == null) {</b>
+<b class="nc">&nbsp;            revertAllChanges()</b>
+&nbsp;            return
+&nbsp;        }
 &nbsp;
-<b class="nc">&nbsp;internal actual val Res.allPluralStringResources: Map&lt;String, PluralStringResource&gt; by lazy {</b>
-<b class="nc">&nbsp;  val map = mutableMapOf&lt;String, PluralStringResource&gt;()</b>
-<b class="nc">&nbsp;  return@lazy map</b>
-&nbsp;}
+<b class="nc">&nbsp;        if (result != text) {</b>
+<b class="nc">&nbsp;            replace(0, length, result)</b>
+&nbsp;        }
+&nbsp;    }
 &nbsp;
-<b class="nc">&nbsp;internal actual val Res.allFontResources: Map&lt;String, FontResource&gt; by lazy {</b>
-<b class="nc">&nbsp;  val map = mutableMapOf&lt;String, FontResource&gt;()</b>
-<b class="nc">&nbsp;  return@lazy map</b>
+&nbsp;    /**
+&nbsp;     * Validates and normalizes amount input.
+&nbsp;     * Returns the normalized string if valid, or null if the input should be rejected.
+&nbsp;     *
+&nbsp;     * Rules:
+&nbsp;     * - Only digits and one decimal separator (`.` or `,`) allowed
+&nbsp;     * - Comma is normalized to dot
+&nbsp;     * - No leading zeros (e.g. &quot;007&quot;), except bare &quot;0&quot; or &quot;0.&quot;
+&nbsp;     * - Maximum 2 digits after the decimal point
+&nbsp;     */
+<b class="fc">&nbsp;    private val AMOUNT_PATTERN = Regex(&quot;^\\d*\\.?\\d*$&quot;)</b>
+&nbsp;    private const val MAX_DECIMAL_DIGITS = 2
+&nbsp;
+&nbsp;    fun validateAndNormalize(input: String): String? {
+<b class="fc">&nbsp;        val normalized = input.replace(&#39;,&#39;, &#39;.&#39;)</b>
+<b class="fc">&nbsp;        val parts = normalized.split(&#39;.&#39;)</b>
+<b class="fc">&nbsp;        val hasInvalidFormat = !normalized.matches(AMOUNT_PATTERN)</b>
+<b class="fc">&nbsp;        val hasLeadingZeros = parts[0].length &gt; 1 &amp;&amp; parts[0].startsWith(&#39;0&#39;)</b>
+<b class="fc">&nbsp;        val hasTooManyDecimals = parts.size == 2 &amp;&amp; parts[1].length &gt; MAX_DECIMAL_DIGITS</b>
+&nbsp;
+<b class="fc">&nbsp;        return normalized.takeUnless { hasInvalidFormat || hasLeadingZeros || hasTooManyDecimals }</b>
+&nbsp;    }
 &nbsp;}
 </code>
 </pre>
@@ -153,7 +168,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 21:54</div>
+    <div style="float:right;">generated on 2026-07-23 10:32</div>
 </div>
 </body>
 </html>

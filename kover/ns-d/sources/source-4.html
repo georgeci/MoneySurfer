@@ -118,6 +118,8 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;
 &nbsp;    override val isDynamicColorAvailable: Boolean = platformIsDynamicColorAvailable
 &nbsp;
+&nbsp;    override val onboardingCompleted: Pref&lt;Boolean&gt; = src.onboardingCompleted.asPref()
+&nbsp;
 &nbsp;    override val paletteSource: Pref&lt;PaletteSource&gt; = src.paletteSource.asPref(
 &nbsp;        fromStored = ::decodePaletteSource,
 &nbsp;        toStored = ::encodePaletteSource,
@@ -181,7 +183,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 21:54</div>
+    <div style="float:right;">generated on 2026-07-23 10:32</div>
 </div>
 </body>
 </html>

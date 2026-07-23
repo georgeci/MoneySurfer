@@ -79,7 +79,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/11)
+    (0/12)
   </span>
 </td>
 <td class="coverageStat">
@@ -87,7 +87,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/102)
+    (0/109)
   </span>
 </td>
 </tr>
@@ -117,6 +117,8 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;) : UiPreferences {
 &nbsp;
 <b class="nc">&nbsp;    override val isDynamicColorAvailable: Boolean = platformIsDynamicColorAvailable</b>
+&nbsp;
+<b class="nc">&nbsp;    override val onboardingCompleted: Pref&lt;Boolean&gt; = src.onboardingCompleted.asPref()</b>
 &nbsp;
 <b class="nc">&nbsp;    override val paletteSource: Pref&lt;PaletteSource&gt; = src.paletteSource.asPref(</b>
 <b class="nc">&nbsp;        fromStored = ::decodePaletteSource,</b>
@@ -181,7 +183,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 21:54</div>
+    <div style="float:right;">generated on 2026-07-23 10:32</div>
 </div>
 </body>
 </html>

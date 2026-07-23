@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > ComGeorgeciMoneysurferSyncInternalDiSyncModuleModuleKt</title>
+  <title>MoneySurfer Coverage Report > UserAccountDeletionRepository</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">org.koin.plugin.hints</a>
+    <a href="../index.html">com.georgeci.moneysurfer.domain.repositories</a>
 </div>
 
-<h1>Coverage Summary for Class: ComGeorgeciMoneysurferSyncInternalDiSyncModuleModuleKt (org.koin.plugin.hints)</h1>
+<h1>Coverage Summary for Class: UserAccountDeletionRepository (com.georgeci.moneysurfer.domain.repositories)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">ComGeorgeciMoneysurferSyncInternalDiSyncModuleModuleKt</td>
+  <td class="name">UserAccountDeletionRepository</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -42,7 +42,38 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <br/>
 <br/>
 
-  <code class="sourceCode">Source code is not available<br /></code>
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.repositories
+&nbsp;
+&nbsp;import arrow.core.Either
+&nbsp;import com.georgeci.moneysurfer.domain.auth.AccountDeletionError
+&nbsp;
+&nbsp;/**
+&nbsp; * Remote-side cleanup for the user-account deletion flow (issue #213). Deletes everything the
+&nbsp; * hosted account-deletion page promises to remove — personal workspaces with their financial
+&nbsp; * records, the user&#39;s memberships, and the user/email lookup docs — while leaving content in
+&nbsp; * workspaces shared with other active members visible to those members.
+&nbsp; *
+&nbsp; * Implementation lives in `:data-remote` (online hosts only); the offline build binds a no-op.
+&nbsp; */
+&nbsp;interface UserAccountDeletionRepository {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Idempotently deletes the remote footprint of [uid]:
+&nbsp;     *  - workspaces owned by the user with no other ACTIVE member are hard-deleted
+&nbsp;     *    (all subcollections, then the root doc),
+&nbsp;     *  - in every other workspace the user&#39;s member row is marked LEFT (profile snapshots
+&nbsp;     *    stay, matching the retention promise on the hosted deletion page),
+&nbsp;     *  - the `userEmails/{email}` mapping (when it points at [uid]) and `users/{uid}` go last.
+&nbsp;     *
+&nbsp;     * Must be called while the user is still authenticated — Firestore rules authorize each
+&nbsp;     * step against `request.auth.uid`. Deleting the Firebase Auth user is a separate step.
+&nbsp;     */
+&nbsp;    suspend fun deleteRemoteUserData(uid: String, email: String?): Either&lt;AccountDeletionError, Unit&gt;
+&nbsp;}
+</code>
+</pre>
 </div>
 
 <script type="text/javascript">
@@ -64,7 +95,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 21:54</div>
+    <div style="float:right;">generated on 2026-07-23 10:32</div>
 </div>
 </body>
 </html>

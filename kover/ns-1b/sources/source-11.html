@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > PeriodTotals</title>
+  <title>MoneySurfer Coverage Report > GoalContribution</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,12 +22,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.model</a>
 </div>
 
-<h1>Coverage Summary for Class: PeriodTotals (com.georgeci.moneysurfer.domain.model)</h1>
+<h1>Coverage Summary for Class: GoalContribution (com.georgeci.moneysurfer.domain.model)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -46,13 +49,21 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">PeriodTotals</td>
+  <td class="name">GoalContribution</td>
 <td class="coverageStat">
   <span class="percent">
     100%
   </span>
   <span class="absValue">
-    (2/2)
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
   </span>
 </td>
     <td class="coverageStat"/>
@@ -61,7 +72,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (12/12)
+    (10/10)
   </span>
 </td>
 <td class="coverageStat">
@@ -69,66 +80,11 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (42/42)
+    (84/84)
   </span>
 </td>
 </tr>
-  <tr>
-    <td class="name">PeriodTotals$Companion</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-  </tr>
-<tr>
-  <td class="name"><strong>Total</strong></td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (3/3)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (13/13)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (43/43)
-  </span>
-</td>
-</tr>
+
 </table>
 
 <br/>
@@ -138,81 +94,33 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.model
 &nbsp;
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.GoalContributionId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.GoalId
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionStatus
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionType
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransferId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 &nbsp;import kotlinx.datetime.LocalDate
-&nbsp;import kotlinx.datetime.TimeZone
-&nbsp;import kotlinx.datetime.toLocalDateTime
+&nbsp;import kotlin.time.Instant
 &nbsp;
 &nbsp;/**
-&nbsp; * Aggregate numbers for a date range. Pure domain return shape — never persisted, never
-&nbsp; * serialized, never pushed. byCategory / byAccount are intentionally omitted; those are
-&nbsp; * separate use cases (charts, accounts breakdown).
-&nbsp; */
-<b class="fc">&nbsp;data class PeriodTotals(</b>
-<b class="fc">&nbsp;    val income: Money,</b>
-<b class="fc">&nbsp;    val expense: Money,</b>
-<b class="fc">&nbsp;    val net: Money,</b>
-<b class="fc">&nbsp;    val plannedIncome: Money,</b>
-<b class="fc">&nbsp;    val plannedExpense: Money,</b>
-&nbsp;) {
-&nbsp;    companion object {
-<b class="fc">&nbsp;        val Empty = PeriodTotals(</b>
-<b class="fc">&nbsp;            income = Money.zero(),</b>
-<b class="fc">&nbsp;            expense = Money.zero(),</b>
-<b class="fc">&nbsp;            net = Money.zero(),</b>
-<b class="fc">&nbsp;            plannedIncome = Money.zero(),</b>
-<b class="fc">&nbsp;            plannedExpense = Money.zero(),</b>
-&nbsp;        )
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;/**
-&nbsp; * Pure aggregation over an in-memory list of transactions. Caller decides which list to
-&nbsp; * pass (typically `transactionRepository.getByWorkspaceId(...)`).
+&nbsp; * One movement against a [SavingsGoal]. [amount] is signed — a negative amount
+&nbsp; * is a withdrawal, not a separate entity and not a separate flag.
 &nbsp; *
-&nbsp; * Period is computed from `transaction.operationAt` interpreted in [timeZone]. Inclusive on
-&nbsp; * both ends. Deleted transactions are absent from the local table — no extra filtering.
+&nbsp; * [transferId] is always `null` in v1: no money moves and `Transaction` is not
+&nbsp; * touched. It exists so the money-backed model can later store the id of a real
+&nbsp; * transfer here without a schema change on either side of the wire.
 &nbsp; */
-&nbsp;fun calculatePeriodTotalsFromList(
-&nbsp;    transactions: List&lt;Transaction&gt;,
-&nbsp;    fromDate: LocalDate,
-&nbsp;    toDate: LocalDate,
-&nbsp;    timeZone: TimeZone,
-&nbsp;): PeriodTotals {
-&nbsp;    var income = 0L
-&nbsp;    var expense = 0L
-&nbsp;    var plannedIncome = 0L
-&nbsp;    var plannedExpense = 0L
-&nbsp;
-&nbsp;    for (tx in transactions) {
-&nbsp;        val date = tx.operationAt.toLocalDateTime(timeZone).date
-&nbsp;        if (date &lt; fromDate || date &gt; toDate) continue
-&nbsp;
-&nbsp;        val magnitude = tx.money.abs().minor
-&nbsp;        when (tx.status) {
-&nbsp;            TransactionStatus.ACTUAL -&gt; when (tx.type) {
-&nbsp;                TransactionType.INCOME -&gt; income += magnitude
-&nbsp;                TransactionType.EXPENSE -&gt; expense += magnitude
-&nbsp;                TransactionType.OPENING_BALANCE -&gt; Unit
-&nbsp;            }
-&nbsp;            TransactionStatus.PLANNED -&gt; when (tx.type) {
-&nbsp;                TransactionType.INCOME -&gt; plannedIncome += magnitude
-&nbsp;                TransactionType.EXPENSE -&gt; plannedExpense += magnitude
-&nbsp;                TransactionType.OPENING_BALANCE -&gt; Unit
-&nbsp;            }
-&nbsp;        }
-&nbsp;    }
-&nbsp;
-&nbsp;    return PeriodTotals(
-&nbsp;        income = Money.fromMinor(income),
-&nbsp;        expense = Money.fromMinor(expense),
-&nbsp;        net = Money.fromMinor(income - expense),
-&nbsp;        plannedIncome = Money.fromMinor(plannedIncome),
-&nbsp;        plannedExpense = Money.fromMinor(plannedExpense),
-&nbsp;    )
-&nbsp;}
+<b class="fc">&nbsp;data class GoalContribution(</b>
+<b class="fc">&nbsp;    val id: GoalContributionId = GoalContributionId.uuid(),</b>
+<b class="fc">&nbsp;    val workspaceId: WorkspaceId,</b>
+<b class="fc">&nbsp;    val goalId: GoalId,</b>
+<b class="fc">&nbsp;    val amount: Money,</b>
+<b class="fc">&nbsp;    val occurredOn: LocalDate,</b>
+<b class="fc">&nbsp;    val note: String = &quot;&quot;,</b>
+<b class="fc">&nbsp;    val transferId: TransferId? = null,</b>
+<b class="fc">&nbsp;    val createdAt: Instant,</b>
+<b class="fc">&nbsp;    val updatedAt: Instant = createdAt,</b>
+&nbsp;)
 </code>
 </pre>
 </div>
@@ -236,7 +144,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 21:54</div>
+    <div style="float:right;">generated on 2026-07-23 10:32</div>
 </div>
 </body>
 </html>

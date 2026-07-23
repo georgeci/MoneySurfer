@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > NoOpCrashReporter</title>
+  <title>MoneySurfer Coverage Report > LocalDataResetRepositoryImpl</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,15 +22,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.data.repository</a>
 </div>
 
-<h1>Coverage Summary for Class: NoOpCrashReporter (com.georgeci.moneysurfer.data.repository)</h1>
+<h1>Coverage Summary for Class: LocalDataResetRepositoryImpl (com.georgeci.moneysurfer.data.repository)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
-<th class="coverageStat 
-">
-  Class, %
-</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -49,21 +46,13 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">NoOpCrashReporter</td>
+  <td class="name">LocalDataResetRepositoryImpl</td>
 <td class="coverageStat">
   <span class="percent">
     0%
   </span>
   <span class="absValue">
-    (0/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/7)
+    (0/2)
   </span>
 </td>
     <td class="coverageStat"/>
@@ -72,7 +61,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/7)
+    (0/13)
   </span>
 </td>
 <td class="coverageStat">
@@ -80,11 +69,42 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/4)
+    (0/136)
   </span>
 </td>
 </tr>
-
+  <tr>
+    <td class="name">LocalDataResetRepositoryImpl$clearAll$1</td>
+    <td class="coverageStat"/>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/136)
+  </span>
+</td>
+</tr>
 </table>
 
 <br/>
@@ -94,15 +114,34 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.repository
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.telemetry.CrashReporter
+&nbsp;import com.georgeci.moneysurfer.data.db.MoneySurferDatabase
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.LocalDataResetRepository
+&nbsp;import org.koin.core.annotation.Single
 &nbsp;
-<b class="nc">&nbsp;class NoOpCrashReporter : CrashReporter {</b>
-<b class="nc">&nbsp;    override fun log(message: String) = Unit</b>
-<b class="nc">&nbsp;    override fun record(error: Throwable) = Unit</b>
-<b class="nc">&nbsp;    override fun setUserId(userId: String?) = Unit</b>
-<b class="nc">&nbsp;    override fun setKey(key: String, value: String) = Unit</b>
-<b class="nc">&nbsp;    override fun setKey(key: String, value: Boolean) = Unit</b>
-<b class="nc">&nbsp;    override fun setCollectionEnabled(enabled: Boolean) = Unit</b>
+&nbsp;/**
+&nbsp; * Takes the database rather than one DAO per table — the parameter list grew
+&nbsp; * with every new table and bought nothing, since this class only ever fans out
+&nbsp; * `deleteAll()`.
+&nbsp; */
+<b class="nc">&nbsp;@Single(binds = [LocalDataResetRepository::class])</b>
+&nbsp;class LocalDataResetRepositoryImpl(
+<b class="nc">&nbsp;    private val database: MoneySurferDatabase,</b>
+&nbsp;) : LocalDataResetRepository {
+&nbsp;
+&nbsp;    // FK-safe order: leaf tables first, then parents.
+&nbsp;    override suspend fun clearAll() {
+<b class="nc">&nbsp;        database.goalContributionDao().deleteAll()</b>
+<b class="nc">&nbsp;        database.goalDao().deleteAll()</b>
+<b class="nc">&nbsp;        database.recurringRuleDao().deleteAll()</b>
+<b class="nc">&nbsp;        database.budgetDao().deleteAll()</b>
+<b class="nc">&nbsp;        database.transactionDao().deleteAll()</b>
+<b class="nc">&nbsp;        database.accountDao().deleteAll()</b>
+<b class="nc">&nbsp;        database.categoryDao().deleteAll()</b>
+<b class="nc">&nbsp;        database.workspaceInviteDao().deleteAll()</b>
+<b class="nc">&nbsp;        database.workspaceMemberDao().deleteAll()</b>
+<b class="nc">&nbsp;        database.workspaceDao().deleteAll()</b>
+<b class="nc">&nbsp;        database.userDao().deleteAll()</b>
+&nbsp;    }
 &nbsp;}
 </code>
 </pre>
@@ -127,7 +166,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 21:54</div>
+    <div style="float:right;">generated on 2026-07-23 10:32</div>
 </div>
 </body>
 </html>

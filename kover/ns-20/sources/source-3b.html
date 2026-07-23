@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > UpdateSavingsGoalUseCase</title>
+  <title>MoneySurfer Coverage Report > SendInviteUseCaseKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,12 +22,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.usecase</a>
 </div>
 
-<h1>Coverage Summary for Class: UpdateSavingsGoalUseCase (com.georgeci.moneysurfer.domain.usecase)</h1>
+<h1>Coverage Summary for Class: SendInviteUseCaseKt (com.georgeci.moneysurfer.domain.usecase)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -46,13 +49,29 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">UpdateSavingsGoalUseCase</td>
+  <td class="name">SendInviteUseCaseKt</td>
 <td class="coverageStat">
   <span class="percent">
     100%
   </span>
   <span class="absValue">
-    (2/2)
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    62.5%
+  </span>
+  <span class="absValue">
+    (5/8)
   </span>
 </td>
 <td class="coverageStat">
@@ -65,60 +84,14 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    94.7%
   </span>
   <span class="absValue">
-    (13/13)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (306/306)
+    (36/38)
   </span>
 </td>
 </tr>
-  <tr>
-    <td class="name">UpdateSavingsGoalUseCase$invoke$1</td>
-    <td class="coverageStat"/>
-  </tr>
-<tr>
-  <td class="name"><strong>Total</strong></td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (2/2)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (4/4)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (13/13)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (306/306)
-  </span>
-</td>
-</tr>
+
 </table>
 
 <br/>
@@ -130,45 +103,144 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;
 &nbsp;import arrow.core.Either
 &nbsp;import arrow.core.raise.either
-&nbsp;import com.georgeci.moneysurfer.domain.model.GoalStatus
-&nbsp;import com.georgeci.moneysurfer.domain.model.SavingsGoal
-&nbsp;import com.georgeci.moneysurfer.domain.repositories.GoalContributionRepository
-&nbsp;import com.georgeci.moneysurfer.domain.repositories.SavingsGoalRepository
-&nbsp;import com.georgeci.moneysurfer.domain.repositories.WorkspaceRepository
+&nbsp;import arrow.core.raise.ensure
+&nbsp;import co.touchlab.kermit.Logger
+&nbsp;import com.georgeci.moneysurfer.domain.auth.SessionPointers
+&nbsp;import com.georgeci.moneysurfer.domain.logging.redactEmail
+&nbsp;import com.georgeci.moneysurfer.domain.logging.redactUid
+&nbsp;import com.georgeci.moneysurfer.domain.model.InviteStatus
+&nbsp;import com.georgeci.moneysurfer.domain.model.WorkspaceInvite
+&nbsp;import com.georgeci.moneysurfer.domain.model.WorkspaceMemberStatus
+&nbsp;import com.georgeci.moneysurfer.domain.model.WorkspaceRole
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceInviteId
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.UserRemoteRepository
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.WorkspaceInviteRepository
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.WorkspaceMemberRepository
+&nbsp;import kotlinx.coroutines.flow.first
 &nbsp;import org.koin.core.annotation.Single
+&nbsp;import kotlin.time.Duration.Companion.days
 &nbsp;
 &nbsp;/**
-&nbsp; * Edits a goal. Lowering the target below the saved amount completes the goal, and
-&nbsp; * raising it above re-opens it — the same rule [AddContributionUseCase] applies from
-&nbsp; * the other side, since either edge can be crossed by moving either number.
+&nbsp; * Sends a workspace invitation:
+&nbsp; * 1. Validate caller is OWNER of [Params.workspaceId].
+&nbsp; * 2. Normalize email + reject invalid / duplicate-active-member / pending-invite cases.
+&nbsp; * 3. Resolve recipient via `userEmails/{email}` mapping — refuse if no user has
+&nbsp; *    registered with that email (UI surfaces it as a field-level error).
+&nbsp; * 4. Build invite with `expiresAt = now + INVITE_TTL_MILLIS`, status PENDING, persist.
 &nbsp; */
-<b class="fc">&nbsp;@Single</b>
-&nbsp;class UpdateSavingsGoalUseCase(
-<b class="fc">&nbsp;    private val goalRepository: SavingsGoalRepository,</b>
-<b class="fc">&nbsp;    private val contributionRepository: GoalContributionRepository,</b>
-<b class="fc">&nbsp;    private val workspaceRepository: WorkspaceRepository,</b>
+&nbsp;@Single
+&nbsp;class SendInviteUseCase(
+&nbsp;    private val memberRepository: WorkspaceMemberRepository,
+&nbsp;    private val inviteRepository: WorkspaceInviteRepository,
+&nbsp;    private val userRemoteRepository: UserRemoteRepository,
+&nbsp;    private val session: SessionPointers,
+&nbsp;    private val getCurrentTime: GetCurrentTimeUseCase,
 &nbsp;) {
+&nbsp;    private val log = Logger.withTag(TAG)
 &nbsp;
-<b class="fc">&nbsp;    suspend operator fun invoke(goal: SavingsGoal): Either&lt;GoalActionError, SavingsGoal&gt; = either {</b>
-<b class="fc">&nbsp;        goalRepository.getById(goal.id) ?: raise(GoalActionError.GoalNotFound)</b>
-<b class="fc">&nbsp;        ensureGoalIsValid(goal, workspaceRepository)</b>
-<b class="fc">&nbsp;        val saved = contributionRepository.savedAmount(goal.id)</b>
-<b class="fc">&nbsp;        val retargeted = goal.copy(status = goal.status.afterProgressChange(saved &gt;= goal.target))</b>
-<b class="fc">&nbsp;        Either.catch { goalRepository.update(retargeted) }</b>
-<b class="fc">&nbsp;            .mapLeft { GoalActionError.LocalWriteFailed(it) }</b>
-<b class="fc">&nbsp;            .bind()</b>
-<b class="fc">&nbsp;        retargeted</b>
+&nbsp;    data class Params(
+&nbsp;        val workspaceId: WorkspaceId,
+&nbsp;        val email: String,
+&nbsp;        val role: WorkspaceRole,
+&nbsp;    )
+&nbsp;
+&nbsp;    suspend operator fun invoke(params: Params): Either&lt;InviteError, WorkspaceInviteId&gt; = either {
+&nbsp;        val callerId = session.currentUserId.flow.first()
+&nbsp;            ?: raise(InviteError.NoCurrentUser)
+&nbsp;
+&nbsp;        val normalizedEmail = params.email.trim().lowercase()
+&nbsp;        ensure(normalizedEmail.isValidEmail()) { InviteError.InvalidEmail }
+&nbsp;
+&nbsp;        val members = memberRepository.getByWorkspaceId(params.workspaceId).first()
+&nbsp;        val callerMember = members.firstOrNull { it.userId == callerId }
+&nbsp;        ensure(callerMember?.role == WorkspaceRole.OWNER) { InviteError.NotOwner }
+&nbsp;
+&nbsp;        val activeMember = members.firstOrNull {
+&nbsp;            it.status == WorkspaceMemberStatus.ACTIVE &amp;&amp; it.email?.lowercase() == normalizedEmail
+&nbsp;        }
+&nbsp;        ensure(activeMember == null) { InviteError.AlreadyMember(normalizedEmail) }
+&nbsp;
+&nbsp;        val existingPending = inviteRepository.getByWorkspaceId(params.workspaceId).first()
+&nbsp;            .firstOrNull { it.status == InviteStatus.PENDING &amp;&amp; it.email == normalizedEmail }
+&nbsp;        ensure(existingPending == null) { InviteError.AlreadyInvited(normalizedEmail) }
+&nbsp;
+&nbsp;        // Hard-resolve recipient via userEmails/{email} mapping. Mapping is written by
+&nbsp;        // PostAuthBootstrap on every login, so any registered account is discoverable.
+&nbsp;        // Miss → UserNotFound (UI shows a field-level error so the inviter can correct
+&nbsp;        // the address). Throw → RemoteSyncFailed so the caller can retry.
+&nbsp;        val targetUserId = Either.catch { userRemoteRepository.findByEmail(normalizedEmail) }
+&nbsp;            .onLeft { log.e(it) { &quot;[targetUserId:lookup] failed email=${normalizedEmail.redactEmail()}&quot; } }
+&nbsp;            .mapLeft { InviteError.RemoteSyncFailed(it) }
+&nbsp;            .bind()
+&nbsp;        if (targetUserId == null) {
+&nbsp;            log.i { &quot;[targetUserId] miss email=${normalizedEmail.redactEmail()} — no registered user&quot; }
+&nbsp;            raise(InviteError.UserNotFound(normalizedEmail))
+&nbsp;        }
+&nbsp;        log.i { &quot;[targetUserId] email=${normalizedEmail.redactEmail()} resolved=${targetUserId.value.redactUid()}&quot; }
+&nbsp;
+&nbsp;        val now = getCurrentTime()
+&nbsp;        val newId = WorkspaceInviteId.uuid()
+&nbsp;        val invite = WorkspaceInvite(
+&nbsp;            id = newId,
+&nbsp;            workspaceId = params.workspaceId,
+&nbsp;            email = normalizedEmail,
+&nbsp;            targetUserId = targetUserId,
+&nbsp;            role = params.role,
+&nbsp;            status = InviteStatus.PENDING,
+&nbsp;            invitedByUserId = callerId,
+&nbsp;            createdAt = now,
+&nbsp;            updatedAt = now,
+&nbsp;            expiresAt = now + INVITE_TTL,
+&nbsp;            respondedAt = null,
+&nbsp;        )
+&nbsp;
+&nbsp;        Either.catch { inviteRepository.upsert(invite) }
+&nbsp;            .onLeft {
+&nbsp;                log.e(it) {
+&nbsp;                    &quot;[local] upsert failed wid=${params.workspaceId.value} &quot; +
+&nbsp;                        &quot;email=${normalizedEmail.redactEmail()}&quot;
+&nbsp;                }
+&nbsp;            }
+&nbsp;            .mapLeft { InviteError.LocalWriteFailed(it) }
+&nbsp;            .bind()
+&nbsp;
+&nbsp;        // Best-effort: seed recipient&#39;s invitedWorkspaceIds so their next syncAll()
+&nbsp;        // discovers the invite without a collectionGroup query.
+&nbsp;        // Non-fatal: if this fails the invite still lands via the outbox; the
+&nbsp;        // recipient can trigger a manual sync which will re-seed this field.
+&nbsp;        val firebaseUid = session.currentFirebaseUid.flow.first()
+&nbsp;        if (firebaseUid != null) {
+&nbsp;            Either.catch {
+&nbsp;                userRemoteRepository.addInvitedWorkspaceRef(targetUserId.value, params.workspaceId)
+&nbsp;            }.onLeft {
+&nbsp;                log.w(it) {
+&nbsp;                    &quot;[remote] addInvitedWorkspaceRef failed uid=${targetUserId.value.redactUid()} &quot; +
+&nbsp;                        &quot;wid=${params.workspaceId.value} — non-fatal&quot;
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        log.i {
+&nbsp;            &quot;[done] wid=${params.workspaceId.value} email=${normalizedEmail.redactEmail()} role=${params.role} &quot; +
+&nbsp;                &quot;id=${newId.value} expiresAt=${invite.expiresAt}&quot;
+&nbsp;        }
+&nbsp;        newId
+&nbsp;    }
+&nbsp;
+&nbsp;    private companion object {
+&nbsp;        const val TAG = &quot;SendInvite&quot;
+&nbsp;
+&nbsp;        /** 14 days. Matches md/members.md decision. */
+&nbsp;        val INVITE_TTL = 14.days
 &nbsp;    }
 &nbsp;}
 &nbsp;
-&nbsp;/**
-&nbsp; * The ACTIVE ↔ COMPLETED flip. Only those two statuses move: a PAUSED or ARCHIVED
-&nbsp; * goal keeps its status no matter what the numbers do.
-&nbsp; */
-&nbsp;internal fun GoalStatus.afterProgressChange(isReached: Boolean): GoalStatus = when {
-&nbsp;    this == GoalStatus.ACTIVE &amp;&amp; isReached -&gt; GoalStatus.COMPLETED
-&nbsp;    this == GoalStatus.COMPLETED &amp;&amp; !isReached -&gt; GoalStatus.ACTIVE
-&nbsp;    else -&gt; this
+&nbsp;private fun String.isValidEmail(): Boolean {
+<b class="pc">&nbsp;    if (isBlank()) return false</b>
+<b class="fc">&nbsp;    val at = indexOf(&#39;@&#39;)</b>
+<b class="pc">&nbsp;    if (at &lt;= 0 || at == length - 1) return false</b>
+<b class="pc">&nbsp;    return indexOf(&#39;.&#39;, startIndex = at) &gt; at + 1</b>
 &nbsp;}
 </code>
 </pre>
@@ -193,7 +265,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 21:54</div>
+    <div style="float:right;">generated on 2026-07-23 10:32</div>
 </div>
 </body>
 </html>

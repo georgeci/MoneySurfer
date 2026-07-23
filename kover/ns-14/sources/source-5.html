@@ -61,21 +61,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp; *   Used by `CreateWorkspaceUseCase` to decide whether to push to Firestore.
 &nbsp; * - [hasUsedDemo] — sticky flag set by `DemoLoginUseCase`, consumed by `WipeDemoDataUseCase`
 &nbsp; *   on real login/signup so demo rows never leak into the real account&#39;s outbox.
-&nbsp; * - [currencyChosen] — sticky flag, `true` by default. The offline first-run seed flips it to
-&nbsp; *   `false` after auto-creating a workspace with a locale-derived currency, so `AppLaunchViewModel`
-&nbsp; *   routes to the currency picker before Dashboard. The picker flips it back to `true` on confirm
-&nbsp; *   *or* on skip, so a relaunch does not show the picker again.
-&nbsp; * - [onboardingSkipped] — sticky flag, `false` by default. Set to `true` when the user taps
-&nbsp; *   &quot;Skip&quot; on the first-run currency picker (keeping the locale-derived seed default). Settings
-&nbsp; *   shows a &quot;Finish setup&quot; entry while this is `true`; confirming the picker clears it.
 &nbsp; */
 &nbsp;interface SessionPointers {
 &nbsp;    val currentUserId: Pref&lt;UserId?&gt;
 &nbsp;    val currentWorkspaceId: Pref&lt;WorkspaceId?&gt;
 &nbsp;    val currentFirebaseUid: Pref&lt;String?&gt;
 &nbsp;    val hasUsedDemo: Pref&lt;Boolean&gt;
-&nbsp;    val currencyChosen: Pref&lt;Boolean&gt;
-&nbsp;    val onboardingSkipped: Pref&lt;Boolean&gt;
 &nbsp;}
 </code>
 </pre>
@@ -100,7 +91,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 21:54</div>
+    <div style="float:right;">generated on 2026-07-23 10:32</div>
 </div>
 </body>
 </html>

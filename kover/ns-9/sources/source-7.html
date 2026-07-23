@@ -49,34 +49,34 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   <td class="name">TransactionDao_Impl</td>
 <td class="coverageStat">
   <span class="percent">
-    67.7%
+    63.6%
   </span>
   <span class="absValue">
-    (21/31)
+    (21/33)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    56.7%
+    53.1%
   </span>
   <span class="absValue">
-    (34/60)
+    (34/64)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    79.5%
+    68.6%
   </span>
   <span class="absValue">
-    (422/531)
+    (422/615)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    79.8%
+    69.9%
   </span>
   <span class="absValue">
-    (1603/2010)
+    (1603/2294)
   </span>
 </td>
 </tr>
@@ -252,34 +252,34 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
-    68.2%
+    65.2%
   </span>
   <span class="absValue">
-    (30/44)
+    (30/46)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    51.2%
+    48.9%
   </span>
   <span class="absValue">
-    (43/84)
+    (43/88)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    74.1%
+    65.6%
   </span>
   <span class="absValue">
-    (479/646)
+    (479/730)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    73.9%
+    66.3%
   </span>
   <span class="absValue">
-    (1825/2469)
+    (1825/2753)
   </span>
 </td>
 </tr>
@@ -297,10 +297,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import androidx.room.EntityUpsertAdapter
 &nbsp;import androidx.room.RoomDatabase
 &nbsp;import androidx.room.coroutines.createFlow
+&nbsp;import androidx.room.util.appendPlaceholders
 &nbsp;import androidx.room.util.getColumnIndexOrThrow
 &nbsp;import androidx.room.util.performSuspending
 &nbsp;import androidx.sqlite.SQLiteStatement
 &nbsp;import com.georgeci.moneysurfer.`data`.db.entity.CategorizedTransactionEntity
+&nbsp;import com.georgeci.moneysurfer.`data`.db.entity.CategoryMonthlyTotalEntity
 &nbsp;import com.georgeci.moneysurfer.`data`.db.entity.TransactionEntity
 &nbsp;import javax.`annotation`.processing.Generated
 &nbsp;import kotlin.Int
@@ -312,6 +314,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import kotlin.collections.MutableList
 &nbsp;import kotlin.collections.mutableListOf
 &nbsp;import kotlin.reflect.KClass
+&nbsp;import kotlin.text.StringBuilder
 &nbsp;import kotlinx.coroutines.flow.Flow
 &nbsp;
 <b class="fc">&nbsp;@Generated(value = [&quot;androidx.room.RoomProcessor&quot;])</b>
@@ -1150,6 +1153,119 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    }
 &nbsp;  }
 &nbsp;
+&nbsp;  public override fun getMonthlyTotalsByCategory(
+&nbsp;    workspaceId: String,
+&nbsp;    categoryIds: List&lt;String&gt;,
+&nbsp;    type: String,
+&nbsp;    fromDate: String,
+&nbsp;    toDateExclusive: String,
+&nbsp;  ): Flow&lt;List&lt;CategoryMonthlyTotalEntity&gt;&gt; {
+<b class="nc">&nbsp;    val _stringBuilder: StringBuilder = StringBuilder()</b>
+<b class="nc">&nbsp;    _stringBuilder.append(&quot;&quot;&quot;</b>
+&nbsp;        |
+<b class="nc">&nbsp;        |&quot;&quot;&quot;.trimMargin())</b>
+<b class="nc">&nbsp;    _stringBuilder.append(&quot;        SELECT&quot;)</b>
+<b class="nc">&nbsp;    _stringBuilder.append(&quot;&quot;&quot;</b>
+&nbsp;        |
+<b class="nc">&nbsp;        |&quot;&quot;&quot;.trimMargin())</b>
+<b class="nc">&nbsp;    _stringBuilder.append(&quot;            transactions.categoryId AS categoryId,&quot;)</b>
+<b class="nc">&nbsp;    _stringBuilder.append(&quot;&quot;&quot;</b>
+&nbsp;        |
+<b class="nc">&nbsp;        |&quot;&quot;&quot;.trimMargin())</b>
+<b class="nc">&nbsp;    _stringBuilder.append(&quot;            substr(transactions.operationDate, 1, 7) AS month,&quot;)</b>
+<b class="nc">&nbsp;    _stringBuilder.append(&quot;&quot;&quot;</b>
+&nbsp;        |
+<b class="nc">&nbsp;        |&quot;&quot;&quot;.trimMargin())</b>
+<b class="nc">&nbsp;    _stringBuilder.append(&quot;            SUM(ABS(transactions.amount)) AS totalMinor,&quot;)</b>
+<b class="nc">&nbsp;    _stringBuilder.append(&quot;&quot;&quot;</b>
+&nbsp;        |
+<b class="nc">&nbsp;        |&quot;&quot;&quot;.trimMargin())</b>
+<b class="nc">&nbsp;    _stringBuilder.append(&quot;            COUNT(*) AS transactionCount&quot;)</b>
+<b class="nc">&nbsp;    _stringBuilder.append(&quot;&quot;&quot;</b>
+&nbsp;        |
+<b class="nc">&nbsp;        |&quot;&quot;&quot;.trimMargin())</b>
+<b class="nc">&nbsp;    _stringBuilder.append(&quot;        FROM transactions&quot;)</b>
+<b class="nc">&nbsp;    _stringBuilder.append(&quot;&quot;&quot;</b>
+&nbsp;        |
+<b class="nc">&nbsp;        |&quot;&quot;&quot;.trimMargin())</b>
+<b class="nc">&nbsp;    _stringBuilder.append(&quot;        WHERE transactions.workspaceId = &quot;)</b>
+<b class="nc">&nbsp;    _stringBuilder.append(&quot;?&quot;)</b>
+<b class="nc">&nbsp;    _stringBuilder.append(&quot;&quot;&quot;</b>
+&nbsp;        |
+<b class="nc">&nbsp;        |&quot;&quot;&quot;.trimMargin())</b>
+<b class="nc">&nbsp;    _stringBuilder.append(&quot;            AND transactions.categoryId IN (&quot;)</b>
+<b class="nc">&nbsp;    val _inputSize: Int = categoryIds.size</b>
+<b class="nc">&nbsp;    appendPlaceholders(_stringBuilder, _inputSize)</b>
+<b class="nc">&nbsp;    _stringBuilder.append(&quot;)&quot;)</b>
+<b class="nc">&nbsp;    _stringBuilder.append(&quot;&quot;&quot;</b>
+&nbsp;        |
+<b class="nc">&nbsp;        |&quot;&quot;&quot;.trimMargin())</b>
+<b class="nc">&nbsp;    _stringBuilder.append(&quot;            AND transactions.type = &quot;)</b>
+<b class="nc">&nbsp;    _stringBuilder.append(&quot;?&quot;)</b>
+<b class="nc">&nbsp;    _stringBuilder.append(&quot;&quot;&quot;</b>
+&nbsp;        |
+<b class="nc">&nbsp;        |&quot;&quot;&quot;.trimMargin())</b>
+<b class="nc">&nbsp;    _stringBuilder.append(&quot;            AND transactions.status = &#39;ACTUAL&#39;&quot;)</b>
+<b class="nc">&nbsp;    _stringBuilder.append(&quot;&quot;&quot;</b>
+&nbsp;        |
+<b class="nc">&nbsp;        |&quot;&quot;&quot;.trimMargin())</b>
+<b class="nc">&nbsp;    _stringBuilder.append(&quot;            AND transactions.operationDate &gt;= &quot;)</b>
+<b class="nc">&nbsp;    _stringBuilder.append(&quot;?&quot;)</b>
+<b class="nc">&nbsp;    _stringBuilder.append(&quot;&quot;&quot;</b>
+&nbsp;        |
+<b class="nc">&nbsp;        |&quot;&quot;&quot;.trimMargin())</b>
+<b class="nc">&nbsp;    _stringBuilder.append(&quot;            AND transactions.operationDate &lt; &quot;)</b>
+<b class="nc">&nbsp;    _stringBuilder.append(&quot;?&quot;)</b>
+<b class="nc">&nbsp;    _stringBuilder.append(&quot;&quot;&quot;</b>
+&nbsp;        |
+<b class="nc">&nbsp;        |&quot;&quot;&quot;.trimMargin())</b>
+<b class="nc">&nbsp;    _stringBuilder.append(&quot;        GROUP BY transactions.categoryId, month&quot;)</b>
+<b class="nc">&nbsp;    _stringBuilder.append(&quot;&quot;&quot;</b>
+&nbsp;        |
+<b class="nc">&nbsp;        |&quot;&quot;&quot;.trimMargin())</b>
+<b class="nc">&nbsp;    _stringBuilder.append(&quot;        &quot;)</b>
+<b class="nc">&nbsp;    val _sql: String = _stringBuilder.toString()</b>
+<b class="nc">&nbsp;    return createFlow(__db, false, arrayOf(&quot;transactions&quot;)) { _connection -&gt;</b>
+<b class="nc">&nbsp;      val _stmt: SQLiteStatement = _connection.prepare(_sql)</b>
+&nbsp;      try {
+<b class="nc">&nbsp;        var _argIndex: Int = 1</b>
+<b class="nc">&nbsp;        _stmt.bindText(_argIndex, workspaceId)</b>
+<b class="nc">&nbsp;        _argIndex = 2</b>
+<b class="nc">&nbsp;        for (_item: String in categoryIds) {</b>
+<b class="nc">&nbsp;          _stmt.bindText(_argIndex, _item)</b>
+<b class="nc">&nbsp;          _argIndex++</b>
+&nbsp;        }
+<b class="nc">&nbsp;        _argIndex = 2 + _inputSize</b>
+<b class="nc">&nbsp;        _stmt.bindText(_argIndex, type)</b>
+<b class="nc">&nbsp;        _argIndex = 3 + _inputSize</b>
+<b class="nc">&nbsp;        _stmt.bindText(_argIndex, fromDate)</b>
+<b class="nc">&nbsp;        _argIndex = 4 + _inputSize</b>
+<b class="nc">&nbsp;        _stmt.bindText(_argIndex, toDateExclusive)</b>
+<b class="nc">&nbsp;        val _columnIndexOfCategoryId: Int = 0</b>
+<b class="nc">&nbsp;        val _columnIndexOfMonth: Int = 1</b>
+<b class="nc">&nbsp;        val _columnIndexOfTotalMinor: Int = 2</b>
+<b class="nc">&nbsp;        val _columnIndexOfTransactionCount: Int = 3</b>
+<b class="nc">&nbsp;        val _result: MutableList&lt;CategoryMonthlyTotalEntity&gt; = mutableListOf()</b>
+<b class="nc">&nbsp;        while (_stmt.step()) {</b>
+<b class="nc">&nbsp;          val _item_1: CategoryMonthlyTotalEntity</b>
+<b class="nc">&nbsp;          val _tmpCategoryId: String</b>
+<b class="nc">&nbsp;          _tmpCategoryId = _stmt.getText(_columnIndexOfCategoryId)</b>
+<b class="nc">&nbsp;          val _tmpMonth: String</b>
+<b class="nc">&nbsp;          _tmpMonth = _stmt.getText(_columnIndexOfMonth)</b>
+<b class="nc">&nbsp;          val _tmpTotalMinor: Long</b>
+<b class="nc">&nbsp;          _tmpTotalMinor = _stmt.getLong(_columnIndexOfTotalMinor)</b>
+<b class="nc">&nbsp;          val _tmpTransactionCount: Int</b>
+<b class="nc">&nbsp;          _tmpTransactionCount = _stmt.getLong(_columnIndexOfTransactionCount).toInt()</b>
+<b class="nc">&nbsp;          _item_1 = CategoryMonthlyTotalEntity(_tmpCategoryId,_tmpMonth,_tmpTotalMinor,_tmpTransactionCount)</b>
+<b class="nc">&nbsp;          _result.add(_item_1)</b>
+&nbsp;        }
+<b class="nc">&nbsp;        _result</b>
+&nbsp;      } finally {
+<b class="nc">&nbsp;        _stmt.close()</b>
+&nbsp;      }
+&nbsp;    }
+&nbsp;  }
+&nbsp;
 &nbsp;  public override suspend fun delete(id: String) {
 <b class="fc">&nbsp;    val _sql: String = &quot;DELETE FROM transactions WHERE id = ?&quot;</b>
 <b class="fc">&nbsp;    return performSuspending(__db, false, true) { _connection -&gt;</b>
@@ -1231,7 +1347,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 21:54</div>
+    <div style="float:right;">generated on 2026-07-23 10:32</div>
 </div>
 </body>
 </html>

@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SurferCategoryCellKt</title>
+  <title>MoneySurfer Coverage Report > SplitAmountParts</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.uikit.components.category</a>
+    <a href="../index.html">com.georgeci.moneysurfer.uikit.components.base</a>
 </div>
 
-<h1>Coverage Summary for Class: SurferCategoryCellKt (com.georgeci.moneysurfer.uikit.components.category)</h1>
+<h1>Coverage Summary for Class: SplitAmountParts (com.georgeci.moneysurfer.uikit.components.base)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SurferCategoryCellKt</td>
+  <td class="name">SplitAmountParts</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -60,34 +60,27 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    50%
+    100%
   </span>
   <span class="absValue">
-    (1/2)
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/5)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    50%
+    100%
   </span>
   <span class="absValue">
-    (9/18)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    91.9%
-  </span>
-  <span class="absValue">
-    (34/37)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    84.6%
-  </span>
-  <span class="absValue">
-    (368/435)
+    (22/22)
   </span>
 </td>
 </tr>
@@ -99,114 +92,150 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.components.category
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.components.base
 &nbsp;
-&nbsp;import androidx.compose.foundation.background
-&nbsp;import androidx.compose.foundation.clickable
 &nbsp;import androidx.compose.foundation.layout.Arrangement
-&nbsp;import androidx.compose.foundation.layout.Box
 &nbsp;import androidx.compose.foundation.layout.Column
-&nbsp;import androidx.compose.foundation.layout.Row
-&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
-&nbsp;import androidx.compose.foundation.layout.padding
-&nbsp;import androidx.compose.foundation.layout.size
-&nbsp;import androidx.compose.foundation.shape.CircleShape
-&nbsp;import androidx.compose.foundation.shape.RoundedCornerShape
+&nbsp;import androidx.compose.material3.LocalContentColor
 &nbsp;import androidx.compose.material3.Text
 &nbsp;import androidx.compose.runtime.Composable
-&nbsp;import androidx.compose.ui.Alignment
+&nbsp;import androidx.compose.runtime.remember
 &nbsp;import androidx.compose.ui.Modifier
-&nbsp;import androidx.compose.ui.draw.clip
 &nbsp;import androidx.compose.ui.graphics.Color
-&nbsp;import androidx.compose.ui.graphics.vector.ImageVector
-&nbsp;import androidx.compose.ui.text.style.TextAlign
-&nbsp;import androidx.compose.ui.text.style.TextOverflow
+&nbsp;import androidx.compose.ui.text.SpanStyle
+&nbsp;import androidx.compose.ui.text.buildAnnotatedString
+&nbsp;import androidx.compose.ui.text.font.FontWeight
+&nbsp;import androidx.compose.ui.text.style.BaselineShift
+&nbsp;import androidx.compose.ui.text.withStyle
 &nbsp;import androidx.compose.ui.tooling.preview.Preview
+&nbsp;import androidx.compose.ui.unit.TextUnit
 &nbsp;import androidx.compose.ui.unit.dp
-&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferCategoryBubble
-&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferCategoryPalette
-&nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+&nbsp;import androidx.compose.ui.unit.em
+&nbsp;import androidx.compose.ui.unit.sp
 &nbsp;import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
 &nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
 &nbsp;
+&nbsp;/** Size tier for [SurferSplitAmount]. Mirrors the design system&#39;s hero / stat / body sizes. */
+&nbsp;enum class SurferSplitAmountTier(
+&nbsp;    internal val integerSize: TextUnit,
+&nbsp;    internal val signSize: TextUnit,
+&nbsp;    internal val fractionSize: TextUnit,
+&nbsp;    internal val letterSpacing: TextUnit,
+&nbsp;) {
+&nbsp;    Hero(integerSize = 56.sp, signSize = 20.sp, fractionSize = 22.sp, letterSpacing = (-1.8).sp),
+&nbsp;    Stat(integerSize = 32.sp, signSize = 14.sp, fractionSize = 14.sp, letterSpacing = (-0.8).sp),
+&nbsp;    Body(integerSize = 22.sp, signSize = 12.sp, fractionSize = 12.sp, letterSpacing = (-0.4).sp),
+&nbsp;}
+&nbsp;
 &nbsp;/**
-&nbsp; * Grid cell for the category picker / creation screens. Renders a [SurferCategoryBubble] over
-&nbsp; * a centered label. Selection promotes the bubble&#39;s surrounding ring to the primary color and
-&nbsp; * tints the label with the secondaryContainer palette so the cell reads as the active choice.
+&nbsp; * Renders a monetary amount with a superscripted currency sign, large integer part, and smaller
+&nbsp; * fractional decimals. Mirrors the dashboard &quot;Total balance&quot; hero treatment so every balance in
+&nbsp; * the app reads the same.
+&nbsp; *
+&nbsp; * Feed it a pre-formatted string such as &quot;€2,480.32&quot; or &quot;−€48.20&quot; — the leading sign/currency
+&nbsp; * prefix, integer portion, and fractional portion are split automatically.
 &nbsp; */
 &nbsp;@Composable
-&nbsp;fun SurferCategoryCell(
-&nbsp;    name: String,
-&nbsp;    icon: ImageVector,
-&nbsp;    tint: Color,
-&nbsp;    selected: Boolean,
-&nbsp;    onClick: () -&gt; Unit,
-<b class="fc">&nbsp;    modifier: Modifier = Modifier,</b>
-<b class="pc">&nbsp;) {</b>
-<b class="fc">&nbsp;    val bg = if (selected) AppTheme.materialColors.secondaryContainer else Color.Transparent</b>
-<b class="fc">&nbsp;    val labelColor = if (selected) {</b>
-<b class="fc">&nbsp;        AppTheme.materialColors.onSecondaryContainer</b>
-<b class="fc">&nbsp;    } else {</b>
-<b class="fc">&nbsp;        AppTheme.materialColors.onSurface</b>
+&nbsp;fun SurferSplitAmount(
+&nbsp;    formattedAmount: String,
+&nbsp;    modifier: Modifier = Modifier,
+&nbsp;    tier: SurferSplitAmountTier = SurferSplitAmountTier.Hero,
+&nbsp;    color: Color = LocalContentColor.current,
+&nbsp;    signAlpha: Float = 0.7f,
+&nbsp;    fractionAlpha: Float = 0.6f,
+&nbsp;) {
+&nbsp;    val parts = rememberSplitAmount(formattedAmount)
+&nbsp;    val annotated = remember(parts, color, signAlpha, fractionAlpha, tier) {
+&nbsp;        buildAnnotatedString {
+&nbsp;            if (parts.sign.isNotEmpty()) {
+&nbsp;                withStyle(
+&nbsp;                    SpanStyle(
+&nbsp;                        fontSize = tier.signSize,
+&nbsp;                        fontWeight = FontWeight.Medium,
+&nbsp;                        color = color.copy(alpha = signAlpha),
+&nbsp;                        baselineShift = BaselineShift(0F),
+&nbsp;                    ),
+&nbsp;                ) { append(parts.sign) }
+&nbsp;            }
+&nbsp;            withStyle(
+&nbsp;                SpanStyle(
+&nbsp;                    fontSize = tier.integerSize,
+&nbsp;                    fontWeight = FontWeight.SemiBold,
+&nbsp;                    letterSpacing = tier.letterSpacing,
+&nbsp;                    color = color,
+&nbsp;                ),
+&nbsp;            ) { append(parts.integer) }
+&nbsp;            withStyle(
+&nbsp;                SpanStyle(
+&nbsp;                    fontSize = tier.fractionSize,
+&nbsp;                    fontWeight = FontWeight.Medium,
+&nbsp;                    color = color.copy(alpha = fractionAlpha),
+&nbsp;                    baselineShift = BaselineShift(0F),
+&nbsp;                ),
+&nbsp;            ) {
+&nbsp;                append(parts.delimiter)
+&nbsp;                append(parts.fraction)
+&nbsp;            }
+&nbsp;        }
 &nbsp;    }
-<b class="fc">&nbsp;    Column(</b>
-<b class="fc">&nbsp;        modifier = modifier</b>
-<b class="fc">&nbsp;            .fillMaxWidth()</b>
-<b class="fc">&nbsp;            .clip(RoundedCornerShape(14.dp))</b>
-<b class="fc">&nbsp;            .background(bg)</b>
-<b class="fc">&nbsp;            .clickable(onClick = onClick)</b>
-<b class="fc">&nbsp;            .padding(vertical = 8.dp),</b>
-<b class="fc">&nbsp;        horizontalAlignment = Alignment.CenterHorizontally,</b>
-<b class="fc">&nbsp;        verticalArrangement = Arrangement.spacedBy(6.dp),</b>
-&nbsp;    ) {
-<b class="fc">&nbsp;        Box(</b>
-<b class="fc">&nbsp;            modifier = Modifier</b>
-<b class="fc">&nbsp;                .size(48.dp)</b>
-<b class="fc">&nbsp;                .clip(CircleShape)</b>
-<b class="fc">&nbsp;                .background(if (selected) AppTheme.materialColors.primary else Color.Transparent),</b>
-<b class="fc">&nbsp;            contentAlignment = Alignment.Center,</b>
-&nbsp;        ) {
-<b class="fc">&nbsp;            SurferCategoryBubble(icon = icon, tint = tint, size = 44.dp)</b>
-<b class="fc">&nbsp;        }</b>
-<b class="fc">&nbsp;        Text(</b>
-<b class="fc">&nbsp;            text = name,</b>
-<b class="fc">&nbsp;            style = AppTheme.typography.labelMedium,</b>
-<b class="fc">&nbsp;            color = labelColor,</b>
-<b class="fc">&nbsp;            textAlign = TextAlign.Center,</b>
-<b class="fc">&nbsp;            maxLines = 1,</b>
-<b class="fc">&nbsp;            overflow = TextOverflow.Ellipsis,</b>
-<b class="fc">&nbsp;            modifier = Modifier.padding(horizontal = 2.dp),</b>
-&nbsp;        )
-<b class="fc">&nbsp;    }</b>
-<b class="fc">&nbsp;}</b>
+&nbsp;    Text(
+&nbsp;        text = annotated,
+&nbsp;        modifier = modifier,
+&nbsp;        maxLines = 1,
+&nbsp;        style = AppTheme.typography.displayLarge.copy(lineHeight = 1.em),
+&nbsp;    )
+&nbsp;}
+&nbsp;
+<b class="fc">&nbsp;internal data class SplitAmountParts(</b>
+<b class="fc">&nbsp;    val sign: String,</b>
+<b class="fc">&nbsp;    val integer: String,</b>
+<b class="fc">&nbsp;    val fraction: String,</b>
+<b class="fc">&nbsp;    val delimiter: Char,</b>
+&nbsp;)
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun rememberSplitAmount(formatted: String): SplitAmountParts =
+&nbsp;    remember(formatted) { splitForDisplay(formatted) }
+&nbsp;
+&nbsp;internal fun splitForDisplay(raw: String): SplitAmountParts {
+&nbsp;    val trimmed = raw.trim()
+&nbsp;    val negative = trimmed.startsWith(&#39;-&#39;) || trimmed.startsWith(&#39;−&#39;)
+&nbsp;    val withoutMinus = if (negative) trimmed.substring(1).trimStart() else trimmed
+&nbsp;    val firstDigit = withoutMinus.indexOfFirst { it.isDigit() }
+&nbsp;    val currencyPrefix = if (firstDigit &gt;= 0) withoutMinus.substring(0, firstDigit) else &quot;&quot;
+&nbsp;    val numberPart = if (firstDigit &gt;= 0) withoutMinus.substring(firstDigit) else withoutMinus
+&nbsp;
+&nbsp;    val dotIndex = numberPart.indexOfLast { it == &#39;.&#39; || it == &#39;,&#39; }
+&nbsp;        .takeIf { it &gt;= 0 &amp;&amp; numberPart.length - it - 1 in 1..2 } ?: -1
+&nbsp;    val integer = if (dotIndex &gt;= 0) numberPart.substring(0, dotIndex) else numberPart
+&nbsp;    val fraction = if (dotIndex &gt;= 0) numberPart.substring(dotIndex + 1).padEnd(2, &#39;0&#39;) else &quot;00&quot;
+&nbsp;    val delimiter = if (dotIndex &gt;= 0) numberPart[dotIndex] else &#39;.&#39;
+&nbsp;
+&nbsp;    val sign = buildString {
+&nbsp;        if (negative) append(&#39;−&#39;)
+&nbsp;        append(currencyPrefix.trim())
+&nbsp;    }
+&nbsp;    return SplitAmountParts(
+&nbsp;        sign = sign,
+&nbsp;        integer = integer,
+&nbsp;        fraction = fraction,
+&nbsp;        delimiter = delimiter,
+&nbsp;    )
+&nbsp;}
 &nbsp;
 &nbsp;@Preview
 &nbsp;@Composable
-<b class="nc">&nbsp;private fun SurferCategoryCellPreview() {</b>
-<b class="nc">&nbsp;    SurferComponentPreview {</b>
-&nbsp;        Row(
-&nbsp;            modifier = Modifier.padding(16.dp),
-&nbsp;            horizontalArrangement = Arrangement.spacedBy(12.dp),
+&nbsp;private fun SurferSplitAmountPreview() {
+&nbsp;    SurferComponentPreview {
+&nbsp;        Column(
+&nbsp;            verticalArrangement = Arrangement.spacedBy(16.dp),
 &nbsp;        ) {
-&nbsp;            SurferCategoryCell(
-&nbsp;                name = &quot;Salary&quot;,
-&nbsp;                icon = SurferIcons.Cash,
-&nbsp;                tint = SurferCategoryPalette.tints[1],
-&nbsp;                selected = false,
-&nbsp;                onClick = {},
-&nbsp;                modifier = Modifier.size(width = 80.dp, height = 96.dp),
-&nbsp;            )
-&nbsp;            SurferCategoryCell(
-&nbsp;                name = &quot;Salary&quot;,
-&nbsp;                icon = SurferIcons.Cash,
-&nbsp;                tint = SurferCategoryPalette.tints[1],
-&nbsp;                selected = true,
-&nbsp;                onClick = {},
-&nbsp;                modifier = Modifier.size(width = 80.dp, height = 96.dp),
-&nbsp;            )
+&nbsp;            SurferSplitAmount(&quot;€2.480.32&quot;, tier = SurferSplitAmountTier.Hero)
+&nbsp;            SurferSplitAmount(&quot;€3,200.00&quot;, tier = SurferSplitAmountTier.Stat)
+&nbsp;            SurferSplitAmount(&quot;−€48.20&quot;, tier = SurferSplitAmountTier.Body)
 &nbsp;        }
 &nbsp;    }
-<b class="nc">&nbsp;}</b>
+&nbsp;}
 </code>
 </pre>
 </div>
@@ -230,7 +259,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 21:54</div>
+    <div style="float:right;">generated on 2026-07-23 10:32</div>
 </div>
 </body>
 </html>

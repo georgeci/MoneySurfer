@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SurferButtonStyle</title>
+  <title>MoneySurfer Coverage Report > RemoteDataResetRepositoryImpl</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,18 +19,15 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.uikit.components</a>
+    <a href="../index.html">com.georgeci.moneysurfer.sync.repository</a>
 </div>
 
-<h1>Coverage Summary for Class: SurferButtonStyle (com.georgeci.moneysurfer.uikit.components)</h1>
+<h1>Coverage Summary for Class: RemoteDataResetRepositoryImpl (com.georgeci.moneysurfer.sync.repository)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
-<th class="coverageStat 
-">
-  Class, %
-</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -49,21 +46,13 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SurferButtonStyle</td>
+  <td class="name">RemoteDataResetRepositoryImpl</td>
 <td class="coverageStat">
   <span class="percent">
     100%
   </span>
   <span class="absValue">
-    (1/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
+    (2/2)
   </span>
 </td>
     <td class="coverageStat"/>
@@ -72,7 +61,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (4/4)
+    (5/5)
   </span>
 </td>
 <td class="coverageStat">
@@ -80,11 +69,42 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (30/30)
+    (29/29)
   </span>
 </td>
 </tr>
-
+  <tr>
+    <td class="name">RemoteDataResetRepositoryImpl$clearAll$1</td>
+    <td class="coverageStat"/>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (29/29)
+  </span>
+</td>
+</tr>
 </table>
 
 <br/>
@@ -92,202 +112,21 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.components
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.sync.repository
 &nbsp;
-&nbsp;import androidx.compose.foundation.layout.Column
-&nbsp;import androidx.compose.foundation.layout.Row
-&nbsp;import androidx.compose.foundation.layout.Spacer
-&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
-&nbsp;import androidx.compose.foundation.layout.height
-&nbsp;import androidx.compose.foundation.layout.padding
-&nbsp;import androidx.compose.foundation.layout.width
-&nbsp;import androidx.compose.material3.Button
-&nbsp;import androidx.compose.material3.FilledTonalButton
-&nbsp;import androidx.compose.material3.Icon
-&nbsp;import androidx.compose.material3.OutlinedButton
-&nbsp;import androidx.compose.material3.Text
-&nbsp;import androidx.compose.material3.TextButton
-&nbsp;import androidx.compose.runtime.Composable
-&nbsp;import androidx.compose.ui.Modifier
-&nbsp;import androidx.compose.ui.graphics.vector.ImageVector
-&nbsp;import androidx.compose.ui.tooling.preview.Preview
-&nbsp;import androidx.compose.ui.unit.dp
-&nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
-&nbsp;import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
-&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.RemoteDataResetRepository
+&nbsp;import com.georgeci.moneysurfer.sync.db.dao.PendingMutationDao
+&nbsp;import com.georgeci.moneysurfer.sync.db.dao.SyncMetaDao
+&nbsp;import org.koin.core.annotation.Single
 &nbsp;
-&nbsp;enum class SurferButtonStyle {
-<b class="fc">&nbsp;    Filled,</b>
-<b class="fc">&nbsp;    Tonal,</b>
-<b class="fc">&nbsp;    Outlined,</b>
-<b class="fc">&nbsp;    Text,</b>
-&nbsp;}
-&nbsp;
-&nbsp;enum class SurferButtonSize(val height: Int) {
-&nbsp;    Biggest(52),
-&nbsp;    Regular(48),
-&nbsp;    Small(36),
-&nbsp;}
-&nbsp;
-&nbsp;@Composable
-&nbsp;fun SurferButton(
-&nbsp;    text: String,
-&nbsp;    onClick: () -&gt; Unit,
-&nbsp;    modifier: Modifier = Modifier,
-&nbsp;    style: SurferButtonStyle = SurferButtonStyle.Filled,
-&nbsp;    size: SurferButtonSize = SurferButtonSize.Regular,
-&nbsp;    enabled: Boolean = true,
-&nbsp;    startIcon: ImageVector? = null,
-&nbsp;    endIcon: ImageVector? = null,
-&nbsp;) {
-&nbsp;    val sizedModifier = modifier.height(size.height.dp)
-&nbsp;    // Match SurferCard&#39;s corner radius so a button placed alongside a card row reads as
-&nbsp;    // the same family. AppTheme.shapes.large == RoundedCornerShape(16.dp).
-&nbsp;    val shape = AppTheme.shapes.large
-&nbsp;
-&nbsp;    when (style) {
-&nbsp;        SurferButtonStyle.Filled -&gt; Button(
-&nbsp;            onClick = onClick,
-&nbsp;            modifier = sizedModifier,
-&nbsp;            enabled = enabled,
-&nbsp;            shape = shape,
-&nbsp;        ) {
-&nbsp;            SurferButtonContent(
-&nbsp;                text = text,
-&nbsp;                startIcon = startIcon,
-&nbsp;                endIcon = endIcon,
-&nbsp;            )
-&nbsp;        }
-&nbsp;
-&nbsp;        SurferButtonStyle.Tonal -&gt; FilledTonalButton(
-&nbsp;            onClick = onClick,
-&nbsp;            modifier = sizedModifier,
-&nbsp;            enabled = enabled,
-&nbsp;            shape = shape,
-&nbsp;        ) {
-&nbsp;            SurferButtonContent(
-&nbsp;                text = text,
-&nbsp;                startIcon = startIcon,
-&nbsp;                endIcon = endIcon,
-&nbsp;            )
-&nbsp;        }
-&nbsp;
-&nbsp;        SurferButtonStyle.Outlined -&gt; OutlinedButton(
-&nbsp;            onClick = onClick,
-&nbsp;            modifier = sizedModifier,
-&nbsp;            enabled = enabled,
-&nbsp;            shape = shape,
-&nbsp;        ) {
-&nbsp;            SurferButtonContent(
-&nbsp;                text = text,
-&nbsp;                startIcon = startIcon,
-&nbsp;                endIcon = endIcon,
-&nbsp;            )
-&nbsp;        }
-&nbsp;
-&nbsp;        SurferButtonStyle.Text -&gt; TextButton(
-&nbsp;            onClick = onClick,
-&nbsp;            modifier = sizedModifier,
-&nbsp;            enabled = enabled,
-&nbsp;            shape = shape,
-&nbsp;        ) {
-&nbsp;            SurferButtonContent(
-&nbsp;                text = text,
-&nbsp;                startIcon = startIcon,
-&nbsp;                endIcon = endIcon,
-&nbsp;            )
-&nbsp;        }
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;@Composable
-&nbsp;private fun SurferButtonContent(
-&nbsp;    text: String,
-&nbsp;    startIcon: ImageVector?,
-&nbsp;    endIcon: ImageVector?,
-&nbsp;) {
-&nbsp;    Row {
-&nbsp;        if (startIcon != null) {
-&nbsp;            Icon(
-&nbsp;                imageVector = startIcon,
-&nbsp;                // decorative — button text provides the accessible label
-&nbsp;                contentDescription = null,
-&nbsp;            )
-&nbsp;            Spacer(Modifier.width(AppTheme.spacing.small))
-&nbsp;        }
-&nbsp;
-&nbsp;        Text(text)
-&nbsp;
-&nbsp;        if (endIcon != null) {
-&nbsp;            Spacer(Modifier.width(AppTheme.spacing.small))
-&nbsp;            Icon(
-&nbsp;                imageVector = endIcon,
-&nbsp;                // decorative — button text provides the accessible label
-&nbsp;                contentDescription = null,
-&nbsp;            )
-&nbsp;        }
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;// One preview per [SurferButtonStyle] showing both [SurferButtonSize] heights side-by-side
-&nbsp;// plus an icons + disabled row. Compact matrix — pick the variant you need without opening
-&nbsp;// a dozen previews.
-&nbsp;
-&nbsp;@Preview
-&nbsp;@Composable
-&nbsp;private fun SurferButtonFilledPreview() {
-&nbsp;    SurferComponentPreview { ButtonStyleMatrix(SurferButtonStyle.Filled, &quot;Save&quot;) }
-&nbsp;}
-&nbsp;
-&nbsp;@Preview
-&nbsp;@Composable
-&nbsp;private fun SurferButtonTonalPreview() {
-&nbsp;    SurferComponentPreview { ButtonStyleMatrix(SurferButtonStyle.Tonal, &quot;Tonal&quot;) }
-&nbsp;}
-&nbsp;
-&nbsp;@Preview
-&nbsp;@Composable
-&nbsp;private fun SurferButtonOutlinedPreview() {
-&nbsp;    SurferComponentPreview { ButtonStyleMatrix(SurferButtonStyle.Outlined, &quot;Cancel&quot;) }
-&nbsp;}
-&nbsp;
-&nbsp;@Preview
-&nbsp;@Composable
-&nbsp;private fun SurferButtonTextPreview() {
-&nbsp;    SurferComponentPreview { ButtonStyleMatrix(SurferButtonStyle.Text, &quot;Skip&quot;) }
-&nbsp;}
-&nbsp;
-&nbsp;@Composable
-&nbsp;private fun ButtonStyleMatrix(style: SurferButtonStyle, label: String) {
-&nbsp;    Column(
-&nbsp;        modifier = Modifier.padding(16.dp),
-&nbsp;    ) {
-&nbsp;        SurferButtonSize.entries.forEach { size -&gt;
-&nbsp;            SurferButton(
-&nbsp;                text = &quot;$label · ${size.name}&quot;,
-&nbsp;                onClick = {},
-&nbsp;                modifier = Modifier.fillMaxWidth(),
-&nbsp;                style = style,
-&nbsp;                size = size,
-&nbsp;            )
-&nbsp;            Spacer(Modifier.height(8.dp))
-&nbsp;        }
-&nbsp;        SurferButton(
-&nbsp;            text = &quot;With icons&quot;,
-&nbsp;            onClick = {},
-&nbsp;            modifier = Modifier.fillMaxWidth(),
-&nbsp;            style = style,
-&nbsp;            startIcon = SurferIcons.Check,
-&nbsp;            endIcon = SurferIcons.ChevronRight,
-&nbsp;        )
-&nbsp;        Spacer(Modifier.height(8.dp))
-&nbsp;        SurferButton(
-&nbsp;            text = &quot;Disabled&quot;,
-&nbsp;            onClick = {},
-&nbsp;            modifier = Modifier.fillMaxWidth(),
-&nbsp;            style = style,
-&nbsp;            enabled = false,
-&nbsp;        )
+<b class="fc">&nbsp;@Single(binds = [RemoteDataResetRepository::class])</b>
+&nbsp;class RemoteDataResetRepositoryImpl(
+<b class="fc">&nbsp;    private val pendingMutationDao: PendingMutationDao,</b>
+<b class="fc">&nbsp;    private val syncMetaDao: SyncMetaDao,</b>
+&nbsp;) : RemoteDataResetRepository {
+&nbsp;    override suspend fun clearAll() {
+<b class="fc">&nbsp;        pendingMutationDao.deleteAll()</b>
+<b class="fc">&nbsp;        syncMetaDao.deleteAll()</b>
 &nbsp;    }
 &nbsp;}
 </code>
@@ -313,7 +152,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 20:32</div>
+    <div style="float:right;">generated on 2026-07-23 10:32</div>
 </div>
 </body>
 </html>
