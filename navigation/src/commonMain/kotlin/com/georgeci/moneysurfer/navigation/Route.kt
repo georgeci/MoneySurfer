@@ -72,6 +72,18 @@ sealed interface Route : NavKey {
     data object CategoriesManage : TopLevel
 
     @Serializable
+    data object Budgets : Route
+
+    @Serializable
+    data class BudgetDetails(val budgetId: String) : Route
+
+    /** Create when [budgetId] is null, edit otherwise — one screen, as with accounts and categories. */
+    @Serializable
+    data class BudgetCreation(
+        val budgetId: String? = null,
+    ) : Route
+
+    @Serializable
     data class CategoryChooser(
         val selectedCategoryId: String? = null,
         val filterType: String? = null,

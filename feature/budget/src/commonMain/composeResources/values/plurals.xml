@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="budget_days_left">
+        <item quantity="one">%1$d day left</item>
+        <item quantity="other">%1$d days left</item>
+    </plurals>
+    <plurals name="budget_days_elapsed">
+        <item quantity="one">%1$d day in</item>
+        <item quantity="other">%1$d days in</item>
+    </plurals>
+</resources>

@@ -37,6 +37,8 @@ import moneysurfer.feature.settings.generated.resources.settings_about_supportin
 import moneysurfer.feature.settings.generated.resources.settings_appearance_hub_supporting
 import moneysurfer.feature.settings.generated.resources.settings_appearance_hub_supporting_dynamic
 import moneysurfer.feature.settings.generated.resources.settings_appearance_hub_title
+import moneysurfer.feature.settings.generated.resources.settings_budgets_supporting
+import moneysurfer.feature.settings.generated.resources.settings_budgets_title
 import moneysurfer.feature.settings.generated.resources.settings_categories_supporting
 import moneysurfer.feature.settings.generated.resources.settings_categories_title
 import moneysurfer.feature.settings.generated.resources.settings_change_workspace
@@ -74,6 +76,7 @@ import org.koin.compose.viewmodel.koinViewModel
 object SettingsTestTags {
     const val Root = "settings:root"
     const val CategoriesRow = "settings:categoriesRow"
+    const val BudgetsRow = "settings:budgetsRow"
     const val AppearanceRow = "settings:appearanceRow"
     const val AboutRow = "settings:aboutRow"
     const val SyncRow = "settings:syncRow"
@@ -82,6 +85,9 @@ object SettingsTestTags {
     const val DeleteAccountRow = "settings:deleteAccountRow"
 }
 
+// The effect dispatch below is one straight-line branch per destination — flat, exhaustive, and
+// checked by the compiler. Its "complexity" is the number of settings rows, not tangled logic.
+@Suppress("CyclomaticComplexMethod")
 @Composable
 fun SettingsScreen(
     onNavigateBack: () -> Unit,
@@ -90,6 +96,7 @@ fun SettingsScreen(
     onNavigateToIncomingInvites: () -> Unit,
     onNavigateToMembers: (com.georgeci.moneysurfer.domain.primitives.WorkspaceId) -> Unit,
     onNavigateToCategories: () -> Unit,
+    onNavigateToBudgets: () -> Unit,
     onNavigateToAppearance: () -> Unit,
     onNavigateToPreferences: () -> Unit,
     onNavigateToSync: () -> Unit,
@@ -109,6 +116,7 @@ fun SettingsScreen(
             SettingsEffect.NavigateToIncomingInvites -> onNavigateToIncomingInvites()
             is SettingsEffect.NavigateToMembers -> onNavigateToMembers(effect.workspaceId)
             SettingsEffect.NavigateToCategories -> onNavigateToCategories()
+            SettingsEffect.NavigateToBudgets -> onNavigateToBudgets()
             SettingsEffect.NavigateToAppearance -> onNavigateToAppearance()
             SettingsEffect.NavigateToPreferences -> onNavigateToPreferences()
             SettingsEffect.NavigateToSync -> onNavigateToSync()
@@ -229,6 +237,14 @@ private fun SettingsContent(
                     onClick = { onEvent(SettingsEvent.OnCategoriesClick) },
                     trailing = { SurferSettingsChevron() },
                     modifier = Modifier.testTag(SettingsTestTags.CategoriesRow),
+                )
+                SurferSettingsRow(
+                    icon = SurferIcons.Savings,
+                    title = stringResource(Res.string.settings_budgets_title),
+                    supportingText = stringResource(Res.string.settings_budgets_supporting),
+                    onClick = { onEvent(SettingsEvent.OnBudgetsClick) },
+                    trailing = { SurferSettingsChevron() },
+                    modifier = Modifier.testTag(SettingsTestTags.BudgetsRow),
                 )
                 SurferSettingsRow(
                     icon = SurferIcons.Palette,

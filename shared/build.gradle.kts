@@ -65,6 +65,7 @@ kotlin {
                 implementation(projects.dataLocal)
                 implementation(projects.navigation)
                 implementation(projects.feature.account)
+                implementation(projects.feature.budget)
                 implementation(projects.feature.category)
                 implementation(projects.feature.dashboard)
                 implementation(projects.feature.login)

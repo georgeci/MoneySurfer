@@ -30,6 +30,7 @@ val settingsNavGraph: FeatureNavGraph = { navigator ->
                 navigator.push(Route.WorkspaceManage(workspaceId = workspaceId.value))
             },
             onNavigateToCategories = { navigator.push(Route.CategoriesManage) },
+            onNavigateToBudgets = { navigator.push(Route.Budgets) },
             onNavigateToAppearance = { navigator.push(Route.SettingsAppearance) },
             onNavigateToPreferences = { navigator.push(Route.SettingsPreferences) },
             onNavigateToSync = { navigator.push(Route.SettingsSync) },
