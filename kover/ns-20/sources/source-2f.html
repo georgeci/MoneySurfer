@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > LogoutUseCase</title>
+  <title>MoneySurfer Coverage Report > GetTransactionsByCategoryUseCase</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.usecase</a>
 </div>
 
-<h1>Coverage Summary for Class: LogoutUseCase (com.georgeci.moneysurfer.domain.usecase)</h1>
+<h1>Coverage Summary for Class: GetTransactionsByCategoryUseCase (com.georgeci.moneysurfer.domain.usecase)</h1>
 
 <table class="coverageStats">
 
@@ -46,13 +46,13 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">LogoutUseCase</td>
+  <td class="name">GetTransactionsByCategoryUseCase</td>
 <td class="coverageStat">
   <span class="percent">
     0%
   </span>
   <span class="absValue">
-    (0/2)
+    (0/3)
   </span>
 </td>
     <td class="coverageStat"/>
@@ -61,7 +61,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/13)
+    (0/6)
   </span>
 </td>
 <td class="coverageStat">
@@ -69,12 +69,87 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/99)
+    (0/20)
   </span>
 </td>
 </tr>
   <tr>
-    <td class="name">LogoutUseCase$invoke$1</td>
+    <td class="name">GetTransactionsByCategoryUseCase$Companion</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">GetTransactionsByCategoryUseCase$invoke$1$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/23)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">GetTransactionsByCategoryUseCase$invoke$1$1$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">GetTransactionsByCategoryUseCase$invoke-ayLZWDE$$inlined$flatMapLatest$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
     <td class="coverageStat"/>
   </tr>
 <tr>
@@ -84,16 +159,23 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
     (0/2)
   </span>
 </td>
-    <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
     0%
   </span>
   <span class="absValue">
-    (0/13)
+    (0/12)
   </span>
 </td>
 <td class="coverageStat">
@@ -101,7 +183,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/99)
+    (0/56)
   </span>
 </td>
 </tr>
@@ -115,31 +197,60 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.usecase
 &nbsp;
 &nbsp;import com.georgeci.moneysurfer.domain.auth.SessionPointers
-&nbsp;import com.georgeci.moneysurfer.domain.repositories.AuthRemoteRepository
-&nbsp;import com.georgeci.moneysurfer.domain.repositories.LocalDataResetRepository
-&nbsp;import com.georgeci.moneysurfer.domain.repositories.RemoteDataResetRepository
-&nbsp;import com.georgeci.moneysurfer.domain.repositories.SessionShutdownGate
+&nbsp;import com.georgeci.moneysurfer.domain.model.CategoryTree
+&nbsp;import com.georgeci.moneysurfer.domain.model.Transaction
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryId
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.CategoryRepository
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.TransactionRepository
+&nbsp;import kotlinx.coroutines.ExperimentalCoroutinesApi
+&nbsp;import kotlinx.coroutines.flow.Flow
+&nbsp;import kotlinx.coroutines.flow.combine
+&nbsp;import kotlinx.coroutines.flow.flatMapLatest
+&nbsp;import kotlinx.coroutines.flow.flowOf
 &nbsp;import org.koin.core.annotation.Single
 &nbsp;
+&nbsp;/**
+&nbsp; * Newest-first transactions booked to [categoryId] **or anything below it**, capped at [limit].
+&nbsp; *
+&nbsp; * Including the subtree matches how the rest of the app treats a parent: the detail screen&#39;s
+&nbsp; * headline number already rolls children up, so a recent list that showed only the parent&#39;s own
+&nbsp; * transactions would contradict the total sitting directly above it.
+&nbsp; *
+&nbsp; * Filtering happens in memory over the workspace list rather than in SQL. That list is already
+&nbsp; * indexed and sorted for exactly this ordering, and it is the same read the dashboard and the
+&nbsp; * transactions list make — so this shares their cached flow instead of adding a third query
+&nbsp; * shape over the same table.
+&nbsp; */
 <b class="nc">&nbsp;@Single</b>
-&nbsp;class LogoutUseCase(
-<b class="nc">&nbsp;    private val sessionShutdownGate: SessionShutdownGate,</b>
-<b class="nc">&nbsp;    private val authRemoteRepository: AuthRemoteRepository,</b>
-<b class="nc">&nbsp;    private val localDataResetRepository: LocalDataResetRepository,</b>
-<b class="nc">&nbsp;    private val remoteDataResetRepository: RemoteDataResetRepository,</b>
+&nbsp;@OptIn(ExperimentalCoroutinesApi::class)
+&nbsp;class GetTransactionsByCategoryUseCase(
+<b class="nc">&nbsp;    private val transactionRepository: TransactionRepository,</b>
+<b class="nc">&nbsp;    private val categoryRepository: CategoryRepository,</b>
 <b class="nc">&nbsp;    private val session: SessionPointers,</b>
 &nbsp;) {
-&nbsp;    suspend operator fun invoke() {
-&nbsp;        // Stop sync work BEFORE wiping local data — otherwise an in-flight
-&nbsp;        // pull could re-populate Room mid-wipe and produce ghost rows.
-<b class="nc">&nbsp;        sessionShutdownGate.shutdown()</b>
-<b class="nc">&nbsp;        session.currentUserId.set(null)</b>
-<b class="nc">&nbsp;        session.currentWorkspaceId.set(null)</b>
-<b class="nc">&nbsp;        session.currentFirebaseUid.set(null)</b>
-<b class="nc">&nbsp;        localDataResetRepository.clearAll()</b>
-<b class="nc">&nbsp;        remoteDataResetRepository.clearAll()</b>
-&nbsp;        // Best-effort: a failed signOut shouldn&#39;t keep the user pinned in the local session.
-<b class="nc">&nbsp;        authRemoteRepository.signOut()</b>
+&nbsp;
+&nbsp;    operator fun invoke(
+&nbsp;        categoryId: CategoryId,
+<b class="nc">&nbsp;        limit: Int = DEFAULT_LIMIT,</b>
+&nbsp;    ): Flow&lt;List&lt;Transaction&gt;&gt; =
+<b class="nc">&nbsp;        session.currentWorkspaceId.flow.flatMapLatest { workspaceId -&gt;</b>
+&nbsp;            workspaceId ?: return@flatMapLatest flowOf(emptyList())
+&nbsp;
+&nbsp;            combine(
+&nbsp;                transactionRepository.getByWorkspaceId(workspaceId),
+&nbsp;                categoryRepository.getByWorkspaceId(workspaceId),
+&nbsp;            ) { transactions, categories -&gt;
+<b class="nc">&nbsp;                val subtree = CategoryTree.descendantsOf(categories, categoryId) + categoryId</b>
+<b class="nc">&nbsp;                transactions.asSequence()</b>
+<b class="nc">&nbsp;                    .filter { it.categoryId in subtree }</b>
+<b class="nc">&nbsp;                    .take(limit)</b>
+<b class="nc">&nbsp;                    .toList()</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;    companion object {
+&nbsp;        /** Enough to fill the detail screen&#39;s &quot;Recent&quot; block without becoming a second list screen. */
+&nbsp;        const val DEFAULT_LIMIT = 10
 &nbsp;    }
 &nbsp;}
 </code>
@@ -165,7 +276,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-23 14:54</div>
+    <div style="float:right;">generated on 2026-07-23 23:54</div>
 </div>
 </body>
 </html>

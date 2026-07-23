@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > WorkspaceMember</title>
+  <title>MoneySurfer Coverage Report > User</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.model</a>
 </div>
 
-<h1>Coverage Summary for Class: WorkspaceMember (com.georgeci.moneysurfer.domain.model)</h1>
+<h1>Coverage Summary for Class: User (com.georgeci.moneysurfer.domain.model)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">WorkspaceMember</td>
+  <td class="name">User</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -72,7 +72,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (12/12)
+    (8/8)
   </span>
 </td>
 <td class="coverageStat">
@@ -80,7 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (113/113)
+    (65/65)
   </span>
 </td>
 </tr>
@@ -96,29 +96,23 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.UserId
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
-&nbsp;import kotlin.time.Instant
 &nbsp;
 &nbsp;/**
-&nbsp; * Participation of a [User] in a [Workspace].
+&nbsp; * Canonical user record. Shared between local (Room) and remote (Firestore) sources.
 &nbsp; *
-&nbsp; * Snapshots ([displayName], [email]) are intentionally duplicated here so the membership
-&nbsp; * roster keeps stable history even after the user later edits their profile or deletes
-&nbsp; * their account. They are populated at the moment the row is written and never retro-updated.
-&nbsp; *
-&nbsp; * Soft-delete via [status] / [leftAt] / [removedAt] — see [WorkspaceMemberStatus].
+&nbsp; * - Local Room storage only persists [id], [displayName], [isAnon]. The other fields default to
+&nbsp; *   empty/null on read because the local row is a cache + FK target, not the source of truth.
+&nbsp; * - The Firestore `users/{uid}` document round-trips every field. [workspaceIds] in particular
+&nbsp; *   is what the post-auth bootstrap walks to pull the user&#39;s workspaces on a fresh device.
 &nbsp; */
-<b class="fc">&nbsp;data class WorkspaceMember(</b>
-<b class="fc">&nbsp;    val userId: UserId,</b>
-<b class="fc">&nbsp;    val workspaceId: WorkspaceId,</b>
-<b class="fc">&nbsp;    val role: WorkspaceRole,</b>
-<b class="fc">&nbsp;    val status: WorkspaceMemberStatus = WorkspaceMemberStatus.ACTIVE,</b>
-<b class="fc">&nbsp;    val displayName: String = &quot;&quot;,</b>
-<b class="fc">&nbsp;    val email: String? = null,</b>
-<b class="fc">&nbsp;    val addedByUserId: UserId? = null,</b>
-<b class="fc">&nbsp;    val createdAt: Instant,</b>
-<b class="fc">&nbsp;    val updatedAt: Instant = createdAt,</b>
-<b class="fc">&nbsp;    val leftAt: Instant? = null,</b>
-<b class="fc">&nbsp;    val removedAt: Instant? = null,</b>
+<b class="fc">&nbsp;data class User(</b>
+<b class="fc">&nbsp;    val id: UserId,</b>
+<b class="fc">&nbsp;    val displayName: String?,</b>
+<b class="fc">&nbsp;    val email: String?,</b>
+<b class="fc">&nbsp;    val isAnon: Boolean,</b>
+<b class="fc">&nbsp;    val workspaceIds: List&lt;WorkspaceId&gt; = emptyList(),</b>
+<b class="fc">&nbsp;    val defaultWorkspaceId: WorkspaceId? = null,</b>
+<b class="fc">&nbsp;    val invitedWorkspaceIds: List&lt;WorkspaceId&gt; = emptyList(),</b>
 &nbsp;)
 </code>
 </pre>
@@ -143,7 +137,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-23 14:54</div>
+    <div style="float:right;">generated on 2026-07-23 23:54</div>
 </div>
 </body>
 </html>

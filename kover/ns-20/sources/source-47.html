@@ -1,0 +1,172 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>MoneySurfer Coverage Report > UpdateSavingsGoalUseCaseKt</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.georgeci.moneysurfer.domain.usecase</a>
+</div>
+
+<h1>Coverage Summary for Class: UpdateSavingsGoalUseCaseKt (com.georgeci.moneysurfer.domain.usecase)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">UpdateSavingsGoalUseCaseKt</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    87.5%
+  </span>
+  <span class="absValue">
+    (7/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (16/16)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.usecase
+&nbsp;
+&nbsp;import arrow.core.Either
+&nbsp;import arrow.core.raise.either
+&nbsp;import com.georgeci.moneysurfer.domain.model.GoalStatus
+&nbsp;import com.georgeci.moneysurfer.domain.model.SavingsGoal
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.GoalContributionRepository
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.SavingsGoalRepository
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.WorkspaceRepository
+&nbsp;import org.koin.core.annotation.Single
+&nbsp;
+&nbsp;/**
+&nbsp; * Edits a goal. Lowering the target below the saved amount completes the goal, and
+&nbsp; * raising it above re-opens it — the same rule [AddContributionUseCase] applies from
+&nbsp; * the other side, since either edge can be crossed by moving either number.
+&nbsp; */
+&nbsp;@Single
+&nbsp;class UpdateSavingsGoalUseCase(
+&nbsp;    private val goalRepository: SavingsGoalRepository,
+&nbsp;    private val contributionRepository: GoalContributionRepository,
+&nbsp;    private val workspaceRepository: WorkspaceRepository,
+&nbsp;) {
+&nbsp;
+&nbsp;    suspend operator fun invoke(goal: SavingsGoal): Either&lt;GoalActionError, SavingsGoal&gt; = either {
+&nbsp;        goalRepository.getById(goal.id) ?: raise(GoalActionError.GoalNotFound)
+&nbsp;        ensureGoalIsValid(goal, workspaceRepository)
+&nbsp;        val saved = contributionRepository.savedAmount(goal.id)
+&nbsp;        val retargeted = goal.copy(status = goal.status.afterProgressChange(saved &gt;= goal.target))
+&nbsp;        Either.catch { goalRepository.update(retargeted) }
+&nbsp;            .mapLeft { GoalActionError.LocalWriteFailed(it) }
+&nbsp;            .bind()
+&nbsp;        retargeted
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * The ACTIVE ↔ COMPLETED flip. Only those two statuses move: a PAUSED or ARCHIVED
+&nbsp; * goal keeps its status no matter what the numbers do.
+&nbsp; */
+<b class="fc">&nbsp;internal fun GoalStatus.afterProgressChange(isReached: Boolean): GoalStatus = when {</b>
+<b class="fc">&nbsp;    this == GoalStatus.ACTIVE &amp;&amp; isReached -&gt; GoalStatus.COMPLETED</b>
+<b class="pc">&nbsp;    this == GoalStatus.COMPLETED &amp;&amp; !isReached -&gt; GoalStatus.ACTIVE</b>
+<b class="fc">&nbsp;    else -&gt; this</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-07-23 23:54</div>
+</div>
+</body>
+</html>

@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > RecurringRuleRepository</title>
+  <title>MoneySurfer Coverage Report > String0_commonMainKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,22 +19,70 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.domain.repositories</a>
+    <a href="../index.html">moneysurfer.uikit.generated.resources</a>
 </div>
 
-<h1>Coverage Summary for Class: RecurringRuleRepository (com.georgeci.moneysurfer.domain.repositories)</h1>
+<h1>Coverage Summary for Class: String0_commonMainKt (moneysurfer.uikit.generated.resources)</h1>
 
 <table class="coverageStats">
 <tr>
   <th class="name">Class</th>
 <th class="coverageStat 
 ">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
   Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
 </th>
 </tr>
 <tr>
-  <td class="name">RecurringRuleRepository</td>
+  <td class="name">String0_commonMainKt</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    54.5%
+  </span>
+  <span class="absValue">
+    (6/11)
+  </span>
+</td>
     <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    32%
+  </span>
+  <span class="absValue">
+    (8/25)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    30.8%
+  </span>
+  <span class="absValue">
+    (74/240)
+  </span>
+</td>
 </tr>
 
 </table>
@@ -44,18 +92,68 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.repositories
+<code class="sourceCode" id="sourceCode">&nbsp;@file:OptIn(InternalResourceApi::class)
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.model.RecurringRule
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.RecurringRuleId
-&nbsp;import kotlinx.coroutines.flow.Flow
+&nbsp;package moneysurfer.uikit.generated.resources
 &nbsp;
-&nbsp;interface RecurringRuleRepository {
-&nbsp;    fun getAll(): Flow&lt;List&lt;RecurringRule&gt;&gt;
-&nbsp;    suspend fun getById(id: RecurringRuleId): RecurringRule?
-&nbsp;    suspend fun insert(rule: RecurringRule)
-&nbsp;    suspend fun update(rule: RecurringRule)
-&nbsp;    suspend fun delete(id: RecurringRuleId)
+&nbsp;import kotlin.OptIn
+&nbsp;import kotlin.String
+&nbsp;import kotlin.collections.MutableMap
+&nbsp;import org.jetbrains.compose.resources.InternalResourceApi
+&nbsp;import org.jetbrains.compose.resources.LanguageQualifier
+&nbsp;import org.jetbrains.compose.resources.ResourceContentHash
+&nbsp;import org.jetbrains.compose.resources.ResourceItem
+&nbsp;import org.jetbrains.compose.resources.StringResource
+&nbsp;
+&nbsp;private const val MD: String = &quot;composeResources/moneysurfer.uikit.generated.resources/&quot;
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-190_044_963)
+<b class="fc">&nbsp;public val Res.string.uikit_back: StringResource by lazy {</b>
+<b class="fc">&nbsp;      StringResource(&quot;string:uikit_back&quot;, &quot;uikit_back&quot;, setOf(</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 10, 34),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 10, 26),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(935_886_272)
+<b class="fc">&nbsp;public val Res.string.uikit_brand: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:uikit_brand&quot;, &quot;uikit_brand&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 45, 35),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 37, 35),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-538_194_959)
+<b class="fc">&nbsp;public val Res.string.uikit_close: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:uikit_close&quot;, &quot;uikit_close&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 81, 39),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 73, 27),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(1_930_263_220)
+<b class="fc">&nbsp;public val Res.string.uikit_done: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:uikit_done&quot;, &quot;uikit_done&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 121, 34),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 101, 26),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(1_985_367_554)
+<b class="fc">&nbsp;public val Res.string.uikit_retry: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:uikit_retry&quot;, &quot;uikit_retry&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 156, 43),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 128, 27),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@InternalResourceApi
+&nbsp;internal fun _collectCommonMainString0Resources(map: MutableMap&lt;String, StringResource&gt;) {
+<b class="nc">&nbsp;  map.put(&quot;uikit_back&quot;, Res.string.uikit_back)</b>
+<b class="nc">&nbsp;  map.put(&quot;uikit_brand&quot;, Res.string.uikit_brand)</b>
+<b class="nc">&nbsp;  map.put(&quot;uikit_close&quot;, Res.string.uikit_close)</b>
+<b class="nc">&nbsp;  map.put(&quot;uikit_done&quot;, Res.string.uikit_done)</b>
+<b class="nc">&nbsp;  map.put(&quot;uikit_retry&quot;, Res.string.uikit_retry)</b>
 &nbsp;}
 </code>
 </pre>
@@ -80,7 +178,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 21:54</div>
+    <div style="float:right;">generated on 2026-07-23 23:54</div>
 </div>
 </body>
 </html>

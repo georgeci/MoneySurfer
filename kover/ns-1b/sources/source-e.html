@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > CategorySpendMonth</title>
+  <title>MoneySurfer Coverage Report > CategorySpendBreakdown</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.model</a>
 </div>
 
-<h1>Coverage Summary for Class: CategorySpendMonth (com.georgeci.moneysurfer.domain.model)</h1>
+<h1>Coverage Summary for Class: CategorySpendBreakdown (com.georgeci.moneysurfer.domain.model)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">CategorySpendMonth</td>
+  <td class="name">CategorySpendBreakdown</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -72,7 +72,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (3/3)
+    (4/4)
   </span>
 </td>
 <td class="coverageStat">
@@ -80,7 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (12/12)
+    (17/17)
   </span>
 </td>
 </tr>
@@ -102,16 +102,16 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import kotlinx.datetime.plus
 &nbsp;
 &nbsp;/** One column of the spend trend. [total] is zero for a month the category booked nothing in. */
-<b class="fc">&nbsp;data class CategorySpendMonth(</b>
-<b class="fc">&nbsp;    val month: YearMonth,</b>
-<b class="fc">&nbsp;    val total: Money,</b>
+&nbsp;data class CategorySpendMonth(
+&nbsp;    val month: YearMonth,
+&nbsp;    val total: Money,
 &nbsp;)
 &nbsp;
 &nbsp;/** One row of the subcategory breakdown — a direct child, with its own subtree rolled in. */
-&nbsp;data class CategorySpendBreakdown(
-&nbsp;    val categoryId: CategoryId,
-&nbsp;    val total: Money,
-&nbsp;    val transactionCount: Int,
+<b class="fc">&nbsp;data class CategorySpendBreakdown(</b>
+<b class="fc">&nbsp;    val categoryId: CategoryId,</b>
+<b class="fc">&nbsp;    val total: Money,</b>
+<b class="fc">&nbsp;    val transactionCount: Int,</b>
 &nbsp;)
 &nbsp;
 &nbsp;/**
@@ -240,7 +240,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-23 14:54</div>
+    <div style="float:right;">generated on 2026-07-23 23:54</div>
 </div>
 </body>
 </html>

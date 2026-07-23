@@ -263,6 +263,160 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
   </tr>
   <tr>
+    <td class="name">Route$BudgetCreation</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/53)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Route$BudgetCreation$Companion</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Route$BudgetDetails</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/28)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Route$BudgetDetails$Companion</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Route$Budgets</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (19/19)
+  </span>
+</td>
+  </tr>
+  <tr>
     <td class="name">Route$CategoriesManage</td>
 <td class="coverageStat">
   <span class="percent">
@@ -1691,10 +1845,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
-    70.4%
+    69.5%
   </span>
   <span class="absValue">
-    (38/54)
+    (41/59)
   </span>
 </td>
 <td class="coverageStat">
@@ -1702,23 +1856,23 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/142)
+    (0/154)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    53.2%
+    52.3%
   </span>
   <span class="absValue">
-    (42/79)
+    (45/86)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    36%
+    35.2%
   </span>
   <span class="absValue">
-    (492/1368)
+    (519/1476)
   </span>
 </td>
 </tr>
@@ -1810,6 +1964,18 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;
 <b class="fc">&nbsp;    @Serializable</b>
 &nbsp;    data object CategoriesManage : TopLevel
+&nbsp;
+<b class="fc">&nbsp;    @Serializable</b>
+&nbsp;    data object Budgets : Route
+&nbsp;
+<b class="pc">&nbsp;    @Serializable</b>
+<b class="nc">&nbsp;    data class BudgetDetails(val budgetId: String) : Route</b>
+&nbsp;
+&nbsp;    /** Create when [budgetId] is null, edit otherwise — one screen, as with accounts and categories. */
+<b class="pc">&nbsp;    @Serializable</b>
+&nbsp;    data class BudgetCreation(
+<b class="nc">&nbsp;        val budgetId: String? = null,</b>
+&nbsp;    ) : Route
 &nbsp;
 <b class="pc">&nbsp;    @Serializable</b>
 <b class="nc">&nbsp;    data class CategoryDetails(val categoryId: String) : Route</b>
@@ -1912,7 +2078,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-23 14:54</div>
+    <div style="float:right;">generated on 2026-07-23 23:54</div>
 </div>
 </body>
 </html>

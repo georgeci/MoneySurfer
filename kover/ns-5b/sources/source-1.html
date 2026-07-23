@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > GoalContributionRepository</title>
+  <title>MoneySurfer Coverage Report > FirstRunSeeder</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.domain.repositories</a>
+    <a href="../index.html">com.georgeci.moneysurfer.domain.firstrun</a>
 </div>
 
-<h1>Coverage Summary for Class: GoalContributionRepository (com.georgeci.moneysurfer.domain.repositories)</h1>
+<h1>Coverage Summary for Class: FirstRunSeeder (com.georgeci.moneysurfer.domain.firstrun)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">GoalContributionRepository</td>
+  <td class="name">FirstRunSeeder</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -44,31 +44,23 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.repositories
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.firstrun
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.model.GoalContribution
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.GoalContributionId
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.GoalId
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
-&nbsp;import kotlinx.coroutines.flow.Flow
-&nbsp;
-&nbsp;interface GoalContributionRepository {
-&nbsp;    /** Newest first. */
-&nbsp;    fun getByGoalId(goalId: GoalId): Flow&lt;List&lt;GoalContribution&gt;&gt;
-&nbsp;    fun getByWorkspaceId(workspaceId: WorkspaceId): Flow&lt;List&lt;GoalContribution&gt;&gt;
-&nbsp;
-&nbsp;    /**
-&nbsp;     * `SUM(amount)` for the goal — the only source of a goal&#39;s `current` amount.
-&nbsp;     * Zero when the goal has no contributions.
-&nbsp;     */
-&nbsp;    fun observeSavedAmount(goalId: GoalId): Flow&lt;Money&gt;
-&nbsp;    suspend fun savedAmount(goalId: GoalId): Money
-&nbsp;
-&nbsp;    suspend fun getById(id: GoalContributionId): GoalContribution?
-&nbsp;    suspend fun insert(contribution: GoalContribution)
-&nbsp;    suspend fun update(contribution: GoalContribution)
-&nbsp;    suspend fun delete(id: GoalContributionId)
+&nbsp;/**
+&nbsp; * Host-owned bootstrap for the local database. Online builds bind a no-op (Firestore-backed
+&nbsp; * onboarding handles empty workspaces); the offline build seeds a local user, a &quot;Personal&quot;
+&nbsp; * workspace and the default categories, so the first-run account screen has somewhere to put
+&nbsp; * the account the user is about to create.
+&nbsp; *
+&nbsp; * Called from `OnboardingViewModel` when the user leaves the onboarding, and again from
+&nbsp; * `AppLaunchViewModel` on every later launch as a repair pass.
+&nbsp; *
+&nbsp; * Implementations must be idempotent — relaunch must not duplicate workspace/category rows. The
+&nbsp; * session pointer flipping `currentWorkspaceId` from null → set is the durable &quot;seeded&quot; flag
+&nbsp; * (no separate boolean needed).
+&nbsp; */
+&nbsp;fun interface FirstRunSeeder {
+&nbsp;    suspend fun seedIfNeeded()
 &nbsp;}
 </code>
 </pre>
@@ -93,7 +85,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-23 14:54</div>
+    <div style="float:right;">generated on 2026-07-23 23:54</div>
 </div>
 </body>
 </html>

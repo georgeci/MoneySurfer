@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > PeriodTotalsKt</title>
+  <title>MoneySurfer Coverage Report > InviteStatus</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,12 +22,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.model</a>
 </div>
 
-<h1>Coverage Summary for Class: PeriodTotalsKt (com.georgeci.moneysurfer.domain.model)</h1>
+<h1>Coverage Summary for Class: InviteStatus (com.georgeci.moneysurfer.domain.model)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -46,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">PeriodTotalsKt</td>
+  <td class="name">InviteStatus</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -57,49 +60,19 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    92.9%
-  </span>
-  <span class="absValue">
-    (13/14)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
     100%
   </span>
   <span class="absValue">
-    (21/21)
+    (1/1)
   </span>
 </td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (111/111)
-  </span>
-</td>
-</tr>
-  <tr>
-    <td class="name">PeriodTotalsKt$WhenMappings</td>
     <td class="coverageStat"/>
-  </tr>
-<tr>
-  <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
     100%
   </span>
   <span class="absValue">
-    (1/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    92.9%
-  </span>
-  <span class="absValue">
-    (13/14)
+    (5/5)
   </span>
 </td>
 <td class="coverageStat">
@@ -107,18 +80,11 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (21/21)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (111/111)
+    (36/36)
   </span>
 </td>
 </tr>
+
 </table>
 
 <br/>
@@ -128,80 +94,22 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.model
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionStatus
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionType
-&nbsp;import kotlinx.datetime.LocalDate
-&nbsp;import kotlinx.datetime.TimeZone
-&nbsp;import kotlinx.datetime.toLocalDateTime
-&nbsp;
 &nbsp;/**
-&nbsp; * Aggregate numbers for a date range. Pure domain return shape — never persisted, never
-&nbsp; * serialized, never pushed. byCategory / byAccount are intentionally omitted; those are
-&nbsp; * separate use cases (charts, accounts breakdown).
-&nbsp; */
-&nbsp;data class PeriodTotals(
-&nbsp;    val income: Money,
-&nbsp;    val expense: Money,
-&nbsp;    val net: Money,
-&nbsp;    val plannedIncome: Money,
-&nbsp;    val plannedExpense: Money,
-&nbsp;) {
-&nbsp;    companion object {
-&nbsp;        val Empty = PeriodTotals(
-&nbsp;            income = Money.zero(),
-&nbsp;            expense = Money.zero(),
-&nbsp;            net = Money.zero(),
-&nbsp;            plannedIncome = Money.zero(),
-&nbsp;            plannedExpense = Money.zero(),
-&nbsp;        )
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;/**
-&nbsp; * Pure aggregation over an in-memory list of transactions. Caller decides which list to
-&nbsp; * pass (typically `transactionRepository.getByWorkspaceId(...)`).
+&nbsp; * Lifecycle of a [WorkspaceInvite].
 &nbsp; *
-&nbsp; * Period is computed from `transaction.operationAt` interpreted in [timeZone]. Inclusive on
-&nbsp; * both ends. Deleted transactions are absent from the local table — no extra filtering.
+&nbsp; * - [PENDING] — created by an owner; awaiting recipient action.
+&nbsp; * - [ACCEPTED] — recipient joined; a [WorkspaceMember] row exists for them.
+&nbsp; * - [DECLINED] — recipient declined; terminal.
+&nbsp; * - [CANCELLED] — owner revoked before response; terminal.
+&nbsp; * - [EXPIRED] — `now &gt; expiresAt`. Computed client-side for display when status is still
+&nbsp; *   PENDING; only persisted if a flow explicitly transitions the doc.
 &nbsp; */
-&nbsp;fun calculatePeriodTotalsFromList(
-&nbsp;    transactions: List&lt;Transaction&gt;,
-&nbsp;    fromDate: LocalDate,
-&nbsp;    toDate: LocalDate,
-&nbsp;    timeZone: TimeZone,
-&nbsp;): PeriodTotals {
-<b class="fc">&nbsp;    var income = 0L</b>
-<b class="fc">&nbsp;    var expense = 0L</b>
-<b class="fc">&nbsp;    var plannedIncome = 0L</b>
-<b class="fc">&nbsp;    var plannedExpense = 0L</b>
-&nbsp;
-<b class="fc">&nbsp;    for (tx in transactions) {</b>
-<b class="fc">&nbsp;        val date = tx.operationAt.toLocalDateTime(timeZone).date</b>
-<b class="fc">&nbsp;        if (date &lt; fromDate || date &gt; toDate) continue</b>
-&nbsp;
-<b class="fc">&nbsp;        val magnitude = tx.money.abs().minor</b>
-<b class="fc">&nbsp;        when (tx.status) {</b>
-<b class="fc">&nbsp;            TransactionStatus.ACTUAL -&gt; when (tx.type) {</b>
-<b class="fc">&nbsp;                TransactionType.INCOME -&gt; income += magnitude</b>
-<b class="fc">&nbsp;                TransactionType.EXPENSE -&gt; expense += magnitude</b>
-&nbsp;                TransactionType.OPENING_BALANCE -&gt; Unit
-&nbsp;            }
-<b class="pc">&nbsp;            TransactionStatus.PLANNED -&gt; when (tx.type) {</b>
-<b class="fc">&nbsp;                TransactionType.INCOME -&gt; plannedIncome += magnitude</b>
-<b class="fc">&nbsp;                TransactionType.EXPENSE -&gt; plannedExpense += magnitude</b>
-&nbsp;                TransactionType.OPENING_BALANCE -&gt; Unit
-&nbsp;            }
-&nbsp;        }
-&nbsp;    }
-&nbsp;
-<b class="fc">&nbsp;    return PeriodTotals(</b>
-<b class="fc">&nbsp;        income = Money.fromMinor(income),</b>
-<b class="fc">&nbsp;        expense = Money.fromMinor(expense),</b>
-<b class="fc">&nbsp;        net = Money.fromMinor(income - expense),</b>
-<b class="fc">&nbsp;        plannedIncome = Money.fromMinor(plannedIncome),</b>
-<b class="fc">&nbsp;        plannedExpense = Money.fromMinor(plannedExpense),</b>
-&nbsp;    )
+&nbsp;enum class InviteStatus {
+<b class="fc">&nbsp;    PENDING,</b>
+<b class="fc">&nbsp;    ACCEPTED,</b>
+<b class="fc">&nbsp;    DECLINED,</b>
+<b class="fc">&nbsp;    CANCELLED,</b>
+<b class="fc">&nbsp;    EXPIRED,</b>
 &nbsp;}
 </code>
 </pre>
@@ -226,7 +134,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-23 14:54</div>
+    <div style="float:right;">generated on 2026-07-23 23:54</div>
 </div>
 </body>
 </html>
