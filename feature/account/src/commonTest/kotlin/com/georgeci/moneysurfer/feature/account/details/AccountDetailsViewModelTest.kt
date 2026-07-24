@@ -50,7 +50,7 @@ class AccountDetailsViewModelTest : StringSpec({
 
     "the online build surfaces the account's extra details in the order they were saved" {
         runTest {
-            val account = anAccount(extraDetails = details)
+            val account = anAccount().copy(extraDetails = details)
             val vm = viewModelFor(account, offline = false)
             try {
                 vm.awaitContent().extraDetails shouldBe details
@@ -62,7 +62,7 @@ class AccountDetailsViewModelTest : StringSpec({
 
     "the offline build shows no extra details, matching the hidden creation section" {
         runTest {
-            val account = anAccount(extraDetails = details)
+            val account = anAccount().copy(extraDetails = details)
             val vm = viewModelFor(account, offline = true)
             try {
                 vm.awaitContent().extraDetails shouldBe emptyList()
