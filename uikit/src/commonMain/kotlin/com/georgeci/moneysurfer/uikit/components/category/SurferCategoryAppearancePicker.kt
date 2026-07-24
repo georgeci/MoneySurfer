@@ -24,6 +24,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.georgeci.moneysurfer.uikit.components.SurferCategoryPalette
+import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
 import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
@@ -161,7 +162,19 @@ private fun ColorSwatch(
             .then(ring)
             .selectable(selected = selected, role = Role.RadioButton, onClick = onClick)
             .semantics { contentDescription = label },
-    )
+        contentAlignment = Alignment.Center,
+    ) {
+        // The ring alone is easy to miss against a pale wash, and it is the only thing
+        // distinguishing the chosen colour from the seven beside it.
+        if (selected) {
+            Icon(
+                imageVector = SurferIcons.Check,
+                contentDescription = SurferSemantics.Decorative,
+                tint = color,
+                modifier = Modifier.size(CheckSize),
+            )
+        }
+    }
 }
 
 private const val DEFAULT_COLUMNS = 4
@@ -171,6 +184,7 @@ private val GridGap = 8.dp
 private val SwatchGap = 6.dp
 private val CellCorner = 14.dp
 private val IconSize = 22.dp
+private val CheckSize = 18.dp
 
 /**
  * Names in palette order, not keyed by icon key or hue value — the palette lists are already the
