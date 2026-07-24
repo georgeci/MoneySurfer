@@ -8,6 +8,9 @@ import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
 import com.georgeci.moneysurfer.domain.primitives.Money
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 
+// Every parameter is defaulted — callers name only the field under test, as in the Budget and
+// Goal fixtures next door.
+@Suppress("LongParameterList")
 fun anAccount(
     id: AccountId = accountId(),
     workspaceId: WorkspaceId = workspaceId(),

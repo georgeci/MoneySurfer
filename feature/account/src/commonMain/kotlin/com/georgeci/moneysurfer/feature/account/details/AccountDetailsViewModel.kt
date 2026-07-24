@@ -3,6 +3,7 @@ package com.georgeci.moneysurfer.feature.account.details
 import arrow.optics.optics
 import com.georgeci.moneysurfer.domain.OfflineBuildFlags
 import com.georgeci.moneysurfer.domain.formatter.MoneyFormatter
+import com.georgeci.moneysurfer.domain.model.Account
 import com.georgeci.moneysurfer.domain.model.AccountExtraDetail
 import com.georgeci.moneysurfer.domain.model.Transaction
 import com.georgeci.moneysurfer.domain.primitives.AccountId
@@ -54,46 +55,54 @@ class AccountDetailsViewModel(
             val currency = account?.currencyCode ?: CurrencyCode("USD")
             getTransactionsByAccount(accountId).collect { transactions ->
                 val visible = transactions.filter { it.type != TransactionType.OPENING_BALANCE }
-                val income = visible.fold(Money.zero()) { acc, t ->
-                    if (t.type == TransactionType.INCOME) acc + t.money.abs() else acc
-                }
-                val expenses = visible.fold(Money.zero()) { acc, t ->
-                    if (t.type == TransactionType.EXPENSE) acc + t.money.abs() else acc
-                }
+                val totals = visible.formatTotals(currency)
                 val txnUi = visible.map { it.toUi(currency) }
-                val formattedIncome = MoneyFormatter.format(income, currency)
-                val formattedExpenses = MoneyFormatter.format(expenses, currency)
                 updateState {
                     when (this) {
-                        is AccountDetailsState.Loading -> AccountDetailsState.Content(
-                            accountId = accountId,
-                            name = account?.name.orEmpty(),
-                            formattedBalance = account?.let {
-                                MoneyFormatter.format(it.balance, it.currencyCode)
-                            }.orEmpty(),
-                            currency = account?.currencyCode?.value.orEmpty(),
-                            formattedIncome = formattedIncome,
-                            formattedExpenses = formattedExpenses,
-                            transactions = txnUi,
-                            filter = TransactionFilter.All,
-                            // Mirrors the creation screen: the offline build has no place to put
-                            // these, so it does not offer to collect them and does not show them.
-                            extraDetails = if (offlineBuildFlags.isOffline) {
-                                emptyList()
-                            } else {
-                                account?.extraDetails.orEmpty()
-                            },
-                        )
+                        is AccountDetailsState.Loading ->
+                            account.toContent(accountId, txnUi, totals)
                         is AccountDetailsState.Content -> copy(
                             transactions = txnUi,
-                            formattedIncome = formattedIncome,
-                            formattedExpenses = formattedExpenses,
+                            formattedIncome = totals.income,
+                            formattedExpenses = totals.expenses,
                         )
                     }
                 }
             }
         }
     }
+
+    /** Per-direction sums over the visible transactions, already formatted for display. */
+    private fun List<Transaction>.formatTotals(currency: CurrencyCode): FormattedTotals {
+        val income = sumOf(TransactionType.INCOME)
+        val expenses = sumOf(TransactionType.EXPENSE)
+        return FormattedTotals(
+            income = MoneyFormatter.format(income, currency),
+            expenses = MoneyFormatter.format(expenses, currency),
+        )
+    }
+
+    private fun List<Transaction>.sumOf(type: TransactionType): Money =
+        fold(Money.zero()) { acc, t -> if (t.type == type) acc + t.money.abs() else acc }
+
+    /** First resolved state for the screen. A null account means it was deleted underneath us. */
+    private fun Account?.toContent(
+        accountId: AccountId,
+        transactions: List<AccountTransactionUi>,
+        totals: FormattedTotals,
+    ) = AccountDetailsState.Content(
+        accountId = accountId,
+        name = this?.name.orEmpty(),
+        formattedBalance = this?.let { MoneyFormatter.format(it.balance, it.currencyCode) }.orEmpty(),
+        currency = this?.currencyCode?.value.orEmpty(),
+        formattedIncome = totals.income,
+        formattedExpenses = totals.expenses,
+        transactions = transactions,
+        filter = TransactionFilter.All,
+        // Mirrors the creation screen: the offline build has no place to put these, so it does
+        // not offer to collect them and does not show them.
+        extraDetails = if (offlineBuildFlags.isOffline) emptyList() else this?.extraDetails.orEmpty(),
+    )
 
     private fun Transaction.toUi(currency: CurrencyCode) = AccountTransactionUi(
         id = id,
@@ -131,6 +140,9 @@ sealed interface AccountDetailsState {
 
     companion object
 }
+
+/** Display-ready income/expense totals for the quick-stats row. */
+private data class FormattedTotals(val income: String, val expenses: String)
 
 enum class TransactionFilter { All, Expenses, Income }
 

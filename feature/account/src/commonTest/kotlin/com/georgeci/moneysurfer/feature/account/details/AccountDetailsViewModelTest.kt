@@ -2,13 +2,18 @@ package com.georgeci.moneysurfer.feature.account.details
 
 import androidx.lifecycle.viewModelScope
 import com.georgeci.moneysurfer.domain.OfflineBuildFlags
+import com.georgeci.moneysurfer.domain.fixtures.USD
+import com.georgeci.moneysurfer.domain.fixtures.aTransaction
 import com.georgeci.moneysurfer.domain.fixtures.anAccount
+import com.georgeci.moneysurfer.domain.fixtures.dollars
+import com.georgeci.moneysurfer.domain.formatter.MoneyFormatter
 import com.georgeci.moneysurfer.domain.model.Account
 import com.georgeci.moneysurfer.domain.model.AccountExtraDetail
 import com.georgeci.moneysurfer.domain.model.Transaction
 import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.Money
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
+import com.georgeci.moneysurfer.domain.primitives.TransactionType
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 import com.georgeci.moneysurfer.domain.repositories.AccountRepository
 import com.georgeci.moneysurfer.domain.repositories.TransactionRepository
@@ -67,6 +72,32 @@ class AccountDetailsViewModelTest : StringSpec({
         }
     }
 
+    "income and expense totals sum only their own direction, ignoring the opening balance" {
+        runTest {
+            val account = anAccount(currencyCode = USD)
+            val transactions = listOf(
+                aTransaction(accountId = account.id, money = 30.dollars, type = TransactionType.INCOME),
+                aTransaction(accountId = account.id, money = 70.dollars, type = TransactionType.INCOME),
+                aTransaction(accountId = account.id, money = 25.dollars, type = TransactionType.EXPENSE),
+                // Never counted on this screen — it is the account's starting point, not activity.
+                aTransaction(
+                    accountId = account.id,
+                    money = 500.dollars,
+                    type = TransactionType.OPENING_BALANCE,
+                ),
+            )
+            val vm = viewModelFor(account, offline = false, transactions = transactions)
+            try {
+                val content = vm.awaitContent()
+                content.formattedIncome shouldBe MoneyFormatter.format(100.dollars, USD)
+                content.formattedExpenses shouldBe MoneyFormatter.format(25.dollars, USD)
+                content.transactions.size shouldBe 3
+            } finally {
+                vm.viewModelScope.cancel()
+            }
+        }
+    }
+
     "an account without extra details reports an empty list rather than a blank section" {
         runTest {
             val vm = viewModelFor(anAccount(), offline = false)
@@ -82,10 +113,14 @@ class AccountDetailsViewModelTest : StringSpec({
 private suspend fun AccountDetailsViewModel.awaitContent(): AccountDetailsState.Content =
     first { it is AccountDetailsState.Content } as AccountDetailsState.Content
 
-private fun viewModelFor(account: Account, offline: Boolean) = AccountDetailsViewModel(
+private fun viewModelFor(
+    account: Account,
+    offline: Boolean,
+    transactions: List<Transaction> = emptyList(),
+) = AccountDetailsViewModel(
     accountId = account.id,
     getAccountById = GetAccountByIdUseCase(SingleAccountRepository(account)),
-    getTransactionsByAccount = GetTransactionsByAccountUseCase(NoTransactionsRepository()),
+    getTransactionsByAccount = GetTransactionsByAccountUseCase(FixedTransactionRepository(transactions)),
     offlineBuildFlags = OfflineBuildFlags(isOffline = offline),
 )
 
@@ -103,12 +138,12 @@ private class SingleAccountRepository(private val account: Account) : AccountRep
     override suspend fun setArchived(accountId: AccountId, archived: Boolean) = error("not used")
 }
 
-private class NoTransactionsRepository : TransactionRepository {
-    private val empty = MutableStateFlow<List<Transaction>>(emptyList())
+private class FixedTransactionRepository(transactions: List<Transaction>) : TransactionRepository {
+    private val all = MutableStateFlow(transactions)
 
-    override fun getAll(): Flow<List<Transaction>> = empty
-    override fun getByAccountId(accountId: AccountId): Flow<List<Transaction>> = empty
-    override fun getByWorkspaceId(workspaceId: WorkspaceId): Flow<List<Transaction>> = empty
+    override fun getAll(): Flow<List<Transaction>> = all
+    override fun getByAccountId(accountId: AccountId): Flow<List<Transaction>> = all
+    override fun getByWorkspaceId(workspaceId: WorkspaceId): Flow<List<Transaction>> = all
     override fun getCategorizedWindow(
         accountId: AccountId?,
         window: TransactionPeriodWindow,
