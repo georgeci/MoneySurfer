@@ -74,6 +74,12 @@ kotlin {
         jvmTest.dependencies {
             implementation(projects.dataLocal)
             implementation(projects.feature.login)
+            // GlobalErrorBoundaryTest drives the real boundary component and the real
+            // MviViewModel escalation path (issue #78).
+            implementation(projects.uikit)
+            implementation(projects.utils)
+            implementation(libs.compose.material3)
+            implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.compose.uiTest)
             // KoinModuleVerificationTest lists the `parametersOf` types, some of
             // which are navigation-level (goal contribution mode).

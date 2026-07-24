@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.viewModelScope
+import co.touchlab.kermit.Logger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalForInheritanceCoroutinesApi
 import kotlinx.coroutines.flow.StateFlow
@@ -34,8 +35,17 @@ abstract class MviViewModel<STATE : Any, EVENT, SIDE_EFFECT : Any>(
         sideEffects.post(effect)
     }
 
+    /**
+     * Runs [block] on [viewModelScope], catching whatever it throws.
+     *
+     * Failures are never swallowed: the throwable is always logged at Error severity,
+     * which is what `CrashReportingLogWriter` turns into a Crashlytics non-fatal. What
+     * [onError] controls is only who renders it — pass a handler to show the failure
+     * inside the screen's own state, or leave it null to escalate to the global error
+     * boundary via [UnhandledErrors] (issue #78).
+     */
     protected fun launch(
-        onError: (Throwable) -> Unit = {},
+        onError: ((Throwable) -> Unit)? = null,
         block: suspend CoroutineScope.() -> Unit,
     ) {
         viewModelScope.launch {
@@ -45,10 +55,13 @@ abstract class MviViewModel<STATE : Any, EVENT, SIDE_EFFECT : Any>(
                 @Suppress("TooGenericExceptionCaught")
                 e: Exception,
             ) {
-                onError(e)
+                Logger.withTag(logTag).e(e) { "Unhandled error in $logTag" }
+                if (onError != null) onError(e) else UnhandledErrors.report(e)
             }
         }
     }
+
+    private val logTag: String get() = this::class.simpleName ?: "MviViewModel"
 }
 
 @NonRestartableComposable

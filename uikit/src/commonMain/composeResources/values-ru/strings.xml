@@ -3,5 +3,7 @@
     <string name="uikit_brand">MoneySurfer</string>
     <string name="uikit_close">Закрыть</string>
     <string name="uikit_done">Готово</string>
+    <string name="uikit_error_boundary_subtitle">На экране произошла непредвиденная ошибка. Попробуйте ещё раз — мы уже получили отчёт.</string>
+    <string name="uikit_error_boundary_title">Что-то пошло не так</string>
     <string name="uikit_retry">Повторить</string>
 </resources>
