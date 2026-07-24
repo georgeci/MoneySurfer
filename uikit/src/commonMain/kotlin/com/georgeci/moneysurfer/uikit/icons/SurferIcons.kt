@@ -52,6 +52,7 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.ui.graphics.vector.ImageVector
 
 object SurferIcons {
@@ -100,6 +101,7 @@ object SurferIcons {
     val Cloud: ImageVector get() = Icons.Filled.Cloud
     val LightMode: ImageVector get() = Icons.Filled.LightMode
     val Visibility: ImageVector get() = Icons.Filled.Visibility
+    val VisibilityOff: ImageVector get() = Icons.Filled.VisibilityOff
     val Globe: ImageVector get() = Icons.Filled.Language
     val Shield: ImageVector get() = Icons.Filled.Security
     val Code: ImageVector get() = Icons.Filled.Code

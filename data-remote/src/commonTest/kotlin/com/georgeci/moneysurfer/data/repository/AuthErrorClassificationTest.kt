@@ -50,6 +50,21 @@ class AuthErrorClassificationTest : StringSpec({
         ) shouldBe AuthError.Type.WeakPassword
     }
 
+    "invalid-email (FIRAuth 17008) classifies as InvalidEmail, not InvalidCredentials" {
+        classifyAuthErrorByMessage(
+            "Error Domain=FIRAuthErrorDomain Code=17008 UserInfo=" +
+                "{FIRAuthErrorUserInfoNameKey=ERROR_INVALID_EMAIL}",
+        ) shouldBe AuthError.Type.InvalidEmail
+    }
+
+    // Android does not put the code name in the message, only this phrase — and it arrives as a
+    // plain FirebaseAuthInvalidCredentialsException, which would otherwise read "wrong email or
+    // password" while creating a brand-new account.
+    "android's badly-formatted phrasing classifies as InvalidEmail" {
+        classifyAuthErrorByMessage("The email address is badly formatted.") shouldBe
+            AuthError.Type.InvalidEmail
+    }
+
     "unrecognized message returns null so the caller falls back to Unknown" {
         classifyAuthErrorByMessage(
             "Error Domain=FIRAuthErrorDomain Code=17020 UserInfo=" +

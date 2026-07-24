@@ -4,6 +4,7 @@ import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
+import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.v2.runComposeUiTest
@@ -27,14 +28,14 @@ import java.awt.GraphicsEnvironment
 @OptIn(ExperimentalTestApi::class)
 class SignInScreenStateTest : StringSpec({
 
-    "submit button is disabled until email and password are filled" {
+    "submit button stays enabled on empty input so submitting can explain what is missing" {
         runComposeUiTest {
             setContent {
                 SignInContent(state = SignInState(), onEvent = {})
             }
 
             onNodeWithTag(SignInTestTags.Root).assertIsDisplayed()
-            onNodeWithTag(SignInTestTags.SubmitButton).assertIsNotEnabled()
+            onNodeWithTag(SignInTestTags.SubmitButton).assertIsEnabled()
         }
     }
 
@@ -70,7 +71,7 @@ class SignInScreenStateTest : StringSpec({
         }
     }
 
-    "error state renders the error text" {
+    "form-level error renders the shared error text" {
         runComposeUiTest {
             setContent {
                 SignInContent(
@@ -83,6 +84,46 @@ class SignInScreenStateTest : StringSpec({
         }
     }
 
+    "email error renders under the email field, not as the shared error text" {
+        runComposeUiTest {
+            setContent {
+                SignInContent(
+                    state = SignInState(error = SignInError.EmailInvalid),
+                    onEvent = {},
+                )
+            }
+
+            onNodeWithTag(SignInTestTags.EmailError, useUnmergedTree = true).assertIsDisplayed()
+            onNodeWithTag(SignInTestTags.ErrorText).assertDoesNotExist()
+        }
+    }
+
+    "password error renders under the password field" {
+        runComposeUiTest {
+            setContent {
+                SignInContent(
+                    state = SignInState(mode = AuthMode.SignUp, error = SignInError.PasswordTooShort),
+                    onEvent = {},
+                )
+            }
+
+            onNodeWithTag(SignInTestTags.PasswordError, useUnmergedTree = true).assertIsDisplayed()
+            onNodeWithTag(SignInTestTags.ErrorText).assertDoesNotExist()
+        }
+    }
+
+    "password is masked until the reveal toggle is tapped" {
+        runComposeUiTest {
+            setContent {
+                SignInContent(state = SignInState(password = "secret1"), onEvent = {})
+            }
+
+            onNodeWithTag(SignInTestTags.PasswordField).assertTextEquals("Password", "•••••••")
+            onNodeWithTag(SignInTestTags.PasswordReveal).performClick()
+            onNodeWithTag(SignInTestTags.PasswordField).assertTextEquals("Password", "secret1")
+        }
+    }
+
     "no error state renders no error text" {
         runComposeUiTest {
             setContent {
@@ -90,6 +131,8 @@ class SignInScreenStateTest : StringSpec({
             }
 
             onNodeWithTag(SignInTestTags.ErrorText).assertDoesNotExist()
+            onNodeWithTag(SignInTestTags.EmailError, useUnmergedTree = true).assertDoesNotExist()
+            onNodeWithTag(SignInTestTags.PasswordError, useUnmergedTree = true).assertDoesNotExist()
         }
     }
 
