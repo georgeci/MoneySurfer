@@ -122,7 +122,20 @@ class SettingsViewModel(
                     postSideEffect(SettingsEffect.NavigateToMembers(workspaceId))
                 }
             }
-            SettingsEvent.OnLogoutClick -> logout()
+            SettingsEvent.OnLogoutClick ->
+                // A guest session is local-only: logging out drops the anonymous user and its
+                // data with no way back, so warn before doing it. Real users keep their data
+                // in the cloud, so their logout is immediate.
+                if (currentState.isAnonymousUser) {
+                    updateState { copy(showGuestLogoutWarning = true) }
+                } else {
+                    logout()
+                }
+            SettingsEvent.OnGuestLogoutDismissed -> updateState { copy(showGuestLogoutWarning = false) }
+            SettingsEvent.OnGuestLogoutConfirmed -> {
+                updateState { copy(showGuestLogoutWarning = false) }
+                logout()
+            }
             else -> navigationEffect(event)?.let(::postSideEffect)
         }
     }
@@ -173,6 +186,7 @@ data class SettingsState(
     val isDynamicColorEnabled: Boolean = false,
     val isOffline: Boolean = false,
     val syncEnabled: Boolean = false,
+    val showGuestLogoutWarning: Boolean = false,
 ) {
     val showProfile: Boolean get() = !isOffline
     val showSyncSection: Boolean get() = !isOffline && syncEnabled
@@ -198,6 +212,8 @@ sealed interface SettingsEvent {
     data object OnCsvBackupClick : SettingsEvent
     data object OnAboutClick : SettingsEvent
     data object OnLogoutClick : SettingsEvent
+    data object OnGuestLogoutConfirmed : SettingsEvent
+    data object OnGuestLogoutDismissed : SettingsEvent
     data object OnDeleteAccountClick : SettingsEvent
 }
 

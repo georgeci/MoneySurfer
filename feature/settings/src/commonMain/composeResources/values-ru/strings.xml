@@ -289,6 +289,10 @@
     <string name="settings_delete_account_confirm_message">Аккаунт и облачные данные будут удалены навсегда. Это действие нельзя отменить.</string>
     <string name="settings_delete_account_confirm_confirm">Удалить навсегда</string>
     <string name="settings_delete_account_confirm_cancel">Отмена</string>
+    <string name="settings_logout_guest_warning_title">Выйти из гостевого режима?</string>
+    <string name="settings_logout_guest_warning_message">Вы вошли как гость. При выходе все данные на этом устройстве будут удалены безвозвратно — счета, транзакции и цели восстановить не получится.</string>
+    <string name="settings_logout_guest_warning_confirm">Выйти и удалить</string>
+    <string name="settings_logout_guest_warning_cancel">Отмена</string>
     <string name="settings_delete_account_notice_wrong_password">Неверный пароль</string>
     <string name="settings_delete_account_notice_recent_login">В целях безопасности выйдите из аккаунта, войдите снова и повторите попытку</string>
     <string name="settings_delete_account_notice_cleanup_failed">Не удалось удалить облачные данные. Проверьте подключение и попробуйте ещё раз</string>

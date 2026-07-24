@@ -16,6 +16,7 @@ import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
 import com.georgeci.moneysurfer.domain.primitives.Money
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
+import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 import com.georgeci.moneysurfer.domain.usecase.CreateAccountUseCase
 import com.georgeci.moneysurfer.domain.usecase.CreateTransactionUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetAccountByIdUseCase
@@ -175,9 +176,10 @@ class AccountCreationViewModel(
 
     private fun saveAccount() {
         val state = currentState as? AccountCreationState.Content ?: return
-        if (state.name.isBlank()) return
-        if (state.balanceError != null) return
-        launch {
+        if (state.name.isBlank() || state.balanceError != null) return
+        launch(
+            onError = ::handleSaveError,
+        ) {
             val trimmedName = state.name.trim()
             if (state.isEditMode) {
                 val existingId = state.editingAccountId ?: return@launch
@@ -197,7 +199,11 @@ class AccountCreationViewModel(
                 return@launch
             }
 
-            val workspaceId = session.currentWorkspaceId.flow.first() ?: return@launch
+            val workspaceId = session.currentWorkspaceId.flow.first() ?: run {
+                log.w { "[save] no current workspace pinned — cannot create account" }
+                snackbar.show(Res.string.accounts_manage_action_failed)
+                return@launch
+            }
             val balanceDouble = InitialBalanceInput.parse(state.balance) ?: 0.0
             val currency = state.currency
             val openingBalance = Money.fromDouble(balanceDouble)
@@ -240,22 +246,28 @@ class AccountCreationViewModel(
             }
 
             snackbar.show(Res.string.account_creation_created_snackbar, listOf(trimmedName))
-
-            if (firstRun) {
-                // First-launch step: the currency picked here becomes the workspace base
-                // currency, so the Dashboard total speaks the user's currency from day one.
-                // The account itself is already saved, so a failure here is reported and the
-                // user still moves on — the workspace currency is fixable from settings, and
-                // stranding them on the first-run screen would invite a duplicate account.
-                updateWorkspaceCurrency(workspaceId, currency).onLeft { err ->
-                    log.w { "[firstRun] workspace currency not applied -> $err" }
-                    snackbar.show(Res.string.account_creation_currency_failed_snackbar)
-                }
-                postSideEffect(AccountCreationEffect.NavigateToDashboard)
-            } else {
-                postSideEffect(AccountCreationEffect.NavigateBack)
-            }
+            finishAccountCreation(workspaceId, currency)
         }
+    }
+
+    private fun handleSaveError(error: Throwable) {
+        log.e(error) { "[save] failed" }
+        snackbar.show(Res.string.accounts_manage_action_failed)
+    }
+
+    private suspend fun finishAccountCreation(workspaceId: WorkspaceId, currency: CurrencyCode) {
+        if (!firstRun) {
+            postSideEffect(AccountCreationEffect.NavigateBack)
+            return
+        }
+
+        // The account is already saved, so a workspace-currency failure is reported without
+        // stranding the user on the first-run screen and inviting a duplicate account.
+        updateWorkspaceCurrency(workspaceId, currency).onLeft { err ->
+            log.w { "[firstRun] workspace currency not applied -> $err" }
+            snackbar.show(Res.string.account_creation_currency_failed_snackbar)
+        }
+        postSideEffect(AccountCreationEffect.NavigateToDashboard)
     }
 
     /** The form's extra-detail rows as they should be stored: normalized, blanks dropped. */

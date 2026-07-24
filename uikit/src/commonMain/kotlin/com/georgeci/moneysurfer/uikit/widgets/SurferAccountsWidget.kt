@@ -59,11 +59,15 @@ fun SurferAccountsWidget(
                 onClick = onItemClick?.let { handler -> { handler(item) } },
             )
         }
-        AddAccountRow(
-            label = addLabel,
-            trailingLabel = addCtaTrailingLabel,
-            onClick = onAddClick,
-        )
+        // The add-account CTA is the empty-state affordance only; once accounts exist,
+        // new ones are created from the "Manage" flow.
+        if (items.isEmpty()) {
+            AddAccountRow(
+                label = addLabel,
+                trailingLabel = addCtaTrailingLabel,
+                onClick = onAddClick,
+            )
+        }
     }
 }
 
