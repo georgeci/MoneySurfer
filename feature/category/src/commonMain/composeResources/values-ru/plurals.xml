@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="category_picker_subcategories">
+        <item quantity="one">%1$d подкатегория</item>
+        <item quantity="few">%1$d подкатегории</item>
+        <item quantity="many">%1$d подкатегорий</item>
+        <item quantity="other">%1$d подкатегорий</item>
+    </plurals>
+</resources>

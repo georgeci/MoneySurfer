@@ -17,6 +17,7 @@ import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.domain.primitives.UserId
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceInviteId
+import com.georgeci.moneysurfer.feature.category.picker.CategoryPickerVariant
 import com.georgeci.moneysurfer.navigation.GoalContributionMode
 import org.koin.core.annotation.KoinExperimentalAPI
 import org.koin.dsl.module
@@ -48,6 +49,8 @@ class OfflineKoinModuleVerificationTest {
                 CategoryId::class,
                 TransactionId::class,
                 CategoryType::class,
+                // The category chooser passes which of the two picker layouts to open.
+                CategoryPickerVariant::class,
                 // Budget details/edit screens pass the budget id via parametersOf.
                 BudgetId::class,
                 // Goal screens pass the goal id, and the contribution screen its

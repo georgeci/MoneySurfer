@@ -6,6 +6,13 @@
     <string name="transaction_creation_category_section_income">Доходы</string>
     <string name="transaction_creation_category_create_new">Создать категорию</string>
     <string name="transaction_creation_category_empty">Нет категорий</string>
+    <string name="category_picker_currently">Сейчас: %1$s</string>
+    <string name="category_picker_new">Новая</string>
+    <string name="category_picker_new_category">Новая категория</string>
+    <string name="category_picker_show_children">Показать подкатегории</string>
+    <string name="category_picker_hide_children">Скрыть подкатегории</string>
+    <string name="category_picker_show_tree">Показать списком</string>
+    <string name="category_picker_show_grid">Показать сеткой</string>
 
     <!-- Category creation / edit -->
     <string name="category_creation_title_create">Новая категория</string>
