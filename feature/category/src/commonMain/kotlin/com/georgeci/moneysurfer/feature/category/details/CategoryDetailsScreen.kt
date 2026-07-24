@@ -27,6 +27,7 @@ import com.georgeci.moneysurfer.domain.primitives.CategoryType
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.uikit.components.SurferCategoryPalette
 import com.georgeci.moneysurfer.uikit.components.account.SurferAccountStatCard
+import com.georgeci.moneysurfer.uikit.components.base.SurferSectionHeader
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbarAction
 import com.georgeci.moneysurfer.uikit.components.category.SurferCategoryBreakdownRow
@@ -267,7 +268,13 @@ private fun CategoryDetailsContent(
             }
 
             item(key = "subcategories-header") {
-                SectionHeader(title = stringResource(Res.string.category_details_subcategories))
+                SurferSectionHeader(
+                    title = stringResource(Res.string.category_details_subcategories),
+                    modifier = Modifier.padding(
+                        horizontal = AppTheme.spacing.small,
+                        vertical = AppTheme.spacing.xSmall,
+                    ),
+                )
             }
 
             if (state.isLeaf) {
@@ -304,7 +311,13 @@ private fun CategoryDetailsContent(
             }
 
             item(key = "recent-header") {
-                SectionHeader(title = stringResource(Res.string.category_details_recent))
+                SurferSectionHeader(
+                    title = stringResource(Res.string.category_details_recent),
+                    modifier = Modifier.padding(
+                        horizontal = AppTheme.spacing.small,
+                        vertical = AppTheme.spacing.xSmall,
+                    ),
+                )
             }
 
             if (state.transactions.isEmpty()) {
@@ -339,18 +352,6 @@ private fun CategoryDetailsContent(
             }
         }
     }
-}
-
-@Composable
-private fun SectionHeader(title: String) {
-    Text(
-        text = title,
-        style = AppTheme.typography.titleSmall,
-        color = AppTheme.materialColors.onSurfaceVariant,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = AppTheme.spacing.small, vertical = AppTheme.spacing.xSmall),
-    )
 }
 
 private fun heroLabelFor(type: CategoryType) = when (type) {

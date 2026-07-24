@@ -26,6 +26,7 @@ import com.georgeci.moneysurfer.domain.primitives.GoalId
 import com.georgeci.moneysurfer.feature.goal.GoalDateField
 import com.georgeci.moneysurfer.feature.goal.GoalDatePickerDialog
 import com.georgeci.moneysurfer.feature.goal.formatGoalDate
+import com.georgeci.moneysurfer.uikit.components.base.SurferSectionLabel
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbarButtonAction
 import com.georgeci.moneysurfer.uikit.components.goal.SurferEmojiPicker
@@ -163,13 +164,13 @@ private fun GoalEditContent(
                 )
             }
 
-            SectionLabel(stringResource(Res.string.goal_edit_icon_label))
+            SurferSectionLabel(stringResource(Res.string.goal_edit_icon_label))
             SurferEmojiPicker(
                 selected = state.emoji,
                 onSelect = { onEvent(GoalEditEvent.OnEmojiSelected(it)) },
             )
 
-            SectionLabel(stringResource(Res.string.goal_edit_color_label))
+            SurferSectionLabel(stringResource(Res.string.goal_edit_color_label))
             SurferGoalHueRow(
                 selected = state.hue,
                 onSelect = { onEvent(GoalEditEvent.OnHueSelected(it)) },
@@ -187,15 +188,6 @@ private fun GoalEditContent(
             },
         )
     }
-}
-
-@Composable
-private fun SectionLabel(text: String) {
-    Text(
-        text = text,
-        style = AppTheme.typography.titleSmall,
-        color = AppTheme.materialColors.onSurfaceVariant,
-    )
 }
 
 @Preview

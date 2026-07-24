@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -56,6 +55,8 @@ import com.georgeci.moneysurfer.uikit.components.account.SurferAccountManageCard
 import com.georgeci.moneysurfer.uikit.components.account.SurferArchivedAccountCard
 import com.georgeci.moneysurfer.uikit.components.account.SurferTotalBalanceCard
 import com.georgeci.moneysurfer.uikit.components.base.SurferDragHandle
+import com.georgeci.moneysurfer.uikit.components.base.SurferSectionHeader
+import com.georgeci.moneysurfer.uikit.components.base.SurferSectionHeaderHint
 import com.georgeci.moneysurfer.uikit.components.base.SurferSwipeAction
 import com.georgeci.moneysurfer.uikit.components.base.SurferSwipeRevealRow
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
@@ -205,10 +206,14 @@ private fun AccountsManageContent(
             }
 
             item(key = "active-header") {
-                SectionHeader(
+                SurferSectionHeader(
                     title = stringResource(Res.string.accounts_manage_active_header),
                     trailing = if (state.isEditing) {
-                        stringResource(Res.string.accounts_manage_drag_to_reorder)
+                        {
+                            SurferSectionHeaderHint(
+                                text = stringResource(Res.string.accounts_manage_drag_to_reorder),
+                            )
+                        }
                     } else {
                         null
                     },
@@ -231,9 +236,13 @@ private fun AccountsManageContent(
 
             if (state.archivedAccounts.isNotEmpty()) {
                 item(key = "archived-header") {
-                    SectionHeader(
+                    SurferSectionHeader(
                         title = stringResource(Res.string.accounts_manage_archived_header),
-                        trailing = stringResource(Res.string.accounts_manage_archived_hint),
+                        trailing = {
+                            SurferSectionHeaderHint(
+                                text = stringResource(Res.string.accounts_manage_archived_hint),
+                            )
+                        },
                         modifier = Modifier.padding(horizontal = 24.dp).padding(top = 20.dp, bottom = 6.dp),
                     )
                 }
@@ -360,32 +369,6 @@ private fun EditToggleChip(
             )
             Spacer(Modifier.width(4.dp))
             Text(text = label, style = AppTheme.typography.labelLarge)
-        }
-    }
-}
-
-@Composable
-private fun SectionHeader(
-    title: String,
-    modifier: Modifier = Modifier,
-    trailing: String? = null,
-) {
-    Row(
-        modifier = modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(
-            text = title.uppercase(),
-            style = AppTheme.typography.labelSmall,
-            color = AppTheme.materialColors.onSurfaceVariant,
-        )
-        Spacer(Modifier.weight(1f))
-        if (trailing != null) {
-            Text(
-                text = trailing,
-                style = AppTheme.typography.labelMedium,
-                color = AppTheme.materialColors.onSurfaceVariant,
-            )
         }
     }
 }

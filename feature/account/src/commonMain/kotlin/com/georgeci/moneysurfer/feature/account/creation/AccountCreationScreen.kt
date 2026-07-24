@@ -67,6 +67,7 @@ import com.georgeci.moneysurfer.feature.account.labelRes
 import com.georgeci.moneysurfer.uikit.components.SurferCurrencyBottomSheet
 import com.georgeci.moneysurfer.uikit.components.SurferCurrencyOption
 import com.georgeci.moneysurfer.uikit.components.SurferCurrencyPickerField
+import com.georgeci.moneysurfer.uikit.components.base.SurferSectionLabel
 import com.georgeci.moneysurfer.uikit.components.base.SurferSegmentedControl
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbarButtonAction
@@ -245,7 +246,10 @@ private fun TypePicker(
     selected: AccountType,
     onSelect: (AccountType) -> Unit,
 ) {
-    SectionLabel(stringResource(Res.string.account_creation_type_label))
+    SurferSectionLabel(
+        text = stringResource(Res.string.account_creation_type_label),
+        modifier = Modifier.padding(bottom = AppTheme.spacing.small),
+    )
     SurferSegmentedControl(
         options = listOf(AccountType.CASH, AccountType.BANK, AccountType.CARD, AccountType.SAVINGS),
         selected = selected,
@@ -267,7 +271,10 @@ private fun CurrencyPicker(
     val resolved = currencies.firstOrNull { it.code == selected } ?: currencies.first()
     var sheetOpen by rememberSaveable { mutableStateOf(false) }
 
-    SectionLabel(stringResource(Res.string.account_creation_currency_label))
+    SurferSectionLabel(
+        text = stringResource(Res.string.account_creation_currency_label),
+        modifier = Modifier.padding(bottom = AppTheme.spacing.small),
+    )
     SurferCurrencyPickerField(
         symbol = resolved.symbol,
         code = resolved.code.value,
@@ -436,16 +443,6 @@ private fun AddFieldChip(
             color = AppTheme.materialColors.onSurface,
         )
     }
-}
-
-@Composable
-private fun SectionLabel(text: String) {
-    Text(
-        text = text,
-        style = AppTheme.typography.labelLarge,
-        color = AppTheme.materialColors.onSurfaceVariant,
-        modifier = Modifier.padding(bottom = AppTheme.spacing.small),
-    )
 }
 
 private val AccountExtraFieldKind.isMultiline: Boolean

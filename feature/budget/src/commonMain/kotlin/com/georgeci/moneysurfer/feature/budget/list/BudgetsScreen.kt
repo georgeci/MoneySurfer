@@ -31,6 +31,7 @@ import com.georgeci.moneysurfer.feature.budget.budgetStatusLabel
 import com.georgeci.moneysurfer.feature.budget.previewBudget
 import com.georgeci.moneysurfer.feature.budget.toUi
 import com.georgeci.moneysurfer.uikit.components.SurferCategoryPalette
+import com.georgeci.moneysurfer.uikit.components.base.SurferSectionHeader
 import com.georgeci.moneysurfer.uikit.components.base.SurferSwipeAction
 import com.georgeci.moneysurfer.uikit.components.base.SurferSwipeRevealRow
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
@@ -161,7 +162,15 @@ private fun BudgetsContent(
         ) {
             if (content.active.isNotEmpty() && content.archived.isNotEmpty()) {
                 item(key = "header:active") {
-                    SectionHeader(stringResource(Res.string.budgets_active_header))
+                    SurferSectionHeader(
+                        title = stringResource(Res.string.budgets_active_header),
+                        modifier = Modifier.padding(
+                            start = AppTheme.spacing.default,
+                            end = AppTheme.spacing.default,
+                            top = AppTheme.spacing.medium,
+                            bottom = AppTheme.spacing.xSmall,
+                        ),
+                    )
                 }
             }
             items(content.active, key = { it.id.value }) { budget ->
@@ -176,7 +185,15 @@ private fun BudgetsContent(
             }
             if (content.archived.isNotEmpty()) {
                 item(key = "header:archived") {
-                    SectionHeader(stringResource(Res.string.budgets_archived_header))
+                    SurferSectionHeader(
+                        title = stringResource(Res.string.budgets_archived_header),
+                        modifier = Modifier.padding(
+                            start = AppTheme.spacing.default,
+                            end = AppTheme.spacing.default,
+                            top = AppTheme.spacing.medium,
+                            bottom = AppTheme.spacing.xSmall,
+                        ),
+                    )
                 }
                 items(content.archived, key = { it.id.value }) { budget ->
                     BudgetRow(
@@ -209,21 +226,6 @@ private fun BudgetsContent(
             },
         )
     }
-}
-
-@Composable
-private fun SectionHeader(text: String) {
-    Text(
-        text = text,
-        style = AppTheme.typography.labelLarge,
-        color = AppTheme.materialColors.onSurfaceVariant,
-        modifier = Modifier.padding(
-            start = AppTheme.spacing.default,
-            end = AppTheme.spacing.default,
-            top = AppTheme.spacing.medium,
-            bottom = AppTheme.spacing.xSmall,
-        ),
-    )
 }
 
 @Composable

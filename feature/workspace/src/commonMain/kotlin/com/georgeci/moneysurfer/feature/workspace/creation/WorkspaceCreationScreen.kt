@@ -47,6 +47,7 @@ import com.georgeci.moneysurfer.uikit.components.SurferCurrencyBottomSheet
 import com.georgeci.moneysurfer.uikit.components.SurferCurrencyOption
 import com.georgeci.moneysurfer.uikit.components.SurferCurrencyPickerField
 import com.georgeci.moneysurfer.uikit.components.SurferFullScreenLoader
+import com.georgeci.moneysurfer.uikit.components.base.SurferSectionLabel
 import com.georgeci.moneysurfer.uikit.components.workspace.SurferInviteRow
 import com.georgeci.moneysurfer.uikit.components.workspace.SurferMemberRow
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
@@ -248,7 +249,10 @@ private fun CurrencyPicker(
     val resolved = currencies.firstOrNull { it.code.value == selected } ?: currencies.first()
     var sheetOpen by rememberSaveable { mutableStateOf(false) }
 
-    SectionLabel(stringResource(Res.string.workspace_creation_section_currency))
+    SurferSectionLabel(
+        text = stringResource(Res.string.workspace_creation_section_currency),
+        modifier = Modifier.padding(bottom = 10.dp),
+    )
     SurferCurrencyPickerField(
         symbol = resolved.symbol,
         code = resolved.code.value,
@@ -362,7 +366,10 @@ private fun MembersSection(
     showInviteRow: Boolean,
     onInviteClick: () -> Unit,
 ) {
-    SectionLabel(stringResource(Res.string.workspace_creation_section_members))
+    SurferSectionLabel(
+        text = stringResource(Res.string.workspace_creation_section_members),
+        modifier = Modifier.padding(bottom = 10.dp),
+    )
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         if (showInviteRow) {
             SurferInviteRow(
@@ -386,16 +393,6 @@ private fun MembersSection(
             }
         }
     }
-}
-
-@Composable
-private fun SectionLabel(text: String) {
-    Text(
-        text = text,
-        style = AppTheme.typography.labelLarge,
-        color = AppTheme.materialColors.onSurfaceVariant,
-        modifier = Modifier.padding(bottom = 10.dp),
-    )
 }
 
 @Composable

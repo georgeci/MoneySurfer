@@ -43,6 +43,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.georgeci.moneysurfer.domain.primitives.CategoryId
 import com.georgeci.moneysurfer.uikit.components.SurferCategoryBubble
 import com.georgeci.moneysurfer.uikit.components.SurferCategoryPalette
+import com.georgeci.moneysurfer.uikit.components.base.SurferSectionLabel
 import com.georgeci.moneysurfer.uikit.components.base.SurferSegmentedControl
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbarButtonAction
@@ -255,7 +256,7 @@ private fun TypeSelector(
     onChange: (CategoryTypeUi) -> Unit,
 ) {
     Column {
-        SectionLabel(stringResource(Res.string.category_creation_type_label))
+        SurferSectionLabel(stringResource(Res.string.category_creation_type_label))
         Spacer(Modifier.height(AppTheme.spacing.small))
         SurferSegmentedControl(
             options = listOf(CategoryTypeUi.Expense, CategoryTypeUi.Income),
@@ -280,7 +281,7 @@ private fun IconGrid(
     onSelect: (String) -> Unit,
 ) {
     Column {
-        SectionLabel(stringResource(Res.string.category_creation_icon_label))
+        SurferSectionLabel(stringResource(Res.string.category_creation_icon_label))
         Spacer(Modifier.height(10.dp))
         // Zipped rather than indexed by position: the key is what gets stored, so the grid
         // never has to agree with the palette on what slot 3 means.
@@ -342,7 +343,7 @@ private fun ColorGrid(
     onSelect: (Int) -> Unit,
 ) {
     Column {
-        SectionLabel(stringResource(Res.string.category_creation_color_label))
+        SurferSectionLabel(stringResource(Res.string.category_creation_color_label))
         Spacer(Modifier.height(10.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
             SurferCategoryPalette.hues.zip(SurferCategoryPalette.tints).forEach { (hue, color) ->
@@ -393,7 +394,7 @@ private fun ParentPicker(
     val noneLabel = stringResource(Res.string.category_creation_parent_none)
 
     Column {
-        SectionLabel(stringResource(Res.string.category_creation_field_parent))
+        SurferSectionLabel(stringResource(Res.string.category_creation_field_parent))
         Spacer(Modifier.height(AppTheme.spacing.small))
         Box {
             Row(
@@ -443,15 +444,6 @@ private fun ParentPicker(
             }
         }
     }
-}
-
-@Composable
-private fun SectionLabel(text: String) {
-    Text(
-        text = text,
-        style = AppTheme.typography.labelLarge,
-        color = AppTheme.materialColors.onSurfaceVariant,
-    )
 }
 
 @Preview

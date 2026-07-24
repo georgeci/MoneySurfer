@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import com.georgeci.moneysurfer.uikit.atom.SurferActionCard
 import com.georgeci.moneysurfer.uikit.components.SurferCategoryPalette
 import com.georgeci.moneysurfer.uikit.components.SurferSearchField
+import com.georgeci.moneysurfer.uikit.components.base.SurferSectionLabel
 import com.georgeci.moneysurfer.uikit.components.category.SurferCategoryCell
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.preview.SurferBottomSheetPreview
@@ -118,7 +119,10 @@ internal fun CategoryChooserContent(
         ) {
             if (expenseItems.isNotEmpty()) {
                 item(key = "expense-header", span = { GridItemSpan(maxLineSpan) }) {
-                    SectionLabel(text = expenseSectionTitle)
+                    SurferSectionLabel(
+                        text = expenseSectionTitle,
+                        modifier = Modifier.padding(vertical = 4.dp),
+                    )
                 }
                 items(expenseItems, key = { "e-${it.id}" }) { cat ->
                     SurferCategoryCell(
@@ -132,7 +136,10 @@ internal fun CategoryChooserContent(
             }
             if (incomeItems.isNotEmpty()) {
                 item(key = "income-header", span = { GridItemSpan(maxLineSpan) }) {
-                    SectionLabel(text = incomeSectionTitle)
+                    SurferSectionLabel(
+                        text = incomeSectionTitle,
+                        modifier = Modifier.padding(vertical = 4.dp),
+                    )
                 }
                 items(incomeItems, key = { "i-${it.id}" }) { cat ->
                     SurferCategoryCell(
@@ -181,16 +188,6 @@ private fun CreateNewCategoryRow(
             )
         }
     }
-}
-
-@Composable
-private fun SectionLabel(text: String) {
-    Text(
-        text = text,
-        style = AppTheme.typography.labelMedium,
-        color = AppTheme.materialColors.onSurfaceVariant,
-        modifier = Modifier.padding(vertical = 4.dp),
-    )
 }
 
 // Composable: category tints are theme-dependent, so the rows resolve inside the preview.
