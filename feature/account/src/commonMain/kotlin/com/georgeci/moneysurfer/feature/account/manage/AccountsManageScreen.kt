@@ -108,7 +108,7 @@ private fun AccountsManageLoading(onEvent: (AccountsManageEvent) -> Unit) {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .padding(horizontal = 16.dp, vertical = 12.dp),
+                .padding(horizontal = AppTheme.spacing.default, vertical = AppTheme.spacing.medium),
             verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
             repeat(ACCOUNTS_SKELETON_ROWS) {
@@ -145,7 +145,7 @@ private fun AccountsManageContent(
                         icon = if (state.isEditing) SurferIcons.Check else SurferIcons.Edit,
                         active = state.isEditing,
                         onClick = { onEvent(AccountsManageEvent.OnToggleEditMode) },
-                        modifier = Modifier.padding(end = 8.dp),
+                        modifier = Modifier.padding(end = AppTheme.spacing.small),
                     )
                 },
             )
@@ -175,7 +175,7 @@ private fun AccountsManageContent(
                 .fillMaxSize()
                 .padding(top = padding.calculateTopPadding()),
             contentPadding = PaddingValues(
-                top = 4.dp,
+                top = AppTheme.spacing.xSmall,
                 bottom = padding.calculateBottomPadding() + 96.dp,
             ),
         ) {
@@ -194,7 +194,10 @@ private fun AccountsManageContent(
                             pluralStringResource(Res.plurals.accounts_manage_stat_archived_count, it, it)
                         },
                     otherCurrencyChipTexts = state.otherCurrencyTotals,
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+                    modifier = Modifier.padding(
+                        horizontal = AppTheme.spacing.default,
+                        vertical = AppTheme.spacing.xSmall,
+                    ),
                 )
             }
 
@@ -210,7 +213,9 @@ private fun AccountsManageContent(
                     } else {
                         null
                     },
-                    modifier = Modifier.padding(horizontal = 24.dp).padding(top = 8.dp, bottom = 6.dp),
+                    modifier = Modifier
+                        .padding(horizontal = AppTheme.spacing.large)
+                        .padding(top = AppTheme.spacing.small, bottom = 6.dp),
                 )
             }
 
@@ -223,7 +228,7 @@ private fun AccountsManageContent(
                     onClick = { onEvent(AccountsManageEvent.OnAccountClick(account.id)) },
                     onArchiveClick = { onEvent(AccountsManageEvent.OnArchiveAccountClick(account.id)) },
                     onRemoveClick = { onEvent(AccountsManageEvent.OnRemoveAccountClick(account.id)) },
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 5.dp),
+                    modifier = Modifier.padding(horizontal = AppTheme.spacing.default, vertical = 5.dp),
                 )
             }
 
@@ -236,7 +241,9 @@ private fun AccountsManageContent(
                                 text = stringResource(Res.string.accounts_manage_archived_hint),
                             )
                         },
-                        modifier = Modifier.padding(horizontal = 24.dp).padding(top = 20.dp, bottom = 6.dp),
+                        modifier = Modifier
+                            .padding(horizontal = AppTheme.spacing.large)
+                            .padding(top = 20.dp, bottom = 6.dp),
                     )
                 }
 
@@ -247,7 +254,10 @@ private fun AccountsManageContent(
                         icon = account.type.icon(),
                         restoreLabel = stringResource(Res.string.accounts_manage_restore),
                         onRestoreClick = { onEvent(AccountsManageEvent.OnRestoreAccountClick(account.id)) },
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+                        modifier = Modifier.padding(
+                            horizontal = AppTheme.spacing.default,
+                            vertical = AppTheme.spacing.xSmall,
+                        ),
                     )
                 }
             }
@@ -258,8 +268,8 @@ private fun AccountsManageContent(
                     style = AppTheme.typography.bodySmall,
                     color = AppTheme.materialColors.onSurfaceVariant,
                     modifier = Modifier
-                        .padding(horizontal = 24.dp)
-                        .padding(top = 18.dp, bottom = 8.dp),
+                        .padding(horizontal = AppTheme.spacing.large)
+                        .padding(top = 18.dp, bottom = AppTheme.spacing.small),
                 )
             }
         }

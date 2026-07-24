@@ -68,7 +68,7 @@ internal fun AccountChooserContent(
         onClose = onClose,
     ) {
         Column(
-            modifier = Modifier.padding(horizontal = 16.dp),
+            modifier = Modifier.padding(horizontal = AppTheme.spacing.default),
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             accounts.forEach { row ->
@@ -84,7 +84,7 @@ internal fun AccountChooserContent(
             label = addNewLabel,
             subtitle = addNewSubtitle,
             onClick = onAddNew,
-            modifier = Modifier.padding(horizontal = 12.dp),
+            modifier = Modifier.padding(horizontal = AppTheme.spacing.medium),
         )
 
         if (transferInsteadLabel != null) {
@@ -94,7 +94,7 @@ internal fun AccountChooserContent(
                     .clickable(onClick = onTransferInstead)
                     .padding(horizontal = 20.dp, vertical = 10.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(AppTheme.spacing.small),
             ) {
                 Icon(
                     imageVector = SurferIcons.SwapHoriz,
@@ -125,7 +125,7 @@ private fun AccountRow(
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalArrangement = Arrangement.spacedBy(AppTheme.spacing.medium),
         ) {
             SurferIconBubble(icon = row.icon)
             Column(modifier = Modifier.weight(1f)) {

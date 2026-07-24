@@ -78,7 +78,7 @@ internal fun CategoryChooserContent(
             SurferAddNewCard(
                 label = createNewLabel,
                 onClick = onCreateNewClick,
-                modifier = Modifier.padding(horizontal = 16.dp),
+                modifier = Modifier.padding(horizontal = AppTheme.spacing.default),
             )
         }
 
@@ -87,7 +87,7 @@ internal fun CategoryChooserContent(
             modifier = Modifier
                 .fillMaxWidth()
                 .heightIn(min = 200.dp, max = 480.dp),
-            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+            contentPadding = PaddingValues(horizontal = AppTheme.spacing.default, vertical = AppTheme.spacing.small),
             horizontalArrangement = Arrangement.spacedBy(10.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
@@ -95,7 +95,7 @@ internal fun CategoryChooserContent(
                 item(key = "expense-header", span = { GridItemSpan(maxLineSpan) }) {
                     SurferSectionLabel(
                         text = expenseSectionTitle,
-                        modifier = Modifier.padding(vertical = 4.dp),
+                        modifier = Modifier.padding(vertical = AppTheme.spacing.xSmall),
                     )
                 }
                 items(expenseItems, key = { "e-${it.id}" }) { cat ->
@@ -112,7 +112,7 @@ internal fun CategoryChooserContent(
                 item(key = "income-header", span = { GridItemSpan(maxLineSpan) }) {
                     SurferSectionLabel(
                         text = incomeSectionTitle,
-                        modifier = Modifier.padding(vertical = 4.dp),
+                        modifier = Modifier.padding(vertical = AppTheme.spacing.xSmall),
                     )
                 }
                 items(incomeItems, key = { "i-${it.id}" }) { cat ->
