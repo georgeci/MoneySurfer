@@ -202,6 +202,13 @@ with rows in `account-components.jsx` and seed data in `account-data.jsx`.
 The canvas also carries a components gallery (`AccountRowLarge`, `AccountRowCompact`,
 `TxnTypeFilter`, `TxnLine`, truncation behaviour) and an EN → RU copy table (`ACCT_COPY`).
 
+Artboards 02–13 arrived with the first design-alignment pass. Of the ones that were
+missing before it, only **02** has been read into these notes (the currency picker below);
+**03, 06, 07, 09, 10 and 12** are listed above but their content is untranscribed — anyone
+implementing against them should transcribe the frame here first. What is still unanswered
+(`kind` vs `type`, `last4`, custom fields, the account icon) and the round-2 prompt live in
+[../../docs/plans/accounts-design-alignment.md](../../docs/plans/accounts-design-alignment.md).
+
 ### Account components
 
 - `ACCOUNT_TYPE_META` — CASH → "Cash"/hue 162, BANK → "Bank"/258, CARD → "Card"/303,

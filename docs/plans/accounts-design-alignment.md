@@ -1,7 +1,8 @@
 ---
 title: Accounts — align mockups and implementation
 created: 2026-07-24
-status: backlog
+updated: 2026-07-24
+status: design pass — round 2
 ---
 
 # Accounts — align mockups and implementation
@@ -20,176 +21,230 @@ Claude Design project `MoneySurfer` (`Accounts.html`).
 Every screen already exists in code — creation (`AccountCreationScreen`), edit
 (reuses creation), details (`AccountDetailsScreen`), manage
 (`AccountsManageScreen`), chooser (`AccountChooserBottomSheet`). No new screens
-need to be built. Roughly 80% of the work is finishing what is already there.
+need to be built.
 
-Three items require a domain-model migration and therefore count as features
-rather than fixes. The rest are small corrections. A separate design pass is
-needed first, because parts of the mockups contradict the shipped model and
-would otherwise force a schema guess.
+Round 1 of the design prompt has landed: the canvas grew from 6 artboards to 13
+and the currency question is settled and shipped. What is left is a smaller,
+sharper set — four contradictions that still have no answer, and seven new
+artboards whose *content* nobody has read into the repo yet. Both are listed
+below, and section [Design prompt — round 2](#design-prompt--round-2) is the
+text to send back.
+
+Until those four answers exist, the extra-details and sort-order schema work
+stays blocked: it would have to guess at `kind`, at `last4`, and at what a
+custom field is allowed to be.
 
 ## Current model
 
 `domain/src/commonMain/kotlin/com/georgeci/moneysurfer/domain/model/Account.kt:10`
 
 ```
-Account(id, workspaceId, name, type, currencyCode, balance, archived, updatedAt)
+Account(id, workspaceId, name, type, currencyCode, balance, archived, updatedAt, archivedAt)
 type ∈ { CASH, BANK, CARD, SAVINGS }
 ```
 
-No `icon`, `kind`, `last4`, `archivedAt` or sort order. The mockups render all
-of them.
+`archivedAt` was added in #307 (DB v29). Still absent: `icon`, `kind`, `last4`,
+sort order, per-account sync state, and any store for the "Extra details" set
+(IBAN, description, BIC/SWIFT, card last 4, bank URL, branch phone, custom
+fields).
 
-## A. Features (require model migration)
+## What shipped since the first review (#308)
+
+| Item | Where | State |
+|---|---|---|
+| Default account type `BANK` | `AccountNavGraph.kt` | done (#307) |
+| `archivedAt` persisted + synced, "Archived Nov 2024" row | `AccountsManageScreen.kt:396` | done (#307) |
+| Hardcoded "Synced 2 min ago" removed; `syncedLabel` now optional | `SurferAccountDetailsHeroCard.kt:60` | done (#307) |
+| Chooser footer "Transfer between accounts instead" | `AccountChooserContent.kt:166` | done (#307) |
+| Per-currency dashboard totals (was: summed across currencies) | `DashboardViewModel.kt` | done (#307) |
+| Create/update/delete moved behind use cases | `domain/usecase/*AccountUseCase.kt` | done (#307) |
+| Currency picker field + bottom sheet | `SurferCurrencyPickerField.kt`, `SurferCurrencyBottomSheet.kt` | done (#312), resolves #277 |
+| Real 30-day balance chart (was static strings) | `GetAccountBalanceSeriesUseCase.kt`, `AccountDetailsScreen.kt:179` | done (#313) |
+| Manage-list empty state | `AccountsManageScreen.kt:170` | done |
+| Extra-details section hidden in the offline build | `AccountCreationViewModel.kt:63` (`extraDetailsEnabled`) | done |
+| WCAG AA semantic accents | uikit | done (#315) |
+| Accounts design-review gaps | feature/account | done (#317) |
+
+So sections A3 and most of B from the first review are closed. A1 (persist
+extra details) and A2 (sort order) remain, both behind the design questions.
+
+## Still open in code
 
 ### A1. Persist "Extra details"
 
-The creation screen already renders chips for IBAN, Description, BIC/SWIFT,
-Card last 4, Bank URL and Branch phone, but `saveAccount` in
-`AccountCreationViewModel.kt:154` ignores `extraFields` entirely. The user fills
-the form and the data silently disappears.
+`AccountCreationScreen.kt:227` renders the chips and
+`AccountCreationViewModel.kt:140-155` maintains them in state, but `saveAccount`
+(`AccountCreationViewModel.kt:180-215`) constructs `Account(...)` without them —
+the values are dropped on save, and no screen would display them anyway.
 
-Needs a key–value store (the design also has a "Custom field…" chip with a
-user-supplied name, so fixed columns will not do), a sync DTO, a Room migration,
-and a place on the details screen to actually display the values — currently
-nothing ever shows them again.
+`AccountExtraFieldKind` (`AccountCreationViewModel.kt:295`) is a closed enum of
+six kinds and lives in the feature module. There is **no `CUSTOM` kind and no
+"Custom field…" chip in the shipped code** — that part of the mockup was never
+built, which is why the naming step has never been specified.
+
+Needs: a key–value store (fixed columns will not do if custom fields survive),
+a sync DTO, a Room migration, and a display section on details.
 
 ### A2. Sort order / drag-to-reorder
 
-Edit mode already draws `SurferDragHandle` and the "Drag to reorder" label in
-`AccountsManageScreen.kt:314`, but no reorder is implemented. Needs a
-`sortOrder` field, a DAO reorder operation, ordering in sync, and the drag
-interaction.
+`AccountsManageScreen.kt:320` draws `SurferDragHandle` and the "Drag to reorder"
+label; `grep sortOrder` over the repo returns nothing. Needs a `sortOrder`
+field, a DAO reorder operation, ordering in sync, and the drag interaction.
 
-### A3. Real 30-day balance chart
+## Contradiction ledger — mockups vs shipped model
 
-`SurferBalanceChartCard` on the details screen is a placeholder fed by static
-strings (`AccountDetailsScreen.kt:180`). Needs a use case producing a daily
-balance series plus the period delta.
-
-## B. Small fixes
-
-| What | Where | Issue | Status |
+| # | Contradiction | State | Recommendation |
 |---|---|---|---|
-| Default account type | `AccountNavGraph.kt:91` | code `SAVINGS`, mockup `Bank` | done (#307) |
-| Currency selector on creation | `AccountCreationScreen.kt:249` | absent from the mockups — decide: drop it or keep as first-run only | open — needs the design pass |
-| Hardcoded "synced" label | `AccountDetailsScreen.kt:170` | `Synced 2 min ago` is a literal; no sync state behind it | done (#307) — label removed, hero param now optional |
-| Details overflow menu | `AccountDetailsScreen.kt:130` | `/* wires later */` — also undesigned | open — needs the design pass |
-| Details hero meta line | `AccountDetailsScreen.kt` | mockup shows `CURRENT · •• 4021`, code shows the currency code | partly done (#307) — kind shows, `last4` still has no field |
-| Archived rows | `AccountsManageScreen.kt:227` | mockup shows "Archived Nov 2024"; no `archivedAt` field | done (#307) — `archivedAt` persisted and synced, DB v29 |
-| Chooser sheet | `AccountChooserContent.kt` | missing the "Total across N accounts" subhead, the "Add new account" row and the "Transfer between accounts instead" footer | done (#307) — footer added; the other two already existed |
-| Multi-currency total | `DashboardViewModel.kt:86` | sums only accounts matching the first account's currency — silently wrong | done (#307) — one total per currency |
-| Missing use cases | ViewModels | create/update/delete call `AccountRepository` directly, unlike archive/restore | done (#307) |
+| C1 | `kind` ("Current"/"Credit") duplicates `type` ("Bank"/"Card") and disagrees per row | **open** | drop `kind`; render the `type` label |
+| C2 | `last4` rendered on CASH and SAVINGS rows, with no way to enter it | **open** | make it the CARD-only projection of the "Card last 4" extra field |
+| C3 | No currency control; `fmt()` hardcodes `€` while seed data has a USD account | **resolved** — per-account picker shipped (#312), `MoneyFormatter.format(money, currencyCode)` everywhere | design seed data still needs the euro sign fixed |
+| C4 | Three details-hero variants (`hero` / `stack` / `split`) | **open** | code already implements `hero` (`SurferAccountDetailsHeroCard.kt:51`) — confirm and delete the other two |
+| C5 | "Synced 2 min ago" / "LIVE" are hardcoded strings | **half-resolved** — labels removed from code; real state exists app-wide (`SurferSyncStatus` = Hidden/Syncing/Synced/Failed, fed by `SyncStatusProvider`, rendered in the toolbar) but is **workspace-level, not per-account** | drop the per-account affordance; the toolbar badge is the sync surface |
+| C6 | `archivedAt` display-only in the mockups | **resolved** — persisted, DB v29; rendered as `{type} · Archived {Mon} {YYYY}` | design should state the RU date format |
+| C7 | Account `icon` is per-account in the mockups | **open, minor** | code derives the icon from `type` (`AccountsManageScreen.kt:411`), except the details hero which hardcodes `SurferIcons.Wallet` (`AccountDetailsScreen.kt:165`) — either confirm type-derived (then fix the hero) or specify a picker |
+| C8 | Manage-list empty state absent from the mockups | **resolved in code** (`AccountsManageScreen.kt:170`); artboard 07 now exists in the canvas but has not been read | transcribe and reconcile |
+| C9 | Archive confirm exists in code (`ArchiveAccountDialog`), was absent from the design | **resolved in the canvas** — artboard 12; content not transcribed | transcribe; if the design says "immediate + Undo snackbar", that is a code change |
 
-## C. Design questions (blocking A1/A2)
+C1, C2, C4 and the custom-field question are the four that block the schema.
+C1/C2 decide whether the migration carries two extra columns or none; the
+custom-field answer decides key–value versus fixed columns.
 
-- `kind` ("Current", "Credit") duplicates `type` ("Bank", "Card") and the two
-  disagree per row. Drop it, or make it an enterable field.
-- `last4` is rendered on CASH and SAVINGS accounts in the seed data. Which types
-  can carry it, and is it the same thing as the "Card last 4" extra field?
-- No currency control anywhere, yet the model is per-account and the seed data
-  contains a USD account; `fmt()` hardcodes `€`.
-- No empty state for the manage list.
-- No archive-confirm dialog in the design, but one exists in code
-  (`ArchiveAccountDialog`).
-- Three details-hero variants (`hero`, `stack`, `split`) — one must be chosen.
-- No edit-account frame, no "Custom field…" naming step, no offline-build
-  variant (extra details are hidden offline).
+## Frame inventory — what round 1 produced
 
-## Design prompt
+The canvas went from 6 artboards to 13. Only artboard 02 has been read into the
+repo (the currency picker note in `md/design/README.md`); the rest are listed in
+the inventory table but their content is untranscribed.
 
-Sent to the design project to resolve section C:
+| # | Artboard | Was missing? | Read into the repo? |
+|---|---|---|---|
+| 01 | New account | no | yes |
+| 02 | New account · currency sheet | yes | **yes** — shipped as `SurferCurrencyPickerField` / `SurferCurrencyBottomSheet` |
+| 03 | New account · name custom field | yes | no |
+| 04 | Manage accounts — edit mode | no | yes |
+| 05 | Manage accounts — view mode | no | yes |
+| 06 | Manage · reorder (mid-drag) | yes | no — needed by A2 |
+| 07 | Manage · empty state | yes | no |
+| 08 | Account details | no | yes |
+| 09 | Account details · ⋮ overflow menu | yes | no — `AccountDetailsScreen.kt:129` is still `/* wires later */` |
+| 10 | Edit account | yes | no |
+| 11 | Account chooser sheet | no | yes |
+| 12 | Archive confirm alert | yes | no |
+| 13 | Delete confirm alert | no | yes |
+
+Two asks from round 1 have **no artboard at all** and must be repeated:
+
+- **Extra details displayed after creation** — nothing in the inventory surfaces
+  IBAN / BIC / phone on Account details. Without it, A1 has no target screen.
+- **Offline-build variant of New account** — the section is hidden when
+  `OfflineBuildFlags.isOffline`; no frame shows what the screen looks like then.
+
+Also still unconfirmed from round 1: the RU copy table (`ACCT_COPY` exists on the
+canvas but has not been checked for coverage of the new frames) and the
+long-name / long-custom-field truncation rows.
+
+## Decisions to make
+
+Each of these needs a yes/no from the design side before the migration is
+written. The recommendation is what the implementation will assume if the answer
+does not come back.
+
+1. **`kind`** — drop it, or promote it to a user-editable sub-label with a
+   control on creation? *Assume: drop.* It has no entry point, contradicts
+   `type` in the seed data, and `type` already drives icon, tint and label.
+2. **`last4`** — which types may carry it, and is it the same value as the
+   "Card last 4" extra field? *Assume: same value, CARD only, shown in the row
+   sub-line only when filled.*
+3. **Custom fields** — do they survive? If yes: max name length, duplicate-name
+   rule, max count, and how they render on details. *Assume: yes, hence a
+   key–value store rather than columns.* This is the single most expensive
+   answer — fixed columns are cheaper and irreversible.
+4. **Details hero** — confirm `hero`, delete `stack` and `split`.
+5. **Per-account sync** — confirm the affordance is gone for good (the toolbar
+   badge stays). *Assume: gone.*
+6. **Extra-details display** — masking rule for IBAN, copy-to-clipboard or not,
+   and whether the section is hidden or shown-empty when nothing is filled.
+7. **Archive** — confirm dialog (current code) or immediate + Undo snackbar?
+8. **Icon** — type-derived (then the details hero is a bug) or per-account?
+
+## Design prompt — round 2
+
+Round 1 is answered by the current canvas; this is the follow-up. Send as-is.
 
 ```
-Revise the Account screens (Accounts.html — screens-1.jsx, screens-2.jsx,
-account-components.jsx, account-data.jsx) to remove divergences with the shipped
-data model, and add the frames that are currently missing. Do not redesign the
-visual language — keep the existing tokens, rows and layout. This is a
-consistency pass.
+Second consistency pass on the Account screens (Accounts.html — screens-1.jsx,
+screens-2.jsx, account-components.jsx, account-data.jsx). The first pass landed:
+the currency picker (artboard 02) is shipped, and artboards 03, 06, 07, 09, 10
+and 12 now exist. Thank you. This round is narrower — four decisions and two
+frames that are still missing. Again: no visual redesign, keep the existing
+tokens, rows and layout.
 
-## 1. The account model is the source of truth
+## 1. Four decisions the schema is waiting on
 
 The implemented model is exactly:
 
-  Account(id, workspaceId, name, type, currencyCode, balance, archived, updatedAt)
+  Account(id, workspaceId, name, type, currencyCode, balance, archived,
+          updatedAt, archivedAt)
   type ∈ { CASH, BANK, CARD, SAVINGS }
 
-Everything the mockups render must either map onto this, or be explicitly
-introduced as a new field with a stated purpose. Please resolve each of these:
+A migration for extra details and sort order cannot be written until these are
+settled. Please answer each explicitly, in the frame labels or a notes block:
 
-- `kind` ("Current", "Savings", "Cash", "Credit") duplicates `type`
-  ("Bank", "Savings", "Cash", "Card") and the two disagree per row. Pick one:
-  either drop `kind` and render the `type` label everywhere, or define `kind` as
-  a distinct user-editable sub-label and add a control for it on the creation
-  screen. Right now it appears in details hero, manage rows and the chooser
-  sheet with no way to enter it.
-- `last4` is shown on every account including CASH and SAVINGS in the seed data.
-  State which types can carry it. If it is the "Card last 4" optional extra
-  field, show it only when that field is filled, and update account-data.jsx so
-  the Cash / Savings rows have `last4: null`.
-- `archivedAt` ("Archived Nov 2024") is display-only in the mockups. Confirm it
-  should be persisted, and specify the date format for both EN and RU.
-- Drag-to-reorder implies a stored sort order. Add a frame showing the mid-drag
-  state (lifted row + drop indicator + where the row lands), so the interaction
-  is specified, not just hinted at by the handle.
+- `kind` ("Current", "Savings", "Cash", "Credit") still duplicates `type`
+  ("Bank", "Savings", "Cash", "Card"), and the two still disagree row by row in
+  account-data.jsx. There is no control anywhere that enters it. Either delete
+  `kind` and render the `type` label in the details hero, the manage rows and
+  the chooser sheet, or add the control that sets it and say what it means next
+  to `type`. We would prefer deleting it.
+- `last4` is still rendered on CASH and SAVINGS rows. State which types may
+  carry it. If it is the "Card last 4" optional extra field, show it only when
+  that field is filled, and set `last4: null` on the Cash / Savings rows in
+  account-data.jsx.
+- Custom fields: does the "Custom field…" chip survive? If yes, artboard 03
+  needs to specify max name length, what happens on a duplicate name, the
+  maximum number of custom fields per account, and how one renders in the
+  details list. If no, remove the chip — a fixed set of six kinds is much
+  cheaper to store. This answer decides key–value storage versus columns, so it
+  is the one we most need.
+- Account icon: is it derived from `type` (as the implementation does
+  everywhere except the details hero), or is it a per-account choice? If
+  per-account, design the picker; otherwise we will fix the hero.
 
-## 2. Currency
+## 2. Two frames that are still missing
 
-The mockups have no currency control anywhere, but the model has a per-account
-`currencyCode` and the seed data contains a USD account. Meanwhile `fmt()` and
-AccountRowLarge hardcode "€" (AccountRowLarge only special-cases USD → "$"), so
-the Amex Gold row renders a USD balance with a euro sign in some places.
+- **Extra details on Account details.** New account collects IBAN, Description,
+  BIC/SWIFT, Card last 4, Bank URL, Branch phone — and no artboard displays
+  them afterwards. Add the section: order of rows, IBAN masking (which digits
+  are shown), whether values are copyable, and what the section looks like when
+  nothing is filled (hidden, or shown empty).
+- **Offline variant of New account.** In the offline build the whole "Extra
+  details" section is hidden. Show that frame so the spacing below the balance
+  field is specified.
 
-Decide and reflect it in the frames:
-- If currency is per account: add the currency control to the New account screen
-  (where in the order? before or after the opening balance?) and make every
-  amount render its own account's symbol.
-- If currency is workspace-level: remove `currencyCode` from account rows and
-  show it once, in the aggregate strip.
-Also specify what the "Total balance" strip shows when accounts have mixed
-currencies — the current design shows a single summed number, which is wrong.
+## 3. Confirmations
 
-## 3. Missing frames — please add
+- **Details hero.** The implementation uses the `hero` variant. Please confirm
+  it as canonical and delete `stack` and `split` from the file.
+- **Per-account sync.** "Synced 2 min ago · Tap for full history", "Synced 2m"
+  and the green "LIVE" badge have been removed from the implementation. Real
+  sync state exists, but it is workspace-level (syncing / synced / failed /
+  hidden) and lives as a badge in the top bar. Please confirm the account
+  screens carry no sync affordance of their own, and remove those strings from
+  the mockups.
+- **Archive.** Artboard 12 now exists. Confirm whether archive shows a confirm
+  dialog (which is what the implementation does today) or is immediate with an
+  Undo snackbar — if the latter, design the snackbar.
+- **Reorder.** Artboard 06 shows the mid-drag state. Confirm that the order is
+  persisted per workspace and applies everywhere accounts are listed (manage,
+  chooser sheet, dashboard), not just in the manage screen.
+- **Archived date.** The row reads "{Type} · Archived Nov 2024". Give the RU
+  form of that string and the month abbreviation set for both languages.
 
-- **Edit account.** The mockups only have "New account", and the details screen
-  has a pencil that leads nowhere. Add the edit variant: title, which fields are
-  editable vs locked (the implementation currently locks currency and opening
-  balance in edit mode), and where "Delete account" lives.
-- **Overflow menu on Account details.** The `I.More` icon in the top bar has no
-  menu attached in any file. Design the menu and its items.
-- **Extra details after creation.** The New account screen collects IBAN,
-  Description, BIC/SWIFT, Card last 4, Bank URL, Branch phone — and no screen
-  ever displays them again. Add the section that surfaces them on Account
-  details (and specify masking for IBAN, and whether it is copyable).
-- **"Custom field…" flow.** The dashed chip exists but the naming step does not.
-  Show the sheet/dialog where the user names the field, plus its validation
-  (max length, duplicate names) and how a custom field renders in the list.
-- **Empty state for Manage accounts** (zero accounts, and zero archived
-  accounts) — neither exists today.
-- **Archive confirmation.** The implementation shows a confirm dialog before
-  archiving; there is only a Delete dialog in the design. Either design the
-  archive confirm, or state that archive is immediate with Undo in a snackbar
-  (and design that snackbar).
-- **Offline build variant of New account.** In the offline build the entire
-  "Extra details" section is hidden. Show that frame.
+## 4. Copy and truncation
 
-## 4. Pick one details hero
-
-AccountDetailsScreen has three hero variants (`hero`, `stack`, `split`). Choose
-the canonical one, delete the other two, and note the choice in the frame label.
-
-## 5. Sync status is a fiction
-
-"Synced 2 min ago · Tap for full history", "Synced 2m" and the green "LIVE"
-badge are hardcoded strings with no state behind them. Either specify the full
-set of states — never synced, syncing, synced, offline, error — as designed
-chips, or remove the sync affordance from the account screens entirely (and say
-which, so the copy can be deleted from the implementation).
-
-## 6. Copy
-
-Provide the RU translation alongside every EN string on these screens, and show
-at least one row with a long account name and a long custom-field name so the
-truncation behaviour is specified.
+Round 1 asked for RU alongside every EN string and for long-name rows; the
+copy table (ACCT_COPY) does not yet cover the new artboards (03, 06, 07, 09,
+10, 12). Please extend it, and include one row with a long account name and one
+with a long custom-field name so truncation is specified.
 
 Keep the changes inside the account files; do not touch the shared design-system
 components unless a fix is genuinely shared.
@@ -197,8 +252,10 @@ components unless a fix is genuinely shared.
 
 ## Suggested order
 
-1. Design alignment pass (section C) — unblocks the schema.
-2. A1 persist extra details — a finished UI that currently lies to the user.
-3. A2 sort order.
-4. A3 balance chart.
-5. Section B fixes — one PR.
+1. Send the round-2 prompt; transcribe artboards 03, 06, 07, 09, 10, 12 into
+   [md/design/README.md](../../md/design/README.md) as they are answered.
+2. A1 persist extra details — a finished UI that currently drops user input.
+   Blocked on decisions 1–3 and 6.
+3. A2 sort order. Blocked on artboard 06 only.
+4. Overflow menu on Account details (artboard 09) — the last `/* wires later */`
+   on these screens.
