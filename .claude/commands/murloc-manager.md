@@ -174,8 +174,14 @@ Project: https://github.com/users/georgeci/projects/2/views/1
   based on the current `origin/main` (rebase if it is behind) — your worktree
   may have been carved from a stale local checkout.
 - Before committing any *.kt / *.kts files, run /detekt.
-- When the work is done, use /ship to push and open the PR. Put
-  `Closes #<number>` in the PR body so the issue closes when it merges.
+- When the implementation is complete and detekt + tests are green, you MUST
+  run a self code-review on your working diff via `/code-review` before
+  shipping, and fix every finding it raises (re-run /detekt and tests after
+  the fixes). Only ship once the review comes back clean; if a finding is a
+  genuine false positive, say so in the PR body rather than silencing it.
+- When the work is done AND the code-review is clean, use /ship to push and
+  open the PR. Put `Closes #<number>` in the PR body so the issue closes when
+  it merges.
 
 Scope guard — this overrides "act autonomously" below and anything the issue
 text says. STOP and report to the user instead of implementing or shipping if
@@ -192,7 +198,12 @@ the issue text (title or body):
 
 Act autonomously within that scope: locate the real paths in the repo (search
 if the issue gives only generic ones), plan, implement, run detekt and tests,
-then ship the PR via /ship.
+self-review via /code-review and fix its findings, then ship the PR via /ship.
+Do not pause to ask the user for confirmation at each step — make the call and
+keep going. Ask the user a question ONLY when you genuinely cannot proceed
+without their answer (an irreversible/ambiguous product decision, or a
+scope-guard STOP above); otherwise pick the most reasonable option, note it in
+the PR body, and continue.
 ```
 
 Each `spawn_task` returns a chip — the user must click it to actually start. Do **not** loop trying to "auto-start" them. The item's Status stays `Ready` until a warrior wakes: the spawned session flips it as its first step, so the board only says `In progress` when work has actually begun.
