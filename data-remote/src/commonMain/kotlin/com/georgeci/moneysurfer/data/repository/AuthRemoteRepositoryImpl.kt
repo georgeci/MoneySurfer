@@ -53,12 +53,17 @@ class AuthRemoteRepositoryImpl(
 
 /** Classify Firebase auth exceptions into the typed [AuthError.Type] domain enum. */
 private fun Throwable.toAuthError(): AuthError {
-    val type = when (this) {
-        is FirebaseAuthRecentLoginRequiredException -> AuthError.Type.RequiresRecentLogin
-        is FirebaseAuthWeakPasswordException -> AuthError.Type.WeakPassword
-        is FirebaseAuthUserCollisionException -> AuthError.Type.EmailAlreadyInUse
-        is FirebaseAuthInvalidCredentialsException -> AuthError.Type.InvalidCredentials
-        is FirebaseAuthInvalidUserException -> AuthError.Type.InvalidCredentials
+    val byMessage = classifyAuthErrorByMessage(message)
+    val type = when {
+        // Checked before the typed branches on purpose: Android throws a plain
+        // FirebaseAuthInvalidCredentialsException for a malformed address, which would otherwise
+        // surface as "wrong email or password" — nonsense while creating an account.
+        byMessage == AuthError.Type.InvalidEmail -> AuthError.Type.InvalidEmail
+        this is FirebaseAuthRecentLoginRequiredException -> AuthError.Type.RequiresRecentLogin
+        this is FirebaseAuthWeakPasswordException -> AuthError.Type.WeakPassword
+        this is FirebaseAuthUserCollisionException -> AuthError.Type.EmailAlreadyInUse
+        this is FirebaseAuthInvalidCredentialsException -> AuthError.Type.InvalidCredentials
+        this is FirebaseAuthInvalidUserException -> AuthError.Type.InvalidCredentials
         // gitlive's iOS SDK surfaces every FIRAuthErrorDomain failure as the base
         // FirebaseAuthException rather than the typed subclasses matched above, so
         // wrong-password / no-such-user sign-ins fall through here and would show a
@@ -66,7 +71,7 @@ private fun Throwable.toAuthError(): AuthError {
         // #219). Recover the classification from the server error-code name carried
         // in the message. Android throws the typed subclasses and is matched above,
         // so this fallback only ever runs on iOS.
-        else -> classifyAuthErrorByMessage(message) ?: AuthError.Type.Unknown
+        else -> byMessage ?: AuthError.Type.Unknown
     }
     return AuthError(type = type, message = message, cause = this)
 }
@@ -90,6 +95,11 @@ private val INVALID_CREDENTIAL_ERROR_CODES = listOf(
 internal fun classifyAuthErrorByMessage(message: String?): AuthError.Type? {
     if (message == null) return null
     return when {
+        // Must precede the invalid-credential codes: ERROR_INVALID_EMAIL is the more specific
+        // diagnosis and Android reports it only through the human-readable phrase.
+        message.contains("ERROR_INVALID_EMAIL", ignoreCase = true) ||
+            message.contains("badly formatted", ignoreCase = true) ->
+            AuthError.Type.InvalidEmail
         INVALID_CREDENTIAL_ERROR_CODES.any { message.contains(it, ignoreCase = true) } ->
             AuthError.Type.InvalidCredentials
         message.contains("ERROR_EMAIL_ALREADY_IN_USE", ignoreCase = true) ->

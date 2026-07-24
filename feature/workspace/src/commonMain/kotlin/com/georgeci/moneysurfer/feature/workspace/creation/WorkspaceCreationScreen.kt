@@ -29,6 +29,9 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -40,8 +43,11 @@ import com.georgeci.moneysurfer.domain.model.Currency
 import com.georgeci.moneysurfer.domain.model.WorkspaceRole
 import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
+import com.georgeci.moneysurfer.uikit.components.SurferCurrencyBottomSheet
+import com.georgeci.moneysurfer.uikit.components.SurferCurrencyOption
+import com.georgeci.moneysurfer.uikit.components.SurferCurrencyPickerField
 import com.georgeci.moneysurfer.uikit.components.SurferFullScreenLoader
-import com.georgeci.moneysurfer.uikit.components.base.SurferSegmentedControl
+import com.georgeci.moneysurfer.uikit.components.base.SurferSectionLabel
 import com.georgeci.moneysurfer.uikit.components.workspace.SurferInviteRow
 import com.georgeci.moneysurfer.uikit.components.workspace.SurferMemberRow
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
@@ -49,6 +55,7 @@ import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.utils.HandleSideEffect
 import moneysurfer.feature.workspace.generated.resources.Res
+import moneysurfer.feature.workspace.generated.resources.first_run_currency_search_placeholder
 import moneysurfer.feature.workspace.generated.resources.workspace_creation_action_create
 import moneysurfer.feature.workspace.generated.resources.workspace_creation_action_update
 import moneysurfer.feature.workspace.generated.resources.workspace_creation_close_content_description
@@ -203,14 +210,10 @@ private fun WorkspaceCreationContent(
                 )
 
                 if (state.currencies.isNotEmpty() && !(state.isEditing && state.isOffline)) {
-                    SectionLabel(stringResource(Res.string.workspace_creation_section_currency))
-                    val selectedCurrency = state.currencies.firstOrNull { it.code.value == state.currency }
-                        ?: state.currencies.first()
-                    SurferSegmentedControl(
-                        options = state.currencies,
-                        selected = selectedCurrency,
-                        label = { "${it.code.value} ${it.symbol}" },
-                        onSelect = { onEvent(WorkspaceCreationEvent.OnCurrencyChanged(it.code.value)) },
+                    CurrencyPicker(
+                        currencies = state.currencies,
+                        selected = state.currency,
+                        onSelect = { onEvent(WorkspaceCreationEvent.OnCurrencyChanged(it)) },
                     )
                 }
 
@@ -229,6 +232,49 @@ private fun WorkspaceCreationContent(
         if (state.isSaving) {
             SurferFullScreenLoader(modifier = Modifier.fillMaxSize())
         }
+    }
+}
+
+/**
+ * A field that opens the currency bottom sheet, mirroring account creation. The supported list
+ * is already eight entries and still growing, which a segmented control cannot hold on a phone
+ * (see issue #277).
+ */
+@Composable
+private fun CurrencyPicker(
+    currencies: List<Currency>,
+    selected: String,
+    onSelect: (String) -> Unit,
+) {
+    val resolved = currencies.firstOrNull { it.code.value == selected } ?: currencies.first()
+    var sheetOpen by rememberSaveable { mutableStateOf(false) }
+
+    SurferSectionLabel(
+        text = stringResource(Res.string.workspace_creation_section_currency),
+        modifier = Modifier.padding(bottom = 10.dp),
+    )
+    SurferCurrencyPickerField(
+        symbol = resolved.symbol,
+        code = resolved.code.value,
+        name = resolved.displayName,
+        onClick = { sheetOpen = true },
+        expanded = sheetOpen,
+    )
+
+    if (sheetOpen) {
+        SurferCurrencyBottomSheet(
+            title = stringResource(Res.string.workspace_creation_section_currency),
+            searchPlaceholder = stringResource(Res.string.first_run_currency_search_placeholder),
+            currencies = currencies.map {
+                SurferCurrencyOption(code = it.code.value, symbol = it.symbol, name = it.displayName)
+            },
+            selectedCode = resolved.code.value,
+            onSelect = {
+                onSelect(it.code)
+                sheetOpen = false
+            },
+            onDismiss = { sheetOpen = false },
+        )
     }
 }
 
@@ -320,7 +366,10 @@ private fun MembersSection(
     showInviteRow: Boolean,
     onInviteClick: () -> Unit,
 ) {
-    SectionLabel(stringResource(Res.string.workspace_creation_section_members))
+    SurferSectionLabel(
+        text = stringResource(Res.string.workspace_creation_section_members),
+        modifier = Modifier.padding(bottom = 10.dp),
+    )
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         if (showInviteRow) {
             SurferInviteRow(
@@ -344,16 +393,6 @@ private fun MembersSection(
             }
         }
     }
-}
-
-@Composable
-private fun SectionLabel(text: String) {
-    Text(
-        text = text,
-        style = AppTheme.typography.labelLarge,
-        color = AppTheme.materialColors.onSurfaceVariant,
-        modifier = Modifier.padding(bottom = 10.dp),
-    )
 }
 
 @Composable

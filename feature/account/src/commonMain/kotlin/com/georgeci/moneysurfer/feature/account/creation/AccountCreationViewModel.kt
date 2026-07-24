@@ -5,6 +5,9 @@ import co.touchlab.kermit.Logger
 import com.georgeci.moneysurfer.domain.OfflineBuildFlags
 import com.georgeci.moneysurfer.domain.auth.SessionPointers
 import com.georgeci.moneysurfer.domain.model.Account
+import com.georgeci.moneysurfer.domain.model.AccountExtraDetail
+import com.georgeci.moneysurfer.domain.model.AccountExtraDetailKey
+import com.georgeci.moneysurfer.domain.model.AccountExtraDetails
 import com.georgeci.moneysurfer.domain.model.Currency
 import com.georgeci.moneysurfer.domain.model.Transaction
 import com.georgeci.moneysurfer.domain.primitives.AccountId
@@ -13,10 +16,12 @@ import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
 import com.georgeci.moneysurfer.domain.primitives.Money
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
-import com.georgeci.moneysurfer.domain.repositories.AccountRepository
+import com.georgeci.moneysurfer.domain.usecase.CreateAccountUseCase
 import com.georgeci.moneysurfer.domain.usecase.CreateTransactionUseCase
+import com.georgeci.moneysurfer.domain.usecase.GetAccountByIdUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetCurrenciesUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetCurrentTimeUseCase
+import com.georgeci.moneysurfer.domain.usecase.UpdateAccountUseCase
 import com.georgeci.moneysurfer.domain.usecase.UpdateWorkspaceCurrencyUseCase
 import com.georgeci.moneysurfer.feature.account.generated.resources.Res
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_created_snackbar
@@ -35,7 +40,9 @@ class AccountCreationViewModel(
     private val accountId: AccountId?,
     private val firstRun: Boolean,
     initialType: AccountType,
-    private val accountRepository: AccountRepository,
+    private val getAccountById: GetAccountByIdUseCase,
+    private val createAccount: CreateAccountUseCase,
+    private val updateAccount: UpdateAccountUseCase,
     private val createTransaction: CreateTransactionUseCase,
     private val session: SessionPointers,
     private val getCurrentTime: GetCurrentTimeUseCase,
@@ -89,9 +96,10 @@ class AccountCreationViewModel(
                 updateState { AccountCreationState.content.type.modify(this) { event.type } }
             is AccountCreationEvent.OnCurrencyChanged ->
                 updateState { AccountCreationState.content.currency.modify(this) { event.currency } }
-            is AccountCreationEvent.OnExtraFieldValueChanged -> updateExtraField(event.kind, event.value)
-            is AccountCreationEvent.OnAddExtraField -> addExtraField(event.kind)
-            is AccountCreationEvent.OnRemoveExtraField -> removeExtraField(event.kind)
+            is AccountCreationEvent.OnExtraFieldValueChanged -> updateExtraField(event.key, event.value)
+            is AccountCreationEvent.OnAddExtraField -> addExtraField(event.key.name)
+            is AccountCreationEvent.OnAddCustomExtraField -> addExtraField(event.name)
+            is AccountCreationEvent.OnRemoveExtraField -> removeExtraField(event.key)
             AccountCreationEvent.OnSaveClick -> saveAccount()
             AccountCreationEvent.OnBackClick -> postSideEffect(AccountCreationEffect.NavigateBack)
         }
@@ -99,15 +107,18 @@ class AccountCreationViewModel(
 
     private fun loadAccount(id: AccountId) {
         launch {
-            val account = accountRepository.getById(id)
+            val account = getAccountById(id)
             updateState {
                 AccountCreationState.Content(
                     name = account?.name.orEmpty(),
                     balance = "",
-                    type = account?.type ?: AccountType.SAVINGS,
+                    type = account?.type ?: AccountType.BANK,
                     currency = account?.currencyCode ?: DEFAULT_CURRENCY,
                     currencies = loadedCurrencies,
-                    extraFields = emptyList(),
+                    // Loaded even in the offline build, where the section is hidden: the rows are
+                    // still part of the account, and saving an edit must not silently drop them.
+                    extraFields = account?.extraDetails.orEmpty()
+                        .map { AccountExtraField(key = it.key, value = it.value) },
                     extraDetailsEnabled = !offlineBuildFlags.isOffline,
                     editingAccountId = id,
                 )
@@ -133,21 +144,32 @@ class AccountCreationViewModel(
         }
     }
 
-    private fun updateExtraField(kind: AccountExtraFieldKind, value: String) = updateState {
+    private fun updateExtraField(key: String, value: String) = updateState {
         AccountCreationState.content.extraFields.modify(this) { fields ->
-            fields.map { if (it.kind == kind) it.copy(value = value) else it }
+            fields.map { if (it.key == key) it.copy(value = value) else it }
         }
     }
 
-    private fun addExtraField(kind: AccountExtraFieldKind) = updateState {
+    /**
+     * Adds an empty row for [rawKey] — a well-known key name from a chip, or a label the user
+     * typed into "Custom field…". Blank names, names already on the form (case-insensitively, so
+     * a custom "iban" cannot shadow the IBAN chip) and additions past [AccountExtraDetails.MAX_DETAILS]
+     * are ignored: the chip or dialog simply does nothing rather than reporting an error the
+     * design has no room for.
+     */
+    private fun addExtraField(rawKey: String) = updateState {
         AccountCreationState.content.extraFields.modify(this) { fields ->
-            if (fields.any { it.kind == kind }) fields else fields + AccountExtraField(kind = kind, value = "")
+            val key = rawKey.replace(WHITESPACE_RUN, " ").trim().take(AccountExtraDetails.MAX_KEY_LENGTH)
+            val rejected = key.isEmpty() ||
+                fields.size >= AccountExtraDetails.MAX_DETAILS ||
+                fields.any { it.key.equals(key, ignoreCase = true) }
+            if (rejected) fields else fields + AccountExtraField(key = key, value = "")
         }
     }
 
-    private fun removeExtraField(kind: AccountExtraFieldKind) = updateState {
+    private fun removeExtraField(key: String) = updateState {
         AccountCreationState.content.extraFields.modify(this) { fields ->
-            fields.filterNot { it.kind == kind }
+            fields.filterNot { it.key == key }
         }
     }
 
@@ -166,13 +188,17 @@ class AccountCreationViewModel(
             val trimmedName = state.name.trim()
             if (state.isEditMode) {
                 val existingId = state.editingAccountId ?: return@launch
-                val existing = accountRepository.getById(existingId) ?: return@launch
-                accountRepository.update(
+                updateAccount(existingId) { existing ->
                     existing.copy(
                         name = trimmedName,
                         type = state.type,
-                    ),
-                )
+                        extraDetails = state.savedExtraDetails(),
+                    )
+                }.onLeft { err ->
+                    log.w { "[edit] not saved id=${existingId.value} -> $err" }
+                    snackbar.show(Res.string.accounts_manage_action_failed)
+                    return@launch
+                }
                 snackbar.show(Res.string.account_creation_updated_snackbar, listOf(trimmedName))
                 postSideEffect(AccountCreationEffect.NavigateBack)
                 return@launch
@@ -187,7 +213,7 @@ class AccountCreationViewModel(
             val currency = state.currency
             val openingBalance = Money.fromDouble(balanceDouble)
             val newAccountId = AccountId.uuid()
-            accountRepository.insert(
+            createAccount(
                 Account(
                     id = newAccountId,
                     workspaceId = workspaceId,
@@ -195,8 +221,13 @@ class AccountCreationViewModel(
                     type = state.type,
                     currencyCode = currency,
                     balance = Money.zero(),
+                    extraDetails = state.savedExtraDetails(),
                 ),
-            )
+            ).onLeft { err ->
+                log.w { "[create] not saved -> $err" }
+                snackbar.show(Res.string.accounts_manage_action_failed)
+                return@launch
+            }
 
             if (!openingBalance.isZero()) {
                 val now = getCurrentTime()
@@ -238,9 +269,16 @@ class AccountCreationViewModel(
         }
     }
 
+    /** The form's extra-detail rows as they should be stored: normalized, blanks dropped. */
+    private fun AccountCreationState.Content.savedExtraDetails(): List<AccountExtraDetail> =
+        AccountExtraDetails.normalize(
+            extraFields.map { AccountExtraDetail(key = it.key, value = it.value) },
+        )
+
     private companion object {
         const val TAG = "AccountCreationVM"
         val DEFAULT_CURRENCY = CurrencyCode("EUR")
+        val WHITESPACE_RUN = Regex("\\s+")
     }
 }
 
@@ -269,10 +307,19 @@ sealed interface AccountCreationState {
          *  so a pristine screen doesn't open covered in red. */
         val nameTouched: Boolean = false,
     ) : AccountCreationState {
-        val availableExtraFieldKinds: List<AccountExtraFieldKind>
-            get() = AccountExtraFieldKind.entries.filter { kind ->
-                extraFields.none { it.kind == kind }
+        /**
+         * Well-known keys still offered as chips. Matched case-insensitively, the same way
+         * [addExtraField] rejects duplicates — otherwise a custom field named "iban" would leave
+         * the IBAN chip on screen as a control that silently does nothing when tapped.
+         */
+        val availableExtraFieldKeys: List<AccountExtraDetailKey>
+            get() = AccountExtraDetailKey.entries.filter { key ->
+                extraFields.none { it.key.equals(key.name, ignoreCase = true) }
             }
+
+        /** Whether another row still fits — gates both the chips and the "Custom field…" action. */
+        val canAddExtraField: Boolean
+            get() = extraFields.size < AccountExtraDetails.MAX_DETAILS
 
         val currencySymbol: String
             get() = currencies.firstOrNull { it.code == currency }?.symbol ?: currency.value
@@ -295,21 +342,28 @@ sealed interface AccountCreationState {
     companion object
 }
 
-enum class AccountExtraFieldKind { IBAN, DESCRIPTION, BIC, CARD_LAST4, BANK_URL, BRANCH_PHONE }
-
+/**
+ * A row in the "Extra details" section while it is being edited. [key] is a well-known
+ * [AccountExtraDetailKey] name or the label the user typed, and doubles as the row's identity in
+ * the event stream — blank values are still rows here, and only get dropped on save.
+ */
 data class AccountExtraField(
-    val kind: AccountExtraFieldKind,
+    val key: String,
     val value: String,
-)
+) {
+    val wellKnownKey: AccountExtraDetailKey?
+        get() = AccountExtraDetails.wellKnownKey(key)
+}
 
 sealed interface AccountCreationEvent {
     data class OnNameChanged(val name: String) : AccountCreationEvent
     data class OnBalanceChanged(val balance: String) : AccountCreationEvent
     data class OnTypeChanged(val type: AccountType) : AccountCreationEvent
     data class OnCurrencyChanged(val currency: CurrencyCode) : AccountCreationEvent
-    data class OnAddExtraField(val kind: AccountExtraFieldKind) : AccountCreationEvent
-    data class OnRemoveExtraField(val kind: AccountExtraFieldKind) : AccountCreationEvent
-    data class OnExtraFieldValueChanged(val kind: AccountExtraFieldKind, val value: String) : AccountCreationEvent
+    data class OnAddExtraField(val key: AccountExtraDetailKey) : AccountCreationEvent
+    data class OnAddCustomExtraField(val name: String) : AccountCreationEvent
+    data class OnRemoveExtraField(val key: String) : AccountCreationEvent
+    data class OnExtraFieldValueChanged(val key: String, val value: String) : AccountCreationEvent
     data object OnSaveClick : AccountCreationEvent
     data object OnBackClick : AccountCreationEvent
 }

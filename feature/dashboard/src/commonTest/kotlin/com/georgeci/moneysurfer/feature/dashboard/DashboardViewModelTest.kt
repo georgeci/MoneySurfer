@@ -2,8 +2,12 @@ package com.georgeci.moneysurfer.feature.dashboard
 
 import com.georgeci.moneysurfer.domain.OfflineBuildFlags
 import com.georgeci.moneysurfer.domain.auth.InMemorySessionPointers
+import com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutConfig
+import com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutItem
+import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetType
 import com.georgeci.moneysurfer.domain.fixtures.FakeGoalContributionRepository
 import com.georgeci.moneysurfer.domain.fixtures.FakeSavingsGoalRepository
+import com.georgeci.moneysurfer.domain.fixtures.FakeUiPreferences
 import com.georgeci.moneysurfer.domain.fixtures.aTransaction
 import com.georgeci.moneysurfer.domain.fixtures.accountId
 import com.georgeci.moneysurfer.domain.fixtures.anAccount
@@ -13,6 +17,7 @@ import com.georgeci.moneysurfer.domain.model.Account
 import com.georgeci.moneysurfer.domain.model.CategorizedTransaction
 import com.georgeci.moneysurfer.domain.model.Transaction
 import com.georgeci.moneysurfer.domain.model.TransactionTotal
+import com.georgeci.moneysurfer.domain.preferences.UiPreferences
 import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.Money
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
@@ -25,6 +30,7 @@ import com.georgeci.moneysurfer.domain.usecase.GetGoalsUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetRecentTransactionsUseCase
 import com.georgeci.moneysurfer.domain.util.TransactionPeriodWindow
 import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 import kotlinx.coroutines.Dispatchers
@@ -92,18 +98,56 @@ class DashboardViewModelTest : StringSpec({
         val content = viewModel.value.shouldBeInstanceOf<DashboardState.Content>()
         content.recentTransactionsEmpty shouldBe false
     }
+
+    "the rendered layout comes from the persisted config, not a fixed list" {
+        val ws = workspaceId("ws-1")
+        val stored = DashboardLayoutConfig(
+            items = listOf(
+                DashboardLayoutItem(DashboardWidgetType.Goals),
+                DashboardLayoutItem(DashboardWidgetType.Balance, enabled = false),
+            ),
+        )
+        val viewModel = newViewModel(
+            ws = ws,
+            accounts = FakeAccountRepository(listOf(anAccount(id = accountId("a-1"), workspaceId = ws))),
+            transactions = FakeTransactionRepository(emptyList()),
+            uiPreferences = FakeUiPreferences(dashboardLayout = stored),
+        )
+
+        val content = viewModel.value.shouldBeInstanceOf<DashboardState.Content>()
+        content.layout.enabledItems.map { it.type } shouldContainExactly listOf(
+            DashboardWidgetType.Goals,
+            // widgets the stored layout never heard of are appended rather than dropped
+            DashboardWidgetType.Accounts,
+            DashboardWidgetType.RecentTransactions,
+        )
+    }
+
+    "an unset layout falls back to the default order" {
+        val ws = workspaceId("ws-1")
+        val viewModel = newViewModel(
+            ws = ws,
+            accounts = FakeAccountRepository(listOf(anAccount(id = accountId("a-1"), workspaceId = ws))),
+            transactions = FakeTransactionRepository(emptyList()),
+        )
+
+        val content = viewModel.value.shouldBeInstanceOf<DashboardState.Content>()
+        content.layout shouldBe DashboardLayoutConfig.DEFAULT
+    }
 })
 
 private fun newViewModel(
     ws: WorkspaceId,
     accounts: FakeAccountRepository,
     transactions: FakeTransactionRepository,
+    uiPreferences: UiPreferences = FakeUiPreferences(),
 ): DashboardViewModel {
     val session = InMemorySessionPointers(currentWorkspaceId = ws)
     return DashboardViewModel(
         getAccounts = GetAccountsUseCase(accounts, session),
         getRecentTransactions = GetRecentTransactionsUseCase(transactions, session),
         getGoals = GetGoalsUseCase(FakeSavingsGoalRepository(), FakeGoalContributionRepository(), session),
+        uiPreferences = uiPreferences,
         offlineBuildFlags = OfflineBuildFlags(isOffline = false),
     )
 }

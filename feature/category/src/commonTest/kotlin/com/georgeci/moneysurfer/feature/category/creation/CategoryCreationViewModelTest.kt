@@ -19,6 +19,7 @@ import com.georgeci.moneysurfer.domain.usecase.GetCategoriesUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetCurrentTimeUseCase
 import com.georgeci.moneysurfer.navigation.SnackbarController
 import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
@@ -245,7 +246,7 @@ class CategoryCreationViewModelTest : StringSpec({
                 vm.currentState.iconKey shouldBe CategoryAppearance.ICON_KEYS[6]
                 vm.currentState.hue shouldBe CategoryAppearance.HUES[2]
                 vm.currentState.parentId shouldBe parent.id
-                vm.currentState.selectedParentName shouldBe "Food"
+                vm.currentState.parentOptions.map { it.name } shouldContain "Food"
             } finally {
                 vm.viewModelScope.cancel()
             }

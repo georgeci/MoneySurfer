@@ -68,17 +68,17 @@ balance series plus the period delta.
 
 ## B. Small fixes
 
-| What | Where | Issue |
-|---|---|---|
-| Default account type | `AccountNavGraph.kt:91` | code `SAVINGS`, mockup `Bank` |
-| Currency selector on creation | `AccountCreationScreen.kt:249` | absent from the mockups — decide: drop it or keep as first-run only |
-| Hardcoded "synced" label | `AccountDetailsScreen.kt:170` | `Synced 2 min ago` is a literal; no sync state behind it |
-| Details overflow menu | `AccountDetailsScreen.kt:130` | `/* wires later */` — also undesigned |
-| Details hero meta line | `AccountDetailsScreen.kt` | mockup shows `CURRENT · •• 4021`, code shows the currency code |
-| Archived rows | `AccountsManageScreen.kt:227` | mockup shows "Archived Nov 2024"; no `archivedAt` field |
-| Chooser sheet | `AccountChooserContent.kt` | missing the "Total across N accounts" subhead, the "Add new account" row and the "Transfer between accounts instead" footer |
-| Multi-currency total | `DashboardViewModel.kt:86` | sums only accounts matching the first account's currency — silently wrong |
-| Missing use cases | ViewModels | create/update/delete call `AccountRepository` directly, unlike archive/restore |
+| What | Where | Issue | Status |
+|---|---|---|---|
+| Default account type | `AccountNavGraph.kt:91` | code `SAVINGS`, mockup `Bank` | done (#307) |
+| Currency selector on creation | `AccountCreationScreen.kt:249` | absent from the mockups — decide: drop it or keep as first-run only | open — needs the design pass |
+| Hardcoded "synced" label | `AccountDetailsScreen.kt:170` | `Synced 2 min ago` is a literal; no sync state behind it | done (#307) — label removed, hero param now optional |
+| Details overflow menu | `AccountDetailsScreen.kt:130` | `/* wires later */` — also undesigned | open — needs the design pass |
+| Details hero meta line | `AccountDetailsScreen.kt` | mockup shows `CURRENT · •• 4021`, code shows the currency code | partly done (#307) — kind shows, `last4` still has no field |
+| Archived rows | `AccountsManageScreen.kt:227` | mockup shows "Archived Nov 2024"; no `archivedAt` field | done (#307) — `archivedAt` persisted and synced, DB v29 |
+| Chooser sheet | `AccountChooserContent.kt` | missing the "Total across N accounts" subhead, the "Add new account" row and the "Transfer between accounts instead" footer | done (#307) — footer added; the other two already existed |
+| Multi-currency total | `DashboardViewModel.kt:86` | sums only accounts matching the first account's currency — silently wrong | done (#307) — one total per currency |
+| Missing use cases | ViewModels | create/update/delete call `AccountRepository` directly, unlike archive/restore | done (#307) |
 
 ## C. Design questions (blocking A1/A2)
 

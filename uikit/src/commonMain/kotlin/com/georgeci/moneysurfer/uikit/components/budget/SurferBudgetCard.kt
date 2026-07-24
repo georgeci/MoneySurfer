@@ -28,6 +28,7 @@ import com.georgeci.moneysurfer.uikit.atom.SurferCard
 import com.georgeci.moneysurfer.uikit.components.SurferCategoryPalette
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
+import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 
 /** One category's mark on a budget card. */
@@ -134,8 +135,7 @@ private fun SurferStackedCategoryBubbles(categories: List<SurferBudgetCategoryVi
             ) {
                 Icon(
                     imageVector = visual.icon,
-                    // decorative — the budget name and footer carry the meaning
-                    contentDescription = null,
+                    contentDescription = SurferSemantics.Decorative,
                     tint = visual.tint,
                     modifier = Modifier.size(BUBBLE_SIZE / 2),
                 )

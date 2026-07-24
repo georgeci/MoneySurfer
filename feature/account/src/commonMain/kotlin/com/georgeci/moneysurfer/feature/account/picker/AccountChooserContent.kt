@@ -1,35 +1,33 @@
 package com.georgeci.moneysurfer.feature.account.picker
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.georgeci.moneysurfer.domain.primitives.AccountId
-import com.georgeci.moneysurfer.uikit.atom.SurferActionCard
 import com.georgeci.moneysurfer.uikit.atom.SurferCard
+import com.georgeci.moneysurfer.uikit.atom.SurferIconBubble
+import com.georgeci.moneysurfer.uikit.atom.SurferSelectionRadio
+import com.georgeci.moneysurfer.uikit.components.SurferAddNewCard
+import com.georgeci.moneysurfer.uikit.components.SurferBottomSheetContent
 import com.georgeci.moneysurfer.uikit.components.base.SurferSplitAmount
 import com.georgeci.moneysurfer.uikit.components.base.SurferSplitAmountTier
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.preview.SurferBottomSheetPreview
+import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 
 internal data class AccountPickerRow(
@@ -42,9 +40,14 @@ internal data class AccountPickerRow(
 
 /**
  * Static content of the account-chooser bottom sheet. Renders the drag handle, header, total
- * summary, the picker list, and the dashed "Add new account" CTA. The hosting [Composable]
- * provides the surrounding `ModalBottomSheet` chrome and wires events through a ViewModel.
+ * summary, the picker list, the dashed "Add new account" CTA and the transfer footer. The hosting
+ * [Composable] provides the surrounding `ModalBottomSheet` chrome and wires events through a
+ * ViewModel.
+ *
+ * [transferInsteadLabel] is null when the host has no transfer to offer — picking the second leg
+ * of a transfer, for instance, is already a transfer.
  */
+@Suppress("LongParameterList")
 @Composable
 internal fun AccountChooserContent(
     title: String,
@@ -56,45 +59,16 @@ internal fun AccountChooserContent(
     onSelect: (AccountId) -> Unit,
     onAddNew: () -> Unit,
     onClose: () -> Unit,
+    transferInsteadLabel: String? = null,
+    onTransferInstead: () -> Unit = {},
 ) {
-    Column(modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 20.dp, end = 8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Text(
-                text = title,
-                style = AppTheme.typography.titleMedium,
-                color = AppTheme.materialColors.onSurface,
-                modifier = Modifier.weight(1f),
-            )
-            Box(
-                modifier = Modifier
-                    .size(36.dp)
-                    .clip(CircleShape)
-                    .clickable(onClick = onClose),
-                contentAlignment = Alignment.Center,
-            ) {
-                Icon(
-                    imageVector = SurferIcons.Close,
-                    contentDescription = null,
-                    tint = AppTheme.materialColors.onSurfaceVariant,
-                    modifier = Modifier.size(18.dp),
-                )
-            }
-        }
-
-        Text(
-            text = summary,
-            style = AppTheme.typography.bodySmall,
-            color = AppTheme.materialColors.onSurfaceVariant,
-            modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 2.dp, bottom = 8.dp),
-        )
-
+    SurferBottomSheetContent(
+        title = title,
+        subtitle = summary,
+        onClose = onClose,
+    ) {
         Column(
-            modifier = Modifier.padding(horizontal = 16.dp),
+            modifier = Modifier.padding(horizontal = AppTheme.spacing.default),
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             accounts.forEach { row ->
@@ -106,42 +80,33 @@ internal fun AccountChooserContent(
             }
         }
 
-        Spacer(Modifier.height(12.dp))
-
-        SurferActionCard(
-            modifier = Modifier.padding(horizontal = 12.dp),
+        SurferAddNewCard(
+            label = addNewLabel,
+            subtitle = addNewSubtitle,
             onClick = onAddNew,
-        ) {
+            modifier = Modifier.padding(horizontal = AppTheme.spacing.medium),
+        )
+
+        if (transferInsteadLabel != null) {
             Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable(onClick = onTransferInstead)
+                    .padding(horizontal = 20.dp, vertical = 10.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                horizontalArrangement = Arrangement.spacedBy(AppTheme.spacing.small),
             ) {
-                Box(
-                    modifier = Modifier
-                        .size(40.dp)
-                        .clip(CircleShape)
-                        .border(1.dp, AppTheme.materialColors.outline, CircleShape),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Icon(
-                        imageVector = SurferIcons.Add,
-                        contentDescription = null,
-                        tint = AppTheme.materialColors.primary,
-                        modifier = Modifier.size(20.dp),
-                    )
-                }
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = addNewLabel,
-                        style = AppTheme.typography.titleSmall,
-                        color = AppTheme.materialColors.primary,
-                    )
-                    Text(
-                        text = addNewSubtitle,
-                        style = AppTheme.typography.bodySmall,
-                        color = AppTheme.materialColors.onSurfaceVariant,
-                    )
-                }
+                Icon(
+                    imageVector = SurferIcons.SwapHoriz,
+                    contentDescription = SurferSemantics.Decorative,
+                    tint = AppTheme.materialColors.primary,
+                    modifier = Modifier.size(18.dp),
+                )
+                Text(
+                    text = transferInsteadLabel,
+                    style = AppTheme.typography.labelLarge,
+                    color = AppTheme.materialColors.primary,
+                )
             }
         }
     }
@@ -160,22 +125,9 @@ private fun AccountRow(
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalArrangement = Arrangement.spacedBy(AppTheme.spacing.medium),
         ) {
-            Box(
-                modifier = Modifier
-                    .size(40.dp)
-                    .clip(CircleShape)
-                    .background(AppTheme.materialColors.primaryContainer),
-                contentAlignment = Alignment.Center,
-            ) {
-                Icon(
-                    imageVector = row.icon,
-                    contentDescription = null,
-                    tint = AppTheme.materialColors.onPrimaryContainer,
-                    modifier = Modifier.size(22.dp),
-                )
-            }
+            SurferIconBubble(icon = row.icon)
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = row.name,
@@ -202,29 +154,7 @@ private fun AccountRow(
                 fractionAlpha = 0.5f,
             )
             Spacer(Modifier.size(4.dp))
-            SelectionRadio(checked = selected)
-        }
-    }
-}
-
-@Composable
-private fun SelectionRadio(checked: Boolean) {
-    val borderColor =
-        if (checked) AppTheme.materialColors.primary else AppTheme.materialColors.outline
-    Box(
-        modifier = Modifier
-            .size(22.dp)
-            .clip(CircleShape)
-            .border(2.dp, borderColor, CircleShape),
-        contentAlignment = Alignment.Center,
-    ) {
-        if (checked) {
-            Box(
-                modifier = Modifier
-                    .size(10.dp)
-                    .clip(CircleShape)
-                    .background(AppTheme.materialColors.primary),
-            )
+            SurferSelectionRadio(selected = selected)
         }
     }
 }
@@ -267,6 +197,7 @@ private fun AccountChooserContentPreview() {
             onSelect = {},
             onAddNew = {},
             onClose = {},
+            transferInsteadLabel = "Transfer between accounts instead",
         )
     }
 }

@@ -15,11 +15,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
+import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 
 /**
@@ -54,8 +56,7 @@ fun SurferErrorState(
         ) {
             Icon(
                 imageVector = icon,
-                // decorative — error illustration; the title/subtitle convey the message
-                contentDescription = null,
+                contentDescription = SurferSemantics.Decorative,
                 tint = AppTheme.materialColors.onErrorContainer,
                 modifier = Modifier.size(28.dp),
             )
@@ -79,10 +80,16 @@ fun SurferErrorState(
                 text = retryLabel,
                 onClick = onRetry,
                 style = SurferButtonStyle.Tonal,
-                modifier = Modifier.padding(top = AppTheme.spacing.xSmall),
+                modifier = Modifier
+                    .padding(top = AppTheme.spacing.xSmall)
+                    .testTag(SurferErrorStateTestTags.RetryButton),
             )
         }
     }
+}
+
+object SurferErrorStateTestTags {
+    const val RetryButton = "errorState:retry"
 }
 
 @Preview

@@ -14,6 +14,7 @@ object SyncEntityTypes {
     const val CATEGORY = "CATEGORY"
     const val TRANSACTION = "TRANSACTION"
     const val BUDGET = "BUDGET"
+    const val RECURRING_RULE = "RECURRING_RULE"
     const val GOAL = "GOAL"
     const val GOAL_CONTRIBUTION = "GOAL_CONTRIBUTION"
 }

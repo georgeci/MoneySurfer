@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import com.georgeci.moneysurfer.uikit.atom.SurferCard
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
+import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.uikit.theme.SurferContainerStyle
 
@@ -112,8 +113,7 @@ fun SurferPickerRow(
             }
             Icon(
                 imageVector = SurferIcons.DropDown,
-                // decorative — chevron indicates the row is expandable; the row label is the accessible name
-                contentDescription = null,
+                contentDescription = SurferSemantics.Decorative,
                 tint = AppTheme.materialColors.onSurfaceVariant,
                 modifier = Modifier.size(18.dp),
             )
@@ -136,8 +136,7 @@ private fun SurferPickerRowIcon(
     ) {
         Icon(
             imageVector = icon,
-            // decorative — category colour/icon indicator; the row label is the accessible name
-            contentDescription = null,
+            contentDescription = SurferSemantics.Decorative,
             tint = tint,
             modifier = Modifier.size(20.dp),
         )

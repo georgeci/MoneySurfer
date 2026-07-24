@@ -29,6 +29,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 
 data class SurferAccentColorOption(
@@ -166,8 +167,7 @@ private fun SwatchTile(
             ) {
                 Icon(
                     imageVector = SurferIcons.Check,
-                    // decorative — selection state indicator; the colour swatch is the visual identity
-                    contentDescription = null,
+                    contentDescription = SurferSemantics.Decorative,
                     tint = Color.White,
                     modifier = Modifier.size(18.dp),
                 )
@@ -205,8 +205,7 @@ private fun DynamicColorTile(
         ) {
             Icon(
                 imageVector = SurferIcons.Palette,
-                // decorative — tile icon identifying the dynamic-colour option; the title provides the accessible label
-                contentDescription = null,
+                contentDescription = SurferSemantics.Decorative,
                 tint = AppTheme.materialColors.primary,
                 modifier = Modifier.size(22.dp),
             )

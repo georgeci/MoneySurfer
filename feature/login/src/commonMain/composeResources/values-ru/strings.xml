@@ -48,10 +48,13 @@
     <string name="legal_privacy_heading">Политика конфиденциальности</string>
     <string name="legal_privacy_body">MoneySurfer создан по принципу offline-first. В офлайн-режиме — когда вы пользуетесь приложением без аккаунта — все данные вашего бюджета хранятся на устройстве и не передаются на наши серверы.\n\nВаши счета, операции, бюджеты и настройки в этом случае хранятся только в локальном хранилище приложения. Мы не продаём эти данные и не передаём их третьим лицам.\n\nЕсли вы войдёте в аккаунт и включите облачную синхронизацию, синхронизируемые данные отправляются нашему хостинг-провайдеру, чтобы быть доступными на всех ваших устройствах и для всей семьи. Синхронизация необязательна; без аккаунта данные вашего бюджета не покидают устройство.\n\nПриложение может собирать анонимные отчёты о сбоях и диагностику, чтобы помогать нам исправлять проблемы. Рекламы в приложении нет.\n\nУдаление приложения или очистка его данных безвозвратно стирают всё, что хранится на устройстве.</string>
     <string name="legal_updated">Обновлено: май 2026</string>
-    <string name="sign_in_error_missing_credentials">Введите e-mail и пароль</string>
+    <string name="sign_in_error_email_required">Введите e-mail</string>
+    <string name="sign_in_error_email_invalid">Проверьте адрес — похоже, он введён не полностью</string>
+    <string name="sign_in_error_password_required">Введите пароль</string>
+    <string name="sign_in_error_password_too_short">Минимум 6 символов</string>
     <string name="sign_in_error_invalid_credentials">Неверный e-mail или пароль</string>
-    <string name="sign_in_error_email_in_use">Этот e-mail уже используется</string>
+    <string name="sign_in_error_email_in_use">Этот e-mail уже зарегистрирован — войдите в аккаунт</string>
     <string name="sign_in_error_weak_password">Слабый пароль — минимум 6 символов</string>
-    <string name="sign_in_error_unknown">Не удалось войти</string>
+    <string name="sign_in_error_unknown">Что-то пошло не так. Попробуйте ещё раз.</string>
     <string name="sign_in_error_permission_denied">Нет доступа. Попробуйте ещё раз или обратитесь в поддержку.</string>
 </resources>

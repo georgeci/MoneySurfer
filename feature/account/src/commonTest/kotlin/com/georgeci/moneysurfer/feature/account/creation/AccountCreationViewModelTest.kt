@@ -10,6 +10,8 @@ import com.georgeci.moneysurfer.domain.fixtures.USD
 import com.georgeci.moneysurfer.domain.fixtures.aWorkspace
 import com.georgeci.moneysurfer.domain.fixtures.workspaceId
 import com.georgeci.moneysurfer.domain.model.Account
+import com.georgeci.moneysurfer.domain.model.AccountExtraDetail
+import com.georgeci.moneysurfer.domain.model.AccountExtraDetailKey
 import com.georgeci.moneysurfer.domain.model.Currency
 import com.georgeci.moneysurfer.domain.model.Transaction
 import com.georgeci.moneysurfer.domain.model.Workspace
@@ -26,15 +28,20 @@ import com.georgeci.moneysurfer.domain.repositories.CurrencyRepository
 import com.georgeci.moneysurfer.domain.repositories.TransactionRepository
 import com.georgeci.moneysurfer.domain.repositories.WorkspaceRepository
 import com.georgeci.moneysurfer.domain.usecase.ApplyTransactionChangeUseCase
+import com.georgeci.moneysurfer.domain.usecase.CreateAccountUseCase
 import com.georgeci.moneysurfer.domain.usecase.CreateTransactionUseCase
+import com.georgeci.moneysurfer.domain.usecase.GetAccountByIdUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetCurrenciesUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetCurrentTimeUseCase
+import com.georgeci.moneysurfer.domain.usecase.UpdateAccountUseCase
 import com.georgeci.moneysurfer.domain.usecase.UpdateWorkspaceCurrencyUseCase
 import com.georgeci.moneysurfer.domain.util.TransactionPeriodWindow
 import com.georgeci.moneysurfer.feature.account.generated.resources.Res
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_created_snackbar
 import com.georgeci.moneysurfer.navigation.SnackbarController
 import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.collections.shouldContain
+import io.kotest.matchers.collections.shouldNotContain
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 import kotlinx.coroutines.Dispatchers
@@ -171,6 +178,173 @@ class AccountCreationViewModelTest : StringSpec({
             val vm = Fixture(workspaceId = ws).createViewModel(offline = true)
             try {
                 vm.awaitCurrencies().extraDetailsEnabled shouldBe false
+            } finally {
+                vm.viewModelScope.cancel()
+            }
+        }
+    }
+
+    "save persists the filled extra details and drops the ones left empty" {
+        runTest {
+            val fixture = Fixture(workspaceId = ws)
+            val vm = fixture.createViewModel()
+            try {
+                vm.awaitCurrencies()
+
+                vm.onEvent(AccountCreationEvent.OnNameChanged("Everyday"))
+                vm.onEvent(AccountCreationEvent.OnAddExtraField(AccountExtraDetailKey.IBAN))
+                vm.onEvent(AccountCreationEvent.OnAddExtraField(AccountExtraDetailKey.BIC))
+                vm.onEvent(
+                    AccountCreationEvent.OnExtraFieldValueChanged(
+                        AccountExtraDetailKey.IBAN.name,
+                        " PL61 1090 1014 ",
+                    ),
+                )
+                vm.onEvent(AccountCreationEvent.OnSaveClick)
+
+                fixture.accountRepository.inserted.single().extraDetails shouldBe listOf(
+                    AccountExtraDetail(key = "IBAN", value = "PL61 1090 1014"),
+                )
+            } finally {
+                vm.viewModelScope.cancel()
+            }
+        }
+    }
+
+    "a custom field is stored under the name the user typed" {
+        runTest {
+            val fixture = Fixture(workspaceId = ws)
+            val vm = fixture.createViewModel()
+            try {
+                vm.awaitCurrencies()
+
+                vm.onEvent(AccountCreationEvent.OnNameChanged("Brokerage"))
+                vm.onEvent(AccountCreationEvent.OnAddCustomExtraField("  Broker   code "))
+                vm.onEvent(AccountCreationEvent.OnExtraFieldValueChanged("Broker code", "MS-4417"))
+                vm.onEvent(AccountCreationEvent.OnSaveClick)
+
+                fixture.accountRepository.inserted.single().extraDetails shouldBe listOf(
+                    AccountExtraDetail(key = "Broker code", value = "MS-4417"),
+                )
+            } finally {
+                vm.viewModelScope.cancel()
+            }
+        }
+    }
+
+    "a custom field that duplicates a field already on the form is ignored" {
+        runTest {
+            val vm = Fixture(workspaceId = ws).createViewModel()
+            try {
+                vm.awaitCurrencies()
+
+                vm.onEvent(AccountCreationEvent.OnAddExtraField(AccountExtraDetailKey.IBAN))
+                vm.onEvent(AccountCreationEvent.OnAddCustomExtraField("iban"))
+                vm.onEvent(AccountCreationEvent.OnAddCustomExtraField("   "))
+
+                (vm.value as AccountCreationState.Content).extraFields.map { it.key } shouldBe
+                    listOf(AccountExtraDetailKey.IBAN.name)
+            } finally {
+                vm.viewModelScope.cancel()
+            }
+        }
+    }
+
+    "a custom field shadowing a well-known key withdraws that key's chip" {
+        runTest {
+            val vm = Fixture(workspaceId = ws).createViewModel()
+            try {
+                vm.awaitCurrencies()
+
+                // The chip and the add-guard have to agree: leaving IBAN on offer here would
+                // render a control that silently does nothing, since addExtraField rejects it.
+                vm.onEvent(AccountCreationEvent.OnAddCustomExtraField("iban"))
+
+                (vm.value as AccountCreationState.Content)
+                    .availableExtraFieldKeys shouldNotContain AccountExtraDetailKey.IBAN
+            } finally {
+                vm.viewModelScope.cancel()
+            }
+        }
+    }
+
+    "removing a row drops it and offers its chip again" {
+        runTest {
+            val vm = Fixture(workspaceId = ws).createViewModel()
+            try {
+                vm.awaitCurrencies()
+
+                vm.onEvent(AccountCreationEvent.OnAddExtraField(AccountExtraDetailKey.BANK_URL))
+                (vm.value as AccountCreationState.Content)
+                    .availableExtraFieldKeys shouldNotContain AccountExtraDetailKey.BANK_URL
+
+                vm.onEvent(AccountCreationEvent.OnRemoveExtraField(AccountExtraDetailKey.BANK_URL.name))
+
+                val state = vm.value as AccountCreationState.Content
+                state.extraFields.shouldBeEmpty()
+                state.availableExtraFieldKeys shouldContain AccountExtraDetailKey.BANK_URL
+            } finally {
+                vm.viewModelScope.cancel()
+            }
+        }
+    }
+
+    "editing an account loads its extra details and saves them back" {
+        runTest {
+            val fixture = Fixture(workspaceId = ws)
+            val existing = Account(
+                id = AccountId("acc-1"),
+                workspaceId = ws,
+                name = "Everyday",
+                type = AccountType.BANK,
+                currencyCode = EUR,
+                balance = Money.zero(),
+                extraDetails = listOf(AccountExtraDetail(key = "IBAN", value = "PL61")),
+            )
+            fixture.accountRepository.insert(existing)
+            val vm = fixture.createViewModel(editing = existing.id)
+            try {
+                val loaded = vm.first {
+                    it is AccountCreationState.Content && it.extraFields.isNotEmpty()
+                } as AccountCreationState.Content
+                loaded.extraFields shouldBe listOf(AccountExtraField(key = "IBAN", value = "PL61"))
+
+                vm.onEvent(AccountCreationEvent.OnExtraFieldValueChanged("IBAN", "PL99"))
+                vm.onEvent(AccountCreationEvent.OnSaveClick)
+
+                fixture.accountRepository.getById(existing.id)?.extraDetails shouldBe
+                    listOf(AccountExtraDetail(key = "IBAN", value = "PL99"))
+            } finally {
+                vm.viewModelScope.cancel()
+            }
+        }
+    }
+
+    "the offline build still carries an edited account's extra details through a save" {
+        runTest {
+            val fixture = Fixture(workspaceId = ws)
+            val existing = Account(
+                id = AccountId("acc-2"),
+                workspaceId = ws,
+                name = "Everyday",
+                type = AccountType.BANK,
+                currencyCode = EUR,
+                balance = Money.zero(),
+                extraDetails = listOf(AccountExtraDetail(key = "IBAN", value = "PL61")),
+            )
+            fixture.accountRepository.insert(existing)
+            val vm = fixture.createViewModel(editing = existing.id, offline = true)
+            try {
+                val loaded = vm.first {
+                    it is AccountCreationState.Content && it.extraFields.isNotEmpty()
+                } as AccountCreationState.Content
+                // Hidden, not discarded — the section is invisible offline, the data is not gone.
+                loaded.extraDetailsEnabled shouldBe false
+
+                vm.onEvent(AccountCreationEvent.OnSaveClick)
+
+                fixture.accountRepository.getById(existing.id)?.extraDetails shouldBe
+                    existing.extraDetails
             } finally {
                 vm.viewModelScope.cancel()
             }
@@ -376,7 +550,9 @@ private class Fixture(val workspaceId: WorkspaceId) {
         accountId = editing,
         firstRun = firstRun,
         initialType = initialType,
-        accountRepository = accountRepository,
+        getAccountById = GetAccountByIdUseCase(accountRepository),
+        createAccount = CreateAccountUseCase(accountRepository),
+        updateAccount = UpdateAccountUseCase(accountRepository),
         createTransaction = createTransaction,
         session = session,
         getCurrentTime = GetCurrentTimeUseCase(clock),

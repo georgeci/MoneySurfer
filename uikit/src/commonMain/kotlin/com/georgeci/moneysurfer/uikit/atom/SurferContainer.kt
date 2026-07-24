@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.Text
@@ -23,21 +22,17 @@ import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.geometry.CornerRadius
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.compositeOver
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+import com.georgeci.moneysurfer.uikit.modifier.surferDashedBorder
 import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
+import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 
 // ─── Filled ──────────────────────────────────────────────────────────
@@ -255,12 +250,12 @@ internal fun SurferAddActionContainer(
             .clip(tokens.shape)
             .then(interactionModifier)
             .background(tokens.background)
-            .dashedBorder(
+            .surferDashedBorder(
                 color = tokens.stroke,
+                shape = tokens.shape,
                 strokeWidth = tokens.strokeWidth,
                 dashLength = tokens.dashLength,
                 dashGap = tokens.dashGap,
-                shape = tokens.shape,
             )
             .padding(tokens.contentPadding),
     ) {
@@ -268,34 +263,6 @@ internal fun SurferAddActionContainer(
             content()
         }
     }
-}
-
-private fun Modifier.dashedBorder(
-    color: Color,
-    strokeWidth: Dp,
-    dashLength: Dp,
-    dashGap: Dp,
-    shape: Shape,
-): Modifier = this.drawBehind {
-    val stroke = strokeWidth.toPx()
-    val inset = stroke / 2f
-    val cornerRadius = when (shape) {
-        is RoundedCornerShape -> shape.topStart.toPx(Size(size.width, size.height), this)
-        else -> 0f
-    }
-    drawRoundRect(
-        color = color,
-        topLeft = Offset(inset, inset),
-        size = Size(size.width - stroke, size.height - stroke),
-        cornerRadius = CornerRadius(cornerRadius - inset, cornerRadius - inset),
-        style = Stroke(
-            width = stroke,
-            pathEffect = PathEffect.dashPathEffect(
-                floatArrayOf(dashLength.toPx(), dashGap.toPx()),
-                0f,
-            ),
-        ),
-    )
 }
 
 // ─── Previews ────────────────────────────────────────────────────────
@@ -370,8 +337,7 @@ private fun SurferAddActionContainerPreview() {
         Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
             SurferAddActionContainer(modifier = Modifier.fillMaxWidth()) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    // decorative — preview only; label text is adjacent
-                    Icon(imageVector = SurferIcons.Add, contentDescription = null)
+                    Icon(imageVector = SurferIcons.Add, contentDescription = SurferSemantics.Decorative)
                     Spacer(Modifier.width(8.dp))
                     Text(text = "Add account", style = AppTheme.typography.labelLarge)
                 }

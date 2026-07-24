@@ -6,6 +6,7 @@ import com.georgeci.moneysurfer.domain.primitives.AccountType
 import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
 import com.georgeci.moneysurfer.domain.primitives.Money
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
+import kotlin.time.Instant
 
 fun anAccount(
     id: AccountId = accountId(),
@@ -15,6 +16,7 @@ fun anAccount(
     currencyCode: CurrencyCode = USD,
     balance: Money = Money.zero(),
     archived: Boolean = false,
+    archivedAt: Instant? = null,
 ): Account = Account(
     id = id,
     workspaceId = workspaceId,
@@ -23,4 +25,5 @@ fun anAccount(
     currencyCode = currencyCode,
     balance = balance,
     archived = archived,
+    archivedAt = archivedAt,
 )

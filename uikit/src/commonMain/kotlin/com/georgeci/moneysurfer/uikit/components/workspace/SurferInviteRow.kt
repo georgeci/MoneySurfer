@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import com.georgeci.moneysurfer.uikit.atom.SurferActionCard
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
+import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 
 /**
@@ -52,8 +53,7 @@ fun SurferInviteRow(
             ) {
                 Icon(
                     imageVector = SurferIcons.Add,
-                    // decorative — the card title ("Invite people") provides the accessible label
-                    contentDescription = null,
+                    contentDescription = SurferSemantics.Decorative,
                     tint = AppTheme.materialColors.onPrimaryContainer,
                     modifier = Modifier.size(20.dp),
                 )

@@ -1,6 +1,8 @@
 package com.georgeci.moneysurfer.feature.login
 
 import app.cash.turbine.test
+import arrow.core.left
+import com.georgeci.moneysurfer.domain.auth.AuthError
 import com.georgeci.moneysurfer.domain.auth.AuthLocalRepository
 import com.georgeci.moneysurfer.domain.auth.InMemorySessionPointers
 import com.georgeci.moneysurfer.domain.model.User
@@ -43,9 +45,113 @@ class SignInViewModelTest : StringSpec({
             awaitItem() shouldBe SignInEffect.NavigateToLegal
         }
     }
+
+    "submitting with no email reports EmailRequired against the email field" {
+        val viewModel = newViewModel()
+
+        viewModel.onEvent(SignInEvent.OnSubmitClick)
+
+        viewModel.currentState.error shouldBe SignInError.EmailRequired
+        viewModel.currentState.emailError shouldBe SignInError.EmailRequired
+        viewModel.currentState.passwordError shouldBe null
+    }
+
+    "submitting with a malformed email reports EmailInvalid" {
+        val viewModel = newViewModel()
+
+        viewModel.onEvent(SignInEvent.OnEmailChanged("surfer@example"))
+        viewModel.onEvent(SignInEvent.OnPasswordChanged("secret1"))
+        viewModel.onEvent(SignInEvent.OnSubmitClick)
+
+        viewModel.currentState.error shouldBe SignInError.EmailInvalid
+    }
+
+    "submitting a valid email with no password reports PasswordRequired" {
+        val viewModel = newViewModel()
+
+        viewModel.onEvent(SignInEvent.OnEmailChanged("surfer@example.com"))
+        viewModel.onEvent(SignInEvent.OnSubmitClick)
+
+        viewModel.currentState.error shouldBe SignInError.PasswordRequired
+        viewModel.currentState.passwordError shouldBe SignInError.PasswordRequired
+    }
+
+    "sign-up with a short password reports PasswordTooShort instead of silently doing nothing" {
+        val viewModel = newViewModel()
+
+        viewModel.onEvent(SignInEvent.OnToggleModeClick)
+        viewModel.onEvent(SignInEvent.OnEmailChanged("surfer@example.com"))
+        viewModel.onEvent(SignInEvent.OnPasswordChanged("12345"))
+        viewModel.onEvent(SignInEvent.OnSubmitClick)
+
+        viewModel.currentState.mode shouldBe AuthMode.SignUp
+        viewModel.currentState.error shouldBe SignInError.PasswordTooShort
+    }
+
+    "sign-up against a taken address reports it on the email field and switches to sign-in" {
+        val viewModel = newViewModel()
+
+        viewModel.onEvent(SignInEvent.OnToggleModeClick)
+        viewModel.onEvent(SignInEvent.OnEmailChanged("surfer@example.com"))
+        viewModel.onEvent(SignInEvent.OnPasswordChanged("secret1"))
+        viewModel.onEvent(SignInEvent.OnSubmitClick)
+
+        viewModel.currentState.emailError shouldBe SignInError.EmailAlreadyInUse
+        viewModel.currentState.mode shouldBe AuthMode.SignIn
+        viewModel.currentState.isLoading shouldBe false
+    }
+
+    "a rules rejection surfaces as PermissionDenied on the form, not on a field" {
+        val viewModel = newViewModel(signupFailure = AuthError.Type.PermissionDenied)
+
+        viewModel.submitSignUp()
+
+        viewModel.currentState.formError shouldBe SignInError.PermissionDenied
+        viewModel.currentState.mode shouldBe AuthMode.SignUp
+    }
+
+    "a provider-rejected address lands on the email field rather than reading as a bad password" {
+        val viewModel = newViewModel(signupFailure = AuthError.Type.InvalidEmail)
+
+        viewModel.submitSignUp()
+
+        viewModel.currentState.emailError shouldBe SignInError.EmailInvalid
+    }
+
+    // RequiresRecentLogin only ever comes out of the account-deletion flow; if it somehow reaches
+    // sign-in there is no re-auth prompt here to act on it, so it must degrade to the generic copy.
+    "RequiresRecentLogin degrades to the generic failure" {
+        val viewModel = newViewModel(signupFailure = AuthError.Type.RequiresRecentLogin)
+
+        viewModel.submitSignUp()
+
+        viewModel.currentState.formError shouldBe SignInError.Unknown
+    }
+
+    "editing a field clears the pending error" {
+        val viewModel = newViewModel()
+
+        viewModel.onEvent(SignInEvent.OnSubmitClick)
+        viewModel.currentState.error shouldBe SignInError.EmailRequired
+
+        viewModel.onEvent(SignInEvent.OnEmailChanged("s"))
+
+        viewModel.currentState.error shouldBe null
+    }
 })
 
-private fun newViewModel(): SignInViewModel {
+/** Fills in valid credentials in sign-up mode and submits, so only the provider failure varies. */
+private fun SignInViewModel.submitSignUp() {
+    onEvent(SignInEvent.OnToggleModeClick)
+    onEvent(SignInEvent.OnEmailChanged("surfer@example.com"))
+    onEvent(SignInEvent.OnPasswordChanged("secret1"))
+    onEvent(SignInEvent.OnSubmitClick)
+}
+
+private fun newViewModel(
+    signupFailure: AuthError.Type = AuthError.Type.EmailAlreadyInUse,
+): SignInViewModel {
+    val auth = StubAuthRemoteRepository(signupFailure)
     val session = InMemorySessionPointers()
     val authLocal = AuthLocalRepository(StubUserRepository, session)
     val wipeDemo = WipeDemoDataUseCase(StubLocalDataResetRepository, session)
@@ -56,10 +162,10 @@ private fun newViewModel(): SignInViewModel {
         getCurrentTime = GetCurrentTimeUseCase(ClockUseCase()),
     )
     return SignInViewModel(
-        login = LoginUseCase(StubAuthRemoteRepository, authLocal, session, wipeDemo, postAuthBootstrap),
-        signup = SignupUseCase(StubAuthRemoteRepository, authLocal, session, wipeDemo, postAuthBootstrap),
+        login = LoginUseCase(auth, authLocal, session, wipeDemo, postAuthBootstrap),
+        signup = SignupUseCase(auth, authLocal, session, wipeDemo, postAuthBootstrap),
         anonymousLogin = AnonymousLoginUseCase(
-            StubAuthRemoteRepository,
+            auth,
             authLocal,
             session,
             wipeDemo,
@@ -108,12 +214,19 @@ private object StubWorkspaceSyncer : WorkspaceSyncer {
     override suspend fun syncWorkspace(workspaceId: WorkspaceId) = error(UNUSED)
 }
 
-private object StubAuthRemoteRepository : AuthRemoteRepository {
+private class StubAuthRemoteRepository(
+    private val signupFailure: AuthError.Type,
+) : AuthRemoteRepository {
     override fun currentUid(): String? = null
     override fun currentEmail(): String? = null
     override fun isCurrentUserAnonymous(): Boolean = false
     override suspend fun signInWithEmail(email: String, password: String) = error(UNUSED)
-    override suspend fun createUserWithEmail(email: String, password: String) = error(UNUSED)
+
+    // The one collaborator call the tests do exercise: whichever failure the case under test
+    // wants back from the provider, so the AuthError -> SignInError mapping is observable.
+    override suspend fun createUserWithEmail(email: String, password: String) =
+        AuthError(signupFailure).left()
+
     override suspend fun signInAnonymously() = error(UNUSED)
     override suspend fun signOut() = error(UNUSED)
     override suspend fun reauthenticateWithEmail(email: String, password: String) = error(UNUSED)

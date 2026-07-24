@@ -17,8 +17,6 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExtendedFloatingActionButton
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -40,6 +38,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.georgeci.moneysurfer.domain.preferences.TransactionPeriodMode
 import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
+import com.georgeci.moneysurfer.uikit.components.base.SurferAddFab
 import com.georgeci.moneysurfer.uikit.components.base.SurferFilterChipRow
 import com.georgeci.moneysurfer.uikit.components.base.SurferPeriodArrow
 import com.georgeci.moneysurfer.uikit.components.base.SurferPeriodPager
@@ -152,12 +151,8 @@ private fun TransactionsByAccountContent(
             )
         },
         floatingActionButton = {
-            ExtendedFloatingActionButton(
-                text = { Text(stringResource(Res.string.transactions_list_new)) },
-                icon = {
-                    // decorative — FAB text label provides the accessible label
-                    Icon(imageVector = SurferIcons.Add, contentDescription = null)
-                },
+            SurferAddFab(
+                label = stringResource(Res.string.transactions_list_new),
                 onClick = { onEvent(TransactionsByAccountEvent.OnAddTransactionClick) },
             )
         },

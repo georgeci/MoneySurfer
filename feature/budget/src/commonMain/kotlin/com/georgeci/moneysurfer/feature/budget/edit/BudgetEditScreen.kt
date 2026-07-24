@@ -26,6 +26,7 @@ import com.georgeci.moneysurfer.domain.primitives.BudgetId
 import com.georgeci.moneysurfer.feature.budget.budgetPeriodLabel
 import com.georgeci.moneysurfer.feature.budget.formatShortDate
 import com.georgeci.moneysurfer.uikit.components.SurferCategoryPalette
+import com.georgeci.moneysurfer.uikit.components.base.SurferSectionLabel
 import com.georgeci.moneysurfer.uikit.components.base.SurferSegmentedControl
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbarButtonAction
@@ -167,7 +168,7 @@ private fun BudgetEditContent(
                     .testTag(BudgetEditTestTags.AmountField),
             )
 
-            SectionLabel(stringResource(Res.string.budget_edit_period_label))
+            SurferSectionLabel(stringResource(Res.string.budget_edit_period_label))
             SurferSegmentedControl(
                 options = BudgetPeriod.entries,
                 selected = state.period,
@@ -189,7 +190,7 @@ private fun BudgetEditContent(
                 )
             }
 
-            SectionLabel(stringResource(Res.string.budget_edit_categories_label))
+            SurferSectionLabel(stringResource(Res.string.budget_edit_categories_label))
             SurferCategoryChipGrid(
                 categories = state.categoryOptions.map { category ->
                     val visual = SurferCategoryPalette.visualFor(
@@ -251,15 +252,6 @@ private fun BudgetEditContent(
             }
         }
     }
-}
-
-@Composable
-private fun SectionLabel(text: String) {
-    Text(
-        text = text,
-        style = AppTheme.typography.labelLarge,
-        color = AppTheme.materialColors.onSurfaceVariant,
-    )
 }
 
 @Preview

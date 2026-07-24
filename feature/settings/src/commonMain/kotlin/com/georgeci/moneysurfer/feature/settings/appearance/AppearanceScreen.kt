@@ -41,6 +41,7 @@ import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsRadio
 import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsRow
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
+import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.uikit.tokens.AccentSeeds
 import com.georgeci.moneysurfer.uikit.tokens.AppColors
@@ -244,7 +245,7 @@ private fun LiveSchemePreview() {
             ) {
                 Icon(
                     imageVector = SurferIcons.Palette,
-                    contentDescription = null,
+                    contentDescription = SurferSemantics.Decorative,
                     tint = colors.onPrimary,
                     modifier = Modifier.size(22.dp),
                 )
@@ -346,7 +347,7 @@ private fun SwatchCell(
                 ) {
                     Icon(
                         imageVector = SurferIcons.Check,
-                        contentDescription = null,
+                        contentDescription = SurferSemantics.Decorative,
                         tint = Color.White,
                         modifier = Modifier.size(18.dp),
                     )

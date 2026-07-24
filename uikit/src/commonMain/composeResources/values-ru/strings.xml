@@ -3,5 +3,25 @@
     <string name="uikit_brand">MoneySurfer</string>
     <string name="uikit_close">Закрыть</string>
     <string name="uikit_done">Готово</string>
+    <string name="uikit_error_boundary_subtitle">На экране произошла непредвиденная ошибка. Попробуйте ещё раз.</string>
+    <string name="uikit_error_boundary_title">Что-то пошло не так</string>
+    <string name="uikit_palette_color_amber">Янтарный</string>
+    <string name="uikit_palette_color_green">Зелёный</string>
+    <string name="uikit_palette_color_lime">Лаймовый</string>
+    <string name="uikit_palette_color_magenta">Пурпурный</string>
+    <string name="uikit_palette_color_red">Красный</string>
+    <string name="uikit_palette_color_rose">Розовый</string>
+    <string name="uikit_palette_color_teal">Бирюзовый</string>
+    <string name="uikit_palette_color_violet">Фиолетовый</string>
+    <string name="uikit_palette_icon_card">Карта</string>
+    <string name="uikit_palette_icon_cash">Наличные</string>
+    <string name="uikit_palette_icon_category">Категория</string>
+    <string name="uikit_palette_icon_event">Событие</string>
+    <string name="uikit_palette_icon_receipt">Чек</string>
+    <string name="uikit_palette_icon_savings">Сбережения</string>
+    <string name="uikit_palette_icon_tag">Метка</string>
+    <string name="uikit_palette_icon_wallet">Кошелёк</string>
+    <string name="uikit_password_hide">Скрыть пароль</string>
+    <string name="uikit_password_show">Показать пароль</string>
     <string name="uikit_retry">Повторить</string>
 </resources>

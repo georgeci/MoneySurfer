@@ -5,15 +5,7 @@ import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.georgeci.moneysurfer.domain.primitives.CategoryId
 import com.georgeci.moneysurfer.domain.primitives.CategoryType
-import com.georgeci.moneysurfer.uikit.components.SurferCategoryPalette
 import com.georgeci.moneysurfer.utils.HandleSideEffect
-import moneysurfer.feature.category.generated.resources.Res
-import moneysurfer.feature.category.generated.resources.transaction_creation_category_create_new
-import moneysurfer.feature.category.generated.resources.transaction_creation_category_search
-import moneysurfer.feature.category.generated.resources.transaction_creation_category_section_expense
-import moneysurfer.feature.category.generated.resources.transaction_creation_category_section_income
-import moneysurfer.feature.category.generated.resources.transaction_creation_category_sheet_title
-import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -22,6 +14,9 @@ import org.koin.core.parameter.parametersOf
  * surrounding [androidx.compose.material3.ModalBottomSheet] is provided by
  * [com.georgeci.moneysurfer.navigation.BottomSheetSceneStrategy]. Visual layout lives
  * in [CategoryChooserContent] — this composable just maps the ViewModel's state and effects.
+ *
+ * [variant] chooses between the two designed layouts, so a caller that knows its user is hunting
+ * for one name gets the flat grid, and one browsing a deep tree gets the expandable cards.
  */
 @Composable
 fun CategoryChooserBottomSheet(
@@ -30,9 +25,10 @@ fun CategoryChooserBottomSheet(
     onDismiss: () -> Unit,
     onNavigateToCategoryCreation: () -> Unit,
     onCategoryPicked: (CategoryId) -> Unit,
+    variant: CategoryPickerVariant = CategoryPickerVariant.GRID,
     viewModel: CategoryChooserViewModel = koinViewModel(
-        key = "${selectedCategoryId?.value}:${filterType?.name}",
-    ) { parametersOf(selectedCategoryId, filterType) },
+        key = "${selectedCategoryId?.value}:${filterType?.name}:${variant.name}",
+    ) { parametersOf(selectedCategoryId, filterType, variant) },
 ) {
     val state by viewModel.collectAsStateWithLifecycle()
 
@@ -44,33 +40,9 @@ fun CategoryChooserBottomSheet(
         }
     }
 
-    val categories = (state as? CategoryChooserState.Content)?.categories.orEmpty()
-
-    CategoryChooserContent(
-        title = stringResource(Res.string.transaction_creation_category_sheet_title),
-        searchPlaceholder = stringResource(Res.string.transaction_creation_category_search),
-        categories = categories.map { cat ->
-            val visual = SurferCategoryPalette.visualFor(
-                id = cat.id.value,
-                iconKey = cat.iconKey,
-                hue = cat.hue,
-                systemKind = cat.systemKind?.name,
-            )
-            CategoryPickerRow(
-                id = cat.id.value,
-                name = cat.name,
-                icon = visual.icon,
-                tint = visual.tint,
-                isIncome = false,
-            )
-        },
-        selectedId = state.selectedId?.value,
-        expenseSectionTitle = stringResource(Res.string.transaction_creation_category_section_expense),
-        incomeSectionTitle = stringResource(Res.string.transaction_creation_category_section_income),
-        onSelect = { row ->
-            viewModel.onEvent(CategoryChooserEvent.OnCategorySelected(CategoryId(row.id)))
-        },
-        createNewLabel = stringResource(Res.string.transaction_creation_category_create_new),
-        onCreateNewClick = { viewModel.onEvent(CategoryChooserEvent.OnCreateNewCategoryClick) },
-    )
+    // Loading is a single frame before the local read lands; drawing the chrome around an empty
+    // body would only flash the tab row into place.
+    (state as? CategoryChooserState.Content)?.let { content ->
+        CategoryChooserContent(state = content, onEvent = viewModel::onEvent)
+    }
 }

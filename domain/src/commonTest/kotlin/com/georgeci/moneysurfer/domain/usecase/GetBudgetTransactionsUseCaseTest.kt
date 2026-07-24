@@ -1,6 +1,7 @@
 package com.georgeci.moneysurfer.domain.usecase
 
 import com.georgeci.moneysurfer.domain.fixtures.EUR
+import com.georgeci.moneysurfer.domain.fixtures.FixedClock
 import com.georgeci.moneysurfer.domain.fixtures.aBudget
 import com.georgeci.moneysurfer.domain.fixtures.aTransaction
 import com.georgeci.moneysurfer.domain.fixtures.aWorkspace
@@ -31,8 +32,6 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
-import kotlin.time.Clock
-import kotlin.time.Instant
 
 private val TODAY = LocalDate(2024, 1, 15)
 private val WORKSPACE = workspaceId("ws-1")
@@ -130,8 +129,4 @@ private class BudgetTransactionsEnv(private val rows: List<Transaction>) {
     )
 
     suspend fun useCase(budget: Budget): List<CategorizedTransaction> = useCase(budget, TimeZone.UTC).first()
-}
-
-private class FixedClock(private val instant: Instant) : Clock {
-    override fun now(): Instant = instant
 }

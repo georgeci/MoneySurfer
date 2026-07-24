@@ -23,8 +23,32 @@ import androidx.compose.ui.unit.dp
 import com.georgeci.moneysurfer.uikit.components.base.SurferSplitAmount
 import com.georgeci.moneysurfer.uikit.components.base.SurferSplitAmountTier
 import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
+import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.uikit.theme.SurferContainerStyle
+
+/**
+ * Bottom line of [SurferBalanceWidget]. The three variants are mutually exclusive by
+ * construction — passing them as three independent nullable strings let callers ask for
+ * combinations the widget silently dropped.
+ */
+sealed interface SurferBalanceFootnote {
+
+    /** Period delta, rendered with a trending-up icon. */
+    data class Trend(val text: String) : SurferBalanceFootnote
+
+    /**
+     * Secondary line carrying what the single headline figure cannot say — e.g. the balances
+     * held in other currencies, which no rate-free sum may fold into it.
+     */
+    data class Note(val text: String) : SurferBalanceFootnote
+
+    /**
+     * Nothing to total yet. Also switches the headline to plain text and drops the sparkline:
+     * there is no amount to split or trend to draw.
+     */
+    data class Empty(val text: String) : SurferBalanceFootnote
+}
 
 @Composable
 fun SurferBalanceWidget(
@@ -32,11 +56,10 @@ fun SurferBalanceWidget(
     balance: String,
     modifier: Modifier = Modifier,
     size: SurferWidgetSize = LocalSurferWidgetSize.current,
-    trendText: String? = null,
-    emptyText: String? = null,
+    footnote: SurferBalanceFootnote? = null,
 ) {
     val hero = size == SurferWidgetSize.Hero
-    val isEmpty = emptyText != null && trendText == null
+    val isEmpty = footnote is SurferBalanceFootnote.Empty
     val elevated = AppTheme.containerStyle == SurferContainerStyle.Card
 
     Card(
@@ -85,29 +108,39 @@ fun SurferBalanceWidget(
                     fractionAlpha = 0.55f,
                 )
             }
-            when {
-                trendText != null -> Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.TrendingUp,
-                        // decorative — trend direction indicator; the trendText provides the accessible label
-                        contentDescription = null,
-                        tint = AppTheme.materialColors.onPrimaryContainer,
-                        modifier = Modifier.size(if (hero) 16.dp else 14.dp),
-                    )
-                    Spacer(Modifier.width(6.dp))
-                    Text(
-                        text = trendText,
-                        style = if (hero) AppTheme.typography.bodyMedium else AppTheme.typography.bodySmall,
-                        color = AppTheme.materialColors.onPrimaryContainer,
-                    )
-                }
-                emptyText != null -> Text(
-                    text = emptyText,
-                    style = AppTheme.typography.bodyMedium,
-                    color = AppTheme.materialColors.onPrimaryContainer.copy(alpha = 0.85f),
-                )
-            }
+            Footnote(hero = hero, footnote = footnote)
         }
+    }
+}
+
+@Composable
+private fun Footnote(hero: Boolean, footnote: SurferBalanceFootnote?) {
+    when (footnote) {
+        null -> Unit
+        is SurferBalanceFootnote.Trend -> Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.TrendingUp,
+                contentDescription = SurferSemantics.Decorative,
+                tint = AppTheme.materialColors.onPrimaryContainer,
+                modifier = Modifier.size(if (hero) 16.dp else 14.dp),
+            )
+            Spacer(Modifier.width(6.dp))
+            Text(
+                text = footnote.text,
+                style = if (hero) AppTheme.typography.bodyMedium else AppTheme.typography.bodySmall,
+                color = AppTheme.materialColors.onPrimaryContainer,
+            )
+        }
+        is SurferBalanceFootnote.Note -> Text(
+            text = footnote.text,
+            style = AppTheme.typography.bodySmall,
+            color = AppTheme.materialColors.onPrimaryContainer.copy(alpha = 0.85f),
+        )
+        is SurferBalanceFootnote.Empty -> Text(
+            text = footnote.text,
+            style = AppTheme.typography.bodyMedium,
+            color = AppTheme.materialColors.onPrimaryContainer.copy(alpha = 0.85f),
+        )
     }
 }
 
@@ -119,7 +152,7 @@ private fun SurferBalanceWidgetHeroPreview() {
             SurferBalanceWidget(
                 title = "Total balance",
                 balance = "€11,575.32",
-                trendText = "+€412 this month",
+                footnote = SurferBalanceFootnote.Trend("+€412 this month"),
                 modifier = Modifier.fillMaxWidth(),
             )
         }
@@ -135,7 +168,7 @@ private fun SurferBalanceWidgetCompactPreview() {
                 title = "Total balance",
                 balance = "€11,575.32",
                 size = SurferWidgetSize.Compact,
-                trendText = "+€412",
+                footnote = SurferBalanceFootnote.Trend("+€412"),
                 modifier = Modifier.width(220.dp),
             )
         }
@@ -150,7 +183,7 @@ private fun SurferBalanceWidgetEmptyPreview() {
             SurferBalanceWidget(
                 title = "Total balance",
                 balance = "—",
-                emptyText = "Add your first account to see balance.",
+                footnote = SurferBalanceFootnote.Empty("Add your first account to see balance."),
                 modifier = Modifier.fillMaxWidth(),
             )
         }

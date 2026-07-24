@@ -2,7 +2,6 @@ package com.georgeci.moneysurfer.uikit.components.workspace
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,15 +19,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.georgeci.moneysurfer.uikit.atom.SurferActionCard
 import com.georgeci.moneysurfer.uikit.atom.SurferCard
+import com.georgeci.moneysurfer.uikit.components.base.SurferOutlinedChip
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
+import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 
 private val IconSize = 48.dp
@@ -96,8 +96,7 @@ fun SurferCreateWorkspaceRow(
             ) {
                 Icon(
                     imageVector = SurferIcons.Add,
-                    // decorative — card title and subtitle provide the accessible label
-                    contentDescription = null,
+                    contentDescription = SurferSemantics.Decorative,
                     tint = AppTheme.materialColors.onSurfaceVariant,
                 )
             }
@@ -157,58 +156,25 @@ private fun RowBody(
                 Spacer(Modifier.height(6.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                     if (editLabel != null) {
-                        ActionChip(
-                            icon = SurferIcons.Edit,
+                        SurferOutlinedChip(
                             label = editLabel,
-                            enabled = enabled,
+                            icon = SurferIcons.Edit,
                             onClick = onEditClick,
+                            enabled = enabled,
                         )
                     }
                     if (membersLabel != null) {
-                        ActionChip(
-                            icon = SurferIcons.People,
+                        SurferOutlinedChip(
                             label = membersLabel,
-                            enabled = enabled,
+                            icon = SurferIcons.People,
                             onClick = onMembersClick,
+                            enabled = enabled,
                         )
                     }
                 }
             }
         }
         RadioIndicator(selected = selected, modifier = Modifier.padding(top = 12.dp))
-    }
-}
-
-@Composable
-private fun ActionChip(
-    icon: ImageVector,
-    label: String,
-    enabled: Boolean,
-    onClick: () -> Unit,
-) {
-    val outline = AppTheme.materialColors.outline
-    Row(
-        modifier = Modifier
-            .height(32.dp)
-            .clip(RoundedCornerShape(16.dp))
-            .border(1.dp, outline, RoundedCornerShape(16.dp))
-            .clickable(enabled = enabled, onClick = onClick)
-            .padding(horizontal = 12.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(6.dp),
-    ) {
-        Icon(
-            imageVector = icon,
-            // decorative — chip label text provides the accessible label
-            contentDescription = null,
-            tint = AppTheme.materialColors.onSurface,
-            modifier = Modifier.size(14.dp),
-        )
-        Text(
-            text = label,
-            style = AppTheme.typography.labelMedium,
-            color = AppTheme.materialColors.onSurface,
-        )
     }
 }
 

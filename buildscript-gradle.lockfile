@@ -114,6 +114,7 @@ org.jetbrains.compose:org.jetbrains.compose.gradle.plugin:1.11.1=classpath
 org.jetbrains.intellij.deps:coverage-report:1.0.25=classpath
 org.jetbrains.intellij.deps:intellij-coverage-agent:1.0.765=classpath
 org.jetbrains.intellij.deps:intellij-coverage-reporter:1.0.765=classpath
+org.jetbrains.kotlin.jvm:org.jetbrains.kotlin.jvm.gradle.plugin:2.4.0=classpath
 org.jetbrains.kotlin.multiplatform:org.jetbrains.kotlin.multiplatform.gradle.plugin:2.4.0=classpath
 org.jetbrains.kotlin.plugin.compose:org.jetbrains.kotlin.plugin.compose.gradle.plugin:2.4.0=classpath
 org.jetbrains.kotlin.plugin.power-assert:org.jetbrains.kotlin.plugin.power-assert.gradle.plugin:2.2.21=classpath

@@ -52,6 +52,26 @@ data class AccountDoc(
     val updatedAt: Long = 0L,
     val deletedAt: Long? = null,
     val clientVersionCode: Int = 1,
+    /**
+     * When the account was archived. Null both for active accounts and for rows written by a
+     * client that predates the field — the manage list falls back to a dateless label either way.
+     */
+    val archivedAt: Long? = null,
+    /**
+     * User-entered key–value details. Empty when written by a client that predates the field;
+     * the reader treats that as "no details" rather than refusing the document.
+     */
+    val extraDetails: List<AccountExtraDetailDoc> = emptyList(),
+)
+
+/**
+ * One "Extra details" entry. [key] is either a well-known key name (`IBAN`, `CARD_LAST4`, …) or
+ * a label the user typed — see `AccountExtraDetail` in the domain.
+ */
+@Serializable
+data class AccountExtraDetailDoc(
+    val key: String = "",
+    val value: String = "",
 )
 
 @Serializable
@@ -119,6 +139,40 @@ data class BudgetDoc(
     val alertPercent: Int = 0,
     val isActive: Boolean = true,
     val rollover: Boolean = false,
+    val createdAt: Long = 0L,
+    val updatedAt: Long = 0L,
+    val deletedAt: Long? = null,
+    val clientVersionCode: Int = 1,
+)
+
+/**
+ * Recurring-rule doc at `workspaces/{wid}/recurringRules/{rid}`.
+ *
+ * The rule must replicate because [TransactionDoc.recurringRuleId] points at it: on a device
+ * that never created the rule the link would otherwise dangle and the cadence could not be
+ * rendered (issue #269).
+ *
+ * The schedule is flattened to match the Room columns one-to-one, except that
+ * `daysOfWeek` / `daysOfMonth` are real lists on the wire where Room keeps CSV columns —
+ * the same entity↔wire conversion [BudgetDoc.categoryIds] makes.
+ */
+@Serializable
+data class RecurringRuleDoc(
+    val title: String = "",
+    val amount: Long = 0L,
+    val categoryId: String = "",
+    val scheduleFrequency: String = "",
+    val scheduleInterval: Int = 1,
+    /** [kotlinx.datetime.DayOfWeek] names, e.g. `["MONDAY"]`. Empty for non-weekly schedules. */
+    val scheduleDaysOfWeek: List<String> = emptyList(),
+    /** Days of month, 1..31. Empty for non-monthly schedules. */
+    val scheduleDaysOfMonth: List<Int> = emptyList(),
+    val scheduleMissingDayPolicy: String = "",
+    /** ISO-8601 local date (`yyyy-MM-dd`) the schedule anchors from. */
+    val startDate: String = "",
+    val nextRunAt: Long? = null,
+    val autoCreate: Boolean = true,
+    val isActive: Boolean = true,
     val createdAt: Long = 0L,
     val updatedAt: Long = 0L,
     val deletedAt: Long? = null,

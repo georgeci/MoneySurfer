@@ -4,37 +4,27 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.ExtendedFloatingActionButton
-import androidx.compose.material3.FilledTonalButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.georgeci.moneysurfer.domain.primitives.AccountId
-import com.georgeci.moneysurfer.domain.primitives.AccountType
 import com.georgeci.moneysurfer.feature.account.generated.resources.Res
 import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_manage_active_header
 import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_manage_add_account
 import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_manage_archive
+import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_manage_archived_at
 import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_manage_archived_footnote
 import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_manage_archived_header
 import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_manage_archived_hint
@@ -48,20 +38,29 @@ import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_man
 import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_manage_stat_archived_count
 import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_manage_stat_total
 import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_manage_title
+import com.georgeci.moneysurfer.feature.account.generated.resources.month_short
+import com.georgeci.moneysurfer.feature.account.icon
 import com.georgeci.moneysurfer.feature.account.labelRes
+import com.georgeci.moneysurfer.uikit.components.SurferEmptyState
 import com.georgeci.moneysurfer.uikit.components.SurferSkeletonRow
 import com.georgeci.moneysurfer.uikit.components.account.SurferAccountManageCard
 import com.georgeci.moneysurfer.uikit.components.account.SurferArchivedAccountCard
 import com.georgeci.moneysurfer.uikit.components.account.SurferTotalBalanceCard
+import com.georgeci.moneysurfer.uikit.components.base.SurferAddFab
 import com.georgeci.moneysurfer.uikit.components.base.SurferDragHandle
+import com.georgeci.moneysurfer.uikit.components.base.SurferSectionHeader
+import com.georgeci.moneysurfer.uikit.components.base.SurferSectionHeaderHint
 import com.georgeci.moneysurfer.uikit.components.base.SurferSwipeAction
 import com.georgeci.moneysurfer.uikit.components.base.SurferSwipeRevealRow
+import com.georgeci.moneysurfer.uikit.components.base.SurferToggleChipButton
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.utils.HandleSideEffect
+import kotlinx.datetime.number
 import org.jetbrains.compose.resources.pluralStringResource
+import org.jetbrains.compose.resources.stringArrayResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -109,7 +108,7 @@ private fun AccountsManageLoading(onEvent: (AccountsManageEvent) -> Unit) {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .padding(horizontal = 16.dp, vertical = 12.dp),
+                .padding(horizontal = AppTheme.spacing.default, vertical = AppTheme.spacing.medium),
             verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
             repeat(ACCOUNTS_SKELETON_ROWS) {
@@ -135,38 +134,37 @@ private fun AccountsManageContent(
                 title = stringResource(Res.string.accounts_manage_title),
                 onBack = { onEvent(AccountsManageEvent.OnBackClick) },
                 actions = {
-                    EditToggleChip(
-                        editing = state.isEditing,
+                    SurferToggleChipButton(
+                        label = stringResource(
+                            if (state.isEditing) {
+                                Res.string.accounts_manage_done
+                            } else {
+                                Res.string.accounts_manage_edit
+                            },
+                        ),
+                        icon = if (state.isEditing) SurferIcons.Check else SurferIcons.Edit,
+                        active = state.isEditing,
                         onClick = { onEvent(AccountsManageEvent.OnToggleEditMode) },
-                        modifier = Modifier.padding(end = 8.dp),
+                        modifier = Modifier.padding(end = AppTheme.spacing.small),
                     )
                 },
             )
         },
         floatingActionButton = {
-            ExtendedFloatingActionButton(
-                text = { Text(stringResource(Res.string.accounts_manage_add_account)) },
-                icon = {
-                    // decorative — FAB text label provides the accessible label
-                    Icon(imageVector = SurferIcons.Add, contentDescription = null)
-                },
+            SurferAddFab(
+                label = stringResource(Res.string.accounts_manage_add_account),
                 onClick = { onEvent(AccountsManageEvent.OnAddAccountClick) },
             )
         },
     ) { padding ->
         if (!hasContent) {
             Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding)
-                    .padding(horizontal = AppTheme.spacing.large),
+                modifier = Modifier.fillMaxSize().padding(padding),
                 contentAlignment = Alignment.Center,
             ) {
-                Text(
-                    text = stringResource(Res.string.accounts_manage_empty),
-                    style = AppTheme.typography.bodyLarge,
-                    color = AppTheme.materialColors.onSurfaceVariant,
-                    textAlign = TextAlign.Center,
+                SurferEmptyState(
+                    title = stringResource(Res.string.accounts_manage_empty),
+                    icon = SurferIcons.Wallet,
                 )
             }
             return@Scaffold
@@ -177,7 +175,7 @@ private fun AccountsManageContent(
                 .fillMaxSize()
                 .padding(top = padding.calculateTopPadding()),
             contentPadding = PaddingValues(
-                top = 4.dp,
+                top = AppTheme.spacing.xSmall,
                 bottom = padding.calculateBottomPadding() + 96.dp,
             ),
         ) {
@@ -195,19 +193,29 @@ private fun AccountsManageContent(
                         ?.let {
                             pluralStringResource(Res.plurals.accounts_manage_stat_archived_count, it, it)
                         },
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+                    otherCurrencyChipTexts = state.otherCurrencyTotals,
+                    modifier = Modifier.padding(
+                        horizontal = AppTheme.spacing.default,
+                        vertical = AppTheme.spacing.xSmall,
+                    ),
                 )
             }
 
             item(key = "active-header") {
-                SectionHeader(
+                SurferSectionHeader(
                     title = stringResource(Res.string.accounts_manage_active_header),
                     trailing = if (state.isEditing) {
-                        stringResource(Res.string.accounts_manage_drag_to_reorder)
+                        {
+                            SurferSectionHeaderHint(
+                                text = stringResource(Res.string.accounts_manage_drag_to_reorder),
+                            )
+                        }
                     } else {
                         null
                     },
-                    modifier = Modifier.padding(horizontal = 24.dp).padding(top = 8.dp, bottom = 6.dp),
+                    modifier = Modifier
+                        .padding(horizontal = AppTheme.spacing.large)
+                        .padding(top = AppTheme.spacing.small, bottom = 6.dp),
                 )
             }
 
@@ -220,16 +228,22 @@ private fun AccountsManageContent(
                     onClick = { onEvent(AccountsManageEvent.OnAccountClick(account.id)) },
                     onArchiveClick = { onEvent(AccountsManageEvent.OnArchiveAccountClick(account.id)) },
                     onRemoveClick = { onEvent(AccountsManageEvent.OnRemoveAccountClick(account.id)) },
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 5.dp),
+                    modifier = Modifier.padding(horizontal = AppTheme.spacing.default, vertical = 5.dp),
                 )
             }
 
             if (state.archivedAccounts.isNotEmpty()) {
                 item(key = "archived-header") {
-                    SectionHeader(
+                    SurferSectionHeader(
                         title = stringResource(Res.string.accounts_manage_archived_header),
-                        trailing = stringResource(Res.string.accounts_manage_archived_hint),
-                        modifier = Modifier.padding(horizontal = 24.dp).padding(top = 20.dp, bottom = 6.dp),
+                        trailing = {
+                            SurferSectionHeaderHint(
+                                text = stringResource(Res.string.accounts_manage_archived_hint),
+                            )
+                        },
+                        modifier = Modifier
+                            .padding(horizontal = AppTheme.spacing.large)
+                            .padding(top = 20.dp, bottom = 6.dp),
                     )
                 }
 
@@ -240,7 +254,10 @@ private fun AccountsManageContent(
                         icon = account.type.icon(),
                         restoreLabel = stringResource(Res.string.accounts_manage_restore),
                         onRestoreClick = { onEvent(AccountsManageEvent.OnRestoreAccountClick(account.id)) },
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+                        modifier = Modifier.padding(
+                            horizontal = AppTheme.spacing.default,
+                            vertical = AppTheme.spacing.xSmall,
+                        ),
                     )
                 }
             }
@@ -251,8 +268,8 @@ private fun AccountsManageContent(
                     style = AppTheme.typography.bodySmall,
                     color = AppTheme.materialColors.onSurfaceVariant,
                     modifier = Modifier
-                        .padding(horizontal = 24.dp)
-                        .padding(top = 18.dp, bottom = 8.dp),
+                        .padding(horizontal = AppTheme.spacing.large)
+                        .padding(top = 18.dp, bottom = AppTheme.spacing.small),
                 )
             }
         }
@@ -321,83 +338,18 @@ private fun ActiveAccountRow(
 }
 
 @Composable
-private fun EditToggleChip(
-    editing: Boolean,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    val icon = if (editing) SurferIcons.Check else SurferIcons.Edit
-    val label = stringResource(if (editing) Res.string.accounts_manage_done else Res.string.accounts_manage_edit)
-    if (editing) {
-        FilledTonalButton(
-            onClick = onClick,
-            modifier = modifier.heightIn(min = 32.dp),
-            contentPadding = PaddingValues(horizontal = 14.dp, vertical = 0.dp),
-        ) {
-            // decorative — button text provides the accessible label
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                modifier = Modifier.size(16.dp),
-            )
-            Spacer(Modifier.width(4.dp))
-            Text(text = label, style = AppTheme.typography.labelLarge)
-        }
-    } else {
-        OutlinedButton(
-            onClick = onClick,
-            modifier = modifier.heightIn(min = 32.dp),
-            contentPadding = PaddingValues(horizontal = 14.dp, vertical = 0.dp),
-        ) {
-            // decorative — button text provides the accessible label
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                modifier = Modifier.size(14.dp),
-            )
-            Spacer(Modifier.width(4.dp))
-            Text(text = label, style = AppTheme.typography.labelLarge)
-        }
-    }
-}
-
-@Composable
-private fun SectionHeader(
-    title: String,
-    modifier: Modifier = Modifier,
-    trailing: String? = null,
-) {
-    Row(
-        modifier = modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(
-            text = title.uppercase(),
-            style = AppTheme.typography.labelSmall,
-            color = AppTheme.materialColors.onSurfaceVariant,
-        )
-        Spacer(Modifier.weight(1f))
-        if (trailing != null) {
-            Text(
-                text = trailing,
-                style = AppTheme.typography.labelMedium,
-                color = AppTheme.materialColors.onSurfaceVariant,
-            )
-        }
-    }
-}
-
-@Composable
 private fun archivedSubtitle(account: AccountManageUi): String {
     val typeLabel = stringResource(account.type.labelRes())
-    return account.archivedLabel?.let { "$typeLabel · $it" } ?: typeLabel
-}
-
-private fun AccountType.icon(): ImageVector = when (this) {
-    AccountType.CASH -> SurferIcons.Cash
-    AccountType.BANK -> SurferIcons.Bank
-    AccountType.CARD -> SurferIcons.CreditCard
-    AccountType.SAVINGS -> SurferIcons.Savings
+    // Accounts archived before `archivedAt` existed carry no date; the type label alone is the
+    // honest fallback.
+    val archivedOn = account.archivedOn ?: return typeLabel
+    val months = stringArrayResource(Res.array.month_short)
+    val archivedLabel = stringResource(
+        Res.string.accounts_manage_archived_at,
+        months[archivedOn.month.number - 1],
+        archivedOn.year.toString(),
+    )
+    return "$typeLabel · $archivedLabel"
 }
 
 @Preview

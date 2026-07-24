@@ -37,6 +37,18 @@ object AppColors {
     val OnSurfaceVariant = Color(0xFF424940)
     val SurfaceTint = Color(0xFF1B5E20)
 
+    // Surface container ramp. Left unset these fall back to Material's baseline tonal palette,
+    // which is purple-tinted, so cards sat on a visibly different neutral hue from the scaffold
+    // behind them. Each level keeps M3's tonal step relative to [Surface] and is re-tinted to
+    // [Surface]'s own neutral: red one below the green channel, blue six below.
+    val SurfaceContainerLowest = Color(0xFFFEFFF9)
+    val SurfaceContainerLow = Color(0xFFF7F8F2)
+    val SurfaceContainer = Color(0xFFF2F3ED)
+    val SurfaceContainerHigh = Color(0xFFEBECE6)
+    val SurfaceContainerHighest = Color(0xFFE5E6E0)
+    val SurfaceBright = Color(0xFFFCFDF7)
+    val SurfaceDim = Color(0xFFDDDED8)
+
     // Outline
     val Outline = Color(0xFF72796F)
     val OutlineVariant = Color(0xFFC2C9BD)
@@ -52,16 +64,43 @@ object AppColors {
     // Semantic — transaction type accents. Material 3 has no income/expense/transfer
     // slots; expose via [SemanticColors] / `AppTheme.semanticColors` so screens never
     // reach for the hex.
-    val Income = Color(0xFF2E9A6A)
-    val Expense = Color(0xFFB54744)
+    //
+    // These are *text* colours (amounts, type pills), so each one holds ≥4.5:1 against
+    // every surface it can land on — down to `surfaceContainerHighest`, and through the
+    // 14–18% self-tinted pill washes mixed in `SurferRecentTransactionsWidget` and the
+    // transaction creation `TypePill`. That worst case is what drove the light values
+    // darker than the mockup's mid-tones; `ColorContrastTest` pins it.
+    val Income = Color(0xFF1C5E41)
+    val Expense = Color(0xFFA3403D)
     val Transfer = Color(0xFF2E5AA8)
 
     /**
      * Amber "approaching the limit" accent. M3 has no warning slot, and `error` is already
      * spoken for by the over-budget state, so a budget nearing its cap needs a third colour
-     * that reads as caution rather than failure. Mirrors the mockup's `oklch(56% 0.13 68)`.
+     * that reads as caution rather than failure. Darkened from the mockup's
+     * `oklch(56% 0.13 68)`, which only reached 3.2:1 on the tonal surface containers.
      */
-    val Warning = Color(0xFFA97110)
+    val Warning = Color(0xFF83580C)
+
+    /**
+     * Category tints, in palette order (mint, amber, indigo, citrus, plum, rose, clay, moss).
+     * Chosen against the light surface; [Dark.CategoryTints] lifts the same hues for the dark
+     * one. Consumed through `SemanticColors.categoryTints` / `SurferCategoryPalette.tints` —
+     * screens and components never index into this list directly.
+     *
+     * Positionally paired with `SurferCategoryPalette.hues`; both must stay in lockstep with
+     * `CategoryAppearance` in the domain module.
+     */
+    val CategoryTints: List<Color> = listOf(
+        Color(0xFF2F8E6E), // mint   — hue 162
+        Color(0xFFB5533B), // amber  — hue  35
+        Color(0xFF2E5AA8), // indigo — hue 258
+        Color(0xFFA06A1E), // citrus — hue  68
+        Color(0xFF6B4E99), // plum   — hue 303
+        Color(0xFFB54A6B), // rose   — hue 340
+        Color(0xFFB54744), // clay   — hue   8
+        Color(0xFF6B7D3D), // moss   — hue  90
+    )
 
     // Dark theme overrides
     object Dark {
@@ -93,6 +132,18 @@ object AppColors {
         val OnSurfaceVariant = Color(0xFFC2C9BD)
         val SurfaceTint = Color(0xFF6EDD72)
 
+        /**
+         * Dark counterpart of the light ramp: the same M3 tonal steps relative to [Surface],
+         * re-tinted to [Surface]'s neutral — red two below the green channel, blue three below.
+         */
+        val SurfaceContainerLowest = Color(0xFF151714)
+        val SurfaceContainerLow = Color(0xFF232522)
+        val SurfaceContainer = Color(0xFF272926)
+        val SurfaceContainerHigh = Color(0xFF313330)
+        val SurfaceContainerHighest = Color(0xFF3C3E3B)
+        val SurfaceBright = Color(0xFF40423F)
+        val SurfaceDim = Color(0xFF1A1C19)
+
         val Outline = Color(0xFF8C9388)
         val OutlineVariant = Color(0xFF424940)
 
@@ -102,11 +153,33 @@ object AppColors {
 
         val Scrim = Color(0xFF000000)
 
+        // Light-on-dark already clears AA on every surface these land on, so the dark
+        // accents keep the mockup's values. See `ColorContrastTest` for the exact pairs.
         val Income = Color(0xFF6FCB9F)
         val Expense = Color(0xFFE89B98)
         val Transfer = Color(0xFF8FB0E0)
 
         /** Same amber, lifted to the mockup's dark-scheme lightness (`oklch(78% 0.13 68)`). */
         val Warning = Color(0xFFE9B45E)
+
+        /**
+         * [AppColors.CategoryTints] with the same hues taken to the lightness the dark scheme's
+         * other accents sit at (HSL L 72% / S 55% — the rule that already produces [Expense] and
+         * [Transfer] from their light counterparts). The light tints are mid-dark on the dark
+         * surface, both as the icon tint and as the 18% wash behind it in `SurferCategoryBubble`.
+         *
+         * Index 2 (indigo) and index 6 (clay) are the same colours as [Transfer] and [Expense]
+         * in the light palette, so they reuse the dark values of those accents verbatim.
+         */
+        val CategoryTints: List<Color> = listOf(
+            Color(0xFF90DFC4), // mint
+            Color(0xFFDFA090), // amber
+            Transfer, //          indigo
+            Color(0xFFDFBE90), // citrus
+            Color(0xFFAF90DF), // plum
+            Color(0xFFDF90A9), // rose
+            Expense, //           clay
+            Color(0xFFC9DF90), // moss
+        )
     }
 }

@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
+import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 
 /** Goal lifecycle as the design system sees it — the domain enum stays in `domain`. */
@@ -61,7 +62,7 @@ fun SurferGoalStatusPill(
             SurferGoalStatus.Active -> Dot(color = content)
             SurferGoalStatus.Completed -> Icon(
                 imageVector = Icons.Default.Check,
-                contentDescription = null,
+                contentDescription = SurferSemantics.Decorative,
                 tint = content,
                 modifier = Modifier.size(14.dp),
             )

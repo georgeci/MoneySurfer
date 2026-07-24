@@ -26,6 +26,7 @@ import com.georgeci.moneysurfer.uikit.components.SurferButtonSize
 import com.georgeci.moneysurfer.uikit.components.SurferButtonStyle
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
+import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 
 /**
@@ -71,8 +72,7 @@ fun SurferIncomingInviteCard(
                 ) {
                     Icon(
                         imageVector = SurferIcons.People,
-                        // decorative — workspace identity icon; the workspace name provides the accessible label
-                        contentDescription = null,
+                        contentDescription = SurferSemantics.Decorative,
                         tint = cs.onSurfaceVariant,
                         modifier = Modifier.size(18.dp),
                     )

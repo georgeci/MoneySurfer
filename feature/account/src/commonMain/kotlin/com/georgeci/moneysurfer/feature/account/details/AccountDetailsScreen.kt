@@ -2,7 +2,7 @@ package com.georgeci.moneysurfer.feature.account.details
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,8 +10,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.ExtendedFloatingActionButton
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -19,30 +17,38 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.georgeci.moneysurfer.domain.model.AccountExtraDetail
+import com.georgeci.moneysurfer.domain.model.AccountExtraDetailKey
 import com.georgeci.moneysurfer.domain.primitives.AccountId
+import com.georgeci.moneysurfer.domain.primitives.AccountType
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
+import com.georgeci.moneysurfer.feature.account.extraDetailLabel
 import com.georgeci.moneysurfer.feature.account.generated.resources.Res
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_add_transaction
-import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_change_this_month
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_chart_title
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_edit_content_description
+import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_extra_details_section
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_filter_all
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_filter_expenses
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_filter_income
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_in_this_month
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_more_content_description
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_out_this_month
-import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_synced_format
-import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_synced_recent
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_title
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_transactions_empty
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_transactions_section
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_transactions_see_all
+import com.georgeci.moneysurfer.feature.account.icon
+import com.georgeci.moneysurfer.feature.account.isMonospaceExtraDetail
+import com.georgeci.moneysurfer.feature.account.labelRes
+import com.georgeci.moneysurfer.uikit.components.SurferSkeletonRow
 import com.georgeci.moneysurfer.uikit.components.account.SurferAccountDetailsHeroCard
 import com.georgeci.moneysurfer.uikit.components.account.SurferAccountStatCard
 import com.georgeci.moneysurfer.uikit.components.account.SurferBalanceChartCard
+import com.georgeci.moneysurfer.uikit.components.base.SurferAddFab
 import com.georgeci.moneysurfer.uikit.components.base.SurferFilterChipRow
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbarAction
@@ -98,13 +104,21 @@ private fun AccountDetailsLoading(onEvent: (AccountDetailsEvent) -> Unit) {
             )
         },
     ) { padding ->
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding),
-        )
+                .padding(padding)
+                .padding(horizontal = AppTheme.spacing.default, vertical = AppTheme.spacing.medium),
+            verticalArrangement = Arrangement.spacedBy(AppTheme.spacing.medium),
+        ) {
+            repeat(SKELETON_ROWS) {
+                SurferSkeletonRow()
+            }
+        }
     }
 }
+
+private const val SKELETON_ROWS = 5
 
 @Composable
 private fun AccountDetailsContent(
@@ -133,17 +147,9 @@ private fun AccountDetailsContent(
             )
         },
         floatingActionButton = {
-            ExtendedFloatingActionButton(
+            SurferAddFab(
+                label = stringResource(Res.string.account_details_add_transaction),
                 onClick = { onEvent(AccountDetailsEvent.OnAddTransactionClick) },
-                icon = {
-                    Icon(
-                        imageVector = SurferIcons.Add,
-                        contentDescription = null,
-                    )
-                },
-                text = { Text(stringResource(Res.string.account_details_add_transaction)) },
-                containerColor = AppTheme.materialColors.primaryContainer,
-                contentColor = AppTheme.materialColors.onPrimaryContainer,
             )
         },
     ) { padding ->
@@ -163,14 +169,14 @@ private fun AccountDetailsContent(
         ) {
             item {
                 SurferAccountDetailsHeroCard(
-                    icon = SurferIcons.Wallet,
+                    // Falls back to the generic wallet only while the type is still loading.
+                    icon = state.type?.icon() ?: SurferIcons.Wallet,
                     name = state.name,
-                    subtitle = state.currency.uppercase(),
+                    // The mockup's meta line is the account kind ("CURRENT · •• 4021"); the
+                    // last-4 half needs a field the model does not have yet, so only the kind
+                    // shows — still closer than the currency code that used to sit here.
+                    subtitle = state.type?.let { stringResource(it.labelRes()).uppercase() }.orEmpty(),
                     formattedBalance = state.formattedBalance.ifBlank { "€0.00" },
-                    syncedLabel = stringResource(
-                        Res.string.account_details_synced_format,
-                        stringResource(Res.string.account_details_synced_recent),
-                    ),
                     modifier = Modifier
                         .padding(horizontal = AppTheme.spacing.default)
                         .padding(bottom = AppTheme.spacing.large),
@@ -180,11 +186,20 @@ private fun AccountDetailsContent(
             item {
                 SurferBalanceChartCard(
                     title = stringResource(Res.string.account_details_chart_title),
-                    delta = stringResource(Res.string.account_details_change_this_month),
+                    delta = state.chart.formattedDelta,
+                    deltaColor = if (state.chart.isDeltaNegative) {
+                        AppTheme.materialColors.error
+                    } else {
+                        AppTheme.semanticColors.income
+                    },
+                    points = state.chart.points,
                     modifier = Modifier
                         .padding(horizontal = AppTheme.spacing.default)
                         .padding(bottom = AppTheme.spacing.medium),
                 )
+            }
+            if (state.extraDetails.isNotEmpty()) {
+                item { ExtraDetailsSection(details = state.extraDetails) }
             }
             item {
                 FilterChips(
@@ -283,6 +298,45 @@ private fun QuickStats(state: AccountDetailsState.Content) {
     }
 }
 
+/**
+ * The "Extra details" the creation screen collected. Read-only here — editing them means opening
+ * the edit form, which is the same screen that defined them.
+ */
+@Composable
+private fun ExtraDetailsSection(details: List<AccountExtraDetail>) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = AppTheme.spacing.large)
+            .padding(bottom = AppTheme.spacing.medium),
+        verticalArrangement = Arrangement.spacedBy(AppTheme.spacing.medium),
+    ) {
+        Text(
+            text = stringResource(Res.string.account_details_extra_details_section),
+            style = AppTheme.typography.labelLarge,
+            color = AppTheme.materialColors.onSurfaceVariant,
+        )
+        details.forEach { detail ->
+            Column(verticalArrangement = Arrangement.spacedBy(AppTheme.spacing.xSmall)) {
+                Text(
+                    text = extraDetailLabel(detail.key),
+                    style = AppTheme.typography.labelMedium,
+                    color = AppTheme.materialColors.onSurfaceVariant,
+                )
+                Text(
+                    text = detail.value,
+                    style = if (isMonospaceExtraDetail(detail.key)) {
+                        AppTheme.typography.bodyMedium.copy(fontFamily = FontFamily.Monospace)
+                    } else {
+                        AppTheme.typography.bodyMedium
+                    },
+                    color = AppTheme.materialColors.onSurface,
+                )
+            }
+        }
+    }
+}
+
 @Composable
 private fun FilterChips(
     selected: TransactionFilter,
@@ -305,6 +359,13 @@ private fun FilterChips(
     )
 }
 
+/** A month of plausible balances so the preview draws the same shape the real series does. */
+private val PreviewChartPoints: List<Pair<Float, Float>> = listOf(
+    2068f, 2042f, 2110f, 2095f, 2180f, 2164f, 2140f, 2210f, 2196f, 2255f,
+    2231f, 2288f, 2262f, 2240f, 2310f, 2295f, 2352f, 2330f, 2308f, 2374f,
+    2360f, 2412f, 2390f, 2368f, 2430f, 2415f, 2462f, 2441f, 2470f, 2480f,
+).mapIndexed { index, balance -> index.toFloat() to balance }
+
 @Preview
 @Composable
 private fun AccountDetailsScreenPreview() {
@@ -314,9 +375,14 @@ private fun AccountDetailsScreenPreview() {
                 accountId = AccountId("preview-acc-1"),
                 name = "Everyday",
                 formattedBalance = "€2,480.32",
-                currency = "EUR",
+                type = AccountType.BANK,
                 formattedIncome = "€3,200.00",
                 formattedExpenses = "€1,148.49",
+                chart = AccountBalanceChartUi(
+                    points = PreviewChartPoints,
+                    formattedDelta = "+€412.00",
+                    isDeltaNegative = false,
+                ),
                 transactions = listOf(
                     AccountTransactionUi(
                         id = TransactionId("preview-tx-1"),
@@ -341,6 +407,13 @@ private fun AccountDetailsScreenPreview() {
                     ),
                 ),
                 filter = TransactionFilter.All,
+                extraDetails = listOf(
+                    AccountExtraDetail(
+                        key = AccountExtraDetailKey.IBAN.name,
+                        value = "PL61 1090 1014 0000 0712 1981 2874",
+                    ),
+                    AccountExtraDetail(key = "Broker code", value = "MS-4417"),
+                ),
             ),
             onEvent = {},
         )

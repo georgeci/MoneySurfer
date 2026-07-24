@@ -99,12 +99,19 @@ sealed interface Route : NavKey {
     data class CategoryChooser(
         val selectedCategoryId: String? = null,
         val filterType: String? = null,
+        /**
+         * Name of a `CategoryPickerVariant` — which of the two picker layouts to open. Null
+         * takes the feature's default rather than binding navigation to the enum.
+         */
+        val variant: String? = null,
     ) : Route
 
     @Serializable
     data class AccountChooser(
         val selectedAccountId: String? = null,
         val excludeAccountId: String? = null,
+        /** Offer the "Transfer between accounts instead" footer — only for a single-account pick. */
+        val showTransferShortcut: Boolean = false,
     ) : Route
 
     @Serializable
