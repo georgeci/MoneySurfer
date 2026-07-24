@@ -1,21 +1,9 @@
 package com.georgeci.moneysurfer.feature.category.manage
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import com.georgeci.moneysurfer.uikit.components.SurferConfirmDialog
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
-import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import moneysurfer.feature.category.generated.resources.Res
 import moneysurfer.feature.category.generated.resources.categories_manage_delete_cancel
@@ -37,54 +25,20 @@ fun DeleteCategoryDialog(
     onDismiss: () -> Unit,
     childCount: Int = 0,
 ) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        icon = {
-            Icon(
-                imageVector = SurferIcons.Delete,
-                contentDescription = SurferSemantics.Decorative,
-                tint = AppTheme.materialColors.error,
-            )
+    SurferConfirmDialog(
+        title = stringResource(Res.string.categories_manage_delete_title),
+        message = stringResource(Res.string.categories_manage_delete_message, categoryName),
+        detail = if (childCount > 0) {
+            stringResource(Res.string.categories_manage_delete_children, childCount)
+        } else {
+            null
         },
-        title = {
-            Text(
-                text = stringResource(Res.string.categories_manage_delete_title),
-                textAlign = TextAlign.Center,
-            )
-        },
-        text = {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    text = stringResource(Res.string.categories_manage_delete_message, categoryName),
-                    textAlign = TextAlign.Center,
-                )
-                if (childCount > 0) {
-                    Spacer(Modifier.height(AppTheme.spacing.small))
-                    Text(
-                        text = stringResource(Res.string.categories_manage_delete_children, childCount),
-                        style = AppTheme.typography.bodySmall,
-                        color = AppTheme.materialColors.onSurfaceVariant,
-                        textAlign = TextAlign.Center,
-                    )
-                }
-            }
-        },
-        confirmButton = {
-            Button(
-                onClick = onConfirm,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = AppTheme.materialColors.error,
-                    contentColor = AppTheme.materialColors.onError,
-                ),
-            ) {
-                Text(stringResource(Res.string.categories_manage_delete_confirm))
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text(stringResource(Res.string.categories_manage_delete_cancel))
-            }
-        },
+        confirmLabel = stringResource(Res.string.categories_manage_delete_confirm),
+        cancelLabel = stringResource(Res.string.categories_manage_delete_cancel),
+        icon = SurferIcons.Delete,
+        destructive = true,
+        onConfirm = onConfirm,
+        onDismiss = onDismiss,
     )
 }
 
