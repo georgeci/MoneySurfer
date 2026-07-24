@@ -33,5 +33,5 @@ data class AccountEntity(
      * a child table because the entries have no identity of their own: nothing queries, renames
      * or counts them across accounts, and they are written and read as one blob with the account.
      */
-    @ColumnInfo(name = "extraDetails", defaultValue = "[]") val extraDetails: String = "[]",
+    @ColumnInfo(name = "extraDetails", defaultValue = "'[]'") val extraDetails: String = "[]",
 )

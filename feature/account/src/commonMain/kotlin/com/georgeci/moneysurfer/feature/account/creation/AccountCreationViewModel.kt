@@ -284,9 +284,14 @@ sealed interface AccountCreationState {
          *  so a pristine screen doesn't open covered in red. */
         val nameTouched: Boolean = false,
     ) : AccountCreationState {
+        /**
+         * Well-known keys still offered as chips. Matched case-insensitively, the same way
+         * [addExtraField] rejects duplicates — otherwise a custom field named "iban" would leave
+         * the IBAN chip on screen as a control that silently does nothing when tapped.
+         */
         val availableExtraFieldKeys: List<AccountExtraDetailKey>
             get() = AccountExtraDetailKey.entries.filter { key ->
-                extraFields.none { it.key == key.name }
+                extraFields.none { it.key.equals(key.name, ignoreCase = true) }
             }
 
         /** Whether another row still fits — gates both the chips and the "Custom field…" action. */

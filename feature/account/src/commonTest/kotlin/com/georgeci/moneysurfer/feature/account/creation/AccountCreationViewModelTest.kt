@@ -247,6 +247,24 @@ class AccountCreationViewModelTest : StringSpec({
         }
     }
 
+    "a custom field shadowing a well-known key withdraws that key's chip" {
+        runTest {
+            val vm = Fixture(workspaceId = ws).createViewModel()
+            try {
+                vm.awaitCurrencies()
+
+                // The chip and the add-guard have to agree: leaving IBAN on offer here would
+                // render a control that silently does nothing, since addExtraField rejects it.
+                vm.onEvent(AccountCreationEvent.OnAddCustomExtraField("iban"))
+
+                (vm.value as AccountCreationState.Content)
+                    .availableExtraFieldKeys shouldNotContain AccountExtraDetailKey.IBAN
+            } finally {
+                vm.viewModelScope.cancel()
+            }
+        }
+    }
+
     "removing a row drops it and offers its chip again" {
         runTest {
             val vm = Fixture(workspaceId = ws).createViewModel()
