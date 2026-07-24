@@ -1,11 +1,15 @@
 package com.georgeci.moneysurfer.uikit.theme
 
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import com.georgeci.moneysurfer.uikit.tokens.AppColors
 
-@Immutable
+/**
+ * Deliberately not `@Immutable`: [categoryTints] is a plain [List], so the deep-immutability
+ * contract that annotation promises cannot be enforced at the type level. Nothing needs it —
+ * this travels through [LocalSemanticColors], a *static* composition local that does not track
+ * reads, and is never passed as a composable parameter.
+ */
 data class SemanticColors(
     val income: Color = AppColors.Income,
     val expense: Color = AppColors.Expense,
