@@ -131,7 +131,10 @@ private fun ColorScheme.assertPillContrast(semantic: SemanticColors) {
 
 private fun assertContrast(foreground: Color, background: Color, minimum: Double, label: String) {
     val ratio = contrastRatio(foreground, background)
-    withClue("$label — ${foreground.hex()} on ${background.hex()} needs $minimum:1") {
+    withClue(
+        "$label — ${foreground.hex()} on ${background.hex()} is " +
+            "${"%.2f".format(ratio)}:1, needs $minimum:1",
+    ) {
         ratio shouldBeGreaterThanOrEqual minimum
     }
 }

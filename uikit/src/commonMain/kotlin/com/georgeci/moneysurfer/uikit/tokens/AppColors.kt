@@ -55,9 +55,9 @@ object AppColors {
     //
     // These are *text* colours (amounts, type pills), so each one holds ≥4.5:1 against
     // every surface it can land on — down to `surfaceContainerHighest`, and through the
-    // 14–18% self-tinted pill washes that `SurferTransactionLine` and the transaction
-    // creation `TypePill` paint behind them. That worst case is what drove the light
-    // values darker than the mockup's mid-tones; `ColorContrastTest` pins it.
+    // 14–18% self-tinted pill washes mixed in `SurferRecentTransactionsWidget` and the
+    // transaction creation `TypePill`. That worst case is what drove the light values
+    // darker than the mockup's mid-tones; `ColorContrastTest` pins it.
     val Income = Color(0xFF1C5E41)
     val Expense = Color(0xFFA3403D)
     val Transfer = Color(0xFF2E5AA8)
