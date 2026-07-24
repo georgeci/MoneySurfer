@@ -40,6 +40,7 @@ import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.utils.HandleSideEffect
 import kotlinx.datetime.Month
 import kotlinx.datetime.YearMonth
+import kotlinx.datetime.number
 import moneysurfer.feature.category.generated.resources.Res
 import moneysurfer.feature.category.generated.resources.category_details_edit_content_description
 import moneysurfer.feature.category.generated.resources.category_details_hero_label_expense
@@ -59,18 +60,8 @@ import moneysurfer.feature.category.generated.resources.category_details_subcate
 import moneysurfer.feature.category.generated.resources.category_details_title
 import moneysurfer.feature.category.generated.resources.category_details_transaction_untitled
 import moneysurfer.feature.category.generated.resources.category_details_trend_title
-import moneysurfer.feature.category.generated.resources.month_short_april
-import moneysurfer.feature.category.generated.resources.month_short_august
-import moneysurfer.feature.category.generated.resources.month_short_december
-import moneysurfer.feature.category.generated.resources.month_short_february
-import moneysurfer.feature.category.generated.resources.month_short_january
-import moneysurfer.feature.category.generated.resources.month_short_july
-import moneysurfer.feature.category.generated.resources.month_short_june
-import moneysurfer.feature.category.generated.resources.month_short_march
-import moneysurfer.feature.category.generated.resources.month_short_may
-import moneysurfer.feature.category.generated.resources.month_short_november
-import moneysurfer.feature.category.generated.resources.month_short_october
-import moneysurfer.feature.category.generated.resources.month_short_september
+import moneysurfer.feature.category.generated.resources.month_short
+import org.jetbrains.compose.resources.stringArrayResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -362,23 +353,16 @@ private fun heroLabelFor(type: CategoryType) = when (type) {
     CategoryType.EXPENSE -> Res.string.category_details_hero_label_expense
 }
 
+/**
+ * Short month name from the feature's own `month_short` array.
+ *
+ * Deliberately not shared with the identical-looking array in `feature/account`: this one labels
+ * a chart axis and takes the nominative ("март"), while the account list reads "archived <month>
+ * <year>" and needs the genitive ("марта"). Same English strings, different Russian ones.
+ */
 @Composable
-private fun monthShortLabel(month: Month): String = stringResource(
-    when (month) {
-        Month.JANUARY -> Res.string.month_short_january
-        Month.FEBRUARY -> Res.string.month_short_february
-        Month.MARCH -> Res.string.month_short_march
-        Month.APRIL -> Res.string.month_short_april
-        Month.MAY -> Res.string.month_short_may
-        Month.JUNE -> Res.string.month_short_june
-        Month.JULY -> Res.string.month_short_july
-        Month.AUGUST -> Res.string.month_short_august
-        Month.SEPTEMBER -> Res.string.month_short_september
-        Month.OCTOBER -> Res.string.month_short_october
-        Month.NOVEMBER -> Res.string.month_short_november
-        Month.DECEMBER -> Res.string.month_short_december
-    },
-)
+private fun monthShortLabel(month: Month): String =
+    stringArrayResource(Res.array.month_short)[month.number - 1]
 
 private const val PercentScale = 100
 
