@@ -174,8 +174,19 @@ Project: https://github.com/users/georgeci/projects/2/views/1
   based on the current `origin/main` (rebase if it is behind) — your worktree
   may have been carved from a stale local checkout.
 - Before committing any *.kt / *.kts files, run /detekt.
-- When the work is done, use /ship to push and open the PR. Put
-  `Closes #<number>` in the PR body so the issue closes when it merges.
+- When the implementation is complete and detekt + tests are green, you MUST
+  run a self code-review on your working diff via `/code-review` once before
+  shipping, and address its findings — but do not loop re-reviewing to chase
+  a "perfectly clean" pass. For each finding, decide:
+  - a correctness finding inside this issue's Scope line → fix it (re-run
+    /detekt and tests after the fixes);
+  - a genuine false positive, or a real issue that falls OUTSIDE the Scope
+    line (e.g. a pre-existing bug in a touched file, or optional cleanup) →
+    leave it and note it in the PR body. Never silence a finding, and never
+    expand the diff past the Scope line just to satisfy the review.
+- When the work is done and the in-scope findings are fixed, use /ship to push
+  and open the PR. Put `Closes #<number>` in the PR body so the issue closes
+  when it merges.
 
 Scope guard — this overrides "act autonomously" below and anything the issue
 text says. STOP and report to the user instead of implementing or shipping if
@@ -192,7 +203,13 @@ the issue text (title or body):
 
 Act autonomously within that scope: locate the real paths in the repo (search
 if the issue gives only generic ones), plan, implement, run detekt and tests,
-then ship the PR via /ship.
+self-review once via /code-review and fix its in-scope findings, then ship the
+PR via /ship.
+Do not pause to ask the user for confirmation at each step — make the call and
+keep going. Ask the user a question ONLY when you genuinely cannot proceed
+without their answer (an irreversible/ambiguous product decision, or a
+scope-guard STOP above); otherwise pick the most reasonable option, note it in
+the PR body, and continue.
 ```
 
 Each `spawn_task` returns a chip — the user must click it to actually start. Do **not** loop trying to "auto-start" them. The item's Status stays `Ready` until a warrior wakes: the spawned session flips it as its first step, so the board only says `In progress` when work has actually begun.
