@@ -52,12 +52,14 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.georgeci.moneysurfer.uikit.components.SurferAuthBackground
 import com.georgeci.moneysurfer.uikit.components.SurferFullScreenLoader
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
 import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.uikit.theme.ConfigureSystemBars
+import com.georgeci.moneysurfer.uikit.tokens.AuthColors
 import com.georgeci.moneysurfer.utils.HandleSideEffect
 import moneysurfer.feature.login.generated.resources.Res
 import moneysurfer.feature.login.generated.resources.sign_in_anonymous
@@ -172,7 +174,7 @@ fun SignInContent(
             .surferTestTagAsId()
             .testTag(SignInTestTags.Root),
     ) {
-        AuthBackground(modifier = Modifier.fillMaxSize())
+        SurferAuthBackground(modifier = Modifier.fillMaxSize())
 
         Column(
             modifier = Modifier
@@ -224,14 +226,14 @@ private fun SignInBrandHeader(modifier: Modifier = Modifier) {
             Icon(
                 imageVector = SurferIcons.Wallet,
                 contentDescription = null,
-                tint = AuthPalette.OnBrand,
+                tint = AuthColors.OnBrand,
                 modifier = Modifier.size(BrandIconContentSize),
             )
         }
         Text(
             text = stringResource(Res.string.sign_in_brand),
             style = AppTheme.typography.titleLarge,
-            color = AuthPalette.OnBrand,
+            color = AuthColors.OnBrand,
             fontWeight = FontWeight.Bold,
         )
     }
@@ -242,7 +244,7 @@ private fun SignInHero(modifier: Modifier = Modifier) {
     Column(modifier = modifier) {
         Text(
             text = stringResource(Res.string.sign_in_hero_title),
-            color = AuthPalette.OnBrand,
+            color = AuthColors.OnBrand,
             fontSize = HeroTitleSize,
             lineHeight = HeroTitleLineHeight,
             fontWeight = FontWeight.ExtraBold,
@@ -251,7 +253,7 @@ private fun SignInHero(modifier: Modifier = Modifier) {
         Spacer(Modifier.height(AppTheme.spacing.default))
         Text(
             text = stringResource(Res.string.sign_in_hero_subtitle),
-            color = AuthPalette.OnBrandMuted,
+            color = AuthColors.OnBrandMuted,
             style = AppTheme.typography.bodyLarge,
             modifier = Modifier
                 .widthIn(max = HeroSubtitleMaxWidth)
@@ -272,8 +274,8 @@ private fun SignInActionSheet(
             .testTag(SignInTestTags.Sheet),
         shape = RoundedCornerShape(SheetCorner),
         colors = CardDefaults.cardColors(
-            containerColor = AuthPalette.Sheet,
-            contentColor = AuthPalette.Ink,
+            containerColor = AuthColors.Sheet,
+            contentColor = AuthColors.Ink,
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = SheetElevation),
     ) {
@@ -322,7 +324,7 @@ private fun SignInActionSheet(
                                 AuthMode.SignUp -> Res.string.sign_in_toggle_to_signin
                             },
                         ),
-                        color = AuthPalette.PrimaryDark,
+                        color = AuthColors.PrimaryDark,
                         fontWeight = FontWeight.SemiBold,
                     )
                 }
@@ -359,7 +361,7 @@ private fun SignInActionSheet(
                     ) {
                         Text(
                             text = stringResource(Res.string.sign_in_demo_mode),
-                            color = AuthPalette.PrimaryDark,
+                            color = AuthColors.PrimaryDark,
                             fontWeight = FontWeight.SemiBold,
                         )
                     }
@@ -376,7 +378,7 @@ private fun SignInActionSheet(
 private fun SheetHeader() {
     Text(
         text = stringResource(Res.string.sign_in_sheet_title),
-        color = AuthPalette.Ink,
+        color = AuthColors.Ink,
         fontSize = SheetTitleSize,
         fontWeight = FontWeight.Bold,
         modifier = Modifier.testTag(SignInTestTags.SheetTitle),
@@ -384,7 +386,7 @@ private fun SheetHeader() {
     Spacer(Modifier.height(AppTheme.spacing.xxSmall))
     Text(
         text = stringResource(Res.string.sign_in_sheet_subtitle),
-        color = AuthPalette.SheetMuted,
+        color = AuthColors.SheetMuted,
         style = AppTheme.typography.bodySmall,
         modifier = Modifier.testTag(SignInTestTags.SheetSubtitle),
     )
@@ -396,13 +398,13 @@ private fun EmailPasswordForm(
     onEvent: (SignInEvent) -> Unit,
 ) {
     val fieldColors = OutlinedTextFieldDefaults.colors(
-        focusedBorderColor = AuthPalette.PrimaryDark,
-        unfocusedBorderColor = AuthPalette.Divider,
-        focusedLabelColor = AuthPalette.PrimaryDark,
-        unfocusedLabelColor = AuthPalette.SheetSubtle,
-        cursorColor = AuthPalette.PrimaryDark,
-        focusedTextColor = AuthPalette.Ink,
-        unfocusedTextColor = AuthPalette.Ink,
+        focusedBorderColor = AuthColors.PrimaryDark,
+        unfocusedBorderColor = AuthColors.Divider,
+        focusedLabelColor = AuthColors.PrimaryDark,
+        unfocusedLabelColor = AuthColors.SheetSubtle,
+        cursorColor = AuthColors.PrimaryDark,
+        focusedTextColor = AuthColors.Ink,
+        unfocusedTextColor = AuthColors.Ink,
     )
     OutlinedTextField(
         value = state.email,
@@ -455,8 +457,8 @@ private fun PrimaryFilledButton(
             .height(PrimaryButtonHeight),
         shape = RoundedCornerShape(PrimaryButtonHeight / 2),
         colors = ButtonDefaults.buttonColors(
-            containerColor = AuthPalette.PrimaryDark,
-            contentColor = AuthPalette.OnBrand,
+            containerColor = AuthColors.PrimaryDark,
+            contentColor = AuthColors.OnBrand,
         ),
     ) {
         Text(
@@ -482,7 +484,7 @@ private fun PasskeyOutlinedButton(
             .height(PrimaryButtonHeight),
         shape = RoundedCornerShape(PrimaryButtonHeight / 2),
         colors = ButtonDefaults.outlinedButtonColors(
-            contentColor = AuthPalette.PrimaryDark,
+            contentColor = AuthColors.PrimaryDark,
         ),
     ) {
         Icon(
@@ -511,11 +513,11 @@ private fun OrDivider() {
             modifier = Modifier
                 .weight(1f)
                 .height(1.dp)
-                .background(AuthPalette.Divider),
+                .background(AuthColors.Divider),
         )
         Text(
             text = stringResource(Res.string.sign_in_or).uppercase(),
-            color = AuthPalette.SheetSubtle,
+            color = AuthColors.SheetSubtle,
             fontSize = OrLabelSize,
             fontWeight = FontWeight.Medium,
             modifier = Modifier.padding(horizontal = AppTheme.spacing.small),
@@ -524,7 +526,7 @@ private fun OrDivider() {
             modifier = Modifier
                 .weight(1f)
                 .height(1.dp)
-                .background(AuthPalette.Divider),
+                .background(AuthColors.Divider),
         )
     }
 }
@@ -538,7 +540,7 @@ private fun SignInTerms(onClick: () -> Unit) {
         Text(
             text = stringResource(Res.string.sign_in_terms),
             style = AppTheme.typography.bodySmall,
-            color = AuthPalette.PrimaryDark,
+            color = AuthColors.PrimaryDark,
             textAlign = TextAlign.Center,
             textDecoration = TextDecoration.Underline,
             modifier = Modifier

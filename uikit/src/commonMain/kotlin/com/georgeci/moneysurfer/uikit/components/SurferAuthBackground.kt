@@ -1,4 +1,4 @@
-package com.georgeci.moneysurfer.feature.login
+package com.georgeci.moneysurfer.uikit.components
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -9,36 +9,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-
-/**
- * Fixed brand palette shared by the pre-auth screens (onboarding + sign-in). These screens stay
- * MoneySurfer green regardless of the user's accent seed — the theme picker only starts applying
- * once they're inside the app.
- */
-internal object AuthPalette {
-    val GreenTop = Color(0xFF7ED321)
-    val GreenBottom = Color(0xFF5FB011)
-    val Ink = Color(0xFF0F2E12)
-    val OnBrand = Color(0xFFFFFFFF)
-    val OnBrandMuted = Color(0xE6FFFFFF)
-    val OnBrandSubtle = Color(0xCCFFFFFF)
-    val Sheet = Color(0xFFFFFFFF)
-    val SheetMuted = Color(0xFF445844)
-    val SheetSubtle = Color(0xFF7A8C7B)
-    val Divider = Color(0xFFD6E4D7)
-    val PrimaryDark = Color(0xFF1B5E20)
-    val GreenSoft = Color(0xFFE8F3E9)
-    val Mint = Color(0xFF2E9A6A)
-    val BrandTile = Color(0x29FFFFFF)
-    val ProgressRest = Color(0x47FFFFFF)
-    val WaveBack = Color(0xFF1B5E20)
-    val WaveMid = Color(0xFF2E7D32)
-    val WaveFront = Color(0xFF2E9A3E)
-}
+import com.georgeci.moneysurfer.uikit.tokens.AuthColors
 
 private val WaveBandHeight: Dp = 220.dp
 
@@ -87,16 +61,16 @@ private const val FrontGradientStartY: Float = 0.74f
 private const val FrontGradientAlpha: Float = 0.55f
 
 /**
- * The green gradient + wave band behind every pre-auth screen. Draw it edge to edge (outside of
- * [com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets]) so it tints the status bar and the
- * navigation bar / gesture ribbon as well.
+ * The green gradient + wave band behind every pre-auth screen (onboarding + sign-in). Draw it edge
+ * to edge (outside of [com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets]) so it tints the
+ * status bar and the navigation bar / gesture ribbon as well.
  */
 @Composable
-internal fun AuthBackground(modifier: Modifier = Modifier) {
+fun SurferAuthBackground(modifier: Modifier = Modifier) {
     Box(
         modifier = modifier.background(
             Brush.verticalGradient(
-                colors = listOf(AuthPalette.GreenTop, AuthPalette.GreenBottom),
+                colors = listOf(AuthColors.GreenTop, AuthColors.GreenBottom),
             ),
         ),
     ) {
@@ -145,12 +119,12 @@ private fun WaveDecoration(modifier: Modifier = Modifier) {
 
         drawPath(
             path = crestPath(BackCrest),
-            color = AuthPalette.WaveBack,
+            color = AuthColors.WaveBack,
             alpha = BackCrestAlpha,
         )
         drawPath(
             path = crestPath(MidCrest),
-            color = AuthPalette.WaveMid,
+            color = AuthColors.WaveMid,
             alpha = MidCrestAlpha,
         )
         drawPath(
@@ -178,8 +152,8 @@ private fun WaveDecoration(modifier: Modifier = Modifier) {
             },
             brush = Brush.verticalGradient(
                 colors = listOf(
-                    AuthPalette.WaveFront.copy(alpha = 0f),
-                    AuthPalette.WaveFront.copy(alpha = FrontGradientAlpha),
+                    AuthColors.WaveFront.copy(alpha = 0f),
+                    AuthColors.WaveFront.copy(alpha = FrontGradientAlpha),
                 ),
                 startY = h * FrontGradientStartY,
                 endY = h,

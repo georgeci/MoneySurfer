@@ -46,12 +46,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.georgeci.moneysurfer.domain.primitives.AccountType
-import com.georgeci.moneysurfer.feature.login.AuthBackground
-import com.georgeci.moneysurfer.feature.login.AuthPalette
+import com.georgeci.moneysurfer.uikit.components.SurferAuthBackground
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
 import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
 import com.georgeci.moneysurfer.uikit.theme.ConfigureSystemBars
+import com.georgeci.moneysurfer.uikit.tokens.AuthColors
 import com.georgeci.moneysurfer.utils.HandleSideEffect
 import moneysurfer.feature.login.generated.resources.Res
 import moneysurfer.feature.login.generated.resources.onboarding_skip
@@ -124,7 +124,7 @@ private fun OnboardingContent(
             .surferTestTagAsId()
             .testTag(OnboardingTestTags.Root),
     ) {
-        AuthBackground(modifier = Modifier.fillMaxSize())
+        SurferAuthBackground(modifier = Modifier.fillMaxSize())
 
         Column(modifier = Modifier.fillMaxSize()) {
             Column(
@@ -163,7 +163,7 @@ private fun OnboardingHeader(
     onEvent: (OnboardingEvent) -> Unit,
 ) {
     if (!state.showProgress) return
-    val muted = AuthPalette.OnBrandSubtle
+    val muted = AuthColors.OnBrandSubtle
     Column(
         modifier = Modifier.padding(start = ScreenPadding, end = ScreenPadding, top = HeaderTopPadding),
         verticalArrangement = Arrangement.spacedBy(HeaderGap),
@@ -199,7 +199,7 @@ private fun OnboardingHeader(
         Row(horizontalArrangement = Arrangement.spacedBy(ProgressGap)) {
             repeat(state.totalSteps) { index ->
                 val done = index < state.stepNumber
-                val color = if (done) AuthPalette.OnBrand else AuthPalette.ProgressRest
+                val color = if (done) AuthColors.OnBrand else AuthColors.ProgressRest
                 Box(
                     modifier = Modifier
                         .weight(1f)
@@ -221,13 +221,13 @@ private fun ValueStep(isOffline: Boolean) {
             modifier = Modifier
                 .size(BrandTileSize)
                 .clip(RoundedCornerShape(BrandTileCorner))
-                .background(AuthPalette.BrandTile),
+                .background(AuthColors.BrandTile),
             contentAlignment = Alignment.Center,
         ) {
             Icon(
                 imageVector = SurferIcons.Wallet,
                 contentDescription = null,
-                tint = AuthPalette.OnBrand,
+                tint = AuthColors.OnBrand,
                 modifier = Modifier.size(BrandIconSize),
             )
         }
@@ -236,7 +236,7 @@ private fun ValueStep(isOffline: Boolean) {
             text = stringResource(Res.string.sign_in_brand),
             fontSize = BrandLabelSize,
             fontWeight = FontWeight.Bold,
-            color = AuthPalette.OnBrand,
+            color = AuthColors.OnBrand,
         )
     }
 
@@ -247,14 +247,14 @@ private fun ValueStep(isOffline: Boolean) {
         fontSize = HeroTitleSize,
         lineHeight = HeroTitleLineHeight,
         fontWeight = FontWeight.ExtraBold,
-        color = AuthPalette.OnBrand,
+        color = AuthColors.OnBrand,
     )
     Spacer(Modifier.height(GapSmall))
     Text(
         text = stringResource(Res.string.onboarding_value_subtitle),
         fontSize = BodyLargeSize,
         lineHeight = BodyLargeLineHeight,
-        color = AuthPalette.OnBrandMuted,
+        color = AuthColors.OnBrandMuted,
         modifier = Modifier.widthIn(max = SubtitleMaxWidth),
     )
 
@@ -295,13 +295,13 @@ private fun ValueFeature(
             modifier = Modifier
                 .size(FeatureTileSize)
                 .clip(RoundedCornerShape(BrandTileCorner))
-                .background(AuthPalette.BrandTile),
+                .background(AuthColors.BrandTile),
             contentAlignment = Alignment.Center,
         ) {
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = AuthPalette.OnBrand,
+                tint = AuthColors.OnBrand,
                 modifier = Modifier.size(BrandIconSize),
             )
         }
@@ -311,13 +311,13 @@ private fun ValueFeature(
                 text = title,
                 fontSize = TitleSmallSize,
                 fontWeight = FontWeight.Bold,
-                color = AuthPalette.OnBrand,
+                color = AuthColors.OnBrand,
             )
             Text(
                 text = body,
                 fontSize = BodySmallSize,
                 lineHeight = BodySmallLineHeight,
-                color = AuthPalette.OnBrandSubtle,
+                color = AuthColors.OnBrandSubtle,
             )
         }
     }
@@ -333,14 +333,14 @@ private fun FirstAccountStep(
         text = stringResource(Res.string.onboarding_start_title),
         fontSize = HeadlineSize,
         fontWeight = FontWeight.Bold,
-        color = AuthPalette.OnBrand,
+        color = AuthColors.OnBrand,
     )
     Spacer(Modifier.height(GapXSmall))
     Text(
         text = stringResource(Res.string.onboarding_start_subtitle),
         fontSize = BodyMediumSize,
         lineHeight = BodyLargeLineHeight,
-        color = AuthPalette.OnBrandMuted,
+        color = AuthColors.OnBrandMuted,
     )
     Spacer(Modifier.height(GapLarge))
 
@@ -361,12 +361,12 @@ private fun AccountKindCard(
     selected: Boolean,
     onClick: () -> Unit,
 ) {
-    val borderColor = if (selected) AuthPalette.PrimaryDark else AuthPalette.Divider
+    val borderColor = if (selected) AuthColors.PrimaryDark else AuthColors.Divider
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(CardCorner))
-            .background(if (selected) AuthPalette.GreenSoft else AuthPalette.Sheet)
+            .background(if (selected) AuthColors.GreenSoft else AuthColors.Sheet)
             .border(CardBorder, borderColor, RoundedCornerShape(CardCorner))
             .clickable(role = Role.RadioButton, onClick = onClick)
             .padding(CardPadding)
@@ -378,13 +378,13 @@ private fun AccountKindCard(
             modifier = Modifier
                 .size(KindTileSize)
                 .clip(RoundedCornerShape(KindTileCorner))
-                .background(if (selected) AuthPalette.PrimaryDark else AuthPalette.GreenSoft),
+                .background(if (selected) AuthColors.PrimaryDark else AuthColors.GreenSoft),
             contentAlignment = Alignment.Center,
         ) {
             Icon(
                 imageVector = kind.icon(),
                 contentDescription = null,
-                tint = if (selected) AuthPalette.OnBrand else AuthPalette.PrimaryDark,
+                tint = if (selected) AuthColors.OnBrand else AuthColors.PrimaryDark,
                 modifier = Modifier.size(KindIconSize),
             )
         }
@@ -395,7 +395,7 @@ private fun AccountKindCard(
                     text = stringResource(kind.titleRes()),
                     fontSize = TitleMediumSize,
                     fontWeight = FontWeight.Bold,
-                    color = AuthPalette.Ink,
+                    color = AuthColors.Ink,
                 )
                 if (kind.recommended) {
                     Spacer(Modifier.size(GapXSmall))
@@ -406,7 +406,7 @@ private fun AccountKindCard(
                 text = stringResource(kind.bodyRes()),
                 fontSize = BodySmallSize,
                 lineHeight = BodySmallLineHeight,
-                color = AuthPalette.SheetMuted,
+                color = AuthColors.SheetMuted,
             )
         }
         Spacer(Modifier.size(GapXSmall))
@@ -414,7 +414,7 @@ private fun AccountKindCard(
             modifier = Modifier
                 .size(RadioSize)
                 .clip(CircleShape)
-                .background(if (selected) AuthPalette.PrimaryDark else Color.Transparent)
+                .background(if (selected) AuthColors.PrimaryDark else Color.Transparent)
                 .border(CardBorder, borderColor, CircleShape),
             contentAlignment = Alignment.Center,
         ) {
@@ -422,7 +422,7 @@ private fun AccountKindCard(
                 Icon(
                     imageVector = SurferIcons.Check,
                     contentDescription = null,
-                    tint = AuthPalette.OnBrand,
+                    tint = AuthColors.OnBrand,
                     modifier = Modifier.size(RadioIconSize),
                 )
             }
@@ -435,15 +435,15 @@ private fun RecommendedBadge() {
     Box(
         modifier = Modifier
             .clip(CircleShape)
-            .background(AuthPalette.Sheet)
-            .border(BadgeBorder, AuthPalette.Mint.copy(alpha = BadgeBorderAlpha), CircleShape)
+            .background(AuthColors.Sheet)
+            .border(BadgeBorder, AuthColors.Mint.copy(alpha = BadgeBorderAlpha), CircleShape)
             .padding(horizontal = BadgePaddingHorizontal, vertical = BadgePaddingVertical),
     ) {
         Text(
             text = stringResource(Res.string.onboarding_start_recommended),
             fontSize = BadgeLabelSize,
             fontWeight = FontWeight.Bold,
-            color = AuthPalette.Mint,
+            color = AuthColors.Mint,
         )
     }
 }
@@ -455,7 +455,8 @@ private fun OnboardingCta(
     onEvent: (OnboardingEvent) -> Unit,
 ) {
     Surface(
-        color = AuthPalette.Sheet,
+        modifier = Modifier.fillMaxWidth(),
+        color = AuthColors.Sheet,
         shape = RoundedCornerShape(topStart = SheetCorner, topEnd = SheetCorner),
     ) {
         Column(
@@ -483,8 +484,8 @@ private fun OnboardingCta(
                     .testTag(OnboardingTestTags.Continue),
                 shape = RoundedCornerShape(CtaHeight / 2),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = AuthPalette.PrimaryDark,
-                    contentColor = AuthPalette.OnBrand,
+                    containerColor = AuthColors.PrimaryDark,
+                    contentColor = AuthColors.OnBrand,
                 ),
             ) {
                 Text(
@@ -510,7 +511,7 @@ private fun OnboardingCta(
                     ),
                     fontSize = BodySmallSize,
                     lineHeight = BodySmallLineHeight,
-                    color = AuthPalette.SheetMuted,
+                    color = AuthColors.SheetMuted,
                     textAlign = TextAlign.Center,
                 )
             }

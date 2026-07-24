@@ -7,6 +7,9 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
+/** Deep enough for any real `ContextWrapper` chain; a cycle would otherwise spin forever. */
+private const val MaxContextUnwrapDepth = 20
+
 @Composable
 actual fun ConfigureSystemBars(
     darkStatusBarBackground: Boolean,
@@ -17,9 +20,12 @@ actual fun ConfigureSystemBars(
     DisposableEffect(view, darkStatusBarBackground, darkNavigationBarBackground) {
         // `LocalView.current.context` is usually a `ContextThemeWrapper` around the activity, so
         // unwrap it rather than casting — a failed cast would silently leave the bars untouched.
+        // The depth is bounded so a wrapper that returns itself as `baseContext` can't hang.
         var context = view.context
-        while (context is ContextWrapper && context !is Activity) {
+        var depth = 0
+        while (context is ContextWrapper && context !is Activity && depth < MaxContextUnwrapDepth) {
             context = context.baseContext
+            depth++
         }
         val window = (context as? Activity)?.window ?: return@DisposableEffect onDispose {}
         val controller = WindowCompat.getInsetsController(window, view)
