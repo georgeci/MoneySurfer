@@ -1,6 +1,8 @@
 package com.georgeci.moneysurfer.feature.category.manage
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -20,6 +22,7 @@ import com.georgeci.moneysurfer.domain.primitives.CategoryId
 import com.georgeci.moneysurfer.domain.primitives.CategoryType
 import com.georgeci.moneysurfer.uikit.components.SurferCategoryPalette
 import com.georgeci.moneysurfer.uikit.components.SurferEmptyState
+import com.georgeci.moneysurfer.uikit.components.SurferSkeletonRow
 import com.georgeci.moneysurfer.uikit.components.base.SurferAddFab
 import com.georgeci.moneysurfer.uikit.components.base.SurferSwipeAction
 import com.georgeci.moneysurfer.uikit.components.base.SurferSwipeRevealRow
@@ -85,9 +88,21 @@ private fun CategoriesManageLoading(onEvent: (CategoriesManageEvent) -> Unit) {
             )
         },
     ) { padding ->
-        Box(modifier = Modifier.fillMaxSize().padding(padding))
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .padding(horizontal = AppTheme.spacing.default, vertical = AppTheme.spacing.medium),
+            verticalArrangement = Arrangement.spacedBy(AppTheme.spacing.medium),
+        ) {
+            repeat(SKELETON_ROWS) {
+                SurferSkeletonRow()
+            }
+        }
     }
 }
+
+private const val SKELETON_ROWS = 5
 
 @Composable
 private fun CategoriesManageContent(

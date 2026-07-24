@@ -16,12 +16,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.georgeci.moneysurfer.domain.primitives.AccountId
-import com.georgeci.moneysurfer.domain.primitives.AccountType
 import com.georgeci.moneysurfer.feature.account.generated.resources.Res
 import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_manage_active_header
 import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_manage_add_account
@@ -41,6 +39,7 @@ import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_man
 import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_manage_stat_total
 import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_manage_title
 import com.georgeci.moneysurfer.feature.account.generated.resources.month_short
+import com.georgeci.moneysurfer.feature.account.icon
 import com.georgeci.moneysurfer.feature.account.labelRes
 import com.georgeci.moneysurfer.uikit.components.SurferEmptyState
 import com.georgeci.moneysurfer.uikit.components.SurferSkeletonRow
@@ -341,13 +340,6 @@ private fun archivedSubtitle(account: AccountManageUi): String {
         archivedOn.year.toString(),
     )
     return "$typeLabel · $archivedLabel"
-}
-
-private fun AccountType.icon(): ImageVector = when (this) {
-    AccountType.CASH -> SurferIcons.Cash
-    AccountType.BANK -> SurferIcons.Bank
-    AccountType.CARD -> SurferIcons.CreditCard
-    AccountType.SAVINGS -> SurferIcons.Savings
 }
 
 @Preview

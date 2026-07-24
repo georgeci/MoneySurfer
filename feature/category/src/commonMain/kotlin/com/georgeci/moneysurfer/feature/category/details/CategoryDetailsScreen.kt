@@ -2,6 +2,7 @@ package com.georgeci.moneysurfer.feature.category.details
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,6 +23,7 @@ import com.georgeci.moneysurfer.domain.primitives.CategoryType
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.uikit.components.SurferCategoryPalette
 import com.georgeci.moneysurfer.uikit.components.SurferDetailPlaceholder
+import com.georgeci.moneysurfer.uikit.components.SurferSkeletonRow
 import com.georgeci.moneysurfer.uikit.components.account.SurferAccountStatCard
 import com.georgeci.moneysurfer.uikit.components.base.SurferAddFab
 import com.georgeci.moneysurfer.uikit.components.base.SurferSectionHeader
@@ -130,15 +132,32 @@ private fun CategoryDetailsPlaceholder(
             )
         },
     ) { padding ->
-        Box(modifier = Modifier.fillMaxSize().padding(padding)) {
-            // Loading passes no message: an empty frame under the toolbar reads as "still
-            // arriving", where a placeholder would claim the category is gone.
-            if (message != null) {
+        // Loading passes no message and gets skeleton rows; a placeholder there would claim the
+        // category is gone when it is merely still arriving.
+        if (message == null) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+                    .padding(
+                        horizontal = AppTheme.spacing.default,
+                        vertical = AppTheme.spacing.medium,
+                    ),
+                verticalArrangement = Arrangement.spacedBy(AppTheme.spacing.medium),
+            ) {
+                repeat(SKELETON_ROWS) {
+                    SurferSkeletonRow()
+                }
+            }
+        } else {
+            Box(modifier = Modifier.fillMaxSize().padding(padding)) {
                 SurferDetailPlaceholder(text = message)
             }
         }
     }
 }
+
+private const val SKELETON_ROWS = 5
 
 @Composable
 private fun CategoryDetailsContent(
