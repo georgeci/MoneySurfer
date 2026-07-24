@@ -19,6 +19,7 @@ kotlin {
             dependencies {
                 implementation(libs.kotlin.stdlib)
                 implementation(libs.kotlinx.coroutinesCore)
+                implementation(libs.kermit)
                 implementation(libs.compose.runtime)
                 implementation(libs.compose.foundation)
                 implementation(libs.androidx.lifecycle.viewmodelCompose)
@@ -31,6 +32,8 @@ kotlin {
                 implementation(libs.kotlin.test)
                 implementation(libs.kotest.framework.engine)
                 implementation(libs.kotest.assertions.core)
+                implementation(libs.turbine)
+                implementation(libs.kotlinx.coroutines.test)
             }
         }
 

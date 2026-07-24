@@ -3,6 +3,8 @@
     <string name="uikit_brand">MoneySurfer</string>
     <string name="uikit_close">Close</string>
     <string name="uikit_done">Done</string>
+    <string name="uikit_error_boundary_subtitle">The screen ran into an unexpected problem. Try again.</string>
+    <string name="uikit_error_boundary_title">Something went wrong</string>
     <string name="uikit_password_hide">Hide password</string>
     <string name="uikit_password_show">Show password</string>
     <string name="uikit_retry">Retry</string>

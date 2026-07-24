@@ -35,6 +35,7 @@ import com.georgeci.moneysurfer.feature.account.generated.resources.Res
 import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_manage_active_header
 import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_manage_add_account
 import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_manage_archive
+import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_manage_archived_at
 import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_manage_archived_footnote
 import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_manage_archived_header
 import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_manage_archived_hint
@@ -48,6 +49,7 @@ import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_man
 import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_manage_stat_archived_count
 import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_manage_stat_total
 import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_manage_title
+import com.georgeci.moneysurfer.feature.account.generated.resources.month_short
 import com.georgeci.moneysurfer.feature.account.labelRes
 import com.georgeci.moneysurfer.uikit.components.SurferSkeletonRow
 import com.georgeci.moneysurfer.uikit.components.account.SurferAccountManageCard
@@ -61,7 +63,9 @@ import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.utils.HandleSideEffect
+import kotlinx.datetime.number
 import org.jetbrains.compose.resources.pluralStringResource
+import org.jetbrains.compose.resources.stringArrayResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -195,6 +199,7 @@ private fun AccountsManageContent(
                         ?.let {
                             pluralStringResource(Res.plurals.accounts_manage_stat_archived_count, it, it)
                         },
+                    otherCurrencyChipTexts = state.otherCurrencyTotals,
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
                 )
             }
@@ -390,7 +395,16 @@ private fun SectionHeader(
 @Composable
 private fun archivedSubtitle(account: AccountManageUi): String {
     val typeLabel = stringResource(account.type.labelRes())
-    return account.archivedLabel?.let { "$typeLabel · $it" } ?: typeLabel
+    // Accounts archived before `archivedAt` existed carry no date; the type label alone is the
+    // honest fallback.
+    val archivedOn = account.archivedOn ?: return typeLabel
+    val months = stringArrayResource(Res.array.month_short)
+    val archivedLabel = stringResource(
+        Res.string.accounts_manage_archived_at,
+        months[archivedOn.month.number - 1],
+        archivedOn.year.toString(),
+    )
+    return "$typeLabel · $archivedLabel"
 }
 
 private fun AccountType.icon(): ImageVector = when (this) {

@@ -2,12 +2,15 @@ package com.georgeci.moneysurfer.feature.account.details
 
 import arrow.optics.optics
 import com.georgeci.moneysurfer.domain.formatter.MoneyFormatter
+import com.georgeci.moneysurfer.domain.model.AccountBalanceSeries
 import com.georgeci.moneysurfer.domain.model.Transaction
 import com.georgeci.moneysurfer.domain.primitives.AccountId
+import com.georgeci.moneysurfer.domain.primitives.AccountType
 import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
 import com.georgeci.moneysurfer.domain.primitives.Money
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
+import com.georgeci.moneysurfer.domain.usecase.GetAccountBalanceSeriesUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetAccountByIdUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetTransactionsByAccountUseCase
 import com.georgeci.moneysurfer.utils.MviViewModel
@@ -18,6 +21,7 @@ class AccountDetailsViewModel(
     accountId: AccountId,
     private val getAccountById: GetAccountByIdUseCase,
     private val getTransactionsByAccount: GetTransactionsByAccountUseCase,
+    private val getAccountBalanceSeries: GetAccountBalanceSeriesUseCase,
 ) : MviViewModel<AccountDetailsState, AccountDetailsEvent, AccountDetailsEffect>(
     initialState = AccountDetailsState.Loading(accountId),
 ) {
@@ -60,6 +64,14 @@ class AccountDetailsViewModel(
                 val txnUi = visible.map { it.toUi(currency) }
                 val formattedIncome = MoneyFormatter.format(income, currency)
                 val formattedExpenses = MoneyFormatter.format(expenses, currency)
+                // The chart is anchored on the same balance the hero card prints, and folds the
+                // history already collected above rather than issuing a second query.
+                val series = getAccountBalanceSeries(
+                    accountId = accountId,
+                    currentBalance = account?.balance ?: Money.zero(),
+                    transactions = transactions,
+                )
+                val chart = series.toUi(currency)
                 updateState {
                     when (this) {
                         is AccountDetailsState.Loading -> AccountDetailsState.Content(
@@ -68,9 +80,10 @@ class AccountDetailsViewModel(
                             formattedBalance = account?.let {
                                 MoneyFormatter.format(it.balance, it.currencyCode)
                             }.orEmpty(),
-                            currency = account?.currencyCode?.value.orEmpty(),
+                            type = account?.type,
                             formattedIncome = formattedIncome,
                             formattedExpenses = formattedExpenses,
+                            chart = chart,
                             transactions = txnUi,
                             filter = TransactionFilter.All,
                         )
@@ -78,11 +91,29 @@ class AccountDetailsViewModel(
                             transactions = txnUi,
                             formattedIncome = formattedIncome,
                             formattedExpenses = formattedExpenses,
+                            chart = chart,
                         )
                     }
                 }
             }
         }
+    }
+
+    /**
+     * The card scales its own axes, so the y values stay in major units and x is just the day
+     * index — the series is evenly spaced by construction.
+     */
+    private fun AccountBalanceSeries.toUi(currency: CurrencyCode): AccountBalanceChartUi {
+        val formatted = MoneyFormatter.format(delta, currency)
+        return AccountBalanceChartUi(
+            points = points.mapIndexed { index, point ->
+                index.toFloat() to (point.balance.minor / Money.MINOR_PER_MAJOR).toFloat()
+            },
+            // Locale formatting only signs negatives; a flat period reads as "+" too, since
+            // "no change" is not a loss.
+            formattedDelta = if (delta.isNegative()) formatted else "+$formatted",
+            isDeltaNegative = delta.isNegative(),
+        )
     }
 
     private fun Transaction.toUi(currency: CurrencyCode) = AccountTransactionUi(
@@ -108,9 +139,11 @@ sealed interface AccountDetailsState {
         override val accountId: AccountId,
         val name: String,
         val formattedBalance: String,
-        val currency: String,
+        /** Drives the hero meta line. Null only while the account row is still being read. */
+        val type: AccountType?,
         val formattedIncome: String,
         val formattedExpenses: String,
+        val chart: AccountBalanceChartUi,
         val transactions: List<AccountTransactionUi>,
         val filter: TransactionFilter,
     ) : AccountDetailsState {
@@ -121,6 +154,13 @@ sealed interface AccountDetailsState {
 }
 
 enum class TransactionFilter { All, Expenses, Income }
+
+/** Balance curve for the details chart: `x to y` pairs the card plots, plus its signed delta. */
+data class AccountBalanceChartUi(
+    val points: List<Pair<Float, Float>>,
+    val formattedDelta: String,
+    val isDeltaNegative: Boolean,
+)
 
 data class AccountTransactionUi(
     val id: TransactionId,

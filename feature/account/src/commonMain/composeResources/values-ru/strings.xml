@@ -20,6 +20,8 @@
     <string name="accounts_manage_archived_snackbar">«%1$s» в архиве</string>
     <string name="accounts_manage_archive_undo">Отменить</string>
     <string name="accounts_manage_action_failed">Что-то пошло не так. Попробуйте ещё раз.</string>
+    <string name="accounts_manage_archived_at">В архиве с %1$s %2$s</string>
+    <string name="accounts_manage_transfer_instead">Лучше перевести между счетами</string>
     <string name="accounts_manage_delete_title">Удалить этот счёт?</string>
     <string name="accounts_manage_delete_message">«%1$s» и все его транзакции будут удалены безвозвратно. Отменить это действие нельзя.</string>
     <string name="accounts_manage_delete_confirm">Удалить</string>
@@ -60,10 +62,7 @@
     <string name="account_details_edit_content_description">Редактировать счёт</string>
     <string name="account_details_more_content_description">Ещё</string>
     <string name="account_details_updated">Обновлено только что</string>
-    <string name="account_details_synced_format">Обновлено %1$s · Нажмите для истории</string>
-    <string name="account_details_synced_recent">2 мин назад</string>
     <string name="account_details_kind_last4_format">%1$s · •• %2$s</string>
-    <string name="account_details_change_this_month">+€412 за месяц</string>
     <string name="account_details_in_this_month">Доходы за месяц</string>
     <string name="account_details_out_this_month">Расходы за месяц</string>
     <string name="account_details_chart_title">Баланс · 30 дней</string>
@@ -83,4 +82,18 @@
     <string name="account_creation_created_snackbar">«%1$s» добавлен</string>
     <string name="account_creation_updated_snackbar">«%1$s» обновлён</string>
     <string name="accounts_manage_deleted_snackbar">«%1$s» удалён</string>
+    <string-array name="month_short">
+        <item>янв.</item>
+        <item>февр.</item>
+        <item>марта</item>
+        <item>апр.</item>
+        <item>мая</item>
+        <item>июня</item>
+        <item>июля</item>
+        <item>авг.</item>
+        <item>сент.</item>
+        <item>окт.</item>
+        <item>нояб.</item>
+        <item>дек.</item>
+    </string-array>
 </resources>

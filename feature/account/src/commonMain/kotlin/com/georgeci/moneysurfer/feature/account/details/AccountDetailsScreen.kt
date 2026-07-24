@@ -22,10 +22,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.georgeci.moneysurfer.domain.primitives.AccountId
+import com.georgeci.moneysurfer.domain.primitives.AccountType
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.feature.account.generated.resources.Res
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_add_transaction
-import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_change_this_month
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_chart_title
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_edit_content_description
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_filter_all
@@ -34,12 +34,11 @@ import com.georgeci.moneysurfer.feature.account.generated.resources.account_deta
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_in_this_month
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_more_content_description
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_out_this_month
-import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_synced_format
-import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_synced_recent
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_title
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_transactions_empty
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_transactions_section
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_transactions_see_all
+import com.georgeci.moneysurfer.feature.account.labelRes
 import com.georgeci.moneysurfer.uikit.components.account.SurferAccountDetailsHeroCard
 import com.georgeci.moneysurfer.uikit.components.account.SurferAccountStatCard
 import com.georgeci.moneysurfer.uikit.components.account.SurferBalanceChartCard
@@ -165,12 +164,11 @@ private fun AccountDetailsContent(
                 SurferAccountDetailsHeroCard(
                     icon = SurferIcons.Wallet,
                     name = state.name,
-                    subtitle = state.currency.uppercase(),
+                    // The mockup's meta line is the account kind ("CURRENT · •• 4021"); the
+                    // last-4 half needs a field the model does not have yet, so only the kind
+                    // shows — still closer than the currency code that used to sit here.
+                    subtitle = state.type?.let { stringResource(it.labelRes()).uppercase() }.orEmpty(),
                     formattedBalance = state.formattedBalance.ifBlank { "€0.00" },
-                    syncedLabel = stringResource(
-                        Res.string.account_details_synced_format,
-                        stringResource(Res.string.account_details_synced_recent),
-                    ),
                     modifier = Modifier
                         .padding(horizontal = AppTheme.spacing.default)
                         .padding(bottom = AppTheme.spacing.large),
@@ -180,7 +178,13 @@ private fun AccountDetailsContent(
             item {
                 SurferBalanceChartCard(
                     title = stringResource(Res.string.account_details_chart_title),
-                    delta = stringResource(Res.string.account_details_change_this_month),
+                    delta = state.chart.formattedDelta,
+                    deltaColor = if (state.chart.isDeltaNegative) {
+                        AppTheme.materialColors.error
+                    } else {
+                        AppTheme.semanticColors.income
+                    },
+                    points = state.chart.points,
                     modifier = Modifier
                         .padding(horizontal = AppTheme.spacing.default)
                         .padding(bottom = AppTheme.spacing.medium),
@@ -305,6 +309,13 @@ private fun FilterChips(
     )
 }
 
+/** A month of plausible balances so the preview draws the same shape the real series does. */
+private val PreviewChartPoints: List<Pair<Float, Float>> = listOf(
+    2068f, 2042f, 2110f, 2095f, 2180f, 2164f, 2140f, 2210f, 2196f, 2255f,
+    2231f, 2288f, 2262f, 2240f, 2310f, 2295f, 2352f, 2330f, 2308f, 2374f,
+    2360f, 2412f, 2390f, 2368f, 2430f, 2415f, 2462f, 2441f, 2470f, 2480f,
+).mapIndexed { index, balance -> index.toFloat() to balance }
+
 @Preview
 @Composable
 private fun AccountDetailsScreenPreview() {
@@ -314,9 +325,14 @@ private fun AccountDetailsScreenPreview() {
                 accountId = AccountId("preview-acc-1"),
                 name = "Everyday",
                 formattedBalance = "€2,480.32",
-                currency = "EUR",
+                type = AccountType.BANK,
                 formattedIncome = "€3,200.00",
                 formattedExpenses = "€1,148.49",
+                chart = AccountBalanceChartUi(
+                    points = PreviewChartPoints,
+                    formattedDelta = "+€412.00",
+                    isDeltaNegative = false,
+                ),
                 transactions = listOf(
                     AccountTransactionUi(
                         id = TransactionId("preview-tx-1"),
