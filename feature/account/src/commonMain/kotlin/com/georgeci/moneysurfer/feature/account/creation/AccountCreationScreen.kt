@@ -1,7 +1,5 @@
 package com.georgeci.moneysurfer.feature.account.creation
 
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -15,7 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
@@ -30,7 +27,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
@@ -67,13 +63,13 @@ import com.georgeci.moneysurfer.feature.account.labelRes
 import com.georgeci.moneysurfer.uikit.components.SurferCurrencyBottomSheet
 import com.georgeci.moneysurfer.uikit.components.SurferCurrencyOption
 import com.georgeci.moneysurfer.uikit.components.SurferCurrencyPickerField
+import com.georgeci.moneysurfer.uikit.components.base.SurferOutlinedChip
 import com.georgeci.moneysurfer.uikit.components.base.SurferSectionLabel
 import com.georgeci.moneysurfer.uikit.components.base.SurferSegmentedControl
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbarButtonAction
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
-import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.utils.HandleSideEffect
 import org.jetbrains.compose.resources.StringResource
@@ -350,8 +346,9 @@ private fun ExtraDetailsSection(
                 verticalArrangement = Arrangement.spacedBy(AppTheme.spacing.small),
             ) {
                 availableKinds.forEach { kind ->
-                    AddFieldChip(
+                    SurferOutlinedChip(
                         label = stringResource(kind.labelRes()),
+                        icon = SurferIcons.Add,
                         onClick = { onAdd(kind) },
                     )
                 }
@@ -411,36 +408,6 @@ private fun ExtraFieldItem(
             } else {
                 AppTheme.typography.bodyLarge
             },
-        )
-    }
-}
-
-@Composable
-private fun AddFieldChip(
-    label: String,
-    onClick: () -> Unit,
-) {
-    val outline = AppTheme.materialColors.outline
-    Row(
-        modifier = Modifier
-            .height(32.dp)
-            .clip(RoundedCornerShape(16.dp))
-            .border(1.dp, outline, RoundedCornerShape(16.dp))
-            .clickable(onClick = onClick)
-            .padding(horizontal = 12.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(6.dp),
-    ) {
-        Icon(
-            imageVector = SurferIcons.Add,
-            contentDescription = SurferSemantics.Decorative,
-            tint = AppTheme.materialColors.onSurface,
-            modifier = Modifier.size(14.dp),
-        )
-        Text(
-            text = label,
-            style = AppTheme.typography.labelMedium,
-            color = AppTheme.materialColors.onSurface,
         )
     }
 }
