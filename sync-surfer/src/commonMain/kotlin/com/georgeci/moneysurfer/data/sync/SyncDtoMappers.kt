@@ -1,6 +1,7 @@
 package com.georgeci.moneysurfer.data.sync
 
 import com.georgeci.moneysurfer.data.db.entity.AccountEntity
+import com.georgeci.moneysurfer.data.db.entity.AccountExtraDetailsColumn
 import com.georgeci.moneysurfer.data.db.entity.BudgetEntity
 import com.georgeci.moneysurfer.data.db.entity.CategoryEntity
 import com.georgeci.moneysurfer.data.db.entity.GoalContributionEntity
@@ -10,6 +11,7 @@ import com.georgeci.moneysurfer.data.db.entity.WorkspaceEntity
 import com.georgeci.moneysurfer.data.db.entity.WorkspaceInviteEntity
 import com.georgeci.moneysurfer.data.db.entity.WorkspaceMemberEntity
 import com.georgeci.moneysurfer.data.remote.AccountDoc
+import com.georgeci.moneysurfer.data.remote.AccountExtraDetailDoc
 import com.georgeci.moneysurfer.data.remote.BudgetDoc
 import com.georgeci.moneysurfer.data.remote.CategoryDoc
 import com.georgeci.moneysurfer.data.remote.GoalContributionDoc
@@ -18,6 +20,7 @@ import com.georgeci.moneysurfer.data.remote.TransactionDoc
 import com.georgeci.moneysurfer.data.remote.WorkspaceDoc
 import com.georgeci.moneysurfer.data.remote.WorkspaceInviteDoc
 import com.georgeci.moneysurfer.data.remote.WorkspaceMemberDoc
+import com.georgeci.moneysurfer.domain.model.AccountExtraDetail
 import com.georgeci.moneysurfer.domain.model.TransactionTags
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -63,6 +66,10 @@ fun AccountEntity.toDoc(): AccountDoc = AccountDoc(
     archived = archived,
     updatedAt = updatedAt,
     archivedAt = archivedAt,
+    // Same stored-column↔wire-list conversion as TransactionEntity.tags below: the wire keeps
+    // structured entries, Room keeps one JSON column.
+    extraDetails = AccountExtraDetailsColumn.decode(extraDetails)
+        .map { AccountExtraDetailDoc(key = it.key, value = it.value) },
 )
 
 fun AccountDoc.toEntity(id: String, workspaceId: String): AccountEntity = AccountEntity(
@@ -75,6 +82,11 @@ fun AccountDoc.toEntity(id: String, workspaceId: String): AccountEntity = Accoun
     archived = archived,
     updatedAt = updatedAt,
     archivedAt = archivedAt,
+    // `encode` normalizes, so a doc from a client we do not control cannot seed the column with
+    // blank keys, duplicates or an unbounded list.
+    extraDetails = AccountExtraDetailsColumn.encode(
+        extraDetails.map { AccountExtraDetail(key = it.key, value = it.value) },
+    ),
 )
 
 fun CategoryEntity.toDoc(): CategoryDoc = CategoryDoc(
