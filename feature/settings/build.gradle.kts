@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.koin.compiler)
     alias(libs.plugins.kotest.multiplatform)
+    alias(libs.plugins.kover)
     alias(libs.plugins.kmp.lib)
 }
 
