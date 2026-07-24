@@ -40,6 +40,12 @@ class DashboardLayoutCodecTest : StringSpec({
         encoded.split('|').size shouldBe config.items.size
     }
 
+    "a trailing empty variant field reads as no variant at all" {
+        val decoded = DashboardLayoutCodec.decode("Goals:1:Hero:")
+
+        decoded.items.first().cardStyle.variant shouldBe null
+    }
+
     "an empty store means the default layout" {
         DashboardLayoutCodec.decode("") shouldBe DashboardLayoutConfig.DEFAULT
     }
