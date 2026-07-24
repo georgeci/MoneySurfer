@@ -1,0 +1,58 @@
+package com.georgeci.moneysurfer.data.preferences
+
+import com.georgeci.moneysurfer.domain.dashboard.DashboardCardStyle
+import com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutConfig
+import com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutItem
+import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetSize
+import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetType
+import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.collections.shouldContainExactly
+import io.kotest.matchers.shouldBe
+
+class DashboardLayoutCodecTest : StringSpec({
+
+    "a customised layout survives a round trip" {
+        val config = DashboardLayoutConfig(
+            items = listOf(
+                DashboardLayoutItem(DashboardWidgetType.Goals, cardStyle = DashboardCardStyle.COMPACT),
+                DashboardLayoutItem(DashboardWidgetType.Balance, enabled = false),
+                DashboardLayoutItem(
+                    DashboardWidgetType.Accounts,
+                    cardStyle = DashboardCardStyle(DashboardWidgetSize.Compact, variant = "strip"),
+                ),
+                DashboardLayoutItem(DashboardWidgetType.RecentTransactions),
+            ),
+        )
+
+        DashboardLayoutCodec.decode(DashboardLayoutCodec.encode(config)) shouldBe config
+    }
+
+    "an empty store means the default layout" {
+        DashboardLayoutCodec.decode("") shouldBe DashboardLayoutConfig.DEFAULT
+    }
+
+    "a widget this build does not know is skipped, and the known ones are kept" {
+        val decoded = DashboardLayoutCodec.decode("Goals:1:Hero|Cryptocurrency:1:Hero")
+
+        decoded.enabledItems.first().type shouldBe DashboardWidgetType.Goals
+        decoded.items.map { it.type } shouldContainExactly listOf(
+            DashboardWidgetType.Goals,
+            DashboardWidgetType.Balance,
+            DashboardWidgetType.Accounts,
+            DashboardWidgetType.RecentTransactions,
+        )
+    }
+
+    "garbage decodes to the default layout instead of an empty dashboard" {
+        DashboardLayoutCodec.decode("¯\\_(ツ)_/¯") shouldBe DashboardLayoutConfig.DEFAULT
+    }
+
+    "an unreadable size falls back to Hero rather than dropping the widget" {
+        val decoded = DashboardLayoutCodec.decode("Goals:1:Enormous")
+
+        decoded.items.first() shouldBe DashboardLayoutItem(
+            DashboardWidgetType.Goals,
+            cardStyle = DashboardCardStyle.HERO,
+        )
+    }
+})

@@ -1,5 +1,7 @@
 package com.georgeci.moneysurfer.domain.preferences
 
+import com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutConfig
+
 interface UiPreferences {
     val isDynamicColorAvailable: Boolean
 
@@ -19,4 +21,12 @@ interface UiPreferences {
      * period is deliberately not persisted — the list always reopens on the current one.
      */
     val transactionsPeriodMode: Pref<TransactionPeriodMode>
+
+    /**
+     * Order, visibility and card style of the dashboard widgets. Device-local in v1: the layout
+     * describes the screen in the user's hand, so it is deliberately not synced through Firestore
+     * (a phone layout would be wrong on a tablet). Migrating it to the workspace later is a
+     * matter of swapping the binding behind this `Pref`.
+     */
+    val dashboardLayout: Pref<DashboardLayoutConfig>
 }

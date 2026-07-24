@@ -56,6 +56,15 @@ class UiSettingsDataSource(
         default = "Card",
     )
 
+    /**
+     * Encoded dashboard widget layout — see `DashboardLayoutCodec`. Device-scoped and not synced;
+     * empty means "never customised", which decodes to the default layout.
+     */
+    val dashboardLayout = prefs.string(
+        name = "ui.dashboard_layout",
+        default = "",
+    )
+
     /** Name of a `TransactionPeriodMode` — the window the transactions list opens on. */
     val transactionsPeriodMode = prefs.string(
         name = "ui.transactions_period_mode",
