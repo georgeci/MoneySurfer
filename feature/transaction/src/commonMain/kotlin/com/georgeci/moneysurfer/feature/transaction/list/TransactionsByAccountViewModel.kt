@@ -26,7 +26,7 @@ import com.georgeci.moneysurfer.feature.transaction.filter.TransactionFilterStor
 import com.georgeci.moneysurfer.feature.transaction.filter.TransactionFilters
 import com.georgeci.moneysurfer.feature.transaction.filter.TransactionSort
 import com.georgeci.moneysurfer.feature.transaction.filter.TransactionTypeFilter
-import com.georgeci.moneysurfer.feature.transaction.filter.matches
+import com.georgeci.moneysurfer.feature.transaction.filter.compile
 import com.georgeci.moneysurfer.feature.transaction.filter.resolveWindow
 import com.georgeci.moneysurfer.utils.MviViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -45,6 +45,26 @@ import org.koin.core.annotation.KoinViewModel
 
 /** Rows fetched per page. One screenful is ~15 rows, so a page covers a long scroll burst. */
 private const val PAGE_SIZE = 200
+
+/**
+ * Enough rendered rows that the list is comfortably scrollable, so the normal scroll-driven
+ * load-more can take over. Below this, a filtered page auto-advances — see
+ * [shouldLoadMoreToFillFilteredList].
+ */
+private const val AUTO_LOAD_UNTIL_SCROLLABLE = 20
+
+/**
+ * Whether a filtered page is too sparse to scroll and should pull its next raw page.
+ *
+ * A filter that matches only a handful of the loaded rows leaves too few to scroll, so without
+ * this the user could never reach matches deeper in the window and an all-miss first page would
+ * wrongly read as "nothing matches". Bounded by the window: a month stops at the month's rows.
+ *
+ * The real cure is to filter in SQL (the DAO already has an FTS `searchByText`); this keeps the
+ * in-memory page honest until that lands.
+ */
+private fun shouldLoadMoreToFillFilteredList(content: TransactionsByAccountState.Content): Boolean =
+    content.isFiltered && content.canLoadMore && content.renderedRowCount < AUTO_LOAD_UNTIL_SCROLLABLE
 
 /**
  * The chip rail's values. Names are resolved from the account and category lists rather than in
@@ -110,7 +130,15 @@ class TransactionsByAccountViewModel(
                 postSideEffect(TransactionsByAccountEffect.NavigateToTransactionDetails(event.transactionId))
             is TransactionsByAccountEvent.OnSearchQueryChanged -> filterStore.setQuery(event.query)
             TransactionsByAccountEvent.OnOpenFiltersClick ->
-                postSideEffect(TransactionsByAccountEffect.NavigateToFilters(currentState.accountId))
+                // Carry the anchor the list is paged to: the filter screen's live result count
+                // resolves the same window from it, so `Apply · N results` matches the list the
+                // user returns to rather than always counting today's period.
+                postSideEffect(
+                    TransactionsByAccountEffect.NavigateToFilters(
+                        accountId = currentState.accountId,
+                        anchorEpochDay = anchorDate.value.toEpochDays(),
+                    ),
+                )
             TransactionsByAccountEvent.OnPreviousPeriodClick -> shiftAnchor(by = -1)
             TransactionsByAccountEvent.OnNextPeriodClick -> shiftAnchor(by = 1)
             is TransactionsByAccountEvent.OnPeriodModeChanged -> launch {
@@ -180,7 +208,14 @@ class TransactionsByAccountViewModel(
                     accounts = accounts,
                     categories = categories,
                 )
-            }.collect { content -> updateState { content } }
+            }.collect { content ->
+                updateState { content }
+                // Filtering runs in memory over the loaded page, but the scroll-driven load-more
+                // can only fire once the rendered list is long enough to scroll. While a filter is
+                // active and too few rows match to scroll, keep pulling the next raw page until the
+                // list is scrollable again (normal paging takes over) or the window is exhausted.
+                if (shouldLoadMoreToFillFilteredList(content)) pageLimit.value += PAGE_SIZE
+            }
         }
     }
 
@@ -208,7 +243,10 @@ class TransactionsByAccountViewModel(
         // different account picked on the filter screen would silently show nothing.
         val effective = if (accountId != null) filters.copy(accountIds = emptySet()) else filters
 
-        val matched = visible.filter { effective.matches(it) }
+        // Compile once, then test each row: the amount fields are parsed a single time for the
+        // whole page rather than re-parsed per row.
+        val matcher = effective.compile()
+        val matched = visible.filter { matcher.matches(it) }
         // Already ordered by the query's (operationDate, operationAt, createdAt) DESC — reversing
         // the flat list is what "oldest first" means, inside each day as well as between days.
         val ordered = if (effective.sort == TransactionSort.Oldest) matched.reversed() else matched
@@ -390,6 +428,9 @@ sealed interface TransactionsByAccountState {
     ) : TransactionsByAccountState {
         val isEmpty: Boolean get() = groups.isEmpty()
 
+        /** Rows actually shown, across every day group — what the LazyColumn can scroll. */
+        val renderedRowCount: Int get() = groups.sumOf { it.transactions.size }
+
         companion object
     }
 
@@ -470,5 +511,8 @@ sealed interface TransactionsByAccountEffect {
     data object NavigateBack : TransactionsByAccountEffect
     data class NavigateToTransactionCreation(val accountId: AccountId?) : TransactionsByAccountEffect
     data class NavigateToTransactionDetails(val transactionId: TransactionId) : TransactionsByAccountEffect
-    data class NavigateToFilters(val accountId: AccountId?) : TransactionsByAccountEffect
+    data class NavigateToFilters(
+        val accountId: AccountId?,
+        val anchorEpochDay: Long,
+    ) : TransactionsByAccountEffect
 }

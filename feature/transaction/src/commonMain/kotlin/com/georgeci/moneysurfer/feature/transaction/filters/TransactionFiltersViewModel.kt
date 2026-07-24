@@ -15,7 +15,7 @@ import com.georgeci.moneysurfer.feature.transaction.filter.TransactionFilterStor
 import com.georgeci.moneysurfer.feature.transaction.filter.TransactionFilters
 import com.georgeci.moneysurfer.feature.transaction.filter.TransactionSort
 import com.georgeci.moneysurfer.feature.transaction.filter.TransactionTypeFilter
-import com.georgeci.moneysurfer.feature.transaction.filter.matches
+import com.georgeci.moneysurfer.feature.transaction.filter.compile
 import com.georgeci.moneysurfer.feature.transaction.filter.resolveWindow
 import com.georgeci.moneysurfer.utils.MviViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -50,6 +50,11 @@ private const val COUNT_LIMIT = 500
 @KoinViewModel
 class TransactionFiltersViewModel(
     private val accountId: AccountId?,
+    /**
+     * The day the list is paged to, or null to fall back to today. Only used while the range still
+     * follows the period pager — a preset or custom range resolves its own window regardless.
+     */
+    private val anchorEpochDay: Long?,
     private val filterStore: TransactionFilterStore,
     private val getTransactionsByAccount: GetTransactionsByAccountUseCase,
     private val getAccounts: GetAccountsUseCase,
@@ -144,13 +149,17 @@ class TransactionFiltersViewModel(
     private fun observeData() {
         launch {
             val periodMode = uiPreferences.transactionsPeriodMode.flow.first()
+            // The window the list is actually showing when the range still follows the pager: the
+            // day it was paged to, not necessarily today.
+            val anchor = anchorEpochDay?.let(LocalDate::fromEpochDays) ?: today
             val counted = draft
                 .map { filters -> filters.forCount() }
                 .distinctUntilChanged()
                 .flatMapLatest { filters ->
-                    val window = resolveWindow(filters.dateRange, periodMode, today, today)
+                    val window = resolveWindow(filters.dateRange, periodMode, anchor, today)
+                    val matcher = filters.compile()
                     getTransactionsByAccount.window(accountId, window, COUNT_LIMIT + 1)
-                        .map { rows -> rows.count { filters.matches(it) } }
+                        .map { rows -> rows.count { matcher.matches(it) } }
                 }
 
             combine(draft, counted, getAccounts(), getCategories()) { filters, count, accounts, categories ->
@@ -169,16 +178,17 @@ class TransactionFiltersViewModel(
     /**
      * The draft as the count query sees it: an account-scoped list ignores the account selection,
      * exactly as the list does.
-     *
-     * The pager's anchor is deliberately not carried over. While the draft says "follow the
-     * period" the count is for *today's* period, which is where the list will be sitting after
-     * Apply if the user has not paged — and paging is a live thing the filter screen cannot see
-     * from behind a full-screen route.
      */
     private fun TransactionFilters.forCount(): TransactionFilters =
         if (accountId != null) copy(accountIds = emptySet()) else this
 }
 
+/**
+ * A plain data class rather than the sealed `Loading` / `Content` the repo uses elsewhere: the
+ * screen has no async-load phase. The draft is available synchronously from
+ * [TransactionFilterStore] at construction, so there is never a "Loading" state to model — the
+ * accounts, categories and result count merely refine an already-usable screen as they arrive.
+ */
 data class TransactionFiltersState(
     val draft: TransactionFilters,
     val showAccounts: Boolean,

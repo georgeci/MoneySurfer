@@ -120,10 +120,14 @@ sealed interface Route : NavKey {
     /**
      * Full-screen transaction filters. [accountId] is the list's own scope, not a filter: when it
      * is set the screen hides its account picker, because the list is already restricted to that
-     * account.
+     * account. [anchorEpochDay] is the day the list is currently paged to, so the screen's live
+     * result count resolves the same date window when the range still follows the period pager.
      */
     @Serializable
-    data class TransactionFilters(val accountId: String? = null) : Route
+    data class TransactionFilters(
+        val accountId: String? = null,
+        val anchorEpochDay: Long? = null,
+    ) : Route
 
     @Serializable
     data class TransactionCreation(

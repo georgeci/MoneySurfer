@@ -1,6 +1,7 @@
 package com.georgeci.moneysurfer.feature.transaction.filter
 
 import com.georgeci.moneysurfer.domain.model.CategorizedTransaction
+import com.georgeci.moneysurfer.domain.model.Transaction
 import com.georgeci.moneysurfer.domain.preferences.TransactionPeriodMode
 import com.georgeci.moneysurfer.domain.primitives.TransactionStatus
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
@@ -110,62 +111,87 @@ private fun normalizeAmountInput(raw: String): String? {
 private fun pow10(exponent: Int): Long = generateSequence(1L) { it * DECIMAL_RADIX }.elementAt(exponent)
 
 /**
- * Whether [row] survives these filters.
+ * A [TransactionFilters] with its three free-text amount fields parsed exactly once, ready to test
+ * many rows.
  *
- * The date window is *not* checked here — it is applied by the query (see [resolveWindow]), so
- * re-checking it would only duplicate a bound the database already honoured.
- *
- * `accountIds` is expected to be empty when the list is already scoped to one account; the
- * ViewModel clears it there, because intersecting a per-account list with a different account
- * would silently show nothing.
+ * The min/max bounds and the search-amount are constant across a whole page, so parsing them per
+ * row (as a naive `matches` loop would) repeats the same parse hundreds of times per rebuild.
+ * [TransactionFilters.compile] does it once; the per-row [matches] then only compares.
  */
-fun TransactionFilters.matches(row: CategorizedTransaction): Boolean {
-    val transaction = row.transaction
-    return listOf(
-        matchesType(row),
-        accountIds.isEmpty() || transaction.accountId in accountIds,
-        categoryIds.isEmpty() || transaction.categoryId in categoryIds,
-        matchesAmountBounds(row),
-        !recurringOnly || transaction.recurringRuleId != null,
-        !plannedOnly || transaction.status == TransactionStatus.PLANNED,
-        matchesQuery(row),
-    ).all { it }
+class CompiledFilters internal constructor(
+    private val filters: TransactionFilters,
+    private val minMinor: Long?,
+    private val maxMinor: Long?,
+    private val queryAmount: AmountRange?,
+    private val needle: String,
+) {
+    /**
+     * Whether [row] survives these filters.
+     *
+     * The date window is *not* checked here — it is applied by the query (see [resolveWindow]), so
+     * re-checking it would only duplicate a bound the database already honoured.
+     *
+     * `accountIds` is expected to be empty when the list is already scoped to one account; the
+     * ViewModel clears it there, because intersecting a per-account list with a different account
+     * would silently show nothing.
+     */
+    fun matches(row: CategorizedTransaction): Boolean {
+        val transaction = row.transaction
+        return matchesType(transaction) &&
+            (filters.accountIds.isEmpty() || transaction.accountId in filters.accountIds) &&
+            (filters.categoryIds.isEmpty() || transaction.categoryId in filters.categoryIds) &&
+            matchesAmountBounds(transaction) &&
+            (!filters.recurringOnly || transaction.recurringRuleId != null) &&
+            (!filters.plannedOnly || transaction.status == TransactionStatus.PLANNED) &&
+            matchesQuery(row)
+    }
+
+    private fun matchesType(transaction: Transaction): Boolean = when (filters.type) {
+        TransactionTypeFilter.All -> true
+        TransactionTypeFilter.Expenses -> transaction.type == TransactionType.EXPENSE
+        TransactionTypeFilter.Income -> transaction.type == TransactionType.INCOME
+    }
+
+    /**
+     * Bounds compare against the *magnitude*: the sign is the type filter's business, and a user
+     * asking for "at least 50" means fifty of money, not −50 being below the bound.
+     *
+     * An unparseable bound is ignored rather than treated as zero, and a trailing separator reads
+     * as the digits before it, so neither nonsense nor a half-typed "12." empties the list.
+     */
+    private fun matchesAmountBounds(transaction: Transaction): Boolean {
+        val minor = transaction.money.abs().minor
+        return (minMinor == null || minor >= minMinor) && (maxMinor == null || minor <= maxMinor)
+    }
+
+    /**
+     * Free-text search over what the user can actually see or remember about a row: merchant, note,
+     * category, tags — and the amount, which is matched numerically rather than as text so that
+     * "12" finds €12.40 without also finding every note containing "12".
+     */
+    private fun matchesQuery(row: CategorizedTransaction): Boolean {
+        if (needle.isEmpty()) return true
+        val transaction = row.transaction
+        val textHit = sequenceOf(transaction.merchant, transaction.note, row.categoryName.orEmpty())
+            .plus(transaction.tags)
+            .any { it.contains(needle, ignoreCase = true) }
+        val amountHit = queryAmount != null &&
+            transaction.money.abs().minor in queryAmount.fromMinor..queryAmount.toMinor
+        return textHit || amountHit
+    }
 }
 
-private fun TransactionFilters.matchesType(row: CategorizedTransaction): Boolean = when (type) {
-    TransactionTypeFilter.All -> true
-    TransactionTypeFilter.Expenses -> row.transaction.type == TransactionType.EXPENSE
-    TransactionTypeFilter.Income -> row.transaction.type == TransactionType.INCOME
+/** Parses the amount fields once so a per-row loop only compares — see [CompiledFilters]. */
+fun TransactionFilters.compile(): CompiledFilters {
+    val trimmed = query.trim()
+    return CompiledFilters(
+        filters = this,
+        minMinor = parseAmountQuery(minAmount)?.fromMinor,
+        maxMinor = parseAmountQuery(maxAmount)?.toMinor,
+        queryAmount = trimmed.takeIf { it.isNotEmpty() }?.let(::parseAmountQuery),
+        needle = trimmed,
+    )
 }
 
-/**
- * Bounds compare against the *magnitude*: the sign is the type filter's business, and a user
- * asking for "at least 50" means fifty of money, not −50 being below the bound.
- *
- * An unparseable bound is ignored rather than treated as zero, and a trailing separator reads
- * as the digits before it, so neither nonsense nor a half-typed "12." empties the list.
- */
-private fun TransactionFilters.matchesAmountBounds(row: CategorizedTransaction): Boolean {
-    val minor = row.transaction.money.abs().minor
-    val min = parseAmountQuery(minAmount)
-    val max = parseAmountQuery(maxAmount)
-    return (min == null || minor >= min.fromMinor) && (max == null || minor <= max.toMinor)
-}
-
-/**
- * Free-text search over what the user can actually see or remember about a row: merchant, note,
- * category, tags — and the amount, which is matched numerically rather than as text so that "12"
- * finds €12.40 without also finding every note containing "12".
- */
-private fun TransactionFilters.matchesQuery(row: CategorizedTransaction): Boolean {
-    val needle = query.trim()
-    if (needle.isEmpty()) return true
-    val transaction = row.transaction
-    val textHit = sequenceOf(transaction.merchant, transaction.note, row.categoryName.orEmpty())
-        .plus(transaction.tags)
-        .any { it.contains(needle, ignoreCase = true) }
-    val amount = parseAmountQuery(needle)
-    val amountHit = amount != null &&
-        transaction.money.abs().minor in amount.fromMinor..amount.toMinor
-    return textHit || amountHit
-}
+/** Single-row convenience — compiles then tests. For a page of rows, [compile] once and reuse. */
+fun TransactionFilters.matches(row: CategorizedTransaction): Boolean = compile().matches(row)

@@ -32,8 +32,13 @@ val transactionNavGraph: FeatureNavGraph = { navigator ->
             onNavigateToTransactionDetails = { transactionId ->
                 navigator.push(Route.TransactionDetails(transactionId.value))
             },
-            onNavigateToFilters = { accountId ->
-                navigator.push(Route.TransactionFilters(accountId = accountId?.value))
+            onNavigateToFilters = { accountId, anchorEpochDay ->
+                navigator.push(
+                    Route.TransactionFilters(
+                        accountId = accountId?.value,
+                        anchorEpochDay = anchorEpochDay,
+                    ),
+                )
             },
         )
     }
@@ -41,6 +46,7 @@ val transactionNavGraph: FeatureNavGraph = { navigator ->
     entry<Route.TransactionFilters> { key ->
         TransactionFiltersScreen(
             accountId = key.accountId?.let { AccountId(it) },
+            anchorEpochDay = key.anchorEpochDay,
             onNavigateBack = { navigator.pop() },
         )
     }

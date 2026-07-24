@@ -89,7 +89,7 @@ fun TransactionsByAccountScreen(
     onNavigateBack: () -> Unit,
     onNavigateToTransactionCreation: (AccountId?) -> Unit,
     onNavigateToTransactionDetails: (TransactionId) -> Unit,
-    onNavigateToFilters: (AccountId?) -> Unit,
+    onNavigateToFilters: (AccountId?, Long) -> Unit,
     viewModel: TransactionsByAccountViewModel = koinViewModel(
         key = accountId?.value.orEmpty(),
     ) { parametersOf(accountId) },
@@ -103,7 +103,8 @@ fun TransactionsByAccountScreen(
                 onNavigateToTransactionCreation(effect.accountId)
             is TransactionsByAccountEffect.NavigateToTransactionDetails ->
                 onNavigateToTransactionDetails(effect.transactionId)
-            is TransactionsByAccountEffect.NavigateToFilters -> onNavigateToFilters(effect.accountId)
+            is TransactionsByAccountEffect.NavigateToFilters ->
+                onNavigateToFilters(effect.accountId, effect.anchorEpochDay)
         }
     }
 

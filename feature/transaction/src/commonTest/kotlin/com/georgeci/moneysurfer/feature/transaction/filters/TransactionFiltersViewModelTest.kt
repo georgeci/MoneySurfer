@@ -170,15 +170,33 @@ class TransactionFiltersViewModelTest : StringSpec({
             env.viewModel().currentState.draft.recurringOnly shouldBe true
         }
     }
+
+    "the follow-period count uses the anchor the list was paged to, not today" {
+        runTest {
+            val env = Env(
+                transactions = listOf(
+                    expense(id = "jan-1", amount = 10, date = LocalDate(2025, 1, 10)),
+                    expense(id = "jan-2", amount = 10, date = LocalDate(2025, 1, 20)),
+                    expense(id = "today", amount = 10, date = TODAY),
+                ),
+            )
+
+            // Anchored on January (the month the list is showing) counts January's two rows...
+            env.viewModel(anchorEpochDay = LocalDate(2025, 1, 15).toEpochDays())
+                .currentState.resultCount shouldBe 2
+            // ...while no anchor falls back to today's month, which holds one.
+            env.viewModel().currentState.resultCount shouldBe 1
+        }
+    }
 })
 
-private fun expense(id: String, amount: Int): Transaction = aTransaction(
+private fun expense(id: String, amount: Int, date: LocalDate = TODAY): Transaction = aTransaction(
     id = transactionId(id),
     workspaceId = WORKSPACE,
     accountId = ACCOUNT,
     money = amount.dollars,
-    operationDate = TODAY,
-    operationAt = TODAY.atStartOfDayIn(TimeZone.UTC),
+    operationDate = date,
+    operationAt = date.atStartOfDayIn(TimeZone.UTC),
     type = TransactionType.EXPENSE,
 )
 
@@ -190,9 +208,13 @@ private class Env(transactions: List<Transaction> = emptyList()) {
     private val repository = WindowedTransactions(transactions)
     private val session = InMemorySessionPointers(currentWorkspaceId = WORKSPACE)
 
-    fun viewModel(accountId: AccountId? = null): TransactionFiltersViewModel =
+    fun viewModel(
+        accountId: AccountId? = null,
+        anchorEpochDay: Long? = null,
+    ): TransactionFiltersViewModel =
         TransactionFiltersViewModel(
             accountId = accountId,
+            anchorEpochDay = anchorEpochDay,
             filterStore = filterStore,
             getTransactionsByAccount = GetTransactionsByAccountUseCase(repository),
             getAccounts = GetAccountsUseCase(OneAccount, session),

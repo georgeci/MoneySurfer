@@ -42,6 +42,7 @@ import com.georgeci.moneysurfer.feature.transaction.filter.TransactionSort
 import com.georgeci.moneysurfer.feature.transaction.filter.TransactionTypeFilter
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly
+import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 import kotlinx.coroutines.Dispatchers
@@ -320,6 +321,29 @@ class TransactionsByAccountViewModelTest : StringSpec({
             viewModel.onEvent(TransactionsByAccountEvent.OnSearchQueryChanged("12"))
 
             viewModel.content().rowIds().shouldContainExactly("near")
+        }
+    }
+
+    "a sparse search keeps loading until deep matches surface, not showing nothing" {
+        runTest {
+            // 200 non-matching newest rows, then 5 matching rows older than the first page.
+            val noise = (1..PAGE_SIZE).map { expense(id = "n-$it", date = LocalDate(2025, 3, 20), amount = 1) }
+            val coffee = (1..5).map { i ->
+                expense(id = "c-$i", date = LocalDate(2025, 1, i), amount = 4).copy(merchant = "Coffee")
+            }
+            val env = Env(transactions = noise + coffee)
+            val viewModel = env.viewModel()
+            // All time so the window holds every row; the matches sit beyond the first 200.
+            viewModel.onEvent(
+                TransactionsByAccountEvent.OnPeriodModeChanged(TransactionPeriodMode.AllTime),
+            )
+
+            viewModel.onEvent(TransactionsByAccountEvent.OnSearchQueryChanged("coffee"))
+
+            // Without auto-loading, the first page has 0 coffee rows and the list is stuck empty.
+            val state = viewModel.content()
+            state.isEmpty shouldBe false
+            state.groups.flatMap { it.transactions } shouldHaveSize 5
         }
     }
 

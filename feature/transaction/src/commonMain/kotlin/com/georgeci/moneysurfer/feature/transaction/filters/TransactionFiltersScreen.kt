@@ -46,10 +46,13 @@ private const val APPLY_WEIGHT = 1.4f
 @Composable
 fun TransactionFiltersScreen(
     accountId: AccountId?,
+    anchorEpochDay: Long?,
     onNavigateBack: () -> Unit,
+    // Key on the anchor as well: reopening the screen on a different paged period must build a
+    // fresh ViewModel so its result count reflects that period, not the one it first opened on.
     viewModel: TransactionFiltersViewModel = koinViewModel(
-        key = accountId?.value.orEmpty(),
-    ) { parametersOf(accountId) },
+        key = "${accountId?.value.orEmpty()}:$anchorEpochDay",
+    ) { parametersOf(accountId, anchorEpochDay) },
 ) {
     val state by viewModel.collectAsStateWithLifecycle()
 

@@ -1,32 +1,25 @@
 package com.georgeci.moneysurfer.feature.transaction.list
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.georgeci.moneysurfer.feature.transaction.filter.TransactionDatePreset
 import com.georgeci.moneysurfer.feature.transaction.filter.TransactionDateRange
 import com.georgeci.moneysurfer.feature.transaction.filter.TransactionSort
 import com.georgeci.moneysurfer.feature.transaction.filter.TransactionTypeFilter
 import com.georgeci.moneysurfer.uikit.components.SurferSearchField
+import com.georgeci.moneysurfer.uikit.components.base.SurferSelectableChip
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import moneysurfer.feature.transaction.generated.resources.Res
@@ -145,7 +138,11 @@ internal fun FilterChipRail(
     }
 }
 
-/** A chip reads `Type` when unset and `Type · Expenses` once it carries a value. */
+/**
+ * A chip reads `Type` when unset and `Type · Expenses` once it carries a value. No leading check —
+ * the fill alone marks it set, and [highlighted] lets the sort chip (which always shows a value)
+ * still read as unset while it holds the default.
+ */
 @Composable
 private fun RailChip(
     label: String,
@@ -153,39 +150,17 @@ private fun RailChip(
     onClick: () -> Unit,
     highlighted: Boolean = value != null,
 ) {
-    val selected = highlighted
     val text = if (value != null) {
         stringResource(Res.string.transactions_list_chip_value, label, value)
     } else {
         label
     }
-    Row(
-        modifier = Modifier
-            .height(32.dp)
-            .clip(RoundedCornerShape(10.dp))
-            .background(
-                if (selected) AppTheme.materialColors.secondaryContainer else Color.Transparent,
-            )
-            .border(
-                width = 1.dp,
-                color = if (selected) Color.Transparent else AppTheme.materialColors.outline,
-                shape = RoundedCornerShape(10.dp),
-            )
-            .clickable(onClick = onClick)
-            .padding(horizontal = 12.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(
-            text = text,
-            style = AppTheme.typography.labelLarge,
-            color = if (selected) {
-                AppTheme.materialColors.onSecondaryContainer
-            } else {
-                AppTheme.materialColors.onSurface
-            },
-            maxLines = 1,
-        )
-    }
+    SurferSelectableChip(
+        label = text,
+        selected = highlighted,
+        onClick = onClick,
+        showCheck = false,
+    )
 }
 
 /** One pick shows its name, several show how many — null leaves the chip in its bare state. */
