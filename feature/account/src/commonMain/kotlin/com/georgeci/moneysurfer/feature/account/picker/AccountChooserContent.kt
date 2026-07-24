@@ -31,6 +31,9 @@ import com.georgeci.moneysurfer.uikit.components.base.SurferSplitAmountTier
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.preview.SurferBottomSheetPreview
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
+import moneysurfer.uikit.generated.resources.uikit_close
+import org.jetbrains.compose.resources.stringResource
+import moneysurfer.uikit.generated.resources.Res as UikitRes
 
 internal data class AccountPickerRow(
     val id: AccountId,
@@ -86,7 +89,8 @@ internal fun AccountChooserContent(
             ) {
                 Icon(
                     imageVector = SurferIcons.Close,
-                    contentDescription = null,
+                    // The only content of the button, so it has to carry its name.
+                    contentDescription = stringResource(UikitRes.string.uikit_close),
                     tint = AppTheme.materialColors.onSurfaceVariant,
                     modifier = Modifier.size(18.dp),
                 )
