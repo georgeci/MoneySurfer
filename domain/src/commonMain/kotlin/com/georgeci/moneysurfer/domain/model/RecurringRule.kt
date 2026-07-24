@@ -3,12 +3,19 @@ package com.georgeci.moneysurfer.domain.model
 import com.georgeci.moneysurfer.domain.primitives.CategoryId
 import com.georgeci.moneysurfer.domain.primitives.Money
 import com.georgeci.moneysurfer.domain.primitives.RecurringRuleId
+import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
 import kotlin.time.Instant
 
 data class RecurringRule(
     val id: RecurringRuleId = RecurringRuleId.uuid(),
+    /**
+     * Workspace the rule belongs to. Every co-member sees the same rule, so
+     * [com.georgeci.moneysurfer.domain.model.Transaction.recurringRuleId] resolves on
+     * every device rather than dangling on the ones that never created it.
+     */
+    val workspaceId: WorkspaceId,
     val title: String,
     val amount: Money,
     val categoryId: CategoryId,
