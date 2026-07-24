@@ -50,11 +50,11 @@ therefore a gap list, not a diff of two designs.
 | Invitations | Workspace | ✅ | ❌ hidden | `PendingBadge` implemented as `SurferPendingBadge` |
 | — | Personalization | ✅ Categories | ✅ | not designed — real row with no mockup |
 | Appearance | Personalization | ✅ | ✅ | |
-| **Preferences** | Personalization | ⚠️ **no row** | ⚠️ **no row** | screen + route exist, unreachable — see below |
+| Preferences | Personalization | ✅ | ✅ | row added in #275 |
 | **Notifications** | Personalization | ❌ | ❌ | designed, never built |
 | **Language** | Personalization | ❌ | ❌ | designed, never built |
 | Sync | Data | ✅ | ❌ hidden | also hidden online when `syncEnabled = false` |
-| **Backup** | Data | ⚠️ **no row** | ⚠️ **no row** | screen + route exist, unreachable — see below |
+| Backup | Data | ✅ | ✅ | row added in #275; cloud rows hidden offline |
 | Export to CSV | Data | ✅ | ✅ | the one data row that works in both |
 | **Security** (app lock, biometrics) | Data | ❌ | ❌ | designed, never built |
 | About & legal | Help & info | ✅ | ✅ | privacy URL swaps to `URL_PRIVACY_LOCAL` offline |
@@ -83,6 +83,11 @@ The offline golden flow even documents the Backup half as intentional
 (`offline-golden.yaml`: *"There is no Backup row in the Settings screen in any
 build"*) without noting that the screen behind it ships anyway.
 
+**Resolved (issue #275).** `SettingsScreen` now emits `OnPreferencesClick` from a
+Preferences row in *Personalization* and `OnBackupClick` from a Backup row in
+*Data*, both tagged (`SettingsTestTags.PreferencesRow` / `BackupRow`) and composed
+in both variants. The stale `offline-golden.yaml` comment is gone.
+
 ### 2. The `Data` group is empty-ish offline
 
 Offline hides Sync, and Backup has no row — so the whole `Data` section
@@ -91,6 +96,12 @@ header still earns its place, or whether Backup should be *the* offline data row
 (local `.ledger` archive + restore, no cloud) — the design's `BackupScreen`
 already separates "Manual → Download a copy" from the cloud rows, so an
 offline-safe subset is available without new visuals.
+
+**Resolved (issue #275).** Backup *is* the second offline data row. `BackupState`
+gained `showCloudBackup = !isOffline`, which hides the cloud hero, the whole
+Schedule group, "Back up now" and "Delete cloud backup" offline — leaving the
+local `BackupExporter`/`BackupImporter` pair (Download a copy + Restore) and a
+local hero in their place.
 
 ### 3. Sync gating is asymmetric with the rest
 

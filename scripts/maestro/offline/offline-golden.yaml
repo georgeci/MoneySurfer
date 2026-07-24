@@ -1,12 +1,12 @@
 appId: ${APP_ID}
-name: Offline — Golden path (first launch → currency → seed → transaction → settings)
+name: Offline — Golden path (first launch → onboarding → first account → transaction → settings)
 tags:
   - offline
 ---
 # Offline-build E2E golden path. Drives the `:androidApp-offline` / `:iosAppOffline`
-# binary, which needs no Firebase emulator: the offline first-run seeder
-# auto-creates a demo user, a "Personal" workspace and a "Cash" account, then
-# routes straight to the currency picker.
+# binary, which needs no Firebase emulator: the offline first run walks the
+# two-step onboarding, seeds a "Personal" workspace on the way out, and lands on
+# the first-account form.
 #
 # Excluded from the online suites via `tags: [offline]`; run it with the
 # dedicated `qaMaestroOfflineAndroid` / `qaMaestroOfflineIos` Gradle tasks.
@@ -14,29 +14,35 @@ tags:
 # Selectors target Compose `testTag` values exposed to Maestro via
 # `Modifier.surferTestTagAsId()` — see docs/testing/testing-strategy.md.
 
-# Fresh install: wipe state so the first-run seeder and currency picker run.
+# Fresh install: wipe state so onboarding and the first-run seeder run.
 - launchApp:
     clearState: true
 
-# 1. First launch lands on the currency picker (seed flips `currencyChosen` false).
+# 1. First launch lands on onboarding (#279 put it ahead of everything else;
+#    the standalone first-run currency picker this flow used to drive is gone).
 - assertVisible:
-    id: "firstRunCurrency:root"
+    id: "onboarding:root"
 
-# 2. Pick a currency and confirm. Enter fires the search field's IME action
-#    (ImeAction.Search → clearFocus), dismissing the keyboard so the Confirm
-#    button is reachable — Maestro's hideKeyboard is unreliable on iOS where
-#    iPhone keyboards have no dismiss key.
+# 2. Value pitch → the offline-only "where do we start?" step → first account.
+#    The same CTA id carries both steps; Cash is preselected, and confirming it
+#    runs `FirstRunSeeder` before routing to the account form.
 - tapOn:
-    id: "firstRunCurrency:search"
-- inputText: "EUR"
-- pressKey: Enter
+    id: "onboarding:continue"
 - tapOn:
-    id: "firstRunCurrency:currency:EUR"
-- tapOn:
-    id: "firstRunCurrency:confirm"
+    id: "onboarding:continue"
 
-# 3. Seed verified — Dashboard renders with the seeded balance widget and the
-#    add-transaction FAB (only shown once the seeded "Cash" account exists).
+# 3. Name the first account and save. Currency defaults to EUR, and Save sits in
+#    the top bar where the keyboard can never cover it.
+- assertVisible:
+    text: "Your first account"
+- tapOn:
+    text: "Account name"
+- inputText: "Cash"
+- tapOn:
+    text: "Save"
+
+# 4. Seed verified — Dashboard renders with the balance widget and the
+#    add-transaction FAB (only shown once the "Cash" account exists).
 - assertVisible:
     id: "dashboard:root"
 - assertVisible:
@@ -44,7 +50,7 @@ tags:
 - assertVisible:
     id: "dashboard:addTransaction"
 
-# 4. Create an expense transaction. Field order avoids ever needing
+# 5. Create an expense transaction. Field order avoids ever needing
 #    hideKeyboard (unreliable on iOS — iPhone keyboards have no dismiss key):
 #    the note is typed first while the screen has no keyboard covering it,
 #    then the amount (pinned at the top, never covered), then Save in the
@@ -63,18 +69,21 @@ tags:
 - tapOn:
     id: "transactionCreation:save"
 
-# 5. Balance updates — back on the Dashboard, the new transaction is listed.
+# 6. Balance updates — back on the Dashboard, the new transaction is listed.
 - assertVisible:
     id: "dashboard:root"
 - assertVisible:
     text: "Maestro golden expense"
 
-# 6. Settings shows the offline row set — and crucially NOT Sync or Logout.
-#    Those rows are never composed in the offline build, so `notVisible` on
-#    their stable ids is a locale-independent assertion. There is no Backup
-#    row in the Settings screen in any build (no composable renders one), so
-#    there is nothing to assert against — if a Backup row is ever added, tag
-#    it in `SettingsTestTags` and extend the assertions below.
+# 7. Settings shows the offline row set — asserted both ways. Every row the
+#    offline build composes is pinned positively by its stable id, so a row
+#    silently disappearing (or never being wired, as Preferences and Backup
+#    were) fails the flow; Sync and Logout are never composed offline, and
+#    `notVisible` on their ids keeps that gating honest. Both directions are
+#    locale-independent. Preferences and Backup are composed in *both* builds:
+#    Preferences has nothing online-only in it, and the Backup screen hides its
+#    cloud schedule/"Back up now"/"Delete cloud backup" surfaces offline,
+#    leaving the local archive + restore pair.
 - tapOn:
     id: "dashboard:settings"
 - assertVisible:
@@ -82,10 +91,30 @@ tags:
 - assertVisible:
     id: "settings:categoriesRow"
 - assertVisible:
-    id: "settings:appearanceRow"
+    id: "settings:budgetsRow"
 - assertVisible:
-    id: "settings:aboutRow"
+    id: "settings:appearanceRow"
+- scrollUntilVisible:
+    element:
+      id: "settings:preferencesRow"
+    direction: DOWN
+- assertVisible:
+    id: "settings:preferencesRow"
 - assertNotVisible:
     id: "settings:syncRow"
+- scrollUntilVisible:
+    element:
+      id: "settings:backupRow"
+    direction: DOWN
+- assertVisible:
+    id: "settings:backupRow"
+- assertVisible:
+    id: "settings:csvRow"
+- scrollUntilVisible:
+    element:
+      id: "settings:aboutRow"
+    direction: DOWN
+- assertVisible:
+    id: "settings:aboutRow"
 - assertNotVisible:
     id: "settings:logoutRow"

@@ -1,5 +1,6 @@
 package com.georgeci.moneysurfer.feature.settings.backup
 
+import com.georgeci.moneysurfer.domain.OfflineBuildFlags
 import com.georgeci.moneysurfer.domain.backup.BackupError
 import com.georgeci.moneysurfer.domain.backup.BackupExporter
 import com.georgeci.moneysurfer.domain.backup.BackupImporter
@@ -16,7 +17,10 @@ class BackupViewModel(
     private val exporter: BackupExporter,
     private val importer: BackupImporter,
     private val clock: ClockUseCase,
-) : MviViewModel<BackupState, BackupEvent, BackupEffect>(initialState = BackupState()) {
+    offlineBuildFlags: OfflineBuildFlags,
+) : MviViewModel<BackupState, BackupEvent, BackupEffect>(
+    initialState = BackupState(isOffline = offlineBuildFlags.isOffline),
+) {
 
     /** Passphrase chosen in the export dialog, held until the save picker returns a sink. */
     private var pendingExportPassphrase: String? = null
@@ -195,7 +199,16 @@ data class BackupState(
     val showExportOptions: Boolean = false,
     val showImportPassphrase: Boolean = false,
     val phase: BackupPhase = BackupPhase.Idle,
-)
+    val isOffline: Boolean = false,
+) {
+    /**
+     * Scheduled cloud backups, "Back up now" and "Delete cloud backup" all talk to a
+     * remote the offline build does not have. Hiding them leaves the local half —
+     * export an archive, restore from one — which [BackupExporter] and [BackupImporter]
+     * serve entirely from the on-device database.
+     */
+    val showCloudBackup: Boolean get() = !isOffline
+}
 
 enum class BackupPhase { Idle, Exporting, Importing }
 
