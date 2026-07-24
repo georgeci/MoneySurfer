@@ -42,6 +42,11 @@ fun SurferTotalBalanceCard(
     activeChipText: String,
     modifier: Modifier = Modifier,
     archivedChipText: String? = null,
+    /**
+     * Balances held in currencies other than the headline one. They get their own chips because
+     * [formattedTotal] cannot absorb them — summing across currencies needs rates the app has not.
+     */
+    otherCurrencyChipTexts: List<String> = emptyList(),
     periodLabel: String? = null,
 ) {
     SurferCard(modifier = modifier.fillMaxWidth()) {
@@ -96,6 +101,14 @@ fun SurferTotalBalanceCard(
                 if (archivedChipText != null) {
                     CountChip(
                         text = archivedChipText,
+                        background = AppTheme.materialColors.surfaceContainerHigh,
+                        contentColor = AppTheme.materialColors.onSurfaceVariant,
+                        dotAlpha = 0.55f,
+                    )
+                }
+                otherCurrencyChipTexts.forEach { chipText ->
+                    CountChip(
+                        text = chipText,
                         background = AppTheme.materialColors.surfaceContainerHigh,
                         contentColor = AppTheme.materialColors.onSurfaceVariant,
                         dotAlpha = 0.55f,

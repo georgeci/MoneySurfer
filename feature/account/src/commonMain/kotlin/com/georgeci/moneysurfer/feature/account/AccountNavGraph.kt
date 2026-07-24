@@ -10,6 +10,7 @@ import com.georgeci.moneysurfer.feature.account.details.AccountDetailsScreen
 import com.georgeci.moneysurfer.feature.account.manage.AccountsManageScreen
 import com.georgeci.moneysurfer.feature.account.picker.AccountChooserBottomSheet
 import com.georgeci.moneysurfer.navigation.AccountPickerResultKey
+import com.georgeci.moneysurfer.navigation.AccountPickerTransferResultKey
 import com.georgeci.moneysurfer.navigation.BottomSheetSceneStrategy
 import com.georgeci.moneysurfer.navigation.FeatureNavGraph
 import com.georgeci.moneysurfer.navigation.NavDetailPlaceholder
@@ -54,12 +55,17 @@ val accountNavGraph: FeatureNavGraph = { navigator ->
         AccountChooserBottomSheet(
             selectedAccountId = key.selectedAccountId?.let { AccountId(it) },
             excludeAccountId = key.excludeAccountId?.let { AccountId(it) },
+            showTransferShortcut = key.showTransferShortcut,
             onDismiss = { navigator.pop() },
             onNavigateToAccountCreation = {
                 navigator.replaceTop(Route.AccountCreation())
             },
             onAccountPicked = { picked ->
                 resultProducer.setResult(AccountPickerResultKey, picked)
+                navigator.pop()
+            },
+            onTransferRequested = {
+                resultProducer.setResult(AccountPickerTransferResultKey, true)
                 navigator.pop()
             },
         )
@@ -87,8 +93,8 @@ val accountNavGraph: FeatureNavGraph = { navigator ->
     }
 }
 
-/** Type the creation screen opens on when the caller has no opinion. */
-private val DefaultAccountType = AccountType.SAVINGS
+/** Type the creation screen opens on when the caller has no opinion — the mockup's "Bank". */
+private val DefaultAccountType = AccountType.BANK
 
 /** Unknown names can only come from a hand-edited saved stack — fall back instead of crashing. */
 private fun String.toAccountType(): AccountType? =

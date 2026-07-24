@@ -24,6 +24,8 @@
     <string name="accounts_manage_archived_snackbar">"%1$s" archived</string>
     <string name="accounts_manage_archive_undo">Undo</string>
     <string name="accounts_manage_action_failed">Something went wrong. Try again.</string>
+    <string name="accounts_manage_archived_at">Archived %1$s %2$s</string>
+    <string name="accounts_manage_transfer_instead">Transfer between accounts instead</string>
     <string name="account_creation_title">New account</string>
     <string name="account_creation_first_run_title">Your first account</string>
     <string name="account_creation_first_run_subtitle">Add the account you use most — cash, a card, or savings. You can add more later.</string>
@@ -59,8 +61,6 @@
     <string name="account_details_edit_content_description">Edit account</string>
     <string name="account_details_more_content_description">More</string>
     <string name="account_details_updated">Updated just now</string>
-    <string name="account_details_synced_format">Synced %1$s · Tap for full history</string>
-    <string name="account_details_synced_recent">2 min ago</string>
     <string name="account_details_kind_last4_format">%1$s · •• %2$s</string>
     <string name="account_details_change_this_month">+€412 this month</string>
     <string name="account_details_in_this_month">In this month</string>
@@ -82,4 +82,19 @@
     <string name="account_creation_created_snackbar">"%1$s" added</string>
     <string name="account_creation_updated_snackbar">"%1$s" updated</string>
     <string name="accounts_manage_deleted_snackbar">"%1$s" deleted</string>
+    <!-- Indexed by month number − 1. Used by the archived-account row ("Archived Nov 2024"). -->
+    <string-array name="month_short">
+        <item>Jan</item>
+        <item>Feb</item>
+        <item>Mar</item>
+        <item>Apr</item>
+        <item>May</item>
+        <item>Jun</item>
+        <item>Jul</item>
+        <item>Aug</item>
+        <item>Sep</item>
+        <item>Oct</item>
+        <item>Nov</item>
+        <item>Dec</item>
+    </string-array>
 </resources>

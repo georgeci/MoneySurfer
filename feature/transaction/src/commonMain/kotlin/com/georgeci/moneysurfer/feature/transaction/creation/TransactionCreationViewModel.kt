@@ -125,6 +125,12 @@ class TransactionCreationViewModel(
             TransactionCreationEffect.NavigateToAccountChooser(
                 selectedAccountId = selected,
                 excludeAccountId = excluded,
+                // Only a single-account pick can still become a transfer; the From/To slots are
+                // already inside one. Same gate as the type switch, so the footer never leads
+                // somewhere [changeType] would refuse to go.
+                showTransferShortcut = slot == AccountSlot.Single &&
+                    !state.isEditMode &&
+                    featureConfig.transferEnabled,
             ),
         )
     }
@@ -562,6 +568,7 @@ sealed interface TransactionCreationEffect {
     data class NavigateToAccountChooser(
         val selectedAccountId: AccountId?,
         val excludeAccountId: AccountId? = null,
+        val showTransferShortcut: Boolean = false,
     ) : TransactionCreationEffect
 }
 

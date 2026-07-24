@@ -53,6 +53,7 @@ import moneysurfer.feature.dashboard.generated.resources.dashboard_add_account
 import moneysurfer.feature.dashboard.generated.resources.dashboard_add_account_new
 import moneysurfer.feature.dashboard.generated.resources.dashboard_add_transaction
 import moneysurfer.feature.dashboard.generated.resources.dashboard_balance_empty_text
+import moneysurfer.feature.dashboard.generated.resources.dashboard_balance_other_currencies
 import moneysurfer.feature.dashboard.generated.resources.dashboard_balance_title
 import moneysurfer.feature.dashboard.generated.resources.dashboard_goals_empty_subtitle
 import moneysurfer.feature.dashboard.generated.resources.dashboard_goals_empty_title
@@ -205,6 +206,14 @@ private fun DashboardContent(
                         null
                     },
                     trendText = state.formattedTrendDelta,
+                    noteText = state.otherCurrencyTotals
+                        .takeIf { it.isNotEmpty() }
+                        ?.let {
+                            stringResource(
+                                Res.string.dashboard_balance_other_currencies,
+                                it.joinToString(" · "),
+                            )
+                        },
                     showSparkline = false,
                     modifier = Modifier
                         .fillMaxWidth()

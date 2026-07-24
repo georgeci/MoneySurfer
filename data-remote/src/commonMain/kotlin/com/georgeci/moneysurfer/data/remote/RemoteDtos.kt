@@ -52,6 +52,11 @@ data class AccountDoc(
     val updatedAt: Long = 0L,
     val deletedAt: Long? = null,
     val clientVersionCode: Int = 1,
+    /**
+     * When the account was archived. Null both for active accounts and for rows written by a
+     * client that predates the field — the manage list falls back to a dateless label either way.
+     */
+    val archivedAt: Long? = null,
 )
 
 @Serializable

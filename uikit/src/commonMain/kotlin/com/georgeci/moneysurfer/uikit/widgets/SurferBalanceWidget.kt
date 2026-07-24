@@ -36,6 +36,12 @@ fun SurferBalanceWidget(
     size: SurferWidgetSize = LocalSurferWidgetSize.current,
     trendText: String? = null,
     emptyText: String? = null,
+    /**
+     * Secondary line under the headline, shown when there is no [trendText]. Carries what the
+     * single headline figure cannot say — e.g. the balances held in other currencies, which no
+     * rate-free sum may fold into it.
+     */
+    noteText: String? = null,
     showSparkline: Boolean = true,
 ) {
     val hero = size == SurferWidgetSize.Hero
@@ -97,30 +103,51 @@ fun SurferBalanceWidget(
                         fractionAlpha = 0.55f,
                     )
                 }
-                when {
-                    trendText != null -> Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.TrendingUp,
-                            // decorative — trend direction indicator; the trendText provides the accessible label
-                            contentDescription = null,
-                            tint = AppTheme.materialColors.onPrimaryContainer,
-                            modifier = Modifier.size(if (hero) 16.dp else 14.dp),
-                        )
-                        Spacer(Modifier.width(6.dp))
-                        Text(
-                            text = trendText,
-                            style = if (hero) AppTheme.typography.bodyMedium else AppTheme.typography.bodySmall,
-                            color = AppTheme.materialColors.onPrimaryContainer,
-                        )
-                    }
-                    emptyText != null -> Text(
-                        text = emptyText,
-                        style = AppTheme.typography.bodyMedium,
-                        color = AppTheme.materialColors.onPrimaryContainer.copy(alpha = 0.85f),
-                    )
-                }
+                Footnote(
+                    hero = hero,
+                    trendText = trendText,
+                    noteText = noteText,
+                    emptyText = emptyText,
+                )
             }
         }
+    }
+}
+
+/** Bottom line of the widget: at most one of trend, note or empty-state copy, in that order. */
+@Composable
+private fun Footnote(
+    hero: Boolean,
+    trendText: String?,
+    noteText: String?,
+    emptyText: String?,
+) {
+    when {
+        trendText != null -> Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.TrendingUp,
+                // decorative — trend direction indicator; the trendText provides the accessible label
+                contentDescription = null,
+                tint = AppTheme.materialColors.onPrimaryContainer,
+                modifier = Modifier.size(if (hero) 16.dp else 14.dp),
+            )
+            Spacer(Modifier.width(6.dp))
+            Text(
+                text = trendText,
+                style = if (hero) AppTheme.typography.bodyMedium else AppTheme.typography.bodySmall,
+                color = AppTheme.materialColors.onPrimaryContainer,
+            )
+        }
+        noteText != null -> Text(
+            text = noteText,
+            style = AppTheme.typography.bodySmall,
+            color = AppTheme.materialColors.onPrimaryContainer.copy(alpha = 0.85f),
+        )
+        emptyText != null -> Text(
+            text = emptyText,
+            style = AppTheme.typography.bodyMedium,
+            color = AppTheme.materialColors.onPrimaryContainer.copy(alpha = 0.85f),
+        )
     }
 }
 

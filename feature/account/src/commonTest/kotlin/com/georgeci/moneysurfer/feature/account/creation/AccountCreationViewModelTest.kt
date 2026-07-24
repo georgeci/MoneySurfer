@@ -26,9 +26,12 @@ import com.georgeci.moneysurfer.domain.repositories.CurrencyRepository
 import com.georgeci.moneysurfer.domain.repositories.TransactionRepository
 import com.georgeci.moneysurfer.domain.repositories.WorkspaceRepository
 import com.georgeci.moneysurfer.domain.usecase.ApplyTransactionChangeUseCase
+import com.georgeci.moneysurfer.domain.usecase.CreateAccountUseCase
 import com.georgeci.moneysurfer.domain.usecase.CreateTransactionUseCase
+import com.georgeci.moneysurfer.domain.usecase.GetAccountByIdUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetCurrenciesUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetCurrentTimeUseCase
+import com.georgeci.moneysurfer.domain.usecase.UpdateAccountUseCase
 import com.georgeci.moneysurfer.domain.usecase.UpdateWorkspaceCurrencyUseCase
 import com.georgeci.moneysurfer.domain.util.TransactionPeriodWindow
 import com.georgeci.moneysurfer.feature.account.generated.resources.Res
@@ -376,7 +379,9 @@ private class Fixture(val workspaceId: WorkspaceId) {
         accountId = editing,
         firstRun = firstRun,
         initialType = initialType,
-        accountRepository = accountRepository,
+        getAccountById = GetAccountByIdUseCase(accountRepository),
+        createAccount = CreateAccountUseCase(accountRepository),
+        updateAccount = UpdateAccountUseCase(accountRepository),
         createTransaction = createTransaction,
         session = session,
         getCurrentTime = GetCurrentTimeUseCase(clock),
