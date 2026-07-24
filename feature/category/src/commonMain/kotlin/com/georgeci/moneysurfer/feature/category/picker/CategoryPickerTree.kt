@@ -41,6 +41,7 @@ import com.georgeci.moneysurfer.uikit.components.SurferCategoryBubble
 import com.georgeci.moneysurfer.uikit.components.SurferCategoryPalette
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.modifier.surferDashedBorder
+import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import moneysurfer.feature.category.generated.resources.Res
 import moneysurfer.feature.category.generated.resources.category_picker_hide_children
@@ -318,8 +319,7 @@ private fun SelectionRadio(selected: Boolean) {
         if (selected) {
             Icon(
                 imageVector = SurferIcons.Check,
-                // decorative — the row's own name is the accessible label
-                contentDescription = null,
+                contentDescription = SurferSemantics.Decorative,
                 tint = AppTheme.materialColors.onPrimary,
                 modifier = Modifier.size(RadioCheckSize),
             )
@@ -346,8 +346,7 @@ private fun NewCategoryRow(
     ) {
         Icon(
             imageVector = SurferIcons.Add,
-            // decorative — the label next to it names the action
-            contentDescription = null,
+            contentDescription = SurferSemantics.Decorative,
             tint = AppTheme.materialColors.primary,
             modifier = Modifier
                 .padding(end = BubbleSpacing)

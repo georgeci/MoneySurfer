@@ -1,7 +1,5 @@
 package com.georgeci.moneysurfer.feature.account.creation
 
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -15,7 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
@@ -32,7 +29,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
@@ -72,6 +68,8 @@ import com.georgeci.moneysurfer.feature.account.labelRes
 import com.georgeci.moneysurfer.uikit.components.SurferCurrencyBottomSheet
 import com.georgeci.moneysurfer.uikit.components.SurferCurrencyOption
 import com.georgeci.moneysurfer.uikit.components.SurferCurrencyPickerField
+import com.georgeci.moneysurfer.uikit.components.base.SurferOutlinedChip
+import com.georgeci.moneysurfer.uikit.components.base.SurferSectionLabel
 import com.georgeci.moneysurfer.uikit.components.base.SurferSegmentedControl
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbarButtonAction
@@ -251,7 +249,10 @@ private fun TypePicker(
     selected: AccountType,
     onSelect: (AccountType) -> Unit,
 ) {
-    SectionLabel(stringResource(Res.string.account_creation_type_label))
+    SurferSectionLabel(
+        text = stringResource(Res.string.account_creation_type_label),
+        modifier = Modifier.padding(bottom = AppTheme.spacing.small),
+    )
     SurferSegmentedControl(
         options = listOf(AccountType.CASH, AccountType.BANK, AccountType.CARD, AccountType.SAVINGS),
         selected = selected,
@@ -273,7 +274,10 @@ private fun CurrencyPicker(
     val resolved = currencies.firstOrNull { it.code == selected } ?: currencies.first()
     var sheetOpen by rememberSaveable { mutableStateOf(false) }
 
-    SectionLabel(stringResource(Res.string.account_creation_currency_label))
+    SurferSectionLabel(
+        text = stringResource(Res.string.account_creation_currency_label),
+        modifier = Modifier.padding(bottom = AppTheme.spacing.small),
+    )
     SurferCurrencyPickerField(
         symbol = resolved.symbol,
         code = resolved.code.value,
@@ -363,13 +367,15 @@ private fun ExtraDetailsSection(
                 verticalArrangement = Arrangement.spacedBy(AppTheme.spacing.small),
             ) {
                 availableKeys.forEach { key ->
-                    AddFieldChip(
+                    SurferOutlinedChip(
                         label = stringResource(key.labelRes()),
+                        icon = SurferIcons.Add,
                         onClick = { onAdd(key) },
                     )
                 }
-                AddFieldChip(
+                SurferOutlinedChip(
                     label = stringResource(Res.string.account_creation_field_custom),
+                    icon = SurferIcons.Add,
                     onClick = { namingCustomField = true },
                 )
             }
@@ -470,46 +476,6 @@ private fun ExtraFieldItem(
             },
         )
     }
-}
-
-@Composable
-private fun AddFieldChip(
-    label: String,
-    onClick: () -> Unit,
-) {
-    val outline = AppTheme.materialColors.outline
-    Row(
-        modifier = Modifier
-            .height(32.dp)
-            .clip(RoundedCornerShape(16.dp))
-            .border(1.dp, outline, RoundedCornerShape(16.dp))
-            .clickable(onClick = onClick)
-            .padding(horizontal = 12.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(6.dp),
-    ) {
-        Icon(
-            imageVector = SurferIcons.Add,
-            contentDescription = null,
-            tint = AppTheme.materialColors.onSurface,
-            modifier = Modifier.size(14.dp),
-        )
-        Text(
-            text = label,
-            style = AppTheme.typography.labelMedium,
-            color = AppTheme.materialColors.onSurface,
-        )
-    }
-}
-
-@Composable
-private fun SectionLabel(text: String) {
-    Text(
-        text = text,
-        style = AppTheme.typography.labelLarge,
-        color = AppTheme.materialColors.onSurfaceVariant,
-        modifier = Modifier.padding(bottom = AppTheme.spacing.small),
-    )
 }
 
 private val AccountExtraField.isMultiline: Boolean

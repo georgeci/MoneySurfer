@@ -15,6 +15,7 @@ plugins {
     alias(libs.plugins.composeMultiplatform) apply false
     alias(libs.plugins.composeCompiler) apply false
     alias(libs.plugins.kotlinMultiplatform) apply false
+    alias(libs.plugins.kotlinJvm) apply false
     alias(libs.plugins.androidKotlinMultiplatformLibrary) apply false
     alias(libs.plugins.androidLint) apply false
     alias(libs.plugins.ksp) apply false
@@ -184,6 +185,8 @@ val coverageExcludedProjects = setOf(
     // Test-only module: aggregated into Kover so its integration tests credit the
     // modules they exercise, but its own sources aren't production code to cover.
     ":integration-test",
+    // Build tooling: detekt rules run against the build, they are not shipped.
+    ":detekt-rules",
 )
 
 subprojects {
@@ -203,11 +206,20 @@ subprojects {
             "src/iosMain/kotlin",
             "src/jvmMain/kotlin",
             "src/jvmTest/kotlin",
+            // Plain-JVM layout — only `:detekt-rules` uses it.
+            "src/main/kotlin",
+            "src/test/kotlin",
         )
     }
 
     dependencies {
         "detektPlugins"(rootProject.libs.detekt.formatting)
+        // The project's own rules, minus the module that defines them — depending
+        // on itself would be a dependency cycle. It is still linted by the
+        // built-in rules above.
+        if (path != ":detekt-rules") {
+            "detektPlugins"(project(":detekt-rules"))
+        }
     }
 
     tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {

@@ -12,8 +12,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.ExtendedFloatingActionButton
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -34,6 +32,7 @@ import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.uikit.components.SurferEmptyState
 import com.georgeci.moneysurfer.uikit.components.SurferSkeleton
 import com.georgeci.moneysurfer.uikit.components.SurferSkeletonRow
+import com.georgeci.moneysurfer.uikit.components.base.SurferAddFab
 import com.georgeci.moneysurfer.uikit.components.base.SurferDashboardToolbar
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbarAction
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
@@ -179,12 +178,8 @@ private fun DashboardContent(
         },
         floatingActionButton = {
             if (state.accounts.isNotEmpty()) {
-                ExtendedFloatingActionButton(
-                    text = { Text(stringResource(Res.string.dashboard_add_transaction)) },
-                    icon = {
-                        // decorative — FAB text label provides the accessible label
-                        Icon(imageVector = SurferIcons.Add, contentDescription = null)
-                    },
+                SurferAddFab(
+                    label = stringResource(Res.string.dashboard_add_transaction),
                     onClick = { onEvent(DashboardEvent.OnAddTransactionClick) },
                     modifier = Modifier.testTag(DashboardTestTags.AddTransaction),
                 )

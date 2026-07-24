@@ -18,6 +18,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
+import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import moneysurfer.uikit.generated.resources.Res
 import moneysurfer.uikit.generated.resources.uikit_app_icon
@@ -44,7 +45,7 @@ fun SurferSplash(modifier: Modifier = Modifier) {
         ) {
             Image(
                 painter = painterResource(Res.drawable.uikit_app_icon),
-                contentDescription = null,
+                contentDescription = SurferSemantics.Decorative,
                 modifier = Modifier
                     .size(ICON_SIZE)
                     .shadow(elevation = 8.dp, shape = RoundedCornerShape(ICON_CORNER))

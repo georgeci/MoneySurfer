@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.dp
 import com.georgeci.moneysurfer.uikit.atom.SurferActionCard
 import com.georgeci.moneysurfer.uikit.atom.SurferCard
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -51,7 +52,7 @@ private fun CardBody(text: String) {
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        Icon(imageVector = SurferIcons.Wallet, contentDescription = null)
+        Icon(imageVector = SurferIcons.Wallet, contentDescription = SurferSemantics.Decorative)
         Text(text)
     }
 }

@@ -28,6 +28,7 @@ import com.georgeci.moneysurfer.uikit.components.SurferCategoryPalette
 import com.georgeci.moneysurfer.uikit.components.category.SurferCategoryCell
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.modifier.surferDashedBorder
+import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import moneysurfer.feature.category.generated.resources.Res
 import moneysurfer.feature.category.generated.resources.category_picker_new
@@ -114,8 +115,7 @@ private fun NewCategoryCell(
         ) {
             Icon(
                 imageVector = SurferIcons.Add,
-                // decorative — the label under the tile names the action
-                contentDescription = null,
+                contentDescription = SurferSemantics.Decorative,
                 tint = AppTheme.materialColors.primary,
                 modifier = Modifier.size(NewGlyphSize),
             )

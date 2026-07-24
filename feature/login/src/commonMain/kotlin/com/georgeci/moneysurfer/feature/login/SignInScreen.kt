@@ -60,6 +60,7 @@ import com.georgeci.moneysurfer.uikit.components.SurferTextField
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
 import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
+import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.uikit.theme.ConfigureSystemBars
 import com.georgeci.moneysurfer.uikit.tokens.AuthColors
@@ -251,7 +252,7 @@ private fun SignInBrandHeader(modifier: Modifier = Modifier) {
         ) {
             Icon(
                 imageVector = SurferIcons.Wallet,
-                contentDescription = null,
+                contentDescription = SurferSemantics.Decorative,
                 tint = AuthColors.OnBrand,
                 modifier = Modifier.size(BrandIconContentSize),
             )
@@ -507,7 +508,7 @@ private fun PasskeyOutlinedButton(
     ) {
         Icon(
             imageVector = SurferIcons.Fingerprint,
-            contentDescription = null,
+            contentDescription = SurferSemantics.Decorative,
             modifier = Modifier.size(PasskeyIconSize),
         )
         Spacer(Modifier.width(AppTheme.spacing.small))

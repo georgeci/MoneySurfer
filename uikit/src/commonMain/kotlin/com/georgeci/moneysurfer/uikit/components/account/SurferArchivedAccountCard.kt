@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import com.georgeci.moneysurfer.uikit.atom.SurferActionCard
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
+import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 
 /**
@@ -71,8 +72,7 @@ fun SurferArchivedAccountCard(
                 ) {
                     Icon(
                         imageVector = SurferIcons.Restore,
-                        // decorative — button text (restoreLabel) provides the accessible label
-                        contentDescription = null,
+                        contentDescription = SurferSemantics.Decorative,
                         modifier = Modifier.size(14.dp),
                     )
                     Spacer(Modifier.width(6.dp))

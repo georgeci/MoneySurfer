@@ -37,6 +37,7 @@ import com.georgeci.moneysurfer.uikit.components.workspace.SurferInviteRow
 import com.georgeci.moneysurfer.uikit.components.workspace.SurferMemberRow
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.preview.SurferBottomSheetPreview
+import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import moneysurfer.feature.workspace.generated.resources.Res
 import moneysurfer.feature.workspace.generated.resources.workspace_members_close_content_description
@@ -339,7 +340,7 @@ private fun ViewOnlyHint() {
     ) {
         Icon(
             imageVector = SurferIcons.People,
-            contentDescription = null,
+            contentDescription = SurferSemantics.Decorative,
             tint = AppTheme.materialColors.onSurfaceVariant,
             modifier = Modifier.size(16.dp),
         )

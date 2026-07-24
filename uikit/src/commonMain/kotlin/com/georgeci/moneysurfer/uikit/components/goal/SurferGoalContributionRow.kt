@@ -25,6 +25,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
+import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 
 /**
@@ -70,7 +71,7 @@ fun SurferGoalContributionRow(
                     isWithdrawal -> Icons.Default.ArrowUpward
                     else -> Icons.Default.ArrowDownward
                 },
-                contentDescription = null,
+                contentDescription = SurferSemantics.Decorative,
                 tint = accent,
                 modifier = Modifier.size(18.dp),
             )

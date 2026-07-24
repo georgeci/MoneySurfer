@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import com.georgeci.moneysurfer.uikit.components.base.SurferSplitAmount
 import com.georgeci.moneysurfer.uikit.components.base.SurferSplitAmountTier
 import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
+import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.uikit.theme.SurferContainerStyle
 
@@ -132,8 +133,7 @@ private fun Footnote(hero: Boolean, footnote: SurferBalanceFootnote?) {
         is SurferBalanceFootnote.Trend -> Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.TrendingUp,
-                // decorative — trend direction indicator; the trend text provides the accessible label
-                contentDescription = null,
+                contentDescription = SurferSemantics.Decorative,
                 tint = AppTheme.materialColors.onPrimaryContainer,
                 modifier = Modifier.size(if (hero) 16.dp else 14.dp),
             )

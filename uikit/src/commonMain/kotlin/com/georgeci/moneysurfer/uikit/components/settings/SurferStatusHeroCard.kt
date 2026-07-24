@@ -23,6 +23,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
+import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 
 enum class SurferStatusHeroTone { Primary, Secondary, Tertiary }
@@ -65,8 +66,7 @@ fun SurferStatusHeroCard(
         ) {
             Icon(
                 imageVector = icon,
-                // decorative — status illustration; the title and supporting text convey the status
-                contentDescription = null,
+                contentDescription = SurferSemantics.Decorative,
                 tint = fg,
                 modifier = Modifier.size(24.dp),
             )

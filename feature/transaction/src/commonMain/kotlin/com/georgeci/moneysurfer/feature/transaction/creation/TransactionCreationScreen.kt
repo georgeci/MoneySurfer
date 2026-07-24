@@ -72,6 +72,7 @@ import com.georgeci.moneysurfer.uikit.components.base.SurferToolbarButtonAction
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
 import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
+import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.utils.AmountInputTransformation
 import com.georgeci.moneysurfer.utils.HandleSideEffect
@@ -626,7 +627,7 @@ private fun CategoryTile(
                 ) {
                     Icon(
                         imageVector = SurferIcons.Check,
-                        contentDescription = null,
+                        contentDescription = SurferSemantics.Decorative,
                         tint = AppTheme.materialColors.onPrimary,
                         modifier = Modifier.size(10.dp),
                     )
@@ -665,7 +666,7 @@ private fun MoreTile(onClick: () -> Unit) {
         ) {
             Icon(
                 imageVector = SurferIcons.Add,
-                contentDescription = null,
+                contentDescription = SurferSemantics.Decorative,
                 tint = AppTheme.materialColors.primary,
                 modifier = Modifier.size(20.dp),
             )

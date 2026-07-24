@@ -66,22 +66,24 @@
     <string name="category_details_log_income">Добавить доход</string>
 
     <!-- Abbreviated month names for the spend trend axis -->
-    <string name="month_short_january">янв.</string>
-    <string name="month_short_february">февр.</string>
-    <string name="month_short_march">март</string>
-    <string name="month_short_april">апр.</string>
-    <string name="month_short_may">май</string>
-    <string name="month_short_june">июнь</string>
-    <string name="month_short_july">июль</string>
-    <string name="month_short_august">авг.</string>
-    <string name="month_short_september">сент.</string>
-    <string name="month_short_october">окт.</string>
-    <string name="month_short_november">нояб.</string>
-    <string name="month_short_december">дек.</string>
 
     <!-- Action feedback snackbars -->
     <string name="category_creation_created_snackbar">«%1$s» создана</string>
     <string name="category_creation_updated_snackbar">«%1$s» обновлена</string>
     <string name="categories_manage_deleted_snackbar">«%1$s» удалена</string>
     <string name="categories_manage_delete_undo">Отменить</string>
+    <string-array name="month_short">
+        <item>янв.</item>
+        <item>февр.</item>
+        <item>март</item>
+        <item>апр.</item>
+        <item>май</item>
+        <item>июнь</item>
+        <item>июль</item>
+        <item>авг.</item>
+        <item>сент.</item>
+        <item>окт.</item>
+        <item>нояб.</item>
+        <item>дек.</item>
+    </string-array>
 </resources>

@@ -29,6 +29,7 @@ import com.georgeci.moneysurfer.domain.primitives.CategoryType
 import com.georgeci.moneysurfer.uikit.components.SurferSearchField
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.preview.SurferBottomSheetPreview
+import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import moneysurfer.feature.category.generated.resources.Res
 import moneysurfer.feature.category.generated.resources.category_creation_close_content_description
@@ -232,8 +233,7 @@ private fun TypeTab(
     ) {
         Icon(
             imageVector = glyph,
-            // decorative — the tab label right next to it carries the meaning
-            contentDescription = null,
+            contentDescription = SurferSemantics.Decorative,
             tint = content,
             modifier = Modifier.size(TabGlyphSize),
         )
