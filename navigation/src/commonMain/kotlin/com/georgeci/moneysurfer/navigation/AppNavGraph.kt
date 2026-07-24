@@ -69,6 +69,7 @@ internal val navKeySerializersModule = SerializersModule {
         subclass(Route.WorkspaceMemberActions::class, Route.WorkspaceMemberActions.serializer())
         subclass(Route.IncomingInvites::class, Route.IncomingInvites.serializer())
         subclass(Route.Dashboard::class, Route.Dashboard.serializer())
+        subclass(Route.DashboardCustomize::class, Route.DashboardCustomize.serializer())
         subclass(Route.AccountCreation::class, Route.AccountCreation.serializer())
         subclass(Route.AccountsManage::class, Route.AccountsManage.serializer())
         subclass(Route.CategoryCreation::class, Route.CategoryCreation.serializer())

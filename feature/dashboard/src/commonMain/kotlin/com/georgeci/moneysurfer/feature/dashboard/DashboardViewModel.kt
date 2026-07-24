@@ -66,6 +66,7 @@ class DashboardViewModel(
                 postSideEffect(DashboardEffect.NavigateToTransactionCreation(accountId = event.accountId))
             DashboardEvent.OnManageAccountsClick -> postSideEffect(DashboardEffect.NavigateToAccountsManage)
             DashboardEvent.OnSettingsClick -> postSideEffect(DashboardEffect.NavigateToSettings)
+            DashboardEvent.OnCustomizeClick -> postSideEffect(DashboardEffect.NavigateToCustomize)
             DashboardEvent.OnSeeAllGoalsClick -> postSideEffect(DashboardEffect.NavigateToGoals)
             is DashboardEvent.OnGoalClick -> postSideEffect(DashboardEffect.NavigateToGoalDetails(event.goalId))
         }
@@ -194,6 +195,7 @@ sealed interface DashboardEvent {
     data class OnAddTransactionForAccountClick(val accountId: AccountId) : DashboardEvent
     data object OnManageAccountsClick : DashboardEvent
     data object OnSettingsClick : DashboardEvent
+    data object OnCustomizeClick : DashboardEvent
     data object OnSeeAllGoalsClick : DashboardEvent
     data class OnGoalClick(val goalId: GoalId) : DashboardEvent
 }
@@ -205,6 +207,7 @@ sealed interface DashboardEffect {
     data object NavigateToAccountsManage : DashboardEffect
     data class NavigateToTransactionCreation(val accountId: AccountId?) : DashboardEffect
     data object NavigateToSettings : DashboardEffect
+    data object NavigateToCustomize : DashboardEffect
     data object NavigateToTransactionsList : DashboardEffect
     data object NavigateToGoals : DashboardEffect
     data class NavigateToGoalDetails(val goalId: GoalId) : DashboardEffect
