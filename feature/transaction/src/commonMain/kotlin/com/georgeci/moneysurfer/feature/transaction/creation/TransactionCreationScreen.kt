@@ -43,6 +43,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
@@ -406,6 +407,9 @@ private fun TransactionCreationContent(
 
 private const val CATEGORY_PREVIEW_SIZE = 7
 
+/** Opacity of the type pill's tint wash. See [TypePill] for why it is composited, not blended. */
+private const val TYPE_PILL_WASH_ALPHA = 0.18f
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun AmountHero(
@@ -489,10 +493,15 @@ private fun TypePill(type: TransactionTypeUi) {
         TransactionTypeUi.Income -> Res.string.transaction_creation_income
         TransactionTypeUi.Transfer -> Res.string.transaction_creation_transfer
     }
+    // Composited over `surface` rather than left translucent: the label is `tint` on a wash
+    // of the same tint, so the contrast ratio depends entirely on what shows through. Pinning
+    // the wash to the scaffold's own colour keeps the pair at a known ≥4.5:1 even if the pill
+    // is later moved onto a card.
+    val wash = tint.copy(alpha = TYPE_PILL_WASH_ALPHA).compositeOver(AppTheme.materialColors.surface)
     Row(
         modifier = Modifier
             .clip(RoundedCornerShape(percent = 50))
-            .background(tint.copy(alpha = 0.18f))
+            .background(wash)
             .padding(horizontal = 14.dp, vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {

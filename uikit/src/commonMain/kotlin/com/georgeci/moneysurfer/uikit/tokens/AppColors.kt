@@ -52,16 +52,23 @@ object AppColors {
     // Semantic — transaction type accents. Material 3 has no income/expense/transfer
     // slots; expose via [SemanticColors] / `AppTheme.semanticColors` so screens never
     // reach for the hex.
-    val Income = Color(0xFF2E9A6A)
-    val Expense = Color(0xFFB54744)
+    //
+    // These are *text* colours (amounts, type pills), so each one holds ≥4.5:1 against
+    // every surface it can land on — down to `surfaceContainerHighest`, and through the
+    // 14–18% self-tinted pill washes that `SurferTransactionLine` and the transaction
+    // creation `TypePill` paint behind them. That worst case is what drove the light
+    // values darker than the mockup's mid-tones; `ColorContrastTest` pins it.
+    val Income = Color(0xFF1C5E41)
+    val Expense = Color(0xFFA3403D)
     val Transfer = Color(0xFF2E5AA8)
 
     /**
      * Amber "approaching the limit" accent. M3 has no warning slot, and `error` is already
      * spoken for by the over-budget state, so a budget nearing its cap needs a third colour
-     * that reads as caution rather than failure. Mirrors the mockup's `oklch(56% 0.13 68)`.
+     * that reads as caution rather than failure. Darkened from the mockup's
+     * `oklch(56% 0.13 68)`, which only reached 3.2:1 on the tonal surface containers.
      */
-    val Warning = Color(0xFFA97110)
+    val Warning = Color(0xFF83580C)
 
     // Dark theme overrides
     object Dark {
@@ -102,6 +109,8 @@ object AppColors {
 
         val Scrim = Color(0xFF000000)
 
+        // Light-on-dark already clears AA on every surface these land on, so the dark
+        // accents keep the mockup's values. See `ColorContrastTest` for the exact pairs.
         val Income = Color(0xFF6FCB9F)
         val Expense = Color(0xFFE89B98)
         val Transfer = Color(0xFF8FB0E0)
