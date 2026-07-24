@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.georgeci.moneysurfer.uikit.components.SurferCurrencyPickerField
 import com.georgeci.moneysurfer.uikit.components.SurferCurrencyRow
 import com.georgeci.moneysurfer.uikit.components.SurferDropdown
 import com.georgeci.moneysurfer.uikit.components.SurferPickerRow
@@ -63,6 +64,19 @@ class SurferInputScreenshotTest {
                 onClick = {},
                 modifier = Modifier.fillMaxWidth(),
                 selected = true,
+            )
+            SurferCurrencyPickerField(
+                symbol = "€",
+                code = "EUR",
+                name = "Euro",
+                onClick = {},
+            )
+            SurferCurrencyPickerField(
+                symbol = "zł",
+                code = "PLN",
+                name = "Polish Zloty",
+                onClick = {},
+                expanded = true,
             )
         }
     }

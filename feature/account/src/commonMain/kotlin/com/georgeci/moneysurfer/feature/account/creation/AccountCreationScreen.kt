@@ -25,6 +25,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -42,6 +45,7 @@ import com.georgeci.moneysurfer.feature.account.generated.resources.account_crea
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_balance_helper
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_balance_label
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_currency_label
+import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_currency_search_placeholder
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_extra_details_label
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_extra_details_optional
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_field_bank_url
@@ -60,6 +64,9 @@ import com.georgeci.moneysurfer.feature.account.generated.resources.account_crea
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_title
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_type_label
 import com.georgeci.moneysurfer.feature.account.labelRes
+import com.georgeci.moneysurfer.uikit.components.SurferCurrencyBottomSheet
+import com.georgeci.moneysurfer.uikit.components.SurferCurrencyOption
+import com.georgeci.moneysurfer.uikit.components.SurferCurrencyPickerField
 import com.georgeci.moneysurfer.uikit.components.base.SurferSegmentedControl
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbarButtonAction
@@ -246,6 +253,10 @@ private fun TypePicker(
     )
 }
 
+/**
+ * A field that opens the currency bottom sheet. The supported list is already eight entries and
+ * still growing, which a segmented control cannot hold on a phone (see issue #277).
+ */
 @Composable
 private fun CurrencyPicker(
     currencies: List<Currency>,
@@ -253,13 +264,32 @@ private fun CurrencyPicker(
     onSelect: (CurrencyCode) -> Unit,
 ) {
     val resolved = currencies.firstOrNull { it.code == selected } ?: currencies.first()
+    var sheetOpen by rememberSaveable { mutableStateOf(false) }
+
     SectionLabel(stringResource(Res.string.account_creation_currency_label))
-    SurferSegmentedControl(
-        options = currencies,
-        selected = resolved,
-        label = { "${it.code.value} ${it.symbol}" },
-        onSelect = { onSelect(it.code) },
+    SurferCurrencyPickerField(
+        symbol = resolved.symbol,
+        code = resolved.code.value,
+        name = resolved.displayName,
+        onClick = { sheetOpen = true },
+        expanded = sheetOpen,
     )
+
+    if (sheetOpen) {
+        SurferCurrencyBottomSheet(
+            title = stringResource(Res.string.account_creation_currency_label),
+            searchPlaceholder = stringResource(Res.string.account_creation_currency_search_placeholder),
+            currencies = currencies.map {
+                SurferCurrencyOption(code = it.code.value, symbol = it.symbol, name = it.displayName)
+            },
+            selectedCode = resolved.code.value,
+            onSelect = {
+                onSelect(CurrencyCode(it.code))
+                sheetOpen = false
+            },
+            onDismiss = { sheetOpen = false },
+        )
+    }
 }
 
 @OptIn(ExperimentalLayoutApi::class)
