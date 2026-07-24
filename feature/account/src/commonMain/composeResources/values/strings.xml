@@ -62,7 +62,6 @@
     <string name="account_details_synced_format">Synced %1$s · Tap for full history</string>
     <string name="account_details_synced_recent">2 min ago</string>
     <string name="account_details_kind_last4_format">%1$s · •• %2$s</string>
-    <string name="account_details_change_this_month">+€412 this month</string>
     <string name="account_details_in_this_month">In this month</string>
     <string name="account_details_out_this_month">Out this month</string>
     <string name="account_details_chart_title">Balance · 30 days</string>
