@@ -5,14 +5,14 @@ import androidx.sqlite.SQLiteConnection
 import androidx.sqlite.execSQL
 
 /**
- * v28 → v29: give `accounts` the `extraDetails` column the creation screen has been collecting
+ * v29 → v30: give `accounts` the `extraDetails` column the creation screen has been collecting
  * and throwing away (issue #304).
  *
  * Purely additive, and with no backfill to do: the values never reached storage, so every existing
  * row genuinely has no extra details and the empty-array default is the truthful state rather than
  * a placeholder.
  */
-val MIGRATION_28_29: Migration = object : Migration(28, 29) {
+val MIGRATION_29_30: Migration = object : Migration(29, 30) {
     override fun migrate(connection: SQLiteConnection) {
         connection.execSQL("ALTER TABLE `accounts` ADD COLUMN `extraDetails` TEXT NOT NULL DEFAULT '[]'")
     }

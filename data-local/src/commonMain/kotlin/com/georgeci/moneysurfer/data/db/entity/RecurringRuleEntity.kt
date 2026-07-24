@@ -10,16 +10,22 @@ import androidx.room.PrimaryKey
     tableName = "recurring_rules",
     foreignKeys = [
         ForeignKey(
+            entity = WorkspaceEntity::class,
+            parentColumns = ["id"],
+            childColumns = ["workspaceId"],
+        ),
+        ForeignKey(
             entity = CategoryEntity::class,
             parentColumns = ["id"],
             childColumns = ["categoryId"],
         ),
     ],
-    indices = [Index("categoryId")],
+    indices = [Index("workspaceId"), Index("categoryId")],
 )
 data class RecurringRuleEntity(
     @PrimaryKey
     @ColumnInfo(name = "id") val id: String,
+    @ColumnInfo(name = "workspaceId", defaultValue = "") val workspaceId: String,
     @ColumnInfo(name = "title") val title: String,
     @ColumnInfo(name = "amount") val amount: Long,
     @ColumnInfo(name = "categoryId") val categoryId: String,

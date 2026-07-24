@@ -11,6 +11,9 @@ package com.georgeci.moneysurfer.data.sync.plugin
  *  10  invites     — FK: workspaceId (no Room FK enforced, but logically after members)
  *  20  accounts    — FK: workspaceId
  *  30  categories  — FK: workspaceId, parentId (self)
+ *  35  recurringRules — FK: workspaceId, categoryId  ← must be > categories, and < transactions
+ *                    so a pulled transaction's recurringRuleId resolves to a rule this device
+ *                    already has instead of dangling (issue #269)
  *  40  transactions — FK: accountId, categoryId  ← must be > accounts and categories
  *  50  budgets     — FK: workspaceId; references category ids in a CSV column (no Room FK),
  *                    so running after categories is ordering hygiene, not a hard constraint
@@ -24,6 +27,7 @@ internal object SyncPullPriorities {
     const val INVITES = 10
     const val ACCOUNTS = 20
     const val CATEGORIES = 30
+    const val RECURRING_RULES = 35
     const val TRANSACTIONS = 40
     const val BUDGETS = 50
     const val GOALS = 60

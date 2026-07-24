@@ -7,9 +7,14 @@ import com.georgeci.moneysurfer.domain.model.RecurringFrequency
 import com.georgeci.moneysurfer.domain.model.RecurringRule
 import com.georgeci.moneysurfer.domain.model.RecurringSchedule
 import com.georgeci.moneysurfer.domain.primitives.CategoryId
+import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
 import com.georgeci.moneysurfer.domain.primitives.Money
 import com.georgeci.moneysurfer.domain.primitives.RecurringRuleId
+import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 import com.georgeci.moneysurfer.domain.repositories.RecurringRuleRepository
+import com.georgeci.moneysurfer.domain.sync.SyncEntityTypes
+import com.georgeci.moneysurfer.sync.repository.MutationOperation
+import com.georgeci.moneysurfer.sync.repository.OutboxEnqueuer
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.datetime.DayOfWeek
@@ -18,29 +23,62 @@ import org.koin.core.annotation.Single
 @Single(binds = [RecurringRuleRepository::class])
 class RecurringRuleRepositoryImpl(
     private val dao: RecurringRuleDao,
+    private val outboxEnqueuer: OutboxEnqueuer,
+    private val clock: ClockUseCase,
     private val timeFormatter: TimeFormatter,
 ) : RecurringRuleRepository {
 
     override fun getAll(): Flow<List<RecurringRule>> =
         dao.getAll().map { list -> list.map { it.toDomain() } }
 
+    override fun getByWorkspaceId(workspaceId: WorkspaceId): Flow<List<RecurringRule>> =
+        dao.getByWorkspaceId(workspaceId.value).map { list -> list.map { it.toDomain() } }
+
     override suspend fun getById(id: RecurringRuleId): RecurringRule? =
         dao.getById(id.value)?.toDomain()
 
     override suspend fun insert(rule: RecurringRule) {
-        dao.insert(rule.toEntity())
+        val entity = rule.toEntity()
+        dao.insert(entity)
+        enqueueUpsert(entity, MutationOperation.INSERT)
     }
 
     override suspend fun update(rule: RecurringRule) {
-        dao.update(rule.toEntity())
+        val existingCreatedAt = dao.getById(rule.id.value)?.createdAt
+        val entity = rule.toEntity().let { mapped ->
+            mapped.copy(
+                createdAt = existingCreatedAt ?: mapped.createdAt,
+                updatedAt = clock.now().toEpochMilliseconds(),
+            )
+        }
+        dao.update(entity)
+        enqueueUpsert(entity, MutationOperation.UPDATE)
     }
 
     override suspend fun delete(id: RecurringRuleId) {
+        val existing = dao.getById(id.value)
         dao.delete(id.value)
+        if (existing != null) {
+            outboxEnqueuer.enqueueDelete(
+                entityType = SyncEntityTypes.RECURRING_RULE,
+                entityId = existing.id,
+                scopeKey = existing.workspaceId,
+            )
+        }
+    }
+
+    private suspend fun enqueueUpsert(entity: RecurringRuleEntity, operation: MutationOperation) {
+        outboxEnqueuer.enqueueUpsert(
+            entityType = SyncEntityTypes.RECURRING_RULE,
+            entityId = entity.id,
+            scopeKey = entity.workspaceId,
+            operation = operation,
+        )
     }
 
     private fun RecurringRuleEntity.toDomain() = RecurringRule(
         id = RecurringRuleId(id),
+        workspaceId = WorkspaceId(workspaceId),
         title = title,
         amount = Money.fromMinor(amount),
         categoryId = CategoryId(categoryId),
@@ -63,6 +101,7 @@ class RecurringRuleRepositoryImpl(
 
     private fun RecurringRule.toEntity() = RecurringRuleEntity(
         id = id.value,
+        workspaceId = workspaceId.value,
         title = title,
         amount = amount.minor,
         categoryId = categoryId.value,
