@@ -9,15 +9,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.ExtendedFloatingActionButton
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.georgeci.moneysurfer.domain.primitives.CategoryId
@@ -26,6 +23,7 @@ import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.uikit.components.SurferCategoryPalette
 import com.georgeci.moneysurfer.uikit.components.SurferDetailPlaceholder
 import com.georgeci.moneysurfer.uikit.components.account.SurferAccountStatCard
+import com.georgeci.moneysurfer.uikit.components.base.SurferAddFab
 import com.georgeci.moneysurfer.uikit.components.base.SurferSectionHeader
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbarAction
@@ -36,7 +34,6 @@ import com.georgeci.moneysurfer.uikit.components.category.SurferCategoryTrendCar
 import com.georgeci.moneysurfer.uikit.components.transaction.SurferTransactionLine
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
-import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.utils.HandleSideEffect
 import kotlinx.datetime.Month
@@ -182,13 +179,9 @@ private fun CategoryDetailsContent(
                     Res.string.category_details_log_expense
                 },
             )
-            ExtendedFloatingActionButton(
-                text = { Text(label) },
-                icon = {
-                    Icon(imageVector = SurferIcons.Add, contentDescription = SurferSemantics.Decorative)
-                },
+            SurferAddFab(
+                label = label,
                 onClick = { onEvent(CategoryDetailsEvent.OnAddTransactionClick) },
-                modifier = Modifier.semantics { contentDescription = label },
             )
         },
     ) { padding ->

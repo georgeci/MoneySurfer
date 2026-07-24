@@ -8,8 +8,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.ExtendedFloatingActionButton
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -18,8 +16,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -31,6 +27,7 @@ import com.georgeci.moneysurfer.feature.budget.budgetStatusLabel
 import com.georgeci.moneysurfer.feature.budget.previewBudget
 import com.georgeci.moneysurfer.feature.budget.toUi
 import com.georgeci.moneysurfer.uikit.components.SurferCategoryPalette
+import com.georgeci.moneysurfer.uikit.components.base.SurferAddFab
 import com.georgeci.moneysurfer.uikit.components.base.SurferSectionHeader
 import com.georgeci.moneysurfer.uikit.components.base.SurferSwipeAction
 import com.georgeci.moneysurfer.uikit.components.base.SurferSwipeRevealRow
@@ -41,7 +38,6 @@ import com.georgeci.moneysurfer.uikit.components.budget.SurferBudgetCategoryVisu
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
 import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
-import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.utils.HandleSideEffect
 import moneysurfer.feature.budget.generated.resources.Res
@@ -114,15 +110,10 @@ private fun BudgetsContent(
         },
         floatingActionButton = {
             val addLabel = stringResource(Res.string.budgets_add)
-            ExtendedFloatingActionButton(
-                text = { Text(addLabel) },
-                icon = {
-                    Icon(imageVector = SurferIcons.Add, contentDescription = SurferSemantics.Decorative)
-                },
+            SurferAddFab(
+                label = addLabel,
                 onClick = { onEvent(BudgetsEvent.OnAddBudgetClick) },
-                modifier = Modifier
-                    .semantics { contentDescription = addLabel }
-                    .testTag(BudgetsTestTags.AddButton),
+                modifier = Modifier.testTag(BudgetsTestTags.AddButton),
             )
         },
     ) { padding ->

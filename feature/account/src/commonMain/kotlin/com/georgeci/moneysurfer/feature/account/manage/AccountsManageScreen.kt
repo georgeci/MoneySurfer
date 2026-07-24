@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
@@ -54,6 +53,7 @@ import com.georgeci.moneysurfer.uikit.components.SurferSkeletonRow
 import com.georgeci.moneysurfer.uikit.components.account.SurferAccountManageCard
 import com.georgeci.moneysurfer.uikit.components.account.SurferArchivedAccountCard
 import com.georgeci.moneysurfer.uikit.components.account.SurferTotalBalanceCard
+import com.georgeci.moneysurfer.uikit.components.base.SurferAddFab
 import com.georgeci.moneysurfer.uikit.components.base.SurferDragHandle
 import com.georgeci.moneysurfer.uikit.components.base.SurferSectionHeader
 import com.georgeci.moneysurfer.uikit.components.base.SurferSectionHeaderHint
@@ -150,11 +150,8 @@ private fun AccountsManageContent(
             )
         },
         floatingActionButton = {
-            ExtendedFloatingActionButton(
-                text = { Text(stringResource(Res.string.accounts_manage_add_account)) },
-                icon = {
-                    Icon(imageVector = SurferIcons.Add, contentDescription = SurferSemantics.Decorative)
-                },
+            SurferAddFab(
+                label = stringResource(Res.string.accounts_manage_add_account),
                 onClick = { onEvent(AccountsManageEvent.OnAddAccountClick) },
             )
         },

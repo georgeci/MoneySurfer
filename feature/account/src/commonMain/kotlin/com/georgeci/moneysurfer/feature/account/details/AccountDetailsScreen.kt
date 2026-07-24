@@ -10,8 +10,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.ExtendedFloatingActionButton
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -43,13 +41,13 @@ import com.georgeci.moneysurfer.feature.account.labelRes
 import com.georgeci.moneysurfer.uikit.components.account.SurferAccountDetailsHeroCard
 import com.georgeci.moneysurfer.uikit.components.account.SurferAccountStatCard
 import com.georgeci.moneysurfer.uikit.components.account.SurferBalanceChartCard
+import com.georgeci.moneysurfer.uikit.components.base.SurferAddFab
 import com.georgeci.moneysurfer.uikit.components.base.SurferFilterChipRow
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbarAction
 import com.georgeci.moneysurfer.uikit.components.transaction.SurferTransactionLine
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
-import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.utils.HandleSideEffect
 import org.jetbrains.compose.resources.stringResource
@@ -134,17 +132,9 @@ private fun AccountDetailsContent(
             )
         },
         floatingActionButton = {
-            ExtendedFloatingActionButton(
+            SurferAddFab(
+                label = stringResource(Res.string.account_details_add_transaction),
                 onClick = { onEvent(AccountDetailsEvent.OnAddTransactionClick) },
-                icon = {
-                    Icon(
-                        imageVector = SurferIcons.Add,
-                        contentDescription = SurferSemantics.Decorative,
-                    )
-                },
-                text = { Text(stringResource(Res.string.account_details_add_transaction)) },
-                containerColor = AppTheme.materialColors.primaryContainer,
-                contentColor = AppTheme.materialColors.onPrimaryContainer,
             )
         },
     ) { padding ->

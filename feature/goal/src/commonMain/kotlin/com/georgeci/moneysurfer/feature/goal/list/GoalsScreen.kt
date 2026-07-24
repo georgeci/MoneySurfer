@@ -6,16 +6,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.ExtendedFloatingActionButton
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.georgeci.moneysurfer.domain.model.GoalStatus
@@ -24,12 +19,12 @@ import com.georgeci.moneysurfer.feature.goal.formatGoalDate
 import com.georgeci.moneysurfer.feature.goal.labelRes
 import com.georgeci.moneysurfer.feature.goal.toUi
 import com.georgeci.moneysurfer.uikit.components.SurferEmptyState
+import com.georgeci.moneysurfer.uikit.components.base.SurferAddFab
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
 import com.georgeci.moneysurfer.uikit.components.goal.SurferGoalCard
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
 import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
-import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.utils.AsyncState
 import com.georgeci.moneysurfer.utils.HandleSideEffect
@@ -84,11 +79,9 @@ private fun GoalsContent(
         },
         floatingActionButton = {
             val addLabel = stringResource(Res.string.goals_add)
-            ExtendedFloatingActionButton(
-                text = { Text(addLabel) },
-                icon = { Icon(imageVector = SurferIcons.Add, contentDescription = SurferSemantics.Decorative) },
+            SurferAddFab(
+                label = addLabel,
                 onClick = { onEvent(GoalsEvent.OnAddGoalClick) },
-                modifier = Modifier.semantics { contentDescription = addLabel },
             )
         },
     ) { padding ->
