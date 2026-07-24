@@ -118,10 +118,17 @@
     <string name="transaction_details_delete_cancel">Cancel</string>
     <string name="transaction_details_type_expense">Expense</string>
     <string name="transaction_details_type_income">Income</string>
+    <string name="transaction_details_type_transfer">Transfer</string>
     <string name="transaction_details_account_label">Account</string>
-    <string name="transaction_details_date_label">Date</string>
+    <string name="transaction_details_to_account_label">To account</string>
+    <string name="transaction_details_from_label">From</string>
+    <string name="transaction_details_to_label">To</string>
+    <string name="transaction_details_merchant_label">Merchant</string>
     <string name="transaction_details_category_label">Category</string>
-    <string name="transaction_details_currency_label">Currency</string>
+    <!-- Nested category: leaf first, then the parent it sits in ("Coffee · in Dining"). -->
+    <string name="transaction_details_category_nested">%1$s · in %2$s</string>
+    <string name="transaction_details_tags_label">Tags</string>
+    <string name="transaction_details_reference_label">Reference</string>
     <string name="transaction_details_duplicate">Duplicate</string>
     <string name="transaction_details_status_posted">Posted</string>
     <string name="transaction_details_status_planned">Planned</string>

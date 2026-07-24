@@ -5,10 +5,15 @@ import com.georgeci.moneysurfer.domain.model.Transaction
 import com.georgeci.moneysurfer.domain.model.TransactionTotal
 import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
+import com.georgeci.moneysurfer.domain.primitives.TransferId
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 import com.georgeci.moneysurfer.domain.util.TransactionPeriodWindow
 import kotlinx.coroutines.flow.Flow
 
+// Transactions are the app's central entity and every screen queries them along a different axis
+// (account, workspace, window, transfer pair). Splitting the interface to satisfy the threshold
+// would scatter one storage contract across several types without removing a single query.
+@Suppress("TooManyFunctions")
 interface TransactionRepository {
     fun getAll(): Flow<List<Transaction>>
     fun getByAccountId(accountId: AccountId): Flow<List<Transaction>>
@@ -37,6 +42,12 @@ interface TransactionRepository {
     ): Flow<List<TransactionTotal>>
     fun getByWorkspaceId(workspaceId: WorkspaceId): Flow<List<Transaction>>
     suspend fun getById(id: TransactionId): Transaction?
+
+    /**
+     * Every leg sharing [transferId] — two for a healthy transfer, one for a leg whose pair was
+     * deleted or never imported. Callers must not assume a pair exists.
+     */
+    suspend fun getByTransferId(transferId: TransferId): List<Transaction>
     suspend fun insert(transaction: Transaction)
     suspend fun update(transaction: Transaction)
     suspend fun delete(id: TransactionId)

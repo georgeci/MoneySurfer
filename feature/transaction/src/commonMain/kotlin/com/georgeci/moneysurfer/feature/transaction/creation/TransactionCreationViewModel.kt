@@ -34,7 +34,7 @@ import org.koin.core.annotation.KoinViewModel
 @KoinViewModel
 @Suppress("LongParameterList")
 class TransactionCreationViewModel(
-    private val transactionId: TransactionId?,
+    private val seed: TransactionCreationSeed?,
     private val accountId: AccountId?,
     private val getAccounts: GetAccountsUseCase,
     private val getCategories: GetCategoriesUseCase,
@@ -196,54 +196,60 @@ class TransactionCreationViewModel(
                 transferEnabled = featureConfig.transferEnabled,
             )
 
-            if (transactionId != null) {
-                val transaction = getTransactionById(transactionId)
-                if (transaction == null) {
-                    updateState { baseContent }
-                    return@launch
-                }
-                val account = accounts.find { it.id == transaction.accountId }
-                val category = categories.find { it.id == transaction.categoryId }
-                val amountDouble = transaction.money.minor / Money.MINOR_PER_MAJOR
-                val amountText = if (amountDouble == amountDouble.toLong().toDouble()) {
-                    amountDouble.toLong().toString()
+            val existing = seed?.let { getTransactionById(it.transactionId) }
+            updateState {
+                if (seed == null || existing == null) {
+                    baseContent
                 } else {
-                    amountDouble.toString()
+                    baseContent.seededFrom(seed, existing)
                 }
-                val resolvedType = when (transaction.type) {
-                    TransactionType.INCOME -> TransactionTypeUi.Income
-                    else -> TransactionTypeUi.Expense
-                }
-                val activeCategoryType = if (resolvedType == TransactionTypeUi.Income) {
-                    CategoryType.INCOME
-                } else {
-                    CategoryType.EXPENSE
-                }
-                val resolvedSelected = category ?: initialSelected
-                updateState {
-                    baseContent.copy(
-                        amount = amountText,
-                        note = transaction.note,
-                        type = resolvedType,
-                        selectedAccount = account ?: baseContent.selectedAccount,
-                        selectedCategory = resolvedSelected,
-                        timestamp = transaction.operationAt.toEpochMilliseconds(),
-                        isEditMode = true,
-                        editingTransactionId = transactionId,
-                        editingCreatedAt = transaction.createdAt,
-                        pinnedOperationDate = transaction.operationDate,
-                        displayCategories = buildDisplayCategories(
-                            categories = categories,
-                            counts = baseContent.categoryUsageCounts,
-                            type = activeCategoryType,
-                            selected = resolvedSelected,
-                        ),
-                    )
-                }
-            } else {
-                updateState { baseContent }
             }
         }
+    }
+
+    /**
+     * Fills the blank form from an existing transaction.
+     *
+     * In [TransactionCreationSeed.Mode.Edit] that means the row itself, identity and timestamps
+     * included. A duplicate copies only what the user typed — no id, no `createdAt`, and today's
+     * date rather than the original's: it is a new transaction that merely starts out looking
+     * like an old one.
+     */
+    private fun TransactionCreationState.Content.seededFrom(
+        seed: TransactionCreationSeed,
+        transaction: Transaction,
+    ): TransactionCreationState.Content {
+        val account = accounts.find { it.id == transaction.accountId }
+        val category = categories.find { it.id == transaction.categoryId }
+        val resolvedType = when (transaction.type) {
+            TransactionType.INCOME -> TransactionTypeUi.Income
+            else -> TransactionTypeUi.Expense
+        }
+        val activeCategoryType = if (resolvedType == TransactionTypeUi.Income) {
+            CategoryType.INCOME
+        } else {
+            CategoryType.EXPENSE
+        }
+        val resolvedSelected = category ?: selectedCategory
+        val editing = seed.mode == TransactionCreationSeed.Mode.Edit
+        return copy(
+            amount = transaction.money.toAmountInput(),
+            note = transaction.note,
+            type = resolvedType,
+            selectedAccount = account ?: selectedAccount,
+            selectedCategory = resolvedSelected,
+            timestamp = if (editing) transaction.operationAt.toEpochMilliseconds() else timestamp,
+            isEditMode = editing,
+            editingTransactionId = seed.transactionId.takeIf { editing },
+            editingCreatedAt = transaction.createdAt.takeIf { editing },
+            pinnedOperationDate = transaction.operationDate.takeIf { editing },
+            displayCategories = buildDisplayCategories(
+                categories = categories,
+                counts = categoryUsageCounts,
+                type = activeCategoryType,
+                selected = resolvedSelected,
+            ),
+        )
     }
 
     private fun observeCategoryUsage() {
@@ -444,6 +450,12 @@ class TransactionCreationViewModel(
     }
 }
 
+/** Amount as the text field spells it — a whole number keeps no trailing `.0`. */
+private fun Money.toAmountInput(): String {
+    val major = minor / Money.MINOR_PER_MAJOR
+    return if (major == major.toLong().toDouble()) major.toLong().toString() else major.toString()
+}
+
 private fun pickDefaultCategory(
     categories: List<Category>,
     counts: Map<CategoryId, Int>,
@@ -471,6 +483,26 @@ private fun buildDisplayCategories(
 }
 
 private const val CATEGORY_PREVIEW_SIZE = 7
+
+/**
+ * The existing transaction the creation screen opens on, and what it is there for.
+ *
+ * One nullable parameter rather than an id plus a flag: the screen loads exactly one transaction
+ * in either mode, and two independent parameters could contradict each other (a duplicate flag
+ * with no id, an id with no mode).
+ */
+data class TransactionCreationSeed(
+    val transactionId: TransactionId,
+    val mode: Mode,
+) {
+    enum class Mode {
+        /** Update the transaction in place. */
+        Edit,
+
+        /** Use it as a template for a brand-new transaction. */
+        Duplicate,
+    }
+}
 
 enum class TransactionTypeUi { Expense, Income, Transfer }
 

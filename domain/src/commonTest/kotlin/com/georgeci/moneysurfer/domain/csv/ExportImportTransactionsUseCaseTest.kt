@@ -468,6 +468,8 @@ private class FakeTransactionRepository(initial: List<Transaction>) : Transactio
     override fun getByWorkspaceId(workspaceId: WorkspaceId): Flow<List<Transaction>> =
         store.map { all -> all.values.filter { it.workspaceId == workspaceId } }
     override suspend fun getById(id: TransactionId): Transaction? = store.value[id]
+    override suspend fun getByTransferId(transferId: TransferId): List<Transaction> =
+        store.value.values.filter { it.transferId == transferId }
     override suspend fun insert(transaction: Transaction) {
         store.value += (transaction.id to transaction)
     }

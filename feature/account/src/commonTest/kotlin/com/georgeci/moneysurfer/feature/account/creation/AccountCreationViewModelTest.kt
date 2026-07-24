@@ -21,6 +21,7 @@ import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
 import com.georgeci.moneysurfer.domain.primitives.Money
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
+import com.georgeci.moneysurfer.domain.primitives.TransferId
 import com.georgeci.moneysurfer.domain.primitives.UserId
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 import com.georgeci.moneysurfer.domain.repositories.AccountRepository
@@ -616,6 +617,8 @@ private class FakeTransactionRepository : TransactionRepository {
     override fun getTotals(accountId: AccountId?, window: TransactionPeriodWindow) = error("not used")
     override fun getByWorkspaceId(workspaceId: WorkspaceId): Flow<List<Transaction>> = all
     override suspend fun getById(id: TransactionId): Transaction? = byId[id]
+    override suspend fun getByTransferId(transferId: TransferId): List<Transaction> =
+        byId.values.filter { it.transferId == transferId }
     override suspend fun insert(transaction: Transaction) {
         inserted += transaction
         byId[transaction.id] = transaction

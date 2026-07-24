@@ -22,6 +22,7 @@ import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
 import com.georgeci.moneysurfer.domain.primitives.Money
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
+import com.georgeci.moneysurfer.domain.primitives.TransferId
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 import com.georgeci.moneysurfer.domain.repositories.AccountRepository
 import com.georgeci.moneysurfer.domain.repositories.CategoryRepository
@@ -151,6 +152,8 @@ private class TransferEnv(seedCategories: List<Category>) {
         override fun getByWorkspaceId(workspaceId: WorkspaceId): Flow<List<Transaction>> =
             flowOf(txStore.values.filter { it.workspaceId == workspaceId })
         override suspend fun getById(id: TransactionId): Transaction? = txStore[id]
+        override suspend fun getByTransferId(transferId: TransferId): List<Transaction> =
+            txStore.values.filter { it.transferId == transferId }
         override suspend fun insert(transaction: Transaction) { txStore[transaction.id] = transaction }
         override suspend fun update(transaction: Transaction) { txStore[transaction.id] = transaction }
         override suspend fun delete(id: TransactionId) { txStore.remove(id) }

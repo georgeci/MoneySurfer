@@ -6,10 +6,12 @@ import com.georgeci.moneysurfer.domain.auth.InMemorySessionPointers
 import com.georgeci.moneysurfer.domain.fixtures.EUR
 import com.georgeci.moneysurfer.domain.fixtures.USD
 import com.georgeci.moneysurfer.domain.fixtures.aCategory
+import com.georgeci.moneysurfer.domain.fixtures.aTransaction
 import com.georgeci.moneysurfer.domain.fixtures.accountId
 import com.georgeci.moneysurfer.domain.fixtures.anAccount
 import com.georgeci.moneysurfer.domain.fixtures.categoryId
 import com.georgeci.moneysurfer.domain.fixtures.dollars
+import com.georgeci.moneysurfer.domain.fixtures.transactionId
 import com.georgeci.moneysurfer.domain.fixtures.workspaceId
 import com.georgeci.moneysurfer.domain.model.Account
 import com.georgeci.moneysurfer.domain.model.Category
@@ -21,6 +23,7 @@ import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
 import com.georgeci.moneysurfer.domain.primitives.Money
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
+import com.georgeci.moneysurfer.domain.primitives.TransferId
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 import com.georgeci.moneysurfer.domain.repositories.AccountRepository
 import com.georgeci.moneysurfer.domain.repositories.CategoryRepository
@@ -377,6 +380,54 @@ class TransactionCreationViewModelTest : StringSpec({
             }
         }
     }
+
+    "duplicating prefills the fields but saves a brand-new transaction" {
+        runTest {
+            val acc = anAccount(id = accountId("a-1"), workspaceId = ws, currencyCode = USD, balance = 500.dollars)
+            val category = aCategory(id = categoryId("c-exp"), workspaceId = ws, type = CategoryType.EXPENSE)
+            val original = aTransaction(
+                id = transactionId("t-original"),
+                workspaceId = ws,
+                accountId = acc.id,
+                money = 80.dollars,
+                categoryId = category.id,
+                note = "Lidl — weekly shop",
+                type = TransactionType.EXPENSE,
+            )
+            val fixture = Fixture(ws).apply {
+                accountRepository.seed(acc)
+                categoryRepository.seed(category)
+                transactionRepository.insert(original)
+            }
+            val vm = fixture.createViewModel(duplicateOf = original.id)
+            try {
+                val content = vm.awaitContent()
+
+                content.isEditMode shouldBe false
+                content.editingTransactionId shouldBe null
+                content.editingCreatedAt shouldBe null
+                content.pinnedOperationDate shouldBe null
+                content.amount shouldBe "80"
+                content.note shouldBe original.note
+                content.selectedAccount?.id shouldBe acc.id
+                content.selectedCategory?.id shouldBe category.id
+                // The original's timestamp is deliberately not copied — a duplicate is entered now.
+                content.timestamp shouldNotBe original.operationAt.toEpochMilliseconds()
+
+                vm.onEvent(TransactionCreationEvent.OnSaveClick)
+
+                // `original` was seeded through insert(), so the copy is the second entry.
+                val saved = fixture.transactionRepository.inserted.last()
+                saved.id shouldNotBe original.id
+                saved.money shouldBe original.money
+                saved.note shouldBe original.note
+                saved.categoryId shouldBe category.id
+                fixture.transactionRepository.getById(original.id) shouldBe original
+            } finally {
+                vm.viewModelScope.cancel()
+            }
+        }
+    }
 })
 
 /** Wait until the VM finishes its async `loadData()` and exposes a `Content` state.
@@ -395,10 +446,15 @@ private class Fixture(workspaceId: WorkspaceId) {
 
     fun createViewModel(
         editingTransactionId: TransactionId? = null,
+        duplicateOf: TransactionId? = null,
         prefillAccount: AccountId? = null,
         featureConfig: TransactionCreationFeatureConfig = TransactionCreationFeatureConfig(transferEnabled = true),
     ) = TransactionCreationViewModel(
-        transactionId = editingTransactionId,
+        seed = duplicateOf?.let {
+            TransactionCreationSeed(it, TransactionCreationSeed.Mode.Duplicate)
+        } ?: editingTransactionId?.let {
+            TransactionCreationSeed(it, TransactionCreationSeed.Mode.Edit)
+        },
         accountId = prefillAccount,
         getAccounts = GetAccountsUseCase(accountRepository, session),
         getCategories = GetCategoriesUseCase(categoryRepository, session),
@@ -483,6 +539,8 @@ private class FakeTransactionRepository : TransactionRepository {
     override fun getTotals(accountId: AccountId?, window: TransactionPeriodWindow) = error("not used")
     override fun getByWorkspaceId(workspaceId: WorkspaceId): Flow<List<Transaction>> = all
     override suspend fun getById(id: TransactionId): Transaction? = byId[id]
+    override suspend fun getByTransferId(transferId: TransferId): List<Transaction> =
+        byId.values.filter { it.transferId == transferId }
     override suspend fun insert(transaction: Transaction) {
         inserted += transaction
         byId[transaction.id] = transaction

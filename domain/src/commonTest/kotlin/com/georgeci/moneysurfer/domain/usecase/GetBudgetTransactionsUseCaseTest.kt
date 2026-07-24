@@ -19,6 +19,7 @@ import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.domain.primitives.TransactionStatus
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
+import com.georgeci.moneysurfer.domain.primitives.TransferId
 import com.georgeci.moneysurfer.domain.primitives.UserId
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 import com.georgeci.moneysurfer.domain.repositories.TransactionRepository
@@ -108,6 +109,8 @@ private class BudgetTransactionsEnv(private val rows: List<Transaction>) {
         ): Flow<List<TransactionTotal>> = flowOf(emptyList())
         override fun getByWorkspaceId(workspaceId: WorkspaceId): Flow<List<Transaction>> = flowOf(rows)
         override suspend fun getById(id: TransactionId): Transaction? = rows.find { it.id == id }
+        override suspend fun getByTransferId(transferId: TransferId): List<Transaction> =
+            rows.filter { it.transferId == transferId }
         override suspend fun insert(transaction: Transaction) = Unit
         override suspend fun update(transaction: Transaction) = Unit
         override suspend fun delete(id: TransactionId) = Unit
