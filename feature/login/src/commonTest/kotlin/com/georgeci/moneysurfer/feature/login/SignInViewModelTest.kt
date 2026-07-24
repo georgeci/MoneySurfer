@@ -101,6 +101,33 @@ class SignInViewModelTest : StringSpec({
         viewModel.currentState.isLoading shouldBe false
     }
 
+    "a rules rejection surfaces as PermissionDenied on the form, not on a field" {
+        val viewModel = newViewModel(signupFailure = AuthError.Type.PermissionDenied)
+
+        viewModel.submitSignUp()
+
+        viewModel.currentState.formError shouldBe SignInError.PermissionDenied
+        viewModel.currentState.mode shouldBe AuthMode.SignUp
+    }
+
+    "a provider-rejected address lands on the email field rather than reading as a bad password" {
+        val viewModel = newViewModel(signupFailure = AuthError.Type.InvalidEmail)
+
+        viewModel.submitSignUp()
+
+        viewModel.currentState.emailError shouldBe SignInError.EmailInvalid
+    }
+
+    // RequiresRecentLogin only ever comes out of the account-deletion flow; if it somehow reaches
+    // sign-in there is no re-auth prompt here to act on it, so it must degrade to the generic copy.
+    "RequiresRecentLogin degrades to the generic failure" {
+        val viewModel = newViewModel(signupFailure = AuthError.Type.RequiresRecentLogin)
+
+        viewModel.submitSignUp()
+
+        viewModel.currentState.formError shouldBe SignInError.Unknown
+    }
+
     "editing a field clears the pending error" {
         val viewModel = newViewModel()
 
@@ -113,7 +140,18 @@ class SignInViewModelTest : StringSpec({
     }
 })
 
-private fun newViewModel(): SignInViewModel {
+/** Fills in valid credentials in sign-up mode and submits, so only the provider failure varies. */
+private fun SignInViewModel.submitSignUp() {
+    onEvent(SignInEvent.OnToggleModeClick)
+    onEvent(SignInEvent.OnEmailChanged("surfer@example.com"))
+    onEvent(SignInEvent.OnPasswordChanged("secret1"))
+    onEvent(SignInEvent.OnSubmitClick)
+}
+
+private fun newViewModel(
+    signupFailure: AuthError.Type = AuthError.Type.EmailAlreadyInUse,
+): SignInViewModel {
+    val auth = StubAuthRemoteRepository(signupFailure)
     val session = InMemorySessionPointers()
     val authLocal = AuthLocalRepository(StubUserRepository, session)
     val wipeDemo = WipeDemoDataUseCase(StubLocalDataResetRepository, session)
@@ -124,10 +162,10 @@ private fun newViewModel(): SignInViewModel {
         getCurrentTime = GetCurrentTimeUseCase(ClockUseCase()),
     )
     return SignInViewModel(
-        login = LoginUseCase(StubAuthRemoteRepository, authLocal, session, wipeDemo, postAuthBootstrap),
-        signup = SignupUseCase(StubAuthRemoteRepository, authLocal, session, wipeDemo, postAuthBootstrap),
+        login = LoginUseCase(auth, authLocal, session, wipeDemo, postAuthBootstrap),
+        signup = SignupUseCase(auth, authLocal, session, wipeDemo, postAuthBootstrap),
         anonymousLogin = AnonymousLoginUseCase(
-            StubAuthRemoteRepository,
+            auth,
             authLocal,
             session,
             wipeDemo,
@@ -176,16 +214,18 @@ private object StubWorkspaceSyncer : WorkspaceSyncer {
     override suspend fun syncWorkspace(workspaceId: WorkspaceId) = error(UNUSED)
 }
 
-private object StubAuthRemoteRepository : AuthRemoteRepository {
+private class StubAuthRemoteRepository(
+    private val signupFailure: AuthError.Type,
+) : AuthRemoteRepository {
     override fun currentUid(): String? = null
     override fun currentEmail(): String? = null
     override fun isCurrentUserAnonymous(): Boolean = false
     override suspend fun signInWithEmail(email: String, password: String) = error(UNUSED)
 
-    // The one collaborator call the tests do exercise: it drives the "address already taken"
-    // branch that flips the screen back to sign-in.
+    // The one collaborator call the tests do exercise: whichever failure the case under test
+    // wants back from the provider, so the AuthError -> SignInError mapping is observable.
     override suspend fun createUserWithEmail(email: String, password: String) =
-        AuthError(AuthError.Type.EmailAlreadyInUse).left()
+        AuthError(signupFailure).left()
 
     override suspend fun signInAnonymously() = error(UNUSED)
     override suspend fun signOut() = error(UNUSED)
