@@ -43,6 +43,7 @@
     <string name="account_type_card">Карта</string>
     <string name="account_type_savings">Накопления</string>
     <string name="account_creation_currency_label">Валюта</string>
+    <string name="account_creation_currency_search_placeholder">Поиск валюты</string>
     <string name="account_creation_accent_label">Цвет</string>
     <string name="account_creation_extra_details_label">Доп. сведения</string>
     <string name="account_creation_extra_details_optional">По желанию</string>

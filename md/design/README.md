@@ -186,11 +186,21 @@ with rows in `account-components.jsx` and seed data in `account-data.jsx`.
 | # | Artboard | Component |
 |---|---|---|
 | 01 | New account | `AccountCreationScreen` |
-| 02 | Manage accounts — edit mode | `AccountManageScreen editing` |
-| 03 | Manage accounts — view mode | `AccountManageScreen` |
-| 04 | Account details | `AccountDetailsScreen` |
-| 05 | Account chooser sheet | `AccountChooserSheetScreen` |
-| 06 | Delete confirm alert | `DeleteAccountDialog` |
+| 02 | New account · currency sheet | `AccountCreationScreen currencyOpen` |
+| 03 | New account · name custom field | `AccountCreationScreen customFieldOpen` |
+| 04 | Manage accounts — edit mode | `AccountManageScreen` |
+| 05 | Manage accounts — view mode | `AccountManageScreen editing={false}` |
+| 06 | Manage · reorder (mid-drag) | `AccountManageScreen reorder` |
+| 07 | Manage · empty state | `AccountManageScreen empty` |
+| 08 | Account details | `AccountDetailsScreen` |
+| 09 | Account details · ⋮ overflow menu | `AccountDetailsScreen menuOpen` |
+| 10 | Edit account | `AccountEditScreen` |
+| 11 | Account chooser sheet | `AccountChooserSheetScreen` |
+| 12 | Archive confirm alert | `ArchiveAccountDialog` |
+| 13 | Delete confirm alert | `DeleteAccountDialog` |
+
+The canvas also carries a components gallery (`AccountRowLarge`, `AccountRowCompact`,
+`TxnTypeFilter`, `TxnLine`, truncation behaviour) and an EN → RU copy table (`ACCT_COPY`).
 
 ### Account components
 
@@ -201,6 +211,23 @@ with rows in `account-components.jsx` and seed data in `account-data.jsx`.
 - `AccountRowLarge` — hero card, 24 dp radius, hue-tinted fill, uppercase eyebrow, big
   `SplitAmount`, optional footer slot
 - `DeleteAccountDialog` — M3 basic dialog, error-tinted trash badge, Cancel / Delete
+
+### Currency picker (artboard 02) — resolves [#277](https://github.com/georgeci/MoneySurfer/issues/277)
+
+The design replaced the equal-width segmented control with a field that opens a modal sheet:
+
+- **Trigger** — 56 dp outlined field, 12 dp radius, symbol badge (24 dp, `titleMedium`/600),
+  `{name} · {code}` in `bodyLarge`, trailing chevron. The outline turns `primary` while the
+  sheet is open. Shipped as `uikit/.../components/SurferCurrencyPickerField.kt`.
+- **Sheet** — 28 dp top radii on `surfaceContainerLow`, drag handle, `Currency` title, then one
+  card per currency (symbol · name over code · check when selected) at 16 dp side padding with
+  a 10 dp gap. Shipped as `SurferCurrencyBottomSheet` + `SurferCurrencyRow`.
+
+One deliberate departure: the mockup has no search field, the shipped sheet keeps one. The
+supported list is already eight currencies and still growing — that growth is exactly why the
+segmented control was dropped. The list is capped at 420 dp so short lists stay compact.
+
+Used by both account creation and workspace creation, which had the same cramped control.
 
 ### Fields the mockups render that the domain model does not have
 
