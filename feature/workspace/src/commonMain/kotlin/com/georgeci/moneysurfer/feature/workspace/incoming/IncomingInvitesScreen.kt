@@ -42,6 +42,7 @@ import com.georgeci.moneysurfer.uikit.components.SurferButtonStyle
 import com.georgeci.moneysurfer.uikit.components.workspace.SurferIncomingInviteCard
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
+import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.utils.HandleSideEffect
 import kotlinx.coroutines.launch
@@ -265,7 +266,7 @@ private fun EmptyView(modifier: Modifier = Modifier) {
     ) {
         Icon(
             imageVector = SurferIcons.Mail,
-            contentDescription = null,
+            contentDescription = SurferSemantics.Decorative,
             tint = AppTheme.materialColors.onSurfaceVariant,
             modifier = Modifier.size(48.dp),
         )

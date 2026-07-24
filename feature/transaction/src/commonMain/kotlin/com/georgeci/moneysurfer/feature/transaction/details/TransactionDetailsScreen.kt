@@ -48,6 +48,7 @@ import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbarAction
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
+import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.utils.HandleSideEffect
 import moneysurfer.feature.transaction.generated.resources.Res
@@ -208,7 +209,7 @@ private fun TransactionDetailsContent(
                     ) {
                         Icon(
                             imageVector = SurferIcons.Copy,
-                            contentDescription = null,
+                            contentDescription = SurferSemantics.Decorative,
                             modifier = Modifier.size(18.dp),
                         )
                         Spacer(Modifier.width(AppTheme.spacing.small))
@@ -311,7 +312,7 @@ private fun PlannedPill() {
     ) {
         Icon(
             imageVector = SurferIcons.Clock,
-            contentDescription = null,
+            contentDescription = SurferSemantics.Decorative,
             tint = AppTheme.materialColors.onTertiaryContainer,
             modifier = Modifier.size(12.dp),
         )
@@ -407,7 +408,7 @@ private fun DetailRow(spec: DetailRowSpec) {
         ) {
             Icon(
                 imageVector = spec.icon,
-                contentDescription = null,
+                contentDescription = SurferSemantics.Decorative,
                 tint = AppTheme.materialColors.onSecondaryContainer,
                 modifier = Modifier.size(18.dp),
             )
@@ -438,7 +439,7 @@ private fun DeleteConfirmationDialog(
         icon = {
             Icon(
                 imageVector = SurferIcons.Delete,
-                contentDescription = null,
+                contentDescription = SurferSemantics.Decorative,
                 tint = AppTheme.materialColors.error,
             )
         },

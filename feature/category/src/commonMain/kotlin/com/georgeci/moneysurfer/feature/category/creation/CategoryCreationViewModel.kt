@@ -192,7 +192,6 @@ data class CategoryCreationState(
     val showNameCounter: Boolean get() = name.length >= NAME_COUNTER_THRESHOLD
 
     /** Name of the selected parent, or null when this category sits at the root. */
-    val selectedParentName: String? get() = parentOptions.firstOrNull { it.id == parentId }?.name
 
     companion object {
         /** Hard cap on the category name — longer input is truncated in the reducer. */

@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import com.georgeci.moneysurfer.uikit.components.SurferCategoryPalette
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
+import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 
 private val SquircleShape = RoundedCornerShape(percent = 35)
@@ -91,8 +92,7 @@ fun SurferTransactionLine(
         ) {
             Icon(
                 imageVector = leadingIcon,
-                // decorative — category icon; the transaction title provides the accessible label
-                contentDescription = null,
+                contentDescription = SurferSemantics.Decorative,
                 tint = leadingIconTint,
                 modifier = Modifier.size(22.dp),
             )

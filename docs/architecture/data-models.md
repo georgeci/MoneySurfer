@@ -176,9 +176,15 @@ Field name unified: was `addedAt` in Firestore; now `createdAt` everywhere.
 | `type` | `AccountType` | `String` | `String` |
 | `currencyCode` | `CurrencyCode` | `String` (col `currency`) | `String` (col `currency`) |
 | `balance` | `Money` | `Long` (minor units) | `Long` |
+| `extraDetails` | `List<AccountExtraDetail>` | `String` (JSON array of `{key,value}`) | `List<Map>` |
 | `updatedAt` | `Instant` | `Long` | `Long` |
 | `deletedAt` | — | — | `Long?` |
 | `clientVersionCode` | — | — | `Int` |
+
+`extraDetails` is an open key–value list, not a fixed set of columns: the creation screen offers
+six well-known keys (`IBAN`, `DESCRIPTION`, `BIC`, `CARD_LAST4`, `BANK_URL`, `BRANCH_PHONE`) plus a
+user-named "Custom field…". Invariants — trimming, blank/duplicate removal, length and count caps —
+live in `AccountExtraDetails.normalize` and are applied on every write, local or pulled.
 
 ### `workspaces/{wid}/categories/{cid}`
 

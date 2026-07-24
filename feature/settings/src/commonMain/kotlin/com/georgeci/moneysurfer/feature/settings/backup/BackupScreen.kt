@@ -59,6 +59,8 @@ import moneysurfer.feature.settings.generated.resources.settings_backup_import_p
 import moneysurfer.feature.settings.generated.resources.settings_backup_import_passphrase_confirm
 import moneysurfer.feature.settings.generated.resources.settings_backup_import_passphrase_label
 import moneysurfer.feature.settings.generated.resources.settings_backup_import_passphrase_title
+import moneysurfer.feature.settings.generated.resources.settings_backup_local_hero_supporting
+import moneysurfer.feature.settings.generated.resources.settings_backup_local_hero_title
 import moneysurfer.feature.settings.generated.resources.settings_backup_location_pill
 import moneysurfer.feature.settings.generated.resources.settings_backup_location_title
 import moneysurfer.feature.settings.generated.resources.settings_backup_notice_corrupted
@@ -188,51 +190,64 @@ private fun BackupContent(
         showProgressOverlay = state.phase != BackupPhase.Idle,
     ) { padding ->
         Box(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
-            SurferStatusHeroCard(
-                title = stringResource(Res.string.settings_backup_hero_title),
-                supporting = stringResource(Res.string.settings_backup_hero_supporting),
-                icon = SurferIcons.Cloud,
-                tone = SurferStatusHeroTone.Primary,
-            )
+            if (state.showCloudBackup) {
+                SurferStatusHeroCard(
+                    title = stringResource(Res.string.settings_backup_hero_title),
+                    supporting = stringResource(Res.string.settings_backup_hero_supporting),
+                    icon = SurferIcons.Cloud,
+                    tone = SurferStatusHeroTone.Primary,
+                )
+            } else {
+                SurferStatusHeroCard(
+                    title = stringResource(Res.string.settings_backup_local_hero_title),
+                    supporting = stringResource(Res.string.settings_backup_local_hero_supporting),
+                    icon = SurferIcons.Archive,
+                    tone = SurferStatusHeroTone.Tertiary,
+                )
+            }
         }
 
-        SurferSettingsGroup(
-            title = stringResource(Res.string.settings_backup_section_schedule),
-            footnote = stringResource(Res.string.settings_backup_schedule_footnote),
-        ) {
-            SurferSettingsRow(
-                icon = SurferIcons.Calendar,
-                title = stringResource(Res.string.settings_backup_frequency_title),
-                onClick = { onEvent(BackupEvent.OnFrequencyClick) },
-                trailing = {
-                    SurferSettingsValuePill(stringResource(Res.string.settings_backup_frequency_pill))
-                },
-            )
-            SurferSettingsRow(
-                icon = SurferIcons.Shield,
-                title = stringResource(Res.string.settings_backup_encryption_title),
-                supportingText = stringResource(Res.string.settings_backup_encryption_supporting),
-                onClick = { onEvent(BackupEvent.OnEncryptionClick) },
-                trailing = { SurferSettingsValuePill("On") },
-            )
-            SurferSettingsRow(
-                icon = SurferIcons.Cloud,
-                title = stringResource(Res.string.settings_backup_location_title),
-                onClick = { onEvent(BackupEvent.OnLocationClick) },
-                trailing = {
-                    SurferSettingsValuePill(stringResource(Res.string.settings_backup_location_pill))
-                },
-            )
+        if (state.showCloudBackup) {
+            SurferSettingsGroup(
+                title = stringResource(Res.string.settings_backup_section_schedule),
+                footnote = stringResource(Res.string.settings_backup_schedule_footnote),
+            ) {
+                SurferSettingsRow(
+                    icon = SurferIcons.Calendar,
+                    title = stringResource(Res.string.settings_backup_frequency_title),
+                    onClick = { onEvent(BackupEvent.OnFrequencyClick) },
+                    trailing = {
+                        SurferSettingsValuePill(stringResource(Res.string.settings_backup_frequency_pill))
+                    },
+                )
+                SurferSettingsRow(
+                    icon = SurferIcons.Shield,
+                    title = stringResource(Res.string.settings_backup_encryption_title),
+                    supportingText = stringResource(Res.string.settings_backup_encryption_supporting),
+                    onClick = { onEvent(BackupEvent.OnEncryptionClick) },
+                    trailing = { SurferSettingsValuePill("On") },
+                )
+                SurferSettingsRow(
+                    icon = SurferIcons.Cloud,
+                    title = stringResource(Res.string.settings_backup_location_title),
+                    onClick = { onEvent(BackupEvent.OnLocationClick) },
+                    trailing = {
+                        SurferSettingsValuePill(stringResource(Res.string.settings_backup_location_pill))
+                    },
+                )
+            }
         }
 
         SurferSettingsGroup(title = stringResource(Res.string.settings_backup_section_manual)) {
-            SurferSettingsRow(
-                icon = SurferIcons.Cloud,
-                title = stringResource(Res.string.settings_backup_back_up_now_title),
-                supportingText = stringResource(Res.string.settings_backup_back_up_now_supporting),
-                onClick = { onEvent(BackupEvent.OnBackUpNowClick) },
-                trailing = { SurferSettingsChevron() },
-            )
+            if (state.showCloudBackup) {
+                SurferSettingsRow(
+                    icon = SurferIcons.Cloud,
+                    title = stringResource(Res.string.settings_backup_back_up_now_title),
+                    supportingText = stringResource(Res.string.settings_backup_back_up_now_supporting),
+                    onClick = { onEvent(BackupEvent.OnBackUpNowClick) },
+                    trailing = { SurferSettingsChevron() },
+                )
+            }
             SurferSettingsRow(
                 icon = SurferIcons.Download,
                 title = stringResource(Res.string.settings_backup_download_title),
@@ -252,16 +267,18 @@ private fun BackupContent(
             )
         }
 
-        Spacer(Modifier.height(8.dp))
-        Box(modifier = Modifier.padding(horizontal = 16.dp)) {
-            SurferSettingsRow(
-                icon = SurferIcons.Delete,
-                title = stringResource(Res.string.settings_backup_delete_title),
-                supportingText = stringResource(Res.string.settings_backup_delete_supporting),
-                danger = true,
-                multiline = true,
-                onClick = { onEvent(BackupEvent.OnDeleteClick) },
-            )
+        if (state.showCloudBackup) {
+            Spacer(Modifier.height(8.dp))
+            Box(modifier = Modifier.padding(horizontal = 16.dp)) {
+                SurferSettingsRow(
+                    icon = SurferIcons.Delete,
+                    title = stringResource(Res.string.settings_backup_delete_title),
+                    supportingText = stringResource(Res.string.settings_backup_delete_supporting),
+                    danger = true,
+                    multiline = true,
+                    onClick = { onEvent(BackupEvent.OnDeleteClick) },
+                )
+            }
         }
         Spacer(Modifier.height(padding.calculateBottomPadding() + 32.dp))
     }

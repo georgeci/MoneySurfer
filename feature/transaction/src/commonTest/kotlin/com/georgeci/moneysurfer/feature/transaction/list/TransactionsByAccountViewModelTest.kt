@@ -2,6 +2,7 @@ package com.georgeci.moneysurfer.feature.transaction.list
 
 import com.georgeci.moneysurfer.domain.auth.InMemorySessionPointers
 import com.georgeci.moneysurfer.domain.fixtures.EUR
+import com.georgeci.moneysurfer.domain.fixtures.FakeUiPreferences
 import com.georgeci.moneysurfer.domain.fixtures.USD
 import com.georgeci.moneysurfer.domain.fixtures.aCategory
 import com.georgeci.moneysurfer.domain.fixtures.aTransaction
@@ -15,12 +16,7 @@ import com.georgeci.moneysurfer.domain.model.CategorizedTransaction
 import com.georgeci.moneysurfer.domain.model.Category
 import com.georgeci.moneysurfer.domain.model.Transaction
 import com.georgeci.moneysurfer.domain.model.TransactionTotal
-import com.georgeci.moneysurfer.domain.preferences.ContainerStyle
-import com.georgeci.moneysurfer.domain.preferences.PaletteSource
-import com.georgeci.moneysurfer.domain.preferences.Pref
-import com.georgeci.moneysurfer.domain.preferences.ThemeMode
 import com.georgeci.moneysurfer.domain.preferences.TransactionPeriodMode
-import com.georgeci.moneysurfer.domain.preferences.UiPreferences
 import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.CategoryId
 import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
@@ -579,15 +575,6 @@ private object SingleAccountRepository : AccountRepository {
     override suspend fun setArchived(accountId: AccountId, archived: Boolean) = Unit
 }
 
-private class FakeUiPreferences : UiPreferences {
-    override val isDynamicColorAvailable: Boolean = false
-    override val onboardingCompleted: Pref<Boolean> = Pref.inMemory(true)
-    override val paletteSource: Pref<PaletteSource> = Pref.inMemory(PaletteSource.Brand)
-    override val themeMode: Pref<ThemeMode> = Pref.inMemory(ThemeMode.System)
-    override val containerStyle: Pref<ContainerStyle> = Pref.inMemory(ContainerStyle.Card)
-    override val transactionsPeriodMode: Pref<TransactionPeriodMode> =
-        Pref.inMemory(TransactionPeriodMode.DEFAULT)
-
-    /** What a fresh read of the store would return — i.e. what survives process death. */
-    suspend fun storedPeriodMode(): TransactionPeriodMode = transactionsPeriodMode.flow.first()
-}
+/** What a fresh read of the store would return — i.e. what survives process death. */
+private suspend fun FakeUiPreferences.storedPeriodMode(): TransactionPeriodMode =
+    transactionsPeriodMode.flow.first()

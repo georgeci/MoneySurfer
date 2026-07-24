@@ -5,5 +5,23 @@
     <string name="uikit_done">Done</string>
     <string name="uikit_error_boundary_subtitle">The screen ran into an unexpected problem. Try again.</string>
     <string name="uikit_error_boundary_title">Something went wrong</string>
+    <string name="uikit_palette_color_amber">Amber</string>
+    <string name="uikit_palette_color_green">Green</string>
+    <string name="uikit_palette_color_lime">Lime</string>
+    <string name="uikit_palette_color_magenta">Magenta</string>
+    <string name="uikit_palette_color_red">Red</string>
+    <string name="uikit_palette_color_rose">Rose</string>
+    <string name="uikit_palette_color_teal">Teal</string>
+    <string name="uikit_palette_color_violet">Violet</string>
+    <string name="uikit_palette_icon_card">Card</string>
+    <string name="uikit_palette_icon_cash">Cash</string>
+    <string name="uikit_palette_icon_category">Category</string>
+    <string name="uikit_palette_icon_event">Event</string>
+    <string name="uikit_palette_icon_receipt">Receipt</string>
+    <string name="uikit_palette_icon_savings">Savings</string>
+    <string name="uikit_palette_icon_tag">Tag</string>
+    <string name="uikit_palette_icon_wallet">Wallet</string>
+    <string name="uikit_password_hide">Hide password</string>
+    <string name="uikit_password_show">Show password</string>
     <string name="uikit_retry">Retry</string>
 </resources>

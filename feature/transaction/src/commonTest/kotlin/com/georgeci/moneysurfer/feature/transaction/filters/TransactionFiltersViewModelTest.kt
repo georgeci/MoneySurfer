@@ -1,6 +1,7 @@
 package com.georgeci.moneysurfer.feature.transaction.filters
 
 import com.georgeci.moneysurfer.domain.auth.InMemorySessionPointers
+import com.georgeci.moneysurfer.domain.fixtures.FakeUiPreferences
 import com.georgeci.moneysurfer.domain.fixtures.aCategory
 import com.georgeci.moneysurfer.domain.fixtures.aTransaction
 import com.georgeci.moneysurfer.domain.fixtures.accountId
@@ -12,12 +13,6 @@ import com.georgeci.moneysurfer.domain.model.CategorizedTransaction
 import com.georgeci.moneysurfer.domain.model.Category
 import com.georgeci.moneysurfer.domain.model.Transaction
 import com.georgeci.moneysurfer.domain.model.TransactionTotal
-import com.georgeci.moneysurfer.domain.preferences.ContainerStyle
-import com.georgeci.moneysurfer.domain.preferences.PaletteSource
-import com.georgeci.moneysurfer.domain.preferences.Pref
-import com.georgeci.moneysurfer.domain.preferences.ThemeMode
-import com.georgeci.moneysurfer.domain.preferences.TransactionPeriodMode
-import com.georgeci.moneysurfer.domain.preferences.UiPreferences
 import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.CategoryId
 import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
@@ -263,14 +258,4 @@ private object OneCategory : CategoryRepository {
     override suspend fun insert(category: Category) = Unit
     override suspend fun update(category: Category) = Unit
     override suspend fun delete(id: CategoryId) = Unit
-}
-
-private class FakeUiPreferences : UiPreferences {
-    override val isDynamicColorAvailable: Boolean = false
-    override val onboardingCompleted: Pref<Boolean> = Pref.inMemory(true)
-    override val paletteSource: Pref<PaletteSource> = Pref.inMemory(PaletteSource.Brand)
-    override val themeMode: Pref<ThemeMode> = Pref.inMemory(ThemeMode.System)
-    override val containerStyle: Pref<ContainerStyle> = Pref.inMemory(ContainerStyle.Card)
-    override val transactionsPeriodMode: Pref<TransactionPeriodMode> =
-        Pref.inMemory(TransactionPeriodMode.DEFAULT)
 }

@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import com.georgeci.moneysurfer.uikit.atom.SurferCard
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
+import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 
 /**
@@ -72,8 +73,7 @@ fun SurferSettingsRow(
                 ) {
                     Icon(
                         imageVector = icon,
-                        // decorative — icon tile identifying the setting; the row title is the accessible label
-                        contentDescription = null,
+                        contentDescription = SurferSemantics.Decorative,
                         tint = effectiveIconTint,
                         modifier = Modifier.size(20.dp),
                     )
@@ -117,8 +117,7 @@ fun SurferSettingsChevron(
 ) {
     Icon(
         imageVector = SurferIcons.ChevronRight,
-        // decorative — navigation indicator; the row title is the accessible label
-        contentDescription = null,
+        contentDescription = SurferSemantics.Decorative,
         tint = tint,
         modifier = modifier.size(20.dp),
     )
@@ -142,8 +141,7 @@ fun SurferSettingsValuePill(
         )
         Icon(
             imageVector = SurferIcons.ChevronRight,
-            // decorative — navigation indicator; the value text provides the accessible label
-            contentDescription = null,
+            contentDescription = SurferSemantics.Decorative,
             tint = AppTheme.materialColors.onSurfaceVariant,
             modifier = Modifier.size(16.dp),
         )

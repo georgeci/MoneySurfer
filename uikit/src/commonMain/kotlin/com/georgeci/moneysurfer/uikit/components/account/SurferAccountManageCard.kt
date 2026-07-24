@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import com.georgeci.moneysurfer.uikit.atom.SurferCard
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
+import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 
 /**
@@ -104,8 +105,7 @@ fun AccountIconTile(
     ) {
         Icon(
             imageVector = icon,
-            // decorative — account type indicator; the account name provides the accessible label
-            contentDescription = null,
+            contentDescription = SurferSemantics.Decorative,
             tint = fg,
             modifier = Modifier.size(22.dp),
         )

@@ -89,7 +89,7 @@ private fun GoalRow(item: SurferGoalItem, onClick: (() -> Unit)?) {
         Modifier.fillMaxWidth()
     }
     Row(
-        modifier = rowModifier.padding(horizontal = 20.dp),
+        modifier = rowModifier.padding(horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(14.dp),
     ) {

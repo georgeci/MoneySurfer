@@ -15,6 +15,7 @@ plugins {
     alias(libs.plugins.composeMultiplatform) apply false
     alias(libs.plugins.composeCompiler) apply false
     alias(libs.plugins.kotlinMultiplatform) apply false
+    alias(libs.plugins.kotlinJvm) apply false
     alias(libs.plugins.androidKotlinMultiplatformLibrary) apply false
     alias(libs.plugins.androidLint) apply false
     alias(libs.plugins.ksp) apply false
@@ -166,7 +167,7 @@ allprojects {
 // Applied per-module in `subprojects { afterEvaluate { ... } }` rather than as a
 // single root `sonar.coverage.exclusions`: coverage exclusion patterns are matched
 // against each file's path *relative to its own module's baseDir*, and the root
-// property is inherited by every submodule — so a root-level `feature/dashboard/**`
+// property is inherited by every submodule — so a root-level `shared/**`
 // would be matched against `src/commonMain/kotlin/...` inside that module and never
 // hit anything. `**/*` scoped to the module itself is unambiguous.
 //
@@ -176,12 +177,6 @@ val coverageExcludedProjects = setOf(
     ":shared",
     ":sync:no-op",
     ":feature",
-    ":feature:dashboard",
-    ":feature:settings",
-    ":feature:transaction",
-    ":feature:account",
-    ":feature:category",
-    ":feature:workspace",
     ":androidApp",
     ":androidApp-offline",
     ":sync-test-fixtures",
@@ -190,6 +185,8 @@ val coverageExcludedProjects = setOf(
     // Test-only module: aggregated into Kover so its integration tests credit the
     // modules they exercise, but its own sources aren't production code to cover.
     ":integration-test",
+    // Build tooling: detekt rules run against the build, they are not shipped.
+    ":detekt-rules",
 )
 
 subprojects {
@@ -209,11 +206,20 @@ subprojects {
             "src/iosMain/kotlin",
             "src/jvmMain/kotlin",
             "src/jvmTest/kotlin",
+            // Plain-JVM layout — only `:detekt-rules` uses it.
+            "src/main/kotlin",
+            "src/test/kotlin",
         )
     }
 
     dependencies {
         "detektPlugins"(rootProject.libs.detekt.formatting)
+        // The project's own rules, minus the module that defines them — depending
+        // on itself would be a dependency cycle. It is still linted by the
+        // built-in rules above.
+        if (path != ":detekt-rules") {
+            "detektPlugins"(project(":detekt-rules"))
+        }
     }
 
     tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
@@ -293,6 +299,13 @@ dependencies {
     kover(projects.uikit)
     kover(projects.feature.login)
     kover(projects.feature.goal)
+    kover(projects.feature.account)
+    kover(projects.feature.budget)
+    kover(projects.feature.category)
+    kover(projects.feature.dashboard)
+    kover(projects.feature.settings)
+    kover(projects.feature.transaction)
+    kover(projects.feature.workspace)
     kover(projects.utils)
     kover(projects.navigation)
     // Test-only module: contributes no production classes of its own, but its

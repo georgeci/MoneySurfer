@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
+import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 
 /**
@@ -44,8 +45,7 @@ fun SurferCategoryBubble(
     ) {
         Icon(
             imageVector = icon,
-            // decorative — category colour/icon indicator; the surrounding text provides the accessible label
-            contentDescription = null,
+            contentDescription = SurferSemantics.Decorative,
             tint = tint,
             modifier = Modifier.size(size * 0.5f),
         )

@@ -48,9 +48,10 @@ class SignInViewModel(
     private fun submit() {
         val state = currentState
         if (state.isLoading) return
-        if (!state.canSubmit) {
-            log.i { "[submit] rejected: missing credentials (mode=${state.mode})" }
-            updateState { copy(error = SignInError.MissingCredentials) }
+        val invalid = state.validate()
+        if (invalid != null) {
+            log.i { "[submit] rejected: $invalid (mode=${state.mode})" }
+            updateState { copy(error = invalid) }
             return
         }
         val email = state.email
@@ -84,7 +85,18 @@ class SignInViewModel(
                 ifLeft = { err ->
                     val mapped = err.toSignInError()
                     log.w(err.cause) { "[$label] failed -> $mapped (${err.message})" }
-                    updateState { copy(isLoading = false, error = mapped) }
+                    updateState {
+                        copy(
+                            isLoading = false,
+                            error = mapped,
+                            // The account already exists, so put the user one tap from the action
+                            // the message advises. This is also the way out of a half-finished
+                            // sign-up: `SignupUseCase` creates the Firebase user before the local
+                            // and Firestore bootstrap steps, so if one of those fails the address
+                            // is taken from then on and re-trying sign-up can never succeed.
+                            mode = if (mapped == SignInError.EmailAlreadyInUse) AuthMode.SignIn else mode,
+                        )
+                    }
                 },
                 ifRight = {
                     log.i { "[$label] ok -> navigate" }
@@ -103,6 +115,7 @@ class SignInViewModel(
 private fun AuthError.toSignInError(): SignInError = when (type) {
     AuthError.Type.WeakPassword -> SignInError.WeakPassword
     AuthError.Type.EmailAlreadyInUse -> SignInError.EmailAlreadyInUse
+    AuthError.Type.InvalidEmail -> SignInError.EmailInvalid
     AuthError.Type.InvalidCredentials -> SignInError.InvalidCredentials
     AuthError.Type.PermissionDenied -> SignInError.PermissionDenied
     // Only the account-deletion flow can produce this; a sign-in never does.
@@ -112,14 +125,30 @@ private fun AuthError.toSignInError(): SignInError = when (type) {
 
 enum class AuthMode { SignIn, SignUp }
 
-enum class SignInError {
-    MissingCredentials,
-    InvalidCredentials,
-    EmailAlreadyInUse,
-    WeakPassword,
-    PermissionDenied,
-    Unknown,
+/** Which control an error belongs under, so the UI can anchor it to the offending input. */
+enum class SignInField { Email, Password, Form }
+
+enum class SignInError(val field: SignInField) {
+    EmailRequired(SignInField.Email),
+    EmailInvalid(SignInField.Email),
+    EmailAlreadyInUse(SignInField.Email),
+    PasswordRequired(SignInField.Password),
+    PasswordTooShort(SignInField.Password),
+    WeakPassword(SignInField.Password),
+    InvalidCredentials(SignInField.Form),
+    PermissionDenied(SignInField.Form),
+    Unknown(SignInField.Form),
 }
+
+/**
+ * Firebase's own floor for `createUserWithEmailAndPassword`. Enforced locally so sign-up shows a
+ * concrete hint under the field instead of relying on a server round-trip.
+ */
+const val MIN_PASSWORD_LENGTH = 6
+
+// Deliberately permissive — the only job is to catch typos the provider would reject anyway
+// (missing @, missing dot, stray whitespace). Firebase remains the authority.
+private val EMAIL_PATTERN = Regex("""^[^@\s]+@[^@\s]+\.[^@\s]{2,}$""")
 
 data class SignInState(
     val email: String = "",
@@ -129,8 +158,26 @@ data class SignInState(
     val error: SignInError? = null,
     val config: SignInFeatureConfig = SignInFeatureConfig(),
 ) {
+    /**
+     * Only gated on [isLoading]. Blank or malformed input no longer disables the button — a dead
+     * grey button explains nothing, whereas submitting surfaces a message under the offending
+     * field (that silence was the original "I can't sign up" report).
+     */
     val canSubmit: Boolean
-        get() = email.isNotBlank() && password.length >= 6 && !isLoading
+        get() = !isLoading
+
+    val emailError: SignInError? get() = error?.takeIf { it.field == SignInField.Email }
+    val passwordError: SignInError? get() = error?.takeIf { it.field == SignInField.Password }
+    val formError: SignInError? get() = error?.takeIf { it.field == SignInField.Form }
+
+    /** First client-side problem with the current input, or null when it is worth a network call. */
+    fun validate(): SignInError? = when {
+        email.isBlank() -> SignInError.EmailRequired
+        !EMAIL_PATTERN.matches(email.trim()) -> SignInError.EmailInvalid
+        password.isEmpty() -> SignInError.PasswordRequired
+        mode == AuthMode.SignUp && password.length < MIN_PASSWORD_LENGTH -> SignInError.PasswordTooShort
+        else -> null
+    }
 }
 
 sealed interface SignInEvent {

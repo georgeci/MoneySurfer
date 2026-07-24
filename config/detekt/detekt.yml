@@ -1,6 +1,14 @@
 build:
   maxIssues: 0
 
+config:
+  validation: true
+  # `:detekt-rules` defines the `moneysurfer` rule set, so it cannot depend on it —
+  # that would be a dependency cycle. Its own detekt run therefore has no such rule
+  # set on the classpath and reads the block below as unknown config. Every other
+  # module does load it and validates it normally.
+  excludes: 'moneysurfer.*'
+
 complexity:
   LongMethod:
     threshold: 80
@@ -104,3 +112,9 @@ formatting:
     autoCorrect: true
   MaximumLineLength:
     active: false
+
+# Project-specific rules from `:detekt-rules`.
+moneysurfer:
+  active: true
+  DecorativeContentDescription:
+    active: true

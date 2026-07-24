@@ -22,6 +22,7 @@ import com.georgeci.moneysurfer.uikit.components.account.SurferAccountManageCard
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.modifier.surferDashedBorder
 import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
+import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 
 data class SurferAccountItem(
@@ -58,11 +59,15 @@ fun SurferAccountsWidget(
                 onClick = onItemClick?.let { handler -> { handler(item) } },
             )
         }
-        AddAccountRow(
-            label = addLabel,
-            trailingLabel = addCtaTrailingLabel,
-            onClick = onAddClick,
-        )
+        // The add-account CTA is the empty-state affordance only; once accounts exist,
+        // new ones are created from the "Manage" flow.
+        if (items.isEmpty()) {
+            AddAccountRow(
+                label = addLabel,
+                trailingLabel = addCtaTrailingLabel,
+                onClick = onAddClick,
+            )
+        }
     }
 }
 
@@ -85,8 +90,7 @@ private fun AddAccountRow(
             ) {
                 Icon(
                     imageVector = SurferIcons.Add,
-                    // decorative — the label text next to it provides the accessible label
-                    contentDescription = null,
+                    contentDescription = SurferSemantics.Decorative,
                     tint = AppTheme.materialColors.onSurfaceVariant,
                     modifier = Modifier.size(18.dp),
                 )

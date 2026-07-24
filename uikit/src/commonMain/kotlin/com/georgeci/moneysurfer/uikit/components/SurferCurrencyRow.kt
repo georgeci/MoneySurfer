@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import com.georgeci.moneysurfer.uikit.atom.SurferCard
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
+import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 
 /**
@@ -68,8 +69,7 @@ fun SurferCurrencyRow(
             if (selected) {
                 Icon(
                     imageVector = SurferIcons.Check,
-                    // decorative — selection state indicator; the currency name provides the accessible label
-                    contentDescription = null,
+                    contentDescription = SurferSemantics.Decorative,
                     tint = LocalContentColor.current,
                     modifier = Modifier.size(20.dp),
                 )

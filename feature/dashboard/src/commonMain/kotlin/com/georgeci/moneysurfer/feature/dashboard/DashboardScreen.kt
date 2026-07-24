@@ -11,11 +11,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.ExtendedFloatingActionButton
-import androidx.compose.material3.Icon
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,12 +24,14 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetSize
+import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetType
 import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.GoalId
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
-import com.georgeci.moneysurfer.uikit.components.SurferEmptyState
 import com.georgeci.moneysurfer.uikit.components.SurferSkeleton
 import com.georgeci.moneysurfer.uikit.components.SurferSkeletonRow
+import com.georgeci.moneysurfer.uikit.components.base.SurferAddFab
 import com.georgeci.moneysurfer.uikit.components.base.SurferDashboardToolbar
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbarAction
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
@@ -120,6 +122,9 @@ private const val DASHBOARD_SKELETON_ROWS = 4
 
 private val DASHBOARD_WIDGET_MIN_HEIGHT = 180.dp
 
+/** Bottom scroll inset that keeps the last row clear of the extended "Add transaction" FAB. */
+private val DASHBOARD_FAB_CLEARANCE = 88.dp
+
 @Composable
 private fun DashboardLoading() {
     Scaffold(
@@ -150,10 +155,6 @@ private fun DashboardContent(
     state: DashboardState.Content,
     onEvent: (DashboardEvent) -> Unit,
 ) {
-    val widgetSize = LocalSurferWidgetSize.current
-    val heroWidgets = widgetSize == SurferWidgetSize.Hero
-    val accountsPadding = if (heroWidgets) 8.dp else 6.dp
-
     Scaffold(
         modifier = Modifier
             .surferSafeInsets()
@@ -179,116 +180,154 @@ private fun DashboardContent(
         },
         floatingActionButton = {
             if (state.accounts.isNotEmpty()) {
-                ExtendedFloatingActionButton(
-                    text = { Text(stringResource(Res.string.dashboard_add_transaction)) },
-                    icon = {
-                        // decorative — FAB text label provides the accessible label
-                        Icon(imageVector = SurferIcons.Add, contentDescription = null)
-                    },
+                SurferAddFab(
+                    label = stringResource(Res.string.dashboard_add_transaction),
                     onClick = { onEvent(DashboardEvent.OnAddTransactionClick) },
                     modifier = Modifier.testTag(DashboardTestTags.AddTransaction),
                 )
             }
         },
     ) { padding ->
+        // Clear the extended FAB so the last transactions can scroll above it instead of
+        // being hidden behind it; only reserve the space when the FAB is actually shown.
+        val fabClearance = if (state.accounts.isNotEmpty()) DASHBOARD_FAB_CLEARANCE else 0.dp
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(top = padding.calculateTopPadding()),
-            contentPadding = PaddingValues(bottom = padding.calculateBottomPadding()),
+            contentPadding = PaddingValues(bottom = padding.calculateBottomPadding() + fabClearance),
         ) {
-            item(key = "balance") {
-                SurferBalanceWidget(
-                    title = stringResource(Res.string.dashboard_balance_title),
-                    balance = state.formattedTotalBalance ?: "—",
-                    footnote = balanceFootnote(state),
-                    showSparkline = false,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
-                        .defaultMinSize(minHeight = DASHBOARD_WIDGET_MIN_HEIGHT)
-                        .testTag(DashboardTestTags.Balance),
-                )
-            }
-
-            item(key = "accounts-header") {
-                SectionHeader(
-                    title = stringResource(Res.string.dashboard_accounts_section_title),
-                    action = stringResource(Res.string.dashboard_accounts_manage),
-                    onActionClick = { onEvent(DashboardEvent.OnManageAccountsClick) },
-                    modifier = Modifier.padding(horizontal = 24.dp),
-                )
-            }
-
-            item(key = "accounts") {
-                SurferAccountsWidget(
-                    items = state.accounts.map { it.toWidgetItem() },
-                    onAddClick = { onEvent(DashboardEvent.OnAddAccountClick) },
-                    addLabel = stringResource(Res.string.dashboard_add_account),
-                    addCtaTrailingLabel = stringResource(Res.string.dashboard_add_account_new),
-                    onItemClick = { item ->
-                        item.accountId()?.let { onEvent(DashboardEvent.OnAccountClick(it)) }
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
-                        .defaultMinSize(minHeight = DASHBOARD_WIDGET_MIN_HEIGHT)
-                        .padding(accountsPadding),
-                )
-            }
-
-            item(key = "goals") {
-                SurferGoalsWidget(
-                    items = state.goals.map { it.toWidgetItem() },
-                    title = stringResource(Res.string.dashboard_goals_title),
-                    seeAllLabel = stringResource(Res.string.dashboard_goals_see_all),
-                    onSeeAllClick = { onEvent(DashboardEvent.OnSeeAllGoalsClick) },
-                    onItemClick = { item -> onEvent(DashboardEvent.OnGoalClick(GoalId(item.id))) },
-                    emptyTitle = stringResource(Res.string.dashboard_goals_empty_title),
-                    emptySubtitle = stringResource(Res.string.dashboard_goals_empty_subtitle),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
-                        .defaultMinSize(minHeight = DASHBOARD_WIDGET_MIN_HEIGHT)
-                        .padding(vertical = 8.dp),
-                )
-            }
-
-            item(key = "recent") {
-                if (state.recentTransactionsEmpty) {
-                    SurferEmptyState(
-                        title = stringResource(Res.string.dashboard_recent_empty_title),
-                        subtitle = stringResource(Res.string.dashboard_recent_empty_subtitle),
-                        icon = SurferIcons.Receipt,
-                        actionLabel = stringResource(Res.string.dashboard_add_transaction),
-                        onActionClick = { onEvent(DashboardEvent.OnAddTransactionClick) },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp)
-                            .defaultMinSize(minHeight = DASHBOARD_WIDGET_MIN_HEIGHT)
-                            .padding(vertical = 8.dp),
-                    )
-                } else {
-                    val bubbleBg = AppTheme.materialColors.primaryContainer
-                    val bubbleFg = AppTheme.materialColors.onPrimaryContainer
-                    SurferRecentTransactionsWidget(
-                        items = state.transactions.map { it.toWidgetItem(bubbleBg, bubbleFg) },
-                        title = stringResource(Res.string.dashboard_recent_title),
-                        seeAllLabel = stringResource(Res.string.dashboard_recent_see_all),
-                        onSeeAllClick = { onEvent(DashboardEvent.OnSeeAllTransactionsClick) },
-                        onItemClick = { item ->
-                            item.transactionId()?.let { onEvent(DashboardEvent.OnTransactionClick(it)) }
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp)
-                            .defaultMinSize(minHeight = DASHBOARD_WIDGET_MIN_HEIGHT)
-                            .padding(vertical = 8.dp),
+            items(
+                items = state.layout.enabledItems,
+                key = { it.type.name },
+            ) { layoutItem ->
+                // Per-widget size: the enclosing screen no longer dictates one size for the column,
+                // so the Compact branch inside each widget is reachable from the layout config.
+                CompositionLocalProvider(
+                    LocalSurferWidgetSize provides layoutItem.cardStyle.size.toWidgetSize(),
+                ) {
+                    DashboardWidget(
+                        type = layoutItem.type,
+                        state = state,
+                        onEvent = onEvent,
                     )
                 }
             }
         }
     }
+}
+
+private fun DashboardWidgetSize.toWidgetSize(): SurferWidgetSize = when (this) {
+    DashboardWidgetSize.Hero -> SurferWidgetSize.Hero
+    DashboardWidgetSize.Compact -> SurferWidgetSize.Compact
+}
+
+/**
+ * The registry's render half: every [DashboardWidgetType] resolves to exactly one widget here.
+ * Adding a widget type without a branch is a compile error, which is the point.
+ */
+@Composable
+private fun DashboardWidget(
+    type: DashboardWidgetType,
+    state: DashboardState.Content,
+    onEvent: (DashboardEvent) -> Unit,
+) {
+    when (type) {
+        DashboardWidgetType.Balance -> BalanceWidget(state)
+        DashboardWidgetType.Accounts -> AccountsWidget(state, onEvent)
+        DashboardWidgetType.Goals -> GoalsWidget(state, onEvent)
+        DashboardWidgetType.RecentTransactions -> RecentTransactionsWidget(state, onEvent)
+    }
+}
+
+@Composable
+private fun BalanceWidget(state: DashboardState.Content) {
+    SurferBalanceWidget(
+        title = stringResource(Res.string.dashboard_balance_title),
+        balance = state.formattedTotalBalance ?: "—",
+        footnote = balanceFootnote(state),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
+            .testTag(DashboardTestTags.Balance),
+    )
+}
+
+@Composable
+private fun AccountsWidget(
+    state: DashboardState.Content,
+    onEvent: (DashboardEvent) -> Unit,
+) {
+    val hero = LocalSurferWidgetSize.current == SurferWidgetSize.Hero
+    Column {
+        SectionHeader(
+            title = stringResource(Res.string.dashboard_accounts_section_title),
+            action = stringResource(Res.string.dashboard_accounts_manage),
+            onActionClick = { onEvent(DashboardEvent.OnManageAccountsClick) },
+            modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 8.dp),
+        )
+        SurferAccountsWidget(
+            items = state.accounts.map { it.toWidgetItem() },
+            onAddClick = { onEvent(DashboardEvent.OnAddAccountClick) },
+            addLabel = stringResource(Res.string.dashboard_add_account),
+            addCtaTrailingLabel = stringResource(Res.string.dashboard_add_account_new),
+            onItemClick = { item ->
+                item.accountId()?.let { onEvent(DashboardEvent.OnAccountClick(it)) }
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+                .padding(vertical = if (hero) 8.dp else 6.dp),
+        )
+    }
+}
+
+@Composable
+private fun GoalsWidget(
+    state: DashboardState.Content,
+    onEvent: (DashboardEvent) -> Unit,
+) {
+    SurferGoalsWidget(
+        items = state.goals.map { it.toWidgetItem() },
+        title = stringResource(Res.string.dashboard_goals_title),
+        seeAllLabel = stringResource(Res.string.dashboard_goals_see_all),
+        onSeeAllClick = { onEvent(DashboardEvent.OnSeeAllGoalsClick) },
+        onItemClick = { item -> onEvent(DashboardEvent.OnGoalClick(GoalId(item.id))) },
+        emptyTitle = stringResource(Res.string.dashboard_goals_empty_title),
+        emptySubtitle = stringResource(Res.string.dashboard_goals_empty_subtitle),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
+            .defaultMinSize(minHeight = DASHBOARD_WIDGET_MIN_HEIGHT)
+            .padding(vertical = 8.dp),
+    )
+}
+
+@Composable
+private fun RecentTransactionsWidget(
+    state: DashboardState.Content,
+    onEvent: (DashboardEvent) -> Unit,
+) {
+    val modifier = Modifier
+        .fillMaxWidth()
+        .padding(horizontal = 16.dp)
+        .defaultMinSize(minHeight = DASHBOARD_WIDGET_MIN_HEIGHT)
+        .padding(vertical = 8.dp)
+
+    val bubbleBg = AppTheme.materialColors.primaryContainer
+    val bubbleFg = AppTheme.materialColors.onPrimaryContainer
+    SurferRecentTransactionsWidget(
+        items = state.transactions.map { it.toWidgetItem(bubbleBg, bubbleFg) },
+        title = stringResource(Res.string.dashboard_recent_title),
+        seeAllLabel = stringResource(Res.string.dashboard_recent_see_all),
+        onSeeAllClick = { onEvent(DashboardEvent.OnSeeAllTransactionsClick) },
+        onItemClick = { item ->
+            item.transactionId()?.let { onEvent(DashboardEvent.OnTransactionClick(it)) }
+        },
+        emptyTitle = stringResource(Res.string.dashboard_recent_empty_title),
+        emptySubtitle = stringResource(Res.string.dashboard_recent_empty_subtitle),
+        modifier = modifier,
+    )
 }
 
 /**

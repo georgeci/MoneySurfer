@@ -3,12 +3,8 @@ package com.georgeci.moneysurfer.feature.login.onboarding
 import app.cash.turbine.test
 import com.georgeci.moneysurfer.domain.OfflineBuildFlags
 import com.georgeci.moneysurfer.domain.firstrun.FirstRunSeeder
-import com.georgeci.moneysurfer.domain.preferences.ContainerStyle
-import com.georgeci.moneysurfer.domain.preferences.PaletteSource
+import com.georgeci.moneysurfer.domain.fixtures.FakeUiPreferences
 import com.georgeci.moneysurfer.domain.preferences.Pref
-import com.georgeci.moneysurfer.domain.preferences.ThemeMode
-import com.georgeci.moneysurfer.domain.preferences.TransactionPeriodMode
-import com.georgeci.moneysurfer.domain.preferences.UiPreferences
 import com.georgeci.moneysurfer.domain.primitives.AccountType
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
@@ -217,17 +213,7 @@ private object FailingSeeder : FirstRunSeeder {
     override suspend fun seedIfNeeded() = error("simulated local seed failure")
 }
 
-private open class FakeUiPreferences : UiPreferences {
-    override val isDynamicColorAvailable: Boolean = false
-    override val onboardingCompleted: Pref<Boolean> = Pref.inMemory(false)
-    override val paletteSource: Pref<PaletteSource> = Pref.inMemory(PaletteSource.DEFAULT)
-    override val themeMode: Pref<ThemeMode> = Pref.inMemory(ThemeMode.System)
-    override val containerStyle: Pref<ContainerStyle> = Pref.inMemory(ContainerStyle.Card)
-    override val transactionsPeriodMode: Pref<TransactionPeriodMode> =
-        Pref.inMemory(TransactionPeriodMode.DEFAULT)
-}
-
-private class FailingUiPreferences : FakeUiPreferences() {
+private class FailingUiPreferences : FakeUiPreferences(onboardingCompleted = false) {
     override val onboardingCompleted: Pref<Boolean> = object : Pref<Boolean> {
         override val flow = flowOf(false)
         override suspend fun set(value: Boolean) = error("simulated DataStore write failure")

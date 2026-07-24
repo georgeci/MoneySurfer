@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
+import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
@@ -137,8 +138,7 @@ fun SurferSwipeAction(
     ) {
         Icon(
             imageVector = icon,
-            // decorative — swipe-action label text directly below provides the accessible label
-            contentDescription = null,
+            contentDescription = SurferSemantics.Decorative,
             tint = fg,
             modifier = Modifier.size(20.dp),
         )

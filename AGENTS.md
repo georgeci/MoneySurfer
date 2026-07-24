@@ -48,6 +48,7 @@ utils/                  small shared utilities (MviViewModel, AsyncState)
 integration-test/       Firebase/Room integration tests
 firestore-tests/        Firestore rules tests (npm/Mocha)
 build-logic/            Gradle convention plugins
+detekt-rules/           project-specific detekt rules (build tooling)
 iosApp/                 native iOS Xcode entry point (online)
 iosAppOffline/          native iOS Xcode entry point (offline)
 ```

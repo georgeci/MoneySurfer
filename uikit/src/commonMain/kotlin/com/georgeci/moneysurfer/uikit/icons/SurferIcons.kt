@@ -5,6 +5,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.CallSplit
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.automirrored.filled.ReceiptLong
 import androidx.compose.material.icons.filled.AccountBalance
@@ -30,6 +31,7 @@ import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.Fingerprint
+import androidx.compose.material.icons.filled.GridView
 import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -51,6 +53,7 @@ import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.ui.graphics.vector.ImageVector
 
 object SurferIcons {
@@ -65,6 +68,8 @@ object SurferIcons {
     val Edit: ImageVector get() = Icons.Filled.Edit
     val Search: ImageVector get() = Icons.Filled.Search
     val MoreVert: ImageVector get() = Icons.Filled.MoreVert
+    val GridView: ImageVector get() = Icons.Filled.GridView
+    val ListView: ImageVector get() = Icons.AutoMirrored.Filled.List
 
     val Wallet: ImageVector get() = Icons.Filled.AccountBalanceWallet
     val Bank: ImageVector get() = Icons.Filled.AccountBalance
@@ -97,6 +102,7 @@ object SurferIcons {
     val Cloud: ImageVector get() = Icons.Filled.Cloud
     val LightMode: ImageVector get() = Icons.Filled.LightMode
     val Visibility: ImageVector get() = Icons.Filled.Visibility
+    val VisibilityOff: ImageVector get() = Icons.Filled.VisibilityOff
     val Globe: ImageVector get() = Icons.Filled.Language
     val Shield: ImageVector get() = Icons.Filled.Security
     val Code: ImageVector get() = Icons.Filled.Code

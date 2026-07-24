@@ -25,6 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
+import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 
 /**
@@ -72,8 +73,7 @@ fun SurferCurrencyPickerField(
         )
         Icon(
             imageVector = SurferIcons.DropDown,
-            // decorative — the chevron only signals the field opens a sheet; the value is the label
-            contentDescription = null,
+            contentDescription = SurferSemantics.Decorative,
             tint = colors.onSurfaceVariant,
             modifier = Modifier.size(18.dp),
         )

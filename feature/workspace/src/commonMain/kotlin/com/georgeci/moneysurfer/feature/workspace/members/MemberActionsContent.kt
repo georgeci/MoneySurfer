@@ -30,6 +30,7 @@ import com.georgeci.moneysurfer.domain.primitives.UserId
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.preview.SurferBottomSheetPreview
+import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import moneysurfer.feature.workspace.generated.resources.Res
 import moneysurfer.feature.workspace.generated.resources.workspace_member_actions_confirm_remove_cancel
@@ -201,7 +202,7 @@ private fun RoleRow(
         if (selected) {
             Icon(
                 imageVector = SurferIcons.Check,
-                contentDescription = null,
+                contentDescription = SurferSemantics.Decorative,
                 tint = cs.onSecondaryContainer,
                 modifier = Modifier.size(18.dp),
             )
@@ -236,7 +237,7 @@ private fun DangerRow(
         ) {
             Icon(
                 imageVector = SurferIcons.Delete,
-                contentDescription = null,
+                contentDescription = SurferSemantics.Decorative,
                 tint = cs.onErrorContainer,
                 modifier = Modifier.size(18.dp),
             )

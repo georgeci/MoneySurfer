@@ -19,6 +19,7 @@ import com.georgeci.moneysurfer.uikit.components.base.SurferSplitAmount
 import com.georgeci.moneysurfer.uikit.components.base.SurferSplitAmountTier
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
+import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 
 /**
@@ -46,8 +47,7 @@ fun SurferAccountStatCard(
             ) {
                 Icon(
                     imageVector = icon,
-                    // decorative — stat-type indicator; the label text provides the accessible name
-                    contentDescription = null,
+                    contentDescription = SurferSemantics.Decorative,
                     tint = iconTint,
                     modifier = Modifier.size(14.dp),
                 )

@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import com.georgeci.moneysurfer.uikit.components.SurferCategoryPalette
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
+import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 
 /** One selectable category in [SurferCategoryChipGrid]. */
 data class SurferCategoryChip(
@@ -61,7 +62,7 @@ fun SurferCategoryChipGrid(
             leadingIcon = {
                 Icon(
                     imageVector = SurferIcons.Category,
-                    contentDescription = null,
+                    contentDescription = SurferSemantics.Decorative,
                     modifier = Modifier.size(FilterChipDefaults.IconSize),
                 )
             },
@@ -74,7 +75,7 @@ fun SurferCategoryChipGrid(
                 leadingIcon = {
                     Icon(
                         imageVector = category.icon,
-                        contentDescription = null,
+                        contentDescription = SurferSemantics.Decorative,
                         tint = category.tint,
                         modifier = Modifier.size(FilterChipDefaults.IconSize),
                     )

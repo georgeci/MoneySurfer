@@ -19,11 +19,11 @@
     <string name="settings_appearance_hub_supporting">Тема и акцент</string>
     <string name="settings_appearance_hub_supporting_dynamic">Динамическая палитра · система</string>
     <string name="settings_preferences_hub_title">Параметры</string>
-    <string name="settings_preferences_hub_supporting">EUR · Понедельник · 24ч · 1 234,56</string>
+    <string name="settings_preferences_hub_supporting">Язык, регион, форматы денег и календаря</string>
     <string name="settings_sync_hub_title">Синхронизация</string>
     <string name="settings_sync_hub_supporting">4 минуты назад · iCloud</string>
     <string name="settings_backup">Резервная копия</string>
-    <string name="settings_backup_supporting">Последний бэкап: сегодня, 14:02</string>
+    <string name="settings_backup_supporting">Сохранить или восстановить полный архив устройства</string>
     <string name="settings_about">О приложении</string>
     <string name="settings_about_supporting_format">v%1$s</string>
     <string name="settings_feedback">Отправить отзыв</string>
@@ -194,6 +194,8 @@
     <string name="settings_backup_title">Резервная копия</string>
     <string name="settings_backup_hero_title">Последний бэкап · сегодня</string>
     <string name="settings_backup_hero_supporting">14:02 · 18 МБ · 2 341 транзакция</string>
+    <string name="settings_backup_local_hero_title">Локальная копия</string>
+    <string name="settings_backup_local_hero_supporting">В этой сборке все данные хранятся на устройстве. Сохраните архив в надёжном месте и восстановите его отсюда, когда понадобится.</string>
     <string name="settings_backup_section_schedule">Расписание</string>
     <string name="settings_backup_schedule_footnote">Бэкапы шифруются end-to-end ключом аккаунта.</string>
     <string name="settings_backup_frequency_title">Частота</string>
@@ -206,7 +208,7 @@
     <string name="settings_backup_back_up_now_title">Создать сейчас</string>
     <string name="settings_backup_back_up_now_supporting">Свежий снапшот вне расписания</string>
     <string name="settings_backup_download_title">Скачать копию</string>
-    <string name="settings_backup_download_supporting">.ledger архив · 18 МБ</string>
+    <string name="settings_backup_download_supporting">.zip архив · пароль по желанию</string>
     <string name="settings_backup_section_restore">Восстановление</string>
     <string name="settings_backup_restore_title">Восстановить из бэкапа</string>
     <string name="settings_backup_restore_supporting">Заменит текущие данные</string>
@@ -289,6 +291,10 @@
     <string name="settings_delete_account_confirm_message">Аккаунт и облачные данные будут удалены навсегда. Это действие нельзя отменить.</string>
     <string name="settings_delete_account_confirm_confirm">Удалить навсегда</string>
     <string name="settings_delete_account_confirm_cancel">Отмена</string>
+    <string name="settings_logout_guest_warning_title">Выйти из гостевого режима?</string>
+    <string name="settings_logout_guest_warning_message">Вы вошли как гость. При выходе все данные на этом устройстве будут удалены безвозвратно — счета, транзакции и цели восстановить не получится.</string>
+    <string name="settings_logout_guest_warning_confirm">Выйти и удалить</string>
+    <string name="settings_logout_guest_warning_cancel">Отмена</string>
     <string name="settings_delete_account_notice_wrong_password">Неверный пароль</string>
     <string name="settings_delete_account_notice_recent_login">В целях безопасности выйдите из аккаунта, войдите снова и повторите попытку</string>
     <string name="settings_delete_account_notice_cleanup_failed">Не удалось удалить облачные данные. Проверьте подключение и попробуйте ещё раз</string>

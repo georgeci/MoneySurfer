@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.modifier.surferDashedBorder
 import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
+import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 
 // ─── Filled ──────────────────────────────────────────────────────────
@@ -336,8 +337,7 @@ private fun SurferAddActionContainerPreview() {
         Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
             SurferAddActionContainer(modifier = Modifier.fillMaxWidth()) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    // decorative — preview only; label text is adjacent
-                    Icon(imageVector = SurferIcons.Add, contentDescription = null)
+                    Icon(imageVector = SurferIcons.Add, contentDescription = SurferSemantics.Decorative)
                     Spacer(Modifier.width(8.dp))
                     Text(text = "Add account", style = AppTheme.typography.labelLarge)
                 }

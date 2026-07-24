@@ -20,11 +20,11 @@
     <string name="settings_appearance_hub_supporting">Theme &amp; accent</string>
     <string name="settings_appearance_hub_supporting_dynamic">Dynamic palette · system</string>
     <string name="settings_preferences_hub_title">Preferences</string>
-    <string name="settings_preferences_hub_supporting">EUR · Monday · 24h · 1,234.56</string>
+    <string name="settings_preferences_hub_supporting">Language, region, money and calendar formats</string>
     <string name="settings_sync_hub_title">Sync</string>
     <string name="settings_sync_hub_supporting">Synced 4 minutes ago · iCloud</string>
     <string name="settings_backup">Backup</string>
-    <string name="settings_backup_supporting">Last backup: today, 14:02</string>
+    <string name="settings_backup_supporting">Save or restore a full archive of this device</string>
     <string name="settings_about">About &amp; legal</string>
     <string name="settings_about_supporting_format">v%1$s</string>
     <string name="settings_feedback">Send feedback</string>
@@ -194,6 +194,8 @@
     <string name="settings_backup_title">Backup</string>
     <string name="settings_backup_hero_title">Last backup · today</string>
     <string name="settings_backup_hero_supporting">14:02 · 18 MB · 2,341 transactions</string>
+    <string name="settings_backup_local_hero_title">Local backup</string>
+    <string name="settings_backup_local_hero_supporting">This build stores everything on this device. Save an archive somewhere safe, and restore it here when you need it.</string>
     <string name="settings_backup_section_schedule">Schedule</string>
     <string name="settings_backup_schedule_footnote">Backups are end-to-end encrypted with your account key.</string>
     <string name="settings_backup_frequency_title">Backup frequency</string>
@@ -206,7 +208,7 @@
     <string name="settings_backup_back_up_now_title">Back up now</string>
     <string name="settings_backup_back_up_now_supporting">Force a fresh snapshot</string>
     <string name="settings_backup_download_title">Download a copy</string>
-    <string name="settings_backup_download_supporting">.ledger archive · 18 MB</string>
+    <string name="settings_backup_download_supporting">.zip archive · optional passphrase</string>
     <string name="settings_backup_section_restore">Restore</string>
     <string name="settings_backup_restore_title">Restore from backup</string>
     <string name="settings_backup_restore_supporting">Replaces current data</string>
@@ -289,6 +291,10 @@
     <string name="settings_delete_account_confirm_message">Your account and cloud data will be permanently deleted. This cannot be undone.</string>
     <string name="settings_delete_account_confirm_confirm">Delete forever</string>
     <string name="settings_delete_account_confirm_cancel">Cancel</string>
+    <string name="settings_logout_guest_warning_title">Log out as guest?</string>
+    <string name="settings_logout_guest_warning_message">You\'re signed in as a guest. Logging out permanently deletes all data on this device — your accounts, transactions and goals can\'t be recovered.</string>
+    <string name="settings_logout_guest_warning_confirm">Log out &amp; delete</string>
+    <string name="settings_logout_guest_warning_cancel">Cancel</string>
     <string name="settings_delete_account_notice_wrong_password">Incorrect password</string>
     <string name="settings_delete_account_notice_recent_login">For security, please sign out, sign in again, and retry</string>
     <string name="settings_delete_account_notice_cleanup_failed">Couldn\'t delete your cloud data. Check your connection and try again</string>

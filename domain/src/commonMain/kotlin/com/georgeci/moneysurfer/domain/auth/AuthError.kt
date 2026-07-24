@@ -13,6 +13,13 @@ data class AuthError(
     enum class Type {
         InvalidCredentials,
         EmailAlreadyInUse,
+
+        /**
+         * The provider rejected the address itself (`ERROR_INVALID_EMAIL`). Distinct from
+         * [InvalidCredentials]: during sign-up there is nothing to "not match", so reporting it
+         * as wrong-email-or-password would be actively misleading.
+         */
+        InvalidEmail,
         WeakPassword,
 
         /**
