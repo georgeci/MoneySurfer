@@ -27,15 +27,20 @@ fun Modifier.surferDashedBorder(
 ): Modifier = this.drawBehind {
     val stroke = strokeWidth.toPx()
     val inset = stroke / 2f
+    // CircleShape is a percent-based RoundedCornerShape, so it resolves here too.
     val cornerRadius = when (shape) {
         is RoundedCornerShape -> shape.topStart.toPx(Size(size.width, size.height), this)
         else -> 0f
     }
+    // A box narrower than its own stroke would otherwise draw an inverted rect.
+    val innerWidth = (size.width - stroke).coerceAtLeast(0f)
+    val innerHeight = (size.height - stroke).coerceAtLeast(0f)
+    val innerRadius = (cornerRadius - inset).coerceAtLeast(0f)
     drawRoundRect(
         color = color,
         topLeft = Offset(inset, inset),
-        size = Size(size.width - stroke, size.height - stroke),
-        cornerRadius = CornerRadius(cornerRadius - inset, cornerRadius - inset),
+        size = Size(innerWidth, innerHeight),
+        cornerRadius = CornerRadius(innerRadius, innerRadius),
         style = Stroke(
             width = stroke,
             pathEffect = PathEffect.dashPathEffect(floatArrayOf(dashLength.toPx(), dashGap.toPx()), 0f),
