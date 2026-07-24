@@ -22,14 +22,26 @@ data class CurrencyTotal(
 fun List<Account>.totalsByCurrency(): List<CurrencyTotal> =
     groupBy { it.currencyCode }
         .map { (currency, accounts) ->
-            currency to accounts.fold(Money.zero()) { acc, account -> acc + account.balance }
+            // Carry the bucket size through the sort — it is what "most-used" means, and
+            // re-deriving it per comparison would rescan the whole list for every currency.
+            CurrencyTotalWithCount(
+                total = CurrencyTotal(
+                    currencyCode = currency,
+                    amount = accounts.fold(Money.zero()) { acc, account -> acc + account.balance },
+                ),
+                accountCount = accounts.size,
+            )
         }
         .sortedWith(
-            compareByDescending<Pair<CurrencyCode, Money>> { (currency, _) ->
-                count { it.currencyCode == currency }
-            }.thenBy { (currency, _) -> currency.value },
+            compareByDescending<CurrencyTotalWithCount> { it.accountCount }
+                .thenBy { it.total.currencyCode.value },
         )
-        .map { (currency, total) -> CurrencyTotal(currency, total) }
+        .map { it.total }
+
+private data class CurrencyTotalWithCount(
+    val total: CurrencyTotal,
+    val accountCount: Int,
+)
 
 /** [totalsByCurrency] rendered for display, same order — head first, everything else after it. */
 fun List<Account>.formattedTotalsByCurrency(): List<String> =
