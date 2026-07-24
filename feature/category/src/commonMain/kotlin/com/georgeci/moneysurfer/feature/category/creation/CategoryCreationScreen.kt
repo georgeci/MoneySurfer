@@ -1,9 +1,6 @@
 package com.georgeci.moneysurfer.feature.category.creation
 
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -17,20 +14,14 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextOverflow
@@ -40,6 +31,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.georgeci.moneysurfer.domain.primitives.CategoryId
 import com.georgeci.moneysurfer.uikit.components.SurferCategoryBubble
 import com.georgeci.moneysurfer.uikit.components.SurferCategoryPalette
+import com.georgeci.moneysurfer.uikit.components.SurferDropdown
 import com.georgeci.moneysurfer.uikit.components.base.SurferSectionLabel
 import com.georgeci.moneysurfer.uikit.components.base.SurferSegmentedControl
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
@@ -48,7 +40,6 @@ import com.georgeci.moneysurfer.uikit.components.category.SurferColorSwatchRow
 import com.georgeci.moneysurfer.uikit.components.category.SurferIconPickerGrid
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
-import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.utils.HandleSideEffect
 import moneysurfer.feature.category.generated.resources.Res
@@ -71,7 +62,6 @@ import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
 private val SectionSpacing = 24.dp
-private val GridCellCorner = 14.dp
 
 @Composable
 fun CategoryCreationScreen(
@@ -207,7 +197,7 @@ private fun CategoryCreationContent(
             }
 
             ParentPicker(
-                selectedName = state.selectedParentName,
+                selectedId = state.parentId,
                 options = state.parentOptions,
                 onSelect = { onEvent(CategoryCreationEvent.OnParentSelected(it)) },
             )
@@ -279,66 +269,29 @@ private fun TypeSelector(
     }
 }
 
+/**
+ * Parent selection over the eligible options the ViewModel computed — the category itself, its
+ * descendants, system rows and the wrong type are already gone from [options], so anything
+ * offered here is safe to save.
+ *
+ * "None" is an entry in the list rather than a separate control: having no parent is an ordinary
+ * choice for a top-level category, not the absence of one.
+ */
 @Composable
 private fun ParentPicker(
-    selectedName: String?,
+    selectedId: CategoryId?,
     options: List<CategoryParentOption>,
     onSelect: (CategoryId?) -> Unit,
 ) {
-    var expanded by remember { mutableStateOf(false) }
     val noneLabel = stringResource(Res.string.category_creation_parent_none)
-
-    Column {
-        SurferSectionLabel(stringResource(Res.string.category_creation_field_parent))
-        Spacer(Modifier.height(AppTheme.spacing.small))
-        Box {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(GridCellCorner))
-                    .border(1.dp, AppTheme.materialColors.outlineVariant, RoundedCornerShape(GridCellCorner))
-                    .clickable(enabled = options.isNotEmpty()) { expanded = true }
-                    .padding(horizontal = AppTheme.spacing.default, vertical = 14.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text(
-                    text = selectedName ?: noneLabel,
-                    style = AppTheme.typography.bodyLarge,
-                    color = if (selectedName == null) {
-                        AppTheme.materialColors.onSurfaceVariant
-                    } else {
-                        AppTheme.materialColors.onSurface
-                    },
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.weight(1f),
-                )
-                Icon(
-                    imageVector = SurferIcons.ChevronRight,
-                    contentDescription = SurferSemantics.Decorative,
-                    tint = AppTheme.materialColors.onSurfaceVariant,
-                )
-            }
-            DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-                DropdownMenuItem(
-                    text = { Text(noneLabel) },
-                    onClick = {
-                        expanded = false
-                        onSelect(null)
-                    },
-                )
-                options.forEach { option ->
-                    DropdownMenuItem(
-                        text = { Text(option.name) },
-                        onClick = {
-                            expanded = false
-                            onSelect(option.id)
-                        },
-                    )
-                }
-            }
-        }
-    }
+    val entries = listOf<CategoryParentOption?>(null) + options
+    SurferDropdown(
+        items = entries,
+        selected = entries.firstOrNull { it?.id == selectedId },
+        label = stringResource(Res.string.category_creation_field_parent),
+        itemName = { it?.name ?: noneLabel },
+        onItemSelected = { onSelect(it?.id) },
+    )
 }
 
 @Preview
