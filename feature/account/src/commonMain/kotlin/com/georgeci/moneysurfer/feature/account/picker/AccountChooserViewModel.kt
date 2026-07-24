@@ -1,10 +1,9 @@
 package com.georgeci.moneysurfer.feature.account.picker
 
 import arrow.optics.optics
-import com.georgeci.moneysurfer.domain.formatter.MoneyFormatter
 import com.georgeci.moneysurfer.domain.model.Account
+import com.georgeci.moneysurfer.domain.model.formattedTotalsByCurrency
 import com.georgeci.moneysurfer.domain.primitives.AccountId
-import com.georgeci.moneysurfer.domain.primitives.Money
 import com.georgeci.moneysurfer.domain.usecase.GetAccountsUseCase
 import com.georgeci.moneysurfer.utils.MviViewModel
 import org.koin.core.annotation.KoinViewModel
@@ -28,6 +27,8 @@ class AccountChooserViewModel(
                 postSideEffect(AccountChooserEffect.PublishResult(event.id))
             AccountChooserEvent.OnAddNewAccountClick ->
                 postSideEffect(AccountChooserEffect.NavigateToAccountCreation)
+            AccountChooserEvent.OnTransferInsteadClick ->
+                postSideEffect(AccountChooserEffect.RequestTransfer)
             AccountChooserEvent.OnDismiss -> postSideEffect(AccountChooserEffect.Dismiss)
         }
     }
@@ -40,14 +41,13 @@ class AccountChooserViewModel(
                 } else {
                     all
                 }
-                val total = accounts.fold(0L) { acc, a -> acc + a.balance.minor }
-                val currency = accounts.firstOrNull()?.currencyCode
-                val totalFormatted = currency?.let { MoneyFormatter.format(Money(total), it) }
                 updateState {
                     AccountChooserState.Content(
                         accounts = accounts,
                         selectedId = selectedId,
-                        totalFormatted = totalFormatted,
+                        // One figure per currency — the old single sum added minor units across
+                        // currencies and labelled the result with whichever one came first.
+                        totalsFormatted = accounts.formattedTotalsByCurrency(),
                     )
                 }
             }
@@ -68,7 +68,8 @@ sealed interface AccountChooserState {
     data class Content(
         val accounts: List<Account>,
         override val selectedId: AccountId?,
-        val totalFormatted: String?,
+        /** One formatted total per currency, most-used currency first. Empty when there are none. */
+        val totalsFormatted: List<String>,
     ) : AccountChooserState {
         companion object
     }
@@ -79,6 +80,7 @@ sealed interface AccountChooserState {
 sealed interface AccountChooserEvent {
     data class OnAccountSelected(val id: AccountId) : AccountChooserEvent
     data object OnAddNewAccountClick : AccountChooserEvent
+    data object OnTransferInsteadClick : AccountChooserEvent
     data object OnDismiss : AccountChooserEvent
 }
 
@@ -86,4 +88,7 @@ sealed interface AccountChooserEffect {
     data object NavigateToAccountCreation : AccountChooserEffect
     data object Dismiss : AccountChooserEffect
     data class PublishResult(val id: AccountId) : AccountChooserEffect
+
+    /** The user wants a transfer rather than a single-account entry — hand that back to the host. */
+    data object RequestTransfer : AccountChooserEffect
 }

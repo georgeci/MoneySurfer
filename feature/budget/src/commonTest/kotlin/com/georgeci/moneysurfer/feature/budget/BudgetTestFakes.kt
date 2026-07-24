@@ -4,19 +4,24 @@ import com.georgeci.moneysurfer.domain.model.Budget
 import com.georgeci.moneysurfer.domain.model.CategorizedTransaction
 import com.georgeci.moneysurfer.domain.model.Category
 import com.georgeci.moneysurfer.domain.model.Transaction
+import com.georgeci.moneysurfer.domain.model.TransactionTotal
 import com.georgeci.moneysurfer.domain.model.Workspace
 import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.BudgetId
 import com.georgeci.moneysurfer.domain.primitives.CategoryId
+import com.georgeci.moneysurfer.domain.primitives.Money
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
+import com.georgeci.moneysurfer.domain.primitives.TransactionType
 import com.georgeci.moneysurfer.domain.primitives.UserId
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 import com.georgeci.moneysurfer.domain.repositories.BudgetRepository
 import com.georgeci.moneysurfer.domain.repositories.CategoryRepository
 import com.georgeci.moneysurfer.domain.repositories.TransactionRepository
 import com.georgeci.moneysurfer.domain.repositories.WorkspaceRepository
+import com.georgeci.moneysurfer.domain.util.TransactionPeriodWindow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.map
 
 /** Replay-1 in-memory repositories: every write re-emits, so a view model sees its own effects. */
 internal class FakeBudgetRepository(initial: List<Budget> = emptyList()) : BudgetRepository {
@@ -58,12 +63,55 @@ internal class FakeTransactionRepository(initial: List<Transaction> = emptyList(
     }
 
     override fun getAll(): Flow<List<Transaction>> = flow
-    override fun getAllCategorized(): Flow<List<CategorizedTransaction>> =
-        MutableStateFlow(flow.value.map { CategorizedTransaction(it, categoryName = null) })
-
     override fun getByAccountId(accountId: AccountId): Flow<List<Transaction>> = flow
-    override fun getByAccountIdCategorized(accountId: AccountId): Flow<List<CategorizedTransaction>> =
-        getAllCategorized()
+
+    /** Mirrors `TransactionDao.getCategorizedWindow`: filter, sort newest-first, then [limit]. */
+    override fun getCategorizedWindow(
+        accountId: AccountId?,
+        window: TransactionPeriodWindow,
+        limit: Int,
+    ): Flow<List<CategorizedTransaction>> = flow.map { transactions ->
+        transactions
+            .inWindow(accountId, window)
+            .sortedWith(
+                compareByDescending<Transaction> { it.operationDate }
+                    .thenByDescending { it.operationAt }
+                    .thenByDescending { it.createdAt },
+            )
+            .take(limit)
+            .map { CategorizedTransaction(it, categoryName = null) }
+    }
+
+    /** Like `TransactionDao.getTotals`: magnitudes summed per (type, currency) over the window. */
+    override fun getTotals(
+        accountId: AccountId?,
+        window: TransactionPeriodWindow,
+    ): Flow<List<TransactionTotal>> = flow.map { transactions ->
+        transactions
+            .inWindow(accountId, window)
+            .groupBy { it.type to it.currencyCode }
+            .map { (key, rows) ->
+                val (type, currencyCode) = key
+                TransactionTotal(
+                    type = type,
+                    currencyCode = currencyCode,
+                    total = rows.fold(Money.zero()) { acc, row -> acc + row.money.abs() },
+                )
+            }
+    }
+
+    /**
+     * The shared `WHERE` of both queries. Opening balances are an account artefact and are
+     * excluded by the DAO itself, never by the caller.
+     */
+    private fun List<Transaction>.inWindow(
+        accountId: AccountId?,
+        window: TransactionPeriodWindow,
+    ): List<Transaction> = filter {
+        (accountId == null || it.accountId == accountId) &&
+            it.operationDate in window &&
+            it.type != TransactionType.OPENING_BALANCE
+    }
 
     override fun getByWorkspaceId(workspaceId: WorkspaceId): Flow<List<Transaction>> = flow
     override suspend fun getById(id: TransactionId): Transaction? = flow.value.firstOrNull { it.id == id }

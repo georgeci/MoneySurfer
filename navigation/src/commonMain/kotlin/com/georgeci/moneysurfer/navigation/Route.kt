@@ -110,6 +110,8 @@ sealed interface Route : NavKey {
     data class AccountChooser(
         val selectedAccountId: String? = null,
         val excludeAccountId: String? = null,
+        /** Offer the "Transfer between accounts instead" footer — only for a single-account pick. */
+        val showTransferShortcut: Boolean = false,
     ) : Route
 
     @Serializable

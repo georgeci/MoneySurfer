@@ -16,4 +16,10 @@ data class Account(
     val balance: Money,
     val archived: Boolean = false,
     val updatedAt: Instant = Instant.fromEpochMilliseconds(0),
+    /**
+     * When the account was archived, or `null` while it is active. Set by the repository on
+     * archive and cleared on restore — the manage list renders it as "Archived Nov 2024", which
+     * `updatedAt` cannot supply because balance recalculation keeps bumping it.
+     */
+    val archivedAt: Instant? = null,
 )

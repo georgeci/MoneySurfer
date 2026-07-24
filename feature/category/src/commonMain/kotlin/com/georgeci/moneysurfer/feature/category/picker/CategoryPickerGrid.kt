@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -19,9 +20,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.graphics.PathEffect
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -29,6 +27,7 @@ import com.georgeci.moneysurfer.domain.primitives.CategoryId
 import com.georgeci.moneysurfer.uikit.components.SurferCategoryPalette
 import com.georgeci.moneysurfer.uikit.components.category.SurferCategoryCell
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+import com.georgeci.moneysurfer.uikit.modifier.surferDashedBorder
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import moneysurfer.feature.category.generated.resources.Res
 import moneysurfer.feature.category.generated.resources.category_picker_new
@@ -42,9 +41,6 @@ private val GridMaxHeight = 420.dp
 private val GridSpacing = 10.dp
 private val BubbleSize = 44.dp
 private val CellRadius = 14.dp
-private val DashStroke = 1.5.dp
-private val DashOn = 4.dp
-private val DashOff = 4.dp
 private val NewGlyphSize = 20.dp
 private val CellVerticalPadding = 8.dp
 private val CellLabelSpacing = 6.dp
@@ -113,19 +109,7 @@ private fun NewCategoryCell(
         Box(
             modifier = Modifier
                 .size(BubbleSize)
-                .drawBehind {
-                    val stroke = DashStroke.toPx()
-                    drawCircle(
-                        color = outline,
-                        radius = (size.minDimension - stroke) / 2f,
-                        style = Stroke(
-                            width = stroke,
-                            pathEffect = PathEffect.dashPathEffect(
-                                floatArrayOf(DashOn.toPx(), DashOff.toPx()),
-                            ),
-                        ),
-                    )
-                },
+                .surferDashedBorder(color = outline, shape = CircleShape),
             contentAlignment = Alignment.Center,
         ) {
             Icon(

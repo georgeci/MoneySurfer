@@ -6,9 +6,9 @@ import com.georgeci.moneysurfer.domain.formatter.MoneyFormatter
 import com.georgeci.moneysurfer.domain.model.Account
 import com.georgeci.moneysurfer.domain.model.SavingsGoalSummary
 import com.georgeci.moneysurfer.domain.model.Transaction
+import com.georgeci.moneysurfer.domain.model.formattedTotalsByCurrency
 import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.GoalId
-import com.georgeci.moneysurfer.domain.primitives.Money
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
 import com.georgeci.moneysurfer.domain.usecase.GetAccountsUseCase
@@ -65,13 +65,15 @@ class DashboardViewModel(
                 getRecentTransactions(),
                 getGoals(),
             ) { accounts, transactions, goals ->
+                val totals = accounts.formattedTotalsByCurrency()
                 DashboardState.Content(
                     accounts = accounts.map { it.toUi() },
                     transactions = transactions
                         .filter { it.type != TransactionType.OPENING_BALANCE }
                         .take(RECENT_TRANSACTIONS_LIMIT)
                         .map { it.toUi() },
-                    formattedTotalBalance = accounts.formattedTotal(),
+                    formattedTotalBalance = totals.firstOrNull(),
+                    otherCurrencyTotals = totals.drop(1),
                     workspaceName = null,
                     workspaceInitial = null,
                     greeting = null,
@@ -81,13 +83,6 @@ class DashboardViewModel(
                 )
             }.collect { newContent -> updateState { newContent } }
         }
-    }
-
-    private fun List<Account>.formattedTotal(): String? {
-        val currency = firstOrNull()?.currencyCode ?: return null
-        val total = filter { it.currencyCode == currency }
-            .fold(Money.zero()) { acc, account -> acc + account.balance }
-        return MoneyFormatter.format(total, currency)
     }
 
     private fun Account.toUi() = AccountUi(
@@ -122,7 +117,13 @@ sealed interface DashboardState {
     data class Content(
         val accounts: List<AccountUi>,
         val transactions: List<TransactionUi>,
+        /** Total for the most-used currency, or null when there are no accounts. */
         val formattedTotalBalance: String?,
+        /**
+         * Totals for the remaining currencies. Shown as a note beside the headline: adding them
+         * into it would need FX rates the app does not have, and dropping them was the old bug.
+         */
+        val otherCurrencyTotals: List<String> = emptyList(),
         val workspaceName: String?,
         val workspaceInitial: String?,
         val greeting: String?,

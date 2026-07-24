@@ -2,6 +2,7 @@ package com.georgeci.moneysurfer.feature.account.manage
 
 import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.AccountType
+import kotlinx.datetime.LocalDate
 
 internal val PreviewActiveAccountsFull = listOf(
     AccountManageUi(AccountId("preview-acc-1"), "Everyday", AccountType.BANK, "€2,480.32", "EUR"),
@@ -18,6 +19,6 @@ internal val PreviewArchivedAccounts = listOf(
         AccountType.CARD,
         "€0.00",
         "EUR",
-        archivedLabel = "Archived Nov 2024",
+        archivedOn = LocalDate(2024, 11, 18),
     ),
 )

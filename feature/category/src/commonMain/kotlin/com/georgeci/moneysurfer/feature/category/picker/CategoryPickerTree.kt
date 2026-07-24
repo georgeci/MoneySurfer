@@ -30,11 +30,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextOverflow
@@ -43,6 +40,7 @@ import com.georgeci.moneysurfer.domain.primitives.CategoryId
 import com.georgeci.moneysurfer.uikit.components.SurferCategoryBubble
 import com.georgeci.moneysurfer.uikit.components.SurferCategoryPalette
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+import com.georgeci.moneysurfer.uikit.modifier.surferDashedBorder
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import moneysurfer.feature.category.generated.resources.Res
 import moneysurfer.feature.category.generated.resources.category_picker_hide_children
@@ -72,9 +70,6 @@ private val RadioSize = 22.dp
 private val RadioStroke = 2.dp
 private val RadioCheckSize = 14.dp
 private val HairlineHeight = 1.dp
-private val DashStroke = 1.5.dp
-private val DashOn = 5.dp
-private val DashOff = 4.dp
 private const val ChevronExpandedDegrees = 180f
 private const val ChevronRotationMillis = 140
 
@@ -345,21 +340,7 @@ private fun NewCategoryRow(
             .padding(top = CardSpacing)
             .clip(shape)
             .clickable(onClick = onClick)
-            .drawBehind {
-                val stroke = DashStroke.toPx()
-                drawRoundRect(
-                    color = outline,
-                    topLeft = Offset(stroke / 2f, stroke / 2f),
-                    size = Size(size.width - stroke, size.height - stroke),
-                    cornerRadius = CornerRadius(CardRadius.toPx()),
-                    style = Stroke(
-                        width = stroke,
-                        pathEffect = PathEffect.dashPathEffect(
-                            floatArrayOf(DashOn.toPx(), DashOff.toPx()),
-                        ),
-                    ),
-                )
-            }
+            .surferDashedBorder(color = outline, shape = shape)
             .padding(horizontal = RowHorizontalPadding, vertical = RowVerticalPadding),
         verticalAlignment = Alignment.CenterVertically,
     ) {

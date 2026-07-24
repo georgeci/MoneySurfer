@@ -44,6 +44,8 @@ interface AccountDao {
     @Query("UPDATE accounts SET balance = :balance, updatedAt = :updatedAt WHERE id = :id")
     suspend fun setBalance(id: String, balance: Long, updatedAt: Long)
 
-    @Query("UPDATE accounts SET archived = :archived, updatedAt = :updatedAt WHERE id = :id")
-    suspend fun setArchived(id: String, archived: Boolean, updatedAt: Long)
+    @Query(
+        "UPDATE accounts SET archived = :archived, archivedAt = :archivedAt, updatedAt = :updatedAt WHERE id = :id",
+    )
+    suspend fun setArchived(id: String, archived: Boolean, archivedAt: Long?, updatedAt: Long)
 }

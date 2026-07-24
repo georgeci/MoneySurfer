@@ -3,11 +3,11 @@ package com.georgeci.moneysurfer.feature.account.manage
 import arrow.optics.optics
 import com.georgeci.moneysurfer.domain.formatter.MoneyFormatter
 import com.georgeci.moneysurfer.domain.model.Account
+import com.georgeci.moneysurfer.domain.model.formattedTotalsByCurrency
 import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.AccountType
-import com.georgeci.moneysurfer.domain.primitives.Money
-import com.georgeci.moneysurfer.domain.repositories.AccountRepository
 import com.georgeci.moneysurfer.domain.usecase.ArchiveAccountUseCase
+import com.georgeci.moneysurfer.domain.usecase.DeleteAccountUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetAccountsUseCase
 import com.georgeci.moneysurfer.domain.usecase.RestoreAccountUseCase
 import com.georgeci.moneysurfer.feature.account.generated.resources.Res
@@ -17,12 +17,15 @@ import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_man
 import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_manage_deleted_snackbar
 import com.georgeci.moneysurfer.navigation.SnackbarController
 import com.georgeci.moneysurfer.utils.MviViewModel
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import org.koin.core.annotation.KoinViewModel
 
 @KoinViewModel
 class AccountsManageViewModel(
     private val getAccounts: GetAccountsUseCase,
-    private val accountRepository: AccountRepository,
+    private val deleteAccount: DeleteAccountUseCase,
     private val archiveAccount: ArchiveAccountUseCase,
     private val restoreAccount: RestoreAccountUseCase,
     private val snackbar: SnackbarController,
@@ -128,8 +131,12 @@ class AccountsManageViewModel(
         val target = content.pendingDelete ?: return
         updateState { AccountsManageState.content.pendingDelete.modify(this) { null } }
         launch {
-            accountRepository.delete(target.id)
-            snackbar.show(Res.string.accounts_manage_deleted_snackbar, listOf(target.name))
+            deleteAccount(target.id).fold(
+                ifLeft = { snackbar.show(Res.string.accounts_manage_action_failed) },
+                ifRight = {
+                    snackbar.show(Res.string.accounts_manage_deleted_snackbar, listOf(target.name))
+                },
+            )
         }
     }
 
@@ -138,31 +145,26 @@ class AccountsManageViewModel(
             getAccounts().collect { accounts ->
                 val active = accounts.filterNot { it.archived }.map { it.toUi() }
                 val archived = accounts.filter { it.archived }.map { it.toUi() }
-                val total = accounts.filterNot { it.archived }.formattedTotal()
+                val totals = accounts.filterNot { it.archived }.formattedTotalsByCurrency()
                 updateState {
                     when (this) {
                         is AccountsManageState.Loading -> AccountsManageState.Content(
                             isEditing = false,
                             activeAccounts = active,
                             archivedAccounts = archived,
-                            formattedTotal = total,
+                            formattedTotal = totals.firstOrNull(),
+                            otherCurrencyTotals = totals.drop(1),
                         )
                         is AccountsManageState.Content -> copy(
                             activeAccounts = active,
                             archivedAccounts = archived,
-                            formattedTotal = total,
+                            formattedTotal = totals.firstOrNull(),
+                            otherCurrencyTotals = totals.drop(1),
                         )
                     }
                 }
             }
         }
-    }
-
-    private fun List<Account>.formattedTotal(): String? {
-        val currency = firstOrNull()?.currencyCode ?: return null
-        val total = filter { it.currencyCode == currency }
-            .fold(Money.zero()) { acc, account -> acc + account.balance }
-        return MoneyFormatter.format(total, currency)
     }
 
     private fun Account.toUi() = AccountManageUi(
@@ -171,6 +173,7 @@ class AccountsManageViewModel(
         type = type,
         formattedBalance = MoneyFormatter.format(balance, currencyCode),
         currency = currencyCode.value,
+        archivedOn = archivedAt?.toLocalDateTime(TimeZone.currentSystemDefault())?.date,
     )
 }
 
@@ -183,7 +186,13 @@ sealed interface AccountsManageState {
         val isEditing: Boolean,
         val activeAccounts: List<AccountManageUi>,
         val archivedAccounts: List<AccountManageUi>,
+        /** Total for the most-used currency, or null when there are no active accounts. */
         val formattedTotal: String?,
+        /**
+         * Totals for every other currency in play. Rendered beside [formattedTotal] rather than
+         * folded into it — without FX rates a single number would just hide these balances.
+         */
+        val otherCurrencyTotals: List<String> = emptyList(),
         val pendingDelete: AccountsManagePendingDelete? = null,
         val pendingArchive: AccountsManagePendingArchive? = null,
     ) : AccountsManageState {
@@ -209,7 +218,8 @@ data class AccountManageUi(
     val type: AccountType,
     val formattedBalance: String,
     val currency: String,
-    val archivedLabel: String? = null,
+    /** Date the account was archived, or null when it is active (or was archived pre-#307). */
+    val archivedOn: LocalDate? = null,
 )
 
 sealed interface AccountsManageEvent {

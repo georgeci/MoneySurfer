@@ -1,10 +1,12 @@
 package com.georgeci.moneysurfer.uikit.components
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -28,6 +30,14 @@ data class SurferCurrencyOption(
     val name: String,
 )
 
+/**
+ * Currency chooser as a modal bottom sheet: title, search field, and one [SurferCurrencyRow]
+ * card per currency. The sheet wraps its content and caps the list at [ListMaxHeight] so a
+ * short currency list reads as a compact sheet instead of a full-height page.
+ *
+ * Departure from the design: the mockup has no search field. The supported list keeps growing,
+ * so the field stays — it is the reason this sheet replaced the segmented control at all.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SurferCurrencyBottomSheet(
@@ -59,11 +69,7 @@ fun SurferCurrencyBottomSheet(
         containerColor = AppTheme.materialColors.surfaceContainerLow,
         shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(bottom = 16.dp),
-        ) {
+        Column(modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp)) {
             Text(
                 text = title,
                 style = AppTheme.typography.titleMedium,
@@ -77,10 +83,9 @@ fun SurferCurrencyBottomSheet(
             )
             Spacer(Modifier.height(8.dp))
             LazyColumn(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f),
-                contentPadding = androidx.compose.foundation.layout.PaddingValues(bottom = 16.dp),
+                modifier = Modifier.fillMaxWidth().heightIn(max = ListMaxHeight),
+                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 4.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp),
             ) {
                 items(filtered, key = { it.code }) { currency ->
                     SurferCurrencyRow(
@@ -95,3 +100,5 @@ fun SurferCurrencyBottomSheet(
         }
     }
 }
+
+private val ListMaxHeight = 420.dp

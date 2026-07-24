@@ -8,6 +8,7 @@ import com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreation
 import com.georgeci.moneysurfer.feature.transaction.details.TransactionDetailsScreen
 import com.georgeci.moneysurfer.feature.transaction.list.TransactionsByAccountScreen
 import com.georgeci.moneysurfer.navigation.AccountPickerResultKey
+import com.georgeci.moneysurfer.navigation.AccountPickerTransferResultKey
 import com.georgeci.moneysurfer.navigation.CategoryPickerResultKey
 import com.georgeci.moneysurfer.navigation.FeatureNavGraph
 import com.georgeci.moneysurfer.navigation.NavDetailPlaceholder
@@ -39,11 +40,13 @@ val transactionNavGraph: FeatureNavGraph = { navigator ->
                 NavigationResultMetadata.resultConsumer(
                     CategoryPickerResultKey,
                     AccountPickerResultKey,
+                    AccountPickerTransferResultKey,
                 ),
         ) + ListDetailSceneStrategy.detailPane(),
     ) { key ->
         val pickedCategoryId = rememberNavigationResult(CategoryPickerResultKey)
         val pickedAccountId = rememberNavigationResult(AccountPickerResultKey)
+        val transferRequested = rememberNavigationResult(AccountPickerTransferResultKey)
 
         TransactionCreationScreen(
             transactionId = key.transactionId?.let { TransactionId(it) },
@@ -58,16 +61,18 @@ val transactionNavGraph: FeatureNavGraph = { navigator ->
                 )
             },
             onNavigateToCategoryCreation = { navigator.push(Route.CategoryCreation()) },
-            onNavigateToAccountChooser = { selectedId, excludeId ->
+            onNavigateToAccountChooser = { selectedId, excludeId, showTransferShortcut ->
                 navigator.push(
                     Route.AccountChooser(
                         selectedAccountId = selectedId?.value,
                         excludeAccountId = excludeId?.value,
+                        showTransferShortcut = showTransferShortcut,
                     ),
                 )
             },
             pickedCategoryId = pickedCategoryId,
             pickedAccountId = pickedAccountId,
+            transferRequested = transferRequested,
         )
     }
 

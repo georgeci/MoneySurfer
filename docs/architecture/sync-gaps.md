@@ -161,9 +161,11 @@ a reviewer.
 
 ## Telemetry
 
-- **Logging only.** `KermitSyncTelemetry` writes to Kermit. No
-  Crashlytics, no OpenTelemetry. The interface is small and one-line to
-  swap in `:sync-surfer`.
+- **Kermit only, but Kermit now reaches Crashlytics.**
+  `KermitSyncTelemetry` writes to Kermit; since #78 a `CrashReportingLogWriter`
+  forwards Warn+ lines to Crashlytics as breadcrumbs and logged throwables as
+  non-fatals (see [crash-reporting.md](crash-reporting.md)). No OpenTelemetry.
+  The interface is small and one-line to swap in `:sync-surfer`.
 
 ## Persistence of `lastOutcome`
 

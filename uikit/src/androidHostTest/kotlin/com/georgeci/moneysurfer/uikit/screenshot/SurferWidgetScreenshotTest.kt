@@ -10,6 +10,7 @@ import androidx.compose.ui.unit.dp
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.widgets.SurferAccountItem
 import com.georgeci.moneysurfer.uikit.widgets.SurferAccountsWidget
+import com.georgeci.moneysurfer.uikit.widgets.SurferBalanceFootnote
 import com.georgeci.moneysurfer.uikit.widgets.SurferBalanceWidget
 import com.georgeci.moneysurfer.uikit.widgets.SurferQuickActionsWidget
 import com.georgeci.moneysurfer.uikit.widgets.SurferRecentTransactionItem
@@ -38,7 +39,7 @@ class SurferWidgetScreenshotTest {
                     balance = "€11,575.32",
                     modifier = Modifier.fillMaxWidth(),
                     size = size,
-                    trendText = "+€412 this month",
+                    footnote = SurferBalanceFootnote.Trend("+€412 this month"),
                 )
             }
         }
