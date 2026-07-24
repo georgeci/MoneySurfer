@@ -62,6 +62,12 @@
 - Lines: 19-98
 - Tasks: ci, security, supply-chain
 
+## color-contrast
+- Title: What was audited
+- File: docs/design/color-contrast.md
+- Lines: 27-113
+- Tasks: uikit, theme, accessibility, contrast, wcag
+
 ## context-packs
 - Title: Add Compose screen
 - File: docs/CONTEXT_PACKS.md

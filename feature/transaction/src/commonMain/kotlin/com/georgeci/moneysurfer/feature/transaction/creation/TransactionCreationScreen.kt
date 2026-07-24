@@ -43,6 +43,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
@@ -406,6 +407,9 @@ private fun TransactionCreationContent(
 
 private const val CATEGORY_PREVIEW_SIZE = 7
 
+/** Opacity of the type pill's tint wash. See [TypePill] for why it is composited, not blended. */
+private const val TYPE_PILL_WASH_ALPHA = 0.18f
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun AmountHero(
@@ -489,10 +493,15 @@ private fun TypePill(type: TransactionTypeUi) {
         TransactionTypeUi.Income -> Res.string.transaction_creation_income
         TransactionTypeUi.Transfer -> Res.string.transaction_creation_transfer
     }
+    // Composited over `surface` rather than left translucent: the label is `tint` on a wash
+    // of the same tint, so the contrast ratio depends entirely on what shows through. Pinning
+    // the wash to the scaffold's own colour keeps the pair at a known ≥4.5:1 even if the pill
+    // is later moved onto a card.
+    val wash = tint.copy(alpha = TYPE_PILL_WASH_ALPHA).compositeOver(AppTheme.materialColors.surface)
     Row(
         modifier = Modifier
             .clip(RoundedCornerShape(percent = 50))
-            .background(tint.copy(alpha = 0.18f))
+            .background(wash)
             .padding(horizontal = 14.dp, vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -697,7 +706,6 @@ private fun TransferAccountsBlock(
             label = stringResource(Res.string.transaction_creation_from_label),
             currencySymbol = fromSymbol,
             amountText = fromAmountState.text.toString(),
-            amountEditable = true,
             amountState = fromAmountState,
             account = state.fromAccount,
             accountPlaceholder = stringResource(Res.string.transaction_creation_from_account),
@@ -733,7 +741,6 @@ private fun TransferAccountsBlock(
             label = stringResource(Res.string.transaction_creation_to_label),
             currencySymbol = toSymbol,
             amountText = if (crossCurrency) toAmountState.text.toString() else fromAmountState.text.toString(),
-            amountEditable = crossCurrency,
             amountState = if (crossCurrency) toAmountState else null,
             account = state.toAccount,
             accountPlaceholder = stringResource(Res.string.transaction_creation_to_account),
@@ -771,7 +778,7 @@ private fun TransferLegCard(
     label: String,
     currencySymbol: String,
     amountText: String,
-    amountEditable: Boolean,
+    /** Non-null makes the leg editable; the receiving leg passes null unless the rate differs. */
     amountState: TextFieldState?,
     account: Account?,
     accountPlaceholder: String,
@@ -802,7 +809,7 @@ private fun TransferLegCard(
                 color = AppTheme.materialColors.onSurfaceVariant,
             )
             Spacer(Modifier.width(4.dp))
-            if (amountEditable && amountState != null) {
+            if (amountState != null) {
                 BasicTextField(
                     state = amountState,
                     inputTransformation = AmountInputTransformation,
@@ -855,7 +862,7 @@ private fun TransactionCreationFilledPreview() {
         TransactionCreationContent(
             state = TransactionCreationState.Content(
                 amount = "48.20",
-                note = "Lidl — weekly shop",
+                note = PreviewNote,
                 type = TransactionTypeUi.Expense,
                 accounts = PreviewAccounts,
                 categories = PreviewCategories,
@@ -879,7 +886,7 @@ private fun TransactionCreationTransferPreview() {
         TransactionCreationContent(
             state = TransactionCreationState.Content(
                 amount = "48.20",
-                note = "Lidl — weekly shop",
+                note = PreviewNote,
                 type = TransactionTypeUi.Transfer,
                 accounts = PreviewAccounts,
                 categories = PreviewCategories,
@@ -911,7 +918,7 @@ private fun TransactionCreationTransferCrossCurrencyPreview() {
             state = TransactionCreationState.Content(
                 amount = "250",
                 toAmount = "271.83",
-                note = "Lidl — weekly shop",
+                note = PreviewNote,
                 type = TransactionTypeUi.Transfer,
                 accounts = listOf(from, to),
                 categories = PreviewCategories,
