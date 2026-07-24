@@ -56,6 +56,35 @@ class RecurringRuleDtoMapperSpec : StringSpec({
         entity.toDoc().scheduleDaysOfMonth shouldBe emptyList()
     }
 
+    // The rules gate membership and client version, not field shape, so a co-member's
+    // client can write a padded day name. It passes the wire type check but not the
+    // repository's exact-enum-name parse, which would silently drop the day.
+    "a padded day name from a remote doc is trimmed rather than dropped" {
+        val entity = RecurringRuleDoc(
+            scheduleDaysOfWeek = listOf(" MONDAY", "FRIDAY "),
+        ).toEntity(id = "rule-1", workspaceId = WORKSPACE)
+
+        entity.scheduleDaysOfWeek shouldBe "MONDAY,FRIDAY"
+    }
+
+    "a junk day name from a remote doc never reaches Room" {
+        val entity = RecurringRuleDoc(
+            scheduleDaysOfWeek = listOf("MONDAY", "FUNDAY", ""),
+        ).toEntity(id = "rule-1", workspaceId = WORKSPACE)
+
+        entity.scheduleDaysOfWeek shouldBe "MONDAY"
+    }
+
+    "out-of-range days of month are filtered in both directions" {
+        val entity = RecurringRuleDoc(
+            scheduleDaysOfMonth = listOf(0, 1, 15, 31, 32, -3),
+        ).toEntity(id = "rule-1", workspaceId = WORKSPACE)
+
+        entity.scheduleDaysOfMonth shouldBe "1,15,31"
+        entity.copy(scheduleDaysOfMonth = "0,7,99").toDoc()
+            .scheduleDaysOfMonth shouldBe listOf(7)
+    }
+
     // Blank enum names slip past the rules' string guard but store an unparseable value.
     "blank enum names fall back to the repository's parse defaults" {
         val entity = RecurringRuleDoc(
