@@ -11,12 +11,14 @@ import com.georgeci.moneysurfer.domain.model.Account
 import com.georgeci.moneysurfer.domain.model.AccountExtraDetail
 import com.georgeci.moneysurfer.domain.model.Transaction
 import com.georgeci.moneysurfer.domain.primitives.AccountId
+import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
 import com.georgeci.moneysurfer.domain.primitives.Money
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 import com.georgeci.moneysurfer.domain.repositories.AccountRepository
 import com.georgeci.moneysurfer.domain.repositories.TransactionRepository
+import com.georgeci.moneysurfer.domain.usecase.GetAccountBalanceSeriesUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetAccountByIdUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetTransactionsByAccountUseCase
 import com.georgeci.moneysurfer.domain.util.TransactionPeriodWindow
@@ -121,6 +123,7 @@ private fun viewModelFor(
     accountId = account.id,
     getAccountById = GetAccountByIdUseCase(SingleAccountRepository(account)),
     getTransactionsByAccount = GetTransactionsByAccountUseCase(FixedTransactionRepository(transactions)),
+    getAccountBalanceSeries = GetAccountBalanceSeriesUseCase(ClockUseCase()),
     offlineBuildFlags = OfflineBuildFlags(isOffline = offline),
 )
 
