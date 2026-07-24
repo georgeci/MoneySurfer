@@ -1,7 +1,5 @@
 package com.georgeci.moneysurfer.feature.account.picker
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -24,8 +22,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.georgeci.moneysurfer.domain.primitives.AccountId
-import com.georgeci.moneysurfer.uikit.atom.SurferActionCard
 import com.georgeci.moneysurfer.uikit.atom.SurferCard
+import com.georgeci.moneysurfer.uikit.atom.SurferIconBubble
+import com.georgeci.moneysurfer.uikit.atom.SurferSelectionRadio
+import com.georgeci.moneysurfer.uikit.components.SurferAddNewCard
 import com.georgeci.moneysurfer.uikit.components.base.SurferSplitAmount
 import com.georgeci.moneysurfer.uikit.components.base.SurferSplitAmountTier
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
@@ -120,42 +120,12 @@ internal fun AccountChooserContent(
 
         Spacer(Modifier.height(12.dp))
 
-        SurferActionCard(
-            modifier = Modifier.padding(horizontal = 12.dp),
+        SurferAddNewCard(
+            label = addNewLabel,
+            subtitle = addNewSubtitle,
             onClick = onAddNew,
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(40.dp)
-                        .clip(CircleShape)
-                        .border(1.dp, AppTheme.materialColors.outline, CircleShape),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Icon(
-                        imageVector = SurferIcons.Add,
-                        contentDescription = SurferSemantics.Decorative,
-                        tint = AppTheme.materialColors.primary,
-                        modifier = Modifier.size(20.dp),
-                    )
-                }
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = addNewLabel,
-                        style = AppTheme.typography.titleSmall,
-                        color = AppTheme.materialColors.primary,
-                    )
-                    Text(
-                        text = addNewSubtitle,
-                        style = AppTheme.typography.bodySmall,
-                        color = AppTheme.materialColors.onSurfaceVariant,
-                    )
-                }
-            }
-        }
+            modifier = Modifier.padding(horizontal = 12.dp),
+        )
 
         if (transferInsteadLabel != null) {
             Spacer(Modifier.height(10.dp))
@@ -198,20 +168,7 @@ private fun AccountRow(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            Box(
-                modifier = Modifier
-                    .size(40.dp)
-                    .clip(CircleShape)
-                    .background(AppTheme.materialColors.primaryContainer),
-                contentAlignment = Alignment.Center,
-            ) {
-                Icon(
-                    imageVector = row.icon,
-                    contentDescription = SurferSemantics.Decorative,
-                    tint = AppTheme.materialColors.onPrimaryContainer,
-                    modifier = Modifier.size(22.dp),
-                )
-            }
+            SurferIconBubble(icon = row.icon)
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = row.name,
@@ -238,29 +195,7 @@ private fun AccountRow(
                 fractionAlpha = 0.5f,
             )
             Spacer(Modifier.size(4.dp))
-            SelectionRadio(checked = selected)
-        }
-    }
-}
-
-@Composable
-private fun SelectionRadio(checked: Boolean) {
-    val borderColor =
-        if (checked) AppTheme.materialColors.primary else AppTheme.materialColors.outline
-    Box(
-        modifier = Modifier
-            .size(22.dp)
-            .clip(CircleShape)
-            .border(2.dp, borderColor, CircleShape),
-        contentAlignment = Alignment.Center,
-    ) {
-        if (checked) {
-            Box(
-                modifier = Modifier
-                    .size(10.dp)
-                    .clip(CircleShape)
-                    .background(AppTheme.materialColors.primary),
-            )
+            SurferSelectionRadio(selected = selected)
         }
     }
 }
