@@ -11,6 +11,7 @@ import com.georgeci.moneysurfer.domain.primitives.BudgetId
 import com.georgeci.moneysurfer.domain.primitives.CategoryId
 import com.georgeci.moneysurfer.domain.primitives.Money
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
+import com.georgeci.moneysurfer.domain.primitives.TransactionType
 import com.georgeci.moneysurfer.domain.primitives.UserId
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 import com.georgeci.moneysurfer.domain.repositories.BudgetRepository
@@ -64,37 +65,52 @@ internal class FakeTransactionRepository(initial: List<Transaction> = emptyList(
     override fun getAll(): Flow<List<Transaction>> = flow
     override fun getByAccountId(accountId: AccountId): Flow<List<Transaction>> = flow
 
-    /** Mirrors the real query: account filter, closed date window, newest first, then [limit]. */
+    /** Mirrors `TransactionDao.getCategorizedWindow`: filter, sort newest-first, then [limit]. */
     override fun getCategorizedWindow(
         accountId: AccountId?,
         window: TransactionPeriodWindow,
         limit: Int,
     ): Flow<List<CategorizedTransaction>> = flow.map { transactions ->
         transactions
-            .filter { accountId == null || it.accountId == accountId }
-            .filter { it.operationDate in window }
-            .sortedByDescending { it.operationAt }
+            .inWindow(accountId, window)
+            .sortedWith(
+                compareByDescending<Transaction> { it.operationDate }
+                    .thenByDescending { it.operationAt }
+                    .thenByDescending { it.createdAt },
+            )
             .take(limit)
             .map { CategorizedTransaction(it, categoryName = null) }
     }
 
-    /** Like the real query: magnitudes summed per (type, currency) over the whole window. */
+    /** Like `TransactionDao.getTotals`: magnitudes summed per (type, currency) over the window. */
     override fun getTotals(
         accountId: AccountId?,
         window: TransactionPeriodWindow,
     ): Flow<List<TransactionTotal>> = flow.map { transactions ->
         transactions
-            .filter { accountId == null || it.accountId == accountId }
-            .filter { it.operationDate in window }
+            .inWindow(accountId, window)
             .groupBy { it.type to it.currencyCode }
             .map { (key, rows) ->
                 val (type, currencyCode) = key
                 TransactionTotal(
                     type = type,
                     currencyCode = currencyCode,
-                    total = Money.fromMinor(rows.sumOf { it.money.abs().minor }),
+                    total = rows.fold(Money.zero()) { acc, row -> acc + row.money.abs() },
                 )
             }
+    }
+
+    /**
+     * The shared `WHERE` of both queries. Opening balances are an account artefact and are
+     * excluded by the DAO itself, never by the caller.
+     */
+    private fun List<Transaction>.inWindow(
+        accountId: AccountId?,
+        window: TransactionPeriodWindow,
+    ): List<Transaction> = filter {
+        (accountId == null || it.accountId == accountId) &&
+            it.operationDate in window &&
+            it.type != TransactionType.OPENING_BALANCE
     }
 
     override fun getByWorkspaceId(workspaceId: WorkspaceId): Flow<List<Transaction>> = flow
