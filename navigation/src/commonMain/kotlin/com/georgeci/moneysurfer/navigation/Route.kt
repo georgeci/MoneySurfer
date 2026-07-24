@@ -112,6 +112,14 @@ sealed interface Route : NavKey {
     @Serializable
     data class TransactionsByAccount(val accountId: String? = null) : TopLevel
 
+    /**
+     * Full-screen transaction filters. [accountId] is the list's own scope, not a filter: when it
+     * is set the screen hides its account picker, because the list is already restricted to that
+     * account.
+     */
+    @Serializable
+    data class TransactionFilters(val accountId: String? = null) : Route
+
     @Serializable
     data class TransactionCreation(
         val transactionId: String? = null,
