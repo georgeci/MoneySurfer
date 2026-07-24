@@ -39,6 +39,7 @@ import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.uikit.widgets.LocalSurferWidgetSize
 import com.georgeci.moneysurfer.uikit.widgets.SurferAccountItem
 import com.georgeci.moneysurfer.uikit.widgets.SurferAccountsWidget
+import com.georgeci.moneysurfer.uikit.widgets.SurferBalanceFootnote
 import com.georgeci.moneysurfer.uikit.widgets.SurferBalanceWidget
 import com.georgeci.moneysurfer.uikit.widgets.SurferGoalItem
 import com.georgeci.moneysurfer.uikit.widgets.SurferGoalsWidget
@@ -200,20 +201,7 @@ private fun DashboardContent(
                 SurferBalanceWidget(
                     title = stringResource(Res.string.dashboard_balance_title),
                     balance = state.formattedTotalBalance ?: "—",
-                    emptyText = if (state.formattedTotalBalance == null) {
-                        stringResource(Res.string.dashboard_balance_empty_text)
-                    } else {
-                        null
-                    },
-                    trendText = state.formattedTrendDelta,
-                    noteText = state.otherCurrencyTotals
-                        .takeIf { it.isNotEmpty() }
-                        ?.let {
-                            stringResource(
-                                Res.string.dashboard_balance_other_currencies,
-                                it.joinToString(" · "),
-                            )
-                        },
+                    footnote = balanceFootnote(state),
                     showSparkline = false,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -301,6 +289,25 @@ private fun DashboardContent(
             }
         }
     }
+}
+
+/**
+ * Line under the headline balance. No total at all wins over everything; otherwise a trend, if
+ * we ever compute one, outranks the other-currency note — the note is the fallback that keeps
+ * balances the headline cannot absorb from disappearing.
+ */
+@Composable
+private fun balanceFootnote(state: DashboardState.Content): SurferBalanceFootnote? = when {
+    state.formattedTotalBalance == null ->
+        SurferBalanceFootnote.Empty(stringResource(Res.string.dashboard_balance_empty_text))
+    state.formattedTrendDelta != null -> SurferBalanceFootnote.Trend(state.formattedTrendDelta)
+    state.otherCurrencyTotals.isNotEmpty() -> SurferBalanceFootnote.Note(
+        stringResource(
+            Res.string.dashboard_balance_other_currencies,
+            state.otherCurrencyTotals.joinToString(" · "),
+        ),
+    )
+    else -> null
 }
 
 @Composable
