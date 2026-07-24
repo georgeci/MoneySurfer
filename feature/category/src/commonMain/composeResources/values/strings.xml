@@ -6,6 +6,12 @@
     <string name="transaction_creation_category_section_income">Income</string>
     <string name="transaction_creation_category_create_new">Create new category</string>
     <string name="transaction_creation_category_empty">No categories</string>
+    <string name="category_picker_currently">Currently: %1$s</string>
+    <string name="category_picker_new">New</string>
+    <string name="category_picker_new_category">New category</string>
+    <string name="category_picker_toggle_children">Show subcategories</string>
+    <string name="category_picker_show_tree">Show as list</string>
+    <string name="category_picker_show_grid">Show as grid</string>
 
     <!-- Category creation / edit -->
     <string name="category_creation_title_create">New category</string>
