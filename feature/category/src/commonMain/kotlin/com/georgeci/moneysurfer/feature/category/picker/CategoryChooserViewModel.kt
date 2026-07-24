@@ -95,8 +95,14 @@ class CategoryChooserViewModel(
         return CategoryPickerRows.expandedForSelection(allCategories, selected)
     }
 
+    /** Applies [reducer] once the sheet has content; events that land while loading are dropped. */
     private fun updateContent(reducer: CategoryChooserState.Content.() -> CategoryChooserState.Content) =
-        updateState { (this as? CategoryChooserState.Content)?.reducer()?.rebuild() ?: this }
+        updateState {
+            when (this) {
+                is CategoryChooserState.Content -> reducer().rebuild()
+                is CategoryChooserState.Loading -> this
+            }
+        }
 
     /** Re-derives everything the sheet draws from the inputs the events just changed. */
     private fun CategoryChooserState.Content.rebuild() = copy(
