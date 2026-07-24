@@ -2,37 +2,31 @@ package com.georgeci.moneysurfer.feature.category.manage
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.georgeci.moneysurfer.domain.model.CategoryTree
 import com.georgeci.moneysurfer.domain.primitives.CategoryId
 import com.georgeci.moneysurfer.domain.primitives.CategoryType
-import com.georgeci.moneysurfer.uikit.atom.SurferCard
-import com.georgeci.moneysurfer.uikit.components.SurferCategoryBubble
 import com.georgeci.moneysurfer.uikit.components.SurferCategoryPalette
 import com.georgeci.moneysurfer.uikit.components.SurferEmptyState
 import com.georgeci.moneysurfer.uikit.components.base.SurferAddFab
 import com.georgeci.moneysurfer.uikit.components.base.SurferSwipeAction
 import com.georgeci.moneysurfer.uikit.components.base.SurferSwipeRevealRow
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
+import com.georgeci.moneysurfer.uikit.components.category.SurferCategoryManageCard
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
-import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.utils.HandleSideEffect
 import moneysurfer.feature.category.generated.resources.Res
@@ -201,10 +195,7 @@ private fun CategoryManageRow(
             )
         },
     ) {
-        CategoryManageCard(
-            category = category,
-            onClick = onClick,
-        )
+        CategoryManageCard(category = category, onClick = onClick)
     }
 }
 
@@ -220,42 +211,14 @@ private fun CategoryManageCard(
         hue = category.hue,
         systemKind = category.systemKind,
     )
-    SurferCard(
-        modifier = modifier.fillMaxWidth(),
+    SurferCategoryManageCard(
+        name = category.name,
+        typeLabel = categoryTypeLabel(category.type),
+        icon = visual.icon,
+        tint = visual.tint,
         onClick = onClick,
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(
-                horizontal = AppTheme.spacing.default,
-                vertical = AppTheme.spacing.medium,
-            ),
-        ) {
-            SurferCategoryBubble(
-                icon = visual.icon,
-                tint = visual.tint,
-                size = 36.dp,
-                modifier = Modifier.padding(end = AppTheme.spacing.medium),
-            )
-            Text(
-                text = category.name,
-                style = AppTheme.typography.titleSmall,
-                color = AppTheme.materialColors.onSurface,
-                modifier = Modifier.weight(1f),
-            )
-            Text(
-                text = categoryTypeLabel(category.type),
-                style = AppTheme.typography.bodySmall,
-                color = AppTheme.materialColors.onSurfaceVariant,
-            )
-            Icon(
-                imageVector = SurferIcons.ChevronRight,
-                contentDescription = SurferSemantics.Decorative,
-                tint = AppTheme.materialColors.onSurfaceVariant,
-                modifier = Modifier.padding(start = AppTheme.spacing.small),
-            )
-        }
-    }
+        modifier = modifier,
+    )
 }
 
 @Composable
