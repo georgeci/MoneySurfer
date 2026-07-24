@@ -11,6 +11,7 @@ import com.georgeci.moneysurfer.domain.primitives.Money
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 import com.georgeci.moneysurfer.domain.repositories.AccountRepository
 import com.georgeci.moneysurfer.domain.usecase.ArchiveAccountUseCase
+import com.georgeci.moneysurfer.domain.usecase.DeleteAccountUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetAccountsUseCase
 import com.georgeci.moneysurfer.domain.usecase.RestoreAccountUseCase
 import com.georgeci.moneysurfer.feature.account.generated.resources.Res
@@ -154,7 +155,7 @@ private fun StringSpec.newViewModel(
     val session = InMemorySessionPointers(currentWorkspaceId = workspaceId)
     return AccountsManageViewModel(
         getAccounts = GetAccountsUseCase(repo, session),
-        accountRepository = repo,
+        deleteAccount = DeleteAccountUseCase(repo),
         archiveAccount = ArchiveAccountUseCase(repo),
         restoreAccount = RestoreAccountUseCase(repo),
         snackbar = snackbar,

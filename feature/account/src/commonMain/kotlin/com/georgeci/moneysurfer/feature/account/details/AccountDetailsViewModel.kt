@@ -4,6 +4,7 @@ import arrow.optics.optics
 import com.georgeci.moneysurfer.domain.formatter.MoneyFormatter
 import com.georgeci.moneysurfer.domain.model.Transaction
 import com.georgeci.moneysurfer.domain.primitives.AccountId
+import com.georgeci.moneysurfer.domain.primitives.AccountType
 import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
 import com.georgeci.moneysurfer.domain.primitives.Money
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
@@ -68,7 +69,7 @@ class AccountDetailsViewModel(
                             formattedBalance = account?.let {
                                 MoneyFormatter.format(it.balance, it.currencyCode)
                             }.orEmpty(),
-                            currency = account?.currencyCode?.value.orEmpty(),
+                            type = account?.type,
                             formattedIncome = formattedIncome,
                             formattedExpenses = formattedExpenses,
                             transactions = txnUi,
@@ -108,7 +109,8 @@ sealed interface AccountDetailsState {
         override val accountId: AccountId,
         val name: String,
         val formattedBalance: String,
-        val currency: String,
+        /** Drives the hero meta line. Null only while the account row is still being read. */
+        val type: AccountType?,
         val formattedIncome: String,
         val formattedExpenses: String,
         val transactions: List<AccountTransactionUi>,

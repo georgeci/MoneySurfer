@@ -120,9 +120,10 @@ fun TransactionCreationScreen(
     onNavigateBack: () -> Unit,
     onNavigateToCategoryChooser: (CategoryId?, CategoryType) -> Unit,
     onNavigateToCategoryCreation: () -> Unit,
-    onNavigateToAccountChooser: (AccountId?, AccountId?) -> Unit,
+    onNavigateToAccountChooser: (AccountId?, AccountId?, Boolean) -> Unit,
     pickedCategoryId: CategoryId? = null,
     pickedAccountId: AccountId? = null,
+    transferRequested: Boolean? = null,
     viewModel: TransactionCreationViewModel = koinViewModel(
         key = "$transactionId:$accountId",
     ) { parametersOf(transactionId, accountId) },
@@ -140,6 +141,7 @@ fun TransactionCreationScreen(
             is TransactionCreationEffect.NavigateToAccountChooser -> onNavigateToAccountChooser(
                 effect.selectedAccountId,
                 effect.excludeAccountId,
+                effect.showTransferShortcut,
             )
         }
     }
@@ -152,6 +154,11 @@ fun TransactionCreationScreen(
     LaunchedEffect(pickedAccountId) {
         val id = pickedAccountId ?: return@LaunchedEffect
         viewModel.onEvent(TransactionCreationEvent.OnAccountPicked(id))
+    }
+
+    LaunchedEffect(transferRequested) {
+        if (transferRequested != true) return@LaunchedEffect
+        viewModel.onEvent(TransactionCreationEvent.OnTypeChanged(TransactionTypeUi.Transfer))
     }
 
     when (val current = state) {

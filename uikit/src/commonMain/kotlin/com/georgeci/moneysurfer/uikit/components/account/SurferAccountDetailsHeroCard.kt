@@ -43,6 +43,10 @@ import com.georgeci.moneysurfer.uikit.theme.SurferContainerStyle
  * Hero card on the Account Details screen — primary-container tonal block with the account
  * identity (icon + name + sub-line), the headline balance, and a pulsing live-sync indicator.
  *
+ * [syncedLabel] is optional and the dot goes with it: there is no sync state on the account
+ * screens yet, and a permanently-green "synced" pill is a claim the app cannot back up. Pass a
+ * label only once something real drives it.
+ *
  * Built on M3 [Card] so the surface still picks up tonal-elevation overlays from the theme.
  * Mirrors the `'hero'` variant from the Accounts.html design spec.
  */
@@ -52,8 +56,8 @@ fun SurferAccountDetailsHeroCard(
     name: String,
     subtitle: String,
     formattedBalance: String,
-    syncedLabel: String,
     modifier: Modifier = Modifier,
+    syncedLabel: String? = null,
 ) {
     val elevated = AppTheme.containerStyle == SurferContainerStyle.Card
     Card(
@@ -127,18 +131,20 @@ fun SurferAccountDetailsHeroCard(
                 color = AppTheme.materialColors.onPrimaryContainer,
             )
 
-            Spacer(Modifier.height(14.dp))
+            if (syncedLabel != null) {
+                Spacer(Modifier.height(14.dp))
 
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                PulsingDot(color = AppTheme.semanticColors.income)
-                Text(
-                    text = syncedLabel,
-                    style = AppTheme.typography.labelMedium,
-                    color = AppTheme.materialColors.onPrimaryContainer.copy(alpha = 0.8f),
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    PulsingDot(color = AppTheme.semanticColors.income)
+                    Text(
+                        text = syncedLabel,
+                        style = AppTheme.typography.labelMedium,
+                        color = AppTheme.materialColors.onPrimaryContainer.copy(alpha = 0.8f),
+                    )
+                }
             }
         }
     }
@@ -195,14 +201,13 @@ private fun SurferAccountDetailsHeroCardPreview() {
             SurferAccountDetailsHeroCard(
                 icon = SurferIcons.Wallet,
                 name = "Everyday",
-                subtitle = "EUR",
+                subtitle = "BANK",
                 formattedBalance = "€2,480.32",
-                syncedLabel = "Synced 2 min ago · Tap for full history",
             )
             SurferAccountDetailsHeroCard(
                 icon = SurferIcons.Savings,
                 name = "Emergency Fund",
-                subtitle = "EUR",
+                subtitle = "SAVINGS",
                 formattedBalance = "€8,915.00",
                 syncedLabel = "Synced just now · Tap for full history",
             )
