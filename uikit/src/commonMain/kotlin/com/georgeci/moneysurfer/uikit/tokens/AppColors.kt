@@ -37,10 +37,10 @@ object AppColors {
     val OnSurfaceVariant = Color(0xFF424940)
     val SurfaceTint = Color(0xFF1B5E20)
 
-    // Surface container ramp. Material's baseline tonal palette is purple-tinted, so leaving
-    // these unset made every card sit on a different neutral hue from the scaffold. Levels keep
-    // M3's tonal steps relative to [Surface] and re-tint them green with the app's (-1, 0, -6)
-    // RGB offsets, the same relationship [Surface] (#FCFDF7) and #E2E3DD already have.
+    // Surface container ramp. Left unset these fall back to Material's baseline tonal palette,
+    // which is purple-tinted, so cards sat on a visibly different neutral hue from the scaffold
+    // behind them. Each level keeps M3's tonal step relative to [Surface] and is re-tinted to
+    // [Surface]'s own neutral: red one below the green channel, blue six below.
     val SurfaceContainerLowest = Color(0xFFFEFFF9)
     val SurfaceContainerLow = Color(0xFFF7F8F2)
     val SurfaceContainer = Color(0xFFF2F3ED)
@@ -105,7 +105,10 @@ object AppColors {
         val OnSurfaceVariant = Color(0xFFC2C9BD)
         val SurfaceTint = Color(0xFF6EDD72)
 
-        /** Same ramp as the light scheme, tinted with the dark (-2, 0, -3) RGB offsets. */
+        /**
+         * Dark counterpart of the light ramp: the same M3 tonal steps relative to [Surface],
+         * re-tinted to [Surface]'s neutral — red two below the green channel, blue three below.
+         */
         val SurfaceContainerLowest = Color(0xFF151714)
         val SurfaceContainerLow = Color(0xFF232522)
         val SurfaceContainer = Color(0xFF272926)
