@@ -1,6 +1,5 @@
 package com.georgeci.moneysurfer.feature.category.creation
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -8,14 +7,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
@@ -47,6 +44,8 @@ import com.georgeci.moneysurfer.uikit.components.base.SurferSectionLabel
 import com.georgeci.moneysurfer.uikit.components.base.SurferSegmentedControl
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbarButtonAction
+import com.georgeci.moneysurfer.uikit.components.category.SurferColorSwatchRow
+import com.georgeci.moneysurfer.uikit.components.category.SurferIconPickerGrid
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
 import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
@@ -73,8 +72,6 @@ import org.koin.core.parameter.parametersOf
 
 private val SectionSpacing = 24.dp
 private val GridCellCorner = 14.dp
-private val GridGap = 8.dp
-private const val ICON_GRID_COLUMNS = 4
 
 @Composable
 fun CategoryCreationScreen(
@@ -190,16 +187,24 @@ private fun CategoryCreationContent(
                 modifier = Modifier.fillMaxWidth(),
             )
 
-            IconGrid(
-                selectedKey = state.iconKey,
-                tint = visual.tint,
-                onSelect = { onEvent(CategoryCreationEvent.OnIconSelected(it)) },
-            )
+            Column {
+                SurferSectionLabel(stringResource(Res.string.category_creation_icon_label))
+                Spacer(Modifier.height(10.dp))
+                SurferIconPickerGrid(
+                    selectedKey = state.iconKey,
+                    tint = visual.tint,
+                    onSelect = { onEvent(CategoryCreationEvent.OnIconSelected(it)) },
+                )
+            }
 
-            ColorGrid(
-                selectedHue = state.hue,
-                onSelect = { onEvent(CategoryCreationEvent.OnColorSelected(it)) },
-            )
+            Column {
+                SurferSectionLabel(stringResource(Res.string.category_creation_color_label))
+                Spacer(Modifier.height(10.dp))
+                SurferColorSwatchRow(
+                    selectedHue = state.hue,
+                    onSelect = { onEvent(CategoryCreationEvent.OnColorSelected(it)) },
+                )
+            }
 
             ParentPicker(
                 selectedName = state.selectedParentName,
@@ -274,116 +279,6 @@ private fun TypeSelector(
     }
 }
 
-@Composable
-private fun IconGrid(
-    selectedKey: String,
-    tint: Color,
-    onSelect: (String) -> Unit,
-) {
-    Column {
-        SurferSectionLabel(stringResource(Res.string.category_creation_icon_label))
-        Spacer(Modifier.height(10.dp))
-        // Zipped rather than indexed by position: the key is what gets stored, so the grid
-        // never has to agree with the palette on what slot 3 means.
-        val entries = SurferCategoryPalette.iconKeys.zip(SurferCategoryPalette.icons)
-        Column(verticalArrangement = Arrangement.spacedBy(GridGap)) {
-            entries.chunked(ICON_GRID_COLUMNS).forEach { row ->
-                Row(horizontalArrangement = Arrangement.spacedBy(GridGap)) {
-                    row.forEach { (key, icon) ->
-                        IconGridCell(
-                            icon = icon,
-                            selected = key == selectedKey,
-                            tint = tint,
-                            onClick = { onSelect(key) },
-                            modifier = Modifier.weight(1f),
-                        )
-                    }
-                    repeat(ICON_GRID_COLUMNS - row.size) {
-                        Box(modifier = Modifier.weight(1f))
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun IconGridCell(
-    icon: ImageVector,
-    selected: Boolean,
-    tint: Color,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Box(
-        modifier = modifier
-            .aspectRatio(1f)
-            .clip(RoundedCornerShape(GridCellCorner))
-            .background(if (selected) tint.copy(alpha = 0.15f) else Color.Transparent)
-            .border(
-                if (selected) 2.dp else 1.dp,
-                if (selected) tint else AppTheme.materialColors.outlineVariant,
-                RoundedCornerShape(GridCellCorner),
-            )
-            .clickable(onClick = onClick),
-        contentAlignment = Alignment.Center,
-    ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = SurferSemantics.Decorative,
-            tint = if (selected) tint else AppTheme.materialColors.onSurfaceVariant,
-            modifier = Modifier.size(22.dp),
-        )
-    }
-}
-
-@Composable
-private fun ColorGrid(
-    selectedHue: Int,
-    onSelect: (Int) -> Unit,
-) {
-    Column {
-        SurferSectionLabel(stringResource(Res.string.category_creation_color_label))
-        Spacer(Modifier.height(10.dp))
-        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-            SurferCategoryPalette.hues.zip(SurferCategoryPalette.tints).forEach { (hue, color) ->
-                val selected = hue == selectedHue
-                val ring = if (selected) {
-                    Modifier
-                        .border(3.dp, AppTheme.materialColors.surface, CircleShape)
-                        .border(5.dp, color, CircleShape)
-                } else {
-                    Modifier
-                }
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .aspectRatio(1f)
-                        .clip(CircleShape)
-                        .background(color.copy(alpha = 0.18f))
-                        .then(ring)
-                        .clickable { onSelect(hue) },
-                    contentAlignment = Alignment.Center,
-                ) {
-                    if (selected) {
-                        Icon(
-                            imageVector = SurferIcons.Check,
-                            contentDescription = SurferSemantics.Decorative,
-                            tint = color,
-                            modifier = Modifier.size(18.dp),
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
-
-/**
- * Real picker over the eligible parents the ViewModel computed — the category itself, its
- * descendants, system rows and the wrong type are already gone from [options], so anything
- * offered here is safe to save.
- */
 @Composable
 private fun ParentPicker(
     selectedName: String?,
