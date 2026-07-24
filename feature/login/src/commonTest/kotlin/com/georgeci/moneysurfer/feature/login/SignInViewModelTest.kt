@@ -1,6 +1,8 @@
 package com.georgeci.moneysurfer.feature.login
 
 import app.cash.turbine.test
+import arrow.core.left
+import com.georgeci.moneysurfer.domain.auth.AuthError
 import com.georgeci.moneysurfer.domain.auth.AuthLocalRepository
 import com.georgeci.moneysurfer.domain.auth.InMemorySessionPointers
 import com.georgeci.moneysurfer.domain.model.User
@@ -42,6 +44,72 @@ class SignInViewModelTest : StringSpec({
             viewModel.onEvent(SignInEvent.OnTermsClick)
             awaitItem() shouldBe SignInEffect.NavigateToLegal
         }
+    }
+
+    "submitting with no email reports EmailRequired against the email field" {
+        val viewModel = newViewModel()
+
+        viewModel.onEvent(SignInEvent.OnSubmitClick)
+
+        viewModel.currentState.error shouldBe SignInError.EmailRequired
+        viewModel.currentState.emailError shouldBe SignInError.EmailRequired
+        viewModel.currentState.passwordError shouldBe null
+    }
+
+    "submitting with a malformed email reports EmailInvalid" {
+        val viewModel = newViewModel()
+
+        viewModel.onEvent(SignInEvent.OnEmailChanged("surfer@example"))
+        viewModel.onEvent(SignInEvent.OnPasswordChanged("secret1"))
+        viewModel.onEvent(SignInEvent.OnSubmitClick)
+
+        viewModel.currentState.error shouldBe SignInError.EmailInvalid
+    }
+
+    "submitting a valid email with no password reports PasswordRequired" {
+        val viewModel = newViewModel()
+
+        viewModel.onEvent(SignInEvent.OnEmailChanged("surfer@example.com"))
+        viewModel.onEvent(SignInEvent.OnSubmitClick)
+
+        viewModel.currentState.error shouldBe SignInError.PasswordRequired
+        viewModel.currentState.passwordError shouldBe SignInError.PasswordRequired
+    }
+
+    "sign-up with a short password reports PasswordTooShort instead of silently doing nothing" {
+        val viewModel = newViewModel()
+
+        viewModel.onEvent(SignInEvent.OnToggleModeClick)
+        viewModel.onEvent(SignInEvent.OnEmailChanged("surfer@example.com"))
+        viewModel.onEvent(SignInEvent.OnPasswordChanged("12345"))
+        viewModel.onEvent(SignInEvent.OnSubmitClick)
+
+        viewModel.currentState.mode shouldBe AuthMode.SignUp
+        viewModel.currentState.error shouldBe SignInError.PasswordTooShort
+    }
+
+    "sign-up against a taken address reports it on the email field and switches to sign-in" {
+        val viewModel = newViewModel()
+
+        viewModel.onEvent(SignInEvent.OnToggleModeClick)
+        viewModel.onEvent(SignInEvent.OnEmailChanged("surfer@example.com"))
+        viewModel.onEvent(SignInEvent.OnPasswordChanged("secret1"))
+        viewModel.onEvent(SignInEvent.OnSubmitClick)
+
+        viewModel.currentState.emailError shouldBe SignInError.EmailAlreadyInUse
+        viewModel.currentState.mode shouldBe AuthMode.SignIn
+        viewModel.currentState.isLoading shouldBe false
+    }
+
+    "editing a field clears the pending error" {
+        val viewModel = newViewModel()
+
+        viewModel.onEvent(SignInEvent.OnSubmitClick)
+        viewModel.currentState.error shouldBe SignInError.EmailRequired
+
+        viewModel.onEvent(SignInEvent.OnEmailChanged("s"))
+
+        viewModel.currentState.error shouldBe null
     }
 })
 
@@ -113,7 +181,12 @@ private object StubAuthRemoteRepository : AuthRemoteRepository {
     override fun currentEmail(): String? = null
     override fun isCurrentUserAnonymous(): Boolean = false
     override suspend fun signInWithEmail(email: String, password: String) = error(UNUSED)
-    override suspend fun createUserWithEmail(email: String, password: String) = error(UNUSED)
+
+    // The one collaborator call the tests do exercise: it drives the "address already taken"
+    // branch that flips the screen back to sign-in.
+    override suspend fun createUserWithEmail(email: String, password: String) =
+        AuthError(AuthError.Type.EmailAlreadyInUse).left()
+
     override suspend fun signInAnonymously() = error(UNUSED)
     override suspend fun signOut() = error(UNUSED)
     override suspend fun reauthenticateWithEmail(email: String, password: String) = error(UNUSED)

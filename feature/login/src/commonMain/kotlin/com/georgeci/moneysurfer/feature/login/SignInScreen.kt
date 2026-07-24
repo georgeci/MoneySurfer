@@ -5,27 +5,30 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -43,7 +46,6 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
@@ -52,6 +54,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.georgeci.moneysurfer.uikit.components.SurferFullScreenLoader
+import com.georgeci.moneysurfer.uikit.components.SurferPasswordField
+import com.georgeci.moneysurfer.uikit.components.SurferTextField
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
 import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
@@ -63,8 +67,11 @@ import moneysurfer.feature.login.generated.resources.sign_in_brand
 import moneysurfer.feature.login.generated.resources.sign_in_demo_mode
 import moneysurfer.feature.login.generated.resources.sign_in_email_label
 import moneysurfer.feature.login.generated.resources.sign_in_error_email_in_use
+import moneysurfer.feature.login.generated.resources.sign_in_error_email_invalid
+import moneysurfer.feature.login.generated.resources.sign_in_error_email_required
 import moneysurfer.feature.login.generated.resources.sign_in_error_invalid_credentials
-import moneysurfer.feature.login.generated.resources.sign_in_error_missing_credentials
+import moneysurfer.feature.login.generated.resources.sign_in_error_password_required
+import moneysurfer.feature.login.generated.resources.sign_in_error_password_too_short
 import moneysurfer.feature.login.generated.resources.sign_in_error_permission_denied
 import moneysurfer.feature.login.generated.resources.sign_in_error_unknown
 import moneysurfer.feature.login.generated.resources.sign_in_error_weak_password
@@ -97,6 +104,9 @@ object SignInTestTags {
     const val AnonymousButton = "signIn:anonymous"
     const val DemoButton = "signIn:demo"
     const val ErrorText = "signIn:error"
+    const val EmailError = "$EmailField:error"
+    const val PasswordError = "$PasswordField:error"
+    const val PasswordReveal = "$PasswordField:reveal"
     const val Loader = "signIn:loader"
     const val Terms = "signIn:terms"
 }
@@ -129,7 +139,6 @@ private val HeroSubtitleMaxWidth: Dp = 320.dp
 private val SheetPadding: Dp = 20.dp
 private val SheetElevation: Dp = 12.dp
 private val SheetTitleSize = 18.sp
-private val FieldCorner: Dp = 14.dp
 private val PasskeyIconSize: Dp = 18.dp
 private val OrLabelSize = 11.sp
 private val PrimaryLabelSize = 15.sp
@@ -182,7 +191,10 @@ private const val FrontGradientAlpha: Float = 0.55f
 @Composable
 private fun SignInError.localized(): String = stringResource(
     when (this) {
-        SignInError.MissingCredentials -> Res.string.sign_in_error_missing_credentials
+        SignInError.EmailRequired -> Res.string.sign_in_error_email_required
+        SignInError.EmailInvalid -> Res.string.sign_in_error_email_invalid
+        SignInError.PasswordRequired -> Res.string.sign_in_error_password_required
+        SignInError.PasswordTooShort -> Res.string.sign_in_error_password_too_short
         SignInError.InvalidCredentials -> Res.string.sign_in_error_invalid_credentials
         SignInError.EmailAlreadyInUse -> Res.string.sign_in_error_email_in_use
         SignInError.WeakPassword -> Res.string.sign_in_error_weak_password
@@ -236,25 +248,41 @@ fun SignInContent(
         ) {
             SignInBackground(modifier = Modifier.fillMaxSize())
 
-            Column(
+            // `surferSafeInsets` deliberately drops the bottom side, and that is where the IME
+            // inset lives — without `imePadding` the on-screen keyboard covered the whole action
+            // sheet, so the "Create account" button was simply unreachable. Measuring inside the
+            // padded box gives a viewport height that already accounts for the keyboard; the
+            // scroll container then keeps every field reachable when even that is not enough.
+            BoxWithConstraints(
                 modifier = Modifier
-                    .align(Alignment.TopCenter)
-                    .fillMaxHeight()
-                    .fillMaxWidth()
-                    .widthIn(max = ContentMaxWidth)
-                    .padding(
-                        start = AppTheme.spacing.default,
-                        end = AppTheme.spacing.default,
-                        top = AppTheme.spacing.xLarge,
-                        bottom = AppTheme.spacing.large,
-                    ),
+                    .fillMaxSize()
+                    .imePadding(),
             ) {
-                SignInBrandHeader()
-                Spacer(Modifier.height(AppTheme.spacing.xLarge))
-                SignInHero()
-                Spacer(Modifier.weight(1f))
-                Spacer(Modifier.height(AppTheme.spacing.large))
-                SignInActionSheet(state = state, onEvent = onEvent)
+                val viewportHeight = maxHeight
+                Column(
+                    modifier = Modifier
+                        .align(Alignment.TopCenter)
+                        .fillMaxWidth()
+                        .widthIn(max = ContentMaxWidth)
+                        .verticalScroll(rememberScrollState())
+                        .heightIn(min = viewportHeight)
+                        .padding(
+                            start = AppTheme.spacing.default,
+                            end = AppTheme.spacing.default,
+                            top = AppTheme.spacing.xLarge,
+                            bottom = AppTheme.spacing.large,
+                        ),
+                    verticalArrangement = Arrangement.SpaceBetween,
+                ) {
+                    // Exactly two children so SpaceBetween reproduces the pinned-to-bottom sheet
+                    // of the original weight(1f) layout, which a scrollable column cannot use.
+                    Column(modifier = Modifier.padding(bottom = AppTheme.spacing.large)) {
+                        SignInBrandHeader()
+                        Spacer(Modifier.height(AppTheme.spacing.xLarge))
+                        SignInHero()
+                    }
+                    SignInActionSheet(state = state, onEvent = onEvent)
+                }
             }
 
             if (state.isLoading) {
@@ -442,9 +470,12 @@ private fun SignInActionSheet(
             if (config.emailPassword) {
                 EmailPasswordForm(state = state, onEvent = onEvent)
                 Spacer(Modifier.height(AppTheme.spacing.small))
-                if (state.error != null) {
+                // Only errors that belong to no single field land here; the rest are rendered
+                // as supporting text under the input that caused them.
+                val formError = state.formError
+                if (formError != null) {
                     Text(
-                        text = state.error.localized(),
+                        text = formError.localized(),
                         style = AppTheme.typography.bodySmall,
                         color = AppTheme.materialColors.error,
                         textAlign = TextAlign.Center,
@@ -562,39 +593,28 @@ private fun EmailPasswordForm(
         focusedTextColor = SignInPalette.Ink,
         unfocusedTextColor = SignInPalette.Ink,
     )
-    OutlinedTextField(
+    SurferTextField(
         value = state.email,
         onValueChange = { onEvent(SignInEvent.OnEmailChanged(it)) },
-        label = { Text(stringResource(Res.string.sign_in_email_label)) },
-        singleLine = true,
+        label = stringResource(Res.string.sign_in_email_label),
+        errorText = state.emailError?.localized(),
+        enabled = !state.isLoading,
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Email,
             imeAction = ImeAction.Next,
         ),
-        enabled = !state.isLoading,
-        modifier = Modifier
-            .fillMaxWidth()
-            .testTag(SignInTestTags.EmailField),
-        shape = RoundedCornerShape(FieldCorner),
         colors = fieldColors,
+        fieldTestTag = SignInTestTags.EmailField,
     )
     Spacer(Modifier.height(AppTheme.spacing.small))
-    OutlinedTextField(
+    SurferPasswordField(
         value = state.password,
         onValueChange = { onEvent(SignInEvent.OnPasswordChanged(it)) },
-        label = { Text(stringResource(Res.string.sign_in_password_label)) },
-        singleLine = true,
-        keyboardOptions = KeyboardOptions(
-            keyboardType = KeyboardType.Password,
-            imeAction = ImeAction.Done,
-        ),
-        visualTransformation = PasswordVisualTransformation(),
+        label = stringResource(Res.string.sign_in_password_label),
+        errorText = state.passwordError?.localized(),
         enabled = !state.isLoading,
-        modifier = Modifier
-            .fillMaxWidth()
-            .testTag(SignInTestTags.PasswordField),
-        shape = RoundedCornerShape(FieldCorner),
         colors = fieldColors,
+        fieldTestTag = SignInTestTags.PasswordField,
     )
 }
 
@@ -712,6 +732,22 @@ private fun SignInScreenPreview() {
     AppTheme {
         SignInContent(
             state = SignInState(),
+            onEvent = {},
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun SignInScreenFieldErrorPreview() {
+    AppTheme {
+        SignInContent(
+            state = SignInState(
+                email = "surfer@example",
+                password = "123",
+                mode = AuthMode.SignUp,
+                error = SignInError.PasswordTooShort,
+            ),
             onEvent = {},
         )
     }
