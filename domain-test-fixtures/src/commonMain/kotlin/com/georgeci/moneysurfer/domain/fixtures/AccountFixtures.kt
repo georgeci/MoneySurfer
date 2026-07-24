@@ -8,9 +8,10 @@ import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
 import com.georgeci.moneysurfer.domain.primitives.Money
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 
-// Every parameter is defaulted — callers name only the field under test, as in the Budget and
-// Goal fixtures next door.
-@Suppress("LongParameterList")
+// Every parameter is defaulted — callers name only the field under test. Deliberately not
+// annotated `@Suppress("LongParameterList")` like the Budget and Goal fixtures next door: detekt
+// already excludes `**/*-test-fixtures/**` from that rule, and Sonar's own S107 does not answer to
+// that name (see BudgetFixtures, which carries the annotation and is flagged anyway).
 fun anAccount(
     id: AccountId = accountId(),
     workspaceId: WorkspaceId = workspaceId(),
