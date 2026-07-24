@@ -21,5 +21,7 @@
     <string name="uikit_palette_icon_savings">Сбережения</string>
     <string name="uikit_palette_icon_tag">Метка</string>
     <string name="uikit_palette_icon_wallet">Кошелёк</string>
+    <string name="uikit_password_hide">Скрыть пароль</string>
+    <string name="uikit_password_show">Показать пароль</string>
     <string name="uikit_retry">Повторить</string>
 </resources>

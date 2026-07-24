@@ -57,6 +57,21 @@ data class AccountDoc(
      * client that predates the field — the manage list falls back to a dateless label either way.
      */
     val archivedAt: Long? = null,
+    /**
+     * User-entered key–value details. Empty when written by a client that predates the field;
+     * the reader treats that as "no details" rather than refusing the document.
+     */
+    val extraDetails: List<AccountExtraDetailDoc> = emptyList(),
+)
+
+/**
+ * One "Extra details" entry. [key] is either a well-known key name (`IBAN`, `CARD_LAST4`, …) or
+ * a label the user typed — see `AccountExtraDetail` in the domain.
+ */
+@Serializable
+data class AccountExtraDetailDoc(
+    val key: String = "",
+    val value: String = "",
 )
 
 @Serializable

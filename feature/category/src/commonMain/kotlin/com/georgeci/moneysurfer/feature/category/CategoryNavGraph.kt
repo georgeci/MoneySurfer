@@ -9,6 +9,7 @@ import com.georgeci.moneysurfer.feature.category.creation.CategoryCreationScreen
 import com.georgeci.moneysurfer.feature.category.details.CategoryDetailsScreen
 import com.georgeci.moneysurfer.feature.category.manage.CategoriesManageScreen
 import com.georgeci.moneysurfer.feature.category.picker.CategoryChooserBottomSheet
+import com.georgeci.moneysurfer.feature.category.picker.CategoryPickerVariant
 import com.georgeci.moneysurfer.navigation.BottomSheetSceneStrategy
 import com.georgeci.moneysurfer.navigation.CategoryPickerResultKey
 import com.georgeci.moneysurfer.navigation.FeatureNavGraph
@@ -71,6 +72,7 @@ val categoryNavGraph: FeatureNavGraph = { navigator ->
         CategoryChooserBottomSheet(
             selectedCategoryId = key.selectedCategoryId?.let { CategoryId(it) },
             filterType = key.filterType?.let { runCatching { CategoryType.valueOf(it) }.getOrNull() },
+            variant = CategoryPickerVariant.fromRouteArg(key.variant),
             onDismiss = { navigator.pop() },
             onNavigateToCategoryCreation = {
                 navigator.replaceTop(Route.CategoryCreation())

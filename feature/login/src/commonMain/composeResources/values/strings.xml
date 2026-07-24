@@ -41,11 +41,14 @@
     <string name="sign_in_submit_signup">Create account</string>
     <string name="sign_in_toggle_to_signup">New here? Create an account</string>
     <string name="sign_in_toggle_to_signin">Already have an account? Sign in</string>
-    <string name="sign_in_error_missing_credentials">Enter email and password</string>
+    <string name="sign_in_error_email_required">Enter your email</string>
+    <string name="sign_in_error_email_invalid">Check the email address — it looks incomplete</string>
+    <string name="sign_in_error_password_required">Enter your password</string>
+    <string name="sign_in_error_password_too_short">Use at least 6 characters</string>
     <string name="sign_in_error_invalid_credentials">Wrong email or password</string>
-    <string name="sign_in_error_email_in_use">That email is already in use</string>
+    <string name="sign_in_error_email_in_use">That email is already registered — sign in instead</string>
     <string name="sign_in_error_weak_password">Password is too weak — try at least 6 characters</string>
-    <string name="sign_in_error_unknown">Sign-in failed</string>
+    <string name="sign_in_error_unknown">Something went wrong. Please try again.</string>
     <string name="sign_in_error_permission_denied">You don't have access. Please retry or contact support.</string>
     <string name="sign_in_terms">By continuing you agree to the Terms &amp; Privacy.</string>
     <string name="legal_title">Terms &amp; Privacy</string>

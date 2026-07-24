@@ -61,8 +61,10 @@ kotlin {
         jvmTest.dependencies {
             implementation(projects.dataLocal)
             // OfflineKoinModuleVerificationTest lists the `parametersOf` types, some
-            // of which are navigation-level (goal contribution mode).
+            // of which are navigation-level (goal contribution mode) or owned by a
+            // feature (the category picker's layout variant).
             implementation(projects.navigation)
+            implementation(projects.feature.category)
             implementation(libs.kotest.runner.junit5)
             implementation(project.dependencies.platform(libs.koin.bom))
             implementation(libs.koin.test)

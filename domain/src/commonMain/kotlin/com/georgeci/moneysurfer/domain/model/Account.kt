@@ -22,4 +22,6 @@ data class Account(
      * `updatedAt` cannot supply because balance recalculation keeps bumping it.
      */
     val archivedAt: Instant? = null,
+    /** Optional user-entered key–value details (IBAN, description, custom fields, …). */
+    val extraDetails: List<AccountExtraDetail> = emptyList(),
 )

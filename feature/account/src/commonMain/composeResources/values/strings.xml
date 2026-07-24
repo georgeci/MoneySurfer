@@ -56,6 +56,10 @@
     <string name="account_creation_field_card_last4">Card last 4</string>
     <string name="account_creation_field_bank_url">Bank URL</string>
     <string name="account_creation_field_branch_phone">Branch phone</string>
+    <string name="account_creation_field_custom">Custom field…</string>
+    <string name="account_creation_custom_field_dialog_title">Custom field</string>
+    <string name="account_creation_custom_field_name_label">Field name</string>
+    <string name="account_creation_custom_field_add">Add</string>
     <string name="account_details_title">Account</string>
     <string name="account_details_transactions_section">Transactions</string>
     <string name="account_details_transactions_see_all">See all</string>
@@ -63,7 +67,6 @@
     <string name="account_details_more_content_description">More</string>
     <string name="account_details_updated">Updated just now</string>
     <string name="account_details_kind_last4_format">%1$s · •• %2$s</string>
-    <string name="account_details_change_this_month">+€412 this month</string>
     <string name="account_details_in_this_month">In this month</string>
     <string name="account_details_out_this_month">Out this month</string>
     <string name="account_details_chart_title">Balance · 30 days</string>
@@ -72,6 +75,7 @@
     <string name="account_details_filter_income">Income</string>
     <string name="account_details_add_transaction">Add transaction</string>
     <string name="account_details_transactions_empty">No transactions yet.</string>
+    <string name="account_details_extra_details_section">Extra details</string>
 
     <!-- Account chooser bottom sheet -->
     <string name="transaction_creation_account_sheet_title">From account</string>

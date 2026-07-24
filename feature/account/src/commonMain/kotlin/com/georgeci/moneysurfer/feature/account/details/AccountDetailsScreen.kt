@@ -17,16 +17,20 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.georgeci.moneysurfer.domain.model.AccountExtraDetail
+import com.georgeci.moneysurfer.domain.model.AccountExtraDetailKey
 import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.AccountType
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
+import com.georgeci.moneysurfer.feature.account.extraDetailLabel
 import com.georgeci.moneysurfer.feature.account.generated.resources.Res
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_add_transaction
-import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_change_this_month
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_chart_title
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_edit_content_description
+import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_extra_details_section
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_filter_all
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_filter_expenses
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_filter_income
@@ -38,6 +42,7 @@ import com.georgeci.moneysurfer.feature.account.generated.resources.account_deta
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_transactions_section
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_transactions_see_all
 import com.georgeci.moneysurfer.feature.account.icon
+import com.georgeci.moneysurfer.feature.account.isMonospaceExtraDetail
 import com.georgeci.moneysurfer.feature.account.labelRes
 import com.georgeci.moneysurfer.uikit.components.SurferSkeletonRow
 import com.georgeci.moneysurfer.uikit.components.account.SurferAccountDetailsHeroCard
@@ -181,11 +186,20 @@ private fun AccountDetailsContent(
             item {
                 SurferBalanceChartCard(
                     title = stringResource(Res.string.account_details_chart_title),
-                    delta = stringResource(Res.string.account_details_change_this_month),
+                    delta = state.chart.formattedDelta,
+                    deltaColor = if (state.chart.isDeltaNegative) {
+                        AppTheme.materialColors.error
+                    } else {
+                        AppTheme.semanticColors.income
+                    },
+                    points = state.chart.points,
                     modifier = Modifier
                         .padding(horizontal = AppTheme.spacing.default)
                         .padding(bottom = AppTheme.spacing.medium),
                 )
+            }
+            if (state.extraDetails.isNotEmpty()) {
+                item { ExtraDetailsSection(details = state.extraDetails) }
             }
             item {
                 FilterChips(
@@ -284,6 +298,45 @@ private fun QuickStats(state: AccountDetailsState.Content) {
     }
 }
 
+/**
+ * The "Extra details" the creation screen collected. Read-only here — editing them means opening
+ * the edit form, which is the same screen that defined them.
+ */
+@Composable
+private fun ExtraDetailsSection(details: List<AccountExtraDetail>) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = AppTheme.spacing.large)
+            .padding(bottom = AppTheme.spacing.medium),
+        verticalArrangement = Arrangement.spacedBy(AppTheme.spacing.medium),
+    ) {
+        Text(
+            text = stringResource(Res.string.account_details_extra_details_section),
+            style = AppTheme.typography.labelLarge,
+            color = AppTheme.materialColors.onSurfaceVariant,
+        )
+        details.forEach { detail ->
+            Column(verticalArrangement = Arrangement.spacedBy(AppTheme.spacing.xSmall)) {
+                Text(
+                    text = extraDetailLabel(detail.key),
+                    style = AppTheme.typography.labelMedium,
+                    color = AppTheme.materialColors.onSurfaceVariant,
+                )
+                Text(
+                    text = detail.value,
+                    style = if (isMonospaceExtraDetail(detail.key)) {
+                        AppTheme.typography.bodyMedium.copy(fontFamily = FontFamily.Monospace)
+                    } else {
+                        AppTheme.typography.bodyMedium
+                    },
+                    color = AppTheme.materialColors.onSurface,
+                )
+            }
+        }
+    }
+}
+
 @Composable
 private fun FilterChips(
     selected: TransactionFilter,
@@ -306,6 +359,13 @@ private fun FilterChips(
     )
 }
 
+/** A month of plausible balances so the preview draws the same shape the real series does. */
+private val PreviewChartPoints: List<Pair<Float, Float>> = listOf(
+    2068f, 2042f, 2110f, 2095f, 2180f, 2164f, 2140f, 2210f, 2196f, 2255f,
+    2231f, 2288f, 2262f, 2240f, 2310f, 2295f, 2352f, 2330f, 2308f, 2374f,
+    2360f, 2412f, 2390f, 2368f, 2430f, 2415f, 2462f, 2441f, 2470f, 2480f,
+).mapIndexed { index, balance -> index.toFloat() to balance }
+
 @Preview
 @Composable
 private fun AccountDetailsScreenPreview() {
@@ -318,6 +378,11 @@ private fun AccountDetailsScreenPreview() {
                 type = AccountType.BANK,
                 formattedIncome = "€3,200.00",
                 formattedExpenses = "€1,148.49",
+                chart = AccountBalanceChartUi(
+                    points = PreviewChartPoints,
+                    formattedDelta = "+€412.00",
+                    isDeltaNegative = false,
+                ),
                 transactions = listOf(
                     AccountTransactionUi(
                         id = TransactionId("preview-tx-1"),
@@ -342,6 +407,13 @@ private fun AccountDetailsScreenPreview() {
                     ),
                 ),
                 filter = TransactionFilter.All,
+                extraDetails = listOf(
+                    AccountExtraDetail(
+                        key = AccountExtraDetailKey.IBAN.name,
+                        value = "PL61 1090 1014 0000 0712 1981 2874",
+                    ),
+                    AccountExtraDetail(key = "Broker code", value = "MS-4417"),
+                ),
             ),
             onEvent = {},
         )

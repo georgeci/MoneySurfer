@@ -21,5 +21,7 @@
     <string name="uikit_palette_icon_savings">Savings</string>
     <string name="uikit_palette_icon_tag">Tag</string>
     <string name="uikit_palette_icon_wallet">Wallet</string>
+    <string name="uikit_password_hide">Hide password</string>
+    <string name="uikit_password_show">Show password</string>
     <string name="uikit_retry">Retry</string>
 </resources>

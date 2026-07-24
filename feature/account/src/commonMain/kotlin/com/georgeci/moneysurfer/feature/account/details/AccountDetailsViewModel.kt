@@ -1,7 +1,11 @@
 package com.georgeci.moneysurfer.feature.account.details
 
 import arrow.optics.optics
+import com.georgeci.moneysurfer.domain.OfflineBuildFlags
 import com.georgeci.moneysurfer.domain.formatter.MoneyFormatter
+import com.georgeci.moneysurfer.domain.model.Account
+import com.georgeci.moneysurfer.domain.model.AccountBalanceSeries
+import com.georgeci.moneysurfer.domain.model.AccountExtraDetail
 import com.georgeci.moneysurfer.domain.model.Transaction
 import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.AccountType
@@ -9,6 +13,7 @@ import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
 import com.georgeci.moneysurfer.domain.primitives.Money
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
+import com.georgeci.moneysurfer.domain.usecase.GetAccountBalanceSeriesUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetAccountByIdUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetTransactionsByAccountUseCase
 import com.georgeci.moneysurfer.utils.MviViewModel
@@ -19,6 +24,8 @@ class AccountDetailsViewModel(
     accountId: AccountId,
     private val getAccountById: GetAccountByIdUseCase,
     private val getTransactionsByAccount: GetTransactionsByAccountUseCase,
+    private val getAccountBalanceSeries: GetAccountBalanceSeriesUseCase,
+    private val offlineBuildFlags: OfflineBuildFlags,
 ) : MviViewModel<AccountDetailsState, AccountDetailsEvent, AccountDetailsEffect>(
     initialState = AccountDetailsState.Loading(accountId),
 ) {
@@ -52,38 +59,81 @@ class AccountDetailsViewModel(
             val currency = account?.currencyCode ?: CurrencyCode("USD")
             getTransactionsByAccount(accountId).collect { transactions ->
                 val visible = transactions.filter { it.type != TransactionType.OPENING_BALANCE }
-                val income = visible.fold(Money.zero()) { acc, t ->
-                    if (t.type == TransactionType.INCOME) acc + t.money.abs() else acc
-                }
-                val expenses = visible.fold(Money.zero()) { acc, t ->
-                    if (t.type == TransactionType.EXPENSE) acc + t.money.abs() else acc
-                }
+                val totals = visible.formatTotals(currency)
                 val txnUi = visible.map { it.toUi(currency) }
-                val formattedIncome = MoneyFormatter.format(income, currency)
-                val formattedExpenses = MoneyFormatter.format(expenses, currency)
+                // The chart is anchored on the same balance the hero card prints, and folds the
+                // history already collected above rather than issuing a second query.
+                val series = getAccountBalanceSeries(
+                    accountId = accountId,
+                    currentBalance = account?.balance ?: Money.zero(),
+                    transactions = transactions,
+                )
+                val chart = series.toUi(currency)
                 updateState {
                     when (this) {
-                        is AccountDetailsState.Loading -> AccountDetailsState.Content(
-                            accountId = accountId,
-                            name = account?.name.orEmpty(),
-                            formattedBalance = account?.let {
-                                MoneyFormatter.format(it.balance, it.currencyCode)
-                            }.orEmpty(),
-                            type = account?.type,
-                            formattedIncome = formattedIncome,
-                            formattedExpenses = formattedExpenses,
-                            transactions = txnUi,
-                            filter = TransactionFilter.All,
-                        )
+                        is AccountDetailsState.Loading ->
+                            account.toContent(accountId, txnUi, totals, chart)
                         is AccountDetailsState.Content -> copy(
                             transactions = txnUi,
-                            formattedIncome = formattedIncome,
-                            formattedExpenses = formattedExpenses,
+                            formattedIncome = totals.income,
+                            formattedExpenses = totals.expenses,
+                            chart = chart,
                         )
                     }
                 }
             }
         }
+    }
+
+    /** Per-direction sums over the visible transactions, already formatted for display. */
+    private fun List<Transaction>.formatTotals(currency: CurrencyCode): FormattedTotals {
+        val income = sumOf(TransactionType.INCOME)
+        val expenses = sumOf(TransactionType.EXPENSE)
+        return FormattedTotals(
+            income = MoneyFormatter.format(income, currency),
+            expenses = MoneyFormatter.format(expenses, currency),
+        )
+    }
+
+    private fun List<Transaction>.sumOf(type: TransactionType): Money =
+        fold(Money.zero()) { acc, t -> if (t.type == type) acc + t.money.abs() else acc }
+
+    /** First resolved state for the screen. A null account means it was deleted underneath us. */
+    private fun Account?.toContent(
+        accountId: AccountId,
+        transactions: List<AccountTransactionUi>,
+        totals: FormattedTotals,
+        chart: AccountBalanceChartUi,
+    ) = AccountDetailsState.Content(
+        accountId = accountId,
+        name = this?.name.orEmpty(),
+        formattedBalance = this?.let { MoneyFormatter.format(it.balance, it.currencyCode) }.orEmpty(),
+        type = this?.type,
+        formattedIncome = totals.income,
+        formattedExpenses = totals.expenses,
+        chart = chart,
+        transactions = transactions,
+        filter = TransactionFilter.All,
+        // Mirrors the creation screen: the offline build has no place to put these, so it does
+        // not offer to collect them and does not show them.
+        extraDetails = if (offlineBuildFlags.isOffline) emptyList() else this?.extraDetails.orEmpty(),
+    )
+
+    /**
+     * The card scales its own axes, so the y values stay in major units and x is just the day
+     * index — the series is evenly spaced by construction.
+     */
+    private fun AccountBalanceSeries.toUi(currency: CurrencyCode): AccountBalanceChartUi {
+        val formatted = MoneyFormatter.format(delta, currency)
+        return AccountBalanceChartUi(
+            points = points.mapIndexed { index, point ->
+                index.toFloat() to (point.balance.minor / Money.MINOR_PER_MAJOR).toFloat()
+            },
+            // Locale formatting only signs negatives; a flat period reads as "+" too, since
+            // "no change" is not a loss.
+            formattedDelta = if (delta.isNegative()) formatted else "+$formatted",
+            isDeltaNegative = delta.isNegative(),
+        )
     }
 
     private fun Transaction.toUi(currency: CurrencyCode) = AccountTransactionUi(
@@ -113,8 +163,11 @@ sealed interface AccountDetailsState {
         val type: AccountType?,
         val formattedIncome: String,
         val formattedExpenses: String,
+        val chart: AccountBalanceChartUi,
         val transactions: List<AccountTransactionUi>,
         val filter: TransactionFilter,
+        /** User-entered key–value details; empty when there are none or in the offline build. */
+        val extraDetails: List<AccountExtraDetail> = emptyList(),
     ) : AccountDetailsState {
         companion object
     }
@@ -122,7 +175,17 @@ sealed interface AccountDetailsState {
     companion object
 }
 
+/** Display-ready income/expense totals for the quick-stats row. */
+private data class FormattedTotals(val income: String, val expenses: String)
+
 enum class TransactionFilter { All, Expenses, Income }
+
+/** Balance curve for the details chart: `x to y` pairs the card plots, plus its signed delta. */
+data class AccountBalanceChartUi(
+    val points: List<Pair<Float, Float>>,
+    val formattedDelta: String,
+    val isDeltaNegative: Boolean,
+)
 
 data class AccountTransactionUi(
     val id: TransactionId,

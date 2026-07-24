@@ -99,6 +99,11 @@ sealed interface Route : NavKey {
     data class CategoryChooser(
         val selectedCategoryId: String? = null,
         val filterType: String? = null,
+        /**
+         * Name of a `CategoryPickerVariant` — which of the two picker layouts to open. Null
+         * takes the feature's default rather than binding navigation to the enum.
+         */
+        val variant: String? = null,
     ) : Route
 
     @Serializable
