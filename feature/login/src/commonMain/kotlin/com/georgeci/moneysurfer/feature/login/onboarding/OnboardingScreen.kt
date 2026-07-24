@@ -50,6 +50,7 @@ import com.georgeci.moneysurfer.uikit.components.SurferAuthBackground
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
 import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
+import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.ConfigureSystemBars
 import com.georgeci.moneysurfer.uikit.tokens.AuthColors
 import com.georgeci.moneysurfer.utils.HandleSideEffect
@@ -226,7 +227,7 @@ private fun ValueStep(isOffline: Boolean) {
         ) {
             Icon(
                 imageVector = SurferIcons.Wallet,
-                contentDescription = null,
+                contentDescription = SurferSemantics.Decorative,
                 tint = AuthColors.OnBrand,
                 modifier = Modifier.size(BrandIconSize),
             )
@@ -300,7 +301,7 @@ private fun ValueFeature(
         ) {
             Icon(
                 imageVector = icon,
-                contentDescription = null,
+                contentDescription = SurferSemantics.Decorative,
                 tint = AuthColors.OnBrand,
                 modifier = Modifier.size(BrandIconSize),
             )
@@ -383,7 +384,7 @@ private fun AccountKindCard(
         ) {
             Icon(
                 imageVector = kind.icon(),
-                contentDescription = null,
+                contentDescription = SurferSemantics.Decorative,
                 tint = if (selected) AuthColors.OnBrand else AuthColors.PrimaryDark,
                 modifier = Modifier.size(KindIconSize),
             )
@@ -421,7 +422,7 @@ private fun AccountKindCard(
             if (selected) {
                 Icon(
                     imageVector = SurferIcons.Check,
-                    contentDescription = null,
+                    contentDescription = SurferSemantics.Decorative,
                     tint = AuthColors.OnBrand,
                     modifier = Modifier.size(RadioIconSize),
                 )

@@ -19,6 +19,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 
 /**
@@ -52,8 +53,7 @@ internal fun SurferWidgetEmptyState(
         ) {
             Icon(
                 imageVector = icon,
-                // decorative — widget empty-state illustration; title and subtitle convey the message
-                contentDescription = null,
+                contentDescription = SurferSemantics.Decorative,
                 tint = AppTheme.materialColors.onSurfaceVariant,
                 modifier = Modifier.size(20.dp),
             )

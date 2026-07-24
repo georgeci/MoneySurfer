@@ -49,6 +49,7 @@ import com.georgeci.moneysurfer.uikit.components.base.SurferToolbarAction
 import com.georgeci.moneysurfer.uikit.components.transaction.SurferTransactionLine
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
+import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.utils.HandleSideEffect
 import org.jetbrains.compose.resources.stringResource
@@ -138,7 +139,7 @@ private fun AccountDetailsContent(
                 icon = {
                     Icon(
                         imageVector = SurferIcons.Add,
-                        contentDescription = null,
+                        contentDescription = SurferSemantics.Decorative,
                     )
                 },
                 text = { Text(stringResource(Res.string.account_details_add_transaction)) },

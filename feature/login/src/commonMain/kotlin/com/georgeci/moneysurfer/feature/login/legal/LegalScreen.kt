@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
+import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import moneysurfer.feature.login.generated.resources.Res
 import moneysurfer.feature.login.generated.resources.legal_privacy_body
@@ -95,7 +96,7 @@ private fun LegalSection(icon: ImageVector, heading: StringResource, body: Strin
     ) {
         Icon(
             imageVector = icon,
-            contentDescription = null,
+            contentDescription = SurferSemantics.Decorative,
             tint = AppTheme.materialColors.primary,
             modifier = Modifier.size(24.dp),
         )

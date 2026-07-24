@@ -35,6 +35,7 @@ import com.georgeci.moneysurfer.uikit.components.base.SurferToolbarAction
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
 import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
+import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.uikit.widgets.LocalSurferWidgetSize
 import com.georgeci.moneysurfer.uikit.widgets.SurferAccountItem
@@ -182,8 +183,7 @@ private fun DashboardContent(
                 ExtendedFloatingActionButton(
                     text = { Text(stringResource(Res.string.dashboard_add_transaction)) },
                     icon = {
-                        // decorative — FAB text label provides the accessible label
-                        Icon(imageVector = SurferIcons.Add, contentDescription = null)
+                        Icon(imageVector = SurferIcons.Add, contentDescription = SurferSemantics.Decorative)
                     },
                     onClick = { onEvent(DashboardEvent.OnAddTransactionClick) },
                     modifier = Modifier.testTag(DashboardTestTags.AddTransaction),

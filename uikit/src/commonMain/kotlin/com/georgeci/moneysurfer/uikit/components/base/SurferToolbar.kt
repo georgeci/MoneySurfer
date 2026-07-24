@@ -28,6 +28,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
+import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import moneysurfer.uikit.generated.resources.Res
 import moneysurfer.uikit.generated.resources.uikit_back
@@ -126,8 +127,7 @@ fun SurferToolbarButtonAction(
     ) {
         Icon(
             imageVector = icon,
-            // decorative — button text label provides the accessible label
-            contentDescription = null,
+            contentDescription = SurferSemantics.Decorative,
             modifier = Modifier.size(16.dp),
         )
         Spacer(Modifier.width(6.dp))

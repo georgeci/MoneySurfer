@@ -24,6 +24,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
+import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 
 enum class SurferInsightTone { Good, Warn, Neutral }
@@ -121,8 +122,7 @@ private fun InsightCard(item: SurferInsightItem, onClick: (() -> Unit)?) {
         ) {
             Icon(
                 imageVector = item.icon,
-                // decorative — insight category icon; the item title provides the accessible label
-                contentDescription = null,
+                contentDescription = SurferSemantics.Decorative,
                 tint = fg,
                 modifier = Modifier.size(20.dp),
             )

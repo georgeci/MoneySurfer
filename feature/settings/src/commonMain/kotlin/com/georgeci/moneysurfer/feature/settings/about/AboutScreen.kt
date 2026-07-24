@@ -36,6 +36,7 @@ import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsGroup
 import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsRow
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
+import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.utils.HandleSideEffect
 import moneysurfer.feature.settings.generated.resources.Res
@@ -178,7 +179,7 @@ private fun AppIdentityHero(version: String) {
     ) {
         Image(
             painter = painterResource(UikitRes.drawable.uikit_app_icon),
-            contentDescription = null,
+            contentDescription = SurferSemantics.Decorative,
             modifier = Modifier
                 .size(72.dp)
                 .shadow(elevation = 8.dp, shape = RoundedCornerShape(20.dp))
@@ -217,7 +218,7 @@ private fun GitHubLinkRow(onClick: () -> Unit) {
     ) {
         Icon(
             imageVector = SurferIcons.Info,
-            contentDescription = null,
+            contentDescription = SurferSemantics.Decorative,
             tint = colors.onSurfaceVariant,
         )
         Column(modifier = Modifier.fillMaxWidth()) {

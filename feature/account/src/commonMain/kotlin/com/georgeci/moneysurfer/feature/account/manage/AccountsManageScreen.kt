@@ -61,6 +61,7 @@ import com.georgeci.moneysurfer.uikit.components.base.SurferSwipeRevealRow
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
+import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.utils.HandleSideEffect
 import kotlinx.datetime.number
@@ -151,8 +152,7 @@ private fun AccountsManageContent(
             ExtendedFloatingActionButton(
                 text = { Text(stringResource(Res.string.accounts_manage_add_account)) },
                 icon = {
-                    // decorative — FAB text label provides the accessible label
-                    Icon(imageVector = SurferIcons.Add, contentDescription = null)
+                    Icon(imageVector = SurferIcons.Add, contentDescription = SurferSemantics.Decorative)
                 },
                 onClick = { onEvent(AccountsManageEvent.OnAddAccountClick) },
             )
@@ -339,10 +339,9 @@ private fun EditToggleChip(
             modifier = modifier.heightIn(min = 32.dp),
             contentPadding = PaddingValues(horizontal = 14.dp, vertical = 0.dp),
         ) {
-            // decorative — button text provides the accessible label
             Icon(
                 imageVector = icon,
-                contentDescription = null,
+                contentDescription = SurferSemantics.Decorative,
                 modifier = Modifier.size(16.dp),
             )
             Spacer(Modifier.width(4.dp))
@@ -354,10 +353,9 @@ private fun EditToggleChip(
             modifier = modifier.heightIn(min = 32.dp),
             contentPadding = PaddingValues(horizontal = 14.dp, vertical = 0.dp),
         ) {
-            // decorative — button text provides the accessible label
             Icon(
                 imageVector = icon,
-                contentDescription = null,
+                contentDescription = SurferSemantics.Decorative,
                 modifier = Modifier.size(14.dp),
             )
             Spacer(Modifier.width(4.dp))

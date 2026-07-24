@@ -29,6 +29,7 @@ import com.georgeci.moneysurfer.uikit.atom.SurferActionCard
 import com.georgeci.moneysurfer.uikit.atom.SurferCard
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
+import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 
 private val IconSize = 48.dp
@@ -96,8 +97,7 @@ fun SurferCreateWorkspaceRow(
             ) {
                 Icon(
                     imageVector = SurferIcons.Add,
-                    // decorative — card title and subtitle provide the accessible label
-                    contentDescription = null,
+                    contentDescription = SurferSemantics.Decorative,
                     tint = AppTheme.materialColors.onSurfaceVariant,
                 )
             }
@@ -199,8 +199,7 @@ private fun ActionChip(
     ) {
         Icon(
             imageVector = icon,
-            // decorative — chip label text provides the accessible label
-            contentDescription = null,
+            contentDescription = SurferSemantics.Decorative,
             tint = AppTheme.materialColors.onSurface,
             modifier = Modifier.size(14.dp),
         )

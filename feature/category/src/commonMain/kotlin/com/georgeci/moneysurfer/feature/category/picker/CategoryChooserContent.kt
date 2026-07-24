@@ -37,6 +37,7 @@ import com.georgeci.moneysurfer.uikit.components.SurferSearchField
 import com.georgeci.moneysurfer.uikit.components.category.SurferCategoryCell
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.preview.SurferBottomSheetPreview
+import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 // TODO refactor: lots of magic numbers
 internal data class CategoryPickerRow(
@@ -167,7 +168,7 @@ private fun CreateNewCategoryRow(
             ) {
                 Icon(
                     imageVector = SurferIcons.Add,
-                    contentDescription = null,
+                    contentDescription = SurferSemantics.Decorative,
                     tint = AppTheme.materialColors.onPrimaryContainer,
                     modifier = Modifier.size(18.dp),
                 )

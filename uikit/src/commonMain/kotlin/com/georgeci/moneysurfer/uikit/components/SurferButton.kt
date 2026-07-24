@@ -20,6 +20,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
+import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 
 enum class SurferButtonStyle {
@@ -116,8 +117,7 @@ private fun SurferButtonContent(
         if (startIcon != null) {
             Icon(
                 imageVector = startIcon,
-                // decorative — button text provides the accessible label
-                contentDescription = null,
+                contentDescription = SurferSemantics.Decorative,
             )
             Spacer(Modifier.width(AppTheme.spacing.small))
         }
@@ -128,8 +128,7 @@ private fun SurferButtonContent(
             Spacer(Modifier.width(AppTheme.spacing.small))
             Icon(
                 imageVector = endIcon,
-                // decorative — button text provides the accessible label
-                contentDescription = null,
+                contentDescription = SurferSemantics.Decorative,
             )
         }
     }

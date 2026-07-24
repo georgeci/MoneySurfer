@@ -36,6 +36,7 @@ import com.georgeci.moneysurfer.uikit.components.category.SurferCategoryTrendCar
 import com.georgeci.moneysurfer.uikit.components.transaction.SurferTransactionLine
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
+import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.utils.HandleSideEffect
 import kotlinx.datetime.Month
@@ -193,8 +194,7 @@ private fun CategoryDetailsContent(
             ExtendedFloatingActionButton(
                 text = { Text(label) },
                 icon = {
-                    // decorative — FAB text label provides the accessible label
-                    Icon(imageVector = SurferIcons.Add, contentDescription = null)
+                    Icon(imageVector = SurferIcons.Add, contentDescription = SurferSemantics.Decorative)
                 },
                 onClick = { onEvent(CategoryDetailsEvent.OnAddTransactionClick) },
                 modifier = Modifier.semantics { contentDescription = label },

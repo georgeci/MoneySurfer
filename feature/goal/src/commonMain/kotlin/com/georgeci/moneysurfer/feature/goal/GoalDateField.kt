@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
@@ -64,8 +65,7 @@ internal fun GoalDateField(
     ) {
         Icon(
             imageVector = SurferIcons.Event,
-            // decorative — the field's own label names it
-            contentDescription = null,
+            contentDescription = SurferSemantics.Decorative,
             tint = AppTheme.materialColors.onSurfaceVariant,
             modifier = Modifier.size(FIELD_ICON_SIZE),
         )

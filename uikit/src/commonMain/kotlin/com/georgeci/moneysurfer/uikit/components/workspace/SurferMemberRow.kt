@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import com.georgeci.moneysurfer.uikit.atom.SurferCard
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
+import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 
 /**
@@ -140,8 +141,7 @@ private fun RoleChip(label: String) {
         )
         Icon(
             imageVector = SurferIcons.DropDown,
-            // decorative — role drop-down indicator; the role label provides the accessible name
-            contentDescription = null,
+            contentDescription = SurferSemantics.Decorative,
             tint = AppTheme.materialColors.onSurfaceVariant,
             modifier = Modifier.size(14.dp),
         )

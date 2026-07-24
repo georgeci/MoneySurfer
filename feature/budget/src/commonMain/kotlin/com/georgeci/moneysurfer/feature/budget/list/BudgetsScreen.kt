@@ -40,6 +40,7 @@ import com.georgeci.moneysurfer.uikit.components.budget.SurferBudgetCategoryVisu
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
 import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
+import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.utils.HandleSideEffect
 import moneysurfer.feature.budget.generated.resources.Res
@@ -115,8 +116,7 @@ private fun BudgetsContent(
             ExtendedFloatingActionButton(
                 text = { Text(addLabel) },
                 icon = {
-                    // decorative — FAB text label provides the accessible label
-                    Icon(imageVector = SurferIcons.Add, contentDescription = null)
+                    Icon(imageVector = SurferIcons.Add, contentDescription = SurferSemantics.Decorative)
                 },
                 onClick = { onEvent(BudgetsEvent.OnAddBudgetClick) },
                 modifier = Modifier

@@ -25,6 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
+import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 
 data class SurferRecurringItem(
@@ -135,8 +136,7 @@ private fun RecurringRow(item: SurferRecurringItem, onClick: (() -> Unit)?) {
         ) {
             Icon(
                 imageVector = item.icon,
-                // decorative — recurring-item type indicator; the item name provides the accessible label
-                contentDescription = null,
+                contentDescription = SurferSemantics.Decorative,
                 tint = AppTheme.materialColors.onSurfaceVariant,
                 modifier = Modifier.size(20.dp),
             )

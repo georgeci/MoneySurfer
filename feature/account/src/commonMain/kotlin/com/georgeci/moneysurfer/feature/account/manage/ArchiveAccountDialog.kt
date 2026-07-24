@@ -14,6 +14,7 @@ import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_man
 import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_manage_archive_message
 import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_manage_archive_title
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import org.jetbrains.compose.resources.stringResource
 
@@ -28,7 +29,7 @@ fun ArchiveAccountDialog(
         icon = {
             Icon(
                 imageVector = SurferIcons.Archive,
-                contentDescription = null,
+                contentDescription = SurferSemantics.Decorative,
                 tint = AppTheme.materialColors.primary,
             )
         },

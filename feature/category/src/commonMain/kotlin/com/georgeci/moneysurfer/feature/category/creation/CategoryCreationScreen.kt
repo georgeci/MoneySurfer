@@ -48,6 +48,7 @@ import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbarButtonAction
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
+import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.utils.HandleSideEffect
 import moneysurfer.feature.category.generated.resources.Res
@@ -328,8 +329,7 @@ private fun IconGridCell(
     ) {
         Icon(
             imageVector = icon,
-            // decorative — the surrounding picker label describes the control
-            contentDescription = null,
+            contentDescription = SurferSemantics.Decorative,
             tint = if (selected) tint else AppTheme.materialColors.onSurfaceVariant,
             modifier = Modifier.size(22.dp),
         )
@@ -367,7 +367,7 @@ private fun ColorGrid(
                     if (selected) {
                         Icon(
                             imageVector = SurferIcons.Check,
-                            contentDescription = null,
+                            contentDescription = SurferSemantics.Decorative,
                             tint = color,
                             modifier = Modifier.size(18.dp),
                         )
@@ -419,7 +419,7 @@ private fun ParentPicker(
                 )
                 Icon(
                     imageVector = SurferIcons.ChevronRight,
-                    contentDescription = null,
+                    contentDescription = SurferSemantics.Decorative,
                     tint = AppTheme.materialColors.onSurfaceVariant,
                 )
             }

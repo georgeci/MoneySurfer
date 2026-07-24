@@ -15,6 +15,7 @@ import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_man
 import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_manage_delete_message
 import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_manage_delete_title
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import org.jetbrains.compose.resources.stringResource
 
@@ -34,7 +35,7 @@ fun DeleteAccountDialog(
         icon = {
             Icon(
                 imageVector = SurferIcons.Delete,
-                contentDescription = null,
+                contentDescription = SurferSemantics.Decorative,
                 tint = AppTheme.materialColors.error,
             )
         },

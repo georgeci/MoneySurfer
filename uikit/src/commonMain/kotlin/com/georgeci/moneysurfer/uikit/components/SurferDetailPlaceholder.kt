@@ -18,6 +18,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
+import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 
 @Composable
@@ -39,8 +40,7 @@ fun SurferDetailPlaceholder(
         ) {
             Icon(
                 imageVector = icon,
-                // decorative — placeholder illustration; the text below conveys the message
-                contentDescription = null,
+                contentDescription = SurferSemantics.Decorative,
                 tint = AppTheme.materialColors.onSurfaceVariant,
                 modifier = Modifier.size(48.dp),
             )

@@ -30,6 +30,7 @@ import com.georgeci.moneysurfer.uikit.components.base.SurferSplitAmount
 import com.georgeci.moneysurfer.uikit.components.base.SurferSplitAmountTier
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.preview.SurferBottomSheetPreview
+import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import moneysurfer.uikit.generated.resources.uikit_close
 import org.jetbrains.compose.resources.stringResource
@@ -136,7 +137,7 @@ internal fun AccountChooserContent(
                 ) {
                     Icon(
                         imageVector = SurferIcons.Add,
-                        contentDescription = null,
+                        contentDescription = SurferSemantics.Decorative,
                         tint = AppTheme.materialColors.primary,
                         modifier = Modifier.size(20.dp),
                     )
@@ -168,7 +169,7 @@ internal fun AccountChooserContent(
             ) {
                 Icon(
                     imageVector = SurferIcons.SwapHoriz,
-                    contentDescription = null,
+                    contentDescription = SurferSemantics.Decorative,
                     tint = AppTheme.materialColors.primary,
                     modifier = Modifier.size(18.dp),
                 )
@@ -206,7 +207,7 @@ private fun AccountRow(
             ) {
                 Icon(
                     imageVector = row.icon,
-                    contentDescription = null,
+                    contentDescription = SurferSemantics.Decorative,
                     tint = AppTheme.materialColors.onPrimaryContainer,
                     modifier = Modifier.size(22.dp),
                 )

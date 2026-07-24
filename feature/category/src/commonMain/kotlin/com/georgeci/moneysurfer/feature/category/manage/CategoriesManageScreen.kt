@@ -33,6 +33,7 @@ import com.georgeci.moneysurfer.uikit.components.base.SurferSwipeRevealRow
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
+import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.utils.HandleSideEffect
 import moneysurfer.feature.category.generated.resources.Res
@@ -114,8 +115,7 @@ private fun CategoriesManageContent(
             ExtendedFloatingActionButton(
                 text = { Text(addLabel) },
                 icon = {
-                    // decorative — FAB text label provides the accessible label
-                    Icon(imageVector = SurferIcons.Add, contentDescription = null)
+                    Icon(imageVector = SurferIcons.Add, contentDescription = SurferSemantics.Decorative)
                 },
                 onClick = { onEvent(CategoriesManageEvent.OnAddCategoryClick) },
                 modifier = Modifier.semantics { contentDescription = addLabel },
@@ -261,7 +261,7 @@ private fun CategoryManageCard(
             )
             Icon(
                 imageVector = SurferIcons.ChevronRight,
-                contentDescription = null,
+                contentDescription = SurferSemantics.Decorative,
                 tint = AppTheme.materialColors.onSurfaceVariant,
                 modifier = Modifier.padding(start = AppTheme.spacing.small),
             )

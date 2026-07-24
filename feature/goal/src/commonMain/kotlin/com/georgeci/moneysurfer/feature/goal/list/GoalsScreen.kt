@@ -29,6 +29,7 @@ import com.georgeci.moneysurfer.uikit.components.goal.SurferGoalCard
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
 import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
+import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.utils.AsyncState
 import com.georgeci.moneysurfer.utils.HandleSideEffect
@@ -85,8 +86,7 @@ private fun GoalsContent(
             val addLabel = stringResource(Res.string.goals_add)
             ExtendedFloatingActionButton(
                 text = { Text(addLabel) },
-                // decorative — the FAB label carries the accessible name
-                icon = { Icon(imageVector = SurferIcons.Add, contentDescription = null) },
+                icon = { Icon(imageVector = SurferIcons.Add, contentDescription = SurferSemantics.Decorative) },
                 onClick = { onEvent(GoalsEvent.OnAddGoalClick) },
                 modifier = Modifier.semantics { contentDescription = addLabel },
             )

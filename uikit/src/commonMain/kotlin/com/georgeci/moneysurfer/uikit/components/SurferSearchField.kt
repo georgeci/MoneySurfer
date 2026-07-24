@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 
 /**
@@ -34,8 +35,7 @@ fun SurferSearchField(
         leadingIcon = {
             Icon(
                 imageVector = SurferIcons.Search,
-                // decorative — field placeholder provides context
-                contentDescription = null,
+                contentDescription = SurferSemantics.Decorative,
             )
         },
         singleLine = true,
