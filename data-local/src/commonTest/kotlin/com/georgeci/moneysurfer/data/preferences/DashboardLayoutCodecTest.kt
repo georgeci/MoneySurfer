@@ -27,6 +27,19 @@ class DashboardLayoutCodecTest : StringSpec({
         DashboardLayoutCodec.decode(DashboardLayoutCodec.encode(config)) shouldBe config
     }
 
+    "a variant carrying the separators round-trips instead of splitting the layout" {
+        val config = DashboardLayoutConfig(
+            items = DashboardLayoutConfig.DEFAULT.items.map {
+                it.copy(cardStyle = DashboardCardStyle(DashboardWidgetSize.Hero, variant = "a|b:c%d"))
+            },
+        )
+
+        val encoded = DashboardLayoutCodec.encode(config)
+
+        DashboardLayoutCodec.decode(encoded) shouldBe config
+        encoded.split('|').size shouldBe config.items.size
+    }
+
     "an empty store means the default layout" {
         DashboardLayoutCodec.decode("") shouldBe DashboardLayoutConfig.DEFAULT
     }

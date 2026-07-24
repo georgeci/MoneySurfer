@@ -14,10 +14,14 @@ import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetType
  * Balance:1:Hero|Accounts:1:Compact:strip|Goals:0:Hero
  * ```
  *
- * `type:enabled:size[:variant]`, items separated by `|`. Decoding never throws and never fails
- * the read: anything unparseable is skipped and [DashboardLayoutConfig.normalized] fills the gaps
- * from the default layout, so a store written by a newer build (or corrupted on disk) degrades to
- * a usable dashboard rather than an empty one.
+ * `type:enabled:size[:variant]`, items separated by `|`. Types and sizes are enum names, but
+ * `variant` is free-form widget-defined text, so the separators (and the escape character itself)
+ * are percent-escaped on the way in and restored on the way out — a variant containing `|` would
+ * otherwise re-split into a bogus extra item.
+ *
+ * Decoding never throws and never fails the read: anything unparseable is skipped and
+ * [DashboardLayoutConfig.normalized] fills the gaps from the default layout, so a store written by
+ * a newer build (or corrupted on disk) degrades to a usable dashboard rather than an empty one.
  */
 internal object DashboardLayoutCodec {
 
@@ -26,6 +30,13 @@ internal object DashboardLayoutCodec {
     private const val ENABLED = "1"
     private const val DISABLED = "0"
     private const val MIN_FIELDS = 3
+
+    /** Escape char first on the way in, last on the way out — otherwise escapes eat each other. */
+    private val VARIANT_ESCAPES = listOf(
+        "%" to "%25",
+        ITEM_SEPARATOR.toString() to "%7C",
+        FIELD_SEPARATOR.toString() to "%3A",
+    )
 
     fun encode(config: DashboardLayoutConfig): String =
         config.items.joinToString(ITEM_SEPARATOR.toString()) { item ->
@@ -37,10 +48,16 @@ internal object DashboardLayoutCodec {
                 append(item.cardStyle.size.name)
                 item.cardStyle.variant?.let {
                     append(FIELD_SEPARATOR)
-                    append(it)
+                    append(escapeVariant(it))
                 }
             }
         }
+
+    private fun escapeVariant(variant: String): String =
+        VARIANT_ESCAPES.fold(variant) { acc, (raw, escaped) -> acc.replace(raw, escaped) }
+
+    private fun unescapeVariant(variant: String): String =
+        VARIANT_ESCAPES.reversed().fold(variant) { acc, (raw, escaped) -> acc.replace(escaped, raw) }
 
     fun decode(stored: String): DashboardLayoutConfig {
         if (stored.isBlank()) return DashboardLayoutConfig.DEFAULT
@@ -58,7 +75,7 @@ internal object DashboardLayoutCodec {
             enabled = fields[1] != DISABLED,
             cardStyle = DashboardCardStyle(
                 size = size,
-                variant = fields.getOrNull(MIN_FIELDS)?.takeIf(String::isNotBlank),
+                variant = fields.getOrNull(MIN_FIELDS)?.takeIf(String::isNotBlank)?.let(::unescapeVariant),
             ),
         )
     }

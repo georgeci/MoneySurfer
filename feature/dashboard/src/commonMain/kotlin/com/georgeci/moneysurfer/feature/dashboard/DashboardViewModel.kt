@@ -36,8 +36,9 @@ class DashboardViewModel(
     private val isOffline: Boolean = offlineBuildFlags.isOffline
 
     /**
-     * Widget order and visibility. Normalized on read so a layout persisted by an older build
-     * still shows widgets shipped since — the codec cannot invent them, only this can.
+     * Widget order and visibility. Normalized again here so the screen renders a sound layout
+     * whatever supplies the pref — the DataStore-backed binding already normalizes on decode, but
+     * an in-memory or future remote one need not, and `normalized()` is idempotent.
      */
     private val layout = uiPreferences.dashboardLayout.flow
         .map { it.normalized() }
