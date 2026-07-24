@@ -34,6 +34,7 @@ import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsRow
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
 import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
+import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.utils.HandleSideEffect
 import moneysurfer.feature.settings.generated.resources.Res
@@ -346,7 +347,7 @@ private fun GuestLogoutWarningDialog(
         icon = {
             Icon(
                 imageVector = SurferIcons.Logout,
-                contentDescription = null,
+                contentDescription = SurferSemantics.Decorative,
                 tint = AppTheme.materialColors.error,
             )
         },

@@ -7,6 +7,7 @@ import com.georgeci.moneysurfer.domain.OfflineBuildFlags
 import com.georgeci.moneysurfer.domain.SyncFeatureFlag
 import com.georgeci.moneysurfer.domain.auth.AuthError
 import com.georgeci.moneysurfer.domain.auth.InMemorySessionPointers
+import com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutConfig
 import com.georgeci.moneysurfer.domain.model.User
 import com.georgeci.moneysurfer.domain.model.WorkspaceInvite
 import com.georgeci.moneysurfer.domain.model.WorkspaceMember
@@ -14,6 +15,7 @@ import com.georgeci.moneysurfer.domain.preferences.ContainerStyle
 import com.georgeci.moneysurfer.domain.preferences.PaletteSource
 import com.georgeci.moneysurfer.domain.preferences.Pref
 import com.georgeci.moneysurfer.domain.preferences.ThemeMode
+import com.georgeci.moneysurfer.domain.preferences.TransactionPeriodMode
 import com.georgeci.moneysurfer.domain.preferences.UiPreferences
 import com.georgeci.moneysurfer.domain.primitives.UserId
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
@@ -205,4 +207,8 @@ private class StubUiPreferences : UiPreferences {
     override val paletteSource: Pref<PaletteSource> = Pref.inMemory(PaletteSource.Brand)
     override val themeMode: Pref<ThemeMode> = Pref.inMemory(ThemeMode.System)
     override val containerStyle: Pref<ContainerStyle> = Pref.inMemory(ContainerStyle.Filled)
+    override val transactionsPeriodMode: Pref<TransactionPeriodMode> =
+        Pref.inMemory(TransactionPeriodMode.DEFAULT)
+    override val dashboardLayout: Pref<DashboardLayoutConfig> =
+        Pref.inMemory(DashboardLayoutConfig.DEFAULT)
 }
