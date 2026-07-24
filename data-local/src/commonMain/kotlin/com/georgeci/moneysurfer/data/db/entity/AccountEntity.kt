@@ -27,4 +27,6 @@ data class AccountEntity(
     @ColumnInfo(name = "balance") val balance: Long,
     @ColumnInfo(name = "archived", defaultValue = "0") val archived: Boolean = false,
     @ColumnInfo(name = "updatedAt", defaultValue = "0") val updatedAt: Long = 0L,
+    /** Epoch millis of the archive write, `null` while the account is active. */
+    @ColumnInfo(name = "archivedAt") val archivedAt: Long? = null,
 )

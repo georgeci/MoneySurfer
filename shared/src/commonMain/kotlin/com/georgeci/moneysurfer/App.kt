@@ -2,7 +2,11 @@ package com.georgeci.moneysurfer
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.georgeci.moneysurfer.domain.preferences.AccentSeed
@@ -20,9 +24,11 @@ import com.georgeci.moneysurfer.feature.transaction.transactionNavGraph
 import com.georgeci.moneysurfer.feature.workspace.workspaceNavGraph
 import com.georgeci.moneysurfer.navigation.AppNavGraph
 import com.georgeci.moneysurfer.shared.app.AppViewModel
+import com.georgeci.moneysurfer.uikit.components.SurferErrorBoundary
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.uikit.theme.SurferContainerStyle
 import com.georgeci.moneysurfer.uikit.tokens.AccentSeeds
+import com.georgeci.moneysurfer.utils.UnhandledErrors
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -48,19 +54,33 @@ fun App(
         dynamicColor = useDynamic,
         containerStyle = appState.containerStyle.toUiStyle(),
     ) {
-        AppNavGraph(
-            featureNavGraphs = listOf(
-                loginNavGraph,
-                workspaceNavGraph,
-                dashboardNavGraph,
-                accountNavGraph,
-                categoryNavGraph,
-                budgetNavGraph,
-                goalNavGraph,
-                transactionNavGraph,
-                settingsNavGraph,
-            ),
-        )
+        var hasUnhandledError by remember { mutableStateOf(false) }
+
+        // Failures no ViewModel handled itself (see MviViewModel.launch). They are already
+        // logged at Error severity — and thereby recorded in Crashlytics — by the time they
+        // arrive here; this only decides what the user sees.
+        LaunchedEffect(Unit) {
+            UnhandledErrors.errors.collect { hasUnhandledError = true }
+        }
+
+        SurferErrorBoundary(
+            hasError = hasUnhandledError,
+            onRetry = { hasUnhandledError = false },
+        ) {
+            AppNavGraph(
+                featureNavGraphs = listOf(
+                    loginNavGraph,
+                    workspaceNavGraph,
+                    dashboardNavGraph,
+                    accountNavGraph,
+                    categoryNavGraph,
+                    budgetNavGraph,
+                    goalNavGraph,
+                    transactionNavGraph,
+                    settingsNavGraph,
+                ),
+            )
+        }
     }
 }
 

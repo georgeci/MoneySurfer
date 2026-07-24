@@ -192,7 +192,9 @@ private fun SectionLabel(text: String) {
     )
 }
 
-private val previewRows = listOf(
+// Composable: category tints are theme-dependent, so the rows resolve inside the preview.
+@Composable
+private fun previewRows(): List<CategoryPickerRow> = listOf(
     CategoryPickerRow(
         id = "groceries",
         name = "Groceries",
@@ -240,7 +242,7 @@ private fun CategoryChooserContentPreview() {
         CategoryChooserContent(
             title = "Category",
             searchPlaceholder = "Search categories",
-            categories = previewRows,
+            categories = previewRows(),
             selectedId = "groceries",
             expenseSectionTitle = "Expense",
             incomeSectionTitle = "Income",

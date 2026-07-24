@@ -42,9 +42,14 @@ internal data class AccountPickerRow(
 
 /**
  * Static content of the account-chooser bottom sheet. Renders the drag handle, header, total
- * summary, the picker list, and the dashed "Add new account" CTA. The hosting [Composable]
- * provides the surrounding `ModalBottomSheet` chrome and wires events through a ViewModel.
+ * summary, the picker list, the dashed "Add new account" CTA and the transfer footer. The hosting
+ * [Composable] provides the surrounding `ModalBottomSheet` chrome and wires events through a
+ * ViewModel.
+ *
+ * [transferInsteadLabel] is null when the host has no transfer to offer — picking the second leg
+ * of a transfer, for instance, is already a transfer.
  */
+@Suppress("LongParameterList")
 @Composable
 internal fun AccountChooserContent(
     title: String,
@@ -56,6 +61,8 @@ internal fun AccountChooserContent(
     onSelect: (AccountId) -> Unit,
     onAddNew: () -> Unit,
     onClose: () -> Unit,
+    transferInsteadLabel: String? = null,
+    onTransferInstead: () -> Unit = {},
 ) {
     Column(modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)) {
         Row(
@@ -142,6 +149,30 @@ internal fun AccountChooserContent(
                         color = AppTheme.materialColors.onSurfaceVariant,
                     )
                 }
+            }
+        }
+
+        if (transferInsteadLabel != null) {
+            Spacer(Modifier.height(10.dp))
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable(onClick = onTransferInstead)
+                    .padding(horizontal = 20.dp, vertical = 10.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                Icon(
+                    imageVector = SurferIcons.SwapHoriz,
+                    contentDescription = null,
+                    tint = AppTheme.materialColors.primary,
+                    modifier = Modifier.size(18.dp),
+                )
+                Text(
+                    text = transferInsteadLabel,
+                    style = AppTheme.typography.labelLarge,
+                    color = AppTheme.materialColors.primary,
+                )
             }
         }
     }
@@ -267,6 +298,7 @@ private fun AccountChooserContentPreview() {
             onSelect = {},
             onAddNew = {},
             onClose = {},
+            transferInsteadLabel = "Transfer between accounts instead",
         )
     }
 }

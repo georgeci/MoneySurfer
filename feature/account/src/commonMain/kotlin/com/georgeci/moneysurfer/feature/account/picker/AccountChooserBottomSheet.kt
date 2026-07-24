@@ -6,6 +6,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.georgeci.moneysurfer.domain.formatter.MoneyFormatter
 import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.feature.account.generated.resources.Res
+import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_manage_transfer_instead
 import com.georgeci.moneysurfer.feature.account.generated.resources.transaction_creation_account_add_new
 import com.georgeci.moneysurfer.feature.account.generated.resources.transaction_creation_account_add_new_subtitle
 import com.georgeci.moneysurfer.feature.account.generated.resources.transaction_creation_account_sheet_title
@@ -28,9 +29,11 @@ import org.koin.core.parameter.parametersOf
 fun AccountChooserBottomSheet(
     selectedAccountId: AccountId?,
     excludeAccountId: AccountId? = null,
+    showTransferShortcut: Boolean = false,
     onDismiss: () -> Unit,
     onNavigateToAccountCreation: () -> Unit,
     onAccountPicked: (AccountId) -> Unit,
+    onTransferRequested: () -> Unit = {},
     viewModel: AccountChooserViewModel = koinViewModel(
         key = "${selectedAccountId?.value.orEmpty()}|${excludeAccountId?.value.orEmpty()}",
     ) { parametersOf(selectedAccountId, excludeAccountId) },
@@ -42,21 +45,23 @@ fun AccountChooserBottomSheet(
             AccountChooserEffect.Dismiss -> onDismiss()
             AccountChooserEffect.NavigateToAccountCreation -> onNavigateToAccountCreation()
             is AccountChooserEffect.PublishResult -> onAccountPicked(effect.id)
+            AccountChooserEffect.RequestTransfer -> onTransferRequested()
         }
     }
 
     val content = state as? AccountChooserState.Content
     val accounts = content?.accounts.orEmpty()
-    val totalFormatted = content?.totalFormatted
+    val totalsFormatted = content?.totalsFormatted.orEmpty()
 
-    val summary = if (accounts.isEmpty() || totalFormatted == null) {
+    val summary = if (accounts.isEmpty() || totalsFormatted.isEmpty()) {
         stringResource(Res.string.transaction_creation_account_summary_empty)
     } else {
         pluralStringResource(
             Res.plurals.transaction_creation_account_summary,
             accounts.size,
             accounts.size,
-            totalFormatted,
+            // One figure per currency; with a single currency this reads exactly as before.
+            totalsFormatted.joinToString(" · "),
         )
     }
 
@@ -78,5 +83,8 @@ fun AccountChooserBottomSheet(
         onSelect = { id -> viewModel.onEvent(AccountChooserEvent.OnAccountSelected(id)) },
         onAddNew = { viewModel.onEvent(AccountChooserEvent.OnAddNewAccountClick) },
         onClose = { viewModel.onEvent(AccountChooserEvent.OnDismiss) },
+        transferInsteadLabel = stringResource(Res.string.accounts_manage_transfer_instead)
+            .takeIf { showTransferShortcut },
+        onTransferInstead = { viewModel.onEvent(AccountChooserEvent.OnTransferInsteadClick) },
     )
 }

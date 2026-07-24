@@ -290,9 +290,13 @@ jobs:
             echo "present=false" >> "$GITHUB_OUTPUT"
           fi
 
+      # `!cancelled()` rather than `always()`: a red test suite must still upload
+      # (that's the point of the guard), but a job cancelled by the per-PR
+      # concurrency group is torn down before the test step writes any XML, and
+      # the uploader would then report "JUnit XML file not found" on the PR.
       - name: Upload coverage to Codecov
         if: >-
-          always() &&
+          !cancelled() &&
           steps.codecov_token.outputs.present == 'true' &&
           (github.event_name != 'pull_request' ||
            github.event.pull_request.head.repo.full_name == github.repository)
@@ -306,7 +310,7 @@ jobs:
 
       - name: Upload test results to Codecov
         if: >-
-          always() &&
+          !cancelled() &&
           steps.codecov_token.outputs.present == 'true' &&
           (github.event_name != 'pull_request' ||
            github.event.pull_request.head.repo.full_name == github.repository)
