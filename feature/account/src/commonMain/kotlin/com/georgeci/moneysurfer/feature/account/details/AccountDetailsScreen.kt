@@ -26,7 +26,6 @@ import com.georgeci.moneysurfer.domain.primitives.AccountType
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.feature.account.generated.resources.Res
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_add_transaction
-import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_change_this_month
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_chart_title
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_edit_content_description
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_filter_all
@@ -179,7 +178,13 @@ private fun AccountDetailsContent(
             item {
                 SurferBalanceChartCard(
                     title = stringResource(Res.string.account_details_chart_title),
-                    delta = stringResource(Res.string.account_details_change_this_month),
+                    delta = state.chart.formattedDelta,
+                    deltaColor = if (state.chart.isDeltaNegative) {
+                        AppTheme.materialColors.error
+                    } else {
+                        AppTheme.semanticColors.income
+                    },
+                    points = state.chart.points,
                     modifier = Modifier
                         .padding(horizontal = AppTheme.spacing.default)
                         .padding(bottom = AppTheme.spacing.medium),
@@ -304,6 +309,13 @@ private fun FilterChips(
     )
 }
 
+/** A month of plausible balances so the preview draws the same shape the real series does. */
+private val PreviewChartPoints: List<Pair<Float, Float>> = listOf(
+    2068f, 2042f, 2110f, 2095f, 2180f, 2164f, 2140f, 2210f, 2196f, 2255f,
+    2231f, 2288f, 2262f, 2240f, 2310f, 2295f, 2352f, 2330f, 2308f, 2374f,
+    2360f, 2412f, 2390f, 2368f, 2430f, 2415f, 2462f, 2441f, 2470f, 2480f,
+).mapIndexed { index, balance -> index.toFloat() to balance }
+
 @Preview
 @Composable
 private fun AccountDetailsScreenPreview() {
@@ -316,6 +328,11 @@ private fun AccountDetailsScreenPreview() {
                 type = AccountType.BANK,
                 formattedIncome = "€3,200.00",
                 formattedExpenses = "€1,148.49",
+                chart = AccountBalanceChartUi(
+                    points = PreviewChartPoints,
+                    formattedDelta = "+€412.00",
+                    isDeltaNegative = false,
+                ),
                 transactions = listOf(
                     AccountTransactionUi(
                         id = TransactionId("preview-tx-1"),

@@ -63,7 +63,6 @@
     <string name="account_details_more_content_description">Ещё</string>
     <string name="account_details_updated">Обновлено только что</string>
     <string name="account_details_kind_last4_format">%1$s · •• %2$s</string>
-    <string name="account_details_change_this_month">+€412 за месяц</string>
     <string name="account_details_in_this_month">Доходы за месяц</string>
     <string name="account_details_out_this_month">Расходы за месяц</string>
     <string name="account_details_chart_title">Баланс · 30 дней</string>
