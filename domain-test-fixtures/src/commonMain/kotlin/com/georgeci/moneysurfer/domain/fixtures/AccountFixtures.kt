@@ -1,6 +1,7 @@
 package com.georgeci.moneysurfer.domain.fixtures
 
 import com.georgeci.moneysurfer.domain.model.Account
+import com.georgeci.moneysurfer.domain.model.AccountExtraDetail
 import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.AccountType
 import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
@@ -15,6 +16,7 @@ fun anAccount(
     currencyCode: CurrencyCode = USD,
     balance: Money = Money.zero(),
     archived: Boolean = false,
+    extraDetails: List<AccountExtraDetail> = emptyList(),
 ): Account = Account(
     id = id,
     workspaceId = workspaceId,
@@ -23,4 +25,5 @@ fun anAccount(
     currencyCode = currencyCode,
     balance = balance,
     archived = archived,
+    extraDetails = extraDetails,
 )

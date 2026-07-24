@@ -1,7 +1,9 @@
 package com.georgeci.moneysurfer.feature.account.details
 
 import arrow.optics.optics
+import com.georgeci.moneysurfer.domain.OfflineBuildFlags
 import com.georgeci.moneysurfer.domain.formatter.MoneyFormatter
+import com.georgeci.moneysurfer.domain.model.AccountExtraDetail
 import com.georgeci.moneysurfer.domain.model.Transaction
 import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
@@ -18,6 +20,7 @@ class AccountDetailsViewModel(
     accountId: AccountId,
     private val getAccountById: GetAccountByIdUseCase,
     private val getTransactionsByAccount: GetTransactionsByAccountUseCase,
+    private val offlineBuildFlags: OfflineBuildFlags,
 ) : MviViewModel<AccountDetailsState, AccountDetailsEvent, AccountDetailsEffect>(
     initialState = AccountDetailsState.Loading(accountId),
 ) {
@@ -73,6 +76,13 @@ class AccountDetailsViewModel(
                             formattedExpenses = formattedExpenses,
                             transactions = txnUi,
                             filter = TransactionFilter.All,
+                            // Mirrors the creation screen: the offline build has no place to put
+                            // these, so it does not offer to collect them and does not show them.
+                            extraDetails = if (offlineBuildFlags.isOffline) {
+                                emptyList()
+                            } else {
+                                account?.extraDetails.orEmpty()
+                            },
                         )
                         is AccountDetailsState.Content -> copy(
                             transactions = txnUi,
@@ -113,6 +123,8 @@ sealed interface AccountDetailsState {
         val formattedExpenses: String,
         val transactions: List<AccountTransactionUi>,
         val filter: TransactionFilter,
+        /** User-entered key–value details; empty when there are none or in the offline build. */
+        val extraDetails: List<AccountExtraDetail> = emptyList(),
     ) : AccountDetailsState {
         companion object
     }

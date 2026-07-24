@@ -52,6 +52,21 @@ data class AccountDoc(
     val updatedAt: Long = 0L,
     val deletedAt: Long? = null,
     val clientVersionCode: Int = 1,
+    /**
+     * User-entered key–value details. Empty when written by a client that predates the field;
+     * the reader treats that as "no details" rather than refusing the document.
+     */
+    val extraDetails: List<AccountExtraDetailDoc> = emptyList(),
+)
+
+/**
+ * One "Extra details" entry. [key] is either a well-known key name (`IBAN`, `CARD_LAST4`, …) or
+ * a label the user typed — see `AccountExtraDetail` in the domain.
+ */
+@Serializable
+data class AccountExtraDetailDoc(
+    val key: String = "",
+    val value: String = "",
 )
 
 @Serializable

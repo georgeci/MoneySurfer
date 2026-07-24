@@ -3,6 +3,7 @@ package com.georgeci.moneysurfer.feature.account.details
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,15 +20,20 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.georgeci.moneysurfer.domain.model.AccountExtraDetail
+import com.georgeci.moneysurfer.domain.model.AccountExtraDetailKey
 import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
+import com.georgeci.moneysurfer.feature.account.extraDetailLabel
 import com.georgeci.moneysurfer.feature.account.generated.resources.Res
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_add_transaction
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_change_this_month
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_chart_title
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_edit_content_description
+import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_extra_details_section
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_filter_all
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_filter_expenses
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_filter_income
@@ -40,6 +46,7 @@ import com.georgeci.moneysurfer.feature.account.generated.resources.account_deta
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_transactions_empty
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_transactions_section
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_transactions_see_all
+import com.georgeci.moneysurfer.feature.account.isMonospaceExtraDetail
 import com.georgeci.moneysurfer.uikit.components.account.SurferAccountDetailsHeroCard
 import com.georgeci.moneysurfer.uikit.components.account.SurferAccountStatCard
 import com.georgeci.moneysurfer.uikit.components.account.SurferBalanceChartCard
@@ -186,6 +193,9 @@ private fun AccountDetailsContent(
                         .padding(bottom = AppTheme.spacing.medium),
                 )
             }
+            if (state.extraDetails.isNotEmpty()) {
+                item { ExtraDetailsSection(details = state.extraDetails) }
+            }
             item {
                 FilterChips(
                     selected = state.filter,
@@ -283,6 +293,45 @@ private fun QuickStats(state: AccountDetailsState.Content) {
     }
 }
 
+/**
+ * The "Extra details" the creation screen collected. Read-only here — editing them means opening
+ * the edit form, which is the same screen that defined them.
+ */
+@Composable
+private fun ExtraDetailsSection(details: List<AccountExtraDetail>) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = AppTheme.spacing.large)
+            .padding(bottom = AppTheme.spacing.medium),
+        verticalArrangement = Arrangement.spacedBy(AppTheme.spacing.medium),
+    ) {
+        Text(
+            text = stringResource(Res.string.account_details_extra_details_section),
+            style = AppTheme.typography.labelLarge,
+            color = AppTheme.materialColors.onSurfaceVariant,
+        )
+        details.forEach { detail ->
+            Column(verticalArrangement = Arrangement.spacedBy(AppTheme.spacing.xSmall)) {
+                Text(
+                    text = extraDetailLabel(detail.key),
+                    style = AppTheme.typography.labelMedium,
+                    color = AppTheme.materialColors.onSurfaceVariant,
+                )
+                Text(
+                    text = detail.value,
+                    style = if (isMonospaceExtraDetail(detail.key)) {
+                        AppTheme.typography.bodyMedium.copy(fontFamily = FontFamily.Monospace)
+                    } else {
+                        AppTheme.typography.bodyMedium
+                    },
+                    color = AppTheme.materialColors.onSurface,
+                )
+            }
+        }
+    }
+}
+
 @Composable
 private fun FilterChips(
     selected: TransactionFilter,
@@ -341,6 +390,13 @@ private fun AccountDetailsScreenPreview() {
                     ),
                 ),
                 filter = TransactionFilter.All,
+                extraDetails = listOf(
+                    AccountExtraDetail(
+                        key = AccountExtraDetailKey.IBAN.name,
+                        value = "PL61 1090 1014 0000 0712 1981 2874",
+                    ),
+                    AccountExtraDetail(key = "Broker code", value = "MS-4417"),
+                ),
             ),
             onEvent = {},
         )

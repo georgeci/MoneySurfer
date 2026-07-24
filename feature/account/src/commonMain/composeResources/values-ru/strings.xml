@@ -53,6 +53,10 @@
     <string name="account_creation_field_card_last4">Последние 4 цифры</string>
     <string name="account_creation_field_bank_url">Сайт банка</string>
     <string name="account_creation_field_branch_phone">Телефон отделения</string>
+    <string name="account_creation_field_custom">Своё поле…</string>
+    <string name="account_creation_custom_field_dialog_title">Своё поле</string>
+    <string name="account_creation_custom_field_name_label">Название поля</string>
+    <string name="account_creation_custom_field_add">Добавить</string>
     <string name="account_details_title">Счёт</string>
     <string name="account_details_transactions_section">Транзакции</string>
     <string name="account_details_transactions_see_all">Все</string>
@@ -71,6 +75,7 @@
     <string name="account_details_filter_income">Доходы</string>
     <string name="account_details_add_transaction">Добавить транзакцию</string>
     <string name="account_details_transactions_empty">Транзакций пока нет.</string>
+    <string name="account_details_extra_details_section">Доп. сведения</string>
 
     <!-- Account chooser bottom sheet -->
     <string name="transaction_creation_account_sheet_title">Со счёта</string>

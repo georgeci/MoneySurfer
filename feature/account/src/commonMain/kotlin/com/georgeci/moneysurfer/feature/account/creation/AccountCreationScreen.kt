@@ -18,6 +18,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -25,6 +26,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -33,23 +37,25 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.georgeci.moneysurfer.domain.model.AccountExtraDetailKey
+import com.georgeci.moneysurfer.domain.model.AccountExtraDetails
 import com.georgeci.moneysurfer.domain.model.Currency
 import com.georgeci.moneysurfer.domain.primitives.AccountType
 import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
+import com.georgeci.moneysurfer.feature.account.extraDetailLabel
 import com.georgeci.moneysurfer.feature.account.generated.resources.Res
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_add_another_label
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_balance_error_negative
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_balance_helper
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_balance_label
+import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_cancel
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_currency_label
+import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_custom_field_add
+import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_custom_field_dialog_title
+import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_custom_field_name_label
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_extra_details_label
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_extra_details_optional
-import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_field_bank_url
-import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_field_bic
-import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_field_branch_phone
-import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_field_card_last4
-import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_field_description
-import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_field_iban
+import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_field_custom
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_first_run_subtitle
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_first_run_title
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_name_error_required
@@ -59,6 +65,7 @@ import com.georgeci.moneysurfer.feature.account.generated.resources.account_crea
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_save
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_title
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_type_label
+import com.georgeci.moneysurfer.feature.account.isMonospaceExtraDetail
 import com.georgeci.moneysurfer.feature.account.labelRes
 import com.georgeci.moneysurfer.uikit.components.base.SurferSegmentedControl
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
@@ -218,11 +225,13 @@ private fun AccountCreationContent(
             if (state.extraDetailsEnabled) {
                 ExtraDetailsSection(
                     addedFields = state.extraFields,
-                    availableKinds = state.availableExtraFieldKinds,
-                    onValueChanged = { kind, value ->
-                        onEvent(AccountCreationEvent.OnExtraFieldValueChanged(kind, value))
+                    availableKeys = state.availableExtraFieldKeys,
+                    canAddField = state.canAddExtraField,
+                    onValueChanged = { key, value ->
+                        onEvent(AccountCreationEvent.OnExtraFieldValueChanged(key, value))
                     },
                     onAdd = { onEvent(AccountCreationEvent.OnAddExtraField(it)) },
+                    onAddCustom = { onEvent(AccountCreationEvent.OnAddCustomExtraField(it)) },
                     onRemove = { onEvent(AccountCreationEvent.OnRemoveExtraField(it)) },
                 )
             }
@@ -266,11 +275,25 @@ private fun CurrencyPicker(
 @Composable
 private fun ExtraDetailsSection(
     addedFields: List<AccountExtraField>,
-    availableKinds: List<AccountExtraFieldKind>,
-    onValueChanged: (AccountExtraFieldKind, String) -> Unit,
-    onAdd: (AccountExtraFieldKind) -> Unit,
-    onRemove: (AccountExtraFieldKind) -> Unit,
+    availableKeys: List<AccountExtraDetailKey>,
+    canAddField: Boolean,
+    onValueChanged: (String, String) -> Unit,
+    onAdd: (AccountExtraDetailKey) -> Unit,
+    onAddCustom: (String) -> Unit,
+    onRemove: (String) -> Unit,
 ) {
+    var namingCustomField by remember { mutableStateOf(false) }
+
+    if (namingCustomField) {
+        CustomFieldNameDialog(
+            onDismiss = { namingCustomField = false },
+            onConfirm = { name ->
+                namingCustomField = false
+                onAddCustom(name)
+            },
+        )
+    }
+
     Column {
         Row(
             modifier = Modifier.fillMaxWidth().padding(bottom = AppTheme.spacing.medium),
@@ -293,13 +316,13 @@ private fun ExtraDetailsSection(
             addedFields.forEach { field ->
                 ExtraFieldItem(
                     field = field,
-                    onValueChanged = { onValueChanged(field.kind, it) },
-                    onRemove = { onRemove(field.kind) },
+                    onValueChanged = { onValueChanged(field.key, it) },
+                    onRemove = { onRemove(field.key) },
                 )
             }
         }
 
-        if (availableKinds.isNotEmpty()) {
+        if (canAddField) {
             Spacer(Modifier.height(14.dp))
             Text(
                 text = stringResource(Res.string.account_creation_add_another_label),
@@ -311,15 +334,59 @@ private fun ExtraDetailsSection(
                 horizontalArrangement = Arrangement.spacedBy(AppTheme.spacing.small),
                 verticalArrangement = Arrangement.spacedBy(AppTheme.spacing.small),
             ) {
-                availableKinds.forEach { kind ->
+                availableKeys.forEach { key ->
                     AddFieldChip(
-                        label = stringResource(kind.labelRes()),
-                        onClick = { onAdd(kind) },
+                        label = stringResource(key.labelRes()),
+                        onClick = { onAdd(key) },
                     )
                 }
+                AddFieldChip(
+                    label = stringResource(Res.string.account_creation_field_custom),
+                    onClick = { namingCustomField = true },
+                )
             }
         }
     }
+}
+
+/**
+ * Names a "Custom field…" before it is added. Confirming with a blank name is blocked here; a
+ * name that duplicates a field already on the form is dropped by the ViewModel, which is the only
+ * place that knows the current rows.
+ */
+@Composable
+private fun CustomFieldNameDialog(
+    onDismiss: () -> Unit,
+    onConfirm: (String) -> Unit,
+) {
+    var name by remember { mutableStateOf("") }
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(Res.string.account_creation_custom_field_dialog_title)) },
+        text = {
+            OutlinedTextField(
+                value = name,
+                onValueChange = { if (it.length <= AccountExtraDetails.MAX_KEY_LENGTH) name = it },
+                label = { Text(stringResource(Res.string.account_creation_custom_field_name_label)) },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth(),
+            )
+        },
+        confirmButton = {
+            TextButton(
+                onClick = { onConfirm(name) },
+                enabled = name.isNotBlank(),
+            ) {
+                Text(stringResource(Res.string.account_creation_custom_field_add))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(Res.string.account_creation_cancel))
+            }
+        },
+        containerColor = AppTheme.materialColors.surface,
+    )
 }
 
 @Composable
@@ -328,7 +395,7 @@ private fun ExtraFieldItem(
     onValueChanged: (String) -> Unit,
     onRemove: () -> Unit,
 ) {
-    val label = stringResource(field.kind.labelRes())
+    val label = extraDetailLabel(field.key)
     Column {
         Row(
             modifier = Modifier
@@ -365,10 +432,10 @@ private fun ExtraFieldItem(
             onValueChange = onValueChanged,
             label = { Text(label) },
             modifier = Modifier.fillMaxWidth(),
-            singleLine = !field.kind.isMultiline,
-            minLines = if (field.kind.isMultiline) 3 else 1,
-            maxLines = if (field.kind.isMultiline) 5 else 1,
-            textStyle = if (field.kind.isMonospace) {
+            singleLine = !field.isMultiline,
+            minLines = if (field.isMultiline) 3 else 1,
+            maxLines = if (field.isMultiline) 5 else 1,
+            textStyle = if (isMonospaceExtraDetail(field.key)) {
                 AppTheme.typography.bodyLarge.copy(fontFamily = FontFamily.Monospace)
             } else {
                 AppTheme.typography.bodyLarge
@@ -417,11 +484,8 @@ private fun SectionLabel(text: String) {
     )
 }
 
-private val AccountExtraFieldKind.isMultiline: Boolean
-    get() = this == AccountExtraFieldKind.DESCRIPTION
-
-private val AccountExtraFieldKind.isMonospace: Boolean
-    get() = this == AccountExtraFieldKind.IBAN || this == AccountExtraFieldKind.BIC
+private val AccountExtraField.isMultiline: Boolean
+    get() = wellKnownKey == AccountExtraDetailKey.DESCRIPTION
 
 private fun InitialBalanceError.messageRes(): StringResource = when (this) {
     InitialBalanceError.NEGATIVE_NOT_ALLOWED -> Res.string.account_creation_balance_error_negative
@@ -430,15 +494,6 @@ private fun InitialBalanceError.messageRes(): StringResource = when (this) {
 /** First launch gets a welcoming title; every other entry keeps the plain screen title. */
 private fun accountCreationTitle(firstRun: Boolean): StringResource =
     if (firstRun) Res.string.account_creation_first_run_title else Res.string.account_creation_title
-
-private fun AccountExtraFieldKind.labelRes(): StringResource = when (this) {
-    AccountExtraFieldKind.IBAN -> Res.string.account_creation_field_iban
-    AccountExtraFieldKind.DESCRIPTION -> Res.string.account_creation_field_description
-    AccountExtraFieldKind.BIC -> Res.string.account_creation_field_bic
-    AccountExtraFieldKind.CARD_LAST4 -> Res.string.account_creation_field_card_last4
-    AccountExtraFieldKind.BANK_URL -> Res.string.account_creation_field_bank_url
-    AccountExtraFieldKind.BRANCH_PHONE -> Res.string.account_creation_field_branch_phone
-}
 
 @Preview
 @Composable
@@ -458,13 +513,14 @@ private fun AccountCreationScreenPreview() {
                 ),
                 extraFields = listOf(
                     AccountExtraField(
-                        kind = AccountExtraFieldKind.IBAN,
+                        key = AccountExtraDetailKey.IBAN.name,
                         value = "PL61 1090 1014 0000 0712 1981 2874",
                     ),
                     AccountExtraField(
-                        kind = AccountExtraFieldKind.DESCRIPTION,
+                        key = AccountExtraDetailKey.DESCRIPTION.name,
                         value = "Joint emergency reserve — 6 months of expenses.",
                     ),
+                    AccountExtraField(key = "Broker code", value = "MS-4417"),
                 ),
                 editingAccountId = null,
             ),

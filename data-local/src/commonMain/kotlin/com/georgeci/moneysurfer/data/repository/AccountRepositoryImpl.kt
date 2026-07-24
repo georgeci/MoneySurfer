@@ -2,6 +2,7 @@ package com.georgeci.moneysurfer.data.repository
 
 import com.georgeci.moneysurfer.data.db.dao.AccountDao
 import com.georgeci.moneysurfer.data.db.entity.AccountEntity
+import com.georgeci.moneysurfer.data.db.entity.AccountExtraDetailsColumn
 import com.georgeci.moneysurfer.domain.model.Account
 import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.AccountType
@@ -97,6 +98,7 @@ class AccountRepositoryImpl(
         balance = Money.fromMinor(balance),
         archived = archived,
         updatedAt = timeFormatter.parseInstant(updatedAt),
+        extraDetails = AccountExtraDetailsColumn.decode(extraDetails),
     )
 
     private fun Account.toEntity() = AccountEntity(
@@ -108,5 +110,6 @@ class AccountRepositoryImpl(
         balance = balance.minor,
         archived = archived,
         updatedAt = timeFormatter.formatInstant(updatedAt),
+        extraDetails = AccountExtraDetailsColumn.encode(extraDetails),
     )
 }

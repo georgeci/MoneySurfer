@@ -16,4 +16,6 @@ data class Account(
     val balance: Money,
     val archived: Boolean = false,
     val updatedAt: Instant = Instant.fromEpochMilliseconds(0),
+    /** Optional user-entered key–value details (IBAN, description, custom fields, …). */
+    val extraDetails: List<AccountExtraDetail> = emptyList(),
 )
