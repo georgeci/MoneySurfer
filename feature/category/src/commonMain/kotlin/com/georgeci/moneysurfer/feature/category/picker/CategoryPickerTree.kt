@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
@@ -35,6 +36,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.georgeci.moneysurfer.domain.primitives.CategoryId
@@ -43,9 +45,10 @@ import com.georgeci.moneysurfer.uikit.components.SurferCategoryPalette
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import moneysurfer.feature.category.generated.resources.Res
+import moneysurfer.feature.category.generated.resources.category_picker_hide_children
 import moneysurfer.feature.category.generated.resources.category_picker_new_category
+import moneysurfer.feature.category.generated.resources.category_picker_show_children
 import moneysurfer.feature.category.generated.resources.category_picker_subcategories
-import moneysurfer.feature.category.generated.resources.category_picker_toggle_children
 import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
 
@@ -171,7 +174,11 @@ private fun ParentRow(
         modifier = Modifier
             .fillMaxWidth()
             .background(selectionBackground(parent.selected))
-            .clickable(onClick = onSelect)
+            .selectable(
+                selected = parent.selected,
+                role = Role.RadioButton,
+                onClick = onSelect,
+            )
             .padding(horizontal = RowHorizontalPadding, vertical = RowVerticalPadding),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -211,7 +218,13 @@ private fun ParentRow(
             IconButton(onClick = onToggleExpand) {
                 Icon(
                     imageVector = SurferIcons.DropDown,
-                    contentDescription = stringResource(Res.string.category_picker_toggle_children),
+                    contentDescription = stringResource(
+                        if (group.expanded) {
+                            Res.string.category_picker_hide_children
+                        } else {
+                            Res.string.category_picker_show_children
+                        },
+                    ),
                     tint = AppTheme.materialColors.onSurfaceVariant,
                     modifier = Modifier.rotate(rotation),
                 )
@@ -237,7 +250,11 @@ private fun ChildRow(
         modifier = Modifier
             .fillMaxWidth()
             .background(selectionBackground(child.selected))
-            .clickable(onClick = onSelect)
+            .selectable(
+                selected = child.selected,
+                role = Role.RadioButton,
+                onClick = onSelect,
+            )
             .drawBehind {
                 val stroke = ConnectorStroke.toPx()
                 val x = ConnectorX.toPx()
