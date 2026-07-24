@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -20,6 +21,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
+import com.georgeci.moneysurfer.uikit.theme.AppTheme
 
 /**
  * Circular bubble used to represent a category across the app (dashboard rows, transaction
@@ -65,18 +67,20 @@ data class SurferCategoryVisual(
  * [iconKeys] and [hues] are positionally paired with [icons] and [tints] and must stay in
  * lockstep with `CategoryAppearance` in the domain module — uikit deliberately does not depend
  * on domain, so `CategoryPaletteParityTest` in feature/category asserts the two agree.
+ *
+ * Tints are theme-dependent, so everything that resolves to a [Color] is `@Composable` and reads
+ * the current theme; the index-level resolvers ([tintIndexForHue] and friends) stay pure, which
+ * is also what the parity test asserts against.
  */
 object SurferCategoryPalette {
-    val tints: List<Color> = listOf(
-        Color(0xFF2F8E6E), // mint   — hue 162
-        Color(0xFFB5533B), // amber  — hue  35
-        Color(0xFF2E5AA8), // indigo — hue 258
-        Color(0xFFA06A1E), // citrus — hue  68
-        Color(0xFF6B4E99), // plum   — hue 303
-        Color(0xFFB54A6B), // rose   — hue 340
-        Color(0xFFB54744), // clay   — hue   8
-        Color(0xFF6B7D3D), // moss   — hue  90
-    )
+    /**
+     * Palette tints for the current theme, in the order [hues] describes. Light and dark
+     * variants live in `AppColors.CategoryTints` / `AppColors.Dark.CategoryTints`.
+     */
+    val tints: List<Color>
+        @Composable
+        @ReadOnlyComposable
+        get() = AppTheme.semanticColors.categoryTints
 
     val icons: List<ImageVector> = listOf(
         SurferIcons.Category,
@@ -111,7 +115,11 @@ object SurferCategoryPalette {
     const val TRANSFER_ICON_KEY: String = "transfer"
 
     /** Tint for the system Transfer category. Kept fixed (not hashed) so it's always recognisable. */
-    val TransferTint: Color = Color(0xFF2E5AA8)
+    val TransferTint: Color
+        @Composable
+        @ReadOnlyComposable
+        get() = AppTheme.semanticColors.transfer
+
     val TransferIcon: ImageVector = SurferIcons.SwapHoriz
 
     /**
@@ -122,6 +130,8 @@ object SurferCategoryPalette {
      * grey. A stored value that names nothing in this palette — a key from a newer build, a hue
      * off the wheel — degrades to that same fallback rather than throwing.
      */
+    @Composable
+    @ReadOnlyComposable
     fun visualFor(
         id: String,
         iconKey: String,
@@ -142,16 +152,18 @@ object SurferCategoryPalette {
      * Tint for a stored hue, snapped to the nearest palette hue around the colour wheel, or null
      * when the hue is off the wheel entirely (the "never stored" sentinel).
      */
+    @Composable
+    @ReadOnlyComposable
     fun tintForHue(hue: Int, systemKind: String? = null): Color? {
         if (systemKind == SYSTEM_KIND_TRANSFER) return TransferTint
-        if (hue < 0 || hue >= HUE_DEGREES) return null
-        val nearest = hues.indices.minBy { circularHueDistance(hues[it], hue) }
-        return tints[nearest]
+        return tintIndexForHue(hue)?.let { tints[it] }
     }
 
+    @Composable
+    @ReadOnlyComposable
     fun tintFor(id: String, systemKind: String? = null): Color {
         if (systemKind == SYSTEM_KIND_TRANSFER) return TransferTint
-        return tints[nonNegativeMod(stringHash(id), tints.size)]
+        return tints[tintIndexFor(id)]
     }
 
     fun iconFor(id: String, systemKind: String? = null): ImageVector {
@@ -159,17 +171,18 @@ object SurferCategoryPalette {
         return icons[nonNegativeMod(stringHash(id), icons.size)]
     }
 
-    fun tintForName(name: String): Color =
-        if (name.isEmpty()) {
-            tints[0]
-        } else {
-            tints[
-                nonNegativeMod(
-                    name.fold(0L) { acc, c -> acc * 31 + c.code },
-                    tints.size,
-                ),
-            ]
-        }
+    /**
+     * Index into [tints] for a stored hue, snapped to the nearest palette hue around the colour
+     * wheel, or null when the hue is off the wheel entirely (the "never stored" sentinel).
+     * Theme-free half of [tintForHue].
+     */
+    fun tintIndexForHue(hue: Int): Int? {
+        if (hue < 0 || hue >= HUE_DEGREES) return null
+        return hues.indices.minBy { circularHueDistance(hues[it], hue) }
+    }
+
+    /** Index into [tints] for a category that stored no hue. Theme-free half of [tintFor]. */
+    fun tintIndexFor(id: String): Int = nonNegativeMod(stringHash(id), hues.size)
 
     private fun circularHueDistance(a: Int, b: Int): Int {
         val diff = kotlin.math.abs(a - b)

@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -20,6 +21,9 @@ import com.georgeci.moneysurfer.uikit.components.transaction.SurferTransactionLi
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
+
+/** Opacity of the income amount pill's tint wash. */
+private const val INCOME_PILL_WASH_ALPHA = 0.14f
 
 data class SurferRecentTransactionItem(
     val id: String,
@@ -48,6 +52,13 @@ fun SurferRecentTransactionsWidget(
     emptySubtitle: String? = null,
 ) {
     val incomeColor = AppTheme.semanticColors.income
+
+    // The income amount is `incomeColor` text on a wash of the same colour, so leaving the
+    // wash translucent would make its contrast depend on whatever the widget is dropped onto.
+    // Compositing over `surface` fixes the pair at a known ≥4.5:1 in both themes.
+    val incomePillBackground = incomeColor
+        .copy(alpha = INCOME_PILL_WASH_ALPHA)
+        .compositeOver(AppTheme.materialColors.surface)
 
     Column(
         modifier = modifier,
@@ -104,7 +115,7 @@ fun SurferRecentTransactionsWidget(
                         amountPillBackground = if (transaction.isExpense) {
                             null
                         } else {
-                            incomeColor.copy(alpha = 0.14f)
+                            incomePillBackground
                         },
                         onClick = onItemClick?.let { handler -> { handler(transaction) } },
                     )

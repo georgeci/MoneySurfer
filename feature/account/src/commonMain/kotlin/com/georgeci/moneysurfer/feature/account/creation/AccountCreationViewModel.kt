@@ -16,15 +16,18 @@ import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
 import com.georgeci.moneysurfer.domain.primitives.Money
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
-import com.georgeci.moneysurfer.domain.repositories.AccountRepository
+import com.georgeci.moneysurfer.domain.usecase.CreateAccountUseCase
 import com.georgeci.moneysurfer.domain.usecase.CreateTransactionUseCase
+import com.georgeci.moneysurfer.domain.usecase.GetAccountByIdUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetCurrenciesUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetCurrentTimeUseCase
+import com.georgeci.moneysurfer.domain.usecase.UpdateAccountUseCase
 import com.georgeci.moneysurfer.domain.usecase.UpdateWorkspaceCurrencyUseCase
 import com.georgeci.moneysurfer.feature.account.generated.resources.Res
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_created_snackbar
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_currency_failed_snackbar
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_updated_snackbar
+import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_manage_action_failed
 import com.georgeci.moneysurfer.navigation.SnackbarController
 import com.georgeci.moneysurfer.utils.MviViewModel
 import kotlinx.coroutines.flow.first
@@ -37,7 +40,9 @@ class AccountCreationViewModel(
     private val accountId: AccountId?,
     private val firstRun: Boolean,
     initialType: AccountType,
-    private val accountRepository: AccountRepository,
+    private val getAccountById: GetAccountByIdUseCase,
+    private val createAccount: CreateAccountUseCase,
+    private val updateAccount: UpdateAccountUseCase,
     private val createTransaction: CreateTransactionUseCase,
     private val session: SessionPointers,
     private val getCurrentTime: GetCurrentTimeUseCase,
@@ -102,12 +107,12 @@ class AccountCreationViewModel(
 
     private fun loadAccount(id: AccountId) {
         launch {
-            val account = accountRepository.getById(id)
+            val account = getAccountById(id)
             updateState {
                 AccountCreationState.Content(
                     name = account?.name.orEmpty(),
                     balance = "",
-                    type = account?.type ?: AccountType.SAVINGS,
+                    type = account?.type ?: AccountType.BANK,
                     currency = account?.currencyCode ?: DEFAULT_CURRENCY,
                     currencies = loadedCurrencies,
                     // Loaded even in the offline build, where the section is hidden: the rows are
@@ -176,14 +181,17 @@ class AccountCreationViewModel(
             val trimmedName = state.name.trim()
             if (state.isEditMode) {
                 val existingId = state.editingAccountId ?: return@launch
-                val existing = accountRepository.getById(existingId) ?: return@launch
-                accountRepository.update(
+                updateAccount(existingId) { existing ->
                     existing.copy(
                         name = trimmedName,
                         type = state.type,
                         extraDetails = state.savedExtraDetails(),
-                    ),
-                )
+                    )
+                }.onLeft { err ->
+                    log.w { "[edit] not saved id=${existingId.value} -> $err" }
+                    snackbar.show(Res.string.accounts_manage_action_failed)
+                    return@launch
+                }
                 snackbar.show(Res.string.account_creation_updated_snackbar, listOf(trimmedName))
                 postSideEffect(AccountCreationEffect.NavigateBack)
                 return@launch
@@ -194,7 +202,7 @@ class AccountCreationViewModel(
             val currency = state.currency
             val openingBalance = Money.fromDouble(balanceDouble)
             val newAccountId = AccountId.uuid()
-            accountRepository.insert(
+            createAccount(
                 Account(
                     id = newAccountId,
                     workspaceId = workspaceId,
@@ -204,7 +212,11 @@ class AccountCreationViewModel(
                     balance = Money.zero(),
                     extraDetails = state.savedExtraDetails(),
                 ),
-            )
+            ).onLeft { err ->
+                log.w { "[create] not saved -> $err" }
+                snackbar.show(Res.string.accounts_manage_action_failed)
+                return@launch
+            }
 
             if (!openingBalance.isZero()) {
                 val now = getCurrentTime()

@@ -71,7 +71,14 @@ class AccountRepositoryImpl(
     override suspend fun setArchived(accountId: AccountId, archived: Boolean) {
         val existing = dao.getById(accountId.value) ?: return
         if (existing.archived == archived) return
-        dao.setArchived(accountId.value, archived, clock.now().toEpochMilliseconds())
+        val now = clock.now().toEpochMilliseconds()
+        dao.setArchived(
+            id = accountId.value,
+            archived = archived,
+            // Restoring clears the stamp — an account that comes back has no archive date.
+            archivedAt = now.takeIf { archived },
+            updatedAt = now,
+        )
         outboxEnqueuer.enqueueUpsert(
             entityType = SyncEntityTypes.ACCOUNT,
             entityId = existing.id,
@@ -98,6 +105,7 @@ class AccountRepositoryImpl(
         balance = Money.fromMinor(balance),
         archived = archived,
         updatedAt = timeFormatter.parseInstant(updatedAt),
+        archivedAt = timeFormatter.parseInstantOrNull(archivedAt),
         extraDetails = AccountExtraDetailsColumn.decode(extraDetails),
     )
 
@@ -110,6 +118,7 @@ class AccountRepositoryImpl(
         balance = balance.minor,
         archived = archived,
         updatedAt = timeFormatter.formatInstant(updatedAt),
+        archivedAt = timeFormatter.formatInstantOrNull(archivedAt),
         extraDetails = AccountExtraDetailsColumn.encode(extraDetails),
     )
 }

@@ -26,6 +26,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.georgeci.moneysurfer.domain.model.AccountExtraDetail
 import com.georgeci.moneysurfer.domain.model.AccountExtraDetailKey
 import com.georgeci.moneysurfer.domain.primitives.AccountId
+import com.georgeci.moneysurfer.domain.primitives.AccountType
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.feature.account.extraDetailLabel
 import com.georgeci.moneysurfer.feature.account.generated.resources.Res
@@ -40,13 +41,12 @@ import com.georgeci.moneysurfer.feature.account.generated.resources.account_deta
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_in_this_month
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_more_content_description
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_out_this_month
-import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_synced_format
-import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_synced_recent
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_title
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_transactions_empty
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_transactions_section
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_transactions_see_all
 import com.georgeci.moneysurfer.feature.account.isMonospaceExtraDetail
+import com.georgeci.moneysurfer.feature.account.labelRes
 import com.georgeci.moneysurfer.uikit.components.account.SurferAccountDetailsHeroCard
 import com.georgeci.moneysurfer.uikit.components.account.SurferAccountStatCard
 import com.georgeci.moneysurfer.uikit.components.account.SurferBalanceChartCard
@@ -172,12 +172,11 @@ private fun AccountDetailsContent(
                 SurferAccountDetailsHeroCard(
                     icon = SurferIcons.Wallet,
                     name = state.name,
-                    subtitle = state.currency.uppercase(),
+                    // The mockup's meta line is the account kind ("CURRENT · •• 4021"); the
+                    // last-4 half needs a field the model does not have yet, so only the kind
+                    // shows — still closer than the currency code that used to sit here.
+                    subtitle = state.type?.let { stringResource(it.labelRes()).uppercase() }.orEmpty(),
                     formattedBalance = state.formattedBalance.ifBlank { "€0.00" },
-                    syncedLabel = stringResource(
-                        Res.string.account_details_synced_format,
-                        stringResource(Res.string.account_details_synced_recent),
-                    ),
                     modifier = Modifier
                         .padding(horizontal = AppTheme.spacing.default)
                         .padding(bottom = AppTheme.spacing.large),
@@ -363,7 +362,7 @@ private fun AccountDetailsScreenPreview() {
                 accountId = AccountId("preview-acc-1"),
                 name = "Everyday",
                 formattedBalance = "€2,480.32",
-                currency = "EUR",
+                type = AccountType.BANK,
                 formattedIncome = "€3,200.00",
                 formattedExpenses = "€1,148.49",
                 transactions = listOf(

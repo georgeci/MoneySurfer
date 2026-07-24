@@ -65,6 +65,7 @@ fun AccountEntity.toDoc(): AccountDoc = AccountDoc(
     balance = balance,
     archived = archived,
     updatedAt = updatedAt,
+    archivedAt = archivedAt,
     // Same stored-column↔wire-list conversion as TransactionEntity.tags below: the wire keeps
     // structured entries, Room keeps one JSON column.
     extraDetails = AccountExtraDetailsColumn.decode(extraDetails)
@@ -80,6 +81,7 @@ fun AccountDoc.toEntity(id: String, workspaceId: String): AccountEntity = Accoun
     balance = balance,
     archived = archived,
     updatedAt = updatedAt,
+    archivedAt = archivedAt,
     // `encode` normalizes, so a doc from a client we do not control cannot seed the column with
     // blank keys, duplicates or an unbounded list.
     extraDetails = AccountExtraDetailsColumn.encode(

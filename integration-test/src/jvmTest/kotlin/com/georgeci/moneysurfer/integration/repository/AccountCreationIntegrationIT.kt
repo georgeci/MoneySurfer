@@ -85,4 +85,22 @@ class AccountCreationIntegrationIT : StringSpec({
         stored.balance shouldBe 75.dollars
         stored.currencyCode shouldBe EUR
     }
+
+    "archiving stamps archivedAt and restoring clears it" {
+        val account = anAccount(id = accountId("a-eur"), workspaceId = DEFAULT_WORKSPACE_ID)
+        stack.accountRepository.insert(account)
+        stack.accountRepository.getById(account.id)!!.archivedAt shouldBe null
+
+        stack.accountRepository.setArchived(account.id, archived = true)
+
+        val archived = stack.accountRepository.getById(account.id)!!
+        archived.archived shouldBe true
+        archived.archivedAt shouldNotBe null
+
+        stack.accountRepository.setArchived(account.id, archived = false)
+
+        val restored = stack.accountRepository.getById(account.id)!!
+        restored.archived shouldBe false
+        restored.archivedAt shouldBe null
+    }
 })

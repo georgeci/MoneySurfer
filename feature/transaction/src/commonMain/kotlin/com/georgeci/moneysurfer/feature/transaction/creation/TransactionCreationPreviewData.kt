@@ -11,6 +11,9 @@ import com.georgeci.moneysurfer.domain.primitives.Money
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 import kotlin.time.Instant
 
+/** Sample note shared by the `@Preview` states so they read as the same transaction. */
+internal const val PreviewNote = "Lidl — weekly shop"
+
 internal val PreviewAccounts = listOf(
     Account(
         id = AccountId("preview-acc-1"),
