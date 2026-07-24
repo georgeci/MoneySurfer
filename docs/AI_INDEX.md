@@ -71,7 +71,7 @@
 ## crash-reporting
 - Title: The path a failure takes
 - File: docs/architecture/crash-reporting.md
-- Lines: 19-100
+- Lines: 19-102
 - Tasks: telemetry, crashlytics, error-handling
 
 ## docs-maintainer-agent
