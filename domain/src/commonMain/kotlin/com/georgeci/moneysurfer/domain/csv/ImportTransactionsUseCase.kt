@@ -23,8 +23,9 @@ import okio.BufferedSource
 import org.koin.core.annotation.Single
 
 /**
- * Merges transactions from a CSV produced by [ExportTransactionsUseCase] into
- * the local database. Rows whose id already exists locally (or earlier in the
+ * Merges transactions from a CSV produced by [ExportTransactionsUseCase] — by
+ * this build or by any earlier one, see [TransactionCsvFormat] — into the local
+ * database. Rows whose id already exists locally (or earlier in the
  * same file) are skipped as duplicates; rows that fail to parse, reference
  * unknown workspaces/accounts/categories, cross workspace boundaries, carry a
  * currency other than their account's, or form an inconsistent transfer pair
@@ -59,10 +60,12 @@ class ImportTransactionsUseCase(
     private suspend fun runImport(source: BufferedSource): CsvImportReport {
         val records = Csv.parseRecords(readCapped(source))
         val headerRecord = records.firstOrNull() ?: throw TransactionCsvError.EmptyFile
-        if (headerRecord.fields != TransactionCsvCodec.header) {
-            throw TransactionCsvError.HeaderMismatch
-        }
-        return importRecords(records.drop(1), loadKnownIds())
+        // The header row identifies the layout, so a backup written by an older
+        // build still imports — its rows just carry fewer columns, and the
+        // fields it never had decode to their "not recorded" defaults.
+        val format = TransactionCsvFormat.forHeader(headerRecord.fields)
+            ?: throw TransactionCsvError.HeaderMismatch
+        return importRecords(records.drop(1), loadKnownIds(), format)
     }
 
     /**
@@ -87,8 +90,9 @@ class ImportTransactionsUseCase(
     private suspend fun importRecords(
         records: List<CsvRecord>,
         known: KnownIds,
+        format: TransactionCsvFormat,
     ): CsvImportReport {
-        val rows = records.map { DecodedRow(it.rowNumber, decodeRow(it.fields, known)) }
+        val rows = records.map { DecodedRow(it.rowNumber, decodeRow(it.fields, known, format)) }
         val unpaired = unpairedTransferIds(rows)
         var imported = 0
         var skipped = 0
@@ -142,8 +146,12 @@ class ImportTransactionsUseCase(
             setOf(TransactionType.EXPENSE, TransactionType.INCOME) &&
             this[0].accountId != this[1].accountId
 
-    private suspend fun decodeRow(fields: List<String>, known: KnownIds): RowResult =
-        when (val decoded = TransactionCsvCodec.decode(fields)) {
+    private suspend fun decodeRow(
+        fields: List<String>,
+        known: KnownIds,
+        format: TransactionCsvFormat,
+    ): RowResult =
+        when (val decoded = TransactionCsvCodec.decode(fields, format)) {
             is TransactionCsvDecodeResult.Rejected -> RowResult.Failed(decoded.issue)
             is TransactionCsvDecodeResult.Decoded -> {
                 val transaction = decoded.transaction
