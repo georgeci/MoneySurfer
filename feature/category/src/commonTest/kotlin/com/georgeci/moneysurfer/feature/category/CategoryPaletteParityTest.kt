@@ -2,6 +2,7 @@ package com.georgeci.moneysurfer.feature.category
 
 import com.georgeci.moneysurfer.domain.model.CategoryAppearance
 import com.georgeci.moneysurfer.uikit.components.SurferCategoryPalette
+import com.georgeci.moneysurfer.uikit.tokens.AppColors
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 
@@ -31,33 +32,35 @@ class CategoryPaletteParityTest : StringSpec({
             (SurferCategoryPalette.iconForKey(key) != null) shouldBe true
         }
         CategoryAppearance.HUES.forEach { hue ->
-            (SurferCategoryPalette.tintForHue(hue) != null) shouldBe true
+            (SurferCategoryPalette.tintIndexForHue(hue) != null) shouldBe true
         }
+    }
+
+    "both themes carry a tint for every hue in the catalogue" {
+        AppColors.CategoryTints.size shouldBe CategoryAppearance.HUES.size
+        AppColors.Dark.CategoryTints.size shouldBe CategoryAppearance.HUES.size
     }
 
     "the unset sentinels fall back rather than resolving to a real slot" {
         SurferCategoryPalette.iconForKey("") shouldBe null
-        SurferCategoryPalette.tintForHue(CategoryAppearance.UNSET_HUE) shouldBe null
+        SurferCategoryPalette.tintIndexForHue(CategoryAppearance.UNSET_HUE) shouldBe null
     }
 
-    "a stored appearance beats the id hash, and an unstored one falls back to it" {
-        val stored = SurferCategoryPalette.visualFor(
-            id = "c-1",
-            iconKey = CategoryAppearance.ICON_KEYS[3],
-            hue = CategoryAppearance.HUES[3],
-        )
-        stored.icon shouldBe SurferCategoryPalette.icons[3]
-        stored.tint shouldBe SurferCategoryPalette.tints[3]
+    "a stored appearance lands on its own slot, and the id-hash fallback agrees with domain" {
+        SurferCategoryPalette.iconForKey(CategoryAppearance.ICON_KEYS[3]) shouldBe
+            SurferCategoryPalette.icons[3]
+        SurferCategoryPalette.tintIndexForHue(CategoryAppearance.HUES[3]) shouldBe 3
 
-        val unstored = SurferCategoryPalette.visualFor(id = "c-1", iconKey = "", hue = -1)
-        unstored.icon shouldBe SurferCategoryPalette.iconForKey(CategoryAppearance.defaultIconKey("c-1"))
-        unstored.tint shouldBe SurferCategoryPalette.tintForHue(CategoryAppearance.defaultHue("c-1"))
+        SurferCategoryPalette.iconFor("c-1") shouldBe
+            SurferCategoryPalette.iconForKey(CategoryAppearance.defaultIconKey("c-1"))
+        SurferCategoryPalette.tintIndexFor("c-1") shouldBe
+            SurferCategoryPalette.tintIndexForHue(CategoryAppearance.defaultHue("c-1"))
     }
 
     "an off-palette hue snaps to the nearest tint instead of disappearing" {
         // 165 is 3 degrees from the mint hue (162) and far from everything else.
-        SurferCategoryPalette.tintForHue(165) shouldBe SurferCategoryPalette.tints[0]
+        SurferCategoryPalette.tintIndexForHue(165) shouldBe 0
         // 355 wraps past 360 to reach clay (8) rather than settling on rose (340).
-        SurferCategoryPalette.tintForHue(355) shouldBe SurferCategoryPalette.tints[6]
+        SurferCategoryPalette.tintIndexForHue(355) shouldBe 6
     }
 })

@@ -63,6 +63,26 @@ object AppColors {
      */
     val Warning = Color(0xFFA97110)
 
+    /**
+     * Category tints, in palette order (mint, amber, indigo, citrus, plum, rose, clay, moss).
+     * Chosen against the light surface; [Dark.CategoryTints] lifts the same hues for the dark
+     * one. Consumed through `SemanticColors.categoryTints` / `SurferCategoryPalette.tints` —
+     * screens and components never index into this list directly.
+     *
+     * Positionally paired with `SurferCategoryPalette.hues`; both must stay in lockstep with
+     * `CategoryAppearance` in the domain module.
+     */
+    val CategoryTints: List<Color> = listOf(
+        Color(0xFF2F8E6E), // mint   — hue 162
+        Color(0xFFB5533B), // amber  — hue  35
+        Color(0xFF2E5AA8), // indigo — hue 258
+        Color(0xFFA06A1E), // citrus — hue  68
+        Color(0xFF6B4E99), // plum   — hue 303
+        Color(0xFFB54A6B), // rose   — hue 340
+        Color(0xFFB54744), // clay   — hue   8
+        Color(0xFF6B7D3D), // moss   — hue  90
+    )
+
     // Dark theme overrides
     object Dark {
         val Primary = Color(0xFF6EDD72)
@@ -108,5 +128,25 @@ object AppColors {
 
         /** Same amber, lifted to the mockup's dark-scheme lightness (`oklch(78% 0.13 68)`). */
         val Warning = Color(0xFFE9B45E)
+
+        /**
+         * [AppColors.CategoryTints] with the same hues taken to the lightness the dark scheme's
+         * other accents sit at (HSL L 72% / S 55% — the rule that already produces [Expense] and
+         * [Transfer] from their light counterparts). The light tints are mid-dark on the dark
+         * surface, both as the icon tint and as the 18% wash behind it in `SurferCategoryBubble`.
+         *
+         * Index 2 (indigo) and index 6 (clay) are the same colours as [Transfer] and [Expense]
+         * in the light palette, so they reuse the dark values of those accents verbatim.
+         */
+        val CategoryTints: List<Color> = listOf(
+            Color(0xFF90DFC4), // mint
+            Color(0xFFDFA090), // amber
+            Transfer, //          indigo
+            Color(0xFFDFBE90), // citrus
+            Color(0xFFAF90DF), // plum
+            Color(0xFFDF90A9), // rose
+            Expense, //           clay
+            Color(0xFFC9DF90), // moss
+        )
     }
 }

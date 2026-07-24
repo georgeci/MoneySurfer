@@ -63,7 +63,7 @@ fun SurferTransactionLine(
     onClick: (() -> Unit)? = null,
 ) {
     val categorySeed = categoryHueSeed?.takeIf { it.isNotBlank() }
-    val categoryTint = categorySeed?.let(SurferCategoryPalette::tintFor)
+    val categoryTint = categorySeed?.let { SurferCategoryPalette.tintFor(it) }
     val leadingIcon = categorySeed?.let(SurferCategoryPalette::iconFor) ?: icon
     val leadingIconTint = categoryTint ?: iconTint
     val leadingIconBackground = categoryTint?.copy(alpha = 0.18f) ?: iconBackground
