@@ -167,7 +167,7 @@ allprojects {
 // Applied per-module in `subprojects { afterEvaluate { ... } }` rather than as a
 // single root `sonar.coverage.exclusions`: coverage exclusion patterns are matched
 // against each file's path *relative to its own module's baseDir*, and the root
-// property is inherited by every submodule — so a root-level `feature/dashboard/**`
+// property is inherited by every submodule — so a root-level `shared/**`
 // would be matched against `src/commonMain/kotlin/...` inside that module and never
 // hit anything. `**/*` scoped to the module itself is unambiguous.
 //
@@ -177,12 +177,6 @@ val coverageExcludedProjects = setOf(
     ":shared",
     ":sync:no-op",
     ":feature",
-    ":feature:dashboard",
-    ":feature:settings",
-    ":feature:transaction",
-    ":feature:account",
-    ":feature:category",
-    ":feature:workspace",
     ":androidApp",
     ":androidApp-offline",
     ":sync-test-fixtures",
@@ -305,6 +299,13 @@ dependencies {
     kover(projects.uikit)
     kover(projects.feature.login)
     kover(projects.feature.goal)
+    kover(projects.feature.account)
+    kover(projects.feature.budget)
+    kover(projects.feature.category)
+    kover(projects.feature.dashboard)
+    kover(projects.feature.settings)
+    kover(projects.feature.transaction)
+    kover(projects.feature.workspace)
     kover(projects.utils)
     kover(projects.navigation)
     // Test-only module: contributes no production classes of its own, but its

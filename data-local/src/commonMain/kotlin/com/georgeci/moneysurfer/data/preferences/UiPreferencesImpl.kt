@@ -1,6 +1,7 @@
 package com.georgeci.moneysurfer.data.preferences
 
 import com.georgeci.moneysurfer.data.datastore.UiSettingsDataSource
+import com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutConfig
 import com.georgeci.moneysurfer.domain.preferences.AccentSeed
 import com.georgeci.moneysurfer.domain.preferences.ContainerStyle
 import com.georgeci.moneysurfer.domain.preferences.PaletteSource
@@ -40,6 +41,11 @@ class UiPreferencesImpl(
             runCatching { TransactionPeriodMode.valueOf(stored) }.getOrDefault(TransactionPeriodMode.DEFAULT)
         },
         toStored = { mode -> mode.name },
+    )
+
+    override val dashboardLayout: Pref<DashboardLayoutConfig> = src.dashboardLayout.asPref(
+        fromStored = DashboardLayoutCodec::decode,
+        toStored = DashboardLayoutCodec::encode,
     )
 }
 

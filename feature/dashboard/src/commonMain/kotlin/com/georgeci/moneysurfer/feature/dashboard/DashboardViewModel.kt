@@ -2,11 +2,13 @@ package com.georgeci.moneysurfer.feature.dashboard
 
 import arrow.optics.optics
 import com.georgeci.moneysurfer.domain.OfflineBuildFlags
+import com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutConfig
 import com.georgeci.moneysurfer.domain.formatter.MoneyFormatter
 import com.georgeci.moneysurfer.domain.model.Account
 import com.georgeci.moneysurfer.domain.model.SavingsGoalSummary
 import com.georgeci.moneysurfer.domain.model.Transaction
 import com.georgeci.moneysurfer.domain.model.formattedTotalsByCurrency
+import com.georgeci.moneysurfer.domain.preferences.UiPreferences
 import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.GoalId
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
@@ -16,6 +18,7 @@ import com.georgeci.moneysurfer.domain.usecase.GetGoalsUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetRecentTransactionsUseCase
 import com.georgeci.moneysurfer.utils.MviViewModel
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import org.koin.core.annotation.KoinViewModel
 
@@ -24,12 +27,22 @@ class DashboardViewModel(
     private val getAccounts: GetAccountsUseCase,
     private val getRecentTransactions: GetRecentTransactionsUseCase,
     private val getGoals: GetGoalsUseCase,
+    uiPreferences: UiPreferences,
     offlineBuildFlags: OfflineBuildFlags,
 ) : MviViewModel<DashboardState, DashboardEvent, DashboardEffect>(
     initialState = DashboardState.Loading,
 ) {
 
     private val isOffline: Boolean = offlineBuildFlags.isOffline
+
+    /**
+     * Widget order and visibility. Normalized again here so the screen renders a sound layout
+     * whatever supplies the pref — the DataStore-backed binding already normalizes on decode, but
+     * an in-memory or future remote one need not, and `normalized()` is idempotent.
+     */
+    private val layout = uiPreferences.dashboardLayout.flow
+        .map { it.normalized() }
+        .onStart { emit(DashboardLayoutConfig.DEFAULT) }
 
     init {
         observeDashboard()
@@ -64,7 +77,8 @@ class DashboardViewModel(
                 getAccounts().onStart { emit(emptyList()) },
                 getRecentTransactions(),
                 getGoals(),
-            ) { accounts, transactions, goals ->
+                layout,
+            ) { accounts, transactions, goals, layoutConfig ->
                 val totals = accounts.formattedTotalsByCurrency()
                 DashboardState.Content(
                     accounts = accounts.map { it.toUi() },
@@ -80,6 +94,7 @@ class DashboardViewModel(
                     formattedTrendDelta = null,
                     goals = goals.take(DASHBOARD_GOALS_LIMIT).map { it.toUi() },
                     isOffline = isOffline,
+                    layout = layoutConfig,
                 )
             }.collect { newContent -> updateState { newContent } }
         }
@@ -130,6 +145,8 @@ sealed interface DashboardState {
         val formattedTrendDelta: String?,
         val goals: List<GoalUi> = emptyList(),
         val isOffline: Boolean = false,
+        /** Which widgets the screen renders, in order. */
+        val layout: DashboardLayoutConfig = DashboardLayoutConfig.DEFAULT,
     ) : DashboardState {
 
         /**
