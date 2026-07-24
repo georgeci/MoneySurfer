@@ -21,7 +21,7 @@ never called from anywhere.
 
 ```
 ViewModel coroutine throws
-  └─ MviViewModel.launch catches
+  └─ MviViewModel.launch catches (CancellationException rethrown — not an error)
        ├─ Logger.e(throwable)                      ← always, never swallowed
        │    └─ CrashReportingLogWriter             ← Kermit → Crashlytics
        │         ├─ crashReporter.log(...)         breadcrumb (Warn+)
@@ -61,9 +61,11 @@ with their back stack intact.
 - **Breadcrumbs** — every Kermit line at `Warn` or above, as
   `SEVERITY/Tag: message`.
 - **Non-fatals** — every `Error`/`Assert` line that carries a throwable.
-- **User id** — the session's Firebase uid, mirrored by
-  `bindCrashReportingUser` from `SessionPointers.currentFirebaseUid`; cleared on
-  sign-out.
+- **User id** — the session's Firebase uid, passed to `installCrashReporting`
+  from `SessionPointers.currentFirebaseUid` and mirrored for the lifetime of the
+  process; cleared on sign-out. The collector lives on a single process scope
+  behind the same idempotency latch as the install, so repeated `initKoin` calls
+  (tests, previews) neither stack collectors nor leak scopes.
 - **Native crashes** — via the Gradle plugin's
   `nativeSymbolUploadEnabled` on Android and the `Upload Crashlytics dSYMs`
   build phase on iOS.

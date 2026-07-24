@@ -1,8 +1,10 @@
 package com.georgeci.moneysurfer.utils
 
+import androidx.lifecycle.ViewModelStore
 import app.cash.turbine.test
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
@@ -17,6 +19,9 @@ private class TestViewModel : MviViewModel<String, Unit, Unit>(initialState = ""
 
     fun failHandled(error: Throwable, onError: (Throwable) -> Unit) =
         launch(onError = onError) { throw error }
+
+    fun awaitCancellation(onError: (Throwable) -> Unit) =
+        launch(onError = onError) { CompletableDeferred<Unit>().await() }
 }
 
 class MviViewModelTest : StringSpec({
@@ -46,6 +51,29 @@ class MviViewModelTest : StringSpec({
                 TestViewModel().failHandled(failure) { handled = it }
 
                 handled shouldBe failure
+                expectNoEvents()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+    }
+
+    // Cancelling a scope is how structured concurrency unwinds, not an app failure:
+    // treating it as one would raise the global boundary on every screen exit.
+    "cancelling the view model is not reported as an error" {
+        runTest {
+            var handled: Throwable? = null
+
+            UnhandledErrors.errors.test {
+                // Go through a ViewModelStore rather than poking the scope directly:
+                // this is the real teardown a screen leaving composition triggers.
+                val store = ViewModelStore()
+                val viewModel = TestViewModel()
+                store.put("test", viewModel)
+
+                viewModel.awaitCancellation { handled = it }
+                store.clear()
+
+                handled shouldBe null
                 expectNoEvents()
                 cancelAndIgnoreRemainingEvents()
             }

@@ -3,11 +3,7 @@ package com.georgeci.moneysurfer.di
 import com.georgeci.moneysurfer.domain.auth.SessionPointers
 import com.georgeci.moneysurfer.domain.logging.configureLogging
 import com.georgeci.moneysurfer.domain.telemetry.CrashReporter
-import com.georgeci.moneysurfer.domain.telemetry.bindCrashReportingUser
 import com.georgeci.moneysurfer.domain.telemetry.installCrashReporting
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import org.koin.core.KoinApplication
 import org.koin.core.module.Module
 import org.koin.dsl.KoinAppDeclaration
@@ -45,14 +41,13 @@ fun initKoin(
     // Crashlytics; offline/desktop/test graphs bind a no-op or nothing at all, hence
     // getOrNull.
     koinApplication.koin.getOrNull<CrashReporter>()?.let { crashReporter ->
-        installCrashReporting(crashReporter, isDebug)
-        koinApplication.koin.getOrNull<SessionPointers>()?.let { session ->
-            bindCrashReportingUser(
-                crashReporter = crashReporter,
-                userIds = session.currentFirebaseUid.flow,
-                scope = CoroutineScope(SupervisorJob() + Dispatchers.Default),
-            )
-        }
+        installCrashReporting(
+            crashReporter = crashReporter,
+            isDebug = isDebug,
+            userIds = koinApplication.koin.getOrNull<SessionPointers>()
+                ?.currentFirebaseUid
+                ?.flow,
+        )
     }
 
     return koinApplication

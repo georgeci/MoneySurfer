@@ -9,6 +9,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalForInheritanceCoroutinesApi
 import kotlinx.coroutines.flow.StateFlow
@@ -36,13 +37,18 @@ abstract class MviViewModel<STATE : Any, EVENT, SIDE_EFFECT : Any>(
     }
 
     /**
-     * Runs [block] on [viewModelScope], catching whatever it throws.
+     * Runs [block] on [viewModelScope], catching every failure it produces.
      *
      * Failures are never swallowed: the throwable is always logged at Error severity,
      * which is what `CrashReportingLogWriter` turns into a Crashlytics non-fatal. What
      * [onError] controls is only who renders it — pass a handler to show the failure
      * inside the screen's own state, or leave it null to escalate to the global error
      * boundary via [UnhandledErrors] (issue #78).
+     *
+     * [CancellationException] is rethrown rather than handled: it is how structured
+     * concurrency unwinds a cancelled scope, not an app error. Swallowing it would log
+     * "Unhandled error" — and raise the global boundary — every time a screen leaves
+     * composition and `viewModelScope` is cleared.
      */
     protected fun launch(
         onError: ((Throwable) -> Unit)? = null,
@@ -51,9 +57,11 @@ abstract class MviViewModel<STATE : Any, EVENT, SIDE_EFFECT : Any>(
         viewModelScope.launch {
             try {
                 block()
+            } catch (e: CancellationException) {
+                throw e
             } catch (
                 @Suppress("TooGenericExceptionCaught")
-                e: Exception,
+                e: Throwable,
             ) {
                 Logger.withTag(logTag).e(e) { "Unhandled error in $logTag" }
                 if (onError != null) onError(e) else UnhandledErrors.report(e)

@@ -4,10 +4,20 @@ import co.touchlab.kermit.Logger
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runCurrent
+import kotlinx.coroutines.withContext
+
+private const val CollectorSettleMillis = 200L
+
+/** Lets the process-scoped uid collector catch up with the flow it observes. */
+private suspend fun settleCollector() {
+    withContext(Dispatchers.Default) { delay(CollectorSettleMillis) }
+}
 
 class CrashReportingTest : StringSpec({
 
@@ -54,6 +64,23 @@ class CrashReportingTest : StringSpec({
         Logger.withTag("Spec").e(failure) { "it broke" }
 
         reporter.recorded shouldContainExactly listOf(failure)
+    }
+
+    "installing twice does not stack uid collectors" {
+        val reporter = FakeCrashReporter()
+        val uids = MutableStateFlow<String?>("uid-1")
+
+        installCrashReporting(reporter, isDebug = false, userIds = uids)
+        installCrashReporting(reporter, isDebug = false, userIds = uids)
+        // The collector runs on the install's own process scope (Dispatchers.Default),
+        // so let it settle rather than driving a scheduler we don't own. Settling before
+        // the second value also keeps StateFlow from conflating the initial one away.
+        settleCollector()
+        uids.value = "uid-2"
+        settleCollector()
+
+        // A stacked second collector would have doubled both.
+        reporter.userIds shouldContainExactly listOf("uid-1", "uid-2")
     }
 
     "the user id follows the session" {
