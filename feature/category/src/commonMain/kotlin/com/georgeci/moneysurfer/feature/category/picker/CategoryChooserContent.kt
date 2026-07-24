@@ -1,18 +1,14 @@
 package com.georgeci.moneysurfer.feature.category.picker
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -24,6 +20,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.georgeci.moneysurfer.uikit.components.SurferAddNewCard
+import com.georgeci.moneysurfer.uikit.components.SurferBottomSheetContent
 import com.georgeci.moneysurfer.uikit.components.SurferCategoryPalette
 import com.georgeci.moneysurfer.uikit.components.SurferSearchField
 import com.georgeci.moneysurfer.uikit.components.base.SurferSectionLabel
@@ -69,17 +66,7 @@ internal fun CategoryChooserContent(
     val expenseItems = filtered.filterNot { it.isIncome }
     val incomeItems = filtered.filter { it.isIncome }
 
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(bottom = 16.dp),
-    ) {
-        Text(
-            text = title,
-            style = AppTheme.typography.titleMedium,
-            color = AppTheme.materialColors.onSurface,
-            modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 4.dp, bottom = 12.dp),
-        )
+    SurferBottomSheetContent(title = title, modifier = modifier) {
         SurferSearchField(
             value = query,
             onValueChange = { query = it },
@@ -88,15 +75,12 @@ internal fun CategoryChooserContent(
         )
 
         if (createNewLabel != null && onCreateNewClick != null) {
-            Spacer(Modifier.height(12.dp))
             SurferAddNewCard(
                 label = createNewLabel,
                 onClick = onCreateNewClick,
                 modifier = Modifier.padding(horizontal = 16.dp),
             )
         }
-
-        Spacer(Modifier.height(12.dp))
 
         LazyVerticalGrid(
             columns = GridCells.Fixed(4),

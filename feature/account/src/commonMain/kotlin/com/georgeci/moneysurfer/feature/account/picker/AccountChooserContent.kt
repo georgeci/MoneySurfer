@@ -2,21 +2,17 @@ package com.georgeci.moneysurfer.feature.account.picker
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -26,15 +22,13 @@ import com.georgeci.moneysurfer.uikit.atom.SurferCard
 import com.georgeci.moneysurfer.uikit.atom.SurferIconBubble
 import com.georgeci.moneysurfer.uikit.atom.SurferSelectionRadio
 import com.georgeci.moneysurfer.uikit.components.SurferAddNewCard
+import com.georgeci.moneysurfer.uikit.components.SurferBottomSheetContent
 import com.georgeci.moneysurfer.uikit.components.base.SurferSplitAmount
 import com.georgeci.moneysurfer.uikit.components.base.SurferSplitAmountTier
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.preview.SurferBottomSheetPreview
 import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
-import moneysurfer.uikit.generated.resources.uikit_close
-import org.jetbrains.compose.resources.stringResource
-import moneysurfer.uikit.generated.resources.Res as UikitRes
 
 internal data class AccountPickerRow(
     val id: AccountId,
@@ -68,43 +62,11 @@ internal fun AccountChooserContent(
     transferInsteadLabel: String? = null,
     onTransferInstead: () -> Unit = {},
 ) {
-    Column(modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 20.dp, end = 8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Text(
-                text = title,
-                style = AppTheme.typography.titleMedium,
-                color = AppTheme.materialColors.onSurface,
-                modifier = Modifier.weight(1f),
-            )
-            Box(
-                modifier = Modifier
-                    .size(36.dp)
-                    .clip(CircleShape)
-                    .clickable(onClick = onClose),
-                contentAlignment = Alignment.Center,
-            ) {
-                Icon(
-                    imageVector = SurferIcons.Close,
-                    // The only content of the button, so it has to carry its name.
-                    contentDescription = stringResource(UikitRes.string.uikit_close),
-                    tint = AppTheme.materialColors.onSurfaceVariant,
-                    modifier = Modifier.size(18.dp),
-                )
-            }
-        }
-
-        Text(
-            text = summary,
-            style = AppTheme.typography.bodySmall,
-            color = AppTheme.materialColors.onSurfaceVariant,
-            modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 2.dp, bottom = 8.dp),
-        )
-
+    SurferBottomSheetContent(
+        title = title,
+        subtitle = summary,
+        onClose = onClose,
+    ) {
         Column(
             modifier = Modifier.padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),
@@ -118,8 +80,6 @@ internal fun AccountChooserContent(
             }
         }
 
-        Spacer(Modifier.height(12.dp))
-
         SurferAddNewCard(
             label = addNewLabel,
             subtitle = addNewSubtitle,
@@ -128,7 +88,6 @@ internal fun AccountChooserContent(
         )
 
         if (transferInsteadLabel != null) {
-            Spacer(Modifier.height(10.dp))
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
