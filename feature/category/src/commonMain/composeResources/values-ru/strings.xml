@@ -31,6 +31,10 @@
     <string name="category_creation_color_label">Цвет</string>
     <string name="category_creation_field_parent">Родительская категория</string>
     <string name="category_creation_parent_none">Без родителя</string>
+    <string name="category_creation_cap_label">Лимит на месяц</string>
+    <string name="category_creation_cap_hint">Создаёт месячный бюджет для этой категории. Оставьте пустым, если лимит не нужен.</string>
+    <string name="category_creation_cap_managed">Задан бюджетом «%1$s»</string>
+    <string name="category_creation_cap_managed_hint">Категория входит в общий бюджет. Измените лимит в разделе «Бюджеты», чтобы у него остался один владелец.</string>
     <string name="category_creation_untitled">Без названия</string>
 
     <!-- Categories management screen -->

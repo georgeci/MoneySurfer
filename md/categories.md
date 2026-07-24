@@ -111,9 +111,42 @@ the parent-cycle guard.
 
 ---
 
+## Quick cap — what the control does (issue #248)
+
+Shipped. The category form's monthly-cap field writes a `Budget` with
+`categoryIds = [thisCategory]`, `period = MONTHLY` and `startDate = today`, named after the
+category. Typing an amount creates it, changing the amount updates it, clearing the field deletes
+it. Nothing is stored on `Category`.
+
+Which budget the control speaks for is decided by `resolveCategoryCapCoverage()` in
+[domain/model/CategoryCapCoverage.kt](../domain/src/commonMain/kotlin/com/georgeci/moneysurfer/domain/model/CategoryCapCoverage.kt),
+so the screen and the write path cannot disagree:
+
+| Budgets naming this category | Control |
+|---|---|
+| none | editable, empty — saving an amount creates the backing budget |
+| exactly one, naming only this category | editable, prefilled — that budget *is* the cap |
+| one naming other categories too, or more than one | **read-only**, naming the budget: "Set by the … budget" |
+
+**The read-only case is the decision the issue asked for.** A category already inside a shared
+budget must not also get a cap from the shortcut — that is two limits on one category with no
+defined winner, exactly what decision 1 exists to prevent. The form says which budget owns the
+limit and sends the user to Budgets to change it, rather than silently creating a second one.
+The write path re-resolves coverage instead of trusting the screen, so a budget created while the
+form was open cannot be overwritten by a stale state.
+
+Two kinds of budget deliberately do **not** count as coverage:
+
+- **archived** ones (`isActive = false`) — they limit nothing, so a cap set now is a fresh budget
+  rather than a resurrection;
+- the **all-categories** budget (empty `categoryIds`) — it is the global spending envelope that
+  per-category budgets already live inside, not a competing per-category limit. Counting it would
+  leave the shortcut permanently dead for anyone who keeps a general budget.
+
+The control is offered for expense categories only, since a budget caps spending. Converting an
+expense category to income on the form deletes its backing budget along with it.
+
 ## Follow-up work, tracked separately
 
-- **Quick cap** — the category form's cap control, implemented as a single-category `Budget`.
-  Blocked on the Budgets feature.
 - **`CategoryDetailScreen`** — hero, six-month trend bars, subcategory breakdown and recent
   transactions. Needs per-month aggregate queries that do not exist yet, plus a new route.
