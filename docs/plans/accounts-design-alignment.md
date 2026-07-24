@@ -43,27 +43,26 @@ Account(id, workspaceId, name, type, currencyCode, balance, archived, updatedAt,
 type ∈ { CASH, BANK, CARD, SAVINGS }
 ```
 
-`archivedAt` was added in #307 (DB v29). Still absent: `icon`, `kind`, `last4`,
+`archivedAt` was added by PR #317 (DB v29), which closed issue #307. Still absent: `icon`, `kind`, `last4`,
 sort order, per-account sync state, and any store for the "Extra details" set
 (IBAN, description, BIC/SWIFT, card last 4, bank URL, branch phone, custom
 fields).
 
-## What shipped since the first review (#308)
+## What shipped since the first review (PR #308)
 
 | Item | Where | State |
 |---|---|---|
-| Default account type `BANK` | `AccountNavGraph.kt` | done (#307) |
-| `archivedAt` persisted + synced, "Archived Nov 2024" row | `AccountsManageScreen.kt:396` | done (#307) |
-| Hardcoded "Synced 2 min ago" removed; `syncedLabel` now optional | `SurferAccountDetailsHeroCard.kt:60` | done (#307) |
-| Chooser footer "Transfer between accounts instead" | `AccountChooserContent.kt:166` | done (#307) |
-| Per-currency dashboard totals (was: summed across currencies) | `DashboardViewModel.kt` | done (#307) |
-| Create/update/delete moved behind use cases | `domain/usecase/*AccountUseCase.kt` | done (#307) |
-| Currency picker field + bottom sheet | `SurferCurrencyPickerField.kt`, `SurferCurrencyBottomSheet.kt` | done (#312), resolves #277 |
-| Real 30-day balance chart (was static strings) | `GetAccountBalanceSeriesUseCase.kt`, `AccountDetailsScreen.kt:179` | done (#313) |
+| Default account type `BANK` | `AccountNavGraph.kt` | PR #317 (closed issue #307) |
+| `archivedAt` persisted + synced, "Archived Nov 2024" row | `AccountsManageScreen.kt:396` | PR #317 |
+| Hardcoded "Synced 2 min ago" removed; `syncedLabel` now optional | `SurferAccountDetailsHeroCard.kt:60` | PR #317 |
+| Chooser footer "Transfer between accounts instead" | `AccountChooserContent.kt:166` | PR #317 |
+| Per-currency dashboard totals (was: summed across currencies) | `DashboardViewModel.kt` | PR #317 |
+| Create/update/delete moved behind use cases | `domain/usecase/*AccountUseCase.kt` | PR #317 |
+| Currency picker field + bottom sheet | `SurferCurrencyPickerField.kt`, `SurferCurrencyBottomSheet.kt` | PR #312, resolves issue #277 |
+| Real 30-day balance chart (was static strings) | `GetAccountBalanceSeriesUseCase.kt`, `AccountDetailsScreen.kt:179` | PR #313 |
 | Manage-list empty state | `AccountsManageScreen.kt:170` | done |
 | Extra-details section hidden in the offline build | `AccountCreationViewModel.kt:63` (`extraDetailsEnabled`) | done |
-| WCAG AA semantic accents | uikit | done (#315) |
-| Accounts design-review gaps | feature/account | done (#317) |
+| WCAG AA semantic accents | uikit | PR #315 |
 
 So sections A3 and most of B from the first review are closed. A1 (persist
 extra details) and A2 (sort order) remain, both behind the design questions.
@@ -88,7 +87,7 @@ a sync DTO, a Room migration, and a display section on details.
 ### A2. Sort order / drag-to-reorder
 
 `AccountsManageScreen.kt:320` draws `SurferDragHandle` and the "Drag to reorder"
-label; `grep sortOrder` over the repo returns nothing. Needs a `sortOrder`
+label; no `sortOrder` symbol exists anywhere in the Kotlin sources. Needs a `sortOrder`
 field, a DAO reorder operation, ordering in sync, and the drag interaction.
 
 ## Contradiction ledger — mockups vs shipped model
@@ -97,7 +96,7 @@ field, a DAO reorder operation, ordering in sync, and the drag interaction.
 |---|---|---|---|
 | C1 | `kind` ("Current"/"Credit") duplicates `type` ("Bank"/"Card") and disagrees per row | **open** | drop `kind`; render the `type` label |
 | C2 | `last4` rendered on CASH and SAVINGS rows, with no way to enter it | **open** | make it the CARD-only projection of the "Card last 4" extra field |
-| C3 | No currency control; `fmt()` hardcodes `€` while seed data has a USD account | **resolved** — per-account picker shipped (#312), `MoneyFormatter.format(money, currencyCode)` everywhere | design seed data still needs the euro sign fixed |
+| C3 | No currency control; `fmt()` hardcodes `€` while seed data has a USD account | **resolved** — per-account picker shipped (PR #312), `MoneyFormatter.format(money, currencyCode)` everywhere | design seed data still needs the euro sign fixed |
 | C4 | Three details-hero variants (`hero` / `stack` / `split`) | **open** | code already implements `hero` (`SurferAccountDetailsHeroCard.kt:51`) — confirm and delete the other two |
 | C5 | "Synced 2 min ago" / "LIVE" are hardcoded strings | **half-resolved** — labels removed from code; real state exists app-wide (`SurferSyncStatus` = Hidden/Syncing/Synced/Failed, fed by `SyncStatusProvider`, rendered in the toolbar) but is **workspace-level, not per-account** | drop the per-account affordance; the toolbar badge is the sync surface |
 | C6 | `archivedAt` display-only in the mockups | **resolved** — persisted, DB v29; rendered as `{type} · Archived {Mon} {YYYY}` | design should state the RU date format |
