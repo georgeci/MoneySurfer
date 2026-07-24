@@ -1,5 +1,6 @@
 package com.georgeci.moneysurfer.data.di
 
+import com.georgeci.moneysurfer.data.remote.ExchangeRateApiConfig
 import com.georgeci.moneysurfer.domain.repositories.FirebaseConfig
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.analytics.FirebaseAnalytics
@@ -25,6 +26,10 @@ class RemoteDataModule {
             it.useEmulator(config.emulatorHost, config.authPort)
         }
     }
+
+    /** FX provider endpoint. Bound here rather than defaulted in the source so it stays swappable. */
+    @Single
+    fun exchangeRateApiConfig(): ExchangeRateApiConfig = ExchangeRateApiConfig()
 
     @Single
     fun firebaseFirestore(config: FirebaseConfig): FirebaseFirestore = Firebase.firestore.also {

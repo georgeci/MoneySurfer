@@ -5,28 +5,36 @@ import com.georgeci.moneysurfer.domain.OfflineBuildFlags
 import com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutConfig
 import com.georgeci.moneysurfer.domain.formatter.MoneyFormatter
 import com.georgeci.moneysurfer.domain.model.Account
+import com.georgeci.moneysurfer.domain.model.ConvertedTotal
+import com.georgeci.moneysurfer.domain.model.ExchangeRateSnapshot
 import com.georgeci.moneysurfer.domain.model.SavingsGoalSummary
 import com.georgeci.moneysurfer.domain.model.Transaction
-import com.georgeci.moneysurfer.domain.model.formattedTotalsByCurrency
 import com.georgeci.moneysurfer.domain.preferences.UiPreferences
 import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.GoalId
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
+import com.georgeci.moneysurfer.domain.usecase.ConvertAccountsTotalUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetAccountsUseCase
+import com.georgeci.moneysurfer.domain.usecase.GetExchangeRatesUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetGoalsUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetRecentTransactionsUseCase
 import com.georgeci.moneysurfer.utils.MviViewModel
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import org.koin.core.annotation.KoinViewModel
+import kotlin.time.Instant
 
 @KoinViewModel
 class DashboardViewModel(
     private val getAccounts: GetAccountsUseCase,
     private val getRecentTransactions: GetRecentTransactionsUseCase,
     private val getGoals: GetGoalsUseCase,
+    private val getExchangeRates: GetExchangeRatesUseCase,
+    private val convertAccountsTotal: ConvertAccountsTotalUseCase,
     uiPreferences: UiPreferences,
     offlineBuildFlags: OfflineBuildFlags,
 ) : MviViewModel<DashboardState, DashboardEvent, DashboardEffect>(
@@ -77,17 +85,19 @@ class DashboardViewModel(
                 getAccounts().onStart { emit(emptyList()) },
                 getRecentTransactions(),
                 getGoals(),
+                getExchangeRates().onStart { emit(null) },
                 layout,
-            ) { accounts, transactions, goals, layoutConfig ->
-                val totals = accounts.formattedTotalsByCurrency()
+            ) { accounts, transactions, goals, rates, layoutConfig ->
+                val balance = accounts.convertedTotal(rates)?.toBalanceUi()
                 DashboardState.Content(
                     accounts = accounts.map { it.toUi() },
                     transactions = transactions
                         .filter { it.type != TransactionType.OPENING_BALANCE }
                         .take(RECENT_TRANSACTIONS_LIMIT)
                         .map { it.toUi() },
-                    formattedTotalBalance = totals.firstOrNull(),
-                    otherCurrencyTotals = totals.drop(1),
+                    formattedTotalBalance = balance?.headline,
+                    otherCurrencyTotals = balance?.notConverted.orEmpty(),
+                    ratesAsOf = balance?.asOf,
                     workspaceName = null,
                     workspaceInitial = null,
                     greeting = null,
@@ -99,6 +109,43 @@ class DashboardViewModel(
             }.collect { newContent -> updateState { newContent } }
         }
     }
+
+    /**
+     * The converted total. `null` until a base currency is known — a workspace is always selected
+     * by the time accounts exist, so this only covers the first frame after launch and the
+     * signed-out state, both of which render the empty balance anyway.
+     */
+    private fun List<Account>.convertedTotal(rates: ExchangeRateSnapshot?): ConvertedTotal? =
+        rates?.let { convertAccountsTotal(this, it.baseCurrency, it.rates) }
+
+    /**
+     * Splits the total into what the balance widget renders.
+     *
+     * When nothing could be priced in the base currency — a workspace whose accounts are all in
+     * currencies the cache does not cover — the headline falls back to the largest remaining
+     * bucket instead of going empty. `formattedTotalBalance == null` is the screen's "no accounts
+     * at all" signal, and letting an unconvertible balance trip it would tell a user who *has*
+     * money to add their first account.
+     */
+    private fun ConvertedTotal.toBalanceUi(): BalanceUi {
+        val leftOver = unconverted.map { MoneyFormatter.format(it.amount, it.currencyCode) }
+        return when (val converted = total) {
+            null -> BalanceUi(
+                headline = leftOver.firstOrNull(),
+                notConverted = leftOver.drop(1),
+                asOf = null,
+            )
+            else -> BalanceUi(
+                headline = MoneyFormatter.format(converted, baseCurrency),
+                notConverted = leftOver,
+                asOf = asOf?.asIsoDate(),
+            )
+        }
+    }
+
+    /** ISO date — the "as of" label has to be unambiguous, and the app ships no date locale rules. */
+    private fun Instant.asIsoDate(): String =
+        toLocalDateTime(TimeZone.currentSystemDefault()).date.toString()
 
     private fun Account.toUi() = AccountUi(
         id = id,
@@ -132,13 +179,23 @@ sealed interface DashboardState {
     data class Content(
         val accounts: List<AccountUi>,
         val transactions: List<TransactionUi>,
-        /** Total for the most-used currency, or null when there are no accounts. */
+        /**
+         * Every account balance converted into the workspace base currency, or null when no
+         * account could be priced there (no accounts at all, or none in a currency the cached
+         * rates cover).
+         */
         val formattedTotalBalance: String?,
         /**
-         * Totals for the remaining currencies. Shown as a note beside the headline: adding them
-         * into it would need FX rates the app does not have, and dropping them was the old bug.
+         * Per-currency totals for the accounts no cached rate could convert. Shown as a note
+         * beside the headline — dropping them was the old bug, and they are never folded into
+         * the headline at a rate the app does not have.
          */
         val otherCurrencyTotals: List<String> = emptyList(),
+        /**
+         * ISO date the converting rates were published, or null when the total needed no rates.
+         * Renders as the staleness signal so a total computed offline says how old it is.
+         */
+        val ratesAsOf: String? = null,
         val workspaceName: String?,
         val workspaceInitial: String?,
         val greeting: String?,
@@ -161,6 +218,13 @@ sealed interface DashboardState {
 
     companion object
 }
+
+/** The three strings the balance widget needs, already formatted. */
+private data class BalanceUi(
+    val headline: String?,
+    val notConverted: List<String>,
+    val asOf: String?,
+)
 
 data class AccountUi(
     val id: AccountId,

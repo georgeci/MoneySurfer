@@ -353,7 +353,7 @@
 ## time-policy
 - Title: Time policy
 - File: docs/architecture/data-models.md
-- Lines: 45-68
+- Lines: 46-69
 - Tasks: time, persistence, domain
 
 ## transactions-feature

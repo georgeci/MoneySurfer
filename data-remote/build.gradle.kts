@@ -15,7 +15,25 @@ kotlin {
         namespace = "com.georgeci.moneysurfer.data.remote"
     }
 
+    // Adding the manual jvm+android edge below opts out of the auto-applied
+    // source-set hierarchy, so re-apply the default template explicitly to keep
+    // the iOS (native) intermediates wired to commonMain.
+    applyDefaultHierarchyTemplate()
+
     sourceSets {
+        // JVM and Android share the same java.net HTTP stack, so the plain-GET actual behind the
+        // FX fetch lives once in this intermediate set rather than as two identical twins. Only
+        // the iOS actual (NSURLSession) differs.
+        val jvmAndroidMain by creating {
+            dependsOn(commonMain.get())
+        }
+        jvmMain {
+            dependsOn(jvmAndroidMain)
+        }
+        androidMain {
+            dependsOn(jvmAndroidMain)
+        }
+
         commonMain {
             dependencies {
                 implementation(libs.kotlin.stdlib)
@@ -24,6 +42,7 @@ kotlin {
                 implementation(libs.arrow.core)
                 implementation(libs.kermit)
                 implementation(libs.kotlinx.serialization.core)
+                implementation(libs.kotlinx.serialization.json)
                 implementation(libs.gitlive.firebase.common)
                 implementation(libs.gitlive.firebase.analytics)
                 implementation(libs.gitlive.firebase.auth)
