@@ -4,12 +4,23 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import com.georgeci.moneysurfer.uikit.tokens.AppColors
 
+/**
+ * Deliberately not `@Immutable`: [categoryTints] is a plain [List], so the deep-immutability
+ * contract that annotation promises cannot be enforced at the type level. Nothing needs it —
+ * this travels through [LocalSemanticColors], a *static* composition local that does not track
+ * reads, and is never passed as a composable parameter.
+ */
 data class SemanticColors(
     val income: Color = AppColors.Income,
     val expense: Color = AppColors.Expense,
     val transfer: Color = AppColors.Transfer,
     /** Caution accent — a budget past its alert threshold but not yet over. */
     val warning: Color = AppColors.Warning,
+    /**
+     * Category tints in palette order. Read through `SurferCategoryPalette`, which owns the
+     * hue/icon-key mapping onto this list; call sites go through its resolvers.
+     */
+    val categoryTints: List<Color> = AppColors.CategoryTints,
 )
 
 internal val LightSemanticColors = SemanticColors(
@@ -17,6 +28,7 @@ internal val LightSemanticColors = SemanticColors(
     expense = AppColors.Expense,
     transfer = AppColors.Transfer,
     warning = AppColors.Warning,
+    categoryTints = AppColors.CategoryTints,
 )
 
 internal val DarkSemanticColors = SemanticColors(
@@ -24,6 +36,7 @@ internal val DarkSemanticColors = SemanticColors(
     expense = AppColors.Dark.Expense,
     transfer = AppColors.Dark.Transfer,
     warning = AppColors.Dark.Warning,
+    categoryTints = AppColors.Dark.CategoryTints,
 )
 
 val LocalSemanticColors = staticCompositionLocalOf { LightSemanticColors }
