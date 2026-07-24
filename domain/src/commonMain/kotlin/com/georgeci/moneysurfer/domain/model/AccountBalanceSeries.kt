@@ -27,8 +27,6 @@ data class AccountBalanceSeries(
     companion object {
         /** Window the account details chart draws, matching its "Balance · 30 days" label. */
         const val DEFAULT_DAYS: Int = 30
-
-        val Empty = AccountBalanceSeries(points = emptyList(), delta = Money.zero())
     }
 }
 
