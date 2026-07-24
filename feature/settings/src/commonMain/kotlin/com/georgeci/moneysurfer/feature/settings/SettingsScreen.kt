@@ -43,6 +43,8 @@ import moneysurfer.feature.settings.generated.resources.settings_about_supportin
 import moneysurfer.feature.settings.generated.resources.settings_appearance_hub_supporting
 import moneysurfer.feature.settings.generated.resources.settings_appearance_hub_supporting_dynamic
 import moneysurfer.feature.settings.generated.resources.settings_appearance_hub_title
+import moneysurfer.feature.settings.generated.resources.settings_backup
+import moneysurfer.feature.settings.generated.resources.settings_backup_supporting
 import moneysurfer.feature.settings.generated.resources.settings_budgets_supporting
 import moneysurfer.feature.settings.generated.resources.settings_budgets_title
 import moneysurfer.feature.settings.generated.resources.settings_categories_supporting
@@ -62,6 +64,8 @@ import moneysurfer.feature.settings.generated.resources.settings_members_count_f
 import moneysurfer.feature.settings.generated.resources.settings_pending_invites
 import moneysurfer.feature.settings.generated.resources.settings_pending_invites_supporting_empty
 import moneysurfer.feature.settings.generated.resources.settings_pending_invites_supporting_format
+import moneysurfer.feature.settings.generated.resources.settings_preferences_hub_supporting
+import moneysurfer.feature.settings.generated.resources.settings_preferences_hub_title
 import moneysurfer.feature.settings.generated.resources.settings_section_data
 import moneysurfer.feature.settings.generated.resources.settings_section_help
 import moneysurfer.feature.settings.generated.resources.settings_section_personalization
@@ -80,14 +84,18 @@ import org.koin.compose.viewmodel.koinViewModel
  *
  * [SyncRow], [LogoutRow] and [DeleteAccountRow] are never composed in the offline build;
  * their absence is what the offline golden Maestro flow asserts via `notVisible`.
+ * Everything else — including [PreferencesRow] and [BackupRow] — is composed in both
+ * variants, and the same flow asserts those positively.
  */
 object SettingsTestTags {
     const val Root = "settings:root"
     const val CategoriesRow = "settings:categoriesRow"
     const val BudgetsRow = "settings:budgetsRow"
     const val AppearanceRow = "settings:appearanceRow"
+    const val PreferencesRow = "settings:preferencesRow"
     const val AboutRow = "settings:aboutRow"
     const val SyncRow = "settings:syncRow"
+    const val BackupRow = "settings:backupRow"
     const val CsvRow = "settings:csvRow"
     const val LogoutRow = "settings:logoutRow"
     const val DeleteAccountRow = "settings:deleteAccountRow"
@@ -251,6 +259,14 @@ private fun SettingsContent(
                     trailing = { SurferSettingsChevron() },
                     modifier = Modifier.testTag(SettingsTestTags.AppearanceRow),
                 )
+                SurferSettingsRow(
+                    icon = SurferIcons.Globe,
+                    title = stringResource(Res.string.settings_preferences_hub_title),
+                    supportingText = stringResource(Res.string.settings_preferences_hub_supporting),
+                    onClick = { onEvent(SettingsEvent.OnPreferencesClick) },
+                    trailing = { SurferSettingsChevron() },
+                    modifier = Modifier.testTag(SettingsTestTags.PreferencesRow),
+                )
             }
 
             SurferSettingsGroup(title = stringResource(Res.string.settings_section_data)) {
@@ -264,6 +280,14 @@ private fun SettingsContent(
                         modifier = Modifier.testTag(SettingsTestTags.SyncRow),
                     )
                 }
+                SurferSettingsRow(
+                    icon = SurferIcons.Archive,
+                    title = stringResource(Res.string.settings_backup),
+                    supportingText = stringResource(Res.string.settings_backup_supporting),
+                    onClick = { onEvent(SettingsEvent.OnBackupClick) },
+                    trailing = { SurferSettingsChevron() },
+                    modifier = Modifier.testTag(SettingsTestTags.BackupRow),
+                )
                 SurferSettingsRow(
                     icon = SurferIcons.Download,
                     title = stringResource(Res.string.settings_csv_title),
