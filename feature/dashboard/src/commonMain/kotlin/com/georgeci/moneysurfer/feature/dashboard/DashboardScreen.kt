@@ -41,6 +41,7 @@ import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.uikit.widgets.LocalSurferWidgetSize
 import com.georgeci.moneysurfer.uikit.widgets.SurferAccountItem
 import com.georgeci.moneysurfer.uikit.widgets.SurferAccountsWidget
+import com.georgeci.moneysurfer.uikit.widgets.SurferAddAccountCta
 import com.georgeci.moneysurfer.uikit.widgets.SurferBalanceFootnote
 import com.georgeci.moneysurfer.uikit.widgets.SurferBalanceVariant
 import com.georgeci.moneysurfer.uikit.widgets.SurferBalanceWidget
@@ -307,9 +308,12 @@ private fun AccountsWidget(
         )
         SurferAccountsWidget(
             items = state.accounts.map { it.toWidgetItem() },
-            onAddClick = { onEvent(DashboardEvent.OnAddAccountClick) },
-            addLabel = stringResource(Res.string.dashboard_add_account),
-            addCtaTrailingLabel = stringResource(Res.string.dashboard_add_account_new),
+            addCta = SurferAddAccountCta(
+                label = stringResource(Res.string.dashboard_add_account),
+                onClick = { onEvent(DashboardEvent.OnAddAccountClick) },
+                trailingLabel = stringResource(Res.string.dashboard_add_account_new),
+                testTag = DashboardTestTags.AddAccount,
+            ),
             onItemClick = { item ->
                 item.accountId()?.let { onEvent(DashboardEvent.OnAccountClick(it)) }
             },
@@ -317,7 +321,6 @@ private fun AccountsWidget(
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp)
                 .padding(vertical = if (hero) 8.dp else 6.dp),
-            addTestTag = DashboardTestTags.AddAccount,
         )
     }
 }

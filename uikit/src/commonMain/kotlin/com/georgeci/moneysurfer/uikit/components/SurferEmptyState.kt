@@ -15,7 +15,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -29,7 +28,9 @@ import com.georgeci.moneysurfer.uikit.theme.AppTheme
  * optional call-to-action. Use it when a list or screen has no content yet — the CTA is
  * what turns a dead end into the next step the user should take.
  *
- * [actionTestTag] tags the CTA button so a UI test can tap it without matching localized copy.
+ * To address the CTA from a UI test, tag the block through [modifier] at the call site — the
+ * host screen owns its own selectors, and a dedicated tag parameter here would be one more
+ * argument on an already wide signature.
  */
 @Composable
 fun SurferEmptyState(
@@ -41,7 +42,6 @@ fun SurferEmptyState(
     /** Leading glyph of the CTA. Defaults to `Add` — the common "create the first one" case. */
     actionIcon: ImageVector = SurferIcons.Add,
     onActionClick: (() -> Unit)? = null,
-    actionTestTag: String? = null,
 ) {
     Column(
         modifier = modifier
@@ -84,9 +84,7 @@ fun SurferEmptyState(
                 onClick = onActionClick,
                 style = SurferButtonStyle.Tonal,
                 startIcon = actionIcon,
-                modifier = Modifier
-                    .padding(top = AppTheme.spacing.xSmall)
-                    .then(actionTestTag?.let { Modifier.testTag(it) } ?: Modifier),
+                modifier = Modifier.padding(top = AppTheme.spacing.xSmall),
             )
         }
     }

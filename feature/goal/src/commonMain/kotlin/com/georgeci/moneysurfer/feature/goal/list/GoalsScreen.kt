@@ -44,13 +44,13 @@ import org.koin.compose.viewmodel.koinViewModel
  * Stable selectors for the Goals list — see docs/testing/testing-strategy.md.
  *
  * The FAB is always composed, so on an empty list it sits alongside the empty-state CTA that
- * fires the same event — [AddButton] and [AddEmptyStateButton] are separate tags because both
- * are on screen at once and a flow has to name which one it taps.
+ * fires the same event. [AddButton] names the FAB, which is the one reachable in both states;
+ * the empty-state CTA carries no tag because no flow needs to single it out. Add one — through
+ * `SurferEmptyState`'s `modifier` — if that changes.
  */
 object GoalsTestTags {
     const val Root = "goals:root"
     const val AddButton = "goals:add"
-    const val AddEmptyStateButton = "goals:addEmptyState"
 }
 
 @Composable
@@ -116,7 +116,6 @@ private fun GoalsContent(
                     subtitle = stringResource(Res.string.goals_empty_subtitle),
                     actionLabel = stringResource(Res.string.goals_add),
                     onActionClick = { onEvent(GoalsEvent.OnAddGoalClick) },
-                    actionTestTag = GoalsTestTags.AddEmptyStateButton,
                 )
             }
 

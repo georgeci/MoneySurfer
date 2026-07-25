@@ -35,21 +35,25 @@ data class SurferAccountItem(
 )
 
 /**
- * Accounts widget for the dashboard column.
- *
- * [addTestTag] tags the add-account CTA so a UI test can tap it without matching localized copy;
- * the host screen owns the tag value because the CTA is a step in its flow, not the widget's.
+ * The empty-state "add your first account" affordance: its copy, its click, and the selector a
+ * UI test taps it by. Four arguments describing one control, so they travel as one — the host
+ * screen still owns [testTag], because the CTA is a step in its flow rather than the widget's.
  */
+data class SurferAddAccountCta(
+    val label: String,
+    val onClick: () -> Unit,
+    val trailingLabel: String? = null,
+    val testTag: String? = null,
+)
+
+/** Accounts widget for the dashboard column. */
 @Composable
 fun SurferAccountsWidget(
     items: List<SurferAccountItem>,
-    onAddClick: () -> Unit,
-    addLabel: String,
+    addCta: SurferAddAccountCta,
     modifier: Modifier = Modifier,
     size: SurferWidgetSize = LocalSurferWidgetSize.current,
-    addCtaTrailingLabel: String? = null,
     onItemClick: ((SurferAccountItem) -> Unit)? = null,
-    addTestTag: String? = null,
 ) {
     val hero = size == SurferWidgetSize.Hero
     val visibleItems = if (hero) items else items.take(2)
@@ -71,10 +75,10 @@ fun SurferAccountsWidget(
         // new ones are created from the "Manage" flow.
         if (items.isEmpty()) {
             AddAccountRow(
-                label = addLabel,
-                trailingLabel = addCtaTrailingLabel,
-                onClick = onAddClick,
-                modifier = addTestTag?.let { Modifier.testTag(it) } ?: Modifier,
+                label = addCta.label,
+                trailingLabel = addCta.trailingLabel,
+                onClick = addCta.onClick,
+                modifier = addCta.testTag?.let { Modifier.testTag(it) } ?: Modifier,
             )
         }
     }
@@ -133,9 +137,11 @@ private fun SurferAccountsWidgetHeroPreview() {
                     SurferAccountItem("2", "Emergency Fund", "Savings · •• 7712", "€8,915.00", SurferIcons.Savings),
                     SurferAccountItem("3", "Cash wallet", "Cash", "€180.00", SurferIcons.Cash),
                 ),
-                onAddClick = {},
-                addLabel = "Add account",
-                addCtaTrailingLabel = "New",
+                addCta = SurferAddAccountCta(
+                    label = "Add account",
+                    onClick = {},
+                    trailingLabel = "New",
+                ),
                 modifier = Modifier
                     .fillMaxWidth()
                     .width(360.dp),
@@ -151,9 +157,11 @@ private fun SurferAccountsWidgetEmptyPreview() {
         Box(modifier = Modifier.padding(16.dp)) {
             SurferAccountsWidget(
                 items = emptyList(),
-                onAddClick = {},
-                addLabel = "Add account",
-                addCtaTrailingLabel = "New",
+                addCta = SurferAddAccountCta(
+                    label = "Add account",
+                    onClick = {},
+                    trailingLabel = "New",
+                ),
                 modifier = Modifier.fillMaxWidth(),
             )
         }
