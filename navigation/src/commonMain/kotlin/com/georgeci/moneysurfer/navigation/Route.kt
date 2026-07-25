@@ -137,6 +137,12 @@ sealed interface Route : NavKey {
     data class TransactionCreation(
         val transactionId: String? = null,
         val accountId: String? = null,
+        /**
+         * Read [transactionId] as a template for a brand-new transaction instead of editing it.
+         * A flag rather than a second id field: the screen loads exactly one transaction either
+         * way, and two nullable id fields could disagree about which.
+         */
+        val duplicate: Boolean = false,
     ) : Route
 
     @Serializable

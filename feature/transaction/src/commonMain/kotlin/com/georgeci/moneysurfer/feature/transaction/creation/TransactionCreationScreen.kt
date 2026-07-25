@@ -114,10 +114,26 @@ object TransactionCreationTestTags {
     const val Save = "transactionCreation:save"
 }
 
+private fun transactionCreationSeed(
+    transactionId: TransactionId?,
+    duplicate: Boolean,
+): TransactionCreationSeed? = transactionId?.let {
+    TransactionCreationSeed(
+        transactionId = it,
+        mode = if (duplicate) {
+            TransactionCreationSeed.Mode.Duplicate
+        } else {
+            TransactionCreationSeed.Mode.Edit
+        },
+    )
+}
+
 @Composable
 fun TransactionCreationScreen(
     transactionId: TransactionId? = null,
     accountId: AccountId? = null,
+    /** Treat [transactionId] as a template for a new transaction rather than the row to edit. */
+    duplicate: Boolean = false,
     onNavigateBack: () -> Unit,
     onNavigateToCategoryChooser: (CategoryId?, CategoryType) -> Unit,
     onNavigateToCategoryCreation: () -> Unit,
@@ -126,8 +142,8 @@ fun TransactionCreationScreen(
     pickedAccountId: AccountId? = null,
     transferRequested: Boolean? = null,
     viewModel: TransactionCreationViewModel = koinViewModel(
-        key = "$transactionId:$accountId",
-    ) { parametersOf(transactionId, accountId) },
+        key = "$transactionId:$accountId:$duplicate",
+    ) { parametersOf(transactionCreationSeed(transactionId, duplicate), accountId) },
 ) {
     val state by viewModel.collectAsStateWithLifecycle()
 

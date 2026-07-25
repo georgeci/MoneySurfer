@@ -118,10 +118,17 @@
     <string name="transaction_details_delete_cancel">Отмена</string>
     <string name="transaction_details_type_expense">Расход</string>
     <string name="transaction_details_type_income">Доход</string>
+    <string name="transaction_details_type_transfer">Перевод</string>
     <string name="transaction_details_account_label">Счёт</string>
-    <string name="transaction_details_date_label">Дата</string>
+    <string name="transaction_details_to_account_label">На счёт</string>
+    <string name="transaction_details_from_label">Откуда</string>
+    <string name="transaction_details_to_label">Куда</string>
+    <string name="transaction_details_merchant_label">Продавец</string>
     <string name="transaction_details_category_label">Категория</string>
-    <string name="transaction_details_currency_label">Валюта</string>
+    <!-- Nested category: leaf first, then the parent it sits in ("Кофе · в Рестораны"). -->
+    <string name="transaction_details_category_nested">%1$s · в %2$s</string>
+    <string name="transaction_details_tags_label">Метки</string>
+    <string name="transaction_details_reference_label">Номер</string>
     <string name="transaction_details_duplicate">Дублировать</string>
     <string name="transaction_details_status_posted">Проведена</string>
     <string name="transaction_details_status_planned">Запланирована</string>

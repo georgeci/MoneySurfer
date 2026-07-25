@@ -6,10 +6,13 @@ import com.georgeci.moneysurfer.domain.auth.InMemorySessionPointers
 import com.georgeci.moneysurfer.domain.fixtures.EUR
 import com.georgeci.moneysurfer.domain.fixtures.USD
 import com.georgeci.moneysurfer.domain.fixtures.aCategory
+import com.georgeci.moneysurfer.domain.fixtures.aTransaction
 import com.georgeci.moneysurfer.domain.fixtures.accountId
 import com.georgeci.moneysurfer.domain.fixtures.anAccount
 import com.georgeci.moneysurfer.domain.fixtures.categoryId
 import com.georgeci.moneysurfer.domain.fixtures.dollars
+import com.georgeci.moneysurfer.domain.fixtures.recurringRuleId
+import com.georgeci.moneysurfer.domain.fixtures.transactionId
 import com.georgeci.moneysurfer.domain.fixtures.workspaceId
 import com.georgeci.moneysurfer.domain.model.Account
 import com.georgeci.moneysurfer.domain.model.Category
@@ -20,7 +23,9 @@ import com.georgeci.moneysurfer.domain.primitives.CategoryType
 import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
 import com.georgeci.moneysurfer.domain.primitives.Money
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
+import com.georgeci.moneysurfer.domain.primitives.TransactionStatus
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
+import com.georgeci.moneysurfer.domain.primitives.TransferId
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 import com.georgeci.moneysurfer.domain.repositories.AccountRepository
 import com.georgeci.moneysurfer.domain.repositories.CategoryRepository
@@ -36,6 +41,7 @@ import com.georgeci.moneysurfer.domain.usecase.UpdateTransactionUseCase
 import com.georgeci.moneysurfer.domain.util.TransactionPeriodWindow
 import com.georgeci.moneysurfer.navigation.SnackbarController
 import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import kotlinx.coroutines.Dispatchers
@@ -377,6 +383,142 @@ class TransactionCreationViewModelTest : StringSpec({
             }
         }
     }
+
+    "duplicating prefills the fields but saves a brand-new transaction" {
+        runTest {
+            val acc = anAccount(id = accountId("a-1"), workspaceId = ws, currencyCode = USD, balance = 500.dollars)
+            val category = aCategory(id = categoryId("c-exp"), workspaceId = ws, type = CategoryType.EXPENSE)
+            val original = aTransaction(
+                id = transactionId("t-original"),
+                workspaceId = ws,
+                accountId = acc.id,
+                money = 80.dollars,
+                categoryId = category.id,
+                note = "Lidl — weekly shop",
+                type = TransactionType.EXPENSE,
+            )
+            val fixture = Fixture(ws).apply {
+                accountRepository.seed(acc)
+                categoryRepository.seed(category)
+                transactionRepository.insert(original)
+            }
+            val vm = fixture.createViewModel(duplicateOf = original.id)
+            try {
+                val content = vm.awaitContent()
+
+                content.isEditMode shouldBe false
+                content.editingTransactionId shouldBe null
+                content.editingCreatedAt shouldBe null
+                content.pinnedOperationDate shouldBe null
+                content.amount shouldBe "80"
+                content.note shouldBe original.note
+                content.selectedAccount?.id shouldBe acc.id
+                content.selectedCategory?.id shouldBe category.id
+                // The original's timestamp is deliberately not copied — a duplicate is entered now.
+                content.timestamp shouldNotBe original.operationAt.toEpochMilliseconds()
+
+                vm.onEvent(TransactionCreationEvent.OnSaveClick)
+
+                // `original` was seeded through insert(), so the copy is the second entry.
+                val saved = fixture.transactionRepository.inserted.last()
+                saved.id shouldNotBe original.id
+                saved.money shouldBe original.money
+                saved.note shouldBe original.note
+                saved.categoryId shouldBe category.id
+                fixture.transactionRepository.getById(original.id) shouldBe original
+            } finally {
+                vm.viewModelScope.cancel()
+            }
+        }
+    }
+
+    "editing hands back the fields the form has no input for" {
+        runTest {
+            val acc = anAccount(id = accountId("a-1"), workspaceId = ws, currencyCode = USD, balance = 500.dollars)
+            val category = aCategory(id = categoryId("c-exp"), workspaceId = ws, type = CategoryType.EXPENSE)
+            // Everything here lives outside the form: no field on the screen can express it, so an
+            // edit that changes only the amount must leave all of it exactly as it was.
+            val original = aTransaction(
+                id = transactionId("t-1"),
+                workspaceId = ws,
+                accountId = acc.id,
+                money = 80.dollars,
+                categoryId = category.id,
+                merchant = "Lidl",
+                tags = listOf("weekly", "food"),
+                type = TransactionType.EXPENSE,
+                status = TransactionStatus.PLANNED,
+                transferId = TransferId("tr-1"),
+                recurringRuleId = recurringRuleId("r-1"),
+            )
+            val fixture = Fixture(ws).apply {
+                accountRepository.seed(acc)
+                categoryRepository.seed(category)
+                transactionRepository.insert(original)
+            }
+            val vm = fixture.createViewModel(editingTransactionId = original.id)
+            try {
+                vm.awaitContent()
+
+                vm.onEvent(TransactionCreationEvent.OnAmountChanged("95"))
+                vm.onEvent(TransactionCreationEvent.OnSaveClick)
+
+                val updated = fixture.transactionRepository.getById(original.id).shouldNotBeNull()
+                updated.money shouldBe 95.dollars
+                updated.merchant shouldBe "Lidl"
+                updated.tags shouldBe listOf("weekly", "food")
+                updated.status shouldBe TransactionStatus.PLANNED
+                // Dropping this would orphan the transfer's other leg.
+                updated.transferId shouldBe TransferId("tr-1")
+                updated.recurringRuleId shouldBe recurringRuleId("r-1")
+            } finally {
+                vm.viewModelScope.cancel()
+            }
+        }
+    }
+
+    "duplicating carries the merchant and tags but not the pairing, schedule or planned state" {
+        runTest {
+            val acc = anAccount(id = accountId("a-1"), workspaceId = ws, currencyCode = USD, balance = 500.dollars)
+            val category = aCategory(id = categoryId("c-exp"), workspaceId = ws, type = CategoryType.EXPENSE)
+            val original = aTransaction(
+                id = transactionId("t-original"),
+                workspaceId = ws,
+                accountId = acc.id,
+                money = 80.dollars,
+                categoryId = category.id,
+                merchant = "Lidl",
+                tags = listOf("weekly"),
+                type = TransactionType.EXPENSE,
+                status = TransactionStatus.PLANNED,
+                transferId = TransferId("tr-1"),
+                recurringRuleId = recurringRuleId("r-1"),
+            )
+            val fixture = Fixture(ws).apply {
+                accountRepository.seed(acc)
+                categoryRepository.seed(category)
+                transactionRepository.insert(original)
+            }
+            // The details screen hides Duplicate for a transfer leg, so this asserts the VM is
+            // defensive rather than describing a reachable flow.
+            val vm = fixture.createViewModel(duplicateOf = original.id)
+            try {
+                vm.awaitContent()
+
+                vm.onEvent(TransactionCreationEvent.OnSaveClick)
+
+                val copy = fixture.transactionRepository.inserted.last()
+                copy.id shouldNotBe original.id
+                copy.merchant shouldBe "Lidl"
+                copy.tags shouldBe listOf("weekly")
+                copy.status shouldBe TransactionStatus.ACTUAL
+                copy.transferId shouldBe null
+                copy.recurringRuleId shouldBe null
+            } finally {
+                vm.viewModelScope.cancel()
+            }
+        }
+    }
 })
 
 /** Wait until the VM finishes its async `loadData()` and exposes a `Content` state.
@@ -395,10 +537,15 @@ private class Fixture(workspaceId: WorkspaceId) {
 
     fun createViewModel(
         editingTransactionId: TransactionId? = null,
+        duplicateOf: TransactionId? = null,
         prefillAccount: AccountId? = null,
         featureConfig: TransactionCreationFeatureConfig = TransactionCreationFeatureConfig(transferEnabled = true),
     ) = TransactionCreationViewModel(
-        transactionId = editingTransactionId,
+        seed = duplicateOf?.let {
+            TransactionCreationSeed(it, TransactionCreationSeed.Mode.Duplicate)
+        } ?: editingTransactionId?.let {
+            TransactionCreationSeed(it, TransactionCreationSeed.Mode.Edit)
+        },
         accountId = prefillAccount,
         getAccounts = GetAccountsUseCase(accountRepository, session),
         getCategories = GetCategoriesUseCase(categoryRepository, session),
@@ -483,6 +630,8 @@ private class FakeTransactionRepository : TransactionRepository {
     override fun getTotals(accountId: AccountId?, window: TransactionPeriodWindow) = error("not used")
     override fun getByWorkspaceId(workspaceId: WorkspaceId): Flow<List<Transaction>> = all
     override suspend fun getById(id: TransactionId): Transaction? = byId[id]
+    override suspend fun getByTransferId(transferId: TransferId): List<Transaction> =
+        byId.values.filter { it.transferId == transferId }
     override suspend fun insert(transaction: Transaction) {
         inserted += transaction
         byId[transaction.id] = transaction

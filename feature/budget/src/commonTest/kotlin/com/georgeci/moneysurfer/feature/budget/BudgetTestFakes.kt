@@ -12,6 +12,7 @@ import com.georgeci.moneysurfer.domain.primitives.CategoryId
 import com.georgeci.moneysurfer.domain.primitives.Money
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
+import com.georgeci.moneysurfer.domain.primitives.TransferId
 import com.georgeci.moneysurfer.domain.primitives.UserId
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 import com.georgeci.moneysurfer.domain.repositories.BudgetRepository
@@ -115,6 +116,8 @@ internal class FakeTransactionRepository(initial: List<Transaction> = emptyList(
 
     override fun getByWorkspaceId(workspaceId: WorkspaceId): Flow<List<Transaction>> = flow
     override suspend fun getById(id: TransactionId): Transaction? = flow.value.firstOrNull { it.id == id }
+    override suspend fun getByTransferId(transferId: TransferId): List<Transaction> =
+        flow.value.filter { it.transferId == transferId }
     override suspend fun insert(transaction: Transaction) {
         flow.value = flow.value + transaction
     }

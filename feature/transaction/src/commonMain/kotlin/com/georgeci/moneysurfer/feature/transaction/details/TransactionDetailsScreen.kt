@@ -40,8 +40,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
+import com.georgeci.moneysurfer.domain.primitives.TransactionType
 import com.georgeci.moneysurfer.uikit.components.SurferCategoryBubble
 import com.georgeci.moneysurfer.uikit.components.SurferCategoryPalette
+import com.georgeci.moneysurfer.uikit.components.SurferCategoryVisual
 import com.georgeci.moneysurfer.uikit.components.base.SurferSplitAmount
 import com.georgeci.moneysurfer.uikit.components.base.SurferSplitAmountTier
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
@@ -54,8 +56,7 @@ import com.georgeci.moneysurfer.utils.HandleSideEffect
 import moneysurfer.feature.transaction.generated.resources.Res
 import moneysurfer.feature.transaction.generated.resources.transaction_details_account_label
 import moneysurfer.feature.transaction.generated.resources.transaction_details_category_label
-import moneysurfer.feature.transaction.generated.resources.transaction_details_currency_label
-import moneysurfer.feature.transaction.generated.resources.transaction_details_date_label
+import moneysurfer.feature.transaction.generated.resources.transaction_details_category_nested
 import moneysurfer.feature.transaction.generated.resources.transaction_details_delete_cancel
 import moneysurfer.feature.transaction.generated.resources.transaction_details_delete_confirm
 import moneysurfer.feature.transaction.generated.resources.transaction_details_delete_content_description
@@ -64,11 +65,18 @@ import moneysurfer.feature.transaction.generated.resources.transaction_details_d
 import moneysurfer.feature.transaction.generated.resources.transaction_details_delete_title
 import moneysurfer.feature.transaction.generated.resources.transaction_details_duplicate
 import moneysurfer.feature.transaction.generated.resources.transaction_details_edit_content_description
+import moneysurfer.feature.transaction.generated.resources.transaction_details_from_label
+import moneysurfer.feature.transaction.generated.resources.transaction_details_merchant_label
+import moneysurfer.feature.transaction.generated.resources.transaction_details_reference_label
 import moneysurfer.feature.transaction.generated.resources.transaction_details_status_planned
 import moneysurfer.feature.transaction.generated.resources.transaction_details_status_posted
+import moneysurfer.feature.transaction.generated.resources.transaction_details_tags_label
 import moneysurfer.feature.transaction.generated.resources.transaction_details_title
+import moneysurfer.feature.transaction.generated.resources.transaction_details_to_account_label
+import moneysurfer.feature.transaction.generated.resources.transaction_details_to_label
 import moneysurfer.feature.transaction.generated.resources.transaction_details_type_expense
 import moneysurfer.feature.transaction.generated.resources.transaction_details_type_income
+import moneysurfer.feature.transaction.generated.resources.transaction_details_type_transfer
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -78,6 +86,7 @@ fun TransactionDetailsScreen(
     transactionId: TransactionId,
     onNavigateBack: () -> Unit,
     onNavigateToEdit: (TransactionId) -> Unit = {},
+    onNavigateToDuplicate: (TransactionId) -> Unit = {},
     viewModel: TransactionDetailsViewModel = koinViewModel(
         key = transactionId.value,
     ) { parametersOf(transactionId) },
@@ -88,6 +97,7 @@ fun TransactionDetailsScreen(
         when (effect) {
             TransactionDetailsEffect.NavigateBack -> onNavigateBack()
             is TransactionDetailsEffect.NavigateToEdit -> onNavigateToEdit(effect.transactionId)
+            is TransactionDetailsEffect.NavigateToDuplicate -> onNavigateToDuplicate(effect.transactionId)
         }
     }
 
@@ -129,22 +139,6 @@ private fun TransactionDetailsContent(
         )
     }
 
-    val typeLabel = stringResource(
-        if (state.isExpense) {
-            Res.string.transaction_details_type_expense
-        } else {
-            Res.string.transaction_details_type_income
-        },
-    )
-    // Was hashing the category *name* — two categories renamed to the same word shared a colour
-    // and a rename silently repainted the screen. Now it reads the category's stored choice.
-    val categoryVisual = SurferCategoryPalette.visualFor(
-        id = state.categoryId,
-        iconKey = state.categoryIconKey,
-        hue = state.categoryHue,
-        systemKind = state.categorySystemKind,
-    )
-
     Scaffold(
         modifier = Modifier.surferSafeInsets(),
         containerColor = AppTheme.materialColors.surface,
@@ -179,11 +173,12 @@ private fun TransactionDetailsContent(
                     .verticalScroll(rememberScrollState())
                     .weight(1f),
             ) {
+                val heroVisual = heroVisualFor(state)
                 HeroCard(
-                    categoryName = state.categoryName,
-                    categoryTint = categoryVisual.tint,
-                    categoryIcon = categoryVisual.icon,
-                    typeLabel = typeLabel.uppercase(),
+                    header = heroHeaderFor(state),
+                    headerColor = heroVisual.tint,
+                    categoryTint = heroVisual.tint,
+                    categoryIcon = heroVisual.icon,
                     formattedAmount = state.formattedAmount,
                     note = state.note,
                     formattedDate = state.formattedDate,
@@ -195,7 +190,7 @@ private fun TransactionDetailsContent(
                 Spacer(Modifier.height(padding.calculateBottomPadding()))
             }
 
-            if (ShowDuplicateAction) {
+            if (state.canDuplicate) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -203,7 +198,7 @@ private fun TransactionDetailsContent(
                         .padding(bottom = AppTheme.spacing.large),
                 ) {
                     FilledTonalButton(
-                        onClick = {},
+                        onClick = { onEvent(TransactionDetailsEvent.OnDuplicateClick) },
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(20.dp),
                     ) {
@@ -221,12 +216,64 @@ private fun TransactionDetailsContent(
     }
 }
 
+/**
+ * Hero bubble and hue per variant: a transfer is neutral with a swap glyph (money moved sideways,
+ * its category is the seeded system one), income is green whatever the category says, and an
+ * expense keeps its category's own colour.
+ *
+ * The category's stored appearance is read rather than its *name* hashed — two categories renamed
+ * to the same word used to share a colour, and a rename silently repainted the screen.
+ */
+@Composable
+private fun heroVisualFor(state: TransactionDetailsState.Content): SurferCategoryVisual {
+    val categoryVisual = SurferCategoryPalette.visualFor(
+        id = state.categoryId,
+        iconKey = state.categoryIconKey,
+        hue = state.categoryHue,
+        systemKind = state.categorySystemKind,
+    )
+    return when {
+        state.isTransfer -> SurferCategoryVisual(
+            icon = SurferCategoryPalette.TransferIcon,
+            tint = SurferCategoryPalette.TransferTint,
+        )
+        state.isIncome -> categoryVisual.copy(tint = AppTheme.semanticColors.income)
+        else -> categoryVisual
+    }
+}
+
+/** `TRANSFER · POSTED`, or `GROCERIES · EXPENSE · POSTED` once there is a category to name. */
+@Composable
+private fun heroHeaderFor(state: TransactionDetailsState.Content): String {
+    val typeLabel = stringResource(
+        when {
+            state.isTransfer -> Res.string.transaction_details_type_transfer
+            state.type == TransactionType.INCOME -> Res.string.transaction_details_type_income
+            else -> Res.string.transaction_details_type_expense
+        },
+    ).uppercase()
+    val statusLabel = stringResource(
+        if (state.isPlanned) {
+            Res.string.transaction_details_status_planned
+        } else {
+            Res.string.transaction_details_status_posted
+        },
+    ).uppercase()
+    // A transfer's category is always the seeded "Transfer" one — naming it would just repeat
+    // the type label.
+    return if (state.isTransfer || state.categoryName.isBlank()) {
+        "$typeLabel · $statusLabel"
+    } else {
+        "${state.categoryName.uppercase()} · $typeLabel · $statusLabel"
+    }
+}
+
 @Composable
 private fun HeroCard(
-    categoryName: String,
+    header: String,
+    headerColor: Color,
     categoryTint: Color,
     categoryIcon: ImageVector,
-    typeLabel: String,
     formattedAmount: String,
     note: String,
     formattedDate: String,
@@ -234,18 +281,12 @@ private fun HeroCard(
 ) {
     val outlineVariant = AppTheme.materialColors.outlineVariant
     val surface = AppTheme.materialColors.surface
-    val headerColor = categoryTint
     val heroBrush = Brush.linearGradient(
         colors = listOf(
             categoryTint.copy(alpha = 0.22f),
             surface,
         ),
     )
-    val statusLabel = if (isPlanned) {
-        stringResource(Res.string.transaction_details_status_planned)
-    } else {
-        stringResource(Res.string.transaction_details_status_posted)
-    }
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -259,11 +300,6 @@ private fun HeroCard(
     ) {
         SurferCategoryBubble(icon = categoryIcon, tint = categoryTint, size = 64.dp)
         Spacer(Modifier.height(12.dp))
-        val header = if (categoryName.isNotBlank()) {
-            "${categoryName.uppercase()} · $typeLabel · ${statusLabel.uppercase()}"
-        } else {
-            "$typeLabel · ${statusLabel.uppercase()}"
-        }
         Text(
             text = header,
             style = AppTheme.typography.labelLarge,
@@ -324,40 +360,91 @@ private fun PlannedPill() {
     }
 }
 
+/**
+ * Account, Merchant, Category, Tags, Reference — the rows the design asks for. Date is not among
+ * them: the hero already carries it, and the currency is legible in every formatted amount on the
+ * screen, so neither earns a row of its own.
+ *
+ * A transfer swaps the account and category rows for `From` / `To`, since "which account" has two
+ * answers and the category is always the seeded system one.
+ */
 @Composable
 private fun DetailsCard(state: TransactionDetailsState.Content) {
     val rows = buildList {
-        if (state.accountName.isNotBlank()) {
-            add(
-                DetailRowSpec(
-                    SurferIcons.CreditCard,
-                    stringResource(Res.string.transaction_details_account_label),
-                    state.accountName,
-                ),
-            )
+        val transfer = state.transfer
+        if (transfer != null) {
+            if (transfer.fromAccountName.isNotBlank()) {
+                add(
+                    DetailRowSpec(
+                        SurferIcons.ArrowUp,
+                        stringResource(Res.string.transaction_details_from_label),
+                        transfer.fromAccountName,
+                    ),
+                )
+            }
+            if (transfer.toAccountName.isNotBlank()) {
+                add(
+                    DetailRowSpec(
+                        SurferIcons.ArrowDown,
+                        stringResource(Res.string.transaction_details_to_label),
+                        transfer.toAccountName,
+                    ),
+                )
+            }
+        } else {
+            if (state.accountName.isNotBlank()) {
+                add(
+                    DetailRowSpec(
+                        SurferIcons.CreditCard,
+                        // Income lands *in* the account; naming it "To account" keeps the row
+                        // readable next to the "From" sender below it.
+                        if (state.isIncome) {
+                            stringResource(Res.string.transaction_details_to_account_label)
+                        } else {
+                            stringResource(Res.string.transaction_details_account_label)
+                        },
+                        state.accountName,
+                    ),
+                )
+            }
+            if (state.merchant.isNotBlank()) {
+                add(
+                    DetailRowSpec(
+                        SurferIcons.Receipt,
+                        if (state.isIncome) {
+                            stringResource(Res.string.transaction_details_from_label)
+                        } else {
+                            stringResource(Res.string.transaction_details_merchant_label)
+                        },
+                        state.merchant,
+                    ),
+                )
+            }
+            if (state.categoryName.isNotBlank()) {
+                add(
+                    DetailRowSpec(
+                        SurferIcons.Category,
+                        stringResource(Res.string.transaction_details_category_label),
+                        categoryValue(state),
+                    ),
+                )
+            }
         }
-        add(
-            DetailRowSpec(
-                SurferIcons.Event,
-                stringResource(Res.string.transaction_details_date_label),
-                state.formattedDate,
-            ),
-        )
-        if (state.categoryName.isNotBlank()) {
-            add(
-                DetailRowSpec(
-                    SurferIcons.Category,
-                    stringResource(Res.string.transaction_details_category_label),
-                    state.categoryName,
-                ),
-            )
-        }
-        if (state.currency.isNotBlank()) {
+        if (state.tags.isNotEmpty()) {
             add(
                 DetailRowSpec(
                     SurferIcons.Tag,
-                    stringResource(Res.string.transaction_details_currency_label),
-                    state.currency,
+                    stringResource(Res.string.transaction_details_tags_label),
+                    state.tags.joinToString(TAG_SEPARATOR),
+                ),
+            )
+        }
+        if (state.reference.isNotBlank()) {
+            add(
+                DetailRowSpec(
+                    SurferIcons.Code,
+                    stringResource(Res.string.transaction_details_reference_label),
+                    state.reference,
                 ),
             )
         }
@@ -387,6 +474,19 @@ private fun DetailsCard(state: TransactionDetailsState.Content) {
         }
     }
 }
+
+/** `Coffee · in Dining` for a nested category, plain `Dining` for a top-level one. */
+@Composable
+private fun categoryValue(state: TransactionDetailsState.Content): String {
+    val parent = state.parentCategoryName
+    return if (parent.isNullOrBlank()) {
+        state.categoryName
+    } else {
+        stringResource(Res.string.transaction_details_category_nested, state.categoryName, parent)
+    }
+}
+
+private const val TAG_SEPARATOR = " · "
 
 private data class DetailRowSpec(val icon: ImageVector, val label: String, val value: String)
 
@@ -476,19 +576,45 @@ private fun DeleteConfirmationDialog(
     )
 }
 
+private fun previewExpense(showDeleteConfirmation: Boolean = false, isPlanned: Boolean = false) =
+    TransactionDetailsState.Content(
+        transactionId = TransactionId("preview-tx-1a13"),
+        formattedAmount = "−€48.20",
+        type = TransactionType.EXPENSE,
+        note = "Lidl — weekly shop",
+        merchant = "Lidl",
+        accountName = "Everyday",
+        categoryName = "Groceries",
+        parentCategoryName = "Home",
+        tags = listOf("weekly", "food"),
+        reference = "TX-1A13",
+        formattedDate = "18 Mar 2025",
+        isPlanned = isPlanned,
+        showDeleteConfirmation = showDeleteConfirmation,
+    )
+
 @Preview
 @Composable
 private fun TransactionDetailsExpensePreview() {
     AppTheme {
+        TransactionDetailsContent(state = previewExpense(), onEvent = {})
+    }
+}
+
+@Preview
+@Composable
+private fun TransactionDetailsIncomePreview() {
+    AppTheme {
         TransactionDetailsContent(
             state = TransactionDetailsState.Content(
-                transactionId = TransactionId("preview-tx-1"),
-                formattedAmount = "−€48.20",
-                isExpense = true,
-                note = "Lidl — weekly shop",
-                accountName = "Everyday",
-                categoryName = "Groceries",
-                currency = "EUR",
+                transactionId = TransactionId("preview-tx-2b24"),
+                formattedAmount = "+€1,500.00",
+                type = TransactionType.INCOME,
+                note = "Monthly salary",
+                merchant = "Acme Ltd",
+                accountName = "Savings",
+                categoryName = "Salary",
+                reference = "TX-2B24",
                 formattedDate = "18 Mar 2025",
                 isPlanned = false,
                 showDeleteConfirmation = false,
@@ -500,17 +626,20 @@ private fun TransactionDetailsExpensePreview() {
 
 @Preview
 @Composable
-private fun TransactionDetailsIncomePreview() {
+private fun TransactionDetailsTransferPreview() {
     AppTheme {
         TransactionDetailsContent(
             state = TransactionDetailsState.Content(
-                transactionId = TransactionId("preview-tx-2"),
-                formattedAmount = "€1,500.00",
-                isExpense = false,
-                note = "Monthly salary",
-                accountName = "Savings",
-                categoryName = "Income",
-                currency = "EUR",
+                transactionId = TransactionId("preview-tx-3c35"),
+                formattedAmount = "€200.00",
+                type = TransactionType.EXPENSE,
+                transfer = TransferLeg(fromAccountName = "Everyday", toAccountName = "Savings"),
+                note = "Rainy day top-up",
+                accountName = "Everyday",
+                categoryName = "Transfer",
+                categorySystemKind = SurferCategoryPalette.SYSTEM_KIND_TRANSFER,
+                categoryIconKey = SurferCategoryPalette.TRANSFER_ICON_KEY,
+                reference = "TX-3C35",
                 formattedDate = "18 Mar 2025",
                 isPlanned = false,
                 showDeleteConfirmation = false,
@@ -524,21 +653,7 @@ private fun TransactionDetailsIncomePreview() {
 @Composable
 private fun TransactionDetailsDeletePreview() {
     AppTheme {
-        TransactionDetailsContent(
-            state = TransactionDetailsState.Content(
-                transactionId = TransactionId("preview-tx-1"),
-                formattedAmount = "−€48.20",
-                isExpense = true,
-                note = "Lidl — weekly shop",
-                accountName = "Everyday",
-                categoryName = "Groceries",
-                currency = "EUR",
-                formattedDate = "18 Mar 2025",
-                isPlanned = false,
-                showDeleteConfirmation = true,
-            ),
-            onEvent = {},
-        )
+        TransactionDetailsContent(state = previewExpense(showDeleteConfirmation = true), onEvent = {})
     }
 }
 
@@ -546,22 +661,6 @@ private fun TransactionDetailsDeletePreview() {
 @Composable
 private fun TransactionDetailsPlannedPreview() {
     AppTheme {
-        TransactionDetailsContent(
-            state = TransactionDetailsState.Content(
-                transactionId = TransactionId("preview-tx-1"),
-                formattedAmount = "−€48.20",
-                isExpense = true,
-                note = "Lidl — weekly shop",
-                accountName = "Everyday",
-                categoryName = "Groceries",
-                currency = "EUR",
-                formattedDate = "20 Mar 2025",
-                isPlanned = true,
-                showDeleteConfirmation = false,
-            ),
-            onEvent = {},
-        )
+        TransactionDetailsContent(state = previewExpense(isPlanned = true), onEvent = {})
     }
 }
-
-private const val ShowDuplicateAction = false

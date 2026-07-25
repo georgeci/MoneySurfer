@@ -18,6 +18,7 @@ import com.georgeci.moneysurfer.domain.primitives.UserId
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceInviteId
 import com.georgeci.moneysurfer.feature.category.picker.CategoryPickerVariant
+import com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationSeed
 import com.georgeci.moneysurfer.navigation.GoalContributionMode
 import org.koin.core.annotation.KoinExperimentalAPI
 import org.koin.dsl.module
@@ -48,6 +49,9 @@ class OfflineKoinModuleVerificationTest {
                 AccountId::class,
                 CategoryId::class,
                 TransactionId::class,
+                // TransactionCreationScreen passes the transaction it opens on, plus whether it is
+                // there to edit that row or to duplicate it.
+                TransactionCreationSeed::class,
                 CategoryType::class,
                 // The category chooser passes which of the two picker layouts to open.
                 CategoryPickerVariant::class,

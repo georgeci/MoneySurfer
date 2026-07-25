@@ -68,6 +68,7 @@ val transactionNavGraph: FeatureNavGraph = { navigator ->
         TransactionCreationScreen(
             transactionId = key.transactionId?.let { TransactionId(it) },
             accountId = key.accountId?.let { AccountId(it) },
+            duplicate = key.duplicate,
             onNavigateBack = { navigator.pop() },
             onNavigateToCategoryChooser = { selectedId, filterType ->
                 navigator.push(
@@ -101,6 +102,11 @@ val transactionNavGraph: FeatureNavGraph = { navigator ->
             onNavigateBack = { navigator.pop() },
             onNavigateToEdit = { transactionId ->
                 navigator.push(Route.TransactionCreation(transactionId = transactionId.value))
+            },
+            onNavigateToDuplicate = { transactionId ->
+                navigator.push(
+                    Route.TransactionCreation(transactionId = transactionId.value, duplicate = true),
+                )
             },
         )
     }
