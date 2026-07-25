@@ -8,8 +8,11 @@ import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.CategoryId
 import com.georgeci.moneysurfer.domain.primitives.CategoryType
 import com.georgeci.moneysurfer.domain.primitives.Money
+import com.georgeci.moneysurfer.domain.primitives.RecurringRuleId
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
+import com.georgeci.moneysurfer.domain.primitives.TransactionStatus
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
+import com.georgeci.moneysurfer.domain.primitives.TransferId
 import com.georgeci.moneysurfer.domain.repositories.TransactionRepository
 import com.georgeci.moneysurfer.domain.usecase.CreateTransactionUseCase
 import com.georgeci.moneysurfer.domain.usecase.CreateTransferUseCase
@@ -243,6 +246,14 @@ class TransactionCreationViewModel(
             editingTransactionId = seed.transactionId.takeIf { editing },
             editingCreatedAt = transaction.createdAt.takeIf { editing },
             pinnedOperationDate = transaction.operationDate.takeIf { editing },
+            preserved = if (editing) {
+                PreservedTransactionFields.of(transaction)
+            } else {
+                // A duplicate keeps what the user typed about the counterparty, but is a fresh
+                // manual entry: it inherits neither the transfer pairing (a second leg would be
+                // missing), the recurring rule that generated the original, nor its planned state.
+                PreservedTransactionFields(merchant = transaction.merchant, tags = transaction.tags)
+            },
             displayCategories = buildDisplayCategories(
                 categories = categories,
                 counts = categoryUsageCounts,
@@ -386,12 +397,19 @@ class TransactionCreationViewModel(
                 currencyCode = account.currencyCode,
                 categoryId = category.id,
                 note = state.note,
+                // This rebuilds the whole row rather than patching the stored one, so every field
+                // the form does not edit has to be handed back explicitly — omitting one resets it.
+                merchant = state.preserved.merchant,
+                tags = state.preserved.tags,
                 operationAt = operationAt,
                 operationDate = state.pinnedOperationDate
                     ?: operationAt.toLocalDateTime(zone).date,
                 type = type,
+                status = state.preserved.status,
                 createdAt = state.editingCreatedAt ?: now,
                 updatedAt = now,
+                transferId = state.preserved.transferId,
+                recurringRuleId = state.preserved.recurringRuleId,
             )
 
             if (state.isEditMode) {
@@ -491,6 +509,35 @@ private const val CATEGORY_PREVIEW_SIZE = 7
  * in either mode, and two independent parameters could contradict each other (a duplicate flag
  * with no id, an id with no mode).
  */
+/**
+ * Everything a stored transaction carries that this screen has no field for.
+ *
+ * `saveTransaction` builds a whole new [Transaction] instead of patching the stored row, so a
+ * field that is not routed back through here is silently reset to its default on update — which
+ * is how editing used to wipe a transaction's merchant and tags, downgrade a `PLANNED` row to
+ * `ACTUAL`, and orphan the other leg of a transfer by dropping its `transferId`.
+ *
+ * The defaults are what a brand-new transaction should have, so a blank form needs no special case.
+ */
+data class PreservedTransactionFields(
+    val merchant: String = "",
+    val tags: List<String> = emptyList(),
+    val status: TransactionStatus = TransactionStatus.ACTUAL,
+    val transferId: TransferId? = null,
+    val recurringRuleId: RecurringRuleId? = null,
+) {
+    companion object {
+        /** Everything [transaction] holds outside the form — what an edit must hand back untouched. */
+        fun of(transaction: Transaction): PreservedTransactionFields = PreservedTransactionFields(
+            merchant = transaction.merchant,
+            tags = transaction.tags,
+            status = transaction.status,
+            transferId = transaction.transferId,
+            recurringRuleId = transaction.recurringRuleId,
+        )
+    }
+}
+
 data class TransactionCreationSeed(
     val transactionId: TransactionId,
     val mode: Mode,
@@ -527,6 +574,11 @@ sealed interface TransactionCreationState {
         // change between the original save and the edit would silently shift the
         // stored business date.
         val pinnedOperationDate: LocalDate? = null,
+        /**
+         * Fields of the transaction being edited that this form cannot change but must not
+         * destroy — see [PreservedTransactionFields].
+         */
+        val preserved: PreservedTransactionFields = PreservedTransactionFields(),
         val timestamp: Long,
         val categoryUsageCounts: Map<CategoryId, Int>,
         val displayCategories: List<Category>,
