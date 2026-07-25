@@ -1,0 +1,194 @@
+name: iOS distribute
+
+# Builds the Release archive of iosApp (online variant), exports an App Store
+# IPA, and uploads it to App Store Connect for TestFlight processing.
+#
+# Scope: ios-online only. iosAppOffline remains outside this tester lane.
+#
+# Required repo secrets (see docs/ci/testflight.md):
+#   GOOGLE_SERVICE_INFO_PLIST_RELEASE  base64 production Firebase plist
+#   ASC_API_KEY_ID                     App Store Connect API key id
+#   ASC_API_ISSUER_ID                  App Store Connect issuer UUID
+#   ASC_API_KEY_BASE64                 base64 AuthKey_<id>.p8
+#
+# Optional:
+#   ASC_TEAM_ID                        Apple team id (release.sh has a default)
+
+on:
+  workflow_dispatch:
+  schedule:
+    # 04:17 UTC — 30 min after android-distribute.yml.
+    - cron: "17 4 * * *"
+
+concurrency:
+  group: ios-distribute
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  distribute:
+    name: Build + upload release IPA
+    runs-on: macos-15
+    timeout-minutes: 75
+    permissions:
+      actions: read
+      contents: read
+
+    steps:
+      - name: Harden the runner (egress audit)
+        uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920 # v2.20.0
+        with:
+          egress-policy: audit
+
+      # A manual upload must fail loudly when setup is incomplete. The nightly
+      # schedule only emits a notice so missing initial secrets don't make the
+      # default branch red every day.
+      - name: Check required secrets
+        id: preflight
+        env:
+          FIREBASE_PLIST: ${{ secrets.GOOGLE_SERVICE_INFO_PLIST_RELEASE }}
+          API_KEY_ID: ${{ secrets.ASC_API_KEY_ID }}
+          API_ISSUER_ID: ${{ secrets.ASC_API_ISSUER_ID }}
+          API_KEY_BASE64: ${{ secrets.ASC_API_KEY_BASE64 }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          missing=()
+          [ -n "$FIREBASE_PLIST" ] || missing+=(GOOGLE_SERVICE_INFO_PLIST_RELEASE)
+          [ -n "$API_KEY_ID" ] || missing+=(ASC_API_KEY_ID)
+          [ -n "$API_ISSUER_ID" ] || missing+=(ASC_API_ISSUER_ID)
+          [ -n "$API_KEY_BASE64" ] || missing+=(ASC_API_KEY_BASE64)
+          if [ ${#missing[@]} -eq 0 ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "ready=false" >> "$GITHUB_OUTPUT"
+          if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
+            echo "::error::Missing secrets: ${missing[*]} — see docs/ci/testflight.md"
+            exit 1
+          fi
+          echo "::notice::Missing secrets: ${missing[*]} — skipping scheduled distribute."
+
+      - name: Skip if no new commits since last successful run
+        id: check
+        if: steps.preflight.outputs.ready == 'true' && github.event_name == 'schedule'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          last_sha=$(gh run list \
+            --workflow=ios-distribute.yml \
+            --branch=main \
+            --status=success \
+            --limit=2 \
+            --json headSha,databaseId \
+            --repo "$GITHUB_REPOSITORY" \
+            --jq '[.[] | select(.databaseId != ${{ github.run_id }})][0].headSha // ""')
+          echo "last successful SHA: ${last_sha:-<none>}"
+          echo "current SHA:         $GITHUB_SHA"
+          if [[ -n "$last_sha" && "$last_sha" == "$GITHUB_SHA" ]]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Checkout
+        if: steps.preflight.outputs.ready == 'true' && steps.check.outputs.skip != 'true'
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+
+      - name: Decode production Firebase config
+        if: steps.preflight.outputs.ready == 'true' && steps.check.outputs.skip != 'true'
+        uses: ./.github/actions/firebase-config
+        with:
+          ios-release-plist: ${{ secrets.GOOGLE_SERVICE_INFO_PLIST_RELEASE }}
+
+      - name: Decode App Store Connect API key
+        id: api-key
+        if: steps.preflight.outputs.ready == 'true' && steps.check.outputs.skip != 'true'
+        env:
+          API_KEY_BASE64: ${{ secrets.ASC_API_KEY_BASE64 }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          dest="${RUNNER_TEMP}/AuthKey.p8"
+          printf '%s' "$API_KEY_BASE64" | base64 -d > "$dest"
+          if [ ! -s "$dest" ]; then
+            echo "::error::ASC_API_KEY_BASE64 decoded to an empty file."
+            exit 1
+          fi
+          chmod 600 "$dest"
+          echo "path=$dest" >> "$GITHUB_OUTPUT"
+
+      - name: Set up JDK
+        if: steps.preflight.outputs.ready == 'true' && steps.check.outputs.skip != 'true'
+        uses: actions/setup-java@03ad4de0992f5dab5e18fcb136590ce7c4a0ac95 # v5.6.0
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Gradle
+        if: steps.preflight.outputs.ready == 'true' && steps.check.outputs.skip != 'true'
+        uses: gradle/actions/setup-gradle@3f131e8634966bd73d06cc69884922b02e6faf92 # v6.2.0
+
+      - name: Cache Kotlin/Native (~/.konan)
+        if: steps.preflight.outputs.ready == 'true' && steps.check.outputs.skip != 'true'
+        uses: ./.github/actions/konan-cache
+
+      - name: Select Xcode
+        if: steps.preflight.outputs.ready == 'true' && steps.check.outputs.skip != 'true'
+        uses: ./.github/actions/select-xcode
+
+      - name: Archive, export, and upload iosApp
+        if: steps.preflight.outputs.ready == 'true' && steps.check.outputs.skip != 'true'
+        env:
+          ASC_API_KEY_ID: ${{ secrets.ASC_API_KEY_ID }}
+          ASC_API_ISSUER_ID: ${{ secrets.ASC_API_ISSUER_ID }}
+          ASC_API_KEY_PATH: ${{ steps.api-key.outputs.path }}
+          ASC_TEAM_ID: ${{ secrets.ASC_TEAM_ID }}
+          ASC_BUILD_NUMBER: ${{ github.run_number }}
+        run: scripts/ios/release.sh main
+
+      - name: Locate IPA
+        id: ipa
+        if: steps.preflight.outputs.ready == 'true' && steps.check.outputs.skip != 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          ipa=$(find build/ios/iosApp -path '*/export/*.ipa' -type f | head -1)
+          if [ -z "$ipa" ]; then
+            echo "::error::No IPA produced by scripts/ios/release.sh main."
+            exit 1
+          fi
+          echo "path=$ipa" >> "$GITHUB_OUTPUT"
+          {
+            echo "### TestFlight"
+            echo
+            echo "- IPA: \`$(basename "$ipa")\`"
+            echo "- Build: \`${GITHUB_RUN_NUMBER}\`"
+            echo "- Commit: \`${GITHUB_SHA}\`"
+            echo
+            echo "Upload completed; App Store Connect processing continues asynchronously."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Remove credentials
+        if: always()
+        env:
+          API_KEY_ID: ${{ secrets.ASC_API_KEY_ID }}
+        shell: bash
+        run: |
+          rm -f "${RUNNER_TEMP}/AuthKey.p8"
+          if [ -n "$API_KEY_ID" ]; then
+            rm -f "${HOME}/.appstoreconnect/private_keys/AuthKey_${API_KEY_ID}.p8"
+          fi
+
+      - name: Upload IPA artifact
+        if: steps.ipa.outputs.path != ''
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: iosApp-release-ipa
+          path: ${{ steps.ipa.outputs.path }}
+          retention-days: 14
+          if-no-files-found: error

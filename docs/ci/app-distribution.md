@@ -16,7 +16,7 @@ Distribution.
 
 Scope: **android-online only**. `:androidApp-offline` is Firebase-free by
 design, and iOS testers go through TestFlight
-([`scripts/ios/release.sh`](../../scripts/ios/release.sh)).
+([iOS TestFlight distribution](testflight.md)).
 
 ## Triggers
 

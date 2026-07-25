@@ -292,18 +292,16 @@ val allureMaestroIosDir = allureRootDir.resolve("maestro-ios")
 val allureFirestoreDir = allureRootDir.resolve("firestore")
 val allureAllDir = allureRootDir.resolve("all")
 
-val commonScopeModules = listOf(
-    "composeApp", "shared", "domain",
-    "data-local", "data-remote",
-    "sync/api", "sync/default", "sync-surfer",
-    "integration-test", "utils",
-)
-val androidHostScopeModules = listOf(
-    "shared", "domain",
-    "data-local", "data-remote",
-    "sync/api", "sync/default", "sync-surfer",
-    "uikit",
-)
+fun testOwners(vararg sourceSets: String): List<Project> =
+    subprojects.filter { subproject ->
+        sourceSets.any { sourceSet ->
+            subproject.projectDir.resolve("src/$sourceSet").isDirectory
+        }
+    }
+
+val commonTestOwners = testOwners("commonTest", "jvmTest")
+val androidHostTestOwners = testOwners("commonTest", "androidHostTest")
+
 val androidDeviceScopeModules = listOf(
     "androidApp", "shared", "domain",
     "data-local", "data-remote",
@@ -311,17 +309,16 @@ val androidDeviceScopeModules = listOf(
     "uikit", "integration-test",
 )
 
-fun moduleTestResults(module: String, scope: String): File =
-    rootProject.file("$module/build/test-results/$scope")
-
 fun moduleAndroidDeviceResults(module: String): File =
     rootProject.file("$module/build/outputs/androidTest-results")
 
 val commonScopeAllureSources: List<File> =
-    commonScopeModules.map { moduleTestResults(it, "jvmTest") }
+    commonTestOwners.map { it.layout.buildDirectory.dir("test-results/jvmTest").get().asFile }
 
 val androidHostScopeAllureSources: List<File> =
-    androidHostScopeModules.map { moduleTestResults(it, "testAndroidHostTest") }
+    androidHostTestOwners.map {
+        it.layout.buildDirectory.dir("test-results/testAndroidHostTest").get().asFile
+    }
 
 val androidDeviceScopeAllureSources: List<File> =
     androidDeviceScopeModules.map(::moduleAndroidDeviceResults)
@@ -335,9 +332,7 @@ val allScopeAllureSources: List<File> =
     (
         commonScopeAllureSources +
             androidHostScopeAllureSources +
-            androidDeviceScopeAllureSources +
-            maestroAllureSources +
-            firestoreAllureSources
+            androidDeviceScopeAllureSources
         ).distinct()
 
 /**
@@ -715,29 +710,22 @@ tasks.register<Exec>("qaIntegrationDeviceHermetic") {
     finalizedBy("allureGenerateAndroidDevice")
 }
 
-val commonTestTasks = listOf(
-    ":composeApp:jvmTest",
-    ":shared:jvmTest",
-    ":domain:jvmTest",
-    ":data-local:jvmTest",
-    ":data-remote:jvmTest",
-    ":sync:api:jvmTest",
-    ":sync:default:jvmTest",
-    ":sync-surfer:jvmTest",
-    ":integration-test:jvmTest",
-    ":utils:jvmTest",
-)
+/**
+ * Aggregate test owners from their source sets instead of maintaining a second
+ * module registry here. `TaskCollection` is live, so tasks created later while
+ * subprojects are configured are included without `afterEvaluate`.
+ *
+ * This intentionally keys off source directories: modules with an empty test
+ * target do not make every aggregate invocation pay configuration/execution
+ * overhead, while a newly added test source set joins QA automatically.
+ */
+val commonTestTasks = commonTestOwners.map { subproject ->
+    subproject.tasks.matching { it.name == "jvmTest" }
+}
 
-val androidHostTestTasks = listOf(
-    ":shared:testAndroidHostTest",
-    ":domain:testAndroidHostTest",
-    ":data-local:testAndroidHostTest",
-    ":data-remote:testAndroidHostTest",
-    ":sync:api:testAndroidHostTest",
-    ":sync:default:testAndroidHostTest",
-    ":sync-surfer:testAndroidHostTest",
-    ":uikit:testAndroidHostTest",
-)
+val androidHostTestTasks = androidHostTestOwners.map { subproject ->
+    subproject.tasks.matching { it.name == "testAndroidHostTest" }
+}
 
 val androidDeviceTestTasks = listOf(
     ":androidApp:connectedDebugAndroidTest",
@@ -897,10 +885,6 @@ tasks.named<Exec>("allureGenerateMaestroIos") {
     dependsOn("maestroPrepareAllureResultsIos")
 }
 
-tasks.named<Exec>("allureGenerateAll") {
-    dependsOn("maestroPrepareAllureResults")
-}
-
 tasks.register("qaCommon") {
     group = "verification"
     description = "Run common scope tests + Kover reports; always generate Allure report into build/reports/allure/common/."
@@ -951,10 +935,6 @@ tasks.register<Exec>("qaFirestoreRules") {
             )
         }
     }
-}
-
-tasks.named<Exec>("allureGenerateAll") {
-    dependsOn("allureGenerateFirestore")
 }
 
 /**
@@ -1129,12 +1109,10 @@ val maestroOfflineJunit = maestroReportsDir.resolve("maestro-offline-golden.xml"
 // different report name from the Android one right above.
 val maestroOfflineIosJunit = maestroIosReportsDir.resolve("maestro-offline-app-open-ios.xml")
 
-tasks.register<Exec>("maestroAssembleOfflineDebug") {
+tasks.register("maestroAssembleOfflineDebug") {
     group = "verification"
     description = "Build the offline debug APK for Maestro E2E tests."
-    notCompatibleWithConfigurationCache("Spawns a nested Gradle build.")
-    workingDir = rootDir
-    commandLine("./gradlew", ":androidApp-offline:assembleDebug")
+    dependsOn(":androidApp-offline:assembleDebug")
 }
 
 tasks.register<Exec>("maestroInstallOfflineDebug") {
@@ -1236,11 +1214,17 @@ tasks.register<Exec>("qaMaestroOfflineIos") {
     }
 }
 
-tasks.register("qaAll") {
+tasks.register("qaJvmAndAndroid") {
     group = "verification"
-    description = "Run all test scopes + Kover reports; always generate Allure report into build/reports/allure/all/."
+    description = "Run JVM, Android host, and Android device scopes + Kover; generate the combined Allure report."
     dependsOn("testAllScopes", "koverXmlReport", "koverHtmlReport")
     finalizedBy("allureGenerateAll", "printKoverCoverageImportHints")
+}
+
+tasks.register("qaAll") {
+    group = "verification"
+    description = "Deprecated alias for qaJvmAndAndroid; does not run Maestro or Firestore-rules tests."
+    dependsOn("qaJvmAndAndroid")
 }
 
 tasks.register("printKoverCoverageImportHints") {

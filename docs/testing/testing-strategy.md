@@ -8,6 +8,7 @@
 - [Common Commands](#common-commands)
 - [QA Entry Points](#qa-entry-points)
   - [Offline golden-path E2E](#offline-golden-path-e2e)
+  - [iOS E2E scope (issue #297)](#ios-e2e-scope-issue-297)
 - [Desktop UI tests (Compose, jvmTest)](#desktop-ui-tests-compose-jvmtest)
 - [Test tags (Compose ↔ Maestro)](#test-tags-compose--maestro)
 - [Rules](#rules)
@@ -66,8 +67,17 @@ the behaviour genuinely depends on the platform.
 ./gradlew qaAndroidHost
 ./gradlew qaAndroidDevice
 ./gradlew qaMaestro
-./gradlew qaAll
+./gradlew qaJvmAndAndroid
 ```
+
+`qaJvmAndAndroid` aggregates JVM, Android host, and Android device scopes. It
+does not run Maestro or Firestore-rules tests. `qaAll` remains only as a
+deprecated compatibility alias for the same scope.
+
+`qaCommon` and `qaAndroidHost` discover test-owning modules from their
+`commonTest`, `jvmTest`, and `androidHostTest` source directories. Adding a test
+source set therefore opts the module into the aggregate without updating a
+separate module list.
 
 ### Offline golden-path E2E
 
