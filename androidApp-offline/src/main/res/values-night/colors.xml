@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="splash_background">#FF14110D</color>
+    <!-- Must equal AppColors.Background / AppColors.Dark.Background in uikit: the
+         AndroidX splash hands straight over to SurferSplash, which paints the theme
+         background. Any difference shows up as a flash on every cold start. -->
+    <color name="splash_background">#FF1A1C19</color>
 </resources>

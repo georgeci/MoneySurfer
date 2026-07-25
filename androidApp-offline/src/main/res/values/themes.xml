@@ -5,7 +5,9 @@
          crossfades from this into [postSplashScreenTheme]. -->
     <style name="Theme.MoneySurfer.Splash" parent="Theme.SplashScreen">
         <item name="windowSplashScreenBackground">@color/splash_background</item>
-        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher_foreground</item>
+        <!-- The full adaptive icon, not @mipmap/ic_launcher_foreground: the foreground layer
+             is a white glyph on transparent, which is invisible on the light background. -->
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>
         <item name="postSplashScreenTheme">@style/Theme.MoneySurfer</item>
     </style>
 
