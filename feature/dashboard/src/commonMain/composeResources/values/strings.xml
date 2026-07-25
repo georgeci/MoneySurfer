@@ -17,7 +17,8 @@
     <string name="dashboard_add_transaction">Add transaction</string>
     <string name="dashboard_balance_title">Total balance</string>
     <string name="dashboard_balance_empty_text">Add your first account to see balance.</string>
-    <string name="dashboard_balance_other_currencies">Plus %1$s in other currencies</string>
+    <string name="dashboard_balance_other_currencies">Plus %1$s no rate could convert</string>
+    <string name="dashboard_balance_rates_as_of">Converted at rates from %1$s · exchangerate-api.com</string>
     <string name="dashboard_accounts_section_title">Accounts</string>
     <string name="dashboard_accounts_manage">Manage</string>
     <string name="dashboard_add_account">Add account</string>
