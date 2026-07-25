@@ -39,14 +39,13 @@ class ConvertAccountsTotalUseCase {
         val unconverted = mutableListOf<CurrencyTotal>()
 
         byCurrency.forEach { bucket ->
-            val inBase = when {
-                bucket.currencyCode == baseCurrency -> bucket.amount
-                else -> usable?.convertToBase(bucket.amount, bucket.currencyCode)
-                    ?.also { usedRates = true }
-            }
+            val inBase: Money? = bucket.inBaseCurrency(baseCurrency, usable)
             if (inBase == null) {
                 unconverted += bucket
             } else {
+                // A bucket already in the base needed no quote; anything else got here through
+                // one, and that is what earns the "as of" label below.
+                if (bucket.currencyCode != baseCurrency) usedRates = true
                 converted = (converted ?: Money.zero()) + inBase
             }
         }
@@ -60,4 +59,8 @@ class ConvertAccountsTotalUseCase {
             asOf = usable?.asOf?.takeIf { usedRates },
         )
     }
+
+    /** This bucket expressed in [base], or `null` when [rates] cannot price its currency. */
+    private fun CurrencyTotal.inBaseCurrency(base: CurrencyCode, rates: ExchangeRateTable?): Money? =
+        if (currencyCode == base) amount else rates?.convertToBase(amount, currencyCode)
 }

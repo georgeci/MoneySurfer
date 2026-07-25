@@ -7,7 +7,7 @@ import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
  * The FX provider behind [ExchangeRateRepository]. Implemented over HTTP in `data-remote`; the
  * offline build binds a no-op so the cache is simply never refilled there.
  */
-interface ExchangeRateRemoteSource {
+fun interface ExchangeRateRemoteSource {
 
     /**
      * Latest published quotes against [base], or `null` when the provider could not be reached
