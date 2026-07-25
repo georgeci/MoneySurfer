@@ -26,10 +26,17 @@ inputs:
       produce GoogleService-Info.plist").
     required: false
     default: ""
+  ios-release-plist:
+    description: >
+      base64 of the Release (production) GoogleService-Info.plist. Decoded to
+      iosApp/Firebase/Prod/GoogleService-Info.plist — the source the Xcode
+      build phase embeds in Release archives.
+    required: false
+    default: ""
   require-all:
     description: >
-      If "true", fail when any of debug-json / release-json / ios-plist is
-      empty. Default "false" — decode whichever ones are provided.
+      If "true", fail when any config input is empty. Default "false" —
+      decode whichever ones are provided.
     required: false
     default: "false"
 
@@ -42,6 +49,7 @@ runs:
         DEBUG_JSON: ${{ inputs.debug-json }}
         RELEASE_JSON: ${{ inputs.release-json }}
         IOS_PLIST: ${{ inputs.ios-plist }}
+        IOS_RELEASE_PLIST: ${{ inputs.ios-release-plist }}
         REQUIRE_ALL: ${{ inputs.require-all }}
       run: |
         set -euo pipefail
@@ -75,6 +83,7 @@ runs:
         decode_b64 "GOOGLE_SERVICES_JSON_DEBUG"   "$DEBUG_JSON"   "androidApp/src/debug/google-services.json"
         decode_b64 "GOOGLE_SERVICES_JSON_RELEASE" "$RELEASE_JSON" "androidApp/src/release/google-services.json"
         decode_b64 "GOOGLE_SERVICE_INFO_PLIST"    "$IOS_PLIST"    "iosApp/Firebase/Dev/GoogleService-Info.plist"
+        decode_b64 "GOOGLE_SERVICE_INFO_PLIST_RELEASE" "$IOS_RELEASE_PLIST" "iosApp/Firebase/Prod/GoogleService-Info.plist"
 
         # JSON sanity-check: must parse and have a project_info block.
         for f in androidApp/src/debug/google-services.json androidApp/src/release/google-services.json; do
@@ -86,10 +95,13 @@ runs:
 
         # Plist sanity-check: plutil if available (always on macOS, sometimes
         # on Linux runners), otherwise just verify it's not empty.
-        plist=iosApp/Firebase/Dev/GoogleService-Info.plist
-        if [ -f "$plist" ] && command -v plutil >/dev/null 2>&1; then
-          plutil -lint "$plist" >/dev/null \
-            || { echo "::error::$plist is not a valid plist"; exit 1; }
-        fi
+        for plist in \
+          iosApp/Firebase/Dev/GoogleService-Info.plist \
+          iosApp/Firebase/Prod/GoogleService-Info.plist; do
+          if [ -f "$plist" ] && command -v plutil >/dev/null 2>&1; then
+            plutil -lint "$plist" >/dev/null \
+              || { echo "::error::$plist is not a valid plist"; exit 1; }
+          fi
+        done
 
         echo "Done. decoded=$decoded skipped=$skipped"

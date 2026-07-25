@@ -200,6 +200,12 @@
 - Lines: 87-113
 - Tasks: invites, domain, kotlin
 
+## ios-testflight-distribution
+- Title: Scope and triggers
+- File: docs/ci/testflight.md
+- Lines: 28-123
+- Tasks: ios, testflight, ci, release
+
 ## markdown-rules
 - Title: Rules
 - File: ai/skills/markdown-rules.md
