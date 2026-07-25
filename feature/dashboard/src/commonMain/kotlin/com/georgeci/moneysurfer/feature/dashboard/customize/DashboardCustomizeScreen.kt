@@ -59,8 +59,21 @@ import org.koin.compose.viewmodel.koinViewModel
 /** Stable selectors for the customize screen — see docs/testing/testing-strategy.md. */
 object DashboardCustomizeTestTags {
     const val Root = "dashboardCustomize:root"
-    const val Enabled = "dashboardCustomize:enabled"
-    const val Available = "dashboardCustomize:available"
+    const val EnabledHeader = "dashboardCustomize:enabledHeader"
+    const val AvailableHeader = "dashboardCustomize:availableHeader"
+    const val ReorderHint = "dashboardCustomize:reorderHint"
+
+    /** Row in the "On dashboard" section — [widget] is the [DashboardWidgetType] name. */
+    fun enabledRow(widget: String): String = "dashboardCustomize:on:$widget"
+
+    /** Row in the "Available" section. */
+    fun availableRow(widget: String): String = "dashboardCustomize:available:$widget"
+
+    /** Visibility switch inside a row of either section; a widget appears in exactly one. */
+    fun toggle(widget: String): String = "dashboardCustomize:toggle:$widget"
+
+    /** Reorder grip, present only on rows in the "On dashboard" section. */
+    fun dragHandle(widget: String): String = "dashboardCustomize:drag:$widget"
 }
 
 @Composable
@@ -81,8 +94,12 @@ fun DashboardCustomizeScreen(
 
 private const val CUSTOMIZE_SKELETON_ROWS = 4
 
+/**
+ * Stateless half of the screen — public so `:composeApp` desktop UI tests can mount it with an
+ * injected state, the way `SignInContent` is used.
+ */
 @Composable
-internal fun DashboardCustomizeContent(
+fun DashboardCustomizeContent(
     state: AsyncState<DashboardLayoutConfig>,
     onEvent: (DashboardCustomizeEvent) -> Unit,
 ) {
@@ -158,7 +175,8 @@ private fun CustomizeList(
         item(key = "header-enabled") {
             SectionHeader(
                 title = stringResource(Res.string.dashboard_customize_section_enabled),
-                modifier = Modifier.testTag(DashboardCustomizeTestTags.Enabled),
+                modifier = Modifier.testTag(DashboardCustomizeTestTags.EnabledHeader),
+                // Nothing to reorder with a single widget on the dashboard.
                 hint = stringResource(Res.string.dashboard_customize_reorder_hint)
                     .takeIf { enabled.size > 1 },
             )
@@ -182,7 +200,7 @@ private fun CustomizeList(
                 title = stringResource(Res.string.dashboard_customize_section_available),
                 modifier = Modifier
                     .padding(top = 16.dp)
-                    .testTag(DashboardCustomizeTestTags.Available),
+                    .testTag(DashboardCustomizeTestTags.AvailableHeader),
             )
         }
         if (available.isEmpty()) {
@@ -212,7 +230,14 @@ private fun SectionHeader(
     SurferSectionHeader(
         title = title,
         modifier = modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-        trailing = hint?.let { { SurferSectionHeaderHint(text = it) } },
+        trailing = hint?.let {
+            {
+                SurferSectionHeaderHint(
+                    text = it,
+                    modifier = Modifier.testTag(DashboardCustomizeTestTags.ReorderHint),
+                )
+            }
+        },
     )
 }
 
@@ -233,9 +258,10 @@ private fun EnabledWidgetRow(
     handleModifier: Modifier,
     onEvent: (DashboardCustomizeEvent) -> Unit,
 ) {
+    val widget = item.type.name
     SurferSettingsRow(
         title = stringResource(item.type.titleResource()),
-        modifier = modifier,
+        modifier = modifier.testTag(DashboardCustomizeTestTags.enabledRow(widget)),
         icon = item.type.icon(),
         trailing = {
             Row(
@@ -247,8 +273,11 @@ private fun EnabledWidgetRow(
                     onCheckedChange = {
                         onEvent(DashboardCustomizeEvent.OnWidgetEnabledChange(item.type, enabled = false))
                     },
+                    modifier = Modifier.testTag(DashboardCustomizeTestTags.toggle(widget)),
                 )
-                SurferDragHandle(modifier = handleModifier)
+                SurferDragHandle(
+                    modifier = handleModifier.testTag(DashboardCustomizeTestTags.dragHandle(widget)),
+                )
             }
         },
     )
@@ -259,11 +288,19 @@ private fun AvailableWidgetRow(
     item: DashboardLayoutItem,
     onEvent: (DashboardCustomizeEvent) -> Unit,
 ) {
+    val widget = item.type.name
     val turnOn = { onEvent(DashboardCustomizeEvent.OnWidgetEnabledChange(item.type, enabled = true)) }
     SurferSettingsRow(
         title = stringResource(item.type.titleResource()),
+        modifier = Modifier.testTag(DashboardCustomizeTestTags.availableRow(widget)),
         icon = item.type.icon(),
-        trailing = { SurferSettingsSwitch(checked = false, onCheckedChange = { turnOn() }) },
+        trailing = {
+            SurferSettingsSwitch(
+                checked = false,
+                onCheckedChange = { turnOn() },
+                modifier = Modifier.testTag(DashboardCustomizeTestTags.toggle(widget)),
+            )
+        },
         onClick = turnOn,
     )
 }
