@@ -257,7 +257,7 @@
 ## qa-runbook
 - Title: Setup
 - File: docs/testing/qa-runbook.md
-- Lines: 47-338
+- Lines: 48-347
 - Tasks: testing, qa, reports, tooling
 
 ## rules-bug-1
@@ -389,7 +389,7 @@
 ## testing-strategy
 - Title: Test layers
 - File: docs/testing/testing-strategy.md
-- Lines: 35-184
+- Lines: 36-194
 - Tasks: testing, qa, validation
 
 ## time-policy

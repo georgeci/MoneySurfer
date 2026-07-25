@@ -9,6 +9,7 @@
 - [Firebase bootstrap (emulator)](#firebase-bootstrap-emulator)
 - [QA tasks](#qa-tasks)
 - [Plain test/Maestro tasks (no Allure)](#plain-testmaestro-tasks-no-allure)
+  - [iOS scope: launch smoke only (issue #297)](#ios-scope-launch-smoke-only-issue-297)
 - [Desktop UI tests (:composeApp:jvmTest)](#desktop-ui-tests-composeappjvmtest)
 - [Integration tests (:integration-test)](#integration-tests-integration-test)
   - [Running locally](#running-locally)
@@ -113,7 +114,15 @@ FIREBASE_PROJECT_ID=demo-moneysurfer scripts/firebase/start.sh
 | `./gradlew qaMaestroAndroid` / `qaMaestro` | Android flows via `firebase emulators:exec` + seed | — | `build/reports/allure/maestro/` |
 | `./gradlew qaMaestroIos` | iOS Simulator **launch smoke only** (see below) via `firebase emulators:exec` + seed | — | `build/reports/allure/maestro-ios/` |
 | `./gradlew qaFirestoreRules` | Mocha (`firestore-tests/`) via `firebase emulators:exec --only firestore` | — | `build/reports/allure/firestore/` |
-| `./gradlew qaAll` | `testAllScopes` (common + Android host + Android device; no Maestro/Firestore-rules run) | yes | `build/reports/allure/all/` |
+| `./gradlew qaJvmAndAndroid` | `testAllScopes` (common + Android host + Android device; no Maestro/Firestore-rules run) | yes | `build/reports/allure/all/` |
+
+`qaAll` is a deprecated compatibility alias for `qaJvmAndAndroid`; it is not
+an exhaustive run of every QA scope.
+
+The common and Android-host aggregates discover test owners from
+`commonTest`, `jvmTest`, and `androidHostTest` source directories rather than a
+maintained module list. Adding one of those source sets is therefore enough to
+join the corresponding aggregate.
 
 ## Plain test/Maestro tasks (no Allure)
 
