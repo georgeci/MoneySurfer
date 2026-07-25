@@ -129,6 +129,13 @@ class TransactionsByAccountViewModel(
             is TransactionsByAccountEvent.OnTransactionClick ->
                 postSideEffect(TransactionsByAccountEffect.NavigateToTransactionDetails(event.transactionId))
             is TransactionsByAccountEvent.OnSearchQueryChanged -> filterStore.setQuery(event.query)
+            TransactionsByAccountEvent.OnClearFiltersClick -> {
+                // The search text goes too, unlike `clear()` on its own: this is the empty state's
+                // CTA, and it promises the list back — leaving the query applied would answer the
+                // tap with the same empty screen.
+                filterStore.clear()
+                filterStore.setQuery("")
+            }
             TransactionsByAccountEvent.OnOpenFiltersClick ->
                 // Carry the anchor the list is paged to: the filter screen's live result count
                 // resolves the same window from it, so `Apply · N results` matches the list the
@@ -254,7 +261,10 @@ class TransactionsByAccountViewModel(
         return TransactionsByAccountState.Content(
             accountId = accountId,
             accountName = account?.name.orEmpty(),
-            groups = groupByDate(ordered),
+            groups = groupByDate(ordered, accounts.associate { it.id to it.name }),
+            // A row only has to name its account where the list mixes several. Scoped to one, the
+            // toolbar already says which, and repeating it on every row would be noise.
+            showAccountOnRows = accountId == null,
             summary = buildSummary(loaded.totals, currency),
             query = filters.query,
             filters = chips(effective, accounts, categories),
@@ -274,7 +284,10 @@ class TransactionsByAccountViewModel(
         )
     }
 
-    private fun groupByDate(rows: List<CategorizedTransaction>): List<TransactionGroupUi> =
+    private fun groupByDate(
+        rows: List<CategorizedTransaction>,
+        accountNames: Map<AccountId, String>,
+    ): List<TransactionGroupUi> =
         rows.groupBy { it.transaction.operationDate }
             .map { (date, txns) ->
                 val net = txns.fold(Money.zero()) { acc, t -> acc + t.signedMoney() }
@@ -283,20 +296,31 @@ class TransactionsByAccountViewModel(
                     dateLabel = dateLabel(date),
                     netFormatted = MoneyFormatter.format(net, txns.first().currencyCode),
                     netPositive = !net.isNegative(),
-                    transactions = txns.map { it.toRow() },
+                    transactions = txns.map { it.toRow(accountNames) },
                 )
             }
 
-    private fun CategorizedTransaction.toRow(): TransactionRowUi = TransactionRowUi(
-        id = transaction.id,
-        // Merchant first: "Starbucks" identifies the row better than whatever was jotted next
-        // to it, and the note still shows when there is no merchant.
-        title = transaction.merchant.ifBlank { transaction.note }.ifBlank { categoryName.orEmpty() },
-        subtitle = categoryName.orEmpty(),
-        formattedAmount = MoneyFormatter.format(transaction.money.abs(), transaction.currencyCode),
-        isExpense = transaction.type == TransactionType.EXPENSE,
-        categoryHueSeed = categoryName ?: transaction.categoryId?.value.orEmpty(),
-    )
+    private fun CategorizedTransaction.toRow(accountNames: Map<AccountId, String>): TransactionRowUi {
+        val isTransferLeg = transaction.transferId != null
+        return TransactionRowUi(
+            id = transaction.id,
+            // Merchant first: "Starbucks" identifies the row better than whatever was jotted next
+            // to it, and the note still shows when there is no merchant.
+            title = transaction.merchant.ifBlank { transaction.note }.ifBlank { categoryName.orEmpty() },
+            subtitle = categoryName.orEmpty(),
+            accountName = accountNames[transaction.accountId].orEmpty(),
+            formattedAmount = MoneyFormatter.format(transaction.money.abs(), transaction.currencyCode),
+            isExpense = transaction.type == TransactionType.EXPENSE,
+            isTransfer = isTransferLeg,
+            // A transfer leg is drawn from the shared transfer palette instead of its category's
+            // hue, so it carries no seed — see how the screen renders it.
+            categoryHueSeed = if (isTransferLeg) {
+                ""
+            } else {
+                categoryName ?: transaction.categoryId?.value.orEmpty()
+            },
+        )
+    }
 
     /**
      * The single currency the summary strip renders in.
@@ -414,6 +438,8 @@ sealed interface TransactionsByAccountState {
         override val accountId: AccountId?,
         val accountName: String,
         val groups: List<TransactionGroupUi>,
+        /** Whether a row should name the account it belongs to — true on the all-accounts list. */
+        val showAccountOnRows: Boolean,
         val summary: TransactionSummaryUi,
         val query: String,
         val filters: TransactionFilterChipsUi,
@@ -486,6 +512,10 @@ data class TransactionRowUi(
     val formattedAmount: String,
     val isExpense: Boolean,
     val categoryHueSeed: String,
+    /** Name of the owning account, rendered only where the list mixes several — may be blank. */
+    val accountName: String = "",
+    /** One leg of a transfer: money moved sideways, drawn neutral with a swap glyph. */
+    val isTransfer: Boolean = false,
 )
 
 data class TransactionSummaryUi(
@@ -501,6 +531,9 @@ sealed interface TransactionsByAccountEvent {
     data class OnTransactionClick(val transactionId: TransactionId) : TransactionsByAccountEvent
     data class OnSearchQueryChanged(val query: String) : TransactionsByAccountEvent
     data object OnOpenFiltersClick : TransactionsByAccountEvent
+
+    /** The empty state's CTA when nothing matched: drops every filter *and* the search text. */
+    data object OnClearFiltersClick : TransactionsByAccountEvent
     data object OnPreviousPeriodClick : TransactionsByAccountEvent
     data object OnNextPeriodClick : TransactionsByAccountEvent
     data class OnPeriodModeChanged(val mode: TransactionPeriodMode) : TransactionsByAccountEvent

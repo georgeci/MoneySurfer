@@ -146,10 +146,21 @@ class CompiledFilters internal constructor(
             matchesQuery(row)
     }
 
-    private fun matchesType(transaction: Transaction): Boolean = when (filters.type) {
-        TransactionTypeFilter.All -> true
-        TransactionTypeFilter.Expenses -> transaction.type == TransactionType.EXPENSE
-        TransactionTypeFilter.Income -> transaction.type == TransactionType.INCOME
+    /**
+     * The stored type alone cannot answer this: both legs of a transfer are an ordinary
+     * `EXPENSE`/`INCOME` pair, so reading only [Transaction.type] would leave `Expenses` showing
+     * the outgoing leg the user picked the segment to hide. `transferId` is what separates money
+     * that left the books from money that only moved sideways, and it keeps the four segments
+     * disjoint.
+     */
+    private fun matchesType(transaction: Transaction): Boolean {
+        val isTransferLeg = transaction.transferId != null
+        return when (filters.type) {
+            TransactionTypeFilter.All -> true
+            TransactionTypeFilter.Expenses -> !isTransferLeg && transaction.type == TransactionType.EXPENSE
+            TransactionTypeFilter.Income -> !isTransferLeg && transaction.type == TransactionType.INCOME
+            TransactionTypeFilter.Transfer -> isTransferLeg
+        }
     }
 
     /**

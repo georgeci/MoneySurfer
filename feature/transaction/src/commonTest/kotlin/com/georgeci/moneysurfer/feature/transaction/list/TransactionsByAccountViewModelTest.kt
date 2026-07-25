@@ -439,6 +439,76 @@ class TransactionsByAccountViewModelTest : StringSpec({
         }
     }
 
+    "rows name their account only where the list mixes several" {
+        runTest {
+            val env = Env(
+                transactions = listOf(
+                    expense(id = "mine", amount = 10),
+                    expense(id = "theirs", amount = 20, account = OTHER_ACCOUNT),
+                ),
+            )
+
+            val allAccounts = env.viewModel(accountId = null).content()
+            allAccounts.showAccountOnRows shouldBe true
+            allAccounts.rows().map { it.accountName }
+                .shouldContainExactly("Everyday", "Savings")
+
+            // Scoped to one account the toolbar already says which; the rows still carry the name
+            // so the screen can decide, but the screen is told not to draw it.
+            env.viewModel(accountId = ACCOUNT).content().showAccountOnRows shouldBe false
+        }
+    }
+
+    "a transfer leg is filterable and marked as a transfer on the row" {
+        runTest {
+            val env = Env(
+                transactions = listOf(
+                    expense(id = "rent", amount = 40),
+                    expense(id = "moved-out", amount = 100).copy(transferId = TransferId("tr-1")),
+                    income(id = "moved-in", amount = 100).copy(transferId = TransferId("tr-1")),
+                ),
+            )
+            val viewModel = env.viewModel(accountId = null)
+
+            env.filterStore.commit(
+                env.filterStore.filters.value.copy(type = TransactionTypeFilter.Transfer),
+            )
+
+            val transfers = viewModel.content()
+            transfers.rowIds().shouldContainExactly("moved-out", "moved-in")
+            transfers.rows().map { it.isTransfer } shouldBe listOf(true, true)
+            // The seeded transfer category must not colour the row: it renders from the shared
+            // transfer palette instead, which the blank seed is what selects.
+            transfers.rows().map { it.categoryHueSeed } shouldBe listOf("", "")
+
+            // The point of the segment: the outgoing leg no longer reads as a plain expense.
+            env.filterStore.commit(
+                env.filterStore.filters.value.copy(type = TransactionTypeFilter.Expenses),
+            )
+            viewModel.content().rowIds().shouldContainExactly("rent")
+        }
+    }
+
+    "clearing from the empty state drops the filters and the search text together" {
+        runTest {
+            val env = Env(transactions = listOf(expense(id = "rent", amount = 40)))
+            val viewModel = env.viewModel()
+            env.filterStore.commit(
+                env.filterStore.filters.value.copy(type = TransactionTypeFilter.Income),
+            )
+            viewModel.onEvent(TransactionsByAccountEvent.OnSearchQueryChanged("coffee"))
+            viewModel.content().isEmpty shouldBe true
+
+            viewModel.onEvent(TransactionsByAccountEvent.OnClearFiltersClick)
+
+            val state = viewModel.content()
+            state.query shouldBe ""
+            state.isFiltered shouldBe false
+            // Anything less would answer the CTA with the same empty screen.
+            state.rowIds().shouldContainExactly("rent")
+        }
+    }
+
     "the all-accounts summary currency is the dominant one, not the newest row's" {
         runTest {
             val env = Env(
@@ -460,6 +530,7 @@ private const val PAGE_SIZE = 200
 
 private val WORKSPACE = WorkspaceId("ws-1")
 private val ACCOUNT = accountId("acc-1")
+private val OTHER_ACCOUNT = accountId("acc-2")
 
 private fun expense(
     id: String,
@@ -485,6 +556,9 @@ private fun TransactionsByAccountState.Content.rowCount(): Int = groups.sumOf { 
 
 private fun TransactionsByAccountState.Content.rowIds(): List<String> =
     groups.flatMap { group -> group.transactions.map { it.id.value } }
+
+private fun TransactionsByAccountState.Content.rows(): List<TransactionRowUi> =
+    groups.flatMap { it.transactions }
 
 /** An expense of an exact number of minor units, for the amount-tolerance cases. */
 private fun expenseCents(id: String, cents: Long): Transaction =
@@ -589,11 +663,14 @@ private class WindowingTransactionRepository(
 }
 
 private object SingleAccountRepository : AccountRepository {
-    private val account = anAccount(id = ACCOUNT, workspaceId = WORKSPACE, name = "Everyday")
+    private val accounts = listOf(
+        anAccount(id = ACCOUNT, workspaceId = WORKSPACE, name = "Everyday"),
+        anAccount(id = OTHER_ACCOUNT, workspaceId = WORKSPACE, name = "Savings"),
+    )
 
-    override suspend fun getById(id: AccountId): Account? = account.takeIf { it.id == id }
-    override fun getAll(): Flow<List<Account>> = flowOf(listOf(account))
-    override fun getByWorkspaceId(workspaceId: WorkspaceId): Flow<List<Account>> = flowOf(listOf(account))
+    override suspend fun getById(id: AccountId): Account? = accounts.find { it.id == id }
+    override fun getAll(): Flow<List<Account>> = flowOf(accounts)
+    override fun getByWorkspaceId(workspaceId: WorkspaceId): Flow<List<Account>> = flowOf(accounts)
     override suspend fun insert(account: Account) = Unit
     override suspend fun update(account: Account) = Unit
     override suspend fun delete(id: AccountId) = Unit

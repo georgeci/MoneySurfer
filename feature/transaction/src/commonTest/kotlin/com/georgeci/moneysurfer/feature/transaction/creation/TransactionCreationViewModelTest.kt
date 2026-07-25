@@ -17,6 +17,7 @@ import com.georgeci.moneysurfer.domain.fixtures.workspaceId
 import com.georgeci.moneysurfer.domain.model.Account
 import com.georgeci.moneysurfer.domain.model.Category
 import com.georgeci.moneysurfer.domain.model.Transaction
+import com.georgeci.moneysurfer.domain.model.reference
 import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.CategoryId
 import com.georgeci.moneysurfer.domain.primitives.CategoryType
@@ -33,6 +34,7 @@ import com.georgeci.moneysurfer.domain.repositories.TransactionRepository
 import com.georgeci.moneysurfer.domain.usecase.ApplyTransactionChangeUseCase
 import com.georgeci.moneysurfer.domain.usecase.CreateTransactionUseCase
 import com.georgeci.moneysurfer.domain.usecase.CreateTransferUseCase
+import com.georgeci.moneysurfer.domain.usecase.DeleteTransactionUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetAccountsUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetCategoriesUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetCurrentTimeUseCase
@@ -56,6 +58,8 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import moneysurfer.feature.transaction.generated.resources.Res
 import moneysurfer.feature.transaction.generated.resources.transaction_creation_created_snackbar
+import moneysurfer.feature.transaction.generated.resources.transaction_details_delete_undo
+import moneysurfer.feature.transaction.generated.resources.transaction_details_deleted_snackbar
 
 /**
  * Save flows for `TransactionCreationViewModel`. Each test stages accounts +
@@ -477,6 +481,178 @@ class TransactionCreationViewModelTest : StringSpec({
         }
     }
 
+    "editing snapshots the stored row for the identity band and keeps it while fields change" {
+        runTest {
+            val acc = anAccount(id = accountId("a-1"), workspaceId = ws, currencyCode = USD, balance = 500.dollars)
+            val category = aCategory(id = categoryId("c-exp"), workspaceId = ws, type = CategoryType.EXPENSE)
+            val original = aTransaction(
+                id = transactionId("t-8213"),
+                workspaceId = ws,
+                accountId = acc.id,
+                money = 48.dollars,
+                categoryId = category.id,
+                note = "Lidl — weekly shop",
+                type = TransactionType.EXPENSE,
+            )
+            val fixture = Fixture(ws).apply {
+                accountRepository.seed(acc)
+                categoryRepository.seed(category)
+                transactionRepository.insert(original)
+            }
+            val vm = fixture.createViewModel(editingTransactionId = original.id)
+            try {
+                val identity = vm.awaitContent().editIdentity.shouldNotBeNull()
+                identity.reference shouldBe original.id.reference
+                identity.type shouldBe TransactionTypeUi.Expense
+                identity.note shouldBe original.note
+                identity.formattedAmount shouldBe "−$48.00"
+
+                // The band answers "which transaction is this", so editing must not rewrite it.
+                vm.onEvent(TransactionCreationEvent.OnAmountChanged("95"))
+                vm.onEvent(TransactionCreationEvent.OnNoteChanged("something else"))
+
+                vm.awaitContent().editIdentity shouldBe identity
+            } finally {
+                vm.viewModelScope.cancel()
+            }
+        }
+    }
+
+    "the identity band calls a transfer leg a transfer and leaves its amount unsigned" {
+        runTest {
+            val acc = anAccount(id = accountId("a-1"), workspaceId = ws, currencyCode = USD, balance = 500.dollars)
+            val category = aCategory(id = categoryId("c-exp"), workspaceId = ws, type = CategoryType.EXPENSE)
+            // Stored as an ordinary EXPENSE, as both legs of a transfer are — only the transferId
+            // says the money moved sideways rather than left.
+            val leg = aTransaction(
+                id = transactionId("t-leg"),
+                workspaceId = ws,
+                accountId = acc.id,
+                money = 200.dollars,
+                categoryId = category.id,
+                note = "Rainy day top-up",
+                type = TransactionType.EXPENSE,
+                transferId = TransferId("tr-1"),
+            )
+            val fixture = Fixture(ws).apply {
+                accountRepository.seed(acc)
+                categoryRepository.seed(category)
+                transactionRepository.insert(leg)
+            }
+            val vm = fixture.createViewModel(editingTransactionId = leg.id)
+            try {
+                val identity = vm.awaitContent().editIdentity.shouldNotBeNull()
+                identity.type shouldBe TransactionTypeUi.Transfer
+                // Neither "+" nor "−": the money neither arrived nor left, matching the details screen.
+                identity.formattedAmount shouldBe "$200.00"
+            } finally {
+                vm.viewModelScope.cancel()
+            }
+        }
+    }
+
+    "there is no identity band outside edit mode" {
+        runTest {
+            val acc = anAccount(id = accountId("a-1"), workspaceId = ws, currencyCode = USD)
+            val category = aCategory(id = categoryId("c-exp"), workspaceId = ws, type = CategoryType.EXPENSE)
+            val original = aTransaction(
+                id = transactionId("t-1"),
+                workspaceId = ws,
+                accountId = acc.id,
+                money = 48.dollars,
+                categoryId = category.id,
+                type = TransactionType.EXPENSE,
+            )
+            val fixture = Fixture(ws).apply {
+                accountRepository.seed(acc)
+                categoryRepository.seed(category)
+                transactionRepository.insert(original)
+            }
+            val duplicating = fixture.createViewModel(duplicateOf = original.id)
+            try {
+                duplicating.awaitContent().editIdentity shouldBe null
+            } finally {
+                duplicating.viewModelScope.cancel()
+            }
+        }
+    }
+
+    "deleting from edit mode removes the row, refunds the balance and offers undo" {
+        runTest {
+            val acc = anAccount(id = accountId("a-1"), workspaceId = ws, currencyCode = USD, balance = 500.dollars)
+            val category = aCategory(id = categoryId("c-exp"), workspaceId = ws, type = CategoryType.EXPENSE)
+            val original = aTransaction(
+                id = transactionId("t-1"),
+                workspaceId = ws,
+                accountId = acc.id,
+                money = 80.dollars,
+                categoryId = category.id,
+                type = TransactionType.EXPENSE,
+            )
+            val fixture = Fixture(ws).apply {
+                accountRepository.seed(acc)
+                categoryRepository.seed(category)
+                transactionRepository.insert(original)
+            }
+            val vm = fixture.createViewModel(editingTransactionId = original.id)
+            try {
+                vm.awaitContent()
+
+                vm.onEvent(TransactionCreationEvent.OnDeleteClick)
+                vm.awaitContent().showDeleteConfirmation shouldBe true
+
+                fixture.snackbar.requests.test {
+                    vm.onEvent(TransactionCreationEvent.OnDeleteConfirmed)
+
+                    val request = awaitItem()
+                    request.message shouldBe Res.string.transaction_details_deleted_snackbar
+                    request.actionLabel shouldBe Res.string.transaction_details_delete_undo
+                    fixture.transactionRepository.getById(original.id) shouldBe null
+                    fixture.accountRepository.byId[acc.id]!!.balance shouldBe 580.dollars
+
+                    // Undo is the same restore the details screen offers — row and balance both.
+                    request.onAction.shouldNotBeNull().invoke()
+                    fixture.transactionRepository.getById(original.id) shouldBe original
+                    fixture.accountRepository.byId[acc.id]!!.balance shouldBe 500.dollars
+                }
+            } finally {
+                vm.viewModelScope.cancel()
+            }
+        }
+    }
+
+    "dismissing the delete confirmation leaves the transaction alone" {
+        runTest {
+            val acc = anAccount(id = accountId("a-1"), workspaceId = ws, currencyCode = USD, balance = 500.dollars)
+            val category = aCategory(id = categoryId("c-exp"), workspaceId = ws, type = CategoryType.EXPENSE)
+            val original = aTransaction(
+                id = transactionId("t-1"),
+                workspaceId = ws,
+                accountId = acc.id,
+                money = 80.dollars,
+                categoryId = category.id,
+                type = TransactionType.EXPENSE,
+            )
+            val fixture = Fixture(ws).apply {
+                accountRepository.seed(acc)
+                categoryRepository.seed(category)
+                transactionRepository.insert(original)
+            }
+            val vm = fixture.createViewModel(editingTransactionId = original.id)
+            try {
+                vm.awaitContent()
+
+                vm.onEvent(TransactionCreationEvent.OnDeleteClick)
+                vm.onEvent(TransactionCreationEvent.OnDeleteDismissed)
+
+                vm.awaitContent().showDeleteConfirmation shouldBe false
+                fixture.transactionRepository.getById(original.id) shouldBe original
+            } finally {
+                vm.viewModelScope.cancel()
+            }
+        }
+    }
+
     "duplicating carries the merchant and tags but not the pairing, schedule or planned state" {
         runTest {
             val acc = anAccount(id = accountId("a-1"), workspaceId = ws, currencyCode = USD, balance = 500.dollars)
@@ -557,6 +733,8 @@ private class Fixture(workspaceId: WorkspaceId) {
             applyTransactionChange = applyChange,
             getCurrentTime = GetCurrentTimeUseCase(clock),
         ),
+        deleteTransaction = DeleteTransactionUseCase(transactionRepository, applyChange),
+        applyTransactionChange = applyChange,
         getCurrentTime = GetCurrentTimeUseCase(clock),
         transactionRepository = transactionRepository,
         featureConfig = featureConfig,
