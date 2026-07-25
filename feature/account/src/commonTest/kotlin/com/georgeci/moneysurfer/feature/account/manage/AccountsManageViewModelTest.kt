@@ -152,9 +152,9 @@ class AccountsManageViewModelTest : StringSpec({
         val ws = workspaceId("ws-1")
         val repo = FakeAccountRepository(
             initial = listOf(
-                anAccount(id = accountId("a-1"), workspaceId = ws, name = "Everyday", sortOrder = 2),
-                anAccount(id = accountId("a-2"), workspaceId = ws, name = "Savings", sortOrder = 0),
-                anAccount(id = accountId("a-3"), workspaceId = ws, name = "Card", sortOrder = 1),
+                anAccount(id = accountId("a-1"), workspaceId = ws, name = "Everyday").copy(sortOrder = 2),
+                anAccount(id = accountId("a-2"), workspaceId = ws, name = "Savings").copy(sortOrder = 0),
+                anAccount(id = accountId("a-3"), workspaceId = ws, name = "Card").copy(sortOrder = 1),
             ),
             workspaceId = ws,
         )
@@ -209,9 +209,9 @@ class AccountsManageViewModelTest : StringSpec({
 })
 
 private fun threeAccounts(ws: WorkspaceId): Triple<Account, Account, Account> = Triple(
-    anAccount(id = accountId("a-1"), workspaceId = ws, name = "Everyday", sortOrder = 0),
-    anAccount(id = accountId("a-2"), workspaceId = ws, name = "Savings", sortOrder = 1),
-    anAccount(id = accountId("a-3"), workspaceId = ws, name = "Card", sortOrder = 2),
+    anAccount(id = accountId("a-1"), workspaceId = ws, name = "Everyday").copy(sortOrder = 0),
+    anAccount(id = accountId("a-2"), workspaceId = ws, name = "Savings").copy(sortOrder = 1),
+    anAccount(id = accountId("a-3"), workspaceId = ws, name = "Card").copy(sortOrder = 2),
 )
 
 private fun StringSpec.newViewModel(

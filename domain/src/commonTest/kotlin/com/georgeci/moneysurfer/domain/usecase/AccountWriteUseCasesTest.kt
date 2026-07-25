@@ -78,9 +78,9 @@ class AccountWriteUseCasesTest : StringSpec({
     }
 
     "reorder numbers the accounts in the order it was given" {
-        val first = anAccount(id = accountId("a-1"), sortOrder = 0)
-        val second = anAccount(id = accountId("a-2"), sortOrder = 1)
-        val third = anAccount(id = accountId("a-3"), sortOrder = 2)
+        val first = anAccount(id = accountId("a-1")).copy(sortOrder = 0)
+        val second = anAccount(id = accountId("a-2")).copy(sortOrder = 1)
+        val third = anAccount(id = accountId("a-3")).copy(sortOrder = 2)
         val repo = FakeWritableAccountRepository(
             mutableMapOf(first.id to first, second.id to second, third.id to third),
         )

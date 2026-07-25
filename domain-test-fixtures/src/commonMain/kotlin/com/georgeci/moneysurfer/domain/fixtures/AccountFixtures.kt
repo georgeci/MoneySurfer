@@ -17,7 +17,6 @@ fun anAccount(
     balance: Money = Money.zero(),
     archived: Boolean = false,
     archivedAt: Instant? = null,
-    sortOrder: Int = 0,
 ): Account = Account(
     id = id,
     workspaceId = workspaceId,
@@ -27,5 +26,6 @@ fun anAccount(
     balance = balance,
     archived = archived,
     archivedAt = archivedAt,
-    sortOrder = sortOrder,
 )
+// `sortOrder` deliberately has no parameter here: the builder is already at the parameter limit,
+// and only the reorder tests care about it — they say `anAccount(...).copy(sortOrder = n)`.
