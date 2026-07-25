@@ -113,7 +113,7 @@
 ## context-packs
 - Title: Add Compose screen
 - File: docs/CONTEXT_PACKS.md
-- Lines: 26-59
+- Lines: 27-68
 - Tasks: context, docs, agent
 
 ## crash-reporting
@@ -241,6 +241,24 @@
 - File: docs/architecture/navigation.AI_SUMMARY.md
 - Lines: 23-29
 - Tasks: navigation, screen, summary
+
+## onboarding-flow
+- Title: Onboarding
+- File: docs/features/onboarding.md
+- Lines: 83-120
+- Tasks: onboarding, first-run, navigation
+
+## onboarding-splash
+- Title: Splash
+- File: docs/features/onboarding.md
+- Lines: 35-81
+- Tasks: splash, launch, navigation
+
+## onboarding-start-route
+- Title: Start route
+- File: docs/features/onboarding.md
+- Lines: 122-149
+- Tasks: first-run, navigation, offline
 
 ## persistence-rules
 - Title: Rules
