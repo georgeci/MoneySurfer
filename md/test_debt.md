@@ -73,15 +73,16 @@ Existing IT inventory (under `integration-test/src/androidDeviceTest/`):
 
 ### 5. Pull batch pagination (`BATCH_SIZE = 100`)
 
-**Why:** [`PullRemoteChangesUseCaseImpl.BATCH_SIZE`](../data/src/commonMain/kotlin/com/georgeci/moneysurfer/data/sync/PullRemoteChangesUseCaseImpl.kt) is 100. The cursor-paged pull is correct iff a second pull picks up where the first one left off. Single-batch tests don't prove it.
+**Why:** [`PullRemoteChangesUseCaseImpl.BATCH_SIZE`](../sync-surfer/src/commonMain/kotlin/com/georgeci/moneysurfer/data/sync/PullRemoteChangesUseCaseImpl.kt) is 100. The cursor-paged pull is correct iff the next query picks up where the last one left off. Single-batch tests don't prove it.
 
-**Setup:** seed > 100 (e.g. 150) account docs into Firestore via `set(...)` in a loop, with strictly-increasing `updatedAt`. First pull, then second pull.
+**Note (issue #342):** the pull now *drains* — `pullBatches` loops until a batch comes back short of `BATCH_SIZE`, so one sync pulls the whole collection rather than 100 docs per minute. Unit coverage against a fake reader is in `PullRemoteChangesUseCaseImplSpec` ("a collection larger than one batch is drained by a single pull"). What is still missing is the same thing against the real Firestore emulator, where the query, the cursor and the ordering are the SDK's rather than a fake's.
+
+**Setup:** seed > 100 (e.g. 250) account docs into Firestore via `set(...)` in a loop, with strictly-increasing `updatedAt`. One pull.
 
 **Acceptance:**
-- First pull: `downloadedCount = 100`, cursor advances to the 100th doc's `updatedAt`.
-- Second pull: `downloadedCount = 50`, cursor advances to the 150th doc's `updatedAt`.
-- Local Room has all 150 rows.
-- Third pull: `downloadedCount = 0`.
+- One pull: `downloadedCount = 250`, cursor advances to the 250th doc's `updatedAt`.
+- Local Room has all 250 rows.
+- Second pull: `downloadedCount = 0`.
 
 ---
 

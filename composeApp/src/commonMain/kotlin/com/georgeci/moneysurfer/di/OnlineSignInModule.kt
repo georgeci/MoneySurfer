@@ -27,11 +27,16 @@ class OnlineSignInModule {
     fun offlineBuildFlags(): OfflineBuildFlags = OfflineBuildFlags(isOffline = false)
 
     /**
-     * Sync is hidden by default in the online build — flip to `enabled = true` to
-     * expose Settings → Sync, the periodic in-process ticker, and the use-case
-     * driven sync triggers (PostAuthBootstrap, CreateWorkspace, AcceptInvite,
+     * Sync is live in the online build: Settings → Sync, the periodic in-process ticker, and the
+     * use-case driven triggers (PostAuthBootstrap, CreateWorkspace, AcceptInvite,
      * RefreshIncomingInvites). See [SyncFeatureFlag] for the full gating surface.
+     *
+     * Enabled in issue #342, once its preconditions landed: the remote user document is no longer
+     * filled with refs to workspaces that were never created, a stale ref no longer blocks
+     * sign-in, the pull drains instead of stopping at 100 documents per collection, and a
+     * workspace pushed from the outbox registers its own ref. Turning this back off is a release
+     * decision — record it in AGENTS.md → "Feature flags shipped switched off".
      */
     @Single
-    fun syncFeatureFlag(): SyncFeatureFlag = SyncFeatureFlag(enabled = false)
+    fun syncFeatureFlag(): SyncFeatureFlag = SyncFeatureFlag(enabled = true)
 }

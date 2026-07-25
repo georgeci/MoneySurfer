@@ -3,6 +3,7 @@ package com.georgeci.moneysurfer.domain.usecase
 import arrow.core.Either
 import arrow.core.raise.either
 import co.touchlab.kermit.Logger
+import com.georgeci.moneysurfer.domain.SyncFeatureFlag
 import com.georgeci.moneysurfer.domain.auth.SessionPointers
 import com.georgeci.moneysurfer.domain.constants.DEFAULT_CATEGORY_SEEDS
 import com.georgeci.moneysurfer.domain.logging.redactUid
@@ -27,10 +28,12 @@ import kotlin.time.Instant
  * End-to-end create-workspace flow:
  *  1. Local: insert Workspace + WorkspaceMember(OWNER) + default Category rows.
  *  2. Remote: push the workspace to Firestore and append the wid to `users/{uid}.workspaceIds`
- *     so other devices see it. Skipped for the local "demo" session (no Firebase uid).
+ *     so other devices see it. Skipped for the local "demo" session (no Firebase uid) and
+ *     whenever [SyncFeatureFlag] is off.
  *  3. Pin the new workspace as the active one so the next screen lands on Dashboard.
  */
 @Single
+@Suppress("LongParameterList")
 class CreateWorkspaceUseCase(
     private val workspaceRepository: WorkspaceRepository,
     private val workspaceMemberRepository: WorkspaceMemberRepository,
@@ -39,6 +42,7 @@ class CreateWorkspaceUseCase(
     private val workspaceSyncer: WorkspaceSyncer,
     private val session: SessionPointers,
     private val getCurrentTime: GetCurrentTimeUseCase,
+    private val syncFeatureFlag: SyncFeatureFlag,
 ) {
     private val log = Logger.withTag(TAG)
 
@@ -70,8 +74,14 @@ class CreateWorkspaceUseCase(
         // pulls with PERMISSION_DENIED via firestore.rules `isMember`).
         //
         // Demo session (no Firebase uid) → no remote contract; success is local-only.
+        //
+        // The flag has to be checked HERE and not only inside `WorkspaceSyncer`: with sync off
+        // `pushAll()` returns normally, which is indistinguishable from a landed push, so the
+        // two `UserRemoteRepository` calls below would still run and fill
+        // `users/{uid}.workspaceIds` with ids whose `workspaces/{wid}` document was never
+        // created — exactly the dangling refs the block above exists to prevent (issue #342).
         val firebaseUid = session.currentFirebaseUid.flow.first()
-        if (firebaseUid != null) {
+        if (firebaseUid != null && syncFeatureFlag.enabled) {
             Either.catch { workspaceSyncer.pushAll() }
                 .onLeft { log.w(it) { "[remote] pushAll failed wid=${newId.value}" } }
                 .onRight { log.i { "[remote] pushAll ok wid=${newId.value}" } }
@@ -100,7 +110,10 @@ class CreateWorkspaceUseCase(
                     log.i { "[remote] setDefaultWorkspace ok uid=${firebaseUid.redactUid()} wid=${newId.value}" }
                 }
         } else {
-            log.i { "[remote] skipped (no Firebase uid — local/demo session)" }
+            log.i {
+                "[remote] skipped (firebaseUid=${firebaseUid != null} " +
+                    "syncEnabled=${syncFeatureFlag.enabled}) — local-only workspace"
+            }
         }
 
         session.currentWorkspaceId.set(newId)

@@ -158,6 +158,30 @@ insufficient.
 - Known gaps are referenced from [docs/architecture/sync.md](docs/architecture/sync.md);
   do not claim "fully implemented" without checking them.
 
+### Feature flags shipped switched off
+
+A feature can be fully written, merged and still be dark in production because one
+`single { }` binding says `false`. That is invisible in code review and in the module
+map, so it must be written down here.
+
+| Flag | Bound in | Currently |
+| --- | --- | --- |
+| `SyncFeatureFlag` | [composeApp/.../di/OnlineSignInModule.kt](composeApp/src/commonMain/kotlin/com/georgeci/moneysurfer/di/OnlineSignInModule.kt) (online), `composeAppOffline/.../di/OfflineWiring.kt` (offline, always `false`) | online: **on** since issue #342; offline: off by design |
+
+Rules for this table:
+
+- Adding a flag that ships `false` means adding a row here in the same PR, naming the
+  file and line that binds it.
+- Flipping one is a **release decision**, not a refactor: say so in the PR body and list
+  what the flip turns on.
+- Before flipping, check what the flag gates on *both* sides. `SyncFeatureFlag` gated
+  `WorkspaceSyncer` but not the direct `UserRemoteRepository` writes, and that asymmetry
+  corrupted every remote user document for months — see
+  [docs/architecture/cloud-login-hydration.md](docs/architecture/cloud-login-hydration.md).
+- A "no-op on failure" and a "no-op because disabled" must not be indistinguishable to
+  the caller. If a disabled path returns success, callers downstream of it will act as if
+  the work happened.
+
 ## Firestore Rules
 
 - Persistence overview: [docs/architecture/persistence.md](docs/architecture/persistence.md).

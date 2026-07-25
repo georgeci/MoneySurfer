@@ -9,12 +9,14 @@ import com.georgeci.moneysurfer.domain.repositories.AuthRemoteRepository
 import org.koin.core.annotation.Single
 
 @Single
+@Suppress("LongParameterList")
 class SignupUseCase(
     private val authRemoteRepository: AuthRemoteRepository,
     private val authLocalRepository: AuthLocalRepository,
     private val session: SessionPointers,
     private val wipeDemoDataUseCase: WipeDemoDataUseCase,
     private val postAuthBootstrap: PostAuthBootstrapUseCase,
+    private val abandonAuthSession: AbandonAuthSessionUseCase,
 ) {
     suspend operator fun invoke(
         email: String,
@@ -36,11 +38,13 @@ class SignupUseCase(
         )
         session.currentFirebaseUid.set(uid)
 
+        // Roll the pointers back when the bootstrap fails — see [LoginUseCase] for why the
+        // pins cannot simply be deferred until after it (issue #342).
         postAuthBootstrap(
             uid = uid,
             email = trimmed,
             displayName = displayName,
             isAnon = false,
-        ).bind()
+        ).onLeft { abandonAuthSession(isAnon = false) }.bind()
     }
 }

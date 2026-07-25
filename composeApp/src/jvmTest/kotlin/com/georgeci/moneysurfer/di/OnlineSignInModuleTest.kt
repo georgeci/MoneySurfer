@@ -29,9 +29,13 @@ class OnlineSignInModuleTest {
     }
 
     @Test
-    fun `online build registers SyncFeatureFlag disabled by default`() {
+    fun `online build registers SyncFeatureFlag enabled`() {
         val flag = OnlineSignInModule().syncFeatureFlag()
 
-        assertFalse(flag.enabled, "sync is hidden by default in the online build")
+        assertTrue(
+            flag.enabled,
+            "sync is live in the online build since issue #342 — turning it off again is a " +
+                "release decision, not a refactor, and belongs in AGENTS.md's dark-flag table",
+        )
     }
 }

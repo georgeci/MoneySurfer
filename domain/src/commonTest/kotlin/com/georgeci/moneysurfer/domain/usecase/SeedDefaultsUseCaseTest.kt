@@ -1,5 +1,6 @@
 package com.georgeci.moneysurfer.domain.usecase
 
+import com.georgeci.moneysurfer.domain.SyncFeatureFlag
 import com.georgeci.moneysurfer.domain.auth.InMemorySessionPointers
 import com.georgeci.moneysurfer.domain.constants.DEFAULT_CATEGORY_SEEDS
 import com.georgeci.moneysurfer.domain.model.Account
@@ -127,6 +128,8 @@ private class SeedTestEnv(
         workspaceSyncer = SeedFakeWorkspaceSyncer,
         session = session,
         getCurrentTime = getCurrentTime,
+        // Offline seed path — there is no Firebase session here either way.
+        syncFeatureFlag = SyncFeatureFlag(enabled = false),
     )
     val useCase = SeedDefaultsUseCase(
         createWorkspace = createWorkspace,
