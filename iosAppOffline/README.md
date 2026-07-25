@@ -24,9 +24,11 @@ but links the `ComposeAppOffline.framework` produced by `:composeAppOffline`
    distinguishable on the home screen when installed side-by-side, replace
    the icons here.
 4. **CI.** Covered: `.github/workflows/ios-offline.yml` builds `iosAppOffline`
-   on every PR and `main` push and runs the offline golden Maestro flow
-   (`scripts/maestro/offline/offline-golden.yaml`) on an iOS Simulator via
-   `./gradlew qaMaestroOfflineIos`.
+   on every PR and `main` push; the simulator run lives in `nightly.yml` and
+   drives `./gradlew qaMaestroOfflineIos`. That task currently runs the launch
+   smoke (`scripts/maestro/ios/app-open.yaml`) rather than the offline golden
+   flow (`scripts/maestro/offline/offline-golden.yaml`), which keeps running on
+   Android — see issue #297.
 5. **App Store Connect.** Only needed if the offline build is shipped as a
    public release. Bundle id `com.georgeci.moneysurfer.offline` would need
    its own App Store Connect record. Not required for internal QA.
