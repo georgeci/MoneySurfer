@@ -671,11 +671,14 @@ jobs:
     name: Aggregate + publish to Pages
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    # Serialize every gh-pages writer (this job, nightly-publish, gh-pages-prune)
-    # on one group so pushes never race into a non-fast-forward. Job-level so it
-    # overrides the workflow's per-PR concurrency group.
+    # Only main pushes write gh-pages, so only those runs share the writer lock
+    # with nightly-publish and gh-pages-prune. PR and manual runs only upload an
+    # artifact; a run-specific group keeps them out of the shared queue, where
+    # GitHub would evict an older pending job when a third writer queued.
     concurrency:
-      group: gh-pages-write
+      group: >-
+        ${{ github.event_name == 'push' && github.ref == 'refs/heads/main'
+            && 'gh-pages-write' || format('publish-artifact-{0}', github.run_id) }}
       cancel-in-progress: false
     needs: [changes, junit, firestore-rules]
     # Skip on doc-only PRs — no fresh test results to aggregate, and we don't
