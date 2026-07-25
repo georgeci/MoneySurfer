@@ -88,6 +88,36 @@ class CategoryCapCoverageTest : StringSpec({
         coverage.shouldBeInstanceOf<CategoryCapCoverage.Managed>().budget shouldBe older
     }
 
+    "two budgets created at the same instant break the tie by id, so the notice is stable" {
+        val alpha = aBudget(
+            id = budgetId("b-alpha"),
+            name = "Alpha",
+            categoryIds = listOf(food),
+            createdAt = testInstant,
+        )
+        val beta = aBudget(
+            id = budgetId("b-beta"),
+            name = "Beta",
+            categoryIds = listOf(food),
+            createdAt = testInstant,
+        )
+
+        val coverage = resolveCategoryCapCoverage(food, budgets = listOf(beta, alpha))
+
+        coverage.shouldBeInstanceOf<CategoryCapCoverage.Managed>().budget shouldBe alpha
+    }
+
+    "a workspace full of budgets that miss this category still leaves the control free" {
+        val budgets = listOf(
+            aBudget(id = budgetId("b-other-archived"), categoryIds = listOf(categoryId("c-rent")), isActive = false),
+            aBudget(id = budgetId("b-other-active"), categoryIds = listOf(categoryId("c-rent"))),
+            aBudget(id = budgetId("b-envelope"), categoryIds = emptyList()),
+            aBudget(id = budgetId("b-food-archived"), categoryIds = listOf(food), isActive = false),
+        )
+
+        resolveCategoryCapCoverage(food, budgets) shouldBe CategoryCapCoverage.Editable(budget = null)
+    }
+
     "an archived duplicate does not push the control read-only" {
         val active = aBudget(id = budgetId("b-active"), categoryIds = listOf(food))
         val archived = aBudget(id = budgetId("b-archived"), categoryIds = listOf(food), isActive = false)

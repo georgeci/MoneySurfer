@@ -17,6 +17,7 @@ import com.georgeci.moneysurfer.domain.primitives.BudgetId
 import com.georgeci.moneysurfer.domain.primitives.CategoryId
 import com.georgeci.moneysurfer.domain.primitives.CategoryType
 import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
+import com.georgeci.moneysurfer.domain.primitives.Money
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 import com.georgeci.moneysurfer.domain.repositories.BudgetRepository
 import com.georgeci.moneysurfer.domain.repositories.CategoryRepository
@@ -399,6 +400,68 @@ class CategoryCreationViewModelTest : StringSpec({
                 val budget = fixture.budgetRepository.snapshot().single()
                 budget.id shouldBe backing.id
                 budget.amount shouldBe 450.dollars
+            } finally {
+                vm.viewModelScope.cancel()
+            }
+        }
+    }
+
+    "a cap with cents survives the round-trip through the field" {
+        runTest {
+            val category = aCategory(id = categoryId("c-food"), workspaceId = ws, name = "Food")
+            val backing = aBudget(
+                id = budgetId("b-food"),
+                workspaceId = ws,
+                categoryIds = listOf(category.id),
+                amount = Money.fromMajor(12, 50),
+            )
+            val fixture = Fixture(workspaceId = ws, existing = listOf(category), budgets = listOf(backing))
+            val vm = fixture.createViewModel(editing = category.id)
+            try {
+                // Not "12.5" and not "1250" — the field speaks major units with both decimals.
+                vm.currentState.cap shouldBe "12.50"
+
+                vm.onEvent(CategoryCreationEvent.OnCapChanged("7.05"))
+                vm.onEvent(CategoryCreationEvent.OnSaveClick)
+
+                fixture.budgetRepository.snapshot().single().amount shouldBe Money.fromMajor(7, 5)
+            } finally {
+                vm.viewModelScope.cancel()
+            }
+        }
+    }
+
+    // Zero is not a limit of zero — it means "no cap". Creating a budget for it would open at
+    // 100% over budget the moment the first transaction lands.
+    "a cap of zero creates no budget" {
+        runTest {
+            val fixture = Fixture(workspaceId = ws)
+            val vm = fixture.createViewModel()
+            try {
+                vm.onEvent(CategoryCreationEvent.OnNameChanged("Groceries"))
+                vm.onEvent(CategoryCreationEvent.OnCapChanged("0"))
+                vm.currentState.capAsMoney.shouldBeNull()
+
+                vm.onEvent(CategoryCreationEvent.OnSaveClick)
+
+                fixture.budgetRepository.snapshot().shouldBeEmpty()
+            } finally {
+                vm.viewModelScope.cancel()
+            }
+        }
+    }
+
+    "a cap zeroed out on an existing category deletes the backing budget" {
+        runTest {
+            val category = aCategory(id = categoryId("c-food"), workspaceId = ws, name = "Food")
+            val backing = aBudget(workspaceId = ws, categoryIds = listOf(category.id), amount = 300.dollars)
+            val fixture = Fixture(workspaceId = ws, existing = listOf(category), budgets = listOf(backing))
+            val vm = fixture.createViewModel(editing = category.id)
+            try {
+                vm.onEvent(CategoryCreationEvent.OnCapChanged("0"))
+                vm.onEvent(CategoryCreationEvent.OnSaveClick)
+
+                fixture.budgetRepository.snapshot().shouldBeEmpty()
             } finally {
                 vm.viewModelScope.cancel()
             }
