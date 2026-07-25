@@ -73,6 +73,7 @@ stage_api_key() {
   local dest="$keys_dir/AuthKey_${ASC_API_KEY_ID}.p8"
   cp -f "$ASC_API_KEY_PATH" "$dest"
   chmod 600 "$dest"
+  ASC_STAGED_API_KEY_PATH="$dest"
 }
 
 run_target() {
@@ -104,6 +105,14 @@ run_target() {
     echo "▸ [$scheme] Overriding APP_VERSION_CODE → $ASC_BUILD_NUMBER (xcodebuild build-setting)…"
     version_override=("APP_VERSION_CODE=$ASC_BUILD_NUMBER")
   fi
+  local -a authentication_args=()
+  if [[ -n "${ASC_STAGED_API_KEY_PATH:-}" ]]; then
+    authentication_args=(
+      -authenticationKeyPath "$ASC_STAGED_API_KEY_PATH"
+      -authenticationKeyID "$ASC_API_KEY_ID"
+      -authenticationKeyIssuerID "$ASC_API_ISSUER_ID"
+    )
+  fi
 
   echo "▸ [$scheme] Archiving (Release)…"
   xcodebuild \
@@ -113,6 +122,7 @@ run_target() {
     -destination 'generic/platform=iOS' \
     -archivePath "$archive_path" \
     -allowProvisioningUpdates \
+    ${authentication_args[@]+"${authentication_args[@]}"} \
     ${version_override[@]+"${version_override[@]}"} \
     archive
 
@@ -122,7 +132,8 @@ run_target() {
     -archivePath "$archive_path" \
     -exportPath "$export_dir" \
     -exportOptionsPlist "$export_options" \
-    -allowProvisioningUpdates
+    -allowProvisioningUpdates \
+    ${authentication_args[@]+"${authentication_args[@]}"}
 
   local ipa_path
   ipa_path="$(ls "$export_dir"/*.ipa | head -n1)"
