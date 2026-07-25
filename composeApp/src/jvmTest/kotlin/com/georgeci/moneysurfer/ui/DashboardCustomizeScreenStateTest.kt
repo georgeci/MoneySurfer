@@ -7,11 +7,15 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.v2.runComposeUiTest
+import com.georgeci.moneysurfer.domain.dashboard.DashboardCardStyle
 import com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutConfig
+import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetSize
 import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetType
+import com.georgeci.moneysurfer.feature.dashboard.customize.DashboardCardStyleSheetContent
 import com.georgeci.moneysurfer.feature.dashboard.customize.DashboardCustomizeContent
 import com.georgeci.moneysurfer.feature.dashboard.customize.DashboardCustomizeEvent
 import com.georgeci.moneysurfer.feature.dashboard.customize.DashboardCustomizeTestTags
+import com.georgeci.moneysurfer.uikit.widgets.SurferBalanceVariant
 import com.georgeci.moneysurfer.utils.AsyncState
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContain
@@ -140,6 +144,83 @@ class DashboardCustomizeScreenStateTest : StringSpec({
         }
     }
 
+    "an on-dashboard row shows the card style it is set to, and opens the picker" {
+        runComposeUiTest {
+            setContent {
+                DashboardCustomizeContent(
+                    state = AsyncState.Content(
+                        DashboardLayoutConfig.DEFAULT
+                            .withCardStyle(DashboardWidgetType.Balance, DashboardCardStyle(variant = INLINE)),
+                    ),
+                    onEvent = {},
+                )
+            }
+
+            onNodeWithTag(DashboardCustomizeTestTags.styleAction(BALANCE)).performClick()
+            waitForIdle()
+
+            onNodeWithTag(DashboardCustomizeTestTags.styleSheet(BALANCE)).assertExists()
+            // The sheet opens on the style the row advertised, not on the widget's default.
+            onNodeWithTag(styleOption(INLINE)).assertExists()
+        }
+    }
+
+    "the style sheet offers both sizes and, for the balance card, its variants" {
+        runComposeUiTest {
+            setContent {
+                DashboardCardStyleSheetContent(item = BALANCE_ITEM, onSelect = {})
+            }
+
+            onNodeWithTag(DashboardCustomizeTestTags.styleSheet(BALANCE)).assertIsDisplayed()
+            onNodeWithTag(styleOption(DashboardWidgetSize.Hero.name)).assertIsDisplayed()
+            onNodeWithTag(styleOption(DashboardWidgetSize.Compact.name)).assertIsDisplayed()
+            onNodeWithTag(styleOption(SurferBalanceVariant.Minimal.name)).assertExists()
+        }
+    }
+
+    "a widget with no variants gets a size-only sheet" {
+        runComposeUiTest {
+            setContent {
+                DashboardCardStyleSheetContent(
+                    item = DashboardLayoutConfig.DEFAULT.items.first { it.type == DashboardWidgetType.Goals },
+                    onSelect = {},
+                )
+            }
+
+            onNodeWithTag(
+                DashboardCustomizeTestTags.styleOption(
+                    DashboardWidgetType.Goals.name,
+                    DashboardWidgetSize.Compact.name,
+                ),
+            ).assertIsDisplayed()
+            onNodeWithTag(
+                DashboardCustomizeTestTags.styleOption(
+                    DashboardWidgetType.Goals.name,
+                    SurferBalanceVariant.Classic.name,
+                ),
+            ).assertDoesNotExist()
+        }
+    }
+
+    "picking a tile reports the whole card style, keeping the half that was not touched" {
+        runComposeUiTest {
+            val picked = mutableListOf<DashboardCardStyle>()
+            setContent {
+                DashboardCardStyleSheetContent(
+                    item = BALANCE_ITEM.copy(cardStyle = DashboardCardStyle(variant = INLINE)),
+                    onSelect = { picked += it },
+                )
+            }
+
+            onNodeWithTag(styleOption(DashboardWidgetSize.Compact.name)).performClick()
+            waitForIdle()
+
+            picked shouldContainExactly listOf(
+                DashboardCardStyle(size = DashboardWidgetSize.Compact, variant = INLINE),
+            )
+        }
+    }
+
     "a drag that never leaves the row it started on asks for nothing" {
         runComposeUiTest {
             val events = mutableListOf<DashboardCustomizeEvent>()
@@ -170,6 +251,15 @@ private const val DRAG_OVERSHOOT = 1.5f
 
 private val GOALS_OFF = DashboardLayoutConfig.DEFAULT
     .withWidgetEnabled(DashboardWidgetType.Goals, enabled = false)
+
+private val BALANCE = DashboardWidgetType.Balance.name
+
+private val INLINE = SurferBalanceVariant.Inline.name
+
+private val BALANCE_ITEM = DashboardLayoutConfig.DEFAULT.items
+    .first { it.type == DashboardWidgetType.Balance }
+
+private fun styleOption(option: String) = DashboardCustomizeTestTags.styleOption(BALANCE, option)
 
 private val ONLY_BALANCE = DashboardLayoutConfig.DEFAULT.items
     .filter { it.type == DashboardWidgetType.Balance }

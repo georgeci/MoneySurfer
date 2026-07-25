@@ -18,6 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.georgeci.moneysurfer.uikit.components.base.SurferSplitAmount
@@ -50,12 +51,43 @@ sealed interface SurferBalanceFootnote {
     data class Empty(val text: String) : SurferBalanceFootnote
 }
 
+/**
+ * Typographic treatment of the balance card. Only the arrangement and the type scale of the title
+ * and the amount change — the container, its colours and the footnote are the same in all four, so
+ * the choice reads as a style rather than as four different widgets.
+ *
+ * The entry names double as the persisted keys of a dashboard card style, which is why
+ * [fromKey] is lenient: a layout written by a newer build may name a treatment this one has never
+ * heard of, and falling back to [Classic] beats refusing to draw the balance.
+ */
+enum class SurferBalanceVariant {
+
+    /** Label above the amount — the dashboard default. */
+    Classic,
+
+    /** Amount first, label demoted to a caption under it. */
+    Stacked,
+
+    /** Label and amount on one line, the amount a tier smaller so both fit. */
+    Inline,
+
+    /** Amount alone; the card's position on the dashboard is the label. */
+    Minimal,
+
+    ;
+
+    companion object {
+        fun fromKey(key: String?): SurferBalanceVariant = entries.firstOrNull { it.name == key } ?: Classic
+    }
+}
+
 @Composable
 fun SurferBalanceWidget(
     title: String,
     balance: String,
     modifier: Modifier = Modifier,
     size: SurferWidgetSize = LocalSurferWidgetSize.current,
+    variant: SurferBalanceVariant = SurferBalanceVariant.Classic,
     footnote: SurferBalanceFootnote? = null,
 ) {
     val hero = size == SurferWidgetSize.Hero
@@ -88,28 +120,84 @@ fun SurferBalanceWidget(
                 .padding(horizontal = if (hero) 20.dp else 16.dp, vertical = if (hero) 18.dp else 14.dp),
             verticalArrangement = Arrangement.spacedBy(if (hero) 8.dp else 4.dp),
         ) {
-            Text(
-                text = title,
-                style = if (hero) AppTheme.typography.labelLarge else AppTheme.typography.labelMedium,
-                color = AppTheme.materialColors.onPrimaryContainer.copy(alpha = 0.8f),
-            )
-            if (isEmpty) {
-                Text(
-                    text = balance,
-                    style = if (hero) AppTheme.typography.displaySmall else AppTheme.typography.headlineSmall,
-                    color = AppTheme.materialColors.onPrimaryContainer,
-                )
-            } else {
-                SurferSplitAmount(
-                    formattedAmount = balance,
-                    tier = if (hero) SurferSplitAmountTier.Hero else SurferSplitAmountTier.Stat,
-                    color = AppTheme.materialColors.onPrimaryContainer,
-                    signAlpha = 0.7f,
-                    fractionAlpha = 0.55f,
-                )
+            val tier = variant.amountTier(hero)
+            when (variant) {
+                SurferBalanceVariant.Classic -> {
+                    Title(text = title, hero = hero)
+                    Amount(balance = balance, tier = tier, isEmpty = isEmpty)
+                }
+                SurferBalanceVariant.Stacked -> {
+                    Amount(balance = balance, tier = tier, isEmpty = isEmpty)
+                    Title(text = title, hero = hero, caption = true)
+                }
+                SurferBalanceVariant.Inline -> Row(verticalAlignment = Alignment.CenterVertically) {
+                    Title(text = title, hero = hero, modifier = Modifier.weight(1f))
+                    Amount(balance = balance, tier = tier, isEmpty = isEmpty)
+                }
+                SurferBalanceVariant.Minimal -> Amount(balance = balance, tier = tier, isEmpty = isEmpty)
             }
             Footnote(hero = hero, footnote = footnote)
         }
+    }
+}
+
+/**
+ * How big the amount is set. Every treatment but [SurferBalanceVariant.Inline] gives the amount
+ * the full width of the card, so it keeps the hero tier; a line it shares with the title cannot.
+ */
+private fun SurferBalanceVariant.amountTier(hero: Boolean): SurferSplitAmountTier = when (this) {
+    SurferBalanceVariant.Inline -> if (hero) SurferSplitAmountTier.Stat else SurferSplitAmountTier.Body
+    else -> if (hero) SurferSplitAmountTier.Hero else SurferSplitAmountTier.Stat
+}
+
+@Composable
+private fun Title(
+    text: String,
+    hero: Boolean,
+    modifier: Modifier = Modifier,
+    caption: Boolean = false,
+) {
+    Text(
+        text = text,
+        style = when {
+            caption -> if (hero) AppTheme.typography.labelMedium else AppTheme.typography.labelSmall
+            hero -> AppTheme.typography.labelLarge
+            else -> AppTheme.typography.labelMedium
+        },
+        color = AppTheme.materialColors.onPrimaryContainer.copy(alpha = 0.8f),
+        // Inline puts the title on the amount's line, where the amount is measured first: a long
+        // balance leaves the title a narrow column, and it must shorten rather than stack up.
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
+        modifier = modifier,
+    )
+}
+
+/** The headline figure. An empty balance is a dash, not an amount, so it is plain text. */
+@Composable
+private fun Amount(
+    balance: String,
+    tier: SurferSplitAmountTier,
+    isEmpty: Boolean,
+) {
+    if (isEmpty) {
+        Text(
+            text = balance,
+            style = when (tier) {
+                SurferSplitAmountTier.Hero -> AppTheme.typography.displaySmall
+                SurferSplitAmountTier.Stat -> AppTheme.typography.headlineSmall
+                SurferSplitAmountTier.Body -> AppTheme.typography.titleLarge
+            },
+            color = AppTheme.materialColors.onPrimaryContainer,
+        )
+    } else {
+        SurferSplitAmount(
+            formattedAmount = balance,
+            tier = tier,
+            color = AppTheme.materialColors.onPrimaryContainer,
+            signAlpha = 0.7f,
+            fractionAlpha = 0.55f,
+        )
     }
 }
 
@@ -171,6 +259,27 @@ private fun SurferBalanceWidgetCompactPreview() {
                 footnote = SurferBalanceFootnote.Trend("+€412"),
                 modifier = Modifier.width(220.dp),
             )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun SurferBalanceWidgetVariantsPreview() {
+    SurferComponentPreview {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            SurferBalanceVariant.entries.forEach { variant ->
+                SurferBalanceWidget(
+                    title = "Total balance",
+                    balance = "€11,575.32",
+                    variant = variant,
+                    footnote = SurferBalanceFootnote.Trend("+€412 this month"),
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.georgeci.moneysurfer.feature.dashboard.customize
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -13,8 +14,12 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
@@ -33,6 +38,7 @@ import com.georgeci.moneysurfer.uikit.components.base.surferReorderHandle
 import com.georgeci.moneysurfer.uikit.components.base.surferReorderableItem
 import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsRow
 import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsSwitch
+import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsValuePill
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
 import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
@@ -48,11 +54,6 @@ import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_reo
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_section_available
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_section_enabled
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_title
-import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_widget_accounts
-import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_widget_balance
-import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_widget_goals
-import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_widget_recent
-import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -74,6 +75,15 @@ object DashboardCustomizeTestTags {
 
     /** Reorder grip, present only on rows in the "On dashboard" section. */
     fun dragHandle(widget: String): String = "dashboardCustomize:drag:$widget"
+
+    /** The "Hero · Classic" pill on an on-dashboard row; opens the card-style sheet. */
+    fun styleAction(widget: String): String = "dashboardCustomize:styleAction:$widget"
+
+    /** The card-style sheet, once opened for a widget. */
+    fun styleSheet(widget: String): String = "dashboardCustomize:style:$widget"
+
+    /** A preview tile in that sheet — [option] is a size name or a variant key. */
+    fun styleOption(widget: String, option: String): String = "dashboardCustomize:style:$widget:$option"
 }
 
 @Composable
@@ -147,6 +157,9 @@ private fun CustomizeList(
 ) {
     val enabled = layout.enabledItems
     val available = layout.disabledItems
+    // Which widget's style sheet is open, by type name — the type itself is not saveable. Held
+    // here rather than in the ViewModel because it is sheet chrome, not part of the layout.
+    var styleTarget by rememberSaveable { mutableStateOf<String?>(null) }
     val listState = rememberLazyListState()
     val reorderState = rememberSurferReorderState(
         listState = listState,
@@ -191,6 +204,7 @@ private fun CustomizeList(
                 item = item,
                 modifier = surferReorderableItem(reorderState, item.type.name),
                 handleModifier = Modifier.surferReorderHandle(reorderState, item.type.name),
+                onStyleClick = { styleTarget = item.type.name },
                 onEvent = onEvent,
             )
         }
@@ -218,6 +232,17 @@ private fun CustomizeList(
                 modifier = Modifier.padding(top = 16.dp),
             )
         }
+    }
+
+    // Resolved against the live layout, not captured when the sheet opened, so the tiles show the
+    // selection the last tap produced. A widget switched off while its sheet is open closes it.
+    val styled = styleTarget?.let { name -> enabled.firstOrNull { it.type.name == name } }
+    if (styled != null) {
+        DashboardCardStyleSheet(
+            item = styled,
+            onSelect = { onEvent(DashboardCustomizeEvent.OnCardStyleChange(styled.type, it)) },
+            onDismiss = { styleTarget = null },
+        )
     }
 }
 
@@ -256,6 +281,7 @@ private fun EnabledWidgetRow(
     item: DashboardLayoutItem,
     modifier: Modifier,
     handleModifier: Modifier,
+    onStyleClick: () -> Unit,
     onEvent: (DashboardCustomizeEvent) -> Unit,
 ) {
     val widget = item.type.name
@@ -263,6 +289,18 @@ private fun EnabledWidgetRow(
         title = stringResource(item.type.titleResource()),
         modifier = modifier.testTag(DashboardCustomizeTestTags.enabledRow(widget)),
         icon = item.type.icon(),
+        // The pill carries the click, not the whole row: a clickable row merges its subtree
+        // semantics, which would swallow the drag grip and the switch as addressable nodes.
+        supporting = {
+            SurferSettingsValuePill(
+                text = cardStyleSummary(item.type, item.cardStyle),
+                modifier = Modifier
+                    .clip(AppTheme.shapes.small)
+                    .clickable(onClick = onStyleClick)
+                    .padding(vertical = 4.dp, horizontal = 2.dp)
+                    .testTag(DashboardCustomizeTestTags.styleAction(widget)),
+            )
+        },
         trailing = {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -303,17 +341,6 @@ private fun AvailableWidgetRow(
         },
         onClick = turnOn,
     )
-}
-
-/**
- * Widget labels for the customize list. Deliberately separate from the strings the widgets render
- * as their own headings: a widget needs a name here even when its card shows none.
- */
-private fun DashboardWidgetType.titleResource(): StringResource = when (this) {
-    DashboardWidgetType.Balance -> Res.string.dashboard_customize_widget_balance
-    DashboardWidgetType.Accounts -> Res.string.dashboard_customize_widget_accounts
-    DashboardWidgetType.Goals -> Res.string.dashboard_customize_widget_goals
-    DashboardWidgetType.RecentTransactions -> Res.string.dashboard_customize_widget_recent
 }
 
 private fun DashboardWidgetType.icon(): ImageVector = when (this) {
