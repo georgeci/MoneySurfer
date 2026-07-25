@@ -71,11 +71,11 @@ import moneysurfer.feature.login.generated.resources.sign_in_anonymous
 import moneysurfer.feature.login.generated.resources.sign_in_brand
 import moneysurfer.feature.login.generated.resources.sign_in_demo_mode
 import moneysurfer.feature.login.generated.resources.sign_in_email_label
+import moneysurfer.feature.login.generated.resources.sign_in_error_dialog_ok
+import moneysurfer.feature.login.generated.resources.sign_in_error_dialog_title
 import moneysurfer.feature.login.generated.resources.sign_in_error_email_in_use
 import moneysurfer.feature.login.generated.resources.sign_in_error_email_invalid
 import moneysurfer.feature.login.generated.resources.sign_in_error_email_required
-import moneysurfer.feature.login.generated.resources.sign_in_error_dialog_ok
-import moneysurfer.feature.login.generated.resources.sign_in_error_dialog_title
 import moneysurfer.feature.login.generated.resources.sign_in_error_invalid_credentials
 import moneysurfer.feature.login.generated.resources.sign_in_error_password_required
 import moneysurfer.feature.login.generated.resources.sign_in_error_password_too_short
