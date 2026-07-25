@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import com.georgeci.moneysurfer.uikit.components.SurferCategoryPalette
 import com.georgeci.moneysurfer.uikit.components.SurferEmptyState
@@ -21,6 +22,7 @@ import moneysurfer.feature.transaction.generated.resources.transactions_list_emp
 import moneysurfer.feature.transaction.generated.resources.transactions_list_empty_search
 import moneysurfer.feature.transaction.generated.resources.transactions_list_empty_search_cta
 import moneysurfer.feature.transaction.generated.resources.transactions_list_empty_title
+import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 
 /** Alpha of the transfer tile's tint wash — the same weight the category bubbles use. */
@@ -90,61 +92,78 @@ private fun TransactionRowUi.metaLine(showAccount: Boolean): String? = listOf(
     .takeIf { it.isNotBlank() }
 
 /**
- * Title, one line of guidance and a single CTA, per the design system's empty-state rule.
+ * Why the list is empty, which is what every word and the CTA on the empty state follow from.
  *
- * The CTA is what tells the two cases apart: an untouched list has nothing to show *yet*, so it
- * offers the first transaction; a narrowed one has hidden what exists, so it offers the way back.
- * The search-only wording is separate from the filtered one because "clear filters" would name a
- * control the user never touched.
+ * Resolved from [TransactionsByAccountState.Content.activeFilterCount] rather than from
+ * `isFiltered`: the latter already counts a non-blank query, so it cannot tell [Search] from
+ * [Filtered] — and only a real filter may be offered for clearing.
  */
+private enum class EmptyReason { FirstRun, Search, Filtered }
+
+private fun TransactionsByAccountState.Content.emptyReason(): EmptyReason = when {
+    activeFilterCount > 0 -> EmptyReason.Filtered
+    query.isNotBlank() -> EmptyReason.Search
+    else -> EmptyReason.FirstRun
+}
+
+/** Everything the empty state renders, so each reason names its copy in one place. */
+private data class EmptyStateSpec(
+    val title: StringResource,
+    val guidance: StringResource,
+    val actionLabel: StringResource,
+    val icon: ImageVector,
+    val actionIcon: ImageVector,
+    val action: TransactionsByAccountEvent,
+)
+
+private fun EmptyReason.spec(): EmptyStateSpec = when (this) {
+    // Nothing to show *yet*: the next step is the first transaction.
+    EmptyReason.FirstRun -> EmptyStateSpec(
+        title = Res.string.transactions_list_empty_title,
+        guidance = Res.string.transactions_list_empty,
+        actionLabel = Res.string.transactions_list_empty_cta,
+        icon = SurferIcons.Receipt,
+        actionIcon = SurferIcons.Add,
+        action = TransactionsByAccountEvent.OnAddTransactionClick,
+    )
+    // Rows exist and are hidden, so the CTA is the way back rather than a way forward. "Clear
+    // filters" would name a control the search-only user never touched, hence the two variants.
+    EmptyReason.Search -> EmptyStateSpec(
+        title = Res.string.transactions_list_empty_filtered_title,
+        guidance = Res.string.transactions_list_empty_search,
+        actionLabel = Res.string.transactions_list_empty_search_cta,
+        icon = SurferIcons.Search,
+        actionIcon = SurferIcons.Close,
+        action = TransactionsByAccountEvent.OnClearFiltersClick,
+    )
+    EmptyReason.Filtered -> EmptyStateSpec(
+        title = Res.string.transactions_list_empty_filtered_title,
+        guidance = Res.string.transactions_list_empty_filtered,
+        actionLabel = Res.string.transactions_list_empty_filtered_cta,
+        icon = SurferIcons.Search,
+        actionIcon = SurferIcons.Close,
+        action = TransactionsByAccountEvent.OnClearFiltersClick,
+    )
+}
+
+/** Title, one line of guidance and a single CTA, per the design system's empty-state rule. */
 @Composable
 internal fun EmptyState(
     state: TransactionsByAccountState.Content,
     onEvent: (TransactionsByAccountEvent) -> Unit,
 ) {
-    // `activeFilterCount`, not `isFiltered`: the latter already counts a non-blank query, so it
-    // cannot tell "only searched" from "searched and filtered" — and only the former may promise
-    // to clear a filter the user actually set.
-    val hasFilters = state.activeFilterCount > 0
-    val searchOnly = state.query.isNotBlank() && !hasFilters
-    val narrowed = state.query.isNotBlank() || hasFilters
+    val spec = state.emptyReason().spec()
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center,
     ) {
         SurferEmptyState(
-            title = stringResource(
-                if (narrowed) {
-                    Res.string.transactions_list_empty_filtered_title
-                } else {
-                    Res.string.transactions_list_empty_title
-                },
-            ),
-            subtitle = stringResource(
-                when {
-                    searchOnly -> Res.string.transactions_list_empty_search
-                    narrowed -> Res.string.transactions_list_empty_filtered
-                    else -> Res.string.transactions_list_empty
-                },
-            ),
-            icon = if (narrowed) SurferIcons.Search else SurferIcons.Receipt,
-            actionLabel = stringResource(
-                when {
-                    searchOnly -> Res.string.transactions_list_empty_search_cta
-                    narrowed -> Res.string.transactions_list_empty_filtered_cta
-                    else -> Res.string.transactions_list_empty_cta
-                },
-            ),
-            actionIcon = if (narrowed) SurferIcons.Close else SurferIcons.Add,
-            onActionClick = {
-                onEvent(
-                    if (narrowed) {
-                        TransactionsByAccountEvent.OnClearFiltersClick
-                    } else {
-                        TransactionsByAccountEvent.OnAddTransactionClick
-                    },
-                )
-            },
+            title = stringResource(spec.title),
+            subtitle = stringResource(spec.guidance),
+            icon = spec.icon,
+            actionLabel = stringResource(spec.actionLabel),
+            actionIcon = spec.actionIcon,
+            onActionClick = { onEvent(spec.action) },
         )
     }
 }

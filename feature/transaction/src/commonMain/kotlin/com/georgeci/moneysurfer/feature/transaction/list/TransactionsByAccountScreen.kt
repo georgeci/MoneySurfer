@@ -37,8 +37,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.georgeci.moneysurfer.domain.preferences.TransactionPeriodMode
 import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
-import com.georgeci.moneysurfer.feature.transaction.filter.TransactionDateRange
-import com.georgeci.moneysurfer.feature.transaction.filter.TransactionSort
 import com.georgeci.moneysurfer.feature.transaction.filter.TransactionTypeFilter
 import com.georgeci.moneysurfer.uikit.components.base.SurferAddFab
 import com.georgeci.moneysurfer.uikit.components.base.SurferPeriodArrow
@@ -558,12 +556,7 @@ private fun TransactionsByAccountEmptyPreview() {
                 accountName = "Savings",
                 groups = emptyList(),
                 showAccountOnRows = false,
-                summary = TransactionSummaryUi(
-                    incomeFormatted = "+€0.00",
-                    expenseFormatted = "−€0.00",
-                    netFormatted = "+€0.00",
-                    netPositive = true,
-                ),
+                summary = previewEmptySummary(),
                 query = "",
                 filters = previewChips(),
                 activeFilterCount = 0,
@@ -596,12 +589,7 @@ private fun TransactionsByAccountEmptyFilteredPreview() {
                 accountName = "Savings",
                 groups = emptyList(),
                 showAccountOnRows = false,
-                summary = TransactionSummaryUi(
-                    incomeFormatted = "+€0.00",
-                    expenseFormatted = "−€0.00",
-                    netFormatted = "+€0.00",
-                    netPositive = true,
-                ),
+                summary = previewEmptySummary(),
                 query = "",
                 filters = previewChips().copy(type = TransactionTypeFilter.Transfer),
                 activeFilterCount = 1,
@@ -617,13 +605,3 @@ private fun TransactionsByAccountEmptyFilteredPreview() {
         )
     }
 }
-
-private fun previewChips(): TransactionFilterChipsUi = TransactionFilterChipsUi(
-    dateRange = TransactionDateRange.FollowPeriod,
-    type = TransactionTypeFilter.All,
-    accountCount = 0,
-    accountName = null,
-    categoryCount = 0,
-    categoryName = null,
-    sort = TransactionSort.Newest,
-)

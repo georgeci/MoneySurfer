@@ -518,6 +518,39 @@ class TransactionCreationViewModelTest : StringSpec({
         }
     }
 
+    "the identity band calls a transfer leg a transfer and leaves its amount unsigned" {
+        runTest {
+            val acc = anAccount(id = accountId("a-1"), workspaceId = ws, currencyCode = USD, balance = 500.dollars)
+            val category = aCategory(id = categoryId("c-exp"), workspaceId = ws, type = CategoryType.EXPENSE)
+            // Stored as an ordinary EXPENSE, as both legs of a transfer are — only the transferId
+            // says the money moved sideways rather than left.
+            val leg = aTransaction(
+                id = transactionId("t-leg"),
+                workspaceId = ws,
+                accountId = acc.id,
+                money = 200.dollars,
+                categoryId = category.id,
+                note = "Rainy day top-up",
+                type = TransactionType.EXPENSE,
+                transferId = TransferId("tr-1"),
+            )
+            val fixture = Fixture(ws).apply {
+                accountRepository.seed(acc)
+                categoryRepository.seed(category)
+                transactionRepository.insert(leg)
+            }
+            val vm = fixture.createViewModel(editingTransactionId = leg.id)
+            try {
+                val identity = vm.awaitContent().editIdentity.shouldNotBeNull()
+                identity.type shouldBe TransactionTypeUi.Transfer
+                // Neither "+" nor "−": the money neither arrived nor left, matching the details screen.
+                identity.formattedAmount shouldBe "$200.00"
+            } finally {
+                vm.viewModelScope.cancel()
+            }
+        }
+    }
+
     "there is no identity band outside edit mode" {
         runTest {
             val acc = anAccount(id = accountId("a-1"), workspaceId = ws, currencyCode = USD)
