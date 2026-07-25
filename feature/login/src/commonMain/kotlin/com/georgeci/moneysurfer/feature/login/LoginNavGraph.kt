@@ -20,8 +20,13 @@ val loginNavGraph: FeatureNavGraph = { navigator ->
 
     entry<Route.SignIn> {
         SignInScreen(
-            onNavigateToWorkspaceSelector = {
-                navigator.replaceTop(Route.WorkspaceSelector(showActions = false))
+            onNavigateToWorkspaceSelector = { cloudDataUnavailable ->
+                navigator.replaceTop(
+                    Route.WorkspaceSelector(
+                        showActions = false,
+                        cloudDataUnavailable = cloudDataUnavailable,
+                    ),
+                )
             },
             onNavigateToLegal = { navigator.push(Route.Legal) },
         )

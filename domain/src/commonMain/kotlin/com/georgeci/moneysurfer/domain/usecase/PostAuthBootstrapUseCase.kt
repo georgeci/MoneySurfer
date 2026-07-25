@@ -1,14 +1,18 @@
 package com.georgeci.moneysurfer.domain.usecase
 
 import arrow.core.Either
+import arrow.core.getOrElse
+import arrow.core.raise.Raise
 import arrow.core.raise.either
 import co.touchlab.kermit.Logger
 import com.georgeci.moneysurfer.domain.auth.AuthError
 import com.georgeci.moneysurfer.domain.auth.SessionPointers
 import com.georgeci.moneysurfer.domain.logging.redactEmail
 import com.georgeci.moneysurfer.domain.logging.redactUid
+import com.georgeci.moneysurfer.domain.model.User
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 import com.georgeci.moneysurfer.domain.repositories.UserRemoteRepository
+import com.georgeci.moneysurfer.domain.repositories.WorkspaceRepository
 import com.georgeci.moneysurfer.domain.repositories.WorkspaceSyncer
 import org.koin.core.annotation.Single
 
@@ -18,13 +22,17 @@ import org.koin.core.annotation.Single
  * selector handle workspace creation.
  *
  * For an existing user we resolve `defaultWorkspaceId` with a fallback to the first item in
- * `workspaceIds` — covers historical accounts where the default was never written. The resolved
- * id seeds `session.currentWorkspaceId` so a fresh device skips the selector and lands on
- * Dashboard.
+ * `workspaceIds` — covers historical accounts where the default was never written — and pin it
+ * as `session.currentWorkspaceId`, but **only after checking the workspace actually landed in
+ * Room**. Pinning an id the pull never hydrated routes the next cold start to Dashboard on top
+ * of an empty database, with the selector never shown again (issue #342). When the remote lists
+ * workspaces and none of them hydrated, the caller gets [Result.CloudDataUnavailable] instead.
  */
 @Single
+@Suppress("LongParameterList")
 class PostAuthBootstrapUseCase(
     private val userRemoteRepository: UserRemoteRepository,
+    private val workspaceRepository: WorkspaceRepository,
     private val workspaceSyncer: WorkspaceSyncer,
     private val session: SessionPointers,
     private val getCurrentTime: GetCurrentTimeUseCase,
@@ -32,9 +40,24 @@ class PostAuthBootstrapUseCase(
     private val log = Logger.withTag(TAG)
 
     sealed interface Result {
+        /**
+         * [defaultWorkspaceId] is the workspace that was pinned — always one that exists in Room,
+         * so it can be `null` even when [workspaceIds] is not (the user is a member of workspaces
+         * that have not been hydrated on this device).
+         */
         data class ExistingUser(
             val workspaceIds: List<WorkspaceId>,
             val defaultWorkspaceId: WorkspaceId?,
+        ) : Result
+
+        /**
+         * The remote user document lists workspaces but the pull hydrated none of them — sync is
+         * off, the network died mid-pull, or every ref is stale. Auth itself succeeded, so the
+         * session stays valid; the UI tells the user their cloud data is not here rather than
+         * dropping them into an empty selector as if the account were brand new.
+         */
+        data class CloudDataUnavailable(
+            val workspaceIds: List<WorkspaceId>,
         ) : Result
 
         data object FirstTime : Result
@@ -84,37 +107,7 @@ class PostAuthBootstrapUseCase(
             .bind()
 
         if (existing != null) {
-            log.i { "[pull] existing user, syncing all workspaces" }
-            // syncAll fetches users/{uid}.workspaceIds from remote and runs cursor-based pull
-            // for every workspace — including ones not yet local. Fail-loud: a PERMISSION_DENIED
-            // here means a stale workspaceIds ref; aborting keeps the sign-in screen visible
-            // rather than sending users to a broken state.
-            Either.catch { workspaceSyncer.syncAll() }
-                .onLeft { log.e(it) { "[pull] syncAll failed" } }
-                .mapLeft { it.toAuthError() }
-                .bind()
-
-            // Resolve the active workspace: server's choice wins, otherwise pick the first
-            // workspace in the list. Historical user docs have `defaultWorkspaceId = null`
-            // because the field was never written before — without this fallback those users
-            // re-pick a workspace on every fresh device.
-            val resolvedDefault = existing.defaultWorkspaceId
-                ?: existing.workspaceIds.firstOrNull()
-
-            if (resolvedDefault != null) {
-                session.currentWorkspaceId.set(resolvedDefault)
-                log.i { "[seed] currentWorkspaceId=${resolvedDefault.value}" }
-            }
-
-            Result.ExistingUser(
-                workspaceIds = existing.workspaceIds,
-                defaultWorkspaceId = resolvedDefault,
-            ).also {
-                log.i {
-                    "[done] ExistingUser uid=${uid.redactUid()} workspaces=${it.workspaceIds.size} " +
-                        "default=${it.defaultWorkspaceId}"
-                }
-            }
+            hydrateExistingUser(uid = uid, existing = existing)
         } else {
             log.i { "[create] first-time user, creating users/${uid.redactUid()} …" }
             Either
@@ -134,6 +127,65 @@ class PostAuthBootstrapUseCase(
             Result.FirstTime.also { log.i { "[done] FirstTime uid=${uid.redactUid()}" } }
         }
     }
+
+    /**
+     * Pulls every workspace the remote user document lists, then picks the one to pin: the
+     * server's default if it hydrated, otherwise the first list entry that did.
+     */
+    private suspend fun Raise<AuthError>.hydrateExistingUser(uid: String, existing: User): Result {
+        log.i { "[pull] existing user, syncing all workspaces" }
+        // syncAll fetches users/{uid}.workspaceIds from remote and runs cursor-based pull
+        // for every workspace — including ones not yet local. Fail-loud: a PERMISSION_DENIED
+        // here means the whole account is unreachable (individual stale refs are tolerated
+        // inside the pull); aborting keeps the sign-in screen visible rather than sending
+        // users to a broken state.
+        Either.catch { workspaceSyncer.syncAll() }
+            .onLeft { log.e(it) { "[pull] syncAll failed" } }
+            .mapLeft { it.toAuthError() }
+            .bind()
+
+        // Historical user docs have `defaultWorkspaceId = null` because the field was never
+        // written before — without the fallback to the first entry those users re-pick a
+        // workspace on every fresh device. Both candidates are then filtered through Room:
+        // `defaultWorkspaceId` is not guaranteed to be a member of `workspaceIds`
+        // (server-side skew), and neither is guaranteed to have been hydrated by the pull.
+        val preferred = existing.defaultWorkspaceId ?: existing.workspaceIds.firstOrNull()
+        val resolvedDefault = preferred?.takeIf { isHydrated(it) }
+            ?: existing.workspaceIds.firstOrNull { isHydrated(it) }
+
+        if (resolvedDefault == null) {
+            if (existing.workspaceIds.isEmpty()) {
+                log.i { "[done] ExistingUser uid=${uid.redactUid()} with no workspaces" }
+                return Result.ExistingUser(workspaceIds = emptyList(), defaultWorkspaceId = null)
+            }
+            log.w {
+                "[done] CloudDataUnavailable uid=${uid.redactUid()} — remote lists " +
+                    "${existing.workspaceIds.size} workspace(s), none of them reached Room; " +
+                    "leaving currentWorkspaceId unset"
+            }
+            return Result.CloudDataUnavailable(workspaceIds = existing.workspaceIds)
+        }
+
+        session.currentWorkspaceId.set(resolvedDefault)
+        log.i {
+            "[done] ExistingUser uid=${uid.redactUid()} workspaces=${existing.workspaceIds.size} " +
+                "currentWorkspaceId=${resolvedDefault.value}"
+        }
+        return Result.ExistingUser(
+            workspaceIds = existing.workspaceIds,
+            defaultWorkspaceId = resolvedDefault,
+        )
+    }
+
+    /**
+     * True when [workspaceId] has a row in the local database, i.e. the pull actually brought
+     * the workspace down. A lookup failure counts as "not hydrated": pinning on a Room error
+     * is the outcome this guard exists to prevent.
+     */
+    private suspend fun isHydrated(workspaceId: WorkspaceId): Boolean =
+        Either.catch { workspaceRepository.getById(workspaceId) != null }
+            .onLeft { log.w(it) { "[verify] local lookup failed wid=${workspaceId.value}" } }
+            .getOrElse { false }
 
     /**
      * Domain layer can't import Firebase types, so we sniff the exception class name

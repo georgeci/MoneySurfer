@@ -148,7 +148,7 @@ private fun SignInError.localized(): String = stringResource(
 
 @Composable
 fun SignInScreen(
-    onNavigateToWorkspaceSelector: () -> Unit,
+    onNavigateToWorkspaceSelector: (cloudDataUnavailable: Boolean) -> Unit,
     onNavigateToLegal: () -> Unit,
     viewModel: SignInViewModel = koinViewModel(),
 ) {
@@ -156,7 +156,8 @@ fun SignInScreen(
 
     viewModel.HandleSideEffect { effect ->
         when (effect) {
-            SignInEffect.NavigateToWorkspaceSelector -> onNavigateToWorkspaceSelector()
+            is SignInEffect.NavigateToWorkspaceSelector ->
+                onNavigateToWorkspaceSelector(effect.cloudDataUnavailable)
             SignInEffect.NavigateToLegal -> onNavigateToLegal()
         }
     }

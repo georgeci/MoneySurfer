@@ -1,6 +1,7 @@
 package com.georgeci.moneysurfer.domain.usecase
 
 import arrow.core.Either
+import com.georgeci.moneysurfer.domain.SyncFeatureFlag
 import com.georgeci.moneysurfer.domain.auth.InMemorySessionPointers
 import com.georgeci.moneysurfer.domain.constants.DEFAULT_CATEGORY_SEEDS
 import com.georgeci.moneysurfer.domain.model.Category
@@ -249,6 +250,29 @@ class CreateWorkspaceUseCaseTest : StringSpec({
         env.userRemoteRepo.setDefaultCalls shouldHaveSize 0
     }
 
+    "no remote calls at all when the sync feature is off, even with a Firebase uid" {
+        // Regression for issue #342: `pushAll()` no-ops with the flag off, which used to read as
+        // a landed push — so `addWorkspaceRef` filled `users/{uid}.workspaceIds` with an id whose
+        // `workspaces/{wid}` document was never written. Every online build shipped with the flag
+        // off was corrupting the remote user doc on every workspace creation.
+        val env = TestEnv(
+            currentUserId = OWNER_ID,
+            firebaseUid = FIREBASE_UID,
+            syncEnabled = false,
+        )
+
+        val result = env.useCase(defaultParams())
+
+        val newId = result.shouldBeInstanceOf<Either.Right<WorkspaceId>>().value
+        env.callLog shouldHaveSize 0
+        env.syncer.pushAllCount shouldBe 0
+        env.userRemoteRepo.addRefCalls shouldHaveSize 0
+        env.userRemoteRepo.setDefaultCalls shouldHaveSize 0
+        // The workspace is still created and pinned — it is simply local-only.
+        env.workspaceRepo.inserted.single().id shouldBe newId
+        env.session.currentWorkspaceId.flow.first() shouldBe newId
+    }
+
     "member insert failure returns LocalWriteFailed and skips categories, remote work and pin" {
         val boom = RuntimeException("member insert failed")
         val env = TestEnv(
@@ -322,9 +346,11 @@ private fun defaultParams() = CreateWorkspaceUseCase.Params(
     baseCurrency = CurrencyCode("USD"),
 )
 
+@Suppress("LongParameterList")
 private class TestEnv(
     currentUserId: UserId?,
     firebaseUid: String? = null,
+    syncEnabled: Boolean = true,
     val callLog: MutableList<String> = mutableListOf(),
     val workspaceRepo: FakeWorkspaceRepository = FakeWorkspaceRepository(),
     val memberRepo: FakeWorkspaceMemberRepository = FakeWorkspaceMemberRepository(),
@@ -345,6 +371,7 @@ private class TestEnv(
         workspaceSyncer = syncer,
         session = session,
         getCurrentTime = GetCurrentTimeUseCase(ClockUseCase()),
+        syncFeatureFlag = SyncFeatureFlag(enabled = syncEnabled),
     )
 }
 

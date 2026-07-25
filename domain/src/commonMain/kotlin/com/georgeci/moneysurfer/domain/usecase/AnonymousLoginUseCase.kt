@@ -15,6 +15,7 @@ class AnonymousLoginUseCase(
     private val session: SessionPointers,
     private val wipeDemoDataUseCase: WipeDemoDataUseCase,
     private val postAuthBootstrap: PostAuthBootstrapUseCase,
+    private val abandonAuthSession: AbandonAuthSessionUseCase,
 ) {
     suspend operator fun invoke(): Either<AuthError, PostAuthBootstrapUseCase.Result> = either {
         val uid = authRemoteRepository.signInAnonymously().bind()
@@ -30,11 +31,13 @@ class AnonymousLoginUseCase(
         )
         session.currentFirebaseUid.set(uid)
 
+        // Roll the pointers back when the bootstrap fails — see [LoginUseCase] for why the
+        // pins cannot simply be deferred until after it (issue #342).
         postAuthBootstrap(
             uid = uid,
             email = null,
             displayName = null,
             isAnon = true,
-        ).bind()
+        ).onLeft { abandonAuthSession(isAnon = true) }.bind()
     }
 }

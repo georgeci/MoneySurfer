@@ -5,6 +5,8 @@
     <string name="workspace_selector_heading_subtitle">У каждого — свои бюджеты, счета и участники.</string>
     <string name="workspace_selector_heading_subtitle_offline">У каждого — свои бюджеты и счета.</string>
     <string name="workspace_selector_empty">Для пользователя нет доступных workspace.</string>
+    <string name="workspace_selector_cloud_unavailable">Не удалось загрузить ваши пространства из облака. Выйдите и войдите заново, чтобы повторить — созданное здесь пространство будет новым и пустым.</string>
+    <string name="workspace_selector_sign_out">Выйти</string>
     <string name="workspace_selector_create_title">Новое пространство</string>
     <string name="workspace_selector_create_subtitle">Для поездки, проекта или чего-то ещё</string>
     <string name="workspace_selector_edit_content_description">Редактировать</string>

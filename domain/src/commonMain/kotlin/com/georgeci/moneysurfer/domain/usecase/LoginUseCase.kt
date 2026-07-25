@@ -9,12 +9,14 @@ import com.georgeci.moneysurfer.domain.repositories.AuthRemoteRepository
 import org.koin.core.annotation.Single
 
 @Single
+@Suppress("LongParameterList")
 class LoginUseCase(
     private val authRemoteRepository: AuthRemoteRepository,
     private val authLocalRepository: AuthLocalRepository,
     private val session: SessionPointers,
     private val wipeDemoDataUseCase: WipeDemoDataUseCase,
     private val postAuthBootstrap: PostAuthBootstrapUseCase,
+    private val abandonAuthSession: AbandonAuthSessionUseCase,
 ) {
     suspend operator fun invoke(
         email: String,
@@ -37,11 +39,16 @@ class LoginUseCase(
         )
         session.currentFirebaseUid.set(uid)
 
+        // The pointers have to be live *before* the bootstrap — the pull reads
+        // `currentFirebaseUid` to discover the user's workspaces — so atomicity is bought with a
+        // rollback rather than by deferring the writes. Without it a failed bootstrap leaves a
+        // signed-in session with no workspace, which the next launch routes past sign-in
+        // straight into the selector with no way back (issue #342).
         postAuthBootstrap(
             uid = uid,
             email = trimmed,
             displayName = displayName,
             isAnon = false,
-        ).bind()
+        ).onLeft { abandonAuthSession(isAnon = false) }.bind()
     }
 }
