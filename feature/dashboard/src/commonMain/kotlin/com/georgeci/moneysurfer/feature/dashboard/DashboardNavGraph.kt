@@ -1,5 +1,6 @@
 package com.georgeci.moneysurfer.feature.dashboard
 
+import com.georgeci.moneysurfer.feature.dashboard.customize.DashboardCustomizeScreen
 import com.georgeci.moneysurfer.navigation.FeatureNavGraph
 import com.georgeci.moneysurfer.navigation.Route
 
@@ -18,9 +19,16 @@ val dashboardNavGraph: FeatureNavGraph = { navigator ->
                 navigator.push(Route.TransactionDetails(transactionId.value))
             },
             onNavigateToSettings = { navigator.push(Route.Settings) },
+            onNavigateToCustomize = { navigator.push(Route.DashboardCustomize) },
             onNavigateToTransactionsList = { navigator.push(Route.TransactionsByAccount()) },
             onNavigateToGoals = { navigator.push(Route.Goals) },
             onNavigateToGoalDetails = { goalId -> navigator.push(Route.GoalDetails(goalId.value)) },
+        )
+    }
+
+    entry<Route.DashboardCustomize> {
+        DashboardCustomizeScreen(
+            onNavigateBack = { navigator.pop() },
         )
     }
 }

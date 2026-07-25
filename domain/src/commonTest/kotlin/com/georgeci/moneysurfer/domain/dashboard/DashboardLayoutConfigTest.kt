@@ -50,6 +50,127 @@ class DashboardLayoutConfigTest : StringSpec({
         stored.normalized() shouldBe stored
     }
 
+    "disabledItems is the complement of enabledItems" {
+        val config = DashboardLayoutConfig(
+            items = listOf(
+                DashboardLayoutItem(DashboardWidgetType.Goals),
+                DashboardLayoutItem(DashboardWidgetType.Balance, enabled = false),
+                DashboardLayoutItem(DashboardWidgetType.Accounts),
+            ),
+        )
+
+        config.disabledItems.map { it.type } shouldContainExactly listOf(DashboardWidgetType.Balance)
+    }
+
+    "switching a widget off keeps its card style and parks it after the enabled ones" {
+        val config = DashboardLayoutConfig(
+            items = listOf(
+                DashboardLayoutItem(DashboardWidgetType.Balance, cardStyle = DashboardCardStyle.COMPACT),
+                DashboardLayoutItem(DashboardWidgetType.Accounts),
+                DashboardLayoutItem(DashboardWidgetType.Goals),
+            ),
+        )
+
+        val updated = config.withWidgetEnabled(DashboardWidgetType.Balance, enabled = false)
+
+        updated.items.map { it.type } shouldContainExactly listOf(
+            DashboardWidgetType.Accounts,
+            DashboardWidgetType.Goals,
+            DashboardWidgetType.Balance,
+        )
+        updated.enabledItems.map { it.type } shouldContainExactly listOf(
+            DashboardWidgetType.Accounts,
+            DashboardWidgetType.Goals,
+        )
+        updated.items.last().cardStyle shouldBe DashboardCardStyle.COMPACT
+    }
+
+    "switching a widget on appends it after the last enabled one, before the still-off ones" {
+        val config = DashboardLayoutConfig(
+            items = listOf(
+                DashboardLayoutItem(DashboardWidgetType.Balance),
+                DashboardLayoutItem(DashboardWidgetType.Accounts, enabled = false),
+                DashboardLayoutItem(DashboardWidgetType.Goals, enabled = false),
+            ),
+        )
+
+        val updated = config.withWidgetEnabled(DashboardWidgetType.Goals, enabled = true)
+
+        updated.items.map { it.type } shouldContainExactly listOf(
+            DashboardWidgetType.Balance,
+            DashboardWidgetType.Goals,
+            DashboardWidgetType.Accounts,
+        )
+        updated.enabledItems.map { it.type } shouldContainExactly listOf(
+            DashboardWidgetType.Balance,
+            DashboardWidgetType.Goals,
+        )
+    }
+
+    "switching a widget to the state it already has changes nothing" {
+        val config = DashboardLayoutConfig.DEFAULT
+
+        config.withWidgetEnabled(DashboardWidgetType.Balance, enabled = true) shouldBe config
+    }
+
+    "moving a widget down puts it in the slot of the widget it landed on" {
+        val moved = DashboardLayoutConfig.DEFAULT.withWidgetMoved(
+            from = DashboardWidgetType.Balance,
+            to = DashboardWidgetType.Goals,
+        )
+
+        moved.items.map { it.type } shouldContainExactly listOf(
+            DashboardWidgetType.Accounts,
+            DashboardWidgetType.Goals,
+            DashboardWidgetType.Balance,
+            DashboardWidgetType.RecentTransactions,
+        )
+    }
+
+    "moving a widget up puts it in the slot of the widget it landed on" {
+        val moved = DashboardLayoutConfig.DEFAULT.withWidgetMoved(
+            from = DashboardWidgetType.RecentTransactions,
+            to = DashboardWidgetType.Balance,
+        )
+
+        moved.items.map { it.type } shouldContainExactly listOf(
+            DashboardWidgetType.RecentTransactions,
+            DashboardWidgetType.Balance,
+            DashboardWidgetType.Accounts,
+            DashboardWidgetType.Goals,
+        )
+    }
+
+    "moving reorders only the enabled widgets and leaves the switched-off ones behind them" {
+        val config = DashboardLayoutConfig(
+            items = listOf(
+                DashboardLayoutItem(DashboardWidgetType.Balance),
+                DashboardLayoutItem(DashboardWidgetType.Accounts, enabled = false),
+                DashboardLayoutItem(DashboardWidgetType.Goals),
+            ),
+        )
+
+        val moved = config.withWidgetMoved(from = DashboardWidgetType.Goals, to = DashboardWidgetType.Balance)
+
+        moved.items.map { it.type } shouldContainExactly listOf(
+            DashboardWidgetType.Goals,
+            DashboardWidgetType.Balance,
+            DashboardWidgetType.Accounts,
+        )
+    }
+
+    "moving a widget onto itself, or onto a switched-off one, changes nothing" {
+        val config = DashboardLayoutConfig(
+            items = listOf(
+                DashboardLayoutItem(DashboardWidgetType.Balance),
+                DashboardLayoutItem(DashboardWidgetType.Accounts, enabled = false),
+            ),
+        )
+
+        config.withWidgetMoved(DashboardWidgetType.Balance, DashboardWidgetType.Balance) shouldBe config
+        config.withWidgetMoved(DashboardWidgetType.Balance, DashboardWidgetType.Accounts) shouldBe config
+    }
+
     "normalizing drops duplicate entries for the same widget, keeping the first" {
         val stored = DashboardLayoutConfig(
             items = DashboardLayoutConfig.DEFAULT.items +

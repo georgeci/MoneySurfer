@@ -55,6 +55,10 @@ sealed interface Route : NavKey {
     @Serializable
     data object Dashboard : TopLevel
 
+    /** Widget visibility and order for the dashboard — reached from its top bar, not a tab. */
+    @Serializable
+    data object DashboardCustomize : Route
+
     /**
      * [firstRun] marks the offline first-launch step: the screen creates the very first account,
      * adopts its currency as the workspace base currency, and lands on Dashboard instead of

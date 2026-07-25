@@ -58,6 +58,7 @@ import moneysurfer.feature.dashboard.generated.resources.dashboard_add_transacti
 import moneysurfer.feature.dashboard.generated.resources.dashboard_balance_empty_text
 import moneysurfer.feature.dashboard.generated.resources.dashboard_balance_other_currencies
 import moneysurfer.feature.dashboard.generated.resources.dashboard_balance_title
+import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_content_description
 import moneysurfer.feature.dashboard.generated.resources.dashboard_goals_empty_subtitle
 import moneysurfer.feature.dashboard.generated.resources.dashboard_goals_empty_title
 import moneysurfer.feature.dashboard.generated.resources.dashboard_goals_see_all
@@ -76,6 +77,7 @@ import org.koin.compose.viewmodel.koinViewModel
 object DashboardTestTags {
     const val Root = "dashboard:root"
     const val Balance = "dashboard:balance"
+    const val Customize = "dashboard:customize"
     const val Settings = "dashboard:settings"
     const val AddTransaction = "dashboard:addTransaction"
 }
@@ -88,6 +90,7 @@ fun DashboardScreen(
     onNavigateToAccountDetails: (AccountId) -> Unit,
     onNavigateToTransactionDetails: (TransactionId) -> Unit,
     onNavigateToSettings: () -> Unit,
+    onNavigateToCustomize: () -> Unit,
     onNavigateToTransactionsList: () -> Unit,
     onNavigateToGoals: () -> Unit,
     onNavigateToGoalDetails: (GoalId) -> Unit,
@@ -103,6 +106,7 @@ fun DashboardScreen(
             DashboardEffect.NavigateToAccountsManage -> onNavigateToAccountsManage()
             is DashboardEffect.NavigateToTransactionCreation -> onNavigateToTransactionCreation(effect.accountId)
             DashboardEffect.NavigateToSettings -> onNavigateToSettings()
+            DashboardEffect.NavigateToCustomize -> onNavigateToCustomize()
             DashboardEffect.NavigateToTransactionsList -> onNavigateToTransactionsList()
             DashboardEffect.NavigateToGoals -> onNavigateToGoals()
             is DashboardEffect.NavigateToGoalDetails -> onNavigateToGoalDetails(effect.goalId)
@@ -169,6 +173,12 @@ private fun DashboardContent(
                 primaryText = workspaceName,
                 secondaryText = state.greeting ?: stringResource(Res.string.dashboard_toolbar_greeting),
                 actions = {
+                    SurferToolbarAction(
+                        icon = SurferIcons.Edit,
+                        contentDescription = stringResource(Res.string.dashboard_customize_content_description),
+                        onClick = { onEvent(DashboardEvent.OnCustomizeClick) },
+                        modifier = Modifier.testTag(DashboardTestTags.Customize),
+                    )
                     SurferToolbarAction(
                         icon = SurferIcons.Settings,
                         contentDescription = stringResource(Res.string.dashboard_settings_content_description),
