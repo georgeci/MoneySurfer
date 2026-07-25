@@ -10,6 +10,21 @@ name: Transaction — Delete then Undo restores it
 # below finds it again on the next run.
 - runFlow: 03_dashboard_add_account.yaml
 
+# Bring the Recent widget on screen *before* the guard reads it. `notVisible` is
+# a screen-visibility test, and the widget sits below Balance and Accounts, so a
+# guard evaluated on the unscrolled dashboard reports "missing" for a
+# transaction that exists and creates a duplicate — one more per run, with the
+# flow still green. The widget tag always resolves, so this scroll is safe even
+# on a workspace with no transactions at all.
+#
+# Residual limit: the widget renders at most RECENT_TRANSACTIONS_LIMIT (5) rows,
+# so a fixture pushed past that by newer transactions would still read as
+# missing. Test Workspace stays well under it today.
+- scrollUntilVisible:
+    element:
+      id: "dashboard:recent"
+    direction: DOWN
+
 - runFlow:
     when:
       notVisible: "Undoable expense"

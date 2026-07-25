@@ -25,6 +25,15 @@ name: Workspace — Create and select test workspace
       notVisible:
         id: "workspaceSelector:root"
     commands:
+      # Let the toolbar's workspace name arrive before judging it. The dashboard
+      # renders `state.workspaceName ?: defaultTitle`, so a read taken before the
+      # workspace streams in sees the fallback title, concludes "wrong
+      # workspace", and sends every chained flow on a needless settings-to-picker
+      # detour (#351 review).
+      - extendedWaitUntil:
+          visible: "Test Workspace"
+          timeout: 15000
+          optional: true
       - runFlow:
           when:
             notVisible: "Test Workspace"
@@ -78,7 +87,11 @@ name: Workspace — Create and select test workspace
           id: "workspaceSelector:confirm"
 
 # Assert we landed on Dashboard content, in the workspace this flow promises.
+# The name is waited on rather than asserted outright: it arrives with the rest
+# of the dashboard state, so a bare assertVisible races the fallback title on a
+# loaded emulator — the same read 03 already guards with an explicit wait.
 - assertVisible:
     id: "dashboard:root"
-- assertVisible:
-    text: "Test Workspace"
+- extendedWaitUntil:
+    visible: "Test Workspace"
+    timeout: 20000

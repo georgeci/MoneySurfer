@@ -37,19 +37,22 @@ name: Auth — Sign in with test user
     id: "signIn:submit"
 
 # Sign-in lands on the workspace picker, or straight on the dashboard when a
-# workspace is already selected. Either destination proves the credentials took.
-- runFlow:
-    when:
-      visible:
-        id: "workspaceSelector:root"
-    commands:
-      - assertVisible:
-          id: "workspaceSelector:root"
+# workspace is already selected. Wait for the more common destination, then
+# assert unconditionally that the sign-in screen is behind us.
+#
+# This used to be two `when: visible: X` blocks that each asserted X — both
+# tautologies. If the sign-in failed and the app stayed put, neither condition
+# held, neither block ran, and this flow reported a pass having asserted
+# nothing: a sign-in smoke test that could not fail on a failed sign-in
+# (#351 review). Leaving the screen is the one thing that must be true either
+# way, so that is what gets asserted.
+- extendedWaitUntil:
+    visible:
+      id: "workspaceSelector:root"
+    timeout: 15000
+    optional: true
 
-- runFlow:
-    when:
-      visible:
-        id: "dashboard:root"
-    commands:
-      - assertVisible:
-          id: "dashboard:root"
+- assertNotVisible:
+    id: "signIn:root"
+- assertNotVisible:
+    text: "Wrong email or password"

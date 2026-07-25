@@ -3,7 +3,12 @@ name: Account — Create savings account with opening balance
 ---
 # Pre-condition: active workspace; baseline account already created.
 # Exercises the "Savings" account type which other flows don't cover.
-
+#
+# Creation goes through Accounts → Manage, not the dashboard CTA. That CTA is an
+# empty-state affordance: `SurferAccountsWidget` composes it only while the
+# account list is empty, and this flow chains 03, which guarantees "Main Bank"
+# exists. Tapping it here could never resolve — the flow was failing on every
+# run for as long as it has existed (#351 review).
 - runFlow: 03_dashboard_add_account.yaml
 
 - runFlow:
@@ -11,7 +16,11 @@ name: Account — Create savings account with opening balance
       notVisible: "Rainy Day"
     commands:
       - tapOn:
-          id: "dashboard:addAccount"
+          id: "dashboard:accountsManage"
+      - assertVisible:
+          id: "accountsManage:root"
+      - tapOn:
+          id: "accountsManage:add"
       - assertVisible:
           id: "accountCreation:root"
 
@@ -28,7 +37,16 @@ name: Account — Create savings account with opening balance
       - tapOn:
           id: "accountCreation:save"
 
-# Back on Dashboard with the new savings account visible
+# Saving returns to the accounts list this flow came from; walk back to the
+# dashboard so the closing assertions run where the other flows expect to be.
+- runFlow:
+    when:
+      visible:
+        id: "accountsManage:root"
+    commands:
+      - tapOn:
+          id: "toolbar:back"
+
 - assertVisible:
     id: "dashboard:accounts"
 - assertVisible:

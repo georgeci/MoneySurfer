@@ -53,7 +53,19 @@ guarded creation — funding a goal, contributing to a budget — belong inside 
 they re-apply on every run. `18_goal_create_and_contribute.yaml` used to add another 250 per run
 against an assertion hard-coded to 10%.
 
-**4. Assert what you did, not what it computes to.**
+**4. A tag resolving is not the same as the node being composed.**
+Some affordances exist only in one state. The dashboard's add-account CTA
+(`dashboard:addAccount`) is composed *only while the account list is empty* — once an account
+exists, new ones are created from Accounts → Manage (`dashboard:accountsManage` →
+`accountsManage:add`). `10` and `15` both tapped the empty-state CTA after chaining a flow that
+guarantees an account, so `15` failed on every run and `10` failed whenever it was scheduled
+after `03`. Check the composable, not just the tag name.
+
+Related: a `when: notVisible: "<fixture>"` guard tests what is **on screen**, not what exists.
+Scroll the owning widget into view first (`scrollUntilVisible` on `dashboard:recent`), or the
+guard will re-create a fixture that is merely below the fold.
+
+**5. Assert what you did, not what it computes to.**
 Prefer the recorded contribution (`.*250.*`) over a derived ring percentage; prefer
 `assertNotVisible` on your own fixture over "the list is empty", which any neighbouring flow can
 falsify (see the Income filter in `07_account_details_and_filters.yaml`).

@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -56,6 +57,7 @@ import com.georgeci.moneysurfer.uikit.components.base.SurferToggleChipButton
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
+import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.utils.HandleSideEffect
 import kotlinx.datetime.number
@@ -63,6 +65,16 @@ import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringArrayResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
+
+/**
+ * This screen owns the only add-account affordance that survives a non-empty list — the
+ * dashboard's own CTA is empty-state-only — so E2E flows that create a second account come
+ * through here.
+ */
+object AccountsManageTestTags {
+    const val Root = "accountsManage:root"
+    const val Add = "accountsManage:add"
+}
 
 @Composable
 fun AccountsManageScreen(
@@ -127,7 +139,10 @@ private fun AccountsManageContent(
 ) {
     val hasContent = state.activeAccounts.isNotEmpty() || state.archivedAccounts.isNotEmpty()
     Scaffold(
-        modifier = Modifier.surferSafeInsets(),
+        modifier = Modifier
+            .surferSafeInsets()
+            .testTag(AccountsManageTestTags.Root)
+            .surferTestTagAsId(),
         containerColor = AppTheme.materialColors.surface,
         topBar = {
             SurferToolbar(
@@ -154,6 +169,7 @@ private fun AccountsManageContent(
             SurferAddFab(
                 label = stringResource(Res.string.accounts_manage_add_account),
                 onClick = { onEvent(AccountsManageEvent.OnAddAccountClick) },
+                modifier = Modifier.testTag(AccountsManageTestTags.Add),
             )
         },
     ) { padding ->

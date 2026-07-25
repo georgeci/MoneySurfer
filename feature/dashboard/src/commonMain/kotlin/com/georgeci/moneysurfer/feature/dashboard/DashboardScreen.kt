@@ -89,7 +89,13 @@ object DashboardTestTags {
     const val Settings = "dashboard:settings"
     const val AddTransaction = "dashboard:addTransaction"
     const val Accounts = "dashboard:accounts"
+
+    /**
+     * Empty-state CTA only — `SurferAccountsWidget` composes it just while the account list is
+     * empty. Once an account exists, new ones are created from [AccountsManage].
+     */
     const val AddAccount = "dashboard:addAccount"
+    const val AccountsManage = "dashboard:accountsManage"
     const val Recent = "dashboard:recent"
     const val RecentSeeAll = "dashboard:recentSeeAll"
     const val RecentEmpty = "dashboard:recentEmpty"
@@ -289,6 +295,7 @@ private fun AccountsWidget(
             title = stringResource(Res.string.dashboard_accounts_section_title),
             action = stringResource(Res.string.dashboard_accounts_manage),
             onActionClick = { onEvent(DashboardEvent.OnManageAccountsClick) },
+            actionTestTag = DashboardTestTags.AccountsManage,
             modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 8.dp),
         )
         SurferAccountsWidget(
@@ -389,6 +396,7 @@ private fun SectionHeader(
     modifier: Modifier = Modifier,
     action: String? = null,
     onActionClick: (() -> Unit)? = null,
+    actionTestTag: String? = null,
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
@@ -405,11 +413,13 @@ private fun SectionHeader(
                 text = action,
                 style = AppTheme.typography.labelMedium,
                 color = AppTheme.materialColors.primary,
-                modifier = if (onActionClick != null) {
-                    Modifier.clickable(onClick = onActionClick)
-                } else {
-                    Modifier
-                },
+                modifier = (
+                    if (onActionClick != null) {
+                        Modifier.clickable(onClick = onActionClick)
+                    } else {
+                        Modifier
+                    }
+                    ).then(actionTestTag?.let { Modifier.testTag(it) } ?: Modifier),
             )
         }
     }

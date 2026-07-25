@@ -9,6 +9,14 @@ name: Transaction — Details, edit and delete
 # (#351). "Editable expense" is written and read by this flow alone.
 - runFlow: 03_dashboard_add_account.yaml
 
+# Bring the Recent widget on screen *before* the guard reads it — `notVisible` on
+# the unscrolled dashboard reports "missing" for a transaction that merely sits
+# below the fold. See the fuller note in 17_transaction_delete_undo.yaml.
+- scrollUntilVisible:
+    element:
+      id: "dashboard:recent"
+    direction: DOWN
+
 - runFlow:
     when:
       notVisible: "Editable expense"
