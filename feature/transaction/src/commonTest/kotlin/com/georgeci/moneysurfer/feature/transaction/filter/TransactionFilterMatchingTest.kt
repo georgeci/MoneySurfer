@@ -4,6 +4,8 @@ import com.georgeci.moneysurfer.domain.fixtures.aTransaction
 import com.georgeci.moneysurfer.domain.model.CategorizedTransaction
 import com.georgeci.moneysurfer.domain.preferences.TransactionPeriodMode
 import com.georgeci.moneysurfer.domain.primitives.Money
+import com.georgeci.moneysurfer.domain.primitives.TransactionType
+import com.georgeci.moneysurfer.domain.primitives.TransferId
 import com.georgeci.moneysurfer.domain.util.TransactionPeriodWindow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.nulls.shouldBeNull
@@ -96,6 +98,38 @@ class TransactionFilterMatchingTest : StringSpec({
         TransactionFilters(query = "coffee").activeCount shouldBe 0
         TransactionFilters(minAmount = "5", maxAmount = "50").activeCount shouldBe 1
         TransactionFilters(recurringOnly = true, plannedOnly = true).activeCount shouldBe 2
+    }
+
+    "the type segments partition the list, transfer legs included" {
+        val expense = row(minor = 1000)
+        val income = CategorizedTransaction(
+            transaction = expense.transaction.copy(type = TransactionType.INCOME),
+            categoryName = "Salary",
+        )
+        // Both legs of a transfer are stored as an ordinary EXPENSE/INCOME pair — only the
+        // transferId tells them apart, which is why `Expenses` must not keep the outgoing one.
+        val outgoingLeg = CategorizedTransaction(
+            transaction = expense.transaction.copy(transferId = TransferId("tr-1")),
+            categoryName = "Transfer",
+        )
+        val incomingLeg = CategorizedTransaction(
+            transaction = income.transaction.copy(transferId = TransferId("tr-1")),
+            categoryName = "Transfer",
+        )
+
+        val expenses = TransactionFilters(type = TransactionTypeFilter.Expenses)
+        expenses.matches(expense) shouldBe true
+        expenses.matches(outgoingLeg) shouldBe false
+
+        val incomes = TransactionFilters(type = TransactionTypeFilter.Income)
+        incomes.matches(income) shouldBe true
+        incomes.matches(incomingLeg) shouldBe false
+
+        val transfers = TransactionFilters(type = TransactionTypeFilter.Transfer)
+        transfers.matches(outgoingLeg) shouldBe true
+        transfers.matches(incomingLeg) shouldBe true
+        transfers.matches(expense) shouldBe false
+        transfers.matches(income) shouldBe false
     }
 
     "reset drops the filters and keeps the search text" {

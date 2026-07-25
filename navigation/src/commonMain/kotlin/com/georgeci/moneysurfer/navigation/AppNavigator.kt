@@ -14,6 +14,20 @@ class AppNavigator internal constructor(
         backStack.removeLastOrNull()
     }
 
+    /**
+     * Pops up to [count] entries at once, for a screen whose caller has also become unreachable —
+     * editing a transaction and deleting it leaves the details screen of a row that no longer
+     * exists directly underneath.
+     *
+     * Never empties the stack: with nothing on it there is no destination left to render.
+     */
+    fun pop(count: Int) {
+        repeat(count) {
+            if (backStack.size <= 1) return
+            backStack.removeLastOrNull()
+        }
+    }
+
     fun replaceTop(route: Route) {
         backStack.removeLastOrNull()
         backStack.add(route)

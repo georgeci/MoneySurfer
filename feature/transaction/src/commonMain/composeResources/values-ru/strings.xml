@@ -2,11 +2,17 @@
     <!-- Transactions list (by account) -->
     <string name="transactions_list_title">Транзакции</string>
     <string name="transactions_list_new">Новая</string>
-    <string name="transactions_list_empty">Пока нет транзакций. Добавьте первую, чтобы она появилась здесь.</string>
-    <string name="transactions_list_empty_filtered">По выбранному фильтру ничего нет.</string>
+    <string name="transactions_list_empty_title">Пока нет транзакций</string>
+    <string name="transactions_list_empty">Добавьте первую — она появится здесь.</string>
+    <string name="transactions_list_empty_cta">Добавить транзакцию</string>
+    <string name="transactions_list_empty_filtered_title">Ничего не найдено</string>
+    <string name="transactions_list_empty_filtered">Под выбранные фильтры не подходит ни одна транзакция.</string>
+    <string name="transactions_list_empty_filtered_cta">Сбросить фильтры</string>
+    <string name="transactions_list_empty_search_cta">Очистить поиск</string>
     <string name="transactions_list_filter_all">Все</string>
     <string name="transactions_list_filter_expenses">Расходы</string>
     <string name="transactions_list_filter_income">Доходы</string>
+    <string name="transactions_list_filter_transfer">Переводы</string>
     <string name="transactions_list_summary_income">Доход</string>
     <string name="transactions_list_summary_expenses">Расход</string>
     <string name="transactions_list_summary_net">Сальдо</string>
@@ -184,6 +190,7 @@
     <string name="transaction_filters_type_all">Все</string>
     <string name="transaction_filters_type_expenses">Расходы</string>
     <string name="transaction_filters_type_income">Доходы</string>
+    <string name="transaction_filters_type_transfer">Переводы</string>
     <string name="transaction_filters_section_accounts">Счета</string>
     <string name="transaction_filters_section_categories">Категории</string>
     <string name="transaction_filters_categories_counter">выбрано %1$d из %2$d</string>

@@ -7,8 +7,13 @@ import kotlinx.datetime.LocalDate
 /**
  * The type segment. Shared by the list's chip rail and the filter screen's segmented control —
  * both edit the same field of [TransactionFilters], so there is one enum, not two.
+ *
+ * [Transfer] is not a stored transaction type: a transfer is a paired `EXPENSE`/`INCOME` couple,
+ * told apart by its `transferId` (see `CompiledFilters.matchesType`). The four values still
+ * partition the list, because the two money-moved-sideways legs are what [Expenses] and [Income]
+ * exclude.
  */
-enum class TransactionTypeFilter { All, Expenses, Income }
+enum class TransactionTypeFilter { All, Expenses, Income, Transfer }
 
 /**
  * The sort order set implied by the design's `Sort: Newest` chip.
