@@ -83,9 +83,19 @@ offline`.
 # Android — needs a booted emulator/device:
 ./gradlew qaMaestroOfflineAndroid
 
-# iOS — needs a booted Simulator:
+# iOS — needs a booted Simulator. Runs the launch smoke, not the golden path:
 ./gradlew qaMaestroOfflineIos
 ```
+
+### iOS E2E scope (issue #297)
+
+Both iOS entry points — `qaMaestroIos` (online) and `qaMaestroOfflineIos`
+(offline) — currently run one flow, `scripts/maestro/ios/app-open.yaml`: launch
+with `clearState` and assert onboarding renders. The suites were
+non-deterministically red on iOS, so they were cut back to the signal worth
+acting on; nothing was deleted, and Android still runs both the online suite and
+the offline golden path in full. Use `maestroRunAllIos` to drive the whole suite
+on a simulator locally. See [qa-runbook.md](qa-runbook.md#ios-scope-launch-smoke-only-issue-297).
 
 ## Desktop UI tests (Compose, `jvmTest`)
 

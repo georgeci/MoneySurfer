@@ -1,0 +1,42 @@
+appId: ${APP_ID}
+name: Smoke — app launches (iOS)
+tags:
+  - smoke
+---
+# The only flow the iOS lanes run right now (issue #297): the full iOS suites
+# were non-deterministically red, so `qaMaestroIos` and `qaMaestroOfflineIos`
+# were cut back to "does the app come up at all". Everything else still lives at
+# `scripts/maestro/` (online) and `scripts/maestro/offline/` (offline golden)
+# and keeps running on Android; drive the whole iOS suite locally with
+# `maestroRunAllIos` while the flake work is in progress.
+#
+# Build-agnostic on purpose — `${APP_ID}` is the online `.dev` bundle id for
+# `qaMaestroIos` and the offline one for `qaMaestroOfflineIos`. Both builds gate
+# startup on onboarding (`AppLaunchViewModel` step 0, issue #173), so a
+# clean-state launch lands on the same screen either way.
+#
+# Lives in `scripts/maestro/ios/` rather than next to the numbered flows so the
+# Android suites (which target `scripts/maestro/` and, without a workspace
+# config, only scan top-level flows) never pick it up. The `smoke` tag is belt
+# and braces — it's in the suites' `--exclude-tags` list too.
+
+# Fresh install: no leftover session or completed-onboarding preference from an
+# earlier run, so the launch decision is the same on a warm CI simulator as on a
+# cold one.
+- launchApp:
+    clearState: true
+
+# Cold start on a CI simulator (first launch after install, Compose + Koin graph
+# warm-up) routinely takes longer than `assertVisible`'s default window — wait it
+# out explicitly instead of failing the one signal this lane has.
+- extendedWaitUntil:
+    visible:
+      id: "onboarding:root"
+    timeout: 60000
+
+# Root plus the CTA: the container alone can be present while the content failed
+# to compose, and the continue button is the first thing a user could act on.
+- assertVisible:
+    id: "onboarding:root"
+- assertVisible:
+    id: "onboarding:continue"
