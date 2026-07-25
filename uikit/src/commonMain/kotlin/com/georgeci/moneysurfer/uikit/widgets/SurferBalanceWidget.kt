@@ -232,15 +232,22 @@ private fun Footnote(hero: Boolean, footnote: SurferBalanceFootnote?) {
     }
 }
 
+/** Shared preview copy, so the four galleries below differ only in the treatment they show. */
+private const val PREVIEW_TITLE = "Total balance"
+
+private const val PREVIEW_BALANCE = "€11,575.32"
+
+private const val PREVIEW_TREND = "+€412 this month"
+
 @Preview
 @Composable
 private fun SurferBalanceWidgetHeroPreview() {
     SurferComponentPreview {
         Box(modifier = Modifier.padding(16.dp)) {
             SurferBalanceWidget(
-                title = "Total balance",
-                balance = "€11,575.32",
-                footnote = SurferBalanceFootnote.Trend("+€412 this month"),
+                title = PREVIEW_TITLE,
+                balance = PREVIEW_BALANCE,
+                footnote = SurferBalanceFootnote.Trend(PREVIEW_TREND),
                 modifier = Modifier.fillMaxWidth(),
             )
         }
@@ -253,8 +260,8 @@ private fun SurferBalanceWidgetCompactPreview() {
     SurferComponentPreview {
         Box(modifier = Modifier.padding(16.dp)) {
             SurferBalanceWidget(
-                title = "Total balance",
-                balance = "€11,575.32",
+                title = PREVIEW_TITLE,
+                balance = PREVIEW_BALANCE,
                 size = SurferWidgetSize.Compact,
                 footnote = SurferBalanceFootnote.Trend("+€412"),
                 modifier = Modifier.width(220.dp),
@@ -273,10 +280,10 @@ private fun SurferBalanceWidgetVariantsPreview() {
         ) {
             SurferBalanceVariant.entries.forEach { variant ->
                 SurferBalanceWidget(
-                    title = "Total balance",
-                    balance = "€11,575.32",
+                    title = PREVIEW_TITLE,
+                    balance = PREVIEW_BALANCE,
                     variant = variant,
-                    footnote = SurferBalanceFootnote.Trend("+€412 this month"),
+                    footnote = SurferBalanceFootnote.Trend(PREVIEW_TREND),
                     modifier = Modifier.fillMaxWidth(),
                 )
             }
@@ -290,7 +297,7 @@ private fun SurferBalanceWidgetEmptyPreview() {
     SurferComponentPreview {
         Box(modifier = Modifier.padding(16.dp)) {
             SurferBalanceWidget(
-                title = "Total balance",
+                title = PREVIEW_TITLE,
                 balance = "—",
                 footnote = SurferBalanceFootnote.Empty("Add your first account to see balance."),
                 modifier = Modifier.fillMaxWidth(),

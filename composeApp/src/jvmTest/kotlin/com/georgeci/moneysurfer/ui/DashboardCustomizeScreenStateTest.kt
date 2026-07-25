@@ -178,6 +178,26 @@ class DashboardCustomizeScreenStateTest : StringSpec({
         }
     }
 
+    "every widget renders a sample of itself in both size tiles" {
+        DashboardWidgetType.entries.forEach { type ->
+            runComposeUiTest {
+                setContent {
+                    DashboardCardStyleSheetContent(
+                        item = DashboardLayoutConfig.DEFAULT.items.first { it.type == type },
+                        onSelect = {},
+                    )
+                }
+
+                // Each tile draws the real widget from sample data; a branch that crashes or
+                // measures to nothing under the preview scaling shows up here and nowhere else.
+                DashboardWidgetSize.entries.forEach { size ->
+                    onNodeWithTag(DashboardCustomizeTestTags.styleOption(type.name, size.name))
+                        .assertIsDisplayed()
+                }
+            }
+        }
+    }
+
     "a widget with no variants gets a size-only sheet" {
         runComposeUiTest {
             setContent {
