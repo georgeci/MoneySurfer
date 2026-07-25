@@ -31,6 +31,10 @@
     <string name="category_creation_color_label">Color</string>
     <string name="category_creation_field_parent">Parent category</string>
     <string name="category_creation_parent_none">None</string>
+    <string name="category_creation_cap_label">Monthly cap</string>
+    <string name="category_creation_cap_hint">Creates a monthly budget for this category. Leave empty for no cap.</string>
+    <string name="category_creation_cap_managed">Set by the "%1$s" budget</string>
+    <string name="category_creation_cap_managed_hint">This category shares a budget with others. Change the limit in Budgets so it keeps a single owner.</string>
     <string name="category_creation_untitled">Untitled category</string>
 
     <!-- Categories management screen -->
