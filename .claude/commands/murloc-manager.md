@@ -175,15 +175,18 @@ Project: https://github.com/users/georgeci/projects/2/views/1
   may have been carved from a stale local checkout.
 - Before committing any *.kt / *.kts files, run /detekt.
 - When the implementation is complete and detekt + tests are green, you MUST
-  run a self code-review on your working diff via `/code-review` once before
-  shipping, and address its findings — but do not loop re-reviewing to chase
-  a "perfectly clean" pass. For each finding, decide:
+  self-review your working diff once before shipping. `/code-review` is
+  user-triggered only — you cannot invoke it, so do NOT try and do NOT ask
+  the user to run it for you. Instead, re-read the full diff
+  (`git diff origin/main...HEAD`) with fresh eyes, hunting for correctness
+  bugs, missed edge cases, and broken conventions. Do not loop re-reviewing
+  to chase a "perfectly clean" pass. For each finding, decide:
   - a correctness finding inside this issue's Scope line → fix it (re-run
     /detekt and tests after the fixes);
-  - a genuine false positive, or a real issue that falls OUTSIDE the Scope
-    line (e.g. a pre-existing bug in a touched file, or optional cleanup) →
-    leave it and note it in the PR body. Never silence a finding, and never
-    expand the diff past the Scope line just to satisfy the review.
+  - a real issue that falls OUTSIDE the Scope line (e.g. a pre-existing bug
+    in a touched file, or optional cleanup) → leave it and note it in the
+    PR body. Never expand the diff past the Scope line just to satisfy the
+    review. The user can run `/code-review ultra <PR#>` on the PR afterwards.
 - When the work is done and the in-scope findings are fixed, use /ship to push
   and open the PR. Put `Closes #<number>` in the PR body so the issue closes
   when it merges.
@@ -203,8 +206,8 @@ the issue text (title or body):
 
 Act autonomously within that scope: locate the real paths in the repo (search
 if the issue gives only generic ones), plan, implement, run detekt and tests,
-self-review once via /code-review and fix its in-scope findings, then ship the
-PR via /ship.
+self-review the diff once and fix the in-scope findings, then ship the PR
+via /ship.
 Do not pause to ask the user for confirmation at each step — make the call and
 keep going. Ask the user a question ONLY when you genuinely cannot proceed
 without their answer (an irreversible/ambiguous product decision, or a
