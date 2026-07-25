@@ -54,4 +54,17 @@ class AccountDtoMapperSpec : StringSpec({
             doc.toEntity(id = ACCOUNT, workspaceId = WORKSPACE).extraDetails,
         ) shouldBe listOf(AccountExtraDetail(key = "IBAN", value = "PL61"))
     }
+
+    "the list position survives the wire, so a reorder reaches the other device" {
+        val doc = accountDoc().copy(sortOrder = 4)
+
+        val entity = doc.toEntity(id = ACCOUNT, workspaceId = WORKSPACE)
+
+        entity.sortOrder shouldBe 4
+        entity.toDoc().sortOrder shouldBe 4
+    }
+
+    "a doc from a client that predates sortOrder lands at the front rather than nowhere" {
+        accountDoc().toEntity(id = ACCOUNT, workspaceId = WORKSPACE).sortOrder shouldBe 0
+    }
 })
