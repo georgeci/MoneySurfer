@@ -26,14 +26,29 @@ class CrashReportingLogWriterTest : StringSpec({
         }
     }
 
-    "a warning becomes a breadcrumb but not a non-fatal" {
+    "a warning with a throwable becomes a breadcrumb and a non-fatal" {
+        val reporter = FakeCrashReporter()
+        val failure = IllegalStateException("boom")
+
+        CrashReportingLogWriter(reporter).log(
+            severity = Severity.Warn,
+            message = "sync retry scheduled",
+            tag = "SyncEngine",
+            throwable = failure,
+        )
+
+        reporter.breadcrumbs shouldContainExactly listOf("WARN/SyncEngine: sync retry scheduled")
+        reporter.recorded shouldContainExactly listOf(failure)
+    }
+
+    "a warning without a throwable only leaves a breadcrumb" {
         val reporter = FakeCrashReporter()
 
         CrashReportingLogWriter(reporter).log(
             severity = Severity.Warn,
             message = "sync retry scheduled",
             tag = "SyncEngine",
-            throwable = IllegalStateException("boom"),
+            throwable = null,
         )
 
         reporter.breadcrumbs shouldContainExactly listOf("WARN/SyncEngine: sync retry scheduled")

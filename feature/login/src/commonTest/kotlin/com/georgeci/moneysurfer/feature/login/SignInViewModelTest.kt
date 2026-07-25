@@ -91,7 +91,7 @@ class SignInViewModelTest : StringSpec({
         viewModel.currentState.error shouldBe SignInError.PasswordTooShort
     }
 
-    "sign-up against a taken address reports it on the email field and switches to sign-in" {
+    "sign-up against a taken address shows a dialog and switches to sign-in" {
         val viewModel = newViewModel()
 
         viewModel.onEvent(SignInEvent.OnToggleModeClick)
@@ -99,26 +99,28 @@ class SignInViewModelTest : StringSpec({
         viewModel.onEvent(SignInEvent.OnPasswordChanged("secret1"))
         viewModel.onEvent(SignInEvent.OnSubmitClick)
 
-        viewModel.currentState.emailError shouldBe SignInError.EmailAlreadyInUse
+        viewModel.currentState.dialogError shouldBe SignInError.EmailAlreadyInUse
+        viewModel.currentState.emailError shouldBe null
         viewModel.currentState.mode shouldBe AuthMode.SignIn
         viewModel.currentState.isLoading shouldBe false
     }
 
-    "a rules rejection surfaces as PermissionDenied on the form, not on a field" {
+    "a rules rejection surfaces as PermissionDenied in a dialog" {
         val viewModel = newViewModel(signupFailure = AuthError.Type.PermissionDenied)
 
         viewModel.submitSignUp()
 
-        viewModel.currentState.formError shouldBe SignInError.PermissionDenied
+        viewModel.currentState.dialogError shouldBe SignInError.PermissionDenied
+        viewModel.currentState.formError shouldBe null
         viewModel.currentState.mode shouldBe AuthMode.SignUp
     }
 
-    "a provider-rejected address lands on the email field rather than reading as a bad password" {
+    "a provider-rejected address keeps its specific copy in the dialog" {
         val viewModel = newViewModel(signupFailure = AuthError.Type.InvalidEmail)
 
         viewModel.submitSignUp()
 
-        viewModel.currentState.emailError shouldBe SignInError.EmailInvalid
+        viewModel.currentState.dialogError shouldBe SignInError.EmailInvalid
     }
 
     // RequiresRecentLogin only ever comes out of the account-deletion flow; if it somehow reaches
@@ -128,7 +130,18 @@ class SignInViewModelTest : StringSpec({
 
         viewModel.submitSignUp()
 
-        viewModel.currentState.formError shouldBe SignInError.Unknown
+        viewModel.currentState.dialogError shouldBe SignInError.Unknown
+    }
+
+    "dismissing an auth error clears the dialog" {
+        val viewModel = newViewModel()
+
+        viewModel.submitSignUp()
+        viewModel.currentState.dialogError shouldBe SignInError.EmailAlreadyInUse
+
+        viewModel.onEvent(SignInEvent.OnErrorDismiss)
+
+        viewModel.currentState.dialogError shouldBe null
     }
 
     "editing a field clears the pending error" {

@@ -42,6 +42,7 @@ class SignInViewModel(
             SignInEvent.OnSubmitClick -> submit()
             SignInEvent.OnAnonymousLoginClick -> runAuth("anon") { anonymousLogin() }
             SignInEvent.OnLoginClick -> runAuth("demo") { demoLogin() }
+            SignInEvent.OnErrorDismiss -> updateState { copy(error = null) }
             SignInEvent.OnTermsClick -> postSideEffect(SignInEffect.NavigateToLegal)
         }
     }
@@ -52,7 +53,7 @@ class SignInViewModel(
         val invalid = state.validate()
         if (invalid != null) {
             log.i { "[submit] rejected: $invalid (mode=${state.mode})" }
-            updateState { copy(error = invalid) }
+            updateState { copy(error = invalid, errorPresentation = SignInErrorPresentation.Inline) }
             return
         }
         val email = state.email
@@ -80,18 +81,27 @@ class SignInViewModel(
         launch(
             onError = { err ->
                 log.w(err) { "[$label] failed with exception" }
-                updateState { copy(isLoading = false, error = SignInError.Unknown) }
+                updateState {
+                    copy(
+                        isLoading = false,
+                        error = SignInError.Unknown,
+                        errorPresentation = SignInErrorPresentation.Dialog,
+                    )
+                }
             },
         ) {
             updateState { copy(isLoading = true, error = null) }
             block().fold(
                 ifLeft = { err ->
                     val mapped = err.toSignInError()
-                    log.w(err.cause) { "[$label] failed -> $mapped (${err.message})" }
+                    log.w(AuthNonFatalException(label, err)) {
+                        "[$label] failed -> $mapped (${err.message})"
+                    }
                     updateState {
                         copy(
                             isLoading = false,
                             error = mapped,
+                            errorPresentation = SignInErrorPresentation.Dialog,
                             // The account already exists, so put the user one tap from the action
                             // the message advises. This is also the way out of a half-finished
                             // sign-up: `SignupUseCase` creates the Firebase user before the local
@@ -136,6 +146,8 @@ enum class AuthMode { SignIn, SignUp }
 /** Which control an error belongs under, so the UI can anchor it to the offending input. */
 enum class SignInField { Email, Password, Form }
 
+enum class SignInErrorPresentation { Inline, Dialog }
+
 enum class SignInError(val field: SignInField) {
     EmailRequired(SignInField.Email),
     EmailInvalid(SignInField.Email),
@@ -164,6 +176,7 @@ data class SignInState(
     val mode: AuthMode = AuthMode.SignIn,
     val isLoading: Boolean = false,
     val error: SignInError? = null,
+    val errorPresentation: SignInErrorPresentation = SignInErrorPresentation.Inline,
     val config: SignInFeatureConfig = SignInFeatureConfig(),
 ) {
     /**
@@ -174,9 +187,20 @@ data class SignInState(
     val canSubmit: Boolean
         get() = !isLoading
 
-    val emailError: SignInError? get() = error?.takeIf { it.field == SignInField.Email }
-    val passwordError: SignInError? get() = error?.takeIf { it.field == SignInField.Password }
-    val formError: SignInError? get() = error?.takeIf { it.field == SignInField.Form }
+    val emailError: SignInError?
+        get() = error?.takeIf {
+            errorPresentation == SignInErrorPresentation.Inline && it.field == SignInField.Email
+        }
+    val passwordError: SignInError?
+        get() = error?.takeIf {
+            errorPresentation == SignInErrorPresentation.Inline && it.field == SignInField.Password
+        }
+    val formError: SignInError?
+        get() = error?.takeIf {
+            errorPresentation == SignInErrorPresentation.Inline && it.field == SignInField.Form
+        }
+    val dialogError: SignInError?
+        get() = error?.takeIf { errorPresentation == SignInErrorPresentation.Dialog }
 
     /** First client-side problem with the current input, or null when it is worth a network call. */
     fun validate(): SignInError? = when {
@@ -195,6 +219,7 @@ sealed interface SignInEvent {
     data object OnSubmitClick : SignInEvent
     data object OnLoginClick : SignInEvent
     data object OnAnonymousLoginClick : SignInEvent
+    data object OnErrorDismiss : SignInEvent
     data object OnTermsClick : SignInEvent
 }
 
@@ -205,3 +230,8 @@ sealed interface SignInEffect {
 
     data object NavigateToLegal : SignInEffect
 }
+
+private class AuthNonFatalException(
+    label: String,
+    error: AuthError,
+) : RuntimeException("Auth $label failed: ${error.type}", error.cause)

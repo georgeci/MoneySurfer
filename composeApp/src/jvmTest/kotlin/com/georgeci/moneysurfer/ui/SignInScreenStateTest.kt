@@ -11,6 +11,7 @@ import androidx.compose.ui.test.v2.runComposeUiTest
 import com.georgeci.moneysurfer.feature.login.AuthMode
 import com.georgeci.moneysurfer.feature.login.SignInContent
 import com.georgeci.moneysurfer.feature.login.SignInError
+import com.georgeci.moneysurfer.feature.login.SignInErrorPresentation
 import com.georgeci.moneysurfer.feature.login.SignInEvent
 import com.georgeci.moneysurfer.feature.login.SignInState
 import com.georgeci.moneysurfer.feature.login.SignInTestTags
@@ -71,7 +72,7 @@ class SignInScreenStateTest : StringSpec({
         }
     }
 
-    "form-level error renders the shared error text" {
+    "inline form-level error renders the shared error text" {
         runComposeUiTest {
             setContent {
                 SignInContent(
@@ -81,6 +82,26 @@ class SignInScreenStateTest : StringSpec({
             }
 
             onNodeWithTag(SignInTestTags.ErrorText).assertIsDisplayed()
+        }
+    }
+
+    "auth error renders a dialog instead of field or form text" {
+        runComposeUiTest {
+            val events = mutableListOf<SignInEvent>()
+            setContent {
+                SignInContent(
+                    state = SignInState(
+                        error = SignInError.InvalidCredentials,
+                        errorPresentation = SignInErrorPresentation.Dialog,
+                    ),
+                    onEvent = { events += it },
+                )
+            }
+
+            onNodeWithTag(SignInTestTags.ErrorDialog).assertIsDisplayed()
+            onNodeWithTag(SignInTestTags.ErrorText).assertDoesNotExist()
+            onNodeWithTag(SignInTestTags.ErrorDialogConfirm).performClick()
+            events shouldContainExactly listOf(SignInEvent.OnErrorDismiss)
         }
     }
 

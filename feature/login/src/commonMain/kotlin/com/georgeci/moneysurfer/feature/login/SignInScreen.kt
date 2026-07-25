@@ -26,6 +26,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -73,6 +74,8 @@ import moneysurfer.feature.login.generated.resources.sign_in_email_label
 import moneysurfer.feature.login.generated.resources.sign_in_error_email_in_use
 import moneysurfer.feature.login.generated.resources.sign_in_error_email_invalid
 import moneysurfer.feature.login.generated.resources.sign_in_error_email_required
+import moneysurfer.feature.login.generated.resources.sign_in_error_dialog_ok
+import moneysurfer.feature.login.generated.resources.sign_in_error_dialog_title
 import moneysurfer.feature.login.generated.resources.sign_in_error_invalid_credentials
 import moneysurfer.feature.login.generated.resources.sign_in_error_password_required
 import moneysurfer.feature.login.generated.resources.sign_in_error_password_too_short
@@ -108,6 +111,8 @@ object SignInTestTags {
     const val AnonymousButton = "signIn:anonymous"
     const val DemoButton = "signIn:demo"
     const val ErrorText = "signIn:error"
+    const val ErrorDialog = "signIn:errorDialog"
+    const val ErrorDialogConfirm = "signIn:errorDialog:confirm"
     const val EmailError = "$EmailField:error"
     const val PasswordError = "$PasswordField:error"
     const val PasswordReveal = "$PasswordField:reveal"
@@ -234,7 +239,36 @@ fun SignInContent(
                     .testTag(SignInTestTags.Loader),
             )
         }
+
+        state.dialogError?.let { error ->
+            SignInErrorDialog(
+                error = error,
+                onDismiss = { onEvent(SignInEvent.OnErrorDismiss) },
+            )
+        }
     }
+}
+
+@Composable
+private fun SignInErrorDialog(
+    error: SignInError,
+    onDismiss: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(Res.string.sign_in_error_dialog_title)) },
+        text = { Text(error.localized()) },
+        confirmButton = {
+            TextButton(
+                onClick = onDismiss,
+                modifier = Modifier.testTag(SignInTestTags.ErrorDialogConfirm),
+            ) {
+                Text(stringResource(Res.string.sign_in_error_dialog_ok))
+            }
+        },
+        containerColor = AppTheme.materialColors.surface,
+        modifier = Modifier.testTag(SignInTestTags.ErrorDialog),
+    )
 }
 
 @Composable
