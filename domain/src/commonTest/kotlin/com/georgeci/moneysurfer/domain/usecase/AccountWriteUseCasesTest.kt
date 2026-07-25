@@ -76,6 +76,31 @@ class AccountWriteUseCasesTest : StringSpec({
         result.shouldBeInstanceOf<Either.Left<AccountActionError>>()
         result.value shouldBe AccountActionError.AccountNotFound
     }
+
+    "reorder numbers the accounts in the order it was given" {
+        val first = anAccount(id = accountId("a-1")).copy(sortOrder = 0)
+        val second = anAccount(id = accountId("a-2")).copy(sortOrder = 1)
+        val third = anAccount(id = accountId("a-3")).copy(sortOrder = 2)
+        val repo = FakeWritableAccountRepository(
+            mutableMapOf(first.id to first, second.id to second, third.id to third),
+        )
+
+        val result = ReorderAccountsUseCase(repo).invoke(listOf(third.id, first.id, second.id))
+
+        result shouldBe Either.Right(Unit)
+        repo.store.getValue(third.id).sortOrder shouldBe 0
+        repo.store.getValue(first.id).sortOrder shouldBe 1
+        repo.store.getValue(second.id).sortOrder shouldBe 2
+    }
+
+    "reorder surfaces a repository failure instead of throwing" {
+        val repo = FakeWritableAccountRepository(failWrites = true)
+
+        val result = ReorderAccountsUseCase(repo).invoke(listOf(accountId("a-1")))
+
+        result.shouldBeInstanceOf<Either.Left<AccountActionError>>()
+        result.value.shouldBeInstanceOf<AccountActionError.LocalWriteFailed>()
+    }
 })
 
 private class FakeWritableAccountRepository(
@@ -100,4 +125,10 @@ private class FakeWritableAccountRepository(
     override suspend fun applyDelta(accountId: AccountId, delta: Money) = Unit
     override suspend fun setBalance(accountId: AccountId, balance: Money) = Unit
     override suspend fun setArchived(accountId: AccountId, archived: Boolean) = Unit
+    override suspend fun reorder(orderedIds: List<AccountId>) {
+        if (failWrites) error("disk full")
+        orderedIds.forEachIndexed { position, id ->
+            store[id]?.let { store[id] = it.copy(sortOrder = position) }
+        }
+    }
 }

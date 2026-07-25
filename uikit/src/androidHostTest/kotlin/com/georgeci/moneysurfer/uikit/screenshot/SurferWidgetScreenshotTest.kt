@@ -11,6 +11,7 @@ import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.widgets.SurferAccountItem
 import com.georgeci.moneysurfer.uikit.widgets.SurferAccountsWidget
 import com.georgeci.moneysurfer.uikit.widgets.SurferBalanceFootnote
+import com.georgeci.moneysurfer.uikit.widgets.SurferBalanceVariant
 import com.georgeci.moneysurfer.uikit.widgets.SurferBalanceWidget
 import com.georgeci.moneysurfer.uikit.widgets.SurferQuickActionsWidget
 import com.georgeci.moneysurfer.uikit.widgets.SurferRecentTransactionItem
@@ -39,6 +40,24 @@ class SurferWidgetScreenshotTest {
                     balance = "€11,575.32",
                     modifier = Modifier.fillMaxWidth(),
                     size = size,
+                    footnote = SurferBalanceFootnote.Trend("+€412 this month"),
+                )
+            }
+        }
+    }
+
+    @Test
+    fun surferBalanceWidgetVariants() = captureLightAndDark("surfer_balance_widget_variants") {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            SurferBalanceVariant.entries.forEach { variant ->
+                SurferBalanceWidget(
+                    title = "Total balance",
+                    balance = "€11,575.32",
+                    modifier = Modifier.fillMaxWidth(),
+                    variant = variant,
                     footnote = SurferBalanceFootnote.Trend("+€412 this month"),
                 )
             }

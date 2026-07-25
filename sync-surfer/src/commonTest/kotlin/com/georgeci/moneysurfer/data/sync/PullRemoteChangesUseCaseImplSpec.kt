@@ -19,6 +19,7 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldContainExactly
+import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
@@ -218,6 +219,112 @@ class PullRemoteChangesUseCaseImplSpec : StringSpec({
         env.accountsPlugin.applied.map { it.first } shouldContainExactly listOf("a-1")
     }
 
+    // -- Draining across batches (issue #342) ------------------------------------------------
+
+    "a collection larger than one batch is drained by a single pull" {
+        // Before this, one pull moved at most BATCH_SIZE docs and the rest trickled in through
+        // the 1-minute ticker — a real account showed wrong balances for tens of minutes.
+        val env = PullEnv(providerWorkspaceIds = listOf("ws-1"))
+        env.reader.collectionDocs["ws-1" to "accounts"] =
+            (1..250).map { doc("a-$it", updatedAt = it.toLong()) }
+
+        val result = env.pull(SyncScope.AllUserData)
+
+        result shouldBe Either.Right(PullSummary(downloadedCount = 250, conflictCount = 0))
+        env.accountsPlugin.applied shouldHaveSize 250
+        env.syncMeta.cursors["ws-1" to "accounts"] shouldBe Instant.fromEpochMilliseconds(250)
+        // 100 + 100 + 50: the short third batch ends the loop.
+        env.reader.fetchCalls.filter { it.collection == "accounts" }
+            .map { it.sinceMillis } shouldContainExactly listOf(0L, 100L, 200L)
+    }
+
+    "a full batch of same-timestamp documents terminates the loop rather than re-reading itself" {
+        // The query is a strict `updatedAt > cursor`, so once the cursor lands on the shared
+        // timestamp the follow-up query comes back empty and the loop ends. Whatever did not fit
+        // in the first batch stays invisible — a pre-existing consequence of the strict cursor,
+        // not something the drain loop introduced (see md/test_debt.md §6).
+        val env = PullEnv(providerWorkspaceIds = listOf("ws-1"))
+        env.reader.collectionDocs["ws-1" to "accounts"] =
+            (1..150).map { doc("a-$it", updatedAt = 7) }
+
+        val result = env.pull(SyncScope.AllUserData)
+
+        result shouldBe Either.Right(PullSummary(downloadedCount = 100, conflictCount = 0))
+        env.reader.fetchCalls.filter { it.collection == "accounts" }
+            .map { it.sinceMillis } shouldContainExactly listOf(0L, 7L)
+        env.syncMeta.cursors["ws-1" to "accounts"] shouldBe Instant.fromEpochMilliseconds(7)
+    }
+
+    "cancellation between batches aborts the pull" {
+        val env = PullEnv(providerWorkspaceIds = listOf("ws-1"))
+        val token = SimpleCancelToken()
+        env.reader.collectionDocs["ws-1" to "accounts"] =
+            (1..150).map { doc("a-$it", updatedAt = it.toLong()) }
+        env.accountsPlugin.onApply = { docId -> if (docId == "a-100") token.cancel() }
+
+        shouldThrow<SyncCancelledException> {
+            env.pull(SyncScope.AllUserData, cancelToken = token)
+        }
+
+        // The first batch completed and its cursor landed; the second was never requested.
+        env.reader.fetchCalls.filter { it.collection == "accounts" } shouldHaveSize 1
+    }
+
+    // -- Stale workspace refs (issue #342) ---------------------------------------------------
+
+    "an unreadable workspace is skipped instead of failing the whole pull" {
+        // A `users/{uid}.workspaceIds` entry whose workspaces/{wid} document was never created
+        // reads as PERMISSION_DENIED. Raising here used to make sign-in impossible for the
+        // entire account.
+        val env = PullEnv(providerWorkspaceIds = listOf("ws-stale", "ws-ok"))
+        env.reader.denyWorkspaces += "ws-stale"
+        env.reader.collectionDocs["ws-stale" to "accounts"] = listOf(doc("a-never", updatedAt = 1))
+        env.reader.collectionDocs["ws-ok" to "accounts"] = listOf(doc("a-1", updatedAt = 10))
+
+        val result = env.pull(SyncScope.AllUserData)
+
+        result shouldBe Either.Right(PullSummary(downloadedCount = 1, conflictCount = 0))
+        env.accountsPlugin.applied shouldContainExactly listOf("a-1" to "ws-ok")
+    }
+
+    "a denied subcollection query skips the rest of that workspace" {
+        // The other SDK shape: the root `get()` returns nothing rather than throwing, and the
+        // denial surfaces on the first subcollection query instead.
+        val env = PullEnv(providerWorkspaceIds = listOf("ws-stale"))
+        env.reader.denyCollections += "ws-stale" to "invites"
+        env.reader.collectionDocs["ws-stale" to "accounts"] = listOf(doc("a-1", updatedAt = 10))
+
+        val result = env.pull(SyncScope.AllUserData)
+
+        // invites (priority 5) is denied, so accounts (priority 10) is never reached.
+        result shouldBe Either.Right(PullSummary(downloadedCount = 0, conflictCount = 0))
+        env.accountsPlugin.applied.shouldBeEmpty()
+    }
+
+    "a network failure aborts the pull instead of passing as a stale ref" {
+        // Only a denial means "this workspace will never be readable". A dropped connection
+        // means the data is not here *yet* — swallowing it would report a successful sync that
+        // downloaded nothing, and the UI would claim the user is up to date.
+        val env = PullEnv(providerWorkspaceIds = listOf("ws-1"))
+        env.reader.failWorkspacesWith["ws-1"] = "UNAVAILABLE: backend unreachable"
+
+        val result = env.pull(SyncScope.AllUserData)
+
+        result.shouldBeInstanceOf<Either.Left<SyncError>>()
+    }
+
+    "a local apply failure still aborts the pull" {
+        // Tolerance is for unreadable *remote* workspaces only — a plugin that cannot write to
+        // Room is a real error and must not be swallowed as a stale ref.
+        val env = PullEnv(providerWorkspaceIds = listOf("ws-1", "ws-2"))
+        env.reader.collectionDocs["ws-1" to "accounts"] = listOf(doc("a-bad", updatedAt = 42))
+        env.accountsPlugin.failOnDocId = "a-bad"
+
+        val result = env.pull(SyncScope.AllUserData)
+
+        result.shouldBeInstanceOf<Either.Left<SyncError>>()
+    }
+
     "AllUserData additionally pulls invites from workspaces the user is invited to" {
         val env = PullEnv(
             firebaseUid = "uid-7",
@@ -331,11 +438,22 @@ private class FakeCollectionReader : WorkspaceCollectionReader {
     val collectionDocs = mutableMapOf<Pair<String, String>, List<RemoteDocument>>()
     val inviteDocs = mutableMapOf<Pair<String, String>, List<RemoteDocument>>()
 
+    /** Workspaces whose every read raises, as Firestore rules would for a non-member. */
+    val denyWorkspaces = mutableSetOf<String>()
+
+    /** `workspaceId to collection` pairs that raise while the rest of the workspace reads fine. */
+    val denyCollections = mutableSetOf<Pair<String, String>>()
+
+    /** Workspaces whose reads fail with something *other* than a denial, keyed by message. */
+    val failWorkspacesWith = mutableMapOf<String, String>()
+
     val fetchCalls = mutableListOf<FetchCall>()
     val inviteFetchCalls = mutableListOf<FetchCall>()
 
-    override suspend fun fetchWorkspaceDoc(workspaceId: String): RemoteDocument? =
-        rootDocs[workspaceId]
+    override suspend fun fetchWorkspaceDoc(workspaceId: String): RemoteDocument? {
+        denyIfBlocked(workspaceId, "root")
+        return rootDocs[workspaceId]
+    }
 
     override suspend fun fetchUpdatedSince(
         workspaceId: String,
@@ -343,10 +461,18 @@ private class FakeCollectionReader : WorkspaceCollectionReader {
         sinceMillis: Long,
         limit: Int,
     ): List<RemoteDocument> {
+        denyIfBlocked(workspaceId, collectionName)
         fetchCalls += FetchCall(workspaceId, collectionName, sinceMillis)
         return collectionDocs[workspaceId to collectionName].orEmpty()
             .filter { (it.getLong("updatedAt") ?: 0L) > sinceMillis }
             .take(limit)
+    }
+
+    private fun denyIfBlocked(workspaceId: String, collectionName: String) {
+        failWorkspacesWith[workspaceId]?.let { error(it) }
+        if (workspaceId in denyWorkspaces || (workspaceId to collectionName) in denyCollections) {
+            error("PERMISSION_DENIED: Missing or insufficient permissions")
+        }
     }
 
     override suspend fun fetchInvitesForUser(

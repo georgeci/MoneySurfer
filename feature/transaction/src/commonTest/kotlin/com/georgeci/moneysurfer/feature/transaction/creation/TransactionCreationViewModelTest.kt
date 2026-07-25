@@ -788,6 +788,7 @@ private class FakeAccountRepository : AccountRepository {
         byId[accountId] = current.copy(balance = balance)
         byWorkspace.value = byId.values.toList()
     }
+    override suspend fun reorder(orderedIds: List<AccountId>) = Unit
     override suspend fun setArchived(accountId: AccountId, archived: Boolean) {
         val current = byId[accountId] ?: return
         byId[accountId] = current.copy(archived = archived)

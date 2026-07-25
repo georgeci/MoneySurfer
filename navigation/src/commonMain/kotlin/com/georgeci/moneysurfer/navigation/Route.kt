@@ -18,9 +18,15 @@ sealed interface Route : NavKey {
     @Serializable
     data object Legal : Route
 
+    /**
+     * [cloudDataUnavailable] marks the sign-in path where the account is known to own workspaces
+     * that never reached the local database — the selector says so instead of looking like a
+     * brand-new account with nothing in it (issue #342).
+     */
     @Serializable
     data class WorkspaceSelector(
         val showActions: Boolean = false,
+        val cloudDataUnavailable: Boolean = false,
     ) : Route
 
     @Serializable

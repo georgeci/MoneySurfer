@@ -7,6 +7,7 @@ import com.georgeci.moneysurfer.domain.config.HostCapabilities
 import com.georgeci.moneysurfer.domain.usecase.AnonymousLoginUseCase
 import com.georgeci.moneysurfer.domain.usecase.DemoLoginUseCase
 import com.georgeci.moneysurfer.domain.usecase.LoginUseCase
+import com.georgeci.moneysurfer.domain.usecase.PostAuthBootstrapUseCase
 import com.georgeci.moneysurfer.domain.usecase.SignupUseCase
 import com.georgeci.moneysurfer.utils.MviViewModel
 import org.koin.core.annotation.KoinViewModel
@@ -73,7 +74,9 @@ class SignInViewModel(
         }
     }
 
-    private fun runAuth(label: String, block: suspend () -> Either<AuthError, *>) {
+    // `Any?` rather than a star projection: the success value is inspected, and a star-projected
+    // right side is only usable as `Nothing`.
+    private fun runAuth(label: String, block: suspend () -> Either<AuthError, Any?>) {
         if (currentState.isLoading) {
             log.d { "[$label] ignored: already loading" }
             return
@@ -103,9 +106,14 @@ class SignInViewModel(
                         )
                     }
                 },
-                ifRight = {
-                    log.i { "[$label] ok -> navigate" }
-                    postSideEffect(SignInEffect.NavigateToWorkspaceSelector)
+                ifRight = { result ->
+                    // Auth succeeded either way; the bootstrap just could not find the account's
+                    // workspaces locally, and the selector has to say so rather than render an
+                    // empty list that reads as "you have no workspaces" (issue #342).
+                    val cloudDataUnavailable =
+                        result is PostAuthBootstrapUseCase.Result.CloudDataUnavailable
+                    log.i { "[$label] ok -> navigate (cloudDataUnavailable=$cloudDataUnavailable)" }
+                    postSideEffect(SignInEffect.NavigateToWorkspaceSelector(cloudDataUnavailable))
                     updateState { copy(isLoading = false) }
                 },
             )
@@ -207,6 +215,9 @@ sealed interface SignInEvent {
 }
 
 sealed interface SignInEffect {
-    data object NavigateToWorkspaceSelector : SignInEffect
+    data class NavigateToWorkspaceSelector(
+        val cloudDataUnavailable: Boolean = false,
+    ) : SignInEffect
+
     data object NavigateToLegal : SignInEffect
 }

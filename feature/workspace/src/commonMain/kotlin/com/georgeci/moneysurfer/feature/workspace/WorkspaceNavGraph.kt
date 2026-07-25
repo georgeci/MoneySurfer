@@ -22,9 +22,12 @@ val workspaceNavGraph: FeatureNavGraph = { navigator ->
     entry<Route.WorkspaceSelector> { key ->
         WorkspaceSelectorScreen(
             showActions = key.showActions,
+            cloudDataUnavailable = key.cloudDataUnavailable,
             onNavigateToDashboard = {
                 navigator.replaceTop(Route.Dashboard)
             },
+            // `resetTo`: logout wiped the local data, so nothing behind this entry is still valid.
+            onNavigateToSignIn = { navigator.resetTo(Route.SignIn) },
             onNavigateToWorkspaceCreation = { navigator.push(Route.WorkspaceCreation()) },
             onNavigateToWorkspaceEdit = { workspaceId ->
                 navigator.push(Route.WorkspaceCreation(workspaceId = workspaceId.value))

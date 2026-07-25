@@ -1,5 +1,6 @@
 package com.georgeci.moneysurfer.feature.dashboard.customize
 
+import com.georgeci.moneysurfer.domain.dashboard.DashboardCardStyle
 import com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutConfig
 import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetType
 import com.georgeci.moneysurfer.domain.preferences.UiPreferences
@@ -39,6 +40,8 @@ class DashboardCustomizeViewModel(
                 edit { it.withWidgetEnabled(event.type, event.enabled) }
             is DashboardCustomizeEvent.OnWidgetMove ->
                 edit { it.withWidgetMoved(from = event.from, to = event.to) }
+            is DashboardCustomizeEvent.OnCardStyleChange ->
+                edit { it.withCardStyle(event.type, event.cardStyle) }
         }
     }
 
@@ -73,6 +76,12 @@ sealed interface DashboardCustomizeEvent {
 
     /** [from] was dragged onto the dashboard slot [to] holds right now. */
     data class OnWidgetMove(val from: DashboardWidgetType, val to: DashboardWidgetType) : DashboardCustomizeEvent
+
+    /** A size or variant was picked for [type] in the card-style sheet. */
+    data class OnCardStyleChange(
+        val type: DashboardWidgetType,
+        val cardStyle: DashboardCardStyle,
+    ) : DashboardCustomizeEvent
 }
 
 sealed interface DashboardCustomizeEffect {

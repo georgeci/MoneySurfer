@@ -243,9 +243,9 @@ internal class SyncSettingsImpl(private val config: Config) : SyncSettings {
 }
 ```
 
-Three terms, not two: today's `SyncFeatureFlag` is deliberately `false` in *both* hosts
-because the feature is not shipped, and a `remote && user` pair has no slot for that
-build-owned term — dropping it would silently enable sync at migration step 1.
+Three terms, not two: the offline host has no Firestore to sync against, so its build term is
+`false` while the online host's is `true` (issue #342). A `remote && user` pair has no slot for
+that build-owned term — dropping it would silently enable sync in the offline build.
 
 **What `true → false` does.** The flag is a flow, so a server kill switch can retract
 mid-session and the transition needs a defined shape. The policy is *start nothing new, finish

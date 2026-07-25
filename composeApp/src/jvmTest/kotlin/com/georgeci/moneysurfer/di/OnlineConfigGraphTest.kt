@@ -70,7 +70,7 @@ class OnlineConfigGraphTest : StringSpec({
         }
     }
 
-    "online build layer keeps the full surface and leaves sync off" {
+    "online build layer keeps the full surface, sync included" {
         withOnlineGraph { koin ->
             val build = koin.get<BuildConfigSource>()
             listOf(
@@ -86,8 +86,9 @@ class OnlineConfigGraphTest : StringSpec({
                 LayerValue.Present(true),
                 LayerValue.Present(true),
                 LayerValue.Present(true),
-                // Sync is not shipped; both hosts declare it off.
-                LayerValue.Present(false),
+                // Sync is live in the online build since issue #342 — turning it off again is a
+                // release decision, not a refactor, and belongs in AGENTS.md's dark-flag table.
+                LayerValue.Present(true),
             )
         }
     }

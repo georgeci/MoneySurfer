@@ -33,7 +33,7 @@ data class FakeHostCapabilities(
     }
 }
 
-/** [SyncSettings] pinned to one value — `false` by default, matching both shipped hosts. */
+/** [SyncSettings] pinned to one value — `false` by default, the conservative choice for a test. */
 class FakeSyncSettings(enabled: Boolean = false) : SyncSettings {
     private val state = MutableStateFlow(enabled)
     override val isEnabled: Flow<Boolean> = state

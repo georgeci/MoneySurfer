@@ -258,9 +258,9 @@ val iosMaestroDeviceId = providers.gradleProperty("iosSimulatorUdid").orNull
 //  - `setup`   : reusable login fragment, not a standalone flow.
 //  - `offline` : offline-build golden path — different appId, no Firebase
 //                emulator. Run via `qaMaestroOfflineAndroid` / `qaMaestroOfflineIos`.
-//  - `sync`    : needs the Sync hub, which `SyncFeatureFlag(enabled = false)`
-//                hides in the shipped online build (gated off since #110). Drop
-//                this tag once the flag is flipped on — see 14_force_sync_now.yaml.
+//  - `sync`    : needs the Sync hub. `host.sync_enabled` is `true` in the online
+//                build since #342, so these flows can be un-tagged once they have
+//                been run green against the emulator — see 14_force_sync_now.yaml.
 //  - `smoke`   : the iOS launch smoke (`scripts/maestro/ios/app-open.yaml`),
 //                driven directly by the iOS tasks. It sits in a subdirectory
 //                the suite targets don't scan anyway — this is belt and braces.

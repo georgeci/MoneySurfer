@@ -34,7 +34,8 @@ interface SessionPointers {
 /**
  * Write side of [SessionPointers] — injected only by session-lifecycle use cases (`Login`,
  * `Signup`, `AnonymousLogin`, `DemoLogin`, `Logout`, `DeleteUserAccount`, `SelectWorkspace`,
- * `CreateWorkspace`, `PostAuthBootstrap`, `AuthLocalRepository`, `SyncCoordinatorWorkspaceSyncer`).
+ * `CreateWorkspace`, `PostAuthBootstrap`, `AbandonAuthSession`, `AuthLocalRepository`,
+ * `SyncCoordinatorWorkspaceSyncer`).
  */
 interface SessionMutator {
 

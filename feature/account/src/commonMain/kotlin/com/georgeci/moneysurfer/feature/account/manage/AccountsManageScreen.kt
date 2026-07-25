@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -54,6 +55,9 @@ import com.georgeci.moneysurfer.uikit.components.base.SurferSwipeAction
 import com.georgeci.moneysurfer.uikit.components.base.SurferSwipeRevealRow
 import com.georgeci.moneysurfer.uikit.components.base.SurferToggleChipButton
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
+import com.georgeci.moneysurfer.uikit.components.base.rememberSurferReorderState
+import com.georgeci.moneysurfer.uikit.components.base.surferReorderHandle
+import com.georgeci.moneysurfer.uikit.components.base.surferReorderableItem
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
@@ -170,7 +174,22 @@ private fun AccountsManageContent(
             return@Scaffold
         }
 
+        val listState = rememberLazyListState()
+        val reorderState = rememberSurferReorderState(
+            listState = listState,
+            keys = state.activeAccounts.map { activeRowKey(it.id) },
+            onMove = { from, to ->
+                val fromId = state.activeAccounts.firstOrNull { activeRowKey(it.id) == from }?.id
+                val toId = state.activeAccounts.firstOrNull { activeRowKey(it.id) == to }?.id
+                if (fromId != null && toId != null) {
+                    onEvent(AccountsManageEvent.OnAccountMove(from = fromId, to = toId))
+                }
+            },
+            onMoveEnd = { onEvent(AccountsManageEvent.OnAccountMoveEnd) },
+        )
+
         LazyColumn(
+            state = listState,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(top = padding.calculateTopPadding()),
@@ -219,7 +238,8 @@ private fun AccountsManageContent(
                 )
             }
 
-            items(state.activeAccounts, key = { "active-${it.id.value}" }) { account ->
+            items(state.activeAccounts, key = { activeRowKey(it.id) }) { account ->
+                val rowKey = activeRowKey(account.id)
                 ActiveAccountRow(
                     account = account,
                     editing = state.isEditing,
@@ -228,7 +248,9 @@ private fun AccountsManageContent(
                     onClick = { onEvent(AccountsManageEvent.OnAccountClick(account.id)) },
                     onArchiveClick = { onEvent(AccountsManageEvent.OnArchiveAccountClick(account.id)) },
                     onRemoveClick = { onEvent(AccountsManageEvent.OnRemoveAccountClick(account.id)) },
-                    modifier = Modifier.padding(horizontal = AppTheme.spacing.default, vertical = 5.dp),
+                    handleModifier = Modifier.surferReorderHandle(reorderState, rowKey),
+                    modifier = surferReorderableItem(reorderState, rowKey)
+                        .padding(horizontal = AppTheme.spacing.default, vertical = 5.dp),
                 )
             }
 
@@ -292,6 +314,12 @@ private fun AccountsManageContent(
     }
 }
 
+/**
+ * Row key of an active account. Shared by the `LazyColumn` item and the reorder state — the
+ * drag reports moves as keys, and the two have to be the same string for a drop to land.
+ */
+private fun activeRowKey(id: AccountId): String = "active-${id.value}"
+
 @Composable
 private fun ActiveAccountRow(
     account: AccountManageUi,
@@ -301,6 +329,7 @@ private fun ActiveAccountRow(
     onClick: () -> Unit,
     onArchiveClick: () -> Unit,
     onRemoveClick: () -> Unit,
+    handleModifier: Modifier,
     modifier: Modifier = Modifier,
 ) {
     val typeLabel = stringResource(account.type.labelRes())
@@ -329,7 +358,7 @@ private fun ActiveAccountRow(
             formattedBalance = account.formattedBalance,
             onClick = if (editing) null else onClick,
             trailing = if (editing) {
-                { SurferDragHandle() }
+                { SurferDragHandle(modifier = handleModifier) }
             } else {
                 null
             },

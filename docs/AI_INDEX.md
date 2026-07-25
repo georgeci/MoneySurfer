@@ -71,37 +71,37 @@
 ## cloud-login-f1-dangling-refs
 - Title: F1 — Asymmetric flag gating writes dangling workspace refs (critical)
 - File: docs/architecture/cloud-login-hydration.md
-- Lines: 65-108
+- Lines: 73-120
 - Tasks: sync, firestore, feature-flag, data-integrity
 
 ## cloud-login-f2-pointer-seed
 - Title: F2 — Bootstrap pins a workspace that does not exist locally
 - File: docs/architecture/cloud-login-hydration.md
-- Lines: 110-123
+- Lines: 122-139
 - Tasks: auth, login, workspace, session
 
 ## cloud-login-f3-pull-pagination
 - Title: F3 — The pull fetches one batch per collection, with no pagination loop
 - File: docs/architecture/cloud-login-hydration.md
-- Lines: 125-143
+- Lines: 141-163
 - Tasks: sync, pull, pagination
 
 ## cloud-login-f4-bootstrap-abort
 - Title: F4 — One unreadable workspace aborts the whole bootstrap, blocking sign-in
 - File: docs/architecture/cloud-login-hydration.md
-- Lines: 145-162
+- Lines: 165-201
 - Tasks: sync, pull, auth, error-handling
 
 ## cloud-login-remediation
 - Title: Remediation
 - File: docs/architecture/cloud-login-hydration.md
-- Lines: 189-204
+- Lines: 227-273
 - Tasks: sync, auth, roadmap, known-issues
 
 ## cloud-login-verdict
 - Title: Verdict
 - File: docs/architecture/cloud-login-hydration.md
-- Lines: 41-50
+- Lines: 49-58
 - Tasks: sync, auth, login, workspace, known-issues
 
 ## color-contrast
@@ -113,7 +113,7 @@
 ## context-packs
 - Title: Add Compose screen
 - File: docs/CONTEXT_PACKS.md
-- Lines: 26-59
+- Lines: 27-68
 - Tasks: context, docs, agent
 
 ## crash-reporting
@@ -241,6 +241,24 @@
 - File: docs/architecture/navigation.AI_SUMMARY.md
 - Lines: 23-29
 - Tasks: navigation, screen, summary
+
+## onboarding-flow
+- Title: Onboarding
+- File: docs/features/onboarding.md
+- Lines: 83-120
+- Tasks: onboarding, first-run, navigation
+
+## onboarding-splash
+- Title: Splash
+- File: docs/features/onboarding.md
+- Lines: 35-81
+- Tasks: splash, launch, navigation
+
+## onboarding-start-route
+- Title: Start route
+- File: docs/features/onboarding.md
+- Lines: 122-149
+- Tasks: first-run, navigation, offline
 
 ## persistence-rules
 - Title: Rules

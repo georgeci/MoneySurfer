@@ -25,11 +25,13 @@ class OnlineHostConfigModule {
         put(HostConfigKeys.signInAnonymous, true)
         put(HostConfigKeys.signInDemo, true)
         put(HostConfigKeys.transferEnabled, true)
-        // Sync is hidden by default in the online build — flip to `true` to expose Settings → Sync,
-        // the periodic in-process ticker, and the use-case-driven triggers (PostAuthBootstrap,
-        // CreateWorkspace, AcceptInvite, RefreshIncomingInvites). It is the build-owned term of
-        // `SyncSettings.isEnabled`, so the server kill switch and the user toggle can only narrow it.
-        put(HostConfigKeys.syncEnabled, false)
+        // Sync is live in the online build since issue #342: Settings → Sync, the periodic
+        // in-process ticker, and the use-case-driven triggers (PostAuthBootstrap, CreateWorkspace,
+        // AcceptInvite, RefreshIncomingInvites). This is the build-owned term of
+        // `SyncSettings.isEnabled`, so the server kill switch and the user toggle can only narrow
+        // it. Turning it back off is a release decision — record it in AGENTS.md → "Feature flags
+        // shipped switched off".
+        put(HostConfigKeys.syncEnabled, true)
     }
 
     /**

@@ -5,6 +5,7 @@
 - [Context Packs](#context-packs)
 - [TL;DR for agents](#tldr-for-agents)
 - [Add Compose screen](#add-compose-screen)
+- [Change app launch, splash or onboarding](#change-app-launch-splash-or-onboarding)
 - [Change sync logic](#change-sync-logic)
 - [Change persistence or Firestore rules](#change-persistence-or-firestore-rules)
 - [Update documentation](#update-documentation)
@@ -31,6 +32,14 @@ Read:
 - `docs/PROJECT_MAP.md`
 - `docs/architecture/navigation.AI_SUMMARY.md`
 - `uikit/README.md`
+
+## Change app launch, splash or onboarding
+
+Read:
+- `AGENTS.md` — UI Rules, Testing Conventions
+- `docs/PROJECT_MAP.md`
+- `docs/features/onboarding.md`
+- `docs/architecture/navigation.AI_SUMMARY.md`
 
 ## Change sync logic
 

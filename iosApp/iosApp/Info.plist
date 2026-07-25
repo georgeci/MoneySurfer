@@ -6,5 +6,16 @@
 	<true/>
 	<key>MS_USE_EMULATOR</key>
 	<string>$(MS_USE_EMULATOR)</string>
+	<!-- Native launch screen: brand icon on the splash background, matching
+	     SurferSplash and the Android Theme.MoneySurfer.Splash. Spelled out here
+	     rather than via INFOPLIST_KEY_UILaunchScreen_* build settings — those
+	     resolve but do not merge into the generated dict, which ships empty. -->
+	<key>UILaunchScreen</key>
+	<dict>
+		<key>UIColorName</key>
+		<string>LaunchBackground</string>
+		<key>UIImageName</key>
+		<string>LaunchIcon</string>
+	</dict>
 </dict>
 </plist>

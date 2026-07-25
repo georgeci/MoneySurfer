@@ -1,8 +1,10 @@
 package com.georgeci.moneysurfer.feature.dashboard.customize
 
 import app.cash.turbine.test
+import com.georgeci.moneysurfer.domain.dashboard.DashboardCardStyle
 import com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutConfig
 import com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutItem
+import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetSize
 import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetType
 import com.georgeci.moneysurfer.domain.fixtures.FakeUiPreferences
 import com.georgeci.moneysurfer.domain.preferences.Pref
@@ -124,6 +126,35 @@ class DashboardCustomizeViewModelTest : StringSpec({
         )
 
         preferences.dashboardLayout.flow.first() shouldBe viewModel.layout()
+    }
+
+    "picking a card style persists it without moving the widget" {
+        val preferences = FakeUiPreferences()
+        val viewModel = DashboardCustomizeViewModel(preferences)
+
+        viewModel.onEvent(
+            DashboardCustomizeEvent.OnCardStyleChange(
+                type = DashboardWidgetType.Balance,
+                cardStyle = DashboardCardStyle(DashboardWidgetSize.Compact, variant = "Inline"),
+            ),
+        )
+
+        viewModel.layout().enabledItems.map { it.type } shouldContainExactly
+            DashboardLayoutConfig.DEFAULT.items.map { it.type }
+        viewModel.layout().items.single { it.type == DashboardWidgetType.Balance }.cardStyle shouldBe
+            DashboardCardStyle(DashboardWidgetSize.Compact, variant = "Inline")
+        preferences.dashboardLayout.flow.first() shouldBe viewModel.layout()
+    }
+
+    "picking the style a widget already has is not written back" {
+        val preferences = RecordingUiPreferences()
+        val viewModel = DashboardCustomizeViewModel(preferences)
+
+        viewModel.onEvent(
+            DashboardCustomizeEvent.OnCardStyleChange(DashboardWidgetType.Balance, DashboardCardStyle.HERO),
+        )
+
+        preferences.layoutWrites shouldBe 0
     }
 
     "the back action leaves the screen" {

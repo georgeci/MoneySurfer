@@ -10,6 +10,7 @@ import com.georgeci.moneysurfer.data.sync.CurrentAuthInfo
 import com.georgeci.moneysurfer.data.sync.UploadPendingChangesUseCaseImpl
 import com.georgeci.moneysurfer.domain.auth.InMemorySessionPointers
 import com.georgeci.moneysurfer.domain.constants.DEFAULT_CATEGORY_SEEDS
+import com.georgeci.moneysurfer.domain.fixtures.FakeSyncSettings
 import com.georgeci.moneysurfer.domain.model.AppVersionStatus
 import com.georgeci.moneysurfer.domain.model.User
 import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
@@ -202,6 +203,9 @@ private class CreationStack(
         session = session,
         sessionMutator = session,
         getCurrentTime = GetCurrentTimeUseCase(clock),
+        // The remote collaborators are no-ops here; sync is on so the use case still walks
+        // its full remote branch, which is what this test is about.
+        syncSettings = FakeSyncSettings(enabled = true),
     )
 
     suspend fun seedOwner() {

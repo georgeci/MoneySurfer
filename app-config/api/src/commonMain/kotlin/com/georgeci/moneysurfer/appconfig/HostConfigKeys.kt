@@ -16,7 +16,7 @@ package com.georgeci.moneysurfer.appconfig
  *
  * The declared [ConfigKey.default] is the *online* value in every case, so a host that forgets a
  * key degrades to the fuller surface rather than to a silently crippled one — except
- * [syncEnabled], which is off in both hosts today because the feature is not shipped.
+ * [syncEnabled], where the fuller surface is the dangerous one.
  */
 object HostConfigKeys {
 
@@ -33,9 +33,12 @@ object HostConfigKeys {
     val transferEnabled: ConfigKey<Boolean> = ConfigKey.bool("host.transfer_enabled", default = true)
 
     /**
-     * Build-owned term of `SyncSettings.isEnabled`. Lives here rather than next to the other sync
-     * keys because hosts have to declare it, and it is `false` in *both* hosts today — a
-     * `remote && user` pair would have no slot for it and sync would silently switch on.
+     * Build-owned term of `SyncSettings.isEnabled`: `true` in the online host since issue #342,
+     * `false` in the offline one, which has no Firebase to sync against at all.
+     *
+     * Lives here rather than next to the other sync keys because hosts have to declare it, and it
+     * is the one key whose default is *not* the online value: a host that forgets to declare it
+     * must land on "no sync" rather than have the engine switch sync on behind its back.
      */
     val syncEnabled: ConfigKey<Boolean> = ConfigKey.bool("host.sync_enabled", default = false)
 

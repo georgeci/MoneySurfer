@@ -7,6 +7,7 @@ import com.georgeci.moneysurfer.domain.auth.AuthLocalRepository
 import com.georgeci.moneysurfer.domain.auth.InMemorySessionPointers
 import com.georgeci.moneysurfer.domain.fixtures.FakeHostCapabilities
 import com.georgeci.moneysurfer.domain.model.User
+import com.georgeci.moneysurfer.domain.model.Workspace
 import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
 import com.georgeci.moneysurfer.domain.primitives.UserId
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
@@ -14,7 +15,9 @@ import com.georgeci.moneysurfer.domain.repositories.AuthRemoteRepository
 import com.georgeci.moneysurfer.domain.repositories.LocalDataResetRepository
 import com.georgeci.moneysurfer.domain.repositories.UserRemoteRepository
 import com.georgeci.moneysurfer.domain.repositories.UserRepository
+import com.georgeci.moneysurfer.domain.repositories.WorkspaceRepository
 import com.georgeci.moneysurfer.domain.repositories.WorkspaceSyncer
+import com.georgeci.moneysurfer.domain.usecase.AbandonAuthSessionUseCase
 import com.georgeci.moneysurfer.domain.usecase.AnonymousLoginUseCase
 import com.georgeci.moneysurfer.domain.usecase.DemoLoginUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetCurrentTimeUseCase
@@ -158,19 +161,22 @@ private fun newViewModel(
     val wipeDemo = WipeDemoDataUseCase(StubLocalDataResetRepository, session, session)
     val postAuthBootstrap = PostAuthBootstrapUseCase(
         userRemoteRepository = StubUserRemoteRepository,
+        workspaceRepository = StubWorkspaceRepository,
         workspaceSyncer = StubWorkspaceSyncer,
         sessionMutator = session,
         getCurrentTime = GetCurrentTimeUseCase(ClockUseCase()),
     )
+    val abandon = AbandonAuthSessionUseCase(session, auth)
     return SignInViewModel(
-        login = LoginUseCase(auth, authLocal, session, wipeDemo, postAuthBootstrap),
-        signup = SignupUseCase(auth, authLocal, session, wipeDemo, postAuthBootstrap),
+        login = LoginUseCase(auth, authLocal, session, wipeDemo, postAuthBootstrap, abandon),
+        signup = SignupUseCase(auth, authLocal, session, wipeDemo, postAuthBootstrap, abandon),
         anonymousLogin = AnonymousLoginUseCase(
             auth,
             authLocal,
             session,
             wipeDemo,
             postAuthBootstrap,
+            abandon,
         ),
         demoLogin = DemoLoginUseCase(authLocal, session),
         hostCapabilities = FakeHostCapabilities(),
@@ -207,6 +213,15 @@ private object StubUserRemoteRepository : UserRemoteRepository {
     override suspend fun upsertEmailMapping(email: String, uid: String) = error(UNUSED)
     override suspend fun addInvitedWorkspaceRef(uid: String, workspaceId: WorkspaceId) = error(UNUSED)
     override suspend fun removeInvitedWorkspaceRef(uid: String, workspaceId: WorkspaceId) = error(UNUSED)
+}
+
+private object StubWorkspaceRepository : WorkspaceRepository {
+    override fun getAll(): Flow<List<Workspace>> = emptyFlow()
+    override fun getByUserId(userId: UserId): Flow<List<Workspace>> = emptyFlow()
+    override suspend fun getById(id: WorkspaceId): Workspace? = null
+    override suspend fun insert(workspace: Workspace) = error(UNUSED)
+    override suspend fun update(workspace: Workspace) = error(UNUSED)
+    override suspend fun delete(id: WorkspaceId) = error(UNUSED)
 }
 
 private object StubWorkspaceSyncer : WorkspaceSyncer {
