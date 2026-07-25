@@ -19,6 +19,7 @@ import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
 import com.georgeci.moneysurfer.domain.primitives.Money
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
+import com.georgeci.moneysurfer.domain.primitives.TransferId
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 import com.georgeci.moneysurfer.domain.repositories.AccountRepository
 import com.georgeci.moneysurfer.domain.repositories.CategoryRepository
@@ -252,6 +253,8 @@ private class WindowedTransactions(transactions: List<Transaction>) : Transactio
     override fun getByAccountId(accountId: AccountId): Flow<List<Transaction>> = rows
     override fun getByWorkspaceId(workspaceId: WorkspaceId): Flow<List<Transaction>> = rows
     override suspend fun getById(id: TransactionId): Transaction? = rows.value.find { it.id == id }
+    override suspend fun getByTransferId(transferId: TransferId): List<Transaction> =
+        rows.value.filter { it.transferId == transferId }
     override suspend fun insert(transaction: Transaction) = Unit
     override suspend fun update(transaction: Transaction) = Unit
     override suspend fun delete(id: TransactionId) = Unit
