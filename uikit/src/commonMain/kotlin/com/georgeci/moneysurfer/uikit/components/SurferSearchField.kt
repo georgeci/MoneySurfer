@@ -19,6 +19,9 @@ import com.georgeci.moneysurfer.uikit.theme.AppTheme
 /**
  * Rounded, indicator-less search text field with a leading search glyph, used by the
  * currency and category pickers. [containerColor] tunes the fill to the surrounding surface.
+ *
+ * [trailing] fills the field's trailing slot — the transactions list puts its filter button
+ * there, which is what keeps the button inside the field rather than beside it.
  */
 @Composable
 fun SurferSearchField(
@@ -27,11 +30,13 @@ fun SurferSearchField(
     placeholder: String,
     modifier: Modifier = Modifier,
     containerColor: Color = AppTheme.materialColors.surfaceContainerHigh,
+    trailing: @Composable (() -> Unit)? = null,
 ) {
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
         placeholder = { Text(placeholder) },
+        trailingIcon = trailing,
         leadingIcon = {
             Icon(
                 imageVector = SurferIcons.Search,

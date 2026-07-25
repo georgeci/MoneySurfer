@@ -38,8 +38,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.georgeci.moneysurfer.domain.preferences.TransactionPeriodMode
 import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
+import com.georgeci.moneysurfer.feature.transaction.filter.TransactionDateRange
+import com.georgeci.moneysurfer.feature.transaction.filter.TransactionSort
+import com.georgeci.moneysurfer.feature.transaction.filter.TransactionTypeFilter
 import com.georgeci.moneysurfer.uikit.components.base.SurferAddFab
-import com.georgeci.moneysurfer.uikit.components.base.SurferFilterChipRow
 import com.georgeci.moneysurfer.uikit.components.base.SurferPeriodArrow
 import com.georgeci.moneysurfer.uikit.components.base.SurferPeriodPager
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
@@ -56,9 +58,7 @@ import moneysurfer.feature.transaction.generated.resources.transactions_list_dat
 import moneysurfer.feature.transaction.generated.resources.transactions_list_date_yesterday
 import moneysurfer.feature.transaction.generated.resources.transactions_list_empty
 import moneysurfer.feature.transaction.generated.resources.transactions_list_empty_filtered
-import moneysurfer.feature.transaction.generated.resources.transactions_list_filter_all
-import moneysurfer.feature.transaction.generated.resources.transactions_list_filter_expenses
-import moneysurfer.feature.transaction.generated.resources.transactions_list_filter_income
+import moneysurfer.feature.transaction.generated.resources.transactions_list_empty_search
 import moneysurfer.feature.transaction.generated.resources.transactions_list_months
 import moneysurfer.feature.transaction.generated.resources.transactions_list_months_genitive
 import moneysurfer.feature.transaction.generated.resources.transactions_list_months_short
@@ -89,6 +89,7 @@ fun TransactionsByAccountScreen(
     onNavigateBack: () -> Unit,
     onNavigateToTransactionCreation: (AccountId?) -> Unit,
     onNavigateToTransactionDetails: (TransactionId) -> Unit,
+    onNavigateToFilters: (AccountId?, Long) -> Unit,
     viewModel: TransactionsByAccountViewModel = koinViewModel(
         key = accountId?.value.orEmpty(),
     ) { parametersOf(accountId) },
@@ -102,6 +103,8 @@ fun TransactionsByAccountScreen(
                 onNavigateToTransactionCreation(effect.accountId)
             is TransactionsByAccountEffect.NavigateToTransactionDetails ->
                 onNavigateToTransactionDetails(effect.transactionId)
+            is TransactionsByAccountEffect.NavigateToFilters ->
+                onNavigateToFilters(effect.accountId, effect.anchorEpochDay)
         }
     }
 
@@ -162,13 +165,26 @@ private fun TransactionsByAccountContent(
                 .fillMaxSize()
                 .padding(top = padding.calculateTopPadding()),
         ) {
-            PeriodPager(
-                state = state,
+            SearchRow(
+                query = state.query,
+                activeFilterCount = state.activeFilterCount,
                 onEvent = onEvent,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 4.dp),
             )
+
+            Spacer(Modifier.height(8.dp))
+
+            // Only while the pager still owns the date window — an explicit range from the filter
+            // screen takes it over, and two controls over one window is exactly the trap the
+            // filters were supposed to avoid.
+            if (state.showPeriodPager) {
+                PeriodPager(
+                    state = state,
+                    onEvent = onEvent,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 4.dp),
+                )
+            }
 
             SummaryStrip(
                 summary = state.summary,
@@ -177,18 +193,15 @@ private fun TransactionsByAccountContent(
                     .padding(horizontal = 16.dp, vertical = 8.dp),
             )
 
-            TypeFilterChips(
-                selected = state.typeFilter,
-                onSelect = { onEvent(TransactionsByAccountEvent.OnTypeFilterChanged(it)) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 4.dp),
+            FilterChipRail(
+                chips = state.filters,
+                onOpenFilters = { onEvent(TransactionsByAccountEvent.OnOpenFiltersClick) },
             )
 
             Spacer(Modifier.height(4.dp))
 
             if (state.isEmpty) {
-                EmptyState(isFiltered = state.isFiltered)
+                EmptyState(state = state)
                 return@Scaffold
             }
 
@@ -448,39 +461,11 @@ private fun SummaryDivider() {
 }
 
 @Composable
-private fun TypeFilterChips(
-    selected: TransactionTypeFilter,
-    onSelect: (TransactionTypeFilter) -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    val labelAll = stringResource(Res.string.transactions_list_filter_all)
-    val labelExpenses = stringResource(Res.string.transactions_list_filter_expenses)
-    val labelIncome = stringResource(Res.string.transactions_list_filter_income)
-    SurferFilterChipRow(
-        modifier = modifier,
-        options = listOf(
-            TransactionTypeFilter.All,
-            TransactionTypeFilter.Expenses,
-            TransactionTypeFilter.Income,
-        ),
-        selected = selected,
-        label = {
-            when (it) {
-                TransactionTypeFilter.All -> labelAll
-                TransactionTypeFilter.Expenses -> labelExpenses
-                TransactionTypeFilter.Income -> labelIncome
-            }
-        },
-        onSelect = onSelect,
-    )
-}
-
-@Composable
-private fun EmptyState(isFiltered: Boolean) {
-    val text = if (isFiltered) {
-        stringResource(Res.string.transactions_list_empty_filtered)
-    } else {
-        stringResource(Res.string.transactions_list_empty)
+private fun EmptyState(state: TransactionsByAccountState.Content) {
+    val text = when {
+        state.query.isNotBlank() -> stringResource(Res.string.transactions_list_empty_search)
+        state.isFiltered -> stringResource(Res.string.transactions_list_empty_filtered)
+        else -> stringResource(Res.string.transactions_list_empty)
     }
     Box(
         modifier = Modifier
@@ -575,10 +560,13 @@ private fun TransactionsByAccountPreview() {
                     netFormatted = "+€3,127.30",
                     netPositive = true,
                 ),
-                typeFilter = TransactionTypeFilter.All,
+                query = "",
+                filters = previewChips(),
+                activeFilterCount = 0,
                 isFiltered = false,
                 periodMode = TransactionPeriodMode.Month,
                 period = TransactionPeriodUi.Month(monthNumber = 3, year = 2025),
+                showPeriodPager = true,
                 canGoToPreviousPeriod = true,
                 canGoToNextPeriod = false,
                 canLoadMore = false,
@@ -603,7 +591,9 @@ private fun TransactionsByAccountEmptyPreview() {
                     netFormatted = "+€0.00",
                     netPositive = true,
                 ),
-                typeFilter = TransactionTypeFilter.All,
+                query = "",
+                filters = previewChips(),
+                activeFilterCount = 0,
                 isFiltered = false,
                 periodMode = TransactionPeriodMode.Week,
                 period = TransactionPeriodUi.Week(
@@ -612,6 +602,7 @@ private fun TransactionsByAccountEmptyPreview() {
                     weekNumber = 13,
                     weekYear = 2025,
                 ),
+                showPeriodPager = true,
                 canGoToPreviousPeriod = true,
                 canGoToNextPeriod = true,
                 canLoadMore = false,
@@ -620,3 +611,13 @@ private fun TransactionsByAccountEmptyPreview() {
         )
     }
 }
+
+private fun previewChips(): TransactionFilterChipsUi = TransactionFilterChipsUi(
+    dateRange = TransactionDateRange.FollowPeriod,
+    type = TransactionTypeFilter.All,
+    accountCount = 0,
+    accountName = null,
+    categoryCount = 0,
+    categoryName = null,
+    sort = TransactionSort.Newest,
+)

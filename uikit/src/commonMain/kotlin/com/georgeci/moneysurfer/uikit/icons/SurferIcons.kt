@@ -51,6 +51,7 @@ import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material.icons.filled.Sync
+import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -110,6 +111,9 @@ object SurferIcons {
     val Clock: ImageVector get() = Icons.Filled.Schedule
     val Download: ImageVector get() = Icons.Filled.Download
     val Sync: ImageVector get() = Icons.Filled.Sync
+
+    /** Filter controls — the sliders glyph, not a funnel: it opens a screen full of settings. */
+    val Filter: ImageVector get() = Icons.Filled.Tune
     val Bolt: ImageVector get() = Icons.Filled.Bolt
 
     // Custom drawable resources — add as you import SVGs into composeResources/drawable/
