@@ -170,16 +170,19 @@ private fun StyleOptionTile(
             .border(if (selected) 2.dp else 1.dp, outline, TILE_SHAPE),
     ) {
         Column(
-            modifier = Modifier.padding(10.dp),
+            // The whole tile is drawing, not reading matter: the thumbnail's sample figures must
+            // not be read out as if they were the user's, and the label below it is already the
+            // name of the tap target laid over everything. Announcing both says it twice.
+            modifier = Modifier
+                .padding(10.dp)
+                .clearAndSetSemantics {},
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(PREVIEW_HEIGHT)
-                    .clipToBounds()
-                    // Sample figures a screen reader must not read out as if they were the user's.
-                    .clearAndSetSemantics {},
+                    .clipToBounds(),
                 contentAlignment = Alignment.TopStart,
             ) {
                 preview()
