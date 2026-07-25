@@ -27,5 +27,8 @@ class LocalDataResetRepositoryImpl(
         database.workspaceMemberDao().deleteAll()
         database.workspaceDao().deleteAll()
         database.userDao().deleteAll()
+        // Not user data — public FX quotes — but "reset local data" should leave no rows behind,
+        // and the cost of forgetting them is a single refetch on the next dashboard open.
+        database.exchangeRateDao().deleteAll()
     }
 }

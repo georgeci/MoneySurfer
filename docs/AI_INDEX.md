@@ -14,6 +14,12 @@
 - Lines: 26-45
 - Tasks: adr, architecture, modules
 
+## adr-configuration
+- Title: Decision
+- File: docs/adr/ADR-004-configuration.md
+- Lines: 62-782
+- Tasks: adr, config, flags, preferences
+
 ## adr-navigation
 - Title: Decision
 - File: docs/adr/ADR-002-navigation.md
@@ -353,7 +359,7 @@
 ## time-policy
 - Title: Time policy
 - File: docs/architecture/data-models.md
-- Lines: 45-68
+- Lines: 46-69
 - Tasks: time, persistence, domain
 
 ## transactions-feature

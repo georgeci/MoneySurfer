@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -24,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -41,8 +43,13 @@ import com.georgeci.moneysurfer.uikit.components.category.SurferIconPickerGrid
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
+import com.georgeci.moneysurfer.utils.AmountInputTransformation
 import com.georgeci.moneysurfer.utils.HandleSideEffect
 import moneysurfer.feature.category.generated.resources.Res
+import moneysurfer.feature.category.generated.resources.category_creation_cap_hint
+import moneysurfer.feature.category.generated.resources.category_creation_cap_label
+import moneysurfer.feature.category.generated.resources.category_creation_cap_managed
+import moneysurfer.feature.category.generated.resources.category_creation_cap_managed_hint
 import moneysurfer.feature.category.generated.resources.category_creation_color_label
 import moneysurfer.feature.category.generated.resources.category_creation_field_parent
 import moneysurfer.feature.category.generated.resources.category_creation_icon_label
@@ -202,6 +209,14 @@ private fun CategoryCreationContent(
                 onSelect = { onEvent(CategoryCreationEvent.OnParentSelected(it)) },
             )
 
+            if (state.showCap) {
+                CapField(
+                    cap = state.cap,
+                    managedByBudgetName = state.capManagedByBudgetName,
+                    onChange = { onEvent(CategoryCreationEvent.OnCapChanged(it)) },
+                )
+            }
+
             Spacer(Modifier.height(padding.calculateBottomPadding() + SectionSpacing))
         }
     }
@@ -294,6 +309,52 @@ private fun ParentPicker(
     )
 }
 
+/**
+ * The monthly-cap shortcut. `Category` has no `cap` field — this is a two-tap front end for a
+ * budget whose only category is this one (md/categories.md, decision 2). Clearing it deletes that
+ * budget; leaving it empty never creates one.
+ *
+ * When a budget the user built on the Budgets screen already limits this category *alongside
+ * others*, the field is replaced by a read-only notice naming that budget. Offering an editable
+ * cap there would put two limits on one category with no defined winner, which is exactly what
+ * keeping limits in Budgets was meant to avoid. The all-categories budget is not treated as such
+ * coverage: it is the global envelope that per-category budgets already live inside.
+ */
+@Composable
+private fun CapField(
+    cap: String,
+    managedByBudgetName: String?,
+    onChange: (String) -> Unit,
+) {
+    if (managedByBudgetName != null) {
+        Column {
+            SurferSectionLabel(stringResource(Res.string.category_creation_cap_label))
+            Spacer(Modifier.height(10.dp))
+            Text(
+                text = stringResource(Res.string.category_creation_cap_managed, managedByBudgetName),
+                style = AppTheme.typography.bodyLarge,
+                color = AppTheme.materialColors.onSurface,
+            )
+            Spacer(Modifier.height(4.dp))
+            Text(
+                text = stringResource(Res.string.category_creation_cap_managed_hint),
+                style = AppTheme.typography.bodySmall,
+                color = AppTheme.materialColors.onSurfaceVariant,
+            )
+        }
+    } else {
+        OutlinedTextField(
+            value = cap,
+            onValueChange = { input -> AmountInputTransformation.validateAndNormalize(input)?.let(onChange) },
+            label = { Text(stringResource(Res.string.category_creation_cap_label)) },
+            supportingText = { Text(stringResource(Res.string.category_creation_cap_hint)) },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth(),
+        )
+    }
+}
+
 @Preview
 @Composable
 private fun CategoryCreationPreview() {
@@ -305,6 +366,7 @@ private fun CategoryCreationPreview() {
                 hue = SurferCategoryPalette.hues[1],
                 parentOptions = listOf(CategoryParentOption(CategoryId("c-1"), "Dining")),
                 parentId = CategoryId("c-1"),
+                cap = "250",
             ),
             isEditing = false,
             onEvent = {},

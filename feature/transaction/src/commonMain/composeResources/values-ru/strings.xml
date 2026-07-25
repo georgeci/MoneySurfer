@@ -139,4 +139,64 @@
     <string name="transaction_creation_transfer_snackbar">Перевод добавлен</string>
     <string name="transaction_details_deleted_snackbar">Транзакция удалена</string>
     <string name="transaction_details_delete_undo">Отменить</string>
+
+    <!-- Список транзакций — поиск и лента фильтров -->
+    <string name="transactions_list_search_placeholder">Поиск по продавцу, заметке, сумме</string>
+    <string name="transactions_list_search_content_description">Поиск транзакций</string>
+    <string name="transactions_list_filters_content_description">Фильтры</string>
+    <string name="transactions_list_filters_badge">%1$d</string>
+    <string name="transactions_list_chip_date">Дата</string>
+    <string name="transactions_list_chip_type">Тип</string>
+    <string name="transactions_list_chip_account">Счёт</string>
+    <string name="transactions_list_chip_category">Категория</string>
+    <string name="transactions_list_chip_sort">Сортировка</string>
+    <string name="transactions_list_chip_value">%1$s · %2$s</string>
+    <string name="transactions_list_chip_selected_count">выбрано: %1$d</string>
+    <string name="transactions_list_chip_date_custom">Свой период</string>
+    <string name="transactions_list_sort_newest">Сначала новые</string>
+    <string name="transactions_list_sort_oldest">Сначала старые</string>
+    <string name="transactions_list_empty_search">По этому запросу ничего не найдено.</string>
+
+    <!-- Экран фильтров транзакций -->
+    <string name="transaction_filters_title">Фильтры</string>
+    <string name="transaction_filters_close_content_description">Закрыть фильтры</string>
+    <string name="transaction_filters_reset">Сбросить</string>
+    <string name="transaction_filters_cancel">Отмена</string>
+    <string name="transaction_filters_apply">Применить · %1$s</string>
+    <string name="transaction_filters_results">результатов: %1$d</string>
+    <string name="transaction_filters_results_capped">результатов: %1$d+</string>
+    <string name="transaction_filters_section_date">Период</string>
+    <string name="transaction_filters_date_today">Сегодня</string>
+    <string name="transaction_filters_date_yesterday">Вчера</string>
+    <string name="transaction_filters_date_this_week">Эта неделя</string>
+    <string name="transaction_filters_date_this_month">Этот месяц</string>
+    <string name="transaction_filters_date_last_month">Прошлый месяц</string>
+    <string name="transaction_filters_date_this_year">Этот год</string>
+    <string name="transaction_filters_date_custom">Свой период</string>
+    <string name="transaction_filters_date_from">С</string>
+    <string name="transaction_filters_date_to">По</string>
+    <string name="transaction_filters_date_any">Любая</string>
+    <string name="transaction_filters_date_follows_period">Совпадает с периодом, выбранным в списке.</string>
+    <string name="transaction_filters_date_picker_confirm">Выбрать</string>
+    <string name="transaction_filters_date_picker_dismiss">Отмена</string>
+    <string name="transaction_filters_date_picker_clear">Очистить</string>
+    <string name="transaction_filters_section_type">Тип</string>
+    <string name="transaction_filters_type_all">Все</string>
+    <string name="transaction_filters_type_expenses">Расходы</string>
+    <string name="transaction_filters_type_income">Доходы</string>
+    <string name="transaction_filters_section_accounts">Счета</string>
+    <string name="transaction_filters_section_categories">Категории</string>
+    <string name="transaction_filters_categories_counter">выбрано %1$d из %2$d</string>
+    <string name="transaction_filters_categories_all">Все категории</string>
+    <string name="transaction_filters_section_amount">Сумма</string>
+    <string name="transaction_filters_amount_min">От</string>
+    <string name="transaction_filters_amount_max">До</string>
+    <string name="transaction_filters_section_other">Прочее</string>
+    <string name="transaction_filters_recurring_only">Только повторяющиеся</string>
+    <string name="transaction_filters_recurring_only_hint">Только транзакции, созданные правилом повтора.</string>
+    <string name="transaction_filters_planned_only">Только запланированные</string>
+    <string name="transaction_filters_planned_only_hint">Только транзакции со статусом «запланирована», а не «проведена».</string>
+    <string name="transaction_filters_section_sort">Сортировка</string>
+    <string name="transaction_filters_sort_newest">Сначала новые</string>
+    <string name="transaction_filters_sort_oldest">Сначала старые</string>
 </resources>

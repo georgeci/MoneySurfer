@@ -139,4 +139,70 @@
     <string name="transaction_creation_transfer_snackbar">Transfer added</string>
     <string name="transaction_details_deleted_snackbar">Transaction deleted</string>
     <string name="transaction_details_delete_undo">Undo</string>
+
+    <!-- Transactions list — search and filter chip rail -->
+    <string name="transactions_list_search_placeholder">Search merchant, note, amount</string>
+    <string name="transactions_list_search_content_description">Search transactions</string>
+    <string name="transactions_list_filters_content_description">Filters</string>
+    <!-- Badge on the filter button: how many filters are active -->
+    <string name="transactions_list_filters_badge">%1$d</string>
+    <string name="transactions_list_chip_date">Date</string>
+    <string name="transactions_list_chip_type">Type</string>
+    <string name="transactions_list_chip_account">Account</string>
+    <string name="transactions_list_chip_category">Category</string>
+    <string name="transactions_list_chip_sort">Sort</string>
+    <!-- A chip showing its current value, e.g. "Type · Expenses" -->
+    <string name="transactions_list_chip_value">%1$s · %2$s</string>
+    <!-- Chip value when several things are picked, e.g. "Category · 3 selected" -->
+    <string name="transactions_list_chip_selected_count">%1$d selected</string>
+    <string name="transactions_list_chip_date_custom">Custom</string>
+    <string name="transactions_list_sort_newest">Newest</string>
+    <string name="transactions_list_sort_oldest">Oldest</string>
+    <string name="transactions_list_empty_search">Nothing matches this search.</string>
+
+    <!-- Transaction filters screen -->
+    <string name="transaction_filters_title">Filters</string>
+    <string name="transaction_filters_close_content_description">Close filters</string>
+    <string name="transaction_filters_reset">Reset</string>
+    <string name="transaction_filters_cancel">Cancel</string>
+    <!-- Footer button, e.g. "Apply · 47 results" -->
+    <string name="transaction_filters_apply">Apply · %1$s</string>
+    <string name="transaction_filters_results">%1$d results</string>
+    <!-- Shown once the live count hits its cap, e.g. "500+ results" -->
+    <string name="transaction_filters_results_capped">%1$d+ results</string>
+    <string name="transaction_filters_section_date">Date range</string>
+    <string name="transaction_filters_date_today">Today</string>
+    <string name="transaction_filters_date_yesterday">Yesterday</string>
+    <string name="transaction_filters_date_this_week">This week</string>
+    <string name="transaction_filters_date_this_month">This month</string>
+    <string name="transaction_filters_date_last_month">Last month</string>
+    <string name="transaction_filters_date_this_year">This year</string>
+    <string name="transaction_filters_date_custom">Custom</string>
+    <string name="transaction_filters_date_from">From</string>
+    <string name="transaction_filters_date_to">To</string>
+    <string name="transaction_filters_date_any">Any</string>
+    <string name="transaction_filters_date_follows_period">Follows the period shown on the list.</string>
+    <string name="transaction_filters_date_picker_confirm">Select</string>
+    <string name="transaction_filters_date_picker_dismiss">Cancel</string>
+    <string name="transaction_filters_date_picker_clear">Clear</string>
+    <string name="transaction_filters_section_type">Type</string>
+    <string name="transaction_filters_type_all">All</string>
+    <string name="transaction_filters_type_expenses">Expenses</string>
+    <string name="transaction_filters_type_income">Income</string>
+    <string name="transaction_filters_section_accounts">Accounts</string>
+    <string name="transaction_filters_section_categories">Categories</string>
+    <!-- Counter above the category chips, e.g. "3 of 24 selected" -->
+    <string name="transaction_filters_categories_counter">%1$d of %2$d selected</string>
+    <string name="transaction_filters_categories_all">All categories</string>
+    <string name="transaction_filters_section_amount">Amount</string>
+    <string name="transaction_filters_amount_min">Min</string>
+    <string name="transaction_filters_amount_max">Max</string>
+    <string name="transaction_filters_section_other">Other</string>
+    <string name="transaction_filters_recurring_only">Recurring only</string>
+    <string name="transaction_filters_recurring_only_hint">Only transactions created by a recurring rule.</string>
+    <string name="transaction_filters_planned_only">Planned only</string>
+    <string name="transaction_filters_planned_only_hint">Only transactions marked planned rather than posted.</string>
+    <string name="transaction_filters_section_sort">Sort</string>
+    <string name="transaction_filters_sort_newest">Newest first</string>
+    <string name="transaction_filters_sort_oldest">Oldest first</string>
 </resources>

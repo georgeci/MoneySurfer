@@ -17,6 +17,7 @@
   - [workspaces/{wid}/transactions/{tid} — Transaction](#workspaceswidtransactionstid--transaction)
   - [workspaces/{wid}/budgets/{bid} — Budget](#workspaceswidbudgetsbid--budget)
   - [workspaces/{wid}/recurringRules/{rid} — RecurringRule](#workspaceswidrecurringrulesrid--recurringrule)
+  - [exchangerates — local-only FX cache](#exchangerates--local-only-fx-cache)
 - [Sync metadata fields](#sync-metadata-fields)
 - [Mappers](#mappers)
 <!-- DOCS:END -->
@@ -301,6 +302,23 @@ Detail fields (issue #260):
 | `updatedAt` | `Instant` | `Long` | `Long` |
 | `deletedAt` | — | — | `Long?` |
 | `clientVersionCode` | — | — | `Int` |
+
+### `exchange_rates` — local-only FX cache
+
+No Firestore counterpart: these are public reference quotes fetched from an FX
+provider, not workspace data, so they are never synced or backed up remotely.
+Filled by `ExchangeRateRepositoryImpl` (Room) from `ExchangeRateRemoteSource`
+(HTTP, `data-remote`) at most once a day per base currency, and read by
+`ConvertAccountsTotalUseCase` to fold multi-currency balances into the
+workspace base currency.
+
+| Field | Domain | Room | Firestore |
+|---|---|---|---|
+| `baseCurrency` | `CurrencyCode` | PK part `baseCurrency: String` | — |
+| `currency` | `CurrencyCode` | PK part `currency: String` | — |
+| `rate` | `Double` (units of `currency` per 1 `baseCurrency`) | `Double` | — |
+| `asOf` | `Instant` (provider publication time) | `Long` | — |
+| `fetchedAt` | — *(policy only)* | `Long` | — |
 
 ## Sync metadata fields
 

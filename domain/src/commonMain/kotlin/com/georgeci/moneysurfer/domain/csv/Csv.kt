@@ -58,6 +58,71 @@ internal object Csv {
             field
         }
 
+    /**
+     * Separator for a list packed into a single CSV field. Deliberately not the
+     * `,` the Room column uses — that is this file's field delimiter, so a
+     * comma-joined list would either split into columns or force quoting on
+     * every non-empty cell. A pipe stays legible and editable in a spreadsheet,
+     * which is the point of exporting the list at all.
+     */
+    private const val LIST_SEPARATOR = '|'
+
+    /** Escape for a [LIST_SEPARATOR] (or an escape) that occurs inside a value. */
+    private const val LIST_ESCAPE = '\\'
+
+    /**
+     * Packs [values] into one CSV field, escaping any separator inside a value
+     * so the packing is lossless. Unlike the Room column — which strips its
+     * separator from the value up front — nothing here constrains what a value
+     * may contain, so a tag holding a literal `|` survives the round-trip
+     * instead of splitting in two.
+     */
+    fun encodeCellList(values: List<String>): String =
+        values.joinToString(LIST_SEPARATOR.toString(), transform = ::escapeListValue)
+
+    /**
+     * Reverses [encodeCellList]. An empty cell is an empty list; blank segments
+     * (a trailing separator, a doubled one) come back as blank values for the
+     * caller to drop. A dangling trailing escape is kept as a literal character
+     * rather than swallowed — a hand-edited cell should not lose data.
+     */
+    fun decodeCellList(cell: String): List<String> {
+        if (cell.isEmpty()) return emptyList()
+        val values = mutableListOf<String>()
+        val value = StringBuilder()
+        var index = 0
+        while (index < cell.length) {
+            val char = cell[index]
+            when {
+                char == LIST_ESCAPE && index + 1 < cell.length -> {
+                    value.append(cell[index + 1])
+                    index += 2
+                }
+                char == LIST_SEPARATOR -> {
+                    values.add(value.toString())
+                    value.clear()
+                    index++
+                }
+                else -> {
+                    value.append(char)
+                    index++
+                }
+            }
+        }
+        values.add(value.toString())
+        return values
+    }
+
+    private fun escapeListValue(value: String): String {
+        if (value.none { it == LIST_SEPARATOR || it == LIST_ESCAPE }) return value
+        return buildString(value.length + 1) {
+            for (char in value) {
+                if (char == LIST_SEPARATOR || char == LIST_ESCAPE) append(LIST_ESCAPE)
+                append(char)
+            }
+        }
+    }
+
     private fun encodeField(field: String): String =
         if (field.any { it in charsRequiringQuotes }) {
             "\"" + field.replace("\"", "\"\"") + "\""

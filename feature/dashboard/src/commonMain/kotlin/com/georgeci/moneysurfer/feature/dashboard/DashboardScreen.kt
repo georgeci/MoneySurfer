@@ -57,7 +57,9 @@ import moneysurfer.feature.dashboard.generated.resources.dashboard_add_account_n
 import moneysurfer.feature.dashboard.generated.resources.dashboard_add_transaction
 import moneysurfer.feature.dashboard.generated.resources.dashboard_balance_empty_text
 import moneysurfer.feature.dashboard.generated.resources.dashboard_balance_other_currencies
+import moneysurfer.feature.dashboard.generated.resources.dashboard_balance_rates_as_of
 import moneysurfer.feature.dashboard.generated.resources.dashboard_balance_title
+import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_content_description
 import moneysurfer.feature.dashboard.generated.resources.dashboard_goals_empty_subtitle
 import moneysurfer.feature.dashboard.generated.resources.dashboard_goals_empty_title
 import moneysurfer.feature.dashboard.generated.resources.dashboard_goals_see_all
@@ -76,6 +78,7 @@ import org.koin.compose.viewmodel.koinViewModel
 object DashboardTestTags {
     const val Root = "dashboard:root"
     const val Balance = "dashboard:balance"
+    const val Customize = "dashboard:customize"
     const val Settings = "dashboard:settings"
     const val AddTransaction = "dashboard:addTransaction"
 }
@@ -88,6 +91,7 @@ fun DashboardScreen(
     onNavigateToAccountDetails: (AccountId) -> Unit,
     onNavigateToTransactionDetails: (TransactionId) -> Unit,
     onNavigateToSettings: () -> Unit,
+    onNavigateToCustomize: () -> Unit,
     onNavigateToTransactionsList: () -> Unit,
     onNavigateToGoals: () -> Unit,
     onNavigateToGoalDetails: (GoalId) -> Unit,
@@ -103,6 +107,7 @@ fun DashboardScreen(
             DashboardEffect.NavigateToAccountsManage -> onNavigateToAccountsManage()
             is DashboardEffect.NavigateToTransactionCreation -> onNavigateToTransactionCreation(effect.accountId)
             DashboardEffect.NavigateToSettings -> onNavigateToSettings()
+            DashboardEffect.NavigateToCustomize -> onNavigateToCustomize()
             DashboardEffect.NavigateToTransactionsList -> onNavigateToTransactionsList()
             DashboardEffect.NavigateToGoals -> onNavigateToGoals()
             is DashboardEffect.NavigateToGoalDetails -> onNavigateToGoalDetails(effect.goalId)
@@ -169,6 +174,12 @@ private fun DashboardContent(
                 primaryText = workspaceName,
                 secondaryText = state.greeting ?: stringResource(Res.string.dashboard_toolbar_greeting),
                 actions = {
+                    SurferToolbarAction(
+                        icon = SurferIcons.Edit,
+                        contentDescription = stringResource(Res.string.dashboard_customize_content_description),
+                        onClick = { onEvent(DashboardEvent.OnCustomizeClick) },
+                        modifier = Modifier.testTag(DashboardTestTags.Customize),
+                    )
                     SurferToolbarAction(
                         icon = SurferIcons.Settings,
                         contentDescription = stringResource(Res.string.dashboard_settings_content_description),
@@ -331,21 +342,24 @@ private fun RecentTransactionsWidget(
 }
 
 /**
- * Line under the headline balance. No total at all wins over everything; otherwise a trend, if
- * we ever compute one, outranks the other-currency note — the note is the fallback that keeps
- * balances the headline cannot absorb from disappearing.
+ * Line under the headline balance. No total at all wins over everything; after that come the two
+ * things that qualify the headline — balances no rate could absorb, then how old the rates that
+ * built it are — because a figure the reader might misread outranks the decorative trend.
  */
 @Composable
 private fun balanceFootnote(state: DashboardState.Content): SurferBalanceFootnote? = when {
     state.formattedTotalBalance == null ->
         SurferBalanceFootnote.Empty(stringResource(Res.string.dashboard_balance_empty_text))
-    state.formattedTrendDelta != null -> SurferBalanceFootnote.Trend(state.formattedTrendDelta)
     state.otherCurrencyTotals.isNotEmpty() -> SurferBalanceFootnote.Note(
         stringResource(
             Res.string.dashboard_balance_other_currencies,
             state.otherCurrencyTotals.joinToString(" · "),
         ),
     )
+    state.ratesAsOf != null -> SurferBalanceFootnote.Note(
+        stringResource(Res.string.dashboard_balance_rates_as_of, state.ratesAsOf),
+    )
+    state.formattedTrendDelta != null -> SurferBalanceFootnote.Trend(state.formattedTrendDelta)
     else -> null
 }
 
