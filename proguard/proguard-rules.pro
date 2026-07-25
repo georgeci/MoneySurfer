@@ -60,6 +60,25 @@
 # from Koin's optional interop paths (mirrors Koin's own consumer rules).
 -dontwarn org.koin.**
 
+# --- Firebase component discovery ---
+# firebase-common reads the `com.google.firebase.components:<FQCN>` meta-data
+# entries the library manifests contribute and instantiates each registrar
+# reflectively via its no-arg constructor (ComponentDiscovery.instantiate ->
+# Class.forName + getDeclaredConstructor()). R8 keeps the *class* (the name is
+# in the manifest) but has no reference to the constructor, so full mode shrinks
+# it away: discovery then fails with
+#   ComponentDiscovery: Could not instantiate …CrashlyticsRegistrar
+#   Caused by: NoSuchMethodException: …CrashlyticsRegistrar.<init> []
+# and every API backed by that registrar is missing at runtime — for Crashlytics
+# that means `FirebaseCrashlytics.getInstance()` throws "FirebaseCrashlytics
+# component is not present.", killing the app in Application.onCreate (the
+# reporter is a Koin single resolved by initKoin) and, being pre-init, never
+# reporting the crash. Release-only, so it only ever showed up in the Play /
+# App Distribution builds.
+-keep class * implements com.google.firebase.components.ComponentRegistrar {
+    <init>();
+}
+
 # --- Enums (often serialized by name) ---
 -keepclassmembers enum * {
     public static **[] values();
