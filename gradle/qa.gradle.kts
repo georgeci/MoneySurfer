@@ -261,7 +261,15 @@ val iosMaestroDeviceId = providers.gradleProperty("iosSimulatorUdid").orNull
 //  - `sync`    : needs the Sync hub, which `SyncFeatureFlag(enabled = false)`
 //                hides in the shipped online build (gated off since #110). Drop
 //                this tag once the flag is flipped on — see 14_force_sync_now.yaml.
-val maestroSetupTags = listOf("setup", "offline", "sync")
+//  - `smoke`   : the iOS launch smoke (`scripts/maestro/ios/app-open.yaml`),
+//                driven directly by the iOS tasks. It sits in a subdirectory
+//                the suite targets don't scan anyway — this is belt and braces.
+val maestroSetupTags = listOf("setup", "offline", "sync", "smoke")
+
+// Sole iOS flow while the iOS suites are cut back to a launch smoke (#297).
+// `qaMaestroIos` and `qaMaestroOfflineIos` both point here; the flow reads its
+// bundle id from `APP_ID`, so the same file covers the online and offline apps.
+val iosSmokeFlow = "scripts/maestro/ios/app-open.yaml"
 
 val iosMaestroDerivedDataDir = rootProject.file("build/ios-maestro")
 // The online Xcode config (`iosApp/Configuration/Config.xcconfig`) overrides
@@ -1020,21 +1028,28 @@ tasks.register("qaMaestro") {
 }
 
 /**
- * Boots Auth + Firestore emulators → seeds test users → runs all Maestro flows
- * against the currently booted iOS Simulator → tears down. The Debug simulator
- * app is built with Info.plist `MS_USE_EMULATOR=YES`, so iOS Firebase uses
- * `localhost:8080/9099`.
+ * Boots Auth + Firestore emulators → seeds test users → runs the iOS Maestro
+ * flow(s) against the currently booted iOS Simulator → tears down. The Debug
+ * simulator app is built with Info.plist `MS_USE_EMULATOR=YES`, so iOS Firebase
+ * uses `localhost:8080/9099`.
+ *
+ * Scope as of #297: the launch smoke ([iosSmokeFlow]) only — the 17-flow online
+ * suite was non-deterministically red on iOS, so this lane was cut back to the
+ * one assertion worth acting on. The emulator + seed wrapper stays so restoring
+ * the full suite is a one-line change back to `scripts/maestro/` + the tag
+ * exclusions; `maestroRunAllIos` still drives every flow locally in the
+ * meantime (with the emulator already running).
  */
 tasks.register<Exec>("qaMaestroIos") {
     group = "verification"
-    description = "Boot Firebase Emulator, seed users, run all iOS Maestro flows, generate Allure report."
+    description = "Boot Firebase Emulator, seed users, run the iOS launch smoke flow, generate Allure report."
     notCompatibleWithConfigurationCache("Spawns Firebase emulator subprocess.")
     dependsOn("maestroInstallIosSimulator")
     finalizedBy("allureGenerateMaestroIos")
     isIgnoreExitValue = true
     workingDir = rootDir
     val maestroBin = resolveMaestroExecutable()
-    val flowsDir = rootDir.resolve("scripts/maestro/").absolutePath
+    val flowTarget = rootDir.resolve(iosSmokeFlow).absolutePath
     val reportPath = maestroIosAllFlowsJunit.absolutePath
     val debugOutputPath = maestroIosDebugDir.absolutePath
     val testOutputPath = maestroIosArtifactsDir.absolutePath
@@ -1060,9 +1075,11 @@ tasks.register<Exec>("qaMaestroIos") {
                     "--debug-output", debugOutputPath,
                     "--test-output-dir", testOutputPath,
                     "--flatten-debug-output",
-                ) + maestroSetupTags.flatMap { listOf("--exclude-tags", it) } +
+                ) +
+                // No `--exclude-tags`: the target is a single flow file rather
+                // than the suite directory, so there is nothing to filter out.
                 listOf(
-                    flowsDir,
+                    flowTarget,
                 ))
                 .joinToString(" "),
         ),
@@ -1092,6 +1109,10 @@ tasks.register<Exec>("qaMaestroIos") {
  * online suites — these tasks need no Firebase emulator and no seeded test users.
  * They install the `.dev` debug offline binary and run only the `offline`-tagged
  * flow via `--include-tags`.
+ *
+ * iOS is the exception while #297 is open: `qaMaestroOfflineIos` drives the launch
+ * smoke ([iosSmokeFlow]) against the same offline binary instead of the golden
+ * path, which keeps running on Android via `qaMaestroOfflineAndroid`.
  */
 val offlineDebugApkPath = rootProject.file(
     "androidApp-offline/build/outputs/apk/debug/androidApp-offline-debug.apk",
@@ -1104,7 +1125,9 @@ val iosOfflineMaestroAppPath = iosOfflineMaestroDerivedDataDir.resolve(
     "Build/Products/Debug-iphonesimulator/MoneySurferOffline Dev.app",
 )
 val maestroOfflineJunit = maestroReportsDir.resolve("maestro-offline-golden.xml")
-val maestroOfflineIosJunit = maestroIosReportsDir.resolve("maestro-offline-golden-ios.xml")
+// iOS runs the launch smoke instead of the golden path (#297) — hence the
+// different report name from the Android one right above.
+val maestroOfflineIosJunit = maestroIosReportsDir.resolve("maestro-offline-app-open-ios.xml")
 
 tasks.register<Exec>("maestroAssembleOfflineDebug") {
     group = "verification"
@@ -1189,7 +1212,7 @@ tasks.register<Exec>("maestroInstallIosOfflineSimulator") {
 
 tasks.register<Exec>("qaMaestroOfflineIos") {
     group = "verification"
-    description = "Install the offline app + run the offline golden Maestro flow on the booted iOS Simulator."
+    description = "Install the offline app + run the launch smoke Maestro flow on the booted iOS Simulator."
     notCompatibleWithConfigurationCache("Resolves the Maestro executable and flow path at execution time.")
     dependsOn("maestroInstallIosOfflineSimulator")
     workingDir = rootDir
@@ -1198,10 +1221,13 @@ tasks.register<Exec>("qaMaestroOfflineIos") {
         commandLine(
             buildMaestroCommand(
                 rootDir = rootDir,
-                // Subdirectory target — same reasoning as qaMaestroOfflineAndroid.
-                target = "scripts/maestro/offline/",
+                // Launch smoke instead of the offline golden path while the iOS
+                // lanes are cut back (#297) — the golden flow still runs on
+                // Android via `qaMaestroOfflineAndroid`. Single-file target, so
+                // no `--include-tags offline` filter is needed; the flow picks up
+                // the offline bundle id from `APP_ID` below.
+                target = iosSmokeFlow,
                 junitOutput = maestroOfflineIosJunit,
-                includeTags = listOf("offline"),
                 appId = offlineMaestroAppId,
                 platform = "ios",
                 deviceId = iosMaestroDeviceId,

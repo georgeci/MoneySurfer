@@ -3,10 +3,12 @@ name: iOS offline
 # Per-PR + main lane for the offline iOS app (issue #83). Build-only: it links
 # the Kotlin framework and compiles iosAppOffline via xcodebuild, catching
 # Kotlin/Swift/link regressions on every PR without paying for a simulator boot
-# or a Maestro run. The actual offline golden flow
-# (scripts/maestro/offline/offline-golden.yaml, issue #69) runs in nightly.yml's
+# or a Maestro run. The simulator run lives in nightly.yml's
 # `maestro-ios-offline` job alongside the other E2E jobs (issue #172 §4) — E2E
-# signal on every PR isn't worth the macos-15 minutes.
+# signal on every PR isn't worth the macos-15 minutes. That job currently drives
+# the launch smoke (scripts/maestro/ios/app-open.yaml) rather than the offline
+# golden flow (scripts/maestro/offline/offline-golden.yaml, issue #69), which
+# runs on Android while the iOS suites are cut back (issue #297).
 
 on:
   pull_request:

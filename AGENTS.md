@@ -246,7 +246,7 @@ QA entry points:
 ./gradlew qaAndroidDevice
 ./gradlew qaMaestro
 ./gradlew qaMaestroOfflineAndroid   # offline golden path, Android
-./gradlew qaMaestroOfflineIos       # offline golden path, iOS Simulator
+./gradlew qaMaestroOfflineIos       # offline app launch smoke, iOS Simulator (#297)
 ./gradlew qaAll
 ```
 

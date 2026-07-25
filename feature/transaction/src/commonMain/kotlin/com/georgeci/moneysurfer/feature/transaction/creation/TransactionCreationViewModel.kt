@@ -2,9 +2,12 @@ package com.georgeci.moneysurfer.feature.transaction.creation
 
 import arrow.optics.optics
 import com.georgeci.moneysurfer.domain.config.HostCapabilities
+import com.georgeci.moneysurfer.domain.formatter.MoneyFormatter
 import com.georgeci.moneysurfer.domain.model.Account
 import com.georgeci.moneysurfer.domain.model.Category
+import com.georgeci.moneysurfer.domain.model.CategoryAppearance
 import com.georgeci.moneysurfer.domain.model.Transaction
+import com.georgeci.moneysurfer.domain.model.reference
 import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.CategoryId
 import com.georgeci.moneysurfer.domain.primitives.CategoryType
@@ -15,8 +18,10 @@ import com.georgeci.moneysurfer.domain.primitives.TransactionStatus
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
 import com.georgeci.moneysurfer.domain.primitives.TransferId
 import com.georgeci.moneysurfer.domain.repositories.TransactionRepository
+import com.georgeci.moneysurfer.domain.usecase.ApplyTransactionChangeUseCase
 import com.georgeci.moneysurfer.domain.usecase.CreateTransactionUseCase
 import com.georgeci.moneysurfer.domain.usecase.CreateTransferUseCase
+import com.georgeci.moneysurfer.domain.usecase.DeleteTransactionUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetAccountsUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetCategoriesUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetCurrentTimeUseCase
@@ -32,6 +37,8 @@ import moneysurfer.feature.transaction.generated.resources.Res
 import moneysurfer.feature.transaction.generated.resources.transaction_creation_created_snackbar
 import moneysurfer.feature.transaction.generated.resources.transaction_creation_transfer_snackbar
 import moneysurfer.feature.transaction.generated.resources.transaction_creation_updated_snackbar
+import moneysurfer.feature.transaction.generated.resources.transaction_details_delete_undo
+import moneysurfer.feature.transaction.generated.resources.transaction_details_deleted_snackbar
 import org.koin.core.annotation.KoinViewModel
 
 // ViewModel composes loading + creation + transfer flows; splitting now would push wiring to a holder.
@@ -46,6 +53,8 @@ class TransactionCreationViewModel(
     private val createTransaction: CreateTransactionUseCase,
     private val updateTransaction: UpdateTransactionUseCase,
     private val createTransfer: CreateTransferUseCase,
+    private val deleteTransaction: DeleteTransactionUseCase,
+    private val applyTransactionChange: ApplyTransactionChangeUseCase,
     private val getCurrentTime: GetCurrentTimeUseCase,
     private val transactionRepository: TransactionRepository,
     private val hostCapabilities: HostCapabilities,
@@ -102,6 +111,13 @@ class TransactionCreationViewModel(
                 )
             }
             TransactionCreationEvent.OnSaveClick -> saveTransaction()
+            TransactionCreationEvent.OnDeleteClick -> updateState {
+                TransactionCreationState.content.showDeleteConfirmation.modify(this) { true }
+            }
+            TransactionCreationEvent.OnDeleteDismissed -> updateState {
+                TransactionCreationState.content.showDeleteConfirmation.modify(this) { false }
+            }
+            TransactionCreationEvent.OnDeleteConfirmed -> handleDelete()
             TransactionCreationEvent.OnBackClick -> postSideEffect(TransactionCreationEffect.NavigateBack)
         }
     }
@@ -247,6 +263,7 @@ class TransactionCreationViewModel(
             editingTransactionId = seed.transactionId.takeIf { editing },
             editingCreatedAt = transaction.createdAt.takeIf { editing },
             pinnedOperationDate = transaction.operationDate.takeIf { editing },
+            editIdentity = if (editing) identityOf(transaction, category) else null,
             preserved = if (editing) {
                 PreservedTransactionFields.of(transaction)
             } else {
@@ -447,6 +464,28 @@ class TransactionCreationViewModel(
         }
     }
 
+    /**
+     * Deletes the row being edited, exactly the way the details screen does — same undo snackbar,
+     * restoring through [applyTransactionChange] so the account balance comes back with it.
+     *
+     * Guarded on [TransactionCreationState.Content.editingTransactionId]: there is nothing to
+     * delete while creating or duplicating, and the screen hides the action there.
+     */
+    private fun handleDelete() {
+        val editingId = (currentState as? TransactionCreationState.Content)?.editingTransactionId ?: return
+        launch {
+            val deleted = deleteTransaction(editingId)
+            if (deleted != null) {
+                snackbar.show(
+                    message = Res.string.transaction_details_deleted_snackbar,
+                    actionLabel = Res.string.transaction_details_delete_undo,
+                    onAction = { applyTransactionChange(old = null, new = deleted) },
+                )
+            }
+            postSideEffect(TransactionCreationEffect.NavigateBackAfterDelete)
+        }
+    }
+
     private data class TransferPlan(
         val from: Account,
         val to: Account,
@@ -473,6 +512,37 @@ class TransactionCreationViewModel(
 private fun Money.toAmountInput(): String {
     val major = minor / Money.MINOR_PER_MAJOR
     return if (major == major.toLong().toDouble()) major.toLong().toString() else major.toString()
+}
+
+/**
+ * The stored row, frozen for the identity band — the design's `04b · Edit transaction`.
+ *
+ * Read from [transaction] rather than from the live form on purpose: the band answers "which
+ * transaction am I editing", so it has to keep saying what was opened even after the amount or
+ * the note has been typed over. A transfer leg is labelled as a transfer and left unsigned,
+ * matching the details screen.
+ */
+private fun identityOf(transaction: Transaction, category: Category?): TransactionEditIdentity {
+    val formatted = MoneyFormatter.format(transaction.money.abs(), transaction.currencyCode)
+    return TransactionEditIdentity(
+        reference = transaction.id.reference,
+        type = when {
+            transaction.transferId != null -> TransactionTypeUi.Transfer
+            transaction.type == TransactionType.INCOME -> TransactionTypeUi.Income
+            else -> TransactionTypeUi.Expense
+        },
+        note = transaction.note.ifBlank { transaction.merchant },
+        formattedAmount = when {
+            transaction.transferId != null -> formatted
+            transaction.type == TransactionType.INCOME -> "+$formatted"
+            transaction.type == TransactionType.EXPENSE -> "−$formatted"
+            else -> formatted
+        },
+        categoryId = category?.id?.value.orEmpty(),
+        categoryIconKey = category?.iconKey.orEmpty(),
+        categoryHue = category?.hue ?: CategoryAppearance.UNSET_HUE,
+        categorySystemKind = category?.systemKind?.name,
+    )
 }
 
 private fun pickDefaultCategory(
@@ -554,6 +624,28 @@ data class TransactionCreationSeed(
 
 enum class TransactionTypeUi { Expense, Income, Transfer }
 
+/**
+ * The transaction being edited, as it was stored — what the edit screen's identity band renders so
+ * the user can tell which row they opened without scrolling or going back.
+ *
+ * A snapshot, not a view of the form: it is taken once when the transaction is loaded and never
+ * follows the fields the user is editing.
+ */
+data class TransactionEditIdentity(
+    /** Short human-readable id, e.g. `TX-8213`. */
+    val reference: String,
+    val type: TransactionTypeUi,
+    /** The note, falling back to the merchant when there is none; may still be blank. */
+    val note: String,
+    /** Signed for income and expense, unsigned for a transfer leg. */
+    val formattedAmount: String,
+    /** The category's stored appearance, fed to the shared bubble resolver. */
+    val categoryId: String,
+    val categoryIconKey: String,
+    val categoryHue: Int,
+    val categorySystemKind: String?,
+)
+
 @optics
 sealed interface TransactionCreationState {
     data object Loading : TransactionCreationState
@@ -569,6 +661,10 @@ sealed interface TransactionCreationState {
         val selectedCategory: Category?,
         val isEditMode: Boolean,
         val editingTransactionId: TransactionId?,
+        /** Non-null only in edit mode: the stored row behind the identity band. */
+        val editIdentity: TransactionEditIdentity? = null,
+        /** Whether the delete confirmation is up — the same dialog the details screen shows. */
+        val showDeleteConfirmation: Boolean = false,
         val editingCreatedAt: kotlin.time.Instant? = null,
         // Original `operationDate` from the persisted transaction. Preserved across
         // edits unless the user explicitly picks a new date — otherwise a timezone
@@ -640,11 +736,21 @@ sealed interface TransactionCreationEvent {
     data object OnOpenToAccountChooser : TransactionCreationEvent
     data object OnSwapAccountsClick : TransactionCreationEvent
     data object OnSaveClick : TransactionCreationEvent
+    data object OnDeleteClick : TransactionCreationEvent
+    data object OnDeleteConfirmed : TransactionCreationEvent
+    data object OnDeleteDismissed : TransactionCreationEvent
     data object OnBackClick : TransactionCreationEvent
 }
 
 sealed interface TransactionCreationEffect {
     data object NavigateBack : TransactionCreationEffect
+
+    /**
+     * The edited transaction is gone, so the screen that opened this one — the details of that very
+     * row — must not be returned to. Distinct from [NavigateBack] because only the caller knows how
+     * far back that is.
+     */
+    data object NavigateBackAfterDelete : TransactionCreationEffect
     data class NavigateToCategoryChooser(
         val selectedCategoryId: CategoryId?,
         val filterType: CategoryType,

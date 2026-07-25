@@ -61,6 +61,7 @@ import com.georgeci.moneysurfer.domain.primitives.CategoryId
 import com.georgeci.moneysurfer.domain.primitives.CategoryType
 import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
+import com.georgeci.moneysurfer.feature.transaction.delete.TransactionDeleteConfirmationDialog
 import com.georgeci.moneysurfer.uikit.components.SurferButton
 import com.georgeci.moneysurfer.uikit.components.SurferButtonSize
 import com.georgeci.moneysurfer.uikit.components.SurferButtonStyle
@@ -68,6 +69,7 @@ import com.georgeci.moneysurfer.uikit.components.SurferCategoryBubble
 import com.georgeci.moneysurfer.uikit.components.SurferCategoryPalette
 import com.georgeci.moneysurfer.uikit.components.SurferPickerRow
 import com.georgeci.moneysurfer.uikit.components.base.SurferSegmentedControl
+import com.georgeci.moneysurfer.uikit.components.base.SurferToolbarAction
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbarButtonAction
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
@@ -101,6 +103,7 @@ import moneysurfer.feature.transaction.generated.resources.transaction_creation_
 import moneysurfer.feature.transaction.generated.resources.transaction_creation_today
 import moneysurfer.feature.transaction.generated.resources.transaction_creation_transfer
 import moneysurfer.feature.transaction.generated.resources.transaction_creation_update
+import moneysurfer.feature.transaction.generated.resources.transaction_details_delete_content_description
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -112,6 +115,7 @@ object TransactionCreationTestTags {
     const val Amount = "transactionCreation:amount"
     const val Note = "transactionCreation:note"
     const val Save = "transactionCreation:save"
+    const val Delete = "transactionCreation:delete"
 }
 
 private fun transactionCreationSeed(
@@ -135,6 +139,11 @@ fun TransactionCreationScreen(
     /** Treat [transactionId] as a template for a new transaction rather than the row to edit. */
     duplicate: Boolean = false,
     onNavigateBack: () -> Unit,
+    /**
+     * Leaving after the edited transaction was deleted. Defaults to [onNavigateBack]; the nav graph
+     * overrides it to also drop the details screen of the row that no longer exists.
+     */
+    onNavigateBackAfterDelete: () -> Unit = onNavigateBack,
     onNavigateToCategoryChooser: (CategoryId?, CategoryType) -> Unit,
     onNavigateToCategoryCreation: () -> Unit,
     onNavigateToAccountChooser: (AccountId?, AccountId?, Boolean) -> Unit,
@@ -150,6 +159,7 @@ fun TransactionCreationScreen(
     viewModel.HandleSideEffect { effect ->
         when (effect) {
             TransactionCreationEffect.NavigateBack -> onNavigateBack()
+            TransactionCreationEffect.NavigateBackAfterDelete -> onNavigateBackAfterDelete()
             is TransactionCreationEffect.NavigateToCategoryChooser -> onNavigateToCategoryChooser(
                 effect.selectedCategoryId,
                 effect.filterType,
@@ -249,15 +259,12 @@ private fun TransactionCreationContent(
         }
     }
 
-    val title = if (state.isEditMode) {
-        stringResource(Res.string.transaction_creation_title_edit)
-    } else {
-        stringResource(Res.string.transaction_creation_title_create)
-    }
-    val saveLabel = if (state.isEditMode) {
-        stringResource(Res.string.transaction_creation_update)
-    } else {
-        stringResource(Res.string.transaction_creation_save)
+    if (state.showDeleteConfirmation) {
+        TransactionDeleteConfirmationDialog(
+            noteOrNull = state.note.ifBlank { null },
+            onConfirm = { onEvent(TransactionCreationEvent.OnDeleteConfirmed) },
+            onDismiss = { onEvent(TransactionCreationEvent.OnDeleteDismissed) },
+        )
     }
 
     Scaffold(
@@ -266,39 +273,7 @@ private fun TransactionCreationContent(
             .surferTestTagAsId()
             .testTag(TransactionCreationTestTags.Root),
         containerColor = AppTheme.materialColors.surface,
-        topBar = {
-            TopAppBar(
-                title = { Text(title, style = AppTheme.typography.titleLarge) },
-                navigationIcon = {
-                    Box(
-                        modifier = Modifier
-                            .padding(start = 4.dp)
-                            .size(48.dp)
-                            .clickable { onEvent(TransactionCreationEvent.OnBackClick) },
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Icon(
-                            imageVector = SurferIcons.Close,
-                            contentDescription = stringResource(
-                                Res.string.transaction_creation_close_content_description,
-                            ),
-                        )
-                    }
-                },
-                actions = {
-                    SurferToolbarButtonAction(
-                        icon = SurferIcons.Check,
-                        text = saveLabel,
-                        onClick = { onEvent(TransactionCreationEvent.OnSaveClick) },
-                        enabled = state.isSaveEnabled,
-                        modifier = Modifier.testTag(TransactionCreationTestTags.Save),
-                    )
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = AppTheme.materialColors.surface,
-                ),
-            )
-        },
+        topBar = { CreationTopBar(state = state, onEvent = onEvent) },
     ) { padding ->
         Column(
             modifier = Modifier
@@ -306,6 +281,16 @@ private fun TransactionCreationContent(
                 .padding(top = padding.calculateTopPadding())
                 .verticalScroll(rememberScrollState()),
         ) {
+            state.editIdentity?.let { identity ->
+                EditIdentityBand(
+                    identity = identity,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                        .padding(bottom = AppTheme.spacing.default),
+                )
+            }
+
             // Editing an existing single-leg transaction can't morph into a paired transfer in
             // place — hide the Transfer segment to avoid silently creating a new transfer pair
             // alongside the original row. The offline build also hides Transfer entirely
@@ -429,6 +414,74 @@ private fun TransactionCreationContent(
     }
 }
 
+/**
+ * Close · title · [delete] · Save.
+ *
+ * Both words on the bar and the delete action itself hang off edit mode, so they live together
+ * here rather than as three separate branches inside the screen body.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun CreationTopBar(
+    state: TransactionCreationState.Content,
+    onEvent: (TransactionCreationEvent) -> Unit,
+) {
+    val title = if (state.isEditMode) {
+        stringResource(Res.string.transaction_creation_title_edit)
+    } else {
+        stringResource(Res.string.transaction_creation_title_create)
+    }
+    val saveLabel = if (state.isEditMode) {
+        stringResource(Res.string.transaction_creation_update)
+    } else {
+        stringResource(Res.string.transaction_creation_save)
+    }
+    TopAppBar(
+        title = { Text(title, style = AppTheme.typography.titleLarge) },
+        navigationIcon = {
+            Box(
+                modifier = Modifier
+                    .padding(start = 4.dp)
+                    .size(48.dp)
+                    .clickable { onEvent(TransactionCreationEvent.OnBackClick) },
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(
+                    imageVector = SurferIcons.Close,
+                    contentDescription = stringResource(
+                        Res.string.transaction_creation_close_content_description,
+                    ),
+                )
+            }
+        },
+        actions = {
+            // Destructive action sits before Save, never where the commit button was a moment ago
+            // on the create screen — a mis-tap here can only be taken back through the snackbar.
+            if (state.isEditMode) {
+                SurferToolbarAction(
+                    icon = SurferIcons.Delete,
+                    contentDescription = stringResource(
+                        Res.string.transaction_details_delete_content_description,
+                    ),
+                    tint = AppTheme.materialColors.error,
+                    onClick = { onEvent(TransactionCreationEvent.OnDeleteClick) },
+                    modifier = Modifier.testTag(TransactionCreationTestTags.Delete),
+                )
+            }
+            SurferToolbarButtonAction(
+                icon = SurferIcons.Check,
+                text = saveLabel,
+                onClick = { onEvent(TransactionCreationEvent.OnSaveClick) },
+                enabled = state.isSaveEnabled,
+                modifier = Modifier.testTag(TransactionCreationTestTags.Save),
+            )
+        },
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = AppTheme.materialColors.surface,
+        ),
+    )
+}
+
 private const val CATEGORY_PREVIEW_SIZE = 7
 
 /** Opacity of the type pill's tint wash. See [TypePill] for why it is composited, not blended. */
@@ -535,13 +588,6 @@ private fun TypePill(type: TransactionTypeUi) {
             color = tint,
         )
     }
-}
-
-@Composable
-private fun typeTint(type: TransactionTypeUi): Color = when (type) {
-    TransactionTypeUi.Expense -> AppTheme.semanticColors.expense
-    TransactionTypeUi.Income -> AppTheme.semanticColors.income
-    TransactionTypeUi.Transfer -> AppTheme.semanticColors.transfer
 }
 
 @Composable
@@ -894,6 +940,42 @@ private fun TransactionCreationFilledPreview() {
                 selectedCategory = PreviewCategories.first(),
                 isEditMode = false,
                 editingTransactionId = null,
+                timestamp = 0L,
+                categoryUsageCounts = emptyMap(),
+                displayCategories = PreviewCategories,
+            ),
+            onEvent = {},
+        )
+    }
+}
+
+/** Edit mode: identity band on top, delete action in the bar, no Transfer segment. */
+@Preview
+@Composable
+private fun TransactionCreationEditPreview() {
+    AppTheme {
+        val category = PreviewCategories.first()
+        TransactionCreationContent(
+            state = TransactionCreationState.Content(
+                amount = "48.20",
+                note = PreviewNote,
+                type = TransactionTypeUi.Expense,
+                accounts = PreviewAccounts,
+                categories = PreviewCategories,
+                selectedAccount = PreviewAccounts.first(),
+                selectedCategory = category,
+                isEditMode = true,
+                editingTransactionId = TransactionId("preview-tx-8213"),
+                editIdentity = TransactionEditIdentity(
+                    reference = "TX-8213",
+                    type = TransactionTypeUi.Expense,
+                    note = PreviewNote,
+                    formattedAmount = "−€48.20",
+                    categoryId = category.id.value,
+                    categoryIconKey = category.iconKey,
+                    categoryHue = category.hue,
+                    categorySystemKind = null,
+                ),
                 timestamp = 0L,
                 categoryUsageCounts = emptyMap(),
                 displayCategories = PreviewCategories,

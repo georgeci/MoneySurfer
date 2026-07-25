@@ -70,6 +70,9 @@ val transactionNavGraph: FeatureNavGraph = { navigator ->
             accountId = key.accountId?.let { AccountId(it) },
             duplicate = key.duplicate,
             onNavigateBack = { navigator.pop() },
+            // Edit is only ever pushed from the details of the row being edited, and that row is
+            // now gone — returning to it would show a screen for a deleted transaction.
+            onNavigateBackAfterDelete = { navigator.pop(count = 2) },
             onNavigateToCategoryChooser = { selectedId, filterType ->
                 navigator.push(
                     Route.CategoryChooser(

@@ -396,14 +396,16 @@ jobs:
   maestro-ios:
     name: Maestro iOS (E2E)
     needs: decide
-    # DISABLED (issue #297): flaky (10/18 last night, non-deterministic set of
-    # failures). Turned off with the other Maestro jobs so the nightly stops
-    # going red every night. Re-enable via #297; flip back to
-    # `needs.decide.outputs.run`.
-    if: false
-    # Gating as of issue #219: the online suite (17 flows — 18 minus the
-    # sync-tagged one, whose feature is disabled) now passes end to end, so a
-    # failure here is real signal and blocks the nightly.
+    # RE-ENABLED (issue #297) with a much smaller scope: this job was turned off
+    # because the 17-flow online suite was flaky (10/18 one night, a different
+    # set of failures each run). `qaMaestroIos` now drives a single launch smoke
+    # (scripts/maestro/ios/app-open.yaml: install → launch clean → onboarding
+    # renders), which has no cross-flow state to leak and no navigation races —
+    # so a red here is real signal again and blocks the nightly. The full suite
+    # still runs on Android; `maestroRunAllIos` drives it locally on iOS.
+    # Restoring it here means flipping the target in gradle/qa.gradle.kts back
+    # to `scripts/maestro/` + the tag exclusions.
+    if: needs.decide.outputs.run == 'true'
     runs-on: macos-15
     timeout-minutes: 90
     permissions:
@@ -522,17 +524,19 @@ jobs:
   maestro-ios-offline:
     name: Maestro iOS offline (E2E)
     needs: decide
-    # DISABLED (issue #297): turned off with the other Maestro jobs while the
-    # E2E suites are stabilized. Re-enable via #297; flip back to
-    # `needs.decide.outputs.run`.
-    if: false
+    # RE-ENABLED (issue #297): off while the E2E suites were being stabilized,
+    # back on now that `qaMaestroOfflineIos` runs only the launch smoke (see the
+    # scope note below and the sibling maestro-ios job).
+    if: needs.decide.outputs.run == 'true'
     runs-on: macos-15
     timeout-minutes: 60
     permissions:
       contents: read
     # The offline-iOS E2E run used to live in the per-PR ios-offline.yml. That
     # lane is now build-only (§4) — cheap enough to gate every PR — while the
-    # actual golden-flow run moved here, next to the other nightly E2E jobs.
+    # simulator run moved here, next to the other nightly E2E jobs. Scope as of
+    # #297: the launch smoke (scripts/maestro/ios/app-open.yaml), not the
+    # offline golden path — that one still runs on Android.
     # No Firebase config on purpose: the offline app is fully network-free
     # (maestro-setup with online-stack=false installs only the Maestro CLI).
 
