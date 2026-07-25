@@ -235,12 +235,11 @@ jobs:
   maestro-android:
     name: Maestro Android (E2E)
     needs: decide
-    # DISABLED (issue #297): the Maestro E2E suites are flaky on both platforms
-    # (shared-emulator state leaks between flows + racy navigation waits — the
-    # set of failing flows changes run to run). Turned off entirely so the
-    # nightly stops mailing a red result every night. Re-enable via #297 once
-    # the isolation/flake fixes land. Flip back to `needs.decide.outputs.run`.
-    if: false
+    # Diagnostic while issue #297 remains open: the suite is flaky, so this job
+    # runs for trend/history signal but remains non-blocking via
+    # `continue-on-error`. Keeping it scheduled prevents E2E regressions from
+    # disappearing completely while isolation and navigation waits are fixed.
+    if: needs.decide.outputs.run == 'true'
     # QUARANTINED (issue #220): still partially red. Progress so far:
     #   - qaAndroidDevice (instrumented sync tests): GREEN. The off-by-one
     #     sync-count expectations were stale (they never accounted for the

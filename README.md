@@ -130,7 +130,7 @@ Common commands:
 ```shell
 ./gradlew qaCommon          # JVM unit tests across all common modules
 ./gradlew qaAndroidHost     # Android host-side unit tests
-./gradlew qaAll             # everything
+./gradlew qaJvmAndAndroid   # JVM + Android host/device; no Maestro or Firestore rules
 ```
 
 Firestore rules tests:

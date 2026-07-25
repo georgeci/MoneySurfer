@@ -254,8 +254,11 @@ QA entry points:
 ./gradlew qaMaestro
 ./gradlew qaMaestroOfflineAndroid   # offline golden path, Android
 ./gradlew qaMaestroOfflineIos       # offline app launch smoke, iOS Simulator (#297)
-./gradlew qaAll
+./gradlew qaJvmAndAndroid           # JVM + Android host/device; no Maestro/Firestore rules
 ```
+
+`qaAll` is a deprecated compatibility alias for `qaJvmAndAndroid`; it is not
+an exhaustive run of every QA scope.
 
 **Before any commit that touches Kotlin sources**, run copy-paste detection
 locally so duplication is fixed before SonarCloud flags it on the PR:
