@@ -35,6 +35,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -50,6 +51,7 @@ import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbarAction
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
+import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
 import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.utils.HandleSideEffect
@@ -80,6 +82,19 @@ import moneysurfer.feature.transaction.generated.resources.transaction_details_t
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
+
+/**
+ * Stable selectors for the transaction details screen — see docs/testing/testing-strategy.md.
+ *
+ * [ConfirmDelete] sits inside the delete dialog, which is its own window: the screen root's
+ * `surferTestTagAsId()` does not reach it, so the confirm button carries its own.
+ */
+object TransactionDetailsTestTags {
+    const val Root = "transactionDetails:root"
+    const val Edit = "transactionDetails:edit"
+    const val Delete = "transactionDetails:delete"
+    const val ConfirmDelete = "transactionDetails:confirmDelete"
+}
 
 @Composable
 fun TransactionDetailsScreen(
@@ -140,7 +155,10 @@ private fun TransactionDetailsContent(
     }
 
     Scaffold(
-        modifier = Modifier.surferSafeInsets(),
+        modifier = Modifier
+            .surferSafeInsets()
+            .testTag(TransactionDetailsTestTags.Root)
+            .surferTestTagAsId(),
         containerColor = AppTheme.materialColors.surface,
         topBar = {
             SurferToolbar(
@@ -151,12 +169,14 @@ private fun TransactionDetailsContent(
                         icon = SurferIcons.Edit,
                         contentDescription = stringResource(Res.string.transaction_details_edit_content_description),
                         onClick = { onEvent(TransactionDetailsEvent.OnEditClick) },
+                        modifier = Modifier.testTag(TransactionDetailsTestTags.Edit),
                     )
                     SurferToolbarAction(
                         icon = SurferIcons.Delete,
                         contentDescription = stringResource(Res.string.transaction_details_delete_content_description),
-                        tint = AppTheme.materialColors.error,
                         onClick = { onEvent(TransactionDetailsEvent.OnDeleteClick) },
+                        modifier = Modifier.testTag(TransactionDetailsTestTags.Delete),
+                        tint = AppTheme.materialColors.error,
                     )
                 },
             )
@@ -560,6 +580,9 @@ private fun DeleteConfirmationDialog(
         confirmButton = {
             Button(
                 onClick = onConfirm,
+                modifier = Modifier
+                    .surferTestTagAsId()
+                    .testTag(TransactionDetailsTestTags.ConfirmDelete),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = AppTheme.materialColors.error,
                     contentColor = AppTheme.materialColors.onError,

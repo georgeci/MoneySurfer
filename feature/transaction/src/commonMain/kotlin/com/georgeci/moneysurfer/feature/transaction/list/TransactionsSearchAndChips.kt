@@ -13,6 +13,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.georgeci.moneysurfer.feature.transaction.filter.TransactionDatePreset
 import com.georgeci.moneysurfer.feature.transaction.filter.TransactionDateRange
@@ -110,22 +111,26 @@ internal fun FilterChipRail(
                 label = stringResource(Res.string.transactions_list_chip_date),
                 value = value,
                 onClick = onOpenFilters,
+                modifier = Modifier.testTag(TransactionsListTestTags.FilterDate),
             )
         }
         RailChip(
             label = stringResource(Res.string.transactions_list_chip_type),
             value = chips.type.chipValue(),
             onClick = onOpenFilters,
+            modifier = Modifier.testTag(TransactionsListTestTags.FilterType),
         )
         RailChip(
             label = stringResource(Res.string.transactions_list_chip_account),
             value = selectionValue(chips.accountName, chips.accountCount),
             onClick = onOpenFilters,
+            modifier = Modifier.testTag(TransactionsListTestTags.FilterAccount),
         )
         RailChip(
             label = stringResource(Res.string.transactions_list_chip_category),
             value = selectionValue(chips.categoryName, chips.categoryCount),
             onClick = onOpenFilters,
+            modifier = Modifier.testTag(TransactionsListTestTags.FilterCategory),
         )
         RailChip(
             label = stringResource(Res.string.transactions_list_chip_sort),
@@ -134,6 +139,7 @@ internal fun FilterChipRail(
             // whether it differs from the default rather than from having a value at all.
             highlighted = chips.sort != TransactionSort.Newest,
             onClick = onOpenFilters,
+            modifier = Modifier.testTag(TransactionsListTestTags.FilterSort),
         )
     }
 }
@@ -148,6 +154,7 @@ private fun RailChip(
     label: String,
     value: String?,
     onClick: () -> Unit,
+    modifier: Modifier = Modifier,
     highlighted: Boolean = value != null,
 ) {
     val text = if (value != null) {
@@ -159,6 +166,7 @@ private fun RailChip(
         label = text,
         selected = highlighted,
         onClick = onClick,
+        modifier = modifier,
         showCheck = false,
     )
 }

@@ -38,6 +38,6 @@ tags:
     text: "Force sync now"
 
 - tapOn:
-    text: "Back"
+    id: "toolbar:back"
 - assertVisible:
     id: "settings:root"

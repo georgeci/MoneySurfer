@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.georgeci.moneysurfer.domain.model.GoalStatus
@@ -24,6 +25,7 @@ import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
 import com.georgeci.moneysurfer.uikit.components.goal.SurferGoalCard
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
+import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
 import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.utils.AsyncState
@@ -37,6 +39,19 @@ import moneysurfer.feature.goal.generated.resources.goals_empty_title
 import moneysurfer.feature.goal.generated.resources.goals_title
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
+
+/**
+ * Stable selectors for the Goals list — see docs/testing/testing-strategy.md.
+ *
+ * The FAB is always composed, so on an empty list it sits alongside the empty-state CTA that
+ * fires the same event — [AddButton] and [AddEmptyStateButton] are separate tags because both
+ * are on screen at once and a flow has to name which one it taps.
+ */
+object GoalsTestTags {
+    const val Root = "goals:root"
+    const val AddButton = "goals:add"
+    const val AddEmptyStateButton = "goals:addEmptyState"
+}
 
 @Composable
 fun GoalsScreen(
@@ -69,7 +84,10 @@ private fun GoalsContent(
     onEvent: (GoalsEvent) -> Unit,
 ) {
     Scaffold(
-        modifier = Modifier.surferSafeInsets(),
+        modifier = Modifier
+            .surferSafeInsets()
+            .testTag(GoalsTestTags.Root)
+            .surferTestTagAsId(),
         containerColor = AppTheme.materialColors.surface,
         topBar = {
             SurferToolbar(
@@ -82,6 +100,7 @@ private fun GoalsContent(
             SurferAddFab(
                 label = addLabel,
                 onClick = { onEvent(GoalsEvent.OnAddGoalClick) },
+                modifier = Modifier.testTag(GoalsTestTags.AddButton),
             )
         },
     ) { padding ->
@@ -97,6 +116,7 @@ private fun GoalsContent(
                     subtitle = stringResource(Res.string.goals_empty_subtitle),
                     actionLabel = stringResource(Res.string.goals_add),
                     onActionClick = { onEvent(GoalsEvent.OnAddGoalClick) },
+                    actionTestTag = GoalsTestTags.AddEmptyStateButton,
                 )
             }
 

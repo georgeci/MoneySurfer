@@ -11,26 +11,26 @@ name: Account — Create savings account with opening balance
       notVisible: "Rainy Day"
     commands:
       - tapOn:
-          text: "Add account"
+          id: "dashboard:addAccount"
       - assertVisible:
-          text: "New account"
+          id: "accountCreation:root"
 
       - tapOn:
-          text: "Savings"
+          id: "accountCreation:type:savings"
 
       - tapOn:
-          text: "Account name"
+          id: "accountCreation:name"
       - inputText: "Rainy Day"
       - tapOn:
-          text: "Opening balance"
+          id: "accountCreation:openingBalance"
       - inputText: "2500"
 
       - tapOn:
-          text: "Save"
+          id: "accountCreation:save"
 
 # Back on Dashboard with the new savings account visible
 - assertVisible:
-    text: "Accounts"
+    id: "dashboard:accounts"
 - assertVisible:
     text: "Rainy Day"
 - assertVisible:

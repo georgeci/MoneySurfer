@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -27,6 +28,8 @@ import com.georgeci.moneysurfer.uikit.theme.AppTheme
  * Centered empty-state block: an icon medallion, a title, an optional subtitle and an
  * optional call-to-action. Use it when a list or screen has no content yet — the CTA is
  * what turns a dead end into the next step the user should take.
+ *
+ * [actionTestTag] tags the CTA button so a UI test can tap it without matching localized copy.
  */
 @Composable
 fun SurferEmptyState(
@@ -36,6 +39,7 @@ fun SurferEmptyState(
     icon: ImageVector = SurferIcons.Info,
     actionLabel: String? = null,
     onActionClick: (() -> Unit)? = null,
+    actionTestTag: String? = null,
 ) {
     Column(
         modifier = modifier
@@ -78,7 +82,9 @@ fun SurferEmptyState(
                 onClick = onActionClick,
                 style = SurferButtonStyle.Tonal,
                 startIcon = SurferIcons.Add,
-                modifier = Modifier.padding(top = AppTheme.spacing.xSmall),
+                modifier = Modifier
+                    .padding(top = AppTheme.spacing.xSmall)
+                    .then(actionTestTag?.let { Modifier.testTag(it) } ?: Modifier),
             )
         }
     }

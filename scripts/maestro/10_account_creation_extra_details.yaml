@@ -8,24 +8,31 @@ name: Account — Create card account with extra details
       notVisible: "Travel Card"
     commands:
       - tapOn:
-          text: "Add account"
+          id: "dashboard:addAccount"
       - assertVisible:
-          text: "New account"
+          id: "accountCreation:root"
       - tapOn:
-          text: "Card"
+          id: "accountCreation:type:card"
       - tapOn:
-          text: "Account name"
+          id: "accountCreation:name"
       - inputText: "Travel Card"
       - tapOn:
-          text: "Opening balance"
+          id: "accountCreation:openingBalance"
       - inputText: "123.45"
+      # Extra details are opt-in: the "IBAN" chip *adds* the field, it isn't the
+      # field. Both carry the same label, so the old `tapOn: text: "IBAN"` hit
+      # the chip and the IBAN string that followed went to whatever was still
+      # focused — the opening-balance input. Tap the chip, then the field it
+      # created, and only then type (#352).
       - tapOn:
-          text: "IBAN"
+          id: "accountCreation:addExtra:iban"
+      - tapOn:
+          id: "accountCreation:iban"
       - inputText: "ES9121000418450200051332"
       - tapOn:
-          text: "Save"
+          id: "accountCreation:save"
 
 - assertVisible:
-    text: "Accounts"
+    id: "dashboard:accounts"
 - assertVisible:
     text: "Travel Card"

@@ -36,16 +36,20 @@ name: Auth — Sign in with test user
 - tapOn:
     id: "signIn:submit"
 
+# Sign-in lands on the workspace picker, or straight on the dashboard when a
+# workspace is already selected. Either destination proves the credentials took.
 - runFlow:
     when:
-      visible: "Choose a workspace"
+      visible:
+        id: "workspaceSelector:root"
     commands:
       - assertVisible:
-          text: "Choose a workspace"
+          id: "workspaceSelector:root"
 
 - runFlow:
     when:
-      visible: "Accounts"
+      visible:
+        id: "dashboard:root"
     commands:
       - assertVisible:
-          text: "Accounts"
+          id: "dashboard:root"

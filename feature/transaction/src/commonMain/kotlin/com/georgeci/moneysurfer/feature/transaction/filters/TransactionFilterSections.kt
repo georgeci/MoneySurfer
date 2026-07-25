@@ -79,6 +79,7 @@ internal fun TypeSection(
             selected = type,
             label = { labels.getValue(it) },
             onSelect = { onEvent(TransactionFiltersEvent.OnTypeSelected(it)) },
+            optionTestTag = { TransactionFiltersTestTags.TypePrefix + it.name.lowercase() },
         )
     }
 }

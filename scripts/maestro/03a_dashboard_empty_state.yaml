@@ -19,10 +19,10 @@ name: Dashboard — empty-state CTA before first transaction
 - assertVisible:
     id: "settings:root"
 - tapOn:
-    text: "Change workspace"
+    id: "settings:workspaceRow"
 
 - assertVisible:
-    text: "Choose a workspace"
+    id: "workspaceSelector:root"
 # Branch on the row, then select-and-confirm — see the note in
 # 02_workspace_create.yaml.
 - runFlow:
@@ -30,16 +30,16 @@ name: Dashboard — empty-state CTA before first transaction
       notVisible: "Empty Workspace"
     commands:
       - tapOn:
-          text: "New workspace"
+          id: "workspaceSelector:create"
       - tapOn:
-          text: "Workspace name"
+          id: "workspaceCreation:name"
       - inputText: "Empty Workspace"
       - tapOn:
-          text: "Create"
+          id: "workspaceCreation:save"
 - tapOn:
     text: "Empty Workspace"
 - tapOn:
-    text: "Use Empty Workspace"
+    id: "workspaceSelector:confirm"
 
 # Same precondition as before — one account, zero transactions. The dashboard
 # only offers the "add transaction" affordance once an account exists. Let the
@@ -54,22 +54,20 @@ name: Dashboard — empty-state CTA before first transaction
       notVisible: "Empty Bank"
     commands:
       - tapOn:
-          text: "Add account"
+          id: "dashboard:addAccount"
       - assertVisible:
-          text: "New account"
+          id: "accountCreation:root"
       - tapOn:
-          text: "Account name"
+          id: "accountCreation:name"
       - inputText: "Empty Bank"
       - tapOn:
-          text: "Bank"
+          id: "accountCreation:type:bank"
       - tapOn:
-          text: "Save"
+          id: "accountCreation:save"
 
 # Golden first-run state: the Recent section shows the empty state, not a blank box.
 - assertVisible:
-    text: "No activity yet"
-- assertVisible:
-    text: "Transactions you log will show up here."
+    id: "dashboard:recentEmpty"
 
 # The empty-state CTA is the next step — it opens transaction creation.
 - tapOn:
@@ -77,22 +75,17 @@ name: Dashboard — empty-state CTA before first transaction
 - assertVisible:
     id: "transactionCreation:root"
 
-# Leave without saving, and hand the suite back its shared workspace so later
-# flows don't inherit the empty one.
+# Leave without saving; the empty state must survive an abandoned creation.
 - tapOn:
-    text: "Close"
+    id: "transactionCreation:close"
 - assertVisible:
-    text: "No activity yet"
+    id: "dashboard:recentEmpty"
 
-- tapOn:
-    id: "dashboard:settings"
-- tapOn:
-    text: "Change workspace"
-- assertVisible:
-    text: "Choose a workspace"
-- tapOn:
-    text: "Test Workspace"
-- tapOn:
-    text: "Use Test Workspace"
-- assertVisible:
-    text: "Accounts"
+# This flow deliberately ends with `Empty Workspace` still selected. It used to
+# switch back to `Test Workspace` here "so later flows don't inherit the empty
+# one" — but that only held when this flow ran to completion. A failure anywhere
+# above skipped the switch-back and left every later flow writing its fixtures
+# into `Empty Workspace`, which both corrupted the shared baseline and destroyed
+# this flow's own precondition for the next run (#351). Restoring the shared
+# workspace is now 02_workspace_create.yaml's job, on the way *in*, where it runs
+# regardless of how this flow ended.

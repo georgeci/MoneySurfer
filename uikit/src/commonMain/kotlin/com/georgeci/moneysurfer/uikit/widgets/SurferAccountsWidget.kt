@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.georgeci.moneysurfer.uikit.atom.SurferActionCard
@@ -33,6 +34,12 @@ data class SurferAccountItem(
     val icon: ImageVector = SurferIcons.Wallet,
 )
 
+/**
+ * Accounts widget for the dashboard column.
+ *
+ * [addTestTag] tags the add-account CTA so a UI test can tap it without matching localized copy;
+ * the host screen owns the tag value because the CTA is a step in its flow, not the widget's.
+ */
 @Composable
 fun SurferAccountsWidget(
     items: List<SurferAccountItem>,
@@ -42,6 +49,7 @@ fun SurferAccountsWidget(
     size: SurferWidgetSize = LocalSurferWidgetSize.current,
     addCtaTrailingLabel: String? = null,
     onItemClick: ((SurferAccountItem) -> Unit)? = null,
+    addTestTag: String? = null,
 ) {
     val hero = size == SurferWidgetSize.Hero
     val visibleItems = if (hero) items else items.take(2)
@@ -66,6 +74,7 @@ fun SurferAccountsWidget(
                 label = addLabel,
                 trailingLabel = addCtaTrailingLabel,
                 onClick = onAddClick,
+                modifier = addTestTag?.let { Modifier.testTag(it) } ?: Modifier,
             )
         }
     }
@@ -76,8 +85,9 @@ private fun AddAccountRow(
     label: String,
     trailingLabel: String?,
     onClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    SurferActionCard(modifier = Modifier.fillMaxWidth(), onClick = onClick) {
+    SurferActionCard(modifier = modifier.fillMaxWidth(), onClick = onClick) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(12.dp),

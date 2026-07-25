@@ -30,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -48,6 +49,7 @@ import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
 import com.georgeci.moneysurfer.uikit.components.transaction.SurferTransactionLine
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
+import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.utils.HandleSideEffect
 import kotlinx.datetime.LocalDate
@@ -82,6 +84,21 @@ import org.jetbrains.compose.resources.stringArrayResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
+
+/**
+ * Stable selectors for the transactions list screen — see docs/testing/testing-strategy.md.
+ *
+ * The `filter:*` tags name the chips of the rail, not filter *values*: every chip is a shortcut
+ * that opens the filters screen rather than a segment that toggles a value on this screen.
+ */
+object TransactionsListTestTags {
+    const val Root = "transactionsList:root"
+    const val FilterDate = "transactionsList:filter:date"
+    const val FilterType = "transactionsList:filter:type"
+    const val FilterAccount = "transactionsList:filter:account"
+    const val FilterCategory = "transactionsList:filter:category"
+    const val FilterSort = "transactionsList:filter:sort"
+}
 
 @Composable
 fun TransactionsByAccountScreen(
@@ -145,7 +162,10 @@ private fun TransactionsByAccountContent(
     val title = state.accountName.ifBlank { titleFallback }
     val untitled = stringResource(Res.string.transactions_list_untitled)
     Scaffold(
-        modifier = Modifier.surferSafeInsets(),
+        modifier = Modifier
+            .surferSafeInsets()
+            .testTag(TransactionsListTestTags.Root)
+            .surferTestTagAsId(),
         containerColor = AppTheme.materialColors.surface,
         topBar = {
             SurferToolbar(

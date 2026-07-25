@@ -86,9 +86,16 @@ import org.koin.compose.viewmodel.koinViewModel
  * their absence is what the offline golden Maestro flow asserts via `notVisible`.
  * Everything else — including [PreferencesRow] and [BackupRow] — is composed in both
  * variants, and the same flow asserts those positively.
+ *
+ * [ProfileName] and [MembersRow] are state-gated rather than build-gated: the first needs a
+ * profile to show, the second a workspace with members, so assert them only where the flow
+ * has put the app in that state.
  */
 object SettingsTestTags {
     const val Root = "settings:root"
+    const val ProfileName = "settings:profileName"
+    const val WorkspaceRow = "settings:workspaceRow"
+    const val MembersRow = "settings:membersRow"
     const val CategoriesRow = "settings:categoriesRow"
     const val BudgetsRow = "settings:budgetsRow"
     const val AppearanceRow = "settings:appearanceRow"
@@ -181,6 +188,7 @@ private fun SettingsContent(
                         name = stringResource(Res.string.settings_user_name),
                         email = userEmailText(state),
                         trailing = null,
+                        nameTestTag = SettingsTestTags.ProfileName,
                     )
                 }
             }
@@ -192,6 +200,7 @@ private fun SettingsContent(
                     supportingText = stringResource(Res.string.settings_change_workspace_supporting),
                     onClick = { onEvent(SettingsEvent.OnChangeWorkspaceClick) },
                     trailing = { SurferSettingsChevron() },
+                    modifier = Modifier.testTag(SettingsTestTags.WorkspaceRow),
                 )
                 if (state.showWorkspaceMembers && state.currentWorkspaceId != null) {
                     SurferSettingsRow(
@@ -204,6 +213,7 @@ private fun SettingsContent(
                         ),
                         onClick = { onEvent(SettingsEvent.OnMembersClick) },
                         trailing = { SurferSettingsChevron() },
+                        modifier = Modifier.testTag(SettingsTestTags.MembersRow),
                     )
                 }
                 if (state.showPendingInvites) {
