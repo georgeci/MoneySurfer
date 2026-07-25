@@ -4,6 +4,7 @@ import com.georgeci.moneysurfer.data.db.dao.UserDao
 import com.georgeci.moneysurfer.data.db.dao.WorkspaceDao
 import com.georgeci.moneysurfer.data.db.entity.UserEntity
 import com.georgeci.moneysurfer.data.remote.WorkspaceDoc
+import com.georgeci.moneysurfer.data.sync.WorkspaceRefRegistrar
 import com.georgeci.moneysurfer.data.sync.toDoc
 import com.georgeci.moneysurfer.data.sync.toEntity
 import com.georgeci.moneysurfer.domain.AppInfo
@@ -37,6 +38,7 @@ class WorkspaceSyncPlugin(
     private val appInfo: AppInfo,
     private val workspaceDao: WorkspaceDao,
     private val userDao: UserDao,
+    private val workspaceRefRegistrar: WorkspaceRefRegistrar,
 ) : SyncEntityPlugin {
 
     override val entityType: String = SyncEntityTypes.WORKSPACE
@@ -51,6 +53,10 @@ class WorkspaceSyncPlugin(
             -> {
                 val entity = workspaceDao.getById(mutation.entityId) ?: return
                 docRef.set(entity.toDoc().copy(clientVersionCode = appInfo.versionCode))
+                // The ref travels with the document. A workspace created while sync was
+                // disabled has no `users/{uid}.workspaceIds` entry and nothing else would ever
+                // add one, leaving it invisible to every other device (issue #342).
+                workspaceRefRegistrar.register(mutation.entityId)
             }
             MutationOperation.DELETE -> docRef.pushTombstone(
                 tombstonePatchFor(mutation, clientVersionCode = appInfo.versionCode),

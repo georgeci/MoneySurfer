@@ -40,6 +40,7 @@ import moneysurfer.feature.transaction.generated.resources.transactions_list_chi
 import moneysurfer.feature.transaction.generated.resources.transactions_list_chip_value
 import moneysurfer.feature.transaction.generated.resources.transactions_list_filter_expenses
 import moneysurfer.feature.transaction.generated.resources.transactions_list_filter_income
+import moneysurfer.feature.transaction.generated.resources.transactions_list_filter_transfer
 import moneysurfer.feature.transaction.generated.resources.transactions_list_filters_badge
 import moneysurfer.feature.transaction.generated.resources.transactions_list_filters_content_description
 import moneysurfer.feature.transaction.generated.resources.transactions_list_search_placeholder
@@ -203,6 +204,7 @@ private fun TransactionTypeFilter.chipValue(): String? = when (this) {
     TransactionTypeFilter.All -> null
     TransactionTypeFilter.Expenses -> stringResource(Res.string.transactions_list_filter_expenses)
     TransactionTypeFilter.Income -> stringResource(Res.string.transactions_list_filter_income)
+    TransactionTypeFilter.Transfer -> stringResource(Res.string.transactions_list_filter_transfer)
 }
 
 @Composable

@@ -54,5 +54,7 @@ name: Auth — Sign in with test user
 
 - assertNotVisible:
     id: "signIn:root"
+# A rejected sign-in raises the error dialog (#360) rather than failing silently,
+# so its absence is a second, independent way of saying the credentials took.
 - assertNotVisible:
-    text: "Wrong email or password"
+    id: "signIn:errorDialog"

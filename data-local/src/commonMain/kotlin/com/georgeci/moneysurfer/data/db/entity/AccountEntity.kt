@@ -36,4 +36,10 @@ data class AccountEntity(
      * or counts them across accounts, and they are written and read as one blob with the account.
      */
     @ColumnInfo(name = "extraDetails", defaultValue = "'[]'") val extraDetails: String = "[]",
+    /**
+     * User-defined position within the workspace, ascending. Every read orders by it and falls
+     * back to `name` so rows that share a value — a workspace nobody has reordered yet — still
+     * come out in a stable order.
+     */
+    @ColumnInfo(name = "sortOrder", defaultValue = "0") val sortOrder: Int = 0,
 )

@@ -1,5 +1,6 @@
 package com.georgeci.moneysurfer.domain.usecase
 
+import com.georgeci.moneysurfer.domain.SyncFeatureFlag
 import com.georgeci.moneysurfer.domain.auth.InMemorySessionPointers
 import com.georgeci.moneysurfer.domain.constants.DEFAULT_CATEGORY_SEEDS
 import com.georgeci.moneysurfer.domain.model.Account
@@ -127,6 +128,8 @@ private class SeedTestEnv(
         workspaceSyncer = SeedFakeWorkspaceSyncer,
         session = session,
         getCurrentTime = getCurrentTime,
+        // Offline seed path — there is no Firebase session here either way.
+        syncFeatureFlag = SyncFeatureFlag(enabled = false),
     )
     val useCase = SeedDefaultsUseCase(
         createWorkspace = createWorkspace,
@@ -192,6 +195,7 @@ private class FakeAccountRepo : AccountRepository {
     override suspend fun delete(id: AccountId) = error("not used")
     override suspend fun applyDelta(accountId: AccountId, delta: Money) = error("not used")
     override suspend fun setBalance(accountId: AccountId, balance: Money) = error("not used")
+    override suspend fun reorder(orderedIds: List<AccountId>) = error("not used")
     override suspend fun setArchived(accountId: AccountId, archived: Boolean) = error("not used")
 }
 

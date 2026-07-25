@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -36,6 +38,7 @@ import com.georgeci.moneysurfer.utils.HandleSideEffect
 import moneysurfer.feature.workspace.generated.resources.Res
 import moneysurfer.feature.workspace.generated.resources.workspace_selector_action_edit
 import moneysurfer.feature.workspace.generated.resources.workspace_selector_action_members
+import moneysurfer.feature.workspace.generated.resources.workspace_selector_cloud_unavailable
 import moneysurfer.feature.workspace.generated.resources.workspace_selector_continue
 import moneysurfer.feature.workspace.generated.resources.workspace_selector_create_subtitle
 import moneysurfer.feature.workspace.generated.resources.workspace_selector_create_title
@@ -43,6 +46,7 @@ import moneysurfer.feature.workspace.generated.resources.workspace_selector_empt
 import moneysurfer.feature.workspace.generated.resources.workspace_selector_heading_subtitle
 import moneysurfer.feature.workspace.generated.resources.workspace_selector_heading_subtitle_offline
 import moneysurfer.feature.workspace.generated.resources.workspace_selector_heading_title
+import moneysurfer.feature.workspace.generated.resources.workspace_selector_sign_out
 import moneysurfer.feature.workspace.generated.resources.workspace_selector_use_workspace
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -56,10 +60,17 @@ object WorkspaceSelectorTestTags {
     const val Confirm = "workspaceSelector:confirm"
 }
 
+/**
+ * [cloudDataUnavailable] comes straight from the route: the account owns workspaces that the
+ * post-auth pull never brought down, so the empty list below is a hydration failure rather than
+ * a new account. Pure presentation — nothing in the view model depends on it (issue #342).
+ */
 @Composable
 fun WorkspaceSelectorScreen(
     showActions: Boolean,
+    cloudDataUnavailable: Boolean = false,
     onNavigateToDashboard: () -> Unit,
+    onNavigateToSignIn: () -> Unit,
     onNavigateToWorkspaceCreation: () -> Unit,
     onNavigateToWorkspaceEdit: (WorkspaceId) -> Unit,
     onNavigateToWorkspaceMembers: (WorkspaceId) -> Unit,
@@ -72,6 +83,7 @@ fun WorkspaceSelectorScreen(
     viewModel.HandleSideEffect { effect ->
         when (effect) {
             WorkspaceSelectorEffect.NavigateToDashboard -> onNavigateToDashboard()
+            WorkspaceSelectorEffect.NavigateToSignIn -> onNavigateToSignIn()
             WorkspaceSelectorEffect.NavigateToWorkspaceCreation -> onNavigateToWorkspaceCreation()
             is WorkspaceSelectorEffect.NavigateToWorkspaceEdit -> onNavigateToWorkspaceEdit(effect.workspaceId)
             is WorkspaceSelectorEffect.NavigateToWorkspaceMembers -> onNavigateToWorkspaceMembers(effect.workspaceId)
@@ -82,6 +94,7 @@ fun WorkspaceSelectorScreen(
         is WorkspaceSelectorState.Loading -> WorkspaceSelectorLoading()
         is WorkspaceSelectorState.Content -> WorkspaceSelectorContent(
             state = current,
+            cloudDataUnavailable = cloudDataUnavailable,
             onEvent = viewModel::onEvent,
         )
     }
@@ -108,6 +121,7 @@ private fun WorkspaceSelectorLoading() {
 private fun WorkspaceSelectorContent(
     state: WorkspaceSelectorState.Content,
     onEvent: (WorkspaceSelectorEvent) -> Unit,
+    cloudDataUnavailable: Boolean = false,
 ) {
     val editLabel = stringResource(Res.string.workspace_selector_action_edit)
     val membersLabel = stringResource(Res.string.workspace_selector_action_members)
@@ -119,7 +133,23 @@ private fun WorkspaceSelectorContent(
                 .surferTestTagAsId(),
             containerColor = AppTheme.materialColors.surface,
             topBar = {
-                SurferToolbar(title = stringResource(Res.string.workspace_selector_heading_title))
+                SurferToolbar(
+                    title = stringResource(Res.string.workspace_selector_heading_title),
+                    actions = {
+                        // The only exit when the selector is the root of the stack: no back
+                        // entry, and Settings sits behind Dashboard, which needs a workspace.
+                        if (state.canSignOut) {
+                            IconButton(onClick = { onEvent(WorkspaceSelectorEvent.OnSignOutClick) }) {
+                                Icon(
+                                    imageVector = SurferIcons.Logout,
+                                    contentDescription = stringResource(
+                                        Res.string.workspace_selector_sign_out,
+                                    ),
+                                )
+                            }
+                        }
+                    },
+                )
             },
             bottomBar = {
                 ConfirmBar(
@@ -159,9 +189,19 @@ private fun WorkspaceSelectorContent(
                 if (state.workspaces.isEmpty()) {
                     item(key = "empty") {
                         Text(
-                            text = stringResource(Res.string.workspace_selector_empty),
+                            text = stringResource(
+                                if (cloudDataUnavailable) {
+                                    Res.string.workspace_selector_cloud_unavailable
+                                } else {
+                                    Res.string.workspace_selector_empty
+                                },
+                            ),
                             style = AppTheme.typography.bodyLarge,
-                            color = AppTheme.materialColors.onSurfaceVariant,
+                            color = if (cloudDataUnavailable) {
+                                AppTheme.materialColors.error
+                            } else {
+                                AppTheme.materialColors.onSurfaceVariant
+                            },
                             modifier = Modifier.padding(
                                 horizontal = AppTheme.spacing.large,
                                 vertical = AppTheme.spacing.small,
@@ -288,6 +328,24 @@ private fun WorkspaceSelectorEmptyPreview() {
                 isSelecting = false,
             ),
             onEvent = {},
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun WorkspaceSelectorCloudUnavailablePreview() {
+    AppTheme {
+        WorkspaceSelectorContent(
+            state = WorkspaceSelectorState.Content(
+                workspaces = emptyList(),
+                selectedWorkspaceId = null,
+                pendingWorkspaceId = null,
+                showActions = false,
+                isSelecting = false,
+            ),
+            onEvent = {},
+            cloudDataUnavailable = true,
         )
     }
 }

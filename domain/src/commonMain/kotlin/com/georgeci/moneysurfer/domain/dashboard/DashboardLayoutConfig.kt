@@ -60,6 +60,19 @@ data class DashboardLayoutConfig(
     }
 
     /**
+     * [type] restyled. Order and enabled-ness are left alone — the style picker only changes how a
+     * widget looks, and it can be opened for a widget that sits anywhere in the list. Like
+     * [withWidgetEnabled], naming a [type] the layout does not carry is a no-op.
+     */
+    fun withCardStyle(type: DashboardWidgetType, cardStyle: DashboardCardStyle): DashboardLayoutConfig {
+        val target = items.firstOrNull { it.type == type } ?: return this
+        if (target.cardStyle == cardStyle) return this
+        return DashboardLayoutConfig(
+            items = items.map { if (it.type == type) it.copy(cardStyle = cardStyle) else it },
+        )
+    }
+
+    /**
      * A layout safe to render: at most one entry per widget type, with any type missing from
      * [items] appended in its [DEFAULT] position and style. Persisted layouts written by an older
      * app version know nothing about widgets added since, and dropping those silently would make

@@ -42,6 +42,7 @@ import com.georgeci.moneysurfer.uikit.widgets.LocalSurferWidgetSize
 import com.georgeci.moneysurfer.uikit.widgets.SurferAccountItem
 import com.georgeci.moneysurfer.uikit.widgets.SurferAccountsWidget
 import com.georgeci.moneysurfer.uikit.widgets.SurferBalanceFootnote
+import com.georgeci.moneysurfer.uikit.widgets.SurferBalanceVariant
 import com.georgeci.moneysurfer.uikit.widgets.SurferBalanceWidget
 import com.georgeci.moneysurfer.uikit.widgets.SurferGoalItem
 import com.georgeci.moneysurfer.uikit.widgets.SurferGoalsWidget
@@ -239,6 +240,7 @@ private fun DashboardContent(
                 ) {
                     DashboardWidget(
                         type = layoutItem.type,
+                        variant = layoutItem.cardStyle.variant,
                         state = state,
                         onEvent = onEvent,
                     )
@@ -256,15 +258,19 @@ private fun DashboardWidgetSize.toWidgetSize(): SurferWidgetSize = when (this) {
 /**
  * The registry's render half: every [DashboardWidgetType] resolves to exactly one widget here.
  * Adding a widget type without a branch is a compile error, which is the point.
+ *
+ * [variant] is the widget-specific half of the card style. It stays a raw key this far in: only
+ * the widget that defines the treatments knows how to read it, and a widget with none ignores it.
  */
 @Composable
 private fun DashboardWidget(
     type: DashboardWidgetType,
+    variant: String?,
     state: DashboardState.Content,
     onEvent: (DashboardEvent) -> Unit,
 ) {
     when (type) {
-        DashboardWidgetType.Balance -> BalanceWidget(state)
+        DashboardWidgetType.Balance -> BalanceWidget(state, variant)
         DashboardWidgetType.Accounts -> AccountsWidget(state, onEvent)
         DashboardWidgetType.Goals -> GoalsWidget(state, onEvent)
         DashboardWidgetType.RecentTransactions -> RecentTransactionsWidget(state, onEvent)
@@ -272,10 +278,11 @@ private fun DashboardWidget(
 }
 
 @Composable
-private fun BalanceWidget(state: DashboardState.Content) {
+private fun BalanceWidget(state: DashboardState.Content, variant: String?) {
     SurferBalanceWidget(
         title = stringResource(Res.string.dashboard_balance_title),
         balance = state.formattedTotalBalance ?: "—",
+        variant = SurferBalanceVariant.fromKey(variant),
         footnote = balanceFootnote(state),
         modifier = Modifier
             .fillMaxWidth()

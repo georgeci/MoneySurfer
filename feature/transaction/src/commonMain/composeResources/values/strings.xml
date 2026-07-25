@@ -2,11 +2,17 @@
     <!-- Transactions list (by account) -->
     <string name="transactions_list_title">Transactions</string>
     <string name="transactions_list_new">New</string>
-    <string name="transactions_list_empty">No transactions yet. Log one to see it here.</string>
-    <string name="transactions_list_empty_filtered">No transactions match this filter.</string>
+    <string name="transactions_list_empty_title">No transactions yet</string>
+    <string name="transactions_list_empty">Log your first one and it will show up here.</string>
+    <string name="transactions_list_empty_cta">Add transaction</string>
+    <string name="transactions_list_empty_filtered_title">Nothing to show</string>
+    <string name="transactions_list_empty_filtered">No transactions match the filters you applied.</string>
+    <string name="transactions_list_empty_filtered_cta">Clear filters</string>
+    <string name="transactions_list_empty_search_cta">Clear search</string>
     <string name="transactions_list_filter_all">All</string>
     <string name="transactions_list_filter_expenses">Expenses</string>
     <string name="transactions_list_filter_income">Income</string>
+    <string name="transactions_list_filter_transfer">Transfers</string>
     <string name="transactions_list_summary_income">Income</string>
     <string name="transactions_list_summary_expenses">Expenses</string>
     <string name="transactions_list_summary_net">Net</string>
@@ -189,6 +195,7 @@
     <string name="transaction_filters_type_all">All</string>
     <string name="transaction_filters_type_expenses">Expenses</string>
     <string name="transaction_filters_type_income">Income</string>
+    <string name="transaction_filters_type_transfer">Transfers</string>
     <string name="transaction_filters_section_accounts">Accounts</string>
     <string name="transaction_filters_section_categories">Categories</string>
     <!-- Counter above the category chips, e.g. "3 of 24 selected" -->

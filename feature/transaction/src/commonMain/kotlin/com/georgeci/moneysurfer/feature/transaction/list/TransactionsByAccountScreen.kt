@@ -32,22 +32,17 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.georgeci.moneysurfer.domain.preferences.TransactionPeriodMode
 import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
-import com.georgeci.moneysurfer.feature.transaction.filter.TransactionDateRange
-import com.georgeci.moneysurfer.feature.transaction.filter.TransactionSort
 import com.georgeci.moneysurfer.feature.transaction.filter.TransactionTypeFilter
 import com.georgeci.moneysurfer.uikit.components.base.SurferAddFab
 import com.georgeci.moneysurfer.uikit.components.base.SurferPeriodArrow
 import com.georgeci.moneysurfer.uikit.components.base.SurferPeriodPager
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
-import com.georgeci.moneysurfer.uikit.components.transaction.SurferTransactionLine
-import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
 import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
@@ -58,9 +53,6 @@ import moneysurfer.feature.transaction.generated.resources.Res
 import moneysurfer.feature.transaction.generated.resources.transactions_list_date_full
 import moneysurfer.feature.transaction.generated.resources.transactions_list_date_today
 import moneysurfer.feature.transaction.generated.resources.transactions_list_date_yesterday
-import moneysurfer.feature.transaction.generated.resources.transactions_list_empty
-import moneysurfer.feature.transaction.generated.resources.transactions_list_empty_filtered
-import moneysurfer.feature.transaction.generated.resources.transactions_list_empty_search
 import moneysurfer.feature.transaction.generated.resources.transactions_list_months
 import moneysurfer.feature.transaction.generated.resources.transactions_list_months_genitive
 import moneysurfer.feature.transaction.generated.resources.transactions_list_months_short
@@ -221,7 +213,7 @@ private fun TransactionsByAccountContent(
             Spacer(Modifier.height(4.dp))
 
             if (state.isEmpty) {
-                EmptyState(state = state)
+                EmptyState(state = state, onEvent = onEvent)
                 return@Scaffold
             }
 
@@ -243,25 +235,10 @@ private fun TransactionsByAccountContent(
                     }
                     group.transactions.forEach { row ->
                         item(key = "t-${row.id.value}") {
-                            val amountColor = if (row.isExpense) {
-                                AppTheme.materialColors.onSurface
-                            } else {
-                                AppTheme.semanticColors.income
-                            }
-                            SurferTransactionLine(
-                                modifier = Modifier.padding(horizontal = 16.dp)
-                                    .padding(bottom = 12.dp),
-                                icon = if (row.isExpense) SurferIcons.Receipt else SurferIcons.Wallet,
-                                title = row.title.ifBlank { untitled },
-                                formattedAmount = row.formattedAmount,
-                                categoryHueSeed = row.categoryHueSeed,
-                                meta = row.subtitle.takeIf { it.isNotEmpty() },
-                                amountColor = amountColor,
-                                amountPillBackground = if (row.isExpense) {
-                                    null
-                                } else {
-                                    AppTheme.semanticColors.income.copy(alpha = 0.14f)
-                                },
+                            TransactionRow(
+                                row = row,
+                                showAccount = state.showAccountOnRows,
+                                untitled = untitled,
                                 onClick = { onEvent(TransactionsByAccountEvent.OnTransactionClick(row.id)) },
                             )
                         }
@@ -481,28 +458,6 @@ private fun SummaryDivider() {
 }
 
 @Composable
-private fun EmptyState(state: TransactionsByAccountState.Content) {
-    val text = when {
-        state.query.isNotBlank() -> stringResource(Res.string.transactions_list_empty_search)
-        state.isFiltered -> stringResource(Res.string.transactions_list_empty_filtered)
-        else -> stringResource(Res.string.transactions_list_empty)
-    }
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 32.dp),
-        contentAlignment = Alignment.Center,
-    ) {
-        Text(
-            text = text,
-            style = AppTheme.typography.bodyLarge,
-            color = AppTheme.materialColors.onSurfaceVariant,
-            textAlign = TextAlign.Center,
-        )
-    }
-}
-
-@Composable
 private fun DateHeader(group: TransactionGroupUi) {
     Row(
         modifier = Modifier
@@ -529,9 +484,10 @@ private fun DateHeader(group: TransactionGroupUi) {
 private fun TransactionsByAccountPreview() {
     AppTheme {
         TransactionsByAccountContent(
+            // All-accounts variant: the one where a row has to say which account it belongs to.
             state = TransactionsByAccountState.Content(
-                accountId = AccountId("preview-acc-1"),
-                accountName = "Everyday",
+                accountId = null,
+                accountName = "",
                 groups = listOf(
                     TransactionGroupUi(
                         date = LocalDate(2025, 3, 26),
@@ -546,6 +502,7 @@ private fun TransactionsByAccountPreview() {
                                 formattedAmount = "−€48.20",
                                 isExpense = true,
                                 categoryHueSeed = "preview-cat-1",
+                                accountName = "Everyday",
                             ),
                             TransactionRowUi(
                                 id = TransactionId("preview-tx-2"),
@@ -554,6 +511,17 @@ private fun TransactionsByAccountPreview() {
                                 formattedAmount = "−€24.50",
                                 isExpense = true,
                                 categoryHueSeed = "preview-cat-2",
+                                accountName = "Everyday",
+                            ),
+                            TransactionRowUi(
+                                id = TransactionId("preview-tx-4"),
+                                title = "Rainy day top-up",
+                                subtitle = "Transfer",
+                                formattedAmount = "€200.00",
+                                isExpense = true,
+                                categoryHueSeed = "",
+                                accountName = "Savings",
+                                isTransfer = true,
                             ),
                         ),
                     ),
@@ -570,10 +538,12 @@ private fun TransactionsByAccountPreview() {
                                 formattedAmount = "+€3,200.00",
                                 isExpense = false,
                                 categoryHueSeed = "preview-cat-3",
+                                accountName = "Everyday",
                             ),
                         ),
                     ),
                 ),
+                showAccountOnRows = true,
                 summary = TransactionSummaryUi(
                     incomeFormatted = "+€3,200.00",
                     expenseFormatted = "−€72.70",
@@ -605,12 +575,8 @@ private fun TransactionsByAccountEmptyPreview() {
                 accountId = AccountId("preview-acc-1"),
                 accountName = "Savings",
                 groups = emptyList(),
-                summary = TransactionSummaryUi(
-                    incomeFormatted = "+€0.00",
-                    expenseFormatted = "−€0.00",
-                    netFormatted = "+€0.00",
-                    netPositive = true,
-                ),
+                showAccountOnRows = false,
+                summary = previewEmptySummary(),
                 query = "",
                 filters = previewChips(),
                 activeFilterCount = 0,
@@ -632,12 +598,30 @@ private fun TransactionsByAccountEmptyPreview() {
     }
 }
 
-private fun previewChips(): TransactionFilterChipsUi = TransactionFilterChipsUi(
-    dateRange = TransactionDateRange.FollowPeriod,
-    type = TransactionTypeFilter.All,
-    accountCount = 0,
-    accountName = null,
-    categoryCount = 0,
-    categoryName = null,
-    sort = TransactionSort.Newest,
-)
+/** The other empty state: rows exist, the filters are hiding them, so the CTA is the way back. */
+@Preview
+@Composable
+private fun TransactionsByAccountEmptyFilteredPreview() {
+    AppTheme {
+        TransactionsByAccountContent(
+            state = TransactionsByAccountState.Content(
+                accountId = AccountId("preview-acc-1"),
+                accountName = "Savings",
+                groups = emptyList(),
+                showAccountOnRows = false,
+                summary = previewEmptySummary(),
+                query = "",
+                filters = previewChips().copy(type = TransactionTypeFilter.Transfer),
+                activeFilterCount = 1,
+                isFiltered = true,
+                periodMode = TransactionPeriodMode.Month,
+                period = TransactionPeriodUi.Month(monthNumber = 3, year = 2025),
+                showPeriodPager = true,
+                canGoToPreviousPeriod = true,
+                canGoToNextPeriod = false,
+                canLoadMore = false,
+            ),
+            onEvent = {},
+        )
+    }
+}

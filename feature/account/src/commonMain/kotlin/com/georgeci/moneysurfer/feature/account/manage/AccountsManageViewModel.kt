@@ -9,6 +9,7 @@ import com.georgeci.moneysurfer.domain.primitives.AccountType
 import com.georgeci.moneysurfer.domain.usecase.ArchiveAccountUseCase
 import com.georgeci.moneysurfer.domain.usecase.DeleteAccountUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetAccountsUseCase
+import com.georgeci.moneysurfer.domain.usecase.ReorderAccountsUseCase
 import com.georgeci.moneysurfer.domain.usecase.RestoreAccountUseCase
 import com.georgeci.moneysurfer.feature.account.generated.resources.Res
 import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_manage_action_failed
@@ -17,6 +18,8 @@ import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_man
 import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_manage_deleted_snackbar
 import com.georgeci.moneysurfer.navigation.SnackbarController
 import com.georgeci.moneysurfer.utils.MviViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -28,13 +31,37 @@ class AccountsManageViewModel(
     private val deleteAccount: DeleteAccountUseCase,
     private val archiveAccount: ArchiveAccountUseCase,
     private val restoreAccount: RestoreAccountUseCase,
+    private val reorderAccounts: ReorderAccountsUseCase,
     private val snackbar: SnackbarController,
 ) : MviViewModel<AccountsManageState, AccountsManageEvent, AccountsManageEffect>(
     initialState = AccountsManageState.Loading,
 ) {
 
+    /**
+     * The order the user has dragged the active accounts into, or null while the database is the
+     * only authority on it. A drag is persisted on drop, so between the first move and the write
+     * landing the stored order is stale — and even afterwards an unrelated emission (a balance
+     * recalculation, a sync pull) can carry the old one. Without this overlay either would snap
+     * the rows back out from under the finger.
+     */
+    private var userOrder: List<AccountId>? = null
+
+    /**
+     * The order waiting to be written, or null until something is dropped. Each drop would
+     * otherwise start its own write coroutine, and two of those can read the table before either
+     * has written it: the second then finds a row already sitting at its target position, skips
+     * it, and leaves the list in an order nobody chose. One writer draining a conflated flow
+     * keeps the last drop last.
+     */
+    private val pendingOrder = MutableStateFlow<List<AccountId>?>(null)
+
     init {
         observeAccounts()
+        launch {
+            pendingOrder.filterNotNull().collect { order ->
+                reorderAccounts(order).onLeft { snackbar.show(Res.string.accounts_manage_action_failed) }
+            }
+        }
     }
 
     override fun onEvent(event: AccountsManageEvent) {
@@ -50,7 +77,24 @@ class AccountsManageViewModel(
             is AccountsManageEvent.OnRemoveAccountClick -> requestDelete(event.accountId)
             AccountsManageEvent.OnDeleteCancel -> dismissDelete()
             AccountsManageEvent.OnDeleteConfirm -> confirmDelete()
+            is AccountsManageEvent.OnAccountMove -> moveAccount(from = event.from, to = event.to)
+            AccountsManageEvent.OnAccountMoveEnd -> persistUserOrder()
         }
+    }
+
+    /**
+     * Moves [from] into the slot [to] holds right now. State only — a drag reports a move every
+     * half row, and the order is written once, when the row is dropped.
+     */
+    private fun moveAccount(from: AccountId, to: AccountId) {
+        val content = currentState as? AccountsManageState.Content ?: return
+        val reordered = content.activeAccounts.moved(from = from, to = to) ?: return
+        userOrder = reordered.map { it.id }
+        updateState { AccountsManageState.content.activeAccounts.modify(this) { reordered } }
+    }
+
+    private fun persistUserOrder() {
+        pendingOrder.value = userOrder ?: return
     }
 
     private fun toggleEditMode() = updateState {
@@ -143,9 +187,14 @@ class AccountsManageViewModel(
     private fun observeAccounts() {
         launch {
             getAccounts().collect { accounts ->
-                val active = accounts.filterNot { it.archived }.map { it.toUi() }
+                val stored = accounts.filterNot { it.archived }
+                val activeAccounts = userOrder?.let(stored::orderedBy) ?: stored
+                // Once the database agrees with the drag, it is the authority again — including
+                // when it agrees only because an account the drag named has since been deleted.
+                if (activeAccounts == stored) userOrder = null
+                val active = activeAccounts.map { it.toUi() }
                 val archived = accounts.filter { it.archived }.map { it.toUi() }
-                val totals = accounts.filterNot { it.archived }.formattedTotalsByCurrency()
+                val totals = activeAccounts.formattedTotalsByCurrency()
                 updateState {
                     when (this) {
                         is AccountsManageState.Loading -> AccountsManageState.Content(
@@ -166,16 +215,33 @@ class AccountsManageViewModel(
             }
         }
     }
-
-    private fun Account.toUi() = AccountManageUi(
-        id = id,
-        name = name,
-        type = type,
-        formattedBalance = MoneyFormatter.format(balance, currencyCode),
-        currency = currencyCode.value,
-        archivedOn = archivedAt?.toLocalDateTime(TimeZone.currentSystemDefault())?.date,
-    )
 }
+
+/**
+ * The accounts of the receiver arranged the way [order] names them. Accounts [order] says nothing
+ * about — created since the drag — keep the position they came in with, after the placed ones.
+ */
+private fun List<Account>.orderedBy(order: List<AccountId>): List<Account> {
+    val positions = order.withIndex().associate { (index, id) -> id to index }
+    return sortedBy { positions[it.id] ?: Int.MAX_VALUE }
+}
+
+private fun List<AccountManageUi>.moved(from: AccountId, to: AccountId): List<AccountManageUi>? {
+    if (from == to) return null
+    val fromIndex = indexOfFirst { it.id == from }
+    val toIndex = indexOfFirst { it.id == to }
+    if (fromIndex < 0 || toIndex < 0) return null
+    return toMutableList().apply { add(toIndex, removeAt(fromIndex)) }
+}
+
+private fun Account.toUi() = AccountManageUi(
+    id = id,
+    name = name,
+    type = type,
+    formattedBalance = MoneyFormatter.format(balance, currencyCode),
+    currency = currencyCode.value,
+    archivedOn = archivedAt?.toLocalDateTime(TimeZone.currentSystemDefault())?.date,
+)
 
 @optics
 sealed interface AccountsManageState {
@@ -234,6 +300,12 @@ sealed interface AccountsManageEvent {
     data class OnRemoveAccountClick(val accountId: AccountId) : AccountsManageEvent
     data object OnDeleteConfirm : AccountsManageEvent
     data object OnDeleteCancel : AccountsManageEvent
+
+    /** [from] was dragged onto the slot [to] occupies right now, among the active accounts. */
+    data class OnAccountMove(val from: AccountId, val to: AccountId) : AccountsManageEvent
+
+    /** The dragged row was dropped — write the order the moves have built up. */
+    data object OnAccountMoveEnd : AccountsManageEvent
 }
 
 sealed interface AccountsManageEffect {

@@ -51,6 +51,7 @@ import moneysurfer.feature.transaction.generated.resources.transaction_filters_s
 import moneysurfer.feature.transaction.generated.resources.transaction_filters_type_all
 import moneysurfer.feature.transaction.generated.resources.transaction_filters_type_expenses
 import moneysurfer.feature.transaction.generated.resources.transaction_filters_type_income
+import moneysurfer.feature.transaction.generated.resources.transaction_filters_type_transfer
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -71,6 +72,7 @@ internal fun TypeSection(
         TransactionTypeFilter.All to stringResource(Res.string.transaction_filters_type_all),
         TransactionTypeFilter.Expenses to stringResource(Res.string.transaction_filters_type_expenses),
         TransactionTypeFilter.Income to stringResource(Res.string.transaction_filters_type_income),
+        TransactionTypeFilter.Transfer to stringResource(Res.string.transaction_filters_type_transfer),
     )
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         FilterSectionHeader(stringResource(Res.string.transaction_filters_section_type))

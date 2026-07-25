@@ -9,6 +9,7 @@
 - [Firebase bootstrap (emulator)](#firebase-bootstrap-emulator)
 - [QA tasks](#qa-tasks)
 - [Plain test/Maestro tasks (no Allure)](#plain-testmaestro-tasks-no-allure)
+  - [iOS scope: launch smoke only (issue #297)](#ios-scope-launch-smoke-only-issue-297)
 - [Desktop UI tests (:composeApp:jvmTest)](#desktop-ui-tests-composeappjvmtest)
 - [Integration tests (:integration-test)](#integration-tests-integration-test)
   - [Running locally](#running-locally)
@@ -111,9 +112,17 @@ FIREBASE_PROJECT_ID=demo-moneysurfer scripts/firebase/start.sh
 | `./gradlew qaAndroidHost` | `testAndroidHost` | yes | `build/reports/allure/android-host/` |
 | `./gradlew qaAndroidDevice` | `testAndroidDevice` (instrumented) | — | `build/reports/allure/android-device/` |
 | `./gradlew qaMaestroAndroid` / `qaMaestro` | Android flows via `firebase emulators:exec` + seed | — | `build/reports/allure/maestro/` |
-| `./gradlew qaMaestroIos` | iOS Simulator flows via `firebase emulators:exec` + seed | — | `build/reports/allure/maestro-ios/` |
+| `./gradlew qaMaestroIos` | iOS Simulator **launch smoke only** (see below) via `firebase emulators:exec` + seed | — | `build/reports/allure/maestro-ios/` |
 | `./gradlew qaFirestoreRules` | Mocha (`firestore-tests/`) via `firebase emulators:exec --only firestore` | — | `build/reports/allure/firestore/` |
-| `./gradlew qaAll` | `testAllScopes` (common + Android host + Android device; no Maestro/Firestore-rules run) | yes | `build/reports/allure/all/` |
+| `./gradlew qaJvmAndAndroid` | `testAllScopes` (common + Android host + Android device; no Maestro/Firestore-rules run) | yes | `build/reports/allure/all/` |
+
+`qaAll` is a deprecated compatibility alias for `qaJvmAndAndroid`; it is not
+an exhaustive run of every QA scope.
+
+The common and Android-host aggregates discover test owners from
+`commonTest`, `jvmTest`, and `androidHostTest` source directories rather than a
+maintained module list. Adding one of those source sets is therefore enough to
+join the corresponding aggregate.
 
 ## Plain test/Maestro tasks (no Allure)
 
@@ -139,6 +148,26 @@ FIREBASE_PROJECT_ID=demo-moneysurfer scripts/firebase/start.sh
 iOS defaults to simulator name `iPhone 17`. Override with
 `-PiosSimulatorName="<name>"`; pass `-PiosSimulatorUdid=<udid>` when multiple
 simulators are visible to Maestro.
+
+### iOS scope: launch smoke only (issue #297)
+
+The iOS E2E suites were non-deterministically red, so the two iOS entry points
+are cut back to a single flow — [`scripts/maestro/ios/app-open.yaml`](../../scripts/maestro/ios/app-open.yaml):
+install → launch with `clearState` → assert onboarding renders. It is
+build-agnostic (`appId: ${APP_ID}`), so the same flow covers both apps:
+
+| Task | App | Flow |
+|---|---|---|
+| `./gradlew qaMaestroIos` | online `.dev` build | launch smoke |
+| `./gradlew qaMaestroOfflineIos` | offline `.dev` build | launch smoke |
+
+Nothing was deleted: the online suite (`scripts/maestro/*.yaml`) and the offline
+golden path (`scripts/maestro/offline/offline-golden.yaml`) still run in full on
+Android via `qaMaestroAndroid` / `qaMaestroOfflineAndroid`. To drive the whole
+suite on iOS while the flake work is in progress, use `maestroRunAllIos` /
+`maestroRunAllIosJunit` (Firebase Emulator must already be running). Restoring
+the suite in the QA tasks is a one-line change back to the `scripts/maestro/`
+target in [`gradle/qa.gradle.kts`](../../gradle/qa.gradle.kts).
 
 ## Desktop UI tests (`:composeApp:jvmTest`)
 

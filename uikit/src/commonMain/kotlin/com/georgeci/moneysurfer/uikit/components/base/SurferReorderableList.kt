@@ -35,6 +35,7 @@ class SurferReorderState internal constructor(
     private val listState: LazyListState,
     private val reorderableKeys: State<List<Any>>,
     private val onMove: State<(from: Any, to: Any) -> Unit>,
+    private val onMoveEnd: State<() -> Unit>,
 ) {
 
     /** Key of the row under the finger, or null when nothing is being dragged. */
@@ -94,9 +95,13 @@ class SurferReorderState internal constructor(
     }
 
     internal fun onDragStop() {
+        val wasDragging = draggingKey != null
         draggingKey = null
         draggingIndex = null
         draggedDistance = 0f
+        // Only after a real drag: the gesture detector also reports a stop for a touch that never
+        // moved, and a caller that persists on drop should not write on a plain tap of the grip.
+        if (wasDragging) onMoveEnd.value()
     }
 }
 
@@ -104,17 +109,22 @@ class SurferReorderState internal constructor(
  * Remembers the reorder state for [listState]. [keys] are the keys of the reorderable rows in
  * their current order — pass them fresh on every recomposition; the state reads the latest value
  * rather than the one captured when it was created. [onMove] receives the dragged row's key and
- * the key of the row whose slot it should take.
+ * the key of the row whose slot it should take. [onMoveEnd] fires once when the row is dropped,
+ * for callers that would rather persist the settled order than every intermediate one.
  */
 @Composable
 fun rememberSurferReorderState(
     listState: LazyListState,
     keys: List<Any>,
     onMove: (from: Any, to: Any) -> Unit,
+    onMoveEnd: () -> Unit = {},
 ): SurferReorderState {
     val currentKeys = rememberUpdatedState(keys)
     val currentOnMove = rememberUpdatedState(onMove)
-    return remember(listState) { SurferReorderState(listState, currentKeys, currentOnMove) }
+    val currentOnMoveEnd = rememberUpdatedState(onMoveEnd)
+    return remember(listState) {
+        SurferReorderState(listState, currentKeys, currentOnMove, currentOnMoveEnd)
+    }
 }
 
 /**

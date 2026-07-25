@@ -38,6 +38,8 @@ fun SurferEmptyState(
     subtitle: String? = null,
     icon: ImageVector = SurferIcons.Info,
     actionLabel: String? = null,
+    /** Leading glyph of the CTA. Defaults to `Add` — the common "create the first one" case. */
+    actionIcon: ImageVector = SurferIcons.Add,
     onActionClick: (() -> Unit)? = null,
     actionTestTag: String? = null,
 ) {
@@ -81,7 +83,7 @@ fun SurferEmptyState(
                 text = actionLabel,
                 onClick = onActionClick,
                 style = SurferButtonStyle.Tonal,
-                startIcon = SurferIcons.Add,
+                startIcon = actionIcon,
                 modifier = Modifier
                     .padding(top = AppTheme.spacing.xSmall)
                     .then(actionTestTag?.let { Modifier.testTag(it) } ?: Modifier),

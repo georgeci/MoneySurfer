@@ -26,6 +26,12 @@ import com.georgeci.moneysurfer.uikit.theme.AppTheme
 /** Opacity of the income amount pill's tint wash. */
 private const val INCOME_PILL_WASH_ALPHA = 0.14f
 
+/**
+ * Rows a compact card shows. The widget is handed the same list either way — the dashboard has no
+ * idea which size the user picked for it — so the trimming has to happen here.
+ */
+private const val COMPACT_ROWS = 3
+
 data class SurferRecentTransactionItem(
     val id: String,
     val title: String,
@@ -53,6 +59,7 @@ fun SurferRecentTransactionsWidget(
     seeAllLabel: String,
     onSeeAllClick: () -> Unit,
     modifier: Modifier = Modifier,
+    size: SurferWidgetSize = LocalSurferWidgetSize.current,
     onItemClick: ((SurferRecentTransactionItem) -> Unit)? = null,
     emptyIcon: ImageVector = SurferIcons.Receipt,
     emptyTitle: String? = null,
@@ -60,6 +67,8 @@ fun SurferRecentTransactionsWidget(
     seeAllTestTag: String? = null,
     emptyTestTag: String? = null,
 ) {
+    val hero = size == SurferWidgetSize.Hero
+    val visibleItems = if (hero) items else items.take(COMPACT_ROWS)
     val incomeColor = AppTheme.semanticColors.income
 
     // The income amount is `incomeColor` text on a wash of the same colour, so leaving the
@@ -103,9 +112,9 @@ fun SurferRecentTransactionsWidget(
             )
         } else {
             Column(
-                verticalArrangement = Arrangement.spacedBy(12.dp),
+                verticalArrangement = Arrangement.spacedBy(if (hero) 12.dp else 8.dp),
             ) {
-                items.forEach { transaction ->
+                visibleItems.forEach { transaction ->
                     SurferTransactionLine(
                         icon = transaction.icon ?: SurferIcons.Receipt,
                         title = transaction.title,

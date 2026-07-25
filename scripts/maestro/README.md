@@ -107,3 +107,12 @@ is fixture data or a validation message, by the rule above.
 - `sync` — needs the sync feature flag on; `14_force_sync_now.yaml` cannot pass in the shipped
   online build (see #110).
 - `offline` — the offline-build suite under `offline/`.
+- `smoke` — the iOS launch smoke, `ios/app-open.yaml`.
+
+## Where each suite runs
+
+The numbered flows in this directory are the **Android** online suite. The iOS lanes
+(`qaMaestroIos`, `qaMaestroOfflineIos`) were cut back to the single launch smoke in `ios/` while
+the flake work continues (#348) — so a flow added here gets iOS coverage only through
+`maestroRunAllIos`, run locally against a simulator. That does not make iOS-specific selector
+notes obsolete: the flows still have to work there, and `maestroRunAllIos` is the check.

@@ -16,9 +16,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilledTonalButton
@@ -26,7 +23,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -42,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
+import com.georgeci.moneysurfer.feature.transaction.delete.TransactionDeleteConfirmationDialog
 import com.georgeci.moneysurfer.uikit.components.SurferCategoryBubble
 import com.georgeci.moneysurfer.uikit.components.SurferCategoryPalette
 import com.georgeci.moneysurfer.uikit.components.SurferCategoryVisual
@@ -59,12 +56,7 @@ import moneysurfer.feature.transaction.generated.resources.Res
 import moneysurfer.feature.transaction.generated.resources.transaction_details_account_label
 import moneysurfer.feature.transaction.generated.resources.transaction_details_category_label
 import moneysurfer.feature.transaction.generated.resources.transaction_details_category_nested
-import moneysurfer.feature.transaction.generated.resources.transaction_details_delete_cancel
-import moneysurfer.feature.transaction.generated.resources.transaction_details_delete_confirm
 import moneysurfer.feature.transaction.generated.resources.transaction_details_delete_content_description
-import moneysurfer.feature.transaction.generated.resources.transaction_details_delete_message
-import moneysurfer.feature.transaction.generated.resources.transaction_details_delete_message_generic
-import moneysurfer.feature.transaction.generated.resources.transaction_details_delete_title
 import moneysurfer.feature.transaction.generated.resources.transaction_details_duplicate
 import moneysurfer.feature.transaction.generated.resources.transaction_details_edit_content_description
 import moneysurfer.feature.transaction.generated.resources.transaction_details_from_label
@@ -147,7 +139,7 @@ private fun TransactionDetailsContent(
     onEvent: (TransactionDetailsEvent) -> Unit,
 ) {
     if (state.showDeleteConfirmation) {
-        DeleteConfirmationDialog(
+        TransactionDeleteConfirmationDialog(
             noteOrNull = state.note.ifBlank { null },
             onConfirm = { onEvent(TransactionDetailsEvent.OnDeleteConfirmed) },
             onDismiss = { onEvent(TransactionDetailsEvent.OnDeleteDismissed) },
@@ -546,57 +538,6 @@ private fun DetailRow(spec: DetailRowSpec) {
             )
         }
     }
-}
-
-@Composable
-private fun DeleteConfirmationDialog(
-    noteOrNull: String?,
-    onConfirm: () -> Unit,
-    onDismiss: () -> Unit,
-) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        icon = {
-            Icon(
-                imageVector = SurferIcons.Delete,
-                contentDescription = SurferSemantics.Decorative,
-                tint = AppTheme.materialColors.error,
-            )
-        },
-        title = {
-            Text(
-                text = stringResource(Res.string.transaction_details_delete_title),
-                textAlign = TextAlign.Center,
-            )
-        },
-        text = {
-            val msg = if (noteOrNull != null) {
-                stringResource(Res.string.transaction_details_delete_message, noteOrNull)
-            } else {
-                stringResource(Res.string.transaction_details_delete_message_generic)
-            }
-            Text(text = msg, textAlign = TextAlign.Center)
-        },
-        confirmButton = {
-            Button(
-                onClick = onConfirm,
-                modifier = Modifier
-                    .surferTestTagAsId()
-                    .testTag(TransactionDetailsTestTags.ConfirmDelete),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = AppTheme.materialColors.error,
-                    contentColor = AppTheme.materialColors.onError,
-                ),
-            ) {
-                Text(stringResource(Res.string.transaction_details_delete_confirm))
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text(stringResource(Res.string.transaction_details_delete_cancel))
-            }
-        },
-    )
 }
 
 private fun previewExpense(showDeleteConfirmation: Boolean = false, isPlanned: Boolean = false) =

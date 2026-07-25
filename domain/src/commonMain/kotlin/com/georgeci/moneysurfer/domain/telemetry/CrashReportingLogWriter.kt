@@ -5,7 +5,7 @@ import co.touchlab.kermit.Severity
 
 /**
  * Bridges Kermit into [CrashReporter]: every Warn-and-above line becomes a Crashlytics
- * breadcrumb, and every Error/Assert line that carries a [Throwable] is additionally
+ * breadcrumb, and every Warn-and-above line that carries a [Throwable] is additionally
  * recorded as a non-fatal.
  *
  * The [Severity.Warn] floor is deliberate and matches the release min-severity set by
@@ -27,7 +27,7 @@ class CrashReportingLogWriter(
     ) {
         crashReporter.log("${severity.name.uppercase()}/${tag.ifBlank { "NoTag" }}: $message")
 
-        if (severity >= Severity.Error && throwable != null) {
+        if (severity >= Severity.Warn && throwable != null) {
             crashReporter.record(throwable)
         }
     }

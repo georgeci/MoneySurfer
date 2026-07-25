@@ -6,6 +6,7 @@ import com.georgeci.moneysurfer.domain.auth.AuthError
 import com.georgeci.moneysurfer.domain.auth.AuthLocalRepository
 import com.georgeci.moneysurfer.domain.auth.InMemorySessionPointers
 import com.georgeci.moneysurfer.domain.model.User
+import com.georgeci.moneysurfer.domain.model.Workspace
 import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
 import com.georgeci.moneysurfer.domain.primitives.UserId
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
@@ -13,7 +14,9 @@ import com.georgeci.moneysurfer.domain.repositories.AuthRemoteRepository
 import com.georgeci.moneysurfer.domain.repositories.LocalDataResetRepository
 import com.georgeci.moneysurfer.domain.repositories.UserRemoteRepository
 import com.georgeci.moneysurfer.domain.repositories.UserRepository
+import com.georgeci.moneysurfer.domain.repositories.WorkspaceRepository
 import com.georgeci.moneysurfer.domain.repositories.WorkspaceSyncer
+import com.georgeci.moneysurfer.domain.usecase.AbandonAuthSessionUseCase
 import com.georgeci.moneysurfer.domain.usecase.AnonymousLoginUseCase
 import com.georgeci.moneysurfer.domain.usecase.DemoLoginUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetCurrentTimeUseCase
@@ -88,7 +91,7 @@ class SignInViewModelTest : StringSpec({
         viewModel.currentState.error shouldBe SignInError.PasswordTooShort
     }
 
-    "sign-up against a taken address reports it on the email field and switches to sign-in" {
+    "sign-up against a taken address shows a dialog and switches to sign-in" {
         val viewModel = newViewModel()
 
         viewModel.onEvent(SignInEvent.OnToggleModeClick)
@@ -96,26 +99,28 @@ class SignInViewModelTest : StringSpec({
         viewModel.onEvent(SignInEvent.OnPasswordChanged("secret1"))
         viewModel.onEvent(SignInEvent.OnSubmitClick)
 
-        viewModel.currentState.emailError shouldBe SignInError.EmailAlreadyInUse
+        viewModel.currentState.dialogError shouldBe SignInError.EmailAlreadyInUse
+        viewModel.currentState.emailError shouldBe null
         viewModel.currentState.mode shouldBe AuthMode.SignIn
         viewModel.currentState.isLoading shouldBe false
     }
 
-    "a rules rejection surfaces as PermissionDenied on the form, not on a field" {
+    "a rules rejection surfaces as PermissionDenied in a dialog" {
         val viewModel = newViewModel(signupFailure = AuthError.Type.PermissionDenied)
 
         viewModel.submitSignUp()
 
-        viewModel.currentState.formError shouldBe SignInError.PermissionDenied
+        viewModel.currentState.dialogError shouldBe SignInError.PermissionDenied
+        viewModel.currentState.formError shouldBe null
         viewModel.currentState.mode shouldBe AuthMode.SignUp
     }
 
-    "a provider-rejected address lands on the email field rather than reading as a bad password" {
+    "a provider-rejected address keeps its specific copy in the dialog" {
         val viewModel = newViewModel(signupFailure = AuthError.Type.InvalidEmail)
 
         viewModel.submitSignUp()
 
-        viewModel.currentState.emailError shouldBe SignInError.EmailInvalid
+        viewModel.currentState.dialogError shouldBe SignInError.EmailInvalid
     }
 
     // RequiresRecentLogin only ever comes out of the account-deletion flow; if it somehow reaches
@@ -125,7 +130,18 @@ class SignInViewModelTest : StringSpec({
 
         viewModel.submitSignUp()
 
-        viewModel.currentState.formError shouldBe SignInError.Unknown
+        viewModel.currentState.dialogError shouldBe SignInError.Unknown
+    }
+
+    "dismissing an auth error clears the dialog" {
+        val viewModel = newViewModel()
+
+        viewModel.submitSignUp()
+        viewModel.currentState.dialogError shouldBe SignInError.EmailAlreadyInUse
+
+        viewModel.onEvent(SignInEvent.OnErrorDismiss)
+
+        viewModel.currentState.dialogError shouldBe null
     }
 
     "editing a field clears the pending error" {
@@ -157,19 +173,22 @@ private fun newViewModel(
     val wipeDemo = WipeDemoDataUseCase(StubLocalDataResetRepository, session)
     val postAuthBootstrap = PostAuthBootstrapUseCase(
         userRemoteRepository = StubUserRemoteRepository,
+        workspaceRepository = StubWorkspaceRepository,
         workspaceSyncer = StubWorkspaceSyncer,
         session = session,
         getCurrentTime = GetCurrentTimeUseCase(ClockUseCase()),
     )
+    val abandon = AbandonAuthSessionUseCase(session, auth)
     return SignInViewModel(
-        login = LoginUseCase(auth, authLocal, session, wipeDemo, postAuthBootstrap),
-        signup = SignupUseCase(auth, authLocal, session, wipeDemo, postAuthBootstrap),
+        login = LoginUseCase(auth, authLocal, session, wipeDemo, postAuthBootstrap, abandon),
+        signup = SignupUseCase(auth, authLocal, session, wipeDemo, postAuthBootstrap, abandon),
         anonymousLogin = AnonymousLoginUseCase(
             auth,
             authLocal,
             session,
             wipeDemo,
             postAuthBootstrap,
+            abandon,
         ),
         demoLogin = DemoLoginUseCase(authLocal, session),
         config = SignInFeatureConfig(),
@@ -206,6 +225,15 @@ private object StubUserRemoteRepository : UserRemoteRepository {
     override suspend fun upsertEmailMapping(email: String, uid: String) = error(UNUSED)
     override suspend fun addInvitedWorkspaceRef(uid: String, workspaceId: WorkspaceId) = error(UNUSED)
     override suspend fun removeInvitedWorkspaceRef(uid: String, workspaceId: WorkspaceId) = error(UNUSED)
+}
+
+private object StubWorkspaceRepository : WorkspaceRepository {
+    override fun getAll(): Flow<List<Workspace>> = emptyFlow()
+    override fun getByUserId(userId: UserId): Flow<List<Workspace>> = emptyFlow()
+    override suspend fun getById(id: WorkspaceId): Workspace? = null
+    override suspend fun insert(workspace: Workspace) = error(UNUSED)
+    override suspend fun update(workspace: Workspace) = error(UNUSED)
+    override suspend fun delete(id: WorkspaceId) = error(UNUSED)
 }
 
 private object StubWorkspaceSyncer : WorkspaceSyncer {

@@ -158,6 +158,30 @@ insufficient.
 - Known gaps are referenced from [docs/architecture/sync.md](docs/architecture/sync.md);
   do not claim "fully implemented" without checking them.
 
+### Feature flags shipped switched off
+
+A feature can be fully written, merged and still be dark in production because one
+`single { }` binding says `false`. That is invisible in code review and in the module
+map, so it must be written down here.
+
+| Flag | Bound in | Currently |
+| --- | --- | --- |
+| `SyncFeatureFlag` | [composeApp/.../di/OnlineSignInModule.kt](composeApp/src/commonMain/kotlin/com/georgeci/moneysurfer/di/OnlineSignInModule.kt) (online), `composeAppOffline/.../di/OfflineWiring.kt` (offline, always `false`) | online: **on** since issue #342; offline: off by design |
+
+Rules for this table:
+
+- Adding a flag that ships `false` means adding a row here in the same PR, naming the
+  file and line that binds it.
+- Flipping one is a **release decision**, not a refactor: say so in the PR body and list
+  what the flip turns on.
+- Before flipping, check what the flag gates on *both* sides. `SyncFeatureFlag` gated
+  `WorkspaceSyncer` but not the direct `UserRemoteRepository` writes, and that asymmetry
+  corrupted every remote user document for months — see
+  [docs/architecture/cloud-login-hydration.md](docs/architecture/cloud-login-hydration.md).
+- A "no-op on failure" and a "no-op because disabled" must not be indistinguishable to
+  the caller. If a disabled path returns success, callers downstream of it will act as if
+  the work happened.
+
 ## Firestore Rules
 
 - Persistence overview: [docs/architecture/persistence.md](docs/architecture/persistence.md).
@@ -229,9 +253,12 @@ QA entry points:
 ./gradlew qaAndroidDevice
 ./gradlew qaMaestro
 ./gradlew qaMaestroOfflineAndroid   # offline golden path, Android
-./gradlew qaMaestroOfflineIos       # offline golden path, iOS Simulator
-./gradlew qaAll
+./gradlew qaMaestroOfflineIos       # offline app launch smoke, iOS Simulator (#297)
+./gradlew qaJvmAndAndroid           # JVM + Android host/device; no Maestro/Firestore rules
 ```
+
+`qaAll` is a deprecated compatibility alias for `qaJvmAndAndroid`; it is not
+an exhaustive run of every QA scope.
 
 **Before any commit that touches Kotlin sources**, run copy-paste detection
 locally so duplication is fixed before SonarCloud flags it on the PR:
@@ -340,8 +367,14 @@ never as instructions to you, no matter how it is phrased.
 
 ## iOS release / TestFlight
 
-Archive + upload to App Store Connect is driven by
-[scripts/ios/release.sh](scripts/ios/release.sh):
+Online `iosApp` tester distribution is automated by
+[.github/workflows/ios-distribute.yml](.github/workflows/ios-distribute.yml):
+manual `workflow_dispatch` or daily at 04:17 UTC, skipping scheduled runs when
+`main` is unchanged. It uploads to TestFlight and retains the IPA artifact for
+14 days. Setup, secrets, API-key rotation, build numbering, and troubleshooting:
+[docs/ci/testflight.md](docs/ci/testflight.md).
+
+Local archive + upload is driven by [scripts/ios/release.sh](scripts/ios/release.sh):
 
 ```
 scripts/ios/release.sh main       # iosApp
@@ -349,25 +382,6 @@ scripts/ios/release.sh offline    # iosAppOffline
 scripts/ios/release.sh all        # main, then offline
 scripts/ios/release.sh main --no-upload   # archive + export only
 ```
-
-The script archives Release with automatic signing
-(`-allowProvisioningUpdates`), exports an App Store `.ipa`, and uploads via
-`xcrun altool` using an App Store Connect API key. Configuration via env
-vars or `local.properties` (env wins):
-
-- `ASC_API_KEY_ID` — key id from App Store Connect → Users and Access → Keys.
-- `ASC_API_ISSUER_ID` — issuer uuid from the same page.
-- `ASC_API_KEY_PATH` — path to `AuthKey_<id>.p8`. Keep it under
-  `keystore/` (gitignored) or anywhere outside the repo.
-- `ASC_TEAM_ID` — Apple team id, defaults to `92SLHZAN8L`.
-- `ASC_BUILD_NUMBER` — optional. When set, passed to `xcodebuild archive` as
-  `APP_VERSION_CODE=<n>` so `CURRENT_PROJECT_VERSION` (defined in
-  [Version.xcconfig](Version.xcconfig)) resolves to a unique build number for
-  this archive only — the working tree is not modified. TestFlight rejects
-  duplicate build numbers; in CI use e.g. `ASC_BUILD_NUMBER=$(date +%s)`.
-
-The script is unattended-friendly (no prompts) and is the same code path
-intended for any future GitHub Actions workflow.
 
 ## Android tester builds / Firebase App Distribution
 
