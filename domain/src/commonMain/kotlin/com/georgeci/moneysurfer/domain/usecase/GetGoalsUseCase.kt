@@ -31,7 +31,7 @@ class GetGoalsUseCase(
 ) {
 
     operator fun invoke(includeArchived: Boolean = false): Flow<List<SavingsGoalSummary>> =
-        session.currentWorkspaceId.flow.flatMapLatest { workspaceId ->
+        session.currentWorkspaceId.flatMapLatest { workspaceId ->
             workspaceId ?: return@flatMapLatest flowOf(emptyList())
             combine(
                 goalRepository.getByWorkspaceId(workspaceId),

@@ -13,6 +13,10 @@
 }%%
 
 graph LR
+  subgraph :app-config
+    :app-config:api["api"]
+    :app-config:default["default"]
+  end
   subgraph :feature
     :feature:goal["goal"]
     :feature:account["account"]
@@ -50,8 +54,12 @@ graph LR
   :sync-surfer --> :data-remote
   :sync-surfer --> :data-test-fixtures
   :sync-surfer --> :domain-test-fixtures
+  :app-config:api --> :domain
+  :app-config:default --> :app-config:api
+  :app-config:default --> :domain
   :data-local --> :domain
   :data-local --> :sync:api
+  :data-local --> :app-config:api
   :data-local --> :domain-test-fixtures
   :feature:settings --> :domain
   :feature:settings --> :navigation
@@ -70,6 +78,7 @@ graph LR
   :androidApp-offline --> :composeAppOffline
   :androidApp-offline --> :shared
   :shared --> :domain
+  :shared --> :app-config:api
   :shared --> :uikit
   :shared --> :utils
   :shared --> :data-local
@@ -98,6 +107,8 @@ graph LR
   :androidApp --> :shared
   :composeAppOffline --> :shared
   :composeAppOffline --> :domain
+  :composeAppOffline --> :app-config:api
+  :composeAppOffline --> :app-config:default
   :composeAppOffline --> :feature:login
   :composeAppOffline --> :feature:transaction
   :composeAppOffline --> :sync:api
@@ -146,6 +157,8 @@ graph LR
   :domain-test-fixtures --> :domain
   :composeApp --> :shared
   :composeApp --> :domain
+  :composeApp --> :app-config:api
+  :composeApp --> :app-config:default
   :composeApp --> :feature:login
   :composeApp --> :feature:transaction
   :composeApp --> :data-remote

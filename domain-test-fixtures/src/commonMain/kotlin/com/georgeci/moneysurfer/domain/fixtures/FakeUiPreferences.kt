@@ -7,11 +7,17 @@ import com.georgeci.moneysurfer.domain.preferences.Pref
 import com.georgeci.moneysurfer.domain.preferences.ThemeMode
 import com.georgeci.moneysurfer.domain.preferences.TransactionPeriodMode
 import com.georgeci.moneysurfer.domain.preferences.UiPreferences
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 /**
  * In-memory [UiPreferences] for ViewModel tests. Every pref is a real `Pref.inMemory`, so writes
  * are observable exactly as they would be through DataStore — reading `flow.first()` back tells
  * you what would have survived process death.
+ *
+ * The one fixture for every module: adding a field to [UiPreferences] should not break unrelated
+ * tests, which is what the hand-written fakes in `feature/login`, `feature/settings` and
+ * `feature/transaction` used to do.
  */
 open class FakeUiPreferences(
     override val isDynamicColorAvailable: Boolean = false,
@@ -25,6 +31,12 @@ open class FakeUiPreferences(
 ) : UiPreferences {
     override val onboardingCompleted: Pref<Boolean> = Pref.inMemory(onboardingCompleted)
     override val paletteSource: Pref<PaletteSource> = Pref.inMemory(paletteSource)
+
+    /** Same clamp the real implementation applies, so a test can assert either side of it. */
+    override val effectivePaletteSource: Flow<PaletteSource> = this.paletteSource.flow.map { stored ->
+        if (stored is PaletteSource.Dynamic && !isDynamicColorAvailable) PaletteSource.DEFAULT else stored
+    }
+
     override val themeMode: Pref<ThemeMode> = Pref.inMemory(themeMode)
     override val containerStyle: Pref<ContainerStyle> = Pref.inMemory(containerStyle)
     override val transactionsPeriodMode: Pref<TransactionPeriodMode> = Pref.inMemory(transactionsPeriodMode)

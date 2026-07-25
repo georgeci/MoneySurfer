@@ -176,4 +176,11 @@ sealed interface Route : NavKey {
     /** Online-only user-account deletion flow (issue #213). */
     @Serializable
     data object SettingsDeleteAccount : Route
+
+    /**
+     * QA configuration panel. Registered in both builds, but Settings only surfaces a way here when
+     * a real debug-overrides layer is bound — release builds resolve `DebugConfigSource.Empty`.
+     */
+    @Serializable
+    data object SettingsDebugConfig : Route
 }

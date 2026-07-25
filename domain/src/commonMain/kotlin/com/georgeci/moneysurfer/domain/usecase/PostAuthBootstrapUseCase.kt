@@ -4,7 +4,7 @@ import arrow.core.Either
 import arrow.core.raise.either
 import co.touchlab.kermit.Logger
 import com.georgeci.moneysurfer.domain.auth.AuthError
-import com.georgeci.moneysurfer.domain.auth.SessionPointers
+import com.georgeci.moneysurfer.domain.auth.SessionMutator
 import com.georgeci.moneysurfer.domain.logging.redactEmail
 import com.georgeci.moneysurfer.domain.logging.redactUid
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
@@ -26,7 +26,7 @@ import org.koin.core.annotation.Single
 class PostAuthBootstrapUseCase(
     private val userRemoteRepository: UserRemoteRepository,
     private val workspaceSyncer: WorkspaceSyncer,
-    private val session: SessionPointers,
+    private val sessionMutator: SessionMutator,
     private val getCurrentTime: GetCurrentTimeUseCase,
 ) {
     private val log = Logger.withTag(TAG)
@@ -102,7 +102,7 @@ class PostAuthBootstrapUseCase(
                 ?: existing.workspaceIds.firstOrNull()
 
             if (resolvedDefault != null) {
-                session.currentWorkspaceId.set(resolvedDefault)
+                sessionMutator.setCurrentWorkspace(resolvedDefault)
                 log.i { "[seed] currentWorkspaceId=${resolvedDefault.value}" }
             }
 

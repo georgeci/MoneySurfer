@@ -200,6 +200,7 @@ private class CreationStack(
         userRemoteRepository = NoOpUserRemoteRepository,
         workspaceSyncer = NoOpWorkspaceSyncer,
         session = session,
+        sessionMutator = session,
         getCurrentTime = GetCurrentTimeUseCase(clock),
     )
 

@@ -3,6 +3,7 @@ package com.georgeci.moneysurfer.domain.usecase
 import arrow.core.Either
 import arrow.core.raise.either
 import co.touchlab.kermit.Logger
+import com.georgeci.moneysurfer.domain.auth.SessionMutator
 import com.georgeci.moneysurfer.domain.auth.SessionPointers
 import com.georgeci.moneysurfer.domain.constants.DEFAULT_CATEGORY_SEEDS
 import com.georgeci.moneysurfer.domain.logging.redactUid
@@ -38,6 +39,7 @@ class CreateWorkspaceUseCase(
     private val userRemoteRepository: UserRemoteRepository,
     private val workspaceSyncer: WorkspaceSyncer,
     private val session: SessionPointers,
+    private val sessionMutator: SessionMutator,
     private val getCurrentTime: GetCurrentTimeUseCase,
 ) {
     private val log = Logger.withTag(TAG)
@@ -49,7 +51,7 @@ class CreateWorkspaceUseCase(
     )
 
     suspend operator fun invoke(params: Params): Either<CreateWorkspaceError, WorkspaceId> = either {
-        val ownerId = session.currentUserId.flow.first()
+        val ownerId = session.currentUserId.first()
             ?: raise(CreateWorkspaceError.NoCurrentUser)
         val newId = WorkspaceId.uuid()
         val now = getCurrentTime()
@@ -70,7 +72,7 @@ class CreateWorkspaceUseCase(
         // pulls with PERMISSION_DENIED via firestore.rules `isMember`).
         //
         // Demo session (no Firebase uid) → no remote contract; success is local-only.
-        val firebaseUid = session.currentFirebaseUid.flow.first()
+        val firebaseUid = session.currentFirebaseUid.first()
         if (firebaseUid != null) {
             Either.catch { workspaceSyncer.pushAll() }
                 .onLeft { log.w(it) { "[remote] pushAll failed wid=${newId.value}" } }
@@ -103,7 +105,7 @@ class CreateWorkspaceUseCase(
             log.i { "[remote] skipped (no Firebase uid — local/demo session)" }
         }
 
-        session.currentWorkspaceId.set(newId)
+        sessionMutator.setCurrentWorkspace(newId)
         log.i { "[done] wid=${newId.value} pinned as current workspace" }
 
         newId

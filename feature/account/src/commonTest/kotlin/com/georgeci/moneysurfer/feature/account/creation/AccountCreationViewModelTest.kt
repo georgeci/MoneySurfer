@@ -2,9 +2,9 @@ package com.georgeci.moneysurfer.feature.account.creation
 
 import androidx.lifecycle.viewModelScope
 import app.cash.turbine.test
-import com.georgeci.moneysurfer.domain.OfflineBuildFlags
 import com.georgeci.moneysurfer.domain.auth.InMemorySessionPointers
 import com.georgeci.moneysurfer.domain.fixtures.EUR
+import com.georgeci.moneysurfer.domain.fixtures.FakeHostCapabilities
 import com.georgeci.moneysurfer.domain.fixtures.RUB
 import com.georgeci.moneysurfer.domain.fixtures.USD
 import com.georgeci.moneysurfer.domain.fixtures.aWorkspace
@@ -559,7 +559,7 @@ private class Fixture(val workspaceId: WorkspaceId) {
         getCurrencies = GetCurrenciesUseCase(currencyRepository),
         updateWorkspaceCurrency = UpdateWorkspaceCurrencyUseCase(workspaceRepository, accountRepository),
         snackbar = snackbar,
-        offlineBuildFlags = OfflineBuildFlags(isOffline = offline),
+        hostCapabilities = FakeHostCapabilities(isOffline = offline),
     )
 }
 

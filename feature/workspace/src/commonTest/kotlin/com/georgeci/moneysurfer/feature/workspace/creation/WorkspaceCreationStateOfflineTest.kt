@@ -7,7 +7,7 @@ import io.kotest.matchers.shouldBe
 /**
  * Locks in the offline-build gating for the workspace creation/edit screen. The Members
  * section (invite row + member list) is remote-only; the offline build hides it via the
- * `isOffline` flag injected from `OfflineBuildFlags`.
+ * `isOffline` flag injected from `HostCapabilities`.
  */
 class WorkspaceCreationStateOfflineTest : StringSpec({
 

@@ -41,7 +41,7 @@ class SeedDefaultsUseCaseTest : StringSpec({
 
         env.workspaceRepo.inserted shouldHaveSize 0
         env.categoryRepo.inserted shouldHaveSize 0
-        env.session.currentWorkspaceId.flow.first() shouldBe PRE_PINNED
+        env.session.currentWorkspaceId.first() shouldBe PRE_PINNED
     }
 
     "repairs missing Cash account when workspace was pinned without one" {
@@ -78,7 +78,7 @@ class SeedDefaultsUseCaseTest : StringSpec({
         account.currencyCode shouldBe CurrencyCode("USD")
         account.balance shouldBe Money.zero()
 
-        env.session.currentWorkspaceId.flow.first() shouldBe ws.id
+        env.session.currentWorkspaceId.first() shouldBe ws.id
     }
 
     "is idempotent — second invocation does not duplicate workspace or Cash account" {
@@ -99,7 +99,7 @@ class SeedDefaultsUseCaseTest : StringSpec({
 
         env.workspaceRepo.inserted shouldHaveSize 0
         env.accountRepo.inserted shouldHaveSize 0
-        env.session.currentWorkspaceId.flow.first() shouldBe null
+        env.session.currentWorkspaceId.first() shouldBe null
     }
 })
 
@@ -126,6 +126,7 @@ private class SeedTestEnv(
         userRemoteRepository = SeedFakeUserRemoteRepo,
         workspaceSyncer = SeedFakeWorkspaceSyncer,
         session = session,
+        sessionMutator = session,
         getCurrentTime = getCurrentTime,
     )
     val useCase = SeedDefaultsUseCase(

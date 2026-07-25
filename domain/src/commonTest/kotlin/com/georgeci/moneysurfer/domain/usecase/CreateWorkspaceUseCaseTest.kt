@@ -40,7 +40,7 @@ class CreateWorkspaceUseCaseTest : StringSpec({
         env.workspaceRepo.inserted shouldHaveSize 0
         env.memberRepo.inserted shouldHaveSize 0
         env.categoryRepo.inserted shouldHaveSize 0
-        env.session.currentWorkspaceId.flow.first() shouldBe null
+        env.session.currentWorkspaceId.first() shouldBe null
     }
 
     "writes workspace, member, default categories and pins it as current (no Firebase session)" {
@@ -83,7 +83,7 @@ class CreateWorkspaceUseCaseTest : StringSpec({
         env.syncer.pushAllCount shouldBe 0
         env.userRemoteRepo.addRefCalls shouldHaveSize 0
         env.userRemoteRepo.setDefaultCalls shouldHaveSize 0
-        env.session.currentWorkspaceId.flow.first() shouldBe newId
+        env.session.currentWorkspaceId.first() shouldBe newId
     }
 
     "trims name and description before insert" {
@@ -111,7 +111,7 @@ class CreateWorkspaceUseCaseTest : StringSpec({
         env.syncer.pushAllCount shouldBe 1
         env.userRemoteRepo.addRefCalls shouldBe listOf(FIREBASE_UID to newId)
         env.userRemoteRepo.setDefaultCalls shouldBe listOf(FIREBASE_UID to newId)
-        env.session.currentWorkspaceId.flow.first() shouldBe newId
+        env.session.currentWorkspaceId.first() shouldBe newId
     }
 
     "still pins workspace when setDefaultWorkspace throws" {
@@ -127,7 +127,7 @@ class CreateWorkspaceUseCaseTest : StringSpec({
         val newId = result.value
         env.userRemoteRepo.addRefCalls shouldBe listOf(FIREBASE_UID to newId)
         env.userRemoteRepo.setDefaultCalls shouldHaveSize 0
-        env.session.currentWorkspaceId.flow.first() shouldBe newId
+        env.session.currentWorkspaceId.first() shouldBe newId
     }
 
     "pushAll failure surfaces as RemoteSyncFailed and skips addRef + pin" {
@@ -149,7 +149,7 @@ class CreateWorkspaceUseCaseTest : StringSpec({
         env.workspaceRepo.inserted.single().id shouldBe (env.workspaceRepo.inserted.single().id)
         env.userRemoteRepo.addRefCalls shouldHaveSize 0
         env.userRemoteRepo.setDefaultCalls shouldHaveSize 0
-        env.session.currentWorkspaceId.flow.first() shouldBe null
+        env.session.currentWorkspaceId.first() shouldBe null
     }
 
     "still pins workspace and succeeds when addWorkspaceRef throws" {
@@ -164,7 +164,7 @@ class CreateWorkspaceUseCaseTest : StringSpec({
         result.shouldBeInstanceOf<Either.Right<WorkspaceId>>()
         val newId = result.value
         env.syncer.pushAllCount shouldBe 1
-        env.session.currentWorkspaceId.flow.first() shouldBe newId
+        env.session.currentWorkspaceId.first() shouldBe newId
     }
 
     "local insert failure returns LocalWriteFailed and skips remote work" {
@@ -184,7 +184,7 @@ class CreateWorkspaceUseCaseTest : StringSpec({
         env.categoryRepo.inserted shouldHaveSize 0
         env.syncer.pushAllCount shouldBe 0
         env.userRemoteRepo.addRefCalls shouldHaveSize 0
-        env.session.currentWorkspaceId.flow.first() shouldBe null
+        env.session.currentWorkspaceId.first() shouldBe null
     }
 
     // -- Regression coverage: workspaceIds must be filled on the happy path --
@@ -266,7 +266,7 @@ class CreateWorkspaceUseCaseTest : StringSpec({
         env.categoryRepo.inserted shouldHaveSize 0
         env.syncer.pushAllCount shouldBe 0
         env.userRemoteRepo.addRefCalls shouldHaveSize 0
-        env.session.currentWorkspaceId.flow.first() shouldBe null
+        env.session.currentWorkspaceId.first() shouldBe null
     }
 
     "category seed failure returns LocalWriteFailed and skips remote work and pin" {
@@ -284,7 +284,7 @@ class CreateWorkspaceUseCaseTest : StringSpec({
         env.workspaceRepo.inserted shouldHaveSize 1
         env.memberRepo.inserted shouldHaveSize 1
         env.syncer.pushAllCount shouldBe 0
-        env.session.currentWorkspaceId.flow.first() shouldBe null
+        env.session.currentWorkspaceId.first() shouldBe null
     }
 
     "pushAll failure keeps all local rows so a retry can re-push them" {
@@ -309,7 +309,7 @@ class CreateWorkspaceUseCaseTest : StringSpec({
 
         first shouldNotBe second
         env.workspaceRepo.inserted.map { it.id } shouldBe listOf(first, second)
-        env.session.currentWorkspaceId.flow.first() shouldBe second
+        env.session.currentWorkspaceId.first() shouldBe second
     }
 })
 
@@ -344,6 +344,7 @@ private class TestEnv(
         userRemoteRepository = userRemoteRepo,
         workspaceSyncer = syncer,
         session = session,
+        sessionMutator = session,
         getCurrentTime = GetCurrentTimeUseCase(ClockUseCase()),
     )
 }

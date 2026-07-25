@@ -3,20 +3,15 @@ package com.georgeci.moneysurfer.feature.settings
 import arrow.core.Either
 import arrow.core.right
 import com.georgeci.moneysurfer.domain.AppInfo
-import com.georgeci.moneysurfer.domain.OfflineBuildFlags
-import com.georgeci.moneysurfer.domain.SyncFeatureFlag
 import com.georgeci.moneysurfer.domain.auth.AuthError
 import com.georgeci.moneysurfer.domain.auth.InMemorySessionPointers
-import com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutConfig
+import com.georgeci.moneysurfer.domain.fixtures.FakeHostCapabilities
+import com.georgeci.moneysurfer.domain.fixtures.FakeSyncSettings
+import com.georgeci.moneysurfer.domain.fixtures.FakeUiPreferences
+import com.georgeci.moneysurfer.domain.fixtures.UnavailableDebugConfigInspector
 import com.georgeci.moneysurfer.domain.model.User
 import com.georgeci.moneysurfer.domain.model.WorkspaceInvite
 import com.georgeci.moneysurfer.domain.model.WorkspaceMember
-import com.georgeci.moneysurfer.domain.preferences.ContainerStyle
-import com.georgeci.moneysurfer.domain.preferences.PaletteSource
-import com.georgeci.moneysurfer.domain.preferences.Pref
-import com.georgeci.moneysurfer.domain.preferences.ThemeMode
-import com.georgeci.moneysurfer.domain.preferences.TransactionPeriodMode
-import com.georgeci.moneysurfer.domain.preferences.UiPreferences
 import com.georgeci.moneysurfer.domain.primitives.UserId
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceInviteId
@@ -109,7 +104,7 @@ private class VmEnv(isAnonymous: Boolean) {
         remoteDataResetRepository = object : RemoteDataResetRepository {
             override suspend fun clearAll() = Unit
         },
-        session = session,
+        sessionMutator = session,
     )
 
     val viewModel = SettingsViewModel(
@@ -124,10 +119,11 @@ private class VmEnv(isAnonymous: Boolean) {
         ),
         refreshIncomingInvites = RefreshIncomingInvitesUseCase(StubWorkspaceSyncer),
         memberRepository = StubMemberRepository,
-        uiPreferences = StubUiPreferences(),
-        syncFeatureFlag = SyncFeatureFlag(enabled = false),
+        uiPreferences = FakeUiPreferences(),
+        syncSettings = FakeSyncSettings(enabled = false),
         appInfo = AppInfo(version = "1.0.0", versionCode = 1),
-        offlineBuildFlags = OfflineBuildFlags(isOffline = false),
+        hostCapabilities = FakeHostCapabilities(),
+        debugConfigInspector = UnavailableDebugConfigInspector,
     )
 }
 
@@ -199,16 +195,4 @@ private object StubWorkspaceSyncer : WorkspaceSyncer {
     override suspend fun pushAll() = Unit
     override suspend fun syncAll() = Unit
     override suspend fun syncWorkspace(workspaceId: WorkspaceId) = Unit
-}
-
-private class StubUiPreferences : UiPreferences {
-    override val isDynamicColorAvailable: Boolean = false
-    override val onboardingCompleted: Pref<Boolean> = Pref.inMemory(false)
-    override val paletteSource: Pref<PaletteSource> = Pref.inMemory(PaletteSource.Brand)
-    override val themeMode: Pref<ThemeMode> = Pref.inMemory(ThemeMode.System)
-    override val containerStyle: Pref<ContainerStyle> = Pref.inMemory(ContainerStyle.Filled)
-    override val transactionsPeriodMode: Pref<TransactionPeriodMode> =
-        Pref.inMemory(TransactionPeriodMode.DEFAULT)
-    override val dashboardLayout: Pref<DashboardLayoutConfig> =
-        Pref.inMemory(DashboardLayoutConfig.DEFAULT)
 }

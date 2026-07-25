@@ -97,6 +97,7 @@ internal val navKeySerializersModule = SerializersModule {
         subclass(Route.SettingsAbout::class, Route.SettingsAbout.serializer())
         subclass(Route.SettingsLicenses::class, Route.SettingsLicenses.serializer())
         subclass(Route.SettingsDeleteAccount::class, Route.SettingsDeleteAccount.serializer())
+        subclass(Route.SettingsDebugConfig::class, Route.SettingsDebugConfig.serializer())
     }
 }
 

@@ -109,7 +109,7 @@ class PullRemoteChangesUseCaseImpl(
         // Uses fetchInvitesForUser (which adds a targetUserId filter) because the caller is
         // not yet a workspace member and a general list query would be PERMISSION_DENIED.
         if (scope == SyncScope.AllUserData || scope == SyncScope.ChangedSinceLastSync) {
-            val uid = session.currentFirebaseUid.flow.first()
+            val uid = session.currentFirebaseUid.first()
             if (uid != null) {
                 val invitedIds = userWorkspacesProvider.invitedWorkspaceIds()
                 val invitePlugin = plugins.firstOrNull {
@@ -150,7 +150,7 @@ class PullRemoteChangesUseCaseImpl(
     private suspend fun workspaceIdsForScope(scope: SyncScope): List<String> = when (scope) {
         SyncScope.UploadOnly -> emptyList()
         SyncScope.ActiveWorkspace -> {
-            session.currentWorkspaceId.flow.first()?.value
+            session.currentWorkspaceId.first()?.value
                 ?.let { listOf(it) } ?: emptyList()
         }
         SyncScope.AllUserData -> userWorkspacesProvider.workspaceIds()
@@ -163,7 +163,7 @@ class PullRemoteChangesUseCaseImpl(
                 // NOT used for AllUserData — a full sync should only pull what the
                 // remote says the user owns; using currentWorkspaceId for AllUserData
                 // causes PERMISSION_DENIED when the user is only an invitee of that wid.
-                session.currentWorkspaceId.flow.first()?.value
+                session.currentWorkspaceId.first()?.value
                     ?.let { listOf(it) } ?: emptyList()
             }
         }

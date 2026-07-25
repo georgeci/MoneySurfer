@@ -25,7 +25,7 @@ class PostAuthBootstrapUseCaseTest : StringSpec({
         result.shouldBeInstanceOf<Either.Right<PostAuthBootstrapUseCase.Result>>()
         result.value shouldBe PostAuthBootstrapUseCase.Result.FirstTime
         recording.createCalls.size shouldBe 1
-        env.session.currentWorkspaceId.flow.first() shouldBe null
+        env.session.currentWorkspaceId.first() shouldBe null
     }
 
     "existing user with explicit defaultWorkspaceId is preserved" {
@@ -42,7 +42,7 @@ class PostAuthBootstrapUseCaseTest : StringSpec({
             .shouldBeInstanceOf<PostAuthBootstrapUseCase.Result.ExistingUser>()
         existing.defaultWorkspaceId shouldBe WS_2
         existing.workspaceIds shouldBe listOf(WS_1, WS_2)
-        env.session.currentWorkspaceId.flow.first() shouldBe WS_2
+        env.session.currentWorkspaceId.first() shouldBe WS_2
     }
 
     "existing user with null defaultWorkspaceId falls back to the first workspace" {
@@ -58,7 +58,7 @@ class PostAuthBootstrapUseCaseTest : StringSpec({
         val existing = (result as Either.Right).value
             .shouldBeInstanceOf<PostAuthBootstrapUseCase.Result.ExistingUser>()
         existing.defaultWorkspaceId shouldBe WS_1
-        env.session.currentWorkspaceId.flow.first() shouldBe WS_1
+        env.session.currentWorkspaceId.first() shouldBe WS_1
     }
 
     "existing user with empty workspaceIds returns null default and leaves pointer untouched" {
@@ -75,7 +75,7 @@ class PostAuthBootstrapUseCaseTest : StringSpec({
             .shouldBeInstanceOf<PostAuthBootstrapUseCase.Result.ExistingUser>()
         existing.defaultWorkspaceId shouldBe null
         existing.workspaceIds shouldBe emptyList()
-        env.session.currentWorkspaceId.flow.first() shouldBe null
+        env.session.currentWorkspaceId.first() shouldBe null
     }
 
     "fetch failure propagates as AuthError.Unknown" {
@@ -84,7 +84,7 @@ class PostAuthBootstrapUseCaseTest : StringSpec({
         val result = env.useCase(uid = UID, email = null, displayName = null, isAnon = false)
 
         result.shouldBeInstanceOf<Either.Left<*>>()
-        env.session.currentWorkspaceId.flow.first() shouldBe null
+        env.session.currentWorkspaceId.first() shouldBe null
     }
 
     "workspace pull failure aborts bootstrap with AuthError" {
@@ -97,7 +97,7 @@ class PostAuthBootstrapUseCaseTest : StringSpec({
 
         val left = result.shouldBeInstanceOf<Either.Left<com.georgeci.moneysurfer.domain.auth.AuthError>>()
         // Local pointer must NOT be seeded — the bootstrap raised before reaching the seed step.
-        env.session.currentWorkspaceId.flow.first() shouldBe null
+        env.session.currentWorkspaceId.first() shouldBe null
         // Sync was attempted.
         env.syncer.syncAllCount shouldBe 1
         // Cause is the simulated Firestore exception.
@@ -147,7 +147,7 @@ private class BootstrapEnv(
     val useCase = PostAuthBootstrapUseCase(
         userRemoteRepository = remote,
         workspaceSyncer = syncer,
-        session = session,
+        sessionMutator = session,
         getCurrentTime = GetCurrentTimeUseCase(ClockUseCase()),
     )
 }

@@ -55,7 +55,7 @@ class OutboxEnqueuerImpl(
      *    See block.md.
      */
     override suspend fun isEnabled(): Boolean {
-        val uid = session.currentFirebaseUid.flow.first()
+        val uid = session.currentFirebaseUid.first()
         if (uid.isNullOrEmpty()) return false
         return appVersionGate.isSyncAllowed()
     }

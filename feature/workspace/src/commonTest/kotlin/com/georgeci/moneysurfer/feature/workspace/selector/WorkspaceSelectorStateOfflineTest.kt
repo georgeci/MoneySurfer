@@ -6,7 +6,7 @@ import io.kotest.matchers.shouldBe
 /**
  * Locks in the offline-build gating for the workspace selector. The per-row "Members"
  * action is remote-only — offline workspaces are always single-user, so the offline
- * build hides it via the `isOffline` flag injected from `OfflineBuildFlags`.
+ * build hides it via the `isOffline` flag injected from `HostCapabilities`.
  */
 class WorkspaceSelectorStateOfflineTest : StringSpec({
 

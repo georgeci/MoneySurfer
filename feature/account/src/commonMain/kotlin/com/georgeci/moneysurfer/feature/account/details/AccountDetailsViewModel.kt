@@ -1,7 +1,7 @@
 package com.georgeci.moneysurfer.feature.account.details
 
 import arrow.optics.optics
-import com.georgeci.moneysurfer.domain.OfflineBuildFlags
+import com.georgeci.moneysurfer.domain.config.HostCapabilities
 import com.georgeci.moneysurfer.domain.formatter.MoneyFormatter
 import com.georgeci.moneysurfer.domain.model.Account
 import com.georgeci.moneysurfer.domain.model.AccountBalanceSeries
@@ -25,7 +25,7 @@ class AccountDetailsViewModel(
     private val getAccountById: GetAccountByIdUseCase,
     private val getTransactionsByAccount: GetTransactionsByAccountUseCase,
     private val getAccountBalanceSeries: GetAccountBalanceSeriesUseCase,
-    private val offlineBuildFlags: OfflineBuildFlags,
+    private val hostCapabilities: HostCapabilities,
 ) : MviViewModel<AccountDetailsState, AccountDetailsEvent, AccountDetailsEffect>(
     initialState = AccountDetailsState.Loading(accountId),
 ) {
@@ -116,7 +116,7 @@ class AccountDetailsViewModel(
         filter = TransactionFilter.All,
         // Mirrors the creation screen: the offline build has no place to put these, so it does
         // not offer to collect them and does not show them.
-        extraDetails = if (offlineBuildFlags.isOffline) emptyList() else this?.extraDetails.orEmpty(),
+        extraDetails = if (hostCapabilities.isOffline) emptyList() else this?.extraDetails.orEmpty(),
     )
 
     /**

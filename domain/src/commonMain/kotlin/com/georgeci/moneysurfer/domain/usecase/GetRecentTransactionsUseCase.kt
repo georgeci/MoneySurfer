@@ -18,7 +18,7 @@ class GetRecentTransactionsUseCase(
 ) {
 
     operator fun invoke(limit: Int = DEFAULT_LIMIT): Flow<List<Transaction>> =
-        session.currentWorkspaceId.flow.flatMapLatest { workspaceId ->
+        session.currentWorkspaceId.flatMapLatest { workspaceId ->
             workspaceId
                 ?.let(transactionRepository::getByWorkspaceId)
                 ?.map { it.take(limit) }

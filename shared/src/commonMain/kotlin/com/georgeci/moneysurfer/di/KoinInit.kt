@@ -9,9 +9,9 @@ import org.koin.core.module.Module
 import org.koin.dsl.KoinAppDeclaration
 import org.koin.plugin.module.dsl.startKoin
 
-// Local-only platform bindings: MoneySurferDatabase + DataStore + AppInfo.
-// Provided per platform via expect/actual in shared. The `CrashReporter` binding
-// comes from the host's wiring (`onlineWiring` / `offlineWiring`), not from here.
+// Local-only platform bindings: MoneySurferDatabase + DataStore + AppInfo + the debug-overrides
+// configuration layer. Provided per platform via expect/actual in shared. The `CrashReporter`
+// binding comes from the host's wiring (`onlineWiring` / `offlineWiring`), not from here.
 expect val sharedPlatformModule: Module
 
 /**
@@ -44,9 +44,7 @@ fun initKoin(
         installCrashReporting(
             crashReporter = crashReporter,
             isDebug = isDebug,
-            userIds = koinApplication.koin.getOrNull<SessionPointers>()
-                ?.currentFirebaseUid
-                ?.flow,
+            userIds = koinApplication.koin.getOrNull<SessionPointers>()?.currentFirebaseUid,
         )
     }
 

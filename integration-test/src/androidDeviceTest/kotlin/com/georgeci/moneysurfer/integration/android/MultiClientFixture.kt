@@ -124,9 +124,9 @@ internal suspend fun bootstrapTwoClient(
         )
     }
 
-    ownerHarness.session.currentFirebaseUid.set(ownerUid)
-    ownerHarness.session.currentUserId.set(UserId(ownerUid))
-    ownerHarness.session.currentWorkspaceId.set(workspaceId)
+    ownerHarness.session.setFirebaseUid(ownerUid)
+    ownerHarness.session.setCurrentUser(UserId(ownerUid))
+    ownerHarness.session.setCurrentWorkspace(workspaceId)
 
     // ── Seed Firestore directly (owner auth) ──────────────────────────────────
     // Push now flows through the outbox; for the bootstrap fixture we write the
@@ -208,9 +208,9 @@ internal suspend fun bootstrapTwoClient(
         )
     }
 
-    peerHarness.session.currentFirebaseUid.set(peerUid)
-    peerHarness.session.currentUserId.set(UserId(peerUid))
-    peerHarness.session.currentWorkspaceId.set(workspaceId)
+    peerHarness.session.setFirebaseUid(peerUid)
+    peerHarness.session.setCurrentUser(UserId(peerUid))
+    peerHarness.session.setCurrentWorkspace(workspaceId)
 
     peerHarness.pullRemoteChanges(
         scope = SyncScope.ActiveWorkspace,

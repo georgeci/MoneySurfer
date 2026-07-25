@@ -2,6 +2,7 @@ package com.georgeci.moneysurfer.offline.di
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import com.georgeci.moneysurfer.appconfig.DebugConfigSource
 import com.georgeci.moneysurfer.data.db.MoneySurferDatabase
 import com.georgeci.moneysurfer.di.AppModule
 import com.georgeci.moneysurfer.di.module
@@ -69,5 +70,6 @@ private val testPlatformModule = module {
     single<MoneySurferDatabase> { error("verify() must not instantiate this") }
     single<BackupStorageLocator> { error("verify() must not instantiate this") }
     single<DataStore<Preferences>> { error("verify() must not instantiate this") }
+    single<DebugConfigSource> { DebugConfigSource.Empty }
     single { AppInfo(version = "test", versionCode = 1) }
 }

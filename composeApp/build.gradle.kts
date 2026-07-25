@@ -48,6 +48,8 @@ kotlin {
         commonMain.dependencies {
             implementation(projects.shared)
             implementation(projects.domain)
+            implementation(projects.appConfig.api)
+            implementation(projects.appConfig.default)
             implementation(projects.feature.login)
             implementation(projects.feature.transaction)
             implementation(projects.dataRemote)

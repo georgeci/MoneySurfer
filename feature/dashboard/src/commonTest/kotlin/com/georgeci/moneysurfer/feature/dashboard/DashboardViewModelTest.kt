@@ -1,11 +1,11 @@
 package com.georgeci.moneysurfer.feature.dashboard
 
-import com.georgeci.moneysurfer.domain.OfflineBuildFlags
 import com.georgeci.moneysurfer.domain.auth.InMemorySessionPointers
 import com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutConfig
 import com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutItem
 import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetType
 import com.georgeci.moneysurfer.domain.fixtures.FakeGoalContributionRepository
+import com.georgeci.moneysurfer.domain.fixtures.FakeHostCapabilities
 import com.georgeci.moneysurfer.domain.fixtures.FakeSavingsGoalRepository
 import com.georgeci.moneysurfer.domain.fixtures.FakeUiPreferences
 import com.georgeci.moneysurfer.domain.fixtures.aTransaction
@@ -148,7 +148,7 @@ private fun newViewModel(
         getRecentTransactions = GetRecentTransactionsUseCase(transactions, session),
         getGoals = GetGoalsUseCase(FakeSavingsGoalRepository(), FakeGoalContributionRepository(), session),
         uiPreferences = uiPreferences,
-        offlineBuildFlags = OfflineBuildFlags(isOffline = false),
+        hostCapabilities = FakeHostCapabilities(isOffline = false),
     )
 }
 

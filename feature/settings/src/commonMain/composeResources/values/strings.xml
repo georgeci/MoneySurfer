@@ -300,4 +300,15 @@
     <string name="settings_delete_account_notice_cleanup_failed">Couldn\'t delete your cloud data. Check your connection and try again</string>
     <string name="settings_delete_account_notice_auth_failed">Your data was removed, but the sign-in account couldn\'t be deleted. Please try again</string>
     <string name="settings_delete_account_notice_generic">Account deletion failed. Please try again</string>
+    <string name="settings_debug_config">Configuration (debug)</string>
+    <string name="settings_debug_config_supporting">Inspect and override every configuration key</string>
+    <string name="settings_debug_config_title">Configuration</string>
+    <string name="settings_debug_config_section_keys">Keys</string>
+    <string name="settings_debug_config_footnote">Overrides live in a separate debug store and never touch your settings. Debug builds only.</string>
+    <string name="settings_debug_config_reset_all">Reset all overrides</string>
+    <string name="settings_debug_config_winner_format">from %1$s</string>
+    <string name="settings_debug_config_clear">Clear override</string>
+    <string name="settings_debug_config_invalid_format">%1$s is not a valid value for %2$s</string>
+    <string name="settings_debug_config_layer_absent">absent</string>
+    <string name="settings_debug_config_layer_undecodable_format">%1$s (undecodable)</string>
 </resources>

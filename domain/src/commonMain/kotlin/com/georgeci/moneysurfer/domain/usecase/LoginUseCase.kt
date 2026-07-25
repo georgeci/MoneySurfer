@@ -4,7 +4,7 @@ import arrow.core.Either
 import arrow.core.raise.either
 import com.georgeci.moneysurfer.domain.auth.AuthError
 import com.georgeci.moneysurfer.domain.auth.AuthLocalRepository
-import com.georgeci.moneysurfer.domain.auth.SessionPointers
+import com.georgeci.moneysurfer.domain.auth.SessionMutator
 import com.georgeci.moneysurfer.domain.repositories.AuthRemoteRepository
 import org.koin.core.annotation.Single
 
@@ -12,7 +12,7 @@ import org.koin.core.annotation.Single
 class LoginUseCase(
     private val authRemoteRepository: AuthRemoteRepository,
     private val authLocalRepository: AuthLocalRepository,
-    private val session: SessionPointers,
+    private val sessionMutator: SessionMutator,
     private val wipeDemoDataUseCase: WipeDemoDataUseCase,
     private val postAuthBootstrap: PostAuthBootstrapUseCase,
 ) {
@@ -35,7 +35,7 @@ class LoginUseCase(
             displayName = displayName,
             isAnon = false,
         )
-        session.currentFirebaseUid.set(uid)
+        sessionMutator.setFirebaseUid(uid)
 
         postAuthBootstrap(
             uid = uid,

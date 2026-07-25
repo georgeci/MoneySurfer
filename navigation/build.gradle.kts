@@ -51,6 +51,9 @@ kotlin {
                 implementation(libs.kotlin.test)
                 implementation(libs.kotest.framework.engine)
                 implementation(libs.kotest.assertions.core)
+                // Virtual time for the periodic-sync gate: `flatMapLatest` over a hot source is
+                // racy without a controlled dispatcher.
+                implementation(libs.kotlinx.coroutines.test)
             }
         }
 
