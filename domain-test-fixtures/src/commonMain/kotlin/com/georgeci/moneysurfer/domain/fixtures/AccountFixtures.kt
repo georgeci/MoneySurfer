@@ -27,5 +27,3 @@ fun anAccount(
     archived = archived,
     archivedAt = archivedAt,
 )
-// `sortOrder` deliberately has no parameter here: the builder is already at the parameter limit,
-// and only the reorder tests care about it — they say `anAccount(...).copy(sortOrder = n)`.
