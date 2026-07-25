@@ -47,6 +47,7 @@ class FakeSyncSettings(enabled: Boolean = false) : SyncSettings {
 object UnavailableDebugConfigInspector : DebugConfigInspector {
     override val isAvailable: Boolean = false
     override val rows: Flow<List<ConfigDebugRow>> = flowOf(emptyList())
+    override val degradedLayers: List<String> = emptyList()
     override suspend fun override(name: String, raw: String): Result<Unit> =
         Result.failure(IllegalStateException("debug overrides are unavailable"))
 

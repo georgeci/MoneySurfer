@@ -188,6 +188,56 @@ class LayeredConfigSpec : StringSpec({
         }
     }
 
+    "a layer that cannot be hydrated degrades instead of taking startup down" {
+        runTest {
+            // `hydrate()` is the first suspend call the startup coroutine awaits, so a throw here
+            // would kill it before a start route exists — a crash loop on a truncated file.
+            val engine = LayeredConfig(
+                layers = listOf(
+                    UnreadableConfigSource(ConfigLayer.Debug),
+                    FakeLocalConfigSource(),
+                    BuildConfigSource { put(HOST_FACT, true) },
+                ),
+                local = FakeLocalConfigSource(),
+                failFastOnEarlySnapshot = true,
+            )
+
+            engine.hydrate()
+
+            engine.degradedLayers shouldBe setOf(ConfigLayer.Debug)
+            // Still usable: the surviving layers resolve, and snapshot does not trip the debug guard.
+            engine.snapshot(HOST_FACT) shouldBe true
+        }
+    }
+
+    "the layers that can be read are still warmed when another fails" {
+        runTest {
+            val engine = LayeredConfig(
+                layers = listOf(
+                    UnreadableConfigSource(ConfigLayer.Debug),
+                    FakeLocalConfigSource(mapOf(USER_SETTING.name to "false")),
+                    BuildConfigSource { },
+                ),
+                local = FakeLocalConfigSource(),
+                failFastOnEarlySnapshot = false,
+            )
+
+            engine.hydrate()
+
+            // One bad file must not cost the user their stored settings.
+            engine.snapshot(USER_SETTING) shouldBe false
+        }
+    }
+
+    "nothing is degraded on the happy path" {
+        runTest {
+            val engine = config()
+            engine.hydrate()
+
+            engine.degradedLayers.shouldBeEmpty()
+        }
+    }
+
     "hydrate is idempotent" {
         runTest {
             val engine = config()

@@ -1,7 +1,7 @@
 package com.georgeci.moneysurfer.data.config
 
 import com.georgeci.moneysurfer.appconfig.DebugConfigSource
-import com.georgeci.moneysurfer.data.datastore.createDataStore
+import com.georgeci.moneysurfer.data.datastore.createReplaceOnCorruptionDataStore
 import com.georgeci.moneysurfer.domain.storage.iosAppStorageFilePath
 import kotlin.experimental.ExperimentalNativeApi
 
@@ -13,7 +13,7 @@ import kotlin.experimental.ExperimentalNativeApi
 fun createDebugConfigSource(): DebugConfigSource =
     if (kotlin.native.Platform.isDebugBinary) {
         DebugConfigSourceImpl(
-            createDataStore(
+            createReplaceOnCorruptionDataStore(
                 producePath = { iosAppStorageFilePath(DEBUG_OVERRIDES_FILE_NAME, isDatabase = false) },
             ),
         )

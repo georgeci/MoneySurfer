@@ -48,6 +48,8 @@ private class InMemoryConfig(initial: Map<String, Any> = emptyMap()) : Config {
     override val changes: Flow<Unit> = state.map { }
 
     override suspend fun hydrate() = Unit
+
+    override val degradedLayers: Set<ConfigLayer> = emptySet()
 }
 
 class ConfigFacadesJvmTest : StringSpec({

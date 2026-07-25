@@ -311,4 +311,5 @@
     <string name="settings_debug_config_invalid_format">%1$s is not a valid value for %2$s</string>
     <string name="settings_debug_config_layer_absent">absent</string>
     <string name="settings_debug_config_layer_undecodable_format">%1$s (undecodable)</string>
+    <string name="settings_debug_config_degraded_format">Could not read: %1$s — values below fall back to the layers underneath</string>
 </resources>

@@ -311,4 +311,5 @@
     <string name="settings_debug_config_invalid_format">%1$s — недопустимое значение для %2$s</string>
     <string name="settings_debug_config_layer_absent">нет значения</string>
     <string name="settings_debug_config_layer_undecodable_format">%1$s (не распознано)</string>
+    <string name="settings_debug_config_degraded_format">Не удалось прочитать: %1$s — значения ниже берутся из слоёв под ним</string>
 </resources>

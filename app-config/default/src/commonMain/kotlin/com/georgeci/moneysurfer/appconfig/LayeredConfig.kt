@@ -31,13 +31,43 @@ class LayeredConfig(
     @Volatile
     private var hydrated: Boolean = false
 
+    @Volatile
+    private var degraded: Set<ConfigLayer> = emptySet()
+
+    override val degradedLayers: Set<ConfigLayer> get() = degraded
+
+    /**
+     * Warms every layer it can and reports the ones it could not.
+     *
+     * A failure here must not stop startup. This is the first suspend call `AppLaunchViewModel`
+     * awaits, so a throw would kill the coroutine before a start route is ever resolved — the app
+     * would crash-loop on a truncated preferences file until its data is cleared. Falling through to
+     * Build values and key defaults leaves a usable app instead, which is the same stance the
+     * surrounding startup code already takes for the first-run seeder.
+     *
+     * The cost is silence, so it is paid for twice: the failure is logged at Error severity (which
+     * `CrashReportingLogWriter` turns into a Crashlytics non-fatal) and the layer stays in
+     * [degradedLayers] so the debug panel can say "unavailable" rather than implying the layer is
+     * simply empty. Recovery needs no retry logic — the mirror refills from the source's `changes`
+     * flow as soon as the store is readable again.
+     */
     override suspend fun hydrate() {
         if (hydrated) return
         hydration.withLock {
             if (hydrated) return
-            layers.forEach { it.hydrate() }
+            degraded = layers.mapNotNullTo(mutableSetOf()) { source -> source.hydrateOrNull() }
             hydrated = true
         }
+    }
+
+    /** Returns the layer when hydration failed, `null` when it succeeded. */
+    @Suppress("TooGenericExceptionCaught") // Any store failure must degrade, not propagate.
+    private suspend fun ConfigSource.hydrateOrNull(): ConfigLayer? = try {
+        hydrate()
+        null
+    } catch (e: Throwable) {
+        log.e(e) { "[$layer] hydration failed — resolving without this layer until it recovers" }
+        layer
     }
 
     override val changes: Flow<Unit> = combine(layers.map { it.changes }) { }

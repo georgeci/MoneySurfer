@@ -2,6 +2,7 @@ package com.georgeci.moneysurfer.appconfig
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 
 /**
@@ -86,4 +87,11 @@ internal class FakeRemoteGlobalConfigSource(
     override fun <T : Any> peek(key: ConfigKey<T>): LayerValue<T> = delegate.peek(key)
     override val changes: Flow<Unit> = delegate.changes
     override suspend fun hydrate() = delegate.hydrate()
+}
+
+/** Models a store that cannot be read at all — a truncated preferences file. */
+internal class UnreadableConfigSource(override val layer: ConfigLayer) : ConfigSource {
+    override fun <T : Any> peek(key: ConfigKey<T>): LayerValue<T> = LayerValue.Absent
+    override val changes: Flow<Unit> = flowOf(Unit)
+    override suspend fun hydrate(): Unit = error("corrupt store")
 }

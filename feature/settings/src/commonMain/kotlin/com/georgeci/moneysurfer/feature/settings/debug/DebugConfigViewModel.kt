@@ -16,7 +16,10 @@ import org.koin.core.annotation.KoinViewModel
 class DebugConfigViewModel(
     private val inspector: DebugConfigInspector,
 ) : MviViewModel<DebugConfigState, DebugConfigEvent, DebugConfigEffect>(
-    initialState = DebugConfigState(isAvailable = inspector.isAvailable),
+    initialState = DebugConfigState(
+        isAvailable = inspector.isAvailable,
+        degradedLayers = inspector.degradedLayers,
+    ),
 ) {
 
     init {
@@ -51,6 +54,11 @@ class DebugConfigViewModel(
 data class DebugConfigState(
     val isAvailable: Boolean = false,
     val rows: List<ConfigDebugRow> = emptyList(),
+    /**
+     * Layers whose store could not be read at startup. Their rows resolve as if the layer were
+     * empty, so the panel has to say so rather than presenting the fallback as the real answer.
+     */
+    val degradedLayers: List<String> = emptyList(),
 )
 
 sealed interface DebugConfigEvent {

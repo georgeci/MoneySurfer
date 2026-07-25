@@ -3,7 +3,7 @@ package com.georgeci.moneysurfer.data.config
 import android.content.Context
 import android.content.pm.ApplicationInfo
 import com.georgeci.moneysurfer.appconfig.DebugConfigSource
-import com.georgeci.moneysurfer.data.datastore.createDataStore
+import com.georgeci.moneysurfer.data.datastore.createReplaceOnCorruptionDataStore
 
 /**
  * Debug layer for Android. Release APKs get [DebugConfigSource.Empty] — the layer stays in the
@@ -17,7 +17,7 @@ import com.georgeci.moneysurfer.data.datastore.createDataStore
 fun createDebugConfigSource(context: Context): DebugConfigSource =
     if (context.isDebuggable()) {
         DebugConfigSourceImpl(
-            createDataStore(
+            createReplaceOnCorruptionDataStore(
                 producePath = { context.filesDir.resolve(DEBUG_OVERRIDES_FILE_NAME).absolutePath },
             ),
         )

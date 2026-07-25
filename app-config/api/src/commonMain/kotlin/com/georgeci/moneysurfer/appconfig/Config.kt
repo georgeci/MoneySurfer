@@ -43,8 +43,22 @@ interface Config {
     /**
      * Warms every layer's in-memory mirror. Awaited once at startup, before the first
      * [snapshot]. Idempotent.
+     *
+     * Never throws: a layer whose store cannot be read is skipped and named in [degradedLayers],
+     * because this runs before a start route exists and a failure here would otherwise take the
+     * whole app down with it.
      */
     suspend fun hydrate()
+
+    /**
+     * Layers [hydrate] could not warm. Empty on the happy path.
+     *
+     * A degraded layer resolves as absent, so values fall through to the layers below and finally to
+     * `key.default` — correct, but not necessarily current. Kept observable so the debug panel can
+     * distinguish "this layer holds nothing" from "this layer could not be read"; the mirror refills
+     * on its own once the store is readable again.
+     */
+    val degradedLayers: Set<ConfigLayer>
 }
 
 data class ConfigResolution<T : Any>(

@@ -32,6 +32,7 @@ private fun row(name: String, value: String = "true") = ConfigDebugRow(
  */
 private class RecordingInspector(
     override val isAvailable: Boolean = true,
+    override val degradedLayers: List<String> = emptyList(),
     private val accept: Boolean = true,
     initialRows: List<ConfigDebugRow> = listOf(row("panel.flag")),
 ) : DebugConfigInspector {
@@ -75,6 +76,14 @@ class DebugConfigViewModelTest : StringSpec({
     "availability comes from the inspector, so a release build renders nothing" {
         DebugConfigViewModel(RecordingInspector(isAvailable = false)).currentState.isAvailable shouldBe false
         DebugConfigViewModel(RecordingInspector(isAvailable = true)).currentState.isAvailable shouldBe true
+    }
+
+    "a layer that failed to load is carried into state so the panel can say so" {
+        // Without this the panel would present a fallback value as the real answer.
+        DebugConfigViewModel(RecordingInspector(degradedLayers = listOf("Debug")))
+            .currentState.degradedLayers shouldBe listOf("Debug")
+
+        DebugConfigViewModel(RecordingInspector()).currentState.degradedLayers shouldBe emptyList()
     }
 
     "rows are mirrored into state as the inspector re-resolves them" {

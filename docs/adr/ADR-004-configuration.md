@@ -694,6 +694,13 @@ Revisit if a slider-backed key appears.
 - `sync = true` keys are stored in Room `config_entry` (account-scoped, wiped on account
   change); `sync = false` keys stay in DataStore and are never wiped.
 - Layer order is declared explicitly in one place.
+- **Hydration never fails startup.** It runs before a start route exists, so a layer whose store
+  cannot be read is skipped, logged at Error severity, and named in `Config.degradedLayers` — never
+  thrown. A degraded layer resolves as absent, so values fall through and stay usable; the debug
+  panel says which layer is unreadable rather than presenting the fallback as current. Stores whose
+  contents are disposable (the debug-override file) additionally replace themselves on corruption, so
+  recovery needs no retry logic. The app's settings file deliberately does not — it holds the session
+  pointers, and silently replacing it would sign the user out.
 - **A read never writes.** Resolving to `key.default` does not create a Local entry, `hydrate()`
   does not persist anything, and the fallback after a decode failure is not written back over the
   value that failed. Otherwise a fresh device would upload its own defaults before the first

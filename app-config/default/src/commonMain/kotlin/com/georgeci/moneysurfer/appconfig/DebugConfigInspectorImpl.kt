@@ -24,6 +24,8 @@ class DebugConfigInspectorImpl(
 
     override val isAvailable: Boolean get() = debugSource.isActive
 
+    override val degradedLayers: List<String> get() = config.degradedLayers.map { it.name }
+
     override val rows: Flow<List<ConfigDebugRow>> = config.changes
         .map { registry.keys.map { key -> key.toRow() } }
         .distinctUntilChanged()

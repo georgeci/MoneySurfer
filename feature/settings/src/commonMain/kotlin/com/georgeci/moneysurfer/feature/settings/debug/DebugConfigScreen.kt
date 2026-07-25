@@ -32,6 +32,7 @@ import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.utils.HandleSideEffect
 import moneysurfer.feature.settings.generated.resources.Res
+import moneysurfer.feature.settings.generated.resources.settings_debug_config_degraded_format
 import moneysurfer.feature.settings.generated.resources.settings_debug_config_footnote
 import moneysurfer.feature.settings.generated.resources.settings_debug_config_invalid_format
 import moneysurfer.feature.settings.generated.resources.settings_debug_config_layer_absent
@@ -47,6 +48,7 @@ import org.koin.compose.viewmodel.koinViewModel
 object DebugConfigTestTags {
     const val Root = "debugConfig:root"
     const val ResetAllRow = "debugConfig:resetAll"
+    const val DegradedBanner = "debugConfig:degradedBanner"
 
     fun row(name: String): String = "debugConfig:row:$name"
 }
@@ -97,6 +99,22 @@ internal fun DebugConfigContent(
         onBack = { onEvent(DebugConfigEvent.OnBackClick) },
         showProgressOverlay = false,
     ) { padding ->
+        if (state.degradedLayers.isNotEmpty()) {
+            // A layer whose store failed to load resolves as absent, so every row below it shows a
+            // fallback. Saying so beats letting the panel present that fallback as the truth.
+            Text(
+                text = stringResource(
+                    Res.string.settings_debug_config_degraded_format,
+                    state.degradedLayers.joinToString(),
+                ),
+                style = AppTheme.typography.bodyMedium,
+                color = AppTheme.materialColors.error,
+                modifier = Modifier
+                    .padding(horizontal = 16.dp, vertical = AppTheme.spacing.small)
+                    .testTag(DebugConfigTestTags.DegradedBanner),
+            )
+        }
+
         SurferSettingsGroup(
             modifier = Modifier.testTag(DebugConfigTestTags.Root),
             title = stringResource(Res.string.settings_debug_config_section_keys),

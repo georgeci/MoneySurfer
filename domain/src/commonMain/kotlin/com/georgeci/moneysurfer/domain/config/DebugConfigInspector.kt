@@ -18,6 +18,15 @@ interface DebugConfigInspector {
 
     val rows: Flow<List<ConfigDebugRow>>
 
+    /**
+     * Names of layers whose store could not be read at startup, pre-rendered. Empty on the happy
+     * path.
+     *
+     * Their rows resolve as if the layer were empty, so without this the panel would report a stale
+     * fallback as the real answer. Recovery is automatic once the store is readable again.
+     */
+    val degradedLayers: List<String>
+
     /** Fails when [raw] does not decode through the key's codec, or when the key is unknown. */
     suspend fun override(name: String, raw: String): Result<Unit>
 
