@@ -62,6 +62,12 @@ data class AccountDoc(
      * the reader treats that as "no details" rather than refusing the document.
      */
     val extraDetails: List<AccountExtraDetailDoc> = emptyList(),
+    /**
+     * Position in the workspace's account list, ascending. Zero both for the first account and
+     * for rows written by a client that predates the field — the reader breaks ties by name, so
+     * an un-migrated workspace still lists in a stable order.
+     */
+    val sortOrder: Int = 0,
 )
 
 /**

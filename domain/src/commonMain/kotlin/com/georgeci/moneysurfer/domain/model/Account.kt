@@ -24,4 +24,11 @@ data class Account(
     val archivedAt: Instant? = null,
     /** Optional user-entered key–value details (IBAN, description, custom fields, …). */
     val extraDetails: List<AccountExtraDetail> = emptyList(),
+    /**
+     * Position of the account in every list the user sees, ascending. Owned by
+     * `AccountRepository.reorder` — the manage screen's drag-to-reorder is the only thing that
+     * assigns it; creation appends. Equal values are broken by name, so a workspace that has
+     * never been reordered still lists in a stable order rather than an arbitrary one.
+     */
+    val sortOrder: Int = 0,
 )

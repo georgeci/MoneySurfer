@@ -172,6 +172,7 @@ private class TransferEnv(seedCategories: List<Category>) {
         override suspend fun setBalance(accountId: AccountId, balance: Money) {
             balances[accountId] = balance.minor
         }
+        override suspend fun reorder(orderedIds: List<AccountId>) = Unit
         override suspend fun setArchived(accountId: AccountId, archived: Boolean) = Unit
     }
 

@@ -17,6 +17,7 @@ fun anAccount(
     balance: Money = Money.zero(),
     archived: Boolean = false,
     archivedAt: Instant? = null,
+    sortOrder: Int = 0,
 ): Account = Account(
     id = id,
     workspaceId = workspaceId,
@@ -26,4 +27,5 @@ fun anAccount(
     balance = balance,
     archived = archived,
     archivedAt = archivedAt,
+    sortOrder = sortOrder,
 )

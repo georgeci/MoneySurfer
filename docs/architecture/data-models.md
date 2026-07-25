@@ -178,9 +178,15 @@ Field name unified: was `addedAt` in Firestore; now `createdAt` everywhere.
 | `currencyCode` | `CurrencyCode` | `String` (col `currency`) | `String` (col `currency`) |
 | `balance` | `Money` | `Long` (minor units) | `Long` |
 | `extraDetails` | `List<AccountExtraDetail>` | `String` (JSON array of `{key,value}`) | `List<Map>` |
+| `sortOrder` | `Int` | `Int` | `Int` |
 | `updatedAt` | `Instant` | `Long` | `Long` |
 | `deletedAt` | — | — | `Long?` |
 | `clientVersionCode` | — | — | `Int` |
+
+`sortOrder` is the position the user dragged the account to on the manage screen, ascending, and
+every read orders by it with `name` as the tiebreak. `AccountRepository.reorder` is the only writer
+— creation appends, and a reorder writes (and syncs) just the rows whose position changed. DB v33
+backfills it from insertion order so an upgrade does not silently re-sort anyone's list.
 
 `extraDetails` is an open key–value list, not a fixed set of columns: the creation screen offers
 six well-known keys (`IBAN`, `DESCRIPTION`, `BIC`, `CARD_LAST4`, `BANK_URL`, `BRANCH_PHONE`) plus a

@@ -70,6 +70,7 @@ fun AccountEntity.toDoc(): AccountDoc = AccountDoc(
     // structured entries, Room keeps one JSON column.
     extraDetails = AccountExtraDetailsColumn.decode(extraDetails)
         .map { AccountExtraDetailDoc(key = it.key, value = it.value) },
+    sortOrder = sortOrder,
 )
 
 fun AccountDoc.toEntity(id: String, workspaceId: String): AccountEntity = AccountEntity(
@@ -87,6 +88,7 @@ fun AccountDoc.toEntity(id: String, workspaceId: String): AccountEntity = Accoun
     extraDetails = AccountExtraDetailsColumn.encode(
         extraDetails.map { AccountExtraDetail(key = it.key, value = it.value) },
     ),
+    sortOrder = sortOrder,
 )
 
 fun CategoryEntity.toDoc(): CategoryDoc = CategoryDoc(

@@ -570,6 +570,7 @@ private class FakeAccountRepository(initial: List<Account>) : AccountRepository 
         val account = store.value[accountId] ?: return
         insert(account.copy(balance = balance))
     }
+    override suspend fun reorder(orderedIds: List<AccountId>) = Unit
     override suspend fun setArchived(accountId: AccountId, archived: Boolean) {
         val account = store.value[accountId] ?: return
         insert(account.copy(archived = archived))

@@ -599,6 +599,7 @@ private object SingleAccountRepository : AccountRepository {
     override suspend fun delete(id: AccountId) = Unit
     override suspend fun applyDelta(accountId: AccountId, delta: Money) = Unit
     override suspend fun setBalance(accountId: AccountId, balance: Money) = Unit
+    override suspend fun reorder(orderedIds: List<AccountId>) = Unit
     override suspend fun setArchived(accountId: AccountId, archived: Boolean) = Unit
 }
 

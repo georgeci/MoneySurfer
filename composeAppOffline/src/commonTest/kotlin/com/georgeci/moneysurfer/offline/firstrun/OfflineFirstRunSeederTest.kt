@@ -219,6 +219,7 @@ private class FakeAccountRepo : AccountRepository {
     override suspend fun delete(id: AccountId) = error("not used")
     override suspend fun applyDelta(accountId: AccountId, delta: Money) = error("not used")
     override suspend fun setBalance(accountId: AccountId, balance: Money) = error("not used")
+    override suspend fun reorder(orderedIds: List<AccountId>) = error("not used")
     override suspend fun setArchived(accountId: AccountId, archived: Boolean) = error("not used")
 }
 
