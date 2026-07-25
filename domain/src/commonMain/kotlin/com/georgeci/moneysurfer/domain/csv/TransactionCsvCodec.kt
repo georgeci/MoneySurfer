@@ -149,8 +149,10 @@ object TransactionCsvCodec {
          * id), and [required] still rejects a blank field, so an older layout
          * can never quietly satisfy a mandatory column.
          */
-        private fun raw(column: TransactionCsvColumn): String =
-            format.indexOf(column)?.let { fields[it] } ?: ""
+        private fun raw(column: TransactionCsvColumn): String {
+            val index = format.indexOf(column) ?: return ""
+            return fields[index]
+        }
 
         private fun required(column: TransactionCsvColumn): String =
             raw(column).ifBlank { throw FieldRejectedException(column) }

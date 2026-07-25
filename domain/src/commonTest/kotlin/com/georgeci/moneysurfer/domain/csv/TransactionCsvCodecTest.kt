@@ -109,6 +109,15 @@ class TransactionCsvCodecTest : StringSpec({
             listOf("back\\slash", "trailing\\")
     }
 
+    "a tag cell ending in a dangling escape keeps it as a literal character" {
+        // The encoder always doubles an escape, so only a hand-edited cell can
+        // end in a lone one — decoding must not swallow the character with it.
+        val fields = TransactionCsvCodec.encode(aTransaction()).toMutableList()
+        fields[TransactionCsvColumn.Tags.ordinal] = "solo\\"
+
+        decoded(fields).tags shouldBe listOf("solo\\")
+    }
+
     "a merchant starting with a formula trigger is neutralised on encode" {
         listOf("=HYPERLINK(\"http://evil\")", "+1", "-1", "@SUM(A1)", "\tcmd", "\rx").forEach {
             encodedField(aTransaction(merchant = it), TransactionCsvColumn.Merchant) shouldBe "'$it"
