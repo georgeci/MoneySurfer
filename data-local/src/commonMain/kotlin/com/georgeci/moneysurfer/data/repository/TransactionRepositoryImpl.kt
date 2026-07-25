@@ -30,6 +30,9 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.koin.core.annotation.Single
 
+// Mirrors [TransactionRepository]'s query surface plus the entity/domain mappers those overrides
+// share; the count follows the interface it implements. See the note there.
+@Suppress("TooManyFunctions")
 @Single(binds = [TransactionRepository::class])
 class TransactionRepositoryImpl(
     private val dao: TransactionDao,
@@ -69,6 +72,9 @@ class TransactionRepositoryImpl(
 
     override suspend fun getById(id: TransactionId): Transaction? =
         dao.getById(id.value)?.toDomain()
+
+    override suspend fun getByTransferId(transferId: TransferId): List<Transaction> =
+        dao.getByTransferId(transferId.value).map { it.toDomain() }
 
     override suspend fun insert(transaction: Transaction) {
         val entity = transaction.toEntity()

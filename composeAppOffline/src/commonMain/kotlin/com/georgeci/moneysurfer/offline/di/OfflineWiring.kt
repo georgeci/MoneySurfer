@@ -7,6 +7,7 @@ import com.georgeci.moneysurfer.domain.firstrun.FirstRunSeeder
 import com.georgeci.moneysurfer.domain.repositories.AppConfigRepository
 import com.georgeci.moneysurfer.domain.repositories.AppVersionGate
 import com.georgeci.moneysurfer.domain.repositories.AuthRemoteRepository
+import com.georgeci.moneysurfer.domain.repositories.ExchangeRateRemoteSource
 import com.georgeci.moneysurfer.domain.repositories.RemoteDataResetRepository
 import com.georgeci.moneysurfer.domain.repositories.SessionShutdownGate
 import com.georgeci.moneysurfer.domain.repositories.UserAccountDeletionRepository
@@ -20,6 +21,7 @@ import com.georgeci.moneysurfer.offline.noop.NoOpAppConfigRepository
 import com.georgeci.moneysurfer.offline.noop.NoOpAppVersionGate
 import com.georgeci.moneysurfer.offline.noop.NoOpAuthRemoteRepository
 import com.georgeci.moneysurfer.offline.noop.NoOpCrashReporter
+import com.georgeci.moneysurfer.offline.noop.NoOpExchangeRateRemoteSource
 import com.georgeci.moneysurfer.offline.noop.NoOpOutboxEnqueuer
 import com.georgeci.moneysurfer.offline.noop.NoOpPendingMutationQueue
 import com.georgeci.moneysurfer.offline.noop.NoOpRemoteDataResetRepository
@@ -44,6 +46,7 @@ private val offlineNoOpModule: Module = module {
     single<UserAccountDeletionRepository> { NoOpUserAccountDeletionRepository() }
     single<SessionShutdownGate> { NoOpSessionShutdownGate() }
     single<PendingMutationQueue> { NoOpPendingMutationQueue() }
+    single<ExchangeRateRemoteSource> { NoOpExchangeRateRemoteSource() }
 }
 
 /**

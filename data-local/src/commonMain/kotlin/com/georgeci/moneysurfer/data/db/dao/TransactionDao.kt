@@ -116,6 +116,17 @@ interface TransactionDao {
     suspend fun getById(id: String): TransactionEntity?
 
     /**
+     * Both legs of one transfer, oldest first so the pair reads source-then-destination for
+     * legs saved in that order.
+     *
+     * Deliberately unindexed: `transferId` is null on the overwhelming majority of rows, this
+     * runs once when a transfer's details screen opens, and an index would cost a schema
+     * migration plus write amplification on every insert to serve that one lookup.
+     */
+    @Query("SELECT * FROM transactions WHERE transferId = :transferId ORDER BY createdAt ASC")
+    suspend fun getByTransferId(transferId: String): List<TransactionEntity>
+
+    /**
      * Full-text search over notes and merchants within a workspace, newest first.
      *
      * A bare `MATCH` against the virtual table spans both indexed columns, so this needs no

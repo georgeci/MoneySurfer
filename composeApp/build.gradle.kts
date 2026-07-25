@@ -76,6 +76,8 @@ kotlin {
         jvmTest.dependencies {
             implementation(projects.dataLocal)
             implementation(projects.feature.login)
+            // DashboardCustomizeScreenStateTest mounts the customize screen's stateless content.
+            implementation(projects.feature.dashboard)
             // GlobalErrorBoundaryTest drives the real boundary component and the real
             // MviViewModel escalation path (issue #78).
             implementation(projects.uikit)

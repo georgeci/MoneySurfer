@@ -6,6 +6,7 @@ import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationScreen
 import com.georgeci.moneysurfer.feature.transaction.details.TransactionDetailsScreen
+import com.georgeci.moneysurfer.feature.transaction.filters.TransactionFiltersScreen
 import com.georgeci.moneysurfer.feature.transaction.list.TransactionsByAccountScreen
 import com.georgeci.moneysurfer.navigation.AccountPickerResultKey
 import com.georgeci.moneysurfer.navigation.AccountPickerTransferResultKey
@@ -31,6 +32,22 @@ val transactionNavGraph: FeatureNavGraph = { navigator ->
             onNavigateToTransactionDetails = { transactionId ->
                 navigator.push(Route.TransactionDetails(transactionId.value))
             },
+            onNavigateToFilters = { accountId, anchorEpochDay ->
+                navigator.push(
+                    Route.TransactionFilters(
+                        accountId = accountId?.value,
+                        anchorEpochDay = anchorEpochDay,
+                    ),
+                )
+            },
+        )
+    }
+
+    entry<Route.TransactionFilters> { key ->
+        TransactionFiltersScreen(
+            accountId = key.accountId?.let { AccountId(it) },
+            anchorEpochDay = key.anchorEpochDay,
+            onNavigateBack = { navigator.pop() },
         )
     }
 
@@ -51,6 +68,7 @@ val transactionNavGraph: FeatureNavGraph = { navigator ->
         TransactionCreationScreen(
             transactionId = key.transactionId?.let { TransactionId(it) },
             accountId = key.accountId?.let { AccountId(it) },
+            duplicate = key.duplicate,
             onNavigateBack = { navigator.pop() },
             onNavigateToCategoryChooser = { selectedId, filterType ->
                 navigator.push(
@@ -84,6 +102,11 @@ val transactionNavGraph: FeatureNavGraph = { navigator ->
             onNavigateBack = { navigator.pop() },
             onNavigateToEdit = { transactionId ->
                 navigator.push(Route.TransactionCreation(transactionId = transactionId.value))
+            },
+            onNavigateToDuplicate = { transactionId ->
+                navigator.push(
+                    Route.TransactionCreation(transactionId = transactionId.value, duplicate = true),
+                )
             },
         )
     }

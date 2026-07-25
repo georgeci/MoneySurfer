@@ -22,6 +22,7 @@ import com.georgeci.moneysurfer.domain.primitives.CategoryId
 import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
 import com.georgeci.moneysurfer.domain.primitives.Money
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
+import com.georgeci.moneysurfer.domain.primitives.TransferId
 import com.georgeci.moneysurfer.domain.primitives.UserId
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 import com.georgeci.moneysurfer.domain.repositories.AccountRepository
@@ -214,6 +215,8 @@ private class SimpleTransactionRepository(initial: List<Transaction>) : Transact
     ): Flow<List<TransactionTotal>> = flowOf(emptyList())
     override fun getByWorkspaceId(workspaceId: WorkspaceId): Flow<List<Transaction>> = flowOf(emptyList())
     override suspend fun getById(id: TransactionId): Transaction? = store[id]
+    override suspend fun getByTransferId(transferId: TransferId): List<Transaction> =
+        store.values.filter { it.transferId == transferId }
     override suspend fun insert(transaction: Transaction) {
         store = store + (transaction.id to transaction)
     }

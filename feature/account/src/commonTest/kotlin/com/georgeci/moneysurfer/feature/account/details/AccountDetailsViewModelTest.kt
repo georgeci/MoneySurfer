@@ -15,6 +15,7 @@ import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
 import com.georgeci.moneysurfer.domain.primitives.Money
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
+import com.georgeci.moneysurfer.domain.primitives.TransferId
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 import com.georgeci.moneysurfer.domain.repositories.AccountRepository
 import com.georgeci.moneysurfer.domain.repositories.TransactionRepository
@@ -154,6 +155,8 @@ private class FixedTransactionRepository(transactions: List<Transaction>) : Tran
     ) = error("not used")
     override fun getTotals(accountId: AccountId?, window: TransactionPeriodWindow) = error("not used")
     override suspend fun getById(id: TransactionId): Transaction? = null
+    override suspend fun getByTransferId(transferId: TransferId): List<Transaction> =
+        all.value.filter { it.transferId == transferId }
     override suspend fun insert(transaction: Transaction) = error("not used")
     override suspend fun update(transaction: Transaction) = error("not used")
     override suspend fun delete(id: TransactionId) = error("not used")

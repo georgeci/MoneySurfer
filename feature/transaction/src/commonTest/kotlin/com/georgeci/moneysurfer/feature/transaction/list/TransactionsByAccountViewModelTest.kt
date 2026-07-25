@@ -1,32 +1,49 @@
 package com.georgeci.moneysurfer.feature.transaction.list
 
+import com.georgeci.moneysurfer.domain.auth.InMemorySessionPointers
 import com.georgeci.moneysurfer.domain.fixtures.EUR
 import com.georgeci.moneysurfer.domain.fixtures.FakeUiPreferences
 import com.georgeci.moneysurfer.domain.fixtures.USD
+import com.georgeci.moneysurfer.domain.fixtures.aCategory
 import com.georgeci.moneysurfer.domain.fixtures.aTransaction
 import com.georgeci.moneysurfer.domain.fixtures.accountId
 import com.georgeci.moneysurfer.domain.fixtures.anAccount
+import com.georgeci.moneysurfer.domain.fixtures.categoryId
 import com.georgeci.moneysurfer.domain.fixtures.dollars
 import com.georgeci.moneysurfer.domain.fixtures.transactionId
 import com.georgeci.moneysurfer.domain.model.Account
 import com.georgeci.moneysurfer.domain.model.CategorizedTransaction
+import com.georgeci.moneysurfer.domain.model.Category
 import com.georgeci.moneysurfer.domain.model.Transaction
 import com.georgeci.moneysurfer.domain.model.TransactionTotal
 import com.georgeci.moneysurfer.domain.preferences.TransactionPeriodMode
 import com.georgeci.moneysurfer.domain.primitives.AccountId
+import com.georgeci.moneysurfer.domain.primitives.CategoryId
 import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
 import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
 import com.georgeci.moneysurfer.domain.primitives.Money
+import com.georgeci.moneysurfer.domain.primitives.RecurringRuleId
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
+import com.georgeci.moneysurfer.domain.primitives.TransactionStatus
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
+import com.georgeci.moneysurfer.domain.primitives.TransferId
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 import com.georgeci.moneysurfer.domain.repositories.AccountRepository
+import com.georgeci.moneysurfer.domain.repositories.CategoryRepository
 import com.georgeci.moneysurfer.domain.repositories.TransactionRepository
 import com.georgeci.moneysurfer.domain.usecase.GetAccountByIdUseCase
+import com.georgeci.moneysurfer.domain.usecase.GetAccountsUseCase
+import com.georgeci.moneysurfer.domain.usecase.GetCategoriesUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetTransactionsByAccountUseCase
 import com.georgeci.moneysurfer.domain.util.TransactionPeriodWindow
+import com.georgeci.moneysurfer.feature.transaction.filter.TransactionDatePreset
+import com.georgeci.moneysurfer.feature.transaction.filter.TransactionDateRange
+import com.georgeci.moneysurfer.feature.transaction.filter.TransactionFilterStore
+import com.georgeci.moneysurfer.feature.transaction.filter.TransactionSort
+import com.georgeci.moneysurfer.feature.transaction.filter.TransactionTypeFilter
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly
+import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 import kotlinx.coroutines.Dispatchers
@@ -259,14 +276,166 @@ class TransactionsByAccountViewModelTest : StringSpec({
             )
             val viewModel = env.viewModel()
 
-            viewModel.onEvent(
-                TransactionsByAccountEvent.OnTypeFilterChanged(TransactionTypeFilter.Income),
+            env.filterStore.commit(
+                env.filterStore.filters.value.copy(type = TransactionTypeFilter.Income),
             )
 
             val state = viewModel.content()
             state.isFiltered shouldBe true
+            state.activeFilterCount shouldBe 1
             state.groups.single().transactions.single().id.value shouldBe "salary"
             state.summary.expenseFormatted shouldBe "−$40.00"
+        }
+    }
+
+    "search matches merchant, note and category, and survives into the state" {
+        runTest {
+            val env = Env(
+                transactions = listOf(
+                    expense(id = "coffee", amount = 4).copy(merchant = "Starbucks"),
+                    expense(id = "book", amount = 20).copy(note = "Birthday present"),
+                    expense(id = "rent", amount = 900),
+                ),
+            )
+            val viewModel = env.viewModel()
+
+            viewModel.onEvent(TransactionsByAccountEvent.OnSearchQueryChanged("star"))
+
+            val state = viewModel.content()
+            state.query shouldBe "star"
+            state.rowIds().shouldContainExactly("coffee")
+            // The search box is its own visible state; it must not also inflate the filter badge.
+            state.activeFilterCount shouldBe 0
+        }
+    }
+
+    "searching an amount tolerates the cents the user did not type" {
+        runTest {
+            val env = Env(
+                transactions = listOf(
+                    expenseCents(id = "near", cents = 1240),
+                    expenseCents(id = "far", cents = 1300),
+                ),
+            )
+            val viewModel = env.viewModel()
+
+            viewModel.onEvent(TransactionsByAccountEvent.OnSearchQueryChanged("12"))
+
+            viewModel.content().rowIds().shouldContainExactly("near")
+        }
+    }
+
+    "a sparse search keeps loading until deep matches surface, not showing nothing" {
+        runTest {
+            // 200 non-matching newest rows, then 5 matching rows older than the first page.
+            val noise = (1..PAGE_SIZE).map { expense(id = "n-$it", date = LocalDate(2025, 3, 20), amount = 1) }
+            val coffee = (1..5).map { i ->
+                expense(id = "c-$i", date = LocalDate(2025, 1, i), amount = 4).copy(merchant = "Coffee")
+            }
+            val env = Env(transactions = noise + coffee)
+            val viewModel = env.viewModel()
+            // All time so the window holds every row; the matches sit beyond the first 200.
+            viewModel.onEvent(
+                TransactionsByAccountEvent.OnPeriodModeChanged(TransactionPeriodMode.AllTime),
+            )
+
+            viewModel.onEvent(TransactionsByAccountEvent.OnSearchQueryChanged("coffee"))
+
+            // Without auto-loading, the first page has 0 coffee rows and the list is stuck empty.
+            val state = viewModel.content()
+            state.isEmpty shouldBe false
+            state.groups.flatMap { it.transactions } shouldHaveSize 5
+        }
+    }
+
+    "an explicit date range replaces the pager window and hides the pager" {
+        runTest {
+            val env = Env(
+                transactions = listOf(
+                    expense(id = "today", date = TODAY, amount = 1),
+                    expense(id = "earlier", date = LocalDate(2025, 3, 1), amount = 1),
+                ),
+            )
+            val viewModel = env.viewModel()
+
+            env.filterStore.commit(
+                env.filterStore.filters.value.copy(
+                    dateRange = TransactionDateRange.Preset(TransactionDatePreset.Today),
+                ),
+            )
+
+            val state = viewModel.content()
+            state.showPeriodPager shouldBe false
+            env.repository.lastWindow shouldBe TransactionPeriodWindow(from = TODAY, to = TODAY)
+            state.rowIds().shouldContainExactly("today")
+        }
+    }
+
+    "oldest first reverses the whole list, day groups included" {
+        runTest {
+            val env = Env(
+                transactions = listOf(
+                    expense(id = "newer", date = LocalDate(2025, 3, 20), amount = 1),
+                    expense(id = "older", date = LocalDate(2025, 3, 2), amount = 1),
+                ),
+            )
+            val viewModel = env.viewModel()
+
+            env.filterStore.commit(env.filterStore.filters.value.copy(sort = TransactionSort.Oldest))
+
+            viewModel.content().rowIds().shouldContainExactly("older", "newer")
+        }
+    }
+
+    "recurring-only and planned-only read the domain fields they name" {
+        runTest {
+            val env = Env(
+                transactions = listOf(
+                    expense(id = "manual", amount = 1),
+                    expense(id = "generated", amount = 1)
+                        .copy(recurringRuleId = RecurringRuleId("rule-1")),
+                    expense(id = "planned", amount = 1)
+                        .copy(status = TransactionStatus.PLANNED),
+                ),
+            )
+            val viewModel = env.viewModel()
+
+            env.filterStore.commit(env.filterStore.filters.value.copy(recurringOnly = true))
+            viewModel.content().rowIds().shouldContainExactly("generated")
+
+            env.filterStore.commit(
+                env.filterStore.filters.value.copy(recurringOnly = false, plannedOnly = true),
+            )
+            viewModel.content().rowIds().shouldContainExactly("planned")
+        }
+    }
+
+    "the amount bounds compare against the magnitude, not the sign" {
+        runTest {
+            val env = Env(
+                transactions = listOf(
+                    expense(id = "small", amount = 10),
+                    expense(id = "big", amount = 90),
+                ),
+            )
+            val viewModel = env.viewModel()
+
+            env.filterStore.commit(env.filterStore.filters.value.copy(minAmount = "50"))
+
+            viewModel.content().rowIds().shouldContainExactly("big")
+        }
+    }
+
+    "an account-scoped list ignores an account picked on the filter screen" {
+        runTest {
+            val env = Env(transactions = listOf(expense(id = "mine", amount = 10)))
+            val viewModel = env.viewModel(accountId = ACCOUNT)
+
+            env.filterStore.commit(
+                env.filterStore.filters.value.copy(accountIds = setOf(accountId("other"))),
+            )
+
+            viewModel.content().rowIds().shouldContainExactly("mine")
         }
     }
 
@@ -314,21 +483,48 @@ private fun income(id: String, date: LocalDate = TODAY, amount: Int): Transactio
 
 private fun TransactionsByAccountState.Content.rowCount(): Int = groups.sumOf { it.transactions.size }
 
+private fun TransactionsByAccountState.Content.rowIds(): List<String> =
+    groups.flatMap { group -> group.transactions.map { it.id.value } }
+
+/** An expense of an exact number of minor units, for the amount-tolerance cases. */
+private fun expenseCents(id: String, cents: Long): Transaction =
+    expense(id = id, amount = 0).copy(money = Money.fromMinor(cents))
+
 private fun TransactionsByAccountViewModel.content(): TransactionsByAccountState.Content =
     currentState.shouldBeInstanceOf<TransactionsByAccountState.Content>()
 
 private class Env(transactions: List<Transaction> = emptyList()) {
     val repository = WindowingTransactionRepository(transactions)
     val preferences = FakeUiPreferences()
+    val filterStore = TransactionFilterStore()
+    private val session = InMemorySessionPointers(currentWorkspaceId = WORKSPACE)
 
     fun viewModel(accountId: AccountId? = ACCOUNT): TransactionsByAccountViewModel =
         TransactionsByAccountViewModel(
             accountId = accountId,
             getTransactionsByAccount = GetTransactionsByAccountUseCase(repository),
             getAccountById = GetAccountByIdUseCase(SingleAccountRepository),
+            getAccounts = GetAccountsUseCase(SingleAccountRepository, session),
+            getCategories = GetCategoriesUseCase(SeededCategoryRepository, session),
+            filterStore = filterStore,
             uiPreferences = preferences,
             clock = ClockUseCase(FixedClock(TODAY.atStartOfDayIn(TimeZone.UTC))),
         )
+}
+
+private val GROCERIES = categoryId("cat-groceries")
+
+private object SeededCategoryRepository : CategoryRepository {
+    private val categories = listOf(
+        aCategory(id = GROCERIES, workspaceId = WORKSPACE, name = "Groceries"),
+    )
+
+    override fun getAll(): Flow<List<Category>> = flowOf(categories)
+    override fun getByWorkspaceId(workspaceId: WorkspaceId): Flow<List<Category>> = flowOf(categories)
+    override suspend fun getById(id: CategoryId): Category? = categories.find { it.id == id }
+    override suspend fun insert(category: Category) = Unit
+    override suspend fun update(category: Category) = Unit
+    override suspend fun delete(id: CategoryId) = Unit
 }
 
 private class FixedClock(private val instant: Instant) : Clock {
@@ -385,6 +581,8 @@ private class WindowingTransactionRepository(
     override fun getByAccountId(accountId: AccountId): Flow<List<Transaction>> = rows
     override fun getByWorkspaceId(workspaceId: WorkspaceId): Flow<List<Transaction>> = rows
     override suspend fun getById(id: TransactionId): Transaction? = rows.value.find { it.id == id }
+    override suspend fun getByTransferId(transferId: TransferId): List<Transaction> =
+        rows.value.filter { it.transferId == transferId }
     override suspend fun insert(transaction: Transaction) = Unit
     override suspend fun update(transaction: Transaction) = Unit
     override suspend fun delete(id: TransactionId) = Unit

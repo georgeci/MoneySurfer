@@ -4,6 +4,7 @@ import arrow.optics.optics
 import com.georgeci.moneysurfer.domain.formatter.MoneyFormatter
 import com.georgeci.moneysurfer.domain.model.Account
 import com.georgeci.moneysurfer.domain.model.CategorizedTransaction
+import com.georgeci.moneysurfer.domain.model.Category
 import com.georgeci.moneysurfer.domain.model.TransactionTotal
 import com.georgeci.moneysurfer.domain.preferences.TransactionPeriodMode
 import com.georgeci.moneysurfer.domain.preferences.UiPreferences
@@ -14,13 +15,22 @@ import com.georgeci.moneysurfer.domain.primitives.Money
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
 import com.georgeci.moneysurfer.domain.usecase.GetAccountByIdUseCase
+import com.georgeci.moneysurfer.domain.usecase.GetAccountsUseCase
+import com.georgeci.moneysurfer.domain.usecase.GetCategoriesUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetTransactionsByAccountUseCase
 import com.georgeci.moneysurfer.domain.util.TransactionPeriodWindow
 import com.georgeci.moneysurfer.domain.util.isoWeek
-import com.georgeci.moneysurfer.domain.util.periodWindow
 import com.georgeci.moneysurfer.domain.util.shiftPeriod
+import com.georgeci.moneysurfer.feature.transaction.filter.TransactionDateRange
+import com.georgeci.moneysurfer.feature.transaction.filter.TransactionFilterStore
+import com.georgeci.moneysurfer.feature.transaction.filter.TransactionFilters
+import com.georgeci.moneysurfer.feature.transaction.filter.TransactionSort
+import com.georgeci.moneysurfer.feature.transaction.filter.TransactionTypeFilter
+import com.georgeci.moneysurfer.feature.transaction.filter.compile
+import com.georgeci.moneysurfer.feature.transaction.filter.resolveWindow
 import com.georgeci.moneysurfer.utils.MviViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -36,11 +46,55 @@ import org.koin.core.annotation.KoinViewModel
 /** Rows fetched per page. One screenful is ~15 rows, so a page covers a long scroll burst. */
 private const val PAGE_SIZE = 200
 
+/**
+ * Enough rendered rows that the list is comfortably scrollable, so the normal scroll-driven
+ * load-more can take over. Below this, a filtered page auto-advances — see
+ * [shouldLoadMoreToFillFilteredList].
+ */
+private const val AUTO_LOAD_UNTIL_SCROLLABLE = 20
+
+/**
+ * Whether a filtered page is too sparse to scroll and should pull its next raw page.
+ *
+ * A filter that matches only a handful of the loaded rows leaves too few to scroll, so without
+ * this the user could never reach matches deeper in the window and an all-miss first page would
+ * wrongly read as "nothing matches". Bounded by the window: a month stops at the month's rows.
+ *
+ * The real cure is to filter in SQL (the DAO already has an FTS `searchByText`); this keeps the
+ * in-memory page honest until that lands.
+ */
+private fun shouldLoadMoreToFillFilteredList(content: TransactionsByAccountState.Content): Boolean =
+    content.isFiltered && content.canLoadMore && content.renderedRowCount < AUTO_LOAD_UNTIL_SCROLLABLE
+
+/**
+ * The chip rail's values. Names are resolved from the account and category lists rather than in
+ * the screen, which has neither; a single selection shows its name, several show their count, and
+ * nothing selected leaves the chip in its bare "Account" state.
+ */
+private fun chips(
+    filters: TransactionFilters,
+    accounts: List<Account>,
+    categories: List<Category>,
+): TransactionFilterChipsUi = TransactionFilterChipsUi(
+    dateRange = filters.dateRange,
+    type = filters.type,
+    accountCount = filters.accountIds.size,
+    accountName = filters.accountIds.singleOrNull()
+        ?.let { id -> accounts.firstOrNull { it.id == id }?.name },
+    categoryCount = filters.categoryIds.size,
+    categoryName = filters.categoryIds.singleOrNull()
+        ?.let { id -> categories.firstOrNull { it.id == id }?.name },
+    sort = filters.sort,
+)
+
 @KoinViewModel
 class TransactionsByAccountViewModel(
     accountId: AccountId?,
     private val getTransactionsByAccount: GetTransactionsByAccountUseCase,
     private val getAccountById: GetAccountByIdUseCase,
+    private val getAccounts: GetAccountsUseCase,
+    private val getCategories: GetCategoriesUseCase,
+    private val filterStore: TransactionFilterStore,
     private val uiPreferences: UiPreferences,
     private val clock: ClockUseCase,
 ) : MviViewModel<TransactionsByAccountState, TransactionsByAccountEvent, TransactionsByAccountEffect>(
@@ -49,8 +103,6 @@ class TransactionsByAccountViewModel(
 
     private val zone = TimeZone.currentSystemDefault()
     private val today: LocalDate get() = clock.now().toLocalDateTime(zone).date
-
-    private val typeFilter = MutableStateFlow(TransactionTypeFilter.All)
 
     /**
      * A date inside the visible period, not the period itself — the window is derived from it and
@@ -76,8 +128,17 @@ class TransactionsByAccountViewModel(
                 postSideEffect(TransactionsByAccountEffect.NavigateToTransactionCreation(currentState.accountId))
             is TransactionsByAccountEvent.OnTransactionClick ->
                 postSideEffect(TransactionsByAccountEffect.NavigateToTransactionDetails(event.transactionId))
-            is TransactionsByAccountEvent.OnTypeFilterChanged ->
-                typeFilter.value = event.filter
+            is TransactionsByAccountEvent.OnSearchQueryChanged -> filterStore.setQuery(event.query)
+            TransactionsByAccountEvent.OnOpenFiltersClick ->
+                // Carry the anchor the list is paged to: the filter screen's live result count
+                // resolves the same window from it, so `Apply · N results` matches the list the
+                // user returns to rather than always counting today's period.
+                postSideEffect(
+                    TransactionsByAccountEffect.NavigateToFilters(
+                        accountId = currentState.accountId,
+                        anchorEpochDay = anchorDate.value.toEpochDays(),
+                    ),
+                )
             TransactionsByAccountEvent.OnPreviousPeriodClick -> shiftAnchor(by = -1)
             TransactionsByAccountEvent.OnNextPeriodClick -> shiftAnchor(by = 1)
             is TransactionsByAccountEvent.OnPeriodModeChanged -> launch {
@@ -98,104 +159,144 @@ class TransactionsByAccountViewModel(
         pageLimit.value += PAGE_SIZE
     }
 
+    /**
+     * Two layers, on purpose. The *window* — pager mode, anchor and the filters' date range — is
+     * what the database is queried with, and a change to it invalidates paging. Every other filter
+     * narrows the rows already loaded, so typing in the search field must not throw the user back
+     * to page one.
+     */
     @OptIn(ExperimentalCoroutinesApi::class)
     private fun observeData() {
         launch {
             val accountId = currentState.accountId
             val account = if (accountId != null) getAccountById(accountId) else null
 
-            combine(
+            val loaded = combine(
                 uiPreferences.transactionsPeriodMode.flow.distinctUntilChanged(),
                 anchorDate,
-            ) { mode, anchor -> Period(mode = mode, anchor = anchor) }
+                filterStore.filters.map { it.dateRange }.distinctUntilChanged(),
+            ) { mode, anchor, dateRange ->
+                Period(
+                    mode = mode,
+                    anchor = anchor,
+                    dateRange = dateRange,
+                    window = resolveWindow(dateRange, mode, anchor, today),
+                )
+            }
+                .distinctUntilChanged()
                 // A new window invalidates the accumulated paging: the first page of the new
                 // period is what the user is about to look at, not page 7 of the old one.
                 .onEach { pageLimit.value = PAGE_SIZE }
                 .flatMapLatest { period ->
-                    val page = pageLimit.flatMapLatest { limit ->
-                        // One row over the page: its presence is what "there is more" means, and
-                        // it costs one row rather than a second COUNT query.
-                        getTransactionsByAccount.window(accountId, period.window, limit + 1)
-                            .map { rows -> Page(rows = rows, limit = limit) }
-                    }
                     combine(
-                        page,
+                        pageFlow(accountId, period),
                         getTransactionsByAccount.totals(accountId, period.window),
-                        typeFilter,
-                    ) { loaded, totals, filter ->
-                        buildContent(
-                            accountId = accountId,
-                            account = account,
-                            period = period,
-                            page = loaded,
-                            totals = totals,
-                            filter = filter,
-                        )
-                    }
+                    ) { page, totals -> Loaded(period = period, page = page, totals = totals) }
                 }
-                .collect { content -> updateState { content } }
+
+            combine(
+                loaded,
+                filterStore.filters,
+                getAccounts(),
+                getCategories(),
+            ) { rows, filters, accounts, categories ->
+                buildContent(
+                    accountId = accountId,
+                    account = account,
+                    loaded = rows,
+                    filters = filters,
+                    accounts = accounts,
+                    categories = categories,
+                )
+            }.collect { content ->
+                updateState { content }
+                // Filtering runs in memory over the loaded page, but the scroll-driven load-more
+                // can only fire once the rendered list is long enough to scroll. While a filter is
+                // active and too few rows match to scroll, keep pulling the next raw page until the
+                // list is scrollable again (normal paging takes over) or the window is exhausted.
+                if (shouldLoadMoreToFillFilteredList(content)) pageLimit.value += PAGE_SIZE
+            }
         }
     }
+
+    private fun pageFlow(accountId: AccountId?, period: Period): Flow<Page> =
+        pageLimit.flatMapLatest { limit ->
+            // One row over the page: its presence is what "there is more" means, and it costs one
+            // row rather than a second COUNT query.
+            getTransactionsByAccount.window(accountId, period.window, limit + 1)
+                .map { rows -> Page(rows = rows, limit = limit) }
+        }
 
     private fun buildContent(
         accountId: AccountId?,
         account: Account?,
-        period: Period,
-        page: Page,
-        totals: List<TransactionTotal>,
-        filter: TransactionTypeFilter,
+        loaded: Loaded,
+        filters: TransactionFilters,
+        accounts: List<Account>,
+        categories: List<Category>,
     ): TransactionsByAccountState.Content {
+        val page = loaded.page
         val canLoadMore = page.rows.size > page.limit
         val visible = page.rows.take(page.limit)
-        val currency = summaryCurrency(account, totals)
+        val currency = summaryCurrency(account, loaded.totals)
+        // An account-scoped list is already restricted by the query; intersecting it with a
+        // different account picked on the filter screen would silently show nothing.
+        val effective = if (accountId != null) filters.copy(accountIds = emptySet()) else filters
 
-        val filtered = when (filter) {
-            TransactionTypeFilter.All -> visible
-            TransactionTypeFilter.Expenses -> visible.filter { it.type == TransactionType.EXPENSE }
-            TransactionTypeFilter.Income -> visible.filter { it.type == TransactionType.INCOME }
-        }
-        // Already ordered by the query's (operationDate, operationAt, createdAt) DESC — grouping
-        // preserves encounter order, so no re-sort is needed here.
-        val groups = filtered.groupBy { it.transaction.operationDate }
-            .map { (date, txns) ->
-                val net = txns.fold(Money.zero()) { acc, t -> acc + t.signedMoney() }
-                val groupCurrency = txns.first().currencyCode
-                TransactionGroupUi(
-                    date = date,
-                    dateLabel = dateLabel(date),
-                    netFormatted = MoneyFormatter.format(net, groupCurrency),
-                    netPositive = !net.isNegative(),
-                    transactions = txns.map { t ->
-                        val transaction = t.transaction
-                        val categoryName = t.categoryName
-                        TransactionRowUi(
-                            id = transaction.id,
-                            title = transaction.note.ifBlank { categoryName.orEmpty() },
-                            subtitle = categoryName.orEmpty(),
-                            formattedAmount = MoneyFormatter.format(transaction.money.abs(), transaction.currencyCode),
-                            isExpense = transaction.type == TransactionType.EXPENSE,
-                            categoryHueSeed = categoryName ?: transaction.categoryId?.value.orEmpty(),
-                        )
-                    },
-                )
-            }
+        // Compile once, then test each row: the amount fields are parsed a single time for the
+        // whole page rather than re-parsed per row.
+        val matcher = effective.compile()
+        val matched = visible.filter { matcher.matches(it) }
+        // Already ordered by the query's (operationDate, operationAt, createdAt) DESC — reversing
+        // the flat list is what "oldest first" means, inside each day as well as between days.
+        val ordered = if (effective.sort == TransactionSort.Oldest) matched.reversed() else matched
 
         return TransactionsByAccountState.Content(
             accountId = accountId,
             accountName = account?.name.orEmpty(),
-            groups = groups,
-            summary = buildSummary(totals, currency),
-            typeFilter = filter,
-            isFiltered = filter != TransactionTypeFilter.All,
-            periodMode = period.mode,
-            period = periodLabel(period),
+            groups = groupByDate(ordered),
+            summary = buildSummary(loaded.totals, currency),
+            query = filters.query,
+            filters = chips(effective, accounts, categories),
+            activeFilterCount = effective.activeCount,
+            isFiltered = effective.isNarrowed,
+            periodMode = loaded.period.mode,
+            period = periodLabel(loaded.period),
+            // The pager is the date window's source only while no explicit range is set — see
+            // `resolveWindow`. Hiding it there is what keeps the two from competing.
+            showPeriodPager = effective.dateRange == TransactionDateRange.FollowPeriod,
             // Paging forward past the current period would only ever show an empty list, so the
             // pager stops there; going back is always allowed.
-            canGoToPreviousPeriod = period.mode != TransactionPeriodMode.AllTime,
-            canGoToNextPeriod = period.mode != TransactionPeriodMode.AllTime && today !in period.window,
+            canGoToPreviousPeriod = loaded.period.mode != TransactionPeriodMode.AllTime,
+            canGoToNextPeriod = loaded.period.mode != TransactionPeriodMode.AllTime &&
+                today !in loaded.period.window,
             canLoadMore = canLoadMore,
         )
     }
+
+    private fun groupByDate(rows: List<CategorizedTransaction>): List<TransactionGroupUi> =
+        rows.groupBy { it.transaction.operationDate }
+            .map { (date, txns) ->
+                val net = txns.fold(Money.zero()) { acc, t -> acc + t.signedMoney() }
+                TransactionGroupUi(
+                    date = date,
+                    dateLabel = dateLabel(date),
+                    netFormatted = MoneyFormatter.format(net, txns.first().currencyCode),
+                    netPositive = !net.isNegative(),
+                    transactions = txns.map { it.toRow() },
+                )
+            }
+
+    private fun CategorizedTransaction.toRow(): TransactionRowUi = TransactionRowUi(
+        id = transaction.id,
+        // Merchant first: "Starbucks" identifies the row better than whatever was jotted next
+        // to it, and the note still shows when there is no merchant.
+        title = transaction.merchant.ifBlank { transaction.note }.ifBlank { categoryName.orEmpty() },
+        subtitle = categoryName.orEmpty(),
+        formattedAmount = MoneyFormatter.format(transaction.money.abs(), transaction.currencyCode),
+        isExpense = transaction.type == TransactionType.EXPENSE,
+        categoryHueSeed = categoryName ?: transaction.categoryId?.value.orEmpty(),
+    )
 
     /**
      * The single currency the summary strip renders in.
@@ -215,6 +316,10 @@ class TransactionsByAccountViewModel(
     /**
      * Summary of the whole period, not of the loaded page: [totals] come straight from the
      * database aggregation, so paging cannot change these numbers.
+     *
+     * It also deliberately ignores the filters. The strip answers "what happened in this period",
+     * which stays true while the user narrows the list below it; recomputing it from the matched
+     * page would instead answer "what is on screen", and would drift as pages load.
      *
      * Rows in other currencies are dropped rather than added to the displayed one — mixing minor
      * units across currencies would produce a confidently wrong number.
@@ -270,7 +375,6 @@ class TransactionsByAccountViewModel(
         filter(predicate).fold(Money.zero()) { acc, total -> acc + total.total }
 
     private val CategorizedTransaction.currencyCode: CurrencyCode get() = transaction.currencyCode
-    private val CategorizedTransaction.type: TransactionType get() = transaction.type
 
     private fun CategorizedTransaction.signedMoney(): Money = when (transaction.type) {
         TransactionType.EXPENSE -> -transaction.money.abs()
@@ -280,11 +384,19 @@ class TransactionsByAccountViewModel(
     /** One fetch: at most `limit + 1` rows, the extra one only signalling that more exist. */
     private data class Page(val rows: List<CategorizedTransaction>, val limit: Int)
 
+    /** Everything one window produced: the page of rows and the period totals behind it. */
+    private data class Loaded(
+        val period: Period,
+        val page: Page,
+        val totals: List<TransactionTotal>,
+    )
+
     /** The visible period: what the user picked, where they paged to, and the resulting bounds. */
     private data class Period(
         val mode: TransactionPeriodMode,
         val anchor: LocalDate,
-        val window: TransactionPeriodWindow = periodWindow(mode, anchor),
+        val dateRange: TransactionDateRange,
+        val window: TransactionPeriodWindow,
     )
 }
 
@@ -303,15 +415,21 @@ sealed interface TransactionsByAccountState {
         val accountName: String,
         val groups: List<TransactionGroupUi>,
         val summary: TransactionSummaryUi,
-        val typeFilter: TransactionTypeFilter,
+        val query: String,
+        val filters: TransactionFilterChipsUi,
+        val activeFilterCount: Int,
         val isFiltered: Boolean,
         val periodMode: TransactionPeriodMode,
         val period: TransactionPeriodUi,
+        val showPeriodPager: Boolean,
         val canGoToPreviousPeriod: Boolean,
         val canGoToNextPeriod: Boolean,
         val canLoadMore: Boolean,
     ) : TransactionsByAccountState {
         val isEmpty: Boolean get() = groups.isEmpty()
+
+        /** Rows actually shown, across every day group — what the LazyColumn can scroll. */
+        val renderedRowCount: Int get() = groups.sumOf { it.transactions.size }
 
         companion object
     }
@@ -347,6 +465,20 @@ sealed interface TransactionPeriodUi {
     data object AllTime : TransactionPeriodUi
 }
 
+/**
+ * The filter chip rail's contents. Every chip is a shortcut into the filter screen, so these carry
+ * only what the chip label shows — a name when exactly one thing is picked, a count otherwise.
+ */
+data class TransactionFilterChipsUi(
+    val dateRange: TransactionDateRange,
+    val type: TransactionTypeFilter,
+    val accountCount: Int,
+    val accountName: String?,
+    val categoryCount: Int,
+    val categoryName: String?,
+    val sort: TransactionSort,
+)
+
 data class TransactionRowUi(
     val id: TransactionId,
     val title: String,
@@ -363,13 +495,12 @@ data class TransactionSummaryUi(
     val netPositive: Boolean,
 )
 
-enum class TransactionTypeFilter { All, Expenses, Income }
-
 sealed interface TransactionsByAccountEvent {
     data object OnBackClick : TransactionsByAccountEvent
     data object OnAddTransactionClick : TransactionsByAccountEvent
     data class OnTransactionClick(val transactionId: TransactionId) : TransactionsByAccountEvent
-    data class OnTypeFilterChanged(val filter: TransactionTypeFilter) : TransactionsByAccountEvent
+    data class OnSearchQueryChanged(val query: String) : TransactionsByAccountEvent
+    data object OnOpenFiltersClick : TransactionsByAccountEvent
     data object OnPreviousPeriodClick : TransactionsByAccountEvent
     data object OnNextPeriodClick : TransactionsByAccountEvent
     data class OnPeriodModeChanged(val mode: TransactionPeriodMode) : TransactionsByAccountEvent
@@ -380,4 +511,8 @@ sealed interface TransactionsByAccountEffect {
     data object NavigateBack : TransactionsByAccountEffect
     data class NavigateToTransactionCreation(val accountId: AccountId?) : TransactionsByAccountEffect
     data class NavigateToTransactionDetails(val transactionId: TransactionId) : TransactionsByAccountEffect
+    data class NavigateToFilters(
+        val accountId: AccountId?,
+        val anchorEpochDay: Long,
+    ) : TransactionsByAccountEffect
 }

@@ -21,6 +21,11 @@ Public composables (pick the right atom + add ripple on click):
 - [SurferCard.kt](src/commonMain/kotlin/com/georgeci/moneysurfer/uikit/atom/SurferCard.kt) — `SurferCard(selected, onClick?)`. Picks the variant based on `AppTheme.containerStyle` and `selected`. Optional `onClick` adds a ripple-bounded click area.
 - [SurferActionCard.kt](src/commonMain/kotlin/com/georgeci/moneysurfer/uikit/atom/SurferActionCard.kt) — `SurferActionCard(onClick?)`. Wraps the dashed `SurferAddActionContainer`. Optional `onClick` adds ripple.
 
+Drag-to-reorder ([components/base](src/commonMain/kotlin/com/georgeci/moneysurfer/uikit/components/base)):
+
+- [SurferDragHandle.kt](src/commonMain/kotlin/com/georgeci/moneysurfer/uikit/components/base/SurferDragHandle.kt) — the six-dot grip. Purely visual; pair it with the state below to make it drag.
+- [SurferReorderableList.kt](src/commonMain/kotlin/com/georgeci/moneysurfer/uikit/components/base/SurferReorderableList.kt) — `rememberSurferReorderState(listState, keys, onMove)` plus `Modifier.surferReorderableItem(state, key)` on each row and `Modifier.surferReorderHandle(state, key)` on its `SurferDragHandle`. Moves are reported as row *keys*, not indices, so a `LazyColumn` that also holds headers or a second section needs no index arithmetic. Drag is confined to the handle, leaving the rest of the row free to scroll.
+
 Savings goals ([components/goal](src/commonMain/kotlin/com/georgeci/moneysurfer/uikit/components/goal)) — the
 one part of the system where emoji are allowed alongside workspace icons:
 

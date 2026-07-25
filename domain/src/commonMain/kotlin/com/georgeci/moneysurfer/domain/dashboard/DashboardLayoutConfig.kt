@@ -15,6 +15,50 @@ data class DashboardLayoutConfig(
     val enabledItems: List<DashboardLayoutItem>
         get() = items.filter { it.enabled }
 
+    /** The widgets the user switched off — the "Available" half of the customize screen. */
+    val disabledItems: List<DashboardLayoutItem>
+        get() = items.filterNot { it.enabled }
+
+    /**
+     * [type] switched on or off, keeping the item either way so its card style survives the round
+     * trip. Switching on appends the widget after the last enabled one — it joins the bottom of the
+     * dashboard, rather than reappearing in a middle slot the user cannot see from the toggle.
+     * Switching off sends it to the end of [items], so the enabled block stays contiguous.
+     *
+     * A [type] the layout does not carry is a no-op: only [normalized] adds items.
+     */
+    fun withWidgetEnabled(type: DashboardWidgetType, enabled: Boolean): DashboardLayoutConfig {
+        val target = items.firstOrNull { it.type == type } ?: return this
+        if (target.enabled == enabled) return this
+        val others = items.filterNot { it.type == type }
+        val moved = target.copy(enabled = enabled)
+        val stillEnabled = others.filter { it.enabled }
+        val stillDisabled = others.filterNot { it.enabled }
+        return DashboardLayoutConfig(
+            items = if (enabled) {
+                stillEnabled + moved + stillDisabled
+            } else {
+                stillEnabled + stillDisabled + moved
+            },
+        )
+    }
+
+    /**
+     * [from] dragged onto the slot [to] currently occupies, within [enabledItems]. Positions are
+     * expressed as widget types rather than indices because the customize screen drags rows out of
+     * a list that also holds headers and the switched-off section — indices there are not layout
+     * positions. Switched-off widgets have no slot to trade, so naming one is a no-op.
+     */
+    fun withWidgetMoved(from: DashboardWidgetType, to: DashboardWidgetType): DashboardLayoutConfig {
+        if (from == to) return this
+        val reordered = enabledItems.toMutableList()
+        val fromIndex = reordered.indexOfFirst { it.type == from }
+        val toIndex = reordered.indexOfFirst { it.type == to }
+        if (fromIndex < 0 || toIndex < 0) return this
+        reordered.add(toIndex, reordered.removeAt(fromIndex))
+        return DashboardLayoutConfig(items = reordered + disabledItems)
+    }
+
     /**
      * A layout safe to render: at most one entry per widget type, with any type missing from
      * [items] appended in its [DEFAULT] position and style. Persisted layouts written by an older

@@ -68,6 +68,42 @@
 - Lines: 19-98
 - Tasks: ci, security, supply-chain
 
+## cloud-login-f1-dangling-refs
+- Title: F1 — Asymmetric flag gating writes dangling workspace refs (critical)
+- File: docs/architecture/cloud-login-hydration.md
+- Lines: 65-108
+- Tasks: sync, firestore, feature-flag, data-integrity
+
+## cloud-login-f2-pointer-seed
+- Title: F2 — Bootstrap pins a workspace that does not exist locally
+- File: docs/architecture/cloud-login-hydration.md
+- Lines: 110-123
+- Tasks: auth, login, workspace, session
+
+## cloud-login-f3-pull-pagination
+- Title: F3 — The pull fetches one batch per collection, with no pagination loop
+- File: docs/architecture/cloud-login-hydration.md
+- Lines: 125-143
+- Tasks: sync, pull, pagination
+
+## cloud-login-f4-bootstrap-abort
+- Title: F4 — One unreadable workspace aborts the whole bootstrap, blocking sign-in
+- File: docs/architecture/cloud-login-hydration.md
+- Lines: 145-162
+- Tasks: sync, pull, auth, error-handling
+
+## cloud-login-remediation
+- Title: Remediation
+- File: docs/architecture/cloud-login-hydration.md
+- Lines: 189-204
+- Tasks: sync, auth, roadmap, known-issues
+
+## cloud-login-verdict
+- Title: Verdict
+- File: docs/architecture/cloud-login-hydration.md
+- Lines: 41-50
+- Tasks: sync, auth, login, workspace, known-issues
+
 ## color-contrast
 - Title: What was audited
 - File: docs/design/color-contrast.md
@@ -359,7 +395,7 @@
 ## time-policy
 - Title: Time policy
 - File: docs/architecture/data-models.md
-- Lines: 45-68
+- Lines: 46-69
 - Tasks: time, persistence, domain
 
 ## transactions-feature

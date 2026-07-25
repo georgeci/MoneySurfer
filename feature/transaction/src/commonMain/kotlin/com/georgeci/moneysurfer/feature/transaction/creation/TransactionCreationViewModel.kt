@@ -9,8 +9,11 @@ import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.CategoryId
 import com.georgeci.moneysurfer.domain.primitives.CategoryType
 import com.georgeci.moneysurfer.domain.primitives.Money
+import com.georgeci.moneysurfer.domain.primitives.RecurringRuleId
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
+import com.georgeci.moneysurfer.domain.primitives.TransactionStatus
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
+import com.georgeci.moneysurfer.domain.primitives.TransferId
 import com.georgeci.moneysurfer.domain.repositories.TransactionRepository
 import com.georgeci.moneysurfer.domain.usecase.CreateTransactionUseCase
 import com.georgeci.moneysurfer.domain.usecase.CreateTransferUseCase
@@ -35,7 +38,7 @@ import org.koin.core.annotation.KoinViewModel
 @KoinViewModel
 @Suppress("LongParameterList")
 class TransactionCreationViewModel(
-    private val transactionId: TransactionId?,
+    private val seed: TransactionCreationSeed?,
     private val accountId: AccountId?,
     private val getAccounts: GetAccountsUseCase,
     private val getCategories: GetCategoriesUseCase,
@@ -197,54 +200,68 @@ class TransactionCreationViewModel(
                 transferEnabled = hostCapabilities.transferEnabled,
             )
 
-            if (transactionId != null) {
-                val transaction = getTransactionById(transactionId)
-                if (transaction == null) {
-                    updateState { baseContent }
-                    return@launch
-                }
-                val account = accounts.find { it.id == transaction.accountId }
-                val category = categories.find { it.id == transaction.categoryId }
-                val amountDouble = transaction.money.minor / Money.MINOR_PER_MAJOR
-                val amountText = if (amountDouble == amountDouble.toLong().toDouble()) {
-                    amountDouble.toLong().toString()
+            val existing = seed?.let { getTransactionById(it.transactionId) }
+            updateState {
+                if (seed == null || existing == null) {
+                    baseContent
                 } else {
-                    amountDouble.toString()
+                    baseContent.seededFrom(seed, existing)
                 }
-                val resolvedType = when (transaction.type) {
-                    TransactionType.INCOME -> TransactionTypeUi.Income
-                    else -> TransactionTypeUi.Expense
-                }
-                val activeCategoryType = if (resolvedType == TransactionTypeUi.Income) {
-                    CategoryType.INCOME
-                } else {
-                    CategoryType.EXPENSE
-                }
-                val resolvedSelected = category ?: initialSelected
-                updateState {
-                    baseContent.copy(
-                        amount = amountText,
-                        note = transaction.note,
-                        type = resolvedType,
-                        selectedAccount = account ?: baseContent.selectedAccount,
-                        selectedCategory = resolvedSelected,
-                        timestamp = transaction.operationAt.toEpochMilliseconds(),
-                        isEditMode = true,
-                        editingTransactionId = transactionId,
-                        editingCreatedAt = transaction.createdAt,
-                        pinnedOperationDate = transaction.operationDate,
-                        displayCategories = buildDisplayCategories(
-                            categories = categories,
-                            counts = baseContent.categoryUsageCounts,
-                            type = activeCategoryType,
-                            selected = resolvedSelected,
-                        ),
-                    )
-                }
-            } else {
-                updateState { baseContent }
             }
         }
+    }
+
+    /**
+     * Fills the blank form from an existing transaction.
+     *
+     * In [TransactionCreationSeed.Mode.Edit] that means the row itself, identity and timestamps
+     * included. A duplicate copies only what the user typed — no id, no `createdAt`, and today's
+     * date rather than the original's: it is a new transaction that merely starts out looking
+     * like an old one.
+     */
+    private fun TransactionCreationState.Content.seededFrom(
+        seed: TransactionCreationSeed,
+        transaction: Transaction,
+    ): TransactionCreationState.Content {
+        val account = accounts.find { it.id == transaction.accountId }
+        val category = categories.find { it.id == transaction.categoryId }
+        val resolvedType = when (transaction.type) {
+            TransactionType.INCOME -> TransactionTypeUi.Income
+            else -> TransactionTypeUi.Expense
+        }
+        val activeCategoryType = if (resolvedType == TransactionTypeUi.Income) {
+            CategoryType.INCOME
+        } else {
+            CategoryType.EXPENSE
+        }
+        val resolvedSelected = category ?: selectedCategory
+        val editing = seed.mode == TransactionCreationSeed.Mode.Edit
+        return copy(
+            amount = transaction.money.toAmountInput(),
+            note = transaction.note,
+            type = resolvedType,
+            selectedAccount = account ?: selectedAccount,
+            selectedCategory = resolvedSelected,
+            timestamp = if (editing) transaction.operationAt.toEpochMilliseconds() else timestamp,
+            isEditMode = editing,
+            editingTransactionId = seed.transactionId.takeIf { editing },
+            editingCreatedAt = transaction.createdAt.takeIf { editing },
+            pinnedOperationDate = transaction.operationDate.takeIf { editing },
+            preserved = if (editing) {
+                PreservedTransactionFields.of(transaction)
+            } else {
+                // A duplicate keeps what the user typed about the counterparty, but is a fresh
+                // manual entry: it inherits neither the transfer pairing (a second leg would be
+                // missing), the recurring rule that generated the original, nor its planned state.
+                PreservedTransactionFields(merchant = transaction.merchant, tags = transaction.tags)
+            },
+            displayCategories = buildDisplayCategories(
+                categories = categories,
+                counts = categoryUsageCounts,
+                type = activeCategoryType,
+                selected = resolvedSelected,
+            ),
+        )
     }
 
     private fun observeCategoryUsage() {
@@ -381,12 +398,19 @@ class TransactionCreationViewModel(
                 currencyCode = account.currencyCode,
                 categoryId = category.id,
                 note = state.note,
+                // This rebuilds the whole row rather than patching the stored one, so every field
+                // the form does not edit has to be handed back explicitly — omitting one resets it.
+                merchant = state.preserved.merchant,
+                tags = state.preserved.tags,
                 operationAt = operationAt,
                 operationDate = state.pinnedOperationDate
                     ?: operationAt.toLocalDateTime(zone).date,
                 type = type,
+                status = state.preserved.status,
                 createdAt = state.editingCreatedAt ?: now,
                 updatedAt = now,
+                transferId = state.preserved.transferId,
+                recurringRuleId = state.preserved.recurringRuleId,
             )
 
             if (state.isEditMode) {
@@ -445,6 +469,12 @@ class TransactionCreationViewModel(
     }
 }
 
+/** Amount as the text field spells it — a whole number keeps no trailing `.0`. */
+private fun Money.toAmountInput(): String {
+    val major = minor / Money.MINOR_PER_MAJOR
+    return if (major == major.toLong().toDouble()) major.toLong().toString() else major.toString()
+}
+
 private fun pickDefaultCategory(
     categories: List<Category>,
     counts: Map<CategoryId, Int>,
@@ -473,6 +503,55 @@ private fun buildDisplayCategories(
 
 private const val CATEGORY_PREVIEW_SIZE = 7
 
+/**
+ * The existing transaction the creation screen opens on, and what it is there for.
+ *
+ * One nullable parameter rather than an id plus a flag: the screen loads exactly one transaction
+ * in either mode, and two independent parameters could contradict each other (a duplicate flag
+ * with no id, an id with no mode).
+ */
+/**
+ * Everything a stored transaction carries that this screen has no field for.
+ *
+ * `saveTransaction` builds a whole new [Transaction] instead of patching the stored row, so a
+ * field that is not routed back through here is silently reset to its default on update — which
+ * is how editing used to wipe a transaction's merchant and tags, downgrade a `PLANNED` row to
+ * `ACTUAL`, and orphan the other leg of a transfer by dropping its `transferId`.
+ *
+ * The defaults are what a brand-new transaction should have, so a blank form needs no special case.
+ */
+data class PreservedTransactionFields(
+    val merchant: String = "",
+    val tags: List<String> = emptyList(),
+    val status: TransactionStatus = TransactionStatus.ACTUAL,
+    val transferId: TransferId? = null,
+    val recurringRuleId: RecurringRuleId? = null,
+) {
+    companion object {
+        /** Everything [transaction] holds outside the form — what an edit must hand back untouched. */
+        fun of(transaction: Transaction): PreservedTransactionFields = PreservedTransactionFields(
+            merchant = transaction.merchant,
+            tags = transaction.tags,
+            status = transaction.status,
+            transferId = transaction.transferId,
+            recurringRuleId = transaction.recurringRuleId,
+        )
+    }
+}
+
+data class TransactionCreationSeed(
+    val transactionId: TransactionId,
+    val mode: Mode,
+) {
+    enum class Mode {
+        /** Update the transaction in place. */
+        Edit,
+
+        /** Use it as a template for a brand-new transaction. */
+        Duplicate,
+    }
+}
+
 enum class TransactionTypeUi { Expense, Income, Transfer }
 
 @optics
@@ -496,6 +575,11 @@ sealed interface TransactionCreationState {
         // change between the original save and the edit would silently shift the
         // stored business date.
         val pinnedOperationDate: LocalDate? = null,
+        /**
+         * Fields of the transaction being edited that this form cannot change but must not
+         * destroy — see [PreservedTransactionFields].
+         */
+        val preserved: PreservedTransactionFields = PreservedTransactionFields(),
         val timestamp: Long,
         val categoryUsageCounts: Map<CategoryId, Int>,
         val displayCategories: List<Category>,

@@ -2,15 +2,18 @@ package com.georgeci.moneysurfer.integration.repository
 
 import com.georgeci.moneysurfer.domain.fixtures.EUR
 import com.georgeci.moneysurfer.domain.fixtures.USD
+import com.georgeci.moneysurfer.domain.fixtures.aTransaction
 import com.georgeci.moneysurfer.domain.fixtures.accountId
 import com.georgeci.moneysurfer.domain.fixtures.anAccount
 import com.georgeci.moneysurfer.domain.fixtures.dollars
 import com.georgeci.moneysurfer.domain.fixtures.testDate
 import com.georgeci.moneysurfer.domain.fixtures.testInstant
+import com.georgeci.moneysurfer.domain.fixtures.transactionId
 import com.georgeci.moneysurfer.domain.primitives.CategorySystemKind
 import com.georgeci.moneysurfer.domain.primitives.Money
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
 import com.georgeci.moneysurfer.domain.usecase.CreateTransferUseCase
+import com.georgeci.moneysurfer.domain.usecase.GetTransferCounterpartUseCase
 import com.georgeci.moneysurfer.integration.fixtures.IntegrationHarness
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
@@ -170,6 +173,109 @@ class TransferCreationIntegrationIT : StringSpec({
             .getByWorkspaceId(DEFAULT_WORKSPACE_ID).first()
         txns.size shouldBe 4
         txns.map { it.categoryId }.toSet() shouldBe setOf(transferCategories.single().id)
+    }
+
+    "getByTransferId returns only the legs of the requested transfer" {
+        val from = anAccount(
+            id = accountId("a-from"),
+            workspaceId = DEFAULT_WORKSPACE_ID,
+            currencyCode = USD,
+            balance = 1_000.dollars,
+        )
+        val to = anAccount(
+            id = accountId("a-to"),
+            workspaceId = DEFAULT_WORKSPACE_ID,
+            currencyCode = USD,
+            balance = Money.zero(),
+        )
+        stack.accountRepository.insert(from)
+        stack.accountRepository.insert(to)
+
+        // Two transfers plus a plain expense: the query has to pick one pair out of rows that
+        // include another transfer and a row whose transferId is null.
+        repeat(2) {
+            stack.createTransfer(
+                CreateTransferUseCase.Params(
+                    from = from,
+                    to = to,
+                    fromMoney = 10.dollars,
+                    toMoney = 10.dollars,
+                    note = "n$it",
+                    operationAt = testInstant,
+                    operationDate = testDate,
+                ),
+            )
+        }
+        stack.transactionRepository.insert(
+            aTransaction(
+                id = transactionId("t-plain"),
+                workspaceId = DEFAULT_WORKSPACE_ID,
+                accountId = from.id,
+                money = 5.dollars,
+                categoryId = null,
+                type = TransactionType.EXPENSE,
+            ),
+        )
+
+        val all = stack.transactionRepository.getByWorkspaceId(DEFAULT_WORKSPACE_ID).first()
+        val targetTransferId = all.mapNotNull { it.transferId }.first()
+
+        val legs = stack.transactionRepository.getByTransferId(targetTransferId)
+
+        legs.size shouldBe 2
+        legs.map { it.id }.toSet() shouldBe
+            all.filter { it.transferId == targetTransferId }.map { it.id }.toSet()
+        legs.map { it.type }.toSet() shouldBe setOf(TransactionType.EXPENSE, TransactionType.INCOME)
+    }
+
+    "the transfer counterpart resolves to the opposite leg through real storage" {
+        val from = anAccount(
+            id = accountId("a-from"),
+            workspaceId = DEFAULT_WORKSPACE_ID,
+            currencyCode = USD,
+            balance = 1_000.dollars,
+        )
+        val to = anAccount(
+            id = accountId("a-to"),
+            workspaceId = DEFAULT_WORKSPACE_ID,
+            currencyCode = USD,
+            balance = Money.zero(),
+        )
+        stack.accountRepository.insert(from)
+        stack.accountRepository.insert(to)
+
+        stack.createTransfer(
+            CreateTransferUseCase.Params(
+                from = from,
+                to = to,
+                fromMoney = 200.dollars,
+                toMoney = 200.dollars,
+                note = "rent",
+                operationAt = testInstant,
+                operationDate = testDate,
+            ),
+        )
+
+        val getCounterpart = GetTransferCounterpartUseCase(stack.transactionRepository)
+        val txns = stack.transactionRepository.getByWorkspaceId(DEFAULT_WORKSPACE_ID).first()
+        val expense = txns.single { it.type == TransactionType.EXPENSE }
+        val income = txns.single { it.type == TransactionType.INCOME }
+
+        // This is what the details screen calls to say "Everyday → Savings"; each leg has to see
+        // the other, never itself.
+        getCounterpart(expense)?.id shouldBe income.id
+        getCounterpart(income)?.id shouldBe expense.id
+
+        val plain = aTransaction(
+            id = transactionId("t-plain"),
+            workspaceId = DEFAULT_WORKSPACE_ID,
+            accountId = from.id,
+            money = 5.dollars,
+            categoryId = null,
+            type = TransactionType.EXPENSE,
+        )
+        stack.transactionRepository.insert(plain)
+        getCounterpart(plain) shouldBe null
     }
 
     "transfer with from == to throws IllegalArgumentException" {
