@@ -17,7 +17,7 @@ class GetAccountsUseCase(
 ) {
 
     operator fun invoke(): Flow<List<Account>> =
-        session.currentWorkspaceId.flow.flatMapLatest { workspaceId ->
+        session.currentWorkspaceId.flatMapLatest { workspaceId ->
             workspaceId?.let(accountRepository::getByWorkspaceId) ?: flowOf(emptyList())
         }
 }

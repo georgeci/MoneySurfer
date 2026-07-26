@@ -32,14 +32,19 @@
   why the guards exist. Read [Remediation](#remediation) for the status of each item.
 
 READ WHEN:
-- changing `SyncFeatureFlag` or anything it gates
-- flipping the online build to `enabled = true`
+- changing `host.sync_enabled` / `SyncSettings` or anything they gate
 - touching `PostAuthBootstrapUseCase`, `CreateWorkspaceUseCase`, or the workspace selector
 - investigating "I signed in on my other phone and my data is gone"
 
 Audit date: 2026-07-25. Baseline: `main` @ `93880d1b0`.
-Fixed: 2026-07-25, issue #342 — R1–R5 landed; `SyncFeatureFlag(enabled = true)` in the
-online build.
+Fixed: 2026-07-25, issue #342 — R1–R5 landed; sync is on in the online build.
+
+**Naming note.** Everything below says `SyncFeatureFlag`, which is what the gate was called
+at audit time. Issue #332 replaced it with the `host.sync_enabled` Build-layer key behind the
+`SyncSettings` facade, and the flag's single boolean became the *build* term of a three-way and
+(build AND server kill switch AND user toggle) — see
+[ADR-004](../adr/ADR-004-configuration.md). The findings are quoted as they were written; the
+gate they describe is that build term.
 
 <!-- AI:SECTION id=cloud-login-verdict task=sync,auth,login,workspace,known-issues -->
 ## Verdict

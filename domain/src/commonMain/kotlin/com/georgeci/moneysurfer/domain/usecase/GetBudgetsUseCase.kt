@@ -18,7 +18,7 @@ class GetBudgetsUseCase(
 
     /** Every budget of the active workspace, archived ones included — the caller splits them. */
     operator fun invoke(): Flow<List<Budget>> =
-        session.currentWorkspaceId.flow.flatMapLatest { workspaceId ->
+        session.currentWorkspaceId.flatMapLatest { workspaceId ->
             workspaceId?.let(budgetRepository::getByWorkspaceId) ?: flowOf(emptyList())
         }
 }

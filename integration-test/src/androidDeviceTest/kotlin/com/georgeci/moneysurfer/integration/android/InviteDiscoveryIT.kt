@@ -171,8 +171,8 @@ class InviteDiscoveryIT {
         }
 
         // ── 5. Invitee pulls — Phase 2 of PullRemoteChangesUseCaseImpl ────────
-        inviteeHarness.session.currentFirebaseUid.set(inviteeUid)
-        inviteeHarness.session.currentUserId.set(UserId(inviteeUid))
+        inviteeHarness.session.setFirebaseUid(inviteeUid)
+        inviteeHarness.session.setCurrentUser(UserId(inviteeUid))
         // currentWorkspaceId intentionally NOT set: the invitee hasn't joined any workspace
         // yet. AllUserData scope must not fall back to currentWorkspaceId (the invited wid)
         // because the invitee is not a member and the members/accounts queries would be denied.
@@ -254,9 +254,9 @@ class InviteDiscoveryIT {
             )
         }
 
-        ownerHarness.session.currentFirebaseUid.set(ownerUid)
-        ownerHarness.session.currentUserId.set(UserId(ownerUid))
-        ownerHarness.session.currentWorkspaceId.set(workspaceId)
+        ownerHarness.session.setFirebaseUid(ownerUid)
+        ownerHarness.session.setCurrentUser(UserId(ownerUid))
+        ownerHarness.session.setCurrentWorkspace(workspaceId)
 
         // Create owner's user doc (mirrors PostAuthBootstrap) then add workspace ref
         // so UserWorkspacesProvider.workspaceIds() returns the wid during the pull.
@@ -322,7 +322,7 @@ class InviteDiscoveryIT {
         ownerHarness.userRemoteRepository.addInvitedWorkspaceRef(inviteeUid, workspaceId)
 
         // Invitee removes it (decline path).
-        inviteeHarness.session.currentFirebaseUid.set(inviteeUid)
+        inviteeHarness.session.setFirebaseUid(inviteeUid)
         inviteeHarness.userRemoteRepository.removeInvitedWorkspaceRef(inviteeUid, workspaceId)
 
         val snap = inviteeHarness.env.firestore

@@ -1,6 +1,5 @@
 package com.georgeci.moneysurfer.domain.usecase
 
-import com.georgeci.moneysurfer.domain.SyncFeatureFlag
 import com.georgeci.moneysurfer.domain.auth.InMemorySessionPointers
 import com.georgeci.moneysurfer.domain.constants.DEFAULT_CATEGORY_SEEDS
 import com.georgeci.moneysurfer.domain.model.Account
@@ -42,7 +41,7 @@ class SeedDefaultsUseCaseTest : StringSpec({
 
         env.workspaceRepo.inserted shouldHaveSize 0
         env.categoryRepo.inserted shouldHaveSize 0
-        env.session.currentWorkspaceId.flow.first() shouldBe PRE_PINNED
+        env.session.currentWorkspaceId.first() shouldBe PRE_PINNED
     }
 
     "repairs missing Cash account when workspace was pinned without one" {
@@ -79,7 +78,7 @@ class SeedDefaultsUseCaseTest : StringSpec({
         account.currencyCode shouldBe CurrencyCode("USD")
         account.balance shouldBe Money.zero()
 
-        env.session.currentWorkspaceId.flow.first() shouldBe ws.id
+        env.session.currentWorkspaceId.first() shouldBe ws.id
     }
 
     "is idempotent — second invocation does not duplicate workspace or Cash account" {
@@ -100,7 +99,7 @@ class SeedDefaultsUseCaseTest : StringSpec({
 
         env.workspaceRepo.inserted shouldHaveSize 0
         env.accountRepo.inserted shouldHaveSize 0
-        env.session.currentWorkspaceId.flow.first() shouldBe null
+        env.session.currentWorkspaceId.first() shouldBe null
     }
 })
 
@@ -127,9 +126,8 @@ private class SeedTestEnv(
         userRemoteRepository = SeedFakeUserRemoteRepo,
         workspaceSyncer = SeedFakeWorkspaceSyncer,
         session = session,
+        sessionMutator = session,
         getCurrentTime = getCurrentTime,
-        // Offline seed path — there is no Firebase session here either way.
-        syncFeatureFlag = SyncFeatureFlag(enabled = false),
     )
     val useCase = SeedDefaultsUseCase(
         createWorkspace = createWorkspace,
@@ -212,7 +210,7 @@ private object SeedFakeUserRemoteRepo : UserRemoteRepository {
 }
 
 private object SeedFakeWorkspaceSyncer : WorkspaceSyncer {
-    override suspend fun pushAll() = Unit
+    override suspend fun pushAll(): Boolean = true
     override suspend fun syncAll() = Unit
     override suspend fun syncWorkspace(workspaceId: WorkspaceId) = Unit
 }

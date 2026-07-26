@@ -2,7 +2,6 @@ package com.georgeci.moneysurfer.sync.repository
 
 import com.georgeci.moneysurfer.domain.auth.SessionPointers
 import com.georgeci.moneysurfer.domain.model.AppVersionStatus
-import com.georgeci.moneysurfer.domain.preferences.Pref
 import com.georgeci.moneysurfer.domain.primitives.UserId
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 import com.georgeci.moneysurfer.domain.repositories.AppVersionGate
@@ -27,10 +26,10 @@ private class FakeQueue : PendingMutationQueue {
 }
 
 private class FakeSessionPointers(uid: String?) : SessionPointers {
-    override val currentUserId: Pref<UserId?> = Pref.inMemory(null)
-    override val currentWorkspaceId: Pref<WorkspaceId?> = Pref.inMemory(null)
-    override val currentFirebaseUid: Pref<String?> = Pref.inMemory(uid)
-    override val hasUsedDemo: Pref<Boolean> = Pref.inMemory(false)
+    override val currentUserId: Flow<UserId?> = MutableStateFlow(null)
+    override val currentWorkspaceId: Flow<WorkspaceId?> = MutableStateFlow(null)
+    override val currentFirebaseUid: Flow<String?> = MutableStateFlow(uid)
+    override val hasUsedDemo: Flow<Boolean> = MutableStateFlow(false)
 }
 
 private class FakeAppVersionGate(private var allowed: Boolean) : AppVersionGate {

@@ -123,9 +123,9 @@ class MembersFlowIT {
         )
         ownerHarness.userRemoteRepository.addWorkspaceRef(ownerUid, workspaceId)
 
-        ownerHarness.session.currentFirebaseUid.set(ownerUid)
-        ownerHarness.session.currentUserId.set(UserId(ownerUid))
-        ownerHarness.session.currentWorkspaceId.set(workspaceId)
+        ownerHarness.session.setFirebaseUid(ownerUid)
+        ownerHarness.session.setCurrentUser(UserId(ownerUid))
+        ownerHarness.session.setCurrentWorkspace(workspaceId)
 
         val pullResult = ownerHarness.pullRemoteChanges(
             scope = SyncScope.AllUserData,
@@ -284,9 +284,9 @@ class MembersFlowIT {
             )
         }
 
-        memberHarness.session.currentFirebaseUid.set(memberUid)
-        memberHarness.session.currentUserId.set(UserId(memberUid))
-        memberHarness.session.currentWorkspaceId.set(workspaceId)
+        memberHarness.session.setFirebaseUid(memberUid)
+        memberHarness.session.setCurrentUser(UserId(memberUid))
+        memberHarness.session.setCurrentWorkspace(workspaceId)
 
         // markLeft → Room update + outbox enqueue.
         memberHarness.memberRepository.markLeft(

@@ -26,7 +26,7 @@ class CancelInviteUseCase(
     private val log = Logger.withTag(TAG)
 
     suspend operator fun invoke(id: WorkspaceInviteId): Either<InviteError, Unit> = either {
-        val callerId = session.currentUserId.flow.first()
+        val callerId = session.currentUserId.first()
             ?: raise(InviteError.NoCurrentUser)
 
         val invite = inviteRepository.getById(id)

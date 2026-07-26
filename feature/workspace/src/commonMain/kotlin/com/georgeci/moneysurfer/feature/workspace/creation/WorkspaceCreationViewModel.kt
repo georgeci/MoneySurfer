@@ -2,7 +2,7 @@ package com.georgeci.moneysurfer.feature.workspace.creation
 
 import arrow.optics.optics
 import co.touchlab.kermit.Logger
-import com.georgeci.moneysurfer.domain.OfflineBuildFlags
+import com.georgeci.moneysurfer.domain.config.HostCapabilities
 import com.georgeci.moneysurfer.domain.model.Currency
 import com.georgeci.moneysurfer.domain.model.WorkspaceRole
 import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
@@ -20,12 +20,12 @@ class WorkspaceCreationViewModel(
     private val workspaceRepository: WorkspaceRepository,
     private val createWorkspace: CreateWorkspaceUseCase,
     private val getCurrencies: GetCurrenciesUseCase,
-    offlineBuildFlags: OfflineBuildFlags,
+    hostCapabilities: HostCapabilities,
 ) : MviViewModel<WorkspaceCreationState, WorkspaceCreationEvent, WorkspaceCreationEffect>(
     initialState = WorkspaceCreationState.Loading,
 ) {
 
-    private val isOffline: Boolean = offlineBuildFlags.isOffline
+    private val isOffline: Boolean = hostCapabilities.isOffline
 
     private val log = Logger.withTag(TAG)
 

@@ -8,6 +8,7 @@ import com.georgeci.moneysurfer.feature.settings.account.DeleteUserAccountScreen
 import com.georgeci.moneysurfer.feature.settings.appearance.AppearanceScreen
 import com.georgeci.moneysurfer.feature.settings.backup.BackupScreen
 import com.georgeci.moneysurfer.feature.settings.csv.CsvBackupScreen
+import com.georgeci.moneysurfer.feature.settings.debug.DebugConfigScreen
 import com.georgeci.moneysurfer.feature.settings.preferences.PreferencesScreen
 import com.georgeci.moneysurfer.feature.settings.sync.SyncScreen
 import com.georgeci.moneysurfer.navigation.FeatureNavGraph
@@ -37,6 +38,7 @@ val settingsNavGraph: FeatureNavGraph = { navigator ->
             onNavigateToCsvBackup = { navigator.push(Route.SettingsCsv) },
             onNavigateToAbout = { navigator.push(Route.SettingsAbout) },
             onNavigateToDeleteAccount = { navigator.push(Route.SettingsDeleteAccount) },
+            onNavigateToDebugConfig = { navigator.push(Route.SettingsDebugConfig) },
         )
     }
 
@@ -89,5 +91,11 @@ val settingsNavGraph: FeatureNavGraph = { navigator ->
         metadata = ListDetailSceneStrategy.detailPane(),
     ) {
         DeleteUserAccountScreen(onNavigateBack = { navigator.pop() })
+    }
+
+    entry<Route.SettingsDebugConfig>(
+        metadata = ListDetailSceneStrategy.detailPane(),
+    ) {
+        DebugConfigScreen(onNavigateBack = { navigator.pop() })
     }
 }

@@ -1,6 +1,5 @@
 package com.georgeci.moneysurfer.feature.dashboard
 
-import com.georgeci.moneysurfer.domain.OfflineBuildFlags
 import com.georgeci.moneysurfer.domain.auth.InMemorySessionPointers
 import com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutConfig
 import com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutItem
@@ -9,6 +8,7 @@ import com.georgeci.moneysurfer.domain.fixtures.EUR
 import com.georgeci.moneysurfer.domain.fixtures.FakeExchangeRateRepository
 import com.georgeci.moneysurfer.domain.fixtures.FakeGoalContributionRepository
 import com.georgeci.moneysurfer.domain.fixtures.FakeGoalWorkspaceRepository
+import com.georgeci.moneysurfer.domain.fixtures.FakeHostCapabilities
 import com.georgeci.moneysurfer.domain.fixtures.FakeSavingsGoalRepository
 import com.georgeci.moneysurfer.domain.fixtures.FakeUiPreferences
 import com.georgeci.moneysurfer.domain.fixtures.USD
@@ -229,7 +229,7 @@ private fun newViewModel(
         getExchangeRates = GetExchangeRatesUseCase(session, workspaces, rates),
         convertAccountsTotal = ConvertAccountsTotalUseCase(),
         uiPreferences = uiPreferences,
-        offlineBuildFlags = OfflineBuildFlags(isOffline = false),
+        hostCapabilities = FakeHostCapabilities(isOffline = false),
     )
 }
 

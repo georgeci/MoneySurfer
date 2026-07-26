@@ -47,6 +47,9 @@ kotlin {
                 implementation(libs.kotest.assertions.core)
                 implementation(libs.turbine)
                 implementation(libs.kotlinx.coroutines.test)
+                // commonTest, not jvmTest: the specs here also compile for androidHostTest, and the
+                // shared facade fakes (FakeSyncSettings, FakeHostCapabilities) are used from common.
+                implementation(projects.domainTestFixtures)
             }
         }
 
@@ -55,7 +58,6 @@ kotlin {
                 implementation(libs.kotest.runner.junit5)
                 implementation(libs.fixture.monkey.kotlin)
                 implementation(projects.dataTestFixtures)
-                implementation(projects.domainTestFixtures)
             }
         }
 

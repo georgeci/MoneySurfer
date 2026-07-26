@@ -27,7 +27,7 @@ class ListPendingInvitesForCurrentUserUseCase(
     private val session: SessionPointers,
 ) {
     operator fun invoke(): Flow<List<WorkspaceInvite>> = flow {
-        val callerId = session.currentUserId.flow.first()
+        val callerId = session.currentUserId.first()
         if (callerId == null) {
             emit(emptyList())
             return@flow

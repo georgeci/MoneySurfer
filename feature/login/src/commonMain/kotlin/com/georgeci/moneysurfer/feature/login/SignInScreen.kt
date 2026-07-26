@@ -329,7 +329,6 @@ private fun SignInActionSheet(
     state: SignInState,
     onEvent: (SignInEvent) -> Unit,
 ) {
-    val config = state.config
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -345,7 +344,7 @@ private fun SignInActionSheet(
             SheetHeader()
             Spacer(Modifier.height(AppTheme.spacing.default))
 
-            if (config.emailPassword) {
+            if (state.emailPasswordEnabled) {
                 EmailPasswordForm(state = state, onEvent = onEvent)
                 Spacer(Modifier.height(AppTheme.spacing.small))
                 // Only errors that belong to no single field land here; the rest are rendered
@@ -395,8 +394,8 @@ private fun SignInActionSheet(
                 }
             }
 
-            if (config.anonymous) {
-                if (config.emailPassword) {
+            if (state.anonymousEnabled) {
+                if (state.emailPasswordEnabled) {
                     OrDivider()
                 }
                 PasskeyOutlinedButton(
@@ -407,9 +406,9 @@ private fun SignInActionSheet(
                 )
             }
 
-            if (config.demo) {
+            if (state.demoEnabled) {
                 Spacer(Modifier.height(AppTheme.spacing.small))
-                if (config.demoOnly) {
+                if (state.demoOnly) {
                     PrimaryFilledButton(
                         text = stringResource(Res.string.sign_in_demo_mode),
                         onClick = { onEvent(SignInEvent.OnLoginClick) },
@@ -637,11 +636,9 @@ private fun SignInScreenDemoOnlyPreview() {
     AppTheme {
         SignInContent(
             state = SignInState(
-                config = SignInFeatureConfig(
-                    emailPassword = false,
-                    anonymous = false,
-                    demo = true,
-                ),
+                emailPasswordEnabled = false,
+                anonymousEnabled = false,
+                demoEnabled = true,
             ),
             onEvent = {},
         )

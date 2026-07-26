@@ -37,7 +37,7 @@ internal suspend fun Raise<InviteError>.resolveOwnerActionTarget(
     workspaceId: WorkspaceId,
     targetUserId: UserId,
 ): OwnerActionTarget {
-    val callerId = session.currentUserId.flow.first()
+    val callerId = session.currentUserId.first()
         ?: raise(InviteError.NoCurrentUser)
 
     val members = memberRepository.getByWorkspaceId(workspaceId).first()

@@ -1,7 +1,9 @@
 package com.georgeci.moneysurfer.di
 
+import com.georgeci.moneysurfer.appconfig.DebugConfigSource
 import com.georgeci.moneysurfer.data.backup.IosAppRestarter
 import com.georgeci.moneysurfer.data.backup.IosBackupStorageLocator
+import com.georgeci.moneysurfer.data.config.createDebugConfigSource
 import com.georgeci.moneysurfer.data.datastore.createDataStore
 import com.georgeci.moneysurfer.data.db.MoneySurferDatabase
 import com.georgeci.moneysurfer.data.db.getDatabaseBuilder
@@ -16,6 +18,8 @@ import platform.Foundation.NSBundle
 actual val sharedPlatformModule: Module = module {
     single<MoneySurferDatabase> { getRoomDatabase(getDatabaseBuilder()) }
     single { createDataStore() }
+    // Own DataStore file, created in the factory rather than bound — see the Android actual.
+    single<DebugConfigSource> { createDebugConfigSource() }
     single {
         AppInfo(
             version = readVersionName(),

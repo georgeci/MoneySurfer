@@ -1,8 +1,10 @@
 package com.georgeci.moneysurfer.di
 
 import android.content.Context
+import com.georgeci.moneysurfer.appconfig.DebugConfigSource
 import com.georgeci.moneysurfer.data.backup.AndroidAppRestarter
 import com.georgeci.moneysurfer.data.backup.AndroidBackupStorageLocator
+import com.georgeci.moneysurfer.data.config.createDebugConfigSource
 import com.georgeci.moneysurfer.data.datastore.createDataStore
 import com.georgeci.moneysurfer.data.db.MoneySurferDatabase
 import com.georgeci.moneysurfer.data.db.getDatabaseBuilder
@@ -19,6 +21,10 @@ actual val sharedPlatformModule: Module = module {
         getRoomDatabase(builder)
     }
     single { createDataStore(context = get()) }
+    // Debug overrides get their own DataStore file, created inside the factory rather than
+    // bound: a second unqualified `DataStore<Preferences>` would collide with the one above
+    // and both layers would read the same file. Release APKs resolve `Empty`.
+    single<DebugConfigSource> { createDebugConfigSource(context = get()) }
     single {
         val context: Context = get()
         AppInfo(

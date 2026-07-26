@@ -47,7 +47,7 @@ class AcceptInviteUseCase(
     suspend operator fun invoke(id: WorkspaceInviteId): Either<InviteError, Unit> = either {
         log.i { "[start] id=${id.value}" }
 
-        val callerId = session.currentUserId.flow.first()
+        val callerId = session.currentUserId.first()
             ?: raise(InviteError.NoCurrentUser).also { log.w { "[reject] no current user" } }
         val caller = userRepository.getById(callerId)
             ?: raise(InviteError.NoCurrentUser).also {
@@ -117,7 +117,7 @@ class AcceptInviteUseCase(
         // trigger a local sync so workspace data lands immediately. Failures here don't fail
         // the accept — the member row + ACCEPTED invite are already pushed via the outbox,
         // and the next bootstrap will pick up whatever this skipped.
-        val firebaseUid = session.currentFirebaseUid.flow.first()
+        val firebaseUid = session.currentFirebaseUid.first()
         if (firebaseUid.isNullOrBlank()) {
             log.i { "[remote:skip] no firebase session — local-only accept" }
         } else {

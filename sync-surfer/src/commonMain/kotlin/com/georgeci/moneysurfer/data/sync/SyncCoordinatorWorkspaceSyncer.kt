@@ -1,12 +1,13 @@
 package com.georgeci.moneysurfer.data.sync
 
-import com.georgeci.moneysurfer.domain.SyncFeatureFlag
-import com.georgeci.moneysurfer.domain.auth.SessionPointers
+import com.georgeci.moneysurfer.domain.auth.SessionMutator
+import com.georgeci.moneysurfer.domain.config.SyncSettings
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 import com.georgeci.moneysurfer.domain.repositories.WorkspaceSyncer
 import com.georgeci.moneysurfer.sync.api.SyncError
 import com.georgeci.moneysurfer.sync.api.SyncReason
 import com.georgeci.moneysurfer.sync.coordinator.SyncCoordinator
+import kotlinx.coroutines.flow.first
 import org.koin.core.annotation.Single
 
 /**
@@ -20,31 +21,32 @@ import org.koin.core.annotation.Single
  * `users/{uid}.workspaceIds` via [UserWorkspacesProvider] and runs a cursor-based pull for
  * every workspace, including ones not yet in the local database.
  *
- * [syncWorkspace] sets [SessionPointers.currentWorkspaceId] to the target workspace and
+ * [syncWorkspace] sets the session's current workspace to the target workspace and
  * uses [SyncReason.SWIPE_REFRESH] → [SyncScope.ActiveWorkspace]: pulls only that workspace.
  * Used after accepting an invite so only the newly joined workspace is hydrated.
  */
 @Single(binds = [WorkspaceSyncer::class])
 class SyncCoordinatorWorkspaceSyncer(
     private val syncCoordinator: SyncCoordinator,
-    private val session: SessionPointers,
-    private val syncFeatureFlag: SyncFeatureFlag,
+    private val sessionMutator: SessionMutator,
+    private val syncSettings: SyncSettings,
 ) : WorkspaceSyncer {
 
-    // When the sync feature is off we want every use-case-driven trigger
+    // When sync is off we want every use-case-driven trigger
     // (PostAuthBootstrap, CreateWorkspace, AcceptInvite, RefreshIncomingInvites)
     // to no-op instead of hitting Firestore. Gating at the syncer keeps the
-    // use cases agnostic of the flag.
+    // use cases agnostic of the setting.
 
-    override suspend fun pushAll() {
-        if (!syncFeatureFlag.enabled) return
+    override suspend fun pushAll(): Boolean {
+        if (!syncSettings.isEnabled.first()) return false
         syncCoordinator.requestSync(SyncReason.LOCAL_CHANGE)
             .result.await()
             .fold(ifLeft = { throw it.toException() }, ifRight = { })
+        return true
     }
 
     override suspend fun syncAll() {
-        if (!syncFeatureFlag.enabled) return
+        if (!syncSettings.isEnabled.first()) return
         syncCoordinator.requestSync(SyncReason.MANUAL)
             .result.await()
             .fold(ifLeft = { throw it.toException() }, ifRight = { })
@@ -54,8 +56,8 @@ class SyncCoordinatorWorkspaceSyncer(
         // Switch the active workspace pointer even when sync is off — callers
         // (e.g. AcceptInviteUseCase) rely on this to move the session to the
         // newly joined workspace. Only skip the network round-trip.
-        session.currentWorkspaceId.set(workspaceId)
-        if (!syncFeatureFlag.enabled) return
+        sessionMutator.setCurrentWorkspace(workspaceId)
+        if (!syncSettings.isEnabled.first()) return
         syncCoordinator.requestSync(SyncReason.SWIPE_REFRESH)
             .result.await()
             .fold(ifLeft = { throw it.toException() }, ifRight = { })

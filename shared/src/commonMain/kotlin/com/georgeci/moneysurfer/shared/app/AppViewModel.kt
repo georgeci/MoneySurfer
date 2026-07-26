@@ -24,7 +24,9 @@ class AppViewModel(
     init {
         state.update { it.copy(isDynamicColorAvailable = uiPreferences.isDynamicColorAvailable) }
 
-        uiPreferences.paletteSource.flow
+        // Theming reads the *effective* palette: a `Dynamic` value synced from an Android phone is
+        // not renderable here, and clamping on read is what keeps the stored choice intact.
+        uiPreferences.effectivePaletteSource
             .onEach { source -> state.update { it.copy(paletteSource = source) } }
             .launchIn(viewModelScope)
 

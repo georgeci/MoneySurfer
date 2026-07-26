@@ -1,6 +1,7 @@
 package com.georgeci.moneysurfer.domain.preferences
 
 import com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutConfig
+import kotlinx.coroutines.flow.Flow
 
 interface UiPreferences {
     val isDynamicColorAvailable: Boolean
@@ -11,7 +12,23 @@ interface UiPreferences {
      */
     val onboardingCompleted: Pref<Boolean>
 
+    /**
+     * The stored choice, exactly as written — including [PaletteSource.Dynamic] on a platform with
+     * no Material You. The picker binds here and simply omits the Dynamic option where it is
+     * unavailable: nothing is highlighted, and no write happens unless the user picks something.
+     * Theming reads [effectivePaletteSource] instead.
+     */
     val paletteSource: Pref<PaletteSource>
+
+    /**
+     * [paletteSource] clamped to what this platform can render.
+     *
+     * Kept separate from the stored value rather than clamping the `Pref` itself: on a desktop a
+     * clamped `Pref` would render `Brand` as the current selection, and the first tap would write
+     * `Brand` over the `Dynamic` the user set on their phone.
+     */
+    val effectivePaletteSource: Flow<PaletteSource>
+
     val themeMode: Pref<ThemeMode>
     val containerStyle: Pref<ContainerStyle>
 
