@@ -7,6 +7,7 @@ import com.georgeci.moneysurfer.domain.fixtures.aTransaction
 import com.georgeci.moneysurfer.domain.fixtures.categoryId
 import com.georgeci.moneysurfer.domain.fixtures.transactionId
 import com.georgeci.moneysurfer.domain.fixtures.workspaceId
+import com.georgeci.moneysurfer.domain.model.Account
 import com.georgeci.moneysurfer.domain.model.CategorizedTransaction
 import com.georgeci.moneysurfer.domain.model.Category
 import com.georgeci.moneysurfer.domain.model.CategoryMonthlyTotal
@@ -21,13 +22,19 @@ import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
 import com.georgeci.moneysurfer.domain.primitives.TransferId
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
+import com.georgeci.moneysurfer.domain.repositories.AccountRepository
 import com.georgeci.moneysurfer.domain.repositories.CategoryRepository
 import com.georgeci.moneysurfer.domain.repositories.CategorySpendRepository
 import com.georgeci.moneysurfer.domain.repositories.TransactionRepository
+import com.georgeci.moneysurfer.domain.usecase.ApplyTransactionChangeUseCase
+import com.georgeci.moneysurfer.domain.usecase.DeleteTransactionUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetCategoriesUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetCategorySpendHistoryUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetTransactionsByCategoryUseCase
+import com.georgeci.moneysurfer.domain.usecase.RestoreTransactionsUseCase
 import com.georgeci.moneysurfer.domain.util.TransactionPeriodWindow
+import com.georgeci.moneysurfer.navigation.DeleteTransactionWithUndo
+import com.georgeci.moneysurfer.navigation.SnackbarController
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
@@ -240,8 +247,32 @@ private class Env(
                 categoryRepository = categoryRepo,
                 session = session,
             ),
+            // Present so the screen can be built; the swipe delete itself is covered end to end by
+            // DeleteUndoIntegrationIT against real Room, where balances can actually be asserted.
+            deleteWithUndo = ApplyTransactionChangeUseCase(transactionRepo, UnusedAccountRepository)
+                .let { applyChange ->
+                    DeleteTransactionWithUndo(
+                        deleteTransaction = DeleteTransactionUseCase(transactionRepo, applyChange),
+                        restoreTransactions = RestoreTransactionsUseCase(applyChange),
+                        snackbar = SnackbarController(),
+                    )
+                },
         )
     }
+}
+
+/** This screen never touches accounts; any call here means the test wandered off its subject. */
+private object UnusedAccountRepository : AccountRepository {
+    override suspend fun getById(id: AccountId) = error("not used")
+    override fun getAll(): Flow<List<Account>> = error("not used")
+    override fun getByWorkspaceId(workspaceId: WorkspaceId): Flow<List<Account>> = error("not used")
+    override suspend fun insert(account: Account) = error("not used")
+    override suspend fun update(account: Account) = error("not used")
+    override suspend fun delete(id: AccountId) = error("not used")
+    override suspend fun applyDelta(accountId: AccountId, delta: Money) = error("not used")
+    override suspend fun setBalance(accountId: AccountId, balance: Money) = error("not used")
+    override suspend fun reorder(orderedIds: List<AccountId>) = error("not used")
+    override suspend fun setArchived(accountId: AccountId, archived: Boolean) = error("not used")
 }
 
 private class FakeCategorySpendRepository(

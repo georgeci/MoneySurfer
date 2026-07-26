@@ -8,11 +8,13 @@ import com.georgeci.moneysurfer.domain.fixtures.anAccount
 import com.georgeci.moneysurfer.domain.fixtures.categoryId
 import com.georgeci.moneysurfer.domain.fixtures.dollars
 import com.georgeci.moneysurfer.domain.fixtures.transactionId
+import com.georgeci.moneysurfer.domain.fixtures.transferId
 import com.georgeci.moneysurfer.domain.model.CategoryAppearance
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
 import com.georgeci.moneysurfer.domain.usecase.ApplyTransactionChangeUseCase
 import com.georgeci.moneysurfer.domain.usecase.DeleteCategoryUseCase
 import com.georgeci.moneysurfer.domain.usecase.DeleteTransactionUseCase
+import com.georgeci.moneysurfer.domain.usecase.RestoreTransactionsUseCase
 import com.georgeci.moneysurfer.integration.fixtures.IntegrationHarness
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.nulls.shouldNotBeNull
@@ -62,14 +64,81 @@ class DeleteUndoIntegrationIT : StringSpec({
         stack.accountRepository.getById(account.id)!!.balance shouldBe 420.dollars
 
         val deleted = deleteTransaction(transactionId("t-1"))
-        deleted.shouldNotBeNull()
+        deleted.map { it.id } shouldBe listOf(transactionId("t-1"))
         stack.transactionRepository.getById(transactionId("t-1")) shouldBe null
         stack.accountRepository.getById(account.id)!!.balance shouldBe 500.dollars
 
-        applyChange(old = null, new = deleted)
+        RestoreTransactionsUseCase(applyChange)(deleted)
 
         stack.transactionRepository.getById(transactionId("t-1")).shouldNotBeNull()
         stack.accountRepository.getById(account.id)!!.balance shouldBe 420.dollars
+    }
+
+    // Both legs, against the real Room stack: this is the case the swipe gesture makes reachable
+    // from a list, and dropping one leg would leave the other account credited out of nowhere.
+    "deleting one leg of a transfer removes both and the undo brings both balances back" {
+        val applyChange = ApplyTransactionChangeUseCase(stack.transactionRepository, stack.accountRepository)
+        val deleteTransaction = DeleteTransactionUseCase(stack.transactionRepository, applyChange)
+        val restoreTransactions = RestoreTransactionsUseCase(applyChange)
+
+        val from = anAccount(
+            id = accountId("a-from"),
+            workspaceId = DEFAULT_WORKSPACE_ID,
+            currencyCode = USD,
+            balance = 500.dollars,
+        )
+        val to = anAccount(
+            id = accountId("a-to"),
+            workspaceId = DEFAULT_WORKSPACE_ID,
+            currencyCode = USD,
+            balance = 100.dollars,
+        )
+        stack.accountRepository.insert(from)
+        stack.accountRepository.insert(to)
+
+        val transfer = transferId("tr-1")
+        stack.createTransaction(
+            aTransaction(
+                id = transactionId("leg-out"),
+                workspaceId = DEFAULT_WORKSPACE_ID,
+                accountId = from.id,
+                money = 80.dollars,
+                currencyCode = USD,
+                categoryId = null,
+                type = TransactionType.EXPENSE,
+                transferId = transfer,
+            ),
+        )
+        stack.createTransaction(
+            aTransaction(
+                id = transactionId("leg-in"),
+                workspaceId = DEFAULT_WORKSPACE_ID,
+                accountId = to.id,
+                money = 80.dollars,
+                currencyCode = USD,
+                categoryId = null,
+                type = TransactionType.INCOME,
+                transferId = transfer,
+            ),
+        )
+        stack.accountRepository.getById(from.id)!!.balance shouldBe 420.dollars
+        stack.accountRepository.getById(to.id)!!.balance shouldBe 180.dollars
+
+        // Swiping either leg deletes the transfer; this one is the leg the user did not open.
+        val deleted = deleteTransaction(transactionId("leg-in"))
+
+        deleted.map { it.id }.toSet() shouldBe setOf(transactionId("leg-out"), transactionId("leg-in"))
+        stack.transactionRepository.getById(transactionId("leg-out")) shouldBe null
+        stack.transactionRepository.getById(transactionId("leg-in")) shouldBe null
+        stack.accountRepository.getById(from.id)!!.balance shouldBe 500.dollars
+        stack.accountRepository.getById(to.id)!!.balance shouldBe 100.dollars
+
+        restoreTransactions(deleted)
+
+        stack.transactionRepository.getById(transactionId("leg-out")).shouldNotBeNull()
+        stack.transactionRepository.getById(transactionId("leg-in")).shouldNotBeNull()
+        stack.accountRepository.getById(from.id)!!.balance shouldBe 420.dollars
+        stack.accountRepository.getById(to.id)!!.balance shouldBe 180.dollars
     }
 
     "deleting a category then re-inserting it restores the row" {

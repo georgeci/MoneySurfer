@@ -65,6 +65,8 @@
     <string name="category_details_share_percent">%1$d%%</string>
     <string name="category_details_recent">Recent</string>
     <string name="category_details_recent_empty">No transactions in this category yet.</string>
+    <string name="category_details_transaction_deleted_snackbar">Transaction deleted</string>
+    <string name="category_details_transaction_delete_undo">Undo</string>
     <string name="category_details_transaction_untitled">No description</string>
     <string name="category_details_log_expense">Log expense</string>
     <string name="category_details_log_income">Log income</string>

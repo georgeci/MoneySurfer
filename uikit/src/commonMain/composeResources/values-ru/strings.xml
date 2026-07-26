@@ -24,4 +24,13 @@
     <string name="uikit_password_hide">Скрыть пароль</string>
     <string name="uikit_password_show">Показать пароль</string>
     <string name="uikit_retry">Повторить</string>
+    <string name="uikit_transaction_delete">Удалить</string>
+    <string name="uikit_transaction_delete_cancel">Отмена</string>
+    <string name="uikit_transaction_delete_confirm">Удалить</string>
+    <string name="uikit_transaction_delete_message">«%1$s» будет удалено. Сразу после можно отменить.</string>
+    <string name="uikit_transaction_delete_message_generic">Транзакция будет удалена. Сразу после можно отменить.</string>
+    <string name="uikit_transaction_delete_title">Удалить транзакцию?</string>
+    <string name="uikit_transaction_delete_transfer_message">«%1$s» будет удалено с обоих счетов. Сразу после можно отменить.</string>
+    <string name="uikit_transaction_delete_transfer_message_generic">Перевод будет удалён с обоих счетов. Сразу после можно отменить.</string>
+    <string name="uikit_transaction_delete_transfer_title">Удалить перевод?</string>
 </resources>

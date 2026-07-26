@@ -117,11 +117,6 @@
     <string name="transaction_details_title">Transaction</string>
     <string name="transaction_details_edit_content_description">Edit</string>
     <string name="transaction_details_delete_content_description">Delete</string>
-    <string name="transaction_details_delete_title">Delete transaction?</string>
-    <string name="transaction_details_delete_message">“%1$s” will be removed. You can undo this right after.</string>
-    <string name="transaction_details_delete_message_generic">This transaction will be removed. You can undo this right after.</string>
-    <string name="transaction_details_delete_confirm">Delete</string>
-    <string name="transaction_details_delete_cancel">Cancel</string>
     <string name="transaction_details_type_expense">Expense</string>
     <string name="transaction_details_type_income">Income</string>
     <string name="transaction_details_type_transfer">Transfer</string>
@@ -145,6 +140,8 @@
     <string name="transaction_creation_transfer_snackbar">Transfer added</string>
     <string name="transaction_details_deleted_snackbar">Transaction deleted</string>
     <string name="transaction_details_delete_undo">Undo</string>
+    <string name="transactions_list_deleted_snackbar">Transaction deleted</string>
+    <string name="transactions_list_delete_undo">Undo</string>
 
     <!-- Transactions list — search and filter chip rail -->
     <string name="transactions_list_search_placeholder">Search merchant, note, amount</string>

@@ -28,6 +28,7 @@ import com.georgeci.moneysurfer.feature.transaction.filter.TransactionSort
 import com.georgeci.moneysurfer.feature.transaction.filter.TransactionTypeFilter
 import com.georgeci.moneysurfer.feature.transaction.filter.compile
 import com.georgeci.moneysurfer.feature.transaction.filter.resolveWindow
+import com.georgeci.moneysurfer.navigation.DeleteTransactionWithUndo
 import com.georgeci.moneysurfer.utils.MviViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -41,6 +42,9 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.number
 import kotlinx.datetime.toLocalDateTime
+import moneysurfer.feature.transaction.generated.resources.Res
+import moneysurfer.feature.transaction.generated.resources.transactions_list_delete_undo
+import moneysurfer.feature.transaction.generated.resources.transactions_list_deleted_snackbar
 import org.koin.core.annotation.KoinViewModel
 
 /** Rows fetched per page. One screenful is ~15 rows, so a page covers a long scroll burst. */
@@ -97,6 +101,7 @@ class TransactionsByAccountViewModel(
     private val filterStore: TransactionFilterStore,
     private val uiPreferences: UiPreferences,
     private val clock: ClockUseCase,
+    private val deleteWithUndo: DeleteTransactionWithUndo,
 ) : MviViewModel<TransactionsByAccountState, TransactionsByAccountEvent, TransactionsByAccountEffect>(
     initialState = TransactionsByAccountState.Loading(accountId = accountId),
 ) {
@@ -152,6 +157,15 @@ class TransactionsByAccountViewModel(
                 uiPreferences.transactionsPeriodMode.set(event.mode)
             }
             TransactionsByAccountEvent.OnLoadMore -> loadMore()
+            // No optimistic removal: the list is fed by a database Flow, so the row disappears
+            // when the delete lands and comes back by itself when the Undo does.
+            is TransactionsByAccountEvent.OnDeleteTransaction -> launch {
+                deleteWithUndo(
+                    transactionId = event.transactionId,
+                    message = Res.string.transactions_list_deleted_snackbar,
+                    undoLabel = Res.string.transactions_list_delete_undo,
+                )
+            }
         }
     }
 
@@ -538,6 +552,9 @@ sealed interface TransactionsByAccountEvent {
     data object OnNextPeriodClick : TransactionsByAccountEvent
     data class OnPeriodModeChanged(val mode: TransactionPeriodMode) : TransactionsByAccountEvent
     data object OnLoadMore : TransactionsByAccountEvent
+
+    /** A row was swiped away and the confirmation accepted; the Undo rides on the snackbar. */
+    data class OnDeleteTransaction(val transactionId: TransactionId) : TransactionsByAccountEvent
 }
 
 sealed interface TransactionsByAccountEffect {
