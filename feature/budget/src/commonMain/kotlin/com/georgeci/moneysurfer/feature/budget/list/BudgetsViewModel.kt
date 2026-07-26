@@ -98,7 +98,7 @@ class BudgetsViewModel(
      */
     private fun observeBudgets() {
         launch {
-            session.currentWorkspaceId.flow
+            session.currentWorkspaceId
                 .flatMapLatest { workspaceId ->
                     if (workspaceId == null) {
                         flowOf(emptyList())

@@ -20,12 +20,12 @@ class WipeDemoDataUseCaseSpec : StringSpec({
         runTest {
             val reset = RecordingLocalDataReset()
             val session = InMemorySessionPointers(hasUsedDemo = true)
-            val useCase = WipeDemoDataUseCase(reset, session)
+            val useCase = WipeDemoDataUseCase(reset, session, session)
 
             useCase()
 
             reset.clearAllCount shouldBe 1
-            session.hasUsedDemo.flow.first() shouldBe false
+            session.hasUsedDemo.first() shouldBe false
         }
     }
 
@@ -33,12 +33,12 @@ class WipeDemoDataUseCaseSpec : StringSpec({
         runTest {
             val reset = RecordingLocalDataReset()
             val session = InMemorySessionPointers(hasUsedDemo = false)
-            val useCase = WipeDemoDataUseCase(reset, session)
+            val useCase = WipeDemoDataUseCase(reset, session, session)
 
             useCase()
 
             reset.clearAllCount shouldBe 0
-            session.hasUsedDemo.flow.first() shouldBe false
+            session.hasUsedDemo.first() shouldBe false
         }
     }
 
@@ -46,13 +46,13 @@ class WipeDemoDataUseCaseSpec : StringSpec({
         runTest {
             val reset = RecordingLocalDataReset()
             val session = InMemorySessionPointers(hasUsedDemo = true)
-            val useCase = WipeDemoDataUseCase(reset, session)
+            val useCase = WipeDemoDataUseCase(reset, session, session)
 
             useCase()
             useCase()
 
             reset.clearAllCount shouldBe 1
-            session.hasUsedDemo.flow.first() shouldBe false
+            session.hasUsedDemo.first() shouldBe false
         }
     }
 })

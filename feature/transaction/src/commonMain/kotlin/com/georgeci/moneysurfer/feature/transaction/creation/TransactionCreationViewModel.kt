@@ -1,5 +1,6 @@
 package com.georgeci.moneysurfer.feature.transaction.creation
 
+import com.georgeci.moneysurfer.domain.config.HostCapabilities
 import com.georgeci.moneysurfer.domain.model.Account
 import com.georgeci.moneysurfer.domain.model.Category
 import com.georgeci.moneysurfer.domain.model.Transaction
@@ -47,7 +48,7 @@ class TransactionCreationViewModel(
     private val applyTransactionChange: ApplyTransactionChangeUseCase,
     private val getCurrentTime: GetCurrentTimeUseCase,
     private val transactionRepository: TransactionRepository,
-    private val featureConfig: TransactionCreationFeatureConfig,
+    private val hostCapabilities: HostCapabilities,
     private val snackbar: SnackbarController,
 ) : MviViewModel<TransactionCreationState, TransactionCreationEvent, TransactionCreationEffect>(
     initialState = TransactionCreationState.Loading,
@@ -139,7 +140,7 @@ class TransactionCreationViewModel(
                 // somewhere [changeType] would refuse to go.
                 showTransferShortcut = slot == AccountSlot.Single &&
                     !state.isEditMode &&
-                    featureConfig.transferEnabled,
+                    state.transferEnabled,
             ),
         )
     }
@@ -148,7 +149,9 @@ class TransactionCreationViewModel(
         val content = this as? TransactionCreationState.Content ?: return@updateState this
         // Editing an existing single-leg transaction can't morph into a paired transfer in place;
         // ignore the switch so we don't desync the type with the row that's about to be updated.
-        if (nextType == TransactionTypeUi.Transfer && (content.isEditMode || !featureConfig.transferEnabled)) {
+        // `content.transferEnabled` rather than a fresh `hostCapabilities` read: a QA override landing
+        // mid-screen would otherwise leave a rendered Transfer segment that this guard refuses.
+        if (nextType == TransactionTypeUi.Transfer && (content.isEditMode || !content.transferEnabled)) {
             return@updateState content
         }
         val nextCategoryType = nextType.categoryType()
@@ -198,7 +201,7 @@ class TransactionCreationViewModel(
                     type = initialCategoryType,
                     selected = initialSelected,
                 ),
-                transferEnabled = featureConfig.transferEnabled,
+                transferEnabled = hostCapabilities.transferEnabled,
             )
 
             val existing = seed?.let { getTransactionById(it.transactionId) }

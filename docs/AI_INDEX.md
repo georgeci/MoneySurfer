@@ -17,7 +17,7 @@
 ## adr-configuration
 - Title: Decision
 - File: docs/adr/ADR-004-configuration.md
-- Lines: 62-782
+- Lines: 62-836
 - Tasks: adr, config, flags, preferences
 
 ## adr-navigation
@@ -71,37 +71,37 @@
 ## cloud-login-f1-dangling-refs
 - Title: F1 — Asymmetric flag gating writes dangling workspace refs (critical)
 - File: docs/architecture/cloud-login-hydration.md
-- Lines: 68-115
+- Lines: 73-120
 - Tasks: sync, firestore, feature-flag, data-integrity
 
 ## cloud-login-f2-pointer-seed
 - Title: F2 — Bootstrap pins a workspace that does not exist locally
 - File: docs/architecture/cloud-login-hydration.md
-- Lines: 117-134
+- Lines: 122-139
 - Tasks: auth, login, workspace, session
 
 ## cloud-login-f3-pull-pagination
 - Title: F3 — The pull fetches one batch per collection, with no pagination loop
 - File: docs/architecture/cloud-login-hydration.md
-- Lines: 136-158
+- Lines: 141-163
 - Tasks: sync, pull, pagination
 
 ## cloud-login-f4-bootstrap-abort
 - Title: F4 — One unreadable workspace aborts the whole bootstrap, blocking sign-in
 - File: docs/architecture/cloud-login-hydration.md
-- Lines: 160-196
+- Lines: 165-201
 - Tasks: sync, pull, auth, error-handling
 
 ## cloud-login-remediation
 - Title: Remediation
 - File: docs/architecture/cloud-login-hydration.md
-- Lines: 222-268
+- Lines: 227-273
 - Tasks: sync, auth, roadmap, known-issues
 
 ## cloud-login-verdict
 - Title: Verdict
 - File: docs/architecture/cloud-login-hydration.md
-- Lines: 44-53
+- Lines: 49-58
 - Tasks: sync, auth, login, workspace, known-issues
 
 ## color-contrast

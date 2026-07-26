@@ -17,7 +17,7 @@ class GetCategoriesUseCase(
 ) {
 
     operator fun invoke(): Flow<List<Category>> =
-        session.currentWorkspaceId.flow.flatMapLatest { workspaceId ->
+        session.currentWorkspaceId.flatMapLatest { workspaceId ->
             workspaceId?.let(categoryRepository::getByWorkspaceId) ?: flowOf(emptyList())
         }
 }

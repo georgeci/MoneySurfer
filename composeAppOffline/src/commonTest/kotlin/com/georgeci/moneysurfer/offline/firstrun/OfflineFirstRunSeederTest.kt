@@ -1,6 +1,5 @@
 package com.georgeci.moneysurfer.offline.firstrun
 
-import com.georgeci.moneysurfer.domain.SyncFeatureFlag
 import com.georgeci.moneysurfer.domain.auth.AuthLocalRepository
 import com.georgeci.moneysurfer.domain.auth.InMemorySessionPointers
 import com.georgeci.moneysurfer.domain.constants.PREFILLED_DEFAULT_USER_ID
@@ -54,11 +53,11 @@ class OfflineFirstRunSeederTest : StringSpec({
             env.seeder.seedIfNeeded()
 
             // Demo user was pinned so the seed had a current user to attribute the workspace to.
-            env.session.currentUserId.flow.first() shouldBe UserId(PREFILLED_DEFAULT_USER_ID)
+            env.session.currentUserId.first() shouldBe UserId(PREFILLED_DEFAULT_USER_ID)
 
             val workspace = env.workspaceRepo.inserted.single()
             workspace.name shouldBe "Personal"
-            env.session.currentWorkspaceId.flow.first() shouldBe workspace.id
+            env.session.currentWorkspaceId.first() shouldBe workspace.id
             // The first account is created by the user on the first-run account screen.
             env.accountRepo.inserted shouldHaveSize 0
         }
@@ -99,8 +98,8 @@ class OfflineFirstRunSeederTest : StringSpec({
             env.seeder.seedIfNeeded()
 
             // DemoLogin blew up before pinning the user, so the seed was skipped entirely.
-            env.session.currentUserId.flow.first() shouldBe null
-            env.session.currentWorkspaceId.flow.first() shouldBe null
+            env.session.currentUserId.first() shouldBe null
+            env.session.currentWorkspaceId.first() shouldBe null
             env.workspaceRepo.inserted shouldHaveSize 0
             env.accountRepo.inserted shouldHaveSize 0
         }
@@ -127,7 +126,7 @@ private class SeederEnv(
     private val getCurrentTime = GetCurrentTimeUseCase(ClockUseCase())
     private val demoLogin = DemoLoginUseCase(
         authLocalRepository = AuthLocalRepository(userRepo, session),
-        session = session,
+        sessionMutator = session,
     )
     private val createWorkspace = CreateWorkspaceUseCase(
         workspaceRepository = workspaceRepo,
@@ -136,9 +135,8 @@ private class SeederEnv(
         userRemoteRepository = SeederFakeUserRemoteRepo,
         workspaceSyncer = SeederFakeWorkspaceSyncer,
         session = session,
+        sessionMutator = session,
         getCurrentTime = getCurrentTime,
-        // Offline build: sync is off, exactly as `offlineSignInModule` binds it.
-        syncFeatureFlag = SyncFeatureFlag(enabled = false),
     )
     private val seedDefaults = SeedDefaultsUseCase(
         createWorkspace = createWorkspace,
@@ -239,7 +237,7 @@ private object SeederFakeUserRemoteRepo : UserRemoteRepository {
 }
 
 private object SeederFakeWorkspaceSyncer : WorkspaceSyncer {
-    override suspend fun pushAll() = Unit
+    override suspend fun pushAll(): Boolean = true
     override suspend fun syncAll() = Unit
     override suspend fun syncWorkspace(workspaceId: WorkspaceId) = Unit
 }

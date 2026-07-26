@@ -60,6 +60,9 @@ kotlin {
                 implementation(libs.koin.compose.viewmodel)
                 implementation(libs.koin.annotations)
                 implementation(projects.domain)
+                // Only for the `DebugConfigSource` binding in the per-platform modules —
+                // no engine types leak into shared's own code.
+                implementation(projects.appConfig.api)
                 implementation(projects.uikit)
                 implementation(projects.utils)
                 implementation(projects.dataLocal)

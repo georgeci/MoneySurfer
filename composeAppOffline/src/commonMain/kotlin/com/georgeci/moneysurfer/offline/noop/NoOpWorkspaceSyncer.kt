@@ -8,7 +8,8 @@ import com.georgeci.moneysurfer.domain.repositories.WorkspaceSyncer
  * success — the on-disk Room database is the source of truth.
  */
 class NoOpWorkspaceSyncer : WorkspaceSyncer {
-    override suspend fun pushAll() = Unit
+    /** Nothing is ever pushed in the offline build, and callers must be able to tell. */
+    override suspend fun pushAll(): Boolean = false
     override suspend fun syncAll() = Unit
     override suspend fun syncWorkspace(workspaceId: WorkspaceId) = Unit
 }

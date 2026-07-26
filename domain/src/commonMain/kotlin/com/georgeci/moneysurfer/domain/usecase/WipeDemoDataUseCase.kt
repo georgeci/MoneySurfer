@@ -1,5 +1,6 @@
 package com.georgeci.moneysurfer.domain.usecase
 
+import com.georgeci.moneysurfer.domain.auth.SessionMutator
 import com.georgeci.moneysurfer.domain.auth.SessionPointers
 import com.georgeci.moneysurfer.domain.repositories.LocalDataResetRepository
 import kotlinx.coroutines.flow.first
@@ -22,10 +23,11 @@ import org.koin.core.annotation.Single
 class WipeDemoDataUseCase(
     private val localDataResetRepository: LocalDataResetRepository,
     private val session: SessionPointers,
+    private val sessionMutator: SessionMutator,
 ) {
     suspend operator fun invoke() {
-        if (!session.hasUsedDemo.flow.first()) return
+        if (!session.hasUsedDemo.first()) return
         localDataResetRepository.clearAll()
-        session.hasUsedDemo.set(false)
+        sessionMutator.setHasUsedDemo(false)
     }
 }

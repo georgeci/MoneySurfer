@@ -12,6 +12,7 @@ import com.georgeci.moneysurfer.data.sync.FirebaseUserWorkspacesProvider
 import com.georgeci.moneysurfer.data.sync.FirebaseWorkspaceCollectionReader
 import com.georgeci.moneysurfer.data.sync.PullRemoteChangesUseCaseImpl
 import com.georgeci.moneysurfer.data.sync.UploadPendingChangesUseCaseImpl
+import com.georgeci.moneysurfer.data.sync.WorkspaceRefRegistrar
 import com.georgeci.moneysurfer.data.sync.plugin.AccountSyncPlugin
 import com.georgeci.moneysurfer.data.sync.plugin.CategorySyncPlugin
 import com.georgeci.moneysurfer.data.sync.plugin.TransactionSyncPlugin
@@ -125,12 +126,18 @@ class AndroidIntegrationHarness(appName: String? = null) {
         session = session,
     )
 
+    private val workspaceRefRegistrar = WorkspaceRefRegistrar(
+        userRemoteRepository = userRemoteRepository,
+        session = session,
+    )
+
     val syncPlugins = listOf(
         WorkspaceSyncPlugin(
             firestore = env.firestore,
             appInfo = appInfo,
             workspaceDao = database.workspaceDao(),
             userDao = database.userDao(),
+            workspaceRefRegistrar = workspaceRefRegistrar,
         ),
         WorkspaceMemberSyncPlugin(
             firestore = env.firestore,

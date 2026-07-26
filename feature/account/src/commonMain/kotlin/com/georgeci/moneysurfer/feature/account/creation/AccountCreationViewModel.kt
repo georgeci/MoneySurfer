@@ -2,8 +2,8 @@ package com.georgeci.moneysurfer.feature.account.creation
 
 import arrow.optics.optics
 import co.touchlab.kermit.Logger
-import com.georgeci.moneysurfer.domain.OfflineBuildFlags
 import com.georgeci.moneysurfer.domain.auth.SessionPointers
+import com.georgeci.moneysurfer.domain.config.HostCapabilities
 import com.georgeci.moneysurfer.domain.model.Account
 import com.georgeci.moneysurfer.domain.model.AccountExtraDetail
 import com.georgeci.moneysurfer.domain.model.AccountExtraDetailKey
@@ -50,7 +50,7 @@ class AccountCreationViewModel(
     private val getCurrencies: GetCurrenciesUseCase,
     private val updateWorkspaceCurrency: UpdateWorkspaceCurrencyUseCase,
     private val snackbar: SnackbarController,
-    private val offlineBuildFlags: OfflineBuildFlags,
+    private val hostCapabilities: HostCapabilities,
 ) : MviViewModel<AccountCreationState, AccountCreationEvent, AccountCreationEffect>(
     initialState = if (accountId != null) {
         AccountCreationState.Loading(editingAccountId = accountId)
@@ -64,7 +64,7 @@ class AccountCreationViewModel(
             currency = DEFAULT_CURRENCY,
             currencies = emptyList(),
             extraFields = emptyList(),
-            extraDetailsEnabled = !offlineBuildFlags.isOffline,
+            extraDetailsEnabled = !hostCapabilities.isOffline,
             editingAccountId = null,
         )
     },
@@ -120,7 +120,7 @@ class AccountCreationViewModel(
                     // still part of the account, and saving an edit must not silently drop them.
                     extraFields = account?.extraDetails.orEmpty()
                         .map { AccountExtraField(key = it.key, value = it.value) },
-                    extraDetailsEnabled = !offlineBuildFlags.isOffline,
+                    extraDetailsEnabled = !hostCapabilities.isOffline,
                     editingAccountId = id,
                 )
             }
@@ -199,7 +199,7 @@ class AccountCreationViewModel(
                 return@launch
             }
 
-            val workspaceId = session.currentWorkspaceId.flow.first() ?: run {
+            val workspaceId = session.currentWorkspaceId.first() ?: run {
                 log.w { "[save] no current workspace pinned — cannot create account" }
                 snackbar.show(Res.string.accounts_manage_action_failed)
                 return@launch

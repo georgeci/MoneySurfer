@@ -40,9 +40,9 @@ class AuthSessionRollbackTest : StringSpec({
         val result = env.login(email = "surfer@example.com", password = "secret1")
 
         result.shouldBeInstanceOf<Either.Left<AuthError>>()
-        env.session.currentUserId.flow.first() shouldBe null
-        env.session.currentFirebaseUid.flow.first() shouldBe null
-        env.session.currentWorkspaceId.flow.first() shouldBe null
+        env.session.currentUserId.first() shouldBe null
+        env.session.currentFirebaseUid.first() shouldBe null
+        env.session.currentWorkspaceId.first() shouldBe null
         env.auth.signOutCount shouldBe 1
     }
 
@@ -52,8 +52,8 @@ class AuthSessionRollbackTest : StringSpec({
         val result = env.login(email = "surfer@example.com", password = "secret1")
 
         result.shouldBeInstanceOf<Either.Right<PostAuthBootstrapUseCase.Result>>()
-        env.session.currentUserId.flow.first() shouldBe UserId(UID)
-        env.session.currentFirebaseUid.flow.first() shouldBe UID
+        env.session.currentUserId.first() shouldBe UserId(UID)
+        env.session.currentFirebaseUid.first() shouldBe UID
         env.auth.signOutCount shouldBe 0
     }
 
@@ -63,8 +63,8 @@ class AuthSessionRollbackTest : StringSpec({
         val result = env.signup(email = "surfer@example.com", password = "secret1")
 
         result.shouldBeInstanceOf<Either.Left<AuthError>>()
-        env.session.currentUserId.flow.first() shouldBe null
-        env.session.currentFirebaseUid.flow.first() shouldBe null
+        env.session.currentUserId.first() shouldBe null
+        env.session.currentFirebaseUid.first() shouldBe null
         env.auth.signOutCount shouldBe 1
     }
 
@@ -78,8 +78,8 @@ class AuthSessionRollbackTest : StringSpec({
         val result = env.anonymousLogin()
 
         result.shouldBeInstanceOf<Either.Left<AuthError>>()
-        env.session.currentUserId.flow.first() shouldBe null
-        env.session.currentFirebaseUid.flow.first() shouldBe null
+        env.session.currentUserId.first() shouldBe null
+        env.session.currentFirebaseUid.first() shouldBe null
         env.auth.signOutCount shouldBe 0
     }
 
@@ -89,8 +89,8 @@ class AuthSessionRollbackTest : StringSpec({
         env.login(email = "surfer@example.com", password = "secret1")
             .shouldBeInstanceOf<Either.Left<AuthError>>()
 
-        env.session.currentUserId.flow.first() shouldBe null
-        env.session.currentFirebaseUid.flow.first() shouldBe null
+        env.session.currentUserId.first() shouldBe null
+        env.session.currentFirebaseUid.first() shouldBe null
     }
 })
 
@@ -105,12 +105,12 @@ private class AuthEnv(
     val auth = RecordingAuthRepo(signOutThrows = signOutThrows)
 
     private val authLocal = AuthLocalRepository(NoopUserRepository, session)
-    private val wipeDemo = WipeDemoDataUseCase(NoopLocalDataReset, session)
+    private val wipeDemo = WipeDemoDataUseCase(NoopLocalDataReset, session, session)
     private val bootstrap = PostAuthBootstrapUseCase(
         userRemoteRepository = if (bootstrapFails) ThrowingUserRemoteRepo else EmptyUserRemoteRepo,
         workspaceRepository = NoWorkspaces,
         workspaceSyncer = NoopSyncer,
-        session = session,
+        sessionMutator = session,
         getCurrentTime = GetCurrentTimeUseCase(ClockUseCase()),
     )
     private val abandon = AbandonAuthSessionUseCase(session, auth)
@@ -168,7 +168,7 @@ private object NoWorkspaces : WorkspaceRepository {
 }
 
 private object NoopSyncer : WorkspaceSyncer {
-    override suspend fun pushAll() = Unit
+    override suspend fun pushAll(): Boolean = true
     override suspend fun syncAll() = Unit
     override suspend fun syncWorkspace(workspaceId: WorkspaceId) = Unit
 }

@@ -6,7 +6,7 @@ import arrow.core.raise.Raise
 import arrow.core.raise.either
 import co.touchlab.kermit.Logger
 import com.georgeci.moneysurfer.domain.auth.AuthError
-import com.georgeci.moneysurfer.domain.auth.SessionPointers
+import com.georgeci.moneysurfer.domain.auth.SessionMutator
 import com.georgeci.moneysurfer.domain.logging.redactEmail
 import com.georgeci.moneysurfer.domain.logging.redactUid
 import com.georgeci.moneysurfer.domain.model.User
@@ -34,7 +34,7 @@ class PostAuthBootstrapUseCase(
     private val userRemoteRepository: UserRemoteRepository,
     private val workspaceRepository: WorkspaceRepository,
     private val workspaceSyncer: WorkspaceSyncer,
-    private val session: SessionPointers,
+    private val sessionMutator: SessionMutator,
     private val getCurrentTime: GetCurrentTimeUseCase,
 ) {
     private val log = Logger.withTag(TAG)
@@ -166,7 +166,7 @@ class PostAuthBootstrapUseCase(
             return Result.CloudDataUnavailable(workspaceIds = existing.workspaceIds)
         }
 
-        session.currentWorkspaceId.set(resolvedDefault)
+        sessionMutator.setCurrentWorkspace(resolvedDefault)
         log.i {
             "[done] ExistingUser uid=${uid.redactUid()} workspaces=${existing.workspaceIds.size} " +
                 "currentWorkspaceId=${resolvedDefault.value}"

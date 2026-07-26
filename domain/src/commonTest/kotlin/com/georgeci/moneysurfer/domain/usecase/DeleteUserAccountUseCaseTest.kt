@@ -26,9 +26,9 @@ class DeleteUserAccountUseCaseTest : StringSpec({
 
         result shouldBe Unit.right()
         env.calls shouldBe listOf("reauth", "shutdown", "remoteCleanup", "authDelete", "localReset", "ledgerReset")
-        env.session.currentUserId.flow.first() shouldBe null
-        env.session.currentWorkspaceId.flow.first() shouldBe null
-        env.session.currentFirebaseUid.flow.first() shouldBe null
+        env.session.currentUserId.first() shouldBe null
+        env.session.currentWorkspaceId.first() shouldBe null
+        env.session.currentFirebaseUid.first() shouldBe null
     }
 
     "anonymous flow (null password) skips re-auth" {
@@ -59,7 +59,7 @@ class DeleteUserAccountUseCaseTest : StringSpec({
 
         result shouldBe AccountDeletionError.InvalidCredentials.left()
         env.calls shouldBe listOf("reauth")
-        env.session.currentUserId.flow.first() shouldBe USER_ID
+        env.session.currentUserId.first() shouldBe USER_ID
     }
 
     "remote cleanup failure keeps the local session so the user can retry" {
@@ -71,7 +71,7 @@ class DeleteUserAccountUseCaseTest : StringSpec({
 
         result.shouldBeInstanceOf<Either.Left<AccountDeletionError.RemoteDataCleanupFailed>>()
         env.calls shouldBe listOf("reauth", "shutdown", "remoteCleanup")
-        env.session.currentUserId.flow.first() shouldBe USER_ID
+        env.session.currentUserId.first() shouldBe USER_ID
     }
 
     "stale auth session surfaces RequiresRecentLogin after cleanup" {
@@ -83,7 +83,7 @@ class DeleteUserAccountUseCaseTest : StringSpec({
 
         result shouldBe AccountDeletionError.RequiresRecentLogin.left()
         env.calls shouldBe listOf("shutdown", "remoteCleanup", "authDelete")
-        env.session.currentUserId.flow.first() shouldBe USER_ID
+        env.session.currentUserId.first() shouldBe USER_ID
     }
 })
 
@@ -146,6 +146,6 @@ private class DeletionEnv(
                 calls += "ledgerReset"
             }
         },
-        session = session,
+        sessionMutator = session,
     )
 }

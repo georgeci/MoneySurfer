@@ -1,6 +1,8 @@
 package com.georgeci.moneysurfer.feature.transaction.creation
 
 import com.georgeci.moneysurfer.domain.auth.InMemorySessionPointers
+import com.georgeci.moneysurfer.domain.config.HostCapabilities
+import com.georgeci.moneysurfer.domain.fixtures.FakeHostCapabilities
 import com.georgeci.moneysurfer.domain.model.Account
 import com.georgeci.moneysurfer.domain.model.Category
 import com.georgeci.moneysurfer.domain.model.Transaction
@@ -53,7 +55,7 @@ internal class TransactionCreationFixture(workspaceId: WorkspaceId) {
         editingTransactionId: TransactionId? = null,
         duplicateOf: TransactionId? = null,
         prefillAccount: AccountId? = null,
-        featureConfig: TransactionCreationFeatureConfig = TransactionCreationFeatureConfig(transferEnabled = true),
+        hostCapabilities: HostCapabilities = FakeHostCapabilities(),
     ) = TransactionCreationViewModel(
         seed = duplicateOf?.let {
             TransactionCreationSeed(it, TransactionCreationSeed.Mode.Duplicate)
@@ -75,7 +77,7 @@ internal class TransactionCreationFixture(workspaceId: WorkspaceId) {
         applyTransactionChange = applyChange,
         getCurrentTime = GetCurrentTimeUseCase(clock),
         transactionRepository = transactionRepository,
-        featureConfig = featureConfig,
+        hostCapabilities = hostCapabilities,
         snackbar = snackbar,
     )
 

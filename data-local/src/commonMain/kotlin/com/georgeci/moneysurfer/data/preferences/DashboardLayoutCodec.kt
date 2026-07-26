@@ -59,10 +59,18 @@ internal object DashboardLayoutCodec {
     private fun unescapeVariant(variant: String): String =
         VARIANT_ESCAPES.reversed().fold(variant) { acc, (raw, escaped) -> acc.replace(escaped, raw) }
 
-    fun decode(stored: String): DashboardLayoutConfig {
-        if (stored.isBlank()) return DashboardLayoutConfig.DEFAULT
+    fun decode(stored: String): DashboardLayoutConfig = decodeOrNull(stored) ?: DashboardLayoutConfig.DEFAULT
+
+    /**
+     * `null` when nothing in [stored] parsed, so a caller that needs to tell "the user is on the
+     * default layout" from "the stored string is unreadable" can. The configuration engine does:
+     * reporting garbage as a decoded DEFAULT would make that layer *win*, hiding the corruption
+     * from the debug panel and overwriting the string on the next save.
+     */
+    fun decodeOrNull(stored: String): DashboardLayoutConfig? {
+        if (stored.isBlank()) return null
         val items = stored.split(ITEM_SEPARATOR).mapNotNull(::decodeItem)
-        return if (items.isEmpty()) DashboardLayoutConfig.DEFAULT else DashboardLayoutConfig(items).normalized()
+        return if (items.isEmpty()) null else DashboardLayoutConfig(items).normalized()
     }
 
     private fun decodeItem(stored: String): DashboardLayoutItem? {

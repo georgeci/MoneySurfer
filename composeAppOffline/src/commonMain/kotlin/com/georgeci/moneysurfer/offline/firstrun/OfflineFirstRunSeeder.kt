@@ -31,7 +31,7 @@ class OfflineFirstRunSeeder(
     private val log = Logger.withTag(TAG)
 
     override suspend fun seedIfNeeded() {
-        if (session.currentUserId.flow.first() == null) {
+        if (session.currentUserId.first() == null) {
             demoLoginUseCase().onLeft { err ->
                 log.w { "[abort] DemoLogin failed: $err" }
                 return

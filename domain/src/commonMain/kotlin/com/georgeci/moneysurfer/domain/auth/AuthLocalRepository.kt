@@ -16,7 +16,7 @@ import org.koin.core.annotation.Single
 @Single
 class AuthLocalRepository(
     private val userRepository: UserRepository,
-    private val session: SessionPointers,
+    private val sessionMutator: SessionMutator,
 ) {
     suspend fun createLocalUser(
         uid: String,
@@ -33,6 +33,6 @@ class AuthLocalRepository(
                 isAnon = isAnon,
             ),
         )
-        session.currentUserId.set(id)
+        sessionMutator.setCurrentUser(id)
     }
 }

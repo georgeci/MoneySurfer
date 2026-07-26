@@ -48,7 +48,7 @@ class SeedDefaultsUseCase(
     private val log = Logger.withTag(TAG)
 
     suspend operator fun invoke(currency: CurrencyCode, seedCashAccount: Boolean = true) {
-        val pinned = session.currentWorkspaceId.flow.first()
+        val pinned = session.currentWorkspaceId.first()
         if (pinned != null) {
             if (!seedCashAccount) return
             // Repair path: previous run may have pinned the workspace but died before the Cash

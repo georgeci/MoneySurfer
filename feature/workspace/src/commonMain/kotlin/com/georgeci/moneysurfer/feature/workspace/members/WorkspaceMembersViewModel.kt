@@ -107,7 +107,7 @@ class WorkspaceMembersViewModel(
     private fun observeWorkspace() {
         launch {
             val workspaceId = currentState.workspaceId
-            val userId = session.currentUserId.flow.first()
+            val userId = session.currentUserId.first()
             val workspace = userId
                 ?.let { getWorkspacesForUserUseCase(it).first().firstOrNull { ws -> ws.id == workspaceId } }
 

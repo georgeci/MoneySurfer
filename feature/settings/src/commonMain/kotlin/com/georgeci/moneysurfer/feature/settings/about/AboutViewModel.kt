@@ -1,20 +1,20 @@
 package com.georgeci.moneysurfer.feature.settings.about
 
 import com.georgeci.moneysurfer.domain.AppInfo
-import com.georgeci.moneysurfer.domain.OfflineBuildFlags
+import com.georgeci.moneysurfer.domain.config.HostCapabilities
 import com.georgeci.moneysurfer.utils.MviViewModel
 import org.koin.core.annotation.KoinViewModel
 
 @KoinViewModel
 class AboutViewModel(
     appInfo: AppInfo,
-    offlineBuildFlags: OfflineBuildFlags,
+    hostCapabilities: HostCapabilities,
 ) : MviViewModel<AboutState, AboutEvent, AboutEffect>(
     initialState = AboutState(appVersion = appInfo.version),
 ) {
 
     private val privacyUrl =
-        if (offlineBuildFlags.isOffline) URL_PRIVACY_LOCAL else URL_PRIVACY
+        if (hostCapabilities.isOffline) URL_PRIVACY_LOCAL else URL_PRIVACY
 
     override fun onEvent(event: AboutEvent) {
         when (event) {

@@ -8,7 +8,6 @@ import com.georgeci.moneysurfer.data.repository.WorkspaceMemberRepositoryImpl
 import com.georgeci.moneysurfer.data.repository.WorkspaceRepositoryImpl
 import com.georgeci.moneysurfer.data.sync.CurrentAuthInfo
 import com.georgeci.moneysurfer.data.sync.UploadPendingChangesUseCaseImpl
-import com.georgeci.moneysurfer.domain.SyncFeatureFlag
 import com.georgeci.moneysurfer.domain.auth.InMemorySessionPointers
 import com.georgeci.moneysurfer.domain.constants.DEFAULT_CATEGORY_SEEDS
 import com.georgeci.moneysurfer.domain.model.AppVersionStatus
@@ -201,10 +200,8 @@ private class CreationStack(
         userRemoteRepository = NoOpUserRemoteRepository,
         workspaceSyncer = NoOpWorkspaceSyncer,
         session = session,
+        sessionMutator = session,
         getCurrentTime = GetCurrentTimeUseCase(clock),
-        // The remote collaborators are no-ops here; the flag is on so the use case still walks
-        // its full remote branch, which is what this test is about.
-        syncFeatureFlag = SyncFeatureFlag(enabled = true),
     )
 
     suspend fun seedOwner() {
@@ -241,7 +238,7 @@ private object FakeAuthInfo : CurrentAuthInfo {
 }
 
 private object NoOpWorkspaceSyncer : WorkspaceSyncer {
-    override suspend fun pushAll() = Unit
+    override suspend fun pushAll(): Boolean = true
     override suspend fun syncAll() = Unit
     override suspend fun syncWorkspace(workspaceId: WorkspaceId) = Unit
 }

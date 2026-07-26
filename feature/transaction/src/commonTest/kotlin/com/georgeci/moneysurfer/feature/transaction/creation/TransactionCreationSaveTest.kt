@@ -3,6 +3,7 @@ package com.georgeci.moneysurfer.feature.transaction.creation
 import androidx.lifecycle.viewModelScope
 import app.cash.turbine.test
 import com.georgeci.moneysurfer.domain.fixtures.EUR
+import com.georgeci.moneysurfer.domain.fixtures.FakeHostCapabilities
 import com.georgeci.moneysurfer.domain.fixtures.USD
 import com.georgeci.moneysurfer.domain.fixtures.aCategory
 import com.georgeci.moneysurfer.domain.fixtures.accountId
@@ -314,11 +315,11 @@ class TransactionCreationSaveTest : StringSpec({
         }
     }
 
-    "Transfer is unreachable when transferEnabled flag is off" {
+    "Transfer is unreachable when the host disables it" {
         runTest {
             val fixture = TransactionCreationFixture(ws)
             val vm = fixture.createViewModel(
-                featureConfig = TransactionCreationFeatureConfig(transferEnabled = false),
+                hostCapabilities = FakeHostCapabilities(transferEnabled = false),
             )
             try {
                 vm.awaitContent()
@@ -334,11 +335,11 @@ class TransactionCreationSaveTest : StringSpec({
         }
     }
 
-    "Transfer is reachable when transferEnabled flag is on" {
+    "Transfer is reachable when the host enables it" {
         runTest {
             val fixture = TransactionCreationFixture(ws)
             val vm = fixture.createViewModel(
-                featureConfig = TransactionCreationFeatureConfig(transferEnabled = true),
+                hostCapabilities = FakeHostCapabilities(transferEnabled = true),
             )
             try {
                 vm.awaitContent()

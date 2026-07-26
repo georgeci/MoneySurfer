@@ -48,6 +48,8 @@ kotlin {
         commonMain.dependencies {
             implementation(projects.shared)
             implementation(projects.domain)
+            implementation(projects.appConfig.api)
+            implementation(projects.appConfig.default)
             implementation(projects.feature.login)
             implementation(projects.feature.transaction)
             implementation(projects.dataRemote)
@@ -76,6 +78,8 @@ kotlin {
             implementation(projects.feature.login)
             // DashboardCustomizeScreenStateTest mounts the customize screen's stateless content.
             implementation(projects.feature.dashboard)
+            // DebugConfigScreenStateTest mounts the QA configuration panel's stateless content.
+            implementation(projects.feature.settings)
             // GlobalErrorBoundaryTest drives the real boundary component and the real
             // MviViewModel escalation path (issue #78).
             implementation(projects.uikit)

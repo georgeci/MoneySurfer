@@ -95,7 +95,7 @@ Introduced by [#173](https://github.com/georgeci/MoneySurfer/issues/173) /
 seed and before any session pointer is read — nothing is written to disk until the app has
 introduced itself. That single preference read is also what clears the splash on a first launch.
 
-The flag is `ui.onboarding_completed` in `UiSettingsDataSource`, device-scoped (DataStore, not the
+The flag is the `ui.onboarding_completed` key behind `UiPreferences`, device-scoped (not the
 synced user profile) — reinstall or clear-data replays the onboarding, a new device does too. That
 is intentional: onboarding is a property of the install, not of the account.
 

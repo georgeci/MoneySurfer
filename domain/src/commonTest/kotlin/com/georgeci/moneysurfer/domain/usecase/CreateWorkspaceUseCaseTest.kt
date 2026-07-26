@@ -1,7 +1,6 @@
 package com.georgeci.moneysurfer.domain.usecase
 
 import arrow.core.Either
-import com.georgeci.moneysurfer.domain.SyncFeatureFlag
 import com.georgeci.moneysurfer.domain.auth.InMemorySessionPointers
 import com.georgeci.moneysurfer.domain.constants.DEFAULT_CATEGORY_SEEDS
 import com.georgeci.moneysurfer.domain.model.Category
@@ -41,7 +40,7 @@ class CreateWorkspaceUseCaseTest : StringSpec({
         env.workspaceRepo.inserted shouldHaveSize 0
         env.memberRepo.inserted shouldHaveSize 0
         env.categoryRepo.inserted shouldHaveSize 0
-        env.session.currentWorkspaceId.flow.first() shouldBe null
+        env.session.currentWorkspaceId.first() shouldBe null
     }
 
     "writes workspace, member, default categories and pins it as current (no Firebase session)" {
@@ -84,7 +83,7 @@ class CreateWorkspaceUseCaseTest : StringSpec({
         env.syncer.pushAllCount shouldBe 0
         env.userRemoteRepo.addRefCalls shouldHaveSize 0
         env.userRemoteRepo.setDefaultCalls shouldHaveSize 0
-        env.session.currentWorkspaceId.flow.first() shouldBe newId
+        env.session.currentWorkspaceId.first() shouldBe newId
     }
 
     "trims name and description before insert" {
@@ -112,7 +111,7 @@ class CreateWorkspaceUseCaseTest : StringSpec({
         env.syncer.pushAllCount shouldBe 1
         env.userRemoteRepo.addRefCalls shouldBe listOf(FIREBASE_UID to newId)
         env.userRemoteRepo.setDefaultCalls shouldBe listOf(FIREBASE_UID to newId)
-        env.session.currentWorkspaceId.flow.first() shouldBe newId
+        env.session.currentWorkspaceId.first() shouldBe newId
     }
 
     "still pins workspace when setDefaultWorkspace throws" {
@@ -128,7 +127,7 @@ class CreateWorkspaceUseCaseTest : StringSpec({
         val newId = result.value
         env.userRemoteRepo.addRefCalls shouldBe listOf(FIREBASE_UID to newId)
         env.userRemoteRepo.setDefaultCalls shouldHaveSize 0
-        env.session.currentWorkspaceId.flow.first() shouldBe newId
+        env.session.currentWorkspaceId.first() shouldBe newId
     }
 
     "pushAll failure surfaces as RemoteSyncFailed and skips addRef + pin" {
@@ -150,7 +149,7 @@ class CreateWorkspaceUseCaseTest : StringSpec({
         env.workspaceRepo.inserted.single().id shouldBe (env.workspaceRepo.inserted.single().id)
         env.userRemoteRepo.addRefCalls shouldHaveSize 0
         env.userRemoteRepo.setDefaultCalls shouldHaveSize 0
-        env.session.currentWorkspaceId.flow.first() shouldBe null
+        env.session.currentWorkspaceId.first() shouldBe null
     }
 
     "still pins workspace and succeeds when addWorkspaceRef throws" {
@@ -165,7 +164,7 @@ class CreateWorkspaceUseCaseTest : StringSpec({
         result.shouldBeInstanceOf<Either.Right<WorkspaceId>>()
         val newId = result.value
         env.syncer.pushAllCount shouldBe 1
-        env.session.currentWorkspaceId.flow.first() shouldBe newId
+        env.session.currentWorkspaceId.first() shouldBe newId
     }
 
     "local insert failure returns LocalWriteFailed and skips remote work" {
@@ -185,7 +184,7 @@ class CreateWorkspaceUseCaseTest : StringSpec({
         env.categoryRepo.inserted shouldHaveSize 0
         env.syncer.pushAllCount shouldBe 0
         env.userRemoteRepo.addRefCalls shouldHaveSize 0
-        env.session.currentWorkspaceId.flow.first() shouldBe null
+        env.session.currentWorkspaceId.first() shouldBe null
     }
 
     // -- Regression coverage: workspaceIds must be filled on the happy path --
@@ -250,11 +249,15 @@ class CreateWorkspaceUseCaseTest : StringSpec({
         env.userRemoteRepo.setDefaultCalls shouldHaveSize 0
     }
 
-    "no remote calls at all when the sync feature is off, even with a Firebase uid" {
-        // Regression for issue #342: `pushAll()` no-ops with the flag off, which used to read as
-        // a landed push — so `addWorkspaceRef` filled `users/{uid}.workspaceIds` with an id whose
-        // `workspaces/{wid}` document was never written. Every online build shipped with the flag
-        // off was corrupting the remote user doc on every workspace creation.
+    "a push that reports nothing landed registers no ref, even with a Firebase uid" {
+        // Regression for issue #342: `pushAll()` no-ops with sync off, which used to read as a
+        // landed push — so `addWorkspaceRef` filled `users/{uid}.workspaceIds` with an id whose
+        // `workspaces/{wid}` document was never written. Every online build shipped with sync off
+        // was corrupting the remote user doc on every workspace creation.
+        //
+        // The decision now comes from `pushAll()`'s own return value rather than a second read of
+        // `SyncSettings`: two reads of a live setting can disagree, and the window between them is
+        // long enough for a server kill switch to reopen exactly this hole.
         val env = TestEnv(
             currentUserId = OWNER_ID,
             firebaseUid = FIREBASE_UID,
@@ -270,7 +273,7 @@ class CreateWorkspaceUseCaseTest : StringSpec({
         env.userRemoteRepo.setDefaultCalls shouldHaveSize 0
         // The workspace is still created and pinned — it is simply local-only.
         env.workspaceRepo.inserted.single().id shouldBe newId
-        env.session.currentWorkspaceId.flow.first() shouldBe newId
+        env.session.currentWorkspaceId.first() shouldBe newId
     }
 
     "member insert failure returns LocalWriteFailed and skips categories, remote work and pin" {
@@ -290,7 +293,7 @@ class CreateWorkspaceUseCaseTest : StringSpec({
         env.categoryRepo.inserted shouldHaveSize 0
         env.syncer.pushAllCount shouldBe 0
         env.userRemoteRepo.addRefCalls shouldHaveSize 0
-        env.session.currentWorkspaceId.flow.first() shouldBe null
+        env.session.currentWorkspaceId.first() shouldBe null
     }
 
     "category seed failure returns LocalWriteFailed and skips remote work and pin" {
@@ -308,7 +311,7 @@ class CreateWorkspaceUseCaseTest : StringSpec({
         env.workspaceRepo.inserted shouldHaveSize 1
         env.memberRepo.inserted shouldHaveSize 1
         env.syncer.pushAllCount shouldBe 0
-        env.session.currentWorkspaceId.flow.first() shouldBe null
+        env.session.currentWorkspaceId.first() shouldBe null
     }
 
     "pushAll failure keeps all local rows so a retry can re-push them" {
@@ -333,7 +336,7 @@ class CreateWorkspaceUseCaseTest : StringSpec({
 
         first shouldNotBe second
         env.workspaceRepo.inserted.map { it.id } shouldBe listOf(first, second)
-        env.session.currentWorkspaceId.flow.first() shouldBe second
+        env.session.currentWorkspaceId.first() shouldBe second
     }
 })
 
@@ -356,7 +359,7 @@ private class TestEnv(
     val memberRepo: FakeWorkspaceMemberRepository = FakeWorkspaceMemberRepository(),
     val categoryRepo: FakeCategoryRepository = FakeCategoryRepository(),
     val userRemoteRepo: FakeUserRemoteRepository = FakeUserRemoteRepository(callLog = callLog),
-    val syncer: FakeWorkspaceSyncer = FakeWorkspaceSyncer(callLog = callLog),
+    val syncer: FakeWorkspaceSyncer = FakeWorkspaceSyncer(syncEnabled = syncEnabled, callLog = callLog),
 ) {
     val session = InMemorySessionPointers(
         currentUserId = currentUserId,
@@ -370,8 +373,8 @@ private class TestEnv(
         userRemoteRepository = userRemoteRepo,
         workspaceSyncer = syncer,
         session = session,
+        sessionMutator = session,
         getCurrentTime = GetCurrentTimeUseCase(ClockUseCase()),
-        syncFeatureFlag = SyncFeatureFlag(enabled = syncEnabled),
     )
 }
 
@@ -454,13 +457,17 @@ private class FakeUserRemoteRepository(
 
 private class FakeWorkspaceSyncer(
     private val failOnSync: Boolean = false,
+    /** What the real syncer reports when sync is switched off: called, but nothing was pushed. */
+    private val syncEnabled: Boolean = true,
     private val callLog: MutableList<String> = mutableListOf(),
 ) : WorkspaceSyncer {
     var pushAllCount = 0
-    override suspend fun pushAll() {
+    override suspend fun pushAll(): Boolean {
         if (failOnSync) throw RuntimeException("firestore unavailable")
+        if (!syncEnabled) return false
         callLog += "pushAll"
         pushAllCount++
+        return true
     }
     override suspend fun syncAll() = Unit
     override suspend fun syncWorkspace(workspaceId: WorkspaceId) = Unit
