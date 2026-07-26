@@ -61,6 +61,19 @@ object WorkspaceSelectorTestTags {
 }
 
 /**
+ * The exits [WorkspaceSelectorScreen] offers, one per [WorkspaceSelectorEffect]. Grouped into a
+ * holder so the entry point stays under the parameter limit as destinations are added — see
+ * AGENTS.md → UI Rules.
+ */
+data class WorkspaceSelectorNavigation(
+    val onNavigateToDashboard: () -> Unit,
+    val onNavigateToSignIn: () -> Unit,
+    val onNavigateToWorkspaceCreation: () -> Unit,
+    val onNavigateToWorkspaceEdit: (WorkspaceId) -> Unit,
+    val onNavigateToWorkspaceMembers: (WorkspaceId) -> Unit,
+)
+
+/**
  * [cloudDataUnavailable] comes straight from the route: the account owns workspaces that the
  * post-auth pull never brought down, so the empty list below is a hydration failure rather than
  * a new account. Pure presentation — nothing in the view model depends on it (issue #342).
@@ -68,12 +81,8 @@ object WorkspaceSelectorTestTags {
 @Composable
 fun WorkspaceSelectorScreen(
     showActions: Boolean,
+    navigation: WorkspaceSelectorNavigation,
     cloudDataUnavailable: Boolean = false,
-    onNavigateToDashboard: () -> Unit,
-    onNavigateToSignIn: () -> Unit,
-    onNavigateToWorkspaceCreation: () -> Unit,
-    onNavigateToWorkspaceEdit: (WorkspaceId) -> Unit,
-    onNavigateToWorkspaceMembers: (WorkspaceId) -> Unit,
     viewModel: WorkspaceSelectorViewModel = koinViewModel(
         key = "selector:$showActions",
     ) { parametersOf(showActions) },
@@ -82,11 +91,14 @@ fun WorkspaceSelectorScreen(
 
     viewModel.HandleSideEffect { effect ->
         when (effect) {
-            WorkspaceSelectorEffect.NavigateToDashboard -> onNavigateToDashboard()
-            WorkspaceSelectorEffect.NavigateToSignIn -> onNavigateToSignIn()
-            WorkspaceSelectorEffect.NavigateToWorkspaceCreation -> onNavigateToWorkspaceCreation()
-            is WorkspaceSelectorEffect.NavigateToWorkspaceEdit -> onNavigateToWorkspaceEdit(effect.workspaceId)
-            is WorkspaceSelectorEffect.NavigateToWorkspaceMembers -> onNavigateToWorkspaceMembers(effect.workspaceId)
+            WorkspaceSelectorEffect.NavigateToDashboard -> navigation.onNavigateToDashboard()
+            WorkspaceSelectorEffect.NavigateToSignIn -> navigation.onNavigateToSignIn()
+            WorkspaceSelectorEffect.NavigateToWorkspaceCreation -> navigation.onNavigateToWorkspaceCreation()
+            is WorkspaceSelectorEffect.NavigateToWorkspaceEdit ->
+                navigation.onNavigateToWorkspaceEdit(effect.workspaceId)
+
+            is WorkspaceSelectorEffect.NavigateToWorkspaceMembers ->
+                navigation.onNavigateToWorkspaceMembers(effect.workspaceId)
         }
     }
 

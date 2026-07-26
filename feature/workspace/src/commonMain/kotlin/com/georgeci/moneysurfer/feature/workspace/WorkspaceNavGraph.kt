@@ -11,6 +11,7 @@ import com.georgeci.moneysurfer.feature.workspace.invite.WorkspaceInviteScreen
 import com.georgeci.moneysurfer.feature.workspace.members.MemberActionsBottomSheet
 import com.georgeci.moneysurfer.feature.workspace.members.WorkspaceManageScreen
 import com.georgeci.moneysurfer.feature.workspace.members.WorkspaceMembersBottomSheet
+import com.georgeci.moneysurfer.feature.workspace.selector.WorkspaceSelectorNavigation
 import com.georgeci.moneysurfer.feature.workspace.selector.WorkspaceSelectorScreen
 import com.georgeci.moneysurfer.navigation.BottomSheetSceneStrategy
 import com.georgeci.moneysurfer.navigation.FeatureNavGraph
@@ -22,19 +23,21 @@ val workspaceNavGraph: FeatureNavGraph = { navigator ->
     entry<Route.WorkspaceSelector> { key ->
         WorkspaceSelectorScreen(
             showActions = key.showActions,
+            navigation = WorkspaceSelectorNavigation(
+                onNavigateToDashboard = {
+                    navigator.replaceTop(Route.Dashboard)
+                },
+                // `resetTo`: logout wiped the local data, so nothing behind this entry is still valid.
+                onNavigateToSignIn = { navigator.resetTo(Route.SignIn) },
+                onNavigateToWorkspaceCreation = { navigator.push(Route.WorkspaceCreation()) },
+                onNavigateToWorkspaceEdit = { workspaceId ->
+                    navigator.push(Route.WorkspaceCreation(workspaceId = workspaceId.value))
+                },
+                onNavigateToWorkspaceMembers = { workspaceId ->
+                    navigator.push(Route.WorkspaceMembers(workspaceId = workspaceId.value))
+                },
+            ),
             cloudDataUnavailable = key.cloudDataUnavailable,
-            onNavigateToDashboard = {
-                navigator.replaceTop(Route.Dashboard)
-            },
-            // `resetTo`: logout wiped the local data, so nothing behind this entry is still valid.
-            onNavigateToSignIn = { navigator.resetTo(Route.SignIn) },
-            onNavigateToWorkspaceCreation = { navigator.push(Route.WorkspaceCreation()) },
-            onNavigateToWorkspaceEdit = { workspaceId ->
-                navigator.push(Route.WorkspaceCreation(workspaceId = workspaceId.value))
-            },
-            onNavigateToWorkspaceMembers = { workspaceId ->
-                navigator.push(Route.WorkspaceMembers(workspaceId = workspaceId.value))
-            },
         )
     }
 
