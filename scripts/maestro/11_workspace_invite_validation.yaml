@@ -10,23 +10,25 @@ name: Workspace — Invite member validation
 - assertVisible:
     id: "settings:root"
 - tapOn:
-    text: "Members & permissions"
+    id: "settings:membersRow"
 
 - assertVisible:
-    text: "Test Workspace · Members"
+    id: "workspaceMembers:root"
 - tapOn:
-    text: "Invite people"
+    id: "workspaceMembers:invite"
 
 - assertVisible:
-    text: "Invite member"
+    id: "workspaceInvite:root"
 - tapOn:
-    text: "Email"
+    id: "workspaceInvite:email"
 - inputText: "not-an-email"
 # Dismiss the keyboard first: "Send invite" sits behind it, so tapping straight
 # away lands on the keyboard and the invite is never submitted (#219).
 - pressKey: Enter
 - tapOn:
-    text: "Send invite"
+    id: "workspaceInvite:send"
 
+# The validation message stays a `text:` selector on purpose — this copy *is* the
+# behaviour under test (README.md → Selectors).
 - assertVisible:
     text: "That doesn't look like a valid email."

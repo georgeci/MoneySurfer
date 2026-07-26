@@ -7,11 +7,12 @@ tags:
 # Settings → Sync → "Force sync now" → wait for the run to complete.
 #
 # EXCLUDED from the default online suite (tag `sync`). Sync has been gated off
-# since #110: `OnlineSignInModule` binds `SyncFeatureFlag(enabled = false)` and
-# `SettingsState.showSyncSection` hides the row, so there is no Sync hub to open
-# in the shipped online build and this flow cannot pass (issue #219). Re-include
-# it — drop the tag from `maestroSyncTags` in gradle/qa.gradle.kts — once the
-# flag is flipped on.
+# since #110: `SettingsState.showSyncSection` is `!isOffline && syncEnabled`, and
+# `syncEnabled` follows `SyncSettings.isEnabled` — build AND server kill switch
+# AND user toggle, since #345 folded the old `SyncFeatureFlag` binding into the
+# layered config engine. With it off there is no Sync hub to open in the shipped
+# online build and this flow cannot pass (issue #219). Re-include it — drop the
+# tag from `maestroSetupTags` in gradle/qa.gradle.kts — once sync is switched on.
 
 - runFlow: 03_dashboard_add_account.yaml
 
@@ -38,6 +39,6 @@ tags:
     text: "Force sync now"
 
 - tapOn:
-    text: "Back"
+    id: "toolbar:back"
 - assertVisible:
     id: "settings:root"

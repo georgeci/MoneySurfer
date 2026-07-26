@@ -7,9 +7,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
 import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
 import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
@@ -23,6 +26,18 @@ import moneysurfer.uikit.generated.resources.uikit_transaction_delete_transfer_m
 import moneysurfer.uikit.generated.resources.uikit_transaction_delete_transfer_message_generic
 import moneysurfer.uikit.generated.resources.uikit_transaction_delete_transfer_title
 import org.jetbrains.compose.resources.stringResource
+
+/**
+ * Stable selectors for the shared delete dialog — see docs/testing/testing-strategy.md.
+ *
+ * The value keeps its `transactionDetails:` prefix even though the dialog is no longer owned by
+ * that screen: it is the id two Maestro flows already tap (`08`, `17`), and renaming it would
+ * break them for nothing. The prefix names where the flows first meet this dialog, not where the
+ * composable lives.
+ */
+object SurferDeleteTransactionDialogTestTags {
+    const val Confirm = "transactionDetails:confirmDelete"
+}
 
 /**
  * The one "delete this transaction?" dialog. Deleting is the same act wherever it is started —
@@ -73,6 +88,11 @@ fun SurferDeleteTransactionDialog(
         confirmButton = {
             Button(
                 onClick = onConfirm,
+                // The dialog is its own window, so the hosting screen's `surferTestTagAsId()`
+                // does not reach in here — it has to be applied again alongside the tag.
+                modifier = Modifier
+                    .surferTestTagAsId()
+                    .testTag(SurferDeleteTransactionDialogTestTags.Confirm),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = AppTheme.materialColors.error,
                     contentColor = AppTheme.materialColors.onError,

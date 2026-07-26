@@ -7,20 +7,18 @@ name: Budgets — Create a budget and see it on the list
 - runFlow: 03_dashboard_add_account.yaml
 
 - tapOn:
-    text: "Settings"
+    id: "dashboard:settings"
 
 - assertVisible:
-    text: "Settings"
+    id: "settings:root"
 
 - scrollUntilVisible:
     element:
-      text: "Budgets"
+      id: "settings:budgetsRow"
     direction: DOWN
 - tapOn:
-    text: "Budgets"
+    id: "settings:budgetsRow"
 
-# Budgets list. The "New budget" FAB carries an explicit contentDescription
-# (BudgetsScreen), which Maestro matches by `text:` on Android.
 - assertVisible:
     id: "budgets:root"
 
@@ -35,7 +33,9 @@ name: Budgets — Create a budget and see it on the list
       # the category chips default to "All categories", so a general budget
       # needs nothing else filled in.
       - assertVisible:
-          text: "New budget"
+          id: "budgetEdit:root"
+      # Remaining copy selector: the default category scope has no testTag yet,
+      # and this is the one assertion that the default actually holds (#352).
       - assertVisible:
           text: "All categories"
       - tapOn:
@@ -58,10 +58,10 @@ name: Budgets — Create a budget and see it on the list
 - assertVisible:
     text: "Coffee cap"
 
-# Open it: the details hero shows the ring and the forecast tiles.
+# Open it: the details hero shows the spend ring.
 - tapOn:
     text: "Coffee cap"
 - assertVisible:
     id: "budgetDetails:root"
 - assertVisible:
-    text: "Daily average"
+    id: "budgetDetails:ring"

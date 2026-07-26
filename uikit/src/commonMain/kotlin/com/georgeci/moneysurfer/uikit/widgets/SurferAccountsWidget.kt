@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.georgeci.moneysurfer.uikit.atom.SurferActionCard
@@ -33,14 +34,25 @@ data class SurferAccountItem(
     val icon: ImageVector = SurferIcons.Wallet,
 )
 
+/**
+ * The empty-state "add your first account" affordance: its copy, its click, and the selector a
+ * UI test taps it by. Four arguments describing one control, so they travel as one — the host
+ * screen still owns [testTag], because the CTA is a step in its flow rather than the widget's.
+ */
+data class SurferAddAccountCta(
+    val label: String,
+    val onClick: () -> Unit,
+    val trailingLabel: String? = null,
+    val testTag: String? = null,
+)
+
+/** Accounts widget for the dashboard column. */
 @Composable
 fun SurferAccountsWidget(
     items: List<SurferAccountItem>,
-    onAddClick: () -> Unit,
-    addLabel: String,
+    addCta: SurferAddAccountCta,
     modifier: Modifier = Modifier,
     size: SurferWidgetSize = LocalSurferWidgetSize.current,
-    addCtaTrailingLabel: String? = null,
     onItemClick: ((SurferAccountItem) -> Unit)? = null,
 ) {
     val hero = size == SurferWidgetSize.Hero
@@ -63,9 +75,10 @@ fun SurferAccountsWidget(
         // new ones are created from the "Manage" flow.
         if (items.isEmpty()) {
             AddAccountRow(
-                label = addLabel,
-                trailingLabel = addCtaTrailingLabel,
-                onClick = onAddClick,
+                label = addCta.label,
+                trailingLabel = addCta.trailingLabel,
+                onClick = addCta.onClick,
+                modifier = addCta.testTag?.let { Modifier.testTag(it) } ?: Modifier,
             )
         }
     }
@@ -76,8 +89,9 @@ private fun AddAccountRow(
     label: String,
     trailingLabel: String?,
     onClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    SurferActionCard(modifier = Modifier.fillMaxWidth(), onClick = onClick) {
+    SurferActionCard(modifier = modifier.fillMaxWidth(), onClick = onClick) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -123,9 +137,11 @@ private fun SurferAccountsWidgetHeroPreview() {
                     SurferAccountItem("2", "Emergency Fund", "Savings · •• 7712", "€8,915.00", SurferIcons.Savings),
                     SurferAccountItem("3", "Cash wallet", "Cash", "€180.00", SurferIcons.Cash),
                 ),
-                onAddClick = {},
-                addLabel = "Add account",
-                addCtaTrailingLabel = "New",
+                addCta = SurferAddAccountCta(
+                    label = "Add account",
+                    onClick = {},
+                    trailingLabel = "New",
+                ),
                 modifier = Modifier
                     .fillMaxWidth()
                     .width(360.dp),
@@ -141,9 +157,11 @@ private fun SurferAccountsWidgetEmptyPreview() {
         Box(modifier = Modifier.padding(16.dp)) {
             SurferAccountsWidget(
                 items = emptyList(),
-                onAddClick = {},
-                addLabel = "Add account",
-                addCtaTrailingLabel = "New",
+                addCta = SurferAddAccountCta(
+                    label = "Add account",
+                    onClick = {},
+                    trailingLabel = "New",
+                ),
                 modifier = Modifier.fillMaxWidth(),
             )
         }

@@ -34,6 +34,6 @@ name: Transaction — Add expense transaction
 
 # Assert back on Dashboard and transaction appears in Recent
 - assertVisible:
-    text: "Recent"
+    id: "dashboard:recent"
 - assertVisible:
     text: "Test expense"

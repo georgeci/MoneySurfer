@@ -4,6 +4,13 @@ name: Appearance — Switch theme between Dark, Light and System
 # Pre-condition: active workspace and dashboard.
 # Settings → Appearance → tap each theme row, assert all three are visible
 # (radio rows persist regardless of selection).
+#
+# Scope note: this flow proves the rows are reachable and survive each tap. It
+# does NOT prove the tap selected anything. The assertions it used to make —
+# "Dim surfaces, less glare" after tapping Dark — read like selection checks but
+# are static row subtitles that AppearanceScreen renders for every row whether or
+# not it is selected, so they held before the tap too. Asserting real selection
+# needs the radio state exposed; tracked separately (#352).
 
 - runFlow: 03_dashboard_add_account.yaml
 
@@ -19,41 +26,46 @@ name: Appearance — Switch theme between Dark, Light and System
 
 # Appearance screen
 - assertVisible:
-    text: "Theme"
+    id: "appearance:root"
 - assertVisible:
-    text: "Follow system"
+    id: "appearance:theme:system"
 - assertVisible:
-    text: "Light"
+    id: "appearance:theme:light"
 - assertVisible:
-    text: "Dark"
-- assertVisible:
-    text: "Card style"
+    id: "appearance:theme:dark"
 
 # Switch to Dark
 - tapOn:
-    text: "Dark"
+    id: "appearance:theme:dark"
 - assertVisible:
-    text: "Dim surfaces, less glare"
+    id: "appearance:theme:dark"
 
 # Switch to Light
 - tapOn:
-    text: "Light"
+    id: "appearance:theme:light"
 - assertVisible:
-    text: "Bright surfaces"
+    id: "appearance:theme:light"
 
-# Restore Follow system
+# Restore Follow system — this flow moved the setting, so this flow puts it back.
+# That is self-cleanup, not the successor-oriented kind 03a used to do (#351).
 - tapOn:
-    text: "Follow system"
+    id: "appearance:theme:system"
 - assertVisible:
-    text: "Match device dark mode"
+    id: "appearance:theme:system"
 
-# Try a different card style and back
+# Try a different card style, then restore the default fill.
+- scrollUntilVisible:
+    element:
+      id: "appearance:cardStyle:outlined"
+    direction: DOWN
 - tapOn:
-    text: "Outlined"
+    id: "appearance:cardStyle:outlined"
 - assertVisible:
-    text: "Bordered surfaces, no fill"
+    id: "appearance:cardStyle:outlined"
+- tapOn:
+    id: "appearance:cardStyle:filled"
 
 - tapOn:
-    text: "Back"
+    id: "toolbar:back"
 - assertVisible:
     id: "settings:root"

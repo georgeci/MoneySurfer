@@ -27,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -41,6 +42,7 @@ import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsRadio
 import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsRow
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
+import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
 import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.uikit.tokens.AccentSeeds
@@ -92,6 +94,23 @@ private val FixedSwatches: List<SwatchSpec> = listOf(
     SwatchSpec.Preset(AccentSeed.Rose, Res.string.settings_appearance_swatch_rose, AccentSeeds.Rose),
 )
 
+/**
+ * Stable selectors for the Appearance screen — see docs/testing/testing-strategy.md.
+ *
+ * The option rows are named after the enum entry they set, not the localized label, so a
+ * renamed row title never breaks a flow: `appearance:theme:system|light|dark` and
+ * `appearance:cardStyle:filled|outlined|card`.
+ */
+object AppearanceTestTags {
+    const val Root = "appearance:root"
+
+    /** Row that selects a [ThemeMode]. */
+    fun theme(mode: ThemeMode): String = "appearance:theme:${mode.name.lowercase()}"
+
+    /** Row that selects a [ContainerStyle] — the "Card style" section. */
+    fun cardStyle(style: ContainerStyle): String = "appearance:cardStyle:${style.name.lowercase()}"
+}
+
 @Composable
 fun AppearanceScreen(
     onNavigateBack: () -> Unit,
@@ -122,7 +141,10 @@ private fun AppearanceContent(
     onContainerStyleSelect: (ContainerStyle) -> Unit,
 ) {
     Scaffold(
-        modifier = Modifier.surferSafeInsets(),
+        modifier = Modifier
+            .surferSafeInsets()
+            .testTag(AppearanceTestTags.Root)
+            .surferTestTagAsId(),
         containerColor = AppTheme.materialColors.surface,
         topBar = {
             SurferToolbar(
@@ -152,6 +174,7 @@ private fun AppearanceContent(
                     supportingText = stringResource(Res.string.settings_appearance_theme_system_supporting),
                     onClick = { onThemeModeSelect(ThemeMode.System) },
                     trailing = { SurferSettingsRadio(selected = state.themeMode == ThemeMode.System) },
+                    modifier = Modifier.testTag(AppearanceTestTags.theme(ThemeMode.System)),
                 )
                 SurferSettingsRow(
                     icon = SurferIcons.LightMode,
@@ -159,6 +182,7 @@ private fun AppearanceContent(
                     supportingText = stringResource(Res.string.settings_appearance_theme_light_supporting),
                     onClick = { onThemeModeSelect(ThemeMode.Light) },
                     trailing = { SurferSettingsRadio(selected = state.themeMode == ThemeMode.Light) },
+                    modifier = Modifier.testTag(AppearanceTestTags.theme(ThemeMode.Light)),
                 )
                 SurferSettingsRow(
                     icon = SurferIcons.DarkMode,
@@ -166,6 +190,7 @@ private fun AppearanceContent(
                     supportingText = stringResource(Res.string.settings_appearance_theme_dark_supporting),
                     onClick = { onThemeModeSelect(ThemeMode.Dark) },
                     trailing = { SurferSettingsRadio(selected = state.themeMode == ThemeMode.Dark) },
+                    modifier = Modifier.testTag(AppearanceTestTags.theme(ThemeMode.Dark)),
                 )
             }
 
@@ -199,6 +224,7 @@ private fun AppearanceContent(
                         supportingText = style.displaySupporting(),
                         onClick = { onContainerStyleSelect(style) },
                         trailing = { SurferSettingsRadio(selected = state.containerStyle == style) },
+                        modifier = Modifier.testTag(AppearanceTestTags.cardStyle(style)),
                     )
                 }
             }
