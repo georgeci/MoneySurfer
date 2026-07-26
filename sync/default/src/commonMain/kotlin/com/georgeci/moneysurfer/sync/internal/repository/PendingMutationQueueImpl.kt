@@ -7,6 +7,7 @@ import com.georgeci.moneysurfer.sync.repository.MutationOperation
 import com.georgeci.moneysurfer.sync.repository.PendingMutation
 import com.georgeci.moneysurfer.sync.repository.PendingMutationQueue
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import org.koin.core.annotation.Single
 import kotlin.time.Instant
 
@@ -36,6 +37,9 @@ class PendingMutationQueueImpl(
     }
 
     override val pendingCount: Flow<Int> = dao.pendingCount()
+
+    override fun observeOutbox(limit: Int): Flow<List<PendingMutation>> =
+        dao.observeAll(limit).map { rows -> rows.map { it.toDomain() } }
 
     private fun workspaceFilterFor(scope: SyncScope): String? = when (scope) {
         SyncScope.UploadOnly,

@@ -282,7 +282,10 @@ follow conflict resolution like the other entities. See
 
 ## `SyncMetaRepository`
 
-Source:
+Interface in
+[SyncMetaRepository.kt](../../sync/api/src/commonMain/kotlin/com/georgeci/moneysurfer/sync/repository/SyncMetaRepository.kt)
+(`:sync/api`, so feature modules can read the cursors without depending on the
+runtime), implementation in
 [SyncMetaRepositoryImpl.kt](../../sync/default/src/commonMain/kotlin/com/georgeci/moneysurfer/sync/internal/repository/SyncMetaRepositoryImpl.kt),
 schema in
 [SyncMetaEntity.kt](../../sync/default/src/commonMain/kotlin/com/georgeci/moneysurfer/sync/db/entity/SyncMetaEntity.kt).
@@ -292,11 +295,17 @@ timestamps:
 
 | Field                 | Set by | Read by |
 |------------------------|--------|---------|
-| `lastPulledAt`         | `setCursor` after a successful batch. | `cursor()` for the next pull's `WHERE updatedAt > ?`. |
+| `lastPulledAt`         | `setCursor` after a successful batch. | `cursor()` for the next pull's `WHERE updatedAt > ?`; rendered on Settings → Sync, where a cursor sitting ahead of a remote write is the answer to "why did the pull bring nothing". |
 | `lastSyncSuccessAt`    | `markSuccess` on every collection that finishes (even if empty). | UI badges. |
 | `lastSyncAttemptAt`    | `markAttempt` at the start of `pullCollection`. | UI badges, freshness signal. |
 
-`clearWorkspace(workspaceId)` is the per-workspace wipe. Full table
+`clearScope(scopeKey)` is the per-workspace wipe — also what Settings → Sync
+calls behind "Reset cursors & re-pull", which then requests a MANUAL sync so the
+re-pull actually happens instead of waiting for the next trigger. That screen
+cancels the coordinator and waits for it to go idle *before* clearing: a pull in
+flight writes `setCursor(now)` per collection as it finishes each one, and a new
+request queues behind it rather than merging into it, so wiping mid-run would be
+undone before the re-pull ever ran. Full table
 clear is `deleteAll()` from `SyncMetaDao`, called by
 `LocalDataResetRepositoryImpl.clearAll()` on logout.
 

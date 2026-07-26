@@ -18,4 +18,5 @@ class NoOpPendingMutationQueue : PendingMutationQueue {
     override suspend fun markCompleted(ids: List<String>) = Unit
     override suspend fun markFailed(id: String, error: String) = Unit
     override val pendingCount: Flow<Int> = flowOf(0)
+    override fun observeOutbox(limit: Int): Flow<List<PendingMutation>> = flowOf(emptyList())
 }

@@ -24,20 +24,25 @@ tags:
 - tapOn:
     id: "settings:syncRow"
 
-# Sync screen
+# Sync screen. The hero is the only thing above the fold — live state, last result, outbox and
+# pull cursors sit between it and the actions — so the action row has to be scrolled to, and is
+# addressed by testTag rather than by its label.
 - assertVisible:
-    text: "Sync"
-- assertVisible:
-    text: "Force sync now"
+    id: "sync:hero"
+- scrollUntilVisible:
+    element:
+      id: "sync:action:force"
+    direction: DOWN
 
 - tapOn:
-    text: "Force sync now"
+    id: "sync:action:force"
 
-# After triggering, the hero stays on screen and the action remains tappable.
+# After triggering, the action remains tappable.
 # Don't assert the in-progress label (race-y on emulator with seeded data).
 - assertVisible:
-    text: "Force sync now"
+    id: "sync:action:force"
 
+# The toolbar lives in the Scaffold's topBar, so it stays put however far the content scrolled.
 - tapOn:
     id: "toolbar:back"
 - assertVisible:

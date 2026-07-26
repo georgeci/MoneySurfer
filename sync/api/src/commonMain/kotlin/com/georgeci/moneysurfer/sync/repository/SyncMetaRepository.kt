@@ -14,6 +14,11 @@ import kotlin.time.Instant
  * [scopeKey] is typically a workspace id string. [collection] is an opaque
  * Firestore collection name string (e.g. "accounts", "transactions").
  *
+ * Lives in `sync:api` rather than next to its Room-backed implementation because
+ * the Settings → Sync screen reads the cursors: "a cursor newer than the remote
+ * change" is the answer to "why did the pull bring nothing", and a feature module
+ * must not depend on `sync:default` to ask it.
+ *
  * See SyncCoordinatorFAQ.md №14, sync.md §4.3.
  */
 interface SyncMetaRepository {

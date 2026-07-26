@@ -43,6 +43,10 @@ interface PendingMutationDao {
     @Query("SELECT COUNT(*) FROM pending_mutations WHERE status != 'IN_FLIGHT'")
     fun pendingCount(): Flow<Int>
 
+    /** Every row regardless of status, oldest first — the Sync screen's outbox section. */
+    @Query("SELECT * FROM pending_mutations ORDER BY createdAt ASC LIMIT :limit")
+    fun observeAll(limit: Int): Flow<List<PendingMutationEntity>>
+
     @Query("DELETE FROM pending_mutations")
     suspend fun deleteAll()
 }

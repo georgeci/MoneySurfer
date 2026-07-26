@@ -215,6 +215,7 @@ private class FakeQueue(vararg mutations: PendingMutation) : PendingMutationQueu
     }
 
     override val pendingCount: Flow<Int> = flowOf(rows.size)
+    override fun observeOutbox(limit: Int): Flow<List<PendingMutation>> = flowOf(emptyList())
 }
 
 private class RecordingPlugin(

@@ -30,7 +30,21 @@ interface PendingMutationQueue {
 
     val pendingCount: Flow<Int>
 
+    /**
+     * Live view of the outbox rows themselves, oldest first — the Settings → Sync screen's
+     * outbox section. Unlike [pendingCount] this includes rows currently `IN_FLIGHT`: a push
+     * that never completes leaves the row in that status, and hiding it would make a stuck
+     * outbox look like an empty one.
+     *
+     * Diagnostics only — the push path reads [pending] instead, because it needs the scope
+     * filter and the `markInFlight` handshake that goes with it.
+     */
+    fun observeOutbox(limit: Int = DEFAULT_OUTBOX_LIMIT): Flow<List<PendingMutation>>
+
     companion object {
         const val DEFAULT_BATCH_LIMIT: Int = 100
+
+        /** Enough rows to diagnose a stuck outbox without rendering thousands of them. */
+        const val DEFAULT_OUTBOX_LIMIT: Int = 50
     }
 }
