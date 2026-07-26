@@ -49,6 +49,7 @@ include(":domain")
 // `app-config`, not `config` — `config/detekt` already owns that directory.
 include(":app-config:api")
 include(":app-config:default")
+include(":app-config:remote")
 include(":sync:api")
 include(":sync:default")
 include(":sync:no-op")

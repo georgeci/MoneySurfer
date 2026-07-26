@@ -7,14 +7,14 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.stringPreferencesKey
 import co.touchlab.kermit.Logger
-import com.georgeci.moneysurfer.appconfig.ConfigKey
-import com.georgeci.moneysurfer.appconfig.LayerValue
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlin.concurrent.Volatile
 
 /**
@@ -61,11 +61,25 @@ internal class PreferencesMirror(private val dataStore: DataStore<Preferences>) 
         }
         .map { }
 
-    suspend fun hydrate() {
+    /**
+     * Serializes the two paths that *assign* [snapshot] from a suspending store call.
+     *
+     * Without it they interleave: [hydrate] issues its read, [edit] then writes and publishes the
+     * new snapshot, and the older read finally resolves and overwrites it with pre-write state. The
+     * RemoteGlobal layer makes that reachable — its mirror is written on every foreground return
+     * while startup hydration may still be in flight — and the cost is a layer serving the previous
+     * values for the rest of the session even though the store on disk is current.
+     *
+     * [changes] is deliberately not under the lock: it only ever publishes what the store itself
+     * emitted, and holding a lock across an unbounded flow would deadlock the writers.
+     */
+    private val publish = Mutex()
+
+    suspend fun hydrate() = publish.withLock {
         snapshot = readSnapshot()
     }
 
-    suspend fun edit(transform: (MutablePreferences) -> Unit) {
+    suspend fun edit(transform: (MutablePreferences) -> Unit) = publish.withLock {
         snapshot = dataStore.edit(transform)
         readFailed = false
     }
@@ -90,14 +104,4 @@ internal class PreferencesMirror(private val dataStore: DataStore<Preferences>) 
     private companion object {
         const val TAG = "ConfigMirror"
     }
-}
-
-/**
- * Turns a stored string into a layer value. A codec rejection is [LayerValue.Undecodable], not the
- * key default: resolution then continues to the layer below instead of stopping on a value nobody
- * wrote.
- */
-internal fun <T : Any> ConfigKey<T>.layerValueOf(raw: String?): LayerValue<T> = when (raw) {
-    null -> LayerValue.Absent
-    else -> codec.decode(raw)?.let { LayerValue.Present(it) } ?: LayerValue.Undecodable(raw)
 }

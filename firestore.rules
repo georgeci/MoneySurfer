@@ -1,4 +1,4 @@
-// v2.6.0 — 2026-07-22
+// v2.6.1 — 2026-07-26
 rules_version = '2';
 
 // Workspace-scoped tenancy: every per-user document lives under
@@ -299,10 +299,20 @@ service cloud.firestore {
       allow delete: if signedIn() && resource.data.uid == request.auth.uid;
     }
 
-    // Public read-only app config (force-update gate, see block.md).
+    // Public read-only app config. Two documents, deliberately separate (see ADR-004):
+    //  - `mobile` — the typed force-update gate (see block.md), read pre-auth by AppVersionGate;
+    //  - `flags`  — the free-form server-owned feature flags behind the configuration engine's
+    //    RemoteGlobal layer.
     // Writes go through the Firebase Console.
+    //
+    // Single-doc `get` only, mirroring userEmails: both clients read documents by exact id, so
+    // denying `list` costs nothing and stops the collection being enumerated. That matters because
+    // this collection is world-readable — without it, anyone could scan `appConfig` and read every
+    // flag name in it, which is why unannounced feature names must not be placed here at all.
+    // Denying `list` narrows who can discover them; it does not make them secret.
     match /appConfig/{docId} {
-      allow read: if true;
+      allow get: if true;
+      allow list: if false; // prevent enumeration via collection scan
     }
 
     // Collection-group READ rules for `invites` — MUST be declared on the wildcard

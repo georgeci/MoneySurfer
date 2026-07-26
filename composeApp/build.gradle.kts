@@ -50,8 +50,12 @@ kotlin {
             implementation(projects.domain)
             implementation(projects.appConfig.api)
             implementation(projects.appConfig.default)
+            implementation(projects.appConfig.remote)
             implementation(projects.feature.login)
             implementation(projects.feature.transaction)
+            // The RemoteGlobal layer's DataStore mirror is created by a per-platform factory here,
+            // not in `sharedPlatformModule`: only the online build has a remote layer to mirror.
+            implementation(projects.dataLocal)
             implementation(projects.dataRemote)
             implementation(projects.syncSurfer)
             implementation(projects.sync.default)

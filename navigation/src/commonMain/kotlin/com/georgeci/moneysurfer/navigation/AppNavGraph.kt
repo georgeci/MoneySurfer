@@ -29,7 +29,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
@@ -123,6 +126,18 @@ fun AppNavGraph(
         val current = backStack.lastOrNull()
         if (current == route) return@LaunchedEffect
         navigator.resetTo(route)
+    }
+
+    // Server-owned flags, pulled here rather than from the view model's `init` because this is the
+    // only place in the app that has a lifecycle. `repeatOnLifecycle` runs the block on the first
+    // composition and again on every return to the foreground — which is the whole propagation
+    // model ADR-004 picked over a persistent snapshot listener. The refresh itself is fire-and-
+    // forget inside the view model, so nothing here waits on Firestore.
+    val lifecycleOwner = LocalLifecycleOwner.current
+    LaunchedEffect(lifecycleOwner) {
+        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            appLaunchViewModel.refreshRemoteConfig()
+        }
     }
 
     val entryProvider: (NavKey) -> NavEntry<NavKey> = entryProvider {

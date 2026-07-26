@@ -8,6 +8,7 @@ import com.georgeci.moneysurfer.appconfig.ConfigRegistry
 import com.georgeci.moneysurfer.appconfig.DebugConfigSource
 import com.georgeci.moneysurfer.appconfig.HostConfigKeys
 import com.georgeci.moneysurfer.appconfig.LayerValue
+import com.georgeci.moneysurfer.appconfig.RemoteConfigMirror
 import com.georgeci.moneysurfer.data.db.MoneySurferDatabase
 import com.georgeci.moneysurfer.domain.AppInfo
 import com.georgeci.moneysurfer.domain.backup.AppRestarter
@@ -114,6 +115,7 @@ private val configTestPlatformModule = module {
     single<SyncDatabase> { error("this test must not instantiate the sync database") }
     single<DataStore<Preferences>> { error("this test must not instantiate DataStore") }
     single<DebugConfigSource> { DebugConfigSource.Empty }
+    single<RemoteConfigMirror> { error("this test must not instantiate the flag mirror") }
     single { AppInfo(version = "test", versionCode = 1) }
     single<BackupStorageLocator> { error("this test must not instantiate the backup locator") }
     single<AppRestarter> { error("this test must not instantiate the restarter") }

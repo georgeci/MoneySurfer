@@ -220,8 +220,11 @@ ordered chain plus a free-form remote map lets the server override anything it n
 
 The opt-in flag restores the non-overridable guarantee that host-owned and user-owned keys
 had before the three-policy model collapsed into one chain. The pull/mirror side honours the
-same registry check: a key name in `appConfig/mobile` that is unknown or not
-`remoteOverridable` is ignored and logged, never mirrored.
+same registry check: a key name in `appConfig/flags` that is unknown or not
+`remoteOverridable` is ignored and logged, never mirrored. Filtering at the *write* side as
+well as at resolution is deliberate — a refused name that reached the mirror would sit in
+local storage being refused on every read, and would show up in the debug panel as a value
+the RemoteGlobal layer holds.
 
 A kill switch must not *replace* a user toggle, it must *zero* it. Boolean composition stays
 out of the KV layer — keep two keys and combine them in a use case:
@@ -500,7 +503,7 @@ is already taken by `config/detekt`.)
 ```text
 app-config/api      -> domain              # keys, codecs, Config, ConfigSource + per-layer types
 app-config/default  -> app-config/api      # LayeredConfig, ConfigRegistry, assembly module
-app-config/remote   -> app-config/api      # Firestore-bound RemoteGlobalConfigSource (step 4)
+app-config/remote   -> app-config/{api,default}  # Firestore-bound RemoteGlobalConfigSource (step 4)
 data-local          -> app-config/api      # implements Local + Debug sources, owns UiConfigKeys
 composeApp          -> app-config/{api,default,remote}
 composeAppOffline   -> app-config/{api,default}
@@ -514,7 +517,11 @@ can declare its Build layer without depending on `data-local`.
 
 `app-config/remote` mirrors `sync-surfer`: the only module that binds Firestore to
 configuration, absent from the offline build, and not needed until step 4 — steps 1-3 ship
-without it. No `no-op` module is required, since `Empty` already lives in `api`. The per-user
+without it. No `no-op` module is required, since `Empty` already lives in `api`. It reaches
+past `api` to `default` for one symbol, `ConfigRegistry`: keys are `internal` to the modules
+that own their facades, so the registry is the only thing that can answer "is this name a
+known key, and is it `remoteOverridable`?" — which is the question the whole layer turns on,
+and the consumer the registry's own KDoc was written for. The per-user
 `UserConfigSyncPlugin` is *not* placed here: it is one of thirteen sync plugins and belongs
 with them in `sync-surfer`, on the shared `PluginHelpers` / `SyncPullPriorities`
 infrastructure.
@@ -714,14 +721,43 @@ Revisit if a slider-backed key appears.
 - A layer returning `null` means absent, never a falsy value. Keys are `T : Any`; "empty" is a
   codec sentinel. An undecodable stored value is absent-in-that-layer, logged, not fatal.
 - `appConfig/flags` is world-readable: key names and values placed there are public, so
-  unannounced feature names do not belong in it.
+  unannounced feature names do not belong in it. `allow list: if false` stops the collection
+  being scanned, which narrows who can *discover* a flag name — it does not make one secret,
+  because any `get` of the exact document id returns the whole map to anyone, signed in or not.
 - Kill switches combine with user toggles in a use case, not in the KV layer.
 - Platform-unrepresentable values are clamped at the facade on read, never rewritten in a
   layer — layers must stay honest for `resolve()`.
 
 ## Migration
 
-**Status.** Steps 1-3 shipped together in issue #332, with three deviations worth knowing:
+**Status.** Steps 1-3 shipped together in issue #332; step 4 shipped in issue #333. Step 5
+(per-user sync) is the only one left.
+
+Step 4's deviations worth knowing:
+
+- `app-config/remote` depends on `app-config/default` as well as `api`, for `ConfigRegistry` —
+  see [Module boundaries](#module-boundaries).
+- The layer is refreshed through a `RemoteConfigRefresh` domain facade, for the same reason
+  hydration needed `ConfigHydration`: `navigation` must not see `app-config`. `AppNavGraph`
+  drives it from `repeatOnLifecycle(STARTED)`, which fires on first composition and on every
+  foreground return — one hook covering both halves of "on launch and on foreground return".
+  It is fire-and-forget: hydration is awaited before the start route, this is not, so a cold
+  start never waits on Firestore.
+- The mirror is a `RemoteConfigMirror` contract in `api`, implemented in `data-local` next to
+  the other DataStore-backed layers and bound by the **online host's** per-platform module
+  rather than `sharedPlatformModule` — unlike `DebugConfigSource`, it *is* host-specific.
+  Its own file, `moneysurfer_remote_flags.preferences_pb`, because server-owned disposable
+  values must not ride along in the user's settings file through backup and export; being
+  disposable is also what lets it replace itself on corruption.
+- Values are read as `Map<String, String>`. gitlive's decoder stringifies every field, so a
+  boolean typed into the Firebase Console arrives as `"true"` and `BooleanConfigCodec` takes
+  it — the owner does not have to remember to quote flag values.
+- Retraction is a **replace**, not a merge, and a document that does not exist clears the
+  mirror. A merge would pin a deleted flag at its last value on every device that ever saw it.
+  A *failed fetch* is the one case that leaves the mirror alone, which is what makes an
+  offline launch resolve the last values the server sent.
+
+Steps 1-3's deviations worth knowing:
 
 - No deprecated adapters. Every injection site migrated in the same change, so
   `OfflineBuildFlags`, `SignInFeatureConfig`, `TransactionCreationFeatureConfig`,
