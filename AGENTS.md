@@ -159,6 +159,16 @@ Read [uikit/README.md](uikit/README.md) before UI work.
   behavior and choose token variants.
 - All Compose resource string placeholders must be indexed: `%1$s`, `%1$d`,
   `%2$s`. Never use bare `%s` or `%d`.
+- Screen entry points keep their `onNavigateTo*` lambdas as individual
+  parameters. Group them into a `<Screen>Navigation` data class *only* when the
+  entry point would otherwise declare eight or more parameters — SonarCloud's
+  `kotlin:S107` allows at most seven, and detekt does not catch the overflow
+  because `LongParameterList` skips `@Composable`.
+  `WorkspaceSelectorNavigation` (issue #362) is the reference shape; it is a
+  remedy for an over-limit signature, not a default to apply pre-emptively.
+  Count every declared parameter, including `viewModel` and route-derived
+  flags — five destinations plus `viewModel` plus two flags is what pushed the
+  workspace selector to eight.
 
 ## Sync Rules
 
