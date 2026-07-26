@@ -464,10 +464,17 @@ jobs:
     needs: [changes, junit]
     # Skip on PRs from forks (no SONAR_TOKEN access from fork secrets) and
     # on doc-only changes (see `changes` job).
+    #
+    # The fork guard is written as `!= 'pull_request'` rather than comparing
+    # `head.repo.full_name` unconditionally: on a `push` there is no
+    # `github.event.pull_request`, so the comparison yields null != repo and
+    # silently skipped the job on every push to main. Main's analysis was frozen
+    # from 2026-05-06 to 2026-07-26 that way, which pins SonarCloud's New Code
+    # baseline and leaves findings visible only on PRs (issue #362).
     if: >-
       always() &&
       (needs.changes.outputs.code == 'true' || github.event_name == 'workflow_dispatch') &&
-      (github.event_name == 'workflow_dispatch' ||
+      (github.event_name != 'pull_request' ||
        github.event.pull_request.head.repo.full_name == github.repository)
 
     steps:
@@ -638,7 +645,7 @@ jobs:
     # every PR via ios-offline.yml.
     if: >-
       (needs.changes.outputs.code == 'true' || github.event_name == 'workflow_dispatch') &&
-      (github.event_name == 'workflow_dispatch' ||
+      (github.event_name != 'pull_request' ||
        github.event.pull_request.head.repo.full_name == github.repository)
     permissions:
       contents: read
