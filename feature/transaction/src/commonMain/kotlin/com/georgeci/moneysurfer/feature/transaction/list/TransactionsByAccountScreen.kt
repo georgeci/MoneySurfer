@@ -240,6 +240,7 @@ private fun TransactionsByAccountContent(
                                 showAccount = state.showAccountOnRows,
                                 untitled = untitled,
                                 onClick = { onEvent(TransactionsByAccountEvent.OnTransactionClick(row.id)) },
+                                onDelete = { onEvent(TransactionsByAccountEvent.OnDeleteTransaction(row.id)) },
                             )
                         }
                     }

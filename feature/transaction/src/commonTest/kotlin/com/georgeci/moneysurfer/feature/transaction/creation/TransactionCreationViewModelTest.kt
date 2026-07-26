@@ -41,8 +41,10 @@ import com.georgeci.moneysurfer.domain.usecase.GetAccountsUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetCategoriesUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetCurrentTimeUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetTransactionByIdUseCase
+import com.georgeci.moneysurfer.domain.usecase.RestoreTransactionsUseCase
 import com.georgeci.moneysurfer.domain.usecase.UpdateTransactionUseCase
 import com.georgeci.moneysurfer.domain.util.TransactionPeriodWindow
+import com.georgeci.moneysurfer.navigation.DeleteTransactionWithUndo
 import com.georgeci.moneysurfer.navigation.SnackbarController
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.nulls.shouldNotBeNull
@@ -735,8 +737,11 @@ private class Fixture(workspaceId: WorkspaceId) {
             applyTransactionChange = applyChange,
             getCurrentTime = GetCurrentTimeUseCase(clock),
         ),
-        deleteTransaction = DeleteTransactionUseCase(transactionRepository, applyChange),
-        applyTransactionChange = applyChange,
+        deleteWithUndo = DeleteTransactionWithUndo(
+            deleteTransaction = DeleteTransactionUseCase(transactionRepository, applyChange),
+            restoreTransactions = RestoreTransactionsUseCase(applyChange),
+            snackbar = snackbar,
+        ),
         getCurrentTime = GetCurrentTimeUseCase(clock),
         transactionRepository = transactionRepository,
         hostCapabilities = hostCapabilities,

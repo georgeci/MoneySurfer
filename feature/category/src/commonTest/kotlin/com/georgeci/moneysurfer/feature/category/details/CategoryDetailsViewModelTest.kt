@@ -7,6 +7,7 @@ import com.georgeci.moneysurfer.domain.fixtures.aTransaction
 import com.georgeci.moneysurfer.domain.fixtures.categoryId
 import com.georgeci.moneysurfer.domain.fixtures.transactionId
 import com.georgeci.moneysurfer.domain.fixtures.workspaceId
+import com.georgeci.moneysurfer.domain.model.Account
 import com.georgeci.moneysurfer.domain.model.CategorizedTransaction
 import com.georgeci.moneysurfer.domain.model.Category
 import com.georgeci.moneysurfer.domain.model.CategoryMonthlyTotal
@@ -21,13 +22,19 @@ import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
 import com.georgeci.moneysurfer.domain.primitives.TransferId
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
+import com.georgeci.moneysurfer.domain.repositories.AccountRepository
 import com.georgeci.moneysurfer.domain.repositories.CategoryRepository
 import com.georgeci.moneysurfer.domain.repositories.CategorySpendRepository
 import com.georgeci.moneysurfer.domain.repositories.TransactionRepository
+import com.georgeci.moneysurfer.domain.usecase.ApplyTransactionChangeUseCase
+import com.georgeci.moneysurfer.domain.usecase.DeleteTransactionUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetCategoriesUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetCategorySpendHistoryUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetTransactionsByCategoryUseCase
+import com.georgeci.moneysurfer.domain.usecase.RestoreTransactionsUseCase
 import com.georgeci.moneysurfer.domain.util.TransactionPeriodWindow
+import com.georgeci.moneysurfer.navigation.DeleteTransactionWithUndo
+import com.georgeci.moneysurfer.navigation.SnackbarController
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
@@ -37,10 +44,12 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import kotlinx.datetime.YearMonth
 
@@ -142,6 +151,29 @@ class CategoryDetailsViewModelTest : StringSpec({
         content.transactions.map { it.title } shouldBe listOf("Market", "Bakery")
     }
 
+    "swiping a transaction away removes it, and the snackbar's Undo puts it back" {
+        runTest {
+            val food = aCategory(id = categoryId("food"), name = "Food")
+            val env = Env(
+                categories = listOf(food),
+                transactions = listOf(
+                    aTransaction(id = transactionId("t-1"), categoryId = food.id, note = "Market"),
+                    aTransaction(id = transactionId("t-2"), categoryId = food.id, note = "Bakery"),
+                ),
+            )
+            val viewModel = env.newViewModel(food.id)
+
+            viewModel.onEvent(CategoryDetailsEvent.OnDeleteTransaction(transactionId("t-2")))
+
+            // Not an optimistic edit of the state — the row is gone because the query re-emitted.
+            viewModel.content().transactions.map { it.title } shouldBe listOf("Market")
+
+            env.snackbar.requests.first().onAction!!.invoke()
+
+            viewModel.content().transactions.map { it.title } shouldBe listOf("Market", "Bakery")
+        }
+    }
+
     "OnEditClick asks to open the editor for this category" {
         val food = aCategory(id = categoryId("food"))
         val viewModel = Env(categories = listOf(food)).newViewModel(food.id)
@@ -202,6 +234,7 @@ private class Env(
     private val totalsFor: (YearMonth) -> List<CategoryMonthlyTotal> = { emptyList() },
 ) {
     private val workspace = workspaceId("ws-1")
+    val snackbar = SnackbarController()
 
     // Replay-1 and deliberately unseeded when no categories are given, so the "still loading"
     // case is reachable: a StateFlow always has a value, which would skip Loading entirely.
@@ -240,8 +273,34 @@ private class Env(
                 categoryRepository = categoryRepo,
                 session = session,
             ),
+            deleteWithUndo = ApplyTransactionChangeUseCase(transactionRepo, BalanceOnlyAccountRepository)
+                .let { applyChange ->
+                    DeleteTransactionWithUndo(
+                        deleteTransaction = DeleteTransactionUseCase(transactionRepo, applyChange),
+                        restoreTransactions = RestoreTransactionsUseCase(applyChange),
+                        snackbar = snackbar,
+                    )
+                },
         )
     }
+}
+
+/**
+ * Deleting a transaction moves an account balance, so the write has to land somewhere — but this
+ * screen never reads accounts, and the balances themselves are asserted in DeleteUndoIntegrationIT
+ * against real Room. Anything beyond the delta means the test wandered off its subject.
+ */
+private object BalanceOnlyAccountRepository : AccountRepository {
+    override suspend fun applyDelta(accountId: AccountId, delta: Money) = Unit
+    override suspend fun getById(id: AccountId) = error("not used")
+    override fun getAll(): Flow<List<Account>> = error("not used")
+    override fun getByWorkspaceId(workspaceId: WorkspaceId): Flow<List<Account>> = error("not used")
+    override suspend fun insert(account: Account) = error("not used")
+    override suspend fun update(account: Account) = error("not used")
+    override suspend fun delete(id: AccountId) = error("not used")
+    override suspend fun setBalance(accountId: AccountId, balance: Money) = error("not used")
+    override suspend fun reorder(orderedIds: List<AccountId>) = error("not used")
+    override suspend fun setArchived(accountId: AccountId, archived: Boolean) = error("not used")
 }
 
 private class FakeCategorySpendRepository(

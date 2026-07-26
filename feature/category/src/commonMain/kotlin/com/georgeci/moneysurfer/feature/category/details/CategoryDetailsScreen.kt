@@ -33,6 +33,7 @@ import com.georgeci.moneysurfer.uikit.components.category.SurferCategoryBreakdow
 import com.georgeci.moneysurfer.uikit.components.category.SurferCategoryHeroCard
 import com.georgeci.moneysurfer.uikit.components.category.SurferCategoryTrendBar
 import com.georgeci.moneysurfer.uikit.components.category.SurferCategoryTrendCard
+import com.georgeci.moneysurfer.uikit.components.transaction.SurferSwipeToDeleteTransaction
 import com.georgeci.moneysurfer.uikit.components.transaction.SurferTransactionLine
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
@@ -328,19 +329,26 @@ private fun CategoryDetailsContent(
             } else {
                 items(state.transactions, key = { it.id.value }) { txn ->
                     val untitled = stringResource(Res.string.category_details_transaction_untitled)
-                    SurferTransactionLine(
-                        icon = visual.icon,
-                        title = txn.title.ifBlank { untitled },
-                        formattedAmount = txn.formattedAmount,
-                        categoryHueSeed = txn.categoryHueSeed,
-                        amountColor = if (txn.isExpense) {
-                            AppTheme.materialColors.onSurface
-                        } else {
-                            AppTheme.semanticColors.income
-                        },
-                        onClick = { onEvent(CategoryDetailsEvent.OnTransactionClick(txn.id)) },
-                        modifier = Modifier.fillMaxWidth(),
-                    )
+                    val title = txn.title.ifBlank { untitled }
+                    SurferSwipeToDeleteTransaction(
+                        transactionTitle = title,
+                        onDelete = { onEvent(CategoryDetailsEvent.OnDeleteTransaction(txn.id)) },
+                        isTransfer = txn.isTransfer,
+                    ) {
+                        SurferTransactionLine(
+                            icon = visual.icon,
+                            title = title,
+                            formattedAmount = txn.formattedAmount,
+                            categoryHueSeed = txn.categoryHueSeed,
+                            amountColor = if (txn.isExpense) {
+                                AppTheme.materialColors.onSurface
+                            } else {
+                                AppTheme.semanticColors.income
+                            },
+                            onClick = { onEvent(CategoryDetailsEvent.OnTransactionClick(txn.id)) },
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    }
                 }
             }
         }

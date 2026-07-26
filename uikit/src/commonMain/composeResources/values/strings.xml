@@ -24,4 +24,14 @@
     <string name="uikit_password_hide">Hide password</string>
     <string name="uikit_password_show">Show password</string>
     <string name="uikit_retry">Retry</string>
+    <string name="uikit_transaction_delete">Delete</string>
+    <string name="uikit_transaction_delete_cancel">Cancel</string>
+    <string name="uikit_transaction_delete_confirm">Delete</string>
+    <string name="uikit_transaction_delete_message">“%1$s” will be removed. You can undo this right after.</string>
+    <string name="uikit_transaction_delete_message_generic">This transaction will be removed. You can undo this right after.</string>
+    <string name="uikit_transaction_delete_title">Delete transaction?</string>
+    <!-- A transfer is two rows, so its wording says both sides go — see DeleteTransactionUseCase. -->
+    <string name="uikit_transaction_delete_transfer_message">“%1$s” will be removed from both accounts. You can undo this right after.</string>
+    <string name="uikit_transaction_delete_transfer_message_generic">This transfer will be removed from both accounts. You can undo this right after.</string>
+    <string name="uikit_transaction_delete_transfer_title">Delete transfer?</string>
 </resources>

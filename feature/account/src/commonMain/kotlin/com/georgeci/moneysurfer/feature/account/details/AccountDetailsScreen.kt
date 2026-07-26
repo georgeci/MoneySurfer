@@ -53,6 +53,7 @@ import com.georgeci.moneysurfer.uikit.components.base.SurferAddFab
 import com.georgeci.moneysurfer.uikit.components.base.SurferFilterChipRow
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbarAction
+import com.georgeci.moneysurfer.uikit.components.transaction.SurferSwipeToDeleteTransaction
 import com.georgeci.moneysurfer.uikit.components.transaction.SurferTransactionLine
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
@@ -263,25 +264,35 @@ private fun AccountDetailsContent(
             } else {
                 items(filtered, key = { it.id.value }) { transaction ->
                     val incomeColor = AppTheme.semanticColors.income
-                    SurferTransactionLine(
-                        icon = if (transaction.isExpense) SurferIcons.Receipt else SurferIcons.Wallet,
-                        title = transaction.title,
-                        formattedAmount = transaction.formattedAmount,
-                        categoryHueSeed = transaction.categoryHueSeed,
-                        amountColor = if (transaction.isExpense) {
-                            AppTheme.materialColors.onSurface
-                        } else {
-                            incomeColor
+                    // The gap below the row belongs to the swipe wrapper and the inset to the line
+                    // — see TransactionRow in the transaction feature for why they cannot swap.
+                    SurferSwipeToDeleteTransaction(
+                        transactionTitle = transaction.title,
+                        onDelete = {
+                            onEvent(AccountDetailsEvent.OnDeleteTransaction(transaction.id))
                         },
-                        amountPillBackground = if (transaction.isExpense) {
-                            null
-                        } else {
-                            incomeColor.copy(alpha = 0.18f)
-                        },
-                        modifier = Modifier.padding(horizontal = AppTheme.spacing.default)
-                            .padding(bottom = AppTheme.spacing.small),
-                        onClick = { onEvent(AccountDetailsEvent.OnTransactionClick(transaction.id)) },
-                    )
+                        modifier = Modifier.padding(bottom = AppTheme.spacing.small),
+                        isTransfer = transaction.isTransfer,
+                    ) {
+                        SurferTransactionLine(
+                            icon = if (transaction.isExpense) SurferIcons.Receipt else SurferIcons.Wallet,
+                            title = transaction.title,
+                            formattedAmount = transaction.formattedAmount,
+                            categoryHueSeed = transaction.categoryHueSeed,
+                            amountColor = if (transaction.isExpense) {
+                                AppTheme.materialColors.onSurface
+                            } else {
+                                incomeColor
+                            },
+                            amountPillBackground = if (transaction.isExpense) {
+                                null
+                            } else {
+                                incomeColor.copy(alpha = 0.18f)
+                            },
+                            modifier = Modifier.padding(horizontal = AppTheme.spacing.default),
+                            onClick = { onEvent(AccountDetailsEvent.OnTransactionClick(transaction.id)) },
+                        )
+                    }
                 }
             }
         }

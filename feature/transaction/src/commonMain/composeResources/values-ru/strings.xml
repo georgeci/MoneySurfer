@@ -117,11 +117,6 @@
     <string name="transaction_details_title">Транзакция</string>
     <string name="transaction_details_edit_content_description">Редактировать</string>
     <string name="transaction_details_delete_content_description">Удалить</string>
-    <string name="transaction_details_delete_title">Удалить транзакцию?</string>
-    <string name="transaction_details_delete_message">«%1$s» будет удалено. Сразу после можно отменить.</string>
-    <string name="transaction_details_delete_message_generic">Транзакция будет удалена. Сразу после можно отменить.</string>
-    <string name="transaction_details_delete_confirm">Удалить</string>
-    <string name="transaction_details_delete_cancel">Отмена</string>
     <string name="transaction_details_type_expense">Расход</string>
     <string name="transaction_details_type_income">Доход</string>
     <string name="transaction_details_type_transfer">Перевод</string>
@@ -145,6 +140,8 @@
     <string name="transaction_creation_transfer_snackbar">Перевод добавлен</string>
     <string name="transaction_details_deleted_snackbar">Транзакция удалена</string>
     <string name="transaction_details_delete_undo">Отменить</string>
+    <string name="transactions_list_deleted_snackbar">Транзакция удалена</string>
+    <string name="transactions_list_delete_undo">Отменить</string>
 
     <!-- Список транзакций — поиск и лента фильтров -->
     <string name="transactions_list_search_placeholder">Поиск по продавцу, заметке, сумме</string>

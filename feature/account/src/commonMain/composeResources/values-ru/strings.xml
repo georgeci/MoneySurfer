@@ -75,6 +75,8 @@
     <string name="account_details_filter_income">Доходы</string>
     <string name="account_details_add_transaction">Добавить транзакцию</string>
     <string name="account_details_transactions_empty">Транзакций пока нет.</string>
+    <string name="account_details_transaction_deleted_snackbar">Транзакция удалена</string>
+    <string name="account_details_transaction_delete_undo">Отменить</string>
     <string name="account_details_extra_details_section">Доп. сведения</string>
 
     <!-- Account chooser bottom sheet -->

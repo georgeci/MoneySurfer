@@ -18,15 +18,14 @@ import com.georgeci.moneysurfer.domain.primitives.TransactionStatus
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
 import com.georgeci.moneysurfer.domain.primitives.TransferId
 import com.georgeci.moneysurfer.domain.repositories.TransactionRepository
-import com.georgeci.moneysurfer.domain.usecase.ApplyTransactionChangeUseCase
 import com.georgeci.moneysurfer.domain.usecase.CreateTransactionUseCase
 import com.georgeci.moneysurfer.domain.usecase.CreateTransferUseCase
-import com.georgeci.moneysurfer.domain.usecase.DeleteTransactionUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetAccountsUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetCategoriesUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetCurrentTimeUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetTransactionByIdUseCase
 import com.georgeci.moneysurfer.domain.usecase.UpdateTransactionUseCase
+import com.georgeci.moneysurfer.navigation.DeleteTransactionWithUndo
 import com.georgeci.moneysurfer.navigation.SnackbarController
 import com.georgeci.moneysurfer.utils.MviViewModel
 import kotlinx.coroutines.flow.first
@@ -53,8 +52,7 @@ class TransactionCreationViewModel(
     private val createTransaction: CreateTransactionUseCase,
     private val updateTransaction: UpdateTransactionUseCase,
     private val createTransfer: CreateTransferUseCase,
-    private val deleteTransaction: DeleteTransactionUseCase,
-    private val applyTransactionChange: ApplyTransactionChangeUseCase,
+    private val deleteWithUndo: DeleteTransactionWithUndo,
     private val getCurrentTime: GetCurrentTimeUseCase,
     private val transactionRepository: TransactionRepository,
     private val hostCapabilities: HostCapabilities,
@@ -467,8 +465,9 @@ class TransactionCreationViewModel(
     }
 
     /**
-     * Deletes the row being edited, exactly the way the details screen does — same undo snackbar,
-     * restoring through [applyTransactionChange] so the account balance comes back with it.
+     * Deletes the row being edited, exactly the way the details screen and the lists do — the same
+     * [DeleteTransactionWithUndo], so the undo snackbar and what a delete takes with it are one
+     * behaviour rather than a per-screen approximation of one.
      *
      * Guarded on [TransactionCreationState.Content.editingTransactionId]: there is nothing to
      * delete while creating or duplicating, and the screen hides the action there.
@@ -476,14 +475,11 @@ class TransactionCreationViewModel(
     private fun handleDelete() {
         val editingId = (currentState as? TransactionCreationState.Content)?.editingTransactionId ?: return
         launch {
-            val deleted = deleteTransaction(editingId)
-            if (deleted != null) {
-                snackbar.show(
-                    message = Res.string.transaction_details_deleted_snackbar,
-                    actionLabel = Res.string.transaction_details_delete_undo,
-                    onAction = { applyTransactionChange(old = null, new = deleted) },
-                )
-            }
+            deleteWithUndo(
+                transactionId = editingId,
+                message = Res.string.transaction_details_deleted_snackbar,
+                undoLabel = Res.string.transaction_details_delete_undo,
+            )
             postSideEffect(TransactionCreationEffect.NavigateBackAfterDelete)
         }
     }

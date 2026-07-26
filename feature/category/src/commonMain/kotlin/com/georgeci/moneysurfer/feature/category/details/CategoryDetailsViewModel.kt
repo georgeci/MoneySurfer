@@ -14,10 +14,14 @@ import com.georgeci.moneysurfer.domain.primitives.TransactionType
 import com.georgeci.moneysurfer.domain.usecase.GetCategoriesUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetCategorySpendHistoryUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetTransactionsByCategoryUseCase
+import com.georgeci.moneysurfer.navigation.DeleteTransactionWithUndo
 import com.georgeci.moneysurfer.utils.MviViewModel
 import kotlinx.coroutines.flow.combine
 import kotlinx.datetime.Month
 import kotlinx.datetime.YearMonth
+import moneysurfer.feature.category.generated.resources.Res
+import moneysurfer.feature.category.generated.resources.category_details_transaction_delete_undo
+import moneysurfer.feature.category.generated.resources.category_details_transaction_deleted_snackbar
 import org.koin.core.annotation.KoinViewModel
 
 @KoinViewModel
@@ -26,6 +30,7 @@ class CategoryDetailsViewModel(
     private val getCategories: GetCategoriesUseCase,
     private val getCategorySpendHistory: GetCategorySpendHistoryUseCase,
     private val getTransactionsByCategory: GetTransactionsByCategoryUseCase,
+    private val deleteWithUndo: DeleteTransactionWithUndo,
 ) : MviViewModel<CategoryDetailsState, CategoryDetailsEvent, CategoryDetailsEffect>(
     initialState = CategoryDetailsState.Loading(categoryId),
 ) {
@@ -45,6 +50,14 @@ class CategoryDetailsViewModel(
                 postSideEffect(CategoryDetailsEffect.NavigateToCategoryDetails(event.categoryId))
             is CategoryDetailsEvent.OnTransactionClick ->
                 postSideEffect(CategoryDetailsEffect.NavigateToTransactionDetails(event.transactionId))
+            // The list is a database Flow, so the row leaves — and returns on Undo — on its own.
+            is CategoryDetailsEvent.OnDeleteTransaction -> launch {
+                deleteWithUndo(
+                    transactionId = event.transactionId,
+                    message = Res.string.category_details_transaction_deleted_snackbar,
+                    undoLabel = Res.string.category_details_transaction_delete_undo,
+                )
+            }
         }
     }
 
@@ -126,6 +139,7 @@ class CategoryDetailsViewModel(
         formattedAmount = MoneyFormatter.format(money.abs(), currency),
         isExpense = type == TransactionType.EXPENSE,
         categoryHueSeed = categoryId?.value.orEmpty(),
+        isTransfer = transferId != null,
     )
 
     private companion object {
@@ -205,6 +219,8 @@ data class CategoryTransactionUi(
     val formattedAmount: String,
     val isExpense: Boolean,
     val categoryHueSeed: String,
+    /** One leg of a transfer, which deleting takes down together with its sibling. */
+    val isTransfer: Boolean = false,
 )
 
 sealed interface CategoryDetailsEvent {
@@ -213,6 +229,9 @@ sealed interface CategoryDetailsEvent {
     data object OnAddTransactionClick : CategoryDetailsEvent
     data class OnSubcategoryClick(val categoryId: CategoryId) : CategoryDetailsEvent
     data class OnTransactionClick(val transactionId: TransactionId) : CategoryDetailsEvent
+
+    /** A row was swiped away and the confirmation accepted; the Undo rides on the snackbar. */
+    data class OnDeleteTransaction(val transactionId: TransactionId) : CategoryDetailsEvent
 }
 
 sealed interface CategoryDetailsEffect {

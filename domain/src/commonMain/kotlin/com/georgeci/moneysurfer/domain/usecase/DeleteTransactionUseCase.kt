@@ -11,10 +11,25 @@ class DeleteTransactionUseCase(
     private val applyTransactionChange: ApplyTransactionChangeUseCase,
 ) {
 
-    /** Deletes the transaction and returns the removed row so callers can offer an Undo. */
-    suspend operator fun invoke(id: TransactionId): Transaction? {
-        val old = transactionRepository.getById(id) ?: return null
-        applyTransactionChange(old = old, new = null)
-        return old
+    /**
+     * Deletes the transaction and returns every row removed, so callers can offer an Undo by
+     * handing the list straight back to [RestoreTransactionsUseCase].
+     *
+     * A transfer is deleted whole. Its two legs are one movement of money split across two rows,
+     * and removing only the one the user swiped would leave the other account credited out of
+     * nowhere — a corrupt balance rather than a partly-finished delete.
+     *
+     * Returns an empty list when [id] names nothing, which is also how a caller knows there is
+     * nothing to offer an Undo for.
+     */
+    suspend operator fun invoke(id: TransactionId): List<Transaction> {
+        val target = transactionRepository.getById(id) ?: return emptyList()
+        // A row always matches its own transferId, so this lookup returns the target plus its
+        // siblings — no fallback needed for the transfer case.
+        val rows = target.transferId
+            ?.let { transactionRepository.getByTransferId(it) }
+            ?: listOf(target)
+        rows.forEach { applyTransactionChange(old = it, new = null) }
+        return rows
     }
 }

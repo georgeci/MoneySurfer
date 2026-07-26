@@ -38,7 +38,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
-import com.georgeci.moneysurfer.feature.transaction.delete.TransactionDeleteConfirmationDialog
 import com.georgeci.moneysurfer.uikit.components.SurferCategoryBubble
 import com.georgeci.moneysurfer.uikit.components.SurferCategoryPalette
 import com.georgeci.moneysurfer.uikit.components.SurferCategoryVisual
@@ -46,6 +45,7 @@ import com.georgeci.moneysurfer.uikit.components.base.SurferSplitAmount
 import com.georgeci.moneysurfer.uikit.components.base.SurferSplitAmountTier
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbarAction
+import com.georgeci.moneysurfer.uikit.components.transaction.SurferDeleteTransactionDialog
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
 import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
@@ -78,14 +78,15 @@ import org.koin.core.parameter.parametersOf
 /**
  * Stable selectors for the transaction details screen — see docs/testing/testing-strategy.md.
  *
- * [ConfirmDelete] sits inside the delete dialog, which is its own window: the screen root's
- * `surferTestTagAsId()` does not reach it, so the confirm button carries its own.
+ * The dialog's confirm button is not here: the dialog moved to uikit when the transaction lists
+ * gained swipe-to-delete, and its tag went with it as
+ * [SurferDeleteTransactionDialogTestTags][com.georgeci.moneysurfer.uikit.components.transaction.SurferDeleteTransactionDialogTestTags].
+ * The id the flows tap is unchanged.
  */
 object TransactionDetailsTestTags {
     const val Root = "transactionDetails:root"
     const val Edit = "transactionDetails:edit"
     const val Delete = "transactionDetails:delete"
-    const val ConfirmDelete = "transactionDetails:confirmDelete"
 }
 
 @Composable
@@ -139,10 +140,11 @@ private fun TransactionDetailsContent(
     onEvent: (TransactionDetailsEvent) -> Unit,
 ) {
     if (state.showDeleteConfirmation) {
-        TransactionDeleteConfirmationDialog(
-            noteOrNull = state.note.ifBlank { null },
+        SurferDeleteTransactionDialog(
+            titleOrNull = state.note.ifBlank { null },
             onConfirm = { onEvent(TransactionDetailsEvent.OnDeleteConfirmed) },
             onDismiss = { onEvent(TransactionDetailsEvent.OnDeleteDismissed) },
+            isTransfer = state.isTransfer,
         )
     }
 

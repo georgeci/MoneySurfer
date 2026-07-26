@@ -1,5 +1,6 @@
 package com.georgeci.moneysurfer.feature.transaction.list
 
+import app.cash.turbine.test
 import com.georgeci.moneysurfer.domain.auth.InMemorySessionPointers
 import com.georgeci.moneysurfer.domain.fixtures.EUR
 import com.georgeci.moneysurfer.domain.fixtures.FakeUiPreferences
@@ -11,6 +12,7 @@ import com.georgeci.moneysurfer.domain.fixtures.anAccount
 import com.georgeci.moneysurfer.domain.fixtures.categoryId
 import com.georgeci.moneysurfer.domain.fixtures.dollars
 import com.georgeci.moneysurfer.domain.fixtures.transactionId
+import com.georgeci.moneysurfer.domain.fixtures.transferId
 import com.georgeci.moneysurfer.domain.model.Account
 import com.georgeci.moneysurfer.domain.model.CategorizedTransaction
 import com.georgeci.moneysurfer.domain.model.Category
@@ -31,16 +33,21 @@ import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 import com.georgeci.moneysurfer.domain.repositories.AccountRepository
 import com.georgeci.moneysurfer.domain.repositories.CategoryRepository
 import com.georgeci.moneysurfer.domain.repositories.TransactionRepository
+import com.georgeci.moneysurfer.domain.usecase.ApplyTransactionChangeUseCase
+import com.georgeci.moneysurfer.domain.usecase.DeleteTransactionUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetAccountByIdUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetAccountsUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetCategoriesUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetTransactionsByAccountUseCase
+import com.georgeci.moneysurfer.domain.usecase.RestoreTransactionsUseCase
 import com.georgeci.moneysurfer.domain.util.TransactionPeriodWindow
 import com.georgeci.moneysurfer.feature.transaction.filter.TransactionDatePreset
 import com.georgeci.moneysurfer.feature.transaction.filter.TransactionDateRange
 import com.georgeci.moneysurfer.feature.transaction.filter.TransactionFilterStore
 import com.georgeci.moneysurfer.feature.transaction.filter.TransactionSort
 import com.georgeci.moneysurfer.feature.transaction.filter.TransactionTypeFilter
+import com.georgeci.moneysurfer.navigation.DeleteTransactionWithUndo
+import com.georgeci.moneysurfer.navigation.SnackbarController
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.collections.shouldHaveSize
@@ -509,6 +516,63 @@ class TransactionsByAccountViewModelTest : StringSpec({
         }
     }
 
+    "swiping a row away removes it, and the snackbar's Undo puts it back" {
+        runTest {
+            val env = Env(transactions = listOf(expense(id = "rent", amount = 900), expense(id = "coffee", amount = 4)))
+            val viewModel = env.viewModel()
+
+            viewModel.onEvent(TransactionsByAccountEvent.OnDeleteTransaction(transactionId("coffee")))
+
+            // No optimistic removal in the ViewModel — the row is gone because the database Flow
+            // re-emitted without it.
+            viewModel.content().rowIds().shouldContainExactly("rent")
+
+            env.snackbar.requests.first().onAction!!.invoke()
+
+            viewModel.content().rowIds().shouldContainExactly("rent", "coffee")
+        }
+    }
+
+    "a row that is already gone deletes nothing and offers no Undo" {
+        runTest {
+            val env = Env(transactions = listOf(expense(id = "rent", amount = 900)))
+            val viewModel = env.viewModel()
+
+            // Two devices, or a double tap: nothing was removed, so "Deleted · Undo" would be a
+            // message about an event that did not happen.
+            env.snackbar.requests.test {
+                viewModel.onEvent(TransactionsByAccountEvent.OnDeleteTransaction(transactionId("ghost")))
+
+                viewModel.content().rowIds().shouldContainExactly("rent")
+                expectNoEvents()
+            }
+        }
+    }
+
+    "swiping one leg of a transfer takes both, and Undo restores the pair" {
+        runTest {
+            val transfer = transferId("tr-1")
+            val env = Env(
+                transactions = listOf(
+                    expense(id = "rent", amount = 900),
+                    expense(id = "leg-out", amount = 50).copy(transferId = transfer),
+                    income(id = "leg-in", amount = 50).copy(transferId = transfer),
+                ),
+            )
+            val viewModel = env.viewModel()
+
+            // The leg the user swiped is the incoming one; the outgoing sibling has to go with it,
+            // or the other account keeps money that no longer came from anywhere.
+            viewModel.onEvent(TransactionsByAccountEvent.OnDeleteTransaction(transactionId("leg-in")))
+
+            viewModel.content().rowIds().shouldContainExactly("rent")
+
+            env.snackbar.requests.first().onAction!!.invoke()
+
+            viewModel.content().rowIds().shouldHaveSize(3)
+        }
+    }
+
     "the all-accounts summary currency is the dominant one, not the newest row's" {
         runTest {
             val env = Env(
@@ -571,10 +635,12 @@ private class Env(transactions: List<Transaction> = emptyList()) {
     val repository = WindowingTransactionRepository(transactions)
     val preferences = FakeUiPreferences()
     val filterStore = TransactionFilterStore()
+    val snackbar = SnackbarController()
     private val session = InMemorySessionPointers(currentWorkspaceId = WORKSPACE)
 
-    fun viewModel(accountId: AccountId? = ACCOUNT): TransactionsByAccountViewModel =
-        TransactionsByAccountViewModel(
+    fun viewModel(accountId: AccountId? = ACCOUNT): TransactionsByAccountViewModel {
+        val applyChange = ApplyTransactionChangeUseCase(repository, SingleAccountRepository)
+        return TransactionsByAccountViewModel(
             accountId = accountId,
             getTransactionsByAccount = GetTransactionsByAccountUseCase(repository),
             getAccountById = GetAccountByIdUseCase(SingleAccountRepository),
@@ -583,7 +649,13 @@ private class Env(transactions: List<Transaction> = emptyList()) {
             filterStore = filterStore,
             uiPreferences = preferences,
             clock = ClockUseCase(FixedClock(TODAY.atStartOfDayIn(TimeZone.UTC))),
+            deleteWithUndo = DeleteTransactionWithUndo(
+                deleteTransaction = DeleteTransactionUseCase(repository, applyChange),
+                restoreTransactions = RestoreTransactionsUseCase(applyChange),
+                snackbar = snackbar,
+            ),
         )
+    }
 }
 
 private val GROCERIES = categoryId("cat-groceries")
@@ -657,9 +729,20 @@ private class WindowingTransactionRepository(
     override suspend fun getById(id: TransactionId): Transaction? = rows.value.find { it.id == id }
     override suspend fun getByTransferId(transferId: TransferId): List<Transaction> =
         rows.value.filter { it.transferId == transferId }
-    override suspend fun insert(transaction: Transaction) = Unit
-    override suspend fun update(transaction: Transaction) = Unit
-    override suspend fun delete(id: TransactionId) = Unit
+
+    // Writing, not no-op: the list is fed by this flow, so a delete has to actually leave the
+    // rows for the screen's reaction to it to be worth asserting.
+    override suspend fun insert(transaction: Transaction) {
+        rows.value = rows.value + transaction
+    }
+
+    override suspend fun update(transaction: Transaction) {
+        rows.value = rows.value.map { if (it.id == transaction.id) transaction else it }
+    }
+
+    override suspend fun delete(id: TransactionId) {
+        rows.value = rows.value.filterNot { it.id == id }
+    }
 }
 
 private object SingleAccountRepository : AccountRepository {

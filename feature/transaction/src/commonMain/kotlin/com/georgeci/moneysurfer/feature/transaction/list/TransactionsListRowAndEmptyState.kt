@@ -10,6 +10,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import com.georgeci.moneysurfer.uikit.components.SurferCategoryPalette
 import com.georgeci.moneysurfer.uikit.components.SurferEmptyState
+import com.georgeci.moneysurfer.uikit.components.transaction.SurferSwipeToDeleteTransaction
 import com.georgeci.moneysurfer.uikit.components.transaction.SurferTransactionLine
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
@@ -34,11 +35,16 @@ private const val INCOME_PILL_ALPHA = 0.14f
 private const val META_SEPARATOR = " · "
 
 /**
- * One transaction line, with the three variants the list can render.
+ * One transaction line, with the three variants the list can render, swipeable to delete.
  *
  * A transfer leg is deliberately neither of the other two: it carries the swap glyph on a neutral
  * transfer tint and no amount pill, because the money did not leave or arrive — it moved sideways,
  * and drawing it as a plain expense is exactly what made the two legs unreadable.
+ *
+ * The row's gap to the next one is on the swipe wrapper while its inset stays on the line: the
+ * Delete button is measured against the wrapper, so a bottom padding inside it would push the
+ * button off the line's centre, and a horizontal one would leave a dead 16dp strip at the edge
+ * where the swipe starts.
  */
 @Composable
 internal fun TransactionRow(
@@ -46,16 +52,35 @@ internal fun TransactionRow(
     showAccount: Boolean,
     untitled: String,
     onClick: () -> Unit,
+    onDelete: () -> Unit,
+) {
+    val title = row.title.ifBlank { untitled }
+    SurferSwipeToDeleteTransaction(
+        transactionTitle = title,
+        onDelete = onDelete,
+        modifier = Modifier.padding(bottom = 12.dp),
+        isTransfer = row.isTransfer,
+    ) {
+        TransactionLine(row = row, showAccount = showAccount, title = title, onClick = onClick)
+    }
+}
+
+@Composable
+private fun TransactionLine(
+    row: TransactionRowUi,
+    showAccount: Boolean,
+    title: String,
+    onClick: () -> Unit,
 ) {
     val transferTint = AppTheme.semanticColors.transfer
     SurferTransactionLine(
-        modifier = Modifier.padding(horizontal = 16.dp).padding(bottom = 12.dp),
+        modifier = Modifier.padding(horizontal = 16.dp),
         icon = when {
             row.isTransfer -> SurferCategoryPalette.TransferIcon
             row.isExpense -> SurferIcons.Receipt
             else -> SurferIcons.Wallet
         },
-        title = row.title.ifBlank { untitled },
+        title = title,
         formattedAmount = row.formattedAmount,
         categoryHueSeed = row.categoryHueSeed,
         meta = row.metaLine(showAccount),
