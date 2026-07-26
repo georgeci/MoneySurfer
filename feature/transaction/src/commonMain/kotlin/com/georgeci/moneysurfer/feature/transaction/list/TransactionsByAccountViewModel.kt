@@ -1,7 +1,5 @@
 package com.georgeci.moneysurfer.feature.transaction.list
 
-import arrow.optics.optics
-import com.georgeci.moneysurfer.domain.formatter.MoneyFormatter
 import com.georgeci.moneysurfer.domain.model.Account
 import com.georgeci.moneysurfer.domain.model.CategorizedTransaction
 import com.georgeci.moneysurfer.domain.model.Category
@@ -10,10 +8,6 @@ import com.georgeci.moneysurfer.domain.preferences.TransactionPeriodMode
 import com.georgeci.moneysurfer.domain.preferences.UiPreferences
 import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
-import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
-import com.georgeci.moneysurfer.domain.primitives.Money
-import com.georgeci.moneysurfer.domain.primitives.TransactionId
-import com.georgeci.moneysurfer.domain.primitives.TransactionType
 import com.georgeci.moneysurfer.domain.usecase.GetAccountByIdUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetAccountsUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetCategoriesUseCase
@@ -25,7 +19,6 @@ import com.georgeci.moneysurfer.feature.transaction.filter.TransactionDateRange
 import com.georgeci.moneysurfer.feature.transaction.filter.TransactionFilterStore
 import com.georgeci.moneysurfer.feature.transaction.filter.TransactionFilters
 import com.georgeci.moneysurfer.feature.transaction.filter.TransactionSort
-import com.georgeci.moneysurfer.feature.transaction.filter.TransactionTypeFilter
 import com.georgeci.moneysurfer.feature.transaction.filter.compile
 import com.georgeci.moneysurfer.feature.transaction.filter.resolveWindow
 import com.georgeci.moneysurfer.navigation.DeleteTransactionWithUndo
@@ -69,27 +62,6 @@ private const val AUTO_LOAD_UNTIL_SCROLLABLE = 20
  */
 private fun shouldLoadMoreToFillFilteredList(content: TransactionsByAccountState.Content): Boolean =
     content.isFiltered && content.canLoadMore && content.renderedRowCount < AUTO_LOAD_UNTIL_SCROLLABLE
-
-/**
- * The chip rail's values. Names are resolved from the account and category lists rather than in
- * the screen, which has neither; a single selection shows its name, several show their count, and
- * nothing selected leaves the chip in its bare "Account" state.
- */
-private fun chips(
-    filters: TransactionFilters,
-    accounts: List<Account>,
-    categories: List<Category>,
-): TransactionFilterChipsUi = TransactionFilterChipsUi(
-    dateRange = filters.dateRange,
-    type = filters.type,
-    accountCount = filters.accountIds.size,
-    accountName = filters.accountIds.singleOrNull()
-        ?.let { id -> accounts.firstOrNull { it.id == id }?.name },
-    categoryCount = filters.categoryIds.size,
-    categoryName = filters.categoryIds.singleOrNull()
-        ?.let { id -> categories.firstOrNull { it.id == id }?.name },
-    sort = filters.sort,
-)
 
 @KoinViewModel
 class TransactionsByAccountViewModel(
@@ -264,18 +236,14 @@ class TransactionsByAccountViewModel(
         // different account picked on the filter screen would silently show nothing.
         val effective = if (accountId != null) filters.copy(accountIds = emptySet()) else filters
 
-        // Compile once, then test each row: the amount fields are parsed a single time for the
-        // whole page rather than re-parsed per row.
-        val matcher = effective.compile()
-        val matched = visible.filter { matcher.matches(it) }
-        // Already ordered by the query's (operationDate, operationAt, createdAt) DESC — reversing
-        // the flat list is what "oldest first" means, inside each day as well as between days.
-        val ordered = if (effective.sort == TransactionSort.Oldest) matched.reversed() else matched
-
         return TransactionsByAccountState.Content(
             accountId = accountId,
             accountName = account?.name.orEmpty(),
-            groups = groupByDate(ordered, accounts.associate { it.id to it.name }),
+            groups = groupByDate(
+                rows = matchedRows(visible, effective),
+                accountNames = accounts.associate { it.id to it.name },
+                dateLabel = ::dateLabel,
+            ),
             // A row only has to name its account where the list mixes several. Scoped to one, the
             // toolbar already says which, and repeating it on every row would be noise.
             showAccountOnRows = accountId == null,
@@ -298,85 +266,17 @@ class TransactionsByAccountViewModel(
         )
     }
 
-    private fun groupByDate(
-        rows: List<CategorizedTransaction>,
-        accountNames: Map<AccountId, String>,
-    ): List<TransactionGroupUi> =
-        rows.groupBy { it.transaction.operationDate }
-            .map { (date, txns) ->
-                val net = txns.fold(Money.zero()) { acc, t -> acc + t.signedMoney() }
-                TransactionGroupUi(
-                    date = date,
-                    dateLabel = dateLabel(date),
-                    netFormatted = MoneyFormatter.format(net, txns.first().currencyCode),
-                    netPositive = !net.isNegative(),
-                    transactions = txns.map { it.toRow(accountNames) },
-                )
-            }
-
-    private fun CategorizedTransaction.toRow(accountNames: Map<AccountId, String>): TransactionRowUi {
-        val isTransferLeg = transaction.transferId != null
-        return TransactionRowUi(
-            id = transaction.id,
-            // Merchant first: "Starbucks" identifies the row better than whatever was jotted next
-            // to it, and the note still shows when there is no merchant.
-            title = transaction.merchant.ifBlank { transaction.note }.ifBlank { categoryName.orEmpty() },
-            subtitle = categoryName.orEmpty(),
-            accountName = accountNames[transaction.accountId].orEmpty(),
-            formattedAmount = MoneyFormatter.format(transaction.money.abs(), transaction.currencyCode),
-            isExpense = transaction.type == TransactionType.EXPENSE,
-            isTransfer = isTransferLeg,
-            // A transfer leg is drawn from the shared transfer palette instead of its category's
-            // hue, so it carries no seed — see how the screen renders it.
-            categoryHueSeed = if (isTransferLeg) {
-                ""
-            } else {
-                categoryName ?: transaction.categoryId?.value.orEmpty()
-            },
-        )
-    }
-
-    /**
-     * The single currency the summary strip renders in.
-     *
-     * Scoped to an account it is simply that account's currency. In the all-accounts view there is
-     * no one right answer, so the currency with the largest total magnitude is chosen — a
-     * deterministic, recency-independent pick, so a newly-added transaction in another currency
-     * cannot flip the strip the way keying off the newest visible row did. Amounts in the other
-     * currencies are still excluded from the total (see [buildSummary]); a per-currency summary
-     * would be a larger design change than this screen owns.
-     */
-    private fun summaryCurrency(account: Account?, totals: List<TransactionTotal>): CurrencyCode =
-        account?.currencyCode
-            ?: totals.maxByOrNull { it.total.minor }?.currencyCode
-            ?: CurrencyCode("USD")
-
-    /**
-     * Summary of the whole period, not of the loaded page: [totals] come straight from the
-     * database aggregation, so paging cannot change these numbers.
-     *
-     * It also deliberately ignores the filters. The strip answers "what happened in this period",
-     * which stays true while the user narrows the list below it; recomputing it from the matched
-     * page would instead answer "what is on screen", and would drift as pages load.
-     *
-     * Rows in other currencies are dropped rather than added to the displayed one — mixing minor
-     * units across currencies would produce a confidently wrong number.
-     */
-    private fun buildSummary(
-        totals: List<TransactionTotal>,
-        currency: CurrencyCode,
-    ): TransactionSummaryUi {
-        val inCurrency = totals.filter { it.currencyCode == currency }
-        val income = inCurrency.sumOfMoney { it.type == TransactionType.INCOME }
-        val expense = inCurrency.sumOfMoney { it.type == TransactionType.EXPENSE }
-        val net = income - expense
-        return TransactionSummaryUi(
-            incomeFormatted = "+" + MoneyFormatter.format(income, currency),
-            expenseFormatted = "−" + MoneyFormatter.format(expense, currency),
-            netFormatted = (if (net.isNegative()) "−" else "+") +
-                MoneyFormatter.format(net.abs(), currency),
-            netPositive = !net.isNegative(),
-        )
+    private fun matchedRows(
+        visible: List<CategorizedTransaction>,
+        filters: TransactionFilters,
+    ): List<CategorizedTransaction> {
+        // Compile once, then test each row: the amount fields are parsed a single time for the
+        // whole page rather than re-parsed per row.
+        val matcher = filters.compile()
+        val matched = visible.filter { matcher.matches(it) }
+        // Already ordered by the query's (operationDate, operationAt, createdAt) DESC — reversing
+        // the flat list is what "oldest first" means, inside each day as well as between days.
+        return if (filters.sort == TransactionSort.Oldest) matched.reversed() else matched
     }
 
     private fun periodLabel(period: Period): TransactionPeriodUi = when (period.mode) {
@@ -409,16 +309,6 @@ class TransactionsByAccountViewModel(
         }
     }
 
-    private fun List<TransactionTotal>.sumOfMoney(predicate: (TransactionTotal) -> Boolean): Money =
-        filter(predicate).fold(Money.zero()) { acc, total -> acc + total.total }
-
-    private val CategorizedTransaction.currencyCode: CurrencyCode get() = transaction.currencyCode
-
-    private fun CategorizedTransaction.signedMoney(): Money = when (transaction.type) {
-        TransactionType.EXPENSE -> -transaction.money.abs()
-        else -> transaction.money.abs()
-    }
-
     /** One fetch: at most `limit + 1` rows, the extra one only signalling that more exist. */
     private data class Page(val rows: List<CategorizedTransaction>, val limit: Int)
 
@@ -436,133 +326,4 @@ class TransactionsByAccountViewModel(
         val dateRange: TransactionDateRange,
         val window: TransactionPeriodWindow,
     )
-}
-
-@optics
-sealed interface TransactionsByAccountState {
-    val accountId: AccountId?
-
-    @optics
-    data class Loading(override val accountId: AccountId?) : TransactionsByAccountState {
-        companion object
-    }
-
-    @optics
-    data class Content(
-        override val accountId: AccountId?,
-        val accountName: String,
-        val groups: List<TransactionGroupUi>,
-        /** Whether a row should name the account it belongs to — true on the all-accounts list. */
-        val showAccountOnRows: Boolean,
-        val summary: TransactionSummaryUi,
-        val query: String,
-        val filters: TransactionFilterChipsUi,
-        val activeFilterCount: Int,
-        val isFiltered: Boolean,
-        val periodMode: TransactionPeriodMode,
-        val period: TransactionPeriodUi,
-        val showPeriodPager: Boolean,
-        val canGoToPreviousPeriod: Boolean,
-        val canGoToNextPeriod: Boolean,
-        val canLoadMore: Boolean,
-    ) : TransactionsByAccountState {
-        val isEmpty: Boolean get() = groups.isEmpty()
-
-        /** Rows actually shown, across every day group — what the LazyColumn can scroll. */
-        val renderedRowCount: Int get() = groups.sumOf { it.transactions.size }
-
-        companion object
-    }
-
-    companion object
-}
-
-data class TransactionGroupUi(
-    val date: LocalDate,
-    val dateLabel: TransactionDateUi,
-    val netFormatted: String,
-    val netPositive: Boolean,
-    val transactions: List<TransactionRowUi>,
-)
-
-/** Day-header label, resolved to text by the screen. */
-sealed interface TransactionDateUi {
-    data object Today : TransactionDateUi
-    data object Yesterday : TransactionDateUi
-    data class Exact(val date: LocalDate) : TransactionDateUi
-}
-
-/** Pager label, resolved to text by the screen — see the `PeriodPager` design component. */
-sealed interface TransactionPeriodUi {
-    data class Month(val monthNumber: Int, val year: Int) : TransactionPeriodUi
-    data class Week(
-        val from: LocalDate,
-        val to: LocalDate,
-        val weekNumber: Int,
-        val weekYear: Int,
-    ) : TransactionPeriodUi
-
-    data object AllTime : TransactionPeriodUi
-}
-
-/**
- * The filter chip rail's contents. Every chip is a shortcut into the filter screen, so these carry
- * only what the chip label shows — a name when exactly one thing is picked, a count otherwise.
- */
-data class TransactionFilterChipsUi(
-    val dateRange: TransactionDateRange,
-    val type: TransactionTypeFilter,
-    val accountCount: Int,
-    val accountName: String?,
-    val categoryCount: Int,
-    val categoryName: String?,
-    val sort: TransactionSort,
-)
-
-data class TransactionRowUi(
-    val id: TransactionId,
-    val title: String,
-    val subtitle: String,
-    val formattedAmount: String,
-    val isExpense: Boolean,
-    val categoryHueSeed: String,
-    /** Name of the owning account, rendered only where the list mixes several — may be blank. */
-    val accountName: String = "",
-    /** One leg of a transfer: money moved sideways, drawn neutral with a swap glyph. */
-    val isTransfer: Boolean = false,
-)
-
-data class TransactionSummaryUi(
-    val incomeFormatted: String,
-    val expenseFormatted: String,
-    val netFormatted: String,
-    val netPositive: Boolean,
-)
-
-sealed interface TransactionsByAccountEvent {
-    data object OnBackClick : TransactionsByAccountEvent
-    data object OnAddTransactionClick : TransactionsByAccountEvent
-    data class OnTransactionClick(val transactionId: TransactionId) : TransactionsByAccountEvent
-    data class OnSearchQueryChanged(val query: String) : TransactionsByAccountEvent
-    data object OnOpenFiltersClick : TransactionsByAccountEvent
-
-    /** The empty state's CTA when nothing matched: drops every filter *and* the search text. */
-    data object OnClearFiltersClick : TransactionsByAccountEvent
-    data object OnPreviousPeriodClick : TransactionsByAccountEvent
-    data object OnNextPeriodClick : TransactionsByAccountEvent
-    data class OnPeriodModeChanged(val mode: TransactionPeriodMode) : TransactionsByAccountEvent
-    data object OnLoadMore : TransactionsByAccountEvent
-
-    /** A row was swiped away and the confirmation accepted; the Undo rides on the snackbar. */
-    data class OnDeleteTransaction(val transactionId: TransactionId) : TransactionsByAccountEvent
-}
-
-sealed interface TransactionsByAccountEffect {
-    data object NavigateBack : TransactionsByAccountEffect
-    data class NavigateToTransactionCreation(val accountId: AccountId?) : TransactionsByAccountEffect
-    data class NavigateToTransactionDetails(val transactionId: TransactionId) : TransactionsByAccountEffect
-    data class NavigateToFilters(
-        val accountId: AccountId?,
-        val anchorEpochDay: Long,
-    ) : TransactionsByAccountEffect
 }
