@@ -416,7 +416,9 @@ Online `iosApp` tester distribution is automated by
 [.github/workflows/ios-distribute.yml](.github/workflows/ios-distribute.yml):
 manual `workflow_dispatch` or daily at 04:17 UTC, skipping scheduled runs when
 `main` is unchanged. It uploads to TestFlight and retains the IPA artifact for
-14 days. Setup, secrets, API-key rotation, build numbering, and troubleshooting:
+14 days. Its `github.run_number` drives both the `major.minor.build` marketing
+version and iOS `CFBundleVersion`; Android and iOS workflow counters are
+separate. Setup, secrets, API-key rotation, build numbering, and troubleshooting:
 [docs/ci/testflight.md](docs/ci/testflight.md).
 
 Local archive + upload is driven by [scripts/ios/release.sh](scripts/ios/release.sh):

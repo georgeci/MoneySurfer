@@ -203,7 +203,7 @@
 ## ios-testflight-distribution
 - Title: Scope and triggers
 - File: docs/ci/testflight.md
-- Lines: 28-123
+- Lines: 29-172
 - Tasks: ios, testflight, ci, release
 
 ## markdown-rules
