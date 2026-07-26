@@ -21,7 +21,7 @@ private fun TransactionsByAccountPreview() {
                 groups = previewGroups(),
                 showAccountOnRows = true,
                 summary = TransactionSummaryUi(
-                    incomeFormatted = "+€3,200.00",
+                    incomeFormatted = PreviewPayrollAmount,
                     expenseFormatted = "−€72.70",
                     netFormatted = "+€3,127.30",
                     netPositive = true,
@@ -102,6 +102,9 @@ private fun TransactionsByAccountEmptyFilteredPreview() {
     }
 }
 
+/** The payroll row's amount, which is also its day's net and the period's income. */
+private const val PreviewPayrollAmount = "+€3,200.00"
+
 /** The two days the sample rows are grouped under. */
 private val PreviewToday = LocalDate(2025, 3, 26)
 private val PreviewYesterday = LocalDate(2025, 3, 25)
@@ -146,14 +149,14 @@ private fun previewGroups(): List<TransactionGroupUi> = listOf(
     TransactionGroupUi(
         date = PreviewYesterday,
         dateLabel = TransactionDateUi.Yesterday,
-        netFormatted = "+€3,200.00",
+        netFormatted = PreviewPayrollAmount,
         netPositive = true,
         transactions = listOf(
             TransactionRowUi(
                 id = TransactionId("preview-tx-3"),
                 title = "March payroll",
                 subtitle = "Salary",
-                formattedAmount = "+€3,200.00",
+                formattedAmount = PreviewPayrollAmount,
                 isExpense = false,
                 categoryHueSeed = "preview-cat-3",
                 accountName = "Everyday",

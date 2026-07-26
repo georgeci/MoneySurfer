@@ -7,6 +7,9 @@ import com.georgeci.moneysurfer.domain.primitives.TransactionType
 import com.georgeci.moneysurfer.uikit.components.SurferCategoryPalette
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 
+/** One date across every preview, so they read as the same afternoon. */
+private const val PreviewDate = "18 Mar 2025"
+
 private fun previewExpense(showDeleteConfirmation: Boolean = false, isPlanned: Boolean = false) =
     TransactionDetailsState.Content(
         transactionId = TransactionId("preview-tx-1a13"),
@@ -19,7 +22,7 @@ private fun previewExpense(showDeleteConfirmation: Boolean = false, isPlanned: B
         parentCategoryName = "Home",
         tags = listOf("weekly", "food"),
         reference = "TX-1A13",
-        formattedDate = "18 Mar 2025",
+        formattedDate = PreviewDate,
         isPlanned = isPlanned,
         showDeleteConfirmation = showDeleteConfirmation,
     )
@@ -46,7 +49,7 @@ private fun TransactionDetailsIncomePreview() {
                 accountName = "Savings",
                 categoryName = "Salary",
                 reference = "TX-2B24",
-                formattedDate = "18 Mar 2025",
+                formattedDate = PreviewDate,
                 isPlanned = false,
                 showDeleteConfirmation = false,
             ),
@@ -71,7 +74,7 @@ private fun TransactionDetailsTransferPreview() {
                 categorySystemKind = SurferCategoryPalette.SYSTEM_KIND_TRANSFER,
                 categoryIconKey = SurferCategoryPalette.TRANSFER_ICON_KEY,
                 reference = "TX-3C35",
-                formattedDate = "18 Mar 2025",
+                formattedDate = PreviewDate,
                 isPlanned = false,
                 showDeleteConfirmation = false,
             ),

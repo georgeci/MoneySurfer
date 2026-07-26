@@ -118,8 +118,7 @@ internal fun TransactionDetailsContent(
                 HeroCard(
                     header = heroHeaderFor(state),
                     headerColor = heroVisual.tint,
-                    categoryTint = heroVisual.tint,
-                    categoryIcon = heroVisual.icon,
+                    visual = heroVisual,
                     formattedAmount = state.formattedAmount,
                     note = state.note,
                     formattedDate = state.formattedDate,

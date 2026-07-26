@@ -19,7 +19,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
@@ -98,8 +97,8 @@ internal fun heroHeaderFor(state: TransactionDetailsState.Content): String {
 internal fun HeroCard(
     header: String,
     headerColor: Color,
-    categoryTint: Color,
-    categoryIcon: ImageVector,
+    /** Bubble glyph and hue in one, as [heroVisualFor] resolved them. */
+    visual: SurferCategoryVisual,
     formattedAmount: String,
     note: String,
     formattedDate: String,
@@ -109,7 +108,7 @@ internal fun HeroCard(
     val surface = AppTheme.materialColors.surface
     val heroBrush = Brush.linearGradient(
         colors = listOf(
-            categoryTint.copy(alpha = HERO_GRADIENT_ALPHA),
+            visual.tint.copy(alpha = HERO_GRADIENT_ALPHA),
             surface,
         ),
     )
@@ -124,7 +123,7 @@ internal fun HeroCard(
             .padding(horizontal = 20.dp, vertical = 22.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        SurferCategoryBubble(icon = categoryIcon, tint = categoryTint, size = 64.dp)
+        SurferCategoryBubble(icon = visual.icon, tint = visual.tint, size = 64.dp)
         Spacer(Modifier.height(12.dp))
         Text(
             text = header,
