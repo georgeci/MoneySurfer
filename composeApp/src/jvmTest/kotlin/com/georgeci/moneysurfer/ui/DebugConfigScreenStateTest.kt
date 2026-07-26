@@ -38,6 +38,7 @@ class DebugConfigScreenStateTest : StringSpec({
 
             onNodeWithTag(DebugConfigTestTags.Root).assertIsDisplayed()
             onNodeWithTag(DebugConfigTestTags.row(FLAG_ROW.name)).assertIsDisplayed()
+            onNodeWithTag(DebugConfigTestTags.LogsRow).assertIsDisplayed()
             onNodeWithTag(DebugConfigTestTags.ResetAllRow).assertIsDisplayed()
             onAllNodesWithTag(DebugConfigTestTags.Unavailable).assertCountEquals(0)
         }
@@ -58,6 +59,7 @@ class DebugConfigScreenStateTest : StringSpec({
             onNodeWithTag(DebugConfigTestTags.Unavailable).assertIsDisplayed()
             onAllNodesWithTag(DebugConfigTestTags.Root).assertCountEquals(0)
             onNodeWithTag(DebugConfigTestTags.row(FLAG_ROW.name)).assertDoesNotExist()
+            onAllNodesWithTag(DebugConfigTestTags.LogsRow).assertCountEquals(0)
             onAllNodesWithTag(DebugConfigTestTags.ResetAllRow).assertCountEquals(0)
         }
     }

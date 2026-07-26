@@ -314,4 +314,9 @@
     <string name="settings_debug_config_degraded_format">Could not read: %1$s — values below fall back to the layers underneath</string>
     <string name="settings_debug_config_unavailable">Overrides are unavailable in this build — the debug layer is empty, so nothing here would be stored.</string>
     <string name="settings_debug_config_host_owned">Build identity — overriding this does not change the wiring that was compiled in.</string>
+    <string name="settings_debug_log_title">Logs</string>
+    <string name="settings_debug_log_supporting">Recent warnings and errors from this session</string>
+    <string name="settings_debug_log_footnote">The last 100 warning and error lines, newest first. Kept in memory only — they are gone when the app restarts.</string>
+    <string name="settings_debug_log_empty">Nothing logged at warning level or above since the app started.</string>
+    <string name="settings_debug_log_clear">Clear log</string>
 </resources>

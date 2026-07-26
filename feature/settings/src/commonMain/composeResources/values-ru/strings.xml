@@ -314,4 +314,9 @@
     <string name="settings_debug_config_degraded_format">Не удалось прочитать: %1$s — значения ниже берутся из слоёв под ним</string>
     <string name="settings_debug_config_unavailable">В этой сборке переопределения недоступны — debug-слой пуст, сохранять здесь нечего.</string>
     <string name="settings_debug_config_host_owned">Идентичность сборки — переопределение не меняет уже скомпилированную сборку графа.</string>
+    <string name="settings_debug_log_title">Логи</string>
+    <string name="settings_debug_log_supporting">Недавние предупреждения и ошибки этой сессии</string>
+    <string name="settings_debug_log_footnote">Последние 100 строк уровня warning и error, новые сверху. Хранятся только в памяти — после перезапуска приложения их не будет.</string>
+    <string name="settings_debug_log_empty">С момента запуска приложения не было ни предупреждений, ни ошибок.</string>
+    <string name="settings_debug_log_clear">Очистить лог</string>
 </resources>

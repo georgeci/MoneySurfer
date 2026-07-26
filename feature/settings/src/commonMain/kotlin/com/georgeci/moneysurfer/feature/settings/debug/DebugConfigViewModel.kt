@@ -33,6 +33,7 @@ class DebugConfigViewModel(
     override fun onEvent(event: DebugConfigEvent) {
         when (event) {
             DebugConfigEvent.OnBackClick -> postSideEffect(DebugConfigEffect.NavigateBack)
+            DebugConfigEvent.OnLogsClick -> postSideEffect(DebugConfigEffect.NavigateToLogs)
             is DebugConfigEvent.OnOverride -> override(event.name, event.raw)
             is DebugConfigEvent.OnClearOverride -> launch { inspector.clearOverride(event.name) }
             DebugConfigEvent.OnResetAllClick -> launch { inspector.resetAll() }
@@ -63,6 +64,7 @@ data class DebugConfigState(
 
 sealed interface DebugConfigEvent {
     data object OnBackClick : DebugConfigEvent
+    data object OnLogsClick : DebugConfigEvent
     data class OnOverride(val name: String, val raw: String) : DebugConfigEvent
     data class OnClearOverride(val name: String) : DebugConfigEvent
     data object OnResetAllClick : DebugConfigEvent
@@ -70,5 +72,6 @@ sealed interface DebugConfigEvent {
 
 sealed interface DebugConfigEffect {
     data object NavigateBack : DebugConfigEffect
+    data object NavigateToLogs : DebugConfigEffect
     data class NotifyInvalidValue(val name: String, val raw: String) : DebugConfigEffect
 }
