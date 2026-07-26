@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -30,6 +31,7 @@ import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
 import com.georgeci.moneysurfer.uikit.components.category.SurferCategoryManageCard
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
+import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.utils.HandleSideEffect
 import moneysurfer.feature.category.generated.resources.Res
@@ -46,6 +48,12 @@ import org.koin.compose.viewmodel.koinViewModel
 
 /** Extra leading inset per nesting level. One level is all [CategoryTree.MAX_DEPTH] allows. */
 private val ChildIndent = 24.dp
+
+/** Stable selectors for the Categories management screen — see docs/testing/testing-strategy.md. */
+object CategoriesManageTestTags {
+    const val Root = "categoriesManage:root"
+    const val AddButton = "categoriesManage:add"
+}
 
 @Composable
 fun CategoriesManageScreen(
@@ -110,7 +118,10 @@ private fun CategoriesManageContent(
     onEvent: (CategoriesManageEvent) -> Unit,
 ) {
     Scaffold(
-        modifier = Modifier.surferSafeInsets(),
+        modifier = Modifier
+            .surferSafeInsets()
+            .testTag(CategoriesManageTestTags.Root)
+            .surferTestTagAsId(),
         containerColor = AppTheme.materialColors.surface,
         topBar = {
             SurferToolbar(
@@ -122,6 +133,7 @@ private fun CategoriesManageContent(
             SurferAddFab(
                 label = stringResource(Res.string.categories_manage_add),
                 onClick = { onEvent(CategoriesManageEvent.OnAddCategoryClick) },
+                modifier = Modifier.testTag(CategoriesManageTestTags.AddButton),
             )
         },
     ) { padding ->

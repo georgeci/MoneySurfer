@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -26,6 +27,9 @@ import com.georgeci.moneysurfer.uikit.theme.AppTheme
 /**
  * Hero card with avatar initial, name, email, and an optional trailing chevron.
  * Used at the top of the Settings hub.
+ *
+ * [nameTestTag] tags the [name] line so a UI test can read the signed-in account without
+ * matching localized copy.
  */
 @Composable
 fun SurferNameBlock(
@@ -35,6 +39,7 @@ fun SurferNameBlock(
     initial: String? = null,
     onClick: (() -> Unit)? = null,
     trailing: (@Composable () -> Unit)? = { SurferSettingsChevron(tint = AppTheme.materialColors.onPrimaryContainer) },
+    nameTestTag: String? = null,
 ) {
     val colors = AppTheme.materialColors
     val shape = RoundedCornerShape(20.dp)
@@ -71,6 +76,7 @@ fun SurferNameBlock(
                 color = colors.onPrimaryContainer,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
+                modifier = nameTestTag?.let { Modifier.testTag(it) } ?: Modifier,
             )
             if (email != null) {
                 Text(

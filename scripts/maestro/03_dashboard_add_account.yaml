@@ -8,7 +8,7 @@ name: Dashboard — Add bank account
 
 # Assert dashboard content is visible
 - assertVisible:
-    text: "Accounts"
+    id: "dashboard:accounts"
 
 # Create the baseline account once and reuse it across the remaining flows.
 #
@@ -30,20 +30,20 @@ name: Dashboard — Add bank account
       notVisible: "Main Bank"
     commands:
       - tapOn:
-          text: "Add account"
+          id: "dashboard:addAccount"
       - assertVisible:
-          text: "New account"
+          id: "accountCreation:root"
       - tapOn:
-          text: "Account name"
+          id: "accountCreation:name"
       - inputText: "Main Bank"
       - tapOn:
-          text: "Bank"
+          id: "accountCreation:type:bank"
       - tapOn:
-          text: "Save"
+          id: "accountCreation:save"
 
 # Assert back on Dashboard and account card is visible
 - assertVisible:
-    text: "Accounts"
+    id: "dashboard:accounts"
 - assertVisible:
     text: "Main Bank"
 

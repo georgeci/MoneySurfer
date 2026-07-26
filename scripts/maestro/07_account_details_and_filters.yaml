@@ -1,27 +1,28 @@
 appId: ${APP_ID}
 name: Account — Details and transaction filters
 ---
+# Read-only over the shared baseline: this flow opens 04's "Test expense" and
+# filters around it, but never mutates it. Flows that *do* mutate a transaction
+# (08, 17) own theirs — see README.md → Rules for writing a flow.
 - runFlow: 04_add_transaction.yaml
 
 - tapOn:
     text: "Main Bank"
 
 - assertVisible:
-    text: "Account"
+    id: "accountDetails:root"
 - assertVisible:
     text: "Main Bank"
 - assertVisible:
-    text: "Transactions"
+    text: "Test expense"
+
+- tapOn:
+    id: "accountDetails:filter:expenses"
 - assertVisible:
     text: "Test expense"
 
 - tapOn:
-    text: "Expenses"
-- assertVisible:
-    text: "Test expense"
-
-- tapOn:
-    text: "Income"
+    id: "accountDetails:filter:income"
 # Assert the filter *excludes* the expense rather than that the list is empty:
 # 09_income_transaction_filter logs a "Salary" income against this same account,
 # and Maestro gives no ordering guarantee between the two flows (#219).
@@ -29,16 +30,16 @@ name: Account — Details and transaction filters
     text: "Test expense"
 
 - tapOn:
-    text: "All"
+    id: "accountDetails:filter:all"
 - assertVisible:
     text: "Test expense"
 
 - tapOn:
-    text: "See all"
-# TransactionsByAccountScreen uses the account name as the toolbar title
-# (falls back to "Transactions" only when blank), and the "New" FAB is an
-# ExtendedFloatingActionButton whose label isn't surfaced as a11y text on
-# this Compose version. Assert on the per-account header + a tx row.
+    id: "accountDetails:seeAll"
+# TransactionsByAccountScreen uses the account name as the toolbar title, so the
+# per-account header is fixture data rather than product copy.
+- assertVisible:
+    id: "transactionsList:root"
 - assertVisible:
     text: "Main Bank"
 - assertVisible:

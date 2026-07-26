@@ -7,8 +7,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
+import com.georgeci.moneysurfer.feature.transaction.details.TransactionDetailsTestTags
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
 import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import moneysurfer.feature.transaction.generated.resources.Res
@@ -62,6 +66,11 @@ internal fun TransactionDeleteConfirmationDialog(
         confirmButton = {
             Button(
                 onClick = onConfirm,
+                // The dialog is its own window, so the hosting screen's `surferTestTagAsId()`
+                // does not reach in here — it has to be applied again alongside the tag.
+                modifier = Modifier
+                    .surferTestTagAsId()
+                    .testTag(TransactionDetailsTestTags.ConfirmDelete),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = AppTheme.materialColors.error,
                     contentColor = AppTheme.materialColors.onError,

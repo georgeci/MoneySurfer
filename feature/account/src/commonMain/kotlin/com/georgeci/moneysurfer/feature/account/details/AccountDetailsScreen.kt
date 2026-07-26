@@ -17,6 +17,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -55,11 +56,21 @@ import com.georgeci.moneysurfer.uikit.components.base.SurferToolbarAction
 import com.georgeci.moneysurfer.uikit.components.transaction.SurferTransactionLine
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
+import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.utils.HandleSideEffect
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
+
+/** Stable selectors for the account details screen — see docs/testing/testing-strategy.md. */
+object AccountDetailsTestTags {
+    const val Root = "accountDetails:root"
+    const val SeeAll = "accountDetails:seeAll"
+
+    /** Transaction-type filter chip, suffixed with the lowercased [TransactionFilter]. */
+    const val FilterPrefix = "accountDetails:filter:"
+}
 
 @Composable
 fun AccountDetailsScreen(
@@ -126,7 +137,10 @@ private fun AccountDetailsContent(
     onEvent: (AccountDetailsEvent) -> Unit,
 ) {
     Scaffold(
-        modifier = Modifier.surferSafeInsets(),
+        modifier = Modifier
+            .surferSafeInsets()
+            .testTag(AccountDetailsTestTags.Root)
+            .surferTestTagAsId(),
         containerColor = AppTheme.materialColors.surface,
         topBar = {
             SurferToolbar(
@@ -229,9 +243,11 @@ private fun AccountDetailsContent(
                         text = stringResource(Res.string.account_details_transactions_see_all),
                         style = AppTheme.typography.labelLarge,
                         color = AppTheme.materialColors.primary,
-                        modifier = Modifier.clickable {
-                            onEvent(AccountDetailsEvent.OnSeeAllTransactionsClick)
-                        },
+                        modifier = Modifier
+                            .testTag(AccountDetailsTestTags.SeeAll)
+                            .clickable {
+                                onEvent(AccountDetailsEvent.OnSeeAllTransactionsClick)
+                            },
                     )
                 }
             }
@@ -356,6 +372,7 @@ private fun FilterChips(
             )
         },
         onSelect = onSelect,
+        optionTestTag = { filter -> AccountDetailsTestTags.FilterPrefix + filter.name.lowercase() },
     )
 }
 

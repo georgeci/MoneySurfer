@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.georgeci.moneysurfer.uikit.components.transaction.SurferTransactionLine
@@ -45,6 +46,12 @@ data class SurferRecentTransactionItem(
     val categoryDotColor: Color? = null,
 )
 
+/**
+ * Recent-transactions widget for the dashboard column.
+ *
+ * [seeAllTestTag] and [emptyTestTag] tag the "see all" link and the empty-state block so a UI
+ * test can drive them without matching localized copy; the host screen owns the tag values.
+ */
 @Composable
 fun SurferRecentTransactionsWidget(
     items: List<SurferRecentTransactionItem>,
@@ -57,6 +64,8 @@ fun SurferRecentTransactionsWidget(
     emptyIcon: ImageVector = SurferIcons.Receipt,
     emptyTitle: String? = null,
     emptySubtitle: String? = null,
+    seeAllTestTag: String? = null,
+    emptyTestTag: String? = null,
 ) {
     val hero = size == SurferWidgetSize.Hero
     val visibleItems = if (hero) items else items.take(COMPACT_ROWS)
@@ -88,7 +97,9 @@ fun SurferRecentTransactionsWidget(
                 text = seeAllLabel,
                 style = AppTheme.typography.labelMedium,
                 color = AppTheme.materialColors.primary,
-                modifier = Modifier.clickable(onClick = onSeeAllClick),
+                modifier = Modifier
+                    .clickable(onClick = onSeeAllClick)
+                    .then(seeAllTestTag?.let { Modifier.testTag(it) } ?: Modifier),
             )
         }
         if (items.isEmpty()) {
@@ -96,6 +107,7 @@ fun SurferRecentTransactionsWidget(
                 icon = emptyIcon,
                 title = emptyTitle,
                 subtitle = emptySubtitle,
+                modifier = emptyTestTag?.let { Modifier.testTag(it) } ?: Modifier,
                 contentPadding = 0.dp,
             )
         } else {

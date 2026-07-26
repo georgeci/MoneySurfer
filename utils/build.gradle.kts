@@ -67,4 +67,15 @@ tasks.named<Test>("jvmTest") {
             exclude("**/build/**", "**/.git/**", "**/.gradle/**")
         },
     ).withPathSensitivity(PathSensitivity.RELATIVE)
+
+    // Same deal for MaestroFlowSelectorTest, which pairs the flows' `id:` selectors with the
+    // testTag constants declared in the screens. Both sides have to be inputs: renaming a tag
+    // breaks the gate just as surely as editing a flow does.
+    inputs.files(
+        fileTree(rootDir) {
+            include("scripts/maestro/**/*.yaml")
+            include("**/src/**/*.kt")
+            exclude("**/build/**", "**/.git/**", "**/.gradle/**")
+        },
+    ).withPathSensitivity(PathSensitivity.RELATIVE)
 }

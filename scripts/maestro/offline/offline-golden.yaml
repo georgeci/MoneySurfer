@@ -32,14 +32,16 @@ tags:
     id: "onboarding:continue"
 
 # 3. Name the first account and save. Currency defaults to EUR, and Save sits in
-#    the top bar where the keyboard can never cover it.
+#    the top bar where the keyboard can never cover it. The first-run variant of
+#    this screen carries a different title ("Your first account") but the same
+#    root, so the id holds for both entry points.
 - assertVisible:
-    text: "Your first account"
+    id: "accountCreation:root"
 - tapOn:
-    text: "Account name"
+    id: "accountCreation:name"
 - inputText: "Cash"
 - tapOn:
-    text: "Save"
+    id: "accountCreation:save"
 
 # 4. Seed verified — Dashboard renders with the balance widget and the
 #    add-transaction FAB (only shown once the "Cash" account exists).

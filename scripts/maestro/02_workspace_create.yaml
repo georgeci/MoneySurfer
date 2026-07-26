@@ -2,20 +2,60 @@ appId: ${APP_ID}
 name: Workspace — Create and select test workspace
 ---
 # Chain after 00_login.yaml or run standalone with an existing session.
+#
+# This flow is the suite's workspace *entry gate*: every flow that needs the
+# shared fixture chains it, and it guarantees "Test Workspace" is active by the
+# time it returns — whatever workspace the previous flow happened to leave
+# selected. Earlier revisions relied on the opposite arrangement, where the one
+# flow that switches workspaces (03a) had to switch back on its way out. That
+# tail never runs when the flow fails mid-way, and every later flow then wrote
+# its fixtures into the wrong workspace (issues #297, #351).
 
 - runFlow: 00_login.yaml
 
 # A restored session lands on either the workspace picker or — once a workspace
 # has been selected on a prior run, since the app persists the active workspace
-# across launches — straight on the dashboard. Only drive the picker when it's
-# actually shown; otherwise we're already on the dashboard (issue #219).
+# across launches — straight on the dashboard.
 #
-# Workspace list copy: the selector title "Choose a workspace" is build-independent
-# (only the subtitle has online/offline variants). The per-row "X members" counter
-# was dropped (issue #60) — offline workspaces are single-user.
+# Case 1: already on a dashboard. The toolbar renders the active workspace name,
+# so a missing "Test Workspace" means a different workspace is selected; walk
+# back to the picker and let case 2 below fix it.
 - runFlow:
     when:
-      visible: "Choose a workspace"
+      notVisible:
+        id: "workspaceSelector:root"
+    commands:
+      # Let the toolbar's workspace name arrive before judging it. The dashboard
+      # renders `state.workspaceName ?: defaultTitle`, so a read taken before the
+      # workspace streams in sees the fallback title, concludes "wrong
+      # workspace", and sends every chained flow on a needless settings-to-picker
+      # detour (#351 review).
+      - extendedWaitUntil:
+          visible: "Test Workspace"
+          timeout: 15000
+          optional: true
+      - runFlow:
+          when:
+            notVisible: "Test Workspace"
+          commands:
+            - tapOn:
+                id: "dashboard:settings"
+            - assertVisible:
+                id: "settings:root"
+            - tapOn:
+                id: "settings:workspaceRow"
+            - assertVisible:
+                id: "workspaceSelector:root"
+
+# Case 2: the picker is up — create the workspace when it's missing, then select
+# and confirm it.
+#
+# The workspace *name* stays a `text:` selector throughout: it is fixture data
+# this suite typed in, not product copy (see README.md → Selectors).
+- runFlow:
+    when:
+      visible:
+        id: "workspaceSelector:root"
     commands:
       # Branch on the workspace *row*, not on the confirm button: that button is
       # labelled after whichever workspace is currently highlighted ("Use Empty
@@ -26,26 +66,32 @@ name: Workspace — Create and select test workspace
             notVisible: "Test Workspace"
           commands:
             - tapOn:
-                text: "New workspace"
+                id: "workspaceSelector:create"
             - assertVisible:
-                text: "New workspace"
+                id: "workspaceCreation:root"
             - tapOn:
-                text: "Workspace name"
+                id: "workspaceCreation:name"
             - inputText: "Test Workspace"
             # Don't hideKeyboard: the AVD runs with hw.keyboard=yes, so no soft IME
             # is shown; Maestro then falls back to a BACK keypress which dismisses
             # the creation screen. The "Create" action lives in the TopAppBar so
             # the (absent) keyboard never overlaps it anyway.
             - tapOn:
-                text: "Create"
+                id: "workspaceCreation:save"
 
       # Select the row, then confirm — the picker only enables the confirm
       # button for the highlighted workspace.
       - tapOn:
           text: "Test Workspace"
       - tapOn:
-          text: "Use Test Workspace"
+          id: "workspaceSelector:confirm"
 
-# Assert we landed on Dashboard content
+# Assert we landed on Dashboard content, in the workspace this flow promises.
+# The name is waited on rather than asserted outright: it arrives with the rest
+# of the dashboard state, so a bare assertVisible races the fallback title on a
+# loaded emulator — the same read 03 already guards with an explicit wait.
 - assertVisible:
-    text: "Accounts"
+    id: "dashboard:root"
+- extendedWaitUntil:
+    visible: "Test Workspace"
+    timeout: 20000

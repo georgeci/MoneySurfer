@@ -28,6 +28,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -40,6 +41,7 @@ import com.georgeci.moneysurfer.uikit.components.SurferButtonSize
 import com.georgeci.moneysurfer.uikit.components.SurferButtonStyle
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
+import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.utils.HandleSideEffect
 import kotlinx.coroutines.launch
@@ -63,6 +65,13 @@ import moneysurfer.feature.workspace.generated.resources.workspace_invite_title
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
+
+/** Stable selectors for the workspace invite screen — see docs/testing/testing-strategy.md. */
+object WorkspaceInviteTestTags {
+    const val Root = "workspaceInvite:root"
+    const val Email = "workspaceInvite:email"
+    const val Send = "workspaceInvite:send"
+}
 
 @Composable
 fun WorkspaceInviteScreen(
@@ -107,7 +116,10 @@ private fun InviteContent(
     onEvent: (WorkspaceInviteEvent) -> Unit,
 ) {
     Scaffold(
-        modifier = Modifier.surferSafeInsets(),
+        modifier = Modifier
+            .surferSafeInsets()
+            .testTag(WorkspaceInviteTestTags.Root)
+            .surferTestTagAsId(),
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(Res.string.workspace_invite_title)) },
@@ -158,7 +170,9 @@ private fun InviteContent(
                 size = SurferButtonSize.Biggest,
                 enabled = state.email.isNotBlank() && !state.isSubmitting,
                 onClick = { onEvent(WorkspaceInviteEvent.OnSubmit) },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag(WorkspaceInviteTestTags.Send),
             )
 
             Spacer(Modifier.height(padding.calculateBottomPadding() + AppTheme.spacing.large))
@@ -184,7 +198,9 @@ private fun EmailField(
         OutlinedTextField(
             value = value,
             onValueChange = onChange,
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .testTag(WorkspaceInviteTestTags.Email),
             enabled = enabled,
             isError = error != null,
             singleLine = true,

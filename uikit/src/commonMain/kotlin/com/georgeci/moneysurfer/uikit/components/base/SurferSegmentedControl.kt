@@ -21,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
@@ -32,6 +33,10 @@ import com.georgeci.moneysurfer.uikit.theme.AppTheme
  * Pill-shaped segmented control for picking exactly one value from a small set of options.
  * Selected segment gets the secondaryContainer fill plus a leading check; segments are split by
  * 1dp outline dividers. Caller renders any section label above the control.
+ *
+ * [optionTestTag] tags each segment individually. The row-level [modifier] cannot do that, and
+ * without a per-segment tag an E2E driver has nothing to aim at but the segment's localized
+ * label — which is exactly the coupling issue #352 removes.
  */
 @Composable
 fun <T> SurferSegmentedControl(
@@ -40,6 +45,7 @@ fun <T> SurferSegmentedControl(
     label: @Composable (T) -> String,
     onSelect: (T) -> Unit,
     modifier: Modifier = Modifier,
+    optionTestTag: ((T) -> String)? = null,
 ) {
     val outline = AppTheme.materialColors.outline
     Row(
@@ -63,7 +69,8 @@ fun <T> SurferSegmentedControl(
                     .weight(1f)
                     .fillMaxHeight()
                     .background(bg)
-                    .clickable { onSelect(value) },
+                    .clickable { onSelect(value) }
+                    .then(optionTestTag?.let { Modifier.testTag(it(value)) } ?: Modifier),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center,
             ) {

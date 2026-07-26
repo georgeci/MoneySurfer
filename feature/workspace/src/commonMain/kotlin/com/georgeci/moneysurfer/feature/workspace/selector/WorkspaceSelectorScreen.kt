@@ -17,6 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.georgeci.moneysurfer.domain.model.Workspace
@@ -31,6 +32,7 @@ import com.georgeci.moneysurfer.uikit.components.workspace.SurferCreateWorkspace
 import com.georgeci.moneysurfer.uikit.components.workspace.SurferWorkspaceRow
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
+import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.utils.HandleSideEffect
 import moneysurfer.feature.workspace.generated.resources.Res
@@ -50,6 +52,13 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 import kotlin.time.Instant
+
+/** Stable selectors for the workspace selector screen — see docs/testing/testing-strategy.md. */
+object WorkspaceSelectorTestTags {
+    const val Root = "workspaceSelector:root"
+    const val Create = "workspaceSelector:create"
+    const val Confirm = "workspaceSelector:confirm"
+}
 
 /**
  * [cloudDataUnavailable] comes straight from the route: the account owns workspaces that the
@@ -119,6 +128,9 @@ private fun WorkspaceSelectorContent(
 
     Box(modifier = Modifier.fillMaxSize()) {
         Scaffold(
+            modifier = Modifier
+                .testTag(WorkspaceSelectorTestTags.Root)
+                .surferTestTagAsId(),
             containerColor = AppTheme.materialColors.surface,
             topBar = {
                 SurferToolbar(
@@ -220,10 +232,12 @@ private fun WorkspaceSelectorContent(
                         title = stringResource(Res.string.workspace_selector_create_title),
                         subtitle = stringResource(Res.string.workspace_selector_create_subtitle),
                         onClick = { onEvent(WorkspaceSelectorEvent.OnCreateWorkspaceClick) },
-                        modifier = Modifier.padding(
-                            horizontal = AppTheme.spacing.default,
-                            vertical = AppTheme.spacing.small,
-                        ),
+                        modifier = Modifier
+                            .padding(
+                                horizontal = AppTheme.spacing.default,
+                                vertical = AppTheme.spacing.small,
+                            )
+                            .testTag(WorkspaceSelectorTestTags.Create),
                     )
                 }
             }
@@ -257,7 +271,9 @@ private fun ConfirmBar(
         SurferButton(
             text = label,
             onClick = onClick,
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .testTag(WorkspaceSelectorTestTags.Confirm),
             size = SurferButtonSize.Biggest,
             enabled = enabled,
             endIcon = SurferIcons.ChevronRight,

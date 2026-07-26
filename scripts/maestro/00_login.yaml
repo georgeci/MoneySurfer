@@ -15,7 +15,7 @@ tags:
 # a genuinely logged-out launch fall straight through to the sign-in branch.
 - extendedWaitUntil:
     visible:
-      text: "Choose a workspace"
+      id: "workspaceSelector:root"
     timeout: 12000
     optional: true
 
@@ -50,4 +50,4 @@ tags:
           id: "signIn:submit"
 
       - assertVisible:
-          text: "Choose a workspace"
+          id: "workspaceSelector:root"

@@ -13,6 +13,7 @@ import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.uikit.widgets.LocalSurferWidgetSize
 import com.georgeci.moneysurfer.uikit.widgets.SurferAccountItem
 import com.georgeci.moneysurfer.uikit.widgets.SurferAccountsWidget
+import com.georgeci.moneysurfer.uikit.widgets.SurferAddAccountCta
 import com.georgeci.moneysurfer.uikit.widgets.SurferBalanceFootnote
 import com.georgeci.moneysurfer.uikit.widgets.SurferBalanceVariant
 import com.georgeci.moneysurfer.uikit.widgets.SurferBalanceWidget
@@ -113,9 +114,11 @@ private fun AccountsPreview(modifier: Modifier) {
                 balance = SAMPLE_ACCOUNT_THREE,
             ),
         ),
-        onAddClick = {},
-        addLabel = stringResource(Res.string.dashboard_add_account),
-        addCtaTrailingLabel = stringResource(Res.string.dashboard_accounts_manage),
+        addCta = SurferAddAccountCta(
+            label = stringResource(Res.string.dashboard_add_account),
+            onClick = {},
+            trailingLabel = stringResource(Res.string.dashboard_accounts_manage),
+        ),
         modifier = modifier,
     )
 }

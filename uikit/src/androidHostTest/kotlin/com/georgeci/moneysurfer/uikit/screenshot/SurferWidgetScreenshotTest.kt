@@ -10,6 +10,7 @@ import androidx.compose.ui.unit.dp
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.widgets.SurferAccountItem
 import com.georgeci.moneysurfer.uikit.widgets.SurferAccountsWidget
+import com.georgeci.moneysurfer.uikit.widgets.SurferAddAccountCta
 import com.georgeci.moneysurfer.uikit.widgets.SurferBalanceFootnote
 import com.georgeci.moneysurfer.uikit.widgets.SurferBalanceVariant
 import com.georgeci.moneysurfer.uikit.widgets.SurferBalanceWidget
@@ -83,8 +84,7 @@ class SurferWidgetScreenshotTest {
                         icon = SurferIcons.Savings,
                     ),
                 ),
-                onAddClick = {},
-                addLabel = "Add account",
+                addCta = SurferAddAccountCta(label = "Add account", onClick = {}),
                 modifier = Modifier.fillMaxWidth(),
                 size = SurferWidgetSize.Hero,
             )
