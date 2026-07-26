@@ -150,7 +150,7 @@ class TransactionCreationViewModel(
                 // somewhere [changeType] would refuse to go.
                 showTransferShortcut = slot == AccountSlot.Single &&
                     !state.isEditMode &&
-                    hostCapabilities.transferEnabled,
+                    state.transferEnabled,
             ),
         )
     }
@@ -159,7 +159,9 @@ class TransactionCreationViewModel(
         val content = this as? TransactionCreationState.Content ?: return@updateState this
         // Editing an existing single-leg transaction can't morph into a paired transfer in place;
         // ignore the switch so we don't desync the type with the row that's about to be updated.
-        if (nextType == TransactionTypeUi.Transfer && (content.isEditMode || !hostCapabilities.transferEnabled)) {
+        // `content.transferEnabled` rather than a fresh `hostCapabilities` read: a QA override landing
+        // mid-screen would otherwise leave a rendered Transfer segment that this guard refuses.
+        if (nextType == TransactionTypeUi.Transfer && (content.isEditMode || !content.transferEnabled)) {
             return@updateState content
         }
         val nextCategoryType = if (nextType == TransactionTypeUi.Income) {

@@ -14,7 +14,10 @@ private class TestKeyGroup : ConfigKeyGroup {
     override val keys: List<ConfigKey<*>> = listOf(FLAG, CHOICE)
 }
 
-private class Env(debugActive: Boolean = true) {
+private class Env(
+    debugActive: Boolean = true,
+    keyGroups: List<ConfigKeyGroup> = listOf(TestKeyGroup()),
+) {
     val debug = FakeDebugConfigSource(isActive = debugActive)
     private val local = FakeLocalConfigSource()
     val config = LayeredConfig(
@@ -24,7 +27,7 @@ private class Env(debugActive: Boolean = true) {
     )
     val inspector = DebugConfigInspectorImpl(
         config = config,
-        registry = ConfigRegistry(listOf(TestKeyGroup())),
+        registry = ConfigRegistry(keyGroups),
         debugSource = debug,
     )
 }
@@ -70,6 +73,37 @@ class DebugConfigInspectorImplSpec : StringSpec({
             row.effectiveValue shouldBe "false"
             row.winner shouldBe "Debug"
             row.overridden shouldBe true
+        }
+    }
+
+    "an override the codec can no longer read is still clearable per row" {
+        runTest {
+            // A codec whose wire format changed between builds leaves values like this behind. They
+            // do not win, so deriving `overridden` from the winning layer left the row with no clear
+            // action and "Reset all" — which drops every other override — as the only way out.
+            val env = Env()
+            env.config.hydrate()
+            env.debug.override(FLAG, "perhaps")
+
+            val row = env.inspector.rows.first().single { it.name == "panel.flag" }
+
+            row.winner shouldBe "Build"
+            row.overridden shouldBe true
+
+            env.inspector.clearOverride("panel.flag")
+            env.inspector.rows.first().single { it.name == "panel.flag" }.overridden shouldBe false
+        }
+    }
+
+    "host-identity keys are flagged so the panel can say they are not ordinary flags" {
+        runTest {
+            val env = Env(keyGroups = listOf(TestKeyGroup(), HostConfigKeyGroup()))
+            env.config.hydrate()
+
+            val rows = env.inspector.rows.first()
+
+            rows.single { it.name == HostConfigKeys.isOffline.name }.hostOwned shouldBe true
+            rows.single { it.name == "panel.flag" }.hostOwned shouldBe false
         }
     }
 

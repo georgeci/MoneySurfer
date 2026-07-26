@@ -89,9 +89,46 @@ internal class FakeRemoteGlobalConfigSource(
     override suspend fun hydrate() = delegate.hydrate()
 }
 
-/** Models a store that cannot be read at all — a truncated preferences file. */
+/**
+ * A source that throws out of `hydrate()` instead of degrading. Models a badly behaved third-party
+ * layer, not a DataStore-backed one — `PreferencesMirror` swallows its own read failures and reports
+ * [ConfigSource.isDegraded], which is what [SelfReportingDegradedSource] models.
+ */
 internal class UnreadableConfigSource(override val layer: ConfigLayer) : ConfigSource {
     override fun <T : Any> peek(key: ConfigKey<T>): LayerValue<T> = LayerValue.Absent
     override val changes: Flow<Unit> = flowOf(Unit)
     override suspend fun hydrate(): Unit = error("corrupt store")
+}
+
+/**
+ * A store that cannot be read the way the real DataStore-backed layers behave it: reads resolve as
+ * absent, [isDegraded] says so, and neither `hydrate()` nor `changes` fails — because both run on
+ * the startup path, where a throw has no route to fall back to.
+ *
+ * [recover] flips it back, so a spec can assert the flag clears without any retry logic.
+ */
+internal class SelfReportingDegradedSource(
+    override val layer: ConfigLayer,
+    private val values: Map<String, String> = emptyMap(),
+) : ConfigSource {
+
+    private var degraded = true
+
+    override val isDegraded: Boolean get() = degraded
+
+    override fun <T : Any> peek(key: ConfigKey<T>): LayerValue<T> =
+        if (degraded) LayerValue.Absent else key.layerValueOf(values[key.name])
+
+    override val changes: Flow<Unit> = flowOf(Unit)
+
+    override suspend fun hydrate() = Unit
+
+    fun recover() {
+        degraded = false
+    }
+}
+
+private fun <T : Any> ConfigKey<T>.layerValueOf(raw: String?): LayerValue<T> = when (raw) {
+    null -> LayerValue.Absent
+    else -> codec.decode(raw)?.let { LayerValue.Present(it) } ?: LayerValue.Undecodable(raw)
 }

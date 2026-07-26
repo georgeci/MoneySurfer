@@ -42,7 +42,12 @@ interface DebugConfigInspector {
  * @param winner name of the layer that won, or `"default"` when no layer holds the key.
  * @param kind which control to render — a text field for `PaletteSource`'s `PRESET:<seed>` format
  *   is a routine way to fail.
- * @param overridden `true` when the Debug layer is what won, i.e. this row can be cleared.
+ * @param overridden `true` when the Debug layer holds anything for this key, i.e. this row can be
+ *   cleared. Deliberately not "the Debug layer won": an override the codec can no longer read does
+ *   not win, and it is exactly the one a tester needs to remove.
+ * @param hostOwned `true` for a key that describes the build itself (`host.*`). Overriding one of
+ *   these changes what the app believes it is while its DI graph stays as compiled — useful for QA,
+ *   but not the same kind of switch as a feature flag, so the panel says so.
  */
 data class ConfigDebugRow(
     val name: String,
@@ -50,6 +55,7 @@ data class ConfigDebugRow(
     val winner: String,
     val kind: ConfigDebugRowKind,
     val overridden: Boolean,
+    val hostOwned: Boolean = false,
     val layers: List<ConfigDebugLayerCell>,
 )
 

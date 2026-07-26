@@ -29,7 +29,11 @@ interface Config {
      */
     fun <T : Any> handle(key: SettingKey<T>): Pref<T>
 
-    /** Per-layer detail for the debug panel. Layers stay honest here — nothing is clamped. */
+    /**
+     * Per-layer detail for the debug panel. Layers stay honest here — nothing is clamped, including
+     * a RemoteGlobal value the `remoteOverridable` opt-in refuses: it is reported as held and simply
+     * never wins.
+     */
     fun <T : Any> resolve(key: ConfigKey<T>): ConfigResolution<T>
 
     /**
@@ -65,6 +69,10 @@ data class ConfigResolution<T : Any>(
     val value: T,
     /** `null` when no layer holds the key and `key.default` won. */
     val winner: ConfigLayer?,
-    /** Absent vs undecodable are distinct — the panel must show which. */
+    /**
+     * What each layer holds, not what it was allowed to serve. Absent vs undecodable are distinct —
+     * the panel must show which — and a value present in a layer that did not win was either
+     * outranked or refused by the remote opt-in.
+     */
     val perLayer: Map<ConfigLayer, LayerValue<T>>,
 )

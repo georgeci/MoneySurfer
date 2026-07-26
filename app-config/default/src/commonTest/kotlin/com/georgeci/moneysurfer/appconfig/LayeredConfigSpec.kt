@@ -103,7 +103,11 @@ class LayeredConfigSpec : StringSpec({
             engine.hydrate()
 
             engine.snapshot(HOST_FACT) shouldBe false
-            engine.resolve(HOST_FACT).perLayer[ConfigLayer.RemoteGlobal] shouldBe LayerValue.Absent
+            // The refused value is still reported per layer: the debug panel is the only tool for
+            // diagnosing remote config, and "the server sent nothing" and "the server sent
+            // something we ignored" are different bugs.
+            engine.resolve(HOST_FACT).perLayer[ConfigLayer.RemoteGlobal] shouldBe LayerValue.Present(true)
+            engine.resolve(HOST_FACT).winner shouldBe ConfigLayer.Build
         }
     }
 
@@ -225,6 +229,53 @@ class LayeredConfigSpec : StringSpec({
             engine.hydrate()
 
             // One bad file must not cost the user their stored settings.
+            engine.snapshot(USER_SETTING) shouldBe false
+        }
+    }
+
+    "a source that reports itself degraded is named without throwing anywhere" {
+        runTest {
+            // How the DataStore-backed layers actually fail: `hydrate()` and `changes` both succeed
+            // (they must — the startup coroutine has no route to fall back to) and the source says
+            // it could not be read. Reads therefore have to work too, which is what the old
+            // hydrate-only mechanism never covered.
+            val unreadable = SelfReportingDegradedSource(
+                layer = ConfigLayer.Local,
+                values = mapOf(USER_SETTING.name to "false"),
+            )
+            val engine = LayeredConfig(
+                layers = listOf(FakeDebugConfigSource(), unreadable, BuildConfigSource { }),
+                local = FakeLocalConfigSource(),
+                failFastOnEarlySnapshot = true,
+            )
+            engine.hydrate()
+
+            engine.degradedLayers shouldBe setOf(ConfigLayer.Local)
+            // The stored `false` is unreachable while the store is broken, so the default stands in.
+            engine.snapshot(USER_SETTING) shouldBe true
+            engine.observe(USER_SETTING).first() shouldBe true
+        }
+    }
+
+    "a degraded layer stops being reported once its store recovers" {
+        runTest {
+            // The old mechanism latched the set inside `hydrate()`, which returns early forever
+            // after — so the panel kept flagging a layer that had been serving correct values for
+            // hours.
+            val unreadable = SelfReportingDegradedSource(
+                layer = ConfigLayer.Local,
+                values = mapOf(USER_SETTING.name to "false"),
+            )
+            val engine = LayeredConfig(
+                layers = listOf(FakeDebugConfigSource(), unreadable, BuildConfigSource { }),
+                local = FakeLocalConfigSource(),
+                failFastOnEarlySnapshot = true,
+            )
+            engine.hydrate()
+
+            unreadable.recover()
+
+            engine.degradedLayers.shouldBeEmpty()
             engine.snapshot(USER_SETTING) shouldBe false
         }
     }

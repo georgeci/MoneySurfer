@@ -31,10 +31,16 @@ class LayeredConfig(
     @Volatile
     private var hydrated: Boolean = false
 
+    /**
+     * Layers whose `hydrate()` threw. Latched, because a source that throws rather than reporting
+     * [ConfigSource.isDegraded] gives us no way to observe its recovery — the DataStore-backed
+     * layers do report it, and those clear on their own.
+     */
     @Volatile
-    private var degraded: Set<ConfigLayer> = emptySet()
+    private var hydrationFailures: Set<ConfigLayer> = emptySet()
 
-    override val degradedLayers: Set<ConfigLayer> get() = degraded
+    override val degradedLayers: Set<ConfigLayer>
+        get() = hydrationFailures + layers.filter { it.isDegraded }.map { it.layer }
 
     /**
      * Warms every layer it can and reports the ones it could not.
@@ -49,13 +55,16 @@ class LayeredConfig(
      * `CrashReportingLogWriter` turns into a Crashlytics non-fatal) and the layer stays in
      * [degradedLayers] so the debug panel can say "unavailable" rather than implying the layer is
      * simply empty. Recovery needs no retry logic — the mirror refills from the source's `changes`
-     * flow as soon as the store is readable again.
+     * flow as soon as the store is readable again, and [ConfigSource.isDegraded] stops reporting it.
+     *
+     * A source is expected to swallow its own read failures and report [ConfigSource.isDegraded];
+     * the catch here is the backstop for one that throws anyway.
      */
     override suspend fun hydrate() {
         if (hydrated) return
         hydration.withLock {
             if (hydrated) return
-            degraded = layers.mapNotNullTo(mutableSetOf()) { source -> source.hydrateOrNull() }
+            hydrationFailures = layers.mapNotNullTo(mutableSetOf()) { source -> source.hydrateOrNull() }
             hydrated = true
         }
     }
@@ -94,11 +103,15 @@ class LayeredConfig(
         var winner: ConfigLayer? = null
         var winningValue: T? = null
         layers.forEach { source ->
-            val layerValue = source.served(key)
-            perLayer[source.layer] = layerValue
-            if (winner == null && layerValue is LayerValue.Present) {
+            // What the layer holds goes into `perLayer` verbatim; what it is *allowed* to serve is a
+            // separate question. Reporting a refused value as absent would leave the debug panel
+            // unable to tell "the server sent nothing" from "the server sent something we ignored".
+            val held = source.held(key)
+            perLayer[source.layer] = held
+            val served = if (source.mayServe(key)) held else LayerValue.Absent
+            if (winner == null && served is LayerValue.Present) {
                 winner = source.layer
-                winningValue = layerValue.value
+                winningValue = served.value
             }
         }
         return ConfigResolution(
@@ -109,16 +122,24 @@ class LayeredConfig(
     }
 
     /**
-     * Applies the remote opt-in centrally: a `RemoteGlobalConfigSource` that ignored
+     * The remote opt-in, applied centrally: a `RemoteGlobalConfigSource` that ignored
      * [ConfigKey.remoteOverridable] still cannot override a host fact or seed a user setting.
-     * Also where an undecodable stored value is logged — once, at the resolution boundary, instead
-     * of in every source.
      */
-    private fun <T : Any> ConfigSource.served(key: ConfigKey<T>): LayerValue<T> {
-        if (layer == ConfigLayer.RemoteGlobal && !key.remoteOverridable) return LayerValue.Absent
+    private fun ConfigSource.mayServe(key: ConfigKey<*>): Boolean =
+        layer != ConfigLayer.RemoteGlobal || key.remoteOverridable
+
+    /**
+     * What the layer holds, whatever the engine will do with it. Also where an undecodable stored
+     * value — and a remote value the opt-in refuses — is logged: once, at the resolution boundary,
+     * instead of in every source.
+     */
+    private fun <T : Any> ConfigSource.held(key: ConfigKey<T>): LayerValue<T> {
         val value = peek(key)
-        if (value is LayerValue.Undecodable) {
-            log.w { "[$layer] ${key.name} holds an undecodable value — treating the layer as absent" }
+        when {
+            value is LayerValue.Undecodable ->
+                log.w { "[$layer] ${key.name} holds an undecodable value — treating the layer as absent" }
+            value is LayerValue.Present && !mayServe(key) ->
+                log.w { "[$layer] ${key.name} is not remoteOverridable — value refused, resolving without it" }
         }
         return value
     }

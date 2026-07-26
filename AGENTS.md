@@ -200,7 +200,11 @@ Rules for this table:
   [docs/architecture/cloud-login-hydration.md](docs/architecture/cloud-login-hydration.md).
 - A "no-op on failure" and a "no-op because disabled" must not be indistinguishable to
   the caller. If a disabled path returns success, callers downstream of it will act as if
-  the work happened.
+  the work happened. `WorkspaceSyncer.pushAll()` returns `Boolean` for exactly this reason.
+- A caller must not re-read the setting to decide what a gated call did. The gate is a flow now,
+  so two reads can disagree: `CreateWorkspaceUseCase` reading `SyncSettings` itself would let a
+  kill switch retracting mid-call reopen the #342 dangling-ref hole. Take the answer from the
+  call.
 
 ## Firestore Rules
 

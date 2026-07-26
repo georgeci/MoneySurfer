@@ -312,4 +312,6 @@
     <string name="settings_debug_config_layer_absent">нет значения</string>
     <string name="settings_debug_config_layer_undecodable_format">%1$s (не распознано)</string>
     <string name="settings_debug_config_degraded_format">Не удалось прочитать: %1$s — значения ниже берутся из слоёв под ним</string>
+    <string name="settings_debug_config_unavailable">В этой сборке переопределения недоступны — debug-слой пуст, сохранять здесь нечего.</string>
+    <string name="settings_debug_config_host_owned">Идентичность сборки — переопределение не меняет уже скомпилированную сборку графа.</string>
 </resources>

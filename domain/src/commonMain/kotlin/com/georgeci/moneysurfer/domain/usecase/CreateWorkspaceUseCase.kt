@@ -1,11 +1,11 @@
 package com.georgeci.moneysurfer.domain.usecase
 
 import arrow.core.Either
+import arrow.core.raise.Raise
 import arrow.core.raise.either
 import co.touchlab.kermit.Logger
 import com.georgeci.moneysurfer.domain.auth.SessionMutator
 import com.georgeci.moneysurfer.domain.auth.SessionPointers
-import com.georgeci.moneysurfer.domain.config.SyncSettings
 import com.georgeci.moneysurfer.domain.constants.DEFAULT_CATEGORY_SEEDS
 import com.georgeci.moneysurfer.domain.logging.redactUid
 import com.georgeci.moneysurfer.domain.model.Category
@@ -29,8 +29,8 @@ import kotlin.time.Instant
  * End-to-end create-workspace flow:
  *  1. Local: insert Workspace + WorkspaceMember(OWNER) + default Category rows.
  *  2. Remote: push the workspace to Firestore and append the wid to `users/{uid}.workspaceIds`
- *     so other devices see it. Skipped for the local "demo" session (no Firebase uid) and
- *     whenever [SyncSettings] says sync is off.
+ *     so other devices see it. Skipped for the local "demo" session (no Firebase uid), and for a
+ *     push that did not land because sync is switched off.
  *  3. Pin the new workspace as the active one so the next screen lands on Dashboard.
  */
 @Single
@@ -44,7 +44,6 @@ class CreateWorkspaceUseCase(
     private val session: SessionPointers,
     private val sessionMutator: SessionMutator,
     private val getCurrentTime: GetCurrentTimeUseCase,
-    private val syncSettings: SyncSettings,
 ) {
     private val log = Logger.withTag(TAG)
 
@@ -77,52 +76,51 @@ class CreateWorkspaceUseCase(
         //
         // Demo session (no Firebase uid) → no remote contract; success is local-only.
         //
-        // The setting has to be checked HERE and not only inside `WorkspaceSyncer`: with sync off
-        // `pushAll()` returns normally, which is indistinguishable from a landed push, so the
-        // two `UserRemoteRepository` calls below would still run and fill
-        // `users/{uid}.workspaceIds` with ids whose `workspaces/{wid}` document was never
-        // created — exactly the dangling refs the block above exists to prevent (issue #342).
-        val syncEnabled = syncSettings.isEnabled.first()
+        // The two `UserRemoteRepository` calls below are conditional on the push having actually
+        // landed, and `pushAll()` reports that itself. Re-reading `SyncSettings` here instead would
+        // be a second read of a live setting: a server kill switch retracting between the two reads
+        // would let this branch run against a push that silently did nothing, filling
+        // `users/{uid}.workspaceIds` with ids whose `workspaces/{wid}` document was never created —
+        // exactly the dangling refs the block above exists to prevent (issue #342).
         val firebaseUid = session.currentFirebaseUid.first()
-        if (firebaseUid != null && syncEnabled) {
-            Either.catch { workspaceSyncer.pushAll() }
-                .onLeft { log.w(it) { "[remote] pushAll failed wid=${newId.value}" } }
-                .onRight { log.i { "[remote] pushAll ok wid=${newId.value}" } }
-                .mapLeft { CreateWorkspaceError.RemoteSyncFailed(it) }
-                .bind()
-
-            // sync landed → register the workspace under users/{uid}.workspaceIds + pin as default.
-            // These two are best-effort: a transient failure here doesn't invalidate the workspace,
-            // it just means cross-device discovery is delayed until the next sync cycle.
-            Either.catch { userRemoteRepository.addWorkspaceRef(firebaseUid, newId) }
-                .onLeft {
-                    log.w(it) {
-                        "[remote] addWorkspaceRef failed uid=${firebaseUid.redactUid()} wid=${newId.value}"
-                    }
-                }
-                .onRight {
-                    log.i { "[remote] addWorkspaceRef ok uid=${firebaseUid.redactUid()} wid=${newId.value}" }
-                }
-            Either.catch { userRemoteRepository.setDefaultWorkspace(firebaseUid, newId) }
-                .onLeft {
-                    log.w(it) {
-                        "[remote] setDefaultWorkspace failed uid=${firebaseUid.redactUid()} wid=${newId.value}"
-                    }
-                }
-                .onRight {
-                    log.i { "[remote] setDefaultWorkspace ok uid=${firebaseUid.redactUid()} wid=${newId.value}" }
-                }
+        if (firebaseUid == null) {
+            log.i { "[remote] skipped (no Firebase uid — local/demo session)" }
         } else {
-            log.i {
-                "[remote] skipped (firebaseUid=${firebaseUid != null} " +
-                    "syncEnabled=$syncEnabled) — local-only workspace"
-            }
+            registerRemotely(firebaseUid = firebaseUid, newId = newId)
         }
 
         sessionMutator.setCurrentWorkspace(newId)
         log.i { "[done] wid=${newId.value} pinned as current workspace" }
 
         newId
+    }
+
+    /**
+     * Push the new workspace, then register it under `users/{uid}` — but only if the push actually
+     * landed. `pushAll()` returning `false` means sync is off, so the `workspaces/{wid}` document
+     * does not exist and a ref to it would be dangling.
+     */
+    private suspend fun Raise<CreateWorkspaceError>.registerRemotely(firebaseUid: String, newId: WorkspaceId) {
+        val pushed = Either.catch { workspaceSyncer.pushAll() }
+            .onLeft { log.w(it) { "[remote] pushAll failed wid=${newId.value}" } }
+            .onRight { landed -> log.i { "[remote] pushAll landed=$landed wid=${newId.value}" } }
+            .mapLeft { CreateWorkspaceError.RemoteSyncFailed(it) }
+            .bind()
+
+        if (!pushed) {
+            log.i { "[remote] sync is off — wid=${newId.value} stays local-only, no ref registered" }
+            return
+        }
+
+        // Best-effort: a transient failure here doesn't invalidate the workspace, it just means
+        // cross-device discovery is delayed until the next sync cycle.
+        val at = "uid=${firebaseUid.redactUid()} wid=${newId.value}"
+        Either.catch { userRemoteRepository.addWorkspaceRef(firebaseUid, newId) }
+            .onLeft { log.w(it) { "[remote] addWorkspaceRef failed $at" } }
+            .onRight { log.i { "[remote] addWorkspaceRef ok $at" } }
+        Either.catch { userRemoteRepository.setDefaultWorkspace(firebaseUid, newId) }
+            .onLeft { log.w(it) { "[remote] setDefaultWorkspace failed $at" } }
+            .onRight { log.i { "[remote] setDefaultWorkspace ok $at" } }
     }
 
     private suspend fun writeLocal(

@@ -238,7 +238,7 @@ private object StubWorkspaceRepository : WorkspaceRepository {
 }
 
 private object StubWorkspaceSyncer : WorkspaceSyncer {
-    override suspend fun pushAll() = error(UNUSED)
+    override suspend fun pushAll(): Boolean = error(UNUSED)
     override suspend fun syncAll() = error(UNUSED)
     override suspend fun syncWorkspace(workspaceId: WorkspaceId) = error(UNUSED)
 }

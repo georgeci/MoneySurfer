@@ -96,4 +96,22 @@ class LocalConfigSourceImplJvmTest : StringSpec({
 
         store.data.first()[stringPreferencesKey("config.${KEY.name}")] shouldBe "maybe"
     }
+
+    "a corrupt file degrades the layer instead of throwing out of hydrate or of the change flow" {
+        // The app's own settings store has no `ReplaceFileCorruptionHandler` on purpose (it also
+        // holds the session pointers), so `dataStore.data` throws `CorruptionException` for the life
+        // of the install. Both the startup `hydrate()` and every `Config.observe` collector run
+        // through here, and the startup one has no route to fall back to — so neither may throw.
+        val dir = Files.createTempDirectory("ms-config-corrupt-test")
+        val file = dir.resolve("config.preferences_pb")
+        Files.write(file, byteArrayOf(0x1, 0x2, 0x3, 0x4, 0x5))
+        val source = LocalConfigSourceImpl(createDataStore { file.toString() })
+
+        source.hydrate()
+
+        source.isDegraded shouldBe true
+        source.peek(KEY) shouldBe LayerValue.Absent
+        // The flow a `Config.observe` collector subscribes to still emits rather than failing.
+        source.changes.first() shouldBe Unit
+    }
 })

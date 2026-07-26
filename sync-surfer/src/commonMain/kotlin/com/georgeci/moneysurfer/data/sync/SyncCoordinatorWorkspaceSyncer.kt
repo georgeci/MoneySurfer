@@ -37,11 +37,12 @@ class SyncCoordinatorWorkspaceSyncer(
     // to no-op instead of hitting Firestore. Gating at the syncer keeps the
     // use cases agnostic of the setting.
 
-    override suspend fun pushAll() {
-        if (!syncSettings.isEnabled.first()) return
+    override suspend fun pushAll(): Boolean {
+        if (!syncSettings.isEnabled.first()) return false
         syncCoordinator.requestSync(SyncReason.LOCAL_CHANGE)
             .result.await()
             .fold(ifLeft = { throw it.toException() }, ifRight = { })
+        return true
     }
 
     override suspend fun syncAll() {

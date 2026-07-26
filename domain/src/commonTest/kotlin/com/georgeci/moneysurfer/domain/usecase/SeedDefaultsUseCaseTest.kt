@@ -2,7 +2,6 @@ package com.georgeci.moneysurfer.domain.usecase
 
 import com.georgeci.moneysurfer.domain.auth.InMemorySessionPointers
 import com.georgeci.moneysurfer.domain.constants.DEFAULT_CATEGORY_SEEDS
-import com.georgeci.moneysurfer.domain.fixtures.FakeSyncSettings
 import com.georgeci.moneysurfer.domain.model.Account
 import com.georgeci.moneysurfer.domain.model.Category
 import com.georgeci.moneysurfer.domain.model.User
@@ -129,8 +128,6 @@ private class SeedTestEnv(
         session = session,
         sessionMutator = session,
         getCurrentTime = getCurrentTime,
-        // Offline seed path — there is no Firebase session here either way.
-        syncSettings = FakeSyncSettings(enabled = false),
     )
     val useCase = SeedDefaultsUseCase(
         createWorkspace = createWorkspace,
@@ -213,7 +210,7 @@ private object SeedFakeUserRemoteRepo : UserRemoteRepository {
 }
 
 private object SeedFakeWorkspaceSyncer : WorkspaceSyncer {
-    override suspend fun pushAll() = Unit
+    override suspend fun pushAll(): Boolean = true
     override suspend fun syncAll() = Unit
     override suspend fun syncWorkspace(workspaceId: WorkspaceId) = Unit
 }

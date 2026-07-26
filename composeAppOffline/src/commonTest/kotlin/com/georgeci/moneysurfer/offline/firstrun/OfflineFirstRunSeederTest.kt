@@ -2,7 +2,6 @@ package com.georgeci.moneysurfer.offline.firstrun
 
 import com.georgeci.moneysurfer.domain.auth.AuthLocalRepository
 import com.georgeci.moneysurfer.domain.auth.InMemorySessionPointers
-import com.georgeci.moneysurfer.domain.config.SyncSettings
 import com.georgeci.moneysurfer.domain.constants.PREFILLED_DEFAULT_USER_ID
 import com.georgeci.moneysurfer.domain.model.Account
 import com.georgeci.moneysurfer.domain.model.Category
@@ -138,8 +137,6 @@ private class SeederEnv(
         session = session,
         sessionMutator = session,
         getCurrentTime = getCurrentTime,
-        // Offline build: sync is off, exactly as `offlineConfigModule` declares `host.sync_enabled`.
-        syncSettings = SeederSyncOff,
     )
     private val seedDefaults = SeedDefaultsUseCase(
         createWorkspace = createWorkspace,
@@ -240,16 +237,7 @@ private object SeederFakeUserRemoteRepo : UserRemoteRepository {
 }
 
 private object SeederFakeWorkspaceSyncer : WorkspaceSyncer {
-    override suspend fun pushAll() = Unit
+    override suspend fun pushAll(): Boolean = true
     override suspend fun syncAll() = Unit
     override suspend fun syncWorkspace(workspaceId: WorkspaceId) = Unit
-}
-
-/**
- * The offline build's sync term: always off, exactly as `offlineConfigModule` declares
- * `host.sync_enabled`. Local rather than from `domain-test-fixtures`, which this source set
- * does not depend on.
- */
-private object SeederSyncOff : SyncSettings {
-    override val isEnabled: Flow<Boolean> = flowOf(false)
 }

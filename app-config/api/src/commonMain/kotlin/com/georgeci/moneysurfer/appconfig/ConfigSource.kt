@@ -41,11 +41,27 @@ interface ConfigSource {
     /** Reads the warmed mirror. Cold (un-hydrated, unobserved) sources report [LayerValue.Absent]. */
     fun <T : Any> peek(key: ConfigKey<T>): LayerValue<T>
 
-    /** Emits once with the current state, then again after every change this source serves. */
+    /**
+     * Emits once with the current state, then again after every change this source serves.
+     *
+     * Must not fail. A source whose backing store cannot be read reports [isDegraded] and emits as
+     * if it were empty: this flow is collected on the startup path, before a start route exists, so
+     * a throw here takes the whole app down rather than costing one layer.
+     */
     val changes: Flow<Unit>
 
-    /** Warms the in-memory mirror. Idempotent. */
+    /** Warms the in-memory mirror. Idempotent. Must not fail — see [isDegraded]. */
     suspend fun hydrate()
+
+    /**
+     * `true` while this source's backing store cannot be read. Its keys then resolve as absent, so
+     * values fall through to the layers below and finally to `key.default` — correct, but not
+     * necessarily current, which is why the debug panel surfaces it.
+     *
+     * Live rather than latched: a store that becomes readable again clears the flag on its next
+     * successful read.
+     */
+    val isDegraded: Boolean get() = false
 }
 
 /**

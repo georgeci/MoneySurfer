@@ -3,7 +3,6 @@ package com.georgeci.moneysurfer.domain.usecase
 import arrow.core.Either
 import com.georgeci.moneysurfer.domain.auth.InMemorySessionPointers
 import com.georgeci.moneysurfer.domain.constants.DEFAULT_CATEGORY_SEEDS
-import com.georgeci.moneysurfer.domain.fixtures.FakeSyncSettings
 import com.georgeci.moneysurfer.domain.model.Category
 import com.georgeci.moneysurfer.domain.model.User
 import com.georgeci.moneysurfer.domain.model.Workspace
@@ -250,11 +249,15 @@ class CreateWorkspaceUseCaseTest : StringSpec({
         env.userRemoteRepo.setDefaultCalls shouldHaveSize 0
     }
 
-    "no remote calls at all when the sync feature is off, even with a Firebase uid" {
-        // Regression for issue #342: `pushAll()` no-ops with the flag off, which used to read as
-        // a landed push — so `addWorkspaceRef` filled `users/{uid}.workspaceIds` with an id whose
-        // `workspaces/{wid}` document was never written. Every online build shipped with the flag
-        // off was corrupting the remote user doc on every workspace creation.
+    "a push that reports nothing landed registers no ref, even with a Firebase uid" {
+        // Regression for issue #342: `pushAll()` no-ops with sync off, which used to read as a
+        // landed push — so `addWorkspaceRef` filled `users/{uid}.workspaceIds` with an id whose
+        // `workspaces/{wid}` document was never written. Every online build shipped with sync off
+        // was corrupting the remote user doc on every workspace creation.
+        //
+        // The decision now comes from `pushAll()`'s own return value rather than a second read of
+        // `SyncSettings`: two reads of a live setting can disagree, and the window between them is
+        // long enough for a server kill switch to reopen exactly this hole.
         val env = TestEnv(
             currentUserId = OWNER_ID,
             firebaseUid = FIREBASE_UID,
@@ -356,7 +359,7 @@ private class TestEnv(
     val memberRepo: FakeWorkspaceMemberRepository = FakeWorkspaceMemberRepository(),
     val categoryRepo: FakeCategoryRepository = FakeCategoryRepository(),
     val userRemoteRepo: FakeUserRemoteRepository = FakeUserRemoteRepository(callLog = callLog),
-    val syncer: FakeWorkspaceSyncer = FakeWorkspaceSyncer(callLog = callLog),
+    val syncer: FakeWorkspaceSyncer = FakeWorkspaceSyncer(syncEnabled = syncEnabled, callLog = callLog),
 ) {
     val session = InMemorySessionPointers(
         currentUserId = currentUserId,
@@ -372,7 +375,6 @@ private class TestEnv(
         session = session,
         sessionMutator = session,
         getCurrentTime = GetCurrentTimeUseCase(ClockUseCase()),
-        syncSettings = FakeSyncSettings(enabled = syncEnabled),
     )
 }
 
@@ -455,13 +457,17 @@ private class FakeUserRemoteRepository(
 
 private class FakeWorkspaceSyncer(
     private val failOnSync: Boolean = false,
+    /** What the real syncer reports when sync is switched off: called, but nothing was pushed. */
+    private val syncEnabled: Boolean = true,
     private val callLog: MutableList<String> = mutableListOf(),
 ) : WorkspaceSyncer {
     var pushAllCount = 0
-    override suspend fun pushAll() {
+    override suspend fun pushAll(): Boolean {
         if (failOnSync) throw RuntimeException("firestore unavailable")
+        if (!syncEnabled) return false
         callLog += "pushAll"
         pushAllCount++
+        return true
     }
     override suspend fun syncAll() = Unit
     override suspend fun syncWorkspace(workspaceId: WorkspaceId) = Unit

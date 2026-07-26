@@ -95,7 +95,10 @@ class ConfigFacadesJvmTest : StringSpec({
 
         host.isOffline shouldBe true
         host.transferEnabled shouldBe false
-        host.signInDemoOnly shouldBe true
+        // The offline host's shape: demo is the only entry point left standing.
+        host.signInEmailPassword shouldBe false
+        host.signInAnonymous shouldBe false
+        host.signInDemo shouldBe true
     }
 
     "the stored palette keeps Dynamic while the effective one clamps it" {

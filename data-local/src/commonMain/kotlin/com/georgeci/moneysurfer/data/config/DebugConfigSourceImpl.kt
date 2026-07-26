@@ -35,6 +35,8 @@ class DebugConfigSourceImpl(dataStore: DataStore<Preferences>) : DebugConfigSour
 
     override suspend fun hydrate() = mirror.hydrate()
 
+    override val isDegraded: Boolean get() = mirror.isDegraded
+
     override suspend fun override(key: ConfigKey<*>, raw: String) {
         mirror.edit { preferences -> preferences[stringPreferencesKey(key.name)] = raw }
     }

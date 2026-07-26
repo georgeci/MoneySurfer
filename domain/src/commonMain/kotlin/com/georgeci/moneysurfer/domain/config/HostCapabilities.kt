@@ -23,8 +23,4 @@ interface HostCapabilities {
 
     /** Multi-account transfers in transaction creation. */
     val transferEnabled: Boolean
-
-    /** True when the sign-in screen should render only the demo CTA. */
-    val signInDemoOnly: Boolean
-        get() = signInDemo && !signInEmailPassword && !signInAnonymous
 }

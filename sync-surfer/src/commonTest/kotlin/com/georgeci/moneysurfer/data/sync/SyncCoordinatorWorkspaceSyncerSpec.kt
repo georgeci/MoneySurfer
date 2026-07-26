@@ -74,7 +74,7 @@ private object AlreadyCompletedHandle : SyncHandle {
 
 class SyncCoordinatorWorkspaceSyncerSpec : StringSpec({
 
-    "pushAll is a no-op when sync is disabled" {
+    "pushAll reports that nothing landed when sync is disabled" {
         runTest {
             val syncer = SyncCoordinatorWorkspaceSyncer(
                 syncCoordinator = RejectingCoordinator(),
@@ -82,7 +82,9 @@ class SyncCoordinatorWorkspaceSyncerSpec : StringSpec({
                 syncSettings = FakeSyncSettings(enabled = false),
             )
 
-            syncer.pushAll()
+            // `false`, not a silent `Unit`: `CreateWorkspaceUseCase` writes `users/{uid}.workspaceIds`
+            // only when a push actually landed, and it takes that answer from here (issue #342).
+            syncer.pushAll() shouldBe false
         }
     }
 
@@ -111,11 +113,11 @@ class SyncCoordinatorWorkspaceSyncerSpec : StringSpec({
                 syncSettings = settings,
             )
 
-            syncer.pushAll()
+            syncer.pushAll() shouldBe true
             coordinator.reasons shouldBe listOf(SyncReason.LOCAL_CHANGE)
 
             settings.set(enabled = false)
-            syncer.pushAll()
+            syncer.pushAll() shouldBe false
             syncer.syncAll()
 
             // No second request: the flag is consulted per call, not cached.

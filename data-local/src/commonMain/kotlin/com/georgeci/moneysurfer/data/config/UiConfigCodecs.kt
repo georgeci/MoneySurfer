@@ -49,15 +49,18 @@ internal object PaletteSourceCodec : ConfigCodec<PaletteSource> {
 }
 
 /**
- * Delegates to the existing flat layout encoding. An empty string is reported as absent, not as an
- * empty layout: "never customised" is what the key default already means.
+ * Delegates to the existing flat layout encoding, through the nullable entry point.
+ *
+ * `DashboardLayoutCodec.decode` substitutes the default layout for anything it cannot parse, which
+ * is the right behaviour for a direct read but wrong here: a value the engine cannot decode has to
+ * be reported as undecodable so the layer loses and the panel can show the raw string. A decoded
+ * default would win and look deliberate.
  */
 internal object DashboardLayoutConfigCodec : ConfigCodec<DashboardLayoutConfig> {
 
     override fun encode(value: DashboardLayoutConfig): String = DashboardLayoutCodec.encode(value)
 
-    override fun decode(raw: String): DashboardLayoutConfig? =
-        if (raw.isEmpty()) null else DashboardLayoutCodec.decode(raw)
+    override fun decode(raw: String): DashboardLayoutConfig? = DashboardLayoutCodec.decodeOrNull(raw)
 
     override val valueKind: ConfigValueKind = ConfigValueKind.FreeText
 }

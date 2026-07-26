@@ -53,7 +53,14 @@ class DebugConfigInspectorImpl(
             effectiveValue = codec.encode(resolution.value),
             winner = resolution.winner?.name ?: DEFAULT_WINNER,
             kind = codec.valueKind.toRowKind(),
-            overridden = resolution.winner == ConfigLayer.Debug,
+            // Anything stored in the Debug layer counts, not just a value that won: an override the
+            // codec can no longer read does not win, and deriving this from the winner left it
+            // unclearable per row — "Reset all" was the only way out, taking every other override
+            // with it.
+            overridden = resolution.perLayer[ConfigLayer.Debug].let {
+                it != null && it != LayerValue.Absent
+            },
+            hostOwned = this in HostConfigKeys.all,
             layers = ConfigLayer.entries.map { layer ->
                 resolution.perLayer[layer].toCell(layer, this)
             },

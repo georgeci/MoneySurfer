@@ -312,4 +312,6 @@
     <string name="settings_debug_config_layer_absent">absent</string>
     <string name="settings_debug_config_layer_undecodable_format">%1$s (undecodable)</string>
     <string name="settings_debug_config_degraded_format">Could not read: %1$s — values below fall back to the layers underneath</string>
+    <string name="settings_debug_config_unavailable">Overrides are unavailable in this build — the debug layer is empty, so nothing here would be stored.</string>
+    <string name="settings_debug_config_host_owned">Build identity — overriding this does not change the wiring that was compiled in.</string>
 </resources>

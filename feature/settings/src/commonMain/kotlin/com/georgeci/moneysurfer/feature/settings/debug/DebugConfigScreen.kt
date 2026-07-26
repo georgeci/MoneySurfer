@@ -34,12 +34,14 @@ import com.georgeci.moneysurfer.utils.HandleSideEffect
 import moneysurfer.feature.settings.generated.resources.Res
 import moneysurfer.feature.settings.generated.resources.settings_debug_config_degraded_format
 import moneysurfer.feature.settings.generated.resources.settings_debug_config_footnote
+import moneysurfer.feature.settings.generated.resources.settings_debug_config_host_owned
 import moneysurfer.feature.settings.generated.resources.settings_debug_config_invalid_format
 import moneysurfer.feature.settings.generated.resources.settings_debug_config_layer_absent
 import moneysurfer.feature.settings.generated.resources.settings_debug_config_layer_undecodable_format
 import moneysurfer.feature.settings.generated.resources.settings_debug_config_reset_all
 import moneysurfer.feature.settings.generated.resources.settings_debug_config_section_keys
 import moneysurfer.feature.settings.generated.resources.settings_debug_config_title
+import moneysurfer.feature.settings.generated.resources.settings_debug_config_unavailable
 import moneysurfer.feature.settings.generated.resources.settings_debug_config_winner_format
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -49,6 +51,7 @@ object DebugConfigTestTags {
     const val Root = "debugConfig:root"
     const val ResetAllRow = "debugConfig:resetAll"
     const val DegradedBanner = "debugConfig:degradedBanner"
+    const val Unavailable = "debugConfig:unavailable"
 
     fun row(name: String): String = "debugConfig:row:$name"
 }
@@ -87,8 +90,9 @@ fun DebugConfigScreen(
     )
 }
 
+/** Stateless content, public so `:composeApp`'s desktop UI tests can mount it — as with the other screens. */
 @Composable
-internal fun DebugConfigContent(
+fun DebugConfigContent(
     state: DebugConfigState,
     snackbarHostState: SnackbarHostState,
     onEvent: (DebugConfigEvent) -> Unit,
@@ -99,6 +103,21 @@ internal fun DebugConfigContent(
         onBack = { onEvent(DebugConfigEvent.OnBackClick) },
         showProgressOverlay = false,
     ) { padding ->
+        if (!state.isAvailable) {
+            // Release builds bind `DebugConfigSource.Empty`, which accepts writes and drops them.
+            // A restored back stack can still land here, and editable rows that silently no-op are
+            // worse than none.
+            Text(
+                text = stringResource(Res.string.settings_debug_config_unavailable),
+                style = AppTheme.typography.bodyMedium,
+                color = AppTheme.materialColors.onSurfaceVariant,
+                modifier = Modifier
+                    .padding(horizontal = 16.dp, vertical = AppTheme.spacing.default)
+                    .testTag(DebugConfigTestTags.Unavailable),
+            )
+            return@SettingsSubScreenScaffold
+        }
+
         if (state.degradedLayers.isNotEmpty()) {
             // A layer whose store failed to load resolves as absent, so every row below it shows a
             // fallback. Saying so beats letting the panel present that fallback as the truth.
@@ -219,6 +238,15 @@ private fun ResolutionSummary(row: ConfigDebugRow) {
             style = AppTheme.typography.bodyMedium,
             color = AppTheme.materialColors.onSurfaceVariant,
         )
+        if (row.hostOwned) {
+            // Overriding one of these makes the app believe it is a different build while its DI
+            // graph stays as compiled — worth saying out loud next to an ordinary feature flag.
+            Text(
+                text = stringResource(Res.string.settings_debug_config_host_owned),
+                style = AppTheme.typography.labelSmall,
+                color = AppTheme.materialColors.error,
+            )
+        }
         row.layers.forEach { cell ->
             val rendered = when {
                 cell.undecodable ->

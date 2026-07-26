@@ -285,7 +285,7 @@ private class BootstrapWorkspaceSyncer(
     private val failOnSync: Boolean = false,
 ) : WorkspaceSyncer {
     var syncAllCount = 0
-    override suspend fun pushAll() = Unit
+    override suspend fun pushAll(): Boolean = true
     override suspend fun syncAll() {
         syncAllCount++
         if (failOnSync) throw RuntimeException("PERMISSION_DENIED: Missing or insufficient permissions")

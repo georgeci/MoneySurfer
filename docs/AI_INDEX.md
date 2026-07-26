@@ -17,7 +17,7 @@
 ## adr-configuration
 - Title: Decision
 - File: docs/adr/ADR-004-configuration.md
-- Lines: 62-832
+- Lines: 62-836
 - Tasks: adr, config, flags, preferences
 
 ## adr-navigation

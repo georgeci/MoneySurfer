@@ -39,6 +39,8 @@ class LocalConfigSourceImpl(dataStore: DataStore<Preferences>) : LocalConfigSour
 
     override suspend fun hydrate() = mirror.hydrate()
 
+    override val isDegraded: Boolean get() = mirror.isDegraded
+
     override suspend fun <T : Any> write(key: SettingKey<T>, value: T) {
         mirror.edit { preferences ->
             preferences[stringPreferencesKey(key.preferenceName)] = key.codec.encode(value)
