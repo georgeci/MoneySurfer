@@ -243,9 +243,27 @@ internal class SyncSettingsImpl(private val config: Config) : SyncSettings {
 }
 ```
 
-Three terms, not two: today's `SyncFeatureFlag` is deliberately `false` in *both* hosts
-because the feature is not shipped, and a `remote && user` pair has no slot for that
-build-owned term — dropping it would silently enable sync at migration step 1.
+Three terms, not two: the offline host has no Firestore to sync against, so its build term is
+`false` while the online host's is `true` (issue #342). A `remote && user` pair has no slot for
+that build-owned term — dropping it would silently enable sync in the offline build.
+
+**What `true → false` does.** The flag is a flow, so a server kill switch can retract
+mid-session and the transition needs a defined shape. The policy is *start nothing new, finish
+what is running*:
+
+| | On `isEnabled` becoming `false` |
+| --- | --- |
+| Periodic ticker | stops — the uid flow is unsubscribed |
+| New sync requests (manual, use-case-driven) | no-op before reaching the coordinator |
+| Queued requests | left to the coordinator's own queue semantics |
+| In-flight sync | **not** cancelled — a half-applied pull is worse than a late one |
+| Manual sync UI | hidden; the route stays registered and the screen re-checks defensively |
+| Outbox `enqueue` | unaffected — local writes keep queueing |
+
+`enqueue` is deliberately outside the gate: `OutboxEnqueuerImpl` already no-ops without a
+Firebase uid, and the sign-in reconciliation in [Session lifecycle](#session-lifecycle) is what
+replays writes made while sync was unavailable. Gating enqueue too would drop those writes
+instead of deferring them.
 
 **Hydration.** Every backing store is suspend-only, so a synchronous `snapshot()` needs an
 in-memory map per source, warmed once. `Config.hydrate()` is a suspend call awaited by
@@ -507,7 +525,8 @@ The only configuration types visible to features are domain facades:
 interface UiPreferences        // exists today, unchanged signature
 interface SyncSettings         // replaces SyncFeatureFlag
 interface HostCapabilities     // replaces OfflineBuildFlags + SignInFeatureConfig + TransactionCreationFeatureConfig
-interface AppVersionGate       // exists today, now reads keys instead of RemoteAppConfig
+interface AppVersionGate       // exists today, unchanged — keeps AppConfigRepository and
+                               // appConfig/mobile; see "Version gate stays as it is"
 interface DebugConfigInspector // debug panel only
 ```
 
@@ -675,6 +694,23 @@ Revisit if a slider-backed key appears.
 - `sync = true` keys are stored in Room `config_entry` (account-scoped, wiped on account
   change); `sync = false` keys stay in DataStore and are never wiped.
 - Layer order is declared explicitly in one place.
+- **An unreadable store never fails a read.** Not just `hydrate()` — every path. `hydrate()` runs
+  before a start route exists and `Config.observe` is collected on the same startup coroutine, so a
+  throw from either kills the app before it has anywhere to fall back to. The rule therefore lives in
+  the source, not in the engine: a layer whose store cannot be read logs at Error severity, serves an
+  empty snapshot, and reports `ConfigSource.isDegraded`. `Config.degradedLayers` is derived from that
+  flag, so it clears by itself the moment the store becomes readable again — no retry logic, and no
+  stale red banner in the debug panel. A degraded layer resolves as absent, so values fall through and
+  stay usable; the panel says which layer is unreadable rather than presenting the fallback as current.
+  Stores whose contents are disposable (the debug-override file) additionally replace themselves on
+  corruption. The app's settings file deliberately does not — it holds the session pointers, and
+  silently replacing it would sign the user out.
+- **A read never writes.** Resolving to `key.default` does not create a Local entry, `hydrate()`
+  does not persist anything, and the fallback after a decode failure is not written back over the
+  value that failed. Otherwise a fresh device would upload its own defaults before the first
+  remote pull and win LWW against the user's real settings, and a corrupt value would be silently
+  destroyed instead of staying visible to the debug panel. Reconciliation therefore also sees only
+  keys the user actually wrote.
 - A layer returning `null` means absent, never a falsy value. Keys are `T : Any`; "empty" is a
   codec sentinel. An undecodable stored value is absent-in-that-layer, logged, not fatal.
 - `appConfig/flags` is world-readable: key names and values placed there are public, so
@@ -684,6 +720,24 @@ Revisit if a slider-backed key appears.
   layer — layers must stay honest for `resolve()`.
 
 ## Migration
+
+**Status.** Steps 1-3 shipped together in issue #332, with three deviations worth knowing:
+
+- No deprecated adapters. Every injection site migrated in the same change, so
+  `OfflineBuildFlags`, `SignInFeatureConfig`, `TransactionCreationFeatureConfig`,
+  `SyncFeatureFlag`, `UiSettingsDataSource` and `PrefAdapters` are gone rather than kept for a
+  release.
+- Hydration is reached through a `ConfigHydration` domain facade, because `AppLaunchViewModel`
+  lives in `navigation`, which must not see `app-config` any more than a feature may.
+- The conditional `DebugConfigSource` binding lives in `shared`'s per-platform module rather than
+  in each host. It is not host-specific (both builds want overrides in debug builds), and Android
+  needs the `Context` that module already resolves. `isDebugBuild()` is therefore not an
+  `expect`/`actual` pair: each platform's factory uses what it has — `FLAG_DEBUGGABLE`,
+  `Platform.isDebugBinary`, or `true` on the developer-only desktop build.
+- The Local layer stores values under a `config.` preference prefix. `ui.onboarding_completed` used
+  to be a `booleanPreferencesKey` in the same file and `Preferences.Key` equality is by name only,
+  so reusing the bare name would throw on every existing install. Key *names* are unprefixed
+  everywhere they are user- or wire-visible.
 
 1. `app-config/api` (`ConfigKey`, `SettingKey`, `ConfigCodec`, `Config`, `ConfigSource` and
    the per-layer types) plus `app-config/default` (`LayeredConfig`, `ConfigRegistry`, the

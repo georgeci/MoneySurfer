@@ -38,7 +38,7 @@ class WorkspaceRefRegistrar(
      * the doc-without-ref state this class exists to prevent, with nothing to notice it.
      */
     suspend fun register(workspaceId: String) {
-        val uid = session.currentFirebaseUid.flow.first()
+        val uid = session.currentFirebaseUid.first()
         if (uid == null) {
             log.d { "[ref] skipped wid=$workspaceId — no Firebase session" }
             return

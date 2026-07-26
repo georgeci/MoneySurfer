@@ -156,7 +156,7 @@ class BudgetEditViewModel(
                 return@launch
             }
 
-            val workspaceId = session.currentWorkspaceId.flow.first()
+            val workspaceId = session.currentWorkspaceId.first()
             if (workspaceId == null) {
                 updateState { copy(isLoading = false) }
                 return@launch

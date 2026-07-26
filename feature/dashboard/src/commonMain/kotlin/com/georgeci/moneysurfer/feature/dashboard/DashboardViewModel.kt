@@ -1,7 +1,7 @@
 package com.georgeci.moneysurfer.feature.dashboard
 
 import arrow.optics.optics
-import com.georgeci.moneysurfer.domain.OfflineBuildFlags
+import com.georgeci.moneysurfer.domain.config.HostCapabilities
 import com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutConfig
 import com.georgeci.moneysurfer.domain.formatter.MoneyFormatter
 import com.georgeci.moneysurfer.domain.model.Account
@@ -36,12 +36,12 @@ class DashboardViewModel(
     private val getExchangeRates: GetExchangeRatesUseCase,
     private val convertAccountsTotal: ConvertAccountsTotalUseCase,
     uiPreferences: UiPreferences,
-    offlineBuildFlags: OfflineBuildFlags,
+    hostCapabilities: HostCapabilities,
 ) : MviViewModel<DashboardState, DashboardEvent, DashboardEffect>(
     initialState = DashboardState.Loading,
 ) {
 
-    private val isOffline: Boolean = offlineBuildFlags.isOffline
+    private val isOffline: Boolean = hostCapabilities.isOffline
 
     /**
      * Widget order and visibility. Normalized again here so the screen renders a sound layout

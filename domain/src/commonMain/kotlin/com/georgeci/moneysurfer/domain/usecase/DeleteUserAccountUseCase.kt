@@ -6,7 +6,7 @@ import arrow.core.raise.either
 import arrow.core.raise.ensureNotNull
 import com.georgeci.moneysurfer.domain.auth.AccountDeletionError
 import com.georgeci.moneysurfer.domain.auth.AuthError
-import com.georgeci.moneysurfer.domain.auth.SessionPointers
+import com.georgeci.moneysurfer.domain.auth.SessionMutator
 import com.georgeci.moneysurfer.domain.repositories.AuthRemoteRepository
 import com.georgeci.moneysurfer.domain.repositories.LocalDataResetRepository
 import com.georgeci.moneysurfer.domain.repositories.RemoteDataResetRepository
@@ -37,7 +37,7 @@ class DeleteUserAccountUseCase(
     private val userAccountDeletionRepository: UserAccountDeletionRepository,
     private val localDataResetRepository: LocalDataResetRepository,
     private val remoteDataResetRepository: RemoteDataResetRepository,
-    private val session: SessionPointers,
+    private val sessionMutator: SessionMutator,
 ) {
 
     /**
@@ -59,9 +59,7 @@ class DeleteUserAccountUseCase(
             .mapLeft { it.toDeleteError() }
             .bind()
 
-        session.currentUserId.set(null)
-        session.currentWorkspaceId.set(null)
-        session.currentFirebaseUid.set(null)
+        sessionMutator.clearSession()
         localDataResetRepository.clearAll()
         remoteDataResetRepository.clearAll()
     }

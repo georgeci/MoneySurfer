@@ -83,9 +83,9 @@ class PullCursorAndLwwIT {
 
         // Pin the active workspace + Firebase uid so the use case has something to
         // resolve against.
-        harness.session.currentWorkspaceId.set(ctx.workspaceId)
-        harness.session.currentFirebaseUid.set(ctx.ownerUid)
-        harness.session.currentUserId.set(UserId(ctx.ownerUid))
+        harness.session.setCurrentWorkspace(ctx.workspaceId)
+        harness.session.setFirebaseUid(ctx.ownerUid)
+        harness.session.setCurrentUser(UserId(ctx.ownerUid))
 
         // ── First pull ──────────────────────────────────────────────────────
         val firstPull = harness.pullRemoteChanges(
@@ -172,9 +172,9 @@ class PullCursorAndLwwIT {
     @Test
     fun pull_takes_remote_when_remote_is_newer_and_overwrites_local_row() = runTest {
         val ctx = signInAndSeedWorkspace()
-        harness.session.currentWorkspaceId.set(ctx.workspaceId)
-        harness.session.currentFirebaseUid.set(ctx.ownerUid)
-        harness.session.currentUserId.set(UserId(ctx.ownerUid))
+        harness.session.setCurrentWorkspace(ctx.workspaceId)
+        harness.session.setFirebaseUid(ctx.ownerUid)
+        harness.session.setCurrentUser(UserId(ctx.ownerUid))
 
         // Prime cursor at ctx.seedUpdatedAt so the next pull only sees the rewrite.
         val priming = harness.pullRemoteChanges(
@@ -234,9 +234,9 @@ class PullCursorAndLwwIT {
     @Test
     fun pull_takes_local_when_local_is_newer_and_propagates_remote_tombstone() = runTest {
         val ctx = signInAndSeedWorkspace()
-        harness.session.currentWorkspaceId.set(ctx.workspaceId)
-        harness.session.currentFirebaseUid.set(ctx.ownerUid)
-        harness.session.currentUserId.set(UserId(ctx.ownerUid))
+        harness.session.setCurrentWorkspace(ctx.workspaceId)
+        harness.session.setFirebaseUid(ctx.ownerUid)
+        harness.session.setCurrentUser(UserId(ctx.ownerUid))
 
         // Initial pull primes the cursor at ctx.seedUpdatedAt.
         val priming = harness.pullRemoteChanges(

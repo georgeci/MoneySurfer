@@ -12,10 +12,10 @@ import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.shouldBe
 
 /**
- * Issue #342: a workspace created while `SyncFeatureFlag` was off has no
- * `users/{uid}.workspaceIds` entry, and `addWorkspaceRef` is only ever called at creation /
- * join time. Once the flag is flipped the outbox pushes the document, so the ref has to be
- * registered there or the workspace stays invisible to every other device forever.
+ * Issue #342: a workspace created while sync was off has no `users/{uid}.workspaceIds` entry, and
+ * `addWorkspaceRef` is only ever called at creation / join time. Once sync is on the outbox pushes
+ * the document, so the ref has to be registered there or the workspace stays invisible to every
+ * other device forever.
  */
 class WorkspaceRefRegistrarSpec : StringSpec({
 

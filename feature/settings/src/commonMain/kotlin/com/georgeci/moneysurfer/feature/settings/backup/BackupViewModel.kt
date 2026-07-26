@@ -1,9 +1,9 @@
 package com.georgeci.moneysurfer.feature.settings.backup
 
-import com.georgeci.moneysurfer.domain.OfflineBuildFlags
 import com.georgeci.moneysurfer.domain.backup.BackupError
 import com.georgeci.moneysurfer.domain.backup.BackupExporter
 import com.georgeci.moneysurfer.domain.backup.BackupImporter
+import com.georgeci.moneysurfer.domain.config.HostCapabilities
 import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
 import com.georgeci.moneysurfer.utils.MviViewModel
 import kotlinx.coroutines.CancellationException
@@ -17,9 +17,9 @@ class BackupViewModel(
     private val exporter: BackupExporter,
     private val importer: BackupImporter,
     private val clock: ClockUseCase,
-    offlineBuildFlags: OfflineBuildFlags,
+    hostCapabilities: HostCapabilities,
 ) : MviViewModel<BackupState, BackupEvent, BackupEffect>(
-    initialState = BackupState(isOffline = offlineBuildFlags.isOffline),
+    initialState = BackupState(isOffline = hostCapabilities.isOffline),
 ) {
 
     /** Passphrase chosen in the export dialog, held until the save picker returns a sink. */

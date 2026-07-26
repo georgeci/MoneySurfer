@@ -5,6 +5,7 @@ import arrow.core.left
 import com.georgeci.moneysurfer.domain.auth.AuthError
 import com.georgeci.moneysurfer.domain.auth.AuthLocalRepository
 import com.georgeci.moneysurfer.domain.auth.InMemorySessionPointers
+import com.georgeci.moneysurfer.domain.fixtures.FakeHostCapabilities
 import com.georgeci.moneysurfer.domain.model.User
 import com.georgeci.moneysurfer.domain.model.Workspace
 import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
@@ -170,12 +171,12 @@ private fun newViewModel(
     val auth = StubAuthRemoteRepository(signupFailure)
     val session = InMemorySessionPointers()
     val authLocal = AuthLocalRepository(StubUserRepository, session)
-    val wipeDemo = WipeDemoDataUseCase(StubLocalDataResetRepository, session)
+    val wipeDemo = WipeDemoDataUseCase(StubLocalDataResetRepository, session, session)
     val postAuthBootstrap = PostAuthBootstrapUseCase(
         userRemoteRepository = StubUserRemoteRepository,
         workspaceRepository = StubWorkspaceRepository,
         workspaceSyncer = StubWorkspaceSyncer,
-        session = session,
+        sessionMutator = session,
         getCurrentTime = GetCurrentTimeUseCase(ClockUseCase()),
     )
     val abandon = AbandonAuthSessionUseCase(session, auth)
@@ -191,7 +192,7 @@ private fun newViewModel(
             abandon,
         ),
         demoLogin = DemoLoginUseCase(authLocal, session),
-        config = SignInFeatureConfig(),
+        hostCapabilities = FakeHostCapabilities(),
     )
 }
 
@@ -237,7 +238,7 @@ private object StubWorkspaceRepository : WorkspaceRepository {
 }
 
 private object StubWorkspaceSyncer : WorkspaceSyncer {
-    override suspend fun pushAll() = error(UNUSED)
+    override suspend fun pushAll(): Boolean = error(UNUSED)
     override suspend fun syncAll() = error(UNUSED)
     override suspend fun syncWorkspace(workspaceId: WorkspaceId) = error(UNUSED)
 }

@@ -2,6 +2,7 @@ package com.georgeci.moneysurfer.di
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import com.georgeci.moneysurfer.appconfig.DebugConfigSource
 import com.georgeci.moneysurfer.data.db.MoneySurferDatabase
 import com.georgeci.moneysurfer.domain.AppInfo
 import com.georgeci.moneysurfer.domain.backup.AppRestarter
@@ -91,6 +92,8 @@ private val testPlatformModule = module {
     single<MoneySurferDatabase> { error("verify() must not instantiate this") }
     single<SyncDatabase> { error("verify() must not instantiate this") }
     single<DataStore<Preferences>> { error("verify() must not instantiate this") }
+    // Real hosts bind this from `sharedPlatformModule` (release APKs get `Empty`).
+    single<DebugConfigSource> { DebugConfigSource.Empty }
     single { AppInfo(version = "test", versionCode = 1) }
     single<BackupStorageLocator> { error("verify() must not instantiate this") }
     single<AppRestarter> { error("verify() must not instantiate this") }
