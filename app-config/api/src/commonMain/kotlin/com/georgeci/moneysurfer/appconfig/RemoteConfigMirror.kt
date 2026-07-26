@@ -24,7 +24,14 @@ interface RemoteConfigMirror {
     /** Reads the warmed in-memory copy. `null` means the mirror does not hold this name. */
     fun raw(name: String): String?
 
-    /** Emits once with the current state, then again after every [replaceAll]. Must not fail. */
+    /**
+     * Emits once with the current state, then again whenever the stored values actually change.
+     *
+     * Deliberately not "after every [replaceAll]": the backing store skips a write whose result
+     * equals what it already holds, and a refresh re-sends the same flags nearly every time, so an
+     * unchanged payload produces no emission. Anything that needs to know a refresh *happened* —
+     * a last-checked timestamp, a staleness watchdog — cannot be built on this flow.
+     */
     val changes: Flow<Unit>
 
     /** Warms the in-memory copy from storage. Idempotent. Must not fail — see [isDegraded]. */

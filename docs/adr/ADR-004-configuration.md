@@ -506,14 +506,20 @@ app-config/default  -> app-config/api      # LayeredConfig, ConfigRegistry, asse
 app-config/remote   -> app-config/{api,default}  # Firestore-bound RemoteGlobalConfigSource (step 4)
 data-local          -> app-config/api      # implements Local + Debug sources, owns UiConfigKeys
 composeApp          -> app-config/{api,default,remote}
+composeApp          -> data-local            # flag-mirror factory, per platform (step 4)
 composeAppOffline   -> app-config/{api,default}
 feature/*           -> domain              # app-config is NOT on the classpath
 ```
 
 `api` must stay SDK-free (no Room, DataStore or Firebase), like `sync/api`. The per-layer
 types and their `Empty` objects live there, so `composeAppOffline` can bind
-`RemoteGlobalConfigSource.Empty` without depending on `app-config/remote`, and `composeApp`
+`RemoteGlobalConfigSource.Empty` without depending on `app-config/remote`, and either host
 can declare its Build layer without depending on `data-local`.
+
+Step 4 does add `composeApp -> data-local`, for one reason that is not the Build layer: the
+RemoteGlobal mirror is a DataStore file, its per-platform factory lives with the other
+DataStore-backed layers, and — unlike `DebugConfigSource`, which `shared` binds for both
+hosts — only the online build has a remote layer to mirror, so the binding is host-owned.
 
 `app-config/remote` mirrors `sync-surfer`: the only module that binds Firestore to
 configuration, absent from the offline build, and not needed until step 4 — steps 1-3 ship

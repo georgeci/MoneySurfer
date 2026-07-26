@@ -5,6 +5,7 @@ import dev.gitlive.firebase.firestore.DocumentSnapshot
 import dev.gitlive.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.CancellationException
 import kotlinx.serialization.builtins.MapSerializer
+import kotlinx.serialization.builtins.nullable
 import kotlinx.serialization.builtins.serializer
 import org.koin.core.annotation.Single
 
@@ -62,37 +63,42 @@ class FirestoreRemoteFlagDocument(private val firestore: FirebaseFirestore) : Re
     } catch (cancelled: CancellationException) {
         throw cancelled
     } catch (failure: Throwable) {
-        // Warning, not error: being offline is the expected case here, and the mirror is exactly
-        // what makes it harmless. A permanent failure shows up as a stale debug panel, not a crash.
-        log.w(failure) { "$COLLECTION/$DOCUMENT unreadable — resolving from the mirrored values" }
+        // Message, not throwable: `CrashReportingLogWriter` turns any Warn carrying a `Throwable`
+        // into a Crashlytics non-fatal, and this branch is the *expected* one — every offline
+        // foreground return lands here. Attaching the failure would file one non-fatal per
+        // foreground return per offline user and bury real crashes. The breadcrumb is the signal
+        // worth keeping; a permanent failure surfaces through `isDegraded` instead.
+        log.w { "$COLLECTION/$DOCUMENT unreadable (${failure.message}) — resolving from the mirrored values" }
         RemoteFlagFetch.Unavailable
     }
 
     /**
-     * A **missing** document is only an answer when the server said so.
+     * A **missing** document is only an answer when the server said so — and the SDK guarantees
+     * that for us, rather than this code having to test for it.
      *
-     * `get()` falls back to Firestore's local cache when the network is unreachable, and a cache
-     * miss produces a perfectly ordinary snapshot with `exists == false` rather than an exception.
-     * Reading that as "the server has no flags" would clear the mirror on a device that is merely
-     * offline — and for a kill switch, clearing means reverting to `default = true`, i.e. switching
-     * the killed feature back on. `isFromCache` is what separates the two, so an uncached miss is
-     * reported as [RemoteFlagFetch.Unavailable] and a genuine server-side deletion still propagates.
+     * `get()` does fall back to Firestore's local cache when the network is unreachable, but it
+     * does not hand back an empty snapshot in that case: `DocumentReference` converts
+     * `!exists && metadata.isFromCache` into an `UNAVAILABLE` failure ("Failed to get document
+     * because the client is offline") on Android, iOS and the desktop JVM alike. So an offline
+     * cache miss arrives here as a throw and is caught above as [RemoteFlagFetch.Unavailable], and
+     * a snapshot that does reach this function with `exists == false` really is the server saying
+     * the document is gone.
      *
-     * A document that *exists* is taken from either source: a cached hit is the last thing the
-     * server sent, which is exactly what the mirror already holds.
+     * That distinction is the one this layer turns on: clearing the mirror on a merely-offline
+     * device would revert a kill switch to its `default = true` and switch the killed feature back
+     * on. It is delivered by the `try`/`catch` above, not by anything in here.
      */
-    private fun DocumentSnapshot.toFetch(): RemoteFlagFetch = when {
-        exists -> RemoteFlagFetch.Read(data(FLAG_MAP))
-        metadata.isFromCache -> {
-            log.w { "$COLLECTION/$DOCUMENT missing from cache while offline — keeping the mirrored values" }
-            RemoteFlagFetch.Unavailable
-        }
-        else -> RemoteFlagFetch.Read(emptyMap())
+    private fun DocumentSnapshot.toFetch(): RemoteFlagFetch {
+        if (!exists) return RemoteFlagFetch.Read(emptyMap())
+        // A field the owner cleared to `null` instead of deleting is absent, not the string "null":
+        // gitlive decodes every field through `toString()`, so a nullable value serializer is what
+        // keeps `null` from being mirrored — and `StringConfigCodec` would happily serve it.
+        return RemoteFlagFetch.Read(data(FLAG_MAP).mapNotNull { (name, value) -> value?.let { name to it } }.toMap())
     }
 
     private companion object {
         const val COLLECTION = "appConfig"
         const val DOCUMENT = "flags"
-        val FLAG_MAP = MapSerializer(String.serializer(), String.serializer())
+        val FLAG_MAP = MapSerializer(String.serializer(), String.serializer().nullable)
     }
 }

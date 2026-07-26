@@ -9,9 +9,11 @@ import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.maps.shouldBeEmpty
 import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 
 private val KILL_SWITCH: ConfigKey<Boolean> =
@@ -38,14 +40,22 @@ private class FakeMirror(
     var warm: Boolean = false
         private set
 
+    /** Counts calls, so a test can prove an overlapping refresh was dropped rather than queued. */
+    var writeCount: Int = 0
+        private set
+
     override fun raw(name: String): String? = if (warm) values[name] else null
     override val changes: Flow<Unit> = _changes.asSharedFlow()
     override suspend fun hydrate() { warm = true }
     override suspend fun replaceAll(values: Map<String, String>) {
         writeFailure?.let { throw it }
+        writeCount++
+        val changed = this.values != values
         this.values = values
         warm = true
-        _changes.tryEmit(Unit)
+        // Only on a real change, like the DataStore-backed mirror: it skips a write whose result
+        // equals what it already holds, so an unchanged refresh produces no emission.
+        if (changed) _changes.tryEmit(Unit)
     }
 }
 
@@ -201,6 +211,113 @@ class RemoteGlobalConfigSourceImplSpec : StringSpec({
             shouldNotThrowAny { layer.refresh() }
 
             layer.peek(KILL_SWITCH) shouldBe LayerValue.Present(false)
+        }
+    }
+
+    // ── degraded reporting ───────────────────────────────────────────────────
+
+    "a healthy refresh reports the layer as not degraded" {
+        runTest {
+            val layer = source(RemoteFlagFetch.Read(mapOf(KILL_SWITCH.name to "false")))
+
+            layer.refresh()
+
+            layer.isDegraded shouldBe false
+        }
+    }
+
+    "an unreachable server marks the layer degraded" {
+        runTest {
+            // Without this the debug panel presents weeks-old mirrored flags as the server's
+            // current answer — the one distinction `Config.degradedLayers` exists to draw.
+            val layer = source(RemoteFlagFetch.Unavailable)
+
+            layer.refresh()
+
+            layer.isDegraded shouldBe true
+        }
+    }
+
+    "an unwritable mirror marks the layer degraded" {
+        runTest {
+            val mirror = FakeMirror(writeFailure = IllegalStateException("disk full"))
+            val layer = source(RemoteFlagFetch.Read(mapOf(KILL_SWITCH.name to "false")), mirror)
+
+            layer.refresh()
+
+            // The write is swallowed so the app survives; the degraded flag is what keeps that
+            // silence honest.
+            layer.isDegraded shouldBe true
+        }
+    }
+
+    "a recovered server clears the degraded flag" {
+        runTest {
+            // Live rather than latched, matching every other ConfigSource.
+            val mirror = FakeMirror()
+            var answer: RemoteFlagFetch = RemoteFlagFetch.Unavailable
+            val layer = RemoteGlobalConfigSourceImpl(
+                document = { answer },
+                registry = ConfigRegistry(listOf(TestKeyGroup())),
+                mirror = mirror,
+            )
+
+            layer.refresh()
+            layer.isDegraded shouldBe true
+
+            answer = RemoteFlagFetch.Read(mapOf(KILL_SWITCH.name to "false"))
+            layer.refresh()
+
+            layer.isDegraded shouldBe false
+        }
+    }
+
+    // ── overlapping refreshes ────────────────────────────────────────────────
+
+    "a refresh that lands while one is in flight is dropped, not queued" {
+        runTest {
+            // Each Android Activity recreation — rotation, dark mode, font size, locale — is a
+            // foreground return. Queueing them would pay a billed document read for every one,
+            // long after the event that asked for it.
+            val mirror = FakeMirror()
+            val started = CompletableDeferred<Unit>()
+            val release = CompletableDeferred<Unit>()
+            var fetches = 0
+            val layer = RemoteGlobalConfigSourceImpl(
+                document = {
+                    fetches++
+                    started.complete(Unit)
+                    release.await()
+                    RemoteFlagFetch.Read(mapOf(KILL_SWITCH.name to "false"))
+                },
+                registry = ConfigRegistry(listOf(TestKeyGroup())),
+                mirror = mirror,
+            )
+
+            val inFlight = launch { layer.refresh() }
+            started.await()
+            layer.refresh() // lands mid-flight
+            release.complete(Unit)
+            inFlight.join()
+
+            fetches shouldBe 1
+            mirror.writeCount shouldBe 1
+        }
+    }
+
+    // ── rejection logging ────────────────────────────────────────────────────
+
+    "an unservable name is still rejected on every refresh, not only the first" {
+        runTest {
+            // The log is deduplicated per name; the filtering itself must not be.
+            val mirror = FakeMirror()
+            val layer = source(RemoteFlagFetch.Read(mapOf(HOST_FACT.name to "true")), mirror)
+
+            layer.refresh()
+            layer.refresh()
+
+            mirror.values.shouldBeEmpty()
+            layer.peek(HOST_FACT) shouldBe LayerValue.Absent
         }
     }
 })

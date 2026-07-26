@@ -28,14 +28,21 @@ class RemoteConfigMirrorImplJvmTest : StringSpec({
     }
 
     "a mirrored value survives a cold start" {
-        val store = newStore()
-        RemoteConfigMirrorImpl(store).replaceAll(mapOf("sync.remote_enabled" to "false"))
+        // Reading back through a second wrapper over the *same live store* would be answered from
+        // that store's in-memory cache, and would pass even if nothing were ever flushed. So the
+        // written file is copied to a fresh location and opened by a store that has never seen the
+        // write — a genuine cold start, proving the bytes on disk carry the value.
+        val written = Files.createTempDirectory("ms-remote-flags-written")
+        RemoteConfigMirrorImpl(newStore(written)).replaceAll(mapOf("sync.remote_enabled" to "false"))
 
-        val reopened = RemoteConfigMirrorImpl(store)
+        val restarted = Files.createTempDirectory("ms-remote-flags-restarted")
+        Files.copy(written.resolve(REMOTE_FLAGS_FILE_NAME), restarted.resolve(REMOTE_FLAGS_FILE_NAME))
+        val reopened = RemoteConfigMirrorImpl(newStore(restarted))
         reopened.hydrate()
 
         // This is what makes an offline launch resolve the last value the server sent.
         reopened.raw("sync.remote_enabled") shouldBe "false"
+        reopened.isDegraded shouldBe false
     }
 
     "replaceAll drops keys the new payload omits" {

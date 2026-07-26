@@ -64,6 +64,30 @@ class OnlineConfigGraphTest : StringSpec({
         }
     }
 
+    "the server kill switch is registered and remote-overridable" {
+        withOnlineGraph { koin ->
+            // The one key the RemoteGlobal layer exists to carry, pinned against the *real* graph.
+            // `RemoteGlobalConfigSourceImpl` drops a name the registry does not know with only a
+            // log line, so renaming this key, dropping its `remoteOverridable`, or unbinding
+            // `SyncConfigKeyGroup` would silently kill the switch — setting `sync.remote_enabled`
+            // in `appConfig/flags` would do nothing in production while every suite stayed green.
+            val killSwitch = koin.get<ConfigRegistry>().find("sync.remote_enabled")
+
+            killSwitch.shouldNotBeNull()
+            killSwitch.remoteOverridable shouldBe true
+        }
+    }
+
+    "no host key is remote-overridable" {
+        withOnlineGraph { koin ->
+            // A server able to flip `host.is_offline` would put the online build on the offline
+            // start route while its DI graph stays fully online.
+            val registry = koin.get<ConfigRegistry>()
+
+            HostConfigKeys.all.filter { registry.find(it.name)?.remoteOverridable == true }.shouldBeEmpty()
+        }
+    }
+
     "online build layer declares every host key" {
         withOnlineGraph { koin ->
             val build = koin.get<BuildConfigSource>()

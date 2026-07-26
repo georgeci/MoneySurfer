@@ -127,8 +127,3 @@ internal class SelfReportingDegradedSource(
         degraded = false
     }
 }
-
-private fun <T : Any> ConfigKey<T>.layerValueOf(raw: String?): LayerValue<T> = when (raw) {
-    null -> LayerValue.Absent
-    else -> codec.decode(raw)?.let { LayerValue.Present(it) } ?: LayerValue.Undecodable(raw)
-}
