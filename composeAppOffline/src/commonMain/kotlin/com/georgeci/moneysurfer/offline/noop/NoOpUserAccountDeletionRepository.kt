@@ -7,7 +7,7 @@ import com.georgeci.moneysurfer.domain.repositories.UserAccountDeletionRepositor
 
 /**
  * Offline build has no remote account to delete — the Settings entry point is hidden via
- * [OfflineBuildFlags][com.georgeci.moneysurfer.domain.OfflineBuildFlags]; this binding only
+ * [HostCapabilities][com.georgeci.moneysurfer.domain.config.HostCapabilities]; this binding only
  * keeps the Koin graph resolvable for `DeleteUserAccountUseCase`.
  */
 class NoOpUserAccountDeletionRepository : UserAccountDeletionRepository {

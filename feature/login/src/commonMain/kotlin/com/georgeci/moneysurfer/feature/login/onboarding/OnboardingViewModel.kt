@@ -1,7 +1,7 @@
 package com.georgeci.moneysurfer.feature.login.onboarding
 
 import co.touchlab.kermit.Logger
-import com.georgeci.moneysurfer.domain.OfflineBuildFlags
+import com.georgeci.moneysurfer.domain.config.HostCapabilities
 import com.georgeci.moneysurfer.domain.firstrun.FirstRunSeeder
 import com.georgeci.moneysurfer.domain.preferences.UiPreferences
 import com.georgeci.moneysurfer.domain.primitives.AccountType
@@ -25,9 +25,9 @@ import org.koin.core.annotation.KoinViewModel
 class OnboardingViewModel(
     private val uiPreferences: UiPreferences,
     private val firstRunSeeder: FirstRunSeeder,
-    offlineBuildFlags: OfflineBuildFlags,
+    hostCapabilities: HostCapabilities,
 ) : MviViewModel<OnboardingState, OnboardingEvent, OnboardingEffect>(
-    initialState = OnboardingState(isOffline = offlineBuildFlags.isOffline),
+    initialState = OnboardingState(isOffline = hostCapabilities.isOffline),
 ) {
 
     private val log = Logger.withTag(TAG)

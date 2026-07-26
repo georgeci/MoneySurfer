@@ -203,7 +203,7 @@ class PullRemoteChangesUseCaseImpl(
         cancelToken: SyncCancelToken,
     ): PullSummary {
         val fullFetch = scope == SyncScope.AllUserData || scope == SyncScope.ChangedSinceLastSync
-        val uid = session.currentFirebaseUid.flow.first()
+        val uid = session.currentFirebaseUid.first()
         val invitePlugin = plugins.firstOrNull {
             it.firestoreCollectionName == SyncCollection.WORKSPACE_INVITES
         }
@@ -246,7 +246,7 @@ class PullRemoteChangesUseCaseImpl(
     private suspend fun workspaceIdsForScope(scope: SyncScope): List<String> = when (scope) {
         SyncScope.UploadOnly -> emptyList()
         SyncScope.ActiveWorkspace -> {
-            session.currentWorkspaceId.flow.first()?.value
+            session.currentWorkspaceId.first()?.value
                 ?.let { listOf(it) } ?: emptyList()
         }
         SyncScope.AllUserData -> userWorkspacesProvider.workspaceIds()
@@ -259,7 +259,7 @@ class PullRemoteChangesUseCaseImpl(
                 // NOT used for AllUserData — a full sync should only pull what the
                 // remote says the user owns; using currentWorkspaceId for AllUserData
                 // causes PERMISSION_DENIED when the user is only an invitee of that wid.
-                session.currentWorkspaceId.flow.first()?.value
+                session.currentWorkspaceId.first()?.value
                     ?.let { listOf(it) } ?: emptyList()
             }
         }

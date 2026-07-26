@@ -1,8 +1,8 @@
 package com.georgeci.moneysurfer.feature.workspace.selector
 
 import arrow.optics.optics
-import com.georgeci.moneysurfer.domain.OfflineBuildFlags
 import com.georgeci.moneysurfer.domain.auth.SessionPointers
+import com.georgeci.moneysurfer.domain.config.HostCapabilities
 import com.georgeci.moneysurfer.domain.model.Workspace
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 import com.georgeci.moneysurfer.domain.usecase.GetWorkspacesForUserUseCase
@@ -20,16 +20,16 @@ class WorkspaceSelectorViewModel(
     private val getWorkspacesForUserUseCase: GetWorkspacesForUserUseCase,
     private val selectWorkspaceUseCase: SelectWorkspaceUseCase,
     private val logoutUseCase: LogoutUseCase,
-    offlineBuildFlags: OfflineBuildFlags,
+    hostCapabilities: HostCapabilities,
 ) : MviViewModel<WorkspaceSelectorState, WorkspaceSelectorEvent, WorkspaceSelectorEffect>(
     initialState = WorkspaceSelectorState.Loading(
         showActions = showActions,
-        isOffline = offlineBuildFlags.isOffline,
-        canSignOut = !showActions && !offlineBuildFlags.isOffline,
+        isOffline = hostCapabilities.isOffline,
+        canSignOut = !showActions && !hostCapabilities.isOffline,
     ),
 ) {
 
-    private val isOffline: Boolean = offlineBuildFlags.isOffline
+    private val isOffline: Boolean = hostCapabilities.isOffline
 
     /**
      * The selector is a dead end exactly when it was *not* opened from Settings: sign-in and the
@@ -72,7 +72,7 @@ class WorkspaceSelectorViewModel(
 
     private fun loadWorkspaces() {
         launch {
-            val userId = session.currentUserId.flow.first() ?: run {
+            val userId = session.currentUserId.first() ?: run {
                 promoteToContent(workspaces = emptyList())
                 return@launch
             }
@@ -85,7 +85,7 @@ class WorkspaceSelectorViewModel(
 
     private fun loadSelectedWorkspace() {
         launch {
-            session.currentWorkspaceId.flow.collect { workspaceId ->
+            session.currentWorkspaceId.collect { workspaceId ->
                 updateState {
                     when (this) {
                         is WorkspaceSelectorState.Loading -> WorkspaceSelectorState.Content(

@@ -1,6 +1,7 @@
 package com.georgeci.moneysurfer.data.datastore.core
 
 import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.doublePreferencesKey
@@ -41,11 +42,21 @@ class PreferenceStore(
         default: T,
     ): PreferenceProperty<T> =
         PreferenceProperty(dataStore, key, default)
+
+    /**
+     * Writes several keys in one DataStore edit. A group whose members must move together — the
+     * session pointers on logout — cannot be written as N separate `set` calls, or a crash in
+     * between leaves the group half-updated.
+     */
+    suspend fun edit(transform: (MutablePreferences) -> Unit) {
+        dataStore.edit(transform)
+    }
 }
 
 class PreferenceProperty<T>(
     private val dataStore: DataStore<Preferences>,
-    private val key: Preferences.Key<T>,
+    /** Exposed so a caller can include this property in a multi-key [PreferenceStore.edit]. */
+    val key: Preferences.Key<T>,
     private val default: T,
 ) {
     val flow: Flow<T> =

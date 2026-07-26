@@ -42,7 +42,7 @@ class GetCategorySpendHistoryUseCase(
         categoryId: CategoryId,
         timeZone: TimeZone = TimeZone.currentSystemDefault(),
     ): Flow<CategorySpendHistory> =
-        session.currentWorkspaceId.flow.flatMapLatest { workspaceId ->
+        session.currentWorkspaceId.flatMapLatest { workspaceId ->
             workspaceId ?: return@flatMapLatest flowOf(CategorySpendHistory.Empty)
 
             val months = trailingMonths(

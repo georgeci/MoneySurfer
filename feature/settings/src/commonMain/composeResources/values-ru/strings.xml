@@ -300,4 +300,18 @@
     <string name="settings_delete_account_notice_cleanup_failed">Не удалось удалить облачные данные. Проверьте подключение и попробуйте ещё раз</string>
     <string name="settings_delete_account_notice_auth_failed">Данные удалены, но учётную запись не удалось удалить. Попробуйте ещё раз</string>
     <string name="settings_delete_account_notice_generic">Не удалось удалить аккаунт. Попробуйте ещё раз</string>
+    <string name="settings_debug_config">Конфигурация (debug)</string>
+    <string name="settings_debug_config_supporting">Просмотр и переопределение всех ключей конфигурации</string>
+    <string name="settings_debug_config_title">Конфигурация</string>
+    <string name="settings_debug_config_section_keys">Ключи</string>
+    <string name="settings_debug_config_footnote">Переопределения хранятся в отдельном debug-хранилище и не влияют на ваши настройки. Только для debug-сборок.</string>
+    <string name="settings_debug_config_reset_all">Сбросить все переопределения</string>
+    <string name="settings_debug_config_winner_format">из %1$s</string>
+    <string name="settings_debug_config_clear">Убрать переопределение</string>
+    <string name="settings_debug_config_invalid_format">%1$s — недопустимое значение для %2$s</string>
+    <string name="settings_debug_config_layer_absent">нет значения</string>
+    <string name="settings_debug_config_layer_undecodable_format">%1$s (не распознано)</string>
+    <string name="settings_debug_config_degraded_format">Не удалось прочитать: %1$s — значения ниже берутся из слоёв под ним</string>
+    <string name="settings_debug_config_unavailable">В этой сборке переопределения недоступны — debug-слой пуст, сохранять здесь нечего.</string>
+    <string name="settings_debug_config_host_owned">Идентичность сборки — переопределение не меняет уже скомпилированную сборку графа.</string>
 </resources>

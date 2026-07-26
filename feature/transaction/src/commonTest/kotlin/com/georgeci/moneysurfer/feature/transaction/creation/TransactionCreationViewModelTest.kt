@@ -3,7 +3,9 @@ package com.georgeci.moneysurfer.feature.transaction.creation
 import androidx.lifecycle.viewModelScope
 import app.cash.turbine.test
 import com.georgeci.moneysurfer.domain.auth.InMemorySessionPointers
+import com.georgeci.moneysurfer.domain.config.HostCapabilities
 import com.georgeci.moneysurfer.domain.fixtures.EUR
+import com.georgeci.moneysurfer.domain.fixtures.FakeHostCapabilities
 import com.georgeci.moneysurfer.domain.fixtures.USD
 import com.georgeci.moneysurfer.domain.fixtures.aCategory
 import com.georgeci.moneysurfer.domain.fixtures.aTransaction
@@ -350,11 +352,11 @@ class TransactionCreationViewModelTest : StringSpec({
         }
     }
 
-    "Transfer is unreachable when transferEnabled flag is off" {
+    "Transfer is unreachable when the host disables it" {
         runTest {
             val fixture = Fixture(ws)
             val vm = fixture.createViewModel(
-                featureConfig = TransactionCreationFeatureConfig(transferEnabled = false),
+                hostCapabilities = FakeHostCapabilities(transferEnabled = false),
             )
             try {
                 vm.awaitContent()
@@ -370,11 +372,11 @@ class TransactionCreationViewModelTest : StringSpec({
         }
     }
 
-    "Transfer is reachable when transferEnabled flag is on" {
+    "Transfer is reachable when the host enables it" {
         runTest {
             val fixture = Fixture(ws)
             val vm = fixture.createViewModel(
-                featureConfig = TransactionCreationFeatureConfig(transferEnabled = true),
+                hostCapabilities = FakeHostCapabilities(transferEnabled = true),
             )
             try {
                 vm.awaitContent()
@@ -717,7 +719,7 @@ private class Fixture(workspaceId: WorkspaceId) {
         editingTransactionId: TransactionId? = null,
         duplicateOf: TransactionId? = null,
         prefillAccount: AccountId? = null,
-        featureConfig: TransactionCreationFeatureConfig = TransactionCreationFeatureConfig(transferEnabled = true),
+        hostCapabilities: HostCapabilities = FakeHostCapabilities(),
     ) = TransactionCreationViewModel(
         seed = duplicateOf?.let {
             TransactionCreationSeed(it, TransactionCreationSeed.Mode.Duplicate)
@@ -742,7 +744,7 @@ private class Fixture(workspaceId: WorkspaceId) {
         ),
         getCurrentTime = GetCurrentTimeUseCase(clock),
         transactionRepository = transactionRepository,
-        featureConfig = featureConfig,
+        hostCapabilities = hostCapabilities,
         snackbar = snackbar,
     )
 

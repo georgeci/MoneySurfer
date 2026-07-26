@@ -27,7 +27,7 @@ class DeclineInviteUseCase(
     private val log = Logger.withTag(TAG)
 
     suspend operator fun invoke(id: WorkspaceInviteId): Either<InviteError, Unit> = either {
-        val callerId = session.currentUserId.flow.first()
+        val callerId = session.currentUserId.first()
             ?: raise(InviteError.NoCurrentUser)
         val caller = userRepository.getById(callerId)
             ?: raise(InviteError.NoCurrentUser)
@@ -45,7 +45,7 @@ class DeclineInviteUseCase(
             .mapLeft { InviteError.LocalWriteFailed(it) }
             .bind()
 
-        val firebaseUid = session.currentFirebaseUid.flow.first()
+        val firebaseUid = session.currentFirebaseUid.first()
         if (!firebaseUid.isNullOrBlank()) {
             Either.catch {
                 userRemoteRepository.removeInvitedWorkspaceRef(firebaseUid, invite.workspaceId)

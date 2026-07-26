@@ -1,7 +1,7 @@
 package com.georgeci.moneysurfer.feature.account.details
 
 import androidx.lifecycle.viewModelScope
-import com.georgeci.moneysurfer.domain.OfflineBuildFlags
+import com.georgeci.moneysurfer.domain.fixtures.FakeHostCapabilities
 import com.georgeci.moneysurfer.domain.fixtures.USD
 import com.georgeci.moneysurfer.domain.fixtures.aTransaction
 import com.georgeci.moneysurfer.domain.fixtures.anAccount
@@ -166,7 +166,7 @@ private fun viewModelFor(
         getAccountById = GetAccountByIdUseCase(accounts),
         getTransactionsByAccount = GetTransactionsByAccountUseCase(txns),
         getAccountBalanceSeries = GetAccountBalanceSeriesUseCase(ClockUseCase()),
-        offlineBuildFlags = OfflineBuildFlags(isOffline = offline),
+        hostCapabilities = FakeHostCapabilities(isOffline = offline),
         deleteWithUndo = DeleteTransactionWithUndo(
             deleteTransaction = DeleteTransactionUseCase(txns, applyChange),
             restoreTransactions = RestoreTransactionsUseCase(applyChange),

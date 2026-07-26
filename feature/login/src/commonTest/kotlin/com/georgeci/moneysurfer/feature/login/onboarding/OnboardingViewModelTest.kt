@@ -1,8 +1,8 @@
 package com.georgeci.moneysurfer.feature.login.onboarding
 
 import app.cash.turbine.test
-import com.georgeci.moneysurfer.domain.OfflineBuildFlags
 import com.georgeci.moneysurfer.domain.firstrun.FirstRunSeeder
+import com.georgeci.moneysurfer.domain.fixtures.FakeHostCapabilities
 import com.georgeci.moneysurfer.domain.fixtures.FakeUiPreferences
 import com.georgeci.moneysurfer.domain.preferences.Pref
 import com.georgeci.moneysurfer.domain.primitives.AccountType
@@ -32,7 +32,7 @@ class OnboardingViewModelTest : StringSpec({
     "online build is a single step that continues into sign-in and marks onboarding completed" {
         runTest {
             val prefs = FakeUiPreferences()
-            val viewModel = OnboardingViewModel(prefs, RecordingSeeder(), OfflineBuildFlags(isOffline = false))
+            val viewModel = OnboardingViewModel(prefs, RecordingSeeder(), FakeHostCapabilities(isOffline = false))
 
             viewModel.currentState.totalSteps shouldBe 1
             viewModel.currentState.showProgress shouldBe false
@@ -49,7 +49,7 @@ class OnboardingViewModelTest : StringSpec({
     "offline build advances to the first-account step before finishing" {
         runTest {
             val prefs = FakeUiPreferences()
-            val viewModel = OnboardingViewModel(prefs, RecordingSeeder(), OfflineBuildFlags(isOffline = true))
+            val viewModel = OnboardingViewModel(prefs, RecordingSeeder(), FakeHostCapabilities(isOffline = true))
 
             viewModel.currentState.totalSteps shouldBe 2
             viewModel.currentState.showSkip shouldBe true
@@ -68,7 +68,7 @@ class OnboardingViewModelTest : StringSpec({
     "the picked account kind is handed to account creation" {
         runTest {
             val prefs = FakeUiPreferences()
-            val viewModel = OnboardingViewModel(prefs, RecordingSeeder(), OfflineBuildFlags(isOffline = true))
+            val viewModel = OnboardingViewModel(prefs, RecordingSeeder(), FakeHostCapabilities(isOffline = true))
 
             viewModel.onEvent(OnboardingEvent.OnContinueClick)
             viewModel.onEvent(OnboardingEvent.OnAccountKindSelected(OnboardingAccountKind.Card))
@@ -84,7 +84,7 @@ class OnboardingViewModelTest : StringSpec({
     "skipping keeps the recommended cash default and still completes the onboarding" {
         runTest {
             val prefs = FakeUiPreferences()
-            val viewModel = OnboardingViewModel(prefs, RecordingSeeder(), OfflineBuildFlags(isOffline = true))
+            val viewModel = OnboardingViewModel(prefs, RecordingSeeder(), FakeHostCapabilities(isOffline = true))
 
             viewModel.sideEffects.effectFlow.test {
                 viewModel.onEvent(OnboardingEvent.OnSkipClick)
@@ -99,7 +99,7 @@ class OnboardingViewModelTest : StringSpec({
             val viewModel = OnboardingViewModel(
                 FakeUiPreferences(),
                 RecordingSeeder(),
-                OfflineBuildFlags(isOffline = true),
+                FakeHostCapabilities(isOffline = true),
             )
 
             viewModel.onEvent(OnboardingEvent.OnContinueClick)
@@ -114,7 +114,7 @@ class OnboardingViewModelTest : StringSpec({
             val viewModel = OnboardingViewModel(
                 FailingUiPreferences(),
                 RecordingSeeder(),
-                OfflineBuildFlags(isOffline = false),
+                FakeHostCapabilities(isOffline = false),
             )
 
             // `inFlight` is cleared and no navigation effect is posted — the user stays on the
@@ -128,7 +128,7 @@ class OnboardingViewModelTest : StringSpec({
     "offline finish seeds the workspace before handing off to account creation" {
         runTest {
             val seeder = RecordingSeeder()
-            val viewModel = OnboardingViewModel(FakeUiPreferences(), seeder, OfflineBuildFlags(isOffline = true))
+            val viewModel = OnboardingViewModel(FakeUiPreferences(), seeder, FakeHostCapabilities(isOffline = true))
 
             viewModel.onEvent(OnboardingEvent.OnContinueClick)
             viewModel.onEvent(OnboardingEvent.OnContinueClick)
@@ -140,7 +140,7 @@ class OnboardingViewModelTest : StringSpec({
     "a failed seed leaves the onboarding unfinished so the next launch replays it" {
         runTest {
             val prefs = FakeUiPreferences()
-            val viewModel = OnboardingViewModel(prefs, FailingSeeder, OfflineBuildFlags(isOffline = true))
+            val viewModel = OnboardingViewModel(prefs, FailingSeeder, FakeHostCapabilities(isOffline = true))
 
             viewModel.onEvent(OnboardingEvent.OnContinueClick)
             viewModel.onEvent(OnboardingEvent.OnContinueClick)
@@ -153,7 +153,7 @@ class OnboardingViewModelTest : StringSpec({
     "online finish does not touch the first-run seed" {
         runTest {
             val seeder = RecordingSeeder()
-            val viewModel = OnboardingViewModel(FakeUiPreferences(), seeder, OfflineBuildFlags(isOffline = false))
+            val viewModel = OnboardingViewModel(FakeUiPreferences(), seeder, FakeHostCapabilities(isOffline = false))
 
             viewModel.onEvent(OnboardingEvent.OnContinueClick)
 
@@ -167,7 +167,7 @@ class OnboardingViewModelTest : StringSpec({
             val viewModel = OnboardingViewModel(
                 FakeUiPreferences(),
                 seeder,
-                OfflineBuildFlags(isOffline = true),
+                FakeHostCapabilities(isOffline = true),
             )
 
             viewModel.onEvent(OnboardingEvent.OnContinueClick)

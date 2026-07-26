@@ -156,9 +156,9 @@ class WorkspaceSyncRoundTripIT {
         }
 
         // ── Pull ──────────────────────────────────────────────────────────────
-        harness.session.currentFirebaseUid.set(ownerUid)
-        harness.session.currentUserId.set(UserId(ownerUid))
-        harness.session.currentWorkspaceId.set(workspaceId)
+        harness.session.setFirebaseUid(ownerUid)
+        harness.session.setCurrentUser(UserId(ownerUid))
+        harness.session.setCurrentWorkspace(workspaceId)
 
         harness.pullRemoteChanges(
             scope = SyncScope.ActiveWorkspace,

@@ -1,5 +1,6 @@
 package com.georgeci.moneysurfer.offline.di
 
+import com.georgeci.moneysurfer.appconfig.di.ConfigModule
 import com.georgeci.moneysurfer.sync.noop.di.SyncNoOpModule
 import org.koin.core.annotation.KoinApplication
 import org.koin.core.annotation.Module
@@ -14,6 +15,7 @@ import org.koin.core.annotation.Module
 @Module(
     includes = [
         SyncNoOpModule::class,
+        ConfigModule::class,
     ],
 )
 class OfflineKoinApp

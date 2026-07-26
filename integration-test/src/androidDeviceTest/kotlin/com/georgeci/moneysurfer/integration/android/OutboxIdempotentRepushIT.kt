@@ -146,8 +146,8 @@ class OutboxIdempotentRepushIT {
         // OutboxEnqueuer's signed-in-aware bits behave the same as in prod.
         harness.env.auth.signOut()
         harness.env.auth.signInWithEmailAndPassword(inviteeEmail, inviteePassword)
-        harness.session.currentUserId.set(com.georgeci.moneysurfer.domain.primitives.UserId(recipientUid))
-        harness.session.currentFirebaseUid.set(recipientUid)
+        harness.session.setCurrentUser(com.georgeci.moneysurfer.domain.primitives.UserId(recipientUid))
+        harness.session.setFirebaseUid(recipientUid)
 
         // Mirror the doc into the recipient's local Room VIA THE DAO — bypassing
         // the outbox to match production: `IncomingInviteRemoteRepositoryImpl`

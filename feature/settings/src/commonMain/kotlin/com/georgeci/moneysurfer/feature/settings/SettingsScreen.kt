@@ -53,6 +53,8 @@ import moneysurfer.feature.settings.generated.resources.settings_change_workspac
 import moneysurfer.feature.settings.generated.resources.settings_change_workspace_supporting
 import moneysurfer.feature.settings.generated.resources.settings_csv_supporting
 import moneysurfer.feature.settings.generated.resources.settings_csv_title
+import moneysurfer.feature.settings.generated.resources.settings_debug_config
+import moneysurfer.feature.settings.generated.resources.settings_debug_config_supporting
 import moneysurfer.feature.settings.generated.resources.settings_delete_account
 import moneysurfer.feature.settings.generated.resources.settings_logout
 import moneysurfer.feature.settings.generated.resources.settings_logout_guest_warning_cancel
@@ -86,6 +88,10 @@ import org.koin.compose.viewmodel.koinViewModel
  * their absence is what the offline golden Maestro flow asserts via `notVisible`.
  * Everything else — including [PreferencesRow] and [BackupRow] — is composed in both
  * variants, and the same flow asserts those positively.
+ *
+ * [DebugConfigRow] is the one tag that varies by *build type* rather than by host: it appears
+ * whenever a real debug-overrides layer is bound, and never in a release build. No Maestro flow
+ * asserts it either way, precisely so the golden path stays independent of build type.
  */
 object SettingsTestTags {
     const val Root = "settings:root"
@@ -99,6 +105,7 @@ object SettingsTestTags {
     const val CsvRow = "settings:csvRow"
     const val LogoutRow = "settings:logoutRow"
     const val DeleteAccountRow = "settings:deleteAccountRow"
+    const val DebugConfigRow = "settings:debugConfigRow"
 }
 
 // The effect dispatch below is one straight-line branch per destination — flat, exhaustive, and
@@ -119,6 +126,7 @@ fun SettingsScreen(
     onNavigateToCsvBackup: () -> Unit,
     onNavigateToAbout: () -> Unit,
     onNavigateToDeleteAccount: () -> Unit,
+    onNavigateToDebugConfig: () -> Unit,
     viewModel: SettingsViewModel = koinViewModel(),
 ) {
     val state by viewModel.collectAsStateWithLifecycle()
@@ -138,6 +146,7 @@ fun SettingsScreen(
             SettingsEffect.NavigateToCsvBackup -> onNavigateToCsvBackup()
             SettingsEffect.NavigateToAbout -> onNavigateToAbout()
             SettingsEffect.NavigateToDeleteAccount -> onNavigateToDeleteAccount()
+            SettingsEffect.NavigateToDebugConfig -> onNavigateToDebugConfig()
         }
     }
 
@@ -310,6 +319,16 @@ private fun SettingsContent(
                     trailing = { SurferSettingsChevron() },
                     modifier = Modifier.testTag(SettingsTestTags.AboutRow),
                 )
+                if (state.showDebugConfig) {
+                    SurferSettingsRow(
+                        icon = SurferIcons.Code,
+                        title = stringResource(Res.string.settings_debug_config),
+                        supportingText = stringResource(Res.string.settings_debug_config_supporting),
+                        onClick = { onEvent(SettingsEvent.OnDebugConfigClick) },
+                        trailing = { SurferSettingsChevron() },
+                        modifier = Modifier.testTag(SettingsTestTags.DebugConfigRow),
+                    )
+                }
             }
 
             if (state.showLogout) {

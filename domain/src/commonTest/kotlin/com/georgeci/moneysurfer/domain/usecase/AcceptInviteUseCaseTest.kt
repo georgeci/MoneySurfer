@@ -168,7 +168,7 @@ private class AcceptInviteNoopUserRemoteRepository : UserRemoteRepository {
 }
 
 private class NoopWorkspaceSyncer : WorkspaceSyncer {
-    override suspend fun pushAll() = Unit
+    override suspend fun pushAll(): Boolean = true
     override suspend fun syncAll() = Unit
     override suspend fun syncWorkspace(workspaceId: WorkspaceId) = Unit
 }

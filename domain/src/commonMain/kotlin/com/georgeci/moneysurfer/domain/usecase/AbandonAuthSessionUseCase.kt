@@ -2,7 +2,7 @@ package com.georgeci.moneysurfer.domain.usecase
 
 import arrow.core.Either
 import co.touchlab.kermit.Logger
-import com.georgeci.moneysurfer.domain.auth.SessionPointers
+import com.georgeci.moneysurfer.domain.auth.SessionMutator
 import com.georgeci.moneysurfer.domain.repositories.AuthRemoteRepository
 import org.koin.core.annotation.Single
 
@@ -23,7 +23,7 @@ import org.koin.core.annotation.Single
  */
 @Single
 class AbandonAuthSessionUseCase(
-    private val session: SessionPointers,
+    private val sessionMutator: SessionMutator,
     private val authRemoteRepository: AuthRemoteRepository,
 ) {
     private val log = Logger.withTag(TAG)
@@ -38,9 +38,9 @@ class AbandonAuthSessionUseCase(
      */
     suspend operator fun invoke(isAnon: Boolean) {
         log.w { "[rollback] clearing session pointers after a failed post-auth bootstrap" }
-        session.currentWorkspaceId.set(null)
-        session.currentFirebaseUid.set(null)
-        session.currentUserId.set(null)
+        // One store edit, so a crash mid-rollback cannot leave a half-cleared session behind —
+        // which is the state this use case exists to get out of.
+        sessionMutator.clearSession()
 
         if (isAnon) {
             log.i { "[rollback] keeping the anonymous provider session — signing out would orphan it" }

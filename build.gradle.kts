@@ -177,6 +177,8 @@ val coverageExcludedProjects = setOf(
     ":shared",
     ":sync:no-op",
     ":feature",
+    // Container project for `app-config:api` / `app-config:default`; no sources of its own.
+    ":app-config",
     ":androidApp",
     ":androidApp-offline",
     ":sync-test-fixtures",
@@ -291,6 +293,8 @@ dependencies {
     kover(projects.composeApp)
     kover(projects.composeAppOffline)
     kover(projects.domain)
+    kover(projects.appConfig.api)
+    kover(projects.appConfig.default)
     kover(projects.dataLocal)
     kover(projects.dataRemote)
     kover(projects.syncSurfer)

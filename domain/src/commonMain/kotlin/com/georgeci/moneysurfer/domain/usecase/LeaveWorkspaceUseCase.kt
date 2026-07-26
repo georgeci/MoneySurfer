@@ -28,7 +28,7 @@ class LeaveWorkspaceUseCase(
     private val log = Logger.withTag(TAG)
 
     suspend operator fun invoke(workspaceId: WorkspaceId): Either<InviteError, Unit> = either {
-        val callerId = session.currentUserId.flow.first()
+        val callerId = session.currentUserId.first()
             ?: raise(InviteError.NoCurrentUser)
 
         val members = memberRepository.getByWorkspaceId(workspaceId).first()

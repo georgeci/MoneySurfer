@@ -3,6 +3,7 @@ package com.georgeci.moneysurfer.feature.login
 import arrow.core.Either
 import co.touchlab.kermit.Logger
 import com.georgeci.moneysurfer.domain.auth.AuthError
+import com.georgeci.moneysurfer.domain.config.HostCapabilities
 import com.georgeci.moneysurfer.domain.usecase.AnonymousLoginUseCase
 import com.georgeci.moneysurfer.domain.usecase.DemoLoginUseCase
 import com.georgeci.moneysurfer.domain.usecase.LoginUseCase
@@ -17,9 +18,13 @@ class SignInViewModel(
     private val signup: SignupUseCase,
     private val anonymousLogin: AnonymousLoginUseCase,
     private val demoLogin: DemoLoginUseCase,
-    config: SignInFeatureConfig,
+    hostCapabilities: HostCapabilities,
 ) : MviViewModel<SignInState, SignInEvent, SignInEffect>(
-    initialState = SignInState(config = config),
+    initialState = SignInState(
+        emailPasswordEnabled = hostCapabilities.signInEmailPassword,
+        anonymousEnabled = hostCapabilities.signInAnonymous,
+        demoEnabled = hostCapabilities.signInDemo,
+    ),
 ) {
 
     private val log = Logger.withTag(TAG)
@@ -177,8 +182,19 @@ data class SignInState(
     val isLoading: Boolean = false,
     val error: SignInError? = null,
     val errorPresentation: SignInErrorPresentation = SignInErrorPresentation.Inline,
-    val config: SignInFeatureConfig = SignInFeatureConfig(),
+    /**
+     * Which auth entry points this build offers, from `HostCapabilities`. Flat booleans on the state
+     * rather than a config object: the screen only ever asks "is this button there?", and the host
+     * is the single place that answers it.
+     */
+    val emailPasswordEnabled: Boolean = true,
+    val anonymousEnabled: Boolean = true,
+    val demoEnabled: Boolean = true,
 ) {
+    /** True when the screen should render only the demo CTA — the offline build's shape. */
+    val demoOnly: Boolean
+        get() = demoEnabled && !emailPasswordEnabled && !anonymousEnabled
+
     /**
      * Only gated on [isLoading]. Blank or malformed input no longer disables the button — a dead
      * grey button explains nothing, whereas submitting surfaces a message under the offending
