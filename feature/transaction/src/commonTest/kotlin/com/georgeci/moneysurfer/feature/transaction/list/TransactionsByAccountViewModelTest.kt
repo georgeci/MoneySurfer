@@ -1,5 +1,6 @@
 package com.georgeci.moneysurfer.feature.transaction.list
 
+import app.cash.turbine.test
 import com.georgeci.moneysurfer.domain.auth.InMemorySessionPointers
 import com.georgeci.moneysurfer.domain.fixtures.EUR
 import com.georgeci.moneysurfer.domain.fixtures.FakeUiPreferences
@@ -529,6 +530,22 @@ class TransactionsByAccountViewModelTest : StringSpec({
             env.snackbar.requests.first().onAction!!.invoke()
 
             viewModel.content().rowIds().shouldContainExactly("rent", "coffee")
+        }
+    }
+
+    "a row that is already gone deletes nothing and offers no Undo" {
+        runTest {
+            val env = Env(transactions = listOf(expense(id = "rent", amount = 900)))
+            val viewModel = env.viewModel()
+
+            // Two devices, or a double tap: nothing was removed, so "Deleted · Undo" would be a
+            // message about an event that did not happen.
+            env.snackbar.requests.test {
+                viewModel.onEvent(TransactionsByAccountEvent.OnDeleteTransaction(transactionId("ghost")))
+
+                viewModel.content().rowIds().shouldContainExactly("rent")
+                expectNoEvents()
+            }
         }
     }
 

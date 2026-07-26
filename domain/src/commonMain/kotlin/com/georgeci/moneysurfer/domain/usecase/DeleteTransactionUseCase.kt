@@ -24,9 +24,10 @@ class DeleteTransactionUseCase(
      */
     suspend operator fun invoke(id: TransactionId): List<Transaction> {
         val target = transactionRepository.getById(id) ?: return emptyList()
+        // A row always matches its own transferId, so this lookup returns the target plus its
+        // siblings — no fallback needed for the transfer case.
         val rows = target.transferId
             ?.let { transactionRepository.getByTransferId(it) }
-            ?.takeIf { it.isNotEmpty() }
             ?: listOf(target)
         rows.forEach { applyTransactionChange(old = it, new = null) }
         return rows
