@@ -28,12 +28,17 @@ import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 import com.georgeci.moneysurfer.domain.repositories.AccountRepository
 import com.georgeci.moneysurfer.domain.repositories.CategoryRepository
 import com.georgeci.moneysurfer.domain.repositories.TransactionRepository
+import com.georgeci.moneysurfer.domain.usecase.ApplyTransactionChangeUseCase
+import com.georgeci.moneysurfer.domain.usecase.DeleteTransactionUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetAccountByIdUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetAccountsUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetCategoriesUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetTransactionsByAccountUseCase
+import com.georgeci.moneysurfer.domain.usecase.RestoreTransactionsUseCase
 import com.georgeci.moneysurfer.domain.util.TransactionPeriodWindow
 import com.georgeci.moneysurfer.feature.transaction.filter.TransactionFilterStore
+import com.georgeci.moneysurfer.navigation.DeleteTransactionWithUndo
+import com.georgeci.moneysurfer.navigation.SnackbarController
 import io.kotest.matchers.types.shouldBeInstanceOf
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -99,10 +104,12 @@ internal class Env(transactions: List<Transaction> = emptyList()) {
     val repository = WindowingTransactionRepository(transactions)
     val preferences = FakeUiPreferences()
     val filterStore = TransactionFilterStore()
+    val snackbar = SnackbarController()
     private val session = InMemorySessionPointers(currentWorkspaceId = WORKSPACE)
 
-    fun viewModel(accountId: AccountId? = ACCOUNT): TransactionsByAccountViewModel =
-        TransactionsByAccountViewModel(
+    fun viewModel(accountId: AccountId? = ACCOUNT): TransactionsByAccountViewModel {
+        val applyChange = ApplyTransactionChangeUseCase(repository, SingleAccountRepository)
+        return TransactionsByAccountViewModel(
             accountId = accountId,
             getTransactionsByAccount = GetTransactionsByAccountUseCase(repository),
             getAccountById = GetAccountByIdUseCase(SingleAccountRepository),
@@ -111,7 +118,13 @@ internal class Env(transactions: List<Transaction> = emptyList()) {
             filterStore = filterStore,
             uiPreferences = preferences,
             clock = ClockUseCase(FixedClock(TODAY.atStartOfDayIn(TimeZone.UTC))),
+            deleteWithUndo = DeleteTransactionWithUndo(
+                deleteTransaction = DeleteTransactionUseCase(repository, applyChange),
+                restoreTransactions = RestoreTransactionsUseCase(applyChange),
+                snackbar = snackbar,
+            ),
         )
+    }
 }
 
 private val GROCERIES = categoryId("cat-groceries")
@@ -185,9 +198,20 @@ internal class WindowingTransactionRepository(
     override suspend fun getById(id: TransactionId): Transaction? = rows.value.find { it.id == id }
     override suspend fun getByTransferId(transferId: TransferId): List<Transaction> =
         rows.value.filter { it.transferId == transferId }
-    override suspend fun insert(transaction: Transaction) = Unit
-    override suspend fun update(transaction: Transaction) = Unit
-    override suspend fun delete(id: TransactionId) = Unit
+
+    // Writing, not no-op: the list is fed by this flow, so a delete has to actually leave the
+    // rows for the screen's reaction to it to be worth asserting.
+    override suspend fun insert(transaction: Transaction) {
+        rows.value = rows.value + transaction
+    }
+
+    override suspend fun update(transaction: Transaction) {
+        rows.value = rows.value.map { if (it.id == transaction.id) transaction else it }
+    }
+
+    override suspend fun delete(id: TransactionId) {
+        rows.value = rows.value.filterNot { it.id == id }
+    }
 }
 
 internal object SingleAccountRepository : AccountRepository {

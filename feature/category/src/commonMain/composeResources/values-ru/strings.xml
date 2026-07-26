@@ -65,6 +65,8 @@
     <string name="category_details_share_percent">%1$d%%</string>
     <string name="category_details_recent">Недавние</string>
     <string name="category_details_recent_empty">В этой категории пока нет операций.</string>
+    <string name="category_details_transaction_deleted_snackbar">Транзакция удалена</string>
+    <string name="category_details_transaction_delete_undo">Отменить</string>
     <string name="category_details_transaction_untitled">Без описания</string>
     <string name="category_details_log_expense">Добавить расход</string>
     <string name="category_details_log_income">Добавить доход</string>

@@ -38,12 +38,12 @@ import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.CategoryId
 import com.georgeci.moneysurfer.domain.primitives.CategoryType
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
-import com.georgeci.moneysurfer.feature.transaction.delete.TransactionDeleteConfirmationDialog
 import com.georgeci.moneysurfer.uikit.components.SurferButton
 import com.georgeci.moneysurfer.uikit.components.SurferButtonSize
 import com.georgeci.moneysurfer.uikit.components.SurferButtonStyle
 import com.georgeci.moneysurfer.uikit.components.SurferPickerRow
 import com.georgeci.moneysurfer.uikit.components.base.SurferSegmentedControl
+import com.georgeci.moneysurfer.uikit.components.transaction.SurferDeleteTransactionDialog
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
 import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
@@ -204,10 +204,11 @@ internal fun TransactionCreationContent(
     SyncAmountFields(state = state, amountState = amountState, toAmountState = toAmountState, onEvent = onEvent)
 
     if (state.showDeleteConfirmation) {
-        TransactionDeleteConfirmationDialog(
-            noteOrNull = state.note.ifBlank { null },
+        SurferDeleteTransactionDialog(
+            titleOrNull = state.note.ifBlank { null },
             onConfirm = { onEvent(TransactionCreationEvent.OnDeleteConfirmed) },
             onDismiss = { onEvent(TransactionCreationEvent.OnDeleteDismissed) },
+            isTransfer = state.isTransfer,
         )
     }
 

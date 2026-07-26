@@ -6,6 +6,7 @@ import com.georgeci.moneysurfer.domain.fixtures.USD
 import com.georgeci.moneysurfer.domain.fixtures.aTransaction
 import com.georgeci.moneysurfer.domain.fixtures.anAccount
 import com.georgeci.moneysurfer.domain.fixtures.dollars
+import com.georgeci.moneysurfer.domain.fixtures.transactionId
 import com.georgeci.moneysurfer.domain.formatter.MoneyFormatter
 import com.georgeci.moneysurfer.domain.model.Account
 import com.georgeci.moneysurfer.domain.model.AccountExtraDetail
@@ -19,10 +20,15 @@ import com.georgeci.moneysurfer.domain.primitives.TransferId
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 import com.georgeci.moneysurfer.domain.repositories.AccountRepository
 import com.georgeci.moneysurfer.domain.repositories.TransactionRepository
+import com.georgeci.moneysurfer.domain.usecase.ApplyTransactionChangeUseCase
+import com.georgeci.moneysurfer.domain.usecase.DeleteTransactionUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetAccountBalanceSeriesUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetAccountByIdUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetTransactionsByAccountUseCase
+import com.georgeci.moneysurfer.domain.usecase.RestoreTransactionsUseCase
 import com.georgeci.moneysurfer.domain.util.TransactionPeriodWindow
+import com.georgeci.moneysurfer.navigation.DeleteTransactionWithUndo
+import com.georgeci.moneysurfer.navigation.SnackbarController
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.Dispatchers
@@ -101,6 +107,36 @@ class AccountDetailsViewModelTest : StringSpec({
         }
     }
 
+    "swiping a transaction away removes it, and the snackbar's Undo puts it back" {
+        runTest {
+            val account = anAccount(currencyCode = USD)
+            val snackbar = SnackbarController()
+            val vm = viewModelFor(
+                account = account,
+                offline = false,
+                transactions = listOf(
+                    aTransaction(id = transactionId("keep"), accountId = account.id, money = 30.dollars),
+                    aTransaction(id = transactionId("swiped"), accountId = account.id, money = 70.dollars),
+                ),
+                snackbar = snackbar,
+            )
+            try {
+                vm.awaitContent()
+
+                vm.onEvent(AccountDetailsEvent.OnDeleteTransaction(transactionId("swiped")))
+
+                // Not an optimistic edit of the state — the row is gone because the query re-emitted.
+                vm.awaitContent().transactions.map { it.id.value } shouldBe listOf("keep")
+
+                snackbar.requests.first().onAction!!.invoke()
+
+                vm.awaitContent().transactions.map { it.id.value } shouldBe listOf("keep", "swiped")
+            } finally {
+                vm.viewModelScope.cancel()
+            }
+        }
+    }
+
     "an account without extra details reports an empty list rather than a blank section" {
         runTest {
             val vm = viewModelFor(anAccount(), offline = false)
@@ -120,13 +156,24 @@ private fun viewModelFor(
     account: Account,
     offline: Boolean,
     transactions: List<Transaction> = emptyList(),
-) = AccountDetailsViewModel(
-    accountId = account.id,
-    getAccountById = GetAccountByIdUseCase(SingleAccountRepository(account)),
-    getTransactionsByAccount = GetTransactionsByAccountUseCase(FixedTransactionRepository(transactions)),
-    getAccountBalanceSeries = GetAccountBalanceSeriesUseCase(ClockUseCase()),
-    hostCapabilities = FakeHostCapabilities(isOffline = offline),
-)
+    snackbar: SnackbarController = SnackbarController(),
+): AccountDetailsViewModel {
+    val accounts = SingleAccountRepository(account)
+    val txns = FixedTransactionRepository(transactions)
+    val applyChange = ApplyTransactionChangeUseCase(txns, accounts)
+    return AccountDetailsViewModel(
+        accountId = account.id,
+        getAccountById = GetAccountByIdUseCase(accounts),
+        getTransactionsByAccount = GetTransactionsByAccountUseCase(txns),
+        getAccountBalanceSeries = GetAccountBalanceSeriesUseCase(ClockUseCase()),
+        hostCapabilities = FakeHostCapabilities(isOffline = offline),
+        deleteWithUndo = DeleteTransactionWithUndo(
+            deleteTransaction = DeleteTransactionUseCase(txns, applyChange),
+            restoreTransactions = RestoreTransactionsUseCase(applyChange),
+            snackbar = snackbar,
+        ),
+    )
+}
 
 /** Serves exactly one account; every other operation is out of this screen's reach. */
 private class SingleAccountRepository(private val account: Account) : AccountRepository {
@@ -137,7 +184,10 @@ private class SingleAccountRepository(private val account: Account) : AccountRep
     override suspend fun insert(account: Account) = error("not used")
     override suspend fun update(account: Account) = error("not used")
     override suspend fun delete(id: AccountId) = error("not used")
-    override suspend fun applyDelta(accountId: AccountId, delta: Money) = error("not used")
+
+    // Deleting a transaction moves the balance, so the write has to land somewhere. What the
+    // balance becomes is asserted in DeleteUndoIntegrationIT against real Room.
+    override suspend fun applyDelta(accountId: AccountId, delta: Money) = Unit
     override suspend fun setBalance(accountId: AccountId, balance: Money) = error("not used")
     override suspend fun reorder(orderedIds: List<AccountId>) = error("not used")
     override suspend fun setArchived(accountId: AccountId, archived: Boolean) = error("not used")
@@ -155,10 +205,21 @@ private class FixedTransactionRepository(transactions: List<Transaction>) : Tran
         limit: Int,
     ) = error("not used")
     override fun getTotals(accountId: AccountId?, window: TransactionPeriodWindow) = error("not used")
-    override suspend fun getById(id: TransactionId): Transaction? = null
+    override suspend fun getById(id: TransactionId): Transaction? = all.value.find { it.id == id }
     override suspend fun getByTransferId(transferId: TransferId): List<Transaction> =
         all.value.filter { it.transferId == transferId }
-    override suspend fun insert(transaction: Transaction) = error("not used")
-    override suspend fun update(transaction: Transaction) = error("not used")
-    override suspend fun delete(id: TransactionId) = error("not used")
+
+    // Writing, not no-op: the list is fed by this flow, so a delete has to actually leave the rows
+    // for the screen's reaction to it to be worth asserting.
+    override suspend fun insert(transaction: Transaction) {
+        all.value = all.value + transaction
+    }
+
+    override suspend fun update(transaction: Transaction) {
+        all.value = all.value.map { if (it.id == transaction.id) transaction else it }
+    }
+
+    override suspend fun delete(id: TransactionId) {
+        all.value = all.value.filterNot { it.id == id }
+    }
 }

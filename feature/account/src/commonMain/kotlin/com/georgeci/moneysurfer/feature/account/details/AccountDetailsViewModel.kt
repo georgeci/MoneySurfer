@@ -16,6 +16,10 @@ import com.georgeci.moneysurfer.domain.primitives.TransactionType
 import com.georgeci.moneysurfer.domain.usecase.GetAccountBalanceSeriesUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetAccountByIdUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetTransactionsByAccountUseCase
+import com.georgeci.moneysurfer.feature.account.generated.resources.Res
+import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_transaction_delete_undo
+import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_transaction_deleted_snackbar
+import com.georgeci.moneysurfer.navigation.DeleteTransactionWithUndo
 import com.georgeci.moneysurfer.utils.MviViewModel
 import org.koin.core.annotation.KoinViewModel
 
@@ -26,6 +30,7 @@ class AccountDetailsViewModel(
     private val getTransactionsByAccount: GetTransactionsByAccountUseCase,
     private val getAccountBalanceSeries: GetAccountBalanceSeriesUseCase,
     private val hostCapabilities: HostCapabilities,
+    private val deleteWithUndo: DeleteTransactionWithUndo,
 ) : MviViewModel<AccountDetailsState, AccountDetailsEvent, AccountDetailsEffect>(
     initialState = AccountDetailsState.Loading(accountId),
 ) {
@@ -49,15 +54,26 @@ class AccountDetailsViewModel(
                 updateState {
                     AccountDetailsState.content.filter.modify(this) { event.filter }
                 }
+            // The list is a database Flow, so the row leaves — and returns on Undo — on its own.
+            is AccountDetailsEvent.OnDeleteTransaction -> launch {
+                deleteWithUndo(
+                    transactionId = event.transactionId,
+                    message = Res.string.account_details_transaction_deleted_snackbar,
+                    undoLabel = Res.string.account_details_transaction_delete_undo,
+                )
+            }
         }
     }
 
     private fun loadData() {
         launch {
             val accountId = currentState.accountId
-            val account = getAccountById(accountId)
-            val currency = account?.currencyCode ?: CurrencyCode("USD")
             getTransactionsByAccount(accountId).collect { transactions ->
+                // Re-read per emission rather than once up front: deleting a row from this screen
+                // moves the account's balance, and a value captured before the flow started would
+                // leave the hero card printing the pre-delete number until the screen is reopened.
+                val account = getAccountById(accountId)
+                val currency = account?.currencyCode ?: CurrencyCode("USD")
                 val visible = transactions.filter { it.type != TransactionType.OPENING_BALANCE }
                 val totals = visible.formatTotals(currency)
                 val txnUi = visible.map { it.toUi(currency) }
@@ -75,6 +91,9 @@ class AccountDetailsViewModel(
                             account.toContent(accountId, txnUi, totals, chart)
                         is AccountDetailsState.Content -> copy(
                             transactions = txnUi,
+                            formattedBalance = account
+                                ?.let { MoneyFormatter.format(it.balance, it.currencyCode) }
+                                ?: formattedBalance,
                             formattedIncome = totals.income,
                             formattedExpenses = totals.expenses,
                             chart = chart,
@@ -142,6 +161,7 @@ class AccountDetailsViewModel(
         formattedAmount = MoneyFormatter.format(money.abs(), currency),
         isExpense = type == TransactionType.EXPENSE,
         categoryHueSeed = categoryId?.value.orEmpty(),
+        isTransfer = transferId != null,
     )
 }
 
@@ -193,6 +213,8 @@ data class AccountTransactionUi(
     val formattedAmount: String,
     val isExpense: Boolean,
     val categoryHueSeed: String,
+    /** One leg of a transfer, which deleting takes down together with its sibling. */
+    val isTransfer: Boolean = false,
 )
 
 sealed interface AccountDetailsEvent {
@@ -202,6 +224,9 @@ sealed interface AccountDetailsEvent {
     data object OnAddTransactionClick : AccountDetailsEvent
     data object OnSeeAllTransactionsClick : AccountDetailsEvent
     data class OnFilterChanged(val filter: TransactionFilter) : AccountDetailsEvent
+
+    /** A row was swiped away and the confirmation accepted; the Undo rides on the snackbar. */
+    data class OnDeleteTransaction(val transactionId: TransactionId) : AccountDetailsEvent
 }
 
 sealed interface AccountDetailsEffect {

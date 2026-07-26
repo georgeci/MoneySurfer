@@ -17,6 +17,9 @@ sealed interface TransactionsByAccountEvent {
     data object OnNextPeriodClick : TransactionsByAccountEvent
     data class OnPeriodModeChanged(val mode: TransactionPeriodMode) : TransactionsByAccountEvent
     data object OnLoadMore : TransactionsByAccountEvent
+
+    /** A row was swiped away and the confirmation accepted; the Undo rides on the snackbar. */
+    data class OnDeleteTransaction(val transactionId: TransactionId) : TransactionsByAccountEvent
 }
 
 sealed interface TransactionsByAccountEffect {

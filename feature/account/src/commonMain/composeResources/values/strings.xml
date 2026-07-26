@@ -75,6 +75,8 @@
     <string name="account_details_filter_income">Income</string>
     <string name="account_details_add_transaction">Add transaction</string>
     <string name="account_details_transactions_empty">No transactions yet.</string>
+    <string name="account_details_transaction_deleted_snackbar">Transaction deleted</string>
+    <string name="account_details_transaction_delete_undo">Undo</string>
     <string name="account_details_extra_details_section">Extra details</string>
 
     <!-- Account chooser bottom sheet -->
