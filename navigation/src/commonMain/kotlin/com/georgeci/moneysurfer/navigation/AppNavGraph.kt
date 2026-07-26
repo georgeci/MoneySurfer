@@ -26,8 +26,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavEntry
@@ -118,11 +120,14 @@ fun AppNavGraph(
     val navigator = remember(backStack) { AppNavigator(backStack) }
     val appLaunchViewModel: AppLaunchViewModel = koinViewModel()
     val targetRoute by appLaunchViewModel.targetRoute.collectAsStateWithLifecycle()
+    // The launch decision lands in a `LaunchedEffect`, i.e. one frame *after* the composition that
+    // first sees a non-null `targetRoute`. Without this flag that frame renders the back stack's
+    // bootstrap route (`Route.SignIn`) and `NavDisplay` then animates SignIn → Onboarding.
+    var launchRouteApplied by remember { mutableStateOf(false) }
     LaunchedEffect(targetRoute) {
         val route = targetRoute ?: return@LaunchedEffect
-        val current = backStack.lastOrNull()
-        if (current == route) return@LaunchedEffect
-        navigator.resetTo(route)
+        if (backStack.lastOrNull() != route) navigator.resetTo(route)
+        launchRouteApplied = true
     }
 
     val entryProvider: (NavKey) -> NavEntry<NavKey> = entryProvider {
@@ -179,9 +184,9 @@ fun AppNavGraph(
             snackbarHost = { SnackbarHost(snackbarHostState) { data -> Snackbar(data) } },
         ) { _ ->
             val topLevel = currentTopLevel
-            if (targetRoute == null) {
-                // Launch decision still pending — hold on the splash instead of flashing the
-                // bootstrap route (`Route.SignIn`) at an already signed-in user.
+            if (!launchRouteApplied) {
+                // Launch decision still pending, or made but not yet on the back stack — hold on
+                // the splash instead of flashing the bootstrap route (`Route.SignIn`).
                 SurferSplash()
             } else if (topLevel == null) {
                 navDisplay()
