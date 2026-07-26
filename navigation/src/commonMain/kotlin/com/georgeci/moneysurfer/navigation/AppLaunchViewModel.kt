@@ -6,6 +6,7 @@ import co.touchlab.kermit.Logger
 import com.georgeci.moneysurfer.domain.auth.SessionPointers
 import com.georgeci.moneysurfer.domain.config.ConfigHydration
 import com.georgeci.moneysurfer.domain.config.HostCapabilities
+import com.georgeci.moneysurfer.domain.config.RemoteConfigRefresh
 import com.georgeci.moneysurfer.domain.config.SyncSettings
 import com.georgeci.moneysurfer.domain.firstrun.FirstRunSeeder
 import com.georgeci.moneysurfer.domain.preferences.UiPreferences
@@ -56,6 +57,7 @@ class AppLaunchViewModel(
     private val hostCapabilities: HostCapabilities,
     private val getAccounts: GetAccountsUseCase,
     private val configHydration: ConfigHydration,
+    private val remoteConfigRefresh: RemoteConfigRefresh,
 ) : ViewModel() {
 
     private val log = Logger.withTag(TAG)
@@ -105,6 +107,22 @@ class AppLaunchViewModel(
         }
 
         startPeriodicSyncTicker()
+    }
+
+    /**
+     * Re-reads server-owned flags into the RemoteGlobal layer. Driven by the navigation host's
+     * lifecycle, so it runs once on launch and again on every return to the foreground.
+     *
+     * Deliberately **not** awaited next to `configHydration.hydrate()` above. Hydration is a local
+     * read the start route depends on; this one reaches Firestore, and blocking the splash on a
+     * network round trip would slow every cold start to deliver a value the mirror already answers
+     * for. The result lands in the mirror and reaches the UI through `Config.observe`.
+     *
+     * Nothing to handle on failure: the layer swallows an unreachable server and keeps the mirrored
+     * values, which is what makes an offline launch resolve correctly.
+     */
+    fun refreshRemoteConfig() {
+        viewModelScope.launch { remoteConfigRefresh.refresh() }
     }
 
     /**

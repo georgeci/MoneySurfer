@@ -3,6 +3,7 @@ package com.georgeci.moneysurfer.di
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import com.georgeci.moneysurfer.appconfig.DebugConfigSource
+import com.georgeci.moneysurfer.appconfig.RemoteConfigMirror
 import com.georgeci.moneysurfer.data.db.MoneySurferDatabase
 import com.georgeci.moneysurfer.domain.AppInfo
 import com.georgeci.moneysurfer.domain.backup.AppRestarter
@@ -94,6 +95,9 @@ private val testPlatformModule = module {
     single<DataStore<Preferences>> { error("verify() must not instantiate this") }
     // Real hosts bind this from `sharedPlatformModule` (release APKs get `Empty`).
     single<DebugConfigSource> { DebugConfigSource.Empty }
+    // The online host binds this from its own per-platform `onlinePlatformModule`, which is not on
+    // the JVM test classpath — it builds a DataStore file the way the Room/DataStore stubs above do.
+    single<RemoteConfigMirror> { error("verify() must not instantiate this") }
     single { AppInfo(version = "test", versionCode = 1) }
     single<BackupStorageLocator> { error("verify() must not instantiate this") }
     single<AppRestarter> { error("verify() must not instantiate this") }

@@ -2,7 +2,6 @@ package com.georgeci.moneysurfer.di
 
 import com.georgeci.moneysurfer.appconfig.BuildConfigSource
 import com.georgeci.moneysurfer.appconfig.HostConfigKeys
-import com.georgeci.moneysurfer.appconfig.RemoteGlobalConfigSource
 import org.koin.core.annotation.Module
 import org.koin.core.annotation.Single
 
@@ -33,11 +32,4 @@ class OnlineHostConfigModule {
         // shipped switched off".
         put(HostConfigKeys.syncEnabled, true)
     }
-
-    /**
-     * No remote layer yet: `app-config/remote` and the `appConfig/flags` document land with the
-     * follow-up issue. Until then every `remoteOverridable` key falls through to Build.
-     */
-    @Single
-    fun remoteGlobalConfigSource(): RemoteGlobalConfigSource = RemoteGlobalConfigSource.Empty
 }

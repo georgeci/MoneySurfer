@@ -1,6 +1,7 @@
 package com.georgeci.moneysurfer.di
 
 import com.georgeci.moneysurfer.appconfig.di.ConfigModule
+import com.georgeci.moneysurfer.appconfig.remote.di.RemoteConfigModule
 import com.georgeci.moneysurfer.data.di.RemoteDataModule
 import com.georgeci.moneysurfer.data.di.SyncImplModule
 import com.georgeci.moneysurfer.sync.internal.di.SyncModule
@@ -15,6 +16,9 @@ import org.koin.core.annotation.Module
 // `ConfigModule` is included here rather than in shared's `AppModule` for the same reason the
 // remote modules are: `app-config/default` is a host dependency, and the Build layer it assembles
 // is host-specific.
+//
+// `RemoteConfigModule` is online-only: it binds the RemoteGlobal layer to `appConfig/flags`, and the
+// offline build binds `RemoteGlobalConfigSource.Empty` in its own wiring instead.
 @KoinApplication
 @Module(
     includes = [
@@ -22,6 +26,7 @@ import org.koin.core.annotation.Module
         SyncImplModule::class,
         SyncModule::class,
         ConfigModule::class,
+        RemoteConfigModule::class,
         OnlineHostConfigModule::class,
         OnlineFirstRunModule::class,
     ],

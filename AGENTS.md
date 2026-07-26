@@ -36,6 +36,7 @@ shared/                 DI composition root, app theme, navigation glue
 domain/                 business interfaces, models, use cases
 app-config/api/         SDK-free configuration contracts (keys, codecs, layers)
 app-config/default/     layered configuration engine + Koin assembly
+app-config/remote/      Firestore-bound RemoteGlobal layer (appConfig/flags)
 data-local/             Room, DataStore, backup implementations
 data-remote/            Firebase/Firestore remote implementations
 sync/api/               SDK-free sync coordinator contracts
@@ -64,11 +65,14 @@ androidApp-offline -> composeAppOffline -> shared    feature:* -> {navigation, u
 composeApp        -> {data-remote, sync:default, sync-surfer}   # online wiring
 composeAppOffline -> {sync:api, sync:no-op}                     # offline wiring
 composeApp, composeAppOffline -> app-config:{api, default}      # engine assembly + Build layer
+composeApp        -> app-config:remote                          # online-only RemoteGlobal layer
+composeApp        -> data-local                                 # flag-mirror factory, per platform
 shared            -> data-local                                 # DI wiring only
 shared            -> app-config:api                             # DebugConfigSource binding only
 sync-surfer       -> {sync:default, data-local, data-remote}
 app-config:api    -> domain
 app-config:default -> app-config:api
+app-config:remote -> app-config:{api, default}                  # ConfigRegistry + Firestore
 data-local        -> app-config:api                             # layer impls + key groups
 data-*            -> domain
 ```
@@ -204,6 +208,11 @@ Rules for this table:
 - A host key is only the *build* term. `SyncSettings.isEnabled` also ands in a server kill
   switch and a user toggle, so flipping the build term on is what makes the other two
   reachable — not what forces sync on.
+- The server term is **live** in the online build since issue #333: setting
+  `sync.remote_enabled: false` in the `appConfig/flags` Firestore document turns sync off on
+  every online install at its next launch or foreground return, with no release. Only keys
+  declared `remoteOverridable = true` can be reached that way, and that document is
+  world-readable — see [docs/adr/ADR-004-configuration.md](docs/adr/ADR-004-configuration.md).
 - Before flipping, check what the key gates on *both* sides. The old `SyncFeatureFlag` gated
   `WorkspaceSyncer` but not the direct `UserRemoteRepository` writes, and that asymmetry
   corrupted every remote user document for months — see

@@ -27,6 +27,19 @@ sealed interface LayerValue<out T : Any> {
 }
 
 /**
+ * Turns a stored string into a layer value, for the sources whose backing store holds encoded
+ * strings — every layer except the in-memory Build map.
+ *
+ * A codec rejection is [LayerValue.Undecodable], not [ConfigKey.default]: resolution then continues
+ * to the layer below instead of stopping on a value nobody wrote, and the debug panel can still show
+ * what was actually stored.
+ */
+fun <T : Any> ConfigKey<T>.layerValueOf(raw: String?): LayerValue<T> = when (raw) {
+    null -> LayerValue.Absent
+    else -> codec.decode(raw)?.let { LayerValue.Present(it) } ?: LayerValue.Undecodable(raw)
+}
+
+/**
  * One layer of the chain.
  *
  * [peek] is synchronous, so every source keeps an in-memory mirror of its backing store. The
@@ -117,6 +130,22 @@ private class MapBuildConfigSource(private val values: Map<String, Any>) : Build
  */
 interface RemoteGlobalConfigSource : ConfigSource {
     override val layer: ConfigLayer get() = ConfigLayer.RemoteGlobal
+
+    /**
+     * Re-reads the server document and replaces the persistent mirror with what it holds.
+     *
+     * Separate from [hydrate] because the two answer different questions: [hydrate] warms the mirror
+     * from local storage and is awaited on the startup path, while this reaches the network and must
+     * never be awaited there. Called on launch and on every foreground return — see
+     * `RemoteConfigRefresh`.
+     *
+     * Must not fail, for the same reason [hydrate] must not: a failed fetch leaves the previous
+     * mirror in place, which is what makes an offline launch resolve the last known values.
+     *
+     * The default no-op is what lets the offline host bind [Empty] and keep a layer that is simply
+     * never refreshed.
+     */
+    suspend fun refresh(): Unit = Unit
 
     companion object {
         val Empty: RemoteGlobalConfigSource = object : RemoteGlobalConfigSource {
