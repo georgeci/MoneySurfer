@@ -1,25 +1,64 @@
 appId: ${APP_ID}
 name: Transaction — Details, edit and delete
 ---
-- runFlow: 04_add_transaction.yaml
+# Chain 03, not 04: this flow renames and then deletes the transaction it opens,
+# so it has to own that transaction outright. It used to drive 04's shared "Test
+# expense" — which 07 reads and 17 deletes — so a failure between the rename and
+# the delete left the shared baseline renamed for every later flow, and 04's
+# create-if-missing guard then logged a second "Test expense" beside the orphan
+# (#351). "Editable expense" is written and read by this flow alone.
+- runFlow: 03_dashboard_add_account.yaml
 
+# Bring the Recent widget on screen *before* the guard reads it — `notVisible` on
+# the unscrolled dashboard reports "missing" for a transaction that merely sits
+# below the fold. See the fuller note in 17_transaction_delete_undo.yaml.
+- scrollUntilVisible:
+    element:
+      id: "dashboard:recent"
+    direction: DOWN
+
+- runFlow:
+    when:
+      notVisible: "Editable expense"
+    commands:
+      # testTag selectors + note-before-amount ordering — see the rationale in
+      # 04_add_transaction.yaml.
+      - tapOn:
+          id: "dashboard:addTransaction"
+      - assertVisible:
+          id: "transactionCreation:root"
+      - tapOn:
+          id: "transactionCreation:note"
+      - inputText: "Editable expense"
+      - tapOn:
+          id: "transactionCreation:amount"
+      - inputText: "70"
+      - tapOn:
+          id: "transactionCreation:save"
+
+# The Recent widget shows only the newest few transactions and this workspace
+# gains one per transaction flow, so scroll instead of assuming the row landed
+# on the first screenful.
+- scrollUntilVisible:
+    element:
+      text: "Editable expense"
+    direction: DOWN
 - tapOn:
-    text: "Test expense"
+    text: "Editable expense"
 
 - assertVisible:
-    text: "Transaction"
+    id: "transactionDetails:root"
 - assertVisible:
-    text: "Test expense"
-- assertVisible:
-    text: "Account"
+    text: "Editable expense"
 - assertVisible:
     text: "Main Bank"
 
 - tapOn:
-    text: "Edit"
+    id: "transactionDetails:edit"
 
+# Editing reuses the creation screen, so it answers to the same root tag.
 - assertVisible:
-    text: "Edit transaction"
+    id: "transactionCreation:root"
 # Address the field and the confirm action by testTag. Tapping the floating
 # "Note" label doesn't reliably focus an OutlinedTextField (it left the cursor
 # mid-string and garbled the text), and the toolbar "Update" button is the same
@@ -27,7 +66,7 @@ name: Transaction — Details, edit and delete
 - tapOn:
     id: "transactionCreation:note"
 - eraseText: 50
-- inputText: "Updated expense"
+- inputText: "Edited expense"
 # Move focus back to the amount field before confirming: typing in the note
 # pushes the form up far enough that the toolbar — and with it the Update
 # button — scrolls off the top, so tapping it straight away finds nothing.
@@ -37,16 +76,18 @@ name: Transaction — Details, edit and delete
     id: "transactionCreation:save"
 
 - assertVisible:
-    text: "Transaction"
+    id: "transactionDetails:root"
 - assertVisible:
-    text: "Updated expense"
+    text: "Edited expense"
 
 - tapOn:
-    text: "Delete"
+    id: "transactionDetails:delete"
+# The confirm button carries its own tag: the dialog is a separate window, and
+# both it and the screen action behind it read "Delete".
 - assertVisible:
-    text: "Delete transaction?"
+    id: "transactionDetails:confirmDelete"
 - tapOn:
-    text: "Delete"
+    id: "transactionDetails:confirmDelete"
 
 - assertVisible:
-    text: "Accounts"
+    id: "dashboard:accounts"

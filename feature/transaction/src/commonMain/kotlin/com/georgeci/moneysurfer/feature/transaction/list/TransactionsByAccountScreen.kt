@@ -18,6 +18,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -26,6 +27,7 @@ import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.uikit.components.base.SurferAddFab
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
+import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.utils.HandleSideEffect
 import moneysurfer.feature.transaction.generated.resources.Res
@@ -35,6 +37,21 @@ import moneysurfer.feature.transaction.generated.resources.transactions_list_unt
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
+
+/**
+ * Stable selectors for the transactions list screen — see docs/testing/testing-strategy.md.
+ *
+ * The `filter:*` tags name the chips of the rail, not filter *values*: every chip is a shortcut
+ * that opens the filters screen rather than a segment that toggles a value on this screen.
+ */
+object TransactionsListTestTags {
+    const val Root = "transactionsList:root"
+    const val FilterDate = "transactionsList:filter:date"
+    const val FilterType = "transactionsList:filter:type"
+    const val FilterAccount = "transactionsList:filter:account"
+    const val FilterCategory = "transactionsList:filter:category"
+    const val FilterSort = "transactionsList:filter:sort"
+}
 
 @Composable
 fun TransactionsByAccountScreen(
@@ -97,7 +114,10 @@ internal fun TransactionsByAccountContent(
     val titleFallback = stringResource(Res.string.transactions_list_title)
     val title = state.accountName.ifBlank { titleFallback }
     Scaffold(
-        modifier = Modifier.surferSafeInsets(),
+        modifier = Modifier
+            .surferSafeInsets()
+            .testTag(TransactionsListTestTags.Root)
+            .surferTestTagAsId(),
         containerColor = AppTheme.materialColors.surface,
         topBar = {
             SurferToolbar(

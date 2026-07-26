@@ -12,6 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -24,6 +25,7 @@ import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbarButtonAction
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
+import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
 import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.utils.HandleSideEffect
@@ -39,6 +41,13 @@ import moneysurfer.feature.goal.generated.resources.goal_contribution_title_with
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
+
+/** Stable selectors for the goal add/withdraw screen — see docs/testing/testing-strategy.md. */
+object GoalContributionTestTags {
+    const val Root = "goalContribution:root"
+    const val AmountField = "goalContribution:amount"
+    const val SaveButton = "goalContribution:save"
+}
 
 @Composable
 fun GoalContributionScreen(
@@ -66,7 +75,10 @@ private fun GoalContributionContent(
     onEvent: (GoalContributionEvent) -> Unit,
 ) {
     Scaffold(
-        modifier = Modifier.surferSafeInsets(),
+        modifier = Modifier
+            .surferSafeInsets()
+            .testTag(GoalContributionTestTags.Root)
+            .surferTestTagAsId(),
         containerColor = AppTheme.materialColors.surface,
         topBar = {
             SurferToolbar(
@@ -83,6 +95,7 @@ private fun GoalContributionContent(
                         text = stringResource(Res.string.goal_contribution_save),
                         enabled = state.canSave,
                         onClick = { onEvent(GoalContributionEvent.OnSaveClick) },
+                        modifier = Modifier.testTag(GoalContributionTestTags.SaveButton),
                     )
                 },
             )
@@ -109,7 +122,9 @@ private fun GoalContributionContent(
                 supportingText = state.error?.let { error -> { Text(stringResource(error)) } },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 singleLine = true,
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag(GoalContributionTestTags.AmountField),
             )
 
             GoalDateField(

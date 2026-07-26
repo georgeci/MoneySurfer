@@ -3,51 +3,50 @@ name: Categories — Manage and create a category
 ---
 # Settings → Categories → New category → save → returns to list with new row.
 # Pre-condition: an active workspace; piggyback on the dashboard baseline.
+#
+# Every selector here used to be product copy, and "Categories" matched both the
+# settings row and the title of the screen it opens — so the flow could not tell
+# "I am about to tap the row" from "I have arrived" (#352).
 
 - runFlow: 03_dashboard_add_account.yaml
 
 - tapOn:
-    text: "Settings"
+    id: "dashboard:settings"
 
 - assertVisible:
-    text: "Settings"
+    id: "settings:root"
 
 - scrollUntilVisible:
     element:
-      text: "Categories"
+      id: "settings:categoriesRow"
     direction: DOWN
 - tapOn:
-    text: "Categories"
+    id: "settings:categoriesRow"
 
-# Categories management screen. The "New category" FAB has an explicit
-# contentDescription set in CategoriesManageScreen so Maestro can match it
-# by `text:` (which on Android falls back to contentDescription).
 - assertVisible:
-    text: "Categories"
+    id: "categoriesManage:root"
 
 - runFlow:
     when:
       notVisible: "Coffee"
     commands:
       - tapOn:
-          text: "New category"
+          id: "categoriesManage:add"
 
       # Category creation screen
       - assertVisible:
-          text: "New category"
-      - assertVisible:
-          text: "Type"
+          id: "categoryCreation:root"
       - tapOn:
-          text: "Name"
+          id: "categoryCreation:name"
       - inputText: "Coffee"
       - tapOn:
-          text: "Save"
+          id: "categoryCreation:save"
 
 # Back on Categories list. The list is scrollable and includes both the
 # default seed categories (Income + Expense) and our new "Coffee" — which
 # sits below the fold, so scroll to it before asserting.
 - assertVisible:
-    text: "Categories"
+    id: "categoriesManage:root"
 - scrollUntilVisible:
     element:
       text: "Coffee"

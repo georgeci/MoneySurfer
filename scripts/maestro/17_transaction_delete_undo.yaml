@@ -1,20 +1,69 @@
 appId: ${APP_ID}
 name: Transaction — Delete then Undo restores it
 ---
-# Pre-condition: Dashboard with the baseline "Test expense" transaction.
-- runFlow: 04_add_transaction.yaml
+# Chain 03, not 04: this flow deletes the transaction it opens, so it owns one of
+# its own. Driving 04's shared "Test expense" meant a failure between the delete
+# and the Undo removed the baseline that 07 asserts on and 08 edited — and which
+# flow noticed depended on the order Maestro happened to pick (#351).
+#
+# The flow is self-restoring: Undo puts "Undoable expense" back, so the guard
+# below finds it again on the next run.
+- runFlow: 03_dashboard_add_account.yaml
+
+# Bring the Recent widget on screen *before* the guard reads it. `notVisible` is
+# a screen-visibility test, and the widget sits below Balance and Accounts, so a
+# guard evaluated on the unscrolled dashboard reports "missing" for a
+# transaction that exists and creates a duplicate — one more per run, with the
+# flow still green. The widget tag always resolves, so this scroll is safe even
+# on a workspace with no transactions at all.
+#
+# Residual limit: the widget renders at most RECENT_TRANSACTIONS_LIMIT (5) rows,
+# so a fixture pushed past that by newer transactions would still read as
+# missing. Test Workspace stays well under it today.
+- scrollUntilVisible:
+    element:
+      id: "dashboard:recent"
+    direction: DOWN
+
+- runFlow:
+    when:
+      notVisible: "Undoable expense"
+    commands:
+      # testTag selectors + note-before-amount ordering — see the rationale in
+      # 04_add_transaction.yaml.
+      - tapOn:
+          id: "dashboard:addTransaction"
+      - assertVisible:
+          id: "transactionCreation:root"
+      - tapOn:
+          id: "transactionCreation:note"
+      - inputText: "Undoable expense"
+      - tapOn:
+          id: "transactionCreation:amount"
+      - inputText: "30"
+      - tapOn:
+          id: "transactionCreation:save"
+
+# The Recent widget shows only the newest few transactions and this workspace
+# gains one per transaction flow, so scroll instead of assuming the row landed
+# on the first screenful.
+- scrollUntilVisible:
+    element:
+      text: "Undoable expense"
+    direction: DOWN
+- tapOn:
+    text: "Undoable expense"
+- assertVisible:
+    id: "transactionDetails:root"
 
 - tapOn:
-    text: "Test expense"
+    id: "transactionDetails:delete"
+# The confirm button carries its own tag: the dialog is a separate window, and
+# both it and the screen action behind it read "Delete".
 - assertVisible:
-    text: "Transaction"
-
+    id: "transactionDetails:confirmDelete"
 - tapOn:
-    text: "Delete"
-- assertVisible:
-    text: "Delete transaction?"
-- tapOn:
-    text: "Delete"
+    id: "transactionDetails:confirmDelete"
 
 # The delete navigates back; the app-root Snackbar offers an Undo.
 - assertVisible:
@@ -23,5 +72,9 @@ name: Transaction — Delete then Undo restores it
     text: "Undo"
 
 # Undo re-applies the deleted transaction — it reappears in Recent.
+- scrollUntilVisible:
+    element:
+      text: "Undoable expense"
+    direction: DOWN
 - assertVisible:
-    text: "Test expense"
+    text: "Undoable expense"

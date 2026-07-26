@@ -69,7 +69,14 @@ object TransactionCreationTestTags {
     const val Amount = "transactionCreation:amount"
     const val Note = "transactionCreation:note"
     const val Save = "transactionCreation:save"
+    const val Close = "transactionCreation:close"
     const val Delete = "transactionCreation:delete"
+
+    /**
+     * Transaction-type option, suffixed with the lowercased [TransactionTypeUi]. `transfer` is
+     * only composed outside edit mode and with the transfer flag on.
+     */
+    const val TypePrefix = "transactionCreation:type:"
 }
 
 private fun transactionCreationSeed(
@@ -355,6 +362,9 @@ private fun TypeSegments(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp),
+        optionTestTag = { type ->
+            TransactionCreationTestTags.TypePrefix + type.name.lowercase()
+        },
     )
 }
 

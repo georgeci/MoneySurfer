@@ -6,60 +6,88 @@ name: Goals — Create a goal and add money
 
 - runFlow: 03_dashboard_add_account.yaml
 
-# The goals widget sits below the accounts widget on the dashboard.
+# The goals widget sits below the accounts widget on the dashboard. Its "See all"
+# used to be picked by `text: "See all", index: 0` — positional, and shared with
+# the Recent widget's identical label, so adding a widget above Goals silently
+# retargeted this flow. The widget owns a tag now (#352).
 - scrollUntilVisible:
     element:
-      text: "Goals"
+      id: "dashboard:goals"
     direction: DOWN
 - tapOn:
-    text: "See all"
-    index: 0
+    id: "dashboard:goalsSeeAll"
 
 - assertVisible:
-    text: "Savings goals"
+    id: "goals:root"
 
-# Create the goal once; a re-run of the suite finds it already there.
+# Create the goal *and* fund it under one guard, so the pair is idempotent.
+#
+# The contribution used to sit outside the guard while only the goal creation was
+# protected: a second run against surviving state added another 250 on top of the
+# first, and the closing ring assertion — which hard-coded 250/2400 as "10%" —
+# went red at 20% (#351). Both steps now happen exactly once per fixture, and the
+# assertions below check the recorded contribution rather than a percentage
+# derived from two fixture numbers.
 - runFlow:
     when:
       notVisible: "Lisbon trip"
     commands:
-      # Both the FAB and the empty-state CTA read "New goal"; either is fine.
+      # The FAB is composed even on an empty list, so it sits alongside the
+      # empty-state CTA and both read "New goal". Aim at the FAB explicitly.
       - tapOn:
-          text: "New goal"
+          id: "goals:add"
       - assertVisible:
-          text: "Title"
+          id: "goalEdit:root"
       - tapOn:
-          text: "Title"
+          id: "goalEdit:title"
       - inputText: "Lisbon trip"
       - tapOn:
-          text: "Target"
+          id: "goalEdit:target"
       - inputText: "2400"
       - hideKeyboard
       - tapOn:
-          text: "Save"
+          id: "goalEdit:save"
 
+      - assertVisible:
+          text: "Lisbon trip"
+
+      # Details screen → add a contribution.
+      - tapOn:
+          text: "Lisbon trip"
+      - assertVisible:
+          id: "goalDetails:root"
+      - tapOn:
+          id: "goalDetails:addMoney"
+
+      - assertVisible:
+          id: "goalContribution:root"
+      - tapOn:
+          id: "goalContribution:amount"
+      - inputText: "250"
+      - hideKeyboard
+      - tapOn:
+          id: "goalContribution:save"
+
+# The guard leaves us on the goal details screen; a skipped guard leaves us on
+# the list. Open the goal in that case so the assertions below see one screen
+# either way.
+- runFlow:
+    when:
+      visible:
+        id: "goals:root"
+    commands:
+      - tapOn:
+          text: "Lisbon trip"
+
+# Details screen: the contribution is recorded in the history.
+- assertVisible:
+    id: "goalDetails:root"
 - assertVisible:
     text: "Lisbon trip"
-
-# Details screen → add a contribution.
-- tapOn:
-    text: "Lisbon trip"
 - assertVisible:
-    text: "Add money"
-- tapOn:
-    text: "Add money"
-
+    id: "goalDetails:history"
+# Locale-agnostic amount match — the simulator's region decides the decimal
+# separator and whether the currency symbol leads or trails, and Maestro matches
+# the pattern against the whole element label (see 09_income_transaction_filter).
 - assertVisible:
-    text: "Amount"
-- tapOn:
-    text: "Amount"
-- inputText: "250"
-- hideKeyboard
-- tapOn:
-    text: "Save"
-
-# Back on the details screen: the history now has the contribution, and the
-# ring reflects 250 of 2400.
-- assertVisible:
-    text: "History"
-- assertVisible: "10%"
+    text: ".*250.*"

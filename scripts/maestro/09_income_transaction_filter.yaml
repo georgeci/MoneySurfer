@@ -14,7 +14,7 @@ name: Transaction — Add income and filter list
       - assertVisible:
           id: "transactionCreation:root"
       - tapOn:
-          text: "Income"
+          id: "transactionCreation:type:income"
       - tapOn:
           id: "transactionCreation:note"
       - inputText: "Salary"
@@ -25,16 +25,30 @@ name: Transaction — Add income and filter list
           id: "transactionCreation:save"
 
 - assertVisible:
-    text: "Recent"
+    id: "dashboard:recent"
 - assertVisible:
     text: "Salary"
 
 - tapOn:
-    text: "See all"
+    id: "dashboard:recentSeeAll"
 - assertVisible:
-    text: "Transactions"
+    id: "transactionsList:root"
+
+# The list no longer filters in place: since the filters screen landed (#329),
+# every chip on the rail opens it and the type is committed from there. The old
+# `tapOn: text: "Income"` targeted an inline chip that no longer exists — the
+# kind of silent drift a tag-based selector turns into an obvious failure (#352).
 - tapOn:
-    text: "Income"
+    id: "transactionsList:filter:type"
+- assertVisible:
+    id: "transactionFilters:root"
+- tapOn:
+    id: "transactionFilters:type:income"
+- tapOn:
+    id: "transactionFilters:apply"
+
+- assertVisible:
+    id: "transactionsList:root"
 - assertVisible:
     text: "Salary"
 # Locale-agnostic: the simulator's region decides both the decimal separator and

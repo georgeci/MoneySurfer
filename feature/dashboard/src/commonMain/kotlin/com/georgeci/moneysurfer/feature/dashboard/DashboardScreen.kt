@@ -41,6 +41,7 @@ import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.uikit.widgets.LocalSurferWidgetSize
 import com.georgeci.moneysurfer.uikit.widgets.SurferAccountItem
 import com.georgeci.moneysurfer.uikit.widgets.SurferAccountsWidget
+import com.georgeci.moneysurfer.uikit.widgets.SurferAddAccountCta
 import com.georgeci.moneysurfer.uikit.widgets.SurferBalanceFootnote
 import com.georgeci.moneysurfer.uikit.widgets.SurferBalanceVariant
 import com.georgeci.moneysurfer.uikit.widgets.SurferBalanceWidget
@@ -75,13 +76,33 @@ import moneysurfer.feature.dashboard.generated.resources.dashboard_toolbar_title
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
-/** Stable selectors for the Dashboard — see docs/testing/testing-strategy.md. */
+/**
+ * Stable selectors for the Dashboard — see docs/testing/testing-strategy.md.
+ *
+ * The widget tags name the section, not the composable: which widgets are present and in what
+ * order is user configuration, so a flow asserts [Accounts], [Recent] or [Goals] instead of
+ * an index into the column. [AddAccount], [RecentSeeAll], [GoalsSeeAll] and [RecentEmpty] sit
+ * on nodes owned by shared `uikit` widgets, which take the tag as a parameter.
+ */
 object DashboardTestTags {
     const val Root = "dashboard:root"
     const val Balance = "dashboard:balance"
     const val Customize = "dashboard:customize"
     const val Settings = "dashboard:settings"
     const val AddTransaction = "dashboard:addTransaction"
+    const val Accounts = "dashboard:accounts"
+
+    /**
+     * Empty-state CTA only — `SurferAccountsWidget` composes it just while the account list is
+     * empty. Once an account exists, new ones are created from [AccountsManage].
+     */
+    const val AddAccount = "dashboard:addAccount"
+    const val AccountsManage = "dashboard:accountsManage"
+    const val Recent = "dashboard:recent"
+    const val RecentSeeAll = "dashboard:recentSeeAll"
+    const val RecentEmpty = "dashboard:recentEmpty"
+    const val Goals = "dashboard:goals"
+    const val GoalsSeeAll = "dashboard:goalsSeeAll"
 }
 
 @Composable
@@ -277,18 +298,22 @@ private fun AccountsWidget(
     onEvent: (DashboardEvent) -> Unit,
 ) {
     val hero = LocalSurferWidgetSize.current == SurferWidgetSize.Hero
-    Column {
+    Column(modifier = Modifier.testTag(DashboardTestTags.Accounts)) {
         SectionHeader(
             title = stringResource(Res.string.dashboard_accounts_section_title),
             action = stringResource(Res.string.dashboard_accounts_manage),
             onActionClick = { onEvent(DashboardEvent.OnManageAccountsClick) },
+            actionTestTag = DashboardTestTags.AccountsManage,
             modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 8.dp),
         )
         SurferAccountsWidget(
             items = state.accounts.map { it.toWidgetItem() },
-            onAddClick = { onEvent(DashboardEvent.OnAddAccountClick) },
-            addLabel = stringResource(Res.string.dashboard_add_account),
-            addCtaTrailingLabel = stringResource(Res.string.dashboard_add_account_new),
+            addCta = SurferAddAccountCta(
+                label = stringResource(Res.string.dashboard_add_account),
+                onClick = { onEvent(DashboardEvent.OnAddAccountClick) },
+                trailingLabel = stringResource(Res.string.dashboard_add_account_new),
+                testTag = DashboardTestTags.AddAccount,
+            ),
             onItemClick = { item ->
                 item.accountId()?.let { onEvent(DashboardEvent.OnAccountClick(it)) }
             },
@@ -317,7 +342,9 @@ private fun GoalsWidget(
             .fillMaxWidth()
             .padding(horizontal = 16.dp)
             .defaultMinSize(minHeight = DASHBOARD_WIDGET_MIN_HEIGHT)
-            .padding(vertical = 8.dp),
+            .padding(vertical = 8.dp)
+            .testTag(DashboardTestTags.Goals),
+        seeAllTestTag = DashboardTestTags.GoalsSeeAll,
     )
 }
 
@@ -331,6 +358,7 @@ private fun RecentTransactionsWidget(
         .padding(horizontal = 16.dp)
         .defaultMinSize(minHeight = DASHBOARD_WIDGET_MIN_HEIGHT)
         .padding(vertical = 8.dp)
+        .testTag(DashboardTestTags.Recent)
 
     val bubbleBg = AppTheme.materialColors.primaryContainer
     val bubbleFg = AppTheme.materialColors.onPrimaryContainer
@@ -345,6 +373,8 @@ private fun RecentTransactionsWidget(
         emptyTitle = stringResource(Res.string.dashboard_recent_empty_title),
         emptySubtitle = stringResource(Res.string.dashboard_recent_empty_subtitle),
         modifier = modifier,
+        seeAllTestTag = DashboardTestTags.RecentSeeAll,
+        emptyTestTag = DashboardTestTags.RecentEmpty,
     )
 }
 
@@ -376,6 +406,7 @@ private fun SectionHeader(
     modifier: Modifier = Modifier,
     action: String? = null,
     onActionClick: (() -> Unit)? = null,
+    actionTestTag: String? = null,
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
@@ -392,11 +423,13 @@ private fun SectionHeader(
                 text = action,
                 style = AppTheme.typography.labelMedium,
                 color = AppTheme.materialColors.primary,
-                modifier = if (onActionClick != null) {
-                    Modifier.clickable(onClick = onActionClick)
-                } else {
-                    Modifier
-                },
+                modifier = (
+                    if (onActionClick != null) {
+                        Modifier.clickable(onClick = onActionClick)
+                    } else {
+                        Modifier
+                    }
+                    ).then(actionTestTag?.let { Modifier.testTag(it) } ?: Modifier),
             )
         }
     }

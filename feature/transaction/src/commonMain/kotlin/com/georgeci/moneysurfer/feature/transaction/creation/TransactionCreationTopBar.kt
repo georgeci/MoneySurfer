@@ -56,6 +56,7 @@ internal fun CreationTopBar(
                 modifier = Modifier
                     .padding(start = 4.dp)
                     .size(48.dp)
+                    .testTag(TransactionCreationTestTags.Close)
                     .clickable { onEvent(TransactionCreationEvent.OnBackClick) },
                 contentAlignment = Alignment.Center,
             ) {
