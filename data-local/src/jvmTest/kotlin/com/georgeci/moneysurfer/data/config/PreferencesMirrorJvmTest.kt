@@ -21,6 +21,9 @@ import java.io.IOException
 
 private val KEY = stringPreferencesKey("sync.remote_enabled")
 
+/** A key this layer does not own, standing in for the session pointers on the same file. */
+private val OTHER = stringPreferencesKey("session.current_user_id")
+
 private fun preferencesOf(value: String): Preferences =
     mutablePreferencesOf().apply { this[KEY] = value }
 
@@ -38,8 +41,13 @@ private class GatedDataStore(initial: Preferences) : DataStore<Preferences> {
 
     private val state = MutableStateFlow(initial)
 
-    /** Set to hold the emission being delivered open until it is completed. */
-    var gate: CompletableDeferred<Unit>? = null
+    /**
+     * How many emissions the collection may take. Emissions past it park, which is what lets a test
+     * leave a value the collection has already been handed *undelivered* — the stale-value window a
+     * self-catching-up fake would otherwise close before the assertion runs.
+     */
+    private val allowed = MutableStateFlow(Int.MAX_VALUE)
+    private var delivered = 0
 
     /** Set to hold the next write open until it is completed. */
     var writeGate: CompletableDeferred<Unit>? = null
@@ -50,10 +58,21 @@ private class GatedDataStore(initial: Preferences) : DataStore<Preferences> {
     var subscriptions: Int = 0
         private set
 
+    /** Parks every further emission. The value already in the collection's hand stays there. */
+    fun holdEmissions() {
+        allowed.value = delivered
+    }
+
+    /** Lets exactly one parked emission through, and parks whatever follows it. */
+    fun releaseOne() {
+        allowed.value = delivered + 1
+    }
+
     override val data: Flow<Preferences> = flow {
         if (failReads) throw IOException("unreadable")
         state.collect { captured ->
-            gate?.await()
+            allowed.first { it > delivered }
+            delivered++
             emit(captured)
         }
     }.onStart { subscriptions++ }
@@ -63,6 +82,11 @@ private class GatedDataStore(initial: Preferences) : DataStore<Preferences> {
         val updated = transform(state.value)
         state.value = updated
         return updated
+    }
+
+    /** A write that does not go through the mirror — `SessionPointersImpl` in production. */
+    suspend fun writeElsewhere(value: String) {
+        updateData { it.toMutablePreferences().apply { this[OTHER] = value }.toPreferences() }
     }
 }
 
@@ -87,29 +111,61 @@ class PreferencesMirrorJvmTest : StringSpec({
         }
     }
 
-    "a write waits for the one snapshot writer rather than publishing its own value" {
+    "a stale first emission cannot be published over a write that beat it" {
         runTest {
-            // The bug this closes: `edit` used to assign the snapshot itself, so the write path and
-            // the collection wrote the same field with no ordering between them. A collection
-            // holding a pre-write emission would then land *after* the write and put the previous
-            // value back — a synchronous `peek` reading state the store no longer holds, until the
-            // next emission corrected it. Returning only once the single writer has published the
-            // committed value is what removes the window; the emission below is still parked, so an
-            // `edit` that published its own value would already be finished here.
+            // `dataStore.data` captures its opening value at subscribe time and can deliver it
+            // arbitrarily later — after a write has already committed and published over it.
             val store = GatedDataStore(preferencesOf("old"))
-            store.gate = CompletableDeferred()
+            store.holdEmissions()
             val mirror = PreferencesMirror(store, backgroundScope)
-            runCurrent() // the collection captured pre-write state and parked on the gate
+            runCurrent() // the collection captured pre-write state and parked
 
-            val writing = launch { mirror.edit { it[KEY] = "new" } }
+            mirror.edit { it[KEY] = "new" }
+            store.releaseOne() // the stale value is delivered now, after the commit
             runCurrent()
 
-            writing.isActive shouldBe true
-            // Nothing has been published yet: the pre-write emission is exactly what is queued.
-            mirror.raw(KEY.name) shouldBe null
+            mirror.raw(KEY.name) shouldBe "new"
+        }
+    }
 
-            store.gate?.complete(Unit)
-            writing.join()
+    "a stale emission mid-stream cannot be published over a write either" {
+        runTest {
+            // The same hazard once the collection is warm, which a first-emission-only guard does
+            // not cover: an emission caused by another writer on the same file is in flight when
+            // this layer commits its own.
+            val store = GatedDataStore(preferencesOf("old"))
+            val mirror = PreferencesMirror(store, backgroundScope)
+            mirror.hydrate()
+
+            store.holdEmissions()
+            store.writeElsewhere("u1")
+            runCurrent() // that value is in the collection's hand, parked
+
+            mirror.edit { it[KEY] = "new" }
+            store.releaseOne()
+            runCurrent()
+
+            mirror.raw(KEY.name) shouldBe "new"
+        }
+    }
+
+    "a write racing another writer on the same file still returns" {
+        runTest {
+            // The Local layer shares its DataStore with the session pointers, so the store's value
+            // can move past a write before the collection ever sees that write — DataStore's cache
+            // conflates. Nothing may wait on seeing it published, or the write never returns and
+            // the write lock is wedged behind it.
+            val store = GatedDataStore(emptyPreferences())
+            val mirror = PreferencesMirror(store, backgroundScope)
+            mirror.hydrate()
+            store.holdEmissions()
+
+            mirror.edit { it[KEY] = "new" }
+            // Lands before the collection is dispatched, so the value this layer committed is never
+            // handed over at all — the conflating cache only ever offers the newer one.
+            store.writeElsewhere("u1")
+            store.releaseOne()
+            runCurrent()
 
             mirror.raw(KEY.name) shouldBe "new"
         }
@@ -117,8 +173,7 @@ class PreferencesMirrorJvmTest : StringSpec({
 
     "a second write sees the first one's value rather than the state it replaced" {
         runTest {
-            val store = GatedDataStore(emptyPreferences())
-            val mirror = PreferencesMirror(store, backgroundScope)
+            val mirror = PreferencesMirror(GatedDataStore(emptyPreferences()), backgroundScope)
             mirror.hydrate()
 
             mirror.edit { it[KEY] = "one" }
@@ -135,19 +190,6 @@ class PreferencesMirrorJvmTest : StringSpec({
             mirror.edit { it[KEY] = "new" }
 
             mirror.raw(KEY.name) shouldBe "new"
-        }
-    }
-
-    "a write that changes nothing still returns rather than waiting for an emission it will not get" {
-        runTest {
-            // DataStore skips the write when the transform produces an equal value, so there is no
-            // emission to wait for — the snapshot already holds what was committed.
-            val mirror = PreferencesMirror(GatedDataStore(preferencesOf("stored")), backgroundScope)
-            mirror.hydrate()
-
-            mirror.edit { it[KEY] = "stored" }
-
-            mirror.raw(KEY.name) shouldBe "stored"
         }
     }
 
@@ -182,11 +224,8 @@ class PreferencesMirrorJvmTest : StringSpec({
         }
     }
 
-    "a write completes even after the change collection has died on an unreadable store" {
+    "a write on a store whose read side has died still lands and clears the degraded flag" {
         runTest {
-            // A read failure ends the one collection, so nothing publishes again. Waiting for a
-            // publication here would wedge this write and — through the write lock — every write to
-            // the layer after it, for a store the next write proves is perfectly writable.
             val store = GatedDataStore(emptyPreferences())
             store.failReads = true
             val mirror = PreferencesMirror(store, backgroundScope)
@@ -196,8 +235,7 @@ class PreferencesMirrorJvmTest : StringSpec({
             mirror.edit { it[KEY] = "new" }
 
             mirror.raw(KEY.name) shouldBe "new"
-            // Still degraded: the store is writable, but the layer has no view of it any more.
-            mirror.isDegraded shouldBe true
+            mirror.isDegraded shouldBe false
         }
     }
 

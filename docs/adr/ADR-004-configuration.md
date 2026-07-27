@@ -589,11 +589,14 @@ Four details the naive shape gets wrong:
   binding — included by each `SharedPlatformModule` — and shares the result; `LayeredConfig`
   shares its four-way `combine` the same way. Unshared, every `Config.observe` collector
   re-subscribed all four layers, opening a fresh `dataStore.data` for each of the two
-  store-backed ones; the Settings screen alone puts roughly ten collectors on it. That single
-  collection is also the only writer of each mirror's snapshot: `edit` waits for it to publish
-  the committed value instead of assigning its own, so the two cannot race and leave a
-  synchronous `peek` reading pre-write state. Added in #364; the four host test modules that
-  stand in for `sharedPlatformModule` mirror the binding.
+  store-backed ones; the Settings screen alone puts roughly ten collectors on it. The mirror's
+  snapshot still has two writers — that collection and `edit` — but they are now ordered by a
+  write counter, so a value the store handed the collection before a write committed is dropped
+  rather than published over it. Ordering them rather than routing both through the collection is
+  forced by the Local layer sharing its file with the session pointers: an `edit` that waited for
+  its own value to come back could wait forever, because a session write in the same window makes
+  DataStore's conflating cache skip it. Added in #364; the four host test modules that stand in for
+  `sharedPlatformModule` mirror the binding.
 
 - **`ConfigCodec` and host keys are public API of `api`.** Kotlin rejects a public constructor
   taking an internal parameter type, so `data-local` could not pass `PaletteSourceCodec` to a

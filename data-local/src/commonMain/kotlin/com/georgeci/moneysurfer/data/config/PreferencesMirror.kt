@@ -9,13 +9,12 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import co.touchlab.kermit.Logger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.sync.Mutex
@@ -26,15 +25,15 @@ import kotlin.concurrent.Volatile
  * Shared plumbing for the DataStore-backed configuration layers.
  *
  * `ConfigSource.peek` is synchronous while DataStore is suspend-only, so the last known
- * `Preferences` snapshot is kept in memory. It is filled by exactly one collection of
+ * `Preferences` snapshot is kept in memory. It is kept current by exactly one collection of
  * `dataStore.data` — started eagerly on the application scope and shared by [changes] — so every
- * observer of the layer, and every `Config.observe` collector above it, rides that one
- * subscription instead of opening its own.
+ * observer of the layer, and every `Config.observe` collector above it, rides that one subscription
+ * instead of opening its own.
  *
- * That single collection is also the only writer of [published]. Snapshots therefore land in
- * DataStore's own emission order, and nothing can put a pre-write value back after a write: [edit]
- * waits for its own value to be published rather than assigning it, and [hydrate] is just "wait for
- * the collection's first emission".
+ * [snapshot] has two writers, that collection and [edit], and [writes] is what orders them: a value
+ * the store handed the collection before a write committed is dropped rather than published over
+ * that write. Ordering them explicitly, instead of routing both through the collection, is
+ * deliberate — see [edit].
  */
 internal class PreferencesMirror(
     private val dataStore: DataStore<Preferences>,
@@ -43,40 +42,40 @@ internal class PreferencesMirror(
 
     private val log = Logger.withTag(TAG)
 
-    /**
-     * The mirror `peek` reads. `null` until warm, which resolution reads as "this layer holds
-     * nothing".
-     *
-     * A `StateFlow` rather than a plain field because [edit] has to wait on it: it is the handshake
-     * that keeps a write visible to the synchronous read path the moment `edit` returns, without
-     * making the write path a second writer of the value.
-     */
-    private val published = MutableStateFlow<Preferences?>(null)
-
-    /**
-     * `false` once [changes] has stopped collecting — its store failed a read, or the application
-     * scope was cancelled at shutdown. The collection cannot restart, so from then on nothing will
-     * publish, and [edit] must not wait for a publication that will never come.
-     *
-     * Declared before [changes]: the eager collection can reach `onCompletion` before the
-     * constructor finishes.
-     */
-    private val collecting = MutableStateFlow(true)
+    @Volatile
+    private var snapshot: Preferences? = null
 
     @Volatile
     private var readFailed: Boolean = false
 
     /**
-     * `true` once the file could not be read.
-     *
-     * Latched in practice: a read failure ends the one collection, and there is no second one to
-     * clear the flag on a later successful read. That is the honest reading of the state it
-     * describes — the layer has lost its only view of the store and will not see a change made
-     * anywhere else, whatever the file does next.
+     * `true` while the file cannot be read. Cleared by the next successful read or write, so a store
+     * that recovers stops being reported as degraded without any retry logic.
      */
     val isDegraded: Boolean get() = readFailed
 
-    fun raw(name: String): String? = published.value?.get(stringPreferencesKey(name))
+    /** `null` until warm, which resolution reads as "this layer holds nothing". */
+    fun raw(name: String): String? = snapshot?.get(stringPreferencesKey(name))
+
+    /**
+     * Guards the [snapshot] and [writes] assignments. Held only for the assignments themselves —
+     * **never** across a store call.
+     *
+     * That distinction is the whole point. Holding it across the I/O would serialize correctly, but
+     * it would also put the startup path behind a write: `AppLaunchViewModel` awaits [hydrate]
+     * before a start route exists, the RemoteGlobal layer's mirror is written by a fire-and-forget
+     * refresh in the same frame, and the splash would then wait out someone else's `dataStore.edit`
+     * — including its fsync. DataStore's own reads take no such lock (`tryLock`, falling back to an
+     * unlocked read), so that stall would be new.
+     */
+    private val publish = Mutex()
+
+    /**
+     * Bumped by every completed [edit]. It dates a write, so a store value read before the bump can
+     * be recognised as older than that write and dropped instead of published over it.
+     */
+    @Volatile
+    private var writes: Long = 0
 
     /**
      * One collection of `dataStore.data` per mirror, for the lifetime of the graph.
@@ -93,17 +92,34 @@ internal class PreferencesMirror(
      * DataStore recreates the file on the next successful write, at which point the flag clears.
      * The `catch` sits *below* the publish step on purpose: a failed read must not overwrite a good
      * snapshot with an empty one.
+     *
+     * [writes] is sampled *before* each value is awaited, never after it arrives, and that ordering
+     * is the correctness property here. Sampling afterwards would leave a window in which a write
+     * commits and bumps between the store handing over a value and this code reading the counter —
+     * the stale value would then pass the check and be published over the write. Sampled first, any
+     * write that bumps later is by construction newer than the value in hand, so dropping it is
+     * right. Dropping costs nothing: the dropped value is only ever one this layer already has (its
+     * own write) or one belonging to another writer on the same file, whose keys this layer does
+     * not read.
      */
-    val changes: Flow<Unit> = dataStore.data
-        .onEach { preferences ->
-            published.value = preferences
-            readFailed = false
-        }
+    val changes: Flow<Unit> = flow {
+        var sampledAt = writes
+        emitAll(
+            dataStore.data.onEach { preferences ->
+                publish.withLock {
+                    if (sampledAt == writes) {
+                        snapshot = preferences
+                        readFailed = false
+                    }
+                }
+                sampledAt = writes
+            },
+        )
+    }
         .catch { failure ->
             reportUnreadable(failure)
             emit(emptyPreferences())
         }
-        .onCompletion { collecting.value = false }
         .map { }
         .shareIn(scope, SharingStarted.Eagerly, replay = 1)
 
@@ -113,37 +129,34 @@ internal class PreferencesMirror(
     }
 
     /**
-     * Serialises writes to this mirror.
+     * Serialises writes to this mirror, so their publications keep commit order.
      *
-     * Held across the store call, which the read paths deliberately are not: [hydrate] and `peek`
-     * never touch this lock, so the startup path can never end up waiting out someone else's
-     * `dataStore.edit` — the reason the previous publish lock was kept off the I/O. What it buys is
-     * a single in-flight write per mirror, which is what makes the wait below terminate: with one
-     * writer the store's current value *is* `written`, so the collection is guaranteed to publish
-     * it (or to have published it already).
+     * Held across the store call, unlike [publish]: [hydrate] and `peek` never touch this one, so
+     * the startup path still cannot end up behind someone else's `dataStore.edit`. DataStore
+     * serialises the writes themselves anyway, so the only thing this adds is that the two
+     * assignments below cannot be reordered against another write's.
      */
     private val writing = Mutex()
 
+    /**
+     * Publishes the committed value itself rather than waiting for the collection to publish it.
+     *
+     * Waiting would read better — one writer of [snapshot], no counter — but it cannot be made to
+     * terminate here. The Local layer shares its DataStore file with the session pointers
+     * (`SessionPointersImpl`), which write it without going through this class; `dataStore.data` is
+     * backed by a conflating `StateFlow`, so a session write landing in the dispatch window makes
+     * the collection skip this write's value entirely and hand over the newer one. A wait for "the
+     * collection published exactly what I committed" would then never end, and would hold [writing]
+     * while it did not — wedging every later write to the layer. Publishing here and ordering the
+     * two writers through [writes] has no such failure mode.
+     */
     suspend fun edit(transform: (MutablePreferences) -> Unit) {
         writing.withLock {
             val written = dataStore.edit(transform)
-            // Not `published.value = written`. Two writers of the snapshot have no ordering between
-            // them, so a collection suspended mid-emission could put the pre-write value back and
-            // leave a synchronous `peek` stale until the next emission corrected it. Waiting for
-            // the collection to publish this write keeps one writer and the same guarantee: when
-            // `edit` returns, `raw` reads what was just committed.
-            //
-            // [collecting] is the second term because the wait must be able to end. A store whose
-            // read side failed once — a transient I/O error the next write no longer hits — leaves
-            // a dead collection behind, and waiting on it would wedge this write and, through
-            // [writing], every write to the layer after it.
-            combine(published, collecting) { value, live -> value == written || !live }.first { it }
-            if (!collecting.value) {
-                // Nothing publishes any more, so the write path is the only writer left and there
-                // is nothing to race with. `readFailed` is deliberately not cleared: the store is
-                // writable, but its read side is gone, so the layer really is degraded — it will
-                // not see a change made anywhere else.
-                published.value = written
+            publish.withLock {
+                writes++
+                snapshot = written
+                readFailed = false
             }
         }
     }
