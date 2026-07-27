@@ -14,6 +14,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -103,9 +104,14 @@ fun DebugLogContent(
         ) {
             // A plain column rather than a LazyColumn: the scaffold already scrolls vertically, and
             // nesting a lazy list in it measures with infinite height. The buffer is capped at 100
-            // entries, so composing them all is cheap enough for a debug screen.
+            // entries, so composing them all is affordable — as long as they are keyed. New lines
+            // are prepended, so an unkeyed loop shifts every row by one position and recomposes the
+            // whole list on each of them, which at 100 stack traces is enough to stall the screen
+            // during exactly the error burst it exists to show.
             Column(verticalArrangement = Arrangement.spacedBy(AppTheme.spacing.default)) {
-                entries.forEach { entry -> DebugLogEntryRow(entry) }
+                entries.forEach { entry ->
+                    key(entry.id) { DebugLogEntryRow(entry) }
+                }
             }
         }
 
@@ -144,9 +150,13 @@ private fun DebugLogEntryRow(entry: DebugLogEntry) {
         )
 
         entry.throwable?.let { throwable ->
+            // Remembered: serialising a deep coroutine stack is not something to redo on every
+            // recomposition of a screen that recomposes whenever anything logs.
+            val stackTrace = remember(throwable) { throwable.stackTraceToString() }
+
             Row(modifier = Modifier.horizontalScroll(rememberScrollState())) {
                 Text(
-                    text = throwable.stackTraceToString(),
+                    text = stackTrace,
                     style = AppTheme.typography.bodySmall,
                     color = AppTheme.materialColors.onSurfaceVariant,
                     fontFamily = FontFamily.Monospace,

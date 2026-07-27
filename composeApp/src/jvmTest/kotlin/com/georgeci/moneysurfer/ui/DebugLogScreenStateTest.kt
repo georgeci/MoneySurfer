@@ -63,6 +63,7 @@ class DebugLogScreenStateTest : StringSpec({
 })
 
 private val ERROR_ENTRY = DebugLogEntry(
+    id = 1,
     severity = Severity.Error,
     tag = "SyncCoordinator",
     message = "upload failed",

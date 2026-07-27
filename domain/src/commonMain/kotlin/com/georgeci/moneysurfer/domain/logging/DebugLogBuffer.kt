@@ -7,8 +7,16 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 
-/** One Warn-or-above line as the debug log panel renders it. */
+/**
+ * One Warn-or-above line as the debug log panel renders it.
+ *
+ * @param id unique among the buffered entries and stable for as long as one is buffered. The panel
+ *   keys its rows by it: entries are prepended, so without a key every row shifts position on each
+ *   new line and Compose recomposes the whole list — including a `stackTraceToString()` per row.
+ *   Two identical log lines are otherwise indistinguishable, so equality cannot serve as the key.
+ */
 data class DebugLogEntry(
+    val id: Long,
     val severity: Severity,
     val tag: String,
     val message: String,
@@ -56,6 +64,14 @@ object DebugLogBuffer {
     }
 
     /**
+     * Test-only counterpart to [install], for a spec that restores Kermit's writer list itself —
+     * without this the latch would stay closed and claim an installation that is no longer there.
+     */
+    internal fun resetInstallLatchForTest() {
+        isInstalled = false
+    }
+
+    /**
      * Internal rather than private so the buffer can be exercised without touching Kermit's global
      * writer list, which no test can undo.
      */
@@ -72,9 +88,15 @@ object DebugLogBuffer {
             // `update` rather than `value =`: log lines arrive from whichever thread the failing
             // coroutine ran on (sync uploads on Dispatchers.Default, most of all), and a
             // read-modify-write on `value` drops entries when two of them land at once.
+            //
+            // The id is derived from the current head inside the same block rather than from a
+            // counter of its own, so it inherits that atomicity instead of needing a second
+            // thread-safe primitive: whichever caller wins the CAS numbered its entry against the
+            // list it actually landed on.
             mutableEntries.update { current ->
                 listOf(
                     DebugLogEntry(
+                        id = (current.firstOrNull()?.id ?: 0L) + 1,
                         severity = severity,
                         tag = tag,
                         message = message,

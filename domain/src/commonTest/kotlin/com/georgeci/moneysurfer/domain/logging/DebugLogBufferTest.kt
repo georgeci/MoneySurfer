@@ -27,6 +27,7 @@ class DebugLogBufferTest : StringSpec({
         DebugLogBuffer.logWriter.log(Severity.Error, "upload failed", "Sync", failure)
 
         DebugLogBuffer.entries.value.single() shouldBe DebugLogEntry(
+            id = 1,
             severity = Severity.Error,
             tag = "Sync",
             message = "upload failed",
@@ -52,6 +53,24 @@ class DebugLogBufferTest : StringSpec({
         entries.size shouldBe 100
         entries.first().message shouldBe "entry 119"
         entries.last().message shouldBe "entry 20"
+    }
+
+    // The panel keys its rows by id, so a collision would make Compose reuse one row's state for
+    // another entry — and two identical warnings in a row is the ordinary case, not a corner one.
+    "ids stay unique across the whole buffer, even for identical lines" {
+        repeat(120) { DebugLogBuffer.logWriter.log(Severity.Warn, "same", "Sync", null) }
+
+        val ids = DebugLogBuffer.entries.value.map { it.id }
+        ids.toSet().size shouldBe ids.size
+    }
+
+    "ids restart after a clear, when nothing is left to collide with" {
+        DebugLogBuffer.logWriter.log(Severity.Warn, "before", "Sync", null)
+        DebugLogBuffer.clear()
+
+        DebugLogBuffer.logWriter.log(Severity.Warn, "after", "Sync", null)
+
+        DebugLogBuffer.entries.value.single().id shouldBe 1
     }
 
     "clear empties the buffer" {
