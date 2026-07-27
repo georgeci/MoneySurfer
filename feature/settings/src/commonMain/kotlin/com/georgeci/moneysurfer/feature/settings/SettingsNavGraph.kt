@@ -32,6 +32,7 @@ val settingsNavGraph: FeatureNavGraph = { navigator ->
             },
             onNavigateToCategories = { navigator.push(Route.CategoriesManage) },
             onNavigateToBudgets = { navigator.push(Route.Budgets) },
+            onNavigateToGoals = { navigator.push(Route.Goals) },
             onNavigateToAppearance = { navigator.push(Route.SettingsAppearance) },
             onNavigateToPreferences = { navigator.push(Route.SettingsPreferences) },
             onNavigateToSync = { navigator.push(Route.SettingsSync) },

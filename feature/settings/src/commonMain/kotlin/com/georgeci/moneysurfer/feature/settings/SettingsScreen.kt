@@ -56,6 +56,8 @@ import moneysurfer.feature.settings.generated.resources.settings_csv_title
 import moneysurfer.feature.settings.generated.resources.settings_debug_config
 import moneysurfer.feature.settings.generated.resources.settings_debug_config_supporting
 import moneysurfer.feature.settings.generated.resources.settings_delete_account
+import moneysurfer.feature.settings.generated.resources.settings_goals_supporting
+import moneysurfer.feature.settings.generated.resources.settings_goals_title
 import moneysurfer.feature.settings.generated.resources.settings_logout
 import moneysurfer.feature.settings.generated.resources.settings_logout_guest_warning_cancel
 import moneysurfer.feature.settings.generated.resources.settings_logout_guest_warning_confirm
@@ -86,7 +88,7 @@ import org.koin.compose.viewmodel.koinViewModel
  *
  * [SyncRow], [LogoutRow] and [DeleteAccountRow] are never composed in the offline build;
  * their absence is what the offline golden Maestro flow asserts via `notVisible`.
- * Everything else — including [PreferencesRow] and [BackupRow] — is composed in both
+ * Everything else — including [GoalsRow], [PreferencesRow] and [BackupRow] — is composed in both
  * variants, and the same flow asserts those positively.
  *
  * [ProfileName] and [MembersRow] are state-gated rather than build-gated: the first needs a
@@ -104,6 +106,7 @@ object SettingsTestTags {
     const val MembersRow = "settings:membersRow"
     const val CategoriesRow = "settings:categoriesRow"
     const val BudgetsRow = "settings:budgetsRow"
+    const val GoalsRow = "settings:goalsRow"
     const val AppearanceRow = "settings:appearanceRow"
     const val PreferencesRow = "settings:preferencesRow"
     const val AboutRow = "settings:aboutRow"
@@ -126,6 +129,7 @@ fun SettingsScreen(
     onNavigateToMembers: (com.georgeci.moneysurfer.domain.primitives.WorkspaceId) -> Unit,
     onNavigateToCategories: () -> Unit,
     onNavigateToBudgets: () -> Unit,
+    onNavigateToGoals: () -> Unit,
     onNavigateToAppearance: () -> Unit,
     onNavigateToPreferences: () -> Unit,
     onNavigateToSync: () -> Unit,
@@ -146,6 +150,7 @@ fun SettingsScreen(
             is SettingsEffect.NavigateToMembers -> onNavigateToMembers(effect.workspaceId)
             SettingsEffect.NavigateToCategories -> onNavigateToCategories()
             SettingsEffect.NavigateToBudgets -> onNavigateToBudgets()
+            SettingsEffect.NavigateToGoals -> onNavigateToGoals()
             SettingsEffect.NavigateToAppearance -> onNavigateToAppearance()
             SettingsEffect.NavigateToPreferences -> onNavigateToPreferences()
             SettingsEffect.NavigateToSync -> onNavigateToSync()
@@ -269,6 +274,14 @@ private fun SettingsContent(
                     onClick = { onEvent(SettingsEvent.OnBudgetsClick) },
                     trailing = { SurferSettingsChevron() },
                     modifier = Modifier.testTag(SettingsTestTags.BudgetsRow),
+                )
+                SurferSettingsRow(
+                    icon = SurferIcons.Flag,
+                    title = stringResource(Res.string.settings_goals_title),
+                    supportingText = stringResource(Res.string.settings_goals_supporting),
+                    onClick = { onEvent(SettingsEvent.OnGoalsClick) },
+                    trailing = { SurferSettingsChevron() },
+                    modifier = Modifier.testTag(SettingsTestTags.GoalsRow),
                 )
                 SurferSettingsRow(
                     icon = SurferIcons.Palette,
