@@ -54,9 +54,10 @@ open class ConfigKey<T : Any>(
  * Device-scoped is mandatory for onboarding and demo state — replicating those would replay
  * onboarding across devices and let demo data leak into a real account.
  *
- * Replication itself is not built yet: today every key lives in DataStore and `sync` only records
- * the intent. The follow-up per-user-sync issue is what routes `sync = true` keys into the Room
- * `config_entry` table, wipes them on account change, and pushes them through the outbox.
+ * [sync] also decides where the value is *stored*: `true` routes it into the account-scoped Room
+ * `config_entry` table, which is wiped on account change and pushed through the outbox, while
+ * `false` keeps it in DataStore, where nothing wipes it. `LocalConfigSource` owns that routing, so
+ * no caller sees the split.
  *
  * `remoteOverridable` is hard-coded `false` and not exposed as a parameter, so a user setting
  * cannot become server-controlled by oversight.

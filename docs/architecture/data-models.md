@@ -18,6 +18,7 @@
   - [workspaces/{wid}/budgets/{bid} — Budget](#workspaceswidbudgetsbid--budget)
   - [workspaces/{wid}/recurringRules/{rid} — RecurringRule](#workspaceswidrecurringrulesrid--recurringrule)
   - [exchangerates — local-only FX cache](#exchangerates--local-only-fx-cache)
+  - [users/{uid}/config/{key} — synced setting](#usersuidconfigkey--synced-setting)
 - [Sync metadata fields](#sync-metadata-fields)
 - [Mappers](#mappers)
 <!-- DOCS:END -->
@@ -325,6 +326,44 @@ workspace base currency.
 | `rate` | `Double` (units of `currency` per 1 `baseCurrency`) | `Double` | — |
 | `asOf` | `Instant` (provider publication time) | `Long` | — |
 | `fetchedAt` | — *(policy only)* | `Long` | — |
+
+### `users/{uid}/config/{key}` — synced setting
+
+The one collection that hangs off the *user* document rather than a workspace,
+and the one entity whose Room and Firestore shapes deliberately differ. One
+document per configuration key, **doc id = the key name** (`ui.theme_mode`), so
+there is no `key` field on the wire. Per-key documents are what buy per-key LWW
+from the shared resolver: two devices changing different settings touch
+different documents and both survive.
+
+Only `SettingKey`s declared `sync = true` live here. `sync = false` keys stay in
+DataStore, device-scoped and never wiped — `ui.onboarding_completed` (replicating
+it would replay onboarding), `ui.dashboard_layout` (a phone layout is wrong on a
+tablet) and `sync.user_enabled` (it gates its own replication, so `false` could
+never reach the server and a logout would silently default it back to `true`).
+
+There is no domain type: callers hold a `Pref<T>` from `Config.handle(key)` and
+never see the storage at all. `value` is always a string because that is what
+`ConfigCodec` emits, which is also what keeps the write-shape rule trivial.
+
+| Field | Domain | Room (`config_entry`) | Firestore |
+|---|---|---|---|
+| `key` | — *(the `ConfigKey.name`)* | PK `key: String` | doc id |
+| `value` | — *(codec-encoded `T`)* | `String` | `String` (≤ 1024 chars, rule-enforced) |
+| `updatedAt` | — | `Long` | `Long` |
+| `lastPushedAt` | — | `Long?` | — *(local only)* |
+| `clientVersionCode` | — | — | `Int` |
+
+`lastPushedAt` is the local-only column and the reason this table is Room rather
+than DataStore. It holds the `updatedAt` of the value last known to have reached
+Firestore, so `updatedAt > lastPushedAt OR lastPushedAt IS NULL` is exactly the
+set of settings the sign-in reconciliation re-queues — `OutboxEnqueuerImpl`
+silently drops writes made in demo or signed-out sessions and nothing else
+replays them. A pulled value is stamped as already-pushed so a pull never
+provokes an echo push.
+
+No `deletedAt`: a setting is overwritten, never deleted. The collection is
+purged wholesale by the account-deletion flow, before `users/{uid}` itself.
 
 ## Sync metadata fields
 

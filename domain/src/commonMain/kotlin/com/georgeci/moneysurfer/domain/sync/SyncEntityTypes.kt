@@ -17,4 +17,11 @@ object SyncEntityTypes {
     const val RECURRING_RULE = "RECURRING_RULE"
     const val GOAL = "GOAL"
     const val GOAL_CONTRIBUTION = "GOAL_CONTRIBUTION"
+
+    /**
+     * One synced setting. Unlike every other type here the entity id is not a UUID but the
+     * configuration key name (`ui.theme_mode`), and `scopeKey` is null — settings belong to the
+     * user, not to a workspace.
+     */
+    const val USER_CONFIG = "USER_CONFIG"
 }

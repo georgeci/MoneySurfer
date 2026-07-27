@@ -1,6 +1,7 @@
 package com.georgeci.moneysurfer.data.remote
 
 import com.georgeci.moneysurfer.domain.model.WorkspaceMemberStatus
+import com.georgeci.moneysurfer.sync.api.SyncCollection
 import dev.gitlive.firebase.firestore.CollectionReference
 import dev.gitlive.firebase.firestore.DocumentReference
 import dev.gitlive.firebase.firestore.FirebaseFirestore
@@ -14,6 +15,8 @@ import org.koin.core.annotation.Single
  * [UserAccountDeletionRepositoryImpl][com.georgeci.moneysurfer.data.repository.UserAccountDeletionRepositoryImpl].
  */
 @Single(binds = [AccountDeletionRemoteSource::class])
+// Mirrors the interface one-to-one, so it inherits the same over-ceiling justification.
+@Suppress("TooManyFunctions")
 class FirebaseAccountDeletionRemoteSource(
     private val firestore: FirebaseFirestore,
 ) : AccountDeletionRemoteSource {
@@ -62,6 +65,9 @@ class FirebaseAccountDeletionRemoteSource(
         firestore.collection(USER_EMAILS).document(emailKey).delete()
     }
 
+    override suspend fun deleteUserCollection(uid: String, collectionName: String) =
+        denyingAware { deleteAllDocs(userRef(uid).collection(collectionName)) }
+
     override suspend fun deleteUserDoc(uid: String) = denyingAware { userRef(uid).delete() }
 
     private fun userRef(uid: String): DocumentReference =
@@ -99,10 +105,10 @@ class FirebaseAccountDeletionRemoteSource(
         }
 
     private companion object {
-        const val USERS = "users"
+        const val USERS = SyncCollection.USERS
         const val USER_EMAILS = "userEmails"
         const val WORKSPACES = "workspaces"
-        const val MEMBERS = "members"
+        const val MEMBERS = SyncCollection.WORKSPACE_MEMBERS
         const val CLIENT_VERSION_CODE = 1
         const val MAX_BATCH_SIZE = 400
     }

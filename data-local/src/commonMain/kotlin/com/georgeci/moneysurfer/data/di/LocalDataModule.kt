@@ -4,6 +4,7 @@ import com.georgeci.moneysurfer.data.db.MoneySurferDatabase
 import com.georgeci.moneysurfer.data.db.dao.AccountDao
 import com.georgeci.moneysurfer.data.db.dao.BudgetDao
 import com.georgeci.moneysurfer.data.db.dao.CategoryDao
+import com.georgeci.moneysurfer.data.db.dao.ConfigEntryDao
 import com.georgeci.moneysurfer.data.db.dao.ExchangeRateDao
 import com.georgeci.moneysurfer.data.db.dao.GoalContributionDao
 import com.georgeci.moneysurfer.data.db.dao.GoalDao
@@ -56,4 +57,7 @@ class LocalDataModule {
 
     @Single
     fun exchangeRateDao(database: MoneySurferDatabase): ExchangeRateDao = database.exchangeRateDao()
+
+    @Single
+    fun configEntryDao(database: MoneySurferDatabase): ConfigEntryDao = database.configEntryDao()
 }

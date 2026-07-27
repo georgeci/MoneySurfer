@@ -17,6 +17,10 @@ import com.georgeci.moneysurfer.domain.model.WorkspaceMemberStatus
  * lacks access, implementations throw [RemoteAccessDeniedException] so the repository can skip a
  * stale workspace reference without aborting the whole deletion.
  */
+// One flat list of purge primitives, deliberately over detekt's interface ceiling: every member is
+// a step of the same flow, and splitting them into workspace-side and user-side interfaces would
+// fragment a seam that has exactly one implementation and one caller.
+@Suppress("TooManyFunctions")
 interface AccountDeletionRemoteSource {
 
     /** Workspace ids referenced by `users/{uid}`. Empty when the user doc is gone. */
@@ -42,6 +46,16 @@ interface AccountDeletionRemoteSource {
 
     /** Deletes `userEmails/{emailKey}`. */
     suspend fun deleteEmailMapping(emailKey: String)
+
+    /**
+     * Hard-deletes every document in a subcollection of `users/{uid}`.
+     *
+     * Firestore does not cascade a document delete into its subcollections, so this has to run
+     * *before* [deleteUserDoc]: once the Auth user is gone the documents are unreachable — no
+     * client can authenticate as that uid again — and the personal data they hold would be orphaned
+     * permanently.
+     */
+    suspend fun deleteUserCollection(uid: String, collectionName: String)
 
     /** Deletes `users/{uid}` — the final remote write of the deletion flow. */
     suspend fun deleteUserDoc(uid: String)

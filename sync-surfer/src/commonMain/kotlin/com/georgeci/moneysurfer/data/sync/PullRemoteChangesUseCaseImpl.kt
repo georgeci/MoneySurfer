@@ -13,6 +13,7 @@ import com.georgeci.moneysurfer.sync.api.SyncError
 import com.georgeci.moneysurfer.sync.api.SyncResult
 import com.georgeci.moneysurfer.sync.api.SyncScope
 import com.georgeci.moneysurfer.sync.plugin.EntityApplyResult
+import com.georgeci.moneysurfer.sync.plugin.PullScope
 import com.georgeci.moneysurfer.sync.plugin.RemoteDocument
 import com.georgeci.moneysurfer.sync.plugin.SyncEntityPlugin
 import com.georgeci.moneysurfer.sync.repository.SyncMetaRepository
@@ -41,6 +42,10 @@ import kotlin.time.Instant
  * Members and invites are pulled first so membership rows exist before
  * queries that gate on them.
  *
+ * Phase 3 (every scope that pulls at all): collections under `users/{uid}` rather than under a
+ * workspace — the per-user settings. Cursorless and read whole; it lives in [UserScopedPullPhase],
+ * which shares no state with the workspace phases.
+ *
  * Phase 2 ([SyncScope.AllUserData] / [SyncScope.ChangedSinceLastSync] only): pulls the
  * `invites` collection from workspaces listed in `users/{uid}.invitedWorkspaceIds` — workspaces
  * the user has been invited to but has not yet joined. This replaces the previous
@@ -55,6 +60,7 @@ import kotlin.time.Instant
 @Single(binds = [PullRemoteChangesUseCase::class])
 class PullRemoteChangesUseCaseImpl(
     private val collectionReader: WorkspaceCollectionReader,
+    private val userScopedPull: UserScopedPullPhase,
     private val syncMeta: SyncMetaRepository,
     private val plugins: List<SyncEntityPlugin>,
     private val session: SessionPointers,
@@ -79,10 +85,19 @@ class PullRemoteChangesUseCaseImpl(
             onProgress = onProgress,
             cancelToken = cancelToken,
         )
+        val userScoped = userScopedPull(
+            scope = scope,
+            onProgress = onProgress,
+            cancelToken = cancelToken,
+        ).bind()
 
         PullSummary(
-            downloadedCount = memberWorkspaces.downloadedCount + invited.downloadedCount,
-            conflictCount = memberWorkspaces.conflictCount + invited.conflictCount,
+            downloadedCount = memberWorkspaces.downloadedCount +
+                invited.downloadedCount +
+                userScoped.downloadedCount,
+            conflictCount = memberWorkspaces.conflictCount +
+                invited.conflictCount +
+                userScoped.conflictCount,
         )
     }
 
@@ -468,24 +483,22 @@ class PullRemoteChangesUseCaseImpl(
     }
 
     /**
-     * The GitLive wrapper does not surface a typed `FirebaseFirestoreException` uniformly across
-     * platforms, so fall back to the message the way [toSyncError] itself does.
-     */
-    private fun Throwable.isPermissionDenied(): Boolean =
-        toSyncError() == SyncError.PermissionDenied ||
-            PERMISSION_DENIED_MARKER in message?.uppercase().orEmpty()
-
-    /**
-     * Returns all plugins in pull order ([SyncEntityPlugin.pullPriority], lower first).
+     * Returns the workspace-scoped plugins in pull order ([SyncEntityPlugin.pullPriority], lower
+     * first).
      *
      * Includes plugins with [SyncEntityPlugin.firestoreCollectionName] == null — those
      * own workspace root documents and are dispatched via
      * [WorkspaceCollectionReader.fetchWorkspaceDoc] rather than [pullCollection].
      * See [SyncEntityPlugin] kdoc for tier assignments.
+     *
+     * [PullScope.User] plugins are filtered out here and run once in phase 3 instead: this loop
+     * runs per workspace, and their documents do not live under a workspace at all.
      */
     private fun pluginsInScope(scope: SyncScope): List<SyncEntityPlugin> {
         if (scope == SyncScope.UploadOnly) return emptyList()
-        return plugins.sortedBy { it.pullPriority }
+        return plugins
+            .filter { it.pullScope == PullScope.Workspace }
+            .sortedBy { it.pullPriority }
     }
 
     private companion object {
@@ -497,8 +510,6 @@ class PullRemoteChangesUseCaseImpl(
          * one stopped); it just keeps one pathological collection from monopolising a sync.
          */
         const val MAX_BATCHES_PER_COLLECTION: Int = 50
-
-        const val PERMISSION_DENIED_MARKER: String = "PERMISSION_DENIED"
 
         val EMPTY_SUMMARY = PullSummary(downloadedCount = 0, conflictCount = 0)
     }

@@ -4,6 +4,7 @@ import arrow.core.Either
 import com.georgeci.moneysurfer.domain.auth.AuthError
 import com.georgeci.moneysurfer.domain.auth.AuthLocalRepository
 import com.georgeci.moneysurfer.domain.auth.SessionMutator
+import com.georgeci.moneysurfer.domain.config.SyncedSettingsSession
 import com.georgeci.moneysurfer.domain.constants.PREFILLED_DEFAULT_USER_ID
 import org.koin.core.annotation.Single
 
@@ -18,10 +19,18 @@ import org.koin.core.annotation.Single
 class DemoLoginUseCase(
     private val authLocalRepository: AuthLocalRepository,
     private val sessionMutator: SessionMutator,
+    private val syncedSettingsSession: SyncedSettingsSession,
 ) {
     suspend operator fun invoke(): Either<AuthError, Unit> =
         Either
             .catch {
+                // A demo session is a session: the previous user's settings overlay must not follow
+                // them into it. The reconciliation half no-ops here — there is no Firebase uid.
+                //
+                // Swallowed rather than folded into the result, matching `PostAuthBootstrapUseCase`:
+                // failing to tidy the settings overlay is not a reason to refuse entry to a
+                // local-only demo, and the next session start retries it.
+                Either.catch { syncedSettingsSession.onSessionStart() }
                 authLocalRepository.createLocalUser(
                     uid = PREFILLED_DEFAULT_USER_ID,
                     email = null,

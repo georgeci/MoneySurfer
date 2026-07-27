@@ -3,6 +3,7 @@ package com.georgeci.moneysurfer.offline.firstrun
 import com.georgeci.moneysurfer.domain.auth.AuthLocalRepository
 import com.georgeci.moneysurfer.domain.auth.InMemorySessionPointers
 import com.georgeci.moneysurfer.domain.constants.PREFILLED_DEFAULT_USER_ID
+import com.georgeci.moneysurfer.domain.fixtures.RecordingSyncedSettingsSession
 import com.georgeci.moneysurfer.domain.model.Account
 import com.georgeci.moneysurfer.domain.model.Category
 import com.georgeci.moneysurfer.domain.model.User
@@ -127,6 +128,7 @@ private class SeederEnv(
     private val demoLogin = DemoLoginUseCase(
         authLocalRepository = AuthLocalRepository(userRepo, session),
         sessionMutator = session,
+        syncedSettingsSession = RecordingSyncedSettingsSession(),
     )
     private val createWorkspace = CreateWorkspaceUseCase(
         workspaceRepository = workspaceRepo,

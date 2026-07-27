@@ -10,6 +10,15 @@ package com.georgeci.moneysurfer.sync.api
  * scattered across tests and production code.
  */
 object SyncCollection {
+
+    /**
+     * Root collection of user documents. Not a sub-collection like the rest, but it is the parent
+     * of [USER_CONFIG], and every path built from the two belongs in one place — the reader, the
+     * writer and the account-deletion purge all have to agree on it or a rename goes silently
+     * half-applied.
+     */
+    const val USERS = "users"
+
     const val WORKSPACE_MEMBERS = "members"
     const val WORKSPACE_INVITES = "invites"
     const val ACCOUNTS = "accounts"
@@ -19,4 +28,10 @@ object SyncCollection {
     const val RECURRING_RULES = "recurringRules"
     const val GOALS = "goals"
     const val GOAL_CONTRIBUTIONS = "goalContributions"
+
+    /**
+     * `users/{uid}/config` — the one collection here that hangs off the *user* document rather
+     * than a workspace. Read by the user-scoped pull phase, one document per settings key.
+     */
+    const val USER_CONFIG = "config"
 }

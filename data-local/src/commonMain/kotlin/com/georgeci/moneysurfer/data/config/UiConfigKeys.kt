@@ -33,9 +33,9 @@ internal object UiConfigKeys {
 
     /**
      * `sync = false` is mandatory: replicating this would replay onboarding on every other device,
-     * and resetting it on logout would replay it after every logout. It therefore stays in
-     * DataStore when the per-user-sync issue moves the `sync = true` keys into the account-scoped
-     * Room table.
+     * and resetting it on logout would replay it after every logout. Being device-scoped is also
+     * what keeps it in DataStore rather than in the account-scoped `config_entry` table the wipe
+     * clears.
      */
     val onboardingCompleted: SettingKey<Boolean> =
         SettingKey.bool("ui.onboarding_completed", default = false, sync = false)

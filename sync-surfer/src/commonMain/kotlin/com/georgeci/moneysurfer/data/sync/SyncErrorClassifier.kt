@@ -19,6 +19,20 @@ internal fun Throwable.toSyncError(): SyncError = when (this) {
     else -> SyncError.Unknown(this)
 }
 
+/**
+ * A denial, as opposed to "not here *yet*". The distinction decides whether a caller may skip what
+ * it was reading: a denied read will never succeed for this user, while a network drop or an
+ * expired token would turn skipping into a sync that reports success and downloaded nothing.
+ *
+ * The gitlive wrapper does not surface a typed `FirebaseFirestoreException` uniformly across
+ * platforms, so this falls back to the message the same way [toSyncError] does.
+ */
+internal fun Throwable.isPermissionDenied(): Boolean =
+    toSyncError() == SyncError.PermissionDenied ||
+        PERMISSION_DENIED_MARKER in message?.uppercase().orEmpty()
+
+private const val PERMISSION_DENIED_MARKER: String = "PERMISSION_DENIED"
+
 private fun classifyFirestore(error: FirebaseFirestoreException): SyncError {
     // gitlive does not surface a typed Code enum across all platforms uniformly,
     // so fall back to message inspection until we wire a dedicated mapper per

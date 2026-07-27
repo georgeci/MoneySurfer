@@ -3,9 +3,16 @@ package com.georgeci.moneysurfer.appconfig
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 
-/** Resolution order is `Debug > Local > RemoteGlobal > Build > key.default`. */
+/** Resolution order is `Debug > Session > Local > RemoteGlobal > Build > key.default`. */
 enum class ConfigLayer {
     Debug,
+
+    /**
+     * Values held in memory across the logout boundary, so the UI does not snap to defaults while
+     * the user is still looking at it. Empty for the whole of a normal session — see
+     * [SessionConfigOverlay].
+     */
+    Session,
     Local,
     RemoteGlobal,
     Build,
@@ -156,11 +163,65 @@ interface RemoteGlobalConfigSource : ConfigSource {
     }
 }
 
+/**
+ * The values the account wipe just deleted, held in memory so the running UI keeps its theme and
+ * accent instead of snapping to defaults the moment the user taps "log out".
+ *
+ * Three properties make this safe, and all three are load-bearing:
+ *
+ * - **Nothing persists it.** A process restart lands on defaults, so a wipe is still a wipe from
+ *   the next launch's point of view.
+ * - **It is cleared when the next session starts.** Otherwise the previous user's values would
+ *   shadow whatever the new user's pull writes into Local — reintroducing the leak the wipe exists
+ *   to prevent.
+ * - **A local write to a key releases it.** The overlay outranks Local, so a value the user picks
+ *   while signed out would otherwise be written and then not shown. `Config.handle` calls
+ *   [release] before writing for exactly that reason.
+ */
+interface SessionConfigOverlay : ConfigSource {
+    override val layer: ConfigLayer get() = ConfigLayer.Session
+
+    /** Holds [values] — codec-encoded, keyed by key name — until the next session starts. */
+    fun hold(values: Map<String, String>)
+
+    /** Drops one key, because something below now owns it again. */
+    fun release(name: String)
+
+    /** Drops everything. Called at session start. */
+    fun clear()
+
+    companion object {
+        /**
+         * Never holds anything. The default for engines assembled outside the app (tests), so the
+         * overlay stays an opt-in participant rather than a mandatory constructor argument.
+         */
+        val Inactive: SessionConfigOverlay = object : SessionConfigOverlay {
+            override fun <T : Any> peek(key: ConfigKey<T>): LayerValue<T> = LayerValue.Absent
+            override val changes: Flow<Unit> = flowOf(Unit)
+            override suspend fun hydrate() = Unit
+            override fun hold(values: Map<String, String>) = Unit
+            override fun release(name: String) = Unit
+            override fun clear() = Unit
+        }
+    }
+}
+
 /** Device-local user settings. The only writable layer on the production path. */
 interface LocalConfigSource : ConfigSource {
     override val layer: ConfigLayer get() = ConfigLayer.Local
 
     suspend fun <T : Any> write(key: SettingKey<T>, value: T)
+
+    /**
+     * Drops every account-scoped (`SettingKey.sync`) value, leaving the device-scoped ones alone.
+     * Part of the account wipe.
+     *
+     * It belongs here rather than in the reset repository's DAO fan-out because the layer keeps an
+     * in-memory snapshot behind the synchronous [peek]: a delete made straight through the store
+     * would leave that snapshot serving the wiped account's values until something else happened to
+     * republish it. Only the layer that owns the snapshot can retire it in the same call.
+     */
+    suspend fun clearSynced()
 }
 
 /**

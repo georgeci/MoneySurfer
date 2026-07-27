@@ -18,11 +18,15 @@ import kotlin.concurrent.Volatile
  *
  * @param failFastOnEarlySnapshot debug builds throw when [snapshot] runs before [hydrate], so an
  *   ordering mistake surfaces in development instead of shipping as a silently Build-only read.
+ * @param overlay the layer a write has to retire, because it outranks the one being written to.
+ *   Defaults to [SessionConfigOverlay.Inactive] so an engine assembled without it behaves exactly
+ *   as it did before the overlay existed.
  */
 class LayeredConfig(
     private val layers: List<ConfigSource>,
     private val local: LocalConfigSource,
     private val failFastOnEarlySnapshot: Boolean,
+    private val overlay: SessionConfigOverlay = SessionConfigOverlay.Inactive,
 ) : Config {
 
     private val log = Logger.withTag(TAG)
@@ -95,7 +99,22 @@ class LayeredConfig(
 
     override fun <T : Any> handle(key: SettingKey<T>): Pref<T> = object : Pref<T> {
         override val flow: Flow<T> = observe(key)
-        override suspend fun set(value: T) = local.write(key, value)
+
+        /**
+         * Retiring the overlay entry is what keeps the write visible: the overlay outranks Local,
+         * so a value picked while it still holds this key would be stored and then not shown. It is
+         * a no-op in a normal session, where the overlay holds nothing at all.
+         *
+         * **After** the write, not before. Releasing first would expose the key's default for the
+         * whole duration of `local.write` — a Room write plus an outbox enqueue in a second
+         * database — and, if that write threw, would leave the value gone from both the overlay and
+         * the store, snapping the running UI to a default the user never chose. Held-then-released
+         * only ever shows the old value; released-then-failed shows neither.
+         */
+        override suspend fun set(value: T) {
+            local.write(key, value)
+            overlay.release(key.name)
+        }
     }
 
     override fun <T : Any> resolve(key: ConfigKey<T>): ConfigResolution<T> {

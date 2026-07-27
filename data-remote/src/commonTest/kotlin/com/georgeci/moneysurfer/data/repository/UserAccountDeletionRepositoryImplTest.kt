@@ -41,6 +41,7 @@ class UserAccountDeletionRepositoryImplTest : StringSpec({
             "deleteCollection:$WS/members",
             "deleteWorkspace:$WS",
             "deleteEmailMapping:$EMAIL",
+            "deleteUserCollection:$UID/config",
             "deleteUserDoc:$UID",
         )
     }
@@ -76,6 +77,7 @@ class UserAccountDeletionRepositoryImplTest : StringSpec({
         remote.calls shouldContainExactly listOf(
             "markMemberLeft:$WS/$UID",
             "deleteEmailMapping:$EMAIL",
+            "deleteUserCollection:$UID/config",
             "deleteUserDoc:$UID",
         )
         // leftAt must carry a real wall-clock stamp, not a default 0.
@@ -114,7 +116,11 @@ class UserAccountDeletionRepositoryImplTest : StringSpec({
 
         repository(remote).deleteRemoteUserData(UID, EMAIL).shouldBeRight()
 
-        remote.calls shouldContainExactly listOf("deleteEmailMapping:$EMAIL", "deleteUserDoc:$UID")
+        remote.calls shouldContainExactly listOf(
+            "deleteEmailMapping:$EMAIL",
+            "deleteUserCollection:$UID/config",
+            "deleteUserDoc:$UID",
+        )
     }
 
     "a stale workspace ref that denies access is skipped, deletion still completes" {
@@ -136,7 +142,7 @@ class UserAccountDeletionRepositoryImplTest : StringSpec({
 
         repository(remote).deleteRemoteUserData(UID, EMAIL).shouldBeRight()
 
-        remote.calls shouldContainExactly listOf("deleteUserDoc:$UID")
+        remote.calls shouldContainExactly listOf("deleteUserCollection:$UID/config", "deleteUserDoc:$UID")
     }
 
     "blank email skips the mapping lookup entirely" {
@@ -144,7 +150,7 @@ class UserAccountDeletionRepositoryImplTest : StringSpec({
 
         repository(remote).deleteRemoteUserData(UID, email = "  ").shouldBeRight()
 
-        remote.calls shouldContainExactly listOf("deleteUserDoc:$UID")
+        remote.calls shouldContainExactly listOf("deleteUserCollection:$UID/config", "deleteUserDoc:$UID")
     }
 
     "email is normalised before the mapping lookup" {
@@ -152,7 +158,11 @@ class UserAccountDeletionRepositoryImplTest : StringSpec({
 
         repository(remote).deleteRemoteUserData(UID, email = "  User@Example.COM ").shouldBeRight()
 
-        remote.calls shouldContainExactly listOf("deleteEmailMapping:$EMAIL", "deleteUserDoc:$UID")
+        remote.calls shouldContainExactly listOf(
+            "deleteEmailMapping:$EMAIL",
+            "deleteUserCollection:$UID/config",
+            "deleteUserDoc:$UID",
+        )
     }
 
     "a non-permission failure aborts and surfaces RemoteDataCleanupFailed" {
@@ -229,6 +239,10 @@ private class FakeRemote(
 
     override suspend fun deleteEmailMapping(emailKey: String) {
         calls += "deleteEmailMapping:$emailKey"
+    }
+
+    override suspend fun deleteUserCollection(uid: String, collectionName: String) {
+        calls += "deleteUserCollection:$uid/$collectionName"
     }
 
     override suspend fun deleteUserDoc(uid: String) {

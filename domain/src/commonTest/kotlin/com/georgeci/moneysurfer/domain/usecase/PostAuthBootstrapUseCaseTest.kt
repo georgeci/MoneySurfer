@@ -2,6 +2,7 @@ package com.georgeci.moneysurfer.domain.usecase
 
 import arrow.core.Either
 import com.georgeci.moneysurfer.domain.auth.InMemorySessionPointers
+import com.georgeci.moneysurfer.domain.fixtures.RecordingSyncedSettingsSession
 import com.georgeci.moneysurfer.domain.model.User
 import com.georgeci.moneysurfer.domain.model.Workspace
 import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
@@ -32,6 +33,23 @@ class PostAuthBootstrapUseCaseTest : StringSpec({
         result.value shouldBe PostAuthBootstrapUseCase.Result.FirstTime
         recording.createCalls.size shouldBe 1
         env.session.currentWorkspaceId.first() shouldBe null
+    }
+
+    "a failing settings session start does not fail the sign-in" {
+        // It reads Room and writes the outbox — two different databases — and `either { }` does not
+        // catch exceptions. An unwrapped throw would escape as a raw exception rather than an
+        // `AuthError`, so `LoginUseCase`'s `.onLeft { abandonAuthSession() }` would never run and
+        // the session would be left pinned with no workspace (issue #342).
+        val settings = RecordingSyncedSettingsSession(failWith = "config_entry is unreadable")
+        val env = BootstrapEnv(
+            remote = RecordingRemoteRepo(returnUser = null),
+            settingsSession = settings,
+        )
+
+        val result = env.useCase(uid = UID, email = "x@y", displayName = "X", isAnon = false)
+
+        result.shouldBeInstanceOf<Either.Right<PostAuthBootstrapUseCase.Result>>()
+        settings.sessionStarts shouldBe 1
     }
 
     "existing user with explicit defaultWorkspaceId is preserved" {
@@ -192,6 +210,7 @@ private class BootstrapEnv(
     val remote: UserRemoteRepository,
     val syncer: BootstrapWorkspaceSyncer = BootstrapWorkspaceSyncer(),
     hydratedWorkspaceIds: List<WorkspaceId> = emptyList(),
+    val settingsSession: RecordingSyncedSettingsSession = RecordingSyncedSettingsSession(),
 ) {
     /**
      * [hydratedWorkspaceIds] stands in for what the pull left in Room. It defaults to
@@ -215,6 +234,7 @@ private class BootstrapEnv(
         workspaceSyncer = syncer,
         sessionMutator = session,
         getCurrentTime = GetCurrentTimeUseCase(ClockUseCase()),
+        syncedSettingsSession = settingsSession,
     )
 }
 
