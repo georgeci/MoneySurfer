@@ -16,6 +16,7 @@ import org.koin.core.module.Module
 import org.koin.dsl.module
 
 actual val sharedPlatformModule: Module = module {
+    includes(applicationScopeModule)
     single<MoneySurferDatabase> {
         val builder = getDatabaseBuilder(context = get())
         getRoomDatabase(builder)
@@ -24,7 +25,7 @@ actual val sharedPlatformModule: Module = module {
     // Debug overrides get their own DataStore file, created inside the factory rather than
     // bound: a second unqualified `DataStore<Preferences>` would collide with the one above
     // and both layers would read the same file. Release APKs resolve `Empty`.
-    single<DebugConfigSource> { createDebugConfigSource(context = get()) }
+    single<DebugConfigSource> { createDebugConfigSource(context = get(), scope = get()) }
     single {
         val context: Context = get()
         AppInfo(

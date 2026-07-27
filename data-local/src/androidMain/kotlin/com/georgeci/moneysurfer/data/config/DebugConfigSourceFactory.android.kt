@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.pm.ApplicationInfo
 import com.georgeci.moneysurfer.appconfig.DebugConfigSource
 import com.georgeci.moneysurfer.data.datastore.createReplaceOnCorruptionDataStore
+import kotlinx.coroutines.CoroutineScope
 
 /**
  * Debug layer for Android. Release APKs get [DebugConfigSource.Empty] — the layer stays in the
@@ -14,12 +15,13 @@ import com.georgeci.moneysurfer.data.datastore.createReplaceOnCorruptionDataStor
  * `sharedPlatformModule` already resolves a `Context` on Android, so this is one call per platform
  * in a file that already exists per platform.
  */
-fun createDebugConfigSource(context: Context): DebugConfigSource =
+fun createDebugConfigSource(context: Context, scope: CoroutineScope): DebugConfigSource =
     if (context.isDebuggable()) {
         DebugConfigSourceImpl(
             createReplaceOnCorruptionDataStore(
                 producePath = { context.filesDir.resolve(DEBUG_OVERRIDES_FILE_NAME).absolutePath },
             ),
+            scope,
         )
     } else {
         DebugConfigSource.Empty

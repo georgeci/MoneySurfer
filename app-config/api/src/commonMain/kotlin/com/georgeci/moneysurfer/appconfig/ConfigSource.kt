@@ -50,15 +50,17 @@ fun <T : Any> ConfigKey<T>.layerValueOf(raw: String?): LayerValue<T> = when (raw
  * One layer of the chain.
  *
  * [peek] is synchronous, so every source keeps an in-memory mirror of its backing store. The
- * mirror is warmed by [hydrate] and kept current by [changes] — collecting that flow refreshes
- * the mirror before it emits, which is what makes `Config.resolve` correct while the debug panel
- * is on screen. Sources that own their writes also refresh on write.
+ * mirror is warmed by [hydrate] and kept current by [changes], which is what makes `Config.resolve`
+ * correct while the debug panel is on screen. The store-backed sources do that with a single
+ * collection of their store on the application scope, shared by every collector of [changes], and
+ * a source that owns its writes also publishes on write — the two are ordered against each other so
+ * the mirror cannot go backwards.
  */
 interface ConfigSource {
 
     val layer: ConfigLayer
 
-    /** Reads the warmed mirror. Cold (un-hydrated, unobserved) sources report [LayerValue.Absent]. */
+    /** Reads the warmed mirror. A source that is not warm yet reports [LayerValue.Absent]. */
     fun <T : Any> peek(key: ConfigKey<T>): LayerValue<T>
 
     /**
@@ -79,7 +81,7 @@ interface ConfigSource {
      * necessarily current, which is why the debug panel surfaces it.
      *
      * Live rather than latched: a store that becomes readable again clears the flag on its next
-     * successful read.
+     * successful read or write.
      */
     val isDegraded: Boolean get() = false
 }

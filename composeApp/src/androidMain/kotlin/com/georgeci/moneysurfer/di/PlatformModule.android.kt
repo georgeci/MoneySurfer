@@ -18,7 +18,7 @@ private val onlinePlatformModule: Module = module {
     // Server-flag mirror, on its own DataStore file created inside the factory rather than bound —
     // a second unqualified `DataStore<Preferences>` would collide with the app's own one. Bound per
     // host rather than in `sharedPlatformModule`, because only the online build has a remote layer.
-    single<RemoteConfigMirror> { createRemoteConfigMirror(context = get()) }
+    single<RemoteConfigMirror> { createRemoteConfigMirror(context = get(), scope = get()) }
 }
 
 val onlineWiring: List<Module> = listOf(

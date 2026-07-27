@@ -14,7 +14,7 @@ private val onlinePlatformModule: Module = module {
     single<SyncDatabase> { getSyncRoomDatabase(getSyncDatabaseBuilder()) }
     single<CrashReporter> { FirebaseCrashReporter() }
     // Own DataStore file, created in the factory rather than bound — see the Android actual.
-    single<RemoteConfigMirror> { createRemoteConfigMirror() }
+    single<RemoteConfigMirror> { createRemoteConfigMirror(scope = get()) }
 }
 
 val onlineWiring: List<Module> = listOf(

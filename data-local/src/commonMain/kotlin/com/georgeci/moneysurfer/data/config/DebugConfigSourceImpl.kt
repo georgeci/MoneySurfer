@@ -7,6 +7,7 @@ import com.georgeci.moneysurfer.appconfig.ConfigKey
 import com.georgeci.moneysurfer.appconfig.DebugConfigSource
 import com.georgeci.moneysurfer.appconfig.LayerValue
 import com.georgeci.moneysurfer.appconfig.layerValueOf
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 
 /** File name of the debug-overrides store. Deliberately not the app's settings file. */
@@ -24,9 +25,12 @@ internal const val DEBUG_OVERRIDES_FILE_NAME = "moneysurfer_debug_overrides.pref
  * Values are stored under the bare key name — the file is dedicated, so there is nothing to
  * namespace against.
  */
-class DebugConfigSourceImpl(dataStore: DataStore<Preferences>) : DebugConfigSource {
+class DebugConfigSourceImpl(
+    dataStore: DataStore<Preferences>,
+    scope: CoroutineScope,
+) : DebugConfigSource {
 
-    private val mirror = PreferencesMirror(dataStore)
+    private val mirror = PreferencesMirror(dataStore, scope)
 
     override val isActive: Boolean = true
 

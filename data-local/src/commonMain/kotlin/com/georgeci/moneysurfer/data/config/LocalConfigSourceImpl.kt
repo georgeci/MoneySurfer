@@ -13,6 +13,7 @@ import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
 import com.georgeci.moneysurfer.domain.sync.SyncEntityTypes
 import com.georgeci.moneysurfer.sync.repository.MutationOperation
 import com.georgeci.moneysurfer.sync.repository.OutboxEnqueuer
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -47,12 +48,13 @@ import org.koin.core.annotation.Single
 @Single(binds = [LocalConfigSource::class])
 class LocalConfigSourceImpl(
     dataStore: DataStore<Preferences>,
+    scope: CoroutineScope,
     configEntryDao: ConfigEntryDao,
     private val clock: ClockUseCase,
     private val outbox: OutboxEnqueuer,
 ) : LocalConfigSource {
 
-    private val preferences = PreferencesMirror(dataStore)
+    private val preferences = PreferencesMirror(dataStore, scope)
     private val synced = ConfigEntryMirror(configEntryDao)
 
     override fun <T : Any> peek(key: ConfigKey<T>): LayerValue<T> = when {

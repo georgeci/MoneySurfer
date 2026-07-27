@@ -3,6 +3,7 @@ package com.georgeci.moneysurfer.data.config
 import com.georgeci.moneysurfer.appconfig.DebugConfigSource
 import com.georgeci.moneysurfer.data.datastore.createReplaceOnCorruptionDataStore
 import com.georgeci.moneysurfer.domain.storage.iosAppStorageFilePath
+import kotlinx.coroutines.CoroutineScope
 import kotlin.experimental.ExperimentalNativeApi
 
 /**
@@ -10,12 +11,13 @@ import kotlin.experimental.ExperimentalNativeApi
  * `initKoin(isDebug = ...)`, so the panel appears exactly where debug logging does.
  */
 @OptIn(ExperimentalNativeApi::class)
-fun createDebugConfigSource(): DebugConfigSource =
+fun createDebugConfigSource(scope: CoroutineScope): DebugConfigSource =
     if (kotlin.native.Platform.isDebugBinary) {
         DebugConfigSourceImpl(
             createReplaceOnCorruptionDataStore(
                 producePath = { iosAppStorageFilePath(DEBUG_OVERRIDES_FILE_NAME, isDatabase = false) },
             ),
+            scope,
         )
     } else {
         DebugConfigSource.Empty

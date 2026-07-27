@@ -4,6 +4,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.georgeci.moneysurfer.appconfig.RemoteConfigMirror
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 
 /** File name of the server-flag mirror. Deliberately not the app's settings file. */
@@ -25,9 +26,12 @@ internal const val REMOTE_FLAGS_FILE_NAME = "moneysurfer_remote_flags.preference
  * Values are stored under the bare key name; the file is dedicated, so there is nothing to namespace
  * against.
  */
-class RemoteConfigMirrorImpl(dataStore: DataStore<Preferences>) : RemoteConfigMirror {
+class RemoteConfigMirrorImpl(
+    dataStore: DataStore<Preferences>,
+    scope: CoroutineScope,
+) : RemoteConfigMirror {
 
-    private val mirror = PreferencesMirror(dataStore)
+    private val mirror = PreferencesMirror(dataStore, scope)
 
     override fun raw(name: String): String? = mirror.raw(name)
 

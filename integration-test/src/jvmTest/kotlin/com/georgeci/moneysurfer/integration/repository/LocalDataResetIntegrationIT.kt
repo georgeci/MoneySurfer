@@ -18,6 +18,10 @@ import com.georgeci.moneysurfer.sync.repository.OutboxEnqueuer
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import java.nio.file.Files
 
 private val THEME: SettingKey<String> = SettingKey.string("ui.theme_mode", default = "System", sync = true)
@@ -37,6 +41,11 @@ class LocalDataResetIntegrationIT : StringSpec({
 
     lateinit var harness: IntegrationHarness
 
+    // Stands in for the application scope the graph binds: the preferences mirror keeps one
+    // collection of the store on it for as long as the source lives.
+    val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+    afterSpec { scope.cancel() }
+
     beforeEach { harness = IntegrationHarness() }
     afterEach { harness.close() }
 
@@ -47,6 +56,7 @@ class LocalDataResetIntegrationIT : StringSpec({
 
     fun localConfig(preferences: DataStore<Preferences> = store()) = LocalConfigSourceImpl(
         preferences,
+        scope,
         harness.database.configEntryDao(),
         ClockUseCase(),
         ConfigOnlyOutbox,

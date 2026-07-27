@@ -18,6 +18,10 @@ import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.collections.shouldNotContain
 import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.first
 import java.nio.file.Files
 
@@ -43,6 +47,11 @@ private val SERVER_KEY: ConfigKey<Boolean> =
  */
 class LocalConfigSourceImplJvmTest : StringSpec({
 
+    // Stands in for the application scope the graph binds: the preferences mirror keeps one
+    // collection of the store on it for as long as the source lives.
+    val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+    afterSpec { scope.cancel() }
+
     fun newStore(): DataStore<Preferences> {
         val dir = Files.createTempDirectory("ms-config-test")
         return createDataStore { dir.resolve("config.preferences_pb").toString() }
@@ -52,15 +61,17 @@ class LocalConfigSourceImplJvmTest : StringSpec({
         store: DataStore<Preferences> = newStore(),
         dao: ConfigEntryDao = FakeConfigEntryDao(),
         outbox: OutboxEnqueuer = RecordingOutbox(),
-    ) = LocalConfigSourceImpl(store, dao, ClockUseCase(), outbox)
+    ) = LocalConfigSourceImpl(store, scope, dao, ClockUseCase(), outbox)
 
-    "peek is absent before hydrate, so a pre-hydration snapshot cannot see this layer" {
-        val store = newStore()
-        val written = source(store)
+    "a write is readable through peek the moment it returns" {
+        // The preferences mirror's collection is eager, so a second source over the same store warms
+        // itself and "cold reads absent" is no longer something this layer can be asked. What a
+        // write still owes is that its own value is visible synchronously the moment it returns —
+        // the mirror orders `edit`'s publication against the collection's to keep that true.
+        val written = source()
+
         written.write(DEVICE_KEY, true)
 
-        // Deliberately not hydrated.
-        source(store).peek(DEVICE_KEY) shouldBe LayerValue.Absent
         written.peek(DEVICE_KEY) shouldBe LayerValue.Present(true)
     }
 

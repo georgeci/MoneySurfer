@@ -3,6 +3,7 @@ package com.georgeci.moneysurfer.data.config
 import android.content.Context
 import com.georgeci.moneysurfer.appconfig.RemoteConfigMirror
 import com.georgeci.moneysurfer.data.datastore.createReplaceOnCorruptionDataStore
+import kotlinx.coroutines.CoroutineScope
 
 /**
  * Server-flag mirror for Android, on its own DataStore file.
@@ -11,8 +12,9 @@ import com.georgeci.moneysurfer.data.datastore.createReplaceOnCorruptionDataStor
  * `filesDir` and the other two platforms need nothing — the same shape `createDebugConfigSource`
  * uses. Only the online host binds this; the offline build has no remote layer to mirror.
  */
-fun createRemoteConfigMirror(context: Context): RemoteConfigMirror = RemoteConfigMirrorImpl(
+fun createRemoteConfigMirror(context: Context, scope: CoroutineScope): RemoteConfigMirror = RemoteConfigMirrorImpl(
     createReplaceOnCorruptionDataStore(
         producePath = { context.filesDir.resolve(REMOTE_FLAGS_FILE_NAME).absolutePath },
     ),
+    scope,
 )

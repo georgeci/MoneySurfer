@@ -16,10 +16,11 @@ import org.koin.dsl.module
 import platform.Foundation.NSBundle
 
 actual val sharedPlatformModule: Module = module {
+    includes(applicationScopeModule)
     single<MoneySurferDatabase> { getRoomDatabase(getDatabaseBuilder()) }
     single { createDataStore() }
     // Own DataStore file, created in the factory rather than bound — see the Android actual.
-    single<DebugConfigSource> { createDebugConfigSource() }
+    single<DebugConfigSource> { createDebugConfigSource(scope = get()) }
     single {
         AppInfo(
             version = readVersionName(),

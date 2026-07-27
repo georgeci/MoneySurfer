@@ -19,6 +19,7 @@ import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.CoroutineScope
 import org.koin.dsl.koinApplication
 import org.koin.dsl.module
 
@@ -135,6 +136,8 @@ private fun withOnlineGraph(block: (org.koin.core.Koin) -> Unit) {
  * never touches Room or DataStore, so these factories must not be called.
  */
 private val configTestPlatformModule = module {
+    // Mirrors `applicationScopeModule` — see `KoinModuleVerificationTest`.
+    single<CoroutineScope> { error("this test must not instantiate the application scope") }
     single<MoneySurferDatabase> { error("this test must not instantiate the database") }
     single<SyncDatabase> { error("this test must not instantiate the sync database") }
     single<DataStore<Preferences>> { error("this test must not instantiate DataStore") }

@@ -5,6 +5,7 @@ import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 
 private val KILL_SWITCH: ConfigKey<Boolean> =
@@ -18,8 +19,13 @@ private val USER_SETTING: SettingKey<Boolean> =
 private val OTHER_SETTING: SettingKey<Boolean> =
     SettingKey.bool("test.other_setting", default = true, sync = true)
 
-/** Builds the production layer order over fakes. */
-private fun config(
+/**
+ * Builds the production layer order over fakes.
+ *
+ * On [TestScope] so the shared `changes` collection runs on `backgroundScope` — it is started
+ * eagerly and never completes, so a scope `runTest` does not tear down would hang the test.
+ */
+private fun TestScope.config(
     debug: DebugConfigSource = FakeDebugConfigSource(isActive = false),
     overlay: SessionConfigOverlay = SessionConfigOverlayImpl(),
     local: LocalConfigSource = FakeLocalConfigSource(),
@@ -29,6 +35,7 @@ private fun config(
 ): LayeredConfig = LayeredConfig(
     layers = listOf(debug, overlay, local, remote, build),
     local = local,
+    scope = backgroundScope,
     failFastOnEarlySnapshot = failFastOnEarlySnapshot,
     overlay = overlay,
 )
@@ -162,6 +169,7 @@ class LayeredConfigSpec : StringSpec({
                     BuildConfigSource { put(HOST_FACT, true) },
                 ),
                 local = FakeLocalConfigSource(),
+                scope = backgroundScope,
                 failFastOnEarlySnapshot = false,
             )
 
@@ -208,6 +216,7 @@ class LayeredConfigSpec : StringSpec({
                     BuildConfigSource { put(HOST_FACT, true) },
                 ),
                 local = FakeLocalConfigSource(),
+                scope = backgroundScope,
                 failFastOnEarlySnapshot = true,
             )
 
@@ -228,6 +237,7 @@ class LayeredConfigSpec : StringSpec({
                     BuildConfigSource { },
                 ),
                 local = FakeLocalConfigSource(),
+                scope = backgroundScope,
                 failFastOnEarlySnapshot = false,
             )
 
@@ -251,6 +261,7 @@ class LayeredConfigSpec : StringSpec({
             val engine = LayeredConfig(
                 layers = listOf(FakeDebugConfigSource(), unreadable, BuildConfigSource { }),
                 local = FakeLocalConfigSource(),
+                scope = backgroundScope,
                 failFastOnEarlySnapshot = true,
             )
             engine.hydrate()
@@ -274,6 +285,7 @@ class LayeredConfigSpec : StringSpec({
             val engine = LayeredConfig(
                 layers = listOf(FakeDebugConfigSource(), unreadable, BuildConfigSource { }),
                 local = FakeLocalConfigSource(),
+                scope = backgroundScope,
                 failFastOnEarlySnapshot = true,
             )
             engine.hydrate()
@@ -418,6 +430,7 @@ class LayeredConfigSpec : StringSpec({
             val engine = LayeredConfig(
                 layers = listOf(local, BuildConfigSource { }),
                 local = local,
+                scope = backgroundScope,
                 failFastOnEarlySnapshot = false,
             )
             engine.hydrate()

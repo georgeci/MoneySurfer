@@ -567,7 +567,7 @@ class ConfigModule {
 Layer order is passed explicitly rather than collected via `getAll()` — precedence is a
 correctness property and must not depend on module load order.
 
-Three details the naive shape gets wrong:
+Four details the naive shape gets wrong:
 
 - **Key groups need distinct types.** Koin indexes definitions by primary type, so several
   modules each binding a bare `ConfigKeyGroup` overwrite one another and `getAll()` returns a
@@ -583,6 +583,20 @@ Three details the naive shape gets wrong:
   with the unqualified one already bound in each `SharedPlatformModule`, and both layers would
   end up reading the same file. `DebugConfigSource` creates its own through an `expect/actual`
   `createDebugOverridesDataStore()`; the raw store never enters the graph.
+
+- **The engine needs an application-scoped `CoroutineScope`.** Every DataStore-backed layer
+  collects its store exactly once, on `applicationScopeModule`'s unqualified `CoroutineScope`
+  binding — included by each `SharedPlatformModule` — and shares the result; `LayeredConfig`
+  shares its layer `combine` the same way. Unshared, every `Config.observe` collector
+  re-subscribed every layer, opening a fresh `dataStore.data` for each store-backed one; the
+  Settings screen alone puts roughly ten collectors on it. The mirror's
+  snapshot still has two writers — that collection and `edit` — but they are now ordered by a
+  write counter, so a value the store handed the collection before a write committed is dropped
+  rather than published over it. Ordering them rather than routing both through the collection is
+  forced by the Local layer sharing its file with the session pointers: an `edit` that waited for
+  its own value to come back could wait forever, because a session write in the same window makes
+  DataStore's conflating cache skip it. Added in #364; the four host test modules that stand in for
+  `sharedPlatformModule` mirror the binding.
 
 - **`ConfigCodec` and host keys are public API of `api`.** Kotlin rejects a public constructor
   taking an internal parameter type, so `data-local` could not pass `PaletteSourceCodec` to a

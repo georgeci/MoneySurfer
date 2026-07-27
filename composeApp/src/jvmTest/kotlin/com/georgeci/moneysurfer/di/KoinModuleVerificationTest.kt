@@ -22,6 +22,7 @@ import com.georgeci.moneysurfer.feature.category.picker.CategoryPickerVariant
 import com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationSeed
 import com.georgeci.moneysurfer.navigation.GoalContributionMode
 import com.georgeci.moneysurfer.sync.db.SyncDatabase
+import kotlinx.coroutines.CoroutineScope
 import org.koin.core.annotation.KoinExperimentalAPI
 import org.koin.dsl.module
 import org.koin.test.verify.verify
@@ -90,6 +91,9 @@ class KoinModuleVerificationTest {
  * checks the shape of the graph — it never calls these factories.
  */
 private val testPlatformModule = module {
+    // Mirrors `applicationScopeModule`: the store-backed configuration layers keep one shared
+    // collection on it. `verify()` only walks signatures, so the binding never has to produce one.
+    single<CoroutineScope> { error("verify() must not instantiate this") }
     single<MoneySurferDatabase> { error("verify() must not instantiate this") }
     single<SyncDatabase> { error("verify() must not instantiate this") }
     single<DataStore<Preferences>> { error("verify() must not instantiate this") }
