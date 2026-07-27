@@ -257,32 +257,23 @@
 
     <!-- Backup -->
     <string name="settings_backup_title">Резервная копия</string>
-    <string name="settings_backup_hero_title">Последний бэкап · сегодня</string>
-    <string name="settings_backup_hero_supporting">14:02 · 18 МБ · 2 341 транзакция</string>
+    <string name="settings_backup_hero_title">Резервная копия вручную</string>
+    <string name="settings_backup_hero_supporting">Облачные копии пока не работают. Сохраните архив в надёжном месте и восстановите его отсюда, когда понадобится.</string>
     <string name="settings_backup_local_hero_title">Локальная копия</string>
     <string name="settings_backup_local_hero_supporting">В этой сборке все данные хранятся на устройстве. Сохраните архив в надёжном месте и восстановите его отсюда, когда понадобится.</string>
-    <string name="settings_backup_section_schedule">Расписание</string>
-    <string name="settings_backup_schedule_footnote">Бэкапы шифруются end-to-end ключом аккаунта.</string>
-    <string name="settings_backup_frequency_title">Частота</string>
-    <string name="settings_backup_frequency_pill">Ежедневно</string>
-    <string name="settings_backup_encryption_title">Шифрование</string>
-    <string name="settings_backup_encryption_supporting">AES-256, end-to-end</string>
-    <string name="settings_backup_location_title">Место хранения</string>
-    <string name="settings_backup_location_pill">iCloud</string>
     <string name="settings_backup_section_manual">Вручную</string>
-    <string name="settings_backup_back_up_now_title">Создать сейчас</string>
-    <string name="settings_backup_back_up_now_supporting">Свежий снапшот вне расписания</string>
     <string name="settings_backup_download_title">Скачать копию</string>
     <string name="settings_backup_download_supporting">.zip архив · пароль по желанию</string>
     <string name="settings_backup_section_restore">Восстановление</string>
     <string name="settings_backup_restore_title">Восстановить из бэкапа</string>
     <string name="settings_backup_restore_supporting">Заменит текущие данные</string>
-    <string name="settings_backup_delete_title">Удалить облачный бэкап</string>
-    <string name="settings_backup_delete_supporting">Удалит все бэкапы из iCloud</string>
     <string name="settings_backup_cancel">Отмена</string>
     <string name="settings_backup_restore_confirm_title">Заменить текущие данные?</string>
     <string name="settings_backup_restore_confirm_body">Восстановление заменит все транзакции, счета и настройки на этом устройстве. После завершения приложение перезапустится.</string>
     <string name="settings_backup_restore_confirm_confirm">Восстановить</string>
+    <string name="settings_backup_relaunch_title">Восстановление завершено</string>
+    <string name="settings_backup_relaunch_body">Данные восстановлены. Чтобы завершить, MoneySurfer закроется — откройте его снова.</string>
+    <string name="settings_backup_relaunch_confirm">Закрыть MoneySurfer</string>
     <string name="settings_backup_export_success">Бэкап сохранён</string>
     <string name="settings_backup_notice_invalid_archive">Выбранный файл не является корректным бэкапом MoneySurfer</string>
     <string name="settings_backup_notice_corrupted">Файл бэкапа повреждён</string>

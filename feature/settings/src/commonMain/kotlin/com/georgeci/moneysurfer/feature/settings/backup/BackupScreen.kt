@@ -29,30 +29,21 @@ import com.georgeci.moneysurfer.feature.settings.components.SettingsSubScreenSca
 import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsChevron
 import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsGroup
 import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsRow
-import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsValuePill
 import com.georgeci.moneysurfer.uikit.components.settings.SurferStatusHeroCard
 import com.georgeci.moneysurfer.uikit.components.settings.SurferStatusHeroTone
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.utils.HandleSideEffect
 import moneysurfer.feature.settings.generated.resources.Res
-import moneysurfer.feature.settings.generated.resources.settings_backup_back_up_now_supporting
-import moneysurfer.feature.settings.generated.resources.settings_backup_back_up_now_title
 import moneysurfer.feature.settings.generated.resources.settings_backup_cancel
-import moneysurfer.feature.settings.generated.resources.settings_backup_delete_supporting
-import moneysurfer.feature.settings.generated.resources.settings_backup_delete_title
 import moneysurfer.feature.settings.generated.resources.settings_backup_download_supporting
 import moneysurfer.feature.settings.generated.resources.settings_backup_download_title
-import moneysurfer.feature.settings.generated.resources.settings_backup_encryption_supporting
-import moneysurfer.feature.settings.generated.resources.settings_backup_encryption_title
 import moneysurfer.feature.settings.generated.resources.settings_backup_export_confirm
 import moneysurfer.feature.settings.generated.resources.settings_backup_export_passphrase_confirm_label
 import moneysurfer.feature.settings.generated.resources.settings_backup_export_passphrase_label
 import moneysurfer.feature.settings.generated.resources.settings_backup_export_passphrase_mismatch
 import moneysurfer.feature.settings.generated.resources.settings_backup_export_success
 import moneysurfer.feature.settings.generated.resources.settings_backup_export_warning
-import moneysurfer.feature.settings.generated.resources.settings_backup_frequency_pill
-import moneysurfer.feature.settings.generated.resources.settings_backup_frequency_title
 import moneysurfer.feature.settings.generated.resources.settings_backup_hero_supporting
 import moneysurfer.feature.settings.generated.resources.settings_backup_hero_title
 import moneysurfer.feature.settings.generated.resources.settings_backup_import_passphrase_body
@@ -61,8 +52,6 @@ import moneysurfer.feature.settings.generated.resources.settings_backup_import_p
 import moneysurfer.feature.settings.generated.resources.settings_backup_import_passphrase_title
 import moneysurfer.feature.settings.generated.resources.settings_backup_local_hero_supporting
 import moneysurfer.feature.settings.generated.resources.settings_backup_local_hero_title
-import moneysurfer.feature.settings.generated.resources.settings_backup_location_pill
-import moneysurfer.feature.settings.generated.resources.settings_backup_location_title
 import moneysurfer.feature.settings.generated.resources.settings_backup_notice_corrupted
 import moneysurfer.feature.settings.generated.resources.settings_backup_notice_format_mismatch
 import moneysurfer.feature.settings.generated.resources.settings_backup_notice_generic
@@ -71,15 +60,16 @@ import moneysurfer.feature.settings.generated.resources.settings_backup_notice_m
 import moneysurfer.feature.settings.generated.resources.settings_backup_notice_passphrase_required
 import moneysurfer.feature.settings.generated.resources.settings_backup_notice_schema_mismatch
 import moneysurfer.feature.settings.generated.resources.settings_backup_notice_wrong_passphrase
+import moneysurfer.feature.settings.generated.resources.settings_backup_relaunch_body
+import moneysurfer.feature.settings.generated.resources.settings_backup_relaunch_confirm
+import moneysurfer.feature.settings.generated.resources.settings_backup_relaunch_title
 import moneysurfer.feature.settings.generated.resources.settings_backup_restore_confirm_body
 import moneysurfer.feature.settings.generated.resources.settings_backup_restore_confirm_confirm
 import moneysurfer.feature.settings.generated.resources.settings_backup_restore_confirm_title
 import moneysurfer.feature.settings.generated.resources.settings_backup_restore_supporting
 import moneysurfer.feature.settings.generated.resources.settings_backup_restore_title
-import moneysurfer.feature.settings.generated.resources.settings_backup_schedule_footnote
 import moneysurfer.feature.settings.generated.resources.settings_backup_section_manual
 import moneysurfer.feature.settings.generated.resources.settings_backup_section_restore
-import moneysurfer.feature.settings.generated.resources.settings_backup_section_schedule
 import moneysurfer.feature.settings.generated.resources.settings_backup_title
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
@@ -94,6 +84,7 @@ fun BackupScreen(
     val appRestarter: AppRestarter = koinInject()
     val snackbarHostState = remember { SnackbarHostState() }
     var pendingNotice by remember { mutableStateOf<BackupNotice?>(null) }
+    var showRelaunchNotice by remember { mutableStateOf(false) }
 
     val launcher = rememberBackupPickerLauncher(
         format = BackupPickerFormat.Zip,
@@ -116,14 +107,21 @@ fun BackupScreen(
             BackupEffect.NavigateBack -> onNavigateBack()
             is BackupEffect.RequestSaveFile -> launcher.launchSave(effect.suggestedName)
             BackupEffect.RequestOpenFile -> launcher.launchOpen()
-            BackupEffect.RestartApp -> appRestarter.restart()
+            // Hosts that cannot relaunch themselves (iOS exits the process) get an
+            // explicit "we're about to close, please reopen" step first — otherwise a
+            // successful restore is indistinguishable from a crash.
+            BackupEffect.RestartApp ->
+                if (appRestarter.requiresManualRelaunch) {
+                    showRelaunchNotice = true
+                } else {
+                    appRestarter.restart()
+                }
             is BackupEffect.Notify -> { pendingNotice = effect.notice }
-            BackupEffect.OpenFrequencyPicker,
-            BackupEffect.OpenLocationPicker,
-            BackupEffect.OpenEncryptionScreen,
-            BackupEffect.NotImplemented,
-            -> Unit
         }
+    }
+
+    if (showRelaunchNotice) {
+        RelaunchNoticeDialog(onConfirm = { appRestarter.restart() })
     }
 
     BackupContent(
@@ -158,12 +156,6 @@ private fun BackupContent(
     snackbarHostState: SnackbarHostState,
     onEvent: (BackupEvent) -> Unit,
 ) {
-    if (state.showDeleteConfirmation) {
-        DeleteBackupDialog(
-            onConfirm = { onEvent(BackupEvent.OnDeleteConfirmed) },
-            onDismiss = { onEvent(BackupEvent.OnDeleteDismissed) },
-        )
-    }
     if (state.showRestoreConfirmation) {
         RestoreBackupDialog(
             onConfirm = { onEvent(BackupEvent.OnRestoreConfirmed) },
@@ -190,64 +182,27 @@ private fun BackupContent(
         showProgressOverlay = state.phase != BackupPhase.Idle,
     ) { padding ->
         Box(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
-            if (state.showCloudBackup) {
-                SurferStatusHeroCard(
-                    title = stringResource(Res.string.settings_backup_hero_title),
-                    supporting = stringResource(Res.string.settings_backup_hero_supporting),
-                    icon = SurferIcons.Cloud,
-                    tone = SurferStatusHeroTone.Primary,
-                )
-            } else {
-                SurferStatusHeroCard(
-                    title = stringResource(Res.string.settings_backup_local_hero_title),
-                    supporting = stringResource(Res.string.settings_backup_local_hero_supporting),
-                    icon = SurferIcons.Archive,
-                    tone = SurferStatusHeroTone.Tertiary,
-                )
-            }
-        }
-
-        if (state.showCloudBackup) {
-            SurferSettingsGroup(
-                title = stringResource(Res.string.settings_backup_section_schedule),
-                footnote = stringResource(Res.string.settings_backup_schedule_footnote),
-            ) {
-                SurferSettingsRow(
-                    icon = SurferIcons.Calendar,
-                    title = stringResource(Res.string.settings_backup_frequency_title),
-                    onClick = { onEvent(BackupEvent.OnFrequencyClick) },
-                    trailing = {
-                        SurferSettingsValuePill(stringResource(Res.string.settings_backup_frequency_pill))
+            SurferStatusHeroCard(
+                title = stringResource(
+                    if (state.isOffline) {
+                        Res.string.settings_backup_local_hero_title
+                    } else {
+                        Res.string.settings_backup_hero_title
                     },
-                )
-                SurferSettingsRow(
-                    icon = SurferIcons.Shield,
-                    title = stringResource(Res.string.settings_backup_encryption_title),
-                    supportingText = stringResource(Res.string.settings_backup_encryption_supporting),
-                    onClick = { onEvent(BackupEvent.OnEncryptionClick) },
-                    trailing = { SurferSettingsValuePill("On") },
-                )
-                SurferSettingsRow(
-                    icon = SurferIcons.Cloud,
-                    title = stringResource(Res.string.settings_backup_location_title),
-                    onClick = { onEvent(BackupEvent.OnLocationClick) },
-                    trailing = {
-                        SurferSettingsValuePill(stringResource(Res.string.settings_backup_location_pill))
+                ),
+                supporting = stringResource(
+                    if (state.isOffline) {
+                        Res.string.settings_backup_local_hero_supporting
+                    } else {
+                        Res.string.settings_backup_hero_supporting
                     },
-                )
-            }
+                ),
+                icon = SurferIcons.Archive,
+                tone = SurferStatusHeroTone.Tertiary,
+            )
         }
 
         SurferSettingsGroup(title = stringResource(Res.string.settings_backup_section_manual)) {
-            if (state.showCloudBackup) {
-                SurferSettingsRow(
-                    icon = SurferIcons.Cloud,
-                    title = stringResource(Res.string.settings_backup_back_up_now_title),
-                    supportingText = stringResource(Res.string.settings_backup_back_up_now_supporting),
-                    onClick = { onEvent(BackupEvent.OnBackUpNowClick) },
-                    trailing = { SurferSettingsChevron() },
-                )
-            }
             SurferSettingsRow(
                 icon = SurferIcons.Download,
                 title = stringResource(Res.string.settings_backup_download_title),
@@ -267,19 +222,6 @@ private fun BackupContent(
             )
         }
 
-        if (state.showCloudBackup) {
-            Spacer(Modifier.height(8.dp))
-            Box(modifier = Modifier.padding(horizontal = 16.dp)) {
-                SurferSettingsRow(
-                    icon = SurferIcons.Delete,
-                    title = stringResource(Res.string.settings_backup_delete_title),
-                    supportingText = stringResource(Res.string.settings_backup_delete_supporting),
-                    danger = true,
-                    multiline = true,
-                    onClick = { onEvent(BackupEvent.OnDeleteClick) },
-                )
-            }
-        }
         Spacer(Modifier.height(padding.calculateBottomPadding() + 32.dp))
     }
 }
@@ -395,26 +337,21 @@ private fun ImportPassphraseDialog(
     )
 }
 
+/**
+ * Shown on hosts whose [AppRestarter] can only exit the process (iOS). The
+ * import already succeeded at this point and the in-memory Room handles are
+ * closed, so there is nothing to go back to — the dialog is not dismissible
+ * and its only button ends the process.
+ */
 @Composable
-private fun DeleteBackupDialog(
-    onConfirm: () -> Unit,
-    onDismiss: () -> Unit,
-) {
+private fun RelaunchNoticeDialog(onConfirm: () -> Unit) {
     AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(stringResource(Res.string.settings_backup_delete_title)) },
-        text = { Text(stringResource(Res.string.settings_backup_delete_supporting)) },
+        onDismissRequest = {},
+        title = { Text(stringResource(Res.string.settings_backup_relaunch_title)) },
+        text = { Text(stringResource(Res.string.settings_backup_relaunch_body)) },
         confirmButton = {
             TextButton(onClick = onConfirm) {
-                Text(
-                    text = stringResource(Res.string.settings_backup_delete_title),
-                    color = AppTheme.materialColors.error,
-                )
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text(stringResource(Res.string.settings_backup_cancel))
+                Text(stringResource(Res.string.settings_backup_relaunch_confirm))
             }
         },
     )

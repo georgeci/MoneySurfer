@@ -21,5 +21,13 @@ interface BackupStorageLocator {
  * and the calling layer surfaces a "please reopen" message.
  */
 interface AppRestarter {
+    /**
+     * `true` when [restart] only terminates the process and the user has to
+     * open the app again by hand (iOS). Callers must show that as an explicit
+     * message *before* invoking [restart], or a successful restore looks like
+     * a crash.
+     */
+    val requiresManualRelaunch: Boolean get() = false
+
     fun restart()
 }

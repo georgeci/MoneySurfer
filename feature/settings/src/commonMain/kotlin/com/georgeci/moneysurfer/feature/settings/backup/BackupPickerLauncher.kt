@@ -11,10 +11,8 @@ import okio.BufferedSource
  *  - **Android**: `ActivityResultContracts.CreateDocument` / `OpenDocument`
  *    via `rememberLauncherForActivityResult`.
  *  - **JVM**: `java.awt.FileDialog`.
- *  - **iOS**: currently a no-op stub (see `BackupPickerLauncher.ios.kt`).
- *    The `UIDocumentPicker` flow needs a temp-file ForwardingSink trick plus
- *    UIKit delegate plumbing that we'd rather land with the iOS toolchain
- *    in CI; the Android + JVM paths cover validation in the meantime.
+ *  - **iOS**: `UIDocumentPickerViewController`, staging through a temp file in
+ *    both directions (see `BackupPickerLauncher.ios.kt`).
  *
  * Completion (or cancellation) calls [onSavePicked] / [onOpenPicked] with the
  * chosen sink/source, or `null` when the user cancelled.
@@ -32,10 +30,11 @@ interface BackupPickerLauncher {
 }
 
 /**
- * File format the picker is launched for. Only Android consumes the MIME
- * types (SAF document contracts); JVM's `FileDialog` and the iOS stub ignore
- * them. `application/octet-stream` stays in the open list because some
- * providers report generic types for perfectly valid files.
+ * File format the picker is launched for. Android consumes the MIME types
+ * directly (SAF document contracts) and iOS resolves them to uniform type
+ * identifiers; JVM's `FileDialog` ignores them. `application/octet-stream`
+ * stays in the open list because some providers report generic types for
+ * perfectly valid files.
  */
 enum class BackupPickerFormat(
     val saveMimeType: String,
