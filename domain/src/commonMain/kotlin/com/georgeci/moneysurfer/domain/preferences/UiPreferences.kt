@@ -1,6 +1,7 @@
 package com.georgeci.moneysurfer.domain.preferences
 
 import com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutConfig
+import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
 import kotlinx.coroutines.flow.Flow
 
 interface UiPreferences {
@@ -46,4 +47,40 @@ interface UiPreferences {
      * matter of swapping the binding behind this `Pref`.
      */
     val dashboardLayout: Pref<DashboardLayoutConfig>
+
+    /**
+     * Everything below backs the Preferences screen (issue #370). The screen stores the choices and
+     * renders them back; nothing else reads them yet — the locale, calendar and behaviour features
+     * they describe are not built. They are declared here rather than kept in the ViewModel so the
+     * choice survives process death, and so the consumers, when they arrive, have one place to read
+     * from.
+     *
+     * All of them are device-local (`sync = false`). Replication of user settings is its own
+     * concern (#334) and none of these has a consumer to disagree about yet, so nothing is gained
+     * by putting a half-built key on the wire.
+     */
+    val appLanguage: Pref<AppLanguage>
+
+    val appRegion: Pref<AppRegion>
+
+    /**
+     * Currency new accounts and cross-account totals should default to. Defaults to the platform
+     * locale's currency, so a fresh install is already right for most users without a first-run
+     * question.
+     */
+    val defaultCurrency: Pref<CurrencyCode>
+
+    val numberFormat: Pref<NumberFormatStyle>
+    val weekStart: Pref<WeekStart>
+    val hourFormat: Pref<HourFormat>
+    val defaultTransactionType: Pref<DefaultTransactionType>
+
+    /** Blur balances on the dashboard until tapped. */
+    val hideAmounts: Pref<Boolean>
+
+    /** Suggest a category from the merchant when a transaction is created. */
+    val autoCategorize: Pref<Boolean>
+
+    /** Round purchases up and move the difference to savings. */
+    val roundUpSavings: Pref<Boolean>
 }

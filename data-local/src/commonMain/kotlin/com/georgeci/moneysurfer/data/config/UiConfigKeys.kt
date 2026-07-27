@@ -4,10 +4,18 @@ import com.georgeci.moneysurfer.appconfig.ConfigKey
 import com.georgeci.moneysurfer.appconfig.ConfigKeyGroup
 import com.georgeci.moneysurfer.appconfig.SettingKey
 import com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutConfig
+import com.georgeci.moneysurfer.domain.formatter.CurrencyDefaults
+import com.georgeci.moneysurfer.domain.preferences.AppLanguage
+import com.georgeci.moneysurfer.domain.preferences.AppRegion
 import com.georgeci.moneysurfer.domain.preferences.ContainerStyle
+import com.georgeci.moneysurfer.domain.preferences.DefaultTransactionType
+import com.georgeci.moneysurfer.domain.preferences.HourFormat
+import com.georgeci.moneysurfer.domain.preferences.NumberFormatStyle
 import com.georgeci.moneysurfer.domain.preferences.PaletteSource
 import com.georgeci.moneysurfer.domain.preferences.ThemeMode
 import com.georgeci.moneysurfer.domain.preferences.TransactionPeriodMode
+import com.georgeci.moneysurfer.domain.preferences.WeekStart
+import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
 import org.koin.core.annotation.Single
 
 /**
@@ -48,6 +56,51 @@ internal object UiConfigKeys {
         sync = false,
     )
 
+    /**
+     * Preferences-screen keys (issue #370). All `sync = false`: replicating user settings is its
+     * own concern (#334), and none of these has a consumer yet, so there is nothing for two devices
+     * to disagree about — the screen stores the choice and reads it back, and that is all.
+     */
+    val appLanguage: SettingKey<AppLanguage> =
+        SettingKey.enum("ui.app_language", AppLanguage.DEFAULT, sync = false)
+
+    val appRegion: SettingKey<AppRegion> =
+        SettingKey.enum("ui.app_region", AppRegion.DEFAULT, sync = false)
+
+    /**
+     * The one key whose default is resolved at runtime rather than written down: the currency the
+     * platform locale implies is a far better first guess than any constant, and it is the same
+     * seed account creation already uses. `CurrencyDefaults` is a pure locale lookup with a `USD`
+     * fallback, so this stays a plain value and never becomes a DI participant.
+     */
+    val defaultCurrency: SettingKey<CurrencyCode> = SettingKey.custom(
+        "ui.default_currency",
+        CurrencyDefaults.systemDefault(),
+        CurrencyCodeCodec,
+        sync = false,
+    )
+
+    val numberFormat: SettingKey<NumberFormatStyle> =
+        SettingKey.enum("ui.number_format", NumberFormatStyle.DEFAULT, sync = false)
+
+    val weekStart: SettingKey<WeekStart> =
+        SettingKey.enum("ui.week_start", WeekStart.DEFAULT, sync = false)
+
+    val hourFormat: SettingKey<HourFormat> =
+        SettingKey.enum("ui.hour_format", HourFormat.DEFAULT, sync = false)
+
+    val defaultTransactionType: SettingKey<DefaultTransactionType> =
+        SettingKey.enum("ui.default_transaction_type", DefaultTransactionType.DEFAULT, sync = false)
+
+    val hideAmounts: SettingKey<Boolean> =
+        SettingKey.bool("ui.hide_amounts", default = false, sync = false)
+
+    val autoCategorize: SettingKey<Boolean> =
+        SettingKey.bool("ui.auto_categorize", default = true, sync = false)
+
+    val roundUpSavings: SettingKey<Boolean> =
+        SettingKey.bool("ui.round_up_savings", default = false, sync = false)
+
     val all: List<ConfigKey<*>> = listOf(
         themeMode,
         paletteSource,
@@ -55,6 +108,16 @@ internal object UiConfigKeys {
         transactionsPeriodMode,
         onboardingCompleted,
         dashboardLayout,
+        appLanguage,
+        appRegion,
+        defaultCurrency,
+        numberFormat,
+        weekStart,
+        hourFormat,
+        defaultTransactionType,
+        hideAmounts,
+        autoCategorize,
+        roundUpSavings,
     )
 }
 
