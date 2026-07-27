@@ -70,9 +70,14 @@ internal object DashboardLayoutConfigCodec : ConfigCodec<DashboardLayoutConfig> 
  * Bare ISO-4217 alphabetic code, e.g. `EUR`.
  *
  * Free text rather than a choice: the currency catalogue is data, not a compile-time enum, so the
- * codec cannot list the accepted values. It still validates the *shape* — three letters, upcased —
+ * codec cannot list the accepted values. It still validates the *shape* — three A–Z letters —
  * because a `CurrencyCode` is used unchecked as a formatter key, and reporting garbage as
  * undecodable lets the layer below win instead of persisting a code nothing can render.
+ *
+ * The shape is checked *after* upcasing, and against A–Z rather than `Char.isLetter`. Both matter,
+ * because the debug panel writes this key as free text: `Char.isLetter` is Unicode-wide and would
+ * accept `руб`, and `"aßc"` is three letters that upcase to the four-character `ASSC` — a value
+ * this codec would have produced and then refused to decode on the next read, losing the setting.
  */
 internal object CurrencyCodeCodec : ConfigCodec<CurrencyCode> {
 
@@ -80,9 +85,9 @@ internal object CurrencyCodeCodec : ConfigCodec<CurrencyCode> {
 
     override fun encode(value: CurrencyCode): String = value.value
 
-    override fun decode(raw: String): CurrencyCode? = raw.trim()
-        .takeIf { it.length == ISO_4217_LENGTH && it.all(Char::isLetter) }
-        ?.let { CurrencyCode(it.uppercase()) }
+    override fun decode(raw: String): CurrencyCode? = raw.trim().uppercase()
+        .takeIf { it.length == ISO_4217_LENGTH && it.all { char -> char in 'A'..'Z' } }
+        ?.let(::CurrencyCode)
 
     override val valueKind: ConfigValueKind = ConfigValueKind.FreeText
 }
