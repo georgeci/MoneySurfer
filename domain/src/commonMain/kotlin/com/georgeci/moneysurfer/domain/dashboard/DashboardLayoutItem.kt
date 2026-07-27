@@ -8,5 +8,5 @@ package com.georgeci.moneysurfer.domain.dashboard
 data class DashboardLayoutItem(
     val type: DashboardWidgetType,
     val enabled: Boolean = true,
-    val cardStyle: DashboardCardStyle = DashboardCardStyle.HERO,
+    val cardStyle: DashboardCardStyle = DashboardCardStyle.EXPANDED,
 )
