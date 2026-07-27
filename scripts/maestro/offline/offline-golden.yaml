@@ -95,6 +95,8 @@ tags:
 - assertVisible:
     id: "settings:budgetsRow"
 - assertVisible:
+    id: "settings:goalsRow"
+- assertVisible:
     id: "settings:appearanceRow"
 - scrollUntilVisible:
     element:

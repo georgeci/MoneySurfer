@@ -336,6 +336,8 @@
     <string name="settings_categories_supporting">Управление категориями расходов и доходов</string>
     <string name="settings_budgets_title">Бюджеты</string>
     <string name="settings_budgets_supporting">Лимиты трат и прогресс по ним</string>
+    <string name="settings_goals_title">Цели</string>
+    <string name="settings_goals_supporting">Копите на то, что для вас важно</string>
 
     <!-- Удаление аккаунта пользователя (issue #213) — формулировки синхронизированы со
          страницей georgeci.github.io/account-deletion.html. -->

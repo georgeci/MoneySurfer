@@ -167,6 +167,7 @@ class SettingsViewModel(
         SettingsEvent.OnIncomingInvitesClick -> SettingsEffect.NavigateToIncomingInvites
         SettingsEvent.OnCategoriesClick -> SettingsEffect.NavigateToCategories
         SettingsEvent.OnBudgetsClick -> SettingsEffect.NavigateToBudgets
+        SettingsEvent.OnGoalsClick -> SettingsEffect.NavigateToGoals
         else -> null
     }
 
@@ -219,6 +220,7 @@ sealed interface SettingsEvent {
     data object OnMembersClick : SettingsEvent
     data object OnCategoriesClick : SettingsEvent
     data object OnBudgetsClick : SettingsEvent
+    data object OnGoalsClick : SettingsEvent
     data object OnAppearanceClick : SettingsEvent
     data object OnPreferencesClick : SettingsEvent
     data object OnSyncClick : SettingsEvent
@@ -239,6 +241,7 @@ sealed interface SettingsEffect {
     data class NavigateToMembers(val workspaceId: WorkspaceId) : SettingsEffect
     data object NavigateToCategories : SettingsEffect
     data object NavigateToBudgets : SettingsEffect
+    data object NavigateToGoals : SettingsEffect
     data object NavigateToAppearance : SettingsEffect
     data object NavigateToPreferences : SettingsEffect
     data object NavigateToSync : SettingsEffect
