@@ -59,6 +59,7 @@ kotlin {
             implementation(libs.kotest.framework.engine)
             implementation(libs.kotest.assertions.core)
             implementation(libs.kotlinx.coroutines.test)
+            implementation(projects.domainTestFixtures)
         }
         jvmTest.dependencies {
             implementation(projects.dataLocal)

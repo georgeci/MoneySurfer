@@ -19,6 +19,23 @@ data class UserDoc(
 )
 
 /**
+ * One synced setting, at `users/{uid}/config/{keyName}`. The document id is the key name, so there
+ * is no `key` field — and no nesting: per-key documents are what buy per-key LWW from the existing
+ * resolver, where a single map document would have needed a field-level merge the pipeline cannot
+ * express.
+ *
+ * [value] is always a string because that is what `ConfigCodec` emits, which also keeps the
+ * write-shape rule trivial. [updatedAt] is client-clock epoch millis matching
+ * `config_entry.updatedAt`, so LWW compares like with like.
+ */
+@Serializable
+data class UserConfigDoc(
+    val value: String = "",
+    val updatedAt: Long = 0L,
+    val clientVersionCode: Int = 1,
+)
+
+/**
  * Email→uid mapping for invite recipient discovery. Doc id is the lowercased email.
  * Kept as a separate collection (rather than exposing `users.email` via list rules) so the
  * security rule is a tight `signedIn()` read on a single field with no other PII leakage.

@@ -124,7 +124,7 @@ DAO realisation
 
 | API           | DAO behaviour |
 |---------------|----------------|
-| `enqueue`     | `INSERT` with `status = PENDING`. |
+| `enqueue`     | Insert-if-absent with `status = PENDING`: `INSERT … SELECT … WHERE NOT EXISTS (SELECT 1 … WHERE entityType = :entityType AND entityId = :entityId AND operation = :operation AND status = 'PENDING')`. Rows carry no payload, so N queued rows for one entity all push the identical current value — renaming an account five times used to queue five pushes. The `PENDING` scope is the correctness half: a write landing while a row is `IN_FLIGHT` must create a new row, or the change made after the push read the entity is lost. Room's `@Index` has no `WHERE` clause, so it cannot be a unique index. |
 | `pending`     | `SELECT * WHERE status = 'PENDING' ORDER BY createdAt ASC LIMIT :limit`. |
 | `markInFlight`| `UPDATE … SET status = 'IN_FLIGHT' WHERE id IN (:ids)`. |
 | `markCompleted` | `DELETE FROM pending_mutations WHERE id IN (:ids)`. **Completion deletes the row.** It does not flip a flag. |

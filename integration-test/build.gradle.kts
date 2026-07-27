@@ -72,6 +72,8 @@ kotlin {
             implementation(projects.dataLocal)
             implementation(projects.dataRemote)
             implementation(projects.syncSurfer)
+            implementation(projects.appConfig.api)
+            implementation(projects.appConfig.default)
 
             // Fixtures
             implementation(projects.domainTestFixtures)
@@ -85,6 +87,8 @@ kotlin {
             // Real Room (in-memory) — JVM Room runtime supports in-memory databases.
             implementation(libs.androidx.room.runtime)
             implementation(libs.androidx.sqlite.bundled)
+            // The Local config layer keeps device-scoped keys in DataStore.
+            implementation(libs.androidx.datastore.preferences)
 
             implementation(libs.kotlinx.coroutinesCore)
             implementation(libs.kotlinx.datetime)
@@ -111,6 +115,8 @@ kotlin {
             implementation(projects.dataLocal)
             implementation(projects.dataRemote)
             implementation(projects.syncSurfer)
+            implementation(projects.appConfig.api)
+            implementation(projects.appConfig.default)
 
             // Fixtures
             implementation(projects.domainTestFixtures)
@@ -131,6 +137,8 @@ kotlin {
             // Room (Android runtime, in-memory).
             implementation(libs.androidx.room.runtime)
             implementation(libs.androidx.sqlite.bundled)
+            // The Local config layer keeps device-scoped keys in DataStore.
+            implementation(libs.androidx.datastore.preferences)
 
             // Test plumbing
             implementation(libs.androidx.runner)

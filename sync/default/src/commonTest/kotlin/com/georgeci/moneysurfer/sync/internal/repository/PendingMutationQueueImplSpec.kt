@@ -23,8 +23,38 @@ private class FakePendingMutationDao : PendingMutationDao {
         countFlow.value = rows.values.count { it.status != PendingMutationEntity.STATUS_IN_FLIGHT }
     }
 
-    override suspend fun insert(entity: PendingMutationEntity) {
-        rows[entity.id] = entity
+    @Suppress("LongParameterList")
+    override suspend fun insertIfAbsent(
+        id: String,
+        entityType: String,
+        entityId: String,
+        operation: String,
+        workspaceId: String?,
+        createdAt: Long,
+        attempts: Int,
+        status: String,
+        lastError: String?,
+    ) {
+        val duplicate = rows.values.any {
+            it.entityType == entityType &&
+                it.entityId == entityId &&
+                it.operation == operation &&
+                // Part of the identity: `WORKSPACE_MEMBER` reuses one userId across workspaces.
+                it.workspaceId == workspaceId &&
+                it.status == PendingMutationEntity.STATUS_PENDING
+        }
+        if (duplicate) return
+        rows[id] = PendingMutationEntity(
+            id = id,
+            entityType = entityType,
+            entityId = entityId,
+            operation = operation,
+            workspaceId = workspaceId,
+            createdAt = createdAt,
+            attempts = attempts,
+            status = status,
+            lastError = lastError,
+        )
         recompute()
     }
 

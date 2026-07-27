@@ -12,7 +12,18 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 
 private class RecordingPendingDao(private val log: MutableList<String>) : PendingMutationDao {
-    override suspend fun insert(entity: PendingMutationEntity) = Unit
+    @Suppress("LongParameterList")
+    override suspend fun insertIfAbsent(
+        id: String,
+        entityType: String,
+        entityId: String,
+        operation: String,
+        workspaceId: String?,
+        createdAt: Long,
+        attempts: Int,
+        status: String,
+        lastError: String?,
+    ) = Unit
     override suspend fun pending(workspaceId: String?, limit: Int): List<PendingMutationEntity> = emptyList()
     override suspend fun markInFlight(ids: List<String>) = Unit
     override suspend fun deleteByIds(ids: List<String>) = Unit

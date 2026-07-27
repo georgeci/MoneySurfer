@@ -5,6 +5,7 @@ import arrow.core.right
 import com.georgeci.moneysurfer.domain.auth.AuthError
 import com.georgeci.moneysurfer.domain.auth.AuthLocalRepository
 import com.georgeci.moneysurfer.domain.auth.InMemorySessionPointers
+import com.georgeci.moneysurfer.domain.fixtures.RecordingSyncedSettingsSession
 import com.georgeci.moneysurfer.domain.model.User
 import com.georgeci.moneysurfer.domain.model.Workspace
 import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
@@ -112,6 +113,7 @@ private class AuthEnv(
         workspaceSyncer = NoopSyncer,
         sessionMutator = session,
         getCurrentTime = GetCurrentTimeUseCase(ClockUseCase()),
+        syncedSettingsSession = RecordingSyncedSettingsSession(),
     )
     private val abandon = AbandonAuthSessionUseCase(session, auth)
 

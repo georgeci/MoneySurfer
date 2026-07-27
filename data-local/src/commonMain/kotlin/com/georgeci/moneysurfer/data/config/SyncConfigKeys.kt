@@ -26,9 +26,22 @@ internal object SyncConfigKeys {
     val remoteEnabled: ConfigKey<Boolean> =
         ConfigKey.bool("sync.remote_enabled", default = true, remoteOverridable = true)
 
-    /** User toggle. Synced, so turning sync off on one device turns it off on the others. */
+    /**
+     * User toggle.
+     *
+     * `sync = false` is mandatory, and for a reason that only became visible once replication was
+     * real: this key gates its own replication. `SyncCoordinatorWorkspaceSyncer` refuses to push or
+     * pull while it is `false`, so the value `false` can never reach Firestore — only `true` can.
+     * Were it `sync = true` it would live in the account-scoped `config_entry` table, which
+     * `LocalDataResetRepositoryImpl.clearAll()` wipes on logout, and the next sign-in would resolve
+     * it to the `true` default with nothing on the server able to restore the user's choice.
+     * Turning sync off and logging out would silently turn it back on and start uploading.
+     *
+     * Device-scoped is also the honest scope: "do not talk to the server from this device" is a
+     * decision about a device, not an account setting to be mirrored onto the user's other ones.
+     */
     val userEnabled: SettingKey<Boolean> =
-        SettingKey.bool("sync.user_enabled", default = true, sync = true)
+        SettingKey.bool("sync.user_enabled", default = true, sync = false)
 
     val all: List<ConfigKey<*>> = listOf(remoteEnabled, userEnabled)
 }

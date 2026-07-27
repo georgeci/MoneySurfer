@@ -7,6 +7,7 @@ import arrow.core.raise.either
 import co.touchlab.kermit.Logger
 import com.georgeci.moneysurfer.domain.auth.AuthError
 import com.georgeci.moneysurfer.domain.auth.SessionMutator
+import com.georgeci.moneysurfer.domain.config.SyncedSettingsSession
 import com.georgeci.moneysurfer.domain.logging.redactEmail
 import com.georgeci.moneysurfer.domain.logging.redactUid
 import com.georgeci.moneysurfer.domain.model.User
@@ -36,6 +37,7 @@ class PostAuthBootstrapUseCase(
     private val workspaceSyncer: WorkspaceSyncer,
     private val sessionMutator: SessionMutator,
     private val getCurrentTime: GetCurrentTimeUseCase,
+    private val syncedSettingsSession: SyncedSettingsSession,
 ) {
     private val log = Logger.withTag(TAG)
 
@@ -70,6 +72,19 @@ class PostAuthBootstrapUseCase(
         isAnon: Boolean,
     ): Either<AuthError, Result> = either {
         log.i { "[start] uid=${uid.redactUid()} isAnon=$isAnon hasEmail=${email != null}" }
+
+        // Before anything reads or pulls: drop the previous user's settings overlay, and queue the
+        // settings written while the outbox was refusing writes. Both have to happen ahead of the
+        // first pull of this session — the overlay would otherwise shadow what the pull writes, and
+        // a write reconciled afterwards would race the pull it is supposed to precede.
+        //
+        // Best-effort, like the email backfill below. It touches two databases, and `either { }`
+        // does not catch exceptions: an unwrapped throw would escape as a raw exception rather than
+        // an `AuthError`, so `LoginUseCase`'s `.onLeft { abandonAuthSession() }` would never run and
+        // the session would be left pinned with no workspace — the #342 dangling state. Losing the
+        // reconciliation costs one sync cycle; the next session start retries it.
+        Either.catch { syncedSettingsSession.onSessionStart() }
+            .onLeft { log.w(it) { "[settings] session start failed uid=${uid.redactUid()} — non-fatal" } }
 
         // Backfill the email→uid mapping so future invites can resolve targetUserId for this
         // account. Best-effort — failure shouldn't block the login flow, but it does block

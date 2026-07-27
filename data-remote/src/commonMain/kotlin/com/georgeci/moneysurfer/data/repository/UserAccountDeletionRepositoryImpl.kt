@@ -9,6 +9,7 @@ import com.georgeci.moneysurfer.domain.logging.redactUid
 import com.georgeci.moneysurfer.domain.model.WorkspaceMemberStatus
 import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
 import com.georgeci.moneysurfer.domain.repositories.UserAccountDeletionRepository
+import com.georgeci.moneysurfer.sync.api.SyncCollection
 import org.koin.core.annotation.Single
 
 /**
@@ -50,6 +51,10 @@ class UserAccountDeletionRepositoryImpl(
         }
 
         deleteEmailMapping(email, uid)
+        // Before the user document, never after: Firestore does not cascade deletes into
+        // subcollections, and once `users/{uid}` and the Auth user are gone nobody can ever
+        // authenticate as this uid again to reach what is left behind.
+        USER_COLLECTIONS.forEach { name -> remote.deleteUserCollection(uid, name) }
         remote.deleteUserDoc(uid)
         log.i { "[delete] remote data cleared uid=${uid.redactUid()}" }
     }.mapLeft { AccountDeletionError.RemoteDataCleanupFailed(cause = it) }
@@ -103,6 +108,14 @@ class UserAccountDeletionRepositoryImpl(
 
     private companion object {
         const val TAG = "AccountDeletion"
+
+        /**
+         * Subcollections of `users/{uid}`, purged before the user document itself. Named through
+         * [SyncCollection] rather than spelled out: the pull reads the same path, and a collection
+         * missing from this list is orphaned silently — the documents outlive the Auth user with
+         * nobody able to authenticate as it again.
+         */
+        val USER_COLLECTIONS = listOf(SyncCollection.USER_CONFIG)
 
         /** Workspace subcollections purged before members + root doc. */
         val ENTITY_COLLECTIONS = listOf(

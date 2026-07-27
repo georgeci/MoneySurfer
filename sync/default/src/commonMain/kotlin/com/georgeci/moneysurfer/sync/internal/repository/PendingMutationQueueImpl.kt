@@ -15,8 +15,20 @@ class PendingMutationQueueImpl(
     private val dao: PendingMutationDao,
 ) : PendingMutationQueue {
 
+    /** Insert-if-absent — see [PendingMutationDao.insertIfAbsent] for why the dedup lives in SQL. */
     override suspend fun enqueue(mutation: PendingMutation) {
-        dao.insert(mutation.toEntity(status = PendingMutationEntity.STATUS_PENDING))
+        val entity = mutation.toEntity(status = PendingMutationEntity.STATUS_PENDING)
+        dao.insertIfAbsent(
+            id = entity.id,
+            entityType = entity.entityType,
+            entityId = entity.entityId,
+            operation = entity.operation,
+            workspaceId = entity.workspaceId,
+            createdAt = entity.createdAt,
+            attempts = entity.attempts,
+            status = entity.status,
+            lastError = entity.lastError,
+        )
     }
 
     override suspend fun pending(scope: SyncScope, limit: Int): List<PendingMutation> =

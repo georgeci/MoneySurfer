@@ -6,6 +6,7 @@ import com.georgeci.moneysurfer.domain.auth.AuthError
 import com.georgeci.moneysurfer.domain.auth.AuthLocalRepository
 import com.georgeci.moneysurfer.domain.auth.InMemorySessionPointers
 import com.georgeci.moneysurfer.domain.fixtures.FakeHostCapabilities
+import com.georgeci.moneysurfer.domain.fixtures.RecordingSyncedSettingsSession
 import com.georgeci.moneysurfer.domain.model.User
 import com.georgeci.moneysurfer.domain.model.Workspace
 import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
@@ -178,6 +179,7 @@ private fun newViewModel(
         workspaceSyncer = StubWorkspaceSyncer,
         sessionMutator = session,
         getCurrentTime = GetCurrentTimeUseCase(ClockUseCase()),
+        syncedSettingsSession = RecordingSyncedSettingsSession(),
     )
     val abandon = AbandonAuthSessionUseCase(session, auth)
     return SignInViewModel(
@@ -191,7 +193,7 @@ private fun newViewModel(
             postAuthBootstrap,
             abandon,
         ),
-        demoLogin = DemoLoginUseCase(authLocal, session),
+        demoLogin = DemoLoginUseCase(authLocal, session, RecordingSyncedSettingsSession()),
         hostCapabilities = FakeHostCapabilities(),
     )
 }

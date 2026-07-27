@@ -4,6 +4,8 @@ import arrow.core.Either
 import com.georgeci.moneysurfer.data.db.entity.UserEntity
 import com.georgeci.moneysurfer.data.db.entity.WorkspaceEntity
 import com.georgeci.moneysurfer.data.sync.PullRemoteChangesUseCaseImpl
+import com.georgeci.moneysurfer.data.sync.UserCollectionReader
+import com.georgeci.moneysurfer.data.sync.UserScopedPullPhase
 import com.georgeci.moneysurfer.data.sync.UserWorkspacesProvider
 import com.georgeci.moneysurfer.data.sync.WorkspaceCollectionReader
 import com.georgeci.moneysurfer.domain.auth.InMemorySessionPointers
@@ -184,6 +186,12 @@ private class PullStack(
 
     private val useCase = PullRemoteChangesUseCaseImpl(
         collectionReader = remote,
+        // No user-scoped plugin in this graph, so the phase resolves to an empty summary.
+        userScopedPull = UserScopedPullPhase(
+            reader = EmptyUserCollectionReader,
+            plugins = emptyList(),
+            session = InMemorySessionPointers(currentFirebaseUid = "firebase-uid-1"),
+        ),
         syncMeta = syncMeta,
         plugins = listOf(categoriesPlugin, membersPlugin, rootPlugin),
         session = InMemorySessionPointers(
@@ -257,4 +265,13 @@ private class RecordingApplyPlugin(
         applyOrder += "$entityType:${doc.id}"
         return EntityApplyResult(applied = true, wasConflict = false)
     }
+}
+
+/** Phase 3 has no plugin to run in this graph, so this is never consulted. */
+private object EmptyUserCollectionReader : UserCollectionReader {
+    override suspend fun fetchAll(
+        uid: String,
+        collectionName: String,
+        limit: Int,
+    ): List<RemoteDocument> = emptyList()
 }
