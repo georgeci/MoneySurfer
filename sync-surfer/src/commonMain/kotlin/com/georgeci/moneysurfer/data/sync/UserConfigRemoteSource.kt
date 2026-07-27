@@ -14,7 +14,7 @@ import org.koin.core.annotation.Single
  * be recorded — is the part worth testing, and gitlive's JVM artefact cannot be instantiated off
  * Android.
  */
-interface UserConfigRemoteSource {
+fun interface UserConfigRemoteSource {
 
     suspend fun write(uid: String, key: String, doc: UserConfigDoc)
 }

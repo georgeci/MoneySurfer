@@ -7,7 +7,7 @@ package com.georgeci.moneysurfer.domain.config
  * are session-lifecycle use cases in `domain`, which must not see `app-config` any more than a
  * feature may.
  */
-interface SyncedSettingsSession {
+fun interface SyncedSettingsSession {
 
     /**
      * Run at the start of every session, before its first pull. Two jobs, both of which have to

@@ -19,7 +19,7 @@ import com.georgeci.moneysurfer.sync.plugin.RemoteDocument
  * compromised device) would be materialised whole into memory and re-applied to Room on every
  * foreground sync, on every one of the user's devices.
  */
-interface UserCollectionReader {
+fun interface UserCollectionReader {
 
     /** At most [limit] documents. The caller decides what to do when the cap is reached. */
     suspend fun fetchAll(uid: String, collectionName: String, limit: Int): List<RemoteDocument>
