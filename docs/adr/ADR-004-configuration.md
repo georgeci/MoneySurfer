@@ -587,9 +587,9 @@ Four details the naive shape gets wrong:
 - **The engine needs an application-scoped `CoroutineScope`.** Every DataStore-backed layer
   collects its store exactly once, on `applicationScopeModule`'s unqualified `CoroutineScope`
   binding — included by each `SharedPlatformModule` — and shares the result; `LayeredConfig`
-  shares its four-way `combine` the same way. Unshared, every `Config.observe` collector
-  re-subscribed all four layers, opening a fresh `dataStore.data` for each of the two
-  store-backed ones; the Settings screen alone puts roughly ten collectors on it. The mirror's
+  shares its layer `combine` the same way. Unshared, every `Config.observe` collector
+  re-subscribed every layer, opening a fresh `dataStore.data` for each store-backed one; the
+  Settings screen alone puts roughly ten collectors on it. The mirror's
   snapshot still has two writers — that collection and `edit` — but they are now ordered by a
   write counter, so a value the store handed the collection before a write committed is dropped
   rather than published over it. Ordering them rather than routing both through the collection is
@@ -720,6 +720,12 @@ Revisit if a slider-backed key appears.
 - `sync = false` is required for demo/session/onboarding keys.
 - `sync = true` keys are stored in Room `config_entry` (account-scoped, wiped on account
   change); `sync = false` keys stay in DataStore and are never wiped.
+- **A key that gates sync is `sync = false`.** `sync.user_enabled` is the case: the syncer refuses
+  to push or pull while it is `false`, so the value `false` can never reach Firestore — only `true`
+  can. Account-scoped it would be wiped on logout and resolve back to its `true` default, with
+  nothing on the server able to restore the user's choice, so turning sync off and logging out
+  would silently turn it back on. The rule generalises: a setting cannot replicate through a
+  channel it is itself allowed to close.
 - Layer order is declared explicitly in one place.
 - **An unreadable store never fails a read.** Not just `hydrate()` — every path. `hydrate()` runs
   before a start route exists and `Config.observe` is collected on the same startup coroutine, so a
@@ -750,8 +756,43 @@ Revisit if a slider-backed key appears.
 
 ## Migration
 
-**Status.** Steps 1-3 shipped together in issue #332; step 4 shipped in issue #333. Step 5
-(per-user sync) is the only one left.
+**Status.** Steps 1-3 shipped together in issue #332; step 4 shipped in issue #333; step 5
+shipped in issue #334. The migration is complete.
+
+Step 5's deviations worth knowing:
+
+- `config_entry` carries a fourth column, `lastPushedAt`. The sign-in reconciliation is specified
+  as "every `sync = true` key whose `updatedAt` is newer than `lastPushedAt`", and there was
+  nowhere else for that timestamp to live; the push stamps it, scoped to the `updatedAt` it
+  actually sent, so a write that lands mid-push stays pending. A pulled value is stamped as
+  already-pushed, so a pull never provokes an echo push.
+- The in-memory overlay is a real layer, `ConfigLayer.Session`, ordered `Debug > Session > Local`.
+  Being a layer is what keeps `resolve()` honest for the debug panel. It also forced one engine
+  rule: `Config.handle(key).set` releases the overlay entry, because the overlay outranks the layer
+  being written to and the write would otherwise be stored and not shown. The release happens
+  *after* the write, not before: released first, a store that refused the write would leave the
+  value in neither place and snap the running UI to a default the user never chose.
+- The account wipe drops `config_entry` through `LocalConfigSource.clearSynced()`, not through the
+  reset repository's DAO fan-out. The layer keeps an in-memory snapshot behind the synchronous
+  `peek`, refreshed only by Room's invalidation through a cold flow with no collector of its own —
+  deleting the rows underneath it would leave the wiped account's settings resolving from Local
+  until something happened to observe a setting, and session start clears the overlay that was
+  legitimately masking them.
+- Session-boundary work is reached through a `SyncedSettingsSession` domain facade — same reason
+  as `ConfigHydration` and `RemoteConfigRefresh`: the callers are use cases in `domain`, which
+  must not see `app-config`. It runs at the top of `PostAuthBootstrapUseCase` (before the first
+  pull) and in `DemoLoginUseCase`.
+- The plugin's Firestore write goes through a `UserConfigRemoteSource` seam, mirroring
+  `AccountDeletionRemoteSource`: gitlive's JVM artefact cannot be instantiated off Android, so
+  without the seam none of the push decisions would be unit-testable.
+- **Pre-bump backups are unrestorable.** `BackupImporterImpl.validateVersions` compares
+  `moneySurferDbVersion` for strict equality, so an archive made at v33 now fails with
+  `BackupError.SchemaMismatch`. Accepted pre-release, and it is the same class of loss as the
+  skipped DataStore migration below. `config_entry` itself needs no export work — the backup
+  ships the whole database file.
+- The outbox dedup landed here rather than as its own issue (see
+  [Write volume](#write-volume)); it is a sync-wide behaviour change, covered against real SQLite
+  in `PendingMutationQueueIntegrationIT`.
 
 Step 4's deviations worth knowing:
 

@@ -4,6 +4,7 @@ import com.georgeci.moneysurfer.domain.config.ConfigDebugRow
 import com.georgeci.moneysurfer.domain.config.DebugConfigInspector
 import com.georgeci.moneysurfer.domain.config.HostCapabilities
 import com.georgeci.moneysurfer.domain.config.SyncSettings
+import com.georgeci.moneysurfer.domain.config.SyncedSettingsSession
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
@@ -40,6 +41,23 @@ class FakeSyncSettings(enabled: Boolean = false) : SyncSettings {
 
     suspend fun set(enabled: Boolean) {
         state.value = enabled
+    }
+}
+
+/**
+ * Counts session-start calls, so a test can assert that a sign-in path clears the logout overlay
+ * and reconciles pending pushes *before* it pulls.
+ *
+ * [failWith] models the real failure mode: the implementation reads Room and writes the outbox —
+ * two different databases — and a sign-in must survive either one throwing.
+ */
+class RecordingSyncedSettingsSession(private val failWith: String? = null) : SyncedSettingsSession {
+    var sessionStarts: Int = 0
+        private set
+
+    override suspend fun onSessionStart() {
+        sessionStarts++
+        failWith?.let { error(it) }
     }
 }
 

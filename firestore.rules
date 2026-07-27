@@ -245,6 +245,21 @@ service cloud.firestore {
         && typeNullableIntOk(data, 'deletedAt');
     }
 
+    // UserConfigDoc — data-remote/.../RemoteDtos.kt
+    //
+    // Stricter than the workspace entity shapes above, and deliberately so: this
+    // document has exactly three fields and the client always writes all three
+    // (gitlive encodes defaults), so there is no minimal-doc case to tolerate. The
+    // size cap is what keeps a self-writable collection from becoming free storage —
+    // every current codec emits an enum name or a short token, far under it.
+    function validUserConfig() {
+      return request.resource.data.keys().hasOnly(['value', 'updatedAt', 'clientVersionCode'])
+        && request.resource.data.value is string
+        && request.resource.data.value.size() <= 1024
+        && typeIntOk(request.resource.data, 'updatedAt')
+        && hasValidClientVersion();
+    }
+
     // Personal user document — workspace pointers, profile metadata.
     match /users/{uid} {
       allow read: if signedIn() && request.auth.uid == uid;
@@ -269,6 +284,28 @@ service cloud.firestore {
         && request.resource.data.invitedWorkspaceIds.hasAll(resource.data.invitedWorkspaceIds)
         && request.resource.data.invitedWorkspaceIds.size() == resource.data.invitedWorkspaceIds.size() + 1
         && request.resource.data.invitedWorkspaceIds.size() <= 100;
+
+      // Per-user settings — one document per configuration key, doc id = key name.
+      //
+      // Strictly self-scoped: unlike every workspace collection there is no sharing
+      // dimension here, so no membership lookup is involved and `list` is safe to
+      // allow outright — the user-scoped pull reads the whole collection without a
+      // cursor (about ten tiny documents), so it needs a bare list, not a filtered
+      // ordered query.
+      //
+      // Write-shape validation is NOT optional: these documents are client-written
+      // and the pull path reads `updatedAt`, so a malformed value is exactly the
+      // poison document the issue #156 guard exists to reject.
+      //
+      // `delete` pairs with the account-deletion purge. Firestore does not cascade
+      // deletes into subcollections, so `FirebaseAccountDeletionRemoteSource` clears
+      // this collection *before* deleting `users/{uid}` — otherwise the documents are
+      // orphaned permanently and unreachable once the Auth user is gone.
+      match /config/{key} {
+        allow get, list: if signedIn() && request.auth.uid == uid;
+        allow create, update: if signedIn() && request.auth.uid == uid && validUserConfig();
+        allow delete: if signedIn() && request.auth.uid == uid;
+      }
     }
 
     // email→uid lookup table for invite targetUserId resolution.

@@ -6,6 +6,7 @@ import com.georgeci.moneysurfer.appconfig.DebugConfigSource
 import com.georgeci.moneysurfer.appconfig.LayeredConfig
 import com.georgeci.moneysurfer.appconfig.LocalConfigSource
 import com.georgeci.moneysurfer.appconfig.RemoteGlobalConfigSource
+import com.georgeci.moneysurfer.appconfig.SessionConfigOverlay
 import kotlinx.coroutines.CoroutineScope
 import org.koin.core.annotation.ComponentScan
 import org.koin.core.annotation.Module
@@ -36,14 +37,18 @@ class ConfigModule {
     @Single
     fun config(
         debug: DebugConfigSource,
+        overlay: SessionConfigOverlay,
         local: LocalConfigSource,
         remoteGlobal: RemoteGlobalConfigSource,
         build: BuildConfigSource,
         scope: CoroutineScope,
     ): Config = LayeredConfig(
-        layers = listOf(debug, local, remoteGlobal, build),
+        // The overlay sits directly above Local: it stands in for values the account wipe just
+        // deleted, and it must not outrank a QA override.
+        layers = listOf(debug, overlay, local, remoteGlobal, build),
         local = local,
         scope = scope,
         failFastOnEarlySnapshot = debug.isActive,
+        overlay = overlay,
     )
 }

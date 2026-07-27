@@ -17,7 +17,7 @@
 ## adr-configuration
 - Title: Decision
 - File: docs/adr/ADR-004-configuration.md
-- Lines: 62-878
+- Lines: 62-933
 - Tasks: adr, config, flags, preferences
 
 ## adr-navigation
@@ -395,7 +395,7 @@
 ## sync-pull-lww-rules
 - Title: Rules
 - File: docs/architecture/sync-pull-lww.md
-- Lines: 36-51
+- Lines: 37-52
 - Tasks: sync, pull, lww, tombstones, cursor
 
 ## sync-rules
@@ -419,7 +419,7 @@
 ## time-policy
 - Title: Time policy
 - File: docs/architecture/data-models.md
-- Lines: 46-69
+- Lines: 47-70
 - Tasks: time, persistence, domain
 
 ## transactions-feature

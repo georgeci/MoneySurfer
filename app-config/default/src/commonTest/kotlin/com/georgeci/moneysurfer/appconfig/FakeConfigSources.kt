@@ -41,6 +41,10 @@ internal class FakeStoreConfigSource(
     fun remove(name: String) {
         state.value = state.value - name
     }
+
+    fun clear() {
+        state.value = emptyMap()
+    }
 }
 
 internal class FakeLocalConfigSource(
@@ -60,6 +64,20 @@ internal class FakeLocalConfigSource(
         writes += key.name
         delegate.put(key.name, key.codec.encode(value))
     }
+
+    /** No `sync` split here — this fake has one store, so the wipe empties it. */
+    override suspend fun clearSynced() = delegate.clear()
+}
+
+/** A store that refuses every write, so a test can watch what the engine does with the failure. */
+internal class ThrowingLocalConfigSource : LocalConfigSource {
+    override fun <T : Any> peek(key: ConfigKey<T>): LayerValue<T> = LayerValue.Absent
+    override val changes: Flow<Unit> = flowOf(Unit)
+    override suspend fun hydrate() = Unit
+    override suspend fun <T : Any> write(key: SettingKey<T>, value: T): Unit =
+        error("the store is unwritable")
+
+    override suspend fun clearSynced() = Unit
 }
 
 internal class FakeDebugConfigSource(

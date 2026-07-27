@@ -16,6 +16,9 @@ private val HOST_FACT: ConfigKey<Boolean> = ConfigKey.bool("test.host_fact", def
 private val USER_SETTING: SettingKey<Boolean> =
     SettingKey.bool("test.user_setting", default = true, sync = true)
 
+private val OTHER_SETTING: SettingKey<Boolean> =
+    SettingKey.bool("test.other_setting", default = true, sync = true)
+
 /**
  * Builds the production layer order over fakes.
  *
@@ -24,15 +27,17 @@ private val USER_SETTING: SettingKey<Boolean> =
  */
 private fun TestScope.config(
     debug: DebugConfigSource = FakeDebugConfigSource(isActive = false),
+    overlay: SessionConfigOverlay = SessionConfigOverlayImpl(),
     local: LocalConfigSource = FakeLocalConfigSource(),
     remote: RemoteGlobalConfigSource = FakeRemoteGlobalConfigSource(),
     build: BuildConfigSource = BuildConfigSource { },
     failFastOnEarlySnapshot: Boolean = false,
 ): LayeredConfig = LayeredConfig(
-    layers = listOf(debug, local, remote, build),
+    layers = listOf(debug, overlay, local, remote, build),
     local = local,
     scope = backgroundScope,
     failFastOnEarlySnapshot = failFastOnEarlySnapshot,
+    overlay = overlay,
 )
 
 class LayeredConfigSpec : StringSpec({
@@ -308,6 +313,131 @@ class LayeredConfigSpec : StringSpec({
             engine.hydrate()
 
             engine.snapshot(USER_SETTING) shouldBe true
+        }
+    }
+
+    // ── Session overlay ───────────────────────────────────────────────────────
+
+    "the overlay outranks Local, so the UI keeps its value after the account wipe" {
+        runTest {
+            val local = FakeLocalConfigSource()
+            val overlay = SessionConfigOverlayImpl()
+            val engine = config(overlay = overlay, local = local)
+            engine.hydrate()
+
+            overlay.hold(mapOf(USER_SETTING.name to "false"))
+
+            engine.snapshot(USER_SETTING) shouldBe false
+            engine.resolve(USER_SETTING).winner shouldBe ConfigLayer.Session
+        }
+    }
+
+    "a debug override still outranks the overlay" {
+        runTest {
+            val overlay = SessionConfigOverlayImpl()
+            val engine = config(
+                debug = FakeDebugConfigSource(initial = mapOf(USER_SETTING.name to "true")),
+                overlay = overlay,
+            )
+            engine.hydrate()
+            overlay.hold(mapOf(USER_SETTING.name to "false"))
+
+            engine.resolve(USER_SETTING).winner shouldBe ConfigLayer.Debug
+        }
+    }
+
+    "writing a key releases its overlay entry, so the new value is what resolves" {
+        runTest {
+            // Without the release the write would land in Local and stay invisible underneath the
+            // held value — the user would tap a setting and see nothing change.
+            val local = FakeLocalConfigSource()
+            val overlay = SessionConfigOverlayImpl()
+            val engine = config(overlay = overlay, local = local)
+            engine.hydrate()
+            overlay.hold(mapOf(USER_SETTING.name to "false"))
+
+            engine.handle(USER_SETTING).set(true)
+
+            engine.snapshot(USER_SETTING) shouldBe true
+            engine.resolve(USER_SETTING).winner shouldBe ConfigLayer.Local
+        }
+    }
+
+    "a failed write leaves the held value in place rather than dropping to the default" {
+        runTest {
+            // Release-then-write would have retired the overlay entry before the store could refuse
+            // it, leaving the value in neither place — the running UI would snap to a default the
+            // user never chose, on a write they were told nothing about.
+            val overlay = SessionConfigOverlayImpl()
+            val engine = config(overlay = overlay, local = ThrowingLocalConfigSource())
+            engine.hydrate()
+            overlay.hold(mapOf(USER_SETTING.name to "false"))
+
+            shouldThrow<IllegalStateException> { engine.handle(USER_SETTING).set(true) }
+
+            engine.snapshot(USER_SETTING) shouldBe false
+            engine.resolve(USER_SETTING).winner shouldBe ConfigLayer.Session
+        }
+    }
+
+    "releasing one key leaves the others held" {
+        runTest {
+            val overlay = SessionConfigOverlayImpl()
+            val engine = config(overlay = overlay)
+            engine.hydrate()
+            overlay.hold(mapOf(USER_SETTING.name to "false", OTHER_SETTING.name to "false"))
+
+            engine.handle(USER_SETTING).set(true)
+
+            engine.resolve(OTHER_SETTING).winner shouldBe ConfigLayer.Session
+        }
+    }
+
+    "clearing the overlay at session start stops it shadowing the next user's pull" {
+        runTest {
+            // The leak the account wipe exists to prevent: the previous user's theme sitting above
+            // whatever this user's pull writes into Local.
+            val local = FakeLocalConfigSource()
+            val overlay = SessionConfigOverlayImpl()
+            val engine = config(overlay = overlay, local = local)
+            engine.hydrate()
+            overlay.hold(mapOf(USER_SETTING.name to "false"))
+
+            overlay.clear()
+
+            engine.resolve(USER_SETTING).winner shouldBe null
+            engine.snapshot(USER_SETTING) shouldBe USER_SETTING.default
+        }
+    }
+
+    "the overlay re-emits changes so an observer sees the held value" {
+        runTest {
+            val overlay = SessionConfigOverlayImpl()
+            val engine = config(overlay = overlay)
+            engine.hydrate()
+
+            overlay.hold(mapOf(USER_SETTING.name to "false"))
+
+            engine.observe(USER_SETTING).first() shouldBe false
+        }
+    }
+
+    "an engine assembled without an overlay behaves as it did before" {
+        runTest {
+            // `SessionConfigOverlay.Inactive` is the default so a test-assembled engine, and any
+            // future host that does not wire one, keep the old resolution exactly.
+            val local = FakeLocalConfigSource()
+            val engine = LayeredConfig(
+                layers = listOf(local, BuildConfigSource { }),
+                local = local,
+                scope = backgroundScope,
+                failFastOnEarlySnapshot = false,
+            )
+            engine.hydrate()
+
+            engine.handle(USER_SETTING).set(false)
+
+            engine.snapshot(USER_SETTING) shouldBe false
         }
     }
 })

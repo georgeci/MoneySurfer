@@ -7,6 +7,7 @@
 - [Rules](#rules)
 - [Cursor-based incremental pull](#cursor-based-incremental-pull)
 - [Collections in scope](#collections-in-scope)
+  - [User-scoped collections (phase 3)](#user-scoped-collections-phase-3)
 - [Apply per doc](#apply-per-doc)
   - [Members — special-case userId stub](#members--special-case-userid-stub)
 - [LWW conflict resolver](#lww-conflict-resolver)
@@ -115,6 +116,28 @@ multi-workspace fan-out yet (still per-`currentWorkspaceId`).
 `WORKSPACES`, `WORKSPACE_REFS`, `USERS` are **not** part of the cursor
 pipeline. The user / workspace docs are still written via
 `WorkspaceSyncRepositoryImpl` (v1) and `UserRemoteRepository` directly.
+
+### User-scoped collections (phase 3)
+
+`SyncEntityPlugin.pullScope` says which document tree a plugin's collection hangs
+off. The workspace loop above runs `PullScope.Workspace` plugins only; a separate
+phase runs the `PullScope.User` ones once, with `scopeKey = uid`.
+
+Today that is `users/{uid}/config` — one document per synced setting
+([ADR-004](../adr/ADR-004-configuration.md)). Without the discriminator a
+user-scoped plugin would be run per workspace and would either be handed the
+workspace root document or query a path that does not exist.
+
+The phase is **cursorless**: it reads the whole collection on every pull, because
+the synced set is around ten tiny documents and the alternative is cursor
+bookkeeping in a new scope plus a rule that has to permit a filtered, ordered
+query rather than a bare `list`. "Remote is not newer" is therefore the normal
+outcome, and the config plugin reports it as *skipped*, not as a conflict.
+
+A denial in this phase skips the collection and logs, rather than failing the
+pull: these documents are private to one user and hold nothing another device
+cannot re-derive, while a rules gap that failed the pull would read as "nobody can
+sign in".
 
 ## Apply per doc
 

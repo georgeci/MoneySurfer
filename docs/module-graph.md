@@ -150,6 +150,7 @@ graph LR
   :sync:no-op --> :sync:api
   :sync:no-op --> :detekt-rules
   :data-remote --> :domain
+  :data-remote --> :sync:api
   :data-remote --> :detekt-rules
   :feature:login --> :domain
   :feature:login --> :navigation
@@ -360,6 +361,7 @@ graph LR
   :sync:default --> :sync-test-fixtures
   :sync:no-op --> :sync:api
   :data-remote --> :domain
+  :data-remote --> :sync:api
   :feature:login --> :domain
   :feature:login --> :navigation
   :feature:login --> :sync:api
