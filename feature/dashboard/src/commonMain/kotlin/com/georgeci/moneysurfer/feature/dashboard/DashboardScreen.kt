@@ -252,7 +252,7 @@ private fun DashboardContent(
 }
 
 private fun DashboardWidgetSize.toWidgetSize(): SurferWidgetSize = when (this) {
-    DashboardWidgetSize.Hero -> SurferWidgetSize.Hero
+    DashboardWidgetSize.Expanded -> SurferWidgetSize.Hero
     DashboardWidgetSize.Compact -> SurferWidgetSize.Compact
 }
 

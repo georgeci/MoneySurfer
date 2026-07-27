@@ -31,7 +31,7 @@ fun SurferSpentMonthWidget(
     trailingLabel: String? = null,
     trailingLabelColor: Color? = null,
 ) {
-    val hero = size == SurferWidgetSize.Hero
+    val hero = size == SurferWidgetSize.Expanded
     val clampedProgress = progress.coerceIn(0f, 1f)
 
     Column(

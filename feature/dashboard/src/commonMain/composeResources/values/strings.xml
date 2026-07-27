@@ -18,7 +18,7 @@
     <string name="dashboard_customize_style_size">Size</string>
     <string name="dashboard_customize_style_variant">Style</string>
     <string name="dashboard_customize_style_summary">%1$s · %2$s</string>
-    <string name="dashboard_customize_size_hero">Hero</string>
+    <string name="dashboard_customize_size_expanded">Full</string>
     <string name="dashboard_customize_size_compact">Compact</string>
     <string name="dashboard_customize_variant_balance_classic">Classic</string>
     <string name="dashboard_customize_variant_balance_stacked">Stacked</string>

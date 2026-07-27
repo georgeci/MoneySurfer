@@ -151,7 +151,7 @@ class DashboardCustomizeViewModelTest : StringSpec({
         val viewModel = DashboardCustomizeViewModel(preferences)
 
         viewModel.onEvent(
-            DashboardCustomizeEvent.OnCardStyleChange(DashboardWidgetType.Balance, DashboardCardStyle.HERO),
+            DashboardCustomizeEvent.OnCardStyleChange(DashboardWidgetType.Balance, DashboardCardStyle.EXPANDED),
         )
 
         preferences.layoutWrites shouldBe 0

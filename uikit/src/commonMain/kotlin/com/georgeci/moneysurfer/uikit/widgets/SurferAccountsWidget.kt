@@ -55,7 +55,7 @@ fun SurferAccountsWidget(
     size: SurferWidgetSize = LocalSurferWidgetSize.current,
     onItemClick: ((SurferAccountItem) -> Unit)? = null,
 ) {
-    val hero = size == SurferWidgetSize.Hero
+    val hero = size == SurferWidgetSize.Expanded
     val visibleItems = if (hero) items else items.take(2)
 
     Column(

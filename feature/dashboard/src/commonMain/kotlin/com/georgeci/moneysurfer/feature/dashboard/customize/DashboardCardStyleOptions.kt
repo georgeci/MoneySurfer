@@ -71,7 +71,7 @@ internal fun DashboardWidgetType.selectedVariant(cardStyle: DashboardCardStyle):
 }
 
 internal fun DashboardWidgetSize.labelResource(): StringResource = when (this) {
-    DashboardWidgetSize.Hero -> Res.string.dashboard_customize_size_hero
+    DashboardWidgetSize.Expanded -> Res.string.dashboard_customize_size_hero
     DashboardWidgetSize.Compact -> Res.string.dashboard_customize_size_compact
 }
 
