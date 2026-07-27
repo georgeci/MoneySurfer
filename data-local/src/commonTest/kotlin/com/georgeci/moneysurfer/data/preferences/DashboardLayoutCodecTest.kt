@@ -51,7 +51,7 @@ class DashboardLayoutCodecTest : StringSpec({
     }
 
     "a widget this build does not know is skipped, and the known ones are kept" {
-        val decoded = DashboardLayoutCodec.decode("Goals:1:Hero|Cryptocurrency:1:Hero")
+        val decoded = DashboardLayoutCodec.decode("Goals:1:Expanded|Cryptocurrency:1:Expanded")
 
         decoded.enabledItems.first().type shouldBe DashboardWidgetType.Goals
         decoded.items.map { it.type } shouldContainExactly listOf(
@@ -71,7 +71,7 @@ class DashboardLayoutCodecTest : StringSpec({
 
         decoded.items.first() shouldBe DashboardLayoutItem(
             DashboardWidgetType.Goals,
-            cardStyle = DashboardCardStyle.HERO,
+            cardStyle = DashboardCardStyle.EXPANDED,
         )
     }
 })
