@@ -1,0 +1,207 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>MoneySurfer Coverage Report > MemberActionsBottomSheetKt</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.workspace.members</a>
+</div>
+
+<h1>Coverage Summary for Class: MemberActionsBottomSheetKt (com.georgeci.moneysurfer.feature.workspace.members)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">MemberActionsBottomSheetKt</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    3.6%
+  </span>
+  <span class="absValue">
+    (1/28)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/30)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/620)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.workspace.members
+&nbsp;
+&nbsp;import androidx.compose.foundation.layout.Spacer
+&nbsp;import androidx.compose.foundation.layout.height
+&nbsp;import androidx.compose.material3.AlertDialog
+&nbsp;import androidx.compose.material3.Text
+&nbsp;import androidx.compose.material3.TextButton
+&nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.runtime.getValue
+&nbsp;import androidx.compose.runtime.mutableStateOf
+&nbsp;import androidx.compose.runtime.remember
+&nbsp;import androidx.compose.runtime.setValue
+&nbsp;import androidx.compose.ui.Modifier
+&nbsp;import androidx.compose.ui.unit.dp
+&nbsp;import androidx.lifecycle.compose.collectAsStateWithLifecycle
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.UserId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
+&nbsp;import com.georgeci.moneysurfer.domain.usecase.InviteError
+&nbsp;import com.georgeci.moneysurfer.utils.HandleSideEffect
+&nbsp;import moneysurfer.feature.workspace.generated.resources.Res
+&nbsp;import moneysurfer.feature.workspace.generated.resources.workspace_member_actions_confirm_remove_cancel
+&nbsp;import moneysurfer.feature.workspace.generated.resources.workspace_member_actions_error_cannot_demote_owner
+&nbsp;import moneysurfer.feature.workspace.generated.resources.workspace_member_actions_error_not_owner
+&nbsp;import moneysurfer.feature.workspace.generated.resources.workspace_member_actions_error_unknown
+&nbsp;import org.jetbrains.compose.resources.stringResource
+&nbsp;import org.koin.compose.viewmodel.koinViewModel
+&nbsp;import org.koin.core.parameter.parametersOf
+&nbsp;
+&nbsp;/**
+&nbsp; * Bottom-sheet entry composable for the per-member actions sheet (role picker + Remove). The
+&nbsp; * surrounding [androidx.compose.material3.ModalBottomSheet] is provided by
+&nbsp; * [com.georgeci.moneysurfer.navigation.BottomSheetSceneStrategy]. Visual layout lives
+&nbsp; * in [MemberActionsContent] — this composable just maps the ViewModel&#39;s state and effects.
+&nbsp; */
+&nbsp;@Composable
+<b class="nc">&nbsp;fun MemberActionsBottomSheet(</b>
+&nbsp;    workspaceId: WorkspaceId,
+&nbsp;    targetUserId: UserId,
+&nbsp;    onDismiss: () -&gt; Unit,
+<b class="nc">&nbsp;    viewModel: MemberActionsViewModel = koinViewModel(</b>
+<b class="nc">&nbsp;        key = &quot;${workspaceId.value}:${targetUserId.value}&quot;,</b>
+<b class="nc">&nbsp;    ) { parametersOf(workspaceId, targetUserId) },</b>
+<b class="nc">&nbsp;) {</b>
+<b class="nc">&nbsp;    val state by viewModel.collectAsStateWithLifecycle()</b>
+<b class="nc">&nbsp;    var snackbar by remember { mutableStateOf&lt;String?&gt;(null) }</b>
+<b class="nc">&nbsp;    val unknownText = stringResource(Res.string.workspace_member_actions_error_unknown)</b>
+<b class="nc">&nbsp;    val notOwnerText = stringResource(Res.string.workspace_member_actions_error_not_owner)</b>
+<b class="nc">&nbsp;    val cannotDemoteText = stringResource(Res.string.workspace_member_actions_error_cannot_demote_owner)</b>
+&nbsp;
+<b class="nc">&nbsp;    viewModel.HandleSideEffect { effect -&gt;</b>
+<b class="nc">&nbsp;        when (effect) {</b>
+<b class="nc">&nbsp;            MemberActionsEffect.Dismiss -&gt; onDismiss()</b>
+<b class="nc">&nbsp;            is MemberActionsEffect.ShowError -&gt; {</b>
+<b class="nc">&nbsp;                snackbar = when (effect.error) {</b>
+<b class="nc">&nbsp;                    InviteError.NotOwner -&gt; notOwnerText</b>
+<b class="nc">&nbsp;                    InviteError.CannotDemoteLastOwner -&gt; cannotDemoteText</b>
+<b class="nc">&nbsp;                    else -&gt; unknownText</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    when (val s = state) {</b>
+<b class="nc">&nbsp;        is MemberActionsState.Loading -&gt; Spacer(Modifier.height(160.dp))</b>
+<b class="nc">&nbsp;        is MemberActionsState.Content -&gt; MemberActionsContent(state = s, onEvent = viewModel::onEvent)</b>
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+<b class="nc">&nbsp;    snackbar?.let { msg -&gt;</b>
+<b class="nc">&nbsp;        AlertDialog(</b>
+<b class="nc">&nbsp;            onDismissRequest = { snackbar = null },</b>
+<b class="nc">&nbsp;            confirmButton = {</b>
+<b class="nc">&nbsp;                TextButton(onClick = { snackbar = null }) {</b>
+&nbsp;                    Text(stringResource(Res.string.workspace_member_actions_confirm_remove_cancel))
+&nbsp;                }
+&nbsp;            },
+<b class="nc">&nbsp;            text = { Text(msg) },</b>
+&nbsp;        )
+<b class="nc">&nbsp;    }</b>
+<b class="nc">&nbsp;}</b>
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-07-27 15:02</div>
+</div>
+</body>
+</html>

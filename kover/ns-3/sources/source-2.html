@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > AndroidBackupStorageLocator</title>
+  <title>MoneySurfer Coverage Report > ConfigModule</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.data.backup</a>
+    <a href="../index.html">com.georgeci.moneysurfer.appconfig.di</a>
 </div>
 
-<h1>Coverage Summary for Class: AndroidBackupStorageLocator (com.georgeci.moneysurfer.data.backup)</h1>
+<h1>Coverage Summary for Class: ConfigModule (com.georgeci.moneysurfer.appconfig.di)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,38 +49,38 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">AndroidBackupStorageLocator</td>
+  <td class="name">ConfigModule</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    50%
   </span>
   <span class="absValue">
-    (0/4)
+    (1/2)
   </span>
 </td>
     <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    14.3%
   </span>
   <span class="absValue">
-    (0/5)
+    (1/7)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    5.6%
   </span>
   <span class="absValue">
-    (0/53)
+    (2/36)
   </span>
 </td>
 </tr>
@@ -92,23 +92,59 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.backup
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.appconfig.di
 &nbsp;
-&nbsp;import android.content.Context
-&nbsp;import com.georgeci.moneysurfer.domain.backup.BackupStorageLocator
-&nbsp;import okio.Path
-&nbsp;import okio.Path.Companion.toPath
+&nbsp;import com.georgeci.moneysurfer.appconfig.BuildConfigSource
+&nbsp;import com.georgeci.moneysurfer.appconfig.Config
+&nbsp;import com.georgeci.moneysurfer.appconfig.DebugConfigSource
+&nbsp;import com.georgeci.moneysurfer.appconfig.LayeredConfig
+&nbsp;import com.georgeci.moneysurfer.appconfig.LocalConfigSource
+&nbsp;import com.georgeci.moneysurfer.appconfig.RemoteGlobalConfigSource
+&nbsp;import com.georgeci.moneysurfer.appconfig.SessionConfigOverlay
+&nbsp;import kotlinx.coroutines.CoroutineScope
+&nbsp;import org.koin.core.annotation.ComponentScan
+&nbsp;import org.koin.core.annotation.Module
+&nbsp;import org.koin.core.annotation.Single
 &nbsp;
-&nbsp;private const val MAIN_DB_FILE = &quot;moneysurfer.db&quot;
-&nbsp;private const val SYNC_DB_FILE = &quot;moneysurfer_sync.db&quot;
-&nbsp;private const val DATASTORE_FILE = &quot;moneysurfer_settings.preferences_pb&quot;
+&nbsp;/**
+&nbsp; * Assembly of the configuration engine. Included by each host&#39;s `@KoinApplication` aggregator, so
+&nbsp; * `shared` stays free of `app-config`.
+&nbsp; *
+&nbsp; * No qualifiers: the four layers are distinct types declared in `app-config/api`, so Koin resolves
+&nbsp; * them positionally. Keys are not bound at all, so the graph does not grow with the number of
+&nbsp; * flags.
+&nbsp; *
+&nbsp; * The `@Single` lives inside a `@Module` class because the KSP processor does not accept `@Single`
+&nbsp; * on a top-level function.
+&nbsp; */
+<b class="fc">&nbsp;@Module</b>
+&nbsp;@ComponentScan(&quot;com.georgeci.moneysurfer.appconfig&quot;)
+&nbsp;class ConfigModule {
 &nbsp;
-<b class="nc">&nbsp;class AndroidBackupStorageLocator(private val context: Context) : BackupStorageLocator {</b>
-<b class="nc">&nbsp;    override val platformName: String = &quot;android&quot;</b>
-<b class="nc">&nbsp;    override fun moneySurferDbFile(): Path = context.getDatabasePath(MAIN_DB_FILE).absolutePath.toPath()</b>
-<b class="nc">&nbsp;    override fun syncDbFile(): Path = context.getDatabasePath(SYNC_DB_FILE).absolutePath.toPath()</b>
-&nbsp;    override fun dataStoreFile(): Path =
-<b class="nc">&nbsp;        context.filesDir.resolve(DATASTORE_FILE).absolutePath.toPath()</b>
+&nbsp;    /**
+&nbsp;     * Layer order is a literal list, not `getAll()` — precedence is a correctness property and
+&nbsp;     * must not depend on module load order.
+&nbsp;     *
+&nbsp;     * `debug.isActive` doubles as the debug-build signal: only a debug build binds a real
+&nbsp;     * [DebugConfigSource], so it is also when an early `snapshot()` should fail loudly.
+&nbsp;     */
+&nbsp;    @Single
+&nbsp;    fun config(
+&nbsp;        debug: DebugConfigSource,
+&nbsp;        overlay: SessionConfigOverlay,
+&nbsp;        local: LocalConfigSource,
+&nbsp;        remoteGlobal: RemoteGlobalConfigSource,
+&nbsp;        build: BuildConfigSource,
+&nbsp;        scope: CoroutineScope,
+<b class="nc">&nbsp;    ): Config = LayeredConfig(</b>
+&nbsp;        // The overlay sits directly above Local: it stands in for values the account wipe just
+&nbsp;        // deleted, and it must not outrank a QA override.
+<b class="nc">&nbsp;        layers = listOf(debug, overlay, local, remoteGlobal, build),</b>
+<b class="nc">&nbsp;        local = local,</b>
+<b class="nc">&nbsp;        scope = scope,</b>
+<b class="nc">&nbsp;        failFastOnEarlySnapshot = debug.isActive,</b>
+<b class="nc">&nbsp;        overlay = overlay,</b>
+&nbsp;    )
 &nbsp;}
 </code>
 </pre>
@@ -133,7 +169,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-23 23:54</div>
+    <div style="float:right;">generated on 2026-07-27 15:02</div>
 </div>
 </body>
 </html>

@@ -1,0 +1,236 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>MoneySurfer Coverage Report > TypographyKt</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.georgeci.moneysurfer.uikit.theme</a>
+</div>
+
+<h1>Coverage Summary for Class: TypographyKt (com.georgeci.moneysurfer.uikit.theme)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">TypographyKt</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (91/91)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (680/680)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.theme
+&nbsp;
+&nbsp;import androidx.compose.material3.Typography
+&nbsp;import androidx.compose.ui.text.TextStyle
+&nbsp;import androidx.compose.ui.text.font.FontFamily
+&nbsp;import androidx.compose.ui.text.font.FontWeight
+&nbsp;import androidx.compose.ui.unit.sp
+&nbsp;
+<b class="fc">&nbsp;val AppTypography = Typography(</b>
+<b class="fc">&nbsp;    displayLarge = TextStyle(</b>
+<b class="fc">&nbsp;        fontFamily = FontFamily.Default,</b>
+<b class="fc">&nbsp;        fontWeight = FontWeight.Normal,</b>
+<b class="fc">&nbsp;        fontSize = 57.sp,</b>
+<b class="fc">&nbsp;        lineHeight = 64.sp,</b>
+<b class="fc">&nbsp;        letterSpacing = (-0.25).sp,</b>
+&nbsp;    ),
+<b class="fc">&nbsp;    displayMedium = TextStyle(</b>
+<b class="fc">&nbsp;        fontFamily = FontFamily.Default,</b>
+<b class="fc">&nbsp;        fontWeight = FontWeight.Normal,</b>
+<b class="fc">&nbsp;        fontSize = 45.sp,</b>
+<b class="fc">&nbsp;        lineHeight = 52.sp,</b>
+<b class="fc">&nbsp;        letterSpacing = 0.sp,</b>
+&nbsp;    ),
+<b class="fc">&nbsp;    displaySmall = TextStyle(</b>
+<b class="fc">&nbsp;        fontFamily = FontFamily.Default,</b>
+<b class="fc">&nbsp;        fontWeight = FontWeight.Normal,</b>
+<b class="fc">&nbsp;        fontSize = 36.sp,</b>
+<b class="fc">&nbsp;        lineHeight = 44.sp,</b>
+<b class="fc">&nbsp;        letterSpacing = 0.sp,</b>
+&nbsp;    ),
+<b class="fc">&nbsp;    headlineLarge = TextStyle(</b>
+<b class="fc">&nbsp;        fontFamily = FontFamily.Default,</b>
+<b class="fc">&nbsp;        fontWeight = FontWeight.SemiBold,</b>
+<b class="fc">&nbsp;        fontSize = 32.sp,</b>
+<b class="fc">&nbsp;        lineHeight = 40.sp,</b>
+<b class="fc">&nbsp;        letterSpacing = 0.sp,</b>
+&nbsp;    ),
+<b class="fc">&nbsp;    headlineMedium = TextStyle(</b>
+<b class="fc">&nbsp;        fontFamily = FontFamily.Default,</b>
+<b class="fc">&nbsp;        fontWeight = FontWeight.SemiBold,</b>
+<b class="fc">&nbsp;        fontSize = 28.sp,</b>
+<b class="fc">&nbsp;        lineHeight = 36.sp,</b>
+<b class="fc">&nbsp;        letterSpacing = 0.sp,</b>
+&nbsp;    ),
+<b class="fc">&nbsp;    headlineSmall = TextStyle(</b>
+<b class="fc">&nbsp;        fontFamily = FontFamily.Default,</b>
+<b class="fc">&nbsp;        fontWeight = FontWeight.SemiBold,</b>
+<b class="fc">&nbsp;        fontSize = 24.sp,</b>
+<b class="fc">&nbsp;        lineHeight = 32.sp,</b>
+<b class="fc">&nbsp;        letterSpacing = 0.sp,</b>
+&nbsp;    ),
+<b class="fc">&nbsp;    titleLarge = TextStyle(</b>
+<b class="fc">&nbsp;        fontFamily = FontFamily.Default,</b>
+<b class="fc">&nbsp;        fontWeight = FontWeight.Medium,</b>
+<b class="fc">&nbsp;        fontSize = 22.sp,</b>
+<b class="fc">&nbsp;        lineHeight = 28.sp,</b>
+<b class="fc">&nbsp;        letterSpacing = 0.sp,</b>
+&nbsp;    ),
+<b class="fc">&nbsp;    titleMedium = TextStyle(</b>
+<b class="fc">&nbsp;        fontFamily = FontFamily.Default,</b>
+<b class="fc">&nbsp;        fontWeight = FontWeight.Medium,</b>
+<b class="fc">&nbsp;        fontSize = 16.sp,</b>
+<b class="fc">&nbsp;        lineHeight = 24.sp,</b>
+<b class="fc">&nbsp;        letterSpacing = 0.15.sp,</b>
+&nbsp;    ),
+<b class="fc">&nbsp;    titleSmall = TextStyle(</b>
+<b class="fc">&nbsp;        fontFamily = FontFamily.Default,</b>
+<b class="fc">&nbsp;        fontWeight = FontWeight.Medium,</b>
+<b class="fc">&nbsp;        fontSize = 14.sp,</b>
+<b class="fc">&nbsp;        lineHeight = 20.sp,</b>
+<b class="fc">&nbsp;        letterSpacing = 0.1.sp,</b>
+&nbsp;    ),
+<b class="fc">&nbsp;    bodyLarge = TextStyle(</b>
+<b class="fc">&nbsp;        fontFamily = FontFamily.Default,</b>
+<b class="fc">&nbsp;        fontWeight = FontWeight.Normal,</b>
+<b class="fc">&nbsp;        fontSize = 16.sp,</b>
+<b class="fc">&nbsp;        lineHeight = 24.sp,</b>
+<b class="fc">&nbsp;        letterSpacing = 0.5.sp,</b>
+&nbsp;    ),
+<b class="fc">&nbsp;    bodyMedium = TextStyle(</b>
+<b class="fc">&nbsp;        fontFamily = FontFamily.Default,</b>
+<b class="fc">&nbsp;        fontWeight = FontWeight.Normal,</b>
+<b class="fc">&nbsp;        fontSize = 14.sp,</b>
+<b class="fc">&nbsp;        lineHeight = 20.sp,</b>
+<b class="fc">&nbsp;        letterSpacing = 0.25.sp,</b>
+&nbsp;    ),
+<b class="fc">&nbsp;    bodySmall = TextStyle(</b>
+<b class="fc">&nbsp;        fontFamily = FontFamily.Default,</b>
+<b class="fc">&nbsp;        fontWeight = FontWeight.Normal,</b>
+<b class="fc">&nbsp;        fontSize = 12.sp,</b>
+<b class="fc">&nbsp;        lineHeight = 16.sp,</b>
+<b class="fc">&nbsp;        letterSpacing = 0.4.sp,</b>
+&nbsp;    ),
+<b class="fc">&nbsp;    labelLarge = TextStyle(</b>
+<b class="fc">&nbsp;        fontFamily = FontFamily.Default,</b>
+<b class="fc">&nbsp;        fontWeight = FontWeight.Medium,</b>
+<b class="fc">&nbsp;        fontSize = 14.sp,</b>
+<b class="fc">&nbsp;        lineHeight = 20.sp,</b>
+<b class="fc">&nbsp;        letterSpacing = 0.1.sp,</b>
+&nbsp;    ),
+<b class="fc">&nbsp;    labelMedium = TextStyle(</b>
+<b class="fc">&nbsp;        fontFamily = FontFamily.Default,</b>
+<b class="fc">&nbsp;        fontWeight = FontWeight.Medium,</b>
+<b class="fc">&nbsp;        fontSize = 12.sp,</b>
+<b class="fc">&nbsp;        lineHeight = 16.sp,</b>
+<b class="fc">&nbsp;        letterSpacing = 0.5.sp,</b>
+&nbsp;    ),
+<b class="fc">&nbsp;    labelSmall = TextStyle(</b>
+<b class="fc">&nbsp;        fontFamily = FontFamily.Default,</b>
+<b class="fc">&nbsp;        fontWeight = FontWeight.Medium,</b>
+<b class="fc">&nbsp;        fontSize = 11.sp,</b>
+<b class="fc">&nbsp;        lineHeight = 16.sp,</b>
+<b class="fc">&nbsp;        letterSpacing = 0.5.sp,</b>
+&nbsp;    ),
+&nbsp;)
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-07-27 15:02</div>
+</div>
+</body>
+</html>

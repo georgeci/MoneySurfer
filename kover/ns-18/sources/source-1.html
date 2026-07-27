@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > ComGeorgeciMoneysurferDomainDiDomainModuleModuleKt</title>
+  <title>MoneySurfer Coverage Report > AppInfo</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.domain.di</a>
+    <a href="../index.html">com.georgeci.moneysurfer.domain</a>
 </div>
 
-<h1>Coverage Summary for Class: ComGeorgeciMoneysurferDomainDiDomainModuleModuleKt (com.georgeci.moneysurfer.domain.di)</h1>
+<h1>Coverage Summary for Class: AppInfo (com.georgeci.moneysurfer.domain)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,38 +49,38 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">ComGeorgeciMoneysurferDomainDiDomainModuleModuleKt</td>
+  <td class="name">AppInfo</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
     <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (3/3)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1907)
+    (12/12)
   </span>
 </td>
 </tr>
@@ -90,7 +90,22 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <br/>
 <br/>
 
-  <code class="sourceCode">Source code is not available<br /></code>
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain
+&nbsp;
+&nbsp;/** Carries platform-supplied app metadata into shared code. Bound by each platform module. */
+<b class="fc">&nbsp;data class AppInfo(</b>
+<b class="fc">&nbsp;    val version: String,</b>
+&nbsp;    /**
+&nbsp;     * Monotonically increasing numeric build identifier — used by the
+&nbsp;     * remote app-version gate (see block.md). Android: `versionCode`.
+&nbsp;     * Other platforms compute an equivalent integer.
+&nbsp;     */
+<b class="fc">&nbsp;    val versionCode: Int,</b>
+&nbsp;)
+</code>
+</pre>
 </div>
 
 <script type="text/javascript">
@@ -112,7 +127,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-23 23:54</div>
+    <div style="float:right;">generated on 2026-07-27 15:02</div>
 </div>
 </body>
 </html>

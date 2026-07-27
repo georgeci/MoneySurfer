@@ -1,0 +1,237 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>MoneySurfer Coverage Report > SurferNameBlockKt</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.georgeci.moneysurfer.uikit.components.settings</a>
+</div>
+
+<h1>Coverage Summary for Class: SurferNameBlockKt (com.georgeci.moneysurfer.uikit.components.settings)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">SurferNameBlockKt</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (1/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    25%
+  </span>
+  <span class="absValue">
+    (7/28)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    94.5%
+  </span>
+  <span class="absValue">
+    (52/55)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    85.5%
+  </span>
+  <span class="absValue">
+    (536/627)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.components.settings
+&nbsp;
+&nbsp;import androidx.compose.foundation.background
+&nbsp;import androidx.compose.foundation.clickable
+&nbsp;import androidx.compose.foundation.layout.Arrangement
+&nbsp;import androidx.compose.foundation.layout.Box
+&nbsp;import androidx.compose.foundation.layout.Column
+&nbsp;import androidx.compose.foundation.layout.Row
+&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
+&nbsp;import androidx.compose.foundation.layout.padding
+&nbsp;import androidx.compose.foundation.layout.size
+&nbsp;import androidx.compose.foundation.shape.CircleShape
+&nbsp;import androidx.compose.foundation.shape.RoundedCornerShape
+&nbsp;import androidx.compose.material3.Text
+&nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.ui.Alignment
+&nbsp;import androidx.compose.ui.Modifier
+&nbsp;import androidx.compose.ui.draw.clip
+&nbsp;import androidx.compose.ui.draw.shadow
+&nbsp;import androidx.compose.ui.platform.testTag
+&nbsp;import androidx.compose.ui.text.style.TextOverflow
+&nbsp;import androidx.compose.ui.tooling.preview.Preview
+&nbsp;import androidx.compose.ui.unit.dp
+&nbsp;import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
+&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
+&nbsp;
+&nbsp;/**
+&nbsp; * Hero card with avatar initial, name, email, and an optional trailing chevron.
+&nbsp; * Used at the top of the Settings hub.
+&nbsp; *
+&nbsp; * [nameTestTag] tags the [name] line so a UI test can read the signed-in account without
+&nbsp; * matching localized copy.
+&nbsp; */
+&nbsp;@Composable
+&nbsp;fun SurferNameBlock(
+&nbsp;    name: String,
+<b class="fc">&nbsp;    modifier: Modifier = Modifier,</b>
+<b class="fc">&nbsp;    email: String? = null,</b>
+<b class="fc">&nbsp;    initial: String? = null,</b>
+<b class="fc">&nbsp;    onClick: (() -&gt; Unit)? = null,</b>
+&nbsp;    trailing: (@Composable () -&gt; Unit)? = { SurferSettingsChevron(tint = AppTheme.materialColors.onPrimaryContainer) },
+<b class="fc">&nbsp;    nameTestTag: String? = null,</b>
+<b class="pc">&nbsp;) {</b>
+<b class="fc">&nbsp;    val colors = AppTheme.materialColors</b>
+<b class="fc">&nbsp;    val shape = RoundedCornerShape(20.dp)</b>
+<b class="pc">&nbsp;    val computedInitial = initial ?: name.trim().firstOrNull()?.uppercaseChar()?.toString() ?: &quot;?&quot;</b>
+&nbsp;
+<b class="fc">&nbsp;    Row(</b>
+<b class="fc">&nbsp;        modifier = modifier</b>
+<b class="fc">&nbsp;            .fillMaxWidth()</b>
+<b class="fc">&nbsp;            .shadow(elevation = 2.dp, shape = shape)</b>
+<b class="fc">&nbsp;            .clip(shape)</b>
+<b class="fc">&nbsp;            .background(colors.primaryContainer)</b>
+<b class="pc">&nbsp;            .let { base -&gt; if (onClick != null) base.clickable(onClick = onClick) else base }</b>
+<b class="fc">&nbsp;            .padding(16.dp),</b>
+<b class="fc">&nbsp;        verticalAlignment = Alignment.CenterVertically,</b>
+<b class="fc">&nbsp;        horizontalArrangement = Arrangement.spacedBy(14.dp),</b>
+&nbsp;    ) {
+<b class="fc">&nbsp;        Box(</b>
+<b class="fc">&nbsp;            modifier = Modifier</b>
+<b class="fc">&nbsp;                .size(56.dp)</b>
+<b class="fc">&nbsp;                .clip(CircleShape)</b>
+<b class="fc">&nbsp;                .background(colors.primary),</b>
+<b class="fc">&nbsp;            contentAlignment = Alignment.Center,</b>
+&nbsp;        ) {
+<b class="fc">&nbsp;            Text(</b>
+<b class="fc">&nbsp;                text = computedInitial,</b>
+<b class="fc">&nbsp;                style = AppTheme.typography.titleLarge,</b>
+<b class="fc">&nbsp;                color = colors.onPrimary,</b>
+&nbsp;            )
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;        Column(modifier = Modifier.weight(1f)) {</b>
+<b class="fc">&nbsp;            Text(</b>
+<b class="fc">&nbsp;                text = name,</b>
+<b class="fc">&nbsp;                style = AppTheme.typography.titleMedium,</b>
+<b class="fc">&nbsp;                color = colors.onPrimaryContainer,</b>
+<b class="fc">&nbsp;                maxLines = 1,</b>
+<b class="fc">&nbsp;                overflow = TextOverflow.Ellipsis,</b>
+<b class="pc">&nbsp;                modifier = nameTestTag?.let { Modifier.testTag(it) } ?: Modifier,</b>
+&nbsp;            )
+<b class="pc">&nbsp;            if (email != null) {</b>
+<b class="fc">&nbsp;                Text(</b>
+<b class="fc">&nbsp;                    text = email,</b>
+<b class="fc">&nbsp;                    style = AppTheme.typography.bodySmall,</b>
+<b class="fc">&nbsp;                    color = colors.onPrimaryContainer.copy(alpha = 0.85f),</b>
+<b class="fc">&nbsp;                    maxLines = 1,</b>
+<b class="fc">&nbsp;                    overflow = TextOverflow.Ellipsis,</b>
+&nbsp;                )
+<b class="fc">&nbsp;            }</b>
+<b class="fc">&nbsp;        }</b>
+<b class="pc">&nbsp;        if (trailing != null) {</b>
+<b class="fc">&nbsp;            trailing()</b>
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;    }</b>
+<b class="fc">&nbsp;}</b>
+&nbsp;
+&nbsp;@Preview
+&nbsp;@Composable
+<b class="nc">&nbsp;private fun SurferNameBlockPreview() {</b>
+<b class="nc">&nbsp;    SurferComponentPreview {</b>
+&nbsp;        Column(modifier = Modifier.padding(16.dp)) {
+&nbsp;            SurferNameBlock(
+&nbsp;                name = &quot;Kasia Nowak&quot;,
+&nbsp;                email = &quot;kasia@georgeci.com&quot;,
+&nbsp;                onClick = {},
+&nbsp;            )
+&nbsp;        }
+&nbsp;    }
+<b class="nc">&nbsp;}</b>
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-07-27 15:02</div>
+</div>
+</body>
+</html>

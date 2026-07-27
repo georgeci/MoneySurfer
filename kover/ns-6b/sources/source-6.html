@@ -1,0 +1,328 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>MoneySurfer Coverage Report > SyncDatabase_Impl</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.georgeci.moneysurfer.sync.db</a>
+</div>
+
+<h1>Coverage Summary for Class: SyncDatabase_Impl (com.georgeci.moneysurfer.sync.db)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">SyncDatabase_Impl</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (10/10)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (20/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (98/98)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">SyncDatabase_Impl$createOpenDelegate$_openDelegate$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (4/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    18.8%
+  </span>
+  <span class="absValue">
+    (9/48)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    7.8%
+  </span>
+  <span class="absValue">
+    (27/346)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    77.8%
+  </span>
+  <span class="absValue">
+    (14/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    42.6%
+  </span>
+  <span class="absValue">
+    (29/68)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    28.2%
+  </span>
+  <span class="absValue">
+    (125/444)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.sync.db
+&nbsp;
+&nbsp;import androidx.room.InvalidationTracker
+&nbsp;import androidx.room.RoomOpenDelegate
+&nbsp;import androidx.room.migration.AutoMigrationSpec
+&nbsp;import androidx.room.migration.Migration
+&nbsp;import androidx.room.util.TableInfo
+&nbsp;import androidx.room.util.TableInfo.Companion.read
+&nbsp;import androidx.room.util.dropFtsSyncTriggers
+&nbsp;import androidx.sqlite.SQLiteConnection
+&nbsp;import androidx.sqlite.execSQL
+&nbsp;import com.georgeci.moneysurfer.sync.db.dao.PendingMutationDao
+&nbsp;import com.georgeci.moneysurfer.sync.db.dao.PendingMutationDao_Impl
+&nbsp;import com.georgeci.moneysurfer.sync.db.dao.SyncMetaDao
+&nbsp;import com.georgeci.moneysurfer.sync.db.dao.SyncMetaDao_Impl
+&nbsp;import javax.`annotation`.processing.Generated
+&nbsp;import kotlin.Lazy
+&nbsp;import kotlin.String
+&nbsp;import kotlin.Suppress
+&nbsp;import kotlin.collections.List
+&nbsp;import kotlin.collections.Map
+&nbsp;import kotlin.collections.MutableList
+&nbsp;import kotlin.collections.MutableMap
+&nbsp;import kotlin.collections.MutableSet
+&nbsp;import kotlin.collections.Set
+&nbsp;import kotlin.collections.mutableListOf
+&nbsp;import kotlin.collections.mutableMapOf
+&nbsp;import kotlin.collections.mutableSetOf
+&nbsp;import kotlin.reflect.KClass
+&nbsp;
+<b class="fc">&nbsp;@Generated(value = [&quot;androidx.room.RoomProcessor&quot;])</b>
+&nbsp;@Suppress(names = [&quot;UNCHECKED_CAST&quot;, &quot;DEPRECATION&quot;, &quot;REDUNDANT_PROJECTION&quot;, &quot;REMOVAL&quot;])
+&nbsp;public class SyncDatabase_Impl : SyncDatabase() {
+<b class="fc">&nbsp;  private val _syncMetaDao: Lazy&lt;SyncMetaDao&gt; = lazy {</b>
+<b class="fc">&nbsp;    SyncMetaDao_Impl(this)</b>
+&nbsp;  }
+&nbsp;
+<b class="fc">&nbsp;  private val _pendingMutationDao: Lazy&lt;PendingMutationDao&gt; = lazy {</b>
+<b class="fc">&nbsp;    PendingMutationDao_Impl(this)</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  protected override fun createOpenDelegate(): RoomOpenDelegate {
+<b class="fc">&nbsp;    val _openDelegate: RoomOpenDelegate = object : RoomOpenDelegate(2, &quot;3c40e51c3a3a86fe99dc49f5501ccc5d&quot;, &quot;49f98b8a1936f530e32d1ff0ad92e412&quot;) {</b>
+&nbsp;      public override fun createAllTables(connection: SQLiteConnection) {
+<b class="fc">&nbsp;        connection.execSQL(&quot;CREATE TABLE IF NOT EXISTS `sync_meta` (`workspaceId` TEXT NOT NULL, `collection` TEXT NOT NULL, `lastPulledAt` INTEGER, `lastSyncSuccessAt` INTEGER, `lastSyncAttemptAt` INTEGER, PRIMARY KEY(`workspaceId`, `collection`))&quot;)</b>
+<b class="fc">&nbsp;        connection.execSQL(&quot;CREATE TABLE IF NOT EXISTS `pending_mutations` (`id` TEXT NOT NULL, `entityType` TEXT NOT NULL, `entityId` TEXT NOT NULL, `operation` TEXT NOT NULL, `workspaceId` TEXT, `createdAt` INTEGER NOT NULL, `attempts` INTEGER NOT NULL, `status` TEXT NOT NULL, `lastError` TEXT, PRIMARY KEY(`id`))&quot;)</b>
+<b class="fc">&nbsp;        connection.execSQL(&quot;CREATE INDEX IF NOT EXISTS `index_pending_mutations_status_createdAt` ON `pending_mutations` (`status`, `createdAt`)&quot;)</b>
+<b class="fc">&nbsp;        connection.execSQL(&quot;CREATE INDEX IF NOT EXISTS `index_pending_mutations_workspaceId` ON `pending_mutations` (`workspaceId`)&quot;)</b>
+<b class="fc">&nbsp;        connection.execSQL(&quot;CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)&quot;)</b>
+<b class="fc">&nbsp;        connection.execSQL(&quot;INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, &#39;3c40e51c3a3a86fe99dc49f5501ccc5d&#39;)&quot;)</b>
+&nbsp;      }
+&nbsp;
+&nbsp;      public override fun dropAllTables(connection: SQLiteConnection) {
+<b class="nc">&nbsp;        connection.execSQL(&quot;DROP TABLE IF EXISTS `sync_meta`&quot;)</b>
+<b class="nc">&nbsp;        connection.execSQL(&quot;DROP TABLE IF EXISTS `pending_mutations`&quot;)</b>
+&nbsp;      }
+&nbsp;
+&nbsp;      public override fun onCreate(connection: SQLiteConnection) {
+<b class="fc">&nbsp;      }</b>
+&nbsp;
+&nbsp;      public override fun onOpen(connection: SQLiteConnection) {
+<b class="fc">&nbsp;        internalInitInvalidationTracker(connection)</b>
+&nbsp;      }
+&nbsp;
+&nbsp;      public override fun onPreMigrate(connection: SQLiteConnection) {
+<b class="nc">&nbsp;        dropFtsSyncTriggers(connection)</b>
+&nbsp;      }
+&nbsp;
+&nbsp;      public override fun onPostMigrate(connection: SQLiteConnection) {
+<b class="nc">&nbsp;      }</b>
+&nbsp;
+&nbsp;      public override fun onValidateSchema(connection: SQLiteConnection): RoomOpenDelegate.ValidationResult {
+<b class="nc">&nbsp;        val _columnsSyncMeta: MutableMap&lt;String, TableInfo.Column&gt; = mutableMapOf()</b>
+<b class="nc">&nbsp;        _columnsSyncMeta.put(&quot;workspaceId&quot;, TableInfo.Column(&quot;workspaceId&quot;, &quot;TEXT&quot;, true, 1, null, TableInfo.CREATED_FROM_ENTITY))</b>
+<b class="nc">&nbsp;        _columnsSyncMeta.put(&quot;collection&quot;, TableInfo.Column(&quot;collection&quot;, &quot;TEXT&quot;, true, 2, null, TableInfo.CREATED_FROM_ENTITY))</b>
+<b class="nc">&nbsp;        _columnsSyncMeta.put(&quot;lastPulledAt&quot;, TableInfo.Column(&quot;lastPulledAt&quot;, &quot;INTEGER&quot;, false, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
+<b class="nc">&nbsp;        _columnsSyncMeta.put(&quot;lastSyncSuccessAt&quot;, TableInfo.Column(&quot;lastSyncSuccessAt&quot;, &quot;INTEGER&quot;, false, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
+<b class="nc">&nbsp;        _columnsSyncMeta.put(&quot;lastSyncAttemptAt&quot;, TableInfo.Column(&quot;lastSyncAttemptAt&quot;, &quot;INTEGER&quot;, false, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
+<b class="nc">&nbsp;        val _foreignKeysSyncMeta: MutableSet&lt;TableInfo.ForeignKey&gt; = mutableSetOf()</b>
+<b class="nc">&nbsp;        val _indicesSyncMeta: MutableSet&lt;TableInfo.Index&gt; = mutableSetOf()</b>
+<b class="nc">&nbsp;        val _infoSyncMeta: TableInfo = TableInfo(&quot;sync_meta&quot;, _columnsSyncMeta, _foreignKeysSyncMeta, _indicesSyncMeta)</b>
+<b class="nc">&nbsp;        val _existingSyncMeta: TableInfo = read(connection, &quot;sync_meta&quot;)</b>
+<b class="nc">&nbsp;        if (!_infoSyncMeta.equals(_existingSyncMeta)) {</b>
+<b class="nc">&nbsp;          return RoomOpenDelegate.ValidationResult(false, &quot;&quot;&quot;</b>
+&nbsp;              |sync_meta(com.georgeci.moneysurfer.sync.db.entity.SyncMetaEntity).
+&nbsp;              | Expected:
+<b class="nc">&nbsp;              |&quot;&quot;&quot;.trimMargin() + _infoSyncMeta + &quot;&quot;&quot;</b>
+&nbsp;              |
+&nbsp;              | Found:
+<b class="nc">&nbsp;              |&quot;&quot;&quot;.trimMargin() + _existingSyncMeta)</b>
+&nbsp;        }
+<b class="nc">&nbsp;        val _columnsPendingMutations: MutableMap&lt;String, TableInfo.Column&gt; = mutableMapOf()</b>
+<b class="nc">&nbsp;        _columnsPendingMutations.put(&quot;id&quot;, TableInfo.Column(&quot;id&quot;, &quot;TEXT&quot;, true, 1, null, TableInfo.CREATED_FROM_ENTITY))</b>
+<b class="nc">&nbsp;        _columnsPendingMutations.put(&quot;entityType&quot;, TableInfo.Column(&quot;entityType&quot;, &quot;TEXT&quot;, true, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
+<b class="nc">&nbsp;        _columnsPendingMutations.put(&quot;entityId&quot;, TableInfo.Column(&quot;entityId&quot;, &quot;TEXT&quot;, true, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
+<b class="nc">&nbsp;        _columnsPendingMutations.put(&quot;operation&quot;, TableInfo.Column(&quot;operation&quot;, &quot;TEXT&quot;, true, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
+<b class="nc">&nbsp;        _columnsPendingMutations.put(&quot;workspaceId&quot;, TableInfo.Column(&quot;workspaceId&quot;, &quot;TEXT&quot;, false, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
+<b class="nc">&nbsp;        _columnsPendingMutations.put(&quot;createdAt&quot;, TableInfo.Column(&quot;createdAt&quot;, &quot;INTEGER&quot;, true, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
+<b class="nc">&nbsp;        _columnsPendingMutations.put(&quot;attempts&quot;, TableInfo.Column(&quot;attempts&quot;, &quot;INTEGER&quot;, true, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
+<b class="nc">&nbsp;        _columnsPendingMutations.put(&quot;status&quot;, TableInfo.Column(&quot;status&quot;, &quot;TEXT&quot;, true, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
+<b class="nc">&nbsp;        _columnsPendingMutations.put(&quot;lastError&quot;, TableInfo.Column(&quot;lastError&quot;, &quot;TEXT&quot;, false, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
+<b class="nc">&nbsp;        val _foreignKeysPendingMutations: MutableSet&lt;TableInfo.ForeignKey&gt; = mutableSetOf()</b>
+<b class="nc">&nbsp;        val _indicesPendingMutations: MutableSet&lt;TableInfo.Index&gt; = mutableSetOf()</b>
+<b class="nc">&nbsp;        _indicesPendingMutations.add(TableInfo.Index(&quot;index_pending_mutations_status_createdAt&quot;, false, listOf(&quot;status&quot;, &quot;createdAt&quot;), listOf(&quot;ASC&quot;, &quot;ASC&quot;)))</b>
+<b class="nc">&nbsp;        _indicesPendingMutations.add(TableInfo.Index(&quot;index_pending_mutations_workspaceId&quot;, false, listOf(&quot;workspaceId&quot;), listOf(&quot;ASC&quot;)))</b>
+<b class="nc">&nbsp;        val _infoPendingMutations: TableInfo = TableInfo(&quot;pending_mutations&quot;, _columnsPendingMutations, _foreignKeysPendingMutations, _indicesPendingMutations)</b>
+<b class="nc">&nbsp;        val _existingPendingMutations: TableInfo = read(connection, &quot;pending_mutations&quot;)</b>
+<b class="nc">&nbsp;        if (!_infoPendingMutations.equals(_existingPendingMutations)) {</b>
+<b class="nc">&nbsp;          return RoomOpenDelegate.ValidationResult(false, &quot;&quot;&quot;</b>
+&nbsp;              |pending_mutations(com.georgeci.moneysurfer.sync.db.entity.PendingMutationEntity).
+&nbsp;              | Expected:
+<b class="nc">&nbsp;              |&quot;&quot;&quot;.trimMargin() + _infoPendingMutations + &quot;&quot;&quot;</b>
+&nbsp;              |
+&nbsp;              | Found:
+<b class="nc">&nbsp;              |&quot;&quot;&quot;.trimMargin() + _existingPendingMutations)</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return RoomOpenDelegate.ValidationResult(true, null)</b>
+&nbsp;      }
+&nbsp;    }
+<b class="fc">&nbsp;    return _openDelegate</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  protected override fun createInvalidationTracker(): InvalidationTracker {
+<b class="fc">&nbsp;    val _shadowTablesMap: MutableMap&lt;String, String&gt; = mutableMapOf()</b>
+<b class="fc">&nbsp;    val _viewTables: MutableMap&lt;String, Set&lt;String&gt;&gt; = mutableMapOf()</b>
+<b class="fc">&nbsp;    return InvalidationTracker(this, _shadowTablesMap, _viewTables, &quot;sync_meta&quot;, &quot;pending_mutations&quot;)</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  protected override fun getRequiredTypeConverterClasses(): Map&lt;KClass&lt;*&gt;, List&lt;KClass&lt;*&gt;&gt;&gt; {
+<b class="fc">&nbsp;    val _typeConvertersMap: MutableMap&lt;KClass&lt;*&gt;, List&lt;KClass&lt;*&gt;&gt;&gt; = mutableMapOf()</b>
+<b class="fc">&nbsp;    _typeConvertersMap.put(SyncMetaDao::class, SyncMetaDao_Impl.getRequiredConverters())</b>
+<b class="fc">&nbsp;    _typeConvertersMap.put(PendingMutationDao::class, PendingMutationDao_Impl.getRequiredConverters())</b>
+<b class="fc">&nbsp;    return _typeConvertersMap</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public override fun getRequiredAutoMigrationSpecClasses(): Set&lt;KClass&lt;out AutoMigrationSpec&gt;&gt; {
+<b class="fc">&nbsp;    val _autoMigrationSpecsSet: MutableSet&lt;KClass&lt;out AutoMigrationSpec&gt;&gt; = mutableSetOf()</b>
+<b class="fc">&nbsp;    return _autoMigrationSpecsSet</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public override fun createAutoMigrations(autoMigrationSpecs: Map&lt;KClass&lt;out AutoMigrationSpec&gt;, AutoMigrationSpec&gt;): List&lt;Migration&gt; {
+<b class="fc">&nbsp;    val _autoMigrations: MutableList&lt;Migration&gt; = mutableListOf()</b>
+<b class="fc">&nbsp;    return _autoMigrations</b>
+&nbsp;  }
+&nbsp;
+<b class="fc">&nbsp;  public override fun syncMetaDao(): SyncMetaDao = _syncMetaDao.value</b>
+&nbsp;
+<b class="fc">&nbsp;  public override fun pendingMutationDao(): PendingMutationDao = _pendingMutationDao.value</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-07-27 15:02</div>
+</div>
+</body>
+</html>

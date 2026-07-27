@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SyncCancelToken</title>
+  <title>MoneySurfer Coverage Report > BudgetDetailsState</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,18 +19,15 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.sync.api</a>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.budget.details</a>
 </div>
 
-<h1>Coverage Summary for Class: SyncCancelToken (com.georgeci.moneysurfer.sync.api)</h1>
+<h1>Coverage Summary for Class: BudgetDetailsState (com.georgeci.moneysurfer.feature.budget.details)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
-<th class="coverageStat 
-">
-  Class, %
-</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -48,50 +45,126 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   Instruction, %
 </th>
 </tr>
+  <tr>
+    <td class="name">BudgetDetailsState$Companion</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">BudgetDetailsState$Content</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">BudgetDetailsState$Content$Companion</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">BudgetDetailsState$Loading</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">BudgetDetailsState$Missing</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
 <tr>
-  <td class="name">SyncCancelToken</td>
+  <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (1/1)
+    (0/3)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (2/2)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (2/2)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (2/2)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (9/9)
+    (0/16)
   </span>
 </td>
 </tr>
-
 </table>
 
 <br/>
@@ -99,48 +172,138 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.sync.api
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.budget.details
 &nbsp;
-&nbsp;import kotlin.concurrent.atomics.AtomicBoolean
-&nbsp;import kotlin.concurrent.atomics.ExperimentalAtomicApi
-&nbsp;import kotlin.coroutines.cancellation.CancellationException
+&nbsp;import arrow.optics.optics
+&nbsp;import com.georgeci.moneysurfer.domain.formatter.MoneyFormatter
+&nbsp;import com.georgeci.moneysurfer.domain.model.CategorizedTransaction
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.BudgetId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionId
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.BudgetRepository
+&nbsp;import com.georgeci.moneysurfer.domain.usecase.ArchiveBudgetUseCase
+&nbsp;import com.georgeci.moneysurfer.domain.usecase.GetBudgetProgressUseCase
+&nbsp;import com.georgeci.moneysurfer.domain.usecase.GetBudgetTransactionsUseCase
+&nbsp;import com.georgeci.moneysurfer.domain.usecase.GetCategoriesUseCase
+&nbsp;import com.georgeci.moneysurfer.feature.budget.BudgetUi
+&nbsp;import com.georgeci.moneysurfer.feature.budget.formatShortDate
+&nbsp;import com.georgeci.moneysurfer.feature.budget.toUi
+&nbsp;import com.georgeci.moneysurfer.utils.MviViewModel
+&nbsp;import kotlinx.coroutines.ExperimentalCoroutinesApi
+&nbsp;import kotlinx.coroutines.flow.combine
+&nbsp;import kotlinx.coroutines.flow.flatMapLatest
+&nbsp;import kotlinx.coroutines.flow.flowOf
+&nbsp;import org.koin.core.annotation.KoinViewModel
 &nbsp;
-&nbsp;/**
-&nbsp; * Cancellation token for sync operations.
-&nbsp; *
-&nbsp; * Usage: inside long-running steps (upload, pull) call `throwIfCancelled()`
-&nbsp; * between major sub-operations. See SyncCoordinatorFAQ.md №2.
-&nbsp; */
-<b class="fc">&nbsp;abstract class SyncCancelToken {</b>
-&nbsp;    abstract fun isCancelled(): Boolean
-&nbsp;    abstract fun cancel()
+&nbsp;@KoinViewModel
+&nbsp;@OptIn(ExperimentalCoroutinesApi::class)
+&nbsp;class BudgetDetailsViewModel(
+&nbsp;    private val budgetId: BudgetId,
+&nbsp;    private val budgetRepository: BudgetRepository,
+&nbsp;    private val getBudgetProgress: GetBudgetProgressUseCase,
+&nbsp;    private val getBudgetTransactions: GetBudgetTransactionsUseCase,
+&nbsp;    private val getCategories: GetCategoriesUseCase,
+&nbsp;    private val archiveBudget: ArchiveBudgetUseCase,
+&nbsp;) : MviViewModel&lt;BudgetDetailsState, BudgetDetailsEvent, BudgetDetailsEffect&gt;(
+&nbsp;    initialState = BudgetDetailsState.Loading,
+&nbsp;) {
 &nbsp;
-&nbsp;    fun throwIfCancelled() {
-<b class="fc">&nbsp;        if (isCancelled()) throw SyncCancelledException()</b>
+&nbsp;    init {
+&nbsp;        observeBudget()
 &nbsp;    }
+&nbsp;
+&nbsp;    override fun onEvent(event: BudgetDetailsEvent) {
+&nbsp;        when (event) {
+&nbsp;            BudgetDetailsEvent.OnBackClick -&gt; postSideEffect(BudgetDetailsEffect.NavigateBack)
+&nbsp;            BudgetDetailsEvent.OnEditClick -&gt; postSideEffect(BudgetDetailsEffect.NavigateToBudgetEdit(budgetId))
+&nbsp;            BudgetDetailsEvent.OnArchiveClick -&gt; toggleArchive()
+&nbsp;            is BudgetDetailsEvent.OnTransactionClick -&gt;
+&nbsp;                postSideEffect(BudgetDetailsEffect.NavigateToTransactionDetails(event.transactionId))
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun toggleArchive() {
+&nbsp;        val content = currentState as? BudgetDetailsState.Content ?: return
+&nbsp;        launch { archiveBudget(budgetId, isActive = !content.budget.isActive) }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The budget itself is read once and then re-read through the progress stream: progress
+&nbsp;     * recomputes on every transaction change, and an edit to the budget lands as a new emission
+&nbsp;     * of the repository flow feeding it.
+&nbsp;     */
+&nbsp;    private fun observeBudget() {
+&nbsp;        launch {
+&nbsp;            budgetRepository.getAll()
+&nbsp;                .flatMapLatest { budgets -&gt;
+&nbsp;                    val budget = budgets.firstOrNull { it.id == budgetId }
+&nbsp;                        ?: return@flatMapLatest flowOf(null)
+&nbsp;                    combine(
+&nbsp;                        getBudgetProgress(budget),
+&nbsp;                        getBudgetTransactions(budget),
+&nbsp;                        getCategories(),
+&nbsp;                    ) { progress, transactions, categories -&gt;
+&nbsp;                        val categoriesById = categories.associateBy { it.id.value }
+&nbsp;                        BudgetDetailsState.Content(
+&nbsp;                            budget = progress.toUi(categoriesById),
+&nbsp;                            transactions = transactions.map { it.toUi() },
+&nbsp;                        )
+&nbsp;                    }
+&nbsp;                }
+&nbsp;                .collect { content -&gt;
+&nbsp;                    updateState { content ?: BudgetDetailsState.Missing }
+&nbsp;                }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun CategorizedTransaction.toUi() = BudgetTransactionUi(
+&nbsp;        id = transaction.id,
+&nbsp;        title = transaction.merchant.takeIf { it.isNotBlank() }
+&nbsp;            ?: transaction.note.takeIf { it.isNotBlank() }
+&nbsp;            ?: categoryName.orEmpty(),
+&nbsp;        categoryName = categoryName,
+&nbsp;        amountFormatted = MoneyFormatter.format(transaction.money.abs(), transaction.currencyCode),
+&nbsp;        dateLabel = formatShortDate(transaction.operationDate),
+&nbsp;    )
 &nbsp;}
 &nbsp;
-&nbsp;@OptIn(ExperimentalAtomicApi::class)
-&nbsp;class SimpleCancelToken : SyncCancelToken() {
-&nbsp;    private val flag = AtomicBoolean(false)
-&nbsp;    override fun isCancelled(): Boolean = flag.load()
-&nbsp;    override fun cancel() { flag.store(true) }
+&nbsp;@optics
+&nbsp;sealed interface BudgetDetailsState {
+<b class="nc">&nbsp;    data object Loading : BudgetDetailsState</b>
+&nbsp;
+&nbsp;    /** The budget was deleted — on another device, or from the list behind this screen. */
+<b class="nc">&nbsp;    data object Missing : BudgetDetailsState</b>
+&nbsp;
+<b class="nc">&nbsp;    @optics</b>
+&nbsp;    data class Content(
+<b class="nc">&nbsp;        val budget: BudgetUi,</b>
+<b class="nc">&nbsp;        val transactions: List&lt;BudgetTransactionUi&gt;,</b>
+&nbsp;    ) : BudgetDetailsState {
+&nbsp;        companion object
+&nbsp;    }
+&nbsp;
+&nbsp;    companion object
 &nbsp;}
 &nbsp;
-&nbsp;/**
-&nbsp; * Token wrapping a set of child tokens with `all` semantics:
-&nbsp; * considered cancelled only when ALL children are cancelled.
-&nbsp; * Required for merged sync requests — cancelling one child does not abort the rest.
-&nbsp; * See SyncCoordinatorFAQ.md №2, №4.
-&nbsp; */
-&nbsp;class CompositeCancelToken(
-&nbsp;    private val children: List&lt;SyncCancelToken&gt;,
-&nbsp;) : SyncCancelToken() {
-&nbsp;    override fun isCancelled(): Boolean = children.all { it.isCancelled() }
-&nbsp;    override fun cancel() { children.forEach { it.cancel() } }
+&nbsp;data class BudgetTransactionUi(
+&nbsp;    val id: TransactionId,
+&nbsp;    val title: String,
+&nbsp;    val categoryName: String?,
+&nbsp;    val amountFormatted: String,
+&nbsp;    val dateLabel: String,
+&nbsp;)
+&nbsp;
+&nbsp;sealed interface BudgetDetailsEvent {
+&nbsp;    data object OnBackClick : BudgetDetailsEvent
+&nbsp;    data object OnEditClick : BudgetDetailsEvent
+&nbsp;    data object OnArchiveClick : BudgetDetailsEvent
+&nbsp;    data class OnTransactionClick(val transactionId: TransactionId) : BudgetDetailsEvent
 &nbsp;}
 &nbsp;
-&nbsp;class SyncCancelledException : CancellationException(&quot;Sync cancelled&quot;)
+&nbsp;sealed interface BudgetDetailsEffect {
+&nbsp;    data object NavigateBack : BudgetDetailsEffect
+&nbsp;    data class NavigateToBudgetEdit(val budgetId: BudgetId) : BudgetDetailsEffect
+&nbsp;    data class NavigateToTransactionDetails(val transactionId: TransactionId) : BudgetDetailsEffect
+&nbsp;}
 </code>
 </pre>
 </div>
@@ -164,7 +327,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-23 23:54</div>
+    <div style="float:right;">generated on 2026-07-27 15:02</div>
 </div>
 </body>
 </html>

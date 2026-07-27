@@ -1,0 +1,106 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>MoneySurfer Coverage Report > OutboxEnqueuer</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.georgeci.moneysurfer.sync.repository</a>
+</div>
+
+<h1>Coverage Summary for Class: OutboxEnqueuer (com.georgeci.moneysurfer.sync.repository)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+</tr>
+<tr>
+  <td class="name">OutboxEnqueuer</td>
+    <td class="coverageStat"/>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.sync.repository
+&nbsp;
+&nbsp;/**
+&nbsp; * Outbox writer used by data-layer repositories to enqueue local mutations
+&nbsp; * for deferred push to the remote backend.
+&nbsp; *
+&nbsp; * The implementation guards against demo mode and non-Firebase sessions —
+&nbsp; * callers do not need to check [isEnabled] before calling [enqueueUpsert] /
+&nbsp; * [enqueueDelete]; the impl silently no-ops when sync is not allowed.
+&nbsp; *
+&nbsp; * [entityType] — constant from [com.georgeci.moneysurfer.domain.sync.SyncEntityTypes].
+&nbsp; * [scopeKey]   — workspace id for subcollection entities, null for root entities.
+&nbsp; *
+&nbsp; * See sync.md §4.3.
+&nbsp; */
+&nbsp;interface OutboxEnqueuer {
+&nbsp;
+&nbsp;    suspend fun enqueueUpsert(
+&nbsp;        entityType: String,
+&nbsp;        entityId: String,
+&nbsp;        scopeKey: String?,
+&nbsp;        operation: MutationOperation,
+&nbsp;    )
+&nbsp;
+&nbsp;    suspend fun enqueueDelete(
+&nbsp;        entityType: String,
+&nbsp;        entityId: String,
+&nbsp;        scopeKey: String?,
+&nbsp;    )
+&nbsp;
+&nbsp;    /** Returns false for demo / signed-out sessions — mutations are local-only. */
+&nbsp;    suspend fun isEnabled(): Boolean
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-07-27 15:02</div>
+</div>
+</body>
+</html>

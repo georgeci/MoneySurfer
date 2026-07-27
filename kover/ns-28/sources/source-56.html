@@ -1,0 +1,188 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>MoneySurfer Coverage Report > WipeDemoDataUseCase</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.georgeci.moneysurfer.domain.usecase</a>
+</div>
+
+<h1>Coverage Summary for Class: WipeDemoDataUseCase (com.georgeci.moneysurfer.domain.usecase)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">WipeDemoDataUseCase</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (7/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (48/48)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">WipeDemoDataUseCase$invoke$1</td>
+    <td class="coverageStat"/>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (7/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (48/48)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.usecase
+&nbsp;
+&nbsp;import com.georgeci.moneysurfer.domain.auth.SessionMutator
+&nbsp;import com.georgeci.moneysurfer.domain.auth.SessionPointers
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.LocalDataResetRepository
+&nbsp;import kotlinx.coroutines.flow.first
+&nbsp;import org.koin.core.annotation.Single
+&nbsp;
+&nbsp;/**
+&nbsp; * Drops all locally-stored data accumulated during a demo session.
+&nbsp; *
+&nbsp; * Invoked by real-auth use cases ([LoginUseCase] / [SignupUseCase] /
+&nbsp; * [AnonymousLoginUseCase]) **after** Firebase auth succeeds and **before**
+&nbsp; * `PostAuthBootstrapUseCase` so the real session starts on a clean slate.
+&nbsp; *
+&nbsp; * No-op when `hasUsedDemo` flag is unset — keeps repeated login flows cheap.
+&nbsp; *
+&nbsp; * Demo data is intentionally never pushed to Firestore (the outbox guard in
+&nbsp; * `OutboxEnqueuer` blocks enqueue without a Firebase uid), so the wipe here
+&nbsp; * has no remote-cleanup counterpart. See sync.md §2.11.
+&nbsp; */
+<b class="fc">&nbsp;@Single</b>
+&nbsp;class WipeDemoDataUseCase(
+<b class="fc">&nbsp;    private val localDataResetRepository: LocalDataResetRepository,</b>
+<b class="fc">&nbsp;    private val session: SessionPointers,</b>
+<b class="fc">&nbsp;    private val sessionMutator: SessionMutator,</b>
+&nbsp;) {
+&nbsp;    suspend operator fun invoke() {
+<b class="fc">&nbsp;        if (!session.hasUsedDemo.first()) return</b>
+<b class="fc">&nbsp;        localDataResetRepository.clearAll()</b>
+<b class="fc">&nbsp;        sessionMutator.setHasUsedDemo(false)</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-07-27 15:02</div>
+</div>
+</body>
+</html>

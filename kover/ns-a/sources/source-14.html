@@ -1,0 +1,253 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>MoneySurfer Coverage Report > UiConfigKeys</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.georgeci.moneysurfer.data.config</a>
+</div>
+
+<h1>Coverage Summary for Class: UiConfigKeys (com.georgeci.moneysurfer.data.config)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">UiConfigKeys</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (18/18)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (55/55)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (286/286)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.config
+&nbsp;
+&nbsp;import com.georgeci.moneysurfer.appconfig.ConfigKey
+&nbsp;import com.georgeci.moneysurfer.appconfig.ConfigKeyGroup
+&nbsp;import com.georgeci.moneysurfer.appconfig.SettingKey
+&nbsp;import com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutConfig
+&nbsp;import com.georgeci.moneysurfer.domain.formatter.CurrencyDefaults
+&nbsp;import com.georgeci.moneysurfer.domain.preferences.AppLanguage
+&nbsp;import com.georgeci.moneysurfer.domain.preferences.AppRegion
+&nbsp;import com.georgeci.moneysurfer.domain.preferences.ContainerStyle
+&nbsp;import com.georgeci.moneysurfer.domain.preferences.DefaultTransactionType
+&nbsp;import com.georgeci.moneysurfer.domain.preferences.HourFormat
+&nbsp;import com.georgeci.moneysurfer.domain.preferences.NumberFormatStyle
+&nbsp;import com.georgeci.moneysurfer.domain.preferences.PaletteSource
+&nbsp;import com.georgeci.moneysurfer.domain.preferences.ThemeMode
+&nbsp;import com.georgeci.moneysurfer.domain.preferences.TransactionPeriodMode
+&nbsp;import com.georgeci.moneysurfer.domain.preferences.WeekStart
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
+&nbsp;import org.koin.core.annotation.Single
+&nbsp;
+&nbsp;/**
+&nbsp; * Keys behind [UiPreferencesImpl][com.georgeci.moneysurfer.data.preferences.UiPreferencesImpl].
+&nbsp; *
+&nbsp; * `internal` so no feature can reach a key directly — name, default and codec now live in one
+&nbsp; * place instead of being spread across a DataStore declaration, a per-field adapter and an
+&nbsp; * interface.
+&nbsp; */
+&nbsp;internal object UiConfigKeys {
+&nbsp;
+<b class="fc">&nbsp;    val themeMode: SettingKey&lt;ThemeMode&gt; =</b>
+<b class="fc">&nbsp;        SettingKey.enum(&quot;ui.theme_mode&quot;, ThemeMode.System, sync = true)</b>
+&nbsp;
+<b class="fc">&nbsp;    val paletteSource: SettingKey&lt;PaletteSource&gt; =</b>
+<b class="fc">&nbsp;        SettingKey.custom(&quot;ui.palette_source&quot;, PaletteSource.DEFAULT, PaletteSourceCodec, sync = true)</b>
+&nbsp;
+<b class="fc">&nbsp;    val containerStyle: SettingKey&lt;ContainerStyle&gt; =</b>
+<b class="fc">&nbsp;        SettingKey.enum(&quot;ui.container_style&quot;, ContainerStyle.Card, sync = true)</b>
+&nbsp;
+<b class="fc">&nbsp;    val transactionsPeriodMode: SettingKey&lt;TransactionPeriodMode&gt; =</b>
+<b class="fc">&nbsp;        SettingKey.enum(&quot;ui.transactions_period_mode&quot;, TransactionPeriodMode.DEFAULT, sync = true)</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * `sync = false` is mandatory: replicating this would replay onboarding on every other device,
+&nbsp;     * and resetting it on logout would replay it after every logout. Being device-scoped is also
+&nbsp;     * what keeps it in DataStore rather than in the account-scoped `config_entry` table the wipe
+&nbsp;     * clears.
+&nbsp;     */
+<b class="fc">&nbsp;    val onboardingCompleted: SettingKey&lt;Boolean&gt; =</b>
+<b class="fc">&nbsp;        SettingKey.bool(&quot;ui.onboarding_completed&quot;, default = false, sync = false)</b>
+&nbsp;
+&nbsp;    /** Device-local by design — a phone layout would be wrong on a tablet. */
+<b class="fc">&nbsp;    val dashboardLayout: SettingKey&lt;DashboardLayoutConfig&gt; = SettingKey.custom(</b>
+<b class="fc">&nbsp;        &quot;ui.dashboard_layout&quot;,</b>
+<b class="fc">&nbsp;        DashboardLayoutConfig.DEFAULT,</b>
+<b class="fc">&nbsp;        DashboardLayoutConfigCodec,</b>
+<b class="fc">&nbsp;        sync = false,</b>
+&nbsp;    )
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Preferences-screen keys (issue #370). All `sync = false`: replicating user settings is its
+&nbsp;     * own concern (#334), and none of these has a consumer yet, so there is nothing for two devices
+&nbsp;     * to disagree about — the screen stores the choice and reads it back, and that is all.
+&nbsp;     */
+<b class="fc">&nbsp;    val appLanguage: SettingKey&lt;AppLanguage&gt; =</b>
+<b class="fc">&nbsp;        SettingKey.enum(&quot;ui.app_language&quot;, AppLanguage.DEFAULT, sync = false)</b>
+&nbsp;
+<b class="fc">&nbsp;    val appRegion: SettingKey&lt;AppRegion&gt; =</b>
+<b class="fc">&nbsp;        SettingKey.enum(&quot;ui.app_region&quot;, AppRegion.DEFAULT, sync = false)</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The one key whose default is resolved at runtime rather than written down: the currency the
+&nbsp;     * platform locale implies is a far better first guess than any constant, and it is the same
+&nbsp;     * seed account creation already uses. `CurrencyDefaults` is a pure locale lookup with a `USD`
+&nbsp;     * fallback, so this stays a plain value and never becomes a DI participant.
+&nbsp;     */
+<b class="fc">&nbsp;    val defaultCurrency: SettingKey&lt;CurrencyCode&gt; = SettingKey.custom(</b>
+<b class="fc">&nbsp;        &quot;ui.default_currency&quot;,</b>
+<b class="fc">&nbsp;        CurrencyDefaults.systemDefault(),</b>
+<b class="fc">&nbsp;        CurrencyCodeCodec,</b>
+<b class="fc">&nbsp;        sync = false,</b>
+&nbsp;    )
+&nbsp;
+<b class="fc">&nbsp;    val numberFormat: SettingKey&lt;NumberFormatStyle&gt; =</b>
+<b class="fc">&nbsp;        SettingKey.enum(&quot;ui.number_format&quot;, NumberFormatStyle.DEFAULT, sync = false)</b>
+&nbsp;
+<b class="fc">&nbsp;    val weekStart: SettingKey&lt;WeekStart&gt; =</b>
+<b class="fc">&nbsp;        SettingKey.enum(&quot;ui.week_start&quot;, WeekStart.DEFAULT, sync = false)</b>
+&nbsp;
+<b class="fc">&nbsp;    val hourFormat: SettingKey&lt;HourFormat&gt; =</b>
+<b class="fc">&nbsp;        SettingKey.enum(&quot;ui.hour_format&quot;, HourFormat.DEFAULT, sync = false)</b>
+&nbsp;
+<b class="fc">&nbsp;    val defaultTransactionType: SettingKey&lt;DefaultTransactionType&gt; =</b>
+<b class="fc">&nbsp;        SettingKey.enum(&quot;ui.default_transaction_type&quot;, DefaultTransactionType.DEFAULT, sync = false)</b>
+&nbsp;
+<b class="fc">&nbsp;    val hideAmounts: SettingKey&lt;Boolean&gt; =</b>
+<b class="fc">&nbsp;        SettingKey.bool(&quot;ui.hide_amounts&quot;, default = false, sync = false)</b>
+&nbsp;
+<b class="fc">&nbsp;    val autoCategorize: SettingKey&lt;Boolean&gt; =</b>
+<b class="fc">&nbsp;        SettingKey.bool(&quot;ui.auto_categorize&quot;, default = true, sync = false)</b>
+&nbsp;
+<b class="fc">&nbsp;    val roundUpSavings: SettingKey&lt;Boolean&gt; =</b>
+<b class="fc">&nbsp;        SettingKey.bool(&quot;ui.round_up_savings&quot;, default = false, sync = false)</b>
+&nbsp;
+<b class="fc">&nbsp;    val all: List&lt;ConfigKey&lt;*&gt;&gt; = listOf(</b>
+<b class="fc">&nbsp;        themeMode,</b>
+<b class="fc">&nbsp;        paletteSource,</b>
+<b class="fc">&nbsp;        containerStyle,</b>
+<b class="fc">&nbsp;        transactionsPeriodMode,</b>
+<b class="fc">&nbsp;        onboardingCompleted,</b>
+<b class="fc">&nbsp;        dashboardLayout,</b>
+<b class="fc">&nbsp;        appLanguage,</b>
+<b class="fc">&nbsp;        appRegion,</b>
+<b class="fc">&nbsp;        defaultCurrency,</b>
+<b class="fc">&nbsp;        numberFormat,</b>
+<b class="fc">&nbsp;        weekStart,</b>
+<b class="fc">&nbsp;        hourFormat,</b>
+<b class="fc">&nbsp;        defaultTransactionType,</b>
+<b class="fc">&nbsp;        hideAmounts,</b>
+<b class="fc">&nbsp;        autoCategorize,</b>
+<b class="fc">&nbsp;        roundUpSavings,</b>
+&nbsp;    )
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * One class per group, bound to the shared interface. Several modules binding a bare
+&nbsp; * `ConfigKeyGroup` would overwrite one another in Koin&#39;s definition index and `getAll()` would
+&nbsp; * return a single surviving group, silently hiding most keys from the debug panel.
+&nbsp; */
+&nbsp;@Single(binds = [ConfigKeyGroup::class])
+&nbsp;class UiConfigKeyGroup : ConfigKeyGroup {
+&nbsp;    override val keys: List&lt;ConfigKey&lt;*&gt;&gt; = UiConfigKeys.all
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-07-27 15:02</div>
+</div>
+</body>
+</html>

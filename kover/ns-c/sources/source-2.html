@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > ComGeorgeciMoneysurferDataDiRemoteDataModuleModuleKt</title>
+  <title>MoneySurfer Coverage Report > PreferenceStore</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,18 +19,15 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.data.di</a>
+    <a href="../index.html">com.georgeci.moneysurfer.data.datastore.core</a>
 </div>
 
-<h1>Coverage Summary for Class: ComGeorgeciMoneysurferDataDiRemoteDataModuleModuleKt (com.georgeci.moneysurfer.data.di)</h1>
+<h1>Coverage Summary for Class: PreferenceStore (com.georgeci.moneysurfer.data.datastore.core)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
-<th class="coverageStat 
-">
-  Class, %
-</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -49,48 +46,162 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">ComGeorgeciMoneysurferDataDiRemoteDataModuleModuleKt</td>
+  <td class="name">PreferenceStore</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    20%
   </span>
   <span class="absValue">
-    (0/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
+    (3/15)
   </span>
 </td>
     <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    25%
   </span>
   <span class="absValue">
-    (0/1)
+    (4/16)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    21.5%
   </span>
   <span class="absValue">
-    (0/94)
+    (31/144)
   </span>
 </td>
 </tr>
-
+  <tr>
+    <td class="name">PreferenceStore$edit$1</td>
+    <td class="coverageStat"/>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    20%
+  </span>
+  <span class="absValue">
+    (3/15)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    25%
+  </span>
+  <span class="absValue">
+    (4/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    21.5%
+  </span>
+  <span class="absValue">
+    (31/144)
+  </span>
+</td>
+</tr>
 </table>
 
 <br/>
 <br/>
 
-  <code class="sourceCode">Source code is not available<br /></code>
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.datastore.core
+&nbsp;
+&nbsp;import androidx.datastore.core.DataStore
+&nbsp;import androidx.datastore.preferences.core.MutablePreferences
+&nbsp;import androidx.datastore.preferences.core.Preferences
+&nbsp;import androidx.datastore.preferences.core.booleanPreferencesKey
+&nbsp;import androidx.datastore.preferences.core.doublePreferencesKey
+&nbsp;import androidx.datastore.preferences.core.edit
+&nbsp;import androidx.datastore.preferences.core.floatPreferencesKey
+&nbsp;import androidx.datastore.preferences.core.intPreferencesKey
+&nbsp;import androidx.datastore.preferences.core.longPreferencesKey
+&nbsp;import androidx.datastore.preferences.core.stringPreferencesKey
+&nbsp;import kotlinx.coroutines.flow.Flow
+&nbsp;import kotlinx.coroutines.flow.distinctUntilChanged
+&nbsp;import kotlinx.coroutines.flow.first
+&nbsp;import kotlinx.coroutines.flow.map
+&nbsp;
+<b class="fc">&nbsp;class PreferenceStore(</b>
+<b class="fc">&nbsp;    private val dataStore: DataStore&lt;Preferences&gt;,</b>
+&nbsp;) {
+&nbsp;
+<b class="nc">&nbsp;    fun boolean(name: String, default: Boolean = false): PreferenceProperty&lt;Boolean&gt; =</b>
+<b class="nc">&nbsp;        PreferenceProperty(dataStore, booleanPreferencesKey(name), default)</b>
+&nbsp;
+<b class="nc">&nbsp;    fun int(name: String, default: Int = 0): PreferenceProperty&lt;Int&gt; =</b>
+<b class="nc">&nbsp;        PreferenceProperty(dataStore, intPreferencesKey(name), default)</b>
+&nbsp;
+<b class="nc">&nbsp;    fun long(name: String, default: Long = 0L): PreferenceProperty&lt;Long&gt; =</b>
+<b class="nc">&nbsp;        PreferenceProperty(dataStore, longPreferencesKey(name), default)</b>
+&nbsp;
+<b class="nc">&nbsp;    fun float(name: String, default: Float = 0f): PreferenceProperty&lt;Float&gt; =</b>
+<b class="nc">&nbsp;        PreferenceProperty(dataStore, floatPreferencesKey(name), default)</b>
+&nbsp;
+<b class="nc">&nbsp;    fun double(name: String, default: Double = 0.0): PreferenceProperty&lt;Double&gt; =</b>
+<b class="nc">&nbsp;        PreferenceProperty(dataStore, doublePreferencesKey(name), default)</b>
+&nbsp;
+<b class="nc">&nbsp;    fun string(name: String, default: String = &quot;&quot;): PreferenceProperty&lt;String&gt; =</b>
+<b class="nc">&nbsp;        PreferenceProperty(dataStore, stringPreferencesKey(name), default)</b>
+&nbsp;
+&nbsp;    fun &lt;T&gt; custom(
+&nbsp;        key: Preferences.Key&lt;T&gt;,
+&nbsp;        default: T,
+&nbsp;    ): PreferenceProperty&lt;T&gt; =
+<b class="fc">&nbsp;        PreferenceProperty(dataStore, key, default)</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Writes several keys in one DataStore edit. A group whose members must move together — the
+&nbsp;     * session pointers on logout — cannot be written as N separate `set` calls, or a crash in
+&nbsp;     * between leaves the group half-updated.
+&nbsp;     */
+&nbsp;    suspend fun edit(transform: (MutablePreferences) -&gt; Unit) {
+<b class="fc">&nbsp;        dataStore.edit(transform)</b>
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;class PreferenceProperty&lt;T&gt;(
+&nbsp;    private val dataStore: DataStore&lt;Preferences&gt;,
+&nbsp;    /** Exposed so a caller can include this property in a multi-key [PreferenceStore.edit]. */
+&nbsp;    val key: Preferences.Key&lt;T&gt;,
+&nbsp;    private val default: T,
+&nbsp;) {
+&nbsp;    val flow: Flow&lt;T&gt; =
+&nbsp;        dataStore.data
+&nbsp;            .map { preferences -&gt; preferences[key] ?: default }
+&nbsp;            .distinctUntilChanged()
+&nbsp;
+&nbsp;    suspend fun get(): T =
+&nbsp;        dataStore.data.map { it[key] ?: default }.first()
+&nbsp;
+&nbsp;    suspend fun set(value: T) {
+&nbsp;        dataStore.edit { preferences -&gt;
+&nbsp;            preferences[key] = value
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    suspend fun update(transform: (T) -&gt; T) {
+&nbsp;        dataStore.edit { preferences -&gt;
+&nbsp;            val oldValue = preferences[key] ?: default
+&nbsp;            preferences[key] = transform(oldValue)
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    suspend fun remove() {
+&nbsp;        dataStore.edit { preferences -&gt;
+&nbsp;            preferences.remove(key)
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
 </div>
 
 <script type="text/javascript">
@@ -112,7 +223,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-23 23:54</div>
+    <div style="float:right;">generated on 2026-07-27 15:02</div>
 </div>
 </body>
 </html>

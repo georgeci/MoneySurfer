@@ -1,0 +1,215 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>MoneySurfer Coverage Report > SurferBudgetProgressBarKt</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.georgeci.moneysurfer.uikit.components.budget</a>
+</div>
+
+<h1>Coverage Summary for Class: SurferBudgetProgressBarKt (com.georgeci.moneysurfer.uikit.components.budget)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">SurferBudgetProgressBarKt</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/33)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/469)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.components.budget
+&nbsp;
+&nbsp;import androidx.compose.foundation.Canvas
+&nbsp;import androidx.compose.foundation.layout.Arrangement
+&nbsp;import androidx.compose.foundation.layout.Column
+&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
+&nbsp;import androidx.compose.foundation.layout.height
+&nbsp;import androidx.compose.foundation.layout.padding
+&nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.ui.Modifier
+&nbsp;import androidx.compose.ui.geometry.CornerRadius
+&nbsp;import androidx.compose.ui.geometry.Offset
+&nbsp;import androidx.compose.ui.geometry.Size
+&nbsp;import androidx.compose.ui.semantics.clearAndSetSemantics
+&nbsp;import androidx.compose.ui.semantics.contentDescription
+&nbsp;import androidx.compose.ui.tooling.preview.Preview
+&nbsp;import androidx.compose.ui.unit.Dp
+&nbsp;import androidx.compose.ui.unit.dp
+&nbsp;import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
+&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
+&nbsp;
+&nbsp;/**
+&nbsp; * Budget spend as a bar, with a tick mark at the alert threshold.
+&nbsp; *
+&nbsp; * The fill is capped at the full width — past 100 % the colour carries the overspend, not the
+&nbsp; * geometry, so an overshoot never draws outside the track. [contentDescription] is what screen
+&nbsp; * readers get: the bar is a picture of numbers stated in the surrounding text, so the caller
+&nbsp; * passes the sentence rather than letting the shape speak for itself.
+&nbsp; */
+&nbsp;@Composable
+&nbsp;fun SurferBudgetProgressBar(
+&nbsp;    progress: Float,
+&nbsp;    status: SurferBudgetStatus,
+<b class="nc">&nbsp;    modifier: Modifier = Modifier,</b>
+<b class="nc">&nbsp;    alertFraction: Float? = null,</b>
+<b class="nc">&nbsp;    height: Dp = 8.dp,</b>
+<b class="nc">&nbsp;    contentDescription: String? = null,</b>
+<b class="nc">&nbsp;) {</b>
+<b class="nc">&nbsp;    val fill = status.color</b>
+<b class="nc">&nbsp;    val track = AppTheme.materialColors.surfaceContainerHighest</b>
+<b class="nc">&nbsp;    val tickColor = AppTheme.materialColors.onSurfaceVariant</b>
+<b class="nc">&nbsp;    val capped = progress.coerceIn(0f, 1f)</b>
+&nbsp;
+<b class="nc">&nbsp;    Canvas(</b>
+<b class="nc">&nbsp;        modifier = modifier</b>
+<b class="nc">&nbsp;            .fillMaxWidth()</b>
+<b class="nc">&nbsp;            .height(height)</b>
+<b class="nc">&nbsp;            .clearAndSetSemantics {</b>
+<b class="nc">&nbsp;                if (contentDescription != null) this.contentDescription = contentDescription</b>
+&nbsp;            },
+<b class="nc">&nbsp;    ) {</b>
+<b class="nc">&nbsp;        val radius = CornerRadius(size.height / 2f)</b>
+<b class="nc">&nbsp;        drawRoundRect(color = track, cornerRadius = radius)</b>
+<b class="nc">&nbsp;        if (capped &gt; 0f) {</b>
+<b class="nc">&nbsp;            drawRoundRect(</b>
+<b class="nc">&nbsp;                color = fill,</b>
+<b class="nc">&nbsp;                size = Size(size.width * capped, size.height),</b>
+<b class="nc">&nbsp;                cornerRadius = radius,</b>
+&nbsp;            )
+&nbsp;        }
+<b class="nc">&nbsp;        val tick = alertFraction?.coerceIn(0f, 1f) ?: return@Canvas</b>
+<b class="nc">&nbsp;        val x = (size.width * tick).coerceIn(0f, size.width - TICK_WIDTH_PX)</b>
+<b class="nc">&nbsp;        drawRect(</b>
+<b class="nc">&nbsp;            color = tickColor.copy(alpha = 0.6f),</b>
+<b class="nc">&nbsp;            topLeft = Offset(x, 0f),</b>
+<b class="nc">&nbsp;            size = Size(TICK_WIDTH_PX, size.height),</b>
+&nbsp;        )
+&nbsp;    }
+<b class="nc">&nbsp;}</b>
+&nbsp;
+&nbsp;private const val TICK_WIDTH_PX = 2f
+&nbsp;
+&nbsp;@Preview
+&nbsp;@Composable
+<b class="nc">&nbsp;private fun SurferBudgetProgressBarPreview() {</b>
+<b class="nc">&nbsp;    SurferComponentPreview {</b>
+&nbsp;        Column(
+&nbsp;            modifier = Modifier.fillMaxWidth().padding(16.dp),
+&nbsp;            verticalArrangement = Arrangement.spacedBy(12.dp),
+&nbsp;        ) {
+&nbsp;            SurferBudgetProgressBar(progress = 0.35f, status = SurferBudgetStatus.Ok, alertFraction = 0.8f)
+&nbsp;            SurferBudgetProgressBar(progress = 0.86f, status = SurferBudgetStatus.Warn, alertFraction = 0.8f)
+&nbsp;            SurferBudgetProgressBar(progress = 1.4f, status = SurferBudgetStatus.Over, alertFraction = 0.8f)
+&nbsp;            SurferBudgetProgressBar(progress = 0f, status = SurferBudgetStatus.Ok)
+&nbsp;        }
+&nbsp;    }
+<b class="nc">&nbsp;}</b>
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-07-27 15:02</div>
+</div>
+</body>
+</html>

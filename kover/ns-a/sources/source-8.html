@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > RecurringRuleEntity</title>
+  <title>MoneySurfer Coverage Report > HostCapabilitiesImpl</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.data.db.entity</a>
+    <a href="../index.html">com.georgeci.moneysurfer.data.config</a>
 </div>
 
-<h1>Coverage Summary for Class: RecurringRuleEntity (com.georgeci.moneysurfer.data.db.entity)</h1>
+<h1>Coverage Summary for Class: HostCapabilitiesImpl (com.georgeci.moneysurfer.data.config)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,38 +49,38 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">RecurringRuleEntity</td>
+  <td class="name">HostCapabilitiesImpl</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/2)
+    (6/6)
   </span>
 </td>
     <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/17)
+    (7/7)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/81)
+    (40/40)
   </span>
 </td>
 </tr>
@@ -92,43 +92,33 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.db.entity
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.config
 &nbsp;
-&nbsp;import androidx.room.ColumnInfo
-&nbsp;import androidx.room.Entity
-&nbsp;import androidx.room.ForeignKey
-&nbsp;import androidx.room.Index
-&nbsp;import androidx.room.PrimaryKey
+&nbsp;import com.georgeci.moneysurfer.appconfig.Config
+&nbsp;import com.georgeci.moneysurfer.appconfig.HostConfigKeys
+&nbsp;import com.georgeci.moneysurfer.domain.config.HostCapabilities
+&nbsp;import org.koin.core.annotation.Single
 &nbsp;
-<b class="nc">&nbsp;@Entity(</b>
-&nbsp;    tableName = &quot;recurring_rules&quot;,
-&nbsp;    foreignKeys = [
-&nbsp;        ForeignKey(
-&nbsp;            entity = CategoryEntity::class,
-&nbsp;            parentColumns = [&quot;id&quot;],
-&nbsp;            childColumns = [&quot;categoryId&quot;],
-&nbsp;        ),
-&nbsp;    ],
-&nbsp;    indices = [Index(&quot;categoryId&quot;)],
-&nbsp;)
-&nbsp;data class RecurringRuleEntity(
-<b class="nc">&nbsp;    @PrimaryKey</b>
-<b class="nc">&nbsp;    @ColumnInfo(name = &quot;id&quot;) val id: String,</b>
-<b class="nc">&nbsp;    @ColumnInfo(name = &quot;title&quot;) val title: String,</b>
-<b class="nc">&nbsp;    @ColumnInfo(name = &quot;amount&quot;) val amount: Long,</b>
-<b class="nc">&nbsp;    @ColumnInfo(name = &quot;categoryId&quot;) val categoryId: String,</b>
-<b class="nc">&nbsp;    @ColumnInfo(name = &quot;scheduleFrequency&quot;) val scheduleFrequency: String,</b>
-<b class="nc">&nbsp;    @ColumnInfo(name = &quot;scheduleInterval&quot;) val scheduleInterval: Int,</b>
-<b class="nc">&nbsp;    @ColumnInfo(name = &quot;scheduleDaysOfWeek&quot;) val scheduleDaysOfWeek: String,</b>
-<b class="nc">&nbsp;    @ColumnInfo(name = &quot;scheduleDaysOfMonth&quot;) val scheduleDaysOfMonth: String,</b>
-<b class="nc">&nbsp;    @ColumnInfo(name = &quot;scheduleMissingDayPolicy&quot;) val scheduleMissingDayPolicy: String,</b>
-<b class="nc">&nbsp;    @ColumnInfo(name = &quot;startDate&quot;) val startDate: String,</b>
-<b class="nc">&nbsp;    @ColumnInfo(name = &quot;nextRunAt&quot;) val nextRunAt: Long?,</b>
-<b class="nc">&nbsp;    @ColumnInfo(name = &quot;autoCreate&quot;) val autoCreate: Boolean,</b>
-<b class="nc">&nbsp;    @ColumnInfo(name = &quot;isActive&quot;) val isActive: Boolean,</b>
-<b class="nc">&nbsp;    @ColumnInfo(name = &quot;createdAt&quot;, defaultValue = &quot;0&quot;) val createdAt: Long = 0L,</b>
-<b class="nc">&nbsp;    @ColumnInfo(name = &quot;updatedAt&quot;, defaultValue = &quot;0&quot;) val updatedAt: Long = 0L,</b>
-&nbsp;)
+&nbsp;/**
+&nbsp; * Reads the host&#39;s Build layer through the engine, so a QA override can shadow any of these
+&nbsp; * locally.
+&nbsp; *
+&nbsp; * Getters rather than constructor-time reads: `Config.snapshot` is only valid after hydration, and
+&nbsp; * this singleton may well be constructed before the startup coroutine has run.
+&nbsp; */
+<b class="fc">&nbsp;@Single(binds = [HostCapabilities::class])</b>
+<b class="fc">&nbsp;class HostCapabilitiesImpl(private val config: Config) : HostCapabilities {</b>
+&nbsp;
+<b class="fc">&nbsp;    override val isOffline: Boolean get() = config.snapshot(HostConfigKeys.isOffline)</b>
+&nbsp;
+<b class="fc">&nbsp;    override val signInEmailPassword: Boolean get() = config.snapshot(HostConfigKeys.signInEmailPassword)</b>
+&nbsp;
+<b class="fc">&nbsp;    override val signInAnonymous: Boolean get() = config.snapshot(HostConfigKeys.signInAnonymous)</b>
+&nbsp;
+<b class="fc">&nbsp;    override val signInDemo: Boolean get() = config.snapshot(HostConfigKeys.signInDemo)</b>
+&nbsp;
+<b class="fc">&nbsp;    override val transferEnabled: Boolean get() = config.snapshot(HostConfigKeys.transferEnabled)</b>
+&nbsp;}
 </code>
 </pre>
 </div>
@@ -152,7 +142,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-23 23:54</div>
+    <div style="float:right;">generated on 2026-07-27 15:02</div>
 </div>
 </body>
 </html>

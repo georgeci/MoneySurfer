@@ -1,0 +1,199 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>MoneySurfer Coverage Report > ConfigResolution</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.georgeci.moneysurfer.appconfig</a>
+</div>
+
+<h1>Coverage Summary for Class: ConfigResolution (com.georgeci.moneysurfer.appconfig)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">ConfigResolution</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (17/17)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.appconfig
+&nbsp;
+&nbsp;import com.georgeci.moneysurfer.domain.preferences.Pref
+&nbsp;import kotlinx.coroutines.flow.Flow
+&nbsp;
+&nbsp;/**
+&nbsp; * The configuration engine: resolves every value from ordered layers.
+&nbsp; *
+&nbsp; * Infrastructure, not API. Features never see it — they inject typed domain facades
+&nbsp; * (`UiPreferences`, `SyncSettings`, `HostCapabilities`, `DebugConfigInspector`), and `Config` is
+&nbsp; * injected only into those facade implementations, never into a ViewModel. The fence is the
+&nbsp; * dependency graph: feature modules have no `app-config` on its classpath.
+&nbsp; */
+&nbsp;interface Config {
+&nbsp;
+&nbsp;    /** First non-absent layer, re-resolved whenever any layer changes. Falls back to `key.default`. */
+&nbsp;    fun &lt;T : Any&gt; observe(key: ConfigKey&lt;T&gt;): Flow&lt;T&gt;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Synchronous resolution. Requires [hydrate] to have completed: called earlier it resolves the
+&nbsp;     * Build layer and defaults only, and throws in debug builds so the ordering mistake is not
+&nbsp;     * silently shipped.
+&nbsp;     */
+&nbsp;    fun &lt;T : Any&gt; snapshot(key: ConfigKey&lt;T&gt;): T
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Read/write handle for a user setting. Takes [SettingKey] only, so writing to a host- or
+&nbsp;     * server-owned flag fails to compile.
+&nbsp;     */
+&nbsp;    fun &lt;T : Any&gt; handle(key: SettingKey&lt;T&gt;): Pref&lt;T&gt;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Per-layer detail for the debug panel. Layers stay honest here — nothing is clamped, including
+&nbsp;     * a RemoteGlobal value the `remoteOverridable` opt-in refuses: it is reported as held and simply
+&nbsp;     * never wins.
+&nbsp;     */
+&nbsp;    fun &lt;T : Any&gt; resolve(key: ConfigKey&lt;T&gt;): ConfigResolution&lt;T&gt;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Emits once with the current state, then again whenever any layer changes.
+&nbsp;     *
+&nbsp;     * For consumers that re-resolve *many* keys at once — the debug panel — where per-key
+&nbsp;     * [observe] would need one subscription each and would dedupe away the ticks it needs.
+&nbsp;     */
+&nbsp;    val changes: Flow&lt;Unit&gt;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Warms every layer&#39;s in-memory mirror. Awaited once at startup, before the first
+&nbsp;     * [snapshot]. Idempotent.
+&nbsp;     *
+&nbsp;     * Never throws: a layer whose store cannot be read is skipped and named in [degradedLayers],
+&nbsp;     * because this runs before a start route exists and a failure here would otherwise take the
+&nbsp;     * whole app down with it.
+&nbsp;     */
+&nbsp;    suspend fun hydrate()
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Layers [hydrate] could not warm. Empty on the happy path.
+&nbsp;     *
+&nbsp;     * A degraded layer resolves as absent, so values fall through to the layers below and finally to
+&nbsp;     * `key.default` — correct, but not necessarily current. Kept observable so the debug panel can
+&nbsp;     * distinguish &quot;this layer holds nothing&quot; from &quot;this layer could not be read&quot;; the mirror refills
+&nbsp;     * on its own once the store is readable again.
+&nbsp;     */
+&nbsp;    val degradedLayers: Set&lt;ConfigLayer&gt;
+&nbsp;}
+&nbsp;
+<b class="fc">&nbsp;data class ConfigResolution&lt;T : Any&gt;(</b>
+<b class="fc">&nbsp;    val value: T,</b>
+&nbsp;    /** `null` when no layer holds the key and `key.default` won. */
+<b class="fc">&nbsp;    val winner: ConfigLayer?,</b>
+&nbsp;    /**
+&nbsp;     * What each layer holds, not what it was allowed to serve. Absent vs undecodable are distinct —
+&nbsp;     * the panel must show which — and a value present in a layer that did not win was either
+&nbsp;     * outranked or refused by the remote opt-in.
+&nbsp;     */
+<b class="fc">&nbsp;    val perLayer: Map&lt;ConfigLayer, LayerValue&lt;T&gt;&gt;,</b>
+&nbsp;)
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-07-27 15:02</div>
+</div>
+</body>
+</html>

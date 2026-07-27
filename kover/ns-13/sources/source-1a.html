@@ -1,0 +1,473 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>MoneySurfer Coverage Report > WorkspaceInviteDoc</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.georgeci.moneysurfer.data.remote</a>
+</div>
+
+<h1>Coverage Summary for Class: WorkspaceInviteDoc (com.georgeci.moneysurfer.data.remote)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">WorkspaceInviteDoc</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    44.7%
+  </span>
+  <span class="absValue">
+    (34/76)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (12/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    76.1%
+  </span>
+  <span class="absValue">
+    (328/431)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">WorkspaceInviteDoc$Companion</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    44.7%
+  </span>
+  <span class="absValue">
+    (34/76)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (13/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    76.3%
+  </span>
+  <span class="absValue">
+    (332/435)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.remote
+&nbsp;
+&nbsp;import kotlinx.serialization.Serializable
+&nbsp;
+&nbsp;/**
+&nbsp; * Firestore wire-format DTOs. Field names mirror Room entities 1:1 so a Firestore document
+&nbsp; * can round-trip through Kotlin serialization without a custom mapping layer.
+&nbsp; */
+&nbsp;
+&nbsp;@Serializable
+&nbsp;data class UserDoc(
+&nbsp;    val displayName: String? = null,
+&nbsp;    val email: String? = null,
+&nbsp;    val isAnon: Boolean = false,
+&nbsp;    val createdAt: Long = 0L,
+&nbsp;    val workspaceIds: List&lt;String&gt; = emptyList(),
+&nbsp;    val defaultWorkspaceId: String? = null,
+&nbsp;    val invitedWorkspaceIds: List&lt;String&gt; = emptyList(),
+&nbsp;)
+&nbsp;
+&nbsp;/**
+&nbsp; * One synced setting, at `users/{uid}/config/{keyName}`. The document id is the key name, so there
+&nbsp; * is no `key` field — and no nesting: per-key documents are what buy per-key LWW from the existing
+&nbsp; * resolver, where a single map document would have needed a field-level merge the pipeline cannot
+&nbsp; * express.
+&nbsp; *
+&nbsp; * [value] is always a string because that is what `ConfigCodec` emits, which also keeps the
+&nbsp; * write-shape rule trivial. [updatedAt] is client-clock epoch millis matching
+&nbsp; * `config_entry.updatedAt`, so LWW compares like with like.
+&nbsp; */
+&nbsp;@Serializable
+&nbsp;data class UserConfigDoc(
+&nbsp;    val value: String = &quot;&quot;,
+&nbsp;    val updatedAt: Long = 0L,
+&nbsp;    val clientVersionCode: Int = 1,
+&nbsp;)
+&nbsp;
+&nbsp;/**
+&nbsp; * Email→uid mapping for invite recipient discovery. Doc id is the lowercased email.
+&nbsp; * Kept as a separate collection (rather than exposing `users.email` via list rules) so the
+&nbsp; * security rule is a tight `signedIn()` read on a single field with no other PII leakage.
+&nbsp; */
+&nbsp;@Serializable
+&nbsp;data class UserEmailDoc(
+&nbsp;    val uid: String = &quot;&quot;,
+&nbsp;    val updatedAt: Long = 0L,
+&nbsp;)
+&nbsp;
+&nbsp;@Serializable
+&nbsp;data class WorkspaceDoc(
+&nbsp;    val name: String = &quot;&quot;,
+&nbsp;    val description: String = &quot;&quot;,
+&nbsp;    val baseCurrency: String = &quot;&quot;,
+&nbsp;    val ownerId: String = &quot;&quot;,
+&nbsp;    val archived: Boolean = false,
+&nbsp;    val createdAt: Long = 0L,
+&nbsp;    val updatedAt: Long = 0L,
+&nbsp;    val deletedAt: Long? = null,
+&nbsp;    val clientVersionCode: Int = 1,
+&nbsp;)
+&nbsp;
+&nbsp;@Serializable
+&nbsp;data class AccountDoc(
+&nbsp;    val name: String = &quot;&quot;,
+&nbsp;    val type: String = &quot;&quot;,
+&nbsp;    val currency: String = &quot;&quot;,
+&nbsp;    val balance: Long = 0L,
+&nbsp;    val archived: Boolean = false,
+&nbsp;    val updatedAt: Long = 0L,
+&nbsp;    val deletedAt: Long? = null,
+&nbsp;    val clientVersionCode: Int = 1,
+&nbsp;    /**
+&nbsp;     * When the account was archived. Null both for active accounts and for rows written by a
+&nbsp;     * client that predates the field — the manage list falls back to a dateless label either way.
+&nbsp;     */
+&nbsp;    val archivedAt: Long? = null,
+&nbsp;    /**
+&nbsp;     * User-entered key–value details. Empty when written by a client that predates the field;
+&nbsp;     * the reader treats that as &quot;no details&quot; rather than refusing the document.
+&nbsp;     */
+&nbsp;    val extraDetails: List&lt;AccountExtraDetailDoc&gt; = emptyList(),
+&nbsp;    /**
+&nbsp;     * Position in the workspace&#39;s account list, ascending. Zero both for the first account and
+&nbsp;     * for rows written by a client that predates the field — the reader breaks ties by name, so
+&nbsp;     * an un-migrated workspace still lists in a stable order.
+&nbsp;     */
+&nbsp;    val sortOrder: Int = 0,
+&nbsp;)
+&nbsp;
+&nbsp;/**
+&nbsp; * One &quot;Extra details&quot; entry. [key] is either a well-known key name (`IBAN`, `CARD_LAST4`, …) or
+&nbsp; * a label the user typed — see `AccountExtraDetail` in the domain.
+&nbsp; */
+&nbsp;@Serializable
+&nbsp;data class AccountExtraDetailDoc(
+&nbsp;    val key: String = &quot;&quot;,
+&nbsp;    val value: String = &quot;&quot;,
+&nbsp;)
+&nbsp;
+&nbsp;@Serializable
+&nbsp;data class CategoryDoc(
+&nbsp;    val name: String = &quot;&quot;,
+&nbsp;    val type: String = &quot;&quot;,
+&nbsp;    val parentId: String? = null,
+&nbsp;    val createdAt: Long = 0L,
+&nbsp;    val updatedAt: Long = 0L,
+&nbsp;    val deletedAt: Long? = null,
+&nbsp;    val clientVersionCode: Int = 1,
+&nbsp;    /** System kind marker (e.g. &quot;TRANSFER&quot;) for built-in categories. Null for user categories. */
+&nbsp;    val systemKind: String? = null,
+&nbsp;    /**
+&nbsp;     * Semantic icon key. Empty when written by a client that predates the field; the reader
+&nbsp;     * resolves that back to the deterministic default rather than rendering nothing.
+&nbsp;     */
+&nbsp;    val iconKey: String = &quot;&quot;,
+&nbsp;    /** Hue in degrees, 0 until 360. `-1` is the same &quot;not written&quot; sentinel as a blank [iconKey]. */
+&nbsp;    val hue: Int = -1,
+&nbsp;)
+&nbsp;
+&nbsp;@Serializable
+&nbsp;data class TransactionDoc(
+&nbsp;    val accountId: String = &quot;&quot;,
+&nbsp;    val categoryId: String? = null,
+&nbsp;    val amount: Long = 0L,
+&nbsp;    val currencyCode: String = &quot;&quot;,
+&nbsp;    val note: String = &quot;&quot;,
+&nbsp;    val merchant: String = &quot;&quot;,
+&nbsp;    /**
+&nbsp;     * A real list on the wire even though Room stores it as a CSV column — same split as
+&nbsp;     * [BudgetDoc.categoryIds], and the mapper converts on the entity↔wire boundary.
+&nbsp;     */
+&nbsp;    val tags: List&lt;String&gt; = emptyList(),
+&nbsp;    val operationAt: Long = 0L,
+&nbsp;    val operationDate: String = &quot;&quot;,
+&nbsp;    val type: String = &quot;&quot;,
+&nbsp;    val status: String = &quot;ACTUAL&quot;,
+&nbsp;    val createdAt: Long = 0L,
+&nbsp;    val updatedAt: Long = 0L,
+&nbsp;    val deletedAt: Long? = null,
+&nbsp;    val clientVersionCode: Int = 1,
+&nbsp;    /** Shared id linking the two legs of a transfer. Null for non-transfer rows. */
+&nbsp;    val transferId: String? = null,
+&nbsp;    /** Rule that generated this row. Null for manual entries. */
+&nbsp;    val recurringRuleId: String? = null,
+&nbsp;)
+&nbsp;
+&nbsp;/**
+&nbsp; * Budget doc lives at `workspaces/{wid}/budgets/{bid}`.
+&nbsp; *
+&nbsp; * `categoryIds` is a real list on the wire even though Room stores it as a CSV column —
+&nbsp; * a list is the natural Firestore shape and the mapper converts. An empty list means
+&nbsp; * &quot;every expense category&quot;.
+&nbsp; */
+&nbsp;@Serializable
+&nbsp;data class BudgetDoc(
+&nbsp;    val name: String = &quot;&quot;,
+&nbsp;    val categoryIds: List&lt;String&gt; = emptyList(),
+&nbsp;    val amount: Long = 0L,
+&nbsp;    val period: String = &quot;&quot;,
+&nbsp;    /** ISO-8601 local date (`yyyy-MM-dd`) the period anchoring counts from. */
+&nbsp;    val startDate: String = &quot;&quot;,
+&nbsp;    val alertPercent: Int = 0,
+&nbsp;    val isActive: Boolean = true,
+&nbsp;    val rollover: Boolean = false,
+&nbsp;    val createdAt: Long = 0L,
+&nbsp;    val updatedAt: Long = 0L,
+&nbsp;    val deletedAt: Long? = null,
+&nbsp;    val clientVersionCode: Int = 1,
+&nbsp;)
+&nbsp;
+&nbsp;/**
+&nbsp; * Recurring-rule doc at `workspaces/{wid}/recurringRules/{rid}`.
+&nbsp; *
+&nbsp; * The rule must replicate because [TransactionDoc.recurringRuleId] points at it: on a device
+&nbsp; * that never created the rule the link would otherwise dangle and the cadence could not be
+&nbsp; * rendered (issue #269).
+&nbsp; *
+&nbsp; * The schedule is flattened to match the Room columns one-to-one, except that
+&nbsp; * `daysOfWeek` / `daysOfMonth` are real lists on the wire where Room keeps CSV columns —
+&nbsp; * the same entity↔wire conversion [BudgetDoc.categoryIds] makes.
+&nbsp; */
+&nbsp;@Serializable
+&nbsp;data class RecurringRuleDoc(
+&nbsp;    val title: String = &quot;&quot;,
+&nbsp;    val amount: Long = 0L,
+&nbsp;    val categoryId: String = &quot;&quot;,
+&nbsp;    val scheduleFrequency: String = &quot;&quot;,
+&nbsp;    val scheduleInterval: Int = 1,
+&nbsp;    /** [kotlinx.datetime.DayOfWeek] names, e.g. `[&quot;MONDAY&quot;]`. Empty for non-weekly schedules. */
+&nbsp;    val scheduleDaysOfWeek: List&lt;String&gt; = emptyList(),
+&nbsp;    /** Days of month, 1..31. Empty for non-monthly schedules. */
+&nbsp;    val scheduleDaysOfMonth: List&lt;Int&gt; = emptyList(),
+&nbsp;    val scheduleMissingDayPolicy: String = &quot;&quot;,
+&nbsp;    /** ISO-8601 local date (`yyyy-MM-dd`) the schedule anchors from. */
+&nbsp;    val startDate: String = &quot;&quot;,
+&nbsp;    val nextRunAt: Long? = null,
+&nbsp;    val autoCreate: Boolean = true,
+&nbsp;    val isActive: Boolean = true,
+&nbsp;    val createdAt: Long = 0L,
+&nbsp;    val updatedAt: Long = 0L,
+&nbsp;    val deletedAt: Long? = null,
+&nbsp;    val clientVersionCode: Int = 1,
+&nbsp;)
+&nbsp;
+&nbsp;/**
+&nbsp; * Savings goal doc at `workspaces/{wid}/goals/{gid}`.
+&nbsp; *
+&nbsp; * There is no `current` / `saved` field by design — the amount saved is always
+&nbsp; * `SUM(goalContributions.amount)` for the goal, so no wire field can drift.
+&nbsp; */
+&nbsp;@Serializable
+&nbsp;data class GoalDoc(
+&nbsp;    val title: String = &quot;&quot;,
+&nbsp;    val emoji: String = &quot;&quot;,
+&nbsp;    val hue: Int = 0,
+&nbsp;    val target: Long = 0L,
+&nbsp;    val currencyCode: String = &quot;&quot;,
+&nbsp;    val startDate: String = &quot;&quot;,
+&nbsp;    val targetDate: String? = null,
+&nbsp;    val accountId: String? = null,
+&nbsp;    val status: String = &quot;ACTIVE&quot;,
+&nbsp;    val createdAt: Long = 0L,
+&nbsp;    val updatedAt: Long = 0L,
+&nbsp;    val deletedAt: Long? = null,
+&nbsp;    val clientVersionCode: Int = 1,
+&nbsp;)
+&nbsp;
+&nbsp;/**
+&nbsp; * Contribution doc at `workspaces/{wid}/goalContributions/{cid}`.
+&nbsp; *
+&nbsp; * A flat workspace-level collection rather than a sub-collection of the goal:
+&nbsp; * the pull path reads workspace sub-collections by cursor, and nesting a level
+&nbsp; * deeper would need a collection-group query and a second cursor.
+&nbsp; */
+&nbsp;@Serializable
+&nbsp;data class GoalContributionDoc(
+&nbsp;    val goalId: String = &quot;&quot;,
+&nbsp;    /** Signed minor units — negative is a withdrawal. */
+&nbsp;    val amount: Long = 0L,
+&nbsp;    val occurredOn: String = &quot;&quot;,
+&nbsp;    val note: String = &quot;&quot;,
+&nbsp;    /** Always null in v1 — reserved for the money-backed model. */
+&nbsp;    val transferId: String? = null,
+&nbsp;    val createdAt: Long = 0L,
+&nbsp;    val updatedAt: Long = 0L,
+&nbsp;    val deletedAt: Long? = null,
+&nbsp;    val clientVersionCode: Int = 1,
+&nbsp;)
+&nbsp;
+&nbsp;/**
+&nbsp; * Member doc lives at `workspaces/{wid}/members/{uid}`. Doc id = userId.
+&nbsp; *
+&nbsp; * Soft-delete via `status` (`ACTIVE` / `LEFT` / `REMOVED`) — `deletedAt` is kept for
+&nbsp; * back-compat with old docs and as a tombstone fallback for clients pulling members.
+&nbsp; */
+&nbsp;@Serializable
+&nbsp;data class WorkspaceMemberDoc(
+&nbsp;    val userId: String = &quot;&quot;,
+&nbsp;    val role: String = &quot;&quot;,
+&nbsp;    val status: String = &quot;ACTIVE&quot;,
+&nbsp;    val displayName: String = &quot;&quot;,
+&nbsp;    val email: String? = null,
+&nbsp;    val addedByUserId: String? = null,
+&nbsp;    val createdAt: Long = 0L,
+&nbsp;    val updatedAt: Long = 0L,
+&nbsp;    val leftAt: Long? = null,
+&nbsp;    val removedAt: Long? = null,
+&nbsp;    val deletedAt: Long? = null,
+&nbsp;    val clientVersionCode: Int = 1,
+&nbsp;    // Id of the owner-issued invite this member row was created from. Firestore rules
+&nbsp;    // require it on self-create so they can verify an invite in this workspace admits
+&nbsp;    // the caller (tenant-isolation gate, issue #152). Stamped by WorkspaceMemberSyncPlugin
+&nbsp;    // at push time from the local invite; null for owner-created rows (owner path in the
+&nbsp;    // rules does not need it) and absent on legacy docs.
+&nbsp;    val inviteId: String? = null,
+&nbsp;)
+&nbsp;
+&nbsp;/**
+&nbsp; * Invite doc lives at `workspaces/{wid}/invites/{inviteId}`. Doc id = invite UUID.
+&nbsp; */
+<b class="pc">&nbsp;@Serializable</b>
+&nbsp;data class WorkspaceInviteDoc(
+<b class="fc">&nbsp;    val email: String = &quot;&quot;,</b>
+<b class="fc">&nbsp;    val targetUserId: String? = null,</b>
+<b class="fc">&nbsp;    val role: String = &quot;&quot;,</b>
+<b class="fc">&nbsp;    val status: String = &quot;PENDING&quot;,</b>
+<b class="fc">&nbsp;    val invitedByUserId: String = &quot;&quot;,</b>
+<b class="fc">&nbsp;    val createdAt: Long = 0L,</b>
+<b class="fc">&nbsp;    val updatedAt: Long = 0L,</b>
+<b class="fc">&nbsp;    val expiresAt: Long = 0L,</b>
+<b class="fc">&nbsp;    val respondedAt: Long? = null,</b>
+<b class="fc">&nbsp;    val deletedAt: Long? = null,</b>
+<b class="fc">&nbsp;    val clientVersionCode: Int = 1,</b>
+&nbsp;)
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-07-27 15:02</div>
+</div>
+</body>
+</html>

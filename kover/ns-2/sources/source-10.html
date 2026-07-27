@@ -1,0 +1,174 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>MoneySurfer Coverage Report > HostConfigKeys</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.georgeci.moneysurfer.appconfig</a>
+</div>
+
+<h1>Coverage Summary for Class: HostConfigKeys (com.georgeci.moneysurfer.appconfig)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">HostConfigKeys</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (8/8)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (13/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (97/97)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.appconfig
+&nbsp;
+&nbsp;/**
+&nbsp; * Host-declared facts, replacing the `OfflineBuildFlags` / `SignInFeatureConfig` /
+&nbsp; * `TransactionCreationFeatureConfig` / `SyncFeatureFlag` data classes and their per-host Koin
+&nbsp; * bindings.
+&nbsp; *
+&nbsp; * These are the one group of keys that is **public**: each host has to enumerate them when it
+&nbsp; * declares its Build layer. Features still cannot reach them — the fence is the dependency graph,
+&nbsp; * not visibility.
+&nbsp; *
+&nbsp; * None of them is `remoteOverridable`. Host wiring must stay host-owned: a server able to flip
+&nbsp; * `host.is_offline` would put the online build on the offline start-route branch while its DI
+&nbsp; * graph stays fully online, which is exactly the property the per-host bindings existed to
+&nbsp; * protect.
+&nbsp; *
+&nbsp; * The declared [ConfigKey.default] is the *online* value in every case, so a host that forgets a
+&nbsp; * key degrades to the fuller surface rather than to a silently crippled one — except
+&nbsp; * [syncEnabled], where the fuller surface is the dangerous one.
+&nbsp; */
+&nbsp;object HostConfigKeys {
+&nbsp;
+&nbsp;    /** `true` in the Firebase-free offline host. Gates profile, sync, members, invites, logout. */
+<b class="fc">&nbsp;    val isOffline: ConfigKey&lt;Boolean&gt; = ConfigKey.bool(&quot;host.is_offline&quot;, default = false)</b>
+&nbsp;
+<b class="fc">&nbsp;    val signInEmailPassword: ConfigKey&lt;Boolean&gt; = ConfigKey.bool(&quot;host.sign_in_email_password&quot;, default = true)</b>
+&nbsp;
+<b class="fc">&nbsp;    val signInAnonymous: ConfigKey&lt;Boolean&gt; = ConfigKey.bool(&quot;host.sign_in_anonymous&quot;, default = true)</b>
+&nbsp;
+<b class="fc">&nbsp;    val signInDemo: ConfigKey&lt;Boolean&gt; = ConfigKey.bool(&quot;host.sign_in_demo&quot;, default = true)</b>
+&nbsp;
+&nbsp;    /** Multi-account transfers — out of scope for the offline MVP. */
+<b class="fc">&nbsp;    val transferEnabled: ConfigKey&lt;Boolean&gt; = ConfigKey.bool(&quot;host.transfer_enabled&quot;, default = true)</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Build-owned term of `SyncSettings.isEnabled`: `true` in the online host since issue #342,
+&nbsp;     * `false` in the offline one, which has no Firebase to sync against at all.
+&nbsp;     *
+&nbsp;     * Lives here rather than next to the other sync keys because hosts have to declare it, and it
+&nbsp;     * is the one key whose default is *not* the online value: a host that forgets to declare it
+&nbsp;     * must land on &quot;no sync&quot; rather than have the engine switch sync on behind its back.
+&nbsp;     */
+<b class="fc">&nbsp;    val syncEnabled: ConfigKey&lt;Boolean&gt; = ConfigKey.bool(&quot;host.sync_enabled&quot;, default = false)</b>
+&nbsp;
+<b class="fc">&nbsp;    val all: List&lt;ConfigKey&lt;*&gt;&gt; = listOf(</b>
+<b class="fc">&nbsp;        isOffline,</b>
+<b class="fc">&nbsp;        signInEmailPassword,</b>
+<b class="fc">&nbsp;        signInAnonymous,</b>
+<b class="fc">&nbsp;        signInDemo,</b>
+<b class="fc">&nbsp;        transferEnabled,</b>
+<b class="fc">&nbsp;        syncEnabled,</b>
+&nbsp;    )
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-07-27 15:02</div>
+</div>
+</body>
+</html>

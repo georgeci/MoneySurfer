@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > OperationDateBackfillMigrationKt</title>
+  <title>MoneySurfer Coverage Report > DataStoreFactory_androidKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,15 +19,18 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.data.db.migration</a>
+    <a href="../index.html">com.georgeci.moneysurfer.data.datastore</a>
 </div>
 
-<h1>Coverage Summary for Class: OperationDateBackfillMigrationKt (com.georgeci.moneysurfer.data.db.migration)</h1>
+<h1>Coverage Summary for Class: DataStoreFactory_androidKt (com.georgeci.moneysurfer.data.datastore)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -46,89 +49,42 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">OperationDateBackfillMigrationKt</td>
+  <td class="name">DataStoreFactory_androidKt</td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (1/1)
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
   </span>
 </td>
     <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (1/1)
+    (0/2)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (6/6)
+    (0/14)
   </span>
 </td>
 </tr>
-  <tr>
-    <td class="name">OperationDateBackfillMigrationKt$MIGRATION_27_28$1</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (2/2)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (3/3)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (7/7)
-  </span>
-</td>
-  </tr>
-<tr>
-  <td class="name"><strong>Total</strong></td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (3/3)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (4/4)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (13/13)
-  </span>
-</td>
-</tr>
+
 </table>
 
 <br/>
@@ -136,36 +92,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.db.migration
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.datastore
 &nbsp;
-&nbsp;import androidx.room.migration.Migration
-&nbsp;import androidx.sqlite.SQLiteConnection
-&nbsp;import androidx.sqlite.execSQL
+&nbsp;import android.content.Context
+&nbsp;import androidx.datastore.core.DataStore
+&nbsp;import androidx.datastore.preferences.core.Preferences
 &nbsp;
-&nbsp;/**
-&nbsp; * v27 → v28: fill in `transactions.operationDate` for rows written before the column existed.
-&nbsp; *
-&nbsp; * The column was added with a `&#39;&#39;` default, and readers have been papering over that ever since —
-&nbsp; * `resolveLegacyOperationDate` derives the date from `operationAt` whenever the stored text is
-&nbsp; * unparseable. That works for a full-table read, but the transactions list now filters on the
-&nbsp; * column in SQL, and `&#39;&#39; &gt;= &#39;2026-07-01&#39;` is false: every legacy row would silently vanish from
-&nbsp; * every date window.
-&nbsp; *
-&nbsp; * The derivation is UTC on purpose — `date(unixepoch)` matches `resolveLegacyOperationDate`&#39;s
-&nbsp; * `TimeZone.UTC` exactly, so a backfilled row keeps the date the app has been showing for it
-&nbsp; * rather than shifting by a day.
-&nbsp; */
-<b class="fc">&nbsp;val MIGRATION_27_28: Migration = object : Migration(27, 28) {</b>
-&nbsp;    override fun migrate(connection: SQLiteConnection) {
-<b class="fc">&nbsp;        connection.execSQL(</b>
-&nbsp;            &quot;&quot;&quot;
-&nbsp;            UPDATE `transactions`
-&nbsp;            SET `operationDate` = date(`operationAt` / 1000, &#39;unixepoch&#39;)
-&nbsp;            WHERE `operationDate` = &#39;&#39;
-<b class="fc">&nbsp;            &quot;&quot;&quot;.trimIndent(),</b>
-&nbsp;        )
-&nbsp;    }
-&nbsp;}
+<b class="nc">&nbsp;fun createDataStore(context: Context): DataStore&lt;Preferences&gt; = createDataStore(</b>
+<b class="nc">&nbsp;    producePath = { context.filesDir.resolve(DATASTORE_FILE_NAME).absolutePath },</b>
+&nbsp;)
 </code>
 </pre>
 </div>
@@ -189,7 +124,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-23 23:54</div>
+    <div style="float:right;">generated on 2026-07-27 15:02</div>
 </div>
 </body>
 </html>

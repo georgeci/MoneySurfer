@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > CategoryMonthlyTotalEntity</title>
+  <title>MoneySurfer Coverage Report > DebugConfigSourceFactory_androidKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.data.db.entity</a>
+    <a href="../index.html">com.georgeci.moneysurfer.data.config</a>
 </div>
 
-<h1>Coverage Summary for Class: CategoryMonthlyTotalEntity (com.georgeci.moneysurfer.data.db.entity)</h1>
+<h1>Coverage Summary for Class: DebugConfigSourceFactory_androidKt (com.georgeci.moneysurfer.data.config)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">CategoryMonthlyTotalEntity</td>
+  <td class="name">DebugConfigSourceFactory_androidKt</td>
 <td class="coverageStat">
   <span class="percent">
     0%
@@ -63,16 +63,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/5)
+    (0/3)
   </span>
 </td>
 <td class="coverageStat">
@@ -80,7 +71,23 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/22)
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/31)
   </span>
 </td>
 </tr>
@@ -92,24 +99,42 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.db.entity
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.config
 &nbsp;
-&nbsp;import androidx.room.ColumnInfo
+&nbsp;import android.content.Context
+&nbsp;import android.content.pm.ApplicationInfo
+&nbsp;import com.georgeci.moneysurfer.appconfig.DebugConfigSource
+&nbsp;import com.georgeci.moneysurfer.data.datastore.createReplaceOnCorruptionDataStore
+&nbsp;import kotlinx.coroutines.CoroutineScope
 &nbsp;
 &nbsp;/**
-&nbsp; * Projection returned by the per-month category aggregate query. Not a table — Room maps a
-&nbsp; * `GROUP BY` result onto it, so there is no `@Entity` and no schema footprint.
+&nbsp; * Debug layer for Android. Release APKs get [DebugConfigSource.Empty] — the layer stays in the
+&nbsp; * chain and always resolves absent.
 &nbsp; *
-&nbsp; * [month] is an ISO `YYYY-MM` string, sliced straight out of `operationDate`. Slicing beats
-&nbsp; * re-deriving the month from `operationAt` because `operationDate` is the business date the
-&nbsp; * user assigned the transaction to — the same date budgets count it under.
+&nbsp; * The signature takes a [Context] rather than being an `expect`/`actual` pair, because that is what
+&nbsp; * Android needs both for the debuggable check and for `filesDir`; iOS and the JVM need nothing.
+&nbsp; * `sharedPlatformModule` already resolves a `Context` on Android, so this is one call per platform
+&nbsp; * in a file that already exists per platform.
 &nbsp; */
-<b class="nc">&nbsp;data class CategoryMonthlyTotalEntity(</b>
-<b class="nc">&nbsp;    @ColumnInfo(name = &quot;categoryId&quot;) val categoryId: String,</b>
-<b class="nc">&nbsp;    @ColumnInfo(name = &quot;month&quot;) val month: String,</b>
-<b class="nc">&nbsp;    @ColumnInfo(name = &quot;totalMinor&quot;) val totalMinor: Long,</b>
-<b class="nc">&nbsp;    @ColumnInfo(name = &quot;transactionCount&quot;) val transactionCount: Int,</b>
-&nbsp;)
+&nbsp;fun createDebugConfigSource(context: Context, scope: CoroutineScope): DebugConfigSource =
+<b class="nc">&nbsp;    if (context.isDebuggable()) {</b>
+<b class="nc">&nbsp;        DebugConfigSourceImpl(</b>
+<b class="nc">&nbsp;            createReplaceOnCorruptionDataStore(</b>
+<b class="nc">&nbsp;                producePath = { context.filesDir.resolve(DEBUG_OVERRIDES_FILE_NAME).absolutePath },</b>
+&nbsp;            ),
+<b class="nc">&nbsp;            scope,</b>
+&nbsp;        )
+&nbsp;    } else {
+<b class="nc">&nbsp;        DebugConfigSource.Empty</b>
+&nbsp;    }
+&nbsp;
+&nbsp;/**
+&nbsp; * `BuildConfig.DEBUG` belongs to whichever Gradle module it is generated in, and this is a library
+&nbsp; * module — the installed application&#39;s own `FLAG_DEBUGGABLE` is the signal that actually tracks the
+&nbsp; * APK the user is running.
+&nbsp; */
+&nbsp;private fun Context.isDebuggable(): Boolean =
+<b class="nc">&nbsp;    applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE != 0</b>
 </code>
 </pre>
 </div>
@@ -133,7 +158,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-23 23:54</div>
+    <div style="float:right;">generated on 2026-07-27 15:02</div>
 </div>
 </body>
 </html>

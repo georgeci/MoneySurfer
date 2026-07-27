@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > UploadProgress</title>
+  <title>MoneySurfer Coverage Report > DashboardWidgetType</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.domain.sync</a>
+    <a href="../index.html">com.georgeci.moneysurfer.domain.dashboard</a>
 </div>
 
-<h1>Coverage Summary for Class: UploadProgress (com.georgeci.moneysurfer.domain.sync)</h1>
+<h1>Coverage Summary for Class: DashboardWidgetType (com.georgeci.moneysurfer.domain.dashboard)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">UploadProgress</td>
+  <td class="name">DashboardWidgetType</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -80,7 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (17/17)
+    (30/30)
   </span>
 </td>
 </tr>
@@ -92,34 +92,20 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.sync
-&nbsp;
-&nbsp;import com.georgeci.moneysurfer.sync.api.SyncCancelToken
-&nbsp;import com.georgeci.moneysurfer.sync.api.SyncResult
-&nbsp;import com.georgeci.moneysurfer.sync.api.SyncScope
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.dashboard
 &nbsp;
 &nbsp;/**
-&nbsp; * Pushes pending mutations from the outbox to the remote backend.
-&nbsp; *
-&nbsp; * Implementations must classify SDK exceptions into [com.georgeci.moneysurfer.sync.api.SyncError]
-&nbsp; * and return them via `Either.Left` — never throw typed errors out of here.
-&nbsp; * See SyncCoordinatorFAQ.md №11, §4.2.
+&nbsp; * Registry of the widgets the dashboard can render. The dashboard screen has a renderer for every
+&nbsp; * entry here, so adding a widget is a two-step change: add the constant, then handle it in the
+&nbsp; * screen&#39;s `when`. Entries are also the persistence keys of a saved layout — renaming one drops
+&nbsp; * that widget from layouts already stored on device, so prefer adding over renaming.
 &nbsp; */
-&nbsp;interface UploadPendingChangesUseCase {
-&nbsp;    suspend operator fun invoke(
-&nbsp;        scope: SyncScope,
-&nbsp;        onProgress: suspend (UploadProgress) -&gt; Unit,
-&nbsp;        cancelToken: SyncCancelToken,
-&nbsp;    ): SyncResult&lt;UploadSummary&gt;
+&nbsp;enum class DashboardWidgetType {
+<b class="fc">&nbsp;    Balance,</b>
+<b class="fc">&nbsp;    Accounts,</b>
+<b class="fc">&nbsp;    Goals,</b>
+<b class="fc">&nbsp;    RecentTransactions,</b>
 &nbsp;}
-&nbsp;
-<b class="fc">&nbsp;data class UploadProgress(</b>
-<b class="fc">&nbsp;    val entityType: String,</b>
-<b class="fc">&nbsp;    val current: Int,</b>
-<b class="fc">&nbsp;    val total: Int,</b>
-&nbsp;)
-&nbsp;
-&nbsp;data class UploadSummary(val uploadedCount: Int)
 </code>
 </pre>
 </div>
@@ -143,7 +129,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 16:22</div>
+    <div style="float:right;">generated on 2026-07-27 15:02</div>
 </div>
 </body>
 </html>

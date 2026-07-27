@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > CategorizedTransactionEntity</title>
+  <title>MoneySurfer Coverage Report > CurrencyCodeCodec</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.data.db.entity</a>
+    <a href="../index.html">com.georgeci.moneysurfer.data.config</a>
 </div>
 
-<h1>Coverage Summary for Class: CategorizedTransactionEntity (com.georgeci.moneysurfer.data.db.entity)</h1>
+<h1>Coverage Summary for Class: CurrencyCodeCodec (com.georgeci.moneysurfer.data.config)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">CategorizedTransactionEntity</td>
+  <td class="name">CurrencyCodeCodec</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -63,16 +63,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (1/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (18/18)
+    (3/3)
   </span>
 </td>
 <td class="coverageStat">
@@ -80,7 +71,23 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (94/94)
+    (10/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (52/52)
   </span>
 </td>
 </tr>
@@ -92,30 +99,99 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.db.entity
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.config
 &nbsp;
-&nbsp;import androidx.room.ColumnInfo
+&nbsp;import com.georgeci.moneysurfer.appconfig.ConfigCodec
+&nbsp;import com.georgeci.moneysurfer.appconfig.ConfigValueKind
+&nbsp;import com.georgeci.moneysurfer.data.preferences.DashboardLayoutCodec
+&nbsp;import com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutConfig
+&nbsp;import com.georgeci.moneysurfer.domain.preferences.AccentSeed
+&nbsp;import com.georgeci.moneysurfer.domain.preferences.PaletteSource
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
 &nbsp;
-&nbsp;data class CategorizedTransactionEntity(
-<b class="fc">&nbsp;    @ColumnInfo(name = &quot;id&quot;) val id: String,</b>
-<b class="fc">&nbsp;    @ColumnInfo(name = &quot;workspaceId&quot;) val workspaceId: String,</b>
-<b class="fc">&nbsp;    @ColumnInfo(name = &quot;accountId&quot;) val accountId: String,</b>
-<b class="fc">&nbsp;    @ColumnInfo(name = &quot;amount&quot;) val amount: Long,</b>
-<b class="fc">&nbsp;    @ColumnInfo(name = &quot;currencyCode&quot;) val currencyCode: String,</b>
-<b class="fc">&nbsp;    @ColumnInfo(name = &quot;categoryId&quot;) val categoryId: String?,</b>
-<b class="fc">&nbsp;    @ColumnInfo(name = &quot;categoryName&quot;) val categoryName: String?,</b>
-<b class="fc">&nbsp;    @ColumnInfo(name = &quot;note&quot;) val note: String,</b>
-<b class="fc">&nbsp;    @ColumnInfo(name = &quot;merchant&quot;) val merchant: String,</b>
-<b class="fc">&nbsp;    @ColumnInfo(name = &quot;tags&quot;) val tags: String,</b>
-<b class="fc">&nbsp;    @ColumnInfo(name = &quot;operationAt&quot;) val operationAt: Long,</b>
-<b class="fc">&nbsp;    @ColumnInfo(name = &quot;operationDate&quot;) val operationDate: String,</b>
-<b class="fc">&nbsp;    @ColumnInfo(name = &quot;type&quot;) val type: String,</b>
-<b class="fc">&nbsp;    @ColumnInfo(name = &quot;status&quot;) val status: String,</b>
-<b class="fc">&nbsp;    @ColumnInfo(name = &quot;createdAt&quot;) val createdAt: Long,</b>
-<b class="fc">&nbsp;    @ColumnInfo(name = &quot;updatedAt&quot;) val updatedAt: Long,</b>
-<b class="fc">&nbsp;    @ColumnInfo(name = &quot;transferId&quot;) val transferId: String? = null,</b>
-<b class="fc">&nbsp;    @ColumnInfo(name = &quot;recurringRuleId&quot;) val recurringRuleId: String? = null,</b>
-&nbsp;)
+&nbsp;/**
+&nbsp; * Wire format, unchanged from the previous hand-rolled adapters:
+&nbsp; *  - `BRAND`
+&nbsp; *  - `PRESET:&lt;seedName&gt;`, e.g. `PRESET:Plum`
+&nbsp; *  - `DYNAMIC`
+&nbsp; *
+&nbsp; * Anything else — including a `PRESET:` with an unknown seed — is undecodable rather than silently
+&nbsp; * `Brand`, so a value written by a newer build falls through to the layer below instead of
+&nbsp; * overwriting the user&#39;s choice with a default.
+&nbsp; */
+&nbsp;internal object PaletteSourceCodec : ConfigCodec&lt;PaletteSource&gt; {
+&nbsp;
+&nbsp;    private const val BRAND = &quot;BRAND&quot;
+&nbsp;    private const val DYNAMIC = &quot;DYNAMIC&quot;
+&nbsp;    private const val PRESET_PREFIX = &quot;PRESET:&quot;
+&nbsp;
+&nbsp;    override fun encode(value: PaletteSource): String = when (value) {
+&nbsp;        PaletteSource.Brand -&gt; BRAND
+&nbsp;        PaletteSource.Dynamic -&gt; DYNAMIC
+&nbsp;        is PaletteSource.Preset -&gt; PRESET_PREFIX + value.seed.name
+&nbsp;    }
+&nbsp;
+&nbsp;    override fun decode(raw: String): PaletteSource? = when {
+&nbsp;        raw == BRAND -&gt; PaletteSource.Brand
+&nbsp;        raw == DYNAMIC -&gt; PaletteSource.Dynamic
+&nbsp;        raw.startsWith(PRESET_PREFIX) -&gt; decodePreset(raw.removePrefix(PRESET_PREFIX))
+&nbsp;        else -&gt; null
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun decodePreset(seedName: String): PaletteSource? =
+&nbsp;        AccentSeed.entries.firstOrNull { it.name == seedName }?.let(PaletteSource::Preset)
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Enumerated rather than free text: `PRESET:&lt;seed&gt;` is exactly the format that makes typing a
+&nbsp;     * raw override a routine way to fail, so the debug panel gets a picker instead of a text field.
+&nbsp;     */
+&nbsp;    override val valueKind: ConfigValueKind = ConfigValueKind.Choice(
+&nbsp;        listOf(BRAND, DYNAMIC) + AccentSeed.entries.map { PRESET_PREFIX + it.name },
+&nbsp;    )
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * Delegates to the existing flat layout encoding, through the nullable entry point.
+&nbsp; *
+&nbsp; * `DashboardLayoutCodec.decode` substitutes the default layout for anything it cannot parse, which
+&nbsp; * is the right behaviour for a direct read but wrong here: a value the engine cannot decode has to
+&nbsp; * be reported as undecodable so the layer loses and the panel can show the raw string. A decoded
+&nbsp; * default would win and look deliberate.
+&nbsp; */
+&nbsp;internal object DashboardLayoutConfigCodec : ConfigCodec&lt;DashboardLayoutConfig&gt; {
+&nbsp;
+&nbsp;    override fun encode(value: DashboardLayoutConfig): String = DashboardLayoutCodec.encode(value)
+&nbsp;
+&nbsp;    override fun decode(raw: String): DashboardLayoutConfig? = DashboardLayoutCodec.decodeOrNull(raw)
+&nbsp;
+&nbsp;    override val valueKind: ConfigValueKind = ConfigValueKind.FreeText
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * Bare ISO-4217 alphabetic code, e.g. `EUR`.
+&nbsp; *
+&nbsp; * Free text rather than a choice: the currency catalogue is data, not a compile-time enum, so the
+&nbsp; * codec cannot list the accepted values. It still validates the *shape* — three A–Z letters —
+&nbsp; * because a `CurrencyCode` is used unchecked as a formatter key, and reporting garbage as
+&nbsp; * undecodable lets the layer below win instead of persisting a code nothing can render.
+&nbsp; *
+&nbsp; * The shape is checked *after* upcasing, and against A–Z rather than `Char.isLetter`. Both matter,
+&nbsp; * because the debug panel writes this key as free text: `Char.isLetter` is Unicode-wide and would
+&nbsp; * accept `руб`, and `&quot;aßc&quot;` is three letters that upcase to the four-character `ASSC` — a value
+&nbsp; * this codec would have produced and then refused to decode on the next read, losing the setting.
+&nbsp; */
+&nbsp;internal object CurrencyCodeCodec : ConfigCodec&lt;CurrencyCode&gt; {
+&nbsp;
+&nbsp;    private const val ISO_4217_LENGTH = 3
+&nbsp;
+<b class="fc">&nbsp;    override fun encode(value: CurrencyCode): String = value.value</b>
+&nbsp;
+<b class="fc">&nbsp;    override fun decode(raw: String): CurrencyCode? = raw.trim().uppercase()</b>
+<b class="fc">&nbsp;        .takeIf { it.length == ISO_4217_LENGTH &amp;&amp; it.all { char -&gt; char in &#39;A&#39;..&#39;Z&#39; } }</b>
+<b class="fc">&nbsp;        ?.let(::CurrencyCode)</b>
+&nbsp;
+<b class="fc">&nbsp;    override val valueKind: ConfigValueKind = ConfigValueKind.FreeText</b>
+&nbsp;}
 </code>
 </pre>
 </div>
@@ -139,7 +215,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-23 23:54</div>
+    <div style="float:right;">generated on 2026-07-27 15:02</div>
 </div>
 </body>
 </html>

@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SyncMetaRepository</title>
+  <title>MoneySurfer Coverage Report > BudgetEditTestTags</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.sync.repository</a>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.budget.edit</a>
 </div>
 
-<h1>Coverage Summary for Class: SyncMetaRepository (com.georgeci.moneysurfer.sync.repository)</h1>
+<h1>Coverage Summary for Class: BudgetEditTestTags (com.georgeci.moneysurfer.feature.budget.edit)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SyncMetaRepository</td>
+  <td class="name">BudgetEditTestTags</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -44,40 +44,273 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.sync.repository
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.budget.edit
 &nbsp;
-&nbsp;import kotlinx.coroutines.flow.Flow
-&nbsp;import kotlin.time.Instant
+&nbsp;import androidx.compose.foundation.layout.Arrangement
+&nbsp;import androidx.compose.foundation.layout.Column
+&nbsp;import androidx.compose.foundation.layout.Row
+&nbsp;import androidx.compose.foundation.layout.fillMaxSize
+&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
+&nbsp;import androidx.compose.foundation.layout.padding
+&nbsp;import androidx.compose.foundation.rememberScrollState
+&nbsp;import androidx.compose.foundation.text.KeyboardOptions
+&nbsp;import androidx.compose.foundation.verticalScroll
+&nbsp;import androidx.compose.material3.OutlinedTextField
+&nbsp;import androidx.compose.material3.Scaffold
+&nbsp;import androidx.compose.material3.Switch
+&nbsp;import androidx.compose.material3.Text
+&nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.runtime.getValue
+&nbsp;import androidx.compose.ui.Alignment
+&nbsp;import androidx.compose.ui.Modifier
+&nbsp;import androidx.compose.ui.platform.testTag
+&nbsp;import androidx.compose.ui.text.input.KeyboardType
+&nbsp;import androidx.compose.ui.tooling.preview.Preview
+&nbsp;import androidx.lifecycle.compose.collectAsStateWithLifecycle
+&nbsp;import com.georgeci.moneysurfer.domain.model.BudgetPeriod
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.BudgetId
+&nbsp;import com.georgeci.moneysurfer.feature.budget.budgetPeriodLabel
+&nbsp;import com.georgeci.moneysurfer.feature.budget.formatShortDate
+&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferCategoryPalette
+&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferSectionLabel
+&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferSegmentedControl
+&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
+&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferToolbarButtonAction
+&nbsp;import com.georgeci.moneysurfer.uikit.components.budget.SurferCategoryChip
+&nbsp;import com.georgeci.moneysurfer.uikit.components.budget.SurferCategoryChipGrid
+&nbsp;import com.georgeci.moneysurfer.uikit.components.budget.SurferPercentStepper
+&nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
+&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
+&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
+&nbsp;import com.georgeci.moneysurfer.utils.AmountInputTransformation
+&nbsp;import com.georgeci.moneysurfer.utils.HandleSideEffect
+&nbsp;import moneysurfer.feature.budget.generated.resources.Res
+&nbsp;import moneysurfer.feature.budget.generated.resources.budget_edit_alert_decrease
+&nbsp;import moneysurfer.feature.budget.generated.resources.budget_edit_alert_increase
+&nbsp;import moneysurfer.feature.budget.generated.resources.budget_edit_alert_label
+&nbsp;import moneysurfer.feature.budget.generated.resources.budget_edit_amount_label
+&nbsp;import moneysurfer.feature.budget.generated.resources.budget_edit_amount_required
+&nbsp;import moneysurfer.feature.budget.generated.resources.budget_edit_categories_hint
+&nbsp;import moneysurfer.feature.budget.generated.resources.budget_edit_categories_label
+&nbsp;import moneysurfer.feature.budget.generated.resources.budget_edit_name_label
+&nbsp;import moneysurfer.feature.budget.generated.resources.budget_edit_name_required
+&nbsp;import moneysurfer.feature.budget.generated.resources.budget_edit_period_label
+&nbsp;import moneysurfer.feature.budget.generated.resources.budget_edit_rollover_label
+&nbsp;import moneysurfer.feature.budget.generated.resources.budget_edit_rollover_supporting
+&nbsp;import moneysurfer.feature.budget.generated.resources.budget_edit_save
+&nbsp;import moneysurfer.feature.budget.generated.resources.budget_edit_start_date_label
+&nbsp;import moneysurfer.feature.budget.generated.resources.budget_edit_title_create
+&nbsp;import moneysurfer.feature.budget.generated.resources.budget_edit_title_edit
+&nbsp;import moneysurfer.feature.budget.generated.resources.budgets_all_categories
+&nbsp;import org.jetbrains.compose.resources.stringResource
+&nbsp;import org.koin.compose.viewmodel.koinViewModel
+&nbsp;import org.koin.core.parameter.parametersOf
 &nbsp;
-&nbsp;/**
-&nbsp; * Per-(scopeKey, collection) sync metadata.
-&nbsp; *
-&nbsp; * - [cursor] — `lastPulledAt` value used as `WHERE updatedAt &gt; cursor` filter
-&nbsp; *   in the next pull. Updated only when remote rows are successfully written
-&nbsp; *   to local Room within the same transaction.
-&nbsp; * - [lastSyncSuccessAt] / [lastSyncAttemptAt] — timestamps for the UI badge.
-&nbsp; *
-&nbsp; * [scopeKey] is typically a workspace id string. [collection] is an opaque
-&nbsp; * Firestore collection name string (e.g. &quot;accounts&quot;, &quot;transactions&quot;).
-&nbsp; *
-&nbsp; * See SyncCoordinatorFAQ.md №14, sync.md §4.3.
-&nbsp; */
-&nbsp;interface SyncMetaRepository {
-&nbsp;    suspend fun cursor(scopeKey: String, collection: String): Instant?
-&nbsp;    suspend fun setCursor(scopeKey: String, collection: String, cursor: Instant)
-&nbsp;    suspend fun markAttempt(scopeKey: String, collection: String, at: Instant)
-&nbsp;    suspend fun markSuccess(scopeKey: String, collection: String, at: Instant)
-&nbsp;    suspend fun clearScope(scopeKey: String)
-&nbsp;    fun observe(scopeKey: String): Flow&lt;List&lt;SyncMeta&gt;&gt;
+&nbsp;/** Stable selectors for the budget create/edit screen — see docs/testing/testing-strategy.md. */
+&nbsp;object BudgetEditTestTags {
+&nbsp;    const val Root = &quot;budgetEdit:root&quot;
+&nbsp;    const val NameField = &quot;budgetEdit:name&quot;
+&nbsp;    const val AmountField = &quot;budgetEdit:amount&quot;
+&nbsp;    const val SaveButton = &quot;budgetEdit:save&quot;
 &nbsp;}
 &nbsp;
-&nbsp;data class SyncMeta(
-&nbsp;    val scopeKey: String,
-&nbsp;    val collection: String,
-&nbsp;    val lastPulledAt: Instant?,
-&nbsp;    val lastSyncSuccessAt: Instant?,
-&nbsp;    val lastSyncAttemptAt: Instant?,
-&nbsp;)
+&nbsp;@Composable
+&nbsp;fun BudgetEditScreen(
+&nbsp;    budgetId: BudgetId? = null,
+&nbsp;    onNavigateBack: () -&gt; Unit,
+&nbsp;    viewModel: BudgetEditViewModel = koinViewModel(
+&nbsp;        key = budgetId?.value ?: &quot;new&quot;,
+&nbsp;    ) { parametersOf(budgetId) },
+&nbsp;) {
+&nbsp;    val state by viewModel.collectAsStateWithLifecycle()
+&nbsp;
+&nbsp;    viewModel.HandleSideEffect { effect -&gt;
+&nbsp;        when (effect) {
+&nbsp;            BudgetEditEffect.NavigateBack -&gt; onNavigateBack()
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    BudgetEditContent(
+&nbsp;        state = state,
+&nbsp;        isEditing = budgetId != null,
+&nbsp;        onEvent = viewModel::onEvent,
+&nbsp;    )
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun BudgetEditContent(
+&nbsp;    state: BudgetEditState,
+&nbsp;    isEditing: Boolean,
+&nbsp;    onEvent: (BudgetEditEvent) -&gt; Unit,
+&nbsp;) {
+&nbsp;    Scaffold(
+&nbsp;        modifier = Modifier
+&nbsp;            .surferSafeInsets()
+&nbsp;            .testTag(BudgetEditTestTags.Root)
+&nbsp;            .surferTestTagAsId(),
+&nbsp;        containerColor = AppTheme.materialColors.surface,
+&nbsp;        topBar = {
+&nbsp;            SurferToolbar(
+&nbsp;                title = stringResource(
+&nbsp;                    if (isEditing) Res.string.budget_edit_title_edit else Res.string.budget_edit_title_create,
+&nbsp;                ),
+&nbsp;                onBack = { onEvent(BudgetEditEvent.OnBackClick) },
+&nbsp;                actions = {
+&nbsp;                    SurferToolbarButtonAction(
+&nbsp;                        icon = SurferIcons.Check,
+&nbsp;                        text = stringResource(Res.string.budget_edit_save),
+&nbsp;                        onClick = { onEvent(BudgetEditEvent.OnSaveClick) },
+&nbsp;                        enabled = state.canSave,
+&nbsp;                        modifier = Modifier
+&nbsp;                            .testTag(BudgetEditTestTags.SaveButton),
+&nbsp;                    )
+&nbsp;                },
+&nbsp;            )
+&nbsp;        },
+&nbsp;    ) { padding -&gt;
+&nbsp;        Column(
+&nbsp;            modifier = Modifier
+&nbsp;                .fillMaxSize()
+&nbsp;                .padding(padding)
+&nbsp;                .verticalScroll(rememberScrollState())
+&nbsp;                .padding(horizontal = AppTheme.spacing.default, vertical = AppTheme.spacing.medium),
+&nbsp;            verticalArrangement = Arrangement.spacedBy(AppTheme.spacing.default),
+&nbsp;        ) {
+&nbsp;            OutlinedTextField(
+&nbsp;                value = state.name,
+&nbsp;                onValueChange = { onEvent(BudgetEditEvent.OnNameChanged(it)) },
+&nbsp;                label = { Text(stringResource(Res.string.budget_edit_name_label)) },
+&nbsp;                isError = state.nameMissing,
+&nbsp;                supportingText = if (state.nameMissing) {
+&nbsp;                    { Text(stringResource(Res.string.budget_edit_name_required)) }
+&nbsp;                } else {
+&nbsp;                    null
+&nbsp;                },
+&nbsp;                singleLine = true,
+&nbsp;                modifier = Modifier
+&nbsp;                    .fillMaxWidth()
+&nbsp;                    .testTag(BudgetEditTestTags.NameField),
+&nbsp;            )
+&nbsp;
+&nbsp;            OutlinedTextField(
+&nbsp;                value = state.amount,
+&nbsp;                onValueChange = { input -&gt;
+&nbsp;                    AmountInputTransformation.validateAndNormalize(input)?.let {
+&nbsp;                        onEvent(BudgetEditEvent.OnAmountChanged(it))
+&nbsp;                    }
+&nbsp;                },
+&nbsp;                label = { Text(stringResource(Res.string.budget_edit_amount_label)) },
+&nbsp;                isError = state.amountMissing,
+&nbsp;                supportingText = if (state.amountMissing) {
+&nbsp;                    { Text(stringResource(Res.string.budget_edit_amount_required)) }
+&nbsp;                } else {
+&nbsp;                    null
+&nbsp;                },
+&nbsp;                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+&nbsp;                singleLine = true,
+&nbsp;                modifier = Modifier
+&nbsp;                    .fillMaxWidth()
+&nbsp;                    .testTag(BudgetEditTestTags.AmountField),
+&nbsp;            )
+&nbsp;
+&nbsp;            SurferSectionLabel(stringResource(Res.string.budget_edit_period_label))
+&nbsp;            SurferSegmentedControl(
+&nbsp;                options = BudgetPeriod.entries,
+&nbsp;                selected = state.period,
+&nbsp;                label = { budgetPeriodLabel(it) },
+&nbsp;                onSelect = { onEvent(BudgetEditEvent.OnPeriodChanged(it)) },
+&nbsp;            )
+&nbsp;
+&nbsp;            Row(verticalAlignment = Alignment.CenterVertically) {
+&nbsp;                Text(
+&nbsp;                    text = stringResource(Res.string.budget_edit_start_date_label),
+&nbsp;                    style = AppTheme.typography.bodyMedium,
+&nbsp;                    color = AppTheme.materialColors.onSurfaceVariant,
+&nbsp;                    modifier = Modifier.weight(1f),
+&nbsp;                )
+&nbsp;                Text(
+&nbsp;                    text = formatShortDate(state.startDate),
+&nbsp;                    style = AppTheme.typography.bodyLarge,
+&nbsp;                    color = AppTheme.materialColors.onSurface,
+&nbsp;                )
+&nbsp;            }
+&nbsp;
+&nbsp;            SurferSectionLabel(stringResource(Res.string.budget_edit_categories_label))
+&nbsp;            SurferCategoryChipGrid(
+&nbsp;                categories = state.categoryOptions.map { category -&gt;
+&nbsp;                    val visual = SurferCategoryPalette.visualFor(
+&nbsp;                        id = category.id,
+&nbsp;                        iconKey = category.iconKey,
+&nbsp;                        hue = category.hue,
+&nbsp;                        systemKind = category.systemKind,
+&nbsp;                    )
+&nbsp;                    SurferCategoryChip(
+&nbsp;                        id = category.id,
+&nbsp;                        name = category.name,
+&nbsp;                        icon = visual.icon,
+&nbsp;                        tint = visual.tint,
+&nbsp;                    )
+&nbsp;                },
+&nbsp;                selectedIds = state.selectedCategoryIds,
+&nbsp;                allCategoriesLabel = stringResource(Res.string.budgets_all_categories),
+&nbsp;                onToggle = { onEvent(BudgetEditEvent.OnCategoryToggled(it)) },
+&nbsp;                onSelectAllCategories = { onEvent(BudgetEditEvent.OnAllCategoriesSelected) },
+&nbsp;            )
+&nbsp;            Text(
+&nbsp;                text = stringResource(Res.string.budget_edit_categories_hint),
+&nbsp;                style = AppTheme.typography.bodySmall,
+&nbsp;                color = AppTheme.materialColors.onSurfaceVariant,
+&nbsp;            )
+&nbsp;
+&nbsp;            Row(verticalAlignment = Alignment.CenterVertically) {
+&nbsp;                Text(
+&nbsp;                    text = stringResource(Res.string.budget_edit_alert_label),
+&nbsp;                    style = AppTheme.typography.bodyMedium,
+&nbsp;                    color = AppTheme.materialColors.onSurfaceVariant,
+&nbsp;                    modifier = Modifier.weight(1f),
+&nbsp;                )
+&nbsp;                SurferPercentStepper(
+&nbsp;                    value = state.alertPercent,
+&nbsp;                    onValueChange = { onEvent(BudgetEditEvent.OnAlertPercentChanged(it)) },
+&nbsp;                    decreaseContentDescription = stringResource(Res.string.budget_edit_alert_decrease),
+&nbsp;                    increaseContentDescription = stringResource(Res.string.budget_edit_alert_increase),
+&nbsp;                )
+&nbsp;            }
+&nbsp;
+&nbsp;            Row(verticalAlignment = Alignment.CenterVertically) {
+&nbsp;                Column(modifier = Modifier.weight(1f)) {
+&nbsp;                    Text(
+&nbsp;                        text = stringResource(Res.string.budget_edit_rollover_label),
+&nbsp;                        style = AppTheme.typography.bodyLarge,
+&nbsp;                        color = AppTheme.materialColors.onSurface,
+&nbsp;                    )
+&nbsp;                    Text(
+&nbsp;                        text = stringResource(Res.string.budget_edit_rollover_supporting),
+&nbsp;                        style = AppTheme.typography.bodySmall,
+&nbsp;                        color = AppTheme.materialColors.onSurfaceVariant,
+&nbsp;                    )
+&nbsp;                }
+&nbsp;                Switch(
+&nbsp;                    checked = state.rollover,
+&nbsp;                    onCheckedChange = { onEvent(BudgetEditEvent.OnRolloverChanged(it)) },
+&nbsp;                )
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Preview
+&nbsp;@Composable
+&nbsp;private fun BudgetEditContentPreview() {
+&nbsp;    AppTheme {
+&nbsp;        BudgetEditContent(
+&nbsp;            state = BudgetEditState(name = &quot;Groceries&quot;, amount = &quot;400&quot;),
+&nbsp;            isEditing = false,
+&nbsp;            onEvent = {},
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
 </code>
 </pre>
 </div>
@@ -101,7 +334,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 17:13</div>
+    <div style="float:right;">generated on 2026-07-27 15:02</div>
 </div>
 </body>
 </html>

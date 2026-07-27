@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SessionPointers</title>
+  <title>MoneySurfer Coverage Report > ExchangeRateApiConfig</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,24 +19,92 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.domain.auth</a>
+    <a href="../index.html">com.georgeci.moneysurfer.data.remote</a>
 </div>
 
-<h1>Coverage Summary for Class: SessionPointers (com.georgeci.moneysurfer.domain.auth)</h1>
+<h1>Coverage Summary for Class: ExchangeRateApiConfig (com.georgeci.moneysurfer.data.remote)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
 <th class="coverageStat 
 ">
+  Method, %
+</th>
+<th class="coverageStat 
+">
   Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
 </th>
 </tr>
 <tr>
-  <td class="name">SessionPointers</td>
+  <td class="name">ExchangeRateApiConfig</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
     <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
 </tr>
-
+  <tr>
+    <td class="name">ExchangeRateApiConfig$Companion</td>
+    <td class="coverageStat"/>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+</tr>
 </table>
 
 <br/>
@@ -44,39 +112,66 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.auth
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.remote
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.preferences.Pref
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.UserId
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
+&nbsp;import com.georgeci.moneysurfer.domain.model.ExchangeRateTable
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
+&nbsp;import kotlinx.serialization.SerialName
+&nbsp;import kotlinx.serialization.Serializable
+&nbsp;import kotlin.time.Instant
 &nbsp;
 &nbsp;/**
-&nbsp; * Session-scoped pointers persisted in DataStore. See CLAUDE.md §&quot;Session pointers in DataStore&quot;
-&nbsp; * and sync.md §2.11 for the demo-flag semantics.
+&nbsp; * Where the FX quotes come from.
 &nbsp; *
-&nbsp; * - [currentUserId] — local user id; set for every flow including demo. Drives &quot;is anyone
-&nbsp; *   signed in&quot; logic.
-&nbsp; * - [currentWorkspaceId] — active workspace; drives per-workspace queries (`Get*UseCase`).
-&nbsp; * - [currentFirebaseUid] — Firebase auth uid; non-null only for Firebase-backed sessions.
-&nbsp; *   Used by `CreateWorkspaceUseCase` to decide whether to push to Firestore.
-&nbsp; * - [hasUsedDemo] — sticky flag set by `DemoLoginUseCase`, consumed by `WipeDemoDataUseCase`
-&nbsp; *   on real login/signup so demo rows never leak into the real account&#39;s outbox.
-&nbsp; * - [currencyChosen] — sticky flag, `true` by default. The offline first-run seed flips it to
-&nbsp; *   `false` after auto-creating a workspace with a locale-derived currency, so `AppLaunchViewModel`
-&nbsp; *   routes to the currency picker before Dashboard. The picker flips it back to `true` on confirm
-&nbsp; *   *or* on skip, so a relaunch does not show the picker again.
-&nbsp; * - [onboardingSkipped] — sticky flag, `false` by default. Set to `true` when the user taps
-&nbsp; *   &quot;Skip&quot; on the first-run currency picker (keeping the locale-derived seed default). Settings
-&nbsp; *   shows a &quot;Finish setup&quot; entry while this is `true`; confirming the picker clears it.
+&nbsp; * Default is ExchangeRate-API&#39;s *open* endpoint (`open.er-api.com`): free, no API key, no
+&nbsp; * registration, ~160 currencies, refreshed daily. Its free tier asks for attribution wherever the
+&nbsp; * rates are shown, which the dashboard&#39;s &quot;as of&quot; footnote carries.
+&nbsp; *
+&nbsp; * Bound in `RemoteDataModule` so the URL is one override away — swapping providers means replacing
+&nbsp; * this binding and [ExchangeRateLatestDto], nothing above the data layer.
 &nbsp; */
-&nbsp;interface SessionPointers {
-&nbsp;    val currentUserId: Pref&lt;UserId?&gt;
-&nbsp;    val currentWorkspaceId: Pref&lt;WorkspaceId?&gt;
-&nbsp;    val currentFirebaseUid: Pref&lt;String?&gt;
-&nbsp;    val hasUsedDemo: Pref&lt;Boolean&gt;
-&nbsp;    val currencyChosen: Pref&lt;Boolean&gt;
-&nbsp;    val onboardingSkipped: Pref&lt;Boolean&gt;
+&nbsp;data class ExchangeRateApiConfig(
+<b class="nc">&nbsp;    val baseUrl: String = DEFAULT_BASE_URL,</b>
+&nbsp;) {
+&nbsp;    /** `…/v6/latest/USD` — the base currency is a path segment, so nothing needs URL-encoding. */
+<b class="nc">&nbsp;    fun latestUrl(base: CurrencyCode): String = &quot;$baseUrl/${base.value}&quot;</b>
+&nbsp;
+&nbsp;    companion object {
+&nbsp;        const val DEFAULT_BASE_URL: String = &quot;https://open.er-api.com/v6/latest&quot;
+&nbsp;    }
 &nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * The subset of the provider&#39;s payload that matters. Unknown fields (`provider`, `terms_of_use`,
+&nbsp; * `time_next_update_*`, …) are ignored by the decoder rather than modelled.
+&nbsp; */
+&nbsp;@Serializable
+&nbsp;internal data class ExchangeRateLatestDto(
+&nbsp;    val result: String = &quot;&quot;,
+&nbsp;    @SerialName(&quot;base_code&quot;) val baseCode: String = &quot;&quot;,
+&nbsp;    @SerialName(&quot;time_last_update_unix&quot;) val timeLastUpdateUnix: Long = 0L,
+&nbsp;    val rates: Map&lt;String, Double&gt; = emptyMap(),
+&nbsp;)
+&nbsp;
+&nbsp;/**
+&nbsp; * Maps the payload to the domain table, or `null` when it is not usable: a non-success `result`,
+&nbsp; * an empty quote set, a base that is not the one asked for (a redirect or a provider fallback), or
+&nbsp; * a missing publication timestamp — all of which would otherwise cache a table the UI would
+&nbsp; * mislabel.
+&nbsp; */
+&nbsp;internal fun ExchangeRateLatestDto.toDomain(requested: CurrencyCode): ExchangeRateTable? {
+&nbsp;    if (result != RESULT_SUCCESS || rates.isEmpty() || timeLastUpdateUnix &lt;= 0L) return null
+&nbsp;    if (!baseCode.equals(requested.value, ignoreCase = true)) return null
+&nbsp;    return ExchangeRateTable(
+&nbsp;        baseCurrency = requested,
+&nbsp;        rates = rates
+&nbsp;            .filterValues { it.isFinite() &amp;&amp; it &gt; 0.0 }
+&nbsp;            .mapKeys { (code, _) -&gt; CurrencyCode(code.uppercase()) },
+&nbsp;        asOf = Instant.fromEpochSeconds(timeLastUpdateUnix),
+&nbsp;    )
+&nbsp;}
+&nbsp;
+&nbsp;private const val RESULT_SUCCESS = &quot;success&quot;
 </code>
 </pre>
 </div>
@@ -100,7 +195,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 16:22</div>
+    <div style="float:right;">generated on 2026-07-27 15:02</div>
 </div>
 </body>
 </html>

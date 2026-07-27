@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SessionShutdownGateImpl</title>
+  <title>MoneySurfer Coverage Report > CategoryCreationEffect</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,18 +19,15 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.sync.internal</a>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.category.creation</a>
 </div>
 
-<h1>Coverage Summary for Class: SessionShutdownGateImpl (com.georgeci.moneysurfer.sync.internal)</h1>
+<h1>Coverage Summary for Class: CategoryCreationEffect (com.georgeci.moneysurfer.feature.category.creation)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
-<th class="coverageStat 
-">
-  Class, %
-</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -48,8 +45,17 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   Instruction, %
 </th>
 </tr>
-<tr>
-  <td class="name">SessionShutdownGateImpl</td>
+  <tr>
+    <td class="name">CategoryCreationEffect$NavigateBack</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -66,13 +72,24 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     (2/2)
   </span>
 </td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
     <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
     100%
   </span>
   <span class="absValue">
-    (5/5)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
@@ -80,11 +97,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (15/15)
+    (2/2)
   </span>
 </td>
 </tr>
-
 </table>
 
 <br/>
@@ -92,33 +108,281 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.sync.internal
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.category.creation
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.repositories.SessionShutdownGate
-&nbsp;import com.georgeci.moneysurfer.sync.coordinator.SyncCoordinator
-&nbsp;import com.georgeci.moneysurfer.sync.scheduler.BackgroundSyncScheduler
-&nbsp;import org.koin.core.annotation.Single
+&nbsp;import com.georgeci.moneysurfer.domain.auth.SessionPointers
+&nbsp;import com.georgeci.moneysurfer.domain.model.Category
+&nbsp;import com.georgeci.moneysurfer.domain.model.CategoryAppearance
+&nbsp;import com.georgeci.moneysurfer.domain.model.CategoryCapCoverage
+&nbsp;import com.georgeci.moneysurfer.domain.model.CategoryTree
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryType
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.CategoryRepository
+&nbsp;import com.georgeci.moneysurfer.domain.usecase.CategoryCapUseCase
+&nbsp;import com.georgeci.moneysurfer.domain.usecase.CreateCategoryUseCase
+&nbsp;import com.georgeci.moneysurfer.domain.usecase.EditCategoryUseCase
+&nbsp;import com.georgeci.moneysurfer.domain.usecase.GetCategoriesUseCase
+&nbsp;import com.georgeci.moneysurfer.domain.usecase.GetCurrentTimeUseCase
+&nbsp;import com.georgeci.moneysurfer.navigation.SnackbarController
+&nbsp;import com.georgeci.moneysurfer.utils.MviViewModel
+&nbsp;import kotlinx.coroutines.flow.first
+&nbsp;import moneysurfer.feature.category.generated.resources.Res
+&nbsp;import moneysurfer.feature.category.generated.resources.category_creation_created_snackbar
+&nbsp;import moneysurfer.feature.category.generated.resources.category_creation_updated_snackbar
+&nbsp;import org.koin.core.annotation.KoinViewModel
 &nbsp;
-&nbsp;/**
-&nbsp; * Order matters:
-&nbsp; * 1. Cancel queued / running sync first so no in-flight push/pull races
-&nbsp; *    with the upcoming local data wipe.
-&nbsp; * 2. Cancel background schedules so they don&#39;t fire after wipe and re-upload
-&nbsp; *    nothing or hit `AuthRequired` because the session is gone.
-&nbsp; *
-&nbsp; * Both [SyncCoordinator.cancelAll] and [BackgroundSyncScheduler.cancelAll]
-&nbsp; * are idempotent — safe to call multiple times.
-&nbsp; */
-<b class="fc">&nbsp;@Single(binds = [SessionShutdownGate::class])</b>
-&nbsp;class SessionShutdownGateImpl(
-<b class="fc">&nbsp;    private val coordinator: SyncCoordinator,</b>
-<b class="fc">&nbsp;    private val scheduler: BackgroundSyncScheduler,</b>
-&nbsp;) : SessionShutdownGate {
+&nbsp;/** Local UI model for the category type toggle. The domain `Category` model does not yet carry
+&nbsp; *  an income flag — this is kept as UI-only state for now. */
+&nbsp;enum class CategoryTypeUi { Expense, Income }
 &nbsp;
-&nbsp;    override suspend fun shutdown() {
-<b class="fc">&nbsp;        coordinator.cancelAll()</b>
-<b class="fc">&nbsp;        scheduler.cancelAll()</b>
+&nbsp;@KoinViewModel
+&nbsp;class CategoryCreationViewModel(
+&nbsp;    private val categoryId: CategoryId?,
+&nbsp;    private val createCategory: CreateCategoryUseCase,
+&nbsp;    private val editCategory: EditCategoryUseCase,
+&nbsp;    private val categoryRepository: CategoryRepository,
+&nbsp;    private val getCategories: GetCategoriesUseCase,
+&nbsp;    private val categoryCap: CategoryCapUseCase,
+&nbsp;    private val session: SessionPointers,
+&nbsp;    private val getCurrentTime: GetCurrentTimeUseCase,
+&nbsp;    private val snackbar: SnackbarController,
+&nbsp;) : MviViewModel&lt;CategoryCreationState, CategoryCreationEvent, CategoryCreationEffect&gt;(
+&nbsp;    initialState = CategoryCreationState(),
+&nbsp;) {
+&nbsp;
+&nbsp;    init {
+&nbsp;        if (categoryId != null) loadCategory(categoryId)
+&nbsp;        observeParentOptions()
+&nbsp;        observeCapCoverage()
 &nbsp;    }
+&nbsp;
+&nbsp;    override fun onEvent(event: CategoryCreationEvent) {
+&nbsp;        when (event) {
+&nbsp;            is CategoryCreationEvent.OnNameChanged -&gt; updateState {
+&nbsp;                copy(
+&nbsp;                    name = event.name.take(CategoryCreationState.NAME_MAX_LENGTH),
+&nbsp;                    nameTouched = true,
+&nbsp;                )
+&nbsp;            }
+&nbsp;            is CategoryCreationEvent.OnTypeChanged -&gt; updateState { withType(event.type) }
+&nbsp;            is CategoryCreationEvent.OnIconSelected -&gt; updateState { copy(iconKey = event.iconKey) }
+&nbsp;            is CategoryCreationEvent.OnColorSelected -&gt; updateState { copy(hue = event.hue) }
+&nbsp;            is CategoryCreationEvent.OnParentSelected -&gt; updateState { copy(parentId = event.parentId) }
+&nbsp;            is CategoryCreationEvent.OnCapChanged -&gt; updateState { copy(cap = event.cap, capTouched = true) }
+&nbsp;            CategoryCreationEvent.OnCancelClick -&gt; postSideEffect(CategoryCreationEffect.NavigateBack)
+&nbsp;            CategoryCreationEvent.OnBackClick -&gt; postSideEffect(CategoryCreationEffect.NavigateBack)
+&nbsp;            CategoryCreationEvent.OnSaveClick -&gt; saveCategory()
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun loadCategory(id: CategoryId) {
+&nbsp;        launch {
+&nbsp;            updateState { copy(isLoading = true) }
+&nbsp;            val category = categoryRepository.getById(id)
+&nbsp;            if (category == null) {
+&nbsp;                updateState { copy(isLoading = false) }
+&nbsp;                return@launch
+&nbsp;            }
+&nbsp;            updateState {
+&nbsp;                copy(
+&nbsp;                    name = category.name,
+&nbsp;                    type = if (category.type == CategoryType.INCOME) CategoryTypeUi.Income else CategoryTypeUi.Expense,
+&nbsp;                    iconKey = category.iconKey,
+&nbsp;                    hue = category.hue,
+&nbsp;                    parentId = category.parentId,
+&nbsp;                    isLoading = false,
+&nbsp;                )
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Keeps the parent picker&#39;s options in step with the type toggle. Recomputing on every
+&nbsp;     * emission also handles the category itself changing under us (a sync pull re-parenting it),
+&nbsp;     * and drops a selected parent that is no longer eligible instead of saving a stale pointer.
+&nbsp;     */
+&nbsp;    private fun observeParentOptions() {
+&nbsp;        launch {
+&nbsp;            getCategories().collect { categories -&gt;
+&nbsp;                updateState { withParentOptions(categories) }
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /** Keeps the monthly-cap control pointed at the budget it speaks for. */
+&nbsp;    private fun observeCapCoverage() {
+&nbsp;        launch {
+&nbsp;            categoryCap.coverageOf(categoryId).collect { coverage -&gt;
+&nbsp;                updateState { withCapCoverage(coverage) }
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun CategoryCreationState.withCapCoverage(coverage: CategoryCapCoverage): CategoryCreationState =
+&nbsp;        when (coverage) {
+&nbsp;            is CategoryCapCoverage.Editable -&gt; copy(
+&nbsp;                capManagedByBudgetName = null,
+&nbsp;                // Seed the field from storage, but never overwrite what the user is typing.
+&nbsp;                cap = if (capTouched) cap else coverage.budget?.amount?.toAmountInput().orEmpty(),
+&nbsp;            )
+&nbsp;            // Read-only: the amount belongs to a budget spanning more than this category, so
+&nbsp;            // showing it in the field would invite the user to edit someone else&#39;s limit.
+&nbsp;            is CategoryCapCoverage.Managed -&gt; copy(capManagedByBudgetName = coverage.budget.name)
+&nbsp;        }
+&nbsp;
+&nbsp;    private fun CategoryCreationState.withType(type: CategoryTypeUi): CategoryCreationState =
+&nbsp;        copy(type = type).withParentOptions(allCategories)
+&nbsp;
+&nbsp;    private fun CategoryCreationState.withParentOptions(categories: List&lt;Category&gt;): CategoryCreationState {
+&nbsp;        val eligible = CategoryTree.eligibleParents(
+&nbsp;            categories = categories,
+&nbsp;            categoryId = categoryId,
+&nbsp;            type = type.toDomain(),
+&nbsp;        )
+&nbsp;        return copy(
+&nbsp;            allCategories = categories,
+&nbsp;            parentOptions = eligible.map { CategoryParentOption(it.id, it.name) },
+&nbsp;            parentId = parentId?.takeIf { selected -&gt; eligible.any { it.id == selected } },
+&nbsp;        )
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun saveCategory() {
+&nbsp;        val state = currentState
+&nbsp;        if (state.name.isBlank()) return
+&nbsp;        launch {
+&nbsp;            updateState { copy(isLoading = true) }
+&nbsp;
+&nbsp;            val trimmedName = state.name.trim()
+&nbsp;            if (categoryId != null) {
+&nbsp;                val existing = categoryRepository.getById(categoryId)
+&nbsp;                if (existing != null) {
+&nbsp;                    val updated = existing.copy(
+&nbsp;                        name = trimmedName,
+&nbsp;                        type = state.type.toDomain(),
+&nbsp;                        iconKey = state.iconKey,
+&nbsp;                        hue = state.hue,
+&nbsp;                        parentId = state.parentId,
+&nbsp;                    )
+&nbsp;                    editCategory(updated)
+&nbsp;                    categoryCap(category = updated, previousName = existing.name, cap = state.capAsMoney)
+&nbsp;                    snackbar.show(Res.string.category_creation_updated_snackbar, listOf(trimmedName))
+&nbsp;                }
+&nbsp;                postSideEffect(CategoryCreationEffect.NavigateBack)
+&nbsp;                return@launch
+&nbsp;            }
+&nbsp;
+&nbsp;            val workspaceId = session.currentWorkspaceId.first()
+&nbsp;            if (workspaceId == null) {
+&nbsp;                updateState { copy(isLoading = false) }
+&nbsp;                return@launch
+&nbsp;            }
+&nbsp;            val created = Category(
+&nbsp;                id = CategoryId.uuid(),
+&nbsp;                workspaceId = workspaceId,
+&nbsp;                name = trimmedName,
+&nbsp;                type = state.type.toDomain(),
+&nbsp;                parentId = state.parentId,
+&nbsp;                createdAt = getCurrentTime(),
+&nbsp;                iconKey = state.iconKey,
+&nbsp;                hue = state.hue,
+&nbsp;            )
+&nbsp;            createCategory(created)
+&nbsp;            categoryCap(category = created, previousName = null, cap = state.capAsMoney)
+&nbsp;            snackbar.show(Res.string.category_creation_created_snackbar, listOf(trimmedName))
+&nbsp;            postSideEffect(CategoryCreationEffect.NavigateBack)
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;private fun CategoryTypeUi.toDomain(): CategoryType =
+&nbsp;    if (this == CategoryTypeUi.Income) CategoryType.INCOME else CategoryType.EXPENSE
+&nbsp;
+&nbsp;private const val MINOR_PER_MAJOR = 100
+&nbsp;private const val DECIMALS = 2
+&nbsp;
+&nbsp;/** Money → the text the cap field shows, in major units with two decimals. */
+&nbsp;private fun Money.toAmountInput(): String {
+&nbsp;    val major = minor / MINOR_PER_MAJOR
+&nbsp;    val cents = (minor % MINOR_PER_MAJOR).toInt()
+&nbsp;    return if (cents == 0) major.toString() else &quot;$major.${cents.toString().padStart(DECIMALS, &#39;0&#39;)}&quot;
+&nbsp;}
+&nbsp;
+&nbsp;/** One row of the parent picker. */
+&nbsp;data class CategoryParentOption(
+&nbsp;    val id: CategoryId,
+&nbsp;    val name: String,
+&nbsp;)
+&nbsp;
+&nbsp;data class CategoryCreationState(
+&nbsp;    val name: String = &quot;&quot;,
+&nbsp;    val type: CategoryTypeUi = CategoryTypeUi.Expense,
+&nbsp;    /** Stored semantic icon key, not a grid index — see `CategoryAppearance`. */
+&nbsp;    val iconKey: String = CategoryAppearance.ICON_KEYS.first(),
+&nbsp;    /** Stored hue in degrees, not a swatch index. */
+&nbsp;    val hue: Int = CategoryAppearance.HUES.first(),
+&nbsp;    val parentId: CategoryId? = null,
+&nbsp;    val parentOptions: List&lt;CategoryParentOption&gt; = emptyList(),
+&nbsp;    /** Raw monthly-cap field text in major units, empty for &quot;no cap&quot;. Backed by a budget, not by
+&nbsp;     *  a field on `Category` — see `CategoryCapCoverage`. */
+&nbsp;    val cap: String = &quot;&quot;,
+&nbsp;    /** Name of the budget that already limits this category alongside others. Non-null puts the
+&nbsp;     *  cap control in its read-only state so the shortcut cannot add a second overlapping limit. */
+&nbsp;    val capManagedByBudgetName: String? = null,
+&nbsp;    val isLoading: Boolean = false,
+&nbsp;    /** Whether the user has edited the name field — gates the required-name inline error
+&nbsp;     *  so a pristine screen doesn&#39;t open covered in red. */
+&nbsp;    val nameTouched: Boolean = false,
+&nbsp;    /** Whether the user has edited the cap field — stops a later budget emission from overwriting
+&nbsp;     *  what they are typing. */
+&nbsp;    internal val capTouched: Boolean = false,
+&nbsp;    /** Last workspace snapshot, kept so the type toggle can re-filter parents without re-querying. */
+&nbsp;    internal val allCategories: List&lt;Category&gt; = emptyList(),
+&nbsp;) {
+&nbsp;    val canSave: Boolean get() = name.isNotBlank() &amp;&amp; !isLoading
+&nbsp;
+&nbsp;    /** Whether to show the required-name inline error: the field was edited and left blank. */
+&nbsp;    val nameMissing: Boolean get() = nameTouched &amp;&amp; name.isBlank()
+&nbsp;
+&nbsp;    /** Whether the name is long enough that the character counter should appear. */
+&nbsp;    val showNameCounter: Boolean get() = name.length &gt;= NAME_COUNTER_THRESHOLD
+&nbsp;
+&nbsp;    /** A budget caps spending, so the control is offered for expense categories only. */
+&nbsp;    val showCap: Boolean get() = type == CategoryTypeUi.Expense
+&nbsp;
+&nbsp;    /** The typed cap as money, or null when the field is empty, unparsable or not positive. */
+&nbsp;    val capAsMoney: Money?
+&nbsp;        get() = cap.toDoubleOrNull()
+&nbsp;            ?.takeIf { it &gt; 0.0 }
+&nbsp;            ?.let(Money::fromDouble)
+&nbsp;
+&nbsp;    companion object {
+&nbsp;        /** Hard cap on the category name — longer input is truncated in the reducer. */
+&nbsp;        const val NAME_MAX_LENGTH = 50
+&nbsp;
+&nbsp;        /** Name length at which the &quot;n/max&quot; character counter becomes visible. */
+&nbsp;        const val NAME_COUNTER_THRESHOLD = 40
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;sealed interface CategoryCreationEvent {
+&nbsp;    data class OnNameChanged(val name: String) : CategoryCreationEvent
+&nbsp;    data class OnTypeChanged(val type: CategoryTypeUi) : CategoryCreationEvent
+&nbsp;    data class OnIconSelected(val iconKey: String) : CategoryCreationEvent
+&nbsp;    data class OnColorSelected(val hue: Int) : CategoryCreationEvent
+&nbsp;
+&nbsp;    /** Null clears the parent, putting the category back at the root. */
+&nbsp;    data class OnParentSelected(val parentId: CategoryId?) : CategoryCreationEvent
+&nbsp;
+&nbsp;    /** Raw cap field text. Empty means &quot;no cap&quot; and clears the backing budget on save. */
+&nbsp;    data class OnCapChanged(val cap: String) : CategoryCreationEvent
+&nbsp;    data object OnCancelClick : CategoryCreationEvent
+&nbsp;    data object OnBackClick : CategoryCreationEvent
+&nbsp;    data object OnSaveClick : CategoryCreationEvent
+&nbsp;}
+&nbsp;
+&nbsp;sealed interface CategoryCreationEffect {
+<b class="fc">&nbsp;    data object NavigateBack : CategoryCreationEffect</b>
 &nbsp;}
 </code>
 </pre>
@@ -143,7 +407,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-23 23:54</div>
+    <div style="float:right;">generated on 2026-07-27 15:02</div>
 </div>
 </body>
 </html>

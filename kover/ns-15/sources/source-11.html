@@ -1,0 +1,654 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>MoneySurfer Coverage Report > WorkspaceUnreadableException</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.georgeci.moneysurfer.data.sync</a>
+</div>
+
+<h1>Coverage Summary for Class: WorkspaceUnreadableException (com.georgeci.moneysurfer.data.sync)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">WorkspaceUnreadableException</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (10/10)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.sync
+&nbsp;
+&nbsp;import arrow.core.raise.Raise
+&nbsp;import arrow.core.raise.either
+&nbsp;import co.touchlab.kermit.Logger
+&nbsp;import com.georgeci.moneysurfer.domain.auth.SessionPointers
+&nbsp;import com.georgeci.moneysurfer.domain.sync.PullProgress
+&nbsp;import com.georgeci.moneysurfer.domain.sync.PullRemoteChangesUseCase
+&nbsp;import com.georgeci.moneysurfer.domain.sync.PullSummary
+&nbsp;import com.georgeci.moneysurfer.sync.api.SyncCancelToken
+&nbsp;import com.georgeci.moneysurfer.sync.api.SyncCollection
+&nbsp;import com.georgeci.moneysurfer.sync.api.SyncError
+&nbsp;import com.georgeci.moneysurfer.sync.api.SyncResult
+&nbsp;import com.georgeci.moneysurfer.sync.api.SyncScope
+&nbsp;import com.georgeci.moneysurfer.sync.plugin.EntityApplyResult
+&nbsp;import com.georgeci.moneysurfer.sync.plugin.PullScope
+&nbsp;import com.georgeci.moneysurfer.sync.plugin.RemoteDocument
+&nbsp;import com.georgeci.moneysurfer.sync.plugin.SyncEntityPlugin
+&nbsp;import com.georgeci.moneysurfer.sync.repository.SyncMetaRepository
+&nbsp;import kotlinx.coroutines.flow.first
+&nbsp;import org.koin.core.annotation.Single
+&nbsp;import kotlin.coroutines.cancellation.CancellationException
+&nbsp;import kotlin.time.Clock
+&nbsp;import kotlin.time.Instant
+&nbsp;
+&nbsp;/**
+&nbsp; * Cursor-based incremental pull. For each workspace in scope and each plugin that exposes a
+&nbsp; * [SyncEntityPlugin.firestoreCollectionName]:
+&nbsp; * 1. read cursor from [SyncMetaRepository]
+&nbsp; * 2. query `WHERE updatedAt &gt; cursor ORDER BY updatedAt LIMIT BATCH` via [WorkspaceCollectionReader]
+&nbsp; * 3. dispatch each doc to the plugin&#39;s [SyncEntityPlugin.applyDoc]
+&nbsp; * 4. advance the cursor to `max(updatedAt)` of the batch
+&nbsp; * 5. repeat from (2) while the batch came back full, so one pull drains the collection instead
+&nbsp; *    of leaving the tail to the next sync cycle
+&nbsp; *
+&nbsp; * Scope determines which workspaces are pulled:
+&nbsp; * - [SyncScope.ActiveWorkspace] → current workspace only (`session.currentWorkspaceId`)
+&nbsp; * - [SyncScope.AllUserData] / [SyncScope.ChangedSinceLastSync] → all workspaces from
+&nbsp; *   [UserWorkspacesProvider] (fetches `users/{uid}.workspaceIds` from remote)
+&nbsp; * - [SyncScope.UploadOnly] → no pull
+&nbsp; *
+&nbsp; * Members and invites are pulled first so membership rows exist before
+&nbsp; * queries that gate on them.
+&nbsp; *
+&nbsp; * Phase 3 (every scope that pulls at all): collections under `users/{uid}` rather than under a
+&nbsp; * workspace — the per-user settings. Cursorless and read whole; it lives in [UserScopedPullPhase],
+&nbsp; * which shares no state with the workspace phases.
+&nbsp; *
+&nbsp; * Phase 2 ([SyncScope.AllUserData] / [SyncScope.ChangedSinceLastSync] only): pulls the
+&nbsp; * `invites` collection from workspaces listed in `users/{uid}.invitedWorkspaceIds` — workspaces
+&nbsp; * the user has been invited to but has not yet joined. This replaces the previous
+&nbsp; * `collectionGroup(&quot;invites&quot;)` approach in [IncomingInviteRemoteRepository].
+&nbsp; *
+&nbsp; * A workspace whose *remote reads* fail is logged and skipped rather than failing the pull: a
+&nbsp; * `users/{uid}.workspaceIds` entry can point at a workspace this user cannot read (a stale ref
+&nbsp; * left behind by an aborted create), and one such entry used to make sign-in impossible for the
+&nbsp; * whole account (issue #342). Plugin failures are a different matter — those are local writes,
+&nbsp; * and they still abort.
+&nbsp; */
+&nbsp;@Single(binds = [PullRemoteChangesUseCase::class])
+&nbsp;class PullRemoteChangesUseCaseImpl(
+&nbsp;    private val collectionReader: WorkspaceCollectionReader,
+&nbsp;    private val userScopedPull: UserScopedPullPhase,
+&nbsp;    private val syncMeta: SyncMetaRepository,
+&nbsp;    private val plugins: List&lt;SyncEntityPlugin&gt;,
+&nbsp;    private val session: SessionPointers,
+&nbsp;    private val userWorkspacesProvider: UserWorkspacesProvider,
+&nbsp;) : PullRemoteChangesUseCase {
+&nbsp;
+&nbsp;    private val log = Logger.withTag(&quot;PullRemoteChanges&quot;)
+&nbsp;
+&nbsp;    override suspend fun invoke(
+&nbsp;        scope: SyncScope,
+&nbsp;        onProgress: suspend (PullProgress) -&gt; Unit,
+&nbsp;        cancelToken: SyncCancelToken,
+&nbsp;    ): SyncResult&lt;PullSummary&gt; = either {
+&nbsp;        val memberWorkspaces = pullMemberWorkspaces(
+&nbsp;            workspaceIds = workspaceIdsForScope(scope),
+&nbsp;            scope = scope,
+&nbsp;            onProgress = onProgress,
+&nbsp;            cancelToken = cancelToken,
+&nbsp;        )
+&nbsp;        val invited = pullInvitedWorkspaces(
+&nbsp;            scope = scope,
+&nbsp;            onProgress = onProgress,
+&nbsp;            cancelToken = cancelToken,
+&nbsp;        )
+&nbsp;        val userScoped = userScopedPull(
+&nbsp;            scope = scope,
+&nbsp;            onProgress = onProgress,
+&nbsp;            cancelToken = cancelToken,
+&nbsp;        ).bind()
+&nbsp;
+&nbsp;        PullSummary(
+&nbsp;            downloadedCount = memberWorkspaces.downloadedCount +
+&nbsp;                invited.downloadedCount +
+&nbsp;                userScoped.downloadedCount,
+&nbsp;            conflictCount = memberWorkspaces.conflictCount +
+&nbsp;                invited.conflictCount +
+&nbsp;                userScoped.conflictCount,
+&nbsp;        )
+&nbsp;    }
+&nbsp;
+&nbsp;    /** Phase 1: every workspace the user is a member of, in [SyncEntityPlugin.pullPriority] order. */
+&nbsp;    private suspend fun Raise&lt;SyncError&gt;.pullMemberWorkspaces(
+&nbsp;        workspaceIds: List&lt;String&gt;,
+&nbsp;        scope: SyncScope,
+&nbsp;        onProgress: suspend (PullProgress) -&gt; Unit,
+&nbsp;        cancelToken: SyncCancelToken,
+&nbsp;    ): PullSummary {
+&nbsp;        var totalDownloaded = 0
+&nbsp;        var totalConflicts = 0
+&nbsp;
+&nbsp;        for (workspaceId in workspaceIds) {
+&nbsp;            val summary = pullWorkspace(
+&nbsp;                workspaceId = workspaceId,
+&nbsp;                scope = scope,
+&nbsp;                onProgress = onProgress,
+&nbsp;                cancelToken = cancelToken,
+&nbsp;            )
+&nbsp;            totalDownloaded += summary.downloadedCount
+&nbsp;            totalConflicts += summary.conflictCount
+&nbsp;        }
+&nbsp;
+&nbsp;        return PullSummary(downloadedCount = totalDownloaded, conflictCount = totalConflicts)
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Runs every in-scope plugin against one workspace. Stops early — keeping whatever already
+&nbsp;     * landed — when the workspace turns out to be unreadable, so a single stale entry in
+&nbsp;     * `users/{uid}.workspaceIds` cannot block sign-in for the whole account.
+&nbsp;     */
+&nbsp;    private suspend fun Raise&lt;SyncError&gt;.pullWorkspace(
+&nbsp;        workspaceId: String,
+&nbsp;        scope: SyncScope,
+&nbsp;        onProgress: suspend (PullProgress) -&gt; Unit,
+&nbsp;        cancelToken: SyncCancelToken,
+&nbsp;    ): PullSummary {
+&nbsp;        var downloadedCount = 0
+&nbsp;        var conflictCount = 0
+&nbsp;
+&nbsp;        for (plugin in pluginsInScope(scope)) {
+&nbsp;            cancelToken.throwIfCancelled()
+&nbsp;            val collectionName = plugin.firestoreCollectionName
+&nbsp;
+&nbsp;            val (downloaded, conflicts) = try {
+&nbsp;                pullOne(
+&nbsp;                    workspaceId = workspaceId,
+&nbsp;                    plugin = plugin,
+&nbsp;                    onProgress = onProgress,
+&nbsp;                    cancelToken = cancelToken,
+&nbsp;                )
+&nbsp;            } catch (cancelled: CancellationException) {
+&nbsp;                throw cancelled
+&nbsp;            } catch (unreadable: WorkspaceUnreadableException) {
+&nbsp;                log.w(throwable = unreadable.cause) {
+&nbsp;                    &quot;[pull] wid=$workspaceId unreadable at &quot; +
+&nbsp;                        &quot;collection=${collectionName ?: &quot;root&quot;} — treating it as a stale &quot; +
+&nbsp;                        &quot;workspaceIds ref and skipping the workspace&quot;
+&nbsp;                }
+&nbsp;                break
+&nbsp;            } catch (
+&nbsp;                @Suppress(&quot;TooGenericExceptionCaught&quot;)
+&nbsp;                failure: Throwable,
+&nbsp;            ) {
+&nbsp;                log.e(throwable = failure) {
+&nbsp;                    &quot;[pull] failed entity=${plugin.entityType} &quot; +
+&nbsp;                        &quot;collection=${collectionName ?: &quot;root&quot;} wid=$workspaceId&quot;
+&nbsp;                }
+&nbsp;                raise(failure.toSyncError())
+&nbsp;            }
+&nbsp;            downloadedCount += downloaded
+&nbsp;            conflictCount += conflicts
+&nbsp;        }
+&nbsp;
+&nbsp;        return PullSummary(downloadedCount = downloadedCount, conflictCount = conflictCount)
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * One plugin against one workspace. A root-doc plugin
+&nbsp;     * ([SyncEntityPlugin.firestoreCollectionName] == null) owns the `workspaces/{wid}` document
+&nbsp;     * itself and is applied directly, which is what guarantees the local `WorkspaceEntity` exists
+&nbsp;     * before subcollection plugins run — `AccountEntity` / `CategoryEntity` / `TransactionEntity`
+&nbsp;     * all carry a Room FK `workspaceId → WorkspaceEntity` (SQLite error 787 otherwise).
+&nbsp;     */
+&nbsp;    private suspend fun pullOne(
+&nbsp;        workspaceId: String,
+&nbsp;        plugin: SyncEntityPlugin,
+&nbsp;        onProgress: suspend (PullProgress) -&gt; Unit,
+&nbsp;        cancelToken: SyncCancelToken,
+&nbsp;    ): Pair&lt;Int, Int&gt; {
+&nbsp;        val collectionName = plugin.firestoreCollectionName
+&nbsp;            ?: run {
+&nbsp;                val doc = readRemote(workspaceId) { collectionReader.fetchWorkspaceDoc(workspaceId) }
+&nbsp;                val applied = doc != null &amp;&amp; plugin.applyDoc(doc, workspaceId).applied
+&nbsp;                return if (applied) 1 to 0 else 0 to 0
+&nbsp;            }
+&nbsp;        return pullCollection(
+&nbsp;            workspaceId = workspaceId,
+&nbsp;            plugin = plugin,
+&nbsp;            collectionName = collectionName,
+&nbsp;            onProgress = onProgress,
+&nbsp;            cancelToken = cancelToken,
+&nbsp;        )
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Phase 2: pull the `invites` collection from workspaces the user is invited to but has not
+&nbsp;     * yet joined. Only for scopes that do a full user-data fetch.
+&nbsp;     *
+&nbsp;     * Uses [WorkspaceCollectionReader.fetchInvitesForUser] (which adds a `targetUserId` filter)
+&nbsp;     * because the caller is not yet a workspace member and a general list query would be
+&nbsp;     * PERMISSION_DENIED.
+&nbsp;     */
+&nbsp;    private suspend fun Raise&lt;SyncError&gt;.pullInvitedWorkspaces(
+&nbsp;        scope: SyncScope,
+&nbsp;        onProgress: suspend (PullProgress) -&gt; Unit,
+&nbsp;        cancelToken: SyncCancelToken,
+&nbsp;    ): PullSummary {
+&nbsp;        val fullFetch = scope == SyncScope.AllUserData || scope == SyncScope.ChangedSinceLastSync
+&nbsp;        val uid = session.currentFirebaseUid.first()
+&nbsp;        val invitePlugin = plugins.firstOrNull {
+&nbsp;            it.firestoreCollectionName == SyncCollection.WORKSPACE_INVITES
+&nbsp;        }
+&nbsp;        if (!fullFetch || uid == null || invitePlugin == null) return EMPTY_SUMMARY
+&nbsp;
+&nbsp;        var totalDownloaded = 0
+&nbsp;        var totalConflicts = 0
+&nbsp;
+&nbsp;        for (workspaceId in userWorkspacesProvider.invitedWorkspaceIds()) {
+&nbsp;            cancelToken.throwIfCancelled()
+&nbsp;            val (downloaded, conflicts) = try {
+&nbsp;                pullInvitesForUser(
+&nbsp;                    workspaceId = workspaceId,
+&nbsp;                    uid = uid,
+&nbsp;                    plugin = invitePlugin,
+&nbsp;                    onProgress = onProgress,
+&nbsp;                    cancelToken = cancelToken,
+&nbsp;                )
+&nbsp;            } catch (cancelled: CancellationException) {
+&nbsp;                throw cancelled
+&nbsp;            } catch (unreadable: WorkspaceUnreadableException) {
+&nbsp;                log.w(throwable = unreadable.cause) {
+&nbsp;                    &quot;[pull] invited wid=$workspaceId unreadable — skipping (stale invited ref)&quot;
+&nbsp;                }
+&nbsp;                continue
+&nbsp;            } catch (
+&nbsp;                @Suppress(&quot;TooGenericExceptionCaught&quot;)
+&nbsp;                failure: Throwable,
+&nbsp;            ) {
+&nbsp;                log.e(throwable = failure) { &quot;[pull] failed (phase2/invites) wid=$workspaceId&quot; }
+&nbsp;                raise(failure.toSyncError())
+&nbsp;            }
+&nbsp;            totalDownloaded += downloaded
+&nbsp;            totalConflicts += conflicts
+&nbsp;        }
+&nbsp;
+&nbsp;        return PullSummary(downloadedCount = totalDownloaded, conflictCount = totalConflicts)
+&nbsp;    }
+&nbsp;
+&nbsp;    private suspend fun workspaceIdsForScope(scope: SyncScope): List&lt;String&gt; = when (scope) {
+&nbsp;        SyncScope.UploadOnly -&gt; emptyList()
+&nbsp;        SyncScope.ActiveWorkspace -&gt; {
+&nbsp;            session.currentWorkspaceId.first()?.value
+&nbsp;                ?.let { listOf(it) } ?: emptyList()
+&nbsp;        }
+&nbsp;        SyncScope.AllUserData -&gt; userWorkspacesProvider.workspaceIds()
+&nbsp;        SyncScope.ChangedSinceLastSync -&gt; {
+&nbsp;            val ids = userWorkspacesProvider.workspaceIds()
+&nbsp;            ids.ifEmpty {
+&nbsp;                // Fallback for incremental sync: provider returned nothing (e.g. first
+&nbsp;                // launch before workspaceIds has been pushed to Firestore). Use the
+&nbsp;                // locally-known active workspace so at least one workspace syncs.
+&nbsp;                // NOT used for AllUserData — a full sync should only pull what the
+&nbsp;                // remote says the user owns; using currentWorkspaceId for AllUserData
+&nbsp;                // causes PERMISSION_DENIED when the user is only an invitee of that wid.
+&nbsp;                session.currentWorkspaceId.first()?.value
+&nbsp;                    ?.let { listOf(it) } ?: emptyList()
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private suspend fun pullCollection(
+&nbsp;        workspaceId: String,
+&nbsp;        plugin: SyncEntityPlugin,
+&nbsp;        collectionName: String,
+&nbsp;        onProgress: suspend (PullProgress) -&gt; Unit,
+&nbsp;        cancelToken: SyncCancelToken,
+&nbsp;    ): Pair&lt;Int, Int&gt; = pullBatches(
+&nbsp;        workspaceId = workspaceId,
+&nbsp;        collectionName = collectionName,
+&nbsp;        plugin = plugin,
+&nbsp;        onProgress = onProgress,
+&nbsp;        cancelToken = cancelToken,
+&nbsp;    ) { sinceMillis -&gt;
+&nbsp;        readRemote(workspaceId) {
+&nbsp;            collectionReader.fetchUpdatedSince(
+&nbsp;                workspaceId = workspaceId,
+&nbsp;                collectionName = collectionName,
+&nbsp;                sinceMillis = sinceMillis,
+&nbsp;                limit = BATCH_SIZE,
+&nbsp;            )
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Pulls invites from a workspace the caller is invited to but has not joined.
+&nbsp;     * Uses [WorkspaceCollectionReader.fetchInvitesForUser] which adds a `targetUserId == uid`
+&nbsp;     * filter, making the query satisfy Firestore rules for non-members.
+&nbsp;     */
+&nbsp;    private suspend fun pullInvitesForUser(
+&nbsp;        workspaceId: String,
+&nbsp;        uid: String,
+&nbsp;        plugin: SyncEntityPlugin,
+&nbsp;        onProgress: suspend (PullProgress) -&gt; Unit,
+&nbsp;        cancelToken: SyncCancelToken,
+&nbsp;    ): Pair&lt;Int, Int&gt; = pullBatches(
+&nbsp;        workspaceId = workspaceId,
+&nbsp;        collectionName = SyncCollection.WORKSPACE_INVITES,
+&nbsp;        plugin = plugin,
+&nbsp;        onProgress = onProgress,
+&nbsp;        cancelToken = cancelToken,
+&nbsp;    ) { sinceMillis -&gt;
+&nbsp;        readRemote(workspaceId) {
+&nbsp;            collectionReader.fetchInvitesForUser(
+&nbsp;                workspaceId = workspaceId,
+&nbsp;                uid = uid,
+&nbsp;                sinceMillis = sinceMillis,
+&nbsp;                limit = BATCH_SIZE,
+&nbsp;            )
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Cursor-based paged pull shared by [pullCollection] and [pullInvitesForUser]: reads the
+&nbsp;     * cursor, then repeatedly runs [fetch] for everything updated since it, applies each doc via
+&nbsp;     * the [plugin] and advances the cursor to `max(updatedAt)` — until a batch comes back short
+&nbsp;     * of [BATCH_SIZE]. Only the query differs between callers, so it is supplied as [fetch].
+&nbsp;     *
+&nbsp;     * Draining here rather than leaving the tail to the next sync cycle is what makes a fresh
+&nbsp;     * sign-in show correct balances: the background ticker only fires once a minute, so a
+&nbsp;     * single-batch pull left an account with a few thousand transactions wrong for tens of
+&nbsp;     * minutes (issue #342).
+&nbsp;     *
+&nbsp;     * Two independent stops guard against an endless loop: [MAX_BATCHES_PER_COLLECTION], and a
+&nbsp;     * cursor that failed to advance — which happens when more than [BATCH_SIZE] documents share
+&nbsp;     * one `updatedAt` millisecond, since the query is a strict `&gt;` on the cursor.
+&nbsp;     *
+&nbsp;     * @return `downloaded to conflicts` across every batch.
+&nbsp;     */
+&nbsp;    @Suppress(&quot;LongParameterList&quot;)
+&nbsp;    private suspend fun pullBatches(
+&nbsp;        workspaceId: String,
+&nbsp;        collectionName: String,
+&nbsp;        plugin: SyncEntityPlugin,
+&nbsp;        onProgress: suspend (PullProgress) -&gt; Unit,
+&nbsp;        cancelToken: SyncCancelToken,
+&nbsp;        fetch: suspend (sinceMillis: Long) -&gt; List&lt;RemoteDocument&gt;,
+&nbsp;    ): Pair&lt;Int, Int&gt; {
+&nbsp;        syncMeta.markAttempt(workspaceId, collectionName, Clock.System.now())
+&nbsp;
+&nbsp;        var cursorMillis = syncMeta.cursor(workspaceId, collectionName)?.toEpochMilliseconds() ?: 0L
+&nbsp;        var downloaded = 0
+&nbsp;        var conflicts = 0
+&nbsp;        var batches = 0
+&nbsp;        var draining = true
+&nbsp;
+&nbsp;        while (draining) {
+&nbsp;            cancelToken.throwIfCancelled()
+&nbsp;            val docs = fetch(cursorMillis)
+&nbsp;            val batch = applyBatch(
+&nbsp;                workspaceId = workspaceId,
+&nbsp;                collectionName = collectionName,
+&nbsp;                plugin = plugin,
+&nbsp;                docs = docs,
+&nbsp;                cursorMillis = cursorMillis,
+&nbsp;                onProgress = onProgress,
+&nbsp;                cancelToken = cancelToken,
+&nbsp;            )
+&nbsp;            downloaded += batch.downloaded
+&nbsp;            conflicts += batch.conflicts
+&nbsp;            batches++
+&nbsp;
+&nbsp;            val cursorAdvanced = batch.maxUpdatedAt &gt; cursorMillis
+&nbsp;            if (cursorAdvanced) {
+&nbsp;                cursorMillis = batch.maxUpdatedAt
+&nbsp;                syncMeta.setCursor(
+&nbsp;                    scopeKey = workspaceId,
+&nbsp;                    collection = collectionName,
+&nbsp;                    cursor = Instant.fromEpochMilliseconds(cursorMillis),
+&nbsp;                )
+&nbsp;            }
+&nbsp;
+&nbsp;            val full = docs.size == BATCH_SIZE
+&nbsp;            draining = full &amp;&amp; cursorAdvanced &amp;&amp; batches &lt; MAX_BATCHES_PER_COLLECTION
+&nbsp;            logStopReason(workspaceId, collectionName, docs.size, full, cursorAdvanced, batches)
+&nbsp;        }
+&nbsp;
+&nbsp;        syncMeta.markSuccess(workspaceId, collectionName, Clock.System.now())
+&nbsp;
+&nbsp;        return downloaded to conflicts
+&nbsp;    }
+&nbsp;
+&nbsp;    /** Applies one batch and reports what it did, including how far the cursor can move. */
+&nbsp;    @Suppress(&quot;LongParameterList&quot;)
+&nbsp;    private suspend fun applyBatch(
+&nbsp;        workspaceId: String,
+&nbsp;        collectionName: String,
+&nbsp;        plugin: SyncEntityPlugin,
+&nbsp;        docs: List&lt;RemoteDocument&gt;,
+&nbsp;        cursorMillis: Long,
+&nbsp;        onProgress: suspend (PullProgress) -&gt; Unit,
+&nbsp;        cancelToken: SyncCancelToken,
+&nbsp;    ): BatchOutcome {
+&nbsp;        var downloaded = 0
+&nbsp;        var conflicts = 0
+&nbsp;        var maxUpdatedAt = cursorMillis
+&nbsp;
+&nbsp;        docs.forEachIndexed { index, doc -&gt;
+&nbsp;            cancelToken.throwIfCancelled()
+&nbsp;            val result: EntityApplyResult = plugin.applyDoc(doc, workspaceId)
+&nbsp;            if (result.applied) downloaded++
+&nbsp;            if (result.wasConflict) conflicts++
+&nbsp;
+&nbsp;            val docUpdatedAt = doc.getLong(&quot;updatedAt&quot;) ?: 0L
+&nbsp;            if (docUpdatedAt &gt; maxUpdatedAt) maxUpdatedAt = docUpdatedAt
+&nbsp;
+&nbsp;            onProgress(
+&nbsp;                PullProgress(collection = collectionName, current = index + 1, total = docs.size),
+&nbsp;            )
+&nbsp;        }
+&nbsp;
+&nbsp;        return BatchOutcome(downloaded = downloaded, conflicts = conflicts, maxUpdatedAt = maxUpdatedAt)
+&nbsp;    }
+&nbsp;
+&nbsp;    /** Notes the two ways a full batch can stop the drain early; a short batch is the normal end. */
+&nbsp;    @Suppress(&quot;LongParameterList&quot;)
+&nbsp;    private fun logStopReason(
+&nbsp;        workspaceId: String,
+&nbsp;        collectionName: String,
+&nbsp;        batchSize: Int,
+&nbsp;        full: Boolean,
+&nbsp;        cursorAdvanced: Boolean,
+&nbsp;        batches: Int,
+&nbsp;    ) {
+&nbsp;        if (full &amp;&amp; !cursorAdvanced) {
+&nbsp;            log.w {
+&nbsp;                &quot;[pull] cursor stuck for wid=$workspaceId collection=$collectionName — all &quot; +
+&nbsp;                    &quot;$batchSize docs in the batch carry the same (or no) updatedAt; stopping to &quot; +
+&nbsp;                    &quot;avoid re-reading the same batch forever&quot;
+&nbsp;            }
+&nbsp;        }
+&nbsp;        if (full &amp;&amp; cursorAdvanced &amp;&amp; batches &gt;= MAX_BATCHES_PER_COLLECTION) {
+&nbsp;            log.w {
+&nbsp;                &quot;[pull] hit the $MAX_BATCHES_PER_COLLECTION-batch ceiling for wid=$workspaceId &quot; +
+&nbsp;                    &quot;collection=$collectionName — the rest is left to the next sync, which &quot; +
+&nbsp;                    &quot;resumes from the stored cursor&quot;
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Runs a remote read. A **denial** is re-thrown as [WorkspaceUnreadableException] so callers
+&nbsp;     * can skip the workspace; everything else propagates untouched and still aborts the pull.
+&nbsp;     *
+&nbsp;     * The distinction matters: a denied read means this workspace will never be readable for this
+&nbsp;     * user, so skipping it is the whole point. A network drop or an expired token means the data
+&nbsp;     * is simply not here *yet* — swallowing those would let the pull report a successful sync that
+&nbsp;     * downloaded nothing, and the UI would tell the user they are up to date when they are not.
+&nbsp;     */
+&nbsp;    private suspend fun &lt;T&gt; readRemote(workspaceId: String, read: suspend () -&gt; T): T = try {
+&nbsp;        read()
+&nbsp;    } catch (cancelled: CancellationException) {
+&nbsp;        throw cancelled
+&nbsp;    } catch (
+&nbsp;        @Suppress(&quot;TooGenericExceptionCaught&quot;)
+&nbsp;        failure: Throwable,
+&nbsp;    ) {
+&nbsp;        if (failure.isPermissionDenied()) {
+&nbsp;            throw WorkspaceUnreadableException(workspaceId, failure)
+&nbsp;        }
+&nbsp;        throw failure
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the workspace-scoped plugins in pull order ([SyncEntityPlugin.pullPriority], lower
+&nbsp;     * first).
+&nbsp;     *
+&nbsp;     * Includes plugins with [SyncEntityPlugin.firestoreCollectionName] == null — those
+&nbsp;     * own workspace root documents and are dispatched via
+&nbsp;     * [WorkspaceCollectionReader.fetchWorkspaceDoc] rather than [pullCollection].
+&nbsp;     * See [SyncEntityPlugin] kdoc for tier assignments.
+&nbsp;     *
+&nbsp;     * [PullScope.User] plugins are filtered out here and run once in phase 3 instead: this loop
+&nbsp;     * runs per workspace, and their documents do not live under a workspace at all.
+&nbsp;     */
+&nbsp;    private fun pluginsInScope(scope: SyncScope): List&lt;SyncEntityPlugin&gt; {
+&nbsp;        if (scope == SyncScope.UploadOnly) return emptyList()
+&nbsp;        return plugins
+&nbsp;            .filter { it.pullScope == PullScope.Workspace }
+&nbsp;            .sortedBy { it.pullPriority }
+&nbsp;    }
+&nbsp;
+&nbsp;    private companion object {
+&nbsp;        const val BATCH_SIZE: Int = 100
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Ceiling on batches per collection per workspace per sync — 50 × 100 = 5 000 documents.
+&nbsp;         * Not a correctness bound (the cursor is persisted, so the next sync resumes where this
+&nbsp;         * one stopped); it just keeps one pathological collection from monopolising a sync.
+&nbsp;         */
+&nbsp;        const val MAX_BATCHES_PER_COLLECTION: Int = 50
+&nbsp;
+&nbsp;        val EMPTY_SUMMARY = PullSummary(downloadedCount = 0, conflictCount = 0)
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;/** What one batch applied, and the newest `updatedAt` it saw. */
+&nbsp;private data class BatchOutcome(
+&nbsp;    val downloaded: Int,
+&nbsp;    val conflicts: Int,
+&nbsp;    val maxUpdatedAt: Long,
+&nbsp;)
+&nbsp;
+&nbsp;/**
+&nbsp; * A workspace whose remote documents could not be read — typically PERMISSION_DENIED on a
+&nbsp; * `users/{uid}.workspaceIds` entry whose `workspaces/{wid}` document was never created. Private
+&nbsp; * to the pull: it never escapes [PullRemoteChangesUseCaseImpl].
+&nbsp; */
+<b class="fc">&nbsp;private class WorkspaceUnreadableException(</b>
+&nbsp;    workspaceId: String,
+<b class="fc">&nbsp;    override val cause: Throwable,</b>
+<b class="fc">&nbsp;) : RuntimeException(&quot;Workspace $workspaceId is not readable&quot;, cause)</b>
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-07-27 15:02</div>
+</div>
+</body>
+</html>

@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SyncCancelledException</title>
+  <title>MoneySurfer Coverage Report > BudgetDetailsState_Content__OpticsKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.sync.api</a>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.budget.details</a>
 </div>
 
-<h1>Coverage Summary for Class: SyncCancelledException (com.georgeci.moneysurfer.sync.api)</h1>
+<h1>Coverage Summary for Class: BudgetDetailsState_Content__OpticsKt (com.georgeci.moneysurfer.feature.budget.details)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,38 +49,38 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SyncCancelledException</td>
+  <td class="name">BudgetDetailsState_Content__OpticsKt</td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (1/1)
+    (0/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (1/1)
+    (0/12)
   </span>
 </td>
     <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (1/1)
+    (0/12)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (3/3)
+    (0/52)
   </span>
 </td>
 </tr>
@@ -92,48 +92,31 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.sync.api
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.budget.details
 &nbsp;
-&nbsp;import kotlin.concurrent.atomics.AtomicBoolean
-&nbsp;import kotlin.concurrent.atomics.ExperimentalAtomicApi
-&nbsp;import kotlin.coroutines.cancellation.CancellationException
+&nbsp;import com.georgeci.moneysurfer.feature.budget.details.BudgetDetailsState.Content as comgeorgecimoneysurferfeaturebudgetdetailsBudgetDetailsStateContent
 &nbsp;
-&nbsp;/**
-&nbsp; * Cancellation token for sync operations.
-&nbsp; *
-&nbsp; * Usage: inside long-running steps (upload, pull) call `throwIfCancelled()`
-&nbsp; * between major sub-operations. See SyncCoordinatorFAQ.md №2.
-&nbsp; */
-&nbsp;abstract class SyncCancelToken {
-&nbsp;    abstract fun isCancelled(): Boolean
-&nbsp;    abstract fun cancel()
-&nbsp;
-&nbsp;    fun throwIfCancelled() {
-&nbsp;        if (isCancelled()) throw SyncCancelledException()
-&nbsp;    }
+<b class="nc">&nbsp;public  val com.georgeci.moneysurfer.feature.budget.details.BudgetDetailsState.Content.Companion.`budget`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.budget.details.BudgetDetailsState.Content, com.georgeci.moneysurfer.feature.budget.BudgetUi&gt;  get() = arrow.optics.Lens(</b>
+<b class="nc">&nbsp;  get = { content: com.georgeci.moneysurfer.feature.budget.details.BudgetDetailsState.Content -&gt; content.`budget` },</b>
+&nbsp;  set = { content: com.georgeci.moneysurfer.feature.budget.details.BudgetDetailsState.Content, value: com.georgeci.moneysurfer.feature.budget.BudgetUi -&gt;
+<b class="nc">&nbsp;  content.copy(`budget` = value)</b>
 &nbsp;}
+&nbsp;)
 &nbsp;
-&nbsp;@OptIn(ExperimentalAtomicApi::class)
-&nbsp;class SimpleCancelToken : SyncCancelToken() {
-&nbsp;    private val flag = AtomicBoolean(false)
-&nbsp;    override fun isCancelled(): Boolean = flag.load()
-&nbsp;    override fun cancel() { flag.store(true) }
+<b class="nc">&nbsp;public  val com.georgeci.moneysurfer.feature.budget.details.BudgetDetailsState.Content.Companion.`transactions`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.budget.details.BudgetDetailsState.Content, kotlin.collections.List&lt;com.georgeci.moneysurfer.feature.budget.details.BudgetTransactionUi&gt;&gt;  get() = arrow.optics.Lens(</b>
+<b class="nc">&nbsp;  get = { content: com.georgeci.moneysurfer.feature.budget.details.BudgetDetailsState.Content -&gt; content.`transactions` },</b>
+&nbsp;  set = { content: com.georgeci.moneysurfer.feature.budget.details.BudgetDetailsState.Content, value: kotlin.collections.List&lt;com.georgeci.moneysurfer.feature.budget.details.BudgetTransactionUi&gt; -&gt;
+<b class="nc">&nbsp;  content.copy(`transactions` = value)</b>
 &nbsp;}
+&nbsp;)
 &nbsp;
-&nbsp;/**
-&nbsp; * Token wrapping a set of child tokens with `all` semantics:
-&nbsp; * considered cancelled only when ALL children are cancelled.
-&nbsp; * Required for merged sync requests — cancelling one child does not abort the rest.
-&nbsp; * See SyncCoordinatorFAQ.md №2, №4.
-&nbsp; */
-&nbsp;class CompositeCancelToken(
-&nbsp;    private val children: List&lt;SyncCancelToken&gt;,
-&nbsp;) : SyncCancelToken() {
-&nbsp;    override fun isCancelled(): Boolean = children.all { it.isCancelled() }
-&nbsp;    override fun cancel() { children.forEach { it.cancel() } }
-&nbsp;}
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.budget.details.BudgetDetailsState.Content&gt;.`budget`: arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.budget.BudgetUi&gt;  get() = this + comgeorgecimoneysurferfeaturebudgetdetailsBudgetDetailsStateContent.`budget`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.budget.details.BudgetDetailsState.Content&gt;.`budget`: arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.budget.BudgetUi&gt;  get() = this + comgeorgecimoneysurferfeaturebudgetdetailsBudgetDetailsStateContent.`budget`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.budget.details.BudgetDetailsState.Content&gt;.`budget`: arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.budget.BudgetUi&gt;  get() = this + comgeorgecimoneysurferfeaturebudgetdetailsBudgetDetailsStateContent.`budget`</b>
 &nbsp;
-<b class="fc">&nbsp;class SyncCancelledException : CancellationException(&quot;Sync cancelled&quot;)</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.budget.details.BudgetDetailsState.Content&gt;.`transactions`: arrow.optics.Lens&lt;__S, kotlin.collections.List&lt;com.georgeci.moneysurfer.feature.budget.details.BudgetTransactionUi&gt;&gt;  get() = this + comgeorgecimoneysurferfeaturebudgetdetailsBudgetDetailsStateContent.`transactions`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.budget.details.BudgetDetailsState.Content&gt;.`transactions`: arrow.optics.Optional&lt;__S, kotlin.collections.List&lt;com.georgeci.moneysurfer.feature.budget.details.BudgetTransactionUi&gt;&gt;  get() = this + comgeorgecimoneysurferfeaturebudgetdetailsBudgetDetailsStateContent.`transactions`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.budget.details.BudgetDetailsState.Content&gt;.`transactions`: arrow.optics.Traversal&lt;__S, kotlin.collections.List&lt;com.georgeci.moneysurfer.feature.budget.details.BudgetTransactionUi&gt;&gt;  get() = this + comgeorgecimoneysurferfeaturebudgetdetailsBudgetDetailsStateContent.`transactions`</b>
 </code>
 </pre>
 </div>
@@ -157,7 +140,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-23 23:54</div>
+    <div style="float:right;">generated on 2026-07-27 15:02</div>
 </div>
 </body>
 </html>

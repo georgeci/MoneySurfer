@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > AppThemeKt</title>
+  <title>MoneySurfer Coverage Report > PreferenceLabelsKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,18 +19,15 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.uikit.theme</a>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.settings.preferences</a>
 </div>
 
-<h1>Coverage Summary for Class: AppThemeKt (com.georgeci.moneysurfer.uikit.theme)</h1>
+<h1>Coverage Summary for Class: PreferenceLabelsKt (com.georgeci.moneysurfer.feature.settings.preferences)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
-<th class="coverageStat 
-">
-  Class, %
-</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -49,49 +46,79 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">AppThemeKt</td>
+  <td class="name">PreferenceLabelsKt</td>
 <td class="coverageStat">
   <span class="percent">
     100%
   </span>
   <span class="absValue">
-    (1/1)
+    (6/6)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    75%
+    38.5%
   </span>
   <span class="absValue">
-    (3/4)
+    (10/26)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    28.6%
+    51.5%
   </span>
   <span class="absValue">
-    (8/28)
+    (17/33)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    78.6%
+    76.1%
   </span>
   <span class="absValue">
-    (22/28)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    74.2%
-  </span>
-  <span class="absValue">
-    (264/356)
+    (194/255)
   </span>
 </td>
 </tr>
-
+  <tr>
+    <td class="name">PreferenceLabelsKt$WhenMappings</td>
+    <td class="coverageStat"/>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    38.5%
+  </span>
+  <span class="absValue">
+    (10/26)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    51.5%
+  </span>
+  <span class="absValue">
+    (17/33)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    76.1%
+  </span>
+  <span class="absValue">
+    (194/255)
+  </span>
+</td>
+</tr>
 </table>
 
 <br/>
@@ -99,105 +126,107 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.theme
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.settings.preferences
 &nbsp;
-&nbsp;import androidx.compose.foundation.isSystemInDarkTheme
-&nbsp;import androidx.compose.material3.ColorScheme
-&nbsp;import androidx.compose.material3.MaterialTheme
-&nbsp;import androidx.compose.material3.Shapes
-&nbsp;import androidx.compose.material3.Typography
 &nbsp;import androidx.compose.runtime.Composable
-&nbsp;import androidx.compose.runtime.CompositionLocalProvider
-&nbsp;import androidx.compose.ui.graphics.Color
-&nbsp;import com.materialkolor.PaletteStyle
-&nbsp;import com.materialkolor.dynamicColorScheme as materialKolorScheme
+&nbsp;import com.georgeci.moneysurfer.domain.model.Currency
+&nbsp;import com.georgeci.moneysurfer.domain.preferences.AppLanguage
+&nbsp;import com.georgeci.moneysurfer.domain.preferences.AppRegion
+&nbsp;import com.georgeci.moneysurfer.domain.preferences.DefaultTransactionType
+&nbsp;import com.georgeci.moneysurfer.domain.preferences.HourFormat
+&nbsp;import com.georgeci.moneysurfer.domain.preferences.WeekStart
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
+&nbsp;import moneysurfer.feature.settings.generated.resources.Res
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_preferences_hour_12
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_preferences_hour_24
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_preferences_region_georgia
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_preferences_region_germany
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_preferences_region_kazakhstan
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_preferences_region_poland
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_preferences_region_russia
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_preferences_region_ukraine
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_preferences_region_united_kingdom
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_preferences_region_united_states
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_preferences_txn_expense
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_preferences_txn_income
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_preferences_value_system
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_preferences_week_monday
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_preferences_week_saturday
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_preferences_week_sunday
+&nbsp;import org.jetbrains.compose.resources.stringResource
 &nbsp;
 &nbsp;/**
-&nbsp; * Style used by `materialKolor` to expand a single seed colour into the full M3 colour scheme.
-&nbsp; * Acts as an app-wide knob — flip the value here and every seed-based palette regenerates.
+&nbsp; * How a stored preference value is written out.
 &nbsp; *
-&nbsp; * Options (selected): `TonalSpot` (Material You default), `Vibrant`, `Expressive`, `Fidelity`,
-&nbsp; * `Content`, `Neutral`, `Monochrome`, `Rainbow`, `FruitSalad`. See `PaletteStyle` KDoc for
-&nbsp; * the visual differences each strategy produces.
+&nbsp; * These map the *value* to a label. The screen never renders a label without a value behind it,
+&nbsp; * which is the difference from the fixed `settings_preferences_*_pill` strings this replaced: a
+&nbsp; * translator can rename an option, but cannot change which option the user picked.
 &nbsp; */
-<b class="fc">&nbsp;internal val SeedPaletteStyle: PaletteStyle = PaletteStyle.TonalSpot</b>
+&nbsp;@Composable
+<b class="pc">&nbsp;internal fun AppLanguage.label(): String = when (this) {</b>
+<b class="fc">&nbsp;    AppLanguage.System -&gt; stringResource(Res.string.settings_preferences_value_system)</b>
+&nbsp;    // Endonyms, deliberately not resources: a language has to be readable to the person looking
+&nbsp;    // for it, so &quot;Русский&quot; stays &quot;Русский&quot; in the English UI and &quot;English&quot; stays &quot;English&quot; in the
+&nbsp;    // Russian one.
+<b class="nc">&nbsp;    AppLanguage.English -&gt; &quot;English&quot;</b>
+<b class="nc">&nbsp;    AppLanguage.Russian -&gt; &quot;Русский&quot;</b>
+<b class="nc">&nbsp;}</b>
 &nbsp;
 &nbsp;@Composable
-<b class="nc">&nbsp;fun AppTheme(</b>
-<b class="fc">&nbsp;    darkTheme: Boolean = isSystemInDarkTheme(),</b>
-<b class="fc">&nbsp;    seedColor: Color? = null,</b>
-<b class="fc">&nbsp;    dynamicColor: Boolean = false,</b>
-<b class="nc">&nbsp;    containerStyle: SurferContainerStyle = SurferContainerStyle.Card,</b>
-&nbsp;    content: @Composable () -&gt; Unit,
-<b class="pc">&nbsp;) {</b>
-<b class="fc">&nbsp;    val colorScheme = when {</b>
-<b class="pc">&nbsp;        dynamicColor &amp;&amp; isDynamicColorAvailable -&gt; dynamicColorScheme(darkTheme)</b>
-<b class="pc">&nbsp;        seedColor != null -&gt; schemeFromSeed(seedColor, darkTheme)</b>
-<b class="fc">&nbsp;        darkTheme -&gt; DarkColorScheme</b>
-<b class="fc">&nbsp;        else -&gt; LightColorScheme</b>
-&nbsp;    }
+<b class="fc">&nbsp;internal fun AppRegion.label(): String = stringResource(</b>
+<b class="pc">&nbsp;    when (this) {</b>
+<b class="fc">&nbsp;        AppRegion.System -&gt; Res.string.settings_preferences_value_system</b>
+<b class="nc">&nbsp;        AppRegion.Germany -&gt; Res.string.settings_preferences_region_germany</b>
+<b class="nc">&nbsp;        AppRegion.UnitedStates -&gt; Res.string.settings_preferences_region_united_states</b>
+<b class="nc">&nbsp;        AppRegion.UnitedKingdom -&gt; Res.string.settings_preferences_region_united_kingdom</b>
+<b class="nc">&nbsp;        AppRegion.Poland -&gt; Res.string.settings_preferences_region_poland</b>
+<b class="nc">&nbsp;        AppRegion.Ukraine -&gt; Res.string.settings_preferences_region_ukraine</b>
+<b class="nc">&nbsp;        AppRegion.Georgia -&gt; Res.string.settings_preferences_region_georgia</b>
+<b class="nc">&nbsp;        AppRegion.Kazakhstan -&gt; Res.string.settings_preferences_region_kazakhstan</b>
+<b class="nc">&nbsp;        AppRegion.Russia -&gt; Res.string.settings_preferences_region_russia</b>
+&nbsp;    },
+&nbsp;)
 &nbsp;
-&nbsp;//    ConfigureSystemBars(darkTheme = darkTheme)
+&nbsp;@Composable
+<b class="fc">&nbsp;internal fun WeekStart.label(): String = stringResource(</b>
+<b class="pc">&nbsp;    when (this) {</b>
+<b class="fc">&nbsp;        WeekStart.Monday -&gt; Res.string.settings_preferences_week_monday</b>
+<b class="nc">&nbsp;        WeekStart.Saturday -&gt; Res.string.settings_preferences_week_saturday</b>
+<b class="nc">&nbsp;        WeekStart.Sunday -&gt; Res.string.settings_preferences_week_sunday</b>
+&nbsp;    },
+&nbsp;)
 &nbsp;
-<b class="fc">&nbsp;    val semanticColors = if (darkTheme) DarkSemanticColors else LightSemanticColors</b>
+&nbsp;@Composable
+<b class="fc">&nbsp;internal fun HourFormat.label(): String = stringResource(</b>
+<b class="pc">&nbsp;    when (this) {</b>
+<b class="fc">&nbsp;        HourFormat.System -&gt; Res.string.settings_preferences_value_system</b>
+<b class="nc">&nbsp;        HourFormat.TwelveHour -&gt; Res.string.settings_preferences_hour_12</b>
+<b class="nc">&nbsp;        HourFormat.TwentyFourHour -&gt; Res.string.settings_preferences_hour_24</b>
+&nbsp;    },
+&nbsp;)
 &nbsp;
-<b class="fc">&nbsp;    CompositionLocalProvider(</b>
-<b class="fc">&nbsp;        LocalSpacing provides Spacing(),</b>
-<b class="fc">&nbsp;        LocalContainerStyle provides containerStyle,</b>
-<b class="fc">&nbsp;        LocalSemanticColors provides semanticColors,</b>
-<b class="fc">&nbsp;    ) {</b>
-<b class="fc">&nbsp;        MaterialTheme(</b>
-<b class="fc">&nbsp;            colorScheme = colorScheme,</b>
-<b class="fc">&nbsp;            typography = AppTypography,</b>
-<b class="fc">&nbsp;            shapes = AppShapes,</b>
-<b class="fc">&nbsp;            content = content,</b>
-&nbsp;        )
-&nbsp;    }
-<b class="fc">&nbsp;}</b>
+&nbsp;@Composable
+<b class="fc">&nbsp;internal fun DefaultTransactionType.label(): String = stringResource(</b>
+<b class="pc">&nbsp;    when (this) {</b>
+<b class="fc">&nbsp;        DefaultTransactionType.Expense -&gt; Res.string.settings_preferences_txn_expense</b>
+<b class="nc">&nbsp;        DefaultTransactionType.Income -&gt; Res.string.settings_preferences_txn_income</b>
+&nbsp;    },
+&nbsp;)
 &nbsp;
 &nbsp;/**
-&nbsp; * Builds a full Material 3 colour scheme from a single seed via HCT tonal palettes
-&nbsp; * (Hue/Chroma/Tone). Powered by `material-kolor`, the KMP port of Google&#39;s
-&nbsp; * `material-color-utilities`. `TonalSpot` is the default style used by Material You.
+&nbsp; * `EUR · €` when the code is one we stock, the bare code otherwise, and [UNKNOWN_VALUE] before the
+&nbsp; * stored code has arrived. A code outside the catalogue is a real possibility — the default comes
+&nbsp; * from the platform locale — and showing it plainly beats pretending the user picked something
+&nbsp; * else.
 &nbsp; */
-&nbsp;private fun schemeFromSeed(seed: Color, dark: Boolean): ColorScheme =
-<b class="nc">&nbsp;    materialKolorScheme(</b>
-<b class="nc">&nbsp;        seedColor = seed,</b>
-<b class="nc">&nbsp;        isDark = dark,</b>
-<b class="nc">&nbsp;        style = SeedPaletteStyle,</b>
-&nbsp;    )
-&nbsp;
-&nbsp;object AppTheme {
-&nbsp;    val materialColors: ColorScheme
-&nbsp;        @Composable
-&nbsp;        @androidx.compose.runtime.ReadOnlyComposable
-&nbsp;        get() = MaterialTheme.colorScheme
-&nbsp;
-&nbsp;    val typography: Typography
-&nbsp;        @Composable
-&nbsp;        @androidx.compose.runtime.ReadOnlyComposable
-&nbsp;        get() = MaterialTheme.typography
-&nbsp;
-&nbsp;    val shapes: Shapes
-&nbsp;        @Composable
-&nbsp;        @androidx.compose.runtime.ReadOnlyComposable
-&nbsp;        get() = MaterialTheme.shapes
-&nbsp;
-&nbsp;    val spacing: Spacing
-&nbsp;        @Composable
-&nbsp;        @androidx.compose.runtime.ReadOnlyComposable
-&nbsp;        get() = LocalSpacing.current
-&nbsp;
-&nbsp;    val containerStyle: SurferContainerStyle
-&nbsp;        @Composable
-&nbsp;        @androidx.compose.runtime.ReadOnlyComposable
-&nbsp;        get() = LocalContainerStyle.current
-&nbsp;
-&nbsp;    val semanticColors: SemanticColors
-&nbsp;        @Composable
-&nbsp;        @androidx.compose.runtime.ReadOnlyComposable
-&nbsp;        get() = LocalSemanticColors.current
+&nbsp;internal fun currencyLabel(code: CurrencyCode?, catalogue: List&lt;Currency&gt;): String {
+<b class="fc">&nbsp;    if (code == null) return UNKNOWN_VALUE</b>
+<b class="pc">&nbsp;    val known = catalogue.firstOrNull { it.code == code }</b>
+<b class="fc">&nbsp;    return if (known == null) code.value else &quot;${known.code.value} · ${known.symbol}&quot;</b>
 &nbsp;}
+&nbsp;
+&nbsp;/** Stand-in for a value the screen does not have yet — never for one it failed to store. */
+&nbsp;internal const val UNKNOWN_VALUE: String = &quot;—&quot;
 </code>
 </pre>
 </div>
@@ -221,7 +250,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-23 23:54</div>
+    <div style="float:right;">generated on 2026-07-27 15:02</div>
 </div>
 </body>
 </html>

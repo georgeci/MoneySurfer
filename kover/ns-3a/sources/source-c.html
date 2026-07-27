@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SurferOutlinedContainerTokens</title>
+  <title>MoneySurfer Coverage Report > CategoriesManageTestTags</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,70 +19,22 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.uikit.atom</a>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.category.manage</a>
 </div>
 
-<h1>Coverage Summary for Class: SurferOutlinedContainerTokens (com.georgeci.moneysurfer.uikit.atom)</h1>
+<h1>Coverage Summary for Class: CategoriesManageTestTags (com.georgeci.moneysurfer.feature.category.manage)</h1>
 
 <table class="coverageStats">
 <tr>
   <th class="name">Class</th>
 <th class="coverageStat 
 ">
-  Class, %
-</th>
-<th class="coverageStat 
-">
-  Method, %
-</th>
-<th class="coverageStat 
-">
   Branch, %
-</th>
-<th class="coverageStat 
-">
-  Line, %
-</th>
-<th class="coverageStat 
-">
-  Instruction, %
 </th>
 </tr>
 <tr>
-  <td class="name">SurferOutlinedContainerTokens</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
-  </span>
-</td>
+  <td class="name">CategoriesManageTestTags</td>
     <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/7)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/32)
-  </span>
-</td>
 </tr>
 
 </table>
@@ -92,401 +44,284 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.atom
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.category.manage
 &nbsp;
-&nbsp;import androidx.compose.foundation.BorderStroke
-&nbsp;import androidx.compose.foundation.background
-&nbsp;import androidx.compose.foundation.border
 &nbsp;import androidx.compose.foundation.layout.Arrangement
 &nbsp;import androidx.compose.foundation.layout.Box
 &nbsp;import androidx.compose.foundation.layout.Column
 &nbsp;import androidx.compose.foundation.layout.PaddingValues
-&nbsp;import androidx.compose.foundation.layout.Row
-&nbsp;import androidx.compose.foundation.layout.Spacer
+&nbsp;import androidx.compose.foundation.layout.fillMaxSize
 &nbsp;import androidx.compose.foundation.layout.fillMaxWidth
 &nbsp;import androidx.compose.foundation.layout.padding
-&nbsp;import androidx.compose.foundation.layout.width
-&nbsp;import androidx.compose.foundation.shape.RoundedCornerShape
-&nbsp;import androidx.compose.material3.Icon
-&nbsp;import androidx.compose.material3.LocalContentColor
-&nbsp;import androidx.compose.material3.Text
+&nbsp;import androidx.compose.foundation.lazy.LazyColumn
+&nbsp;import androidx.compose.foundation.lazy.items
+&nbsp;import androidx.compose.material3.Scaffold
 &nbsp;import androidx.compose.runtime.Composable
-&nbsp;import androidx.compose.runtime.CompositionLocalProvider
-&nbsp;import androidx.compose.runtime.Immutable
-&nbsp;import androidx.compose.runtime.ReadOnlyComposable
+&nbsp;import androidx.compose.runtime.getValue
 &nbsp;import androidx.compose.ui.Alignment
 &nbsp;import androidx.compose.ui.Modifier
-&nbsp;import androidx.compose.ui.draw.clip
-&nbsp;import androidx.compose.ui.draw.drawBehind
-&nbsp;import androidx.compose.ui.draw.shadow
-&nbsp;import androidx.compose.ui.geometry.CornerRadius
-&nbsp;import androidx.compose.ui.geometry.Offset
-&nbsp;import androidx.compose.ui.geometry.Size
-&nbsp;import androidx.compose.ui.graphics.Color
-&nbsp;import androidx.compose.ui.graphics.PathEffect
-&nbsp;import androidx.compose.ui.graphics.Shape
-&nbsp;import androidx.compose.ui.graphics.compositeOver
-&nbsp;import androidx.compose.ui.graphics.drawscope.Stroke
+&nbsp;import androidx.compose.ui.platform.testTag
 &nbsp;import androidx.compose.ui.tooling.preview.Preview
-&nbsp;import androidx.compose.ui.unit.Dp
 &nbsp;import androidx.compose.ui.unit.dp
+&nbsp;import androidx.lifecycle.compose.collectAsStateWithLifecycle
+&nbsp;import com.georgeci.moneysurfer.domain.model.CategoryTree
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryType
+&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferCategoryPalette
+&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferEmptyState
+&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferSkeletonRow
+&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferAddFab
+&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferSwipeAction
+&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferSwipeRevealRow
+&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
+&nbsp;import com.georgeci.moneysurfer.uikit.components.category.SurferCategoryManageCard
 &nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
-&nbsp;import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
+&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
+&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
 &nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
+&nbsp;import com.georgeci.moneysurfer.utils.HandleSideEffect
+&nbsp;import moneysurfer.feature.category.generated.resources.Res
+&nbsp;import moneysurfer.feature.category.generated.resources.categories_manage_add
+&nbsp;import moneysurfer.feature.category.generated.resources.categories_manage_edit
+&nbsp;import moneysurfer.feature.category.generated.resources.categories_manage_empty
+&nbsp;import moneysurfer.feature.category.generated.resources.categories_manage_remove
+&nbsp;import moneysurfer.feature.category.generated.resources.categories_manage_title
+&nbsp;import moneysurfer.feature.category.generated.resources.category_creation_type_expense
+&nbsp;import moneysurfer.feature.category.generated.resources.category_creation_type_income
+&nbsp;import moneysurfer.feature.category.generated.resources.category_creation_type_transfer
+&nbsp;import org.jetbrains.compose.resources.stringResource
+&nbsp;import org.koin.compose.viewmodel.koinViewModel
 &nbsp;
-&nbsp;// ─── Filled ──────────────────────────────────────────────────────────
+&nbsp;/** Extra leading inset per nesting level. One level is all [CategoryTree.MAX_DEPTH] allows. */
+&nbsp;private val ChildIndent = 24.dp
 &nbsp;
-&nbsp;@Immutable
-&nbsp;internal data class SurferFilledContainerTokens(
-&nbsp;    val background: Color,
-&nbsp;    val contentColor: Color,
-&nbsp;    val shape: Shape,
-&nbsp;    val contentPadding: PaddingValues,
-&nbsp;)
-&nbsp;
-&nbsp;internal object SurferFilledContainerDefaults {
-&nbsp;    @Composable
-&nbsp;    @ReadOnlyComposable
-&nbsp;    fun default(): SurferFilledContainerTokens = SurferFilledContainerTokens(
-&nbsp;        background = AppTheme.materialColors.surfaceContainer,
-&nbsp;        contentColor = AppTheme.materialColors.onSurface,
-&nbsp;        shape = AppTheme.shapes.large,
-&nbsp;        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 14.dp),
-&nbsp;    )
-&nbsp;
-&nbsp;    @Composable
-&nbsp;    @ReadOnlyComposable
-&nbsp;    fun selected(): SurferFilledContainerTokens = SurferFilledContainerTokens(
-&nbsp;        background = AppTheme.materialColors.primary,
-&nbsp;        contentColor = Color.White,
-&nbsp;        shape = AppTheme.shapes.large,
-&nbsp;        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 14.dp),
-&nbsp;    )
+&nbsp;/** Stable selectors for the Categories management screen — see docs/testing/testing-strategy.md. */
+&nbsp;object CategoriesManageTestTags {
+&nbsp;    const val Root = &quot;categoriesManage:root&quot;
+&nbsp;    const val AddButton = &quot;categoriesManage:add&quot;
 &nbsp;}
 &nbsp;
 &nbsp;@Composable
-&nbsp;internal fun SurferFilledContainer(
-&nbsp;    modifier: Modifier = Modifier,
-&nbsp;    interactionModifier: Modifier = Modifier,
-&nbsp;    tokens: SurferFilledContainerTokens = SurferFilledContainerDefaults.default(),
-&nbsp;    content: @Composable () -&gt; Unit,
+&nbsp;fun CategoriesManageScreen(
+&nbsp;    onNavigateBack: () -&gt; Unit,
+&nbsp;    onNavigateToCategoryCreation: () -&gt; Unit,
+&nbsp;    onNavigateToCategoryEdit: (CategoryId) -&gt; Unit,
+&nbsp;    onNavigateToCategoryDetails: (CategoryId) -&gt; Unit = {},
+&nbsp;    viewModel: CategoriesManageViewModel = koinViewModel(),
 &nbsp;) {
-&nbsp;    Box(
-&nbsp;        modifier = modifier
-&nbsp;            .clip(tokens.shape)
-&nbsp;            .then(interactionModifier)
-&nbsp;            .background(tokens.background)
-&nbsp;            .padding(tokens.contentPadding),
-&nbsp;    ) {
-&nbsp;        CompositionLocalProvider(LocalContentColor provides tokens.contentColor) {
-&nbsp;            content()
+&nbsp;    val state by viewModel.collectAsStateWithLifecycle()
+&nbsp;
+&nbsp;    viewModel.HandleSideEffect { effect -&gt;
+&nbsp;        when (effect) {
+&nbsp;            CategoriesManageEffect.NavigateBack -&gt; onNavigateBack()
+&nbsp;            CategoriesManageEffect.NavigateToCategoryCreation -&gt; onNavigateToCategoryCreation()
+&nbsp;            is CategoriesManageEffect.NavigateToCategoryDetails -&gt;
+&nbsp;                onNavigateToCategoryDetails(effect.categoryId)
+&nbsp;            is CategoriesManageEffect.NavigateToCategoryEdit -&gt; onNavigateToCategoryEdit(effect.categoryId)
 &nbsp;        }
 &nbsp;    }
-&nbsp;}
 &nbsp;
-&nbsp;// ─── Outlined ────────────────────────────────────────────────────────
-&nbsp;
-<b class="nc">&nbsp;@Immutable</b>
-&nbsp;internal data class SurferOutlinedContainerTokens(
-<b class="nc">&nbsp;    val background: Color,</b>
-<b class="nc">&nbsp;    val stroke: Color,</b>
-<b class="nc">&nbsp;    val strokeWidth: Dp,</b>
-<b class="nc">&nbsp;    val contentColor: Color,</b>
-<b class="nc">&nbsp;    val shape: Shape,</b>
-<b class="nc">&nbsp;    val contentPadding: PaddingValues,</b>
-&nbsp;)
-&nbsp;
-&nbsp;internal object SurferOutlinedContainerDefaults {
-&nbsp;    @Composable
-&nbsp;    @ReadOnlyComposable
-&nbsp;    fun default(): SurferOutlinedContainerTokens = SurferOutlinedContainerTokens(
-&nbsp;        background = Color.Transparent,
-&nbsp;        stroke = AppTheme.materialColors.outlineVariant,
-&nbsp;        strokeWidth = 1.dp,
-&nbsp;        contentColor = AppTheme.materialColors.onSurface,
-&nbsp;        shape = AppTheme.shapes.large,
-&nbsp;        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 13.dp),
-&nbsp;    )
-&nbsp;
-&nbsp;    @Composable
-&nbsp;    @ReadOnlyComposable
-&nbsp;    fun selected(): SurferOutlinedContainerTokens {
-&nbsp;        val cs = AppTheme.materialColors
-&nbsp;        return SurferOutlinedContainerTokens(
-&nbsp;            background = cs.primary.copy(alpha = 0.08f).compositeOver(cs.surface),
-&nbsp;            stroke = cs.primary,
-&nbsp;            strokeWidth = 1.dp,
-&nbsp;            contentColor = cs.onSurface,
-&nbsp;            shape = AppTheme.shapes.large,
-&nbsp;            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 13.dp),
+&nbsp;    when (val current = state) {
+&nbsp;        CategoriesManageState.Loading -&gt; CategoriesManageLoading(onEvent = viewModel::onEvent)
+&nbsp;        is CategoriesManageState.Content -&gt; CategoriesManageContent(
+&nbsp;            state = current,
+&nbsp;            onEvent = viewModel::onEvent,
 &nbsp;        )
 &nbsp;    }
 &nbsp;}
 &nbsp;
 &nbsp;@Composable
-&nbsp;internal fun SurferOutlinedContainer(
-&nbsp;    modifier: Modifier = Modifier,
-&nbsp;    interactionModifier: Modifier = Modifier,
-&nbsp;    tokens: SurferOutlinedContainerTokens = SurferOutlinedContainerDefaults.default(),
-&nbsp;    content: @Composable () -&gt; Unit,
-&nbsp;) {
-&nbsp;    Box(
-&nbsp;        modifier = modifier
-&nbsp;            .clip(tokens.shape)
-&nbsp;            .then(interactionModifier)
-&nbsp;            .background(tokens.background)
-&nbsp;            .border(BorderStroke(tokens.strokeWidth, tokens.stroke), shape = tokens.shape)
-&nbsp;            .padding(tokens.contentPadding),
-&nbsp;    ) {
-&nbsp;        CompositionLocalProvider(LocalContentColor provides tokens.contentColor) {
-&nbsp;            content()
-&nbsp;        }
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;// ─── Card ────────────────────────────────────────────────────────────
-&nbsp;
-&nbsp;@Immutable
-&nbsp;internal data class SurferContainerTokens(
-&nbsp;    val background: Color,
-&nbsp;    val stroke: Color,
-&nbsp;    val strokeWidth: Dp,
-&nbsp;    val shadowElevation: Dp,
-&nbsp;    val contentColor: Color,
-&nbsp;    val shape: Shape,
-&nbsp;    val contentPadding: PaddingValues,
-&nbsp;)
-&nbsp;
-&nbsp;internal object SurferContainerDefaults {
-&nbsp;    @Composable
-&nbsp;    @ReadOnlyComposable
-&nbsp;    fun default(): SurferContainerTokens = SurferContainerTokens(
-&nbsp;        background = AppTheme.materialColors.surfaceContainerLowest,
-&nbsp;        stroke = Color.Transparent,
-&nbsp;        strokeWidth = 0.dp,
-&nbsp;        shadowElevation = 2.dp,
-&nbsp;        contentColor = AppTheme.materialColors.onSurface,
-&nbsp;        shape = AppTheme.shapes.large,
-&nbsp;        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 14.dp),
-&nbsp;    )
-&nbsp;
-&nbsp;    @Composable
-&nbsp;    @ReadOnlyComposable
-&nbsp;    fun selected(): SurferContainerTokens = SurferContainerTokens(
-&nbsp;        background = AppTheme.materialColors.surfaceContainerLowest,
-&nbsp;        stroke = AppTheme.materialColors.primary,
-&nbsp;        strokeWidth = 1.dp,
-&nbsp;        shadowElevation = 8.dp,
-&nbsp;        contentColor = AppTheme.materialColors.onSurface,
-&nbsp;        shape = AppTheme.shapes.large,
-&nbsp;        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 13.dp),
-&nbsp;    )
-&nbsp;}
-&nbsp;
-&nbsp;@Composable
-&nbsp;internal fun SurferContainer(
-&nbsp;    modifier: Modifier = Modifier,
-&nbsp;    interactionModifier: Modifier = Modifier,
-&nbsp;    tokens: SurferContainerTokens = SurferContainerDefaults.default(),
-&nbsp;    content: @Composable () -&gt; Unit,
-&nbsp;) {
-&nbsp;    Box(
-&nbsp;        modifier = modifier
-&nbsp;            .shadow(elevation = tokens.shadowElevation, shape = tokens.shape)
-&nbsp;            .clip(tokens.shape)
-&nbsp;            .then(interactionModifier)
-&nbsp;            .background(tokens.background)
-&nbsp;            .border(BorderStroke(tokens.strokeWidth, tokens.stroke), shape = tokens.shape)
-&nbsp;            .padding(tokens.contentPadding),
-&nbsp;    ) {
-&nbsp;        CompositionLocalProvider(LocalContentColor provides tokens.contentColor) {
-&nbsp;            content()
-&nbsp;        }
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;// ─── AddAction ───────────────────────────────────────────────────────
-&nbsp;
-&nbsp;@Immutable
-&nbsp;internal data class SurferAddActionContainerTokens(
-&nbsp;    val background: Color,
-&nbsp;    val stroke: Color,
-&nbsp;    val strokeWidth: Dp,
-&nbsp;    val dashLength: Dp,
-&nbsp;    val dashGap: Dp,
-&nbsp;    val contentColor: Color,
-&nbsp;    val shape: Shape,
-&nbsp;    val contentPadding: PaddingValues,
-&nbsp;)
-&nbsp;
-&nbsp;internal object SurferAddActionContainerDefaults {
-&nbsp;    @Composable
-&nbsp;    @ReadOnlyComposable
-&nbsp;    fun default(): SurferAddActionContainerTokens {
-&nbsp;        val cs = AppTheme.materialColors
-&nbsp;        return SurferAddActionContainerTokens(
-&nbsp;            background = Color.Transparent,
-&nbsp;            stroke = cs.outline,
-&nbsp;            strokeWidth = 1.5.dp,
-&nbsp;            dashLength = 6.dp,
-&nbsp;            dashGap = 4.dp,
-&nbsp;            contentColor = cs.primary,
-&nbsp;            shape = AppTheme.shapes.large,
-&nbsp;            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 14.dp),
-&nbsp;        )
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;@Composable
-&nbsp;internal fun SurferAddActionContainer(
-&nbsp;    modifier: Modifier = Modifier,
-&nbsp;    interactionModifier: Modifier = Modifier,
-&nbsp;    tokens: SurferAddActionContainerTokens = SurferAddActionContainerDefaults.default(),
-&nbsp;    content: @Composable () -&gt; Unit,
-&nbsp;) {
-&nbsp;    Box(
-&nbsp;        modifier = modifier
-&nbsp;            .clip(tokens.shape)
-&nbsp;            .then(interactionModifier)
-&nbsp;            .background(tokens.background)
-&nbsp;            .dashedBorder(
-&nbsp;                color = tokens.stroke,
-&nbsp;                strokeWidth = tokens.strokeWidth,
-&nbsp;                dashLength = tokens.dashLength,
-&nbsp;                dashGap = tokens.dashGap,
-&nbsp;                shape = tokens.shape,
+&nbsp;private fun CategoriesManageLoading(onEvent: (CategoriesManageEvent) -&gt; Unit) {
+&nbsp;    Scaffold(
+&nbsp;        modifier = Modifier.surferSafeInsets(),
+&nbsp;        containerColor = AppTheme.materialColors.surface,
+&nbsp;        topBar = {
+&nbsp;            SurferToolbar(
+&nbsp;                title = stringResource(Res.string.categories_manage_title),
+&nbsp;                onBack = { onEvent(CategoriesManageEvent.OnBackClick) },
 &nbsp;            )
-&nbsp;            .padding(tokens.contentPadding),
-&nbsp;    ) {
-&nbsp;        CompositionLocalProvider(LocalContentColor provides tokens.contentColor) {
-&nbsp;            content()
+&nbsp;        },
+&nbsp;    ) { padding -&gt;
+&nbsp;        Column(
+&nbsp;            modifier = Modifier
+&nbsp;                .fillMaxSize()
+&nbsp;                .padding(padding)
+&nbsp;                .padding(horizontal = AppTheme.spacing.default, vertical = AppTheme.spacing.medium),
+&nbsp;            verticalArrangement = Arrangement.spacedBy(AppTheme.spacing.medium),
+&nbsp;        ) {
+&nbsp;            repeat(SKELETON_ROWS) {
+&nbsp;                SurferSkeletonRow()
+&nbsp;            }
 &nbsp;        }
 &nbsp;    }
 &nbsp;}
 &nbsp;
-&nbsp;private fun Modifier.dashedBorder(
-&nbsp;    color: Color,
-&nbsp;    strokeWidth: Dp,
-&nbsp;    dashLength: Dp,
-&nbsp;    dashGap: Dp,
-&nbsp;    shape: Shape,
-&nbsp;): Modifier = this.drawBehind {
-&nbsp;    val stroke = strokeWidth.toPx()
-&nbsp;    val inset = stroke / 2f
-&nbsp;    val cornerRadius = when (shape) {
-&nbsp;        is RoundedCornerShape -&gt; shape.topStart.toPx(Size(size.width, size.height), this)
-&nbsp;        else -&gt; 0f
-&nbsp;    }
-&nbsp;    drawRoundRect(
-&nbsp;        color = color,
-&nbsp;        topLeft = Offset(inset, inset),
-&nbsp;        size = Size(size.width - stroke, size.height - stroke),
-&nbsp;        cornerRadius = CornerRadius(cornerRadius - inset, cornerRadius - inset),
-&nbsp;        style = Stroke(
-&nbsp;            width = stroke,
-&nbsp;            pathEffect = PathEffect.dashPathEffect(
-&nbsp;                floatArrayOf(dashLength.toPx(), dashGap.toPx()),
-&nbsp;                0f,
+&nbsp;private const val SKELETON_ROWS = 5
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun CategoriesManageContent(
+&nbsp;    state: CategoriesManageState.Content,
+&nbsp;    onEvent: (CategoriesManageEvent) -&gt; Unit,
+&nbsp;) {
+&nbsp;    Scaffold(
+&nbsp;        modifier = Modifier
+&nbsp;            .surferSafeInsets()
+&nbsp;            .testTag(CategoriesManageTestTags.Root)
+&nbsp;            .surferTestTagAsId(),
+&nbsp;        containerColor = AppTheme.materialColors.surface,
+&nbsp;        topBar = {
+&nbsp;            SurferToolbar(
+&nbsp;                title = stringResource(Res.string.categories_manage_title),
+&nbsp;                onBack = { onEvent(CategoriesManageEvent.OnBackClick) },
+&nbsp;            )
+&nbsp;        },
+&nbsp;        floatingActionButton = {
+&nbsp;            SurferAddFab(
+&nbsp;                label = stringResource(Res.string.categories_manage_add),
+&nbsp;                onClick = { onEvent(CategoriesManageEvent.OnAddCategoryClick) },
+&nbsp;                modifier = Modifier.testTag(CategoriesManageTestTags.AddButton),
+&nbsp;            )
+&nbsp;        },
+&nbsp;    ) { padding -&gt;
+&nbsp;        if (state.categories.isEmpty()) {
+&nbsp;            Box(
+&nbsp;                modifier = Modifier.fillMaxSize().padding(padding),
+&nbsp;                contentAlignment = Alignment.Center,
+&nbsp;            ) {
+&nbsp;                SurferEmptyState(
+&nbsp;                    title = stringResource(Res.string.categories_manage_empty),
+&nbsp;                    icon = SurferIcons.Category,
+&nbsp;                )
+&nbsp;            }
+&nbsp;            return@Scaffold
+&nbsp;        }
+&nbsp;
+&nbsp;        LazyColumn(
+&nbsp;            modifier = Modifier
+&nbsp;                .fillMaxSize()
+&nbsp;                .padding(top = padding.calculateTopPadding()),
+&nbsp;            contentPadding = PaddingValues(
+&nbsp;                top = AppTheme.spacing.small,
+&nbsp;                bottom = padding.calculateBottomPadding() +
+&nbsp;                    AppTheme.spacing.xxxLarge + AppTheme.spacing.xLarge,
 &nbsp;            ),
-&nbsp;        ),
+&nbsp;        ) {
+&nbsp;            items(state.categories, key = { it.id.value }) { category -&gt;
+&nbsp;                CategoryManageRow(
+&nbsp;                    category = category,
+&nbsp;                    deleteLabel = stringResource(Res.string.categories_manage_remove),
+&nbsp;                    editLabel = stringResource(Res.string.categories_manage_edit),
+&nbsp;                    onClick = { onEvent(CategoriesManageEvent.OnCategoryClick(category.id)) },
+&nbsp;                    onEditClick = { onEvent(CategoriesManageEvent.OnEditCategoryClick(category.id)) },
+&nbsp;                    onRemoveClick = { onEvent(CategoriesManageEvent.OnRemoveCategoryClick(category.id)) },
+&nbsp;                    modifier = Modifier
+&nbsp;                        .fillMaxWidth()
+&nbsp;                        .padding(
+&nbsp;                            // Children are indented under the parent they follow — the list is
+&nbsp;                            // already in tree order, so the indent is all the nesting needs.
+&nbsp;                            start = AppTheme.spacing.default + ChildIndent * category.depth,
+&nbsp;                            end = AppTheme.spacing.default,
+&nbsp;                        )
+&nbsp;                        .padding(vertical = AppTheme.spacing.xSmall),
+&nbsp;                )
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    state.pendingDelete?.let { pending -&gt;
+&nbsp;        DeleteCategoryDialog(
+&nbsp;            categoryName = pending.name,
+&nbsp;            childCount = pending.childCount,
+&nbsp;            onConfirm = { onEvent(CategoriesManageEvent.OnDeleteConfirm) },
+&nbsp;            onDismiss = { onEvent(CategoriesManageEvent.OnDeleteCancel) },
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun CategoryManageRow(
+&nbsp;    category: CategoryManageUi,
+&nbsp;    deleteLabel: String,
+&nbsp;    editLabel: String,
+&nbsp;    onClick: () -&gt; Unit,
+&nbsp;    onEditClick: () -&gt; Unit,
+&nbsp;    onRemoveClick: () -&gt; Unit,
+&nbsp;    modifier: Modifier = Modifier,
+&nbsp;) {
+&nbsp;    SurferSwipeRevealRow(
+&nbsp;        // Two actions now that tapping the row opens the detail screen instead of the editor —
+&nbsp;        // edit has to stay reachable from the list itself. 156dp is what two 72dp actions plus
+&nbsp;        // the gaps measure, matching AccountsManage.
+&nbsp;        revealWidth = 156.dp,
+&nbsp;        modifier = modifier,
+&nbsp;        actions = {
+&nbsp;            SurferSwipeAction(
+&nbsp;                icon = SurferIcons.Edit,
+&nbsp;                label = editLabel,
+&nbsp;                onClick = onEditClick,
+&nbsp;            )
+&nbsp;            SurferSwipeAction(
+&nbsp;                icon = SurferIcons.Delete,
+&nbsp;                label = deleteLabel,
+&nbsp;                onClick = onRemoveClick,
+&nbsp;                destructive = true,
+&nbsp;            )
+&nbsp;        },
+&nbsp;    ) {
+&nbsp;        CategoryManageCard(category = category, onClick = onClick)
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun CategoryManageCard(
+&nbsp;    category: CategoryManageUi,
+&nbsp;    onClick: () -&gt; Unit,
+&nbsp;    modifier: Modifier = Modifier,
+&nbsp;) {
+&nbsp;    val visual = SurferCategoryPalette.visualFor(
+&nbsp;        id = category.id.value,
+&nbsp;        iconKey = category.iconKey,
+&nbsp;        hue = category.hue,
+&nbsp;        systemKind = category.systemKind,
+&nbsp;    )
+&nbsp;    SurferCategoryManageCard(
+&nbsp;        name = category.name,
+&nbsp;        typeLabel = categoryTypeLabel(category.type),
+&nbsp;        icon = visual.icon,
+&nbsp;        tint = visual.tint,
+&nbsp;        onClick = onClick,
+&nbsp;        modifier = modifier,
 &nbsp;    )
 &nbsp;}
 &nbsp;
-&nbsp;// ─── Previews ────────────────────────────────────────────────────────
+&nbsp;@Composable
+&nbsp;private fun categoryTypeLabel(type: CategoryType): String =
+&nbsp;    when (type) {
+&nbsp;        CategoryType.EXPENSE -&gt; stringResource(Res.string.category_creation_type_expense)
+&nbsp;        CategoryType.INCOME -&gt; stringResource(Res.string.category_creation_type_income)
+&nbsp;        CategoryType.TRANSFER -&gt; stringResource(Res.string.category_creation_type_transfer)
+&nbsp;    }
 &nbsp;
 &nbsp;@Preview
 &nbsp;@Composable
-&nbsp;private fun SurferFilledContainerPreview() {
-&nbsp;    SurferComponentPreview {
-&nbsp;        Column(
-&nbsp;            verticalArrangement = Arrangement.spacedBy(8.dp),
-&nbsp;            modifier = Modifier.fillMaxWidth().padding(16.dp),
-&nbsp;        ) {
-&nbsp;            SurferFilledContainer(modifier = Modifier.fillMaxWidth()) {
-&nbsp;                PreviewRowBody(&quot;Main account&quot;, &quot;Checking · ••4218&quot;, &quot;$4,210.55&quot;)
-&nbsp;            }
-&nbsp;            SurferFilledContainer(
-&nbsp;                modifier = Modifier.fillMaxWidth(),
-&nbsp;                tokens = SurferFilledContainerDefaults.selected(),
-&nbsp;            ) {
-&nbsp;                PreviewRowBody(&quot;Savings&quot;, &quot;High-yield · 4.5%&quot;, &quot;$12,840.00&quot;)
-&nbsp;            }
-&nbsp;        }
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;@Preview
-&nbsp;@Composable
-&nbsp;private fun SurferOutlinedContainerPreview() {
-&nbsp;    SurferComponentPreview {
-&nbsp;        Column(
-&nbsp;            verticalArrangement = Arrangement.spacedBy(8.dp),
-&nbsp;            modifier = Modifier.fillMaxWidth().padding(16.dp),
-&nbsp;        ) {
-&nbsp;            SurferOutlinedContainer(modifier = Modifier.fillMaxWidth()) {
-&nbsp;                PreviewRowBody(&quot;Main account&quot;, &quot;Checking · ••4218&quot;, &quot;$4,210.55&quot;)
-&nbsp;            }
-&nbsp;            SurferOutlinedContainer(
-&nbsp;                modifier = Modifier.fillMaxWidth(),
-&nbsp;                tokens = SurferOutlinedContainerDefaults.selected(),
-&nbsp;            ) {
-&nbsp;                PreviewRowBody(&quot;Savings&quot;, &quot;High-yield · 4.5%&quot;, &quot;$12,840.00&quot;)
-&nbsp;            }
-&nbsp;        }
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;@Preview
-&nbsp;@Composable
-&nbsp;private fun SurferContainerPreview() {
-&nbsp;    SurferComponentPreview {
-&nbsp;        Column(
-&nbsp;            verticalArrangement = Arrangement.spacedBy(10.dp),
-&nbsp;            modifier = Modifier.fillMaxWidth().padding(16.dp),
-&nbsp;        ) {
-&nbsp;            SurferContainer(modifier = Modifier.fillMaxWidth()) {
-&nbsp;                PreviewRowBody(&quot;Main account&quot;, &quot;Checking · ••4218&quot;, &quot;$4,210.55&quot;)
-&nbsp;            }
-&nbsp;            SurferContainer(
-&nbsp;                modifier = Modifier.fillMaxWidth(),
-&nbsp;                tokens = SurferContainerDefaults.selected(),
-&nbsp;            ) {
-&nbsp;                PreviewRowBody(&quot;Savings&quot;, &quot;High-yield · 4.5%&quot;, &quot;$12,840.00&quot;)
-&nbsp;            }
-&nbsp;        }
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;@Preview
-&nbsp;@Composable
-&nbsp;private fun SurferAddActionContainerPreview() {
-&nbsp;    SurferComponentPreview {
-&nbsp;        Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
-&nbsp;            SurferAddActionContainer(modifier = Modifier.fillMaxWidth()) {
-&nbsp;                Row(verticalAlignment = Alignment.CenterVertically) {
-&nbsp;                    // decorative — preview only; label text is adjacent
-&nbsp;                    Icon(imageVector = SurferIcons.Add, contentDescription = null)
-&nbsp;                    Spacer(Modifier.width(8.dp))
-&nbsp;                    Text(text = &quot;Add account&quot;, style = AppTheme.typography.labelLarge)
-&nbsp;                }
-&nbsp;            }
-&nbsp;        }
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;@Composable
-&nbsp;private fun PreviewRowBody(label: String, hint: String, amount: String) {
-&nbsp;    Row(verticalAlignment = Alignment.CenterVertically) {
-&nbsp;        Column(modifier = Modifier.weight(1f)) {
-&nbsp;            Text(text = label, style = AppTheme.typography.titleSmall)
-&nbsp;            Spacer(Modifier.padding(top = 2.dp))
-&nbsp;            Text(
-&nbsp;                text = hint,
-&nbsp;                style = AppTheme.typography.bodySmall,
-&nbsp;                color = LocalContentColor.current.copy(alpha = 0.7f),
-&nbsp;            )
-&nbsp;        }
-&nbsp;        Text(text = amount, style = AppTheme.typography.titleSmall)
+&nbsp;private fun CategoriesManageContentPreview() {
+&nbsp;    AppTheme {
+&nbsp;        CategoriesManageContent(
+&nbsp;            state = CategoriesManageState.Content(
+&nbsp;                categories = listOf(
+&nbsp;                    CategoryManageUi(CategoryId(&quot;1&quot;), &quot;Food&quot;, CategoryType.EXPENSE),
+&nbsp;                    CategoryManageUi(
+&nbsp;                        id = CategoryId(&quot;2&quot;),
+&nbsp;                        name = &quot;Groceries&quot;,
+&nbsp;                        type = CategoryType.EXPENSE,
+&nbsp;                        parentId = CategoryId(&quot;1&quot;),
+&nbsp;                        depth = 1,
+&nbsp;                    ),
+&nbsp;                    CategoryManageUi(CategoryId(&quot;3&quot;), &quot;Salary&quot;, CategoryType.INCOME),
+&nbsp;                ),
+&nbsp;            ),
+&nbsp;            onEvent = {},
+&nbsp;        )
 &nbsp;    }
 &nbsp;}
 </code>
@@ -512,7 +347,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 17:13</div>
+    <div style="float:right;">generated on 2026-07-27 15:02</div>
 </div>
 </body>
 </html>

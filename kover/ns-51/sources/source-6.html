@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > DynamicColor_jvmKt</title>
+  <title>MoneySurfer Coverage Report > DebugConfigTestTags</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.uikit.theme</a>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.settings.debug</a>
 </div>
 
-<h1>Coverage Summary for Class: DynamicColor_jvmKt (com.georgeci.moneysurfer.uikit.theme)</h1>
+<h1>Coverage Summary for Class: DebugConfigTestTags (com.georgeci.moneysurfer.feature.settings.debug)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,45 +49,38 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">DynamicColor_jvmKt</td>
+  <td class="name">DebugConfigTestTags</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/2)
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/2)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/3)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/21)
+    (2/2)
   </span>
 </td>
 </tr>
@@ -99,17 +92,289 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.theme
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.settings.debug
 &nbsp;
-&nbsp;import androidx.compose.material3.ColorScheme
+&nbsp;import androidx.compose.foundation.horizontalScroll
+&nbsp;import androidx.compose.foundation.layout.Arrangement
+&nbsp;import androidx.compose.foundation.layout.Column
+&nbsp;import androidx.compose.foundation.layout.Row
+&nbsp;import androidx.compose.foundation.layout.Spacer
+&nbsp;import androidx.compose.foundation.layout.height
+&nbsp;import androidx.compose.foundation.layout.padding
+&nbsp;import androidx.compose.foundation.rememberScrollState
+&nbsp;import androidx.compose.material3.SnackbarDuration
+&nbsp;import androidx.compose.material3.SnackbarHostState
+&nbsp;import androidx.compose.material3.Text
 &nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.runtime.LaunchedEffect
+&nbsp;import androidx.compose.runtime.getValue
+&nbsp;import androidx.compose.runtime.mutableStateOf
+&nbsp;import androidx.compose.runtime.remember
+&nbsp;import androidx.compose.runtime.setValue
+&nbsp;import androidx.compose.ui.Modifier
+&nbsp;import androidx.compose.ui.platform.testTag
+&nbsp;import androidx.compose.ui.unit.dp
+&nbsp;import androidx.lifecycle.compose.collectAsStateWithLifecycle
+&nbsp;import com.georgeci.moneysurfer.domain.config.ConfigDebugRow
+&nbsp;import com.georgeci.moneysurfer.domain.config.ConfigDebugRowKind
+&nbsp;import com.georgeci.moneysurfer.feature.settings.components.SettingsSubScreenScaffold
+&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferFilterChipRow
+&nbsp;import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsChevron
+&nbsp;import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsGroup
+&nbsp;import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsRow
+&nbsp;import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsSwitch
+&nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
+&nbsp;import com.georgeci.moneysurfer.utils.HandleSideEffect
+&nbsp;import moneysurfer.feature.settings.generated.resources.Res
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_debug_config_degraded_format
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_debug_config_footnote
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_debug_config_host_owned
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_debug_config_invalid_format
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_debug_config_layer_absent
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_debug_config_layer_undecodable_format
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_debug_config_reset_all
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_debug_config_section_keys
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_debug_config_title
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_debug_config_unavailable
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_debug_config_winner_format
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_debug_log_supporting
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_debug_log_title
+&nbsp;import org.jetbrains.compose.resources.stringResource
+&nbsp;import org.koin.compose.viewmodel.koinViewModel
 &nbsp;
-<b class="nc">&nbsp;actual val isDynamicColorAvailable: Boolean = false</b>
+&nbsp;/** Stable selectors for the QA configuration panel — see docs/testing/testing-strategy.md. */
+&nbsp;object DebugConfigTestTags {
+&nbsp;    const val Root = &quot;debugConfig:root&quot;
+&nbsp;    const val LogsRow = &quot;debugConfig:logs&quot;
+&nbsp;    const val ResetAllRow = &quot;debugConfig:resetAll&quot;
+&nbsp;    const val DegradedBanner = &quot;debugConfig:degradedBanner&quot;
+&nbsp;    const val Unavailable = &quot;debugConfig:unavailable&quot;
+&nbsp;
+<b class="fc">&nbsp;    fun row(name: String): String = &quot;debugConfig:row:$name&quot;</b>
+&nbsp;}
 &nbsp;
 &nbsp;@Composable
-<b class="nc">&nbsp;actual fun dynamicColorScheme(darkTheme: Boolean): ColorScheme {</b>
-&nbsp;    // Dynamic colors are not available on Desktop, fall back to static scheme
-<b class="nc">&nbsp;    return if (darkTheme) DarkColorScheme else LightColorScheme</b>
+&nbsp;fun DebugConfigScreen(
+&nbsp;    onNavigateBack: () -&gt; Unit,
+&nbsp;    onNavigateToLogs: () -&gt; Unit,
+&nbsp;    viewModel: DebugConfigViewModel = koinViewModel(),
+&nbsp;) {
+&nbsp;    val state by viewModel.collectAsStateWithLifecycle()
+&nbsp;    val snackbarHostState = remember { SnackbarHostState() }
+&nbsp;    var pendingInvalid by remember { mutableStateOf&lt;DebugConfigEffect.NotifyInvalidValue?&gt;(null) }
+&nbsp;
+&nbsp;    // Resolved during composition so the positional placeholders go through Compose&#39;s own format
+&nbsp;    // path and survive translator reordering; the effect below only feeds the snackbar.
+&nbsp;    val invalidText: String? = pendingInvalid?.let {
+&nbsp;        stringResource(Res.string.settings_debug_config_invalid_format, it.raw, it.name)
+&nbsp;    }
+&nbsp;    LaunchedEffect(invalidText) {
+&nbsp;        val text = invalidText ?: return@LaunchedEffect
+&nbsp;        snackbarHostState.showSnackbar(message = text, duration = SnackbarDuration.Short)
+&nbsp;        pendingInvalid = null
+&nbsp;    }
+&nbsp;
+&nbsp;    viewModel.HandleSideEffect { effect -&gt;
+&nbsp;        when (effect) {
+&nbsp;            DebugConfigEffect.NavigateBack -&gt; onNavigateBack()
+&nbsp;            DebugConfigEffect.NavigateToLogs -&gt; onNavigateToLogs()
+&nbsp;            is DebugConfigEffect.NotifyInvalidValue -&gt; pendingInvalid = effect
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    DebugConfigContent(
+&nbsp;        state = state,
+&nbsp;        snackbarHostState = snackbarHostState,
+&nbsp;        onEvent = viewModel::onEvent,
+&nbsp;    )
+&nbsp;}
+&nbsp;
+&nbsp;/** Stateless content, public so `:composeApp`&#39;s desktop UI tests can mount it — as with the other screens. */
+&nbsp;@Composable
+&nbsp;fun DebugConfigContent(
+&nbsp;    state: DebugConfigState,
+&nbsp;    snackbarHostState: SnackbarHostState,
+&nbsp;    onEvent: (DebugConfigEvent) -&gt; Unit,
+&nbsp;) {
+&nbsp;    SettingsSubScreenScaffold(
+&nbsp;        title = stringResource(Res.string.settings_debug_config_title),
+&nbsp;        snackbarHostState = snackbarHostState,
+&nbsp;        onBack = { onEvent(DebugConfigEvent.OnBackClick) },
+&nbsp;        showProgressOverlay = false,
+&nbsp;    ) { padding -&gt;
+&nbsp;        if (!state.isAvailable) {
+&nbsp;            // Release builds bind `DebugConfigSource.Empty`, which accepts writes and drops them.
+&nbsp;            // A restored back stack can still land here, and editable rows that silently no-op are
+&nbsp;            // worse than none.
+&nbsp;            Text(
+&nbsp;                text = stringResource(Res.string.settings_debug_config_unavailable),
+&nbsp;                style = AppTheme.typography.bodyMedium,
+&nbsp;                color = AppTheme.materialColors.onSurfaceVariant,
+&nbsp;                modifier = Modifier
+&nbsp;                    .padding(horizontal = 16.dp, vertical = AppTheme.spacing.default)
+&nbsp;                    .testTag(DebugConfigTestTags.Unavailable),
+&nbsp;            )
+&nbsp;            return@SettingsSubScreenScaffold
+&nbsp;        }
+&nbsp;
+&nbsp;        if (state.degradedLayers.isNotEmpty()) {
+&nbsp;            // A layer whose store failed to load resolves as absent, so every row below it shows a
+&nbsp;            // fallback. Saying so beats letting the panel present that fallback as the truth.
+&nbsp;            Text(
+&nbsp;                text = stringResource(
+&nbsp;                    Res.string.settings_debug_config_degraded_format,
+&nbsp;                    state.degradedLayers.joinToString(),
+&nbsp;                ),
+&nbsp;                style = AppTheme.typography.bodyMedium,
+&nbsp;                color = AppTheme.materialColors.error,
+&nbsp;                modifier = Modifier
+&nbsp;                    .padding(horizontal = 16.dp, vertical = AppTheme.spacing.small)
+&nbsp;                    .testTag(DebugConfigTestTags.DegradedBanner),
+&nbsp;            )
+&nbsp;        }
+&nbsp;
+&nbsp;        SurferSettingsGroup(
+&nbsp;            modifier = Modifier.testTag(DebugConfigTestTags.Root),
+&nbsp;            title = stringResource(Res.string.settings_debug_config_section_keys),
+&nbsp;            footnote = stringResource(Res.string.settings_debug_config_footnote),
+&nbsp;        ) {
+&nbsp;            state.rows.forEach { row -&gt; ConfigKeyRow(row = row, onEvent = onEvent) }
+&nbsp;        }
+&nbsp;
+&nbsp;        SurferSettingsGroup {
+&nbsp;            // The other half of the debug panel: what the app logged, for hosts where reading
+&nbsp;            // logcat or the desktop console is not an option.
+&nbsp;            SurferSettingsRow(
+&nbsp;                icon = SurferIcons.ListView,
+&nbsp;                title = stringResource(Res.string.settings_debug_log_title),
+&nbsp;                supportingText = stringResource(Res.string.settings_debug_log_supporting),
+&nbsp;                onClick = { onEvent(DebugConfigEvent.OnLogsClick) },
+&nbsp;                trailing = { SurferSettingsChevron() },
+&nbsp;                modifier = Modifier.testTag(DebugConfigTestTags.LogsRow),
+&nbsp;            )
+&nbsp;        }
+&nbsp;
+&nbsp;        SurferSettingsGroup {
+&nbsp;            SurferSettingsRow(
+&nbsp;                icon = SurferIcons.Delete,
+&nbsp;                title = stringResource(Res.string.settings_debug_config_reset_all),
+&nbsp;                danger = true,
+&nbsp;                onClick = { onEvent(DebugConfigEvent.OnResetAllClick) },
+&nbsp;                modifier = Modifier.testTag(DebugConfigTestTags.ResetAllRow),
+&nbsp;            )
+&nbsp;        }
+&nbsp;
+&nbsp;        Spacer(Modifier.height(padding.calculateBottomPadding() + 24.dp))
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * One key. The control comes from the row&#39;s value kind — a boolean gets a switch, a closed set gets
+&nbsp; * chips — so nobody has to type `PRESET:Plum` by hand. Tapping an overridden row clears its
+&nbsp; * override.
+&nbsp; */
+&nbsp;@Composable
+&nbsp;private fun ConfigKeyRow(
+&nbsp;    row: ConfigDebugRow,
+&nbsp;    onEvent: (DebugConfigEvent) -&gt; Unit,
+&nbsp;) {
+&nbsp;    val clearOverride: (() -&gt; Unit)? =
+&nbsp;        if (row.overridden) ({ onEvent(DebugConfigEvent.OnClearOverride(row.name)) }) else null
+&nbsp;
+&nbsp;    when (val kind = row.kind) {
+&nbsp;        ConfigDebugRowKind.Bool -&gt; SurferSettingsRow(
+&nbsp;            icon = SurferIcons.Code,
+&nbsp;            title = row.name,
+&nbsp;            supporting = { ResolutionSummary(row) },
+&nbsp;            trailing = {
+&nbsp;                SurferSettingsSwitch(
+&nbsp;                    checked = row.effectiveValue.toBoolean(),
+&nbsp;                    onCheckedChange = { checked -&gt;
+&nbsp;                        onEvent(DebugConfigEvent.OnOverride(row.name, checked.toString()))
+&nbsp;                    },
+&nbsp;                )
+&nbsp;            },
+&nbsp;            onClick = clearOverride,
+&nbsp;            multiline = true,
+&nbsp;            modifier = Modifier.testTag(DebugConfigTestTags.row(row.name)),
+&nbsp;        )
+&nbsp;
+&nbsp;        is ConfigDebugRowKind.Choice -&gt; SurferSettingsRow(
+&nbsp;            icon = SurferIcons.Code,
+&nbsp;            title = row.name,
+&nbsp;            supporting = {
+&nbsp;                Column {
+&nbsp;                    ResolutionSummary(row)
+&nbsp;                    Spacer(Modifier.height(AppTheme.spacing.small))
+&nbsp;                    // A closed set can be longer than the screen (the palette&#39;s presets), so the
+&nbsp;                    // chip row scrolls rather than clipping the tail options out of reach.
+&nbsp;                    Row(modifier = Modifier.horizontalScroll(rememberScrollState())) {
+&nbsp;                        SurferFilterChipRow(
+&nbsp;                            options = kind.choices,
+&nbsp;                            selected = row.effectiveValue,
+&nbsp;                            label = { it },
+&nbsp;                            onSelect = { choice -&gt; onEvent(DebugConfigEvent.OnOverride(row.name, choice)) },
+&nbsp;                        )
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            },
+&nbsp;            onClick = clearOverride,
+&nbsp;            multiline = true,
+&nbsp;            modifier = Modifier.testTag(DebugConfigTestTags.row(row.name)),
+&nbsp;        )
+&nbsp;
+&nbsp;        // Free-form values (the encoded dashboard layout) are inspect-only: a text field here is a
+&nbsp;        // routine way to store something no codec can read back.
+&nbsp;        ConfigDebugRowKind.FreeText -&gt; SurferSettingsRow(
+&nbsp;            icon = SurferIcons.Code,
+&nbsp;            title = row.name,
+&nbsp;            supporting = { ResolutionSummary(row) },
+&nbsp;            onClick = clearOverride,
+&nbsp;            multiline = true,
+&nbsp;            modifier = Modifier.testTag(DebugConfigTestTags.row(row.name)),
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * Effective value, the layer that won, and every layer&#39;s cell — absent and undecodable read
+&nbsp; * differently on purpose, because &quot;stored but rejected by the codec&quot; is the failure the per-layer
+&nbsp; * view exists to expose.
+&nbsp; */
+&nbsp;@Composable
+&nbsp;private fun ResolutionSummary(row: ConfigDebugRow) {
+&nbsp;    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+&nbsp;        Text(
+&nbsp;            text = row.effectiveValue + &quot; · &quot; +
+&nbsp;                stringResource(Res.string.settings_debug_config_winner_format, row.winner),
+&nbsp;            style = AppTheme.typography.bodyMedium,
+&nbsp;            color = AppTheme.materialColors.onSurfaceVariant,
+&nbsp;        )
+&nbsp;        if (row.hostOwned) {
+&nbsp;            // Overriding one of these makes the app believe it is a different build while its DI
+&nbsp;            // graph stays as compiled — worth saying out loud next to an ordinary feature flag.
+&nbsp;            Text(
+&nbsp;                text = stringResource(Res.string.settings_debug_config_host_owned),
+&nbsp;                style = AppTheme.typography.labelSmall,
+&nbsp;                color = AppTheme.materialColors.error,
+&nbsp;            )
+&nbsp;        }
+&nbsp;        row.layers.forEach { cell -&gt;
+&nbsp;            val rendered = when {
+&nbsp;                cell.undecodable -&gt;
+&nbsp;                    stringResource(Res.string.settings_debug_config_layer_undecodable_format, cell.value.orEmpty())
+&nbsp;                cell.value == null -&gt; stringResource(Res.string.settings_debug_config_layer_absent)
+&nbsp;                else -&gt; cell.value
+&nbsp;            }
+&nbsp;            Text(
+&nbsp;                text = &quot;${cell.layer}: $rendered&quot;,
+&nbsp;                style = AppTheme.typography.labelSmall,
+&nbsp;                color = AppTheme.materialColors.onSurfaceVariant,
+&nbsp;                modifier = Modifier.padding(start = 2.dp),
+&nbsp;            )
+&nbsp;        }
+&nbsp;    }
 &nbsp;}
 </code>
 </pre>
@@ -134,7 +399,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 21:54</div>
+    <div style="float:right;">generated on 2026-07-27 15:02</div>
 </div>
 </body>
 </html>

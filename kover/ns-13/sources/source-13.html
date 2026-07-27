@@ -1,0 +1,198 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>MoneySurfer Coverage Report > RemoteAccessDeniedException</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.georgeci.moneysurfer.data.remote</a>
+</div>
+
+<h1>Coverage Summary for Class: RemoteAccessDeniedException (com.georgeci.moneysurfer.data.remote)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">RemoteAccessDeniedException</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.remote
+&nbsp;
+&nbsp;import com.georgeci.moneysurfer.domain.model.WorkspaceMemberStatus
+&nbsp;
+&nbsp;/**
+&nbsp; * Remote primitives the account-deletion purge needs, expressed without any Firebase SDK type.
+&nbsp; * The Firestore-specific concerns each operation hides — document paths, wire DTOs, write-batch
+&nbsp; * chunking, exception classification — stay inside [FirebaseAccountDeletionRemoteSource]; the
+&nbsp; * purge/leave decision logic lives in
+&nbsp; * [UserAccountDeletionRepositoryImpl][com.georgeci.moneysurfer.data.repository.UserAccountDeletionRepositoryImpl]
+&nbsp; * and is unit-testable against a fake of this interface.
+&nbsp; *
+&nbsp; * Mirrors the seam already used for pulls
+&nbsp; * ([WorkspaceCollectionReader][com.georgeci.moneysurfer.data.sync.WorkspaceCollectionReader]).
+&nbsp; *
+&nbsp; * Reads return null / empty rather than throwing when a document is missing. When the caller
+&nbsp; * lacks access, implementations throw [RemoteAccessDeniedException] so the repository can skip a
+&nbsp; * stale workspace reference without aborting the whole deletion.
+&nbsp; */
+&nbsp;// One flat list of purge primitives, deliberately over detekt&#39;s interface ceiling: every member is
+&nbsp;// a step of the same flow, and splitting them into workspace-side and user-side interfaces would
+&nbsp;// fragment a seam that has exactly one implementation and one caller.
+&nbsp;@Suppress(&quot;TooManyFunctions&quot;)
+&nbsp;interface AccountDeletionRemoteSource {
+&nbsp;
+&nbsp;    /** Workspace ids referenced by `users/{uid}`. Empty when the user doc is gone. */
+&nbsp;    suspend fun fetchWorkspaceIds(uid: String): List&lt;String&gt;
+&nbsp;
+&nbsp;    /** `ownerId` of the workspace root doc, or null when it does not exist. */
+&nbsp;    suspend fun fetchWorkspaceOwnerId(workspaceId: String): String?
+&nbsp;
+&nbsp;    /** Every member row of the workspace. Missing statuses on legacy docs read as ACTIVE. */
+&nbsp;    suspend fun fetchMembers(workspaceId: String): List&lt;RemoteMemberRef&gt;
+&nbsp;
+&nbsp;    /** Hard-deletes every document in the named workspace subcollection. */
+&nbsp;    suspend fun deleteWorkspaceCollection(workspaceId: String, collectionName: String)
+&nbsp;
+&nbsp;    /** Hard-deletes the workspace root document. */
+&nbsp;    suspend fun deleteWorkspace(workspaceId: String)
+&nbsp;
+&nbsp;    /** Soft-leaves the workspace: member row → LEFT, stamping `leftAt` / `updatedAt`. */
+&nbsp;    suspend fun markMemberLeft(workspaceId: String, uid: String, nowMillis: Long)
+&nbsp;
+&nbsp;    /** uid stored in `userEmails/{emailKey}`, or null when there is no such mapping. */
+&nbsp;    suspend fun fetchEmailMappingUid(emailKey: String): String?
+&nbsp;
+&nbsp;    /** Deletes `userEmails/{emailKey}`. */
+&nbsp;    suspend fun deleteEmailMapping(emailKey: String)
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Hard-deletes every document in a subcollection of `users/{uid}`.
+&nbsp;     *
+&nbsp;     * Firestore does not cascade a document delete into its subcollections, so this has to run
+&nbsp;     * *before* [deleteUserDoc]: once the Auth user is gone the documents are unreachable — no
+&nbsp;     * client can authenticate as that uid again — and the personal data they hold would be orphaned
+&nbsp;     * permanently.
+&nbsp;     */
+&nbsp;    suspend fun deleteUserCollection(uid: String, collectionName: String)
+&nbsp;
+&nbsp;    /** Deletes `users/{uid}` — the final remote write of the deletion flow. */
+&nbsp;    suspend fun deleteUserDoc(uid: String)
+&nbsp;}
+&nbsp;
+&nbsp;/** Member row reduced to what the purge decision needs. */
+&nbsp;data class RemoteMemberRef(
+&nbsp;    val uid: String,
+&nbsp;    val status: WorkspaceMemberStatus,
+&nbsp;)
+&nbsp;
+&nbsp;/**
+&nbsp; * The backend refused the operation for the current user (Firestore PERMISSION_DENIED).
+&nbsp; * Raised by the remote source so the repository can react without importing an SDK type.
+&nbsp; */
+&nbsp;class RemoteAccessDeniedException(
+&nbsp;    message: String?,
+<b class="fc">&nbsp;    cause: Throwable? = null,</b>
+<b class="fc">&nbsp;) : Exception(message, cause)</b>
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-07-27 15:02</div>
+</div>
+</body>
+</html>

@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > CategoryAppearanceMigrationKt</title>
+  <title>MoneySurfer Coverage Report > DataStoreFactoryKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,15 +19,18 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.data.db.migration</a>
+    <a href="../index.html">com.georgeci.moneysurfer.data.datastore</a>
 </div>
 
-<h1>Coverage Summary for Class: CategoryAppearanceMigrationKt (com.georgeci.moneysurfer.data.db.migration)</h1>
+<h1>Coverage Summary for Class: DataStoreFactoryKt (com.georgeci.moneysurfer.data.datastore)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -46,103 +49,42 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">CategoryAppearanceMigrationKt</td>
+  <td class="name">DataStoreFactoryKt</td>
 <td class="coverageStat">
   <span class="percent">
-    50%
+    100%
   </span>
   <span class="absValue">
-    (1/2)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/6)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    5.3%
-  </span>
-  <span class="absValue">
-    (1/19)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    4%
-  </span>
-  <span class="absValue">
-    (6/150)
-  </span>
-</td>
-</tr>
-  <tr>
-    <td class="name">CategoryAppearanceMigrationKt$MIGRATION_25_26$1</td>
-<td class="coverageStat">
-  <span class="percent">
-    50%
-  </span>
-  <span class="absValue">
-    (1/2)
+    (4/4)
   </span>
 </td>
     <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    25%
+    100%
   </span>
   <span class="absValue">
-    (1/4)
+    (5/5)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    33.3%
+    100%
   </span>
   <span class="absValue">
-    (4/12)
-  </span>
-</td>
-  </tr>
-<tr>
-  <td class="name"><strong>Total</strong></td>
-<td class="coverageStat">
-  <span class="percent">
-    50%
-  </span>
-  <span class="absValue">
-    (2/4)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/6)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    8.7%
-  </span>
-  <span class="absValue">
-    (2/23)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    6.2%
-  </span>
-  <span class="absValue">
-    (10/162)
+    (38/38)
   </span>
 </td>
 </tr>
+
 </table>
 
 <br/>
@@ -150,69 +92,36 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.db.migration
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.datastore
 &nbsp;
-&nbsp;import androidx.room.migration.Migration
-&nbsp;import androidx.sqlite.SQLiteConnection
-&nbsp;import androidx.sqlite.execSQL
-&nbsp;import com.georgeci.moneysurfer.domain.model.CategoryAppearance
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.CategorySystemKind
+&nbsp;import androidx.datastore.core.DataStore
+&nbsp;import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
+&nbsp;import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+&nbsp;import androidx.datastore.preferences.core.Preferences
+&nbsp;import androidx.datastore.preferences.core.emptyPreferences
+&nbsp;import okio.Path.Companion.toPath
 &nbsp;
-&nbsp;/**
-&nbsp; * v25 → v26: give `categories` the `iconKey` and `hue` columns the creation screen has been
-&nbsp; * collecting and throwing away.
-&nbsp; *
-&nbsp; * Additive — two `ALTER TABLE ... ADD COLUMN`s, no table rebuild — followed by a deterministic
-&nbsp; * backfill. The backfill is the point: leaving existing rows on the column defaults would paint
-&nbsp; * every category the user already has in one identical colour, which reads as a broken screen
-&nbsp; * rather than as &quot;no colour chosen&quot;. Deriving both values from a stable hash of the category id
-&nbsp; * (see [CategoryAppearance]) instead reproduces exactly what the pre-column UI drew, so the
-&nbsp; * upgrade is visually a no-op.
-&nbsp; *
-&nbsp; * The hash runs in Kotlin rather than SQL because SQLite has no portable string-hash function,
-&nbsp; * and it has to agree bit-for-bit with the one the domain uses on every platform.
-&nbsp; */
-<b class="fc">&nbsp;val MIGRATION_25_26: Migration = object : Migration(25, 26) {</b>
-&nbsp;    override fun migrate(connection: SQLiteConnection) {
-<b class="nc">&nbsp;        connection.execSQL(&quot;ALTER TABLE `categories` ADD COLUMN `iconKey` TEXT NOT NULL DEFAULT &#39;&#39;&quot;)</b>
-<b class="nc">&nbsp;        connection.execSQL(&quot;ALTER TABLE `categories` ADD COLUMN `hue` INTEGER NOT NULL DEFAULT -1&quot;)</b>
-<b class="nc">&nbsp;        backfillCategoryAppearance(connection)</b>
-&nbsp;    }
-&nbsp;}
+&nbsp;internal const val DATASTORE_FILE_NAME = &quot;moneysurfer_settings.preferences_pb&quot;
+&nbsp;
+&nbsp;fun createDataStore(producePath: () -&gt; String): DataStore&lt;Preferences&gt; =
+<b class="fc">&nbsp;    PreferenceDataStoreFactory.createWithPath(</b>
+<b class="fc">&nbsp;        produceFile = { producePath().toPath() },</b>
+&nbsp;    )
 &nbsp;
 &nbsp;/**
-&nbsp; * Reads every category id (with its system kind, so the seeded Transfer row keeps its fixed
-&nbsp; * appearance) and writes the derived icon key and hue back.
+&nbsp; * Same store, but a file DataStore cannot parse is replaced with an empty one instead of throwing
+&nbsp; * `CorruptionException` on every read for the rest of the install&#39;s life.
+&nbsp; *
+&nbsp; * Only for stores whose contents are disposable — the debug-override layer. The app&#39;s own settings
+&nbsp; * file deliberately does **not** use this: it also holds the session pointers, so silently replacing
+&nbsp; * it would sign the user out, and that trade-off deserves its own decision rather than riding along
+&nbsp; * with a QA feature.
 &nbsp; */
-&nbsp;internal fun backfillCategoryAppearance(connection: SQLiteConnection) {
-<b class="nc">&nbsp;    val rows = mutableListOf&lt;Pair&lt;String, CategorySystemKind?&gt;&gt;()</b>
-<b class="nc">&nbsp;    connection.prepare(&quot;SELECT `id`, `systemKind` FROM `categories`&quot;).use { statement -&gt;</b>
-<b class="nc">&nbsp;        while (statement.step()) {</b>
-<b class="nc">&nbsp;            val id = statement.getText(0)</b>
-<b class="nc">&nbsp;            val systemKind = if (statement.isNull(1)) {</b>
-<b class="nc">&nbsp;                null</b>
-&nbsp;            } else {
-<b class="nc">&nbsp;                runCatching { CategorySystemKind.valueOf(statement.getText(1)) }.getOrNull()</b>
-&nbsp;            }
-<b class="nc">&nbsp;            rows += id to systemKind</b>
-&nbsp;        }
-<b class="nc">&nbsp;    }</b>
-&nbsp;
-<b class="nc">&nbsp;    connection.prepare(&quot;UPDATE `categories` SET `iconKey` = ?, `hue` = ? WHERE `id` = ?&quot;).use { statement -&gt;</b>
-<b class="nc">&nbsp;        rows.forEach { (id, systemKind) -&gt;</b>
-<b class="nc">&nbsp;            statement.reset()</b>
-<b class="nc">&nbsp;            statement.bindText(BIND_ICON_KEY, CategoryAppearance.defaultIconKey(id, systemKind))</b>
-<b class="nc">&nbsp;            statement.bindInt(BIND_HUE, CategoryAppearance.defaultHue(id, systemKind))</b>
-<b class="nc">&nbsp;            statement.bindText(BIND_ID, id)</b>
-<b class="nc">&nbsp;            statement.step()</b>
-<b class="nc">&nbsp;        }</b>
-<b class="nc">&nbsp;    }</b>
-&nbsp;}
-&nbsp;
-&nbsp;// Bind indices of the UPDATE above — SQLite parameters are 1-based.
-&nbsp;private const val BIND_ICON_KEY = 1
-&nbsp;private const val BIND_HUE = 2
-&nbsp;private const val BIND_ID = 3
+&nbsp;fun createReplaceOnCorruptionDataStore(producePath: () -&gt; String): DataStore&lt;Preferences&gt; =
+<b class="fc">&nbsp;    PreferenceDataStoreFactory.createWithPath(</b>
+<b class="fc">&nbsp;        corruptionHandler = ReplaceFileCorruptionHandler { emptyPreferences() },</b>
+<b class="fc">&nbsp;        produceFile = { producePath().toPath() },</b>
+&nbsp;    )
 </code>
 </pre>
 </div>
@@ -236,7 +145,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-23 23:54</div>
+    <div style="float:right;">generated on 2026-07-27 15:02</div>
 </div>
 </body>
 </html>

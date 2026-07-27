@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > TransactionCsvDecodeResult</title>
+  <title>MoneySurfer Coverage Report > SyncCoordinatorWorkspaceSyncer</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.domain.csv</a>
+    <a href="../index.html">com.georgeci.moneysurfer.data.sync</a>
 </div>
 
-<h1>Coverage Summary for Class: TransactionCsvDecodeResult (com.georgeci.moneysurfer.domain.csv)</h1>
+<h1>Coverage Summary for Class: SyncCoordinatorWorkspaceSyncer (com.georgeci.moneysurfer.data.sync)</h1>
 
 <table class="coverageStats">
 
@@ -45,87 +45,85 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   Instruction, %
 </th>
 </tr>
+<tr>
+  <td class="name">SyncCoordinatorWorkspaceSyncer</td>
+<td class="coverageStat">
+  <span class="percent">
+    80%
+  </span>
+  <span class="absValue">
+    (4/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    25%
+  </span>
+  <span class="absValue">
+    (5/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    46.2%
+  </span>
+  <span class="absValue">
+    (12/26)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    45%
+  </span>
+  <span class="absValue">
+    (103/229)
+  </span>
+</td>
+</tr>
   <tr>
-    <td class="name">TransactionCsvDecodeResult$Decoded</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
+    <td class="name">SyncCoordinatorWorkspaceSyncer$pushAll$1</td>
     <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (7/7)
-  </span>
-</td>
   </tr>
   <tr>
-    <td class="name">TransactionCsvDecodeResult$Rejected</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
+    <td class="name">SyncCoordinatorWorkspaceSyncer$syncAll$1</td>
     <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (7/7)
-  </span>
-</td>
+  </tr>
+  <tr>
+    <td class="name">SyncCoordinatorWorkspaceSyncer$syncWorkspace$1</td>
+    <td class="coverageStat"/>
   </tr>
 <tr>
   <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    80%
   </span>
   <span class="absValue">
-    (2/2)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (2/2)
+    (4/5)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    25%
   </span>
   <span class="absValue">
-    (14/14)
+    (5/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    46.2%
+  </span>
+  <span class="absValue">
+    (12/26)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    45%
+  </span>
+  <span class="absValue">
+    (103/229)
   </span>
 </td>
 </tr>
@@ -136,151 +134,80 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.csv
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.sync
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.model.Transaction
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.AccountId
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryId
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionId
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionStatus
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionType
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransferId
+&nbsp;import com.georgeci.moneysurfer.domain.auth.SessionMutator
+&nbsp;import com.georgeci.moneysurfer.domain.config.SyncSettings
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
-&nbsp;import kotlinx.datetime.LocalDate
-&nbsp;import kotlin.time.Instant
-&nbsp;
-&nbsp;/** Column order of the transactions CSV. Ordinal == field index in a record. */
-&nbsp;enum class TransactionCsvColumn(val header: String) {
-&nbsp;    Id(&quot;id&quot;),
-&nbsp;    WorkspaceId(&quot;workspace_id&quot;),
-&nbsp;    AccountId(&quot;account_id&quot;),
-&nbsp;    Type(&quot;type&quot;),
-&nbsp;    Status(&quot;status&quot;),
-&nbsp;    AmountMinor(&quot;amount_minor&quot;),
-&nbsp;    Currency(&quot;currency&quot;),
-&nbsp;    CategoryId(&quot;category_id&quot;),
-&nbsp;    Note(&quot;note&quot;),
-&nbsp;    OperationAt(&quot;operation_at&quot;),
-&nbsp;    OperationDate(&quot;operation_date&quot;),
-&nbsp;    CreatedAt(&quot;created_at&quot;),
-&nbsp;    UpdatedAt(&quot;updated_at&quot;),
-&nbsp;    TransferId(&quot;transfer_id&quot;),
-&nbsp;}
-&nbsp;
-&nbsp;sealed interface TransactionCsvDecodeResult {
-<b class="fc">&nbsp;    data class Decoded(val transaction: Transaction) : TransactionCsvDecodeResult</b>
-<b class="fc">&nbsp;    data class Rejected(val issue: CsvRowIssue) : TransactionCsvDecodeResult</b>
-&nbsp;}
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.WorkspaceSyncer
+&nbsp;import com.georgeci.moneysurfer.sync.api.SyncError
+&nbsp;import com.georgeci.moneysurfer.sync.api.SyncReason
+&nbsp;import com.georgeci.moneysurfer.sync.coordinator.SyncCoordinator
+&nbsp;import kotlinx.coroutines.flow.first
+&nbsp;import org.koin.core.annotation.Single
 &nbsp;
 &nbsp;/**
-&nbsp; * Maps a [Transaction] to/from one CSV record. Amounts are minor units,
-&nbsp; * instants are ISO-8601 strings, `operation_date` is an ISO local date, and
-&nbsp; * nullable ids serialise as empty fields. Purely structural — reference
-&nbsp; * validation (does the account exist?) happens in the import use case.
+&nbsp; * [WorkspaceSyncer] implementation that delegates to [SyncCoordinator].
+&nbsp; *
+&nbsp; * [pushAll] uses [SyncReason.LOCAL_CHANGE] → [SyncScope.UploadOnly]: drains the outbox
+&nbsp; * without a remote workspace-list fetch. Used post-create-workspace where the new workspace
+&nbsp; * and its member row need to land on Firestore before `addWorkspaceRef` is called.
+&nbsp; *
+&nbsp; * [syncAll] uses [SyncReason.MANUAL] → [SyncScope.AllUserData]: fetches
+&nbsp; * `users/{uid}.workspaceIds` via [UserWorkspacesProvider] and runs a cursor-based pull for
+&nbsp; * every workspace, including ones not yet in the local database.
+&nbsp; *
+&nbsp; * [syncWorkspace] sets the session&#39;s current workspace to the target workspace and
+&nbsp; * uses [SyncReason.SWIPE_REFRESH] → [SyncScope.ActiveWorkspace]: pulls only that workspace.
+&nbsp; * Used after accepting an invite so only the newly joined workspace is hydrated.
 &nbsp; */
-&nbsp;object TransactionCsvCodec {
+<b class="fc">&nbsp;@Single(binds = [WorkspaceSyncer::class])</b>
+&nbsp;class SyncCoordinatorWorkspaceSyncer(
+<b class="fc">&nbsp;    private val syncCoordinator: SyncCoordinator,</b>
+<b class="fc">&nbsp;    private val sessionMutator: SessionMutator,</b>
+<b class="fc">&nbsp;    private val syncSettings: SyncSettings,</b>
+&nbsp;) : WorkspaceSyncer {
 &nbsp;
-&nbsp;    val header: List&lt;String&gt; = TransactionCsvColumn.entries.map { it.header }
+&nbsp;    // When sync is off we want every use-case-driven trigger
+&nbsp;    // (PostAuthBootstrap, CreateWorkspace, AcceptInvite, RefreshIncomingInvites)
+&nbsp;    // to no-op instead of hitting Firestore. Gating at the syncer keeps the
+&nbsp;    // use cases agnostic of the setting.
 &nbsp;
-&nbsp;    fun encode(transaction: Transaction): List&lt;String&gt; = with(transaction) {
-&nbsp;        listOf(
-&nbsp;            id.value,
-&nbsp;            workspaceId.value,
-&nbsp;            accountId.value,
-&nbsp;            type.name,
-&nbsp;            status.name,
-&nbsp;            money.minor.toString(),
-&nbsp;            currencyCode.value,
-&nbsp;            categoryId?.value.orEmpty(),
-&nbsp;            // Free text: neutralise CSV formula injection before it reaches a
-&nbsp;            // spreadsheet. Reversed by unguardFormula on decode.
-&nbsp;            Csv.guardFormula(note),
-&nbsp;            operationAt.toString(),
-&nbsp;            operationDate.toString(),
-&nbsp;            createdAt.toString(),
-&nbsp;            updatedAt.toString(),
-&nbsp;            transferId?.value.orEmpty(),
-&nbsp;        )
+&nbsp;    override suspend fun pushAll(): Boolean {
+<b class="fc">&nbsp;        if (!syncSettings.isEnabled.first()) return false</b>
+<b class="fc">&nbsp;        syncCoordinator.requestSync(SyncReason.LOCAL_CHANGE)</b>
+<b class="fc">&nbsp;            .result.await()</b>
+<b class="fc">&nbsp;            .fold(ifLeft = { throw it.toException() }, ifRight = { })</b>
+<b class="fc">&nbsp;        return true</b>
 &nbsp;    }
 &nbsp;
-&nbsp;    fun decode(fields: List&lt;String&gt;): TransactionCsvDecodeResult {
-&nbsp;        if (fields.size != header.size) {
-&nbsp;            return TransactionCsvDecodeResult.Rejected(
-&nbsp;                CsvRowIssue.ColumnCountMismatch(expected = header.size, actual = fields.size),
-&nbsp;            )
-&nbsp;        }
-&nbsp;        return FieldReader(fields).decodeTransaction()
+&nbsp;    override suspend fun syncAll() {
+<b class="pc">&nbsp;        if (!syncSettings.isEnabled.first()) return</b>
+<b class="nc">&nbsp;        syncCoordinator.requestSync(SyncReason.MANUAL)</b>
+<b class="nc">&nbsp;            .result.await()</b>
+<b class="nc">&nbsp;            .fold(ifLeft = { throw it.toException() }, ifRight = { })</b>
 &nbsp;    }
 &nbsp;
-&nbsp;    private class FieldReader(private val fields: List&lt;String&gt;) {
-&nbsp;
-&nbsp;        fun decodeTransaction(): TransactionCsvDecodeResult = try {
-&nbsp;            TransactionCsvDecodeResult.Decoded(
-&nbsp;                Transaction(
-&nbsp;                    id = TransactionId(required(TransactionCsvColumn.Id)),
-&nbsp;                    workspaceId = WorkspaceId(required(TransactionCsvColumn.WorkspaceId)),
-&nbsp;                    accountId = AccountId(required(TransactionCsvColumn.AccountId)),
-&nbsp;                    money = Money(amountMinor(TransactionCsvColumn.AmountMinor)),
-&nbsp;                    currencyCode = CurrencyCode(required(TransactionCsvColumn.Currency)),
-&nbsp;                    categoryId = optional(TransactionCsvColumn.CategoryId)?.let(::CategoryId),
-&nbsp;                    note = Csv.unguardFormula(fields[TransactionCsvColumn.Note.ordinal]),
-&nbsp;                    operationAt = instant(TransactionCsvColumn.OperationAt),
-&nbsp;                    operationDate = localDate(TransactionCsvColumn.OperationDate),
-&nbsp;                    type = enum&lt;TransactionType&gt;(TransactionCsvColumn.Type),
-&nbsp;                    status = enum&lt;TransactionStatus&gt;(TransactionCsvColumn.Status),
-&nbsp;                    createdAt = instant(TransactionCsvColumn.CreatedAt),
-&nbsp;                    updatedAt = instant(TransactionCsvColumn.UpdatedAt),
-&nbsp;                    transferId = optional(TransactionCsvColumn.TransferId)?.let(::TransferId),
-&nbsp;                ),
-&nbsp;            )
-&nbsp;        } catch (rejected: FieldRejectedException) {
-&nbsp;            TransactionCsvDecodeResult.Rejected(CsvRowIssue.InvalidValue(rejected.column.header))
-&nbsp;        }
-&nbsp;
-&nbsp;        private fun raw(column: TransactionCsvColumn): String = fields[column.ordinal]
-&nbsp;
-&nbsp;        private fun required(column: TransactionCsvColumn): String =
-&nbsp;            raw(column).ifBlank { throw FieldRejectedException(column) }
-&nbsp;
-&nbsp;        private fun optional(column: TransactionCsvColumn): String? =
-&nbsp;            raw(column).ifBlank { null }
-&nbsp;
-&nbsp;        private fun long(column: TransactionCsvColumn): Long =
-&nbsp;            raw(column).toLongOrNull() ?: throw FieldRejectedException(column)
-&nbsp;
-&nbsp;        /**
-&nbsp;         * A monetary minor amount bounded to the domain cap. Rejects crafted
-&nbsp;         * out-of-range values (e.g. [Long.MIN_VALUE], whose abs() would wrap)
-&nbsp;         * before they enter a [Money] and corrupt a cached balance. See #159.
-&nbsp;         */
-&nbsp;        private fun amountMinor(column: TransactionCsvColumn): Long {
-&nbsp;            val value = long(column)
-&nbsp;            if (value &lt; -Money.MAX_MINOR || value &gt; Money.MAX_MINOR) {
-&nbsp;                throw FieldRejectedException(column)
-&nbsp;            }
-&nbsp;            return value
-&nbsp;        }
-&nbsp;
-&nbsp;        private fun instant(column: TransactionCsvColumn): Instant = try {
-&nbsp;            Instant.parse(required(column))
-&nbsp;        } catch (_: IllegalArgumentException) {
-&nbsp;            throw FieldRejectedException(column)
-&nbsp;        }
-&nbsp;
-&nbsp;        private fun localDate(column: TransactionCsvColumn): LocalDate = try {
-&nbsp;            LocalDate.parse(required(column))
-&nbsp;        } catch (_: IllegalArgumentException) {
-&nbsp;            throw FieldRejectedException(column)
-&nbsp;        }
-&nbsp;
-&nbsp;        private inline fun &lt;reified E : Enum&lt;E&gt;&gt; enum(column: TransactionCsvColumn): E =
-&nbsp;            enumValues&lt;E&gt;().find { it.name == raw(column) }
-&nbsp;                ?: throw FieldRejectedException(column)
+&nbsp;    override suspend fun syncWorkspace(workspaceId: WorkspaceId) {
+&nbsp;        // Switch the active workspace pointer even when sync is off — callers
+&nbsp;        // (e.g. AcceptInviteUseCase) rely on this to move the session to the
+&nbsp;        // newly joined workspace. Only skip the network round-trip.
+<b class="fc">&nbsp;        sessionMutator.setCurrentWorkspace(workspaceId)</b>
+<b class="pc">&nbsp;        if (!syncSettings.isEnabled.first()) return</b>
+<b class="nc">&nbsp;        syncCoordinator.requestSync(SyncReason.SWIPE_REFRESH)</b>
+<b class="nc">&nbsp;            .result.await()</b>
+<b class="nc">&nbsp;            .fold(ifLeft = { throw it.toException() }, ifRight = { })</b>
 &nbsp;    }
 &nbsp;
-&nbsp;    private class FieldRejectedException(val column: TransactionCsvColumn) : RuntimeException()
+<b class="nc">&nbsp;    private fun SyncError.toException(): RuntimeException = when (this) {</b>
+<b class="nc">&nbsp;        SyncError.Cancelled -&gt; RuntimeException(&quot;Sync cancelled&quot;)</b>
+<b class="nc">&nbsp;        SyncError.NetworkUnavailable -&gt; RuntimeException(&quot;Network unavailable&quot;)</b>
+<b class="nc">&nbsp;        SyncError.AuthRequired -&gt; RuntimeException(&quot;Auth required&quot;)</b>
+<b class="nc">&nbsp;        SyncError.PermissionDenied -&gt; RuntimeException(&quot;PERMISSION_DENIED: workspace access denied&quot;)</b>
+<b class="nc">&nbsp;        is SyncError.UnsupportedAppVersion -&gt; RuntimeException(message)</b>
+<b class="nc">&nbsp;        is SyncError.StorageError -&gt; RuntimeException(&quot;Storage error&quot;, cause)</b>
+<b class="nc">&nbsp;        is SyncError.Unknown -&gt; RuntimeException(cause.message ?: &quot;Sync failed&quot;, cause)</b>
+&nbsp;    }
 &nbsp;}
 </code>
 </pre>
@@ -305,7 +232,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-17 22:14</div>
+    <div style="float:right;">generated on 2026-07-27 15:02</div>
 </div>
 </body>
 </html>

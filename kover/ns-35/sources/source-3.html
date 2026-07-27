@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SyncMetaDao</title>
+  <title>MoneySurfer Coverage Report > BudgetsPendingDelete</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,22 +19,70 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.sync.db.dao</a>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.budget.list</a>
 </div>
 
-<h1>Coverage Summary for Class: SyncMetaDao (com.georgeci.moneysurfer.sync.db.dao)</h1>
+<h1>Coverage Summary for Class: BudgetsPendingDelete (com.georgeci.moneysurfer.feature.budget.list)</h1>
 
 <table class="coverageStats">
 <tr>
   <th class="name">Class</th>
 <th class="coverageStat 
 ">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
   Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
 </th>
 </tr>
 <tr>
-  <td class="name">SyncMetaDao</td>
+  <td class="name">BudgetsPendingDelete</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
     <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (12/12)
+  </span>
+</td>
 </tr>
 
 </table>
@@ -44,36 +92,173 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.sync.db.dao
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.budget.list
 &nbsp;
-&nbsp;import androidx.room.Dao
-&nbsp;import androidx.room.Query
-&nbsp;import androidx.room.Upsert
-&nbsp;import com.georgeci.moneysurfer.sync.db.entity.SyncMetaEntity
-&nbsp;import kotlinx.coroutines.flow.Flow
+&nbsp;import arrow.optics.optics
+&nbsp;import com.georgeci.moneysurfer.domain.auth.SessionPointers
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.BudgetId
+&nbsp;import com.georgeci.moneysurfer.domain.usecase.ArchiveBudgetUseCase
+&nbsp;import com.georgeci.moneysurfer.domain.usecase.DeleteBudgetUseCase
+&nbsp;import com.georgeci.moneysurfer.domain.usecase.GetBudgetProgressUseCase
+&nbsp;import com.georgeci.moneysurfer.domain.usecase.GetBudgetsUseCase
+&nbsp;import com.georgeci.moneysurfer.domain.usecase.GetCategoriesUseCase
+&nbsp;import com.georgeci.moneysurfer.feature.budget.BudgetUi
+&nbsp;import com.georgeci.moneysurfer.feature.budget.toUi
+&nbsp;import com.georgeci.moneysurfer.navigation.SnackbarController
+&nbsp;import com.georgeci.moneysurfer.utils.MviViewModel
+&nbsp;import kotlinx.coroutines.ExperimentalCoroutinesApi
+&nbsp;import kotlinx.coroutines.flow.combine
+&nbsp;import kotlinx.coroutines.flow.flatMapLatest
+&nbsp;import kotlinx.coroutines.flow.flowOf
+&nbsp;import kotlinx.coroutines.flow.map
+&nbsp;import moneysurfer.feature.budget.generated.resources.Res
+&nbsp;import moneysurfer.feature.budget.generated.resources.budgets_archive_undo
+&nbsp;import moneysurfer.feature.budget.generated.resources.budgets_archived_snackbar
+&nbsp;import moneysurfer.feature.budget.generated.resources.budgets_deleted_snackbar
+&nbsp;import org.koin.core.annotation.KoinViewModel
 &nbsp;
-&nbsp;@Dao
-&nbsp;interface SyncMetaDao {
+&nbsp;@KoinViewModel
+&nbsp;@OptIn(ExperimentalCoroutinesApi::class)
+&nbsp;class BudgetsViewModel(
+&nbsp;    private val getBudgets: GetBudgetsUseCase,
+&nbsp;    private val getBudgetProgress: GetBudgetProgressUseCase,
+&nbsp;    private val getCategories: GetCategoriesUseCase,
+&nbsp;    private val archiveBudget: ArchiveBudgetUseCase,
+&nbsp;    private val deleteBudget: DeleteBudgetUseCase,
+&nbsp;    private val session: SessionPointers,
+&nbsp;    private val snackbar: SnackbarController,
+&nbsp;) : MviViewModel&lt;BudgetsState, BudgetsEvent, BudgetsEffect&gt;(initialState = BudgetsState.Loading) {
 &nbsp;
-&nbsp;    @Query(
-&nbsp;        &quot;&quot;&quot;
-&nbsp;        SELECT * FROM sync_meta
-&nbsp;        WHERE workspaceId = :workspaceId AND collection = :collection
-&nbsp;        &quot;&quot;&quot;,
-&nbsp;    )
-&nbsp;    suspend fun get(workspaceId: String, collection: String): SyncMetaEntity?
+&nbsp;    init {
+&nbsp;        observeBudgets()
+&nbsp;    }
 &nbsp;
-&nbsp;    @Upsert
-&nbsp;    suspend fun upsert(entity: SyncMetaEntity)
+&nbsp;    override fun onEvent(event: BudgetsEvent) {
+&nbsp;        when (event) {
+&nbsp;            BudgetsEvent.OnBackClick -&gt; postSideEffect(BudgetsEffect.NavigateBack)
+&nbsp;            BudgetsEvent.OnAddBudgetClick -&gt; postSideEffect(BudgetsEffect.NavigateToBudgetCreation)
+&nbsp;            is BudgetsEvent.OnBudgetClick -&gt; postSideEffect(BudgetsEffect.NavigateToBudgetDetails(event.budgetId))
+&nbsp;            is BudgetsEvent.OnArchiveClick -&gt; setActive(event.budgetId, isActive = false)
+&nbsp;            is BudgetsEvent.OnRestoreClick -&gt; setActive(event.budgetId, isActive = true)
+&nbsp;            is BudgetsEvent.OnDeleteClick -&gt; requestDelete(event.budgetId)
+&nbsp;            BudgetsEvent.OnDeleteCancel -&gt; dismissDelete()
+&nbsp;            BudgetsEvent.OnDeleteConfirm -&gt; confirmDelete()
+&nbsp;        }
+&nbsp;    }
 &nbsp;
-&nbsp;    @Query(&quot;SELECT * FROM sync_meta WHERE workspaceId = :workspaceId&quot;)
-&nbsp;    fun observeByWorkspace(workspaceId: String): Flow&lt;List&lt;SyncMetaEntity&gt;&gt;
+&nbsp;    private fun setActive(budgetId: BudgetId, isActive: Boolean) {
+&nbsp;        val name = nameOf(budgetId)
+&nbsp;        launch {
+&nbsp;            archiveBudget(budgetId, isActive)
+&nbsp;            if (!isActive &amp;&amp; name != null) {
+&nbsp;                snackbar.show(
+&nbsp;                    message = Res.string.budgets_archived_snackbar,
+&nbsp;                    messageArgs = listOf(name),
+&nbsp;                    actionLabel = Res.string.budgets_archive_undo,
+&nbsp;                    onAction = { archiveBudget(budgetId, isActive = true) },
+&nbsp;                )
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
 &nbsp;
-&nbsp;    @Query(&quot;DELETE FROM sync_meta WHERE workspaceId = :workspaceId&quot;)
-&nbsp;    suspend fun deleteByWorkspace(workspaceId: String)
+&nbsp;    private fun requestDelete(budgetId: BudgetId) {
+&nbsp;        val name = nameOf(budgetId) ?: return
+&nbsp;        updateState {
+&nbsp;            BudgetsState.content.pendingDelete.modify(this) { BudgetsPendingDelete(budgetId, name) }
+&nbsp;        }
+&nbsp;    }
 &nbsp;
-&nbsp;    @Query(&quot;DELETE FROM sync_meta&quot;)
-&nbsp;    suspend fun deleteAll()
+&nbsp;    private fun dismissDelete() = updateState {
+&nbsp;        BudgetsState.content.pendingDelete.modify(this) { null }
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun confirmDelete() {
+&nbsp;        val target = (currentState as? BudgetsState.Content)?.pendingDelete ?: return
+&nbsp;        updateState { BudgetsState.content.pendingDelete.modify(this) { null } }
+&nbsp;        launch {
+&nbsp;            deleteBudget(target.id) ?: return@launch
+&nbsp;            snackbar.show(Res.string.budgets_deleted_snackbar, listOf(target.name))
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun nameOf(budgetId: BudgetId): String? {
+&nbsp;        val content = currentState as? BudgetsState.Content ?: return null
+&nbsp;        return (content.active + content.archived).firstOrNull { it.id == budgetId }?.name
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * One subscription for every card: budgets and categories drive a single progress query, so
+&nbsp;     * adding a budget costs a recomposition rather than another transaction read per card.
+&nbsp;     */
+&nbsp;    private fun observeBudgets() {
+&nbsp;        launch {
+&nbsp;            session.currentWorkspaceId
+&nbsp;                .flatMapLatest { workspaceId -&gt;
+&nbsp;                    if (workspaceId == null) {
+&nbsp;                        flowOf(emptyList())
+&nbsp;                    } else {
+&nbsp;                        combine(getBudgets(), getCategories()) { budgets, categories -&gt; budgets to categories }
+&nbsp;                            .flatMapLatest { (budgets, categories) -&gt;
+&nbsp;                                val categoriesById = categories.associateBy { it.id.value }
+&nbsp;                                getBudgetProgress.progressOf(workspaceId, budgets)
+&nbsp;                                    .map { progresses -&gt; progresses.map { it.toUi(categoriesById) } }
+&nbsp;                            }
+&nbsp;                    }
+&nbsp;                }
+&nbsp;                .collect { budgets -&gt;
+&nbsp;                    updateState {
+&nbsp;                        when (this) {
+&nbsp;                            is BudgetsState.Loading -&gt; BudgetsState.Content(
+&nbsp;                                active = budgets.filter { it.isActive },
+&nbsp;                                archived = budgets.filterNot { it.isActive },
+&nbsp;                            )
+&nbsp;                            is BudgetsState.Content -&gt; copy(
+&nbsp;                                active = budgets.filter { it.isActive },
+&nbsp;                                archived = budgets.filterNot { it.isActive },
+&nbsp;                            )
+&nbsp;                        }
+&nbsp;                    }
+&nbsp;                }
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@optics
+&nbsp;sealed interface BudgetsState {
+&nbsp;    data object Loading : BudgetsState
+&nbsp;
+&nbsp;    @optics
+&nbsp;    data class Content(
+&nbsp;        val active: List&lt;BudgetUi&gt;,
+&nbsp;        val archived: List&lt;BudgetUi&gt;,
+&nbsp;        val pendingDelete: BudgetsPendingDelete? = null,
+&nbsp;    ) : BudgetsState {
+&nbsp;        companion object
+&nbsp;    }
+&nbsp;
+&nbsp;    companion object
+&nbsp;}
+&nbsp;
+<b class="fc">&nbsp;data class BudgetsPendingDelete(</b>
+<b class="fc">&nbsp;    val id: BudgetId,</b>
+<b class="fc">&nbsp;    val name: String,</b>
+&nbsp;)
+&nbsp;
+&nbsp;sealed interface BudgetsEvent {
+&nbsp;    data object OnBackClick : BudgetsEvent
+&nbsp;    data object OnAddBudgetClick : BudgetsEvent
+&nbsp;    data class OnBudgetClick(val budgetId: BudgetId) : BudgetsEvent
+&nbsp;    data class OnArchiveClick(val budgetId: BudgetId) : BudgetsEvent
+&nbsp;    data class OnRestoreClick(val budgetId: BudgetId) : BudgetsEvent
+&nbsp;    data class OnDeleteClick(val budgetId: BudgetId) : BudgetsEvent
+&nbsp;    data object OnDeleteConfirm : BudgetsEvent
+&nbsp;    data object OnDeleteCancel : BudgetsEvent
+&nbsp;}
+&nbsp;
+&nbsp;sealed interface BudgetsEffect {
+&nbsp;    data object NavigateBack : BudgetsEffect
+&nbsp;    data object NavigateToBudgetCreation : BudgetsEffect
+&nbsp;    data class NavigateToBudgetDetails(val budgetId: BudgetId) : BudgetsEffect
 &nbsp;}
 </code>
 </pre>
@@ -98,7 +283,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-23 23:54</div>
+    <div style="float:right;">generated on 2026-07-27 15:02</div>
 </div>
 </body>
 </html>

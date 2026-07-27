@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > Budget</title>
+  <title>MoneySurfer Coverage Report > SyncedSettingsSession</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,70 +19,22 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.domain.model</a>
+    <a href="../index.html">com.georgeci.moneysurfer.domain.config</a>
 </div>
 
-<h1>Coverage Summary for Class: Budget (com.georgeci.moneysurfer.domain.model)</h1>
+<h1>Coverage Summary for Class: SyncedSettingsSession (com.georgeci.moneysurfer.domain.config)</h1>
 
 <table class="coverageStats">
 <tr>
   <th class="name">Class</th>
 <th class="coverageStat 
 ">
-  Class, %
-</th>
-<th class="coverageStat 
-">
-  Method, %
-</th>
-<th class="coverageStat 
-">
   Branch, %
-</th>
-<th class="coverageStat 
-">
-  Line, %
-</th>
-<th class="coverageStat 
-">
-  Instruction, %
 </th>
 </tr>
 <tr>
-  <td class="name">Budget</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
+  <td class="name">SyncedSettingsSession</td>
     <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (13/13)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (114/114)
-  </span>
-</td>
 </tr>
 
 </table>
@@ -92,36 +44,33 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.model
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.config
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.BudgetId
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryId
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
-&nbsp;import kotlinx.datetime.LocalDate
-&nbsp;import kotlin.time.Instant
+&nbsp;/**
+&nbsp; * Session-boundary maintenance for the settings that replicate per user.
+&nbsp; *
+&nbsp; * A domain facade for the same reason `ConfigHydration` and `RemoteConfigRefresh` are: the callers
+&nbsp; * are session-lifecycle use cases in `domain`, which must not see `app-config` any more than a
+&nbsp; * feature may.
+&nbsp; */
+&nbsp;fun interface SyncedSettingsSession {
 &nbsp;
-<b class="fc">&nbsp;data class Budget(</b>
-<b class="fc">&nbsp;    val id: BudgetId = BudgetId.uuid(),</b>
-<b class="fc">&nbsp;    val workspaceId: WorkspaceId,</b>
-<b class="fc">&nbsp;    val name: String,</b>
-&nbsp;    /** Empty = every expense category. Income categories are never counted. */
-<b class="fc">&nbsp;    val categoryIds: List&lt;CategoryId&gt;,</b>
-<b class="fc">&nbsp;    val amount: Money,</b>
-<b class="fc">&nbsp;    val period: BudgetPeriod = BudgetPeriod.MONTHLY,</b>
-<b class="fc">&nbsp;    val startDate: LocalDate,</b>
-<b class="fc">&nbsp;    val alertPercent: Int = 80,</b>
-<b class="fc">&nbsp;    val isActive: Boolean = true,</b>
-&nbsp;    /** Carry the previous period&#39;s unspent remainder into the next period&#39;s limit. */
-<b class="fc">&nbsp;    val rollover: Boolean = false,</b>
-<b class="fc">&nbsp;    val createdAt: Instant,</b>
-<b class="fc">&nbsp;    val updatedAt: Instant = createdAt,</b>
-&nbsp;)
-&nbsp;
-&nbsp;enum class BudgetPeriod {
-&nbsp;    WEEKLY,
-&nbsp;    MONTHLY,
-&nbsp;    YEARLY,
+&nbsp;    /**
+&nbsp;     * Run at the start of every session, before its first pull. Two jobs, both of which have to
+&nbsp;     * happen there and nowhere else:
+&nbsp;     *
+&nbsp;     * - **Drop the logout overlay.** The previous user&#39;s theme is held in memory so the UI does not
+&nbsp;     *   snap to defaults mid-session; left in place it would shadow whatever this user&#39;s pull writes
+&nbsp;     *   into local storage, which is the leak the account wipe exists to prevent.
+&nbsp;     * - **Re-enqueue writes the outbox refused.** `OutboxEnqueuerImpl` silently no-ops for demo and
+&nbsp;     *   signed-out sessions and nothing else replays those writes, so every setting whose stored
+&nbsp;     *   value never reached the server is queued now. This also closes the window between a local
+&nbsp;     *   write and its enqueue, which no shared transaction can protect — the two stores are
+&nbsp;     *   different databases.
+&nbsp;     *
+&nbsp;     * Idempotent, and safe without a Firebase session: the enqueue itself no-ops there.
+&nbsp;     */
+&nbsp;    suspend fun onSessionStart()
 &nbsp;}
 </code>
 </pre>
@@ -146,7 +95,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-23 23:54</div>
+    <div style="float:right;">generated on 2026-07-27 15:02</div>
 </div>
 </body>
 </html>

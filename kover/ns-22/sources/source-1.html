@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > ComposableSingletons</title>
+  <title>MoneySurfer Coverage Report > Account</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,15 +19,18 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.feature.goal</a>
+    <a href="../index.html">com.georgeci.moneysurfer.domain.model</a>
 </div>
 
-<h1>Coverage Summary for Class: ComposableSingletons (com.georgeci.moneysurfer.feature.goal)</h1>
+<h1>Coverage Summary for Class: Account (com.georgeci.moneysurfer.domain.model)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -45,96 +48,86 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   Instruction, %
 </th>
 </tr>
-  <tr>
-    <td class="name">ComposableSingletons$GoalDateFieldKt</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/2)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/2)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/80)
-  </span>
-</td>
-  </tr>
-  <tr>
-    <td class="name">ComposableSingletons$GoalNavGraphKt</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/14)
-  </span>
-</td>
-  </tr>
 <tr>
-  <td class="name"><strong>Total</strong></td>
+  <td class="name">Account</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/3)
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
   </span>
 </td>
     <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/3)
+    (12/12)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/94)
+    (103/103)
   </span>
 </td>
 </tr>
+
 </table>
 
 <br/>
 <br/>
 
-  <code class="sourceCode">Source code is not available<br /></code>
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.model
+&nbsp;
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.AccountId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.AccountType
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
+&nbsp;import kotlin.time.Instant
+&nbsp;
+<b class="fc">&nbsp;data class Account(</b>
+<b class="fc">&nbsp;    val id: AccountId,</b>
+<b class="fc">&nbsp;    val workspaceId: WorkspaceId,</b>
+<b class="fc">&nbsp;    val name: String,</b>
+<b class="fc">&nbsp;    val type: AccountType,</b>
+<b class="fc">&nbsp;    val currencyCode: CurrencyCode,</b>
+<b class="fc">&nbsp;    val balance: Money,</b>
+<b class="fc">&nbsp;    val archived: Boolean = false,</b>
+<b class="fc">&nbsp;    val updatedAt: Instant = Instant.fromEpochMilliseconds(0),</b>
+&nbsp;    /**
+&nbsp;     * When the account was archived, or `null` while it is active. Set by the repository on
+&nbsp;     * archive and cleared on restore — the manage list renders it as &quot;Archived Nov 2024&quot;, which
+&nbsp;     * `updatedAt` cannot supply because balance recalculation keeps bumping it.
+&nbsp;     */
+<b class="fc">&nbsp;    val archivedAt: Instant? = null,</b>
+&nbsp;    /** Optional user-entered key–value details (IBAN, description, custom fields, …). */
+<b class="fc">&nbsp;    val extraDetails: List&lt;AccountExtraDetail&gt; = emptyList(),</b>
+&nbsp;    /**
+&nbsp;     * Position of the account in every list the user sees, ascending. Owned by
+&nbsp;     * `AccountRepository.reorder` — the manage screen&#39;s drag-to-reorder is the only thing that
+&nbsp;     * assigns it; creation appends. Equal values are broken by name, so a workspace that has
+&nbsp;     * never been reordered still lists in a stable order rather than an arbitrary one.
+&nbsp;     */
+<b class="fc">&nbsp;    val sortOrder: Int = 0,</b>
+&nbsp;)
+</code>
+</pre>
 </div>
 
 <script type="text/javascript">
@@ -156,7 +149,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-23 23:54</div>
+    <div style="float:right;">generated on 2026-07-27 15:02</div>
 </div>
 </body>
 </html>

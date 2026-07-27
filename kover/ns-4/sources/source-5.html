@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > ZipStoredReaderKt</title>
+  <title>MoneySurfer Coverage Report > RemoteFlagDocument</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.data.backup.zip</a>
+    <a href="../index.html">com.georgeci.moneysurfer.appconfig.remote</a>
 </div>
 
-<h1>Coverage Summary for Class: ZipStoredReaderKt (com.georgeci.moneysurfer.data.backup.zip)</h1>
+<h1>Coverage Summary for Class: RemoteFlagDocument (com.georgeci.moneysurfer.appconfig.remote)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">ZipStoredReaderKt</td>
+  <td class="name">RemoteFlagDocument</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -44,114 +44,110 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.backup.zip
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.appconfig.remote
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.backup.BackupError
-&nbsp;import okio.Buffer
-&nbsp;import okio.BufferedSink
-&nbsp;import okio.BufferedSource
+&nbsp;import co.touchlab.kermit.Logger
+&nbsp;import dev.gitlive.firebase.firestore.DocumentSnapshot
+&nbsp;import dev.gitlive.firebase.firestore.FirebaseFirestore
+&nbsp;import kotlinx.coroutines.CancellationException
+&nbsp;import kotlinx.serialization.builtins.MapSerializer
+&nbsp;import kotlinx.serialization.builtins.nullable
+&nbsp;import kotlinx.serialization.builtins.serializer
+&nbsp;import org.koin.core.annotation.Single
+&nbsp;
+&nbsp;/** Shared by the two halves of this layer — they are one subsystem in the log. */
+&nbsp;internal const val REMOTE_CONFIG_LOG_TAG = &quot;RemoteConfig&quot;
 &nbsp;
 &nbsp;/**
-&nbsp; * Streaming reader for ZIPs produced by [ZipStoredWriter].
+&nbsp; * One read of the server-owned flag document, reduced to the shape the layer needs.
 &nbsp; *
-&nbsp; * Reads local-file-headers in order and ignores the trailing central directory.
-&nbsp; * Only the STORED method is supported — a non-zero compression method is a
-&nbsp; * hard error.
+&nbsp; * A seam rather than a direct Firestore call inside the source: `FirebaseFirestore` is a final
+&nbsp; * gitlive class with no test double, so without this the filtering and mirroring rules — which are
+&nbsp; * the part with actual decisions in them — could not be tested at all.
 &nbsp; */
-&nbsp;internal class ZipStoredReader(private val source: BufferedSource) {
+&nbsp;fun interface RemoteFlagDocument {
+&nbsp;    suspend fun fetch(): RemoteFlagFetch
+&nbsp;}
 &nbsp;
-&nbsp;    /** Reads the next entry&#39;s name. Returns `null` once the central directory is reached. */
-&nbsp;    fun nextEntryName(): String? {
-&nbsp;        if (source.exhausted()) return null
-&nbsp;        val signature = source.readIntLe()
-&nbsp;        if (signature != LOCAL_FILE_HEADER_SIGNATURE) {
-&nbsp;            // Treat anything else (central directory, EOCD) as end of stream.
-&nbsp;            return null
-&nbsp;        }
-&nbsp;        currentHeader = readLocalFileHeader()
-&nbsp;        return currentHeader?.name
+&nbsp;/**
+&nbsp; * Why the two cases are distinct: a document that was read and holds nothing must **clear** the
+&nbsp; * mirror, while a document that could not be read must **leave it alone**. Collapsing them into an
+&nbsp; * empty map would drop every flag the moment a device went offline; collapsing them the other way
+&nbsp; * would make a retracted flag stick forever on a device that missed the retraction.
+&nbsp; */
+&nbsp;sealed interface RemoteFlagFetch {
+&nbsp;
+&nbsp;    /** The server answered. [values] is empty when the document does not exist. */
+&nbsp;    data class Read(val values: Map&lt;String, String&gt;) : RemoteFlagFetch
+&nbsp;
+&nbsp;    /** Unreachable or unreadable. Already logged; the mirror keeps what it has. */
+&nbsp;    data object Unavailable : RemoteFlagFetch
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * Reads `appConfig/flags` as a free-form map.
+&nbsp; *
+&nbsp; * Free-form in its *names*, not its value types: everything is decoded to `String`, which is the
+&nbsp; * form every `ConfigCodec` already expects. gitlive&#39;s decoder stringifies whatever the field holds,
+&nbsp; * so a boolean typed into the Firebase Console arrives as `&quot;true&quot;` and `BooleanConfigCodec` accepts
+&nbsp; * it — the owner does not have to remember to quote flag values. A value no codec can read is still
+&nbsp; * mirrored and surfaces as `LayerValue.Undecodable`, so the debug panel shows what the server
+&nbsp; * actually sent rather than a fallback dressed up as the current value.
+&nbsp; *
+&nbsp; * This is the second reader of the `appConfig` collection and deliberately not the first: the
+&nbsp; * app-version gate keeps its own typed `appConfig/mobile` document and its awaitable, fail-open
+&nbsp; * `refresh()`. See ADR-004 → &quot;Version gate stays as it is&quot;.
+&nbsp; */
+&nbsp;@Single(binds = [RemoteFlagDocument::class])
+&nbsp;class FirestoreRemoteFlagDocument(private val firestore: FirebaseFirestore) : RemoteFlagDocument {
+&nbsp;
+&nbsp;    private val log = Logger.withTag(REMOTE_CONFIG_LOG_TAG)
+&nbsp;
+&nbsp;    @Suppress(&quot;TooGenericExceptionCaught&quot;) // Any fetch failure must degrade to the mirror, not propagate.
+&nbsp;    override suspend fun fetch(): RemoteFlagFetch = try {
+&nbsp;        firestore.collection(COLLECTION).document(DOCUMENT).get().toFetch()
+&nbsp;    } catch (cancelled: CancellationException) {
+&nbsp;        throw cancelled
+&nbsp;    } catch (failure: Throwable) {
+&nbsp;        // Message, not throwable: `CrashReportingLogWriter` turns any Warn carrying a `Throwable`
+&nbsp;        // into a Crashlytics non-fatal, and this branch is the *expected* one — every offline
+&nbsp;        // foreground return lands here. Attaching the failure would file one non-fatal per
+&nbsp;        // foreground return per offline user and bury real crashes. The breadcrumb is the signal
+&nbsp;        // worth keeping; a permanent failure surfaces through `isDegraded` instead.
+&nbsp;        log.w { &quot;$COLLECTION/$DOCUMENT unreadable (${failure.message}) — resolving from the mirrored values&quot; }
+&nbsp;        RemoteFlagFetch.Unavailable
 &nbsp;    }
 &nbsp;
 &nbsp;    /**
-&nbsp;     * Streams the body of the most-recent entry into [out] and verifies the CRC32.
-&nbsp;     * Throws [BackupError.CrcMismatch] on mismatch.
+&nbsp;     * A **missing** document is only an answer when the server said so — and the SDK guarantees
+&nbsp;     * that for us, rather than this code having to test for it.
+&nbsp;     *
+&nbsp;     * `get()` does fall back to Firestore&#39;s local cache when the network is unreachable, but it
+&nbsp;     * does not hand back an empty snapshot in that case: `DocumentReference` converts
+&nbsp;     * `!exists &amp;&amp; metadata.isFromCache` into an `UNAVAILABLE` failure (&quot;Failed to get document
+&nbsp;     * because the client is offline&quot;) on Android, iOS and the desktop JVM alike. So an offline
+&nbsp;     * cache miss arrives here as a throw and is caught above as [RemoteFlagFetch.Unavailable], and
+&nbsp;     * a snapshot that does reach this function with `exists == false` really is the server saying
+&nbsp;     * the document is gone.
+&nbsp;     *
+&nbsp;     * That distinction is the one this layer turns on: clearing the mirror on a merely-offline
+&nbsp;     * device would revert a kill switch to its `default = true` and switch the killed feature back
+&nbsp;     * on. It is delivered by the `try`/`catch` above, not by anything in here.
 &nbsp;     */
-&nbsp;    fun readCurrentEntryTo(out: BufferedSink) {
-&nbsp;        val header = currentHeader ?: error(&quot;nextEntryName() returned null or was not called&quot;)
-&nbsp;        val crc = Crc32()
-&nbsp;        var remaining = header.size
-&nbsp;        val readBuffer = ByteArray(COPY_BUFFER_SIZE)
-&nbsp;        while (remaining &gt; 0) {
-&nbsp;            val toRead = minOf(remaining.toLong(), readBuffer.size.toLong()).toInt()
-&nbsp;            val n = source.read(readBuffer, 0, toRead)
-&nbsp;            if (n == -1) {
-&nbsp;                throw BackupError.InvalidArchive(&quot;Truncated entry: ${header.name}&quot;)
-&nbsp;            }
-&nbsp;            crc.update(readBuffer, length = n)
-&nbsp;            out.write(readBuffer, 0, n)
-&nbsp;            remaining -= n
-&nbsp;        }
-&nbsp;        if (crc.getValue() != header.crc) {
-&nbsp;            throw BackupError.CrcMismatch(header.name)
-&nbsp;        }
-&nbsp;        currentHeader = null
+&nbsp;    private fun DocumentSnapshot.toFetch(): RemoteFlagFetch {
+&nbsp;        if (!exists) return RemoteFlagFetch.Read(emptyMap())
+&nbsp;        // A field the owner cleared to `null` instead of deleting is absent, not the string &quot;null&quot;:
+&nbsp;        // gitlive decodes every field through `toString()`, so a nullable value serializer is what
+&nbsp;        // keeps `null` from being mirrored — and `StringConfigCodec` would happily serve it.
+&nbsp;        return RemoteFlagFetch.Read(data(FLAG_MAP).mapNotNull { (name, value) -&gt; value?.let { name to it } }.toMap())
 &nbsp;    }
 &nbsp;
-&nbsp;    /** Reads the current entry into a fresh [Buffer]. */
-&nbsp;    fun readCurrentEntryToBuffer(): Buffer {
-&nbsp;        val buffer = Buffer()
-&nbsp;        readCurrentEntryTo(buffer)
-&nbsp;        return buffer
+&nbsp;    private companion object {
+&nbsp;        const val COLLECTION = &quot;appConfig&quot;
+&nbsp;        const val DOCUMENT = &quot;flags&quot;
+&nbsp;        val FLAG_MAP = MapSerializer(String.serializer(), String.serializer().nullable)
 &nbsp;    }
-&nbsp;
-&nbsp;    private var currentHeader: LocalEntry? = null
-&nbsp;
-&nbsp;    private fun readLocalFileHeader(): LocalEntry {
-&nbsp;        val versionNeeded = source.readShortLe().toInt() and MASK_U16
-&nbsp;        val flags = source.readShortLe().toInt() and MASK_U16
-&nbsp;        val method = source.readShortLe().toInt() and MASK_U16
-&nbsp;        source.readShortLe()
-&nbsp;        source.readShortLe()
-&nbsp;        val crc = source.readIntLe().toLong() and MASK_U32
-&nbsp;        val compressedSize = source.readIntLe().toLong() and MASK_U32
-&nbsp;        val uncompressedSize = source.readIntLe().toLong() and MASK_U32
-&nbsp;        val nameLength = source.readShortLe().toInt() and MASK_U16
-&nbsp;        val extraLength = source.readShortLe().toInt() and MASK_U16
-&nbsp;
-&nbsp;        val problem = when {
-&nbsp;            method != COMPRESSION_METHOD_STORED -&gt;
-&nbsp;                &quot;Unsupported compression method: $method&quot;
-&nbsp;            flags and GENERAL_PURPOSE_DATA_DESCRIPTOR_FLAG != 0 -&gt;
-&nbsp;                &quot;Data-descriptor entries are not supported&quot;
-&nbsp;            versionNeeded &gt; VERSION_NEEDED_TO_EXTRACT -&gt;
-&nbsp;                &quot;ZIP requires version $versionNeeded&quot;
-&nbsp;            compressedSize != uncompressedSize -&gt;
-&nbsp;                &quot;STORED entry has mismatched sizes&quot;
-&nbsp;            // The codec keeps each entry buffered as a single okio Segment chain,
-&nbsp;            // so anything above Int.MAX_VALUE bytes can&#39;t be addressed in the
-&nbsp;            // ByteArray copy loop and would silently overflow on the cast below.
-&nbsp;            // We don&#39;t ship multi-GB DBs, so reject up front.
-&nbsp;            uncompressedSize &gt; Int.MAX_VALUE.toLong() -&gt;
-&nbsp;                &quot;Entry too large: $uncompressedSize bytes&quot;
-&nbsp;            else -&gt; null
-&nbsp;        }
-&nbsp;        if (problem != null) {
-&nbsp;            throw BackupError.InvalidArchive(problem)
-&nbsp;        }
-&nbsp;
-&nbsp;        val nameBytes = source.readByteArray(nameLength.toLong())
-&nbsp;        val name = nameBytes.decodeToString()
-&nbsp;        if (extraLength &gt; 0) source.skip(extraLength.toLong())
-&nbsp;        return LocalEntry(name = name, size = uncompressedSize.toInt(), crc = crc)
-&nbsp;    }
-&nbsp;
-&nbsp;    private data class LocalEntry(val name: String, val size: Int, val crc: Long)
 &nbsp;}
-&nbsp;
-&nbsp;private const val GENERAL_PURPOSE_DATA_DESCRIPTOR_FLAG: Int = 1 shl 3
-&nbsp;private const val COPY_BUFFER_SIZE: Int = 64 * 1024
-&nbsp;private const val MASK_U16: Int = 0xFFFF
-&nbsp;private const val MASK_U32: Long = 0xFFFFFFFFL
 </code>
 </pre>
 </div>
@@ -175,7 +171,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-17 22:14</div>
+    <div style="float:right;">generated on 2026-07-27 15:02</div>
 </div>
 </body>
 </html>

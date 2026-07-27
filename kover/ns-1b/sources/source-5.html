@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > BudgetPeriod</title>
+  <title>MoneySurfer Coverage Report > HostCapabilities</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,70 +19,22 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.domain.model</a>
+    <a href="../index.html">com.georgeci.moneysurfer.domain.config</a>
 </div>
 
-<h1>Coverage Summary for Class: BudgetPeriod (com.georgeci.moneysurfer.domain.model)</h1>
+<h1>Coverage Summary for Class: HostCapabilities (com.georgeci.moneysurfer.domain.config)</h1>
 
 <table class="coverageStats">
 <tr>
   <th class="name">Class</th>
 <th class="coverageStat 
 ">
-  Class, %
-</th>
-<th class="coverageStat 
-">
-  Method, %
-</th>
-<th class="coverageStat 
-">
   Branch, %
-</th>
-<th class="coverageStat 
-">
-  Line, %
-</th>
-<th class="coverageStat 
-">
-  Instruction, %
 </th>
 </tr>
 <tr>
-  <td class="name">BudgetPeriod</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
+  <td class="name">HostCapabilities</td>
     <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (3/3)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (24/24)
-  </span>
-</td>
 </tr>
 
 </table>
@@ -92,36 +44,31 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.model
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.config
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.BudgetId
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryId
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
-&nbsp;import kotlinx.datetime.LocalDate
-&nbsp;import kotlin.time.Instant
+&nbsp;/**
+&nbsp; * What this build of the app can do — the facts the host decides at compile time.
+&nbsp; *
+&nbsp; * Replaces `OfflineBuildFlags`, `SignInFeatureConfig` and `TransactionCreationFeatureConfig`: one
+&nbsp; * facade over the configuration engine&#39;s Build layer instead of three data classes with a Koin
+&nbsp; * binding each in every host.
+&nbsp; *
+&nbsp; * Reads are synchronous because the Build layer is an in-memory map, but they still go through
+&nbsp; * `Config`, so a QA override can shadow one locally. That makes them valid only **after**
+&nbsp; * [ConfigHydration.hydrate] has completed — which `AppLaunchViewModel` awaits before it resolves
+&nbsp; * the start route, i.e. before any screen that injects this facade can exist.
+&nbsp; */
+&nbsp;interface HostCapabilities {
 &nbsp;
-&nbsp;data class Budget(
-&nbsp;    val id: BudgetId = BudgetId.uuid(),
-&nbsp;    val workspaceId: WorkspaceId,
-&nbsp;    val name: String,
-&nbsp;    /** Empty = every expense category. Income categories are never counted. */
-&nbsp;    val categoryIds: List&lt;CategoryId&gt;,
-&nbsp;    val amount: Money,
-&nbsp;    val period: BudgetPeriod = BudgetPeriod.MONTHLY,
-&nbsp;    val startDate: LocalDate,
-&nbsp;    val alertPercent: Int = 80,
-&nbsp;    val isActive: Boolean = true,
-&nbsp;    /** Carry the previous period&#39;s unspent remainder into the next period&#39;s limit. */
-&nbsp;    val rollover: Boolean = false,
-&nbsp;    val createdAt: Instant,
-&nbsp;    val updatedAt: Instant = createdAt,
-&nbsp;)
+&nbsp;    /** Firebase-free build: no profile, sync, members, invites, logout or account deletion. */
+&nbsp;    val isOffline: Boolean
 &nbsp;
-&nbsp;enum class BudgetPeriod {
-<b class="fc">&nbsp;    WEEKLY,</b>
-<b class="fc">&nbsp;    MONTHLY,</b>
-<b class="fc">&nbsp;    YEARLY,</b>
+&nbsp;    val signInEmailPassword: Boolean
+&nbsp;    val signInAnonymous: Boolean
+&nbsp;    val signInDemo: Boolean
+&nbsp;
+&nbsp;    /** Multi-account transfers in transaction creation. */
+&nbsp;    val transferEnabled: Boolean
 &nbsp;}
 </code>
 </pre>
@@ -146,7 +93,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-23 23:54</div>
+    <div style="float:right;">generated on 2026-07-27 15:02</div>
 </div>
 </body>
 </html>

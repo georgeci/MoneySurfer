@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > WorkspaceSyncer</title>
+  <title>MoneySurfer Coverage Report > TransactionRowUi</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,22 +19,70 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.domain.repositories</a>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.transaction.list</a>
 </div>
 
-<h1>Coverage Summary for Class: WorkspaceSyncer (com.georgeci.moneysurfer.domain.repositories)</h1>
+<h1>Coverage Summary for Class: TransactionRowUi (com.georgeci.moneysurfer.feature.transaction.list)</h1>
 
 <table class="coverageStats">
 <tr>
   <th class="name">Class</th>
 <th class="coverageStat 
 ">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
   Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
 </th>
 </tr>
 <tr>
-  <td class="name">WorkspaceSyncer</td>
+  <td class="name">TransactionRowUi</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
     <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (9/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (65/65)
+  </span>
+</td>
 </tr>
 
 </table>
@@ -44,33 +92,75 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.repositories
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.transaction.list
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionId
+&nbsp;import com.georgeci.moneysurfer.feature.transaction.filter.TransactionDateRange
+&nbsp;import com.georgeci.moneysurfer.feature.transaction.filter.TransactionSort
+&nbsp;import com.georgeci.moneysurfer.feature.transaction.filter.TransactionTypeFilter
+&nbsp;import kotlinx.datetime.LocalDate
+&nbsp;
+&nbsp;data class TransactionGroupUi(
+&nbsp;    val date: LocalDate,
+&nbsp;    val dateLabel: TransactionDateUi,
+&nbsp;    val netFormatted: String,
+&nbsp;    val netPositive: Boolean,
+&nbsp;    val transactions: List&lt;TransactionRowUi&gt;,
+&nbsp;)
+&nbsp;
+&nbsp;/** Day-header label, resolved to text by the screen. */
+&nbsp;sealed interface TransactionDateUi {
+&nbsp;    data object Today : TransactionDateUi
+&nbsp;    data object Yesterday : TransactionDateUi
+&nbsp;    data class Exact(val date: LocalDate) : TransactionDateUi
+&nbsp;}
+&nbsp;
+&nbsp;/** Pager label, resolved to text by the screen — see the `PeriodPager` design component. */
+&nbsp;sealed interface TransactionPeriodUi {
+&nbsp;    data class Month(val monthNumber: Int, val year: Int) : TransactionPeriodUi
+&nbsp;    data class Week(
+&nbsp;        val from: LocalDate,
+&nbsp;        val to: LocalDate,
+&nbsp;        val weekNumber: Int,
+&nbsp;        val weekYear: Int,
+&nbsp;    ) : TransactionPeriodUi
+&nbsp;
+&nbsp;    data object AllTime : TransactionPeriodUi
+&nbsp;}
 &nbsp;
 &nbsp;/**
-&nbsp; * Triggers sync operations without exposing the sync infrastructure to domain use cases.
-&nbsp; *
-&nbsp; * [pushAll] drains the outbox (push-only, no remote discovery).
-&nbsp; * [syncAll] fetches the authoritative workspace list from the remote user doc and
-&nbsp; * runs a full cursor-based pull for every workspace — including ones not yet local.
-&nbsp; * [syncWorkspace] pulls a single specific workspace; used after accepting an invite so
-&nbsp; * only the newly joined workspace is hydrated without re-syncing everything.
+&nbsp; * The filter chip rail&#39;s contents. Every chip is a shortcut into the filter screen, so these carry
+&nbsp; * only what the chip label shows — a name when exactly one thing is picked, a count otherwise.
 &nbsp; */
-&nbsp;interface WorkspaceSyncer {
-&nbsp;    /** Push all pending outbox mutations. Throws on error. */
-&nbsp;    suspend fun pushAll()
+&nbsp;data class TransactionFilterChipsUi(
+&nbsp;    val dateRange: TransactionDateRange,
+&nbsp;    val type: TransactionTypeFilter,
+&nbsp;    val accountCount: Int,
+&nbsp;    val accountName: String?,
+&nbsp;    val categoryCount: Int,
+&nbsp;    val categoryName: String?,
+&nbsp;    val sort: TransactionSort,
+&nbsp;)
 &nbsp;
-&nbsp;    /** Push outbox + pull all user workspaces (including undiscovered ones). Throws on error. */
-&nbsp;    suspend fun syncAll()
+<b class="fc">&nbsp;data class TransactionRowUi(</b>
+<b class="fc">&nbsp;    val id: TransactionId,</b>
+<b class="fc">&nbsp;    val title: String,</b>
+<b class="fc">&nbsp;    val subtitle: String,</b>
+<b class="fc">&nbsp;    val formattedAmount: String,</b>
+<b class="fc">&nbsp;    val isExpense: Boolean,</b>
+<b class="fc">&nbsp;    val categoryHueSeed: String,</b>
+&nbsp;    /** Name of the owning account, rendered only where the list mixes several — may be blank. */
+<b class="fc">&nbsp;    val accountName: String = &quot;&quot;,</b>
+&nbsp;    /** One leg of a transfer: money moved sideways, drawn neutral with a swap glyph. */
+<b class="fc">&nbsp;    val isTransfer: Boolean = false,</b>
+&nbsp;)
 &nbsp;
-&nbsp;    /**
-&nbsp;     * Push outbox + pull a single workspace by [workspaceId].
-&nbsp;     * Sets the active workspace to [workspaceId] for the duration of the sync so
-&nbsp;     * [SyncScope.ActiveWorkspace] targets the correct workspace.
-&nbsp;     */
-&nbsp;    suspend fun syncWorkspace(workspaceId: WorkspaceId)
-&nbsp;}
+&nbsp;data class TransactionSummaryUi(
+&nbsp;    val incomeFormatted: String,
+&nbsp;    val expenseFormatted: String,
+&nbsp;    val netFormatted: String,
+&nbsp;    val netPositive: Boolean,
+&nbsp;)
 </code>
 </pre>
 </div>
@@ -94,7 +184,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-23 14:54</div>
+    <div style="float:right;">generated on 2026-07-27 15:02</div>
 </div>
 </body>
 </html>

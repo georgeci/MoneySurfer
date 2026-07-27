@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > TransactionCsvCodec</title>
+  <title>MoneySurfer Coverage Report > TombstonePatch</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.domain.csv</a>
+    <a href="../index.html">com.georgeci.moneysurfer.data.sync.plugin</a>
 </div>
 
-<h1>Coverage Summary for Class: TransactionCsvCodec (com.georgeci.moneysurfer.domain.csv)</h1>
+<h1>Coverage Summary for Class: TombstonePatch (com.georgeci.moneysurfer.data.sync.plugin)</h1>
 
 <table class="coverageStats">
 
@@ -46,13 +46,21 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">TransactionCsvCodec</td>
+  <td class="name">TombstonePatch</td>
 <td class="coverageStat">
   <span class="percent">
-    75%
+    100%
   </span>
   <span class="absValue">
-    (3/4)
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
   </span>
 </td>
 <td class="coverageStat">
@@ -60,63 +68,20 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (10/10)
+    (4/4)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    71.4%
   </span>
   <span class="absValue">
-    (22/22)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (139/139)
+    (40/56)
   </span>
 </td>
 </tr>
   <tr>
-    <td class="name">TransactionCsvCodec$FieldReader</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (10/10)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (20/20)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (32/32)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (315/315)
-  </span>
-</td>
-  </tr>
-  <tr>
-    <td class="name">TransactionCsvCodec$FieldRejectedException</td>
+    <td class="name">TombstonePatch$Companion</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -139,7 +104,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (7/7)
+    (4/4)
   </span>
 </td>
   </tr>
@@ -147,10 +112,18 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
-    93.3%
+    100%
   </span>
   <span class="absValue">
-    (14/15)
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
   </span>
 </td>
 <td class="coverageStat">
@@ -158,23 +131,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (30/30)
+    (5/5)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    73.3%
   </span>
   <span class="absValue">
-    (55/55)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (461/461)
+    (44/60)
   </span>
 </td>
 </tr>
@@ -185,151 +150,56 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.csv
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.sync.plugin
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.model.Transaction
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.AccountId
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryId
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionId
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionStatus
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionType
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransferId
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
-&nbsp;import kotlinx.datetime.LocalDate
-&nbsp;import kotlin.time.Instant
+&nbsp;import com.georgeci.moneysurfer.sync.repository.PendingMutation
+&nbsp;import dev.gitlive.firebase.firestore.DocumentReference
+&nbsp;import kotlinx.serialization.Serializable
 &nbsp;
-&nbsp;/** Column order of the transactions CSV. Ordinal == field index in a record. */
-&nbsp;enum class TransactionCsvColumn(val header: String) {
-&nbsp;    Id(&quot;id&quot;),
-&nbsp;    WorkspaceId(&quot;workspace_id&quot;),
-&nbsp;    AccountId(&quot;account_id&quot;),
-&nbsp;    Type(&quot;type&quot;),
-&nbsp;    Status(&quot;status&quot;),
-&nbsp;    AmountMinor(&quot;amount_minor&quot;),
-&nbsp;    Currency(&quot;currency&quot;),
-&nbsp;    CategoryId(&quot;category_id&quot;),
-&nbsp;    Note(&quot;note&quot;),
-&nbsp;    OperationAt(&quot;operation_at&quot;),
-&nbsp;    OperationDate(&quot;operation_date&quot;),
-&nbsp;    CreatedAt(&quot;created_at&quot;),
-&nbsp;    UpdatedAt(&quot;updated_at&quot;),
-&nbsp;    TransferId(&quot;transfer_id&quot;),
-&nbsp;}
+&nbsp;/**
+&nbsp; * Wire-format patch pushed for [com.georgeci.moneysurfer.sync.repository.MutationOperation.DELETE].
+&nbsp; *
+&nbsp; * Firestore rules deny hard deletes on every entity collection
+&nbsp; * (`allow delete: if false`, firestore.rules v2.0.0), so a local delete
+&nbsp; * replicates as a soft-delete `update`. Field names must match the entity DTOs
+&nbsp; * in RemoteDtos.kt: peers decode `deletedAt != null` and hard-delete the local
+&nbsp; * row, and their `updatedAt &gt; cursor` pull picks the tombstone up
+&nbsp; * (see sync-pull-lww.md → Tombstones).
+&nbsp; */
+<b class="pc">&nbsp;@Serializable</b>
+&nbsp;internal data class TombstonePatch(
+<b class="fc">&nbsp;    val deletedAt: Long,</b>
+<b class="fc">&nbsp;    val updatedAt: Long,</b>
+<b class="fc">&nbsp;    val clientVersionCode: Int,</b>
+&nbsp;)
 &nbsp;
-&nbsp;sealed interface TransactionCsvDecodeResult {
-&nbsp;    data class Decoded(val transaction: Transaction) : TransactionCsvDecodeResult
-&nbsp;    data class Rejected(val issue: CsvRowIssue) : TransactionCsvDecodeResult
+&nbsp;/**
+&nbsp; * [TombstonePatch.deletedAt] and [TombstonePatch.updatedAt] both take the
+&nbsp; * mutation&#39;s enqueue time, so a retried push writes an identical patch —
+&nbsp; * matching the idempotent re-push contract the rest of the outbox relies on.
+&nbsp; */
+&nbsp;internal fun tombstonePatchFor(
+&nbsp;    mutation: PendingMutation,
+&nbsp;    clientVersionCode: Int,
+&nbsp;): TombstonePatch {
+&nbsp;    val deletedAtMillis = mutation.createdAt.toEpochMilliseconds()
+&nbsp;    return TombstonePatch(
+&nbsp;        deletedAt = deletedAtMillis,
+&nbsp;        updatedAt = deletedAtMillis,
+&nbsp;        clientVersionCode = clientVersionCode,
+&nbsp;    )
 &nbsp;}
 &nbsp;
 &nbsp;/**
-&nbsp; * Maps a [Transaction] to/from one CSV record. Amounts are minor units,
-&nbsp; * instants are ISO-8601 strings, `operation_date` is an ISO local date, and
-&nbsp; * nullable ids serialise as empty fields. Purely structural — reference
-&nbsp; * validation (does the account exist?) happens in the import use case.
+&nbsp; * Writes [patch] onto the remote doc, skipping docs that never reached
+&nbsp; * Firestore: an entity created and deleted between two drains leaves the
+&nbsp; * INSERT push a no-op (the Room row is already gone), and updating the
+&nbsp; * missing doc would raise NOT_FOUND on every retry, wedging the batch.
+&nbsp; * A doc that never existed remotely has nothing for peers to forget.
 &nbsp; */
-&nbsp;object TransactionCsvCodec {
-&nbsp;
-<b class="fc">&nbsp;    val header: List&lt;String&gt; = TransactionCsvColumn.entries.map { it.header }</b>
-&nbsp;
-<b class="fc">&nbsp;    fun encode(transaction: Transaction): List&lt;String&gt; = with(transaction) {</b>
-<b class="fc">&nbsp;        listOf(</b>
-<b class="fc">&nbsp;            id.value,</b>
-<b class="fc">&nbsp;            workspaceId.value,</b>
-<b class="fc">&nbsp;            accountId.value,</b>
-<b class="fc">&nbsp;            type.name,</b>
-<b class="fc">&nbsp;            status.name,</b>
-<b class="fc">&nbsp;            money.minor.toString(),</b>
-<b class="fc">&nbsp;            currencyCode.value,</b>
-<b class="fc">&nbsp;            categoryId?.value.orEmpty(),</b>
-&nbsp;            // Free text: neutralise CSV formula injection before it reaches a
-&nbsp;            // spreadsheet. Reversed by unguardFormula on decode.
-<b class="fc">&nbsp;            Csv.guardFormula(note),</b>
-<b class="fc">&nbsp;            operationAt.toString(),</b>
-<b class="fc">&nbsp;            operationDate.toString(),</b>
-<b class="fc">&nbsp;            createdAt.toString(),</b>
-<b class="fc">&nbsp;            updatedAt.toString(),</b>
-<b class="fc">&nbsp;            transferId?.value.orEmpty(),</b>
-<b class="fc">&nbsp;        )</b>
-&nbsp;    }
-&nbsp;
-&nbsp;    fun decode(fields: List&lt;String&gt;): TransactionCsvDecodeResult {
-<b class="fc">&nbsp;        if (fields.size != header.size) {</b>
-<b class="fc">&nbsp;            return TransactionCsvDecodeResult.Rejected(</b>
-<b class="fc">&nbsp;                CsvRowIssue.ColumnCountMismatch(expected = header.size, actual = fields.size),</b>
-&nbsp;            )
-&nbsp;        }
-<b class="fc">&nbsp;        return FieldReader(fields).decodeTransaction()</b>
-&nbsp;    }
-&nbsp;
-<b class="fc">&nbsp;    private class FieldReader(private val fields: List&lt;String&gt;) {</b>
-&nbsp;
-&nbsp;        fun decodeTransaction(): TransactionCsvDecodeResult = try {
-<b class="fc">&nbsp;            TransactionCsvDecodeResult.Decoded(</b>
-<b class="fc">&nbsp;                Transaction(</b>
-<b class="fc">&nbsp;                    id = TransactionId(required(TransactionCsvColumn.Id)),</b>
-<b class="fc">&nbsp;                    workspaceId = WorkspaceId(required(TransactionCsvColumn.WorkspaceId)),</b>
-<b class="fc">&nbsp;                    accountId = AccountId(required(TransactionCsvColumn.AccountId)),</b>
-<b class="fc">&nbsp;                    money = Money(amountMinor(TransactionCsvColumn.AmountMinor)),</b>
-<b class="fc">&nbsp;                    currencyCode = CurrencyCode(required(TransactionCsvColumn.Currency)),</b>
-<b class="fc">&nbsp;                    categoryId = optional(TransactionCsvColumn.CategoryId)?.let(::CategoryId),</b>
-<b class="fc">&nbsp;                    note = Csv.unguardFormula(fields[TransactionCsvColumn.Note.ordinal]),</b>
-<b class="fc">&nbsp;                    operationAt = instant(TransactionCsvColumn.OperationAt),</b>
-<b class="fc">&nbsp;                    operationDate = localDate(TransactionCsvColumn.OperationDate),</b>
-<b class="fc">&nbsp;                    type = enum&lt;TransactionType&gt;(TransactionCsvColumn.Type),</b>
-<b class="fc">&nbsp;                    status = enum&lt;TransactionStatus&gt;(TransactionCsvColumn.Status),</b>
-<b class="fc">&nbsp;                    createdAt = instant(TransactionCsvColumn.CreatedAt),</b>
-<b class="fc">&nbsp;                    updatedAt = instant(TransactionCsvColumn.UpdatedAt),</b>
-<b class="fc">&nbsp;                    transferId = optional(TransactionCsvColumn.TransferId)?.let(::TransferId),</b>
-&nbsp;                ),
-&nbsp;            )
-&nbsp;        } catch (rejected: FieldRejectedException) {
-<b class="fc">&nbsp;            TransactionCsvDecodeResult.Rejected(CsvRowIssue.InvalidValue(rejected.column.header))</b>
-&nbsp;        }
-&nbsp;
-<b class="fc">&nbsp;        private fun raw(column: TransactionCsvColumn): String = fields[column.ordinal]</b>
-&nbsp;
-&nbsp;        private fun required(column: TransactionCsvColumn): String =
-<b class="fc">&nbsp;            raw(column).ifBlank { throw FieldRejectedException(column) }</b>
-&nbsp;
-&nbsp;        private fun optional(column: TransactionCsvColumn): String? =
-<b class="fc">&nbsp;            raw(column).ifBlank { null }</b>
-&nbsp;
-&nbsp;        private fun long(column: TransactionCsvColumn): Long =
-<b class="fc">&nbsp;            raw(column).toLongOrNull() ?: throw FieldRejectedException(column)</b>
-&nbsp;
-&nbsp;        /**
-&nbsp;         * A monetary minor amount bounded to the domain cap. Rejects crafted
-&nbsp;         * out-of-range values (e.g. [Long.MIN_VALUE], whose abs() would wrap)
-&nbsp;         * before they enter a [Money] and corrupt a cached balance. See #159.
-&nbsp;         */
-&nbsp;        private fun amountMinor(column: TransactionCsvColumn): Long {
-<b class="fc">&nbsp;            val value = long(column)</b>
-<b class="fc">&nbsp;            if (value &lt; -Money.MAX_MINOR || value &gt; Money.MAX_MINOR) {</b>
-<b class="fc">&nbsp;                throw FieldRejectedException(column)</b>
-&nbsp;            }
-<b class="fc">&nbsp;            return value</b>
-&nbsp;        }
-&nbsp;
-&nbsp;        private fun instant(column: TransactionCsvColumn): Instant = try {
-<b class="fc">&nbsp;            Instant.parse(required(column))</b>
-&nbsp;        } catch (_: IllegalArgumentException) {
-<b class="fc">&nbsp;            throw FieldRejectedException(column)</b>
-&nbsp;        }
-&nbsp;
-&nbsp;        private fun localDate(column: TransactionCsvColumn): LocalDate = try {
-<b class="fc">&nbsp;            LocalDate.parse(required(column))</b>
-&nbsp;        } catch (_: IllegalArgumentException) {
-<b class="fc">&nbsp;            throw FieldRejectedException(column)</b>
-&nbsp;        }
-&nbsp;
-&nbsp;        private inline fun &lt;reified E : Enum&lt;E&gt;&gt; enum(column: TransactionCsvColumn): E =
-<b class="fc">&nbsp;            enumValues&lt;E&gt;().find { it.name == raw(column) }</b>
-<b class="fc">&nbsp;                ?: throw FieldRejectedException(column)</b>
-&nbsp;    }
-&nbsp;
-<b class="fc">&nbsp;    private class FieldRejectedException(val column: TransactionCsvColumn) : RuntimeException()</b>
+&nbsp;internal suspend fun DocumentReference.pushTombstone(patch: TombstonePatch) {
+&nbsp;    if (!get().exists) return
+&nbsp;    update(patch)
 &nbsp;}
 </code>
 </pre>
@@ -354,7 +224,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 16:22</div>
+    <div style="float:right;">generated on 2026-07-27 15:02</div>
 </div>
 </body>
 </html>

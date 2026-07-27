@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SurferCategoryTrendBar</title>
+  <title>MoneySurfer Coverage Report > ExportedOrganization</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,18 +19,15 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.uikit.components.category</a>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.settings.about.licenses</a>
 </div>
 
-<h1>Coverage Summary for Class: SurferCategoryTrendBar (com.georgeci.moneysurfer.uikit.components.category)</h1>
+<h1>Coverage Summary for Class: ExportedOrganization (com.georgeci.moneysurfer.feature.settings.about.licenses)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
-<th class="coverageStat 
-">
-  Class, %
-</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -49,42 +46,103 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SurferCategoryTrendBar</td>
+  <td class="name">ExportedOrganization</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    20%
   </span>
   <span class="absValue">
-    (0/1)
+    (2/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    63.3%
+  </span>
+  <span class="absValue">
+    (38/60)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ExportedOrganization$Companion</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
   </span>
 </td>
     <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/4)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/17)
+    (4/4)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    20%
+  </span>
+  <span class="absValue">
+    (2/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    65.6%
+  </span>
+  <span class="absValue">
+    (42/64)
   </span>
 </td>
 </tr>
-
 </table>
 
 <br/>
@@ -92,197 +150,130 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.components.category
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.settings.about.licenses
 &nbsp;
-&nbsp;import androidx.compose.foundation.background
-&nbsp;import androidx.compose.foundation.border
-&nbsp;import androidx.compose.foundation.layout.Arrangement
-&nbsp;import androidx.compose.foundation.layout.Box
-&nbsp;import androidx.compose.foundation.layout.Column
-&nbsp;import androidx.compose.foundation.layout.Row
-&nbsp;import androidx.compose.foundation.layout.Spacer
-&nbsp;import androidx.compose.foundation.layout.fillMaxHeight
-&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
-&nbsp;import androidx.compose.foundation.layout.height
-&nbsp;import androidx.compose.foundation.layout.padding
-&nbsp;import androidx.compose.material3.Text
-&nbsp;import androidx.compose.runtime.Composable
-&nbsp;import androidx.compose.ui.Alignment
-&nbsp;import androidx.compose.ui.Modifier
-&nbsp;import androidx.compose.ui.draw.clip
-&nbsp;import androidx.compose.ui.graphics.Color
-&nbsp;import androidx.compose.ui.semantics.clearAndSetSemantics
-&nbsp;import androidx.compose.ui.semantics.contentDescription
-&nbsp;import androidx.compose.ui.text.font.FontWeight
-&nbsp;import androidx.compose.ui.text.style.TextAlign
-&nbsp;import androidx.compose.ui.tooling.preview.Preview
-&nbsp;import androidx.compose.ui.unit.dp
-&nbsp;import com.georgeci.moneysurfer.uikit.atom.SurferCard
-&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferCategoryPalette
-&nbsp;import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
-&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
-&nbsp;
-&nbsp;/** One bar of [SurferCategoryTrendCard]. [value] is a magnitude; [label] is the axis tick. */
-<b class="nc">&nbsp;data class SurferCategoryTrendBar(</b>
-<b class="nc">&nbsp;    val label: String,</b>
-<b class="nc">&nbsp;    val value: Long,</b>
-<b class="nc">&nbsp;    val formattedValue: String,</b>
-&nbsp;)
+&nbsp;import com.georgeci.moneysurfer.utils.MviViewModel
+&nbsp;import kotlinx.serialization.Serializable
+&nbsp;import kotlinx.serialization.json.Json
+&nbsp;import moneysurfer.feature.settings.generated.resources.Res
+&nbsp;import org.jetbrains.compose.resources.ExperimentalResourceApi
+&nbsp;import org.koin.core.annotation.KoinViewModel
 &nbsp;
 &nbsp;/**
-&nbsp; * Month-by-month spend for one category, drawn as bar columns in the category&#39;s [tint].
-&nbsp; *
-&nbsp; * Bars are scaled against the tallest bar in the set rather than against an absolute ceiling,
-&nbsp; * so a quiet category still reads as a shape instead of a flat line. The final column is the
-&nbsp; * current month and is emphasised — it is the one number the rest exist to give context to.
-&nbsp; *
-&nbsp; * A set that is entirely zero draws every bar at the floor height instead of dividing by zero,
-&nbsp; * which is the honest picture for a category nothing has been booked to yet.
+&nbsp; * Lists the third-party libraries bundled with the app together with their
+&nbsp; * licenses. The data comes from `files/aboutlibraries.json`, generated by the
+&nbsp; * AboutLibraries Gradle plugin (`./gradlew :shared:exportLibraryDefinitions`).
 &nbsp; */
-&nbsp;@Composable
-&nbsp;fun SurferCategoryTrendCard(
-&nbsp;    title: String,
-&nbsp;    bars: List&lt;SurferCategoryTrendBar&gt;,
-&nbsp;    tint: Color,
-&nbsp;    modifier: Modifier = Modifier,
-&nbsp;    trailingLabel: String? = null,
+&nbsp;@KoinViewModel
+&nbsp;class LicensesViewModel : MviViewModel&lt;LicensesState, LicensesEvent, LicensesEffect&gt;(
+&nbsp;    initialState = LicensesState(),
 &nbsp;) {
-&nbsp;    SurferCard(modifier = modifier.fillMaxWidth()) {
-&nbsp;        Column(modifier = Modifier.padding(16.dp)) {
-&nbsp;            Row(verticalAlignment = Alignment.Bottom) {
-&nbsp;                Text(
-&nbsp;                    text = title,
-&nbsp;                    style = AppTheme.typography.titleSmall,
-&nbsp;                    color = AppTheme.materialColors.onSurface,
-&nbsp;                    modifier = Modifier.weight(1f),
-&nbsp;                )
-&nbsp;                if (trailingLabel != null) {
-&nbsp;                    Text(
-&nbsp;                        text = trailingLabel,
-&nbsp;                        style = AppTheme.typography.labelMedium,
-&nbsp;                        color = AppTheme.materialColors.onSurfaceVariant,
-&nbsp;                    )
-&nbsp;                }
-&nbsp;            }
 &nbsp;
-&nbsp;            Spacer(Modifier.height(14.dp))
+&nbsp;    init {
+&nbsp;        loadLicenses()
+&nbsp;    }
 &nbsp;
-&nbsp;            val max = bars.maxOfOrNull { it.value } ?: 0L
-&nbsp;            Row(
-&nbsp;                modifier = Modifier.fillMaxWidth().height(ChartHeight),
-&nbsp;                horizontalArrangement = Arrangement.spacedBy(8.dp),
-&nbsp;                verticalAlignment = Alignment.Bottom,
-&nbsp;            ) {
-&nbsp;                bars.forEachIndexed { index, bar -&gt;
-&nbsp;                    TrendColumn(
-&nbsp;                        bar = bar,
-&nbsp;                        tint = tint,
-&nbsp;                        fraction = if (max &gt; 0L) bar.value.toFloat() / max else 0f,
-&nbsp;                        emphasised = index == bars.lastIndex,
-&nbsp;                        modifier = Modifier.weight(1f).fillMaxHeight(),
-&nbsp;                    )
-&nbsp;                }
+&nbsp;    override fun onEvent(event: LicensesEvent) {
+&nbsp;        when (event) {
+&nbsp;            LicensesEvent.OnBackClick -&gt; postSideEffect(LicensesEffect.NavigateBack)
+&nbsp;            is LicensesEvent.OnLibraryClick -&gt; updateState {
+&nbsp;                copy(expandedLibraryId = if (expandedLibraryId == event.libraryId) null else event.libraryId)
 &nbsp;            }
 &nbsp;        }
 &nbsp;    }
-&nbsp;}
 &nbsp;
-&nbsp;@Composable
-&nbsp;private fun TrendColumn(
-&nbsp;    bar: SurferCategoryTrendBar,
-&nbsp;    tint: Color,
-&nbsp;    fraction: Float,
-&nbsp;    emphasised: Boolean,
-&nbsp;    modifier: Modifier = Modifier,
-&nbsp;) {
-&nbsp;    val labelColor = if (emphasised) {
-&nbsp;        AppTheme.materialColors.onSurface
-&nbsp;    } else {
-&nbsp;        AppTheme.materialColors.onSurfaceVariant
-&nbsp;    }
-&nbsp;    Column(
-&nbsp;        modifier = modifier.clearAndSetSemantics {
-&nbsp;            contentDescription = &quot;${bar.label}: ${bar.formattedValue}&quot;
-&nbsp;        },
-&nbsp;        horizontalAlignment = Alignment.CenterHorizontally,
-&nbsp;        verticalArrangement = Arrangement.Bottom,
-&nbsp;    ) {
-&nbsp;        // Only the current column carries its value — six stacked numerals on a phone-width
-&nbsp;        // chart collide, and the other five are readable from the bar heights.
-&nbsp;        if (emphasised) {
-&nbsp;            Text(
-&nbsp;                text = bar.formattedValue,
-&nbsp;                style = AppTheme.typography.labelSmall,
-&nbsp;                color = AppTheme.materialColors.onSurface,
-&nbsp;                fontWeight = FontWeight.SemiBold,
-&nbsp;                maxLines = 1,
-&nbsp;            )
-&nbsp;            Spacer(Modifier.height(4.dp))
-&nbsp;        }
-&nbsp;        Box(
-&nbsp;            modifier = Modifier
-&nbsp;                .fillMaxWidth()
-&nbsp;                .height(barHeight(fraction))
-&nbsp;                .clip(AppTheme.shapes.extraSmall)
-&nbsp;                .background(if (emphasised) tint else tint.copy(alpha = InactiveBarAlpha))
-&nbsp;                .then(
-&nbsp;                    if (emphasised) {
-&nbsp;                        Modifier
-&nbsp;                    } else {
-&nbsp;                        Modifier.border(1.dp, tint.copy(alpha = InactiveBorderAlpha), AppTheme.shapes.extraSmall)
-&nbsp;                    },
-&nbsp;                ),
-&nbsp;        )
-&nbsp;        Spacer(Modifier.height(6.dp))
-&nbsp;        Text(
-&nbsp;            text = bar.label,
-&nbsp;            style = AppTheme.typography.labelSmall,
-&nbsp;            color = labelColor,
-&nbsp;            fontWeight = if (emphasised) FontWeight.SemiBold else FontWeight.Normal,
-&nbsp;            textAlign = TextAlign.Center,
-&nbsp;            maxLines = 1,
-&nbsp;        )
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;/** Keeps an empty month visible as a stub rather than collapsing the column to nothing. */
-&nbsp;private fun barHeight(fraction: Float) = MinBarHeight + (MaxBarHeight - MinBarHeight) * fraction.coerceIn(0f, 1f)
-&nbsp;
-&nbsp;private val ChartHeight = 132.dp
-&nbsp;private val MinBarHeight = 3.dp
-&nbsp;private val MaxBarHeight = 92.dp
-&nbsp;private const val InactiveBarAlpha = 0.28f
-&nbsp;private const val InactiveBorderAlpha = 0.45f
-&nbsp;
-&nbsp;@Preview
-&nbsp;@Composable
-&nbsp;private fun SurferCategoryTrendCardPreview() {
-&nbsp;    SurferComponentPreview {
-&nbsp;        Column(
-&nbsp;            modifier = Modifier.padding(16.dp),
-&nbsp;            verticalArrangement = Arrangement.spacedBy(12.dp),
-&nbsp;        ) {
-&nbsp;            SurferCategoryTrendCard(
-&nbsp;                title = &quot;Last 6 months&quot;,
-&nbsp;                trailingLabel = &quot;Avg €190&quot;,
-&nbsp;                tint = SurferCategoryPalette.tints[5],
-&nbsp;                bars = listOf(
-&nbsp;                    SurferCategoryTrendBar(&quot;Nov&quot;, 20500, &quot;€205&quot;),
-&nbsp;                    SurferCategoryTrendBar(&quot;Dec&quot;, 19200, &quot;€192&quot;),
-&nbsp;                    SurferCategoryTrendBar(&quot;Jan&quot;, 24000, &quot;€240&quot;),
-&nbsp;                    SurferCategoryTrendBar(&quot;Feb&quot;, 19800, &quot;€198&quot;),
-&nbsp;                    SurferCategoryTrendBar(&quot;Mar&quot;, 17600, &quot;€176&quot;),
-&nbsp;                    SurferCategoryTrendBar(&quot;Apr&quot;, 16855, &quot;€168.55&quot;),
-&nbsp;                ),
-&nbsp;            )
-&nbsp;            SurferCategoryTrendCard(
-&nbsp;                title = &quot;Last 6 months&quot;,
-&nbsp;                tint = SurferCategoryPalette.tints[3],
-&nbsp;                bars = List(6) { SurferCategoryTrendBar(&quot;M$it&quot;, 0, &quot;€0&quot;) },
-&nbsp;            )
+&nbsp;    @OptIn(ExperimentalResourceApi::class)
+&nbsp;    private fun loadLicenses() {
+&nbsp;        launch(onError = { updateState { copy(isLoading = false, isError = true) } }) {
+&nbsp;            val libraries = parseOssLibraries(Res.readBytes(LICENSES_RESOURCE).decodeToString())
+&nbsp;            updateState { copy(isLoading = false, libraries = libraries) }
 &nbsp;        }
 &nbsp;    }
+&nbsp;
+&nbsp;    private companion object {
+&nbsp;        const val LICENSES_RESOURCE = &quot;files/aboutlibraries.json&quot;
+&nbsp;    }
 &nbsp;}
+&nbsp;
+&nbsp;data class LicensesState(
+&nbsp;    val isLoading: Boolean = true,
+&nbsp;    val isError: Boolean = false,
+&nbsp;    val libraries: List&lt;OssLibrary&gt; = emptyList(),
+&nbsp;    val expandedLibraryId: String? = null,
+&nbsp;)
+&nbsp;
+&nbsp;data class OssLibrary(
+&nbsp;    val id: String,
+&nbsp;    val name: String,
+&nbsp;    val version: String?,
+&nbsp;    val author: String?,
+&nbsp;    val licenses: List&lt;OssLicense&gt;,
+&nbsp;)
+&nbsp;
+&nbsp;data class OssLicense(
+&nbsp;    val name: String,
+&nbsp;    val content: String?,
+&nbsp;)
+&nbsp;
+&nbsp;sealed interface LicensesEvent {
+&nbsp;    data object OnBackClick : LicensesEvent
+&nbsp;    data class OnLibraryClick(val libraryId: String) : LicensesEvent
+&nbsp;}
+&nbsp;
+&nbsp;sealed interface LicensesEffect {
+&nbsp;    data object NavigateBack : LicensesEffect
+&nbsp;}
+&nbsp;
+&nbsp;/** Maps the AboutLibraries export JSON to the screen model. */
+&nbsp;internal fun parseOssLibraries(jsonText: String): List&lt;OssLibrary&gt; {
+&nbsp;    val export = exportJson.decodeFromString&lt;AboutLibrariesExport&gt;(jsonText)
+&nbsp;    return export.libraries
+&nbsp;        .map { library -&gt;
+&nbsp;            OssLibrary(
+&nbsp;                id = library.uniqueId,
+&nbsp;                name = library.name ?: library.uniqueId,
+&nbsp;                version = library.artifactVersion,
+&nbsp;                author = library.organization?.name
+&nbsp;                    ?: library.developers.firstOrNull()?.name,
+&nbsp;                licenses = library.licenses.mapNotNull { licenseId -&gt;
+&nbsp;                    export.licenses[licenseId]?.let { license -&gt;
+&nbsp;                        OssLicense(name = license.name, content = license.content)
+&nbsp;                    }
+&nbsp;                },
+&nbsp;            )
+&nbsp;        }
+&nbsp;        .sortedBy { it.name.lowercase() }
+&nbsp;}
+&nbsp;
+&nbsp;private val exportJson = Json { ignoreUnknownKeys = true }
+&nbsp;
+&nbsp;@Serializable
+&nbsp;private data class AboutLibrariesExport(
+&nbsp;    val libraries: List&lt;ExportedLibrary&gt; = emptyList(),
+&nbsp;    val licenses: Map&lt;String, ExportedLicense&gt; = emptyMap(),
+&nbsp;)
+&nbsp;
+&nbsp;@Serializable
+&nbsp;private data class ExportedLibrary(
+&nbsp;    val uniqueId: String,
+&nbsp;    val artifactVersion: String? = null,
+&nbsp;    val name: String? = null,
+&nbsp;    val developers: List&lt;ExportedDeveloper&gt; = emptyList(),
+&nbsp;    val organization: ExportedOrganization? = null,
+&nbsp;    val licenses: List&lt;String&gt; = emptyList(),
+&nbsp;)
+&nbsp;
+&nbsp;@Serializable
+&nbsp;private data class ExportedDeveloper(val name: String? = null)
+&nbsp;
+<b class="pc">&nbsp;@Serializable</b>
+<b class="fc">&nbsp;private data class ExportedOrganization(val name: String? = null)</b>
+&nbsp;
+&nbsp;@Serializable
+&nbsp;private data class ExportedLicense(
+&nbsp;    val name: String,
+&nbsp;    val content: String? = null,
+&nbsp;)
 </code>
 </pre>
 </div>
@@ -306,7 +297,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-23 23:54</div>
+    <div style="float:right;">generated on 2026-07-27 15:02</div>
 </div>
 </body>
 </html>

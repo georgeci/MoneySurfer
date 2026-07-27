@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > AddContributionUseCase</title>
+  <title>MoneySurfer Coverage Report > CurrencyDefaultsKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,92 +19,24 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.domain.usecase</a>
+    <a href="../index.html">com.georgeci.moneysurfer.domain.formatter</a>
 </div>
 
-<h1>Coverage Summary for Class: AddContributionUseCase (com.georgeci.moneysurfer.domain.usecase)</h1>
+<h1>Coverage Summary for Class: CurrencyDefaultsKt (com.georgeci.moneysurfer.domain.formatter)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
 <th class="coverageStat 
 ">
-  Method, %
-</th>
-<th class="coverageStat 
-">
   Branch, %
 </th>
-<th class="coverageStat 
-">
-  Line, %
-</th>
-<th class="coverageStat 
-">
-  Instruction, %
-</th>
 </tr>
 <tr>
-  <td class="name">AddContributionUseCase</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (3/3)
-  </span>
-</td>
+  <td class="name">CurrencyDefaultsKt</td>
     <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (16/16)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (68/68)
-  </span>
-</td>
 </tr>
-  <tr>
-    <td class="name">AddContributionUseCase$invoke$1</td>
-    <td class="coverageStat"/>
-  </tr>
-<tr>
-  <td class="name"><strong>Total</strong></td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (3/3)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (16/16)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (68/68)
-  </span>
-</td>
-</tr>
+
 </table>
 
 <br/>
@@ -112,49 +44,22 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.usecase
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.formatter
 &nbsp;
-&nbsp;import arrow.core.Either
-&nbsp;import arrow.core.raise.either
-&nbsp;import arrow.core.raise.ensure
-&nbsp;import com.georgeci.moneysurfer.domain.model.GoalContribution
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.GoalId
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
-&nbsp;import com.georgeci.moneysurfer.domain.repositories.GoalContributionRepository
-&nbsp;import com.georgeci.moneysurfer.domain.repositories.SavingsGoalRepository
-&nbsp;import kotlinx.datetime.LocalDate
-&nbsp;import org.koin.core.annotation.Single
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
 &nbsp;
 &nbsp;/**
-&nbsp; * Puts money into a goal. No money actually moves and no account balance changes —
-&nbsp; * a goal is a counter of intent (decision 1 in md/goals.md).
+&nbsp; * Best-effort default ISO-4217 currency derived from the platform locale. Used as the seed
+&nbsp; * currency on first launch — the user can change it later via the currency picker (see mvp_1).
+&nbsp; *
+&nbsp; * Returns &quot;USD&quot; if the platform doesn&#39;t expose a currency for the current locale (e.g. a custom
+&nbsp; * locale, or the iOS simulator with `currencyCode == nil`).
 &nbsp; */
-<b class="fc">&nbsp;@Single</b>
-&nbsp;class AddContributionUseCase(
-<b class="fc">&nbsp;    private val goalRepository: SavingsGoalRepository,</b>
-<b class="fc">&nbsp;    private val contributionRepository: GoalContributionRepository,</b>
-<b class="fc">&nbsp;    private val clock: ClockUseCase,</b>
-&nbsp;) {
-&nbsp;
-&nbsp;    suspend operator fun invoke(
-&nbsp;        goalId: GoalId,
-&nbsp;        amount: Money,
-&nbsp;        occurredOn: LocalDate,
-<b class="fc">&nbsp;        note: String = &quot;&quot;,</b>
-<b class="fc">&nbsp;    ): Either&lt;GoalActionError, GoalContribution&gt; = either {</b>
-<b class="fc">&nbsp;        ensure(!amount.isNegative()) { GoalActionError.InvalidAmount }</b>
-<b class="fc">&nbsp;        recordContribution(</b>
-<b class="fc">&nbsp;            goalRepository = goalRepository,</b>
-<b class="fc">&nbsp;            contributionRepository = contributionRepository,</b>
-<b class="fc">&nbsp;            clock = clock,</b>
-<b class="fc">&nbsp;            goalId = goalId,</b>
-<b class="fc">&nbsp;            signedAmount = amount,</b>
-<b class="fc">&nbsp;            occurredOn = occurredOn,</b>
-<b class="fc">&nbsp;            note = note,</b>
-<b class="fc">&nbsp;        )</b>
-&nbsp;    }
+&nbsp;expect object CurrencyDefaults {
+&nbsp;    fun systemDefault(): CurrencyCode
 &nbsp;}
+&nbsp;
+&nbsp;internal const val FALLBACK_CURRENCY: String = &quot;USD&quot;
 </code>
 </pre>
 </div>
@@ -178,7 +83,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-23 23:54</div>
+    <div style="float:right;">generated on 2026-07-27 15:02</div>
 </div>
 </body>
 </html>

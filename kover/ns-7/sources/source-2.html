@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > PreferenceStore</title>
+  <title>MoneySurfer Coverage Report > AndroidBackupStorageLocator</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.data.datastore.core</a>
+    <a href="../index.html">com.georgeci.moneysurfer.data.backup</a>
 </div>
 
-<h1>Coverage Summary for Class: PreferenceStore (com.georgeci.moneysurfer.data.datastore.core)</h1>
+<h1>Coverage Summary for Class: AndroidBackupStorageLocator (com.georgeci.moneysurfer.data.backup)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">PreferenceStore</td>
+  <td class="name">AndroidBackupStorageLocator</td>
 <td class="coverageStat">
   <span class="percent">
     0%
@@ -63,7 +63,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/14)
+    (0/4)
   </span>
 </td>
     <td class="coverageStat"/>
@@ -72,7 +72,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/15)
+    (0/5)
   </span>
 </td>
 <td class="coverageStat">
@@ -80,7 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/125)
+    (0/53)
   </span>
 </td>
 </tr>
@@ -92,82 +92,23 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.datastore.core
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.backup
 &nbsp;
-&nbsp;import androidx.datastore.core.DataStore
-&nbsp;import androidx.datastore.preferences.core.Preferences
-&nbsp;import androidx.datastore.preferences.core.booleanPreferencesKey
-&nbsp;import androidx.datastore.preferences.core.doublePreferencesKey
-&nbsp;import androidx.datastore.preferences.core.edit
-&nbsp;import androidx.datastore.preferences.core.floatPreferencesKey
-&nbsp;import androidx.datastore.preferences.core.intPreferencesKey
-&nbsp;import androidx.datastore.preferences.core.longPreferencesKey
-&nbsp;import androidx.datastore.preferences.core.stringPreferencesKey
-&nbsp;import kotlinx.coroutines.flow.Flow
-&nbsp;import kotlinx.coroutines.flow.distinctUntilChanged
-&nbsp;import kotlinx.coroutines.flow.first
-&nbsp;import kotlinx.coroutines.flow.map
+&nbsp;import android.content.Context
+&nbsp;import com.georgeci.moneysurfer.domain.backup.BackupStorageLocator
+&nbsp;import okio.Path
+&nbsp;import okio.Path.Companion.toPath
 &nbsp;
-<b class="nc">&nbsp;class PreferenceStore(</b>
-<b class="nc">&nbsp;    private val dataStore: DataStore&lt;Preferences&gt;,</b>
-&nbsp;) {
+&nbsp;private const val MAIN_DB_FILE = &quot;moneysurfer.db&quot;
+&nbsp;private const val SYNC_DB_FILE = &quot;moneysurfer_sync.db&quot;
+&nbsp;private const val DATASTORE_FILE = &quot;moneysurfer_settings.preferences_pb&quot;
 &nbsp;
-<b class="nc">&nbsp;    fun boolean(name: String, default: Boolean = false): PreferenceProperty&lt;Boolean&gt; =</b>
-<b class="nc">&nbsp;        PreferenceProperty(dataStore, booleanPreferencesKey(name), default)</b>
-&nbsp;
-<b class="nc">&nbsp;    fun int(name: String, default: Int = 0): PreferenceProperty&lt;Int&gt; =</b>
-<b class="nc">&nbsp;        PreferenceProperty(dataStore, intPreferencesKey(name), default)</b>
-&nbsp;
-<b class="nc">&nbsp;    fun long(name: String, default: Long = 0L): PreferenceProperty&lt;Long&gt; =</b>
-<b class="nc">&nbsp;        PreferenceProperty(dataStore, longPreferencesKey(name), default)</b>
-&nbsp;
-<b class="nc">&nbsp;    fun float(name: String, default: Float = 0f): PreferenceProperty&lt;Float&gt; =</b>
-<b class="nc">&nbsp;        PreferenceProperty(dataStore, floatPreferencesKey(name), default)</b>
-&nbsp;
-<b class="nc">&nbsp;    fun double(name: String, default: Double = 0.0): PreferenceProperty&lt;Double&gt; =</b>
-<b class="nc">&nbsp;        PreferenceProperty(dataStore, doublePreferencesKey(name), default)</b>
-&nbsp;
-<b class="nc">&nbsp;    fun string(name: String, default: String = &quot;&quot;): PreferenceProperty&lt;String&gt; =</b>
-<b class="nc">&nbsp;        PreferenceProperty(dataStore, stringPreferencesKey(name), default)</b>
-&nbsp;
-&nbsp;    fun &lt;T&gt; custom(
-&nbsp;        key: Preferences.Key&lt;T&gt;,
-&nbsp;        default: T,
-&nbsp;    ): PreferenceProperty&lt;T&gt; =
-<b class="nc">&nbsp;        PreferenceProperty(dataStore, key, default)</b>
-&nbsp;}
-&nbsp;
-&nbsp;class PreferenceProperty&lt;T&gt;(
-&nbsp;    private val dataStore: DataStore&lt;Preferences&gt;,
-&nbsp;    private val key: Preferences.Key&lt;T&gt;,
-&nbsp;    private val default: T,
-&nbsp;) {
-&nbsp;    val flow: Flow&lt;T&gt; =
-&nbsp;        dataStore.data
-&nbsp;            .map { preferences -&gt; preferences[key] ?: default }
-&nbsp;            .distinctUntilChanged()
-&nbsp;
-&nbsp;    suspend fun get(): T =
-&nbsp;        dataStore.data.map { it[key] ?: default }.first()
-&nbsp;
-&nbsp;    suspend fun set(value: T) {
-&nbsp;        dataStore.edit { preferences -&gt;
-&nbsp;            preferences[key] = value
-&nbsp;        }
-&nbsp;    }
-&nbsp;
-&nbsp;    suspend fun update(transform: (T) -&gt; T) {
-&nbsp;        dataStore.edit { preferences -&gt;
-&nbsp;            val oldValue = preferences[key] ?: default
-&nbsp;            preferences[key] = transform(oldValue)
-&nbsp;        }
-&nbsp;    }
-&nbsp;
-&nbsp;    suspend fun remove() {
-&nbsp;        dataStore.edit { preferences -&gt;
-&nbsp;            preferences.remove(key)
-&nbsp;        }
-&nbsp;    }
+<b class="nc">&nbsp;class AndroidBackupStorageLocator(private val context: Context) : BackupStorageLocator {</b>
+<b class="nc">&nbsp;    override val platformName: String = &quot;android&quot;</b>
+<b class="nc">&nbsp;    override fun moneySurferDbFile(): Path = context.getDatabasePath(MAIN_DB_FILE).absolutePath.toPath()</b>
+<b class="nc">&nbsp;    override fun syncDbFile(): Path = context.getDatabasePath(SYNC_DB_FILE).absolutePath.toPath()</b>
+&nbsp;    override fun dataStoreFile(): Path =
+<b class="nc">&nbsp;        context.filesDir.resolve(DATASTORE_FILE).absolutePath.toPath()</b>
 &nbsp;}
 </code>
 </pre>
@@ -192,7 +133,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-23 23:54</div>
+    <div style="float:right;">generated on 2026-07-27 15:02</div>
 </div>
 </body>
 </html>

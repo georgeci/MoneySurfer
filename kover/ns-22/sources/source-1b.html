@@ -1,0 +1,262 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>MoneySurfer Coverage Report > CategoryTree</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.georgeci.moneysurfer.domain.model</a>
+</div>
+
+<h1>Coverage Summary for Class: CategoryTree (com.georgeci.moneysurfer.domain.model)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">CategoryTree</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    85.2%
+  </span>
+  <span class="absValue">
+    (46/54)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (48/48)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    93.1%
+  </span>
+  <span class="absValue">
+    (377/405)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.model
+&nbsp;
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryType
+&nbsp;
+&nbsp;/** A category placed in the tree, carrying how deep under a root it sits. */
+&nbsp;data class CategoryNode(
+&nbsp;    val category: Category,
+&nbsp;    val depth: Int,
+&nbsp;)
+&nbsp;
+&nbsp;/**
+&nbsp; * Shapes a flat category list into the parent/child structure both the manage screen and the
+&nbsp; * parent picker need. Kept in the domain because the rule it encodes — a category may not
+&nbsp; * become its own ancestor — is a data-integrity rule, not a rendering detail.
+&nbsp; */
+&nbsp;object CategoryTree {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Deepest indent the UI draws. [eligibleParents] refuses to create anything deeper, but
+&nbsp;     * [flatten] still *renders* deeper rows — it just stops indenting them.
+&nbsp;     */
+&nbsp;    const val MAX_DEPTH: Int = 1
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Flattens to display order: every category, depth-first, each one immediately followed by
+&nbsp;     * its subtree.
+&nbsp;     *
+&nbsp;     * Every input category comes out exactly once. That is the whole contract, and it is worth
+&nbsp;     * stating because the shapes this has to survive are not the shapes the UI can create:
+&nbsp;     *
+&nbsp;     * - A child whose parent is not in [categories] is treated as a root — sync legitimately
+&nbsp;     *   delivers a child before its parent.
+&nbsp;     * - A subtree deeper than [MAX_DEPTH] is rendered in full, with the indent clamped. The UI
+&nbsp;     *   will not build one, but another client&#39;s write can.
+&nbsp;     * - A category caught in a parent cycle is reachable from no root at all. It is emitted at
+&nbsp;     *   the top level once the real roots are exhausted.
+&nbsp;     *
+&nbsp;     * In every one of those cases the alternative is a category that silently disappears from
+&nbsp;     * the manage screen, which is strictly worse than one drawn at the wrong indent.
+&nbsp;     */
+&nbsp;    fun flatten(categories: List&lt;Category&gt;): List&lt;CategoryNode&gt; {
+<b class="fc">&nbsp;        val present = categories.mapTo(mutableSetOf()) { it.id }</b>
+<b class="fc">&nbsp;        val childrenByParent = categories</b>
+<b class="pc">&nbsp;            .filter { it.parentId != null &amp;&amp; it.parentId in present }</b>
+<b class="pc">&nbsp;            .groupBy { requireNotNull(it.parentId) }</b>
+<b class="pc">&nbsp;        val (roots, nested) = categories.partition { it.parentId == null || it.parentId !in present }</b>
+&nbsp;
+<b class="fc">&nbsp;        val emitted = mutableSetOf&lt;CategoryId&gt;()</b>
+<b class="fc">&nbsp;        val result = mutableListOf&lt;CategoryNode&gt;()</b>
+<b class="fc">&nbsp;        val stack = ArrayDeque&lt;CategoryNode&gt;()</b>
+&nbsp;
+&nbsp;        // Real roots first; the nested pass then picks up only what no root reached, i.e. the
+&nbsp;        // members of a parent cycle. Everything else is already emitted and skipped.
+<b class="fc">&nbsp;        (roots + nested).forEach { seed -&gt;</b>
+<b class="fc">&nbsp;            if (seed.id in emitted) return@forEach</b>
+<b class="fc">&nbsp;            stack.addLast(CategoryNode(seed, depth = 0))</b>
+<b class="fc">&nbsp;            while (stack.isNotEmpty()) {</b>
+<b class="fc">&nbsp;                val node = stack.removeLast()</b>
+<b class="fc">&nbsp;                if (!emitted.add(node.category.id)) continue</b>
+<b class="fc">&nbsp;                result += node</b>
+<b class="fc">&nbsp;                val childDepth = (node.depth + 1).coerceAtMost(MAX_DEPTH)</b>
+<b class="fc">&nbsp;                childrenByParent[node.category.id].orEmpty().asReversed().forEach { child -&gt;</b>
+<b class="fc">&nbsp;                    stack.addLast(CategoryNode(child, childDepth))</b>
+<b class="fc">&nbsp;                }</b>
+&nbsp;            }
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;        return result</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /** Direct children of [parentId], in the order [categories] arrived. */
+&nbsp;    fun childrenOf(categories: List&lt;Category&gt;, parentId: CategoryId): List&lt;Category&gt; =
+<b class="fc">&nbsp;        categories.filter { it.parentId == parentId }</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Every category reachable downwards from [rootId].
+&nbsp;     *
+&nbsp;     * [rootId] itself is in the result only when it is reachable from itself — i.e. it sits in a
+&nbsp;     * parent cycle, which sync can deliver even though the UI refuses to create one. That is the
+&nbsp;     * useful answer rather than an edge case to paper over: the one caller, [eligibleParents],
+&nbsp;     * uses this to decide what a category may *not* be parented to, and a category inside a
+&nbsp;     * cycle must not be offered as its own parent either.
+&nbsp;     *
+&nbsp;     * The walk is iterative and keeps a visited set, so a cycle terminates instead of hanging.
+&nbsp;     */
+&nbsp;    fun descendantsOf(categories: List&lt;Category&gt;, rootId: CategoryId): Set&lt;CategoryId&gt; {
+<b class="fc">&nbsp;        val childrenByParent = categories</b>
+<b class="fc">&nbsp;            .filter { it.parentId != null }</b>
+<b class="pc">&nbsp;            .groupBy { requireNotNull(it.parentId) }</b>
+<b class="fc">&nbsp;        val found = mutableSetOf&lt;CategoryId&gt;()</b>
+<b class="fc">&nbsp;        val queue = ArrayDeque(childrenByParent[rootId].orEmpty().map { it.id })</b>
+<b class="fc">&nbsp;        while (queue.isNotEmpty()) {</b>
+<b class="fc">&nbsp;            val next = queue.removeFirst()</b>
+<b class="fc">&nbsp;            if (!found.add(next)) continue</b>
+<b class="fc">&nbsp;            queue += childrenByParent[next].orEmpty().map { it.id }</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return found</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Categories that may be picked as the parent of [categoryId] (null when creating).
+&nbsp;     *
+&nbsp;     * Excludes: a different type (an expense category under an income parent is meaningless),
+&nbsp;     * system categories, the category itself and everything below it (a category cannot be its
+&nbsp;     * own ancestor), and any category already nested [MAX_DEPTH] deep.
+&nbsp;     */
+&nbsp;    fun eligibleParents(
+&nbsp;        categories: List&lt;Category&gt;,
+&nbsp;        categoryId: CategoryId?,
+&nbsp;        type: CategoryType,
+&nbsp;    ): List&lt;Category&gt; {
+<b class="fc">&nbsp;        val excluded = categoryId</b>
+<b class="fc">&nbsp;            ?.let { descendantsOf(categories, it) + it }</b>
+<b class="fc">&nbsp;            .orEmpty()</b>
+<b class="fc">&nbsp;        val byId = categories.associateBy { it.id }</b>
+<b class="fc">&nbsp;        return categories.filter { candidate -&gt;</b>
+<b class="fc">&nbsp;            candidate.type == type &amp;&amp;</b>
+<b class="fc">&nbsp;                candidate.systemKind == null &amp;&amp;</b>
+<b class="fc">&nbsp;                candidate.id !in excluded &amp;&amp;</b>
+<b class="fc">&nbsp;                depthOf(candidate, byId) &lt; MAX_DEPTH</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun depthOf(category: Category, byId: Map&lt;CategoryId, Category&gt;): Int {
+<b class="fc">&nbsp;        var depth = 0</b>
+<b class="fc">&nbsp;        var parentId = category.parentId</b>
+<b class="fc">&nbsp;        val seen = mutableSetOf(category.id)</b>
+<b class="pc">&nbsp;        while (parentId != null &amp;&amp; seen.add(parentId)) {</b>
+<b class="fc">&nbsp;            depth++</b>
+<b class="pc">&nbsp;            parentId = byId[parentId]?.parentId</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return depth</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-07-27 15:02</div>
+</div>
+</body>
+</html>

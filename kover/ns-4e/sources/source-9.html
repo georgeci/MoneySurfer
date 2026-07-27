@@ -1,0 +1,576 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>MoneySurfer Coverage Report > BackupScreenKt</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.settings.backup</a>
+</div>
+
+<h1>Coverage Summary for Class: BackupScreenKt (com.georgeci.moneysurfer.feature.settings.backup)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">BackupScreenKt</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/39)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/122)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/173)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2782)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">BackupScreenKt$BackupScreen$1$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/33)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/40)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/124)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/176)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2815)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.settings.backup
+&nbsp;
+&nbsp;import androidx.compose.foundation.layout.Arrangement
+&nbsp;import androidx.compose.foundation.layout.Box
+&nbsp;import androidx.compose.foundation.layout.Column
+&nbsp;import androidx.compose.foundation.layout.Spacer
+&nbsp;import androidx.compose.foundation.layout.height
+&nbsp;import androidx.compose.foundation.layout.padding
+&nbsp;import androidx.compose.foundation.text.KeyboardOptions
+&nbsp;import androidx.compose.material3.AlertDialog
+&nbsp;import androidx.compose.material3.OutlinedTextField
+&nbsp;import androidx.compose.material3.SnackbarDuration
+&nbsp;import androidx.compose.material3.SnackbarHostState
+&nbsp;import androidx.compose.material3.Text
+&nbsp;import androidx.compose.material3.TextButton
+&nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.runtime.LaunchedEffect
+&nbsp;import androidx.compose.runtime.getValue
+&nbsp;import androidx.compose.runtime.mutableStateOf
+&nbsp;import androidx.compose.runtime.remember
+&nbsp;import androidx.compose.runtime.setValue
+&nbsp;import androidx.compose.ui.Modifier
+&nbsp;import androidx.compose.ui.text.input.KeyboardType
+&nbsp;import androidx.compose.ui.text.input.PasswordVisualTransformation
+&nbsp;import androidx.compose.ui.unit.dp
+&nbsp;import androidx.lifecycle.compose.collectAsStateWithLifecycle
+&nbsp;import com.georgeci.moneysurfer.domain.backup.AppRestarter
+&nbsp;import com.georgeci.moneysurfer.feature.settings.components.SettingsSubScreenScaffold
+&nbsp;import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsChevron
+&nbsp;import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsGroup
+&nbsp;import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsRow
+&nbsp;import com.georgeci.moneysurfer.uikit.components.settings.SurferStatusHeroCard
+&nbsp;import com.georgeci.moneysurfer.uikit.components.settings.SurferStatusHeroTone
+&nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
+&nbsp;import com.georgeci.moneysurfer.utils.HandleSideEffect
+&nbsp;import moneysurfer.feature.settings.generated.resources.Res
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_backup_cancel
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_backup_download_supporting
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_backup_download_title
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_backup_export_confirm
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_backup_export_passphrase_confirm_label
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_backup_export_passphrase_label
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_backup_export_passphrase_mismatch
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_backup_export_success
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_backup_export_warning
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_backup_hero_supporting
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_backup_hero_title
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_backup_import_passphrase_body
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_backup_import_passphrase_confirm
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_backup_import_passphrase_label
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_backup_import_passphrase_title
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_backup_local_hero_supporting
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_backup_local_hero_title
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_backup_notice_corrupted
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_backup_notice_format_mismatch
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_backup_notice_generic
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_backup_notice_invalid_archive
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_backup_notice_missing_file
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_backup_notice_passphrase_required
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_backup_notice_schema_mismatch
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_backup_notice_wrong_passphrase
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_backup_relaunch_body
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_backup_relaunch_confirm
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_backup_relaunch_title
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_backup_restore_confirm_body
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_backup_restore_confirm_confirm
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_backup_restore_confirm_title
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_backup_restore_supporting
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_backup_restore_title
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_backup_section_manual
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_backup_section_restore
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_backup_title
+&nbsp;import org.jetbrains.compose.resources.stringResource
+&nbsp;import org.koin.compose.koinInject
+&nbsp;import org.koin.compose.viewmodel.koinViewModel
+&nbsp;
+&nbsp;@Composable
+<b class="nc">&nbsp;fun BackupScreen(</b>
+&nbsp;    onNavigateBack: () -&gt; Unit,
+<b class="nc">&nbsp;    viewModel: BackupViewModel = koinViewModel(),</b>
+<b class="nc">&nbsp;) {</b>
+<b class="nc">&nbsp;    val state by viewModel.collectAsStateWithLifecycle()</b>
+<b class="nc">&nbsp;    val appRestarter: AppRestarter = koinInject()</b>
+<b class="nc">&nbsp;    val snackbarHostState = remember { SnackbarHostState() }</b>
+<b class="nc">&nbsp;    var pendingNotice by remember { mutableStateOf&lt;BackupNotice?&gt;(null) }</b>
+<b class="nc">&nbsp;    var showRelaunchNotice by remember { mutableStateOf(false) }</b>
+&nbsp;
+<b class="nc">&nbsp;    val launcher = rememberBackupPickerLauncher(</b>
+<b class="nc">&nbsp;        format = BackupPickerFormat.Zip,</b>
+<b class="nc">&nbsp;        onSavePicked = { sink -&gt; viewModel.onEvent(BackupEvent.OnSaveSinkChosen(sink)) },</b>
+<b class="nc">&nbsp;        onOpenPicked = { source -&gt; viewModel.onEvent(BackupEvent.OnOpenSourceChosen(source)) },</b>
+&nbsp;    )
+&nbsp;
+&nbsp;    // Resolve through Compose&#39;s standard format-args path so positional
+&nbsp;    // placeholders survive translator reordering. We snapshot at composition;
+&nbsp;    // the LaunchedEffect below feeds the snackbar from the resolved value.
+<b class="nc">&nbsp;    val pendingNoticeText: String? = pendingNotice?.let { noticeText(it) }</b>
+<b class="nc">&nbsp;    LaunchedEffect(pendingNoticeText) {</b>
+<b class="nc">&nbsp;        val text = pendingNoticeText ?: return@LaunchedEffect</b>
+<b class="nc">&nbsp;        snackbarHostState.showSnackbar(message = text, duration = SnackbarDuration.Short)</b>
+<b class="nc">&nbsp;        pendingNotice = null</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    viewModel.HandleSideEffect { effect -&gt;</b>
+<b class="nc">&nbsp;        when (effect) {</b>
+<b class="nc">&nbsp;            BackupEffect.NavigateBack -&gt; onNavigateBack()</b>
+<b class="nc">&nbsp;            is BackupEffect.RequestSaveFile -&gt; launcher.launchSave(effect.suggestedName)</b>
+<b class="nc">&nbsp;            BackupEffect.RequestOpenFile -&gt; launcher.launchOpen()</b>
+&nbsp;            // Hosts that cannot relaunch themselves (iOS exits the process) get an
+&nbsp;            // explicit &quot;we&#39;re about to close, please reopen&quot; step first — otherwise a
+&nbsp;            // successful restore is indistinguishable from a crash.
+<b class="nc">&nbsp;            BackupEffect.RestartApp -&gt;</b>
+<b class="nc">&nbsp;                if (appRestarter.requiresManualRelaunch) {</b>
+<b class="nc">&nbsp;                    showRelaunchNotice = true</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    appRestarter.restart()</b>
+&nbsp;                }
+&nbsp;            // A notice is how this screen learns an operation ended. Only the
+&nbsp;            // export leaves the picker holding a staged file, and the progress
+&nbsp;            // scrim keeps the two flows from overlapping, so the notice that
+&nbsp;            // lands here is the one belonging to that export.
+<b class="nc">&nbsp;            is BackupEffect.Notify -&gt; {</b>
+<b class="nc">&nbsp;                pendingNotice = effect.notice</b>
+<b class="nc">&nbsp;                launcher.onSaveCompleted(effect.notice == BackupNotice.ExportSuccess)</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    if (showRelaunchNotice) {</b>
+<b class="nc">&nbsp;        RelaunchNoticeDialog(onConfirm = { appRestarter.restart() })</b>
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+<b class="nc">&nbsp;    BackupContent(</b>
+<b class="nc">&nbsp;        state = state,</b>
+<b class="nc">&nbsp;        snackbarHostState = snackbarHostState,</b>
+<b class="nc">&nbsp;        onEvent = viewModel::onEvent,</b>
+&nbsp;    )
+<b class="nc">&nbsp;}</b>
+&nbsp;
+&nbsp;@Composable
+<b class="nc">&nbsp;private fun noticeText(notice: BackupNotice): String? = when (notice) {</b>
+<b class="nc">&nbsp;    BackupNotice.ExportSuccess -&gt; stringResource(Res.string.settings_backup_export_success)</b>
+<b class="nc">&nbsp;    BackupNotice.Cancelled -&gt; null</b>
+<b class="nc">&nbsp;    BackupNotice.InvalidArchive -&gt; stringResource(Res.string.settings_backup_notice_invalid_archive)</b>
+<b class="nc">&nbsp;    BackupNotice.Corrupted -&gt; stringResource(Res.string.settings_backup_notice_corrupted)</b>
+<b class="nc">&nbsp;    BackupNotice.PassphraseRequired -&gt;</b>
+<b class="nc">&nbsp;        stringResource(Res.string.settings_backup_notice_passphrase_required)</b>
+<b class="nc">&nbsp;    BackupNotice.WrongPassphrase -&gt;</b>
+<b class="nc">&nbsp;        stringResource(Res.string.settings_backup_notice_wrong_passphrase)</b>
+<b class="nc">&nbsp;    BackupNotice.Generic -&gt; stringResource(Res.string.settings_backup_notice_generic)</b>
+<b class="nc">&nbsp;    is BackupNotice.MissingFile -&gt;</b>
+<b class="nc">&nbsp;        stringResource(Res.string.settings_backup_notice_missing_file, notice.name)</b>
+<b class="nc">&nbsp;    is BackupNotice.FormatMismatch -&gt;</b>
+<b class="nc">&nbsp;        stringResource(Res.string.settings_backup_notice_format_mismatch, notice.actual, notice.expected)</b>
+<b class="nc">&nbsp;    is BackupNotice.SchemaMismatch -&gt;</b>
+<b class="nc">&nbsp;        stringResource(Res.string.settings_backup_notice_schema_mismatch, notice.actual, notice.expected)</b>
+<b class="nc">&nbsp;}</b>
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun BackupContent(
+&nbsp;    state: BackupState,
+&nbsp;    snackbarHostState: SnackbarHostState,
+&nbsp;    onEvent: (BackupEvent) -&gt; Unit,
+<b class="nc">&nbsp;) {</b>
+<b class="nc">&nbsp;    if (state.showRestoreConfirmation) {</b>
+<b class="nc">&nbsp;        RestoreBackupDialog(</b>
+<b class="nc">&nbsp;            onConfirm = { onEvent(BackupEvent.OnRestoreConfirmed) },</b>
+<b class="nc">&nbsp;            onDismiss = { onEvent(BackupEvent.OnRestoreDismissed) },</b>
+&nbsp;        )
+<b class="nc">&nbsp;    }</b>
+<b class="nc">&nbsp;    if (state.showExportOptions) {</b>
+<b class="nc">&nbsp;        ExportBackupDialog(</b>
+<b class="nc">&nbsp;            onConfirm = { passphrase -&gt; onEvent(BackupEvent.OnExportOptionsConfirmed(passphrase)) },</b>
+<b class="nc">&nbsp;            onDismiss = { onEvent(BackupEvent.OnExportOptionsDismissed) },</b>
+&nbsp;        )
+<b class="nc">&nbsp;    }</b>
+<b class="nc">&nbsp;    if (state.showImportPassphrase) {</b>
+<b class="nc">&nbsp;        ImportPassphraseDialog(</b>
+<b class="nc">&nbsp;            onConfirm = { passphrase -&gt; onEvent(BackupEvent.OnImportPassphraseSubmitted(passphrase)) },</b>
+<b class="nc">&nbsp;            onDismiss = { onEvent(BackupEvent.OnImportPassphraseDismissed) },</b>
+&nbsp;        )
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+<b class="nc">&nbsp;    SettingsSubScreenScaffold(</b>
+<b class="nc">&nbsp;        title = stringResource(Res.string.settings_backup_title),</b>
+<b class="nc">&nbsp;        snackbarHostState = snackbarHostState,</b>
+<b class="nc">&nbsp;        onBack = { onEvent(BackupEvent.OnBackClick) },</b>
+<b class="nc">&nbsp;        showProgressOverlay = state.phase != BackupPhase.Idle,</b>
+<b class="nc">&nbsp;    ) { padding -&gt;</b>
+<b class="nc">&nbsp;        Box(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {</b>
+<b class="nc">&nbsp;            SurferStatusHeroCard(</b>
+<b class="nc">&nbsp;                title = stringResource(</b>
+<b class="nc">&nbsp;                    if (state.isOffline) {</b>
+<b class="nc">&nbsp;                        Res.string.settings_backup_local_hero_title</b>
+&nbsp;                    } else {
+<b class="nc">&nbsp;                        Res.string.settings_backup_hero_title</b>
+&nbsp;                    },
+&nbsp;                ),
+<b class="nc">&nbsp;                supporting = stringResource(</b>
+<b class="nc">&nbsp;                    if (state.isOffline) {</b>
+<b class="nc">&nbsp;                        Res.string.settings_backup_local_hero_supporting</b>
+&nbsp;                    } else {
+<b class="nc">&nbsp;                        Res.string.settings_backup_hero_supporting</b>
+&nbsp;                    },
+&nbsp;                ),
+<b class="nc">&nbsp;                icon = SurferIcons.Archive,</b>
+<b class="nc">&nbsp;                tone = SurferStatusHeroTone.Tertiary,</b>
+&nbsp;            )
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+<b class="nc">&nbsp;        SurferSettingsGroup(title = stringResource(Res.string.settings_backup_section_manual)) {</b>
+<b class="nc">&nbsp;            SurferSettingsRow(</b>
+<b class="nc">&nbsp;                icon = SurferIcons.Download,</b>
+<b class="nc">&nbsp;                title = stringResource(Res.string.settings_backup_download_title),</b>
+<b class="nc">&nbsp;                supportingText = stringResource(Res.string.settings_backup_download_supporting),</b>
+<b class="nc">&nbsp;                onClick = { onEvent(BackupEvent.OnDownloadClick) },</b>
+&nbsp;                trailing = { SurferSettingsChevron() },
+&nbsp;            )
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        SurferSettingsGroup(title = stringResource(Res.string.settings_backup_section_restore)) {</b>
+<b class="nc">&nbsp;            SurferSettingsRow(</b>
+<b class="nc">&nbsp;                icon = SurferIcons.Sync,</b>
+<b class="nc">&nbsp;                title = stringResource(Res.string.settings_backup_restore_title),</b>
+<b class="nc">&nbsp;                supportingText = stringResource(Res.string.settings_backup_restore_supporting),</b>
+<b class="nc">&nbsp;                onClick = { onEvent(BackupEvent.OnRestoreClick) },</b>
+&nbsp;                trailing = { SurferSettingsChevron() },
+&nbsp;            )
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Spacer(Modifier.height(padding.calculateBottomPadding() + 32.dp))</b>
+&nbsp;    }
+<b class="nc">&nbsp;}</b>
+&nbsp;
+&nbsp;/**
+&nbsp; * Pre-export options: warns that a plain export is readable by anyone holding
+&nbsp; * the file, and offers an optional passphrase (with confirmation to guard
+&nbsp; * against a typo locking the user out of their own backup).
+&nbsp; */
+&nbsp;@Composable
+&nbsp;private fun ExportBackupDialog(
+&nbsp;    onConfirm: (String?) -&gt; Unit,
+&nbsp;    onDismiss: () -&gt; Unit,
+<b class="nc">&nbsp;) {</b>
+<b class="nc">&nbsp;    var passphrase by remember { mutableStateOf(&quot;&quot;) }</b>
+<b class="nc">&nbsp;    var confirmation by remember { mutableStateOf(&quot;&quot;) }</b>
+<b class="nc">&nbsp;    val mismatch = passphrase.isNotEmpty() &amp;&amp; confirmation != passphrase</b>
+&nbsp;
+<b class="nc">&nbsp;    AlertDialog(</b>
+<b class="nc">&nbsp;        onDismissRequest = onDismiss,</b>
+&nbsp;        title = { Text(stringResource(Res.string.settings_backup_download_title)) },
+<b class="nc">&nbsp;        text = {</b>
+<b class="nc">&nbsp;            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {</b>
+<b class="nc">&nbsp;                Text(stringResource(Res.string.settings_backup_export_warning))</b>
+<b class="nc">&nbsp;                OutlinedTextField(</b>
+<b class="nc">&nbsp;                    value = passphrase,</b>
+<b class="nc">&nbsp;                    onValueChange = { passphrase = it },</b>
+&nbsp;                    label = { Text(stringResource(Res.string.settings_backup_export_passphrase_label)) },
+<b class="nc">&nbsp;                    singleLine = true,</b>
+<b class="nc">&nbsp;                    visualTransformation = PasswordVisualTransformation(),</b>
+<b class="nc">&nbsp;                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),</b>
+&nbsp;                )
+<b class="nc">&nbsp;                if (passphrase.isNotEmpty()) {</b>
+<b class="nc">&nbsp;                    OutlinedTextField(</b>
+<b class="nc">&nbsp;                        value = confirmation,</b>
+<b class="nc">&nbsp;                        onValueChange = { confirmation = it },</b>
+&nbsp;                        label = {
+&nbsp;                            Text(
+&nbsp;                                stringResource(
+&nbsp;                                    Res.string.settings_backup_export_passphrase_confirm_label,
+&nbsp;                                ),
+&nbsp;                            )
+&nbsp;                        },
+<b class="nc">&nbsp;                        singleLine = true,</b>
+<b class="nc">&nbsp;                        visualTransformation = PasswordVisualTransformation(),</b>
+<b class="nc">&nbsp;                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),</b>
+<b class="nc">&nbsp;                        isError = mismatch,</b>
+<b class="nc">&nbsp;                        supportingText = {</b>
+<b class="nc">&nbsp;                            if (mismatch) {</b>
+<b class="nc">&nbsp;                                Text(</b>
+<b class="nc">&nbsp;                                    stringResource(</b>
+<b class="nc">&nbsp;                                        Res.string.settings_backup_export_passphrase_mismatch,</b>
+&nbsp;                                    ),
+&nbsp;                                )
+<b class="nc">&nbsp;                            }</b>
+&nbsp;                        },
+&nbsp;                    )
+<b class="nc">&nbsp;                }</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        },
+<b class="nc">&nbsp;        confirmButton = {</b>
+<b class="nc">&nbsp;            TextButton(</b>
+<b class="nc">&nbsp;                enabled = !mismatch,</b>
+<b class="nc">&nbsp;                onClick = { onConfirm(passphrase.takeIf { it.isNotEmpty() }) },</b>
+&nbsp;            ) {
+&nbsp;                Text(stringResource(Res.string.settings_backup_export_confirm))
+&nbsp;            }
+&nbsp;        },
+<b class="nc">&nbsp;        dismissButton = {</b>
+<b class="nc">&nbsp;            TextButton(onClick = onDismiss) {</b>
+&nbsp;                Text(stringResource(Res.string.settings_backup_cancel))
+&nbsp;            }
+&nbsp;        },
+&nbsp;    )
+<b class="nc">&nbsp;}</b>
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun ImportPassphraseDialog(
+&nbsp;    onConfirm: (String) -&gt; Unit,
+&nbsp;    onDismiss: () -&gt; Unit,
+<b class="nc">&nbsp;) {</b>
+<b class="nc">&nbsp;    var passphrase by remember { mutableStateOf(&quot;&quot;) }</b>
+&nbsp;
+<b class="nc">&nbsp;    AlertDialog(</b>
+<b class="nc">&nbsp;        onDismissRequest = onDismiss,</b>
+&nbsp;        title = { Text(stringResource(Res.string.settings_backup_import_passphrase_title)) },
+<b class="nc">&nbsp;        text = {</b>
+<b class="nc">&nbsp;            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {</b>
+<b class="nc">&nbsp;                Text(stringResource(Res.string.settings_backup_import_passphrase_body))</b>
+<b class="nc">&nbsp;                OutlinedTextField(</b>
+<b class="nc">&nbsp;                    value = passphrase,</b>
+<b class="nc">&nbsp;                    onValueChange = { passphrase = it },</b>
+&nbsp;                    label = { Text(stringResource(Res.string.settings_backup_import_passphrase_label)) },
+<b class="nc">&nbsp;                    singleLine = true,</b>
+<b class="nc">&nbsp;                    visualTransformation = PasswordVisualTransformation(),</b>
+<b class="nc">&nbsp;                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),</b>
+&nbsp;                )
+<b class="nc">&nbsp;            }</b>
+&nbsp;        },
+<b class="nc">&nbsp;        confirmButton = {</b>
+<b class="nc">&nbsp;            TextButton(</b>
+<b class="nc">&nbsp;                enabled = passphrase.isNotEmpty(),</b>
+<b class="nc">&nbsp;                onClick = { onConfirm(passphrase) },</b>
+&nbsp;            ) {
+&nbsp;                Text(stringResource(Res.string.settings_backup_import_passphrase_confirm))
+&nbsp;            }
+&nbsp;        },
+<b class="nc">&nbsp;        dismissButton = {</b>
+<b class="nc">&nbsp;            TextButton(onClick = onDismiss) {</b>
+&nbsp;                Text(stringResource(Res.string.settings_backup_cancel))
+&nbsp;            }
+&nbsp;        },
+&nbsp;    )
+<b class="nc">&nbsp;}</b>
+&nbsp;
+&nbsp;/**
+&nbsp; * Shown on hosts whose [AppRestarter] can only exit the process (iOS). The
+&nbsp; * import already succeeded at this point and the in-memory Room handles are
+&nbsp; * closed, so there is nothing to go back to — the dialog is not dismissible
+&nbsp; * and its only button ends the process.
+&nbsp; */
+&nbsp;@Composable
+<b class="nc">&nbsp;private fun RelaunchNoticeDialog(onConfirm: () -&gt; Unit) {</b>
+<b class="nc">&nbsp;    AlertDialog(</b>
+<b class="nc">&nbsp;        onDismissRequest = {},</b>
+&nbsp;        title = { Text(stringResource(Res.string.settings_backup_relaunch_title)) },
+&nbsp;        text = { Text(stringResource(Res.string.settings_backup_relaunch_body)) },
+<b class="nc">&nbsp;        confirmButton = {</b>
+<b class="nc">&nbsp;            TextButton(onClick = onConfirm) {</b>
+&nbsp;                Text(stringResource(Res.string.settings_backup_relaunch_confirm))
+&nbsp;            }
+&nbsp;        },
+&nbsp;    )
+<b class="nc">&nbsp;}</b>
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun RestoreBackupDialog(
+&nbsp;    onConfirm: () -&gt; Unit,
+&nbsp;    onDismiss: () -&gt; Unit,
+<b class="nc">&nbsp;) {</b>
+<b class="nc">&nbsp;    AlertDialog(</b>
+<b class="nc">&nbsp;        onDismissRequest = onDismiss,</b>
+&nbsp;        title = { Text(stringResource(Res.string.settings_backup_restore_confirm_title)) },
+&nbsp;        text = { Text(stringResource(Res.string.settings_backup_restore_confirm_body)) },
+<b class="nc">&nbsp;        confirmButton = {</b>
+<b class="nc">&nbsp;            TextButton(onClick = onConfirm) {</b>
+&nbsp;                Text(
+&nbsp;                    text = stringResource(Res.string.settings_backup_restore_confirm_confirm),
+&nbsp;                    color = AppTheme.materialColors.error,
+&nbsp;                )
+&nbsp;            }
+&nbsp;        },
+<b class="nc">&nbsp;        dismissButton = {</b>
+<b class="nc">&nbsp;            TextButton(onClick = onDismiss) {</b>
+&nbsp;                Text(stringResource(Res.string.settings_backup_cancel))
+&nbsp;            }
+&nbsp;        },
+&nbsp;    )
+<b class="nc">&nbsp;}</b>
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-07-27 15:02</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,163 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>MoneySurfer Coverage Report > SemanticColors</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.georgeci.moneysurfer.uikit.theme</a>
+</div>
+
+<h1>Coverage Summary for Class: SemanticColors (com.georgeci.moneysurfer.uikit.theme)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">SemanticColors</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (70/70)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.theme
+&nbsp;
+&nbsp;import androidx.compose.runtime.staticCompositionLocalOf
+&nbsp;import androidx.compose.ui.graphics.Color
+&nbsp;import com.georgeci.moneysurfer.uikit.tokens.AppColors
+&nbsp;
+&nbsp;/**
+&nbsp; * Deliberately not `@Immutable`: [categoryTints] is a plain [List], so the deep-immutability
+&nbsp; * contract that annotation promises cannot be enforced at the type level. Nothing needs it —
+&nbsp; * this travels through [LocalSemanticColors], a *static* composition local that does not track
+&nbsp; * reads, and is never passed as a composable parameter.
+&nbsp; */
+<b class="fc">&nbsp;data class SemanticColors(</b>
+<b class="fc">&nbsp;    val income: Color = AppColors.Income,</b>
+<b class="fc">&nbsp;    val expense: Color = AppColors.Expense,</b>
+<b class="fc">&nbsp;    val transfer: Color = AppColors.Transfer,</b>
+&nbsp;    /** Caution accent — a budget past its alert threshold but not yet over. */
+<b class="fc">&nbsp;    val warning: Color = AppColors.Warning,</b>
+&nbsp;    /**
+&nbsp;     * Category tints in palette order. Read through `SurferCategoryPalette`, which owns the
+&nbsp;     * hue/icon-key mapping onto this list; call sites go through its resolvers.
+&nbsp;     */
+<b class="fc">&nbsp;    val categoryTints: List&lt;Color&gt; = AppColors.CategoryTints,</b>
+&nbsp;)
+&nbsp;
+&nbsp;internal val LightSemanticColors = SemanticColors(
+&nbsp;    income = AppColors.Income,
+&nbsp;    expense = AppColors.Expense,
+&nbsp;    transfer = AppColors.Transfer,
+&nbsp;    warning = AppColors.Warning,
+&nbsp;    categoryTints = AppColors.CategoryTints,
+&nbsp;)
+&nbsp;
+&nbsp;internal val DarkSemanticColors = SemanticColors(
+&nbsp;    income = AppColors.Dark.Income,
+&nbsp;    expense = AppColors.Dark.Expense,
+&nbsp;    transfer = AppColors.Dark.Transfer,
+&nbsp;    warning = AppColors.Dark.Warning,
+&nbsp;    categoryTints = AppColors.Dark.CategoryTints,
+&nbsp;)
+&nbsp;
+&nbsp;val LocalSemanticColors = staticCompositionLocalOf { LightSemanticColors }
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-07-27 15:02</div>
+</div>
+</body>
+</html>

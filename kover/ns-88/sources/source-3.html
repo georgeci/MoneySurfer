@@ -1,0 +1,169 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>MoneySurfer Coverage Report > SurferScaleToWidthKt</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.georgeci.moneysurfer.uikit.modifier</a>
+</div>
+
+<h1>Coverage Summary for Class: SurferScaleToWidthKt (com.georgeci.moneysurfer.uikit.modifier)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">SurferScaleToWidthKt</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (1/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (15/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    98.7%
+  </span>
+  <span class="absValue">
+    (75/76)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.modifier
+&nbsp;
+&nbsp;import androidx.compose.ui.Modifier
+&nbsp;import androidx.compose.ui.graphics.TransformOrigin
+&nbsp;import androidx.compose.ui.layout.layout
+&nbsp;import androidx.compose.ui.unit.Constraints
+&nbsp;import androidx.compose.ui.unit.Dp
+&nbsp;import kotlin.math.roundToInt
+&nbsp;
+&nbsp;/**
+&nbsp; * Lays the content out at [contentWidth] and then draws it shrunk to the width the parent offers,
+&nbsp; * reporting the scaled-down size so the surrounding layout still measures correctly.
+&nbsp; *
+&nbsp; * This is what makes a thumbnail of a real screen component possible: a widget rendered directly
+&nbsp; * into a 150dp tile is not the same widget the dashboard shows — its text wraps, its rows collapse,
+&nbsp; * its hero typography overflows. Measuring at the dashboard&#39;s own width and scaling the result
+&nbsp; * keeps the proportions the user is choosing between.
+&nbsp; *
+&nbsp; * Scale is capped at 1: a tile wider than [contentWidth] shows the component at its natural size
+&nbsp; * rather than magnifying it into a blur.
+&nbsp; */
+<b class="fc">&nbsp;fun Modifier.surferScaleToWidth(contentWidth: Dp): Modifier = this.layout { measurable, constraints -&gt;</b>
+<b class="fc">&nbsp;    val target = contentWidth.roundToPx().coerceAtLeast(1)</b>
+<b class="fc">&nbsp;    val placeable = measurable.measure(</b>
+<b class="fc">&nbsp;        Constraints(</b>
+<b class="fc">&nbsp;            minWidth = target,</b>
+<b class="fc">&nbsp;            maxWidth = target,</b>
+<b class="fc">&nbsp;            minHeight = 0,</b>
+<b class="fc">&nbsp;            maxHeight = Constraints.Infinity,</b>
+&nbsp;        ),
+&nbsp;    )
+<b class="pc">&nbsp;    val available = if (constraints.hasBoundedWidth) constraints.maxWidth else target</b>
+<b class="fc">&nbsp;    val scale = (available.toFloat() / target).coerceAtMost(1f)</b>
+<b class="fc">&nbsp;    layout((target * scale).roundToInt(), (placeable.height * scale).roundToInt()) {</b>
+<b class="fc">&nbsp;        placeable.placeWithLayer(x = 0, y = 0) {</b>
+<b class="fc">&nbsp;            scaleX = scale</b>
+<b class="fc">&nbsp;            scaleY = scale</b>
+<b class="fc">&nbsp;            transformOrigin = TransformOrigin(0f, 0f)</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-07-27 15:02</div>
+</div>
+</body>
+</html>

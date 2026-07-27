@@ -1,0 +1,221 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>MoneySurfer Coverage Report > TransactionDetailsScreenPreviewsKt</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.transaction.details</a>
+</div>
+
+<h1>Coverage Summary for Class: TransactionDetailsScreenPreviewsKt (com.georgeci.moneysurfer.feature.transaction.details)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">TransactionDetailsScreenPreviewsKt</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/30)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/301)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.transaction.details
+&nbsp;
+&nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.ui.tooling.preview.Preview
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionType
+&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferCategoryPalette
+&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
+&nbsp;
+&nbsp;/** One date across every preview, so they read as the same afternoon. */
+&nbsp;private const val PreviewDate = &quot;18 Mar 2025&quot;
+&nbsp;
+<b class="nc">&nbsp;private fun previewExpense(showDeleteConfirmation: Boolean = false, isPlanned: Boolean = false) =</b>
+<b class="nc">&nbsp;    TransactionDetailsState.Content(</b>
+<b class="nc">&nbsp;        transactionId = TransactionId(&quot;preview-tx-1a13&quot;),</b>
+<b class="nc">&nbsp;        formattedAmount = &quot;−€48.20&quot;,</b>
+<b class="nc">&nbsp;        type = TransactionType.EXPENSE,</b>
+<b class="nc">&nbsp;        note = &quot;Lidl — weekly shop&quot;,</b>
+<b class="nc">&nbsp;        merchant = &quot;Lidl&quot;,</b>
+<b class="nc">&nbsp;        accountName = &quot;Everyday&quot;,</b>
+<b class="nc">&nbsp;        categoryName = &quot;Groceries&quot;,</b>
+<b class="nc">&nbsp;        parentCategoryName = &quot;Home&quot;,</b>
+<b class="nc">&nbsp;        tags = listOf(&quot;weekly&quot;, &quot;food&quot;),</b>
+<b class="nc">&nbsp;        reference = &quot;TX-1A13&quot;,</b>
+<b class="nc">&nbsp;        formattedDate = PreviewDate,</b>
+<b class="nc">&nbsp;        isPlanned = isPlanned,</b>
+<b class="nc">&nbsp;        showDeleteConfirmation = showDeleteConfirmation,</b>
+&nbsp;    )
+&nbsp;
+&nbsp;@Preview
+&nbsp;@Composable
+<b class="nc">&nbsp;private fun TransactionDetailsExpensePreview() {</b>
+<b class="nc">&nbsp;    AppTheme {</b>
+&nbsp;        TransactionDetailsContent(state = previewExpense(), onEvent = {})
+&nbsp;    }
+<b class="nc">&nbsp;}</b>
+&nbsp;
+&nbsp;@Preview
+&nbsp;@Composable
+<b class="nc">&nbsp;private fun TransactionDetailsIncomePreview() {</b>
+<b class="nc">&nbsp;    AppTheme {</b>
+&nbsp;        TransactionDetailsContent(
+&nbsp;            state = TransactionDetailsState.Content(
+&nbsp;                transactionId = TransactionId(&quot;preview-tx-2b24&quot;),
+&nbsp;                formattedAmount = &quot;+€1,500.00&quot;,
+&nbsp;                type = TransactionType.INCOME,
+&nbsp;                note = &quot;Monthly salary&quot;,
+&nbsp;                merchant = &quot;Acme Ltd&quot;,
+&nbsp;                accountName = &quot;Savings&quot;,
+&nbsp;                categoryName = &quot;Salary&quot;,
+&nbsp;                reference = &quot;TX-2B24&quot;,
+&nbsp;                formattedDate = PreviewDate,
+&nbsp;                isPlanned = false,
+&nbsp;                showDeleteConfirmation = false,
+&nbsp;            ),
+&nbsp;            onEvent = {},
+&nbsp;        )
+&nbsp;    }
+<b class="nc">&nbsp;}</b>
+&nbsp;
+&nbsp;@Preview
+&nbsp;@Composable
+<b class="nc">&nbsp;private fun TransactionDetailsTransferPreview() {</b>
+<b class="nc">&nbsp;    AppTheme {</b>
+&nbsp;        TransactionDetailsContent(
+&nbsp;            state = TransactionDetailsState.Content(
+&nbsp;                transactionId = TransactionId(&quot;preview-tx-3c35&quot;),
+&nbsp;                formattedAmount = &quot;€200.00&quot;,
+&nbsp;                type = TransactionType.EXPENSE,
+&nbsp;                transfer = TransferLeg(fromAccountName = &quot;Everyday&quot;, toAccountName = &quot;Savings&quot;),
+&nbsp;                note = &quot;Rainy day top-up&quot;,
+&nbsp;                accountName = &quot;Everyday&quot;,
+&nbsp;                categoryName = &quot;Transfer&quot;,
+&nbsp;                categorySystemKind = SurferCategoryPalette.SYSTEM_KIND_TRANSFER,
+&nbsp;                categoryIconKey = SurferCategoryPalette.TRANSFER_ICON_KEY,
+&nbsp;                reference = &quot;TX-3C35&quot;,
+&nbsp;                formattedDate = PreviewDate,
+&nbsp;                isPlanned = false,
+&nbsp;                showDeleteConfirmation = false,
+&nbsp;            ),
+&nbsp;            onEvent = {},
+&nbsp;        )
+&nbsp;    }
+<b class="nc">&nbsp;}</b>
+&nbsp;
+&nbsp;@Preview
+&nbsp;@Composable
+<b class="nc">&nbsp;private fun TransactionDetailsDeletePreview() {</b>
+<b class="nc">&nbsp;    AppTheme {</b>
+&nbsp;        TransactionDetailsContent(state = previewExpense(showDeleteConfirmation = true), onEvent = {})
+&nbsp;    }
+<b class="nc">&nbsp;}</b>
+&nbsp;
+&nbsp;@Preview
+&nbsp;@Composable
+<b class="nc">&nbsp;private fun TransactionDetailsPlannedPreview() {</b>
+<b class="nc">&nbsp;    AppTheme {</b>
+&nbsp;        TransactionDetailsContent(state = previewExpense(isPlanned = true), onEvent = {})
+&nbsp;    }
+<b class="nc">&nbsp;}</b>
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-07-27 15:02</div>
+</div>
+</body>
+</html>

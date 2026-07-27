@@ -1,0 +1,196 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>MoneySurfer Coverage Report > SurferErrorBoundaryKt</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.georgeci.moneysurfer.uikit.components</a>
+</div>
+
+<h1>Coverage Summary for Class: SurferErrorBoundaryKt (com.georgeci.moneysurfer.uikit.components)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">SurferErrorBoundaryKt</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    66.7%
+  </span>
+  <span class="absValue">
+    (2/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    41.7%
+  </span>
+  <span class="absValue">
+    (5/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    87.5%
+  </span>
+  <span class="absValue">
+    (21/24)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    79.9%
+  </span>
+  <span class="absValue">
+    (223/279)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.components
+&nbsp;
+&nbsp;import androidx.compose.foundation.layout.Box
+&nbsp;import androidx.compose.foundation.layout.fillMaxSize
+&nbsp;import androidx.compose.material3.Surface
+&nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.ui.Alignment
+&nbsp;import androidx.compose.ui.Modifier
+&nbsp;import androidx.compose.ui.platform.testTag
+&nbsp;import androidx.compose.ui.tooling.preview.Preview
+&nbsp;import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
+&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
+&nbsp;import moneysurfer.uikit.generated.resources.Res
+&nbsp;import moneysurfer.uikit.generated.resources.uikit_error_boundary_subtitle
+&nbsp;import moneysurfer.uikit.generated.resources.uikit_error_boundary_title
+&nbsp;import moneysurfer.uikit.generated.resources.uikit_retry
+&nbsp;import org.jetbrains.compose.resources.stringResource
+&nbsp;
+&nbsp;/**
+&nbsp; * App-level fallback for failures no screen handled itself: while [hasError] is true a
+&nbsp; * full-bleed [SurferErrorState] with a retry action covers [content] (issue #78).
+&nbsp; *
+&nbsp; * The content stays composed underneath rather than being torn down and rebuilt, so a
+&nbsp; * transient failure does not cost the user their navigation back stack — dismissing via
+&nbsp; * [onRetry] returns them exactly where they were, and the screen&#39;s own reload runs on the
+&nbsp; * data it already observes.
+&nbsp; */
+&nbsp;@Composable
+&nbsp;fun SurferErrorBoundary(
+&nbsp;    hasError: Boolean,
+&nbsp;    onRetry: () -&gt; Unit,
+<b class="fc">&nbsp;    modifier: Modifier = Modifier,</b>
+&nbsp;    content: @Composable () -&gt; Unit,
+<b class="pc">&nbsp;) {</b>
+<b class="fc">&nbsp;    Box(modifier = modifier.fillMaxSize()) {</b>
+<b class="fc">&nbsp;        content()</b>
+&nbsp;
+<b class="fc">&nbsp;        if (hasError) {</b>
+<b class="fc">&nbsp;            Surface(</b>
+<b class="fc">&nbsp;                modifier = Modifier</b>
+<b class="fc">&nbsp;                    .fillMaxSize()</b>
+<b class="fc">&nbsp;                    .testTag(SurferErrorBoundaryTestTags.Fallback),</b>
+<b class="fc">&nbsp;                color = AppTheme.materialColors.surface,</b>
+<b class="fc">&nbsp;            ) {</b>
+<b class="fc">&nbsp;                Box(contentAlignment = Alignment.Center) {</b>
+<b class="fc">&nbsp;                    SurferErrorState(</b>
+<b class="fc">&nbsp;                        title = stringResource(Res.string.uikit_error_boundary_title),</b>
+<b class="fc">&nbsp;                        subtitle = stringResource(Res.string.uikit_error_boundary_subtitle),</b>
+<b class="fc">&nbsp;                        retryLabel = stringResource(Res.string.uikit_retry),</b>
+<b class="fc">&nbsp;                        onRetry = onRetry,</b>
+&nbsp;                    )
+<b class="fc">&nbsp;                }</b>
+&nbsp;            }
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;    }</b>
+<b class="fc">&nbsp;}</b>
+&nbsp;
+&nbsp;object SurferErrorBoundaryTestTags {
+&nbsp;    const val Fallback = &quot;errorBoundary:fallback&quot;
+&nbsp;}
+&nbsp;
+&nbsp;@Preview
+&nbsp;@Composable
+<b class="nc">&nbsp;private fun SurferErrorBoundaryPreview() {</b>
+<b class="nc">&nbsp;    SurferComponentPreview {</b>
+&nbsp;        SurferErrorBoundary(hasError = true, onRetry = {}) {}
+&nbsp;    }
+<b class="nc">&nbsp;}</b>
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-07-27 15:02</div>
+</div>
+</body>
+</html>

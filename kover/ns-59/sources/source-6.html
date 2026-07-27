@@ -1,0 +1,166 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>MoneySurfer Coverage Report > TransactionFilterStore</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.transaction.filter</a>
+</div>
+
+<h1>Coverage Summary for Class: TransactionFilterStore (com.georgeci.moneysurfer.feature.transaction.filter)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">TransactionFilterStore</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (44/44)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.transaction.filter
+&nbsp;
+&nbsp;import kotlinx.coroutines.flow.MutableStateFlow
+&nbsp;import kotlinx.coroutines.flow.StateFlow
+&nbsp;import kotlinx.coroutines.flow.asStateFlow
+&nbsp;import kotlinx.coroutines.flow.update
+&nbsp;import org.koin.core.annotation.Single
+&nbsp;
+&nbsp;/**
+&nbsp; * The applied filters, held above both the transactions list and the filter screen.
+&nbsp; *
+&nbsp; * Neither ViewModel can own this: the filter screen is a separate destination, so a
+&nbsp; * list-owned copy would be gone by the time it commits, and a screen-owned copy would not exist
+&nbsp; * until the user opened it. A singleton is what &quot;shared by two destinations, survives the
+&nbsp; * navigation between them&quot; means here.
+&nbsp; *
+&nbsp; * Only *applied* filters live here. The filter screen edits its own draft and calls [commit] on
+&nbsp; * `Apply`; `Cancel` simply drops the draft, which is why backing out changes nothing.
+&nbsp; *
+&nbsp; * Scoped to the process, not to a screen: reopening the list keeps whatever the user last
+&nbsp; * applied, the same way the type chips already did within a session. Nothing is persisted across
+&nbsp; * launches — a filter the user cannot see the origin of is worse than re-picking it.
+&nbsp; */
+<b class="fc">&nbsp;@Single</b>
+&nbsp;class TransactionFilterStore {
+&nbsp;
+<b class="fc">&nbsp;    private val state = MutableStateFlow(TransactionFilters.Empty)</b>
+&nbsp;
+<b class="fc">&nbsp;    val filters: StateFlow&lt;TransactionFilters&gt; = state.asStateFlow()</b>
+&nbsp;
+&nbsp;    /** Live as the user types on the list — the search field is not part of the draft/apply cycle. */
+&nbsp;    fun setQuery(query: String) {
+<b class="fc">&nbsp;        state.update { it.copy(query = query) }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /** `Apply` on the filter screen. The draft carries the search text through unchanged. */
+&nbsp;    fun commit(filters: TransactionFilters) {
+<b class="fc">&nbsp;        state.value = filters</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /** Drops every filter but keeps the search text, which the list still shows. */
+&nbsp;    fun clear() {
+<b class="fc">&nbsp;        state.update { it.cleared() }</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-07-27 15:02</div>
+</div>
+</body>
+</html>

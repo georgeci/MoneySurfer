@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SurferGoalContributionRowKt</title>
+  <title>MoneySurfer Coverage Report > DeleteUserAccountScreenKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,18 +19,15 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.uikit.components.goal</a>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.settings.account</a>
 </div>
 
-<h1>Coverage Summary for Class: SurferGoalContributionRowKt (com.georgeci.moneysurfer.uikit.components.goal)</h1>
+<h1>Coverage Summary for Class: DeleteUserAccountScreenKt (com.georgeci.moneysurfer.feature.settings.account)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
-<th class="coverageStat 
-">
-  Class, %
-</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -49,49 +46,114 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SurferGoalContributionRowKt</td>
+  <td class="name">DeleteUserAccountScreenKt</td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (1/1)
+    (0/17)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    50%
+    0%
   </span>
   <span class="absValue">
-    (1/2)
+    (0/55)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    50%
+    0%
   </span>
   <span class="absValue">
-    (16/32)
+    (0/117)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    94.2%
+    0%
   </span>
   <span class="absValue">
-    (49/52)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    84.7%
-  </span>
-  <span class="absValue">
-    (522/616)
+    (0/1628)
   </span>
 </td>
 </tr>
-
+  <tr>
+    <td class="name">DeleteUserAccountScreenKt$DeleteUserAccountScreen$1$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/33)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">DeleteUserAccountScreenKt$WhenMappings</td>
+    <td class="coverageStat"/>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/57)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/120)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1661)
+  </span>
+</td>
+</tr>
 </table>
 
 <br/>
@@ -99,133 +161,282 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.components.goal
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.settings.account
 &nbsp;
-&nbsp;import androidx.compose.foundation.background
-&nbsp;import androidx.compose.foundation.clickable
 &nbsp;import androidx.compose.foundation.layout.Arrangement
-&nbsp;import androidx.compose.foundation.layout.Box
 &nbsp;import androidx.compose.foundation.layout.Column
 &nbsp;import androidx.compose.foundation.layout.Row
+&nbsp;import androidx.compose.foundation.layout.Spacer
 &nbsp;import androidx.compose.foundation.layout.fillMaxWidth
+&nbsp;import androidx.compose.foundation.layout.height
 &nbsp;import androidx.compose.foundation.layout.padding
-&nbsp;import androidx.compose.foundation.layout.size
-&nbsp;import androidx.compose.foundation.shape.CircleShape
-&nbsp;import androidx.compose.material.icons.Icons
-&nbsp;import androidx.compose.material.icons.filled.ArrowDownward
-&nbsp;import androidx.compose.material.icons.filled.ArrowUpward
-&nbsp;import androidx.compose.material.icons.filled.Autorenew
+&nbsp;import androidx.compose.foundation.layout.width
+&nbsp;import androidx.compose.foundation.text.KeyboardOptions
+&nbsp;import androidx.compose.material3.AlertDialog
+&nbsp;import androidx.compose.material3.Button
+&nbsp;import androidx.compose.material3.ButtonDefaults
 &nbsp;import androidx.compose.material3.Icon
+&nbsp;import androidx.compose.material3.OutlinedTextField
+&nbsp;import androidx.compose.material3.SnackbarDuration
+&nbsp;import androidx.compose.material3.SnackbarHostState
 &nbsp;import androidx.compose.material3.Text
+&nbsp;import androidx.compose.material3.TextButton
 &nbsp;import androidx.compose.runtime.Composable
-&nbsp;import androidx.compose.ui.Alignment
+&nbsp;import androidx.compose.runtime.LaunchedEffect
+&nbsp;import androidx.compose.runtime.getValue
+&nbsp;import androidx.compose.runtime.mutableStateOf
+&nbsp;import androidx.compose.runtime.remember
+&nbsp;import androidx.compose.runtime.setValue
 &nbsp;import androidx.compose.ui.Modifier
-&nbsp;import androidx.compose.ui.draw.clip
-&nbsp;import androidx.compose.ui.text.font.FontWeight
-&nbsp;import androidx.compose.ui.text.style.TextOverflow
+&nbsp;import androidx.compose.ui.platform.testTag
+&nbsp;import androidx.compose.ui.text.input.KeyboardType
+&nbsp;import androidx.compose.ui.text.input.PasswordVisualTransformation
+&nbsp;import androidx.compose.ui.text.style.TextAlign
 &nbsp;import androidx.compose.ui.tooling.preview.Preview
 &nbsp;import androidx.compose.ui.unit.dp
-&nbsp;import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
+&nbsp;import androidx.lifecycle.compose.collectAsStateWithLifecycle
+&nbsp;import com.georgeci.moneysurfer.feature.settings.components.SettingsSubScreenScaffold
+&nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+&nbsp;import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 &nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
+&nbsp;import com.georgeci.moneysurfer.utils.HandleSideEffect
+&nbsp;import moneysurfer.feature.settings.generated.resources.Res
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_button
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_confirm_cancel
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_confirm_confirm
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_confirm_message
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_confirm_title
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_deleted_memberships
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_deleted_section
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_deleted_sync
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_deleted_workspaces
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_intro
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_kept_local
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_kept_section
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_kept_shared
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_notice_auth_failed
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_notice_cleanup_failed
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_notice_generic
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_notice_recent_login
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_notice_wrong_password
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_password_label
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_password_missing
+&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account_title
+&nbsp;import org.jetbrains.compose.resources.stringResource
+&nbsp;import org.koin.compose.viewmodel.koinViewModel
 &nbsp;
-&nbsp;/**
-&nbsp; * One line of a goal&#39;s contribution history. A withdrawal is a contribution with a negative
-&nbsp; * amount, so it differs only in its icon and amount colour.
-&nbsp; *
-&nbsp; * [automatic] styles a row created by a scheduled auto-contribution. Nothing produces those in
-&nbsp; * v1 (autopay is deferred), but the styling belongs with the component rather than with the
-&nbsp; * feature that will later switch it on.
-&nbsp; */
-&nbsp;@Suppress(&quot;LongParameterList&quot;)
+&nbsp;/** Stable selectors — see docs/testing/testing-strategy.md. */
+&nbsp;object DeleteUserAccountTestTags {
+&nbsp;    const val PasswordField = &quot;deleteAccount:passwordField&quot;
+&nbsp;    const val DeleteButton = &quot;deleteAccount:deleteButton&quot;
+&nbsp;}
+&nbsp;
 &nbsp;@Composable
-&nbsp;fun SurferGoalContributionRow(
-&nbsp;    amountLabel: String,
-&nbsp;    dateLabel: String,
-&nbsp;    isWithdrawal: Boolean,
-<b class="fc">&nbsp;    modifier: Modifier = Modifier,</b>
-<b class="fc">&nbsp;    note: String? = null,</b>
-<b class="fc">&nbsp;    automatic: Boolean = false,</b>
-<b class="fc">&nbsp;    onClick: (() -&gt; Unit)? = null,</b>
-<b class="pc">&nbsp;) {</b>
-<b class="fc">&nbsp;    val colors = AppTheme.materialColors</b>
-<b class="fc">&nbsp;    val accent = if (isWithdrawal) colors.error else AppTheme.semanticColors.income</b>
-<b class="pc">&nbsp;    val rowModifier = if (onClick != null) modifier.clickable(onClick = onClick) else modifier</b>
+<b class="nc">&nbsp;fun DeleteUserAccountScreen(</b>
+&nbsp;    onNavigateBack: () -&gt; Unit,
+<b class="nc">&nbsp;    viewModel: DeleteUserAccountViewModel = koinViewModel(),</b>
+<b class="nc">&nbsp;) {</b>
+<b class="nc">&nbsp;    val state by viewModel.collectAsStateWithLifecycle()</b>
+<b class="nc">&nbsp;    val snackbarHostState = remember { SnackbarHostState() }</b>
+<b class="nc">&nbsp;    var pendingNotice by remember { mutableStateOf&lt;DeleteUserAccountNotice?&gt;(null) }</b>
 &nbsp;
-<b class="fc">&nbsp;    Row(</b>
-<b class="fc">&nbsp;        modifier = rowModifier</b>
-<b class="fc">&nbsp;            .fillMaxWidth()</b>
-<b class="fc">&nbsp;            .padding(vertical = AppTheme.spacing.small),</b>
-<b class="fc">&nbsp;        verticalAlignment = Alignment.CenterVertically,</b>
-<b class="fc">&nbsp;        horizontalArrangement = Arrangement.spacedBy(AppTheme.spacing.medium),</b>
-&nbsp;    ) {
-<b class="fc">&nbsp;        Box(</b>
-<b class="fc">&nbsp;            modifier = Modifier</b>
-<b class="fc">&nbsp;                .size(36.dp)</b>
-<b class="fc">&nbsp;                .clip(CircleShape)</b>
-<b class="fc">&nbsp;                .background(accent.copy(alpha = ICON_BACKGROUND_ALPHA)),</b>
-<b class="fc">&nbsp;            contentAlignment = Alignment.Center,</b>
-&nbsp;        ) {
-<b class="fc">&nbsp;            Icon(</b>
-<b class="fc">&nbsp;                imageVector = when {</b>
-<b class="pc">&nbsp;                    automatic -&gt; Icons.Default.Autorenew</b>
-<b class="fc">&nbsp;                    isWithdrawal -&gt; Icons.Default.ArrowUpward</b>
-<b class="fc">&nbsp;                    else -&gt; Icons.Default.ArrowDownward</b>
-&nbsp;                },
-<b class="fc">&nbsp;                contentDescription = null,</b>
-<b class="fc">&nbsp;                tint = accent,</b>
-<b class="fc">&nbsp;                modifier = Modifier.size(18.dp),</b>
-&nbsp;            )
-<b class="fc">&nbsp;        }</b>
-<b class="fc">&nbsp;        Column(modifier = Modifier.weight(1f)) {</b>
-<b class="fc">&nbsp;            Text(</b>
-<b class="pc">&nbsp;                text = note?.takeIf { it.isNotBlank() } ?: dateLabel,</b>
-<b class="fc">&nbsp;                style = AppTheme.typography.bodyMedium,</b>
-<b class="fc">&nbsp;                color = colors.onSurface,</b>
-<b class="fc">&nbsp;                maxLines = 1,</b>
-<b class="fc">&nbsp;                overflow = TextOverflow.Ellipsis,</b>
-&nbsp;            )
-<b class="fc">&nbsp;            if (!note.isNullOrBlank()) {</b>
-<b class="fc">&nbsp;                Text(</b>
-<b class="fc">&nbsp;                    text = dateLabel,</b>
-<b class="fc">&nbsp;                    style = AppTheme.typography.bodySmall,</b>
-<b class="fc">&nbsp;                    color = colors.onSurfaceVariant,</b>
-&nbsp;                )
-<b class="fc">&nbsp;            }</b>
-<b class="fc">&nbsp;        }</b>
-<b class="fc">&nbsp;        Text(</b>
-<b class="fc">&nbsp;            text = amountLabel,</b>
-<b class="fc">&nbsp;            style = AppTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium),</b>
-<b class="fc">&nbsp;            color = accent,</b>
+<b class="nc">&nbsp;    val pendingNoticeText: String? = pendingNotice?.let { noticeText(it) }</b>
+<b class="nc">&nbsp;    LaunchedEffect(pendingNoticeText) {</b>
+<b class="nc">&nbsp;        val text = pendingNoticeText ?: return@LaunchedEffect</b>
+<b class="nc">&nbsp;        snackbarHostState.showSnackbar(message = text, duration = SnackbarDuration.Short)</b>
+<b class="nc">&nbsp;        pendingNotice = null</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    viewModel.HandleSideEffect { effect -&gt;</b>
+<b class="nc">&nbsp;        when (effect) {</b>
+<b class="nc">&nbsp;            DeleteUserAccountEffect.NavigateBack -&gt; onNavigateBack()</b>
+<b class="nc">&nbsp;            is DeleteUserAccountEffect.Notify -&gt; pendingNotice = effect.notice</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    DeleteUserAccountContent(</b>
+<b class="nc">&nbsp;        state = state,</b>
+<b class="nc">&nbsp;        snackbarHostState = snackbarHostState,</b>
+<b class="nc">&nbsp;        onEvent = viewModel::onEvent,</b>
+&nbsp;    )
+<b class="nc">&nbsp;}</b>
+&nbsp;
+&nbsp;@Composable
+<b class="nc">&nbsp;private fun noticeText(notice: DeleteUserAccountNotice): String = when (notice) {</b>
+&nbsp;    DeleteUserAccountNotice.WrongPassword -&gt;
+<b class="nc">&nbsp;        stringResource(Res.string.settings_delete_account_notice_wrong_password)</b>
+&nbsp;    DeleteUserAccountNotice.RequiresRecentLogin -&gt;
+<b class="nc">&nbsp;        stringResource(Res.string.settings_delete_account_notice_recent_login)</b>
+&nbsp;    DeleteUserAccountNotice.CleanupFailed -&gt;
+<b class="nc">&nbsp;        stringResource(Res.string.settings_delete_account_notice_cleanup_failed)</b>
+&nbsp;    DeleteUserAccountNotice.AuthDeletionFailed -&gt;
+<b class="nc">&nbsp;        stringResource(Res.string.settings_delete_account_notice_auth_failed)</b>
+&nbsp;    DeleteUserAccountNotice.Generic -&gt;
+<b class="nc">&nbsp;        stringResource(Res.string.settings_delete_account_notice_generic)</b>
+<b class="nc">&nbsp;}</b>
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun DeleteUserAccountContent(
+&nbsp;    state: DeleteUserAccountState,
+&nbsp;    snackbarHostState: SnackbarHostState,
+&nbsp;    onEvent: (DeleteUserAccountEvent) -&gt; Unit,
+<b class="nc">&nbsp;) {</b>
+<b class="nc">&nbsp;    if (state.showConfirmDialog) {</b>
+<b class="nc">&nbsp;        ConfirmDeleteUserAccountDialog(</b>
+<b class="nc">&nbsp;            onConfirm = { onEvent(DeleteUserAccountEvent.OnConfirmAccepted) },</b>
+<b class="nc">&nbsp;            onDismiss = { onEvent(DeleteUserAccountEvent.OnConfirmDismissed) },</b>
 &nbsp;        )
-<b class="fc">&nbsp;    }</b>
-<b class="fc">&nbsp;}</b>
+<b class="nc">&nbsp;    }</b>
 &nbsp;
-&nbsp;private const val ICON_BACKGROUND_ALPHA = 0.12f
+<b class="nc">&nbsp;    SettingsSubScreenScaffold(</b>
+<b class="nc">&nbsp;        title = stringResource(Res.string.settings_delete_account_title),</b>
+<b class="nc">&nbsp;        snackbarHostState = snackbarHostState,</b>
+<b class="nc">&nbsp;        onBack = { onEvent(DeleteUserAccountEvent.OnBackClick) },</b>
+<b class="nc">&nbsp;        showProgressOverlay = state.isDeleting,</b>
+<b class="nc">&nbsp;    ) { padding -&gt;</b>
+<b class="nc">&nbsp;        Column(</b>
+<b class="nc">&nbsp;            modifier = Modifier.padding(horizontal = 16.dp),</b>
+<b class="nc">&nbsp;            verticalArrangement = Arrangement.spacedBy(AppTheme.spacing.small),</b>
+&nbsp;        ) {
+<b class="nc">&nbsp;            Spacer(Modifier.height(4.dp))</b>
+<b class="nc">&nbsp;            Text(</b>
+<b class="nc">&nbsp;                text = stringResource(Res.string.settings_delete_account_intro),</b>
+<b class="nc">&nbsp;                style = AppTheme.typography.bodyMedium,</b>
+<b class="nc">&nbsp;                color = AppTheme.materialColors.onSurfaceVariant,</b>
+&nbsp;            )
+&nbsp;
+<b class="nc">&nbsp;            SectionTitle(stringResource(Res.string.settings_delete_account_deleted_section))</b>
+<b class="nc">&nbsp;            BulletLine(stringResource(Res.string.settings_delete_account_deleted_workspaces))</b>
+<b class="nc">&nbsp;            BulletLine(stringResource(Res.string.settings_delete_account_deleted_memberships))</b>
+<b class="nc">&nbsp;            BulletLine(stringResource(Res.string.settings_delete_account_deleted_sync))</b>
+&nbsp;
+<b class="nc">&nbsp;            SectionTitle(stringResource(Res.string.settings_delete_account_kept_section))</b>
+<b class="nc">&nbsp;            BulletLine(stringResource(Res.string.settings_delete_account_kept_shared))</b>
+<b class="nc">&nbsp;            BulletLine(stringResource(Res.string.settings_delete_account_kept_local))</b>
+&nbsp;
+<b class="nc">&nbsp;            if (state.showPasswordField) {</b>
+<b class="nc">&nbsp;                Spacer(Modifier.height(AppTheme.spacing.small))</b>
+<b class="nc">&nbsp;                OutlinedTextField(</b>
+<b class="nc">&nbsp;                    value = state.password,</b>
+<b class="nc">&nbsp;                    onValueChange = { onEvent(DeleteUserAccountEvent.OnPasswordChange(it)) },</b>
+&nbsp;                    label = { Text(stringResource(Res.string.settings_delete_account_password_label)) },
+<b class="nc">&nbsp;                    singleLine = true,</b>
+<b class="nc">&nbsp;                    visualTransformation = PasswordVisualTransformation(),</b>
+<b class="nc">&nbsp;                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),</b>
+<b class="nc">&nbsp;                    isError = state.passwordMissing,</b>
+<b class="nc">&nbsp;                    supportingText = {</b>
+<b class="nc">&nbsp;                        if (state.passwordMissing) {</b>
+<b class="nc">&nbsp;                            Text(stringResource(Res.string.settings_delete_account_password_missing))</b>
+<b class="nc">&nbsp;                        }</b>
+&nbsp;                    },
+<b class="nc">&nbsp;                    enabled = !state.isDeleting,</b>
+<b class="nc">&nbsp;                    modifier = Modifier</b>
+<b class="nc">&nbsp;                        .fillMaxWidth()</b>
+<b class="nc">&nbsp;                        .testTag(DeleteUserAccountTestTags.PasswordField),</b>
+&nbsp;                )
+<b class="nc">&nbsp;            }</b>
+&nbsp;
+<b class="nc">&nbsp;            Spacer(Modifier.height(AppTheme.spacing.small))</b>
+<b class="nc">&nbsp;            Button(</b>
+<b class="nc">&nbsp;                onClick = { onEvent(DeleteUserAccountEvent.OnDeleteClick) },</b>
+<b class="nc">&nbsp;                enabled = !state.isDeleting,</b>
+<b class="nc">&nbsp;                colors = ButtonDefaults.buttonColors(</b>
+<b class="nc">&nbsp;                    containerColor = AppTheme.materialColors.error,</b>
+<b class="nc">&nbsp;                    contentColor = AppTheme.materialColors.onError,</b>
+&nbsp;                ),
+<b class="nc">&nbsp;                modifier = Modifier</b>
+<b class="nc">&nbsp;                    .fillMaxWidth()</b>
+<b class="nc">&nbsp;                    .testTag(DeleteUserAccountTestTags.DeleteButton),</b>
+&nbsp;            ) {
+&nbsp;                Text(stringResource(Res.string.settings_delete_account_button))
+&nbsp;            }
+<b class="nc">&nbsp;            Spacer(Modifier.height(padding.calculateBottomPadding() + AppTheme.spacing.large))</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+<b class="nc">&nbsp;}</b>
+&nbsp;
+&nbsp;@Composable
+<b class="nc">&nbsp;private fun SectionTitle(text: String) {</b>
+<b class="nc">&nbsp;    Text(</b>
+<b class="nc">&nbsp;        text = text,</b>
+<b class="nc">&nbsp;        style = AppTheme.typography.titleSmall,</b>
+<b class="nc">&nbsp;        color = AppTheme.materialColors.onSurface,</b>
+<b class="nc">&nbsp;        modifier = Modifier.padding(top = AppTheme.spacing.small),</b>
+&nbsp;    )
+<b class="nc">&nbsp;}</b>
+&nbsp;
+&nbsp;@Composable
+<b class="nc">&nbsp;private fun BulletLine(text: String) {</b>
+<b class="nc">&nbsp;    Row {</b>
+<b class="nc">&nbsp;        Text(</b>
+<b class="nc">&nbsp;            text = &quot;•&quot;,</b>
+<b class="nc">&nbsp;            style = AppTheme.typography.bodyMedium,</b>
+<b class="nc">&nbsp;            color = AppTheme.materialColors.onSurfaceVariant,</b>
+&nbsp;        )
+<b class="nc">&nbsp;        Spacer(Modifier.width(8.dp))</b>
+<b class="nc">&nbsp;        Text(</b>
+<b class="nc">&nbsp;            text = text,</b>
+<b class="nc">&nbsp;            style = AppTheme.typography.bodyMedium,</b>
+<b class="nc">&nbsp;            color = AppTheme.materialColors.onSurfaceVariant,</b>
+&nbsp;        )
+<b class="nc">&nbsp;    }</b>
+<b class="nc">&nbsp;}</b>
+&nbsp;
+&nbsp;/** Final confirmation — mirrors the M3 dialog shape used by the financial-account delete. */
+&nbsp;@Composable
+&nbsp;private fun ConfirmDeleteUserAccountDialog(
+&nbsp;    onConfirm: () -&gt; Unit,
+&nbsp;    onDismiss: () -&gt; Unit,
+<b class="nc">&nbsp;) {</b>
+<b class="nc">&nbsp;    AlertDialog(</b>
+<b class="nc">&nbsp;        onDismissRequest = onDismiss,</b>
+&nbsp;        icon = {
+&nbsp;            Icon(
+&nbsp;                imageVector = SurferIcons.Delete,
+&nbsp;                contentDescription = SurferSemantics.Decorative,
+&nbsp;                tint = AppTheme.materialColors.error,
+&nbsp;            )
+&nbsp;        },
+&nbsp;        title = {
+&nbsp;            Text(
+&nbsp;                text = stringResource(Res.string.settings_delete_account_confirm_title),
+&nbsp;                textAlign = TextAlign.Center,
+&nbsp;            )
+&nbsp;        },
+&nbsp;        text = {
+&nbsp;            Text(
+&nbsp;                text = stringResource(Res.string.settings_delete_account_confirm_message),
+&nbsp;                textAlign = TextAlign.Center,
+&nbsp;            )
+&nbsp;        },
+<b class="nc">&nbsp;        confirmButton = {</b>
+<b class="nc">&nbsp;            Button(</b>
+<b class="nc">&nbsp;                onClick = onConfirm,</b>
+<b class="nc">&nbsp;                colors = ButtonDefaults.buttonColors(</b>
+<b class="nc">&nbsp;                    containerColor = AppTheme.materialColors.error,</b>
+<b class="nc">&nbsp;                    contentColor = AppTheme.materialColors.onError,</b>
+&nbsp;                ),
+&nbsp;            ) {
+&nbsp;                Text(stringResource(Res.string.settings_delete_account_confirm_confirm))
+&nbsp;            }
+&nbsp;        },
+<b class="nc">&nbsp;        dismissButton = {</b>
+<b class="nc">&nbsp;            TextButton(onClick = onDismiss) {</b>
+&nbsp;                Text(stringResource(Res.string.settings_delete_account_confirm_cancel))
+&nbsp;            }
+&nbsp;        },
+&nbsp;    )
+<b class="nc">&nbsp;}</b>
 &nbsp;
 &nbsp;@Preview
 &nbsp;@Composable
-<b class="nc">&nbsp;private fun SurferGoalContributionRowPreview() {</b>
-<b class="nc">&nbsp;    SurferComponentPreview {</b>
-&nbsp;        Column(modifier = Modifier.padding(16.dp)) {
-&nbsp;            SurferGoalContributionRow(
-&nbsp;                amountLabel = &quot;+€250&quot;,
-&nbsp;                dateLabel = &quot;12 Jul 2026&quot;,
-&nbsp;                isWithdrawal = false,
-&nbsp;                note = &quot;Salary top-up&quot;,
-&nbsp;            )
-&nbsp;            SurferGoalContributionRow(
-&nbsp;                amountLabel = &quot;−€80&quot;,
-&nbsp;                dateLabel = &quot;3 Jul 2026&quot;,
-&nbsp;                isWithdrawal = true,
-&nbsp;            )
-&nbsp;            SurferGoalContributionRow(
-&nbsp;                amountLabel = &quot;+€100&quot;,
-&nbsp;                dateLabel = &quot;1 Jul 2026&quot;,
-&nbsp;                isWithdrawal = false,
-&nbsp;                automatic = true,
-&nbsp;                note = &quot;Monthly autopay&quot;,
-&nbsp;            )
-&nbsp;        }
+<b class="nc">&nbsp;private fun DeleteUserAccountScreenPreview() {</b>
+<b class="nc">&nbsp;    AppTheme {</b>
+&nbsp;        DeleteUserAccountContent(
+&nbsp;            state = DeleteUserAccountState(userEmail = &quot;kasia@georgeci.com&quot;),
+&nbsp;            snackbarHostState = SnackbarHostState(),
+&nbsp;            onEvent = {},
+&nbsp;        )
 &nbsp;    }
 <b class="nc">&nbsp;}</b>
 </code>
@@ -251,7 +462,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-23 23:54</div>
+    <div style="float:right;">generated on 2026-07-27 15:02</div>
 </div>
 </body>
 </html>

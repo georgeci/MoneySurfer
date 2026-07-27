@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SemanticColors</title>
+  <title>MoneySurfer Coverage Report > GoalEditTestTags</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,70 +19,22 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.uikit.theme</a>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.goal.edit</a>
 </div>
 
-<h1>Coverage Summary for Class: SemanticColors (com.georgeci.moneysurfer.uikit.theme)</h1>
+<h1>Coverage Summary for Class: GoalEditTestTags (com.georgeci.moneysurfer.feature.goal.edit)</h1>
 
 <table class="coverageStats">
 <tr>
   <th class="name">Class</th>
 <th class="coverageStat 
 ">
-  Class, %
-</th>
-<th class="coverageStat 
-">
-  Method, %
-</th>
-<th class="coverageStat 
-">
   Branch, %
-</th>
-<th class="coverageStat 
-">
-  Line, %
-</th>
-<th class="coverageStat 
-">
-  Instruction, %
 </th>
 </tr>
 <tr>
-  <td class="name">SemanticColors</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
-  </span>
-</td>
+  <td class="name">GoalEditTestTags</td>
     <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/4)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/44)
-  </span>
-</td>
 </tr>
 
 </table>
@@ -92,31 +44,232 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.theme
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.goal.edit
 &nbsp;
-&nbsp;import androidx.compose.runtime.staticCompositionLocalOf
-&nbsp;import androidx.compose.ui.graphics.Color
-&nbsp;import com.georgeci.moneysurfer.uikit.tokens.AppColors
+&nbsp;import androidx.compose.foundation.layout.Arrangement
+&nbsp;import androidx.compose.foundation.layout.Column
+&nbsp;import androidx.compose.foundation.layout.Row
+&nbsp;import androidx.compose.foundation.layout.fillMaxSize
+&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
+&nbsp;import androidx.compose.foundation.layout.padding
+&nbsp;import androidx.compose.foundation.layout.size
+&nbsp;import androidx.compose.foundation.rememberScrollState
+&nbsp;import androidx.compose.foundation.text.KeyboardOptions
+&nbsp;import androidx.compose.foundation.verticalScroll
+&nbsp;import androidx.compose.material3.OutlinedTextField
+&nbsp;import androidx.compose.material3.Scaffold
+&nbsp;import androidx.compose.material3.Text
+&nbsp;import androidx.compose.material3.TextButton
+&nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.runtime.getValue
+&nbsp;import androidx.compose.ui.Alignment
+&nbsp;import androidx.compose.ui.Modifier
+&nbsp;import androidx.compose.ui.platform.testTag
+&nbsp;import androidx.compose.ui.text.input.KeyboardType
+&nbsp;import androidx.compose.ui.tooling.preview.Preview
+&nbsp;import androidx.compose.ui.unit.dp
+&nbsp;import androidx.lifecycle.compose.collectAsStateWithLifecycle
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.GoalId
+&nbsp;import com.georgeci.moneysurfer.feature.goal.GoalDateField
+&nbsp;import com.georgeci.moneysurfer.feature.goal.GoalDatePickerDialog
+&nbsp;import com.georgeci.moneysurfer.feature.goal.formatGoalDate
+&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferSectionLabel
+&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
+&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferToolbarButtonAction
+&nbsp;import com.georgeci.moneysurfer.uikit.components.goal.SurferEmojiPicker
+&nbsp;import com.georgeci.moneysurfer.uikit.components.goal.SurferGoalHueRow
+&nbsp;import com.georgeci.moneysurfer.uikit.components.goal.SurferGoalIcon
+&nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
+&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
+&nbsp;import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
+&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
+&nbsp;import com.georgeci.moneysurfer.utils.HandleSideEffect
+&nbsp;import kotlinx.datetime.LocalDate
+&nbsp;import moneysurfer.feature.goal.generated.resources.Res
+&nbsp;import moneysurfer.feature.goal.generated.resources.goal_edit_color_label
+&nbsp;import moneysurfer.feature.goal.generated.resources.goal_edit_icon_label
+&nbsp;import moneysurfer.feature.goal.generated.resources.goal_edit_name_error_required
+&nbsp;import moneysurfer.feature.goal.generated.resources.goal_edit_name_label
+&nbsp;import moneysurfer.feature.goal.generated.resources.goal_edit_save
+&nbsp;import moneysurfer.feature.goal.generated.resources.goal_edit_target_date_clear
+&nbsp;import moneysurfer.feature.goal.generated.resources.goal_edit_target_date_label
+&nbsp;import moneysurfer.feature.goal.generated.resources.goal_edit_target_date_placeholder
+&nbsp;import moneysurfer.feature.goal.generated.resources.goal_edit_target_error
+&nbsp;import moneysurfer.feature.goal.generated.resources.goal_edit_target_label
+&nbsp;import moneysurfer.feature.goal.generated.resources.goal_edit_title_create
+&nbsp;import moneysurfer.feature.goal.generated.resources.goal_edit_title_edit
+&nbsp;import org.jetbrains.compose.resources.stringResource
+&nbsp;import org.koin.compose.viewmodel.koinViewModel
+&nbsp;import org.koin.core.parameter.parametersOf
 &nbsp;
-<b class="nc">&nbsp;data class SemanticColors(</b>
-<b class="nc">&nbsp;    val income: Color = AppColors.Income,</b>
-<b class="nc">&nbsp;    val expense: Color = AppColors.Expense,</b>
-<b class="nc">&nbsp;    val transfer: Color = AppColors.Transfer,</b>
-&nbsp;)
+&nbsp;/** Stable selectors for the goal create/edit screen — see docs/testing/testing-strategy.md. */
+&nbsp;object GoalEditTestTags {
+&nbsp;    const val Root = &quot;goalEdit:root&quot;
+&nbsp;    const val TitleField = &quot;goalEdit:title&quot;
+&nbsp;    const val TargetField = &quot;goalEdit:target&quot;
+&nbsp;    const val SaveButton = &quot;goalEdit:save&quot;
+&nbsp;}
 &nbsp;
-&nbsp;internal val LightSemanticColors = SemanticColors(
-&nbsp;    income = AppColors.Income,
-&nbsp;    expense = AppColors.Expense,
-&nbsp;    transfer = AppColors.Transfer,
-&nbsp;)
+&nbsp;@Composable
+&nbsp;fun GoalEditScreen(
+&nbsp;    goalId: GoalId? = null,
+&nbsp;    onNavigateBack: () -&gt; Unit,
+&nbsp;    viewModel: GoalEditViewModel = koinViewModel(key = goalId?.value ?: &quot;new&quot;) { parametersOf(goalId) },
+&nbsp;) {
+&nbsp;    val state by viewModel.collectAsStateWithLifecycle()
 &nbsp;
-&nbsp;internal val DarkSemanticColors = SemanticColors(
-&nbsp;    income = AppColors.Dark.Income,
-&nbsp;    expense = AppColors.Dark.Expense,
-&nbsp;    transfer = AppColors.Dark.Transfer,
-&nbsp;)
+&nbsp;    viewModel.HandleSideEffect { effect -&gt;
+&nbsp;        when (effect) {
+&nbsp;            GoalEditEffect.NavigateBack -&gt; onNavigateBack()
+&nbsp;        }
+&nbsp;    }
 &nbsp;
-&nbsp;val LocalSemanticColors = staticCompositionLocalOf { LightSemanticColors }
+&nbsp;    GoalEditContent(state = state, onEvent = viewModel::onEvent)
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun GoalEditContent(
+&nbsp;    state: GoalEditState,
+&nbsp;    onEvent: (GoalEditEvent) -&gt; Unit,
+&nbsp;) {
+&nbsp;    Scaffold(
+&nbsp;        modifier = Modifier
+&nbsp;            .surferSafeInsets()
+&nbsp;            .testTag(GoalEditTestTags.Root)
+&nbsp;            .surferTestTagAsId(),
+&nbsp;        containerColor = AppTheme.materialColors.surface,
+&nbsp;        topBar = {
+&nbsp;            SurferToolbar(
+&nbsp;                title = stringResource(
+&nbsp;                    if (state.isEdit) Res.string.goal_edit_title_edit else Res.string.goal_edit_title_create,
+&nbsp;                ),
+&nbsp;                onBack = { onEvent(GoalEditEvent.OnBackClick) },
+&nbsp;                actions = {
+&nbsp;                    SurferToolbarButtonAction(
+&nbsp;                        icon = SurferIcons.Check,
+&nbsp;                        text = stringResource(Res.string.goal_edit_save),
+&nbsp;                        enabled = state.canSave,
+&nbsp;                        onClick = { onEvent(GoalEditEvent.OnSaveClick) },
+&nbsp;                        modifier = Modifier.testTag(GoalEditTestTags.SaveButton),
+&nbsp;                    )
+&nbsp;                },
+&nbsp;            )
+&nbsp;        },
+&nbsp;    ) { padding -&gt;
+&nbsp;        Column(
+&nbsp;            modifier = Modifier
+&nbsp;                .fillMaxSize()
+&nbsp;                .padding(padding)
+&nbsp;                .verticalScroll(rememberScrollState())
+&nbsp;                .padding(AppTheme.spacing.default),
+&nbsp;            verticalArrangement = Arrangement.spacedBy(AppTheme.spacing.default),
+&nbsp;        ) {
+&nbsp;            Row(
+&nbsp;                verticalAlignment = Alignment.CenterVertically,
+&nbsp;                horizontalArrangement = Arrangement.spacedBy(AppTheme.spacing.medium),
+&nbsp;            ) {
+&nbsp;                SurferGoalIcon(emoji = state.emoji, hue = state.hue, size = 56.dp)
+&nbsp;                OutlinedTextField(
+&nbsp;                    value = state.title,
+&nbsp;                    onValueChange = { onEvent(GoalEditEvent.OnTitleChanged(it)) },
+&nbsp;                    label = { Text(stringResource(Res.string.goal_edit_name_label)) },
+&nbsp;                    isError = state.titleMissing,
+&nbsp;                    supportingText = if (state.titleMissing) {
+&nbsp;                        { Text(stringResource(Res.string.goal_edit_name_error_required)) }
+&nbsp;                    } else {
+&nbsp;                        null
+&nbsp;                    },
+&nbsp;                    singleLine = true,
+&nbsp;                    modifier = Modifier
+&nbsp;                        .weight(1f)
+&nbsp;                        .testTag(GoalEditTestTags.TitleField),
+&nbsp;                )
+&nbsp;            }
+&nbsp;
+&nbsp;            OutlinedTextField(
+&nbsp;                value = state.target,
+&nbsp;                onValueChange = { onEvent(GoalEditEvent.OnTargetChanged(it)) },
+&nbsp;                label = { Text(stringResource(Res.string.goal_edit_target_label)) },
+&nbsp;                isError = state.targetMissing,
+&nbsp;                supportingText = if (state.targetMissing) {
+&nbsp;                    { Text(stringResource(Res.string.goal_edit_target_error)) }
+&nbsp;                } else {
+&nbsp;                    null
+&nbsp;                },
+&nbsp;                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+&nbsp;                singleLine = true,
+&nbsp;                modifier = Modifier
+&nbsp;                    .fillMaxWidth()
+&nbsp;                    .testTag(GoalEditTestTags.TargetField),
+&nbsp;            )
+&nbsp;
+&nbsp;            GoalDateField(
+&nbsp;                label = stringResource(Res.string.goal_edit_target_date_label),
+&nbsp;                value = state.targetDate?.let(::formatGoalDate)
+&nbsp;                    ?: stringResource(Res.string.goal_edit_target_date_placeholder),
+&nbsp;                onClick = { onEvent(GoalEditEvent.OnDatePickerOpen) },
+&nbsp;                trailing = if (state.targetDate == null) {
+&nbsp;                    null
+&nbsp;                } else {
+&nbsp;                    {
+&nbsp;                        TextButton(onClick = { onEvent(GoalEditEvent.OnTargetDateCleared) }) {
+&nbsp;                            Text(stringResource(Res.string.goal_edit_target_date_clear))
+&nbsp;                        }
+&nbsp;                    }
+&nbsp;                },
+&nbsp;            )
+&nbsp;
+&nbsp;            state.error?.let { error -&gt;
+&nbsp;                Text(
+&nbsp;                    text = stringResource(error),
+&nbsp;                    style = AppTheme.typography.bodyMedium,
+&nbsp;                    color = AppTheme.materialColors.error,
+&nbsp;                )
+&nbsp;            }
+&nbsp;
+&nbsp;            SurferSectionLabel(stringResource(Res.string.goal_edit_icon_label))
+&nbsp;            SurferEmojiPicker(
+&nbsp;                selected = state.emoji,
+&nbsp;                onSelect = { onEvent(GoalEditEvent.OnEmojiSelected(it)) },
+&nbsp;            )
+&nbsp;
+&nbsp;            SurferSectionLabel(stringResource(Res.string.goal_edit_color_label))
+&nbsp;            SurferGoalHueRow(
+&nbsp;                selected = state.hue,
+&nbsp;                onSelect = { onEvent(GoalEditEvent.OnHueSelected(it)) },
+&nbsp;            )
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    if (state.showDatePicker) {
+&nbsp;        GoalDatePickerDialog(
+&nbsp;            initialDate = state.targetDate,
+&nbsp;            onDismiss = { onEvent(GoalEditEvent.OnDatePickerDismiss) },
+&nbsp;            onConfirm = {
+&nbsp;                onEvent(GoalEditEvent.OnTargetDateChanged(it))
+&nbsp;                onEvent(GoalEditEvent.OnDatePickerDismiss)
+&nbsp;            },
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Preview
+&nbsp;@Composable
+&nbsp;private fun GoalEditScreenPreview() {
+&nbsp;    SurferComponentPreview {
+&nbsp;        GoalEditContent(
+&nbsp;            state = GoalEditState(
+&nbsp;                title = &quot;Lisbon trip&quot;,
+&nbsp;                emoji = &quot;🏖️&quot;,
+&nbsp;                hue = 30,
+&nbsp;                target = &quot;2400&quot;,
+&nbsp;                targetDate = LocalDate(2026, 9, 1),
+&nbsp;            ),
+&nbsp;            onEvent = {},
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
 </code>
 </pre>
 </div>
@@ -140,7 +293,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 15:22</div>
+    <div style="float:right;">generated on 2026-07-27 15:02</div>
 </div>
 </body>
 </html>

@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SyncCoordinatorWorkspaceSyncer</title>
+  <title>MoneySurfer Coverage Report > ExchangeRateCacheMigrationKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.data.sync</a>
+    <a href="../index.html">com.georgeci.moneysurfer.data.db.migration</a>
 </div>
 
-<h1>Coverage Summary for Class: SyncCoordinatorWorkspaceSyncer (com.georgeci.moneysurfer.data.sync)</h1>
+<h1>Coverage Summary for Class: ExchangeRateCacheMigrationKt (com.georgeci.moneysurfer.data.db.migration)</h1>
 
 <table class="coverageStats">
 
@@ -46,84 +46,86 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SyncCoordinatorWorkspaceSyncer</td>
+  <td class="name">ExchangeRateCacheMigrationKt</td>
 <td class="coverageStat">
   <span class="percent">
-    80%
+    100%
   </span>
   <span class="absValue">
-    (4/5)
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    20%
+    100%
   </span>
   <span class="absValue">
-    (4/20)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    32%
-  </span>
-  <span class="absValue">
-    (8/25)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    22.7%
-  </span>
-  <span class="absValue">
-    (44/194)
+    (6/6)
   </span>
 </td>
 </tr>
   <tr>
-    <td class="name">SyncCoordinatorWorkspaceSyncer$pushAll$1</td>
+    <td class="name">ExchangeRateCacheMigrationKt$MIGRATION_31_32$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (1/2)
+  </span>
+</td>
     <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">SyncCoordinatorWorkspaceSyncer$syncAll$1</td>
-    <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">SyncCoordinatorWorkspaceSyncer$syncWorkspace$1</td>
-    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    33.3%
+  </span>
+  <span class="absValue">
+    (1/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    57.1%
+  </span>
+  <span class="absValue">
+    (4/7)
+  </span>
+</td>
   </tr>
 <tr>
   <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
-    80%
+    66.7%
   </span>
   <span class="absValue">
-    (4/5)
+    (2/3)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (2/4)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    20%
+    76.9%
   </span>
   <span class="absValue">
-    (4/20)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    32%
-  </span>
-  <span class="absValue">
-    (8/25)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    22.7%
-  </span>
-  <span class="absValue">
-    (44/194)
+    (10/13)
   </span>
 </td>
 </tr>
@@ -134,77 +136,33 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.sync
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.db.migration
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.SyncFeatureFlag
-&nbsp;import com.georgeci.moneysurfer.domain.auth.SessionPointers
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
-&nbsp;import com.georgeci.moneysurfer.domain.repositories.WorkspaceSyncer
-&nbsp;import com.georgeci.moneysurfer.sync.api.SyncError
-&nbsp;import com.georgeci.moneysurfer.sync.api.SyncReason
-&nbsp;import com.georgeci.moneysurfer.sync.coordinator.SyncCoordinator
-&nbsp;import org.koin.core.annotation.Single
+&nbsp;import androidx.room.migration.Migration
+&nbsp;import androidx.sqlite.SQLiteConnection
+&nbsp;import androidx.sqlite.execSQL
 &nbsp;
 &nbsp;/**
-&nbsp; * [WorkspaceSyncer] implementation that delegates to [SyncCoordinator].
+&nbsp; * v31 → v32: add `exchange_rates`, the local FX cache behind the multi-currency dashboard total.
 &nbsp; *
-&nbsp; * [pushAll] uses [SyncReason.LOCAL_CHANGE] → [SyncScope.UploadOnly]: drains the outbox
-&nbsp; * without a remote workspace-list fetch. Used post-create-workspace where the new workspace
-&nbsp; * and its member row need to land on Firestore before `addWorkspaceRef` is called.
-&nbsp; *
-&nbsp; * [syncAll] uses [SyncReason.MANUAL] → [SyncScope.AllUserData]: fetches
-&nbsp; * `users/{uid}.workspaceIds` via [UserWorkspacesProvider] and runs a cursor-based pull for
-&nbsp; * every workspace, including ones not yet in the local database.
-&nbsp; *
-&nbsp; * [syncWorkspace] sets [SessionPointers.currentWorkspaceId] to the target workspace and
-&nbsp; * uses [SyncReason.SWIPE_REFRESH] → [SyncScope.ActiveWorkspace]: pulls only that workspace.
-&nbsp; * Used after accepting an invite so only the newly joined workspace is hydrated.
+&nbsp; * Pure addition — nothing existing is touched, and an upgraded install simply starts with an
+&nbsp; * empty cache that the first refresh fills. The DDL is the one Room generates for
+&nbsp; * `ExchangeRateEntity`; keep the two in step or Room&#39;s schema validation fails at open time.
 &nbsp; */
-<b class="fc">&nbsp;@Single(binds = [WorkspaceSyncer::class])</b>
-&nbsp;class SyncCoordinatorWorkspaceSyncer(
-<b class="fc">&nbsp;    private val syncCoordinator: SyncCoordinator,</b>
-<b class="fc">&nbsp;    private val session: SessionPointers,</b>
-<b class="fc">&nbsp;    private val syncFeatureFlag: SyncFeatureFlag,</b>
-&nbsp;) : WorkspaceSyncer {
-&nbsp;
-&nbsp;    // When the sync feature is off we want every use-case-driven trigger
-&nbsp;    // (PostAuthBootstrap, CreateWorkspace, AcceptInvite, RefreshIncomingInvites)
-&nbsp;    // to no-op instead of hitting Firestore. Gating at the syncer keeps the
-&nbsp;    // use cases agnostic of the flag.
-&nbsp;
-&nbsp;    override suspend fun pushAll() {
-<b class="pc">&nbsp;        if (!syncFeatureFlag.enabled) return</b>
-<b class="nc">&nbsp;        syncCoordinator.requestSync(SyncReason.LOCAL_CHANGE)</b>
-<b class="nc">&nbsp;            .result.await()</b>
-<b class="nc">&nbsp;            .fold(ifLeft = { throw it.toException() }, ifRight = { })</b>
-&nbsp;    }
-&nbsp;
-&nbsp;    override suspend fun syncAll() {
-<b class="pc">&nbsp;        if (!syncFeatureFlag.enabled) return</b>
-<b class="nc">&nbsp;        syncCoordinator.requestSync(SyncReason.MANUAL)</b>
-<b class="nc">&nbsp;            .result.await()</b>
-<b class="nc">&nbsp;            .fold(ifLeft = { throw it.toException() }, ifRight = { })</b>
-&nbsp;    }
-&nbsp;
-&nbsp;    override suspend fun syncWorkspace(workspaceId: WorkspaceId) {
-&nbsp;        // Switch the active workspace pointer even when sync is off — callers
-&nbsp;        // (e.g. AcceptInviteUseCase) rely on this to move the session to the
-&nbsp;        // newly joined workspace. Only skip the network round-trip.
-<b class="fc">&nbsp;        session.currentWorkspaceId.set(workspaceId)</b>
-<b class="pc">&nbsp;        if (!syncFeatureFlag.enabled) return</b>
-<b class="nc">&nbsp;        syncCoordinator.requestSync(SyncReason.SWIPE_REFRESH)</b>
-<b class="nc">&nbsp;            .result.await()</b>
-<b class="nc">&nbsp;            .fold(ifLeft = { throw it.toException() }, ifRight = { })</b>
-&nbsp;    }
-&nbsp;
-<b class="nc">&nbsp;    private fun SyncError.toException(): RuntimeException = when (this) {</b>
-<b class="nc">&nbsp;        SyncError.Cancelled -&gt; RuntimeException(&quot;Sync cancelled&quot;)</b>
-<b class="nc">&nbsp;        SyncError.NetworkUnavailable -&gt; RuntimeException(&quot;Network unavailable&quot;)</b>
-<b class="nc">&nbsp;        SyncError.AuthRequired -&gt; RuntimeException(&quot;Auth required&quot;)</b>
-<b class="nc">&nbsp;        SyncError.PermissionDenied -&gt; RuntimeException(&quot;PERMISSION_DENIED: workspace access denied&quot;)</b>
-<b class="nc">&nbsp;        is SyncError.UnsupportedAppVersion -&gt; RuntimeException(message)</b>
-<b class="nc">&nbsp;        is SyncError.StorageError -&gt; RuntimeException(&quot;Storage error&quot;, cause)</b>
-<b class="nc">&nbsp;        is SyncError.Unknown -&gt; RuntimeException(cause.message ?: &quot;Sync failed&quot;, cause)</b>
+<b class="fc">&nbsp;val MIGRATION_31_32: Migration = object : Migration(31, 32) {</b>
+&nbsp;    override fun migrate(connection: SQLiteConnection) {
+<b class="nc">&nbsp;        connection.execSQL(</b>
+&nbsp;            &quot;&quot;&quot;
+&nbsp;            CREATE TABLE IF NOT EXISTS `exchange_rates` (
+&nbsp;                `baseCurrency` TEXT NOT NULL,
+&nbsp;                `currency` TEXT NOT NULL,
+&nbsp;                `rate` REAL NOT NULL,
+&nbsp;                `asOf` INTEGER NOT NULL,
+&nbsp;                `fetchedAt` INTEGER NOT NULL,
+&nbsp;                PRIMARY KEY(`baseCurrency`, `currency`)
+&nbsp;            )
+<b class="nc">&nbsp;            &quot;&quot;&quot;.trimIndent(),</b>
+&nbsp;        )
 &nbsp;    }
 &nbsp;}
 </code>
@@ -230,7 +188,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-23 23:54</div>
+    <div style="float:right;">generated on 2026-07-27 15:02</div>
 </div>
 </body>
 </html>

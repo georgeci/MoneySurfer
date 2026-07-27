@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > FirebaseConfigImpl</title>
+  <title>MoneySurfer Coverage Report > ConfigEntryDao_Impl</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.data.remote</a>
+    <a href="../index.html">com.georgeci.moneysurfer.data.db.dao</a>
 </div>
 
-<h1>Coverage Summary for Class: FirebaseConfigImpl (com.georgeci.moneysurfer.data.remote)</h1>
+<h1>Coverage Summary for Class: ConfigEntryDao_Impl (com.georgeci.moneysurfer.data.db.dao)</h1>
 
 <table class="coverageStats">
 
@@ -46,62 +46,100 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">FirebaseConfigImpl</td>
+  <td class="name">ConfigEntryDao_Impl</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/5)
+    (17/17)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    78.6%
   </span>
   <span class="absValue">
-    (0/22)
+    (11/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    97.8%
+  </span>
+  <span class="absValue">
+    (133/136)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    98.1%
+  </span>
+  <span class="absValue">
+    (509/519)
   </span>
 </td>
 </tr>
   <tr>
-    <td class="name">FirebaseConfigImpl$Companion</td>
+    <td class="name">ConfigEntryDao_Impl$Companion</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
     <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
   </tr>
 <tr>
   <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/5)
+    (18/18)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    78.6%
   </span>
   <span class="absValue">
-    (0/22)
+    (11/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    97.8%
+  </span>
+  <span class="absValue">
+    (134/137)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    98.1%
+  </span>
+  <span class="absValue">
+    (510/520)
   </span>
 </td>
 </tr>
@@ -112,45 +150,270 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.remote
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.`data`.db.dao
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.repositories.FirebaseConfig
-&nbsp;import org.koin.core.annotation.Single
+&nbsp;import androidx.room.RoomDatabase
+&nbsp;import androidx.room.coroutines.createFlow
+&nbsp;import androidx.room.util.getColumnIndexOrThrow
+&nbsp;import androidx.room.util.performSuspending
+&nbsp;import androidx.sqlite.SQLiteStatement
+&nbsp;import com.georgeci.moneysurfer.`data`.db.entity.ConfigEntryEntity
+&nbsp;import javax.`annotation`.processing.Generated
+&nbsp;import kotlin.Int
+&nbsp;import kotlin.Long
+&nbsp;import kotlin.String
+&nbsp;import kotlin.Suppress
+&nbsp;import kotlin.collections.List
+&nbsp;import kotlin.collections.MutableList
+&nbsp;import kotlin.collections.mutableListOf
+&nbsp;import kotlin.reflect.KClass
+&nbsp;import kotlinx.coroutines.flow.Flow
 &nbsp;
-&nbsp;/**
-&nbsp; * Default `FirebaseConfig` binding. The toggle [useEmulator] is sourced from
-&nbsp; * [defaultUseEmulator] (per-platform `expect/actual`) — Android pulls
-&nbsp; * `BuildConfig.USE_EMULATOR`, JVM/iOS read an env var. Tests bind their own
-&nbsp; * `FirebaseConfig` instead of using this one.
-&nbsp; *
-&nbsp; * Ports are static (matching `firebase.json`); the host is platform-specific
-&nbsp; * (`10.0.2.2` for Android emulator, `localhost` elsewhere).
-&nbsp; */
-<b class="nc">&nbsp;@Single(binds = [FirebaseConfig::class])</b>
-&nbsp;class FirebaseConfigImpl : FirebaseConfig {
-<b class="nc">&nbsp;    override val useEmulator: Boolean = defaultUseEmulator()</b>
-<b class="nc">&nbsp;    override val emulatorHost: String = defaultEmulatorHost()</b>
-<b class="nc">&nbsp;    override val authPort: Int = DEFAULT_AUTH_PORT</b>
-<b class="nc">&nbsp;    override val firestorePort: Int = DEFAULT_FIRESTORE_PORT</b>
+<b class="fc">&nbsp;@Generated(value = [&quot;androidx.room.RoomProcessor&quot;])</b>
+&nbsp;@Suppress(names = [&quot;UNCHECKED_CAST&quot;, &quot;DEPRECATION&quot;, &quot;REDUNDANT_PROJECTION&quot;, &quot;REMOVAL&quot;])
+&nbsp;public class ConfigEntryDao_Impl(
+&nbsp;  __db: RoomDatabase,
+&nbsp;) : ConfigEntryDao {
+&nbsp;  private val __db: RoomDatabase
+<b class="fc">&nbsp;  init {</b>
+<b class="fc">&nbsp;    this.__db = __db</b>
+<b class="fc">&nbsp;  }</b>
 &nbsp;
-&nbsp;    private companion object {
-&nbsp;        const val DEFAULT_AUTH_PORT: Int = 9099
-&nbsp;        const val DEFAULT_FIRESTORE_PORT: Int = 8080
+&nbsp;  public override fun observeAll(): Flow&lt;List&lt;ConfigEntryEntity&gt;&gt; {
+<b class="fc">&nbsp;    val _sql: String = &quot;SELECT * FROM config_entry&quot;</b>
+<b class="fc">&nbsp;    return createFlow(__db, false, arrayOf(&quot;config_entry&quot;)) { _connection -&gt;</b>
+<b class="fc">&nbsp;      val _stmt: SQLiteStatement = _connection.prepare(_sql)</b>
+&nbsp;      try {
+<b class="fc">&nbsp;        val _columnIndexOfKey: Int = getColumnIndexOrThrow(_stmt, &quot;key&quot;)</b>
+<b class="fc">&nbsp;        val _columnIndexOfValue: Int = getColumnIndexOrThrow(_stmt, &quot;value&quot;)</b>
+<b class="fc">&nbsp;        val _columnIndexOfUpdatedAt: Int = getColumnIndexOrThrow(_stmt, &quot;updatedAt&quot;)</b>
+<b class="fc">&nbsp;        val _columnIndexOfLastPushedAt: Int = getColumnIndexOrThrow(_stmt, &quot;lastPushedAt&quot;)</b>
+<b class="fc">&nbsp;        val _result: MutableList&lt;ConfigEntryEntity&gt; = mutableListOf()</b>
+<b class="fc">&nbsp;        while (_stmt.step()) {</b>
+<b class="fc">&nbsp;          val _item: ConfigEntryEntity</b>
+<b class="fc">&nbsp;          val _tmpKey: String</b>
+<b class="fc">&nbsp;          _tmpKey = _stmt.getText(_columnIndexOfKey)</b>
+<b class="fc">&nbsp;          val _tmpValue: String</b>
+<b class="fc">&nbsp;          _tmpValue = _stmt.getText(_columnIndexOfValue)</b>
+<b class="fc">&nbsp;          val _tmpUpdatedAt: Long</b>
+<b class="fc">&nbsp;          _tmpUpdatedAt = _stmt.getLong(_columnIndexOfUpdatedAt)</b>
+<b class="fc">&nbsp;          val _tmpLastPushedAt: Long?</b>
+<b class="pc">&nbsp;          if (_stmt.isNull(_columnIndexOfLastPushedAt)) {</b>
+<b class="nc">&nbsp;            _tmpLastPushedAt = null</b>
+&nbsp;          } else {
+<b class="fc">&nbsp;            _tmpLastPushedAt = _stmt.getLong(_columnIndexOfLastPushedAt)</b>
+&nbsp;          }
+<b class="fc">&nbsp;          _item = ConfigEntryEntity(_tmpKey,_tmpValue,_tmpUpdatedAt,_tmpLastPushedAt)</b>
+<b class="fc">&nbsp;          _result.add(_item)</b>
+&nbsp;        }
+<b class="fc">&nbsp;        _result</b>
+&nbsp;      } finally {
+<b class="fc">&nbsp;        _stmt.close()</b>
+&nbsp;      }
 &nbsp;    }
+&nbsp;  }
+&nbsp;
+&nbsp;  public override suspend fun getAll(): List&lt;ConfigEntryEntity&gt; {
+<b class="fc">&nbsp;    val _sql: String = &quot;SELECT * FROM config_entry&quot;</b>
+<b class="fc">&nbsp;    return performSuspending(__db, true, false) { _connection -&gt;</b>
+<b class="fc">&nbsp;      val _stmt: SQLiteStatement = _connection.prepare(_sql)</b>
+&nbsp;      try {
+<b class="fc">&nbsp;        val _columnIndexOfKey: Int = getColumnIndexOrThrow(_stmt, &quot;key&quot;)</b>
+<b class="fc">&nbsp;        val _columnIndexOfValue: Int = getColumnIndexOrThrow(_stmt, &quot;value&quot;)</b>
+<b class="fc">&nbsp;        val _columnIndexOfUpdatedAt: Int = getColumnIndexOrThrow(_stmt, &quot;updatedAt&quot;)</b>
+<b class="fc">&nbsp;        val _columnIndexOfLastPushedAt: Int = getColumnIndexOrThrow(_stmt, &quot;lastPushedAt&quot;)</b>
+<b class="fc">&nbsp;        val _result: MutableList&lt;ConfigEntryEntity&gt; = mutableListOf()</b>
+<b class="fc">&nbsp;        while (_stmt.step()) {</b>
+<b class="fc">&nbsp;          val _item: ConfigEntryEntity</b>
+<b class="fc">&nbsp;          val _tmpKey: String</b>
+<b class="fc">&nbsp;          _tmpKey = _stmt.getText(_columnIndexOfKey)</b>
+<b class="fc">&nbsp;          val _tmpValue: String</b>
+<b class="fc">&nbsp;          _tmpValue = _stmt.getText(_columnIndexOfValue)</b>
+<b class="fc">&nbsp;          val _tmpUpdatedAt: Long</b>
+<b class="fc">&nbsp;          _tmpUpdatedAt = _stmt.getLong(_columnIndexOfUpdatedAt)</b>
+<b class="fc">&nbsp;          val _tmpLastPushedAt: Long?</b>
+<b class="pc">&nbsp;          if (_stmt.isNull(_columnIndexOfLastPushedAt)) {</b>
+<b class="fc">&nbsp;            _tmpLastPushedAt = null</b>
+&nbsp;          } else {
+<b class="nc">&nbsp;            _tmpLastPushedAt = _stmt.getLong(_columnIndexOfLastPushedAt)</b>
+&nbsp;          }
+<b class="fc">&nbsp;          _item = ConfigEntryEntity(_tmpKey,_tmpValue,_tmpUpdatedAt,_tmpLastPushedAt)</b>
+<b class="fc">&nbsp;          _result.add(_item)</b>
+&nbsp;        }
+<b class="fc">&nbsp;        _result</b>
+&nbsp;      } finally {
+<b class="fc">&nbsp;        _stmt.close()</b>
+&nbsp;      }
+&nbsp;    }
+&nbsp;  }
+&nbsp;
+&nbsp;  public override suspend fun getByKey(key: String): ConfigEntryEntity? {
+<b class="fc">&nbsp;    val _sql: String = &quot;SELECT * FROM config_entry WHERE `key` = ?&quot;</b>
+<b class="fc">&nbsp;    return performSuspending(__db, true, false) { _connection -&gt;</b>
+<b class="fc">&nbsp;      val _stmt: SQLiteStatement = _connection.prepare(_sql)</b>
+&nbsp;      try {
+<b class="fc">&nbsp;        var _argIndex: Int = 1</b>
+<b class="fc">&nbsp;        _stmt.bindText(_argIndex, key)</b>
+<b class="fc">&nbsp;        val _columnIndexOfKey: Int = getColumnIndexOrThrow(_stmt, &quot;key&quot;)</b>
+<b class="fc">&nbsp;        val _columnIndexOfValue: Int = getColumnIndexOrThrow(_stmt, &quot;value&quot;)</b>
+<b class="fc">&nbsp;        val _columnIndexOfUpdatedAt: Int = getColumnIndexOrThrow(_stmt, &quot;updatedAt&quot;)</b>
+<b class="fc">&nbsp;        val _columnIndexOfLastPushedAt: Int = getColumnIndexOrThrow(_stmt, &quot;lastPushedAt&quot;)</b>
+<b class="fc">&nbsp;        val _result: ConfigEntryEntity?</b>
+<b class="pc">&nbsp;        if (_stmt.step()) {</b>
+<b class="fc">&nbsp;          val _tmpKey: String</b>
+<b class="fc">&nbsp;          _tmpKey = _stmt.getText(_columnIndexOfKey)</b>
+<b class="fc">&nbsp;          val _tmpValue: String</b>
+<b class="fc">&nbsp;          _tmpValue = _stmt.getText(_columnIndexOfValue)</b>
+<b class="fc">&nbsp;          val _tmpUpdatedAt: Long</b>
+<b class="fc">&nbsp;          _tmpUpdatedAt = _stmt.getLong(_columnIndexOfUpdatedAt)</b>
+<b class="fc">&nbsp;          val _tmpLastPushedAt: Long?</b>
+<b class="fc">&nbsp;          if (_stmt.isNull(_columnIndexOfLastPushedAt)) {</b>
+<b class="fc">&nbsp;            _tmpLastPushedAt = null</b>
+&nbsp;          } else {
+<b class="fc">&nbsp;            _tmpLastPushedAt = _stmt.getLong(_columnIndexOfLastPushedAt)</b>
+&nbsp;          }
+<b class="fc">&nbsp;          _result = ConfigEntryEntity(_tmpKey,_tmpValue,_tmpUpdatedAt,_tmpLastPushedAt)</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;          _result = null</b>
+&nbsp;        }
+<b class="fc">&nbsp;        _result</b>
+&nbsp;      } finally {
+<b class="fc">&nbsp;        _stmt.close()</b>
+&nbsp;      }
+&nbsp;    }
+&nbsp;  }
+&nbsp;
+&nbsp;  public override suspend fun keysPendingPush(): List&lt;String&gt; {
+<b class="fc">&nbsp;    val _sql: String = &quot;SELECT `key` FROM config_entry WHERE `lastPushedAt` IS NULL OR `updatedAt` &gt; `lastPushedAt`&quot;</b>
+<b class="fc">&nbsp;    return performSuspending(__db, true, false) { _connection -&gt;</b>
+<b class="fc">&nbsp;      val _stmt: SQLiteStatement = _connection.prepare(_sql)</b>
+&nbsp;      try {
+<b class="fc">&nbsp;        val _result: MutableList&lt;String&gt; = mutableListOf()</b>
+<b class="fc">&nbsp;        while (_stmt.step()) {</b>
+<b class="fc">&nbsp;          val _item: String</b>
+<b class="fc">&nbsp;          _item = _stmt.getText(0)</b>
+<b class="fc">&nbsp;          _result.add(_item)</b>
+&nbsp;        }
+<b class="fc">&nbsp;        _result</b>
+&nbsp;      } finally {
+<b class="fc">&nbsp;        _stmt.close()</b>
+&nbsp;      }
+&nbsp;    }
+&nbsp;  }
+&nbsp;
+&nbsp;  public override suspend fun write(
+&nbsp;    key: String,
+&nbsp;    `value`: String,
+&nbsp;    updatedAt: Long,
+&nbsp;  ) {
+<b class="fc">&nbsp;    val _sql: String = &quot;&quot;&quot;</b>
+&nbsp;        |
+&nbsp;        |        INSERT INTO config_entry (`key`, `value`, `updatedAt`, `lastPushedAt`)
+&nbsp;        |        VALUES (?, ?, ?, NULL)
+&nbsp;        |        ON CONFLICT(`key`) DO UPDATE SET
+&nbsp;        |            `value` = ?,
+&nbsp;        |            `updatedAt` = ?
+&nbsp;        |        
+<b class="fc">&nbsp;        &quot;&quot;&quot;.trimMargin()</b>
+<b class="fc">&nbsp;    return performSuspending(__db, false, true) { _connection -&gt;</b>
+<b class="fc">&nbsp;      val _stmt: SQLiteStatement = _connection.prepare(_sql)</b>
+&nbsp;      try {
+<b class="fc">&nbsp;        var _argIndex: Int = 1</b>
+<b class="fc">&nbsp;        _stmt.bindText(_argIndex, key)</b>
+<b class="fc">&nbsp;        _argIndex = 2</b>
+<b class="fc">&nbsp;        _stmt.bindText(_argIndex, value)</b>
+<b class="fc">&nbsp;        _argIndex = 3</b>
+<b class="fc">&nbsp;        _stmt.bindLong(_argIndex, updatedAt)</b>
+<b class="fc">&nbsp;        _argIndex = 4</b>
+<b class="fc">&nbsp;        _stmt.bindText(_argIndex, value)</b>
+<b class="fc">&nbsp;        _argIndex = 5</b>
+<b class="fc">&nbsp;        _stmt.bindLong(_argIndex, updatedAt)</b>
+<b class="fc">&nbsp;        _stmt.step()</b>
+&nbsp;      } finally {
+&nbsp;        _stmt.close()
+&nbsp;      }
+&nbsp;    }
+&nbsp;  }
+&nbsp;
+&nbsp;  public override suspend fun applyRemote(
+&nbsp;    key: String,
+&nbsp;    `value`: String,
+&nbsp;    updatedAt: Long,
+&nbsp;  ) {
+<b class="fc">&nbsp;    val _sql: String = &quot;&quot;&quot;</b>
+&nbsp;        |
+&nbsp;        |        INSERT INTO config_entry (`key`, `value`, `updatedAt`, `lastPushedAt`)
+&nbsp;        |        VALUES (?, ?, ?, ?)
+&nbsp;        |        ON CONFLICT(`key`) DO UPDATE SET
+&nbsp;        |            `value` = ?,
+&nbsp;        |            `updatedAt` = ?,
+&nbsp;        |            `lastPushedAt` = ?
+&nbsp;        |        
+<b class="fc">&nbsp;        &quot;&quot;&quot;.trimMargin()</b>
+<b class="fc">&nbsp;    return performSuspending(__db, false, true) { _connection -&gt;</b>
+<b class="fc">&nbsp;      val _stmt: SQLiteStatement = _connection.prepare(_sql)</b>
+&nbsp;      try {
+<b class="fc">&nbsp;        var _argIndex: Int = 1</b>
+<b class="fc">&nbsp;        _stmt.bindText(_argIndex, key)</b>
+<b class="fc">&nbsp;        _argIndex = 2</b>
+<b class="fc">&nbsp;        _stmt.bindText(_argIndex, value)</b>
+<b class="fc">&nbsp;        _argIndex = 3</b>
+<b class="fc">&nbsp;        _stmt.bindLong(_argIndex, updatedAt)</b>
+<b class="fc">&nbsp;        _argIndex = 4</b>
+<b class="fc">&nbsp;        _stmt.bindLong(_argIndex, updatedAt)</b>
+<b class="fc">&nbsp;        _argIndex = 5</b>
+<b class="fc">&nbsp;        _stmt.bindText(_argIndex, value)</b>
+<b class="fc">&nbsp;        _argIndex = 6</b>
+<b class="fc">&nbsp;        _stmt.bindLong(_argIndex, updatedAt)</b>
+<b class="fc">&nbsp;        _argIndex = 7</b>
+<b class="fc">&nbsp;        _stmt.bindLong(_argIndex, updatedAt)</b>
+<b class="fc">&nbsp;        _stmt.step()</b>
+&nbsp;      } finally {
+&nbsp;        _stmt.close()
+&nbsp;      }
+&nbsp;    }
+&nbsp;  }
+&nbsp;
+&nbsp;  public override suspend fun markPushed(key: String, pushedUpdatedAt: Long) {
+<b class="fc">&nbsp;    val _sql: String = &quot;&quot;&quot;</b>
+&nbsp;        |
+&nbsp;        |        UPDATE config_entry
+&nbsp;        |        SET `lastPushedAt` = ?
+&nbsp;        |        WHERE `key` = ? AND `updatedAt` = ?
+&nbsp;        |        
+<b class="fc">&nbsp;        &quot;&quot;&quot;.trimMargin()</b>
+<b class="fc">&nbsp;    return performSuspending(__db, false, true) { _connection -&gt;</b>
+<b class="fc">&nbsp;      val _stmt: SQLiteStatement = _connection.prepare(_sql)</b>
+&nbsp;      try {
+<b class="fc">&nbsp;        var _argIndex: Int = 1</b>
+<b class="fc">&nbsp;        _stmt.bindLong(_argIndex, pushedUpdatedAt)</b>
+<b class="fc">&nbsp;        _argIndex = 2</b>
+<b class="fc">&nbsp;        _stmt.bindText(_argIndex, key)</b>
+<b class="fc">&nbsp;        _argIndex = 3</b>
+<b class="fc">&nbsp;        _stmt.bindLong(_argIndex, pushedUpdatedAt)</b>
+<b class="fc">&nbsp;        _stmt.step()</b>
+&nbsp;      } finally {
+&nbsp;        _stmt.close()
+&nbsp;      }
+&nbsp;    }
+&nbsp;  }
+&nbsp;
+&nbsp;  public override suspend fun deleteAll() {
+<b class="fc">&nbsp;    val _sql: String = &quot;DELETE FROM config_entry&quot;</b>
+<b class="fc">&nbsp;    return performSuspending(__db, false, true) { _connection -&gt;</b>
+<b class="fc">&nbsp;      val _stmt: SQLiteStatement = _connection.prepare(_sql)</b>
+&nbsp;      try {
+<b class="fc">&nbsp;        _stmt.step()</b>
+&nbsp;      } finally {
+&nbsp;        _stmt.close()
+&nbsp;      }
+&nbsp;    }
+&nbsp;  }
+&nbsp;
+&nbsp;  public companion object {
+<b class="fc">&nbsp;    public fun getRequiredConverters(): List&lt;KClass&lt;*&gt;&gt; = emptyList()</b>
+&nbsp;  }
 &nbsp;}
-&nbsp;
-&nbsp;/**
-&nbsp; * Whether this build should target the emulator by default. Android maps to
-&nbsp; * `BuildConfig.USE_EMULATOR`, JVM to env var `MS_USE_EMULATOR`, iOS to env var
-&nbsp; * or Info.plist key `MS_USE_EMULATOR`.
-&nbsp; */
-&nbsp;internal expect fun defaultUseEmulator(): Boolean
-&nbsp;
-&nbsp;/**
-&nbsp; * The hostname over which the host machine is reachable from this platform&#39;s
-&nbsp; * runtime. Android emulator: `10.0.2.2`. iOS simulator + Desktop: `localhost`.
-&nbsp; */
-&nbsp;internal expect fun defaultEmulatorHost(): String
 </code>
 </pre>
 </div>
@@ -174,7 +437,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-23 23:54</div>
+    <div style="float:right;">generated on 2026-07-27 15:02</div>
 </div>
 </body>
 </html>

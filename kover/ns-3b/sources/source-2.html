@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > PendingMutationQueueImplKt</title>
+  <title>MoneySurfer Coverage Report > CategoryChooserContentKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,18 +19,15 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.sync.internal.repository</a>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.category.picker</a>
 </div>
 
-<h1>Coverage Summary for Class: PendingMutationQueueImplKt (com.georgeci.moneysurfer.sync.internal.repository)</h1>
+<h1>Coverage Summary for Class: CategoryChooserContentKt (com.georgeci.moneysurfer.feature.category.picker)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
-<th class="coverageStat 
-">
-  Class, %
-</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -49,42 +46,163 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">PendingMutationQueueImplKt</td>
+  <td class="name">CategoryChooserContentKt</td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (1/1)
+    (0/15)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (2/2)
+    (0/58)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/183)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0.6%
+  </span>
+  <span class="absValue">
+    (12/1943)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">CategoryChooserContentKt$CategoryChooserContent$1$5$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
   </span>
 </td>
     <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (19/19)
+    (0/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (44/44)
+    (0/9)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">CategoryChooserContentKt$CategoryChooserContent$1$7$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">CategoryChooserContentKt$CategoryChooserContent$1$8$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">CategoryChooserContentKt$WhenMappings</td>
+    <td class="coverageStat"/>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/58)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/186)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0.6%
+  </span>
+  <span class="absValue">
+    (12/1970)
   </span>
 </td>
 </tr>
-
 </table>
 
 <br/>
@@ -92,76 +210,347 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.sync.internal.repository
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.category.picker
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.sync.api.SyncScope
-&nbsp;import com.georgeci.moneysurfer.sync.db.dao.PendingMutationDao
-&nbsp;import com.georgeci.moneysurfer.sync.db.entity.PendingMutationEntity
-&nbsp;import com.georgeci.moneysurfer.sync.repository.MutationOperation
-&nbsp;import com.georgeci.moneysurfer.sync.repository.PendingMutation
-&nbsp;import com.georgeci.moneysurfer.sync.repository.PendingMutationQueue
-&nbsp;import kotlinx.coroutines.flow.Flow
-&nbsp;import org.koin.core.annotation.Single
-&nbsp;import kotlin.time.Instant
+&nbsp;import androidx.compose.foundation.background
+&nbsp;import androidx.compose.foundation.border
+&nbsp;import androidx.compose.foundation.clickable
+&nbsp;import androidx.compose.foundation.layout.Arrangement
+&nbsp;import androidx.compose.foundation.layout.Column
+&nbsp;import androidx.compose.foundation.layout.Row
+&nbsp;import androidx.compose.foundation.layout.Spacer
+&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
+&nbsp;import androidx.compose.foundation.layout.height
+&nbsp;import androidx.compose.foundation.layout.padding
+&nbsp;import androidx.compose.foundation.layout.size
+&nbsp;import androidx.compose.foundation.layout.width
+&nbsp;import androidx.compose.foundation.shape.RoundedCornerShape
+&nbsp;import androidx.compose.material3.Icon
+&nbsp;import androidx.compose.material3.IconButton
+&nbsp;import androidx.compose.material3.Text
+&nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.ui.Alignment
+&nbsp;import androidx.compose.ui.Modifier
+&nbsp;import androidx.compose.ui.draw.clip
+&nbsp;import androidx.compose.ui.graphics.Color
+&nbsp;import androidx.compose.ui.graphics.vector.ImageVector
+&nbsp;import androidx.compose.ui.tooling.preview.Preview
+&nbsp;import androidx.compose.ui.unit.dp
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryType
+&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferSearchField
+&nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+&nbsp;import com.georgeci.moneysurfer.uikit.preview.SurferBottomSheetPreview
+&nbsp;import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
+&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
+&nbsp;import moneysurfer.feature.category.generated.resources.Res
+&nbsp;import moneysurfer.feature.category.generated.resources.category_creation_close_content_description
+&nbsp;import moneysurfer.feature.category.generated.resources.category_creation_type_expense
+&nbsp;import moneysurfer.feature.category.generated.resources.category_creation_type_income
+&nbsp;import moneysurfer.feature.category.generated.resources.category_creation_type_transfer
+&nbsp;import moneysurfer.feature.category.generated.resources.category_picker_currently
+&nbsp;import moneysurfer.feature.category.generated.resources.category_picker_show_grid
+&nbsp;import moneysurfer.feature.category.generated.resources.category_picker_show_tree
+&nbsp;import moneysurfer.feature.category.generated.resources.transaction_creation_category_search
+&nbsp;import moneysurfer.feature.category.generated.resources.transaction_creation_category_sheet_title
+&nbsp;import org.jetbrains.compose.resources.stringResource
 &nbsp;
-&nbsp;@Single(binds = [PendingMutationQueue::class])
-&nbsp;class PendingMutationQueueImpl(
-&nbsp;    private val dao: PendingMutationDao,
-&nbsp;) : PendingMutationQueue {
+&nbsp;/** The title block sits one step wider than the body rows below it, as the artboard has it. */
+<b class="nc">&nbsp;private val SheetHeaderPadding = 20.dp</b>
 &nbsp;
-&nbsp;    override suspend fun enqueue(mutation: PendingMutation) {
-&nbsp;        dao.insert(mutation.toEntity(status = PendingMutationEntity.STATUS_PENDING))
+&nbsp;/** Shared with both variant bodies so the grid, the cards and the search field line up. */
+<b class="nc">&nbsp;internal val SheetBodyPadding = 16.dp</b>
+<b class="nc">&nbsp;private val TabHeight = 36.dp</b>
+<b class="nc">&nbsp;private val TabRadius = 18.dp</b>
+<b class="nc">&nbsp;private val TabGlyphSize = 16.dp</b>
+<b class="nc">&nbsp;private val TabSpacing = 8.dp</b>
+<b class="nc">&nbsp;private val TabLabelSpacing = 6.dp</b>
+<b class="nc">&nbsp;private val SublineSpacing = 2.dp</b>
+<b class="nc">&nbsp;private val ChromeSpacing = 12.dp</b>
+<b class="nc">&nbsp;private val SheetBottomPadding = 16.dp</b>
+&nbsp;
+&nbsp;/**
+&nbsp; * Everything the category-chooser sheet draws below the drag handle: the title block with the
+&nbsp; * `Currently: …` subline and a close action, the Expense / Income / Transfer tab row, the search
+&nbsp; * field, and then whichever of the two designed bodies [CategoryChooserState.Content.variant]
+&nbsp; * asks for.
+&nbsp; *
+&nbsp; * The sheet shell itself — 28dp top corners, `surfaceContainerLow`, the 32×4 handle — comes from
+&nbsp; * the `ModalBottomSheet` that `BottomSheetSceneStrategy` wraps this entry in, so it is
+&nbsp; * deliberately not redrawn here.
+&nbsp; */
+&nbsp;@Composable
+&nbsp;internal fun CategoryChooserContent(
+&nbsp;    state: CategoryChooserState.Content,
+&nbsp;    onEvent: (CategoryChooserEvent) -&gt; Unit,
+<b class="nc">&nbsp;    modifier: Modifier = Modifier,</b>
+<b class="nc">&nbsp;) {</b>
+<b class="nc">&nbsp;    Column(</b>
+<b class="nc">&nbsp;        modifier = modifier</b>
+<b class="nc">&nbsp;            .fillMaxWidth()</b>
+<b class="nc">&nbsp;            .padding(bottom = SheetBottomPadding),</b>
+&nbsp;    ) {
+<b class="nc">&nbsp;        ChooserHeader(</b>
+<b class="nc">&nbsp;            selectedName = state.selectedName,</b>
+<b class="nc">&nbsp;            variant = state.variant,</b>
+<b class="nc">&nbsp;            onToggleVariant = { onEvent(CategoryChooserEvent.OnVariantToggle) },</b>
+<b class="nc">&nbsp;            onClose = { onEvent(CategoryChooserEvent.OnDismiss) },</b>
+&nbsp;        )
+&nbsp;
+<b class="nc">&nbsp;        if (!state.typeLocked) {</b>
+<b class="nc">&nbsp;            Spacer(Modifier.height(ChromeSpacing))</b>
+<b class="nc">&nbsp;            TypeTabRow(</b>
+<b class="nc">&nbsp;                selected = state.type,</b>
+<b class="nc">&nbsp;                onSelect = { onEvent(CategoryChooserEvent.OnTypeSelected(it)) },</b>
+&nbsp;            )
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+<b class="nc">&nbsp;        Spacer(Modifier.height(ChromeSpacing))</b>
+<b class="nc">&nbsp;        SurferSearchField(</b>
+<b class="nc">&nbsp;            value = state.query,</b>
+<b class="nc">&nbsp;            onValueChange = { onEvent(CategoryChooserEvent.OnQueryChange(it)) },</b>
+<b class="nc">&nbsp;            placeholder = stringResource(Res.string.transaction_creation_category_search),</b>
+<b class="nc">&nbsp;            containerColor = AppTheme.materialColors.surfaceContainerHighest,</b>
+&nbsp;        )
+<b class="nc">&nbsp;        Spacer(Modifier.height(ChromeSpacing))</b>
+&nbsp;
+<b class="nc">&nbsp;        when (state.variant) {</b>
+<b class="nc">&nbsp;            CategoryPickerVariant.GRID -&gt; CategoryPickerGrid(</b>
+<b class="nc">&nbsp;                items = state.gridItems,</b>
+<b class="nc">&nbsp;                onSelect = { onEvent(CategoryChooserEvent.OnCategorySelected(it)) },</b>
+<b class="nc">&nbsp;                onCreateNew = { onEvent(CategoryChooserEvent.OnCreateNewCategoryClick) },</b>
+&nbsp;            )
+<b class="nc">&nbsp;            CategoryPickerVariant.TREE -&gt; CategoryPickerTree(</b>
+<b class="nc">&nbsp;                groups = state.treeItems,</b>
+<b class="nc">&nbsp;                onSelect = { onEvent(CategoryChooserEvent.OnCategorySelected(it)) },</b>
+<b class="nc">&nbsp;                onToggleExpand = { onEvent(CategoryChooserEvent.OnParentExpandToggle(it)) },</b>
+<b class="nc">&nbsp;                onCreateNew = { onEvent(CategoryChooserEvent.OnCreateNewCategoryClick) },</b>
+&nbsp;            )
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;    }</b>
+<b class="nc">&nbsp;}</b>
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun ChooserHeader(
+&nbsp;    selectedName: String?,
+&nbsp;    variant: CategoryPickerVariant,
+&nbsp;    onToggleVariant: () -&gt; Unit,
+&nbsp;    onClose: () -&gt; Unit,
+<b class="nc">&nbsp;) {</b>
+<b class="nc">&nbsp;    Row(</b>
+<b class="nc">&nbsp;        modifier = Modifier</b>
+<b class="nc">&nbsp;            .fillMaxWidth()</b>
+<b class="nc">&nbsp;            .padding(start = SheetHeaderPadding, end = SheetBodyPadding),</b>
+<b class="nc">&nbsp;        verticalAlignment = Alignment.CenterVertically,</b>
+&nbsp;    ) {
+<b class="nc">&nbsp;        Column(modifier = Modifier.weight(1f)) {</b>
+<b class="nc">&nbsp;            Text(</b>
+<b class="nc">&nbsp;                text = stringResource(Res.string.transaction_creation_category_sheet_title),</b>
+<b class="nc">&nbsp;                style = AppTheme.typography.titleMedium,</b>
+<b class="nc">&nbsp;                color = AppTheme.materialColors.onSurface,</b>
+&nbsp;            )
+&nbsp;            // Only meaningful once something is picked — an empty &quot;Currently:&quot; reads as a bug.
+<b class="nc">&nbsp;            if (selectedName != null) {</b>
+<b class="nc">&nbsp;                Spacer(Modifier.height(SublineSpacing))</b>
+<b class="nc">&nbsp;                Text(</b>
+<b class="nc">&nbsp;                    text = stringResource(Res.string.category_picker_currently, selectedName),</b>
+<b class="nc">&nbsp;                    style = AppTheme.typography.bodySmall,</b>
+<b class="nc">&nbsp;                    color = AppTheme.materialColors.onSurfaceVariant,</b>
+&nbsp;                )
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;        // Shows the layout it switches *to*, so the glyph reads as the destination rather than
+&nbsp;        // as a label for what is already on screen.
+<b class="nc">&nbsp;        IconButton(onClick = onToggleVariant) {</b>
+<b class="nc">&nbsp;            Icon(</b>
+<b class="nc">&nbsp;                imageVector = when (variant) {</b>
+<b class="nc">&nbsp;                    CategoryPickerVariant.GRID -&gt; SurferIcons.ListView</b>
+<b class="nc">&nbsp;                    CategoryPickerVariant.TREE -&gt; SurferIcons.GridView</b>
+&nbsp;                },
+<b class="nc">&nbsp;                contentDescription = stringResource(</b>
+<b class="nc">&nbsp;                    when (variant) {</b>
+<b class="nc">&nbsp;                        CategoryPickerVariant.GRID -&gt; Res.string.category_picker_show_tree</b>
+<b class="nc">&nbsp;                        CategoryPickerVariant.TREE -&gt; Res.string.category_picker_show_grid</b>
+&nbsp;                    },
+&nbsp;                ),
+<b class="nc">&nbsp;                tint = AppTheme.materialColors.onSurfaceVariant,</b>
+&nbsp;            )
+&nbsp;        }
+<b class="nc">&nbsp;        IconButton(onClick = onClose) {</b>
+&nbsp;            Icon(
+&nbsp;                imageVector = SurferIcons.Close,
+&nbsp;                contentDescription = stringResource(
+&nbsp;                    Res.string.category_creation_close_content_description,
+&nbsp;                ),
+&nbsp;                tint = AppTheme.materialColors.onSurfaceVariant,
+&nbsp;            )
+&nbsp;        }
+<b class="nc">&nbsp;    }</b>
+<b class="nc">&nbsp;}</b>
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun TypeTabRow(
+&nbsp;    selected: CategoryType,
+&nbsp;    onSelect: (CategoryType) -&gt; Unit,
+<b class="nc">&nbsp;) {</b>
+<b class="nc">&nbsp;    Row(</b>
+<b class="nc">&nbsp;        modifier = Modifier</b>
+<b class="nc">&nbsp;            .fillMaxWidth()</b>
+<b class="nc">&nbsp;            .padding(horizontal = SheetBodyPadding),</b>
+<b class="nc">&nbsp;        horizontalArrangement = Arrangement.spacedBy(TabSpacing),</b>
+&nbsp;    ) {
+<b class="nc">&nbsp;        CategoryType.entries.forEach { type -&gt;</b>
+<b class="nc">&nbsp;            TypeTab(</b>
+<b class="nc">&nbsp;                label = categoryTypeLabel(type),</b>
+<b class="nc">&nbsp;                glyph = typeGlyph(type),</b>
+<b class="nc">&nbsp;                selected = type == selected,</b>
+<b class="nc">&nbsp;                onClick = { onSelect(type) },</b>
+<b class="nc">&nbsp;                modifier = Modifier.weight(1f),</b>
+&nbsp;            )
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;    }</b>
+<b class="nc">&nbsp;}</b>
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun TypeTab(
+&nbsp;    label: String,
+&nbsp;    glyph: ImageVector,
+&nbsp;    selected: Boolean,
+&nbsp;    onClick: () -&gt; Unit,
+<b class="nc">&nbsp;    modifier: Modifier = Modifier,</b>
+<b class="nc">&nbsp;) {</b>
+<b class="nc">&nbsp;    val shape = RoundedCornerShape(TabRadius)</b>
+<b class="nc">&nbsp;    val content = if (selected) {</b>
+<b class="nc">&nbsp;        AppTheme.materialColors.onSecondaryContainer</b>
+<b class="nc">&nbsp;    } else {</b>
+<b class="nc">&nbsp;        AppTheme.materialColors.onSurfaceVariant</b>
 &nbsp;    }
+<b class="nc">&nbsp;    Row(</b>
+<b class="nc">&nbsp;        modifier = modifier</b>
+<b class="nc">&nbsp;            .height(TabHeight)</b>
+<b class="nc">&nbsp;            .clip(shape)</b>
+<b class="nc">&nbsp;            .background(</b>
+<b class="nc">&nbsp;                if (selected) AppTheme.materialColors.secondaryContainer else Color.Transparent,</b>
+&nbsp;            )
+<b class="nc">&nbsp;            .then(</b>
+<b class="nc">&nbsp;                if (selected) {</b>
+<b class="nc">&nbsp;                    Modifier</b>
+<b class="nc">&nbsp;                } else {</b>
+<b class="nc">&nbsp;                    Modifier.border(1.dp, AppTheme.materialColors.outlineVariant, shape)</b>
+&nbsp;                },
+&nbsp;            )
+<b class="nc">&nbsp;            .clickable(onClick = onClick),</b>
+<b class="nc">&nbsp;        verticalAlignment = Alignment.CenterVertically,</b>
+<b class="nc">&nbsp;        horizontalArrangement = Arrangement.Center,</b>
+&nbsp;    ) {
+<b class="nc">&nbsp;        Icon(</b>
+<b class="nc">&nbsp;            imageVector = glyph,</b>
+<b class="nc">&nbsp;            contentDescription = SurferSemantics.Decorative,</b>
+<b class="nc">&nbsp;            tint = content,</b>
+<b class="nc">&nbsp;            modifier = Modifier.size(TabGlyphSize),</b>
+&nbsp;        )
+<b class="nc">&nbsp;        Spacer(Modifier.width(TabLabelSpacing))</b>
+<b class="nc">&nbsp;        Text(text = label, style = AppTheme.typography.labelLarge, color = content)</b>
+<b class="nc">&nbsp;    }</b>
+<b class="nc">&nbsp;}</b>
 &nbsp;
-&nbsp;    override suspend fun pending(scope: SyncScope, limit: Int): List&lt;PendingMutation&gt; =
-&nbsp;        dao.pending(workspaceId = workspaceFilterFor(scope), limit = limit)
-&nbsp;            .map { it.toDomain() }
-&nbsp;
-&nbsp;    override suspend fun markInFlight(ids: List&lt;String&gt;) {
-&nbsp;        if (ids.isNotEmpty()) dao.markInFlight(ids)
-&nbsp;    }
-&nbsp;
-&nbsp;    override suspend fun markCompleted(ids: List&lt;String&gt;) {
-&nbsp;        if (ids.isNotEmpty()) dao.deleteByIds(ids)
-&nbsp;    }
-&nbsp;
-&nbsp;    override suspend fun markFailed(id: String, error: String) {
-&nbsp;        dao.markFailed(id, error)
-&nbsp;    }
-&nbsp;
-&nbsp;    override val pendingCount: Flow&lt;Int&gt; = dao.pendingCount()
-&nbsp;
-&nbsp;    private fun workspaceFilterFor(scope: SyncScope): String? = when (scope) {
-&nbsp;        SyncScope.UploadOnly,
-&nbsp;        SyncScope.ActiveWorkspace,
-&nbsp;        SyncScope.AllUserData,
-&nbsp;        SyncScope.ChangedSinceLastSync,
-&nbsp;        -&gt; null
-&nbsp;    }
+<b class="nc">&nbsp;private fun typeGlyph(type: CategoryType): ImageVector = when (type) {</b>
+<b class="nc">&nbsp;    CategoryType.EXPENSE -&gt; SurferIcons.ArrowDown</b>
+<b class="nc">&nbsp;    CategoryType.INCOME -&gt; SurferIcons.ArrowUp</b>
+<b class="nc">&nbsp;    CategoryType.TRANSFER -&gt; SurferIcons.SwapHoriz</b>
 &nbsp;}
 &nbsp;
-<b class="fc">&nbsp;private fun PendingMutation.toEntity(status: String) = PendingMutationEntity(</b>
-<b class="fc">&nbsp;    id = id,</b>
-<b class="fc">&nbsp;    entityType = entityType,</b>
-<b class="fc">&nbsp;    entityId = entityId,</b>
-<b class="fc">&nbsp;    operation = operation.name,</b>
-<b class="fc">&nbsp;    workspaceId = scopeKey,</b>
-<b class="fc">&nbsp;    createdAt = createdAt.toEpochMilliseconds(),</b>
-<b class="fc">&nbsp;    attempts = attempts,</b>
-<b class="fc">&nbsp;    status = status,</b>
-<b class="fc">&nbsp;    lastError = lastError,</b>
+&nbsp;@Composable
+<b class="nc">&nbsp;private fun categoryTypeLabel(type: CategoryType): String = when (type) {</b>
+<b class="nc">&nbsp;    CategoryType.EXPENSE -&gt; stringResource(Res.string.category_creation_type_expense)</b>
+<b class="nc">&nbsp;    CategoryType.INCOME -&gt; stringResource(Res.string.category_creation_type_income)</b>
+<b class="nc">&nbsp;    CategoryType.TRANSFER -&gt; stringResource(Res.string.category_creation_type_transfer)</b>
+<b class="nc">&nbsp;}</b>
+&nbsp;
+&nbsp;private fun previewItem(
+&nbsp;    id: String,
+&nbsp;    name: String,
+&nbsp;    iconKey: String,
+&nbsp;    hue: Int,
+<b class="nc">&nbsp;    selected: Boolean = false,</b>
+<b class="nc">&nbsp;) = CategoryPickerItem(</b>
+<b class="nc">&nbsp;    id = CategoryId(id),</b>
+<b class="nc">&nbsp;    name = name,</b>
+<b class="nc">&nbsp;    iconKey = iconKey,</b>
+<b class="nc">&nbsp;    hue = hue,</b>
+<b class="nc">&nbsp;    systemKind = null,</b>
+<b class="nc">&nbsp;    selected = selected,</b>
 &nbsp;)
 &nbsp;
-<b class="fc">&nbsp;private fun PendingMutationEntity.toDomain() = PendingMutation(</b>
-<b class="fc">&nbsp;    id = id,</b>
-<b class="fc">&nbsp;    entityType = entityType,</b>
-<b class="fc">&nbsp;    entityId = entityId,</b>
-<b class="fc">&nbsp;    operation = MutationOperation.valueOf(operation),</b>
-<b class="fc">&nbsp;    scopeKey = workspaceId,</b>
-<b class="fc">&nbsp;    createdAt = Instant.fromEpochMilliseconds(createdAt),</b>
-<b class="fc">&nbsp;    attempts = attempts,</b>
-<b class="fc">&nbsp;    lastError = lastError,</b>
+<b class="nc">&nbsp;private val previewGridItems = listOf(</b>
+<b class="nc">&nbsp;    previewItem(&quot;groceries&quot;, &quot;Groceries&quot;, &quot;cash&quot;, 162, selected = true),</b>
+<b class="nc">&nbsp;    previewItem(&quot;dining&quot;, &quot;Dining&quot;, &quot;receipt&quot;, 35),</b>
+<b class="nc">&nbsp;    previewItem(&quot;transport&quot;, &quot;Transport&quot;, &quot;card&quot;, 258),</b>
+<b class="nc">&nbsp;    previewItem(&quot;rent&quot;, &quot;Rent&quot;, &quot;wallet&quot;, 303),</b>
+<b class="nc">&nbsp;    previewItem(&quot;fuel&quot;, &quot;Fuel&quot;, &quot;tag&quot;, 68),</b>
+<b class="nc">&nbsp;    previewItem(&quot;pharmacy&quot;, &quot;Pharmacy&quot;, &quot;event&quot;, 340),</b>
 &nbsp;)
+&nbsp;
+<b class="nc">&nbsp;private val previewTreeGroups = listOf(</b>
+<b class="nc">&nbsp;    CategoryTreeGroup(</b>
+<b class="nc">&nbsp;        parent = previewItem(&quot;food&quot;, &quot;Food&quot;, &quot;cash&quot;, 162),</b>
+<b class="nc">&nbsp;        childCount = 2,</b>
+<b class="nc">&nbsp;        expanded = true,</b>
+<b class="nc">&nbsp;        children = listOf(</b>
+<b class="nc">&nbsp;            previewItem(&quot;groceries&quot;, &quot;Groceries&quot;, &quot;cash&quot;, 162, selected = true),</b>
+<b class="nc">&nbsp;            previewItem(&quot;dining&quot;, &quot;Dining&quot;, &quot;receipt&quot;, 35),</b>
+&nbsp;        ),
+&nbsp;    ),
+<b class="nc">&nbsp;    CategoryTreeGroup(</b>
+<b class="nc">&nbsp;        parent = previewItem(&quot;transport&quot;, &quot;Transport&quot;, &quot;card&quot;, 258),</b>
+<b class="nc">&nbsp;        childCount = 3,</b>
+&nbsp;    ),
+<b class="nc">&nbsp;    CategoryTreeGroup(parent = previewItem(&quot;rent&quot;, &quot;Rent&quot;, &quot;wallet&quot;, 303)),</b>
+&nbsp;)
+&nbsp;
+<b class="nc">&nbsp;private fun previewState(variant: CategoryPickerVariant) = CategoryChooserState.Content(</b>
+<b class="nc">&nbsp;    selectedId = CategoryId(&quot;groceries&quot;),</b>
+<b class="nc">&nbsp;    selectedName = &quot;Groceries&quot;,</b>
+<b class="nc">&nbsp;    type = CategoryType.EXPENSE,</b>
+<b class="nc">&nbsp;    typeLocked = false,</b>
+<b class="nc">&nbsp;    query = &quot;&quot;,</b>
+<b class="nc">&nbsp;    expandedIds = setOf(CategoryId(&quot;food&quot;)),</b>
+<b class="nc">&nbsp;    variant = variant,</b>
+<b class="nc">&nbsp;    gridItems = previewGridItems,</b>
+<b class="nc">&nbsp;    treeItems = previewTreeGroups,</b>
+&nbsp;)
+&nbsp;
+&nbsp;@Preview
+&nbsp;@Composable
+<b class="nc">&nbsp;private fun CategoryChooserGridPreview() {</b>
+<b class="nc">&nbsp;    SurferBottomSheetPreview {</b>
+&nbsp;        CategoryChooserContent(state = previewState(CategoryPickerVariant.GRID), onEvent = {})
+&nbsp;    }
+<b class="nc">&nbsp;}</b>
+&nbsp;
+&nbsp;@Preview
+&nbsp;@Composable
+<b class="nc">&nbsp;private fun CategoryChooserTreePreview() {</b>
+<b class="nc">&nbsp;    SurferBottomSheetPreview {</b>
+&nbsp;        CategoryChooserContent(state = previewState(CategoryPickerVariant.TREE), onEvent = {})
+&nbsp;    }
+<b class="nc">&nbsp;}</b>
+&nbsp;
+&nbsp;@Preview
+&nbsp;@Composable
+<b class="nc">&nbsp;private fun CategoryChooserGridDarkPreview() {</b>
+<b class="nc">&nbsp;    SurferBottomSheetPreview(darkTheme = true) {</b>
+&nbsp;        CategoryChooserContent(state = previewState(CategoryPickerVariant.GRID), onEvent = {})
+&nbsp;    }
+<b class="nc">&nbsp;}</b>
+&nbsp;
+&nbsp;@Preview
+&nbsp;@Composable
+<b class="nc">&nbsp;private fun CategoryChooserTreeDarkPreview() {</b>
+<b class="nc">&nbsp;    SurferBottomSheetPreview(darkTheme = true) {</b>
+&nbsp;        CategoryChooserContent(state = previewState(CategoryPickerVariant.TREE), onEvent = {})
+&nbsp;    }
+<b class="nc">&nbsp;}</b>
 </code>
 </pre>
 </div>
@@ -185,7 +574,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-23 23:54</div>
+    <div style="float:right;">generated on 2026-07-27 15:02</div>
 </div>
 </body>
 </html>

@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > WorkspaceInviteId</title>
+  <title>MoneySurfer Coverage Report > SyncPullPriorities</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,116 +19,24 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.domain.primitives</a>
+    <a href="../index.html">com.georgeci.moneysurfer.data.sync.plugin</a>
 </div>
 
-<h1>Coverage Summary for Class: WorkspaceInviteId (com.georgeci.moneysurfer.domain.primitives)</h1>
+<h1>Coverage Summary for Class: SyncPullPriorities (com.georgeci.moneysurfer.data.sync.plugin)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
 <th class="coverageStat 
 ">
-  Method, %
-</th>
-<th class="coverageStat 
-">
   Branch, %
 </th>
-<th class="coverageStat 
-">
-  Line, %
-</th>
-<th class="coverageStat 
-">
-  Instruction, %
-</th>
 </tr>
 <tr>
-  <td class="name">WorkspaceInviteId</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
+  <td class="name">SyncPullPriorities</td>
     <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (11/11)
-  </span>
-</td>
 </tr>
-  <tr>
-    <td class="name">WorkspaceInviteId$Companion</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (4/4)
-  </span>
-</td>
-  </tr>
-<tr>
-  <td class="name"><strong>Total</strong></td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (2/2)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (2/2)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (15/15)
-  </span>
-</td>
-</tr>
+
 </table>
 
 <br/>
@@ -136,20 +44,41 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.primitives
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.sync.plugin
 &nbsp;
-&nbsp;import kotlinx.serialization.Serializable
-&nbsp;import kotlin.jvm.JvmInline
-&nbsp;import kotlin.uuid.ExperimentalUuidApi
-&nbsp;import kotlin.uuid.Uuid
-&nbsp;
-&nbsp;@JvmInline
-&nbsp;@Serializable
-<b class="fc">&nbsp;value class WorkspaceInviteId(val value: String) {</b>
-&nbsp;    companion object {
-&nbsp;        @OptIn(ExperimentalUuidApi::class)
-<b class="fc">&nbsp;        fun uuid(): WorkspaceInviteId = WorkspaceInviteId(Uuid.random().toString())</b>
-&nbsp;    }
+&nbsp;/**
+&nbsp; * Pull-order priorities for workspace sync plugins.
+&nbsp; *
+&nbsp; * Lower values run first. Gaps of 10 leave room for future plugins.
+&nbsp; * Order is driven by Room FK dependencies — a plugin must run after all
+&nbsp; * plugins whose entities it references as a foreign key.
+&nbsp; *
+&nbsp; *   0  members     — creates UserEntity stubs (insertIgnore); no FK deps
+&nbsp; *  10  invites     — FK: workspaceId (no Room FK enforced, but logically after members)
+&nbsp; *  20  accounts    — FK: workspaceId
+&nbsp; *  30  categories  — FK: workspaceId, parentId (self)
+&nbsp; *  35  recurringRules — FK: workspaceId, categoryId  ← must be &gt; categories, and &lt; transactions
+&nbsp; *                    so a pulled transaction&#39;s recurringRuleId resolves to a rule this device
+&nbsp; *                    already has instead of dangling (issue #269)
+&nbsp; *  40  transactions — FK: accountId, categoryId  ← must be &gt; accounts and categories
+&nbsp; *  50  budgets     — FK: workspaceId; references category ids in a CSV column (no Room FK),
+&nbsp; *                    so running after categories is ordering hygiene, not a hard constraint
+&nbsp; *  60  goals       — FK: workspaceId, accountId (nullable)  ← must be &gt; accounts
+&nbsp; *  70  goalContributions — FK: workspaceId, goalId (cascade)  ← must be &gt; goals
+&nbsp; * 100  (default)   — no ordering constraint
+&nbsp; */
+&nbsp;internal object SyncPullPriorities {
+&nbsp;    const val WORKSPACE = -100
+&nbsp;    const val MEMBERS = 0
+&nbsp;    const val INVITES = 10
+&nbsp;    const val ACCOUNTS = 20
+&nbsp;    const val CATEGORIES = 30
+&nbsp;    const val RECURRING_RULES = 35
+&nbsp;    const val TRANSACTIONS = 40
+&nbsp;    const val BUDGETS = 50
+&nbsp;    const val GOALS = 60
+&nbsp;    const val GOAL_CONTRIBUTIONS = 70
+&nbsp;    const val DEFAULT = 100
 &nbsp;}
 </code>
 </pre>
@@ -174,7 +103,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-05-06 14:45</div>
+    <div style="float:right;">generated on 2026-07-27 15:02</div>
 </div>
 </body>
 </html>

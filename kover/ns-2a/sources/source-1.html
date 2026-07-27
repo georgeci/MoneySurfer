@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > ComposableSingletons</title>
+  <title>MoneySurfer Coverage Report > AccountExtraDetailLabelKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.feature.login.legal</a>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.account</a>
 </div>
 
-<h1>Coverage Summary for Class: ComposableSingletons (com.georgeci.moneysurfer.feature.login.legal)</h1>
+<h1>Coverage Summary for Class: AccountExtraDetailLabelKt (com.georgeci.moneysurfer.feature.account)</h1>
 
 <table class="coverageStats">
 
@@ -45,33 +45,44 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   Instruction, %
 </th>
 </tr>
+<tr>
+  <td class="name">AccountExtraDetailLabelKt</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    4.3%
+  </span>
+  <span class="absValue">
+    (4/94)
+  </span>
+</td>
+</tr>
   <tr>
-    <td class="name">ComposableSingletons$LegalScreenKt</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/2)
-  </span>
-</td>
+    <td class="name">AccountExtraDetailLabelKt$WhenMappings</td>
     <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/26)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/171)
-  </span>
-</td>
   </tr>
 <tr>
   <td class="name"><strong>Total</strong></td>
@@ -80,16 +91,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/2)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/26)
+    (0/3)
   </span>
 </td>
 <td class="coverageStat">
@@ -97,7 +99,23 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/171)
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    4.3%
+  </span>
+  <span class="absValue">
+    (4/94)
   </span>
 </td>
 </tr>
@@ -106,7 +124,47 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <br/>
 <br/>
 
-  <code class="sourceCode">Source code is not available<br /></code>
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.account
+&nbsp;
+&nbsp;import androidx.compose.runtime.Composable
+&nbsp;import com.georgeci.moneysurfer.domain.model.AccountExtraDetailKey
+&nbsp;import com.georgeci.moneysurfer.domain.model.AccountExtraDetails
+&nbsp;import com.georgeci.moneysurfer.feature.account.generated.resources.Res
+&nbsp;import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_field_bank_url
+&nbsp;import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_field_bic
+&nbsp;import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_field_branch_phone
+&nbsp;import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_field_card_last4
+&nbsp;import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_field_description
+&nbsp;import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_field_iban
+&nbsp;import org.jetbrains.compose.resources.StringResource
+&nbsp;import org.jetbrains.compose.resources.stringResource
+&nbsp;
+<b class="nc">&nbsp;internal fun AccountExtraDetailKey.labelRes(): StringResource = when (this) {</b>
+<b class="nc">&nbsp;    AccountExtraDetailKey.IBAN -&gt; Res.string.account_creation_field_iban</b>
+<b class="nc">&nbsp;    AccountExtraDetailKey.DESCRIPTION -&gt; Res.string.account_creation_field_description</b>
+<b class="nc">&nbsp;    AccountExtraDetailKey.BIC -&gt; Res.string.account_creation_field_bic</b>
+<b class="nc">&nbsp;    AccountExtraDetailKey.CARD_LAST4 -&gt; Res.string.account_creation_field_card_last4</b>
+<b class="nc">&nbsp;    AccountExtraDetailKey.BANK_URL -&gt; Res.string.account_creation_field_bank_url</b>
+<b class="nc">&nbsp;    AccountExtraDetailKey.BRANCH_PHONE -&gt; Res.string.account_creation_field_branch_phone</b>
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * Label for a stored extra-detail key: localized for the six well-known keys, and the user&#39;s own
+&nbsp; * wording for a custom field — which is by definition already in their language.
+&nbsp; */
+&nbsp;@Composable
+&nbsp;internal fun extraDetailLabel(key: String): String =
+<b class="nc">&nbsp;    AccountExtraDetails.wellKnownKey(key)?.let { stringResource(it.labelRes()) } ?: key</b>
+&nbsp;
+&nbsp;/** IBAN and BIC are copied character by character; a monospace face is what makes that readable. */
+&nbsp;internal fun isMonospaceExtraDetail(key: String): Boolean =
+<b class="nc">&nbsp;    AccountExtraDetails.wellKnownKey(key).let {</b>
+<b class="nc">&nbsp;        it == AccountExtraDetailKey.IBAN || it == AccountExtraDetailKey.BIC</b>
+&nbsp;    }
+</code>
+</pre>
 </div>
 
 <script type="text/javascript">
@@ -128,7 +186,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-23 23:54</div>
+    <div style="float:right;">generated on 2026-07-27 15:02</div>
 </div>
 </body>
 </html>

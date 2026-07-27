@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > NoOpRemoteDataResetRepository</title>
+  <title>MoneySurfer Coverage Report > AccountChooserState_Loading__OpticsKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,18 +19,15 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.offline.noop</a>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.account.picker</a>
 </div>
 
-<h1>Coverage Summary for Class: NoOpRemoteDataResetRepository (com.georgeci.moneysurfer.offline.noop)</h1>
+<h1>Coverage Summary for Class: AccountChooserState_Loading__OpticsKt (com.georgeci.moneysurfer.feature.account.picker)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
-<th class="coverageStat 
-">
-  Class, %
-</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -49,7 +46,44 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">NoOpRemoteDataResetRepository</td>
+  <td class="name">AccountChooserState_Loading__OpticsKt</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">AccountChooserState_Loading__OpticsKt$selectedId$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
     0%
@@ -66,13 +100,24 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     (0/2)
   </span>
 </td>
+  </tr>
+  <tr>
+    <td class="name">AccountChooserState_Loading__OpticsKt$selectedId$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
     <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
     0%
   </span>
   <span class="absValue">
-    (0/2)
+    (0/1)
   </span>
 </td>
 <td class="coverageStat">
@@ -83,8 +128,35 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     (0/3)
   </span>
 </td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/25)
+  </span>
+</td>
 </tr>
-
 </table>
 
 <br/>
@@ -92,17 +164,20 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.offline.noop
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.account.picker
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.repositories.RemoteDataResetRepository
 &nbsp;
-&nbsp;/**
-&nbsp; * Offline build has no sync database, so there are no pending mutations or
-&nbsp; * cursor metadata to clear on logout.
-&nbsp; */
-<b class="nc">&nbsp;class NoOpRemoteDataResetRepository : RemoteDataResetRepository {</b>
-<b class="nc">&nbsp;    override suspend fun clearAll() = Unit</b>
+&nbsp;
+<b class="nc">&nbsp;public  val com.georgeci.moneysurfer.feature.account.picker.AccountChooserState.Loading.Companion.`selectedId`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.account.picker.AccountChooserState.Loading, com.georgeci.moneysurfer.domain.primitives.AccountId?&gt;  get() = arrow.optics.Lens(</b>
+<b class="nc">&nbsp;  get = { loading: com.georgeci.moneysurfer.feature.account.picker.AccountChooserState.Loading -&gt; loading.`selectedId` },</b>
+&nbsp;  set = { loading: com.georgeci.moneysurfer.feature.account.picker.AccountChooserState.Loading, value: com.georgeci.moneysurfer.domain.primitives.AccountId? -&gt;
+<b class="nc">&nbsp;  loading.copy(`selectedId` = value)</b>
 &nbsp;}
+&nbsp;)
+&nbsp;
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.account.picker.AccountChooserState.Loading&gt;.`selectedId`: arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.domain.primitives.AccountId?&gt;  get() = this + com.georgeci.moneysurfer.feature.account.picker.AccountChooserState.Loading.`selectedId`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.account.picker.AccountChooserState.Loading&gt;.`selectedId`: arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.domain.primitives.AccountId?&gt;  get() = this + com.georgeci.moneysurfer.feature.account.picker.AccountChooserState.Loading.`selectedId`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.account.picker.AccountChooserState.Loading&gt;.`selectedId`: arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.domain.primitives.AccountId?&gt;  get() = this + com.georgeci.moneysurfer.feature.account.picker.AccountChooserState.Loading.`selectedId`</b>
 </code>
 </pre>
 </div>
@@ -126,7 +201,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 21:54</div>
+    <div style="float:right;">generated on 2026-07-27 15:02</div>
 </div>
 </body>
 </html>

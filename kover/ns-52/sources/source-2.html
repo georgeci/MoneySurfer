@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SurferPreviewKt</title>
+  <title>MoneySurfer Coverage Report > SettingsModule</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.uikit.preview</a>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.settings.di</a>
 </div>
 
-<h1>Coverage Summary for Class: SurferPreviewKt (com.georgeci.moneysurfer.uikit.preview)</h1>
+<h1>Coverage Summary for Class: SettingsModule (com.georgeci.moneysurfer.feature.settings.di)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,24 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SurferPreviewKt</td>
+  <td class="name">SettingsModule</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -66,30 +83,6 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     (2/2)
   </span>
 </td>
-<td class="coverageStat">
-  <span class="percent">
-    25%
-  </span>
-  <span class="absValue">
-    (3/12)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (10/10)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    93%
-  </span>
-  <span class="absValue">
-    (173/186)
-  </span>
-</td>
 </tr>
 
 </table>
@@ -99,35 +92,14 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.preview
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.settings.di
 &nbsp;
-&nbsp;import androidx.compose.foundation.background
-&nbsp;import androidx.compose.foundation.layout.Box
-&nbsp;import androidx.compose.runtime.Composable
-&nbsp;import androidx.compose.ui.Modifier
-&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
-&nbsp;import com.georgeci.moneysurfer.uikit.theme.SurferContainerStyle
+&nbsp;import org.koin.core.annotation.ComponentScan
+&nbsp;import org.koin.core.annotation.Module
 &nbsp;
-&nbsp;/**
-&nbsp; * Harness used ONLY by uikit @Preview composables. Wraps [content] in [AppTheme] and paints the
-&nbsp; * themed surface background so components preview on the same canvas the app uses at runtime.
-&nbsp; * Keep app-level screens out of this helper — those should preview inside their own Scaffold.
-&nbsp; */
-&nbsp;@Composable
-&nbsp;fun SurferComponentPreview(
-<b class="fc">&nbsp;    darkTheme: Boolean = false,</b>
-<b class="fc">&nbsp;    containerStyle: SurferContainerStyle = SurferContainerStyle.Card,</b>
-&nbsp;    content: @Composable () -&gt; Unit,
-<b class="pc">&nbsp;) {</b>
-<b class="fc">&nbsp;    AppTheme(darkTheme = darkTheme, containerStyle = containerStyle) {</b>
-<b class="fc">&nbsp;        Box(</b>
-<b class="fc">&nbsp;            modifier = Modifier</b>
-<b class="fc">&nbsp;                .background(AppTheme.materialColors.surface),</b>
-&nbsp;        ) {
-<b class="fc">&nbsp;            content()</b>
-<b class="fc">&nbsp;        }</b>
-&nbsp;    }
-<b class="fc">&nbsp;}</b>
+<b class="fc">&nbsp;@Module</b>
+&nbsp;@ComponentScan(&quot;com.georgeci.moneysurfer.feature.settings&quot;)
+&nbsp;class SettingsModule
 </code>
 </pre>
 </div>
@@ -151,7 +123,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-23 23:54</div>
+    <div style="float:right;">generated on 2026-07-27 15:02</div>
 </div>
 </body>
 </html>

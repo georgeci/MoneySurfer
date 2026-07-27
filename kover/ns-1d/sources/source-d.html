@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > RecurringRuleId</title>
+  <title>MoneySurfer Coverage Report > TransactionCsvFormatKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,15 +19,18 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.domain.primitives</a>
+    <a href="../index.html">com.georgeci.moneysurfer.domain.csv</a>
 </div>
 
-<h1>Coverage Summary for Class: RecurringRuleId (com.georgeci.moneysurfer.domain.primitives)</h1>
+<h1>Coverage Summary for Class: TransactionCsvFormatKt (com.georgeci.moneysurfer.domain.csv)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -46,7 +49,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">RecurringRuleId</td>
+  <td class="name">TransactionCsvFormatKt</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -61,7 +72,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (1/1)
+    (19/19)
   </span>
 </td>
 <td class="coverageStat">
@@ -69,66 +80,11 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (11/11)
+    (84/84)
   </span>
 </td>
 </tr>
-  <tr>
-    <td class="name">RecurringRuleId$Companion</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/4)
-  </span>
-</td>
-  </tr>
-<tr>
-  <td class="name"><strong>Total</strong></td>
-<td class="coverageStat">
-  <span class="percent">
-    50%
-  </span>
-  <span class="absValue">
-    (1/2)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    50%
-  </span>
-  <span class="absValue">
-    (1/2)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    73.3%
-  </span>
-  <span class="absValue">
-    (11/15)
-  </span>
-</td>
-</tr>
+
 </table>
 
 <br/>
@@ -136,21 +92,84 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.primitives
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.csv
 &nbsp;
-&nbsp;import kotlinx.serialization.Serializable
-&nbsp;import kotlin.jvm.JvmInline
-&nbsp;import kotlin.uuid.ExperimentalUuidApi
-&nbsp;import kotlin.uuid.Uuid
+&nbsp;/**
+&nbsp; * The column layout of a transactions CSV that this codec wrote at some point.
+&nbsp; *
+&nbsp; * The header row *is* the format version: a file&#39;s header names its columns in
+&nbsp; * order, so [forHeader] maps it back to the layout it was written with and the
+&nbsp; * decoder reads that layout — no version marker, no per-row `schema_version`
+&nbsp; * column, nothing outside the CSV grid a spreadsheet would mangle.
+&nbsp; *
+&nbsp; * Every layout stays listed here forever, and each one keeps its own exact
+&nbsp; * field count: a record is still rejected unless it carries every column of
+&nbsp; * *its* file&#39;s format, so a truncated row is rejected in a [V1] file and in a
+&nbsp; * [V2] file alike. Adding columns therefore means adding an entry here, never
+&nbsp; * relaxing the length check into &quot;missing tail fields default to empty&quot;.
+&nbsp; */
+&nbsp;enum class TransactionCsvFormat(val columns: List&lt;TransactionCsvColumn&gt;) {
 &nbsp;
-&nbsp;@JvmInline
-&nbsp;@Serializable
-<b class="fc">&nbsp;value class RecurringRuleId(val value: String) {</b>
+&nbsp;    /** Pre-#260 exports: ends at `transfer_id`, before merchant/tags/recurring rule. */
+&nbsp;    V1(V1_COLUMNS),
+&nbsp;
+&nbsp;    /** #260&#39;s fields appended — what [TransactionCsvCodec.encode] writes today. */
+&nbsp;    V2(V2_COLUMNS),
+&nbsp;    ;
+&nbsp;
+&nbsp;    val header: List&lt;String&gt; = columns.map { it.header }
+&nbsp;
+&nbsp;    private val indexByColumn: Map&lt;TransactionCsvColumn, Int&gt; =
+&nbsp;        columns.withIndex().associate { (index, column) -&gt; column to index }
+&nbsp;
+&nbsp;    /** Field index of [column] in this layout, or null when the layout predates it. */
+&nbsp;    fun indexOf(column: TransactionCsvColumn): Int? = indexByColumn[column]
+&nbsp;
 &nbsp;    companion object {
-&nbsp;        @OptIn(ExperimentalUuidApi::class)
-<b class="nc">&nbsp;        fun uuid(): RecurringRuleId = RecurringRuleId(Uuid.random().toString())</b>
+&nbsp;        /**
+&nbsp;         * The newest layout — what every export writes and what [decode] assumes
+&nbsp;         * when a caller has no header row to resolve ([TransactionCsvCodec.decode]).
+&nbsp;         * Newest is the last entry,
+&nbsp;         * so a future format only has to be declared, not registered here.
+&nbsp;         */
+&nbsp;        val Latest: TransactionCsvFormat = entries.last()
+&nbsp;
+&nbsp;        /** The layout [header] was written with, or null when it is not one of ours. */
+&nbsp;        fun forHeader(header: List&lt;String&gt;): TransactionCsvFormat? =
+&nbsp;            entries.find { it.header == header }
 &nbsp;    }
 &nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * Each layout&#39;s columns, frozen. Every list here describes bytes already sitting
+&nbsp; * in some user&#39;s backup file, so none of them may be re-derived from
+&nbsp; * `TransactionCsvColumn.entries`: that would silently re-define an old format
+&nbsp; * the day a column is added, and files written in it would stop matching their
+&nbsp; * own header. A new column means a new list appended below, leaving these as the
+&nbsp; * builds that wrote them left them.
+&nbsp; */
+<b class="fc">&nbsp;private val V1_COLUMNS: List&lt;TransactionCsvColumn&gt; = listOf(</b>
+<b class="fc">&nbsp;    TransactionCsvColumn.Id,</b>
+<b class="fc">&nbsp;    TransactionCsvColumn.WorkspaceId,</b>
+<b class="fc">&nbsp;    TransactionCsvColumn.AccountId,</b>
+<b class="fc">&nbsp;    TransactionCsvColumn.Type,</b>
+<b class="fc">&nbsp;    TransactionCsvColumn.Status,</b>
+<b class="fc">&nbsp;    TransactionCsvColumn.AmountMinor,</b>
+<b class="fc">&nbsp;    TransactionCsvColumn.Currency,</b>
+<b class="fc">&nbsp;    TransactionCsvColumn.CategoryId,</b>
+<b class="fc">&nbsp;    TransactionCsvColumn.Note,</b>
+<b class="fc">&nbsp;    TransactionCsvColumn.OperationAt,</b>
+<b class="fc">&nbsp;    TransactionCsvColumn.OperationDate,</b>
+<b class="fc">&nbsp;    TransactionCsvColumn.CreatedAt,</b>
+<b class="fc">&nbsp;    TransactionCsvColumn.UpdatedAt,</b>
+<b class="fc">&nbsp;    TransactionCsvColumn.TransferId,</b>
+&nbsp;)
+&nbsp;
+<b class="fc">&nbsp;private val V2_COLUMNS: List&lt;TransactionCsvColumn&gt; = V1_COLUMNS + listOf(</b>
+<b class="fc">&nbsp;    TransactionCsvColumn.Merchant,</b>
+<b class="fc">&nbsp;    TransactionCsvColumn.Tags,</b>
+<b class="fc">&nbsp;    TransactionCsvColumn.RecurringRuleId,</b>
+&nbsp;)
 </code>
 </pre>
 </div>
@@ -174,7 +193,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-23 23:54</div>
+    <div style="float:right;">generated on 2026-07-27 15:02</div>
 </div>
 </body>
 </html>

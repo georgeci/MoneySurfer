@@ -1,0 +1,258 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>MoneySurfer Coverage Report > SurferGoalContributionRowKt</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.georgeci.moneysurfer.uikit.components.goal</a>
+</div>
+
+<h1>Coverage Summary for Class: SurferGoalContributionRowKt (com.georgeci.moneysurfer.uikit.components.goal)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">SurferGoalContributionRowKt</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (1/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (16/32)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    94.2%
+  </span>
+  <span class="absValue">
+    (49/52)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    84.8%
+  </span>
+  <span class="absValue">
+    (525/619)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.components.goal
+&nbsp;
+&nbsp;import androidx.compose.foundation.background
+&nbsp;import androidx.compose.foundation.clickable
+&nbsp;import androidx.compose.foundation.layout.Arrangement
+&nbsp;import androidx.compose.foundation.layout.Box
+&nbsp;import androidx.compose.foundation.layout.Column
+&nbsp;import androidx.compose.foundation.layout.Row
+&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
+&nbsp;import androidx.compose.foundation.layout.padding
+&nbsp;import androidx.compose.foundation.layout.size
+&nbsp;import androidx.compose.foundation.shape.CircleShape
+&nbsp;import androidx.compose.material.icons.Icons
+&nbsp;import androidx.compose.material.icons.filled.ArrowDownward
+&nbsp;import androidx.compose.material.icons.filled.ArrowUpward
+&nbsp;import androidx.compose.material.icons.filled.Autorenew
+&nbsp;import androidx.compose.material3.Icon
+&nbsp;import androidx.compose.material3.Text
+&nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.ui.Alignment
+&nbsp;import androidx.compose.ui.Modifier
+&nbsp;import androidx.compose.ui.draw.clip
+&nbsp;import androidx.compose.ui.text.font.FontWeight
+&nbsp;import androidx.compose.ui.text.style.TextOverflow
+&nbsp;import androidx.compose.ui.tooling.preview.Preview
+&nbsp;import androidx.compose.ui.unit.dp
+&nbsp;import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
+&nbsp;import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
+&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
+&nbsp;
+&nbsp;/**
+&nbsp; * One line of a goal&#39;s contribution history. A withdrawal is a contribution with a negative
+&nbsp; * amount, so it differs only in its icon and amount colour.
+&nbsp; *
+&nbsp; * [automatic] styles a row created by a scheduled auto-contribution. Nothing produces those in
+&nbsp; * v1 (autopay is deferred), but the styling belongs with the component rather than with the
+&nbsp; * feature that will later switch it on.
+&nbsp; */
+&nbsp;@Suppress(&quot;LongParameterList&quot;)
+&nbsp;@Composable
+&nbsp;fun SurferGoalContributionRow(
+&nbsp;    amountLabel: String,
+&nbsp;    dateLabel: String,
+&nbsp;    isWithdrawal: Boolean,
+<b class="fc">&nbsp;    modifier: Modifier = Modifier,</b>
+<b class="fc">&nbsp;    note: String? = null,</b>
+<b class="fc">&nbsp;    automatic: Boolean = false,</b>
+<b class="fc">&nbsp;    onClick: (() -&gt; Unit)? = null,</b>
+<b class="pc">&nbsp;) {</b>
+<b class="fc">&nbsp;    val colors = AppTheme.materialColors</b>
+<b class="fc">&nbsp;    val accent = if (isWithdrawal) colors.error else AppTheme.semanticColors.income</b>
+<b class="pc">&nbsp;    val rowModifier = if (onClick != null) modifier.clickable(onClick = onClick) else modifier</b>
+&nbsp;
+<b class="fc">&nbsp;    Row(</b>
+<b class="fc">&nbsp;        modifier = rowModifier</b>
+<b class="fc">&nbsp;            .fillMaxWidth()</b>
+<b class="fc">&nbsp;            .padding(vertical = AppTheme.spacing.small),</b>
+<b class="fc">&nbsp;        verticalAlignment = Alignment.CenterVertically,</b>
+<b class="fc">&nbsp;        horizontalArrangement = Arrangement.spacedBy(AppTheme.spacing.medium),</b>
+&nbsp;    ) {
+<b class="fc">&nbsp;        Box(</b>
+<b class="fc">&nbsp;            modifier = Modifier</b>
+<b class="fc">&nbsp;                .size(36.dp)</b>
+<b class="fc">&nbsp;                .clip(CircleShape)</b>
+<b class="fc">&nbsp;                .background(accent.copy(alpha = ICON_BACKGROUND_ALPHA)),</b>
+<b class="fc">&nbsp;            contentAlignment = Alignment.Center,</b>
+&nbsp;        ) {
+<b class="fc">&nbsp;            Icon(</b>
+<b class="fc">&nbsp;                imageVector = when {</b>
+<b class="pc">&nbsp;                    automatic -&gt; Icons.Default.Autorenew</b>
+<b class="fc">&nbsp;                    isWithdrawal -&gt; Icons.Default.ArrowUpward</b>
+<b class="fc">&nbsp;                    else -&gt; Icons.Default.ArrowDownward</b>
+&nbsp;                },
+<b class="fc">&nbsp;                contentDescription = SurferSemantics.Decorative,</b>
+<b class="fc">&nbsp;                tint = accent,</b>
+<b class="fc">&nbsp;                modifier = Modifier.size(18.dp),</b>
+&nbsp;            )
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;        Column(modifier = Modifier.weight(1f)) {</b>
+<b class="fc">&nbsp;            Text(</b>
+<b class="pc">&nbsp;                text = note?.takeIf { it.isNotBlank() } ?: dateLabel,</b>
+<b class="fc">&nbsp;                style = AppTheme.typography.bodyMedium,</b>
+<b class="fc">&nbsp;                color = colors.onSurface,</b>
+<b class="fc">&nbsp;                maxLines = 1,</b>
+<b class="fc">&nbsp;                overflow = TextOverflow.Ellipsis,</b>
+&nbsp;            )
+<b class="fc">&nbsp;            if (!note.isNullOrBlank()) {</b>
+<b class="fc">&nbsp;                Text(</b>
+<b class="fc">&nbsp;                    text = dateLabel,</b>
+<b class="fc">&nbsp;                    style = AppTheme.typography.bodySmall,</b>
+<b class="fc">&nbsp;                    color = colors.onSurfaceVariant,</b>
+&nbsp;                )
+<b class="fc">&nbsp;            }</b>
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;        Text(</b>
+<b class="fc">&nbsp;            text = amountLabel,</b>
+<b class="fc">&nbsp;            style = AppTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium),</b>
+<b class="fc">&nbsp;            color = accent,</b>
+&nbsp;        )
+<b class="fc">&nbsp;    }</b>
+<b class="fc">&nbsp;}</b>
+&nbsp;
+&nbsp;private const val ICON_BACKGROUND_ALPHA = 0.12f
+&nbsp;
+&nbsp;@Preview
+&nbsp;@Composable
+<b class="nc">&nbsp;private fun SurferGoalContributionRowPreview() {</b>
+<b class="nc">&nbsp;    SurferComponentPreview {</b>
+&nbsp;        Column(modifier = Modifier.padding(16.dp)) {
+&nbsp;            SurferGoalContributionRow(
+&nbsp;                amountLabel = &quot;+€250&quot;,
+&nbsp;                dateLabel = &quot;12 Jul 2026&quot;,
+&nbsp;                isWithdrawal = false,
+&nbsp;                note = &quot;Salary top-up&quot;,
+&nbsp;            )
+&nbsp;            SurferGoalContributionRow(
+&nbsp;                amountLabel = &quot;−€80&quot;,
+&nbsp;                dateLabel = &quot;3 Jul 2026&quot;,
+&nbsp;                isWithdrawal = true,
+&nbsp;            )
+&nbsp;            SurferGoalContributionRow(
+&nbsp;                amountLabel = &quot;+€100&quot;,
+&nbsp;                dateLabel = &quot;1 Jul 2026&quot;,
+&nbsp;                isWithdrawal = false,
+&nbsp;                automatic = true,
+&nbsp;                note = &quot;Monthly autopay&quot;,
+&nbsp;            )
+&nbsp;        }
+&nbsp;    }
+<b class="nc">&nbsp;}</b>
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-07-27 15:02</div>
+</div>
+</body>
+</html>

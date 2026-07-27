@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > ProjectionSummary</title>
+  <title>MoneySurfer Coverage Report > DashboardLayoutConfig</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,18 +19,15 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.domain.sync</a>
+    <a href="../index.html">com.georgeci.moneysurfer.domain.dashboard</a>
 </div>
 
-<h1>Coverage Summary for Class: ProjectionSummary (com.georgeci.moneysurfer.domain.sync)</h1>
+<h1>Coverage Summary for Class: DashboardLayoutConfig (com.georgeci.moneysurfer.domain.dashboard)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
-<th class="coverageStat 
-">
-  Class, %
-</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -49,15 +46,42 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">ProjectionSummary</td>
+  <td class="name">DashboardLayoutConfig</td>
 <td class="coverageStat">
   <span class="percent">
     100%
   </span>
   <span class="absValue">
-    (1/1)
+    (8/8)
   </span>
 </td>
+<td class="coverageStat">
+  <span class="percent">
+    93.8%
+  </span>
+  <span class="absValue">
+    (30/32)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (35/35)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    99.1%
+  </span>
+  <span class="absValue">
+    (318/321)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DashboardLayoutConfig$Companion</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -80,11 +104,45 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (7/7)
+    (1/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (9/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    93.8%
+  </span>
+  <span class="absValue">
+    (30/32)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (36/36)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    99.1%
+  </span>
+  <span class="absValue">
+    (319/322)
   </span>
 </td>
 </tr>
-
 </table>
 
 <br/>
@@ -92,9 +150,108 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.sync
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.dashboard
 &nbsp;
-<b class="fc">&nbsp;data class ProjectionSummary(val recalculatedCount: Int)</b>
+&nbsp;/**
+&nbsp; * The dashboard layout: an ordered list of widgets, top to bottom, in a single vertical column.
+&nbsp; * Order in [items] *is* the render order; there are no rows or columns to reconcile.
+&nbsp; *
+&nbsp; * Stored per device (see `UiPreferences.dashboardLayout`), never synced — a layout is a property
+&nbsp; * of the screen the user is holding, not of the workspace.
+&nbsp; */
+<b class="fc">&nbsp;data class DashboardLayoutConfig(</b>
+<b class="fc">&nbsp;    val items: List&lt;DashboardLayoutItem&gt;,</b>
+&nbsp;) {
+&nbsp;
+&nbsp;    /** What the dashboard actually renders, in order. */
+&nbsp;    val enabledItems: List&lt;DashboardLayoutItem&gt;
+<b class="fc">&nbsp;        get() = items.filter { it.enabled }</b>
+&nbsp;
+&nbsp;    /** The widgets the user switched off — the &quot;Available&quot; half of the customize screen. */
+&nbsp;    val disabledItems: List&lt;DashboardLayoutItem&gt;
+<b class="fc">&nbsp;        get() = items.filterNot { it.enabled }</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * [type] switched on or off, keeping the item either way so its card style survives the round
+&nbsp;     * trip. Switching on appends the widget after the last enabled one — it joins the bottom of the
+&nbsp;     * dashboard, rather than reappearing in a middle slot the user cannot see from the toggle.
+&nbsp;     * Switching off sends it to the end of [items], so the enabled block stays contiguous.
+&nbsp;     *
+&nbsp;     * A [type] the layout does not carry is a no-op: only [normalized] adds items.
+&nbsp;     */
+&nbsp;    fun withWidgetEnabled(type: DashboardWidgetType, enabled: Boolean): DashboardLayoutConfig {
+<b class="pc">&nbsp;        val target = items.firstOrNull { it.type == type } ?: return this</b>
+<b class="fc">&nbsp;        if (target.enabled == enabled) return this</b>
+<b class="fc">&nbsp;        val others = items.filterNot { it.type == type }</b>
+<b class="fc">&nbsp;        val moved = target.copy(enabled = enabled)</b>
+<b class="fc">&nbsp;        val stillEnabled = others.filter { it.enabled }</b>
+<b class="fc">&nbsp;        val stillDisabled = others.filterNot { it.enabled }</b>
+<b class="fc">&nbsp;        return DashboardLayoutConfig(</b>
+<b class="fc">&nbsp;            items = if (enabled) {</b>
+<b class="fc">&nbsp;                stillEnabled + moved + stillDisabled</b>
+&nbsp;            } else {
+<b class="fc">&nbsp;                stillEnabled + stillDisabled + moved</b>
+&nbsp;            },
+&nbsp;        )
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * [from] dragged onto the slot [to] currently occupies, within [enabledItems]. Positions are
+&nbsp;     * expressed as widget types rather than indices because the customize screen drags rows out of
+&nbsp;     * a list that also holds headers and the switched-off section — indices there are not layout
+&nbsp;     * positions. Switched-off widgets have no slot to trade, so naming one is a no-op.
+&nbsp;     */
+&nbsp;    fun withWidgetMoved(from: DashboardWidgetType, to: DashboardWidgetType): DashboardLayoutConfig {
+<b class="fc">&nbsp;        if (from == to) return this</b>
+<b class="fc">&nbsp;        val reordered = enabledItems.toMutableList()</b>
+<b class="fc">&nbsp;        val fromIndex = reordered.indexOfFirst { it.type == from }</b>
+<b class="fc">&nbsp;        val toIndex = reordered.indexOfFirst { it.type == to }</b>
+<b class="pc">&nbsp;        if (fromIndex &lt; 0 || toIndex &lt; 0) return this</b>
+<b class="fc">&nbsp;        reordered.add(toIndex, reordered.removeAt(fromIndex))</b>
+<b class="fc">&nbsp;        return DashboardLayoutConfig(items = reordered + disabledItems)</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * [type] restyled. Order and enabled-ness are left alone — the style picker only changes how a
+&nbsp;     * widget looks, and it can be opened for a widget that sits anywhere in the list. Like
+&nbsp;     * [withWidgetEnabled], naming a [type] the layout does not carry is a no-op.
+&nbsp;     */
+&nbsp;    fun withCardStyle(type: DashboardWidgetType, cardStyle: DashboardCardStyle): DashboardLayoutConfig {
+<b class="fc">&nbsp;        val target = items.firstOrNull { it.type == type } ?: return this</b>
+<b class="fc">&nbsp;        if (target.cardStyle == cardStyle) return this</b>
+<b class="fc">&nbsp;        return DashboardLayoutConfig(</b>
+<b class="fc">&nbsp;            items = items.map { if (it.type == type) it.copy(cardStyle = cardStyle) else it },</b>
+&nbsp;        )
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * A layout safe to render: at most one entry per widget type, with any type missing from
+&nbsp;     * [items] appended in its [DEFAULT] position and style. Persisted layouts written by an older
+&nbsp;     * app version know nothing about widgets added since, and dropping those silently would make
+&nbsp;     * a new widget invisible until the user resets the dashboard.
+&nbsp;     */
+&nbsp;    fun normalized(): DashboardLayoutConfig {
+<b class="fc">&nbsp;        val unique = items.distinctBy { it.type }</b>
+<b class="fc">&nbsp;        val present = unique.mapTo(mutableSetOf()) { it.type }</b>
+<b class="fc">&nbsp;        val missing = DEFAULT.items.filterNot { it.type in present }</b>
+<b class="fc">&nbsp;        return if (unique.size == items.size &amp;&amp; missing.isEmpty()) this else DashboardLayoutConfig(unique + missing)</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    companion object {
+&nbsp;        /**
+&nbsp;         * Variant A from the design: the balance headline first, then the accounts strip, goals,
+&nbsp;         * and the recent-transactions list. Every widget starts enabled and Hero-sized.
+&nbsp;         */
+<b class="fc">&nbsp;        val DEFAULT = DashboardLayoutConfig(</b>
+<b class="fc">&nbsp;            items = listOf(</b>
+<b class="fc">&nbsp;                DashboardLayoutItem(DashboardWidgetType.Balance),</b>
+<b class="fc">&nbsp;                DashboardLayoutItem(DashboardWidgetType.Accounts),</b>
+<b class="fc">&nbsp;                DashboardLayoutItem(DashboardWidgetType.Goals),</b>
+<b class="fc">&nbsp;                DashboardLayoutItem(DashboardWidgetType.RecentTransactions),</b>
+&nbsp;            ),
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
 </code>
 </pre>
 </div>
@@ -118,7 +275,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 16:22</div>
+    <div style="float:right;">generated on 2026-07-27 15:02</div>
 </div>
 </body>
 </html>

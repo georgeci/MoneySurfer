@@ -1,0 +1,269 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>MoneySurfer Coverage Report > TransactionCreationState</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.transaction.creation</a>
+</div>
+
+<h1>Coverage Summary for Class: TransactionCreationState (com.georgeci.moneysurfer.feature.transaction.creation)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+  <tr>
+    <td class="name">TransactionCreationState$Companion</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">TransactionCreationState$Content</td>
+<td class="coverageStat">
+  <span class="percent">
+    85.7%
+  </span>
+  <span class="absValue">
+    (6/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    37.5%
+  </span>
+  <span class="absValue">
+    (12/32)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    87.2%
+  </span>
+  <span class="absValue">
+    (34/39)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    85.7%
+  </span>
+  <span class="absValue">
+    (245/286)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">TransactionCreationState$Content$Companion</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">TransactionCreationState$Loading</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    87.5%
+  </span>
+  <span class="absValue">
+    (7/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    37.5%
+  </span>
+  <span class="absValue">
+    (12/32)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    87.5%
+  </span>
+  <span class="absValue">
+    (35/40)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    85.8%
+  </span>
+  <span class="absValue">
+    (247/288)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.transaction.creation
+&nbsp;
+&nbsp;import arrow.optics.optics
+&nbsp;import com.georgeci.moneysurfer.domain.model.Account
+&nbsp;import com.georgeci.moneysurfer.domain.model.Category
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionId
+&nbsp;import kotlinx.datetime.LocalDate
+&nbsp;
+&nbsp;enum class TransactionTypeUi { Expense, Income, Transfer }
+&nbsp;
+&nbsp;@optics
+&nbsp;sealed interface TransactionCreationState {
+<b class="fc">&nbsp;    data object Loading : TransactionCreationState</b>
+&nbsp;
+<b class="fc">&nbsp;    @optics</b>
+<b class="fc">&nbsp;    data class Content(</b>
+<b class="fc">&nbsp;        val amount: String,</b>
+<b class="fc">&nbsp;        val note: String,</b>
+<b class="fc">&nbsp;        val type: TransactionTypeUi,</b>
+<b class="fc">&nbsp;        val accounts: List&lt;Account&gt;,</b>
+<b class="fc">&nbsp;        val categories: List&lt;Category&gt;,</b>
+<b class="fc">&nbsp;        val selectedAccount: Account?,</b>
+<b class="fc">&nbsp;        val selectedCategory: Category?,</b>
+<b class="fc">&nbsp;        val isEditMode: Boolean,</b>
+<b class="fc">&nbsp;        val editingTransactionId: TransactionId?,</b>
+&nbsp;        /** Non-null only in edit mode: the stored row behind the identity band. */
+<b class="fc">&nbsp;        val editIdentity: TransactionEditIdentity? = null,</b>
+&nbsp;        /** Whether the delete confirmation is up — the same dialog the details screen shows. */
+<b class="fc">&nbsp;        val showDeleteConfirmation: Boolean = false,</b>
+<b class="fc">&nbsp;        val editingCreatedAt: kotlin.time.Instant? = null,</b>
+&nbsp;        // Original `operationDate` from the persisted transaction. Preserved across
+&nbsp;        // edits unless the user explicitly picks a new date — otherwise a timezone
+&nbsp;        // change between the original save and the edit would silently shift the
+&nbsp;        // stored business date.
+<b class="fc">&nbsp;        val pinnedOperationDate: LocalDate? = null,</b>
+&nbsp;        /**
+&nbsp;         * Fields of the transaction being edited that this form cannot change but must not
+&nbsp;         * destroy — see [PreservedTransactionFields].
+&nbsp;         */
+<b class="fc">&nbsp;        val preserved: PreservedTransactionFields = PreservedTransactionFields(),</b>
+<b class="fc">&nbsp;        val timestamp: Long,</b>
+<b class="fc">&nbsp;        val categoryUsageCounts: Map&lt;CategoryId, Int&gt;,</b>
+<b class="fc">&nbsp;        val displayCategories: List&lt;Category&gt;,</b>
+<b class="fc">&nbsp;        val fromAccount: Account? = null,</b>
+<b class="fc">&nbsp;        val toAccount: Account? = null,</b>
+<b class="fc">&nbsp;        val toAmount: String = &quot;&quot;,</b>
+<b class="fc">&nbsp;        val transferEnabled: Boolean = true,</b>
+&nbsp;    ) : TransactionCreationState {
+<b class="fc">&nbsp;        val isExpense: Boolean get() = type == TransactionTypeUi.Expense</b>
+<b class="fc">&nbsp;        val isTransfer: Boolean get() = type == TransactionTypeUi.Transfer</b>
+&nbsp;        val crossCurrency: Boolean
+<b class="pc">&nbsp;            get() = isTransfer &amp;&amp;</b>
+<b class="pc">&nbsp;                fromAccount != null &amp;&amp;</b>
+<b class="pc">&nbsp;                toAccount != null &amp;&amp;</b>
+<b class="fc">&nbsp;                fromAccount.currencyCode != toAccount.currencyCode</b>
+&nbsp;
+&nbsp;        /** Inline validation error for the (from) amount field, or null when it is acceptable. */
+&nbsp;        val amountError: TransactionAmountError?
+<b class="fc">&nbsp;            get() = TransactionAmountInput.errorFor(amount)</b>
+&nbsp;
+&nbsp;        /** Inline validation error for the cross-currency &quot;to&quot; amount, or null when it is acceptable. */
+&nbsp;        val toAmountError: TransactionAmountError?
+<b class="nc">&nbsp;            get() = if (crossCurrency) TransactionAmountInput.errorFor(toAmount) else null</b>
+&nbsp;
+&nbsp;        val isSaveEnabled: Boolean
+<b class="pc">&nbsp;            get() = if (isTransfer) {</b>
+<b class="nc">&nbsp;                TransactionAmountInput.isValid(amount) &amp;&amp;</b>
+<b class="nc">&nbsp;                    (!crossCurrency || TransactionAmountInput.isValid(toAmount)) &amp;&amp;</b>
+<b class="nc">&nbsp;                    fromAccount != null &amp;&amp; toAccount != null &amp;&amp;</b>
+<b class="nc">&nbsp;                    fromAccount.id != toAccount.id</b>
+&nbsp;            } else {
+<b class="fc">&nbsp;                TransactionAmountInput.isValid(amount) &amp;&amp;</b>
+<b class="pc">&nbsp;                    selectedAccount != null &amp;&amp;</b>
+<b class="pc">&nbsp;                    selectedCategory != null</b>
+&nbsp;            }
+&nbsp;
+&nbsp;        companion object
+&nbsp;    }
+&nbsp;
+&nbsp;    companion object
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-07-27 15:02</div>
+</div>
+</body>
+</html>

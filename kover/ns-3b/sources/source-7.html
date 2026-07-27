@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SurferButtonSize</title>
+  <title>MoneySurfer Coverage Report > CategoryChooserState_Loading__OpticsKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,18 +19,15 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.uikit.components</a>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.category.picker</a>
 </div>
 
-<h1>Coverage Summary for Class: SurferButtonSize (com.georgeci.moneysurfer.uikit.components)</h1>
+<h1>Coverage Summary for Class: CategoryChooserState_Loading__OpticsKt (com.georgeci.moneysurfer.feature.category.picker)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
-<th class="coverageStat 
-">
-  Class, %
-</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -49,42 +46,117 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SurferButtonSize</td>
+  <td class="name">CategoryChooserState_Loading__OpticsKt</td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (1/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (2/2)
+    (0/4)
   </span>
 </td>
     <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (4/4)
+    (0/4)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (36/36)
+    (0/20)
   </span>
 </td>
 </tr>
-
+  <tr>
+    <td class="name">CategoryChooserState_Loading__OpticsKt$selectedId$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">CategoryChooserState_Loading__OpticsKt$selectedId$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/25)
+  </span>
+</td>
+</tr>
 </table>
 
 <br/>
@@ -92,204 +164,20 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.components
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.category.picker
 &nbsp;
-&nbsp;import androidx.compose.foundation.layout.Column
-&nbsp;import androidx.compose.foundation.layout.Row
-&nbsp;import androidx.compose.foundation.layout.Spacer
-&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
-&nbsp;import androidx.compose.foundation.layout.height
-&nbsp;import androidx.compose.foundation.layout.padding
-&nbsp;import androidx.compose.foundation.layout.width
-&nbsp;import androidx.compose.material3.Button
-&nbsp;import androidx.compose.material3.FilledTonalButton
-&nbsp;import androidx.compose.material3.Icon
-&nbsp;import androidx.compose.material3.OutlinedButton
-&nbsp;import androidx.compose.material3.Text
-&nbsp;import androidx.compose.material3.TextButton
-&nbsp;import androidx.compose.runtime.Composable
-&nbsp;import androidx.compose.ui.Modifier
-&nbsp;import androidx.compose.ui.graphics.vector.ImageVector
-&nbsp;import androidx.compose.ui.tooling.preview.Preview
-&nbsp;import androidx.compose.ui.unit.dp
-&nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
-&nbsp;import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
-&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
 &nbsp;
-&nbsp;enum class SurferButtonStyle {
-&nbsp;    Filled,
-&nbsp;    Tonal,
-&nbsp;    Outlined,
-&nbsp;    Text,
+&nbsp;
+<b class="nc">&nbsp;public  val com.georgeci.moneysurfer.feature.category.picker.CategoryChooserState.Loading.Companion.`selectedId`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.category.picker.CategoryChooserState.Loading, com.georgeci.moneysurfer.domain.primitives.CategoryId?&gt;  get() = arrow.optics.Lens(</b>
+<b class="nc">&nbsp;  get = { loading: com.georgeci.moneysurfer.feature.category.picker.CategoryChooserState.Loading -&gt; loading.`selectedId` },</b>
+&nbsp;  set = { loading: com.georgeci.moneysurfer.feature.category.picker.CategoryChooserState.Loading, value: com.georgeci.moneysurfer.domain.primitives.CategoryId? -&gt;
+<b class="nc">&nbsp;  loading.copy(`selectedId` = value)</b>
 &nbsp;}
+&nbsp;)
 &nbsp;
-<b class="fc">&nbsp;enum class SurferButtonSize(val height: Int) {</b>
-<b class="fc">&nbsp;    Biggest(52),</b>
-<b class="fc">&nbsp;    Regular(48),</b>
-<b class="fc">&nbsp;    Small(36),</b>
-&nbsp;}
-&nbsp;
-&nbsp;@Composable
-&nbsp;fun SurferButton(
-&nbsp;    text: String,
-&nbsp;    onClick: () -&gt; Unit,
-&nbsp;    modifier: Modifier = Modifier,
-&nbsp;    style: SurferButtonStyle = SurferButtonStyle.Filled,
-&nbsp;    size: SurferButtonSize = SurferButtonSize.Regular,
-&nbsp;    enabled: Boolean = true,
-&nbsp;    startIcon: ImageVector? = null,
-&nbsp;    endIcon: ImageVector? = null,
-&nbsp;) {
-&nbsp;    val sizedModifier = modifier.height(size.height.dp)
-&nbsp;    // Match SurferCard&#39;s corner radius so a button placed alongside a card row reads as
-&nbsp;    // the same family. AppTheme.shapes.large == RoundedCornerShape(16.dp).
-&nbsp;    val shape = AppTheme.shapes.large
-&nbsp;
-&nbsp;    when (style) {
-&nbsp;        SurferButtonStyle.Filled -&gt; Button(
-&nbsp;            onClick = onClick,
-&nbsp;            modifier = sizedModifier,
-&nbsp;            enabled = enabled,
-&nbsp;            shape = shape,
-&nbsp;        ) {
-&nbsp;            SurferButtonContent(
-&nbsp;                text = text,
-&nbsp;                startIcon = startIcon,
-&nbsp;                endIcon = endIcon,
-&nbsp;            )
-&nbsp;        }
-&nbsp;
-&nbsp;        SurferButtonStyle.Tonal -&gt; FilledTonalButton(
-&nbsp;            onClick = onClick,
-&nbsp;            modifier = sizedModifier,
-&nbsp;            enabled = enabled,
-&nbsp;            shape = shape,
-&nbsp;        ) {
-&nbsp;            SurferButtonContent(
-&nbsp;                text = text,
-&nbsp;                startIcon = startIcon,
-&nbsp;                endIcon = endIcon,
-&nbsp;            )
-&nbsp;        }
-&nbsp;
-&nbsp;        SurferButtonStyle.Outlined -&gt; OutlinedButton(
-&nbsp;            onClick = onClick,
-&nbsp;            modifier = sizedModifier,
-&nbsp;            enabled = enabled,
-&nbsp;            shape = shape,
-&nbsp;        ) {
-&nbsp;            SurferButtonContent(
-&nbsp;                text = text,
-&nbsp;                startIcon = startIcon,
-&nbsp;                endIcon = endIcon,
-&nbsp;            )
-&nbsp;        }
-&nbsp;
-&nbsp;        SurferButtonStyle.Text -&gt; TextButton(
-&nbsp;            onClick = onClick,
-&nbsp;            modifier = sizedModifier,
-&nbsp;            enabled = enabled,
-&nbsp;            shape = shape,
-&nbsp;        ) {
-&nbsp;            SurferButtonContent(
-&nbsp;                text = text,
-&nbsp;                startIcon = startIcon,
-&nbsp;                endIcon = endIcon,
-&nbsp;            )
-&nbsp;        }
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;@Composable
-&nbsp;private fun SurferButtonContent(
-&nbsp;    text: String,
-&nbsp;    startIcon: ImageVector?,
-&nbsp;    endIcon: ImageVector?,
-&nbsp;) {
-&nbsp;    Row {
-&nbsp;        if (startIcon != null) {
-&nbsp;            Icon(
-&nbsp;                imageVector = startIcon,
-&nbsp;                // decorative — button text provides the accessible label
-&nbsp;                contentDescription = null,
-&nbsp;            )
-&nbsp;            Spacer(Modifier.width(AppTheme.spacing.small))
-&nbsp;        }
-&nbsp;
-&nbsp;        Text(text)
-&nbsp;
-&nbsp;        if (endIcon != null) {
-&nbsp;            Spacer(Modifier.width(AppTheme.spacing.small))
-&nbsp;            Icon(
-&nbsp;                imageVector = endIcon,
-&nbsp;                // decorative — button text provides the accessible label
-&nbsp;                contentDescription = null,
-&nbsp;            )
-&nbsp;        }
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;// One preview per [SurferButtonStyle] showing both [SurferButtonSize] heights side-by-side
-&nbsp;// plus an icons + disabled row. Compact matrix — pick the variant you need without opening
-&nbsp;// a dozen previews.
-&nbsp;
-&nbsp;@Preview
-&nbsp;@Composable
-&nbsp;private fun SurferButtonFilledPreview() {
-&nbsp;    SurferComponentPreview { ButtonStyleMatrix(SurferButtonStyle.Filled, &quot;Save&quot;) }
-&nbsp;}
-&nbsp;
-&nbsp;@Preview
-&nbsp;@Composable
-&nbsp;private fun SurferButtonTonalPreview() {
-&nbsp;    SurferComponentPreview { ButtonStyleMatrix(SurferButtonStyle.Tonal, &quot;Tonal&quot;) }
-&nbsp;}
-&nbsp;
-&nbsp;@Preview
-&nbsp;@Composable
-&nbsp;private fun SurferButtonOutlinedPreview() {
-&nbsp;    SurferComponentPreview { ButtonStyleMatrix(SurferButtonStyle.Outlined, &quot;Cancel&quot;) }
-&nbsp;}
-&nbsp;
-&nbsp;@Preview
-&nbsp;@Composable
-&nbsp;private fun SurferButtonTextPreview() {
-&nbsp;    SurferComponentPreview { ButtonStyleMatrix(SurferButtonStyle.Text, &quot;Skip&quot;) }
-&nbsp;}
-&nbsp;
-&nbsp;@Composable
-&nbsp;private fun ButtonStyleMatrix(style: SurferButtonStyle, label: String) {
-&nbsp;    Column(
-&nbsp;        modifier = Modifier.padding(16.dp),
-&nbsp;    ) {
-&nbsp;        SurferButtonSize.entries.forEach { size -&gt;
-&nbsp;            SurferButton(
-&nbsp;                text = &quot;$label · ${size.name}&quot;,
-&nbsp;                onClick = {},
-&nbsp;                modifier = Modifier.fillMaxWidth(),
-&nbsp;                style = style,
-&nbsp;                size = size,
-&nbsp;            )
-&nbsp;            Spacer(Modifier.height(8.dp))
-&nbsp;        }
-&nbsp;        SurferButton(
-&nbsp;            text = &quot;With icons&quot;,
-&nbsp;            onClick = {},
-&nbsp;            modifier = Modifier.fillMaxWidth(),
-&nbsp;            style = style,
-&nbsp;            startIcon = SurferIcons.Check,
-&nbsp;            endIcon = SurferIcons.ChevronRight,
-&nbsp;        )
-&nbsp;        Spacer(Modifier.height(8.dp))
-&nbsp;        SurferButton(
-&nbsp;            text = &quot;Disabled&quot;,
-&nbsp;            onClick = {},
-&nbsp;            modifier = Modifier.fillMaxWidth(),
-&nbsp;            style = style,
-&nbsp;            enabled = false,
-&nbsp;        )
-&nbsp;    }
-&nbsp;}
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.category.picker.CategoryChooserState.Loading&gt;.`selectedId`: arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.domain.primitives.CategoryId?&gt;  get() = this + com.georgeci.moneysurfer.feature.category.picker.CategoryChooserState.Loading.`selectedId`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.category.picker.CategoryChooserState.Loading&gt;.`selectedId`: arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.domain.primitives.CategoryId?&gt;  get() = this + com.georgeci.moneysurfer.feature.category.picker.CategoryChooserState.Loading.`selectedId`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.category.picker.CategoryChooserState.Loading&gt;.`selectedId`: arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.domain.primitives.CategoryId?&gt;  get() = this + com.georgeci.moneysurfer.feature.category.picker.CategoryChooserState.Loading.`selectedId`</b>
 </code>
 </pre>
 </div>
@@ -313,7 +201,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 17:13</div>
+    <div style="float:right;">generated on 2026-07-27 15:02</div>
 </div>
 </body>
 </html>

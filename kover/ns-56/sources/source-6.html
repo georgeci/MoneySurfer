@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > StateHolder</title>
+  <title>MoneySurfer Coverage Report > TransactionCreationAmountHeroKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,18 +19,15 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.utils</a>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.transaction.creation</a>
 </div>
 
-<h1>Coverage Summary for Class: StateHolder (com.georgeci.moneysurfer.utils)</h1>
+<h1>Coverage Summary for Class: TransactionCreationAmountHeroKt (com.georgeci.moneysurfer.feature.transaction.creation)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
-<th class="coverageStat 
-">
-  Class, %
-</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -49,42 +46,114 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">StateHolder</td>
+  <td class="name">TransactionCreationAmountHeroKt</td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (1/1)
+    (0/4)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (3/3)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (6/6)
+    (0/36)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (23/23)
+    (0/73)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    1%
+  </span>
+  <span class="absValue">
+    (8/769)
   </span>
 </td>
 </tr>
-
+  <tr>
+    <td class="name">TransactionCreationAmountHeroKt$AmountHero$1$1$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/150)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">TransactionCreationAmountHeroKt$WhenMappings</td>
+    <td class="coverageStat"/>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/44)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/83)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0.9%
+  </span>
+  <span class="absValue">
+    (8/919)
+  </span>
+</td>
+</tr>
 </table>
 
 <br/>
@@ -92,27 +161,162 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.utils
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.transaction.creation
 &nbsp;
-&nbsp;import kotlinx.coroutines.ExperimentalForInheritanceCoroutinesApi
-&nbsp;import kotlinx.coroutines.flow.MutableStateFlow
-&nbsp;import kotlinx.coroutines.flow.StateFlow
-&nbsp;import kotlinx.coroutines.flow.asStateFlow
-&nbsp;import kotlinx.coroutines.flow.update
+&nbsp;import androidx.compose.foundation.background
+&nbsp;import androidx.compose.foundation.layout.Box
+&nbsp;import androidx.compose.foundation.layout.Column
+&nbsp;import androidx.compose.foundation.layout.Row
+&nbsp;import androidx.compose.foundation.layout.Spacer
+&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
+&nbsp;import androidx.compose.foundation.layout.height
+&nbsp;import androidx.compose.foundation.layout.padding
+&nbsp;import androidx.compose.foundation.layout.width
+&nbsp;import androidx.compose.foundation.shape.RoundedCornerShape
+&nbsp;import androidx.compose.foundation.text.BasicTextField
+&nbsp;import androidx.compose.foundation.text.KeyboardOptions
+&nbsp;import androidx.compose.foundation.text.input.TextFieldLineLimits
+&nbsp;import androidx.compose.foundation.text.input.TextFieldState
+&nbsp;import androidx.compose.material3.LocalTextStyle
+&nbsp;import androidx.compose.material3.Text
+&nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.ui.Alignment
+&nbsp;import androidx.compose.ui.Modifier
+&nbsp;import androidx.compose.ui.draw.clip
+&nbsp;import androidx.compose.ui.graphics.SolidColor
+&nbsp;import androidx.compose.ui.graphics.compositeOver
+&nbsp;import androidx.compose.ui.platform.testTag
+&nbsp;import androidx.compose.ui.text.font.FontWeight
+&nbsp;import androidx.compose.ui.text.input.KeyboardType
+&nbsp;import androidx.compose.ui.text.style.TextAlign
+&nbsp;import androidx.compose.ui.unit.dp
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
+&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
+&nbsp;import com.georgeci.moneysurfer.utils.AmountInputTransformation
+&nbsp;import moneysurfer.feature.transaction.generated.resources.Res
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_creation_amount_error_format
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_creation_amount_error_zero
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_creation_amount_placeholder
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_creation_expense
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_creation_income
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_creation_transfer
+&nbsp;import org.jetbrains.compose.resources.StringResource
+&nbsp;import org.jetbrains.compose.resources.stringResource
 &nbsp;
-<b class="fc">&nbsp;@OptIn(ExperimentalForInheritanceCoroutinesApi::class)</b>
-&nbsp;class StateHolder&lt;STATE&gt; private constructor(
-<b class="fc">&nbsp;    private val mutableStateFlow: MutableStateFlow&lt;STATE&gt;,</b>
-<b class="fc">&nbsp;    private val stateFlow: StateFlow&lt;STATE&gt; = mutableStateFlow.asStateFlow(),</b>
-&nbsp;) : StateFlow&lt;STATE&gt; by stateFlow {
-&nbsp;    constructor(
-&nbsp;        initialState: STATE,
-<b class="fc">&nbsp;    ) : this(</b>
-<b class="fc">&nbsp;        MutableStateFlow(initialState),</b>
+&nbsp;/** Opacity of the type pill&#39;s tint wash. See [TypePill] for why it is composited, not blended. */
+&nbsp;private const val TYPE_PILL_WASH_ALPHA = 0.18f
+&nbsp;
+&nbsp;@Composable
+&nbsp;internal fun AmountHero(
+&nbsp;    type: TransactionTypeUi,
+&nbsp;    currencySymbol: String,
+&nbsp;    amountState: TextFieldState,
+&nbsp;    error: TransactionAmountError?,
+<b class="nc">&nbsp;) {</b>
+<b class="nc">&nbsp;    Column(</b>
+<b class="nc">&nbsp;        modifier = Modifier</b>
+<b class="nc">&nbsp;            .fillMaxWidth()</b>
+<b class="nc">&nbsp;            .padding(horizontal = AppTheme.spacing.large),</b>
+<b class="nc">&nbsp;        horizontalAlignment = Alignment.CenterHorizontally,</b>
+&nbsp;    ) {
+<b class="nc">&nbsp;        TypePill(type = type)</b>
+<b class="nc">&nbsp;        Spacer(Modifier.height(AppTheme.spacing.xSmall))</b>
+<b class="nc">&nbsp;        Row(verticalAlignment = Alignment.Bottom) {</b>
+<b class="nc">&nbsp;            Text(</b>
+<b class="nc">&nbsp;                text = currencySymbol,</b>
+<b class="nc">&nbsp;                style = AppTheme.typography.displayMedium,</b>
+<b class="nc">&nbsp;                color = AppTheme.materialColors.onSurfaceVariant,</b>
+&nbsp;            )
+<b class="nc">&nbsp;            Spacer(Modifier.width(4.dp))</b>
+<b class="nc">&nbsp;            val text = amountState.text.toString()</b>
+<b class="nc">&nbsp;            val placeholderText = stringResource(Res.string.transaction_creation_amount_placeholder)</b>
+<b class="nc">&nbsp;            BasicTextField(</b>
+<b class="nc">&nbsp;                state = amountState,</b>
+<b class="nc">&nbsp;                modifier = Modifier.testTag(TransactionCreationTestTags.Amount),</b>
+<b class="nc">&nbsp;                inputTransformation = AmountInputTransformation,</b>
+<b class="nc">&nbsp;                lineLimits = TextFieldLineLimits.SingleLine,</b>
+<b class="nc">&nbsp;                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),</b>
+<b class="nc">&nbsp;                textStyle = LocalTextStyle.current.merge(AppTheme.typography.displayLarge).copy(</b>
+<b class="nc">&nbsp;                    color = AppTheme.materialColors.onSurface,</b>
+<b class="nc">&nbsp;                    textAlign = TextAlign.Start,</b>
+<b class="nc">&nbsp;                    fontWeight = FontWeight.Medium,</b>
+&nbsp;                ),
+<b class="nc">&nbsp;                cursorBrush = SolidColor(AppTheme.materialColors.primary),</b>
+<b class="nc">&nbsp;                decorator = { innerTextField -&gt;</b>
+<b class="nc">&nbsp;                    Box {</b>
+<b class="nc">&nbsp;                        if (text.isEmpty()) {</b>
+<b class="nc">&nbsp;                            Text(</b>
+<b class="nc">&nbsp;                                text = placeholderText,</b>
+<b class="nc">&nbsp;                                style = AppTheme.typography.displayLarge,</b>
+<b class="nc">&nbsp;                                color = AppTheme.materialColors.onSurfaceVariant,</b>
+&nbsp;                            )
+<b class="nc">&nbsp;                        }</b>
+<b class="nc">&nbsp;                        innerTextField()</b>
+<b class="nc">&nbsp;                    }</b>
+<b class="nc">&nbsp;                },</b>
+&nbsp;            )
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        if (error != null) {</b>
+<b class="nc">&nbsp;            Spacer(Modifier.height(AppTheme.spacing.xSmall))</b>
+<b class="nc">&nbsp;            AmountErrorText(error)</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;    }</b>
+<b class="nc">&nbsp;}</b>
+&nbsp;
+&nbsp;@Composable
+&nbsp;internal fun AmountErrorText(
+&nbsp;    error: TransactionAmountError,
+<b class="nc">&nbsp;    modifier: Modifier = Modifier,</b>
+<b class="nc">&nbsp;) {</b>
+<b class="nc">&nbsp;    val messageRes: StringResource = when (error) {</b>
+<b class="nc">&nbsp;        TransactionAmountError.INVALID_FORMAT -&gt; Res.string.transaction_creation_amount_error_format</b>
+<b class="nc">&nbsp;        TransactionAmountError.NOT_POSITIVE -&gt; Res.string.transaction_creation_amount_error_zero</b>
+&nbsp;    }
+<b class="nc">&nbsp;    Text(</b>
+<b class="nc">&nbsp;        text = stringResource(messageRes),</b>
+<b class="nc">&nbsp;        style = AppTheme.typography.bodySmall,</b>
+<b class="nc">&nbsp;        color = AppTheme.materialColors.error,</b>
+<b class="nc">&nbsp;        modifier = modifier,</b>
 &nbsp;    )
+<b class="nc">&nbsp;}</b>
 &nbsp;
-&nbsp;    fun updateState(updater: (STATE) -&gt; STATE) {
-<b class="fc">&nbsp;        mutableStateFlow.update(updater)</b>
+&nbsp;@Composable
+<b class="nc">&nbsp;private fun TypePill(type: TransactionTypeUi) {</b>
+<b class="nc">&nbsp;    val tint = typeTint(type)</b>
+<b class="nc">&nbsp;    val labelRes = when (type) {</b>
+<b class="nc">&nbsp;        TransactionTypeUi.Expense -&gt; Res.string.transaction_creation_expense</b>
+<b class="nc">&nbsp;        TransactionTypeUi.Income -&gt; Res.string.transaction_creation_income</b>
+<b class="nc">&nbsp;        TransactionTypeUi.Transfer -&gt; Res.string.transaction_creation_transfer</b>
+&nbsp;    }
+&nbsp;    // Composited over `surface` rather than left translucent: the label is `tint` on a wash
+&nbsp;    // of the same tint, so the contrast ratio depends entirely on what shows through. Pinning
+&nbsp;    // the wash to the scaffold&#39;s own colour keeps the pair at a known ≥4.5:1 even if the pill
+&nbsp;    // is later moved onto a card.
+<b class="nc">&nbsp;    val wash = tint.copy(alpha = TYPE_PILL_WASH_ALPHA).compositeOver(AppTheme.materialColors.surface)</b>
+<b class="nc">&nbsp;    Row(</b>
+<b class="nc">&nbsp;        modifier = Modifier</b>
+<b class="nc">&nbsp;            .clip(RoundedCornerShape(percent = 50))</b>
+<b class="nc">&nbsp;            .background(wash)</b>
+<b class="nc">&nbsp;            .padding(horizontal = 14.dp, vertical = 4.dp),</b>
+<b class="nc">&nbsp;        verticalAlignment = Alignment.CenterVertically,</b>
+&nbsp;    ) {
+<b class="nc">&nbsp;        Text(</b>
+<b class="nc">&nbsp;            text = stringResource(labelRes).uppercase(),</b>
+<b class="nc">&nbsp;            style = AppTheme.typography.labelMedium,</b>
+<b class="nc">&nbsp;            color = tint,</b>
+&nbsp;        )
+<b class="nc">&nbsp;    }</b>
+<b class="nc">&nbsp;}</b>
+&nbsp;
+&nbsp;internal fun currencySymbol(code: CurrencyCode?): String {
+<b class="nc">&nbsp;    val value = code?.value ?: return &quot;$&quot;</b>
+<b class="nc">&nbsp;    return when (value) {</b>
+<b class="nc">&nbsp;        &quot;EUR&quot; -&gt; &quot;€&quot;</b>
+<b class="nc">&nbsp;        &quot;GBP&quot; -&gt; &quot;£&quot;</b>
+<b class="nc">&nbsp;        &quot;PLN&quot; -&gt; &quot;zł&quot;</b>
+<b class="nc">&nbsp;        &quot;JPY&quot; -&gt; &quot;¥&quot;</b>
+<b class="nc">&nbsp;        &quot;RUB&quot; -&gt; &quot;₽&quot;</b>
+<b class="nc">&nbsp;        else -&gt; &quot;$&quot;</b>
 &nbsp;    }
 &nbsp;}
 </code>
@@ -138,7 +342,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-23 23:54</div>
+    <div style="float:right;">generated on 2026-07-27 15:02</div>
 </div>
 </body>
 </html>

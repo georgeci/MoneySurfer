@@ -1,0 +1,91 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>MoneySurfer Coverage Report > ExchangeRateRemoteSource</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.georgeci.moneysurfer.domain.repositories</a>
+</div>
+
+<h1>Coverage Summary for Class: ExchangeRateRemoteSource (com.georgeci.moneysurfer.domain.repositories)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+</tr>
+<tr>
+  <td class="name">ExchangeRateRemoteSource</td>
+    <td class="coverageStat"/>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.repositories
+&nbsp;
+&nbsp;import com.georgeci.moneysurfer.domain.model.ExchangeRateTable
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
+&nbsp;
+&nbsp;/**
+&nbsp; * The FX provider behind [ExchangeRateRepository]. Implemented over HTTP in `data-remote`; the
+&nbsp; * offline build binds a no-op so the cache is simply never refilled there.
+&nbsp; */
+&nbsp;fun interface ExchangeRateRemoteSource {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Latest published quotes against [base], or `null` when the provider could not be reached
+&nbsp;     * or answered with something unusable. Implementations do not throw — an unreachable
+&nbsp;     * provider is an expected state on a phone, not an error the caller can act on.
+&nbsp;     */
+&nbsp;    suspend fun fetchLatest(base: CurrencyCode): ExchangeRateTable?
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-07-27 15:02</div>
+</div>
+</body>
+</html>
