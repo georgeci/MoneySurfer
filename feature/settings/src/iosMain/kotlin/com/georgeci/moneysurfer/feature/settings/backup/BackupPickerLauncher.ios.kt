@@ -2,7 +2,6 @@ package com.georgeci.moneysurfer.feature.settings.backup
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.uikit.LocalUIViewController
@@ -49,18 +48,20 @@ actual fun rememberBackupPickerLauncher(
     onOpenPicked: (BufferedSource?) -> Unit,
 ): BackupPickerLauncher {
     val host = LocalUIViewController.current
-    // The callbacks are fresh lambdas on every recomposition. Reading them through
-    // a state keeps the launcher — and with it the strongly-held delegate — alive
-    // across a recomposition that happens mid-pick.
-    val currentOnSavePicked by rememberUpdatedState(onSavePicked)
-    val currentOnOpenPicked by rememberUpdatedState(onOpenPicked)
+    // The callbacks are fresh lambdas on every recomposition, but the launcher must
+    // outlive one — recreating it mid-pick would drop the strongly-held delegate.
+    // So it is keyed on the host alone and reads `.value` at call time to reach the
+    // current callback. Explicit `.value` rather than a `by` delegate: these are
+    // read from lambdas that run long after this composition returned.
+    val currentOnSavePicked = rememberUpdatedState(onSavePicked)
+    val currentOnOpenPicked = rememberUpdatedState(onOpenPicked)
 
     val launcher = remember(host, format) {
         IosBackupPickerLauncher(
             host = host,
             format = format,
-            onSavePicked = { currentOnSavePicked(it) },
-            onOpenPicked = { currentOnOpenPicked(it) },
+            onSavePicked = { currentOnSavePicked.value(it) },
+            onOpenPicked = { currentOnOpenPicked.value(it) },
         )
     }
     DisposableEffect(launcher) {
