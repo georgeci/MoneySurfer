@@ -268,32 +268,23 @@
 
     <!-- Backup screen -->
     <string name="settings_backup_title">Backup</string>
-    <string name="settings_backup_hero_title">Last backup · today</string>
-    <string name="settings_backup_hero_supporting">14:02 · 18 MB · 2,341 transactions</string>
+    <string name="settings_backup_hero_title">Manual backup</string>
+    <string name="settings_backup_hero_supporting">Cloud backup isn't available yet. Save an archive somewhere safe, and restore it here when you need it.</string>
     <string name="settings_backup_local_hero_title">Local backup</string>
     <string name="settings_backup_local_hero_supporting">This build stores everything on this device. Save an archive somewhere safe, and restore it here when you need it.</string>
-    <string name="settings_backup_section_schedule">Schedule</string>
-    <string name="settings_backup_schedule_footnote">Backups are end-to-end encrypted with your account key.</string>
-    <string name="settings_backup_frequency_title">Backup frequency</string>
-    <string name="settings_backup_frequency_pill">Daily</string>
-    <string name="settings_backup_encryption_title">Encryption</string>
-    <string name="settings_backup_encryption_supporting">AES-256, end-to-end</string>
-    <string name="settings_backup_location_title">Storage location</string>
-    <string name="settings_backup_location_pill">iCloud</string>
     <string name="settings_backup_section_manual">Manual</string>
-    <string name="settings_backup_back_up_now_title">Back up now</string>
-    <string name="settings_backup_back_up_now_supporting">Force a fresh snapshot</string>
     <string name="settings_backup_download_title">Download a copy</string>
     <string name="settings_backup_download_supporting">.zip archive · optional passphrase</string>
     <string name="settings_backup_section_restore">Restore</string>
     <string name="settings_backup_restore_title">Restore from backup</string>
     <string name="settings_backup_restore_supporting">Replaces current data</string>
-    <string name="settings_backup_delete_title">Delete cloud backup</string>
-    <string name="settings_backup_delete_supporting">Removes all backups from iCloud</string>
     <string name="settings_backup_cancel">Cancel</string>
     <string name="settings_backup_restore_confirm_title">Replace current data?</string>
     <string name="settings_backup_restore_confirm_body">Restoring will replace all transactions, accounts, and settings on this device. The app will restart afterwards.</string>
     <string name="settings_backup_restore_confirm_confirm">Restore</string>
+    <string name="settings_backup_relaunch_title">Restore complete</string>
+    <string name="settings_backup_relaunch_body">Your data has been restored. MoneySurfer has to close to finish — please open it again.</string>
+    <string name="settings_backup_relaunch_confirm">Close MoneySurfer</string>
     <string name="settings_backup_export_success">Backup saved</string>
     <string name="settings_backup_notice_invalid_archive">Selected file is not a valid MoneySurfer backup</string>
     <string name="settings_backup_notice_corrupted">Backup file is corrupted</string>
