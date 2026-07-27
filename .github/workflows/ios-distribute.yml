@@ -10,6 +10,9 @@ name: iOS distribute
 #   ASC_API_KEY_ID                     App Store Connect API key id
 #   ASC_API_ISSUER_ID                  App Store Connect issuer UUID
 #   ASC_API_KEY_BASE64                 base64 AuthKey_<id>.p8
+#   IOS_DISTRIBUTION_CERTIFICATE_BASE64  base64 Apple Distribution .p12
+#   IOS_DISTRIBUTION_CERTIFICATE_PASSWORD  password of that .p12
+#   IOS_PROVISIONING_PROFILE_BASE64    base64 App Store profile
 #
 # Optional:
 #   ASC_TEAM_ID                        Apple team id (release.sh has a default)
@@ -52,6 +55,9 @@ jobs:
           API_KEY_ID: ${{ secrets.ASC_API_KEY_ID }}
           API_ISSUER_ID: ${{ secrets.ASC_API_ISSUER_ID }}
           API_KEY_BASE64: ${{ secrets.ASC_API_KEY_BASE64 }}
+          DISTRIBUTION_CERTIFICATE: ${{ secrets.IOS_DISTRIBUTION_CERTIFICATE_BASE64 }}
+          DISTRIBUTION_CERTIFICATE_PASSWORD: ${{ secrets.IOS_DISTRIBUTION_CERTIFICATE_PASSWORD }}
+          PROVISIONING_PROFILE: ${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}
         shell: bash
         run: |
           set -euo pipefail
@@ -60,6 +66,9 @@ jobs:
           [ -n "$API_KEY_ID" ] || missing+=(ASC_API_KEY_ID)
           [ -n "$API_ISSUER_ID" ] || missing+=(ASC_API_ISSUER_ID)
           [ -n "$API_KEY_BASE64" ] || missing+=(ASC_API_KEY_BASE64)
+          [ -n "$DISTRIBUTION_CERTIFICATE" ] || missing+=(IOS_DISTRIBUTION_CERTIFICATE_BASE64)
+          [ -n "$DISTRIBUTION_CERTIFICATE_PASSWORD" ] || missing+=(IOS_DISTRIBUTION_CERTIFICATE_PASSWORD)
+          [ -n "$PROVISIONING_PROFILE" ] || missing+=(IOS_PROVISIONING_PROFILE_BASE64)
           if [ ${#missing[@]} -eq 0 ]; then
             echo "ready=true" >> "$GITHUB_OUTPUT"
             exit 0
@@ -122,6 +131,75 @@ jobs:
           chmod 600 "$dest"
           echo "path=$dest" >> "$GITHUB_OUTPUT"
 
+      # The API key authenticates App Store Connect and automatic provisioning,
+      # but exportArchive cannot use cloud signing unless that key has a
+      # separate Apple permission. Install explicit distribution assets so the
+      # export works independently of cloud-managed certificates.
+      - name: Install distribution signing assets
+        id: signing
+        if: steps.preflight.outputs.ready == 'true' && steps.check.outputs.skip != 'true'
+        env:
+          CERTIFICATE_BASE64: ${{ secrets.IOS_DISTRIBUTION_CERTIFICATE_BASE64 }}
+          CERTIFICATE_PASSWORD: ${{ secrets.IOS_DISTRIBUTION_CERTIFICATE_PASSWORD }}
+          PROFILE_BASE64: ${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}
+          KEYCHAIN_PASSWORD: ${{ github.run_id }}-${{ github.run_attempt }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          certificate="${RUNNER_TEMP}/ios-distribution.p12"
+          keychain="${RUNNER_TEMP}/ios-signing.keychain-db"
+          profile="${HOME}/Library/MobileDevice/Provisioning Profiles/ci-app-store.mobileprovision"
+          profile_plist="${RUNNER_TEMP}/ios-provisioning-profile.plist"
+
+          printf '%s' "$CERTIFICATE_BASE64" | base64 -d > "$certificate"
+          printf '%s' "$PROFILE_BASE64" | base64 -d > "${RUNNER_TEMP}/ios-profile.mobileprovision"
+          [ -s "$certificate" ] || { echo "::error::Distribution certificate decoded to an empty file."; exit 1; }
+          [ -s "${RUNNER_TEMP}/ios-profile.mobileprovision" ] \
+            || { echo "::error::Provisioning profile decoded to an empty file."; exit 1; }
+
+          security cms -D -i "${RUNNER_TEMP}/ios-profile.mobileprovision" > "$profile_plist"
+          app_identifier=$(plutil -extract Entitlements.application-identifier raw "$profile_plist")
+          profile_name=$(plutil -extract Name raw "$profile_plist")
+          case "$app_identifier" in
+            *.com.georgeci.moneysurfer) ;;
+            *)
+              echo "::error::Provisioning profile is for '$app_identifier', expected com.georgeci.moneysurfer."
+              exit 1
+              ;;
+          esac
+          mkdir -p "$(dirname "$profile")"
+          cp "${RUNNER_TEMP}/ios-profile.mobileprovision" "$profile"
+          chmod 600 "$profile"
+
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$keychain"
+          security set-keychain-settings -lut 21600 "$keychain"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$keychain"
+          existing_keychains=()
+          while IFS= read -r existing; do
+            existing_keychains+=("${existing//\"/}")
+          done < <(security list-keychains -d user)
+          security list-keychains -d user -s "$keychain" "${existing_keychains[@]}"
+          security import "$certificate" \
+            -k "$keychain" \
+            -P "$CERTIFICATE_PASSWORD" \
+            -A \
+            -t cert \
+            -f pkcs12
+          security set-key-partition-list \
+            -S apple-tool:,apple: \
+            -s \
+            -k "$KEYCHAIN_PASSWORD" \
+            "$keychain"
+          security find-identity -v -p codesigning "$keychain" \
+            | grep -E 'Apple Distribution|iPhone Distribution' > /dev/null \
+            || { echo "::error::The .p12 contains no Apple Distribution signing identity."; exit 1; }
+
+          {
+            echo "keychain=$keychain"
+            echo "profile=$profile"
+            echo "profile-name=$profile_name"
+          } >> "$GITHUB_OUTPUT"
+
       - name: Set up JDK
         if: steps.preflight.outputs.ready == 'true' && steps.check.outputs.skip != 'true'
         uses: actions/setup-java@03ad4de0992f5dab5e18fcb136590ce7c4a0ac95 # v5.6.0
@@ -149,6 +227,7 @@ jobs:
           ASC_API_KEY_PATH: ${{ steps.api-key.outputs.path }}
           ASC_TEAM_ID: ${{ secrets.ASC_TEAM_ID }}
           ASC_BUILD_NUMBER: ${{ github.run_number }}
+          IOS_PROVISIONING_PROFILE_NAME: ${{ steps.signing.outputs.profile-name }}
         run: scripts/ios/release.sh main
 
       - name: Locate IPA
@@ -177,11 +256,23 @@ jobs:
         if: always()
         env:
           API_KEY_ID: ${{ secrets.ASC_API_KEY_ID }}
+          SIGNING_KEYCHAIN: ${{ steps.signing.outputs.keychain }}
+          PROVISIONING_PROFILE: ${{ steps.signing.outputs.profile }}
         shell: bash
         run: |
           rm -f "${RUNNER_TEMP}/AuthKey.p8"
+          rm -f \
+            "${RUNNER_TEMP}/ios-distribution.p12" \
+            "${RUNNER_TEMP}/ios-profile.mobileprovision" \
+            "${RUNNER_TEMP}/ios-provisioning-profile.plist"
           if [ -n "$API_KEY_ID" ]; then
             rm -f "${HOME}/.appstoreconnect/private_keys/AuthKey_${API_KEY_ID}.p8"
+          fi
+          if [ -n "$PROVISIONING_PROFILE" ]; then
+            rm -f "$PROVISIONING_PROFILE"
+          fi
+          if [ -n "$SIGNING_KEYCHAIN" ]; then
+            security delete-keychain "$SIGNING_KEYCHAIN" || true
           fi
 
       - name: Upload IPA artifact
