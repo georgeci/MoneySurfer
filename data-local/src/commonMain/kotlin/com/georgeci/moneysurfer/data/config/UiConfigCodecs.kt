@@ -6,6 +6,7 @@ import com.georgeci.moneysurfer.data.preferences.DashboardLayoutCodec
 import com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutConfig
 import com.georgeci.moneysurfer.domain.preferences.AccentSeed
 import com.georgeci.moneysurfer.domain.preferences.PaletteSource
+import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
 
 /**
  * Wire format, unchanged from the previous hand-rolled adapters:
@@ -61,6 +62,27 @@ internal object DashboardLayoutConfigCodec : ConfigCodec<DashboardLayoutConfig> 
     override fun encode(value: DashboardLayoutConfig): String = DashboardLayoutCodec.encode(value)
 
     override fun decode(raw: String): DashboardLayoutConfig? = DashboardLayoutCodec.decodeOrNull(raw)
+
+    override val valueKind: ConfigValueKind = ConfigValueKind.FreeText
+}
+
+/**
+ * Bare ISO-4217 alphabetic code, e.g. `EUR`.
+ *
+ * Free text rather than a choice: the currency catalogue is data, not a compile-time enum, so the
+ * codec cannot list the accepted values. It still validates the *shape* — three letters, upcased —
+ * because a `CurrencyCode` is used unchecked as a formatter key, and reporting garbage as
+ * undecodable lets the layer below win instead of persisting a code nothing can render.
+ */
+internal object CurrencyCodeCodec : ConfigCodec<CurrencyCode> {
+
+    private const val ISO_4217_LENGTH = 3
+
+    override fun encode(value: CurrencyCode): String = value.value
+
+    override fun decode(raw: String): CurrencyCode? = raw.trim()
+        .takeIf { it.length == ISO_4217_LENGTH && it.all(Char::isLetter) }
+        ?.let { CurrencyCode(it.uppercase()) }
 
     override val valueKind: ConfigValueKind = ConfigValueKind.FreeText
 }
