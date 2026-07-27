@@ -9,11 +9,8 @@ import kotlin.native.Platform
 @OptIn(ExperimentalNativeApi::class)
 fun MainViewController() = ComposeUIViewController(
     configure = {
-        DebugErrors.installKermitWriter()
         initKoin(isDebug = Platform.isDebugBinary, extraModules = onlineWiring)
     },
 ) {
-    DebugErrorOverlay {
-        App()
-    }
+    App()
 }

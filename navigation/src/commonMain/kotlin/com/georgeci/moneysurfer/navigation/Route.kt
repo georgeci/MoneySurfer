@@ -211,4 +211,11 @@ sealed interface Route : NavKey {
      */
     @Serializable
     data object SettingsDebugConfig : Route
+
+    /**
+     * The last Warn/Error log lines this process produced, reachable from [SettingsDebugConfig].
+     * Gated by the same debug-layer signal — the buffer behind it is only filled in debug builds.
+     */
+    @Serializable
+    data object SettingsDebugLog : Route
 }

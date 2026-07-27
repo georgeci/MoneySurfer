@@ -6,6 +6,7 @@ import com.georgeci.moneysurfer.domain.config.ConfigDebugRow
 import com.georgeci.moneysurfer.domain.config.ConfigDebugRowKind
 import com.georgeci.moneysurfer.domain.config.DebugConfigInspector
 import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -152,6 +153,24 @@ class DebugConfigViewModelTest : StringSpec({
 
                 awaitItem() shouldBe DebugConfigEffect.NavigateBack
             }
+        }
+    }
+
+    "the logs row navigates without touching the inspector" {
+        runTest {
+            val inspector = RecordingInspector()
+            val viewModel = DebugConfigViewModel(inspector)
+
+            viewModel.sideEffects.effectFlow.test {
+                viewModel.onEvent(DebugConfigEvent.OnLogsClick)
+
+                awaitItem() shouldBe DebugConfigEffect.NavigateToLogs
+            }
+
+            // The log buffer is not configuration: nothing about this row may reach the layers.
+            inspector.overrides.shouldBeEmpty()
+            inspector.cleared.shouldBeEmpty()
+            inspector.resetAllCount shouldBe 0
         }
     }
 })

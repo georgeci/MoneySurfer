@@ -9,6 +9,7 @@ import com.georgeci.moneysurfer.feature.settings.appearance.AppearanceScreen
 import com.georgeci.moneysurfer.feature.settings.backup.BackupScreen
 import com.georgeci.moneysurfer.feature.settings.csv.CsvBackupScreen
 import com.georgeci.moneysurfer.feature.settings.debug.DebugConfigScreen
+import com.georgeci.moneysurfer.feature.settings.debug.DebugLogScreen
 import com.georgeci.moneysurfer.feature.settings.preferences.PreferencesScreen
 import com.georgeci.moneysurfer.feature.settings.sync.SyncScreen
 import com.georgeci.moneysurfer.navigation.FeatureNavGraph
@@ -96,6 +97,15 @@ val settingsNavGraph: FeatureNavGraph = { navigator ->
     entry<Route.SettingsDebugConfig>(
         metadata = ListDetailSceneStrategy.detailPane(),
     ) {
-        DebugConfigScreen(onNavigateBack = { navigator.pop() })
+        DebugConfigScreen(
+            onNavigateBack = { navigator.pop() },
+            onNavigateToLogs = { navigator.push(Route.SettingsDebugLog) },
+        )
+    }
+
+    entry<Route.SettingsDebugLog>(
+        metadata = ListDetailSceneStrategy.detailPane(),
+    ) {
+        DebugLogScreen(onNavigateBack = { navigator.pop() })
     }
 }

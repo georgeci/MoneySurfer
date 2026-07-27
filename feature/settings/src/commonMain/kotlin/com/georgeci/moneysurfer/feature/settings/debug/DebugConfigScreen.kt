@@ -25,6 +25,7 @@ import com.georgeci.moneysurfer.domain.config.ConfigDebugRow
 import com.georgeci.moneysurfer.domain.config.ConfigDebugRowKind
 import com.georgeci.moneysurfer.feature.settings.components.SettingsSubScreenScaffold
 import com.georgeci.moneysurfer.uikit.components.base.SurferFilterChipRow
+import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsChevron
 import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsGroup
 import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsRow
 import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsSwitch
@@ -43,12 +44,15 @@ import moneysurfer.feature.settings.generated.resources.settings_debug_config_se
 import moneysurfer.feature.settings.generated.resources.settings_debug_config_title
 import moneysurfer.feature.settings.generated.resources.settings_debug_config_unavailable
 import moneysurfer.feature.settings.generated.resources.settings_debug_config_winner_format
+import moneysurfer.feature.settings.generated.resources.settings_debug_log_supporting
+import moneysurfer.feature.settings.generated.resources.settings_debug_log_title
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 /** Stable selectors for the QA configuration panel — see docs/testing/testing-strategy.md. */
 object DebugConfigTestTags {
     const val Root = "debugConfig:root"
+    const val LogsRow = "debugConfig:logs"
     const val ResetAllRow = "debugConfig:resetAll"
     const val DegradedBanner = "debugConfig:degradedBanner"
     const val Unavailable = "debugConfig:unavailable"
@@ -59,6 +63,7 @@ object DebugConfigTestTags {
 @Composable
 fun DebugConfigScreen(
     onNavigateBack: () -> Unit,
+    onNavigateToLogs: () -> Unit,
     viewModel: DebugConfigViewModel = koinViewModel(),
 ) {
     val state by viewModel.collectAsStateWithLifecycle()
@@ -79,6 +84,7 @@ fun DebugConfigScreen(
     viewModel.HandleSideEffect { effect ->
         when (effect) {
             DebugConfigEffect.NavigateBack -> onNavigateBack()
+            DebugConfigEffect.NavigateToLogs -> onNavigateToLogs()
             is DebugConfigEffect.NotifyInvalidValue -> pendingInvalid = effect
         }
     }
@@ -140,6 +146,19 @@ fun DebugConfigContent(
             footnote = stringResource(Res.string.settings_debug_config_footnote),
         ) {
             state.rows.forEach { row -> ConfigKeyRow(row = row, onEvent = onEvent) }
+        }
+
+        SurferSettingsGroup {
+            // The other half of the debug panel: what the app logged, for hosts where reading
+            // logcat or the desktop console is not an option.
+            SurferSettingsRow(
+                icon = SurferIcons.ListView,
+                title = stringResource(Res.string.settings_debug_log_title),
+                supportingText = stringResource(Res.string.settings_debug_log_supporting),
+                onClick = { onEvent(DebugConfigEvent.OnLogsClick) },
+                trailing = { SurferSettingsChevron() },
+                modifier = Modifier.testTag(DebugConfigTestTags.LogsRow),
+            )
         }
 
         SurferSettingsGroup {
