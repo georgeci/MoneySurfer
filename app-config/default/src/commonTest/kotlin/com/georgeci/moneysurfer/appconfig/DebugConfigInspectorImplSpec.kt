@@ -2,6 +2,7 @@ package com.georgeci.moneysurfer.appconfig
 
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 
@@ -15,6 +16,7 @@ private class TestKeyGroup : ConfigKeyGroup {
 }
 
 private class Env(
+    scope: CoroutineScope,
     debugActive: Boolean = true,
     keyGroups: List<ConfigKeyGroup> = listOf(TestKeyGroup()),
 ) {
@@ -23,6 +25,7 @@ private class Env(
     val config = LayeredConfig(
         layers = listOf(debug, local, FakeRemoteGlobalConfigSource(), BuildConfigSource { put(FLAG, true) }),
         local = local,
+        scope = scope,
         failFastOnEarlySnapshot = false,
     )
     val inspector = DebugConfigInspectorImpl(
@@ -36,7 +39,7 @@ class DebugConfigInspectorImplSpec : StringSpec({
 
     "rows list every registered key with its winning layer" {
         runTest {
-            val env = Env()
+            val env = Env(backgroundScope)
             env.config.hydrate()
 
             val rows = env.inspector.rows.first()
@@ -50,7 +53,7 @@ class DebugConfigInspectorImplSpec : StringSpec({
 
     "each row carries the value kind derived from its codec" {
         runTest {
-            val env = Env()
+            val env = Env(backgroundScope)
             env.config.hydrate()
 
             val rows = env.inspector.rows.first()
@@ -64,7 +67,7 @@ class DebugConfigInspectorImplSpec : StringSpec({
 
     "an override applies and marks the row as overridden" {
         runTest {
-            val env = Env()
+            val env = Env(backgroundScope)
             env.config.hydrate()
 
             env.inspector.override("panel.flag", "false").isSuccess shouldBe true
@@ -81,7 +84,7 @@ class DebugConfigInspectorImplSpec : StringSpec({
             // A codec whose wire format changed between builds leaves values like this behind. They
             // do not win, so deriving `overridden` from the winning layer left the row with no clear
             // action and "Reset all" — which drops every other override — as the only way out.
-            val env = Env()
+            val env = Env(backgroundScope)
             env.config.hydrate()
             env.debug.override(FLAG, "perhaps")
 
@@ -97,7 +100,7 @@ class DebugConfigInspectorImplSpec : StringSpec({
 
     "host-identity keys are flagged so the panel can say they are not ordinary flags" {
         runTest {
-            val env = Env(keyGroups = listOf(TestKeyGroup(), HostConfigKeyGroup()))
+            val env = Env(backgroundScope, keyGroups = listOf(TestKeyGroup(), HostConfigKeyGroup()))
             env.config.hydrate()
 
             val rows = env.inspector.rows.first()
@@ -109,7 +112,7 @@ class DebugConfigInspectorImplSpec : StringSpec({
 
     "clearing an override falls back to the layer underneath" {
         runTest {
-            val env = Env()
+            val env = Env(backgroundScope)
             env.config.hydrate()
             env.inspector.override("panel.flag", "false")
 
@@ -123,7 +126,7 @@ class DebugConfigInspectorImplSpec : StringSpec({
 
     "an undecodable override is rejected instead of stored" {
         runTest {
-            val env = Env()
+            val env = Env(backgroundScope)
             env.config.hydrate()
 
             env.inspector.override("panel.choice", "Sepia").isFailure shouldBe true
@@ -134,7 +137,7 @@ class DebugConfigInspectorImplSpec : StringSpec({
 
     "an unknown key name is rejected" {
         runTest {
-            val env = Env()
+            val env = Env(backgroundScope)
             env.config.hydrate()
 
             env.inspector.override("panel.nope", "true").isFailure shouldBe true
@@ -143,7 +146,7 @@ class DebugConfigInspectorImplSpec : StringSpec({
 
     "per-layer cells distinguish absent from undecodable" {
         runTest {
-            val env = Env()
+            val env = Env(backgroundScope)
             env.config.hydrate()
             // Written straight to the store, bypassing the inspector's validation — this is the
             // state a value stored by a newer build leaves behind.
@@ -160,6 +163,8 @@ class DebugConfigInspectorImplSpec : StringSpec({
     }
 
     "the panel is unavailable when no real debug layer is bound" {
-        Env(debugActive = false).inspector.isAvailable shouldBe false
+        runTest {
+            Env(backgroundScope, debugActive = false).inspector.isAvailable shouldBe false
+        }
     }
 })

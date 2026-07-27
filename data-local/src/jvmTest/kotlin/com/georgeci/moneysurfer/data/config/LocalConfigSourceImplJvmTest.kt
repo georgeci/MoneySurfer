@@ -11,6 +11,10 @@ import com.georgeci.moneysurfer.data.datastore.createDataStore
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldNotContain
 import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.first
 import java.nio.file.Files
 
@@ -23,26 +27,31 @@ private val KEY: SettingKey<Boolean> = SettingKey.bool("ui.onboarding_completed"
  */
 class LocalConfigSourceImplJvmTest : StringSpec({
 
+    // Stands in for the application scope the graph binds: the mirror keeps one collection of the
+    // store on it for as long as the source lives.
+    val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+    afterSpec { scope.cancel() }
+
     fun newStore(): DataStore<Preferences> {
         val dir = Files.createTempDirectory("ms-config-test")
         return createDataStore { dir.resolve("config.preferences_pb").toString() }
     }
 
-    "peek is absent before hydrate, so a pre-hydration snapshot cannot see this layer" {
-        val store = newStore()
-        val source = LocalConfigSourceImpl(store)
+    "a write is readable through peek the moment it returns" {
+        // `write` does not publish the snapshot itself — it waits for the shared collection to.
+        // This is what keeps the synchronous read path current across that hand-off.
+        val source = LocalConfigSourceImpl(newStore(), scope)
+
         source.write(KEY, true)
 
-        // Deliberately not hydrated.
-        LocalConfigSourceImpl(store).peek(KEY) shouldBe LayerValue.Absent
         source.peek(KEY) shouldBe LayerValue.Present(true)
     }
 
     "a written value round-trips after hydrate" {
         val store = newStore()
-        LocalConfigSourceImpl(store).write(KEY, true)
+        LocalConfigSourceImpl(store, scope).write(KEY, true)
 
-        val reopened = LocalConfigSourceImpl(store)
+        val reopened = LocalConfigSourceImpl(store, scope)
         reopened.hydrate()
 
         reopened.peek(KEY) shouldBe LayerValue.Present(true)
@@ -55,7 +64,7 @@ class LocalConfigSourceImplJvmTest : StringSpec({
         // every existing install — the prefix is what keeps the two apart.
         store.edit { it[booleanPreferencesKey(KEY.name)] = true }
 
-        val source = LocalConfigSourceImpl(store)
+        val source = LocalConfigSourceImpl(store, scope)
         source.hydrate()
 
         source.peek(KEY) shouldBe LayerValue.Absent
@@ -63,7 +72,7 @@ class LocalConfigSourceImplJvmTest : StringSpec({
     }
 
     "changes emits the current state and again after a write" {
-        val source = LocalConfigSourceImpl(newStore())
+        val source = LocalConfigSourceImpl(newStore(), scope)
 
         source.changes.first() shouldBe Unit
         source.write(KEY, true)
@@ -76,7 +85,7 @@ class LocalConfigSourceImplJvmTest : StringSpec({
         // before the first remote pull — and win LWW against the user's real settings, because the
         // local write is newer. Nothing in the read path may touch the store.
         val store = newStore()
-        val source = LocalConfigSourceImpl(store)
+        val source = LocalConfigSourceImpl(store, scope)
 
         source.hydrate()
         source.peek(KEY) shouldBe LayerValue.Absent
@@ -89,7 +98,7 @@ class LocalConfigSourceImplJvmTest : StringSpec({
         // would destroy the evidence the debug panel exists to show.
         val store = newStore()
         store.edit { it[stringPreferencesKey("config.${KEY.name}")] = "maybe" }
-        val source = LocalConfigSourceImpl(store)
+        val source = LocalConfigSourceImpl(store, scope)
         source.hydrate()
 
         source.peek(KEY) shouldBe LayerValue.Undecodable("maybe")
@@ -105,7 +114,7 @@ class LocalConfigSourceImplJvmTest : StringSpec({
         val dir = Files.createTempDirectory("ms-config-corrupt-test")
         val file = dir.resolve("config.preferences_pb")
         Files.write(file, byteArrayOf(0x1, 0x2, 0x3, 0x4, 0x5))
-        val source = LocalConfigSourceImpl(createDataStore { file.toString() })
+        val source = LocalConfigSourceImpl(createDataStore { file.toString() }, scope)
 
         source.hydrate()
 

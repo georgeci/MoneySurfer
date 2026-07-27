@@ -8,6 +8,7 @@ import com.georgeci.moneysurfer.appconfig.LayerValue
 import com.georgeci.moneysurfer.appconfig.LocalConfigSource
 import com.georgeci.moneysurfer.appconfig.SettingKey
 import com.georgeci.moneysurfer.appconfig.layerValueOf
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import org.koin.core.annotation.Single
 
@@ -29,9 +30,12 @@ import org.koin.core.annotation.Single
  * `users/{uid}/config/{keyName}` later) — the prefix belongs to this store, not to the key.
  */
 @Single(binds = [LocalConfigSource::class])
-class LocalConfigSourceImpl(dataStore: DataStore<Preferences>) : LocalConfigSource {
+class LocalConfigSourceImpl(
+    dataStore: DataStore<Preferences>,
+    scope: CoroutineScope,
+) : LocalConfigSource {
 
-    private val mirror = PreferencesMirror(dataStore)
+    private val mirror = PreferencesMirror(dataStore, scope)
 
     override fun <T : Any> peek(key: ConfigKey<T>): LayerValue<T> =
         key.layerValueOf(mirror.raw(key.preferenceName))

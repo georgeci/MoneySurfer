@@ -6,6 +6,7 @@ import com.georgeci.moneysurfer.appconfig.DebugConfigSource
 import com.georgeci.moneysurfer.appconfig.LayeredConfig
 import com.georgeci.moneysurfer.appconfig.LocalConfigSource
 import com.georgeci.moneysurfer.appconfig.RemoteGlobalConfigSource
+import kotlinx.coroutines.CoroutineScope
 import org.koin.core.annotation.ComponentScan
 import org.koin.core.annotation.Module
 import org.koin.core.annotation.Single
@@ -38,9 +39,11 @@ class ConfigModule {
         local: LocalConfigSource,
         remoteGlobal: RemoteGlobalConfigSource,
         build: BuildConfigSource,
+        scope: CoroutineScope,
     ): Config = LayeredConfig(
         layers = listOf(debug, local, remoteGlobal, build),
         local = local,
+        scope = scope,
         failFastOnEarlySnapshot = debug.isActive,
     )
 }

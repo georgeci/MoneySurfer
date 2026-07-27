@@ -21,6 +21,7 @@ import com.georgeci.moneysurfer.domain.primitives.WorkspaceInviteId
 import com.georgeci.moneysurfer.feature.category.picker.CategoryPickerVariant
 import com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationSeed
 import com.georgeci.moneysurfer.navigation.GoalContributionMode
+import kotlinx.coroutines.CoroutineScope
 import org.koin.core.annotation.KoinExperimentalAPI
 import org.koin.dsl.module
 import org.koin.test.verify.verify
@@ -71,6 +72,8 @@ class OfflineKoinModuleVerificationTest {
 }
 
 private val testPlatformModule = module {
+    // Mirrors `applicationScopeModule` — see composeApp's `KoinModuleVerificationTest`.
+    single<CoroutineScope> { error("verify() must not instantiate this") }
     single<MoneySurferDatabase> { error("verify() must not instantiate this") }
     single<BackupStorageLocator> { error("verify() must not instantiate this") }
     single<DataStore<Preferences>> { error("verify() must not instantiate this") }

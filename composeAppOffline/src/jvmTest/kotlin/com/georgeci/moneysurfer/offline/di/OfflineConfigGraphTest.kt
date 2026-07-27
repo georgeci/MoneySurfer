@@ -16,6 +16,7 @@ import com.georgeci.moneysurfer.domain.backup.BackupStorageLocator
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.CoroutineScope
 import org.koin.dsl.koinApplication
 import org.koin.dsl.module
 
@@ -89,6 +90,8 @@ private fun withOfflineGraph(block: (org.koin.core.Koin) -> Unit) {
 }
 
 private val configTestPlatformModule = module {
+    // Mirrors `applicationScopeModule` — see composeApp's `KoinModuleVerificationTest`.
+    single<CoroutineScope> { error("this test must not instantiate the application scope") }
     single<MoneySurferDatabase> { error("this test must not instantiate the database") }
     single<DataStore<Preferences>> { error("this test must not instantiate DataStore") }
     single<DebugConfigSource> { DebugConfigSource.Empty }

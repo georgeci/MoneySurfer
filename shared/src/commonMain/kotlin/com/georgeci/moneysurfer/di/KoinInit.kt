@@ -10,8 +10,9 @@ import org.koin.dsl.KoinAppDeclaration
 import org.koin.plugin.module.dsl.startKoin
 
 // Local-only platform bindings: MoneySurferDatabase + DataStore + AppInfo + the debug-overrides
-// configuration layer. Provided per platform via expect/actual in shared. The `CrashReporter`
-// binding comes from the host's wiring (`onlineWiring` / `offlineWiring`), not from here.
+// configuration layer, plus the process-lifetime `CoroutineScope` from [applicationScopeModule].
+// Provided per platform via expect/actual in shared. The `CrashReporter` binding comes from the
+// host's wiring (`onlineWiring` / `offlineWiring`), not from here.
 expect val sharedPlatformModule: Module
 
 /**

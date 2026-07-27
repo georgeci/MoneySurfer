@@ -6,6 +6,10 @@ import com.georgeci.moneysurfer.data.datastore.createReplaceOnCorruptionDataStor
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.first
 import java.nio.file.Files
 
@@ -16,15 +20,21 @@ import java.nio.file.Files
  */
 class RemoteConfigMirrorImplJvmTest : StringSpec({
 
+    // Stands in for the application scope the graph binds — see `LocalConfigSourceImplJvmTest`.
+    val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+    afterSpec { scope.cancel() }
+
     fun newStore(dir: java.nio.file.Path = Files.createTempDirectory("ms-remote-flags-test")): DataStore<Preferences> =
         createReplaceOnCorruptionDataStore { dir.resolve(REMOTE_FLAGS_FILE_NAME).toString() }
 
-    "raw is null before hydrate, so a pre-hydration snapshot cannot see this layer" {
-        val store = newStore()
-        RemoteConfigMirrorImpl(store).replaceAll(mapOf("sync.remote_enabled" to "false"))
+    "a replaced value is readable through raw the moment replaceAll returns" {
+        // `replaceAll` does not publish the snapshot itself — it waits for the shared collection to,
+        // which is what keeps `RemoteGlobalConfigSource.peek` current right after a refresh.
+        val mirror = RemoteConfigMirrorImpl(newStore(), scope)
 
-        // Deliberately not hydrated.
-        RemoteConfigMirrorImpl(store).raw("sync.remote_enabled").shouldBeNull()
+        mirror.replaceAll(mapOf("sync.remote_enabled" to "false"))
+
+        mirror.raw("sync.remote_enabled") shouldBe "false"
     }
 
     "a mirrored value survives a cold start" {
@@ -33,11 +43,11 @@ class RemoteConfigMirrorImplJvmTest : StringSpec({
         // written file is copied to a fresh location and opened by a store that has never seen the
         // write — a genuine cold start, proving the bytes on disk carry the value.
         val written = Files.createTempDirectory("ms-remote-flags-written")
-        RemoteConfigMirrorImpl(newStore(written)).replaceAll(mapOf("sync.remote_enabled" to "false"))
+        RemoteConfigMirrorImpl(newStore(written), scope).replaceAll(mapOf("sync.remote_enabled" to "false"))
 
         val restarted = Files.createTempDirectory("ms-remote-flags-restarted")
         Files.copy(written.resolve(REMOTE_FLAGS_FILE_NAME), restarted.resolve(REMOTE_FLAGS_FILE_NAME))
-        val reopened = RemoteConfigMirrorImpl(newStore(restarted))
+        val reopened = RemoteConfigMirrorImpl(newStore(restarted), scope)
         reopened.hydrate()
 
         // This is what makes an offline launch resolve the last value the server sent.
@@ -46,7 +56,7 @@ class RemoteConfigMirrorImplJvmTest : StringSpec({
     }
 
     "replaceAll drops keys the new payload omits" {
-        val mirror = RemoteConfigMirrorImpl(newStore())
+        val mirror = RemoteConfigMirrorImpl(newStore(), scope)
         mirror.replaceAll(mapOf("a.flag" to "true", "b.flag" to "true"))
 
         mirror.replaceAll(mapOf("a.flag" to "false"))
@@ -57,7 +67,7 @@ class RemoteConfigMirrorImplJvmTest : StringSpec({
     }
 
     "changes emits the current state and again after a replace" {
-        val mirror = RemoteConfigMirrorImpl(newStore())
+        val mirror = RemoteConfigMirrorImpl(newStore(), scope)
 
         mirror.changes.first() shouldBe Unit
         mirror.replaceAll(mapOf("a.flag" to "true"))
@@ -70,7 +80,7 @@ class RemoteConfigMirrorImplJvmTest : StringSpec({
         // app's settings file, which also holds the session pointers.
         val dir = Files.createTempDirectory("ms-remote-flags-corrupt-test")
         Files.write(dir.resolve(REMOTE_FLAGS_FILE_NAME), byteArrayOf(0x1, 0x2, 0x3, 0x4, 0x5))
-        val mirror = RemoteConfigMirrorImpl(newStore(dir))
+        val mirror = RemoteConfigMirrorImpl(newStore(dir), scope)
 
         mirror.hydrate()
 

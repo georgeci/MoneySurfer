@@ -2,10 +2,13 @@ package com.georgeci.moneysurfer.appconfig
 
 import co.touchlab.kermit.Logger
 import com.georgeci.moneysurfer.domain.preferences.Pref
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlin.concurrent.Volatile
@@ -16,12 +19,14 @@ import kotlin.concurrent.Volatile
  * Order is passed in, never collected via `getAll()`: precedence is a correctness property and
  * must not depend on Koin module load order.
  *
+ * @param scope process-lifetime scope the shared [changes] collection runs on.
  * @param failFastOnEarlySnapshot debug builds throw when [snapshot] runs before [hydrate], so an
  *   ordering mistake surfaces in development instead of shipping as a silently Build-only read.
  */
 class LayeredConfig(
     private val layers: List<ConfigSource>,
     private val local: LocalConfigSource,
+    scope: CoroutineScope,
     private val failFastOnEarlySnapshot: Boolean,
 ) : Config {
 
@@ -79,14 +84,28 @@ class LayeredConfig(
         layer
     }
 
-    override val changes: Flow<Unit> = combine(layers.map { it.changes }) { }
+    /**
+     * One combine over the layers for the whole process, not one per collector.
+     *
+     * The Settings screen alone puts roughly ten collectors on this flow — `observeSyncEnabled`,
+     * `observePendingCount`, the palette source, the theme observer, the dashboard layout. Unshared,
+     * each of them re-subscribed all four layers; the two DataStore-backed ones would open a fresh
+     * `dataStore.data` collection every time. `Eagerly` because the layers below are already hot for
+     * the lifetime of the graph, and `replay = 1` so a collector arriving later still resolves the
+     * current value before waiting for a change.
+     */
+    override val changes: Flow<Unit> =
+        combine(layers.map { it.changes }) { }.shareIn(scope, SharingStarted.Eagerly, replay = 1)
 
     override fun <T : Any> observe(key: ConfigKey<T>): Flow<T> =
         changes.map { resolve(key).value }.distinctUntilChanged()
 
     override fun <T : Any> snapshot(key: ConfigKey<T>): T {
         if (!hydrated) {
-            val message = "Config.snapshot(${key.name}) before hydrate() — only Build and defaults resolve"
+            // "May", not "will": the store-backed layers warm themselves from their own shared
+            // collection, so which of them a read this early sees is a race — the reason it is a
+            // bug regardless of what any single run happens to return.
+            val message = "Config.snapshot(${key.name}) before hydrate() — may resolve Build and defaults only"
             if (failFastOnEarlySnapshot) error(message)
             log.w { message }
         }
