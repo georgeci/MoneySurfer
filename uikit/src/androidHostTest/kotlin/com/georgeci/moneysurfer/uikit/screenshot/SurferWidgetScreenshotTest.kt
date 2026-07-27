@@ -86,7 +86,7 @@ class SurferWidgetScreenshotTest {
                 ),
                 addCta = SurferAddAccountCta(label = "Add account", onClick = {}),
                 modifier = Modifier.fillMaxWidth(),
-                size = SurferWidgetSize.Hero,
+                size = SurferWidgetSize.Expanded,
             )
         }
     }
@@ -136,7 +136,7 @@ class SurferWidgetScreenshotTest {
                 secondaryIcon = SurferIcons.SwapHoriz,
                 onSecondaryClick = {},
                 modifier = Modifier.fillMaxWidth(),
-                size = SurferWidgetSize.Hero,
+                size = SurferWidgetSize.Expanded,
             )
         }
     }

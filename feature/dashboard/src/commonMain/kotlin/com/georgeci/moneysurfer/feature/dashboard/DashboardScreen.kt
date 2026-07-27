@@ -252,7 +252,7 @@ private fun DashboardContent(
 }
 
 private fun DashboardWidgetSize.toWidgetSize(): SurferWidgetSize = when (this) {
-    DashboardWidgetSize.Expanded -> SurferWidgetSize.Hero
+    DashboardWidgetSize.Expanded -> SurferWidgetSize.Expanded
     DashboardWidgetSize.Compact -> SurferWidgetSize.Compact
 }
 
@@ -297,7 +297,7 @@ private fun AccountsWidget(
     state: DashboardState.Content,
     onEvent: (DashboardEvent) -> Unit,
 ) {
-    val hero = LocalSurferWidgetSize.current == SurferWidgetSize.Hero
+    val hero = LocalSurferWidgetSize.current == SurferWidgetSize.Expanded
     Column(modifier = Modifier.testTag(DashboardTestTags.Accounts)) {
         SectionHeader(
             title = stringResource(Res.string.dashboard_accounts_section_title),

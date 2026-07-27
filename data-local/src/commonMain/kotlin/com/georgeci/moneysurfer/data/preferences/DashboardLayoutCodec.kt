@@ -77,7 +77,7 @@ internal object DashboardLayoutCodec {
         val fields = stored.split(FIELD_SEPARATOR, limit = MIN_FIELDS + 1)
         if (fields.size < MIN_FIELDS) return null
         val type = DashboardWidgetType.entries.firstOrNull { it.name == fields[0] } ?: return null
-        val size = DashboardWidgetSize.entries.firstOrNull { it.name == fields[2] } ?: DashboardWidgetSize.Hero
+        val size = DashboardWidgetSize.entries.firstOrNull { it.name == fields[2] } ?: DashboardWidgetSize.Expanded
         return DashboardLayoutItem(
             type = type,
             enabled = fields[1] != DISABLED,
