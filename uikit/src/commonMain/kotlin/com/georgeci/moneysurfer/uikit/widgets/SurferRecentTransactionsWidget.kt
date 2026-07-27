@@ -67,7 +67,7 @@ fun SurferRecentTransactionsWidget(
     seeAllTestTag: String? = null,
     emptyTestTag: String? = null,
 ) {
-    val hero = size == SurferWidgetSize.Hero
+    val hero = size == SurferWidgetSize.Expanded
     val visibleItems = if (hero) items else items.take(COMPACT_ROWS)
     val incomeColor = AppTheme.semanticColors.income
 

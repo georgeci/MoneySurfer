@@ -43,7 +43,7 @@ fun SurferCategoriesDonutWidget(
     emptyCenterText: String? = null,
     emptyLegendText: String? = null,
 ) {
-    val hero = size == SurferWidgetSize.Hero
+    val hero = size == SurferWidgetSize.Expanded
     val donutSize = if (hero) 140.dp else 84.dp
     val legendItems = if (hero) 5 else 3
     val isEmpty = segments.isEmpty()

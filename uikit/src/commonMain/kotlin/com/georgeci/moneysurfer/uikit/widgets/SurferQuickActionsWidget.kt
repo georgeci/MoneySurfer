@@ -31,7 +31,7 @@ fun SurferQuickActionsWidget(
     modifier: Modifier = Modifier,
     size: SurferWidgetSize = LocalSurferWidgetSize.current,
 ) {
-    val hero = size == SurferWidgetSize.Hero
+    val hero = size == SurferWidgetSize.Expanded
     val buttonSize = if (hero) SurferButtonSize.Biggest else SurferButtonSize.Regular
     val gap = if (hero) 10.dp else 8.dp
 

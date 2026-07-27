@@ -18,7 +18,7 @@
     <string name="dashboard_customize_style_size">Размер</string>
     <string name="dashboard_customize_style_variant">Стиль</string>
     <string name="dashboard_customize_style_summary">%1$s · %2$s</string>
-    <string name="dashboard_customize_size_hero">Крупный</string>
+    <string name="dashboard_customize_size_expanded">Крупный</string>
     <string name="dashboard_customize_size_compact">Компактный</string>
     <string name="dashboard_customize_variant_balance_classic">Классический</string>
     <string name="dashboard_customize_variant_balance_stacked">Стопкой</string>

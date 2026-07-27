@@ -53,7 +53,7 @@ fun SurferGoalsWidget(
     emptySubtitle: String? = null,
     seeAllTestTag: String? = null,
 ) {
-    val hero = size == SurferWidgetSize.Hero
+    val hero = size == SurferWidgetSize.Expanded
     val visibleItems = if (hero) items.take(2) else items.take(1)
 
     SurferWidgetCard(

@@ -5,7 +5,7 @@ package com.georgeci.moneysurfer.domain.dashboard
  * declared in the domain so a layout can be persisted without leaking UI types into `data`.
  */
 enum class DashboardWidgetSize {
-    Hero,
+    Expanded,
     Compact,
 }
 
@@ -16,11 +16,11 @@ enum class DashboardWidgetSize {
  * touching this type or the persistence format.
  */
 data class DashboardCardStyle(
-    val size: DashboardWidgetSize = DashboardWidgetSize.Hero,
+    val size: DashboardWidgetSize = DashboardWidgetSize.Expanded,
     val variant: String? = null,
 ) {
     companion object {
-        val HERO = DashboardCardStyle(DashboardWidgetSize.Hero)
+        val EXPANDED = DashboardCardStyle(DashboardWidgetSize.Expanded)
         val COMPACT = DashboardCardStyle(DashboardWidgetSize.Compact)
     }
 }

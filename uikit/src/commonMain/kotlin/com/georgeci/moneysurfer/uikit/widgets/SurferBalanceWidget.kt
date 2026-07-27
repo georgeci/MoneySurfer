@@ -90,7 +90,7 @@ fun SurferBalanceWidget(
     variant: SurferBalanceVariant = SurferBalanceVariant.Classic,
     footnote: SurferBalanceFootnote? = null,
 ) {
-    val hero = size == SurferWidgetSize.Hero
+    val hero = size == SurferWidgetSize.Expanded
     val isEmpty = footnote is SurferBalanceFootnote.Empty
     val elevated = AppTheme.containerStyle == SurferContainerStyle.Card
 

@@ -30,7 +30,7 @@ class DashboardLayoutCodecTest : StringSpec({
     "a variant carrying the separators round-trips instead of splitting the layout" {
         val config = DashboardLayoutConfig(
             items = DashboardLayoutConfig.DEFAULT.items.map {
-                it.copy(cardStyle = DashboardCardStyle(DashboardWidgetSize.Hero, variant = "a|b:c%d"))
+                it.copy(cardStyle = DashboardCardStyle(DashboardWidgetSize.Expanded, variant = "a|b:c%d"))
             },
         )
 
@@ -41,7 +41,7 @@ class DashboardLayoutCodecTest : StringSpec({
     }
 
     "a trailing empty variant field reads as no variant at all" {
-        val decoded = DashboardLayoutCodec.decode("Goals:1:Hero:")
+        val decoded = DashboardLayoutCodec.decode("Goals:1:Expanded:")
 
         decoded.items.first().cardStyle.variant shouldBe null
     }
@@ -51,7 +51,7 @@ class DashboardLayoutCodecTest : StringSpec({
     }
 
     "a widget this build does not know is skipped, and the known ones are kept" {
-        val decoded = DashboardLayoutCodec.decode("Goals:1:Hero|Cryptocurrency:1:Hero")
+        val decoded = DashboardLayoutCodec.decode("Goals:1:Expanded|Cryptocurrency:1:Expanded")
 
         decoded.enabledItems.first().type shouldBe DashboardWidgetType.Goals
         decoded.items.map { it.type } shouldContainExactly listOf(
@@ -71,7 +71,7 @@ class DashboardLayoutCodecTest : StringSpec({
 
         decoded.items.first() shouldBe DashboardLayoutItem(
             DashboardWidgetType.Goals,
-            cardStyle = DashboardCardStyle.HERO,
+            cardStyle = DashboardCardStyle.EXPANDED,
         )
     }
 })

@@ -200,7 +200,7 @@ class DashboardLayoutConfigTest : StringSpec({
     "restyling to the style a widget already has, or a widget the layout lacks, changes nothing" {
         val config = DashboardLayoutConfig(items = listOf(DashboardLayoutItem(DashboardWidgetType.Balance)))
 
-        config.withCardStyle(DashboardWidgetType.Balance, DashboardCardStyle.HERO) shouldBe config
+        config.withCardStyle(DashboardWidgetType.Balance, DashboardCardStyle.EXPANDED) shouldBe config
         config.withCardStyle(DashboardWidgetType.Goals, DashboardCardStyle.COMPACT) shouldBe config
     }
 

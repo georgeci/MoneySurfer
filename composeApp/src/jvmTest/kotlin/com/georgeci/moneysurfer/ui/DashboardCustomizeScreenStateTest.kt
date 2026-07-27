@@ -172,7 +172,7 @@ class DashboardCustomizeScreenStateTest : StringSpec({
             }
 
             onNodeWithTag(DashboardCustomizeTestTags.styleSheet(BALANCE)).assertIsDisplayed()
-            onNodeWithTag(styleOption(DashboardWidgetSize.Hero.name)).assertIsDisplayed()
+            onNodeWithTag(styleOption(DashboardWidgetSize.Expanded.name)).assertIsDisplayed()
             onNodeWithTag(styleOption(DashboardWidgetSize.Compact.name)).assertIsDisplayed()
             onNodeWithTag(styleOption(SurferBalanceVariant.Minimal.name)).assertExists()
         }

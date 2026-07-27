@@ -64,7 +64,7 @@ internal fun DashboardWidgetPreview(
     modifier: Modifier = Modifier,
 ) {
     val widgetSize = when (cardStyle.size) {
-        DashboardWidgetSize.Hero -> SurferWidgetSize.Hero
+        DashboardWidgetSize.Expanded -> SurferWidgetSize.Expanded
         DashboardWidgetSize.Compact -> SurferWidgetSize.Compact
     }
     CompositionLocalProvider(LocalSurferWidgetSize provides widgetSize) {

@@ -7,7 +7,7 @@ import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetType
 import com.georgeci.moneysurfer.uikit.widgets.SurferBalanceVariant
 import moneysurfer.feature.dashboard.generated.resources.Res
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_size_compact
-import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_size_hero
+import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_size_expanded
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_style_summary
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_variant_balance_classic
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_variant_balance_inline
@@ -71,12 +71,12 @@ internal fun DashboardWidgetType.selectedVariant(cardStyle: DashboardCardStyle):
 }
 
 internal fun DashboardWidgetSize.labelResource(): StringResource = when (this) {
-    DashboardWidgetSize.Hero -> Res.string.dashboard_customize_size_hero
+    DashboardWidgetSize.Expanded -> Res.string.dashboard_customize_size_expanded
     DashboardWidgetSize.Compact -> Res.string.dashboard_customize_size_compact
 }
 
 /**
- * What the customize row says under a widget's name — "Hero", or "Hero · Classic" once the widget
+ * What the customize row says under a widget's name — "Full", or "Full · Classic" once the widget
  * has variants to distinguish.
  */
 @Composable
