@@ -12,6 +12,7 @@ import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.runTest
 import kotlin.time.Instant
 
@@ -19,8 +20,11 @@ private class FakePendingMutationDao : PendingMutationDao {
     val rows: MutableMap<String, PendingMutationEntity> = LinkedHashMap()
     val countFlow = MutableStateFlow(0)
 
+    val allFlow = MutableStateFlow<List<PendingMutationEntity>>(emptyList())
+
     fun recompute() {
         countFlow.value = rows.values.count { it.status != PendingMutationEntity.STATUS_IN_FLIGHT }
+        allFlow.value = rows.values.sortedBy { it.createdAt }
     }
 
     override suspend fun insert(entity: PendingMutationEntity) {
@@ -59,6 +63,8 @@ private class FakePendingMutationDao : PendingMutationDao {
     }
 
     override fun pendingCount(): Flow<Int> = countFlow
+
+    override fun observeAll(limit: Int): Flow<List<PendingMutationEntity>> = allFlow.map { it.take(limit) }
 
     override suspend fun deleteAll() {
         rows.clear()
@@ -209,6 +215,30 @@ class PendingMutationQueueImplSpec : StringSpec({
                 queue.pending(scope, limit = 10).map { it.id }.toSet() shouldBe
                     setOf("ws1", "ws2", "root")
             }
+        }
+    }
+
+    "observeOutbox keeps in-flight rows, oldest first — a stuck push must not read as an empty outbox" {
+        runTest {
+            val dao = FakePendingMutationDao()
+            val queue = PendingMutationQueueImpl(dao)
+            queue.enqueue(mutation("second", 2L))
+            queue.enqueue(mutation("first", 1L))
+            queue.markInFlight(listOf("first"))
+
+            queue.pendingCount.first() shouldBe 1
+            queue.observeOutbox().first().map { it.id } shouldContainExactly listOf("first", "second")
+        }
+    }
+
+    "observeOutbox honours its row limit" {
+        runTest {
+            val dao = FakePendingMutationDao()
+            val queue = PendingMutationQueueImpl(dao)
+            queue.enqueue(mutation("a", 1L))
+            queue.enqueue(mutation("b", 2L))
+
+            queue.observeOutbox(limit = 1).first().map { it.id } shouldContainExactly listOf("a")
         }
     }
 

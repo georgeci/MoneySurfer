@@ -152,6 +152,7 @@ private object StubPendingMutationQueue : PendingMutationQueue {
     override suspend fun markCompleted(ids: List<String>) = error("unused")
     override suspend fun markFailed(id: String, error: String) = error("unused")
     override val pendingCount: Flow<Int> = flowOf(0)
+    override fun observeOutbox(limit: Int): Flow<List<PendingMutation>> = flowOf(emptyList())
 }
 
 private object StubUserRepository : UserRepository {

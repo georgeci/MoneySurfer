@@ -44,7 +44,7 @@
     <string name="categories_manage_remove">Delete</string>
     <string name="categories_manage_edit">Edit</string>
     <string name="categories_manage_delete_title">Delete category?</string>
-    <string name="categories_manage_delete_message">"%1$s" will be removed. Transactions using it won\'t be deleted.</string>
+    <string name="categories_manage_delete_message">"%1$s" will be removed. Transactions using it won't be deleted.</string>
     <string name="categories_manage_delete_children">Its %1$d subcategories will move to the top level.</string>
     <string name="categories_manage_delete_confirm">Delete</string>
     <string name="categories_manage_delete_cancel">Cancel</string>

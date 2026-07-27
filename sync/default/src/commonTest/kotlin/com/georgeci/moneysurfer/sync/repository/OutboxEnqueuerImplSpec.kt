@@ -13,6 +13,7 @@ import io.kotest.matchers.string.shouldContain
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 
 private class FakeQueue : PendingMutationQueue {
@@ -23,6 +24,7 @@ private class FakeQueue : PendingMutationQueue {
     override suspend fun markCompleted(ids: List<String>) = Unit
     override suspend fun markFailed(id: String, error: String) = Unit
     override val pendingCount: Flow<Int> = MutableStateFlow(0)
+    override fun observeOutbox(limit: Int): Flow<List<PendingMutation>> = flowOf(emptyList())
 }
 
 private class FakeSessionPointers(uid: String?) : SessionPointers {

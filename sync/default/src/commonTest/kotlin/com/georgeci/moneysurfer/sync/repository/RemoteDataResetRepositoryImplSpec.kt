@@ -18,6 +18,7 @@ private class RecordingPendingDao(private val log: MutableList<String>) : Pendin
     override suspend fun deleteByIds(ids: List<String>) = Unit
     override suspend fun markFailed(id: String, error: String) = Unit
     override fun pendingCount(): Flow<Int> = MutableStateFlow(0)
+    override fun observeAll(limit: Int): Flow<List<PendingMutationEntity>> = MutableStateFlow(emptyList())
     override suspend fun deleteAll() { log += "pending.deleteAll" }
 }
 

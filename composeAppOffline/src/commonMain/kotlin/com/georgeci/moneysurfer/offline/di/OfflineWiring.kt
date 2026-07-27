@@ -26,11 +26,13 @@ import com.georgeci.moneysurfer.offline.noop.NoOpOutboxEnqueuer
 import com.georgeci.moneysurfer.offline.noop.NoOpPendingMutationQueue
 import com.georgeci.moneysurfer.offline.noop.NoOpRemoteDataResetRepository
 import com.georgeci.moneysurfer.offline.noop.NoOpSessionShutdownGate
+import com.georgeci.moneysurfer.offline.noop.NoOpSyncMetaRepository
 import com.georgeci.moneysurfer.offline.noop.NoOpUserAccountDeletionRepository
 import com.georgeci.moneysurfer.offline.noop.NoOpUserRemoteRepository
 import com.georgeci.moneysurfer.offline.noop.NoOpWorkspaceSyncer
 import com.georgeci.moneysurfer.sync.repository.OutboxEnqueuer
 import com.georgeci.moneysurfer.sync.repository.PendingMutationQueue
+import com.georgeci.moneysurfer.sync.repository.SyncMetaRepository
 import org.koin.core.module.Module
 import org.koin.dsl.module
 
@@ -46,6 +48,7 @@ private val offlineNoOpModule: Module = module {
     single<UserAccountDeletionRepository> { NoOpUserAccountDeletionRepository() }
     single<SessionShutdownGate> { NoOpSessionShutdownGate() }
     single<PendingMutationQueue> { NoOpPendingMutationQueue() }
+    single<SyncMetaRepository> { NoOpSyncMetaRepository() }
     single<ExchangeRateRemoteSource> { NoOpExchangeRateRemoteSource() }
 }
 

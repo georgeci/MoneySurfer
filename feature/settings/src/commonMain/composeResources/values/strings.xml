@@ -72,24 +72,11 @@
 
     <string name="settings_sync">Sync with Firestore</string>
     <string name="settings_sync_idle">Push local data, then pull remote changes</string>
-    <string name="settings_sync_in_progress">Syncing…</string>
     <string name="settings_sync_in_progress_with_step">Syncing… %1$s</string>
     <string name="settings_sync_no_workspace">No active workspace</string>
     <string name="settings_sync_done">Pushed %1$d, pulled %2$d</string>
     <string name="settings_sync_failed">Sync failed: %1$s</string>
 
-    <string name="settings_sync_step_push_workspace">pushing workspace</string>
-    <string name="settings_sync_step_push_members">pushing members</string>
-    <string name="settings_sync_step_push_invites">pushing invites</string>
-    <string name="settings_sync_step_push_accounts">pushing accounts</string>
-    <string name="settings_sync_step_push_categories">pushing categories</string>
-    <string name="settings_sync_step_push_transactions">pushing transactions</string>
-    <string name="settings_sync_step_pull_workspace">pulling workspace</string>
-    <string name="settings_sync_step_pull_members">pulling members</string>
-    <string name="settings_sync_step_pull_invites">pulling invites</string>
-    <string name="settings_sync_step_pull_accounts">pulling accounts</string>
-    <string name="settings_sync_step_pull_categories">pulling categories</string>
-    <string name="settings_sync_step_pull_transactions">pulling transactions</string>
     <string name="settings_sync_step_clear_accounts">clearing accounts</string>
     <string name="settings_sync_step_clear_categories">clearing categories</string>
     <string name="settings_sync_step_clear_transactions">clearing transactions</string>
@@ -175,7 +162,6 @@
     <!-- Sync screen -->
     <string name="settings_sync_title">Sync</string>
     <string name="settings_sync_hero_idle_title">Up to date</string>
-    <string name="settings_sync_hero_idle_supporting">Last sync: today, 14:02</string>
     <string name="settings_sync_hero_progress_title">Syncing…</string>
     <string name="settings_sync_section_account">Cloud account</string>
     <string name="settings_sync_cloud_account_title">iCloud</string>
@@ -189,6 +175,85 @@
     <string name="settings_sync_background_title">Sync in background</string>
     <string name="settings_sync_background_supporting">Push when app is closed</string>
     <string name="settings_sync_action_force">Force sync now</string>
+    <!-- Sync screen · live coordinator state -->
+    <string name="settings_sync_section_live">Live state</string>
+    <string name="settings_sync_live_idle_title">Idle</string>
+    <string name="settings_sync_live_idle_supporting">No sync running</string>
+    <string name="settings_sync_live_queued_title">Queued</string>
+    <string name="settings_sync_live_queued_supporting">Requests waiting: %1$d</string>
+    <string name="settings_sync_live_running_title">Running</string>
+    <string name="settings_sync_live_request">request: %1$s</string>
+    <string name="settings_sync_live_reasons">reasons: %1$s</string>
+    <string name="settings_sync_live_scope">scope: %1$s</string>
+    <string name="settings_sync_live_step">step: %1$s</string>
+    <string name="settings_sync_workspace_scope">Workspace: %1$s</string>
+
+    <!-- Sync screen · coordinator steps -->
+    <string name="settings_sync_step_waiting_network">waiting for network</string>
+    <string name="settings_sync_step_started">started</string>
+    <string name="settings_sync_step_uploading">uploading changes</string>
+    <string name="settings_sync_step_uploading_entity">uploading %1$s %2$d/%3$d</string>
+    <string name="settings_sync_step_pulling">downloading changes</string>
+    <string name="settings_sync_step_pulling_collection">downloading %1$s</string>
+    <string name="settings_sync_step_recalculating">recalculating balances</string>
+    <string name="settings_sync_step_completed">completed</string>
+    <string name="settings_sync_step_cancelled">cancelled</string>
+    <string name="settings_sync_step_failed">failed</string>
+
+    <!-- Sync screen · last outcome -->
+    <string name="settings_sync_section_last">Last result</string>
+    <string name="settings_sync_last_none_title">No sync yet</string>
+    <string name="settings_sync_last_none_supporting">No sync has finished in this session</string>
+    <string name="settings_sync_last_success_title">Succeeded</string>
+    <string name="settings_sync_last_failed_title">Failed</string>
+    <string name="settings_sync_last_cancelled_title">Cancelled</string>
+    <string name="settings_sync_last_counts">uploaded %1$d · downloaded %2$d · conflicts %3$d · recalculated %4$d</string>
+    <string name="settings_sync_last_at">at %1$s</string>
+
+    <!-- Sync screen · errors -->
+    <string name="settings_sync_error_cancelled">Cancelled</string>
+    <string name="settings_sync_error_network">No internet connection</string>
+    <string name="settings_sync_error_auth">Please sign in again</string>
+    <string name="settings_sync_error_permission">You don't have access to this workspace</string>
+    <string name="settings_sync_error_storage">Local storage error</string>
+    <string name="settings_sync_error_unknown">Sync failed</string>
+
+    <!-- Sync screen · outbox -->
+    <string name="settings_sync_section_outbox">Outbox · %1$d</string>
+    <string name="settings_sync_section_outbox_unknown">Outbox</string>
+    <string name="settings_sync_outbox_unknown_title">Not read</string>
+    <string name="settings_sync_outbox_unknown_supporting">Sync is off, so the queue is left alone — changes may still be waiting in it.</string>
+    <string name="settings_sync_outbox_footnote">Rows are pushed oldest first. One that keeps failing stays here with its attempt count.</string>
+    <string name="settings_sync_outbox_empty_title">Nothing queued</string>
+    <string name="settings_sync_outbox_empty_supporting">Every local change has been pushed</string>
+    <string name="settings_sync_outbox_row_title">%1$s %2$s</string>
+    <string name="settings_sync_outbox_scope">scope: %1$s</string>
+    <string name="settings_sync_outbox_scope_root">root collection</string>
+    <string name="settings_sync_outbox_attempts">attempts: %1$d</string>
+    <string name="settings_sync_outbox_error">last error: %1$s</string>
+    <string name="settings_sync_outbox_truncated">Showing the first %1$d rows.</string>
+
+    <!-- Sync screen · pull cursors -->
+    <string name="settings_sync_section_cursors">Pull cursors</string>
+    <string name="settings_sync_cursors_footnote">Each pull asks the server for rows newer than lastPulledAt. A cursor ahead of the remote change is why a pull returns nothing.</string>
+    <string name="settings_sync_cursors_empty_title">No cursors yet</string>
+    <string name="settings_sync_cursors_empty_supporting">Nothing has been pulled for this workspace</string>
+    <string name="settings_sync_cursor_pulled">lastPulledAt: %1$s</string>
+    <string name="settings_sync_cursor_success">success: %1$s</string>
+    <string name="settings_sync_cursor_attempt">attempt: %1$s</string>
+    <string name="settings_sync_value_never">never</string>
+
+    <!-- Sync screen · actions -->
+    <string name="settings_sync_section_actions">Actions</string>
+    <string name="settings_sync_action_force_supporting">Push the outbox, then pull every collection</string>
+    <string name="settings_sync_action_reset_cursors">Reset cursors &amp; re-pull</string>
+    <string name="settings_sync_action_reset_cursors_supporting">Clears lastPulledAt for this workspace, then starts a full sync</string>
+    <string name="settings_sync_actions_disabled_footnote">Sync is switched off, so these actions do nothing.</string>
+    <string name="settings_sync_reset_cursors_confirm_title">Reset pull cursors?</string>
+    <string name="settings_sync_reset_cursors_confirm_message">The next sync re-reads every collection of this workspace from the server.</string>
+    <string name="settings_sync_reset_cursors_confirm_detail">Local data is not deleted — remote rows are merged in by last-write-wins.</string>
+    <string name="settings_sync_reset_cursors_confirm_confirm">Reset &amp; sync</string>
+    <string name="settings_sync_reset_cursors_confirm_cancel">Cancel</string>
 
     <!-- Backup screen -->
     <string name="settings_backup_title">Backup</string>
@@ -223,14 +288,14 @@
     <string name="settings_backup_notice_corrupted">Backup file is corrupted</string>
     <string name="settings_backup_notice_generic">Backup operation failed</string>
     <string name="settings_backup_notice_missing_file">Backup is missing required entry: %1$s</string>
-    <string name="settings_backup_notice_format_mismatch">Backup format v%1$d isn\'t supported (expected v%2$d)</string>
+    <string name="settings_backup_notice_format_mismatch">Backup format v%1$d isn't supported (expected v%2$d)</string>
     <string name="settings_backup_notice_schema_mismatch">Backup is from database v%1$d; this app uses v%2$d</string>
     <string name="settings_backup_notice_passphrase_required">This backup is encrypted — a passphrase is required</string>
     <string name="settings_backup_notice_wrong_passphrase">Wrong passphrase, or the backup file is corrupted</string>
     <string name="settings_backup_export_warning">Without a passphrase the file is saved unencrypted — anyone who gets hold of it can read all your financial data.</string>
     <string name="settings_backup_export_passphrase_label">Passphrase (optional)</string>
     <string name="settings_backup_export_passphrase_confirm_label">Confirm passphrase</string>
-    <string name="settings_backup_export_passphrase_mismatch">Passphrases don\'t match</string>
+    <string name="settings_backup_export_passphrase_mismatch">Passphrases don't match</string>
     <string name="settings_backup_export_confirm">Download</string>
     <string name="settings_backup_import_passphrase_title">Encrypted backup</string>
     <string name="settings_backup_import_passphrase_body">This backup is protected by a passphrase. Enter it to restore your data.</string>
@@ -253,7 +318,7 @@
     <string name="settings_about_licenses_supporting">Third-party libraries we build on</string>
     <string name="settings_licenses_title">Open-source licenses</string>
     <string name="settings_licenses_summary_format">%1$d open-source libraries</string>
-    <string name="settings_licenses_error">Couldn\'t load the license list</string>
+    <string name="settings_licenses_error">Couldn't load the license list</string>
     <string name="settings_about_section_help">Help</string>
     <string name="settings_about_help_center_title">Help center</string>
     <string name="settings_about_help_center_supporting">Guides &amp; FAQ</string>
@@ -292,13 +357,13 @@
     <string name="settings_delete_account_confirm_confirm">Delete forever</string>
     <string name="settings_delete_account_confirm_cancel">Cancel</string>
     <string name="settings_logout_guest_warning_title">Log out as guest?</string>
-    <string name="settings_logout_guest_warning_message">You\'re signed in as a guest. Logging out permanently deletes all data on this device — your accounts, transactions and goals can\'t be recovered.</string>
+    <string name="settings_logout_guest_warning_message">You're signed in as a guest. Logging out permanently deletes all data on this device — your accounts, transactions and goals can't be recovered.</string>
     <string name="settings_logout_guest_warning_confirm">Log out &amp; delete</string>
     <string name="settings_logout_guest_warning_cancel">Cancel</string>
     <string name="settings_delete_account_notice_wrong_password">Incorrect password</string>
     <string name="settings_delete_account_notice_recent_login">For security, please sign out, sign in again, and retry</string>
-    <string name="settings_delete_account_notice_cleanup_failed">Couldn\'t delete your cloud data. Check your connection and try again</string>
-    <string name="settings_delete_account_notice_auth_failed">Your data was removed, but the sign-in account couldn\'t be deleted. Please try again</string>
+    <string name="settings_delete_account_notice_cleanup_failed">Couldn't delete your cloud data. Check your connection and try again</string>
+    <string name="settings_delete_account_notice_auth_failed">Your data was removed, but the sign-in account couldn't be deleted. Please try again</string>
     <string name="settings_delete_account_notice_generic">Account deletion failed. Please try again</string>
     <string name="settings_debug_config">Configuration (debug)</string>
     <string name="settings_debug_config_supporting">Inspect and override every configuration key</string>

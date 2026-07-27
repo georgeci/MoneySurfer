@@ -84,6 +84,8 @@ kotlin {
             implementation(projects.feature.dashboard)
             // DebugConfigScreenStateTest mounts the QA configuration panel's stateless content.
             implementation(projects.feature.settings)
+            // SyncScreenStateTest feeds the sync panel real outbox rows and cursors.
+            implementation(projects.sync.api)
             // GlobalErrorBoundaryTest drives the real boundary component and the real
             // MviViewModel escalation path (issue #78).
             implementation(projects.uikit)

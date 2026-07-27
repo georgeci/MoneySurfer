@@ -14,12 +14,14 @@ import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.runTest
 import kotlin.time.Instant
 
 private class FakePendingMutationDao : PendingMutationDao {
     val rows: MutableList<PendingMutationEntity> = mutableListOf()
     private val countFlow = MutableStateFlow(0)
+    private val allFlow = MutableStateFlow<List<PendingMutationEntity>>(emptyList())
 
     override suspend fun insert(entity: PendingMutationEntity) {
         rows += entity
@@ -66,6 +68,9 @@ private class FakePendingMutationDao : PendingMutationDao {
 
     override fun pendingCount(): Flow<Int> = countFlow.asStateFlow()
 
+    override fun observeAll(limit: Int): Flow<List<PendingMutationEntity>> =
+        allFlow.map { rows -> rows.sortedBy { it.createdAt }.take(limit) }
+
     override suspend fun deleteAll() {
         rows.clear()
         recomputeCount()
@@ -73,6 +78,7 @@ private class FakePendingMutationDao : PendingMutationDao {
 
     private fun recomputeCount() {
         countFlow.value = rows.count { it.status != PendingMutationEntity.STATUS_IN_FLIGHT }
+        allFlow.value = rows.toList()
     }
 }
 
