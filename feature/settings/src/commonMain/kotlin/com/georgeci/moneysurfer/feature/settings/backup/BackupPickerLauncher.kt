@@ -27,6 +27,20 @@ expect fun rememberBackupPickerLauncher(
 interface BackupPickerLauncher {
     fun launchSave(suggestedName: String)
     fun launchOpen()
+
+    /**
+     * Reports how the write into the last [launchSave] sink ended.
+     *
+     * **Every screen that calls [launchSave] must call this exactly once per
+     * export**, as soon as it knows the outcome — on iOS the archive is staged
+     * in a temp file and the "where do I put it" picker only appears from here.
+     * Closing the sink cannot stand in for it: an aborted export closes its sink
+     * too, and acting on that would offer the user a truncated archive.
+     *
+     * No-op on Android and JVM, where the picker already chose the destination
+     * before a single byte was written.
+     */
+    fun onSaveCompleted(succeeded: Boolean) = Unit
 }
 
 /**

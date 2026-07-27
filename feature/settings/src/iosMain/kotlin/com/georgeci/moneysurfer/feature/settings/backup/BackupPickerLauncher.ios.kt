@@ -6,12 +6,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.uikit.LocalUIViewController
+import co.touchlab.kermit.Logger
 import okio.BufferedSink
 import okio.BufferedSource
 import okio.FileSystem
 import okio.Path
 import okio.Path.Companion.toPath
-import okio.Sink
 import okio.Source
 import okio.buffer
 import platform.Foundation.NSTemporaryDirectory
@@ -23,19 +23,18 @@ import platform.UIKit.UIViewController
 import platform.UniformTypeIdentifiers.UTType
 import platform.UniformTypeIdentifiers.UTTypeData
 import platform.darwin.NSObject
-import platform.darwin.dispatch_async
-import platform.darwin.dispatch_get_main_queue
 
 /**
  * `UIDocumentPicker` is asymmetric with the cross-platform contract: it moves or
  * copies files that already exist on disk, and it never hands back a stream. So
  * both directions go through the app's temp directory.
  *
- *  - **Save** — we open a sink onto a temp file straight away and hand it to the
- *    caller. The archive is written there first; closing the sink is what tells
- *    us the export finished, and only then do we present the "export" picker so
- *    the user can place the finished file. The temp copy is deleted once the
- *    picker is done with it.
+ *  - **Save** — the sink handed to the caller writes into a staged temp file.
+ *    The "where do I put it" picker is presented from
+ *    [BackupPickerLauncher.onSaveCompleted], not from closing the sink: an
+ *    aborted export closes its sink too, and presenting on close would offer
+ *    the user a truncated archive. A staged file nobody reports on is deleted
+ *    when the screen goes away.
  *  - **Open** — the picker runs in `asCopy` mode, so iOS drops a copy we own into
  *    our temp directory and we never touch a security-scoped URL. The source we
  *    return deletes that copy when it is closed.
@@ -79,33 +78,42 @@ private class IosBackupPickerLauncher(
 
     /** Strongly held: the picker's `delegate` property is weak. */
     private val delegate = PickerDelegate(
-        onPicked = { urls -> onDocumentsPicked(urls) },
-        onCancelled = { onPickerCancelled() },
+        onPicked = { urls -> guarded { onDocumentsPicked(urls) } },
+        onCancelled = { guarded { onPickerCancelled() } },
     )
 
     /** Temp directories staged for this launcher, deleted on dispose if still around. */
     private val stagedDirectories = mutableSetOf<String>()
 
-    /**
-     * Which picker the next delegate callback belongs to. An export is queued the
-     * moment its sink closes, so the two modes cannot share a single flag: a late
-     * export could otherwise claim the callback of an open picker already on screen.
-     */
+    /** Which picker, if any, the next delegate callback belongs to. */
     private var mode = PickerMode.None
+
+    /** Archive being written by the last [launchSave], until [onSaveCompleted] reports on it. */
+    private var stagedExport: Path? = null
+
+    /** A finished archive that could not be presented because a picker was already up. */
+    private var deferredExport: Path? = null
 
     /** Set once the composable leaves; nothing may be presented afterwards. */
     private var disposed = false
 
     override fun launchSave(suggestedName: String) {
-        val stagedFile = if (disposed) null else stageTempFile(suggestedName)
-        if (stagedFile == null) {
+        discardStagedExport()
+        val staged = if (disposed) null else stageTempFile(suggestedName)
+        val sink = staged?.let { runCatching { FileSystem.SYSTEM.sink(it) }.getOrNull() }
+        if (sink == null) {
+            if (staged != null) deleteStagedDirectory(staged.parent?.toString())
             onSavePicked(null)
             return
         }
-        val sink = OnCloseSink(FileSystem.SYSTEM.sink(stagedFile)) {
-            onMainQueue { presentExportPicker(stagedFile) }
-        }
+        stagedExport = staged
         onSavePicked(sink.buffer())
+    }
+
+    override fun onSaveCompleted(succeeded: Boolean) {
+        val staged = stagedExport ?: return
+        stagedExport = null
+        if (succeeded) presentExportPicker(staged) else deleteStagedDirectory(staged.parent?.toString())
     }
 
     override fun launchOpen() {
@@ -122,23 +130,23 @@ private class IosBackupPickerLauncher(
     fun dispose() {
         disposed = true
         mode = PickerMode.None
+        stagedExport = null
+        deferredExport = null
         clearStagedFiles()
     }
 
     /**
-     * Presents the finished archive for the user to place. Skipped when nothing was
-     * written — a cancelled export closes its sink while `viewModelScope` unwinds,
-     * and a save sheet for an empty file (on a screen the user may already have
-     * left) is pure noise.
-     *
-     * A *failed* export is not distinguishable here: it also closes a sink that has
-     * bytes in it, so the user can be offered a truncated archive alongside the
-     * error snackbar. Telling the two apart needs a success signal on the shared
-     * picker contract, which this change deliberately leaves alone.
+     * Presents the finished archive so the user can place it. An empty file means
+     * the export was cancelled before it wrote anything, which is nothing to offer.
+     * A picker already on screen wins; this one is retried once that picker closes.
      */
     private fun presentExportPicker(stagedFile: Path) {
-        if (disposed || mode == PickerMode.Open) {
+        if (disposed) {
             deleteStagedDirectory(stagedFile.parent?.toString())
+            return
+        }
+        if (mode != PickerMode.None) {
+            deferredExport = stagedFile
             return
         }
         val size = FileSystem.SYSTEM.metadataOrNull(stagedFile)?.size
@@ -162,20 +170,19 @@ private class IosBackupPickerLauncher(
         if (finishedMode != PickerMode.Open) {
             // `asCopy` left our staged file behind once iOS finished copying it out.
             clearStagedFiles()
-            return
-        }
-        val path = url?.path
-        if (path == null) {
-            onOpenPicked(null)
+            presentDeferredExport()
             return
         }
         // `asCopy` puts the copy in our own temp area, so we own it and delete it
         // once the importer is done reading.
-        val file = path.toPath()
-        val source = OnCloseSource(FileSystem.SYSTEM.source(file)) {
-            runCatching { FileSystem.SYSTEM.delete(file) }
+        val file = url?.path?.toPath()
+        val source = file?.let { runCatching { FileSystem.SYSTEM.source(it) }.getOrNull() }
+        if (file == null || source == null) {
+            onOpenPicked(null)
+        } else {
+            onOpenPicked(OnCloseSource(source) { runCatching { FileSystem.SYSTEM.delete(file) } }.buffer())
         }
-        onOpenPicked(source.buffer())
+        presentDeferredExport()
     }
 
     private fun onPickerCancelled() {
@@ -187,6 +194,20 @@ private class IosBackupPickerLauncher(
             // The archive was written but the user declined to place it anywhere.
             clearStagedFiles()
         }
+        presentDeferredExport()
+    }
+
+    private fun presentDeferredExport() {
+        val deferred = deferredExport ?: return
+        deferredExport = null
+        presentExportPicker(deferred)
+    }
+
+    /** Drops a staged archive nobody reported on — a previous export that never completed. */
+    private fun discardStagedExport() {
+        val abandoned = stagedExport ?: return
+        stagedExport = null
+        deleteStagedDirectory(abandoned.parent?.toString())
     }
 
     /**
@@ -213,6 +234,9 @@ private class IosBackupPickerLauncher(
     }
 }
 
+/** Which picker, if any, the next delegate callback belongs to. */
+private enum class PickerMode { None, Export, Open }
+
 /**
  * Maps the shared MIME types onto uniform type identifiers, which is what the
  * iOS 14+ picker takes. Anything the system cannot resolve is dropped, and an
@@ -221,31 +245,7 @@ private class IosBackupPickerLauncher(
 private fun BackupPickerFormat.contentTypes(): List<UTType> =
     openMimeTypes.mapNotNull { UTType.typeWithMIMEType(it) }.ifEmpty { listOf(UTTypeData) }
 
-/** Which picker, if any, the next delegate callback belongs to. */
-private enum class PickerMode { None, Export, Open }
-
-/**
- * Runs [onClose] the first time the stream is closed. `RealBufferedSink` already
- * short-circuits its own second close, but the export error path closes the sink
- * again by hand, so the flag keeps "present the picker once" true regardless of
- * how the caller unwinds.
- */
-private class OnCloseSink(
-    private val delegate: Sink,
-    private val onClose: () -> Unit,
-) : Sink by delegate {
-    private var closed = false
-
-    override fun close() {
-        delegate.close()
-        if (!closed) {
-            closed = true
-            onClose()
-        }
-    }
-}
-
-/** [OnCloseSink]'s read-side twin. */
+/** Deletes the picker's temp copy once the importer is done with it. */
 private class OnCloseSource(
     private val delegate: Source,
     private val onClose: () -> Unit,
@@ -278,7 +278,13 @@ private class PickerDelegate(
     }
 }
 
-/** Export finishes on a background dispatcher; UIKit presentation must not. */
-private fun onMainQueue(block: () -> Unit) {
-    dispatch_async(dispatch_get_main_queue()) { block() }
+/**
+ * UIKit invokes the delegate directly, and a Kotlin exception escaping a method
+ * that Objective-C called terminates the process instead of unwinding. Nothing
+ * reachable from a picker callback may throw past this point.
+ */
+private inline fun guarded(block: () -> Unit) {
+    runCatching(block).onFailure { error ->
+        Logger.e(error) { "Backup picker callback failed" }
+    }
 }

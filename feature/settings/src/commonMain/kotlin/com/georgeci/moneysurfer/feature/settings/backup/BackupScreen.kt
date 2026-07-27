@@ -116,7 +116,14 @@ fun BackupScreen(
                 } else {
                     appRestarter.restart()
                 }
-            is BackupEffect.Notify -> { pendingNotice = effect.notice }
+            // A notice is how this screen learns an operation ended. Only the
+            // export leaves the picker holding a staged file, and the progress
+            // scrim keeps the two flows from overlapping, so the notice that
+            // lands here is the one belonging to that export.
+            is BackupEffect.Notify -> {
+                pendingNotice = effect.notice
+                launcher.onSaveCompleted(effect.notice == BackupNotice.ExportSuccess)
+            }
         }
     }
 
