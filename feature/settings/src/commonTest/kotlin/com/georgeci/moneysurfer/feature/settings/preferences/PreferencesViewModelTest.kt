@@ -81,6 +81,31 @@ class PreferencesViewModelTest : StringSpec({
         viewModel(preferences).currentState.weekStart shouldBe WeekStart.Saturday
     }
 
+    "each picker writes to its own preference and to no other" {
+        // All seven branches in one pass, each set to something other than its default. A branch
+        // wired to the wrong handle leaves its own pref at the default *and* overwrites a
+        // neighbour, and only asserting them together catches that — the per-event tests below
+        // would each still pass.
+        val preferences = FakeUiPreferences()
+        val screen = viewModel(preferences)
+
+        screen.onEvent(PreferencesEvent.OnLanguageSelect(AppLanguage.Russian))
+        screen.onEvent(PreferencesEvent.OnRegionSelect(AppRegion.Georgia))
+        screen.onEvent(PreferencesEvent.OnCurrencySelect(CurrencyCode("PLN")))
+        screen.onEvent(PreferencesEvent.OnNumberFormatSelect(NumberFormatStyle.DotGroupCommaDecimal))
+        screen.onEvent(PreferencesEvent.OnWeekStartSelect(WeekStart.Sunday))
+        screen.onEvent(PreferencesEvent.OnHourFormatSelect(HourFormat.TwelveHour))
+        screen.onEvent(PreferencesEvent.OnDefaultTransactionTypeSelect(DefaultTransactionType.Income))
+
+        preferences.appLanguage.flow.first() shouldBe AppLanguage.Russian
+        preferences.appRegion.flow.first() shouldBe AppRegion.Georgia
+        preferences.defaultCurrency.flow.first() shouldBe CurrencyCode("PLN")
+        preferences.numberFormat.flow.first() shouldBe NumberFormatStyle.DotGroupCommaDecimal
+        preferences.weekStart.flow.first() shouldBe WeekStart.Sunday
+        preferences.hourFormat.flow.first() shouldBe HourFormat.TwelveHour
+        preferences.defaultTransactionType.flow.first() shouldBe DefaultTransactionType.Income
+    }
+
     "every toggle reaches the store, so navigating away and back does not reset it" {
         val preferences = FakeUiPreferences()
         val screen = viewModel(preferences)

@@ -98,8 +98,14 @@ fun PreferencesScreen(
     PreferencesContent(state = state, onEvent = viewModel::onEvent)
 }
 
+/**
+ * Stateless half of the screen — public so `:composeApp` desktop UI tests can mount it with an
+ * injected state, the way [DashboardCustomizeContent][com.georgeci.moneysurfer.feature.dashboard.customize]
+ * is mounted. That cover is the point of this screen: the bug being fixed was pills that rendered a
+ * fixed string, and only a real render can tell a pill bound to state from one that is not.
+ */
 @Composable
-private fun PreferencesContent(
+fun PreferencesContent(
     state: PreferencesState,
     onEvent: (PreferencesEvent) -> Unit,
 ) {
