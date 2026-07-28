@@ -35,7 +35,9 @@ import com.georgeci.moneysurfer.uikit.theme.AppTheme
 
 /**
  * How the spent-by-category card presents the same rows. The choice is a card style, not five
- * widgets: every variant draws the list below, and none of them adds or drops a category.
+ * widgets: every variant reads the one list below and none of them reorders or re-measures it.
+ * They do differ in how much of it they show — [Gauge] is the single-category reading and draws
+ * only the largest spender, and every other variant lists as many rows as its size has room for.
  *
  * They split into two families, which is what decides what a shape *measures*:
  *
@@ -44,10 +46,13 @@ import com.georgeci.moneysurfer.uikit.theme.AppTheme
  *   never has to be guessed — [SurferCategorySpendItem.caption] is drawn beside every such meter
  *   and says so in words.
  * - [Ring], [Multi] and [Chips] draw shapes that stand for the whole period, so their geometry is
- *   always the share: segments that measured different things would not add up to the card. A cap
- *   reaches those variants as the status colour, always alongside
- *   [SurferCategorySpendCap.statusLabel] — a colour on its own is not a state every reader can get
- *   at.
+ *   always the share: segments that measured different things would not add up to the card.
+ *
+ * A cap that has something to report takes a shape off the category tint — the [Bar] meter, the
+ * [Chips] pill, the [Ring] arc — and never on its own: the colour only ever appears together with
+ * [SurferCategorySpendCap.statusLabel], because a colour is not a state every reader can get at.
+ * [Multi]'s segments stay on the category tint whatever the cap says, since a stacked bar is read
+ * as a composition of categories rather than a row of states; its legend carries the word.
  *
  * The entry names double as the persisted keys of a dashboard card style, which is why [fromKey]
  * is lenient: a layout written by a newer build may name a treatment this one has never heard of,
@@ -403,11 +408,20 @@ private fun StatusPill(cap: SurferCategorySpendCap?) {
 }
 
 /**
- * A capped category is coloured by how it is doing against its cap; an uncapped one keeps its own
- * category colour, because there is no state to report and a uniform tint would say there is.
+ * A category keeps its own colour until there is something to report about its cap.
+ *
+ * Only [SurferBudgetStatus.Warn] and [SurferBudgetStatus.Over] take the meter off the category
+ * tint, and those are exactly the two that carry a [SurferCategorySpendCap.statusLabel] — so the
+ * colour never says something no word is saying. A capped-but-healthy category staying on its own
+ * tint also keeps the variants readable: `Ok.color` is the one primary for every category, so
+ * colouring by it would flatten a whole card of healthy caps into one indistinguishable colour
+ * while the legend dots and the stacked bar went on showing each category's own.
  */
 @Composable
-private fun SurferCategorySpendItem.meterColor(): Color = cap?.status?.color ?: tint
+private fun SurferCategorySpendItem.meterColor(): Color {
+    val status = cap?.status?.takeIf { it != SurferBudgetStatus.Ok } ?: return tint
+    return status.color
+}
 
 @Composable
 private fun CategoryMeter(fraction: Float, color: Color, height: Dp) {

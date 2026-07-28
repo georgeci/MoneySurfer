@@ -54,8 +54,11 @@ internal fun SpentByCategoryWidget(state: DashboardState.Content, variant: Strin
 /**
  * The row as the card draws it. The tint comes from the category's stored hue through the one
  * resolver every category bubble goes through, so a category keeps the same colour here as on the
- * screens that own it; the uncategorized bucket has no stored appearance and falls back to the
- * hash of its label.
+ * screens that own it.
+ *
+ * The uncategorized bucket has no stored appearance, so its tint is hashed from the fixed
+ * [UNCATEGORIZED_ID] rather than from the label beside it — the label is translated, and a bucket
+ * that changed colour when the user switched language would look like a different category.
  */
 @Composable
 private fun CategorySpendUi.toWidgetItem(): SurferCategorySpendItem {
