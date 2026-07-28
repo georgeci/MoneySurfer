@@ -4,6 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.georgeci.moneysurfer.domain.auth.SessionPointers
 import com.georgeci.moneysurfer.domain.model.User
+import com.georgeci.moneysurfer.domain.model.Workspace
+import com.georgeci.moneysurfer.domain.primitives.UserId
+import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 import com.georgeci.moneysurfer.domain.repositories.AuthRemoteRepository
 import com.georgeci.moneysurfer.domain.repositories.UserRepository
 import com.georgeci.moneysurfer.domain.repositories.WorkspaceRepository
@@ -41,9 +44,12 @@ class AppShellViewModel(
         userRepository.getAll(),
         workspaceRepository.getAll(),
     ) { userId, workspaceId, users, workspaces ->
-        AppShellIdentity(
-            userName = resolveUserName(users.firstOrNull { it.id == userId }),
-            workspaceName = workspaces.firstOrNull { it.id == workspaceId }?.name,
+        resolveShellIdentity(
+            userId = userId,
+            workspaceId = workspaceId,
+            users = users,
+            workspaces = workspaces,
+            providerEmail = authRemoteRepository.currentEmail(),
         )
     }.stateIn(
         scope = viewModelScope,
@@ -51,16 +57,28 @@ class AppShellViewModel(
         initialValue = AppShellIdentity(),
     )
 
-    /**
-     * The local row is a cache and an FK target, so it reliably carries only the display name —
-     * the email is the auth provider's to answer for, which is where `SettingsViewModel` reads it
-     * too. Null when neither is known (an anonymous session), and the drawer names it instead.
-     */
-    private fun resolveUserName(user: User?): String? =
-        user?.displayName?.takeIf { it.isNotBlank() }
-            ?: authRemoteRepository.currentEmail()?.takeIf { it.isNotBlank() }
-
     private companion object {
         const val SUBSCRIPTION_TIMEOUT_MILLIS = 5_000L
     }
 }
+
+/**
+ * The footer's two lines from one snapshot of the session — the policy on its own, so it can be
+ * tested without a view model scope, as [resolveStartRoute] is.
+ *
+ * The local user row is a cache and an FK target, so it reliably carries only the display name;
+ * the email is the auth provider's to answer for, which is where `SettingsViewModel` reads it too.
+ * Both null — an anonymous session that never picked a name — leaves [AppShellIdentity.userName]
+ * null, and the drawer names the user itself rather than rendering an empty line.
+ */
+internal fun resolveShellIdentity(
+    userId: UserId?,
+    workspaceId: WorkspaceId?,
+    users: List<User>,
+    workspaces: List<Workspace>,
+    providerEmail: String?,
+): AppShellIdentity = AppShellIdentity(
+    userName = users.firstOrNull { it.id == userId }?.displayName?.takeIf { it.isNotBlank() }
+        ?: providerEmail?.takeIf { it.isNotBlank() },
+    workspaceName = workspaces.firstOrNull { it.id == workspaceId }?.name,
+)
