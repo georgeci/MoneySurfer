@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > TransactionCreationState_Content__OpticsKt</title>
+  <title>MoneySurfer Coverage Report > TransactionCreationSplitBlockKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,12 +22,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.feature.transaction.creation</a>
 </div>
 
-<h1>Coverage Summary for Class: TransactionCreationState_Content__OpticsKt (com.georgeci.moneysurfer.feature.transaction.creation)</h1>
+<h1>Coverage Summary for Class: TransactionCreationSplitBlockKt (com.georgeci.moneysurfer.feature.transaction.creation)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -46,117 +49,49 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">TransactionCreationState_Content__OpticsKt</td>
+  <td class="name">TransactionCreationSplitBlockKt</td>
 <td class="coverageStat">
   <span class="percent">
-    12.9%
+    0%
   </span>
   <span class="absValue">
-    (16/124)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    12.9%
-  </span>
-  <span class="absValue">
-    (16/124)
+    (0/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    15.7%
+    0%
   </span>
   <span class="absValue">
-    (144/920)
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/66)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/89)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1130)
   </span>
 </td>
 </tr>
-  <tr>
-    <td class="name">TransactionCreationState_Content__OpticsKt$editingTransactionId$1</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/2)
-  </span>
-</td>
-  </tr>
-  <tr>
-    <td class="name">TransactionCreationState_Content__OpticsKt$editingTransactionId$2</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/25)
-  </span>
-</td>
-  </tr>
-<tr>
-  <td class="name"><strong>Total</strong></td>
-<td class="coverageStat">
-  <span class="percent">
-    12.7%
-  </span>
-  <span class="absValue">
-    (16/126)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    12.7%
-  </span>
-  <span class="absValue">
-    (16/126)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    15.2%
-  </span>
-  <span class="absValue">
-    (144/947)
-  </span>
-</td>
-</tr>
+
 </table>
 
 <br/>
@@ -166,238 +101,207 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.transaction.creation
 &nbsp;
+&nbsp;import androidx.compose.foundation.layout.Arrangement
+&nbsp;import androidx.compose.foundation.layout.Column
+&nbsp;import androidx.compose.foundation.layout.Row
+&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
+&nbsp;import androidx.compose.foundation.layout.width
+&nbsp;import androidx.compose.foundation.text.KeyboardOptions
+&nbsp;import androidx.compose.material3.Icon
+&nbsp;import androidx.compose.material3.IconButton
+&nbsp;import androidx.compose.material3.OutlinedTextField
+&nbsp;import androidx.compose.material3.Text
+&nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.ui.Alignment
+&nbsp;import androidx.compose.ui.Modifier
+&nbsp;import androidx.compose.ui.platform.testTag
+&nbsp;import androidx.compose.ui.text.input.KeyboardType
+&nbsp;import androidx.compose.ui.unit.dp
+&nbsp;import com.georgeci.moneysurfer.domain.formatter.MoneyFormatter
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
+&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferButton
+&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferButtonSize
+&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferButtonStyle
+&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferPickerRow
+&nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
+&nbsp;import moneysurfer.feature.transaction.generated.resources.Res
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_creation_amount_label
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_creation_category_label
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_creation_split_add_line
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_creation_split_category_placeholder
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_creation_split_enable
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_creation_split_over
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_creation_split_remainder
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_creation_split_remove_line
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_creation_split_title
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_creation_split_total
+&nbsp;import org.jetbrains.compose.resources.stringResource
 &nbsp;
+&nbsp;/** Stable selectors for the split editor — see docs/testing/testing-strategy.md. */
+&nbsp;object TransactionSplitTestTags {
+&nbsp;    const val Toggle = &quot;transactionCreation:split:toggle&quot;
+&nbsp;    const val AddLine = &quot;transactionCreation:split:addLine&quot;
 &nbsp;
-<b class="fc">&nbsp;public  val com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.Companion.`amount`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content, kotlin.String&gt;  get() = arrow.optics.Lens(</b>
-<b class="fc">&nbsp;  get = { content: com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content -&gt; content.`amount` },</b>
-&nbsp;  set = { content: com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content, value: kotlin.String -&gt;
-<b class="fc">&nbsp;  content.copy(`amount` = value)</b>
+&nbsp;    /** One line&#39;s amount field, suffixed with the line&#39;s index. */
+&nbsp;    const val LineAmountPrefix = &quot;transactionCreation:split:amount:&quot;
 &nbsp;}
-&nbsp;)
 &nbsp;
-<b class="fc">&nbsp;public  val com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.Companion.`note`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content, kotlin.String&gt;  get() = arrow.optics.Lens(</b>
-<b class="fc">&nbsp;  get = { content: com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content -&gt; content.`note` },</b>
-&nbsp;  set = { content: com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content, value: kotlin.String -&gt;
-<b class="fc">&nbsp;  content.copy(`note` = value)</b>
-&nbsp;}
-&nbsp;)
+&nbsp;/**
+&nbsp; * Turns the single-category form into a receipt filed under several categories, and back.
+&nbsp; *
+&nbsp; * Offered on creation only. Converting a stored transaction into a group would mean deleting the
+&nbsp; * row and writing N in its place — new ids, a different thing to sync — which is a larger change
+&nbsp; * than an edit screen should make behind one toggle.
+&nbsp; */
+&nbsp;@Composable
+&nbsp;internal fun SplitToggleRow(
+&nbsp;    state: TransactionCreationState.Content,
+&nbsp;    onEvent: (TransactionCreationEvent) -&gt; Unit,
+<b class="nc">&nbsp;) {</b>
+<b class="nc">&nbsp;    if (state.isEditMode) return</b>
+<b class="nc">&nbsp;    Row(</b>
+<b class="nc">&nbsp;        modifier = Modifier.fillMaxWidth(),</b>
+<b class="nc">&nbsp;        horizontalArrangement = Arrangement.End,</b>
+&nbsp;    ) {
+<b class="nc">&nbsp;        SurferButton(</b>
+<b class="nc">&nbsp;            text = stringResource(Res.string.transaction_creation_split_enable),</b>
+<b class="nc">&nbsp;            onClick = { onEvent(TransactionCreationEvent.OnSplitToggled) },</b>
+<b class="nc">&nbsp;            style = if (state.isSplit) SurferButtonStyle.Tonal else SurferButtonStyle.Text,</b>
+&nbsp;            // Deliberately the smallest size: this row sits between the category grid and the note
+&nbsp;            // field on a scrolling form, and every dp it adds pushes the note (and the Save button
+&nbsp;            // the flows tap) further under the keyboard on a short screen.
+<b class="nc">&nbsp;            size = SurferButtonSize.Small,</b>
+<b class="nc">&nbsp;            startIcon = SurferIcons.Category,</b>
+<b class="nc">&nbsp;            modifier = Modifier.testTag(TransactionSplitTestTags.Toggle),</b>
+&nbsp;        )
+<b class="nc">&nbsp;    }</b>
+<b class="nc">&nbsp;}</b>
 &nbsp;
-<b class="nc">&nbsp;public  val com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.Companion.`type`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content, com.georgeci.moneysurfer.feature.transaction.creation.TransactionTypeUi&gt;  get() = arrow.optics.Lens(</b>
-<b class="nc">&nbsp;  get = { content: com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content -&gt; content.`type` },</b>
-&nbsp;  set = { content: com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content, value: com.georgeci.moneysurfer.feature.transaction.creation.TransactionTypeUi -&gt;
-<b class="nc">&nbsp;  content.copy(`type` = value)</b>
-&nbsp;}
-&nbsp;)
+&nbsp;/**
+&nbsp; * The lines a split will be written as: a category and a slice of the amount each.
+&nbsp; *
+&nbsp; * The **last** line is not editable — it always carries whatever is left of the amount above. That
+&nbsp; * is what makes the legs add up by construction: there is no way to save a receipt whose parts do
+&nbsp; * not sum to the payment, and no arithmetic for the user to redo when they change one line.
+&nbsp; */
+&nbsp;@Composable
+&nbsp;internal fun SplitLinesBlock(
+&nbsp;    state: TransactionCreationState.Content,
+&nbsp;    onEvent: (TransactionCreationEvent) -&gt; Unit,
+<b class="nc">&nbsp;) {</b>
+<b class="nc">&nbsp;    val currency = state.selectedAccount?.currencyCode ?: CurrencyCode(&quot;USD&quot;)</b>
+<b class="nc">&nbsp;    Column(verticalArrangement = Arrangement.spacedBy(AppTheme.spacing.small)) {</b>
+<b class="nc">&nbsp;        Text(</b>
+<b class="nc">&nbsp;            text = stringResource(Res.string.transaction_creation_split_title),</b>
+<b class="nc">&nbsp;            style = AppTheme.typography.titleSmall,</b>
+<b class="nc">&nbsp;            color = AppTheme.materialColors.onSurface,</b>
+&nbsp;        )
+<b class="nc">&nbsp;        state.splitLines.forEachIndexed { index, line -&gt;</b>
+<b class="nc">&nbsp;            SplitLineRow(</b>
+<b class="nc">&nbsp;                line = line,</b>
+<b class="nc">&nbsp;                index = index,</b>
+&nbsp;                // Only the trailing line is derived; every line above it is the user&#39;s to type.
+<b class="nc">&nbsp;                remainderFormatted = if (index == state.splitLines.lastIndex) {</b>
+<b class="nc">&nbsp;                    MoneyFormatter.format(state.splitRemainder, currency)</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    null</b>
+&nbsp;                },
+<b class="nc">&nbsp;                onEvent = onEvent,</b>
+&nbsp;            )
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        SurferButton(</b>
+<b class="nc">&nbsp;            text = stringResource(Res.string.transaction_creation_split_add_line),</b>
+<b class="nc">&nbsp;            onClick = { onEvent(TransactionCreationEvent.OnSplitLineAdded) },</b>
+<b class="nc">&nbsp;            style = SurferButtonStyle.Text,</b>
+<b class="nc">&nbsp;            size = SurferButtonSize.Biggest,</b>
+<b class="nc">&nbsp;            startIcon = SurferIcons.Add,</b>
+<b class="nc">&nbsp;            modifier = Modifier.testTag(TransactionSplitTestTags.AddLine),</b>
+&nbsp;        )
+<b class="nc">&nbsp;        SplitStatusLine(state = state, currency = currency)</b>
+<b class="nc">&nbsp;    }</b>
+<b class="nc">&nbsp;}</b>
 &nbsp;
-<b class="nc">&nbsp;public  val com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.Companion.`accounts`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content, kotlin.collections.List&lt;com.georgeci.moneysurfer.domain.model.Account&gt;&gt;  get() = arrow.optics.Lens(</b>
-<b class="nc">&nbsp;  get = { content: com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content -&gt; content.`accounts` },</b>
-&nbsp;  set = { content: com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content, value: kotlin.collections.List&lt;com.georgeci.moneysurfer.domain.model.Account&gt; -&gt;
-<b class="nc">&nbsp;  content.copy(`accounts` = value)</b>
-&nbsp;}
-&nbsp;)
+&nbsp;@Composable
+&nbsp;private fun SplitLineRow(
+&nbsp;    line: TransactionSplitLineUi,
+&nbsp;    index: Int,
+&nbsp;    remainderFormatted: String?,
+&nbsp;    onEvent: (TransactionCreationEvent) -&gt; Unit,
+<b class="nc">&nbsp;) {</b>
+<b class="nc">&nbsp;    Row(</b>
+<b class="nc">&nbsp;        modifier = Modifier.fillMaxWidth(),</b>
+<b class="nc">&nbsp;        horizontalArrangement = Arrangement.spacedBy(AppTheme.spacing.small),</b>
+<b class="nc">&nbsp;        verticalAlignment = Alignment.CenterVertically,</b>
+&nbsp;    ) {
+<b class="nc">&nbsp;        SurferPickerRow(</b>
+<b class="nc">&nbsp;            label = stringResource(Res.string.transaction_creation_category_label),</b>
+<b class="nc">&nbsp;            value = line.category?.name</b>
+<b class="nc">&nbsp;                ?: stringResource(Res.string.transaction_creation_split_category_placeholder),</b>
+<b class="nc">&nbsp;            icon = SurferIcons.Category,</b>
+<b class="nc">&nbsp;            onClick = { onEvent(TransactionCreationEvent.OnOpenSplitLineCategoryChooser(line.key)) },</b>
+<b class="nc">&nbsp;            modifier = Modifier.weight(1f),</b>
+&nbsp;        )
+<b class="nc">&nbsp;        OutlinedTextField(</b>
+<b class="nc">&nbsp;            value = remainderFormatted ?: line.amount,</b>
+<b class="nc">&nbsp;            onValueChange = { typed -&gt;</b>
+<b class="nc">&nbsp;                onEvent(TransactionCreationEvent.OnSplitLineAmountChanged(line.key, typed))</b>
+&nbsp;            },
+&nbsp;            label = { Text(stringResource(Res.string.transaction_creation_amount_label)) },
+<b class="nc">&nbsp;            singleLine = true,</b>
+<b class="nc">&nbsp;            readOnly = remainderFormatted != null,</b>
+<b class="nc">&nbsp;            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),</b>
+<b class="nc">&nbsp;            shape = AppTheme.shapes.extraSmall,</b>
+<b class="nc">&nbsp;            modifier = Modifier</b>
+<b class="nc">&nbsp;                .width(SPLIT_AMOUNT_FIELD_WIDTH)</b>
+<b class="nc">&nbsp;                .testTag(TransactionSplitTestTags.LineAmountPrefix + index),</b>
+&nbsp;        )
+<b class="nc">&nbsp;        IconButton(onClick = { onEvent(TransactionCreationEvent.OnSplitLineRemoved(line.key)) }) {</b>
+&nbsp;            Icon(
+&nbsp;                imageVector = SurferIcons.Close,
+&nbsp;                contentDescription = stringResource(Res.string.transaction_creation_split_remove_line),
+&nbsp;                tint = AppTheme.materialColors.onSurfaceVariant,
+&nbsp;            )
+&nbsp;        }
+<b class="nc">&nbsp;    }</b>
+<b class="nc">&nbsp;}</b>
 &nbsp;
-<b class="nc">&nbsp;public  val com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.Companion.`categories`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content, kotlin.collections.List&lt;com.georgeci.moneysurfer.domain.model.Category&gt;&gt;  get() = arrow.optics.Lens(</b>
-<b class="nc">&nbsp;  get = { content: com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content -&gt; content.`categories` },</b>
-&nbsp;  set = { content: com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content, value: kotlin.collections.List&lt;com.georgeci.moneysurfer.domain.model.Category&gt; -&gt;
-<b class="nc">&nbsp;  content.copy(`categories` = value)</b>
-&nbsp;}
-&nbsp;)
+&nbsp;/**
+&nbsp; * How the lines stand against the amount. Over-assigning is the only state the editor calls out in
+&nbsp; * error colour — a positive remainder is simply a line the user has not filled in yet.
+&nbsp; */
+&nbsp;@Composable
+<b class="nc">&nbsp;private fun SplitStatusLine(state: TransactionCreationState.Content, currency: CurrencyCode) {</b>
+<b class="nc">&nbsp;    val remainder = state.splitRemainder</b>
+<b class="nc">&nbsp;    val overAssigned = remainder.isNegative()</b>
+<b class="nc">&nbsp;    val text = when {</b>
+<b class="nc">&nbsp;        overAssigned -&gt; stringResource(</b>
+<b class="nc">&nbsp;            Res.string.transaction_creation_split_over,</b>
+<b class="nc">&nbsp;            MoneyFormatter.format(remainder.abs(), currency),</b>
+&nbsp;        )
+<b class="nc">&nbsp;        remainder.isZero() -&gt; stringResource(</b>
+<b class="nc">&nbsp;            Res.string.transaction_creation_split_total,</b>
+<b class="nc">&nbsp;            MoneyFormatter.format(state.splitTotal, currency),</b>
+<b class="nc">&nbsp;            MoneyFormatter.format(state.splitTotal, currency),</b>
+&nbsp;        )
+<b class="nc">&nbsp;        else -&gt; stringResource(</b>
+<b class="nc">&nbsp;            Res.string.transaction_creation_split_remainder,</b>
+<b class="nc">&nbsp;            MoneyFormatter.format(remainder, currency),</b>
+&nbsp;        )
+&nbsp;    }
+<b class="nc">&nbsp;    Text(</b>
+<b class="nc">&nbsp;        text = text,</b>
+<b class="nc">&nbsp;        style = AppTheme.typography.bodySmall,</b>
+<b class="nc">&nbsp;        color = if (overAssigned) {</b>
+<b class="nc">&nbsp;            AppTheme.materialColors.error</b>
+<b class="nc">&nbsp;        } else {</b>
+<b class="nc">&nbsp;            AppTheme.materialColors.onSurfaceVariant</b>
+&nbsp;        },
+&nbsp;    )
+<b class="nc">&nbsp;}</b>
 &nbsp;
-<b class="nc">&nbsp;public  val com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.Companion.`selectedAccount`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content, com.georgeci.moneysurfer.domain.model.Account?&gt;  get() = arrow.optics.Lens(</b>
-<b class="nc">&nbsp;  get = { content: com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content -&gt; content.`selectedAccount` },</b>
-&nbsp;  set = { content: com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content, value: com.georgeci.moneysurfer.domain.model.Account? -&gt;
-<b class="nc">&nbsp;  content.copy(`selectedAccount` = value)</b>
-&nbsp;}
-&nbsp;)
-&nbsp;
-<b class="nc">&nbsp;public  val com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.Companion.`selectedCategory`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content, com.georgeci.moneysurfer.domain.model.Category?&gt;  get() = arrow.optics.Lens(</b>
-<b class="nc">&nbsp;  get = { content: com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content -&gt; content.`selectedCategory` },</b>
-&nbsp;  set = { content: com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content, value: com.georgeci.moneysurfer.domain.model.Category? -&gt;
-<b class="nc">&nbsp;  content.copy(`selectedCategory` = value)</b>
-&nbsp;}
-&nbsp;)
-&nbsp;
-<b class="nc">&nbsp;public  val com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.Companion.`isEditMode`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content, kotlin.Boolean&gt;  get() = arrow.optics.Lens(</b>
-<b class="nc">&nbsp;  get = { content: com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content -&gt; content.`isEditMode` },</b>
-&nbsp;  set = { content: com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content, value: kotlin.Boolean -&gt;
-<b class="nc">&nbsp;  content.copy(`isEditMode` = value)</b>
-&nbsp;}
-&nbsp;)
-&nbsp;
-<b class="nc">&nbsp;public  val com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.Companion.`editingTransactionId`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content, com.georgeci.moneysurfer.domain.primitives.TransactionId?&gt;  get() = arrow.optics.Lens(</b>
-<b class="nc">&nbsp;  get = { content: com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content -&gt; content.`editingTransactionId` },</b>
-&nbsp;  set = { content: com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content, value: com.georgeci.moneysurfer.domain.primitives.TransactionId? -&gt;
-<b class="nc">&nbsp;  content.copy(`editingTransactionId` = value)</b>
-&nbsp;}
-&nbsp;)
-&nbsp;
-<b class="nc">&nbsp;public  val com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.Companion.`editIdentity`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content, com.georgeci.moneysurfer.feature.transaction.creation.TransactionEditIdentity?&gt;  get() = arrow.optics.Lens(</b>
-<b class="nc">&nbsp;  get = { content: com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content -&gt; content.`editIdentity` },</b>
-&nbsp;  set = { content: com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content, value: com.georgeci.moneysurfer.feature.transaction.creation.TransactionEditIdentity? -&gt;
-<b class="nc">&nbsp;  content.copy(`editIdentity` = value)</b>
-&nbsp;}
-&nbsp;)
-&nbsp;
-<b class="fc">&nbsp;public  val com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.Companion.`showDeleteConfirmation`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content, kotlin.Boolean&gt;  get() = arrow.optics.Lens(</b>
-<b class="fc">&nbsp;  get = { content: com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content -&gt; content.`showDeleteConfirmation` },</b>
-&nbsp;  set = { content: com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content, value: kotlin.Boolean -&gt;
-<b class="fc">&nbsp;  content.copy(`showDeleteConfirmation` = value)</b>
-&nbsp;}
-&nbsp;)
-&nbsp;
-<b class="nc">&nbsp;public  val com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.Companion.`editingCreatedAt`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content, kotlin.time.Instant?&gt;  get() = arrow.optics.Lens(</b>
-<b class="nc">&nbsp;  get = { content: com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content -&gt; content.`editingCreatedAt` },</b>
-&nbsp;  set = { content: com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content, value: kotlin.time.Instant? -&gt;
-<b class="nc">&nbsp;  content.copy(`editingCreatedAt` = value)</b>
-&nbsp;}
-&nbsp;)
-&nbsp;
-<b class="nc">&nbsp;public  val com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.Companion.`pinnedOperationDate`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content, kotlinx.datetime.LocalDate?&gt;  get() = arrow.optics.Lens(</b>
-<b class="nc">&nbsp;  get = { content: com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content -&gt; content.`pinnedOperationDate` },</b>
-&nbsp;  set = { content: com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content, value: kotlinx.datetime.LocalDate? -&gt;
-<b class="nc">&nbsp;  content.copy(`pinnedOperationDate` = value)</b>
-&nbsp;}
-&nbsp;)
-&nbsp;
-<b class="nc">&nbsp;public  val com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.Companion.`preserved`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content, com.georgeci.moneysurfer.feature.transaction.creation.PreservedTransactionFields&gt;  get() = arrow.optics.Lens(</b>
-<b class="nc">&nbsp;  get = { content: com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content -&gt; content.`preserved` },</b>
-&nbsp;  set = { content: com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content, value: com.georgeci.moneysurfer.feature.transaction.creation.PreservedTransactionFields -&gt;
-<b class="nc">&nbsp;  content.copy(`preserved` = value)</b>
-&nbsp;}
-&nbsp;)
-&nbsp;
-<b class="nc">&nbsp;public  val com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.Companion.`timestamp`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content, kotlin.Long&gt;  get() = arrow.optics.Lens(</b>
-<b class="nc">&nbsp;  get = { content: com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content -&gt; content.`timestamp` },</b>
-&nbsp;  set = { content: com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content, value: kotlin.Long -&gt;
-<b class="nc">&nbsp;  content.copy(`timestamp` = value)</b>
-&nbsp;}
-&nbsp;)
-&nbsp;
-<b class="nc">&nbsp;public  val com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.Companion.`categoryUsageCounts`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content, kotlin.collections.Map&lt;com.georgeci.moneysurfer.domain.primitives.CategoryId, kotlin.Int&gt;&gt;  get() = arrow.optics.Lens(</b>
-<b class="nc">&nbsp;  get = { content: com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content -&gt; content.`categoryUsageCounts` },</b>
-&nbsp;  set = { content: com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content, value: kotlin.collections.Map&lt;com.georgeci.moneysurfer.domain.primitives.CategoryId, kotlin.Int&gt; -&gt;
-<b class="nc">&nbsp;  content.copy(`categoryUsageCounts` = value)</b>
-&nbsp;}
-&nbsp;)
-&nbsp;
-<b class="nc">&nbsp;public  val com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.Companion.`displayCategories`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content, kotlin.collections.List&lt;com.georgeci.moneysurfer.domain.model.Category&gt;&gt;  get() = arrow.optics.Lens(</b>
-<b class="nc">&nbsp;  get = { content: com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content -&gt; content.`displayCategories` },</b>
-&nbsp;  set = { content: com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content, value: kotlin.collections.List&lt;com.georgeci.moneysurfer.domain.model.Category&gt; -&gt;
-<b class="nc">&nbsp;  content.copy(`displayCategories` = value)</b>
-&nbsp;}
-&nbsp;)
-&nbsp;
-<b class="nc">&nbsp;public  val com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.Companion.`fromAccount`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content, com.georgeci.moneysurfer.domain.model.Account?&gt;  get() = arrow.optics.Lens(</b>
-<b class="nc">&nbsp;  get = { content: com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content -&gt; content.`fromAccount` },</b>
-&nbsp;  set = { content: com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content, value: com.georgeci.moneysurfer.domain.model.Account? -&gt;
-<b class="nc">&nbsp;  content.copy(`fromAccount` = value)</b>
-&nbsp;}
-&nbsp;)
-&nbsp;
-<b class="nc">&nbsp;public  val com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.Companion.`toAccount`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content, com.georgeci.moneysurfer.domain.model.Account?&gt;  get() = arrow.optics.Lens(</b>
-<b class="nc">&nbsp;  get = { content: com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content -&gt; content.`toAccount` },</b>
-&nbsp;  set = { content: com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content, value: com.georgeci.moneysurfer.domain.model.Account? -&gt;
-<b class="nc">&nbsp;  content.copy(`toAccount` = value)</b>
-&nbsp;}
-&nbsp;)
-&nbsp;
-<b class="fc">&nbsp;public  val com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.Companion.`toAmount`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content, kotlin.String&gt;  get() = arrow.optics.Lens(</b>
-<b class="fc">&nbsp;  get = { content: com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content -&gt; content.`toAmount` },</b>
-&nbsp;  set = { content: com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content, value: kotlin.String -&gt;
-<b class="fc">&nbsp;  content.copy(`toAmount` = value)</b>
-&nbsp;}
-&nbsp;)
-&nbsp;
-<b class="nc">&nbsp;public  val com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.Companion.`transferEnabled`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content, kotlin.Boolean&gt;  get() = arrow.optics.Lens(</b>
-<b class="nc">&nbsp;  get = { content: com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content -&gt; content.`transferEnabled` },</b>
-&nbsp;  set = { content: com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content, value: kotlin.Boolean -&gt;
-<b class="nc">&nbsp;  content.copy(`transferEnabled` = value)</b>
-&nbsp;}
-&nbsp;)
-&nbsp;
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content&gt;.`amount`: arrow.optics.Lens&lt;__S, kotlin.String&gt;  get() = this + com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.`amount`</b>
-<b class="fc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content&gt;.`amount`: arrow.optics.Optional&lt;__S, kotlin.String&gt;  get() = this + com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.`amount`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content&gt;.`amount`: arrow.optics.Traversal&lt;__S, kotlin.String&gt;  get() = this + com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.`amount`</b>
-&nbsp;
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content&gt;.`note`: arrow.optics.Lens&lt;__S, kotlin.String&gt;  get() = this + com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.`note`</b>
-<b class="fc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content&gt;.`note`: arrow.optics.Optional&lt;__S, kotlin.String&gt;  get() = this + com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.`note`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content&gt;.`note`: arrow.optics.Traversal&lt;__S, kotlin.String&gt;  get() = this + com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.`note`</b>
-&nbsp;
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content&gt;.`type`: arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionTypeUi&gt;  get() = this + com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.`type`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content&gt;.`type`: arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionTypeUi&gt;  get() = this + com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.`type`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content&gt;.`type`: arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionTypeUi&gt;  get() = this + com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.`type`</b>
-&nbsp;
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content&gt;.`accounts`: arrow.optics.Lens&lt;__S, kotlin.collections.List&lt;com.georgeci.moneysurfer.domain.model.Account&gt;&gt;  get() = this + com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.`accounts`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content&gt;.`accounts`: arrow.optics.Optional&lt;__S, kotlin.collections.List&lt;com.georgeci.moneysurfer.domain.model.Account&gt;&gt;  get() = this + com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.`accounts`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content&gt;.`accounts`: arrow.optics.Traversal&lt;__S, kotlin.collections.List&lt;com.georgeci.moneysurfer.domain.model.Account&gt;&gt;  get() = this + com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.`accounts`</b>
-&nbsp;
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content&gt;.`categories`: arrow.optics.Lens&lt;__S, kotlin.collections.List&lt;com.georgeci.moneysurfer.domain.model.Category&gt;&gt;  get() = this + com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.`categories`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content&gt;.`categories`: arrow.optics.Optional&lt;__S, kotlin.collections.List&lt;com.georgeci.moneysurfer.domain.model.Category&gt;&gt;  get() = this + com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.`categories`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content&gt;.`categories`: arrow.optics.Traversal&lt;__S, kotlin.collections.List&lt;com.georgeci.moneysurfer.domain.model.Category&gt;&gt;  get() = this + com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.`categories`</b>
-&nbsp;
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content&gt;.`selectedAccount`: arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.domain.model.Account?&gt;  get() = this + com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.`selectedAccount`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content&gt;.`selectedAccount`: arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.domain.model.Account?&gt;  get() = this + com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.`selectedAccount`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content&gt;.`selectedAccount`: arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.domain.model.Account?&gt;  get() = this + com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.`selectedAccount`</b>
-&nbsp;
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content&gt;.`selectedCategory`: arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.domain.model.Category?&gt;  get() = this + com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.`selectedCategory`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content&gt;.`selectedCategory`: arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.domain.model.Category?&gt;  get() = this + com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.`selectedCategory`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content&gt;.`selectedCategory`: arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.domain.model.Category?&gt;  get() = this + com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.`selectedCategory`</b>
-&nbsp;
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content&gt;.`isEditMode`: arrow.optics.Lens&lt;__S, kotlin.Boolean&gt;  get() = this + com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.`isEditMode`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content&gt;.`isEditMode`: arrow.optics.Optional&lt;__S, kotlin.Boolean&gt;  get() = this + com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.`isEditMode`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content&gt;.`isEditMode`: arrow.optics.Traversal&lt;__S, kotlin.Boolean&gt;  get() = this + com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.`isEditMode`</b>
-&nbsp;
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content&gt;.`editingTransactionId`: arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.domain.primitives.TransactionId?&gt;  get() = this + com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.`editingTransactionId`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content&gt;.`editingTransactionId`: arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.domain.primitives.TransactionId?&gt;  get() = this + com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.`editingTransactionId`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content&gt;.`editingTransactionId`: arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.domain.primitives.TransactionId?&gt;  get() = this + com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.`editingTransactionId`</b>
-&nbsp;
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content&gt;.`editIdentity`: arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionEditIdentity?&gt;  get() = this + com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.`editIdentity`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content&gt;.`editIdentity`: arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionEditIdentity?&gt;  get() = this + com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.`editIdentity`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content&gt;.`editIdentity`: arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionEditIdentity?&gt;  get() = this + com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.`editIdentity`</b>
-&nbsp;
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content&gt;.`showDeleteConfirmation`: arrow.optics.Lens&lt;__S, kotlin.Boolean&gt;  get() = this + com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.`showDeleteConfirmation`</b>
-<b class="fc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content&gt;.`showDeleteConfirmation`: arrow.optics.Optional&lt;__S, kotlin.Boolean&gt;  get() = this + com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.`showDeleteConfirmation`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content&gt;.`showDeleteConfirmation`: arrow.optics.Traversal&lt;__S, kotlin.Boolean&gt;  get() = this + com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.`showDeleteConfirmation`</b>
-&nbsp;
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content&gt;.`editingCreatedAt`: arrow.optics.Lens&lt;__S, kotlin.time.Instant?&gt;  get() = this + com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.`editingCreatedAt`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content&gt;.`editingCreatedAt`: arrow.optics.Optional&lt;__S, kotlin.time.Instant?&gt;  get() = this + com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.`editingCreatedAt`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content&gt;.`editingCreatedAt`: arrow.optics.Traversal&lt;__S, kotlin.time.Instant?&gt;  get() = this + com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.`editingCreatedAt`</b>
-&nbsp;
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content&gt;.`pinnedOperationDate`: arrow.optics.Lens&lt;__S, kotlinx.datetime.LocalDate?&gt;  get() = this + com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.`pinnedOperationDate`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content&gt;.`pinnedOperationDate`: arrow.optics.Optional&lt;__S, kotlinx.datetime.LocalDate?&gt;  get() = this + com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.`pinnedOperationDate`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content&gt;.`pinnedOperationDate`: arrow.optics.Traversal&lt;__S, kotlinx.datetime.LocalDate?&gt;  get() = this + com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.`pinnedOperationDate`</b>
-&nbsp;
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content&gt;.`preserved`: arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.PreservedTransactionFields&gt;  get() = this + com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.`preserved`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content&gt;.`preserved`: arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.PreservedTransactionFields&gt;  get() = this + com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.`preserved`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content&gt;.`preserved`: arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.PreservedTransactionFields&gt;  get() = this + com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.`preserved`</b>
-&nbsp;
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content&gt;.`timestamp`: arrow.optics.Lens&lt;__S, kotlin.Long&gt;  get() = this + com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.`timestamp`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content&gt;.`timestamp`: arrow.optics.Optional&lt;__S, kotlin.Long&gt;  get() = this + com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.`timestamp`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content&gt;.`timestamp`: arrow.optics.Traversal&lt;__S, kotlin.Long&gt;  get() = this + com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.`timestamp`</b>
-&nbsp;
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content&gt;.`categoryUsageCounts`: arrow.optics.Lens&lt;__S, kotlin.collections.Map&lt;com.georgeci.moneysurfer.domain.primitives.CategoryId, kotlin.Int&gt;&gt;  get() = this + com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.`categoryUsageCounts`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content&gt;.`categoryUsageCounts`: arrow.optics.Optional&lt;__S, kotlin.collections.Map&lt;com.georgeci.moneysurfer.domain.primitives.CategoryId, kotlin.Int&gt;&gt;  get() = this + com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.`categoryUsageCounts`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content&gt;.`categoryUsageCounts`: arrow.optics.Traversal&lt;__S, kotlin.collections.Map&lt;com.georgeci.moneysurfer.domain.primitives.CategoryId, kotlin.Int&gt;&gt;  get() = this + com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.`categoryUsageCounts`</b>
-&nbsp;
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content&gt;.`displayCategories`: arrow.optics.Lens&lt;__S, kotlin.collections.List&lt;com.georgeci.moneysurfer.domain.model.Category&gt;&gt;  get() = this + com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.`displayCategories`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content&gt;.`displayCategories`: arrow.optics.Optional&lt;__S, kotlin.collections.List&lt;com.georgeci.moneysurfer.domain.model.Category&gt;&gt;  get() = this + com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.`displayCategories`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content&gt;.`displayCategories`: arrow.optics.Traversal&lt;__S, kotlin.collections.List&lt;com.georgeci.moneysurfer.domain.model.Category&gt;&gt;  get() = this + com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.`displayCategories`</b>
-&nbsp;
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content&gt;.`fromAccount`: arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.domain.model.Account?&gt;  get() = this + com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.`fromAccount`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content&gt;.`fromAccount`: arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.domain.model.Account?&gt;  get() = this + com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.`fromAccount`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content&gt;.`fromAccount`: arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.domain.model.Account?&gt;  get() = this + com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.`fromAccount`</b>
-&nbsp;
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content&gt;.`toAccount`: arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.domain.model.Account?&gt;  get() = this + com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.`toAccount`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content&gt;.`toAccount`: arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.domain.model.Account?&gt;  get() = this + com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.`toAccount`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content&gt;.`toAccount`: arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.domain.model.Account?&gt;  get() = this + com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.`toAccount`</b>
-&nbsp;
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content&gt;.`toAmount`: arrow.optics.Lens&lt;__S, kotlin.String&gt;  get() = this + com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.`toAmount`</b>
-<b class="fc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content&gt;.`toAmount`: arrow.optics.Optional&lt;__S, kotlin.String&gt;  get() = this + com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.`toAmount`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content&gt;.`toAmount`: arrow.optics.Traversal&lt;__S, kotlin.String&gt;  get() = this + com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.`toAmount`</b>
-&nbsp;
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content&gt;.`transferEnabled`: arrow.optics.Lens&lt;__S, kotlin.Boolean&gt;  get() = this + com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.`transferEnabled`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content&gt;.`transferEnabled`: arrow.optics.Optional&lt;__S, kotlin.Boolean&gt;  get() = this + com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.`transferEnabled`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content&gt;.`transferEnabled`: arrow.optics.Traversal&lt;__S, kotlin.Boolean&gt;  get() = this + com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content.`transferEnabled`</b>
+&nbsp;/** Wide enough for a five-figure amount without stealing the category picker&#39;s room. */
+<b class="nc">&nbsp;private val SPLIT_AMOUNT_FIELD_WIDTH = 132.dp</b>
 </code>
 </pre>
 </div>
@@ -421,7 +325,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 17:47</div>
+    <div style="float:right;">generated on 2026-07-28 18:03</div>
 </div>
 </body>
 </html>

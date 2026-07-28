@@ -49,34 +49,34 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   <td class="name">TransactionRepositoryImpl</td>
 <td class="coverageStat">
   <span class="percent">
-    93.8%
+    94.1%
   </span>
   <span class="absValue">
-    (15/16)
+    (16/17)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    81.2%
+    80.6%
   </span>
   <span class="absValue">
-    (26/32)
+    (29/36)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    94%
+    94.3%
   </span>
   <span class="absValue">
-    (94/100)
+    (99/105)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    82.9%
+    84.2%
   </span>
   <span class="absValue">
-    (522/630)
+    (583/692)
   </span>
 </td>
 </tr>
@@ -150,6 +150,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   </tr>
   <tr>
     <td class="name">TransactionRepositoryImpl$getById$1</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">TransactionRepositoryImpl$getBySplitId$1</td>
     <td class="coverageStat"/>
   </tr>
   <tr>
@@ -264,34 +268,34 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
-    48.4%
+    50%
   </span>
   <span class="absValue">
-    (15/31)
+    (16/32)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    81.2%
+    80.6%
   </span>
   <span class="absValue">
-    (26/32)
+    (29/36)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    94%
+    94.3%
   </span>
   <span class="absValue">
-    (94/100)
+    (99/105)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    82.9%
+    84.2%
   </span>
   <span class="absValue">
-    (522/630)
+    (583/692)
   </span>
 </td>
 </tr>
@@ -318,6 +322,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.RecurringRuleId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.SplitId
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionId
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionStatus
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionType
@@ -380,6 +385,9 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    override suspend fun getByTransferId(transferId: TransferId): List&lt;Transaction&gt; =
 <b class="fc">&nbsp;        dao.getByTransferId(transferId.value).map { it.toDomain() }</b>
 &nbsp;
+&nbsp;    override suspend fun getBySplitId(splitId: SplitId): List&lt;Transaction&gt; =
+<b class="fc">&nbsp;        dao.getBySplitId(splitId.value).map { it.toDomain() }</b>
+&nbsp;
 &nbsp;    override suspend fun insert(transaction: Transaction) {
 <b class="fc">&nbsp;        val entity = transaction.toEntity()</b>
 <b class="fc">&nbsp;        dao.insert(entity)</b>
@@ -434,6 +442,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;        createdAt = timeFormatter.parseInstant(createdAt),</b>
 <b class="fc">&nbsp;        updatedAt = timeFormatter.parseInstant(updatedAt),</b>
 <b class="fc">&nbsp;        transferId = transferId?.let(::TransferId),</b>
+<b class="fc">&nbsp;        splitId = splitId?.let(::SplitId),</b>
 <b class="fc">&nbsp;        recurringRuleId = recurringRuleId?.let(::RecurringRuleId),</b>
 &nbsp;    )
 &nbsp;
@@ -457,9 +466,11 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;            createdAt = createdAt,</b>
 <b class="fc">&nbsp;            updatedAt = updatedAt,</b>
 <b class="fc">&nbsp;            transferId = transferId,</b>
+<b class="fc">&nbsp;            splitId = splitId,</b>
 <b class="fc">&nbsp;            recurringRuleId = recurringRuleId,</b>
 <b class="fc">&nbsp;        ).toDomain(),</b>
 <b class="fc">&nbsp;        categoryName = categoryName,</b>
+<b class="fc">&nbsp;        splitLegCount = splitLegCount,</b>
 &nbsp;    )
 &nbsp;
 &nbsp;    private fun resolveOperationDate(stored: String, operationAt: Long) =
@@ -484,6 +495,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;        createdAt = timeFormatter.formatInstant(createdAt),</b>
 <b class="fc">&nbsp;        updatedAt = timeFormatter.formatInstant(updatedAt),</b>
 <b class="fc">&nbsp;        transferId = transferId?.value,</b>
+<b class="pc">&nbsp;        splitId = splitId?.value,</b>
 <b class="fc">&nbsp;        recurringRuleId = recurringRuleId?.value,</b>
 &nbsp;    )
 &nbsp;}
@@ -548,7 +560,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 17:47</div>
+    <div style="float:right;">generated on 2026-07-28 18:03</div>
 </div>
 </body>
 </html>

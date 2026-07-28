@@ -72,7 +72,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (18/18)
+    (19/19)
   </span>
 </td>
 <td class="coverageStat">
@@ -80,7 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (137/137)
+    (149/149)
   </span>
 </td>
 </tr>
@@ -99,6 +99,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.RecurringRuleId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.SplitId
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionId
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionStatus
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionType
@@ -147,6 +148,20 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;    val updatedAt: Instant,</b>
 <b class="fc">&nbsp;    val transferId: TransferId? = null,</b>
 &nbsp;    /**
+&nbsp;     * Shared id of the legs one receipt was split across — groceries and household chemicals paid
+&nbsp;     * for in one go — or null for an ordinary single-category transaction.
+&nbsp;     *
+&nbsp;     * Every leg is a whole transaction: it carries its own category and its own amount, so budgets,
+&nbsp;     * monthly totals and the account balance need no knowledge of splits at all. Only the places
+&nbsp;     * that would otherwise show one receipt as N rows — the transaction list, the recent-activity
+&nbsp;     * widget, search results — collapse a group back into a single row.
+&nbsp;     *
+&nbsp;     * The legs of a group share account, currency, business date and type; that invariant is
+&nbsp;     * established by `CreateSplitTransactionUseCase` and re-established by `UpdateTransactionUseCase`
+&nbsp;     * whenever a single leg is edited through the ordinary edit path.
+&nbsp;     */
+<b class="fc">&nbsp;    val splitId: SplitId? = null,</b>
+&nbsp;    /**
 &nbsp;     * The rule that generated this row, or null for a manually entered one. A link rather
 &nbsp;     * than an `isRecurring` boolean: the schedule already lives on [RecurringRule], and a
 &nbsp;     * flag would be a second copy of that fact free to drift from it. &quot;Recurring only&quot;
@@ -181,7 +196,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 17:47</div>
+    <div style="float:right;">generated on 2026-07-28 18:03</div>
 </div>
 </body>
 </html>

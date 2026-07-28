@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > TransactionEditIdentity</title>
+  <title>MoneySurfer Coverage Report > TransactionCreationState__OpticsKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,15 +22,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.feature.transaction.creation</a>
 </div>
 
-<h1>Coverage Summary for Class: TransactionEditIdentity (com.georgeci.moneysurfer.feature.transaction.creation)</h1>
+<h1>Coverage Summary for Class: TransactionCreationState__OpticsKt (com.georgeci.moneysurfer.feature.transaction.creation)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
-<th class="coverageStat 
-">
-  Class, %
-</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -49,42 +46,109 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">TransactionEditIdentity</td>
+  <td class="name">TransactionCreationState__OpticsKt</td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    12.5%
   </span>
   <span class="absValue">
-    (1/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
+    (1/8)
   </span>
 </td>
     <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    12.5%
   </span>
   <span class="absValue">
-    (9/9)
+    (1/8)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    11.1%
   </span>
   <span class="absValue">
-    (42/42)
+    (4/36)
   </span>
 </td>
 </tr>
-
+  <tr>
+    <td class="name">TransactionCreationState__OpticsKt$special$$inlined$instanceOf$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">TransactionCreationState__OpticsKt$special$$inlined$instanceOf$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">TransactionCreationState__OpticsKt$special$$inlined$instanceOf$3</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">TransactionCreationState__OpticsKt$special$$inlined$instanceOf$4</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    8.3%
+  </span>
+  <span class="absValue">
+    (1/12)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    12.5%
+  </span>
+  <span class="absValue">
+    (1/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    11.1%
+  </span>
+  <span class="absValue">
+    (4/36)
+  </span>
+</td>
+</tr>
 </table>
 
 <br/>
@@ -94,82 +158,22 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.transaction.creation
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.model.Transaction
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.RecurringRuleId
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionId
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionStatus
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransferId
+&nbsp;import arrow.core.left
+&nbsp;import arrow.core.right
+&nbsp;import arrow.core.identity
 &nbsp;
-&nbsp;/**
-&nbsp; * Everything a stored transaction carries that this screen has no field for.
-&nbsp; *
-&nbsp; * `saveTransaction` builds a whole new [Transaction] instead of patching the stored row, so a
-&nbsp; * field that is not routed back through here is silently reset to its default on update — which
-&nbsp; * is how editing used to wipe a transaction&#39;s merchant and tags, downgrade a `PLANNED` row to
-&nbsp; * `ACTUAL`, and orphan the other leg of a transfer by dropping its `transferId`.
-&nbsp; *
-&nbsp; * The defaults are what a brand-new transaction should have, so a blank form needs no special case.
-&nbsp; */
-&nbsp;data class PreservedTransactionFields(
-&nbsp;    val merchant: String = &quot;&quot;,
-&nbsp;    val tags: List&lt;String&gt; = emptyList(),
-&nbsp;    val status: TransactionStatus = TransactionStatus.ACTUAL,
-&nbsp;    val transferId: TransferId? = null,
-&nbsp;    val recurringRuleId: RecurringRuleId? = null,
-&nbsp;) {
-&nbsp;    companion object {
-&nbsp;        /** Everything [transaction] holds outside the form — what an edit must hand back untouched. */
-&nbsp;        fun of(transaction: Transaction): PreservedTransactionFields = PreservedTransactionFields(
-&nbsp;            merchant = transaction.merchant,
-&nbsp;            tags = transaction.tags,
-&nbsp;            status = transaction.status,
-&nbsp;            transferId = transaction.transferId,
-&nbsp;            recurringRuleId = transaction.recurringRuleId,
-&nbsp;        )
-&nbsp;    }
-&nbsp;}
 &nbsp;
-&nbsp;/**
-&nbsp; * The existing transaction the creation screen opens on, and what it is there for.
-&nbsp; *
-&nbsp; * One nullable parameter rather than an id plus a flag: the screen loads exactly one transaction
-&nbsp; * in either mode, and two independent parameters could contradict each other (a duplicate flag
-&nbsp; * with no id, an id with no mode).
-&nbsp; */
-&nbsp;data class TransactionCreationSeed(
-&nbsp;    val transactionId: TransactionId,
-&nbsp;    val mode: Mode,
-&nbsp;) {
-&nbsp;    enum class Mode {
-&nbsp;        /** Update the transaction in place. */
-&nbsp;        Edit,
+<b class="fc">&nbsp;public  val com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Companion.`content`: arrow.optics.Prism&lt;com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content&gt;  get() = arrow.optics.Prism.instanceOf()</b>
 &nbsp;
-&nbsp;        /** Use it as a template for a brand-new transaction. */
-&nbsp;        Duplicate,
-&nbsp;    }
-&nbsp;}
+<b class="nc">&nbsp;public  val com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Companion.`loading`: arrow.optics.Prism&lt;com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Loading&gt;  get() = arrow.optics.Prism.instanceOf()</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState&gt;.`content`: arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content&gt;  get() = this + com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.`content`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Prism&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState&gt;.`content`: arrow.optics.Prism&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content&gt;  get() = this + com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.`content`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState&gt;.`content`: arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Content&gt;  get() = this + com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.`content`</b>
 &nbsp;
-&nbsp;/**
-&nbsp; * The transaction being edited, as it was stored — what the edit screen&#39;s identity band renders so
-&nbsp; * the user can tell which row they opened without scrolling or going back.
-&nbsp; *
-&nbsp; * A snapshot, not a view of the form: it is taken once when the transaction is loaded and never
-&nbsp; * follows the fields the user is editing.
-&nbsp; */
-<b class="fc">&nbsp;data class TransactionEditIdentity(</b>
-&nbsp;    /** Short human-readable id, e.g. `TX-8213`. */
-<b class="fc">&nbsp;    val reference: String,</b>
-<b class="fc">&nbsp;    val type: TransactionTypeUi,</b>
-&nbsp;    /** The note, falling back to the merchant when there is none; may still be blank. */
-<b class="fc">&nbsp;    val note: String,</b>
-&nbsp;    /** Signed for income and expense, unsigned for a transfer leg. */
-<b class="fc">&nbsp;    val formattedAmount: String,</b>
-&nbsp;    /** The category&#39;s stored appearance, fed to the shared bubble resolver. */
-<b class="fc">&nbsp;    val categoryId: String,</b>
-<b class="fc">&nbsp;    val categoryIconKey: String,</b>
-<b class="fc">&nbsp;    val categoryHue: Int,</b>
-<b class="fc">&nbsp;    val categorySystemKind: String?,</b>
-&nbsp;)
+&nbsp;
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState&gt;.`loading`: arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Loading&gt;  get() = this + com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.`loading`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Prism&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState&gt;.`loading`: arrow.optics.Prism&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Loading&gt;  get() = this + com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.`loading`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState&gt;.`loading`: arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.Loading&gt;  get() = this + com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationState.`loading`</b>
 </code>
 </pre>
 </div>
@@ -193,7 +197,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 17:47</div>
+    <div style="float:right;">generated on 2026-07-28 18:03</div>
 </div>
 </body>
 </html>

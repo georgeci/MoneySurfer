@@ -72,7 +72,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (7/7)
+    (8/8)
   </span>
 </td>
 <td class="coverageStat">
@@ -80,7 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (47/47)
+    (59/59)
   </span>
 </td>
 </tr>
@@ -234,6 +234,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;        isExpense = type == TransactionType.EXPENSE,
 &nbsp;        categoryHueSeed = categoryId?.value.orEmpty(),
 &nbsp;        isTransfer = transferId != null,
+&nbsp;        isSplitLeg = splitId != null,
 &nbsp;    )
 &nbsp;
 &nbsp;    private companion object {
@@ -315,6 +316,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;    val categoryHueSeed: String,</b>
 &nbsp;    /** One leg of a transfer, which deleting takes down together with its sibling. */
 <b class="fc">&nbsp;    val isTransfer: Boolean = false,</b>
+&nbsp;    /**
+&nbsp;     * One leg of a receipt split across categories. The legs are listed separately here — that is
+&nbsp;     * the point of a category screen — but deleting one takes the whole receipt, so the
+&nbsp;     * confirmation has to say so.
+&nbsp;     */
+<b class="fc">&nbsp;    val isSplitLeg: Boolean = false,</b>
 &nbsp;)
 &nbsp;
 &nbsp;sealed interface CategoryDetailsEvent {
@@ -358,7 +365,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 17:47</div>
+    <div style="float:right;">generated on 2026-07-28 18:03</div>
 </div>
 </body>
 </html>

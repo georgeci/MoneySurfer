@@ -118,6 +118,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_recent_empty_subtitle
 &nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_recent_empty_title
 &nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_recent_see_all
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_recent_split_categories
 &nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_recent_title
 &nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_settings_content_description
 &nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_toolbar_greeting
@@ -560,13 +561,20 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;private fun SurferAccountItem.accountId(): AccountId? =
 &nbsp;    id.takeIf { it.isNotEmpty() }?.let(::AccountId)
 &nbsp;
+&nbsp;@Composable
 &nbsp;private fun TransactionUi.toWidgetItem(
 &nbsp;    iconBgColor: Color,
 &nbsp;    iconFgColor: Color,
 &nbsp;): SurferRecentTransactionItem = SurferRecentTransactionItem(
 &nbsp;    id = id.value,
 &nbsp;    title = title,
-&nbsp;    subtitle = &quot;&quot;,
+&nbsp;    // A collapsed receipt says how many categories it covers; an ordinary row has nothing to add
+&nbsp;    // under its title here, and the list screen is where the category belongs.
+&nbsp;    subtitle = if (splitCategoryCount &gt; 0) {
+&nbsp;        stringResource(Res.string.dashboard_recent_split_categories, splitCategoryCount)
+&nbsp;    } else {
+&nbsp;        &quot;&quot;
+&nbsp;    },
 &nbsp;    amount = formattedAmount,
 &nbsp;    isExpense = isExpense,
 &nbsp;    iconBgColor = iconBgColor,
@@ -664,7 +672,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 17:47</div>
+    <div style="float:right;">generated on 2026-07-28 18:03</div>
 </div>
 </body>
 </html>

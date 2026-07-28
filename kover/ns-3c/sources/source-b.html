@@ -57,26 +57,26 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    44.4%
+    44.7%
   </span>
   <span class="absValue">
-    (16/36)
+    (17/38)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    73%
+    73.4%
   </span>
   <span class="absValue">
-    (46/63)
+    (47/64)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    67.1%
+    67.5%
   </span>
   <span class="absValue">
-    (233/347)
+    (243/360)
   </span>
 </td>
 </tr>
@@ -223,7 +223,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (146/146)
+    (147/147)
   </span>
 </td>
   </tr>
@@ -299,26 +299,26 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    58.3%
+    58%
   </span>
   <span class="absValue">
-    (28/48)
+    (29/50)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    81.5%
+    81.7%
   </span>
   <span class="absValue">
-    (75/92)
+    (76/93)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    82.2%
+    82.1%
   </span>
   <span class="absValue">
-    (526/640)
+    (537/654)
   </span>
 </td>
 </tr>
@@ -339,7 +339,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.domain.model.ConvertedTotal
 &nbsp;import com.georgeci.moneysurfer.domain.model.ExchangeRateSnapshot
 &nbsp;import com.georgeci.moneysurfer.domain.model.SavingsGoalSummary
-&nbsp;import com.georgeci.moneysurfer.domain.model.Transaction
+&nbsp;import com.georgeci.moneysurfer.domain.model.TransactionSplitGroup
 &nbsp;import com.georgeci.moneysurfer.domain.preferences.UiPreferences
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.AccountId
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.GoalId
@@ -427,7 +427,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;                DashboardState.Content(</b>
 <b class="fc">&nbsp;                    accounts = accounts.map { it.toUi() },</b>
 <b class="fc">&nbsp;                    transactions = transactions</b>
-<b class="fc">&nbsp;                        .filter { it.type != TransactionType.OPENING_BALANCE }</b>
+<b class="fc">&nbsp;                        .filter { it.primary.type != TransactionType.OPENING_BALANCE }</b>
 <b class="fc">&nbsp;                        .take(RECENT_TRANSACTIONS_LIMIT)</b>
 <b class="fc">&nbsp;                        .map { it.toUi() },</b>
 <b class="fc">&nbsp;                    formattedTotalBalance = balance?.headline,</b>
@@ -498,12 +498,17 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="nc">&nbsp;        progress = progress.percent.toFloat(),</b>
 &nbsp;    )
 &nbsp;
-<b class="fc">&nbsp;    private fun Transaction.toUi() = TransactionUi(</b>
-<b class="fc">&nbsp;        id = id,</b>
-<b class="pc">&nbsp;        title = note.ifBlank { &quot;No description&quot; },</b>
-<b class="fc">&nbsp;        formattedAmount = MoneyFormatter.format(money.abs(), currencyCode),</b>
-<b class="pc">&nbsp;        isExpense = type == TransactionType.EXPENSE,</b>
-<b class="pc">&nbsp;        categoryHueSeed = categoryId?.value.orEmpty(),</b>
+&nbsp;    /**
+&nbsp;     * One receipt as the widget draws it. A split shows the whole payment and how many categories
+&nbsp;     * it covers — its legs are separate rows only where a category is what the screen is about.
+&nbsp;     */
+<b class="fc">&nbsp;    private fun TransactionSplitGroup.toUi() = TransactionUi(</b>
+<b class="fc">&nbsp;        id = primary.id,</b>
+<b class="pc">&nbsp;        title = primary.note.ifBlank { &quot;No description&quot; },</b>
+<b class="fc">&nbsp;        formattedAmount = MoneyFormatter.format(total, primary.currencyCode),</b>
+<b class="pc">&nbsp;        isExpense = primary.type == TransactionType.EXPENSE,</b>
+<b class="pc">&nbsp;        categoryHueSeed = primary.categoryId?.value.orEmpty(),</b>
+<b class="pc">&nbsp;        splitCategoryCount = if (isSplit) categoryCount else 0,</b>
 &nbsp;    )
 &nbsp;}
 &nbsp;
@@ -589,6 +594,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    val formattedAmount: String,
 &nbsp;    val isExpense: Boolean,
 &nbsp;    val categoryHueSeed: String,
+&nbsp;    /**
+&nbsp;     * How many categories a collapsed split covers, or `0` for an ordinary transaction. Non-zero
+&nbsp;     * makes [formattedAmount] the whole receipt and gives the row its &quot;N categories&quot; meta line;
+&nbsp;     * [id] is the leg tapping it opens.
+&nbsp;     */
+&nbsp;    val splitCategoryCount: Int = 0,
 &nbsp;)
 &nbsp;
 &nbsp;sealed interface DashboardEvent {
@@ -649,7 +660,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 17:47</div>
+    <div style="float:right;">generated on 2026-07-28 18:03</div>
 </div>
 </body>
 </html>

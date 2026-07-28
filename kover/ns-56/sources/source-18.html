@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > TransactionTypeUi</title>
+  <title>MoneySurfer Coverage Report > TransactionCreationTransferBlockKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.feature.transaction.creation</a>
 </div>
 
-<h1>Coverage Summary for Class: TransactionTypeUi (com.georgeci.moneysurfer.feature.transaction.creation)</h1>
+<h1>Coverage Summary for Class: TransactionCreationTransferBlockKt (com.georgeci.moneysurfer.feature.transaction.creation)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,38 +49,45 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">TransactionTypeUi</td>
+  <td class="name">TransactionCreationTransferBlockKt</td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (1/1)
+    (0/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (1/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
+    (0/4)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (24/24)
+    (0/66)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/120)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1424)
   </span>
 </td>
 </tr>
@@ -94,85 +101,227 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.transaction.creation
 &nbsp;
-&nbsp;import arrow.optics.optics
+&nbsp;import androidx.compose.foundation.background
+&nbsp;import androidx.compose.foundation.clickable
+&nbsp;import androidx.compose.foundation.layout.Arrangement
+&nbsp;import androidx.compose.foundation.layout.Box
+&nbsp;import androidx.compose.foundation.layout.Column
+&nbsp;import androidx.compose.foundation.layout.Row
+&nbsp;import androidx.compose.foundation.layout.Spacer
+&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
+&nbsp;import androidx.compose.foundation.layout.padding
+&nbsp;import androidx.compose.foundation.layout.size
+&nbsp;import androidx.compose.foundation.layout.width
+&nbsp;import androidx.compose.foundation.shape.CircleShape
+&nbsp;import androidx.compose.foundation.text.BasicTextField
+&nbsp;import androidx.compose.foundation.text.KeyboardOptions
+&nbsp;import androidx.compose.foundation.text.input.TextFieldLineLimits
+&nbsp;import androidx.compose.foundation.text.input.TextFieldState
+&nbsp;import androidx.compose.material3.ExperimentalMaterial3Api
+&nbsp;import androidx.compose.material3.Icon
+&nbsp;import androidx.compose.material3.LocalTextStyle
+&nbsp;import androidx.compose.material3.Text
+&nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.ui.Alignment
+&nbsp;import androidx.compose.ui.Modifier
+&nbsp;import androidx.compose.ui.draw.clip
+&nbsp;import androidx.compose.ui.graphics.SolidColor
+&nbsp;import androidx.compose.ui.text.font.FontWeight
+&nbsp;import androidx.compose.ui.text.input.KeyboardType
+&nbsp;import androidx.compose.ui.text.style.TextAlign
+&nbsp;import androidx.compose.ui.unit.dp
+&nbsp;import com.georgeci.moneysurfer.domain.formatter.MoneyFormatter
 &nbsp;import com.georgeci.moneysurfer.domain.model.Account
-&nbsp;import com.georgeci.moneysurfer.domain.model.Category
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryId
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionId
-&nbsp;import kotlinx.datetime.LocalDate
+&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferPickerRow
+&nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
+&nbsp;import com.georgeci.moneysurfer.utils.AmountInputTransformation
+&nbsp;import moneysurfer.feature.transaction.generated.resources.Res
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_creation_account_empty
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_creation_amount_placeholder
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_creation_from_account
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_creation_from_label
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_creation_rate_hint
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_creation_swap_content_description
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_creation_to_account
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_creation_to_label
+&nbsp;import org.jetbrains.compose.resources.stringResource
 &nbsp;
-<b class="fc">&nbsp;enum class TransactionTypeUi { Expense, Income, Transfer }</b>
+&nbsp;@OptIn(ExperimentalMaterial3Api::class)
+&nbsp;@Composable
+&nbsp;internal fun TransferAccountsBlock(
+&nbsp;    state: TransactionCreationState.Content,
+&nbsp;    fromAmountState: TextFieldState,
+&nbsp;    toAmountState: TextFieldState,
+&nbsp;    onEvent: (TransactionCreationEvent) -&gt; Unit,
+<b class="nc">&nbsp;) {</b>
+<b class="nc">&nbsp;    val crossCurrency = state.crossCurrency</b>
+<b class="nc">&nbsp;    val fromSymbol = currencySymbol(state.fromAccount?.currencyCode)</b>
+<b class="nc">&nbsp;    val toSymbol = currencySymbol(state.toAccount?.currencyCode)</b>
 &nbsp;
-&nbsp;@optics
-&nbsp;sealed interface TransactionCreationState {
-&nbsp;    data object Loading : TransactionCreationState
+<b class="nc">&nbsp;    Column(</b>
+<b class="nc">&nbsp;        modifier = Modifier</b>
+<b class="nc">&nbsp;            .fillMaxWidth()</b>
+<b class="nc">&nbsp;            .padding(horizontal = 16.dp),</b>
+<b class="nc">&nbsp;        verticalArrangement = Arrangement.spacedBy(8.dp),</b>
+&nbsp;    ) {
+<b class="nc">&nbsp;        TransferLegCard(</b>
+<b class="nc">&nbsp;            label = stringResource(Res.string.transaction_creation_from_label),</b>
+<b class="nc">&nbsp;            currencySymbol = fromSymbol,</b>
+<b class="nc">&nbsp;            amountText = fromAmountState.text.toString(),</b>
+<b class="nc">&nbsp;            amountState = fromAmountState,</b>
+<b class="nc">&nbsp;            account = state.fromAccount,</b>
+<b class="nc">&nbsp;            accountPlaceholder = stringResource(Res.string.transaction_creation_from_account),</b>
+<b class="nc">&nbsp;            onAccountClick = { onEvent(TransactionCreationEvent.OnOpenFromAccountChooser) },</b>
+&nbsp;        )
 &nbsp;
-&nbsp;    @optics
-&nbsp;    data class Content(
-&nbsp;        val amount: String,
-&nbsp;        val note: String,
-&nbsp;        val type: TransactionTypeUi,
-&nbsp;        val accounts: List&lt;Account&gt;,
-&nbsp;        val categories: List&lt;Category&gt;,
-&nbsp;        val selectedAccount: Account?,
-&nbsp;        val selectedCategory: Category?,
-&nbsp;        val isEditMode: Boolean,
-&nbsp;        val editingTransactionId: TransactionId?,
-&nbsp;        /** Non-null only in edit mode: the stored row behind the identity band. */
-&nbsp;        val editIdentity: TransactionEditIdentity? = null,
-&nbsp;        /** Whether the delete confirmation is up — the same dialog the details screen shows. */
-&nbsp;        val showDeleteConfirmation: Boolean = false,
-&nbsp;        val editingCreatedAt: kotlin.time.Instant? = null,
-&nbsp;        // Original `operationDate` from the persisted transaction. Preserved across
-&nbsp;        // edits unless the user explicitly picks a new date — otherwise a timezone
-&nbsp;        // change between the original save and the edit would silently shift the
-&nbsp;        // stored business date.
-&nbsp;        val pinnedOperationDate: LocalDate? = null,
-&nbsp;        /**
-&nbsp;         * Fields of the transaction being edited that this form cannot change but must not
-&nbsp;         * destroy — see [PreservedTransactionFields].
-&nbsp;         */
-&nbsp;        val preserved: PreservedTransactionFields = PreservedTransactionFields(),
-&nbsp;        val timestamp: Long,
-&nbsp;        val categoryUsageCounts: Map&lt;CategoryId, Int&gt;,
-&nbsp;        val displayCategories: List&lt;Category&gt;,
-&nbsp;        val fromAccount: Account? = null,
-&nbsp;        val toAccount: Account? = null,
-&nbsp;        val toAmount: String = &quot;&quot;,
-&nbsp;        val transferEnabled: Boolean = true,
-&nbsp;    ) : TransactionCreationState {
-&nbsp;        val isExpense: Boolean get() = type == TransactionTypeUi.Expense
-&nbsp;        val isTransfer: Boolean get() = type == TransactionTypeUi.Transfer
-&nbsp;        val crossCurrency: Boolean
-&nbsp;            get() = isTransfer &amp;&amp;
-&nbsp;                fromAccount != null &amp;&amp;
-&nbsp;                toAccount != null &amp;&amp;
-&nbsp;                fromAccount.currencyCode != toAccount.currencyCode
+<b class="nc">&nbsp;        state.amountError?.let { error -&gt;</b>
+<b class="nc">&nbsp;            AmountErrorText(error, modifier = Modifier.padding(start = 4.dp))</b>
+<b class="nc">&nbsp;        }</b>
 &nbsp;
-&nbsp;        /** Inline validation error for the (from) amount field, or null when it is acceptable. */
-&nbsp;        val amountError: TransactionAmountError?
-&nbsp;            get() = TransactionAmountInput.errorFor(amount)
+<b class="nc">&nbsp;        Box(</b>
+<b class="nc">&nbsp;            modifier = Modifier.fillMaxWidth(),</b>
+<b class="nc">&nbsp;            contentAlignment = Alignment.Center,</b>
+&nbsp;        ) {
+<b class="nc">&nbsp;            Box(</b>
+<b class="nc">&nbsp;                modifier = Modifier</b>
+<b class="nc">&nbsp;                    .size(40.dp)</b>
+<b class="nc">&nbsp;                    .clip(CircleShape)</b>
+<b class="nc">&nbsp;                    .background(AppTheme.materialColors.primary)</b>
+<b class="nc">&nbsp;                    .clickable { onEvent(TransactionCreationEvent.OnSwapAccountsClick) },</b>
+<b class="nc">&nbsp;                contentAlignment = Alignment.Center,</b>
+&nbsp;            ) {
+<b class="nc">&nbsp;                Icon(</b>
+<b class="nc">&nbsp;                    imageVector = SurferIcons.SwapHoriz,</b>
+<b class="nc">&nbsp;                    contentDescription = stringResource(Res.string.transaction_creation_swap_content_description),</b>
+<b class="nc">&nbsp;                    tint = AppTheme.materialColors.onPrimary,</b>
+<b class="nc">&nbsp;                    modifier = Modifier.size(20.dp),</b>
+&nbsp;                )
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;        }</b>
 &nbsp;
-&nbsp;        /** Inline validation error for the cross-currency &quot;to&quot; amount, or null when it is acceptable. */
-&nbsp;        val toAmountError: TransactionAmountError?
-&nbsp;            get() = if (crossCurrency) TransactionAmountInput.errorFor(toAmount) else null
+<b class="nc">&nbsp;        TransferLegCard(</b>
+<b class="nc">&nbsp;            label = stringResource(Res.string.transaction_creation_to_label),</b>
+<b class="nc">&nbsp;            currencySymbol = toSymbol,</b>
+<b class="nc">&nbsp;            amountText = if (crossCurrency) toAmountState.text.toString() else fromAmountState.text.toString(),</b>
+<b class="nc">&nbsp;            amountState = if (crossCurrency) toAmountState else null,</b>
+<b class="nc">&nbsp;            account = state.toAccount,</b>
+<b class="nc">&nbsp;            accountPlaceholder = stringResource(Res.string.transaction_creation_to_account),</b>
+<b class="nc">&nbsp;            onAccountClick = { onEvent(TransactionCreationEvent.OnOpenToAccountChooser) },</b>
+&nbsp;        )
 &nbsp;
-&nbsp;        val isSaveEnabled: Boolean
-&nbsp;            get() = if (isTransfer) {
-&nbsp;                TransactionAmountInput.isValid(amount) &amp;&amp;
-&nbsp;                    (!crossCurrency || TransactionAmountInput.isValid(toAmount)) &amp;&amp;
-&nbsp;                    fromAccount != null &amp;&amp; toAccount != null &amp;&amp;
-&nbsp;                    fromAccount.id != toAccount.id
+<b class="nc">&nbsp;        state.toAmountError?.let { error -&gt;</b>
+<b class="nc">&nbsp;            AmountErrorText(error, modifier = Modifier.padding(start = 4.dp))</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+<b class="nc">&nbsp;        if (crossCurrency) {</b>
+<b class="nc">&nbsp;            RateHint(state = state, fromSymbol = fromSymbol, toSymbol = toSymbol)</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;    }</b>
+<b class="nc">&nbsp;}</b>
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun RateHint(
+&nbsp;    state: TransactionCreationState.Content,
+&nbsp;    fromSymbol: String,
+&nbsp;    toSymbol: String,
+<b class="nc">&nbsp;) {</b>
+<b class="nc">&nbsp;    val from = state.amount.toDoubleOrNull()?.takeIf { it &gt; 0 } ?: return</b>
+<b class="nc">&nbsp;    val to = state.toAmount.toDoubleOrNull()?.takeIf { it &gt; 0 } ?: return</b>
+<b class="nc">&nbsp;    Text(</b>
+<b class="nc">&nbsp;        text = stringResource(</b>
+<b class="nc">&nbsp;            Res.string.transaction_creation_rate_hint,</b>
+<b class="nc">&nbsp;            fromSymbol,</b>
+<b class="nc">&nbsp;            formatRate(to / from),</b>
+<b class="nc">&nbsp;            toSymbol,</b>
+&nbsp;        ),
+<b class="nc">&nbsp;        style = AppTheme.typography.bodySmall,</b>
+<b class="nc">&nbsp;        color = AppTheme.materialColors.onSurfaceVariant,</b>
+<b class="nc">&nbsp;        modifier = Modifier.padding(start = 4.dp, top = 2.dp),</b>
+&nbsp;    )
+<b class="nc">&nbsp;}</b>
+&nbsp;
+&nbsp;@OptIn(ExperimentalMaterial3Api::class)
+&nbsp;@Composable
+&nbsp;private fun TransferLegCard(
+&nbsp;    label: String,
+&nbsp;    currencySymbol: String,
+&nbsp;    amountText: String,
+&nbsp;    /** Non-null makes the leg editable; the receiving leg passes null unless the rate differs. */
+&nbsp;    amountState: TextFieldState?,
+&nbsp;    account: Account?,
+&nbsp;    accountPlaceholder: String,
+&nbsp;    onAccountClick: () -&gt; Unit,
+<b class="nc">&nbsp;) {</b>
+<b class="nc">&nbsp;    val shape = AppTheme.shapes.small</b>
+<b class="nc">&nbsp;    Column(</b>
+<b class="nc">&nbsp;        modifier = Modifier</b>
+<b class="nc">&nbsp;            .fillMaxWidth()</b>
+<b class="nc">&nbsp;            .clip(shape)</b>
+<b class="nc">&nbsp;            .background(AppTheme.materialColors.surfaceVariant.copy(alpha = 0.4f))</b>
+<b class="nc">&nbsp;            .padding(horizontal = 16.dp, vertical = 12.dp),</b>
+<b class="nc">&nbsp;        verticalArrangement = Arrangement.spacedBy(8.dp),</b>
+&nbsp;    ) {
+<b class="nc">&nbsp;        Row(</b>
+<b class="nc">&nbsp;            modifier = Modifier.fillMaxWidth(),</b>
+<b class="nc">&nbsp;            verticalAlignment = Alignment.CenterVertically,</b>
+&nbsp;        ) {
+<b class="nc">&nbsp;            Text(</b>
+<b class="nc">&nbsp;                text = label,</b>
+<b class="nc">&nbsp;                style = AppTheme.typography.labelMedium,</b>
+<b class="nc">&nbsp;                color = AppTheme.materialColors.onSurfaceVariant,</b>
+<b class="nc">&nbsp;                modifier = Modifier.weight(1f),</b>
+&nbsp;            )
+<b class="nc">&nbsp;            Text(</b>
+<b class="nc">&nbsp;                text = currencySymbol,</b>
+<b class="nc">&nbsp;                style = AppTheme.typography.headlineMedium,</b>
+<b class="nc">&nbsp;                color = AppTheme.materialColors.onSurfaceVariant,</b>
+&nbsp;            )
+<b class="nc">&nbsp;            Spacer(Modifier.width(4.dp))</b>
+<b class="nc">&nbsp;            if (amountState != null) {</b>
+<b class="nc">&nbsp;                BasicTextField(</b>
+<b class="nc">&nbsp;                    state = amountState,</b>
+<b class="nc">&nbsp;                    inputTransformation = AmountInputTransformation,</b>
+<b class="nc">&nbsp;                    lineLimits = TextFieldLineLimits.SingleLine,</b>
+<b class="nc">&nbsp;                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),</b>
+<b class="nc">&nbsp;                    textStyle = LocalTextStyle.current.merge(AppTheme.typography.headlineLarge).copy(</b>
+<b class="nc">&nbsp;                        color = AppTheme.materialColors.onSurface,</b>
+<b class="nc">&nbsp;                        textAlign = TextAlign.End,</b>
+<b class="nc">&nbsp;                        fontWeight = FontWeight.Medium,</b>
+&nbsp;                    ),
+<b class="nc">&nbsp;                    cursorBrush = SolidColor(AppTheme.materialColors.primary),</b>
+&nbsp;                )
 &nbsp;            } else {
-&nbsp;                TransactionAmountInput.isValid(amount) &amp;&amp;
-&nbsp;                    selectedAccount != null &amp;&amp;
-&nbsp;                    selectedCategory != null
+<b class="nc">&nbsp;                Text(</b>
+<b class="nc">&nbsp;                    text = amountText.ifEmpty { stringResource(Res.string.transaction_creation_amount_placeholder) },</b>
+<b class="nc">&nbsp;                    style = AppTheme.typography.headlineLarge,</b>
+<b class="nc">&nbsp;                    color = AppTheme.materialColors.onSurface,</b>
+<b class="nc">&nbsp;                    fontWeight = FontWeight.Medium,</b>
+&nbsp;                )
 &nbsp;            }
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        SurferPickerRow(</b>
+<b class="nc">&nbsp;            label = accountPlaceholder,</b>
+<b class="nc">&nbsp;            value = account?.let { acc -&gt;</b>
+<b class="nc">&nbsp;                val balance = MoneyFormatter.format(acc.balance, acc.currencyCode)</b>
+<b class="nc">&nbsp;                &quot;${acc.name} · $balance&quot;</b>
+<b class="nc">&nbsp;            } ?: stringResource(Res.string.transaction_creation_account_empty),</b>
+<b class="nc">&nbsp;            icon = SurferIcons.CreditCard,</b>
+<b class="nc">&nbsp;            onClick = onAccountClick,</b>
+&nbsp;        )
+<b class="nc">&nbsp;    }</b>
+<b class="nc">&nbsp;}</b>
 &nbsp;
-&nbsp;        companion object
+&nbsp;private const val RATE_DECIMAL_SCALE = 10_000.0
+&nbsp;
+&nbsp;private fun formatRate(rate: Double): String {
+<b class="nc">&nbsp;    val rounded = (rate * RATE_DECIMAL_SCALE).toLong() / RATE_DECIMAL_SCALE</b>
+<b class="nc">&nbsp;    val asLong = rounded.toLong()</b>
+<b class="nc">&nbsp;    return if (rounded == asLong.toDouble()) {</b>
+<b class="nc">&nbsp;        asLong.toString()</b>
+&nbsp;    } else {
+<b class="nc">&nbsp;        rounded.toString()</b>
 &nbsp;    }
-&nbsp;
-&nbsp;    companion object
 &nbsp;}
 </code>
 </pre>
@@ -197,7 +346,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 17:47</div>
+    <div style="float:right;">generated on 2026-07-28 18:03</div>
 </div>
 </body>
 </html>

@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > TransactionId</title>
+  <title>MoneySurfer Coverage Report > SplitId</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.primitives</a>
 </div>
 
-<h1>Coverage Summary for Class: TransactionId (com.georgeci.moneysurfer.domain.primitives)</h1>
+<h1>Coverage Summary for Class: SplitId (com.georgeci.moneysurfer.domain.primitives)</h1>
 
 <table class="coverageStats">
 
@@ -46,7 +46,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">TransactionId</td>
+  <td class="name">SplitId</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -74,7 +74,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 </tr>
   <tr>
-    <td class="name">TransactionId$Companion</td>
+    <td class="name">SplitId$Companion</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -143,12 +143,17 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import kotlin.uuid.ExperimentalUuidApi
 &nbsp;import kotlin.uuid.Uuid
 &nbsp;
+&nbsp;/**
+&nbsp; * Shared id of the sibling rows one receipt was split across — the same grouping technique
+&nbsp; * [TransferId] uses, and deliberately not a foreign key to a child table: every leg stays a
+&nbsp; * self-contained transaction, which is what keeps per-entity LWW sync correct for it.
+&nbsp; */
 &nbsp;@JvmInline
 &nbsp;@Serializable
-<b class="fc">&nbsp;value class TransactionId(val value: String) {</b>
+<b class="fc">&nbsp;value class SplitId(val value: String) {</b>
 &nbsp;    companion object {
 &nbsp;        @OptIn(ExperimentalUuidApi::class)
-<b class="fc">&nbsp;        fun uuid(): TransactionId = TransactionId(Uuid.random().toString())</b>
+<b class="fc">&nbsp;        fun uuid(): SplitId = SplitId(Uuid.random().toString())</b>
 &nbsp;    }
 &nbsp;}
 </code>
@@ -174,7 +179,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 17:47</div>
+    <div style="float:right;">generated on 2026-07-28 18:03</div>
 </div>
 </body>
 </html>

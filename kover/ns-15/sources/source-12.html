@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > WorkspaceCollectionReader</title>
+  <title>MoneySurfer Coverage Report > UserWorkspacesProvider</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.data.sync</a>
 </div>
 
-<h1>Coverage Summary for Class: WorkspaceCollectionReader (com.georgeci.moneysurfer.data.sync)</h1>
+<h1>Coverage Summary for Class: UserWorkspacesProvider (com.georgeci.moneysurfer.data.sync)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">WorkspaceCollectionReader</td>
+  <td class="name">UserWorkspacesProvider</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -46,36 +46,16 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.sync
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.sync.plugin.RemoteDocument
+&nbsp;/**
+&nbsp; * Provides the authoritative list of workspace IDs for the current user from the remote
+&nbsp; * source (`users/{uid}.workspaceIds`). Used by [PullRemoteChangesUseCaseImpl] to discover
+&nbsp; * workspaces not yet present in the local database.
+&nbsp; */
+&nbsp;interface UserWorkspacesProvider {
+&nbsp;    suspend fun workspaceIds(): List&lt;String&gt;
 &nbsp;
-&nbsp;interface WorkspaceCollectionReader {
-&nbsp;    /**
-&nbsp;     * Fetches the workspace root document (`/workspaces/{workspaceId}`).
-&nbsp;     * Returns null if the document does not exist or the caller lacks access.
-&nbsp;     * Used by [PullRemoteChangesUseCaseImpl] to hydrate the local [WorkspaceEntity]
-&nbsp;     * before subcollection pulls (accounts / categories / transactions all have a
-&nbsp;     * Room FK on `workspaceId`).
-&nbsp;     */
-&nbsp;    suspend fun fetchWorkspaceDoc(workspaceId: String): RemoteDocument?
-&nbsp;
-&nbsp;    suspend fun fetchUpdatedSince(
-&nbsp;        workspaceId: String,
-&nbsp;        collectionName: String,
-&nbsp;        sinceMillis: Long,
-&nbsp;        limit: Int,
-&nbsp;    ): List&lt;RemoteDocument&gt;
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Fetches invite documents from a workspace the caller has been invited to but
-&nbsp;     * has not yet joined. Adds a `targetUserId == uid` constraint so the query
-&nbsp;     * satisfies Firestore rules for non-members (see firestore.rules §invites).
-&nbsp;     */
-&nbsp;    suspend fun fetchInvitesForUser(
-&nbsp;        workspaceId: String,
-&nbsp;        uid: String,
-&nbsp;        sinceMillis: Long,
-&nbsp;        limit: Int,
-&nbsp;    ): List&lt;RemoteDocument&gt;
+&nbsp;    /** Workspace IDs the user has been invited to but not yet joined. */
+&nbsp;    suspend fun invitedWorkspaceIds(): List&lt;String&gt;
 &nbsp;}
 </code>
 </pre>
@@ -100,7 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 17:47</div>
+    <div style="float:right;">generated on 2026-07-28 18:03</div>
 </div>
 </body>
 </html>

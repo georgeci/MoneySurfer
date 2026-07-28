@@ -76,7 +76,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/552)
+    (0/543)
   </span>
 </td>
 </tr>
@@ -375,7 +375,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/604)
+    (0/595)
   </span>
 </td>
 </tr>
@@ -390,7 +390,6 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;
 &nbsp;import androidx.compose.material3.ExperimentalMaterial3Api
 &nbsp;import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
-&nbsp;import androidx.compose.material3.adaptive.navigation3.ListDetailSceneStrategy
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryId
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryType
 &nbsp;import com.georgeci.moneysurfer.feature.category.creation.CategoryCreationScreen
@@ -403,13 +402,14 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.navigation.FeatureNavGraph
 &nbsp;import com.georgeci.moneysurfer.navigation.NavDetailPlaceholder
 &nbsp;import com.georgeci.moneysurfer.navigation.Route
+&nbsp;import com.georgeci.moneysurfer.navigation.SurferPaneSceneStrategy
 &nbsp;import io.github.irgaly.navigation3.resultstate.LocalNavigationResultProducer
 &nbsp;import io.github.irgaly.navigation3.resultstate.setResult
 &nbsp;
 &nbsp;@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3AdaptiveApi::class)
 <b class="nc">&nbsp;val categoryNavGraph: FeatureNavGraph = { navigator -&gt;</b>
 <b class="nc">&nbsp;    entry&lt;Route.CategoryCreation&gt;(</b>
-<b class="nc">&nbsp;        metadata = ListDetailSceneStrategy.detailPane(),</b>
+<b class="nc">&nbsp;        metadata = SurferPaneSceneStrategy.detailPane(),</b>
 <b class="nc">&nbsp;    ) {</b>
 <b class="nc">&nbsp;        CategoryCreationScreen(</b>
 <b class="nc">&nbsp;            categoryId = it.categoryId?.let(::CategoryId),</b>
@@ -418,7 +418,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    }
 &nbsp;
 <b class="nc">&nbsp;    entry&lt;Route.CategoriesManage&gt;(</b>
-<b class="nc">&nbsp;        metadata = ListDetailSceneStrategy.listPane(detailPlaceholder = { NavDetailPlaceholder() }),</b>
+<b class="nc">&nbsp;        metadata = SurferPaneSceneStrategy.listPane(detailPlaceholder = { NavDetailPlaceholder() }),</b>
 <b class="nc">&nbsp;    ) {</b>
 <b class="nc">&nbsp;        CategoriesManageScreen(</b>
 <b class="nc">&nbsp;            onNavigateBack = { navigator.pop() },</b>
@@ -433,7 +433,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    }
 &nbsp;
 <b class="nc">&nbsp;    entry&lt;Route.CategoryDetails&gt;(</b>
-<b class="nc">&nbsp;        metadata = ListDetailSceneStrategy.detailPane(),</b>
+<b class="nc">&nbsp;        metadata = SurferPaneSceneStrategy.detailPane(),</b>
 <b class="nc">&nbsp;    ) { key -&gt;</b>
 <b class="nc">&nbsp;        CategoryDetailsScreen(</b>
 <b class="nc">&nbsp;            categoryId = CategoryId(key.categoryId),</b>
@@ -495,7 +495,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 17:47</div>
+    <div style="float:right;">generated on 2026-07-28 18:03</div>
 </div>
 </body>
 </html>

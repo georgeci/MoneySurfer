@@ -69,7 +69,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/366)
+    (0/351)
   </span>
 </td>
 </tr>
@@ -301,7 +301,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/392)
+    (0/377)
   </span>
 </td>
 </tr>
@@ -315,7 +315,6 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.goal
 &nbsp;
 &nbsp;import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
-&nbsp;import androidx.compose.material3.adaptive.navigation3.ListDetailSceneStrategy
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.GoalId
 &nbsp;import com.georgeci.moneysurfer.feature.goal.contribution.GoalContributionScreen
 &nbsp;import com.georgeci.moneysurfer.feature.goal.details.GoalDetailsScreen
@@ -325,11 +324,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.navigation.GoalContributionMode
 &nbsp;import com.georgeci.moneysurfer.navigation.NavDetailPlaceholder
 &nbsp;import com.georgeci.moneysurfer.navigation.Route
+&nbsp;import com.georgeci.moneysurfer.navigation.SurferPaneSceneStrategy
 &nbsp;
 &nbsp;@OptIn(ExperimentalMaterial3AdaptiveApi::class)
 <b class="nc">&nbsp;val goalNavGraph: FeatureNavGraph = { navigator -&gt;</b>
 <b class="nc">&nbsp;    entry&lt;Route.Goals&gt;(</b>
-<b class="nc">&nbsp;        metadata = ListDetailSceneStrategy.listPane(detailPlaceholder = { NavDetailPlaceholder() }),</b>
+<b class="nc">&nbsp;        metadata = SurferPaneSceneStrategy.listPane(detailPlaceholder = { NavDetailPlaceholder() }),</b>
 <b class="nc">&nbsp;    ) {</b>
 <b class="nc">&nbsp;        GoalsScreen(</b>
 <b class="nc">&nbsp;            onNavigateBack = { navigator.pop() },</b>
@@ -339,7 +339,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    }
 &nbsp;
 <b class="nc">&nbsp;    entry&lt;Route.GoalDetails&gt;(</b>
-<b class="nc">&nbsp;        metadata = ListDetailSceneStrategy.detailPane(),</b>
+<b class="nc">&nbsp;        metadata = SurferPaneSceneStrategy.detailPane(),</b>
 <b class="nc">&nbsp;    ) { key -&gt;</b>
 <b class="nc">&nbsp;        GoalDetailsScreen(</b>
 <b class="nc">&nbsp;            goalId = GoalId(key.goalId),</b>
@@ -352,7 +352,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    }
 &nbsp;
 <b class="nc">&nbsp;    entry&lt;Route.GoalCreation&gt;(</b>
-<b class="nc">&nbsp;        metadata = ListDetailSceneStrategy.detailPane(),</b>
+<b class="nc">&nbsp;        metadata = SurferPaneSceneStrategy.detailPane(),</b>
 <b class="nc">&nbsp;    ) {</b>
 <b class="nc">&nbsp;        GoalEditScreen(</b>
 <b class="nc">&nbsp;            goalId = null,</b>
@@ -361,7 +361,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    }
 &nbsp;
 <b class="nc">&nbsp;    entry&lt;Route.GoalEdit&gt;(</b>
-<b class="nc">&nbsp;        metadata = ListDetailSceneStrategy.detailPane(),</b>
+<b class="nc">&nbsp;        metadata = SurferPaneSceneStrategy.detailPane(),</b>
 <b class="nc">&nbsp;    ) { key -&gt;</b>
 <b class="nc">&nbsp;        GoalEditScreen(</b>
 <b class="nc">&nbsp;            goalId = GoalId(key.goalId),</b>
@@ -370,7 +370,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    }
 &nbsp;
 <b class="nc">&nbsp;    entry&lt;Route.GoalContribution&gt;(</b>
-<b class="nc">&nbsp;        metadata = ListDetailSceneStrategy.detailPane(),</b>
+<b class="nc">&nbsp;        metadata = SurferPaneSceneStrategy.detailPane(),</b>
 <b class="nc">&nbsp;    ) { key -&gt;</b>
 <b class="nc">&nbsp;        GoalContributionScreen(</b>
 <b class="nc">&nbsp;            goalId = GoalId(key.goalId),</b>
@@ -402,7 +402,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 17:47</div>
+    <div style="float:right;">generated on 2026-07-28 18:03</div>
 </div>
 </body>
 </html>

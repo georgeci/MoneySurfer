@@ -60,7 +60,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (14/14)
+    (18/18)
   </span>
 </td>
 <td class="coverageStat">
@@ -68,7 +68,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (28/28)
+    (29/29)
   </span>
 </td>
 <td class="coverageStat">
@@ -76,7 +76,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (180/180)
+    (193/193)
   </span>
 </td>
 </tr>
@@ -95,7 +95,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (24/24)
+    (26/26)
   </span>
 </td>
 <td class="coverageStat">
@@ -103,7 +103,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (41/41)
+    (42/42)
   </span>
 </td>
 <td class="coverageStat">
@@ -111,7 +111,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (394/394)
+    (342/342)
   </span>
 </td>
   </tr>
@@ -158,7 +158,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (38/38)
+    (44/44)
   </span>
 </td>
 <td class="coverageStat">
@@ -166,7 +166,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (70/70)
+    (72/72)
   </span>
 </td>
 <td class="coverageStat">
@@ -174,7 +174,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (581/581)
+    (542/542)
   </span>
 </td>
 </tr>
@@ -194,6 +194,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.RecurringRuleId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.SplitId
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionId
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionStatus
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionType
@@ -227,6 +228,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    Merchant(&quot;merchant&quot;),
 &nbsp;    Tags(&quot;tags&quot;),
 &nbsp;    RecurringRuleId(&quot;recurring_rule_id&quot;),
+&nbsp;    SplitId(&quot;split_id&quot;),
 &nbsp;}
 &nbsp;
 &nbsp;sealed interface TransactionCsvDecodeResult {
@@ -273,6 +275,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;            // spreadsheet would evaluate once a user re-orders the cell by hand.
 <b class="fc">&nbsp;            Csv.encodeCellList(tags.map(Csv::guardFormula)),</b>
 <b class="fc">&nbsp;            recurringRuleId?.value.orEmpty(),</b>
+<b class="fc">&nbsp;            splitId?.value.orEmpty(),</b>
 <b class="fc">&nbsp;        )</b>
 &nbsp;    }
 &nbsp;
@@ -323,6 +326,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;                    transferId = optional(TransactionCsvColumn.TransferId)?.let(::TransferId),</b>
 <b class="fc">&nbsp;                    recurringRuleId = optional(TransactionCsvColumn.RecurringRuleId)</b>
 <b class="fc">&nbsp;                        ?.let(::RecurringRuleId),</b>
+<b class="fc">&nbsp;                    splitId = optional(TransactionCsvColumn.SplitId)?.let(::SplitId),</b>
 &nbsp;                ),
 &nbsp;            )
 &nbsp;        } catch (rejected: FieldRejectedException) {
@@ -418,7 +422,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 17:47</div>
+    <div style="float:right;">generated on 2026-07-28 18:03</div>
 </div>
 </body>
 </html>

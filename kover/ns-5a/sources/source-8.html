@@ -315,6 +315,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.feature.transaction.filter.TransactionTypeFilter
 &nbsp;import com.georgeci.moneysurfer.feature.transaction.filter.compile
 &nbsp;import com.georgeci.moneysurfer.feature.transaction.filter.resolveWindow
+&nbsp;import com.georgeci.moneysurfer.feature.transaction.list.collapseSplitLegs
 &nbsp;import com.georgeci.moneysurfer.utils.MviViewModel
 &nbsp;import kotlinx.coroutines.ExperimentalCoroutinesApi
 &nbsp;import kotlinx.coroutines.flow.MutableStateFlow
@@ -457,7 +458,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;                    val window = resolveWindow(filters.dateRange, periodMode, anchor, today)</b>
 <b class="fc">&nbsp;                    val matcher = filters.compile()</b>
 <b class="fc">&nbsp;                    getTransactionsByAccount.window(accountId, window, COUNT_LIMIT + 1)</b>
-<b class="fc">&nbsp;                        .map { rows -&gt; rows.count { matcher.matches(it) } }</b>
+&nbsp;                        // Matched *then* collapsed, the same two steps in the same order the list
+&nbsp;                        // applies: the button promises how many rows the user is about to see, and
+&nbsp;                        // a receipt split across three categories is one of them, not three.
+<b class="fc">&nbsp;                        .map { rows -&gt; collapseSplitLegs(rows.filter { matcher.matches(it) }).size }</b>
 &nbsp;                }
 &nbsp;
 <b class="fc">&nbsp;            combine(draft, counted, getAccounts(), getCategories()) { filters, count, accounts, categories -&gt;</b>
@@ -544,7 +548,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 17:47</div>
+    <div style="float:right;">generated on 2026-07-28 18:03</div>
 </div>
 </body>
 </html>

@@ -57,10 +57,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    45.6%
+    45.1%
   </span>
   <span class="absValue">
-    (52/114)
+    (55/122)
   </span>
 </td>
 <td class="coverageStat">
@@ -68,15 +68,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (18/18)
+    (19/19)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    79%
+    78.6%
   </span>
   <span class="absValue">
-    (583/738)
+    (615/782)
   </span>
 </td>
 </tr>
@@ -120,10 +120,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    45.6%
+    45.1%
   </span>
   <span class="absValue">
-    (52/114)
+    (55/122)
   </span>
 </td>
 <td class="coverageStat">
@@ -131,15 +131,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (19/19)
+    (20/20)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    79.1%
+    78.8%
   </span>
   <span class="absValue">
-    (587/742)
+    (619/786)
   </span>
 </td>
 </tr>
@@ -292,6 +292,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;    val clientVersionCode: Int = 1,</b>
 &nbsp;    /** Shared id linking the two legs of a transfer. Null for non-transfer rows. */
 <b class="fc">&nbsp;    val transferId: String? = null,</b>
+&nbsp;    /**
+&nbsp;     * Shared id linking the sibling rows one receipt was split across. Null for the ordinary
+&nbsp;     * single-category row.
+&nbsp;     *
+&nbsp;     * Every leg is a self-contained document, which is why a split replicates correctly under
+&nbsp;     * per-entity LWW where a parent doc plus child allocation docs would not: legs are pulled
+&nbsp;     * independently and none of them is meaningless on its own.
+&nbsp;     */
+<b class="fc">&nbsp;    val splitId: String? = null,</b>
 &nbsp;    /** Rule that generated this row. Null for manual entries. */
 <b class="fc">&nbsp;    val recurringRuleId: String? = null,</b>
 &nbsp;)
@@ -467,7 +476,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 17:47</div>
+    <div style="float:right;">generated on 2026-07-28 18:03</div>
 </div>
 </body>
 </html>

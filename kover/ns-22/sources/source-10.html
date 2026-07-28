@@ -80,7 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (12/12)
+    (17/17)
   </span>
 </td>
 </tr>
@@ -94,9 +94,18 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.model
 &nbsp;
-<b class="fc">&nbsp;data class CategorizedTransaction(</b>
+&nbsp;data class CategorizedTransaction(
 <b class="fc">&nbsp;    val transaction: Transaction,</b>
 <b class="fc">&nbsp;    val categoryName: String?,</b>
+&nbsp;    /**
+&nbsp;     * How many legs the row&#39;s split group has in storage, or `0` when the row is not a split leg.
+&nbsp;     *
+&nbsp;     * Counted by the window query rather than stored, and compared against the legs actually
+&nbsp;     * present in a page: a collapsed row is only drawn when the two agree, so a group the paging
+&nbsp;     * limit or a filter cut in half is rendered as its individual legs instead of as a total that
+&nbsp;     * silently changes on the next &quot;load more&quot;.
+&nbsp;     */
+<b class="fc">&nbsp;    val splitLegCount: Int = 0,</b>
 &nbsp;)
 </code>
 </pre>
@@ -121,7 +130,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 17:47</div>
+    <div style="float:right;">generated on 2026-07-28 18:03</div>
 </div>
 </body>
 </html>

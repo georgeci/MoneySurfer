@@ -256,6 +256,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;        isExpense = type == TransactionType.EXPENSE,
 &nbsp;        categoryHueSeed = categoryId?.value.orEmpty(),
 &nbsp;        isTransfer = transferId != null,
+&nbsp;        isSplitLeg = splitId != null,
 &nbsp;    )
 &nbsp;}
 &nbsp;
@@ -309,6 +310,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    val categoryHueSeed: String,
 &nbsp;    /** One leg of a transfer, which deleting takes down together with its sibling. */
 &nbsp;    val isTransfer: Boolean = false,
+&nbsp;    /**
+&nbsp;     * One leg of a receipt split across categories. This screen deliberately lists the legs
+&nbsp;     * separately — a leg is its own row under its own category here — but deleting one still takes
+&nbsp;     * the whole receipt, so the confirmation has to say so.
+&nbsp;     */
+&nbsp;    val isSplitLeg: Boolean = false,
 &nbsp;)
 &nbsp;
 &nbsp;sealed interface AccountDetailsEvent {
@@ -353,7 +360,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 17:47</div>
+    <div style="float:right;">generated on 2026-07-28 18:03</div>
 </div>
 </body>
 </html>

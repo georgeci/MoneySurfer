@@ -117,6 +117,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    data object OnOpenFromAccountChooser : TransactionCreationEvent
 &nbsp;    data object OnOpenToAccountChooser : TransactionCreationEvent
 &nbsp;    data object OnSwapAccountsClick : TransactionCreationEvent
+&nbsp;
+&nbsp;    /** Turn the split editor on (seeded with two lines) or off, discarding its lines. */
+&nbsp;    data object OnSplitToggled : TransactionCreationEvent
+&nbsp;    data object OnSplitLineAdded : TransactionCreationEvent
+&nbsp;    data class OnSplitLineRemoved(val key: Int) : TransactionCreationEvent
+&nbsp;    data class OnSplitLineAmountChanged(val key: Int, val amount: String) : TransactionCreationEvent
+&nbsp;
+&nbsp;    /** Open the category chooser for one split line rather than for the transaction as a whole. */
+&nbsp;    data class OnOpenSplitLineCategoryChooser(val key: Int) : TransactionCreationEvent
 &nbsp;    data object OnSaveClick : TransactionCreationEvent
 &nbsp;    data object OnDeleteClick : TransactionCreationEvent
 &nbsp;    data object OnDeleteConfirmed : TransactionCreationEvent
@@ -146,6 +155,16 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;}
 &nbsp;
 <b class="fc">&nbsp;internal enum class AccountSlot { Single, From, To }</b>
+&nbsp;
+&nbsp;/**
+&nbsp; * Where a category coming back from the chooser belongs: the transaction itself, or one line of the
+&nbsp; * split editor. The chooser returns only an id, so the screen has to remember what it was opened
+&nbsp; * for — the same shape [AccountSlot] serves for the account chooser&#39;s three slots.
+&nbsp; */
+&nbsp;internal sealed interface CategorySlot {
+&nbsp;    data object Single : CategorySlot
+&nbsp;    data class SplitLine(val key: Int) : CategorySlot
+&nbsp;}
 </code>
 </pre>
 </div>
@@ -169,7 +188,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 17:47</div>
+    <div style="float:right;">generated on 2026-07-28 18:03</div>
 </div>
 </body>
 </html>

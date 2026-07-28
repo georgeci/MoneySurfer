@@ -54,7 +54,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.domain.model.ConvertedTotal
 &nbsp;import com.georgeci.moneysurfer.domain.model.ExchangeRateSnapshot
 &nbsp;import com.georgeci.moneysurfer.domain.model.SavingsGoalSummary
-&nbsp;import com.georgeci.moneysurfer.domain.model.Transaction
+&nbsp;import com.georgeci.moneysurfer.domain.model.TransactionSplitGroup
 &nbsp;import com.georgeci.moneysurfer.domain.preferences.UiPreferences
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.AccountId
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.GoalId
@@ -142,7 +142,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;                DashboardState.Content(
 &nbsp;                    accounts = accounts.map { it.toUi() },
 &nbsp;                    transactions = transactions
-&nbsp;                        .filter { it.type != TransactionType.OPENING_BALANCE }
+&nbsp;                        .filter { it.primary.type != TransactionType.OPENING_BALANCE }
 &nbsp;                        .take(RECENT_TRANSACTIONS_LIMIT)
 &nbsp;                        .map { it.toUi() },
 &nbsp;                    formattedTotalBalance = balance?.headline,
@@ -213,12 +213,17 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;        progress = progress.percent.toFloat(),
 &nbsp;    )
 &nbsp;
-&nbsp;    private fun Transaction.toUi() = TransactionUi(
-&nbsp;        id = id,
-&nbsp;        title = note.ifBlank { &quot;No description&quot; },
-&nbsp;        formattedAmount = MoneyFormatter.format(money.abs(), currencyCode),
-&nbsp;        isExpense = type == TransactionType.EXPENSE,
-&nbsp;        categoryHueSeed = categoryId?.value.orEmpty(),
+&nbsp;    /**
+&nbsp;     * One receipt as the widget draws it. A split shows the whole payment and how many categories
+&nbsp;     * it covers — its legs are separate rows only where a category is what the screen is about.
+&nbsp;     */
+&nbsp;    private fun TransactionSplitGroup.toUi() = TransactionUi(
+&nbsp;        id = primary.id,
+&nbsp;        title = primary.note.ifBlank { &quot;No description&quot; },
+&nbsp;        formattedAmount = MoneyFormatter.format(total, primary.currencyCode),
+&nbsp;        isExpense = primary.type == TransactionType.EXPENSE,
+&nbsp;        categoryHueSeed = primary.categoryId?.value.orEmpty(),
+&nbsp;        splitCategoryCount = if (isSplit) categoryCount else 0,
 &nbsp;    )
 &nbsp;}
 &nbsp;
@@ -304,6 +309,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    val formattedAmount: String,
 &nbsp;    val isExpense: Boolean,
 &nbsp;    val categoryHueSeed: String,
+&nbsp;    /**
+&nbsp;     * How many categories a collapsed split covers, or `0` for an ordinary transaction. Non-zero
+&nbsp;     * makes [formattedAmount] the whole receipt and gives the row its &quot;N categories&quot; meta line;
+&nbsp;     * [id] is the leg tapping it opens.
+&nbsp;     */
+&nbsp;    val splitCategoryCount: Int = 0,
 &nbsp;)
 &nbsp;
 &nbsp;sealed interface DashboardEvent {
@@ -364,7 +375,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 17:47</div>
+    <div style="float:right;">generated on 2026-07-28 18:03</div>
 </div>
 </body>
 </html>

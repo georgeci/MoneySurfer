@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > TransactionFilterChipsUi</title>
+  <title>MoneySurfer Coverage Report > TransactionDateUi</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,15 +22,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.feature.transaction.list</a>
 </div>
 
-<h1>Coverage Summary for Class: TransactionFilterChipsUi (com.georgeci.moneysurfer.feature.transaction.list)</h1>
+<h1>Coverage Summary for Class: TransactionDateUi (com.georgeci.moneysurfer.feature.transaction.list)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
-<th class="coverageStat 
-">
-  Class, %
-</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -48,16 +45,8 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   Instruction, %
 </th>
 </tr>
-<tr>
-  <td class="name">TransactionFilterChipsUi</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
+  <tr>
+    <td class="name">TransactionDateUi$Exact</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -72,7 +61,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (8/8)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
@@ -80,11 +69,94 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (37/37)
+    (7/7)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">TransactionDateUi$Today</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">TransactionDateUi$Yesterday</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (11/11)
   </span>
 </td>
 </tr>
-
 </table>
 
 <br/>
@@ -110,9 +182,9 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;
 &nbsp;/** Day-header label, resolved to text by the screen. */
 &nbsp;sealed interface TransactionDateUi {
-&nbsp;    data object Today : TransactionDateUi
-&nbsp;    data object Yesterday : TransactionDateUi
-&nbsp;    data class Exact(val date: LocalDate) : TransactionDateUi
+<b class="fc">&nbsp;    data object Today : TransactionDateUi</b>
+<b class="fc">&nbsp;    data object Yesterday : TransactionDateUi</b>
+<b class="fc">&nbsp;    data class Exact(val date: LocalDate) : TransactionDateUi</b>
 &nbsp;}
 &nbsp;
 &nbsp;/** Pager label, resolved to text by the screen — see the `PeriodPager` design component. */
@@ -132,14 +204,14 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp; * The filter chip rail&#39;s contents. Every chip is a shortcut into the filter screen, so these carry
 &nbsp; * only what the chip label shows — a name when exactly one thing is picked, a count otherwise.
 &nbsp; */
-<b class="fc">&nbsp;data class TransactionFilterChipsUi(</b>
-<b class="fc">&nbsp;    val dateRange: TransactionDateRange,</b>
-<b class="fc">&nbsp;    val type: TransactionTypeFilter,</b>
-<b class="fc">&nbsp;    val accountCount: Int,</b>
-<b class="fc">&nbsp;    val accountName: String?,</b>
-<b class="fc">&nbsp;    val categoryCount: Int,</b>
-<b class="fc">&nbsp;    val categoryName: String?,</b>
-<b class="fc">&nbsp;    val sort: TransactionSort,</b>
+&nbsp;data class TransactionFilterChipsUi(
+&nbsp;    val dateRange: TransactionDateRange,
+&nbsp;    val type: TransactionTypeFilter,
+&nbsp;    val accountCount: Int,
+&nbsp;    val accountName: String?,
+&nbsp;    val categoryCount: Int,
+&nbsp;    val categoryName: String?,
+&nbsp;    val sort: TransactionSort,
 &nbsp;)
 &nbsp;
 &nbsp;data class TransactionRowUi(
@@ -153,6 +225,24 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    val accountName: String = &quot;&quot;,
 &nbsp;    /** One leg of a transfer: money moved sideways, drawn neutral with a swap glyph. */
 &nbsp;    val isTransfer: Boolean = false,
+&nbsp;    /**
+&nbsp;     * How many categories a collapsed split row covers, or `0` when the row is an ordinary
+&nbsp;     * transaction. Non-zero replaces [subtitle] with the &quot;N categories&quot; badge: a receipt split
+&nbsp;     * across several categories has no single category name to show, and [formattedAmount] is the
+&nbsp;     * whole receipt rather than any one leg. [id] is the leg the row opens — its details screen
+&nbsp;     * carries the breakdown.
+&nbsp;     */
+&nbsp;    val splitCategoryCount: Int = 0,
+&nbsp;    /**
+&nbsp;     * Whether the row belongs to a receipt split across categories — true for a collapsed row and
+&nbsp;     * for a lone leg alike.
+&nbsp;     *
+&nbsp;     * Deliberately separate from [splitCategoryCount], which is only non-zero once a group is
+&nbsp;     * collapsed: a page that holds part of a group renders its legs individually, and deleting one
+&nbsp;     * of those still takes the whole receipt. The delete confirmation keys off this, so what the
+&nbsp;     * dialog promises matches what the delete does at every window size.
+&nbsp;     */
+&nbsp;    val isSplitLeg: Boolean = false,
 &nbsp;)
 &nbsp;
 &nbsp;data class TransactionSummaryUi(
@@ -184,7 +274,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 17:47</div>
+    <div style="float:right;">generated on 2026-07-28 18:03</div>
 </div>
 </body>
 </html>

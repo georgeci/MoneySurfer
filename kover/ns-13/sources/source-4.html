@@ -292,6 +292,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    val clientVersionCode: Int = 1,
 &nbsp;    /** Shared id linking the two legs of a transfer. Null for non-transfer rows. */
 &nbsp;    val transferId: String? = null,
+&nbsp;    /**
+&nbsp;     * Shared id linking the sibling rows one receipt was split across. Null for the ordinary
+&nbsp;     * single-category row.
+&nbsp;     *
+&nbsp;     * Every leg is a self-contained document, which is why a split replicates correctly under
+&nbsp;     * per-entity LWW where a parent doc plus child allocation docs would not: legs are pulled
+&nbsp;     * independently and none of them is meaningless on its own.
+&nbsp;     */
+&nbsp;    val splitId: String? = null,
 &nbsp;    /** Rule that generated this row. Null for manual entries. */
 &nbsp;    val recurringRuleId: String? = null,
 &nbsp;)
@@ -467,7 +476,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 17:47</div>
+    <div style="float:right;">generated on 2026-07-28 18:03</div>
 </div>
 </body>
 </html>

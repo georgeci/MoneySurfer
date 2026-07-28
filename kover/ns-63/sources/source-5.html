@@ -73,10 +73,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    17.3%
+    17.4%
   </span>
   <span class="absValue">
-    (278/1606)
+    (278/1599)
   </span>
 </td>
 </tr>
@@ -309,7 +309,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     16.2%
   </span>
   <span class="absValue">
-    (278/1720)
+    (278/1713)
   </span>
 </td>
 </tr>
@@ -340,7 +340,6 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import androidx.compose.material3.Text
 &nbsp;import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 &nbsp;import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
-&nbsp;import androidx.compose.material3.adaptive.navigation3.rememberListDetailSceneStrategy
 &nbsp;import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 &nbsp;import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffoldDefaults
 &nbsp;import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
@@ -443,7 +442,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="nc">&nbsp;) {</b>
 <b class="nc">&nbsp;    val backStack = rememberNavBackStack(savedStateConfig, Route.SignIn)</b>
 <b class="nc">&nbsp;    val bottomSheetStrategy = remember { BottomSheetSceneStrategy&lt;NavKey&gt;() }</b>
-<b class="nc">&nbsp;    val listDetailStrategy = rememberListDetailSceneStrategy&lt;NavKey&gt;()</b>
+<b class="nc">&nbsp;    val paneStrategy = rememberSurferPaneSceneStrategy&lt;NavKey&gt;()</b>
 <b class="nc">&nbsp;    val navigator = remember(backStack) { AppNavigator(backStack) }</b>
 <b class="nc">&nbsp;    val appLaunchViewModel: AppLaunchViewModel = koinViewModel()</b>
 <b class="nc">&nbsp;    val targetRoute by appLaunchViewModel.targetRoute.collectAsStateWithLifecycle()</b>
@@ -486,7 +485,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="nc">&nbsp;            onBack = { navigator.pop() },</b>
 <b class="nc">&nbsp;            sceneStrategies = listOf(</b>
 <b class="nc">&nbsp;                bottomSheetStrategy,</b>
-<b class="nc">&nbsp;                listDetailStrategy,</b>
+<b class="nc">&nbsp;                paneStrategy,</b>
 &nbsp;            ),
 <b class="nc">&nbsp;            transitionSpec = {</b>
 <b class="nc">&nbsp;                slideInHorizontally(tween(ANIMATION_DURATION)) { it } togetherWith</b>
@@ -626,7 +625,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 17:47</div>
+    <div style="float:right;">generated on 2026-07-28 18:03</div>
 </div>
 </body>
 </html>

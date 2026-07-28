@@ -57,7 +57,6 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import androidx.compose.foundation.layout.padding
 &nbsp;import androidx.compose.foundation.lazy.LazyColumn
 &nbsp;import androidx.compose.foundation.lazy.items
-&nbsp;import androidx.compose.material3.Scaffold
 &nbsp;import androidx.compose.material3.Text
 &nbsp;import androidx.compose.runtime.Composable
 &nbsp;import androidx.compose.runtime.getValue
@@ -76,7 +75,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.feature.budget.budgetStatusLabel
 &nbsp;import com.georgeci.moneysurfer.feature.budget.previewBudget
 &nbsp;import com.georgeci.moneysurfer.feature.budget.toUi
-&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
+&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferPaneScaffold
 &nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferToolbarButtonAction
 &nbsp;import com.georgeci.moneysurfer.uikit.components.budget.SurferAlertBanner
 &nbsp;import com.georgeci.moneysurfer.uikit.components.budget.SurferBudgetRing
@@ -84,7 +83,6 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.uikit.components.budget.SurferStatTile
 &nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 &nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
-&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
 &nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
 &nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
 &nbsp;import com.georgeci.moneysurfer.utils.HandleSideEffect
@@ -146,26 +144,20 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    onEvent: (BudgetDetailsEvent) -&gt; Unit,
 &nbsp;) {
 &nbsp;    val content = state as? BudgetDetailsState.Content
-&nbsp;    Scaffold(
+&nbsp;    SurferPaneScaffold(
+&nbsp;        title = content?.budget?.name ?: stringResource(Res.string.budget_details_title),
 &nbsp;        modifier = Modifier
-&nbsp;            .surferSafeInsets()
 &nbsp;            .testTag(BudgetDetailsTestTags.Root)
 &nbsp;            .surferTestTagAsId(),
-&nbsp;        containerColor = AppTheme.materialColors.surface,
-&nbsp;        topBar = {
-&nbsp;            SurferToolbar(
-&nbsp;                title = content?.budget?.name ?: stringResource(Res.string.budget_details_title),
-&nbsp;                onBack = { onEvent(BudgetDetailsEvent.OnBackClick) },
-&nbsp;                actions = {
-&nbsp;                    if (content != null) {
-&nbsp;                        SurferToolbarButtonAction(
-&nbsp;                            icon = SurferIcons.Edit,
-&nbsp;                            text = stringResource(Res.string.budget_details_edit),
-&nbsp;                            onClick = { onEvent(BudgetDetailsEvent.OnEditClick) },
-&nbsp;                        )
-&nbsp;                    }
-&nbsp;                },
-&nbsp;            )
+&nbsp;        onBack = { onEvent(BudgetDetailsEvent.OnBackClick) },
+&nbsp;        actions = {
+&nbsp;            if (content != null) {
+&nbsp;                SurferToolbarButtonAction(
+&nbsp;                    icon = SurferIcons.Edit,
+&nbsp;                    text = stringResource(Res.string.budget_details_edit),
+&nbsp;                    onClick = { onEvent(BudgetDetailsEvent.OnEditClick) },
+&nbsp;                )
+&nbsp;            }
 &nbsp;        },
 &nbsp;    ) { padding -&gt;
 &nbsp;        if (state is BudgetDetailsState.Missing) {
@@ -184,11 +176,11 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;                    textAlign = TextAlign.Center,
 &nbsp;                )
 &nbsp;            }
-&nbsp;            return@Scaffold
+&nbsp;            return@SurferPaneScaffold
 &nbsp;        }
 &nbsp;        if (content == null) {
 &nbsp;            Box(modifier = Modifier.fillMaxSize().padding(padding))
-&nbsp;            return@Scaffold
+&nbsp;            return@SurferPaneScaffold
 &nbsp;        }
 &nbsp;
 &nbsp;        LazyColumn(
@@ -417,7 +409,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 17:47</div>
+    <div style="float:right;">generated on 2026-07-28 18:03</div>
 </div>
 </body>
 </html>

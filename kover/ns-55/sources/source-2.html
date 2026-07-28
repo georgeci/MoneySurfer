@@ -76,7 +76,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/572)
+    (0/563)
   </span>
 </td>
 </tr>
@@ -431,7 +431,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/672)
+    (0/663)
   </span>
 </td>
 </tr>
@@ -445,7 +445,6 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.transaction
 &nbsp;
 &nbsp;import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
-&nbsp;import androidx.compose.material3.adaptive.navigation3.ListDetailSceneStrategy
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.AccountId
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionId
 &nbsp;import com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationScreen
@@ -458,6 +457,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.navigation.FeatureNavGraph
 &nbsp;import com.georgeci.moneysurfer.navigation.NavDetailPlaceholder
 &nbsp;import com.georgeci.moneysurfer.navigation.Route
+&nbsp;import com.georgeci.moneysurfer.navigation.SurferPaneSceneStrategy
 &nbsp;import com.georgeci.moneysurfer.navigation.util.rememberNavigationResult
 &nbsp;import io.github.irgaly.navigation3.resultstate.NavigationResultMetadata
 &nbsp;import io.github.irgaly.navigation3.resultstate.resultConsumer
@@ -465,7 +465,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;@OptIn(ExperimentalMaterial3AdaptiveApi::class)
 <b class="nc">&nbsp;val transactionNavGraph: FeatureNavGraph = { navigator -&gt;</b>
 <b class="nc">&nbsp;    entry&lt;Route.TransactionsByAccount&gt;(</b>
-<b class="nc">&nbsp;        metadata = ListDetailSceneStrategy.listPane(detailPlaceholder = { NavDetailPlaceholder() }),</b>
+<b class="nc">&nbsp;        metadata = SurferPaneSceneStrategy.listPane(detailPlaceholder = { NavDetailPlaceholder() }),</b>
 <b class="nc">&nbsp;    ) { key -&gt;</b>
 <b class="nc">&nbsp;        TransactionsByAccountScreen(</b>
 <b class="nc">&nbsp;            accountId = key.accountId?.let { AccountId(it) },</b>
@@ -503,7 +503,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="nc">&nbsp;                    AccountPickerResultKey,</b>
 <b class="nc">&nbsp;                    AccountPickerTransferResultKey,</b>
 &nbsp;                ),
-<b class="nc">&nbsp;        ) + ListDetailSceneStrategy.detailPane(),</b>
+<b class="nc">&nbsp;        ) + SurferPaneSceneStrategy.detailPane(),</b>
 <b class="nc">&nbsp;    ) { key -&gt;</b>
 <b class="nc">&nbsp;        val pickedCategoryId = rememberNavigationResult(CategoryPickerResultKey)</b>
 <b class="nc">&nbsp;        val pickedAccountId = rememberNavigationResult(AccountPickerResultKey)</b>
@@ -543,7 +543,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    }
 &nbsp;
 <b class="nc">&nbsp;    entry&lt;Route.TransactionDetails&gt;(</b>
-<b class="nc">&nbsp;        metadata = ListDetailSceneStrategy.detailPane(),</b>
+<b class="nc">&nbsp;        metadata = SurferPaneSceneStrategy.detailPane(),</b>
 <b class="nc">&nbsp;    ) { key -&gt;</b>
 <b class="nc">&nbsp;        TransactionDetailsScreen(</b>
 <b class="nc">&nbsp;            transactionId = TransactionId(key.transactionId),</b>
@@ -582,7 +582,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 17:47</div>
+    <div style="float:right;">generated on 2026-07-28 18:03</div>
 </div>
 </body>
 </html>

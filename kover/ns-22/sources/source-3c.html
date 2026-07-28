@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > Workspace</title>
+  <title>MoneySurfer Coverage Report > TransactionTotal</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.model</a>
 </div>
 
-<h1>Coverage Summary for Class: Workspace (com.georgeci.moneysurfer.domain.model)</h1>
+<h1>Coverage Summary for Class: TransactionTotal (com.georgeci.moneysurfer.domain.model)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">Workspace</td>
+  <td class="name">TransactionTotal</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -72,7 +72,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (9/9)
+    (4/4)
   </span>
 </td>
 <td class="coverageStat">
@@ -80,7 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (65/65)
+    (17/17)
   </span>
 </td>
 </tr>
@@ -95,19 +95,20 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.model
 &nbsp;
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.UserId
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
-&nbsp;import kotlin.time.Instant
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionType
 &nbsp;
-<b class="fc">&nbsp;data class Workspace(</b>
-<b class="fc">&nbsp;    val id: WorkspaceId,</b>
-<b class="fc">&nbsp;    val name: String,</b>
-<b class="fc">&nbsp;    val description: String,</b>
-<b class="fc">&nbsp;    val baseCurrency: CurrencyCode,</b>
-<b class="fc">&nbsp;    val ownerId: UserId,</b>
-<b class="fc">&nbsp;    val createdAt: Instant,</b>
-<b class="fc">&nbsp;    val updatedAt: Instant = createdAt,</b>
-<b class="fc">&nbsp;    val archived: Boolean = false,</b>
+&nbsp;/**
+&nbsp; * Sum of transaction magnitudes for one (type, currency) pair inside a date window.
+&nbsp; *
+&nbsp; * Aggregated by the database rather than by folding a loaded list, so the transactions-list
+&nbsp; * summary stays exact even when the list itself is paged. Split per currency because minor
+&nbsp; * units of different currencies must never be added together.
+&nbsp; */
+<b class="fc">&nbsp;data class TransactionTotal(</b>
+<b class="fc">&nbsp;    val type: TransactionType,</b>
+<b class="fc">&nbsp;    val currencyCode: CurrencyCode,</b>
+<b class="fc">&nbsp;    val total: Money,</b>
 &nbsp;)
 </code>
 </pre>
@@ -132,7 +133,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 17:47</div>
+    <div style="float:right;">generated on 2026-07-28 18:03</div>
 </div>
 </body>
 </html>

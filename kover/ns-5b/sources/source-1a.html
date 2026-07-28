@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > TransactionsSearchAndChipsKt</title>
+  <title>MoneySurfer Coverage Report > TransactionsListSummaryStripKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,12 +22,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.feature.transaction.list</a>
 </div>
 
-<h1>Coverage Summary for Class: TransactionsSearchAndChipsKt (com.georgeci.moneysurfer.feature.transaction.list)</h1>
+<h1>Coverage Summary for Class: TransactionsListSummaryStripKt (com.georgeci.moneysurfer.feature.transaction.list)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -46,7 +49,23 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">TransactionsSearchAndChipsKt</td>
+  <td class="name">TransactionsListSummaryStripKt</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
 <td class="coverageStat">
   <span class="percent">
     0%
@@ -60,7 +79,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/60)
+    (0/54)
   </span>
 </td>
 <td class="coverageStat">
@@ -68,57 +87,11 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/101)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0.7%
-  </span>
-  <span class="absValue">
-    (8/1138)
+    (0/541)
   </span>
 </td>
 </tr>
-  <tr>
-    <td class="name">TransactionsSearchAndChipsKt$WhenMappings</td>
-    <td class="coverageStat"/>
-  </tr>
-<tr>
-  <td class="name"><strong>Total</strong></td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/14)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/60)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/101)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0.7%
-  </span>
-  <span class="absValue">
-    (8/1138)
-  </span>
-</td>
-</tr>
+
 </table>
 
 <br/>
@@ -128,220 +101,102 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.transaction.list
 &nbsp;
-&nbsp;import androidx.compose.foundation.horizontalScroll
-&nbsp;import androidx.compose.foundation.layout.Arrangement
+&nbsp;import androidx.compose.foundation.background
+&nbsp;import androidx.compose.foundation.layout.Box
+&nbsp;import androidx.compose.foundation.layout.Column
 &nbsp;import androidx.compose.foundation.layout.Row
-&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
+&nbsp;import androidx.compose.foundation.layout.Spacer
+&nbsp;import androidx.compose.foundation.layout.height
 &nbsp;import androidx.compose.foundation.layout.padding
-&nbsp;import androidx.compose.foundation.rememberScrollState
-&nbsp;import androidx.compose.material3.Badge
-&nbsp;import androidx.compose.material3.BadgedBox
-&nbsp;import androidx.compose.material3.Icon
-&nbsp;import androidx.compose.material3.IconButton
+&nbsp;import androidx.compose.foundation.layout.width
+&nbsp;import androidx.compose.foundation.shape.RoundedCornerShape
 &nbsp;import androidx.compose.material3.Text
 &nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.ui.Alignment
 &nbsp;import androidx.compose.ui.Modifier
-&nbsp;import androidx.compose.ui.platform.testTag
+&nbsp;import androidx.compose.ui.draw.clip
+&nbsp;import androidx.compose.ui.graphics.Color
 &nbsp;import androidx.compose.ui.unit.dp
-&nbsp;import com.georgeci.moneysurfer.feature.transaction.filter.TransactionDatePreset
-&nbsp;import com.georgeci.moneysurfer.feature.transaction.filter.TransactionDateRange
-&nbsp;import com.georgeci.moneysurfer.feature.transaction.filter.TransactionSort
-&nbsp;import com.georgeci.moneysurfer.feature.transaction.filter.TransactionTypeFilter
-&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferSearchField
-&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferSelectableChip
-&nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 &nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
 &nbsp;import moneysurfer.feature.transaction.generated.resources.Res
-&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_filters_date_last_month
-&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_filters_date_this_month
-&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_filters_date_this_week
-&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_filters_date_this_year
-&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_filters_date_today
-&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_filters_date_yesterday
-&nbsp;import moneysurfer.feature.transaction.generated.resources.transactions_list_chip_account
-&nbsp;import moneysurfer.feature.transaction.generated.resources.transactions_list_chip_category
-&nbsp;import moneysurfer.feature.transaction.generated.resources.transactions_list_chip_date
-&nbsp;import moneysurfer.feature.transaction.generated.resources.transactions_list_chip_date_custom
-&nbsp;import moneysurfer.feature.transaction.generated.resources.transactions_list_chip_selected_count
-&nbsp;import moneysurfer.feature.transaction.generated.resources.transactions_list_chip_sort
-&nbsp;import moneysurfer.feature.transaction.generated.resources.transactions_list_chip_type
-&nbsp;import moneysurfer.feature.transaction.generated.resources.transactions_list_chip_value
-&nbsp;import moneysurfer.feature.transaction.generated.resources.transactions_list_filter_expenses
-&nbsp;import moneysurfer.feature.transaction.generated.resources.transactions_list_filter_income
-&nbsp;import moneysurfer.feature.transaction.generated.resources.transactions_list_filter_transfer
-&nbsp;import moneysurfer.feature.transaction.generated.resources.transactions_list_filters_badge
-&nbsp;import moneysurfer.feature.transaction.generated.resources.transactions_list_filters_content_description
-&nbsp;import moneysurfer.feature.transaction.generated.resources.transactions_list_search_placeholder
-&nbsp;import moneysurfer.feature.transaction.generated.resources.transactions_list_sort_newest
-&nbsp;import moneysurfer.feature.transaction.generated.resources.transactions_list_sort_oldest
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transactions_list_summary_expenses
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transactions_list_summary_income
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transactions_list_summary_net
 &nbsp;import org.jetbrains.compose.resources.stringResource
 &nbsp;
-&nbsp;/**
-&nbsp; * The design&#39;s search field with the filter button inside it. The badge counts applied filters
-&nbsp; * only — the search text is right there in the field, so counting it too would say the same thing
-&nbsp; * twice.
-&nbsp; */
 &nbsp;@Composable
-&nbsp;internal fun SearchRow(
-&nbsp;    query: String,
-&nbsp;    activeFilterCount: Int,
-&nbsp;    onEvent: (TransactionsByAccountEvent) -&gt; Unit,
-<b class="nc">&nbsp;) {</b>
-<b class="nc">&nbsp;    val filtersLabel = stringResource(Res.string.transactions_list_filters_content_description)</b>
-<b class="nc">&nbsp;    SurferSearchField(</b>
-<b class="nc">&nbsp;        value = query,</b>
-<b class="nc">&nbsp;        onValueChange = { onEvent(TransactionsByAccountEvent.OnSearchQueryChanged(it)) },</b>
-<b class="nc">&nbsp;        placeholder = stringResource(Res.string.transactions_list_search_placeholder),</b>
-<b class="nc">&nbsp;        containerColor = AppTheme.materialColors.surfaceContainerLow,</b>
-<b class="nc">&nbsp;        trailing = {</b>
-<b class="nc">&nbsp;            BadgedBox(</b>
-<b class="nc">&nbsp;                badge = {</b>
-<b class="nc">&nbsp;                    if (activeFilterCount &gt; 0) {</b>
-<b class="nc">&nbsp;                        Badge {</b>
-<b class="nc">&nbsp;                            Text(</b>
-<b class="nc">&nbsp;                                stringResource(</b>
-<b class="nc">&nbsp;                                    Res.string.transactions_list_filters_badge,</b>
-<b class="nc">&nbsp;                                    activeFilterCount,</b>
-&nbsp;                                ),
-&nbsp;                            )
-&nbsp;                        }
-<b class="nc">&nbsp;                    }</b>
-&nbsp;                },
-<b class="nc">&nbsp;            ) {</b>
-<b class="nc">&nbsp;                IconButton(onClick = { onEvent(TransactionsByAccountEvent.OnOpenFiltersClick) }) {</b>
-<b class="nc">&nbsp;                    Icon(imageVector = SurferIcons.Filter, contentDescription = filtersLabel)</b>
-&nbsp;                }
-&nbsp;            }
-&nbsp;        },
-&nbsp;    )
-<b class="nc">&nbsp;}</b>
-&nbsp;
-&nbsp;/**
-&nbsp; * `Type` / `Account` / `Category` / `Sort`, plus a date chip once an explicit range replaces the
-&nbsp; * pager — without it the range would be applied with nothing on screen saying so.
-&nbsp; *
-&nbsp; * Every chip opens the filter screen rather than cycling its own value: the chips are shortcuts
-&nbsp; * into it, so there is one place where a filter is changed and one place it can be read from.
-&nbsp; */
-&nbsp;@Composable
-&nbsp;internal fun FilterChipRail(
-&nbsp;    chips: TransactionFilterChipsUi,
-&nbsp;    onOpenFilters: () -&gt; Unit,
+&nbsp;internal fun SummaryStrip(
+&nbsp;    summary: TransactionSummaryUi,
+<b class="nc">&nbsp;    modifier: Modifier = Modifier,</b>
 <b class="nc">&nbsp;) {</b>
 <b class="nc">&nbsp;    Row(</b>
-<b class="nc">&nbsp;        modifier = Modifier</b>
-<b class="nc">&nbsp;            .fillMaxWidth()</b>
-<b class="nc">&nbsp;            .horizontalScroll(rememberScrollState())</b>
-<b class="nc">&nbsp;            .padding(horizontal = 16.dp, vertical = 4.dp),</b>
-<b class="nc">&nbsp;        horizontalArrangement = Arrangement.spacedBy(8.dp),</b>
+<b class="nc">&nbsp;        modifier = modifier</b>
+<b class="nc">&nbsp;            .clip(RoundedCornerShape(16.dp))</b>
+<b class="nc">&nbsp;            .background(AppTheme.materialColors.surfaceContainerLow)</b>
+<b class="nc">&nbsp;            .padding(horizontal = 14.dp, vertical = 12.dp),</b>
+<b class="nc">&nbsp;        verticalAlignment = Alignment.CenterVertically,</b>
 &nbsp;    ) {
-<b class="nc">&nbsp;        chips.dateRangeValue()?.let { value -&gt;</b>
-<b class="nc">&nbsp;            RailChip(</b>
-<b class="nc">&nbsp;                label = stringResource(Res.string.transactions_list_chip_date),</b>
-<b class="nc">&nbsp;                value = value,</b>
-<b class="nc">&nbsp;                onClick = onOpenFilters,</b>
-<b class="nc">&nbsp;                modifier = Modifier.testTag(TransactionsListTestTags.FilterDate),</b>
-&nbsp;            )
-<b class="nc">&nbsp;        }</b>
-<b class="nc">&nbsp;        RailChip(</b>
-<b class="nc">&nbsp;            label = stringResource(Res.string.transactions_list_chip_type),</b>
-<b class="nc">&nbsp;            value = chips.type.chipValue(),</b>
-<b class="nc">&nbsp;            onClick = onOpenFilters,</b>
-<b class="nc">&nbsp;            modifier = Modifier.testTag(TransactionsListTestTags.FilterType),</b>
+<b class="nc">&nbsp;        SummaryCell(</b>
+<b class="nc">&nbsp;            label = stringResource(Res.string.transactions_list_summary_income),</b>
+<b class="nc">&nbsp;            value = summary.incomeFormatted,</b>
+<b class="nc">&nbsp;            valueColor = AppTheme.semanticColors.income,</b>
+<b class="nc">&nbsp;            modifier = Modifier.weight(1f),</b>
 &nbsp;        )
-<b class="nc">&nbsp;        RailChip(</b>
-<b class="nc">&nbsp;            label = stringResource(Res.string.transactions_list_chip_account),</b>
-<b class="nc">&nbsp;            value = selectionValue(chips.accountName, chips.accountCount),</b>
-<b class="nc">&nbsp;            onClick = onOpenFilters,</b>
-<b class="nc">&nbsp;            modifier = Modifier.testTag(TransactionsListTestTags.FilterAccount),</b>
+<b class="nc">&nbsp;        SummaryDivider()</b>
+<b class="nc">&nbsp;        SummaryCell(</b>
+<b class="nc">&nbsp;            label = stringResource(Res.string.transactions_list_summary_expenses),</b>
+<b class="nc">&nbsp;            value = summary.expenseFormatted,</b>
+<b class="nc">&nbsp;            valueColor = AppTheme.materialColors.onSurface,</b>
+<b class="nc">&nbsp;            modifier = Modifier.weight(1f),</b>
 &nbsp;        )
-<b class="nc">&nbsp;        RailChip(</b>
-<b class="nc">&nbsp;            label = stringResource(Res.string.transactions_list_chip_category),</b>
-<b class="nc">&nbsp;            value = selectionValue(chips.categoryName, chips.categoryCount),</b>
-<b class="nc">&nbsp;            onClick = onOpenFilters,</b>
-<b class="nc">&nbsp;            modifier = Modifier.testTag(TransactionsListTestTags.FilterCategory),</b>
-&nbsp;        )
-<b class="nc">&nbsp;        RailChip(</b>
-<b class="nc">&nbsp;            label = stringResource(Res.string.transactions_list_chip_sort),</b>
-<b class="nc">&nbsp;            value = chips.sort.chipValue(),</b>
-&nbsp;            // The sort chip always spells out its value, so &quot;is it filled&quot; has to come from
-&nbsp;            // whether it differs from the default rather than from having a value at all.
-<b class="nc">&nbsp;            highlighted = chips.sort != TransactionSort.Newest,</b>
-<b class="nc">&nbsp;            onClick = onOpenFilters,</b>
-<b class="nc">&nbsp;            modifier = Modifier.testTag(TransactionsListTestTags.FilterSort),</b>
+<b class="nc">&nbsp;        SummaryDivider()</b>
+<b class="nc">&nbsp;        SummaryCell(</b>
+<b class="nc">&nbsp;            label = stringResource(Res.string.transactions_list_summary_net),</b>
+<b class="nc">&nbsp;            value = summary.netFormatted,</b>
+<b class="nc">&nbsp;            valueColor = if (summary.netPositive) {</b>
+<b class="nc">&nbsp;                AppTheme.semanticColors.income</b>
+<b class="nc">&nbsp;            } else {</b>
+<b class="nc">&nbsp;                AppTheme.materialColors.onSurface</b>
+&nbsp;            },
+<b class="nc">&nbsp;            modifier = Modifier.weight(1f),</b>
 &nbsp;        )
 <b class="nc">&nbsp;    }</b>
 <b class="nc">&nbsp;}</b>
 &nbsp;
-&nbsp;/**
-&nbsp; * A chip reads `Type` when unset and `Type · Expenses` once it carries a value. No leading check —
-&nbsp; * the fill alone marks it set, and [highlighted] lets the sort chip (which always shows a value)
-&nbsp; * still read as unset while it holds the default.
-&nbsp; */
 &nbsp;@Composable
-<b class="nc">&nbsp;private fun RailChip(</b>
+&nbsp;private fun SummaryCell(
 &nbsp;    label: String,
-&nbsp;    value: String?,
-&nbsp;    onClick: () -&gt; Unit,
+&nbsp;    value: String,
+&nbsp;    valueColor: Color,
 <b class="nc">&nbsp;    modifier: Modifier = Modifier,</b>
-<b class="nc">&nbsp;    highlighted: Boolean = value != null,</b>
 <b class="nc">&nbsp;) {</b>
-<b class="nc">&nbsp;    val text = if (value != null) {</b>
-<b class="nc">&nbsp;        stringResource(Res.string.transactions_list_chip_value, label, value)</b>
-<b class="nc">&nbsp;    } else {</b>
-<b class="nc">&nbsp;        label</b>
+<b class="nc">&nbsp;    Column(modifier = modifier) {</b>
+<b class="nc">&nbsp;        Text(</b>
+<b class="nc">&nbsp;            text = label.uppercase(),</b>
+<b class="nc">&nbsp;            style = AppTheme.typography.labelSmall,</b>
+<b class="nc">&nbsp;            color = AppTheme.materialColors.onSurfaceVariant,</b>
+<b class="nc">&nbsp;            maxLines = 1,</b>
+&nbsp;        )
+<b class="nc">&nbsp;        Spacer(Modifier.height(2.dp))</b>
+<b class="nc">&nbsp;        Text(</b>
+<b class="nc">&nbsp;            text = value,</b>
+<b class="nc">&nbsp;            style = AppTheme.typography.titleMedium,</b>
+<b class="nc">&nbsp;            color = valueColor,</b>
+<b class="nc">&nbsp;            maxLines = 1,</b>
+&nbsp;        )
 <b class="nc">&nbsp;    }</b>
-<b class="nc">&nbsp;    SurferSelectableChip(</b>
-<b class="nc">&nbsp;        label = text,</b>
-<b class="nc">&nbsp;        selected = highlighted,</b>
-<b class="nc">&nbsp;        onClick = onClick,</b>
-<b class="nc">&nbsp;        modifier = modifier,</b>
-<b class="nc">&nbsp;        showCheck = false,</b>
+<b class="nc">&nbsp;}</b>
+&nbsp;
+&nbsp;@Composable
+<b class="nc">&nbsp;private fun SummaryDivider() {</b>
+<b class="nc">&nbsp;    Box(</b>
+<b class="nc">&nbsp;        modifier = Modifier</b>
+<b class="nc">&nbsp;            .padding(horizontal = 8.dp)</b>
+<b class="nc">&nbsp;            .width(1.dp)</b>
+<b class="nc">&nbsp;            .height(28.dp)</b>
+<b class="nc">&nbsp;            .background(AppTheme.materialColors.outlineVariant),</b>
 &nbsp;    )
 <b class="nc">&nbsp;}</b>
-&nbsp;
-&nbsp;/** One pick shows its name, several show how many — null leaves the chip in its bare state. */
-&nbsp;@Composable
-<b class="nc">&nbsp;private fun selectionValue(name: String?, count: Int): String? = when {</b>
-<b class="nc">&nbsp;    count == 0 -&gt; null</b>
-<b class="nc">&nbsp;    name != null -&gt; name</b>
-<b class="nc">&nbsp;    else -&gt; stringResource(Res.string.transactions_list_chip_selected_count, count)</b>
-&nbsp;}
-&nbsp;
-&nbsp;@Composable
-<b class="nc">&nbsp;private fun TransactionFilterChipsUi.dateRangeValue(): String? = when (val range = dateRange) {</b>
-<b class="nc">&nbsp;    TransactionDateRange.FollowPeriod -&gt; null</b>
-<b class="nc">&nbsp;    is TransactionDateRange.Custom -&gt; stringResource(Res.string.transactions_list_chip_date_custom)</b>
-<b class="nc">&nbsp;    is TransactionDateRange.Preset -&gt; range.preset.chipValue()</b>
-<b class="nc">&nbsp;}</b>
-&nbsp;
-&nbsp;@Composable
-<b class="nc">&nbsp;private fun TransactionDatePreset.chipValue(): String = stringResource(</b>
-<b class="nc">&nbsp;    when (this) {</b>
-<b class="nc">&nbsp;        TransactionDatePreset.Today -&gt; Res.string.transaction_filters_date_today</b>
-<b class="nc">&nbsp;        TransactionDatePreset.Yesterday -&gt; Res.string.transaction_filters_date_yesterday</b>
-<b class="nc">&nbsp;        TransactionDatePreset.ThisWeek -&gt; Res.string.transaction_filters_date_this_week</b>
-<b class="nc">&nbsp;        TransactionDatePreset.ThisMonth -&gt; Res.string.transaction_filters_date_this_month</b>
-<b class="nc">&nbsp;        TransactionDatePreset.LastMonth -&gt; Res.string.transaction_filters_date_last_month</b>
-<b class="nc">&nbsp;        TransactionDatePreset.ThisYear -&gt; Res.string.transaction_filters_date_this_year</b>
-&nbsp;    },
-&nbsp;)
-&nbsp;
-&nbsp;@Composable
-<b class="nc">&nbsp;private fun TransactionTypeFilter.chipValue(): String? = when (this) {</b>
-<b class="nc">&nbsp;    TransactionTypeFilter.All -&gt; null</b>
-<b class="nc">&nbsp;    TransactionTypeFilter.Expenses -&gt; stringResource(Res.string.transactions_list_filter_expenses)</b>
-<b class="nc">&nbsp;    TransactionTypeFilter.Income -&gt; stringResource(Res.string.transactions_list_filter_income)</b>
-<b class="nc">&nbsp;    TransactionTypeFilter.Transfer -&gt; stringResource(Res.string.transactions_list_filter_transfer)</b>
-<b class="nc">&nbsp;}</b>
-&nbsp;
-&nbsp;@Composable
-<b class="nc">&nbsp;private fun TransactionSort.chipValue(): String = stringResource(</b>
-<b class="nc">&nbsp;    when (this) {</b>
-<b class="nc">&nbsp;        TransactionSort.Newest -&gt; Res.string.transactions_list_sort_newest</b>
-<b class="nc">&nbsp;        TransactionSort.Oldest -&gt; Res.string.transactions_list_sort_oldest</b>
-&nbsp;    },
-&nbsp;)
 </code>
 </pre>
 </div>
@@ -365,7 +220,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 17:47</div>
+    <div style="float:right;">generated on 2026-07-28 18:03</div>
 </div>
 </body>
 </html>

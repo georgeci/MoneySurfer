@@ -72,7 +72,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (19/19)
+    (21/21)
   </span>
 </td>
 <td class="coverageStat">
@@ -80,7 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (84/84)
+    (91/91)
   </span>
 </td>
 </tr>
@@ -113,8 +113,11 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    /** Pre-#260 exports: ends at `transfer_id`, before merchant/tags/recurring rule. */
 &nbsp;    V1(V1_COLUMNS),
 &nbsp;
-&nbsp;    /** #260&#39;s fields appended — what [TransactionCsvCodec.encode] writes today. */
+&nbsp;    /** #260&#39;s fields appended: merchant, tags, recurring rule. */
 &nbsp;    V2(V2_COLUMNS),
+&nbsp;
+&nbsp;    /** #399&#39;s `split_id` appended — what [TransactionCsvCodec.encode] writes today. */
+&nbsp;    V3(V3_COLUMNS),
 &nbsp;    ;
 &nbsp;
 &nbsp;    val header: List&lt;String&gt; = columns.map { it.header }
@@ -170,6 +173,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;    TransactionCsvColumn.Tags,</b>
 <b class="fc">&nbsp;    TransactionCsvColumn.RecurringRuleId,</b>
 &nbsp;)
+&nbsp;
+<b class="fc">&nbsp;private val V3_COLUMNS: List&lt;TransactionCsvColumn&gt; = V2_COLUMNS + listOf(</b>
+<b class="fc">&nbsp;    TransactionCsvColumn.SplitId,</b>
+&nbsp;)
 </code>
 </pre>
 </div>
@@ -193,7 +200,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 17:47</div>
+    <div style="float:right;">generated on 2026-07-28 18:03</div>
 </div>
 </body>
 </html>

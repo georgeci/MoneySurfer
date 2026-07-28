@@ -56,7 +56,6 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import androidx.compose.foundation.layout.padding
 &nbsp;import androidx.compose.foundation.lazy.LazyColumn
 &nbsp;import androidx.compose.foundation.lazy.items
-&nbsp;import androidx.compose.material3.Scaffold
 &nbsp;import androidx.compose.material3.Text
 &nbsp;import androidx.compose.runtime.Composable
 &nbsp;import androidx.compose.runtime.getValue
@@ -95,15 +94,14 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.uikit.components.account.SurferAccountDetailsHeroCard
 &nbsp;import com.georgeci.moneysurfer.uikit.components.account.SurferAccountStatCard
 &nbsp;import com.georgeci.moneysurfer.uikit.components.account.SurferBalanceChartCard
-&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferAddFab
 &nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferFilterChipRow
-&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
+&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferPaneAction
+&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferPaneScaffold
 &nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferToolbarAction
 &nbsp;import com.georgeci.moneysurfer.uikit.components.transaction.SurferSwipeToDeleteTransaction
 &nbsp;import com.georgeci.moneysurfer.uikit.components.transaction.SurferTransactionLine
 &nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 &nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
-&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
 &nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
 &nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
 &nbsp;import com.georgeci.moneysurfer.utils.HandleSideEffect
@@ -153,15 +151,9 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;
 &nbsp;@Composable
 &nbsp;private fun AccountDetailsLoading(onEvent: (AccountDetailsEvent) -&gt; Unit) {
-&nbsp;    Scaffold(
-&nbsp;        modifier = Modifier.surferSafeInsets(),
-&nbsp;        containerColor = AppTheme.materialColors.surface,
-&nbsp;        topBar = {
-&nbsp;            SurferToolbar(
-&nbsp;                title = stringResource(Res.string.account_details_title),
-&nbsp;                onBack = { onEvent(AccountDetailsEvent.OnBackClick) },
-&nbsp;            )
-&nbsp;        },
+&nbsp;    SurferPaneScaffold(
+&nbsp;        title = stringResource(Res.string.account_details_title),
+&nbsp;        onBack = { onEvent(AccountDetailsEvent.OnBackClick) },
 &nbsp;    ) { padding -&gt;
 &nbsp;        Column(
 &nbsp;            modifier = Modifier
@@ -185,36 +177,28 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    state: AccountDetailsState.Content,
 &nbsp;    onEvent: (AccountDetailsEvent) -&gt; Unit,
 &nbsp;) {
-&nbsp;    Scaffold(
+&nbsp;    SurferPaneScaffold(
+&nbsp;        title = stringResource(Res.string.account_details_title),
 &nbsp;        modifier = Modifier
-&nbsp;            .surferSafeInsets()
 &nbsp;            .testTag(AccountDetailsTestTags.Root)
 &nbsp;            .surferTestTagAsId(),
-&nbsp;        containerColor = AppTheme.materialColors.surface,
-&nbsp;        topBar = {
-&nbsp;            SurferToolbar(
-&nbsp;                title = stringResource(Res.string.account_details_title),
-&nbsp;                onBack = { onEvent(AccountDetailsEvent.OnBackClick) },
-&nbsp;                actions = {
-&nbsp;                    SurferToolbarAction(
-&nbsp;                        icon = SurferIcons.Edit,
-&nbsp;                        contentDescription = stringResource(Res.string.account_details_edit_content_description),
-&nbsp;                        onClick = { onEvent(AccountDetailsEvent.OnEditClick) },
-&nbsp;                    )
-&nbsp;                    SurferToolbarAction(
-&nbsp;                        icon = SurferIcons.MoreVert,
-&nbsp;                        contentDescription = stringResource(Res.string.account_details_more_content_description),
-&nbsp;                        onClick = { /* overflow menu — wires later */ },
-&nbsp;                    )
-&nbsp;                },
+&nbsp;        onBack = { onEvent(AccountDetailsEvent.OnBackClick) },
+&nbsp;        actions = {
+&nbsp;            SurferToolbarAction(
+&nbsp;                icon = SurferIcons.Edit,
+&nbsp;                contentDescription = stringResource(Res.string.account_details_edit_content_description),
+&nbsp;                onClick = { onEvent(AccountDetailsEvent.OnEditClick) },
+&nbsp;            )
+&nbsp;            SurferToolbarAction(
+&nbsp;                icon = SurferIcons.MoreVert,
+&nbsp;                contentDescription = stringResource(Res.string.account_details_more_content_description),
+&nbsp;                onClick = { /* overflow menu — wires later */ },
 &nbsp;            )
 &nbsp;        },
-&nbsp;        floatingActionButton = {
-&nbsp;            SurferAddFab(
-&nbsp;                label = stringResource(Res.string.account_details_add_transaction),
-&nbsp;                onClick = { onEvent(AccountDetailsEvent.OnAddTransactionClick) },
-&nbsp;            )
-&nbsp;        },
+&nbsp;        primaryAction = SurferPaneAction(
+&nbsp;            label = stringResource(Res.string.account_details_add_transaction),
+&nbsp;            onClick = { onEvent(AccountDetailsEvent.OnAddTransactionClick) },
+&nbsp;        ),
 &nbsp;    ) { padding -&gt;
 &nbsp;        val filtered = remember(state.filter, state.transactions) {
 &nbsp;            when (state.filter) {
@@ -322,6 +306,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;                        },
 &nbsp;                        modifier = Modifier.padding(bottom = AppTheme.spacing.small),
 &nbsp;                        isTransfer = transaction.isTransfer,
+&nbsp;                        isSplit = transaction.isSplitLeg,
 &nbsp;                    ) {
 &nbsp;                        SurferTransactionLine(
 &nbsp;                            icon = if (transaction.isExpense) SurferIcons.Receipt else SurferIcons.Wallet,
@@ -519,7 +504,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 17:47</div>
+    <div style="float:right;">generated on 2026-07-28 18:03</div>
 </div>
 </body>
 </html>

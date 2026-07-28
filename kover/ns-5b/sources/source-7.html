@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > TransactionPeriodUi</title>
+  <title>MoneySurfer Coverage Report > TransactionGroupUi</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,12 +22,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.feature.transaction.list</a>
 </div>
 
-<h1>Coverage Summary for Class: TransactionPeriodUi (com.georgeci.moneysurfer.feature.transaction.list)</h1>
+<h1>Coverage Summary for Class: TransactionGroupUi (com.georgeci.moneysurfer.feature.transaction.list)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -45,98 +48,22 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   Instruction, %
 </th>
 </tr>
-  <tr>
-    <td class="name">TransactionPeriodUi$AllTime</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (2/2)
-  </span>
-</td>
-  </tr>
-  <tr>
-    <td class="name">TransactionPeriodUi$Month</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (12/12)
-  </span>
-</td>
-  </tr>
-  <tr>
-    <td class="name">TransactionPeriodUi$Week</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (5/5)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (22/22)
-  </span>
-</td>
-  </tr>
 <tr>
-  <td class="name"><strong>Total</strong></td>
+  <td class="name">TransactionGroupUi</td>
 <td class="coverageStat">
   <span class="percent">
     100%
   </span>
   <span class="absValue">
-    (3/3)
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
   </span>
 </td>
     <td class="coverageStat"/>
@@ -145,7 +72,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (7/7)
+    (6/6)
   </span>
 </td>
 <td class="coverageStat">
@@ -153,10 +80,11 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (36/36)
+    (27/27)
   </span>
 </td>
 </tr>
+
 </table>
 
 <br/>
@@ -172,12 +100,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.feature.transaction.filter.TransactionTypeFilter
 &nbsp;import kotlinx.datetime.LocalDate
 &nbsp;
-&nbsp;data class TransactionGroupUi(
-&nbsp;    val date: LocalDate,
-&nbsp;    val dateLabel: TransactionDateUi,
-&nbsp;    val netFormatted: String,
-&nbsp;    val netPositive: Boolean,
-&nbsp;    val transactions: List&lt;TransactionRowUi&gt;,
+<b class="fc">&nbsp;data class TransactionGroupUi(</b>
+<b class="fc">&nbsp;    val date: LocalDate,</b>
+<b class="fc">&nbsp;    val dateLabel: TransactionDateUi,</b>
+<b class="fc">&nbsp;    val netFormatted: String,</b>
+<b class="fc">&nbsp;    val netPositive: Boolean,</b>
+<b class="fc">&nbsp;    val transactions: List&lt;TransactionRowUi&gt;,</b>
 &nbsp;)
 &nbsp;
 &nbsp;/** Day-header label, resolved to text by the screen. */
@@ -189,15 +117,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;
 &nbsp;/** Pager label, resolved to text by the screen — see the `PeriodPager` design component. */
 &nbsp;sealed interface TransactionPeriodUi {
-<b class="fc">&nbsp;    data class Month(val monthNumber: Int, val year: Int) : TransactionPeriodUi</b>
-<b class="fc">&nbsp;    data class Week(</b>
-<b class="fc">&nbsp;        val from: LocalDate,</b>
-<b class="fc">&nbsp;        val to: LocalDate,</b>
-<b class="fc">&nbsp;        val weekNumber: Int,</b>
-<b class="fc">&nbsp;        val weekYear: Int,</b>
+&nbsp;    data class Month(val monthNumber: Int, val year: Int) : TransactionPeriodUi
+&nbsp;    data class Week(
+&nbsp;        val from: LocalDate,
+&nbsp;        val to: LocalDate,
+&nbsp;        val weekNumber: Int,
+&nbsp;        val weekYear: Int,
 &nbsp;    ) : TransactionPeriodUi
 &nbsp;
-<b class="fc">&nbsp;    data object AllTime : TransactionPeriodUi</b>
+&nbsp;    data object AllTime : TransactionPeriodUi
 &nbsp;}
 &nbsp;
 &nbsp;/**
@@ -225,6 +153,24 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    val accountName: String = &quot;&quot;,
 &nbsp;    /** One leg of a transfer: money moved sideways, drawn neutral with a swap glyph. */
 &nbsp;    val isTransfer: Boolean = false,
+&nbsp;    /**
+&nbsp;     * How many categories a collapsed split row covers, or `0` when the row is an ordinary
+&nbsp;     * transaction. Non-zero replaces [subtitle] with the &quot;N categories&quot; badge: a receipt split
+&nbsp;     * across several categories has no single category name to show, and [formattedAmount] is the
+&nbsp;     * whole receipt rather than any one leg. [id] is the leg the row opens — its details screen
+&nbsp;     * carries the breakdown.
+&nbsp;     */
+&nbsp;    val splitCategoryCount: Int = 0,
+&nbsp;    /**
+&nbsp;     * Whether the row belongs to a receipt split across categories — true for a collapsed row and
+&nbsp;     * for a lone leg alike.
+&nbsp;     *
+&nbsp;     * Deliberately separate from [splitCategoryCount], which is only non-zero once a group is
+&nbsp;     * collapsed: a page that holds part of a group renders its legs individually, and deleting one
+&nbsp;     * of those still takes the whole receipt. The delete confirmation keys off this, so what the
+&nbsp;     * dialog promises matches what the delete does at every window size.
+&nbsp;     */
+&nbsp;    val isSplitLeg: Boolean = false,
 &nbsp;)
 &nbsp;
 &nbsp;data class TransactionSummaryUi(
@@ -256,7 +202,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 17:47</div>
+    <div style="float:right;">generated on 2026-07-28 18:03</div>
 </div>
 </body>
 </html>

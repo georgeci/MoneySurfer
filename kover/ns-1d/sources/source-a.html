@@ -145,6 +145,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.RecurringRuleId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.SplitId
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionId
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionStatus
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionType
@@ -178,6 +179,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    Merchant(&quot;merchant&quot;),
 &nbsp;    Tags(&quot;tags&quot;),
 &nbsp;    RecurringRuleId(&quot;recurring_rule_id&quot;),
+&nbsp;    SplitId(&quot;split_id&quot;),
 &nbsp;}
 &nbsp;
 &nbsp;sealed interface TransactionCsvDecodeResult {
@@ -224,6 +226,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;            // spreadsheet would evaluate once a user re-orders the cell by hand.
 &nbsp;            Csv.encodeCellList(tags.map(Csv::guardFormula)),
 &nbsp;            recurringRuleId?.value.orEmpty(),
+&nbsp;            splitId?.value.orEmpty(),
 &nbsp;        )
 &nbsp;    }
 &nbsp;
@@ -274,6 +277,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;                    transferId = optional(TransactionCsvColumn.TransferId)?.let(::TransferId),
 &nbsp;                    recurringRuleId = optional(TransactionCsvColumn.RecurringRuleId)
 &nbsp;                        ?.let(::RecurringRuleId),
+&nbsp;                    splitId = optional(TransactionCsvColumn.SplitId)?.let(::SplitId),
 &nbsp;                ),
 &nbsp;            )
 &nbsp;        } catch (rejected: FieldRejectedException) {
@@ -369,7 +373,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 17:47</div>
+    <div style="float:right;">generated on 2026-07-28 18:03</div>
 </div>
 </body>
 </html>

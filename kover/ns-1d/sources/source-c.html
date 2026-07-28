@@ -61,7 +61,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (7/7)
+    (8/8)
   </span>
 </td>
 <td class="coverageStat">
@@ -69,7 +69,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (73/73)
+    (80/80)
   </span>
 </td>
 </tr>
@@ -131,7 +131,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (9/9)
+    (10/10)
   </span>
 </td>
 <td class="coverageStat">
@@ -139,7 +139,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (98/98)
+    (105/105)
   </span>
 </td>
 </tr>
@@ -171,8 +171,11 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    /** Pre-#260 exports: ends at `transfer_id`, before merchant/tags/recurring rule. */
 <b class="fc">&nbsp;    V1(V1_COLUMNS),</b>
 &nbsp;
-&nbsp;    /** #260&#39;s fields appended — what [TransactionCsvCodec.encode] writes today. */
+&nbsp;    /** #260&#39;s fields appended: merchant, tags, recurring rule. */
 <b class="fc">&nbsp;    V2(V2_COLUMNS),</b>
+&nbsp;
+&nbsp;    /** #399&#39;s `split_id` appended — what [TransactionCsvCodec.encode] writes today. */
+<b class="fc">&nbsp;    V3(V3_COLUMNS),</b>
 &nbsp;    ;
 &nbsp;
 <b class="fc">&nbsp;    val header: List&lt;String&gt; = columns.map { it.header }</b>
@@ -228,6 +231,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    TransactionCsvColumn.Tags,
 &nbsp;    TransactionCsvColumn.RecurringRuleId,
 &nbsp;)
+&nbsp;
+&nbsp;private val V3_COLUMNS: List&lt;TransactionCsvColumn&gt; = V2_COLUMNS + listOf(
+&nbsp;    TransactionCsvColumn.SplitId,
+&nbsp;)
 </code>
 </pre>
 </div>
@@ -251,7 +258,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 17:47</div>
+    <div style="float:right;">generated on 2026-07-28 18:03</div>
 </div>
 </body>
 </html>

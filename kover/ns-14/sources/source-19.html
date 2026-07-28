@@ -150,6 +150,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.RecurringRuleId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.SplitId
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionId
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionStatus
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionType
@@ -212,6 +213,9 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    override suspend fun getByTransferId(transferId: TransferId): List&lt;Transaction&gt; =
 &nbsp;        dao.getByTransferId(transferId.value).map { it.toDomain() }
 &nbsp;
+&nbsp;    override suspend fun getBySplitId(splitId: SplitId): List&lt;Transaction&gt; =
+&nbsp;        dao.getBySplitId(splitId.value).map { it.toDomain() }
+&nbsp;
 &nbsp;    override suspend fun insert(transaction: Transaction) {
 &nbsp;        val entity = transaction.toEntity()
 &nbsp;        dao.insert(entity)
@@ -266,6 +270,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;        createdAt = timeFormatter.parseInstant(createdAt),
 &nbsp;        updatedAt = timeFormatter.parseInstant(updatedAt),
 &nbsp;        transferId = transferId?.let(::TransferId),
+&nbsp;        splitId = splitId?.let(::SplitId),
 &nbsp;        recurringRuleId = recurringRuleId?.let(::RecurringRuleId),
 &nbsp;    )
 &nbsp;
@@ -289,9 +294,11 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;            createdAt = createdAt,
 &nbsp;            updatedAt = updatedAt,
 &nbsp;            transferId = transferId,
+&nbsp;            splitId = splitId,
 &nbsp;            recurringRuleId = recurringRuleId,
 &nbsp;        ).toDomain(),
 &nbsp;        categoryName = categoryName,
+&nbsp;        splitLegCount = splitLegCount,
 &nbsp;    )
 &nbsp;
 &nbsp;    private fun resolveOperationDate(stored: String, operationAt: Long) =
@@ -316,6 +323,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;        createdAt = timeFormatter.formatInstant(createdAt),
 &nbsp;        updatedAt = timeFormatter.formatInstant(updatedAt),
 &nbsp;        transferId = transferId?.value,
+&nbsp;        splitId = splitId?.value,
 &nbsp;        recurringRuleId = recurringRuleId?.value,
 &nbsp;    )
 &nbsp;}
@@ -380,7 +388,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 17:47</div>
+    <div style="float:right;">generated on 2026-07-28 18:03</div>
 </div>
 </body>
 </html>

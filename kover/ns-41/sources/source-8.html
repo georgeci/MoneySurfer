@@ -63,7 +63,6 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import androidx.compose.material3.IconButton
 &nbsp;import androidx.compose.material3.ModalBottomSheet
 &nbsp;import androidx.compose.material3.OutlinedButton
-&nbsp;import androidx.compose.material3.Scaffold
 &nbsp;import androidx.compose.material3.Text
 &nbsp;import androidx.compose.material3.TextButton
 &nbsp;import androidx.compose.runtime.Composable
@@ -81,7 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.feature.goal.labelRes
 &nbsp;import com.georgeci.moneysurfer.feature.goal.toUi
 &nbsp;import com.georgeci.moneysurfer.navigation.GoalContributionMode
-&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
+&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferPaneScaffold
 &nbsp;import com.georgeci.moneysurfer.uikit.components.goal.SurferGoalContributionRow
 &nbsp;import com.georgeci.moneysurfer.uikit.components.goal.SurferGoalIcon
 &nbsp;import com.georgeci.moneysurfer.uikit.components.goal.SurferGoalProgressRing
@@ -89,7 +88,6 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.uikit.components.goal.goalAccentColor
 &nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 &nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
-&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
 &nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
 &nbsp;import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
 &nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
@@ -159,30 +157,24 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    content: GoalDetailsContent?,
 &nbsp;    onEvent: (GoalDetailsEvent) -&gt; Unit,
 &nbsp;) {
-&nbsp;    Scaffold(
+&nbsp;    SurferPaneScaffold(
+&nbsp;        title = content?.title.orEmpty(),
 &nbsp;        modifier = Modifier
-&nbsp;            .surferSafeInsets()
 &nbsp;            .testTag(GoalDetailsTestTags.Root)
 &nbsp;            .surferTestTagAsId(),
-&nbsp;        containerColor = AppTheme.materialColors.surface,
-&nbsp;        topBar = {
-&nbsp;            SurferToolbar(
-&nbsp;                title = content?.title.orEmpty(),
-&nbsp;                onBack = { onEvent(GoalDetailsEvent.OnBackClick) },
-&nbsp;                actions = {
-&nbsp;                    IconButton(onClick = { onEvent(GoalDetailsEvent.OnActionsClick) }) {
-&nbsp;                        Icon(
-&nbsp;                            imageVector = SurferIcons.MoreVert,
-&nbsp;                            contentDescription = stringResource(Res.string.goal_details_actions),
-&nbsp;                        )
-&nbsp;                    }
-&nbsp;                },
-&nbsp;            )
+&nbsp;        onBack = { onEvent(GoalDetailsEvent.OnBackClick) },
+&nbsp;        actions = {
+&nbsp;            IconButton(onClick = { onEvent(GoalDetailsEvent.OnActionsClick) }) {
+&nbsp;                Icon(
+&nbsp;                    imageVector = SurferIcons.MoreVert,
+&nbsp;                    contentDescription = stringResource(Res.string.goal_details_actions),
+&nbsp;                )
+&nbsp;            }
 &nbsp;        },
 &nbsp;    ) { padding -&gt;
 &nbsp;        if (content == null) {
 &nbsp;            Box(modifier = Modifier.fillMaxSize().padding(padding))
-&nbsp;            return@Scaffold
+&nbsp;            return@SurferPaneScaffold
 &nbsp;        }
 &nbsp;        GoalDetailsBody(content = content, padding = padding, onEvent = onEvent)
 &nbsp;
@@ -469,7 +461,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 17:47</div>
+    <div style="float:right;">generated on 2026-07-28 18:03</div>
 </div>
 </body>
 </html>

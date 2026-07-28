@@ -60,27 +60,27 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    51.9%
+    51.4%
   </span>
   <span class="absValue">
-    (41/79)
+    (54/105)
   </span>
 </td>
     <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    23.1%
+    22.3%
   </span>
   <span class="absValue">
-    (45/195)
+    (58/260)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    20.3%
+    19.4%
   </span>
   <span class="absValue">
-    (380/1872)
+    (484/2496)
   </span>
 </td>
 </tr>
@@ -108,320 +108,436 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;private const val MD: String =
 &nbsp;    &quot;composeResources/moneysurfer.feature.transaction.generated.resources/&quot;
 &nbsp;
+&nbsp;@delegate:ResourceContentHash(439_539_190)
+<b class="fc">&nbsp;internal val Res.string.transaction_filters_type_all: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:transaction_filters_type_all&quot;, &quot;transaction_filters_type_all&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 8081, 44),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 6329, 40),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(1_340_699_527)
+<b class="fc">&nbsp;internal val Res.string.transaction_filters_type_expenses: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:transaction_filters_type_expenses&quot;, &quot;transaction_filters_type_expenses&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 8126, 61),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 6370, 53),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(1_714_291_899)
+<b class="fc">&nbsp;internal val Res.string.transaction_filters_type_income: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:transaction_filters_type_income&quot;, &quot;transaction_filters_type_income&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 8188, 55),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 6424, 47),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-224_525_539)
+<b class="fc">&nbsp;internal val Res.string.transaction_filters_type_transfer: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:transaction_filters_type_transfer&quot;, &quot;transaction_filters_type_transfer&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 8244, 65),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 6472, 53),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(1_947_237_329)
+<b class="fc">&nbsp;internal val Res.string.transactions_list_chip_account: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:transactions_list_chip_account&quot;, &quot;transactions_list_chip_account&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 8310, 50),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 6526, 50),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(391_069_452)
+<b class="fc">&nbsp;internal val Res.string.transactions_list_chip_category: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:transactions_list_chip_category&quot;, &quot;transactions_list_chip_category&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 8361, 63),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 6577, 51),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-423_648_048)
+<b class="fc">&nbsp;internal val Res.string.transactions_list_chip_date: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:transactions_list_chip_date&quot;, &quot;transactions_list_chip_date&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 8496, 47),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 6680, 43),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(1_449_802_569)
+<b class="fc">&nbsp;internal val Res.string.transactions_list_chip_date_custom: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:transactions_list_chip_date_custom&quot;, &quot;transactions_list_chip_date_custom&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 8425, 70),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 6629, 50),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(881_925_259)
+<b class="fc">&nbsp;internal val Res.string.transactions_list_chip_selected_count: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:transactions_list_chip_selected_count&quot;, &quot;transactions_list_chip_selected_count&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 8544, 73),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 6724, 65),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(1_172_182_651)
+<b class="fc">&nbsp;internal val Res.string.transactions_list_chip_sort: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:transactions_list_chip_sort&quot;, &quot;transactions_list_chip_sort&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 8618, 63),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 6790, 43),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(106_723_727)
+<b class="fc">&nbsp;internal val Res.string.transactions_list_chip_type: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:transactions_list_chip_type&quot;, &quot;transactions_list_chip_type&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 8682, 43),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 6834, 43),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-1_731_324_128)
+<b class="fc">&nbsp;internal val Res.string.transactions_list_chip_value: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:transactions_list_chip_value&quot;, &quot;transactions_list_chip_value&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 8726, 52),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 6878, 52),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
 &nbsp;@delegate:ResourceContentHash(-516_179_456)
 <b class="fc">&nbsp;internal val Res.string.transactions_list_date_full: StringResource by lazy {</b>
 <b class="nc">&nbsp;      StringResource(&quot;string:transactions_list_date_full&quot;, &quot;transactions_list_date_full&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 7675, 55),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 6115, 55),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 8779, 55),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 6931, 55),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
 &nbsp;@delegate:ResourceContentHash(1_773_032_597)
 <b class="fc">&nbsp;internal val Res.string.transactions_list_date_today: StringResource by lazy {</b>
 <b class="nc">&nbsp;      StringResource(&quot;string:transactions_list_date_today&quot;, &quot;transactions_list_date_today&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 7731, 56),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 6171, 44),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 8835, 56),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 6987, 44),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
 &nbsp;@delegate:ResourceContentHash(26_816_387)
 <b class="fc">&nbsp;internal val Res.string.transactions_list_date_yesterday: StringResource by lazy {</b>
 <b class="nc">&nbsp;      StringResource(&quot;string:transactions_list_date_yesterday&quot;, &quot;transactions_list_date_yesterday&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 7788, 56),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 6216, 52),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 8892, 56),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 7032, 52),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
 &nbsp;@delegate:ResourceContentHash(-294_691_173)
 <b class="fc">&nbsp;internal val Res.string.transactions_list_delete_undo: StringResource by lazy {</b>
 <b class="fc">&nbsp;      StringResource(&quot;string:transactions_list_delete_undo&quot;, &quot;transactions_list_delete_undo&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 7845, 61),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 6269, 45),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 8949, 61),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 7085, 45),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
 &nbsp;@delegate:ResourceContentHash(723_482_477)
 <b class="fc">&nbsp;internal val Res.string.transactions_list_deleted_snackbar: StringResource by lazy {</b>
 <b class="fc">&nbsp;      StringResource(&quot;string:transactions_list_deleted_snackbar&quot;, &quot;transactions_list_deleted_snackbar&quot;, setOf(</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 7907, 90),</b>
-<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 6315, 70),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 9011, 90),</b>
+<b class="fc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 7131, 70),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
 &nbsp;@delegate:ResourceContentHash(-312_594_612)
 <b class="fc">&nbsp;internal val Res.string.transactions_list_empty: StringResource by lazy {</b>
 <b class="nc">&nbsp;      StringResource(&quot;string:transactions_list_empty&quot;, &quot;transactions_list_empty&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 8731, 123),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 6883, 91),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 9835, 123),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 7699, 91),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
 &nbsp;@delegate:ResourceContentHash(-569_514_008)
 <b class="fc">&nbsp;internal val Res.string.transactions_list_empty_cta: StringResource by lazy {</b>
 <b class="nc">&nbsp;      StringResource(&quot;string:transactions_list_empty_cta&quot;, &quot;transactions_list_empty_cta&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 7998, 87),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 6386, 55),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 9102, 87),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 7202, 55),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
 &nbsp;@delegate:ResourceContentHash(-447_874_996)
 <b class="fc">&nbsp;internal val Res.string.transactions_list_empty_filtered: StringResource by lazy {</b>
 <b class="nc">&nbsp;      StringResource(&quot;string:transactions_list_empty_filtered&quot;, &quot;transactions_list_empty_filtered&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 8266, 172),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 6574, 104),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 9370, 172),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 7390, 104),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
 &nbsp;@delegate:ResourceContentHash(-1_947_797_912)
 <b class="fc">&nbsp;internal val Res.string.transactions_list_empty_filtered_cta: StringResource by lazy {</b>
 <b class="nc">&nbsp;      StringResource(&quot;string:transactions_list_empty_filtered_cta&quot;, &quot;transactions_list_empty_filtered_cta&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 8086, 88),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 6442, 64),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 9190, 88),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 7258, 64),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
 &nbsp;@delegate:ResourceContentHash(2_043_282_418)
 <b class="fc">&nbsp;internal val Res.string.transactions_list_empty_filtered_title: StringResource by lazy {</b>
 <b class="nc">&nbsp;      StringResource(&quot;string:transactions_list_empty_filtered_title&quot;, &quot;transactions_list_empty_filtered_title&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 8175, 90),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 6507, 66),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 9279, 90),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 7323, 66),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
 &nbsp;@delegate:ResourceContentHash(743_344_798)
 <b class="fc">&nbsp;internal val Res.string.transactions_list_empty_search: StringResource by lazy {</b>
 <b class="nc">&nbsp;      StringResource(&quot;string:transactions_list_empty_search&quot;, &quot;transactions_list_empty_search&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 8518, 126),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 6738, 78),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 9622, 126),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 7554, 78),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
 &nbsp;@delegate:ResourceContentHash(1_948_966_498)
 <b class="fc">&nbsp;internal val Res.string.transactions_list_empty_search_cta: StringResource by lazy {</b>
 <b class="nc">&nbsp;      StringResource(&quot;string:transactions_list_empty_search_cta&quot;, &quot;transactions_list_empty_search_cta&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 8439, 78),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 6679, 58),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 9543, 78),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 7495, 58),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
 &nbsp;@delegate:ResourceContentHash(1_416_249_796)
 <b class="fc">&nbsp;internal val Res.string.transactions_list_empty_title: StringResource by lazy {</b>
 <b class="nc">&nbsp;      StringResource(&quot;string:transactions_list_empty_title&quot;, &quot;transactions_list_empty_title&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 8645, 85),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 6817, 65),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 9749, 85),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 7633, 65),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
 &nbsp;@delegate:ResourceContentHash(439_539_190)
 <b class="fc">&nbsp;internal val Res.string.transactions_list_filter_all: StringResource by lazy {</b>
 <b class="nc">&nbsp;      StringResource(&quot;string:transactions_list_filter_all&quot;, &quot;transactions_list_filter_all&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 8855, 44),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 6975, 40),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 9959, 44),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 7791, 40),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
 &nbsp;@delegate:ResourceContentHash(1_340_699_527)
 <b class="fc">&nbsp;internal val Res.string.transactions_list_filter_expenses: StringResource by lazy {</b>
 <b class="nc">&nbsp;      StringResource(&quot;string:transactions_list_filter_expenses&quot;, &quot;transactions_list_filter_expenses&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 8900, 61),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 7016, 53),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 10004, 61),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 7832, 53),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
 &nbsp;@delegate:ResourceContentHash(1_714_291_899)
 <b class="fc">&nbsp;internal val Res.string.transactions_list_filter_income: StringResource by lazy {</b>
 <b class="nc">&nbsp;      StringResource(&quot;string:transactions_list_filter_income&quot;, &quot;transactions_list_filter_income&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 8962, 55),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 7070, 47),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 10066, 55),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 7886, 47),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
 &nbsp;@delegate:ResourceContentHash(-224_525_539)
 <b class="fc">&nbsp;internal val Res.string.transactions_list_filter_transfer: StringResource by lazy {</b>
 <b class="nc">&nbsp;      StringResource(&quot;string:transactions_list_filter_transfer&quot;, &quot;transactions_list_filter_transfer&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 9018, 65),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 7118, 53),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 10122, 65),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 7934, 53),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
 &nbsp;@delegate:ResourceContentHash(-841_968_928)
 <b class="fc">&nbsp;internal val Res.string.transactions_list_filters_badge: StringResource by lazy {</b>
 <b class="nc">&nbsp;      StringResource(&quot;string:transactions_list_filters_badge&quot;, &quot;transactions_list_filters_badge&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 9084, 47),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 7172, 47),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 10188, 47),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 7988, 47),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
 &nbsp;@delegate:ResourceContentHash(1_521_816_508)
 <b class="fc">&nbsp;internal val Res.string.transactions_list_filters_content_description: StringResource by lazy {</b>
 <b class="nc">&nbsp;      StringResource(&quot;string:transactions_list_filters_content_description&quot;, &quot;transactions_list_filters_content_description&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 9132, 73),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 7220, 65),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 10236, 73),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 8036, 65),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
 &nbsp;@delegate:ResourceContentHash(-799_818_477)
 <b class="fc">&nbsp;internal val Res.string.transactions_list_new: StringResource by lazy {</b>
 <b class="nc">&nbsp;      StringResource(&quot;string:transactions_list_new&quot;, &quot;transactions_list_new&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 9206, 45),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 7286, 33),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 10310, 45),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 8102, 33),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
 &nbsp;@delegate:ResourceContentHash(-1_053_985_393)
 <b class="fc">&nbsp;internal val Res.string.transactions_list_period_all_time: StringResource by lazy {</b>
 <b class="nc">&nbsp;      StringResource(&quot;string:transactions_list_period_all_time&quot;, &quot;transactions_list_period_all_time&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 9346, 65),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 7386, 53),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 10450, 65),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 8202, 53),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
 &nbsp;@delegate:ResourceContentHash(1_759_035_762)
 <b class="fc">&nbsp;internal val Res.string.transactions_list_period_all_time_sub: StringResource by lazy {</b>
 <b class="nc">&nbsp;      StringResource(&quot;string:transactions_list_period_all_time_sub&quot;, &quot;transactions_list_period_all_time_sub&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 9252, 93),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 7320, 65),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 10356, 93),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 8136, 65),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
 &nbsp;@delegate:ResourceContentHash(-1_053_985_393)
 <b class="fc">&nbsp;internal val Res.string.transactions_list_period_mode_all_time: StringResource by lazy {</b>
 <b class="nc">&nbsp;      StringResource(&quot;string:transactions_list_period_mode_all_time&quot;, &quot;transactions_list_period_mode_all_time&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 9412, 70),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 7440, 58),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 10516, 70),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 8256, 58),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
 &nbsp;@delegate:ResourceContentHash(-1_558_260_591)
 <b class="fc">&nbsp;internal val Res.string.transactions_list_period_mode_month: StringResource by lazy {</b>
 <b class="nc">&nbsp;      StringResource(&quot;string:transactions_list_period_mode_month&quot;, &quot;transactions_list_period_mode_month&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 9483, 59),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 7499, 51),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 10587, 59),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 8315, 51),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
 &nbsp;@delegate:ResourceContentHash(-1_017_234_191)
 <b class="fc">&nbsp;internal val Res.string.transactions_list_period_mode_week: StringResource by lazy {</b>
 <b class="nc">&nbsp;      StringResource(&quot;string:transactions_list_period_mode_week&quot;, &quot;transactions_list_period_mode_week&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 9543, 58),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 7551, 50),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 10647, 58),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 8367, 50),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
 &nbsp;@delegate:ResourceContentHash(98_570_088)
 <b class="fc">&nbsp;internal val Res.string.transactions_list_period_next: StringResource by lazy {</b>
 <b class="nc">&nbsp;      StringResource(&quot;string:transactions_list_period_next&quot;, &quot;transactions_list_period_next&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 9602, 81),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 7602, 53),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 10706, 81),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 8418, 53),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
 &nbsp;@delegate:ResourceContentHash(1_254_737_271)
 <b class="fc">&nbsp;internal val Res.string.transactions_list_period_previous: StringResource by lazy {</b>
 <b class="nc">&nbsp;      StringResource(&quot;string:transactions_list_period_previous&quot;, &quot;transactions_list_period_previous&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 9684, 85),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 7656, 61),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 10788, 85),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 8472, 61),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
 &nbsp;@delegate:ResourceContentHash(1_736_794_687)
 <b class="fc">&nbsp;internal val Res.string.transactions_list_period_week_range: StringResource by lazy {</b>
 <b class="nc">&nbsp;      StringResource(&quot;string:transactions_list_period_week_range&quot;, &quot;transactions_list_period_week_range&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 9858, 67),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 7806, 67),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 10962, 67),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 8622, 67),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
 &nbsp;@delegate:ResourceContentHash(909_440_815)
 <b class="fc">&nbsp;internal val Res.string.transactions_list_period_week_range_cross_month: StringResource by lazy {</b>
 <b class="nc">&nbsp;      StringResource(&quot;string:transactions_list_period_week_range_cross_month&quot;, &quot;transactions_list_period_week_range_cross_month&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 9770, 87),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 7718, 87),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 10874, 87),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 8534, 87),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
 &nbsp;@delegate:ResourceContentHash(1_791_894_659)
 <b class="fc">&nbsp;internal val Res.string.transactions_list_period_week_sub: StringResource by lazy {</b>
 <b class="nc">&nbsp;      StringResource(&quot;string:transactions_list_period_week_sub&quot;, &quot;transactions_list_period_week_sub&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 9926, 61),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 7874, 61),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 11030, 61),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 8690, 61),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
 &nbsp;@delegate:ResourceContentHash(-587_822_539)
 <b class="fc">&nbsp;internal val Res.string.transactions_list_search_content_description: StringResource by lazy {</b>
 <b class="nc">&nbsp;      StringResource(&quot;string:transactions_list_search_content_description&quot;, &quot;transactions_list_search_content_description&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 9988, 96),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 7936, 80),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 11092, 96),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 8752, 80),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
 &nbsp;@delegate:ResourceContentHash(1_131_759_747)
 <b class="fc">&nbsp;internal val Res.string.transactions_list_search_placeholder: StringResource by lazy {</b>
 <b class="nc">&nbsp;      StringResource(&quot;string:transactions_list_search_placeholder&quot;, &quot;transactions_list_search_placeholder&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 10085, 124),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 8017, 84),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 11189, 124),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 8833, 84),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
 &nbsp;@delegate:ResourceContentHash(769_790_844)
 <b class="fc">&nbsp;internal val Res.string.transactions_list_sort_newest: StringResource by lazy {</b>
 <b class="nc">&nbsp;      StringResource(&quot;string:transactions_list_sort_newest&quot;, &quot;transactions_list_sort_newest&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 10210, 73),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 8102, 45),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 11314, 73),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 8918, 45),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
 &nbsp;@delegate:ResourceContentHash(-1_190_574_627)
 <b class="fc">&nbsp;internal val Res.string.transactions_list_sort_oldest: StringResource by lazy {</b>
 <b class="nc">&nbsp;      StringResource(&quot;string:transactions_list_sort_oldest&quot;, &quot;transactions_list_sort_oldest&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 10284, 73),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 8148, 45),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 11388, 73),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 8964, 45),</b>
+&nbsp;      ))
+&nbsp;    }
+&nbsp;
+&nbsp;@delegate:ResourceContentHash(-1_254_784_972)
+<b class="fc">&nbsp;internal val Res.string.transactions_list_split_categories: StringResource by lazy {</b>
+<b class="nc">&nbsp;      StringResource(&quot;string:transactions_list_split_categories&quot;, &quot;transactions_list_split_categories&quot;, setOf(</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 11462, 74),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 9010, 62),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
 &nbsp;@delegate:ResourceContentHash(-1_468_612_166)
 <b class="fc">&nbsp;internal val Res.string.transactions_list_summary_expenses: StringResource by lazy {</b>
 <b class="nc">&nbsp;      StringResource(&quot;string:transactions_list_summary_expenses&quot;, &quot;transactions_list_summary_expenses&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 10358, 58),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 8194, 54),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 11537, 58),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 9073, 54),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
 &nbsp;@delegate:ResourceContentHash(1_713_894_541)
 <b class="fc">&nbsp;internal val Res.string.transactions_list_summary_income: StringResource by lazy {</b>
 <b class="nc">&nbsp;      StringResource(&quot;string:transactions_list_summary_income&quot;, &quot;transactions_list_summary_income&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 10417, 56),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 8249, 48),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 11596, 56),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 9128, 48),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
 &nbsp;@delegate:ResourceContentHash(-1_814_834_370)
 <b class="fc">&nbsp;internal val Res.string.transactions_list_summary_net: StringResource by lazy {</b>
 <b class="nc">&nbsp;      StringResource(&quot;string:transactions_list_summary_net&quot;, &quot;transactions_list_summary_net&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 10474, 53),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 8298, 41),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 11653, 53),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 9177, 41),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
 &nbsp;@delegate:ResourceContentHash(-2_081_215_191)
 <b class="fc">&nbsp;internal val Res.string.transactions_list_title: StringResource by lazy {</b>
 <b class="nc">&nbsp;      StringResource(&quot;string:transactions_list_title&quot;, &quot;transactions_list_title&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 10528, 59),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 8340, 47),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 11707, 59),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 9219, 47),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
 &nbsp;@delegate:ResourceContentHash(-2_080_873_167)
 <b class="fc">&nbsp;internal val Res.string.transactions_list_untitled: StringResource by lazy {</b>
 <b class="nc">&nbsp;      StringResource(&quot;string:transactions_list_untitled&quot;, &quot;transactions_list_untitled&quot;, setOf(</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 10588, 62),</b>
-<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 8388, 50),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(LanguageQualifier(&quot;ru&quot;), ), &quot;${MD}values-ru/strings.commonMain.cvr&quot;, 11767, 62),</b>
+<b class="nc">&nbsp;        ResourceItem(setOf(), &quot;${MD}values/strings.commonMain.cvr&quot;, 9267, 50),</b>
 &nbsp;      ))
 &nbsp;    }
 &nbsp;
 &nbsp;@InternalResourceApi
 &nbsp;internal fun _collectCommonMainString1Resources(map: MutableMap&lt;String, StringResource&gt;) {
+<b class="nc">&nbsp;  map.put(&quot;transaction_filters_type_all&quot;, Res.string.transaction_filters_type_all)</b>
+<b class="nc">&nbsp;  map.put(&quot;transaction_filters_type_expenses&quot;, Res.string.transaction_filters_type_expenses)</b>
+<b class="nc">&nbsp;  map.put(&quot;transaction_filters_type_income&quot;, Res.string.transaction_filters_type_income)</b>
+<b class="nc">&nbsp;  map.put(&quot;transaction_filters_type_transfer&quot;, Res.string.transaction_filters_type_transfer)</b>
+<b class="nc">&nbsp;  map.put(&quot;transactions_list_chip_account&quot;, Res.string.transactions_list_chip_account)</b>
+<b class="nc">&nbsp;  map.put(&quot;transactions_list_chip_category&quot;, Res.string.transactions_list_chip_category)</b>
+<b class="nc">&nbsp;  map.put(&quot;transactions_list_chip_date&quot;, Res.string.transactions_list_chip_date)</b>
+<b class="nc">&nbsp;  map.put(&quot;transactions_list_chip_date_custom&quot;, Res.string.transactions_list_chip_date_custom)</b>
+<b class="nc">&nbsp;  map.put(&quot;transactions_list_chip_selected_count&quot;, Res.string.transactions_list_chip_selected_count)</b>
+<b class="nc">&nbsp;  map.put(&quot;transactions_list_chip_sort&quot;, Res.string.transactions_list_chip_sort)</b>
+<b class="nc">&nbsp;  map.put(&quot;transactions_list_chip_type&quot;, Res.string.transactions_list_chip_type)</b>
+<b class="nc">&nbsp;  map.put(&quot;transactions_list_chip_value&quot;, Res.string.transactions_list_chip_value)</b>
 <b class="nc">&nbsp;  map.put(&quot;transactions_list_date_full&quot;, Res.string.transactions_list_date_full)</b>
 <b class="nc">&nbsp;  map.put(&quot;transactions_list_date_today&quot;, Res.string.transactions_list_date_today)</b>
 <b class="nc">&nbsp;  map.put(&quot;transactions_list_date_yesterday&quot;, Res.string.transactions_list_date_yesterday)</b>
@@ -456,6 +572,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="nc">&nbsp;  map.put(&quot;transactions_list_search_placeholder&quot;, Res.string.transactions_list_search_placeholder)</b>
 <b class="nc">&nbsp;  map.put(&quot;transactions_list_sort_newest&quot;, Res.string.transactions_list_sort_newest)</b>
 <b class="nc">&nbsp;  map.put(&quot;transactions_list_sort_oldest&quot;, Res.string.transactions_list_sort_oldest)</b>
+<b class="nc">&nbsp;  map.put(&quot;transactions_list_split_categories&quot;, Res.string.transactions_list_split_categories)</b>
 <b class="nc">&nbsp;  map.put(&quot;transactions_list_summary_expenses&quot;, Res.string.transactions_list_summary_expenses)</b>
 <b class="nc">&nbsp;  map.put(&quot;transactions_list_summary_income&quot;, Res.string.transactions_list_summary_income)</b>
 <b class="nc">&nbsp;  map.put(&quot;transactions_list_summary_net&quot;, Res.string.transactions_list_summary_net)</b>
@@ -485,7 +602,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 17:47</div>
+    <div style="float:right;">generated on 2026-07-28 18:03</div>
 </div>
 </body>
 </html>

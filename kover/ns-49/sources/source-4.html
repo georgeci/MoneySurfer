@@ -69,7 +69,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/1011)
+    (0/978)
   </span>
 </td>
 </tr>
@@ -389,7 +389,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/1019)
+    (0/986)
   </span>
 </td>
 </tr>
@@ -403,7 +403,6 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.settings
 &nbsp;
 &nbsp;import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
-&nbsp;import androidx.compose.material3.adaptive.navigation3.ListDetailSceneStrategy
 &nbsp;import com.georgeci.moneysurfer.feature.settings.about.AboutScreen
 &nbsp;import com.georgeci.moneysurfer.feature.settings.about.licenses.LicensesScreen
 &nbsp;import com.georgeci.moneysurfer.feature.settings.account.DeleteUserAccountScreen
@@ -417,11 +416,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.navigation.FeatureNavGraph
 &nbsp;import com.georgeci.moneysurfer.navigation.NavDetailPlaceholder
 &nbsp;import com.georgeci.moneysurfer.navigation.Route
+&nbsp;import com.georgeci.moneysurfer.navigation.SurferPaneSceneStrategy
 &nbsp;
 &nbsp;@OptIn(ExperimentalMaterial3AdaptiveApi::class)
 <b class="nc">&nbsp;val settingsNavGraph: FeatureNavGraph = { navigator -&gt;</b>
 <b class="nc">&nbsp;    entry&lt;Route.Settings&gt;(</b>
-<b class="nc">&nbsp;        metadata = ListDetailSceneStrategy.listPane(detailPlaceholder = { NavDetailPlaceholder() }),</b>
+<b class="nc">&nbsp;        metadata = SurferPaneSceneStrategy.listPane(detailPlaceholder = { NavDetailPlaceholder() }),</b>
 <b class="nc">&nbsp;    ) {</b>
 <b class="nc">&nbsp;        SettingsScreen(</b>
 <b class="nc">&nbsp;            onNavigateBack = { navigator.pop() },</b>
@@ -447,37 +447,37 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    }
 &nbsp;
 <b class="nc">&nbsp;    entry&lt;Route.SettingsAppearance&gt;(</b>
-<b class="nc">&nbsp;        metadata = ListDetailSceneStrategy.detailPane(),</b>
+<b class="nc">&nbsp;        metadata = SurferPaneSceneStrategy.detailPane(),</b>
 <b class="nc">&nbsp;    ) {</b>
 <b class="nc">&nbsp;        AppearanceScreen(onNavigateBack = { navigator.pop() })</b>
 &nbsp;    }
 &nbsp;
 <b class="nc">&nbsp;    entry&lt;Route.SettingsPreferences&gt;(</b>
-<b class="nc">&nbsp;        metadata = ListDetailSceneStrategy.detailPane(),</b>
+<b class="nc">&nbsp;        metadata = SurferPaneSceneStrategy.detailPane(),</b>
 <b class="nc">&nbsp;    ) {</b>
 <b class="nc">&nbsp;        PreferencesScreen(onNavigateBack = { navigator.pop() })</b>
 &nbsp;    }
 &nbsp;
 <b class="nc">&nbsp;    entry&lt;Route.SettingsSync&gt;(</b>
-<b class="nc">&nbsp;        metadata = ListDetailSceneStrategy.detailPane(),</b>
+<b class="nc">&nbsp;        metadata = SurferPaneSceneStrategy.detailPane(),</b>
 <b class="nc">&nbsp;    ) {</b>
 <b class="nc">&nbsp;        SyncScreen(onNavigateBack = { navigator.pop() })</b>
 &nbsp;    }
 &nbsp;
 <b class="nc">&nbsp;    entry&lt;Route.SettingsBackup&gt;(</b>
-<b class="nc">&nbsp;        metadata = ListDetailSceneStrategy.detailPane(),</b>
+<b class="nc">&nbsp;        metadata = SurferPaneSceneStrategy.detailPane(),</b>
 <b class="nc">&nbsp;    ) {</b>
 <b class="nc">&nbsp;        BackupScreen(onNavigateBack = { navigator.pop() })</b>
 &nbsp;    }
 &nbsp;
 <b class="nc">&nbsp;    entry&lt;Route.SettingsCsv&gt;(</b>
-<b class="nc">&nbsp;        metadata = ListDetailSceneStrategy.detailPane(),</b>
+<b class="nc">&nbsp;        metadata = SurferPaneSceneStrategy.detailPane(),</b>
 <b class="nc">&nbsp;    ) {</b>
 <b class="nc">&nbsp;        CsvBackupScreen(onNavigateBack = { navigator.pop() })</b>
 &nbsp;    }
 &nbsp;
 <b class="nc">&nbsp;    entry&lt;Route.SettingsAbout&gt;(</b>
-<b class="nc">&nbsp;        metadata = ListDetailSceneStrategy.detailPane(),</b>
+<b class="nc">&nbsp;        metadata = SurferPaneSceneStrategy.detailPane(),</b>
 <b class="nc">&nbsp;    ) {</b>
 <b class="nc">&nbsp;        AboutScreen(</b>
 <b class="nc">&nbsp;            onNavigateBack = { navigator.pop() },</b>
@@ -486,19 +486,19 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    }
 &nbsp;
 <b class="nc">&nbsp;    entry&lt;Route.SettingsLicenses&gt;(</b>
-<b class="nc">&nbsp;        metadata = ListDetailSceneStrategy.detailPane(),</b>
+<b class="nc">&nbsp;        metadata = SurferPaneSceneStrategy.detailPane(),</b>
 <b class="nc">&nbsp;    ) {</b>
 <b class="nc">&nbsp;        LicensesScreen(onNavigateBack = { navigator.pop() })</b>
 &nbsp;    }
 &nbsp;
 <b class="nc">&nbsp;    entry&lt;Route.SettingsDeleteAccount&gt;(</b>
-<b class="nc">&nbsp;        metadata = ListDetailSceneStrategy.detailPane(),</b>
+<b class="nc">&nbsp;        metadata = SurferPaneSceneStrategy.detailPane(),</b>
 <b class="nc">&nbsp;    ) {</b>
 <b class="nc">&nbsp;        DeleteUserAccountScreen(onNavigateBack = { navigator.pop() })</b>
 &nbsp;    }
 &nbsp;
 <b class="nc">&nbsp;    entry&lt;Route.SettingsDebugConfig&gt;(</b>
-<b class="nc">&nbsp;        metadata = ListDetailSceneStrategy.detailPane(),</b>
+<b class="nc">&nbsp;        metadata = SurferPaneSceneStrategy.detailPane(),</b>
 <b class="nc">&nbsp;    ) {</b>
 <b class="nc">&nbsp;        DebugConfigScreen(</b>
 <b class="nc">&nbsp;            onNavigateBack = { navigator.pop() },</b>
@@ -507,7 +507,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    }
 &nbsp;
 <b class="nc">&nbsp;    entry&lt;Route.SettingsDebugLog&gt;(</b>
-<b class="nc">&nbsp;        metadata = ListDetailSceneStrategy.detailPane(),</b>
+<b class="nc">&nbsp;        metadata = SurferPaneSceneStrategy.detailPane(),</b>
 <b class="nc">&nbsp;    ) {</b>
 <b class="nc">&nbsp;        DebugLogScreen(onNavigateBack = { navigator.pop() })</b>
 &nbsp;    }
@@ -535,7 +535,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 17:47</div>
+    <div style="float:right;">generated on 2026-07-28 18:03</div>
 </div>
 </body>
 </html>

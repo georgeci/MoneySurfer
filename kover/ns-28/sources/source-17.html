@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > DeclineInviteUseCase</title>
+  <title>MoneySurfer Coverage Report > CreateWorkspaceUseCase</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.usecase</a>
 </div>
 
-<h1>Coverage Summary for Class: DeclineInviteUseCase (com.georgeci.moneysurfer.domain.usecase)</h1>
+<h1>Coverage Summary for Class: CreateWorkspaceUseCase (com.georgeci.moneysurfer.domain.usecase)</h1>
 
 <table class="coverageStats">
 
@@ -46,80 +46,116 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">DeclineInviteUseCase</td>
+  <td class="name">CreateWorkspaceUseCase</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/2)
+    (4/4)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/20)
+    (8/8)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/30)
+    (71/71)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/674)
+    (925/925)
   </span>
 </td>
 </tr>
   <tr>
-    <td class="name">DeclineInviteUseCase$Companion</td>
+    <td class="name">CreateWorkspaceUseCase$Companion</td>
     <td class="coverageStat"/>
   </tr>
   <tr>
-    <td class="name">DeclineInviteUseCase$invoke$1</td>
+    <td class="name">CreateWorkspaceUseCase$invoke$1</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">CreateWorkspaceUseCase$Params</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (17/17)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">CreateWorkspaceUseCase$registerRemotely$1</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">CreateWorkspaceUseCase$writeLocal$1</td>
     <td class="coverageStat"/>
   </tr>
 <tr>
   <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/2)
+    (5/5)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/20)
+    (8/8)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/30)
+    (75/75)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/674)
+    (942/942)
   </span>
 </td>
 </tr>
@@ -133,64 +169,172 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.usecase
 &nbsp;
 &nbsp;import arrow.core.Either
+&nbsp;import arrow.core.raise.Raise
 &nbsp;import arrow.core.raise.either
-&nbsp;import arrow.core.raise.ensure
 &nbsp;import co.touchlab.kermit.Logger
+&nbsp;import com.georgeci.moneysurfer.domain.auth.SessionMutator
 &nbsp;import com.georgeci.moneysurfer.domain.auth.SessionPointers
+&nbsp;import com.georgeci.moneysurfer.domain.constants.DEFAULT_CATEGORY_SEEDS
 &nbsp;import com.georgeci.moneysurfer.domain.logging.redactUid
-&nbsp;import com.georgeci.moneysurfer.domain.model.InviteStatus
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceInviteId
+&nbsp;import com.georgeci.moneysurfer.domain.model.Category
+&nbsp;import com.georgeci.moneysurfer.domain.model.Workspace
+&nbsp;import com.georgeci.moneysurfer.domain.model.WorkspaceMember
+&nbsp;import com.georgeci.moneysurfer.domain.model.WorkspaceRole
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.UserId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.CategoryRepository
 &nbsp;import com.georgeci.moneysurfer.domain.repositories.UserRemoteRepository
-&nbsp;import com.georgeci.moneysurfer.domain.repositories.UserRepository
-&nbsp;import com.georgeci.moneysurfer.domain.repositories.WorkspaceInviteRepository
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.WorkspaceMemberRepository
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.WorkspaceRepository
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.WorkspaceSyncer
 &nbsp;import kotlinx.coroutines.flow.first
 &nbsp;import org.koin.core.annotation.Single
+&nbsp;import kotlin.time.Instant
 &nbsp;
 &nbsp;/**
-&nbsp; * Recipient declines a pending invitation. No member row created; invite transitions to DECLINED.
+&nbsp; * End-to-end create-workspace flow:
+&nbsp; *  1. Local: insert Workspace + WorkspaceMember(OWNER) + default Category rows.
+&nbsp; *  2. Remote: push the workspace to Firestore and append the wid to `users/{uid}.workspaceIds`
+&nbsp; *     so other devices see it. Skipped for the local &quot;demo&quot; session (no Firebase uid), and for a
+&nbsp; *     push that did not land because sync is switched off.
+&nbsp; *  3. Pin the new workspace as the active one so the next screen lands on Dashboard.
 &nbsp; */
-<b class="nc">&nbsp;@Single</b>
-&nbsp;class DeclineInviteUseCase(
-<b class="nc">&nbsp;    private val inviteRepository: WorkspaceInviteRepository,</b>
-<b class="nc">&nbsp;    private val userRepository: UserRepository,</b>
-<b class="nc">&nbsp;    private val userRemoteRepository: UserRemoteRepository,</b>
-<b class="nc">&nbsp;    private val session: SessionPointers,</b>
+<b class="fc">&nbsp;@Single</b>
+&nbsp;@Suppress(&quot;LongParameterList&quot;)
+&nbsp;class CreateWorkspaceUseCase(
+<b class="fc">&nbsp;    private val workspaceRepository: WorkspaceRepository,</b>
+<b class="fc">&nbsp;    private val workspaceMemberRepository: WorkspaceMemberRepository,</b>
+<b class="fc">&nbsp;    private val categoryRepository: CategoryRepository,</b>
+<b class="fc">&nbsp;    private val userRemoteRepository: UserRemoteRepository,</b>
+<b class="fc">&nbsp;    private val workspaceSyncer: WorkspaceSyncer,</b>
+<b class="fc">&nbsp;    private val session: SessionPointers,</b>
+<b class="fc">&nbsp;    private val sessionMutator: SessionMutator,</b>
+<b class="fc">&nbsp;    private val getCurrentTime: GetCurrentTimeUseCase,</b>
 &nbsp;) {
-<b class="nc">&nbsp;    private val log = Logger.withTag(TAG)</b>
+<b class="fc">&nbsp;    private val log = Logger.withTag(TAG)</b>
 &nbsp;
-<b class="nc">&nbsp;    suspend operator fun invoke(id: WorkspaceInviteId): Either&lt;InviteError, Unit&gt; = either {</b>
-<b class="nc">&nbsp;        val callerId = session.currentUserId.first()</b>
-<b class="nc">&nbsp;            ?: raise(InviteError.NoCurrentUser)</b>
-<b class="nc">&nbsp;        val caller = userRepository.getById(callerId)</b>
-<b class="nc">&nbsp;            ?: raise(InviteError.NoCurrentUser)</b>
+<b class="fc">&nbsp;    data class Params(</b>
+<b class="fc">&nbsp;        val name: String,</b>
+<b class="fc">&nbsp;        val description: String,</b>
+<b class="fc">&nbsp;        val baseCurrency: CurrencyCode,</b>
+&nbsp;    )
 &nbsp;
-<b class="nc">&nbsp;        val invite = inviteRepository.getById(id)</b>
-<b class="nc">&nbsp;            ?: raise(InviteError.InviteNotFound)</b>
-<b class="nc">&nbsp;        ensure(invite.status == InviteStatus.PENDING) { InviteError.InviteNotPending }</b>
+<b class="fc">&nbsp;    suspend operator fun invoke(params: Params): Either&lt;CreateWorkspaceError, WorkspaceId&gt; = either {</b>
+<b class="fc">&nbsp;        val ownerId = session.currentUserId.first()</b>
+<b class="fc">&nbsp;            ?: raise(CreateWorkspaceError.NoCurrentUser)</b>
+<b class="fc">&nbsp;        val newId = WorkspaceId.uuid()</b>
+<b class="fc">&nbsp;        val now = getCurrentTime()</b>
+<b class="fc">&nbsp;        log.i { &quot;[start] uid=${ownerId.value.redactUid()} wid=${newId.value} name=&#39;${params.name}&#39;&quot; }</b>
 &nbsp;
-<b class="nc">&nbsp;        val emailMatches = caller.email?.lowercase() == invite.email.lowercase()</b>
-<b class="nc">&nbsp;        val uidMatches = invite.targetUserId == callerId</b>
-<b class="nc">&nbsp;        ensure(emailMatches || uidMatches) { InviteError.InviteNotFound }</b>
+<b class="fc">&nbsp;        Either</b>
+<b class="fc">&nbsp;            .catch { writeLocal(newId, ownerId, now, params) }</b>
+<b class="fc">&nbsp;            .onLeft { log.e(it) { &quot;[local] failed wid=${newId.value}&quot; } }</b>
+<b class="fc">&nbsp;            .mapLeft { CreateWorkspaceError.LocalWriteFailed(it) }</b>
+<b class="fc">&nbsp;            .bind()</b>
+<b class="fc">&nbsp;        log.i { &quot;[local] ok wid=${newId.value}&quot; }</b>
 &nbsp;
-<b class="nc">&nbsp;        Either.catch { inviteRepository.markDeclined(id) }</b>
-<b class="nc">&nbsp;            .onLeft { log.e(it) { &quot;[local] markDeclined failed id=${id.value}&quot; } }</b>
-<b class="nc">&nbsp;            .mapLeft { InviteError.LocalWriteFailed(it) }</b>
-<b class="nc">&nbsp;            .bind()</b>
-&nbsp;
-<b class="nc">&nbsp;        val firebaseUid = session.currentFirebaseUid.first()</b>
-<b class="nc">&nbsp;        if (!firebaseUid.isNullOrBlank()) {</b>
-<b class="nc">&nbsp;            Either.catch {</b>
-<b class="nc">&nbsp;                userRemoteRepository.removeInvitedWorkspaceRef(firebaseUid, invite.workspaceId)</b>
-<b class="nc">&nbsp;            }.onLeft {</b>
-<b class="nc">&nbsp;                log.w(it) { &quot;[remote] removeInvitedWorkspaceRef failed — non-fatal&quot; }</b>
-<b class="nc">&nbsp;            }</b>
+&nbsp;        // Remote push pipeline. If `syncWorkspace` fails the use case fails LOUD
+&nbsp;        // (returns Left) — UI must surface the error so the user can retry.
+&nbsp;        // Skipping `addWorkspaceRef` / `setDefaultWorkspace` / pin keeps the global
+&nbsp;        // state consistent: `users/{uid}.workspaceIds` won&#39;t reference a workspace
+&nbsp;        // whose `members/{uid}` row never landed (would otherwise lock subsequent
+&nbsp;        // pulls with PERMISSION_DENIED via firestore.rules `isMember`).
+&nbsp;        //
+&nbsp;        // Demo session (no Firebase uid) → no remote contract; success is local-only.
+&nbsp;        //
+&nbsp;        // The two `UserRemoteRepository` calls below are conditional on the push having actually
+&nbsp;        // landed, and `pushAll()` reports that itself. Re-reading `SyncSettings` here instead would
+&nbsp;        // be a second read of a live setting: a server kill switch retracting between the two reads
+&nbsp;        // would let this branch run against a push that silently did nothing, filling
+&nbsp;        // `users/{uid}.workspaceIds` with ids whose `workspaces/{wid}` document was never created —
+&nbsp;        // exactly the dangling refs the block above exists to prevent (issue #342).
+<b class="fc">&nbsp;        val firebaseUid = session.currentFirebaseUid.first()</b>
+<b class="fc">&nbsp;        if (firebaseUid == null) {</b>
+<b class="fc">&nbsp;            log.i { &quot;[remote] skipped (no Firebase uid — local/demo session)&quot; }</b>
+&nbsp;        } else {
+<b class="fc">&nbsp;            registerRemotely(firebaseUid = firebaseUid, newId = newId)</b>
 &nbsp;        }
 &nbsp;
-<b class="nc">&nbsp;        log.i { &quot;[done] uid=${callerId.value.redactUid()} id=${id.value}&quot; }</b>
-<b class="nc">&nbsp;    }</b>
+<b class="fc">&nbsp;        sessionMutator.setCurrentWorkspace(newId)</b>
+<b class="fc">&nbsp;        log.i { &quot;[done] wid=${newId.value} pinned as current workspace&quot; }</b>
+&nbsp;
+<b class="fc">&nbsp;        newId</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Push the new workspace, then register it under `users/{uid}` — but only if the push actually
+&nbsp;     * landed. `pushAll()` returning `false` means sync is off, so the `workspaces/{wid}` document
+&nbsp;     * does not exist and a ref to it would be dangling.
+&nbsp;     */
+&nbsp;    private suspend fun Raise&lt;CreateWorkspaceError&gt;.registerRemotely(firebaseUid: String, newId: WorkspaceId) {
+<b class="fc">&nbsp;        val pushed = Either.catch { workspaceSyncer.pushAll() }</b>
+<b class="fc">&nbsp;            .onLeft { log.w(it) { &quot;[remote] pushAll failed wid=${newId.value}&quot; } }</b>
+<b class="fc">&nbsp;            .onRight { landed -&gt; log.i { &quot;[remote] pushAll landed=$landed wid=${newId.value}&quot; } }</b>
+<b class="fc">&nbsp;            .mapLeft { CreateWorkspaceError.RemoteSyncFailed(it) }</b>
+<b class="fc">&nbsp;            .bind()</b>
+&nbsp;
+<b class="fc">&nbsp;        if (!pushed) {</b>
+<b class="fc">&nbsp;            log.i { &quot;[remote] sync is off — wid=${newId.value} stays local-only, no ref registered&quot; }</b>
+&nbsp;            return
+&nbsp;        }
+&nbsp;
+&nbsp;        // Best-effort: a transient failure here doesn&#39;t invalidate the workspace, it just means
+&nbsp;        // cross-device discovery is delayed until the next sync cycle.
+<b class="fc">&nbsp;        val at = &quot;uid=${firebaseUid.redactUid()} wid=${newId.value}&quot;</b>
+<b class="fc">&nbsp;        Either.catch { userRemoteRepository.addWorkspaceRef(firebaseUid, newId) }</b>
+<b class="fc">&nbsp;            .onLeft { log.w(it) { &quot;[remote] addWorkspaceRef failed $at&quot; } }</b>
+<b class="fc">&nbsp;            .onRight { log.i { &quot;[remote] addWorkspaceRef ok $at&quot; } }</b>
+<b class="fc">&nbsp;        Either.catch { userRemoteRepository.setDefaultWorkspace(firebaseUid, newId) }</b>
+<b class="fc">&nbsp;            .onLeft { log.w(it) { &quot;[remote] setDefaultWorkspace failed $at&quot; } }</b>
+<b class="fc">&nbsp;            .onRight { log.i { &quot;[remote] setDefaultWorkspace ok $at&quot; } }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private suspend fun writeLocal(
+&nbsp;        newId: WorkspaceId,
+&nbsp;        ownerId: UserId,
+&nbsp;        now: Instant,
+&nbsp;        params: Params,
+&nbsp;    ) {
+<b class="fc">&nbsp;        workspaceRepository.insert(</b>
+<b class="fc">&nbsp;            Workspace(</b>
+<b class="fc">&nbsp;                id = newId,</b>
+<b class="fc">&nbsp;                name = params.name.trim(),</b>
+<b class="fc">&nbsp;                description = params.description.trim(),</b>
+<b class="fc">&nbsp;                baseCurrency = params.baseCurrency,</b>
+<b class="fc">&nbsp;                ownerId = ownerId,</b>
+<b class="fc">&nbsp;                createdAt = now,</b>
+<b class="fc">&nbsp;                archived = false,</b>
+&nbsp;            ),
+&nbsp;        )
+<b class="fc">&nbsp;        workspaceMemberRepository.insert(</b>
+<b class="fc">&nbsp;            WorkspaceMember(</b>
+<b class="fc">&nbsp;                userId = ownerId,</b>
+<b class="fc">&nbsp;                workspaceId = newId,</b>
+<b class="fc">&nbsp;                role = WorkspaceRole.OWNER,</b>
+<b class="fc">&nbsp;                addedByUserId = ownerId,</b>
+<b class="fc">&nbsp;                createdAt = now,</b>
+<b class="fc">&nbsp;                updatedAt = now,</b>
+&nbsp;            ),
+&nbsp;        )
+<b class="fc">&nbsp;        DEFAULT_CATEGORY_SEEDS.forEach { seed -&gt;</b>
+<b class="fc">&nbsp;            categoryRepository.insert(</b>
+<b class="fc">&nbsp;                Category(</b>
+<b class="fc">&nbsp;                    id = CategoryId.uuid(),</b>
+<b class="fc">&nbsp;                    workspaceId = newId,</b>
+<b class="fc">&nbsp;                    name = seed.name,</b>
+<b class="fc">&nbsp;                    type = seed.type,</b>
+<b class="fc">&nbsp;                    parentId = null,</b>
+<b class="fc">&nbsp;                    createdAt = now,</b>
+<b class="fc">&nbsp;                    systemKind = seed.systemKind,</b>
+&nbsp;                ),
+&nbsp;            )
+<b class="fc">&nbsp;        }</b>
+&nbsp;    }
 &nbsp;
 &nbsp;    private companion object {
-&nbsp;        const val TAG = &quot;DeclineInvite&quot;
+&nbsp;        const val TAG = &quot;CreateWorkspace&quot;
 &nbsp;    }
 &nbsp;}
 </code>
@@ -216,7 +360,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 17:47</div>
+    <div style="float:right;">generated on 2026-07-28 18:03</div>
 </div>
 </body>
 </html>

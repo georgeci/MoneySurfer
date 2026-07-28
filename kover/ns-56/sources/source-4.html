@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > TransactionAmountError</title>
+  <title>MoneySurfer Coverage Report > PreservedTransactionFields</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,15 +22,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.feature.transaction.creation</a>
 </div>
 
-<h1>Coverage Summary for Class: TransactionAmountError (com.georgeci.moneysurfer.feature.transaction.creation)</h1>
+<h1>Coverage Summary for Class: PreservedTransactionFields (com.georgeci.moneysurfer.feature.transaction.creation)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
-<th class="coverageStat 
-">
-  Class, %
-</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -49,15 +46,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">TransactionAmountError</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
+  <td class="name">PreservedTransactionFields</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -72,7 +61,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (1/1)
+    (7/7)
   </span>
 </td>
 <td class="coverageStat">
@@ -80,11 +69,66 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (18/18)
+    (77/77)
   </span>
 </td>
 </tr>
-
+  <tr>
+    <td class="name">PreservedTransactionFields$Companion</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (7/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (16/16)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (14/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (93/93)
+  </span>
+</td>
+</tr>
 </table>
 
 <br/>
@@ -94,42 +138,108 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.transaction.creation
 &nbsp;
+&nbsp;import com.georgeci.moneysurfer.domain.model.Category
+&nbsp;import com.georgeci.moneysurfer.domain.model.Transaction
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.RecurringRuleId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.SplitId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionStatus
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransferId
+&nbsp;
 &nbsp;/**
-&nbsp; * Pure validation for the transaction amount fields (single amount and both
-&nbsp; * transfer legs). Lives outside the ViewModel so the parsing rules can be
-&nbsp; * unit-tested directly — same split as `InitialBalanceInput` in feature/account.
+&nbsp; * Everything a stored transaction carries that this screen has no field for.
+&nbsp; *
+&nbsp; * `saveTransaction` builds a whole new [Transaction] instead of patching the stored row, so a
+&nbsp; * field that is not routed back through here is silently reset to its default on update — which
+&nbsp; * is how editing used to wipe a transaction&#39;s merchant and tags, downgrade a `PLANNED` row to
+&nbsp; * `ACTUAL`, and orphan the other leg of a transfer by dropping its `transferId`.
+&nbsp; *
+&nbsp; * The defaults are what a brand-new transaction should have, so a blank form needs no special case.
 &nbsp; */
-&nbsp;object TransactionAmountInput {
-&nbsp;
-&nbsp;    /** Digits with at most one decimal separator; no sign, no exponent. */
-&nbsp;    private val AMOUNT_PATTERN = Regex(&quot;&quot;&quot;\d*\.?\d*&quot;&quot;&quot;)
-&nbsp;
+<b class="fc">&nbsp;data class PreservedTransactionFields(</b>
+<b class="fc">&nbsp;    val merchant: String = &quot;&quot;,</b>
+<b class="fc">&nbsp;    val tags: List&lt;String&gt; = emptyList(),</b>
+<b class="fc">&nbsp;    val status: TransactionStatus = TransactionStatus.ACTUAL,</b>
+<b class="fc">&nbsp;    val transferId: TransferId? = null,</b>
 &nbsp;    /**
-&nbsp;     * Parses a raw amount (&#39;,&#39; normalised to &#39;.&#39;) to a [Double], or null when
-&nbsp;     * the text is not a plain unsigned decimal — e.g. &quot;1.2.3&quot;, &quot;12a&quot;, &quot;-5&quot;.
+&nbsp;     * The receipt this row is one leg of. Dropping it on save would not merely lose a link: the
+&nbsp;     * remaining legs would stay behind with no collapsed row left to reveal them, and the edited
+&nbsp;     * row would leave the group without ever being deleted from it.
 &nbsp;     */
-&nbsp;    fun parse(amount: String): Double? {
-&nbsp;        val normalized = amount.replace(&#39;,&#39;, &#39;.&#39;)
-&nbsp;        if (!normalized.matches(AMOUNT_PATTERN)) return null
-&nbsp;        return normalized.toDoubleOrNull()
-&nbsp;    }
-&nbsp;
-&nbsp;    /** Submit gate: the amount parses and is strictly positive. */
-&nbsp;    fun isValid(amount: String): Boolean = (parse(amount) ?: return false) &gt; 0.0
-&nbsp;
-&nbsp;    /**
-&nbsp;     * The inline error to surface for [amount], or null when the field is
-&nbsp;     * empty (nothing to complain about yet) or holds a positive amount.
-&nbsp;     */
-&nbsp;    fun errorFor(amount: String): TransactionAmountError? {
-&nbsp;        if (amount.isBlank()) return null
-&nbsp;        val parsed = parse(amount) ?: return TransactionAmountError.INVALID_FORMAT
-&nbsp;        return if (parsed &gt; 0.0) null else TransactionAmountError.NOT_POSITIVE
+<b class="fc">&nbsp;    val splitId: SplitId? = null,</b>
+<b class="fc">&nbsp;    val recurringRuleId: RecurringRuleId? = null,</b>
+&nbsp;) {
+&nbsp;    companion object {
+&nbsp;        /** Everything [transaction] holds outside the form — what an edit must hand back untouched. */
+<b class="fc">&nbsp;        fun of(transaction: Transaction): PreservedTransactionFields = PreservedTransactionFields(</b>
+<b class="fc">&nbsp;            merchant = transaction.merchant,</b>
+<b class="fc">&nbsp;            tags = transaction.tags,</b>
+<b class="fc">&nbsp;            status = transaction.status,</b>
+<b class="fc">&nbsp;            transferId = transaction.transferId,</b>
+<b class="fc">&nbsp;            splitId = transaction.splitId,</b>
+<b class="fc">&nbsp;            recurringRuleId = transaction.recurringRuleId,</b>
+&nbsp;        )
 &nbsp;    }
 &nbsp;}
 &nbsp;
-&nbsp;/** Validation failures for a transaction amount field. */
-<b class="fc">&nbsp;enum class TransactionAmountError { INVALID_FORMAT, NOT_POSITIVE }</b>
+&nbsp;/**
+&nbsp; * One line of the split editor: a slice of the receipt and the category it is filed under.
+&nbsp; *
+&nbsp; * [key] is a per-screen counter, not an id of anything stored — nothing is written until Save, and
+&nbsp; * two lines picking the same category must still be two distinct lines the user can edit and remove
+&nbsp; * independently.
+&nbsp; *
+&nbsp; * [amount] is raw input, empty until typed, and it is ignored on the **last** line: that one always
+&nbsp; * shows whatever is left of the receipt, so the legs add up to the amount by construction rather
+&nbsp; * than by asking the user to make them.
+&nbsp; */
+&nbsp;data class TransactionSplitLineUi(
+&nbsp;    val key: Int,
+&nbsp;    val category: Category? = null,
+&nbsp;    val amount: String = &quot;&quot;,
+&nbsp;)
+&nbsp;
+&nbsp;/**
+&nbsp; * The existing transaction the creation screen opens on, and what it is there for.
+&nbsp; *
+&nbsp; * One nullable parameter rather than an id plus a flag: the screen loads exactly one transaction
+&nbsp; * in either mode, and two independent parameters could contradict each other (a duplicate flag
+&nbsp; * with no id, an id with no mode).
+&nbsp; */
+&nbsp;data class TransactionCreationSeed(
+&nbsp;    val transactionId: TransactionId,
+&nbsp;    val mode: Mode,
+&nbsp;) {
+&nbsp;    enum class Mode {
+&nbsp;        /** Update the transaction in place. */
+&nbsp;        Edit,
+&nbsp;
+&nbsp;        /** Use it as a template for a brand-new transaction. */
+&nbsp;        Duplicate,
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * The transaction being edited, as it was stored — what the edit screen&#39;s identity band renders so
+&nbsp; * the user can tell which row they opened without scrolling or going back.
+&nbsp; *
+&nbsp; * A snapshot, not a view of the form: it is taken once when the transaction is loaded and never
+&nbsp; * follows the fields the user is editing.
+&nbsp; */
+&nbsp;data class TransactionEditIdentity(
+&nbsp;    /** Short human-readable id, e.g. `TX-8213`. */
+&nbsp;    val reference: String,
+&nbsp;    val type: TransactionTypeUi,
+&nbsp;    /** The note, falling back to the merchant when there is none; may still be blank. */
+&nbsp;    val note: String,
+&nbsp;    /** Signed for income and expense, unsigned for a transfer leg. */
+&nbsp;    val formattedAmount: String,
+&nbsp;    /** The category&#39;s stored appearance, fed to the shared bubble resolver. */
+&nbsp;    val categoryId: String,
+&nbsp;    val categoryIconKey: String,
+&nbsp;    val categoryHue: Int,
+&nbsp;    val categorySystemKind: String?,
+&nbsp;)
 </code>
 </pre>
 </div>
@@ -153,7 +263,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 17:47</div>
+    <div style="float:right;">generated on 2026-07-28 18:03</div>
 </div>
 </body>
 </html>

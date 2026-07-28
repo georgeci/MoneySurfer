@@ -72,7 +72,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (19/19)
+    (20/20)
   </span>
 </td>
 <td class="coverageStat">
@@ -80,7 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (103/103)
+    (110/110)
   </span>
 </td>
 </tr>
@@ -135,6 +135,11 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;            orders = [Index.Order.ASC, Index.Order.DESC, Index.Order.DESC, Index.Order.DESC],
 &nbsp;        ),
 &nbsp;        Index(&quot;categoryId&quot;),
+&nbsp;        // Unlike `transferId`, which is read once when a details screen opens, `splitId` is
+&nbsp;        // correlated per row by the list window query (see TransactionDao.getCategorizedWindow)
+&nbsp;        // to learn how many legs a group has. That runs on every emission of the list Flow, so
+&nbsp;        // the index earns its write amplification.
+&nbsp;        Index(&quot;splitId&quot;),
 &nbsp;    ],
 &nbsp;)
 &nbsp;data class TransactionEntity(
@@ -158,6 +163,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;    @ColumnInfo(name = &quot;createdAt&quot;, defaultValue = &quot;0&quot;) val createdAt: Long = 0L,</b>
 <b class="fc">&nbsp;    @ColumnInfo(name = &quot;updatedAt&quot;, defaultValue = &quot;0&quot;) val updatedAt: Long = 0L,</b>
 <b class="fc">&nbsp;    @ColumnInfo(name = &quot;transferId&quot;) val transferId: String? = null,</b>
+&nbsp;    // Shared id of the sibling rows one receipt was split across. Null for the overwhelming
+&nbsp;    // majority of rows — see the domain model for why a split is N transactions rather than a
+&nbsp;    // child allocation table.
+<b class="fc">&nbsp;    @ColumnInfo(name = &quot;splitId&quot;) val splitId: String? = null,</b>
 &nbsp;    // No ForeignKey to recurring_rules and no index: the rules table is not synced yet, so a
 &nbsp;    // pulled transaction can name a rule this device has never seen — an FK would reject the
 &nbsp;    // row outright. An index would also be dead weight, since the &quot;Recurring only&quot; filter runs
@@ -187,7 +196,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 17:47</div>
+    <div style="float:right;">generated on 2026-07-28 18:03</div>
 </div>
 </body>
 </html>

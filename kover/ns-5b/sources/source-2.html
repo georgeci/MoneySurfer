@@ -117,6 +117,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import moneysurfer.feature.transaction.generated.resources.transactions_list_empty_search
 &nbsp;import moneysurfer.feature.transaction.generated.resources.transactions_list_empty_search_cta
 &nbsp;import moneysurfer.feature.transaction.generated.resources.transactions_list_empty_title
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transactions_list_split_categories
 &nbsp;import org.jetbrains.compose.resources.StringResource
 &nbsp;import org.jetbrains.compose.resources.stringResource
 &nbsp;
@@ -149,13 +150,29 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    onDelete: () -&gt; Unit,
 &nbsp;) {
 &nbsp;    val title = row.title.ifBlank { untitled }
+&nbsp;    // Resolved here rather than in the mapping: only a composable can reach the string table, and
+&nbsp;    // a collapsed receipt&#39;s meta is a count, not the name of any one of its categories.
+&nbsp;    val subtitle = if (row.splitCategoryCount &gt; 0) {
+&nbsp;        stringResource(Res.string.transactions_list_split_categories, row.splitCategoryCount)
+&nbsp;    } else {
+&nbsp;        row.subtitle
+&nbsp;    }
 &nbsp;    SurferSwipeToDeleteTransaction(
 &nbsp;        transactionTitle = title,
 &nbsp;        onDelete = onDelete,
 &nbsp;        modifier = Modifier.padding(bottom = 12.dp),
 &nbsp;        isTransfer = row.isTransfer,
+&nbsp;        // Any leg of a receipt, not just a collapsed row: the swipe takes the whole group either
+&nbsp;        // way, and a page holding part of a group renders its legs individually.
+&nbsp;        isSplit = row.isSplitLeg,
 &nbsp;    ) {
-&nbsp;        TransactionLine(row = row, showAccount = showAccount, title = title, onClick = onClick)
+&nbsp;        TransactionLine(
+&nbsp;            row = row,
+&nbsp;            showAccount = showAccount,
+&nbsp;            title = title,
+&nbsp;            subtitle = subtitle,
+&nbsp;            onClick = onClick,
+&nbsp;        )
 &nbsp;    }
 &nbsp;}
 &nbsp;
@@ -164,6 +181,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    row: TransactionRowUi,
 &nbsp;    showAccount: Boolean,
 &nbsp;    title: String,
+&nbsp;    subtitle: String,
 &nbsp;    onClick: () -&gt; Unit,
 &nbsp;) {
 &nbsp;    val transferTint = AppTheme.semanticColors.transfer
@@ -171,13 +189,16 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;        modifier = Modifier.padding(horizontal = 16.dp),
 &nbsp;        icon = when {
 &nbsp;            row.isTransfer -&gt; SurferCategoryPalette.TransferIcon
+&nbsp;            // A collapsed split is several categories at once, so the category glyph says more
+&nbsp;            // about it than the generic receipt every expense row carries.
+&nbsp;            row.splitCategoryCount &gt; 0 -&gt; SurferIcons.Category
 &nbsp;            row.isExpense -&gt; SurferIcons.Receipt
 &nbsp;            else -&gt; SurferIcons.Wallet
 &nbsp;        },
 &nbsp;        title = title,
 &nbsp;        formattedAmount = row.formattedAmount,
 &nbsp;        categoryHueSeed = row.categoryHueSeed,
-&nbsp;        meta = row.metaLine(showAccount),
+&nbsp;        meta = row.metaLine(subtitle, showAccount),
 &nbsp;        iconTint = if (row.isTransfer) transferTint else AppTheme.materialColors.onSurfaceVariant,
 &nbsp;        iconBackground = if (row.isTransfer) {
 &nbsp;            transferTint.copy(alpha = TRANSFER_TILE_ALPHA)
@@ -203,7 +224,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp; * scoped to one. Either half may be missing (an uncategorised row, a single-account list), so the
 &nbsp; * separator is joined in rather than baked into a string.
 &nbsp; */
-&nbsp;private fun TransactionRowUi.metaLine(showAccount: Boolean): String? = listOf(
+&nbsp;private fun TransactionRowUi.metaLine(subtitle: String, showAccount: Boolean): String? = listOf(
 &nbsp;    subtitle,
 &nbsp;    accountName.takeIf { showAccount }.orEmpty(),
 &nbsp;).filter { it.isNotBlank() }
@@ -309,7 +330,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 17:47</div>
+    <div style="float:right;">generated on 2026-07-28 18:03</div>
 </div>
 </body>
 </html>
