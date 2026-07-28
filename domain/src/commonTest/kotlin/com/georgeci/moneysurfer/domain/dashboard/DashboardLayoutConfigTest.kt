@@ -9,6 +9,7 @@ class DashboardLayoutConfigTest : StringSpec({
     "the default layout covers every widget type, enabled, in Variant A order" {
         DashboardLayoutConfig.DEFAULT.items.map { it.type } shouldContainExactly listOf(
             DashboardWidgetType.Balance,
+            DashboardWidgetType.QuickActions,
             DashboardWidgetType.Accounts,
             DashboardWidgetType.Goals,
             DashboardWidgetType.RecentTransactions,
@@ -37,6 +38,7 @@ class DashboardLayoutConfigTest : StringSpec({
         stored.normalized().items.map { it.type } shouldContainExactly listOf(
             DashboardWidgetType.Goals,
             DashboardWidgetType.Balance,
+            DashboardWidgetType.QuickActions,
             DashboardWidgetType.Accounts,
             DashboardWidgetType.RecentTransactions,
         )
@@ -120,6 +122,7 @@ class DashboardLayoutConfigTest : StringSpec({
         )
 
         moved.items.map { it.type } shouldContainExactly listOf(
+            DashboardWidgetType.QuickActions,
             DashboardWidgetType.Accounts,
             DashboardWidgetType.Goals,
             DashboardWidgetType.Balance,
@@ -136,6 +139,7 @@ class DashboardLayoutConfigTest : StringSpec({
         moved.items.map { it.type } shouldContainExactly listOf(
             DashboardWidgetType.RecentTransactions,
             DashboardWidgetType.Balance,
+            DashboardWidgetType.QuickActions,
             DashboardWidgetType.Accounts,
             DashboardWidgetType.Goals,
         )

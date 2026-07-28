@@ -1,6 +1,7 @@
 package com.georgeci.moneysurfer.feature.dashboard.customize
 
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
@@ -8,6 +9,7 @@ import androidx.compose.ui.unit.dp
 import com.georgeci.moneysurfer.domain.dashboard.DashboardCardStyle
 import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetSize
 import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetType
+import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.modifier.surferScaleToWidth
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.uikit.widgets.LocalSurferWidgetSize
@@ -19,12 +21,14 @@ import com.georgeci.moneysurfer.uikit.widgets.SurferBalanceVariant
 import com.georgeci.moneysurfer.uikit.widgets.SurferBalanceWidget
 import com.georgeci.moneysurfer.uikit.widgets.SurferGoalItem
 import com.georgeci.moneysurfer.uikit.widgets.SurferGoalsWidget
+import com.georgeci.moneysurfer.uikit.widgets.SurferQuickActionsWidget
 import com.georgeci.moneysurfer.uikit.widgets.SurferRecentTransactionItem
 import com.georgeci.moneysurfer.uikit.widgets.SurferRecentTransactionsWidget
 import com.georgeci.moneysurfer.uikit.widgets.SurferWidgetSize
 import moneysurfer.feature.dashboard.generated.resources.Res
 import moneysurfer.feature.dashboard.generated.resources.dashboard_accounts_manage
 import moneysurfer.feature.dashboard.generated.resources.dashboard_add_account
+import moneysurfer.feature.dashboard.generated.resources.dashboard_add_transaction
 import moneysurfer.feature.dashboard.generated.resources.dashboard_balance_title
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_preview_account_cash
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_preview_account_everyday
@@ -37,6 +41,7 @@ import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_pre
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_preview_transaction_salary
 import moneysurfer.feature.dashboard.generated.resources.dashboard_goals_see_all
 import moneysurfer.feature.dashboard.generated.resources.dashboard_goals_title
+import moneysurfer.feature.dashboard.generated.resources.dashboard_quick_action_transfer
 import moneysurfer.feature.dashboard.generated.resources.dashboard_recent_see_all
 import moneysurfer.feature.dashboard.generated.resources.dashboard_recent_title
 import org.jetbrains.compose.resources.stringResource
@@ -73,6 +78,7 @@ internal fun DashboardWidgetPreview(
             .fillMaxWidth()
         when (type) {
             DashboardWidgetType.Balance -> BalancePreview(cardStyle.variant, modifier.then(content))
+            DashboardWidgetType.QuickActions -> QuickActionsPreview(modifier.then(content))
             DashboardWidgetType.Accounts -> AccountsPreview(modifier.then(content))
             DashboardWidgetType.Goals -> GoalsPreview(modifier.then(content))
             DashboardWidgetType.RecentTransactions -> RecentTransactionsPreview(modifier.then(content))
@@ -88,6 +94,25 @@ private fun BalancePreview(variant: String?, modifier: Modifier) {
         variant = SurferBalanceVariant.fromKey(variant),
         footnote = SurferBalanceFootnote.Trend(SAMPLE_TREND),
         modifier = modifier,
+    )
+}
+
+/**
+ * The buttons are inert here — the tile is a thumbnail, not a second place to log a transaction.
+ * Height rather than intrinsic sizing: the row is two buttons, so nothing inside it would make the
+ * Compact and Expanded tiles differ in the picker otherwise.
+ */
+@Composable
+private fun QuickActionsPreview(modifier: Modifier) {
+    val hero = LocalSurferWidgetSize.current == SurferWidgetSize.Expanded
+    SurferQuickActionsWidget(
+        primaryLabel = stringResource(Res.string.dashboard_add_transaction),
+        primaryIcon = SurferIcons.Add,
+        onPrimaryClick = {},
+        secondaryLabel = stringResource(Res.string.dashboard_quick_action_transfer),
+        secondaryIcon = SurferIcons.SwapHoriz,
+        onSecondaryClick = {},
+        modifier = modifier.height(if (hero) SAMPLE_ACTIONS_HERO else SAMPLE_ACTIONS_COMPACT),
     )
 }
 
@@ -182,6 +207,8 @@ private fun RecentTransactionsPreview(modifier: Modifier) {
     )
 }
 
+private val SAMPLE_ACTIONS_HERO = 80.dp
+private val SAMPLE_ACTIONS_COMPACT = 64.dp
 private const val SAMPLE_CURRENCY = "EUR"
 private const val SAMPLE_TOTAL = "€11,575.32"
 private const val SAMPLE_TREND = "+€412"

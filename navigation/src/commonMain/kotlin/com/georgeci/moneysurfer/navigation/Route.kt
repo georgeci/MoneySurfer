@@ -149,6 +149,13 @@ sealed interface Route : NavKey {
          * way, and two nullable id fields could disagree about which.
          */
         val duplicate: Boolean = false,
+        /**
+         * Open the form already switched to Transfer. Same request the account picker's "transfer
+         * instead" footer makes once the screen is open — a caller that already knows the user
+         * wants a transfer (the dashboard's quick actions) says so up front instead. The screen
+         * still runs it through the type switch, so a build with transfers off ignores it.
+         */
+        val transfer: Boolean = false,
     ) : Route
 
     @Serializable

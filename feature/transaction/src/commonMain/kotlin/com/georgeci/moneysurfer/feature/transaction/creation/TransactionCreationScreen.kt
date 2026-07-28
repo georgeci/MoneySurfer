@@ -99,6 +99,8 @@ fun TransactionCreationScreen(
     accountId: AccountId? = null,
     /** Treat [transactionId] as a template for a new transaction rather than the row to edit. */
     duplicate: Boolean = false,
+    /** Open already switched to Transfer, for a caller that knows that is what the user asked for. */
+    transfer: Boolean = false,
     onNavigateBack: () -> Unit,
     /**
      * Leaving after the edited transaction was deleted. Defaults to [onNavigateBack]; the nav graph
@@ -112,7 +114,7 @@ fun TransactionCreationScreen(
     pickedAccountId: AccountId? = null,
     transferRequested: Boolean? = null,
     viewModel: TransactionCreationViewModel = koinViewModel(
-        key = "$transactionId:$accountId:$duplicate",
+        key = "$transactionId:$accountId:$duplicate:$transfer",
     ) { parametersOf(transactionCreationSeed(transactionId, duplicate), accountId) },
 ) {
     val state by viewModel.collectAsStateWithLifecycle()
@@ -144,8 +146,13 @@ fun TransactionCreationScreen(
         viewModel.onEvent(TransactionCreationEvent.OnAccountPicked(id))
     }
 
-    LaunchedEffect(transferRequested) {
-        if (transferRequested != true) return@LaunchedEffect
+    // Waiting for Content matters for [transfer]: a route that asks for a transfer up front is
+    // composed while the form is still Loading, and the type switch is a no-op on that state.
+    // [transferRequested] always comes back to a screen that has long since loaded.
+    val contentLoaded = state is TransactionCreationState.Content
+    LaunchedEffect(transferRequested, transfer, contentLoaded) {
+        if (!contentLoaded) return@LaunchedEffect
+        if (transferRequested != true && !transfer) return@LaunchedEffect
         viewModel.onEvent(TransactionCreationEvent.OnTypeChanged(TransactionTypeUi.Transfer))
     }
 

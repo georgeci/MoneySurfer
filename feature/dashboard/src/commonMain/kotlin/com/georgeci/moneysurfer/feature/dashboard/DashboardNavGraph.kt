@@ -12,6 +12,7 @@ val dashboardNavGraph: FeatureNavGraph = { navigator ->
             onNavigateToTransactionCreation = { accountId ->
                 navigator.push(Route.TransactionCreation(accountId = accountId?.value))
             },
+            onNavigateToTransferCreation = { navigator.push(Route.TransactionCreation(transfer = true)) },
             onNavigateToAccountDetails = { accountId ->
                 navigator.push(Route.AccountDetails(accountId.value))
             },

@@ -34,6 +34,7 @@ class DashboardCustomizeViewModelTest : StringSpec({
         viewModel.layout().items.map { it.type } shouldContainExactly listOf(
             DashboardWidgetType.Goals,
             DashboardWidgetType.Balance,
+            DashboardWidgetType.QuickActions,
             DashboardWidgetType.Accounts,
             DashboardWidgetType.RecentTransactions,
         )
@@ -49,6 +50,7 @@ class DashboardCustomizeViewModelTest : StringSpec({
 
         viewModel.layout().enabledItems.map { it.type } shouldContainExactly listOf(
             DashboardWidgetType.Balance,
+            DashboardWidgetType.QuickActions,
             DashboardWidgetType.Accounts,
             DashboardWidgetType.RecentTransactions,
         )
@@ -68,6 +70,7 @@ class DashboardCustomizeViewModelTest : StringSpec({
         )
 
         viewModel.layout().enabledItems.map { it.type } shouldContainExactly listOf(
+            DashboardWidgetType.QuickActions,
             DashboardWidgetType.Accounts,
             DashboardWidgetType.Goals,
             DashboardWidgetType.RecentTransactions,
@@ -90,6 +93,7 @@ class DashboardCustomizeViewModelTest : StringSpec({
         viewModel.layout().enabledItems.map { it.type } shouldContainExactly listOf(
             DashboardWidgetType.RecentTransactions,
             DashboardWidgetType.Balance,
+            DashboardWidgetType.QuickActions,
             DashboardWidgetType.Accounts,
             DashboardWidgetType.Goals,
         )
