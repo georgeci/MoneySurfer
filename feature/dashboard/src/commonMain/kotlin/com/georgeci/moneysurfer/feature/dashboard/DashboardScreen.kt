@@ -114,6 +114,7 @@ object DashboardTestTags {
      */
     const val AddAccount = "dashboard:addAccount"
     const val AccountsManage = "dashboard:accountsManage"
+    const val Insights = "dashboard:insights"
     const val Recent = "dashboard:recent"
     const val RecentSeeAll = "dashboard:recentSeeAll"
     const val RecentEmpty = "dashboard:recentEmpty"
@@ -279,6 +280,7 @@ private fun DashboardWidget(
         DashboardWidgetType.SafeToSpend -> SafeToSpendWidget(state, onEvent)
         DashboardWidgetType.BurnRate -> BurnRateWidget(state)
         DashboardWidgetType.Accounts -> AccountsWidget(state, onEvent)
+        DashboardWidgetType.Insights -> InsightsWidget(state, variant)
         DashboardWidgetType.Goals -> GoalsWidget(state, onEvent)
         DashboardWidgetType.RecentTransactions -> RecentTransactionsWidget(state, onEvent)
     }

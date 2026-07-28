@@ -4,4 +4,8 @@
         <item quantity="one">%1$d day left</item>
         <item quantity="other">%1$d days left</item>
     </plurals>
+    <plurals name="dashboard_insights_subscriptions_title">
+        <item quantity="one">%1$d active subscription</item>
+        <item quantity="other">%1$d active subscriptions</item>
+    </plurals>
 </resources>

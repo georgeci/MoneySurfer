@@ -12,6 +12,7 @@ enum class DashboardWidgetType {
     SafeToSpend,
     BurnRate,
     Accounts,
+    Insights,
     Goals,
     RecentTransactions,
 }

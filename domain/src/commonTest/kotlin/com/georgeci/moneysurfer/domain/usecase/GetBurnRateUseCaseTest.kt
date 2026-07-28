@@ -82,18 +82,17 @@ class GetBurnRateUseCaseTest : StringSpec({
         runTest {
             useCaseOf(spend = spend)(TimeZone.UTC).test {
                 awaitItem()
-                spend.lastScope?.workspaceId shouldBe ws
-                spend.lastScope?.baseCurrency shouldBe USD
-                spend.lastScope?.window shouldBe TransactionPeriodWindow(LocalDate(2026, 4, 1), todayDate)
+                val scope = spend.dailyScopes.last()
+                scope.workspaceId shouldBe ws
+                scope.baseCurrency shouldBe USD
+                scope.window shouldBe TransactionPeriodWindow(LocalDate(2026, 4, 1), todayDate)
                 cancelAndIgnoreRemainingEvents()
             }
         }
     }
 
     "the series is the week ending today, with the days the query skipped filled in" {
-        val spend = FakeSpendAnalyticsRepository(
-            listOf(point(6, 20.dollars), point(10, 15.dollars)),
-        )
+        val spend = FakeSpendAnalyticsRepository(daily = listOf(point(6, 20.dollars), point(10, 15.dollars)))
 
         runTest {
             useCaseOf(spend = spend)(TimeZone.UTC).test {
@@ -108,7 +107,7 @@ class GetBurnRateUseCaseTest : StringSpec({
     }
 
     "with no budget the projection still emits, without a verdict on it" {
-        val spend = FakeSpendAnalyticsRepository(listOf(point(10, 70.dollars)))
+        val spend = FakeSpendAnalyticsRepository(daily = listOf(point(10, 70.dollars)))
 
         runTest {
             useCaseOf(spend = spend)(TimeZone.UTC).test {
@@ -123,7 +122,7 @@ class GetBurnRateUseCaseTest : StringSpec({
     }
 
     "a general monthly budget turns the projection into a verdict" {
-        val spend = FakeSpendAnalyticsRepository(listOf(point(10, 70.dollars)))
+        val spend = FakeSpendAnalyticsRepository(daily = listOf(point(10, 70.dollars)))
         val budget = aBudget(workspaceId = ws, amount = 500.dollars, categoryIds = emptyList())
 
         runTest {
@@ -137,7 +136,7 @@ class GetBurnRateUseCaseTest : StringSpec({
     }
 
     "a projection past the cap reads as off pace" {
-        val spend = FakeSpendAnalyticsRepository(listOf(point(10, 70.dollars)))
+        val spend = FakeSpendAnalyticsRepository(daily = listOf(point(10, 70.dollars)))
         val budget = aBudget(workspaceId = ws, amount = 200.dollars, categoryIds = emptyList())
 
         runTest {
@@ -149,7 +148,7 @@ class GetBurnRateUseCaseTest : StringSpec({
     }
 
     "a category budget leaves the verdict off rather than judging every expense by it" {
-        val spend = FakeSpendAnalyticsRepository(listOf(point(10, 70.dollars)))
+        val spend = FakeSpendAnalyticsRepository(daily = listOf(point(10, 70.dollars)))
         val groceries = aBudget(workspaceId = ws, amount = 50.dollars)
 
         runTest {

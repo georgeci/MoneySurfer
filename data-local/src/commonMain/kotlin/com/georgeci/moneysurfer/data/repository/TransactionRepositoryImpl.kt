@@ -86,26 +86,58 @@ class TransactionRepositoryImpl(
         enqueueUpsert(entity, MutationOperation.INSERT)
     }
 
+    /**
+     * `@Update` rewrites the whole row, so every column the domain model does not carry has to be
+     * read back from storage first or it is silently reset. `createdAt` is one; `deletedAt` is the
+     * other, and it is read through [TransactionDao.getByIdIncludingDeleted] precisely because a
+     * tombstoned row is invisible to the ordinary lookup — writing `Transaction`'s implicit "live"
+     * over it would undelete the row as a side effect of an unrelated edit. Lifting a tombstone is
+     * [restore]'s job and nothing else's.
+     */
     override suspend fun update(transaction: Transaction) {
-        val existingCreatedAt = dao.getById(transaction.id.value)?.createdAt
-        val entity = transaction.toEntity().copy(
-            createdAt = existingCreatedAt ?: transaction.toEntity().createdAt,
+        val stored = dao.getByIdIncludingDeleted(transaction.id.value)
+        val entity = transaction.toEntity()
+        val updated = entity.copy(
+            createdAt = stored?.createdAt ?: entity.createdAt,
             updatedAt = clock.now().toEpochMilliseconds(),
+            deletedAt = stored?.deletedAt,
         )
-        dao.update(entity)
-        enqueueUpsert(entity, MutationOperation.UPDATE)
+        dao.update(updated)
+        enqueueUpsert(updated, MutationOperation.UPDATE)
     }
 
+    /**
+     * Writes a tombstone instead of dropping the row, then enqueues the same DELETE mutation the
+     * hard delete used to (issue #346) — the wire contract is unchanged, because Firestore has
+     * always taken deletes as a `deletedAt` patch rather than a document removal.
+     *
+     * The outbox entry is skipped when nothing was tombstoned. A second delete of the same id
+     * would otherwise push a second tombstone whose `deletedAt` is a later instant than the one
+     * peers already agreed on.
+     */
     override suspend fun delete(id: TransactionId) {
-        val existing = dao.getById(id.value)
-        dao.delete(id.value)
-        if (existing != null) {
+        val existing = dao.getById(id.value) ?: return
+        val marked = dao.softDelete(id.value, clock.now().toEpochMilliseconds())
+        if (marked > 0) {
             outboxEnqueuer.enqueueDelete(
                 entityType = SyncEntityTypes.TRANSACTION,
                 entityId = existing.id,
                 scopeKey = existing.workspaceId,
             )
         }
+    }
+
+    /**
+     * Clears the tombstone in place — one UPDATE, no re-insert — and pushes the result as an
+     * ordinary upsert. That upsert is what lifts the tombstone remotely too: the doc is written
+     * whole, with `deletedAt` back to null, so peers see a restored row rather than a new one
+     * appearing beside the delete they already applied.
+     */
+    override suspend fun restore(id: TransactionId): Transaction? {
+        if (dao.restore(id.value, clock.now().toEpochMilliseconds()) == 0) return null
+        val restored = dao.getById(id.value) ?: return null
+        enqueueUpsert(restored, MutationOperation.UPDATE)
+        return restored.toDomain()
     }
 
     private suspend fun enqueueUpsert(entity: TransactionEntity, operation: MutationOperation) {
