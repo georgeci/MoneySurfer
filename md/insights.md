@@ -248,6 +248,15 @@ is a trap for whoever extends it later rather than a blocker for #296 itself.
   seven-day guard is never evaluated against a week and nothing here breaks it. That is a decision,
   not an oversight: `DashboardWidgetType.Insights` says so at the constant. Whoever makes the guard
   a share of the period is the one who gets to flip it.
+- **BurnRate (#294 / #413) landed during #296's review and is also left unwired**, for a related
+  reason. That card is two spans at once by design — a fixed `BURN_RATE_DAYS` chart of the last
+  week, and a projection of where the *month* lands — so `monthToDate`, `daysAheadInMonth` and
+  `monthlySpendCap` are all month-shaped. Pointing it at `DashboardPeriod` is not passing a window
+  down; it is deciding what the card projects to under Week, which cap judges it, and whether the
+  chart becomes the ISO week rather than a trailing seven days. Those are the widget's own design
+  questions, and answering them inside #296 would have redesigned a widget merged hours earlier.
+  Both remaining flips are the same shape of follow-up: make the span a parameter of the rule, then
+  set `isPeriodScoped`.
 - The `netByMonth` caveat above is untouched and still stands: no dashboard widget reaches
   `SpendAnalyticsRepository` through a `DashboardPeriod`, so no month-shaped query is reachable
   from a Week selection today. #287 is where that has to be honoured.

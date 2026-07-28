@@ -15,6 +15,19 @@ enum class DashboardWidgetType(val isPeriodScoped: Boolean = false) {
     Balance,
     QuickActions,
     SafeToSpend(isPeriodScoped = true),
+
+    /**
+     * Spend-oriented, and **not** period-scoped yet — a scoping call, not an oversight.
+     *
+     * This card is deliberately two spans at once: a fixed [BURN_RATE_DAYS] bar chart of the last
+     * week, and a projection of where the *month* lands. `monthToDate`, `daysAheadInMonth` and
+     * `monthlySpendCap` are all month-shaped, so reading [DashboardPeriod] here is not a matter of
+     * passing a window down — it means deciding what the card projects to under Week, which cap it
+     * measures against, and whether the chart becomes the ISO week rather than a trailing seven
+     * days. That is the widget's own design question, and #413 landed after #296 was reviewed.
+     * See `md/insights.md` Phase 2.
+     */
+    BurnRate,
     Accounts,
 
     /**
