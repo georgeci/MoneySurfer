@@ -5,13 +5,11 @@
 // so every distributed build is distinguishable. Local builds keep the default
 // below.
 //
-// The default below is also the local iOS build number (CURRENT_PROJECT_VERSION
-// resolves to it), so it must never go down: a lower number blocks installing
-// over an app already on the device. 3 is where the old static
-// APP_VERSION_CODE left off.
+// Local builds always use build 0. Distribution workflows override it with
+// their independent, monotonically increasing run numbers.
 APP_VERSION_MAJOR = 0
 APP_VERSION_MINOR = 1
-APP_BUILD_NUMBER = 3
+APP_BUILD_NUMBER = 0
 
 // Xcode interpolates these; the Android convention plugin derives its own
 // versionName / versionCode from the three parts above (xcconfig has no
