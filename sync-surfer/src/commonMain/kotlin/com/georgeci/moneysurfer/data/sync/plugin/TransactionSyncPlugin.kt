@@ -56,8 +56,13 @@ class TransactionSyncPlugin(
      * nothing to forget, and `softDelete` no-ops there.
      *
      * The tombstone wins unconditionally, without consulting the resolver — as the hard delete it
-     * replaces did. A delete is not a field-level edit that a newer local write can outrank; the
-     * user removed the row, and the way back is Undo on the device that deleted it.
+     * replaces did. The other direction still goes through last-writer-wins: a remote doc with no
+     * `deletedAt` and a newer `updatedAt` than the local delete clears the tombstone through the
+     * upsert below, which is a peer's edit legitimately outranking this device's delete.
+     *
+     * `softDelete` also copies the remote `deletedAt` onto `updatedAt` — the same value the
+     * tombstone patch wrote remotely — so re-pulling the doc is a tie, resolves to `TakeLocal` and
+     * changes nothing.
      */
     override suspend fun applyDoc(doc: RemoteDocument, scopeKey: String): EntityApplyResult {
         val dto = doc.decodeOrNull(TransactionDoc.serializer()) ?: return SKIPPED_APPLY_RESULT

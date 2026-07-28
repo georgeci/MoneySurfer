@@ -151,10 +151,13 @@ interface TransactionDao {
      * The row behind [id] whether or not it carries a tombstone — the one read that deliberately
      * sees deleted rows.
      *
-     * Two callers need it. Undo restores through [restore] and has to read back what it revived,
-     * and the sync plugin has to know a locally-deleted row exists at all: were the tombstone
-     * invisible there, an older remote doc would arrive as a brand-new row and resurrect what the
-     * user just deleted instead of losing the last-writer-wins comparison.
+     * It exists for the sync plugin's conflict resolution, which has to know that a locally-deleted
+     * row exists at all: were the tombstone invisible there, an older remote doc would arrive as a
+     * brand-new row and resurrect what the user just deleted, instead of losing the
+     * last-writer-wins comparison against the delete's `updatedAt`.
+     *
+     * Undo does not need it — [restore] lifts the tombstone first, after which the row answers to
+     * [getById] like any other.
      */
     @Query("SELECT * FROM transactions WHERE id = :id")
     suspend fun getByIdIncludingDeleted(id: String): TransactionEntity?
