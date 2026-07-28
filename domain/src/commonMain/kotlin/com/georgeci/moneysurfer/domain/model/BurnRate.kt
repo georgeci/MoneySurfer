@@ -2,6 +2,7 @@ package com.georgeci.moneysurfer.domain.model
 
 import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
 import com.georgeci.moneysurfer.domain.primitives.Money
+import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 import com.georgeci.moneysurfer.domain.util.TransactionPeriodWindow
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
@@ -34,6 +35,11 @@ data class DailySpendSeries(
     /** The last day of [days] — the day the projection is made from. */
     val today: LocalDate,
     val currency: CurrencyCode,
+    /**
+     * The workspace these figures were queried for. Carried rather than assumed so anything pairing
+     * the series with a second per-workspace query can check the two agree — see [monthlySpendCap].
+     */
+    val workspaceId: WorkspaceId,
 ) {
 
     /** What the whole window booked. */
@@ -124,6 +130,7 @@ fun dailySpendSeries(
     points: List<DailySpendPoint>,
     today: LocalDate,
     currency: CurrencyCode,
+    workspaceId: WorkspaceId,
 ): DailySpendSeries {
     val byDate = points.associate { it.date to it.total }
     val firstDay = today.minus(BURN_RATE_DAYS - 1, DateTimeUnit.DAY)
@@ -135,7 +142,13 @@ fun dailySpendSeries(
     val monthToDate = points
         .filter { it.date >= monthStart && it.date <= today }
         .fold(Money.zero()) { sum, point -> sum + point.total }
-    return DailySpendSeries(days = days, monthToDate = monthToDate, today = today, currency = currency)
+    return DailySpendSeries(
+        days = days,
+        monthToDate = monthToDate,
+        today = today,
+        currency = currency,
+        workspaceId = workspaceId,
+    )
 }
 
 /** The projection [monthlyLimit] is judged against; pass null when no budget backs a cap. */
@@ -146,9 +159,10 @@ fun DailySpendSeries.project(monthlyLimit: Money?): BurnRate = BurnRate(
 )
 
 /**
- * The cap a month's projected spend can honestly be read against, or null when no budget sets one.
+ * The cap [workspaceId]'s projected month can honestly be read against, or null when no budget sets
+ * one.
  *
- * Two filters do the work, and both are about comparing like with like:
+ * Three filters do the work. Two are about comparing like with like:
  *
  * - **monthly periods only.** The projection covers a calendar month, so a weekly or yearly limit is
  *   simply a different quantity. Scaling one into a monthly equivalent would invent a number the
@@ -157,19 +171,30 @@ fun DailySpendSeries.project(monthlyLimit: Money?): BurnRate = BurnRate(
  *   what the projection sums. A category cap covers a slice of the spend; measuring the whole
  *   month's projection against it would report "off pace" on a budget that is nowhere near its cap.
  *
- * Within that set the largest limit wins, ties broken by budget id, so the verdict does not flip
- * between two equal budgets on recomposition — the same pick order
- * [com.georgeci.moneysurfer.domain.model.safeToSpend] applies.
+ * The third is about not comparing two workspaces. [workspaceId] is required rather than assumed
+ * because the caller pairs this list with a spend series read through a *second* subscription to
+ * `SessionPointers.currentWorkspaceId`, and two collectors of that pointer are not ordered against
+ * each other: on a workspace switch the budget query can already be answering for the new workspace
+ * while the series is still the old one. That is the hazard [safeToSpend] avoids by taking its
+ * workspace from the budgets themselves — an option here only if a burn rate needed a budget to
+ * exist at all, which it does not. Filtering instead makes a mismatched pair yield no cap, so the
+ * widget drops the verdict for a frame rather than judging one workspace's spend by another's limit.
+ *
+ * The largest qualifying limit wins. Ties need no further tiebreak: the answer is the amount, so two
+ * budgets capped the same are the same answer.
  *
  * [Budget.amount] rather than an effective limit with a rollover carry: a carry belongs to one
  * budget window, and this is measured against a calendar month, which a budget anchored mid-month
  * does not line up with. The plain amount is the per-month cap the user set, whichever day it runs
  * from.
  */
-fun List<Budget>.monthlySpendCap(): Money? =
-    filter { it.isActive && it.period == BudgetPeriod.MONTHLY && it.categoryIds.isEmpty() }
-        .minWithOrNull(compareByDescending<Budget> { it.amount.minor }.thenBy { it.id.value })
-        ?.amount
+fun List<Budget>.monthlySpendCap(workspaceId: WorkspaceId): Money? =
+    filter {
+        it.workspaceId == workspaceId &&
+            it.isActive &&
+            it.period == BudgetPeriod.MONTHLY &&
+            it.categoryIds.isEmpty()
+    }.maxOfOrNull { it.amount }
 
 private fun firstDayOfMonth(date: LocalDate): LocalDate = LocalDate(date.year, date.month, 1)
 

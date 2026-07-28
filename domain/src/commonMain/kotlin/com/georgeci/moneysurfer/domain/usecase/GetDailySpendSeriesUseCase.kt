@@ -54,7 +54,8 @@ class GetDailySpendSeriesUseCase(
                     baseCurrency = currency,
                     window = dailySpendSeriesWindow(today),
                 )
-                spendAnalytics.daily(scope).map { points -> dailySpendSeries(points, today, currency) }
+                spendAnalytics.daily(scope)
+                    .map { points -> dailySpendSeries(points, today, currency, workspaceId) }
             }
         }
 
