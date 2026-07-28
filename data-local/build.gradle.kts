@@ -24,7 +24,7 @@ kotlin {
         // JVM and Android share the same javax.crypto / JCA backend, so the
         // BackupCrypto actual lives once in this intermediate set rather than
         // as two byte-identical twins. Only the iOS actual (CommonCrypto) differs.
-        val jvmAndroidMain by creating {
+        val jvmAndroidMain = create("jvmAndroidMain") {
             dependsOn(commonMain.get())
         }
         jvmMain {

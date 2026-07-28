@@ -92,8 +92,16 @@ jobs:
 
       # --no-configuration-cache is required: --write-locks mutates resolution
       # state that the configuration cache refuses to serialize.
-      - name: Regenerate lockfiles
-        run: ./gradlew resolveAndLockAll --write-locks --no-configuration-cache
+      - name: Regenerate Gradle trust state
+        run: |
+          ./gradlew resolveAndLockAll \
+            --write-locks \
+            --write-verification-metadata sha256 \
+            --no-configuration-cache
+          ./gradlew -p build-logic :kmp:dependencies \
+            --write-locks \
+            --write-verification-metadata sha256 \
+            --no-configuration-cache
 
       - name: Commit and push
         env:
@@ -103,13 +111,13 @@ jobs:
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          if git diff --quiet -- '*.lockfile'; then
-            echo "::notice::Lock state already matches the manifest — nothing to push."
+          if git diff --quiet -- '*.lockfile' ':(glob)**/verification-metadata.xml'; then
+            echo "::notice::Gradle trust state already matches the manifest — nothing to push."
             exit 0
           fi
 
-          git add '*.lockfile'
-          git commit -m "build(deps): regenerate Gradle lockfiles for #${PR_NUMBER}"
+          git add '*.lockfile' ':(glob)**/verification-metadata.xml'
+          git commit -m "build(deps): regenerate Gradle trust state for #${PR_NUMBER}"
 
           # Rebasing rewrites the dependabot commit, so the push is a
           # force-with-lease against the branch we just checked out.

@@ -1,5 +1,26 @@
 import org.gradle.api.tasks.testing.Test
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import java.util.Properties
+
+val desktopPackageVersion = Properties().apply {
+    rootProject.file("Version.xcconfig").inputStream().use(::load)
+}.let { version ->
+    val major = version.getProperty("APP_VERSION_MAJOR")?.trim()
+        ?: error("Missing APP_VERSION_MAJOR in Version.xcconfig")
+    val minor = version.getProperty("APP_VERSION_MINOR")?.trim()
+        ?: error("Missing APP_VERSION_MINOR in Version.xcconfig")
+    val build = providers.environmentVariable("APP_BUILD_NUMBER").orNull
+        ?.trim()
+        ?.takeIf(String::isNotEmpty)
+        ?: version.getProperty("APP_BUILD_NUMBER")?.trim()
+        ?: error("Missing APP_BUILD_NUMBER in Version.xcconfig")
+    listOf(major, minor, build).forEach { component ->
+        require(component.toIntOrNull() != null) {
+            "Desktop package version component must be an integer: $component"
+        }
+    }
+    "$major.$minor.$build"
+}
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -124,7 +145,7 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "com.georgeci.moneysurfer"
-            packageVersion = "1.0.0"
+            packageVersion = desktopPackageVersion
         }
     }
 }

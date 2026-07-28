@@ -4,7 +4,9 @@ import com.github.triplet.gradle.androidpublisher.ReleaseStatus
 import com.github.triplet.gradle.play.PlayPublisherExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.tasks.TaskProvider
 import org.gradle.kotlin.dsl.configure
+import org.gradle.kotlin.dsl.register
 import java.io.File
 import java.util.Properties
 
@@ -37,27 +39,59 @@ class PlayPublisherConventionPlugin : Plugin<Project> {
     override fun apply(target: Project): Unit = with(target) {
         pluginManager.apply("com.github.triplet.play")
 
-        val credsFile = resolveServiceAccountFile()
+        val credentials = resolveServiceAccount()
 
         extensions.configure<PlayPublisherExtension> {
-            enabled.set(credsFile != null)
-            credsFile?.let { serviceAccountCredentials.set(it) }
+            enabled.set(credentials != null)
+            credentials?.file?.let { serviceAccountCredentials.set(it) }
             defaultToAppBundles.set(true)
             track.set("internal")
             releaseStatus.set(ReleaseStatus.DRAFT)
         }
+
+        credentials?.preparationTask?.let { preparationTask ->
+            tasks.matching { task ->
+                task.name != preparationTask.name &&
+                    (
+                        task.name.startsWith("publish") ||
+                            task.name.startsWith("promote") ||
+                            task.name.startsWith("bootstrap") ||
+                            task.name.endsWith("PrivateArtifact")
+                        )
+            }.configureEach {
+                dependsOn(preparationTask)
+            }
+        }
     }
 
-    private fun Project.resolveServiceAccountFile(): File? {
-        val inlineJson = providers.environmentVariable("PLAY_SERVICE_ACCOUNT_JSON").orNull
-        if (!inlineJson.isNullOrBlank()) {
+    private fun Project.resolveServiceAccount(): PlayCredentials? {
+        val inlineJson = providers.environmentVariable("PLAY_SERVICE_ACCOUNT_JSON")
+        if (inlineJson.isPresent) {
             val materialized = layout.buildDirectory
                 .file("play/service-account.json")
                 .get()
                 .asFile
-            materialized.parentFile.mkdirs()
-            materialized.writeText(inlineJson)
-            return materialized
+            val preparationTask = tasks.register("materializePlayServiceAccount") {
+                group = "publishing"
+                description = "Materializes Play credentials with owner-only permissions."
+                outputs.file(materialized)
+                outputs.cacheIf { false }
+                outputs.upToDateWhen { false }
+                doLast {
+                    val contents = inlineJson.get()
+                    require(contents.isNotBlank()) { "PLAY_SERVICE_ACCOUNT_JSON must not be blank" }
+                    materialized.parentFile.mkdirs()
+                    materialized.writeText(contents)
+                    // Avoid relying on the runner's umask: service-account keys must
+                    // never be readable or writable by group/other users.
+                    check(materialized.setReadable(false, false))
+                    check(materialized.setWritable(false, false))
+                    check(materialized.setExecutable(false, false))
+                    check(materialized.setReadable(true, true))
+                    check(materialized.setWritable(true, true))
+                }
+            }
+            return PlayCredentials(materialized, preparationTask)
         }
 
         val pathFromEnv = providers.environmentVariable("PLAY_SERVICE_ACCOUNT_JSON_PATH").orNull
@@ -68,6 +102,13 @@ class PlayPublisherConventionPlugin : Plugin<Project> {
                     .getProperty("PLAY_SERVICE_ACCOUNT_JSON_PATH")
             }
         val resolvedPath = pathFromEnv ?: pathFromProps ?: "play-service-account.json"
-        return rootProject.file(resolvedPath).takeIf { it.exists() }
+        return rootProject.file(resolvedPath)
+            .takeIf { it.exists() }
+            ?.let { PlayCredentials(it, null) }
     }
 }
+
+private data class PlayCredentials(
+    val file: File,
+    val preparationTask: TaskProvider<*>?,
+)

@@ -24,7 +24,7 @@ kotlin {
         // JVM and Android share the same java.net HTTP stack, so the plain-GET actual behind the
         // FX fetch lives once in this intermediate set rather than as two identical twins. Only
         // the iOS actual (NSURLSession) differs.
-        val jvmAndroidMain by creating {
+        val jvmAndroidMain = create("jvmAndroidMain") {
             dependsOn(commonMain.get())
         }
         jvmMain {

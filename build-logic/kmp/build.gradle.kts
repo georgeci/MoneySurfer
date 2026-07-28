@@ -1,5 +1,15 @@
+buildscript {
+    configurations.named("classpath") {
+        resolutionStrategy.activateDependencyLocking()
+    }
+}
+
 plugins {
     `kotlin-dsl`
+}
+
+dependencyLocking {
+    lockAllConfigurations()
 }
 
 dependencies {
