@@ -27,7 +27,7 @@ import com.georgeci.moneysurfer.domain.preferences.WeekStart
 import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
 import com.georgeci.moneysurfer.uikit.components.SurferCurrencyBottomSheet
 import com.georgeci.moneysurfer.uikit.components.SurferCurrencyOption
-import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
+import com.georgeci.moneysurfer.uikit.components.base.SurferPaneTopBar
 import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsGroup
 import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsRow
 import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsSwitch
@@ -117,7 +117,7 @@ fun PreferencesContent(
             .surferTestTagAsId(),
         containerColor = AppTheme.materialColors.surface,
         topBar = {
-            SurferToolbar(
+            SurferPaneTopBar(
                 title = stringResource(Res.string.settings_preferences_title),
                 onBack = { onEvent(PreferencesEvent.OnBackClick) },
                 colors = TopAppBarDefaults.topAppBarColors(
