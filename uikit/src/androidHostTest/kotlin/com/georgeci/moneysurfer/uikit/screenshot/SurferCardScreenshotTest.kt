@@ -11,6 +11,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.georgeci.moneysurfer.screenshot.ScreenshotQualifiers
+import com.georgeci.moneysurfer.screenshot.ScreenshotSdk
+import com.georgeci.moneysurfer.screenshot.captureLightAndDark
 import com.georgeci.moneysurfer.uikit.atom.SurferActionCard
 import com.georgeci.moneysurfer.uikit.atom.SurferCard
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
