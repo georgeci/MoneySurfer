@@ -18,7 +18,6 @@ import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
-import androidx.compose.material3.adaptive.navigation3.rememberListDetailSceneStrategy
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffoldDefaults
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
@@ -121,7 +120,7 @@ fun AppNavGraph(
 ) {
     val backStack = rememberNavBackStack(savedStateConfig, Route.SignIn)
     val bottomSheetStrategy = remember { BottomSheetSceneStrategy<NavKey>() }
-    val listDetailStrategy = rememberListDetailSceneStrategy<NavKey>()
+    val paneStrategy = rememberSurferPaneSceneStrategy<NavKey>()
     val navigator = remember(backStack) { AppNavigator(backStack) }
     val appLaunchViewModel: AppLaunchViewModel = koinViewModel()
     val targetRoute by appLaunchViewModel.targetRoute.collectAsStateWithLifecycle()
@@ -164,7 +163,7 @@ fun AppNavGraph(
             onBack = { navigator.pop() },
             sceneStrategies = listOf(
                 bottomSheetStrategy,
-                listDetailStrategy,
+                paneStrategy,
             ),
             transitionSpec = {
                 slideInHorizontally(tween(ANIMATION_DURATION)) { it } togetherWith

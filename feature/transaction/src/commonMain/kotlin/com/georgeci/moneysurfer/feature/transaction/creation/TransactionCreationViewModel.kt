@@ -2,7 +2,6 @@ package com.georgeci.moneysurfer.feature.transaction.creation
 
 import com.georgeci.moneysurfer.domain.config.HostCapabilities
 import com.georgeci.moneysurfer.domain.model.Account
-import com.georgeci.moneysurfer.domain.model.Category
 import com.georgeci.moneysurfer.domain.model.Transaction
 import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.CategoryId
@@ -10,6 +9,7 @@ import com.georgeci.moneysurfer.domain.primitives.Money
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
 import com.georgeci.moneysurfer.domain.repositories.TransactionRepository
+import com.georgeci.moneysurfer.domain.usecase.CreateSplitTransactionUseCase
 import com.georgeci.moneysurfer.domain.usecase.CreateTransactionUseCase
 import com.georgeci.moneysurfer.domain.usecase.CreateTransferUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetAccountsUseCase
@@ -25,6 +25,7 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import moneysurfer.feature.transaction.generated.resources.Res
 import moneysurfer.feature.transaction.generated.resources.transaction_creation_created_snackbar
+import moneysurfer.feature.transaction.generated.resources.transaction_creation_split_snackbar
 import moneysurfer.feature.transaction.generated.resources.transaction_creation_transfer_snackbar
 import moneysurfer.feature.transaction.generated.resources.transaction_creation_updated_snackbar
 import moneysurfer.feature.transaction.generated.resources.transaction_details_delete_undo
@@ -50,6 +51,7 @@ class TransactionCreationViewModel(
     private val createTransaction: CreateTransactionUseCase,
     private val updateTransaction: UpdateTransactionUseCase,
     private val createTransfer: CreateTransferUseCase,
+    private val createSplitTransaction: CreateSplitTransactionUseCase,
     private val deleteWithUndo: DeleteTransactionWithUndo,
     private val getCurrentTime: GetCurrentTimeUseCase,
     private val transactionRepository: TransactionRepository,
@@ -65,6 +67,12 @@ class TransactionCreationViewModel(
     }
 
     private var pendingAccountSlot: AccountSlot = AccountSlot.Single
+
+    /** What the category chooser was last opened for — see [CategorySlot]. */
+    private var pendingCategorySlot: CategorySlot = CategorySlot.Single
+
+    /** Hands out the split lines' stable keys; never reused within one screen. */
+    private var splitLineKeys: Int = 0
 
     override fun onEvent(event: TransactionCreationEvent) {
         when (event) {
@@ -90,22 +98,31 @@ class TransactionCreationViewModel(
                     .set(this, getCurrentTime().toEpochMilliseconds())
                     .let { TransactionCreationState.content.pinnedOperationDate.set(it, null) }
             }
-            TransactionCreationEvent.OnOpenCategoryChooser -> openCategoryChooser()
+            TransactionCreationEvent.OnOpenCategoryChooser -> openCategoryChooser(CategorySlot.Single)
             TransactionCreationEvent.OnOpenCategoryCreation -> postSideEffect(
                 TransactionCreationEffect.NavigateToCategoryCreation,
             )
             TransactionCreationEvent.OnOpenAccountChooser -> openAccountChooser(AccountSlot.Single)
             TransactionCreationEvent.OnOpenFromAccountChooser -> openAccountChooser(AccountSlot.From)
             TransactionCreationEvent.OnOpenToAccountChooser -> openAccountChooser(AccountSlot.To)
-            TransactionCreationEvent.OnSwapAccountsClick -> updateState {
-                val c = this as? TransactionCreationState.Content ?: return@updateState this
-                c.copy(
-                    fromAccount = c.toAccount,
-                    toAccount = c.fromAccount,
-                    amount = c.toAmount,
-                    toAmount = c.amount,
+            TransactionCreationEvent.OnSwapAccountsClick -> updateContent { content ->
+                content.copy(
+                    fromAccount = content.toAccount,
+                    toAccount = content.fromAccount,
+                    amount = content.toAmount,
+                    toAmount = content.amount,
                 )
             }
+            TransactionCreationEvent.OnSplitToggled ->
+                updateContent { it.withSplitToggled { splitLineKeys++ } }
+            TransactionCreationEvent.OnSplitLineAdded ->
+                updateContent { it.withSplitLineAdded(key = splitLineKeys++) }
+            is TransactionCreationEvent.OnSplitLineRemoved ->
+                updateContent { it.withSplitLineRemoved(key = event.key) }
+            is TransactionCreationEvent.OnSplitLineAmountChanged ->
+                updateContent { it.withSplitLineAmount(key = event.key, amount = event.amount) }
+            is TransactionCreationEvent.OnOpenSplitLineCategoryChooser ->
+                openCategoryChooser(CategorySlot.SplitLine(event.key))
             TransactionCreationEvent.OnSaveClick -> saveTransaction()
             TransactionCreationEvent.OnDeleteClick -> updateState {
                 TransactionCreationState.content.showDeleteConfirmation.modify(this) { true }
@@ -118,11 +135,34 @@ class TransactionCreationViewModel(
         }
     }
 
-    private fun openCategoryChooser() {
+    /**
+     * Reduces the loaded form, leaving [TransactionCreationState.Loading] alone — an event that
+     * arrives before the screen has loaded has no form to change.
+     *
+     * A `when` over the sealed state rather than the `as?` this used to repeat at every call site:
+     * one place to state the rule, and no cast for a static analyser to squint at (SonarCloud reads
+     * `this` inside a `STATE.() -> STATE` reducer as the ViewModel and calls the cast impossible).
+     */
+    private fun updateContent(
+        block: (TransactionCreationState.Content) -> TransactionCreationState.Content,
+    ) = updateState {
+        when (this) {
+            is TransactionCreationState.Content -> block(this)
+            TransactionCreationState.Loading -> this
+        }
+    }
+
+    private fun openCategoryChooser(slot: CategorySlot) {
         val state = currentState as? TransactionCreationState.Content ?: return
+        pendingCategorySlot = slot
+        val selected = when (slot) {
+            CategorySlot.Single -> state.selectedCategory?.id
+            is CategorySlot.SplitLine ->
+                state.splitLines.firstOrNull { it.key == slot.key }?.category?.id
+        }
         postSideEffect(
             TransactionCreationEffect.NavigateToCategoryChooser(
-                selectedCategoryId = state.selectedCategory?.id,
+                selectedCategoryId = selected,
                 filterType = state.type.categoryType(),
             ),
         )
@@ -175,6 +215,15 @@ class TransactionCreationViewModel(
             ),
             fromAccount = if (nextType == TransactionTypeUi.Transfer) seededFrom else content.fromAccount,
             toAccount = if (nextType == TransactionTypeUi.Transfer) seededTo else content.toAccount,
+            // The split editor's lines carry categories of the *old* type, and every category
+            // belongs to one side. Keeping them would write income legs filed under expense
+            // categories — money the spend aggregates (which filter on `type = 'EXPENSE'`) would
+            // never see, under a category whose own screen would then list income. The lines and
+            // their amounts survive; only a category the new type cannot use is dropped, which
+            // leaves Save disabled until the user picks a replacement.
+            splitLines = content.splitLines.map { line ->
+                line.copy(category = line.category?.takeIf { it.type == nextCategoryType })
+            },
         )
     }
 
@@ -258,7 +307,7 @@ class TransactionCreationViewModel(
         if (match != null) {
             updateState {
                 val c = this as? TransactionCreationState.Content ?: return@updateState this
-                applyAccountToSlot(c, match, slot)
+                c.withAccountInSlot(match, slot)
             }
             return
         }
@@ -268,28 +317,19 @@ class TransactionCreationViewModel(
             updateState {
                 val c = this as? TransactionCreationState.Content ?: return@updateState this
                 val withRefreshed = c.copy(accounts = refreshed)
-                if (newMatch != null) applyAccountToSlot(withRefreshed, newMatch, slot) else withRefreshed
+                if (newMatch != null) withRefreshed.withAccountInSlot(newMatch, slot) else withRefreshed
             }
         }
     }
 
-    private fun applyAccountToSlot(
-        content: TransactionCreationState.Content,
-        account: Account,
-        slot: AccountSlot,
-    ): TransactionCreationState.Content = when (slot) {
-        AccountSlot.Single -> content.copy(selectedAccount = account)
-        AccountSlot.From -> content.copy(fromAccount = account)
-        AccountSlot.To -> content.copy(toAccount = account)
-    }
-
     private fun applyPickedCategory(picked: CategoryId) {
         val content = currentState as? TransactionCreationState.Content ?: return
+        val slot = pendingCategorySlot
         val match = content.categories.find { it.id == picked }
         if (match != null) {
             updateState {
                 val c = this as? TransactionCreationState.Content ?: return@updateState this
-                c.withSelectedCategory(categories = c.categories, selected = match)
+                c.withPickedCategory(categories = c.categories, selected = match, slot = slot)
             }
             return
         }
@@ -299,29 +339,23 @@ class TransactionCreationViewModel(
             val newMatch = refreshed.find { it.id == picked }
             updateState {
                 val c = this as? TransactionCreationState.Content ?: return@updateState this
-                c.withSelectedCategory(categories = refreshed, selected = newMatch ?: c.selectedCategory)
+                c.withPickedCategory(
+                    categories = refreshed,
+                    selected = newMatch ?: c.categoryInSlot(slot),
+                    slot = slot,
+                )
             }
         }
     }
-
-    private fun TransactionCreationState.Content.withSelectedCategory(
-        categories: List<Category>,
-        selected: Category?,
-    ): TransactionCreationState.Content = copy(
-        categories = categories,
-        selectedCategory = selected,
-        displayCategories = buildDisplayCategories(
-            categories = categories,
-            counts = categoryUsageCounts,
-            type = type.categoryType(),
-            selected = selected,
-        ),
-    )
 
     private fun saveTransaction() {
         val state = currentState as? TransactionCreationState.Content ?: return
         if (state.isTransfer) {
             saveTransfer(state)
+            return
+        }
+        if (state.isSplit) {
+            saveSplit(state)
             return
         }
         val account = state.selectedAccount ?: return
@@ -355,6 +389,7 @@ class TransactionCreationViewModel(
                 createdAt = state.editingCreatedAt ?: now,
                 updatedAt = now,
                 transferId = state.preserved.transferId,
+                splitId = state.preserved.splitId,
                 recurringRuleId = state.preserved.recurringRuleId,
             )
 
@@ -366,6 +401,39 @@ class TransactionCreationViewModel(
                 snackbar.show(Res.string.transaction_creation_created_snackbar)
             }
 
+            postSideEffect(TransactionCreationEffect.NavigateBack)
+        }
+    }
+
+    /**
+     * Writes the split editor's lines as one receipt: N sibling rows sharing a split id, each with
+     * its own category and slice of the amount.
+     *
+     * Guarded twice on purpose — the Save button is disabled unless [isSplitComplete][
+     * TransactionCreationState.Content.isSplitComplete] holds, and the use case rejects a group it
+     * could not write. The state's own check is what keeps a half-filled editor from reaching a
+     * `require` and crashing the screen.
+     */
+    private fun saveSplit(state: TransactionCreationState.Content) {
+        val account = state.selectedAccount ?: return
+        if (!state.isSplitComplete) return
+        val legs = state.splitLegs()
+
+        launch {
+            val zone = TimeZone.currentSystemDefault()
+            val operationAt = kotlin.time.Instant.fromEpochMilliseconds(state.timestamp)
+            createSplitTransaction(
+                CreateSplitTransactionUseCase.Params(
+                    account = account,
+                    legs = legs,
+                    note = state.note,
+                    operationAt = operationAt,
+                    operationDate = state.pinnedOperationDate
+                        ?: operationAt.toLocalDateTime(zone).date,
+                    type = if (state.isExpense) TransactionType.EXPENSE else TransactionType.INCOME,
+                ),
+            )
+            snackbar.show(Res.string.transaction_creation_split_snackbar)
             postSideEffect(TransactionCreationEffect.NavigateBack)
         }
     }

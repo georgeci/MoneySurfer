@@ -72,6 +72,7 @@ import moneysurfer.feature.dashboard.generated.resources.dashboard_quick_action_
 import moneysurfer.feature.dashboard.generated.resources.dashboard_recent_empty_subtitle
 import moneysurfer.feature.dashboard.generated.resources.dashboard_recent_empty_title
 import moneysurfer.feature.dashboard.generated.resources.dashboard_recent_see_all
+import moneysurfer.feature.dashboard.generated.resources.dashboard_recent_split_categories
 import moneysurfer.feature.dashboard.generated.resources.dashboard_recent_title
 import moneysurfer.feature.dashboard.generated.resources.dashboard_settings_content_description
 import moneysurfer.feature.dashboard.generated.resources.dashboard_toolbar_greeting
@@ -516,13 +517,20 @@ private fun GoalUi.toWidgetItem(): SurferGoalItem = SurferGoalItem(
 private fun SurferAccountItem.accountId(): AccountId? =
     id.takeIf { it.isNotEmpty() }?.let(::AccountId)
 
+@Composable
 private fun TransactionUi.toWidgetItem(
     iconBgColor: Color,
     iconFgColor: Color,
 ): SurferRecentTransactionItem = SurferRecentTransactionItem(
     id = id.value,
     title = title,
-    subtitle = "",
+    // A collapsed receipt says how many categories it covers; an ordinary row has nothing to add
+    // under its title here, and the list screen is where the category belongs.
+    subtitle = if (splitCategoryCount > 0) {
+        stringResource(Res.string.dashboard_recent_split_categories, splitCategoryCount)
+    } else {
+        ""
+    },
     amount = formattedAmount,
     isExpense = isExpense,
     iconBgColor = iconBgColor,

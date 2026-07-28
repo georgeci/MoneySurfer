@@ -45,23 +45,29 @@ private const val PAGE_SIZE = 200
 
 /**
  * Enough rendered rows that the list is comfortably scrollable, so the normal scroll-driven
- * load-more can take over. Below this, a filtered page auto-advances — see
- * [shouldLoadMoreToFillFilteredList].
+ * load-more can take over. Below this, a sparse page auto-advances — see
+ * [shouldLoadMoreToFillList].
  */
 private const val AUTO_LOAD_UNTIL_SCROLLABLE = 20
 
 /**
- * Whether a filtered page is too sparse to scroll and should pull its next raw page.
+ * Whether a page renders too few rows to scroll and should pull its next raw page.
  *
- * A filter that matches only a handful of the loaded rows leaves too few to scroll, so without
- * this the user could never reach matches deeper in the window and an all-miss first page would
- * wrongly read as "nothing matches". Bounded by the window: a month stops at the month's rows.
+ * Two things thin a page out. A filter that matches only a handful of the loaded rows leaves too
+ * few to scroll, so without this the user could never reach matches deeper in the window and an
+ * all-miss first page would wrongly read as "nothing matches". Collapsing does the same without any
+ * filter: a page made mostly of one receipt's legs renders as a couple of visible rows, and the raw
+ * `rows.size > limit` that drives [TransactionsByAccountState.Content.canLoadMore] stopped matching
+ * what is on screen the moment groups started collapsing.
  *
- * The real cure is to filter in SQL (the DAO already has an FTS `searchByText`); this keeps the
- * in-memory page honest until that lands.
+ * Counting *rendered* rows is what covers both. Bounded by the window: a month stops at the month's
+ * rows.
+ *
+ * The real cure for the filter half is to filter in SQL (the DAO already has an FTS `searchByText`);
+ * this keeps the in-memory page honest until that lands.
  */
-private fun shouldLoadMoreToFillFilteredList(content: TransactionsByAccountState.Content): Boolean =
-    content.isFiltered && content.canLoadMore && content.renderedRowCount < AUTO_LOAD_UNTIL_SCROLLABLE
+private fun shouldLoadMoreToFillList(content: TransactionsByAccountState.Content): Boolean =
+    content.canLoadMore && content.renderedRowCount < AUTO_LOAD_UNTIL_SCROLLABLE
 
 @KoinViewModel
 class TransactionsByAccountViewModel(
@@ -203,11 +209,12 @@ class TransactionsByAccountViewModel(
                 )
             }.collect { content ->
                 updateState { content }
-                // Filtering runs in memory over the loaded page, but the scroll-driven load-more
-                // can only fire once the rendered list is long enough to scroll. While a filter is
-                // active and too few rows match to scroll, keep pulling the next raw page until the
-                // list is scrollable again (normal paging takes over) or the window is exhausted.
-                if (shouldLoadMoreToFillFilteredList(content)) pageLimit.value += PAGE_SIZE
+                // Filtering and split-collapsing both run in memory over the loaded page, but the
+                // scroll-driven load-more can only fire once the rendered list is long enough to
+                // scroll. While too few rows are rendered to scroll, keep pulling the next raw page
+                // until the list is scrollable again (normal paging takes over) or the window is
+                // exhausted.
+                if (shouldLoadMoreToFillList(content)) pageLimit.value += PAGE_SIZE
             }
         }
     }

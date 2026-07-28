@@ -51,6 +51,8 @@
     <string name="dashboard_recent_see_all">Все</string>
     <string name="dashboard_recent_empty_title">Активности пока нет</string>
     <string name="dashboard_recent_empty_subtitle">Новые транзакции появятся здесь.</string>
+    <!-- Meta line of a collapsed split row: how many categories the receipt covers -->
+    <string name="dashboard_recent_split_categories">Категорий: %1$d</string>
     <string name="dashboard_budgets_title">Бюджеты</string>
     <string name="dashboard_budgets_see_all">Все</string>
     <string name="dashboard_budgets_empty_title">Бюджетов пока нет</string>

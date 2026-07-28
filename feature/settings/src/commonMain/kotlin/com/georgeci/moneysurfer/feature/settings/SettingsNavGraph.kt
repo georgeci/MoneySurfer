@@ -1,7 +1,6 @@
 package com.georgeci.moneysurfer.feature.settings
 
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
-import androidx.compose.material3.adaptive.navigation3.ListDetailSceneStrategy
 import com.georgeci.moneysurfer.feature.settings.about.AboutScreen
 import com.georgeci.moneysurfer.feature.settings.about.licenses.LicensesScreen
 import com.georgeci.moneysurfer.feature.settings.account.DeleteUserAccountScreen
@@ -15,11 +14,12 @@ import com.georgeci.moneysurfer.feature.settings.sync.SyncScreen
 import com.georgeci.moneysurfer.navigation.FeatureNavGraph
 import com.georgeci.moneysurfer.navigation.NavDetailPlaceholder
 import com.georgeci.moneysurfer.navigation.Route
+import com.georgeci.moneysurfer.navigation.SurferPaneSceneStrategy
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 val settingsNavGraph: FeatureNavGraph = { navigator ->
     entry<Route.Settings>(
-        metadata = ListDetailSceneStrategy.listPane(detailPlaceholder = { NavDetailPlaceholder() }),
+        metadata = SurferPaneSceneStrategy.listPane(detailPlaceholder = { NavDetailPlaceholder() }),
     ) {
         SettingsScreen(
             onNavigateBack = { navigator.pop() },
@@ -45,37 +45,37 @@ val settingsNavGraph: FeatureNavGraph = { navigator ->
     }
 
     entry<Route.SettingsAppearance>(
-        metadata = ListDetailSceneStrategy.detailPane(),
+        metadata = SurferPaneSceneStrategy.detailPane(),
     ) {
         AppearanceScreen(onNavigateBack = { navigator.pop() })
     }
 
     entry<Route.SettingsPreferences>(
-        metadata = ListDetailSceneStrategy.detailPane(),
+        metadata = SurferPaneSceneStrategy.detailPane(),
     ) {
         PreferencesScreen(onNavigateBack = { navigator.pop() })
     }
 
     entry<Route.SettingsSync>(
-        metadata = ListDetailSceneStrategy.detailPane(),
+        metadata = SurferPaneSceneStrategy.detailPane(),
     ) {
         SyncScreen(onNavigateBack = { navigator.pop() })
     }
 
     entry<Route.SettingsBackup>(
-        metadata = ListDetailSceneStrategy.detailPane(),
+        metadata = SurferPaneSceneStrategy.detailPane(),
     ) {
         BackupScreen(onNavigateBack = { navigator.pop() })
     }
 
     entry<Route.SettingsCsv>(
-        metadata = ListDetailSceneStrategy.detailPane(),
+        metadata = SurferPaneSceneStrategy.detailPane(),
     ) {
         CsvBackupScreen(onNavigateBack = { navigator.pop() })
     }
 
     entry<Route.SettingsAbout>(
-        metadata = ListDetailSceneStrategy.detailPane(),
+        metadata = SurferPaneSceneStrategy.detailPane(),
     ) {
         AboutScreen(
             onNavigateBack = { navigator.pop() },
@@ -84,19 +84,19 @@ val settingsNavGraph: FeatureNavGraph = { navigator ->
     }
 
     entry<Route.SettingsLicenses>(
-        metadata = ListDetailSceneStrategy.detailPane(),
+        metadata = SurferPaneSceneStrategy.detailPane(),
     ) {
         LicensesScreen(onNavigateBack = { navigator.pop() })
     }
 
     entry<Route.SettingsDeleteAccount>(
-        metadata = ListDetailSceneStrategy.detailPane(),
+        metadata = SurferPaneSceneStrategy.detailPane(),
     ) {
         DeleteUserAccountScreen(onNavigateBack = { navigator.pop() })
     }
 
     entry<Route.SettingsDebugConfig>(
-        metadata = ListDetailSceneStrategy.detailPane(),
+        metadata = SurferPaneSceneStrategy.detailPane(),
     ) {
         DebugConfigScreen(
             onNavigateBack = { navigator.pop() },
@@ -105,7 +105,7 @@ val settingsNavGraph: FeatureNavGraph = { navigator ->
     }
 
     entry<Route.SettingsDebugLog>(
-        metadata = ListDetailSceneStrategy.detailPane(),
+        metadata = SurferPaneSceneStrategy.detailPane(),
     ) {
         DebugLogScreen(onNavigateBack = { navigator.pop() })
     }

@@ -1,7 +1,7 @@
 ---
 title: Split one transaction across several categories
 created: 2026-07-28
-status: backlog
+status: implemented
 ---
 
 # Split one transaction across several categories
@@ -15,7 +15,7 @@ status: backlog
   - [Transaction counts stop meaning receipts](#transaction-counts-stop-meaning-receipts)
   - [List collapsing has to survive the paging window](#list-collapsing-has-to-survive-the-paging-window)
 - [Implementation outline](#implementation-outline)
-- [Open question to settle before coding](#open-question-to-settle-before-coding)
+- [Open question, as settled](#open-question-as-settled)
 <!-- DOCS:END -->
 
 One supermarket receipt is one payment but several spending categories —
@@ -28,7 +28,11 @@ and every analytic hangs directly off it — `getMonthlyTotalsByCategory` and
 `BudgetProgress`, `CategorySpendRepository`, the category filter, CSV
 export/import, and the transaction sync plugin.
 
-Nothing is implemented yet.
+Implemented in issue #399 — `splitId` on the entity, model, sync document and
+CSV, a split editor on the creation screen, and a collapsed row in the list and
+the recent-activity widget with the breakdown on the details screen. The
+sections below are the decision record; where implementation settled something
+the plan left open, it says so inline.
 
 ## Decision
 
@@ -140,9 +144,36 @@ leg is its own row under its own category.
    screen; the two paging rules above (complete a trailing group before cutting
    the window, count visible rows for `canLoadMore`).
 
-## Open question to settle before coding
+## Open question, as settled
 
-**Are differing dates or accounts across legs forbidden?** They should be —
-otherwise a group stops being one receipt. That is an invariant to validate on
-write and to protect when a single leg is edited through the ordinary edit
-path.
+**Are differing dates or accounts across legs forbidden?** Yes — plus currency,
+moment and type, for the same reason: differ on any of them and the group stops
+describing one payment, which is exactly what the collapsed row and the details
+breakdown assume.
+
+Validated on write in `CreateSplitTransactionUseCase`, which builds every leg
+from one set of receipt-level fields, so the invariant cannot be violated by
+construction there.
+
+Protected on edit by **propagation, not rejection**. `UpdateTransactionUseCase`
+carries the receipt-level fields of an edited leg onto its siblings, leaving
+category and amount alone. Refusing the edit was the alternative and is worse:
+the edit screen edits one leg and knows nothing about splits, so a user moving a
+receipt to the right date would be told no with no way to say yes. A sibling
+already in step is left untouched, so an ordinary single-category edit still
+enqueues exactly one row for sync.
+
+Two smaller decisions the implementation had to make:
+
+- **Collapsing only ever applies to a group the page holds in full.** The window
+  query counts each row's group size (`splitLegCount`, a correlated subquery, not
+  a stored column); a group present in part — cut by the paging limit or thinned
+  by an in-memory filter — renders as the individual legs it has. That is honest
+  at every window size and needs neither a held-back trailing group nor a
+  completing join. `canLoadMore` still counts raw rows, but the auto-advance that
+  used to fire only for a sparse *filtered* page now fires for any page rendering
+  too few rows to scroll, which is the collapsed case as well.
+- **Converting an existing transaction into a split is not offered.** It would
+  mean deleting the stored row and writing N in its place — new ids, a different
+  thing to sync — which is more than an edit screen should do behind one toggle.
+  The editor is creation-only; the toggle is hidden in edit mode.

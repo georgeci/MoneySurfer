@@ -165,6 +165,7 @@ fun TransactionEntity.toDoc(): TransactionDoc = TransactionDoc(
     createdAt = createdAt,
     updatedAt = updatedAt,
     transferId = transferId,
+    splitId = splitId,
     recurringRuleId = recurringRuleId,
 )
 
@@ -205,6 +206,7 @@ fun TransactionDoc.toEntity(id: String, workspaceId: String): TransactionEntity 
         createdAt = resolvedCreatedAt,
         updatedAt = updatedAt,
         transferId = transferId,
+        splitId = splitId,
         recurringRuleId = recurringRuleId,
     )
 }

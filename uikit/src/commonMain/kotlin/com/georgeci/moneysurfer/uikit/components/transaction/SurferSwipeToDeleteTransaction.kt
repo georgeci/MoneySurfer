@@ -45,6 +45,8 @@ private val REVEAL_WIDTH = 84.dp
  *   about to go; blank falls back to the dialog's generic wording.
  * @param isTransfer whether the row is one leg of a transfer, which both legs of are deleted
  *   together — the dialog says so.
+ * @param isSplit whether the row stands for a receipt split across categories, every leg of which
+ *   is deleted together — the dialog says so.
  */
 @Composable
 fun SurferSwipeToDeleteTransaction(
@@ -52,6 +54,7 @@ fun SurferSwipeToDeleteTransaction(
     onDelete: () -> Unit,
     modifier: Modifier = Modifier,
     isTransfer: Boolean = false,
+    isSplit: Boolean = false,
     content: @Composable () -> Unit,
 ) {
     // Survives configuration changes and process death: the dialog is a question already put to
@@ -88,6 +91,7 @@ fun SurferSwipeToDeleteTransaction(
             },
             onDismiss = { showConfirmation = false },
             isTransfer = isTransfer,
+            isSplit = isSplit,
         )
     }
 }

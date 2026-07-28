@@ -1,4 +1,4 @@
-// v2.6.1 — 2026-07-26
+// v2.6.2 — 2026-07-28
 rules_version = '2';
 
 // Workspace-scoped tenancy: every per-user document lives under
@@ -196,6 +196,9 @@ service cloud.firestore {
         && typeIntOk(data, 'updatedAt')
         && typeNullableIntOk(data, 'deletedAt')
         && typeNullableStrOk(data, 'transferId')
+        // Optional like every other field in this shape (no hasOnly anywhere here), so a client
+        // that predates splits keeps validating and its pushes are unaffected by deploying this.
+        && typeNullableStrOk(data, 'splitId')
         && typeNullableStrOk(data, 'recurringRuleId');
     }
 
