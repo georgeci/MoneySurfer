@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > DashboardNavigation</title>
+  <title>MoneySurfer Coverage Report > DashboardInsightsWidgetKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,15 +22,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.feature.dashboard</a>
 </div>
 
-<h1>Coverage Summary for Class: DashboardNavigation (com.georgeci.moneysurfer.feature.dashboard)</h1>
+<h1>Coverage Summary for Class: DashboardInsightsWidgetKt (com.georgeci.moneysurfer.feature.dashboard)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
-<th class="coverageStat 
-">
-  Class, %
-</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -49,42 +46,79 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">DashboardNavigation</td>
+  <td class="name">DashboardInsightsWidgetKt</td>
 <td class="coverageStat">
   <span class="percent">
     100%
   </span>
   <span class="absValue">
-    (1/1)
+    (5/5)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    86.2%
   </span>
   <span class="absValue">
-    (1/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (13/13)
+    (25/29)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    95.1%
   </span>
   <span class="absValue">
-    (62/62)
+    (39/41)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    97%
+  </span>
+  <span class="absValue">
+    (514/530)
   </span>
 </td>
 </tr>
-
+  <tr>
+    <td class="name">DashboardInsightsWidgetKt$WhenMappings</td>
+    <td class="coverageStat"/>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    86.2%
+  </span>
+  <span class="absValue">
+    (25/29)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    95.1%
+  </span>
+  <span class="absValue">
+    (39/41)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    97%
+  </span>
+  <span class="absValue">
+    (514/530)
+  </span>
+</td>
+</tr>
 </table>
 
 <br/>
@@ -94,64 +128,116 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.dashboard
 &nbsp;
+&nbsp;import androidx.compose.foundation.layout.defaultMinSize
+&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
+&nbsp;import androidx.compose.foundation.layout.padding
 &nbsp;import androidx.compose.runtime.Composable
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.AccountId
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.GoalId
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionId
-&nbsp;import com.georgeci.moneysurfer.utils.HandleSideEffect
+&nbsp;import androidx.compose.ui.Modifier
+&nbsp;import androidx.compose.ui.platform.testTag
+&nbsp;import androidx.compose.ui.unit.Dp
+&nbsp;import androidx.compose.ui.unit.dp
+&nbsp;import com.georgeci.moneysurfer.domain.insight.InsightTone
+&nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferInsightItem
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferInsightTone
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferInsightsVariant
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferInsightsWidget
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.Res
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_insights_category_down_title
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_insights_category_up_title
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_insights_comparison_body
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_insights_empty_text
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_insights_period_down_title
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_insights_period_flat_title
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_insights_period_up_title
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_insights_subscriptions_body
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_insights_subscriptions_title
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_insights_title
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_insights_uncategorized
+&nbsp;import org.jetbrains.compose.resources.pluralStringResource
+&nbsp;import org.jetbrains.compose.resources.stringResource
 &nbsp;
 &nbsp;/**
-&nbsp; * Where the dashboard can send the user. Grouped rather than declared one lambda per destination:
-&nbsp; * the screen reaches a dozen places, and `kotlin:S107` allows seven parameters. Same remedy and
-&nbsp; * same shape as `WorkspaceSelectorNavigation` — see AGENTS.md → UI Rules.
+&nbsp; * The generated insights, and the copy that turns each rule&#39;s finding into a sentence.
+&nbsp; *
+&nbsp; * Lives beside `DashboardScreen` rather than in it: six sentence shapes is more copy than any other
+&nbsp; * widget on the dashboard needs, and the screen&#39;s job is to route a widget type to one call.
+&nbsp; *
+&nbsp; * Draws its own empty state rather than standing down the way the quick-actions row does —
+&nbsp; * &quot;nothing notable this period&quot; is an answer, and a widget the user switched on should not vanish
+&nbsp; * because the engine had a quiet month.
 &nbsp; */
-<b class="fc">&nbsp;data class DashboardNavigation(</b>
-<b class="fc">&nbsp;    val onNavigateToAccountCreation: () -&gt; Unit,</b>
-<b class="fc">&nbsp;    val onNavigateToAccountsManage: () -&gt; Unit,</b>
-<b class="fc">&nbsp;    val onNavigateToTransactionCreation: (accountId: AccountId?) -&gt; Unit,</b>
-<b class="fc">&nbsp;    val onNavigateToTransferCreation: () -&gt; Unit,</b>
-<b class="fc">&nbsp;    val onNavigateToAccountDetails: (AccountId) -&gt; Unit,</b>
-<b class="fc">&nbsp;    val onNavigateToTransactionDetails: (TransactionId) -&gt; Unit,</b>
-<b class="fc">&nbsp;    val onNavigateToSettings: () -&gt; Unit,</b>
-<b class="fc">&nbsp;    val onNavigateToCustomize: () -&gt; Unit,</b>
-<b class="fc">&nbsp;    val onNavigateToTransactionsList: () -&gt; Unit,</b>
-<b class="fc">&nbsp;    val onNavigateToGoals: () -&gt; Unit,</b>
-<b class="fc">&nbsp;    val onNavigateToGoalDetails: (GoalId) -&gt; Unit,</b>
-<b class="fc">&nbsp;    val onNavigateToBudgetCreation: () -&gt; Unit,</b>
+&nbsp;@Composable
+<b class="pc">&nbsp;internal fun InsightsWidget(state: DashboardState.Content, variant: String?) {</b>
+<b class="fc">&nbsp;    SurferInsightsWidget(</b>
+<b class="fc">&nbsp;        items = state.insights.map { it.toWidgetItem() },</b>
+<b class="fc">&nbsp;        title = stringResource(Res.string.dashboard_insights_title),</b>
+<b class="fc">&nbsp;        variant = SurferInsightsVariant.fromKey(variant),</b>
+<b class="fc">&nbsp;        emptyText = stringResource(Res.string.dashboard_insights_empty_text),</b>
+<b class="fc">&nbsp;        modifier = Modifier</b>
+<b class="fc">&nbsp;            .fillMaxWidth()</b>
+<b class="fc">&nbsp;            .padding(horizontal = 16.dp)</b>
+&nbsp;            // Only the empty state needs a floor to centre itself in; cards size themselves, and
+&nbsp;            // a compact carousel showing one of them would otherwise hang dead space underneath.
+<b class="fc">&nbsp;            .defaultMinSize(minHeight = if (state.insights.isEmpty()) INSIGHTS_EMPTY_HEIGHT else Dp.Unspecified)</b>
+<b class="fc">&nbsp;            .padding(vertical = 8.dp)</b>
+<b class="fc">&nbsp;            .testTag(DashboardTestTags.Insights),</b>
+&nbsp;    )
+<b class="fc">&nbsp;}</b>
+&nbsp;
+&nbsp;/**
+&nbsp; * The card an insight draws. The rule that produced it already chose the tone in `domain`; this
+&nbsp; * side picks the words and the icon that go with it.
+&nbsp; */
+&nbsp;@Composable
+<b class="fc">&nbsp;private fun InsightUi.toWidgetItem(): SurferInsightItem = SurferInsightItem(</b>
+<b class="fc">&nbsp;    id = id,</b>
+<b class="fc">&nbsp;    tone = when (tone) {</b>
+<b class="fc">&nbsp;        InsightTone.Good -&gt; SurferInsightTone.Good</b>
+<b class="fc">&nbsp;        InsightTone.Warn -&gt; SurferInsightTone.Warn</b>
+<b class="fc">&nbsp;        InsightTone.Neutral -&gt; SurferInsightTone.Neutral</b>
+&nbsp;    },
+<b class="fc">&nbsp;    icon = when (kind) {</b>
+<b class="fc">&nbsp;        InsightKind.CategoryUp, InsightKind.PeriodUp -&gt; SurferIcons.ArrowUp</b>
+<b class="fc">&nbsp;        InsightKind.CategoryDown, InsightKind.PeriodDown -&gt; SurferIcons.ArrowDown</b>
+<b class="fc">&nbsp;        InsightKind.PeriodFlat -&gt; SurferIcons.Calendar</b>
+<b class="fc">&nbsp;        InsightKind.Subscriptions -&gt; SurferIcons.Sync</b>
+&nbsp;    },
+<b class="fc">&nbsp;    title = insightTitle(),</b>
+<b class="fc">&nbsp;    body = insightBody(),</b>
 &nbsp;)
 &nbsp;
-&nbsp;/**
-&nbsp; * The screen&#39;s whole side-effect half: one branch per [DashboardEffect], nothing else.
-&nbsp; *
-&nbsp; * A plain function rather than a lambda inside the composable, for two reasons. A flat dispatch
-&nbsp; * table that grows with the destination list is what pushed `DashboardScreen` over the complexity
-&nbsp; * limit; and a mis-wired branch here sends the user to the wrong screen, which is worth a test —
-&nbsp; * one that needs no composition, no lifecycle and no view model to run.
-&nbsp; */
-&nbsp;internal fun DashboardNavigation.navigate(effect: DashboardEffect) {
-&nbsp;    when (effect) {
-&nbsp;        is DashboardEffect.NavigateToAccountDetails -&gt; onNavigateToAccountDetails(effect.accountId)
-&nbsp;        is DashboardEffect.NavigateToTransactionDetails -&gt; onNavigateToTransactionDetails(effect.transactionId)
-&nbsp;        DashboardEffect.NavigateToAccountCreation -&gt; onNavigateToAccountCreation()
-&nbsp;        DashboardEffect.NavigateToAccountsManage -&gt; onNavigateToAccountsManage()
-&nbsp;        is DashboardEffect.NavigateToTransactionCreation -&gt; onNavigateToTransactionCreation(effect.accountId)
-&nbsp;        DashboardEffect.NavigateToTransferCreation -&gt; onNavigateToTransferCreation()
-&nbsp;        DashboardEffect.NavigateToSettings -&gt; onNavigateToSettings()
-&nbsp;        DashboardEffect.NavigateToCustomize -&gt; onNavigateToCustomize()
-&nbsp;        DashboardEffect.NavigateToTransactionsList -&gt; onNavigateToTransactionsList()
-&nbsp;        DashboardEffect.NavigateToGoals -&gt; onNavigateToGoals()
-&nbsp;        is DashboardEffect.NavigateToGoalDetails -&gt; onNavigateToGoalDetails(effect.goalId)
-&nbsp;        DashboardEffect.NavigateToBudgetCreation -&gt; onNavigateToBudgetCreation()
-&nbsp;    }
+&nbsp;@Composable
+<b class="fc">&nbsp;private fun InsightUi.insightTitle(): String {</b>
+&nbsp;    // A slice with no category is a real slice, so it gets a name rather than being skipped.
+<b class="fc">&nbsp;    val subject = label ?: stringResource(Res.string.dashboard_insights_uncategorized)</b>
+<b class="pc">&nbsp;    return when (kind) {</b>
+&nbsp;        InsightKind.CategoryUp -&gt;
+<b class="fc">&nbsp;            stringResource(Res.string.dashboard_insights_category_up_title, subject, percent)</b>
+&nbsp;        InsightKind.CategoryDown -&gt;
+<b class="fc">&nbsp;            stringResource(Res.string.dashboard_insights_category_down_title, subject, percent)</b>
+<b class="fc">&nbsp;        InsightKind.PeriodUp -&gt; stringResource(Res.string.dashboard_insights_period_up_title, percent)</b>
+<b class="fc">&nbsp;        InsightKind.PeriodDown -&gt; stringResource(Res.string.dashboard_insights_period_down_title, percent)</b>
+<b class="fc">&nbsp;        InsightKind.PeriodFlat -&gt; stringResource(Res.string.dashboard_insights_period_flat_title)</b>
+&nbsp;        InsightKind.Subscriptions -&gt;
+<b class="fc">&nbsp;            pluralStringResource(Res.plurals.dashboard_insights_subscriptions_title, count, count)</b>
+<b class="nc">&nbsp;    }</b>
 &nbsp;}
 &nbsp;
 &nbsp;@Composable
-&nbsp;internal fun HandleDashboardEffects(
-&nbsp;    viewModel: DashboardViewModel,
-&nbsp;    navigation: DashboardNavigation,
-&nbsp;) {
-&nbsp;    viewModel.HandleSideEffect(navigation::navigate)
-&nbsp;}
+<b class="pc">&nbsp;private fun InsightUi.insightBody(): String = when (kind) {</b>
+&nbsp;    InsightKind.CategoryUp,
+&nbsp;    InsightKind.CategoryDown,
+&nbsp;    InsightKind.PeriodUp,
+&nbsp;    InsightKind.PeriodDown,
+&nbsp;    InsightKind.PeriodFlat,
+<b class="fc">&nbsp;    -&gt; stringResource(Res.string.dashboard_insights_comparison_body, amount, comparison)</b>
+&nbsp;    InsightKind.Subscriptions -&gt;
+<b class="fc">&nbsp;        stringResource(Res.string.dashboard_insights_subscriptions_body, amount)</b>
+<b class="nc">&nbsp;}</b>
+&nbsp;
+&nbsp;/** Same floor the other dashboard cards use, so a quiet Insights card lines up with a quiet Goals one. */
+<b class="fc">&nbsp;private val INSIGHTS_EMPTY_HEIGHT = 180.dp</b>
 </code>
 </pre>
 </div>
@@ -175,7 +261,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 22:39</div>
+    <div style="float:right;">generated on 2026-07-28 23:01</div>
 </div>
 </body>
 </html>

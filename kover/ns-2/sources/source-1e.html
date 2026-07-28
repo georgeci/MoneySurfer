@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > ConfigKeyGroup</title>
+  <title>MoneySurfer Coverage Report > Config</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.appconfig</a>
 </div>
 
-<h1>Coverage Summary for Class: ConfigKeyGroup (com.georgeci.moneysurfer.appconfig)</h1>
+<h1>Coverage Summary for Class: Config (com.georgeci.moneysurfer.appconfig)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">ConfigKeyGroup</td>
+  <td class="name">Config</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -46,106 +46,82 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.appconfig
 &nbsp;
+&nbsp;import com.georgeci.moneysurfer.domain.preferences.Pref
+&nbsp;import kotlinx.coroutines.flow.Flow
+&nbsp;
 &nbsp;/**
-&nbsp; * One configuration value: a compile-time constant, never a DI participant. The number of Koin
-&nbsp; * bindings therefore does not grow with the number of flags.
+&nbsp; * The configuration engine: resolves every value from ordered layers.
 &nbsp; *
-&nbsp; * [T] is `Any`-bounded because the engine already spends `null` on &quot;absent in this layer&quot; — an
-&nbsp; * &quot;empty&quot; value has to be a sentinel inside the codec instead.
-&nbsp; *
-&nbsp; * Plain `ConfigKey` is **read-only**: host-owned facts and server-owned flags. Only [SettingKey]
-&nbsp; * can be written, so `Config.handle` on a server flag fails to compile.
+&nbsp; * Infrastructure, not API. Features never see it — they inject typed domain facades
+&nbsp; * (`UiPreferences`, `SyncSettings`, `HostCapabilities`, `DebugConfigInspector`), and `Config` is
+&nbsp; * injected only into those facade implementations, never into a ViewModel. The fence is the
+&nbsp; * dependency graph: feature modules have no `app-config` on its classpath.
 &nbsp; */
-&nbsp;open class ConfigKey&lt;T : Any&gt;(
-&nbsp;    val name: String,
-&nbsp;    val default: T,
-&nbsp;    val codec: ConfigCodec&lt;T&gt;,
+&nbsp;interface Config {
+&nbsp;
+&nbsp;    /** First non-absent layer, re-resolved whenever any layer changes. Falls back to `key.default`. */
+&nbsp;    fun &lt;T : Any&gt; observe(key: ConfigKey&lt;T&gt;): Flow&lt;T&gt;
+&nbsp;
 &nbsp;    /**
-&nbsp;     * Opt-in: only these keys are served (or mirrored) by the RemoteGlobal layer. Without the
-&nbsp;     * opt-in a free-form remote map could override anything it names — `host.is_offline` would
-&nbsp;     * flip the online build onto the offline start route while its DI graph stays online, and any
-&nbsp;     * `SettingKey` the user never wrote has an absent Local layer, so a remote
-&nbsp;     * `ui.onboarding_completed` would skip onboarding on every fresh install.
+&nbsp;     * Synchronous resolution. Requires [hydrate] to have completed: called earlier it resolves the
+&nbsp;     * Build layer and defaults only, and throws in debug builds so the ordering mistake is not
+&nbsp;     * silently shipped.
 &nbsp;     */
-&nbsp;    val remoteOverridable: Boolean = false,
-&nbsp;) {
-&nbsp;    override fun toString(): String = &quot;ConfigKey($name)&quot;
+&nbsp;    fun &lt;T : Any&gt; snapshot(key: ConfigKey&lt;T&gt;): T
 &nbsp;
-&nbsp;    companion object {
-&nbsp;        fun bool(
-&nbsp;            name: String,
-&nbsp;            default: Boolean,
-&nbsp;            remoteOverridable: Boolean = false,
-&nbsp;        ): ConfigKey&lt;Boolean&gt; = ConfigKey(name, default, BooleanConfigCodec, remoteOverridable)
+&nbsp;    /**
+&nbsp;     * Read/write handle for a user setting. Takes [SettingKey] only, so writing to a host- or
+&nbsp;     * server-owned flag fails to compile.
+&nbsp;     */
+&nbsp;    fun &lt;T : Any&gt; handle(key: SettingKey&lt;T&gt;): Pref&lt;T&gt;
 &nbsp;
-&nbsp;        fun string(
-&nbsp;            name: String,
-&nbsp;            default: String,
-&nbsp;            remoteOverridable: Boolean = false,
-&nbsp;        ): ConfigKey&lt;String&gt; = ConfigKey(name, default, StringConfigCodec, remoteOverridable)
+&nbsp;    /**
+&nbsp;     * Per-layer detail for the debug panel. Layers stay honest here — nothing is clamped, including
+&nbsp;     * a RemoteGlobal value the `remoteOverridable` opt-in refuses: it is reported as held and simply
+&nbsp;     * never wins.
+&nbsp;     */
+&nbsp;    fun &lt;T : Any&gt; resolve(key: ConfigKey&lt;T&gt;): ConfigResolution&lt;T&gt;
 &nbsp;
-&nbsp;        inline fun &lt;reified E : Enum&lt;E&gt;&gt; enum(
-&nbsp;            name: String,
-&nbsp;            default: E,
-&nbsp;            remoteOverridable: Boolean = false,
-&nbsp;        ): ConfigKey&lt;E&gt; = ConfigKey(name, default, EnumConfigCodec(enumValues&lt;E&gt;().toList()), remoteOverridable)
-&nbsp;    }
+&nbsp;    /**
+&nbsp;     * Emits once with the current state, then again whenever any layer changes.
+&nbsp;     *
+&nbsp;     * For consumers that re-resolve *many* keys at once — the debug panel — where per-key
+&nbsp;     * [observe] would need one subscription each and would dedupe away the ticks it needs.
+&nbsp;     */
+&nbsp;    val changes: Flow&lt;Unit&gt;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Warms every layer&#39;s in-memory mirror. Awaited once at startup, before the first
+&nbsp;     * [snapshot]. Idempotent.
+&nbsp;     *
+&nbsp;     * Never throws: a layer whose store cannot be read is skipped and named in [degradedLayers],
+&nbsp;     * because this runs before a start route exists and a failure here would otherwise take the
+&nbsp;     * whole app down with it.
+&nbsp;     */
+&nbsp;    suspend fun hydrate()
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Layers [hydrate] could not warm. Empty on the happy path.
+&nbsp;     *
+&nbsp;     * A degraded layer resolves as absent, so values fall through to the layers below and finally to
+&nbsp;     * `key.default` — correct, but not necessarily current. Kept observable so the debug panel can
+&nbsp;     * distinguish &quot;this layer holds nothing&quot; from &quot;this layer could not be read&quot;; the mirror refills
+&nbsp;     * on its own once the store is readable again.
+&nbsp;     */
+&nbsp;    val degradedLayers: Set&lt;ConfigLayer&gt;
 &nbsp;}
 &nbsp;
-&nbsp;/**
-&nbsp; * Writable key — a user setting. Only settings get a setter, so a server- or host-owned flag
-&nbsp; * cannot be written by mistake.
-&nbsp; *
-&nbsp; * [sync] `true` marks the value for per-user replication; `false` keeps it device-scoped.
-&nbsp; * Device-scoped is mandatory for onboarding and demo state — replicating those would replay
-&nbsp; * onboarding across devices and let demo data leak into a real account.
-&nbsp; *
-&nbsp; * [sync] also decides where the value is *stored*: `true` routes it into the account-scoped Room
-&nbsp; * `config_entry` table, which is wiped on account change and pushed through the outbox, while
-&nbsp; * `false` keeps it in DataStore, where nothing wipes it. `LocalConfigSource` owns that routing, so
-&nbsp; * no caller sees the split.
-&nbsp; *
-&nbsp; * `remoteOverridable` is hard-coded `false` and not exposed as a parameter, so a user setting
-&nbsp; * cannot become server-controlled by oversight.
-&nbsp; */
-&nbsp;class SettingKey&lt;T : Any&gt;(
-&nbsp;    name: String,
-&nbsp;    default: T,
-&nbsp;    codec: ConfigCodec&lt;T&gt;,
-&nbsp;    val sync: Boolean,
-&nbsp;) : ConfigKey&lt;T&gt;(name, default, codec, remoteOverridable = false) {
-&nbsp;
-&nbsp;    companion object {
-&nbsp;        fun bool(name: String, default: Boolean, sync: Boolean): SettingKey&lt;Boolean&gt; =
-&nbsp;            SettingKey(name, default, BooleanConfigCodec, sync)
-&nbsp;
-&nbsp;        fun string(name: String, default: String, sync: Boolean): SettingKey&lt;String&gt; =
-&nbsp;            SettingKey(name, default, StringConfigCodec, sync)
-&nbsp;
-&nbsp;        inline fun &lt;reified E : Enum&lt;E&gt;&gt; enum(name: String, default: E, sync: Boolean): SettingKey&lt;E&gt; =
-&nbsp;            SettingKey(name, default, EnumConfigCodec(enumValues&lt;E&gt;().toList()), sync)
-&nbsp;
-&nbsp;        fun &lt;T : Any&gt; custom(
-&nbsp;            name: String,
-&nbsp;            default: T,
-&nbsp;            codec: ConfigCodec&lt;T&gt;,
-&nbsp;            sync: Boolean,
-&nbsp;        ): SettingKey&lt;T&gt; = SettingKey(name, default, codec, sync)
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;/**
-&nbsp; * Every key a module owns, contributed to a runtime registry. The debug panel and the
-&nbsp; * remote-config pull both need *all* keys, and keys are `internal` to their owning module, so
-&nbsp; * they cannot see the symbols — they read the registry instead.
-&nbsp; *
-&nbsp; * Bind one class per group to this shared interface (the `SyncEntityPlugin` precedent). Several
-&nbsp; * modules binding a bare `ConfigKeyGroup` would overwrite one another in Koin&#39;s definition index
-&nbsp; * and `getAll()` would return a single surviving group.
-&nbsp; */
-&nbsp;interface ConfigKeyGroup {
-&nbsp;    val keys: List&lt;ConfigKey&lt;*&gt;&gt;
-&nbsp;}
+&nbsp;data class ConfigResolution&lt;T : Any&gt;(
+&nbsp;    val value: T,
+&nbsp;    /** `null` when no layer holds the key and `key.default` won. */
+&nbsp;    val winner: ConfigLayer?,
+&nbsp;    /**
+&nbsp;     * What each layer holds, not what it was allowed to serve. Absent vs undecodable are distinct —
+&nbsp;     * the panel must show which — and a value present in a layer that did not win was either
+&nbsp;     * outranked or refused by the remote opt-in.
+&nbsp;     */
+&nbsp;    val perLayer: Map&lt;ConfigLayer, LayerValue&lt;T&gt;&gt;,
+&nbsp;)
 </code>
 </pre>
 </div>
@@ -169,7 +145,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 22:39</div>
+    <div style="float:right;">generated on 2026-07-28 23:01</div>
 </div>
 </body>
 </html>

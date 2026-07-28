@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > CreateSplitTransactionUseCaseKt</title>
+  <title>MoneySurfer Coverage Report > WithdrawFromGoalUseCase</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,21 +22,89 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.usecase</a>
 </div>
 
-<h1>Coverage Summary for Class: CreateSplitTransactionUseCaseKt (com.georgeci.moneysurfer.domain.usecase)</h1>
+<h1>Coverage Summary for Class: WithdrawFromGoalUseCase (com.georgeci.moneysurfer.domain.usecase)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
 <th class="coverageStat 
 ">
+  Method, %
+</th>
+<th class="coverageStat 
+">
   Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
 </th>
 </tr>
 <tr>
-  <td class="name">CreateSplitTransactionUseCaseKt</td>
+  <td class="name">WithdrawFromGoalUseCase</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
     <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (16/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (69/69)
+  </span>
+</td>
 </tr>
-
+  <tr>
+    <td class="name">WithdrawFromGoalUseCase$invoke$1</td>
+    <td class="coverageStat"/>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (16/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (69/69)
+  </span>
+</td>
+</tr>
 </table>
 
 <br/>
@@ -46,96 +114,45 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.usecase
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.model.Account
-&nbsp;import com.georgeci.moneysurfer.domain.model.Transaction
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryId
+&nbsp;import arrow.core.Either
+&nbsp;import arrow.core.raise.either
+&nbsp;import arrow.core.raise.ensure
+&nbsp;import com.georgeci.moneysurfer.domain.model.GoalContribution
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.GoalId
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.SplitId
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionId
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionStatus
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionType
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.GoalContributionRepository
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.SavingsGoalRepository
 &nbsp;import kotlinx.datetime.LocalDate
 &nbsp;import org.koin.core.annotation.Single
-&nbsp;import kotlin.time.Instant
-&nbsp;
-&nbsp;/** Fewer legs than this is not a split — it is an ordinary transaction, created the ordinary way. */
-&nbsp;private const val MIN_SPLIT_LEGS = 2
 &nbsp;
 &nbsp;/**
-&nbsp; * Writes one receipt as N sibling transactions sharing a [SplitId] — groceries and household
-&nbsp; * chemicals from the same supermarket run, each landing in its own category.
-&nbsp; *
-&nbsp; * Every leg is a complete transaction, so budgets, monthly totals, spend history and the account
-&nbsp; * balance need no split-awareness at all: a leg filed under &quot;Household chemicals&quot; is indistinguishable
-&nbsp; * from an ordinary transaction to all of them. That is the whole reason a split is sibling rows
-&nbsp; * rather than a child allocation table (the other half of the reason is sync: per-entity LWW cannot
-&nbsp; * keep a parent and its children consistent when they are pulled independently). The trade-offs are
-&nbsp; * written up in `docs/plans/split-transaction-across-categories.md`.
-&nbsp; *
-&nbsp; * The invariant this establishes is that the legs of a group differ **only** in category and
-&nbsp; * amount: account, currency, business date, moment and type are the receipt&#39;s, shared by all of
-&nbsp; * them. [UpdateTransactionUseCase] re-establishes it whenever a single leg is later edited through
-&nbsp; * the ordinary edit path, so a group cannot drift into two payments.
+&nbsp; * Takes money back out of a goal. [amount] is passed positive and stored negated —
+&nbsp; * a withdrawal is a contribution with a negative amount, not its own entity.
 &nbsp; */
-&nbsp;@Single
-&nbsp;class CreateSplitTransactionUseCase(
-&nbsp;    private val applyTransactionChange: ApplyTransactionChangeUseCase,
-&nbsp;    private val getCurrentTime: GetCurrentTimeUseCase,
+<b class="fc">&nbsp;@Single</b>
+&nbsp;class WithdrawFromGoalUseCase(
+<b class="fc">&nbsp;    private val goalRepository: SavingsGoalRepository,</b>
+<b class="fc">&nbsp;    private val contributionRepository: GoalContributionRepository,</b>
+<b class="fc">&nbsp;    private val clock: ClockUseCase,</b>
 &nbsp;) {
 &nbsp;
-&nbsp;    /** One allocation of the receipt: where it is filed and how much of the payment it took. */
-&nbsp;    data class Leg(val categoryId: CategoryId?, val money: Money)
-&nbsp;
-&nbsp;    data class Params(
-&nbsp;        val account: Account,
-&nbsp;        val legs: List&lt;Leg&gt;,
-&nbsp;        val note: String,
-&nbsp;        val merchant: String = &quot;&quot;,
-&nbsp;        val tags: List&lt;String&gt; = emptyList(),
-&nbsp;        val operationAt: Instant,
-&nbsp;        val operationDate: LocalDate,
-&nbsp;        val type: TransactionType,
-&nbsp;        val status: TransactionStatus = TransactionStatus.ACTUAL,
-&nbsp;    )
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Returns the legs as written, oldest first — the caller can hand them straight to
-&nbsp;     * [DeleteTransactionUseCase]&#39;s Undo counterpart or assert on them in a test.
-&nbsp;     *
-&nbsp;     * Throws [IllegalArgumentException] on a group that could not be one receipt: fewer than two
-&nbsp;     * legs, or a leg carrying no money. Both are programmer errors — the creation screen keeps its
-&nbsp;     * Save button disabled until neither holds.
-&nbsp;     */
-&nbsp;    suspend operator fun invoke(params: Params): List&lt;Transaction&gt; {
-&nbsp;        require(params.legs.size &gt;= MIN_SPLIT_LEGS) {
-&nbsp;            &quot;A split needs at least $MIN_SPLIT_LEGS legs, got ${params.legs.size}&quot;
-&nbsp;        }
-&nbsp;        require(params.legs.none { it.money.abs().isZero() }) { &quot;A split leg must carry an amount&quot; }
-&nbsp;
-&nbsp;        val now = getCurrentTime()
-&nbsp;        val splitId = SplitId.uuid()
-&nbsp;        val rows = params.legs.map { leg -&gt;
-&nbsp;            Transaction(
-&nbsp;                id = TransactionId.uuid(),
-&nbsp;                workspaceId = params.account.workspaceId,
-&nbsp;                accountId = params.account.id,
-&nbsp;                money = leg.money.abs(),
-&nbsp;                currencyCode = params.account.currencyCode,
-&nbsp;                categoryId = leg.categoryId,
-&nbsp;                note = params.note,
-&nbsp;                merchant = params.merchant,
-&nbsp;                tags = params.tags,
-&nbsp;                operationAt = params.operationAt,
-&nbsp;                operationDate = params.operationDate,
-&nbsp;                type = params.type,
-&nbsp;                status = params.status,
-&nbsp;                createdAt = now,
-&nbsp;                updatedAt = now,
-&nbsp;                splitId = splitId,
-&nbsp;            )
-&nbsp;        }
-&nbsp;        rows.forEach { applyTransactionChange(old = null, new = it) }
-&nbsp;        return rows
+&nbsp;    suspend operator fun invoke(
+&nbsp;        goalId: GoalId,
+&nbsp;        amount: Money,
+&nbsp;        occurredOn: LocalDate,
+<b class="fc">&nbsp;        note: String = &quot;&quot;,</b>
+<b class="fc">&nbsp;    ): Either&lt;GoalActionError, GoalContribution&gt; = either {</b>
+<b class="fc">&nbsp;        ensure(!amount.isNegative()) { GoalActionError.InvalidAmount }</b>
+<b class="fc">&nbsp;        recordContribution(</b>
+<b class="fc">&nbsp;            goalRepository = goalRepository,</b>
+<b class="fc">&nbsp;            contributionRepository = contributionRepository,</b>
+<b class="fc">&nbsp;            clock = clock,</b>
+<b class="fc">&nbsp;            goalId = goalId,</b>
+<b class="fc">&nbsp;            signedAmount = -amount,</b>
+<b class="fc">&nbsp;            occurredOn = occurredOn,</b>
+<b class="fc">&nbsp;            note = note,</b>
+<b class="fc">&nbsp;        )</b>
 &nbsp;    }
 &nbsp;}
 </code>
@@ -161,7 +178,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 22:39</div>
+    <div style="float:right;">generated on 2026-07-28 23:01</div>
 </div>
 </body>
 </html>

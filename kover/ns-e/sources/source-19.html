@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > CategoryDao</title>
+  <title>MoneySurfer Coverage Report > GoalDao</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.data.db.dao</a>
 </div>
 
-<h1>Coverage Summary for Class: CategoryDao (com.georgeci.moneysurfer.data.db.dao)</h1>
+<h1>Coverage Summary for Class: GoalDao (com.georgeci.moneysurfer.data.db.dao)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">CategoryDao</td>
+  <td class="name">GoalDao</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -51,37 +51,38 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import androidx.room.Query
 &nbsp;import androidx.room.Update
 &nbsp;import androidx.room.Upsert
-&nbsp;import com.georgeci.moneysurfer.data.db.entity.CategoryEntity
+&nbsp;import com.georgeci.moneysurfer.data.db.entity.GoalEntity
 &nbsp;import kotlinx.coroutines.flow.Flow
 &nbsp;
 &nbsp;@Dao
-&nbsp;interface CategoryDao {
+&nbsp;interface GoalDao {
 &nbsp;
-&nbsp;    @Query(&quot;SELECT * FROM categories&quot;)
-&nbsp;    fun getAll(): Flow&lt;List&lt;CategoryEntity&gt;&gt;
+&nbsp;    @Query(&quot;SELECT * FROM goals&quot;)
+&nbsp;    fun getAll(): Flow&lt;List&lt;GoalEntity&gt;&gt;
 &nbsp;
-&nbsp;    @Query(&quot;SELECT * FROM categories WHERE workspaceId = :workspaceId&quot;)
-&nbsp;    fun getByWorkspaceId(workspaceId: String): Flow&lt;List&lt;CategoryEntity&gt;&gt;
+&nbsp;    @Query(&quot;SELECT * FROM goals WHERE workspaceId = :workspaceId ORDER BY createdAt DESC&quot;)
+&nbsp;    fun getByWorkspaceId(workspaceId: String): Flow&lt;List&lt;GoalEntity&gt;&gt;
 &nbsp;
-&nbsp;    @Query(&quot;SELECT * FROM categories WHERE id = :id&quot;)
-&nbsp;    suspend fun getById(id: String): CategoryEntity?
+&nbsp;    @Query(&quot;SELECT * FROM goals WHERE id = :id&quot;)
+&nbsp;    suspend fun getById(id: String): GoalEntity?
+&nbsp;
+&nbsp;    /** Emits `null` once the goal is deleted, so the details screen can close itself. */
+&nbsp;    @Query(&quot;SELECT * FROM goals WHERE id = :id&quot;)
+&nbsp;    fun observeById(id: String): Flow&lt;GoalEntity?&gt;
 &nbsp;
 &nbsp;    @Insert
-&nbsp;    suspend fun insert(entity: CategoryEntity)
-&nbsp;
-&nbsp;    @Insert
-&nbsp;    suspend fun insertAll(entities: List&lt;CategoryEntity&gt;)
+&nbsp;    suspend fun insert(entity: GoalEntity)
 &nbsp;
 &nbsp;    @Update
-&nbsp;    suspend fun update(entity: CategoryEntity)
+&nbsp;    suspend fun update(entity: GoalEntity)
 &nbsp;
 &nbsp;    @Upsert
-&nbsp;    suspend fun upsertAll(entities: List&lt;CategoryEntity&gt;)
+&nbsp;    suspend fun upsertAll(entities: List&lt;GoalEntity&gt;)
 &nbsp;
-&nbsp;    @Query(&quot;DELETE FROM categories WHERE id = :id&quot;)
+&nbsp;    @Query(&quot;DELETE FROM goals WHERE id = :id&quot;)
 &nbsp;    suspend fun delete(id: String)
 &nbsp;
-&nbsp;    @Query(&quot;DELETE FROM categories&quot;)
+&nbsp;    @Query(&quot;DELETE FROM goals&quot;)
 &nbsp;    suspend fun deleteAll()
 &nbsp;}
 </code>
@@ -107,7 +108,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 22:39</div>
+    <div style="float:right;">generated on 2026-07-28 23:01</div>
 </div>
 </body>
 </html>

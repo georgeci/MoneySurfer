@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > Crc32Kt</title>
+  <title>MoneySurfer Coverage Report > ZipStoredReaderKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.data.backup.zip</a>
 </div>
 
-<h1>Coverage Summary for Class: Crc32Kt (com.georgeci.moneysurfer.data.backup.zip)</h1>
+<h1>Coverage Summary for Class: ZipStoredReaderKt (com.georgeci.moneysurfer.data.backup.zip)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">Crc32Kt</td>
+  <td class="name">ZipStoredReaderKt</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -46,47 +46,116 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.backup.zip
 &nbsp;
+&nbsp;import com.georgeci.moneysurfer.domain.backup.BackupError
+&nbsp;import okio.Buffer
+&nbsp;import okio.BufferedSink
+&nbsp;import okio.BufferedSource
+&nbsp;
 &nbsp;/**
-&nbsp; * IEEE 802.3 CRC-32 — same polynomial as ZIP / PNG / `java.util.zip.CRC32`.
+&nbsp; * Streaming reader for ZIPs produced by [ZipStoredWriter].
 &nbsp; *
-&nbsp; * Table-based, KMP-native (no `java.util.zip` on iOS).
+&nbsp; * Reads local-file-headers in order and ignores the trailing central directory.
+&nbsp; * Only the STORED method is supported — a non-zero compression method is a
+&nbsp; * hard error.
 &nbsp; */
-&nbsp;internal class Crc32 {
-&nbsp;    private var value: Int = 0.inv()
+&nbsp;internal class ZipStoredReader(private val source: BufferedSource) {
 &nbsp;
-&nbsp;    fun update(buffer: ByteArray, offset: Int = 0, length: Int = buffer.size - offset) {
-&nbsp;        var crc = value
-&nbsp;        val end = offset + length
-&nbsp;        var i = offset
-&nbsp;        while (i &lt; end) {
-&nbsp;            crc = (crc ushr BITS_PER_BYTE) xor TABLE[(crc xor buffer[i].toInt()) and BYTE_MASK]
-&nbsp;            i++
+&nbsp;    /** Reads the next entry&#39;s name. Returns `null` once the central directory is reached. */
+&nbsp;    fun nextEntryName(): String? {
+&nbsp;        if (source.exhausted()) return null
+&nbsp;        val signature = source.readIntLe()
+&nbsp;        if (signature != LOCAL_FILE_HEADER_SIGNATURE) {
+&nbsp;            // Treat anything else (central directory, EOCD) as end of stream.
+&nbsp;            return null
 &nbsp;        }
-&nbsp;        value = crc
+&nbsp;        currentHeader = readLocalFileHeader()
+&nbsp;        return currentHeader?.name
 &nbsp;    }
 &nbsp;
-&nbsp;    fun getValue(): Long = (value.inv().toLong() and MASK_U32)
+&nbsp;    /** Declared size of the most-recent entry, or `null` outside an entry. */
+&nbsp;    val currentEntrySize: Long?
+&nbsp;        get() = currentHeader?.size?.toLong()
 &nbsp;
-&nbsp;    companion object {
-&nbsp;        private val TABLE: IntArray = IntArray(TABLE_SIZE).also { table -&gt;
-&nbsp;            for (n in 0 until TABLE_SIZE) {
-&nbsp;                var c = n
-&nbsp;                repeat(BITS_PER_BYTE) {
-&nbsp;                    c = if (c and 1 != 0) (c ushr 1) xor POLY else c ushr 1
-&nbsp;                }
-&nbsp;                table[n] = c
+&nbsp;    /**
+&nbsp;     * Streams the body of the most-recent entry into [out] and verifies the CRC32.
+&nbsp;     * Throws [BackupError.CrcMismatch] on mismatch.
+&nbsp;     */
+&nbsp;    fun readCurrentEntryTo(out: BufferedSink) {
+&nbsp;        val header = currentHeader ?: error(&quot;nextEntryName() returned null or was not called&quot;)
+&nbsp;        val crc = Crc32()
+&nbsp;        var remaining = header.size
+&nbsp;        val readBuffer = ByteArray(COPY_BUFFER_SIZE)
+&nbsp;        while (remaining &gt; 0) {
+&nbsp;            val toRead = minOf(remaining.toLong(), readBuffer.size.toLong()).toInt()
+&nbsp;            val n = source.read(readBuffer, 0, toRead)
+&nbsp;            if (n == -1) {
+&nbsp;                throw BackupError.InvalidArchive(&quot;Truncated entry: ${header.name}&quot;)
 &nbsp;            }
+&nbsp;            crc.update(readBuffer, length = n)
+&nbsp;            out.write(readBuffer, 0, n)
+&nbsp;            remaining -= n
 &nbsp;        }
+&nbsp;        if (crc.getValue() != header.crc) {
+&nbsp;            throw BackupError.CrcMismatch(header.name)
+&nbsp;        }
+&nbsp;        currentHeader = null
 &nbsp;    }
+&nbsp;
+&nbsp;    /** Reads the current entry into a fresh [Buffer]. */
+&nbsp;    fun readCurrentEntryToBuffer(): Buffer {
+&nbsp;        val buffer = Buffer()
+&nbsp;        readCurrentEntryTo(buffer)
+&nbsp;        return buffer
+&nbsp;    }
+&nbsp;
+&nbsp;    private var currentHeader: LocalEntry? = null
+&nbsp;
+&nbsp;    private fun readLocalFileHeader(): LocalEntry {
+&nbsp;        val versionNeeded = source.readShortLe().toInt() and MASK_U16
+&nbsp;        val flags = source.readShortLe().toInt() and MASK_U16
+&nbsp;        val method = source.readShortLe().toInt() and MASK_U16
+&nbsp;        source.readShortLe()
+&nbsp;        source.readShortLe()
+&nbsp;        val crc = source.readIntLe().toLong() and MASK_U32
+&nbsp;        val compressedSize = source.readIntLe().toLong() and MASK_U32
+&nbsp;        val uncompressedSize = source.readIntLe().toLong() and MASK_U32
+&nbsp;        val nameLength = source.readShortLe().toInt() and MASK_U16
+&nbsp;        val extraLength = source.readShortLe().toInt() and MASK_U16
+&nbsp;
+&nbsp;        val problem = when {
+&nbsp;            method != COMPRESSION_METHOD_STORED -&gt;
+&nbsp;                &quot;Unsupported compression method: $method&quot;
+&nbsp;            flags and GENERAL_PURPOSE_DATA_DESCRIPTOR_FLAG != 0 -&gt;
+&nbsp;                &quot;Data-descriptor entries are not supported&quot;
+&nbsp;            versionNeeded &gt; VERSION_NEEDED_TO_EXTRACT -&gt;
+&nbsp;                &quot;ZIP requires version $versionNeeded&quot;
+&nbsp;            compressedSize != uncompressedSize -&gt;
+&nbsp;                &quot;STORED entry has mismatched sizes&quot;
+&nbsp;            // The codec keeps each entry buffered as a single okio Segment chain,
+&nbsp;            // so anything above Int.MAX_VALUE bytes can&#39;t be addressed in the
+&nbsp;            // ByteArray copy loop and would silently overflow on the cast below.
+&nbsp;            // We don&#39;t ship multi-GB DBs, so reject up front.
+&nbsp;            uncompressedSize &gt; Int.MAX_VALUE.toLong() -&gt;
+&nbsp;                &quot;Entry too large: $uncompressedSize bytes&quot;
+&nbsp;            else -&gt; null
+&nbsp;        }
+&nbsp;        if (problem != null) {
+&nbsp;            throw BackupError.InvalidArchive(problem)
+&nbsp;        }
+&nbsp;
+&nbsp;        val nameBytes = source.readByteArray(nameLength.toLong())
+&nbsp;        val name = nameBytes.decodeToString()
+&nbsp;        if (extraLength &gt; 0) source.skip(extraLength.toLong())
+&nbsp;        return LocalEntry(name = name, size = uncompressedSize.toInt(), crc = crc)
+&nbsp;    }
+&nbsp;
+&nbsp;    private data class LocalEntry(val name: String, val size: Int, val crc: Long)
 &nbsp;}
 &nbsp;
-&nbsp;private const val TABLE_SIZE = 256
-&nbsp;private const val BITS_PER_BYTE = 8
-&nbsp;private const val BYTE_MASK = 0xFF
-&nbsp;private const val MASK_U32 = 0xFFFFFFFFL
-&nbsp;
-&nbsp;@Suppress(&quot;MagicNumber&quot;)
-&nbsp;private const val POLY: Int = 0xEDB88320.toInt()
+&nbsp;private const val GENERAL_PURPOSE_DATA_DESCRIPTOR_FLAG: Int = 1 shl 3
+&nbsp;private const val COPY_BUFFER_SIZE: Int = 64 * 1024
+&nbsp;private const val MASK_U16: Int = 0xFFFF
+&nbsp;private const val MASK_U32: Long = 0xFFFFFFFFL
 </code>
 </pre>
 </div>
@@ -110,7 +179,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 22:39</div>
+    <div style="float:right;">generated on 2026-07-28 23:01</div>
 </div>
 </body>
 </html>

@@ -187,7 +187,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    val hasMixedCurrency: Boolean,
 &nbsp;    /** Workspace base currency, carried along so callers can format without a second lookup. */
 &nbsp;    val currency: CurrencyCode?,
-&nbsp;)
+&nbsp;) {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Spend as a fraction of [effectiveLimit] — what a progress bar is drawn from. Can exceed 1,
+&nbsp;     * which is the overspend; a zero limit reads as 0, never as a NaN.
+&nbsp;     */
+&nbsp;    val spentFraction: Float
+&nbsp;        get() = if (effectiveLimit.minor &lt;= 0L) 0f else spent.minor.toFloat() / effectiveLimit.minor.toFloat()
+&nbsp;}
 &nbsp;
 &nbsp;private const val PERCENT = 100
 &nbsp;private const val WEEKLY_DAYS = 7
@@ -340,7 +348,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 22:39</div>
+    <div style="float:right;">generated on 2026-07-28 23:01</div>
 </div>
 </body>
 </html>

@@ -52,31 +52,31 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (11/11)
+    (12/12)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    61.5%
+    61.4%
   </span>
   <span class="absValue">
-    (32/52)
+    (35/57)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    99.4%
+    99.5%
   </span>
   <span class="absValue">
-    (173/174)
+    (218/219)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    98%
+    98.1%
   </span>
   <span class="absValue">
-    (1555/1587)
+    (1835/1870)
   </span>
 </td>
 </tr>
@@ -91,31 +91,31 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (11/11)
+    (12/12)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    61.5%
+    61.4%
   </span>
   <span class="absValue">
-    (32/52)
+    (35/57)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    99.4%
+    99.5%
   </span>
   <span class="absValue">
-    (173/174)
+    (218/219)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    98%
+    98.1%
   </span>
   <span class="absValue">
-    (1555/1587)
+    (1835/1870)
   </span>
 </td>
 </tr>
@@ -147,6 +147,8 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferBalanceFootnote
 &nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferBalanceVariant
 &nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferBalanceWidget
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferBudgetItem
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferBudgetsWidget
 &nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferBurnRateBar
 &nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferBurnRateData
 &nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferBurnRatePace
@@ -168,6 +170,14 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_add_account
 &nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_add_transaction
 &nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_balance_title
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_budgets_left
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_budgets_over
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_budgets_see_all
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_budgets_spent_of
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_budgets_status_ok
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_budgets_status_over
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_budgets_status_warn
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_budgets_title
 &nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_burn_rate_average
 &nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_burn_rate_caption
 &nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_burn_rate_on_track
@@ -236,6 +246,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;            DashboardWidgetType.QuickActions -&gt; QuickActionsPreview(modifier.then(content))</b>
 <b class="fc">&nbsp;            DashboardWidgetType.SafeToSpend -&gt; SafeToSpendPreview(modifier.then(content))</b>
 <b class="fc">&nbsp;            DashboardWidgetType.BurnRate -&gt; BurnRatePreview(modifier.then(content))</b>
+<b class="fc">&nbsp;            DashboardWidgetType.Budgets -&gt; BudgetsPreview(modifier.then(content))</b>
 <b class="fc">&nbsp;            DashboardWidgetType.Accounts -&gt; AccountsPreview(modifier.then(content))</b>
 <b class="fc">&nbsp;            DashboardWidgetType.Insights -&gt; InsightsPreview(cardStyle.variant, modifier.then(content))</b>
 <b class="fc">&nbsp;            DashboardWidgetType.Goals -&gt; GoalsPreview(modifier.then(content))</b>
@@ -329,6 +340,66 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;                status = SurferBudgetStatus.Ok,</b>
 &nbsp;            ),
 &nbsp;        ),
+<b class="fc">&nbsp;        modifier = modifier,</b>
+&nbsp;    )
+<b class="fc">&nbsp;}</b>
+&nbsp;
+&nbsp;/**
+&nbsp; * Sample budgets rather than the user&#39;s own, for the same reason the safe-to-spend tile uses them:
+&nbsp; * the picker draws every widget, including the ones switched off, so it must not depend on there
+&nbsp; * being a budget to read. The ids are named rather than numbered — nothing reads them back, and
+&nbsp; * repeating &quot;preview-1&quot; across widgets is a duplicated literal for no gain.
+&nbsp; */
+&nbsp;@Composable
+<b class="pc">&nbsp;private fun BudgetsPreview(modifier: Modifier) {</b>
+<b class="fc">&nbsp;    SurferBudgetsWidget(</b>
+<b class="fc">&nbsp;        items = listOf(</b>
+<b class="fc">&nbsp;            SurferBudgetItem(</b>
+<b class="fc">&nbsp;                id = &quot;preview-budget-groceries&quot;,</b>
+<b class="fc">&nbsp;                name = stringResource(Res.string.dashboard_customize_preview_transaction_groceries),</b>
+<b class="fc">&nbsp;                statusLabel = stringResource(Res.string.dashboard_budgets_status_warn),</b>
+<b class="fc">&nbsp;                status = SurferBudgetStatus.Warn,</b>
+<b class="fc">&nbsp;                spentOfLimit = stringResource(</b>
+<b class="fc">&nbsp;                    Res.string.dashboard_budgets_spent_of,</b>
+<b class="fc">&nbsp;                    SAMPLE_BUDGET_SPENT,</b>
+<b class="fc">&nbsp;                    SAMPLE_BUDGET_CAP,</b>
+&nbsp;                ),
+<b class="fc">&nbsp;                remaining = stringResource(Res.string.dashboard_budgets_left, SAMPLE_BUDGET_LEFT),</b>
+<b class="fc">&nbsp;                progress = SAMPLE_BUDGET_PROGRESS,</b>
+<b class="fc">&nbsp;                alertFraction = SAMPLE_BUDGET_ALERT,</b>
+&nbsp;            ),
+<b class="fc">&nbsp;            SurferBudgetItem(</b>
+<b class="fc">&nbsp;                id = &quot;preview-budget-rent&quot;,</b>
+<b class="fc">&nbsp;                name = stringResource(Res.string.dashboard_customize_preview_transaction_rent),</b>
+<b class="fc">&nbsp;                statusLabel = stringResource(Res.string.dashboard_budgets_status_ok),</b>
+<b class="fc">&nbsp;                status = SurferBudgetStatus.Ok,</b>
+<b class="fc">&nbsp;                spentOfLimit = stringResource(</b>
+<b class="fc">&nbsp;                    Res.string.dashboard_budgets_spent_of,</b>
+<b class="fc">&nbsp;                    SAMPLE_RENT_SPENT,</b>
+<b class="fc">&nbsp;                    SAMPLE_RENT_CAP,</b>
+&nbsp;                ),
+<b class="fc">&nbsp;                remaining = stringResource(Res.string.dashboard_budgets_left, SAMPLE_RENT_LEFT),</b>
+<b class="fc">&nbsp;                progress = SAMPLE_RENT_PROGRESS,</b>
+<b class="fc">&nbsp;                alertFraction = SAMPLE_BUDGET_ALERT,</b>
+&nbsp;            ),
+<b class="fc">&nbsp;            SurferBudgetItem(</b>
+<b class="fc">&nbsp;                id = &quot;preview-budget-coffee&quot;,</b>
+<b class="fc">&nbsp;                name = stringResource(Res.string.dashboard_customize_preview_transaction_coffee),</b>
+<b class="fc">&nbsp;                statusLabel = stringResource(Res.string.dashboard_budgets_status_over),</b>
+<b class="fc">&nbsp;                status = SurferBudgetStatus.Over,</b>
+<b class="fc">&nbsp;                spentOfLimit = stringResource(</b>
+<b class="fc">&nbsp;                    Res.string.dashboard_budgets_spent_of,</b>
+<b class="fc">&nbsp;                    SAMPLE_COFFEE_SPENT,</b>
+<b class="fc">&nbsp;                    SAMPLE_COFFEE_CAP,</b>
+&nbsp;                ),
+<b class="fc">&nbsp;                remaining = stringResource(Res.string.dashboard_budgets_over, SAMPLE_COFFEE_OVER),</b>
+<b class="fc">&nbsp;                progress = SAMPLE_COFFEE_PROGRESS,</b>
+<b class="fc">&nbsp;                alertFraction = SAMPLE_BUDGET_ALERT,</b>
+&nbsp;            ),
+&nbsp;        ),
+<b class="fc">&nbsp;        title = stringResource(Res.string.dashboard_budgets_title),</b>
+<b class="fc">&nbsp;        seeAllLabel = stringResource(Res.string.dashboard_budgets_see_all),</b>
+<b class="fc">&nbsp;        onSeeAllClick = {},</b>
 <b class="fc">&nbsp;        modifier = modifier,</b>
 &nbsp;    )
 <b class="fc">&nbsp;}</b>
@@ -486,6 +557,19 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;private const val SAMPLE_BURN_PROJECTION = &quot;€1,263&quot;
 &nbsp;private const val SAMPLE_BURN_FIRST_DAY = 22
 <b class="fc">&nbsp;private val SAMPLE_BURN_FRACTIONS = listOf(0.42f, 0.18f, 1f, 0f, 0.63f, 0.31f, 0.24f)</b>
+&nbsp;private const val SAMPLE_BUDGET_SPENT = &quot;€312.40&quot;
+&nbsp;private const val SAMPLE_BUDGET_CAP = &quot;€400.00&quot;
+&nbsp;private const val SAMPLE_BUDGET_LEFT = &quot;€87.60&quot;
+&nbsp;private const val SAMPLE_BUDGET_PROGRESS = 0.78f
+&nbsp;private const val SAMPLE_BUDGET_ALERT = 0.8f
+&nbsp;private const val SAMPLE_RENT_SPENT = &quot;€760.00&quot;
+&nbsp;private const val SAMPLE_RENT_CAP = &quot;€1,200.00&quot;
+&nbsp;private const val SAMPLE_RENT_LEFT = &quot;€440.00&quot;
+&nbsp;private const val SAMPLE_RENT_PROGRESS = 0.63f
+&nbsp;private const val SAMPLE_COFFEE_SPENT = &quot;€68.40&quot;
+&nbsp;private const val SAMPLE_COFFEE_CAP = &quot;€60.00&quot;
+&nbsp;private const val SAMPLE_COFFEE_OVER = &quot;€8.40&quot;
+&nbsp;private const val SAMPLE_COFFEE_PROGRESS = 1.14f
 </code>
 </pre>
 </div>
@@ -509,7 +593,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 22:39</div>
+    <div style="float:right;">generated on 2026-07-28 23:01</div>
 </div>
 </body>
 </html>

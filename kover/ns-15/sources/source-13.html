@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > UserCollectionReader</title>
+  <title>MoneySurfer Coverage Report > WorkspaceCollectionReader</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.data.sync</a>
 </div>
 
-<h1>Coverage Summary for Class: UserCollectionReader (com.georgeci.moneysurfer.data.sync)</h1>
+<h1>Coverage Summary for Class: WorkspaceCollectionReader (com.georgeci.moneysurfer.data.sync)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">UserCollectionReader</td>
+  <td class="name">WorkspaceCollectionReader</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -48,27 +48,34 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;
 &nbsp;import com.georgeci.moneysurfer.sync.plugin.RemoteDocument
 &nbsp;
-&nbsp;/**
-&nbsp; * Reads a collection under `users/{uid}` — the user-scoped counterpart of
-&nbsp; * [WorkspaceCollectionReader].
-&nbsp; *
-&nbsp; * Deliberately whole-collection and cursorless, unlike every workspace read. The one collection
-&nbsp; * behind it (`config`) is about ten tiny documents and is not expected to grow much, so incremental
-&nbsp; * reads would buy nothing but cursor bookkeeping in a brand-new scope — and the Firestore rule then
-&nbsp; * only has to permit a bare `list` rather than prove a filtered, ordered query.
-&nbsp; *
-&nbsp; * &quot;Not expected to grow much&quot; is an expectation, not a guarantee, which is why [limit] is not
-&nbsp; * optional. Nothing prunes these documents: the config plugin stores keys it does not recognise so
-&nbsp; * a mixed-version pair of devices cannot lose each other&#39;s settings, and no code path deletes one
-&nbsp; * outside the account-deletion purge — so every renamed or retired `SettingKey` leaves an orphan
-&nbsp; * behind for good. Uncapped, a collection that grew through that drift (or a client bug, or a
-&nbsp; * compromised device) would be materialised whole into memory and re-applied to Room on every
-&nbsp; * foreground sync, on every one of the user&#39;s devices.
-&nbsp; */
-&nbsp;fun interface UserCollectionReader {
+&nbsp;interface WorkspaceCollectionReader {
+&nbsp;    /**
+&nbsp;     * Fetches the workspace root document (`/workspaces/{workspaceId}`).
+&nbsp;     * Returns null if the document does not exist or the caller lacks access.
+&nbsp;     * Used by [PullRemoteChangesUseCaseImpl] to hydrate the local [WorkspaceEntity]
+&nbsp;     * before subcollection pulls (accounts / categories / transactions all have a
+&nbsp;     * Room FK on `workspaceId`).
+&nbsp;     */
+&nbsp;    suspend fun fetchWorkspaceDoc(workspaceId: String): RemoteDocument?
 &nbsp;
-&nbsp;    /** At most [limit] documents. The caller decides what to do when the cap is reached. */
-&nbsp;    suspend fun fetchAll(uid: String, collectionName: String, limit: Int): List&lt;RemoteDocument&gt;
+&nbsp;    suspend fun fetchUpdatedSince(
+&nbsp;        workspaceId: String,
+&nbsp;        collectionName: String,
+&nbsp;        sinceMillis: Long,
+&nbsp;        limit: Int,
+&nbsp;    ): List&lt;RemoteDocument&gt;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Fetches invite documents from a workspace the caller has been invited to but
+&nbsp;     * has not yet joined. Adds a `targetUserId == uid` constraint so the query
+&nbsp;     * satisfies Firestore rules for non-members (see firestore.rules §invites).
+&nbsp;     */
+&nbsp;    suspend fun fetchInvitesForUser(
+&nbsp;        workspaceId: String,
+&nbsp;        uid: String,
+&nbsp;        sinceMillis: Long,
+&nbsp;        limit: Int,
+&nbsp;    ): List&lt;RemoteDocument&gt;
 &nbsp;}
 </code>
 </pre>
@@ -93,7 +100,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 22:39</div>
+    <div style="float:right;">generated on 2026-07-28 23:01</div>
 </div>
 </body>
 </html>

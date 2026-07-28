@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > RestoreAccountUseCase</title>
+  <title>MoneySurfer Coverage Report > ReorderAccountsUseCase</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.usecase</a>
 </div>
 
-<h1>Coverage Summary for Class: RestoreAccountUseCase (com.georgeci.moneysurfer.domain.usecase)</h1>
+<h1>Coverage Summary for Class: ReorderAccountsUseCase (com.georgeci.moneysurfer.domain.usecase)</h1>
 
 <table class="coverageStats">
 
@@ -46,7 +46,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">RestoreAccountUseCase</td>
+  <td class="name">ReorderAccountsUseCase</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -55,12 +55,13 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     (2/2)
   </span>
 </td>
+    <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    75%
+    100%
   </span>
   <span class="absValue">
-    (3/4)
+    (4/4)
   </span>
 </td>
 <td class="coverageStat">
@@ -68,20 +69,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (9/9)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    94.9%
-  </span>
-  <span class="absValue">
-    (166/175)
+    (37/37)
   </span>
 </td>
 </tr>
   <tr>
-    <td class="name">RestoreAccountUseCase$invoke$1</td>
+    <td class="name">ReorderAccountsUseCase$invoke$1</td>
     <td class="coverageStat"/>
   </tr>
 <tr>
@@ -94,12 +87,13 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     (2/2)
   </span>
 </td>
+    <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    75%
+    100%
   </span>
   <span class="absValue">
-    (3/4)
+    (4/4)
   </span>
 </td>
 <td class="coverageStat">
@@ -107,15 +101,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (9/9)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    94.9%
-  </span>
-  <span class="absValue">
-    (166/175)
+    (37/37)
   </span>
 </td>
 </tr>
@@ -129,25 +115,22 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.usecase
 &nbsp;
 &nbsp;import arrow.core.Either
-&nbsp;import arrow.core.raise.either
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.AccountId
 &nbsp;import com.georgeci.moneysurfer.domain.repositories.AccountRepository
 &nbsp;import org.koin.core.annotation.Single
 &nbsp;
 &nbsp;/**
-&nbsp; * Reverses [ArchiveAccountUseCase] — moves the account back to the active list.
+&nbsp; * Persists the order the user dragged the accounts into. [orderedIds] is the full list of the
+&nbsp; * accounts being ordered, first to last; the repository turns it into `sortOrder` values and
+&nbsp; * syncs the rows that moved.
 &nbsp; */
 <b class="fc">&nbsp;@Single</b>
-&nbsp;class RestoreAccountUseCase(
+&nbsp;class ReorderAccountsUseCase(
 <b class="fc">&nbsp;    private val accountRepository: AccountRepository,</b>
 &nbsp;) {
-<b class="fc">&nbsp;    suspend operator fun invoke(id: AccountId): Either&lt;AccountActionError, Unit&gt; = either {</b>
-<b class="pc">&nbsp;        val existing = accountRepository.getById(id) ?: raise(AccountActionError.AccountNotFound)</b>
-<b class="fc">&nbsp;        if (!existing.archived) return@either</b>
-<b class="fc">&nbsp;        Either.catch { accountRepository.setArchived(id, archived = false) }</b>
+&nbsp;    suspend operator fun invoke(orderedIds: List&lt;AccountId&gt;): Either&lt;AccountActionError, Unit&gt; =
+<b class="fc">&nbsp;        Either.catch { accountRepository.reorder(orderedIds) }</b>
 <b class="fc">&nbsp;            .mapLeft { AccountActionError.LocalWriteFailed(it) }</b>
-<b class="fc">&nbsp;            .bind()</b>
-<b class="fc">&nbsp;    }</b>
 &nbsp;}
 </code>
 </pre>
@@ -172,7 +155,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 22:39</div>
+    <div style="float:right;">generated on 2026-07-28 23:01</div>
 </div>
 </body>
 </html>

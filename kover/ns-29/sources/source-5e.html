@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > WithdrawFromGoalUseCase</title>
+  <title>MoneySurfer Coverage Report > WipeDemoDataUseCase</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.usecase</a>
 </div>
 
-<h1>Coverage Summary for Class: WithdrawFromGoalUseCase (com.georgeci.moneysurfer.domain.usecase)</h1>
+<h1>Coverage Summary for Class: WipeDemoDataUseCase (com.georgeci.moneysurfer.domain.usecase)</h1>
 
 <table class="coverageStats">
 
@@ -46,22 +46,13 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">WithdrawFromGoalUseCase</td>
+  <td class="name">WipeDemoDataUseCase</td>
 <td class="coverageStat">
   <span class="percent">
     100%
   </span>
   <span class="absValue">
-    (3/3)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (16/16)
+    (2/2)
   </span>
 </td>
 <td class="coverageStat">
@@ -69,12 +60,28 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (69/69)
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (7/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (48/48)
   </span>
 </td>
 </tr>
   <tr>
-    <td class="name">WithdrawFromGoalUseCase$invoke$1</td>
+    <td class="name">WipeDemoDataUseCase$invoke$1</td>
     <td class="coverageStat"/>
   </tr>
 <tr>
@@ -84,16 +91,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (3/3)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (16/16)
+    (2/2)
   </span>
 </td>
 <td class="coverageStat">
@@ -101,7 +99,23 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (69/69)
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (7/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (48/48)
   </span>
 </td>
 </tr>
@@ -114,45 +128,35 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.usecase
 &nbsp;
-&nbsp;import arrow.core.Either
-&nbsp;import arrow.core.raise.either
-&nbsp;import arrow.core.raise.ensure
-&nbsp;import com.georgeci.moneysurfer.domain.model.GoalContribution
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.GoalId
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
-&nbsp;import com.georgeci.moneysurfer.domain.repositories.GoalContributionRepository
-&nbsp;import com.georgeci.moneysurfer.domain.repositories.SavingsGoalRepository
-&nbsp;import kotlinx.datetime.LocalDate
+&nbsp;import com.georgeci.moneysurfer.domain.auth.SessionMutator
+&nbsp;import com.georgeci.moneysurfer.domain.auth.SessionPointers
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.LocalDataResetRepository
+&nbsp;import kotlinx.coroutines.flow.first
 &nbsp;import org.koin.core.annotation.Single
 &nbsp;
 &nbsp;/**
-&nbsp; * Takes money back out of a goal. [amount] is passed positive and stored negated —
-&nbsp; * a withdrawal is a contribution with a negative amount, not its own entity.
+&nbsp; * Drops all locally-stored data accumulated during a demo session.
+&nbsp; *
+&nbsp; * Invoked by real-auth use cases ([LoginUseCase] / [SignupUseCase] /
+&nbsp; * [AnonymousLoginUseCase]) **after** Firebase auth succeeds and **before**
+&nbsp; * `PostAuthBootstrapUseCase` so the real session starts on a clean slate.
+&nbsp; *
+&nbsp; * No-op when `hasUsedDemo` flag is unset — keeps repeated login flows cheap.
+&nbsp; *
+&nbsp; * Demo data is intentionally never pushed to Firestore (the outbox guard in
+&nbsp; * `OutboxEnqueuer` blocks enqueue without a Firebase uid), so the wipe here
+&nbsp; * has no remote-cleanup counterpart. See sync.md §2.11.
 &nbsp; */
 <b class="fc">&nbsp;@Single</b>
-&nbsp;class WithdrawFromGoalUseCase(
-<b class="fc">&nbsp;    private val goalRepository: SavingsGoalRepository,</b>
-<b class="fc">&nbsp;    private val contributionRepository: GoalContributionRepository,</b>
-<b class="fc">&nbsp;    private val clock: ClockUseCase,</b>
+&nbsp;class WipeDemoDataUseCase(
+<b class="fc">&nbsp;    private val localDataResetRepository: LocalDataResetRepository,</b>
+<b class="fc">&nbsp;    private val session: SessionPointers,</b>
+<b class="fc">&nbsp;    private val sessionMutator: SessionMutator,</b>
 &nbsp;) {
-&nbsp;
-&nbsp;    suspend operator fun invoke(
-&nbsp;        goalId: GoalId,
-&nbsp;        amount: Money,
-&nbsp;        occurredOn: LocalDate,
-<b class="fc">&nbsp;        note: String = &quot;&quot;,</b>
-<b class="fc">&nbsp;    ): Either&lt;GoalActionError, GoalContribution&gt; = either {</b>
-<b class="fc">&nbsp;        ensure(!amount.isNegative()) { GoalActionError.InvalidAmount }</b>
-<b class="fc">&nbsp;        recordContribution(</b>
-<b class="fc">&nbsp;            goalRepository = goalRepository,</b>
-<b class="fc">&nbsp;            contributionRepository = contributionRepository,</b>
-<b class="fc">&nbsp;            clock = clock,</b>
-<b class="fc">&nbsp;            goalId = goalId,</b>
-<b class="fc">&nbsp;            signedAmount = -amount,</b>
-<b class="fc">&nbsp;            occurredOn = occurredOn,</b>
-<b class="fc">&nbsp;            note = note,</b>
-<b class="fc">&nbsp;        )</b>
+&nbsp;    suspend operator fun invoke() {
+<b class="fc">&nbsp;        if (!session.hasUsedDemo.first()) return</b>
+<b class="fc">&nbsp;        localDataResetRepository.clearAll()</b>
+<b class="fc">&nbsp;        sessionMutator.setHasUsedDemo(false)</b>
 &nbsp;    }
 &nbsp;}
 </code>
@@ -178,7 +182,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 22:39</div>
+    <div style="float:right;">generated on 2026-07-28 23:01</div>
 </div>
 </body>
 </html>

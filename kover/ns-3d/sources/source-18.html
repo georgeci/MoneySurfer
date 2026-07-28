@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > InsightUi</title>
+  <title>MoneySurfer Coverage Report > GoalUi</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.feature.dashboard</a>
 </div>
 
-<h1>Coverage Summary for Class: InsightUi (com.georgeci.moneysurfer.feature.dashboard)</h1>
+<h1>Coverage Summary for Class: GoalUi (com.georgeci.moneysurfer.feature.dashboard)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">InsightUi</td>
+  <td class="name">GoalUi</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -72,7 +72,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (8/8)
+    (6/6)
   </span>
 </td>
 <td class="coverageStat">
@@ -80,7 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (50/50)
+    (27/27)
   </span>
 </td>
 </tr>
@@ -103,6 +103,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.domain.insight.InsightTone
 &nbsp;import com.georgeci.moneysurfer.domain.insight.SpendTrend
 &nbsp;import com.georgeci.moneysurfer.domain.model.Account
+&nbsp;import com.georgeci.moneysurfer.domain.model.BudgetProgress
 &nbsp;import com.georgeci.moneysurfer.domain.model.BudgetStatus
 &nbsp;import com.georgeci.moneysurfer.domain.model.BurnRate
 &nbsp;import com.georgeci.moneysurfer.domain.model.BurnRatePace
@@ -111,8 +112,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.domain.model.SafeToSpend
 &nbsp;import com.georgeci.moneysurfer.domain.model.SavingsGoalSummary
 &nbsp;import com.georgeci.moneysurfer.domain.model.TransactionSplitGroup
+&nbsp;import com.georgeci.moneysurfer.domain.model.safeToSpend
 &nbsp;import com.georgeci.moneysurfer.domain.preferences.UiPreferences
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.AccountId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.BudgetId
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.GoalId
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionId
@@ -120,6 +123,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.domain.usecase.ConvertAccountsTotalUseCase
 &nbsp;import com.georgeci.moneysurfer.domain.usecase.GenerateInsightsUseCase
 &nbsp;import com.georgeci.moneysurfer.domain.usecase.GetAccountsUseCase
+&nbsp;import com.georgeci.moneysurfer.domain.usecase.GetActiveBudgetProgressUseCase
 &nbsp;import com.georgeci.moneysurfer.domain.usecase.GetBurnRateUseCase
 &nbsp;import com.georgeci.moneysurfer.domain.usecase.GetExchangeRatesUseCase
 &nbsp;import com.georgeci.moneysurfer.domain.usecase.GetGoalsUseCase
@@ -147,6 +151,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    private val getGoals: GetGoalsUseCase,
 &nbsp;    private val getExchangeRates: GetExchangeRatesUseCase,
 &nbsp;    private val getSafeToSpend: GetSafeToSpendUseCase,
+&nbsp;    private val getActiveBudgetProgress: GetActiveBudgetProgressUseCase,
 &nbsp;    private val getBurnRate: GetBurnRateUseCase,
 &nbsp;    private val generateInsights: GenerateInsightsUseCase,
 &nbsp;    private val convertAccountsTotal: ConvertAccountsTotalUseCase,
@@ -187,7 +192,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    }
 &nbsp;
 &nbsp;    private fun observeDashboard() {
-&nbsp;        // The layout, the period and the two budget-shaped widgets are folded into one source
+&nbsp;        // The layout, the period and the three budget-shaped widgets are folded into one source
 &nbsp;        // because `combine` tops out at five typed flows, and these are never read apart.
 &nbsp;        //
 &nbsp;        // The period reaches safe-to-spend as a flow, not as this combine&#39;s value: `getSafeToSpend`
@@ -199,6 +204,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;            layout,
 &nbsp;            period,
 &nbsp;            getSafeToSpend(period.map { it.budgetPeriod }).onStart { emit(null) },
+&nbsp;            // The budgets card lists what safe-to-spend picks one of. It reads the progress list
+&nbsp;            // itself rather than the headline, and takes no period: a budget owns its own window,
+&nbsp;            // so the switch cannot reshape which caps the user is tracking.
+&nbsp;            getActiveBudgetProgress().onStart { emit(emptyList()) },
 &nbsp;            // Burn rate takes no period: it projects to month-end off a fixed seven-day chart.
 &nbsp;            // See `DashboardWidgetType.BurnRate` for why that is a scoping call, not an omission.
 &nbsp;            getBurnRate().onStart { emit(null) },
@@ -211,7 +220,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;                getGoals(),
 &nbsp;                getExchangeRates().onStart { emit(null) },
 &nbsp;                widgetSources,
-&nbsp;                // Read by name rather than destructured: at four members the positional form is
+&nbsp;                // Read by name rather than destructured: at five members the positional form is
 &nbsp;                // one reordered field away from a silent swap, and detekt caps it at three.
 &nbsp;            ) { accounts, transactions, goals, rates, widgets -&gt;
 &nbsp;                val balance = accounts.convertedTotal(rates)?.toBalanceUi()
@@ -230,6 +239,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;                    formattedTrendDelta = null,
 &nbsp;                    goals = goals.take(DASHBOARD_GOALS_LIMIT).map { it.toUi() },
 &nbsp;                    safeToSpend = widgets.safeToSpend?.toUi(),
+&nbsp;                    budgets = widgets.budgetProgress.toBudgetsUi(),
 &nbsp;                    burnRate = widgets.burnRate?.toUi(),
 &nbsp;                    isOffline = isOffline,
 &nbsp;                    transferEnabled = transferEnabled,
@@ -306,6 +316,39 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;        paceFraction = elapsedFraction,
 &nbsp;        status = status,
 &nbsp;    )
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The budgets the widget lists, most pressing first: spend against the limit, descending, with
+&nbsp;     * ties broken by budget id so two equally-spent budgets keep a stable order across emissions.
+&nbsp;     * A budget the user is closest to blowing is the one worth the row — the rest are a tap away on
+&nbsp;     * the budgets screen.
+&nbsp;     *
+&nbsp;     * Progress carrying no base currency is dropped rather than formatted against a guess: the
+&nbsp;     * workspace row can be missing behind its budgets for a moment after a pull, and
+&nbsp;     * `MoneyFormatter` is backed by `java.util.Currency`, which rejects anything but an ISO code.
+&nbsp;     */
+&nbsp;    private fun List&lt;BudgetProgress&gt;.toBudgetsUi(): List&lt;BudgetSummaryUi&gt; =
+&nbsp;        sortedWith(compareByDescending&lt;BudgetProgress&gt; { it.spentFraction }.thenBy { it.budget.id.value })
+&nbsp;            // Lazily, so a workspace with thirty budgets formats money for the three rows the card
+&nbsp;            // draws rather than for all thirty on every transaction change.
+&nbsp;            .asSequence()
+&nbsp;            .mapNotNull { it.toUiOrNull() }
+&nbsp;            .take(DASHBOARD_BUDGETS_LIMIT)
+&nbsp;            .toList()
+&nbsp;
+&nbsp;    private fun BudgetProgress.toUiOrNull(): BudgetSummaryUi? {
+&nbsp;        val currency = currency ?: return null
+&nbsp;        return BudgetSummaryUi(
+&nbsp;            id = budget.id,
+&nbsp;            name = budget.name,
+&nbsp;            spentFormatted = MoneyFormatter.format(spent, currency),
+&nbsp;            limitFormatted = MoneyFormatter.format(effectiveLimit, currency),
+&nbsp;            remainderFormatted = MoneyFormatter.format(remaining.abs(), currency),
+&nbsp;            progress = spentFraction,
+&nbsp;            alertFraction = budget.alertPercent / PERCENT,
+&nbsp;            status = status,
+&nbsp;        )
+&nbsp;    }
 &nbsp;
 &nbsp;    /**
 &nbsp;     * The chart&#39;s bars carry no money of their own: a currency printed seven times over a 64dp-tall
@@ -419,6 +462,8 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;        val goals: List&lt;GoalUi&gt; = emptyList(),
 &nbsp;        /** What is still safe to spend this period, or null while no active budget backs a number. */
 &nbsp;        val safeToSpend: SafeToSpendUi? = null,
+&nbsp;        /** The active budgets worth a row, most pressing first — empty when none are tracked. */
+&nbsp;        val budgets: List&lt;BudgetSummaryUi&gt; = emptyList(),
 &nbsp;        /**
 &nbsp;         * The week&#39;s spend pace and where the month lands at it, or null while no workspace backs a
 &nbsp;         * series. Unlike [safeToSpend] this one does not need a budget — a null pace inside it is
@@ -468,6 +513,8 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    val layout: DashboardLayoutConfig,
 &nbsp;    val period: DashboardPeriod,
 &nbsp;    val safeToSpend: SafeToSpend?,
+&nbsp;    /** Every active budget&#39;s progress — the rows the budgets card draws. */
+&nbsp;    val budgetProgress: List&lt;BudgetProgress&gt;,
 &nbsp;    val burnRate: BurnRate?,
 &nbsp;)
 &nbsp;
@@ -485,12 +532,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    val currency: String,
 &nbsp;)
 &nbsp;
-&nbsp;data class GoalUi(
-&nbsp;    val id: GoalId,
-&nbsp;    val name: String,
-&nbsp;    val formattedSaved: String,
-&nbsp;    val formattedTarget: String,
-&nbsp;    val progress: Float,
+<b class="fc">&nbsp;data class GoalUi(</b>
+<b class="fc">&nbsp;    val id: GoalId,</b>
+<b class="fc">&nbsp;    val name: String,</b>
+<b class="fc">&nbsp;    val formattedSaved: String,</b>
+<b class="fc">&nbsp;    val formattedTarget: String,</b>
+<b class="fc">&nbsp;    val progress: Float,</b>
 &nbsp;)
 &nbsp;
 &nbsp;/**
@@ -516,19 +563,19 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp; * does not use keep their defaults and never reach its copy.
 &nbsp; */
 &nbsp;data class InsightUi(
-<b class="fc">&nbsp;    val id: String,</b>
-<b class="fc">&nbsp;    val kind: InsightKind,</b>
-<b class="fc">&nbsp;    val tone: InsightTone,</b>
+&nbsp;    val id: String,
+&nbsp;    val kind: InsightKind,
+&nbsp;    val tone: InsightTone,
 &nbsp;    /** Category name for the two category kinds; null for the uncategorized bucket. */
-<b class="fc">&nbsp;    val label: String? = null,</b>
+&nbsp;    val label: String? = null,
 &nbsp;    /** The headline amount — this period&#39;s spend, or the monthly subscription total. */
-<b class="fc">&nbsp;    val amount: String = &quot;&quot;,</b>
+&nbsp;    val amount: String = &quot;&quot;,
 &nbsp;    /** The same-stretch figure from the previous period. Unused by [InsightKind.Subscriptions]. */
-<b class="fc">&nbsp;    val comparison: String = &quot;&quot;,</b>
+&nbsp;    val comparison: String = &quot;&quot;,
 &nbsp;    /** Magnitude of the change in whole percent. Zero for the kinds that compare nothing. */
-<b class="fc">&nbsp;    val percent: Int = 0,</b>
+&nbsp;    val percent: Int = 0,
 &nbsp;    /** Active subscription count. Zero for every kind but [InsightKind.Subscriptions]. */
-<b class="fc">&nbsp;    val count: Int = 0,</b>
+&nbsp;    val count: Int = 0,
 &nbsp;)
 &nbsp;
 &nbsp;/**
@@ -547,6 +594,28 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    val progress: Float,
 &nbsp;    /** How much of the period has gone — the tick [progress] is read against. */
 &nbsp;    val paceFraction: Float,
+&nbsp;    val status: BudgetStatus,
+&nbsp;) {
+&nbsp;    /** Derived rather than stored, so the wording and the colour can never disagree. */
+&nbsp;    val isOver: Boolean get() = status == BudgetStatus.OVER
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * One budget row of the budgets widget. Money is formatted here; the sentences around it — the
+&nbsp; * status word, &quot;left&quot; against &quot;over&quot; — are built on the screen, which is where the strings are.
+&nbsp; */
+&nbsp;data class BudgetSummaryUi(
+&nbsp;    val id: BudgetId,
+&nbsp;    val name: String,
+&nbsp;    val spentFormatted: String,
+&nbsp;    /** The budget amount plus any rollover carry — what the spend is measured against. */
+&nbsp;    val limitFormatted: String,
+&nbsp;    /** Always positive — the sign lives in [isOver], which picks the wording. */
+&nbsp;    val remainderFormatted: String,
+&nbsp;    /** Spend against the limit; can exceed 1, which the bar caps rather than overdraws. */
+&nbsp;    val progress: Float,
+&nbsp;    /** Where this budget&#39;s alert threshold sits — the tick [progress] is read against. */
+&nbsp;    val alertFraction: Float,
 &nbsp;    val status: BudgetStatus,
 &nbsp;) {
 &nbsp;    /** Derived rather than stored, so the wording and the colour can never disagree. */
@@ -607,10 +676,13 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp; * test, and lands the user on the wrong screen — so it has to be drivable by a plain spec with no
 &nbsp; * view model to build. Between the two tables, event → effect → destination is covered end to end.
 &nbsp; *
-&nbsp; * Split out of `onEvent` because the dashboard is a hub: thirteen of its fourteen events do nothing
-&nbsp; * but name a destination, and leaving them inline left the one event that *changes this screen* as
-&nbsp; * the fourteenth line of a list that reads as boilerplate.
+&nbsp; * Split out of `onEvent` because the dashboard is a hub: all but one of its events do nothing but
+&nbsp; * name a destination, and leaving them inline left the one event that *changes this screen* as the
+&nbsp; * last line of a list that reads as boilerplate.
 &nbsp; */
+&nbsp;// The table&#39;s &quot;complexity&quot; is the number of places the dashboard can reach, not tangled logic —
+&nbsp;// every branch is one destination. Same call as `SettingsScreen` and `DashboardNavigation.navigate`.
+&nbsp;@Suppress(&quot;CyclomaticComplexMethod&quot;)
 &nbsp;internal fun DashboardEvent.Navigate.destination(): DashboardEffect = when (this) {
 &nbsp;    is DashboardEvent.OnAccountClick -&gt; DashboardEffect.NavigateToAccountDetails(accountId)
 &nbsp;    is DashboardEvent.OnTransactionClick -&gt; DashboardEffect.NavigateToTransactionDetails(transactionId)
@@ -626,6 +698,8 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    DashboardEvent.OnSeeAllGoalsClick -&gt; DashboardEffect.NavigateToGoals
 &nbsp;    is DashboardEvent.OnGoalClick -&gt; DashboardEffect.NavigateToGoalDetails(goalId)
 &nbsp;    DashboardEvent.OnSetBudgetClick -&gt; DashboardEffect.NavigateToBudgetCreation
+&nbsp;    DashboardEvent.OnSeeAllBudgetsClick -&gt; DashboardEffect.NavigateToBudgets
+&nbsp;    is DashboardEvent.OnBudgetClick -&gt; DashboardEffect.NavigateToBudgetDetails(budgetId)
 &nbsp;}
 &nbsp;
 &nbsp;sealed interface DashboardEvent {
@@ -651,6 +725,8 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    data object OnSeeAllGoalsClick : Navigate
 &nbsp;    data class OnGoalClick(val goalId: GoalId) : Navigate
 &nbsp;    data object OnSetBudgetClick : Navigate
+&nbsp;    data object OnSeeAllBudgetsClick : Navigate
+&nbsp;    data class OnBudgetClick(val budgetId: BudgetId) : Navigate
 &nbsp;
 &nbsp;    /** The Week/Month switch. Affects the screen only — nothing about it is written to disk. */
 &nbsp;    data class OnPeriodChange(val period: DashboardPeriod) : DashboardEvent
@@ -673,12 +749,20 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;
 &nbsp;    /** The budget editor, opened empty — the way out of the safe-to-spend widget&#39;s empty state. */
 &nbsp;    data object NavigateToBudgetCreation : DashboardEffect
+&nbsp;    data object NavigateToBudgets : DashboardEffect
+&nbsp;    data class NavigateToBudgetDetails(val budgetId: BudgetId) : DashboardEffect
 &nbsp;}
 &nbsp;
 &nbsp;private const val RECENT_TRANSACTIONS_LIMIT = 5
 &nbsp;
 &nbsp;/** The widget shows two rows at most; reading more of the list would be wasted work. */
 &nbsp;private const val DASHBOARD_GOALS_LIMIT = 2
+&nbsp;
+&nbsp;/** Three rows is what the full-size budgets card draws; the compact one keeps the first. */
+&nbsp;private const val DASHBOARD_BUDGETS_LIMIT = 3
+&nbsp;
+&nbsp;/** Alert thresholds are stored as whole percents; the bar wants a fraction. */
+&nbsp;private const val PERCENT = 100f
 </code>
 </pre>
 </div>
@@ -702,7 +786,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 22:39</div>
+    <div style="float:right;">generated on 2026-07-28 23:01</div>
 </div>
 </body>
 </html>

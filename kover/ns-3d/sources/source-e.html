@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > DashboardSafeToSpendWidgetKt</title>
+  <title>MoneySurfer Coverage Report > DashboardNavigationKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,12 +22,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.feature.dashboard</a>
 </div>
 
-<h1>Coverage Summary for Class: DashboardSafeToSpendWidgetKt (com.georgeci.moneysurfer.feature.dashboard)</h1>
+<h1>Coverage Summary for Class: DashboardNavigationKt (com.georgeci.moneysurfer.feature.dashboard)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -46,79 +49,49 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">DashboardSafeToSpendWidgetKt</td>
+  <td class="name">DashboardNavigationKt</td>
 <td class="coverageStat">
   <span class="percent">
     100%
   </span>
   <span class="absValue">
-    (3/3)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    60%
+    50%
   </span>
   <span class="absValue">
-    (9/15)
+    (1/2)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    82.4%
   </span>
   <span class="absValue">
-    (38/38)
+    (28/34)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    98%
+    83.3%
   </span>
   <span class="absValue">
-    (339/346)
+    (15/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    54.4%
+  </span>
+  <span class="absValue">
+    (143/263)
   </span>
 </td>
 </tr>
-  <tr>
-    <td class="name">DashboardSafeToSpendWidgetKt$WhenMappings</td>
-    <td class="coverageStat"/>
-  </tr>
-<tr>
-  <td class="name"><strong>Total</strong></td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (3/3)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    60%
-  </span>
-  <span class="absValue">
-    (9/15)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (38/38)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    98%
-  </span>
-  <span class="absValue">
-    (339/346)
-  </span>
-</td>
-</tr>
+
 </table>
 
 <br/>
@@ -128,94 +101,74 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.dashboard
 &nbsp;
-&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
-&nbsp;import androidx.compose.foundation.layout.padding
 &nbsp;import androidx.compose.runtime.Composable
-&nbsp;import androidx.compose.ui.Modifier
-&nbsp;import androidx.compose.ui.platform.testTag
-&nbsp;import androidx.compose.ui.unit.dp
-&nbsp;import com.georgeci.moneysurfer.domain.model.BudgetStatus
-&nbsp;import com.georgeci.moneysurfer.uikit.components.budget.SurferBudgetStatus
-&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferSafeToSpendData
-&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferSafeToSpendEmpty
-&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferSafeToSpendWidget
-&nbsp;import moneysurfer.feature.dashboard.generated.resources.Res
-&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_days_left
-&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_safe_to_spend_bar_a11y
-&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_safe_to_spend_caption
-&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_safe_to_spend_empty_subtitle
-&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_safe_to_spend_empty_title
-&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_safe_to_spend_over_caption
-&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_safe_to_spend_per_day
-&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_safe_to_spend_set_budget
-&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_safe_to_spend_title
-&nbsp;import org.jetbrains.compose.resources.pluralStringResource
-&nbsp;import org.jetbrains.compose.resources.stringResource
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.AccountId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.BudgetId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.GoalId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionId
+&nbsp;import com.georgeci.moneysurfer.utils.HandleSideEffect
 &nbsp;
 &nbsp;/**
-&nbsp; * What is still safe to spend this period, and the pace that makes it last.
+&nbsp; * Where the dashboard can send the user. Grouped rather than declared one lambda per destination:
+&nbsp; * the screen reaches a dozen places, and `kotlin:S107` allows seven parameters. Same remedy and
+&nbsp; * same shape as `WorkspaceSelectorNavigation` — see AGENTS.md → UI Rules.
+&nbsp; */
+&nbsp;data class DashboardNavigation(
+&nbsp;    val onNavigateToAccountCreation: () -&gt; Unit,
+&nbsp;    val onNavigateToAccountsManage: () -&gt; Unit,
+&nbsp;    val onNavigateToTransactionCreation: (accountId: AccountId?) -&gt; Unit,
+&nbsp;    val onNavigateToTransferCreation: () -&gt; Unit,
+&nbsp;    val onNavigateToAccountDetails: (AccountId) -&gt; Unit,
+&nbsp;    val onNavigateToTransactionDetails: (TransactionId) -&gt; Unit,
+&nbsp;    val onNavigateToSettings: () -&gt; Unit,
+&nbsp;    val onNavigateToCustomize: () -&gt; Unit,
+&nbsp;    val onNavigateToTransactionsList: () -&gt; Unit,
+&nbsp;    val onNavigateToGoals: () -&gt; Unit,
+&nbsp;    val onNavigateToGoalDetails: (GoalId) -&gt; Unit,
+&nbsp;    val onNavigateToBudgetCreation: () -&gt; Unit,
+&nbsp;    val onNavigateToBudgets: () -&gt; Unit,
+&nbsp;    val onNavigateToBudgetDetails: (BudgetId) -&gt; Unit,
+&nbsp;)
+&nbsp;
+&nbsp;/**
+&nbsp; * The screen&#39;s whole side-effect half: one branch per [DashboardEffect], nothing else.
 &nbsp; *
-&nbsp; * Unlike the quick-actions row this one keeps drawing with nothing behind it: &quot;no budget&quot; is a
-&nbsp; * state the widget is *for*, and the card that says so also carries the link that fixes it.
+&nbsp; * A plain function rather than a lambda inside the composable, for two reasons. A flat dispatch
+&nbsp; * table that grows with the destination list is what pushed `DashboardScreen` over the complexity
+&nbsp; * limit; and a mis-wired branch here sends the user to the wrong screen, which is worth a test —
+&nbsp; * one that needs no composition, no lifecycle and no view model to run.
 &nbsp; */
-&nbsp;@Composable
-&nbsp;internal fun SafeToSpendWidget(
-&nbsp;    state: DashboardState.Content,
-&nbsp;    onEvent: (DashboardEvent) -&gt; Unit,
-<b class="pc">&nbsp;) {</b>
-<b class="fc">&nbsp;    SurferSafeToSpendWidget(</b>
-<b class="fc">&nbsp;        title = stringResource(Res.string.dashboard_safe_to_spend_title),</b>
-<b class="fc">&nbsp;        data = state.safeToSpend?.toWidgetData(),</b>
-<b class="fc">&nbsp;        empty = SurferSafeToSpendEmpty(</b>
-<b class="fc">&nbsp;            title = stringResource(Res.string.dashboard_safe_to_spend_empty_title),</b>
-<b class="fc">&nbsp;            subtitle = stringResource(Res.string.dashboard_safe_to_spend_empty_subtitle),</b>
-<b class="fc">&nbsp;            actionLabel = stringResource(Res.string.dashboard_safe_to_spend_set_budget),</b>
-<b class="fc">&nbsp;            onActionClick = { onEvent(DashboardEvent.OnSetBudgetClick) },</b>
-<b class="fc">&nbsp;            actionTestTag = DashboardTestTags.SafeToSpendSetBudget,</b>
-&nbsp;        ),
-<b class="fc">&nbsp;        modifier = Modifier</b>
-<b class="fc">&nbsp;            .fillMaxWidth()</b>
-<b class="fc">&nbsp;            .padding(horizontal = 16.dp)</b>
-<b class="fc">&nbsp;            .padding(vertical = 8.dp)</b>
-<b class="fc">&nbsp;            .testTag(DashboardTestTags.SafeToSpend),</b>
-&nbsp;    )
-<b class="fc">&nbsp;}</b>
-&nbsp;
-&nbsp;/**
-&nbsp; * The sentences around the numbers. The bar restates figures the card already prints, so its
-&nbsp; * screen-reader line is the spend against the limit rather than a percentage read off the shape.
-&nbsp; */
-&nbsp;@Composable
-<b class="fc">&nbsp;private fun SafeToSpendUi.toWidgetData(): SurferSafeToSpendData {</b>
-<b class="fc">&nbsp;    val daysLeftLabel = pluralStringResource(Res.plurals.dashboard_days_left, daysLeft, daysLeft)</b>
-<b class="fc">&nbsp;    val captionResource = if (isOver) {</b>
-<b class="fc">&nbsp;        Res.string.dashboard_safe_to_spend_over_caption</b>
-&nbsp;    } else {
-<b class="fc">&nbsp;        Res.string.dashboard_safe_to_spend_caption</b>
+&nbsp;// One straight-line branch per destination — flat, exhaustive, and checked by the compiler. Its
+&nbsp;// &quot;complexity&quot; is the number of places the dashboard can reach, not tangled logic; grouping the
+&nbsp;// branches behind nested types to please the metric would cost exactly the readability the flat
+&nbsp;// table buys. Same call as `SettingsScreen`.
+&nbsp;@Suppress(&quot;CyclomaticComplexMethod&quot;)
+&nbsp;internal fun DashboardNavigation.navigate(effect: DashboardEffect) {
+<b class="fc">&nbsp;    when (effect) {</b>
+<b class="fc">&nbsp;        is DashboardEffect.NavigateToAccountDetails -&gt; onNavigateToAccountDetails(effect.accountId)</b>
+<b class="fc">&nbsp;        is DashboardEffect.NavigateToTransactionDetails -&gt; onNavigateToTransactionDetails(effect.transactionId)</b>
+<b class="fc">&nbsp;        DashboardEffect.NavigateToAccountCreation -&gt; onNavigateToAccountCreation()</b>
+<b class="fc">&nbsp;        DashboardEffect.NavigateToAccountsManage -&gt; onNavigateToAccountsManage()</b>
+<b class="fc">&nbsp;        is DashboardEffect.NavigateToTransactionCreation -&gt; onNavigateToTransactionCreation(effect.accountId)</b>
+<b class="fc">&nbsp;        DashboardEffect.NavigateToTransferCreation -&gt; onNavigateToTransferCreation()</b>
+<b class="fc">&nbsp;        DashboardEffect.NavigateToSettings -&gt; onNavigateToSettings()</b>
+<b class="fc">&nbsp;        DashboardEffect.NavigateToCustomize -&gt; onNavigateToCustomize()</b>
+<b class="fc">&nbsp;        DashboardEffect.NavigateToTransactionsList -&gt; onNavigateToTransactionsList()</b>
+<b class="fc">&nbsp;        DashboardEffect.NavigateToGoals -&gt; onNavigateToGoals()</b>
+<b class="fc">&nbsp;        is DashboardEffect.NavigateToGoalDetails -&gt; onNavigateToGoalDetails(effect.goalId)</b>
+<b class="fc">&nbsp;        DashboardEffect.NavigateToBudgetCreation -&gt; onNavigateToBudgetCreation()</b>
+<b class="fc">&nbsp;        DashboardEffect.NavigateToBudgets -&gt; onNavigateToBudgets()</b>
+<b class="fc">&nbsp;        is DashboardEffect.NavigateToBudgetDetails -&gt; onNavigateToBudgetDetails(effect.budgetId)</b>
 &nbsp;    }
-<b class="fc">&nbsp;    return SurferSafeToSpendData(</b>
-<b class="fc">&nbsp;        amount = remainingFormatted,</b>
-<b class="fc">&nbsp;        caption = stringResource(captionResource, limitFormatted, budgetName),</b>
-<b class="fc">&nbsp;        perDay = stringResource(Res.string.dashboard_safe_to_spend_per_day, perDayFormatted),</b>
-<b class="fc">&nbsp;        daysLeft = daysLeftLabel,</b>
-<b class="fc">&nbsp;        progress = progress,</b>
-<b class="fc">&nbsp;        paceFraction = paceFraction,</b>
-<b class="fc">&nbsp;        status = status.toWidgetStatus(),</b>
-<b class="fc">&nbsp;        progressContentDescription = stringResource(</b>
-<b class="fc">&nbsp;            Res.string.dashboard_safe_to_spend_bar_a11y,</b>
-<b class="fc">&nbsp;            spentFormatted,</b>
-<b class="fc">&nbsp;            limitFormatted,</b>
-<b class="fc">&nbsp;            daysLeftLabel,</b>
-&nbsp;        ),
-&nbsp;    )
 &nbsp;}
 &nbsp;
-&nbsp;/** `uikit` does not depend on `domain`, so the status word crosses over here. */
-<b class="fc">&nbsp;private fun BudgetStatus.toWidgetStatus(): SurferBudgetStatus = when (this) {</b>
-<b class="fc">&nbsp;    BudgetStatus.OK -&gt; SurferBudgetStatus.Ok</b>
-<b class="fc">&nbsp;    BudgetStatus.WARN -&gt; SurferBudgetStatus.Warn</b>
-<b class="fc">&nbsp;    BudgetStatus.OVER -&gt; SurferBudgetStatus.Over</b>
-&nbsp;}
+&nbsp;@Composable
+&nbsp;internal fun HandleDashboardEffects(
+&nbsp;    viewModel: DashboardViewModel,
+&nbsp;    navigation: DashboardNavigation,
+<b class="nc">&nbsp;) {</b>
+<b class="nc">&nbsp;    viewModel.HandleSideEffect(navigation::navigate)</b>
+<b class="nc">&nbsp;}</b>
 </code>
 </pre>
 </div>
@@ -239,7 +192,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 22:39</div>
+    <div style="float:right;">generated on 2026-07-28 23:01</div>
 </div>
 </body>
 </html>
