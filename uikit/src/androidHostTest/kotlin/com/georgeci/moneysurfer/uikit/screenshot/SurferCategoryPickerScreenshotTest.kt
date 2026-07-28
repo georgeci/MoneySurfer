@@ -5,6 +5,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.georgeci.moneysurfer.screenshot.ScreenshotQualifiers
+import com.georgeci.moneysurfer.screenshot.ScreenshotSdk
+import com.georgeci.moneysurfer.screenshot.captureLightAndDark
 import com.georgeci.moneysurfer.uikit.components.SurferCategoryPalette
 import com.georgeci.moneysurfer.uikit.components.category.SurferCategoryManageCard
 import com.georgeci.moneysurfer.uikit.components.category.SurferColorSwatchRow

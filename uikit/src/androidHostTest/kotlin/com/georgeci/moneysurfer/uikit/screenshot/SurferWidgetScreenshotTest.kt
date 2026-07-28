@@ -8,6 +8,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.georgeci.moneysurfer.screenshot.ScreenshotQualifiers
+import com.georgeci.moneysurfer.screenshot.ScreenshotSdk
+import com.georgeci.moneysurfer.screenshot.captureLightAndDark
 import com.georgeci.moneysurfer.uikit.components.budget.SurferBudgetStatus
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.widgets.SurferAccountItem
