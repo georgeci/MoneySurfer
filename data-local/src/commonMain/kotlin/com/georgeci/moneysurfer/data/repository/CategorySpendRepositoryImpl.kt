@@ -45,8 +45,10 @@ class CategorySpendRepositoryImpl(
 
     /**
      * Null for a row whose `month` will not parse. `substr` cannot produce one from a valid
-     * `operationDate`, but the column is a plain string an older or foreign writer could have
-     * put anything in, and dropping one unreadable month beats failing the whole screen.
+     * `operationDate`, and since the query joined the shared spend predicate it cannot see an
+     * invalid one either — `operationDate = date(operationDate)` admits only canonical dates. Kept
+     * as a second line because the column is a plain string one predicate change away from letting
+     * something else through, and dropping one unreadable month beats failing the whole screen.
      */
     private fun CategoryMonthlyTotalEntity.toDomain(): CategoryMonthlyTotal? {
         val parsed = runCatching { YearMonth.parse(month) }.getOrNull() ?: return null

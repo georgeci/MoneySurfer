@@ -113,9 +113,14 @@ private fun CurrencySpendEntity.toDomain(): CurrencyTotal = CurrencyTotal(
 )
 
 /**
- * Null for a row whose date will not parse. `operationDate` is a plain string column an older or
- * foreign writer could have put anything in, and dropping one unreadable day beats failing the
- * whole screen — the same defence [CategorySpendRepositoryImpl] applies to its months.
+ * Null for a row whose date will not parse — dropping one unreadable day beats failing the whole
+ * screen, the same defence [CategorySpendRepositoryImpl] applies to its months.
+ *
+ * Kept as a second line rather than a live path: the query's `operationDate = date(operationDate)`
+ * term already admits nothing but a canonical `YYYY-MM-DD`, which [LocalDate.parse] always accepts,
+ * so nothing reaching here can fail. That is why coverage reports the null branch as never taken —
+ * it is unreachable by construction, and only stays because `operationDate` is a plain text column
+ * one predicate change away from letting something else through.
  */
 private fun DailySpendEntity.toDomain(): DailySpendPoint? {
     val parsed = runCatching { LocalDate.parse(operationDate) }.getOrNull() ?: return null
@@ -128,6 +133,9 @@ private fun DailySpendEntity.toDomain(): DailySpendPoint? {
  * A month arrives as one row per type it booked, so the side it did not book folds to zero rather
  * than dropping the column from the chart. Months keep the order SQLite returned them in, which
  * `ORDER BY month ASC` already makes ascending.
+ *
+ * The unparseable-month branch is the same unreachable-by-construction guard [DailySpendEntity]
+ * carries: `substr` over a canonical date cannot produce anything [YearMonth.parse] refuses.
  */
 private fun List<MonthlyTypeTotalEntity>.toMonthlyNets(): List<MonthlyNet> =
     groupBy { it.month }.mapNotNull { (month, rows) ->
