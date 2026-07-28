@@ -136,8 +136,7 @@ class PullRemoteChangesUseCaseImpl(
         onProgress: suspend (PullProgress) -> Unit,
         cancelToken: SyncCancelToken,
     ): PullSummary {
-        var downloadedCount = 0
-        var conflictCount = 0
+        val pluginSummaries = mutableListOf<PullSummary>()
 
         for (plugin in pluginsInScope(scope)) {
             cancelToken.throwIfCancelled()
@@ -169,11 +168,13 @@ class PullRemoteChangesUseCaseImpl(
                 }
                 raise(failure.toSyncError())
             }
-            downloadedCount += downloaded
-            conflictCount += conflicts
+            pluginSummaries += PullSummary(downloadedCount = downloaded, conflictCount = conflicts)
         }
 
-        return PullSummary(downloadedCount = downloadedCount, conflictCount = conflictCount)
+        return PullSummary(
+            downloadedCount = pluginSummaries.sumOf(PullSummary::downloadedCount),
+            conflictCount = pluginSummaries.sumOf(PullSummary::conflictCount),
+        )
     }
 
     /**

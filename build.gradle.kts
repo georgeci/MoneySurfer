@@ -357,6 +357,25 @@ sonar {
             "**/build/**,**/generated/**,iosApp/**,scripts/**,md/**,docs/**,firestore-tests/**,**/config/detekt/**",
         )
 
+        // Compose APIs legitimately expose independent state, callback, and styling slots.
+        // Keep S107 active everywhere else: DAO methods, use cases, and ordinary Kotlin APIs
+        // still benefit from the seven-parameter limit.
+        val composeLongParameterListExclusions = mapOf(
+            "composeConfirmDialog" to "**/SurferConfirmDialog.kt",
+            "composeTextField" to "**/SurferTextField.kt",
+            "composeGoalCard" to "**/SurferGoalCard.kt",
+            "composeAccountChooser" to "**/AccountChooserBottomSheet.kt",
+            "composeTransactionCreation" to "**/TransactionCreationScreen.kt",
+        )
+        property(
+            "sonar.issue.ignore.multicriteria",
+            composeLongParameterListExclusions.keys.joinToString(","),
+        )
+        composeLongParameterListExclusions.forEach { (criterion, resourceKey) ->
+            property("sonar.issue.ignore.multicriteria.$criterion.ruleKey", "kotlin:S107")
+            property("sonar.issue.ignore.multicriteria.$criterion.resourceKey", resourceKey)
+        }
+
         // Coverage import (issue #272). Kover emits a JaCoCo-format XML — verified:
         // the merged report carries <sourcefile>/<line> elements, which is what
         // Sonar's JaCoCo sensor actually reads (a report with only <class>/<method>

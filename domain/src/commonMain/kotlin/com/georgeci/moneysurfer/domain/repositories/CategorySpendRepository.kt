@@ -16,7 +16,7 @@ import kotlinx.datetime.YearMonth
  * memory on every emission. This one is answered by a `GROUP BY` in SQLite, so the amount of
  * data crossing the boundary is one row per category per month regardless of volume.
  */
-interface CategorySpendRepository {
+fun interface CategorySpendRepository {
 
     /**
      * Per-month totals for [categoryIds], over the months [fromMonth]..[toMonth] inclusive.
