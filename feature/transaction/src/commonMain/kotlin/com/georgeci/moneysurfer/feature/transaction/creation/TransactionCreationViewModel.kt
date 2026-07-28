@@ -105,31 +105,22 @@ class TransactionCreationViewModel(
             TransactionCreationEvent.OnOpenAccountChooser -> openAccountChooser(AccountSlot.Single)
             TransactionCreationEvent.OnOpenFromAccountChooser -> openAccountChooser(AccountSlot.From)
             TransactionCreationEvent.OnOpenToAccountChooser -> openAccountChooser(AccountSlot.To)
-            TransactionCreationEvent.OnSwapAccountsClick -> updateState {
-                val c = this as? TransactionCreationState.Content ?: return@updateState this
-                c.copy(
-                    fromAccount = c.toAccount,
-                    toAccount = c.fromAccount,
-                    amount = c.toAmount,
-                    toAmount = c.amount,
+            TransactionCreationEvent.OnSwapAccountsClick -> updateContent { content ->
+                content.copy(
+                    fromAccount = content.toAccount,
+                    toAccount = content.fromAccount,
+                    amount = content.toAmount,
+                    toAmount = content.amount,
                 )
             }
-            TransactionCreationEvent.OnSplitToggled -> updateState {
-                val c = this as? TransactionCreationState.Content ?: return@updateState this
-                c.withSplitToggled { splitLineKeys++ }
-            }
-            TransactionCreationEvent.OnSplitLineAdded -> updateState {
-                val c = this as? TransactionCreationState.Content ?: return@updateState this
-                c.withSplitLineAdded(key = splitLineKeys++)
-            }
-            is TransactionCreationEvent.OnSplitLineRemoved -> updateState {
-                val c = this as? TransactionCreationState.Content ?: return@updateState this
-                c.withSplitLineRemoved(key = event.key)
-            }
-            is TransactionCreationEvent.OnSplitLineAmountChanged -> updateState {
-                val c = this as? TransactionCreationState.Content ?: return@updateState this
-                c.withSplitLineAmount(key = event.key, amount = event.amount)
-            }
+            TransactionCreationEvent.OnSplitToggled ->
+                updateContent { it.withSplitToggled { splitLineKeys++ } }
+            TransactionCreationEvent.OnSplitLineAdded ->
+                updateContent { it.withSplitLineAdded(key = splitLineKeys++) }
+            is TransactionCreationEvent.OnSplitLineRemoved ->
+                updateContent { it.withSplitLineRemoved(key = event.key) }
+            is TransactionCreationEvent.OnSplitLineAmountChanged ->
+                updateContent { it.withSplitLineAmount(key = event.key, amount = event.amount) }
             is TransactionCreationEvent.OnOpenSplitLineCategoryChooser ->
                 openCategoryChooser(CategorySlot.SplitLine(event.key))
             TransactionCreationEvent.OnSaveClick -> saveTransaction()
@@ -141,6 +132,23 @@ class TransactionCreationViewModel(
             }
             TransactionCreationEvent.OnDeleteConfirmed -> handleDelete()
             TransactionCreationEvent.OnBackClick -> postSideEffect(TransactionCreationEffect.NavigateBack)
+        }
+    }
+
+    /**
+     * Reduces the loaded form, leaving [TransactionCreationState.Loading] alone — an event that
+     * arrives before the screen has loaded has no form to change.
+     *
+     * A `when` over the sealed state rather than the `as?` this used to repeat at every call site:
+     * one place to state the rule, and no cast for a static analyser to squint at (SonarCloud reads
+     * `this` inside a `STATE.() -> STATE` reducer as the ViewModel and calls the cast impossible).
+     */
+    private fun updateContent(
+        block: (TransactionCreationState.Content) -> TransactionCreationState.Content,
+    ) = updateState {
+        when (this) {
+            is TransactionCreationState.Content -> block(this)
+            TransactionCreationState.Loading -> this
         }
     }
 
@@ -299,7 +307,7 @@ class TransactionCreationViewModel(
         if (match != null) {
             updateState {
                 val c = this as? TransactionCreationState.Content ?: return@updateState this
-                applyAccountToSlot(c, match, slot)
+                c.withAccountInSlot(match, slot)
             }
             return
         }
@@ -309,19 +317,9 @@ class TransactionCreationViewModel(
             updateState {
                 val c = this as? TransactionCreationState.Content ?: return@updateState this
                 val withRefreshed = c.copy(accounts = refreshed)
-                if (newMatch != null) applyAccountToSlot(withRefreshed, newMatch, slot) else withRefreshed
+                if (newMatch != null) withRefreshed.withAccountInSlot(newMatch, slot) else withRefreshed
             }
         }
-    }
-
-    private fun applyAccountToSlot(
-        content: TransactionCreationState.Content,
-        account: Account,
-        slot: AccountSlot,
-    ): TransactionCreationState.Content = when (slot) {
-        AccountSlot.Single -> content.copy(selectedAccount = account)
-        AccountSlot.From -> content.copy(fromAccount = account)
-        AccountSlot.To -> content.copy(toAccount = account)
     }
 
     private fun applyPickedCategory(picked: CategoryId) {

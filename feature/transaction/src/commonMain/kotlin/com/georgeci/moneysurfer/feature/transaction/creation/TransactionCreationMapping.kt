@@ -1,6 +1,7 @@
 package com.georgeci.moneysurfer.feature.transaction.creation
 
 import com.georgeci.moneysurfer.domain.formatter.MoneyFormatter
+import com.georgeci.moneysurfer.domain.model.Account
 import com.georgeci.moneysurfer.domain.model.Category
 import com.georgeci.moneysurfer.domain.model.CategoryAppearance
 import com.georgeci.moneysurfer.domain.model.Transaction
@@ -60,6 +61,16 @@ internal fun TransactionCreationState.Content.seededFrom(
             selected = resolvedSelected,
         ),
     )
+}
+
+/** Puts a chosen account in the slot the chooser was opened for — see [AccountSlot]. */
+internal fun TransactionCreationState.Content.withAccountInSlot(
+    account: Account,
+    slot: AccountSlot,
+): TransactionCreationState.Content = when (slot) {
+    AccountSlot.Single -> copy(selectedAccount = account)
+    AccountSlot.From -> copy(fromAccount = account)
+    AccountSlot.To -> copy(toAccount = account)
 }
 
 /** Categories the type's picker offers: everything but income belongs to the expense side. */
