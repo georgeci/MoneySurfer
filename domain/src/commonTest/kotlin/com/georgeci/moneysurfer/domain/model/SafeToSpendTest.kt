@@ -7,6 +7,7 @@ import com.georgeci.moneysurfer.domain.fixtures.budgetId
 import com.georgeci.moneysurfer.domain.fixtures.categoryId
 import com.georgeci.moneysurfer.domain.fixtures.dollars
 import com.georgeci.moneysurfer.domain.fixtures.transactionId
+import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
 import com.georgeci.moneysurfer.domain.primitives.Money
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
 import io.kotest.core.spec.style.StringSpec
@@ -21,6 +22,7 @@ private fun progressOf(
     budget: Budget,
     spent: Money = Money.zero(),
     today: LocalDate = LocalDate(2026, 4, 16),
+    baseCurrency: CurrencyCode? = USD,
 ) = calculateBudgetProgress(
     budget = budget,
     transactions = if (spent.isZero()) {
@@ -36,7 +38,7 @@ private fun progressOf(
             ),
         )
     },
-    baseCurrency = USD,
+    baseCurrency = baseCurrency,
     today = today,
 )
 
@@ -44,6 +46,15 @@ class SafeToSpendTest : StringSpec({
 
     "no budgets means no number to show" {
         emptyList<BudgetProgress>().safeToSpend().shouldBeNull()
+    }
+
+    "a budget whose workspace has no base currency yields nothing to format" {
+        val budget = aBudget(amount = 600.dollars, startDate = periodStart, categoryIds = emptyList())
+
+        // The workspace row is missing behind a budget that references it — a state a pull can
+        // produce for a moment. Money the app cannot name must not reach MoneyFormatter, which
+        // rejects anything that is not a three-letter ISO code.
+        listOf(progressOf(budget, baseCurrency = null)).safeToSpend().shouldBeNull()
     }
 
     "archived budgets never speak for the headline" {

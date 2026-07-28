@@ -333,7 +333,6 @@ private fun newViewModel(
         getSafeToSpend = GetSafeToSpendUseCase(
             getBudgets = GetBudgetsUseCase(FakeBudgetRepository(budgets), session),
             getBudgetProgress = GetBudgetProgressUseCase(transactions, workspaces, clock),
-            session = session,
         ),
         convertAccountsTotal = ConvertAccountsTotalUseCase(),
         uiPreferences = uiPreferences,

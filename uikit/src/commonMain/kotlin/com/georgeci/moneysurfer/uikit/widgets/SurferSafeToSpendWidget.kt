@@ -128,7 +128,7 @@ private fun SafeToSpendBody(data: SurferSafeToSpendData, hero: Boolean) {
         SurferBudgetProgressBar(
             progress = data.progress,
             status = data.status,
-            alertFraction = data.paceFraction,
+            tickFraction = data.paceFraction,
             height = if (hero) 10.dp else 8.dp,
             contentDescription = data.progressContentDescription,
         )

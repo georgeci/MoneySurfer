@@ -25,8 +25,12 @@ data class SafeToSpend(
     val limit: Money,
     val window: BudgetPeriodWindow,
     val status: BudgetStatus,
-    /** Workspace base currency, or null when the workspace has none yet. */
-    val currency: CurrencyCode?,
+    /**
+     * Workspace base currency. Non-null by construction: a figure nobody can format is not a
+     * figure, so [safeToSpend] withholds the whole projection rather than handing the UI an
+     * amount it has to invent a currency for.
+     */
+    val currency: CurrencyCode,
 ) {
 
     val isOver: Boolean get() = status == BudgetStatus.OVER
@@ -64,6 +68,11 @@ data class SafeToSpend(
  * 2. within that tier, the largest limit, which is the cap the user framed the period with;
  * 3. ties broken by budget id, so the headline does not jump between two equal budgets on
  *    recomposition.
+ *
+ * Also null when the winning progress carries no base currency — the workspace row is missing
+ * behind budgets that reference it, which a pull can produce for a moment. Money the app cannot
+ * name is worse than no money at all: `MoneyFormatter` is backed by `java.util.Currency`, which
+ * rejects anything that is not a three-letter ISO code.
  */
 fun List<BudgetProgress>.safeToSpend(): SafeToSpend? = primaryProgress()?.toSafeToSpend()
 
@@ -75,14 +84,17 @@ private fun List<BudgetProgress>.primaryProgress(): BudgetProgress? {
         .firstOrNull()
 }
 
-private fun BudgetProgress.toSafeToSpend(): SafeToSpend = SafeToSpend(
-    budgetName = budget.name,
-    remaining = remaining,
-    perDay = perDayRemaining,
-    daysLeft = daysLeft,
-    spent = spent,
-    limit = effectiveLimit,
-    window = window,
-    status = status,
-    currency = currency,
-)
+private fun BudgetProgress.toSafeToSpend(): SafeToSpend? {
+    val baseCurrency = currency ?: return null
+    return SafeToSpend(
+        budgetName = budget.name,
+        remaining = remaining,
+        perDay = perDayRemaining,
+        daysLeft = daysLeft,
+        spent = spent,
+        limit = effectiveLimit,
+        window = window,
+        status = status,
+        currency = baseCurrency,
+    )
+}

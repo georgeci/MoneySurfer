@@ -13,7 +13,6 @@ import com.georgeci.moneysurfer.domain.model.SavingsGoalSummary
 import com.georgeci.moneysurfer.domain.model.Transaction
 import com.georgeci.moneysurfer.domain.preferences.UiPreferences
 import com.georgeci.moneysurfer.domain.primitives.AccountId
-import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
 import com.georgeci.moneysurfer.domain.primitives.GoalId
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
@@ -176,20 +175,17 @@ class DashboardViewModel(
      * The headline is signed — negative once the budget is overspent — so the widget states the
      * overshoot rather than flooring at zero and pretending the period is merely spent out.
      */
-    private fun SafeToSpend.toUi(): SafeToSpendUi {
-        val currency = currency ?: CurrencyCode("")
-        return SafeToSpendUi(
-            budgetName = budgetName,
-            remainingFormatted = MoneyFormatter.format(remaining, currency),
-            spentFormatted = MoneyFormatter.format(spent, currency),
-            limitFormatted = MoneyFormatter.format(limit, currency),
-            perDayFormatted = MoneyFormatter.format(perDay, currency),
-            daysLeft = daysLeft,
-            progress = spentFraction,
-            paceFraction = elapsedFraction,
-            status = status,
-        )
-    }
+    private fun SafeToSpend.toUi(): SafeToSpendUi = SafeToSpendUi(
+        budgetName = budgetName,
+        remainingFormatted = MoneyFormatter.format(remaining, currency),
+        spentFormatted = MoneyFormatter.format(spent, currency),
+        limitFormatted = MoneyFormatter.format(limit, currency),
+        perDayFormatted = MoneyFormatter.format(perDay, currency),
+        daysLeft = daysLeft,
+        progress = spentFraction,
+        paceFraction = elapsedFraction,
+        status = status,
+    )
 
     private fun SavingsGoalSummary.toUi() = GoalUi(
         id = goal.id,

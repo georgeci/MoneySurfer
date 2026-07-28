@@ -1,6 +1,5 @@
 package com.georgeci.moneysurfer.domain.usecase
 
-import com.georgeci.moneysurfer.domain.auth.SessionPointers
 import com.georgeci.moneysurfer.domain.model.SafeToSpend
 import com.georgeci.moneysurfer.domain.model.safeToSpend
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -18,31 +17,33 @@ import org.koin.core.annotation.Single
  *
  * Archived budgets are dropped before progress is computed rather than after: progress reads the
  * whole transaction list per budget, and a workspace can accumulate archived budgets indefinitely.
+ *
+ * The workspace comes from the budgets themselves rather than from a second subscription to
+ * `SessionPointers.currentWorkspaceId`. Two collectors of the same pointer are not ordered against
+ * each other, so on a workspace switch the budget query can deliver the new workspace's budgets
+ * while the separately-read id is still the old one — and `progressOf` would then match those
+ * budgets against the previous workspace's transactions, briefly reporting the full limit as unspent.
+ * Reading both from one emission makes that pairing impossible; [GetBudgetsUseCase] already returns
+ * an empty list when nobody is signed in, which is the same "nothing backs it" answer.
  */
 @Single
 @OptIn(ExperimentalCoroutinesApi::class)
 class GetSafeToSpendUseCase(
     private val getBudgets: GetBudgetsUseCase,
     private val getBudgetProgress: GetBudgetProgressUseCase,
-    private val session: SessionPointers,
 ) {
 
     operator fun invoke(timeZone: TimeZone = TimeZone.currentSystemDefault()): Flow<SafeToSpend?> =
-        session.currentWorkspaceId.flatMapLatest { workspaceId ->
-            if (workspaceId == null) {
-                flowOf(null)
-            } else {
-                getBudgets()
-                    .map { budgets -> budgets.filter { it.isActive } }
-                    .distinctUntilChanged()
-                    .flatMapLatest { budgets ->
-                        if (budgets.isEmpty()) {
-                            flowOf(null)
-                        } else {
-                            getBudgetProgress.progressOf(workspaceId, budgets, timeZone)
-                                .map { progresses -> progresses.safeToSpend() }
-                        }
-                    }
+        getBudgets()
+            .map { budgets -> budgets.filter { it.isActive } }
+            .distinctUntilChanged()
+            .flatMapLatest { budgets ->
+                val workspaceId = budgets.firstOrNull()?.workspaceId
+                if (workspaceId == null) {
+                    flowOf(null)
+                } else {
+                    getBudgetProgress.progressOf(workspaceId, budgets, timeZone)
+                        .map { progresses -> progresses.safeToSpend() }
+                }
             }
-        }
 }
