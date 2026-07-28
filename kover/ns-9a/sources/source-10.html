@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > WorkspaceRepository</title>
+  <title>MoneySurfer Coverage Report > TransactionRepository</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.repositories</a>
 </div>
 
-<h1>Coverage Summary for Class: WorkspaceRepository (com.georgeci.moneysurfer.domain.repositories)</h1>
+<h1>Coverage Summary for Class: TransactionRepository (com.georgeci.moneysurfer.domain.repositories)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">WorkspaceRepository</td>
+  <td class="name">TransactionRepository</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -46,18 +46,57 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.repositories
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.model.Workspace
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.UserId
+&nbsp;import com.georgeci.moneysurfer.domain.model.CategorizedTransaction
+&nbsp;import com.georgeci.moneysurfer.domain.model.Transaction
+&nbsp;import com.georgeci.moneysurfer.domain.model.TransactionTotal
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.AccountId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransferId
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
+&nbsp;import com.georgeci.moneysurfer.domain.util.TransactionPeriodWindow
 &nbsp;import kotlinx.coroutines.flow.Flow
 &nbsp;
-&nbsp;interface WorkspaceRepository {
-&nbsp;    fun getAll(): Flow&lt;List&lt;Workspace&gt;&gt;
-&nbsp;    fun getByUserId(userId: UserId): Flow&lt;List&lt;Workspace&gt;&gt;
-&nbsp;    suspend fun getById(id: WorkspaceId): Workspace?
-&nbsp;    suspend fun insert(workspace: Workspace)
-&nbsp;    suspend fun update(workspace: Workspace)
-&nbsp;    suspend fun delete(id: WorkspaceId)
+&nbsp;// Transactions are the app&#39;s central entity and every screen queries them along a different axis
+&nbsp;// (account, workspace, window, transfer pair). Splitting the interface to satisfy the threshold
+&nbsp;// would scatter one storage contract across several types without removing a single query.
+&nbsp;@Suppress(&quot;TooManyFunctions&quot;)
+&nbsp;interface TransactionRepository {
+&nbsp;    fun getAll(): Flow&lt;List&lt;Transaction&gt;&gt;
+&nbsp;    fun getByAccountId(accountId: AccountId): Flow&lt;List&lt;Transaction&gt;&gt;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Newest-first page of categorized transactions inside [window], for one account or — when
+&nbsp;     * [accountId] is `null` — every account.
+&nbsp;     *
+&nbsp;     * At most [limit] rows are returned: the caller grows the limit to page further rather than
+&nbsp;     * offsetting, so a row inserted while the user scrolls cannot shift the already-visible
+&nbsp;     * prefix. An unbounded [window] is still bounded by [limit].
+&nbsp;     */
+&nbsp;    fun getCategorizedWindow(
+&nbsp;        accountId: AccountId?,
+&nbsp;        window: TransactionPeriodWindow,
+&nbsp;        limit: Int,
+&nbsp;    ): Flow&lt;List&lt;CategorizedTransaction&gt;&gt;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Per-type, per-currency sums over the *whole* [window] — unaffected by the paging applied to
+&nbsp;     * [getCategorizedWindow], so a summary built from these stays correct as pages load.
+&nbsp;     */
+&nbsp;    fun getTotals(
+&nbsp;        accountId: AccountId?,
+&nbsp;        window: TransactionPeriodWindow,
+&nbsp;    ): Flow&lt;List&lt;TransactionTotal&gt;&gt;
+&nbsp;    fun getByWorkspaceId(workspaceId: WorkspaceId): Flow&lt;List&lt;Transaction&gt;&gt;
+&nbsp;    suspend fun getById(id: TransactionId): Transaction?
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Every leg sharing [transferId] — two for a healthy transfer, one for a leg whose pair was
+&nbsp;     * deleted or never imported. Callers must not assume a pair exists.
+&nbsp;     */
+&nbsp;    suspend fun getByTransferId(transferId: TransferId): List&lt;Transaction&gt;
+&nbsp;    suspend fun insert(transaction: Transaction)
+&nbsp;    suspend fun update(transaction: Transaction)
+&nbsp;    suspend fun delete(id: TransactionId)
 &nbsp;}
 </code>
 </pre>
@@ -82,7 +121,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-27 15:02</div>
+    <div style="float:right;">generated on 2026-07-28 14:48</div>
 </div>
 </body>
 </html>

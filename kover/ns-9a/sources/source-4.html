@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > RecurringRuleRepository</title>
+  <title>MoneySurfer Coverage Report > ExchangeRateRemoteSource</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.repositories</a>
 </div>
 
-<h1>Coverage Summary for Class: RecurringRuleRepository (com.georgeci.moneysurfer.domain.repositories)</h1>
+<h1>Coverage Summary for Class: ExchangeRateRemoteSource (com.georgeci.moneysurfer.domain.repositories)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">RecurringRuleRepository</td>
+  <td class="name">ExchangeRateRemoteSource</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -46,18 +46,21 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.repositories
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.model.RecurringRule
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.RecurringRuleId
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
-&nbsp;import kotlinx.coroutines.flow.Flow
+&nbsp;import com.georgeci.moneysurfer.domain.model.ExchangeRateTable
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
 &nbsp;
-&nbsp;interface RecurringRuleRepository {
-&nbsp;    fun getAll(): Flow&lt;List&lt;RecurringRule&gt;&gt;
-&nbsp;    fun getByWorkspaceId(workspaceId: WorkspaceId): Flow&lt;List&lt;RecurringRule&gt;&gt;
-&nbsp;    suspend fun getById(id: RecurringRuleId): RecurringRule?
-&nbsp;    suspend fun insert(rule: RecurringRule)
-&nbsp;    suspend fun update(rule: RecurringRule)
-&nbsp;    suspend fun delete(id: RecurringRuleId)
+&nbsp;/**
+&nbsp; * The FX provider behind [ExchangeRateRepository]. Implemented over HTTP in `data-remote`; the
+&nbsp; * offline build binds a no-op so the cache is simply never refilled there.
+&nbsp; */
+&nbsp;fun interface ExchangeRateRemoteSource {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Latest published quotes against [base], or `null` when the provider could not be reached
+&nbsp;     * or answered with something unusable. Implementations do not throw — an unreachable
+&nbsp;     * provider is an expected state on a phone, not an error the caller can act on.
+&nbsp;     */
+&nbsp;    suspend fun fetchLatest(base: CurrencyCode): ExchangeRateTable?
 &nbsp;}
 </code>
 </pre>
@@ -82,7 +85,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-27 15:02</div>
+    <div style="float:right;">generated on 2026-07-28 14:48</div>
 </div>
 </body>
 </html>

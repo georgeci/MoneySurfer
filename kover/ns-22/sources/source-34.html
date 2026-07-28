@@ -133,7 +133,9 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;     * Order is the user&#39;s; duplicates and commas are already gone.
 &nbsp;     */
 <b class="fc">&nbsp;    val tags: List&lt;String&gt; = emptyList(),</b>
+&nbsp;    /** Absolute moment. Sorting and audit only — never re-derive a calendar day from it. */
 <b class="fc">&nbsp;    val operationAt: Instant,</b>
+&nbsp;    /** Business date. What budgets count against and what SQL date windows filter on. */
 <b class="fc">&nbsp;    val operationDate: LocalDate,</b>
 <b class="fc">&nbsp;    val type: TransactionType,</b>
 <b class="fc">&nbsp;    val status: TransactionStatus = TransactionStatus.ACTUAL,</b>
@@ -179,7 +181,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-27 15:02</div>
+    <div style="float:right;">generated on 2026-07-28 14:48</div>
 </div>
 </body>
 </html>

@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > OutboxEnqueuer</title>
+  <title>MoneySurfer Coverage Report > ConflictResolver</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.sync.repository</a>
 </div>
 
-<h1>Coverage Summary for Class: OutboxEnqueuer (com.georgeci.moneysurfer.sync.repository)</h1>
+<h1>Coverage Summary for Class: ConflictResolver (com.georgeci.moneysurfer.sync.repository)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">OutboxEnqueuer</td>
+  <td class="name">ConflictResolver</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -46,36 +46,38 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.sync.repository
 &nbsp;
+&nbsp;import kotlin.time.Instant
+&nbsp;
 &nbsp;/**
-&nbsp; * Outbox writer used by data-layer repositories to enqueue local mutations
-&nbsp; * for deferred push to the remote backend.
+&nbsp; * Strategy for combining a local and a remote version of the same entity.
 &nbsp; *
-&nbsp; * The implementation guards against demo mode and non-Firebase sessions —
-&nbsp; * callers do not need to check [isEnabled] before calling [enqueueUpsert] /
-&nbsp; * [enqueueDelete]; the impl silently no-ops when sync is not allowed.
+&nbsp; * Phase 2 ships only LWW (last-write-wins) by `updatedAt`. Future strategies
+&nbsp; * (`Skip` for blocking inbox, `Merged` for field-level merges) plug in here.
 &nbsp; *
-&nbsp; * [entityType] — constant from [com.georgeci.moneysurfer.domain.sync.SyncEntityTypes].
-&nbsp; * [scopeKey]   — workspace id for subcollection entities, null for root entities.
-&nbsp; *
-&nbsp; * See sync.md §4.3.
+&nbsp; * See SyncCoordinatorFAQ.md №5, sync.md §4.2.
 &nbsp; */
-&nbsp;interface OutboxEnqueuer {
+&nbsp;interface ConflictResolver {
+&nbsp;    fun &lt;T : Any&gt; resolve(
+&nbsp;        local: T?,
+&nbsp;        remote: T,
+&nbsp;        metadata: ConflictMetadata,
+&nbsp;    ): ConflictResolution&lt;T&gt;
+&nbsp;}
 &nbsp;
-&nbsp;    suspend fun enqueueUpsert(
-&nbsp;        entityType: String,
-&nbsp;        entityId: String,
-&nbsp;        scopeKey: String?,
-&nbsp;        operation: MutationOperation,
-&nbsp;    )
+&nbsp;data class ConflictMetadata(
+&nbsp;    val entityType: String,
+&nbsp;    val entityId: String,
+&nbsp;    val localUpdatedAt: Instant?,
+&nbsp;    val remoteUpdatedAt: Instant,
+&nbsp;)
 &nbsp;
-&nbsp;    suspend fun enqueueDelete(
-&nbsp;        entityType: String,
-&nbsp;        entityId: String,
-&nbsp;        scopeKey: String?,
-&nbsp;    )
+&nbsp;sealed interface ConflictResolution&lt;out T&gt; {
+&nbsp;    data class TakeRemote&lt;T&gt;(val value: T) : ConflictResolution&lt;T&gt;
+&nbsp;    data class TakeLocal&lt;T&gt;(val value: T) : ConflictResolution&lt;T&gt;
+&nbsp;    data class Merged&lt;T&gt;(val value: T) : ConflictResolution&lt;T&gt;
 &nbsp;
-&nbsp;    /** Returns false for demo / signed-out sessions — mutations are local-only. */
-&nbsp;    suspend fun isEnabled(): Boolean
+&nbsp;    /** Defer decision to a manual-resolution inbox (not implemented in Phase 2). */
+&nbsp;    data object Skip : ConflictResolution&lt;Nothing&gt;
 &nbsp;}
 </code>
 </pre>
@@ -100,7 +102,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-27 15:02</div>
+    <div style="float:right;">generated on 2026-07-28 14:48</div>
 </div>
 </body>
 </html>
