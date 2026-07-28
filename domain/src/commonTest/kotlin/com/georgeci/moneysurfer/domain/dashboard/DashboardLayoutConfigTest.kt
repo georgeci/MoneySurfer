@@ -1,6 +1,7 @@
 package com.georgeci.moneysurfer.domain.dashboard
 
 import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.collections.shouldContainAll
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.shouldBe
 
@@ -229,5 +230,21 @@ class DashboardLayoutConfigTest : StringSpec({
         val normalized = stored.normalized()
 
         normalized.items shouldContainExactly DashboardLayoutConfig.DEFAULT.items
+    }
+
+    "the default layout has something for the period switch to drive" {
+        DashboardLayoutConfig.DEFAULT.hasPeriodScopedWidget shouldBe true
+    }
+
+    "switching off every period-scoped widget leaves the switch nothing to drive" {
+        val periodScoped = DashboardWidgetType.entries.filter { it.isPeriodScoped }
+        val config = periodScoped.fold(DashboardLayoutConfig.DEFAULT) { acc, type ->
+            acc.withWidgetEnabled(type, enabled = false)
+        }
+
+        // The widgets are still in the layout — only switched off. A disabled one renders nothing,
+        // so a switch above it would change nothing visible either.
+        config.items.map { it.type } shouldContainAll periodScoped
+        config.hasPeriodScopedWidget shouldBe false
     }
 })

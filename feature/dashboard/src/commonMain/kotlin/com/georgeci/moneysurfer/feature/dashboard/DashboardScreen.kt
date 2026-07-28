@@ -24,6 +24,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.georgeci.moneysurfer.domain.dashboard.DashboardPeriod
 import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetSize
 import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetType
 import com.georgeci.moneysurfer.domain.primitives.AccountId
@@ -93,6 +94,11 @@ object DashboardTestTags {
     const val Customize = "dashboard:customize"
     const val Settings = "dashboard:settings"
     const val AddTransaction = "dashboard:addTransaction"
+
+    /** The Week/Month switch itself; [periodOption] addresses either of its two segments. */
+    const val PeriodSwitch = "dashboard:period"
+
+    fun periodOption(period: DashboardPeriod): String = "$PeriodSwitch:${period.name.lowercase()}"
 
     /**
      * The quick-actions row, not either button inside it — `SurferQuickActionsWidget` takes no per
@@ -234,6 +240,11 @@ fun DashboardContent(
                 .padding(top = padding.calculateTopPadding()),
             contentPadding = PaddingValues(bottom = padding.calculateBottomPadding() + fabClearance),
         ) {
+            if (state.periodSwitchVisible) {
+                item(key = DashboardTestTags.PeriodSwitch) {
+                    DashboardPeriodSwitch(selected = state.period, onEvent = onEvent)
+                }
+            }
             items(
                 items = state.layout.enabledItems,
                 key = { it.type.name },

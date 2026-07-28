@@ -18,6 +18,7 @@ import com.georgeci.moneysurfer.uikit.components.base.SurferAddFab
 import com.georgeci.moneysurfer.uikit.components.base.SurferDashboardToolbar
 import com.georgeci.moneysurfer.uikit.components.base.SurferFilterChipRow
 import com.georgeci.moneysurfer.uikit.components.base.SurferOutlinedChip
+import com.georgeci.moneysurfer.uikit.components.base.SurferPeriodSwitch
 import com.georgeci.moneysurfer.uikit.components.base.SurferSectionHeader
 import com.georgeci.moneysurfer.uikit.components.base.SurferSectionHeaderHint
 import com.georgeci.moneysurfer.uikit.components.base.SurferSectionLabel
@@ -93,6 +94,33 @@ class SurferBaseScreenshotTest {
                 label = { it },
                 onSelect = {},
                 modifier = Modifier.fillMaxWidth(),
+            )
+        }
+    }
+
+    /**
+     * Captured apart from [surferSelectors] rather than beside the segmented control: this one
+     * sizes to its labels, so a frame it shared with two full-width rows would render it as a
+     * fragment in a corner — and the point of the capture is that a track carrying one raised
+     * thumb still reads as a single control at header size, in both themes.
+     */
+    @Test
+    fun surferPeriodSwitch() = captureLightAndDark("surfer_period_switch") {
+        Row(
+            modifier = Modifier.padding(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            SurferPeriodSwitch(
+                options = listOf("Week", "Month"),
+                selected = "Month",
+                label = { it },
+                onSelect = {},
+            )
+            SurferPeriodSwitch(
+                options = listOf("Week", "Month"),
+                selected = "Week",
+                label = { it },
+                onSelect = {},
             )
         }
     }
