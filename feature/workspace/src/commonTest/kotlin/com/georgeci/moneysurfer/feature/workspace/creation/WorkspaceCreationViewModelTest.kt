@@ -3,6 +3,7 @@ package com.georgeci.moneysurfer.feature.workspace.creation
 import app.cash.turbine.test
 import com.georgeci.moneysurfer.domain.auth.InMemorySessionPointers
 import com.georgeci.moneysurfer.domain.fixtures.EUR
+import com.georgeci.moneysurfer.domain.fixtures.FakeCategoryRepository
 import com.georgeci.moneysurfer.domain.fixtures.FakeHostCapabilities
 import com.georgeci.moneysurfer.domain.fixtures.RUB
 import com.georgeci.moneysurfer.domain.fixtures.USD
@@ -14,7 +15,6 @@ import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
 import com.georgeci.moneysurfer.domain.usecase.CreateWorkspaceUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetCurrenciesUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetCurrentTimeUseCase
-import com.georgeci.moneysurfer.feature.workspace.FakeCategoryRepository
 import com.georgeci.moneysurfer.feature.workspace.FakeCurrencyRepository
 import com.georgeci.moneysurfer.feature.workspace.FakeWorkspaceMemberRepository
 import com.georgeci.moneysurfer.feature.workspace.FakeWorkspaceRepository

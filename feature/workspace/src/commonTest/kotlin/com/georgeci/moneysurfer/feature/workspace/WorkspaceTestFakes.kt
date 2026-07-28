@@ -3,17 +3,14 @@ package com.georgeci.moneysurfer.feature.workspace
 import arrow.core.Either
 import arrow.core.right
 import com.georgeci.moneysurfer.domain.auth.AuthError
-import com.georgeci.moneysurfer.domain.model.Category
 import com.georgeci.moneysurfer.domain.model.Currency
 import com.georgeci.moneysurfer.domain.model.User
 import com.georgeci.moneysurfer.domain.model.Workspace
 import com.georgeci.moneysurfer.domain.model.WorkspaceMember
-import com.georgeci.moneysurfer.domain.primitives.CategoryId
 import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
 import com.georgeci.moneysurfer.domain.primitives.UserId
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 import com.georgeci.moneysurfer.domain.repositories.AuthRemoteRepository
-import com.georgeci.moneysurfer.domain.repositories.CategoryRepository
 import com.georgeci.moneysurfer.domain.repositories.CurrencyRepository
 import com.georgeci.moneysurfer.domain.repositories.LocalDataResetRepository
 import com.georgeci.moneysurfer.domain.repositories.RemoteDataResetRepository
@@ -92,26 +89,6 @@ internal class FakeWorkspaceMemberRepository : WorkspaceMemberRepository {
 
     override suspend fun markRemoved(userId: UserId, workspaceId: WorkspaceId, removedByUserId: UserId?) = Unit
     override suspend fun markLeft(userId: UserId, workspaceId: WorkspaceId) = Unit
-}
-
-internal class FakeCategoryRepository : CategoryRepository {
-    private val flow = MutableStateFlow(emptyList<Category>())
-
-    override fun getAll(): Flow<List<Category>> = flow
-    override fun getByWorkspaceId(workspaceId: WorkspaceId): Flow<List<Category>> = flow
-    override suspend fun getById(id: CategoryId): Category? = flow.value.firstOrNull { it.id == id }
-
-    override suspend fun insert(category: Category) {
-        flow.value = flow.value + category
-    }
-
-    override suspend fun update(category: Category) {
-        flow.value = flow.value.map { if (it.id == category.id) category else it }
-    }
-
-    override suspend fun delete(id: CategoryId) {
-        flow.value = flow.value.filterNot { it.id == id }
-    }
 }
 
 internal class FakeCurrencyRepository(
