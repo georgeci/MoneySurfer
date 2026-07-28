@@ -102,7 +102,7 @@ fun SurferBudgetCard(
             SurferBudgetProgressBar(
                 progress = metrics.progress,
                 status = status,
-                alertFraction = metrics.alertFraction,
+                tickFraction = metrics.alertFraction,
             )
 
             Text(

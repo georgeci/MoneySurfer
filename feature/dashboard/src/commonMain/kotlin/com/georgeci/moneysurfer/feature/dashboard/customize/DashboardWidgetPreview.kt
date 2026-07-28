@@ -8,6 +8,7 @@ import androidx.compose.ui.unit.dp
 import com.georgeci.moneysurfer.domain.dashboard.DashboardCardStyle
 import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetSize
 import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetType
+import com.georgeci.moneysurfer.uikit.components.budget.SurferBudgetStatus
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.modifier.surferScaleToWidth
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
@@ -27,6 +28,8 @@ import com.georgeci.moneysurfer.uikit.widgets.SurferInsightsWidget
 import com.georgeci.moneysurfer.uikit.widgets.SurferQuickActionsWidget
 import com.georgeci.moneysurfer.uikit.widgets.SurferRecentTransactionItem
 import com.georgeci.moneysurfer.uikit.widgets.SurferRecentTransactionsWidget
+import com.georgeci.moneysurfer.uikit.widgets.SurferSafeToSpendData
+import com.georgeci.moneysurfer.uikit.widgets.SurferSafeToSpendWidget
 import com.georgeci.moneysurfer.uikit.widgets.SurferWidgetSize
 import moneysurfer.feature.dashboard.generated.resources.Res
 import moneysurfer.feature.dashboard.generated.resources.dashboard_accounts_manage
@@ -48,12 +51,17 @@ import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_pre
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_preview_transaction_groceries
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_preview_transaction_rent
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_preview_transaction_salary
+import moneysurfer.feature.dashboard.generated.resources.dashboard_days_left
 import moneysurfer.feature.dashboard.generated.resources.dashboard_goals_see_all
 import moneysurfer.feature.dashboard.generated.resources.dashboard_goals_title
 import moneysurfer.feature.dashboard.generated.resources.dashboard_insights_title
 import moneysurfer.feature.dashboard.generated.resources.dashboard_quick_action_transfer
 import moneysurfer.feature.dashboard.generated.resources.dashboard_recent_see_all
 import moneysurfer.feature.dashboard.generated.resources.dashboard_recent_title
+import moneysurfer.feature.dashboard.generated.resources.dashboard_safe_to_spend_caption
+import moneysurfer.feature.dashboard.generated.resources.dashboard_safe_to_spend_per_day
+import moneysurfer.feature.dashboard.generated.resources.dashboard_safe_to_spend_title
+import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
 
 /**
@@ -89,6 +97,7 @@ internal fun DashboardWidgetPreview(
         when (type) {
             DashboardWidgetType.Balance -> BalancePreview(cardStyle.variant, modifier.then(content))
             DashboardWidgetType.QuickActions -> QuickActionsPreview(modifier.then(content))
+            DashboardWidgetType.SafeToSpend -> SafeToSpendPreview(modifier.then(content))
             DashboardWidgetType.Accounts -> AccountsPreview(modifier.then(content))
             DashboardWidgetType.Insights -> InsightsPreview(cardStyle.variant, modifier.then(content))
             DashboardWidgetType.Goals -> GoalsPreview(modifier.then(content))
@@ -124,6 +133,35 @@ private fun QuickActionsPreview(modifier: Modifier) {
         secondaryLabel = stringResource(Res.string.dashboard_quick_action_transfer),
         secondaryIcon = SurferIcons.SwapHoriz,
         onSecondaryClick = {},
+        modifier = modifier,
+    )
+}
+
+/**
+ * Sample numbers rather than the user's own: the tile is drawn for every widget in the picker,
+ * including the ones switched off, so it must not depend on there being a budget to read.
+ */
+@Composable
+private fun SafeToSpendPreview(modifier: Modifier) {
+    SurferSafeToSpendWidget(
+        title = stringResource(Res.string.dashboard_safe_to_spend_title),
+        data = SurferSafeToSpendData(
+            amount = SAMPLE_SAFE_TO_SPEND,
+            caption = stringResource(
+                Res.string.dashboard_safe_to_spend_caption,
+                SAMPLE_BUDGET_LIMIT,
+                stringResource(Res.string.dashboard_customize_preview_account_everyday),
+            ),
+            perDay = stringResource(Res.string.dashboard_safe_to_spend_per_day, SAMPLE_SAFE_PER_DAY),
+            daysLeft = pluralStringResource(
+                Res.plurals.dashboard_days_left,
+                SAMPLE_DAYS_LEFT,
+                SAMPLE_DAYS_LEFT,
+            ),
+            progress = SAMPLE_SAFE_PROGRESS,
+            paceFraction = SAMPLE_SAFE_PACE,
+            status = SurferBudgetStatus.Ok,
+        ),
         modifier = modifier,
     )
 }
@@ -271,3 +309,9 @@ private const val SAMPLE_EXPENSE_ONE = "−€48.20"
 private const val SAMPLE_INCOME = "+€3,200.00"
 private const val SAMPLE_EXPENSE_TWO = "−€9.99"
 private const val SAMPLE_EXPENSE_THREE = "−€760.00"
+private const val SAMPLE_SAFE_TO_SPEND = "€642.30"
+private const val SAMPLE_BUDGET_LIMIT = "€1,800"
+private const val SAMPLE_SAFE_PER_DAY = "€53.52"
+private const val SAMPLE_DAYS_LEFT = 12
+private const val SAMPLE_SAFE_PROGRESS = 0.64f
+private const val SAMPLE_SAFE_PACE = 0.6f

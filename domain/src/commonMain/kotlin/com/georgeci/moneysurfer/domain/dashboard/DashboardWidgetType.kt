@@ -9,6 +9,7 @@ package com.georgeci.moneysurfer.domain.dashboard
 enum class DashboardWidgetType {
     Balance,
     QuickActions,
+    SafeToSpend,
     Accounts,
     Insights,
     Goals,

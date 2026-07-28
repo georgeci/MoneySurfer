@@ -8,8 +8,10 @@ import com.georgeci.moneysurfer.domain.insight.Insight
 import com.georgeci.moneysurfer.domain.insight.InsightTone
 import com.georgeci.moneysurfer.domain.insight.SpendTrend
 import com.georgeci.moneysurfer.domain.model.Account
+import com.georgeci.moneysurfer.domain.model.BudgetStatus
 import com.georgeci.moneysurfer.domain.model.ConvertedTotal
 import com.georgeci.moneysurfer.domain.model.ExchangeRateSnapshot
+import com.georgeci.moneysurfer.domain.model.SafeToSpend
 import com.georgeci.moneysurfer.domain.model.SavingsGoalSummary
 import com.georgeci.moneysurfer.domain.model.TransactionSplitGroup
 import com.georgeci.moneysurfer.domain.preferences.UiPreferences
@@ -23,6 +25,7 @@ import com.georgeci.moneysurfer.domain.usecase.GetAccountsUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetExchangeRatesUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetGoalsUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetRecentTransactionsUseCase
+import com.georgeci.moneysurfer.domain.usecase.GetSafeToSpendUseCase
 import com.georgeci.moneysurfer.utils.MviViewModel
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
@@ -38,6 +41,7 @@ class DashboardViewModel(
     private val getRecentTransactions: GetRecentTransactionsUseCase,
     private val getGoals: GetGoalsUseCase,
     private val getExchangeRates: GetExchangeRatesUseCase,
+    private val getSafeToSpend: GetSafeToSpendUseCase,
     private val generateInsights: GenerateInsightsUseCase,
     private val convertAccountsTotal: ConvertAccountsTotalUseCase,
     uiPreferences: UiPreferences,
@@ -85,18 +89,25 @@ class DashboardViewModel(
             DashboardEvent.OnCustomizeClick -> postSideEffect(DashboardEffect.NavigateToCustomize)
             DashboardEvent.OnSeeAllGoalsClick -> postSideEffect(DashboardEffect.NavigateToGoals)
             is DashboardEvent.OnGoalClick -> postSideEffect(DashboardEffect.NavigateToGoalDetails(event.goalId))
+            DashboardEvent.OnSetBudgetClick -> postSideEffect(DashboardEffect.NavigateToBudgetCreation)
         }
     }
 
     private fun observeDashboard() {
+        // Layout and safe-to-spend are folded into one source because `combine` tops out at five
+        // typed flows, and these two are the pair that is never read apart.
+        val layoutAndSafeToSpend =
+            combine(layout, getSafeToSpend().onStart { emit(null) }) { layoutConfig, safeToSpend ->
+                layoutConfig to safeToSpend
+            }
         launch {
             combine(
                 getAccounts().onStart { emit(emptyList()) },
                 getRecentTransactions(),
                 getGoals(),
                 getExchangeRates().onStart { emit(null) },
-                layout,
-            ) { accounts, transactions, goals, rates, layoutConfig ->
+                layoutAndSafeToSpend,
+            ) { accounts, transactions, goals, rates, (layoutConfig, safeToSpend) ->
                 val balance = accounts.convertedTotal(rates)?.toBalanceUi()
                 DashboardState.Content(
                     accounts = accounts.map { it.toUi() },
@@ -112,14 +123,15 @@ class DashboardViewModel(
                     greeting = null,
                     formattedTrendDelta = null,
                     goals = goals.take(DASHBOARD_GOALS_LIMIT).map { it.toUi() },
+                    safeToSpend = safeToSpend?.toUi(),
                     isOffline = isOffline,
                     transferEnabled = transferEnabled,
                     layout = layoutConfig,
                 )
             }
-                // A sixth source would need the array-arity `combine`, which loses every element
-                // type. The insights are also the slowest input — two aggregates plus the category
-                // tree — so joining them last lets the rest of the dashboard draw without them.
+                // Joined here rather than folded into a pair above: the insights are the slowest
+                // input — two aggregates plus the category tree — so keeping them last lets the
+                // rest of the dashboard draw without waiting on them.
                 .combine(generateInsights().onStart { emit(emptyList()) }) { content, insights ->
                     content.copy(insights = insights.map { it.toUi() })
                 }
@@ -169,6 +181,22 @@ class DashboardViewModel(
         name = name,
         formattedBalance = MoneyFormatter.format(balance, currencyCode),
         currency = currencyCode.value,
+    )
+
+    /**
+     * The headline is signed — negative once the budget is overspent — so the widget states the
+     * overshoot rather than flooring at zero and pretending the period is merely spent out.
+     */
+    private fun SafeToSpend.toUi(): SafeToSpendUi = SafeToSpendUi(
+        budgetName = budgetName,
+        remainingFormatted = MoneyFormatter.format(remaining, currency),
+        spentFormatted = MoneyFormatter.format(spent, currency),
+        limitFormatted = MoneyFormatter.format(limit, currency),
+        perDayFormatted = MoneyFormatter.format(perDay, currency),
+        daysLeft = daysLeft,
+        progress = spentFraction,
+        paceFraction = elapsedFraction,
+        status = status,
     )
 
     private fun SavingsGoalSummary.toUi() = GoalUi(
@@ -258,6 +286,8 @@ sealed interface DashboardState {
         val greeting: String?,
         val formattedTrendDelta: String?,
         val goals: List<GoalUi> = emptyList(),
+        /** What is still safe to spend this period, or null while no active budget backs a number. */
+        val safeToSpend: SafeToSpendUi? = null,
         /** Generated spending insights, most actionable first. Empty until the engine has run. */
         val insights: List<InsightUi> = emptyList(),
         val isOffline: Boolean = false,
@@ -344,6 +374,28 @@ data class InsightUi(
     val count: Int = 0,
 )
 
+/**
+ * The safe-to-spend widget's numbers. Money is formatted here; the sentences around it are built
+ * on the screen, which is where the string resources are.
+ */
+data class SafeToSpendUi(
+    val budgetName: String,
+    /** Signed — negative once the budget is overspent. */
+    val remainingFormatted: String,
+    val spentFormatted: String,
+    val limitFormatted: String,
+    val perDayFormatted: String,
+    val daysLeft: Int,
+    /** Spend against the limit; can exceed 1, which the bar caps rather than overdraws. */
+    val progress: Float,
+    /** How much of the period has gone — the tick [progress] is read against. */
+    val paceFraction: Float,
+    val status: BudgetStatus,
+) {
+    /** Derived rather than stored, so the wording and the colour can never disagree. */
+    val isOver: Boolean get() = status == BudgetStatus.OVER
+}
+
 data class TransactionUi(
     val id: TransactionId,
     val title: String,
@@ -371,6 +423,7 @@ sealed interface DashboardEvent {
     data object OnCustomizeClick : DashboardEvent
     data object OnSeeAllGoalsClick : DashboardEvent
     data class OnGoalClick(val goalId: GoalId) : DashboardEvent
+    data object OnSetBudgetClick : DashboardEvent
 }
 
 sealed interface DashboardEffect {
@@ -387,6 +440,9 @@ sealed interface DashboardEffect {
     data object NavigateToTransactionsList : DashboardEffect
     data object NavigateToGoals : DashboardEffect
     data class NavigateToGoalDetails(val goalId: GoalId) : DashboardEffect
+
+    /** The budget editor, opened empty — the way out of the safe-to-spend widget's empty state. */
+    data object NavigateToBudgetCreation : DashboardEffect
 }
 
 private const val RECENT_TRANSACTIONS_LIMIT = 5
