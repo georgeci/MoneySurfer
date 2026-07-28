@@ -96,6 +96,40 @@ What must not be built on:
 
 No UI. This is the phase that makes every later number defensible.
 
+**Landed (issue #384)**, with three calls the plan left open:
+
+- `PeriodTotals` / `calculatePeriodTotalsFromList` / `CalculatePeriodTotalsUseCase` were deleted
+  rather than re-expressed. Nothing referenced them, and `netByMonth` covers the income/expense
+  split they existed for. The planned-income/expense split they also carried has no consumer;
+  it belongs in the same query when a screen wants it.
+- `topMerchants` skips rows with a blank `merchant` instead of bucketing them. Unlike a missing
+  category, an empty label is not a counterparty the user could act on, and it would be the
+  largest bar in most workspaces.
+- The shared `WHERE` carries one term the predicate below does not:
+  `operationDate = date(operationDate)`, which admits only the canonical `YYYY-MM-DD` spelling.
+  `operationDate` is plain text, and the month and day series parse it while the category,
+  merchant and currency rollups do not — so any string SQLite reads but `LocalDate.parse` refuses
+  (`''`, `'2025-3-5'`, `'2025-03-05T10:00'`, a Julian day number) would be counted by one half and
+  dropped by the other. `''` is the only spelling seen in the wild, from before the column
+  existed, and `MIGRATION_27_28` already backfilled it; the rest guards against an older or
+  foreign writer. `getMonthlyTotalsByCategory` carries the same term, so all six queries agree.
+
+Still open from the [status quo](#status-quo) table: the SQL predicate tests the *stored* type,
+so the legacy `REGULAR` spelling that `TransactionRepositoryImpl.parseType` resolves by sign is
+counted by `Budget.counts` and by nothing in Insights. Pre-existing — `getMonthlyTotalsByCategory`
+always behaved this way — and best fixed by a backfill migration, not by a fourth predicate.
+
+Two contract notes for the widget tasks:
+
+- `netByMonth` groups *inside* the window, so a window whose ends are not month boundaries returns
+  part-months under a full month's name — `MonthlyNet.month` cannot express the difference. #296's
+  Week mode belongs on `daily`, not here.
+- `GetCategorySpendHistoryUseCase` observes the workspace base currency rather than reading it
+  once, because the aggregate filters on it: a device that has not pulled the workspace row yet
+  resolves `null`, which matches nothing, and a latched `null` would leave an empty trend on
+  screen for as long as the caller stayed subscribed. Any use case built on `SpendScope` needs the
+  same treatment.
+
 New aggregation-only interface, alongside `CategorySpendRepository` rather than
 inside `TransactionRepository`:
 
