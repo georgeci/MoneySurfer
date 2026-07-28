@@ -16,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.tooling.preview.Preview
@@ -31,6 +32,11 @@ import com.georgeci.moneysurfer.uikit.theme.AppTheme
  *
  * [content] is stacked in the hole (percent, spent, "of limit"); the caller owns that text so
  * the ring stays free of formatting concerns.
+ *
+ * [color] defaults to the colour [status] maps to, which is what a budget screen wants. A caller
+ * whose shape is not primarily about a budget overrides it — the dashboard's spent-by-category card
+ * paints a category in its own tint until its cap has something to report, and passes that decision
+ * here so its ring cannot disagree with the legend beside it.
  */
 @Composable
 fun SurferBudgetRing(
@@ -39,11 +45,12 @@ fun SurferBudgetRing(
     modifier: Modifier = Modifier,
     size: Dp = 176.dp,
     strokeWidth: Dp = 14.dp,
+    color: Color = status.color,
     content: @Composable () -> Unit = {},
 ) {
     ArcMeter(
         progress = progress,
-        status = status,
+        color = color,
         span = ArcSpan.FullTurn,
         modifier = modifier,
         width = size,
@@ -60,7 +67,7 @@ fun SurferBudgetRing(
  *
  * Shares [ArcMeter] with the ring on purpose: the two differ in the arc they span and nothing else,
  * and a second copy of the geometry is how a status colour or a cap ends up fixed in one shape and
- * not the other.
+ * not the other. [color] overrides the status colour exactly as it does on [SurferBudgetRing].
  */
 @Composable
 fun SurferBudgetGauge(
@@ -69,11 +76,12 @@ fun SurferBudgetGauge(
     modifier: Modifier = Modifier,
     width: Dp = 176.dp,
     strokeWidth: Dp = 12.dp,
+    color: Color = status.color,
     content: @Composable () -> Unit = {},
 ) {
     ArcMeter(
         progress = progress,
-        status = status,
+        color = color,
         span = ArcSpan.TopHalf,
         modifier = modifier,
         width = width,
@@ -116,14 +124,13 @@ private data class ArcSpan(
 @Composable
 private fun ArcMeter(
     progress: Float,
-    status: SurferBudgetStatus,
+    color: Color,
     span: ArcSpan,
     modifier: Modifier,
     width: Dp,
     strokeWidth: Dp,
     content: @Composable () -> Unit,
 ) {
-    val fill = status.color
     val track = AppTheme.materialColors.surfaceContainerHighest
     val capped = progress.coerceIn(0f, 1f)
 
@@ -150,7 +157,7 @@ private fun ArcMeter(
             )
             if (capped > 0f) {
                 drawArc(
-                    color = fill,
+                    color = color,
                     startAngle = span.startDegrees,
                     sweepAngle = span.sweepDegrees * capped,
                     useCenter = false,

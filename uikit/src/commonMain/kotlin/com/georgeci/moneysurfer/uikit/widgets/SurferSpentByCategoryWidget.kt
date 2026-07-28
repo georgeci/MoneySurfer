@@ -204,12 +204,15 @@ private fun RingBody(items: List<SurferCategorySpendItem>, hero: Boolean) {
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        // The ring stands for the whole period, so it fills to the top category's share of it.
+        // The ring stands for the whole period, so it fills to the top category's share of it, and
+        // it takes the same colour the row would get anywhere else on this card — otherwise the arc
+        // and its own legend dot, an inch apart, would show one category in two colours.
         SurferBudgetRing(
             progress = top.share,
             status = top.cap?.status ?: SurferBudgetStatus.Ok,
             size = if (hero) 116.dp else 84.dp,
             strokeWidth = if (hero) 12.dp else 9.dp,
+            color = top.meterColor(),
         ) {
             // The amount alone: the legend beside it names this category on its first row, and the
             // hole is too narrow to repeat a name without truncating it.
@@ -246,6 +249,7 @@ private fun GaugeBody(item: SurferCategorySpendItem, hero: Boolean) {
             status = item.cap?.status ?: SurferBudgetStatus.Ok,
             width = if (hero) 180.dp else 128.dp,
             strokeWidth = if (hero) 12.dp else 9.dp,
+            color = item.meterColor(),
         ) {
             Text(
                 text = item.amount,

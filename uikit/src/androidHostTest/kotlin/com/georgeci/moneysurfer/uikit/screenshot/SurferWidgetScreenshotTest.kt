@@ -5,12 +5,14 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.georgeci.moneysurfer.screenshot.ScreenshotQualifiers
 import com.georgeci.moneysurfer.screenshot.ScreenshotSdk
 import com.georgeci.moneysurfer.screenshot.captureLightAndDark
+import com.georgeci.moneysurfer.uikit.components.SurferCategoryPalette
 import com.georgeci.moneysurfer.uikit.components.budget.SurferBudgetStatus
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.widgets.SurferAccountItem
@@ -19,12 +21,17 @@ import com.georgeci.moneysurfer.uikit.widgets.SurferAddAccountCta
 import com.georgeci.moneysurfer.uikit.widgets.SurferBalanceFootnote
 import com.georgeci.moneysurfer.uikit.widgets.SurferBalanceVariant
 import com.georgeci.moneysurfer.uikit.widgets.SurferBalanceWidget
+import com.georgeci.moneysurfer.uikit.widgets.SurferCategorySpendCap
+import com.georgeci.moneysurfer.uikit.widgets.SurferCategorySpendItem
 import com.georgeci.moneysurfer.uikit.widgets.SurferQuickActionsWidget
 import com.georgeci.moneysurfer.uikit.widgets.SurferRecentTransactionItem
 import com.georgeci.moneysurfer.uikit.widgets.SurferRecentTransactionsWidget
 import com.georgeci.moneysurfer.uikit.widgets.SurferSafeToSpendData
 import com.georgeci.moneysurfer.uikit.widgets.SurferSafeToSpendEmpty
 import com.georgeci.moneysurfer.uikit.widgets.SurferSafeToSpendWidget
+import com.georgeci.moneysurfer.uikit.widgets.SurferSpentByCategoryEmpty
+import com.georgeci.moneysurfer.uikit.widgets.SurferSpentByCategoryVariant
+import com.georgeci.moneysurfer.uikit.widgets.SurferSpentByCategoryWidget
 import com.georgeci.moneysurfer.uikit.widgets.SurferWidgetSize
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -212,6 +219,114 @@ class SurferWidgetScreenshotTest {
                 ),
                 modifier = Modifier.fillMaxWidth(),
                 size = SurferWidgetSize.Expanded,
+            )
+        }
+    }
+
+    /**
+     * All five treatments at Hero. The sample deliberately mixes a capped-and-warned category, an
+     * overspent one and three uncapped ones: what separates the variants is not only their geometry
+     * but where each puts the status colour and the status word, and a uniform sample would hide
+     * both.
+     */
+    @Test
+    fun surferSpentByCategoryWidget() = captureLightAndDark("surfer_spent_by_category_widget") {
+        SpentByCategoryGallery(size = SurferWidgetSize.Expanded)
+    }
+
+    /** The same five at Compact — fewer rows, a tighter type scale, the same captions. */
+    @Test
+    fun surferSpentByCategoryWidgetCompact() =
+        captureLightAndDark("surfer_spent_by_category_widget_compact") {
+            SpentByCategoryGallery(size = SurferWidgetSize.Compact)
+        }
+
+    /** No spend this period: the card keeps its heading and says so rather than disappearing. */
+    @Test
+    fun surferSpentByCategoryWidgetEmpty() =
+        captureLightAndDark("surfer_spent_by_category_widget_empty") {
+            Column(modifier = Modifier.padding(16.dp)) {
+                SurferSpentByCategoryWidget(
+                    title = SpentByCategoryTitle,
+                    items = emptyList(),
+                    modifier = Modifier.fillMaxWidth().height(SafeToSpendEmptyHeight),
+                    empty = SurferSpentByCategoryEmpty(
+                        title = "Nothing spent yet",
+                        subtitle = "Expenses you log this month break down here.",
+                    ),
+                )
+            }
+        }
+}
+
+private const val SpentByCategoryTitle = "Spent by category"
+
+@Composable
+private fun SpentByCategoryGallery(size: SurferWidgetSize) {
+    val tints = SurferCategoryPalette.tints
+    val items = listOf(
+        SurferCategorySpendItem(
+            id = "rent",
+            name = "Rent",
+            amount = "€760.00",
+            share = 0.45f,
+            caption = "45% of spending",
+            tint = tints[0],
+        ),
+        SurferCategorySpendItem(
+            id = "groceries",
+            name = "Groceries",
+            amount = "€142.10",
+            share = 0.22f,
+            caption = "€142.10 of €150",
+            tint = tints[1],
+            cap = SurferCategorySpendCap(
+                progress = 0.95f,
+                status = SurferBudgetStatus.Warn,
+                statusLabel = "Near limit",
+            ),
+        ),
+        SurferCategorySpendItem(
+            id = "dining",
+            name = "Eating out",
+            amount = "€96.40",
+            share = 0.12f,
+            caption = "over €80",
+            tint = tints[2],
+            cap = SurferCategorySpendCap(
+                progress = 1.2f,
+                status = SurferBudgetStatus.Over,
+                statusLabel = "Over",
+            ),
+        ),
+        SurferCategorySpendItem(
+            id = "transport",
+            name = "Transport",
+            amount = "€54.00",
+            share = 0.08f,
+            caption = "8% of spending",
+            tint = tints[3],
+        ),
+        SurferCategorySpendItem(
+            id = "leisure",
+            name = "Leisure",
+            amount = "€38.20",
+            share = 0.06f,
+            caption = "6% of spending",
+            tint = tints[4],
+        ),
+    )
+    Column(
+        modifier = Modifier.padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        SurferSpentByCategoryVariant.entries.forEach { variant ->
+            SurferSpentByCategoryWidget(
+                title = SpentByCategoryTitle,
+                items = items,
+                modifier = Modifier.fillMaxWidth(),
+                size = size,
+                variant = variant,
             )
         }
     }
