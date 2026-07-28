@@ -7,12 +7,17 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
@@ -84,6 +89,10 @@ data class SurferDrawerSection(
  * @param userName primary line of the footer — a display name, an email, or a placeholder.
  * @param workspaceName secondary line; omitted when no workspace is selected yet.
  * @param onUserClick makes the footer a button (the workspace switcher). Null leaves it inert.
+ * @param windowInsets the insets the drawer keeps its content clear of. Owned here rather than by
+ *   the host for the same reason `NavigationRail` owns its own: the surface has to paint edge to
+ *   edge — under the status bar and any start-edge cutout — while the brand header and the user
+ *   footer stay out from under them. The default matches `NavigationRailDefaults.windowInsets`.
  */
 @Composable
 fun SurferNavigationDrawer(
@@ -93,6 +102,8 @@ fun SurferNavigationDrawer(
     brand: String = stringResource(Res.string.uikit_brand),
     workspaceName: String? = null,
     onUserClick: (() -> Unit)? = null,
+    windowInsets: WindowInsets =
+        WindowInsets.safeDrawing.only(WindowInsetsSides.Start + WindowInsetsSides.Vertical),
 ) {
     Row(modifier = modifier.fillMaxHeight().width(DrawerWidth)) {
         Column(
@@ -100,6 +111,8 @@ fun SurferNavigationDrawer(
                 .weight(1f)
                 .fillMaxHeight()
                 .background(AppTheme.materialColors.surfaceContainerLow)
+                // Inside the background, so the surface still reaches the window edge.
+                .windowInsetsPadding(windowInsets)
                 .testTag(SurferNavigationDrawerTestTags.Root),
         ) {
             BrandHeader(brand = brand)
@@ -273,7 +286,9 @@ private val BrandLogoCorner: Dp = 10.dp
 private val HorizontalInset: Dp = 10.dp
 private val ItemInset: Dp = 10.dp
 private val ItemGap: Dp = 2.dp
-private val ItemHeight: Dp = 40.dp
+
+/** The 48 dp minimum touch target — `Modifier.selectable` does not expand one of its own. */
+private val ItemHeight: Dp = 48.dp
 private val ItemCorner: Dp = 10.dp
 private val ItemIconSize: Dp = 20.dp
 private val AvatarSize: Dp = 32.dp

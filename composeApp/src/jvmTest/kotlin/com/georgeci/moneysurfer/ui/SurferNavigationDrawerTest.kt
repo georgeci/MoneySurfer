@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.ExperimentalTestApi
+import androidx.compose.ui.test.assertHasClickAction
+import androidx.compose.ui.test.assertHasNoClickAction
 import androidx.compose.ui.test.assertIsNotSelected
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.onAllNodesWithText
@@ -79,6 +81,7 @@ class SurferNavigationDrawerTest : StringSpec({
             var userClicks = 0
             setContent { Drawer(onUserClick = { userClicks++ }) }
 
+            onNodeWithTag(SurferNavigationDrawerTestTags.User).assertHasClickAction()
             onNodeWithTag(SurferNavigationDrawerTestTags.User).performClick()
 
             userClicks shouldBe 1
@@ -89,9 +92,10 @@ class SurferNavigationDrawerTest : StringSpec({
         runComposeUiTest {
             setContent { Drawer(onUserClick = null) }
 
-            // Nothing to assert but that clicking it neither crashes nor reports anything —
-            // the footer is a label until the caller gives it somewhere to go.
-            onNodeWithTag(SurferNavigationDrawerTestTags.User).performClick()
+            // The footer is a label until the caller gives it somewhere to go. Asserted on the
+            // semantics rather than by clicking it: `performClick` needs no click action, so a
+            // click that reports nothing would pass even if the guard were dropped.
+            onNodeWithTag(SurferNavigationDrawerTestTags.User).assertHasNoClickAction()
             onNodeWithText(USER).assertExists()
         }
     }

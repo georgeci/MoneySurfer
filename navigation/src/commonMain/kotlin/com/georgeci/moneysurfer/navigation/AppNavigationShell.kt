@@ -4,11 +4,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.safeDrawing
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
@@ -16,6 +16,7 @@ import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffo
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.georgeci.moneysurfer.uikit.components.base.SurferDrawerItem
@@ -97,10 +98,13 @@ internal fun AppNavigationShell(
  * The drawer presentation: [SurferNavigationDrawer] beside the content, with the destinations
  * grouped by [NavigationSection].
  *
- * The horizontal `safeDrawing` insets are padded — and thereby consumed — once around both
- * children, exactly as [SurferPaneSceneStrategy] does for the two panes inside `content`. Applied
- * by each child instead, the drawer would pad the window edge and the content its own left edge,
- * which is an interior edge with no system inset behind it.
+ * Insets are split the way `NavigationSuiteScaffold` splits them for the rail, not the way
+ * [SurferPaneSceneStrategy] splits them for two panes. The drawer is chrome, so its surface has to
+ * reach the window edge and pad its own content — padding the whole row instead would leave a
+ * strip of the scaffold background beside a start-edge cutout, and leave the brand header under
+ * the status bar. What the host owes the content pane is only the *consumption*: the start inset
+ * is the drawer's, so the pane inside must not apply it again on an interior edge. The end inset
+ * survives for `SurferPaneScene` and the screens to apply.
  */
 @Composable
 private fun AppNavigationDrawer(
@@ -111,20 +115,23 @@ private fun AppNavigationDrawer(
 ) {
     val viewModel: AppShellViewModel = koinViewModel()
     val identity by viewModel.identity.collectAsStateWithLifecycle()
-    Row(
-        modifier = Modifier
-            .fillMaxSize()
-            .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal)),
-    ) {
+    Row(modifier = Modifier.fillMaxSize()) {
         SurferNavigationDrawer(
             sections = drawerSections(currentTopLevel = currentTopLevel, onSelect = onSelect),
             userName = identity.userName ?: stringResource(Res.string.nav_user_guest),
             workspaceName = identity.workspaceName,
             onUserClick = onOpenWorkspaceSelector,
         )
-        // `weight` only sizes the horizontal axis; without `fillMaxHeight` the content column
-        // would wrap its children's height instead of filling the window beside the drawer.
-        Box(modifier = Modifier.weight(1f).fillMaxHeight()) { content() }
+        Box(
+            // `weight` only sizes the horizontal axis; without `fillMaxHeight` the content column
+            // would wrap its children's height instead of filling the window beside the drawer.
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxHeight()
+                .consumeWindowInsets(WindowInsets.safeDrawing.only(WindowInsetsSides.Start)),
+        ) {
+            content()
+        }
     }
 }
 
@@ -133,25 +140,37 @@ private fun AppNavigationDrawer(
  * each one. `groupBy` preserves insertion order for both the keys and the values, so a section
  * that ever became non-contiguous in the enum would still render as one block — the enum's own
  * doc is what keeps the two orders honest.
+ *
+ * Remembered because the `onClick` lambdas are built inside a plain `map`, which the Compose
+ * compiler does not memoize: without this every recomposition would hand the drawer seven items
+ * with new lambda identities, and `@Immutable` would buy nothing. The resolved label lists are
+ * keys rather than a locale token, so a configuration change still rebuilds them.
  */
 @Composable
 private fun drawerSections(
     currentTopLevel: Route.TopLevel,
     onSelect: (Route) -> Unit,
-): List<SurferDrawerSection> =
-    TopLevelDestination.entries.groupBy { it.section }.map { (section, destinations) ->
-        SurferDrawerSection(
-            label = section.label?.let { stringResource(it) },
-            items = destinations.map { destination ->
-                SurferDrawerItem(
-                    label = stringResource(destination.label),
-                    icon = destination.icon,
-                    selected = destination.matches(currentTopLevel),
-                    onClick = { onSelect(destination.route) },
-                )
-            },
-        )
+): List<SurferDrawerSection> {
+    val labels = TopLevelDestination.entries.map { stringResource(it.label) }
+    val sectionLabels = NavigationSection.entries.map { section ->
+        section.label?.let { stringResource(it) }
     }
+    return remember(currentTopLevel, onSelect, labels, sectionLabels) {
+        TopLevelDestination.entries.groupBy { it.section }.map { (section, destinations) ->
+            SurferDrawerSection(
+                label = sectionLabels[section.ordinal],
+                items = destinations.map { destination ->
+                    SurferDrawerItem(
+                        label = labels[destination.ordinal],
+                        icon = destination.icon,
+                        selected = destination.matches(currentTopLevel),
+                        onClick = { onSelect(destination.route) },
+                    )
+                },
+            )
+        }
+    }
+}
 
 /** The rail (and the empty Compact) presentation — the flat list `NavigationSuiteScaffold` takes. */
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)

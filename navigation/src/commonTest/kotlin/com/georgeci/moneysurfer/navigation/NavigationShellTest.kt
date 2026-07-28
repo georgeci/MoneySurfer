@@ -4,6 +4,7 @@ import com.georgeci.moneysurfer.uikit.window.SurferWindowSize
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 
 /**
  * The width → presentation policy and the invariants the one destination list has to hold for all
@@ -53,7 +54,7 @@ class NavigationShellTest : StringSpec({
 
     "only the manage section is captioned" {
         NavigationSection.Primary.label shouldBe null
-        (NavigationSection.Manage.label != null) shouldBe true
+        NavigationSection.Manage.label shouldNotBe null
     }
 
     "no two destinations share a route" {
