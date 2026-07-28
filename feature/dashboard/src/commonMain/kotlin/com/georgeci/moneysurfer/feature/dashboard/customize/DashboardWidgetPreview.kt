@@ -169,21 +169,21 @@ private fun InsightsPreview(variant: String?, modifier: Modifier) {
     SurferInsightsWidget(
         items = listOf(
             SurferInsightItem(
-                id = "preview-1",
+                id = "preview-insight-1",
                 tone = SurferInsightTone.Warn,
                 icon = SurferIcons.ArrowUp,
                 title = stringResource(Res.string.dashboard_customize_preview_insight_up_title),
                 body = stringResource(Res.string.dashboard_customize_preview_insight_up_body),
             ),
             SurferInsightItem(
-                id = "preview-2",
+                id = "preview-insight-2",
                 tone = SurferInsightTone.Good,
                 icon = SurferIcons.ArrowDown,
                 title = stringResource(Res.string.dashboard_customize_preview_insight_down_title),
                 body = stringResource(Res.string.dashboard_customize_preview_insight_down_body),
             ),
             SurferInsightItem(
-                id = "preview-3",
+                id = "preview-insight-3",
                 tone = SurferInsightTone.Neutral,
                 icon = SurferIcons.Sync,
                 title = stringResource(Res.string.dashboard_customize_preview_insight_subs_title),

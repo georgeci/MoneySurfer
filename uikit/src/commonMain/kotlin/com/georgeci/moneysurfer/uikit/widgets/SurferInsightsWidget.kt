@@ -67,10 +67,15 @@ enum class SurferInsightsVariant {
 /**
  * The generated-insight card.
  *
- * [SurferInsightsVariant.List] keeps as many cards as the size allows — three expanded, one
+ * [SurferInsightsVariant.List] keeps as many cards as the size allows — four expanded, one
  * compact — because a column of insights is read at a glance. [SurferInsightsVariant.Carousel]
  * keeps all of them instead and trades height for swipes, which is what makes it worth offering:
  * a compact carousel still reaches every insight.
+ *
+ * There is no "N new" badge slot. Counting new findings needs seen-or-dismissed state that
+ * nothing persists yet (see `Insight.id` for the hook it would hang on), so the parameter was
+ * only ever rendering `items.size` — and an eighth parameter trips SonarCloud's `kotlin:S107`,
+ * which `@Composable` hides from detekt. It comes back with the feature that needs it.
  */
 @Composable
 fun SurferInsightsWidget(
@@ -80,21 +85,11 @@ fun SurferInsightsWidget(
     size: SurferWidgetSize = LocalSurferWidgetSize.current,
     variant: SurferInsightsVariant = SurferInsightsVariant.List,
     onItemClick: ((SurferInsightItem) -> Unit)? = null,
-    badgeFormat: ((Int) -> String)? = null,
     emptyText: String? = null,
 ) {
     SurferWidgetCard(
         title = title,
         modifier = modifier,
-        trailing = {
-            if (items.isNotEmpty() && badgeFormat != null) {
-                Text(
-                    text = badgeFormat(items.size),
-                    style = AppTheme.typography.labelMedium,
-                    color = AppTheme.materialColors.primary,
-                )
-            }
-        },
     ) {
         if (items.isEmpty()) {
             SurferWidgetEmptyState(
@@ -307,7 +302,6 @@ private fun SurferInsightsWidgetHeroPreview() {
             SurferInsightsWidget(
                 items = PREVIEW_ITEMS,
                 title = "Insights",
-                badgeFormat = { "$it new" },
                 modifier = Modifier.fillMaxWidth(),
             )
         }

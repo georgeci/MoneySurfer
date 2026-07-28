@@ -86,6 +86,56 @@ class DashboardInsightsScreenTest : StringSpec({
         }
     }
 
+    "the two period sentences the samples do not cover still draw" {
+        runComposeUiTest {
+            setContent {
+                DashboardContent(
+                    state = contentWith(
+                        listOf(
+                            InsightUi(
+                                id = "period-spend:2026-07",
+                                kind = InsightKind.PeriodUp,
+                                tone = InsightTone.Warn,
+                                amount = "€640.00",
+                                comparison = "€520.00",
+                                percent = 23,
+                            ),
+                        ),
+                    ),
+                    onEvent = {},
+                )
+            }
+
+            onNodeWithText("Spending is up 23%").assertIsDisplayed()
+        }
+    }
+
+    "a period in line with the last one names that, without a percentage" {
+        runComposeUiTest {
+            setContent {
+                DashboardContent(
+                    state = contentWith(
+                        listOf(
+                            InsightUi(
+                                id = "period-spend:2026-07",
+                                kind = InsightKind.PeriodFlat,
+                                tone = InsightTone.Neutral,
+                                amount = "€528.00",
+                                comparison = "€520.00",
+                                percent = 1,
+                            ),
+                        ),
+                    ),
+                    onEvent = {},
+                )
+            }
+
+            onNodeWithText("Spending is steady").assertIsDisplayed()
+            onNodeWithText("€528.00 this month, against €520.00 by the same day last month.")
+                .assertIsDisplayed()
+        }
+    }
+
     "a slice with no category is named rather than left blank" {
         runComposeUiTest {
             setContent {
