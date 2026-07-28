@@ -140,6 +140,15 @@ data class TransactionDoc(
     val clientVersionCode: Int = 1,
     /** Shared id linking the two legs of a transfer. Null for non-transfer rows. */
     val transferId: String? = null,
+    /**
+     * Shared id linking the sibling rows one receipt was split across. Null for the ordinary
+     * single-category row.
+     *
+     * Every leg is a self-contained document, which is why a split replicates correctly under
+     * per-entity LWW where a parent doc plus child allocation docs would not: legs are pulled
+     * independently and none of them is meaningless on its own.
+     */
+    val splitId: String? = null,
     /** Rule that generated this row. Null for manual entries. */
     val recurringRuleId: String? = null,
 )

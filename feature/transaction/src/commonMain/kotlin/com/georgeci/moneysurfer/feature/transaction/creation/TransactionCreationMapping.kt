@@ -49,7 +49,8 @@ internal fun TransactionCreationState.Content.seededFrom(
         } else {
             // A duplicate keeps what the user typed about the counterparty, but is a fresh
             // manual entry: it inherits neither the transfer pairing (a second leg would be
-            // missing), the recurring rule that generated the original, nor its planned state.
+            // missing), the split group (it would silently add a leg to someone else's receipt),
+            // the recurring rule that generated the original, nor its planned state.
             PreservedTransactionFields(merchant = transaction.merchant, tags = transaction.tags)
         },
         displayCategories = buildDisplayCategories(

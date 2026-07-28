@@ -17,6 +17,7 @@ import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.CategoryId
 import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
 import com.georgeci.moneysurfer.domain.primitives.Money
+import com.georgeci.moneysurfer.domain.primitives.SplitId
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
 import com.georgeci.moneysurfer.domain.primitives.TransferId
@@ -255,6 +256,8 @@ private class WindowedTransactions(transactions: List<Transaction>) : Transactio
     override suspend fun getById(id: TransactionId): Transaction? = rows.value.find { it.id == id }
     override suspend fun getByTransferId(transferId: TransferId): List<Transaction> =
         rows.value.filter { it.transferId == transferId }
+    override suspend fun getBySplitId(splitId: SplitId): List<Transaction> =
+        rows.value.filter { it.splitId == splitId }
     override suspend fun insert(transaction: Transaction) = Unit
     override suspend fun update(transaction: Transaction) = Unit
     override suspend fun delete(id: TransactionId) = Unit

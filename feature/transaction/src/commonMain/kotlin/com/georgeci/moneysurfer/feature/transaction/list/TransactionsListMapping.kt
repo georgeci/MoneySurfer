@@ -8,6 +8,7 @@ import com.georgeci.moneysurfer.domain.model.TransactionTotal
 import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
 import com.georgeci.moneysurfer.domain.primitives.Money
+import com.georgeci.moneysurfer.domain.primitives.SplitId
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
 import com.georgeci.moneysurfer.feature.transaction.filter.TransactionFilters
 import kotlinx.datetime.LocalDate
@@ -38,28 +39,81 @@ internal fun groupByDate(
     accountNames: Map<AccountId, String>,
     dateLabel: (LocalDate) -> TransactionDateUi,
 ): List<TransactionGroupUi> =
-    rows.groupBy { it.transaction.operationDate }
-        .map { (date, txns) ->
-            val net = txns.fold(Money.zero()) { acc, t -> acc + t.signedMoney() }
+    collapseSplitLegs(rows)
+        .groupBy { it.primary.transaction.operationDate }
+        .map { (date, receipts) ->
+            val net = receipts.fold(Money.zero()) { acc, receipt -> acc + receipt.signedMoney() }
             TransactionGroupUi(
                 date = date,
                 dateLabel = dateLabel(date),
-                netFormatted = MoneyFormatter.format(net, txns.first().transaction.currencyCode),
+                netFormatted = MoneyFormatter.format(
+                    net,
+                    receipts.first().primary.transaction.currencyCode,
+                ),
                 netPositive = !net.isNegative(),
-                transactions = txns.map { it.toRow(accountNames) },
+                transactions = receipts.map { it.toRow(accountNames) },
             )
         }
 
-private fun CategorizedTransaction.toRow(accountNames: Map<AccountId, String>): TransactionRowUi {
+/**
+ * One line of the list: an ordinary transaction, or every leg of a split the page holds in full.
+ *
+ * The legs of a split share account, date and type by construction (see
+ * `CreateSplitTransactionUseCase`), so a receipt has one date to group under and one currency to
+ * format in.
+ */
+internal data class ListReceipt(val legs: List<CategorizedTransaction>) {
+    val primary: CategorizedTransaction get() = legs.first()
+    val isSplit: Boolean get() = legs.size > 1
+
+    /** Distinct categories the receipt was filed under — what the collapsed row's badge counts. */
+    val categoryCount: Int get() = legs.map { it.transaction.categoryId }.distinct().size
+}
+
+/**
+ * Collapses the legs of a split into a single receipt — a supermarket run paid for once should be
+ * one row, not one row per category it was filed under.
+ *
+ * **Only a group present in full collapses.** A page is a `LIMIT` window and may be narrowed
+ * further by an in-memory filter, so a group can easily be here in part: cut by the paging
+ * boundary, or thinned down to the one leg a category filter matched. Collapsing those would render
+ * a total quietly missing money — a figure that changes on its own when the user taps "load more".
+ * Rendering the legs it actually has instead is honest at every window size, and it is also what
+ * the account- and category-scoped lists want, where a leg genuinely is its own row.
+ *
+ * [CategorizedTransaction.splitLegCount] is the group's size in storage, counted by the window
+ * query, which is what makes "present in full" answerable without a second round trip.
+ */
+internal fun collapseSplitLegs(rows: List<CategorizedTransaction>): List<ListReceipt> {
+    val presentLegs = rows
+        .filter { it.transaction.splitId != null }
+        .groupBy { it.transaction.splitId }
+    val collapsed = mutableSetOf<SplitId>()
+    return rows.mapNotNull { row ->
+        val splitId = row.transaction.splitId ?: return@mapNotNull ListReceipt(listOf(row))
+        val legs = presentLegs[splitId].orEmpty()
+        if (legs.size < row.splitLegCount) return@mapNotNull ListReceipt(listOf(row))
+        if (!collapsed.add(splitId)) return@mapNotNull null
+        ListReceipt(legs)
+    }
+}
+
+private fun ListReceipt.toRow(accountNames: Map<AccountId, String>): TransactionRowUi {
+    val transaction = primary.transaction
     val isTransferLeg = transaction.transferId != null
+    val total = legs.fold(Money.zero()) { acc, leg -> acc + leg.transaction.money.abs() }
     return TransactionRowUi(
         id = transaction.id,
         // Merchant first: "Starbucks" identifies the row better than whatever was jotted next
         // to it, and the note still shows when there is no merchant.
-        title = transaction.merchant.ifBlank { transaction.note }.ifBlank { categoryName.orEmpty() },
-        subtitle = categoryName.orEmpty(),
+        title = transaction.merchant.ifBlank { transaction.note }
+            .ifBlank { primary.categoryName.orEmpty() },
+        // A collapsed receipt names no single category — the screen replaces this with the
+        // category count, which is the one thing the row can say truthfully about all of them.
+        subtitle = primary.categoryName.orEmpty(),
+        splitCategoryCount = if (isSplit) categoryCount else 0,
         accountName = accountNames[transaction.accountId].orEmpty(),
-        formattedAmount = MoneyFormatter.format(transaction.money.abs(), transaction.currencyCode),
+        formattedAmount = MoneyFormatter.format(total, transaction.currencyCode),
         isExpense = transaction.type == TransactionType.EXPENSE,
         isTransfer = isTransferLeg,
         // A transfer leg is drawn from the shared transfer palette instead of its category's
@@ -67,15 +121,17 @@ private fun CategorizedTransaction.toRow(accountNames: Map<AccountId, String>): 
         categoryHueSeed = if (isTransferLeg) {
             ""
         } else {
-            categoryName ?: transaction.categoryId?.value.orEmpty()
+            primary.categoryName ?: transaction.categoryId?.value.orEmpty()
         },
     )
 }
 
-private fun CategorizedTransaction.signedMoney(): Money = when (transaction.type) {
-    TransactionType.EXPENSE -> -transaction.money.abs()
-    else -> transaction.money.abs()
-}
+/** The receipt's contribution to the day's net — every leg of it, signed by its type. */
+private fun ListReceipt.signedMoney(): Money =
+    legs.fold(Money.zero()) { acc, leg ->
+        val magnitude = leg.transaction.money.abs()
+        acc + if (leg.transaction.type == TransactionType.EXPENSE) -magnitude else magnitude
+    }
 
 /**
  * The single currency the summary strip renders in.

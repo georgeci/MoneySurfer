@@ -238,6 +238,7 @@ live in `AccountExtraDetails.normalize` and are applied on every write, local or
 | `createdAt` | `Instant` | `Long` | `Long` |
 | `updatedAt` | `Instant` | `Long` | `Long` |
 | `transferId` | `TransferId?` | `String?` | `String?` |
+| `splitId` | `SplitId?` | `String?` (indexed) | `String?` |
 | `recurringRuleId` | `RecurringRuleId?` | `String?` | `String?` |
 | `deletedAt` | — | — | `Long?` |
 | `clientVersionCode` | — | — | `Int` |
@@ -264,6 +265,34 @@ Detail fields (issue #260):
   `TransactionReference.kt`. It is a display label, not a key. A
   bank-supplied reference surviving a statement import would be a separate,
   stored field.
+Split across categories (issue #399):
+
+- `splitId` — the shared id of the sibling rows one receipt was split across
+  (groceries + household chemicals in one supermarket payment), mirroring how
+  `transferId` groups the two legs of a transfer. A split is **N transactions**,
+  not one transaction with N allocations: sync is per-entity LWW with
+  tombstones, and a parent doc plus child allocation docs pulled independently
+  cannot be kept consistent, while a leg is self-contained and LWW is already
+  correct for it. Every category analytic — budgets, monthly totals, spend
+  history, the category filter, CSV — therefore keeps working unchanged on the
+  legs, and only the surfaces that show one line per payment (transaction list,
+  recent-activity widget, search) collapse a group back into one row.
+- The legs of a group share account, currency, business date, moment and type,
+  and differ only in category and amount. `CreateSplitTransactionUseCase`
+  establishes that; `UpdateTransactionUseCase` re-establishes it by propagating
+  those fields to the siblings when a single leg is edited through the ordinary
+  edit path. `DeleteTransactionUseCase` removes a group whole, as it does a
+  transfer.
+- Indexed, unlike `transferId`: the list window query counts a row's group size
+  per row (`splitLegCount`, not a stored column) so it can tell a group it holds
+  in full from one the paging limit or a filter cut in half — only the former
+  collapses. Deriving the count instead of storing it is what keeps it from
+  drifting under LWW.
+- A **transaction count** stops meaning a receipt count: a subtree swallowing
+  two legs of one receipt reports both. Money totals are unaffected, and
+  per-leaf-category counts stay right. Accepted as the defined semantics — see
+  `docs/plans/split-transaction-across-categories.md`.
+
 - Receipt attachments are **out of scope** for this model. Attachment storage
   is its own epic (blob storage, quotas, offline cache); no boolean stands in
   for it here.

@@ -2,6 +2,7 @@ package com.georgeci.moneysurfer.domain.usecase
 
 import com.georgeci.moneysurfer.domain.fixtures.aTransaction
 import com.georgeci.moneysurfer.domain.fixtures.accountId
+import com.georgeci.moneysurfer.domain.fixtures.splitId
 import com.georgeci.moneysurfer.domain.fixtures.transactionId
 import com.georgeci.moneysurfer.domain.fixtures.transferId
 import com.georgeci.moneysurfer.domain.primitives.Money
@@ -80,6 +81,36 @@ class DeleteTransactionUseCaseTest : StringSpec({
 
         deleted.map { it.id } shouldBe listOf(transactionId("t-1"))
         env.txStore.keys.shouldBeEmpty()
+    }
+
+    "deleting one leg of a split takes the whole receipt with it" {
+        val env = TransactionStoreEnv()
+        val useCase = DeleteTransactionUseCase(env.txRepo, env.applyChange)
+        val split = splitId("sp-1")
+        env.seed(
+            aTransaction(
+                id = transactionId("leg-groceries"),
+                accountId = from,
+                money = Money.fromMinor(3_000),
+                splitId = split,
+            ),
+            aTransaction(
+                id = transactionId("leg-chemicals"),
+                accountId = from,
+                money = Money.fromMinor(400),
+                splitId = split,
+            ),
+            aTransaction(id = transactionId("unrelated"), accountId = from, money = hundred),
+        )
+
+        // The list shows the group as one row, so deleting that row deletes the payment — not the
+        // part of it that happens to be filed under Groceries.
+        val deleted = useCase(transactionId("leg-groceries"))
+
+        deleted.map { it.id }.toSet() shouldBe
+            setOf(transactionId("leg-groceries"), transactionId("leg-chemicals"))
+        env.txStore.keys shouldBe setOf(transactionId("unrelated"))
+        env.balanceOf(from) shouldBe Money.fromMinor(3_400)
     }
 
     "deleting an id that is not there returns nothing, so no Undo is offered" {

@@ -1,7 +1,9 @@
 package com.georgeci.moneysurfer.feature.transaction.creation
 
+import com.georgeci.moneysurfer.domain.model.Category
 import com.georgeci.moneysurfer.domain.model.Transaction
 import com.georgeci.moneysurfer.domain.primitives.RecurringRuleId
+import com.georgeci.moneysurfer.domain.primitives.SplitId
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.domain.primitives.TransactionStatus
 import com.georgeci.moneysurfer.domain.primitives.TransferId
@@ -21,6 +23,12 @@ data class PreservedTransactionFields(
     val tags: List<String> = emptyList(),
     val status: TransactionStatus = TransactionStatus.ACTUAL,
     val transferId: TransferId? = null,
+    /**
+     * The receipt this row is one leg of. Dropping it on save would not merely lose a link: the
+     * remaining legs would stay behind with no collapsed row left to reveal them, and the edited
+     * row would leave the group without ever being deleted from it.
+     */
+    val splitId: SplitId? = null,
     val recurringRuleId: RecurringRuleId? = null,
 ) {
     companion object {
@@ -30,10 +38,28 @@ data class PreservedTransactionFields(
             tags = transaction.tags,
             status = transaction.status,
             transferId = transaction.transferId,
+            splitId = transaction.splitId,
             recurringRuleId = transaction.recurringRuleId,
         )
     }
 }
+
+/**
+ * One line of the split editor: a slice of the receipt and the category it is filed under.
+ *
+ * [key] is a per-screen counter, not an id of anything stored — nothing is written until Save, and
+ * two lines picking the same category must still be two distinct lines the user can edit and remove
+ * independently.
+ *
+ * [amount] is raw input, empty until typed, and it is ignored on the **last** line: that one always
+ * shows whatever is left of the receipt, so the legs add up to the amount by construction rather
+ * than by asking the user to make them.
+ */
+data class TransactionSplitLineUi(
+    val key: Int,
+    val category: Category? = null,
+    val amount: String = "",
+)
 
 /**
  * The existing transaction the creation screen opens on, and what it is there for.

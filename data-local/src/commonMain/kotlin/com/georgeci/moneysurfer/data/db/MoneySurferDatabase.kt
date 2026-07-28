@@ -36,7 +36,7 @@ import com.georgeci.moneysurfer.data.db.entity.WorkspaceMemberEntity
  * Schema version of [MoneySurferDatabase]. Single source of truth so the
  * Room annotation, the backup manifest, and tests can never drift.
  */
-const val MONEY_SURFER_DB_VERSION: Int = 34
+const val MONEY_SURFER_DB_VERSION: Int = 35
 
 @Database(
     entities = [

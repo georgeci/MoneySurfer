@@ -113,6 +113,7 @@ internal fun TransactionDetailsContent(
             onConfirm = { onEvent(TransactionDetailsEvent.OnDeleteConfirmed) },
             onDismiss = { onEvent(TransactionDetailsEvent.OnDeleteDismissed) },
             isTransfer = state.isTransfer,
+            isSplit = state.isSplit,
         )
     }
 
@@ -146,6 +147,8 @@ internal fun TransactionDetailsContent(
                     formattedDate = state.formattedDate,
                     isPlanned = state.isPlanned,
                 )
+
+                state.split?.let { SplitCard(split = it) }
 
                 DetailsCard(state = state)
 

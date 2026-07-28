@@ -20,5 +20,12 @@ data class CategorizedTransactionEntity(
     @ColumnInfo(name = "createdAt") val createdAt: Long,
     @ColumnInfo(name = "updatedAt") val updatedAt: Long,
     @ColumnInfo(name = "transferId") val transferId: String? = null,
+    @ColumnInfo(name = "splitId") val splitId: String? = null,
+    /**
+     * How many legs this row's split group has in the whole table, or `0` for a row that is not
+     * part of a split — see `TransactionDao.getCategorizedWindow`. Not a stored column: it is
+     * counted per row, so it can never drift the way a denormalized leg count would under LWW sync.
+     */
+    @ColumnInfo(name = "splitLegCount") val splitLegCount: Int = 0,
     @ColumnInfo(name = "recurringRuleId") val recurringRuleId: String? = null,
 )

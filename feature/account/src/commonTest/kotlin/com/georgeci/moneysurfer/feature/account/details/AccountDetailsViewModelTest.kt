@@ -14,6 +14,7 @@ import com.georgeci.moneysurfer.domain.model.Transaction
 import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
 import com.georgeci.moneysurfer.domain.primitives.Money
+import com.georgeci.moneysurfer.domain.primitives.SplitId
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
 import com.georgeci.moneysurfer.domain.primitives.TransferId
@@ -208,6 +209,8 @@ private class FixedTransactionRepository(transactions: List<Transaction>) : Tran
     override suspend fun getById(id: TransactionId): Transaction? = all.value.find { it.id == id }
     override suspend fun getByTransferId(transferId: TransferId): List<Transaction> =
         all.value.filter { it.transferId == transferId }
+    override suspend fun getBySplitId(splitId: SplitId): List<Transaction> =
+        all.value.filter { it.splitId == splitId }
 
     // Writing, not no-op: the list is fed by this flow, so a delete has to actually leave the rows
     // for the screen's reaction to it to be worth asserting.
