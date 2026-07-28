@@ -5,31 +5,39 @@ import com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutConfig
 import com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutItem
 import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetType
 import com.georgeci.moneysurfer.domain.fixtures.EUR
+import com.georgeci.moneysurfer.domain.fixtures.FakeCategoryRepository
 import com.georgeci.moneysurfer.domain.fixtures.FakeExchangeRateRepository
 import com.georgeci.moneysurfer.domain.fixtures.FakeGoalContributionRepository
 import com.georgeci.moneysurfer.domain.fixtures.FakeGoalWorkspaceRepository
 import com.georgeci.moneysurfer.domain.fixtures.FakeHostCapabilities
+import com.georgeci.moneysurfer.domain.fixtures.FakeRecurringRuleRepository
 import com.georgeci.moneysurfer.domain.fixtures.FakeSavingsGoalRepository
+import com.georgeci.moneysurfer.domain.fixtures.FakeSpendAnalyticsRepository
 import com.georgeci.moneysurfer.domain.fixtures.FakeUiPreferences
 import com.georgeci.moneysurfer.domain.fixtures.FixedClock
 import com.georgeci.moneysurfer.domain.fixtures.USD
 import com.georgeci.moneysurfer.domain.fixtures.aBudget
+import com.georgeci.moneysurfer.domain.fixtures.aCategory
+import com.georgeci.moneysurfer.domain.fixtures.aRecurringRule
 import com.georgeci.moneysurfer.domain.fixtures.aTransaction
 import com.georgeci.moneysurfer.domain.fixtures.aWorkspace
 import com.georgeci.moneysurfer.domain.fixtures.accountId
 import com.georgeci.moneysurfer.domain.fixtures.anAccount
 import com.georgeci.moneysurfer.domain.fixtures.anExchangeRateTable
 import com.georgeci.moneysurfer.domain.fixtures.budgetId
+import com.georgeci.moneysurfer.domain.fixtures.categoryId
 import com.georgeci.moneysurfer.domain.fixtures.dollars
 import com.georgeci.moneysurfer.domain.fixtures.testDate
 import com.georgeci.moneysurfer.domain.fixtures.testInstant
 import com.georgeci.moneysurfer.domain.fixtures.transactionId
 import com.georgeci.moneysurfer.domain.fixtures.workspaceId
 import com.georgeci.moneysurfer.domain.formatter.MoneyFormatter
+import com.georgeci.moneysurfer.domain.insight.InsightTone
 import com.georgeci.moneysurfer.domain.model.Account
 import com.georgeci.moneysurfer.domain.model.Budget
 import com.georgeci.moneysurfer.domain.model.BudgetStatus
 import com.georgeci.moneysurfer.domain.model.CategorizedTransaction
+import com.georgeci.moneysurfer.domain.model.CategorySpendSlice
 import com.georgeci.moneysurfer.domain.model.Transaction
 import com.georgeci.moneysurfer.domain.model.TransactionTotal
 import com.georgeci.moneysurfer.domain.preferences.UiPreferences
@@ -47,6 +55,7 @@ import com.georgeci.moneysurfer.domain.repositories.AccountRepository
 import com.georgeci.moneysurfer.domain.repositories.BudgetRepository
 import com.georgeci.moneysurfer.domain.repositories.TransactionRepository
 import com.georgeci.moneysurfer.domain.usecase.ConvertAccountsTotalUseCase
+import com.georgeci.moneysurfer.domain.usecase.GenerateInsightsUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetAccountsUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetBudgetProgressUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetBudgetsUseCase
@@ -69,6 +78,9 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atStartOfDayIn
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class DashboardViewModelTest : StringSpec({
@@ -149,6 +161,7 @@ class DashboardViewModelTest : StringSpec({
             DashboardWidgetType.QuickActions,
             DashboardWidgetType.SafeToSpend,
             DashboardWidgetType.Accounts,
+            DashboardWidgetType.Insights,
             DashboardWidgetType.RecentTransactions,
         )
     }
@@ -269,6 +282,70 @@ class DashboardViewModelTest : StringSpec({
         content.ratesAsOf shouldBe "2024-01-01"
     }
 
+    "a rise maps to the warning sentence, with both amounts formatted in the base currency" {
+        val ws = workspaceId("ws-1")
+        val viewModel = newViewModel(
+            ws = ws,
+            accounts = FakeAccountRepository(emptyList()),
+            transactions = FakeTransactionRepository(emptyList()),
+            spendAnalytics = spendOf(current = 400.dollars, previous = 300.dollars),
+            recurringRules = FakeRecurringRuleRepository(
+                listOf(aRecurringRule(workspaceId = ws, categoryId = DINING, amount = 12.dollars)),
+            ),
+        )
+
+        val content = viewModel.value.shouldBeInstanceOf<DashboardState.Content>()
+        // Warn before Neutral: the compact card shows one, and it should be the actionable one.
+        content.insights.map { it.kind } shouldContainExactly listOf(
+            InsightKind.CategoryUp,
+            InsightKind.PeriodUp,
+            InsightKind.Subscriptions,
+        )
+
+        val category = content.insights.first()
+        category.tone shouldBe InsightTone.Warn
+        category.label shouldBe "Dining"
+        category.percent shouldBe 33
+        category.amount shouldBe MoneyFormatter.format(400.dollars, USD)
+        category.comparison shouldBe MoneyFormatter.format(300.dollars, USD)
+
+        val subscriptions = content.insights.last()
+        subscriptions.tone shouldBe InsightTone.Neutral
+        subscriptions.count shouldBe 1
+        subscriptions.amount shouldBe MoneyFormatter.format(12.dollars, USD)
+    }
+
+    "a fall maps to the saving sentence rather than the same one with a sign" {
+        val ws = workspaceId("ws-1")
+        val viewModel = newViewModel(
+            ws = ws,
+            accounts = FakeAccountRepository(emptyList()),
+            transactions = FakeTransactionRepository(emptyList()),
+            spendAnalytics = spendOf(current = 200.dollars, previous = 300.dollars),
+        )
+
+        val content = viewModel.value.shouldBeInstanceOf<DashboardState.Content>()
+        content.insights.map { it.kind } shouldContainExactly listOf(
+            InsightKind.CategoryDown,
+            InsightKind.PeriodDown,
+        )
+        content.insights.forEach { it.tone shouldBe InsightTone.Good }
+    }
+
+    "a period that barely moved is neutral, not a win" {
+        val ws = workspaceId("ws-1")
+        val viewModel = newViewModel(
+            ws = ws,
+            accounts = FakeAccountRepository(emptyList()),
+            transactions = FakeTransactionRepository(emptyList()),
+            spendAnalytics = spendOf(current = 305.dollars, previous = 300.dollars),
+        )
+
+        val content = viewModel.value.shouldBeInstanceOf<DashboardState.Content>()
+        content.insights.map { it.kind } shouldContainExactly listOf(InsightKind.PeriodFlat)
+        content.insights.single().tone shouldBe InsightTone.Neutral
+    }
+
     "a currency no cached rate covers is shown beside the headline, never dropped" {
         val ws = workspaceId("ws-1")
         val viewModel = newViewModel(
@@ -312,6 +389,21 @@ class DashboardViewModelTest : StringSpec({
     }
 })
 
+/** Mid-month, so the comparison rules are past their minimum-sample guard. */
+private val INSIGHTS_TODAY = LocalDate(2026, 7, 15)
+
+private val DINING = categoryId("cat-dining")
+
+/** One category's spend in both windows the engine reads for [INSIGHTS_TODAY]. */
+private fun spendOf(current: Money, previous: Money) = FakeSpendAnalyticsRepository(
+    mapOf(
+        TransactionPeriodWindow(LocalDate(2026, 7, 1), INSIGHTS_TODAY) to
+            listOf(CategorySpendSlice(DINING, current, 4)),
+        TransactionPeriodWindow(LocalDate(2026, 6, 1), LocalDate(2026, 6, 15)) to
+            listOf(CategorySpendSlice(DINING, previous, 3)),
+    ),
+)
+
 @Suppress("LongParameterList")
 private fun newViewModel(
     ws: WorkspaceId,
@@ -323,6 +415,8 @@ private fun newViewModel(
     hostCapabilities: FakeHostCapabilities = FakeHostCapabilities(isOffline = false),
     budgets: List<Budget> = emptyList(),
     clock: ClockUseCase = ClockUseCase(FixedClock(testInstant)),
+    spendAnalytics: FakeSpendAnalyticsRepository = FakeSpendAnalyticsRepository(),
+    recurringRules: FakeRecurringRuleRepository = FakeRecurringRuleRepository(),
 ): DashboardViewModel {
     val session = InMemorySessionPointers(currentWorkspaceId = ws)
     val workspaces = FakeGoalWorkspaceRepository(listOf(aWorkspace(id = ws, baseCurrency = baseCurrency)))
@@ -334,6 +428,19 @@ private fun newViewModel(
         getSafeToSpend = GetSafeToSpendUseCase(
             getBudgets = GetBudgetsUseCase(FakeBudgetRepository(budgets), session),
             getBudgetProgress = GetBudgetProgressUseCase(transactions, workspaces, clock),
+        ),
+        generateInsights = GenerateInsightsUseCase(
+            spendAnalytics = spendAnalytics,
+            categoryRepository = FakeCategoryRepository(
+                listOf(aCategory(id = DINING, workspaceId = ws, name = "Dining")),
+            ),
+            recurringRuleRepository = recurringRules,
+            workspaceRepository = workspaces,
+            session = session,
+            // Its own clock rather than the shared one: that is pinned to testInstant, the 1st of
+            // a month, where the engine's minimum-sample guard correctly silences every
+            // comparison rule — and these specs are about what those rules produce.
+            clock = ClockUseCase(FixedClock(INSIGHTS_TODAY.atStartOfDayIn(TimeZone.UTC))),
         ),
         convertAccountsTotal = ConvertAccountsTotalUseCase(),
         uiPreferences = uiPreferences,

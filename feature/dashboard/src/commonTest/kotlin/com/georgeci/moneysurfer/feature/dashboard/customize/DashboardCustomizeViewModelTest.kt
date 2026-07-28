@@ -37,6 +37,7 @@ class DashboardCustomizeViewModelTest : StringSpec({
             DashboardWidgetType.QuickActions,
             DashboardWidgetType.SafeToSpend,
             DashboardWidgetType.Accounts,
+            DashboardWidgetType.Insights,
             DashboardWidgetType.RecentTransactions,
         )
     }
@@ -54,6 +55,7 @@ class DashboardCustomizeViewModelTest : StringSpec({
             DashboardWidgetType.QuickActions,
             DashboardWidgetType.SafeToSpend,
             DashboardWidgetType.Accounts,
+            DashboardWidgetType.Insights,
             DashboardWidgetType.RecentTransactions,
         )
         viewModel.layout().disabledItems.map { it.type } shouldContainExactly listOf(DashboardWidgetType.Goals)
@@ -75,6 +77,7 @@ class DashboardCustomizeViewModelTest : StringSpec({
             DashboardWidgetType.QuickActions,
             DashboardWidgetType.SafeToSpend,
             DashboardWidgetType.Accounts,
+            DashboardWidgetType.Insights,
             DashboardWidgetType.Goals,
             DashboardWidgetType.RecentTransactions,
             DashboardWidgetType.Balance,
@@ -99,6 +102,7 @@ class DashboardCustomizeViewModelTest : StringSpec({
             DashboardWidgetType.QuickActions,
             DashboardWidgetType.SafeToSpend,
             DashboardWidgetType.Accounts,
+            DashboardWidgetType.Insights,
             DashboardWidgetType.Goals,
         )
         preferences.dashboardLayout.flow.first() shouldBe viewModel.layout()

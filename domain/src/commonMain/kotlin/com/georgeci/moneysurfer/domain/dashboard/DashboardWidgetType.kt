@@ -11,6 +11,7 @@ enum class DashboardWidgetType {
     QuickActions,
     SafeToSpend,
     Accounts,
+    Insights,
     Goals,
     RecentTransactions,
 }
