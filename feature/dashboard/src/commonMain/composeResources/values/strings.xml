@@ -121,4 +121,7 @@
     <string name="dashboard_customize_preview_insight_down_body">€84 this month, against €106 by the same day last month.</string>
     <string name="dashboard_customize_preview_insight_subs_title">4 active subscriptions</string>
     <string name="dashboard_customize_preview_insight_subs_body">About €62 a month.</string>
+    <!-- Segments of the dashboard period switch; both label a span, not a point in time -->
+    <string name="dashboard_period_week">Week</string>
+    <string name="dashboard_period_month">Month</string>
 </resources>

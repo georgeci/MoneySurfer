@@ -118,4 +118,6 @@
     <string name="dashboard_customize_preview_insight_down_body">€84 в этом месяце против €106 на ту же дату в прошлом.</string>
     <string name="dashboard_customize_preview_insight_subs_title">4 активные подписки</string>
     <string name="dashboard_customize_preview_insight_subs_body">Около €62 в месяц.</string>
+    <string name="dashboard_period_week">Неделя</string>
+    <string name="dashboard_period_month">Месяц</string>
 </resources>

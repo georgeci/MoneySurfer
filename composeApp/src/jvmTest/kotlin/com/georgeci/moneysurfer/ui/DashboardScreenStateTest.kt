@@ -2,6 +2,8 @@ package com.georgeci.moneysurfer.ui
 
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotSelected
+import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithTag
@@ -11,6 +13,7 @@ import androidx.compose.ui.test.v2.runComposeUiTest
 import com.georgeci.moneysurfer.domain.dashboard.DashboardCardStyle
 import com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutConfig
 import com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutItem
+import com.georgeci.moneysurfer.domain.dashboard.DashboardPeriod
 import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetType
 import com.georgeci.moneysurfer.domain.model.BudgetStatus
 import com.georgeci.moneysurfer.domain.model.BurnRatePace
@@ -165,6 +168,52 @@ class DashboardScreenStateTest : StringSpec({
             }
 
             onNodeWithText("of $SAFE_TO_SPEND_LIMIT · Everyday").assertIsDisplayed()
+        }
+    }
+
+    "the period switch sits above the widgets with the current span selected" {
+        runComposeUiTest {
+            setContent {
+                DashboardContent(state = contentWith(accounts = 2, transferEnabled = true), onEvent = {})
+            }
+
+            onNodeWithTag(DashboardTestTags.PeriodSwitch).assertIsDisplayed()
+            onNodeWithTag(DashboardTestTags.periodOption(DashboardPeriod.Month)).assertIsSelected()
+            onNodeWithTag(DashboardTestTags.periodOption(DashboardPeriod.Week)).assertIsNotSelected()
+        }
+    }
+
+    "picking the other span asks the view model for it rather than deciding on screen" {
+        runComposeUiTest {
+            val events = mutableListOf<DashboardEvent>()
+            setContent {
+                DashboardContent(
+                    state = contentWith(accounts = 2, transferEnabled = true),
+                    onEvent = { events += it },
+                )
+            }
+
+            onNodeWithTag(DashboardTestTags.periodOption(DashboardPeriod.Week)).performClick()
+            waitForIdle()
+
+            events shouldContainExactly listOf(DashboardEvent.OnPeriodChange(DashboardPeriod.Week))
+        }
+    }
+
+    "a layout with no period-scoped widget draws no period switch" {
+        runComposeUiTest {
+            val layout = DashboardWidgetType.entries
+                .filter { it.isPeriodScoped }
+                .fold(DashboardLayoutConfig.DEFAULT) { acc, type -> acc.withWidgetEnabled(type, enabled = false) }
+            setContent {
+                DashboardContent(
+                    state = contentWith(accounts = 2, transferEnabled = true).copy(layout = layout),
+                    onEvent = {},
+                )
+            }
+
+            // A Week/Month control with nothing under it to re-read would read as broken.
+            onNodeWithTag(DashboardTestTags.PeriodSwitch).assertDoesNotExist()
         }
     }
 

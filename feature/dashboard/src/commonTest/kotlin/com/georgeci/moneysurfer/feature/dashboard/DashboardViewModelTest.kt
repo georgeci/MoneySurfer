@@ -4,6 +4,7 @@ import app.cash.turbine.test
 import com.georgeci.moneysurfer.domain.auth.InMemorySessionPointers
 import com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutConfig
 import com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutItem
+import com.georgeci.moneysurfer.domain.dashboard.DashboardPeriod
 import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetType
 import com.georgeci.moneysurfer.domain.fixtures.EUR
 import com.georgeci.moneysurfer.domain.fixtures.FakeCategoryRepository
@@ -38,6 +39,7 @@ import com.georgeci.moneysurfer.domain.formatter.MoneyFormatter
 import com.georgeci.moneysurfer.domain.insight.InsightTone
 import com.georgeci.moneysurfer.domain.model.Account
 import com.georgeci.moneysurfer.domain.model.Budget
+import com.georgeci.moneysurfer.domain.model.BudgetPeriod
 import com.georgeci.moneysurfer.domain.model.BudgetStatus
 import com.georgeci.moneysurfer.domain.model.BurnRatePace
 import com.georgeci.moneysurfer.domain.model.CategorizedTransaction
@@ -46,7 +48,6 @@ import com.georgeci.moneysurfer.domain.model.CategorySpendSlice
 import com.georgeci.moneysurfer.domain.model.DailySpendPoint
 import com.georgeci.moneysurfer.domain.model.Transaction
 import com.georgeci.moneysurfer.domain.model.TransactionTotal
-import com.georgeci.moneysurfer.domain.preferences.TransactionPeriodMode
 import com.georgeci.moneysurfer.domain.preferences.UiPreferences
 import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.BudgetId
@@ -74,7 +75,6 @@ import com.georgeci.moneysurfer.domain.usecase.GetGoalsUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetRecentTransactionsUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetSafeToSpendUseCase
 import com.georgeci.moneysurfer.domain.util.TransactionPeriodWindow
-import com.georgeci.moneysurfer.domain.util.periodWindow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldContainExactly
@@ -306,6 +306,72 @@ class DashboardViewModelTest : StringSpec({
         // A 370 projection against a 300 cap.
         viewModel.value.shouldBeInstanceOf<DashboardState.Content>()
             .burnRate?.pace shouldBe BurnRatePace.OffPace
+    }
+
+    "the dashboard opens on Month with the switch shown over the default layout" {
+        val ws = workspaceId("ws-1")
+        val viewModel = newViewModel(
+            ws = ws,
+            accounts = FakeAccountRepository(listOf(anAccount(id = accountId("a-1"), workspaceId = ws))),
+            transactions = FakeTransactionRepository(emptyList()),
+        )
+
+        val content = viewModel.value.shouldBeInstanceOf<DashboardState.Content>()
+        content.period shouldBe DashboardPeriod.Month
+        content.periodSwitchVisible shouldBe true
+    }
+
+    "picking a period re-picks the budget the headline speaks for" {
+        val ws = workspaceId("ws-1")
+        val viewModel = newViewModel(
+            ws = ws,
+            accounts = FakeAccountRepository(listOf(anAccount(id = accountId("a-1"), workspaceId = ws))),
+            transactions = FakeTransactionRepository(emptyList()),
+            budgets = listOf(
+                aBudget(
+                    id = budgetId("b-weekly"),
+                    workspaceId = ws,
+                    name = "This week",
+                    amount = 200.dollars,
+                    period = BudgetPeriod.WEEKLY,
+                    categoryIds = emptyList(),
+                    startDate = testDate,
+                ),
+                aBudget(
+                    id = budgetId("b-monthly"),
+                    workspaceId = ws,
+                    name = "This month",
+                    amount = 800.dollars,
+                    period = BudgetPeriod.MONTHLY,
+                    categoryIds = emptyList(),
+                    startDate = testDate,
+                ),
+            ),
+        )
+
+        viewModel.value.shouldBeInstanceOf<DashboardState.Content>()
+            .safeToSpend?.budgetName shouldBe "This month"
+
+        viewModel.onEvent(DashboardEvent.OnPeriodChange(DashboardPeriod.Week))
+
+        val content = viewModel.value.shouldBeInstanceOf<DashboardState.Content>()
+        content.period shouldBe DashboardPeriod.Week
+        content.safeToSpend?.budgetName shouldBe "This week"
+    }
+
+    "the period switch stands down when nothing on the layout reads it" {
+        val ws = workspaceId("ws-1")
+        val layout = DashboardWidgetType.entries
+            .filter { it.isPeriodScoped }
+            .fold(DashboardLayoutConfig.DEFAULT) { acc, type -> acc.withWidgetEnabled(type, enabled = false) }
+        val viewModel = newViewModel(
+            ws = ws,
+            accounts = FakeAccountRepository(listOf(anAccount(id = accountId("a-1"), workspaceId = ws))),
+            transactions = FakeTransactionRepository(emptyList()),
+            uiPreferences = FakeUiPreferences(dashboardLayout = layout),
+        )
+
+        viewModel.value.shouldBeInstanceOf<DashboardState.Content>().periodSwitchVisible shouldBe false
     }
 
     "spent-by-category stays empty with no spend, so the widget can say the month is bare" {
@@ -681,12 +747,12 @@ private val INSIGHTS_TODAY = LocalDate(2026, 7, 15)
 private val DINING = categoryId("cat-dining")
 
 /**
- * Spend answered for exactly the window `GetCategorySpendUseCase` asks for under the shared
- * [testInstant] clock. Derived from `periodWindow` rather than spelled out, so the fake cannot
- * drift from the use case's own month maths and silently start answering nothing.
+ * Spend answered for exactly the window the dashboard asks for under the shared [testInstant]
+ * clock. Derived from [DashboardPeriod.DEFAULT] rather than spelled out, so the fake follows the
+ * same period the screen feeds the use case instead of drifting into answering nothing.
  */
 private fun spendInTestMonth(vararg slices: CategorySpendSlice) = FakeSpendAnalyticsRepository(
-    mapOf(periodWindow(TransactionPeriodMode.Month, testDate) to slices.toList()),
+    mapOf(DashboardPeriod.DEFAULT.window(testDate) to slices.toList()),
 )
 
 /** One category's spend in both windows the engine reads for [INSIGHTS_TODAY]. */

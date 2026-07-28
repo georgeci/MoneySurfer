@@ -1,10 +1,10 @@
 package com.georgeci.moneysurfer.domain.usecase
 
 import com.georgeci.moneysurfer.domain.auth.SessionPointers
+import com.georgeci.moneysurfer.domain.dashboard.DashboardPeriod
 import com.georgeci.moneysurfer.domain.model.SpendScope
 import com.georgeci.moneysurfer.domain.model.SpentByCategory
 import com.georgeci.moneysurfer.domain.model.buildSpentByCategory
-import com.georgeci.moneysurfer.domain.preferences.TransactionPeriodMode
 import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
 import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
@@ -13,7 +13,6 @@ import com.georgeci.moneysurfer.domain.repositories.CategoryRepository
 import com.georgeci.moneysurfer.domain.repositories.SpendAnalyticsRepository
 import com.georgeci.moneysurfer.domain.repositories.WorkspaceRepository
 import com.georgeci.moneysurfer.domain.util.TransactionPeriodWindow
-import com.georgeci.moneysurfer.domain.util.periodWindow
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -26,8 +25,8 @@ import kotlinx.datetime.toLocalDateTime
 import org.koin.core.annotation.Single
 
 /**
- * Where this month's money went, category by category, for the active workspace — or null while
- * nothing backs it: nobody signed in, or a workspace whose base currency cannot be read.
+ * Where the chosen period's money went, category by category, for the active workspace — or null
+ * while nothing backs it: nobody signed in, or a workspace whose base currency cannot be read.
  *
  * Spend comes from [SpendAnalyticsRepository.byCategory], one `GROUP BY` in SQLite, rather than
  * from folding the workspace's transactions in memory. That is the whole point of that interface,
@@ -39,6 +38,14 @@ import org.koin.core.annotation.Single
  * [SessionPointers.currentWorkspaceId] again, and two collectors of one pointer are not ordered
  * against each other — on a workspace switch that lets the new workspace's spend pair with the
  * previous one's categories, which is exactly the bug the safe-to-spend wiring had to unpick.
+ *
+ * [period] arrives as a flow and is required rather than defaulted, following
+ * [GetSafeToSpendUseCase]: this is a spend figure, so it is only meaningful once the caller says
+ * which span it answers for, and the dashboard's Week/Month switch has to reach it or the card
+ * would keep showing the month while every widget beside it changed. Unlike safe-to-spend the
+ * period here reshapes the query rather than re-picking a budget — the window *is* what
+ * [SpendAnalyticsRepository.byCategory] groups over — so a change re-runs one `GROUP BY` rather
+ * than the workspace's whole transaction list.
  */
 @Single
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -52,20 +59,23 @@ class GetCategorySpendUseCase(
 ) {
 
     operator fun invoke(
+        period: Flow<DashboardPeriod>,
         timeZone: TimeZone = TimeZone.currentSystemDefault(),
     ): Flow<SpentByCategory?> =
         session.currentWorkspaceId.flatMapLatest { workspaceId ->
             workspaceId ?: return@flatMapLatest flowOf(null)
 
-            val window = periodWindow(
-                mode = TransactionPeriodMode.Month,
-                anchor = clock.now().toLocalDateTime(timeZone).date,
-            )
-
-            baseCurrency(workspaceId).flatMapLatest { currency ->
-                currency ?: return@flatMapLatest flowOf(null)
-                breakdownOf(workspaceId, currency, window)
-            }
+            combine(
+                period.distinctUntilChanged(),
+                baseCurrency(workspaceId),
+            ) { chosen, currency -> chosen to currency }
+                .flatMapLatest { (chosen, currency) ->
+                    currency ?: return@flatMapLatest flowOf(null)
+                    // Re-read on every emission rather than once per workspace: the window is the
+                    // period's answer for *today*, and the period is the thing that changes.
+                    val today = clock.now().toLocalDateTime(timeZone).date
+                    breakdownOf(workspaceId, currency, chosen.window(today))
+                }
         }
 
     /**
