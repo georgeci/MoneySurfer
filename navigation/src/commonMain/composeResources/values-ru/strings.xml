@@ -2,7 +2,11 @@
     <string name="nav_dashboard">Главная</string>
     <string name="nav_transactions">Операции</string>
     <string name="nav_accounts">Счета</string>
+    <string name="nav_budgets">Бюджеты</string>
+    <string name="nav_goals">Цели</string>
     <string name="nav_categories">Категории</string>
     <string name="nav_settings">Настройки</string>
+    <string name="nav_section_manage">Управление</string>
+    <string name="nav_user_guest">Гость</string>
     <string name="nav_detail_placeholder">Выберите элемент, чтобы увидеть детали</string>
 </resources>
