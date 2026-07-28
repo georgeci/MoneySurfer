@@ -6,18 +6,22 @@ import com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutConfig
 import com.georgeci.moneysurfer.domain.formatter.MoneyFormatter
 import com.georgeci.moneysurfer.domain.model.Account
 import com.georgeci.moneysurfer.domain.model.BudgetStatus
+import com.georgeci.moneysurfer.domain.model.CategorySpend
 import com.georgeci.moneysurfer.domain.model.ConvertedTotal
 import com.georgeci.moneysurfer.domain.model.ExchangeRateSnapshot
 import com.georgeci.moneysurfer.domain.model.SafeToSpend
 import com.georgeci.moneysurfer.domain.model.SavingsGoalSummary
+import com.georgeci.moneysurfer.domain.model.SpentByCategory
 import com.georgeci.moneysurfer.domain.model.TransactionSplitGroup
 import com.georgeci.moneysurfer.domain.preferences.UiPreferences
 import com.georgeci.moneysurfer.domain.primitives.AccountId
+import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
 import com.georgeci.moneysurfer.domain.primitives.GoalId
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
 import com.georgeci.moneysurfer.domain.usecase.ConvertAccountsTotalUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetAccountsUseCase
+import com.georgeci.moneysurfer.domain.usecase.GetCategorySpendUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetExchangeRatesUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetGoalsUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetRecentTransactionsUseCase
@@ -29,6 +33,7 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.koin.core.annotation.KoinViewModel
+import kotlin.math.roundToInt
 import kotlin.time.Instant
 
 @KoinViewModel
@@ -38,6 +43,7 @@ class DashboardViewModel(
     private val getGoals: GetGoalsUseCase,
     private val getExchangeRates: GetExchangeRatesUseCase,
     private val getSafeToSpend: GetSafeToSpendUseCase,
+    private val getCategorySpend: GetCategorySpendUseCase,
     private val convertAccountsTotal: ConvertAccountsTotalUseCase,
     uiPreferences: UiPreferences,
     hostCapabilities: HostCapabilities,
@@ -89,20 +95,23 @@ class DashboardViewModel(
     }
 
     private fun observeDashboard() {
-        // Layout and safe-to-spend are folded into one source because `combine` tops out at five
-        // typed flows, and these two are the pair that is never read apart.
-        val layoutAndSafeToSpend =
-            combine(layout, getSafeToSpend().onStart { emit(null) }) { layoutConfig, safeToSpend ->
-                layoutConfig to safeToSpend
-            }
+        // The layout and the two budget-shaped sources are folded into one because `combine` tops
+        // out at five typed flows, and the three of them are never read apart.
+        val layoutAndSpend = combine(
+            layout,
+            getSafeToSpend().onStart { emit(null) },
+            getCategorySpend().onStart { emit(null) },
+        ) { layoutConfig, safeToSpend, categorySpend ->
+            DashboardSpend(layoutConfig, safeToSpend, categorySpend)
+        }
         launch {
             combine(
                 getAccounts().onStart { emit(emptyList()) },
                 getRecentTransactions(),
                 getGoals(),
                 getExchangeRates().onStart { emit(null) },
-                layoutAndSafeToSpend,
-            ) { accounts, transactions, goals, rates, (layoutConfig, safeToSpend) ->
+                layoutAndSpend,
+            ) { accounts, transactions, goals, rates, (layoutConfig, safeToSpend, categorySpend) ->
                 val balance = accounts.convertedTotal(rates)?.toBalanceUi()
                 DashboardState.Content(
                     accounts = accounts.map { it.toUi() },
@@ -119,6 +128,7 @@ class DashboardViewModel(
                     formattedTrendDelta = null,
                     goals = goals.take(DASHBOARD_GOALS_LIMIT).map { it.toUi() },
                     safeToSpend = safeToSpend?.toUi(),
+                    spentByCategory = categorySpend?.toUi().orEmpty(),
                     isOffline = isOffline,
                     transferEnabled = transferEnabled,
                     layout = layoutConfig,
@@ -187,6 +197,28 @@ class DashboardViewModel(
         status = status,
     )
 
+    /**
+     * The breakdown's rows, largest spender first. Money is formatted here against the breakdown's
+     * own currency — non-null by construction, so nothing has to invent one.
+     */
+    private fun SpentByCategory.toUi(): List<CategorySpendUi> = entries.map { it.toUi(currency) }
+
+    private fun CategorySpend.toUi(currency: CurrencyCode) = CategorySpendUi(
+        categoryId = category?.id?.value,
+        name = category?.name,
+        hue = category?.hue,
+        spentFormatted = MoneyFormatter.format(spent, currency),
+        share = share,
+        cap = cap?.let {
+            CategoryCapUi(
+                limitFormatted = MoneyFormatter.format(it.limit, currency),
+                status = it.status,
+                // Non-null whenever `cap` is — the two come off the same entry.
+                progress = capFraction ?: 0f,
+            )
+        },
+    )
+
     private fun SavingsGoalSummary.toUi() = GoalUi(
         id = goal.id,
         name = goal.title,
@@ -241,6 +273,11 @@ sealed interface DashboardState {
         val goals: List<GoalUi> = emptyList(),
         /** What is still safe to spend this period, or null while no active budget backs a number. */
         val safeToSpend: SafeToSpendUi? = null,
+        /**
+         * Where this month's money went, largest spender first — empty while the month holds no
+         * spend, which is the spent-by-category widget's own empty state rather than a missing one.
+         */
+        val spentByCategory: List<CategorySpendUi> = emptyList(),
         val isOffline: Boolean = false,
         /**
          * Whether this build offers multi-account transfers. The quick-actions widget is the only
@@ -264,6 +301,16 @@ sealed interface DashboardState {
 
     companion object
 }
+
+/**
+ * The three sources folded into one arm of the screen's `combine`, which tops out at five.
+ * A named holder rather than a `Triple` so the destructuring above reads.
+ */
+private data class DashboardSpend(
+    val layout: DashboardLayoutConfig,
+    val safeToSpend: SafeToSpend?,
+    val categorySpend: SpentByCategory?,
+)
 
 /** The three strings the balance widget needs, already formatted. */
 private data class BalanceUi(
@@ -308,6 +355,36 @@ data class SafeToSpendUi(
     /** Derived rather than stored, so the wording and the colour can never disagree. */
     val isOver: Boolean get() = status == BudgetStatus.OVER
 }
+
+/**
+ * One row of the spent-by-category widget. The label for the uncategorized bucket and the sentences
+ * around the numbers are built on the screen, which is where the string resources are.
+ */
+data class CategorySpendUi(
+    /** Null for the uncategorized bucket, which is a real slice with no category behind it. */
+    val categoryId: String?,
+    /** Null for the uncategorized bucket — the screen owns that label. */
+    val name: String?,
+    /** The category's stored hue, or null for the bucket that has no stored appearance. */
+    val hue: Int?,
+    val spentFormatted: String,
+    /** Share of the month's total spend, `0f..1f`. */
+    val share: Float,
+    /** The cap on this category, or null while nothing caps it. */
+    val cap: CategoryCapUi? = null,
+) {
+
+    /** [share] as whole percent, for the caption of a row that has no cap to state instead. */
+    val sharePercent: Int get() = (share * PERCENT).roundToInt()
+}
+
+/** The cap a single-category budget puts on one row, already formatted. */
+data class CategoryCapUi(
+    val limitFormatted: String,
+    val status: BudgetStatus,
+    /** Spend against the cap; can exceed 1, which the meter caps rather than overdrawing. */
+    val progress: Float,
+)
 
 data class TransactionUi(
     val id: TransactionId,
@@ -357,6 +434,8 @@ sealed interface DashboardEffect {
     /** The budget editor, opened empty — the way out of the safe-to-spend widget's empty state. */
     data object NavigateToBudgetCreation : DashboardEffect
 }
+
+private const val PERCENT = 100
 
 private const val RECENT_TRANSACTIONS_LIMIT = 5
 

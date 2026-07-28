@@ -14,12 +14,14 @@ import com.georgeci.moneysurfer.domain.fixtures.FakeUiPreferences
 import com.georgeci.moneysurfer.domain.fixtures.FixedClock
 import com.georgeci.moneysurfer.domain.fixtures.USD
 import com.georgeci.moneysurfer.domain.fixtures.aBudget
+import com.georgeci.moneysurfer.domain.fixtures.aCategory
 import com.georgeci.moneysurfer.domain.fixtures.aTransaction
 import com.georgeci.moneysurfer.domain.fixtures.aWorkspace
 import com.georgeci.moneysurfer.domain.fixtures.accountId
 import com.georgeci.moneysurfer.domain.fixtures.anAccount
 import com.georgeci.moneysurfer.domain.fixtures.anExchangeRateTable
 import com.georgeci.moneysurfer.domain.fixtures.budgetId
+import com.georgeci.moneysurfer.domain.fixtures.categoryId
 import com.georgeci.moneysurfer.domain.fixtures.dollars
 import com.georgeci.moneysurfer.domain.fixtures.testDate
 import com.georgeci.moneysurfer.domain.fixtures.testInstant
@@ -30,11 +32,19 @@ import com.georgeci.moneysurfer.domain.model.Account
 import com.georgeci.moneysurfer.domain.model.Budget
 import com.georgeci.moneysurfer.domain.model.BudgetStatus
 import com.georgeci.moneysurfer.domain.model.CategorizedTransaction
+import com.georgeci.moneysurfer.domain.model.Category
+import com.georgeci.moneysurfer.domain.model.CategorySpendSlice
+import com.georgeci.moneysurfer.domain.model.CurrencyTotal
+import com.georgeci.moneysurfer.domain.model.DailySpendPoint
+import com.georgeci.moneysurfer.domain.model.MerchantSpend
+import com.georgeci.moneysurfer.domain.model.MonthlyNet
+import com.georgeci.moneysurfer.domain.model.SpendScope
 import com.georgeci.moneysurfer.domain.model.Transaction
 import com.georgeci.moneysurfer.domain.model.TransactionTotal
 import com.georgeci.moneysurfer.domain.preferences.UiPreferences
 import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.BudgetId
+import com.georgeci.moneysurfer.domain.primitives.CategoryId
 import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
 import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
 import com.georgeci.moneysurfer.domain.primitives.Money
@@ -45,11 +55,14 @@ import com.georgeci.moneysurfer.domain.primitives.TransferId
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 import com.georgeci.moneysurfer.domain.repositories.AccountRepository
 import com.georgeci.moneysurfer.domain.repositories.BudgetRepository
+import com.georgeci.moneysurfer.domain.repositories.CategoryRepository
+import com.georgeci.moneysurfer.domain.repositories.SpendAnalyticsRepository
 import com.georgeci.moneysurfer.domain.repositories.TransactionRepository
 import com.georgeci.moneysurfer.domain.usecase.ConvertAccountsTotalUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetAccountsUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetBudgetProgressUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetBudgetsUseCase
+import com.georgeci.moneysurfer.domain.usecase.GetCategorySpendUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetExchangeRatesUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetGoalsUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetRecentTransactionsUseCase
@@ -148,6 +161,7 @@ class DashboardViewModelTest : StringSpec({
             // widgets the stored layout never heard of are appended rather than dropped
             DashboardWidgetType.QuickActions,
             DashboardWidgetType.SafeToSpend,
+            DashboardWidgetType.SpentByCategory,
             DashboardWidgetType.Accounts,
             DashboardWidgetType.RecentTransactions,
         )
@@ -236,6 +250,84 @@ class DashboardViewModelTest : StringSpec({
         viewModel.value.shouldBeInstanceOf<DashboardState.Content>().safeToSpend shouldBe null
     }
 
+    "spent-by-category stays empty with no spend, so the widget can say the month is bare" {
+        val ws = workspaceId("ws-1")
+        val viewModel = newViewModel(
+            ws = ws,
+            accounts = FakeAccountRepository(listOf(anAccount(id = accountId("a-1"), workspaceId = ws))),
+            transactions = FakeTransactionRepository(emptyList()),
+        )
+
+        viewModel.value.shouldBeInstanceOf<DashboardState.Content>().spentByCategory.shouldBeEmpty()
+    }
+
+    "spent-by-category formats the aggregate's rows and orders them largest first" {
+        val ws = workspaceId("ws-1")
+        val rent = categoryId("c-rent")
+        val food = categoryId("c-food")
+        val viewModel = newViewModel(
+            ws = ws,
+            accounts = FakeAccountRepository(listOf(anAccount(id = accountId("a-1"), workspaceId = ws))),
+            transactions = FakeTransactionRepository(emptyList()),
+            categories = listOf(
+                aCategory(id = rent, workspaceId = ws, name = "Rent"),
+                aCategory(id = food, workspaceId = ws, name = "Food"),
+            ),
+            spendByCategory = listOf(
+                CategorySpendSlice(categoryId = food, total = 40.dollars, transactionCount = 2),
+                CategorySpendSlice(categoryId = rent, total = 60.dollars, transactionCount = 1),
+            ),
+        )
+
+        val rows = viewModel.value.shouldBeInstanceOf<DashboardState.Content>().spentByCategory
+        rows.map { it.name } shouldContainExactly listOf("Rent", "Food")
+        rows.first().spentFormatted shouldBe MoneyFormatter.format(60.dollars, USD)
+        rows.first().share shouldBe 0.6f
+        rows.first().sharePercent shouldBe 60
+        // Nothing caps either category, so the rows carry no over/near state to draw.
+        rows.all { it.cap == null } shouldBe true
+    }
+
+    "a single-category budget reaches the row it caps as a formatted limit and a status" {
+        val ws = workspaceId("ws-1")
+        val food = categoryId("c-food")
+        val viewModel = newViewModel(
+            ws = ws,
+            accounts = FakeAccountRepository(listOf(anAccount(id = accountId("a-1"), workspaceId = ws))),
+            transactions = FakeTransactionRepository(emptyList()),
+            budgets = listOf(
+                aBudget(workspaceId = ws, categoryIds = listOf(food), amount = 100.dollars, startDate = testDate),
+            ),
+            categories = listOf(aCategory(id = food, workspaceId = ws, name = "Food")),
+            spendByCategory = listOf(
+                CategorySpendSlice(categoryId = food, total = 120.dollars, transactionCount = 3),
+            ),
+        )
+
+        val cap = viewModel.value.shouldBeInstanceOf<DashboardState.Content>().spentByCategory.single().cap
+        cap?.limitFormatted shouldBe MoneyFormatter.format(100.dollars, USD)
+        cap?.status shouldBe BudgetStatus.OVER
+        cap?.progress shouldBe 1.2f
+    }
+
+    "an uncategorized slice keeps its money and leaves the label to the screen" {
+        val ws = workspaceId("ws-1")
+        val viewModel = newViewModel(
+            ws = ws,
+            accounts = FakeAccountRepository(listOf(anAccount(id = accountId("a-1"), workspaceId = ws))),
+            transactions = FakeTransactionRepository(emptyList()),
+            spendByCategory = listOf(
+                CategorySpendSlice(categoryId = null, total = 40.dollars, transactionCount = 1),
+            ),
+        )
+
+        val row = viewModel.value.shouldBeInstanceOf<DashboardState.Content>().spentByCategory.single()
+        row.name shouldBe null
+        row.categoryId shouldBe null
+        row.hue shouldBe null
+        row.spentFormatted shouldBe MoneyFormatter.format(40.dollars, USD)
+    }
+
     "an unset layout falls back to the default order" {
         val ws = workspaceId("ws-1")
         val viewModel = newViewModel(
@@ -322,18 +414,29 @@ private fun newViewModel(
     rates: FakeExchangeRateRepository = FakeExchangeRateRepository(),
     hostCapabilities: FakeHostCapabilities = FakeHostCapabilities(isOffline = false),
     budgets: List<Budget> = emptyList(),
+    categories: List<Category> = emptyList(),
+    spendByCategory: List<CategorySpendSlice> = emptyList(),
     clock: ClockUseCase = ClockUseCase(FixedClock(testInstant)),
 ): DashboardViewModel {
     val session = InMemorySessionPointers(currentWorkspaceId = ws)
     val workspaces = FakeGoalWorkspaceRepository(listOf(aWorkspace(id = ws, baseCurrency = baseCurrency)))
+    val budgetRepository = FakeBudgetRepository(budgets)
     return DashboardViewModel(
         getAccounts = GetAccountsUseCase(accounts, session),
         getRecentTransactions = GetRecentTransactionsUseCase(transactions, session),
         getGoals = GetGoalsUseCase(FakeSavingsGoalRepository(), FakeGoalContributionRepository(), session),
         getExchangeRates = GetExchangeRatesUseCase(session, workspaces, rates),
         getSafeToSpend = GetSafeToSpendUseCase(
-            getBudgets = GetBudgetsUseCase(FakeBudgetRepository(budgets), session),
+            getBudgets = GetBudgetsUseCase(budgetRepository, session),
             getBudgetProgress = GetBudgetProgressUseCase(transactions, workspaces, clock),
+        ),
+        getCategorySpend = GetCategorySpendUseCase(
+            spendAnalytics = FakeSpendAnalyticsRepository(spendByCategory),
+            categoryRepository = FakeCategoryRepository(categories),
+            budgetRepository = budgetRepository,
+            workspaceRepository = workspaces,
+            session = session,
+            clock = clock,
         ),
         convertAccountsTotal = ConvertAccountsTotalUseCase(),
         uiPreferences = uiPreferences,
@@ -351,6 +454,28 @@ private class FakeBudgetRepository(initial: List<Budget>) : BudgetRepository {
     override suspend fun update(budget: Budget) = Unit
     override suspend fun setActive(id: BudgetId, isActive: Boolean) = Unit
     override suspend fun delete(id: BudgetId) = Unit
+}
+
+private class FakeCategoryRepository(initial: List<Category>) : CategoryRepository {
+    private val state = MutableStateFlow(initial)
+
+    override fun getAll(): Flow<List<Category>> = state
+    override fun getByWorkspaceId(workspaceId: WorkspaceId): Flow<List<Category>> = state
+    override suspend fun getById(id: CategoryId): Category? = state.value.firstOrNull { it.id == id }
+    override suspend fun insert(category: Category) = Unit
+    override suspend fun update(category: Category) = Unit
+    override suspend fun delete(id: CategoryId) = Unit
+}
+
+/** Only [byCategory] is wired: the dashboard reads no other rollup. */
+private class FakeSpendAnalyticsRepository(
+    private val slices: List<CategorySpendSlice>,
+) : SpendAnalyticsRepository {
+    override fun byCategory(scope: SpendScope): Flow<List<CategorySpendSlice>> = flowOf(slices)
+    override fun netByMonth(scope: SpendScope): Flow<List<MonthlyNet>> = flowOf(emptyList())
+    override fun daily(scope: SpendScope): Flow<List<DailySpendPoint>> = flowOf(emptyList())
+    override fun topMerchants(scope: SpendScope, limit: Int): Flow<List<MerchantSpend>> = flowOf(emptyList())
+    override fun excludedByCurrency(scope: SpendScope): Flow<List<CurrencyTotal>> = flowOf(emptyList())
 }
 
 private class FakeTransactionRepository(

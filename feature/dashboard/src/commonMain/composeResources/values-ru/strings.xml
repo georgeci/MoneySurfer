@@ -13,6 +13,7 @@
     <string name="dashboard_customize_widget_balance">Общий баланс</string>
     <string name="dashboard_customize_widget_quick_actions">Быстрые действия</string>
     <string name="dashboard_customize_widget_safe_to_spend">Можно потратить</string>
+    <string name="dashboard_customize_widget_spent_by_category">Траты по категориям</string>
     <string name="dashboard_customize_widget_accounts">Счета</string>
     <string name="dashboard_customize_widget_goals">Цели</string>
     <string name="dashboard_customize_widget_recent">Последние транзакции</string>
@@ -26,6 +27,11 @@
     <string name="dashboard_customize_variant_balance_stacked">Стопкой</string>
     <string name="dashboard_customize_variant_balance_inline">В строку</string>
     <string name="dashboard_customize_variant_balance_minimal">Минимальный</string>
+    <string name="dashboard_customize_variant_spent_bar">Полосы</string>
+    <string name="dashboard_customize_variant_spent_ring">Кольцо</string>
+    <string name="dashboard_customize_variant_spent_gauge">Шкала</string>
+    <string name="dashboard_customize_variant_spent_chips">Чипсы</string>
+    <string name="dashboard_customize_variant_spent_multi">Стопкой</string>
     <string name="dashboard_customize_preview_account_everyday">Повседневный</string>
     <string name="dashboard_customize_preview_account_savings">Накопления</string>
     <string name="dashboard_customize_preview_account_cash">Наличные</string>
@@ -59,6 +65,18 @@
     <string name="dashboard_safe_to_spend_empty_title">Бюджета пока нет</string>
     <string name="dashboard_safe_to_spend_empty_subtitle">Задайте лимит, чтобы видеть, сколько можно потратить.</string>
     <string name="dashboard_safe_to_spend_set_budget">Задать бюджет</string>
+    <string name="dashboard_spent_by_category_title">Траты по категориям</string>
+    <string name="dashboard_spent_by_category_empty_title">Трат пока нет</string>
+    <string name="dashboard_spent_by_category_empty_subtitle">Расходы за этот месяц появятся здесь по категориям.</string>
+    <!-- The bucket every expense with no category lands in -->
+    <string name="dashboard_spent_by_category_uncategorized">Без категории</string>
+    <!-- Caption under a category with no cap: what the meter measures instead -->
+    <string name="dashboard_spent_by_category_share">%1$d% от трат</string>
+    <!-- Caption under a capped category: spend against the cap -->
+    <string name="dashboard_spent_by_category_of_cap">%1$s из %2$s</string>
+    <string name="dashboard_spent_by_category_over_cap">сверх %1$s</string>
+    <string name="dashboard_spent_by_category_status_warn">У лимита</string>
+    <string name="dashboard_spent_by_category_status_over">Превышен</string>
     <string name="dashboard_budgets_title">Бюджеты</string>
     <string name="dashboard_budgets_see_all">Все</string>
     <string name="dashboard_budgets_empty_title">Бюджетов пока нет</string>

@@ -24,6 +24,7 @@ class DashboardLayoutCodecTest : StringSpec({
                 // the round trip would fail for a reason that has nothing to do with the codec.
                 DashboardLayoutItem(DashboardWidgetType.QuickActions),
                 DashboardLayoutItem(DashboardWidgetType.SafeToSpend),
+                DashboardLayoutItem(DashboardWidgetType.SpentByCategory),
                 DashboardLayoutItem(DashboardWidgetType.RecentTransactions),
             ),
         )
@@ -63,6 +64,7 @@ class DashboardLayoutCodecTest : StringSpec({
             DashboardWidgetType.Balance,
             DashboardWidgetType.QuickActions,
             DashboardWidgetType.SafeToSpend,
+            DashboardWidgetType.SpentByCategory,
             DashboardWidgetType.Accounts,
             DashboardWidgetType.RecentTransactions,
         )
