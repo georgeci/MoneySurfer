@@ -17,15 +17,23 @@ import kotlin.time.Duration.Companion.days
  * already does. An app that is never launched keeps its tombstones, which costs a few rows and
  * loses nothing.
  *
- * **Why thirty days.** The window is not about the Undo — that is a Snackbar and expires in
- * seconds. It is about the other devices: a peer that has been offline for a while pulls the
- * tombstone by `updatedAt`, and purging locally before it syncs would leave this device with no
- * record either way. Thirty days is comfortably past the sync cadence and short enough that a
- * deleted row does not linger in a backup for a year.
+ * **Why thirty days.** Everything that reads a tombstone is a local, short-lived interaction: the
+ * Undo Snackbar (seconds), an edit that was already open when the row was deleted
+ * ([UpdateTransactionUseCase]), and a CSV import, which must find the tombstone rather than insert
+ * over a surviving id. Thirty days is far past all three and short enough that deleted rows do not
+ * accumulate. Nothing here is waiting on another device — see below.
  *
- * **What it does not do.** The remote doc keeps its `deletedAt` — that tombstone is how peers
- * learn about the delete at all, and it is not this device's to collect. Remote tombstone GC
- * remains an open gap (docs/architecture/sync-gaps.md).
+ * **The window is measured from the delete's own timestamp**, which for a tombstone that arrived by
+ * sync is the clock of the device that made the delete, not the moment this one heard about it. A
+ * delete pushed by a peer that had been offline for longer than [RETENTION] therefore lands here
+ * already expired and is collected on the next launch. That is deliberate rather than an oversight:
+ * none of the three readers above outlives the trip, there is no UI for undoing a delete made on
+ * another device, and a CSV import that finds no tombstone simply inserts the row instead — the
+ * same end state.
+ *
+ * **What it does not do.** The remote doc keeps its `deletedAt`. Purging here says nothing about
+ * any peer's copy — the tombstone stays on the server for them to pull, and collecting *that* is a
+ * separate open gap (docs/architecture/sync-gaps.md).
  */
 @Single
 class PurgeDeletedTransactionsUseCase(

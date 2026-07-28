@@ -82,14 +82,24 @@ class TransactionRepositoryImpl(
         enqueueUpsert(entity, MutationOperation.INSERT)
     }
 
+    /**
+     * `@Update` rewrites the whole row, so every column the domain model does not carry has to be
+     * read back from storage first or it is silently reset. `createdAt` is one; `deletedAt` is the
+     * other, and it is read through [TransactionDao.getByIdIncludingDeleted] precisely because a
+     * tombstoned row is invisible to the ordinary lookup — writing `Transaction`'s implicit "live"
+     * over it would undelete the row as a side effect of an unrelated edit. Lifting a tombstone is
+     * [restore]'s job and nothing else's.
+     */
     override suspend fun update(transaction: Transaction) {
-        val existingCreatedAt = dao.getById(transaction.id.value)?.createdAt
-        val entity = transaction.toEntity().copy(
-            createdAt = existingCreatedAt ?: transaction.toEntity().createdAt,
+        val stored = dao.getByIdIncludingDeleted(transaction.id.value)
+        val entity = transaction.toEntity()
+        val updated = entity.copy(
+            createdAt = stored?.createdAt ?: entity.createdAt,
             updatedAt = clock.now().toEpochMilliseconds(),
+            deletedAt = stored?.deletedAt,
         )
-        dao.update(entity)
-        enqueueUpsert(entity, MutationOperation.UPDATE)
+        dao.update(updated)
+        enqueueUpsert(updated, MutationOperation.UPDATE)
     }
 
     /**

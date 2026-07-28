@@ -281,8 +281,10 @@ has been deleted on a peer device". The current pull behaviour:
   `transactionDao.softDelete(id, deletedAt)` marks the row, every read
   query in `TransactionDao` filters on `deletedAt IS NULL`, and
   `TransactionRepository.restore(id)` lifts the tombstone in a single
-  UPDATE. That is what makes Undo survive process death, and it means a
-  peer's delete is as recoverable here as a local one. A restore pushes
+  UPDATE. That is what makes Undo survive process death, and it is also
+  what keeps an edit that was already open when a peer's delete arrived
+  from colliding with the surviving primary key
+  (`UpdateTransactionUseCase`). A restore pushes
   an ordinary upsert whose `deletedAt` is null, which lifts the
   tombstone remotely as well — no INSERT-after-DELETE flicker.
 - The cursor still advances past tombstones — the doc has a real
@@ -329,15 +331,23 @@ tombstone older than **30 days**.
   It runs off the startup path and its failures are logged and
   swallowed, so housekeeping can never keep the app off its first
   screen.
-- **Why 30 days:** not for the Undo, which is a Snackbar and expires in
-  seconds — for the peers. A device that has been offline for a while
-  pulls the tombstone by `updatedAt`; purging before it syncs would
-  leave this device with no record either way. Thirty days is well past
-  the sync cadence and short enough that a deleted row does not sit in a
-  backup for a year.
-- **What it does not touch:** the remote doc keeps its `deletedAt`. That
-  tombstone is how peers learn about the delete at all, and collecting
-  it is the separate gap above.
+- **Why 30 days:** everything that reads a tombstone is local and
+  short-lived — the Undo Snackbar (seconds), an edit that was already
+  open when the row was deleted (`UpdateTransactionUseCase`), and a CSV
+  import, which has to find the tombstone rather than insert over a
+  surviving id. Thirty days is far past all three and short enough that
+  deleted rows do not accumulate.
+- **Measured from the delete's own timestamp**, which for a pulled
+  tombstone is the *deleting* device's clock, not the moment this one
+  heard about it. A delete pushed by a peer that had been offline longer
+  than the window therefore arrives already expired and is collected on
+  the next launch. Deliberate: none of the three readers above outlives
+  the trip, there is no UI for undoing another device's delete, and an
+  import that finds no tombstone just inserts the row — same end state.
+- **What it does not touch:** the remote doc keeps its `deletedAt`.
+  Purging here says nothing about any peer's copy; that tombstone stays
+  on the server for them to pull, and collecting it is the separate gap
+  above.
 - After the purge the row is gone for good: a restore finds nothing and
   is a no-op, and a CSV import of the same id inserts it fresh.
 

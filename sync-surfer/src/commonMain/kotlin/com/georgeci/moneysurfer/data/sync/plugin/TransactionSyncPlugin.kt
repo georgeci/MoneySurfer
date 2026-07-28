@@ -45,9 +45,13 @@ class TransactionSyncPlugin(
     }
 
     /**
-     * A pulled tombstone marks the local row deleted instead of dropping it (issue #346), which
-     * makes a remote delete and a local one land in exactly the same state — and leaves the peer's
-     * delete just as recoverable as this device's own.
+     * A pulled tombstone marks the local row deleted instead of dropping it (issue #346), so a
+     * remote delete and a local one land in exactly the same state — which is what keeps an edit
+     * that was already in flight here from colliding with the surviving primary key.
+     *
+     * It does not follow that a peer's delete stays recoverable for the full retention window: the
+     * `deletedAt` written here is the deleting device's, so a delete that was made long before it
+     * reached us is purged sooner. `PurgeDeletedTransactionsUseCase` documents why that is fine.
      *
      * It is a targeted UPDATE rather than an upsert of the decoded doc: a tombstone patch carries
      * only `deletedAt`, `updatedAt` and `clientVersionCode`, so upserting what it decodes to would

@@ -15,6 +15,7 @@ import com.georgeci.moneysurfer.domain.preferences.TransactionPeriodMode
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
 import com.georgeci.moneysurfer.domain.usecase.DeleteTransactionUseCase
 import com.georgeci.moneysurfer.domain.usecase.PurgeDeletedTransactionsUseCase
+import com.georgeci.moneysurfer.domain.usecase.UpdateTransactionUseCase
 import com.georgeci.moneysurfer.domain.util.periodWindow
 import com.georgeci.moneysurfer.integration.fixtures.IntegrationHarness
 import io.kotest.core.spec.style.StringSpec
@@ -229,5 +230,83 @@ class TransactionSoftDeleteIntegrationIT : StringSpec({
         stack.applyTransactionChange.restore(target) shouldBe null
 
         stack.transactionRepository.getAll().first().map { it.id } shouldContainExactly listOf(survivor)
+    }
+
+    // The edit screen is open, the row is deleted underneath it — by a pulled delete from another
+    // device, or by a swipe on a list still in the back stack — and then the user presses Save.
+    // A delete no longer frees the id, so treating "no live row" as "create" would collide with the
+    // surviving primary key and fail the save with the balance already moved.
+    "saving an edit to a row deleted underneath it restores the row instead of colliding" {
+        val updateTransaction = UpdateTransactionUseCase(stack.transactionRepository, stack.applyTransactionChange)
+        val edited = dao.getById(target.value).shouldNotBeNull()
+
+        deleteTransaction(target)
+        stack.accountRepository.getById(account)!!.balance shouldBe 460.dollars
+
+        updateTransaction(
+            aTransaction(
+                id = target,
+                workspaceId = DEFAULT_WORKSPACE_ID,
+                accountId = account,
+                money = 10.dollars,
+                currencyCode = USD,
+                categoryId = categoryId("c-1"),
+                note = "coffee",
+                merchant = "Beans",
+                operationDate = OPERATION_DATE,
+                type = TransactionType.EXPENSE,
+            ),
+        )
+
+        val saved = stack.transactionRepository.getById(target).shouldNotBeNull()
+        saved.money shouldBe 10.dollars
+        // 500 − 40 (survivor) − 10 (the edit), with the deleted row's 40 refunded exactly once.
+        stack.accountRepository.getById(account)!!.balance shouldBe 450.dollars
+        // Restored, not re-created: the row kept the createdAt it was originally written with.
+        dao.getById(target.value).shouldNotBeNull().createdAt shouldBe edited.createdAt
+    }
+
+    "saving an edit to a row that was already purged inserts it fresh" {
+        val updateTransaction = UpdateTransactionUseCase(stack.transactionRepository, stack.applyTransactionChange)
+        deleteTransaction(target)
+        stack.retention.purgeDeletedBefore(stack.clock.now() + PurgeDeletedTransactionsUseCase.RETENTION)
+
+        updateTransaction(
+            aTransaction(
+                id = target,
+                workspaceId = DEFAULT_WORKSPACE_ID,
+                accountId = account,
+                money = 10.dollars,
+                currencyCode = USD,
+                categoryId = categoryId("c-1"),
+                operationDate = OPERATION_DATE,
+                type = TransactionType.EXPENSE,
+            ),
+        )
+
+        stack.transactionRepository.getById(target).shouldNotBeNull().money shouldBe 10.dollars
+        stack.accountRepository.getById(account)!!.balance shouldBe 450.dollars
+    }
+
+    // `@Update` rewrites every column, and the domain model has no tombstone field — so without the
+    // read-back in TransactionRepositoryImpl.update an unrelated edit would quietly undelete a row.
+    "updating a tombstoned row through the repository leaves it deleted" {
+        deleteTransaction(target)
+
+        stack.transactionRepository.update(
+            aTransaction(
+                id = target,
+                workspaceId = DEFAULT_WORKSPACE_ID,
+                accountId = account,
+                money = 10.dollars,
+                currencyCode = USD,
+                categoryId = categoryId("c-1"),
+                operationDate = OPERATION_DATE,
+                type = TransactionType.EXPENSE,
+            ),
+        )
+
+        stack.transactionRepository.getById(target) shouldBe null
+        dao.getByIdIncludingDeleted(target.value).shouldNotBeNull().deletedAt.shouldNotBeNull()
     }
 })
