@@ -60,6 +60,7 @@ import com.georgeci.moneysurfer.uikit.components.base.rememberSurferReorderState
 import com.georgeci.moneysurfer.uikit.components.base.surferReorderHandle
 import com.georgeci.moneysurfer.uikit.components.base.surferReorderableItem
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
 import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
@@ -123,6 +124,7 @@ private fun AccountsManageLoading(onEvent: (AccountsManageEvent) -> Unit) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .surferContentContainer()
                 .padding(padding)
                 .padding(horizontal = AppTheme.spacing.default, vertical = AppTheme.spacing.medium),
             verticalArrangement = Arrangement.spacedBy(14.dp),
@@ -179,7 +181,7 @@ private fun AccountsManageContent(
     ) { padding ->
         if (!hasContent) {
             Box(
-                modifier = Modifier.fillMaxSize().padding(padding),
+                modifier = Modifier.fillMaxSize().surferContentContainer().padding(padding),
                 contentAlignment = Alignment.Center,
             ) {
                 SurferEmptyState(
@@ -208,6 +210,7 @@ private fun AccountsManageContent(
             state = listState,
             modifier = Modifier
                 .fillMaxSize()
+                .surferContentContainer()
                 .padding(top = padding.calculateTopPadding()),
             contentPadding = PaddingValues(
                 top = AppTheme.spacing.xSmall,

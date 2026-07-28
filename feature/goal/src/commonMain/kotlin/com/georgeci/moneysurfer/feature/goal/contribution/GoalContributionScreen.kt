@@ -24,6 +24,7 @@ import com.georgeci.moneysurfer.navigation.GoalContributionMode
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbarButtonAction
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
 import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
 import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
@@ -104,6 +105,7 @@ private fun GoalContributionContent(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .surferContentContainer()
                 .padding(padding)
                 .padding(AppTheme.spacing.default),
             verticalArrangement = Arrangement.spacedBy(AppTheme.spacing.default),

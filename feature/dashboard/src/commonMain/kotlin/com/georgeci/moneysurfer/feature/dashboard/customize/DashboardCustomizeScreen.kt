@@ -40,6 +40,7 @@ import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsRow
 import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsSwitch
 import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsValuePill
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
 import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
 import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
@@ -141,6 +142,7 @@ private fun CustomizeSkeleton(padding: PaddingValues) {
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .surferContentContainer()
             .padding(padding)
             .padding(horizontal = 16.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -177,6 +179,7 @@ private fun CustomizeList(
         state = listState,
         modifier = Modifier
             .fillMaxSize()
+            .surferContentContainer()
             .padding(top = padding.calculateTopPadding()),
         contentPadding = PaddingValues(
             start = 16.dp,

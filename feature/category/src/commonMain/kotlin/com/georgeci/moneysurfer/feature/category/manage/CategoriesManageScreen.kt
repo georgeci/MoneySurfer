@@ -30,6 +30,7 @@ import com.georgeci.moneysurfer.uikit.components.base.SurferSwipeRevealRow
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
 import com.georgeci.moneysurfer.uikit.components.category.SurferCategoryManageCard
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
 import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
@@ -99,6 +100,7 @@ private fun CategoriesManageLoading(onEvent: (CategoriesManageEvent) -> Unit) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .surferContentContainer()
                 .padding(padding)
                 .padding(horizontal = AppTheme.spacing.default, vertical = AppTheme.spacing.medium),
             verticalArrangement = Arrangement.spacedBy(AppTheme.spacing.medium),
@@ -139,7 +141,7 @@ private fun CategoriesManageContent(
     ) { padding ->
         if (state.categories.isEmpty()) {
             Box(
-                modifier = Modifier.fillMaxSize().padding(padding),
+                modifier = Modifier.fillMaxSize().surferContentContainer().padding(padding),
                 contentAlignment = Alignment.Center,
             ) {
                 SurferEmptyState(
@@ -153,6 +155,7 @@ private fun CategoriesManageContent(
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
+                .surferContentContainer()
                 .padding(top = padding.calculateTopPadding()),
             contentPadding = PaddingValues(
                 top = AppTheme.spacing.small,

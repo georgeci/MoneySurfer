@@ -42,6 +42,7 @@ import com.georgeci.moneysurfer.uikit.components.base.SurferToolbarButtonAction
 import com.georgeci.moneysurfer.uikit.components.category.SurferColorSwatchRow
 import com.georgeci.moneysurfer.uikit.components.category.SurferIconPickerGrid
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
 import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
@@ -147,6 +148,7 @@ private fun CategoryCreationContent(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .surferContentContainer()
                 .padding(top = padding.calculateTopPadding())
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = SectionSpacing)
