@@ -40,6 +40,8 @@ import com.georgeci.moneysurfer.domain.usecase.UpdateWorkspaceCurrencyUseCase
 import com.georgeci.moneysurfer.domain.util.TransactionPeriodWindow
 import com.georgeci.moneysurfer.feature.account.generated.resources.Res
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_created_snackbar
+import com.georgeci.moneysurfer.feature.account.generated.resources.account_creation_updated_snackbar
+import com.georgeci.moneysurfer.feature.account.generated.resources.accounts_manage_action_failed
 import com.georgeci.moneysurfer.navigation.SnackbarController
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContain
@@ -513,6 +515,161 @@ class AccountCreationViewModelTest : StringSpec({
             }
         }
     }
+
+    "back navigates back" {
+        runTest {
+            val vm = Fixture(workspaceId = ws).createViewModel()
+            try {
+                vm.sideEffects.effectFlow.test {
+                    vm.onEvent(AccountCreationEvent.OnBackClick)
+                    awaitItem() shouldBe AccountCreationEffect.NavigateBack
+                }
+            } finally {
+                vm.viewModelScope.cancel()
+            }
+        }
+    }
+
+    "picking a type swaps it on the form" {
+        runTest {
+            val vm = Fixture(workspaceId = ws).createViewModel(initialType = AccountType.SAVINGS)
+            try {
+                vm.awaitCurrencies()
+
+                vm.onEvent(AccountCreationEvent.OnTypeChanged(AccountType.CARD))
+
+                vm.currentState.shouldBeInstanceOf<AccountCreationState.Content>().type shouldBe AccountType.CARD
+            } finally {
+                vm.viewModelScope.cancel()
+            }
+        }
+    }
+
+    "with no workspace pinned the save reports a failure instead of navigating on" {
+        runTest {
+            val fixture = Fixture(workspaceId = ws, pinWorkspace = false)
+            val vm = fixture.createViewModel()
+            try {
+                vm.awaitCurrencies()
+
+                fixture.snackbar.requests.test {
+                    vm.onEvent(AccountCreationEvent.OnNameChanged("Wallet"))
+                    vm.onEvent(AccountCreationEvent.OnSaveClick)
+                    awaitItem().message shouldBe Res.string.accounts_manage_action_failed
+                }
+                fixture.accountRepository.inserted.shouldBeEmpty()
+            } finally {
+                vm.viewModelScope.cancel()
+            }
+        }
+    }
+
+    "a failed account write is reported and leaves no half-made account behind" {
+        runTest {
+            val fixture = Fixture(workspaceId = ws, failInsert = true)
+            val vm = fixture.createViewModel()
+            try {
+                vm.awaitCurrencies()
+
+                fixture.snackbar.requests.test {
+                    vm.onEvent(AccountCreationEvent.OnNameChanged("Wallet"))
+                    vm.onEvent(AccountCreationEvent.OnSaveClick)
+                    awaitItem().message shouldBe Res.string.accounts_manage_action_failed
+                }
+                fixture.accountRepository.inserted.shouldBeEmpty()
+                fixture.transactionRepository.inserted.shouldBeEmpty()
+            } finally {
+                vm.viewModelScope.cancel()
+            }
+        }
+    }
+
+    "an exception past the wrapped use cases lands on the screen, not the global error boundary" {
+        runTest {
+            // The account insert succeeds; the opening-balance transaction is what blows up. That
+            // call is not wrapped in an `Either`, so it is the one path that actually reaches
+            // `launch(onError = ::handleSaveError)` — an insert failure is caught by
+            // `CreateAccountUseCase` long before the boundary and proves nothing about it.
+            val fixture = Fixture(workspaceId = ws, failTransactionInsert = true)
+            val vm = fixture.createViewModel()
+            try {
+                vm.awaitCurrencies()
+
+                fixture.snackbar.requests.test {
+                    vm.onEvent(AccountCreationEvent.OnNameChanged("Wallet"))
+                    vm.onEvent(AccountCreationEvent.OnBalanceChanged("100"))
+                    vm.onEvent(AccountCreationEvent.OnSaveClick)
+                    awaitItem().message shouldBe Res.string.accounts_manage_action_failed
+                }
+                // Proof the throw happened past `CreateAccountUseCase`'s `Either.catch`: the
+                // account row landed, and only the opening-balance write blew up.
+                fixture.accountRepository.inserted.map { it.name } shouldBe listOf("Wallet")
+                fixture.transactionRepository.inserted.shouldBeEmpty()
+            } finally {
+                vm.viewModelScope.cancel()
+            }
+        }
+    }
+
+    "an edit shows the updated snackbar, not the created one" {
+        runTest {
+            val fixture = Fixture(workspaceId = ws)
+            val existing = Account(
+                id = AccountId("acc-1"),
+                workspaceId = ws,
+                name = "Wallet",
+                type = AccountType.CASH,
+                currencyCode = USD,
+                balance = Money.zero(),
+            )
+            fixture.accountRepository.insert(existing)
+            val vm = fixture.createViewModel(editing = existing.id)
+            try {
+                vm.awaitCurrencies()
+
+                fixture.snackbar.requests.test {
+                    vm.onEvent(AccountCreationEvent.OnNameChanged("  Pocket  "))
+                    vm.onEvent(AccountCreationEvent.OnSaveClick)
+                    val request = awaitItem()
+                    request.message shouldBe Res.string.account_creation_updated_snackbar
+                    request.messageArgs shouldBe listOf("Pocket")
+                }
+                fixture.accountRepository.getById(existing.id)?.name shouldBe "Pocket"
+                // An edit renames a row; it never adds one.
+                fixture.accountRepository.inserted.map { it.id } shouldBe listOf(existing.id)
+            } finally {
+                vm.viewModelScope.cancel()
+            }
+        }
+    }
+
+    "editing an account that is gone reports a failure and stays on the screen" {
+        runTest {
+            val fixture = Fixture(workspaceId = ws)
+            val existing = Account(
+                id = AccountId("acc-1"),
+                workspaceId = ws,
+                name = "Wallet",
+                type = AccountType.CASH,
+                currencyCode = USD,
+                balance = Money.zero(),
+            )
+            fixture.accountRepository.insert(existing)
+            val vm = fixture.createViewModel(editing = existing.id)
+            try {
+                vm.awaitCurrencies()
+                fixture.accountRepository.delete(existing.id)
+
+                fixture.snackbar.requests.test {
+                    vm.onEvent(AccountCreationEvent.OnNameChanged("Pocket"))
+                    vm.onEvent(AccountCreationEvent.OnSaveClick)
+                    awaitItem().message shouldBe Res.string.accounts_manage_action_failed
+                }
+            } finally {
+                vm.viewModelScope.cancel()
+            }
+        }
+    }
 })
 
 /** Wait until the async `loadCurrencies()` populates the currency list — the only piece of
@@ -525,9 +682,14 @@ private fun List<*>.shouldBeEmpty() {
     if (isNotEmpty()) error("Expected empty list, got $this")
 }
 
-private class Fixture(val workspaceId: WorkspaceId) {
-    val accountRepository = FakeAccountRepository()
-    val transactionRepository = FakeTransactionRepository()
+private class Fixture(
+    val workspaceId: WorkspaceId,
+    pinWorkspace: Boolean = true,
+    failInsert: Boolean = false,
+    failTransactionInsert: Boolean = false,
+) {
+    val accountRepository = FakeAccountRepository(failInsert = failInsert)
+    val transactionRepository = FakeTransactionRepository(failInsert = failTransactionInsert)
     val currencyRepository = FakeCurrencyRepository(
         listOf(
             Currency(USD, "$", "US Dollar"),
@@ -536,7 +698,7 @@ private class Fixture(val workspaceId: WorkspaceId) {
         ),
     )
     val workspaceRepository = FakeWorkspaceRepository(aWorkspace(id = workspaceId, baseCurrency = USD))
-    val session = InMemorySessionPointers(currentWorkspaceId = workspaceId)
+    val session = InMemorySessionPointers(currentWorkspaceId = workspaceId.takeIf { pinWorkspace })
     val clock = ClockUseCase()
     val snackbar = SnackbarController()
     val createTransaction = CreateTransactionUseCase(
@@ -565,7 +727,7 @@ private class Fixture(val workspaceId: WorkspaceId) {
     )
 }
 
-private class FakeAccountRepository : AccountRepository {
+private class FakeAccountRepository(private val failInsert: Boolean = false) : AccountRepository {
     val inserted = mutableListOf<Account>()
     private val byId = mutableMapOf<AccountId, Account>()
     private val byWorkspace = MutableStateFlow<List<Account>>(emptyList())
@@ -574,6 +736,7 @@ private class FakeAccountRepository : AccountRepository {
     override fun getByWorkspaceId(workspaceId: WorkspaceId): Flow<List<Account>> = byWorkspace
     override suspend fun getById(id: AccountId): Account? = byId[id]
     override suspend fun insert(account: Account) {
+        if (failInsert) error("simulated local account insert failure")
         inserted += account
         byId[account.id] = account
         byWorkspace.value = byId.values.toList()
@@ -604,7 +767,7 @@ private class FakeAccountRepository : AccountRepository {
     }
 }
 
-private class FakeTransactionRepository : TransactionRepository {
+private class FakeTransactionRepository(private val failInsert: Boolean = false) : TransactionRepository {
     val inserted = mutableListOf<Transaction>()
     private val byId = mutableMapOf<TransactionId, Transaction>()
     private val all = MutableStateFlow<List<Transaction>>(emptyList())
@@ -627,6 +790,7 @@ private class FakeTransactionRepository : TransactionRepository {
     override suspend fun getBySplitId(splitId: SplitId): List<Transaction> =
         byId.values.filter { it.splitId == splitId }
     override suspend fun insert(transaction: Transaction) {
+        if (failInsert) error("simulated local transaction insert failure")
         inserted += transaction
         byId[transaction.id] = transaction
         all.value = byId.values.toList()
