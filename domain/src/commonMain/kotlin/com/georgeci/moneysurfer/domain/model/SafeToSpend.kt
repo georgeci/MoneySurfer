@@ -1,6 +1,5 @@
 package com.georgeci.moneysurfer.domain.model
 
-import com.georgeci.moneysurfer.domain.primitives.BudgetId
 import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
 import com.georgeci.moneysurfer.domain.primitives.Money
 import com.georgeci.moneysurfer.domain.util.BudgetPeriodWindow
@@ -14,7 +13,6 @@ import kotlinx.datetime.daysUntil
  * transactions, so the widget and the budget screens can never disagree about the same budget.
  */
 data class SafeToSpend(
-    val budgetId: BudgetId,
     val budgetName: String,
     /** Negative once the budget is overspent. */
     val remaining: Money,
@@ -29,11 +27,6 @@ data class SafeToSpend(
     val status: BudgetStatus,
     /** Workspace base currency, or null when the workspace has none yet. */
     val currency: CurrencyCode?,
-    /**
-     * Whether expenses in another currency were skipped. The headline is understated when true —
-     * see [BudgetProgress.hasMixedCurrency].
-     */
-    val hasMixedCurrency: Boolean,
 ) {
 
     val isOver: Boolean get() = status == BudgetStatus.OVER
@@ -83,7 +76,6 @@ private fun List<BudgetProgress>.primaryProgress(): BudgetProgress? {
 }
 
 private fun BudgetProgress.toSafeToSpend(): SafeToSpend = SafeToSpend(
-    budgetId = budget.id,
     budgetName = budget.name,
     remaining = remaining,
     perDay = perDayRemaining,
@@ -93,5 +85,4 @@ private fun BudgetProgress.toSafeToSpend(): SafeToSpend = SafeToSpend(
     window = window,
     status = status,
     currency = currency,
-    hasMixedCurrency = hasMixedCurrency,
 )

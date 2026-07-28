@@ -188,7 +188,6 @@ class DashboardViewModel(
             progress = spentFraction,
             paceFraction = elapsedFraction,
             status = status,
-            isOver = isOver,
         )
     }
 
@@ -304,8 +303,10 @@ data class SafeToSpendUi(
     /** How much of the period has gone — the tick [progress] is read against. */
     val paceFraction: Float,
     val status: BudgetStatus,
-    val isOver: Boolean,
-)
+) {
+    /** Derived rather than stored, so the wording and the colour can never disagree. */
+    val isOver: Boolean get() = status == BudgetStatus.OVER
+}
 
 data class TransactionUi(
     val id: TransactionId,

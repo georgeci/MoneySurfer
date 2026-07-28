@@ -115,7 +115,6 @@ class DashboardScreenStateTest : StringSpec({
                             progress = 0.64f,
                             paceFraction = 0.6f,
                             status = BudgetStatus.OK,
-                            isOver = false,
                         ),
                     ),
                     onEvent = {},
