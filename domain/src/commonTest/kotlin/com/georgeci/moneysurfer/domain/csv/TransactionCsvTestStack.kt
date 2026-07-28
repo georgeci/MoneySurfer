@@ -53,18 +53,19 @@ internal class CsvStack(
     val transactionRepository = FakeTransactionRepository(transactions)
     private val accountRepository = FakeAccountRepository(accounts)
 
+    private val applyTransactionChange = ApplyTransactionChangeUseCase(
+        transactionRepository = transactionRepository,
+        accountRepository = accountRepository,
+    )
+
     private val exportUseCase = ExportTransactionsUseCase(transactionRepository)
     private val importUseCase = ImportTransactionsUseCase(
         transactionRepository = transactionRepository,
         accountRepository = accountRepository,
         categoryRepository = FakeCategoryRepository(categories),
         workspaceRepository = FakeWorkspaceRepository(workspaces),
-        createTransaction = CreateTransactionUseCase(
-            ApplyTransactionChangeUseCase(
-                transactionRepository = transactionRepository,
-                accountRepository = accountRepository,
-            ),
-        ),
+        createTransaction = CreateTransactionUseCase(applyTransactionChange),
+        applyTransactionChange = applyTransactionChange,
     )
 
     suspend fun export(buffer: Buffer) = exportUseCase(buffer)
@@ -100,6 +101,10 @@ internal class CountingSource(private val total: Long) : Source {
 internal class FakeTransactionRepository(initial: List<Transaction>) : TransactionRepository {
     private val store = MutableStateFlow(initial.associateBy { it.id })
 
+    // Soft delete, as the real repository does it: out of [store] (so no read can see it) but not
+    // out of the fake, so a restore has something to bring back.
+    private val tombstones = mutableMapOf<TransactionId, Transaction>()
+
     fun stored(): List<Transaction> = store.value.values.toList()
 
     override fun getAll(): Flow<List<Transaction>> = store.map { it.values.toList() }
@@ -126,8 +131,11 @@ internal class FakeTransactionRepository(initial: List<Transaction>) : Transacti
     }
     override suspend fun update(transaction: Transaction) = insert(transaction)
     override suspend fun delete(id: TransactionId) {
+        store.value[id]?.let { tombstones[id] = it }
         store.value -= id
     }
+    override suspend fun restore(id: TransactionId): Transaction? =
+        tombstones.remove(id)?.also { store.value += (id to it) }
 }
 
 internal class FakeAccountRepository(initial: List<Account>) : AccountRepository {

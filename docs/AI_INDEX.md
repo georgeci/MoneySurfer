@@ -269,7 +269,7 @@
 ## persistence-rules
 - Title: Rules
 - File: docs/architecture/persistence.md
-- Lines: 26-40
+- Lines: 26-46
 - Tasks: persistence, room, firestore, datastore
 
 ## project-map
@@ -395,7 +395,7 @@
 ## sync-pull-lww-rules
 - Title: Rules
 - File: docs/architecture/sync-pull-lww.md
-- Lines: 37-52
+- Lines: 39-54
 - Tasks: sync, pull, lww, tombstones, cursor
 
 ## sync-rules

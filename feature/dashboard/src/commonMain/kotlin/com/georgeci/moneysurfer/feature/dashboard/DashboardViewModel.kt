@@ -4,6 +4,9 @@ import arrow.optics.optics
 import com.georgeci.moneysurfer.domain.config.HostCapabilities
 import com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutConfig
 import com.georgeci.moneysurfer.domain.formatter.MoneyFormatter
+import com.georgeci.moneysurfer.domain.insight.Insight
+import com.georgeci.moneysurfer.domain.insight.InsightTone
+import com.georgeci.moneysurfer.domain.insight.SpendTrend
 import com.georgeci.moneysurfer.domain.model.Account
 import com.georgeci.moneysurfer.domain.model.BudgetStatus
 import com.georgeci.moneysurfer.domain.model.CategorySpend
@@ -20,6 +23,7 @@ import com.georgeci.moneysurfer.domain.primitives.GoalId
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
 import com.georgeci.moneysurfer.domain.usecase.ConvertAccountsTotalUseCase
+import com.georgeci.moneysurfer.domain.usecase.GenerateInsightsUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetAccountsUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetCategorySpendUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetExchangeRatesUseCase
@@ -36,7 +40,14 @@ import org.koin.core.annotation.KoinViewModel
 import kotlin.math.roundToInt
 import kotlin.time.Instant
 
+/**
+ * One reader per widget: the dashboard is the one screen that composes every other feature's
+ * numbers, so its dependency list grows by one each time a widget is wired. Grouping them would
+ * only move the list somewhere else — see `observeDashboard`, where the flows themselves *are*
+ * folded, because there `combine`'s five-flow ceiling forces it.
+ */
 @KoinViewModel
+@Suppress("LongParameterList")
 class DashboardViewModel(
     private val getAccounts: GetAccountsUseCase,
     private val getRecentTransactions: GetRecentTransactionsUseCase,
@@ -44,6 +55,7 @@ class DashboardViewModel(
     private val getExchangeRates: GetExchangeRatesUseCase,
     private val getSafeToSpend: GetSafeToSpendUseCase,
     private val getCategorySpend: GetCategorySpendUseCase,
+    private val generateInsights: GenerateInsightsUseCase,
     private val convertAccountsTotal: ConvertAccountsTotalUseCase,
     uiPreferences: UiPreferences,
     hostCapabilities: HostCapabilities,
@@ -133,7 +145,14 @@ class DashboardViewModel(
                     transferEnabled = transferEnabled,
                     layout = layoutConfig,
                 )
-            }.collect { newContent -> updateState { newContent } }
+            }
+                // Joined here rather than folded into a pair above: the insights are the slowest
+                // input — two aggregates plus the category tree — so keeping them last lets the
+                // rest of the dashboard draw without waiting on them.
+                .combine(generateInsights().onStart { emit(emptyList()) }) { content, insights ->
+                    content.copy(insights = insights.map { it.toUi() })
+                }
+                .collect { newContent -> updateState { newContent } }
         }
     }
 
@@ -228,6 +247,41 @@ class DashboardViewModel(
     )
 
     /**
+     * Money is formatted here and the sentence is assembled in the composable: the amounts need a
+     * currency the screen does not carry, and the copy needs a locale the ViewModel does not.
+     */
+    private fun Insight.toUi(): InsightUi = when (this) {
+        is Insight.CategoryChange -> InsightUi(
+            id = id,
+            kind = if (isIncrease) InsightKind.CategoryUp else InsightKind.CategoryDown,
+            tone = tone,
+            label = categoryName,
+            amount = MoneyFormatter.format(current, currency),
+            comparison = MoneyFormatter.format(previous, currency),
+            percent = changePercent,
+        )
+        is Insight.PeriodSpend -> InsightUi(
+            id = id,
+            kind = when (trend) {
+                SpendTrend.Up -> InsightKind.PeriodUp
+                SpendTrend.Down -> InsightKind.PeriodDown
+                SpendTrend.Flat -> InsightKind.PeriodFlat
+            },
+            tone = tone,
+            amount = MoneyFormatter.format(current, currency),
+            comparison = MoneyFormatter.format(previous, currency),
+            percent = changePercent,
+        )
+        is Insight.ActiveSubscriptions -> InsightUi(
+            id = id,
+            kind = InsightKind.Subscriptions,
+            tone = tone,
+            amount = MoneyFormatter.format(monthlyTotal, currency),
+            count = count,
+        )
+    }
+
+    /**
      * One receipt as the widget draws it. A split shows the whole payment and how many categories
      * it covers — its legs are separate rows only where a category is what the screen is about.
      */
@@ -278,6 +332,8 @@ sealed interface DashboardState {
          * spend, which is the spent-by-category widget's own empty state rather than a missing one.
          */
         val spentByCategory: List<CategorySpendUi> = emptyList(),
+        /** Generated spending insights, most actionable first. Empty until the engine has run. */
+        val insights: List<InsightUi> = emptyList(),
         val isOffline: Boolean = false,
         /**
          * Whether this build offers multi-account transfers. The quick-actions widget is the only
@@ -332,6 +388,44 @@ data class GoalUi(
     val formattedSaved: String,
     val formattedTarget: String,
     val progress: Float,
+)
+
+/**
+ * Which sentence an insight draws. One entry per rule outcome rather than per rule, because the
+ * direction is what changes the copy: "Dining is up 24%" and "Dining is down 24%" are two
+ * sentences, not one with a sign in it.
+ */
+enum class InsightKind {
+    CategoryUp,
+    CategoryDown,
+    PeriodUp,
+    PeriodDown,
+    PeriodFlat,
+    Subscriptions,
+}
+
+/**
+ * One insight ready for the widget: which sentence to draw ([kind] and [tone]) plus the values
+ * that fill its placeholders, already formatted in the workspace base currency.
+ *
+ * Flat rather than a mirror of the domain's sealed `Insight`: every insight draws the same card,
+ * so a per-kind UI type would duplicate the domain hierarchy to feed one `when`. Fields a kind
+ * does not use keep their defaults and never reach its copy.
+ */
+data class InsightUi(
+    val id: String,
+    val kind: InsightKind,
+    val tone: InsightTone,
+    /** Category name for the two category kinds; null for the uncategorized bucket. */
+    val label: String? = null,
+    /** The headline amount — this period's spend, or the monthly subscription total. */
+    val amount: String = "",
+    /** The same-stretch figure from the previous period. Unused by [InsightKind.Subscriptions]. */
+    val comparison: String = "",
+    /** Magnitude of the change in whole percent. Zero for the kinds that compare nothing. */
+    val percent: Int = 0,
+    /** Active subscription count. Zero for every kind but [InsightKind.Subscriptions]. */
+    val count: Int = 0,
 )
 
 /**

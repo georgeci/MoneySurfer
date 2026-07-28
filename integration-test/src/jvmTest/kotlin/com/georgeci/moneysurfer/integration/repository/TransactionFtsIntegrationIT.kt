@@ -110,7 +110,11 @@ class TransactionFtsIntegrationIT : StringSpec({
         search("rent") shouldBe listOf("t-new", "t-mid", "t-old")
     }
 
-    "index follows the content table on update and delete" {
+    // The delete half is now a soft delete, and the index is external-content over `note` and
+    // `merchant` only — so the FTS row survives a tombstone and it is the query's
+    // `deletedAt IS NULL` term, not the index, that has to hide the row. Both are exercised here
+    // because either one failing looks the same from the search bar.
+    "index follows the content table on update, and search drops soft-deleted rows" {
         val dao = harness.database.transactionDao()
         dao.insert(transaction(id = "t-1", note = "groceries"))
 
@@ -118,8 +122,21 @@ class TransactionFtsIntegrationIT : StringSpec({
         search("groceries").shouldBeEmpty()
         search("pharmacy") shouldBe listOf("t-1")
 
-        dao.delete("t-1")
+        dao.softDelete("t-1", NOW)
         search("pharmacy").shouldBeEmpty()
+
+        dao.restore("t-1", NOW)
+        search("pharmacy") shouldBe listOf("t-1")
+    }
+
+    "a purged row leaves nothing behind in the index" {
+        val dao = harness.database.transactionDao()
+        dao.insert(transaction(id = "t-1", note = "groceries"))
+        dao.softDelete("t-1", NOW)
+
+        dao.purgeDeletedBefore(NOW + 1)
+
+        search("groceries").shouldBeEmpty()
     }
 
     "does not leak rows from another workspace" {

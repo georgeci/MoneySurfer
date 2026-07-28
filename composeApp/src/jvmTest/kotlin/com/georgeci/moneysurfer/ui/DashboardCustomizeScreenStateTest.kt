@@ -3,8 +3,11 @@ package com.georgeci.moneysurfer.ui
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.hasScrollAction
+import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.v2.runComposeUiTest
 import com.georgeci.moneysurfer.domain.dashboard.DashboardCardStyle
@@ -42,6 +45,11 @@ class DashboardCustomizeScreenStateTest : StringSpec({
             onNodeWithTag(DashboardCustomizeTestTags.EnabledHeader).assertIsDisplayed()
             onNodeWithTag(DashboardCustomizeTestTags.AvailableHeader).assertIsDisplayed()
             onNodeWithTag(enabledRow(DashboardWidgetType.Balance)).assertIsDisplayed()
+            // The list is lazy and the Available section sits under every enabled widget, of
+            // which there are now enough to push it off-screen — so the row has to be scrolled
+            // into existence before any selector can find it.
+            onNode(hasScrollAction())
+                .performScrollToNode(hasTestTag(availableRow(DashboardWidgetType.Goals)))
             onNodeWithTag(availableRow(DashboardWidgetType.Goals)).assertIsDisplayed()
             // A switched-off widget is in exactly one section, not both.
             onNodeWithTag(enabledRow(DashboardWidgetType.Goals)).assertDoesNotExist()
@@ -106,6 +114,11 @@ class DashboardCustomizeScreenStateTest : StringSpec({
                 )
             }
 
+            // The list is lazy and the Available section sits under every enabled widget, of
+            // which there are now enough to push it off-screen — so the row has to be scrolled
+            // into existence before any selector can find it.
+            onNode(hasScrollAction())
+                .performScrollToNode(hasTestTag(availableRow(DashboardWidgetType.Goals)))
             onNodeWithTag(availableRow(DashboardWidgetType.Goals)).performClick()
             waitForIdle()
 

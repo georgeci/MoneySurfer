@@ -447,6 +447,9 @@ private class FakeTransactionRepository(
 ) : TransactionRepository {
     private val flow = MutableStateFlow(transactions)
 
+    /** Rows a delete tombstoned — out of every read, still there for a restore. */
+    private val tombstones = mutableMapOf<TransactionId, Transaction>()
+
     override fun getAll(): Flow<List<Transaction>> = flow
 
     override fun getByAccountId(accountId: AccountId): Flow<List<Transaction>> =
@@ -481,6 +484,10 @@ private class FakeTransactionRepository(
         flow.value = flow.value.map { if (it.id == transaction.id) transaction else it }
     }
     override suspend fun delete(id: TransactionId) {
+        flow.value.filter { it.id == id }.forEach { tombstones[id] = it }
         flow.value = flow.value.filterNot { it.id == id }
     }
+
+    override suspend fun restore(id: TransactionId): Transaction? =
+        tombstones.remove(id)?.also { flow.value = flow.value + it }
 }
