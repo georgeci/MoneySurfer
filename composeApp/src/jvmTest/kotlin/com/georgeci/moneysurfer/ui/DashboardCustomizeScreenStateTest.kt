@@ -139,7 +139,7 @@ class DashboardCustomizeScreenStateTest : StringSpec({
 
             events shouldContain DashboardCustomizeEvent.OnWidgetMove(
                 from = DashboardWidgetType.Accounts,
-                to = DashboardWidgetType.SafeToSpend,
+                to = DashboardWidgetType.Budgets,
             )
         }
     }

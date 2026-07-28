@@ -11,6 +11,7 @@ class DashboardLayoutConfigTest : StringSpec({
             DashboardWidgetType.Balance,
             DashboardWidgetType.QuickActions,
             DashboardWidgetType.SafeToSpend,
+            DashboardWidgetType.Budgets,
             DashboardWidgetType.Accounts,
             DashboardWidgetType.Goals,
             DashboardWidgetType.RecentTransactions,
@@ -41,6 +42,7 @@ class DashboardLayoutConfigTest : StringSpec({
             DashboardWidgetType.Balance,
             DashboardWidgetType.QuickActions,
             DashboardWidgetType.SafeToSpend,
+            DashboardWidgetType.Budgets,
             DashboardWidgetType.Accounts,
             DashboardWidgetType.RecentTransactions,
         )
@@ -126,6 +128,7 @@ class DashboardLayoutConfigTest : StringSpec({
         moved.items.map { it.type } shouldContainExactly listOf(
             DashboardWidgetType.QuickActions,
             DashboardWidgetType.SafeToSpend,
+            DashboardWidgetType.Budgets,
             DashboardWidgetType.Accounts,
             DashboardWidgetType.Goals,
             DashboardWidgetType.Balance,
@@ -144,6 +147,7 @@ class DashboardLayoutConfigTest : StringSpec({
             DashboardWidgetType.Balance,
             DashboardWidgetType.QuickActions,
             DashboardWidgetType.SafeToSpend,
+            DashboardWidgetType.Budgets,
             DashboardWidgetType.Accounts,
             DashboardWidgetType.Goals,
         )

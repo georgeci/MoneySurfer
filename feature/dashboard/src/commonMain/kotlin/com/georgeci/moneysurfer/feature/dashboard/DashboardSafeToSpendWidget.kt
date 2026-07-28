@@ -83,7 +83,7 @@ private fun SafeToSpendUi.toWidgetData(): SurferSafeToSpendData {
 }
 
 /** `uikit` does not depend on `domain`, so the status word crosses over here. */
-private fun BudgetStatus.toWidgetStatus(): SurferBudgetStatus = when (this) {
+internal fun BudgetStatus.toWidgetStatus(): SurferBudgetStatus = when (this) {
     BudgetStatus.OK -> SurferBudgetStatus.Ok
     BudgetStatus.WARN -> SurferBudgetStatus.Warn
     BudgetStatus.OVER -> SurferBudgetStatus.Over

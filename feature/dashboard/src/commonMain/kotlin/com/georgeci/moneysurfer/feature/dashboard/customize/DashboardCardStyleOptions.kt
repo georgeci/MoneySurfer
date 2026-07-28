@@ -15,6 +15,7 @@ import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_var
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_variant_balance_stacked
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_widget_accounts
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_widget_balance
+import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_widget_budgets
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_widget_goals
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_widget_quick_actions
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_widget_recent
@@ -41,6 +42,7 @@ internal fun DashboardWidgetType.variantOptions(): List<DashboardVariantOption> 
     DashboardWidgetType.Balance -> BALANCE_VARIANTS
     DashboardWidgetType.QuickActions,
     DashboardWidgetType.SafeToSpend,
+    DashboardWidgetType.Budgets,
     DashboardWidgetType.Accounts,
     DashboardWidgetType.Goals,
     DashboardWidgetType.RecentTransactions,
@@ -99,6 +101,7 @@ internal fun DashboardWidgetType.titleResource(): StringResource = when (this) {
     DashboardWidgetType.Balance -> Res.string.dashboard_customize_widget_balance
     DashboardWidgetType.QuickActions -> Res.string.dashboard_customize_widget_quick_actions
     DashboardWidgetType.SafeToSpend -> Res.string.dashboard_customize_widget_safe_to_spend
+    DashboardWidgetType.Budgets -> Res.string.dashboard_customize_widget_budgets
     DashboardWidgetType.Accounts -> Res.string.dashboard_customize_widget_accounts
     DashboardWidgetType.Goals -> Res.string.dashboard_customize_widget_goals
     DashboardWidgetType.RecentTransactions -> Res.string.dashboard_customize_widget_recent

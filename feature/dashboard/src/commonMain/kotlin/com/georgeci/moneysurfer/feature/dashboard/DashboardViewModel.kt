@@ -5,23 +5,26 @@ import com.georgeci.moneysurfer.domain.config.HostCapabilities
 import com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutConfig
 import com.georgeci.moneysurfer.domain.formatter.MoneyFormatter
 import com.georgeci.moneysurfer.domain.model.Account
+import com.georgeci.moneysurfer.domain.model.BudgetProgress
 import com.georgeci.moneysurfer.domain.model.BudgetStatus
 import com.georgeci.moneysurfer.domain.model.ConvertedTotal
 import com.georgeci.moneysurfer.domain.model.ExchangeRateSnapshot
 import com.georgeci.moneysurfer.domain.model.SafeToSpend
 import com.georgeci.moneysurfer.domain.model.SavingsGoalSummary
 import com.georgeci.moneysurfer.domain.model.TransactionSplitGroup
+import com.georgeci.moneysurfer.domain.model.safeToSpend
 import com.georgeci.moneysurfer.domain.preferences.UiPreferences
 import com.georgeci.moneysurfer.domain.primitives.AccountId
+import com.georgeci.moneysurfer.domain.primitives.BudgetId
 import com.georgeci.moneysurfer.domain.primitives.GoalId
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
 import com.georgeci.moneysurfer.domain.usecase.ConvertAccountsTotalUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetAccountsUseCase
+import com.georgeci.moneysurfer.domain.usecase.GetActiveBudgetProgressUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetExchangeRatesUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetGoalsUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetRecentTransactionsUseCase
-import com.georgeci.moneysurfer.domain.usecase.GetSafeToSpendUseCase
 import com.georgeci.moneysurfer.utils.MviViewModel
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
@@ -37,7 +40,7 @@ class DashboardViewModel(
     private val getRecentTransactions: GetRecentTransactionsUseCase,
     private val getGoals: GetGoalsUseCase,
     private val getExchangeRates: GetExchangeRatesUseCase,
-    private val getSafeToSpend: GetSafeToSpendUseCase,
+    private val getActiveBudgetProgress: GetActiveBudgetProgressUseCase,
     private val convertAccountsTotal: ConvertAccountsTotalUseCase,
     uiPreferences: UiPreferences,
     hostCapabilities: HostCapabilities,
@@ -62,6 +65,9 @@ class DashboardViewModel(
         observeDashboard()
     }
 
+    // One branch per widget interaction, nearly all of them a single `postSideEffect`. The count
+    // grows with the number of widgets on the dashboard rather than with any logic here.
+    @Suppress("CyclomaticComplexMethod")
     override fun onEvent(event: DashboardEvent) {
         when (event) {
             is DashboardEvent.OnAccountClick -> postSideEffect(
@@ -85,15 +91,23 @@ class DashboardViewModel(
             DashboardEvent.OnSeeAllGoalsClick -> postSideEffect(DashboardEffect.NavigateToGoals)
             is DashboardEvent.OnGoalClick -> postSideEffect(DashboardEffect.NavigateToGoalDetails(event.goalId))
             DashboardEvent.OnSetBudgetClick -> postSideEffect(DashboardEffect.NavigateToBudgetCreation)
+            DashboardEvent.OnSeeAllBudgetsClick -> postSideEffect(DashboardEffect.NavigateToBudgets)
+            is DashboardEvent.OnBudgetClick -> postSideEffect(
+                DashboardEffect.NavigateToBudgetDetails(event.budgetId),
+            )
         }
     }
 
     private fun observeDashboard() {
-        // Layout and safe-to-spend are folded into one source because `combine` tops out at five
+        // Layout and budget progress are folded into one source because `combine` tops out at five
         // typed flows, and these two are the pair that is never read apart.
-        val layoutAndSafeToSpend =
-            combine(layout, getSafeToSpend().onStart { emit(null) }) { layoutConfig, safeToSpend ->
-                layoutConfig to safeToSpend
+        //
+        // One budget subscription feeds two widgets: safe-to-spend is a projection of the same
+        // progress list the budgets widget renders, so the headline and the rows can never disagree
+        // about a budget — and reading them apart would compute every budget's progress twice.
+        val layoutAndBudgets =
+            combine(layout, getActiveBudgetProgress().onStart { emit(emptyList()) }) { layoutConfig, progress ->
+                layoutConfig to progress
             }
         launch {
             combine(
@@ -101,8 +115,8 @@ class DashboardViewModel(
                 getRecentTransactions(),
                 getGoals(),
                 getExchangeRates().onStart { emit(null) },
-                layoutAndSafeToSpend,
-            ) { accounts, transactions, goals, rates, (layoutConfig, safeToSpend) ->
+                layoutAndBudgets,
+            ) { accounts, transactions, goals, rates, (layoutConfig, budgetProgress) ->
                 val balance = accounts.convertedTotal(rates)?.toBalanceUi()
                 DashboardState.Content(
                     accounts = accounts.map { it.toUi() },
@@ -118,7 +132,8 @@ class DashboardViewModel(
                     greeting = null,
                     formattedTrendDelta = null,
                     goals = goals.take(DASHBOARD_GOALS_LIMIT).map { it.toUi() },
-                    safeToSpend = safeToSpend?.toUi(),
+                    safeToSpend = budgetProgress.safeToSpend()?.toUi(),
+                    budgets = budgetProgress.toBudgetsUi(),
                     isOffline = isOffline,
                     transferEnabled = transferEnabled,
                     layout = layoutConfig,
@@ -187,6 +202,35 @@ class DashboardViewModel(
         status = status,
     )
 
+    /**
+     * The budgets the widget lists, most pressing first: spend against the limit, descending, with
+     * ties broken by budget id so two equally-spent budgets keep a stable order across emissions.
+     * A budget the user is closest to blowing is the one worth the row — the rest are a tap away on
+     * the budgets screen.
+     *
+     * Progress carrying no base currency is dropped rather than formatted against a guess: the
+     * workspace row can be missing behind its budgets for a moment after a pull, and
+     * `MoneyFormatter` is backed by `java.util.Currency`, which rejects anything but an ISO code.
+     */
+    private fun List<BudgetProgress>.toBudgetsUi(): List<BudgetSummaryUi> =
+        sortedWith(compareByDescending<BudgetProgress> { it.spentFraction }.thenBy { it.budget.id.value })
+            .mapNotNull { it.toUiOrNull() }
+            .take(DASHBOARD_BUDGETS_LIMIT)
+
+    private fun BudgetProgress.toUiOrNull(): BudgetSummaryUi? {
+        val currency = currency ?: return null
+        return BudgetSummaryUi(
+            id = budget.id,
+            name = budget.name,
+            spentFormatted = MoneyFormatter.format(spent, currency),
+            limitFormatted = MoneyFormatter.format(effectiveLimit, currency),
+            remainderFormatted = MoneyFormatter.format(remaining.abs(), currency),
+            progress = spentFraction,
+            alertFraction = budget.alertPercent / PERCENT,
+            status = status,
+        )
+    }
+
     private fun SavingsGoalSummary.toUi() = GoalUi(
         id = goal.id,
         name = goal.title,
@@ -241,6 +285,8 @@ sealed interface DashboardState {
         val goals: List<GoalUi> = emptyList(),
         /** What is still safe to spend this period, or null while no active budget backs a number. */
         val safeToSpend: SafeToSpendUi? = null,
+        /** The active budgets worth a row, most pressing first — empty when none are tracked. */
+        val budgets: List<BudgetSummaryUi> = emptyList(),
         val isOffline: Boolean = false,
         /**
          * Whether this build offers multi-account transfers. The quick-actions widget is the only
@@ -309,6 +355,28 @@ data class SafeToSpendUi(
     val isOver: Boolean get() = status == BudgetStatus.OVER
 }
 
+/**
+ * One budget row of the budgets widget. Money is formatted here; the sentences around it — the
+ * status word, "left" against "over" — are built on the screen, which is where the strings are.
+ */
+data class BudgetSummaryUi(
+    val id: BudgetId,
+    val name: String,
+    val spentFormatted: String,
+    /** The budget amount plus any rollover carry — what the spend is measured against. */
+    val limitFormatted: String,
+    /** Always positive — the sign lives in [isOver], which picks the wording. */
+    val remainderFormatted: String,
+    /** Spend against the limit; can exceed 1, which the bar caps rather than overdraws. */
+    val progress: Float,
+    /** Where this budget's alert threshold sits — the tick [progress] is read against. */
+    val alertFraction: Float,
+    val status: BudgetStatus,
+) {
+    /** Derived rather than stored, so the wording and the colour can never disagree. */
+    val isOver: Boolean get() = status == BudgetStatus.OVER
+}
+
 data class TransactionUi(
     val id: TransactionId,
     val title: String,
@@ -337,6 +405,8 @@ sealed interface DashboardEvent {
     data object OnSeeAllGoalsClick : DashboardEvent
     data class OnGoalClick(val goalId: GoalId) : DashboardEvent
     data object OnSetBudgetClick : DashboardEvent
+    data object OnSeeAllBudgetsClick : DashboardEvent
+    data class OnBudgetClick(val budgetId: BudgetId) : DashboardEvent
 }
 
 sealed interface DashboardEffect {
@@ -356,9 +426,17 @@ sealed interface DashboardEffect {
 
     /** The budget editor, opened empty — the way out of the safe-to-spend widget's empty state. */
     data object NavigateToBudgetCreation : DashboardEffect
+    data object NavigateToBudgets : DashboardEffect
+    data class NavigateToBudgetDetails(val budgetId: BudgetId) : DashboardEffect
 }
 
 private const val RECENT_TRANSACTIONS_LIMIT = 5
 
 /** The widget shows two rows at most; reading more of the list would be wasted work. */
 private const val DASHBOARD_GOALS_LIMIT = 2
+
+/** Three rows is what the full-size budgets card draws; the compact one keeps the first. */
+private const val DASHBOARD_BUDGETS_LIMIT = 3
+
+/** Alert thresholds are stored as whole percents; the bar wants a fraction. */
+private const val PERCENT = 100f
