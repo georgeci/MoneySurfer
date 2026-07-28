@@ -88,13 +88,14 @@ data class DashboardLayoutConfig(
     companion object {
         /**
          * Variant A from the design: the balance headline first, the quick actions under it, then
-         * the accounts strip, goals, and the recent-transactions list. Every widget starts enabled
-         * and Hero-sized.
+         * safe-to-spend, the accounts strip, goals, and the recent-transactions list. Every widget
+         * starts enabled and Hero-sized.
          */
         val DEFAULT = DashboardLayoutConfig(
             items = listOf(
                 DashboardLayoutItem(DashboardWidgetType.Balance),
                 DashboardLayoutItem(DashboardWidgetType.QuickActions),
+                DashboardLayoutItem(DashboardWidgetType.SafeToSpend),
                 DashboardLayoutItem(DashboardWidgetType.Accounts),
                 DashboardLayoutItem(DashboardWidgetType.Goals),
                 DashboardLayoutItem(DashboardWidgetType.RecentTransactions),

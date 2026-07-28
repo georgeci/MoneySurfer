@@ -18,6 +18,7 @@ import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_wid
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_widget_goals
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_widget_quick_actions
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_widget_recent
+import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_widget_safe_to_spend
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 
@@ -39,6 +40,7 @@ internal data class DashboardVariantOption(
 internal fun DashboardWidgetType.variantOptions(): List<DashboardVariantOption> = when (this) {
     DashboardWidgetType.Balance -> BALANCE_VARIANTS
     DashboardWidgetType.QuickActions,
+    DashboardWidgetType.SafeToSpend,
     DashboardWidgetType.Accounts,
     DashboardWidgetType.Goals,
     DashboardWidgetType.RecentTransactions,
@@ -96,6 +98,7 @@ internal fun cardStyleSummary(type: DashboardWidgetType, cardStyle: DashboardCar
 internal fun DashboardWidgetType.titleResource(): StringResource = when (this) {
     DashboardWidgetType.Balance -> Res.string.dashboard_customize_widget_balance
     DashboardWidgetType.QuickActions -> Res.string.dashboard_customize_widget_quick_actions
+    DashboardWidgetType.SafeToSpend -> Res.string.dashboard_customize_widget_safe_to_spend
     DashboardWidgetType.Accounts -> Res.string.dashboard_customize_widget_accounts
     DashboardWidgetType.Goals -> Res.string.dashboard_customize_widget_goals
     DashboardWidgetType.RecentTransactions -> Res.string.dashboard_customize_widget_recent
