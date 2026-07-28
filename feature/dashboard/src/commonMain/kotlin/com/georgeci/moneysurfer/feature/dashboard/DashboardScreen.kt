@@ -192,8 +192,12 @@ private fun DashboardLoading() {
     }
 }
 
+/**
+ * Stateless half of the screen — public so `:composeApp` desktop UI tests can mount it with an
+ * injected state, the way `DashboardCustomizeContent` is used.
+ */
 @Composable
-private fun DashboardContent(
+fun DashboardContent(
     state: DashboardState.Content,
     onEvent: (DashboardEvent) -> Unit,
 ) {
