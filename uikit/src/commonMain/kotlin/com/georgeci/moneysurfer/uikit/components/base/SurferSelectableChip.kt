@@ -16,6 +16,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.selected
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
@@ -45,6 +47,10 @@ fun SurferSelectableChip(
     }
     Row(
         modifier = modifier
+            // Without this, selection is a fill colour and a deliberately decorative check —
+            // nothing a screen reader, or a test, can read back. `this.` is load-bearing: the
+            // bare name inside `semantics {}` is the parameter, not the property.
+            .semantics { this.selected = selected }
             .height(32.dp)
             .clip(RoundedCornerShape(10.dp))
             .background(if (selected) AppTheme.materialColors.secondaryContainer else Color.Transparent)
