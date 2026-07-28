@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > LoginUseCase</title>
+  <title>MoneySurfer Coverage Report > ListPendingInvitesForCurrentUserUseCase</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.usecase</a>
 </div>
 
-<h1>Coverage Summary for Class: LoginUseCase (com.georgeci.moneysurfer.domain.usecase)</h1>
+<h1>Coverage Summary for Class: ListPendingInvitesForCurrentUserUseCase (com.georgeci.moneysurfer.domain.usecase)</h1>
 
 <table class="coverageStats">
 
@@ -46,7 +46,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">LoginUseCase</td>
+  <td class="name">ListPendingInvitesForCurrentUserUseCase</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -55,12 +55,13 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     (2/2)
   </span>
 </td>
+    <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    50%
+    100%
   </span>
   <span class="absValue">
-    (1/2)
+    (5/5)
   </span>
 </td>
 <td class="coverageStat">
@@ -68,54 +69,112 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (24/24)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (297/297)
+    (18/18)
   </span>
 </td>
 </tr>
   <tr>
-    <td class="name">LoginUseCase$invoke$1</td>
-    <td class="coverageStat"/>
+    <td class="name">ListPendingInvitesForCurrentUserUseCase$invoke$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    20%
+  </span>
+  <span class="absValue">
+    (2/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    33.3%
+  </span>
+  <span class="absValue">
+    (3/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    31.2%
+  </span>
+  <span class="absValue">
+    (43/138)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ListPendingInvitesForCurrentUserUseCase$invoke$1$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/22)
+  </span>
+</td>
   </tr>
 <tr>
   <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    75%
   </span>
   <span class="absValue">
-    (2/2)
+    (3/4)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    50%
+    16.7%
   </span>
   <span class="absValue">
-    (1/2)
+    (2/12)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    47.1%
   </span>
   <span class="absValue">
-    (24/24)
+    (8/17)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    34.3%
   </span>
   <span class="absValue">
-    (297/297)
+    (61/178)
   </span>
 </td>
 </tr>
@@ -128,56 +187,51 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.usecase
 &nbsp;
-&nbsp;import arrow.core.Either
-&nbsp;import arrow.core.raise.either
-&nbsp;import com.georgeci.moneysurfer.domain.auth.AuthError
-&nbsp;import com.georgeci.moneysurfer.domain.auth.AuthLocalRepository
-&nbsp;import com.georgeci.moneysurfer.domain.auth.SessionMutator
-&nbsp;import com.georgeci.moneysurfer.domain.repositories.AuthRemoteRepository
+&nbsp;import com.georgeci.moneysurfer.domain.auth.SessionPointers
+&nbsp;import com.georgeci.moneysurfer.domain.model.InviteStatus
+&nbsp;import com.georgeci.moneysurfer.domain.model.WorkspaceInvite
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.UserRepository
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.WorkspaceInviteRepository
+&nbsp;import kotlinx.coroutines.flow.Flow
+&nbsp;import kotlinx.coroutines.flow.combine
+&nbsp;import kotlinx.coroutines.flow.emitAll
+&nbsp;import kotlinx.coroutines.flow.first
+&nbsp;import kotlinx.coroutines.flow.flow
+&nbsp;import kotlinx.coroutines.flow.flowOf
 &nbsp;import org.koin.core.annotation.Single
 &nbsp;
+&nbsp;/**
+&nbsp; * Streams pending invitations addressed to the current user — by `email` (lowercase match)
+&nbsp; * AND by `targetUserId`. Expired-but-still-PENDING rows are surfaced as PENDING; UI tags
+&nbsp; * them as EXPIRED for display when `now &gt; expiresAt`.
+&nbsp; *
+&nbsp; * Empty when no current user — caller usually doesn&#39;t render anything in that state.
+&nbsp; */
 <b class="fc">&nbsp;@Single</b>
-&nbsp;@Suppress(&quot;LongParameterList&quot;)
-&nbsp;class LoginUseCase(
-<b class="fc">&nbsp;    private val authRemoteRepository: AuthRemoteRepository,</b>
-<b class="fc">&nbsp;    private val authLocalRepository: AuthLocalRepository,</b>
-<b class="fc">&nbsp;    private val sessionMutator: SessionMutator,</b>
-<b class="fc">&nbsp;    private val wipeDemoDataUseCase: WipeDemoDataUseCase,</b>
-<b class="fc">&nbsp;    private val postAuthBootstrap: PostAuthBootstrapUseCase,</b>
-<b class="fc">&nbsp;    private val abandonAuthSession: AbandonAuthSessionUseCase,</b>
+&nbsp;class ListPendingInvitesForCurrentUserUseCase(
+<b class="fc">&nbsp;    private val inviteRepository: WorkspaceInviteRepository,</b>
+<b class="fc">&nbsp;    private val userRepository: UserRepository,</b>
+<b class="fc">&nbsp;    private val session: SessionPointers,</b>
 &nbsp;) {
-&nbsp;    suspend operator fun invoke(
-&nbsp;        email: String,
-&nbsp;        password: String,
-<b class="fc">&nbsp;    ): Either&lt;AuthError, PostAuthBootstrapUseCase.Result&gt; = either {</b>
-<b class="fc">&nbsp;        val trimmed = email.trim()</b>
-<b class="pc">&nbsp;        val displayName = trimmed.ifBlank { null }</b>
+<b class="fc">&nbsp;    operator fun invoke(): Flow&lt;List&lt;WorkspaceInvite&gt;&gt; = flow {</b>
+<b class="pc">&nbsp;        val callerId = session.currentUserId.first()</b>
+<b class="pc">&nbsp;        if (callerId == null) {</b>
+<b class="fc">&nbsp;            emit(emptyList())</b>
+&nbsp;            return@flow
+&nbsp;        }
+<b class="nc">&nbsp;        val caller = userRepository.getById(callerId)</b>
+<b class="nc">&nbsp;        val email = caller?.email?.lowercase()</b>
 &nbsp;
-<b class="fc">&nbsp;        val uid = authRemoteRepository.signInWithEmail(trimmed, password).bind()</b>
+<b class="nc">&nbsp;        val byEmail = if (email != null) inviteRepository.getByEmail(email) else flowOf(emptyList())</b>
+<b class="nc">&nbsp;        val byUid = inviteRepository.getByTargetUserId(callerId)</b>
 &nbsp;
-&nbsp;        // Drop any demo data BEFORE pinning the real session — demo rows must
-&nbsp;        // never end up in the real account&#39;s outbox / Firestore (sync.md §2.11).
-<b class="fc">&nbsp;        wipeDemoDataUseCase()</b>
-&nbsp;
-<b class="fc">&nbsp;        authLocalRepository.createLocalUser(</b>
-<b class="fc">&nbsp;            uid = uid,</b>
-<b class="fc">&nbsp;            email = trimmed,</b>
-<b class="fc">&nbsp;            displayName = displayName,</b>
-<b class="fc">&nbsp;            isAnon = false,</b>
+<b class="nc">&nbsp;        emitAll(</b>
+<b class="nc">&nbsp;            byEmail.combine(byUid) { a, b -&gt;</b>
+<b class="nc">&nbsp;                (a + b)</b>
+<b class="nc">&nbsp;                    .distinctBy { it.id.value }</b>
+<b class="nc">&nbsp;                    .filter { it.status == InviteStatus.PENDING }</b>
+&nbsp;            },
 &nbsp;        )
-<b class="fc">&nbsp;        sessionMutator.setFirebaseUid(uid)</b>
-&nbsp;
-&nbsp;        // The pointers have to be live *before* the bootstrap — the pull reads
-&nbsp;        // `currentFirebaseUid` to discover the user&#39;s workspaces — so atomicity is bought with a
-&nbsp;        // rollback rather than by deferring the writes. Without it a failed bootstrap leaves a
-&nbsp;        // signed-in session with no workspace, which the next launch routes past sign-in
-&nbsp;        // straight into the selector with no way back (issue #342).
-<b class="fc">&nbsp;        postAuthBootstrap(</b>
-<b class="fc">&nbsp;            uid = uid,</b>
-<b class="fc">&nbsp;            email = trimmed,</b>
-<b class="fc">&nbsp;            displayName = displayName,</b>
-<b class="fc">&nbsp;            isAnon = false,</b>
-<b class="fc">&nbsp;        ).onLeft { abandonAuthSession(isAnon = false) }.bind()</b>
 &nbsp;    }
 &nbsp;}
 </code>
@@ -203,7 +257,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 18:03</div>
+    <div style="float:right;">generated on 2026-07-28 20:33</div>
 </div>
 </body>
 </html>

@@ -60,7 +60,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (20/20)
+    (22/22)
   </span>
 </td>
 <td class="coverageStat">
@@ -68,7 +68,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (26/26)
+    (27/27)
   </span>
 </td>
 <td class="coverageStat">
@@ -76,7 +76,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (173/173)
+    (176/176)
   </span>
 </td>
 </tr>
@@ -99,7 +99,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (20/20)
+    (22/22)
   </span>
 </td>
 <td class="coverageStat">
@@ -107,7 +107,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (26/26)
+    (27/27)
   </span>
 </td>
 <td class="coverageStat">
@@ -115,7 +115,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (173/173)
+    (176/176)
   </span>
 </td>
 </tr>
@@ -146,6 +146,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_widget_goals
 &nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_widget_quick_actions
 &nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_widget_recent
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_widget_safe_to_spend
 &nbsp;import org.jetbrains.compose.resources.StringResource
 &nbsp;import org.jetbrains.compose.resources.stringResource
 &nbsp;
@@ -167,6 +168,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;internal fun DashboardWidgetType.variantOptions(): List&lt;DashboardVariantOption&gt; = when (this) {</b>
 <b class="fc">&nbsp;    DashboardWidgetType.Balance -&gt; BALANCE_VARIANTS</b>
 &nbsp;    DashboardWidgetType.QuickActions,
+&nbsp;    DashboardWidgetType.SafeToSpend,
 &nbsp;    DashboardWidgetType.Accounts,
 &nbsp;    DashboardWidgetType.Goals,
 &nbsp;    DashboardWidgetType.RecentTransactions,
@@ -224,6 +226,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;internal fun DashboardWidgetType.titleResource(): StringResource = when (this) {</b>
 <b class="fc">&nbsp;    DashboardWidgetType.Balance -&gt; Res.string.dashboard_customize_widget_balance</b>
 <b class="fc">&nbsp;    DashboardWidgetType.QuickActions -&gt; Res.string.dashboard_customize_widget_quick_actions</b>
+<b class="fc">&nbsp;    DashboardWidgetType.SafeToSpend -&gt; Res.string.dashboard_customize_widget_safe_to_spend</b>
 <b class="fc">&nbsp;    DashboardWidgetType.Accounts -&gt; Res.string.dashboard_customize_widget_accounts</b>
 <b class="fc">&nbsp;    DashboardWidgetType.Goals -&gt; Res.string.dashboard_customize_widget_goals</b>
 <b class="fc">&nbsp;    DashboardWidgetType.RecentTransactions -&gt; Res.string.dashboard_customize_widget_recent</b>
@@ -251,7 +254,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 18:03</div>
+    <div style="float:right;">generated on 2026-07-28 20:33</div>
 </div>
 </body>
 </html>

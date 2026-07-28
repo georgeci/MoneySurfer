@@ -52,7 +52,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/12)
+    (0/13)
   </span>
 </td>
     <td class="coverageStat"/>
@@ -61,7 +61,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/17)
+    (0/19)
   </span>
 </td>
 <td class="coverageStat">
@@ -69,7 +69,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/406)
+    (0/477)
   </span>
 </td>
 </tr>
@@ -247,7 +247,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/20)
+    (0/21)
   </span>
 </td>
 <td class="coverageStat">
@@ -263,7 +263,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/21)
+    (0/23)
   </span>
 </td>
 <td class="coverageStat">
@@ -271,7 +271,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/447)
+    (0/518)
   </span>
 </td>
 </tr>
@@ -291,23 +291,26 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="nc">&nbsp;val dashboardNavGraph: FeatureNavGraph = { navigator -&gt;</b>
 <b class="nc">&nbsp;    entry&lt;Route.Dashboard&gt; {</b>
 <b class="nc">&nbsp;        DashboardScreen(</b>
-<b class="nc">&nbsp;            onNavigateToAccountCreation = { navigator.push(Route.AccountCreation()) },</b>
-<b class="nc">&nbsp;            onNavigateToAccountsManage = { navigator.push(Route.AccountsManage) },</b>
-<b class="nc">&nbsp;            onNavigateToTransactionCreation = { accountId -&gt;</b>
-<b class="nc">&nbsp;                navigator.push(Route.TransactionCreation(accountId = accountId?.value))</b>
-&nbsp;            },
-<b class="nc">&nbsp;            onNavigateToTransferCreation = { navigator.push(Route.TransactionCreation(transfer = true)) },</b>
-<b class="nc">&nbsp;            onNavigateToAccountDetails = { accountId -&gt;</b>
-<b class="nc">&nbsp;                navigator.push(Route.AccountDetails(accountId.value))</b>
-&nbsp;            },
-<b class="nc">&nbsp;            onNavigateToTransactionDetails = { transactionId -&gt;</b>
-<b class="nc">&nbsp;                navigator.push(Route.TransactionDetails(transactionId.value))</b>
-&nbsp;            },
-<b class="nc">&nbsp;            onNavigateToSettings = { navigator.push(Route.Settings) },</b>
-<b class="nc">&nbsp;            onNavigateToCustomize = { navigator.push(Route.DashboardCustomize) },</b>
-<b class="nc">&nbsp;            onNavigateToTransactionsList = { navigator.push(Route.TransactionsByAccount()) },</b>
-<b class="nc">&nbsp;            onNavigateToGoals = { navigator.push(Route.Goals) },</b>
-<b class="nc">&nbsp;            onNavigateToGoalDetails = { goalId -&gt; navigator.push(Route.GoalDetails(goalId.value)) },</b>
+<b class="nc">&nbsp;            navigation = DashboardNavigation(</b>
+<b class="nc">&nbsp;                onNavigateToAccountCreation = { navigator.push(Route.AccountCreation()) },</b>
+<b class="nc">&nbsp;                onNavigateToAccountsManage = { navigator.push(Route.AccountsManage) },</b>
+<b class="nc">&nbsp;                onNavigateToTransactionCreation = { accountId -&gt;</b>
+<b class="nc">&nbsp;                    navigator.push(Route.TransactionCreation(accountId = accountId?.value))</b>
+&nbsp;                },
+<b class="nc">&nbsp;                onNavigateToTransferCreation = { navigator.push(Route.TransactionCreation(transfer = true)) },</b>
+<b class="nc">&nbsp;                onNavigateToAccountDetails = { accountId -&gt;</b>
+<b class="nc">&nbsp;                    navigator.push(Route.AccountDetails(accountId.value))</b>
+&nbsp;                },
+<b class="nc">&nbsp;                onNavigateToTransactionDetails = { transactionId -&gt;</b>
+<b class="nc">&nbsp;                    navigator.push(Route.TransactionDetails(transactionId.value))</b>
+&nbsp;                },
+<b class="nc">&nbsp;                onNavigateToSettings = { navigator.push(Route.Settings) },</b>
+<b class="nc">&nbsp;                onNavigateToCustomize = { navigator.push(Route.DashboardCustomize) },</b>
+<b class="nc">&nbsp;                onNavigateToTransactionsList = { navigator.push(Route.TransactionsByAccount()) },</b>
+<b class="nc">&nbsp;                onNavigateToGoals = { navigator.push(Route.Goals) },</b>
+<b class="nc">&nbsp;                onNavigateToGoalDetails = { goalId -&gt; navigator.push(Route.GoalDetails(goalId.value)) },</b>
+<b class="nc">&nbsp;                onNavigateToBudgetCreation = { navigator.push(Route.BudgetCreation()) },</b>
+&nbsp;            ),
 &nbsp;        )
 &nbsp;    }
 &nbsp;
@@ -340,7 +343,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 18:03</div>
+    <div style="float:right;">generated on 2026-07-28 20:33</div>
 </div>
 </body>
 </html>

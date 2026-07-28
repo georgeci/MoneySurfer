@@ -1,0 +1,182 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>MoneySurfer Coverage Report > SurferWidgetCardKt</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.georgeci.moneysurfer.uikit.widgets</a>
+</div>
+
+<h1>Coverage Summary for Class: SurferWidgetCardKt (com.georgeci.moneysurfer.uikit.widgets)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">SurferWidgetCardKt</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    37.5%
+  </span>
+  <span class="absValue">
+    (3/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (22/22)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    97.9%
+  </span>
+  <span class="absValue">
+    (274/280)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.widgets
+&nbsp;
+&nbsp;import androidx.compose.foundation.background
+&nbsp;import androidx.compose.foundation.layout.Column
+&nbsp;import androidx.compose.foundation.layout.ColumnScope
+&nbsp;import androidx.compose.foundation.layout.Row
+&nbsp;import androidx.compose.foundation.layout.RowScope
+&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
+&nbsp;import androidx.compose.foundation.layout.padding
+&nbsp;import androidx.compose.material3.Text
+&nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.ui.Alignment
+&nbsp;import androidx.compose.ui.Modifier
+&nbsp;import androidx.compose.ui.draw.clip
+&nbsp;import androidx.compose.ui.unit.dp
+&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
+&nbsp;
+&nbsp;/**
+&nbsp; * Rounded surface card with the standard widget header — a weighted [title] plus an optional
+&nbsp; * [trailing] slot (a &quot;see all&quot; link, a badge, …) — followed by [content] in the card&#39;s column.
+&nbsp; *
+&nbsp; * Shared by the widgets whose header is a single title line; widgets that also render a
+&nbsp; * subtitle keep their own header.
+&nbsp; */
+&nbsp;@Composable
+&nbsp;internal fun SurferWidgetCard(
+&nbsp;    title: String,
+<b class="fc">&nbsp;    modifier: Modifier = Modifier,</b>
+&nbsp;    trailing: @Composable RowScope.() -&gt; Unit = {},
+&nbsp;    content: @Composable ColumnScope.() -&gt; Unit,
+<b class="pc">&nbsp;) {</b>
+<b class="fc">&nbsp;    Column(</b>
+<b class="fc">&nbsp;        modifier = modifier</b>
+<b class="fc">&nbsp;            .clip(AppTheme.shapes.large)</b>
+<b class="fc">&nbsp;            .background(AppTheme.materialColors.surface)</b>
+<b class="fc">&nbsp;            .padding(vertical = 14.dp),</b>
+&nbsp;    ) {
+<b class="fc">&nbsp;        Row(</b>
+<b class="fc">&nbsp;            modifier = Modifier</b>
+<b class="fc">&nbsp;                .fillMaxWidth()</b>
+<b class="fc">&nbsp;                .padding(horizontal = 16.dp),</b>
+<b class="fc">&nbsp;            verticalAlignment = Alignment.CenterVertically,</b>
+&nbsp;        ) {
+<b class="fc">&nbsp;            Text(</b>
+<b class="fc">&nbsp;                text = title,</b>
+<b class="fc">&nbsp;                style = AppTheme.typography.titleMedium,</b>
+<b class="fc">&nbsp;                color = AppTheme.materialColors.onSurface,</b>
+<b class="fc">&nbsp;                modifier = Modifier.weight(1f),</b>
+&nbsp;            )
+<b class="fc">&nbsp;            trailing()</b>
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;        content()</b>
+<b class="fc">&nbsp;    }</b>
+<b class="fc">&nbsp;}</b>
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-07-28 20:33</div>
+</div>
+</body>
+</html>

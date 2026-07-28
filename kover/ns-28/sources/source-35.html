@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > GetTransactionByIdUseCase</title>
+  <title>MoneySurfer Coverage Report > GetSplitLegsUseCase</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.usecase</a>
 </div>
 
-<h1>Coverage Summary for Class: GetTransactionByIdUseCase (com.georgeci.moneysurfer.domain.usecase)</h1>
+<h1>Coverage Summary for Class: GetSplitLegsUseCase (com.georgeci.moneysurfer.domain.usecase)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">GetTransactionByIdUseCase</td>
+  <td class="name">GetSplitLegsUseCase</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -66,13 +66,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     (2/2)
   </span>
 </td>
-    <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
     100%
   </span>
   <span class="absValue">
-    (3/3)
+    (2/2)
   </span>
 </td>
 <td class="coverageStat">
@@ -80,7 +79,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (10/10)
+    (4/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (17/17)
   </span>
 </td>
 </tr>
@@ -95,17 +102,25 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.usecase
 &nbsp;
 &nbsp;import com.georgeci.moneysurfer.domain.model.Transaction
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionId
 &nbsp;import com.georgeci.moneysurfer.domain.repositories.TransactionRepository
 &nbsp;import org.koin.core.annotation.Single
 &nbsp;
+&nbsp;/**
+&nbsp; * Every leg of the receipt [transaction] belongs to, or an empty list when it is not part of a
+&nbsp; * split — the breakdown a details screen renders under the amount.
+&nbsp; *
+&nbsp; * A one-leg result is possible and is not a broken group: a leg can arrive from sync or a CSV
+&nbsp; * import before (or without) its siblings, and it is a complete transaction on its own. Callers
+&nbsp; * treat &quot;fewer than two legs&quot; as &quot;nothing to break down&quot;, not as an error.
+&nbsp; */
 <b class="fc">&nbsp;@Single</b>
-&nbsp;class GetTransactionByIdUseCase(
+&nbsp;class GetSplitLegsUseCase(
 <b class="fc">&nbsp;    private val transactionRepository: TransactionRepository,</b>
 &nbsp;) {
 &nbsp;
-&nbsp;    suspend operator fun invoke(id: TransactionId): Transaction? {
-<b class="fc">&nbsp;        return transactionRepository.getById(id)</b>
+&nbsp;    suspend operator fun invoke(transaction: Transaction): List&lt;Transaction&gt; {
+<b class="fc">&nbsp;        val splitId = transaction.splitId ?: return emptyList()</b>
+<b class="fc">&nbsp;        return transactionRepository.getBySplitId(splitId)</b>
 &nbsp;    }
 &nbsp;}
 </code>
@@ -131,7 +146,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 18:03</div>
+    <div style="float:right;">generated on 2026-07-28 20:33</div>
 </div>
 </body>
 </html>

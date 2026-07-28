@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > RemoteConfigRefresh</title>
+  <title>MoneySurfer Coverage Report > DebugConfigInspector</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.config</a>
 </div>
 
-<h1>Coverage Summary for Class: RemoteConfigRefresh (com.georgeci.moneysurfer.domain.config)</h1>
+<h1>Coverage Summary for Class: DebugConfigInspector (com.georgeci.moneysurfer.domain.config)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">RemoteConfigRefresh</td>
+  <td class="name">DebugConfigInspector</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -46,24 +46,81 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.config
 &nbsp;
+&nbsp;import kotlinx.coroutines.flow.Flow
+&nbsp;
 &nbsp;/**
-&nbsp; * Re-reads the server-owned flag document into the configuration engine&#39;s RemoteGlobal layer.
+&nbsp; * Read/write view of every configuration key, for the QA panel in debug builds.
 &nbsp; *
-&nbsp; * Called on launch and on every foreground return, which is the whole propagation model: there is no
-&nbsp; * snapshot listener, so a flag flipped in the console reaches a running app the next time it comes
-&nbsp; * back to the front, and reaches a cold one on its next start.
-&nbsp; *
-&nbsp; * Deliberately separate from [ConfigHydration]. Hydration is local, fast and awaited before the start
-&nbsp; * route is resolved; this one reaches the network and must never be awaited there — its result lands
-&nbsp; * in the mirror and is picked up by `Config.observe`. Failures are swallowed by the layer, so callers
-&nbsp; * have nothing to handle: an unreachable server leaves the last mirrored values in place.
-&nbsp; *
-&nbsp; * A domain facade for the same reason [ConfigHydration] is one — `navigation` must not depend on
-&nbsp; * `app-config`. The offline build binds it over `RemoteGlobalConfigSource.Empty`, where it no-ops.
+&nbsp; * Everything is pre-rendered as strings and the write path is keyed by name, so no `ConfigKey&lt;*&gt;`
+&nbsp; * — and no `app-config` dependency — reaches `feature/settings`.
 &nbsp; */
-&nbsp;fun interface RemoteConfigRefresh {
-&nbsp;    suspend fun refresh()
+&nbsp;interface DebugConfigInspector {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * `false` in release builds, where the Debug layer is empty. The panel and its entry point are
+&nbsp;     * hidden rather than shown broken.
+&nbsp;     */
+&nbsp;    val isAvailable: Boolean
+&nbsp;
+&nbsp;    val rows: Flow&lt;List&lt;ConfigDebugRow&gt;&gt;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Names of layers whose store could not be read at startup, pre-rendered. Empty on the happy
+&nbsp;     * path.
+&nbsp;     *
+&nbsp;     * Their rows resolve as if the layer were empty, so without this the panel would report a stale
+&nbsp;     * fallback as the real answer. Recovery is automatic once the store is readable again.
+&nbsp;     */
+&nbsp;    val degradedLayers: List&lt;String&gt;
+&nbsp;
+&nbsp;    /** Fails when [raw] does not decode through the key&#39;s codec, or when the key is unknown. */
+&nbsp;    suspend fun override(name: String, raw: String): Result&lt;Unit&gt;
+&nbsp;
+&nbsp;    suspend fun clearOverride(name: String)
+&nbsp;
+&nbsp;    suspend fun resetAll()
 &nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * One key as the panel sees it.
+&nbsp; *
+&nbsp; * @param effectiveValue the resolved value, encoded.
+&nbsp; * @param winner name of the layer that won, or `&quot;default&quot;` when no layer holds the key.
+&nbsp; * @param kind which control to render — a text field for `PaletteSource`&#39;s `PRESET:&lt;seed&gt;` format
+&nbsp; *   is a routine way to fail.
+&nbsp; * @param overridden `true` when the Debug layer holds anything for this key, i.e. this row can be
+&nbsp; *   cleared. Deliberately not &quot;the Debug layer won&quot;: an override the codec can no longer read does
+&nbsp; *   not win, and it is exactly the one a tester needs to remove.
+&nbsp; * @param hostOwned `true` for a key that describes the build itself (`host.*`). Overriding one of
+&nbsp; *   these changes what the app believes it is while its DI graph stays as compiled — useful for QA,
+&nbsp; *   but not the same kind of switch as a feature flag, so the panel says so.
+&nbsp; */
+&nbsp;data class ConfigDebugRow(
+&nbsp;    val name: String,
+&nbsp;    val effectiveValue: String,
+&nbsp;    val winner: String,
+&nbsp;    val kind: ConfigDebugRowKind,
+&nbsp;    val overridden: Boolean,
+&nbsp;    val hostOwned: Boolean = false,
+&nbsp;    val layers: List&lt;ConfigDebugLayerCell&gt;,
+&nbsp;)
+&nbsp;
+&nbsp;sealed interface ConfigDebugRowKind {
+&nbsp;    data object Bool : ConfigDebugRowKind
+&nbsp;    data class Choice(val choices: List&lt;String&gt;) : ConfigDebugRowKind
+&nbsp;    data object FreeText : ConfigDebugRowKind
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * One layer&#39;s contribution. [value] is `null` when the layer does not hold the key; [undecodable]
+&nbsp; * distinguishes &quot;stored but rejected by the codec&quot; from that, which is the whole reason the panel
+&nbsp; * shows per-layer cells at all.
+&nbsp; */
+&nbsp;data class ConfigDebugLayerCell(
+&nbsp;    val layer: String,
+&nbsp;    val value: String?,
+&nbsp;    val undecodable: Boolean,
+&nbsp;)
 </code>
 </pre>
 </div>
@@ -87,7 +144,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 18:03</div>
+    <div style="float:right;">generated on 2026-07-28 20:33</div>
 </div>
 </body>
 </html>

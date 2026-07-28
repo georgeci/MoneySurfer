@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > TransactionTags</title>
+  <title>MoneySurfer Coverage Report > TransactionSplitGroup</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.model</a>
 </div>
 
-<h1>Coverage Summary for Class: TransactionTags (com.georgeci.moneysurfer.domain.model)</h1>
+<h1>Coverage Summary for Class: TransactionSplitGroup (com.georgeci.moneysurfer.domain.model)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">TransactionTags</td>
+  <td class="name">TransactionSplitGroup</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -63,15 +63,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (2/2)
+    (3/3)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    83.3%
   </span>
   <span class="absValue">
-    (2/2)
+    (5/6)
   </span>
 </td>
 <td class="coverageStat">
@@ -87,7 +87,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (58/58)
+    (77/77)
   </span>
 </td>
 </tr>
@@ -101,43 +101,52 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.model
 &nbsp;
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
+&nbsp;
 &nbsp;/**
-&nbsp; * Normalization for [Transaction.tags].
+&nbsp; * One receipt: either an ordinary transaction on its own, or the legs it was split across.
 &nbsp; *
-&nbsp; * Tags are an embedded list, not a join table: they are free-form labels with no identity
-&nbsp; * of their own — nothing renames, merges or counts them across transactions yet. A single
-&nbsp; * column costs one migration now; a join table would cost one anyway once a tag manager
-&nbsp; * exists, and buys nothing before then.
-&nbsp; *
-&nbsp; * That storage choice is why normalization is mandatory rather than cosmetic. Room keeps the
-&nbsp; * list as one CSV column, so a comma inside a tag would silently split it in two on the next
-&nbsp; * read. Stripping the separator is the only round-trip-safe option — rejecting the input
-&nbsp; * would surface a storage detail in the UI, and escaping would make the column unreadable
-&nbsp; * in a SQL browser for no gain.
+&nbsp; * A group is what the transaction list, the recent-activity widget and search results render as a
+&nbsp; * single row — a payment the user made once should be one line, whatever number of categories it
+&nbsp; * was filed under. Everything that reasons about categories (budgets, monthly totals, spend
+&nbsp; * history, CSV) keeps working on the legs and never sees this type.
 &nbsp; */
-&nbsp;object TransactionTags {
+<b class="fc">&nbsp;data class TransactionSplitGroup(val legs: List&lt;Transaction&gt;) {</b>
+&nbsp;
+<b class="fc">&nbsp;    init {</b>
+<b class="pc">&nbsp;        require(legs.isNotEmpty()) { &quot;A split group needs at least one leg&quot; }</b>
+<b class="fc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    /** The row that stands for the group: its id is what opening the group navigates to. */
+<b class="fc">&nbsp;    val primary: Transaction get() = legs.first()</b>
+&nbsp;
+<b class="fc">&nbsp;    val isSplit: Boolean get() = legs.size &gt; 1</b>
+&nbsp;
+&nbsp;    /** Magnitude of the whole receipt — the legs share a currency, so a plain sum is sound. */
+<b class="fc">&nbsp;    val total: Money = legs.fold(Money.zero()) { acc, leg -&gt; acc + leg.money.abs() }</b>
 &nbsp;
 &nbsp;    /**
-&nbsp;     * Upper bound on tags per transaction. Bounds both the CSV column and the Firestore doc,
-&nbsp;     * and no design surface shows more than a handful.
+&nbsp;     * Distinct categories the receipt was filed under. Legs left uncategorized count once between
+&nbsp;     * them, which is what the &quot;N categories&quot; badge should say for a half-filled split.
 &nbsp;     */
-&nbsp;    const val MAX_TAGS: Int = 10
+<b class="fc">&nbsp;    val categoryCount: Int = legs.map { it.categoryId }.distinct().size</b>
+&nbsp;}
 &nbsp;
-&nbsp;    private const val SEPARATOR = &#39;,&#39;
-<b class="fc">&nbsp;    private val WHITESPACE_RUN = Regex(&quot;\\s+&quot;)</b>
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Strips separators, trims, drops blanks, removes case-insensitive duplicates keeping the
-&nbsp;     * first spelling the user typed, and caps at [MAX_TAGS].
-&nbsp;     */
-&nbsp;    fun normalize(raw: List&lt;String&gt;): List&lt;String&gt; {
-<b class="fc">&nbsp;        val seen = mutableSetOf&lt;String&gt;()</b>
-<b class="fc">&nbsp;        return raw.asSequence()</b>
-<b class="fc">&nbsp;            .map { it.replace(SEPARATOR, &#39; &#39;).replace(WHITESPACE_RUN, &quot; &quot;).trim() }</b>
-<b class="fc">&nbsp;            .filter { it.isNotEmpty() }</b>
-<b class="fc">&nbsp;            .filter { seen.add(it.lowercase()) }</b>
-<b class="fc">&nbsp;            .take(MAX_TAGS)</b>
-<b class="fc">&nbsp;            .toList()</b>
+&nbsp;/**
+&nbsp; * Collapses split legs into groups, preserving the order the rows arrived in: a group takes the
+&nbsp; * position of its topmost leg, so a list sorted newest-first stays sorted.
+&nbsp; *
+&nbsp; * Legs are matched across the whole list rather than only between neighbours — two legs of one
+&nbsp; * receipt sort adjacently in practice but nothing guarantees another row cannot land between them.
+&nbsp; */
+&nbsp;fun List&lt;Transaction&gt;.groupSplitLegs(): List&lt;TransactionSplitGroup&gt; {
+&nbsp;    val bySplit = filter { it.splitId != null }.groupBy { it.splitId }
+&nbsp;    val seen = mutableSetOf&lt;Any&gt;()
+&nbsp;    return mapNotNull { transaction -&gt;
+&nbsp;        val splitId = transaction.splitId
+&nbsp;            ?: return@mapNotNull TransactionSplitGroup(listOf(transaction))
+&nbsp;        if (!seen.add(splitId)) return@mapNotNull null
+&nbsp;        TransactionSplitGroup(bySplit.getValue(splitId))
 &nbsp;    }
 &nbsp;}
 </code>
@@ -163,7 +172,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 18:03</div>
+    <div style="float:right;">generated on 2026-07-28 20:33</div>
 </div>
 </body>
 </html>
