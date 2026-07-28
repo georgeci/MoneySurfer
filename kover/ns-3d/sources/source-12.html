@@ -49,34 +49,34 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   <td class="name">DashboardViewModel</td>
 <td class="coverageStat">
   <span class="percent">
-    91.7%
+    100%
   </span>
   <span class="absValue">
-    (11/12)
+    (12/12)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    54.5%
+    90.9%
   </span>
   <span class="absValue">
-    (30/55)
+    (50/55)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    85.2%
+    100%
   </span>
   <span class="absValue">
-    (104/122)
+    (122/122)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    81%
+    98.3%
   </span>
   <span class="absValue">
-    (579/715)
+    (703/715)
   </span>
 </td>
 </tr>
@@ -435,34 +435,34 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
-    84.6%
-  </span>
-  <span class="absValue">
-    (22/26)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    64.8%
-  </span>
-  <span class="absValue">
-    (46/71)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    88.7%
-  </span>
-  <span class="absValue">
-    (141/159)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
     88.5%
   </span>
   <span class="absValue">
-    (1051/1187)
+    (23/26)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    93%
+  </span>
+  <span class="absValue">
+    (66/71)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (159/159)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    99%
+  </span>
+  <span class="absValue">
+    (1175/1187)
   </span>
 </td>
 </tr>
@@ -554,27 +554,27 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;
 &nbsp;    override fun onEvent(event: DashboardEvent) {
 <b class="fc">&nbsp;        when (event) {</b>
-<b class="pc">&nbsp;            is DashboardEvent.OnAccountClick -&gt; postSideEffect(</b>
-<b class="nc">&nbsp;                DashboardEffect.NavigateToAccountDetails(event.accountId),</b>
+<b class="fc">&nbsp;            is DashboardEvent.OnAccountClick -&gt; postSideEffect(</b>
+<b class="fc">&nbsp;                DashboardEffect.NavigateToAccountDetails(event.accountId),</b>
 &nbsp;            )
-<b class="pc">&nbsp;            is DashboardEvent.OnTransactionClick -&gt; postSideEffect(</b>
-<b class="nc">&nbsp;                DashboardEffect.NavigateToTransactionDetails(event.transactionId),</b>
+<b class="fc">&nbsp;            is DashboardEvent.OnTransactionClick -&gt; postSideEffect(</b>
+<b class="fc">&nbsp;                DashboardEffect.NavigateToTransactionDetails(event.transactionId),</b>
 &nbsp;            )
-<b class="pc">&nbsp;            DashboardEvent.OnAddAccountClick -&gt; postSideEffect(DashboardEffect.NavigateToAccountCreation)</b>
-<b class="pc">&nbsp;            DashboardEvent.OnSeeAllTransactionsClick -&gt;</b>
-<b class="nc">&nbsp;                postSideEffect(DashboardEffect.NavigateToTransactionsList)</b>
-<b class="pc">&nbsp;            DashboardEvent.OnAddTransactionClick -&gt; postSideEffect(</b>
-<b class="nc">&nbsp;                DashboardEffect.NavigateToTransactionCreation(accountId = null),</b>
+<b class="fc">&nbsp;            DashboardEvent.OnAddAccountClick -&gt; postSideEffect(DashboardEffect.NavigateToAccountCreation)</b>
+<b class="fc">&nbsp;            DashboardEvent.OnSeeAllTransactionsClick -&gt;</b>
+<b class="fc">&nbsp;                postSideEffect(DashboardEffect.NavigateToTransactionsList)</b>
+<b class="fc">&nbsp;            DashboardEvent.OnAddTransactionClick -&gt; postSideEffect(</b>
+<b class="fc">&nbsp;                DashboardEffect.NavigateToTransactionCreation(accountId = null),</b>
 &nbsp;            )
-<b class="pc">&nbsp;            DashboardEvent.OnTransferClick -&gt; postSideEffect(DashboardEffect.NavigateToTransferCreation)</b>
-<b class="nc">&nbsp;            is DashboardEvent.OnAddTransactionForAccountClick -&gt;</b>
-<b class="nc">&nbsp;                postSideEffect(DashboardEffect.NavigateToTransactionCreation(accountId = event.accountId))</b>
-<b class="nc">&nbsp;            DashboardEvent.OnManageAccountsClick -&gt; postSideEffect(DashboardEffect.NavigateToAccountsManage)</b>
-<b class="nc">&nbsp;            DashboardEvent.OnSettingsClick -&gt; postSideEffect(DashboardEffect.NavigateToSettings)</b>
-<b class="nc">&nbsp;            DashboardEvent.OnCustomizeClick -&gt; postSideEffect(DashboardEffect.NavigateToCustomize)</b>
-<b class="nc">&nbsp;            DashboardEvent.OnSeeAllGoalsClick -&gt; postSideEffect(DashboardEffect.NavigateToGoals)</b>
-<b class="nc">&nbsp;            is DashboardEvent.OnGoalClick -&gt; postSideEffect(DashboardEffect.NavigateToGoalDetails(event.goalId))</b>
-<b class="nc">&nbsp;            DashboardEvent.OnSetBudgetClick -&gt; postSideEffect(DashboardEffect.NavigateToBudgetCreation)</b>
+<b class="fc">&nbsp;            DashboardEvent.OnTransferClick -&gt; postSideEffect(DashboardEffect.NavigateToTransferCreation)</b>
+<b class="fc">&nbsp;            is DashboardEvent.OnAddTransactionForAccountClick -&gt;</b>
+<b class="fc">&nbsp;                postSideEffect(DashboardEffect.NavigateToTransactionCreation(accountId = event.accountId))</b>
+<b class="fc">&nbsp;            DashboardEvent.OnManageAccountsClick -&gt; postSideEffect(DashboardEffect.NavigateToAccountsManage)</b>
+<b class="fc">&nbsp;            DashboardEvent.OnSettingsClick -&gt; postSideEffect(DashboardEffect.NavigateToSettings)</b>
+<b class="fc">&nbsp;            DashboardEvent.OnCustomizeClick -&gt; postSideEffect(DashboardEffect.NavigateToCustomize)</b>
+<b class="fc">&nbsp;            DashboardEvent.OnSeeAllGoalsClick -&gt; postSideEffect(DashboardEffect.NavigateToGoals)</b>
+<b class="fc">&nbsp;            is DashboardEvent.OnGoalClick -&gt; postSideEffect(DashboardEffect.NavigateToGoalDetails(event.goalId))</b>
+<b class="fc">&nbsp;            DashboardEvent.OnSetBudgetClick -&gt; postSideEffect(DashboardEffect.NavigateToBudgetCreation)</b>
 &nbsp;        }
 &nbsp;    }
 &nbsp;
@@ -710,12 +710,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;        pace = pace,</b>
 &nbsp;    )
 &nbsp;
-<b class="nc">&nbsp;    private fun SavingsGoalSummary.toUi() = GoalUi(</b>
-<b class="nc">&nbsp;        id = goal.id,</b>
-<b class="nc">&nbsp;        name = goal.title,</b>
-<b class="nc">&nbsp;        formattedSaved = MoneyFormatter.format(progress.saved, goal.currencyCode),</b>
-<b class="nc">&nbsp;        formattedTarget = MoneyFormatter.format(progress.target, goal.currencyCode),</b>
-<b class="nc">&nbsp;        progress = progress.percent.toFloat(),</b>
+<b class="fc">&nbsp;    private fun SavingsGoalSummary.toUi() = GoalUi(</b>
+<b class="fc">&nbsp;        id = goal.id,</b>
+<b class="fc">&nbsp;        name = goal.title,</b>
+<b class="fc">&nbsp;        formattedSaved = MoneyFormatter.format(progress.saved, goal.currencyCode),</b>
+<b class="fc">&nbsp;        formattedTarget = MoneyFormatter.format(progress.target, goal.currencyCode),</b>
+<b class="fc">&nbsp;        progress = progress.percent.toFloat(),</b>
 &nbsp;    )
 &nbsp;
 &nbsp;    /**
@@ -759,9 +759,9 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;     */
 <b class="fc">&nbsp;    private fun TransactionSplitGroup.toUi() = TransactionUi(</b>
 <b class="fc">&nbsp;        id = primary.id,</b>
-<b class="pc">&nbsp;        title = primary.note.ifBlank { &quot;No description&quot; },</b>
+<b class="fc">&nbsp;        title = primary.note.ifBlank { &quot;No description&quot; },</b>
 <b class="fc">&nbsp;        formattedAmount = MoneyFormatter.format(total, primary.currencyCode),</b>
-<b class="pc">&nbsp;        isExpense = primary.type == TransactionType.EXPENSE,</b>
+<b class="fc">&nbsp;        isExpense = primary.type == TransactionType.EXPENSE,</b>
 <b class="pc">&nbsp;        categoryHueSeed = primary.categoryId?.value.orEmpty(),</b>
 <b class="pc">&nbsp;        splitCategoryCount = if (isSplit) categoryCount else 0,</b>
 &nbsp;    )
@@ -1032,7 +1032,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 22:10</div>
+    <div style="float:right;">generated on 2026-07-28 22:19</div>
 </div>
 </body>
 </html>

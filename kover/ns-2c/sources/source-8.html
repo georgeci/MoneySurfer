@@ -49,34 +49,34 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   <td class="name">AccountCreationViewModel</td>
 <td class="coverageStat">
   <span class="percent">
-    95.5%
+    100%
   </span>
   <span class="absValue">
-    (21/22)
+    (22/22)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    90%
+    92.5%
   </span>
   <span class="absValue">
-    (36/40)
+    (37/40)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    92.6%
+    96.3%
   </span>
   <span class="absValue">
-    (75/81)
+    (78/81)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    90.3%
+    95.3%
   </span>
   <span class="absValue">
-    (464/514)
+    (490/514)
   </span>
 </td>
 </tr>
@@ -222,26 +222,26 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    75%
+    91.7%
   </span>
   <span class="absValue">
-    (9/12)
+    (11/12)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    88.5%
+    100%
   </span>
   <span class="absValue">
-    (46/52)
+    (52/52)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    81.8%
+    99.5%
   </span>
   <span class="absValue">
-    (336/411)
+    (409/411)
   </span>
 </td>
   </tr>
@@ -249,34 +249,34 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
-    90.3%
+    93.5%
   </span>
   <span class="absValue">
-    (28/31)
+    (29/31)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    74.4%
+    78.2%
   </span>
   <span class="absValue">
-    (58/78)
+    (61/78)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    90.5%
+    96.2%
   </span>
   <span class="absValue">
-    (143/158)
+    (152/158)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    86.2%
+    94.9%
   </span>
   <span class="absValue">
-    (991/1149)
+    (1090/1149)
   </span>
 </td>
 </tr>
@@ -390,8 +390,8 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;            is AccountCreationEvent.OnAddExtraField -&gt; addExtraField(event.key.name)</b>
 <b class="fc">&nbsp;            is AccountCreationEvent.OnAddCustomExtraField -&gt; addExtraField(event.name)</b>
 <b class="fc">&nbsp;            is AccountCreationEvent.OnRemoveExtraField -&gt; removeExtraField(event.key)</b>
-<b class="pc">&nbsp;            AccountCreationEvent.OnSaveClick -&gt; saveAccount()</b>
-<b class="nc">&nbsp;            AccountCreationEvent.OnBackClick -&gt; postSideEffect(AccountCreationEffect.NavigateBack)</b>
+<b class="fc">&nbsp;            AccountCreationEvent.OnSaveClick -&gt; saveAccount()</b>
+<b class="fc">&nbsp;            AccountCreationEvent.OnBackClick -&gt; postSideEffect(AccountCreationEffect.NavigateBack)</b>
 &nbsp;        }
 &nbsp;    }
 &nbsp;
@@ -479,8 +479,8 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;                        extraDetails = state.savedExtraDetails(),</b>
 &nbsp;                    )
 <b class="fc">&nbsp;                }.onLeft { err -&gt;</b>
-<b class="nc">&nbsp;                    log.w { &quot;[edit] not saved id=${existingId.value} -&gt; $err&quot; }</b>
-<b class="nc">&nbsp;                    snackbar.show(Res.string.accounts_manage_action_failed)</b>
+<b class="fc">&nbsp;                    log.w { &quot;[edit] not saved id=${existingId.value} -&gt; $err&quot; }</b>
+<b class="fc">&nbsp;                    snackbar.show(Res.string.accounts_manage_action_failed)</b>
 &nbsp;                    return@launch
 &nbsp;                }
 <b class="fc">&nbsp;                snackbar.show(Res.string.account_creation_updated_snackbar, listOf(trimmedName))</b>
@@ -488,9 +488,9 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;                return@launch
 &nbsp;            }
 &nbsp;
-<b class="pc">&nbsp;            val workspaceId = session.currentWorkspaceId.first() ?: run {</b>
-<b class="nc">&nbsp;                log.w { &quot;[save] no current workspace pinned — cannot create account&quot; }</b>
-<b class="nc">&nbsp;                snackbar.show(Res.string.accounts_manage_action_failed)</b>
+<b class="fc">&nbsp;            val workspaceId = session.currentWorkspaceId.first() ?: run {</b>
+<b class="fc">&nbsp;                log.w { &quot;[save] no current workspace pinned — cannot create account&quot; }</b>
+<b class="fc">&nbsp;                snackbar.show(Res.string.accounts_manage_action_failed)</b>
 <b class="fc">&nbsp;                return@launch</b>
 &nbsp;            }
 <b class="fc">&nbsp;            val balanceDouble = InitialBalanceInput.parse(state.balance) ?: 0.0</b>
@@ -508,8 +508,8 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;                    extraDetails = state.savedExtraDetails(),</b>
 &nbsp;                ),
 <b class="fc">&nbsp;            ).onLeft { err -&gt;</b>
-<b class="nc">&nbsp;                log.w { &quot;[create] not saved -&gt; $err&quot; }</b>
-<b class="nc">&nbsp;                snackbar.show(Res.string.accounts_manage_action_failed)</b>
+<b class="fc">&nbsp;                log.w { &quot;[create] not saved -&gt; $err&quot; }</b>
+<b class="fc">&nbsp;                snackbar.show(Res.string.accounts_manage_action_failed)</b>
 &nbsp;                return@launch
 &nbsp;            }
 &nbsp;
@@ -540,8 +540,8 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    }
 &nbsp;
 &nbsp;    private fun handleSaveError(error: Throwable) {
-<b class="nc">&nbsp;        log.e(error) { &quot;[save] failed&quot; }</b>
-<b class="nc">&nbsp;        snackbar.show(Res.string.accounts_manage_action_failed)</b>
+<b class="fc">&nbsp;        log.e(error) { &quot;[save] failed&quot; }</b>
+<b class="fc">&nbsp;        snackbar.show(Res.string.accounts_manage_action_failed)</b>
 &nbsp;    }
 &nbsp;
 &nbsp;    private suspend fun finishAccountCreation(workspaceId: WorkspaceId, currency: CurrencyCode) {
@@ -687,7 +687,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 22:10</div>
+    <div style="float:right;">generated on 2026-07-28 22:19</div>
 </div>
 </body>
 </html>

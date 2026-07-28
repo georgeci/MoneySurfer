@@ -57,26 +57,26 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    75%
+    95.8%
   </span>
   <span class="absValue">
-    (18/24)
+    (23/24)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    81.2%
+    85.4%
   </span>
   <span class="absValue">
-    (39/48)
+    (41/48)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    80.5%
+    87.8%
   </span>
   <span class="absValue">
-    (264/328)
+    (288/328)
   </span>
 </td>
 </tr>
@@ -88,27 +88,27 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <td class="name">SignInViewModel$onEvent$4</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
     <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/21)
+    (21/21)
   </span>
 </td>
   </tr>
@@ -116,27 +116,27 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <td class="name">SignInViewModel$onEvent$5</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
     <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/21)
+    (21/21)
   </span>
 </td>
   </tr>
@@ -160,18 +160,18 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    66.7%
+    100%
   </span>
   <span class="absValue">
-    (12/18)
+    (18/18)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    65.8%
+    100%
   </span>
   <span class="absValue">
-    (79/120)
+    (120/120)
   </span>
 </td>
   </tr>
@@ -187,26 +187,26 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    50%
+    100%
   </span>
   <span class="absValue">
-    (1/2)
+    (2/2)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    66.7%
+    100%
   </span>
   <span class="absValue">
-    (2/3)
+    (3/3)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    62.5%
+    100%
   </span>
   <span class="absValue">
-    (30/48)
+    (48/48)
   </span>
 </td>
   </tr>
@@ -222,34 +222,34 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
-    66.7%
+    83.3%
   </span>
   <span class="absValue">
-    (8/12)
+    (10/12)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    75%
+    96.4%
   </span>
   <span class="absValue">
-    (21/28)
+    (27/28)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    74.6%
+    90.1%
   </span>
   <span class="absValue">
-    (53/71)
+    (64/71)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    69.3%
+    92.6%
   </span>
   <span class="absValue">
-    (373/538)
+    (498/538)
   </span>
 </td>
 </tr>
@@ -299,16 +299,16 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;                updateState { copy(password = event.password, error = null) }</b>
 <b class="fc">&nbsp;            SignInEvent.OnToggleModeClick -&gt; updateState {</b>
 <b class="fc">&nbsp;                copy(</b>
-<b class="pc">&nbsp;                    mode = when (mode) {</b>
+<b class="fc">&nbsp;                    mode = when (mode) {</b>
 <b class="fc">&nbsp;                        AuthMode.SignIn -&gt; AuthMode.SignUp</b>
-<b class="nc">&nbsp;                        AuthMode.SignUp -&gt; AuthMode.SignIn</b>
+<b class="fc">&nbsp;                        AuthMode.SignUp -&gt; AuthMode.SignIn</b>
 &nbsp;                    },
 <b class="fc">&nbsp;                    error = null,</b>
 &nbsp;                )
 &nbsp;            }
 <b class="fc">&nbsp;            SignInEvent.OnSubmitClick -&gt; submit()</b>
-<b class="pc">&nbsp;            SignInEvent.OnAnonymousLoginClick -&gt; runAuth(&quot;anon&quot;) { anonymousLogin() }</b>
-<b class="pc">&nbsp;            SignInEvent.OnLoginClick -&gt; runAuth(&quot;demo&quot;) { demoLogin() }</b>
+<b class="fc">&nbsp;            SignInEvent.OnAnonymousLoginClick -&gt; runAuth(&quot;anon&quot;) { anonymousLogin() }</b>
+<b class="fc">&nbsp;            SignInEvent.OnLoginClick -&gt; runAuth(&quot;demo&quot;) { demoLogin() }</b>
 <b class="fc">&nbsp;            SignInEvent.OnErrorDismiss -&gt; updateState { copy(error = null) }</b>
 <b class="fc">&nbsp;            SignInEvent.OnTermsClick -&gt; postSideEffect(SignInEffect.NavigateToLegal)</b>
 &nbsp;        }
@@ -316,7 +316,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;
 &nbsp;    private fun submit() {
 <b class="fc">&nbsp;        val state = currentState</b>
-<b class="pc">&nbsp;        if (state.isLoading) return</b>
+<b class="fc">&nbsp;        if (state.isLoading) return</b>
 <b class="fc">&nbsp;        val invalid = state.validate()</b>
 <b class="fc">&nbsp;        if (invalid != null) {</b>
 <b class="fc">&nbsp;            log.i { &quot;[submit] rejected: $invalid (mode=${state.mode})&quot; }</b>
@@ -325,13 +325,13 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;        }
 <b class="fc">&nbsp;        val email = state.email</b>
 <b class="fc">&nbsp;        val password = state.password</b>
-<b class="pc">&nbsp;        val label = when (state.mode) {</b>
-<b class="nc">&nbsp;            AuthMode.SignIn -&gt; &quot;login&quot;</b>
+<b class="fc">&nbsp;        val label = when (state.mode) {</b>
+<b class="fc">&nbsp;            AuthMode.SignIn -&gt; &quot;login&quot;</b>
 <b class="fc">&nbsp;            AuthMode.SignUp -&gt; &quot;signup&quot;</b>
 &nbsp;        }
 <b class="fc">&nbsp;        runAuth(label) {</b>
-<b class="pc">&nbsp;            when (state.mode) {</b>
-<b class="nc">&nbsp;                AuthMode.SignIn -&gt; login(email, password)</b>
+<b class="fc">&nbsp;            when (state.mode) {</b>
+<b class="fc">&nbsp;                AuthMode.SignIn -&gt; login(email, password)</b>
 <b class="fc">&nbsp;                AuthMode.SignUp -&gt; signup(email, password)</b>
 &nbsp;            }
 &nbsp;        }
@@ -382,12 +382,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;                    // Auth succeeded either way; the bootstrap just could not find the account&#39;s
 &nbsp;                    // workspaces locally, and the selector has to say so rather than render an
 &nbsp;                    // empty list that reads as &quot;you have no workspaces&quot; (issue #342).
-<b class="nc">&nbsp;                    val cloudDataUnavailable =</b>
-<b class="nc">&nbsp;                        result is PostAuthBootstrapUseCase.Result.CloudDataUnavailable</b>
-<b class="nc">&nbsp;                    log.i { &quot;[$label] ok -&gt; navigate (cloudDataUnavailable=$cloudDataUnavailable)&quot; }</b>
-<b class="nc">&nbsp;                    postSideEffect(SignInEffect.NavigateToWorkspaceSelector(cloudDataUnavailable))</b>
-<b class="nc">&nbsp;                    updateState { copy(isLoading = false) }</b>
-<b class="nc">&nbsp;                },</b>
+<b class="fc">&nbsp;                    val cloudDataUnavailable =</b>
+<b class="fc">&nbsp;                        result is PostAuthBootstrapUseCase.Result.CloudDataUnavailable</b>
+<b class="fc">&nbsp;                    log.i { &quot;[$label] ok -&gt; navigate (cloudDataUnavailable=$cloudDataUnavailable)&quot; }</b>
+<b class="fc">&nbsp;                    postSideEffect(SignInEffect.NavigateToWorkspaceSelector(cloudDataUnavailable))</b>
+<b class="fc">&nbsp;                    updateState { copy(isLoading = false) }</b>
+<b class="fc">&nbsp;                },</b>
 &nbsp;            )
 &nbsp;        }
 &nbsp;    }
@@ -536,7 +536,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 22:10</div>
+    <div style="float:right;">generated on 2026-07-28 22:19</div>
 </div>
 </body>
 </html>

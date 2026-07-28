@@ -53,34 +53,34 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <td class="name">WorkspaceSelectorState$Content</td>
 <td class="coverageStat">
   <span class="percent">
-    50%
+    100%
   </span>
   <span class="absValue">
-    (2/4)
+    (4/4)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    75%
   </span>
   <span class="absValue">
-    (0/4)
+    (3/4)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    83.3%
+    100%
   </span>
   <span class="absValue">
-    (10/12)
+    (12/12)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    70.5%
+    97.7%
   </span>
   <span class="absValue">
-    (62/88)
+    (86/88)
   </span>
 </td>
   </tr>
@@ -92,27 +92,27 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <td class="name">WorkspaceSelectorState$Loading</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
     <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/4)
+    (4/4)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/21)
+    (21/21)
   </span>
 </td>
   </tr>
@@ -124,34 +124,34 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
-    40%
+    100%
   </span>
   <span class="absValue">
-    (2/5)
+    (5/5)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    75%
   </span>
   <span class="absValue">
-    (0/4)
+    (3/4)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    62.5%
+    100%
   </span>
   <span class="absValue">
-    (10/16)
+    (16/16)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    56.9%
+    98.2%
   </span>
   <span class="absValue">
-    (62/109)
+    (107/109)
   </span>
 </td>
 </tr>
@@ -321,11 +321,11 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    /** Offer a way back to sign-in — set when this screen has no other exit. */
 &nbsp;    val canSignOut: Boolean
 &nbsp;
-<b class="nc">&nbsp;    @optics</b>
+<b class="fc">&nbsp;    @optics</b>
 &nbsp;    data class Loading(
-<b class="nc">&nbsp;        override val showActions: Boolean,</b>
-<b class="nc">&nbsp;        override val isOffline: Boolean = false,</b>
-<b class="nc">&nbsp;        override val canSignOut: Boolean = false,</b>
+<b class="fc">&nbsp;        override val showActions: Boolean,</b>
+<b class="fc">&nbsp;        override val isOffline: Boolean = false,</b>
+<b class="fc">&nbsp;        override val canSignOut: Boolean = false,</b>
 &nbsp;    ) : WorkspaceSelectorState {
 &nbsp;        companion object
 &nbsp;    }
@@ -348,10 +348,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;            get() = !isOffline</b>
 &nbsp;
 &nbsp;        val activeWorkspaceId: WorkspaceId?
-<b class="nc">&nbsp;            get() = pendingWorkspaceId ?: selectedWorkspaceId</b>
+<b class="fc">&nbsp;            get() = pendingWorkspaceId ?: selectedWorkspaceId</b>
 &nbsp;
 &nbsp;        val activeWorkspace: Workspace?
-<b class="nc">&nbsp;            get() = activeWorkspaceId?.let { id -&gt; workspaces.firstOrNull { it.id == id } }</b>
+<b class="pc">&nbsp;            get() = activeWorkspaceId?.let { id -&gt; workspaces.firstOrNull { it.id == id } }</b>
 &nbsp;
 &nbsp;        companion object
 &nbsp;    }
@@ -398,7 +398,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 22:10</div>
+    <div style="float:right;">generated on 2026-07-28 22:19</div>
 </div>
 </body>
 </html>

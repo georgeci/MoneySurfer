@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SyncMetaDao</title>
+  <title>MoneySurfer Coverage Report > PendingMutationDao</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.sync.db.dao</a>
 </div>
 
-<h1>Coverage Summary for Class: SyncMetaDao (com.georgeci.moneysurfer.sync.db.dao)</h1>
+<h1>Coverage Summary for Class: PendingMutationDao (com.georgeci.moneysurfer.sync.db.dao)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SyncMetaDao</td>
+  <td class="name">PendingMutationDao</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -48,31 +48,97 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;
 &nbsp;import androidx.room.Dao
 &nbsp;import androidx.room.Query
-&nbsp;import androidx.room.Upsert
-&nbsp;import com.georgeci.moneysurfer.sync.db.entity.SyncMetaEntity
+&nbsp;import com.georgeci.moneysurfer.sync.db.entity.PendingMutationEntity
 &nbsp;import kotlinx.coroutines.flow.Flow
 &nbsp;
 &nbsp;@Dao
-&nbsp;interface SyncMetaDao {
+&nbsp;interface PendingMutationDao {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Insert-if-absent: queues the mutation unless an identical one is already waiting.
+&nbsp;     *
+&nbsp;     * Renaming an account five times used to queue five identical pushes, because outbox rows carry
+&nbsp;     * no payload — each one re-reads the entity at push time, so they all push the same current
+&nbsp;     * value. That is redundant, not incorrect, but it is redundant for *every* entity type, and a
+&nbsp;     * settings screen bound to a toggle produces such runs routinely.
+&nbsp;     *
+&nbsp;     * **Scoping to `PENDING` is the correctness part.** A write landing while a row is `IN_FLIGHT`
+&nbsp;     * must produce a *new* row: the in-flight push already read the entity, so without a second row
+&nbsp;     * the change made after that read would never be sent. A plain unique index cannot express
+&nbsp;     * &quot;unique among pending rows only&quot; — Room&#39;s `@Index` has no `WHERE` clause — so the condition
+&nbsp;     * lives in the statement.
+&nbsp;     *
+&nbsp;     * **`workspaceId` is part of the identity, not decoration.** Most entity ids are UUIDs, so
+&nbsp;     * `entityType` + `entityId` would be enough for them — but `WORKSPACE_MEMBER` rows carry
+&nbsp;     * `entityId = userId` and `scopeKey = workspaceId`, and one user is a member of many
+&nbsp;     * workspaces. Matching without the scope would let leaving W1 swallow the enqueue for leaving
+&nbsp;     * W2, and the surviving row pushes only its own workspace: W2 would keep the user ACTIVE on
+&nbsp;     * Firestore forever. `IS` rather than `=` because the column is nullable — settings rows carry
+&nbsp;     * no workspace, and SQL `=` never matches NULL to NULL.
+&nbsp;     */
+&nbsp;    @Query(
+&nbsp;        &quot;&quot;&quot;
+&nbsp;        INSERT INTO pending_mutations (id, entityType, entityId, operation, workspaceId, createdAt, attempts, status, lastError)
+&nbsp;        SELECT :id, :entityType, :entityId, :operation, :workspaceId, :createdAt, :attempts, :status, :lastError
+&nbsp;        WHERE NOT EXISTS (
+&nbsp;            SELECT 1 FROM pending_mutations
+&nbsp;            WHERE entityType = :entityType
+&nbsp;              AND entityId = :entityId
+&nbsp;              AND operation = :operation
+&nbsp;              AND workspaceId IS :workspaceId
+&nbsp;              AND status = &#39;PENDING&#39;
+&nbsp;        )
+&nbsp;        &quot;&quot;&quot;,
+&nbsp;    )
+&nbsp;    @Suppress(&quot;LongParameterList&quot;) // Mirrors the entity: an @Insert cannot express the guard.
+&nbsp;    suspend fun insertIfAbsent(
+&nbsp;        id: String,
+&nbsp;        entityType: String,
+&nbsp;        entityId: String,
+&nbsp;        operation: String,
+&nbsp;        workspaceId: String?,
+&nbsp;        createdAt: Long,
+&nbsp;        attempts: Int,
+&nbsp;        status: String,
+&nbsp;        lastError: String?,
+&nbsp;    )
 &nbsp;
 &nbsp;    @Query(
 &nbsp;        &quot;&quot;&quot;
-&nbsp;        SELECT * FROM sync_meta
-&nbsp;        WHERE workspaceId = :workspaceId AND collection = :collection
+&nbsp;        SELECT * FROM pending_mutations
+&nbsp;        WHERE status = &#39;PENDING&#39;
+&nbsp;          AND (:workspaceId IS NULL OR workspaceId = :workspaceId OR workspaceId IS NULL)
+&nbsp;        ORDER BY createdAt ASC
+&nbsp;        LIMIT :limit
 &nbsp;        &quot;&quot;&quot;,
 &nbsp;    )
-&nbsp;    suspend fun get(workspaceId: String, collection: String): SyncMetaEntity?
+&nbsp;    suspend fun pending(workspaceId: String?, limit: Int): List&lt;PendingMutationEntity&gt;
 &nbsp;
-&nbsp;    @Upsert
-&nbsp;    suspend fun upsert(entity: SyncMetaEntity)
+&nbsp;    @Query(&quot;UPDATE pending_mutations SET status = &#39;IN_FLIGHT&#39; WHERE id IN (:ids)&quot;)
+&nbsp;    suspend fun markInFlight(ids: List&lt;String&gt;)
 &nbsp;
-&nbsp;    @Query(&quot;SELECT * FROM sync_meta WHERE workspaceId = :workspaceId&quot;)
-&nbsp;    fun observeByWorkspace(workspaceId: String): Flow&lt;List&lt;SyncMetaEntity&gt;&gt;
+&nbsp;    @Query(&quot;DELETE FROM pending_mutations WHERE id IN (:ids)&quot;)
+&nbsp;    suspend fun deleteByIds(ids: List&lt;String&gt;)
 &nbsp;
-&nbsp;    @Query(&quot;DELETE FROM sync_meta WHERE workspaceId = :workspaceId&quot;)
-&nbsp;    suspend fun deleteByWorkspace(workspaceId: String)
+&nbsp;    @Query(
+&nbsp;        &quot;&quot;&quot;
+&nbsp;        UPDATE pending_mutations
+&nbsp;        SET status = &#39;PENDING&#39;,
+&nbsp;            attempts = attempts + 1,
+&nbsp;            lastError = :error
+&nbsp;        WHERE id = :id
+&nbsp;        &quot;&quot;&quot;,
+&nbsp;    )
+&nbsp;    suspend fun markFailed(id: String, error: String)
 &nbsp;
-&nbsp;    @Query(&quot;DELETE FROM sync_meta&quot;)
+&nbsp;    @Query(&quot;SELECT COUNT(*) FROM pending_mutations WHERE status != &#39;IN_FLIGHT&#39;&quot;)
+&nbsp;    fun pendingCount(): Flow&lt;Int&gt;
+&nbsp;
+&nbsp;    /** Every row regardless of status, oldest first — the Sync screen&#39;s outbox section. */
+&nbsp;    @Query(&quot;SELECT * FROM pending_mutations ORDER BY createdAt ASC LIMIT :limit&quot;)
+&nbsp;    fun observeAll(limit: Int): Flow&lt;List&lt;PendingMutationEntity&gt;&gt;
+&nbsp;
+&nbsp;    @Query(&quot;DELETE FROM pending_mutations&quot;)
 &nbsp;    suspend fun deleteAll()
 &nbsp;}
 </code>
@@ -98,7 +164,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 22:10</div>
+    <div style="float:right;">generated on 2026-07-28 22:19</div>
 </div>
 </body>
 </html>
