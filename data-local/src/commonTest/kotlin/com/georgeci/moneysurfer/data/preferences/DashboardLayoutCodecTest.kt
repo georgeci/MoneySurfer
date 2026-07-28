@@ -20,6 +20,9 @@ class DashboardLayoutCodecTest : StringSpec({
                     DashboardWidgetType.Accounts,
                     cardStyle = DashboardCardStyle(DashboardWidgetSize.Compact, variant = "strip"),
                 ),
+                // Every type, or the decode-side `normalized()` would append the missing one and
+                // the round trip would fail for a reason that has nothing to do with the codec.
+                DashboardLayoutItem(DashboardWidgetType.QuickActions),
                 DashboardLayoutItem(DashboardWidgetType.RecentTransactions),
             ),
         )
@@ -57,6 +60,7 @@ class DashboardLayoutCodecTest : StringSpec({
         decoded.items.map { it.type } shouldContainExactly listOf(
             DashboardWidgetType.Goals,
             DashboardWidgetType.Balance,
+            DashboardWidgetType.QuickActions,
             DashboardWidgetType.Accounts,
             DashboardWidgetType.RecentTransactions,
         )

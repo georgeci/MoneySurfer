@@ -48,6 +48,7 @@ import com.georgeci.moneysurfer.uikit.widgets.SurferBalanceVariant
 import com.georgeci.moneysurfer.uikit.widgets.SurferBalanceWidget
 import com.georgeci.moneysurfer.uikit.widgets.SurferGoalItem
 import com.georgeci.moneysurfer.uikit.widgets.SurferGoalsWidget
+import com.georgeci.moneysurfer.uikit.widgets.SurferQuickActionsWidget
 import com.georgeci.moneysurfer.uikit.widgets.SurferRecentTransactionItem
 import com.georgeci.moneysurfer.uikit.widgets.SurferRecentTransactionsWidget
 import com.georgeci.moneysurfer.uikit.widgets.SurferWidgetSize
@@ -67,6 +68,7 @@ import moneysurfer.feature.dashboard.generated.resources.dashboard_goals_empty_s
 import moneysurfer.feature.dashboard.generated.resources.dashboard_goals_empty_title
 import moneysurfer.feature.dashboard.generated.resources.dashboard_goals_see_all
 import moneysurfer.feature.dashboard.generated.resources.dashboard_goals_title
+import moneysurfer.feature.dashboard.generated.resources.dashboard_quick_action_transfer
 import moneysurfer.feature.dashboard.generated.resources.dashboard_recent_empty_subtitle
 import moneysurfer.feature.dashboard.generated.resources.dashboard_recent_empty_title
 import moneysurfer.feature.dashboard.generated.resources.dashboard_recent_see_all
@@ -91,6 +93,14 @@ object DashboardTestTags {
     const val Customize = "dashboard:customize"
     const val Settings = "dashboard:settings"
     const val AddTransaction = "dashboard:addTransaction"
+
+    /**
+     * The quick-actions row, not either button inside it — `SurferQuickActionsWidget` takes no per
+     * button tag, and reusing [AddTransaction] for its primary action would put two nodes under one
+     * id, which is an ambiguous selector rather than a convenience. Its buttons are reachable by
+     * their labels, both of which this screen owns.
+     */
+    const val QuickActions = "dashboard:quickActions"
     const val Accounts = "dashboard:accounts"
 
     /**
@@ -111,6 +121,7 @@ fun DashboardScreen(
     onNavigateToAccountCreation: () -> Unit,
     onNavigateToAccountsManage: () -> Unit,
     onNavigateToTransactionCreation: (accountId: AccountId?) -> Unit,
+    onNavigateToTransferCreation: () -> Unit,
     onNavigateToAccountDetails: (AccountId) -> Unit,
     onNavigateToTransactionDetails: (TransactionId) -> Unit,
     onNavigateToSettings: () -> Unit,
@@ -129,6 +140,7 @@ fun DashboardScreen(
             DashboardEffect.NavigateToAccountCreation -> onNavigateToAccountCreation()
             DashboardEffect.NavigateToAccountsManage -> onNavigateToAccountsManage()
             is DashboardEffect.NavigateToTransactionCreation -> onNavigateToTransactionCreation(effect.accountId)
+            DashboardEffect.NavigateToTransferCreation -> onNavigateToTransferCreation()
             DashboardEffect.NavigateToSettings -> onNavigateToSettings()
             DashboardEffect.NavigateToCustomize -> onNavigateToCustomize()
             DashboardEffect.NavigateToTransactionsList -> onNavigateToTransactionsList()
@@ -152,6 +164,9 @@ private val DASHBOARD_WIDGET_MIN_HEIGHT = 180.dp
 
 /** Bottom scroll inset that keeps the last row clear of the extended "Add transaction" FAB. */
 private val DASHBOARD_FAB_CLEARANCE = 88.dp
+
+/** A transfer needs somewhere to send the money, so the quick-actions row waits for a second account. */
+private const val MIN_ACCOUNTS_FOR_TRANSFER = 2
 
 @Composable
 private fun DashboardLoading() {
@@ -179,8 +194,12 @@ private fun DashboardLoading() {
     }
 }
 
+/**
+ * Stateless half of the screen — public so `:composeApp` desktop UI tests can mount it with an
+ * injected state, the way `DashboardCustomizeContent` is used.
+ */
 @Composable
-private fun DashboardContent(
+fun DashboardContent(
     state: DashboardState.Content,
     onEvent: (DashboardEvent) -> Unit,
 ) {
@@ -275,6 +294,7 @@ private fun DashboardWidget(
 ) {
     when (type) {
         DashboardWidgetType.Balance -> BalanceWidget(state, variant)
+        DashboardWidgetType.QuickActions -> QuickActionsWidget(state, onEvent)
         DashboardWidgetType.Accounts -> AccountsWidget(state, onEvent)
         DashboardWidgetType.Goals -> GoalsWidget(state, onEvent)
         DashboardWidgetType.RecentTransactions -> RecentTransactionsWidget(state, onEvent)
@@ -292,6 +312,42 @@ private fun BalanceWidget(state: DashboardState.Content, variant: String?) {
             .fillMaxWidth()
             .padding(horizontal = 16.dp)
             .testTag(DashboardTestTags.Balance),
+    )
+}
+
+/**
+ * The two shortcuts that skip the FAB: log a transaction, or move money between accounts.
+ *
+ * Stands down entirely rather than offering an action the screen would refuse:
+ * - with `transferEnabled` off the creation screen ignores the type switch, so a Transfer button
+ *   would land on an expense form — and this row is half Transfer button;
+ * - below [MIN_ACCOUNTS_FOR_TRANSFER] there is nothing to move money between. The form would open
+ *   with an empty "To" slot whose picker excludes the only account there is, leaving Save disabled
+ *   with no way to enable it.
+ *
+ * All or nothing, because the widget draws both buttons or neither — and the half worth keeping is
+ * Transfer, since "Add transaction" is the FAB this screen already shows.
+ */
+@Composable
+private fun QuickActionsWidget(
+    state: DashboardState.Content,
+    onEvent: (DashboardEvent) -> Unit,
+) {
+    if (!state.transferEnabled || state.accounts.size < MIN_ACCOUNTS_FOR_TRANSFER) return
+    SurferQuickActionsWidget(
+        primaryLabel = stringResource(Res.string.dashboard_add_transaction),
+        primaryIcon = SurferIcons.Add,
+        onPrimaryClick = { onEvent(DashboardEvent.OnAddTransactionClick) },
+        secondaryLabel = stringResource(Res.string.dashboard_quick_action_transfer),
+        secondaryIcon = SurferIcons.SwapHoriz,
+        onSecondaryClick = { onEvent(DashboardEvent.OnTransferClick) },
+        // No explicit height: SurferButton pins its own (52dp Biggest, 48dp Regular) and the row is
+        // top-aligned, so a taller box would just hang dead space under the buttons.
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
+            .padding(vertical = 8.dp)
+            .testTag(DashboardTestTags.QuickActions),
     )
 }
 
@@ -514,6 +570,7 @@ private fun DashboardScreenPreview() {
                 workspaceInitial = null,
                 greeting = null,
                 formattedTrendDelta = "+€412 this month",
+                transferEnabled = true,
             ),
             onEvent = {},
         )

@@ -43,6 +43,8 @@ class DashboardViewModel(
 
     private val isOffline: Boolean = hostCapabilities.isOffline
 
+    private val transferEnabled: Boolean = hostCapabilities.transferEnabled
+
     /**
      * Widget order and visibility. Normalized again here so the screen renders a sound layout
      * whatever supplies the pref — the DataStore-backed binding already normalizes on decode, but
@@ -70,6 +72,7 @@ class DashboardViewModel(
             DashboardEvent.OnAddTransactionClick -> postSideEffect(
                 DashboardEffect.NavigateToTransactionCreation(accountId = null),
             )
+            DashboardEvent.OnTransferClick -> postSideEffect(DashboardEffect.NavigateToTransferCreation)
             is DashboardEvent.OnAddTransactionForAccountClick ->
                 postSideEffect(DashboardEffect.NavigateToTransactionCreation(accountId = event.accountId))
             DashboardEvent.OnManageAccountsClick -> postSideEffect(DashboardEffect.NavigateToAccountsManage)
@@ -105,6 +108,7 @@ class DashboardViewModel(
                     formattedTrendDelta = null,
                     goals = goals.take(DASHBOARD_GOALS_LIMIT).map { it.toUi() },
                     isOffline = isOffline,
+                    transferEnabled = transferEnabled,
                     layout = layoutConfig,
                 )
             }.collect { newContent -> updateState { newContent } }
@@ -203,6 +207,12 @@ sealed interface DashboardState {
         val formattedTrendDelta: String?,
         val goals: List<GoalUi> = emptyList(),
         val isOffline: Boolean = false,
+        /**
+         * Whether this build offers multi-account transfers. The quick-actions widget is the only
+         * thing that reads it: half of that widget is a Transfer button, and a build with transfers
+         * off has no form to send it to.
+         */
+        val transferEnabled: Boolean = false,
         /** Which widgets the screen renders, in order. */
         val layout: DashboardLayoutConfig = DashboardLayoutConfig.DEFAULT,
     ) : DashboardState {
@@ -255,6 +265,7 @@ sealed interface DashboardEvent {
     data class OnTransactionClick(val transactionId: TransactionId) : DashboardEvent
     data object OnAddAccountClick : DashboardEvent
     data object OnAddTransactionClick : DashboardEvent
+    data object OnTransferClick : DashboardEvent
     data object OnSeeAllTransactionsClick : DashboardEvent
     data class OnAddTransactionForAccountClick(val accountId: AccountId) : DashboardEvent
     data object OnManageAccountsClick : DashboardEvent
@@ -270,6 +281,9 @@ sealed interface DashboardEffect {
     data object NavigateToAccountCreation : DashboardEffect
     data object NavigateToAccountsManage : DashboardEffect
     data class NavigateToTransactionCreation(val accountId: AccountId?) : DashboardEffect
+
+    /** The same creation screen, opened on its Transfer tab rather than the default expense one. */
+    data object NavigateToTransferCreation : DashboardEffect
     data object NavigateToSettings : DashboardEffect
     data object NavigateToCustomize : DashboardEffect
     data object NavigateToTransactionsList : DashboardEffect

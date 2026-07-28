@@ -100,6 +100,12 @@ fun TransactionCreationScreen(
     accountId: AccountId? = null,
     /** Treat [transactionId] as a template for a new transaction rather than the row to edit. */
     duplicate: Boolean = false,
+    /**
+     * Open already switched to Transfer, for a caller that knows that is what the user asked for.
+     * Applied once, when the ViewModel loads — not re-applied on later compositions, so the user
+     * stays wherever they moved the type segment to afterwards.
+     */
+    transfer: Boolean = false,
     onNavigateBack: () -> Unit,
     /**
      * Leaving after the edited transaction was deleted. Defaults to [onNavigateBack]; the nav graph
@@ -113,8 +119,8 @@ fun TransactionCreationScreen(
     pickedAccountId: AccountId? = null,
     transferRequested: Boolean? = null,
     viewModel: TransactionCreationViewModel = koinViewModel(
-        key = "$transactionId:$accountId:$duplicate",
-    ) { parametersOf(transactionCreationSeed(transactionId, duplicate), accountId) },
+        key = "$transactionId:$accountId:$duplicate:$transfer",
+    ) { parametersOf(transactionCreationSeed(transactionId, duplicate), accountId, transfer) },
 ) {
     val state by viewModel.collectAsStateWithLifecycle()
 
@@ -145,6 +151,9 @@ fun TransactionCreationScreen(
         viewModel.onEvent(TransactionCreationEvent.OnAccountPicked(id))
     }
 
+    // [transfer] is deliberately absent here — it is a route argument, true for as long as this
+    // entry lives, so replaying it on every composition would drag the user back to the Transfer
+    // tab after they had switched away. It seeds the ViewModel's initial state instead.
     LaunchedEffect(transferRequested) {
         if (transferRequested != true) return@LaunchedEffect
         viewModel.onEvent(TransactionCreationEvent.OnTypeChanged(TransactionTypeUi.Transfer))

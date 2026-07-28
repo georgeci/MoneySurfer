@@ -11,6 +11,7 @@
     <string name="dashboard_customize_available_empty">Every widget is already on your dashboard.</string>
     <string name="dashboard_customize_footnote">The layout is saved on this device only.</string>
     <string name="dashboard_customize_widget_balance">Total balance</string>
+    <string name="dashboard_customize_widget_quick_actions">Quick actions</string>
     <string name="dashboard_customize_widget_accounts">Accounts</string>
     <string name="dashboard_customize_widget_goals">Goals</string>
     <string name="dashboard_customize_widget_recent">Recent transactions</string>
@@ -34,6 +35,7 @@
     <string name="dashboard_customize_preview_transaction_coffee">Coffee</string>
     <string name="dashboard_customize_preview_transaction_rent">Rent</string>
     <string name="dashboard_add_transaction">Add transaction</string>
+    <string name="dashboard_quick_action_transfer">Transfer</string>
     <string name="dashboard_balance_title">Total balance</string>
     <string name="dashboard_balance_empty_text">Add your first account to see balance.</string>
     <string name="dashboard_balance_other_currencies">Plus %1$s no rate could convert</string>

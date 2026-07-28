@@ -57,6 +57,7 @@ internal class TransactionCreationFixture(workspaceId: WorkspaceId) {
         editingTransactionId: TransactionId? = null,
         duplicateOf: TransactionId? = null,
         prefillAccount: AccountId? = null,
+        openAsTransfer: Boolean = false,
         hostCapabilities: HostCapabilities = FakeHostCapabilities(),
     ) = TransactionCreationViewModel(
         seed = duplicateOf?.let {
@@ -65,6 +66,7 @@ internal class TransactionCreationFixture(workspaceId: WorkspaceId) {
             TransactionCreationSeed(it, TransactionCreationSeed.Mode.Edit)
         },
         accountId = prefillAccount,
+        openAsTransfer = openAsTransfer,
         getAccounts = GetAccountsUseCase(accountRepository, session),
         getCategories = GetCategoriesUseCase(categoryRepository, session),
         getTransactionById = GetTransactionByIdUseCase(transactionRepository),

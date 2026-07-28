@@ -50,6 +50,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
@@ -131,9 +132,36 @@ class DashboardViewModelTest : StringSpec({
         content.layout.enabledItems.map { it.type } shouldContainExactly listOf(
             DashboardWidgetType.Goals,
             // widgets the stored layout never heard of are appended rather than dropped
+            DashboardWidgetType.QuickActions,
             DashboardWidgetType.Accounts,
             DashboardWidgetType.RecentTransactions,
         )
+    }
+
+    "the quick-actions Transfer button asks for the transfer form, not the plain creation one" {
+        val ws = workspaceId("ws-1")
+        val viewModel = newViewModel(
+            ws = ws,
+            accounts = FakeAccountRepository(listOf(anAccount(id = accountId("a-1"), workspaceId = ws))),
+            transactions = FakeTransactionRepository(emptyList()),
+        )
+
+        viewModel.onEvent(DashboardEvent.OnTransferClick)
+
+        viewModel.sideEffects.effectFlow.first() shouldBe DashboardEffect.NavigateToTransferCreation
+    }
+
+    "a build with transfers switched off says so, so the quick-actions row can stand down" {
+        val ws = workspaceId("ws-1")
+        val viewModel = newViewModel(
+            ws = ws,
+            accounts = FakeAccountRepository(listOf(anAccount(id = accountId("a-1"), workspaceId = ws))),
+            transactions = FakeTransactionRepository(emptyList()),
+            hostCapabilities = FakeHostCapabilities(isOffline = true, transferEnabled = false),
+        )
+
+        val content = viewModel.value.shouldBeInstanceOf<DashboardState.Content>()
+        content.transferEnabled shouldBe false
     }
 
     "an unset layout falls back to the default order" {
@@ -219,6 +247,7 @@ private fun newViewModel(
     uiPreferences: UiPreferences = FakeUiPreferences(),
     baseCurrency: CurrencyCode = USD,
     rates: FakeExchangeRateRepository = FakeExchangeRateRepository(),
+    hostCapabilities: FakeHostCapabilities = FakeHostCapabilities(isOffline = false),
 ): DashboardViewModel {
     val session = InMemorySessionPointers(currentWorkspaceId = ws)
     val workspaces = FakeGoalWorkspaceRepository(listOf(aWorkspace(id = ws, baseCurrency = baseCurrency)))
@@ -229,7 +258,7 @@ private fun newViewModel(
         getExchangeRates = GetExchangeRatesUseCase(session, workspaces, rates),
         convertAccountsTotal = ConvertAccountsTotalUseCase(),
         uiPreferences = uiPreferences,
-        hostCapabilities = FakeHostCapabilities(isOffline = false),
+        hostCapabilities = hostCapabilities,
     )
 }
 
