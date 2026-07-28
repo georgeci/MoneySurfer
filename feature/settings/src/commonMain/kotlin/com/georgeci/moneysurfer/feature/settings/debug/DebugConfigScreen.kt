@@ -58,6 +58,15 @@ object DebugConfigTestTags {
     const val Unavailable = "debugConfig:unavailable"
 
     fun row(name: String): String = "debugConfig:row:$name"
+
+    /** The switch on a `Bool` row. */
+    fun toggle(name: String): String = "debugConfig:toggle:$name"
+
+    /**
+     * One chip of a `Choice` row. Tagged per option because the chip's only other handle is its
+     * label, which here is the raw encoded value — see the note on `SurferFilterChipRow`.
+     */
+    fun choice(name: String, choice: String): String = "debugConfig:choice:$name:$choice"
 }
 
 @Composable
@@ -199,6 +208,7 @@ private fun ConfigKeyRow(
                     onCheckedChange = { checked ->
                         onEvent(DebugConfigEvent.OnOverride(row.name, checked.toString()))
                     },
+                    modifier = Modifier.testTag(DebugConfigTestTags.toggle(row.name)),
                 )
             },
             onClick = clearOverride,
@@ -221,6 +231,7 @@ private fun ConfigKeyRow(
                             selected = row.effectiveValue,
                             label = { it },
                             onSelect = { choice -> onEvent(DebugConfigEvent.OnOverride(row.name, choice)) },
+                            optionTestTag = { choice -> DebugConfigTestTags.choice(row.name, choice) },
                         )
                     }
                 }
