@@ -16,6 +16,18 @@ enum class DashboardWidgetType(val isPeriodScoped: Boolean = false) {
     QuickActions,
     SafeToSpend(isPeriodScoped = true),
     Accounts,
+
+    /**
+     * Spend-oriented, and still **not** period-scoped — a decision, not an oversight.
+     *
+     * `GenerateInsightsUseCase` builds its own month-to-date window and stands its comparison
+     * rules down below seven elapsed days (`MIN_COMPARISON_DAYS`). Under a Week period that
+     * counter runs 1..7 and clears the bar only on the last day of the week, so pointing this
+     * widget at [DashboardPeriod] would silence it six days in seven. Making the guard a share
+     * of the period, or a per-mode minimum, is what has to happen first — see `md/insights.md`
+     * Phase 2. Until then the switch does not claim to drive this card.
+     */
+    Insights,
     Goals,
     RecentTransactions,
 }

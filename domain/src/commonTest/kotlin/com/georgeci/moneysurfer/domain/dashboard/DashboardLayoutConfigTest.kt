@@ -13,6 +13,7 @@ class DashboardLayoutConfigTest : StringSpec({
             DashboardWidgetType.QuickActions,
             DashboardWidgetType.SafeToSpend,
             DashboardWidgetType.Accounts,
+            DashboardWidgetType.Insights,
             DashboardWidgetType.Goals,
             DashboardWidgetType.RecentTransactions,
         )
@@ -43,6 +44,7 @@ class DashboardLayoutConfigTest : StringSpec({
             DashboardWidgetType.QuickActions,
             DashboardWidgetType.SafeToSpend,
             DashboardWidgetType.Accounts,
+            DashboardWidgetType.Insights,
             DashboardWidgetType.RecentTransactions,
         )
     }
@@ -128,6 +130,7 @@ class DashboardLayoutConfigTest : StringSpec({
             DashboardWidgetType.QuickActions,
             DashboardWidgetType.SafeToSpend,
             DashboardWidgetType.Accounts,
+            DashboardWidgetType.Insights,
             DashboardWidgetType.Goals,
             DashboardWidgetType.Balance,
             DashboardWidgetType.RecentTransactions,
@@ -146,6 +149,7 @@ class DashboardLayoutConfigTest : StringSpec({
             DashboardWidgetType.QuickActions,
             DashboardWidgetType.SafeToSpend,
             DashboardWidgetType.Accounts,
+            DashboardWidgetType.Insights,
             DashboardWidgetType.Goals,
         )
     }

@@ -16,6 +16,7 @@
     <string name="dashboard_customize_widget_accounts">Accounts</string>
     <string name="dashboard_customize_widget_goals">Goals</string>
     <string name="dashboard_customize_widget_recent">Recent transactions</string>
+    <string name="dashboard_customize_widget_insights">Insights</string>
     <string name="dashboard_customize_style_subtitle">Pick how this card looks on the dashboard.</string>
     <string name="dashboard_customize_style_size">Size</string>
     <string name="dashboard_customize_style_variant">Style</string>
@@ -26,6 +27,8 @@
     <string name="dashboard_customize_variant_balance_stacked">Stacked</string>
     <string name="dashboard_customize_variant_balance_inline">Inline</string>
     <string name="dashboard_customize_variant_balance_minimal">Minimal</string>
+    <string name="dashboard_customize_variant_insights_list">List</string>
+    <string name="dashboard_customize_variant_insights_carousel">Carousel</string>
     <string name="dashboard_customize_preview_account_everyday">Everyday</string>
     <string name="dashboard_customize_preview_account_savings">Savings</string>
     <string name="dashboard_customize_preview_account_cash">Cash</string>
@@ -73,6 +76,20 @@
     <string name="dashboard_recurring_empty_subtitle">Subscriptions and recurring bills will appear here.</string>
     <string name="dashboard_insights_title">Insights</string>
     <string name="dashboard_insights_empty_text">Nothing notable this period.</string>
+    <string name="dashboard_insights_uncategorized">Uncategorized</string>
+    <string name="dashboard_insights_category_up_title">%1$s is up %2$d%</string>
+    <string name="dashboard_insights_category_down_title">%1$s is down %2$d%</string>
+    <string name="dashboard_insights_period_up_title">Spending is up %1$d%</string>
+    <string name="dashboard_insights_period_down_title">Spending is down %1$d%</string>
+    <string name="dashboard_insights_period_flat_title">Spending is steady</string>
+    <string name="dashboard_insights_comparison_body">%1$s this month, against %2$s by the same day last month.</string>
+    <string name="dashboard_insights_subscriptions_body">About %1$s a month.</string>
+    <string name="dashboard_customize_preview_insight_up_title">Dining is up 28%</string>
+    <string name="dashboard_customize_preview_insight_up_body">€162 this month, against €127 by the same day last month.</string>
+    <string name="dashboard_customize_preview_insight_down_title">Leisure is down 21%</string>
+    <string name="dashboard_customize_preview_insight_down_body">€84 this month, against €106 by the same day last month.</string>
+    <string name="dashboard_customize_preview_insight_subs_title">4 active subscriptions</string>
+    <string name="dashboard_customize_preview_insight_subs_body">About €62 a month.</string>
     <!-- Segments of the dashboard period switch; both label a span, not a point in time -->
     <string name="dashboard_period_week">Week</string>
     <string name="dashboard_period_month">Month</string>

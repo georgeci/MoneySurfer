@@ -5,6 +5,7 @@ import com.georgeci.moneysurfer.domain.dashboard.DashboardCardStyle
 import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetSize
 import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetType
 import com.georgeci.moneysurfer.uikit.widgets.SurferBalanceVariant
+import com.georgeci.moneysurfer.uikit.widgets.SurferInsightsVariant
 import moneysurfer.feature.dashboard.generated.resources.Res
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_size_compact
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_size_expanded
@@ -13,9 +14,12 @@ import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_var
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_variant_balance_inline
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_variant_balance_minimal
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_variant_balance_stacked
+import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_variant_insights_carousel
+import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_variant_insights_list
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_widget_accounts
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_widget_balance
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_widget_goals
+import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_widget_insights
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_widget_quick_actions
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_widget_recent
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_widget_safe_to_spend
@@ -39,6 +43,7 @@ internal data class DashboardVariantOption(
  */
 internal fun DashboardWidgetType.variantOptions(): List<DashboardVariantOption> = when (this) {
     DashboardWidgetType.Balance -> BALANCE_VARIANTS
+    DashboardWidgetType.Insights -> INSIGHTS_VARIANTS
     DashboardWidgetType.QuickActions,
     DashboardWidgetType.SafeToSpend,
     DashboardWidgetType.Accounts,
@@ -54,6 +59,16 @@ internal fun DashboardWidgetType.variantOptions(): List<DashboardVariantOption> 
  */
 private val BALANCE_VARIANTS = SurferBalanceVariant.entries.map {
     DashboardVariantOption(key = it.name, label = it.labelResource())
+}
+
+/** Same construction as [BALANCE_VARIANTS], for the same reason. */
+private val INSIGHTS_VARIANTS = SurferInsightsVariant.entries.map {
+    DashboardVariantOption(key = it.name, label = it.labelResource())
+}
+
+private fun SurferInsightsVariant.labelResource(): StringResource = when (this) {
+    SurferInsightsVariant.List -> Res.string.dashboard_customize_variant_insights_list
+    SurferInsightsVariant.Carousel -> Res.string.dashboard_customize_variant_insights_carousel
 }
 
 private fun SurferBalanceVariant.labelResource(): StringResource = when (this) {
@@ -100,6 +115,7 @@ internal fun DashboardWidgetType.titleResource(): StringResource = when (this) {
     DashboardWidgetType.QuickActions -> Res.string.dashboard_customize_widget_quick_actions
     DashboardWidgetType.SafeToSpend -> Res.string.dashboard_customize_widget_safe_to_spend
     DashboardWidgetType.Accounts -> Res.string.dashboard_customize_widget_accounts
+    DashboardWidgetType.Insights -> Res.string.dashboard_customize_widget_insights
     DashboardWidgetType.Goals -> Res.string.dashboard_customize_widget_goals
     DashboardWidgetType.RecentTransactions -> Res.string.dashboard_customize_widget_recent
 }

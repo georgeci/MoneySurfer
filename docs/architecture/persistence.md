@@ -33,8 +33,14 @@ READ WHEN:
 - Standard time-field names: `operationAt`, `createdAt`, `updatedAt`,
   `deletedAt`. No legacy synonyms.
 - Room column names and Firestore document field names match 1:1.
-- Soft-delete only on Firestore: every entity DTO has `deletedAt: Long?` and
-  `clientVersionCode: Int`.
+- Every entity DTO has `deletedAt: Long?` and `clientVersionCode: Int`.
+  Firestore is always soft-delete. Room is soft-delete for **transactions**
+  only (issue #346): `transactions.deletedAt` mirrors the wire field, every
+  read query in `TransactionDao` carries `deletedAt IS NULL`, and tombstones
+  are purged after a retention window — see
+  [Local tombstone retention](sync-pull-lww.md#local-tombstone-retention).
+  Accounts, categories, budgets and goals still hard-delete locally; a pulled
+  tombstone drops their row.
 - Rules bug log: see [firestore-rules-bugs.md](firestore-rules-bugs.md).
 - App-version gate behavior: see [app-version-gate.md](app-version-gate.md).
 <!-- AI:END -->

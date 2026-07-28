@@ -164,6 +164,10 @@ fun TransactionEntity.toDoc(): TransactionDoc = TransactionDoc(
     status = status,
     createdAt = createdAt,
     updatedAt = updatedAt,
+    // The Room column and the wire field are the same tombstone (issue #346), so an upsert push
+    // carries it either way: a restore writes `null` and lifts the remote tombstone, and a row
+    // pushed while deleted stays deleted for peers.
+    deletedAt = deletedAt,
     transferId = transferId,
     splitId = splitId,
     recurringRuleId = recurringRuleId,
@@ -205,6 +209,7 @@ fun TransactionDoc.toEntity(id: String, workspaceId: String): TransactionEntity 
         status = status,
         createdAt = resolvedCreatedAt,
         updatedAt = updatedAt,
+        deletedAt = deletedAt,
         transferId = transferId,
         splitId = splitId,
         recurringRuleId = recurringRuleId,
