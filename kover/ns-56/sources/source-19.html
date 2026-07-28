@@ -91,6 +91,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferSegmentedControl
 &nbsp;import com.georgeci.moneysurfer.uikit.components.transaction.SurferDeleteTransactionDialog
 &nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
 &nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
 &nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
 &nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
@@ -145,6 +146,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    accountId: AccountId? = null,
 &nbsp;    /** Treat [transactionId] as a template for a new transaction rather than the row to edit. */
 &nbsp;    duplicate: Boolean = false,
+&nbsp;    /**
+&nbsp;     * Open already switched to Transfer, for a caller that knows that is what the user asked for.
+&nbsp;     * Applied once, when the ViewModel loads — not re-applied on later compositions, so the user
+&nbsp;     * stays wherever they moved the type segment to afterwards.
+&nbsp;     */
+&nbsp;    transfer: Boolean = false,
 &nbsp;    onNavigateBack: () -&gt; Unit,
 &nbsp;    /**
 &nbsp;     * Leaving after the edited transaction was deleted. Defaults to [onNavigateBack]; the nav graph
@@ -158,8 +165,8 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    pickedAccountId: AccountId? = null,
 &nbsp;    transferRequested: Boolean? = null,
 &nbsp;    viewModel: TransactionCreationViewModel = koinViewModel(
-&nbsp;        key = &quot;$transactionId:$accountId:$duplicate&quot;,
-&nbsp;    ) { parametersOf(transactionCreationSeed(transactionId, duplicate), accountId) },
+&nbsp;        key = &quot;$transactionId:$accountId:$duplicate:$transfer&quot;,
+&nbsp;    ) { parametersOf(transactionCreationSeed(transactionId, duplicate), accountId, transfer) },
 &nbsp;) {
 &nbsp;    val state by viewModel.collectAsStateWithLifecycle()
 &nbsp;
@@ -190,6 +197,9 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;        viewModel.onEvent(TransactionCreationEvent.OnAccountPicked(id))
 &nbsp;    }
 &nbsp;
+&nbsp;    // [transfer] is deliberately absent here — it is a route argument, true for as long as this
+&nbsp;    // entry lives, so replaying it on every composition would drag the user back to the Transfer
+&nbsp;    // tab after they had switched away. It seeds the ViewModel&#39;s initial state instead.
 &nbsp;    LaunchedEffect(transferRequested) {
 &nbsp;        if (transferRequested != true) return@LaunchedEffect
 &nbsp;        viewModel.onEvent(TransactionCreationEvent.OnTypeChanged(TransactionTypeUi.Transfer))
@@ -269,6 +279,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;        Column(
 &nbsp;            modifier = Modifier
 &nbsp;                .fillMaxSize()
+&nbsp;                .surferContentContainer()
 &nbsp;                .padding(top = padding.calculateTopPadding())
 &nbsp;                .verticalScroll(rememberScrollState()),
 &nbsp;        ) {
@@ -474,7 +485,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 15:14</div>
+    <div style="float:right;">generated on 2026-07-28 16:08</div>
 </div>
 </body>
 </html>

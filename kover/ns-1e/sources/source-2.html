@@ -68,7 +68,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (35/35)
+    (36/36)
   </span>
 </td>
 <td class="coverageStat">
@@ -76,7 +76,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     99.1%
   </span>
   <span class="absValue">
-    (318/321)
+    (329/332)
   </span>
 </td>
 </tr>
@@ -131,7 +131,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (36/36)
+    (37/37)
   </span>
 </td>
 <td class="coverageStat">
@@ -139,7 +139,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     99.1%
   </span>
   <span class="absValue">
-    (319/322)
+    (330/333)
   </span>
 </td>
 </tr>
@@ -239,12 +239,14 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;
 &nbsp;    companion object {
 &nbsp;        /**
-&nbsp;         * Variant A from the design: the balance headline first, then the accounts strip, goals,
-&nbsp;         * and the recent-transactions list. Every widget starts enabled and Hero-sized.
+&nbsp;         * Variant A from the design: the balance headline first, the quick actions under it, then
+&nbsp;         * the accounts strip, goals, and the recent-transactions list. Every widget starts enabled
+&nbsp;         * and Hero-sized.
 &nbsp;         */
 <b class="fc">&nbsp;        val DEFAULT = DashboardLayoutConfig(</b>
 <b class="fc">&nbsp;            items = listOf(</b>
 <b class="fc">&nbsp;                DashboardLayoutItem(DashboardWidgetType.Balance),</b>
+<b class="fc">&nbsp;                DashboardLayoutItem(DashboardWidgetType.QuickActions),</b>
 <b class="fc">&nbsp;                DashboardLayoutItem(DashboardWidgetType.Accounts),</b>
 <b class="fc">&nbsp;                DashboardLayoutItem(DashboardWidgetType.Goals),</b>
 <b class="fc">&nbsp;                DashboardLayoutItem(DashboardWidgetType.RecentTransactions),</b>
@@ -275,7 +277,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 15:14</div>
+    <div style="float:right;">generated on 2026-07-28 16:08</div>
 </div>
 </body>
 </html>

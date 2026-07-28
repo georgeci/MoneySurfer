@@ -57,18 +57,18 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    60.9%
+    61.3%
   </span>
   <span class="absValue">
-    (56/92)
+    (57/93)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    91.5%
+    91.6%
   </span>
   <span class="absValue">
-    (150/164)
+    (153/167)
   </span>
 </td>
 <td class="coverageStat">
@@ -76,7 +76,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     84.6%
   </span>
   <span class="absValue">
-    (1741/2059)
+    (1752/2070)
   </span>
 </td>
 </tr>
@@ -220,26 +220,26 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    60.9%
+    61.3%
   </span>
   <span class="absValue">
-    (56/92)
+    (57/93)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    91.5%
+    91.7%
   </span>
   <span class="absValue">
-    (151/165)
+    (154/168)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    84.6%
+    84.7%
   </span>
   <span class="absValue">
-    (1748/2066)
+    (1759/2077)
   </span>
 </td>
 </tr>
@@ -292,6 +292,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsSwitch
 &nbsp;import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsValuePill
 &nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
 &nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
 &nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
 &nbsp;import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
@@ -393,6 +394,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;    Column(</b>
 <b class="fc">&nbsp;        modifier = Modifier</b>
 <b class="fc">&nbsp;            .fillMaxSize()</b>
+<b class="fc">&nbsp;            .surferContentContainer()</b>
 <b class="fc">&nbsp;            .padding(padding)</b>
 <b class="fc">&nbsp;            .padding(horizontal = 16.dp),</b>
 <b class="fc">&nbsp;        verticalArrangement = Arrangement.spacedBy(8.dp),</b>
@@ -429,6 +431,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;        state = listState,</b>
 <b class="fc">&nbsp;        modifier = Modifier</b>
 <b class="fc">&nbsp;            .fillMaxSize()</b>
+<b class="fc">&nbsp;            .surferContentContainer()</b>
 <b class="fc">&nbsp;            .padding(top = padding.calculateTopPadding()),</b>
 <b class="fc">&nbsp;        contentPadding = PaddingValues(</b>
 <b class="fc">&nbsp;            start = 16.dp,</b>
@@ -597,6 +600,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;
 <b class="fc">&nbsp;private fun DashboardWidgetType.icon(): ImageVector = when (this) {</b>
 <b class="fc">&nbsp;    DashboardWidgetType.Balance -&gt; SurferIcons.Wallet</b>
+<b class="fc">&nbsp;    DashboardWidgetType.QuickActions -&gt; SurferIcons.Bolt</b>
 <b class="fc">&nbsp;    DashboardWidgetType.Accounts -&gt; SurferIcons.Bank</b>
 <b class="fc">&nbsp;    DashboardWidgetType.Goals -&gt; SurferIcons.Savings</b>
 <b class="fc">&nbsp;    DashboardWidgetType.RecentTransactions -&gt; SurferIcons.Receipt</b>
@@ -637,7 +641,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 15:14</div>
+    <div style="float:right;">generated on 2026-07-28 16:08</div>
 </div>
 </body>
 </html>

@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > GetBudgetsUseCase</title>
+  <title>MoneySurfer Coverage Report > GetCategoriesUseCase</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.usecase</a>
 </div>
 
-<h1>Coverage Summary for Class: GetBudgetsUseCase (com.georgeci.moneysurfer.domain.usecase)</h1>
+<h1>Coverage Summary for Class: GetCategoriesUseCase (com.georgeci.moneysurfer.domain.usecase)</h1>
 
 <table class="coverageStats">
 
@@ -46,7 +46,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">GetBudgetsUseCase</td>
+  <td class="name">GetCategoriesUseCase</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -81,7 +81,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 </tr>
   <tr>
-    <td class="name">GetBudgetsUseCase$invoke$$inlined$flatMapLatest$1</td>
+    <td class="name">GetCategoriesUseCase$invoke$$inlined$flatMapLatest$1</td>
 <td class="coverageStat">
   <span class="percent">
     0%
@@ -137,8 +137,8 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.usecase
 &nbsp;
 &nbsp;import com.georgeci.moneysurfer.domain.auth.SessionPointers
-&nbsp;import com.georgeci.moneysurfer.domain.model.Budget
-&nbsp;import com.georgeci.moneysurfer.domain.repositories.BudgetRepository
+&nbsp;import com.georgeci.moneysurfer.domain.model.Category
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.CategoryRepository
 &nbsp;import kotlinx.coroutines.ExperimentalCoroutinesApi
 &nbsp;import kotlinx.coroutines.flow.Flow
 &nbsp;import kotlinx.coroutines.flow.flatMapLatest
@@ -147,15 +147,14 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;
 <b class="fc">&nbsp;@Single</b>
 &nbsp;@OptIn(ExperimentalCoroutinesApi::class)
-&nbsp;class GetBudgetsUseCase(
-<b class="fc">&nbsp;    private val budgetRepository: BudgetRepository,</b>
+&nbsp;class GetCategoriesUseCase(
+<b class="fc">&nbsp;    private val categoryRepository: CategoryRepository,</b>
 <b class="fc">&nbsp;    private val session: SessionPointers,</b>
 &nbsp;) {
 &nbsp;
-&nbsp;    /** Every budget of the active workspace, archived ones included — the caller splits them. */
-&nbsp;    operator fun invoke(): Flow&lt;List&lt;Budget&gt;&gt; =
+&nbsp;    operator fun invoke(): Flow&lt;List&lt;Category&gt;&gt; =
 <b class="fc">&nbsp;        session.currentWorkspaceId.flatMapLatest { workspaceId -&gt;</b>
-<b class="pc">&nbsp;            workspaceId?.let(budgetRepository::getByWorkspaceId) ?: flowOf(emptyList())</b>
+<b class="pc">&nbsp;            workspaceId?.let(categoryRepository::getByWorkspaceId) ?: flowOf(emptyList())</b>
 &nbsp;        }
 &nbsp;}
 </code>
@@ -181,7 +180,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 15:14</div>
+    <div style="float:right;">generated on 2026-07-28 16:08</div>
 </div>
 </body>
 </html>

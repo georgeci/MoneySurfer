@@ -83,6 +83,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.uikit.components.budget.SurferBudgetStatusPill
 &nbsp;import com.georgeci.moneysurfer.uikit.components.budget.SurferStatTile
 &nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
 &nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
 &nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
 &nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
@@ -169,7 +170,11 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    ) { padding -&gt;
 &nbsp;        if (state is BudgetDetailsState.Missing) {
 &nbsp;            Box(
-&nbsp;                modifier = Modifier.fillMaxSize().padding(padding).padding(AppTheme.spacing.large),
+&nbsp;                modifier = Modifier
+&nbsp;                    .fillMaxSize()
+&nbsp;                    .surferContentContainer()
+&nbsp;                    .padding(padding)
+&nbsp;                    .padding(AppTheme.spacing.large),
 &nbsp;                contentAlignment = Alignment.Center,
 &nbsp;            ) {
 &nbsp;                Text(
@@ -187,7 +192,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;        }
 &nbsp;
 &nbsp;        LazyColumn(
-&nbsp;            modifier = Modifier.fillMaxSize().padding(top = padding.calculateTopPadding()),
+&nbsp;            modifier = Modifier.fillMaxSize().surferContentContainer().padding(top = padding.calculateTopPadding()),
 &nbsp;            contentPadding = PaddingValues(
 &nbsp;                start = AppTheme.spacing.default,
 &nbsp;                end = AppTheme.spacing.default,
@@ -412,7 +417,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 15:14</div>
+    <div style="float:right;">generated on 2026-07-28 16:08</div>
 </div>
 </body>
 </html>

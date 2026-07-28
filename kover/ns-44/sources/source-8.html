@@ -70,6 +70,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
 &nbsp;import com.georgeci.moneysurfer.uikit.components.goal.SurferGoalCard
 &nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
 &nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
 &nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
 &nbsp;import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
@@ -153,7 +154,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;        when {
 &nbsp;            isLoading -&gt; Box(modifier = Modifier.fillMaxSize().padding(padding))
 &nbsp;            goals.isEmpty() -&gt; Box(
-&nbsp;                modifier = Modifier.fillMaxSize().padding(padding),
+&nbsp;                modifier = Modifier.fillMaxSize().surferContentContainer().padding(padding),
 &nbsp;                contentAlignment = Alignment.Center,
 &nbsp;            ) {
 &nbsp;                SurferEmptyState(
@@ -177,7 +178,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    onEvent: (GoalsEvent) -&gt; Unit,
 &nbsp;) {
 &nbsp;    LazyColumn(
-&nbsp;        modifier = Modifier.fillMaxSize().padding(padding),
+&nbsp;        modifier = Modifier.fillMaxSize().surferContentContainer().padding(padding),
 &nbsp;        contentPadding = PaddingValues(
 &nbsp;            start = AppTheme.spacing.default,
 &nbsp;            end = AppTheme.spacing.default,
@@ -254,7 +255,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 15:14</div>
+    <div style="float:right;">generated on 2026-07-28 16:08</div>
 </div>
 </body>
 </html>

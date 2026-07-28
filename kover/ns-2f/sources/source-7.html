@@ -68,7 +68,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/175)
+    (0/176)
   </span>
 </td>
 <td class="coverageStat">
@@ -76,7 +76,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/2162)
+    (0/2170)
   </span>
 </td>
 </tr>
@@ -311,7 +311,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/179)
+    (0/180)
   </span>
 </td>
 <td class="coverageStat">
@@ -319,7 +319,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/2206)
+    (0/2214)
   </span>
 </td>
 </tr>
@@ -392,6 +392,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.uikit.components.base.surferReorderHandle
 &nbsp;import com.georgeci.moneysurfer.uikit.components.base.surferReorderableItem
 &nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
 &nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
 &nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
 &nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
@@ -455,6 +456,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;        Column(
 &nbsp;            modifier = Modifier
 &nbsp;                .fillMaxSize()
+&nbsp;                .surferContentContainer()
 &nbsp;                .padding(padding)
 &nbsp;                .padding(horizontal = AppTheme.spacing.default, vertical = AppTheme.spacing.medium),
 &nbsp;            verticalArrangement = Arrangement.spacedBy(14.dp),
@@ -511,7 +513,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="nc">&nbsp;    ) { padding -&gt;</b>
 <b class="nc">&nbsp;        if (!hasContent) {</b>
 <b class="nc">&nbsp;            Box(</b>
-<b class="nc">&nbsp;                modifier = Modifier.fillMaxSize().padding(padding),</b>
+<b class="nc">&nbsp;                modifier = Modifier.fillMaxSize().surferContentContainer().padding(padding),</b>
 <b class="nc">&nbsp;                contentAlignment = Alignment.Center,</b>
 &nbsp;            ) {
 <b class="nc">&nbsp;                SurferEmptyState(</b>
@@ -540,6 +542,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="nc">&nbsp;            state = listState,</b>
 <b class="nc">&nbsp;            modifier = Modifier</b>
 <b class="nc">&nbsp;                .fillMaxSize()</b>
+<b class="nc">&nbsp;                .surferContentContainer()</b>
 <b class="nc">&nbsp;                .padding(top = padding.calculateTopPadding()),</b>
 <b class="nc">&nbsp;            contentPadding = PaddingValues(</b>
 <b class="nc">&nbsp;                top = AppTheme.spacing.xSmall,</b>
@@ -799,7 +802,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 15:14</div>
+    <div style="float:right;">generated on 2026-07-28 16:08</div>
 </div>
 </body>
 </html>

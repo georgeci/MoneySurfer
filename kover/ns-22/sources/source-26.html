@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > MissingDayPolicy</title>
+  <title>MoneySurfer Coverage Report > GoalStatus</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.model</a>
 </div>
 
-<h1>Coverage Summary for Class: MissingDayPolicy (com.georgeci.moneysurfer.domain.model)</h1>
+<h1>Coverage Summary for Class: GoalStatus (com.georgeci.moneysurfer.domain.model)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,38 +49,38 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">MissingDayPolicy</td>
+  <td class="name">GoalStatus</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
     <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/2)
+    (4/4)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/18)
+    (30/30)
   </span>
 </td>
 </tr>
@@ -94,52 +94,48 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.model
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.AccountId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.GoalId
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.RecurringRuleId
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
-&nbsp;import kotlinx.datetime.DayOfWeek
 &nbsp;import kotlinx.datetime.LocalDate
 &nbsp;import kotlin.time.Instant
 &nbsp;
-&nbsp;data class RecurringRule(
-&nbsp;    val id: RecurringRuleId = RecurringRuleId.uuid(),
-&nbsp;    /**
-&nbsp;     * Workspace the rule belongs to. Every co-member sees the same rule, so
-&nbsp;     * [com.georgeci.moneysurfer.domain.model.Transaction.recurringRuleId] resolves on
-&nbsp;     * every device rather than dangling on the ones that never created it.
-&nbsp;     */
+&nbsp;/**
+&nbsp; * A savings goal — a counter of intent, not a pot of money.
+&nbsp; *
+&nbsp; * The amount saved so far is never stored here: it is always derived as
+&nbsp; * `SUM(GoalContribution.amount)` for the goal, so there is no field that can
+&nbsp; * drift away from the contribution history.
+&nbsp; *
+&nbsp; * [accountId] records where the user intends the money to sit. It is
+&nbsp; * decorative — nothing verifies that the account actually holds it, and no
+&nbsp; * account balance changes when a contribution is recorded.
+&nbsp; */
+&nbsp;data class SavingsGoal(
+&nbsp;    val id: GoalId = GoalId.uuid(),
 &nbsp;    val workspaceId: WorkspaceId,
 &nbsp;    val title: String,
-&nbsp;    val amount: Money,
-&nbsp;    val categoryId: CategoryId,
-&nbsp;    val schedule: RecurringSchedule,
+&nbsp;    val emoji: String,
+&nbsp;    /** Hue in `0..360`, tints the goal&#39;s icon tile. */
+&nbsp;    val hue: Int,
+&nbsp;    val target: Money,
+&nbsp;    val currencyCode: CurrencyCode,
 &nbsp;    val startDate: LocalDate,
-&nbsp;    val nextRunAt: Instant?,
-&nbsp;    val autoCreate: Boolean = true,
-&nbsp;    val isActive: Boolean = true,
-&nbsp;    val createdAt: Instant = Instant.fromEpochMilliseconds(0),
+&nbsp;    /** `null` when the goal has no deadline. */
+&nbsp;    val targetDate: LocalDate? = null,
+&nbsp;    val accountId: AccountId? = null,
+&nbsp;    val status: GoalStatus = GoalStatus.ACTIVE,
+&nbsp;    val createdAt: Instant,
 &nbsp;    val updatedAt: Instant = createdAt,
 &nbsp;)
 &nbsp;
-&nbsp;data class RecurringSchedule(
-&nbsp;    val frequency: RecurringFrequency,
-&nbsp;    val interval: Int = 1,
-&nbsp;    val daysOfWeek: Set&lt;DayOfWeek&gt; = emptySet(),
-&nbsp;    val daysOfMonth: Set&lt;Int&gt; = emptySet(),
-&nbsp;    val missingDayPolicy: MissingDayPolicy = MissingDayPolicy.LAST_DAY_OF_MONTH,
-&nbsp;)
-&nbsp;
-&nbsp;enum class RecurringFrequency {
-&nbsp;    DAILY,
-&nbsp;    WEEKLY,
-&nbsp;    MONTHLY,
-&nbsp;    YEARLY,
-&nbsp;}
-&nbsp;
-&nbsp;enum class MissingDayPolicy {
-<b class="nc">&nbsp;    SKIP,</b>
-<b class="nc">&nbsp;    LAST_DAY_OF_MONTH,</b>
+&nbsp;enum class GoalStatus {
+<b class="fc">&nbsp;    ACTIVE,</b>
+<b class="fc">&nbsp;    COMPLETED,</b>
+<b class="fc">&nbsp;    PAUSED,</b>
+<b class="fc">&nbsp;    ARCHIVED,</b>
 &nbsp;}
 </code>
 </pre>
@@ -164,7 +160,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 15:14</div>
+    <div style="float:right;">generated on 2026-07-28 16:08</div>
 </div>
 </body>
 </html>

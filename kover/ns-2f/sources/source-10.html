@@ -106,6 +106,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.uikit.components.base.surferReorderHandle
 &nbsp;import com.georgeci.moneysurfer.uikit.components.base.surferReorderableItem
 &nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
 &nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
 &nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
 &nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
@@ -169,6 +170,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;        Column(
 &nbsp;            modifier = Modifier
 &nbsp;                .fillMaxSize()
+&nbsp;                .surferContentContainer()
 &nbsp;                .padding(padding)
 &nbsp;                .padding(horizontal = AppTheme.spacing.default, vertical = AppTheme.spacing.medium),
 &nbsp;            verticalArrangement = Arrangement.spacedBy(14.dp),
@@ -225,7 +227,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    ) { padding -&gt;
 &nbsp;        if (!hasContent) {
 &nbsp;            Box(
-&nbsp;                modifier = Modifier.fillMaxSize().padding(padding),
+&nbsp;                modifier = Modifier.fillMaxSize().surferContentContainer().padding(padding),
 &nbsp;                contentAlignment = Alignment.Center,
 &nbsp;            ) {
 &nbsp;                SurferEmptyState(
@@ -254,6 +256,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;            state = listState,
 &nbsp;            modifier = Modifier
 &nbsp;                .fillMaxSize()
+&nbsp;                .surferContentContainer()
 &nbsp;                .padding(top = padding.calculateTopPadding()),
 &nbsp;            contentPadding = PaddingValues(
 &nbsp;                top = AppTheme.spacing.xSmall,
@@ -513,7 +516,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 15:14</div>
+    <div style="float:right;">generated on 2026-07-28 16:08</div>
 </div>
 </body>
 </html>

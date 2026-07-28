@@ -63,7 +63,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (1/1)
+    (3/3)
   </span>
 </td>
     <td class="coverageStat"/>
@@ -72,7 +72,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (1/1)
+    (3/3)
   </span>
 </td>
 <td class="coverageStat">
@@ -80,7 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (2/2)
+    (7/7)
   </span>
 </td>
 </tr>
@@ -152,6 +152,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    const val Unavailable = &quot;debugConfig:unavailable&quot;
 &nbsp;
 <b class="fc">&nbsp;    fun row(name: String): String = &quot;debugConfig:row:$name&quot;</b>
+&nbsp;
+&nbsp;    /** The switch on a `Bool` row. */
+<b class="fc">&nbsp;    fun toggle(name: String): String = &quot;debugConfig:toggle:$name&quot;</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * One chip of a `Choice` row. Tagged per option because the chip&#39;s only other handle is its
+&nbsp;     * label, which here is the raw encoded value — see the note on `SurferFilterChipRow`.
+&nbsp;     */
+<b class="fc">&nbsp;    fun choice(name: String, choice: String): String = &quot;debugConfig:choice:$name:$choice&quot;</b>
 &nbsp;}
 &nbsp;
 &nbsp;@Composable
@@ -293,6 +302,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;                    onCheckedChange = { checked -&gt;
 &nbsp;                        onEvent(DebugConfigEvent.OnOverride(row.name, checked.toString()))
 &nbsp;                    },
+&nbsp;                    modifier = Modifier.testTag(DebugConfigTestTags.toggle(row.name)),
 &nbsp;                )
 &nbsp;            },
 &nbsp;            onClick = clearOverride,
@@ -315,6 +325,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;                            selected = row.effectiveValue,
 &nbsp;                            label = { it },
 &nbsp;                            onSelect = { choice -&gt; onEvent(DebugConfigEvent.OnOverride(row.name, choice)) },
+&nbsp;                            optionTestTag = { choice -&gt; DebugConfigTestTags.choice(row.name, choice) },
 &nbsp;                        )
 &nbsp;                    }
 &nbsp;                }
@@ -399,7 +410,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 15:14</div>
+    <div style="float:right;">generated on 2026-07-28 16:08</div>
 </div>
 </body>
 </html>

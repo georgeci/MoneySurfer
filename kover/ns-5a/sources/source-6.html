@@ -79,7 +79,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/89)
+    (0/90)
   </span>
 </td>
 <td class="coverageStat">
@@ -87,7 +87,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/1115)
+    (0/1129)
   </span>
 </td>
 </tr>
@@ -128,6 +128,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.uikit.components.SurferButton
 &nbsp;import com.georgeci.moneysurfer.uikit.components.SurferButtonStyle
 &nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
+&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
 &nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
 &nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
 &nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
@@ -211,6 +212,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="nc">&nbsp;        Column(</b>
 <b class="nc">&nbsp;            modifier = Modifier</b>
 <b class="nc">&nbsp;                .fillMaxSize()</b>
+<b class="nc">&nbsp;                .surferContentContainer()</b>
 <b class="nc">&nbsp;                .padding(padding)</b>
 <b class="nc">&nbsp;                .verticalScroll(rememberScrollState())</b>
 <b class="nc">&nbsp;                .padding(horizontal = 16.dp),</b>
@@ -258,7 +260,9 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="nc">&nbsp;        stringResource(Res.string.transaction_filters_results, state.resultCount)</b>
 &nbsp;    }
 <b class="nc">&nbsp;    Surface(color = AppTheme.materialColors.surface) {</b>
-<b class="nc">&nbsp;        Column {</b>
+&nbsp;        // The surface itself bleeds to the window edges; its contents take the same cap as the
+&nbsp;        // form above, so the divider terminates that column instead of overrunning it.
+<b class="nc">&nbsp;        Column(modifier = Modifier.surferContentContainer()) {</b>
 <b class="nc">&nbsp;            HorizontalDivider(color = AppTheme.materialColors.outlineVariant)</b>
 <b class="nc">&nbsp;            Row(</b>
 <b class="nc">&nbsp;                modifier = Modifier</b>
@@ -323,7 +327,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 15:14</div>
+    <div style="float:right;">generated on 2026-07-28 16:08</div>
 </div>
 </body>
 </html>

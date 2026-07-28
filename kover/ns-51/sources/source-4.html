@@ -49,34 +49,34 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   <td class="name">DebugConfigScreenKt</td>
 <td class="coverageStat">
   <span class="percent">
-    52.6%
+    75%
   </span>
   <span class="absValue">
-    (10/19)
+    (15/20)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    29.7%
+    42.2%
   </span>
   <span class="absValue">
-    (19/64)
+    (27/64)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    64.7%
+    85.1%
   </span>
   <span class="absValue">
-    (90/139)
+    (120/141)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    58.4%
+    75.7%
   </span>
   <span class="absValue">
-    (1044/1788)
+    (1381/1824)
   </span>
 </td>
 </tr>
@@ -119,34 +119,34 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
-    50%
+    71.4%
   </span>
   <span class="absValue">
-    (10/20)
+    (15/21)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    28.8%
+    40.9%
   </span>
   <span class="absValue">
-    (19/66)
+    (27/66)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    63.4%
+    83.3%
   </span>
   <span class="absValue">
-    (90/142)
+    (120/144)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    57.3%
+    74.4%
   </span>
   <span class="absValue">
-    (1044/1821)
+    (1381/1857)
   </span>
 </td>
 </tr>
@@ -217,6 +217,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    const val Unavailable = &quot;debugConfig:unavailable&quot;
 &nbsp;
 &nbsp;    fun row(name: String): String = &quot;debugConfig:row:$name&quot;
+&nbsp;
+&nbsp;    /** The switch on a `Bool` row. */
+&nbsp;    fun toggle(name: String): String = &quot;debugConfig:toggle:$name&quot;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * One chip of a `Choice` row. Tagged per option because the chip&#39;s only other handle is its
+&nbsp;     * label, which here is the raw encoded value — see the note on `SurferFilterChipRow`.
+&nbsp;     */
+&nbsp;    fun choice(name: String, choice: String): String = &quot;debugConfig:choice:$name:$choice&quot;
 &nbsp;}
 &nbsp;
 &nbsp;@Composable
@@ -345,10 +354,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    onEvent: (DebugConfigEvent) -&gt; Unit,
 <b class="pc">&nbsp;) {</b>
 <b class="fc">&nbsp;    val clearOverride: (() -&gt; Unit)? =</b>
-<b class="pc">&nbsp;        if (row.overridden) ({ onEvent(DebugConfigEvent.OnClearOverride(row.name)) }) else null</b>
+<b class="fc">&nbsp;        if (row.overridden) ({ onEvent(DebugConfigEvent.OnClearOverride(row.name)) }) else null</b>
 &nbsp;
 <b class="fc">&nbsp;    when (val kind = row.kind) {</b>
-<b class="pc">&nbsp;        ConfigDebugRowKind.Bool -&gt; SurferSettingsRow(</b>
+<b class="fc">&nbsp;        ConfigDebugRowKind.Bool -&gt; SurferSettingsRow(</b>
 <b class="fc">&nbsp;            icon = SurferIcons.Code,</b>
 <b class="fc">&nbsp;            title = row.name,</b>
 <b class="fc">&nbsp;            supporting = { ResolutionSummary(row) },</b>
@@ -356,8 +365,9 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;                SurferSettingsSwitch(</b>
 <b class="fc">&nbsp;                    checked = row.effectiveValue.toBoolean(),</b>
 <b class="fc">&nbsp;                    onCheckedChange = { checked -&gt;</b>
-<b class="nc">&nbsp;                        onEvent(DebugConfigEvent.OnOverride(row.name, checked.toString()))</b>
+<b class="fc">&nbsp;                        onEvent(DebugConfigEvent.OnOverride(row.name, checked.toString()))</b>
 &nbsp;                    },
+<b class="fc">&nbsp;                    modifier = Modifier.testTag(DebugConfigTestTags.toggle(row.name)),</b>
 &nbsp;                )
 &nbsp;            },
 <b class="fc">&nbsp;            onClick = clearOverride,</b>
@@ -365,39 +375,40 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;            modifier = Modifier.testTag(DebugConfigTestTags.row(row.name)),</b>
 &nbsp;        )
 &nbsp;
-<b class="nc">&nbsp;        is ConfigDebugRowKind.Choice -&gt; SurferSettingsRow(</b>
-<b class="nc">&nbsp;            icon = SurferIcons.Code,</b>
-<b class="nc">&nbsp;            title = row.name,</b>
-<b class="nc">&nbsp;            supporting = {</b>
-<b class="nc">&nbsp;                Column {</b>
-<b class="nc">&nbsp;                    ResolutionSummary(row)</b>
-<b class="nc">&nbsp;                    Spacer(Modifier.height(AppTheme.spacing.small))</b>
+<b class="fc">&nbsp;        is ConfigDebugRowKind.Choice -&gt; SurferSettingsRow(</b>
+<b class="fc">&nbsp;            icon = SurferIcons.Code,</b>
+<b class="fc">&nbsp;            title = row.name,</b>
+<b class="fc">&nbsp;            supporting = {</b>
+<b class="fc">&nbsp;                Column {</b>
+<b class="fc">&nbsp;                    ResolutionSummary(row)</b>
+<b class="fc">&nbsp;                    Spacer(Modifier.height(AppTheme.spacing.small))</b>
 &nbsp;                    // A closed set can be longer than the screen (the palette&#39;s presets), so the
 &nbsp;                    // chip row scrolls rather than clipping the tail options out of reach.
-<b class="nc">&nbsp;                    Row(modifier = Modifier.horizontalScroll(rememberScrollState())) {</b>
-<b class="nc">&nbsp;                        SurferFilterChipRow(</b>
-<b class="nc">&nbsp;                            options = kind.choices,</b>
-<b class="nc">&nbsp;                            selected = row.effectiveValue,</b>
-<b class="nc">&nbsp;                            label = { it },</b>
-<b class="nc">&nbsp;                            onSelect = { choice -&gt; onEvent(DebugConfigEvent.OnOverride(row.name, choice)) },</b>
+<b class="fc">&nbsp;                    Row(modifier = Modifier.horizontalScroll(rememberScrollState())) {</b>
+<b class="fc">&nbsp;                        SurferFilterChipRow(</b>
+<b class="fc">&nbsp;                            options = kind.choices,</b>
+<b class="fc">&nbsp;                            selected = row.effectiveValue,</b>
+<b class="fc">&nbsp;                            label = { it },</b>
+<b class="fc">&nbsp;                            onSelect = { choice -&gt; onEvent(DebugConfigEvent.OnOverride(row.name, choice)) },</b>
+<b class="fc">&nbsp;                            optionTestTag = { choice -&gt; DebugConfigTestTags.choice(row.name, choice) },</b>
 &nbsp;                        )
-<b class="nc">&nbsp;                    }</b>
-<b class="nc">&nbsp;                }</b>
+<b class="fc">&nbsp;                    }</b>
+<b class="fc">&nbsp;                }</b>
 &nbsp;            },
-<b class="nc">&nbsp;            onClick = clearOverride,</b>
-<b class="nc">&nbsp;            multiline = true,</b>
-<b class="nc">&nbsp;            modifier = Modifier.testTag(DebugConfigTestTags.row(row.name)),</b>
+<b class="fc">&nbsp;            onClick = clearOverride,</b>
+<b class="fc">&nbsp;            multiline = true,</b>
+<b class="fc">&nbsp;            modifier = Modifier.testTag(DebugConfigTestTags.row(row.name)),</b>
 &nbsp;        )
 &nbsp;
 &nbsp;        // Free-form values (the encoded dashboard layout) are inspect-only: a text field here is a
 &nbsp;        // routine way to store something no codec can read back.
-<b class="nc">&nbsp;        ConfigDebugRowKind.FreeText -&gt; SurferSettingsRow(</b>
-<b class="nc">&nbsp;            icon = SurferIcons.Code,</b>
-<b class="nc">&nbsp;            title = row.name,</b>
-<b class="nc">&nbsp;            supporting = { ResolutionSummary(row) },</b>
-<b class="nc">&nbsp;            onClick = clearOverride,</b>
-<b class="nc">&nbsp;            multiline = true,</b>
-<b class="nc">&nbsp;            modifier = Modifier.testTag(DebugConfigTestTags.row(row.name)),</b>
+<b class="fc">&nbsp;        ConfigDebugRowKind.FreeText -&gt; SurferSettingsRow(</b>
+<b class="fc">&nbsp;            icon = SurferIcons.Code,</b>
+<b class="fc">&nbsp;            title = row.name,</b>
+<b class="fc">&nbsp;            supporting = { ResolutionSummary(row) },</b>
+<b class="fc">&nbsp;            onClick = clearOverride,</b>
+<b class="fc">&nbsp;            multiline = true,</b>
+<b class="fc">&nbsp;            modifier = Modifier.testTag(DebugConfigTestTags.row(row.name)),</b>
 &nbsp;        )
 <b class="nc">&nbsp;    }</b>
 <b class="fc">&nbsp;}</b>
@@ -416,7 +427,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;            style = AppTheme.typography.bodyMedium,</b>
 <b class="fc">&nbsp;            color = AppTheme.materialColors.onSurfaceVariant,</b>
 &nbsp;        )
-<b class="pc">&nbsp;        if (row.hostOwned) {</b>
+<b class="fc">&nbsp;        if (row.hostOwned) {</b>
 &nbsp;            // Overriding one of these makes the app believe it is a different build while its DI
 &nbsp;            // graph stays as compiled — worth saying out loud next to an ordinary feature flag.
 <b class="fc">&nbsp;            Text(</b>
@@ -424,12 +435,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;                style = AppTheme.typography.labelSmall,</b>
 <b class="fc">&nbsp;                color = AppTheme.materialColors.error,</b>
 &nbsp;            )
-<b class="nc">&nbsp;        }</b>
+<b class="fc">&nbsp;        }</b>
 <b class="fc">&nbsp;        row.layers.forEach { cell -&gt;</b>
 <b class="fc">&nbsp;            val rendered = when {</b>
-<b class="pc">&nbsp;                cell.undecodable -&gt;</b>
-<b class="nc">&nbsp;                    stringResource(Res.string.settings_debug_config_layer_undecodable_format, cell.value.orEmpty())</b>
-<b class="pc">&nbsp;                cell.value == null -&gt; stringResource(Res.string.settings_debug_config_layer_absent)</b>
+<b class="fc">&nbsp;                cell.undecodable -&gt;</b>
+<b class="pc">&nbsp;                    stringResource(Res.string.settings_debug_config_layer_undecodable_format, cell.value.orEmpty())</b>
+<b class="fc">&nbsp;                cell.value == null -&gt; stringResource(Res.string.settings_debug_config_layer_absent)</b>
 <b class="fc">&nbsp;                else -&gt; cell.value</b>
 &nbsp;            }
 <b class="fc">&nbsp;            Text(</b>
@@ -464,7 +475,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 15:14</div>
+    <div style="float:right;">generated on 2026-07-28 16:08</div>
 </div>
 </body>
 </html>

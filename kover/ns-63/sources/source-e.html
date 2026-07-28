@@ -1373,7 +1373,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/24)
+    (0/30)
   </span>
 </td>
 <td class="coverageStat">
@@ -1381,7 +1381,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/4)
+    (0/5)
   </span>
 </td>
 <td class="coverageStat">
@@ -1389,7 +1389,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/129)
+    (0/165)
   </span>
 </td>
   </tr>
@@ -2003,23 +2003,23 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/198)
+    (0/204)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    51.5%
+    51%
   </span>
   <span class="absValue">
-    (50/97)
+    (50/98)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    33.6%
+    32.9%
   </span>
   <span class="absValue">
-    (597/1778)
+    (597/1814)
   </span>
 </td>
 </tr>
@@ -2181,6 +2181,13 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;         * way, and two nullable id fields could disagree about which.
 &nbsp;         */
 <b class="nc">&nbsp;        val duplicate: Boolean = false,</b>
+&nbsp;        /**
+&nbsp;         * Open the form already switched to Transfer. Same request the account picker&#39;s &quot;transfer
+&nbsp;         * instead&quot; footer makes once the screen is open — a caller that already knows the user
+&nbsp;         * wants a transfer (the dashboard&#39;s quick actions) says so up front instead. The screen
+&nbsp;         * still runs it through the type switch, so a build with transfers off ignores it.
+&nbsp;         */
+<b class="nc">&nbsp;        val transfer: Boolean = false,</b>
 &nbsp;    ) : Route
 &nbsp;
 <b class="pc">&nbsp;    @Serializable</b>
@@ -2274,7 +2281,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 15:14</div>
+    <div style="float:right;">generated on 2026-07-28 16:08</div>
 </div>
 </body>
 </html>

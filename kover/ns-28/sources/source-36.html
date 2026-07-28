@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > GetTransactionsByCategoryUseCase</title>
+  <title>MoneySurfer Coverage Report > GetTransferCounterpartUseCase</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.usecase</a>
 </div>
 
-<h1>Coverage Summary for Class: GetTransactionsByCategoryUseCase (com.georgeci.moneysurfer.domain.usecase)</h1>
+<h1>Coverage Summary for Class: GetTransferCounterpartUseCase (com.georgeci.moneysurfer.domain.usecase)</h1>
 
 <table class="coverageStats">
 
@@ -46,21 +46,13 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">GetTransactionsByCategoryUseCase</td>
+  <td class="name">GetTransferCounterpartUseCase</td>
 <td class="coverageStat">
   <span class="percent">
     100%
   </span>
   <span class="absValue">
-    (4/4)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    50%
-  </span>
-  <span class="absValue">
-    (1/2)
+    (2/2)
   </span>
 </td>
 <td class="coverageStat">
@@ -68,33 +60,9 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (11/11)
+    (2/2)
   </span>
 </td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (19/19)
-  </span>
-</td>
-</tr>
-  <tr>
-    <td class="name">GetTransactionsByCategoryUseCase$Companion</td>
-    <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">GetTransactionsByCategoryUseCase$invoke$1$1</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -108,73 +76,22 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (23/23)
+    (39/39)
   </span>
 </td>
-  </tr>
+</tr>
   <tr>
-    <td class="name">GetTransactionsByCategoryUseCase$invoke$1$1$1</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    50%
-  </span>
-  <span class="absValue">
-    (1/2)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    84.6%
-  </span>
-  <span class="absValue">
-    (11/13)
-  </span>
-</td>
-  </tr>
-  <tr>
-    <td class="name">GetTransactionsByCategoryUseCase$invoke-ayLZWDE$$inlined$flatMapLatest$1</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
-  </span>
-</td>
+    <td class="name">GetTransferCounterpartUseCase$invoke$1</td>
     <td class="coverageStat"/>
   </tr>
 <tr>
   <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
-    85.7%
+    100%
   </span>
   <span class="absValue">
-    (6/7)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    50%
-  </span>
-  <span class="absValue">
-    (2/4)
+    (2/2)
   </span>
 </td>
 <td class="coverageStat">
@@ -182,15 +99,23 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (17/17)
+    (2/2)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    96.4%
+    100%
   </span>
   <span class="absValue">
-    (53/55)
+    (5/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (39/39)
   </span>
 </td>
 </tr>
@@ -203,61 +128,30 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.usecase
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.auth.SessionPointers
-&nbsp;import com.georgeci.moneysurfer.domain.model.CategoryTree
 &nbsp;import com.georgeci.moneysurfer.domain.model.Transaction
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryId
-&nbsp;import com.georgeci.moneysurfer.domain.repositories.CategoryRepository
 &nbsp;import com.georgeci.moneysurfer.domain.repositories.TransactionRepository
-&nbsp;import kotlinx.coroutines.ExperimentalCoroutinesApi
-&nbsp;import kotlinx.coroutines.flow.Flow
-&nbsp;import kotlinx.coroutines.flow.combine
-&nbsp;import kotlinx.coroutines.flow.flatMapLatest
-&nbsp;import kotlinx.coroutines.flow.flowOf
 &nbsp;import org.koin.core.annotation.Single
 &nbsp;
 &nbsp;/**
-&nbsp; * Newest-first transactions booked to [categoryId] **or anything below it**, capped at [limit].
+&nbsp; * The other leg of the transfer [transaction] belongs to, or `null` when it is not a transfer
+&nbsp; * at all or its pair is missing.
 &nbsp; *
-&nbsp; * Including the subtree matches how the rest of the app treats a parent: the detail screen&#39;s
-&nbsp; * headline number already rolls children up, so a recent list that showed only the parent&#39;s own
-&nbsp; * transactions would contradict the total sitting directly above it.
+&nbsp; * A transfer is two ordinary rows sharing a `transferId` — an `EXPENSE` on the source account
+&nbsp; * and an `INCOME` on the destination (see `CreateTransferUseCase`). Neither row knows the other
+&nbsp; * account, so anything that wants to say &quot;from X to Y&quot; has to resolve the sibling first.
 &nbsp; *
-&nbsp; * Filtering happens in memory over the workspace list rather than in SQL. That list is already
-&nbsp; * indexed and sorted for exactly this ordering, and it is the same read the dashboard and the
-&nbsp; * transactions list make — so this shares their cached flow instead of adding a third query
-&nbsp; * shape over the same table.
+&nbsp; * A missing pair is a legitimate state, not a bug to throw on: a leg can arrive from sync or a
+&nbsp; * CSV import before (or without) its counterpart.
 &nbsp; */
 <b class="fc">&nbsp;@Single</b>
-&nbsp;@OptIn(ExperimentalCoroutinesApi::class)
-&nbsp;class GetTransactionsByCategoryUseCase(
+&nbsp;class GetTransferCounterpartUseCase(
 <b class="fc">&nbsp;    private val transactionRepository: TransactionRepository,</b>
-<b class="fc">&nbsp;    private val categoryRepository: CategoryRepository,</b>
-<b class="fc">&nbsp;    private val session: SessionPointers,</b>
 &nbsp;) {
 &nbsp;
-&nbsp;    operator fun invoke(
-&nbsp;        categoryId: CategoryId,
-<b class="fc">&nbsp;        limit: Int = DEFAULT_LIMIT,</b>
-&nbsp;    ): Flow&lt;List&lt;Transaction&gt;&gt; =
-<b class="fc">&nbsp;        session.currentWorkspaceId.flatMapLatest { workspaceId -&gt;</b>
-<b class="pc">&nbsp;            workspaceId ?: return@flatMapLatest flowOf(emptyList())</b>
-&nbsp;
-<b class="fc">&nbsp;            combine(</b>
-<b class="fc">&nbsp;                transactionRepository.getByWorkspaceId(workspaceId),</b>
-<b class="fc">&nbsp;                categoryRepository.getByWorkspaceId(workspaceId),</b>
-&nbsp;            ) { transactions, categories -&gt;
-<b class="fc">&nbsp;                val subtree = CategoryTree.descendantsOf(categories, categoryId) + categoryId</b>
-<b class="fc">&nbsp;                transactions.asSequence()</b>
-<b class="pc">&nbsp;                    .filter { it.categoryId in subtree }</b>
-<b class="fc">&nbsp;                    .take(limit)</b>
-<b class="fc">&nbsp;                    .toList()</b>
-<b class="fc">&nbsp;            }</b>
-&nbsp;        }
-&nbsp;
-&nbsp;    companion object {
-&nbsp;        /** Enough to fill the detail screen&#39;s &quot;Recent&quot; block without becoming a second list screen. */
-&nbsp;        const val DEFAULT_LIMIT = 10
+&nbsp;    suspend operator fun invoke(transaction: Transaction): Transaction? {
+<b class="fc">&nbsp;        val transferId = transaction.transferId ?: return null</b>
+<b class="fc">&nbsp;        return transactionRepository.getByTransferId(transferId)</b>
+<b class="fc">&nbsp;            .firstOrNull { it.id != transaction.id }</b>
 &nbsp;    }
 &nbsp;}
 </code>
@@ -283,7 +177,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 15:14</div>
+    <div style="float:right;">generated on 2026-07-28 16:08</div>
 </div>
 </body>
 </html>

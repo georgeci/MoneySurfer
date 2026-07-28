@@ -68,7 +68,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/162)
+    (0/164)
   </span>
 </td>
 <td class="coverageStat">
@@ -76,7 +76,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/1727)
+    (0/1735)
   </span>
 </td>
 </tr>
@@ -235,7 +235,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/165)
+    (0/167)
   </span>
 </td>
 <td class="coverageStat">
@@ -243,7 +243,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/1754)
+    (0/1762)
   </span>
 </td>
 </tr>
@@ -287,6 +287,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.uikit.components.workspace.SurferCreateWorkspaceRow
 &nbsp;import com.georgeci.moneysurfer.uikit.components.workspace.SurferWorkspaceRow
 &nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
 &nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
 &nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
 &nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
@@ -430,6 +431,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="nc">&nbsp;            LazyColumn(</b>
 <b class="nc">&nbsp;                modifier = Modifier</b>
 <b class="nc">&nbsp;                    .fillMaxSize()</b>
+<b class="nc">&nbsp;                    .surferContentContainer()</b>
 <b class="nc">&nbsp;                    .padding(top = padding.calculateTopPadding()),</b>
 <b class="nc">&nbsp;                verticalArrangement = Arrangement.spacedBy(AppTheme.spacing.small),</b>
 <b class="nc">&nbsp;                contentPadding = PaddingValues(</b>
@@ -533,6 +535,9 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="nc">&nbsp;            .fillMaxWidth()</b>
 <b class="nc">&nbsp;            .background(AppTheme.materialColors.surface)</b>
 <b class="nc">&nbsp;            .navigationBarsPadding()</b>
+&nbsp;            // Background and system insets stay full-bleed; only the button takes the content cap,
+&nbsp;            // so it lines up with the list above instead of stretching across the window.
+<b class="nc">&nbsp;            .surferContentContainer()</b>
 <b class="nc">&nbsp;            .padding(horizontal = AppTheme.spacing.default)</b>
 <b class="nc">&nbsp;            .padding(top = AppTheme.spacing.medium, bottom = AppTheme.spacing.large),</b>
 &nbsp;    ) {
@@ -667,7 +672,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 15:14</div>
+    <div style="float:right;">generated on 2026-07-28 16:08</div>
 </div>
 </body>
 </html>

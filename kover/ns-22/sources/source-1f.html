@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > CurrencyTotalWithCount</title>
+  <title>MoneySurfer Coverage Report > CurrencyTotal</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.model</a>
 </div>
 
-<h1>Coverage Summary for Class: CurrencyTotalWithCount (com.georgeci.moneysurfer.domain.model)</h1>
+<h1>Coverage Summary for Class: CurrencyTotal (com.georgeci.moneysurfer.domain.model)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">CurrencyTotalWithCount</td>
+  <td class="name">CurrencyTotal</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -99,9 +99,9 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
 &nbsp;
 &nbsp;/** Sum of every account balance that shares [currencyCode]. */
-&nbsp;data class CurrencyTotal(
-&nbsp;    val currencyCode: CurrencyCode,
-&nbsp;    val amount: Money,
+<b class="fc">&nbsp;data class CurrencyTotal(</b>
+<b class="fc">&nbsp;    val currencyCode: CurrencyCode,</b>
+<b class="fc">&nbsp;    val amount: Money,</b>
 &nbsp;)
 &nbsp;
 &nbsp;/**
@@ -132,9 +132,9 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;        )
 &nbsp;        .map { it.total }
 &nbsp;
-<b class="fc">&nbsp;private data class CurrencyTotalWithCount(</b>
-<b class="fc">&nbsp;    val total: CurrencyTotal,</b>
-<b class="fc">&nbsp;    val accountCount: Int,</b>
+&nbsp;private data class CurrencyTotalWithCount(
+&nbsp;    val total: CurrencyTotal,
+&nbsp;    val accountCount: Int,
 &nbsp;)
 &nbsp;
 &nbsp;/** [totalsByCurrency] rendered for display, same order — head first, everything else after it. */
@@ -163,7 +163,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 15:14</div>
+    <div style="float:right;">generated on 2026-07-28 16:08</div>
 </div>
 </body>
 </html>

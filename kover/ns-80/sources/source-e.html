@@ -79,15 +79,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (34/34)
+    (35/35)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    98.4%
+    98.5%
   </span>
   <span class="absValue">
-    (371/377)
+    (407/413)
   </span>
 </td>
 </tr>
@@ -117,6 +117,8 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import androidx.compose.ui.Modifier
 &nbsp;import androidx.compose.ui.draw.clip
 &nbsp;import androidx.compose.ui.graphics.Color
+&nbsp;import androidx.compose.ui.semantics.selected
+&nbsp;import androidx.compose.ui.semantics.semantics
 &nbsp;import androidx.compose.ui.unit.dp
 &nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 &nbsp;import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
@@ -146,6 +148,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    }
 <b class="fc">&nbsp;    Row(</b>
 <b class="fc">&nbsp;        modifier = modifier</b>
+&nbsp;            // Without this, selection is a fill colour and a deliberately decorative check —
+&nbsp;            // nothing a screen reader, or a test, can read back. `this.` is load-bearing: the
+&nbsp;            // bare name inside `semantics {}` is the parameter, not the property.
+<b class="fc">&nbsp;            .semantics { this.selected = selected }</b>
 <b class="fc">&nbsp;            .height(32.dp)</b>
 <b class="fc">&nbsp;            .clip(RoundedCornerShape(10.dp))</b>
 <b class="fc">&nbsp;            .background(if (selected) AppTheme.materialColors.secondaryContainer else Color.Transparent)</b>
@@ -198,7 +204,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 15:14</div>
+    <div style="float:right;">generated on 2026-07-28 16:08</div>
 </div>
 </body>
 </html>

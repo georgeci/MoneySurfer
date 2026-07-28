@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SurferDashedBorderKt</title>
+  <title>MoneySurfer Coverage Report > SurferContentContainerKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.uikit.modifier</a>
 </div>
 
-<h1>Coverage Summary for Class: SurferDashedBorderKt (com.georgeci.moneysurfer.uikit.modifier)</h1>
+<h1>Coverage Summary for Class: SurferContentContainerKt (com.georgeci.moneysurfer.uikit.modifier)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SurferDashedBorderKt</td>
+  <td class="name">SurferContentContainerKt</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -60,34 +60,27 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
+    66.7%
+  </span>
+  <span class="absValue">
+    (2/3)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
     100%
   </span>
   <span class="absValue">
-    (2/2)
+    (6/6)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    50%
+    100%
   </span>
   <span class="absValue">
-    (1/2)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    80%
-  </span>
-  <span class="absValue">
-    (16/20)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    90.3%
-  </span>
-  <span class="absValue">
-    (121/134)
+    (35/35)
   </span>
 </td>
 </tr>
@@ -101,53 +94,51 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.modifier
 &nbsp;
-&nbsp;import androidx.compose.foundation.shape.RoundedCornerShape
+&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
+&nbsp;import androidx.compose.foundation.layout.widthIn
+&nbsp;import androidx.compose.foundation.layout.wrapContentWidth
+&nbsp;import androidx.compose.ui.Alignment
 &nbsp;import androidx.compose.ui.Modifier
-&nbsp;import androidx.compose.ui.draw.drawBehind
-&nbsp;import androidx.compose.ui.geometry.CornerRadius
-&nbsp;import androidx.compose.ui.geometry.Offset
-&nbsp;import androidx.compose.ui.geometry.Size
-&nbsp;import androidx.compose.ui.graphics.Color
-&nbsp;import androidx.compose.ui.graphics.PathEffect
-&nbsp;import androidx.compose.ui.graphics.Shape
-&nbsp;import androidx.compose.ui.graphics.drawscope.Stroke
 &nbsp;import androidx.compose.ui.unit.Dp
 &nbsp;import androidx.compose.ui.unit.dp
 &nbsp;
 &nbsp;/**
-&nbsp; * Draws a dashed outline inset by half the stroke so the whole line stays inside the bounds.
-&nbsp; * Shared by the dashed-card chrome and its satellite decorations (e.g. the &quot;+&quot; bubble) so a
-&nbsp; * single dash rhythm is used everywhere — do not hand-roll another `dashPathEffect`.
+&nbsp; * Widest a screen&#39;s content is allowed to get before it stops growing and starts centring.
+&nbsp; *
+&nbsp; * 840 dp is the Material 3 Expanded lower bound: below it the cap never engages, so phones and
+&nbsp; * small tablets are untouched, and above it a settings row or a transaction line keeps a readable
+&nbsp; * measure instead of stretching across the window. Screens that genuinely want more room (a wide
+&nbsp; * chart, a two-column form) pass their own value to [surferContentContainer].
 &nbsp; */
-&nbsp;fun Modifier.surferDashedBorder(
-&nbsp;    color: Color,
-&nbsp;    shape: Shape,
-<b class="nc">&nbsp;    strokeWidth: Dp = 1.5.dp,</b>
-<b class="nc">&nbsp;    dashLength: Dp = 6.dp,</b>
-<b class="nc">&nbsp;    dashGap: Dp = 4.dp,</b>
-<b class="fc">&nbsp;): Modifier = this.drawBehind {</b>
-<b class="fc">&nbsp;    val stroke = strokeWidth.toPx()</b>
-<b class="fc">&nbsp;    val inset = stroke / 2f</b>
-&nbsp;    // CircleShape is a percent-based RoundedCornerShape, so it resolves here too.
-<b class="fc">&nbsp;    val cornerRadius = when (shape) {</b>
-<b class="pc">&nbsp;        is RoundedCornerShape -&gt; shape.topStart.toPx(Size(size.width, size.height), this)</b>
-<b class="nc">&nbsp;        else -&gt; 0f</b>
-&nbsp;    }
-&nbsp;    // A box narrower than its own stroke would otherwise draw an inverted rect.
-<b class="fc">&nbsp;    val innerWidth = (size.width - stroke).coerceAtLeast(0f)</b>
-<b class="fc">&nbsp;    val innerHeight = (size.height - stroke).coerceAtLeast(0f)</b>
-<b class="fc">&nbsp;    val innerRadius = (cornerRadius - inset).coerceAtLeast(0f)</b>
-<b class="fc">&nbsp;    drawRoundRect(</b>
-<b class="fc">&nbsp;        color = color,</b>
-<b class="fc">&nbsp;        topLeft = Offset(inset, inset),</b>
-<b class="fc">&nbsp;        size = Size(innerWidth, innerHeight),</b>
-<b class="fc">&nbsp;        cornerRadius = CornerRadius(innerRadius, innerRadius),</b>
-<b class="fc">&nbsp;        style = Stroke(</b>
-<b class="fc">&nbsp;            width = stroke,</b>
-<b class="fc">&nbsp;            pathEffect = PathEffect.dashPathEffect(floatArrayOf(dashLength.toPx(), dashGap.toPx()), 0f),</b>
-&nbsp;        ),
-&nbsp;    )
-&nbsp;}
+<b class="fc">&nbsp;val SurferContentMaxWidth: Dp = 840.dp</b>
+&nbsp;
+&nbsp;/**
+&nbsp; * Caps content at [maxWidth] and centres it horizontally in whatever space the parent offers.
+&nbsp; *
+&nbsp; * Apply at a screen&#39;s content root, *before* the padding and scrolling modifiers, so the cap
+&nbsp; * bounds the content rather than the window:
+&nbsp; *
+&nbsp; * ```
+&nbsp; * Column(
+&nbsp; *     modifier = Modifier
+&nbsp; *         .fillMaxSize()
+&nbsp; *         .surferContentContainer()
+&nbsp; *         .padding(padding)
+&nbsp; *         .verticalScroll(rememberScrollState()),
+&nbsp; * )
+&nbsp; * ```
+&nbsp; *
+&nbsp; * The chain is a no-op whenever the parent is narrower than [maxWidth]: [fillMaxWidth] pins the
+&nbsp; * outer width, [wrapContentWidth] relaxes the child&#39;s minimum so it can be narrower and centres
+&nbsp; * whatever comes back, [widthIn] applies the cap, and the trailing [fillMaxWidth] hands the child
+&nbsp; * the same *fixed* width it used to get — so content that relied on filling its parent keeps
+&nbsp; * filling it, just within the cap.
+&nbsp; */
+<b class="fc">&nbsp;fun Modifier.surferContentContainer(maxWidth: Dp = SurferContentMaxWidth): Modifier = this</b>
+<b class="fc">&nbsp;    .fillMaxWidth()</b>
+<b class="fc">&nbsp;    .wrapContentWidth(Alignment.CenterHorizontally)</b>
+<b class="fc">&nbsp;    .widthIn(max = maxWidth)</b>
+<b class="fc">&nbsp;    .fillMaxWidth()</b>
 </code>
 </pre>
 </div>
@@ -171,7 +162,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 15:14</div>
+    <div style="float:right;">generated on 2026-07-28 16:08</div>
 </div>
 </body>
 </html>

@@ -134,6 +134,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsSwitch
 &nbsp;import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsValuePill
 &nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
 &nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
 &nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
 &nbsp;import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
@@ -235,6 +236,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    Column(
 &nbsp;        modifier = Modifier
 &nbsp;            .fillMaxSize()
+&nbsp;            .surferContentContainer()
 &nbsp;            .padding(padding)
 &nbsp;            .padding(horizontal = 16.dp),
 &nbsp;        verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -271,6 +273,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;        state = listState,
 &nbsp;        modifier = Modifier
 &nbsp;            .fillMaxSize()
+&nbsp;            .surferContentContainer()
 &nbsp;            .padding(top = padding.calculateTopPadding()),
 &nbsp;        contentPadding = PaddingValues(
 &nbsp;            start = 16.dp,
@@ -439,6 +442,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;
 &nbsp;private fun DashboardWidgetType.icon(): ImageVector = when (this) {
 &nbsp;    DashboardWidgetType.Balance -&gt; SurferIcons.Wallet
+&nbsp;    DashboardWidgetType.QuickActions -&gt; SurferIcons.Bolt
 &nbsp;    DashboardWidgetType.Accounts -&gt; SurferIcons.Bank
 &nbsp;    DashboardWidgetType.Goals -&gt; SurferIcons.Savings
 &nbsp;    DashboardWidgetType.RecentTransactions -&gt; SurferIcons.Receipt
@@ -479,7 +483,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 15:14</div>
+    <div style="float:right;">generated on 2026-07-28 16:08</div>
 </div>
 </body>
 </html>

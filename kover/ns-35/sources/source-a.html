@@ -82,6 +82,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.uikit.components.budget.SurferBudgetCardMetrics
 &nbsp;import com.georgeci.moneysurfer.uikit.components.budget.SurferBudgetCategoryVisual
 &nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
 &nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
 &nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
 &nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
@@ -172,6 +173,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;            Box(
 &nbsp;                modifier = Modifier
 &nbsp;                    .fillMaxSize()
+&nbsp;                    .surferContentContainer()
 &nbsp;                    .padding(padding)
 &nbsp;                    .padding(horizontal = AppTheme.spacing.large),
 &nbsp;                contentAlignment = Alignment.Center,
@@ -189,6 +191,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;        LazyColumn(
 &nbsp;            modifier = Modifier
 &nbsp;                .fillMaxSize()
+&nbsp;                .surferContentContainer()
 &nbsp;                .padding(top = padding.calculateTopPadding())
 &nbsp;                .testTag(BudgetsTestTags.List),
 &nbsp;            contentPadding = PaddingValues(
@@ -367,7 +370,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 15:14</div>
+    <div style="float:right;">generated on 2026-07-28 16:08</div>
 </div>
 </body>
 </html>

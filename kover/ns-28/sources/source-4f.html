@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SignupUseCase</title>
+  <title>MoneySurfer Coverage Report > UpdateAccountUseCase</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.usecase</a>
 </div>
 
-<h1>Coverage Summary for Class: SignupUseCase (com.georgeci.moneysurfer.domain.usecase)</h1>
+<h1>Coverage Summary for Class: UpdateAccountUseCase (com.georgeci.moneysurfer.domain.usecase)</h1>
 
 <table class="coverageStats">
 
@@ -46,7 +46,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SignupUseCase</td>
+  <td class="name">UpdateAccountUseCase</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -57,10 +57,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    50%
+    100%
   </span>
   <span class="absValue">
-    (1/2)
+    (2/2)
   </span>
 </td>
 <td class="coverageStat">
@@ -68,7 +68,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (24/24)
+    (8/8)
   </span>
 </td>
 <td class="coverageStat">
@@ -76,12 +76,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (297/297)
+    (105/105)
   </span>
 </td>
 </tr>
   <tr>
-    <td class="name">SignupUseCase$invoke$1</td>
+    <td class="name">UpdateAccountUseCase$invoke$1</td>
     <td class="coverageStat"/>
   </tr>
 <tr>
@@ -96,10 +96,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    50%
+    100%
   </span>
   <span class="absValue">
-    (1/2)
+    (2/2)
   </span>
 </td>
 <td class="coverageStat">
@@ -107,7 +107,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (24/24)
+    (8/8)
   </span>
 </td>
 <td class="coverageStat">
@@ -115,7 +115,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (297/297)
+    (105/105)
   </span>
 </td>
 </tr>
@@ -130,51 +130,29 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;
 &nbsp;import arrow.core.Either
 &nbsp;import arrow.core.raise.either
-&nbsp;import com.georgeci.moneysurfer.domain.auth.AuthError
-&nbsp;import com.georgeci.moneysurfer.domain.auth.AuthLocalRepository
-&nbsp;import com.georgeci.moneysurfer.domain.auth.SessionMutator
-&nbsp;import com.georgeci.moneysurfer.domain.repositories.AuthRemoteRepository
+&nbsp;import com.georgeci.moneysurfer.domain.model.Account
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.AccountId
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.AccountRepository
 &nbsp;import org.koin.core.annotation.Single
 &nbsp;
+&nbsp;/**
+&nbsp; * Applies [edit] to the stored account. The caller never assembles the row itself — currency,
+&nbsp; * balance and archive state are owned by other flows, so an editor that copied a stale snapshot
+&nbsp; * back could roll them back.
+&nbsp; */
 <b class="fc">&nbsp;@Single</b>
-&nbsp;@Suppress(&quot;LongParameterList&quot;)
-&nbsp;class SignupUseCase(
-<b class="fc">&nbsp;    private val authRemoteRepository: AuthRemoteRepository,</b>
-<b class="fc">&nbsp;    private val authLocalRepository: AuthLocalRepository,</b>
-<b class="fc">&nbsp;    private val sessionMutator: SessionMutator,</b>
-<b class="fc">&nbsp;    private val wipeDemoDataUseCase: WipeDemoDataUseCase,</b>
-<b class="fc">&nbsp;    private val postAuthBootstrap: PostAuthBootstrapUseCase,</b>
-<b class="fc">&nbsp;    private val abandonAuthSession: AbandonAuthSessionUseCase,</b>
+&nbsp;class UpdateAccountUseCase(
+<b class="fc">&nbsp;    private val accountRepository: AccountRepository,</b>
 &nbsp;) {
 &nbsp;    suspend operator fun invoke(
-&nbsp;        email: String,
-&nbsp;        password: String,
-<b class="fc">&nbsp;    ): Either&lt;AuthError, PostAuthBootstrapUseCase.Result&gt; = either {</b>
-<b class="fc">&nbsp;        val trimmed = email.trim()</b>
-<b class="pc">&nbsp;        val displayName = trimmed.ifBlank { null }</b>
-&nbsp;
-<b class="fc">&nbsp;        val uid = authRemoteRepository.createUserWithEmail(trimmed, password).bind()</b>
-&nbsp;
-&nbsp;        // Drop any demo data BEFORE pinning the real session (sync.md §2.11).
-<b class="fc">&nbsp;        wipeDemoDataUseCase()</b>
-&nbsp;
-<b class="fc">&nbsp;        authLocalRepository.createLocalUser(</b>
-<b class="fc">&nbsp;            uid = uid,</b>
-<b class="fc">&nbsp;            email = trimmed,</b>
-<b class="fc">&nbsp;            displayName = displayName,</b>
-<b class="fc">&nbsp;            isAnon = false,</b>
-&nbsp;        )
-<b class="fc">&nbsp;        sessionMutator.setFirebaseUid(uid)</b>
-&nbsp;
-&nbsp;        // Roll the pointers back when the bootstrap fails — see [LoginUseCase] for why the
-&nbsp;        // pins cannot simply be deferred until after it (issue #342).
-<b class="fc">&nbsp;        postAuthBootstrap(</b>
-<b class="fc">&nbsp;            uid = uid,</b>
-<b class="fc">&nbsp;            email = trimmed,</b>
-<b class="fc">&nbsp;            displayName = displayName,</b>
-<b class="fc">&nbsp;            isAnon = false,</b>
-<b class="fc">&nbsp;        ).onLeft { abandonAuthSession(isAnon = false) }.bind()</b>
-&nbsp;    }
+&nbsp;        id: AccountId,
+&nbsp;        edit: (Account) -&gt; Account,
+<b class="fc">&nbsp;    ): Either&lt;AccountActionError, Unit&gt; = either {</b>
+<b class="fc">&nbsp;        val existing = accountRepository.getById(id) ?: raise(AccountActionError.AccountNotFound)</b>
+<b class="fc">&nbsp;        Either.catch { accountRepository.update(edit(existing)) }</b>
+<b class="fc">&nbsp;            .mapLeft { AccountActionError.LocalWriteFailed(it) }</b>
+<b class="fc">&nbsp;            .bind()</b>
+<b class="fc">&nbsp;    }</b>
 &nbsp;}
 </code>
 </pre>
@@ -199,7 +177,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 15:14</div>
+    <div style="float:right;">generated on 2026-07-28 16:08</div>
 </div>
 </body>
 </html>

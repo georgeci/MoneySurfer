@@ -49,39 +49,39 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   <td class="name">CategorySpendRepositoryImpl</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/3)
+    (3/3)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    62.5%
   </span>
   <span class="absValue">
-    (0/6)
+    (5/8)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/16)
+    (17/17)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    93.7%
   </span>
   <span class="absValue">
-    (0/90)
+    (89/95)
   </span>
 </td>
 </tr>
   <tr>
-    <td class="name">CategorySpendRepositoryImpl$monthlyTotals-DlrFMEg$$inlined$map$1</td>
+    <td class="name">CategorySpendRepositoryImpl$monthlyTotals-Bjg8v0k$$inlined$map$1</td>
 <td class="coverageStat">
   <span class="percent">
     0%
@@ -93,11 +93,11 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <td class="coverageStat"/>
   </tr>
   <tr>
-    <td class="name">CategorySpendRepositoryImpl$monthlyTotals-DlrFMEg$$inlined$map$1$1</td>
+    <td class="name">CategorySpendRepositoryImpl$monthlyTotals-Bjg8v0k$$inlined$map$1$1</td>
     <td class="coverageStat"/>
   </tr>
   <tr>
-    <td class="name">CategorySpendRepositoryImpl$monthlyTotals-DlrFMEg$$inlined$map$1$2</td>
+    <td class="name">CategorySpendRepositoryImpl$monthlyTotals-Bjg8v0k$$inlined$map$1$2</td>
 <td class="coverageStat">
   <span class="percent">
     0%
@@ -109,41 +109,41 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <td class="coverageStat"/>
   </tr>
   <tr>
-    <td class="name">CategorySpendRepositoryImpl$monthlyTotals-DlrFMEg$$inlined$map$1$2$1</td>
+    <td class="name">CategorySpendRepositoryImpl$monthlyTotals-Bjg8v0k$$inlined$map$1$2$1</td>
     <td class="coverageStat"/>
   </tr>
 <tr>
   <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    50%
   </span>
   <span class="absValue">
-    (0/6)
+    (3/6)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    62.5%
   </span>
   <span class="absValue">
-    (0/6)
+    (5/8)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/16)
+    (17/17)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    93.7%
   </span>
   <span class="absValue">
-    (0/90)
+    (89/95)
   </span>
 </td>
 </tr>
@@ -161,6 +161,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.domain.model.CategoryMonthlyTotal
 &nbsp;import com.georgeci.moneysurfer.domain.model.next
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionType
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
@@ -171,43 +172,47 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import kotlinx.datetime.YearMonth
 &nbsp;import org.koin.core.annotation.Single
 &nbsp;
-<b class="nc">&nbsp;@Single(binds = [CategorySpendRepository::class])</b>
+<b class="fc">&nbsp;@Single(binds = [CategorySpendRepository::class])</b>
 &nbsp;class CategorySpendRepositoryImpl(
-<b class="nc">&nbsp;    private val dao: TransactionDao,</b>
+<b class="fc">&nbsp;    private val dao: TransactionDao,</b>
 &nbsp;) : CategorySpendRepository {
 &nbsp;
 &nbsp;    override fun monthlyTotals(
 &nbsp;        workspaceId: WorkspaceId,
 &nbsp;        categoryIds: List&lt;CategoryId&gt;,
 &nbsp;        type: TransactionType,
+&nbsp;        baseCurrency: CurrencyCode?,
 &nbsp;        fromMonth: YearMonth,
 &nbsp;        toMonth: YearMonth,
 &nbsp;    ): Flow&lt;List&lt;CategoryMonthlyTotal&gt;&gt; {
 &nbsp;        // `IN ()` is a syntax error in SQLite, and an empty subtree is a normal state — a
 &nbsp;        // category can be deleted out from under an open detail screen.
-<b class="nc">&nbsp;        if (categoryIds.isEmpty()) return flowOf(emptyList())</b>
+<b class="pc">&nbsp;        if (categoryIds.isEmpty()) return flowOf(emptyList())</b>
 &nbsp;
-<b class="nc">&nbsp;        return dao.getMonthlyTotalsByCategory(</b>
-<b class="nc">&nbsp;            workspaceId = workspaceId.value,</b>
-<b class="nc">&nbsp;            categoryIds = categoryIds.map { it.value },</b>
-<b class="nc">&nbsp;            type = type.name,</b>
-<b class="nc">&nbsp;            fromDate = fromMonth.firstDay.toString(),</b>
-<b class="nc">&nbsp;            toDateExclusive = toMonth.next().firstDay.toString(),</b>
-<b class="nc">&nbsp;        ).map { rows -&gt; rows.mapNotNull { it.toDomain() } }</b>
+<b class="fc">&nbsp;        return dao.getMonthlyTotalsByCategory(</b>
+<b class="fc">&nbsp;            workspaceId = workspaceId.value,</b>
+<b class="fc">&nbsp;            categoryIds = categoryIds.map { it.value },</b>
+<b class="fc">&nbsp;            type = type.name,</b>
+<b class="fc">&nbsp;            baseCurrency = baseCurrency?.value,</b>
+<b class="fc">&nbsp;            fromDate = fromMonth.firstDay.toString(),</b>
+<b class="fc">&nbsp;            toDateExclusive = toMonth.next().firstDay.toString(),</b>
+<b class="fc">&nbsp;        ).map { rows -&gt; rows.mapNotNull { it.toDomain() } }</b>
 &nbsp;    }
 &nbsp;
 &nbsp;    /**
 &nbsp;     * Null for a row whose `month` will not parse. `substr` cannot produce one from a valid
-&nbsp;     * `operationDate`, but the column is a plain string an older or foreign writer could have
-&nbsp;     * put anything in, and dropping one unreadable month beats failing the whole screen.
+&nbsp;     * `operationDate`, and since the query joined the shared spend predicate it cannot see an
+&nbsp;     * invalid one either — `operationDate = date(operationDate)` admits only canonical dates. Kept
+&nbsp;     * as a second line because the column is a plain string one predicate change away from letting
+&nbsp;     * something else through, and dropping one unreadable month beats failing the whole screen.
 &nbsp;     */
 &nbsp;    private fun CategoryMonthlyTotalEntity.toDomain(): CategoryMonthlyTotal? {
-<b class="nc">&nbsp;        val parsed = runCatching { YearMonth.parse(month) }.getOrNull() ?: return null</b>
-<b class="nc">&nbsp;        return CategoryMonthlyTotal(</b>
-<b class="nc">&nbsp;            categoryId = CategoryId(categoryId),</b>
-<b class="nc">&nbsp;            month = parsed,</b>
-<b class="nc">&nbsp;            total = Money.fromMinor(totalMinor),</b>
-<b class="nc">&nbsp;            transactionCount = transactionCount,</b>
+<b class="pc">&nbsp;        val parsed = runCatching { YearMonth.parse(month) }.getOrNull() ?: return null</b>
+<b class="fc">&nbsp;        return CategoryMonthlyTotal(</b>
+<b class="fc">&nbsp;            categoryId = CategoryId(categoryId),</b>
+<b class="fc">&nbsp;            month = parsed,</b>
+<b class="fc">&nbsp;            total = Money.fromMinor(totalMinor),</b>
+<b class="fc">&nbsp;            transactionCount = transactionCount,</b>
 &nbsp;        )
 &nbsp;    }
 &nbsp;}
@@ -234,7 +239,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 15:14</div>
+    <div style="float:right;">generated on 2026-07-28 16:08</div>
 </div>
 </body>
 </html>

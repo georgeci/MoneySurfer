@@ -60,7 +60,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/68)
+    (0/70)
   </span>
 </td>
 <td class="coverageStat">
@@ -68,7 +68,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/111)
+    (0/116)
   </span>
 </td>
 <td class="coverageStat">
@@ -76,7 +76,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/1562)
+    (0/1660)
   </span>
 </td>
 </tr>
@@ -171,7 +171,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/68)
+    (0/70)
   </span>
 </td>
 <td class="coverageStat">
@@ -179,7 +179,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/112)
+    (0/117)
   </span>
 </td>
 <td class="coverageStat">
@@ -187,7 +187,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/1572)
+    (0/1670)
   </span>
 </td>
 </tr>
@@ -226,6 +226,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import androidx.lifecycle.compose.collectAsStateWithLifecycle
 &nbsp;import com.georgeci.moneysurfer.uikit.atom.SurferCard
 &nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
+&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
 &nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
 &nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
 &nbsp;import com.georgeci.moneysurfer.utils.HandleSideEffect
@@ -292,7 +293,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;@Composable
 <b class="nc">&nbsp;private fun LicensesError(padding: PaddingValues) {</b>
 <b class="nc">&nbsp;    Box(</b>
-<b class="nc">&nbsp;        modifier = Modifier.fillMaxSize().padding(padding),</b>
+<b class="nc">&nbsp;        modifier = Modifier.fillMaxSize().surferContentContainer().padding(padding),</b>
 <b class="nc">&nbsp;        contentAlignment = Alignment.Center,</b>
 &nbsp;    ) {
 <b class="nc">&nbsp;        Text(</b>
@@ -312,7 +313,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    onEvent: (LicensesEvent) -&gt; Unit,
 <b class="nc">&nbsp;) {</b>
 <b class="nc">&nbsp;    LazyColumn(</b>
-<b class="nc">&nbsp;        modifier = Modifier.fillMaxSize().padding(top = padding.calculateTopPadding()),</b>
+<b class="nc">&nbsp;        modifier = Modifier.fillMaxSize().surferContentContainer().padding(top = padding.calculateTopPadding()),</b>
 <b class="nc">&nbsp;        contentPadding = PaddingValues(</b>
 <b class="nc">&nbsp;            start = 16.dp,</b>
 <b class="nc">&nbsp;            end = 16.dp,</b>
@@ -325,7 +326,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="nc">&nbsp;            Text(</b>
 <b class="nc">&nbsp;                text = stringResource(</b>
 <b class="nc">&nbsp;                    Res.string.settings_licenses_summary_format,</b>
-<b class="nc">&nbsp;                    state.libraries.size,</b>
+<b class="nc">&nbsp;                    state.libraries.sumOf { it.artifacts.size },</b>
 &nbsp;                ),
 <b class="nc">&nbsp;                style = AppTheme.typography.bodySmall,</b>
 <b class="nc">&nbsp;                color = AppTheme.materialColors.onSurfaceVariant,</b>
@@ -385,6 +386,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="nc">&nbsp;            }</b>
 <b class="nc">&nbsp;            AnimatedVisibility(visible = expanded) {</b>
 <b class="nc">&nbsp;                Column {</b>
+<b class="nc">&nbsp;                    Spacer(Modifier.height(10.dp))</b>
+<b class="nc">&nbsp;                    Text(</b>
+<b class="nc">&nbsp;                        text = library.artifacts.joinToString(separator = &quot;\n&quot;),</b>
+<b class="nc">&nbsp;                        style = AppTheme.typography.bodySmall,</b>
+<b class="nc">&nbsp;                        color = colors.onSurfaceVariant,</b>
+&nbsp;                    )
 <b class="nc">&nbsp;                    library.licenses.forEach { license -&gt;</b>
 <b class="nc">&nbsp;                        license.content?.let { content -&gt;</b>
 <b class="nc">&nbsp;                            Spacer(Modifier.height(10.dp))</b>
@@ -423,7 +430,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 15:14</div>
+    <div style="float:right;">generated on 2026-07-28 16:08</div>
 </div>
 </body>
 </html>

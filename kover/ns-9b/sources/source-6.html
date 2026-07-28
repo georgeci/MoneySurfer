@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > Koin_hints_com_georgeci_moneysurfer_sync_internal_di_SyncModuleKt</title>
+  <title>MoneySurfer Coverage Report > SavingsGoalRepository</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">org.koin.plugin.hints</a>
+    <a href="../index.html">com.georgeci.moneysurfer.domain.repositories</a>
 </div>
 
-<h1>Coverage Summary for Class: Koin_hints_com_georgeci_moneysurfer_sync_internal_di_SyncModuleKt (org.koin.plugin.hints)</h1>
+<h1>Coverage Summary for Class: SavingsGoalRepository (com.georgeci.moneysurfer.domain.repositories)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">Koin_hints_com_georgeci_moneysurfer_sync_internal_di_SyncModuleKt</td>
+  <td class="name">SavingsGoalRepository</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -42,7 +42,33 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <br/>
 <br/>
 
-  <code class="sourceCode">Source code is not available<br /></code>
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.repositories
+&nbsp;
+&nbsp;import com.georgeci.moneysurfer.domain.model.SavingsGoal
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.GoalId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
+&nbsp;import kotlinx.coroutines.flow.Flow
+&nbsp;
+&nbsp;interface SavingsGoalRepository {
+&nbsp;    fun getByWorkspaceId(workspaceId: WorkspaceId): Flow&lt;List&lt;SavingsGoal&gt;&gt;
+&nbsp;    suspend fun getById(id: GoalId): SavingsGoal?
+&nbsp;
+&nbsp;    /** Emits `null` once the goal is deleted. */
+&nbsp;    fun observeById(id: GoalId): Flow&lt;SavingsGoal?&gt;
+&nbsp;    suspend fun insert(goal: SavingsGoal)
+&nbsp;    suspend fun update(goal: SavingsGoal)
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Hard-deletes the goal and, through Room&#39;s cascade, its contributions.
+&nbsp;     * Contribution deletes are enqueued on the outbox explicitly — Firestore has
+&nbsp;     * no cascade, so silently dropped local rows would leave remote orphans.
+&nbsp;     */
+&nbsp;    suspend fun delete(id: GoalId)
+&nbsp;}
+</code>
+</pre>
 </div>
 
 <script type="text/javascript">
@@ -64,7 +90,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 15:14</div>
+    <div style="float:right;">generated on 2026-07-28 16:08</div>
 </div>
 </body>
 </html>

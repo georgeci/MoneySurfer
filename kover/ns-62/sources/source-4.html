@@ -125,6 +125,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.uikit.components.workspace.SurferCreateWorkspaceRow
 &nbsp;import com.georgeci.moneysurfer.uikit.components.workspace.SurferWorkspaceRow
 &nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
 &nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
 &nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
 &nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
@@ -268,6 +269,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;            LazyColumn(
 &nbsp;                modifier = Modifier
 &nbsp;                    .fillMaxSize()
+&nbsp;                    .surferContentContainer()
 &nbsp;                    .padding(top = padding.calculateTopPadding()),
 &nbsp;                verticalArrangement = Arrangement.spacedBy(AppTheme.spacing.small),
 &nbsp;                contentPadding = PaddingValues(
@@ -371,6 +373,9 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;            .fillMaxWidth()
 &nbsp;            .background(AppTheme.materialColors.surface)
 &nbsp;            .navigationBarsPadding()
+&nbsp;            // Background and system insets stay full-bleed; only the button takes the content cap,
+&nbsp;            // so it lines up with the list above instead of stretching across the window.
+&nbsp;            .surferContentContainer()
 &nbsp;            .padding(horizontal = AppTheme.spacing.default)
 &nbsp;            .padding(top = AppTheme.spacing.medium, bottom = AppTheme.spacing.large),
 &nbsp;    ) {
@@ -505,7 +510,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 15:14</div>
+    <div style="float:right;">generated on 2026-07-28 16:08</div>
 </div>
 </body>
 </html>

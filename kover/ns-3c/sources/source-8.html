@@ -65,7 +65,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (14/14)
+    (15/15)
   </span>
 </td>
 <td class="coverageStat">
@@ -73,7 +73,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (76/76)
+    (83/83)
   </span>
 </td>
   </tr>
@@ -125,7 +125,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (15/15)
+    (16/16)
   </span>
 </td>
 <td class="coverageStat">
@@ -133,7 +133,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (78/78)
+    (85/85)
   </span>
 </td>
 </tr>
@@ -189,6 +189,8 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;
 &nbsp;    private val isOffline: Boolean = hostCapabilities.isOffline
 &nbsp;
+&nbsp;    private val transferEnabled: Boolean = hostCapabilities.transferEnabled
+&nbsp;
 &nbsp;    /**
 &nbsp;     * Widget order and visibility. Normalized again here so the screen renders a sound layout
 &nbsp;     * whatever supplies the pref — the DataStore-backed binding already normalizes on decode, but
@@ -216,6 +218,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;            DashboardEvent.OnAddTransactionClick -&gt; postSideEffect(
 &nbsp;                DashboardEffect.NavigateToTransactionCreation(accountId = null),
 &nbsp;            )
+&nbsp;            DashboardEvent.OnTransferClick -&gt; postSideEffect(DashboardEffect.NavigateToTransferCreation)
 &nbsp;            is DashboardEvent.OnAddTransactionForAccountClick -&gt;
 &nbsp;                postSideEffect(DashboardEffect.NavigateToTransactionCreation(accountId = event.accountId))
 &nbsp;            DashboardEvent.OnManageAccountsClick -&gt; postSideEffect(DashboardEffect.NavigateToAccountsManage)
@@ -251,6 +254,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;                    formattedTrendDelta = null,
 &nbsp;                    goals = goals.take(DASHBOARD_GOALS_LIMIT).map { it.toUi() },
 &nbsp;                    isOffline = isOffline,
+&nbsp;                    transferEnabled = transferEnabled,
 &nbsp;                    layout = layoutConfig,
 &nbsp;                )
 &nbsp;            }.collect { newContent -&gt; updateState { newContent } }
@@ -349,6 +353,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;        val formattedTrendDelta: String?,</b>
 <b class="fc">&nbsp;        val goals: List&lt;GoalUi&gt; = emptyList(),</b>
 <b class="fc">&nbsp;        val isOffline: Boolean = false,</b>
+&nbsp;        /**
+&nbsp;         * Whether this build offers multi-account transfers. The quick-actions widget is the only
+&nbsp;         * thing that reads it: half of that widget is a Transfer button, and a build with transfers
+&nbsp;         * off has no form to send it to.
+&nbsp;         */
+<b class="fc">&nbsp;        val transferEnabled: Boolean = false,</b>
 &nbsp;        /** Which widgets the screen renders, in order. */
 <b class="fc">&nbsp;        val layout: DashboardLayoutConfig = DashboardLayoutConfig.DEFAULT,</b>
 &nbsp;    ) : DashboardState {
@@ -401,6 +411,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    data class OnTransactionClick(val transactionId: TransactionId) : DashboardEvent
 &nbsp;    data object OnAddAccountClick : DashboardEvent
 &nbsp;    data object OnAddTransactionClick : DashboardEvent
+&nbsp;    data object OnTransferClick : DashboardEvent
 &nbsp;    data object OnSeeAllTransactionsClick : DashboardEvent
 &nbsp;    data class OnAddTransactionForAccountClick(val accountId: AccountId) : DashboardEvent
 &nbsp;    data object OnManageAccountsClick : DashboardEvent
@@ -416,6 +427,9 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    data object NavigateToAccountCreation : DashboardEffect
 &nbsp;    data object NavigateToAccountsManage : DashboardEffect
 &nbsp;    data class NavigateToTransactionCreation(val accountId: AccountId?) : DashboardEffect
+&nbsp;
+&nbsp;    /** The same creation screen, opened on its Transfer tab rather than the default expense one. */
+&nbsp;    data object NavigateToTransferCreation : DashboardEffect
 &nbsp;    data object NavigateToSettings : DashboardEffect
 &nbsp;    data object NavigateToCustomize : DashboardEffect
 &nbsp;    data object NavigateToTransactionsList : DashboardEffect
@@ -450,7 +464,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 15:14</div>
+    <div style="float:right;">generated on 2026-07-28 16:08</div>
 </div>
 </body>
 </html>

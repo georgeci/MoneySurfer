@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > UserRepositoryImpl</title>
+  <title>MoneySurfer Coverage Report > UserAccountDeletionRepositoryImpl</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.data.repository</a>
 </div>
 
-<h1>Coverage Summary for Class: UserRepositoryImpl (com.georgeci.moneysurfer.data.repository)</h1>
+<h1>Coverage Summary for Class: UserAccountDeletionRepositoryImpl (com.georgeci.moneysurfer.data.repository)</h1>
 
 <table class="coverageStats">
 
@@ -46,42 +46,42 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">UserRepositoryImpl</td>
+  <td class="name">UserAccountDeletionRepositoryImpl</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/7)
+    (7/7)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    83.3%
   </span>
   <span class="absValue">
-    (0/2)
+    (20/24)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/8)
+    (44/44)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    99.1%
   </span>
   <span class="absValue">
-    (0/56)
+    (629/635)
   </span>
 </td>
 </tr>
   <tr>
-    <td class="name">UserRepositoryImpl$getAll$$inlined$map$1</td>
+    <td class="name">UserAccountDeletionRepositoryImpl$Companion</td>
 <td class="coverageStat">
   <span class="percent">
     0%
@@ -91,63 +91,71 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   </span>
 </td>
     <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">UserRepositoryImpl$getAll$$inlined$map$1$1</td>
-    <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">UserRepositoryImpl$getAll$$inlined$map$1$2</td>
 <td class="coverageStat">
   <span class="percent">
     0%
   </span>
   <span class="absValue">
-    (0/1)
+    (0/2)
   </span>
 </td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">UserAccountDeletionRepositoryImpl$deleteEmailMapping$1</td>
     <td class="coverageStat"/>
   </tr>
   <tr>
-    <td class="name">UserRepositoryImpl$getAll$$inlined$map$1$2$1</td>
+    <td class="name">UserAccountDeletionRepositoryImpl$deleteRemoteUserData$1</td>
     <td class="coverageStat"/>
   </tr>
   <tr>
-    <td class="name">UserRepositoryImpl$getById$1</td>
+    <td class="name">UserAccountDeletionRepositoryImpl$disposeWorkspace$1</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">UserAccountDeletionRepositoryImpl$purgeWorkspace$1</td>
     <td class="coverageStat"/>
   </tr>
 <tr>
   <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    77.8%
   </span>
   <span class="absValue">
-    (0/10)
+    (7/9)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    83.3%
   </span>
   <span class="absValue">
-    (0/2)
+    (20/24)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    95.7%
   </span>
   <span class="absValue">
-    (0/8)
+    (44/46)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    98.7%
   </span>
   <span class="absValue">
-    (0/56)
+    (629/637)
   </span>
 </td>
 </tr>
@@ -160,58 +168,136 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.repository
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.data.db.dao.UserDao
-&nbsp;import com.georgeci.moneysurfer.data.db.entity.UserEntity
-&nbsp;import com.georgeci.moneysurfer.domain.model.User
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.UserId
-&nbsp;import com.georgeci.moneysurfer.domain.repositories.UserRepository
-&nbsp;import kotlinx.coroutines.flow.Flow
-&nbsp;import kotlinx.coroutines.flow.map
+&nbsp;import arrow.core.Either
+&nbsp;import co.touchlab.kermit.Logger
+&nbsp;import com.georgeci.moneysurfer.data.remote.AccountDeletionRemoteSource
+&nbsp;import com.georgeci.moneysurfer.data.remote.RemoteAccessDeniedException
+&nbsp;import com.georgeci.moneysurfer.domain.auth.AccountDeletionError
+&nbsp;import com.georgeci.moneysurfer.domain.logging.redactUid
+&nbsp;import com.georgeci.moneysurfer.domain.model.WorkspaceMemberStatus
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.UserAccountDeletionRepository
+&nbsp;import com.georgeci.moneysurfer.sync.api.SyncCollection
 &nbsp;import org.koin.core.annotation.Single
 &nbsp;
-<b class="nc">&nbsp;@Single(binds = [UserRepository::class])</b>
-&nbsp;class UserRepositoryImpl(
-<b class="nc">&nbsp;    private val dao: UserDao,</b>
-&nbsp;) : UserRepository {
+&nbsp;/**
+&nbsp; * Remote cleanup for account deletion (issue #213). Every step is idempotent — a retry after a
+&nbsp; * part-way failure re-runs against whatever documents are left. The caller
+&nbsp; * ([DeleteUserAccountUseCase][com.georgeci.moneysurfer.domain.usecase.DeleteUserAccountUseCase])
+&nbsp; * guarantees sync is shut down first, so nothing re-creates docs behind the purge.
+&nbsp; *
+&nbsp; * Deletion semantics mirror the hosted account-deletion page: workspaces that are effectively
+&nbsp; * personal (owned, no other ACTIVE member) are hard-deleted; in workspaces shared with other
+&nbsp; * people the user&#39;s member row flips to LEFT and the content stays for the remaining members.
+&nbsp; *
+&nbsp; * All Firestore specifics sit behind [AccountDeletionRemoteSource], so this class holds only the
+&nbsp; * decision logic and is unit-tested against a fake.
+&nbsp; */
+<b class="fc">&nbsp;@Single(binds = [UserAccountDeletionRepository::class])</b>
+&nbsp;class UserAccountDeletionRepositoryImpl(
+<b class="fc">&nbsp;    private val remote: AccountDeletionRemoteSource,</b>
+<b class="fc">&nbsp;    private val clock: ClockUseCase,</b>
+&nbsp;) : UserAccountDeletionRepository {
 &nbsp;
-&nbsp;    override fun getAll(): Flow&lt;List&lt;User&gt;&gt; =
-<b class="nc">&nbsp;        dao.getAll().map { list -&gt; list.map { it.toDomain() } }</b>
+<b class="fc">&nbsp;    private val log = Logger.withTag(TAG)</b>
 &nbsp;
-&nbsp;    override suspend fun getById(id: UserId): User? =
-<b class="nc">&nbsp;        dao.getById(id.value)?.toDomain()</b>
+&nbsp;    override suspend fun deleteRemoteUserData(
+&nbsp;        uid: String,
+&nbsp;        email: String?,
+<b class="fc">&nbsp;    ): Either&lt;AccountDeletionError, Unit&gt; = Either.catch {</b>
+<b class="fc">&nbsp;        val workspaceIds = remote.fetchWorkspaceIds(uid)</b>
+<b class="fc">&nbsp;        log.i { &quot;[delete] start uid=${uid.redactUid()} workspaces=${workspaceIds.size}&quot; }</b>
 &nbsp;
-&nbsp;    override suspend fun insert(user: User) {
-<b class="nc">&nbsp;        dao.insert(user.toEntity())</b>
+<b class="fc">&nbsp;        workspaceIds.forEach { workspaceId -&gt;</b>
+&nbsp;            try {
+<b class="fc">&nbsp;                disposeWorkspace(workspaceId, uid)</b>
+&nbsp;            } catch (e: RemoteAccessDeniedException) {
+&nbsp;                // A stale ref in users/{uid}.workspaceIds (left / evicted earlier) is denied —
+&nbsp;                // there is nothing of the user&#39;s left to clean up there.
+<b class="fc">&nbsp;                log.w(e) { &quot;[delete] no access to workspace=$workspaceId — skipping stale ref&quot; }</b>
+&nbsp;            }
+<b class="fc">&nbsp;        }</b>
+&nbsp;
+<b class="fc">&nbsp;        deleteEmailMapping(email, uid)</b>
+&nbsp;        // Before the user document, never after: Firestore does not cascade deletes into
+&nbsp;        // subcollections, and once `users/{uid}` and the Auth user are gone nobody can ever
+&nbsp;        // authenticate as this uid again to reach what is left behind.
+<b class="fc">&nbsp;        USER_COLLECTIONS.forEach { name -&gt; remote.deleteUserCollection(uid, name) }</b>
+<b class="fc">&nbsp;        remote.deleteUserDoc(uid)</b>
+<b class="fc">&nbsp;        log.i { &quot;[delete] remote data cleared uid=${uid.redactUid()}&quot; }</b>
+<b class="fc">&nbsp;    }.mapLeft { AccountDeletionError.RemoteDataCleanupFailed(cause = it) }</b>
+&nbsp;
+&nbsp;    private suspend fun disposeWorkspace(workspaceId: String, uid: String) {
+<b class="fc">&nbsp;        val ownerId = remote.fetchWorkspaceOwnerId(workspaceId) ?: return</b>
+<b class="fc">&nbsp;        val members = remote.fetchMembers(workspaceId)</b>
+<b class="fc">&nbsp;        val hasOtherActiveMembers = members.any {</b>
+<b class="fc">&nbsp;            it.uid != uid &amp;&amp; it.status == WorkspaceMemberStatus.ACTIVE</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        if (ownerId == uid &amp;&amp; !hasOtherActiveMembers) {</b>
+<b class="fc">&nbsp;            log.i { &quot;[delete] purging personal workspace=$workspaceId&quot; }</b>
+<b class="fc">&nbsp;            purgeWorkspace(workspaceId)</b>
+&nbsp;        } else {
+<b class="fc">&nbsp;            log.i { &quot;[delete] leaving shared workspace=$workspaceId&quot; }</b>
+<b class="pc">&nbsp;            leaveWorkspace(workspaceId, uid, members.firstOrNull { it.uid == uid }?.status)</b>
+&nbsp;        }
 &nbsp;    }
 &nbsp;
-&nbsp;    override suspend fun update(user: User) {
-<b class="nc">&nbsp;        dao.update(user.toEntity())</b>
+&nbsp;    /**
+&nbsp;     * Hard-delete of a personal workspace. Members go last among subcollections (listing the
+&nbsp;     * others requires an ACTIVE membership row) and the root doc goes after everything — the
+&nbsp;     * subcollection delete rules read it via `isOwner()`, so it must outlive them.
+&nbsp;     */
+&nbsp;    private suspend fun purgeWorkspace(workspaceId: String) {
+<b class="fc">&nbsp;        ENTITY_COLLECTIONS.forEach { name -&gt; remote.deleteWorkspaceCollection(workspaceId, name) }</b>
+<b class="fc">&nbsp;        remote.deleteWorkspaceCollection(workspaceId, &quot;members&quot;)</b>
+<b class="fc">&nbsp;        remote.deleteWorkspace(workspaceId)</b>
 &nbsp;    }
 &nbsp;
-&nbsp;    override suspend fun upsert(user: User) {
-<b class="nc">&nbsp;        dao.upsert(user.toEntity())</b>
+&nbsp;    /**
+&nbsp;     * Marks the user&#39;s own member row LEFT instead of deleting it — profile snapshots stay
+&nbsp;     * visible to remaining members, matching the retention promise on the hosted page. A row the
+&nbsp;     * owner already flipped to REMOVED is left alone (rules deny self-updates on it), as is a
+&nbsp;     * workspace the user has no row in.
+&nbsp;     */
+&nbsp;    private suspend fun leaveWorkspace(workspaceId: String, uid: String, status: WorkspaceMemberStatus?) {
+<b class="fc">&nbsp;        if (status != WorkspaceMemberStatus.ACTIVE) return</b>
+<b class="fc">&nbsp;        remote.markMemberLeft(workspaceId, uid, clock.now().toEpochMilliseconds())</b>
 &nbsp;    }
 &nbsp;
-&nbsp;    override suspend fun delete(id: UserId) {
-<b class="nc">&nbsp;        dao.delete(id.value)</b>
+&nbsp;    /** Removes the email→uid lookup row, but only when it still points at the deleted user. */
+&nbsp;    private suspend fun deleteEmailMapping(email: String?, uid: String) {
+<b class="pc">&nbsp;        val key = email?.trim()?.lowercase().orEmpty()</b>
+<b class="fc">&nbsp;        if (key.isEmpty()) return</b>
+<b class="fc">&nbsp;        if (remote.fetchEmailMappingUid(key) == uid) {</b>
+<b class="fc">&nbsp;            remote.deleteEmailMapping(key)</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private companion object {
+&nbsp;        const val TAG = &quot;AccountDeletion&quot;
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Subcollections of `users/{uid}`, purged before the user document itself. Named through
+&nbsp;         * [SyncCollection] rather than spelled out: the pull reads the same path, and a collection
+&nbsp;         * missing from this list is orphaned silently — the documents outlive the Auth user with
+&nbsp;         * nobody able to authenticate as it again.
+&nbsp;         */
+<b class="pc">&nbsp;        val USER_COLLECTIONS = listOf(SyncCollection.USER_CONFIG)</b>
+&nbsp;
+&nbsp;        /** Workspace subcollections purged before members + root doc. */
+<b class="pc">&nbsp;        val ENTITY_COLLECTIONS = listOf(</b>
+<b class="fc">&nbsp;            &quot;accounts&quot;,</b>
+<b class="fc">&nbsp;            &quot;categories&quot;,</b>
+<b class="fc">&nbsp;            &quot;transactions&quot;,</b>
+<b class="fc">&nbsp;            &quot;invites&quot;,</b>
+<b class="fc">&nbsp;            &quot;budgets&quot;,</b>
+<b class="fc">&nbsp;            &quot;recurringRules&quot;,</b>
+<b class="fc">&nbsp;            &quot;goalContributions&quot;,</b>
+<b class="fc">&nbsp;            &quot;goals&quot;,</b>
+&nbsp;        )
 &nbsp;    }
 &nbsp;}
-&nbsp;
-&nbsp;// Local Room storage only persists id/displayName/isAnon. The remote-only fields (email,
-&nbsp;// workspaceIds, defaultWorkspaceId) default to empty/null on read — the Firestore record
-&nbsp;// owns those values, the local row is just a cache + FK target.
-&nbsp;private fun UserEntity.toDomain() = User(
-&nbsp;    id = UserId(id),
-&nbsp;    displayName = displayName,
-&nbsp;    email = null,
-&nbsp;    isAnon = isAnon,
-&nbsp;)
-&nbsp;
-&nbsp;private fun User.toEntity() = UserEntity(
-&nbsp;    id = id.value,
-&nbsp;    displayName = displayName,
-&nbsp;    isAnon = isAnon,
-&nbsp;)
 </code>
 </pre>
 </div>
@@ -235,7 +321,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 15:14</div>
+    <div style="float:right;">generated on 2026-07-28 16:08</div>
 </div>
 </body>
 </html>

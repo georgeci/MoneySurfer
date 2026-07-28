@@ -73,6 +73,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.uikit.components.SurferButton
 &nbsp;import com.georgeci.moneysurfer.uikit.components.SurferButtonStyle
 &nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
+&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
 &nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
 &nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
 &nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
@@ -156,6 +157,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;        Column(
 &nbsp;            modifier = Modifier
 &nbsp;                .fillMaxSize()
+&nbsp;                .surferContentContainer()
 &nbsp;                .padding(padding)
 &nbsp;                .verticalScroll(rememberScrollState())
 &nbsp;                .padding(horizontal = 16.dp),
@@ -203,7 +205,9 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;        stringResource(Res.string.transaction_filters_results, state.resultCount)
 &nbsp;    }
 &nbsp;    Surface(color = AppTheme.materialColors.surface) {
-&nbsp;        Column {
+&nbsp;        // The surface itself bleeds to the window edges; its contents take the same cap as the
+&nbsp;        // form above, so the divider terminates that column instead of overrunning it.
+&nbsp;        Column(modifier = Modifier.surferContentContainer()) {
 &nbsp;            HorizontalDivider(color = AppTheme.materialColors.outlineVariant)
 &nbsp;            Row(
 &nbsp;                modifier = Modifier
@@ -268,7 +272,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 15:14</div>
+    <div style="float:right;">generated on 2026-07-28 16:08</div>
 </div>
 </body>
 </html>

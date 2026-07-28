@@ -65,10 +65,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    73%
+    73.2%
   </span>
   <span class="absValue">
-    (108/148)
+    (109/149)
   </span>
 </td>
 <td class="coverageStat">
@@ -76,7 +76,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     65.4%
   </span>
   <span class="absValue">
-    (796/1218)
+    (799/1221)
   </span>
 </td>
 </tr>
@@ -193,7 +193,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     78.6%
   </span>
   <span class="absValue">
-    (11/14)
+    (22/28)
   </span>
 </td>
 <td class="coverageStat">
@@ -201,15 +201,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (29/29)
+    (33/33)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    99.5%
+    97.8%
   </span>
   <span class="absValue">
-    (198/199)
+    (263/269)
   </span>
 </td>
   </tr>
@@ -402,26 +402,26 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    52.5%
+    54%
   </span>
   <span class="absValue">
-    (125/238)
+    (136/252)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    79.9%
+    80.3%
   </span>
   <span class="absValue">
-    (203/254)
+    (208/259)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    69.6%
+    70.4%
   </span>
   <span class="absValue">
-    (1383/1987)
+    (1451/2060)
   </span>
 </td>
 </tr>
@@ -471,6 +471,13 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;class TransactionCreationViewModel(
 <b class="fc">&nbsp;    private val seed: TransactionCreationSeed?,</b>
 <b class="fc">&nbsp;    private val accountId: AccountId?,</b>
+&nbsp;    /**
+&nbsp;     * Open on the Transfer tab, for a caller that already knows that is what the user asked for.
+&nbsp;     * Read once while loading rather than applied as an event from the screen: a route argument is
+&nbsp;     * true for the whole lifetime of the entry, so replaying it on every composition would undo a
+&nbsp;     * type the user has since changed by hand (after a rotation, say).
+&nbsp;     */
+<b class="fc">&nbsp;    private val openAsTransfer: Boolean,</b>
 <b class="fc">&nbsp;    private val getAccounts: GetAccountsUseCase,</b>
 <b class="fc">&nbsp;    private val getCategories: GetCategoriesUseCase,</b>
 <b class="fc">&nbsp;    private val getTransactionById: GetTransactionByIdUseCase,</b>
@@ -611,9 +618,13 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;            val categories = getCategories().first()</b>
 <b class="pc">&nbsp;            val prefillAccount = accountId?.let { id -&gt; accounts.find { it.id == id } }</b>
 &nbsp;
-<b class="fc">&nbsp;            val initialType = TransactionTypeUi.Expense</b>
+&nbsp;            // Same three gates the type switch applies: a seeded screen is an edit or a duplicate
+&nbsp;            // of a single-leg row, and a build with transfers off has no Transfer tab to open on.
+<b class="pc">&nbsp;            val openingTransfer = openAsTransfer &amp;&amp; seed == null &amp;&amp; hostCapabilities.transferEnabled</b>
+<b class="fc">&nbsp;            val initialType = if (openingTransfer) TransactionTypeUi.Transfer else TransactionTypeUi.Expense</b>
 <b class="fc">&nbsp;            val initialCategoryType = initialType.categoryType()</b>
 <b class="fc">&nbsp;            val initialSelected = pickDefaultCategory(categories, emptyMap(), initialCategoryType)</b>
+<b class="fc">&nbsp;            val initialAccount = prefillAccount ?: accounts.firstOrNull()</b>
 &nbsp;
 <b class="fc">&nbsp;            val baseContent = TransactionCreationState.Content(</b>
 <b class="fc">&nbsp;                amount = &quot;&quot;,</b>
@@ -621,7 +632,11 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;                type = initialType,</b>
 <b class="fc">&nbsp;                accounts = accounts,</b>
 <b class="fc">&nbsp;                categories = categories,</b>
-<b class="fc">&nbsp;                selectedAccount = prefillAccount ?: accounts.firstOrNull(),</b>
+<b class="fc">&nbsp;                selectedAccount = initialAccount,</b>
+&nbsp;                // Seeded the way [changeType] seeds them, so arriving on the Transfer tab by route
+&nbsp;                // and reaching it by tapping the segment leave the same two slots filled.
+<b class="fc">&nbsp;                fromAccount = if (openingTransfer) initialAccount else null,</b>
+<b class="pc">&nbsp;                toAccount = if (openingTransfer) accounts.firstOrNull { it.id != initialAccount?.id } else null,</b>
 <b class="fc">&nbsp;                selectedCategory = initialSelected,</b>
 <b class="fc">&nbsp;                isEditMode = false,</b>
 <b class="fc">&nbsp;                editingTransactionId = null,</b>
@@ -875,7 +890,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 15:14</div>
+    <div style="float:right;">generated on 2026-07-28 16:08</div>
 </div>
 </body>
 </html>
