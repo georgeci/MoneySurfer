@@ -1,10 +1,14 @@
 package com.georgeci.moneysurfer.ui
 
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.test.ComposeUiTest
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.hasScrollAction
+import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.v2.runComposeUiTest
 import com.georgeci.moneysurfer.domain.dashboard.DashboardCardStyle
@@ -42,6 +46,7 @@ class DashboardCustomizeScreenStateTest : StringSpec({
             onNodeWithTag(DashboardCustomizeTestTags.EnabledHeader).assertIsDisplayed()
             onNodeWithTag(DashboardCustomizeTestTags.AvailableHeader).assertIsDisplayed()
             onNodeWithTag(enabledRow(DashboardWidgetType.Balance)).assertIsDisplayed()
+            scrollToRow(availableRow(DashboardWidgetType.Goals))
             onNodeWithTag(availableRow(DashboardWidgetType.Goals)).assertIsDisplayed()
             // A switched-off widget is in exactly one section, not both.
             onNodeWithTag(enabledRow(DashboardWidgetType.Goals)).assertDoesNotExist()
@@ -106,6 +111,7 @@ class DashboardCustomizeScreenStateTest : StringSpec({
                 )
             }
 
+            scrollToRow(availableRow(DashboardWidgetType.Goals))
             onNodeWithTag(availableRow(DashboardWidgetType.Goals)).performClick()
             waitForIdle()
 
@@ -139,7 +145,8 @@ class DashboardCustomizeScreenStateTest : StringSpec({
 
             events shouldContain DashboardCustomizeEvent.OnWidgetMove(
                 from = DashboardWidgetType.Accounts,
-                to = DashboardWidgetType.SafeToSpend,
+                // The row above Accounts in the default layout.
+                to = DashboardWidgetType.BurnRate,
             )
         }
     }
@@ -268,6 +275,20 @@ private const val DRAG_STEPS = 8
 
 /** Drag a little further than one row so touch slop cannot eat the whole travel. */
 private const val DRAG_OVERSHOOT = 1.5f
+
+/**
+ * Brings a row into the viewport before addressing it.
+ *
+ * The sections live in one `LazyColumn`, so a row far enough down is not composed at all and no
+ * selector can find it. That bit once by accident: the default layout grew past a screenful when
+ * the burn-rate and insights widgets landed, and two assertions on the switched-off row started
+ * failing for a reason that had nothing to do with what they test. Scrolling first keeps them
+ * independent of how many widgets the default layout happens to carry.
+ */
+@OptIn(ExperimentalTestApi::class)
+private fun ComposeUiTest.scrollToRow(tag: String) {
+    onNode(hasScrollAction()).performScrollToNode(hasTestTag(tag))
+}
 
 private val GOALS_OFF = DashboardLayoutConfig.DEFAULT
     .withWidgetEnabled(DashboardWidgetType.Goals, enabled = false)

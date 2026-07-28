@@ -19,6 +19,10 @@ import com.georgeci.moneysurfer.uikit.widgets.SurferAddAccountCta
 import com.georgeci.moneysurfer.uikit.widgets.SurferBalanceFootnote
 import com.georgeci.moneysurfer.uikit.widgets.SurferBalanceVariant
 import com.georgeci.moneysurfer.uikit.widgets.SurferBalanceWidget
+import com.georgeci.moneysurfer.uikit.widgets.SurferBurnRateBar
+import com.georgeci.moneysurfer.uikit.widgets.SurferBurnRateData
+import com.georgeci.moneysurfer.uikit.widgets.SurferBurnRatePace
+import com.georgeci.moneysurfer.uikit.widgets.SurferBurnRateWidget
 import com.georgeci.moneysurfer.uikit.widgets.SurferGoalItem
 import com.georgeci.moneysurfer.uikit.widgets.SurferGoalsWidget
 import com.georgeci.moneysurfer.uikit.widgets.SurferInsightItem
@@ -36,6 +40,11 @@ import moneysurfer.feature.dashboard.generated.resources.dashboard_accounts_mana
 import moneysurfer.feature.dashboard.generated.resources.dashboard_add_account
 import moneysurfer.feature.dashboard.generated.resources.dashboard_add_transaction
 import moneysurfer.feature.dashboard.generated.resources.dashboard_balance_title
+import moneysurfer.feature.dashboard.generated.resources.dashboard_burn_rate_average
+import moneysurfer.feature.dashboard.generated.resources.dashboard_burn_rate_caption
+import moneysurfer.feature.dashboard.generated.resources.dashboard_burn_rate_on_track
+import moneysurfer.feature.dashboard.generated.resources.dashboard_burn_rate_projection
+import moneysurfer.feature.dashboard.generated.resources.dashboard_burn_rate_title
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_preview_account_cash
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_preview_account_everyday
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_preview_account_savings
@@ -98,6 +107,7 @@ internal fun DashboardWidgetPreview(
             DashboardWidgetType.Balance -> BalancePreview(cardStyle.variant, modifier.then(content))
             DashboardWidgetType.QuickActions -> QuickActionsPreview(modifier.then(content))
             DashboardWidgetType.SafeToSpend -> SafeToSpendPreview(modifier.then(content))
+            DashboardWidgetType.BurnRate -> BurnRatePreview(modifier.then(content))
             DashboardWidgetType.Accounts -> AccountsPreview(modifier.then(content))
             DashboardWidgetType.Insights -> InsightsPreview(cardStyle.variant, modifier.then(content))
             DashboardWidgetType.Goals -> GoalsPreview(modifier.then(content))
@@ -161,6 +171,35 @@ private fun SafeToSpendPreview(modifier: Modifier) {
             progress = SAMPLE_SAFE_PROGRESS,
             paceFraction = SAMPLE_SAFE_PACE,
             status = SurferBudgetStatus.Ok,
+        ),
+        modifier = modifier,
+    )
+}
+
+/**
+ * Sample numbers again, for the same reason [SafeToSpendPreview] uses them: the tile is drawn for
+ * every widget in the picker, including the ones switched off, so it must not depend on there being
+ * a week of spend to read.
+ */
+@Composable
+private fun BurnRatePreview(modifier: Modifier) {
+    SurferBurnRateWidget(
+        title = stringResource(Res.string.dashboard_burn_rate_title),
+        data = SurferBurnRateData(
+            average = stringResource(Res.string.dashboard_burn_rate_average, SAMPLE_BURN_AVERAGE),
+            caption = stringResource(Res.string.dashboard_burn_rate_caption),
+            bars = SAMPLE_BURN_FRACTIONS.mapIndexed { index, fraction ->
+                SurferBurnRateBar(
+                    label = (SAMPLE_BURN_FIRST_DAY + index).toString(),
+                    fraction = fraction,
+                    isToday = index == SAMPLE_BURN_FRACTIONS.lastIndex,
+                )
+            },
+            projection = stringResource(Res.string.dashboard_burn_rate_projection, SAMPLE_BURN_PROJECTION),
+            pace = SurferBurnRatePace(
+                label = stringResource(Res.string.dashboard_burn_rate_on_track),
+                status = SurferBudgetStatus.Ok,
+            ),
         ),
         modifier = modifier,
     )
@@ -315,3 +354,7 @@ private const val SAMPLE_SAFE_PER_DAY = "€53.52"
 private const val SAMPLE_DAYS_LEFT = 12
 private const val SAMPLE_SAFE_PROGRESS = 0.64f
 private const val SAMPLE_SAFE_PACE = 0.6f
+private const val SAMPLE_BURN_AVERAGE = "€42.10"
+private const val SAMPLE_BURN_PROJECTION = "€1,263"
+private const val SAMPLE_BURN_FIRST_DAY = 22
+private val SAMPLE_BURN_FRACTIONS = listOf(0.42f, 0.18f, 1f, 0f, 0.63f, 0.31f, 0.24f)

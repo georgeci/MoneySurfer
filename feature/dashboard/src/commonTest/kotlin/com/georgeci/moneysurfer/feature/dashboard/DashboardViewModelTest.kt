@@ -36,8 +36,10 @@ import com.georgeci.moneysurfer.domain.insight.InsightTone
 import com.georgeci.moneysurfer.domain.model.Account
 import com.georgeci.moneysurfer.domain.model.Budget
 import com.georgeci.moneysurfer.domain.model.BudgetStatus
+import com.georgeci.moneysurfer.domain.model.BurnRatePace
 import com.georgeci.moneysurfer.domain.model.CategorizedTransaction
 import com.georgeci.moneysurfer.domain.model.CategorySpendSlice
+import com.georgeci.moneysurfer.domain.model.DailySpendPoint
 import com.georgeci.moneysurfer.domain.model.Transaction
 import com.georgeci.moneysurfer.domain.model.TransactionTotal
 import com.georgeci.moneysurfer.domain.preferences.UiPreferences
@@ -59,6 +61,8 @@ import com.georgeci.moneysurfer.domain.usecase.GenerateInsightsUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetAccountsUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetBudgetProgressUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetBudgetsUseCase
+import com.georgeci.moneysurfer.domain.usecase.GetBurnRateUseCase
+import com.georgeci.moneysurfer.domain.usecase.GetDailySpendSeriesUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetExchangeRatesUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetGoalsUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetRecentTransactionsUseCase
@@ -160,6 +164,7 @@ class DashboardViewModelTest : StringSpec({
             // widgets the stored layout never heard of are appended rather than dropped
             DashboardWidgetType.QuickActions,
             DashboardWidgetType.SafeToSpend,
+            DashboardWidgetType.BurnRate,
             DashboardWidgetType.Accounts,
             DashboardWidgetType.Insights,
             DashboardWidgetType.RecentTransactions,
@@ -247,6 +252,52 @@ class DashboardViewModelTest : StringSpec({
         )
 
         viewModel.value.shouldBeInstanceOf<DashboardState.Content>().safeToSpend shouldBe null
+    }
+
+    "the burn rate formats the week's pace and the projection it implies" {
+        val ws = workspaceId("ws-1")
+        // testDate is 1 January 2024: day one of a 31-day month, so 30 days are still ahead.
+        val viewModel = newViewModel(
+            ws = ws,
+            accounts = FakeAccountRepository(listOf(anAccount(id = accountId("a-1"), workspaceId = ws))),
+            transactions = FakeTransactionRepository(emptyList()),
+            spendAnalytics = FakeSpendAnalyticsRepository(
+                daily = listOf(DailySpendPoint(date = testDate, total = 70.dollars)),
+            ),
+        )
+
+        val burnRate = viewModel.value.shouldBeInstanceOf<DashboardState.Content>().burnRate
+        // 70 over seven days is 10 a day; 70 booked plus 30 days at 10 is 370 by month end.
+        burnRate?.averageFormatted shouldBe MoneyFormatter.format(10.dollars, USD)
+        burnRate?.projectedFormatted shouldBe MoneyFormatter.format(370.dollars, USD)
+        burnRate?.weekTotalFormatted shouldBe MoneyFormatter.format(70.dollars, USD)
+        burnRate?.days?.map { it.dayOfMonth } shouldContainExactly listOf(26, 27, 28, 29, 30, 31, 1)
+        // Only the last bar is today, and it is the only day that booked anything.
+        burnRate?.days?.map { it.isToday } shouldContainExactly listOf(
+            false, false, false, false, false, false, true,
+        )
+        burnRate?.days?.map { it.fraction } shouldContainExactly listOf(0f, 0f, 0f, 0f, 0f, 0f, 1f)
+        // Nothing caps the month, so the card draws the projection with no verdict on it.
+        burnRate?.pace shouldBe null
+    }
+
+    "the burn rate is judged against a general monthly budget when there is one" {
+        val ws = workspaceId("ws-1")
+        val viewModel = newViewModel(
+            ws = ws,
+            accounts = FakeAccountRepository(listOf(anAccount(id = accountId("a-1"), workspaceId = ws))),
+            transactions = FakeTransactionRepository(emptyList()),
+            budgets = listOf(
+                aBudget(workspaceId = ws, amount = 300.dollars, categoryIds = emptyList(), startDate = testDate),
+            ),
+            spendAnalytics = FakeSpendAnalyticsRepository(
+                daily = listOf(DailySpendPoint(date = testDate, total = 70.dollars)),
+            ),
+        )
+
+        // A 370 projection against a 300 cap.
+        viewModel.value.shouldBeInstanceOf<DashboardState.Content>()
+            .burnRate?.pace shouldBe BurnRatePace.OffPace
     }
 
     "an unset layout falls back to the default order" {
@@ -428,6 +479,10 @@ private fun newViewModel(
         getSafeToSpend = GetSafeToSpendUseCase(
             getBudgets = GetBudgetsUseCase(FakeBudgetRepository(budgets), session),
             getBudgetProgress = GetBudgetProgressUseCase(transactions, workspaces, clock),
+        ),
+        getBurnRate = GetBurnRateUseCase(
+            getDailySpendSeries = GetDailySpendSeriesUseCase(spendAnalytics, workspaces, session, clock),
+            getBudgets = GetBudgetsUseCase(FakeBudgetRepository(budgets), session),
         ),
         generateInsights = GenerateInsightsUseCase(
             spendAnalytics = spendAnalytics,
