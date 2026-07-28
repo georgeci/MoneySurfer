@@ -1,7 +1,7 @@
 package com.georgeci.moneysurfer.feature.account.details
 
-import app.cash.turbine.test
 import androidx.lifecycle.viewModelScope
+import app.cash.turbine.test
 import com.georgeci.moneysurfer.domain.fixtures.FakeHostCapabilities
 import com.georgeci.moneysurfer.domain.fixtures.USD
 import com.georgeci.moneysurfer.domain.fixtures.aTransaction
