@@ -52,35 +52,35 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   <td class="name">OnboardingTestTags</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
     <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/3)
+    (3/3)
   </span>
 </td>
 </tr>
@@ -183,7 +183,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    const val Continue = &quot;onboarding:continue&quot;
 &nbsp;    const val Skip = &quot;onboarding:skip&quot;
 &nbsp;
-<b class="nc">&nbsp;    fun accountKind(kind: OnboardingAccountKind): String = &quot;onboarding:kind:${kind.name}&quot;</b>
+<b class="fc">&nbsp;    fun accountKind(kind: OnboardingAccountKind): String = &quot;onboarding:kind:${kind.name}&quot;</b>
 &nbsp;}
 &nbsp;
 &nbsp;@Composable
@@ -204,8 +204,13 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    OnboardingContent(state = state, onEvent = viewModel::onEvent)
 &nbsp;}
 &nbsp;
+&nbsp;/**
+&nbsp; * Stateless body of the onboarding flow. Internal rather than private so the screenshot captures
+&nbsp; * can mount it with an injected [OnboardingState] instead of standing up a Koin-backed
+&nbsp; * [OnboardingViewModel].
+&nbsp; */
 &nbsp;@Composable
-&nbsp;private fun OnboardingContent(
+&nbsp;internal fun OnboardingContent(
 &nbsp;    state: OnboardingState,
 &nbsp;    onEvent: (OnboardingEvent) -&gt; Unit,
 &nbsp;) {
@@ -718,7 +723,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 16:08</div>
+    <div style="float:right;">generated on 2026-07-28 17:47</div>
 </div>
 </body>
 </html>
