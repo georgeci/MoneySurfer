@@ -219,6 +219,16 @@ spend widget through one `SpendScope`. Built on `periodWindow(mode, anchor)` and
 `shiftPeriod`, not a new type. Per decision 6 this is device-local UI state, not
 a preference — unless the user asks for it to stick.
 
+**The insights engine does not take a period mode, and its guard is month-shaped.**
+`GenerateInsightsUseCase` (#295, Phase 5) hard-codes month-to-date against the same
+stretch of the previous month, and stands its comparison rules down below
+`MIN_COMPARISON_DAYS = 7` elapsed days. Wiring the Insights widget to a Week period
+would silence it for six days of every seven: in Week mode `elapsedDays` runs 1..7
+and only ever reaches the threshold on the last day of the week. The guard has to
+become a *share* of the period (a quarter of it, say) or a per-mode minimum before
+the switch can reach that widget. #296's own scope does not list Insights, so this
+is a trap for whoever extends it later rather than a blocker for #296 itself.
+
 ## Phase 3 — `feature/insights` module
 
 New module `feature/insights` (nothing exists under `feature/` for it today),
@@ -298,6 +308,16 @@ be persisted later. Rules are table-driven kotest specs in `domain`.
 
 The widget also gained a `list` / `carousel` card-style variant, keyed the way
 `SurferBalanceVariant` already is, so the picker offers it without a persistence change.
+
+Left open, deliberately:
+
+- **The base-currency empty state.** [Phase 3](#phase-3--featureinsights-module) requires an empty
+  state that *names* the reason when the currency filter hides everything — a blank card in a
+  mixed-currency workspace reads as a bug, not as a policy. The dashboard widget does not do this
+  yet: it ignores `excludedByCurrency` and falls back to "Nothing notable this period." Fixing it
+  means a fifth flow into the use case's `combine` and a signal on `Insight` that the copy can
+  render, so it belongs with the screen that owns the wording (#385).
+- **The seven-day guard is month-shaped** — see [Phase 2](#phase-2--shared-period-state-296).
 
 ## Phase 6 — reuse
 
