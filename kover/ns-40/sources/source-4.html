@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > GoalContributionScreenKt</title>
+  <title>MoneySurfer Coverage Report > GoalFormatKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.feature.goal.contribution</a>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.goal</a>
 </div>
 
-<h1>Coverage Summary for Class: GoalContributionScreenKt (com.georgeci.moneysurfer.feature.goal.contribution)</h1>
+<h1>Coverage Summary for Class: GoalFormatKt (com.georgeci.moneysurfer.feature.goal)</h1>
 
 <table class="coverageStats">
 
@@ -46,13 +46,13 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">GoalContributionScreenKt</td>
+  <td class="name">GoalFormatKt</td>
 <td class="coverageStat">
   <span class="percent">
     0%
   </span>
   <span class="absValue">
-    (0/15)
+    (0/3)
   </span>
 </td>
 <td class="coverageStat">
@@ -60,7 +60,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/38)
+    (0/12)
   </span>
 </td>
 <td class="coverageStat">
@@ -68,20 +68,20 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/76)
+    (0/13)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0.4%
+    7.4%
   </span>
   <span class="absValue">
-    (4/1097)
+    (8/108)
   </span>
 </td>
 </tr>
   <tr>
-    <td class="name">GoalContributionScreenKt$WhenMappings</td>
+    <td class="name">GoalFormatKt$WhenMappings</td>
     <td class="coverageStat"/>
   </tr>
 <tr>
@@ -91,7 +91,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/15)
+    (0/3)
   </span>
 </td>
 <td class="coverageStat">
@@ -99,7 +99,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/38)
+    (0/12)
   </span>
 </td>
 <td class="coverageStat">
@@ -107,15 +107,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/76)
+    (0/13)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0.4%
+    7.4%
   </span>
   <span class="absValue">
-    (4/1097)
+    (8/108)
   </span>
 </td>
 </tr>
@@ -126,181 +126,69 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.goal.contribution
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.goal
 &nbsp;
-&nbsp;import androidx.compose.foundation.layout.Arrangement
-&nbsp;import androidx.compose.foundation.layout.Column
-&nbsp;import androidx.compose.foundation.layout.fillMaxSize
-&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
-&nbsp;import androidx.compose.foundation.layout.padding
-&nbsp;import androidx.compose.foundation.text.KeyboardOptions
-&nbsp;import androidx.compose.material3.OutlinedTextField
-&nbsp;import androidx.compose.material3.Scaffold
-&nbsp;import androidx.compose.material3.Text
-&nbsp;import androidx.compose.runtime.Composable
-&nbsp;import androidx.compose.runtime.getValue
-&nbsp;import androidx.compose.ui.Modifier
-&nbsp;import androidx.compose.ui.platform.testTag
-&nbsp;import androidx.compose.ui.text.input.KeyboardType
-&nbsp;import androidx.compose.ui.tooling.preview.Preview
-&nbsp;import androidx.lifecycle.compose.collectAsStateWithLifecycle
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.GoalId
-&nbsp;import com.georgeci.moneysurfer.feature.goal.GoalDateField
-&nbsp;import com.georgeci.moneysurfer.feature.goal.GoalDatePickerDialog
-&nbsp;import com.georgeci.moneysurfer.feature.goal.formatGoalDate
-&nbsp;import com.georgeci.moneysurfer.navigation.GoalContributionMode
-&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
-&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferToolbarButtonAction
-&nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
-&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
-&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
-&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
-&nbsp;import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
-&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
-&nbsp;import com.georgeci.moneysurfer.utils.HandleSideEffect
+&nbsp;import com.georgeci.moneysurfer.domain.model.GoalStatus
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
+&nbsp;import com.georgeci.moneysurfer.uikit.components.goal.SurferGoalStatus
 &nbsp;import kotlinx.datetime.LocalDate
 &nbsp;import moneysurfer.feature.goal.generated.resources.Res
-&nbsp;import moneysurfer.feature.goal.generated.resources.goal_contribution_amount_label
-&nbsp;import moneysurfer.feature.goal.generated.resources.goal_contribution_date_label
-&nbsp;import moneysurfer.feature.goal.generated.resources.goal_contribution_note_label
-&nbsp;import moneysurfer.feature.goal.generated.resources.goal_contribution_save
-&nbsp;import moneysurfer.feature.goal.generated.resources.goal_contribution_saved_label
-&nbsp;import moneysurfer.feature.goal.generated.resources.goal_contribution_title_add
-&nbsp;import moneysurfer.feature.goal.generated.resources.goal_contribution_title_withdraw
-&nbsp;import org.jetbrains.compose.resources.stringResource
-&nbsp;import org.koin.compose.viewmodel.koinViewModel
-&nbsp;import org.koin.core.parameter.parametersOf
+&nbsp;import moneysurfer.feature.goal.generated.resources.goal_status_active
+&nbsp;import moneysurfer.feature.goal.generated.resources.goal_status_archived
+&nbsp;import moneysurfer.feature.goal.generated.resources.goal_status_completed
+&nbsp;import moneysurfer.feature.goal.generated.resources.goal_status_paused
+&nbsp;import org.jetbrains.compose.resources.StringResource
 &nbsp;
-&nbsp;/** Stable selectors for the goal add/withdraw screen — see docs/testing/testing-strategy.md. */
-&nbsp;object GoalContributionTestTags {
-&nbsp;    const val Root = &quot;goalContribution:root&quot;
-&nbsp;    const val AmountField = &quot;goalContribution:amount&quot;
-&nbsp;    const val SaveButton = &quot;goalContribution:save&quot;
+&nbsp;/** The design system carries its own status enum so `uikit` stays free of `domain`. */
+<b class="nc">&nbsp;internal fun GoalStatus.toUi(): SurferGoalStatus = when (this) {</b>
+<b class="nc">&nbsp;    GoalStatus.ACTIVE -&gt; SurferGoalStatus.Active</b>
+<b class="nc">&nbsp;    GoalStatus.COMPLETED -&gt; SurferGoalStatus.Completed</b>
+<b class="nc">&nbsp;    GoalStatus.PAUSED -&gt; SurferGoalStatus.Paused</b>
+<b class="nc">&nbsp;    GoalStatus.ARCHIVED -&gt; SurferGoalStatus.Archived</b>
 &nbsp;}
 &nbsp;
-&nbsp;@Composable
-<b class="nc">&nbsp;fun GoalContributionScreen(</b>
-&nbsp;    goalId: GoalId,
-&nbsp;    mode: GoalContributionMode,
-&nbsp;    onNavigateBack: () -&gt; Unit,
-<b class="nc">&nbsp;    viewModel: GoalContributionViewModel = koinViewModel(</b>
-<b class="nc">&nbsp;        key = &quot;${goalId.value}-${mode.name}&quot;,</b>
-<b class="nc">&nbsp;    ) { parametersOf(goalId, mode) },</b>
-<b class="nc">&nbsp;) {</b>
-<b class="nc">&nbsp;    val state by viewModel.collectAsStateWithLifecycle()</b>
+<b class="nc">&nbsp;internal fun GoalStatus.labelRes(): StringResource = when (this) {</b>
+<b class="nc">&nbsp;    GoalStatus.ACTIVE -&gt; Res.string.goal_status_active</b>
+<b class="nc">&nbsp;    GoalStatus.COMPLETED -&gt; Res.string.goal_status_completed</b>
+<b class="nc">&nbsp;    GoalStatus.PAUSED -&gt; Res.string.goal_status_paused</b>
+<b class="nc">&nbsp;    GoalStatus.ARCHIVED -&gt; Res.string.goal_status_archived</b>
+&nbsp;}
 &nbsp;
-<b class="nc">&nbsp;    viewModel.HandleSideEffect { effect -&gt;</b>
-<b class="nc">&nbsp;        when (effect) {</b>
-<b class="nc">&nbsp;            GoalContributionEffect.NavigateBack -&gt; onNavigateBack()</b>
+&nbsp;/** `05 Aug 2026` — the same shape the transaction screens use. */
+&nbsp;internal fun formatGoalDate(date: LocalDate): String {
+<b class="nc">&nbsp;    val month = date.month.name.lowercase().replaceFirstChar { it.uppercase() }.take(MONTH_ABBREVIATION)</b>
+<b class="nc">&nbsp;    val day = date.day.toString().padStart(2, &#39;0&#39;)</b>
+<b class="nc">&nbsp;    return &quot;$day $month ${date.year}&quot;</b>
+&nbsp;}
+&nbsp;
+&nbsp;private const val MONTH_ABBREVIATION = 3
+&nbsp;
+&nbsp;/**
+&nbsp; * Text-field input for goal amounts: digits and at most one decimal separator. Goal amounts are
+&nbsp; * never negative — the withdraw screen flips the sign itself — so a minus is simply dropped.
+&nbsp; */
+&nbsp;internal object GoalAmountInput {
+&nbsp;
+&nbsp;    fun sanitize(raw: String): String {
+&nbsp;        val digits = StringBuilder()
+&nbsp;        var separatorUsed = false
+&nbsp;        for (ch in raw) {
+&nbsp;            when {
+&nbsp;                ch.isDigit() -&gt; digits.append(ch)
+&nbsp;                (ch == &#39;.&#39; || ch == &#39;,&#39;) &amp;&amp; !separatorUsed -&gt; {
+&nbsp;                    separatorUsed = true
+&nbsp;                    digits.append(&#39;.&#39;)
+&nbsp;                }
+&nbsp;            }
 &nbsp;        }
+&nbsp;        return digits.toString()
 &nbsp;    }
 &nbsp;
-<b class="nc">&nbsp;    GoalContributionContent(state = state, onEvent = viewModel::onEvent)</b>
-<b class="nc">&nbsp;}</b>
-&nbsp;
-&nbsp;@Composable
-&nbsp;private fun GoalContributionContent(
-&nbsp;    state: GoalContributionState,
-&nbsp;    onEvent: (GoalContributionEvent) -&gt; Unit,
-<b class="nc">&nbsp;) {</b>
-<b class="nc">&nbsp;    Scaffold(</b>
-<b class="nc">&nbsp;        modifier = Modifier</b>
-<b class="nc">&nbsp;            .surferSafeInsets()</b>
-<b class="nc">&nbsp;            .testTag(GoalContributionTestTags.Root)</b>
-<b class="nc">&nbsp;            .surferTestTagAsId(),</b>
-<b class="nc">&nbsp;        containerColor = AppTheme.materialColors.surface,</b>
-<b class="nc">&nbsp;        topBar = {</b>
-<b class="nc">&nbsp;            SurferToolbar(</b>
-<b class="nc">&nbsp;                title = stringResource(</b>
-<b class="nc">&nbsp;                    when (state.mode) {</b>
-<b class="nc">&nbsp;                        GoalContributionMode.ADD -&gt; Res.string.goal_contribution_title_add</b>
-<b class="nc">&nbsp;                        GoalContributionMode.WITHDRAW -&gt; Res.string.goal_contribution_title_withdraw</b>
-&nbsp;                    },
-&nbsp;                ),
-<b class="nc">&nbsp;                onBack = { onEvent(GoalContributionEvent.OnBackClick) },</b>
-<b class="nc">&nbsp;                actions = {</b>
-<b class="nc">&nbsp;                    SurferToolbarButtonAction(</b>
-<b class="nc">&nbsp;                        icon = SurferIcons.Check,</b>
-<b class="nc">&nbsp;                        text = stringResource(Res.string.goal_contribution_save),</b>
-<b class="nc">&nbsp;                        enabled = state.canSave,</b>
-<b class="nc">&nbsp;                        onClick = { onEvent(GoalContributionEvent.OnSaveClick) },</b>
-<b class="nc">&nbsp;                        modifier = Modifier.testTag(GoalContributionTestTags.SaveButton),</b>
-&nbsp;                    )
-&nbsp;                },
-&nbsp;            )
-&nbsp;        },
-<b class="nc">&nbsp;    ) { padding -&gt;</b>
-<b class="nc">&nbsp;        Column(</b>
-<b class="nc">&nbsp;            modifier = Modifier</b>
-<b class="nc">&nbsp;                .fillMaxSize()</b>
-<b class="nc">&nbsp;                .surferContentContainer()</b>
-<b class="nc">&nbsp;                .padding(padding)</b>
-<b class="nc">&nbsp;                .padding(AppTheme.spacing.default),</b>
-<b class="nc">&nbsp;            verticalArrangement = Arrangement.spacedBy(AppTheme.spacing.default),</b>
-&nbsp;        ) {
-<b class="nc">&nbsp;            Text(</b>
-<b class="nc">&nbsp;                text = stringResource(Res.string.goal_contribution_saved_label, state.savedLabel),</b>
-<b class="nc">&nbsp;                style = AppTheme.typography.bodyMedium,</b>
-<b class="nc">&nbsp;                color = AppTheme.materialColors.onSurfaceVariant,</b>
-&nbsp;            )
-&nbsp;
-<b class="nc">&nbsp;            OutlinedTextField(</b>
-<b class="nc">&nbsp;                value = state.amount,</b>
-<b class="nc">&nbsp;                onValueChange = { onEvent(GoalContributionEvent.OnAmountChanged(it)) },</b>
-&nbsp;                label = { Text(stringResource(Res.string.goal_contribution_amount_label)) },
-<b class="nc">&nbsp;                isError = state.error != null,</b>
-<b class="nc">&nbsp;                supportingText = state.error?.let { error -&gt; { Text(stringResource(error)) } },</b>
-<b class="nc">&nbsp;                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),</b>
-<b class="nc">&nbsp;                singleLine = true,</b>
-<b class="nc">&nbsp;                modifier = Modifier</b>
-<b class="nc">&nbsp;                    .fillMaxWidth()</b>
-<b class="nc">&nbsp;                    .testTag(GoalContributionTestTags.AmountField),</b>
-&nbsp;            )
-&nbsp;
-<b class="nc">&nbsp;            GoalDateField(</b>
-<b class="nc">&nbsp;                label = stringResource(Res.string.goal_contribution_date_label),</b>
-<b class="nc">&nbsp;                value = state.occurredOn?.let(::formatGoalDate).orEmpty(),</b>
-<b class="nc">&nbsp;                onClick = { onEvent(GoalContributionEvent.OnDatePickerOpen) },</b>
-&nbsp;            )
-&nbsp;
-<b class="nc">&nbsp;            OutlinedTextField(</b>
-<b class="nc">&nbsp;                value = state.note,</b>
-<b class="nc">&nbsp;                onValueChange = { onEvent(GoalContributionEvent.OnNoteChanged(it)) },</b>
-&nbsp;                label = { Text(stringResource(Res.string.goal_contribution_note_label)) },
-<b class="nc">&nbsp;                singleLine = true,</b>
-<b class="nc">&nbsp;                modifier = Modifier.fillMaxWidth(),</b>
-&nbsp;            )
-<b class="nc">&nbsp;        }</b>
-&nbsp;    }
-&nbsp;
-<b class="nc">&nbsp;    if (state.showDatePicker) {</b>
-<b class="nc">&nbsp;        GoalDatePickerDialog(</b>
-<b class="nc">&nbsp;            initialDate = state.occurredOn,</b>
-<b class="nc">&nbsp;            onDismiss = { onEvent(GoalContributionEvent.OnDatePickerDismiss) },</b>
-<b class="nc">&nbsp;            onConfirm = {</b>
-<b class="nc">&nbsp;                onEvent(GoalContributionEvent.OnDateChanged(it))</b>
-<b class="nc">&nbsp;                onEvent(GoalContributionEvent.OnDatePickerDismiss)</b>
-&nbsp;            },
-&nbsp;        )
-<b class="nc">&nbsp;    }</b>
-<b class="nc">&nbsp;}</b>
-&nbsp;
-&nbsp;@Preview
-&nbsp;@Composable
-<b class="nc">&nbsp;private fun GoalContributionScreenPreview() {</b>
-<b class="nc">&nbsp;    SurferComponentPreview {</b>
-&nbsp;        GoalContributionContent(
-&nbsp;            state = GoalContributionState(
-&nbsp;                mode = GoalContributionMode.ADD,
-&nbsp;                goalTitle = &quot;Emergency fund&quot;,
-&nbsp;                savedLabel = &quot;€8,915&quot;,
-&nbsp;                amount = &quot;250&quot;,
-&nbsp;                occurredOn = LocalDate(2026, 7, 12),
-&nbsp;            ),
-&nbsp;            onEvent = {},
-&nbsp;        )
-&nbsp;    }
-<b class="nc">&nbsp;}</b>
+&nbsp;    /** `null` while the field is empty or still half-typed (`&quot;.&quot;`). */
+&nbsp;    fun parse(value: String): Money? = value.toDoubleOrNull()
+&nbsp;        ?.takeIf { it &gt; 0.0 }
+&nbsp;        ?.let(Money::fromDouble)
+&nbsp;}
 </code>
 </pre>
 </div>
@@ -324,7 +212,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 21:18</div>
+    <div style="float:right;">generated on 2026-07-28 21:38</div>
 </div>
 </body>
 </html>

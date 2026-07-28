@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > CategoryDao</title>
+  <title>MoneySurfer Coverage Report > WorkspaceMemberDao</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.data.db.dao</a>
 </div>
 
-<h1>Coverage Summary for Class: CategoryDao (com.georgeci.moneysurfer.data.db.dao)</h1>
+<h1>Coverage Summary for Class: WorkspaceMemberDao (com.georgeci.moneysurfer.data.db.dao)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">CategoryDao</td>
+  <td class="name">WorkspaceMemberDao</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -51,37 +51,41 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import androidx.room.Query
 &nbsp;import androidx.room.Update
 &nbsp;import androidx.room.Upsert
-&nbsp;import com.georgeci.moneysurfer.data.db.entity.CategoryEntity
+&nbsp;import com.georgeci.moneysurfer.data.db.entity.WorkspaceMemberEntity
 &nbsp;import kotlinx.coroutines.flow.Flow
 &nbsp;
 &nbsp;@Dao
-&nbsp;interface CategoryDao {
+&nbsp;@Suppress(&quot;TooManyFunctions&quot;)
+&nbsp;interface WorkspaceMemberDao {
 &nbsp;
-&nbsp;    @Query(&quot;SELECT * FROM categories&quot;)
-&nbsp;    fun getAll(): Flow&lt;List&lt;CategoryEntity&gt;&gt;
+&nbsp;    @Query(&quot;SELECT * FROM workspace_members&quot;)
+&nbsp;    fun getAll(): Flow&lt;List&lt;WorkspaceMemberEntity&gt;&gt;
 &nbsp;
-&nbsp;    @Query(&quot;SELECT * FROM categories WHERE workspaceId = :workspaceId&quot;)
-&nbsp;    fun getByWorkspaceId(workspaceId: String): Flow&lt;List&lt;CategoryEntity&gt;&gt;
+&nbsp;    @Query(&quot;SELECT * FROM workspace_members WHERE workspaceId = :workspaceId&quot;)
+&nbsp;    fun getByWorkspaceId(workspaceId: String): Flow&lt;List&lt;WorkspaceMemberEntity&gt;&gt;
 &nbsp;
-&nbsp;    @Query(&quot;SELECT * FROM categories WHERE id = :id&quot;)
-&nbsp;    suspend fun getById(id: String): CategoryEntity?
+&nbsp;    @Query(&quot;SELECT * FROM workspace_members WHERE userId = :userId&quot;)
+&nbsp;    fun getByUserId(userId: String): Flow&lt;List&lt;WorkspaceMemberEntity&gt;&gt;
+&nbsp;
+&nbsp;    @Query(&quot;SELECT * FROM workspace_members WHERE userId = :userId AND workspaceId = :workspaceId&quot;)
+&nbsp;    suspend fun getById(userId: String, workspaceId: String): WorkspaceMemberEntity?
 &nbsp;
 &nbsp;    @Insert
-&nbsp;    suspend fun insert(entity: CategoryEntity)
+&nbsp;    suspend fun insert(entity: WorkspaceMemberEntity)
 &nbsp;
 &nbsp;    @Insert
-&nbsp;    suspend fun insertAll(entities: List&lt;CategoryEntity&gt;)
+&nbsp;    suspend fun insertAll(entities: List&lt;WorkspaceMemberEntity&gt;)
 &nbsp;
 &nbsp;    @Update
-&nbsp;    suspend fun update(entity: CategoryEntity)
+&nbsp;    suspend fun update(entity: WorkspaceMemberEntity)
 &nbsp;
 &nbsp;    @Upsert
-&nbsp;    suspend fun upsertAll(entities: List&lt;CategoryEntity&gt;)
+&nbsp;    suspend fun upsert(entity: WorkspaceMemberEntity)
 &nbsp;
-&nbsp;    @Query(&quot;DELETE FROM categories WHERE id = :id&quot;)
-&nbsp;    suspend fun delete(id: String)
+&nbsp;    @Query(&quot;DELETE FROM workspace_members WHERE userId = :userId AND workspaceId = :workspaceId&quot;)
+&nbsp;    suspend fun delete(userId: String, workspaceId: String)
 &nbsp;
-&nbsp;    @Query(&quot;DELETE FROM categories&quot;)
+&nbsp;    @Query(&quot;DELETE FROM workspace_members&quot;)
 &nbsp;    suspend fun deleteAll()
 &nbsp;}
 </code>
@@ -107,7 +111,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 21:18</div>
+    <div style="float:right;">generated on 2026-07-28 21:38</div>
 </div>
 </body>
 </html>

@@ -1,0 +1,246 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>MoneySurfer Coverage Report > SurferSkeletonKt</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.georgeci.moneysurfer.uikit.components</a>
+</div>
+
+<h1>Coverage Summary for Class: SurferSkeletonKt (com.georgeci.moneysurfer.uikit.components)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">SurferSkeletonKt</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    28.6%
+  </span>
+  <span class="absValue">
+    (2/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    66.7%
+  </span>
+  <span class="absValue">
+    (8/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    93.8%
+  </span>
+  <span class="absValue">
+    (45/48)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    91.3%
+  </span>
+  <span class="absValue">
+    (544/596)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.components
+&nbsp;
+&nbsp;import androidx.compose.animation.core.LinearEasing
+&nbsp;import androidx.compose.animation.core.RepeatMode
+&nbsp;import androidx.compose.animation.core.animateFloat
+&nbsp;import androidx.compose.animation.core.infiniteRepeatable
+&nbsp;import androidx.compose.animation.core.rememberInfiniteTransition
+&nbsp;import androidx.compose.animation.core.tween
+&nbsp;import androidx.compose.foundation.background
+&nbsp;import androidx.compose.foundation.layout.Arrangement
+&nbsp;import androidx.compose.foundation.layout.Column
+&nbsp;import androidx.compose.foundation.layout.Row
+&nbsp;import androidx.compose.foundation.layout.Spacer
+&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
+&nbsp;import androidx.compose.foundation.layout.height
+&nbsp;import androidx.compose.foundation.layout.padding
+&nbsp;import androidx.compose.foundation.layout.size
+&nbsp;import androidx.compose.foundation.layout.width
+&nbsp;import androidx.compose.foundation.shape.CircleShape
+&nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.runtime.getValue
+&nbsp;import androidx.compose.runtime.mutableStateOf
+&nbsp;import androidx.compose.runtime.remember
+&nbsp;import androidx.compose.runtime.setValue
+&nbsp;import androidx.compose.ui.Alignment
+&nbsp;import androidx.compose.ui.Modifier
+&nbsp;import androidx.compose.ui.draw.clip
+&nbsp;import androidx.compose.ui.geometry.Offset
+&nbsp;import androidx.compose.ui.graphics.Brush
+&nbsp;import androidx.compose.ui.graphics.Shape
+&nbsp;import androidx.compose.ui.layout.onSizeChanged
+&nbsp;import androidx.compose.ui.tooling.preview.Preview
+&nbsp;import androidx.compose.ui.unit.dp
+&nbsp;import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
+&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
+&nbsp;
+&nbsp;/**
+&nbsp; * A single shimmering placeholder block. Sweeps a highlight band across a muted base so a
+&nbsp; * loading screen reads as &quot;content is on the way&quot; rather than an empty void. Compose these
+&nbsp; * into screen-shaped skeletons (see [SurferSkeletonRow]).
+&nbsp; */
+&nbsp;@Composable
+<b class="fc">&nbsp;fun SurferSkeleton(</b>
+<b class="fc">&nbsp;    modifier: Modifier = Modifier,</b>
+<b class="fc">&nbsp;    shape: Shape = AppTheme.shapes.medium,</b>
+<b class="pc">&nbsp;) {</b>
+<b class="fc">&nbsp;    val base = AppTheme.materialColors.onSurface.copy(alpha = 0.08f)</b>
+<b class="fc">&nbsp;    val highlight = AppTheme.materialColors.onSurface.copy(alpha = 0.16f)</b>
+&nbsp;
+<b class="fc">&nbsp;    var widthPx by remember { mutableStateOf(0f) }</b>
+<b class="fc">&nbsp;    val transition = rememberInfiniteTransition(label = &quot;surfer-skeleton&quot;)</b>
+<b class="fc">&nbsp;    val progress by transition.animateFloat(</b>
+<b class="fc">&nbsp;        initialValue = 0f,</b>
+<b class="fc">&nbsp;        targetValue = 1f,</b>
+<b class="fc">&nbsp;        animationSpec = infiniteRepeatable(</b>
+<b class="fc">&nbsp;            animation = tween(durationMillis = 1300, easing = LinearEasing),</b>
+<b class="fc">&nbsp;            repeatMode = RepeatMode.Restart,</b>
+&nbsp;        ),
+<b class="fc">&nbsp;        label = &quot;surfer-skeleton-progress&quot;,</b>
+&nbsp;    )
+&nbsp;
+<b class="fc">&nbsp;    val travel = widthPx * 2f</b>
+<b class="fc">&nbsp;    val translate = progress * travel - widthPx</b>
+<b class="fc">&nbsp;    val brush = Brush.linearGradient(</b>
+<b class="fc">&nbsp;        colors = listOf(base, highlight, base),</b>
+<b class="fc">&nbsp;        start = Offset(translate, 0f),</b>
+<b class="fc">&nbsp;        end = Offset(translate + widthPx, 0f),</b>
+&nbsp;    )
+&nbsp;
+<b class="fc">&nbsp;    androidx.compose.foundation.layout.Box(</b>
+<b class="fc">&nbsp;        modifier = modifier</b>
+<b class="fc">&nbsp;            .clip(shape)</b>
+<b class="fc">&nbsp;            .onSizeChanged { widthPx = it.width.toFloat() }</b>
+<b class="fc">&nbsp;            .background(brush),</b>
+&nbsp;    )
+<b class="fc">&nbsp;}</b>
+&nbsp;
+&nbsp;/**
+&nbsp; * A list-row skeleton: a circular avatar placeholder beside two stacked text-line
+&nbsp; * placeholders. Drop several into a column to skeleton-out a loading list.
+&nbsp; */
+&nbsp;@Composable
+<b class="pc">&nbsp;fun SurferSkeletonRow(modifier: Modifier = Modifier) {</b>
+<b class="fc">&nbsp;    Row(</b>
+<b class="fc">&nbsp;        modifier = modifier.fillMaxWidth(),</b>
+<b class="fc">&nbsp;        verticalAlignment = Alignment.CenterVertically,</b>
+&nbsp;    ) {
+<b class="fc">&nbsp;        SurferSkeleton(</b>
+<b class="fc">&nbsp;            modifier = Modifier.size(44.dp),</b>
+<b class="fc">&nbsp;            shape = CircleShape,</b>
+&nbsp;        )
+<b class="fc">&nbsp;        Spacer(Modifier.width(AppTheme.spacing.medium))</b>
+<b class="fc">&nbsp;        Column(</b>
+<b class="fc">&nbsp;            modifier = Modifier.weight(1f),</b>
+<b class="fc">&nbsp;            verticalArrangement = Arrangement.spacedBy(AppTheme.spacing.xSmall),</b>
+&nbsp;        ) {
+<b class="fc">&nbsp;            SurferSkeleton(modifier = Modifier.fillMaxWidth(fraction = 0.55f).height(14.dp))</b>
+<b class="fc">&nbsp;            SurferSkeleton(modifier = Modifier.fillMaxWidth(fraction = 0.35f).height(12.dp))</b>
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;        Spacer(Modifier.width(AppTheme.spacing.medium))</b>
+<b class="fc">&nbsp;        SurferSkeleton(modifier = Modifier.width(64.dp).height(16.dp))</b>
+<b class="fc">&nbsp;    }</b>
+<b class="fc">&nbsp;}</b>
+&nbsp;
+&nbsp;@Preview
+&nbsp;@Composable
+<b class="nc">&nbsp;private fun SurferSkeletonPreview() {</b>
+<b class="nc">&nbsp;    SurferComponentPreview {</b>
+&nbsp;        Column(
+&nbsp;            modifier = Modifier.padding(16.dp),
+&nbsp;            verticalArrangement = Arrangement.spacedBy(12.dp),
+&nbsp;        ) {
+&nbsp;            SurferSkeleton(modifier = Modifier.fillMaxWidth().height(160.dp))
+&nbsp;            SurferSkeletonRow()
+&nbsp;            SurferSkeletonRow()
+&nbsp;        }
+&nbsp;    }
+<b class="nc">&nbsp;}</b>
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-07-28 21:38</div>
+</div>
+</body>
+</html>

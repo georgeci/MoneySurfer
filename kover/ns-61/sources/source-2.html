@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > InviteUi</title>
+  <title>MoneySurfer Coverage Report > InviteFieldError</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.feature.workspace.members</a>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.workspace.invite</a>
 </div>
 
-<h1>Coverage Summary for Class: InviteUi (com.georgeci.moneysurfer.feature.workspace.members)</h1>
+<h1>Coverage Summary for Class: InviteFieldError (com.georgeci.moneysurfer.feature.workspace.invite)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">InviteUi</td>
+  <td class="name">InviteFieldError</td>
 <td class="coverageStat">
   <span class="percent">
     0%
@@ -72,7 +72,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/6)
+    (0/1)
   </span>
 </td>
 <td class="coverageStat">
@@ -80,7 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/27)
+    (0/30)
   </span>
 </td>
 </tr>
@@ -92,237 +92,96 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.workspace.members
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.workspace.invite
 &nbsp;
 &nbsp;import arrow.optics.optics
-&nbsp;import com.georgeci.moneysurfer.domain.auth.SessionPointers
-&nbsp;import com.georgeci.moneysurfer.domain.model.InviteStatus
-&nbsp;import com.georgeci.moneysurfer.domain.model.WorkspaceInvite
-&nbsp;import com.georgeci.moneysurfer.domain.model.WorkspaceMember
-&nbsp;import com.georgeci.moneysurfer.domain.model.WorkspaceMemberStatus
 &nbsp;import com.georgeci.moneysurfer.domain.model.WorkspaceRole
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.UserId
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceInviteId
-&nbsp;import com.georgeci.moneysurfer.domain.repositories.WorkspaceInviteRepository
-&nbsp;import com.georgeci.moneysurfer.domain.repositories.WorkspaceMemberRepository
-&nbsp;import com.georgeci.moneysurfer.domain.usecase.CancelInviteUseCase
-&nbsp;import com.georgeci.moneysurfer.domain.usecase.GetWorkspacesForUserUseCase
 &nbsp;import com.georgeci.moneysurfer.domain.usecase.InviteError
-&nbsp;import com.georgeci.moneysurfer.domain.usecase.LeaveWorkspaceUseCase
+&nbsp;import com.georgeci.moneysurfer.domain.usecase.SendInviteUseCase
 &nbsp;import com.georgeci.moneysurfer.utils.MviViewModel
-&nbsp;import kotlinx.coroutines.flow.combine
-&nbsp;import kotlinx.coroutines.flow.first
 &nbsp;import org.koin.core.annotation.KoinViewModel
 &nbsp;
 &nbsp;@KoinViewModel
-&nbsp;class WorkspaceMembersViewModel(
+&nbsp;class WorkspaceInviteViewModel(
 &nbsp;    workspaceId: WorkspaceId,
-&nbsp;    private val session: SessionPointers,
-&nbsp;    private val getWorkspacesForUserUseCase: GetWorkspacesForUserUseCase,
-&nbsp;    private val memberRepository: WorkspaceMemberRepository,
-&nbsp;    private val inviteRepository: WorkspaceInviteRepository,
-&nbsp;    private val leaveWorkspace: LeaveWorkspaceUseCase,
-&nbsp;    private val cancelInvite: CancelInviteUseCase,
-&nbsp;    private val clock: ClockUseCase,
-&nbsp;) : MviViewModel&lt;WorkspaceMembersState, WorkspaceMembersEvent, WorkspaceMembersEffect&gt;(
-&nbsp;    initialState = WorkspaceMembersState.Loading(workspaceId),
+&nbsp;    private val sendInvite: SendInviteUseCase,
+&nbsp;) : MviViewModel&lt;WorkspaceInviteState, WorkspaceInviteEvent, WorkspaceInviteEffect&gt;(
+&nbsp;    initialState = WorkspaceInviteState(workspaceId = workspaceId),
 &nbsp;) {
 &nbsp;
-&nbsp;    init { observeWorkspace() }
-&nbsp;
-&nbsp;    override fun onEvent(event: WorkspaceMembersEvent) {
+&nbsp;    override fun onEvent(event: WorkspaceInviteEvent) {
 &nbsp;        when (event) {
-&nbsp;            WorkspaceMembersEvent.OnDismiss -&gt; postSideEffect(WorkspaceMembersEffect.Dismiss)
-&nbsp;            WorkspaceMembersEvent.OnInviteClick -&gt; postSideEffect(WorkspaceMembersEffect.OpenInvite)
-&nbsp;            is WorkspaceMembersEvent.OnTabSelected -&gt; selectTab(event.tab)
-&nbsp;            is WorkspaceMembersEvent.OnMemberClick -&gt; openMemberActions(event.userId)
-&nbsp;            WorkspaceMembersEvent.OnLeaveClick -&gt; updateContent { copy(showLeaveDialog = true) }
-&nbsp;            WorkspaceMembersEvent.OnLeaveCancel -&gt; updateContent { copy(showLeaveDialog = false) }
-&nbsp;            WorkspaceMembersEvent.OnLeaveConfirm -&gt; performLeave()
-&nbsp;            is WorkspaceMembersEvent.OnInviteCancel -&gt; performCancelInvite(event.id)
+&nbsp;            WorkspaceInviteEvent.OnDismiss -&gt; postSideEffect(WorkspaceInviteEffect.Dismiss)
+&nbsp;            is WorkspaceInviteEvent.OnEmailChanged -&gt; updateState {
+&nbsp;                copy(email = event.email, emailError = null)
+&nbsp;            }
+&nbsp;            is WorkspaceInviteEvent.OnRoleSelected -&gt; updateState { copy(role = event.role) }
+&nbsp;            WorkspaceInviteEvent.OnSubmit -&gt; submit()
 &nbsp;        }
 &nbsp;    }
 &nbsp;
-&nbsp;    private fun openMemberActions(userId: UserId) {
-&nbsp;        val state = WorkspaceMembersState.content.getOrNull(currentState) ?: return
-&nbsp;        val target = state.members.firstOrNull { it.userId == userId } ?: return
-&nbsp;
-&nbsp;        if (state.canManage &amp;&amp; !target.isYou &amp;&amp; target.role != WorkspaceRole.OWNER) {
-&nbsp;            postSideEffect(
-&nbsp;                WorkspaceMembersEffect.OpenMemberActions(state.workspaceId, userId),
-&nbsp;            )
-&nbsp;        }
-&nbsp;    }
-&nbsp;
-&nbsp;    private fun performLeave() {
-&nbsp;        val state = currentState as? WorkspaceMembersState.Content ?: return
-&nbsp;        if (state.busy) return
-&nbsp;        updateContent { copy(busy = true) }
-&nbsp;        launch(onError = { reportFailure(InviteError.LocalWriteFailed(it)) }) {
-&nbsp;            leaveWorkspace(state.workspaceId).fold(
-&nbsp;                ifLeft = { reportFailure(it) },
+&nbsp;    private fun submit() {
+&nbsp;        val state = currentState
+&nbsp;        if (state.isSubmitting) return
+&nbsp;        updateState { copy(isSubmitting = true, emailError = null) }
+&nbsp;        launch(onError = { handleFailure(InviteError.LocalWriteFailed(it)) }) {
+&nbsp;            sendInvite(
+&nbsp;                SendInviteUseCase.Params(
+&nbsp;                    workspaceId = state.workspaceId,
+&nbsp;                    email = state.email,
+&nbsp;                    role = state.role,
+&nbsp;                ),
+&nbsp;            ).fold(
+&nbsp;                ifLeft = { handleFailure(it) },
 &nbsp;                ifRight = {
-&nbsp;                    updateContent { copy(busy = false, showLeaveDialog = false) }
-&nbsp;                    postSideEffect(WorkspaceMembersEffect.LeftWorkspace)
+&nbsp;                    updateState { copy(isSubmitting = false) }
+&nbsp;                    postSideEffect(WorkspaceInviteEffect.Sent(state.email.trim().lowercase()))
 &nbsp;                },
 &nbsp;            )
 &nbsp;        }
 &nbsp;    }
 &nbsp;
-&nbsp;    private fun performCancelInvite(id: WorkspaceInviteId) {
-&nbsp;        val state = currentState as? WorkspaceMembersState.Content ?: return
-&nbsp;        if (state.busy) return
-&nbsp;        updateContent { copy(busy = true) }
-&nbsp;        launch(onError = { reportFailure(InviteError.LocalWriteFailed(it)) }) {
-&nbsp;            cancelInvite(id).fold(
-&nbsp;                ifLeft = { reportFailure(it) },
-&nbsp;                ifRight = { updateContent { copy(busy = false) } },
-&nbsp;            )
+&nbsp;    private fun handleFailure(error: InviteError) {
+&nbsp;        updateState { copy(isSubmitting = false, emailError = mapToFieldError(error)) }
+&nbsp;        if (mapToFieldError(error) == null) {
+&nbsp;            postSideEffect(WorkspaceInviteEffect.ShowError(error))
 &nbsp;        }
 &nbsp;    }
 &nbsp;
-&nbsp;    private fun reportFailure(error: InviteError) {
-&nbsp;        updateContent { copy(busy = false, showLeaveDialog = false) }
-&nbsp;        postSideEffect(WorkspaceMembersEffect.ShowError(error))
-&nbsp;    }
-&nbsp;
-&nbsp;    private fun selectTab(tab: MembersTab) {
-&nbsp;        updateContent { if (this.tab == tab) this else copy(tab = tab) }
-&nbsp;    }
-&nbsp;
-&nbsp;    private inline fun updateContent(
-&nbsp;        crossinline block: WorkspaceMembersState.Content.() -&gt; WorkspaceMembersState.Content,
-&nbsp;    ) {
-&nbsp;        updateState { if (this is WorkspaceMembersState.Content) block() else this }
-&nbsp;    }
-&nbsp;
-&nbsp;    private fun observeWorkspace() {
-&nbsp;        launch {
-&nbsp;            val workspaceId = currentState.workspaceId
-&nbsp;            val userId = session.currentUserId.first()
-&nbsp;            val workspace = userId
-&nbsp;                ?.let { getWorkspacesForUserUseCase(it).first().firstOrNull { ws -&gt; ws.id == workspaceId } }
-&nbsp;
-&nbsp;            val membersFlow = memberRepository.getByWorkspaceId(workspaceId)
-&nbsp;            val invitesFlow = inviteRepository.getByWorkspaceId(workspaceId)
-&nbsp;
-&nbsp;            combine(membersFlow, invitesFlow) { members, invites -&gt; members to invites }
-&nbsp;                .collect { (members, invites) -&gt;
-&nbsp;                    val activeMembers = members.filter { it.status == WorkspaceMemberStatus.ACTIVE }
-&nbsp;                    val pendingInvites = invites
-&nbsp;                        .filter { it.status == InviteStatus.PENDING }
-&nbsp;                        .sortedByDescending { it.createdAt }
-&nbsp;                    val now = clock.now()
-&nbsp;                    val viewerRole = activeMembers.firstOrNull { it.userId == userId }?.role
-&nbsp;
-&nbsp;                    updateState {
-&nbsp;                        val previous = this as? WorkspaceMembersState.Content
-&nbsp;                        WorkspaceMembersState.Content(
-&nbsp;                            workspaceId = workspaceId,
-&nbsp;                            workspaceName = workspace?.name.orEmpty(),
-&nbsp;                            currentUserId = userId,
-&nbsp;                            viewerRole = viewerRole,
-&nbsp;                            members = activeMembers.map { it.toUi(userId) },
-&nbsp;                            pendingInvites = pendingInvites.map { it.toUi(now) },
-&nbsp;                            tab = previous?.tab ?: MembersTab.Active,
-&nbsp;                            busy = previous?.busy ?: false,
-&nbsp;                            showLeaveDialog = previous?.showLeaveDialog ?: false,
-&nbsp;                        )
-&nbsp;                    }
-&nbsp;                }
-&nbsp;        }
+&nbsp;    private fun mapToFieldError(error: InviteError): InviteFieldError? = when (error) {
+&nbsp;        InviteError.InvalidEmail -&gt; InviteFieldError.Invalid
+&nbsp;        is InviteError.AlreadyMember -&gt; InviteFieldError.AlreadyMember
+&nbsp;        is InviteError.AlreadyInvited -&gt; InviteFieldError.AlreadyInvited
+&nbsp;        is InviteError.UserNotFound -&gt; InviteFieldError.UserNotFound
+&nbsp;        else -&gt; null
 &nbsp;    }
 &nbsp;}
 &nbsp;
-&nbsp;private fun WorkspaceMember.toUi(currentUserId: UserId?): MemberUi = MemberUi(
-&nbsp;    userId = userId,
-&nbsp;    name = displayName.ifBlank { email.orEmpty() }.ifBlank { &quot;Member&quot; },
-&nbsp;    email = email.orEmpty(),
-&nbsp;    role = role,
-&nbsp;    initial = (displayName.firstOrNull() ?: email?.firstOrNull() ?: &#39;?&#39;).uppercaseChar().toString(),
-&nbsp;    isYou = userId == currentUserId,
-&nbsp;)
-&nbsp;
-&nbsp;private fun WorkspaceInvite.toUi(now: kotlin.time.Instant): InviteUi = InviteUi(
-&nbsp;    id = id,
-&nbsp;    email = email,
-&nbsp;    role = role,
-&nbsp;    isExpired = expiresAt &lt;= now,
-&nbsp;    expiresAt = expiresAt,
-&nbsp;)
-&nbsp;
 &nbsp;@optics
-&nbsp;sealed interface WorkspaceMembersState {
-&nbsp;    val workspaceId: WorkspaceId
-&nbsp;
-&nbsp;    @optics
-&nbsp;    data class Loading(override val workspaceId: WorkspaceId) : WorkspaceMembersState {
-&nbsp;        companion object
-&nbsp;    }
-&nbsp;
-&nbsp;    @optics
-&nbsp;    data class Content(
-&nbsp;        override val workspaceId: WorkspaceId,
-&nbsp;        val workspaceName: String,
-&nbsp;        val currentUserId: UserId?,
-&nbsp;        val viewerRole: WorkspaceRole?,
-&nbsp;        val members: List&lt;MemberUi&gt;,
-&nbsp;        val pendingInvites: List&lt;InviteUi&gt;,
-&nbsp;        val tab: MembersTab,
-&nbsp;        val busy: Boolean,
-&nbsp;        val showLeaveDialog: Boolean,
-&nbsp;    ) : WorkspaceMembersState {
-&nbsp;        val canManage: Boolean get() = viewerRole == WorkspaceRole.OWNER
-&nbsp;        val canLeave: Boolean get() = viewerRole != null &amp;&amp; viewerRole != WorkspaceRole.OWNER
-&nbsp;        val activeCount: Int get() = members.size
-&nbsp;        val invitedCount: Int get() = pendingInvites.count { !it.isExpired }
-&nbsp;        companion object
-&nbsp;    }
-&nbsp;
+&nbsp;data class WorkspaceInviteState(
+&nbsp;    val workspaceId: WorkspaceId,
+&nbsp;    val email: String = &quot;&quot;,
+&nbsp;    val role: WorkspaceRole = WorkspaceRole.EDITOR,
+&nbsp;    val isSubmitting: Boolean = false,
+&nbsp;    val emailError: InviteFieldError? = null,
+&nbsp;) {
 &nbsp;    companion object
 &nbsp;}
 &nbsp;
-&nbsp;data class MemberUi(
-&nbsp;    val userId: UserId,
-&nbsp;    val name: String,
-&nbsp;    val email: String,
-&nbsp;    val role: WorkspaceRole,
-&nbsp;    val initial: String,
-&nbsp;    val isYou: Boolean,
-&nbsp;)
+<b class="nc">&nbsp;enum class InviteFieldError { Invalid, AlreadyMember, AlreadyInvited, UserNotFound }</b>
 &nbsp;
-<b class="nc">&nbsp;data class InviteUi(</b>
-<b class="nc">&nbsp;    val id: WorkspaceInviteId,</b>
-<b class="nc">&nbsp;    val email: String,</b>
-<b class="nc">&nbsp;    val role: WorkspaceRole,</b>
-<b class="nc">&nbsp;    val isExpired: Boolean,</b>
-<b class="nc">&nbsp;    val expiresAt: kotlin.time.Instant,</b>
-&nbsp;)
-&nbsp;
-&nbsp;enum class MembersTab { Active, Invited }
-&nbsp;
-&nbsp;sealed interface WorkspaceMembersEvent {
-&nbsp;    data object OnDismiss : WorkspaceMembersEvent
-&nbsp;    data object OnInviteClick : WorkspaceMembersEvent
-&nbsp;    data class OnTabSelected(val tab: MembersTab) : WorkspaceMembersEvent
-&nbsp;    data class OnMemberClick(val userId: UserId) : WorkspaceMembersEvent
-&nbsp;    data object OnLeaveClick : WorkspaceMembersEvent
-&nbsp;    data object OnLeaveCancel : WorkspaceMembersEvent
-&nbsp;    data object OnLeaveConfirm : WorkspaceMembersEvent
-&nbsp;    data class OnInviteCancel(val id: WorkspaceInviteId) : WorkspaceMembersEvent
+&nbsp;sealed interface WorkspaceInviteEvent {
+&nbsp;    data object OnDismiss : WorkspaceInviteEvent
+&nbsp;    data class OnEmailChanged(val email: String) : WorkspaceInviteEvent
+&nbsp;    data class OnRoleSelected(val role: WorkspaceRole) : WorkspaceInviteEvent
+&nbsp;    data object OnSubmit : WorkspaceInviteEvent
 &nbsp;}
 &nbsp;
-&nbsp;sealed interface WorkspaceMembersEffect {
-&nbsp;    data object Dismiss : WorkspaceMembersEffect
-&nbsp;    data object OpenInvite : WorkspaceMembersEffect
-&nbsp;    data class OpenMemberActions(
-&nbsp;        val workspaceId: WorkspaceId,
-&nbsp;        val targetUserId: UserId,
-&nbsp;    ) : WorkspaceMembersEffect
-&nbsp;    data object LeftWorkspace : WorkspaceMembersEffect
-&nbsp;    data class ShowError(val error: InviteError) : WorkspaceMembersEffect
+&nbsp;sealed interface WorkspaceInviteEffect {
+&nbsp;    data object Dismiss : WorkspaceInviteEffect
+&nbsp;    data class Sent(val email: String) : WorkspaceInviteEffect
+&nbsp;    data class ShowError(val error: InviteError) : WorkspaceInviteEffect
 &nbsp;}
 </code>
 </pre>
@@ -347,7 +206,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 21:18</div>
+    <div style="float:right;">generated on 2026-07-28 21:38</div>
 </div>
 </body>
 </html>

@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > OutboxEnqueuerImpl</title>
+  <title>MoneySurfer Coverage Report > CategoryDetailsState_Content__OpticsKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.sync.repository</a>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.category.details</a>
 </div>
 
-<h1>Coverage Summary for Class: OutboxEnqueuerImpl (com.georgeci.moneysurfer.sync.repository)</h1>
+<h1>Coverage Summary for Class: CategoryDetailsState_Content__OpticsKt (com.georgeci.moneysurfer.feature.category.details)</h1>
 
 <table class="coverageStats">
 
@@ -46,84 +46,114 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">OutboxEnqueuerImpl</td>
+  <td class="name">CategoryDetailsState_Content__OpticsKt</td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (5/5)
+    (0/82)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/82)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (12/12)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (22/22)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (178/178)
+    (0/514)
   </span>
 </td>
 </tr>
   <tr>
-    <td class="name">OutboxEnqueuerImpl$enqueueDelete$1</td>
+    <td class="name">CategoryDetailsState_Content__OpticsKt$categoryId$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
     <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
   </tr>
   <tr>
-    <td class="name">OutboxEnqueuerImpl$enqueueUpsert$1</td>
+    <td class="name">CategoryDetailsState_Content__OpticsKt$categoryId$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
     <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">OutboxEnqueuerImpl$isEnabled$1</td>
-    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
   </tr>
 <tr>
   <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (5/5)
+    (0/84)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/84)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (12/12)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (22/22)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (178/178)
+    (0/534)
   </span>
 </td>
 </tr>
@@ -134,85 +164,163 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.sync.repository
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.category.details
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.auth.SessionPointers
-&nbsp;import com.georgeci.moneysurfer.domain.repositories.AppVersionGate
-&nbsp;import kotlinx.coroutines.flow.first
-&nbsp;import org.koin.core.annotation.Single
-&nbsp;import kotlin.time.Clock
-&nbsp;import kotlin.uuid.ExperimentalUuidApi
-&nbsp;import kotlin.uuid.Uuid
 &nbsp;
-&nbsp;/**
-&nbsp; * Convenience wrapper for repositories: guards against demo mode and
-&nbsp; * packages the [PendingMutation] for the outbox.
-&nbsp; *
-&nbsp; * [entityType] is a string constant from [com.georgeci.moneysurfer.domain.sync.SyncEntityTypes].
-&nbsp; * [scopeKey] carries the workspace id for subcollection entities, null for root-collection entities.
-&nbsp; *
-&nbsp; * The push worker reads the entity from Room at push time — no payload serialization happens here.
-&nbsp; * See sync.md §4.3.
-&nbsp; */
-<b class="fc">&nbsp;@Single(binds = [OutboxEnqueuer::class])</b>
-&nbsp;class OutboxEnqueuerImpl(
-<b class="fc">&nbsp;    private val outbox: PendingMutationQueue,</b>
-<b class="fc">&nbsp;    private val session: SessionPointers,</b>
-<b class="fc">&nbsp;    private val appVersionGate: AppVersionGate,</b>
-&nbsp;) : OutboxEnqueuer {
 &nbsp;
-&nbsp;    override suspend fun enqueueUpsert(
-&nbsp;        entityType: String,
-&nbsp;        entityId: String,
-&nbsp;        scopeKey: String?,
-&nbsp;        operation: MutationOperation,
-&nbsp;    ) {
-<b class="fc">&nbsp;        require(operation != MutationOperation.DELETE) {</b>
-<b class="fc">&nbsp;            &quot;DELETE has no payload — call enqueueDelete instead&quot;</b>
-&nbsp;        }
-<b class="fc">&nbsp;        if (!isEnabled()) return</b>
-<b class="fc">&nbsp;        outbox.enqueue(buildMutation(entityType, entityId, scopeKey, operation))</b>
-&nbsp;    }
-&nbsp;
-&nbsp;    override suspend fun enqueueDelete(
-&nbsp;        entityType: String,
-&nbsp;        entityId: String,
-&nbsp;        scopeKey: String?,
-&nbsp;    ) {
-<b class="fc">&nbsp;        if (!isEnabled()) return</b>
-<b class="fc">&nbsp;        outbox.enqueue(buildMutation(entityType, entityId, scopeKey, MutationOperation.DELETE))</b>
-&nbsp;    }
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Outbox accepts mutations only when:
-&nbsp;     * 1. The user is signed in to a real Firebase account (demo sessions
-&nbsp;     *    skip — mutations stay purely local).
-&nbsp;     * 2. The remote app-version gate is not in `Unsupported` state.
-&nbsp;     *    See block.md.
-&nbsp;     */
-&nbsp;    override suspend fun isEnabled(): Boolean {
-<b class="fc">&nbsp;        val uid = session.currentFirebaseUid.flow.first()</b>
-<b class="fc">&nbsp;        if (uid.isNullOrEmpty()) return false</b>
-<b class="fc">&nbsp;        return appVersionGate.isSyncAllowed()</b>
-&nbsp;    }
-&nbsp;
-&nbsp;    @OptIn(ExperimentalUuidApi::class)
-&nbsp;    private fun buildMutation(
-&nbsp;        entityType: String,
-&nbsp;        entityId: String,
-&nbsp;        scopeKey: String?,
-&nbsp;        operation: MutationOperation,
-<b class="fc">&nbsp;    ): PendingMutation = PendingMutation(</b>
-<b class="fc">&nbsp;        id = Uuid.random().toString(),</b>
-<b class="fc">&nbsp;        entityType = entityType,</b>
-<b class="fc">&nbsp;        entityId = entityId,</b>
-<b class="fc">&nbsp;        operation = operation,</b>
-<b class="fc">&nbsp;        scopeKey = scopeKey,</b>
-<b class="fc">&nbsp;        createdAt = Clock.System.now(),</b>
-<b class="fc">&nbsp;        attempts = 0,</b>
-<b class="fc">&nbsp;        lastError = null,</b>
-&nbsp;    )
+<b class="nc">&nbsp;public  val com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content.Companion.`categoryId`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content, com.georgeci.moneysurfer.domain.primitives.CategoryId&gt;  get() = arrow.optics.Lens(</b>
+<b class="nc">&nbsp;  get = { content: com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content -&gt; content.`categoryId` },</b>
+&nbsp;  set = { content: com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content, value: com.georgeci.moneysurfer.domain.primitives.CategoryId -&gt;
+<b class="nc">&nbsp;  content.copy(`categoryId` = value)</b>
 &nbsp;}
+&nbsp;)
+&nbsp;
+<b class="nc">&nbsp;public  val com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content.Companion.`name`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content, kotlin.String&gt;  get() = arrow.optics.Lens(</b>
+<b class="nc">&nbsp;  get = { content: com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content -&gt; content.`name` },</b>
+&nbsp;  set = { content: com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content, value: kotlin.String -&gt;
+<b class="nc">&nbsp;  content.copy(`name` = value)</b>
+&nbsp;}
+&nbsp;)
+&nbsp;
+<b class="nc">&nbsp;public  val com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content.Companion.`type`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content, com.georgeci.moneysurfer.domain.primitives.CategoryType&gt;  get() = arrow.optics.Lens(</b>
+<b class="nc">&nbsp;  get = { content: com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content -&gt; content.`type` },</b>
+&nbsp;  set = { content: com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content, value: com.georgeci.moneysurfer.domain.primitives.CategoryType -&gt;
+<b class="nc">&nbsp;  content.copy(`type` = value)</b>
+&nbsp;}
+&nbsp;)
+&nbsp;
+<b class="nc">&nbsp;public  val com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content.Companion.`iconKey`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content, kotlin.String&gt;  get() = arrow.optics.Lens(</b>
+<b class="nc">&nbsp;  get = { content: com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content -&gt; content.`iconKey` },</b>
+&nbsp;  set = { content: com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content, value: kotlin.String -&gt;
+<b class="nc">&nbsp;  content.copy(`iconKey` = value)</b>
+&nbsp;}
+&nbsp;)
+&nbsp;
+<b class="nc">&nbsp;public  val com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content.Companion.`hue`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content, kotlin.Int&gt;  get() = arrow.optics.Lens(</b>
+<b class="nc">&nbsp;  get = { content: com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content -&gt; content.`hue` },</b>
+&nbsp;  set = { content: com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content, value: kotlin.Int -&gt;
+<b class="nc">&nbsp;  content.copy(`hue` = value)</b>
+&nbsp;}
+&nbsp;)
+&nbsp;
+<b class="nc">&nbsp;public  val com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content.Companion.`systemKind`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content, kotlin.String?&gt;  get() = arrow.optics.Lens(</b>
+<b class="nc">&nbsp;  get = { content: com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content -&gt; content.`systemKind` },</b>
+&nbsp;  set = { content: com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content, value: kotlin.String? -&gt;
+<b class="nc">&nbsp;  content.copy(`systemKind` = value)</b>
+&nbsp;}
+&nbsp;)
+&nbsp;
+<b class="nc">&nbsp;public  val com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content.Companion.`isLeaf`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content, kotlin.Boolean&gt;  get() = arrow.optics.Lens(</b>
+<b class="nc">&nbsp;  get = { content: com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content -&gt; content.`isLeaf` },</b>
+&nbsp;  set = { content: com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content, value: kotlin.Boolean -&gt;
+<b class="nc">&nbsp;  content.copy(`isLeaf` = value)</b>
+&nbsp;}
+&nbsp;)
+&nbsp;
+<b class="nc">&nbsp;public  val com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content.Companion.`formattedTotal`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content, kotlin.String&gt;  get() = arrow.optics.Lens(</b>
+<b class="nc">&nbsp;  get = { content: com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content -&gt; content.`formattedTotal` },</b>
+&nbsp;  set = { content: com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content, value: kotlin.String -&gt;
+<b class="nc">&nbsp;  content.copy(`formattedTotal` = value)</b>
+&nbsp;}
+&nbsp;)
+&nbsp;
+<b class="nc">&nbsp;public  val com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content.Companion.`formattedAverage`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content, kotlin.String&gt;  get() = arrow.optics.Lens(</b>
+<b class="nc">&nbsp;  get = { content: com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content -&gt; content.`formattedAverage` },</b>
+&nbsp;  set = { content: com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content, value: kotlin.String -&gt;
+<b class="nc">&nbsp;  content.copy(`formattedAverage` = value)</b>
+&nbsp;}
+&nbsp;)
+&nbsp;
+<b class="nc">&nbsp;public  val com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content.Companion.`formattedPerTransaction`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content, kotlin.String?&gt;  get() = arrow.optics.Lens(</b>
+<b class="nc">&nbsp;  get = { content: com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content -&gt; content.`formattedPerTransaction` },</b>
+&nbsp;  set = { content: com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content, value: kotlin.String? -&gt;
+<b class="nc">&nbsp;  content.copy(`formattedPerTransaction` = value)</b>
+&nbsp;}
+&nbsp;)
+&nbsp;
+<b class="nc">&nbsp;public  val com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content.Companion.`transactionCount`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content, kotlin.Int&gt;  get() = arrow.optics.Lens(</b>
+<b class="nc">&nbsp;  get = { content: com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content -&gt; content.`transactionCount` },</b>
+&nbsp;  set = { content: com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content, value: kotlin.Int -&gt;
+<b class="nc">&nbsp;  content.copy(`transactionCount` = value)</b>
+&nbsp;}
+&nbsp;)
+&nbsp;
+<b class="nc">&nbsp;public  val com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content.Companion.`months`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content, kotlin.collections.List&lt;com.georgeci.moneysurfer.feature.category.details.CategoryTrendMonthUi&gt;&gt;  get() = arrow.optics.Lens(</b>
+<b class="nc">&nbsp;  get = { content: com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content -&gt; content.`months` },</b>
+&nbsp;  set = { content: com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content, value: kotlin.collections.List&lt;com.georgeci.moneysurfer.feature.category.details.CategoryTrendMonthUi&gt; -&gt;
+<b class="nc">&nbsp;  content.copy(`months` = value)</b>
+&nbsp;}
+&nbsp;)
+&nbsp;
+<b class="nc">&nbsp;public  val com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content.Companion.`subcategories`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content, kotlin.collections.List&lt;com.georgeci.moneysurfer.feature.category.details.CategorySubcategoryUi&gt;&gt;  get() = arrow.optics.Lens(</b>
+<b class="nc">&nbsp;  get = { content: com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content -&gt; content.`subcategories` },</b>
+&nbsp;  set = { content: com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content, value: kotlin.collections.List&lt;com.georgeci.moneysurfer.feature.category.details.CategorySubcategoryUi&gt; -&gt;
+<b class="nc">&nbsp;  content.copy(`subcategories` = value)</b>
+&nbsp;}
+&nbsp;)
+&nbsp;
+<b class="nc">&nbsp;public  val com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content.Companion.`transactions`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content, kotlin.collections.List&lt;com.georgeci.moneysurfer.feature.category.details.CategoryTransactionUi&gt;&gt;  get() = arrow.optics.Lens(</b>
+<b class="nc">&nbsp;  get = { content: com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content -&gt; content.`transactions` },</b>
+&nbsp;  set = { content: com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content, value: kotlin.collections.List&lt;com.georgeci.moneysurfer.feature.category.details.CategoryTransactionUi&gt; -&gt;
+<b class="nc">&nbsp;  content.copy(`transactions` = value)</b>
+&nbsp;}
+&nbsp;)
+&nbsp;
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content&gt;.`categoryId`: arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.domain.primitives.CategoryId&gt;  get() = this + com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content.`categoryId`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content&gt;.`categoryId`: arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.domain.primitives.CategoryId&gt;  get() = this + com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content.`categoryId`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content&gt;.`categoryId`: arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.domain.primitives.CategoryId&gt;  get() = this + com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content.`categoryId`</b>
+&nbsp;
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content&gt;.`name`: arrow.optics.Lens&lt;__S, kotlin.String&gt;  get() = this + com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content.`name`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content&gt;.`name`: arrow.optics.Optional&lt;__S, kotlin.String&gt;  get() = this + com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content.`name`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content&gt;.`name`: arrow.optics.Traversal&lt;__S, kotlin.String&gt;  get() = this + com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content.`name`</b>
+&nbsp;
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content&gt;.`type`: arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.domain.primitives.CategoryType&gt;  get() = this + com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content.`type`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content&gt;.`type`: arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.domain.primitives.CategoryType&gt;  get() = this + com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content.`type`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content&gt;.`type`: arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.domain.primitives.CategoryType&gt;  get() = this + com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content.`type`</b>
+&nbsp;
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content&gt;.`iconKey`: arrow.optics.Lens&lt;__S, kotlin.String&gt;  get() = this + com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content.`iconKey`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content&gt;.`iconKey`: arrow.optics.Optional&lt;__S, kotlin.String&gt;  get() = this + com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content.`iconKey`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content&gt;.`iconKey`: arrow.optics.Traversal&lt;__S, kotlin.String&gt;  get() = this + com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content.`iconKey`</b>
+&nbsp;
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content&gt;.`hue`: arrow.optics.Lens&lt;__S, kotlin.Int&gt;  get() = this + com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content.`hue`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content&gt;.`hue`: arrow.optics.Optional&lt;__S, kotlin.Int&gt;  get() = this + com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content.`hue`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content&gt;.`hue`: arrow.optics.Traversal&lt;__S, kotlin.Int&gt;  get() = this + com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content.`hue`</b>
+&nbsp;
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content&gt;.`systemKind`: arrow.optics.Lens&lt;__S, kotlin.String?&gt;  get() = this + com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content.`systemKind`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content&gt;.`systemKind`: arrow.optics.Optional&lt;__S, kotlin.String?&gt;  get() = this + com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content.`systemKind`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content&gt;.`systemKind`: arrow.optics.Traversal&lt;__S, kotlin.String?&gt;  get() = this + com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content.`systemKind`</b>
+&nbsp;
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content&gt;.`isLeaf`: arrow.optics.Lens&lt;__S, kotlin.Boolean&gt;  get() = this + com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content.`isLeaf`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content&gt;.`isLeaf`: arrow.optics.Optional&lt;__S, kotlin.Boolean&gt;  get() = this + com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content.`isLeaf`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content&gt;.`isLeaf`: arrow.optics.Traversal&lt;__S, kotlin.Boolean&gt;  get() = this + com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content.`isLeaf`</b>
+&nbsp;
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content&gt;.`formattedTotal`: arrow.optics.Lens&lt;__S, kotlin.String&gt;  get() = this + com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content.`formattedTotal`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content&gt;.`formattedTotal`: arrow.optics.Optional&lt;__S, kotlin.String&gt;  get() = this + com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content.`formattedTotal`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content&gt;.`formattedTotal`: arrow.optics.Traversal&lt;__S, kotlin.String&gt;  get() = this + com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content.`formattedTotal`</b>
+&nbsp;
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content&gt;.`formattedAverage`: arrow.optics.Lens&lt;__S, kotlin.String&gt;  get() = this + com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content.`formattedAverage`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content&gt;.`formattedAverage`: arrow.optics.Optional&lt;__S, kotlin.String&gt;  get() = this + com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content.`formattedAverage`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content&gt;.`formattedAverage`: arrow.optics.Traversal&lt;__S, kotlin.String&gt;  get() = this + com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content.`formattedAverage`</b>
+&nbsp;
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content&gt;.`formattedPerTransaction`: arrow.optics.Lens&lt;__S, kotlin.String?&gt;  get() = this + com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content.`formattedPerTransaction`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content&gt;.`formattedPerTransaction`: arrow.optics.Optional&lt;__S, kotlin.String?&gt;  get() = this + com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content.`formattedPerTransaction`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content&gt;.`formattedPerTransaction`: arrow.optics.Traversal&lt;__S, kotlin.String?&gt;  get() = this + com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content.`formattedPerTransaction`</b>
+&nbsp;
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content&gt;.`transactionCount`: arrow.optics.Lens&lt;__S, kotlin.Int&gt;  get() = this + com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content.`transactionCount`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content&gt;.`transactionCount`: arrow.optics.Optional&lt;__S, kotlin.Int&gt;  get() = this + com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content.`transactionCount`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content&gt;.`transactionCount`: arrow.optics.Traversal&lt;__S, kotlin.Int&gt;  get() = this + com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content.`transactionCount`</b>
+&nbsp;
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content&gt;.`months`: arrow.optics.Lens&lt;__S, kotlin.collections.List&lt;com.georgeci.moneysurfer.feature.category.details.CategoryTrendMonthUi&gt;&gt;  get() = this + com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content.`months`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content&gt;.`months`: arrow.optics.Optional&lt;__S, kotlin.collections.List&lt;com.georgeci.moneysurfer.feature.category.details.CategoryTrendMonthUi&gt;&gt;  get() = this + com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content.`months`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content&gt;.`months`: arrow.optics.Traversal&lt;__S, kotlin.collections.List&lt;com.georgeci.moneysurfer.feature.category.details.CategoryTrendMonthUi&gt;&gt;  get() = this + com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content.`months`</b>
+&nbsp;
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content&gt;.`subcategories`: arrow.optics.Lens&lt;__S, kotlin.collections.List&lt;com.georgeci.moneysurfer.feature.category.details.CategorySubcategoryUi&gt;&gt;  get() = this + com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content.`subcategories`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content&gt;.`subcategories`: arrow.optics.Optional&lt;__S, kotlin.collections.List&lt;com.georgeci.moneysurfer.feature.category.details.CategorySubcategoryUi&gt;&gt;  get() = this + com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content.`subcategories`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content&gt;.`subcategories`: arrow.optics.Traversal&lt;__S, kotlin.collections.List&lt;com.georgeci.moneysurfer.feature.category.details.CategorySubcategoryUi&gt;&gt;  get() = this + com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content.`subcategories`</b>
+&nbsp;
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content&gt;.`transactions`: arrow.optics.Lens&lt;__S, kotlin.collections.List&lt;com.georgeci.moneysurfer.feature.category.details.CategoryTransactionUi&gt;&gt;  get() = this + com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content.`transactions`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content&gt;.`transactions`: arrow.optics.Optional&lt;__S, kotlin.collections.List&lt;com.georgeci.moneysurfer.feature.category.details.CategoryTransactionUi&gt;&gt;  get() = this + com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content.`transactions`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content&gt;.`transactions`: arrow.optics.Traversal&lt;__S, kotlin.collections.List&lt;com.georgeci.moneysurfer.feature.category.details.CategoryTransactionUi&gt;&gt;  get() = this + com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Content.`transactions`</b>
 </code>
 </pre>
 </div>
@@ -236,7 +344,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 20:32</div>
+    <div style="float:right;">generated on 2026-07-28 21:38</div>
 </div>
 </body>
 </html>

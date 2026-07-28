@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > PendingMutationQueue</title>
+  <title>MoneySurfer Coverage Report > CategoryDetailsState_Missing__OpticsKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.sync.repository</a>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.category.details</a>
 </div>
 
-<h1>Coverage Summary for Class: PendingMutationQueue (com.georgeci.moneysurfer.sync.repository)</h1>
+<h1>Coverage Summary for Class: CategoryDetailsState_Missing__OpticsKt (com.georgeci.moneysurfer.feature.category.details)</h1>
 
 <table class="coverageStats">
 
@@ -46,66 +46,114 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">PendingMutationQueue</td>
+  <td class="name">CategoryDetailsState_Missing__OpticsKt</td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (1/1)
+    (0/4)
   </span>
 </td>
     <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (1/1)
+    (0/4)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (18/18)
+    (0/20)
   </span>
 </td>
 </tr>
   <tr>
-    <td class="name">PendingMutationQueue$Companion</td>
+    <td class="name">CategoryDetailsState_Missing__OpticsKt$categoryId$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
     <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
   </tr>
   <tr>
-    <td class="name">PendingMutationQueue$DefaultImpls</td>
+    <td class="name">CategoryDetailsState_Missing__OpticsKt$categoryId$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
     <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
   </tr>
 <tr>
   <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (1/1)
+    (0/6)
   </span>
 </td>
     <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (1/1)
+    (0/6)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (18/18)
+    (0/25)
   </span>
 </td>
 </tr>
@@ -116,42 +164,20 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.sync.repository
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.category.details
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.sync.api.SyncScope
-&nbsp;import kotlinx.coroutines.flow.Flow
 &nbsp;
-&nbsp;/**
-&nbsp; * Outbox of local mutations waiting to be pushed to the remote backend.
-&nbsp; *
-&nbsp; * Lifecycle of a row:
-&nbsp; * 1. [enqueue] — produced by a repository&#39;s dual-write inside the same Room transaction
-&nbsp; *    that wrote the entity. Status = `PENDING`.
-&nbsp; * 2. [pending] — read by [com.georgeci.moneysurfer.sync.usecase.UploadPendingChangesUseCase]
-&nbsp; *    when sync runs. Caller then flips status via [markInFlight].
-&nbsp; * 3. [markCompleted] — successful push removes the row.
-&nbsp; * 4. [markFailed] — push exception bumps `attempts` and resets status to `PENDING`
-&nbsp; *    (next sync cycle picks it up again, possibly with backoff in a later phase).
-&nbsp; *
-&nbsp; * See SyncCoordinatorFAQ.md №13.
-&nbsp; */
-&nbsp;interface PendingMutationQueue {
-&nbsp;    suspend fun enqueue(mutation: PendingMutation)
 &nbsp;
-<b class="fc">&nbsp;    suspend fun pending(scope: SyncScope, limit: Int = DEFAULT_BATCH_LIMIT): List&lt;PendingMutation&gt;</b>
-&nbsp;
-&nbsp;    suspend fun markInFlight(ids: List&lt;String&gt;)
-&nbsp;
-&nbsp;    suspend fun markCompleted(ids: List&lt;String&gt;)
-&nbsp;
-&nbsp;    suspend fun markFailed(id: String, error: String)
-&nbsp;
-&nbsp;    val pendingCount: Flow&lt;Int&gt;
-&nbsp;
-&nbsp;    companion object {
-&nbsp;        const val DEFAULT_BATCH_LIMIT: Int = 100
-&nbsp;    }
+<b class="nc">&nbsp;public  val com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Missing.Companion.`categoryId`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Missing, com.georgeci.moneysurfer.domain.primitives.CategoryId&gt;  get() = arrow.optics.Lens(</b>
+<b class="nc">&nbsp;  get = { missing: com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Missing -&gt; missing.`categoryId` },</b>
+&nbsp;  set = { missing: com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Missing, value: com.georgeci.moneysurfer.domain.primitives.CategoryId -&gt;
+<b class="nc">&nbsp;  missing.copy(`categoryId` = value)</b>
 &nbsp;}
+&nbsp;)
+&nbsp;
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Missing&gt;.`categoryId`: arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.domain.primitives.CategoryId&gt;  get() = this + com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Missing.`categoryId`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Missing&gt;.`categoryId`: arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.domain.primitives.CategoryId&gt;  get() = this + com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Missing.`categoryId`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Missing&gt;.`categoryId`: arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.domain.primitives.CategoryId&gt;  get() = this + com.georgeci.moneysurfer.feature.category.details.CategoryDetailsState.Missing.`categoryId`</b>
 </code>
 </pre>
 </div>
@@ -175,7 +201,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 20:32</div>
+    <div style="float:right;">generated on 2026-07-28 21:38</div>
 </div>
 </body>
 </html>

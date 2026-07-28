@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > MviViewModelKt</title>
+  <title>MoneySurfer Coverage Report > SurferWindowSizeKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,15 +19,18 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.utils</a>
+    <a href="../index.html">com.georgeci.moneysurfer.uikit.window</a>
 </div>
 
-<h1>Coverage Summary for Class: MviViewModelKt (com.georgeci.moneysurfer.utils)</h1>
+<h1>Coverage Summary for Class: SurferWindowSizeKt (com.georgeci.moneysurfer.uikit.window)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -46,159 +49,42 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">MviViewModelKt</td>
+  <td class="name">SurferWindowSizeKt</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/2)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/6)
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/5)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/119)
+    (54/54)
   </span>
 </td>
 </tr>
-  <tr>
-    <td class="name">MviViewModelKt$HandleSideEffect$1$1</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/22)
-  </span>
-</td>
-  </tr>
-  <tr>
-    <td class="name">MviViewModelKt$HandleSideEffect$1$1$1</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/20)
-  </span>
-</td>
-  </tr>
-  <tr>
-    <td class="name">MviViewModelKt$HandleSideEffect$1$1$1$1</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/6)
-  </span>
-</td>
-  </tr>
-<tr>
-  <td class="name"><strong>Total</strong></td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/5)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/6)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/8)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/167)
-  </span>
-</td>
-</tr>
+
 </table>
 
 <br/>
@@ -206,99 +92,76 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.utils
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.window
 &nbsp;
 &nbsp;import androidx.compose.runtime.Composable
-&nbsp;import androidx.compose.runtime.LaunchedEffect
-&nbsp;import androidx.compose.runtime.NonRestartableComposable
-&nbsp;import androidx.lifecycle.Lifecycle
-&nbsp;import androidx.lifecycle.ViewModel
-&nbsp;import androidx.lifecycle.compose.LocalLifecycleOwner
-&nbsp;import androidx.lifecycle.repeatOnLifecycle
-&nbsp;import androidx.lifecycle.viewModelScope
-&nbsp;import co.touchlab.kermit.Logger
-&nbsp;import kotlinx.coroutines.CancellationException
-&nbsp;import kotlinx.coroutines.CoroutineScope
-&nbsp;import kotlinx.coroutines.ExperimentalForInheritanceCoroutinesApi
-&nbsp;import kotlinx.coroutines.flow.StateFlow
-&nbsp;import kotlinx.coroutines.launch
+&nbsp;import androidx.compose.ui.platform.LocalDensity
+&nbsp;import androidx.compose.ui.platform.LocalWindowInfo
+&nbsp;import androidx.compose.ui.unit.Dp
+&nbsp;import androidx.compose.ui.unit.dp
 &nbsp;
-&nbsp;@OptIn(ExperimentalForInheritanceCoroutinesApi::class)
-&nbsp;abstract class MviViewModel&lt;STATE : Any, EVENT, SIDE_EFFECT : Any&gt;(
-&nbsp;    private val stateHolder: StateHolder&lt;STATE&gt;,
-&nbsp;) : ViewModel(), StateFlow&lt;STATE&gt; by stateHolder {
+&nbsp;/**
+&nbsp; * The Material 3 window *width* breakpoints, named once for the whole app.
+&nbsp; *
+&nbsp; * Before this existed every caller reached for `androidx.window.core.layout` constants directly,
+&nbsp; * so &quot;wide&quot; meant whatever each screen happened to compare against. Features depend on this enum
+&nbsp; * instead; `androidx.window` stays an implementation detail of the windowing libraries.
+&nbsp; *
+&nbsp; * Entries are declared narrow-to-wide, so the natural enum ordering is also the width ordering:
+&nbsp; * `currentSurferWindowSize() &gt;= SurferWindowSize.Medium` reads as &quot;at least Medium&quot;.
+&nbsp; *
+&nbsp; * Height breakpoints are deliberately absent — nothing in the app branches on window height yet,
+&nbsp; * and an unused axis is one more thing to keep honest.
+&nbsp; */
+&nbsp;enum class SurferWindowSize {
+&nbsp;    /** `&lt; 600 dp` — phones in portrait, and the narrow pane of a split-screen window. */
+&nbsp;    Compact,
 &nbsp;
-&nbsp;    constructor(initialState: STATE) : this(StateHolder(initialState))
+&nbsp;    /** `600–839 dp` — large phones in landscape, small tablets, resized desktop windows. */
+&nbsp;    Medium,
 &nbsp;
-&nbsp;    val sideEffects = Effect&lt;SIDE_EFFECT&gt;()
+&nbsp;    /** `840–1199 dp` — tablets in landscape, most desktop windows. */
+&nbsp;    Expanded,
 &nbsp;
-&nbsp;    val currentState: STATE get() = stateHolder.value
+&nbsp;    /** `&gt;= 1200 dp` — maximised desktop windows and large external displays. */
+&nbsp;    Large,
 &nbsp;
-&nbsp;    abstract fun onEvent(event: EVENT)
+&nbsp;    ;
 &nbsp;
-&nbsp;    protected fun updateState(reducer: STATE.() -&gt; STATE) {
-&nbsp;        stateHolder.updateState { it.reducer() }
-&nbsp;    }
+&nbsp;    companion object {
+&nbsp;        /** Lower bound of [Medium]. */
+&nbsp;        val MediumLowerBound: Dp = 600.dp
 &nbsp;
-&nbsp;    protected fun postSideEffect(effect: SIDE_EFFECT) {
-&nbsp;        sideEffects.post(effect)
-&nbsp;    }
+&nbsp;        /** Lower bound of [Expanded]. */
+&nbsp;        val ExpandedLowerBound: Dp = 840.dp
 &nbsp;
-&nbsp;    /**
-&nbsp;     * Runs [block] on [viewModelScope], catching every failure it produces.
-&nbsp;     *
-&nbsp;     * Failures are never swallowed: the throwable is always logged at Error severity,
-&nbsp;     * which is what `CrashReportingLogWriter` turns into a Crashlytics non-fatal. What
-&nbsp;     * [onError] controls is only who renders it — pass a handler to show the failure
-&nbsp;     * inside the screen&#39;s own state, or leave it null to escalate to the global error
-&nbsp;     * boundary via [UnhandledErrors] (issue #78).
-&nbsp;     *
-&nbsp;     * [CancellationException] is rethrown rather than handled: it is how structured
-&nbsp;     * concurrency unwinds a cancelled scope, not an app error. Swallowing it would log
-&nbsp;     * &quot;Unhandled error&quot; — and raise the global boundary — every time a screen leaves
-&nbsp;     * composition and `viewModelScope` is cleared.
-&nbsp;     */
-&nbsp;    protected fun launch(
-&nbsp;        onError: ((Throwable) -&gt; Unit)? = null,
-&nbsp;        block: suspend CoroutineScope.() -&gt; Unit,
-&nbsp;    ) {
-&nbsp;        viewModelScope.launch {
-&nbsp;            try {
-&nbsp;                block()
-&nbsp;            } catch (e: CancellationException) {
-&nbsp;                throw e
-&nbsp;            } catch (
-&nbsp;                @Suppress(&quot;TooGenericExceptionCaught&quot;)
-&nbsp;                e: Throwable,
-&nbsp;            ) {
-&nbsp;                Logger.withTag(logTag).e(e) { &quot;Unhandled error in $logTag&quot; }
-&nbsp;                if (onError != null) onError(e) else UnhandledErrors.report(e)
-&nbsp;            }
-&nbsp;        }
-&nbsp;    }
+&nbsp;        /** Lower bound of [Large]. */
+&nbsp;        val LargeLowerBound: Dp = 1200.dp
 &nbsp;
-&nbsp;    private val logTag: String get() = this::class.simpleName ?: &quot;MviViewModel&quot;
-&nbsp;}
-&nbsp;
-&nbsp;@NonRestartableComposable
-&nbsp;@Composable
-&nbsp;fun &lt;SIDE_EFFECT : Any&gt; Effect&lt;SIDE_EFFECT&gt;.HandleSideEffect(
-&nbsp;    handler: (SIDE_EFFECT) -&gt; Unit,
-<b class="nc">&nbsp;) {</b>
-<b class="nc">&nbsp;    val lifecycleOwner = LocalLifecycleOwner.current</b>
-<b class="nc">&nbsp;    LaunchedEffect(lifecycleOwner) {</b>
-<b class="nc">&nbsp;        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {</b>
-<b class="nc">&nbsp;            effectFlow.collect(handler)</b>
+&nbsp;        /** Buckets a window [width] into a breakpoint. Widest bound first — the order matters. */
+&nbsp;        fun ofWidth(width: Dp): SurferWindowSize = when {
+&nbsp;            width &gt;= LargeLowerBound -&gt; Large
+&nbsp;            width &gt;= ExpandedLowerBound -&gt; Expanded
+&nbsp;            width &gt;= MediumLowerBound -&gt; Medium
+&nbsp;            else -&gt; Compact
 &nbsp;        }
 &nbsp;    }
 &nbsp;}
 &nbsp;
-&nbsp;@NonRestartableComposable
+&nbsp;/**
+&nbsp; * The [SurferWindowSize] of the window this composition is hosted in, recomposing when the window
+&nbsp; * is resized.
+&nbsp; *
+&nbsp; * Measures `LocalWindowInfo.containerSize` in the current density — the same input
+&nbsp; * `currentWindowAdaptiveInfo()` derives its `WindowSizeClass` from, minus the dependency on the
+&nbsp; * `androidx.window` breakpoint sets (whose default set stops at Expanded and would collapse
+&nbsp; * [SurferWindowSize.Large] into it).
+&nbsp; */
 &nbsp;@Composable
-&nbsp;fun &lt;SIDE_EFFECT : Any&gt; MviViewModel&lt;*, *, SIDE_EFFECT&gt;.HandleSideEffect(
-&nbsp;    handler: (SIDE_EFFECT) -&gt; Unit,
-<b class="nc">&nbsp;) {</b>
-<b class="nc">&nbsp;    sideEffects.HandleSideEffect(handler)</b>
+<b class="fc">&nbsp;fun currentSurferWindowSize(): SurferWindowSize {</b>
+<b class="fc">&nbsp;    val containerWidth = LocalWindowInfo.current.containerSize.width</b>
+<b class="fc">&nbsp;    val widthDp = with(LocalDensity.current) { containerWidth.toDp() }</b>
+<b class="fc">&nbsp;    return SurferWindowSize.ofWidth(widthDp)</b>
 &nbsp;}
 </code>
 </pre>
@@ -323,7 +186,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 21:18</div>
+    <div style="float:right;">generated on 2026-07-28 21:38</div>
 </div>
 </body>
 </html>

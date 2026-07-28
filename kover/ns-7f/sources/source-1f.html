@@ -1,0 +1,284 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>MoneySurfer Coverage Report > WaveCrest</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.georgeci.moneysurfer.uikit.components</a>
+</div>
+
+<h1>Coverage Summary for Class: WaveCrest (com.georgeci.moneysurfer.uikit.components)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">WaveCrest</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (12/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (78/78)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.components
+&nbsp;
+&nbsp;import androidx.compose.foundation.Canvas
+&nbsp;import androidx.compose.foundation.background
+&nbsp;import androidx.compose.foundation.layout.Box
+&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
+&nbsp;import androidx.compose.foundation.layout.height
+&nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.ui.Alignment
+&nbsp;import androidx.compose.ui.Modifier
+&nbsp;import androidx.compose.ui.graphics.Brush
+&nbsp;import androidx.compose.ui.graphics.Path
+&nbsp;import androidx.compose.ui.unit.Dp
+&nbsp;import androidx.compose.ui.unit.dp
+&nbsp;import com.georgeci.moneysurfer.uikit.tokens.AuthColors
+&nbsp;
+&nbsp;private val WaveBandHeight: Dp = 220.dp
+&nbsp;
+&nbsp;private const val DefaultCp1X: Float = 0.22f
+&nbsp;private const val DefaultCp1Y: Float = -30f
+&nbsp;private const val DefaultCp2X: Float = 0.42f
+&nbsp;private const val DefaultCp2Y: Float = 30f
+&nbsp;private const val DefaultMidX: Float = 0.63f
+&nbsp;private const val DefaultCp3X: Float = 0.78f
+&nbsp;private const val DefaultCp3Y: Float = -25f
+&nbsp;private const val DefaultCp4X: Float = 0.92f
+&nbsp;private const val DefaultCp4Y: Float = 15f
+&nbsp;
+&nbsp;private data class WaveCrest(
+<b class="fc">&nbsp;    val startY: Float,</b>
+<b class="fc">&nbsp;    val midY: Float,</b>
+<b class="fc">&nbsp;    val endY: Float,</b>
+<b class="fc">&nbsp;    val cp1X: Float = DefaultCp1X,</b>
+<b class="fc">&nbsp;    val cp1Y: Float = DefaultCp1Y,</b>
+<b class="fc">&nbsp;    val cp2X: Float = DefaultCp2X,</b>
+<b class="fc">&nbsp;    val cp2Y: Float = DefaultCp2Y,</b>
+<b class="fc">&nbsp;    val midX: Float = DefaultMidX,</b>
+<b class="fc">&nbsp;    val cp3X: Float = DefaultCp3X,</b>
+<b class="fc">&nbsp;    val cp3Y: Float = DefaultCp3Y,</b>
+<b class="fc">&nbsp;    val cp4X: Float = DefaultCp4X,</b>
+<b class="fc">&nbsp;    val cp4Y: Float = DefaultCp4Y,</b>
+&nbsp;)
+&nbsp;
+&nbsp;private val BackCrest = WaveCrest(startY = 0.40f, midY = 0.60f, endY = 0.50f)
+&nbsp;private val MidCrest = WaveCrest(startY = 0.60f, midY = 0.78f, endY = 0.65f)
+&nbsp;private const val BackCrestAlpha: Float = 0.55f
+&nbsp;private const val MidCrestAlpha: Float = 0.85f
+&nbsp;private const val FrontCrestStartY: Float = 0.82f
+&nbsp;private const val FrontCp1X: Float = 0.20f
+&nbsp;private const val FrontCp1Y: Float = 0.74f
+&nbsp;private const val FrontCp2X: Float = 0.45f
+&nbsp;private const val FrontCp2Y: Float = 0.93f
+&nbsp;private const val FrontMidX: Float = 0.66f
+&nbsp;private const val FrontMidY: Float = 0.84f
+&nbsp;private const val FrontCp3X: Float = 0.83f
+&nbsp;private const val FrontCp3Y: Float = 0.76f
+&nbsp;private const val FrontCp4X: Float = 0.95f
+&nbsp;private const val FrontCp4Y: Float = 0.88f
+&nbsp;private const val FrontEndY: Float = 0.82f
+&nbsp;private const val FrontGradientStartY: Float = 0.74f
+&nbsp;private const val FrontGradientAlpha: Float = 0.55f
+&nbsp;
+&nbsp;/**
+&nbsp; * The green gradient + wave band behind every pre-auth screen (onboarding + sign-in). Draw it edge
+&nbsp; * to edge (outside of [com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets]) so it tints the
+&nbsp; * status bar and the navigation bar / gesture ribbon as well.
+&nbsp; */
+&nbsp;@Composable
+&nbsp;fun SurferAuthBackground(modifier: Modifier = Modifier) {
+&nbsp;    Box(
+&nbsp;        modifier = modifier.background(
+&nbsp;            Brush.verticalGradient(
+&nbsp;                colors = listOf(AuthColors.GreenTop, AuthColors.GreenBottom),
+&nbsp;            ),
+&nbsp;        ),
+&nbsp;    ) {
+&nbsp;        WaveDecoration(
+&nbsp;            modifier = Modifier
+&nbsp;                .align(Alignment.BottomCenter)
+&nbsp;                .fillMaxWidth()
+&nbsp;                .height(WaveBandHeight),
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun WaveDecoration(modifier: Modifier = Modifier) {
+&nbsp;    Canvas(modifier = modifier) {
+&nbsp;        val w = size.width
+&nbsp;        val h = size.height
+&nbsp;
+&nbsp;        fun crestPath(crest: WaveCrest): Path {
+&nbsp;            val startY = h * crest.startY
+&nbsp;            val midY = h * crest.midY
+&nbsp;            val endY = h * crest.endY
+&nbsp;            return Path().apply {
+&nbsp;                moveTo(0f, startY)
+&nbsp;                cubicTo(
+&nbsp;                    w * crest.cp1X,
+&nbsp;                    startY + crest.cp1Y,
+&nbsp;                    w * crest.cp2X,
+&nbsp;                    midY + crest.cp2Y,
+&nbsp;                    w * crest.midX,
+&nbsp;                    midY,
+&nbsp;                )
+&nbsp;                cubicTo(
+&nbsp;                    w * crest.cp3X,
+&nbsp;                    midY + crest.cp3Y,
+&nbsp;                    w * crest.cp4X,
+&nbsp;                    endY + crest.cp4Y,
+&nbsp;                    w,
+&nbsp;                    endY,
+&nbsp;                )
+&nbsp;                lineTo(w, h)
+&nbsp;                lineTo(0f, h)
+&nbsp;                close()
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        drawPath(
+&nbsp;            path = crestPath(BackCrest),
+&nbsp;            color = AuthColors.WaveBack,
+&nbsp;            alpha = BackCrestAlpha,
+&nbsp;        )
+&nbsp;        drawPath(
+&nbsp;            path = crestPath(MidCrest),
+&nbsp;            color = AuthColors.WaveMid,
+&nbsp;            alpha = MidCrestAlpha,
+&nbsp;        )
+&nbsp;        drawPath(
+&nbsp;            path = Path().apply {
+&nbsp;                moveTo(0f, h * FrontCrestStartY)
+&nbsp;                cubicTo(
+&nbsp;                    w * FrontCp1X,
+&nbsp;                    h * FrontCp1Y,
+&nbsp;                    w * FrontCp2X,
+&nbsp;                    h * FrontCp2Y,
+&nbsp;                    w * FrontMidX,
+&nbsp;                    h * FrontMidY,
+&nbsp;                )
+&nbsp;                cubicTo(
+&nbsp;                    w * FrontCp3X,
+&nbsp;                    h * FrontCp3Y,
+&nbsp;                    w * FrontCp4X,
+&nbsp;                    h * FrontCp4Y,
+&nbsp;                    w,
+&nbsp;                    h * FrontEndY,
+&nbsp;                )
+&nbsp;                lineTo(w, h)
+&nbsp;                lineTo(0f, h)
+&nbsp;                close()
+&nbsp;            },
+&nbsp;            brush = Brush.verticalGradient(
+&nbsp;                colors = listOf(
+&nbsp;                    AuthColors.WaveFront.copy(alpha = 0f),
+&nbsp;                    AuthColors.WaveFront.copy(alpha = FrontGradientAlpha),
+&nbsp;                ),
+&nbsp;                startY = h * FrontGradientStartY,
+&nbsp;                endY = h,
+&nbsp;            ),
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-07-28 21:38</div>
+</div>
+</body>
+</html>

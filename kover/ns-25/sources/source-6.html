@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > BottomSheetSceneStrategy</title>
+  <title>MoneySurfer Coverage Report > CategoryType</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,15 +19,18 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.navigation</a>
+    <a href="../index.html">com.georgeci.moneysurfer.domain.primitives</a>
 </div>
 
-<h1>Coverage Summary for Class: BottomSheetSceneStrategy (com.georgeci.moneysurfer.navigation)</h1>
+<h1>Coverage Summary for Class: CategoryType (com.georgeci.moneysurfer.domain.primitives)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -46,103 +49,42 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">BottomSheetSceneStrategy</td>
+  <td class="name">CategoryType</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/2)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/6)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/11)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/43)
-  </span>
-</td>
-</tr>
-  <tr>
-    <td class="name">BottomSheetSceneStrategy$Companion</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/2)
+    (1/1)
   </span>
 </td>
     <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/2)
+    (3/3)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/12)
-  </span>
-</td>
-  </tr>
-<tr>
-  <td class="name"><strong>Total</strong></td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/4)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/6)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/13)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/55)
+    (24/24)
   </span>
 </td>
 </tr>
+
 </table>
 
 <br/>
@@ -150,75 +92,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.navigation
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.primitives
 &nbsp;
-&nbsp;import androidx.compose.material3.ExperimentalMaterial3Api
-&nbsp;import androidx.compose.material3.ModalBottomSheet
-&nbsp;import androidx.compose.material3.ModalBottomSheetProperties
-&nbsp;import androidx.compose.runtime.Composable
-&nbsp;import androidx.navigation3.runtime.NavEntry
-&nbsp;import androidx.navigation3.scene.OverlayScene
-&nbsp;import androidx.navigation3.scene.Scene
-&nbsp;import androidx.navigation3.scene.SceneStrategy
-&nbsp;import androidx.navigation3.scene.SceneStrategyScope
-&nbsp;
-&nbsp;/** An [OverlayScene] that renders an [entry] within a [ModalBottomSheet]. */
-&nbsp;@OptIn(ExperimentalMaterial3Api::class)
-&nbsp;internal class BottomSheetScene&lt;T : Any&gt;(
-&nbsp;    override val key: Any,
-&nbsp;    private val entry: NavEntry&lt;T&gt;,
-&nbsp;    override val previousEntries: List&lt;NavEntry&lt;T&gt;&gt;,
-&nbsp;    override val overlaidEntries: List&lt;NavEntry&lt;T&gt;&gt;,
-&nbsp;    private val modalBottomSheetProperties: ModalBottomSheetProperties,
-&nbsp;    private val onBack: () -&gt; Unit,
-&nbsp;) : OverlayScene&lt;T&gt; {
-&nbsp;
-&nbsp;    override val entries: List&lt;NavEntry&lt;T&gt;&gt; = listOf(entry)
-&nbsp;
-&nbsp;    override val content: @Composable () -&gt; Unit = {
-&nbsp;        ModalBottomSheet(
-&nbsp;            onDismissRequest = onBack,
-&nbsp;            properties = modalBottomSheetProperties,
-&nbsp;        ) {
-&nbsp;            entry.Content()
-&nbsp;        }
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;/**
-&nbsp; * A [SceneStrategy] that displays entries marked with [bottomSheet] metadata inside a
-&nbsp; * [ModalBottomSheet], keeping the previous entry composed underneath.
-&nbsp; *
-&nbsp; * Based on the Navigation 3 bottom sheet recipe:
-&nbsp; * https://developer.android.com/guide/navigation/navigation-3/recipes/bottomsheet
-&nbsp; *
-&nbsp; * Chain before any non-overlay strategies.
-&nbsp; */
-<b class="nc">&nbsp;@OptIn(ExperimentalMaterial3Api::class)</b>
-&nbsp;class BottomSheetSceneStrategy&lt;T : Any&gt; : SceneStrategy&lt;T&gt; {
-&nbsp;
-&nbsp;    override fun SceneStrategyScope&lt;T&gt;.calculateScene(entries: List&lt;NavEntry&lt;T&gt;&gt;): Scene&lt;T&gt;? {
-<b class="nc">&nbsp;        val lastEntry = entries.lastOrNull() ?: return null</b>
-<b class="nc">&nbsp;        val properties = lastEntry.metadata[BOTTOM_SHEET_KEY] as? ModalBottomSheetProperties</b>
-<b class="nc">&nbsp;            ?: return null</b>
-<b class="nc">&nbsp;        return BottomSheetScene(</b>
-<b class="nc">&nbsp;            key = lastEntry.contentKey,</b>
-<b class="nc">&nbsp;            entry = lastEntry,</b>
-<b class="nc">&nbsp;            previousEntries = entries.dropLast(1),</b>
-<b class="nc">&nbsp;            overlaidEntries = entries.dropLast(1),</b>
-<b class="nc">&nbsp;            modalBottomSheetProperties = properties,</b>
-<b class="nc">&nbsp;            onBack = onBack,</b>
-&nbsp;        )
-&nbsp;    }
-&nbsp;
-&nbsp;    companion object {
-&nbsp;        /** Mark a [NavEntry] so this strategy renders it inside a [ModalBottomSheet]. */
-&nbsp;        fun bottomSheet(
-<b class="nc">&nbsp;            modalBottomSheetProperties: ModalBottomSheetProperties = ModalBottomSheetProperties(),</b>
-<b class="nc">&nbsp;        ): Map&lt;String, Any&gt; = mapOf(BOTTOM_SHEET_KEY to modalBottomSheetProperties)</b>
-&nbsp;
-&nbsp;        internal const val BOTTOM_SHEET_KEY = &quot;bottomSheet&quot;
-&nbsp;    }
+&nbsp;enum class CategoryType {
+<b class="fc">&nbsp;    EXPENSE,</b>
+<b class="fc">&nbsp;    INCOME,</b>
+<b class="fc">&nbsp;    TRANSFER,</b>
 &nbsp;}
 </code>
 </pre>
@@ -243,7 +122,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 20:32</div>
+    <div style="float:right;">generated on 2026-07-28 21:38</div>
 </div>
 </body>
 </html>

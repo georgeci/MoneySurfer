@@ -1,0 +1,186 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>MoneySurfer Coverage Report > SurferErrorStateTestTags</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.georgeci.moneysurfer.uikit.components</a>
+</div>
+
+<h1>Coverage Summary for Class: SurferErrorStateTestTags (com.georgeci.moneysurfer.uikit.components)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+</tr>
+<tr>
+  <td class="name">SurferErrorStateTestTags</td>
+    <td class="coverageStat"/>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.components
+&nbsp;
+&nbsp;import androidx.compose.foundation.background
+&nbsp;import androidx.compose.foundation.layout.Arrangement
+&nbsp;import androidx.compose.foundation.layout.Box
+&nbsp;import androidx.compose.foundation.layout.Column
+&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
+&nbsp;import androidx.compose.foundation.layout.padding
+&nbsp;import androidx.compose.foundation.layout.size
+&nbsp;import androidx.compose.foundation.shape.CircleShape
+&nbsp;import androidx.compose.material3.Icon
+&nbsp;import androidx.compose.material3.Text
+&nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.ui.Alignment
+&nbsp;import androidx.compose.ui.Modifier
+&nbsp;import androidx.compose.ui.draw.clip
+&nbsp;import androidx.compose.ui.graphics.vector.ImageVector
+&nbsp;import androidx.compose.ui.platform.testTag
+&nbsp;import androidx.compose.ui.text.style.TextAlign
+&nbsp;import androidx.compose.ui.tooling.preview.Preview
+&nbsp;import androidx.compose.ui.unit.dp
+&nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+&nbsp;import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
+&nbsp;import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
+&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
+&nbsp;
+&nbsp;/**
+&nbsp; * Centered error-state block: an error-tinted icon medallion, a title, an optional subtitle
+&nbsp; * and an optional retry action. Mirrors [SurferEmptyState] but signals a failed load rather
+&nbsp; * than absent content — use [SurferEmptyState] when the load succeeded but produced nothing.
+&nbsp; *
+&nbsp; * @param onRetry when non-null, renders a retry button; override [retryLabel] to relabel it.
+&nbsp; */
+&nbsp;@Composable
+&nbsp;fun SurferErrorState(
+&nbsp;    title: String,
+&nbsp;    modifier: Modifier = Modifier,
+&nbsp;    subtitle: String? = null,
+&nbsp;    icon: ImageVector = SurferIcons.Info,
+&nbsp;    retryLabel: String = &quot;Retry&quot;,
+&nbsp;    onRetry: (() -&gt; Unit)? = null,
+&nbsp;) {
+&nbsp;    Column(
+&nbsp;        modifier = modifier
+&nbsp;            .fillMaxWidth()
+&nbsp;            .padding(AppTheme.spacing.large),
+&nbsp;        horizontalAlignment = Alignment.CenterHorizontally,
+&nbsp;        verticalArrangement = Arrangement.spacedBy(AppTheme.spacing.small),
+&nbsp;    ) {
+&nbsp;        Box(
+&nbsp;            modifier = Modifier
+&nbsp;                .size(64.dp)
+&nbsp;                .clip(CircleShape)
+&nbsp;                .background(AppTheme.materialColors.errorContainer),
+&nbsp;            contentAlignment = Alignment.Center,
+&nbsp;        ) {
+&nbsp;            Icon(
+&nbsp;                imageVector = icon,
+&nbsp;                contentDescription = SurferSemantics.Decorative,
+&nbsp;                tint = AppTheme.materialColors.onErrorContainer,
+&nbsp;                modifier = Modifier.size(28.dp),
+&nbsp;            )
+&nbsp;        }
+&nbsp;        Text(
+&nbsp;            text = title,
+&nbsp;            style = AppTheme.typography.titleMedium,
+&nbsp;            color = AppTheme.materialColors.onSurface,
+&nbsp;            textAlign = TextAlign.Center,
+&nbsp;        )
+&nbsp;        if (subtitle != null) {
+&nbsp;            Text(
+&nbsp;                text = subtitle,
+&nbsp;                style = AppTheme.typography.bodyMedium,
+&nbsp;                color = AppTheme.materialColors.onSurfaceVariant,
+&nbsp;                textAlign = TextAlign.Center,
+&nbsp;            )
+&nbsp;        }
+&nbsp;        if (onRetry != null) {
+&nbsp;            SurferButton(
+&nbsp;                text = retryLabel,
+&nbsp;                onClick = onRetry,
+&nbsp;                style = SurferButtonStyle.Tonal,
+&nbsp;                modifier = Modifier
+&nbsp;                    .padding(top = AppTheme.spacing.xSmall)
+&nbsp;                    .testTag(SurferErrorStateTestTags.RetryButton),
+&nbsp;            )
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;object SurferErrorStateTestTags {
+&nbsp;    const val RetryButton = &quot;errorState:retry&quot;
+&nbsp;}
+&nbsp;
+&nbsp;@Preview
+&nbsp;@Composable
+&nbsp;private fun SurferErrorStatePreview() {
+&nbsp;    SurferComponentPreview {
+&nbsp;        SurferErrorState(
+&nbsp;            title = &quot;Something went wrong&quot;,
+&nbsp;            subtitle = &quot;We couldn&#39;t load your accounts. Check your connection and try again.&quot;,
+&nbsp;            onRetry = {},
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Preview
+&nbsp;@Composable
+&nbsp;private fun SurferErrorStateNoRetryPreview() {
+&nbsp;    SurferComponentPreview {
+&nbsp;        SurferErrorState(title = &quot;Failed to sync&quot;)
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-07-28 21:38</div>
+</div>
+</body>
+</html>

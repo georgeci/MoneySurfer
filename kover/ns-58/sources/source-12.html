@@ -1,0 +1,269 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>MoneySurfer Coverage Report > TransactionDetailsTestTags</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.transaction.details</a>
+</div>
+
+<h1>Coverage Summary for Class: TransactionDetailsTestTags (com.georgeci.moneysurfer.feature.transaction.details)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+</tr>
+<tr>
+  <td class="name">TransactionDetailsTestTags</td>
+    <td class="coverageStat"/>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.transaction.details
+&nbsp;
+&nbsp;import androidx.compose.foundation.layout.Box
+&nbsp;import androidx.compose.foundation.layout.Column
+&nbsp;import androidx.compose.foundation.layout.Row
+&nbsp;import androidx.compose.foundation.layout.Spacer
+&nbsp;import androidx.compose.foundation.layout.fillMaxSize
+&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
+&nbsp;import androidx.compose.foundation.layout.height
+&nbsp;import androidx.compose.foundation.layout.padding
+&nbsp;import androidx.compose.foundation.layout.size
+&nbsp;import androidx.compose.foundation.layout.width
+&nbsp;import androidx.compose.foundation.rememberScrollState
+&nbsp;import androidx.compose.foundation.shape.RoundedCornerShape
+&nbsp;import androidx.compose.foundation.verticalScroll
+&nbsp;import androidx.compose.material3.FilledTonalButton
+&nbsp;import androidx.compose.material3.Icon
+&nbsp;import androidx.compose.material3.Text
+&nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.runtime.getValue
+&nbsp;import androidx.compose.ui.Modifier
+&nbsp;import androidx.compose.ui.platform.testTag
+&nbsp;import androidx.compose.ui.unit.dp
+&nbsp;import androidx.lifecycle.compose.collectAsStateWithLifecycle
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionId
+&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferPaneScaffold
+&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferToolbarAction
+&nbsp;import com.georgeci.moneysurfer.uikit.components.transaction.SurferDeleteTransactionDialog
+&nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
+&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
+&nbsp;import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
+&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
+&nbsp;import com.georgeci.moneysurfer.utils.HandleSideEffect
+&nbsp;import moneysurfer.feature.transaction.generated.resources.Res
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_details_delete_content_description
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_details_duplicate
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_details_edit_content_description
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_details_title
+&nbsp;import org.jetbrains.compose.resources.stringResource
+&nbsp;import org.koin.compose.viewmodel.koinViewModel
+&nbsp;import org.koin.core.parameter.parametersOf
+&nbsp;
+&nbsp;/**
+&nbsp; * Stable selectors for the transaction details screen — see docs/testing/testing-strategy.md.
+&nbsp; *
+&nbsp; * The dialog&#39;s confirm button is not here: the dialog moved to uikit when the transaction lists
+&nbsp; * gained swipe-to-delete, and its tag went with it as
+&nbsp; * [SurferDeleteTransactionDialogTestTags][com.georgeci.moneysurfer.uikit.components.transaction.SurferDeleteTransactionDialogTestTags].
+&nbsp; * The id the flows tap is unchanged.
+&nbsp; */
+&nbsp;object TransactionDetailsTestTags {
+&nbsp;    const val Root = &quot;transactionDetails:root&quot;
+&nbsp;    const val Edit = &quot;transactionDetails:edit&quot;
+&nbsp;    const val Delete = &quot;transactionDetails:delete&quot;
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+&nbsp;fun TransactionDetailsScreen(
+&nbsp;    transactionId: TransactionId,
+&nbsp;    onNavigateBack: () -&gt; Unit,
+&nbsp;    onNavigateToEdit: (TransactionId) -&gt; Unit = {},
+&nbsp;    onNavigateToDuplicate: (TransactionId) -&gt; Unit = {},
+&nbsp;    viewModel: TransactionDetailsViewModel = koinViewModel(
+&nbsp;        key = transactionId.value,
+&nbsp;    ) { parametersOf(transactionId) },
+&nbsp;) {
+&nbsp;    val state by viewModel.collectAsStateWithLifecycle()
+&nbsp;
+&nbsp;    viewModel.HandleSideEffect { effect -&gt;
+&nbsp;        when (effect) {
+&nbsp;            TransactionDetailsEffect.NavigateBack -&gt; onNavigateBack()
+&nbsp;            is TransactionDetailsEffect.NavigateToEdit -&gt; onNavigateToEdit(effect.transactionId)
+&nbsp;            is TransactionDetailsEffect.NavigateToDuplicate -&gt; onNavigateToDuplicate(effect.transactionId)
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    when (val current = state) {
+&nbsp;        is TransactionDetailsState.Loading -&gt; TransactionDetailsLoading(onEvent = viewModel::onEvent)
+&nbsp;        is TransactionDetailsState.Content -&gt; TransactionDetailsContent(
+&nbsp;            state = current,
+&nbsp;            onEvent = viewModel::onEvent,
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun TransactionDetailsLoading(onEvent: (TransactionDetailsEvent) -&gt; Unit) {
+&nbsp;    SurferPaneScaffold(
+&nbsp;        title = stringResource(Res.string.transaction_details_title),
+&nbsp;        onBack = { onEvent(TransactionDetailsEvent.OnBackClick) },
+&nbsp;    ) { padding -&gt;
+&nbsp;        Box(modifier = Modifier.fillMaxSize().padding(padding))
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+&nbsp;internal fun TransactionDetailsContent(
+&nbsp;    state: TransactionDetailsState.Content,
+&nbsp;    onEvent: (TransactionDetailsEvent) -&gt; Unit,
+&nbsp;) {
+&nbsp;    if (state.showDeleteConfirmation) {
+&nbsp;        SurferDeleteTransactionDialog(
+&nbsp;            titleOrNull = state.note.ifBlank { null },
+&nbsp;            onConfirm = { onEvent(TransactionDetailsEvent.OnDeleteConfirmed) },
+&nbsp;            onDismiss = { onEvent(TransactionDetailsEvent.OnDeleteDismissed) },
+&nbsp;            isTransfer = state.isTransfer,
+&nbsp;            isSplit = state.isSplit,
+&nbsp;        )
+&nbsp;    }
+&nbsp;
+&nbsp;    SurferPaneScaffold(
+&nbsp;        title = stringResource(Res.string.transaction_details_title),
+&nbsp;        modifier = Modifier
+&nbsp;            .testTag(TransactionDetailsTestTags.Root)
+&nbsp;            .surferTestTagAsId(),
+&nbsp;        onBack = { onEvent(TransactionDetailsEvent.OnBackClick) },
+&nbsp;        actions = { DetailsActions(onEvent = onEvent) },
+&nbsp;    ) { padding -&gt;
+&nbsp;        Column(
+&nbsp;            modifier = Modifier
+&nbsp;                .fillMaxSize()
+&nbsp;                .surferContentContainer()
+&nbsp;                .padding(top = padding.calculateTopPadding()),
+&nbsp;        ) {
+&nbsp;            Column(
+&nbsp;                modifier = Modifier
+&nbsp;                    .fillMaxWidth()
+&nbsp;                    .verticalScroll(rememberScrollState())
+&nbsp;                    .weight(1f),
+&nbsp;            ) {
+&nbsp;                val heroVisual = heroVisualFor(state)
+&nbsp;                HeroCard(
+&nbsp;                    header = heroHeaderFor(state),
+&nbsp;                    headerColor = heroVisual.tint,
+&nbsp;                    visual = heroVisual,
+&nbsp;                    formattedAmount = state.formattedAmount,
+&nbsp;                    note = state.note,
+&nbsp;                    formattedDate = state.formattedDate,
+&nbsp;                    isPlanned = state.isPlanned,
+&nbsp;                )
+&nbsp;
+&nbsp;                state.split?.let { SplitCard(split = it) }
+&nbsp;
+&nbsp;                DetailsCard(state = state)
+&nbsp;
+&nbsp;                Spacer(Modifier.height(padding.calculateBottomPadding()))
+&nbsp;            }
+&nbsp;
+&nbsp;            if (state.canDuplicate) {
+&nbsp;                DuplicateButton(onEvent = onEvent)
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun DetailsActions(onEvent: (TransactionDetailsEvent) -&gt; Unit) {
+&nbsp;    SurferToolbarAction(
+&nbsp;        icon = SurferIcons.Edit,
+&nbsp;        contentDescription = stringResource(Res.string.transaction_details_edit_content_description),
+&nbsp;        onClick = { onEvent(TransactionDetailsEvent.OnEditClick) },
+&nbsp;        modifier = Modifier.testTag(TransactionDetailsTestTags.Edit),
+&nbsp;    )
+&nbsp;    SurferToolbarAction(
+&nbsp;        icon = SurferIcons.Delete,
+&nbsp;        contentDescription = stringResource(Res.string.transaction_details_delete_content_description),
+&nbsp;        onClick = { onEvent(TransactionDetailsEvent.OnDeleteClick) },
+&nbsp;        modifier = Modifier.testTag(TransactionDetailsTestTags.Delete),
+&nbsp;        tint = AppTheme.materialColors.error,
+&nbsp;    )
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun DuplicateButton(onEvent: (TransactionDetailsEvent) -&gt; Unit) {
+&nbsp;    Row(
+&nbsp;        modifier = Modifier
+&nbsp;            .fillMaxWidth()
+&nbsp;            .padding(horizontal = 16.dp)
+&nbsp;            .padding(bottom = AppTheme.spacing.large),
+&nbsp;    ) {
+&nbsp;        FilledTonalButton(
+&nbsp;            onClick = { onEvent(TransactionDetailsEvent.OnDuplicateClick) },
+&nbsp;            modifier = Modifier.fillMaxWidth(),
+&nbsp;            shape = RoundedCornerShape(20.dp),
+&nbsp;        ) {
+&nbsp;            Icon(
+&nbsp;                imageVector = SurferIcons.Copy,
+&nbsp;                contentDescription = SurferSemantics.Decorative,
+&nbsp;                modifier = Modifier.size(18.dp),
+&nbsp;            )
+&nbsp;            Spacer(Modifier.width(AppTheme.spacing.small))
+&nbsp;            Text(stringResource(Res.string.transaction_details_duplicate))
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-07-28 21:38</div>
+</div>
+</body>
+</html>

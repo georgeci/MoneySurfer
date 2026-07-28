@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > WorkspaceSyncer</title>
+  <title>MoneySurfer Coverage Report > ListReceipt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,22 +19,77 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.domain.repositories</a>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.transaction.list</a>
 </div>
 
-<h1>Coverage Summary for Class: WorkspaceSyncer (com.georgeci.moneysurfer.domain.repositories)</h1>
+<h1>Coverage Summary for Class: ListReceipt (com.georgeci.moneysurfer.feature.transaction.list)</h1>
 
 <table class="coverageStats">
 <tr>
   <th class="name">Class</th>
 <th class="coverageStat 
 ">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
   Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
 </th>
 </tr>
 <tr>
-  <td class="name">WorkspaceSyncer</td>
-    <td class="coverageStat"/>
+  <td class="name">ListReceipt</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (3/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    94.7%
+  </span>
+  <span class="absValue">
+    (36/38)
+  </span>
+</td>
 </tr>
 
 </table>
@@ -44,33 +99,187 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.repositories
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.transaction.list
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
+&nbsp;import com.georgeci.moneysurfer.domain.formatter.MoneyFormatter
+&nbsp;import com.georgeci.moneysurfer.domain.model.Account
+&nbsp;import com.georgeci.moneysurfer.domain.model.CategorizedTransaction
+&nbsp;import com.georgeci.moneysurfer.domain.model.Category
+&nbsp;import com.georgeci.moneysurfer.domain.model.TransactionTotal
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.AccountId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.SplitId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionType
+&nbsp;import com.georgeci.moneysurfer.feature.transaction.filter.TransactionFilters
+&nbsp;import kotlinx.datetime.LocalDate
 &nbsp;
 &nbsp;/**
-&nbsp; * Triggers sync operations without exposing the sync infrastructure to domain use cases.
-&nbsp; *
-&nbsp; * [pushAll] drains the outbox (push-only, no remote discovery).
-&nbsp; * [syncAll] fetches the authoritative workspace list from the remote user doc and
-&nbsp; * runs a full cursor-based pull for every workspace — including ones not yet local.
-&nbsp; * [syncWorkspace] pulls a single specific workspace; used after accepting an invite so
-&nbsp; * only the newly joined workspace is hydrated without re-syncing everything.
+&nbsp; * The chip rail&#39;s values. Names are resolved from the account and category lists rather than in
+&nbsp; * the screen, which has neither; a single selection shows its name, several show their count, and
+&nbsp; * nothing selected leaves the chip in its bare &quot;Account&quot; state.
 &nbsp; */
-&nbsp;interface WorkspaceSyncer {
-&nbsp;    /** Push all pending outbox mutations. Throws on error. */
-&nbsp;    suspend fun pushAll()
+&nbsp;internal fun chips(
+&nbsp;    filters: TransactionFilters,
+&nbsp;    accounts: List&lt;Account&gt;,
+&nbsp;    categories: List&lt;Category&gt;,
+&nbsp;): TransactionFilterChipsUi = TransactionFilterChipsUi(
+&nbsp;    dateRange = filters.dateRange,
+&nbsp;    type = filters.type,
+&nbsp;    accountCount = filters.accountIds.size,
+&nbsp;    accountName = filters.accountIds.singleOrNull()
+&nbsp;        ?.let { id -&gt; accounts.firstOrNull { it.id == id }?.name },
+&nbsp;    categoryCount = filters.categoryIds.size,
+&nbsp;    categoryName = filters.categoryIds.singleOrNull()
+&nbsp;        ?.let { id -&gt; categories.firstOrNull { it.id == id }?.name },
+&nbsp;    sort = filters.sort,
+&nbsp;)
 &nbsp;
-&nbsp;    /** Push outbox + pull all user workspaces (including undiscovered ones). Throws on error. */
-&nbsp;    suspend fun syncAll()
+&nbsp;internal fun groupByDate(
+&nbsp;    rows: List&lt;CategorizedTransaction&gt;,
+&nbsp;    accountNames: Map&lt;AccountId, String&gt;,
+&nbsp;    dateLabel: (LocalDate) -&gt; TransactionDateUi,
+&nbsp;): List&lt;TransactionGroupUi&gt; =
+&nbsp;    collapseSplitLegs(rows)
+&nbsp;        .groupBy { it.primary.transaction.operationDate }
+&nbsp;        .map { (date, receipts) -&gt;
+&nbsp;            val net = receipts.fold(Money.zero()) { acc, receipt -&gt; acc + receipt.signedMoney() }
+&nbsp;            TransactionGroupUi(
+&nbsp;                date = date,
+&nbsp;                dateLabel = dateLabel(date),
+&nbsp;                netFormatted = MoneyFormatter.format(
+&nbsp;                    net,
+&nbsp;                    receipts.first().primary.transaction.currencyCode,
+&nbsp;                ),
+&nbsp;                netPositive = !net.isNegative(),
+&nbsp;                transactions = receipts.map { it.toRow(accountNames) },
+&nbsp;            )
+&nbsp;        }
 &nbsp;
-&nbsp;    /**
-&nbsp;     * Push outbox + pull a single workspace by [workspaceId].
-&nbsp;     * Sets the active workspace to [workspaceId] for the duration of the sync so
-&nbsp;     * [SyncScope.ActiveWorkspace] targets the correct workspace.
-&nbsp;     */
-&nbsp;    suspend fun syncWorkspace(workspaceId: WorkspaceId)
+&nbsp;/**
+&nbsp; * One line of the list: an ordinary transaction, or every leg of a split the page holds in full.
+&nbsp; *
+&nbsp; * The legs of a split share account, date and type by construction (see
+&nbsp; * `CreateSplitTransactionUseCase`), so a receipt has one date to group under and one currency to
+&nbsp; * format in.
+&nbsp; */
+<b class="fc">&nbsp;internal data class ListReceipt(val legs: List&lt;CategorizedTransaction&gt;) {</b>
+<b class="fc">&nbsp;    val primary: CategorizedTransaction get() = legs.first()</b>
+<b class="fc">&nbsp;    val isSplit: Boolean get() = legs.size &gt; 1</b>
+&nbsp;
+&nbsp;    /** Distinct categories the receipt was filed under — what the collapsed row&#39;s badge counts. */
+<b class="pc">&nbsp;    val categoryCount: Int get() = legs.map { it.transaction.categoryId }.distinct().size</b>
 &nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * Collapses the legs of a split into a single receipt — a supermarket run paid for once should be
+&nbsp; * one row, not one row per category it was filed under.
+&nbsp; *
+&nbsp; * **Only a group present in full collapses.** A page is a `LIMIT` window and may be narrowed
+&nbsp; * further by an in-memory filter, so a group can easily be here in part: cut by the paging
+&nbsp; * boundary, or thinned down to the one leg a category filter matched. Collapsing those would render
+&nbsp; * a total quietly missing money — a figure that changes on its own when the user taps &quot;load more&quot;.
+&nbsp; * Rendering the legs it actually has instead is honest at every window size, and it is also what
+&nbsp; * the account- and category-scoped lists want, where a leg genuinely is its own row.
+&nbsp; *
+&nbsp; * [CategorizedTransaction.splitLegCount] is the group&#39;s size in storage, counted by the window
+&nbsp; * query, which is what makes &quot;present in full&quot; answerable without a second round trip.
+&nbsp; */
+&nbsp;internal fun collapseSplitLegs(rows: List&lt;CategorizedTransaction&gt;): List&lt;ListReceipt&gt; {
+&nbsp;    val presentLegs = rows
+&nbsp;        .filter { it.transaction.splitId != null }
+&nbsp;        .groupBy { it.transaction.splitId }
+&nbsp;    val collapsed = mutableSetOf&lt;SplitId&gt;()
+&nbsp;    return rows.mapNotNull { row -&gt;
+&nbsp;        val splitId = row.transaction.splitId ?: return@mapNotNull ListReceipt(listOf(row))
+&nbsp;        val legs = presentLegs[splitId].orEmpty()
+&nbsp;        if (legs.size &lt; row.splitLegCount) return@mapNotNull ListReceipt(listOf(row))
+&nbsp;        if (!collapsed.add(splitId)) return@mapNotNull null
+&nbsp;        ListReceipt(legs)
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;private fun ListReceipt.toRow(accountNames: Map&lt;AccountId, String&gt;): TransactionRowUi {
+&nbsp;    val transaction = primary.transaction
+&nbsp;    val isTransferLeg = transaction.transferId != null
+&nbsp;    val total = legs.fold(Money.zero()) { acc, leg -&gt; acc + leg.transaction.money.abs() }
+&nbsp;    return TransactionRowUi(
+&nbsp;        id = transaction.id,
+&nbsp;        // Merchant first: &quot;Starbucks&quot; identifies the row better than whatever was jotted next
+&nbsp;        // to it, and the note still shows when there is no merchant.
+&nbsp;        title = transaction.merchant.ifBlank { transaction.note }
+&nbsp;            .ifBlank { primary.categoryName.orEmpty() },
+&nbsp;        // A collapsed receipt names no single category — the screen replaces this with the
+&nbsp;        // category count, which is the one thing the row can say truthfully about all of them.
+&nbsp;        subtitle = primary.categoryName.orEmpty(),
+&nbsp;        splitCategoryCount = if (isSplit) categoryCount else 0,
+&nbsp;        isSplitLeg = transaction.splitId != null,
+&nbsp;        accountName = accountNames[transaction.accountId].orEmpty(),
+&nbsp;        formattedAmount = MoneyFormatter.format(total, transaction.currencyCode),
+&nbsp;        isExpense = transaction.type == TransactionType.EXPENSE,
+&nbsp;        isTransfer = isTransferLeg,
+&nbsp;        // A transfer leg is drawn from the shared transfer palette instead of its category&#39;s
+&nbsp;        // hue, so it carries no seed — see how the screen renders it.
+&nbsp;        categoryHueSeed = if (isTransferLeg) {
+&nbsp;            &quot;&quot;
+&nbsp;        } else {
+&nbsp;            primary.categoryName ?: transaction.categoryId?.value.orEmpty()
+&nbsp;        },
+&nbsp;    )
+&nbsp;}
+&nbsp;
+&nbsp;/** The receipt&#39;s contribution to the day&#39;s net — every leg of it, signed by its type. */
+&nbsp;private fun ListReceipt.signedMoney(): Money =
+&nbsp;    legs.fold(Money.zero()) { acc, leg -&gt;
+&nbsp;        val magnitude = leg.transaction.money.abs()
+&nbsp;        acc + if (leg.transaction.type == TransactionType.EXPENSE) -magnitude else magnitude
+&nbsp;    }
+&nbsp;
+&nbsp;/**
+&nbsp; * The single currency the summary strip renders in.
+&nbsp; *
+&nbsp; * Scoped to an account it is simply that account&#39;s currency. In the all-accounts view there is
+&nbsp; * no one right answer, so the currency with the largest total magnitude is chosen — a
+&nbsp; * deterministic, recency-independent pick, so a newly-added transaction in another currency
+&nbsp; * cannot flip the strip the way keying off the newest visible row did. Amounts in the other
+&nbsp; * currencies are still excluded from the total (see [buildSummary]); a per-currency summary
+&nbsp; * would be a larger design change than this screen owns.
+&nbsp; */
+&nbsp;internal fun summaryCurrency(account: Account?, totals: List&lt;TransactionTotal&gt;): CurrencyCode =
+&nbsp;    account?.currencyCode
+&nbsp;        ?: totals.maxByOrNull { it.total.minor }?.currencyCode
+&nbsp;        ?: CurrencyCode(&quot;USD&quot;)
+&nbsp;
+&nbsp;/**
+&nbsp; * Summary of the whole period, not of the loaded page: [totals] come straight from the
+&nbsp; * database aggregation, so paging cannot change these numbers.
+&nbsp; *
+&nbsp; * It also deliberately ignores the filters. The strip answers &quot;what happened in this period&quot;,
+&nbsp; * which stays true while the user narrows the list below it; recomputing it from the matched
+&nbsp; * page would instead answer &quot;what is on screen&quot;, and would drift as pages load.
+&nbsp; *
+&nbsp; * Rows in other currencies are dropped rather than added to the displayed one — mixing minor
+&nbsp; * units across currencies would produce a confidently wrong number.
+&nbsp; */
+&nbsp;internal fun buildSummary(
+&nbsp;    totals: List&lt;TransactionTotal&gt;,
+&nbsp;    currency: CurrencyCode,
+&nbsp;): TransactionSummaryUi {
+&nbsp;    val inCurrency = totals.filter { it.currencyCode == currency }
+&nbsp;    val income = inCurrency.sumOfMoney { it.type == TransactionType.INCOME }
+&nbsp;    val expense = inCurrency.sumOfMoney { it.type == TransactionType.EXPENSE }
+&nbsp;    val net = income - expense
+&nbsp;    return TransactionSummaryUi(
+&nbsp;        incomeFormatted = &quot;+&quot; + MoneyFormatter.format(income, currency),
+&nbsp;        expenseFormatted = &quot;−&quot; + MoneyFormatter.format(expense, currency),
+&nbsp;        netFormatted = (if (net.isNegative()) &quot;−&quot; else &quot;+&quot;) +
+&nbsp;            MoneyFormatter.format(net.abs(), currency),
+&nbsp;        netPositive = !net.isNegative(),
+&nbsp;    )
+&nbsp;}
+&nbsp;
+&nbsp;private fun List&lt;TransactionTotal&gt;.sumOfMoney(predicate: (TransactionTotal) -&gt; Boolean): Money =
+&nbsp;    filter(predicate).fold(Money.zero()) { acc, total -&gt; acc + total.total }
 </code>
 </pre>
 </div>
@@ -94,7 +303,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-23 23:54</div>
+    <div style="float:right;">generated on 2026-07-28 21:38</div>
 </div>
 </body>
 </html>

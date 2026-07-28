@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SyncDatabaseConstructor</title>
+  <title>MoneySurfer Coverage Report > BudgetDetailsState_Content__OpticsKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.sync.db</a>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.budget.details</a>
 </div>
 
-<h1>Coverage Summary for Class: SyncDatabaseConstructor (com.georgeci.moneysurfer.sync.db)</h1>
+<h1>Coverage Summary for Class: BudgetDetailsState_Content__OpticsKt (com.georgeci.moneysurfer.feature.budget.details)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SyncDatabaseConstructor</td>
+  <td class="name">BudgetDetailsState_Content__OpticsKt</td>
 <td class="coverageStat">
   <span class="percent">
     0%
@@ -63,7 +63,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/1)
+    (0/12)
   </span>
 </td>
     <td class="coverageStat"/>
@@ -72,7 +72,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/1)
+    (0/12)
   </span>
 </td>
 <td class="coverageStat">
@@ -80,7 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/4)
+    (0/52)
   </span>
 </td>
 </tr>
@@ -92,13 +92,31 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.sync.db
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.budget.details
 &nbsp;
-&nbsp;import androidx.room.RoomDatabaseConstructor
+&nbsp;import com.georgeci.moneysurfer.feature.budget.details.BudgetDetailsState.Content as comgeorgecimoneysurferfeaturebudgetdetailsBudgetDetailsStateContent
 &nbsp;
-&nbsp;public actual object SyncDatabaseConstructor : RoomDatabaseConstructor&lt;SyncDatabase&gt; {
-<b class="nc">&nbsp;  actual override fun initialize(): SyncDatabase = com.georgeci.moneysurfer.sync.db.SyncDatabase_Impl()</b>
+<b class="nc">&nbsp;public  val com.georgeci.moneysurfer.feature.budget.details.BudgetDetailsState.Content.Companion.`budget`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.budget.details.BudgetDetailsState.Content, com.georgeci.moneysurfer.feature.budget.BudgetUi&gt;  get() = arrow.optics.Lens(</b>
+<b class="nc">&nbsp;  get = { content: com.georgeci.moneysurfer.feature.budget.details.BudgetDetailsState.Content -&gt; content.`budget` },</b>
+&nbsp;  set = { content: com.georgeci.moneysurfer.feature.budget.details.BudgetDetailsState.Content, value: com.georgeci.moneysurfer.feature.budget.BudgetUi -&gt;
+<b class="nc">&nbsp;  content.copy(`budget` = value)</b>
 &nbsp;}
+&nbsp;)
+&nbsp;
+<b class="nc">&nbsp;public  val com.georgeci.moneysurfer.feature.budget.details.BudgetDetailsState.Content.Companion.`transactions`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.budget.details.BudgetDetailsState.Content, kotlin.collections.List&lt;com.georgeci.moneysurfer.feature.budget.details.BudgetTransactionUi&gt;&gt;  get() = arrow.optics.Lens(</b>
+<b class="nc">&nbsp;  get = { content: com.georgeci.moneysurfer.feature.budget.details.BudgetDetailsState.Content -&gt; content.`transactions` },</b>
+&nbsp;  set = { content: com.georgeci.moneysurfer.feature.budget.details.BudgetDetailsState.Content, value: kotlin.collections.List&lt;com.georgeci.moneysurfer.feature.budget.details.BudgetTransactionUi&gt; -&gt;
+<b class="nc">&nbsp;  content.copy(`transactions` = value)</b>
+&nbsp;}
+&nbsp;)
+&nbsp;
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.budget.details.BudgetDetailsState.Content&gt;.`budget`: arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.budget.BudgetUi&gt;  get() = this + comgeorgecimoneysurferfeaturebudgetdetailsBudgetDetailsStateContent.`budget`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.budget.details.BudgetDetailsState.Content&gt;.`budget`: arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.budget.BudgetUi&gt;  get() = this + comgeorgecimoneysurferfeaturebudgetdetailsBudgetDetailsStateContent.`budget`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.budget.details.BudgetDetailsState.Content&gt;.`budget`: arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.budget.BudgetUi&gt;  get() = this + comgeorgecimoneysurferfeaturebudgetdetailsBudgetDetailsStateContent.`budget`</b>
+&nbsp;
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.budget.details.BudgetDetailsState.Content&gt;.`transactions`: arrow.optics.Lens&lt;__S, kotlin.collections.List&lt;com.georgeci.moneysurfer.feature.budget.details.BudgetTransactionUi&gt;&gt;  get() = this + comgeorgecimoneysurferfeaturebudgetdetailsBudgetDetailsStateContent.`transactions`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.budget.details.BudgetDetailsState.Content&gt;.`transactions`: arrow.optics.Optional&lt;__S, kotlin.collections.List&lt;com.georgeci.moneysurfer.feature.budget.details.BudgetTransactionUi&gt;&gt;  get() = this + comgeorgecimoneysurferfeaturebudgetdetailsBudgetDetailsStateContent.`transactions`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.budget.details.BudgetDetailsState.Content&gt;.`transactions`: arrow.optics.Traversal&lt;__S, kotlin.collections.List&lt;com.georgeci.moneysurfer.feature.budget.details.BudgetTransactionUi&gt;&gt;  get() = this + comgeorgecimoneysurferfeaturebudgetdetailsBudgetDetailsStateContent.`transactions`</b>
 </code>
 </pre>
 </div>
@@ -122,7 +140,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 21:54</div>
+    <div style="float:right;">generated on 2026-07-28 21:38</div>
 </div>
 </body>
 </html>

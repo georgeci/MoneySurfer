@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > AuthRemoteRepository</title>
+  <title>MoneySurfer Coverage Report > TransactionFilterChipsUi</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,22 +19,70 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.domain.repositories</a>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.transaction.list</a>
 </div>
 
-<h1>Coverage Summary for Class: AuthRemoteRepository (com.georgeci.moneysurfer.domain.repositories)</h1>
+<h1>Coverage Summary for Class: TransactionFilterChipsUi (com.georgeci.moneysurfer.feature.transaction.list)</h1>
 
 <table class="coverageStats">
 <tr>
   <th class="name">Class</th>
 <th class="coverageStat 
 ">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
   Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
 </th>
 </tr>
 <tr>
-  <td class="name">AuthRemoteRepository</td>
+  <td class="name">TransactionFilterChipsUi</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
     <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (8/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (37/37)
+  </span>
+</td>
 </tr>
 
 </table>
@@ -44,50 +92,93 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.repositories
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.transaction.list
 &nbsp;
-&nbsp;import arrow.core.Either
-&nbsp;import com.georgeci.moneysurfer.domain.auth.AuthError
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionId
+&nbsp;import com.georgeci.moneysurfer.feature.transaction.filter.TransactionDateRange
+&nbsp;import com.georgeci.moneysurfer.feature.transaction.filter.TransactionSort
+&nbsp;import com.georgeci.moneysurfer.feature.transaction.filter.TransactionTypeFilter
+&nbsp;import kotlinx.datetime.LocalDate
+&nbsp;
+&nbsp;data class TransactionGroupUi(
+&nbsp;    val date: LocalDate,
+&nbsp;    val dateLabel: TransactionDateUi,
+&nbsp;    val netFormatted: String,
+&nbsp;    val netPositive: Boolean,
+&nbsp;    val transactions: List&lt;TransactionRowUi&gt;,
+&nbsp;)
+&nbsp;
+&nbsp;/** Day-header label, resolved to text by the screen. */
+&nbsp;sealed interface TransactionDateUi {
+&nbsp;    data object Today : TransactionDateUi
+&nbsp;    data object Yesterday : TransactionDateUi
+&nbsp;    data class Exact(val date: LocalDate) : TransactionDateUi
+&nbsp;}
+&nbsp;
+&nbsp;/** Pager label, resolved to text by the screen — see the `PeriodPager` design component. */
+&nbsp;sealed interface TransactionPeriodUi {
+&nbsp;    data class Month(val monthNumber: Int, val year: Int) : TransactionPeriodUi
+&nbsp;    data class Week(
+&nbsp;        val from: LocalDate,
+&nbsp;        val to: LocalDate,
+&nbsp;        val weekNumber: Int,
+&nbsp;        val weekYear: Int,
+&nbsp;    ) : TransactionPeriodUi
+&nbsp;
+&nbsp;    data object AllTime : TransactionPeriodUi
+&nbsp;}
 &nbsp;
 &nbsp;/**
-&nbsp; * Auth-provider gateway. The data-layer implementation wraps Firebase Auth and classifies
-&nbsp; * provider-specific exceptions into [AuthError.Type] before crossing the module boundary, so
-&nbsp; * the domain stays free of any third-party auth SDK types.
+&nbsp; * The filter chip rail&#39;s contents. Every chip is a shortcut into the filter screen, so these carry
+&nbsp; * only what the chip label shows — a name when exactly one thing is picked, a count otherwise.
 &nbsp; */
-&nbsp;interface AuthRemoteRepository {
-&nbsp;    /** Returns the uid of the already-signed-in user, or null when no session is active. */
-&nbsp;    fun currentUid(): String?
+<b class="fc">&nbsp;data class TransactionFilterChipsUi(</b>
+<b class="fc">&nbsp;    val dateRange: TransactionDateRange,</b>
+<b class="fc">&nbsp;    val type: TransactionTypeFilter,</b>
+<b class="fc">&nbsp;    val accountCount: Int,</b>
+<b class="fc">&nbsp;    val accountName: String?,</b>
+<b class="fc">&nbsp;    val categoryCount: Int,</b>
+<b class="fc">&nbsp;    val categoryName: String?,</b>
+<b class="fc">&nbsp;    val sort: TransactionSort,</b>
+&nbsp;)
 &nbsp;
-&nbsp;    /** Returns current user&#39;s email, or null if unavailable (for example anonymous session). */
-&nbsp;    fun currentEmail(): String?
-&nbsp;
-&nbsp;    /** True when current Firebase session is anonymous. */
-&nbsp;    fun isCurrentUserAnonymous(): Boolean
-&nbsp;
-&nbsp;    /** Sign in with the email/password provider. Returns the resulting uid. */
-&nbsp;    suspend fun signInWithEmail(email: String, password: String): Either&lt;AuthError, String&gt;
-&nbsp;
-&nbsp;    /** Create a new account via the email/password provider. Returns the resulting uid. */
-&nbsp;    suspend fun createUserWithEmail(email: String, password: String): Either&lt;AuthError, String&gt;
-&nbsp;
-&nbsp;    /** Anonymous sign-in for &quot;guest&quot; mode. Idempotent: returns the existing uid if any. */
-&nbsp;    suspend fun signInAnonymously(): Either&lt;AuthError, String&gt;
-&nbsp;
-&nbsp;    /** Signs the active session out. No-op if there is no active session. */
-&nbsp;    suspend fun signOut(): Either&lt;AuthError, Unit&gt;
-&nbsp;
+&nbsp;data class TransactionRowUi(
+&nbsp;    val id: TransactionId,
+&nbsp;    val title: String,
+&nbsp;    val subtitle: String,
+&nbsp;    val formattedAmount: String,
+&nbsp;    val isExpense: Boolean,
+&nbsp;    val categoryHueSeed: String,
+&nbsp;    /** Name of the owning account, rendered only where the list mixes several — may be blank. */
+&nbsp;    val accountName: String = &quot;&quot;,
+&nbsp;    /** One leg of a transfer: money moved sideways, drawn neutral with a swap glyph. */
+&nbsp;    val isTransfer: Boolean = false,
 &nbsp;    /**
-&nbsp;     * Refreshes the current session&#39;s credential with the email/password provider. Required
-&nbsp;     * before destructive operations ([deleteCurrentUser]) when the last sign-in is not recent.
+&nbsp;     * How many categories a collapsed split row covers, or `0` when the row is an ordinary
+&nbsp;     * transaction. Non-zero replaces [subtitle] with the &quot;N categories&quot; badge: a receipt split
+&nbsp;     * across several categories has no single category name to show, and [formattedAmount] is the
+&nbsp;     * whole receipt rather than any one leg. [id] is the leg the row opens — its details screen
+&nbsp;     * carries the breakdown.
 &nbsp;     */
-&nbsp;    suspend fun reauthenticateWithEmail(email: String, password: String): Either&lt;AuthError, Unit&gt;
-&nbsp;
+&nbsp;    val splitCategoryCount: Int = 0,
 &nbsp;    /**
-&nbsp;     * Permanently deletes the current Firebase Auth user. Fails with
-&nbsp;     * [AuthError.Type.RequiresRecentLogin] when the provider demands a fresh credential first.
+&nbsp;     * Whether the row belongs to a receipt split across categories — true for a collapsed row and
+&nbsp;     * for a lone leg alike.
+&nbsp;     *
+&nbsp;     * Deliberately separate from [splitCategoryCount], which is only non-zero once a group is
+&nbsp;     * collapsed: a page that holds part of a group renders its legs individually, and deleting one
+&nbsp;     * of those still takes the whole receipt. The delete confirmation keys off this, so what the
+&nbsp;     * dialog promises matches what the delete does at every window size.
 &nbsp;     */
-&nbsp;    suspend fun deleteCurrentUser(): Either&lt;AuthError, Unit&gt;
-&nbsp;}
+&nbsp;    val isSplitLeg: Boolean = false,
+&nbsp;)
+&nbsp;
+&nbsp;data class TransactionSummaryUi(
+&nbsp;    val incomeFormatted: String,
+&nbsp;    val expenseFormatted: String,
+&nbsp;    val netFormatted: String,
+&nbsp;    val netPositive: Boolean,
+&nbsp;)
 </code>
 </pre>
 </div>
@@ -111,7 +202,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-23 23:54</div>
+    <div style="float:right;">generated on 2026-07-28 21:38</div>
 </div>
 </body>
 </html>

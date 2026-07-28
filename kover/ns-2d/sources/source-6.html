@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SyncDatabase_Impl</title>
+  <title>MoneySurfer Coverage Report > AccountDetailsState_Content__OpticsKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.sync.db</a>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.account.details</a>
 </div>
 
-<h1>Coverage Summary for Class: SyncDatabase_Impl (com.georgeci.moneysurfer.sync.db)</h1>
+<h1>Coverage Summary for Class: AccountDetailsState_Content__OpticsKt (com.georgeci.moneysurfer.feature.account.details)</h1>
 
 <table class="coverageStats">
 
@@ -46,41 +46,22 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SyncDatabase_Impl</td>
+  <td class="name">AccountDetailsState_Content__OpticsKt</td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (10/10)
+    (0/58)
   </span>
 </td>
     <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (20/20)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (98/98)
-  </span>
-</td>
-</tr>
-  <tr>
-    <td class="name">SyncDatabase_Impl$createOpenDelegate$_openDelegate$1</td>
-<td class="coverageStat">
-  <span class="percent">
-    50%
-  </span>
-  <span class="absValue">
-    (4/8)
+    (0/58)
   </span>
 </td>
 <td class="coverageStat">
@@ -88,23 +69,63 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/4)
+    (0/326)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">AccountDetailsState_Content__OpticsKt$accountId$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    18.8%
+    0%
   </span>
   <span class="absValue">
-    (9/48)
+    (0/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">AccountDetailsState_Content__OpticsKt$accountId$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    7.8%
+    0%
   </span>
   <span class="absValue">
-    (27/346)
+    (0/14)
   </span>
 </td>
   </tr>
@@ -112,10 +133,19 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
-    77.8%
+    0%
   </span>
   <span class="absValue">
-    (14/18)
+    (0/60)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/60)
   </span>
 </td>
 <td class="coverageStat">
@@ -123,23 +153,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/4)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    42.6%
-  </span>
-  <span class="absValue">
-    (29/68)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    28.2%
-  </span>
-  <span class="absValue">
-    (125/444)
+    (0/342)
   </span>
 </td>
 </tr>
@@ -150,155 +164,119 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.sync.db
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.account.details
 &nbsp;
-&nbsp;import androidx.room.InvalidationTracker
-&nbsp;import androidx.room.RoomOpenDelegate
-&nbsp;import androidx.room.migration.AutoMigrationSpec
-&nbsp;import androidx.room.migration.Migration
-&nbsp;import androidx.room.util.TableInfo
-&nbsp;import androidx.room.util.TableInfo.Companion.read
-&nbsp;import androidx.room.util.dropFtsSyncTriggers
-&nbsp;import androidx.sqlite.SQLiteConnection
-&nbsp;import androidx.sqlite.execSQL
-&nbsp;import com.georgeci.moneysurfer.sync.db.dao.PendingMutationDao
-&nbsp;import com.georgeci.moneysurfer.sync.db.dao.PendingMutationDao_Impl
-&nbsp;import com.georgeci.moneysurfer.sync.db.dao.SyncMetaDao
-&nbsp;import com.georgeci.moneysurfer.sync.db.dao.SyncMetaDao_Impl
-&nbsp;import javax.`annotation`.processing.Generated
-&nbsp;import kotlin.Lazy
-&nbsp;import kotlin.String
-&nbsp;import kotlin.Suppress
-&nbsp;import kotlin.collections.List
-&nbsp;import kotlin.collections.Map
-&nbsp;import kotlin.collections.MutableList
-&nbsp;import kotlin.collections.MutableMap
-&nbsp;import kotlin.collections.MutableSet
-&nbsp;import kotlin.collections.Set
-&nbsp;import kotlin.collections.mutableListOf
-&nbsp;import kotlin.collections.mutableMapOf
-&nbsp;import kotlin.collections.mutableSetOf
-&nbsp;import kotlin.reflect.KClass
 &nbsp;
-<b class="fc">&nbsp;@Generated(value = [&quot;androidx.room.RoomProcessor&quot;])</b>
-&nbsp;@Suppress(names = [&quot;UNCHECKED_CAST&quot;, &quot;DEPRECATION&quot;, &quot;REDUNDANT_PROJECTION&quot;, &quot;REMOVAL&quot;])
-&nbsp;public class SyncDatabase_Impl : SyncDatabase() {
-<b class="fc">&nbsp;  private val _syncMetaDao: Lazy&lt;SyncMetaDao&gt; = lazy {</b>
-<b class="fc">&nbsp;    SyncMetaDao_Impl(this)</b>
-&nbsp;  }
 &nbsp;
-<b class="fc">&nbsp;  private val _pendingMutationDao: Lazy&lt;PendingMutationDao&gt; = lazy {</b>
-<b class="fc">&nbsp;    PendingMutationDao_Impl(this)</b>
-&nbsp;  }
-&nbsp;
-&nbsp;  protected override fun createOpenDelegate(): RoomOpenDelegate {
-<b class="fc">&nbsp;    val _openDelegate: RoomOpenDelegate = object : RoomOpenDelegate(2, &quot;3c40e51c3a3a86fe99dc49f5501ccc5d&quot;, &quot;49f98b8a1936f530e32d1ff0ad92e412&quot;) {</b>
-&nbsp;      public override fun createAllTables(connection: SQLiteConnection) {
-<b class="fc">&nbsp;        connection.execSQL(&quot;CREATE TABLE IF NOT EXISTS `sync_meta` (`workspaceId` TEXT NOT NULL, `collection` TEXT NOT NULL, `lastPulledAt` INTEGER, `lastSyncSuccessAt` INTEGER, `lastSyncAttemptAt` INTEGER, PRIMARY KEY(`workspaceId`, `collection`))&quot;)</b>
-<b class="fc">&nbsp;        connection.execSQL(&quot;CREATE TABLE IF NOT EXISTS `pending_mutations` (`id` TEXT NOT NULL, `entityType` TEXT NOT NULL, `entityId` TEXT NOT NULL, `operation` TEXT NOT NULL, `workspaceId` TEXT, `createdAt` INTEGER NOT NULL, `attempts` INTEGER NOT NULL, `status` TEXT NOT NULL, `lastError` TEXT, PRIMARY KEY(`id`))&quot;)</b>
-<b class="fc">&nbsp;        connection.execSQL(&quot;CREATE INDEX IF NOT EXISTS `index_pending_mutations_status_createdAt` ON `pending_mutations` (`status`, `createdAt`)&quot;)</b>
-<b class="fc">&nbsp;        connection.execSQL(&quot;CREATE INDEX IF NOT EXISTS `index_pending_mutations_workspaceId` ON `pending_mutations` (`workspaceId`)&quot;)</b>
-<b class="fc">&nbsp;        connection.execSQL(&quot;CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)&quot;)</b>
-<b class="fc">&nbsp;        connection.execSQL(&quot;INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, &#39;3c40e51c3a3a86fe99dc49f5501ccc5d&#39;)&quot;)</b>
-&nbsp;      }
-&nbsp;
-&nbsp;      public override fun dropAllTables(connection: SQLiteConnection) {
-<b class="nc">&nbsp;        connection.execSQL(&quot;DROP TABLE IF EXISTS `sync_meta`&quot;)</b>
-<b class="nc">&nbsp;        connection.execSQL(&quot;DROP TABLE IF EXISTS `pending_mutations`&quot;)</b>
-&nbsp;      }
-&nbsp;
-&nbsp;      public override fun onCreate(connection: SQLiteConnection) {
-<b class="fc">&nbsp;      }</b>
-&nbsp;
-&nbsp;      public override fun onOpen(connection: SQLiteConnection) {
-<b class="fc">&nbsp;        internalInitInvalidationTracker(connection)</b>
-&nbsp;      }
-&nbsp;
-&nbsp;      public override fun onPreMigrate(connection: SQLiteConnection) {
-<b class="nc">&nbsp;        dropFtsSyncTriggers(connection)</b>
-&nbsp;      }
-&nbsp;
-&nbsp;      public override fun onPostMigrate(connection: SQLiteConnection) {
-<b class="nc">&nbsp;      }</b>
-&nbsp;
-&nbsp;      public override fun onValidateSchema(connection: SQLiteConnection): RoomOpenDelegate.ValidationResult {
-<b class="nc">&nbsp;        val _columnsSyncMeta: MutableMap&lt;String, TableInfo.Column&gt; = mutableMapOf()</b>
-<b class="nc">&nbsp;        _columnsSyncMeta.put(&quot;workspaceId&quot;, TableInfo.Column(&quot;workspaceId&quot;, &quot;TEXT&quot;, true, 1, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsSyncMeta.put(&quot;collection&quot;, TableInfo.Column(&quot;collection&quot;, &quot;TEXT&quot;, true, 2, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsSyncMeta.put(&quot;lastPulledAt&quot;, TableInfo.Column(&quot;lastPulledAt&quot;, &quot;INTEGER&quot;, false, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsSyncMeta.put(&quot;lastSyncSuccessAt&quot;, TableInfo.Column(&quot;lastSyncSuccessAt&quot;, &quot;INTEGER&quot;, false, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsSyncMeta.put(&quot;lastSyncAttemptAt&quot;, TableInfo.Column(&quot;lastSyncAttemptAt&quot;, &quot;INTEGER&quot;, false, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        val _foreignKeysSyncMeta: MutableSet&lt;TableInfo.ForeignKey&gt; = mutableSetOf()</b>
-<b class="nc">&nbsp;        val _indicesSyncMeta: MutableSet&lt;TableInfo.Index&gt; = mutableSetOf()</b>
-<b class="nc">&nbsp;        val _infoSyncMeta: TableInfo = TableInfo(&quot;sync_meta&quot;, _columnsSyncMeta, _foreignKeysSyncMeta, _indicesSyncMeta)</b>
-<b class="nc">&nbsp;        val _existingSyncMeta: TableInfo = read(connection, &quot;sync_meta&quot;)</b>
-<b class="nc">&nbsp;        if (!_infoSyncMeta.equals(_existingSyncMeta)) {</b>
-<b class="nc">&nbsp;          return RoomOpenDelegate.ValidationResult(false, &quot;&quot;&quot;</b>
-&nbsp;              |sync_meta(com.georgeci.moneysurfer.sync.db.entity.SyncMetaEntity).
-&nbsp;              | Expected:
-<b class="nc">&nbsp;              |&quot;&quot;&quot;.trimMargin() + _infoSyncMeta + &quot;&quot;&quot;</b>
-&nbsp;              |
-&nbsp;              | Found:
-<b class="nc">&nbsp;              |&quot;&quot;&quot;.trimMargin() + _existingSyncMeta)</b>
-&nbsp;        }
-<b class="nc">&nbsp;        val _columnsPendingMutations: MutableMap&lt;String, TableInfo.Column&gt; = mutableMapOf()</b>
-<b class="nc">&nbsp;        _columnsPendingMutations.put(&quot;id&quot;, TableInfo.Column(&quot;id&quot;, &quot;TEXT&quot;, true, 1, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsPendingMutations.put(&quot;entityType&quot;, TableInfo.Column(&quot;entityType&quot;, &quot;TEXT&quot;, true, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsPendingMutations.put(&quot;entityId&quot;, TableInfo.Column(&quot;entityId&quot;, &quot;TEXT&quot;, true, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsPendingMutations.put(&quot;operation&quot;, TableInfo.Column(&quot;operation&quot;, &quot;TEXT&quot;, true, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsPendingMutations.put(&quot;workspaceId&quot;, TableInfo.Column(&quot;workspaceId&quot;, &quot;TEXT&quot;, false, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsPendingMutations.put(&quot;createdAt&quot;, TableInfo.Column(&quot;createdAt&quot;, &quot;INTEGER&quot;, true, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsPendingMutations.put(&quot;attempts&quot;, TableInfo.Column(&quot;attempts&quot;, &quot;INTEGER&quot;, true, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsPendingMutations.put(&quot;status&quot;, TableInfo.Column(&quot;status&quot;, &quot;TEXT&quot;, true, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        _columnsPendingMutations.put(&quot;lastError&quot;, TableInfo.Column(&quot;lastError&quot;, &quot;TEXT&quot;, false, 0, null, TableInfo.CREATED_FROM_ENTITY))</b>
-<b class="nc">&nbsp;        val _foreignKeysPendingMutations: MutableSet&lt;TableInfo.ForeignKey&gt; = mutableSetOf()</b>
-<b class="nc">&nbsp;        val _indicesPendingMutations: MutableSet&lt;TableInfo.Index&gt; = mutableSetOf()</b>
-<b class="nc">&nbsp;        _indicesPendingMutations.add(TableInfo.Index(&quot;index_pending_mutations_status_createdAt&quot;, false, listOf(&quot;status&quot;, &quot;createdAt&quot;), listOf(&quot;ASC&quot;, &quot;ASC&quot;)))</b>
-<b class="nc">&nbsp;        _indicesPendingMutations.add(TableInfo.Index(&quot;index_pending_mutations_workspaceId&quot;, false, listOf(&quot;workspaceId&quot;), listOf(&quot;ASC&quot;)))</b>
-<b class="nc">&nbsp;        val _infoPendingMutations: TableInfo = TableInfo(&quot;pending_mutations&quot;, _columnsPendingMutations, _foreignKeysPendingMutations, _indicesPendingMutations)</b>
-<b class="nc">&nbsp;        val _existingPendingMutations: TableInfo = read(connection, &quot;pending_mutations&quot;)</b>
-<b class="nc">&nbsp;        if (!_infoPendingMutations.equals(_existingPendingMutations)) {</b>
-<b class="nc">&nbsp;          return RoomOpenDelegate.ValidationResult(false, &quot;&quot;&quot;</b>
-&nbsp;              |pending_mutations(com.georgeci.moneysurfer.sync.db.entity.PendingMutationEntity).
-&nbsp;              | Expected:
-<b class="nc">&nbsp;              |&quot;&quot;&quot;.trimMargin() + _infoPendingMutations + &quot;&quot;&quot;</b>
-&nbsp;              |
-&nbsp;              | Found:
-<b class="nc">&nbsp;              |&quot;&quot;&quot;.trimMargin() + _existingPendingMutations)</b>
-&nbsp;        }
-<b class="nc">&nbsp;        return RoomOpenDelegate.ValidationResult(true, null)</b>
-&nbsp;      }
-&nbsp;    }
-<b class="fc">&nbsp;    return _openDelegate</b>
-&nbsp;  }
-&nbsp;
-&nbsp;  protected override fun createInvalidationTracker(): InvalidationTracker {
-<b class="fc">&nbsp;    val _shadowTablesMap: MutableMap&lt;String, String&gt; = mutableMapOf()</b>
-<b class="fc">&nbsp;    val _viewTables: MutableMap&lt;String, Set&lt;String&gt;&gt; = mutableMapOf()</b>
-<b class="fc">&nbsp;    return InvalidationTracker(this, _shadowTablesMap, _viewTables, &quot;sync_meta&quot;, &quot;pending_mutations&quot;)</b>
-&nbsp;  }
-&nbsp;
-&nbsp;  protected override fun getRequiredTypeConverterClasses(): Map&lt;KClass&lt;*&gt;, List&lt;KClass&lt;*&gt;&gt;&gt; {
-<b class="fc">&nbsp;    val _typeConvertersMap: MutableMap&lt;KClass&lt;*&gt;, List&lt;KClass&lt;*&gt;&gt;&gt; = mutableMapOf()</b>
-<b class="fc">&nbsp;    _typeConvertersMap.put(SyncMetaDao::class, SyncMetaDao_Impl.getRequiredConverters())</b>
-<b class="fc">&nbsp;    _typeConvertersMap.put(PendingMutationDao::class, PendingMutationDao_Impl.getRequiredConverters())</b>
-<b class="fc">&nbsp;    return _typeConvertersMap</b>
-&nbsp;  }
-&nbsp;
-&nbsp;  public override fun getRequiredAutoMigrationSpecClasses(): Set&lt;KClass&lt;out AutoMigrationSpec&gt;&gt; {
-<b class="fc">&nbsp;    val _autoMigrationSpecsSet: MutableSet&lt;KClass&lt;out AutoMigrationSpec&gt;&gt; = mutableSetOf()</b>
-<b class="fc">&nbsp;    return _autoMigrationSpecsSet</b>
-&nbsp;  }
-&nbsp;
-&nbsp;  public override fun createAutoMigrations(autoMigrationSpecs: Map&lt;KClass&lt;out AutoMigrationSpec&gt;, AutoMigrationSpec&gt;): List&lt;Migration&gt; {
-<b class="fc">&nbsp;    val _autoMigrations: MutableList&lt;Migration&gt; = mutableListOf()</b>
-<b class="fc">&nbsp;    return _autoMigrations</b>
-&nbsp;  }
-&nbsp;
-<b class="fc">&nbsp;  public override fun syncMetaDao(): SyncMetaDao = _syncMetaDao.value</b>
-&nbsp;
-<b class="fc">&nbsp;  public override fun pendingMutationDao(): PendingMutationDao = _pendingMutationDao.value</b>
+<b class="nc">&nbsp;public  val com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content.Companion.`accountId`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content, com.georgeci.moneysurfer.domain.primitives.AccountId&gt;  get() = arrow.optics.Lens(</b>
+<b class="nc">&nbsp;  get = { content: com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content -&gt; content.`accountId` },</b>
+&nbsp;  set = { content: com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content, value: com.georgeci.moneysurfer.domain.primitives.AccountId -&gt;
+<b class="nc">&nbsp;  content.copy(`accountId` = value)</b>
 &nbsp;}
+&nbsp;)
+&nbsp;
+<b class="nc">&nbsp;public  val com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content.Companion.`name`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content, kotlin.String&gt;  get() = arrow.optics.Lens(</b>
+<b class="nc">&nbsp;  get = { content: com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content -&gt; content.`name` },</b>
+&nbsp;  set = { content: com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content, value: kotlin.String -&gt;
+<b class="nc">&nbsp;  content.copy(`name` = value)</b>
+&nbsp;}
+&nbsp;)
+&nbsp;
+<b class="nc">&nbsp;public  val com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content.Companion.`formattedBalance`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content, kotlin.String&gt;  get() = arrow.optics.Lens(</b>
+<b class="nc">&nbsp;  get = { content: com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content -&gt; content.`formattedBalance` },</b>
+&nbsp;  set = { content: com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content, value: kotlin.String -&gt;
+<b class="nc">&nbsp;  content.copy(`formattedBalance` = value)</b>
+&nbsp;}
+&nbsp;)
+&nbsp;
+<b class="nc">&nbsp;public  val com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content.Companion.`type`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content, com.georgeci.moneysurfer.domain.primitives.AccountType?&gt;  get() = arrow.optics.Lens(</b>
+<b class="nc">&nbsp;  get = { content: com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content -&gt; content.`type` },</b>
+&nbsp;  set = { content: com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content, value: com.georgeci.moneysurfer.domain.primitives.AccountType? -&gt;
+<b class="nc">&nbsp;  content.copy(`type` = value)</b>
+&nbsp;}
+&nbsp;)
+&nbsp;
+<b class="nc">&nbsp;public  val com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content.Companion.`formattedIncome`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content, kotlin.String&gt;  get() = arrow.optics.Lens(</b>
+<b class="nc">&nbsp;  get = { content: com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content -&gt; content.`formattedIncome` },</b>
+&nbsp;  set = { content: com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content, value: kotlin.String -&gt;
+<b class="nc">&nbsp;  content.copy(`formattedIncome` = value)</b>
+&nbsp;}
+&nbsp;)
+&nbsp;
+<b class="nc">&nbsp;public  val com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content.Companion.`formattedExpenses`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content, kotlin.String&gt;  get() = arrow.optics.Lens(</b>
+<b class="nc">&nbsp;  get = { content: com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content -&gt; content.`formattedExpenses` },</b>
+&nbsp;  set = { content: com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content, value: kotlin.String -&gt;
+<b class="nc">&nbsp;  content.copy(`formattedExpenses` = value)</b>
+&nbsp;}
+&nbsp;)
+&nbsp;
+<b class="nc">&nbsp;public  val com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content.Companion.`chart`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content, com.georgeci.moneysurfer.feature.account.details.AccountBalanceChartUi&gt;  get() = arrow.optics.Lens(</b>
+<b class="nc">&nbsp;  get = { content: com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content -&gt; content.`chart` },</b>
+&nbsp;  set = { content: com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content, value: com.georgeci.moneysurfer.feature.account.details.AccountBalanceChartUi -&gt;
+<b class="nc">&nbsp;  content.copy(`chart` = value)</b>
+&nbsp;}
+&nbsp;)
+&nbsp;
+<b class="nc">&nbsp;public  val com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content.Companion.`transactions`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content, kotlin.collections.List&lt;com.georgeci.moneysurfer.feature.account.details.AccountTransactionUi&gt;&gt;  get() = arrow.optics.Lens(</b>
+<b class="nc">&nbsp;  get = { content: com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content -&gt; content.`transactions` },</b>
+&nbsp;  set = { content: com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content, value: kotlin.collections.List&lt;com.georgeci.moneysurfer.feature.account.details.AccountTransactionUi&gt; -&gt;
+<b class="nc">&nbsp;  content.copy(`transactions` = value)</b>
+&nbsp;}
+&nbsp;)
+&nbsp;
+<b class="nc">&nbsp;public  val com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content.Companion.`filter`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content, com.georgeci.moneysurfer.feature.account.details.TransactionFilter&gt;  get() = arrow.optics.Lens(</b>
+<b class="nc">&nbsp;  get = { content: com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content -&gt; content.`filter` },</b>
+&nbsp;  set = { content: com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content, value: com.georgeci.moneysurfer.feature.account.details.TransactionFilter -&gt;
+<b class="nc">&nbsp;  content.copy(`filter` = value)</b>
+&nbsp;}
+&nbsp;)
+&nbsp;
+<b class="nc">&nbsp;public  val com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content.Companion.`extraDetails`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content, kotlin.collections.List&lt;com.georgeci.moneysurfer.domain.model.AccountExtraDetail&gt;&gt;  get() = arrow.optics.Lens(</b>
+<b class="nc">&nbsp;  get = { content: com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content -&gt; content.`extraDetails` },</b>
+&nbsp;  set = { content: com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content, value: kotlin.collections.List&lt;com.georgeci.moneysurfer.domain.model.AccountExtraDetail&gt; -&gt;
+<b class="nc">&nbsp;  content.copy(`extraDetails` = value)</b>
+&nbsp;}
+&nbsp;)
+&nbsp;
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content&gt;.`accountId`: arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.domain.primitives.AccountId&gt;  get() = this + com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content.`accountId`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content&gt;.`accountId`: arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.domain.primitives.AccountId&gt;  get() = this + com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content.`accountId`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content&gt;.`accountId`: arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.domain.primitives.AccountId&gt;  get() = this + com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content.`accountId`</b>
+&nbsp;
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content&gt;.`name`: arrow.optics.Lens&lt;__S, kotlin.String&gt;  get() = this + com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content.`name`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content&gt;.`name`: arrow.optics.Optional&lt;__S, kotlin.String&gt;  get() = this + com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content.`name`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content&gt;.`name`: arrow.optics.Traversal&lt;__S, kotlin.String&gt;  get() = this + com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content.`name`</b>
+&nbsp;
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content&gt;.`formattedBalance`: arrow.optics.Lens&lt;__S, kotlin.String&gt;  get() = this + com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content.`formattedBalance`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content&gt;.`formattedBalance`: arrow.optics.Optional&lt;__S, kotlin.String&gt;  get() = this + com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content.`formattedBalance`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content&gt;.`formattedBalance`: arrow.optics.Traversal&lt;__S, kotlin.String&gt;  get() = this + com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content.`formattedBalance`</b>
+&nbsp;
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content&gt;.`type`: arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.domain.primitives.AccountType?&gt;  get() = this + com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content.`type`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content&gt;.`type`: arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.domain.primitives.AccountType?&gt;  get() = this + com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content.`type`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content&gt;.`type`: arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.domain.primitives.AccountType?&gt;  get() = this + com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content.`type`</b>
+&nbsp;
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content&gt;.`formattedIncome`: arrow.optics.Lens&lt;__S, kotlin.String&gt;  get() = this + com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content.`formattedIncome`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content&gt;.`formattedIncome`: arrow.optics.Optional&lt;__S, kotlin.String&gt;  get() = this + com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content.`formattedIncome`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content&gt;.`formattedIncome`: arrow.optics.Traversal&lt;__S, kotlin.String&gt;  get() = this + com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content.`formattedIncome`</b>
+&nbsp;
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content&gt;.`formattedExpenses`: arrow.optics.Lens&lt;__S, kotlin.String&gt;  get() = this + com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content.`formattedExpenses`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content&gt;.`formattedExpenses`: arrow.optics.Optional&lt;__S, kotlin.String&gt;  get() = this + com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content.`formattedExpenses`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content&gt;.`formattedExpenses`: arrow.optics.Traversal&lt;__S, kotlin.String&gt;  get() = this + com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content.`formattedExpenses`</b>
+&nbsp;
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content&gt;.`chart`: arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.account.details.AccountBalanceChartUi&gt;  get() = this + com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content.`chart`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content&gt;.`chart`: arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.account.details.AccountBalanceChartUi&gt;  get() = this + com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content.`chart`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content&gt;.`chart`: arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.account.details.AccountBalanceChartUi&gt;  get() = this + com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content.`chart`</b>
+&nbsp;
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content&gt;.`transactions`: arrow.optics.Lens&lt;__S, kotlin.collections.List&lt;com.georgeci.moneysurfer.feature.account.details.AccountTransactionUi&gt;&gt;  get() = this + com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content.`transactions`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content&gt;.`transactions`: arrow.optics.Optional&lt;__S, kotlin.collections.List&lt;com.georgeci.moneysurfer.feature.account.details.AccountTransactionUi&gt;&gt;  get() = this + com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content.`transactions`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content&gt;.`transactions`: arrow.optics.Traversal&lt;__S, kotlin.collections.List&lt;com.georgeci.moneysurfer.feature.account.details.AccountTransactionUi&gt;&gt;  get() = this + com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content.`transactions`</b>
+&nbsp;
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content&gt;.`filter`: arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.account.details.TransactionFilter&gt;  get() = this + com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content.`filter`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content&gt;.`filter`: arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.account.details.TransactionFilter&gt;  get() = this + com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content.`filter`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content&gt;.`filter`: arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.account.details.TransactionFilter&gt;  get() = this + com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content.`filter`</b>
+&nbsp;
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content&gt;.`extraDetails`: arrow.optics.Lens&lt;__S, kotlin.collections.List&lt;com.georgeci.moneysurfer.domain.model.AccountExtraDetail&gt;&gt;  get() = this + com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content.`extraDetails`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content&gt;.`extraDetails`: arrow.optics.Optional&lt;__S, kotlin.collections.List&lt;com.georgeci.moneysurfer.domain.model.AccountExtraDetail&gt;&gt;  get() = this + com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content.`extraDetails`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content&gt;.`extraDetails`: arrow.optics.Traversal&lt;__S, kotlin.collections.List&lt;com.georgeci.moneysurfer.domain.model.AccountExtraDetail&gt;&gt;  get() = this + com.georgeci.moneysurfer.feature.account.details.AccountDetailsState.Content.`extraDetails`</b>
 </code>
 </pre>
 </div>
@@ -322,7 +300,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-22 20:32</div>
+    <div style="float:right;">generated on 2026-07-28 21:38</div>
 </div>
 </body>
 </html>

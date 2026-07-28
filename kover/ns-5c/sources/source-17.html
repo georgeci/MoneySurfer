@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > CurrencyRepository</title>
+  <title>MoneySurfer Coverage Report > TransactionsListPeriodPagerKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,24 +19,106 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.domain.repositories</a>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.transaction.list</a>
 </div>
 
-<h1>Coverage Summary for Class: CurrencyRepository (com.georgeci.moneysurfer.domain.repositories)</h1>
+<h1>Coverage Summary for Class: TransactionsListPeriodPagerKt (com.georgeci.moneysurfer.feature.transaction.list)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
 <th class="coverageStat 
 ">
+  Method, %
+</th>
+<th class="coverageStat 
+">
   Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
 </th>
 </tr>
 <tr>
-  <td class="name">CurrencyRepository</td>
-    <td class="coverageStat"/>
+  <td class="name">TransactionsListPeriodPagerKt</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/21)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/58)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0.5%
+  </span>
+  <span class="absValue">
+    (4/797)
+  </span>
+</td>
 </tr>
-
+  <tr>
+    <td class="name">TransactionsListPeriodPagerKt$WhenMappings</td>
+    <td class="coverageStat"/>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/21)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/58)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0.5%
+  </span>
+  <span class="absValue">
+    (4/797)
+  </span>
+</td>
+</tr>
 </table>
 
 <br/>
@@ -44,14 +126,131 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.repositories
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.transaction.list
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.model.Currency
-&nbsp;import kotlinx.coroutines.flow.Flow
+&nbsp;import androidx.compose.foundation.layout.Box
+&nbsp;import androidx.compose.material3.DropdownMenu
+&nbsp;import androidx.compose.material3.DropdownMenuItem
+&nbsp;import androidx.compose.material3.Text
+&nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.runtime.getValue
+&nbsp;import androidx.compose.runtime.mutableStateOf
+&nbsp;import androidx.compose.runtime.remember
+&nbsp;import androidx.compose.runtime.setValue
+&nbsp;import androidx.compose.ui.Modifier
+&nbsp;import com.georgeci.moneysurfer.domain.preferences.TransactionPeriodMode
+&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferPeriodArrow
+&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferPeriodPager
+&nbsp;import kotlinx.datetime.LocalDate
+&nbsp;import kotlinx.datetime.number
+&nbsp;import moneysurfer.feature.transaction.generated.resources.Res
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transactions_list_months
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transactions_list_months_short
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transactions_list_period_all_time
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transactions_list_period_all_time_sub
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transactions_list_period_mode_all_time
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transactions_list_period_mode_month
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transactions_list_period_mode_week
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transactions_list_period_next
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transactions_list_period_previous
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transactions_list_period_week_range
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transactions_list_period_week_range_cross_month
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transactions_list_period_week_sub
+&nbsp;import org.jetbrains.compose.resources.stringArrayResource
+&nbsp;import org.jetbrains.compose.resources.stringResource
 &nbsp;
-&nbsp;interface CurrencyRepository {
-&nbsp;    fun getAll(): Flow&lt;List&lt;Currency&gt;&gt;
+&nbsp;/**
+&nbsp; * The design&#39;s `PeriodPager`, plus a menu on the label: the design never drew a mode switcher, and
+&nbsp; * the pill is the only place on the screen where the period is already the subject.
+&nbsp; *
+&nbsp; * In all-time mode the arrows are disabled rather than the pager hidden (the design&#39;s
+&nbsp; * `All time · arrows disabled` variant) — hiding it would strand the user with no way back.
+&nbsp; */
+&nbsp;@Composable
+&nbsp;internal fun PeriodPager(
+&nbsp;    state: TransactionsByAccountState.Content,
+&nbsp;    onEvent: (TransactionsByAccountEvent) -&gt; Unit,
+<b class="nc">&nbsp;    modifier: Modifier = Modifier,</b>
+<b class="nc">&nbsp;) {</b>
+<b class="nc">&nbsp;    var menuExpanded by remember { mutableStateOf(false) }</b>
+<b class="nc">&nbsp;    Box(modifier = modifier) {</b>
+<b class="nc">&nbsp;        SurferPeriodPager(</b>
+<b class="nc">&nbsp;            label = state.period.label(),</b>
+<b class="nc">&nbsp;            sublabel = state.period.sublabel(),</b>
+<b class="nc">&nbsp;            previous = SurferPeriodArrow(</b>
+<b class="nc">&nbsp;                onClick = { onEvent(TransactionsByAccountEvent.OnPreviousPeriodClick) },</b>
+<b class="nc">&nbsp;                enabled = state.canGoToPreviousPeriod,</b>
+<b class="nc">&nbsp;                contentDescription = stringResource(Res.string.transactions_list_period_previous),</b>
+&nbsp;            ),
+<b class="nc">&nbsp;            next = SurferPeriodArrow(</b>
+<b class="nc">&nbsp;                onClick = { onEvent(TransactionsByAccountEvent.OnNextPeriodClick) },</b>
+<b class="nc">&nbsp;                enabled = state.canGoToNextPeriod,</b>
+<b class="nc">&nbsp;                contentDescription = stringResource(Res.string.transactions_list_period_next),</b>
+&nbsp;            ),
+<b class="nc">&nbsp;            onLabelClick = { menuExpanded = true },</b>
+&nbsp;        )
+<b class="nc">&nbsp;        DropdownMenu(</b>
+<b class="nc">&nbsp;            expanded = menuExpanded,</b>
+<b class="nc">&nbsp;            onDismissRequest = { menuExpanded = false },</b>
+<b class="nc">&nbsp;        ) {</b>
+<b class="nc">&nbsp;            TransactionPeriodMode.entries.forEach { mode -&gt;</b>
+<b class="nc">&nbsp;                DropdownMenuItem(</b>
+<b class="nc">&nbsp;                    text = { Text(mode.label()) },</b>
+<b class="nc">&nbsp;                    onClick = {</b>
+<b class="nc">&nbsp;                        menuExpanded = false</b>
+<b class="nc">&nbsp;                        onEvent(TransactionsByAccountEvent.OnPeriodModeChanged(mode))</b>
+&nbsp;                    },
+&nbsp;                )
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+<b class="nc">&nbsp;    }</b>
+<b class="nc">&nbsp;}</b>
+&nbsp;
+&nbsp;@Composable
+<b class="nc">&nbsp;private fun TransactionPeriodMode.label(): String = stringResource(</b>
+<b class="nc">&nbsp;    when (this) {</b>
+<b class="nc">&nbsp;        TransactionPeriodMode.Month -&gt; Res.string.transactions_list_period_mode_month</b>
+<b class="nc">&nbsp;        TransactionPeriodMode.Week -&gt; Res.string.transactions_list_period_mode_week</b>
+<b class="nc">&nbsp;        TransactionPeriodMode.AllTime -&gt; Res.string.transactions_list_period_mode_all_time</b>
+&nbsp;    },
+&nbsp;)
+&nbsp;
+&nbsp;@Composable
+<b class="nc">&nbsp;private fun TransactionPeriodUi.label(): String = when (this) {</b>
+<b class="nc">&nbsp;    is TransactionPeriodUi.Month -&gt; monthNames()[monthNumber - 1]</b>
+<b class="nc">&nbsp;    is TransactionPeriodUi.Week -&gt; weekRangeLabel(from, to)</b>
+<b class="nc">&nbsp;    TransactionPeriodUi.AllTime -&gt; stringResource(Res.string.transactions_list_period_all_time)</b>
+<b class="nc">&nbsp;}</b>
+&nbsp;
+&nbsp;@Composable
+<b class="nc">&nbsp;private fun TransactionPeriodUi.sublabel(): String = when (this) {</b>
+<b class="nc">&nbsp;    is TransactionPeriodUi.Month -&gt; year.toString()</b>
+<b class="nc">&nbsp;    is TransactionPeriodUi.Week -&gt;</b>
+<b class="nc">&nbsp;        stringResource(Res.string.transactions_list_period_week_sub, weekNumber, weekYear)</b>
+<b class="nc">&nbsp;    TransactionPeriodUi.AllTime -&gt; stringResource(Res.string.transactions_list_period_all_time_sub)</b>
+<b class="nc">&nbsp;}</b>
+&nbsp;
+&nbsp;/** `Mar 25 – 31`, or `Mar 30 – Apr 5` when the week straddles two months. */
+&nbsp;@Composable
+<b class="nc">&nbsp;private fun weekRangeLabel(from: LocalDate, to: LocalDate): String {</b>
+<b class="nc">&nbsp;    val shortMonths = stringArrayResource(Res.array.transactions_list_months_short)</b>
+<b class="nc">&nbsp;    val fromMonth = shortMonths[from.month.number - 1]</b>
+<b class="nc">&nbsp;    return if (from.month == to.month) {</b>
+<b class="nc">&nbsp;        stringResource(Res.string.transactions_list_period_week_range, fromMonth, from.day, to.day)</b>
+<b class="nc">&nbsp;    } else {</b>
+<b class="nc">&nbsp;        stringResource(</b>
+<b class="nc">&nbsp;            Res.string.transactions_list_period_week_range_cross_month,</b>
+<b class="nc">&nbsp;            fromMonth,</b>
+<b class="nc">&nbsp;            from.day,</b>
+<b class="nc">&nbsp;            shortMonths[to.month.number - 1],</b>
+<b class="nc">&nbsp;            to.day,</b>
+&nbsp;        )
+&nbsp;    }
 &nbsp;}
+&nbsp;
+&nbsp;/** Standalone month names — the pager label is a sentence of its own. */
+&nbsp;@Composable
+<b class="nc">&nbsp;private fun monthNames(): List&lt;String&gt; = stringArrayResource(Res.array.transactions_list_months)</b>
 </code>
 </pre>
 </div>
@@ -75,7 +274,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-23 23:54</div>
+    <div style="float:right;">generated on 2026-07-28 21:38</div>
 </div>
 </body>
 </html>

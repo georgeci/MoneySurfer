@@ -1,0 +1,276 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>MoneySurfer Coverage Report > GetSafeToSpendUseCase</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.georgeci.moneysurfer.domain.usecase</a>
+</div>
+
+<h1>Coverage Summary for Class: GetSafeToSpendUseCase (com.georgeci.moneysurfer.domain.usecase)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">GetSafeToSpendUseCase</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (14/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (30/30)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">GetSafeToSpendUseCase$invoke$$inlined$flatMapLatest$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">GetSafeToSpendUseCase$invoke$$inlined$map$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">GetSafeToSpendUseCase$invoke$$inlined$map$1$1</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">GetSafeToSpendUseCase$invoke$$inlined$map$1$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">GetSafeToSpendUseCase$invoke$$inlined$map$1$2$1</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">GetSafeToSpendUseCase$invoke$lambda$1$$inlined$map$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">GetSafeToSpendUseCase$invoke$lambda$1$$inlined$map$1$1</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">GetSafeToSpendUseCase$invoke$lambda$1$$inlined$map$1$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">GetSafeToSpendUseCase$invoke$lambda$1$$inlined$map$1$2$1</td>
+    <td class="coverageStat"/>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    36.4%
+  </span>
+  <span class="absValue">
+    (4/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (14/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (30/30)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.usecase
+&nbsp;
+&nbsp;import com.georgeci.moneysurfer.domain.model.SafeToSpend
+&nbsp;import com.georgeci.moneysurfer.domain.model.safeToSpend
+&nbsp;import kotlinx.coroutines.ExperimentalCoroutinesApi
+&nbsp;import kotlinx.coroutines.flow.Flow
+&nbsp;import kotlinx.coroutines.flow.distinctUntilChanged
+&nbsp;import kotlinx.coroutines.flow.flatMapLatest
+&nbsp;import kotlinx.coroutines.flow.flowOf
+&nbsp;import kotlinx.coroutines.flow.map
+&nbsp;import kotlinx.datetime.TimeZone
+&nbsp;import org.koin.core.annotation.Single
+&nbsp;
+&nbsp;/**
+&nbsp; * Live safe-to-spend for the active workspace, or null while nothing backs it — no workspace, no
+&nbsp; * active budget, or a workspace whose budgets were all archived.
+&nbsp; *
+&nbsp; * Archived budgets are dropped before progress is computed rather than after: progress reads the
+&nbsp; * whole transaction list per budget, and a workspace can accumulate archived budgets indefinitely.
+&nbsp; *
+&nbsp; * The workspace comes from the budgets themselves rather than from a second subscription to
+&nbsp; * `SessionPointers.currentWorkspaceId`. Two collectors of the same pointer are not ordered against
+&nbsp; * each other, so on a workspace switch the budget query can deliver the new workspace&#39;s budgets
+&nbsp; * while the separately-read id is still the old one — and `progressOf` would then match those
+&nbsp; * budgets against the previous workspace&#39;s transactions, briefly reporting the full limit as unspent.
+&nbsp; * Reading both from one emission makes that pairing impossible; [GetBudgetsUseCase] already returns
+&nbsp; * an empty list when nobody is signed in, which is the same &quot;nothing backs it&quot; answer.
+&nbsp; */
+<b class="fc">&nbsp;@Single</b>
+&nbsp;@OptIn(ExperimentalCoroutinesApi::class)
+&nbsp;class GetSafeToSpendUseCase(
+<b class="fc">&nbsp;    private val getBudgets: GetBudgetsUseCase,</b>
+<b class="fc">&nbsp;    private val getBudgetProgress: GetBudgetProgressUseCase,</b>
+&nbsp;) {
+&nbsp;
+<b class="fc">&nbsp;    operator fun invoke(timeZone: TimeZone = TimeZone.currentSystemDefault()): Flow&lt;SafeToSpend?&gt; =</b>
+<b class="fc">&nbsp;        getBudgets()</b>
+<b class="fc">&nbsp;            .map { budgets -&gt; budgets.filter { it.isActive } }</b>
+<b class="fc">&nbsp;            .distinctUntilChanged()</b>
+<b class="fc">&nbsp;            .flatMapLatest { budgets -&gt;</b>
+<b class="fc">&nbsp;                val workspaceId = budgets.firstOrNull()?.workspaceId</b>
+<b class="fc">&nbsp;                if (workspaceId == null) {</b>
+<b class="fc">&nbsp;                    flowOf(null)</b>
+&nbsp;                } else {
+<b class="fc">&nbsp;                    getBudgetProgress.progressOf(workspaceId, budgets, timeZone)</b>
+<b class="fc">&nbsp;                        .map { progresses -&gt; progresses.safeToSpend() }</b>
+<b class="fc">&nbsp;                }</b>
+&nbsp;            }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-07-28 21:38</div>
+</div>
+</body>
+</html>

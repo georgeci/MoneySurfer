@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SurferBottomSheetPreviewKt</title>
+  <title>MoneySurfer Coverage Report > SurferContentContainerKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.uikit.preview</a>
+    <a href="../index.html">com.georgeci.moneysurfer.uikit.modifier</a>
 </div>
 
-<h1>Coverage Summary for Class: SurferBottomSheetPreviewKt (com.georgeci.moneysurfer.uikit.preview)</h1>
+<h1>Coverage Summary for Class: SurferContentContainerKt (com.georgeci.moneysurfer.uikit.modifier)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,45 +49,38 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SurferBottomSheetPreviewKt</td>
+  <td class="name">SurferContentContainerKt</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    66.7%
   </span>
   <span class="absValue">
-    (0/2)
+    (2/3)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/6)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/12)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/28)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/328)
+    (35/35)
   </span>
 </td>
 </tr>
@@ -99,72 +92,53 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.preview
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.modifier
 &nbsp;
-&nbsp;import androidx.compose.foundation.background
-&nbsp;import androidx.compose.foundation.layout.Arrangement
-&nbsp;import androidx.compose.foundation.layout.Box
-&nbsp;import androidx.compose.foundation.layout.Column
 &nbsp;import androidx.compose.foundation.layout.fillMaxWidth
-&nbsp;import androidx.compose.foundation.layout.height
-&nbsp;import androidx.compose.foundation.layout.padding
-&nbsp;import androidx.compose.foundation.layout.size
-&nbsp;import androidx.compose.foundation.shape.CircleShape
-&nbsp;import androidx.compose.foundation.shape.RoundedCornerShape
-&nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.foundation.layout.widthIn
+&nbsp;import androidx.compose.foundation.layout.wrapContentWidth
 &nbsp;import androidx.compose.ui.Alignment
 &nbsp;import androidx.compose.ui.Modifier
-&nbsp;import androidx.compose.ui.draw.clip
+&nbsp;import androidx.compose.ui.unit.Dp
 &nbsp;import androidx.compose.ui.unit.dp
-&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
-&nbsp;import com.georgeci.moneysurfer.uikit.theme.SurferContainerStyle
 &nbsp;
 &nbsp;/**
-&nbsp; * Preview harness for composables that ship inside a `ModalBottomSheet` at runtime.
+&nbsp; * Widest a screen&#39;s content is allowed to get before it stops growing and starts centring.
 &nbsp; *
-&nbsp; * Mimics the live sheet&#39;s chrome (top-rounded surfaceContainerLow shell + 32×4 drag handle)
-&nbsp; * inside a normal `@Preview` canvas. Use this instead of wrapping previews in
-&nbsp; * `ModalBottomSheet` directly — that component is `Popup`-based and renders blank in some
-&nbsp; * preview tooling versions, which is exactly what we want to avoid.
-&nbsp; *
-&nbsp; * Doesn&#39;t change runtime behavior: the real screen still uses `ModalBottomSheet` via
-&nbsp; * `BottomSheetSceneStrategy`. This is preview-only.
+&nbsp; * 840 dp is the Material 3 Expanded lower bound: below it the cap never engages, so phones and
+&nbsp; * small tablets are untouched, and above it a settings row or a transaction line keeps a readable
+&nbsp; * measure instead of stretching across the window. Screens that genuinely want more room (a wide
+&nbsp; * chart, a two-column form) pass their own value to [surferContentContainer].
 &nbsp; */
-&nbsp;@Composable
-&nbsp;fun SurferBottomSheetPreview(
-<b class="nc">&nbsp;    darkTheme: Boolean = false,</b>
-<b class="nc">&nbsp;    containerStyle: SurferContainerStyle = SurferContainerStyle.Card,</b>
-&nbsp;    content: @Composable () -&gt; Unit,
-<b class="nc">&nbsp;) {</b>
-<b class="nc">&nbsp;    AppTheme(darkTheme = darkTheme, containerStyle = containerStyle) {</b>
-<b class="nc">&nbsp;        Box(</b>
-<b class="nc">&nbsp;            modifier = Modifier</b>
-<b class="nc">&nbsp;                .fillMaxWidth()</b>
-<b class="nc">&nbsp;                .background(AppTheme.materialColors.scrim.copy(alpha = 0.32f))</b>
-<b class="nc">&nbsp;                .padding(top = 48.dp),</b>
-&nbsp;        ) {
-<b class="nc">&nbsp;            Column(</b>
-<b class="nc">&nbsp;                modifier = Modifier</b>
-<b class="nc">&nbsp;                    .fillMaxWidth()</b>
-<b class="nc">&nbsp;                    .clip(RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp))</b>
-<b class="nc">&nbsp;                    .background(AppTheme.materialColors.surfaceContainerLow),</b>
-<b class="nc">&nbsp;                horizontalAlignment = Alignment.CenterHorizontally,</b>
-<b class="nc">&nbsp;                verticalArrangement = Arrangement.Top,</b>
-&nbsp;            ) {
-<b class="nc">&nbsp;                Box(</b>
-<b class="nc">&nbsp;                    modifier = Modifier</b>
-<b class="nc">&nbsp;                        .padding(top = 12.dp, bottom = 4.dp)</b>
-<b class="nc">&nbsp;                        .size(width = 32.dp, height = 4.dp)</b>
-<b class="nc">&nbsp;                        .clip(CircleShape)</b>
-<b class="nc">&nbsp;                        .background(AppTheme.materialColors.onSurfaceVariant.copy(alpha = 0.4f)),</b>
-&nbsp;                )
-<b class="nc">&nbsp;                Box(modifier = Modifier.fillMaxWidth()) {</b>
-<b class="nc">&nbsp;                    content()</b>
-<b class="nc">&nbsp;                }</b>
-<b class="nc">&nbsp;            }</b>
-<b class="nc">&nbsp;        }</b>
-&nbsp;    }
-<b class="nc">&nbsp;}</b>
+<b class="fc">&nbsp;val SurferContentMaxWidth: Dp = 840.dp</b>
+&nbsp;
+&nbsp;/**
+&nbsp; * Caps content at [maxWidth] and centres it horizontally in whatever space the parent offers.
+&nbsp; *
+&nbsp; * Apply at a screen&#39;s content root, *before* the padding and scrolling modifiers, so the cap
+&nbsp; * bounds the content rather than the window:
+&nbsp; *
+&nbsp; * ```
+&nbsp; * Column(
+&nbsp; *     modifier = Modifier
+&nbsp; *         .fillMaxSize()
+&nbsp; *         .surferContentContainer()
+&nbsp; *         .padding(padding)
+&nbsp; *         .verticalScroll(rememberScrollState()),
+&nbsp; * )
+&nbsp; * ```
+&nbsp; *
+&nbsp; * The chain is a no-op whenever the parent is narrower than [maxWidth]: [fillMaxWidth] pins the
+&nbsp; * outer width, [wrapContentWidth] relaxes the child&#39;s minimum so it can be narrower and centres
+&nbsp; * whatever comes back, [widthIn] applies the cap, and the trailing [fillMaxWidth] hands the child
+&nbsp; * the same *fixed* width it used to get — so content that relied on filling its parent keeps
+&nbsp; * filling it, just within the cap.
+&nbsp; */
+<b class="fc">&nbsp;fun Modifier.surferContentContainer(maxWidth: Dp = SurferContentMaxWidth): Modifier = this</b>
+<b class="fc">&nbsp;    .fillMaxWidth()</b>
+<b class="fc">&nbsp;    .wrapContentWidth(Alignment.CenterHorizontally)</b>
+<b class="fc">&nbsp;    .widthIn(max = maxWidth)</b>
+<b class="fc">&nbsp;    .fillMaxWidth()</b>
 </code>
 </pre>
 </div>
@@ -188,7 +162,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 21:18</div>
+    <div style="float:right;">generated on 2026-07-28 21:38</div>
 </div>
 </body>
 </html>

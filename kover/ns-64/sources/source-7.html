@@ -1,0 +1,191 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>MoneySurfer Coverage Report > BottomSheetScene</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.georgeci.moneysurfer.navigation</a>
+</div>
+
+<h1>Coverage Summary for Class: BottomSheetScene (com.georgeci.moneysurfer.navigation)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">BottomSheetScene</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/86)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.navigation
+&nbsp;
+&nbsp;import androidx.compose.material3.ExperimentalMaterial3Api
+&nbsp;import androidx.compose.material3.ModalBottomSheet
+&nbsp;import androidx.compose.material3.ModalBottomSheetProperties
+&nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.navigation3.runtime.NavEntry
+&nbsp;import androidx.navigation3.scene.OverlayScene
+&nbsp;import androidx.navigation3.scene.Scene
+&nbsp;import androidx.navigation3.scene.SceneStrategy
+&nbsp;import androidx.navigation3.scene.SceneStrategyScope
+&nbsp;
+&nbsp;/** An [OverlayScene] that renders an [entry] within a [ModalBottomSheet]. */
+<b class="nc">&nbsp;@OptIn(ExperimentalMaterial3Api::class)</b>
+&nbsp;internal class BottomSheetScene&lt;T : Any&gt;(
+<b class="nc">&nbsp;    override val key: Any,</b>
+<b class="nc">&nbsp;    private val entry: NavEntry&lt;T&gt;,</b>
+<b class="nc">&nbsp;    override val previousEntries: List&lt;NavEntry&lt;T&gt;&gt;,</b>
+<b class="nc">&nbsp;    override val overlaidEntries: List&lt;NavEntry&lt;T&gt;&gt;,</b>
+<b class="nc">&nbsp;    private val modalBottomSheetProperties: ModalBottomSheetProperties,</b>
+<b class="nc">&nbsp;    private val onBack: () -&gt; Unit,</b>
+&nbsp;) : OverlayScene&lt;T&gt; {
+&nbsp;
+<b class="nc">&nbsp;    override val entries: List&lt;NavEntry&lt;T&gt;&gt; = listOf(entry)</b>
+&nbsp;
+<b class="nc">&nbsp;    override val content: @Composable () -&gt; Unit = {</b>
+<b class="nc">&nbsp;        ModalBottomSheet(</b>
+<b class="nc">&nbsp;            onDismissRequest = onBack,</b>
+<b class="nc">&nbsp;            properties = modalBottomSheetProperties,</b>
+<b class="nc">&nbsp;        ) {</b>
+<b class="nc">&nbsp;            entry.Content()</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * A [SceneStrategy] that displays entries marked with [bottomSheet] metadata inside a
+&nbsp; * [ModalBottomSheet], keeping the previous entry composed underneath.
+&nbsp; *
+&nbsp; * Based on the Navigation 3 bottom sheet recipe:
+&nbsp; * https://developer.android.com/guide/navigation/navigation-3/recipes/bottomsheet
+&nbsp; *
+&nbsp; * Chain before any non-overlay strategies.
+&nbsp; */
+&nbsp;@OptIn(ExperimentalMaterial3Api::class)
+&nbsp;class BottomSheetSceneStrategy&lt;T : Any&gt; : SceneStrategy&lt;T&gt; {
+&nbsp;
+&nbsp;    override fun SceneStrategyScope&lt;T&gt;.calculateScene(entries: List&lt;NavEntry&lt;T&gt;&gt;): Scene&lt;T&gt;? {
+&nbsp;        val lastEntry = entries.lastOrNull() ?: return null
+&nbsp;        val properties = lastEntry.metadata[BOTTOM_SHEET_KEY] as? ModalBottomSheetProperties
+&nbsp;            ?: return null
+&nbsp;        return BottomSheetScene(
+&nbsp;            key = lastEntry.contentKey,
+&nbsp;            entry = lastEntry,
+&nbsp;            previousEntries = entries.dropLast(1),
+&nbsp;            overlaidEntries = entries.dropLast(1),
+&nbsp;            modalBottomSheetProperties = properties,
+&nbsp;            onBack = onBack,
+&nbsp;        )
+&nbsp;    }
+&nbsp;
+&nbsp;    companion object {
+&nbsp;        /** Mark a [NavEntry] so this strategy renders it inside a [ModalBottomSheet]. */
+&nbsp;        fun bottomSheet(
+&nbsp;            modalBottomSheetProperties: ModalBottomSheetProperties = ModalBottomSheetProperties(),
+&nbsp;        ): Map&lt;String, Any&gt; = mapOf(BOTTOM_SHEET_KEY to modalBottomSheetProperties)
+&nbsp;
+&nbsp;        internal const val BOTTOM_SHEET_KEY = &quot;bottomSheet&quot;
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-07-28 21:38</div>
+</div>
+</body>
+</html>

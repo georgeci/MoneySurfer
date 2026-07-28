@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SurferWindowSizeKt</title>
+  <title>MoneySurfer Coverage Report > SurferAddAccountCta</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.uikit.window</a>
+    <a href="../index.html">com.georgeci.moneysurfer.uikit.widgets</a>
 </div>
 
-<h1>Coverage Summary for Class: SurferWindowSizeKt (com.georgeci.moneysurfer.uikit.window)</h1>
+<h1>Coverage Summary for Class: SurferAddAccountCta (com.georgeci.moneysurfer.uikit.widgets)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SurferWindowSizeKt</td>
+  <td class="name">SurferAddAccountCta</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -80,7 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (54/54)
+    (24/24)
   </span>
 </td>
 </tr>
@@ -92,76 +92,174 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.window
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.widgets
 &nbsp;
+&nbsp;import androidx.compose.foundation.layout.Arrangement
+&nbsp;import androidx.compose.foundation.layout.Box
+&nbsp;import androidx.compose.foundation.layout.Column
+&nbsp;import androidx.compose.foundation.layout.Row
+&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
+&nbsp;import androidx.compose.foundation.layout.padding
+&nbsp;import androidx.compose.foundation.layout.size
+&nbsp;import androidx.compose.foundation.layout.width
+&nbsp;import androidx.compose.foundation.shape.CircleShape
+&nbsp;import androidx.compose.material3.Icon
+&nbsp;import androidx.compose.material3.Text
 &nbsp;import androidx.compose.runtime.Composable
-&nbsp;import androidx.compose.ui.platform.LocalDensity
-&nbsp;import androidx.compose.ui.platform.LocalWindowInfo
-&nbsp;import androidx.compose.ui.unit.Dp
+&nbsp;import androidx.compose.ui.Alignment
+&nbsp;import androidx.compose.ui.Modifier
+&nbsp;import androidx.compose.ui.graphics.vector.ImageVector
+&nbsp;import androidx.compose.ui.platform.testTag
+&nbsp;import androidx.compose.ui.tooling.preview.Preview
 &nbsp;import androidx.compose.ui.unit.dp
+&nbsp;import com.georgeci.moneysurfer.uikit.atom.SurferActionCard
+&nbsp;import com.georgeci.moneysurfer.uikit.components.account.SurferAccountManageCard
+&nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferDashedBorder
+&nbsp;import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
+&nbsp;import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
+&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
+&nbsp;
+&nbsp;data class SurferAccountItem(
+&nbsp;    val id: String,
+&nbsp;    val name: String,
+&nbsp;    val subtitle: String,
+&nbsp;    val balance: String,
+&nbsp;    val icon: ImageVector = SurferIcons.Wallet,
+&nbsp;)
 &nbsp;
 &nbsp;/**
-&nbsp; * The Material 3 window *width* breakpoints, named once for the whole app.
-&nbsp; *
-&nbsp; * Before this existed every caller reached for `androidx.window.core.layout` constants directly,
-&nbsp; * so &quot;wide&quot; meant whatever each screen happened to compare against. Features depend on this enum
-&nbsp; * instead; `androidx.window` stays an implementation detail of the windowing libraries.
-&nbsp; *
-&nbsp; * Entries are declared narrow-to-wide, so the natural enum ordering is also the width ordering:
-&nbsp; * `currentSurferWindowSize() &gt;= SurferWindowSize.Medium` reads as &quot;at least Medium&quot;.
-&nbsp; *
-&nbsp; * Height breakpoints are deliberately absent — nothing in the app branches on window height yet,
-&nbsp; * and an unused axis is one more thing to keep honest.
+&nbsp; * The empty-state &quot;add your first account&quot; affordance: its copy, its click, and the selector a
+&nbsp; * UI test taps it by. Four arguments describing one control, so they travel as one — the host
+&nbsp; * screen still owns [testTag], because the CTA is a step in its flow rather than the widget&#39;s.
 &nbsp; */
-&nbsp;enum class SurferWindowSize {
-&nbsp;    /** `&lt; 600 dp` — phones in portrait, and the narrow pane of a split-screen window. */
-&nbsp;    Compact,
+&nbsp;data class SurferAddAccountCta(
+<b class="fc">&nbsp;    val label: String,</b>
+<b class="fc">&nbsp;    val onClick: () -&gt; Unit,</b>
+<b class="fc">&nbsp;    val trailingLabel: String? = null,</b>
+<b class="fc">&nbsp;    val testTag: String? = null,</b>
+&nbsp;)
 &nbsp;
-&nbsp;    /** `600–839 dp` — large phones in landscape, small tablets, resized desktop windows. */
-&nbsp;    Medium,
+&nbsp;/** Accounts widget for the dashboard column. */
+&nbsp;@Composable
+&nbsp;fun SurferAccountsWidget(
+&nbsp;    items: List&lt;SurferAccountItem&gt;,
+&nbsp;    addCta: SurferAddAccountCta,
+&nbsp;    modifier: Modifier = Modifier,
+&nbsp;    size: SurferWidgetSize = LocalSurferWidgetSize.current,
+&nbsp;    onItemClick: ((SurferAccountItem) -&gt; Unit)? = null,
+&nbsp;) {
+&nbsp;    val hero = size == SurferWidgetSize.Expanded
+&nbsp;    val visibleItems = if (hero) items else items.take(2)
 &nbsp;
-&nbsp;    /** `840–1199 dp` — tablets in landscape, most desktop windows. */
-&nbsp;    Expanded,
-&nbsp;
-&nbsp;    /** `&gt;= 1200 dp` — maximised desktop windows and large external displays. */
-&nbsp;    Large,
-&nbsp;
-&nbsp;    ;
-&nbsp;
-&nbsp;    companion object {
-&nbsp;        /** Lower bound of [Medium]. */
-&nbsp;        val MediumLowerBound: Dp = 600.dp
-&nbsp;
-&nbsp;        /** Lower bound of [Expanded]. */
-&nbsp;        val ExpandedLowerBound: Dp = 840.dp
-&nbsp;
-&nbsp;        /** Lower bound of [Large]. */
-&nbsp;        val LargeLowerBound: Dp = 1200.dp
-&nbsp;
-&nbsp;        /** Buckets a window [width] into a breakpoint. Widest bound first — the order matters. */
-&nbsp;        fun ofWidth(width: Dp): SurferWindowSize = when {
-&nbsp;            width &gt;= LargeLowerBound -&gt; Large
-&nbsp;            width &gt;= ExpandedLowerBound -&gt; Expanded
-&nbsp;            width &gt;= MediumLowerBound -&gt; Medium
-&nbsp;            else -&gt; Compact
+&nbsp;    Column(
+&nbsp;        modifier = modifier,
+&nbsp;        verticalArrangement = Arrangement.spacedBy(8.dp),
+&nbsp;    ) {
+&nbsp;        visibleItems.forEach { item -&gt;
+&nbsp;            SurferAccountManageCard(
+&nbsp;                name = item.name,
+&nbsp;                subtitle = item.subtitle,
+&nbsp;                icon = item.icon,
+&nbsp;                formattedBalance = item.balance,
+&nbsp;                onClick = onItemClick?.let { handler -&gt; { handler(item) } },
+&nbsp;            )
+&nbsp;        }
+&nbsp;        // The add-account CTA is the empty-state affordance only; once accounts exist,
+&nbsp;        // new ones are created from the &quot;Manage&quot; flow.
+&nbsp;        if (items.isEmpty()) {
+&nbsp;            AddAccountRow(
+&nbsp;                label = addCta.label,
+&nbsp;                trailingLabel = addCta.trailingLabel,
+&nbsp;                onClick = addCta.onClick,
+&nbsp;                modifier = addCta.testTag?.let { Modifier.testTag(it) } ?: Modifier,
+&nbsp;            )
 &nbsp;        }
 &nbsp;    }
 &nbsp;}
 &nbsp;
-&nbsp;/**
-&nbsp; * The [SurferWindowSize] of the window this composition is hosted in, recomposing when the window
-&nbsp; * is resized.
-&nbsp; *
-&nbsp; * Measures `LocalWindowInfo.containerSize` in the current density — the same input
-&nbsp; * `currentWindowAdaptiveInfo()` derives its `WindowSizeClass` from, minus the dependency on the
-&nbsp; * `androidx.window` breakpoint sets (whose default set stops at Expanded and would collapse
-&nbsp; * [SurferWindowSize.Large] into it).
-&nbsp; */
 &nbsp;@Composable
-<b class="fc">&nbsp;fun currentSurferWindowSize(): SurferWindowSize {</b>
-<b class="fc">&nbsp;    val containerWidth = LocalWindowInfo.current.containerSize.width</b>
-<b class="fc">&nbsp;    val widthDp = with(LocalDensity.current) { containerWidth.toDp() }</b>
-<b class="fc">&nbsp;    return SurferWindowSize.ofWidth(widthDp)</b>
+&nbsp;private fun AddAccountRow(
+&nbsp;    label: String,
+&nbsp;    trailingLabel: String?,
+&nbsp;    onClick: () -&gt; Unit,
+&nbsp;    modifier: Modifier = Modifier,
+&nbsp;) {
+&nbsp;    SurferActionCard(modifier = modifier.fillMaxWidth(), onClick = onClick) {
+&nbsp;        Row(
+&nbsp;            verticalAlignment = Alignment.CenterVertically,
+&nbsp;            horizontalArrangement = Arrangement.spacedBy(12.dp),
+&nbsp;        ) {
+&nbsp;            Box(
+&nbsp;                modifier = Modifier
+&nbsp;                    .size(36.dp)
+&nbsp;                    .surferDashedBorder(color = AppTheme.materialColors.outline, shape = CircleShape),
+&nbsp;                contentAlignment = Alignment.Center,
+&nbsp;            ) {
+&nbsp;                Icon(
+&nbsp;                    imageVector = SurferIcons.Add,
+&nbsp;                    contentDescription = SurferSemantics.Decorative,
+&nbsp;                    tint = AppTheme.materialColors.onSurfaceVariant,
+&nbsp;                    modifier = Modifier.size(18.dp),
+&nbsp;                )
+&nbsp;            }
+&nbsp;            Text(
+&nbsp;                text = label,
+&nbsp;                style = AppTheme.typography.titleSmall,
+&nbsp;                color = AppTheme.materialColors.onSurface,
+&nbsp;                modifier = Modifier.weight(1f),
+&nbsp;            )
+&nbsp;            if (trailingLabel != null) {
+&nbsp;                Text(
+&nbsp;                    text = trailingLabel,
+&nbsp;                    style = AppTheme.typography.labelMedium,
+&nbsp;                    color = AppTheme.materialColors.primary,
+&nbsp;                )
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Preview
+&nbsp;@Composable
+&nbsp;private fun SurferAccountsWidgetHeroPreview() {
+&nbsp;    SurferComponentPreview {
+&nbsp;        Box(modifier = Modifier.padding(16.dp)) {
+&nbsp;            SurferAccountsWidget(
+&nbsp;                items = listOf(
+&nbsp;                    SurferAccountItem(&quot;1&quot;, &quot;Everyday&quot;, &quot;Current · •• 4021&quot;, &quot;€2,480.32&quot;, SurferIcons.CreditCard),
+&nbsp;                    SurferAccountItem(&quot;2&quot;, &quot;Emergency Fund&quot;, &quot;Savings · •• 7712&quot;, &quot;€8,915.00&quot;, SurferIcons.Savings),
+&nbsp;                    SurferAccountItem(&quot;3&quot;, &quot;Cash wallet&quot;, &quot;Cash&quot;, &quot;€180.00&quot;, SurferIcons.Cash),
+&nbsp;                ),
+&nbsp;                addCta = SurferAddAccountCta(
+&nbsp;                    label = &quot;Add account&quot;,
+&nbsp;                    onClick = {},
+&nbsp;                    trailingLabel = &quot;New&quot;,
+&nbsp;                ),
+&nbsp;                modifier = Modifier
+&nbsp;                    .fillMaxWidth()
+&nbsp;                    .width(360.dp),
+&nbsp;            )
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Preview
+&nbsp;@Composable
+&nbsp;private fun SurferAccountsWidgetEmptyPreview() {
+&nbsp;    SurferComponentPreview {
+&nbsp;        Box(modifier = Modifier.padding(16.dp)) {
+&nbsp;            SurferAccountsWidget(
+&nbsp;                items = emptyList(),
+&nbsp;                addCta = SurferAddAccountCta(
+&nbsp;                    label = &quot;Add account&quot;,
+&nbsp;                    onClick = {},
+&nbsp;                    trailingLabel = &quot;New&quot;,
+&nbsp;                ),
+&nbsp;                modifier = Modifier.fillMaxWidth(),
+&nbsp;            )
+&nbsp;        }
+&nbsp;    }
 &nbsp;}
 </code>
 </pre>
@@ -186,7 +284,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 21:18</div>
+    <div style="float:right;">generated on 2026-07-28 21:38</div>
 </div>
 </body>
 </html>

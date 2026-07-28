@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > AccountSlot</title>
+  <title>MoneySurfer Coverage Report > ComposableSingletons</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,18 +19,15 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.feature.transaction.creation</a>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.transaction</a>
 </div>
 
-<h1>Coverage Summary for Class: AccountSlot (com.georgeci.moneysurfer.feature.transaction.creation)</h1>
+<h1>Coverage Summary for Class: ComposableSingletons (com.georgeci.moneysurfer.feature.transaction)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
-<th class="coverageStat 
-">
-  Class, %
-</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -48,125 +45,68 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   Instruction, %
 </th>
 </tr>
-<tr>
-  <td class="name">AccountSlot</td>
+  <tr>
+    <td class="name">ComposableSingletons$TransactionNavGraphKt</td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (1/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
+    (0/1)
   </span>
 </td>
     <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (1/1)
+    (0/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    0%
   </span>
   <span class="absValue">
-    (24/24)
+    (0/14)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
   </span>
 </td>
 </tr>
-
 </table>
 
 <br/>
 <br/>
 
-
-<pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.transaction.creation
-&nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.model.Account
-&nbsp;import com.georgeci.moneysurfer.domain.model.Category
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.AccountId
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryId
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryType
-&nbsp;
-&nbsp;sealed interface TransactionCreationEvent {
-&nbsp;    data class OnAmountChanged(val amount: String) : TransactionCreationEvent
-&nbsp;    data class OnToAmountChanged(val amount: String) : TransactionCreationEvent
-&nbsp;    data class OnNoteChanged(val note: String) : TransactionCreationEvent
-&nbsp;    data class OnAccountSelected(val account: Account) : TransactionCreationEvent
-&nbsp;    data class OnCategorySelected(val category: Category) : TransactionCreationEvent
-&nbsp;    data class OnCategoryPicked(val id: CategoryId) : TransactionCreationEvent
-&nbsp;    data class OnAccountPicked(val id: AccountId) : TransactionCreationEvent
-&nbsp;    data class OnTypeChanged(val type: TransactionTypeUi) : TransactionCreationEvent
-&nbsp;    data class OnDateChanged(val timestamp: Long) : TransactionCreationEvent
-&nbsp;    data object OnTodayClick : TransactionCreationEvent
-&nbsp;    data object OnOpenCategoryChooser : TransactionCreationEvent
-&nbsp;    data object OnOpenCategoryCreation : TransactionCreationEvent
-&nbsp;    data object OnOpenAccountChooser : TransactionCreationEvent
-&nbsp;    data object OnOpenFromAccountChooser : TransactionCreationEvent
-&nbsp;    data object OnOpenToAccountChooser : TransactionCreationEvent
-&nbsp;    data object OnSwapAccountsClick : TransactionCreationEvent
-&nbsp;
-&nbsp;    /** Turn the split editor on (seeded with two lines) or off, discarding its lines. */
-&nbsp;    data object OnSplitToggled : TransactionCreationEvent
-&nbsp;    data object OnSplitLineAdded : TransactionCreationEvent
-&nbsp;    data class OnSplitLineRemoved(val key: Int) : TransactionCreationEvent
-&nbsp;    data class OnSplitLineAmountChanged(val key: Int, val amount: String) : TransactionCreationEvent
-&nbsp;
-&nbsp;    /** Open the category chooser for one split line rather than for the transaction as a whole. */
-&nbsp;    data class OnOpenSplitLineCategoryChooser(val key: Int) : TransactionCreationEvent
-&nbsp;    data object OnSaveClick : TransactionCreationEvent
-&nbsp;    data object OnDeleteClick : TransactionCreationEvent
-&nbsp;    data object OnDeleteConfirmed : TransactionCreationEvent
-&nbsp;    data object OnDeleteDismissed : TransactionCreationEvent
-&nbsp;    data object OnBackClick : TransactionCreationEvent
-&nbsp;}
-&nbsp;
-&nbsp;sealed interface TransactionCreationEffect {
-&nbsp;    data object NavigateBack : TransactionCreationEffect
-&nbsp;
-&nbsp;    /**
-&nbsp;     * The edited transaction is gone, so the screen that opened this one — the details of that very
-&nbsp;     * row — must not be returned to. Distinct from [NavigateBack] because only the caller knows how
-&nbsp;     * far back that is.
-&nbsp;     */
-&nbsp;    data object NavigateBackAfterDelete : TransactionCreationEffect
-&nbsp;    data class NavigateToCategoryChooser(
-&nbsp;        val selectedCategoryId: CategoryId?,
-&nbsp;        val filterType: CategoryType,
-&nbsp;    ) : TransactionCreationEffect
-&nbsp;    data object NavigateToCategoryCreation : TransactionCreationEffect
-&nbsp;    data class NavigateToAccountChooser(
-&nbsp;        val selectedAccountId: AccountId?,
-&nbsp;        val excludeAccountId: AccountId? = null,
-&nbsp;        val showTransferShortcut: Boolean = false,
-&nbsp;    ) : TransactionCreationEffect
-&nbsp;}
-&nbsp;
-<b class="fc">&nbsp;internal enum class AccountSlot { Single, From, To }</b>
-&nbsp;
-&nbsp;/**
-&nbsp; * Where a category coming back from the chooser belongs: the transaction itself, or one line of the
-&nbsp; * split editor. The chooser returns only an id, so the screen has to remember what it was opened
-&nbsp; * for — the same shape [AccountSlot] serves for the account chooser&#39;s three slots.
-&nbsp; */
-&nbsp;internal sealed interface CategorySlot {
-&nbsp;    data object Single : CategorySlot
-&nbsp;    data class SplitLine(val key: Int) : CategorySlot
-&nbsp;}
-</code>
-</pre>
+  <code class="sourceCode">Source code is not available<br /></code>
 </div>
 
 <script type="text/javascript">
@@ -188,7 +128,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 21:18</div>
+    <div style="float:right;">generated on 2026-07-28 21:38</div>
 </div>
 </body>
 </html>

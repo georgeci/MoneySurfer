@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SettingsTestTags</title>
+  <title>MoneySurfer Coverage Report > OnboardingViewModel</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,24 +19,141 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.feature.settings</a>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.login.onboarding</a>
 </div>
 
-<h1>Coverage Summary for Class: SettingsTestTags (com.georgeci.moneysurfer.feature.settings)</h1>
+<h1>Coverage Summary for Class: OnboardingViewModel (com.georgeci.moneysurfer.feature.login.onboarding)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
 <th class="coverageStat 
 ">
+  Method, %
+</th>
+<th class="coverageStat 
+">
   Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
 </th>
 </tr>
 <tr>
-  <td class="name">SettingsTestTags</td>
-    <td class="coverageStat"/>
+  <td class="name">OnboardingViewModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    92.9%
+  </span>
+  <span class="absValue">
+    (13/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (21/21)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (146/146)
+  </span>
+</td>
 </tr>
-
+  <tr>
+    <td class="name">OnboardingViewModel$Companion</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">OnboardingViewModel$finish$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (8/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (76/76)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (7/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    93.8%
+  </span>
+  <span class="absValue">
+    (15/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (29/29)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (222/222)
+  </span>
+</td>
+</tr>
 </table>
 
 <br/>
@@ -44,482 +161,145 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.settings
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.login.onboarding
 &nbsp;
-&nbsp;import androidx.compose.foundation.layout.Box
-&nbsp;import androidx.compose.foundation.layout.Column
-&nbsp;import androidx.compose.foundation.layout.Spacer
-&nbsp;import androidx.compose.foundation.layout.fillMaxSize
-&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
-&nbsp;import androidx.compose.foundation.layout.height
-&nbsp;import androidx.compose.foundation.layout.padding
-&nbsp;import androidx.compose.foundation.rememberScrollState
-&nbsp;import androidx.compose.foundation.verticalScroll
-&nbsp;import androidx.compose.material3.AlertDialog
-&nbsp;import androidx.compose.material3.Button
-&nbsp;import androidx.compose.material3.ButtonDefaults
-&nbsp;import androidx.compose.material3.Icon
-&nbsp;import androidx.compose.material3.Scaffold
-&nbsp;import androidx.compose.material3.Text
-&nbsp;import androidx.compose.material3.TextButton
-&nbsp;import androidx.compose.material3.TopAppBarDefaults
-&nbsp;import androidx.compose.runtime.Composable
-&nbsp;import androidx.compose.runtime.getValue
-&nbsp;import androidx.compose.ui.Modifier
-&nbsp;import androidx.compose.ui.platform.testTag
-&nbsp;import androidx.compose.ui.text.style.TextAlign
-&nbsp;import androidx.compose.ui.tooling.preview.Preview
-&nbsp;import androidx.compose.ui.unit.dp
-&nbsp;import androidx.lifecycle.compose.collectAsStateWithLifecycle
-&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
-&nbsp;import com.georgeci.moneysurfer.uikit.components.settings.SurferNameBlock
-&nbsp;import com.georgeci.moneysurfer.uikit.components.settings.SurferPendingBadge
-&nbsp;import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsChevron
-&nbsp;import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsGroup
-&nbsp;import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsRow
-&nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
-&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
-&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
-&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
-&nbsp;import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
-&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
-&nbsp;import com.georgeci.moneysurfer.utils.HandleSideEffect
-&nbsp;import moneysurfer.feature.settings.generated.resources.Res
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_about
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_about_supporting_format
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_appearance_hub_supporting
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_appearance_hub_supporting_dynamic
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_appearance_hub_title
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_backup
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_backup_supporting
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_budgets_supporting
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_budgets_title
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_categories_supporting
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_categories_title
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_change_workspace
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_change_workspace_supporting
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_csv_supporting
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_csv_title
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_debug_config
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_debug_config_supporting
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_delete_account
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_goals_supporting
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_goals_title
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_logout
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_logout_guest_warning_cancel
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_logout_guest_warning_confirm
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_logout_guest_warning_message
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_logout_guest_warning_title
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_members
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_members_count_format
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_pending_invites
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_pending_invites_supporting_empty
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_pending_invites_supporting_format
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_preferences_hub_supporting
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_preferences_hub_title
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_section_data
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_section_help
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_section_personalization
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_section_workspace
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_sync_hub_supporting
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_sync_hub_title
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_title
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_user_name
-&nbsp;import moneysurfer.feature.settings.generated.resources.settings_version_format
-&nbsp;import org.jetbrains.compose.resources.pluralStringResource
-&nbsp;import org.jetbrains.compose.resources.stringResource
-&nbsp;import org.koin.compose.viewmodel.koinViewModel
+&nbsp;import co.touchlab.kermit.Logger
+&nbsp;import com.georgeci.moneysurfer.domain.config.HostCapabilities
+&nbsp;import com.georgeci.moneysurfer.domain.firstrun.FirstRunSeeder
+&nbsp;import com.georgeci.moneysurfer.domain.preferences.UiPreferences
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.AccountType
+&nbsp;import com.georgeci.moneysurfer.utils.MviViewModel
+&nbsp;import org.koin.core.annotation.KoinViewModel
 &nbsp;
 &nbsp;/**
-&nbsp; * Stable selectors for the Settings screen — see docs/testing/testing-strategy.md.
+&nbsp; * First-launch welcome flow, modelled on the `Onboarding` design (screens 01 &quot;Ценность&quot; and an
+&nbsp; * adapted 03 &quot;С чего начнём?&quot;).
 &nbsp; *
-&nbsp; * [SyncRow], [LogoutRow] and [DeleteAccountRow] are never composed in the offline build;
-&nbsp; * their absence is what the offline golden Maestro flow asserts via `notVisible`.
-&nbsp; * Everything else — including [GoalsRow], [PreferencesRow] and [BackupRow] — is composed in both
-&nbsp; * variants, and the same flow asserts those positively.
+&nbsp; * The offline build gets both steps: after the value pitch the user picks what their first
+&nbsp; * account looks like, and that choice pre-fills the account creation screen — whose workspace
+&nbsp; * this view model seeds on the way out via [FirstRunSeeder]. The online build has nothing to pick
+&nbsp; * yet (accounts live inside a workspace that only exists after sign-in), so it stops at the value
+&nbsp; * step and continues into sign-in.
 &nbsp; *
-&nbsp; * [ProfileName] and [MembersRow] are state-gated rather than build-gated: the first needs a
-&nbsp; * profile to show, the second a workspace with members, so assert them only where the flow
-&nbsp; * has put the app in that state.
-&nbsp; *
-&nbsp; * [DebugConfigRow] is the one tag that varies by *build type* rather than by host: it appears
-&nbsp; * whenever a real debug-overrides layer is bound, and never in a release build. No Maestro flow
-&nbsp; * asserts it either way, precisely so the golden path stays independent of build type.
+&nbsp; * `onboardingCompleted` is persisted before navigating, so a process death right after the tap
+&nbsp; * doesn&#39;t replay the onboarding. Skipping completes it too, keeping the default selection.
 &nbsp; */
-&nbsp;object SettingsTestTags {
-&nbsp;    const val Root = &quot;settings:root&quot;
-&nbsp;    const val ProfileName = &quot;settings:profileName&quot;
-&nbsp;    const val WorkspaceRow = &quot;settings:workspaceRow&quot;
-&nbsp;    const val MembersRow = &quot;settings:membersRow&quot;
-&nbsp;    const val CategoriesRow = &quot;settings:categoriesRow&quot;
-&nbsp;    const val BudgetsRow = &quot;settings:budgetsRow&quot;
-&nbsp;    const val GoalsRow = &quot;settings:goalsRow&quot;
-&nbsp;    const val AppearanceRow = &quot;settings:appearanceRow&quot;
-&nbsp;    const val PreferencesRow = &quot;settings:preferencesRow&quot;
-&nbsp;    const val AboutRow = &quot;settings:aboutRow&quot;
-&nbsp;    const val SyncRow = &quot;settings:syncRow&quot;
-&nbsp;    const val BackupRow = &quot;settings:backupRow&quot;
-&nbsp;    const val CsvRow = &quot;settings:csvRow&quot;
-&nbsp;    const val LogoutRow = &quot;settings:logoutRow&quot;
-&nbsp;    const val DeleteAccountRow = &quot;settings:deleteAccountRow&quot;
-&nbsp;    const val DebugConfigRow = &quot;settings:debugConfigRow&quot;
-&nbsp;}
-&nbsp;
-&nbsp;// The effect dispatch below is one straight-line branch per destination — flat, exhaustive, and
-&nbsp;// checked by the compiler. Its &quot;complexity&quot; is the number of settings rows, not tangled logic.
-&nbsp;@Suppress(&quot;CyclomaticComplexMethod&quot;)
-&nbsp;@Composable
-&nbsp;fun SettingsScreen(
-&nbsp;    onNavigateBack: () -&gt; Unit,
-&nbsp;    onNavigateToWorkspaceSelector: () -&gt; Unit,
-&nbsp;    onNavigateToIncomingInvites: () -&gt; Unit,
-&nbsp;    onNavigateToMembers: (com.georgeci.moneysurfer.domain.primitives.WorkspaceId) -&gt; Unit,
-&nbsp;    onNavigateToCategories: () -&gt; Unit,
-&nbsp;    onNavigateToBudgets: () -&gt; Unit,
-&nbsp;    onNavigateToGoals: () -&gt; Unit,
-&nbsp;    onNavigateToAppearance: () -&gt; Unit,
-&nbsp;    onNavigateToPreferences: () -&gt; Unit,
-&nbsp;    onNavigateToSync: () -&gt; Unit,
-&nbsp;    onNavigateToBackup: () -&gt; Unit,
-&nbsp;    onNavigateToCsvBackup: () -&gt; Unit,
-&nbsp;    onNavigateToAbout: () -&gt; Unit,
-&nbsp;    onNavigateToDeleteAccount: () -&gt; Unit,
-&nbsp;    onNavigateToDebugConfig: () -&gt; Unit,
-&nbsp;    viewModel: SettingsViewModel = koinViewModel(),
+<b class="fc">&nbsp;@KoinViewModel</b>
+&nbsp;class OnboardingViewModel(
+<b class="fc">&nbsp;    private val uiPreferences: UiPreferences,</b>
+<b class="fc">&nbsp;    private val firstRunSeeder: FirstRunSeeder,</b>
+&nbsp;    hostCapabilities: HostCapabilities,
+&nbsp;) : MviViewModel&lt;OnboardingState, OnboardingEvent, OnboardingEffect&gt;(
+<b class="fc">&nbsp;    initialState = OnboardingState(isOffline = hostCapabilities.isOffline),</b>
 &nbsp;) {
-&nbsp;    val state by viewModel.collectAsStateWithLifecycle()
 &nbsp;
-&nbsp;    viewModel.HandleSideEffect { effect -&gt;
-&nbsp;        when (effect) {
-&nbsp;            SettingsEffect.NavigateBack -&gt; onNavigateBack()
-&nbsp;            SettingsEffect.NavigateToWorkspaceSelector -&gt; onNavigateToWorkspaceSelector()
-&nbsp;            SettingsEffect.NavigateToIncomingInvites -&gt; onNavigateToIncomingInvites()
-&nbsp;            is SettingsEffect.NavigateToMembers -&gt; onNavigateToMembers(effect.workspaceId)
-&nbsp;            SettingsEffect.NavigateToCategories -&gt; onNavigateToCategories()
-&nbsp;            SettingsEffect.NavigateToBudgets -&gt; onNavigateToBudgets()
-&nbsp;            SettingsEffect.NavigateToGoals -&gt; onNavigateToGoals()
-&nbsp;            SettingsEffect.NavigateToAppearance -&gt; onNavigateToAppearance()
-&nbsp;            SettingsEffect.NavigateToPreferences -&gt; onNavigateToPreferences()
-&nbsp;            SettingsEffect.NavigateToSync -&gt; onNavigateToSync()
-&nbsp;            SettingsEffect.NavigateToBackup -&gt; onNavigateToBackup()
-&nbsp;            SettingsEffect.NavigateToCsvBackup -&gt; onNavigateToCsvBackup()
-&nbsp;            SettingsEffect.NavigateToAbout -&gt; onNavigateToAbout()
-&nbsp;            SettingsEffect.NavigateToDeleteAccount -&gt; onNavigateToDeleteAccount()
-&nbsp;            SettingsEffect.NavigateToDebugConfig -&gt; onNavigateToDebugConfig()
+<b class="fc">&nbsp;    private val log = Logger.withTag(TAG)</b>
+&nbsp;
+&nbsp;    override fun onEvent(event: OnboardingEvent) {
+<b class="fc">&nbsp;        when (event) {</b>
+<b class="fc">&nbsp;            OnboardingEvent.OnContinueClick -&gt; advance()</b>
+<b class="fc">&nbsp;            OnboardingEvent.OnSkipClick -&gt; finish()</b>
+<b class="fc">&nbsp;            OnboardingEvent.OnBackClick -&gt; updateState { copy(step = OnboardingStep.Value) }</b>
+<b class="fc">&nbsp;            is OnboardingEvent.OnAccountKindSelected -&gt;</b>
+<b class="fc">&nbsp;                updateState { copy(selectedAccountKind = event.kind) }</b>
 &nbsp;        }
 &nbsp;    }
 &nbsp;
-&nbsp;    SettingsContent(
-&nbsp;        state = state,
-&nbsp;        onEvent = viewModel::onEvent,
-&nbsp;    )
-&nbsp;}
+&nbsp;    /** Value step moves on to the offline picker when there is one; otherwise it finishes. */
+&nbsp;    private fun advance() {
+<b class="fc">&nbsp;        val state = currentState</b>
+<b class="fc">&nbsp;        if (state.inFlight) return</b>
+<b class="fc">&nbsp;        if (state.step == OnboardingStep.Value &amp;&amp; state.isOffline) {</b>
+<b class="fc">&nbsp;            updateState { copy(step = OnboardingStep.FirstAccount) }</b>
+&nbsp;        } else {
+<b class="fc">&nbsp;            finish()</b>
+&nbsp;        }
+&nbsp;    }
 &nbsp;
-&nbsp;@Composable
-&nbsp;private fun SettingsContent(
-&nbsp;    state: SettingsState,
-&nbsp;    onEvent: (SettingsEvent) -&gt; Unit,
-&nbsp;) {
-&nbsp;    Scaffold(
-&nbsp;        modifier = Modifier
-&nbsp;            .surferSafeInsets()
-&nbsp;            .surferTestTagAsId()
-&nbsp;            .testTag(SettingsTestTags.Root),
-&nbsp;        containerColor = AppTheme.materialColors.surface,
-&nbsp;        topBar = {
-&nbsp;            SurferToolbar(
-&nbsp;                title = stringResource(Res.string.settings_title),
-&nbsp;                onBack = { onEvent(SettingsEvent.OnBackClick) },
-&nbsp;                colors = TopAppBarDefaults.topAppBarColors(
-&nbsp;                    containerColor = AppTheme.materialColors.surface,
-&nbsp;                    titleContentColor = AppTheme.materialColors.onSurface,
-&nbsp;                ),
-&nbsp;            )
-&nbsp;        },
-&nbsp;    ) { padding -&gt;
-&nbsp;        Column(
-&nbsp;            modifier = Modifier
-&nbsp;                .fillMaxSize()
-&nbsp;                .surferContentContainer()
-&nbsp;                .padding(top = padding.calculateTopPadding())
-&nbsp;                .verticalScroll(rememberScrollState()),
+&nbsp;    private fun finish() {
+<b class="fc">&nbsp;        val state = currentState</b>
+<b class="pc">&nbsp;        if (state.inFlight) return</b>
+<b class="fc">&nbsp;        launch(</b>
+&nbsp;            onError = { err -&gt;
+<b class="fc">&nbsp;                log.w(err) { &quot;[finish] failed — onboarding not marked complete, user can retry&quot; }</b>
+<b class="fc">&nbsp;                updateState { copy(inFlight = false) }</b>
+&nbsp;            },
 &nbsp;        ) {
-&nbsp;            if (state.showProfile) {
-&nbsp;                Box(modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 12.dp)) {
-&nbsp;                    SurferNameBlock(
-&nbsp;                        name = stringResource(Res.string.settings_user_name),
-&nbsp;                        email = userEmailText(state),
-&nbsp;                        trailing = null,
-&nbsp;                        nameTestTag = SettingsTestTags.ProfileName,
-&nbsp;                    )
-&nbsp;                }
+<b class="fc">&nbsp;            updateState { copy(inFlight = true) }</b>
+<b class="fc">&nbsp;            val effect = if (state.isOffline) {</b>
+&nbsp;                // The offline first-account screen needs a pinned workspace, so the seed runs
+&nbsp;                // here rather than at launch — the app introduces itself before writing anything.
+<b class="fc">&nbsp;                firstRunSeeder.seedIfNeeded()</b>
+<b class="fc">&nbsp;                OnboardingEffect.NavigateToFirstAccount(state.selectedAccountKind.accountType)</b>
+&nbsp;            } else {
+<b class="fc">&nbsp;                OnboardingEffect.NavigateToSignIn</b>
 &nbsp;            }
-&nbsp;
-&nbsp;            SurferSettingsGroup(title = stringResource(Res.string.settings_section_workspace)) {
-&nbsp;                SurferSettingsRow(
-&nbsp;                    icon = SurferIcons.People,
-&nbsp;                    title = stringResource(Res.string.settings_change_workspace),
-&nbsp;                    supportingText = stringResource(Res.string.settings_change_workspace_supporting),
-&nbsp;                    onClick = { onEvent(SettingsEvent.OnChangeWorkspaceClick) },
-&nbsp;                    trailing = { SurferSettingsChevron() },
-&nbsp;                    modifier = Modifier.testTag(SettingsTestTags.WorkspaceRow),
-&nbsp;                )
-&nbsp;                if (state.showWorkspaceMembers &amp;&amp; state.currentWorkspaceId != null) {
-&nbsp;                    SurferSettingsRow(
-&nbsp;                        icon = SurferIcons.Sparkle,
-&nbsp;                        title = stringResource(Res.string.settings_members),
-&nbsp;                        supportingText = pluralStringResource(
-&nbsp;                            Res.plurals.settings_members_count_format,
-&nbsp;                            state.activeMemberCount,
-&nbsp;                            state.activeMemberCount,
-&nbsp;                        ),
-&nbsp;                        onClick = { onEvent(SettingsEvent.OnMembersClick) },
-&nbsp;                        trailing = { SurferSettingsChevron() },
-&nbsp;                        modifier = Modifier.testTag(SettingsTestTags.MembersRow),
-&nbsp;                    )
-&nbsp;                }
-&nbsp;                if (state.showPendingInvites) {
-&nbsp;                    SurferSettingsRow(
-&nbsp;                        icon = SurferIcons.Mail,
-&nbsp;                        title = stringResource(Res.string.settings_pending_invites),
-&nbsp;                        supporting = if (state.pendingInviteCount &gt; 0) {
-&nbsp;                            {
-&nbsp;                                SurferPendingBadge(
-&nbsp;                                    text = pluralStringResource(
-&nbsp;                                        Res.plurals.settings_pending_invites_supporting_format,
-&nbsp;                                        state.pendingInviteCount,
-&nbsp;                                        state.pendingInviteCount,
-&nbsp;                                    ),
-&nbsp;                                )
-&nbsp;                            }
-&nbsp;                        } else {
-&nbsp;                            null
-&nbsp;                        },
-&nbsp;                        supportingText = if (state.pendingInviteCount == 0) {
-&nbsp;                            stringResource(Res.string.settings_pending_invites_supporting_empty)
-&nbsp;                        } else {
-&nbsp;                            null
-&nbsp;                        },
-&nbsp;                        onClick = { onEvent(SettingsEvent.OnIncomingInvitesClick) },
-&nbsp;                        trailing = { SurferSettingsChevron() },
-&nbsp;                    )
-&nbsp;                }
-&nbsp;            }
-&nbsp;
-&nbsp;            SurferSettingsGroup(title = stringResource(Res.string.settings_section_personalization)) {
-&nbsp;                SurferSettingsRow(
-&nbsp;                    icon = SurferIcons.Category,
-&nbsp;                    title = stringResource(Res.string.settings_categories_title),
-&nbsp;                    supportingText = stringResource(Res.string.settings_categories_supporting),
-&nbsp;                    onClick = { onEvent(SettingsEvent.OnCategoriesClick) },
-&nbsp;                    trailing = { SurferSettingsChevron() },
-&nbsp;                    modifier = Modifier.testTag(SettingsTestTags.CategoriesRow),
-&nbsp;                )
-&nbsp;                SurferSettingsRow(
-&nbsp;                    icon = SurferIcons.Savings,
-&nbsp;                    title = stringResource(Res.string.settings_budgets_title),
-&nbsp;                    supportingText = stringResource(Res.string.settings_budgets_supporting),
-&nbsp;                    onClick = { onEvent(SettingsEvent.OnBudgetsClick) },
-&nbsp;                    trailing = { SurferSettingsChevron() },
-&nbsp;                    modifier = Modifier.testTag(SettingsTestTags.BudgetsRow),
-&nbsp;                )
-&nbsp;                SurferSettingsRow(
-&nbsp;                    icon = SurferIcons.Flag,
-&nbsp;                    title = stringResource(Res.string.settings_goals_title),
-&nbsp;                    supportingText = stringResource(Res.string.settings_goals_supporting),
-&nbsp;                    onClick = { onEvent(SettingsEvent.OnGoalsClick) },
-&nbsp;                    trailing = { SurferSettingsChevron() },
-&nbsp;                    modifier = Modifier.testTag(SettingsTestTags.GoalsRow),
-&nbsp;                )
-&nbsp;                SurferSettingsRow(
-&nbsp;                    icon = SurferIcons.Palette,
-&nbsp;                    title = stringResource(Res.string.settings_appearance_hub_title),
-&nbsp;                    supportingText = appearanceSupporting(state.isDynamicColorEnabled),
-&nbsp;                    onClick = { onEvent(SettingsEvent.OnAppearanceClick) },
-&nbsp;                    trailing = { SurferSettingsChevron() },
-&nbsp;                    modifier = Modifier.testTag(SettingsTestTags.AppearanceRow),
-&nbsp;                )
-&nbsp;                SurferSettingsRow(
-&nbsp;                    icon = SurferIcons.Globe,
-&nbsp;                    title = stringResource(Res.string.settings_preferences_hub_title),
-&nbsp;                    supportingText = stringResource(Res.string.settings_preferences_hub_supporting),
-&nbsp;                    onClick = { onEvent(SettingsEvent.OnPreferencesClick) },
-&nbsp;                    trailing = { SurferSettingsChevron() },
-&nbsp;                    modifier = Modifier.testTag(SettingsTestTags.PreferencesRow),
-&nbsp;                )
-&nbsp;            }
-&nbsp;
-&nbsp;            SurferSettingsGroup(title = stringResource(Res.string.settings_section_data)) {
-&nbsp;                if (state.showSyncSection) {
-&nbsp;                    SurferSettingsRow(
-&nbsp;                        icon = SurferIcons.Sync,
-&nbsp;                        title = stringResource(Res.string.settings_sync_hub_title),
-&nbsp;                        supportingText = stringResource(Res.string.settings_sync_hub_supporting),
-&nbsp;                        onClick = { onEvent(SettingsEvent.OnSyncClick) },
-&nbsp;                        trailing = { SurferSettingsChevron() },
-&nbsp;                        modifier = Modifier.testTag(SettingsTestTags.SyncRow),
-&nbsp;                    )
-&nbsp;                }
-&nbsp;                SurferSettingsRow(
-&nbsp;                    icon = SurferIcons.Archive,
-&nbsp;                    title = stringResource(Res.string.settings_backup),
-&nbsp;                    supportingText = stringResource(Res.string.settings_backup_supporting),
-&nbsp;                    onClick = { onEvent(SettingsEvent.OnBackupClick) },
-&nbsp;                    trailing = { SurferSettingsChevron() },
-&nbsp;                    modifier = Modifier.testTag(SettingsTestTags.BackupRow),
-&nbsp;                )
-&nbsp;                SurferSettingsRow(
-&nbsp;                    icon = SurferIcons.Download,
-&nbsp;                    title = stringResource(Res.string.settings_csv_title),
-&nbsp;                    supportingText = stringResource(Res.string.settings_csv_supporting),
-&nbsp;                    onClick = { onEvent(SettingsEvent.OnCsvBackupClick) },
-&nbsp;                    trailing = { SurferSettingsChevron() },
-&nbsp;                    modifier = Modifier.testTag(SettingsTestTags.CsvRow),
-&nbsp;                )
-&nbsp;            }
-&nbsp;
-&nbsp;            SurferSettingsGroup(title = stringResource(Res.string.settings_section_help)) {
-&nbsp;                SurferSettingsRow(
-&nbsp;                    icon = SurferIcons.Info,
-&nbsp;                    title = stringResource(Res.string.settings_about),
-&nbsp;                    supportingText = stringResource(
-&nbsp;                        Res.string.settings_about_supporting_format,
-&nbsp;                        state.appVersion,
-&nbsp;                    ),
-&nbsp;                    onClick = { onEvent(SettingsEvent.OnAboutClick) },
-&nbsp;                    trailing = { SurferSettingsChevron() },
-&nbsp;                    modifier = Modifier.testTag(SettingsTestTags.AboutRow),
-&nbsp;                )
-&nbsp;                if (state.showDebugConfig) {
-&nbsp;                    SurferSettingsRow(
-&nbsp;                        icon = SurferIcons.Code,
-&nbsp;                        title = stringResource(Res.string.settings_debug_config),
-&nbsp;                        supportingText = stringResource(Res.string.settings_debug_config_supporting),
-&nbsp;                        onClick = { onEvent(SettingsEvent.OnDebugConfigClick) },
-&nbsp;                        trailing = { SurferSettingsChevron() },
-&nbsp;                        modifier = Modifier.testTag(SettingsTestTags.DebugConfigRow),
-&nbsp;                    )
-&nbsp;                }
-&nbsp;            }
-&nbsp;
-&nbsp;            if (state.showLogout) {
-&nbsp;                Spacer(Modifier.height(8.dp))
-&nbsp;                Box(modifier = Modifier.padding(horizontal = 16.dp)) {
-&nbsp;                    SurferSettingsRow(
-&nbsp;                        icon = SurferIcons.Logout,
-&nbsp;                        title = stringResource(Res.string.settings_logout),
-&nbsp;                        danger = true,
-&nbsp;                        onClick = { onEvent(SettingsEvent.OnLogoutClick) },
-&nbsp;                        modifier = Modifier.testTag(SettingsTestTags.LogoutRow),
-&nbsp;                    )
-&nbsp;                }
-&nbsp;            }
-&nbsp;
-&nbsp;            if (state.showDeleteAccount) {
-&nbsp;                Spacer(Modifier.height(8.dp))
-&nbsp;                Box(modifier = Modifier.padding(horizontal = 16.dp)) {
-&nbsp;                    SurferSettingsRow(
-&nbsp;                        icon = SurferIcons.Delete,
-&nbsp;                        title = stringResource(Res.string.settings_delete_account),
-&nbsp;                        danger = true,
-&nbsp;                        onClick = { onEvent(SettingsEvent.OnDeleteAccountClick) },
-&nbsp;                        modifier = Modifier.testTag(SettingsTestTags.DeleteAccountRow),
-&nbsp;                    )
-&nbsp;                }
-&nbsp;            }
-&nbsp;
-&nbsp;            Spacer(Modifier.height(AppTheme.spacing.large))
-&nbsp;            Text(
-&nbsp;                text = stringResource(Res.string.settings_version_format, state.appVersion),
-&nbsp;                style = AppTheme.typography.bodySmall,
-&nbsp;                color = AppTheme.materialColors.onSurfaceVariant,
-&nbsp;                textAlign = TextAlign.Center,
-&nbsp;                modifier = Modifier
-&nbsp;                    .fillMaxWidth()
-&nbsp;                    .padding(horizontal = 24.dp, vertical = AppTheme.spacing.small),
-&nbsp;            )
-&nbsp;            Spacer(Modifier.height(padding.calculateBottomPadding() + AppTheme.spacing.large))
+&nbsp;            // Flag last: if the seed above threw, the onboarding replays on the next launch
+&nbsp;            // instead of dropping the user on a screen with no workspace behind it.
+<b class="fc">&nbsp;            uiPreferences.onboardingCompleted.set(true)</b>
+<b class="fc">&nbsp;            log.i { &quot;[finish] ok -&gt; $effect&quot; }</b>
+<b class="fc">&nbsp;            postSideEffect(effect)</b>
 &nbsp;        }
 &nbsp;    }
 &nbsp;
-&nbsp;    if (state.showGuestLogoutWarning) {
-&nbsp;        GuestLogoutWarningDialog(
-&nbsp;            onConfirm = { onEvent(SettingsEvent.OnGuestLogoutConfirmed) },
-&nbsp;            onDismiss = { onEvent(SettingsEvent.OnGuestLogoutDismissed) },
-&nbsp;        )
+&nbsp;    private companion object {
+&nbsp;        const val TAG = &quot;OnboardingVM&quot;
 &nbsp;    }
 &nbsp;}
 &nbsp;
-&nbsp;/** Guest sessions are local-only — warn that logging out wipes the on-device data for good. */
-&nbsp;@Composable
-&nbsp;private fun GuestLogoutWarningDialog(
-&nbsp;    onConfirm: () -&gt; Unit,
-&nbsp;    onDismiss: () -&gt; Unit,
+&nbsp;enum class OnboardingStep { Value, FirstAccount }
+&nbsp;
+&nbsp;/**
+&nbsp; * The three starting points offered on the offline picker, in design order. [recommended] drives
+&nbsp; * the &quot;Рекомендуем&quot; badge — cash is the one every user can fill in without looking anything up.
+&nbsp; */
+&nbsp;enum class OnboardingAccountKind(
+&nbsp;    val accountType: AccountType,
+&nbsp;    val recommended: Boolean = false,
 &nbsp;) {
-&nbsp;    AlertDialog(
-&nbsp;        onDismissRequest = onDismiss,
-&nbsp;        icon = {
-&nbsp;            Icon(
-&nbsp;                imageVector = SurferIcons.Logout,
-&nbsp;                contentDescription = SurferSemantics.Decorative,
-&nbsp;                tint = AppTheme.materialColors.error,
-&nbsp;            )
-&nbsp;        },
-&nbsp;        title = {
-&nbsp;            Text(
-&nbsp;                text = stringResource(Res.string.settings_logout_guest_warning_title),
-&nbsp;                textAlign = TextAlign.Center,
-&nbsp;            )
-&nbsp;        },
-&nbsp;        text = {
-&nbsp;            Text(
-&nbsp;                text = stringResource(Res.string.settings_logout_guest_warning_message),
-&nbsp;                textAlign = TextAlign.Center,
-&nbsp;            )
-&nbsp;        },
-&nbsp;        confirmButton = {
-&nbsp;            Button(
-&nbsp;                onClick = onConfirm,
-&nbsp;                colors = ButtonDefaults.buttonColors(
-&nbsp;                    containerColor = AppTheme.materialColors.error,
-&nbsp;                    contentColor = AppTheme.materialColors.onError,
-&nbsp;                ),
-&nbsp;            ) {
-&nbsp;                Text(stringResource(Res.string.settings_logout_guest_warning_confirm))
-&nbsp;            }
-&nbsp;        },
-&nbsp;        dismissButton = {
-&nbsp;            TextButton(onClick = onDismiss) {
-&nbsp;                Text(stringResource(Res.string.settings_logout_guest_warning_cancel))
-&nbsp;            }
-&nbsp;        },
-&nbsp;    )
+&nbsp;    Cash(AccountType.CASH, recommended = true),
+&nbsp;    Card(AccountType.CARD),
+&nbsp;    Savings(AccountType.SAVINGS),
 &nbsp;}
 &nbsp;
-&nbsp;@Composable
-&nbsp;private fun appearanceSupporting(isDynamicColorEnabled: Boolean): String =
-&nbsp;    if (isDynamicColorEnabled) {
-&nbsp;        stringResource(Res.string.settings_appearance_hub_supporting_dynamic)
-&nbsp;    } else {
-&nbsp;        stringResource(Res.string.settings_appearance_hub_supporting)
+&nbsp;data class OnboardingState(
+&nbsp;    val isOffline: Boolean = false,
+&nbsp;    val step: OnboardingStep = OnboardingStep.Value,
+&nbsp;    val selectedAccountKind: OnboardingAccountKind = OnboardingAccountKind.Cash,
+&nbsp;    val inFlight: Boolean = false,
+&nbsp;) {
+&nbsp;    /** Offline walks value → first account; online stops at the value pitch. */
+&nbsp;    val totalSteps: Int get() = if (isOffline) OFFLINE_STEPS else ONLINE_STEPS
+&nbsp;
+&nbsp;    val stepNumber: Int get() = when (step) {
+&nbsp;        OnboardingStep.Value -&gt; 1
+&nbsp;        OnboardingStep.FirstAccount -&gt; 2
 &nbsp;    }
 &nbsp;
-&nbsp;private fun userEmailText(state: SettingsState): String =
-&nbsp;    when {
-&nbsp;        state.isAnonymousUser -&gt; &quot;anon&quot;
-&nbsp;        !state.userEmail.isNullOrBlank() -&gt; state.userEmail
-&nbsp;        else -&gt; &quot;anon&quot;
-&nbsp;    }
+&nbsp;    /** A single-step flow has no progress to report. */
+&nbsp;    val showProgress: Boolean get() = totalSteps &gt; ONLINE_STEPS
 &nbsp;
-&nbsp;@Preview
-&nbsp;@Composable
-&nbsp;private fun SettingsScreenPreview() {
-&nbsp;    AppTheme {
-&nbsp;        SettingsContent(
-&nbsp;            state = SettingsState(),
-&nbsp;            onEvent = {},
-&nbsp;        )
+&nbsp;    /** The last step&#39;s CTA commits, so &quot;skip&quot; would be the same button twice. */
+&nbsp;    val showSkip: Boolean get() = step == OnboardingStep.Value &amp;&amp; showProgress
+&nbsp;
+&nbsp;    private companion object {
+&nbsp;        const val ONLINE_STEPS = 1
+&nbsp;        const val OFFLINE_STEPS = 2
 &nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;sealed interface OnboardingEvent {
+&nbsp;    data object OnContinueClick : OnboardingEvent
+&nbsp;    data object OnSkipClick : OnboardingEvent
+&nbsp;    data object OnBackClick : OnboardingEvent
+&nbsp;    data class OnAccountKindSelected(val kind: OnboardingAccountKind) : OnboardingEvent
+&nbsp;}
+&nbsp;
+&nbsp;sealed interface OnboardingEffect {
+&nbsp;    data object NavigateToSignIn : OnboardingEffect
+&nbsp;
+&nbsp;    /** Offline: continue into account creation, pre-filled with the picked [accountType]. */
+&nbsp;    data class NavigateToFirstAccount(val accountType: AccountType) : OnboardingEffect
 &nbsp;}
 </code>
 </pre>
@@ -544,7 +324,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 21:18</div>
+    <div style="float:right;">generated on 2026-07-28 21:38</div>
 </div>
 </body>
 </html>

@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SavingsGoalRepository</title>
+  <title>MoneySurfer Coverage Report > TransactionsByAccountScreenPreviewsKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,22 +19,70 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.domain.repositories</a>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.transaction.list</a>
 </div>
 
-<h1>Coverage Summary for Class: SavingsGoalRepository (com.georgeci.moneysurfer.domain.repositories)</h1>
+<h1>Coverage Summary for Class: TransactionsByAccountScreenPreviewsKt (com.georgeci.moneysurfer.feature.transaction.list)</h1>
 
 <table class="coverageStats">
 <tr>
   <th class="name">Class</th>
 <th class="coverageStat 
 ">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
   Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
 </th>
 </tr>
 <tr>
-  <td class="name">SavingsGoalRepository</td>
+  <td class="name">TransactionsByAccountScreenPreviewsKt</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
     <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/57)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/270)
+  </span>
+</td>
 </tr>
 
 </table>
@@ -44,29 +92,172 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.repositories
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.transaction.list
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.model.SavingsGoal
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.GoalId
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
-&nbsp;import kotlinx.coroutines.flow.Flow
+&nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.ui.tooling.preview.Preview
+&nbsp;import com.georgeci.moneysurfer.domain.preferences.TransactionPeriodMode
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.AccountId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionId
+&nbsp;import com.georgeci.moneysurfer.feature.transaction.filter.TransactionTypeFilter
+&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
+&nbsp;import kotlinx.datetime.LocalDate
 &nbsp;
-&nbsp;interface SavingsGoalRepository {
-&nbsp;    fun getByWorkspaceId(workspaceId: WorkspaceId): Flow&lt;List&lt;SavingsGoal&gt;&gt;
-&nbsp;    suspend fun getById(id: GoalId): SavingsGoal?
+&nbsp;@Preview
+&nbsp;@Composable
+<b class="nc">&nbsp;private fun TransactionsByAccountPreview() {</b>
+<b class="nc">&nbsp;    AppTheme {</b>
+&nbsp;        TransactionsByAccountContent(
+&nbsp;            // All-accounts variant: the one where a row has to say which account it belongs to.
+&nbsp;            state = TransactionsByAccountState.Content(
+&nbsp;                accountId = null,
+&nbsp;                accountName = &quot;&quot;,
+&nbsp;                groups = previewGroups(),
+&nbsp;                showAccountOnRows = true,
+&nbsp;                summary = TransactionSummaryUi(
+&nbsp;                    incomeFormatted = PreviewPayrollAmount,
+&nbsp;                    expenseFormatted = &quot;−€72.70&quot;,
+&nbsp;                    netFormatted = &quot;+€3,127.30&quot;,
+&nbsp;                    netPositive = true,
+&nbsp;                ),
+&nbsp;                query = &quot;&quot;,
+&nbsp;                filters = previewChips(),
+&nbsp;                activeFilterCount = 0,
+&nbsp;                isFiltered = false,
+&nbsp;                periodMode = TransactionPeriodMode.Month,
+&nbsp;                period = TransactionPeriodUi.Month(monthNumber = 3, year = 2025),
+&nbsp;                showPeriodPager = true,
+&nbsp;                canGoToPreviousPeriod = true,
+&nbsp;                canGoToNextPeriod = false,
+&nbsp;                canLoadMore = false,
+&nbsp;            ),
+&nbsp;            onEvent = {},
+&nbsp;        )
+&nbsp;    }
+<b class="nc">&nbsp;}</b>
 &nbsp;
-&nbsp;    /** Emits `null` once the goal is deleted. */
-&nbsp;    fun observeById(id: GoalId): Flow&lt;SavingsGoal?&gt;
-&nbsp;    suspend fun insert(goal: SavingsGoal)
-&nbsp;    suspend fun update(goal: SavingsGoal)
+&nbsp;@Preview
+&nbsp;@Composable
+<b class="nc">&nbsp;private fun TransactionsByAccountEmptyPreview() {</b>
+<b class="nc">&nbsp;    AppTheme {</b>
+&nbsp;        TransactionsByAccountContent(
+&nbsp;            state = TransactionsByAccountState.Content(
+&nbsp;                accountId = AccountId(&quot;preview-acc-1&quot;),
+&nbsp;                accountName = &quot;Savings&quot;,
+&nbsp;                groups = emptyList(),
+&nbsp;                showAccountOnRows = false,
+&nbsp;                summary = previewEmptySummary(),
+&nbsp;                query = &quot;&quot;,
+&nbsp;                filters = previewChips(),
+&nbsp;                activeFilterCount = 0,
+&nbsp;                isFiltered = false,
+&nbsp;                periodMode = TransactionPeriodMode.Week,
+&nbsp;                period = TransactionPeriodUi.Week(
+&nbsp;                    from = LocalDate(2025, 3, 25),
+&nbsp;                    to = LocalDate(2025, 3, 31),
+&nbsp;                    weekNumber = 13,
+&nbsp;                    weekYear = 2025,
+&nbsp;                ),
+&nbsp;                showPeriodPager = true,
+&nbsp;                canGoToPreviousPeriod = true,
+&nbsp;                canGoToNextPeriod = true,
+&nbsp;                canLoadMore = false,
+&nbsp;            ),
+&nbsp;            onEvent = {},
+&nbsp;        )
+&nbsp;    }
+<b class="nc">&nbsp;}</b>
 &nbsp;
-&nbsp;    /**
-&nbsp;     * Hard-deletes the goal and, through Room&#39;s cascade, its contributions.
-&nbsp;     * Contribution deletes are enqueued on the outbox explicitly — Firestore has
-&nbsp;     * no cascade, so silently dropped local rows would leave remote orphans.
-&nbsp;     */
-&nbsp;    suspend fun delete(id: GoalId)
-&nbsp;}
+&nbsp;/** The other empty state: rows exist, the filters are hiding them, so the CTA is the way back. */
+&nbsp;@Preview
+&nbsp;@Composable
+<b class="nc">&nbsp;private fun TransactionsByAccountEmptyFilteredPreview() {</b>
+<b class="nc">&nbsp;    AppTheme {</b>
+&nbsp;        TransactionsByAccountContent(
+&nbsp;            state = TransactionsByAccountState.Content(
+&nbsp;                accountId = AccountId(&quot;preview-acc-1&quot;),
+&nbsp;                accountName = &quot;Savings&quot;,
+&nbsp;                groups = emptyList(),
+&nbsp;                showAccountOnRows = false,
+&nbsp;                summary = previewEmptySummary(),
+&nbsp;                query = &quot;&quot;,
+&nbsp;                filters = previewChips().copy(type = TransactionTypeFilter.Transfer),
+&nbsp;                activeFilterCount = 1,
+&nbsp;                isFiltered = true,
+&nbsp;                periodMode = TransactionPeriodMode.Month,
+&nbsp;                period = TransactionPeriodUi.Month(monthNumber = 3, year = 2025),
+&nbsp;                showPeriodPager = true,
+&nbsp;                canGoToPreviousPeriod = true,
+&nbsp;                canGoToNextPeriod = false,
+&nbsp;                canLoadMore = false,
+&nbsp;            ),
+&nbsp;            onEvent = {},
+&nbsp;        )
+&nbsp;    }
+<b class="nc">&nbsp;}</b>
+&nbsp;
+&nbsp;/** The payroll row&#39;s amount, which is also its day&#39;s net and the period&#39;s income. */
+&nbsp;private const val PreviewPayrollAmount = &quot;+€3,200.00&quot;
+&nbsp;
+&nbsp;/** The two days the sample rows are grouped under. */
+<b class="nc">&nbsp;private val PreviewToday = LocalDate(2025, 3, 26)</b>
+<b class="nc">&nbsp;private val PreviewYesterday = LocalDate(2025, 3, 25)</b>
+&nbsp;
+<b class="nc">&nbsp;private fun previewGroups(): List&lt;TransactionGroupUi&gt; = listOf(</b>
+<b class="nc">&nbsp;    TransactionGroupUi(</b>
+<b class="nc">&nbsp;        date = PreviewToday,</b>
+<b class="nc">&nbsp;        dateLabel = TransactionDateUi.Today,</b>
+<b class="nc">&nbsp;        netFormatted = &quot;−€72.70&quot;,</b>
+<b class="nc">&nbsp;        netPositive = false,</b>
+<b class="nc">&nbsp;        transactions = listOf(</b>
+<b class="nc">&nbsp;            TransactionRowUi(</b>
+<b class="nc">&nbsp;                id = TransactionId(&quot;preview-tx-1&quot;),</b>
+<b class="nc">&nbsp;                title = &quot;Lidl — weekly shop&quot;,</b>
+<b class="nc">&nbsp;                subtitle = &quot;Groceries&quot;,</b>
+<b class="nc">&nbsp;                formattedAmount = &quot;−€48.20&quot;,</b>
+<b class="nc">&nbsp;                isExpense = true,</b>
+<b class="nc">&nbsp;                categoryHueSeed = &quot;preview-cat-1&quot;,</b>
+<b class="nc">&nbsp;                accountName = &quot;Everyday&quot;,</b>
+&nbsp;            ),
+<b class="nc">&nbsp;            TransactionRowUi(</b>
+<b class="nc">&nbsp;                id = TransactionId(&quot;preview-tx-2&quot;),</b>
+<b class="nc">&nbsp;                title = &quot;Ramen with J.&quot;,</b>
+<b class="nc">&nbsp;                subtitle = &quot;Dining&quot;,</b>
+<b class="nc">&nbsp;                formattedAmount = &quot;−€24.50&quot;,</b>
+<b class="nc">&nbsp;                isExpense = true,</b>
+<b class="nc">&nbsp;                categoryHueSeed = &quot;preview-cat-2&quot;,</b>
+<b class="nc">&nbsp;                accountName = &quot;Everyday&quot;,</b>
+&nbsp;            ),
+<b class="nc">&nbsp;            TransactionRowUi(</b>
+<b class="nc">&nbsp;                id = TransactionId(&quot;preview-tx-4&quot;),</b>
+<b class="nc">&nbsp;                title = &quot;Rainy day top-up&quot;,</b>
+<b class="nc">&nbsp;                subtitle = &quot;Transfer&quot;,</b>
+<b class="nc">&nbsp;                formattedAmount = &quot;€200.00&quot;,</b>
+<b class="nc">&nbsp;                isExpense = true,</b>
+<b class="nc">&nbsp;                categoryHueSeed = &quot;&quot;,</b>
+<b class="nc">&nbsp;                accountName = &quot;Savings&quot;,</b>
+<b class="nc">&nbsp;                isTransfer = true,</b>
+&nbsp;            ),
+&nbsp;        ),
+&nbsp;    ),
+<b class="nc">&nbsp;    TransactionGroupUi(</b>
+<b class="nc">&nbsp;        date = PreviewYesterday,</b>
+<b class="nc">&nbsp;        dateLabel = TransactionDateUi.Yesterday,</b>
+<b class="nc">&nbsp;        netFormatted = PreviewPayrollAmount,</b>
+<b class="nc">&nbsp;        netPositive = true,</b>
+<b class="nc">&nbsp;        transactions = listOf(</b>
+<b class="nc">&nbsp;            TransactionRowUi(</b>
+<b class="nc">&nbsp;                id = TransactionId(&quot;preview-tx-3&quot;),</b>
+<b class="nc">&nbsp;                title = &quot;March payroll&quot;,</b>
+<b class="nc">&nbsp;                subtitle = &quot;Salary&quot;,</b>
+<b class="nc">&nbsp;                formattedAmount = PreviewPayrollAmount,</b>
+<b class="nc">&nbsp;                isExpense = false,</b>
+<b class="nc">&nbsp;                categoryHueSeed = &quot;preview-cat-3&quot;,</b>
+<b class="nc">&nbsp;                accountName = &quot;Everyday&quot;,</b>
+&nbsp;            ),
+&nbsp;        ),
+&nbsp;    ),
+&nbsp;)
 </code>
 </pre>
 </div>
@@ -90,7 +281,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-23 23:54</div>
+    <div style="float:right;">generated on 2026-07-28 21:38</div>
 </div>
 </body>
 </html>

@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > TransactionDetailsScreenKt</title>
+  <title>MoneySurfer Coverage Report > TransactionCreationDateFieldsKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.feature.transaction.details</a>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.transaction.creation</a>
 </div>
 
-<h1>Coverage Summary for Class: TransactionDetailsScreenKt (com.georgeci.moneysurfer.feature.transaction.details)</h1>
+<h1>Coverage Summary for Class: TransactionCreationDateFieldsKt (com.georgeci.moneysurfer.feature.transaction.creation)</h1>
 
 <table class="coverageStats">
 
@@ -46,13 +46,13 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">TransactionDetailsScreenKt</td>
+  <td class="name">TransactionCreationDateFieldsKt</td>
 <td class="coverageStat">
   <span class="percent">
     0%
   </span>
   <span class="absValue">
-    (0/8)
+    (0/7)
   </span>
 </td>
 <td class="coverageStat">
@@ -60,7 +60,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/68)
+    (0/26)
   </span>
 </td>
 <td class="coverageStat">
@@ -68,7 +68,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/95)
+    (0/63)
   </span>
 </td>
 <td class="coverageStat">
@@ -76,47 +76,42 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/1341)
+    (0/757)
   </span>
 </td>
 </tr>
   <tr>
-    <td class="name">TransactionDetailsScreenKt$TransactionDetailsScreen$1$1</td>
+    <td class="name">TransactionCreationDateFieldsKt$TransactionDatePickerDialog$notFuture$1$1</td>
 <td class="coverageStat">
   <span class="percent">
     0%
   </span>
   <span class="absValue">
-    (0/1)
+    (0/3)
   </span>
 </td>
-    <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
     0%
   </span>
   <span class="absValue">
-    (0/1)
+    (0/4)
   </span>
 </td>
-  </tr>
-  <tr>
-    <td class="name">TransactionDetailsScreenKt$TransactionDetailsScreen$2$1</td>
 <td class="coverageStat">
   <span class="percent">
     0%
   </span>
   <span class="absValue">
-    (0/1)
+    (0/3)
   </span>
 </td>
-    <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
     0%
   </span>
   <span class="absValue">
-    (0/1)
+    (0/17)
   </span>
 </td>
   </tr>
@@ -135,7 +130,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/68)
+    (0/30)
   </span>
 </td>
 <td class="coverageStat">
@@ -143,7 +138,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/97)
+    (0/66)
   </span>
 </td>
 <td class="coverageStat">
@@ -151,7 +146,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/1341)
+    (0/774)
   </span>
 </td>
 </tr>
@@ -162,202 +157,139 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.transaction.details
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.transaction.creation
 &nbsp;
-&nbsp;import androidx.compose.foundation.layout.Box
+&nbsp;import androidx.compose.foundation.border
+&nbsp;import androidx.compose.foundation.clickable
+&nbsp;import androidx.compose.foundation.layout.Arrangement
 &nbsp;import androidx.compose.foundation.layout.Column
 &nbsp;import androidx.compose.foundation.layout.Row
-&nbsp;import androidx.compose.foundation.layout.Spacer
-&nbsp;import androidx.compose.foundation.layout.fillMaxSize
-&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
-&nbsp;import androidx.compose.foundation.layout.height
+&nbsp;import androidx.compose.foundation.layout.heightIn
 &nbsp;import androidx.compose.foundation.layout.padding
 &nbsp;import androidx.compose.foundation.layout.size
-&nbsp;import androidx.compose.foundation.layout.width
-&nbsp;import androidx.compose.foundation.rememberScrollState
-&nbsp;import androidx.compose.foundation.shape.RoundedCornerShape
-&nbsp;import androidx.compose.foundation.verticalScroll
-&nbsp;import androidx.compose.material3.FilledTonalButton
+&nbsp;import androidx.compose.material3.DatePicker
+&nbsp;import androidx.compose.material3.DatePickerDialog
+&nbsp;import androidx.compose.material3.ExperimentalMaterial3Api
 &nbsp;import androidx.compose.material3.Icon
+&nbsp;import androidx.compose.material3.SelectableDates
 &nbsp;import androidx.compose.material3.Text
+&nbsp;import androidx.compose.material3.TextButton
+&nbsp;import androidx.compose.material3.rememberDatePickerState
 &nbsp;import androidx.compose.runtime.Composable
-&nbsp;import androidx.compose.runtime.getValue
+&nbsp;import androidx.compose.runtime.remember
+&nbsp;import androidx.compose.ui.Alignment
 &nbsp;import androidx.compose.ui.Modifier
-&nbsp;import androidx.compose.ui.platform.testTag
+&nbsp;import androidx.compose.ui.draw.clip
 &nbsp;import androidx.compose.ui.unit.dp
-&nbsp;import androidx.lifecycle.compose.collectAsStateWithLifecycle
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionId
-&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferPaneScaffold
-&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferToolbarAction
-&nbsp;import com.georgeci.moneysurfer.uikit.components.transaction.SurferDeleteTransactionDialog
 &nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
-&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
-&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
 &nbsp;import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 &nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
-&nbsp;import com.georgeci.moneysurfer.utils.HandleSideEffect
+&nbsp;import kotlinx.datetime.TimeZone
+&nbsp;import kotlinx.datetime.toLocalDateTime
 &nbsp;import moneysurfer.feature.transaction.generated.resources.Res
-&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_details_delete_content_description
-&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_details_duplicate
-&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_details_edit_content_description
-&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_details_title
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_creation_close_content_description
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_creation_datetime_label
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_creation_datetime_placeholder
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_creation_save
 &nbsp;import org.jetbrains.compose.resources.stringResource
-&nbsp;import org.koin.compose.viewmodel.koinViewModel
-&nbsp;import org.koin.core.parameter.parametersOf
-&nbsp;
-&nbsp;/**
-&nbsp; * Stable selectors for the transaction details screen — see docs/testing/testing-strategy.md.
-&nbsp; *
-&nbsp; * The dialog&#39;s confirm button is not here: the dialog moved to uikit when the transaction lists
-&nbsp; * gained swipe-to-delete, and its tag went with it as
-&nbsp; * [SurferDeleteTransactionDialogTestTags][com.georgeci.moneysurfer.uikit.components.transaction.SurferDeleteTransactionDialogTestTags].
-&nbsp; * The id the flows tap is unchanged.
-&nbsp; */
-&nbsp;object TransactionDetailsTestTags {
-&nbsp;    const val Root = &quot;transactionDetails:root&quot;
-&nbsp;    const val Edit = &quot;transactionDetails:edit&quot;
-&nbsp;    const val Delete = &quot;transactionDetails:delete&quot;
-&nbsp;}
+&nbsp;import kotlin.time.Clock
+&nbsp;import kotlin.time.Instant
 &nbsp;
 &nbsp;@Composable
-<b class="nc">&nbsp;fun TransactionDetailsScreen(</b>
-&nbsp;    transactionId: TransactionId,
-&nbsp;    onNavigateBack: () -&gt; Unit,
-<b class="nc">&nbsp;    onNavigateToEdit: (TransactionId) -&gt; Unit = {},</b>
-<b class="nc">&nbsp;    onNavigateToDuplicate: (TransactionId) -&gt; Unit = {},</b>
-<b class="nc">&nbsp;    viewModel: TransactionDetailsViewModel = koinViewModel(</b>
-<b class="nc">&nbsp;        key = transactionId.value,</b>
-<b class="nc">&nbsp;    ) { parametersOf(transactionId) },</b>
+&nbsp;internal fun DateTimeField(
+&nbsp;    timestamp: Long?,
+&nbsp;    onClick: () -&gt; Unit,
+<b class="nc">&nbsp;    modifier: Modifier = Modifier,</b>
 <b class="nc">&nbsp;) {</b>
-<b class="nc">&nbsp;    val state by viewModel.collectAsStateWithLifecycle()</b>
-&nbsp;
-<b class="nc">&nbsp;    viewModel.HandleSideEffect { effect -&gt;</b>
-<b class="nc">&nbsp;        when (effect) {</b>
-<b class="nc">&nbsp;            TransactionDetailsEffect.NavigateBack -&gt; onNavigateBack()</b>
-<b class="nc">&nbsp;            is TransactionDetailsEffect.NavigateToEdit -&gt; onNavigateToEdit(effect.transactionId)</b>
-<b class="nc">&nbsp;            is TransactionDetailsEffect.NavigateToDuplicate -&gt; onNavigateToDuplicate(effect.transactionId)</b>
-&nbsp;        }
-&nbsp;    }
-&nbsp;
-<b class="nc">&nbsp;    when (val current = state) {</b>
-<b class="nc">&nbsp;        is TransactionDetailsState.Loading -&gt; TransactionDetailsLoading(onEvent = viewModel::onEvent)</b>
-<b class="nc">&nbsp;        is TransactionDetailsState.Content -&gt; TransactionDetailsContent(</b>
-<b class="nc">&nbsp;            state = current,</b>
-<b class="nc">&nbsp;            onEvent = viewModel::onEvent,</b>
+<b class="nc">&nbsp;    val fieldShape = AppTheme.shapes.extraSmall</b>
+<b class="nc">&nbsp;    Row(</b>
+<b class="nc">&nbsp;        modifier = modifier</b>
+<b class="nc">&nbsp;            .heightIn(min = 56.dp)</b>
+<b class="nc">&nbsp;            .clip(fieldShape)</b>
+<b class="nc">&nbsp;            .border(1.dp, AppTheme.materialColors.outline, fieldShape)</b>
+<b class="nc">&nbsp;            .clickable(onClick = onClick)</b>
+<b class="nc">&nbsp;            .padding(horizontal = 16.dp, vertical = 14.dp),</b>
+<b class="nc">&nbsp;        verticalAlignment = Alignment.CenterVertically,</b>
+<b class="nc">&nbsp;        horizontalArrangement = Arrangement.spacedBy(12.dp),</b>
+&nbsp;    ) {
+<b class="nc">&nbsp;        Icon(</b>
+<b class="nc">&nbsp;            imageVector = SurferIcons.Event,</b>
+<b class="nc">&nbsp;            contentDescription = SurferSemantics.Decorative,</b>
+<b class="nc">&nbsp;            tint = AppTheme.materialColors.onSurfaceVariant,</b>
+<b class="nc">&nbsp;            modifier = Modifier.size(20.dp),</b>
+&nbsp;        )
+<b class="nc">&nbsp;        Column(modifier = Modifier.weight(1f)) {</b>
+<b class="nc">&nbsp;            Text(</b>
+<b class="nc">&nbsp;                text = stringResource(Res.string.transaction_creation_datetime_label),</b>
+<b class="nc">&nbsp;                style = AppTheme.typography.bodySmall,</b>
+<b class="nc">&nbsp;                color = AppTheme.materialColors.onSurfaceVariant,</b>
+&nbsp;            )
+<b class="nc">&nbsp;            Text(</b>
+<b class="nc">&nbsp;                text = timestamp?.let(::formatShortDate)</b>
+<b class="nc">&nbsp;                    ?: stringResource(Res.string.transaction_creation_datetime_placeholder),</b>
+<b class="nc">&nbsp;                style = AppTheme.typography.bodyLarge,</b>
+<b class="nc">&nbsp;                color = AppTheme.materialColors.onSurface,</b>
+&nbsp;            )
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        Icon(</b>
+<b class="nc">&nbsp;            imageVector = SurferIcons.DropDown,</b>
+<b class="nc">&nbsp;            contentDescription = SurferSemantics.Decorative,</b>
+<b class="nc">&nbsp;            tint = AppTheme.materialColors.onSurfaceVariant,</b>
+<b class="nc">&nbsp;            modifier = Modifier.size(18.dp),</b>
 &nbsp;        )
 <b class="nc">&nbsp;    }</b>
 <b class="nc">&nbsp;}</b>
 &nbsp;
+&nbsp;@OptIn(ExperimentalMaterial3Api::class)
 &nbsp;@Composable
-<b class="nc">&nbsp;private fun TransactionDetailsLoading(onEvent: (TransactionDetailsEvent) -&gt; Unit) {</b>
-<b class="nc">&nbsp;    SurferPaneScaffold(</b>
-<b class="nc">&nbsp;        title = stringResource(Res.string.transaction_details_title),</b>
-<b class="nc">&nbsp;        onBack = { onEvent(TransactionDetailsEvent.OnBackClick) },</b>
-&nbsp;    ) { padding -&gt;
-&nbsp;        Box(modifier = Modifier.fillMaxSize().padding(padding))
-&nbsp;    }
-<b class="nc">&nbsp;}</b>
-&nbsp;
-&nbsp;@Composable
-&nbsp;internal fun TransactionDetailsContent(
-&nbsp;    state: TransactionDetailsState.Content,
-&nbsp;    onEvent: (TransactionDetailsEvent) -&gt; Unit,
+&nbsp;internal fun TransactionDatePickerDialog(
+&nbsp;    initialTimestamp: Long?,
+&nbsp;    onDismiss: () -&gt; Unit,
+&nbsp;    onConfirm: (Long) -&gt; Unit,
 <b class="nc">&nbsp;) {</b>
-<b class="nc">&nbsp;    if (state.showDeleteConfirmation) {</b>
-<b class="nc">&nbsp;        SurferDeleteTransactionDialog(</b>
-<b class="nc">&nbsp;            titleOrNull = state.note.ifBlank { null },</b>
-<b class="nc">&nbsp;            onConfirm = { onEvent(TransactionDetailsEvent.OnDeleteConfirmed) },</b>
-<b class="nc">&nbsp;            onDismiss = { onEvent(TransactionDetailsEvent.OnDeleteDismissed) },</b>
-<b class="nc">&nbsp;            isTransfer = state.isTransfer,</b>
-<b class="nc">&nbsp;            isSplit = state.isSplit,</b>
-&nbsp;        )
-<b class="nc">&nbsp;    }</b>
-&nbsp;
-<b class="nc">&nbsp;    SurferPaneScaffold(</b>
-<b class="nc">&nbsp;        title = stringResource(Res.string.transaction_details_title),</b>
-<b class="nc">&nbsp;        modifier = Modifier</b>
-<b class="nc">&nbsp;            .testTag(TransactionDetailsTestTags.Root)</b>
-<b class="nc">&nbsp;            .surferTestTagAsId(),</b>
-<b class="nc">&nbsp;        onBack = { onEvent(TransactionDetailsEvent.OnBackClick) },</b>
-<b class="nc">&nbsp;        actions = { DetailsActions(onEvent = onEvent) },</b>
-<b class="nc">&nbsp;    ) { padding -&gt;</b>
-<b class="nc">&nbsp;        Column(</b>
-<b class="nc">&nbsp;            modifier = Modifier</b>
-<b class="nc">&nbsp;                .fillMaxSize()</b>
-<b class="nc">&nbsp;                .surferContentContainer()</b>
-<b class="nc">&nbsp;                .padding(top = padding.calculateTopPadding()),</b>
-&nbsp;        ) {
-<b class="nc">&nbsp;            Column(</b>
-<b class="nc">&nbsp;                modifier = Modifier</b>
-<b class="nc">&nbsp;                    .fillMaxWidth()</b>
-<b class="nc">&nbsp;                    .verticalScroll(rememberScrollState())</b>
-<b class="nc">&nbsp;                    .weight(1f),</b>
-&nbsp;            ) {
-<b class="nc">&nbsp;                val heroVisual = heroVisualFor(state)</b>
-<b class="nc">&nbsp;                HeroCard(</b>
-<b class="nc">&nbsp;                    header = heroHeaderFor(state),</b>
-<b class="nc">&nbsp;                    headerColor = heroVisual.tint,</b>
-<b class="nc">&nbsp;                    visual = heroVisual,</b>
-<b class="nc">&nbsp;                    formattedAmount = state.formattedAmount,</b>
-<b class="nc">&nbsp;                    note = state.note,</b>
-<b class="nc">&nbsp;                    formattedDate = state.formattedDate,</b>
-<b class="nc">&nbsp;                    isPlanned = state.isPlanned,</b>
-&nbsp;                )
-&nbsp;
-<b class="nc">&nbsp;                state.split?.let { SplitCard(split = it) }</b>
-&nbsp;
-<b class="nc">&nbsp;                DetailsCard(state = state)</b>
-&nbsp;
-<b class="nc">&nbsp;                Spacer(Modifier.height(padding.calculateBottomPadding()))</b>
-<b class="nc">&nbsp;            }</b>
-&nbsp;
-<b class="nc">&nbsp;            if (state.canDuplicate) {</b>
-<b class="nc">&nbsp;                DuplicateButton(onEvent = onEvent)</b>
-<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;    val now = remember { Clock.System.now().toEpochMilliseconds() }</b>
+<b class="nc">&nbsp;    val nowYear = remember(now) {</b>
+<b class="nc">&nbsp;        Instant.fromEpochMilliseconds(now)</b>
+<b class="nc">&nbsp;            .toLocalDateTime(TimeZone.currentSystemDefault())</b>
+<b class="nc">&nbsp;            .year</b>
+&nbsp;    }
+<b class="nc">&nbsp;    val notFuture = remember(now, nowYear) {</b>
+<b class="nc">&nbsp;        object : SelectableDates {</b>
+<b class="nc">&nbsp;            override fun isSelectableDate(utcTimeMillis: Long): Boolean = utcTimeMillis &lt;= now</b>
+<b class="nc">&nbsp;            override fun isSelectableYear(year: Int): Boolean = year &lt;= nowYear</b>
 <b class="nc">&nbsp;        }</b>
 &nbsp;    }
+<b class="nc">&nbsp;    val state = rememberDatePickerState(</b>
+<b class="nc">&nbsp;        initialSelectedDateMillis = initialTimestamp,</b>
+<b class="nc">&nbsp;        selectableDates = notFuture,</b>
+&nbsp;    )
+<b class="nc">&nbsp;    DatePickerDialog(</b>
+<b class="nc">&nbsp;        onDismissRequest = onDismiss,</b>
+<b class="nc">&nbsp;        confirmButton = {</b>
+<b class="nc">&nbsp;            TextButton(</b>
+<b class="nc">&nbsp;                onClick = { state.selectedDateMillis?.let(onConfirm) },</b>
+<b class="nc">&nbsp;                enabled = state.selectedDateMillis != null,</b>
+&nbsp;            ) { Text(stringResource(Res.string.transaction_creation_save)) }
+&nbsp;        },
+<b class="nc">&nbsp;        dismissButton = {</b>
+<b class="nc">&nbsp;            TextButton(onClick = onDismiss) {</b>
+&nbsp;                Text(stringResource(Res.string.transaction_creation_close_content_description))
+&nbsp;            }
+&nbsp;        },
+<b class="nc">&nbsp;    ) {</b>
+<b class="nc">&nbsp;        DatePicker(state = state)</b>
+&nbsp;    }
 <b class="nc">&nbsp;}</b>
 &nbsp;
-&nbsp;@Composable
-<b class="nc">&nbsp;private fun DetailsActions(onEvent: (TransactionDetailsEvent) -&gt; Unit) {</b>
-<b class="nc">&nbsp;    SurferToolbarAction(</b>
-<b class="nc">&nbsp;        icon = SurferIcons.Edit,</b>
-<b class="nc">&nbsp;        contentDescription = stringResource(Res.string.transaction_details_edit_content_description),</b>
-<b class="nc">&nbsp;        onClick = { onEvent(TransactionDetailsEvent.OnEditClick) },</b>
-<b class="nc">&nbsp;        modifier = Modifier.testTag(TransactionDetailsTestTags.Edit),</b>
-&nbsp;    )
-<b class="nc">&nbsp;    SurferToolbarAction(</b>
-<b class="nc">&nbsp;        icon = SurferIcons.Delete,</b>
-<b class="nc">&nbsp;        contentDescription = stringResource(Res.string.transaction_details_delete_content_description),</b>
-<b class="nc">&nbsp;        onClick = { onEvent(TransactionDetailsEvent.OnDeleteClick) },</b>
-<b class="nc">&nbsp;        modifier = Modifier.testTag(TransactionDetailsTestTags.Delete),</b>
-<b class="nc">&nbsp;        tint = AppTheme.materialColors.error,</b>
-&nbsp;    )
-<b class="nc">&nbsp;}</b>
+&nbsp;private const val MONTH_ABBREVIATION_LENGTH = 3
 &nbsp;
-&nbsp;@Composable
-<b class="nc">&nbsp;private fun DuplicateButton(onEvent: (TransactionDetailsEvent) -&gt; Unit) {</b>
-<b class="nc">&nbsp;    Row(</b>
-<b class="nc">&nbsp;        modifier = Modifier</b>
-<b class="nc">&nbsp;            .fillMaxWidth()</b>
-<b class="nc">&nbsp;            .padding(horizontal = 16.dp)</b>
-<b class="nc">&nbsp;            .padding(bottom = AppTheme.spacing.large),</b>
-&nbsp;    ) {
-<b class="nc">&nbsp;        FilledTonalButton(</b>
-<b class="nc">&nbsp;            onClick = { onEvent(TransactionDetailsEvent.OnDuplicateClick) },</b>
-<b class="nc">&nbsp;            modifier = Modifier.fillMaxWidth(),</b>
-<b class="nc">&nbsp;            shape = RoundedCornerShape(20.dp),</b>
-&nbsp;        ) {
-&nbsp;            Icon(
-&nbsp;                imageVector = SurferIcons.Copy,
-&nbsp;                contentDescription = SurferSemantics.Decorative,
-&nbsp;                modifier = Modifier.size(18.dp),
-&nbsp;            )
-&nbsp;            Spacer(Modifier.width(AppTheme.spacing.small))
-&nbsp;            Text(stringResource(Res.string.transaction_details_duplicate))
-&nbsp;        }
-<b class="nc">&nbsp;    }</b>
-<b class="nc">&nbsp;}</b>
+&nbsp;private fun formatShortDate(timestamp: Long): String {
+<b class="nc">&nbsp;    val instant = Instant.fromEpochMilliseconds(timestamp)</b>
+<b class="nc">&nbsp;    val ld = instant.toLocalDateTime(TimeZone.currentSystemDefault()).date</b>
+<b class="nc">&nbsp;    val month = ld.month.name.lowercase().replaceFirstChar { it.uppercase() }.take(MONTH_ABBREVIATION_LENGTH)</b>
+<b class="nc">&nbsp;    val day = ld.day.toString().padStart(2, &#39;0&#39;)</b>
+<b class="nc">&nbsp;    return &quot;$day $month ${ld.year}&quot;</b>
+&nbsp;}
 </code>
 </pre>
 </div>
@@ -381,7 +313,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 21:18</div>
+    <div style="float:right;">generated on 2026-07-28 21:38</div>
 </div>
 </body>
 </html>

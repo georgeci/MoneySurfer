@@ -1,0 +1,273 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>MoneySurfer Coverage Report > SeedDefaultsUseCase</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.georgeci.moneysurfer.domain.usecase</a>
+</div>
+
+<h1>Coverage Summary for Class: SeedDefaultsUseCase (com.georgeci.moneysurfer.domain.usecase)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">SeedDefaultsUseCase</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    84.6%
+  </span>
+  <span class="absValue">
+    (22/26)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (43/43)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    98.7%
+  </span>
+  <span class="absValue">
+    (392/397)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">SeedDefaultsUseCase$Companion</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">SeedDefaultsUseCase$invoke$1</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">SeedDefaultsUseCase$seedCashAccountIfMissing$1</td>
+    <td class="coverageStat"/>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    84.6%
+  </span>
+  <span class="absValue">
+    (22/26)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (43/43)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    98.7%
+  </span>
+  <span class="absValue">
+    (392/397)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.usecase
+&nbsp;
+&nbsp;import arrow.core.Either
+&nbsp;import co.touchlab.kermit.Logger
+&nbsp;import com.georgeci.moneysurfer.domain.auth.SessionPointers
+&nbsp;import com.georgeci.moneysurfer.domain.model.Account
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.AccountId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.AccountType
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.AccountRepository
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.WorkspaceRepository
+&nbsp;import kotlinx.coroutines.flow.first
+&nbsp;import org.koin.core.annotation.Single
+&nbsp;
+&nbsp;/**
+&nbsp; * Bootstrap for an empty install: creates a &quot;Personal&quot; workspace (which seeds the default
+&nbsp; * category set via [CreateWorkspaceUseCase]) and, when asked for, a single &quot;Cash&quot; account.
+&nbsp; *
+&nbsp; * Idempotency contract — the use case is safe to call on every launch:
+&nbsp; *  - If no workspace is pinned, create one + seed Cash.
+&nbsp; *  - If a workspace is already pinned, *repair* missing defaults — i.e. ensure the pinned
+&nbsp; *    workspace has a Cash account. This recovers from a previous run that pinned the workspace
+&nbsp; *    but died before inserting the account, instead of stranding the user on a Dashboard with
+&nbsp; *    no accounts forever (Copilot review feedback on PR #91).
+&nbsp; *  - Existing Cash accounts are never duplicated.
+&nbsp; *
+&nbsp; * `seedCashAccount = false` skips both the seed and the repair: the offline first launch lets
+&nbsp; * the user create their first account explicitly (onboarding → account creation), so an
+&nbsp; * auto-inserted &quot;Cash&quot; row would just be noise. `AppLaunchViewModel` covers the crash window
+&nbsp; * by routing back to the first-run account screen while the workspace has no accounts.
+&nbsp; *
+&nbsp; * Insert failures are caught and logged so a transient repository error doesn&#39;t block the
+&nbsp; * caller (e.g. `AppLaunchViewModel`) from making a navigation decision.
+&nbsp; *
+&nbsp; * The use case is host-agnostic — the caller supplies the seed [CurrencyCode] so platform
+&nbsp; * locale lookup stays out of the domain layer.
+&nbsp; */
+<b class="fc">&nbsp;@Single</b>
+&nbsp;class SeedDefaultsUseCase(
+<b class="fc">&nbsp;    private val createWorkspace: CreateWorkspaceUseCase,</b>
+<b class="fc">&nbsp;    private val accountRepository: AccountRepository,</b>
+<b class="fc">&nbsp;    private val workspaceRepository: WorkspaceRepository,</b>
+<b class="fc">&nbsp;    private val session: SessionPointers,</b>
+<b class="fc">&nbsp;    private val getCurrentTime: GetCurrentTimeUseCase,</b>
+&nbsp;) {
+<b class="fc">&nbsp;    private val log = Logger.withTag(TAG)</b>
+&nbsp;
+<b class="fc">&nbsp;    suspend operator fun invoke(currency: CurrencyCode, seedCashAccount: Boolean = true) {</b>
+<b class="fc">&nbsp;        val pinned = session.currentWorkspaceId.first()</b>
+<b class="fc">&nbsp;        if (pinned != null) {</b>
+<b class="fc">&nbsp;            if (!seedCashAccount) return</b>
+&nbsp;            // Repair path: previous run may have pinned the workspace but died before the Cash
+&nbsp;            // insert. Use the workspace&#39;s own baseCurrency for repair so we don&#39;t overwrite the
+&nbsp;            // user&#39;s currency choice with a freshly derived locale value.
+<b class="fc">&nbsp;            val workspaceCurrency = runCatching { workspaceRepository.getById(pinned)?.baseCurrency }</b>
+<b class="pc">&nbsp;                .getOrNull() ?: currency</b>
+<b class="fc">&nbsp;            seedCashAccountIfMissing(pinned, workspaceCurrency)</b>
+&nbsp;            return
+&nbsp;        }
+<b class="fc">&nbsp;        log.i { &quot;[start] currency=${currency.value}&quot; }</b>
+<b class="fc">&nbsp;        val newId = createWorkspace(</b>
+<b class="fc">&nbsp;            CreateWorkspaceUseCase.Params(</b>
+<b class="fc">&nbsp;                name = DEFAULT_WORKSPACE_NAME,</b>
+<b class="fc">&nbsp;                description = &quot;&quot;,</b>
+<b class="fc">&nbsp;                baseCurrency = currency,</b>
+&nbsp;            ),
+<b class="fc">&nbsp;        ).fold(</b>
+&nbsp;            ifLeft = { err -&gt;
+<b class="fc">&nbsp;                log.w { &quot;[abort] CreateWorkspace failed: $err&quot; }</b>
+&nbsp;                return
+&nbsp;            },
+<b class="fc">&nbsp;            ifRight = { it },</b>
+&nbsp;        )
+<b class="fc">&nbsp;        if (seedCashAccount) seedCashAccountIfMissing(newId, currency)</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private suspend fun seedCashAccountIfMissing(workspaceId: WorkspaceId, currency: CurrencyCode) {
+<b class="fc">&nbsp;        val existing = Either.catch { accountRepository.getByWorkspaceId(workspaceId).first() }</b>
+<b class="fc">&nbsp;            .getOrNull()</b>
+<b class="pc">&nbsp;            .orEmpty()</b>
+<b class="pc">&nbsp;        val alreadyHasCash = existing.any { it.name == DEFAULT_ACCOUNT_NAME &amp;&amp; it.type == AccountType.CASH }</b>
+<b class="fc">&nbsp;        if (alreadyHasCash) {</b>
+<b class="fc">&nbsp;            log.d { &quot;[skip] Cash account already present wid=${workspaceId.value}&quot; }</b>
+&nbsp;            return
+&nbsp;        }
+<b class="fc">&nbsp;        Either.catch {</b>
+<b class="fc">&nbsp;            accountRepository.insert(</b>
+<b class="fc">&nbsp;                Account(</b>
+<b class="fc">&nbsp;                    id = AccountId.uuid(),</b>
+<b class="fc">&nbsp;                    workspaceId = workspaceId,</b>
+<b class="fc">&nbsp;                    name = DEFAULT_ACCOUNT_NAME,</b>
+<b class="fc">&nbsp;                    type = AccountType.CASH,</b>
+<b class="fc">&nbsp;                    currencyCode = currency,</b>
+<b class="fc">&nbsp;                    balance = Money.zero(),</b>
+<b class="fc">&nbsp;                    updatedAt = getCurrentTime(),</b>
+&nbsp;                ),
+&nbsp;            )
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;            .onLeft { log.w(it) { &quot;[insert] Cash account failed wid=${workspaceId.value}&quot; } }</b>
+<b class="fc">&nbsp;            .onRight { log.i { &quot;[done] seeded Cash account wid=${workspaceId.value}&quot; } }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private companion object {
+&nbsp;        const val TAG = &quot;SeedDefaults&quot;
+&nbsp;        const val DEFAULT_WORKSPACE_NAME = &quot;Personal&quot;
+&nbsp;        const val DEFAULT_ACCOUNT_NAME = &quot;Cash&quot;
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-07-28 21:38</div>
+</div>
+</body>
+</html>

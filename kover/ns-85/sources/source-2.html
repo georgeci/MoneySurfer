@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > DeleteVariant</title>
+  <title>MoneySurfer Coverage Report > SurferNameBlockKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,15 +19,18 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.uikit.components.transaction</a>
+    <a href="../index.html">com.georgeci.moneysurfer.uikit.components.settings</a>
 </div>
 
-<h1>Coverage Summary for Class: DeleteVariant (com.georgeci.moneysurfer.uikit.components.transaction)</h1>
+<h1>Coverage Summary for Class: SurferNameBlockKt (com.georgeci.moneysurfer.uikit.components.settings)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -46,103 +49,49 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">DeleteVariant</td>
+  <td class="name">SurferNameBlockKt</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/2)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/16)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    50%
   </span>
   <span class="absValue">
-    (0/66)
-  </span>
-</td>
-</tr>
-  <tr>
-    <td class="name">DeleteVariant$Companion</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
+    (1/2)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    25%
   </span>
   <span class="absValue">
-    (0/4)
+    (7/28)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    94.5%
   </span>
   <span class="absValue">
-    (0/4)
+    (52/55)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    85.5%
   </span>
   <span class="absValue">
-    (0/10)
-  </span>
-</td>
-  </tr>
-<tr>
-  <td class="name"><strong>Total</strong></td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/3)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/4)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/20)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/76)
+    (536/627)
   </span>
 </td>
 </tr>
+
 </table>
 
 <br/>
@@ -150,202 +99,115 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.components.transaction
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.components.settings
 &nbsp;
-&nbsp;import androidx.compose.material3.AlertDialog
-&nbsp;import androidx.compose.material3.Button
-&nbsp;import androidx.compose.material3.ButtonDefaults
-&nbsp;import androidx.compose.material3.Icon
+&nbsp;import androidx.compose.foundation.background
+&nbsp;import androidx.compose.foundation.clickable
+&nbsp;import androidx.compose.foundation.layout.Arrangement
+&nbsp;import androidx.compose.foundation.layout.Box
+&nbsp;import androidx.compose.foundation.layout.Column
+&nbsp;import androidx.compose.foundation.layout.Row
+&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
+&nbsp;import androidx.compose.foundation.layout.padding
+&nbsp;import androidx.compose.foundation.layout.size
+&nbsp;import androidx.compose.foundation.shape.CircleShape
+&nbsp;import androidx.compose.foundation.shape.RoundedCornerShape
 &nbsp;import androidx.compose.material3.Text
-&nbsp;import androidx.compose.material3.TextButton
 &nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.ui.Alignment
 &nbsp;import androidx.compose.ui.Modifier
+&nbsp;import androidx.compose.ui.draw.clip
+&nbsp;import androidx.compose.ui.draw.shadow
 &nbsp;import androidx.compose.ui.platform.testTag
-&nbsp;import androidx.compose.ui.text.style.TextAlign
+&nbsp;import androidx.compose.ui.text.style.TextOverflow
 &nbsp;import androidx.compose.ui.tooling.preview.Preview
-&nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
-&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
+&nbsp;import androidx.compose.ui.unit.dp
 &nbsp;import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
-&nbsp;import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 &nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
-&nbsp;import moneysurfer.uikit.generated.resources.Res
-&nbsp;import moneysurfer.uikit.generated.resources.uikit_transaction_delete_cancel
-&nbsp;import moneysurfer.uikit.generated.resources.uikit_transaction_delete_confirm
-&nbsp;import moneysurfer.uikit.generated.resources.uikit_transaction_delete_message
-&nbsp;import moneysurfer.uikit.generated.resources.uikit_transaction_delete_message_generic
-&nbsp;import moneysurfer.uikit.generated.resources.uikit_transaction_delete_split_message
-&nbsp;import moneysurfer.uikit.generated.resources.uikit_transaction_delete_split_message_generic
-&nbsp;import moneysurfer.uikit.generated.resources.uikit_transaction_delete_split_title
-&nbsp;import moneysurfer.uikit.generated.resources.uikit_transaction_delete_title
-&nbsp;import moneysurfer.uikit.generated.resources.uikit_transaction_delete_transfer_message
-&nbsp;import moneysurfer.uikit.generated.resources.uikit_transaction_delete_transfer_message_generic
-&nbsp;import moneysurfer.uikit.generated.resources.uikit_transaction_delete_transfer_title
-&nbsp;import org.jetbrains.compose.resources.StringResource
-&nbsp;import org.jetbrains.compose.resources.stringResource
 &nbsp;
 &nbsp;/**
-&nbsp; * Stable selectors for the shared delete dialog — see docs/testing/testing-strategy.md.
+&nbsp; * Hero card with avatar initial, name, email, and an optional trailing chevron.
+&nbsp; * Used at the top of the Settings hub.
 &nbsp; *
-&nbsp; * The value keeps its `transactionDetails:` prefix even though the dialog is no longer owned by
-&nbsp; * that screen: it is the id two Maestro flows already tap (`08`, `17`), and renaming it would
-&nbsp; * break them for nothing. The prefix names where the flows first meet this dialog, not where the
-&nbsp; * composable lives.
-&nbsp; */
-&nbsp;object SurferDeleteTransactionDialogTestTags {
-&nbsp;    const val Confirm = &quot;transactionDetails:confirmDelete&quot;
-&nbsp;}
-&nbsp;
-&nbsp;/**
-&nbsp; * The one &quot;delete this transaction?&quot; dialog. Deleting is the same act wherever it is started —
-&nbsp; * the details screen, edit mode on the creation screen, or a swipe on any of the three
-&nbsp; * transaction lists — so a second dialog with its own wording (or its own idea of what Cancel
-&nbsp; * does) would be two answers to one question.
-&nbsp; *
-&nbsp; * It lives in uikit rather than in the transaction feature because those lists span three feature
-&nbsp; * modules, and uikit is the only place all three can see.
-&nbsp; *
-&nbsp; * @param titleOrNull the row&#39;s title, quoted back so the user can see which one is meant; null
-&nbsp; *   falls back to the generic wording rather than quoting an empty string.
-&nbsp; * @param isTransfer whether the row is one leg of a transfer, which changes the copy: a transfer
-&nbsp; *   is deleted whole, so the dialog has to say the money disappears from *both* accounts before
-&nbsp; *   the user agrees to it.
-&nbsp; * @param isSplit whether the row stands for a receipt split across categories, for the same
-&nbsp; *   reason: the delete takes every leg of it, so a user who swiped what looks like one row has to
-&nbsp; *   be told several transactions are about to go. Ignored when [isTransfer] is set — a transfer leg
-&nbsp; *   is never split, and a caller passing both is naming a state the app cannot produce.
+&nbsp; * [nameTestTag] tags the [name] line so a UI test can read the signed-in account without
+&nbsp; * matching localized copy.
 &nbsp; */
 &nbsp;@Composable
-&nbsp;fun SurferDeleteTransactionDialog(
-&nbsp;    titleOrNull: String?,
-&nbsp;    onConfirm: () -&gt; Unit,
-&nbsp;    onDismiss: () -&gt; Unit,
-&nbsp;    isTransfer: Boolean = false,
-&nbsp;    isSplit: Boolean = false,
-&nbsp;) {
-&nbsp;    val variant = DeleteVariant.of(isTransfer = isTransfer, isSplit = isSplit)
-&nbsp;    AlertDialog(
-&nbsp;        onDismissRequest = onDismiss,
-&nbsp;        icon = {
-&nbsp;            Icon(
-&nbsp;                imageVector = SurferIcons.Delete,
-&nbsp;                contentDescription = SurferSemantics.Decorative,
-&nbsp;                tint = AppTheme.materialColors.error,
-&nbsp;            )
-&nbsp;        },
-&nbsp;        title = {
-&nbsp;            Text(
-&nbsp;                text = stringResource(variant.title),
-&nbsp;                textAlign = TextAlign.Center,
-&nbsp;            )
-&nbsp;        },
-&nbsp;        text = {
-&nbsp;            Text(text = deleteMessage(titleOrNull, variant), textAlign = TextAlign.Center)
-&nbsp;        },
-&nbsp;        confirmButton = {
-&nbsp;            Button(
-&nbsp;                onClick = onConfirm,
-&nbsp;                // The dialog is its own window, so the hosting screen&#39;s `surferTestTagAsId()`
-&nbsp;                // does not reach in here — it has to be applied again alongside the tag.
-&nbsp;                modifier = Modifier
-&nbsp;                    .surferTestTagAsId()
-&nbsp;                    .testTag(SurferDeleteTransactionDialogTestTags.Confirm),
-&nbsp;                colors = ButtonDefaults.buttonColors(
-&nbsp;                    containerColor = AppTheme.materialColors.error,
-&nbsp;                    contentColor = AppTheme.materialColors.onError,
-&nbsp;                ),
-&nbsp;            ) {
-&nbsp;                Text(stringResource(Res.string.uikit_transaction_delete_confirm))
-&nbsp;            }
-&nbsp;        },
-&nbsp;        dismissButton = {
-&nbsp;            TextButton(onClick = onDismiss) {
-&nbsp;                Text(stringResource(Res.string.uikit_transaction_delete_cancel))
-&nbsp;            }
-&nbsp;        },
-&nbsp;    )
-&nbsp;}
+&nbsp;fun SurferNameBlock(
+&nbsp;    name: String,
+<b class="fc">&nbsp;    modifier: Modifier = Modifier,</b>
+<b class="fc">&nbsp;    email: String? = null,</b>
+<b class="fc">&nbsp;    initial: String? = null,</b>
+<b class="fc">&nbsp;    onClick: (() -&gt; Unit)? = null,</b>
+&nbsp;    trailing: (@Composable () -&gt; Unit)? = { SurferSettingsChevron(tint = AppTheme.materialColors.onPrimaryContainer) },
+<b class="fc">&nbsp;    nameTestTag: String? = null,</b>
+<b class="pc">&nbsp;) {</b>
+<b class="fc">&nbsp;    val colors = AppTheme.materialColors</b>
+<b class="fc">&nbsp;    val shape = RoundedCornerShape(20.dp)</b>
+<b class="pc">&nbsp;    val computedInitial = initial ?: name.trim().firstOrNull()?.uppercaseChar()?.toString() ?: &quot;?&quot;</b>
 &nbsp;
-&nbsp;/**
-&nbsp; * What is actually being deleted, which is what the copy has to say. Two of the three take more
-&nbsp; * than the row the user pointed at with them, and that is the whole reason the wording differs.
-&nbsp; */
-<b class="nc">&nbsp;private enum class DeleteVariant(</b>
-<b class="nc">&nbsp;    val title: StringResource,</b>
-<b class="nc">&nbsp;    val message: StringResource,</b>
-<b class="nc">&nbsp;    val genericMessage: StringResource,</b>
-&nbsp;) {
-<b class="nc">&nbsp;    Single(</b>
-<b class="nc">&nbsp;        title = Res.string.uikit_transaction_delete_title,</b>
-<b class="nc">&nbsp;        message = Res.string.uikit_transaction_delete_message,</b>
-<b class="nc">&nbsp;        genericMessage = Res.string.uikit_transaction_delete_message_generic,</b>
-&nbsp;    ),
-<b class="nc">&nbsp;    Transfer(</b>
-<b class="nc">&nbsp;        title = Res.string.uikit_transaction_delete_transfer_title,</b>
-<b class="nc">&nbsp;        message = Res.string.uikit_transaction_delete_transfer_message,</b>
-<b class="nc">&nbsp;        genericMessage = Res.string.uikit_transaction_delete_transfer_message_generic,</b>
-&nbsp;    ),
-<b class="nc">&nbsp;    Split(</b>
-<b class="nc">&nbsp;        title = Res.string.uikit_transaction_delete_split_title,</b>
-<b class="nc">&nbsp;        message = Res.string.uikit_transaction_delete_split_message,</b>
-<b class="nc">&nbsp;        genericMessage = Res.string.uikit_transaction_delete_split_message_generic,</b>
-&nbsp;    ),
-&nbsp;    ;
+<b class="fc">&nbsp;    Row(</b>
+<b class="fc">&nbsp;        modifier = modifier</b>
+<b class="fc">&nbsp;            .fillMaxWidth()</b>
+<b class="fc">&nbsp;            .shadow(elevation = 2.dp, shape = shape)</b>
+<b class="fc">&nbsp;            .clip(shape)</b>
+<b class="fc">&nbsp;            .background(colors.primaryContainer)</b>
+<b class="pc">&nbsp;            .let { base -&gt; if (onClick != null) base.clickable(onClick = onClick) else base }</b>
+<b class="fc">&nbsp;            .padding(16.dp),</b>
+<b class="fc">&nbsp;        verticalAlignment = Alignment.CenterVertically,</b>
+<b class="fc">&nbsp;        horizontalArrangement = Arrangement.spacedBy(14.dp),</b>
+&nbsp;    ) {
+<b class="fc">&nbsp;        Box(</b>
+<b class="fc">&nbsp;            modifier = Modifier</b>
+<b class="fc">&nbsp;                .size(56.dp)</b>
+<b class="fc">&nbsp;                .clip(CircleShape)</b>
+<b class="fc">&nbsp;                .background(colors.primary),</b>
+<b class="fc">&nbsp;            contentAlignment = Alignment.Center,</b>
+&nbsp;        ) {
+<b class="fc">&nbsp;            Text(</b>
+<b class="fc">&nbsp;                text = computedInitial,</b>
+<b class="fc">&nbsp;                style = AppTheme.typography.titleLarge,</b>
+<b class="fc">&nbsp;                color = colors.onPrimary,</b>
+&nbsp;            )
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;        Column(modifier = Modifier.weight(1f)) {</b>
+<b class="fc">&nbsp;            Text(</b>
+<b class="fc">&nbsp;                text = name,</b>
+<b class="fc">&nbsp;                style = AppTheme.typography.titleMedium,</b>
+<b class="fc">&nbsp;                color = colors.onPrimaryContainer,</b>
+<b class="fc">&nbsp;                maxLines = 1,</b>
+<b class="fc">&nbsp;                overflow = TextOverflow.Ellipsis,</b>
+<b class="pc">&nbsp;                modifier = nameTestTag?.let { Modifier.testTag(it) } ?: Modifier,</b>
+&nbsp;            )
+<b class="pc">&nbsp;            if (email != null) {</b>
+<b class="fc">&nbsp;                Text(</b>
+<b class="fc">&nbsp;                    text = email,</b>
+<b class="fc">&nbsp;                    style = AppTheme.typography.bodySmall,</b>
+<b class="fc">&nbsp;                    color = colors.onPrimaryContainer.copy(alpha = 0.85f),</b>
+<b class="fc">&nbsp;                    maxLines = 1,</b>
+<b class="fc">&nbsp;                    overflow = TextOverflow.Ellipsis,</b>
+&nbsp;                )
+<b class="fc">&nbsp;            }</b>
+<b class="fc">&nbsp;        }</b>
+<b class="pc">&nbsp;        if (trailing != null) {</b>
+<b class="fc">&nbsp;            trailing()</b>
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;    }</b>
+<b class="fc">&nbsp;}</b>
 &nbsp;
-&nbsp;    companion object {
-<b class="nc">&nbsp;        fun of(isTransfer: Boolean, isSplit: Boolean): DeleteVariant = when {</b>
-<b class="nc">&nbsp;            isTransfer -&gt; Transfer</b>
-<b class="nc">&nbsp;            isSplit -&gt; Split</b>
-<b class="nc">&nbsp;            else -&gt; Single</b>
+&nbsp;@Preview
+&nbsp;@Composable
+<b class="nc">&nbsp;private fun SurferNameBlockPreview() {</b>
+<b class="nc">&nbsp;    SurferComponentPreview {</b>
+&nbsp;        Column(modifier = Modifier.padding(16.dp)) {
+&nbsp;            SurferNameBlock(
+&nbsp;                name = &quot;Kasia Nowak&quot;,
+&nbsp;                email = &quot;kasia@georgeci.com&quot;,
+&nbsp;                onClick = {},
+&nbsp;            )
 &nbsp;        }
 &nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;/** One sentence, quoting the row&#39;s title when there is one to quote. */
-&nbsp;@Composable
-&nbsp;private fun deleteMessage(titleOrNull: String?, variant: DeleteVariant): String =
-&nbsp;    if (titleOrNull != null) {
-&nbsp;        stringResource(variant.message, titleOrNull)
-&nbsp;    } else {
-&nbsp;        stringResource(variant.genericMessage)
-&nbsp;    }
-&nbsp;
-&nbsp;@Preview
-&nbsp;@Composable
-&nbsp;private fun SurferDeleteTransactionDialogPreview() {
-&nbsp;    SurferComponentPreview {
-&nbsp;        SurferDeleteTransactionDialog(
-&nbsp;            titleOrNull = &quot;Starbucks&quot;,
-&nbsp;            onConfirm = {},
-&nbsp;            onDismiss = {},
-&nbsp;        )
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;@Preview
-&nbsp;@Composable
-&nbsp;private fun SurferDeleteTransactionDialogSplitPreview() {
-&nbsp;    SurferComponentPreview {
-&nbsp;        SurferDeleteTransactionDialog(
-&nbsp;            titleOrNull = &quot;Pyaterochka&quot;,
-&nbsp;            onConfirm = {},
-&nbsp;            onDismiss = {},
-&nbsp;            isSplit = true,
-&nbsp;        )
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;@Preview
-&nbsp;@Composable
-&nbsp;private fun SurferDeleteTransactionDialogTransferPreview() {
-&nbsp;    SurferComponentPreview {
-&nbsp;        SurferDeleteTransactionDialog(
-&nbsp;            titleOrNull = &quot;Savings top-up&quot;,
-&nbsp;            onConfirm = {},
-&nbsp;            onDismiss = {},
-&nbsp;            isTransfer = true,
-&nbsp;        )
-&nbsp;    }
-&nbsp;}
+<b class="nc">&nbsp;}</b>
 </code>
 </pre>
 </div>
@@ -369,7 +231,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 21:18</div>
+    <div style="float:right;">generated on 2026-07-28 21:38</div>
 </div>
 </body>
 </html>

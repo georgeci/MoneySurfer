@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SurferSettingsGroupKt</title>
+  <title>MoneySurfer Coverage Report > SurferGoalCardKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.uikit.components.settings</a>
+    <a href="../index.html">com.georgeci.moneysurfer.uikit.components.goal</a>
 </div>
 
-<h1>Coverage Summary for Class: SurferSettingsGroupKt (com.georgeci.moneysurfer.uikit.components.settings)</h1>
+<h1>Coverage Summary for Class: SurferGoalCardKt (com.georgeci.moneysurfer.uikit.components.goal)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SurferSettingsGroupKt</td>
+  <td class="name">SurferGoalCardKt</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -60,34 +60,34 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    50%
+    66.7%
   </span>
   <span class="absValue">
-    (1/2)
+    (2/3)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    57.1%
+    41.7%
   </span>
   <span class="absValue">
-    (8/14)
+    (15/36)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    90.9%
+    94.4%
   </span>
   <span class="absValue">
-    (30/33)
+    (51/54)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    87.9%
+    85.3%
   </span>
   <span class="absValue">
-    (428/487)
+    (621/728)
   </span>
 </td>
 </tr>
@@ -99,96 +99,140 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.components.settings
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.components.goal
 &nbsp;
 &nbsp;import androidx.compose.foundation.layout.Arrangement
 &nbsp;import androidx.compose.foundation.layout.Column
-&nbsp;import androidx.compose.foundation.layout.PaddingValues
+&nbsp;import androidx.compose.foundation.layout.Row
+&nbsp;import androidx.compose.foundation.layout.Spacer
 &nbsp;import androidx.compose.foundation.layout.fillMaxWidth
 &nbsp;import androidx.compose.foundation.layout.padding
+&nbsp;import androidx.compose.foundation.layout.width
 &nbsp;import androidx.compose.material3.Text
 &nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.ui.Alignment
 &nbsp;import androidx.compose.ui.Modifier
+&nbsp;import androidx.compose.ui.draw.alpha
+&nbsp;import androidx.compose.ui.text.font.FontWeight
+&nbsp;import androidx.compose.ui.text.style.TextOverflow
 &nbsp;import androidx.compose.ui.tooling.preview.Preview
 &nbsp;import androidx.compose.ui.unit.dp
-&nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+&nbsp;import com.georgeci.moneysurfer.uikit.atom.SurferCard
 &nbsp;import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
 &nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
 &nbsp;
 &nbsp;/**
-&nbsp; * Section wrapper for a stack of [SurferSettingsRow]s. Optional [title] is rendered above the
-&nbsp; * first row in the primary tint; optional [footnote] sits below the last row in the variant tint.
-&nbsp; *
-&nbsp; * Default horizontal padding (16dp) matches the design&#39;s hub layout. Row gap (8dp) is applied
-&nbsp; * automatically — children should be plain rows, not pre-stacked containers.
+&nbsp; * List card for one savings goal: emoji tile, title, status pill, progress bar and the
+&nbsp; * saved / target line. A PAUSED or ARCHIVED goal is dimmed so a scan of the list reads
+&nbsp; * &quot;these are not moving&quot; without any extra copy.
 &nbsp; */
+&nbsp;@Suppress(&quot;LongParameterList&quot;)
 &nbsp;@Composable
-&nbsp;fun SurferSettingsGroup(
+&nbsp;fun SurferGoalCard(
+&nbsp;    title: String,
+&nbsp;    emoji: String,
+&nbsp;    hue: Int,
+&nbsp;    status: SurferGoalStatus,
+&nbsp;    statusLabel: String,
+&nbsp;    progress: Float,
+&nbsp;    savedLabel: String,
+&nbsp;    targetLabel: String,
+&nbsp;    percentLabel: String,
 <b class="fc">&nbsp;    modifier: Modifier = Modifier,</b>
-<b class="fc">&nbsp;    title: String? = null,</b>
-<b class="fc">&nbsp;    footnote: String? = null,</b>
-<b class="fc">&nbsp;    contentPadding: PaddingValues = PaddingValues(horizontal = 16.dp),</b>
-<b class="fc">&nbsp;    rowSpacing: androidx.compose.ui.unit.Dp = 8.dp,</b>
-&nbsp;    content: @Composable () -&gt; Unit,
+<b class="fc">&nbsp;    caption: String? = null,</b>
+<b class="fc">&nbsp;    onClick: (() -&gt; Unit)? = null,</b>
 <b class="pc">&nbsp;) {</b>
-<b class="fc">&nbsp;    Column(</b>
-<b class="fc">&nbsp;        modifier = modifier</b>
-<b class="fc">&nbsp;            .fillMaxWidth()</b>
-<b class="fc">&nbsp;            .padding(contentPadding)</b>
-<b class="fc">&nbsp;            .padding(bottom = 12.dp),</b>
-&nbsp;    ) {
-<b class="fc">&nbsp;        if (title != null) {</b>
-<b class="fc">&nbsp;            Text(</b>
-<b class="fc">&nbsp;                text = title,</b>
-<b class="fc">&nbsp;                style = AppTheme.typography.labelLarge,</b>
-<b class="fc">&nbsp;                color = AppTheme.materialColors.primary,</b>
-<b class="fc">&nbsp;                modifier = Modifier.padding(start = 8.dp, end = 8.dp, top = 14.dp, bottom = 8.dp),</b>
-&nbsp;            )
+<b class="pc">&nbsp;    val dimmed = status == SurferGoalStatus.Paused || status == SurferGoalStatus.Archived</b>
+<b class="fc">&nbsp;    SurferCard(</b>
+<b class="fc">&nbsp;        modifier = modifier.fillMaxWidth().alpha(if (dimmed) DIMMED_ALPHA else 1f),</b>
+<b class="fc">&nbsp;        onClick = onClick,</b>
+<b class="fc">&nbsp;    ) {</b>
+<b class="fc">&nbsp;        Column(</b>
+<b class="fc">&nbsp;            modifier = Modifier.padding(AppTheme.spacing.default),</b>
+<b class="fc">&nbsp;            verticalArrangement = Arrangement.spacedBy(AppTheme.spacing.medium),</b>
+&nbsp;        ) {
+<b class="fc">&nbsp;            Row(</b>
+<b class="fc">&nbsp;                verticalAlignment = Alignment.CenterVertically,</b>
+<b class="fc">&nbsp;                horizontalArrangement = Arrangement.spacedBy(AppTheme.spacing.medium),</b>
+&nbsp;            ) {
+<b class="fc">&nbsp;                SurferGoalIcon(emoji = emoji, hue = hue)</b>
+<b class="fc">&nbsp;                Column(modifier = Modifier.weight(1f)) {</b>
+<b class="fc">&nbsp;                    Text(</b>
+<b class="fc">&nbsp;                        text = title,</b>
+<b class="fc">&nbsp;                        style = AppTheme.typography.titleMedium.copy(fontWeight = FontWeight.Medium),</b>
+<b class="fc">&nbsp;                        color = AppTheme.materialColors.onSurface,</b>
+<b class="fc">&nbsp;                        maxLines = 1,</b>
+<b class="fc">&nbsp;                        overflow = TextOverflow.Ellipsis,</b>
+&nbsp;                    )
+<b class="fc">&nbsp;                    if (caption != null) {</b>
+<b class="fc">&nbsp;                        Text(</b>
+<b class="fc">&nbsp;                            text = caption,</b>
+<b class="fc">&nbsp;                            style = AppTheme.typography.bodySmall,</b>
+<b class="fc">&nbsp;                            color = AppTheme.materialColors.onSurfaceVariant,</b>
+<b class="fc">&nbsp;                            maxLines = 1,</b>
+<b class="fc">&nbsp;                            overflow = TextOverflow.Ellipsis,</b>
+&nbsp;                        )
+<b class="fc">&nbsp;                    }</b>
+<b class="fc">&nbsp;                }</b>
+<b class="fc">&nbsp;                Spacer(Modifier.width(AppTheme.spacing.small))</b>
+<b class="fc">&nbsp;                SurferGoalStatusPill(status = status, label = statusLabel)</b>
+<b class="fc">&nbsp;            }</b>
+&nbsp;
+<b class="fc">&nbsp;            SurferGoalProgressBar(progress = progress, color = goalAccentColor(hue))</b>
+&nbsp;
+<b class="fc">&nbsp;            Row(</b>
+<b class="fc">&nbsp;                modifier = Modifier.fillMaxWidth(),</b>
+<b class="fc">&nbsp;                verticalAlignment = Alignment.CenterVertically,</b>
+<b class="fc">&nbsp;                horizontalArrangement = Arrangement.SpaceBetween,</b>
+&nbsp;            ) {
+<b class="fc">&nbsp;                Text(</b>
+<b class="fc">&nbsp;                    text = &quot;$savedLabel / $targetLabel&quot;,</b>
+<b class="fc">&nbsp;                    style = AppTheme.typography.bodyMedium,</b>
+<b class="fc">&nbsp;                    color = AppTheme.materialColors.onSurface,</b>
+&nbsp;                )
+<b class="fc">&nbsp;                Text(</b>
+<b class="fc">&nbsp;                    text = percentLabel,</b>
+<b class="fc">&nbsp;                    style = AppTheme.typography.labelLarge,</b>
+<b class="fc">&nbsp;                    color = AppTheme.materialColors.onSurfaceVariant,</b>
+&nbsp;                )
+<b class="fc">&nbsp;            }</b>
 <b class="fc">&nbsp;        }</b>
-<b class="fc">&nbsp;        Column(verticalArrangement = Arrangement.spacedBy(rowSpacing)) {</b>
-<b class="fc">&nbsp;            content()</b>
-<b class="fc">&nbsp;        }</b>
-<b class="fc">&nbsp;        if (footnote != null) {</b>
-<b class="fc">&nbsp;            Text(</b>
-<b class="fc">&nbsp;                text = footnote,</b>
-<b class="fc">&nbsp;                style = AppTheme.typography.bodySmall,</b>
-<b class="fc">&nbsp;                color = AppTheme.materialColors.onSurfaceVariant,</b>
-<b class="fc">&nbsp;                modifier = Modifier.padding(start = 8.dp, end = 8.dp, top = 8.dp),</b>
-&nbsp;            )
-<b class="fc">&nbsp;        }</b>
-<b class="fc">&nbsp;    }</b>
+&nbsp;    }
 <b class="fc">&nbsp;}</b>
+&nbsp;
+&nbsp;private const val DIMMED_ALPHA = 0.7f
 &nbsp;
 &nbsp;@Preview
 &nbsp;@Composable
-<b class="nc">&nbsp;private fun SurferSettingsGroupPreview() {</b>
+<b class="nc">&nbsp;private fun SurferGoalCardPreview() {</b>
 <b class="nc">&nbsp;    SurferComponentPreview {</b>
-&nbsp;        Column {
-&nbsp;            SurferSettingsGroup(title = &quot;Personalization&quot;) {
-&nbsp;                SurferSettingsRow(
-&nbsp;                    icon = SurferIcons.Palette,
-&nbsp;                    title = &quot;Appearance&quot;,
-&nbsp;                    supportingText = &quot;Plum · Light&quot;,
-&nbsp;                    trailing = { SurferSettingsChevron() },
-&nbsp;                    onClick = {},
-&nbsp;                )
-&nbsp;                SurferSettingsRow(
-&nbsp;                    icon = SurferIcons.Notifications,
-&nbsp;                    title = &quot;Notifications&quot;,
-&nbsp;                    trailing = { SurferSettingsSwitch(checked = true, onCheckedChange = {}) },
-&nbsp;                )
-&nbsp;            }
-&nbsp;            SurferSettingsGroup(
-&nbsp;                title = &quot;Color source&quot;,
-&nbsp;                footnote = &quot;Use a fixed accent, or match your wallpaper automatically.&quot;,
-&nbsp;            ) {
-&nbsp;                SurferSettingsRow(
-&nbsp;                    icon = SurferIcons.Sparkle,
-&nbsp;                    title = &quot;Dynamic colors&quot;,
-&nbsp;                    supportingText = &quot;Match wallpaper palette&quot;,
-&nbsp;                    trailing = { SurferSettingsSwitch(checked = false, onCheckedChange = {}) },
-&nbsp;                )
-&nbsp;            }
+&nbsp;        Column(
+&nbsp;            modifier = Modifier.padding(16.dp),
+&nbsp;            verticalArrangement = Arrangement.spacedBy(12.dp),
+&nbsp;        ) {
+&nbsp;            SurferGoalCard(
+&nbsp;                title = &quot;Emergency fund&quot;,
+&nbsp;                emoji = &quot;☂️&quot;,
+&nbsp;                hue = 210,
+&nbsp;                status = SurferGoalStatus.Active,
+&nbsp;                statusLabel = &quot;Active&quot;,
+&nbsp;                progress = 0.74f,
+&nbsp;                savedLabel = &quot;€8,915&quot;,
+&nbsp;                targetLabel = &quot;€12,000&quot;,
+&nbsp;                percentLabel = &quot;74%&quot;,
+&nbsp;                caption = &quot;by Aug 2026&quot;,
+&nbsp;            )
+&nbsp;            SurferGoalCard(
+&nbsp;                title = &quot;Lisbon trip&quot;,
+&nbsp;                emoji = &quot;🏖️&quot;,
+&nbsp;                hue = 30,
+&nbsp;                status = SurferGoalStatus.Paused,
+&nbsp;                statusLabel = &quot;Paused&quot;,
+&nbsp;                progress = 0.62f,
+&nbsp;                savedLabel = &quot;€1,480&quot;,
+&nbsp;                targetLabel = &quot;€2,400&quot;,
+&nbsp;                percentLabel = &quot;62%&quot;,
+&nbsp;            )
 &nbsp;        }
 &nbsp;    }
 <b class="nc">&nbsp;}</b>
@@ -215,7 +259,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 21:18</div>
+    <div style="float:right;">generated on 2026-07-28 21:38</div>
 </div>
 </body>
 </html>

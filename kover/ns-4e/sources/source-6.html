@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > BackupPickerLauncher</title>
+  <title>MoneySurfer Coverage Report > ComposableSingletons</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.feature.settings.backup</a>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.settings.appearance</a>
 </div>
 
-<h1>Coverage Summary for Class: BackupPickerLauncher (com.georgeci.moneysurfer.feature.settings.backup)</h1>
+<h1>Coverage Summary for Class: ComposableSingletons (com.georgeci.moneysurfer.feature.settings.appearance)</h1>
 
 <table class="coverageStats">
 
@@ -45,42 +45,14 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   Instruction, %
 </th>
 </tr>
-<tr>
-  <td class="name">BackupPickerLauncher</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
-  </span>
-</td>
-</tr>
   <tr>
-    <td class="name">BackupPickerLauncher$DefaultImpls</td>
+    <td class="name">ComposableSingletons$AppearanceScreenKt</td>
 <td class="coverageStat">
   <span class="percent">
     0%
   </span>
   <span class="absValue">
-    (0/1)
+    (0/15)
   </span>
 </td>
     <td class="coverageStat"/>
@@ -89,7 +61,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/1)
+    (0/20)
   </span>
 </td>
 <td class="coverageStat">
@@ -97,7 +69,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/3)
+    (0/317)
   </span>
 </td>
   </tr>
@@ -108,7 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/2)
+    (0/15)
   </span>
 </td>
     <td class="coverageStat"/>
@@ -117,7 +89,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/2)
+    (0/20)
   </span>
 </td>
 <td class="coverageStat">
@@ -125,7 +97,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/4)
+    (0/317)
   </span>
 </td>
 </tr>
@@ -134,80 +106,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <br/>
 <br/>
 
-
-<pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.settings.backup
-&nbsp;
-&nbsp;import androidx.compose.runtime.Composable
-&nbsp;import okio.BufferedSink
-&nbsp;import okio.BufferedSource
-&nbsp;
-&nbsp;/**
-&nbsp; * Hides the platform-specific file picker behind a Composable factory.
-&nbsp; *
-&nbsp; * Backed per platform by:
-&nbsp; *  - **Android**: `ActivityResultContracts.CreateDocument` / `OpenDocument`
-&nbsp; *    via `rememberLauncherForActivityResult`.
-&nbsp; *  - **JVM**: `java.awt.FileDialog`.
-&nbsp; *  - **iOS**: `UIDocumentPickerViewController`, staging through a temp file in
-&nbsp; *    both directions (see `BackupPickerLauncher.ios.kt`).
-&nbsp; *
-&nbsp; * Completion (or cancellation) calls [onSavePicked] / [onOpenPicked] with the
-&nbsp; * chosen sink/source, or `null` when the user cancelled.
-&nbsp; */
-&nbsp;@Composable
-&nbsp;expect fun rememberBackupPickerLauncher(
-&nbsp;    format: BackupPickerFormat,
-&nbsp;    onSavePicked: (BufferedSink?) -&gt; Unit,
-&nbsp;    onOpenPicked: (BufferedSource?) -&gt; Unit,
-&nbsp;): BackupPickerLauncher
-&nbsp;
-&nbsp;interface BackupPickerLauncher {
-&nbsp;    fun launchSave(suggestedName: String)
-&nbsp;    fun launchOpen()
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Reports how the write into the last [launchSave] sink ended.
-&nbsp;     *
-&nbsp;     * **Every screen that calls [launchSave] must call this exactly once per
-&nbsp;     * export**, as soon as it knows the outcome — on iOS the archive is staged
-&nbsp;     * in a temp file and the &quot;where do I put it&quot; picker only appears from here.
-&nbsp;     * Closing the sink cannot stand in for it: an aborted export closes its sink
-&nbsp;     * too, and acting on that would offer the user a truncated archive.
-&nbsp;     *
-&nbsp;     * No-op on Android and JVM, where the picker already chose the destination
-&nbsp;     * before a single byte was written.
-&nbsp;     */
-<b class="nc">&nbsp;    fun onSaveCompleted(succeeded: Boolean) = Unit</b>
-&nbsp;}
-&nbsp;
-&nbsp;/**
-&nbsp; * File format the picker is launched for. Android consumes the MIME types
-&nbsp; * directly (SAF document contracts) and iOS resolves them to uniform type
-&nbsp; * identifiers; JVM&#39;s `FileDialog` ignores them. `application/octet-stream`
-&nbsp; * stays in the open list because some providers report generic types for
-&nbsp; * perfectly valid files.
-&nbsp; */
-&nbsp;enum class BackupPickerFormat(
-&nbsp;    val saveMimeType: String,
-&nbsp;    val openMimeTypes: List&lt;String&gt;,
-&nbsp;) {
-&nbsp;    Zip(
-&nbsp;        saveMimeType = &quot;application/zip&quot;,
-&nbsp;        openMimeTypes = listOf(&quot;application/zip&quot;, &quot;application/octet-stream&quot;),
-&nbsp;    ),
-&nbsp;    Csv(
-&nbsp;        saveMimeType = &quot;text/csv&quot;,
-&nbsp;        openMimeTypes = listOf(
-&nbsp;            &quot;text/csv&quot;,
-&nbsp;            &quot;text/comma-separated-values&quot;,
-&nbsp;            &quot;text/plain&quot;,
-&nbsp;            &quot;application/octet-stream&quot;,
-&nbsp;        ),
-&nbsp;    ),
-&nbsp;}
-</code>
-</pre>
+  <code class="sourceCode">Source code is not available<br /></code>
 </div>
 
 <script type="text/javascript">
@@ -229,7 +128,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 21:18</div>
+    <div style="float:right;">generated on 2026-07-28 21:38</div>
 </div>
 </body>
 </html>

@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > BudgetDetailsState</title>
+  <title>MoneySurfer Coverage Report > BudgetPreviewDataKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,15 +19,18 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.feature.budget.details</a>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.budget</a>
 </div>
 
-<h1>Coverage Summary for Class: BudgetDetailsState (com.georgeci.moneysurfer.feature.budget.details)</h1>
+<h1>Coverage Summary for Class: BudgetPreviewDataKt (com.georgeci.moneysurfer.feature.budget)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -45,115 +48,14 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   Instruction, %
 </th>
 </tr>
-  <tr>
-    <td class="name">BudgetDetailsState$Companion</td>
-    <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">BudgetDetailsState$Content</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/3)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/12)
-  </span>
-</td>
-  </tr>
-  <tr>
-    <td class="name">BudgetDetailsState$Content$Companion</td>
-    <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">BudgetDetailsState$Loading</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/2)
-  </span>
-</td>
-  </tr>
-  <tr>
-    <td class="name">BudgetDetailsState$Missing</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/2)
-  </span>
-</td>
-  </tr>
 <tr>
-  <td class="name"><strong>Total</strong></td>
+  <td class="name">BudgetPreviewDataKt</td>
 <td class="coverageStat">
   <span class="percent">
     0%
   </span>
   <span class="absValue">
-    (0/3)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/5)
+    (0/1)
   </span>
 </td>
 <td class="coverageStat">
@@ -161,10 +63,35 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/16)
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/27)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/43)
   </span>
 </td>
 </tr>
+
 </table>
 
 <br/>
@@ -172,138 +99,45 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.budget.details
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.budget
 &nbsp;
-&nbsp;import arrow.optics.optics
-&nbsp;import com.georgeci.moneysurfer.domain.formatter.MoneyFormatter
-&nbsp;import com.georgeci.moneysurfer.domain.model.CategorizedTransaction
+&nbsp;import com.georgeci.moneysurfer.domain.model.BudgetPeriod
+&nbsp;import com.georgeci.moneysurfer.domain.model.BudgetStatus
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.BudgetId
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionId
-&nbsp;import com.georgeci.moneysurfer.domain.repositories.BudgetRepository
-&nbsp;import com.georgeci.moneysurfer.domain.usecase.ArchiveBudgetUseCase
-&nbsp;import com.georgeci.moneysurfer.domain.usecase.GetBudgetProgressUseCase
-&nbsp;import com.georgeci.moneysurfer.domain.usecase.GetBudgetTransactionsUseCase
-&nbsp;import com.georgeci.moneysurfer.domain.usecase.GetCategoriesUseCase
-&nbsp;import com.georgeci.moneysurfer.feature.budget.BudgetUi
-&nbsp;import com.georgeci.moneysurfer.feature.budget.formatShortDate
-&nbsp;import com.georgeci.moneysurfer.feature.budget.toUi
-&nbsp;import com.georgeci.moneysurfer.utils.MviViewModel
-&nbsp;import kotlinx.coroutines.ExperimentalCoroutinesApi
-&nbsp;import kotlinx.coroutines.flow.combine
-&nbsp;import kotlinx.coroutines.flow.flatMapLatest
-&nbsp;import kotlinx.coroutines.flow.flowOf
-&nbsp;import org.koin.core.annotation.KoinViewModel
 &nbsp;
-&nbsp;@KoinViewModel
-&nbsp;@OptIn(ExperimentalCoroutinesApi::class)
-&nbsp;class BudgetDetailsViewModel(
-&nbsp;    private val budgetId: BudgetId,
-&nbsp;    private val budgetRepository: BudgetRepository,
-&nbsp;    private val getBudgetProgress: GetBudgetProgressUseCase,
-&nbsp;    private val getBudgetTransactions: GetBudgetTransactionsUseCase,
-&nbsp;    private val getCategories: GetCategoriesUseCase,
-&nbsp;    private val archiveBudget: ArchiveBudgetUseCase,
-&nbsp;) : MviViewModel&lt;BudgetDetailsState, BudgetDetailsEvent, BudgetDetailsEffect&gt;(
-&nbsp;    initialState = BudgetDetailsState.Loading,
-&nbsp;) {
-&nbsp;
-&nbsp;    init {
-&nbsp;        observeBudget()
-&nbsp;    }
-&nbsp;
-&nbsp;    override fun onEvent(event: BudgetDetailsEvent) {
-&nbsp;        when (event) {
-&nbsp;            BudgetDetailsEvent.OnBackClick -&gt; postSideEffect(BudgetDetailsEffect.NavigateBack)
-&nbsp;            BudgetDetailsEvent.OnEditClick -&gt; postSideEffect(BudgetDetailsEffect.NavigateToBudgetEdit(budgetId))
-&nbsp;            BudgetDetailsEvent.OnArchiveClick -&gt; toggleArchive()
-&nbsp;            is BudgetDetailsEvent.OnTransactionClick -&gt;
-&nbsp;                postSideEffect(BudgetDetailsEffect.NavigateToTransactionDetails(event.transactionId))
-&nbsp;        }
-&nbsp;    }
-&nbsp;
-&nbsp;    private fun toggleArchive() {
-&nbsp;        val content = currentState as? BudgetDetailsState.Content ?: return
-&nbsp;        launch { archiveBudget(budgetId, isActive = !content.budget.isActive) }
-&nbsp;    }
-&nbsp;
-&nbsp;    /**
-&nbsp;     * The budget itself is read once and then re-read through the progress stream: progress
-&nbsp;     * recomputes on every transaction change, and an edit to the budget lands as a new emission
-&nbsp;     * of the repository flow feeding it.
-&nbsp;     */
-&nbsp;    private fun observeBudget() {
-&nbsp;        launch {
-&nbsp;            budgetRepository.getAll()
-&nbsp;                .flatMapLatest { budgets -&gt;
-&nbsp;                    val budget = budgets.firstOrNull { it.id == budgetId }
-&nbsp;                        ?: return@flatMapLatest flowOf(null)
-&nbsp;                    combine(
-&nbsp;                        getBudgetProgress(budget),
-&nbsp;                        getBudgetTransactions(budget),
-&nbsp;                        getCategories(),
-&nbsp;                    ) { progress, transactions, categories -&gt;
-&nbsp;                        val categoriesById = categories.associateBy { it.id.value }
-&nbsp;                        BudgetDetailsState.Content(
-&nbsp;                            budget = progress.toUi(categoriesById),
-&nbsp;                            transactions = transactions.map { it.toUi() },
-&nbsp;                        )
-&nbsp;                    }
-&nbsp;                }
-&nbsp;                .collect { content -&gt;
-&nbsp;                    updateState { content ?: BudgetDetailsState.Missing }
-&nbsp;                }
-&nbsp;        }
-&nbsp;    }
-&nbsp;
-&nbsp;    private fun CategorizedTransaction.toUi() = BudgetTransactionUi(
-&nbsp;        id = transaction.id,
-&nbsp;        title = transaction.merchant.takeIf { it.isNotBlank() }
-&nbsp;            ?: transaction.note.takeIf { it.isNotBlank() }
-&nbsp;            ?: categoryName.orEmpty(),
-&nbsp;        categoryName = categoryName,
-&nbsp;        amountFormatted = MoneyFormatter.format(transaction.money.abs(), transaction.currencyCode),
-&nbsp;        dateLabel = formatShortDate(transaction.operationDate),
-&nbsp;    )
-&nbsp;}
-&nbsp;
-&nbsp;@optics
-&nbsp;sealed interface BudgetDetailsState {
-<b class="nc">&nbsp;    data object Loading : BudgetDetailsState</b>
-&nbsp;
-&nbsp;    /** The budget was deleted — on another device, or from the list behind this screen. */
-<b class="nc">&nbsp;    data object Missing : BudgetDetailsState</b>
-&nbsp;
-<b class="nc">&nbsp;    @optics</b>
-&nbsp;    data class Content(
-<b class="nc">&nbsp;        val budget: BudgetUi,</b>
-<b class="nc">&nbsp;        val transactions: List&lt;BudgetTransactionUi&gt;,</b>
-&nbsp;    ) : BudgetDetailsState {
-&nbsp;        companion object
-&nbsp;    }
-&nbsp;
-&nbsp;    companion object
-&nbsp;}
-&nbsp;
-&nbsp;data class BudgetTransactionUi(
-&nbsp;    val id: TransactionId,
-&nbsp;    val title: String,
-&nbsp;    val categoryName: String?,
-&nbsp;    val amountFormatted: String,
-&nbsp;    val dateLabel: String,
+&nbsp;/**
+&nbsp; * Sample data for `@Preview`s only — never referenced from a screen at runtime. Takes only the
+&nbsp; * fields the previews actually vary; everything else is fixed here.
+&nbsp; */
+&nbsp;internal fun previewBudget(
+<b class="nc">&nbsp;    name: String = &quot;Groceries&quot;,</b>
+<b class="nc">&nbsp;    status: BudgetStatus = BudgetStatus.WARN,</b>
+<b class="nc">&nbsp;    progress: Float = 0.78f,</b>
+<b class="nc">&nbsp;): BudgetUi = BudgetUi(</b>
+<b class="nc">&nbsp;    id = BudgetId(&quot;b-1&quot;),</b>
+<b class="nc">&nbsp;    name = name,</b>
+<b class="nc">&nbsp;    status = status,</b>
+<b class="nc">&nbsp;    spentFormatted = &quot;€312.40&quot;,</b>
+<b class="nc">&nbsp;    limitFormatted = &quot;€400.00&quot;,</b>
+<b class="nc">&nbsp;    remainderFormatted = &quot;€87.60&quot;,</b>
+<b class="nc">&nbsp;    isOver = status == BudgetStatus.OVER,</b>
+<b class="nc">&nbsp;    progress = progress,</b>
+<b class="nc">&nbsp;    alertFraction = 0.8f,</b>
+<b class="nc">&nbsp;    alertPercent = 80,</b>
+<b class="nc">&nbsp;    percent = (progress * 100).toInt(),</b>
+<b class="nc">&nbsp;    period = BudgetPeriod.MONTHLY,</b>
+<b class="nc">&nbsp;    windowLabel = &quot;1 Apr – 30 Apr&quot;,</b>
+<b class="nc">&nbsp;    daysLeft = 12,</b>
+<b class="nc">&nbsp;    elapsedDays = 18,</b>
+<b class="nc">&nbsp;    categories = emptyList(),</b>
+<b class="nc">&nbsp;    isActive = true,</b>
+<b class="nc">&nbsp;    hasMixedCurrency = false,</b>
+<b class="nc">&nbsp;    rolloverCarryFormatted = null,</b>
+<b class="nc">&nbsp;    dailyAverageFormatted = &quot;€17.35&quot;,</b>
+<b class="nc">&nbsp;    projectedTotalFormatted = &quot;€520.50&quot;,</b>
+<b class="nc">&nbsp;    perDayRemainingFormatted = &quot;€7.30&quot;,</b>
+<b class="nc">&nbsp;    overspendFormatted = &quot;€0.00&quot;,</b>
 &nbsp;)
-&nbsp;
-&nbsp;sealed interface BudgetDetailsEvent {
-&nbsp;    data object OnBackClick : BudgetDetailsEvent
-&nbsp;    data object OnEditClick : BudgetDetailsEvent
-&nbsp;    data object OnArchiveClick : BudgetDetailsEvent
-&nbsp;    data class OnTransactionClick(val transactionId: TransactionId) : BudgetDetailsEvent
-&nbsp;}
-&nbsp;
-&nbsp;sealed interface BudgetDetailsEffect {
-&nbsp;    data object NavigateBack : BudgetDetailsEffect
-&nbsp;    data class NavigateToBudgetEdit(val budgetId: BudgetId) : BudgetDetailsEffect
-&nbsp;    data class NavigateToTransactionDetails(val transactionId: TransactionId) : BudgetDetailsEffect
-&nbsp;}
 </code>
 </pre>
 </div>
@@ -327,7 +161,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 21:18</div>
+    <div style="float:right;">generated on 2026-07-28 21:38</div>
 </div>
 </body>
 </html>

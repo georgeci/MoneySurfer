@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > BudgetDetailsState_Content__OpticsKt</title>
+  <title>MoneySurfer Coverage Report > BudgetUi</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.feature.budget.details</a>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.budget</a>
 </div>
 
-<h1>Coverage Summary for Class: BudgetDetailsState_Content__OpticsKt (com.georgeci.moneysurfer.feature.budget.details)</h1>
+<h1>Coverage Summary for Class: BudgetUi (com.georgeci.moneysurfer.feature.budget)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,38 +49,38 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">BudgetDetailsState_Content__OpticsKt</td>
+  <td class="name">BudgetUi</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/12)
+    (1/1)
   </span>
 </td>
     <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/12)
+    (24/24)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/52)
+    (117/117)
   </span>
 </td>
 </tr>
@@ -92,31 +92,139 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.budget.details
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.budget
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.feature.budget.details.BudgetDetailsState.Content as comgeorgecimoneysurferfeaturebudgetdetailsBudgetDetailsStateContent
+&nbsp;import com.georgeci.moneysurfer.domain.formatter.MoneyFormatter
+&nbsp;import com.georgeci.moneysurfer.domain.model.BudgetPeriod
+&nbsp;import com.georgeci.moneysurfer.domain.model.BudgetProgress
+&nbsp;import com.georgeci.moneysurfer.domain.model.BudgetStatus
+&nbsp;import com.georgeci.moneysurfer.domain.model.Category
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.BudgetId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
+&nbsp;import com.georgeci.moneysurfer.uikit.components.budget.SurferBudgetStatus
+&nbsp;import kotlinx.datetime.DateTimeUnit
+&nbsp;import kotlinx.datetime.LocalDate
+&nbsp;import kotlinx.datetime.daysUntil
+&nbsp;import kotlinx.datetime.minus
 &nbsp;
-<b class="nc">&nbsp;public  val com.georgeci.moneysurfer.feature.budget.details.BudgetDetailsState.Content.Companion.`budget`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.budget.details.BudgetDetailsState.Content, com.georgeci.moneysurfer.feature.budget.BudgetUi&gt;  get() = arrow.optics.Lens(</b>
-<b class="nc">&nbsp;  get = { content: com.georgeci.moneysurfer.feature.budget.details.BudgetDetailsState.Content -&gt; content.`budget` },</b>
-&nbsp;  set = { content: com.georgeci.moneysurfer.feature.budget.details.BudgetDetailsState.Content, value: com.georgeci.moneysurfer.feature.budget.BudgetUi -&gt;
-<b class="nc">&nbsp;  content.copy(`budget` = value)</b>
-&nbsp;}
+&nbsp;/** A category as a budget screen needs it: enough to draw a bubble and name it. */
+&nbsp;data class BudgetCategoryUi(
+&nbsp;    val id: String,
+&nbsp;    val name: String,
+&nbsp;    val iconKey: String,
+&nbsp;    val hue: Int,
+&nbsp;    val systemKind: String?,
 &nbsp;)
 &nbsp;
-<b class="nc">&nbsp;public  val com.georgeci.moneysurfer.feature.budget.details.BudgetDetailsState.Content.Companion.`transactions`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.budget.details.BudgetDetailsState.Content, kotlin.collections.List&lt;com.georgeci.moneysurfer.feature.budget.details.BudgetTransactionUi&gt;&gt;  get() = arrow.optics.Lens(</b>
-<b class="nc">&nbsp;  get = { content: com.georgeci.moneysurfer.feature.budget.details.BudgetDetailsState.Content -&gt; content.`transactions` },</b>
-&nbsp;  set = { content: com.georgeci.moneysurfer.feature.budget.details.BudgetDetailsState.Content, value: kotlin.collections.List&lt;com.georgeci.moneysurfer.feature.budget.details.BudgetTransactionUi&gt; -&gt;
-<b class="nc">&nbsp;  content.copy(`transactions` = value)</b>
-&nbsp;}
+&nbsp;/** One budget, pre-formatted for the list and the details header. */
+<b class="fc">&nbsp;data class BudgetUi(</b>
+<b class="fc">&nbsp;    val id: BudgetId,</b>
+<b class="fc">&nbsp;    val name: String,</b>
+<b class="fc">&nbsp;    val status: BudgetStatus,</b>
+<b class="fc">&nbsp;    val spentFormatted: String,</b>
+<b class="fc">&nbsp;    val limitFormatted: String,</b>
+&nbsp;    /** Always positive — the sign lives in [isOver], which picks the wording. */
+<b class="fc">&nbsp;    val remainderFormatted: String,</b>
+<b class="fc">&nbsp;    val isOver: Boolean,</b>
+<b class="fc">&nbsp;    val progress: Float,</b>
+<b class="fc">&nbsp;    val alertFraction: Float,</b>
+<b class="fc">&nbsp;    val alertPercent: Int,</b>
+<b class="fc">&nbsp;    val percent: Int,</b>
+<b class="fc">&nbsp;    val period: BudgetPeriod,</b>
+<b class="fc">&nbsp;    val windowLabel: String,</b>
+<b class="fc">&nbsp;    val daysLeft: Int,</b>
+<b class="fc">&nbsp;    val elapsedDays: Int,</b>
+<b class="fc">&nbsp;    val categories: List&lt;BudgetCategoryUi&gt;,</b>
+<b class="fc">&nbsp;    val isActive: Boolean,</b>
+<b class="fc">&nbsp;    val hasMixedCurrency: Boolean,</b>
+<b class="fc">&nbsp;    val rolloverCarryFormatted: String?,</b>
+<b class="fc">&nbsp;    val dailyAverageFormatted: String,</b>
+<b class="fc">&nbsp;    val projectedTotalFormatted: String,</b>
+<b class="fc">&nbsp;    val perDayRemainingFormatted: String,</b>
+<b class="fc">&nbsp;    val overspendFormatted: String,</b>
 &nbsp;)
 &nbsp;
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.budget.details.BudgetDetailsState.Content&gt;.`budget`: arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.budget.BudgetUi&gt;  get() = this + comgeorgecimoneysurferfeaturebudgetdetailsBudgetDetailsStateContent.`budget`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.budget.details.BudgetDetailsState.Content&gt;.`budget`: arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.budget.BudgetUi&gt;  get() = this + comgeorgecimoneysurferfeaturebudgetdetailsBudgetDetailsStateContent.`budget`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.budget.details.BudgetDetailsState.Content&gt;.`budget`: arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.budget.BudgetUi&gt;  get() = this + comgeorgecimoneysurferfeaturebudgetdetailsBudgetDetailsStateContent.`budget`</b>
+&nbsp;fun BudgetStatus.toUi(): SurferBudgetStatus = when (this) {
+&nbsp;    BudgetStatus.OK -&gt; SurferBudgetStatus.Ok
+&nbsp;    BudgetStatus.WARN -&gt; SurferBudgetStatus.Warn
+&nbsp;    BudgetStatus.OVER -&gt; SurferBudgetStatus.Over
+&nbsp;}
 &nbsp;
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.budget.details.BudgetDetailsState.Content&gt;.`transactions`: arrow.optics.Lens&lt;__S, kotlin.collections.List&lt;com.georgeci.moneysurfer.feature.budget.details.BudgetTransactionUi&gt;&gt;  get() = this + comgeorgecimoneysurferfeaturebudgetdetailsBudgetDetailsStateContent.`transactions`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.budget.details.BudgetDetailsState.Content&gt;.`transactions`: arrow.optics.Optional&lt;__S, kotlin.collections.List&lt;com.georgeci.moneysurfer.feature.budget.details.BudgetTransactionUi&gt;&gt;  get() = this + comgeorgecimoneysurferfeaturebudgetdetailsBudgetDetailsStateContent.`transactions`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.budget.details.BudgetDetailsState.Content&gt;.`transactions`: arrow.optics.Traversal&lt;__S, kotlin.collections.List&lt;com.georgeci.moneysurfer.feature.budget.details.BudgetTransactionUi&gt;&gt;  get() = this + comgeorgecimoneysurferfeaturebudgetdetailsBudgetDetailsStateContent.`transactions`</b>
+&nbsp;private const val PERCENT = 100f
+&nbsp;
+&nbsp;/**
+&nbsp; * Turns domain progress into the strings the screens render.
+&nbsp; *
+&nbsp; * [categoriesById] is the whole workspace map; a budget naming a category that has since been
+&nbsp; * deleted simply drops that bubble instead of failing to render.
+&nbsp; */
+&nbsp;fun BudgetProgress.toUi(categoriesById: Map&lt;String, Category&gt;): BudgetUi {
+&nbsp;    val currency = currency ?: CurrencyCode(&quot;&quot;)
+&nbsp;    val limit = effectiveLimit
+&nbsp;    return BudgetUi(
+&nbsp;        id = budget.id,
+&nbsp;        name = budget.name,
+&nbsp;        status = status,
+&nbsp;        spentFormatted = MoneyFormatter.format(spent, currency),
+&nbsp;        limitFormatted = MoneyFormatter.format(limit, currency),
+&nbsp;        remainderFormatted = MoneyFormatter.format(remaining.abs(), currency),
+&nbsp;        isOver = status == BudgetStatus.OVER,
+&nbsp;        progress = if (limit.minor &lt;= 0L) 0f else spent.minor.toFloat() / limit.minor.toFloat(),
+&nbsp;        alertFraction = budget.alertPercent / PERCENT,
+&nbsp;        alertPercent = budget.alertPercent,
+&nbsp;        percent = percent,
+&nbsp;        period = budget.period,
+&nbsp;        windowLabel = formatWindow(window.startInclusive, window.endExclusive),
+&nbsp;        daysLeft = daysLeft,
+&nbsp;        elapsedDays = elapsedDaysOf(this),
+&nbsp;        categories = budget.categoryIds.mapNotNull { categoriesById[it.value]?.toUi() },
+&nbsp;        isActive = budget.isActive,
+&nbsp;        hasMixedCurrency = hasMixedCurrency,
+&nbsp;        rolloverCarryFormatted = rolloverCarry
+&nbsp;            .takeIf { budget.rollover &amp;&amp; it.isPositive() }
+&nbsp;            ?.let { MoneyFormatter.format(it, currency) },
+&nbsp;        dailyAverageFormatted = MoneyFormatter.format(dailyAverage, currency),
+&nbsp;        projectedTotalFormatted = MoneyFormatter.format(projectedTotal, currency),
+&nbsp;        perDayRemainingFormatted = MoneyFormatter.format(perDayRemaining, currency),
+&nbsp;        overspendFormatted = MoneyFormatter.format(
+&nbsp;            if (remaining.isNegative()) remaining.abs() else Money.zero(),
+&nbsp;            currency,
+&nbsp;        ),
+&nbsp;    )
+&nbsp;}
+&nbsp;
+&nbsp;private fun Category.toUi() = BudgetCategoryUi(
+&nbsp;    id = id.value,
+&nbsp;    name = name,
+&nbsp;    iconKey = iconKey,
+&nbsp;    hue = hue,
+&nbsp;    systemKind = systemKind?.name,
+&nbsp;)
+&nbsp;
+&nbsp;/** Days of the window already behind us, counting today — the denominator of the daily average. */
+&nbsp;private fun elapsedDaysOf(progress: BudgetProgress): Int {
+&nbsp;    val windowDays = progress.window.startInclusive.daysUntil(progress.window.endExclusive)
+&nbsp;    return (windowDays - progress.daysLeft + 1).coerceIn(1, windowDays)
+&nbsp;}
+&nbsp;
+&nbsp;private const val MONTH_ABBREVIATION_LENGTH = 3
+&nbsp;
+&nbsp;/**
+&nbsp; * &quot;1 Apr – 30 Apr&quot;. The end is exclusive in the model but inclusive to a reader, so the label
+&nbsp; * shows the last day that still counts.
+&nbsp; */
+&nbsp;fun formatWindow(startInclusive: LocalDate, endExclusive: LocalDate): String {
+&nbsp;    val lastDay = endExclusive.minus(1, DateTimeUnit.DAY)
+&nbsp;    return &quot;${formatShortDate(startInclusive)} – ${formatShortDate(lastDay)}&quot;
+&nbsp;}
+&nbsp;
+&nbsp;fun formatShortDate(date: LocalDate): String {
+&nbsp;    val month = date.month.name.lowercase()
+&nbsp;        .replaceFirstChar { it.uppercase() }
+&nbsp;        .take(MONTH_ABBREVIATION_LENGTH)
+&nbsp;    return &quot;${date.day} $month&quot;
+&nbsp;}
 </code>
 </pre>
 </div>
@@ -140,7 +248,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 21:18</div>
+    <div style="float:right;">generated on 2026-07-28 21:38</div>
 </div>
 </body>
 </html>

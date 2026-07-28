@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > ComposableSingletons</title>
+  <title>MoneySurfer Coverage Report > InitialBalanceError</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,15 +19,18 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.feature.account.details</a>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.account.creation</a>
 </div>
 
-<h1>Coverage Summary for Class: ComposableSingletons (com.georgeci.moneysurfer.feature.account.details)</h1>
+<h1>Coverage Summary for Class: InitialBalanceError (com.georgeci.moneysurfer.feature.account.creation)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -45,82 +48,112 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   Instruction, %
 </th>
 </tr>
-  <tr>
-    <td class="name">ComposableSingletons$AccountDetailsScreenKt</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/5)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/2)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/57)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/266)
-  </span>
-</td>
-  </tr>
 <tr>
-  <td class="name"><strong>Total</strong></td>
+  <td class="name">InitialBalanceError</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/5)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/2)
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/57)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/266)
+    (12/12)
   </span>
 </td>
 </tr>
+
 </table>
 
 <br/>
 <br/>
 
-  <code class="sourceCode">Source code is not available<br /></code>
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.account.creation
+&nbsp;
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.AccountType
+&nbsp;
+&nbsp;/**
+&nbsp; * Input filtering + validation for the account creation &quot;Opening balance&quot; field.
+&nbsp; * Lives outside the ViewModel so the parsing rules can be unit-tested directly.
+&nbsp; */
+&nbsp;object InitialBalanceInput {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Reduces a raw text-field value to a parseable money string: digits, an
+&nbsp;     * optional leading minus, and at most one decimal separator (&#39;,&#39; normalised
+&nbsp;     * to &#39;.&#39;). Letters and any extra separators are dropped, so the field can
+&nbsp;     * never hold an unparseable amount.
+&nbsp;     */
+&nbsp;    fun sanitize(raw: String): String {
+&nbsp;        val negative = raw.startsWith(&#39;-&#39;)
+&nbsp;        val digits = StringBuilder()
+&nbsp;        var separatorUsed = false
+&nbsp;        for (ch in raw) {
+&nbsp;            when {
+&nbsp;                ch.isDigit() -&gt; digits.append(ch)
+&nbsp;                (ch == &#39;.&#39; || ch == &#39;,&#39;) &amp;&amp; !separatorUsed -&gt; {
+&nbsp;                    separatorUsed = true
+&nbsp;                    digits.append(&#39;.&#39;)
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;        return if (negative) &quot;-$digits&quot; else digits.toString()
+&nbsp;    }
+&nbsp;
+&nbsp;    /** Parses a [sanitize]d value to a [Double], or null while it is still incomplete (e.g. &quot;&quot; or &quot;-&quot;). */
+&nbsp;    fun parse(value: String): Double? = value.toDoubleOrNull()
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The inline error to surface for [balance] given the selected [type], or
+&nbsp;     * null when the amount is acceptable. A negative opening balance is only
+&nbsp;     * valid for account types that can carry debt (see [allowsNegativeBalance]).
+&nbsp;     */
+&nbsp;    fun errorFor(balance: String, type: AccountType): InitialBalanceError? {
+&nbsp;        val parsed = parse(balance) ?: return null
+&nbsp;        return if (parsed &lt; 0 &amp;&amp; !type.allowsNegativeBalance) {
+&nbsp;            InitialBalanceError.NEGATIVE_NOT_ALLOWED
+&nbsp;        } else {
+&nbsp;            null
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;/** Validation failures for the opening balance field. */
+<b class="fc">&nbsp;enum class InitialBalanceError { NEGATIVE_NOT_ALLOWED, }</b>
+&nbsp;
+&nbsp;/**
+&nbsp; * Whether an account of this type can be created with a negative opening
+&nbsp; * balance. Only credit-style accounts (Card) carry debt; cash/bank/savings
+&nbsp; * balances start at zero or above.
+&nbsp; */
+&nbsp;internal val AccountType.allowsNegativeBalance: Boolean
+&nbsp;    get() = this == AccountType.CARD
+</code>
+</pre>
 </div>
 
 <script type="text/javascript">
@@ -142,7 +175,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 21:18</div>
+    <div style="float:right;">generated on 2026-07-28 21:38</div>
 </div>
 </body>
 </html>

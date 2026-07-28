@@ -1,0 +1,472 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>MoneySurfer Coverage Report > DashboardWidgetPreviewKt</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.dashboard.customize</a>
+</div>
+
+<h1>Coverage Summary for Class: DashboardWidgetPreviewKt (com.georgeci.moneysurfer.feature.dashboard.customize)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">DashboardWidgetPreviewKt</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (10/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    60%
+  </span>
+  <span class="absValue">
+    (27/45)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    99.4%
+  </span>
+  <span class="absValue">
+    (153/154)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    97.9%
+  </span>
+  <span class="absValue">
+    (1334/1363)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DashboardWidgetPreviewKt$WhenMappings</td>
+    <td class="coverageStat"/>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (10/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    60%
+  </span>
+  <span class="absValue">
+    (27/45)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    99.4%
+  </span>
+  <span class="absValue">
+    (153/154)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    97.9%
+  </span>
+  <span class="absValue">
+    (1334/1363)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.dashboard.customize
+&nbsp;
+&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
+&nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.runtime.CompositionLocalProvider
+&nbsp;import androidx.compose.ui.Modifier
+&nbsp;import androidx.compose.ui.unit.dp
+&nbsp;import com.georgeci.moneysurfer.domain.dashboard.DashboardCardStyle
+&nbsp;import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetSize
+&nbsp;import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetType
+&nbsp;import com.georgeci.moneysurfer.uikit.components.budget.SurferBudgetStatus
+&nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferScaleToWidth
+&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.LocalSurferWidgetSize
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferAccountItem
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferAccountsWidget
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferAddAccountCta
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferBalanceFootnote
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferBalanceVariant
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferBalanceWidget
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferGoalItem
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferGoalsWidget
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferInsightItem
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferInsightTone
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferInsightsVariant
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferInsightsWidget
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferQuickActionsWidget
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferRecentTransactionItem
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferRecentTransactionsWidget
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferSafeToSpendData
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferSafeToSpendWidget
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferWidgetSize
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.Res
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_accounts_manage
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_add_account
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_add_transaction
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_balance_title
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_preview_account_cash
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_preview_account_everyday
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_preview_account_savings
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_preview_goal_laptop
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_preview_goal_trip
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_preview_insight_down_body
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_preview_insight_down_title
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_preview_insight_subs_body
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_preview_insight_subs_title
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_preview_insight_up_body
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_preview_insight_up_title
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_preview_transaction_coffee
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_preview_transaction_groceries
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_preview_transaction_rent
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_preview_transaction_salary
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_days_left
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_goals_see_all
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_goals_title
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_insights_title
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_quick_action_transfer
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_recent_see_all
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_recent_title
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_safe_to_spend_caption
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_safe_to_spend_per_day
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_safe_to_spend_title
+&nbsp;import org.jetbrains.compose.resources.pluralStringResource
+&nbsp;import org.jetbrains.compose.resources.stringResource
+&nbsp;
+&nbsp;/**
+&nbsp; * Width the sample widget is laid out at before it is scaled into a picker tile: the dashboard&#39;s
+&nbsp; * own content width on a phone (a 392dp artboard minus its 16dp side padding). Measuring at the
+&nbsp; * real width is what makes the thumbnails comparable — see
+&nbsp; * [com.georgeci.moneysurfer.uikit.modifier.surferScaleToWidth].
+&nbsp; */
+<b class="fc">&nbsp;private val PREVIEW_CONTENT_WIDTH = 360.dp</b>
+&nbsp;
+&nbsp;/**
+&nbsp; * A widget drawn from sample data, the way [cardStyle] would draw it on the dashboard. The picker
+&nbsp; * shows these side by side, so they render the real widgets rather than a schematic: the whole
+&nbsp; * point of the choice is what the typography and the row density actually look like.
+&nbsp; *
+&nbsp; * The sample list is longer than a compact card shows on purpose — a size the user picks has to be
+&nbsp; * visibly different in the preview, and several widgets differ only in how many rows they keep.
+&nbsp; */
+&nbsp;@Composable
+&nbsp;internal fun DashboardWidgetPreview(
+&nbsp;    type: DashboardWidgetType,
+&nbsp;    cardStyle: DashboardCardStyle,
+<b class="fc">&nbsp;    modifier: Modifier = Modifier,</b>
+<b class="pc">&nbsp;) {</b>
+<b class="fc">&nbsp;    val widgetSize = when (cardStyle.size) {</b>
+<b class="fc">&nbsp;        DashboardWidgetSize.Expanded -&gt; SurferWidgetSize.Expanded</b>
+<b class="fc">&nbsp;        DashboardWidgetSize.Compact -&gt; SurferWidgetSize.Compact</b>
+&nbsp;    }
+<b class="fc">&nbsp;    CompositionLocalProvider(LocalSurferWidgetSize provides widgetSize) {</b>
+<b class="fc">&nbsp;        val content = Modifier</b>
+<b class="fc">&nbsp;            .surferScaleToWidth(PREVIEW_CONTENT_WIDTH)</b>
+<b class="fc">&nbsp;            .fillMaxWidth()</b>
+<b class="pc">&nbsp;        when (type) {</b>
+<b class="fc">&nbsp;            DashboardWidgetType.Balance -&gt; BalancePreview(cardStyle.variant, modifier.then(content))</b>
+<b class="fc">&nbsp;            DashboardWidgetType.QuickActions -&gt; QuickActionsPreview(modifier.then(content))</b>
+<b class="fc">&nbsp;            DashboardWidgetType.SafeToSpend -&gt; SafeToSpendPreview(modifier.then(content))</b>
+<b class="fc">&nbsp;            DashboardWidgetType.Accounts -&gt; AccountsPreview(modifier.then(content))</b>
+<b class="fc">&nbsp;            DashboardWidgetType.Insights -&gt; InsightsPreview(cardStyle.variant, modifier.then(content))</b>
+<b class="fc">&nbsp;            DashboardWidgetType.Goals -&gt; GoalsPreview(modifier.then(content))</b>
+<b class="fc">&nbsp;            DashboardWidgetType.RecentTransactions -&gt; RecentTransactionsPreview(modifier.then(content))</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+<b class="fc">&nbsp;}</b>
+&nbsp;
+&nbsp;@Composable
+<b class="pc">&nbsp;private fun BalancePreview(variant: String?, modifier: Modifier) {</b>
+<b class="fc">&nbsp;    SurferBalanceWidget(</b>
+<b class="fc">&nbsp;        title = stringResource(Res.string.dashboard_balance_title),</b>
+<b class="fc">&nbsp;        balance = SAMPLE_TOTAL,</b>
+<b class="fc">&nbsp;        variant = SurferBalanceVariant.fromKey(variant),</b>
+<b class="fc">&nbsp;        footnote = SurferBalanceFootnote.Trend(SAMPLE_TREND),</b>
+<b class="fc">&nbsp;        modifier = modifier,</b>
+&nbsp;    )
+<b class="fc">&nbsp;}</b>
+&nbsp;
+&nbsp;/**
+&nbsp; * The buttons are inert here — the tile is a thumbnail, not a second place to log a transaction.
+&nbsp; *
+&nbsp; * The two tiles come out nearly the same height, because all this widget&#39;s size setting changes is
+&nbsp; * the button height (52dp against 48dp). That is the honest thumbnail: padding it out to make the
+&nbsp; * choice look bigger than it is would promise a row the dashboard then does not draw.
+&nbsp; */
+&nbsp;@Composable
+<b class="pc">&nbsp;private fun QuickActionsPreview(modifier: Modifier) {</b>
+<b class="fc">&nbsp;    SurferQuickActionsWidget(</b>
+<b class="fc">&nbsp;        primaryLabel = stringResource(Res.string.dashboard_add_transaction),</b>
+<b class="fc">&nbsp;        primaryIcon = SurferIcons.Add,</b>
+<b class="fc">&nbsp;        onPrimaryClick = {},</b>
+<b class="fc">&nbsp;        secondaryLabel = stringResource(Res.string.dashboard_quick_action_transfer),</b>
+<b class="fc">&nbsp;        secondaryIcon = SurferIcons.SwapHoriz,</b>
+<b class="fc">&nbsp;        onSecondaryClick = {},</b>
+<b class="fc">&nbsp;        modifier = modifier,</b>
+&nbsp;    )
+<b class="fc">&nbsp;}</b>
+&nbsp;
+&nbsp;/**
+&nbsp; * Sample numbers rather than the user&#39;s own: the tile is drawn for every widget in the picker,
+&nbsp; * including the ones switched off, so it must not depend on there being a budget to read.
+&nbsp; */
+&nbsp;@Composable
+<b class="pc">&nbsp;private fun SafeToSpendPreview(modifier: Modifier) {</b>
+<b class="fc">&nbsp;    SurferSafeToSpendWidget(</b>
+<b class="fc">&nbsp;        title = stringResource(Res.string.dashboard_safe_to_spend_title),</b>
+<b class="fc">&nbsp;        data = SurferSafeToSpendData(</b>
+<b class="fc">&nbsp;            amount = SAMPLE_SAFE_TO_SPEND,</b>
+<b class="fc">&nbsp;            caption = stringResource(</b>
+<b class="fc">&nbsp;                Res.string.dashboard_safe_to_spend_caption,</b>
+<b class="fc">&nbsp;                SAMPLE_BUDGET_LIMIT,</b>
+<b class="fc">&nbsp;                stringResource(Res.string.dashboard_customize_preview_account_everyday),</b>
+&nbsp;            ),
+<b class="fc">&nbsp;            perDay = stringResource(Res.string.dashboard_safe_to_spend_per_day, SAMPLE_SAFE_PER_DAY),</b>
+<b class="fc">&nbsp;            daysLeft = pluralStringResource(</b>
+<b class="fc">&nbsp;                Res.plurals.dashboard_days_left,</b>
+<b class="fc">&nbsp;                SAMPLE_DAYS_LEFT,</b>
+<b class="fc">&nbsp;                SAMPLE_DAYS_LEFT,</b>
+&nbsp;            ),
+<b class="fc">&nbsp;            progress = SAMPLE_SAFE_PROGRESS,</b>
+<b class="fc">&nbsp;            paceFraction = SAMPLE_SAFE_PACE,</b>
+<b class="fc">&nbsp;            status = SurferBudgetStatus.Ok,</b>
+&nbsp;        ),
+<b class="fc">&nbsp;        modifier = modifier,</b>
+&nbsp;    )
+<b class="fc">&nbsp;}</b>
+&nbsp;
+&nbsp;@Composable
+<b class="pc">&nbsp;private fun AccountsPreview(modifier: Modifier) {</b>
+<b class="fc">&nbsp;    SurferAccountsWidget(</b>
+<b class="fc">&nbsp;        items = listOf(</b>
+<b class="fc">&nbsp;            SurferAccountItem(</b>
+<b class="fc">&nbsp;                id = &quot;preview-1&quot;,</b>
+<b class="fc">&nbsp;                name = stringResource(Res.string.dashboard_customize_preview_account_everyday),</b>
+<b class="fc">&nbsp;                subtitle = SAMPLE_CURRENCY,</b>
+<b class="fc">&nbsp;                balance = SAMPLE_ACCOUNT_ONE,</b>
+&nbsp;            ),
+<b class="fc">&nbsp;            SurferAccountItem(</b>
+<b class="fc">&nbsp;                id = &quot;preview-2&quot;,</b>
+<b class="fc">&nbsp;                name = stringResource(Res.string.dashboard_customize_preview_account_savings),</b>
+<b class="fc">&nbsp;                subtitle = SAMPLE_CURRENCY,</b>
+<b class="fc">&nbsp;                balance = SAMPLE_ACCOUNT_TWO,</b>
+&nbsp;            ),
+<b class="fc">&nbsp;            SurferAccountItem(</b>
+<b class="fc">&nbsp;                id = &quot;preview-3&quot;,</b>
+<b class="fc">&nbsp;                name = stringResource(Res.string.dashboard_customize_preview_account_cash),</b>
+<b class="fc">&nbsp;                subtitle = SAMPLE_CURRENCY,</b>
+<b class="fc">&nbsp;                balance = SAMPLE_ACCOUNT_THREE,</b>
+&nbsp;            ),
+&nbsp;        ),
+<b class="fc">&nbsp;        addCta = SurferAddAccountCta(</b>
+<b class="fc">&nbsp;            label = stringResource(Res.string.dashboard_add_account),</b>
+<b class="fc">&nbsp;            onClick = {},</b>
+<b class="fc">&nbsp;            trailingLabel = stringResource(Res.string.dashboard_accounts_manage),</b>
+&nbsp;        ),
+<b class="fc">&nbsp;        modifier = modifier,</b>
+&nbsp;    )
+<b class="fc">&nbsp;}</b>
+&nbsp;
+&nbsp;/**
+&nbsp; * Sample sentences rather than the user&#39;s own, like every other tile here: the picker is opened
+&nbsp; * to compare two layouts, and a workspace with one insight (or none) would show two blank tiles.
+&nbsp; */
+&nbsp;@Composable
+<b class="pc">&nbsp;private fun InsightsPreview(variant: String?, modifier: Modifier) {</b>
+<b class="fc">&nbsp;    SurferInsightsWidget(</b>
+<b class="fc">&nbsp;        items = listOf(</b>
+<b class="fc">&nbsp;            SurferInsightItem(</b>
+<b class="fc">&nbsp;                id = &quot;preview-insight-1&quot;,</b>
+<b class="fc">&nbsp;                tone = SurferInsightTone.Warn,</b>
+<b class="fc">&nbsp;                icon = SurferIcons.ArrowUp,</b>
+<b class="fc">&nbsp;                title = stringResource(Res.string.dashboard_customize_preview_insight_up_title),</b>
+<b class="fc">&nbsp;                body = stringResource(Res.string.dashboard_customize_preview_insight_up_body),</b>
+&nbsp;            ),
+<b class="fc">&nbsp;            SurferInsightItem(</b>
+<b class="fc">&nbsp;                id = &quot;preview-insight-2&quot;,</b>
+<b class="fc">&nbsp;                tone = SurferInsightTone.Good,</b>
+<b class="fc">&nbsp;                icon = SurferIcons.ArrowDown,</b>
+<b class="fc">&nbsp;                title = stringResource(Res.string.dashboard_customize_preview_insight_down_title),</b>
+<b class="fc">&nbsp;                body = stringResource(Res.string.dashboard_customize_preview_insight_down_body),</b>
+&nbsp;            ),
+<b class="fc">&nbsp;            SurferInsightItem(</b>
+<b class="fc">&nbsp;                id = &quot;preview-insight-3&quot;,</b>
+<b class="fc">&nbsp;                tone = SurferInsightTone.Neutral,</b>
+<b class="fc">&nbsp;                icon = SurferIcons.Sync,</b>
+<b class="fc">&nbsp;                title = stringResource(Res.string.dashboard_customize_preview_insight_subs_title),</b>
+<b class="fc">&nbsp;                body = stringResource(Res.string.dashboard_customize_preview_insight_subs_body),</b>
+&nbsp;            ),
+&nbsp;        ),
+<b class="fc">&nbsp;        title = stringResource(Res.string.dashboard_insights_title),</b>
+<b class="fc">&nbsp;        variant = SurferInsightsVariant.fromKey(variant),</b>
+<b class="fc">&nbsp;        modifier = modifier,</b>
+&nbsp;    )
+<b class="fc">&nbsp;}</b>
+&nbsp;
+&nbsp;@Composable
+<b class="pc">&nbsp;private fun GoalsPreview(modifier: Modifier) {</b>
+<b class="fc">&nbsp;    SurferGoalsWidget(</b>
+<b class="fc">&nbsp;        items = listOf(</b>
+<b class="fc">&nbsp;            SurferGoalItem(</b>
+<b class="fc">&nbsp;                id = &quot;preview-1&quot;,</b>
+<b class="fc">&nbsp;                name = stringResource(Res.string.dashboard_customize_preview_goal_laptop),</b>
+<b class="fc">&nbsp;                savedFormatted = SAMPLE_GOAL_SAVED,</b>
+<b class="fc">&nbsp;                targetFormatted = SAMPLE_GOAL_TARGET,</b>
+<b class="fc">&nbsp;                progress = SAMPLE_GOAL_PROGRESS,</b>
+<b class="fc">&nbsp;                captionLine = &quot;&quot;,</b>
+&nbsp;            ),
+<b class="fc">&nbsp;            SurferGoalItem(</b>
+<b class="fc">&nbsp;                id = &quot;preview-2&quot;,</b>
+<b class="fc">&nbsp;                name = stringResource(Res.string.dashboard_customize_preview_goal_trip),</b>
+<b class="fc">&nbsp;                savedFormatted = SAMPLE_TRIP_SAVED,</b>
+<b class="fc">&nbsp;                targetFormatted = SAMPLE_TRIP_TARGET,</b>
+<b class="fc">&nbsp;                progress = SAMPLE_TRIP_PROGRESS,</b>
+<b class="fc">&nbsp;                captionLine = &quot;&quot;,</b>
+&nbsp;            ),
+&nbsp;        ),
+<b class="fc">&nbsp;        title = stringResource(Res.string.dashboard_goals_title),</b>
+<b class="fc">&nbsp;        seeAllLabel = stringResource(Res.string.dashboard_goals_see_all),</b>
+<b class="fc">&nbsp;        onSeeAllClick = {},</b>
+<b class="fc">&nbsp;        modifier = modifier,</b>
+&nbsp;    )
+<b class="fc">&nbsp;}</b>
+&nbsp;
+&nbsp;@Composable
+<b class="pc">&nbsp;private fun RecentTransactionsPreview(modifier: Modifier) {</b>
+<b class="fc">&nbsp;    val bubbleBg = AppTheme.materialColors.primaryContainer</b>
+<b class="fc">&nbsp;    val bubbleFg = AppTheme.materialColors.onPrimaryContainer</b>
+<b class="fc">&nbsp;    val samples = listOf(</b>
+<b class="fc">&nbsp;        stringResource(Res.string.dashboard_customize_preview_transaction_groceries) to SAMPLE_EXPENSE_ONE,</b>
+<b class="fc">&nbsp;        stringResource(Res.string.dashboard_customize_preview_transaction_salary) to SAMPLE_INCOME,</b>
+<b class="fc">&nbsp;        stringResource(Res.string.dashboard_customize_preview_transaction_coffee) to SAMPLE_EXPENSE_TWO,</b>
+<b class="fc">&nbsp;        stringResource(Res.string.dashboard_customize_preview_transaction_rent) to SAMPLE_EXPENSE_THREE,</b>
+&nbsp;    )
+<b class="fc">&nbsp;    SurferRecentTransactionsWidget(</b>
+<b class="fc">&nbsp;        items = samples.mapIndexed { index, (title, amount) -&gt;</b>
+<b class="fc">&nbsp;            SurferRecentTransactionItem(</b>
+<b class="fc">&nbsp;                id = &quot;preview-$index&quot;,</b>
+<b class="fc">&nbsp;                title = title,</b>
+<b class="fc">&nbsp;                subtitle = &quot;&quot;,</b>
+<b class="fc">&nbsp;                amount = amount,</b>
+<b class="fc">&nbsp;                isExpense = amount != SAMPLE_INCOME,</b>
+<b class="fc">&nbsp;                iconBgColor = bubbleBg,</b>
+<b class="fc">&nbsp;                iconFgColor = bubbleFg,</b>
+<b class="fc">&nbsp;                iconInitial = title.take(1),</b>
+<b class="fc">&nbsp;                categoryHueSeed = &quot;preview-$index&quot;,</b>
+<b class="fc">&nbsp;            )</b>
+&nbsp;        },
+<b class="fc">&nbsp;        title = stringResource(Res.string.dashboard_recent_title),</b>
+<b class="fc">&nbsp;        seeAllLabel = stringResource(Res.string.dashboard_recent_see_all),</b>
+<b class="fc">&nbsp;        onSeeAllClick = {},</b>
+<b class="fc">&nbsp;        modifier = modifier,</b>
+&nbsp;    )
+<b class="fc">&nbsp;}</b>
+&nbsp;
+&nbsp;private const val SAMPLE_CURRENCY = &quot;EUR&quot;
+&nbsp;private const val SAMPLE_TOTAL = &quot;€11,575.32&quot;
+&nbsp;private const val SAMPLE_TREND = &quot;+€412&quot;
+&nbsp;private const val SAMPLE_ACCOUNT_ONE = &quot;€2,480.32&quot;
+&nbsp;private const val SAMPLE_ACCOUNT_TWO = &quot;€8,915.00&quot;
+&nbsp;private const val SAMPLE_ACCOUNT_THREE = &quot;€180.00&quot;
+&nbsp;private const val SAMPLE_GOAL_SAVED = &quot;€820&quot;
+&nbsp;private const val SAMPLE_GOAL_TARGET = &quot;€1,600&quot;
+&nbsp;private const val SAMPLE_GOAL_PROGRESS = 0.51f
+&nbsp;private const val SAMPLE_TRIP_SAVED = &quot;€1,240&quot;
+&nbsp;private const val SAMPLE_TRIP_TARGET = &quot;€3,000&quot;
+&nbsp;private const val SAMPLE_TRIP_PROGRESS = 0.41f
+&nbsp;private const val SAMPLE_EXPENSE_ONE = &quot;−€48.20&quot;
+&nbsp;private const val SAMPLE_INCOME = &quot;+€3,200.00&quot;
+&nbsp;private const val SAMPLE_EXPENSE_TWO = &quot;−€9.99&quot;
+&nbsp;private const val SAMPLE_EXPENSE_THREE = &quot;−€760.00&quot;
+&nbsp;private const val SAMPLE_SAFE_TO_SPEND = &quot;€642.30&quot;
+&nbsp;private const val SAMPLE_BUDGET_LIMIT = &quot;€1,800&quot;
+&nbsp;private const val SAMPLE_SAFE_PER_DAY = &quot;€53.52&quot;
+&nbsp;private const val SAMPLE_DAYS_LEFT = 12
+&nbsp;private const val SAMPLE_SAFE_PROGRESS = 0.64f
+&nbsp;private const val SAMPLE_SAFE_PACE = 0.6f
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-07-28 21:38</div>
+</div>
+</body>
+</html>

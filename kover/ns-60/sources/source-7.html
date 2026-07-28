@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > WorkspaceInviteState__OpticsKt</title>
+  <title>MoneySurfer Coverage Report > IncomingInvitesState__OpticsKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.feature.workspace.invite</a>
+    <a href="../index.html">com.georgeci.moneysurfer.feature.workspace.incoming</a>
 </div>
 
-<h1>Coverage Summary for Class: WorkspaceInviteState__OpticsKt (com.georgeci.moneysurfer.feature.workspace.invite)</h1>
+<h1>Coverage Summary for Class: IncomingInvitesState__OpticsKt (com.georgeci.moneysurfer.feature.workspace.incoming)</h1>
 
 <table class="coverageStats">
 
@@ -46,7 +46,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">WorkspaceInviteState__OpticsKt</td>
+  <td class="name">IncomingInvitesState__OpticsKt</td>
 <td class="coverageStat">
   <span class="percent">
     0%
@@ -74,7 +74,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 </tr>
   <tr>
-    <td class="name">WorkspaceInviteState__OpticsKt$workspaceId$1</td>
+    <td class="name">IncomingInvitesState__OpticsKt$busyId$1</td>
 <td class="coverageStat">
   <span class="percent">
     0%
@@ -102,7 +102,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
   </tr>
   <tr>
-    <td class="name">WorkspaceInviteState__OpticsKt$workspaceId$2</td>
+    <td class="name">IncomingInvitesState__OpticsKt$busyId$2</td>
 <td class="coverageStat">
   <span class="percent">
     0%
@@ -164,64 +164,64 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.workspace.invite
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.workspace.incoming
 &nbsp;
 &nbsp;
 &nbsp;
-<b class="nc">&nbsp;public  val com.georgeci.moneysurfer.feature.workspace.invite.WorkspaceInviteState.Companion.`workspaceId`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.workspace.invite.WorkspaceInviteState, com.georgeci.moneysurfer.domain.primitives.WorkspaceId&gt;  get() = arrow.optics.Lens(</b>
-<b class="nc">&nbsp;  get = { workspaceInviteState: com.georgeci.moneysurfer.feature.workspace.invite.WorkspaceInviteState -&gt; workspaceInviteState.`workspaceId` },</b>
-&nbsp;  set = { workspaceInviteState: com.georgeci.moneysurfer.feature.workspace.invite.WorkspaceInviteState, value: com.georgeci.moneysurfer.domain.primitives.WorkspaceId -&gt;
-<b class="nc">&nbsp;  workspaceInviteState.copy(`workspaceId` = value)</b>
+<b class="nc">&nbsp;public  val com.georgeci.moneysurfer.feature.workspace.incoming.IncomingInvitesState.Companion.`loading`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.workspace.incoming.IncomingInvitesState, kotlin.Boolean&gt;  get() = arrow.optics.Lens(</b>
+<b class="nc">&nbsp;  get = { incomingInvitesState: com.georgeci.moneysurfer.feature.workspace.incoming.IncomingInvitesState -&gt; incomingInvitesState.`loading` },</b>
+&nbsp;  set = { incomingInvitesState: com.georgeci.moneysurfer.feature.workspace.incoming.IncomingInvitesState, value: kotlin.Boolean -&gt;
+<b class="nc">&nbsp;  incomingInvitesState.copy(`loading` = value)</b>
 &nbsp;}
 &nbsp;)
 &nbsp;
-<b class="nc">&nbsp;public  val com.georgeci.moneysurfer.feature.workspace.invite.WorkspaceInviteState.Companion.`email`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.workspace.invite.WorkspaceInviteState, kotlin.String&gt;  get() = arrow.optics.Lens(</b>
-<b class="nc">&nbsp;  get = { workspaceInviteState: com.georgeci.moneysurfer.feature.workspace.invite.WorkspaceInviteState -&gt; workspaceInviteState.`email` },</b>
-&nbsp;  set = { workspaceInviteState: com.georgeci.moneysurfer.feature.workspace.invite.WorkspaceInviteState, value: kotlin.String -&gt;
-<b class="nc">&nbsp;  workspaceInviteState.copy(`email` = value)</b>
+<b class="nc">&nbsp;public  val com.georgeci.moneysurfer.feature.workspace.incoming.IncomingInvitesState.Companion.`invites`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.workspace.incoming.IncomingInvitesState, kotlin.collections.List&lt;com.georgeci.moneysurfer.feature.workspace.incoming.IncomingInviteUi&gt;&gt;  get() = arrow.optics.Lens(</b>
+<b class="nc">&nbsp;  get = { incomingInvitesState: com.georgeci.moneysurfer.feature.workspace.incoming.IncomingInvitesState -&gt; incomingInvitesState.`invites` },</b>
+&nbsp;  set = { incomingInvitesState: com.georgeci.moneysurfer.feature.workspace.incoming.IncomingInvitesState, value: kotlin.collections.List&lt;com.georgeci.moneysurfer.feature.workspace.incoming.IncomingInviteUi&gt; -&gt;
+<b class="nc">&nbsp;  incomingInvitesState.copy(`invites` = value)</b>
 &nbsp;}
 &nbsp;)
 &nbsp;
-<b class="nc">&nbsp;public  val com.georgeci.moneysurfer.feature.workspace.invite.WorkspaceInviteState.Companion.`role`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.workspace.invite.WorkspaceInviteState, com.georgeci.moneysurfer.domain.model.WorkspaceRole&gt;  get() = arrow.optics.Lens(</b>
-<b class="nc">&nbsp;  get = { workspaceInviteState: com.georgeci.moneysurfer.feature.workspace.invite.WorkspaceInviteState -&gt; workspaceInviteState.`role` },</b>
-&nbsp;  set = { workspaceInviteState: com.georgeci.moneysurfer.feature.workspace.invite.WorkspaceInviteState, value: com.georgeci.moneysurfer.domain.model.WorkspaceRole -&gt;
-<b class="nc">&nbsp;  workspaceInviteState.copy(`role` = value)</b>
+<b class="nc">&nbsp;public  val com.georgeci.moneysurfer.feature.workspace.incoming.IncomingInvitesState.Companion.`busyId`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.workspace.incoming.IncomingInvitesState, com.georgeci.moneysurfer.domain.primitives.WorkspaceInviteId?&gt;  get() = arrow.optics.Lens(</b>
+<b class="nc">&nbsp;  get = { incomingInvitesState: com.georgeci.moneysurfer.feature.workspace.incoming.IncomingInvitesState -&gt; incomingInvitesState.`busyId` },</b>
+&nbsp;  set = { incomingInvitesState: com.georgeci.moneysurfer.feature.workspace.incoming.IncomingInvitesState, value: com.georgeci.moneysurfer.domain.primitives.WorkspaceInviteId? -&gt;
+<b class="nc">&nbsp;  incomingInvitesState.copy(`busyId` = value)</b>
 &nbsp;}
 &nbsp;)
 &nbsp;
-<b class="nc">&nbsp;public  val com.georgeci.moneysurfer.feature.workspace.invite.WorkspaceInviteState.Companion.`isSubmitting`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.workspace.invite.WorkspaceInviteState, kotlin.Boolean&gt;  get() = arrow.optics.Lens(</b>
-<b class="nc">&nbsp;  get = { workspaceInviteState: com.georgeci.moneysurfer.feature.workspace.invite.WorkspaceInviteState -&gt; workspaceInviteState.`isSubmitting` },</b>
-&nbsp;  set = { workspaceInviteState: com.georgeci.moneysurfer.feature.workspace.invite.WorkspaceInviteState, value: kotlin.Boolean -&gt;
-<b class="nc">&nbsp;  workspaceInviteState.copy(`isSubmitting` = value)</b>
+<b class="nc">&nbsp;public  val com.georgeci.moneysurfer.feature.workspace.incoming.IncomingInvitesState.Companion.`refreshing`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.workspace.incoming.IncomingInvitesState, kotlin.Boolean&gt;  get() = arrow.optics.Lens(</b>
+<b class="nc">&nbsp;  get = { incomingInvitesState: com.georgeci.moneysurfer.feature.workspace.incoming.IncomingInvitesState -&gt; incomingInvitesState.`refreshing` },</b>
+&nbsp;  set = { incomingInvitesState: com.georgeci.moneysurfer.feature.workspace.incoming.IncomingInvitesState, value: kotlin.Boolean -&gt;
+<b class="nc">&nbsp;  incomingInvitesState.copy(`refreshing` = value)</b>
 &nbsp;}
 &nbsp;)
 &nbsp;
-<b class="nc">&nbsp;public  val com.georgeci.moneysurfer.feature.workspace.invite.WorkspaceInviteState.Companion.`emailError`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.workspace.invite.WorkspaceInviteState, com.georgeci.moneysurfer.feature.workspace.invite.InviteFieldError?&gt;  get() = arrow.optics.Lens(</b>
-<b class="nc">&nbsp;  get = { workspaceInviteState: com.georgeci.moneysurfer.feature.workspace.invite.WorkspaceInviteState -&gt; workspaceInviteState.`emailError` },</b>
-&nbsp;  set = { workspaceInviteState: com.georgeci.moneysurfer.feature.workspace.invite.WorkspaceInviteState, value: com.georgeci.moneysurfer.feature.workspace.invite.InviteFieldError? -&gt;
-<b class="nc">&nbsp;  workspaceInviteState.copy(`emailError` = value)</b>
+<b class="nc">&nbsp;public  val com.georgeci.moneysurfer.feature.workspace.incoming.IncomingInvitesState.Companion.`refreshError`: arrow.optics.Lens&lt;com.georgeci.moneysurfer.feature.workspace.incoming.IncomingInvitesState, com.georgeci.moneysurfer.domain.usecase.InviteError?&gt;  get() = arrow.optics.Lens(</b>
+<b class="nc">&nbsp;  get = { incomingInvitesState: com.georgeci.moneysurfer.feature.workspace.incoming.IncomingInvitesState -&gt; incomingInvitesState.`refreshError` },</b>
+&nbsp;  set = { incomingInvitesState: com.georgeci.moneysurfer.feature.workspace.incoming.IncomingInvitesState, value: com.georgeci.moneysurfer.domain.usecase.InviteError? -&gt;
+<b class="nc">&nbsp;  incomingInvitesState.copy(`refreshError` = value)</b>
 &nbsp;}
 &nbsp;)
 &nbsp;
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.workspace.invite.WorkspaceInviteState&gt;.`workspaceId`: arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.domain.primitives.WorkspaceId&gt;  get() = this + com.georgeci.moneysurfer.feature.workspace.invite.WorkspaceInviteState.`workspaceId`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.workspace.invite.WorkspaceInviteState&gt;.`workspaceId`: arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.domain.primitives.WorkspaceId&gt;  get() = this + com.georgeci.moneysurfer.feature.workspace.invite.WorkspaceInviteState.`workspaceId`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.workspace.invite.WorkspaceInviteState&gt;.`workspaceId`: arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.domain.primitives.WorkspaceId&gt;  get() = this + com.georgeci.moneysurfer.feature.workspace.invite.WorkspaceInviteState.`workspaceId`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.workspace.incoming.IncomingInvitesState&gt;.`loading`: arrow.optics.Lens&lt;__S, kotlin.Boolean&gt;  get() = this + com.georgeci.moneysurfer.feature.workspace.incoming.IncomingInvitesState.`loading`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.workspace.incoming.IncomingInvitesState&gt;.`loading`: arrow.optics.Optional&lt;__S, kotlin.Boolean&gt;  get() = this + com.georgeci.moneysurfer.feature.workspace.incoming.IncomingInvitesState.`loading`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.workspace.incoming.IncomingInvitesState&gt;.`loading`: arrow.optics.Traversal&lt;__S, kotlin.Boolean&gt;  get() = this + com.georgeci.moneysurfer.feature.workspace.incoming.IncomingInvitesState.`loading`</b>
 &nbsp;
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.workspace.invite.WorkspaceInviteState&gt;.`email`: arrow.optics.Lens&lt;__S, kotlin.String&gt;  get() = this + com.georgeci.moneysurfer.feature.workspace.invite.WorkspaceInviteState.`email`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.workspace.invite.WorkspaceInviteState&gt;.`email`: arrow.optics.Optional&lt;__S, kotlin.String&gt;  get() = this + com.georgeci.moneysurfer.feature.workspace.invite.WorkspaceInviteState.`email`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.workspace.invite.WorkspaceInviteState&gt;.`email`: arrow.optics.Traversal&lt;__S, kotlin.String&gt;  get() = this + com.georgeci.moneysurfer.feature.workspace.invite.WorkspaceInviteState.`email`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.workspace.incoming.IncomingInvitesState&gt;.`invites`: arrow.optics.Lens&lt;__S, kotlin.collections.List&lt;com.georgeci.moneysurfer.feature.workspace.incoming.IncomingInviteUi&gt;&gt;  get() = this + com.georgeci.moneysurfer.feature.workspace.incoming.IncomingInvitesState.`invites`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.workspace.incoming.IncomingInvitesState&gt;.`invites`: arrow.optics.Optional&lt;__S, kotlin.collections.List&lt;com.georgeci.moneysurfer.feature.workspace.incoming.IncomingInviteUi&gt;&gt;  get() = this + com.georgeci.moneysurfer.feature.workspace.incoming.IncomingInvitesState.`invites`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.workspace.incoming.IncomingInvitesState&gt;.`invites`: arrow.optics.Traversal&lt;__S, kotlin.collections.List&lt;com.georgeci.moneysurfer.feature.workspace.incoming.IncomingInviteUi&gt;&gt;  get() = this + com.georgeci.moneysurfer.feature.workspace.incoming.IncomingInvitesState.`invites`</b>
 &nbsp;
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.workspace.invite.WorkspaceInviteState&gt;.`role`: arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.domain.model.WorkspaceRole&gt;  get() = this + com.georgeci.moneysurfer.feature.workspace.invite.WorkspaceInviteState.`role`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.workspace.invite.WorkspaceInviteState&gt;.`role`: arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.domain.model.WorkspaceRole&gt;  get() = this + com.georgeci.moneysurfer.feature.workspace.invite.WorkspaceInviteState.`role`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.workspace.invite.WorkspaceInviteState&gt;.`role`: arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.domain.model.WorkspaceRole&gt;  get() = this + com.georgeci.moneysurfer.feature.workspace.invite.WorkspaceInviteState.`role`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.workspace.incoming.IncomingInvitesState&gt;.`busyId`: arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.domain.primitives.WorkspaceInviteId?&gt;  get() = this + com.georgeci.moneysurfer.feature.workspace.incoming.IncomingInvitesState.`busyId`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.workspace.incoming.IncomingInvitesState&gt;.`busyId`: arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.domain.primitives.WorkspaceInviteId?&gt;  get() = this + com.georgeci.moneysurfer.feature.workspace.incoming.IncomingInvitesState.`busyId`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.workspace.incoming.IncomingInvitesState&gt;.`busyId`: arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.domain.primitives.WorkspaceInviteId?&gt;  get() = this + com.georgeci.moneysurfer.feature.workspace.incoming.IncomingInvitesState.`busyId`</b>
 &nbsp;
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.workspace.invite.WorkspaceInviteState&gt;.`isSubmitting`: arrow.optics.Lens&lt;__S, kotlin.Boolean&gt;  get() = this + com.georgeci.moneysurfer.feature.workspace.invite.WorkspaceInviteState.`isSubmitting`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.workspace.invite.WorkspaceInviteState&gt;.`isSubmitting`: arrow.optics.Optional&lt;__S, kotlin.Boolean&gt;  get() = this + com.georgeci.moneysurfer.feature.workspace.invite.WorkspaceInviteState.`isSubmitting`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.workspace.invite.WorkspaceInviteState&gt;.`isSubmitting`: arrow.optics.Traversal&lt;__S, kotlin.Boolean&gt;  get() = this + com.georgeci.moneysurfer.feature.workspace.invite.WorkspaceInviteState.`isSubmitting`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.workspace.incoming.IncomingInvitesState&gt;.`refreshing`: arrow.optics.Lens&lt;__S, kotlin.Boolean&gt;  get() = this + com.georgeci.moneysurfer.feature.workspace.incoming.IncomingInvitesState.`refreshing`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.workspace.incoming.IncomingInvitesState&gt;.`refreshing`: arrow.optics.Optional&lt;__S, kotlin.Boolean&gt;  get() = this + com.georgeci.moneysurfer.feature.workspace.incoming.IncomingInvitesState.`refreshing`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.workspace.incoming.IncomingInvitesState&gt;.`refreshing`: arrow.optics.Traversal&lt;__S, kotlin.Boolean&gt;  get() = this + com.georgeci.moneysurfer.feature.workspace.incoming.IncomingInvitesState.`refreshing`</b>
 &nbsp;
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.workspace.invite.WorkspaceInviteState&gt;.`emailError`: arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.workspace.invite.InviteFieldError?&gt;  get() = this + com.georgeci.moneysurfer.feature.workspace.invite.WorkspaceInviteState.`emailError`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.workspace.invite.WorkspaceInviteState&gt;.`emailError`: arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.workspace.invite.InviteFieldError?&gt;  get() = this + com.georgeci.moneysurfer.feature.workspace.invite.WorkspaceInviteState.`emailError`</b>
-<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.workspace.invite.WorkspaceInviteState&gt;.`emailError`: arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.workspace.invite.InviteFieldError?&gt;  get() = this + com.georgeci.moneysurfer.feature.workspace.invite.WorkspaceInviteState.`emailError`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.feature.workspace.incoming.IncomingInvitesState&gt;.`refreshError`: arrow.optics.Lens&lt;__S, com.georgeci.moneysurfer.domain.usecase.InviteError?&gt;  get() = this + com.georgeci.moneysurfer.feature.workspace.incoming.IncomingInvitesState.`refreshError`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.feature.workspace.incoming.IncomingInvitesState&gt;.`refreshError`: arrow.optics.Optional&lt;__S, com.georgeci.moneysurfer.domain.usecase.InviteError?&gt;  get() = this + com.georgeci.moneysurfer.feature.workspace.incoming.IncomingInvitesState.`refreshError`</b>
+<b class="nc">&nbsp;public  val &lt;__S&gt; arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.feature.workspace.incoming.IncomingInvitesState&gt;.`refreshError`: arrow.optics.Traversal&lt;__S, com.georgeci.moneysurfer.domain.usecase.InviteError?&gt;  get() = this + com.georgeci.moneysurfer.feature.workspace.incoming.IncomingInvitesState.`refreshError`</b>
 </code>
 </pre>
 </div>
@@ -245,7 +245,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 21:18</div>
+    <div style="float:right;">generated on 2026-07-28 21:38</div>
 </div>
 </body>
 </html>

@@ -1,0 +1,462 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>MoneySurfer Coverage Report > SurferBalanceWidgetKt</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.georgeci.moneysurfer.uikit.widgets</a>
+</div>
+
+<h1>Coverage Summary for Class: SurferBalanceWidgetKt (com.georgeci.moneysurfer.uikit.widgets)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">SurferBalanceWidgetKt</td>
+<td class="coverageStat">
+  <span class="percent">
+    60%
+  </span>
+  <span class="absValue">
+    (6/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    62.4%
+  </span>
+  <span class="absValue">
+    (53/85)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    67.5%
+  </span>
+  <span class="absValue">
+    (81/120)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    69.3%
+  </span>
+  <span class="absValue">
+    (1118/1614)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">SurferBalanceWidgetKt$WhenMappings</td>
+    <td class="coverageStat"/>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    60%
+  </span>
+  <span class="absValue">
+    (6/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    62.4%
+  </span>
+  <span class="absValue">
+    (53/85)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    67.5%
+  </span>
+  <span class="absValue">
+    (81/120)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    69.3%
+  </span>
+  <span class="absValue">
+    (1118/1614)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.widgets
+&nbsp;
+&nbsp;import androidx.compose.foundation.layout.Arrangement
+&nbsp;import androidx.compose.foundation.layout.Box
+&nbsp;import androidx.compose.foundation.layout.Column
+&nbsp;import androidx.compose.foundation.layout.Row
+&nbsp;import androidx.compose.foundation.layout.Spacer
+&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
+&nbsp;import androidx.compose.foundation.layout.padding
+&nbsp;import androidx.compose.foundation.layout.size
+&nbsp;import androidx.compose.foundation.layout.width
+&nbsp;import androidx.compose.material.icons.Icons
+&nbsp;import androidx.compose.material.icons.automirrored.filled.TrendingUp
+&nbsp;import androidx.compose.material3.Card
+&nbsp;import androidx.compose.material3.CardDefaults
+&nbsp;import androidx.compose.material3.Icon
+&nbsp;import androidx.compose.material3.Text
+&nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.ui.Alignment
+&nbsp;import androidx.compose.ui.Modifier
+&nbsp;import androidx.compose.ui.text.style.TextOverflow
+&nbsp;import androidx.compose.ui.tooling.preview.Preview
+&nbsp;import androidx.compose.ui.unit.dp
+&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferSplitAmount
+&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferSplitAmountTier
+&nbsp;import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
+&nbsp;import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
+&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
+&nbsp;import com.georgeci.moneysurfer.uikit.theme.SurferContainerStyle
+&nbsp;
+&nbsp;/**
+&nbsp; * Bottom line of [SurferBalanceWidget]. The three variants are mutually exclusive by
+&nbsp; * construction — passing them as three independent nullable strings let callers ask for
+&nbsp; * combinations the widget silently dropped.
+&nbsp; */
+&nbsp;sealed interface SurferBalanceFootnote {
+&nbsp;
+&nbsp;    /** Period delta, rendered with a trending-up icon. */
+&nbsp;    data class Trend(val text: String) : SurferBalanceFootnote
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Secondary line carrying what the single headline figure cannot say — e.g. the balances
+&nbsp;     * held in other currencies, which no rate-free sum may fold into it.
+&nbsp;     */
+&nbsp;    data class Note(val text: String) : SurferBalanceFootnote
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Nothing to total yet. Also switches the headline to plain text and drops the sparkline:
+&nbsp;     * there is no amount to split or trend to draw.
+&nbsp;     */
+&nbsp;    data class Empty(val text: String) : SurferBalanceFootnote
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * Typographic treatment of the balance card. Only the arrangement and the type scale of the title
+&nbsp; * and the amount change — the container, its colours and the footnote are the same in all four, so
+&nbsp; * the choice reads as a style rather than as four different widgets.
+&nbsp; *
+&nbsp; * The entry names double as the persisted keys of a dashboard card style, which is why
+&nbsp; * [fromKey] is lenient: a layout written by a newer build may name a treatment this one has never
+&nbsp; * heard of, and falling back to [Classic] beats refusing to draw the balance.
+&nbsp; */
+&nbsp;enum class SurferBalanceVariant {
+&nbsp;
+&nbsp;    /** Label above the amount — the dashboard default. */
+&nbsp;    Classic,
+&nbsp;
+&nbsp;    /** Amount first, label demoted to a caption under it. */
+&nbsp;    Stacked,
+&nbsp;
+&nbsp;    /** Label and amount on one line, the amount a tier smaller so both fit. */
+&nbsp;    Inline,
+&nbsp;
+&nbsp;    /** Amount alone; the card&#39;s position on the dashboard is the label. */
+&nbsp;    Minimal,
+&nbsp;
+&nbsp;    ;
+&nbsp;
+&nbsp;    companion object {
+&nbsp;        fun fromKey(key: String?): SurferBalanceVariant = entries.firstOrNull { it.name == key } ?: Classic
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+<b class="nc">&nbsp;fun SurferBalanceWidget(</b>
+&nbsp;    title: String,
+&nbsp;    balance: String,
+<b class="fc">&nbsp;    modifier: Modifier = Modifier,</b>
+<b class="fc">&nbsp;    size: SurferWidgetSize = LocalSurferWidgetSize.current,</b>
+<b class="fc">&nbsp;    variant: SurferBalanceVariant = SurferBalanceVariant.Classic,</b>
+<b class="nc">&nbsp;    footnote: SurferBalanceFootnote? = null,</b>
+<b class="pc">&nbsp;) {</b>
+<b class="fc">&nbsp;    val hero = size == SurferWidgetSize.Expanded</b>
+<b class="fc">&nbsp;    val isEmpty = footnote is SurferBalanceFootnote.Empty</b>
+<b class="pc">&nbsp;    val elevated = AppTheme.containerStyle == SurferContainerStyle.Card</b>
+&nbsp;
+<b class="fc">&nbsp;    Card(</b>
+<b class="fc">&nbsp;        modifier = modifier,</b>
+<b class="fc">&nbsp;        shape = AppTheme.shapes.large,</b>
+<b class="fc">&nbsp;        colors = CardDefaults.cardColors(</b>
+<b class="fc">&nbsp;            containerColor = AppTheme.materialColors.primaryContainer,</b>
+<b class="fc">&nbsp;            contentColor = AppTheme.materialColors.onPrimaryContainer,</b>
+&nbsp;        ),
+<b class="pc">&nbsp;        elevation = if (elevated) {</b>
+<b class="fc">&nbsp;            CardDefaults.elevatedCardElevation()</b>
+<b class="fc">&nbsp;        } else {</b>
+<b class="nc">&nbsp;            CardDefaults.cardElevation(</b>
+<b class="nc">&nbsp;                defaultElevation = 0.dp,</b>
+<b class="nc">&nbsp;                pressedElevation = 0.dp,</b>
+<b class="nc">&nbsp;                focusedElevation = 0.dp,</b>
+<b class="nc">&nbsp;                hoveredElevation = 0.dp,</b>
+<b class="nc">&nbsp;                draggedElevation = 0.dp,</b>
+<b class="nc">&nbsp;                disabledElevation = 0.dp,</b>
+&nbsp;            )
+&nbsp;        },
+<b class="fc">&nbsp;    ) {</b>
+<b class="fc">&nbsp;        Column(</b>
+<b class="fc">&nbsp;            modifier = Modifier</b>
+<b class="fc">&nbsp;                .fillMaxWidth()</b>
+<b class="fc">&nbsp;                .padding(horizontal = if (hero) 20.dp else 16.dp, vertical = if (hero) 18.dp else 14.dp),</b>
+<b class="fc">&nbsp;            verticalArrangement = Arrangement.spacedBy(if (hero) 8.dp else 4.dp),</b>
+&nbsp;        ) {
+<b class="fc">&nbsp;            val tier = variant.amountTier(hero)</b>
+<b class="pc">&nbsp;            when (variant) {</b>
+<b class="fc">&nbsp;                SurferBalanceVariant.Classic -&gt; {</b>
+<b class="fc">&nbsp;                    Title(text = title, hero = hero)</b>
+<b class="fc">&nbsp;                    Amount(balance = balance, tier = tier, isEmpty = isEmpty)</b>
+&nbsp;                }
+<b class="fc">&nbsp;                SurferBalanceVariant.Stacked -&gt; {</b>
+<b class="fc">&nbsp;                    Amount(balance = balance, tier = tier, isEmpty = isEmpty)</b>
+<b class="fc">&nbsp;                    Title(text = title, hero = hero, caption = true)</b>
+&nbsp;                }
+<b class="fc">&nbsp;                SurferBalanceVariant.Inline -&gt; Row(verticalAlignment = Alignment.CenterVertically) {</b>
+<b class="fc">&nbsp;                    Title(text = title, hero = hero, modifier = Modifier.weight(1f))</b>
+<b class="fc">&nbsp;                    Amount(balance = balance, tier = tier, isEmpty = isEmpty)</b>
+<b class="fc">&nbsp;                }</b>
+<b class="fc">&nbsp;                SurferBalanceVariant.Minimal -&gt; Amount(balance = balance, tier = tier, isEmpty = isEmpty)</b>
+<b class="nc">&nbsp;            }</b>
+<b class="fc">&nbsp;            Footnote(hero = hero, footnote = footnote)</b>
+<b class="fc">&nbsp;        }</b>
+&nbsp;    }
+<b class="fc">&nbsp;}</b>
+&nbsp;
+&nbsp;/**
+&nbsp; * How big the amount is set. Every treatment but [SurferBalanceVariant.Inline] gives the amount
+&nbsp; * the full width of the card, so it keeps the hero tier; a line it shares with the title cannot.
+&nbsp; */
+<b class="fc">&nbsp;private fun SurferBalanceVariant.amountTier(hero: Boolean): SurferSplitAmountTier = when (this) {</b>
+<b class="fc">&nbsp;    SurferBalanceVariant.Inline -&gt; if (hero) SurferSplitAmountTier.Stat else SurferSplitAmountTier.Body</b>
+<b class="fc">&nbsp;    else -&gt; if (hero) SurferSplitAmountTier.Hero else SurferSplitAmountTier.Stat</b>
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun Title(
+&nbsp;    text: String,
+&nbsp;    hero: Boolean,
+<b class="fc">&nbsp;    modifier: Modifier = Modifier,</b>
+<b class="fc">&nbsp;    caption: Boolean = false,</b>
+<b class="pc">&nbsp;) {</b>
+<b class="fc">&nbsp;    Text(</b>
+<b class="fc">&nbsp;        text = text,</b>
+<b class="fc">&nbsp;        style = when {</b>
+<b class="fc">&nbsp;            caption -&gt; if (hero) AppTheme.typography.labelMedium else AppTheme.typography.labelSmall</b>
+<b class="fc">&nbsp;            hero -&gt; AppTheme.typography.labelLarge</b>
+<b class="fc">&nbsp;            else -&gt; AppTheme.typography.labelMedium</b>
+&nbsp;        },
+<b class="fc">&nbsp;        color = AppTheme.materialColors.onPrimaryContainer.copy(alpha = 0.8f),</b>
+&nbsp;        // Inline puts the title on the amount&#39;s line, where the amount is measured first: a long
+&nbsp;        // balance leaves the title a narrow column, and it must shorten rather than stack up.
+<b class="fc">&nbsp;        maxLines = 1,</b>
+<b class="fc">&nbsp;        overflow = TextOverflow.Ellipsis,</b>
+<b class="fc">&nbsp;        modifier = modifier,</b>
+&nbsp;    )
+<b class="fc">&nbsp;}</b>
+&nbsp;
+&nbsp;/** The headline figure. An empty balance is a dash, not an amount, so it is plain text. */
+&nbsp;@Composable
+&nbsp;private fun Amount(
+&nbsp;    balance: String,
+&nbsp;    tier: SurferSplitAmountTier,
+&nbsp;    isEmpty: Boolean,
+<b class="pc">&nbsp;) {</b>
+<b class="fc">&nbsp;    if (isEmpty) {</b>
+<b class="nc">&nbsp;        Text(</b>
+<b class="nc">&nbsp;            text = balance,</b>
+<b class="nc">&nbsp;            style = when (tier) {</b>
+<b class="nc">&nbsp;                SurferSplitAmountTier.Hero -&gt; AppTheme.typography.displaySmall</b>
+<b class="nc">&nbsp;                SurferSplitAmountTier.Stat -&gt; AppTheme.typography.headlineSmall</b>
+<b class="nc">&nbsp;                SurferSplitAmountTier.Body -&gt; AppTheme.typography.titleLarge</b>
+<b class="nc">&nbsp;            },</b>
+<b class="nc">&nbsp;            color = AppTheme.materialColors.onPrimaryContainer,</b>
+&nbsp;        )
+<b class="fc">&nbsp;    } else {</b>
+<b class="fc">&nbsp;        SurferSplitAmount(</b>
+<b class="fc">&nbsp;            formattedAmount = balance,</b>
+<b class="fc">&nbsp;            tier = tier,</b>
+<b class="fc">&nbsp;            color = AppTheme.materialColors.onPrimaryContainer,</b>
+<b class="fc">&nbsp;            signAlpha = 0.7f,</b>
+<b class="fc">&nbsp;            fractionAlpha = 0.55f,</b>
+&nbsp;        )
+&nbsp;    }
+<b class="fc">&nbsp;}</b>
+&nbsp;
+&nbsp;@Composable
+<b class="pc">&nbsp;private fun Footnote(hero: Boolean, footnote: SurferBalanceFootnote?) {</b>
+<b class="fc">&nbsp;    when (footnote) {</b>
+<b class="fc">&nbsp;        null -&gt; Unit</b>
+<b class="pc">&nbsp;        is SurferBalanceFootnote.Trend -&gt; Row(verticalAlignment = Alignment.CenterVertically) {</b>
+<b class="fc">&nbsp;            Icon(</b>
+<b class="fc">&nbsp;                imageVector = Icons.AutoMirrored.Filled.TrendingUp,</b>
+<b class="fc">&nbsp;                contentDescription = SurferSemantics.Decorative,</b>
+<b class="fc">&nbsp;                tint = AppTheme.materialColors.onPrimaryContainer,</b>
+<b class="fc">&nbsp;                modifier = Modifier.size(if (hero) 16.dp else 14.dp),</b>
+&nbsp;            )
+<b class="fc">&nbsp;            Spacer(Modifier.width(6.dp))</b>
+<b class="fc">&nbsp;            Text(</b>
+<b class="fc">&nbsp;                text = footnote.text,</b>
+<b class="fc">&nbsp;                style = if (hero) AppTheme.typography.bodyMedium else AppTheme.typography.bodySmall,</b>
+<b class="fc">&nbsp;                color = AppTheme.materialColors.onPrimaryContainer,</b>
+&nbsp;            )
+<b class="fc">&nbsp;        }</b>
+<b class="nc">&nbsp;        is SurferBalanceFootnote.Note -&gt; Text(</b>
+<b class="nc">&nbsp;            text = footnote.text,</b>
+<b class="nc">&nbsp;            style = AppTheme.typography.bodySmall,</b>
+<b class="nc">&nbsp;            color = AppTheme.materialColors.onPrimaryContainer.copy(alpha = 0.85f),</b>
+&nbsp;        )
+<b class="nc">&nbsp;        is SurferBalanceFootnote.Empty -&gt; Text(</b>
+<b class="nc">&nbsp;            text = footnote.text,</b>
+<b class="nc">&nbsp;            style = AppTheme.typography.bodyMedium,</b>
+<b class="nc">&nbsp;            color = AppTheme.materialColors.onPrimaryContainer.copy(alpha = 0.85f),</b>
+&nbsp;        )
+<b class="nc">&nbsp;    }</b>
+<b class="fc">&nbsp;}</b>
+&nbsp;
+&nbsp;/** Shared preview copy, so the four galleries below differ only in the treatment they show. */
+&nbsp;private const val PREVIEW_TITLE = &quot;Total balance&quot;
+&nbsp;
+&nbsp;private const val PREVIEW_BALANCE = &quot;€11,575.32&quot;
+&nbsp;
+&nbsp;private const val PREVIEW_TREND = &quot;+€412 this month&quot;
+&nbsp;
+&nbsp;@Preview
+&nbsp;@Composable
+<b class="nc">&nbsp;private fun SurferBalanceWidgetHeroPreview() {</b>
+<b class="nc">&nbsp;    SurferComponentPreview {</b>
+&nbsp;        Box(modifier = Modifier.padding(16.dp)) {
+&nbsp;            SurferBalanceWidget(
+&nbsp;                title = PREVIEW_TITLE,
+&nbsp;                balance = PREVIEW_BALANCE,
+&nbsp;                footnote = SurferBalanceFootnote.Trend(PREVIEW_TREND),
+&nbsp;                modifier = Modifier.fillMaxWidth(),
+&nbsp;            )
+&nbsp;        }
+&nbsp;    }
+<b class="nc">&nbsp;}</b>
+&nbsp;
+&nbsp;@Preview
+&nbsp;@Composable
+<b class="nc">&nbsp;private fun SurferBalanceWidgetCompactPreview() {</b>
+<b class="nc">&nbsp;    SurferComponentPreview {</b>
+&nbsp;        Box(modifier = Modifier.padding(16.dp)) {
+&nbsp;            SurferBalanceWidget(
+&nbsp;                title = PREVIEW_TITLE,
+&nbsp;                balance = PREVIEW_BALANCE,
+&nbsp;                size = SurferWidgetSize.Compact,
+&nbsp;                footnote = SurferBalanceFootnote.Trend(&quot;+€412&quot;),
+&nbsp;                modifier = Modifier.width(220.dp),
+&nbsp;            )
+&nbsp;        }
+&nbsp;    }
+<b class="nc">&nbsp;}</b>
+&nbsp;
+&nbsp;@Preview
+&nbsp;@Composable
+<b class="nc">&nbsp;private fun SurferBalanceWidgetVariantsPreview() {</b>
+<b class="nc">&nbsp;    SurferComponentPreview {</b>
+&nbsp;        Column(
+&nbsp;            modifier = Modifier.padding(16.dp),
+&nbsp;            verticalArrangement = Arrangement.spacedBy(12.dp),
+&nbsp;        ) {
+&nbsp;            SurferBalanceVariant.entries.forEach { variant -&gt;
+&nbsp;                SurferBalanceWidget(
+&nbsp;                    title = PREVIEW_TITLE,
+&nbsp;                    balance = PREVIEW_BALANCE,
+&nbsp;                    variant = variant,
+&nbsp;                    footnote = SurferBalanceFootnote.Trend(PREVIEW_TREND),
+&nbsp;                    modifier = Modifier.fillMaxWidth(),
+&nbsp;                )
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+<b class="nc">&nbsp;}</b>
+&nbsp;
+&nbsp;@Preview
+&nbsp;@Composable
+<b class="nc">&nbsp;private fun SurferBalanceWidgetEmptyPreview() {</b>
+<b class="nc">&nbsp;    SurferComponentPreview {</b>
+&nbsp;        Box(modifier = Modifier.padding(16.dp)) {
+&nbsp;            SurferBalanceWidget(
+&nbsp;                title = PREVIEW_TITLE,
+&nbsp;                balance = &quot;—&quot;,
+&nbsp;                footnote = SurferBalanceFootnote.Empty(&quot;Add your first account to see balance.&quot;),
+&nbsp;                modifier = Modifier.fillMaxWidth(),
+&nbsp;            )
+&nbsp;        }
+&nbsp;    }
+<b class="nc">&nbsp;}</b>
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-07-28 21:38</div>
+</div>
+</body>
+</html>

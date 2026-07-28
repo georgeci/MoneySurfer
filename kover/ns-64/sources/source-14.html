@@ -1,0 +1,228 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>MoneySurfer Coverage Report > SyncStatusProviderKt</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.georgeci.moneysurfer.navigation</a>
+</div>
+
+<h1>Coverage Summary for Class: SyncStatusProviderKt (com.georgeci.moneysurfer.navigation)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">SyncStatusProviderKt</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    7.1%
+  </span>
+  <span class="absValue">
+    (2/28)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/262)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">SyncStatusProviderKt$SyncStatusProvider$statusFlow$1$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    7.1%
+  </span>
+  <span class="absValue">
+    (2/28)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/265)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.navigation
+&nbsp;
+&nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.runtime.CompositionLocalProvider
+&nbsp;import androidx.compose.runtime.getValue
+&nbsp;import androidx.compose.runtime.remember
+&nbsp;import androidx.lifecycle.compose.collectAsStateWithLifecycle
+&nbsp;import com.georgeci.moneysurfer.sync.api.LastSyncOutcome
+&nbsp;import com.georgeci.moneysurfer.sync.api.SyncState
+&nbsp;import com.georgeci.moneysurfer.sync.coordinator.SyncCoordinator
+&nbsp;import com.georgeci.moneysurfer.uikit.components.base.LocalSurferSyncStatus
+&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferSyncStatus
+&nbsp;import kotlinx.coroutines.flow.combine
+&nbsp;import org.koin.compose.koinInject
+&nbsp;
+&nbsp;/**
+&nbsp; * Single ambient bridge that maps [SyncCoordinator] live state into
+&nbsp; * [LocalSurferSyncStatus]. Wrap once near the root of the UI tree — every
+&nbsp; * `SurferToolbar` underneath then renders the indicator without any per-screen
+&nbsp; * plumbing.
+&nbsp; *
+&nbsp; * Lives next to [AppNavGraph] so `:uikit` stays free of sync-layer types.
+&nbsp; */
+&nbsp;@Composable
+<b class="nc">&nbsp;fun SyncStatusProvider(</b>
+<b class="nc">&nbsp;    coordinator: SyncCoordinator = koinInject(),</b>
+&nbsp;    content: @Composable () -&gt; Unit,
+<b class="nc">&nbsp;) {</b>
+<b class="nc">&nbsp;    val statusFlow = remember(coordinator) {</b>
+<b class="nc">&nbsp;        combine(coordinator.state, coordinator.lastOutcome) { state, outcome -&gt;</b>
+<b class="nc">&nbsp;            toSurferStatus(state, outcome)</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+<b class="nc">&nbsp;    val status by statusFlow.collectAsStateWithLifecycle(initialValue = SurferSyncStatus.Hidden)</b>
+&nbsp;
+<b class="nc">&nbsp;    CompositionLocalProvider(LocalSurferSyncStatus provides status) {</b>
+<b class="nc">&nbsp;        content()</b>
+&nbsp;    }
+<b class="nc">&nbsp;}</b>
+&nbsp;
+&nbsp;private fun toSurferStatus(state: SyncState, outcome: LastSyncOutcome): SurferSyncStatus =
+<b class="nc">&nbsp;    when (state) {</b>
+<b class="nc">&nbsp;        is SyncState.Running, is SyncState.Queued -&gt; SurferSyncStatus.Syncing</b>
+<b class="nc">&nbsp;        SyncState.Idle -&gt; when (outcome) {</b>
+<b class="nc">&nbsp;            is LastSyncOutcome.Success -&gt; SurferSyncStatus.Synced</b>
+<b class="nc">&nbsp;            is LastSyncOutcome.Failed -&gt; SurferSyncStatus.Failed</b>
+<b class="nc">&nbsp;            LastSyncOutcome.None, is LastSyncOutcome.Cancelled -&gt; SurferSyncStatus.Hidden</b>
+&nbsp;        }
+&nbsp;    }
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-07-28 21:38</div>
+</div>
+</body>
+</html>

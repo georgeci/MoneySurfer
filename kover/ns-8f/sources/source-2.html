@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > AsyncState</title>
+  <title>MoneySurfer Coverage Report > SurferPaneKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,15 +19,18 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.utils</a>
+    <a href="../index.html">com.georgeci.moneysurfer.uikit.window</a>
 </div>
 
-<h1>Coverage Summary for Class: AsyncState (com.georgeci.moneysurfer.utils)</h1>
+<h1>Coverage Summary for Class: SurferPaneKt (com.georgeci.moneysurfer.uikit.window)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -45,70 +48,22 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   Instruction, %
 </th>
 </tr>
-  <tr>
-    <td class="name">AsyncState$Content</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (2/2)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (12/12)
-  </span>
-</td>
-  </tr>
-  <tr>
-    <td class="name">AsyncState$Loading</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (2/2)
-  </span>
-</td>
-  </tr>
 <tr>
-  <td class="name"><strong>Total</strong></td>
+  <td class="name">SurferPaneKt</td>
 <td class="coverageStat">
   <span class="percent">
     100%
   </span>
   <span class="absValue">
-    (2/2)
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
   </span>
 </td>
     <td class="coverageStat"/>
@@ -117,7 +72,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (3/3)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
@@ -129,6 +84,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   </span>
 </td>
 </tr>
+
 </table>
 
 <br/>
@@ -136,16 +92,63 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.utils
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.window
 &nbsp;
-&nbsp;sealed interface AsyncState&lt;out C : Any&gt; {
-<b class="fc">&nbsp;    data object Loading : AsyncState&lt;Nothing&gt;</b>
+&nbsp;import androidx.compose.runtime.Immutable
+&nbsp;import androidx.compose.runtime.ProvidableCompositionLocal
+&nbsp;import androidx.compose.runtime.compositionLocalOf
 &nbsp;
-&nbsp;    data class Content&lt;C : Any&gt;(
-<b class="fc">&nbsp;        val value: C,</b>
-<b class="fc">&nbsp;        val pending: Boolean = false,</b>
-&nbsp;    ) : AsyncState&lt;C&gt;
+&nbsp;/** Which pane of the host layout a screen is currently composing into. */
+&nbsp;enum class SurferPaneRole {
+&nbsp;    /**
+&nbsp;     * The screen is the only thing on screen — every compact-width window, and every route the
+&nbsp;     * pane host does not lay out side by side. Chrome behaves exactly as it always has.
+&nbsp;     */
+&nbsp;    Single,
+&nbsp;
+&nbsp;    /** The list pane of a two-pane layout. Owns the section&#39;s top app bar and its FAB. */
+&nbsp;    List,
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The detail pane of a two-pane layout, displayed *next to* its list pane. The list pane is
+&nbsp;     * already drawing the section&#39;s top app bar and FAB, so this one must not draw its own.
+&nbsp;     */
+&nbsp;    Detail,
 &nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * How the pane host is displaying the screen currently composing, published through
+&nbsp; * [LocalSurferPane].
+&nbsp; *
+&nbsp; * A screen reads this instead of measuring the window itself: whether a sibling pane is on screen
+&nbsp; * is a fact about the *back stack* as much as about the width, and only the host knows both. See
+&nbsp; * `SurferPaneSceneStrategy` in `:navigation` for where the value comes from.
+&nbsp; *
+&nbsp; * @param role which pane the screen occupies.
+&nbsp; * @param hasPaneBackStack whether a back affordance on this screen still leads somewhere inside
+&nbsp; *   the two-pane layout rather than merely swapping the detail pane for its placeholder — either
+&nbsp; *   an earlier entry of the same pane to return to (a settings sub-screen that opened another,
+&nbsp; *   About → Licenses) or an entry stacked above this one (a list route pushed from a detail, which
+&nbsp; *   leaves the detail beside a list that is not its own). A detail opened straight from its list
+&nbsp; *   has neither, and is the one case that drops the affordance.
+&nbsp; */
+&nbsp;@Immutable
+&nbsp;data class SurferPane(
+&nbsp;    val role: SurferPaneRole = SurferPaneRole.Single,
+&nbsp;    val hasPaneBackStack: Boolean = false,
+&nbsp;) {
+&nbsp;    /**
+&nbsp;     * Whether this screen draws the section&#39;s top app bar and floating action button. Only the
+&nbsp;     * detail pane of a two-pane layout gives them up — its list pane is already drawing both.
+&nbsp;     */
+&nbsp;    val ownsSectionChrome: Boolean get() = role != SurferPaneRole.Detail
+&nbsp;
+&nbsp;    /** Whether a back affordance on this screen still has somewhere to go. */
+&nbsp;    val showsBackNavigation: Boolean get() = ownsSectionChrome || hasPaneBackStack
+&nbsp;}
+&nbsp;
+&nbsp;/** The [SurferPane] the current composition sits in. Defaults to a plain full-window screen. */
+<b class="fc">&nbsp;val LocalSurferPane: ProvidableCompositionLocal&lt;SurferPane&gt; = compositionLocalOf { SurferPane() }</b>
 </code>
 </pre>
 </div>
@@ -169,7 +172,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 21:18</div>
+    <div style="float:right;">generated on 2026-07-28 21:38</div>
 </div>
 </body>
 </html>

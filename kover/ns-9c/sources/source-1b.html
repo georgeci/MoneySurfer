@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > ComGeorgeciMoneysurferSyncSchedulerDesktopBackgroundSyncSchedulerDefinitionKt</title>
+  <title>MoneySurfer Coverage Report > RecurringRuleRepository</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">org.koin.plugin.hints</a>
+    <a href="../index.html">com.georgeci.moneysurfer.domain.repositories</a>
 </div>
 
-<h1>Coverage Summary for Class: ComGeorgeciMoneysurferSyncSchedulerDesktopBackgroundSyncSchedulerDefinitionKt (org.koin.plugin.hints)</h1>
+<h1>Coverage Summary for Class: RecurringRuleRepository (com.georgeci.moneysurfer.domain.repositories)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">ComGeorgeciMoneysurferSyncSchedulerDesktopBackgroundSyncSchedulerDefinitionKt</td>
+  <td class="name">RecurringRuleRepository</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -42,7 +42,25 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <br/>
 <br/>
 
-  <code class="sourceCode">Source code is not available<br /></code>
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.repositories
+&nbsp;
+&nbsp;import com.georgeci.moneysurfer.domain.model.RecurringRule
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.RecurringRuleId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
+&nbsp;import kotlinx.coroutines.flow.Flow
+&nbsp;
+&nbsp;interface RecurringRuleRepository {
+&nbsp;    fun getAll(): Flow&lt;List&lt;RecurringRule&gt;&gt;
+&nbsp;    fun getByWorkspaceId(workspaceId: WorkspaceId): Flow&lt;List&lt;RecurringRule&gt;&gt;
+&nbsp;    suspend fun getById(id: RecurringRuleId): RecurringRule?
+&nbsp;    suspend fun insert(rule: RecurringRule)
+&nbsp;    suspend fun update(rule: RecurringRule)
+&nbsp;    suspend fun delete(id: RecurringRuleId)
+&nbsp;}
+</code>
+</pre>
 </div>
 
 <script type="text/javascript">
@@ -64,7 +82,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 21:18</div>
+    <div style="float:right;">generated on 2026-07-28 21:38</div>
 </div>
 </body>
 </html>
