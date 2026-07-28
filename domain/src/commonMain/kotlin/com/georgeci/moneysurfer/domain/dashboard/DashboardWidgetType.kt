@@ -10,6 +10,7 @@ enum class DashboardWidgetType {
     Balance,
     QuickActions,
     Accounts,
+    Insights,
     Goals,
     RecentTransactions,
 }

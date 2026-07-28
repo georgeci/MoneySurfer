@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="dashboard_insights_subscriptions_title">
+        <item quantity="one">%1$d активная подписка</item>
+        <item quantity="few">%1$d активные подписки</item>
+        <item quantity="many">%1$d активных подписок</item>
+        <item quantity="other">%1$d активных подписок</item>
+    </plurals>
+</resources>

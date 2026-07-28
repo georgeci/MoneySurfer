@@ -265,6 +265,29 @@ Ids must be stable across recomputation (`"category-up:${categoryId}:${period}"`
 otherwise the "N new" badge counts the same insight forever and dismissal cannot
 be persisted later. Rules are table-driven kotest specs in `domain`.
 
+**Landed (issue #295)**, with four calls the plan left open:
+
+- **The baseline is month-to-*date*, not last month whole.** Comparing three days of July with
+  all of June reads as a 90% fall in every category, so the engine would spend the first week of
+  every month congratulating the user for not having spent the money yet. Both windows are the
+  same number of days, and the previous one is clamped to its own month's last day so a 31st
+  compares against a whole 28-day February. `periodWindow(Month, ...)` is deliberately *not* used
+  — it always spans a whole calendar month, and the point here is a matched pair of part-months.
+- **The floor is relative, not absolute.** A fixed "€20" means something different in every
+  currency the app supports; the floor is 5% of the *previous period's total spend*, which reads
+  the same everywhere and does the job the plan wanted it for (2 → 5 is filtered, 300 → 380 is
+  not).
+- **CategoryUp and CategorySaving are one rule.** They are one finding read in two directions, so
+  `Insight.CategoryChange` carries both and `isIncrease` is the direction. PeriodNet became
+  `PeriodSpend` — expense against expense rather than net income, since `byCategory` already
+  answers it and `netByMonth`'s part-month caveat does not apply.
+- **BudgetRisk is not built.** It is the one rule that genuinely needs Budgets (#243), and #295's
+  scope did not include it. It slots in as a fourth rule with no change to `InsightInput` beyond
+  the progress list.
+
+The widget also gained a `list` / `carousel` card-style variant, keyed the way
+`SurferBalanceVariant` already is, so the picker offers it without a persistence change.
+
 ## Phase 6 — reuse
 
 #294 BurnRate and #293 SafeToSpend both want a daily expense series and are

@@ -15,6 +15,7 @@
     <string name="dashboard_customize_widget_accounts">Счета</string>
     <string name="dashboard_customize_widget_goals">Цели</string>
     <string name="dashboard_customize_widget_recent">Последние транзакции</string>
+    <string name="dashboard_customize_widget_insights">Подсказки</string>
     <string name="dashboard_customize_style_subtitle">Выберите, как эта карточка выглядит на дашборде.</string>
     <string name="dashboard_customize_style_size">Размер</string>
     <string name="dashboard_customize_style_variant">Стиль</string>
@@ -25,6 +26,8 @@
     <string name="dashboard_customize_variant_balance_stacked">Стопкой</string>
     <string name="dashboard_customize_variant_balance_inline">В строку</string>
     <string name="dashboard_customize_variant_balance_minimal">Минимальный</string>
+    <string name="dashboard_customize_variant_insights_list">Списком</string>
+    <string name="dashboard_customize_variant_insights_carousel">Каруселью</string>
     <string name="dashboard_customize_preview_account_everyday">Повседневный</string>
     <string name="dashboard_customize_preview_account_savings">Накопления</string>
     <string name="dashboard_customize_preview_account_cash">Наличные</string>
@@ -62,4 +65,18 @@
     <string name="dashboard_recurring_empty_subtitle">Подписки и регулярные платежи появятся здесь.</string>
     <string name="dashboard_insights_title">Подсказки</string>
     <string name="dashboard_insights_empty_text">В этом периоде ничего особенного.</string>
+    <string name="dashboard_insights_uncategorized">Без категории</string>
+    <string name="dashboard_insights_category_up_title">%1$s — рост на %2$d%</string>
+    <string name="dashboard_insights_category_down_title">%1$s — снижение на %2$d%</string>
+    <string name="dashboard_insights_period_up_title">Расходы выросли на %1$d%</string>
+    <string name="dashboard_insights_period_down_title">Расходы снизились на %1$d%</string>
+    <string name="dashboard_insights_period_flat_title">Расходы стабильны</string>
+    <string name="dashboard_insights_comparison_body">%1$s в этом месяце против %2$s на ту же дату в прошлом.</string>
+    <string name="dashboard_insights_subscriptions_body">Около %1$s в месяц.</string>
+    <string name="dashboard_customize_preview_insight_up_title">Кафе — рост на 28%</string>
+    <string name="dashboard_customize_preview_insight_up_body">€162 в этом месяце против €127 на ту же дату в прошлом.</string>
+    <string name="dashboard_customize_preview_insight_down_title">Досуг — снижение на 21%</string>
+    <string name="dashboard_customize_preview_insight_down_body">€84 в этом месяце против €106 на ту же дату в прошлом.</string>
+    <string name="dashboard_customize_preview_insight_subs_title">4 активные подписки</string>
+    <string name="dashboard_customize_preview_insight_subs_body">Около €62 в месяц.</string>
 </resources>

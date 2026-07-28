@@ -5,12 +5,16 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -20,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
@@ -37,19 +42,47 @@ data class SurferInsightItem(
     val body: String,
 )
 
+/**
+ * How the cards are arranged inside the widget.
+ *
+ * The entry names double as the persisted keys of a dashboard card style, which is why [fromKey]
+ * is lenient: a layout written by a newer build may name a layout this one has never heard of, and
+ * falling back to [List] beats refusing to draw the insights.
+ */
+enum class SurferInsightsVariant {
+
+    /** Stacked cards, as many as the card size has room for — the dashboard default. */
+    List,
+
+    /** One card per page, swiped sideways, with a dot per insight underneath. */
+    Carousel,
+
+    ;
+
+    companion object {
+        fun fromKey(key: String?): SurferInsightsVariant = entries.firstOrNull { it.name == key } ?: List
+    }
+}
+
+/**
+ * The generated-insight card.
+ *
+ * [SurferInsightsVariant.List] keeps as many cards as the size allows — three expanded, one
+ * compact — because a column of insights is read at a glance. [SurferInsightsVariant.Carousel]
+ * keeps all of them instead and trades height for swipes, which is what makes it worth offering:
+ * a compact carousel still reaches every insight.
+ */
 @Composable
 fun SurferInsightsWidget(
     items: List<SurferInsightItem>,
     title: String,
     modifier: Modifier = Modifier,
     size: SurferWidgetSize = LocalSurferWidgetSize.current,
+    variant: SurferInsightsVariant = SurferInsightsVariant.List,
     onItemClick: ((SurferInsightItem) -> Unit)? = null,
     badgeFormat: ((Int) -> String)? = null,
     emptyText: String? = null,
 ) {
-    val hero = size == SurferWidgetSize.Expanded
-    val visibleItems = if (hero) items.take(3) else items.take(1)
-
     SurferWidgetCard(
         title = title,
         modifier = modifier,
@@ -73,22 +106,96 @@ fun SurferInsightsWidget(
         }
 
         Spacer(Modifier.height(10.dp))
-        Column(
-            modifier = Modifier.padding(horizontal = 14.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            visibleItems.forEach { item ->
-                InsightCard(
-                    item = item,
-                    onClick = onItemClick?.let { handler -> { handler(item) } },
-                )
-            }
+        when (variant) {
+            SurferInsightsVariant.List -> InsightList(
+                items = items.take(if (size == SurferWidgetSize.Expanded) EXPANDED_ROWS else COMPACT_ROWS),
+                onItemClick = onItemClick,
+            )
+            SurferInsightsVariant.Carousel -> InsightCarousel(items = items, onItemClick = onItemClick)
         }
     }
 }
 
 @Composable
-private fun InsightCard(item: SurferInsightItem, onClick: (() -> Unit)?) {
+private fun InsightList(
+    items: List<SurferInsightItem>,
+    onItemClick: ((SurferInsightItem) -> Unit)?,
+) {
+    Column(
+        modifier = Modifier.padding(horizontal = CARD_INSET),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        items.forEach { item ->
+            InsightCard(
+                item = item,
+                onClick = onItemClick?.let { handler -> { handler(item) } },
+            )
+        }
+    }
+}
+
+/**
+ * One card per page plus a dot row.
+ *
+ * Every page pins its body to [CAROUSEL_BODY_LINES] lines so the pager keeps one height across the
+ * whole set: a lazy row of pages is measured from what is composed, so pages of different heights
+ * make the card grow and shrink under the reader's thumb mid-swipe.
+ */
+@Composable
+private fun InsightCarousel(
+    items: List<SurferInsightItem>,
+    onItemClick: ((SurferInsightItem) -> Unit)?,
+) {
+    val pagerState = rememberPagerState(pageCount = { items.size })
+    HorizontalPager(
+        state = pagerState,
+        contentPadding = PaddingValues(horizontal = CARD_INSET),
+        pageSpacing = 8.dp,
+    ) { page ->
+        val item = items[page]
+        InsightCard(
+            item = item,
+            onClick = onItemClick?.let { handler -> { handler(item) } },
+            bodyLines = CAROUSEL_BODY_LINES,
+        )
+    }
+    if (items.size > 1) {
+        Spacer(Modifier.height(10.dp))
+        PageDots(count = items.size, selected = pagerState.currentPage)
+    }
+}
+
+@Composable
+private fun PageDots(count: Int, selected: Int) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterHorizontally),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        repeat(count) { index ->
+            val active = index == selected
+            Box(
+                modifier = Modifier
+                    .size(if (active) 8.dp else 6.dp)
+                    .clip(CircleShape)
+                    .background(
+                        if (active) {
+                            AppTheme.materialColors.primary
+                        } else {
+                            AppTheme.materialColors.surfaceContainerHighest
+                        },
+                    ),
+            )
+        }
+    }
+}
+
+@Composable
+private fun InsightCard(
+    item: SurferInsightItem,
+    onClick: (() -> Unit)?,
+    bodyLines: Int? = null,
+) {
     val (bg, fg) = when (item.tone) {
         SurferInsightTone.Good ->
             AppTheme.materialColors.tertiaryContainer to
@@ -138,10 +245,46 @@ private fun InsightCard(item: SurferInsightItem, onClick: (() -> Unit)?) {
                 text = item.body,
                 style = AppTheme.typography.bodySmall,
                 color = fg.copy(alpha = 0.85f),
+                minLines = bodyLines ?: 1,
+                maxLines = bodyLines ?: Int.MAX_VALUE,
+                overflow = TextOverflow.Ellipsis,
             )
         }
     }
 }
+
+/** Side inset of the cards inside the widget — a touch tighter than the header's 16dp. */
+private val CARD_INSET = 14.dp
+
+private const val EXPANDED_ROWS = 3
+private const val COMPACT_ROWS = 1
+
+/** Two lines fit the generated copy; see [InsightCarousel] for why it is pinned rather than capped. */
+private const val CAROUSEL_BODY_LINES = 2
+
+private val PREVIEW_ITEMS = listOf(
+    SurferInsightItem(
+        id = "1",
+        tone = SurferInsightTone.Warn,
+        icon = SurferIcons.ArrowUp,
+        title = "Dining is up 28%",
+        body = "€162 spent — €35 above your usual €127 / month.",
+    ),
+    SurferInsightItem(
+        id = "2",
+        tone = SurferInsightTone.Good,
+        icon = SurferIcons.Sparkle,
+        title = "On track to save €420",
+        body = "You spent 21% less on Leisure than last month.",
+    ),
+    SurferInsightItem(
+        id = "3",
+        tone = SurferInsightTone.Neutral,
+        icon = SurferIcons.Sync,
+        title = "4 active subscriptions",
+        body = "About €62 a month.",
+    ),
+)
 
 @Preview
 @Composable
@@ -149,24 +292,25 @@ private fun SurferInsightsWidgetHeroPreview() {
     SurferComponentPreview {
         Box(modifier = Modifier.padding(16.dp)) {
             SurferInsightsWidget(
-                items = listOf(
-                    SurferInsightItem(
-                        id = "1",
-                        tone = SurferInsightTone.Warn,
-                        icon = SurferIcons.ArrowUp,
-                        title = "Dining is up 28%",
-                        body = "€162 spent — €35 above your usual €127 / month.",
-                    ),
-                    SurferInsightItem(
-                        id = "2",
-                        tone = SurferInsightTone.Good,
-                        icon = SurferIcons.Sparkle,
-                        title = "On track to save €420",
-                        body = "You spent 21% less on Leisure than last month.",
-                    ),
-                ),
+                items = PREVIEW_ITEMS,
                 title = "Insights",
                 badgeFormat = { "$it new" },
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun SurferInsightsWidgetCarouselPreview() {
+    SurferComponentPreview {
+        Box(modifier = Modifier.padding(16.dp)) {
+            SurferInsightsWidget(
+                items = PREVIEW_ITEMS,
+                title = "Insights",
+                variant = SurferInsightsVariant.Carousel,
+                size = SurferWidgetSize.Compact,
                 modifier = Modifier.fillMaxWidth(),
             )
         }

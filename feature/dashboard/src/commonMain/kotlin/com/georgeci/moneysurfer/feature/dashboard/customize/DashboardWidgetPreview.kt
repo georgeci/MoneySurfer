@@ -20,6 +20,10 @@ import com.georgeci.moneysurfer.uikit.widgets.SurferBalanceVariant
 import com.georgeci.moneysurfer.uikit.widgets.SurferBalanceWidget
 import com.georgeci.moneysurfer.uikit.widgets.SurferGoalItem
 import com.georgeci.moneysurfer.uikit.widgets.SurferGoalsWidget
+import com.georgeci.moneysurfer.uikit.widgets.SurferInsightItem
+import com.georgeci.moneysurfer.uikit.widgets.SurferInsightTone
+import com.georgeci.moneysurfer.uikit.widgets.SurferInsightsVariant
+import com.georgeci.moneysurfer.uikit.widgets.SurferInsightsWidget
 import com.georgeci.moneysurfer.uikit.widgets.SurferQuickActionsWidget
 import com.georgeci.moneysurfer.uikit.widgets.SurferRecentTransactionItem
 import com.georgeci.moneysurfer.uikit.widgets.SurferRecentTransactionsWidget
@@ -34,12 +38,19 @@ import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_pre
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_preview_account_savings
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_preview_goal_laptop
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_preview_goal_trip
+import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_preview_insight_down_body
+import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_preview_insight_down_title
+import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_preview_insight_subs_body
+import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_preview_insight_subs_title
+import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_preview_insight_up_body
+import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_preview_insight_up_title
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_preview_transaction_coffee
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_preview_transaction_groceries
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_preview_transaction_rent
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_preview_transaction_salary
 import moneysurfer.feature.dashboard.generated.resources.dashboard_goals_see_all
 import moneysurfer.feature.dashboard.generated.resources.dashboard_goals_title
+import moneysurfer.feature.dashboard.generated.resources.dashboard_insights_title
 import moneysurfer.feature.dashboard.generated.resources.dashboard_quick_action_transfer
 import moneysurfer.feature.dashboard.generated.resources.dashboard_recent_see_all
 import moneysurfer.feature.dashboard.generated.resources.dashboard_recent_title
@@ -79,6 +90,7 @@ internal fun DashboardWidgetPreview(
             DashboardWidgetType.Balance -> BalancePreview(cardStyle.variant, modifier.then(content))
             DashboardWidgetType.QuickActions -> QuickActionsPreview(modifier.then(content))
             DashboardWidgetType.Accounts -> AccountsPreview(modifier.then(content))
+            DashboardWidgetType.Insights -> InsightsPreview(cardStyle.variant, modifier.then(content))
             DashboardWidgetType.Goals -> GoalsPreview(modifier.then(content))
             DashboardWidgetType.RecentTransactions -> RecentTransactionsPreview(modifier.then(content))
         }
@@ -144,6 +156,42 @@ private fun AccountsPreview(modifier: Modifier) {
             onClick = {},
             trailingLabel = stringResource(Res.string.dashboard_accounts_manage),
         ),
+        modifier = modifier,
+    )
+}
+
+/**
+ * Sample sentences rather than the user's own, like every other tile here: the picker is opened
+ * to compare two layouts, and a workspace with one insight (or none) would show two blank tiles.
+ */
+@Composable
+private fun InsightsPreview(variant: String?, modifier: Modifier) {
+    SurferInsightsWidget(
+        items = listOf(
+            SurferInsightItem(
+                id = "preview-1",
+                tone = SurferInsightTone.Warn,
+                icon = SurferIcons.ArrowUp,
+                title = stringResource(Res.string.dashboard_customize_preview_insight_up_title),
+                body = stringResource(Res.string.dashboard_customize_preview_insight_up_body),
+            ),
+            SurferInsightItem(
+                id = "preview-2",
+                tone = SurferInsightTone.Good,
+                icon = SurferIcons.ArrowDown,
+                title = stringResource(Res.string.dashboard_customize_preview_insight_down_title),
+                body = stringResource(Res.string.dashboard_customize_preview_insight_down_body),
+            ),
+            SurferInsightItem(
+                id = "preview-3",
+                tone = SurferInsightTone.Neutral,
+                icon = SurferIcons.Sync,
+                title = stringResource(Res.string.dashboard_customize_preview_insight_subs_title),
+                body = stringResource(Res.string.dashboard_customize_preview_insight_subs_body),
+            ),
+        ),
+        title = stringResource(Res.string.dashboard_insights_title),
+        variant = SurferInsightsVariant.fromKey(variant),
         modifier = modifier,
     )
 }

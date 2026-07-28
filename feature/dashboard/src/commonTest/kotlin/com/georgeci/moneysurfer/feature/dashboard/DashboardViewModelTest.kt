@@ -5,11 +5,14 @@ import com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutConfig
 import com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutItem
 import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetType
 import com.georgeci.moneysurfer.domain.fixtures.EUR
+import com.georgeci.moneysurfer.domain.fixtures.FakeCategoryRepository
 import com.georgeci.moneysurfer.domain.fixtures.FakeExchangeRateRepository
 import com.georgeci.moneysurfer.domain.fixtures.FakeGoalContributionRepository
 import com.georgeci.moneysurfer.domain.fixtures.FakeGoalWorkspaceRepository
 import com.georgeci.moneysurfer.domain.fixtures.FakeHostCapabilities
+import com.georgeci.moneysurfer.domain.fixtures.FakeRecurringRuleRepository
 import com.georgeci.moneysurfer.domain.fixtures.FakeSavingsGoalRepository
+import com.georgeci.moneysurfer.domain.fixtures.FakeSpendAnalyticsRepository
 import com.georgeci.moneysurfer.domain.fixtures.FakeUiPreferences
 import com.georgeci.moneysurfer.domain.fixtures.USD
 import com.georgeci.moneysurfer.domain.fixtures.aTransaction
@@ -27,6 +30,7 @@ import com.georgeci.moneysurfer.domain.model.Transaction
 import com.georgeci.moneysurfer.domain.model.TransactionTotal
 import com.georgeci.moneysurfer.domain.preferences.UiPreferences
 import com.georgeci.moneysurfer.domain.primitives.AccountId
+import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
 import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
 import com.georgeci.moneysurfer.domain.primitives.Money
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
@@ -36,6 +40,7 @@ import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 import com.georgeci.moneysurfer.domain.repositories.AccountRepository
 import com.georgeci.moneysurfer.domain.repositories.TransactionRepository
 import com.georgeci.moneysurfer.domain.usecase.ConvertAccountsTotalUseCase
+import com.georgeci.moneysurfer.domain.usecase.GenerateInsightsUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetAccountsUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetExchangeRatesUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetGoalsUseCase
@@ -134,6 +139,7 @@ class DashboardViewModelTest : StringSpec({
             // widgets the stored layout never heard of are appended rather than dropped
             DashboardWidgetType.QuickActions,
             DashboardWidgetType.Accounts,
+            DashboardWidgetType.Insights,
             DashboardWidgetType.RecentTransactions,
         )
     }
@@ -256,6 +262,16 @@ private fun newViewModel(
         getRecentTransactions = GetRecentTransactionsUseCase(transactions, session),
         getGoals = GetGoalsUseCase(FakeSavingsGoalRepository(), FakeGoalContributionRepository(), session),
         getExchangeRates = GetExchangeRatesUseCase(session, workspaces, rates),
+        // Nothing to generate from: these specs are about the balance and the transaction list,
+        // and an insights engine reading empty aggregates emits an empty list.
+        generateInsights = GenerateInsightsUseCase(
+            spendAnalytics = FakeSpendAnalyticsRepository(),
+            categoryRepository = FakeCategoryRepository(),
+            recurringRuleRepository = FakeRecurringRuleRepository(),
+            workspaceRepository = workspaces,
+            session = session,
+            clock = ClockUseCase(),
+        ),
         convertAccountsTotal = ConvertAccountsTotalUseCase(),
         uiPreferences = uiPreferences,
         hostCapabilities = hostCapabilities,
