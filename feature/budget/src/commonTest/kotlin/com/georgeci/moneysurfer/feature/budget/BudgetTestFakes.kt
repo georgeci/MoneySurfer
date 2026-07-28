@@ -10,6 +10,7 @@ import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.BudgetId
 import com.georgeci.moneysurfer.domain.primitives.CategoryId
 import com.georgeci.moneysurfer.domain.primitives.Money
+import com.georgeci.moneysurfer.domain.primitives.SplitId
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
 import com.georgeci.moneysurfer.domain.primitives.TransferId
@@ -58,6 +59,9 @@ internal class FakeBudgetRepository(initial: List<Budget> = emptyList()) : Budge
 
 internal class FakeTransactionRepository(initial: List<Transaction> = emptyList()) : TransactionRepository {
     private val flow = MutableStateFlow(initial)
+
+    /** Rows a delete tombstoned — out of [flow], so no read sees them, but restorable. */
+    private val tombstones = mutableListOf<Transaction>()
 
     fun emit(transactions: List<Transaction>) {
         flow.value = transactions
@@ -118,6 +122,8 @@ internal class FakeTransactionRepository(initial: List<Transaction> = emptyList(
     override suspend fun getById(id: TransactionId): Transaction? = flow.value.firstOrNull { it.id == id }
     override suspend fun getByTransferId(transferId: TransferId): List<Transaction> =
         flow.value.filter { it.transferId == transferId }
+    override suspend fun getBySplitId(splitId: SplitId): List<Transaction> =
+        flow.value.filter { it.splitId == splitId }
     override suspend fun insert(transaction: Transaction) {
         flow.value = flow.value + transaction
     }
@@ -127,8 +133,15 @@ internal class FakeTransactionRepository(initial: List<Transaction> = emptyList(
     }
 
     override suspend fun delete(id: TransactionId) {
+        tombstones += flow.value.filter { it.id == id }
         flow.value = flow.value.filterNot { it.id == id }
     }
+
+    override suspend fun restore(id: TransactionId): Transaction? =
+        tombstones.firstOrNull { it.id == id }?.also {
+            tombstones -= it
+            flow.value = flow.value + it
+        }
 }
 
 internal class FakeWorkspaceRepository(initial: List<Workspace> = emptyList()) : WorkspaceRepository {

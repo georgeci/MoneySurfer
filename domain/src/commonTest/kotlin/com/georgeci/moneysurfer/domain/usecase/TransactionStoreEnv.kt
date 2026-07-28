@@ -6,6 +6,7 @@ import com.georgeci.moneysurfer.domain.model.Transaction
 import com.georgeci.moneysurfer.domain.model.TransactionTotal
 import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.Money
+import com.georgeci.moneysurfer.domain.primitives.SplitId
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.domain.primitives.TransferId
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
@@ -19,9 +20,16 @@ import kotlinx.coroutines.flow.flowOf
  * In-memory transaction + account stores wired to a real [ApplyTransactionChangeUseCase], shared by
  * the tests of the use cases that write through it. Balances are tracked in minor units so a test
  * can assert the side effect of a write without a real database.
+ *
+ * Soft delete is modelled as two maps rather than one map plus a flag, which is what the real
+ * `deletedAt IS NULL` filter amounts to from a caller's point of view: [txStore] is what any query
+ * can see, [tombstones] is what Undo can still reach.
  */
 class TransactionStoreEnv {
     val txStore = mutableMapOf<TransactionId, Transaction>()
+
+    /** Rows a delete tombstoned: invisible to every read, still restorable. */
+    val tombstones = mutableMapOf<TransactionId, Transaction>()
     val balances = mutableMapOf<AccountId, Long>()
 
     val txRepo = object : TransactionRepository {
@@ -42,9 +50,15 @@ class TransactionStoreEnv {
         override suspend fun getById(id: TransactionId): Transaction? = txStore[id]
         override suspend fun getByTransferId(transferId: TransferId): List<Transaction> =
             txStore.values.filter { it.transferId == transferId }
+        override suspend fun getBySplitId(splitId: SplitId): List<Transaction> =
+            txStore.values.filter { it.splitId == splitId }
         override suspend fun insert(transaction: Transaction) { txStore[transaction.id] = transaction }
         override suspend fun update(transaction: Transaction) { txStore[transaction.id] = transaction }
-        override suspend fun delete(id: TransactionId) { txStore.remove(id) }
+        override suspend fun delete(id: TransactionId) {
+            txStore.remove(id)?.let { tombstones[id] = it }
+        }
+        override suspend fun restore(id: TransactionId): Transaction? =
+            tombstones.remove(id)?.also { txStore[id] = it }
     }
 
     val accRepo = object : AccountRepository {

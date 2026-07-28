@@ -52,7 +52,6 @@ import com.georgeci.moneysurfer.uikit.widgets.SurferQuickActionsWidget
 import com.georgeci.moneysurfer.uikit.widgets.SurferRecentTransactionItem
 import com.georgeci.moneysurfer.uikit.widgets.SurferRecentTransactionsWidget
 import com.georgeci.moneysurfer.uikit.widgets.SurferWidgetSize
-import com.georgeci.moneysurfer.utils.HandleSideEffect
 import moneysurfer.feature.dashboard.generated.resources.Res
 import moneysurfer.feature.dashboard.generated.resources.dashboard_accounts_manage
 import moneysurfer.feature.dashboard.generated.resources.dashboard_accounts_section_title
@@ -72,6 +71,7 @@ import moneysurfer.feature.dashboard.generated.resources.dashboard_quick_action_
 import moneysurfer.feature.dashboard.generated.resources.dashboard_recent_empty_subtitle
 import moneysurfer.feature.dashboard.generated.resources.dashboard_recent_empty_title
 import moneysurfer.feature.dashboard.generated.resources.dashboard_recent_see_all
+import moneysurfer.feature.dashboard.generated.resources.dashboard_recent_split_categories
 import moneysurfer.feature.dashboard.generated.resources.dashboard_recent_title
 import moneysurfer.feature.dashboard.generated.resources.dashboard_settings_content_description
 import moneysurfer.feature.dashboard.generated.resources.dashboard_toolbar_greeting
@@ -101,6 +101,10 @@ object DashboardTestTags {
      * their labels, both of which this screen owns.
      */
     const val QuickActions = "dashboard:quickActions"
+    const val SafeToSpend = "dashboard:safeToSpend"
+
+    /** The "Set a budget" link, shown only while the safe-to-spend widget has no budget to read. */
+    const val SafeToSpendSetBudget = "dashboard:safeToSpendSetBudget"
     const val Accounts = "dashboard:accounts"
 
     /**
@@ -118,36 +122,12 @@ object DashboardTestTags {
 
 @Composable
 fun DashboardScreen(
-    onNavigateToAccountCreation: () -> Unit,
-    onNavigateToAccountsManage: () -> Unit,
-    onNavigateToTransactionCreation: (accountId: AccountId?) -> Unit,
-    onNavigateToTransferCreation: () -> Unit,
-    onNavigateToAccountDetails: (AccountId) -> Unit,
-    onNavigateToTransactionDetails: (TransactionId) -> Unit,
-    onNavigateToSettings: () -> Unit,
-    onNavigateToCustomize: () -> Unit,
-    onNavigateToTransactionsList: () -> Unit,
-    onNavigateToGoals: () -> Unit,
-    onNavigateToGoalDetails: (GoalId) -> Unit,
+    navigation: DashboardNavigation,
     viewModel: DashboardViewModel = koinViewModel(),
 ) {
     val state by viewModel.collectAsStateWithLifecycle()
 
-    viewModel.HandleSideEffect { effect ->
-        when (effect) {
-            is DashboardEffect.NavigateToAccountDetails -> onNavigateToAccountDetails(effect.accountId)
-            is DashboardEffect.NavigateToTransactionDetails -> onNavigateToTransactionDetails(effect.transactionId)
-            DashboardEffect.NavigateToAccountCreation -> onNavigateToAccountCreation()
-            DashboardEffect.NavigateToAccountsManage -> onNavigateToAccountsManage()
-            is DashboardEffect.NavigateToTransactionCreation -> onNavigateToTransactionCreation(effect.accountId)
-            DashboardEffect.NavigateToTransferCreation -> onNavigateToTransferCreation()
-            DashboardEffect.NavigateToSettings -> onNavigateToSettings()
-            DashboardEffect.NavigateToCustomize -> onNavigateToCustomize()
-            DashboardEffect.NavigateToTransactionsList -> onNavigateToTransactionsList()
-            DashboardEffect.NavigateToGoals -> onNavigateToGoals()
-            is DashboardEffect.NavigateToGoalDetails -> onNavigateToGoalDetails(effect.goalId)
-        }
-    }
+    HandleDashboardEffects(viewModel, navigation)
 
     when (val current = state) {
         DashboardState.Loading -> DashboardLoading()
@@ -295,6 +275,7 @@ private fun DashboardWidget(
     when (type) {
         DashboardWidgetType.Balance -> BalanceWidget(state, variant)
         DashboardWidgetType.QuickActions -> QuickActionsWidget(state, onEvent)
+        DashboardWidgetType.SafeToSpend -> SafeToSpendWidget(state, onEvent)
         DashboardWidgetType.Accounts -> AccountsWidget(state, onEvent)
         DashboardWidgetType.Goals -> GoalsWidget(state, onEvent)
         DashboardWidgetType.RecentTransactions -> RecentTransactionsWidget(state, onEvent)
@@ -514,13 +495,20 @@ private fun GoalUi.toWidgetItem(): SurferGoalItem = SurferGoalItem(
 private fun SurferAccountItem.accountId(): AccountId? =
     id.takeIf { it.isNotEmpty() }?.let(::AccountId)
 
+@Composable
 private fun TransactionUi.toWidgetItem(
     iconBgColor: Color,
     iconFgColor: Color,
 ): SurferRecentTransactionItem = SurferRecentTransactionItem(
     id = id.value,
     title = title,
-    subtitle = "",
+    // A collapsed receipt says how many categories it covers; an ordinary row has nothing to add
+    // under its title here, and the list screen is where the category belongs.
+    subtitle = if (splitCategoryCount > 0) {
+        stringResource(Res.string.dashboard_recent_split_categories, splitCategoryCount)
+    } else {
+        ""
+    },
     amount = formattedAmount,
     isExpense = isExpense,
     iconBgColor = iconBgColor,

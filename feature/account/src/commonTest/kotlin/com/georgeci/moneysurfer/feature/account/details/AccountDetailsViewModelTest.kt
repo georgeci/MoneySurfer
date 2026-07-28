@@ -14,6 +14,7 @@ import com.georgeci.moneysurfer.domain.model.Transaction
 import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
 import com.georgeci.moneysurfer.domain.primitives.Money
+import com.georgeci.moneysurfer.domain.primitives.SplitId
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
 import com.georgeci.moneysurfer.domain.primitives.TransferId
@@ -196,6 +197,9 @@ private class SingleAccountRepository(private val account: Account) : AccountRep
 private class FixedTransactionRepository(transactions: List<Transaction>) : TransactionRepository {
     private val all = MutableStateFlow(transactions)
 
+    /** Rows a delete tombstoned — out of every read, still there for a restore. */
+    private val tombstones = mutableMapOf<TransactionId, Transaction>()
+
     override fun getAll(): Flow<List<Transaction>> = all
     override fun getByAccountId(accountId: AccountId): Flow<List<Transaction>> = all
     override fun getByWorkspaceId(workspaceId: WorkspaceId): Flow<List<Transaction>> = all
@@ -208,6 +212,8 @@ private class FixedTransactionRepository(transactions: List<Transaction>) : Tran
     override suspend fun getById(id: TransactionId): Transaction? = all.value.find { it.id == id }
     override suspend fun getByTransferId(transferId: TransferId): List<Transaction> =
         all.value.filter { it.transferId == transferId }
+    override suspend fun getBySplitId(splitId: SplitId): List<Transaction> =
+        all.value.filter { it.splitId == splitId }
 
     // Writing, not no-op: the list is fed by this flow, so a delete has to actually leave the rows
     // for the screen's reaction to it to be worth asserting.
@@ -220,6 +226,10 @@ private class FixedTransactionRepository(transactions: List<Transaction>) : Tran
     }
 
     override suspend fun delete(id: TransactionId) {
+        all.value.filter { it.id == id }.forEach { tombstones[id] = it }
         all.value = all.value.filterNot { it.id == id }
     }
+
+    override suspend fun restore(id: TransactionId): Transaction? =
+        tombstones.remove(id)?.also { all.value = all.value + it }
 }

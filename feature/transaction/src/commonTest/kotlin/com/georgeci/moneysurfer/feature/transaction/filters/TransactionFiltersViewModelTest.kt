@@ -7,6 +7,7 @@ import com.georgeci.moneysurfer.domain.fixtures.aTransaction
 import com.georgeci.moneysurfer.domain.fixtures.accountId
 import com.georgeci.moneysurfer.domain.fixtures.anAccount
 import com.georgeci.moneysurfer.domain.fixtures.dollars
+import com.georgeci.moneysurfer.domain.fixtures.splitId
 import com.georgeci.moneysurfer.domain.fixtures.transactionId
 import com.georgeci.moneysurfer.domain.model.Account
 import com.georgeci.moneysurfer.domain.model.CategorizedTransaction
@@ -17,6 +18,7 @@ import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.CategoryId
 import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
 import com.georgeci.moneysurfer.domain.primitives.Money
+import com.georgeci.moneysurfer.domain.primitives.SplitId
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
 import com.georgeci.moneysurfer.domain.primitives.TransferId
@@ -154,6 +156,22 @@ class TransactionFiltersViewModelTest : StringSpec({
         }
     }
 
+    "the result count promises rows the list will render, so a receipt counts once" {
+        runTest {
+            val receipt = splitId("sp-1")
+            val env = Env(
+                transactions = listOf(
+                    expense(id = "rent", amount = 900),
+                    expense(id = "leg-groceries", amount = 30).copy(splitId = receipt),
+                    expense(id = "leg-chemicals", amount = 4).copy(splitId = receipt),
+                ),
+            )
+
+            // Three rows in storage, two lines on the screen the button leads back to.
+            env.viewModel().currentState.resultCount shouldBe 2
+        }
+    }
+
     "an account-scoped screen hides the account picker" {
         runTest {
             val env = Env()
@@ -241,7 +259,15 @@ private class WindowedTransactions(transactions: List<Transaction>) : Transactio
         all.filter { it.operationDate in window }
             .filter { accountId == null || it.accountId == accountId }
             .take(limit)
-            .map { CategorizedTransaction(transaction = it, categoryName = "Groceries") }
+            .map { row ->
+                CategorizedTransaction(
+                    transaction = row,
+                    categoryName = "Groceries",
+                    // What the DAO's correlated subquery reports: the group's size in the whole
+                    // table, so a page holding part of a group can be told apart from a whole one.
+                    splitLegCount = all.count { it.splitId != null && it.splitId == row.splitId },
+                )
+            }
     }
 
     override fun getTotals(
@@ -255,9 +281,12 @@ private class WindowedTransactions(transactions: List<Transaction>) : Transactio
     override suspend fun getById(id: TransactionId): Transaction? = rows.value.find { it.id == id }
     override suspend fun getByTransferId(transferId: TransferId): List<Transaction> =
         rows.value.filter { it.transferId == transferId }
+    override suspend fun getBySplitId(splitId: SplitId): List<Transaction> =
+        rows.value.filter { it.splitId == splitId }
     override suspend fun insert(transaction: Transaction) = Unit
     override suspend fun update(transaction: Transaction) = Unit
     override suspend fun delete(id: TransactionId) = Unit
+    override suspend fun restore(id: TransactionId): Transaction? = null
 }
 
 private object OneAccount : AccountRepository {

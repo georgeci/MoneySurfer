@@ -1,7 +1,6 @@
 package com.georgeci.moneysurfer.feature.goal
 
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
-import androidx.compose.material3.adaptive.navigation3.ListDetailSceneStrategy
 import com.georgeci.moneysurfer.domain.primitives.GoalId
 import com.georgeci.moneysurfer.feature.goal.contribution.GoalContributionScreen
 import com.georgeci.moneysurfer.feature.goal.details.GoalDetailsScreen
@@ -11,11 +10,12 @@ import com.georgeci.moneysurfer.navigation.FeatureNavGraph
 import com.georgeci.moneysurfer.navigation.GoalContributionMode
 import com.georgeci.moneysurfer.navigation.NavDetailPlaceholder
 import com.georgeci.moneysurfer.navigation.Route
+import com.georgeci.moneysurfer.navigation.SurferPaneSceneStrategy
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 val goalNavGraph: FeatureNavGraph = { navigator ->
     entry<Route.Goals>(
-        metadata = ListDetailSceneStrategy.listPane(detailPlaceholder = { NavDetailPlaceholder() }),
+        metadata = SurferPaneSceneStrategy.listPane(detailPlaceholder = { NavDetailPlaceholder() }),
     ) {
         GoalsScreen(
             onNavigateBack = { navigator.pop() },
@@ -25,7 +25,7 @@ val goalNavGraph: FeatureNavGraph = { navigator ->
     }
 
     entry<Route.GoalDetails>(
-        metadata = ListDetailSceneStrategy.detailPane(),
+        metadata = SurferPaneSceneStrategy.detailPane(),
     ) { key ->
         GoalDetailsScreen(
             goalId = GoalId(key.goalId),
@@ -38,7 +38,7 @@ val goalNavGraph: FeatureNavGraph = { navigator ->
     }
 
     entry<Route.GoalCreation>(
-        metadata = ListDetailSceneStrategy.detailPane(),
+        metadata = SurferPaneSceneStrategy.detailPane(),
     ) {
         GoalEditScreen(
             goalId = null,
@@ -47,7 +47,7 @@ val goalNavGraph: FeatureNavGraph = { navigator ->
     }
 
     entry<Route.GoalEdit>(
-        metadata = ListDetailSceneStrategy.detailPane(),
+        metadata = SurferPaneSceneStrategy.detailPane(),
     ) { key ->
         GoalEditScreen(
             goalId = GoalId(key.goalId),
@@ -56,7 +56,7 @@ val goalNavGraph: FeatureNavGraph = { navigator ->
     }
 
     entry<Route.GoalContribution>(
-        metadata = ListDetailSceneStrategy.detailPane(),
+        metadata = SurferPaneSceneStrategy.detailPane(),
     ) { key ->
         GoalContributionScreen(
             goalId = GoalId(key.goalId),

@@ -21,10 +21,14 @@ import moneysurfer.uikit.generated.resources.uikit_transaction_delete_cancel
 import moneysurfer.uikit.generated.resources.uikit_transaction_delete_confirm
 import moneysurfer.uikit.generated.resources.uikit_transaction_delete_message
 import moneysurfer.uikit.generated.resources.uikit_transaction_delete_message_generic
+import moneysurfer.uikit.generated.resources.uikit_transaction_delete_split_message
+import moneysurfer.uikit.generated.resources.uikit_transaction_delete_split_message_generic
+import moneysurfer.uikit.generated.resources.uikit_transaction_delete_split_title
 import moneysurfer.uikit.generated.resources.uikit_transaction_delete_title
 import moneysurfer.uikit.generated.resources.uikit_transaction_delete_transfer_message
 import moneysurfer.uikit.generated.resources.uikit_transaction_delete_transfer_message_generic
 import moneysurfer.uikit.generated.resources.uikit_transaction_delete_transfer_title
+import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 
 /**
@@ -53,6 +57,10 @@ object SurferDeleteTransactionDialogTestTags {
  * @param isTransfer whether the row is one leg of a transfer, which changes the copy: a transfer
  *   is deleted whole, so the dialog has to say the money disappears from *both* accounts before
  *   the user agrees to it.
+ * @param isSplit whether the row stands for a receipt split across categories, for the same
+ *   reason: the delete takes every leg of it, so a user who swiped what looks like one row has to
+ *   be told several transactions are about to go. Ignored when [isTransfer] is set — a transfer leg
+ *   is never split, and a caller passing both is naming a state the app cannot produce.
  */
 @Composable
 fun SurferDeleteTransactionDialog(
@@ -60,7 +68,9 @@ fun SurferDeleteTransactionDialog(
     onConfirm: () -> Unit,
     onDismiss: () -> Unit,
     isTransfer: Boolean = false,
+    isSplit: Boolean = false,
 ) {
+    val variant = DeleteVariant.of(isTransfer = isTransfer, isSplit = isSplit)
     AlertDialog(
         onDismissRequest = onDismiss,
         icon = {
@@ -72,18 +82,12 @@ fun SurferDeleteTransactionDialog(
         },
         title = {
             Text(
-                text = stringResource(
-                    if (isTransfer) {
-                        Res.string.uikit_transaction_delete_transfer_title
-                    } else {
-                        Res.string.uikit_transaction_delete_title
-                    },
-                ),
+                text = stringResource(variant.title),
                 textAlign = TextAlign.Center,
             )
         },
         text = {
-            Text(text = deleteMessage(titleOrNull, isTransfer), textAlign = TextAlign.Center)
+            Text(text = deleteMessage(titleOrNull, variant), textAlign = TextAlign.Center)
         },
         confirmButton = {
             Button(
@@ -109,15 +113,49 @@ fun SurferDeleteTransactionDialog(
     )
 }
 
-/** Four variants of one sentence: with or without a title to quote, transfer or not. */
-@Composable
-private fun deleteMessage(titleOrNull: String?, isTransfer: Boolean): String = when {
-    titleOrNull != null && isTransfer ->
-        stringResource(Res.string.uikit_transaction_delete_transfer_message, titleOrNull)
-    titleOrNull != null -> stringResource(Res.string.uikit_transaction_delete_message, titleOrNull)
-    isTransfer -> stringResource(Res.string.uikit_transaction_delete_transfer_message_generic)
-    else -> stringResource(Res.string.uikit_transaction_delete_message_generic)
+/**
+ * What is actually being deleted, which is what the copy has to say. Two of the three take more
+ * than the row the user pointed at with them, and that is the whole reason the wording differs.
+ */
+private enum class DeleteVariant(
+    val title: StringResource,
+    val message: StringResource,
+    val genericMessage: StringResource,
+) {
+    Single(
+        title = Res.string.uikit_transaction_delete_title,
+        message = Res.string.uikit_transaction_delete_message,
+        genericMessage = Res.string.uikit_transaction_delete_message_generic,
+    ),
+    Transfer(
+        title = Res.string.uikit_transaction_delete_transfer_title,
+        message = Res.string.uikit_transaction_delete_transfer_message,
+        genericMessage = Res.string.uikit_transaction_delete_transfer_message_generic,
+    ),
+    Split(
+        title = Res.string.uikit_transaction_delete_split_title,
+        message = Res.string.uikit_transaction_delete_split_message,
+        genericMessage = Res.string.uikit_transaction_delete_split_message_generic,
+    ),
+    ;
+
+    companion object {
+        fun of(isTransfer: Boolean, isSplit: Boolean): DeleteVariant = when {
+            isTransfer -> Transfer
+            isSplit -> Split
+            else -> Single
+        }
+    }
 }
+
+/** One sentence, quoting the row's title when there is one to quote. */
+@Composable
+private fun deleteMessage(titleOrNull: String?, variant: DeleteVariant): String =
+    if (titleOrNull != null) {
+        stringResource(variant.message, titleOrNull)
+    } else {
+        stringResource(variant.genericMessage)
+    }
 
 @Preview
 @Composable
@@ -127,6 +165,19 @@ private fun SurferDeleteTransactionDialogPreview() {
             titleOrNull = "Starbucks",
             onConfirm = {},
             onDismiss = {},
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun SurferDeleteTransactionDialogSplitPreview() {
+    SurferComponentPreview {
+        SurferDeleteTransactionDialog(
+            titleOrNull = "Pyaterochka",
+            onConfirm = {},
+            onDismiss = {},
+            isSplit = true,
         )
     }
 }

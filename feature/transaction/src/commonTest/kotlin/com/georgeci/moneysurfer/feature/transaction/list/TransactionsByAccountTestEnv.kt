@@ -21,6 +21,7 @@ import com.georgeci.moneysurfer.domain.primitives.CategoryId
 import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
 import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
 import com.georgeci.moneysurfer.domain.primitives.Money
+import com.georgeci.moneysurfer.domain.primitives.SplitId
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
 import com.georgeci.moneysurfer.domain.primitives.TransferId
@@ -155,6 +156,9 @@ internal class WindowingTransactionRepository(
 ) : TransactionRepository {
     private val rows = MutableStateFlow(transactions)
 
+    /** Rows a delete tombstoned — out of every read, still there for a restore. */
+    private val tombstones = mutableMapOf<TransactionId, Transaction>()
+
     var lastWindow: TransactionPeriodWindow? = null
         private set
 
@@ -168,11 +172,20 @@ internal class WindowingTransactionRepository(
         limit: Int,
     ): Flow<List<CategorizedTransaction>> {
         lastWindow = window
-        return rows.map {
+        return rows.map { all ->
             inWindow(window)
                 .filter { row -> accountId == null || row.accountId == accountId }
                 .take(limit)
-                .map { row -> CategorizedTransaction(transaction = row, categoryName = "Category") }
+                .map { row ->
+                    CategorizedTransaction(
+                        transaction = row,
+                        categoryName = "Category",
+                        // Counted over the whole table, exactly as the DAO's correlated subquery
+                        // does — a group cut by the limit must still report its real size, or the
+                        // list could not tell a complete group from a truncated one.
+                        splitLegCount = all.count { it.splitId != null && it.splitId == row.splitId },
+                    )
+                }
         }
     }
 
@@ -198,6 +211,8 @@ internal class WindowingTransactionRepository(
     override suspend fun getById(id: TransactionId): Transaction? = rows.value.find { it.id == id }
     override suspend fun getByTransferId(transferId: TransferId): List<Transaction> =
         rows.value.filter { it.transferId == transferId }
+    override suspend fun getBySplitId(splitId: SplitId): List<Transaction> =
+        rows.value.filter { it.splitId == splitId }
 
     // Writing, not no-op: the list is fed by this flow, so a delete has to actually leave the
     // rows for the screen's reaction to it to be worth asserting.
@@ -210,8 +225,12 @@ internal class WindowingTransactionRepository(
     }
 
     override suspend fun delete(id: TransactionId) {
+        rows.value.filter { it.id == id }.forEach { tombstones[id] = it }
         rows.value = rows.value.filterNot { it.id == id }
     }
+
+    override suspend fun restore(id: TransactionId): Transaction? =
+        tombstones.remove(id)?.also { rows.value = rows.value + it }
 }
 
 internal object SingleAccountRepository : AccountRepository {

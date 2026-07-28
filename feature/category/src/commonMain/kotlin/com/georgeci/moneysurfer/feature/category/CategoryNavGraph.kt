@@ -2,7 +2,6 @@ package com.georgeci.moneysurfer.feature.category
 
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
-import androidx.compose.material3.adaptive.navigation3.ListDetailSceneStrategy
 import com.georgeci.moneysurfer.domain.primitives.CategoryId
 import com.georgeci.moneysurfer.domain.primitives.CategoryType
 import com.georgeci.moneysurfer.feature.category.creation.CategoryCreationScreen
@@ -15,13 +14,14 @@ import com.georgeci.moneysurfer.navigation.CategoryPickerResultKey
 import com.georgeci.moneysurfer.navigation.FeatureNavGraph
 import com.georgeci.moneysurfer.navigation.NavDetailPlaceholder
 import com.georgeci.moneysurfer.navigation.Route
+import com.georgeci.moneysurfer.navigation.SurferPaneSceneStrategy
 import io.github.irgaly.navigation3.resultstate.LocalNavigationResultProducer
 import io.github.irgaly.navigation3.resultstate.setResult
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3AdaptiveApi::class)
 val categoryNavGraph: FeatureNavGraph = { navigator ->
     entry<Route.CategoryCreation>(
-        metadata = ListDetailSceneStrategy.detailPane(),
+        metadata = SurferPaneSceneStrategy.detailPane(),
     ) {
         CategoryCreationScreen(
             categoryId = it.categoryId?.let(::CategoryId),
@@ -30,7 +30,7 @@ val categoryNavGraph: FeatureNavGraph = { navigator ->
     }
 
     entry<Route.CategoriesManage>(
-        metadata = ListDetailSceneStrategy.listPane(detailPlaceholder = { NavDetailPlaceholder() }),
+        metadata = SurferPaneSceneStrategy.listPane(detailPlaceholder = { NavDetailPlaceholder() }),
     ) {
         CategoriesManageScreen(
             onNavigateBack = { navigator.pop() },
@@ -45,7 +45,7 @@ val categoryNavGraph: FeatureNavGraph = { navigator ->
     }
 
     entry<Route.CategoryDetails>(
-        metadata = ListDetailSceneStrategy.detailPane(),
+        metadata = SurferPaneSceneStrategy.detailPane(),
     ) { key ->
         CategoryDetailsScreen(
             categoryId = CategoryId(key.categoryId),

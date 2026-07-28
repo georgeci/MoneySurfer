@@ -7,6 +7,7 @@ import com.georgeci.moneysurfer.domain.primitives.CategoryId
 import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
 import com.georgeci.moneysurfer.domain.primitives.Money
 import com.georgeci.moneysurfer.domain.primitives.RecurringRuleId
+import com.georgeci.moneysurfer.domain.primitives.SplitId
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.domain.primitives.TransactionStatus
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
@@ -40,6 +41,7 @@ enum class TransactionCsvColumn(val header: String) {
     Merchant("merchant"),
     Tags("tags"),
     RecurringRuleId("recurring_rule_id"),
+    SplitId("split_id"),
 }
 
 sealed interface TransactionCsvDecodeResult {
@@ -86,6 +88,7 @@ object TransactionCsvCodec {
             // spreadsheet would evaluate once a user re-orders the cell by hand.
             Csv.encodeCellList(tags.map(Csv::guardFormula)),
             recurringRuleId?.value.orEmpty(),
+            splitId?.value.orEmpty(),
         )
     }
 
@@ -136,6 +139,7 @@ object TransactionCsvCodec {
                     transferId = optional(TransactionCsvColumn.TransferId)?.let(::TransferId),
                     recurringRuleId = optional(TransactionCsvColumn.RecurringRuleId)
                         ?.let(::RecurringRuleId),
+                    splitId = optional(TransactionCsvColumn.SplitId)?.let(::SplitId),
                 ),
             )
         } catch (rejected: FieldRejectedException) {

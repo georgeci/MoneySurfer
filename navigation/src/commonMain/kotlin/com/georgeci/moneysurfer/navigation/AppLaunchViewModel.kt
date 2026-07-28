@@ -13,6 +13,7 @@ import com.georgeci.moneysurfer.domain.preferences.UiPreferences
 import com.georgeci.moneysurfer.domain.primitives.UserId
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 import com.georgeci.moneysurfer.domain.usecase.GetAccountsUseCase
+import com.georgeci.moneysurfer.domain.usecase.PurgeDeletedTransactionsUseCase
 import com.georgeci.moneysurfer.sync.api.SyncReason
 import com.georgeci.moneysurfer.sync.coordinator.SyncCoordinator
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -58,6 +59,7 @@ class AppLaunchViewModel(
     private val getAccounts: GetAccountsUseCase,
     private val configHydration: ConfigHydration,
     private val remoteConfigRefresh: RemoteConfigRefresh,
+    private val purgeDeletedTransactions: PurgeDeletedTransactionsUseCase,
 ) : ViewModel() {
 
     private val log = Logger.withTag(TAG)
@@ -107,6 +109,24 @@ class AppLaunchViewModel(
         }
 
         startPeriodicSyncTicker()
+        purgeExpiredTombstones()
+    }
+
+    /**
+     * Drops transaction tombstones past their retention window (issue #346) — the "who runs it"
+     * half of the policy documented on [PurgeDeletedTransactionsUseCase].
+     *
+     * Its own coroutine, not a step in the startup chain above: nothing on the first screen reads
+     * the rows it removes, so making the splash wait on a DELETE would buy the user nothing.
+     * Failures are logged and swallowed for the same reason startup swallows a failed seed — a
+     * housekeeping hiccup must not be what keeps the app off its first screen.
+     */
+    private fun purgeExpiredTombstones() {
+        viewModelScope.launch {
+            runCatching { purgeDeletedTransactions() }
+                .onSuccess { purged -> if (purged > 0) log.i { "[retention] purged $purged deleted transaction(s)" } }
+                .onFailure { log.w(it) { "[retention] tombstone purge failed — retrying next launch" } }
+        }
     }
 
     /**

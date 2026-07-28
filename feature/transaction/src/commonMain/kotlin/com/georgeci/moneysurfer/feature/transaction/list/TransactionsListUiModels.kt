@@ -59,6 +59,24 @@ data class TransactionRowUi(
     val accountName: String = "",
     /** One leg of a transfer: money moved sideways, drawn neutral with a swap glyph. */
     val isTransfer: Boolean = false,
+    /**
+     * How many categories a collapsed split row covers, or `0` when the row is an ordinary
+     * transaction. Non-zero replaces [subtitle] with the "N categories" badge: a receipt split
+     * across several categories has no single category name to show, and [formattedAmount] is the
+     * whole receipt rather than any one leg. [id] is the leg the row opens — its details screen
+     * carries the breakdown.
+     */
+    val splitCategoryCount: Int = 0,
+    /**
+     * Whether the row belongs to a receipt split across categories — true for a collapsed row and
+     * for a lone leg alike.
+     *
+     * Deliberately separate from [splitCategoryCount], which is only non-zero once a group is
+     * collapsed: a page that holds part of a group renders its legs individually, and deleting one
+     * of those still takes the whole receipt. The delete confirmation keys off this, so what the
+     * dialog promises matches what the delete does at every window size.
+     */
+    val isSplitLeg: Boolean = false,
 )
 
 data class TransactionSummaryUi(

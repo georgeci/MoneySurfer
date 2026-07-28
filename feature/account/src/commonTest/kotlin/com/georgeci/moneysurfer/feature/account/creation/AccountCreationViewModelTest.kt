@@ -19,6 +19,7 @@ import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.AccountType
 import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
 import com.georgeci.moneysurfer.domain.primitives.Money
+import com.georgeci.moneysurfer.domain.primitives.SplitId
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
 import com.georgeci.moneysurfer.domain.primitives.TransferId
@@ -771,6 +772,9 @@ private class FakeTransactionRepository(private val failInsert: Boolean = false)
     private val byId = mutableMapOf<TransactionId, Transaction>()
     private val all = MutableStateFlow<List<Transaction>>(emptyList())
 
+    /** Rows a delete tombstoned — out of every read, still there for a restore. */
+    private val tombstones = mutableMapOf<TransactionId, Transaction>()
+
     override fun getAll(): Flow<List<Transaction>> = all
     override fun getByAccountId(accountId: AccountId): Flow<List<Transaction>> = all
     override fun getCategorizedWindow(
@@ -783,6 +787,8 @@ private class FakeTransactionRepository(private val failInsert: Boolean = false)
     override suspend fun getById(id: TransactionId): Transaction? = byId[id]
     override suspend fun getByTransferId(transferId: TransferId): List<Transaction> =
         byId.values.filter { it.transferId == transferId }
+    override suspend fun getBySplitId(splitId: SplitId): List<Transaction> =
+        byId.values.filter { it.splitId == splitId }
     override suspend fun insert(transaction: Transaction) {
         if (failInsert) error("simulated local transaction insert failure")
         inserted += transaction
@@ -794,9 +800,15 @@ private class FakeTransactionRepository(private val failInsert: Boolean = false)
         all.value = byId.values.toList()
     }
     override suspend fun delete(id: TransactionId) {
-        byId.remove(id)
+        byId.remove(id)?.let { tombstones[id] = it }
         all.value = byId.values.toList()
     }
+
+    override suspend fun restore(id: TransactionId): Transaction? =
+        tombstones.remove(id)?.also {
+            byId[id] = it
+            all.value = byId.values.toList()
+        }
 }
 
 private class FakeWorkspaceRepository(workspace: Workspace) : WorkspaceRepository {

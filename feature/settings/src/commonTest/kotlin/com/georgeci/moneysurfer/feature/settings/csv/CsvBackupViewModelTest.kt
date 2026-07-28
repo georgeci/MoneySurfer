@@ -21,6 +21,7 @@ import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.CategoryId
 import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
 import com.georgeci.moneysurfer.domain.primitives.Money
+import com.georgeci.moneysurfer.domain.primitives.SplitId
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.domain.primitives.TransferId
 import com.georgeci.moneysurfer.domain.primitives.UserId
@@ -54,6 +55,7 @@ class CsvBackupViewModelTest : StringSpec({
     fun viewModel(existing: List<Transaction> = emptyList()): CsvBackupViewModel {
         val transactionRepository = SimpleTransactionRepository(existing)
         val accountRepository = SimpleAccountRepository()
+        val applyTransactionChange = ApplyTransactionChangeUseCase(transactionRepository, accountRepository)
         return CsvBackupViewModel(
             exportTransactions = ExportTransactionsUseCase(transactionRepository),
             importTransactions = ImportTransactionsUseCase(
@@ -61,9 +63,8 @@ class CsvBackupViewModelTest : StringSpec({
                 accountRepository = accountRepository,
                 categoryRepository = SimpleCategoryRepository(),
                 workspaceRepository = SimpleWorkspaceRepository(),
-                createTransaction = CreateTransactionUseCase(
-                    ApplyTransactionChangeUseCase(transactionRepository, accountRepository),
-                ),
+                createTransaction = CreateTransactionUseCase(applyTransactionChange),
+                applyTransactionChange = applyTransactionChange,
             ),
             clock = ClockUseCase(),
         )
@@ -202,6 +203,9 @@ class CsvBackupViewModelTest : StringSpec({
 private class SimpleTransactionRepository(initial: List<Transaction>) : TransactionRepository {
     private var store = initial.associateBy { it.id }
 
+    /** Rows a delete tombstoned — out of every read, still there for a restore. */
+    private val tombstones = mutableMapOf<TransactionId, Transaction>()
+
     override fun getAll(): Flow<List<Transaction>> = flowOf(store.values.toList())
     override fun getByAccountId(accountId: AccountId): Flow<List<Transaction>> = flowOf(emptyList())
     override fun getCategorizedWindow(
@@ -217,13 +221,19 @@ private class SimpleTransactionRepository(initial: List<Transaction>) : Transact
     override suspend fun getById(id: TransactionId): Transaction? = store[id]
     override suspend fun getByTransferId(transferId: TransferId): List<Transaction> =
         store.values.filter { it.transferId == transferId }
+    override suspend fun getBySplitId(splitId: SplitId): List<Transaction> =
+        store.values.filter { it.splitId == splitId }
     override suspend fun insert(transaction: Transaction) {
         store = store + (transaction.id to transaction)
     }
     override suspend fun update(transaction: Transaction) = insert(transaction)
     override suspend fun delete(id: TransactionId) {
+        store[id]?.let { tombstones[id] = it }
         store = store - id
     }
+
+    override suspend fun restore(id: TransactionId): Transaction? =
+        tombstones.remove(id)?.also { store = store + (id to it) }
 }
 
 private class SimpleAccountRepository : AccountRepository {

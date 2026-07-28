@@ -21,9 +21,12 @@ import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 
 /**
- * Delete + Undo against real Room. Verifies that the entity captured at delete time can be
- * re-applied to fully restore the row (and, for transactions, the account balance) — the
- * persistence guarantee the in-app Undo Snackbar relies on.
+ * Delete + Undo against real Room — the persistence guarantee the in-app Undo Snackbar relies on.
+ *
+ * For transactions the delete is a tombstone since issue #346, so what is verified is that the row
+ * disappears from the reads, comes back through a restore rather than a re-insert, and moves the
+ * account balance both ways. Categories still hard-delete and still restore from the copy the
+ * delete handed back — that difference is deliberate, and the tests below are written to show it.
  */
 class DeleteUndoIntegrationIT : StringSpec({
 
@@ -37,6 +40,43 @@ class DeleteUndoIntegrationIT : StringSpec({
     }
 
     afterEach { harness.close() }
+
+    // The Undo now needs nothing but the id: the row itself never left. This is what makes the
+    // interaction survive a Snackbar being replaced, or the process dying between the two halves —
+    // the case that motivated issue #346.
+    "an Undo built from nothing but the deleted id restores the row and the balance" {
+        val applyChange = ApplyTransactionChangeUseCase(stack.transactionRepository, stack.accountRepository)
+        val deleteTransaction = DeleteTransactionUseCase(stack.transactionRepository, applyChange)
+
+        val account = anAccount(
+            id = accountId("a-1"),
+            workspaceId = DEFAULT_WORKSPACE_ID,
+            currencyCode = USD,
+            balance = 500.dollars,
+        )
+        stack.accountRepository.insert(account)
+        stack.createTransaction(
+            aTransaction(
+                id = transactionId("t-1"),
+                workspaceId = DEFAULT_WORKSPACE_ID,
+                accountId = account.id,
+                money = 80.dollars,
+                currencyCode = USD,
+                categoryId = null,
+                type = TransactionType.EXPENSE,
+            ),
+        )
+
+        deleteTransaction(transactionId("t-1"))
+        stack.transactionRepository.getById(transactionId("t-1")) shouldBe null
+
+        // Deliberately not the Transaction the delete returned — only its id.
+        val restored = applyChange.restore(transactionId("t-1")).shouldNotBeNull()
+
+        restored.money shouldBe 80.dollars
+        stack.transactionRepository.getById(transactionId("t-1")).shouldNotBeNull()
+        stack.accountRepository.getById(account.id)!!.balance shouldBe 420.dollars
+    }
 
     "deleting a transaction then re-applying it restores the row and the balance" {
         val applyChange = ApplyTransactionChangeUseCase(stack.transactionRepository, stack.accountRepository)

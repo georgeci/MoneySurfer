@@ -14,6 +14,7 @@ import com.georgeci.moneysurfer.domain.fixtures.transactionId
 import com.georgeci.moneysurfer.domain.fixtures.workspaceId
 import com.georgeci.moneysurfer.domain.model.reference
 import com.georgeci.moneysurfer.domain.primitives.CategoryType
+import com.georgeci.moneysurfer.domain.primitives.SplitId
 import com.georgeci.moneysurfer.domain.primitives.TransactionStatus
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
 import com.georgeci.moneysurfer.domain.primitives.TransferId
@@ -111,6 +112,7 @@ class TransactionCreationEditTest : StringSpec({
                 type = TransactionType.EXPENSE,
                 status = TransactionStatus.PLANNED,
                 transferId = TransferId("tr-1"),
+                splitId = SplitId("sp-1"),
                 recurringRuleId = recurringRuleId("r-1"),
             )
             val fixture = TransactionCreationFixture(ws).apply {
@@ -132,6 +134,9 @@ class TransactionCreationEditTest : StringSpec({
                 updated.status shouldBe TransactionStatus.PLANNED
                 // Dropping this would orphan the transfer's other leg.
                 updated.transferId shouldBe TransferId("tr-1")
+                // …and dropping this would leave the receipt's other legs with no collapsed row to
+                // reveal them, while this one silently left the group.
+                updated.splitId shouldBe SplitId("sp-1")
                 updated.recurringRuleId shouldBe recurringRuleId("r-1")
             } finally {
                 vm.viewModelScope.cancel()
@@ -326,6 +331,7 @@ class TransactionCreationEditTest : StringSpec({
                 type = TransactionType.EXPENSE,
                 status = TransactionStatus.PLANNED,
                 transferId = TransferId("tr-1"),
+                splitId = SplitId("sp-1"),
                 recurringRuleId = recurringRuleId("r-1"),
             )
             val fixture = TransactionCreationFixture(ws).apply {
@@ -347,6 +353,9 @@ class TransactionCreationEditTest : StringSpec({
                 copy.tags shouldBe listOf("weekly")
                 copy.status shouldBe TransactionStatus.ACTUAL
                 copy.transferId shouldBe null
+                // Same reason: a duplicate must not attach itself as an extra leg of a receipt
+                // the user is only using as a template.
+                copy.splitId shouldBe null
                 copy.recurringRuleId shouldBe null
             } finally {
                 vm.viewModelScope.cancel()

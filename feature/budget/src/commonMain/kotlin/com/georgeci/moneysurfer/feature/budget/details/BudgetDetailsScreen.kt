@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -30,7 +29,7 @@ import com.georgeci.moneysurfer.feature.budget.budgetPeriodLabel
 import com.georgeci.moneysurfer.feature.budget.budgetStatusLabel
 import com.georgeci.moneysurfer.feature.budget.previewBudget
 import com.georgeci.moneysurfer.feature.budget.toUi
-import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
+import com.georgeci.moneysurfer.uikit.components.base.SurferPaneScaffold
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbarButtonAction
 import com.georgeci.moneysurfer.uikit.components.budget.SurferAlertBanner
 import com.georgeci.moneysurfer.uikit.components.budget.SurferBudgetRing
@@ -38,7 +37,6 @@ import com.georgeci.moneysurfer.uikit.components.budget.SurferBudgetStatusPill
 import com.georgeci.moneysurfer.uikit.components.budget.SurferStatTile
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
-import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
 import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.utils.HandleSideEffect
@@ -100,26 +98,20 @@ private fun BudgetDetailsContent(
     onEvent: (BudgetDetailsEvent) -> Unit,
 ) {
     val content = state as? BudgetDetailsState.Content
-    Scaffold(
+    SurferPaneScaffold(
+        title = content?.budget?.name ?: stringResource(Res.string.budget_details_title),
         modifier = Modifier
-            .surferSafeInsets()
             .testTag(BudgetDetailsTestTags.Root)
             .surferTestTagAsId(),
-        containerColor = AppTheme.materialColors.surface,
-        topBar = {
-            SurferToolbar(
-                title = content?.budget?.name ?: stringResource(Res.string.budget_details_title),
-                onBack = { onEvent(BudgetDetailsEvent.OnBackClick) },
-                actions = {
-                    if (content != null) {
-                        SurferToolbarButtonAction(
-                            icon = SurferIcons.Edit,
-                            text = stringResource(Res.string.budget_details_edit),
-                            onClick = { onEvent(BudgetDetailsEvent.OnEditClick) },
-                        )
-                    }
-                },
-            )
+        onBack = { onEvent(BudgetDetailsEvent.OnBackClick) },
+        actions = {
+            if (content != null) {
+                SurferToolbarButtonAction(
+                    icon = SurferIcons.Edit,
+                    text = stringResource(Res.string.budget_details_edit),
+                    onClick = { onEvent(BudgetDetailsEvent.OnEditClick) },
+                )
+            }
         },
     ) { padding ->
         if (state is BudgetDetailsState.Missing) {
@@ -138,11 +130,11 @@ private fun BudgetDetailsContent(
                     textAlign = TextAlign.Center,
                 )
             }
-            return@Scaffold
+            return@SurferPaneScaffold
         }
         if (content == null) {
             Box(modifier = Modifier.fillMaxSize().padding(padding))
-            return@Scaffold
+            return@SurferPaneScaffold
         }
 
         LazyColumn(

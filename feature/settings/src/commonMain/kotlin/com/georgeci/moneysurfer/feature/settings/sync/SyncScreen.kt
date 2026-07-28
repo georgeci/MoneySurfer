@@ -24,7 +24,7 @@ import com.georgeci.moneysurfer.sync.api.SyncStep
 import com.georgeci.moneysurfer.sync.repository.PendingMutation
 import com.georgeci.moneysurfer.sync.repository.SyncMeta
 import com.georgeci.moneysurfer.uikit.components.SurferConfirmDialog
-import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
+import com.georgeci.moneysurfer.uikit.components.base.SurferPaneTopBar
 import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsChevron
 import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsGroup
 import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsRow
@@ -164,7 +164,7 @@ fun SyncContent(
         modifier = Modifier.surferSafeInsets(),
         containerColor = AppTheme.materialColors.surface,
         topBar = {
-            SurferToolbar(
+            SurferPaneTopBar(
                 title = stringResource(Res.string.settings_sync_title),
                 onBack = { onEvent(SyncEvent.OnBackClick) },
                 colors = TopAppBarDefaults.topAppBarColors(

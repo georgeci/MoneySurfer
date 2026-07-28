@@ -6,6 +6,7 @@ import com.georgeci.moneysurfer.domain.primitives.CategoryId
 import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
 import com.georgeci.moneysurfer.domain.primitives.Money
 import com.georgeci.moneysurfer.domain.primitives.RecurringRuleId
+import com.georgeci.moneysurfer.domain.primitives.SplitId
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.domain.primitives.TransactionStatus
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
@@ -33,6 +34,7 @@ fun aTransaction(
     createdAt: Instant = operationAt,
     updatedAt: Instant = createdAt,
     transferId: TransferId? = null,
+    splitId: SplitId? = null,
     recurringRuleId: RecurringRuleId? = null,
 ): Transaction = Transaction(
     id = id,
@@ -51,5 +53,6 @@ fun aTransaction(
     createdAt = createdAt,
     updatedAt = updatedAt,
     transferId = transferId,
+    splitId = splitId,
     recurringRuleId = recurringRuleId,
 )
