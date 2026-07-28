@@ -10,7 +10,7 @@ import kotlin.time.Instant
  * test double of the transaction store would otherwise have to answer a question none of them
  * ask. See `PurgeDeletedTransactionsUseCase` for the policy that drives it.
  */
-interface TransactionRetentionRepository {
+fun interface TransactionRetentionRepository {
 
     /**
      * Removes the rows tombstoned strictly before [threshold] for good, and returns how many

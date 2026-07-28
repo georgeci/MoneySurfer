@@ -123,6 +123,14 @@ class TransactionTombstoneSyncIntegrationIT : StringSpec({
         outbox.enqueued.shouldBeEmpty()
     }
 
+    // Nothing was removed, so there is nothing for peers to forget. A tombstone patch here would
+    // also be pushed at a doc this workspace may not even have.
+    "deleting an id that names no row enqueues nothing" {
+        repository.delete(TransactionId("never-existed"))
+
+        outbox.enqueued.shouldBeEmpty()
+    }
+
     "the pushed doc carries the tombstone while the row is deleted" {
         repository.delete(TransactionId(TX))
 
