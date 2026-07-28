@@ -237,9 +237,10 @@ jobs:
           if-no-files-found: warn
           retention-days: 14
 
-      # `qaAndroidHost` runs :uikit's Roborazzi screenshot tests, which fail the
-      # job on any visual diff against the references committed in
-      # `uikit/screenshots/`. The reference/actual/diff triptych is the only way
+      # `qaAndroidHost` runs the Roborazzi screenshot tests of every module that
+      # has them (:uikit, :feature:login), which fail the job on any visual diff
+      # against the references committed in `<module>/screenshots/`. The
+      # reference/actual/diff triptych is the only way
       # to triage such a failure from a CI log, so publish it whenever the job
       # goes red. See docs/testing/screenshot-tests.md.
       - name: Upload Roborazzi screenshot diffs
