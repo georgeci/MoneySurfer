@@ -170,11 +170,11 @@ interface TransactionDao {
      * [toDateExclusive] is the first day of the month *after* the last month wanted — half-open
      * so the caller never has to know how long the final month is.
      *
-     * The transfer and currency terms come from the shared spend predicate documented over
-     * [getSpendByCategory]. This query used to sum transfer legs and add minor units across
-     * currencies, which made the category trend disagree with both the budget screen and the
-     * Insights aggregates for the same month. A null [baseCurrency] — a workspace that could not
-     * be read — matches nothing, exactly as `Budget.counts` does.
+     * The transfer, currency and canonical-date terms come from the shared spend predicate
+     * documented over [getSpendByCategory]. This query used to sum transfer legs and add minor
+     * units across currencies, which made the category trend disagree with both the budget screen
+     * and the Insights aggregates for the same month. A null [baseCurrency] — a workspace that
+     * could not be read — matches nothing, exactly as `Budget.counts` does.
      */
     @Query(
         """
@@ -190,6 +190,7 @@ interface TransactionDao {
             AND transactions.status = 'ACTUAL'
             AND transactions.transferId IS NULL
             AND transactions.currencyCode = :baseCurrency
+            AND transactions.operationDate = date(transactions.operationDate)
             AND transactions.operationDate >= :fromDate
             AND transactions.operationDate < :toDateExclusive
         GROUP BY transactions.categoryId, month
@@ -214,7 +215,8 @@ interface TransactionDao {
     //     AND type = 'EXPENSE' AND status = 'ACTUAL'
     //     AND transferId IS NULL
     //     AND currencyCode = :baseCurrency
-    //     AND operationDate <> '' AND operationDate >= :fromDate AND operationDate < :toDateExclusive
+    //     AND operationDate = date(operationDate)
+    //     AND operationDate >= :fromDate AND operationDate < :toDateExclusive
     //
     // Term by term:
     //
@@ -228,10 +230,16 @@ interface TransactionDao {
     // - `currencyCode = :baseCurrency` — v1 converts nothing; getSpendByExcludedCurrency reports
     //   what this term left behind. A null base currency matches no row.
     // - Bounds are nullable so an all-time window needs no second query shape, half-open at the
-    //   top so the caller never has to know how long the final month is. `operationDate <> ''`
-    //   only matters for an unbounded window: MIGRATION_27_28 backfilled the rows that carried
-    //   `''`, but one arriving from an older client must not land in the category rollup while
-    //   being dropped from the month and day series, where it fails to parse.
+    //   top so the caller never has to know how long the final month is.
+    // - `operationDate = date(operationDate)` admits only the canonical `YYYY-MM-DD` spelling.
+    //   SQLite's `date()` returns NULL for text it cannot read and a normalized date for text it
+    //   can, so the comparison rejects `''`, `'2025-3-5'`, `'2025-03-05T10:00'` and a Julian day
+    //   number alike — every string `LocalDate.parse` would also refuse. Without it the month and
+    //   day series (which parse) and the category, merchant and currency rollups (which do not)
+    //   disagree by exactly those rows. `''` is the only spelling seen in the wild, from before
+    //   the column existed, and MIGRATION_27_28 already backfilled it; the rest is a guard against
+    //   an older or foreign writer. A bounded window mostly excludes these by string comparison
+    //   anyway — this makes it true for every window, which is the point of one shared predicate.
     //
     // The composite `(workspaceId, operationDate DESC, operationAt DESC, createdAt DESC)` index
     // covers all five. `merchant` is unindexed, so getTopMerchants scans the window — acceptable
@@ -253,7 +261,7 @@ interface TransactionDao {
             AND transactions.status = 'ACTUAL'
             AND transactions.transferId IS NULL
             AND transactions.currencyCode = :baseCurrency
-            AND transactions.operationDate <> ''
+            AND transactions.operationDate = date(transactions.operationDate)
             AND (:fromDate IS NULL OR transactions.operationDate >= :fromDate)
             AND (:toDateExclusive IS NULL OR transactions.operationDate < :toDateExclusive)
         GROUP BY transactions.categoryId
@@ -289,7 +297,7 @@ interface TransactionDao {
             AND transactions.status = 'ACTUAL'
             AND transactions.transferId IS NULL
             AND transactions.currencyCode = :baseCurrency
-            AND transactions.operationDate <> ''
+            AND transactions.operationDate = date(transactions.operationDate)
             AND (:fromDate IS NULL OR transactions.operationDate >= :fromDate)
             AND (:toDateExclusive IS NULL OR transactions.operationDate < :toDateExclusive)
         GROUP BY month, transactions.type
@@ -315,7 +323,7 @@ interface TransactionDao {
             AND transactions.status = 'ACTUAL'
             AND transactions.transferId IS NULL
             AND transactions.currencyCode = :baseCurrency
-            AND transactions.operationDate <> ''
+            AND transactions.operationDate = date(transactions.operationDate)
             AND (:fromDate IS NULL OR transactions.operationDate >= :fromDate)
             AND (:toDateExclusive IS NULL OR transactions.operationDate < :toDateExclusive)
         GROUP BY transactions.operationDate
@@ -349,7 +357,7 @@ interface TransactionDao {
             AND transactions.transferId IS NULL
             AND transactions.currencyCode = :baseCurrency
             AND transactions.merchant <> ''
-            AND transactions.operationDate <> ''
+            AND transactions.operationDate = date(transactions.operationDate)
             AND (:fromDate IS NULL OR transactions.operationDate >= :fromDate)
             AND (:toDateExclusive IS NULL OR transactions.operationDate < :toDateExclusive)
         GROUP BY transactions.merchant
@@ -380,7 +388,7 @@ interface TransactionDao {
             AND transactions.status = 'ACTUAL'
             AND transactions.transferId IS NULL
             AND transactions.currencyCode <> :baseCurrency
-            AND transactions.operationDate <> ''
+            AND transactions.operationDate = date(transactions.operationDate)
             AND (:fromDate IS NULL OR transactions.operationDate >= :fromDate)
             AND (:toDateExclusive IS NULL OR transactions.operationDate < :toDateExclusive)
         GROUP BY transactions.currencyCode

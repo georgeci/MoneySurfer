@@ -32,6 +32,11 @@ data class CategorySpendSlice(
  *
  * A month with income but no spend still produces a row — the query groups by month and type,
  * and the missing side folds to zero here rather than dropping the column from the chart.
+ *
+ * [month] names the calendar month the rows fell in; it does *not* promise the whole month was
+ * counted. A query window that starts or ends mid-month yields a part-month row indistinguishable
+ * from a full one — see
+ * [com.georgeci.moneysurfer.domain.repositories.SpendAnalyticsRepository.netByMonth].
  */
 data class MonthlyNet(
     val month: YearMonth,

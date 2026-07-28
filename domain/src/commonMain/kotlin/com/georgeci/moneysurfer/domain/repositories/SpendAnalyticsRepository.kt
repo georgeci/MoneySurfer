@@ -64,6 +64,14 @@ interface SpendAnalyticsRepository {
      * The only query that looks past expenses. Months the workspace booked nothing in are absent
      * — a chart that wants a fixed number of columns fills the gaps itself, the way
      * `buildCategorySpendHistory` already does for the category trend.
+     *
+     * **The first and last rows are only whole months if the window's ends are.** Grouping happens
+     * inside the window, so a scope covering 10–16 March returns one row labelled `2025-03` holding
+     * that week alone, and a scope starting mid-month returns a part-month under a full month's
+     * name. `MonthlyNet.month` cannot express the difference. Call this with a window whose ends
+     * fall on month boundaries — `periodWindow(Month, ...)`, or a span built from
+     * `trailingMonths(...)` — unless a partial leading or trailing column is what the caller wants
+     * to draw. A week-scoped `SpendScope` (#296) belongs on [daily], not here.
      */
     fun netByMonth(scope: SpendScope): Flow<List<MonthlyNet>>
 

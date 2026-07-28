@@ -133,17 +133,34 @@ class SpendAnalyticsRepositoryImplJvmTest : StringSpec({
     }
 
     /**
-     * A row with no business date is invisible to a bounded window for free — `''` compares below
-     * every real date. Unbounded is where the explicit `operationDate <> ''` term earns its keep:
-     * without it the row would inflate the category rollup while the month and day series, which
-     * cannot parse it, dropped it.
+     * The `operationDate = date(operationDate)` term. Every spelling here is one `LocalDate.parse`
+     * would also refuse, so without it the category and merchant rollups (which never parse) would
+     * count these rows while the month and day series (which do) dropped them — the two would then
+     * disagree by exactly this amount. A bounded window hides some of it by string comparison, so
+     * the assertions run over both.
      */
-    "a row with no operationDate is counted by no aggregate, bounded or not" {
-        insert(row(id = "legacy", date = "", amount = -10_00L, categoryId = FOOD))
+    listOf(
+        "" to "never written, from before the column existed",
+        "2025-3-5" to "unpadded",
+        "2025-03-05T10:00:00" to "a timestamp, not a date",
+        "2025-02-30" to "a day that does not exist",
+    ).forEach { (stored, why) ->
+        "an operationDate that is $why is counted by no aggregate" {
+            insert(row(id = "odd", date = stored, amount = -10_00L, categoryId = FOOD, merchant = "Aldi"))
 
-        repository.byCategory(ALL_TIME).first().shouldBeEmpty()
-        repository.netByMonth(ALL_TIME).first().shouldBeEmpty()
-        repository.daily(ALL_TIME).first().shouldBeEmpty()
+            listOf(ALL_TIME, MARCH).forEach { scope ->
+                repository.byCategory(scope).first().shouldBeEmpty()
+                repository.netByMonth(scope).first().shouldBeEmpty()
+                repository.daily(scope).first().shouldBeEmpty()
+                repository.topMerchants(scope, limit = 10).first().shouldBeEmpty()
+            }
+        }
+    }
+
+    "a canonical operationDate on the same day still counts" {
+        insert(row(id = "fine", date = "2025-03-05", amount = -10_00L, categoryId = FOOD))
+
+        repository.byCategory(MARCH).first() shouldContainExactly listOf(slice(FOOD, 10_00L, count = 1))
     }
 
     "income counts in the monthly net and nowhere else" {

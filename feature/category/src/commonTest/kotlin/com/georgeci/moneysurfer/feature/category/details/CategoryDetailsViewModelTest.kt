@@ -2,6 +2,8 @@ package com.georgeci.moneysurfer.feature.category.details
 
 import app.cash.turbine.test
 import com.georgeci.moneysurfer.domain.auth.InMemorySessionPointers
+import com.georgeci.moneysurfer.domain.fixtures.EUR
+import com.georgeci.moneysurfer.domain.fixtures.USD
 import com.georgeci.moneysurfer.domain.fixtures.aCategory
 import com.georgeci.moneysurfer.domain.fixtures.aTransaction
 import com.georgeci.moneysurfer.domain.fixtures.aWorkspace
@@ -139,6 +141,46 @@ class CategoryDetailsViewModelTest : StringSpec({
         content.subcategories.single().share shouldBe 0f
     }
 
+    /**
+     * The session pointer lives in preferences and is restored independently of the `workspaces`
+     * row, so a device that has not pulled the workspace yet resolves no base currency — and the
+     * aggregate query filters on it. The trend has to fill in when the row lands rather than stay
+     * latched on the empty result for as long as the screen is open.
+     */
+    "a workspace that has not landed yet leaves the trend empty, then fills it in" {
+        val food = aCategory(id = categoryId("food"), name = "Food")
+        val env = Env(
+            categories = listOf(food),
+            totalsFor = { month -> listOf(monthlyTotal(food.id, month, 42_00)) },
+            workspaceCurrency = null,
+        )
+        val viewModel = env.newViewModel(food.id)
+
+        viewModel.content().months.last().minorValue shouldBe 0L
+
+        env.setWorkspaceCurrency(USD)
+
+        viewModel.content().months.last().minorValue shouldBe 42_00L
+    }
+
+    "changing the base currency re-points the trend at the rows that now count" {
+        val food = aCategory(id = categoryId("food"), name = "Food")
+        val env = Env(
+            categories = listOf(food),
+            totalsFor = { month -> listOf(monthlyTotal(food.id, month, 42_00)) },
+        )
+        val viewModel = env.newViewModel(food.id)
+
+        viewModel.content().months.last().minorValue shouldBe 42_00L
+
+        // The stored rows stay in USD — UpdateWorkspaceCurrencyUseCase rewrites accounts, not
+        // transactions — so switching the workspace to EUR must empty the trend, the way budgets
+        // already treat a foreign-currency expense.
+        env.setWorkspaceCurrency(EUR)
+
+        viewModel.content().months.last().minorValue shouldBe 0L
+    }
+
     "recent transactions include the ones booked to a child" {
         val food = aCategory(id = categoryId("food"), name = "Food")
         val groceries = aCategory(id = categoryId("groceries"), name = "Groceries", parentId = food.id)
@@ -237,6 +279,7 @@ private class Env(
     categories: List<Category>? = null,
     private val transactions: List<Transaction> = emptyList(),
     private val totalsFor: (YearMonth) -> List<CategoryMonthlyTotal> = { emptyList() },
+    workspaceCurrency: CurrencyCode? = USD,
 ) {
     private val workspace = workspaceId("ws-1")
     val snackbar = SnackbarController()
@@ -245,6 +288,10 @@ private class Env(
     // case is reachable: a StateFlow always has a value, which would skip Loading entirely.
     private val categoryFlow = MutableSharedFlow<List<Category>>(replay = 1)
     private var current: List<Category> = categories.orEmpty()
+
+    // A null [workspaceCurrency] models a device whose session pointer already names a workspace
+    // Room has not stored yet. The row can land later, so this is a flow rather than a fixed value.
+    private val workspaceFlow = MutableStateFlow(workspacesWith(workspaceCurrency))
 
     init {
         if (categories != null) check(categoryFlow.tryEmit(categories)) { "failed to seed categories" }
@@ -255,6 +302,13 @@ private class Env(
         check(categoryFlow.tryEmit(next)) { "failed to emit categories" }
     }
 
+    fun setWorkspaceCurrency(currency: CurrencyCode) {
+        workspaceFlow.value = workspacesWith(currency)
+    }
+
+    private fun workspacesWith(currency: CurrencyCode?): List<Workspace> =
+        currency?.let { listOf(aWorkspace(id = workspace, baseCurrency = it)) }.orEmpty()
+
     fun newViewModel(categoryId: CategoryId): CategoryDetailsViewModel {
         val session = InMemorySessionPointers(currentWorkspaceId = workspace)
         val categoryRepo = FakeCategoryRepository(
@@ -263,14 +317,14 @@ private class Env(
             write = ::setCategories,
         )
         val transactionRepo = FakeTransactionRepository(transactions)
-        val spendRepo = FakeCategorySpendRepository(totalsFor)
+        val spendRepo = FakeCategorySpendRepository(totalsFor, rowCurrency = USD)
         return CategoryDetailsViewModel(
             categoryId = categoryId,
             getCategories = GetCategoriesUseCase(categoryRepo, session),
             getCategorySpendHistory = GetCategorySpendHistoryUseCase(
                 categoryRepository = categoryRepo,
                 spendRepository = spendRepo,
-                workspaceRepository = FakeWorkspaceRepository(aWorkspace(id = workspace)),
+                workspaceRepository = FakeWorkspaceRepository(workspaceFlow),
                 session = session,
                 clock = ClockUseCase(),
             ),
@@ -309,8 +363,18 @@ private object BalanceOnlyAccountRepository : AccountRepository {
     override suspend fun setArchived(accountId: AccountId, archived: Boolean) = error("not used")
 }
 
+/**
+ * Reproduces the aggregate query's currency filter rather than ignoring it: the seeded rows are all
+ * denominated in [rowCurrency], so a query for any other base currency — or for none, on a device
+ * that has not stored the workspace yet — comes back empty, exactly as the SQL
+ * `currencyCode = :baseCurrency` term does.
+ *
+ * Without that, a regression that stopped threading the currency through would leave every spec in
+ * this file green while the shipped trend rendered zeros.
+ */
 private class FakeCategorySpendRepository(
     private val totalsFor: (YearMonth) -> List<CategoryMonthlyTotal>,
+    private val rowCurrency: CurrencyCode,
 ) : CategorySpendRepository {
     override fun monthlyTotals(
         workspaceId: WorkspaceId,
@@ -319,19 +383,25 @@ private class FakeCategorySpendRepository(
         baseCurrency: CurrencyCode?,
         fromMonth: YearMonth,
         toMonth: YearMonth,
-    ): Flow<List<CategoryMonthlyTotal>> =
-        MutableStateFlow(totalsFor(toMonth).filter { it.categoryId in categoryIds })
+    ): Flow<List<CategoryMonthlyTotal>> = MutableStateFlow(
+        if (baseCurrency != rowCurrency) {
+            emptyList()
+        } else {
+            totalsFor(toMonth).filter { it.categoryId in categoryIds }
+        },
+    )
 }
 
 /**
- * The spend history use case reads the workspace for its base currency, which the aggregate query
- * filters on. Only [getById] is reachable from this screen; the fake above ignores the currency it
- * ends up with, so the value only has to be non-null to prove it was resolved.
+ * The spend history use case *observes* the workspace for its base currency, so this is backed by a
+ * flow the test can write to — a workspace row arriving late, or its currency changing, has to
+ * re-point a subscription that is already running.
  */
-private class FakeWorkspaceRepository(private val workspace: Workspace) : WorkspaceRepository {
-    override fun getAll(): Flow<List<Workspace>> = flowOf(listOf(workspace))
-    override fun getByUserId(userId: UserId): Flow<List<Workspace>> = flowOf(listOf(workspace))
-    override suspend fun getById(id: WorkspaceId): Workspace? = workspace.takeIf { it.id == id }
+private class FakeWorkspaceRepository(private val workspaces: Flow<List<Workspace>>) : WorkspaceRepository {
+    override fun getAll(): Flow<List<Workspace>> = workspaces
+    override fun getByUserId(userId: UserId): Flow<List<Workspace>> = workspaces
+    override suspend fun getById(id: WorkspaceId): Workspace? =
+        workspaces.first().firstOrNull { it.id == id }
     override suspend fun insert(workspace: Workspace) = error("not used")
     override suspend fun update(workspace: Workspace) = error("not used")
     override suspend fun delete(id: WorkspaceId) = error("not used")
