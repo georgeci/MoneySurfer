@@ -4,6 +4,7 @@ import app.cash.turbine.test
 import com.georgeci.moneysurfer.domain.auth.InMemorySessionPointers
 import com.georgeci.moneysurfer.domain.fixtures.aCategory
 import com.georgeci.moneysurfer.domain.fixtures.aTransaction
+import com.georgeci.moneysurfer.domain.fixtures.aWorkspace
 import com.georgeci.moneysurfer.domain.fixtures.categoryId
 import com.georgeci.moneysurfer.domain.fixtures.transactionId
 import com.georgeci.moneysurfer.domain.fixtures.workspaceId
@@ -14,18 +15,22 @@ import com.georgeci.moneysurfer.domain.model.CategoryMonthlyTotal
 import com.georgeci.moneysurfer.domain.model.CategorySpendHistory
 import com.georgeci.moneysurfer.domain.model.Transaction
 import com.georgeci.moneysurfer.domain.model.TransactionTotal
+import com.georgeci.moneysurfer.domain.model.Workspace
 import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.CategoryId
 import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
+import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
 import com.georgeci.moneysurfer.domain.primitives.Money
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
 import com.georgeci.moneysurfer.domain.primitives.TransferId
+import com.georgeci.moneysurfer.domain.primitives.UserId
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 import com.georgeci.moneysurfer.domain.repositories.AccountRepository
 import com.georgeci.moneysurfer.domain.repositories.CategoryRepository
 import com.georgeci.moneysurfer.domain.repositories.CategorySpendRepository
 import com.georgeci.moneysurfer.domain.repositories.TransactionRepository
+import com.georgeci.moneysurfer.domain.repositories.WorkspaceRepository
 import com.georgeci.moneysurfer.domain.usecase.ApplyTransactionChangeUseCase
 import com.georgeci.moneysurfer.domain.usecase.DeleteTransactionUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetCategoriesUseCase
@@ -265,6 +270,7 @@ private class Env(
             getCategorySpendHistory = GetCategorySpendHistoryUseCase(
                 categoryRepository = categoryRepo,
                 spendRepository = spendRepo,
+                workspaceRepository = FakeWorkspaceRepository(aWorkspace(id = workspace)),
                 session = session,
                 clock = ClockUseCase(),
             ),
@@ -310,10 +316,25 @@ private class FakeCategorySpendRepository(
         workspaceId: WorkspaceId,
         categoryIds: List<CategoryId>,
         type: TransactionType,
+        baseCurrency: CurrencyCode?,
         fromMonth: YearMonth,
         toMonth: YearMonth,
     ): Flow<List<CategoryMonthlyTotal>> =
         MutableStateFlow(totalsFor(toMonth).filter { it.categoryId in categoryIds })
+}
+
+/**
+ * The spend history use case reads the workspace for its base currency, which the aggregate query
+ * filters on. Only [getById] is reachable from this screen; the fake above ignores the currency it
+ * ends up with, so the value only has to be non-null to prove it was resolved.
+ */
+private class FakeWorkspaceRepository(private val workspace: Workspace) : WorkspaceRepository {
+    override fun getAll(): Flow<List<Workspace>> = flowOf(listOf(workspace))
+    override fun getByUserId(userId: UserId): Flow<List<Workspace>> = flowOf(listOf(workspace))
+    override suspend fun getById(id: WorkspaceId): Workspace? = workspace.takeIf { it.id == id }
+    override suspend fun insert(workspace: Workspace) = error("not used")
+    override suspend fun update(workspace: Workspace) = error("not used")
+    override suspend fun delete(id: WorkspaceId) = error("not used")
 }
 
 private class FakeCategoryRepository(

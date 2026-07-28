@@ -7,6 +7,11 @@ import androidx.room.Update
 import androidx.room.Upsert
 import com.georgeci.moneysurfer.data.db.entity.CategorizedTransactionEntity
 import com.georgeci.moneysurfer.data.db.entity.CategoryMonthlyTotalEntity
+import com.georgeci.moneysurfer.data.db.entity.CategorySpendSliceEntity
+import com.georgeci.moneysurfer.data.db.entity.CurrencySpendEntity
+import com.georgeci.moneysurfer.data.db.entity.DailySpendEntity
+import com.georgeci.moneysurfer.data.db.entity.MerchantSpendEntity
+import com.georgeci.moneysurfer.data.db.entity.MonthlyTypeTotalEntity
 import com.georgeci.moneysurfer.data.db.entity.TransactionEntity
 import com.georgeci.moneysurfer.data.db.entity.TransactionTotalEntity
 import kotlinx.coroutines.flow.Flow
@@ -164,6 +169,12 @@ interface TransactionDao {
      *
      * [toDateExclusive] is the first day of the month *after* the last month wanted — half-open
      * so the caller never has to know how long the final month is.
+     *
+     * The transfer and currency terms come from the shared spend predicate documented over
+     * [getSpendByCategory]. This query used to sum transfer legs and add minor units across
+     * currencies, which made the category trend disagree with both the budget screen and the
+     * Insights aggregates for the same month. A null [baseCurrency] — a workspace that could not
+     * be read — matches nothing, exactly as `Budget.counts` does.
      */
     @Query(
         """
@@ -177,6 +188,8 @@ interface TransactionDao {
             AND transactions.categoryId IN (:categoryIds)
             AND transactions.type = :type
             AND transactions.status = 'ACTUAL'
+            AND transactions.transferId IS NULL
+            AND transactions.currencyCode = :baseCurrency
             AND transactions.operationDate >= :fromDate
             AND transactions.operationDate < :toDateExclusive
         GROUP BY transactions.categoryId, month
@@ -186,9 +199,201 @@ interface TransactionDao {
         workspaceId: String,
         categoryIds: List<String>,
         type: String,
+        baseCurrency: String?,
         fromDate: String,
         toDateExclusive: String,
     ): Flow<List<CategoryMonthlyTotalEntity>>
+
+    // region Spend aggregates
+    //
+    // The five queries below back SpendAnalyticsRepository, and all of them apply the same
+    // predicate — the one budgets already use. Written out once here so a sixth query cannot
+    // quietly drift from it; Room needs the SQL inline, so the copies are deliberate:
+    //
+    //   WHERE workspaceId = :workspaceId
+    //     AND type = 'EXPENSE' AND status = 'ACTUAL'
+    //     AND transferId IS NULL
+    //     AND currencyCode = :baseCurrency
+    //     AND operationDate <> '' AND operationDate >= :fromDate AND operationDate < :toDateExclusive
+    //
+    // Term by term:
+    //
+    // - `type = 'EXPENSE'` — the stored spelling, not the parsed one. The legacy `REGULAR` type
+    //   that `TransactionRepositoryImpl.parseType` resolves by sign is not counted here, matching
+    //   getMonthlyTotalsByCategory; a device still holding such rows sees them nowhere in
+    //   Insights. getNetTotalsByMonth widens this term to `IN ('EXPENSE', 'INCOME')` because it
+    //   needs both sides, and splits them again by grouping on the column.
+    // - `transferId IS NULL` — transfer legs carry a CategoryType.TRANSFER category, so filtering
+    //   by category type would not catch them.
+    // - `currencyCode = :baseCurrency` — v1 converts nothing; getSpendByExcludedCurrency reports
+    //   what this term left behind. A null base currency matches no row.
+    // - Bounds are nullable so an all-time window needs no second query shape, half-open at the
+    //   top so the caller never has to know how long the final month is. `operationDate <> ''`
+    //   only matters for an unbounded window: MIGRATION_27_28 backfilled the rows that carried
+    //   `''`, but one arriving from an older client must not land in the category rollup while
+    //   being dropped from the month and day series, where it fails to parse.
+    //
+    // The composite `(workspaceId, operationDate DESC, operationAt DESC, createdAt DESC)` index
+    // covers all five. `merchant` is unindexed, so getTopMerchants scans the window — acceptable
+    // while the window is bounded.
+
+    /**
+     * Spend per category inside the window, largest first. `categoryId` comes back null for the
+     * uncategorized bucket, which is a slice of the result rather than a gap in it.
+     */
+    @Query(
+        """
+        SELECT
+            transactions.categoryId AS categoryId,
+            SUM(ABS(transactions.amount)) AS totalMinor,
+            COUNT(*) AS transactionCount
+        FROM transactions
+        WHERE transactions.workspaceId = :workspaceId
+            AND transactions.type = 'EXPENSE'
+            AND transactions.status = 'ACTUAL'
+            AND transactions.transferId IS NULL
+            AND transactions.currencyCode = :baseCurrency
+            AND transactions.operationDate <> ''
+            AND (:fromDate IS NULL OR transactions.operationDate >= :fromDate)
+            AND (:toDateExclusive IS NULL OR transactions.operationDate < :toDateExclusive)
+        GROUP BY transactions.categoryId
+        ORDER BY totalMinor DESC, transactions.categoryId ASC
+        """,
+    )
+    fun getSpendByCategory(
+        workspaceId: String,
+        baseCurrency: String,
+        fromDate: String?,
+        toDateExclusive: String?,
+    ): Flow<List<CategorySpendSliceEntity>>
+
+    /**
+     * Per-month, per-type magnitudes inside the window, oldest month first — the income-vs-expense
+     * trend.
+     *
+     * The one aggregate that widens the type term instead of dropping it: income belongs in the
+     * trend, an opening balance is an account artefact and would otherwise conjure up a month out
+     * of nothing but the day an account was opened. Grouping by type in SQL rather than summing
+     * signed amounts keeps both sides available — a month's net is a subtraction the caller can
+     * make, but a net stored as one number cannot be split back apart.
+     */
+    @Query(
+        """
+        SELECT
+            substr(transactions.operationDate, 1, 7) AS month,
+            transactions.type AS type,
+            SUM(ABS(transactions.amount)) AS totalMinor
+        FROM transactions
+        WHERE transactions.workspaceId = :workspaceId
+            AND transactions.type IN ('EXPENSE', 'INCOME')
+            AND transactions.status = 'ACTUAL'
+            AND transactions.transferId IS NULL
+            AND transactions.currencyCode = :baseCurrency
+            AND transactions.operationDate <> ''
+            AND (:fromDate IS NULL OR transactions.operationDate >= :fromDate)
+            AND (:toDateExclusive IS NULL OR transactions.operationDate < :toDateExclusive)
+        GROUP BY month, transactions.type
+        ORDER BY month ASC
+        """,
+    )
+    fun getNetTotalsByMonth(
+        workspaceId: String,
+        baseCurrency: String,
+        fromDate: String?,
+        toDateExclusive: String?,
+    ): Flow<List<MonthlyTypeTotalEntity>>
+
+    /** Spend per business date inside the window, oldest first. Days without spend are absent. */
+    @Query(
+        """
+        SELECT
+            transactions.operationDate AS operationDate,
+            SUM(ABS(transactions.amount)) AS totalMinor
+        FROM transactions
+        WHERE transactions.workspaceId = :workspaceId
+            AND transactions.type = 'EXPENSE'
+            AND transactions.status = 'ACTUAL'
+            AND transactions.transferId IS NULL
+            AND transactions.currencyCode = :baseCurrency
+            AND transactions.operationDate <> ''
+            AND (:fromDate IS NULL OR transactions.operationDate >= :fromDate)
+            AND (:toDateExclusive IS NULL OR transactions.operationDate < :toDateExclusive)
+        GROUP BY transactions.operationDate
+        ORDER BY transactions.operationDate ASC
+        """,
+    )
+    fun getDailySpend(
+        workspaceId: String,
+        baseCurrency: String,
+        fromDate: String?,
+        toDateExclusive: String?,
+    ): Flow<List<DailySpendEntity>>
+
+    /**
+     * The [limit] biggest merchants inside the window, largest first.
+     *
+     * Rows with no merchant are excluded rather than bucketed: the column defaults to `''`, and an
+     * empty label is not a counterparty the user could act on — it would just be the largest bar
+     * in most workspaces. Uncategorized spend is still reachable through [getSpendByCategory].
+     */
+    @Query(
+        """
+        SELECT
+            transactions.merchant AS merchant,
+            SUM(ABS(transactions.amount)) AS totalMinor,
+            COUNT(*) AS transactionCount
+        FROM transactions
+        WHERE transactions.workspaceId = :workspaceId
+            AND transactions.type = 'EXPENSE'
+            AND transactions.status = 'ACTUAL'
+            AND transactions.transferId IS NULL
+            AND transactions.currencyCode = :baseCurrency
+            AND transactions.merchant <> ''
+            AND transactions.operationDate <> ''
+            AND (:fromDate IS NULL OR transactions.operationDate >= :fromDate)
+            AND (:toDateExclusive IS NULL OR transactions.operationDate < :toDateExclusive)
+        GROUP BY transactions.merchant
+        ORDER BY totalMinor DESC, transactions.merchant ASC
+        LIMIT :limit
+        """,
+    )
+    fun getTopMerchants(
+        workspaceId: String,
+        baseCurrency: String,
+        fromDate: String?,
+        toDateExclusive: String?,
+        limit: Int,
+    ): Flow<List<MerchantSpendEntity>>
+
+    /**
+     * Spend the base-currency term left out, per currency, largest first — the inverse of the
+     * other four, so no expense in the window goes unreported.
+     */
+    @Query(
+        """
+        SELECT
+            transactions.currencyCode AS currencyCode,
+            SUM(ABS(transactions.amount)) AS totalMinor
+        FROM transactions
+        WHERE transactions.workspaceId = :workspaceId
+            AND transactions.type = 'EXPENSE'
+            AND transactions.status = 'ACTUAL'
+            AND transactions.transferId IS NULL
+            AND transactions.currencyCode <> :baseCurrency
+            AND transactions.operationDate <> ''
+            AND (:fromDate IS NULL OR transactions.operationDate >= :fromDate)
+            AND (:toDateExclusive IS NULL OR transactions.operationDate < :toDateExclusive)
+        GROUP BY transactions.currencyCode
+        ORDER BY totalMinor DESC, transactions.currencyCode ASC
+        """,
+    )
+    fun getSpendByExcludedCurrency(
+        workspaceId: String,
+        baseCurrency: String,
+        fromDate: String?,
+        toDateExclusive: String?,
+    ): Flow<List<CurrencySpendEntity>>
+    // endregion
 
     @Insert
     suspend fun insert(entity: TransactionEntity)

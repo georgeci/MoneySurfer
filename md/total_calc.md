@@ -281,6 +281,15 @@ This relies on the Firestore client transaction guaranteeing read-write atomicit
 
 ## 7. Period totals
 
+> **Superseded (issue #384).** `PeriodTotals`, `calculatePeriodTotalsFromList` and
+> `CalculatePeriodTotalsUseCase` are gone. They summed minor units across currencies, counted
+> transfer legs, and derived the period from `operationAt` plus the caller's timezone — three
+> disagreements with the predicate budgets apply, in code no feature had wired up yet.
+> `SpendAnalyticsRepository.netByMonth` is the replacement: same income/expense split, one
+> `GROUP BY` in SQLite, `operationDate` as the date. The planned income/expense split has no
+> consumer and was not carried over; add it back to that query when a screen asks for it. See
+> [md/insights.md](insights.md).
+
 Pure domain return shape. NOT persisted, NOT serialized, NOT pushed. Slim — only what the dashboard needs. `byCategory` / `byAccount` are separate use cases (charts, accounts breakdown).
 
 ```kotlin

@@ -2,6 +2,7 @@ package com.georgeci.moneysurfer.domain.repositories
 
 import com.georgeci.moneysurfer.domain.model.CategoryMonthlyTotal
 import com.georgeci.moneysurfer.domain.primitives.CategoryId
+import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 import kotlinx.coroutines.flow.Flow
@@ -23,11 +24,17 @@ interface CategorySpendRepository {
      * Only `ACTUAL` transactions of [type] count — a planned transaction is not spend that
      * happened, and mixing income into an expense trend would net the two out to nonsense.
      * Months a category booked nothing in are simply absent from the result.
+     *
+     * The rest of the filter is the canonical spend predicate shared with
+     * [SpendAnalyticsRepository]: transfer legs never count, and only [baseCurrency] rows do.
+     * A null [baseCurrency] — a workspace that could not be read — yields nothing, matching what
+     * [com.georgeci.moneysurfer.domain.model.Budget.counts] does with the same input.
      */
     fun monthlyTotals(
         workspaceId: WorkspaceId,
         categoryIds: List<CategoryId>,
         type: TransactionType,
+        baseCurrency: CurrencyCode?,
         fromMonth: YearMonth,
         toMonth: YearMonth,
     ): Flow<List<CategoryMonthlyTotal>>

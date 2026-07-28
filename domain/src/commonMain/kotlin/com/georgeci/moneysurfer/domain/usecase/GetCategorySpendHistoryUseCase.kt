@@ -11,6 +11,7 @@ import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
 import com.georgeci.moneysurfer.domain.repositories.CategoryRepository
 import com.georgeci.moneysurfer.domain.repositories.CategorySpendRepository
+import com.georgeci.moneysurfer.domain.repositories.WorkspaceRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
@@ -28,12 +29,17 @@ import org.koin.core.annotation.Single
  * Re-emits when either side changes — renaming or reparenting a subcategory reshapes the split
  * without a transaction moving, and logging a transaction changes the numbers without the tree
  * moving, so both flows have to be live.
+ *
+ * The workspace is read once per subscription for its base currency, which the query filters on:
+ * a change to it goes through `UpdateWorkspaceCurrencyUseCase` and rewrites the accounts anyway,
+ * so re-reading it per emission would buy nothing.
  */
 @Single
 @OptIn(ExperimentalCoroutinesApi::class)
 class GetCategorySpendHistoryUseCase(
     private val categoryRepository: CategoryRepository,
     private val spendRepository: CategorySpendRepository,
+    private val workspaceRepository: WorkspaceRepository,
     private val session: SessionPointers,
     private val clock: ClockUseCase,
 ) {
@@ -49,6 +55,7 @@ class GetCategorySpendHistoryUseCase(
                 anchor = clock.now().toLocalDateTime(timeZone).date.yearMonth,
                 count = CategorySpendHistory.TREND_MONTHS,
             )
+            val baseCurrency = workspaceRepository.getById(workspaceId)?.baseCurrency
 
             categoryRepository.getByWorkspaceId(workspaceId).flatMapLatest { categories ->
                 val root = categories.firstOrNull { it.id == categoryId }
@@ -62,6 +69,7 @@ class GetCategorySpendHistoryUseCase(
                     workspaceId = workspaceId,
                     categoryIds = subtree,
                     type = root.type.toTransactionType(),
+                    baseCurrency = baseCurrency,
                     fromMonth = months.first(),
                     toMonth = months.last(),
                 ).map { totals ->

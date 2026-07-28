@@ -96,6 +96,25 @@ What must not be built on:
 
 No UI. This is the phase that makes every later number defensible.
 
+**Landed (issue #384)**, with three calls the plan left open:
+
+- `PeriodTotals` / `calculatePeriodTotalsFromList` / `CalculatePeriodTotalsUseCase` were deleted
+  rather than re-expressed. Nothing referenced them, and `netByMonth` covers the income/expense
+  split they existed for. The planned-income/expense split they also carried has no consumer;
+  it belongs in the same query when a screen wants it.
+- `topMerchants` skips rows with a blank `merchant` instead of bucketing them. Unlike a missing
+  category, an empty label is not a counterparty the user could act on, and it would be the
+  largest bar in most workspaces.
+- The shared `WHERE` carries one term the predicate below does not: `operationDate <> ''`. It
+  only bites on an unbounded window, where a legacy row `MIGRATION_27_28` missed would otherwise
+  land in the category rollup while being dropped from the month and day series, which cannot
+  parse it.
+
+Still open from the [status quo](#status-quo) table: the SQL predicate tests the *stored* type,
+so the legacy `REGULAR` spelling that `TransactionRepositoryImpl.parseType` resolves by sign is
+counted by `Budget.counts` and by nothing in Insights. Pre-existing — `getMonthlyTotalsByCategory`
+always behaved this way — and best fixed by a backfill migration, not by a fourth predicate.
+
 New aggregation-only interface, alongside `CategorySpendRepository` rather than
 inside `TransactionRepository`:
 
