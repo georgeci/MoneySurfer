@@ -13,8 +13,11 @@ import com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutConfig
 import com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutItem
 import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetType
 import com.georgeci.moneysurfer.domain.model.BudgetStatus
+import com.georgeci.moneysurfer.domain.model.BurnRatePace
 import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.feature.dashboard.AccountUi
+import com.georgeci.moneysurfer.feature.dashboard.BurnRateDayUi
+import com.georgeci.moneysurfer.feature.dashboard.BurnRateUi
 import com.georgeci.moneysurfer.feature.dashboard.CategoryCapUi
 import com.georgeci.moneysurfer.feature.dashboard.CategorySpendUi
 import com.georgeci.moneysurfer.feature.dashboard.DashboardContent
@@ -30,9 +33,10 @@ import io.kotest.matchers.collections.shouldContainExactly
  * Desktop UI cover for the dashboard widgets whose behaviour lives on the screen rather than in
  * the state — see docs/testing/testing-strategy.md.
  *
- * The quick-actions row decides for itself whether to draw at all, and safe-to-spend decides
- * between its number and its "set a budget" state. Neither decision is visible to a ViewModel
- * test: both are about what reaches the screen, not about what the state holds.
+ * The quick-actions row decides for itself whether to draw at all, safe-to-spend decides between
+ * its number and its "set a budget" state, and burn rate decides whether its projection carries a
+ * verdict. None of those is visible to a ViewModel test: they are about what reaches the screen,
+ * not about what the state holds.
  */
 @OptIn(ExperimentalTestApi::class)
 class DashboardScreenStateTest : StringSpec({
@@ -164,6 +168,39 @@ class DashboardScreenStateTest : StringSpec({
         }
     }
 
+    "the burn-rate card draws its pace and projection, and says so when a budget judges them" {
+        runComposeUiTest {
+            setContent {
+                DashboardContent(
+                    state = contentWith(accounts = 2, transferEnabled = true).copy(
+                        burnRate = burnRateUi(pace = BurnRatePace.OffPace),
+                    ),
+                    onEvent = {},
+                )
+            }
+
+            onNodeWithTag(DashboardTestTags.BurnRate).assertIsDisplayed()
+            onNodeWithText("$BURN_RATE_AVERAGE a day").assertIsDisplayed()
+            onNodeWithText("$BURN_RATE_PROJECTION projected by month end").assertIsDisplayed()
+            onNodeWithText("Off pace").assertIsDisplayed()
+        }
+    }
+
+    "with no budget the burn-rate card still draws the projection, minus the verdict" {
+        runComposeUiTest {
+            setContent {
+                DashboardContent(
+                    state = contentWith(accounts = 2, transferEnabled = true).copy(burnRate = burnRateUi()),
+                    onEvent = {},
+                )
+            }
+
+            onNodeWithText("$BURN_RATE_PROJECTION projected by month end").assertIsDisplayed()
+            // Neither verdict belongs on a projection with no cap to miss.
+            onNodeWithText("On track").assertDoesNotExist()
+            onNodeWithText("Off pace").assertDoesNotExist()
+        }
+    }
     "every spent-by-category variant draws its rows rather than any of them measuring to nothing" {
         SurferSpentByCategoryVariant.entries.forEach { variant ->
             runComposeUiTest {
@@ -229,7 +266,13 @@ class DashboardScreenStateTest : StringSpec({
     "a month with no spend keeps the card and says so, rather than leaving a gap" {
         runComposeUiTest {
             setContent {
-                DashboardContent(state = contentWith(accounts = 2, transferEnabled = true), onEvent = {})
+                // The card alone, like the variant cases: the default layout is long enough that
+                // this one would otherwise sit below the fold and never compose.
+                DashboardContent(
+                    state = spentByCategoryState(SurferSpentByCategoryVariant.Bar)
+                        .copy(spentByCategory = emptyList()),
+                    onEvent = {},
+                )
             }
 
             onNodeWithTag(DashboardTestTags.SpentByCategory).assertIsDisplayed()
@@ -275,6 +318,20 @@ private fun safeToSpendUi(
     progress = progress,
     paceFraction = 0.6f,
     status = status,
+)
+
+private const val BURN_RATE_AVERAGE = "€42.10"
+private const val BURN_RATE_PROJECTION = "€1,263.00"
+
+private fun burnRateUi(pace: BurnRatePace? = null) = BurnRateUi(
+    averageFormatted = BURN_RATE_AVERAGE,
+    projectedFormatted = BURN_RATE_PROJECTION,
+    weekTotalFormatted = "€294.70",
+    busiestDayFormatted = "€96.00",
+    days = List(7) { index ->
+        BurnRateDayUi(dayOfMonth = 22 + index, fraction = index / 6f, isToday = index == 6)
+    },
+    pace = pace,
 )
 
 private const val GROCERIES_SPEND = "€142.10"

@@ -8,19 +8,12 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
-import androidx.compose.material3.Text
-import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
-import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
-import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
-import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffoldDefaults
-import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -44,14 +37,11 @@ import androidx.savedstate.serialization.SavedStateConfiguration
 import com.georgeci.moneysurfer.navigation.util.rememberViewModelStoreNavEntryDecorator
 import com.georgeci.moneysurfer.uikit.components.SurferSplash
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
-import com.georgeci.moneysurfer.uikit.window.SurferWindowSize
-import com.georgeci.moneysurfer.uikit.window.currentSurferWindowSize
 import io.github.irgaly.navigation3.resultstate.rememberNavigationResultNavEntryDecorator
 import kotlinx.coroutines.launch
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 import org.jetbrains.compose.resources.getString
-import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -113,7 +103,7 @@ private val savedStateConfig = SavedStateConfiguration {
     serializersModule = navKeySerializersModule
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3AdaptiveApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppNavGraph(
     featureNavGraphs: List<FeatureNavGraph>,
@@ -207,9 +197,12 @@ fun AppNavGraph(
             } else if (topLevel == null) {
                 navDisplay()
             } else {
-                AppNavigationSuite(
+                AppNavigationShell(
                     currentTopLevel = topLevel,
                     onSelect = navigator::resetTo,
+                    onOpenWorkspaceSelector = {
+                        navigator.push(Route.WorkspaceSelector(showActions = true))
+                    },
                     content = navDisplay,
                 )
             }
@@ -241,38 +234,6 @@ private suspend fun SnackbarHostState.present(request: SnackbarRequest) {
         duration = if (actionLabel != null) SnackbarDuration.Long else SnackbarDuration.Short,
     )
     if (result == SnackbarResult.ActionPerformed) request.onAction?.invoke()
-}
-
-@OptIn(ExperimentalMaterial3AdaptiveApi::class)
-@Composable
-private fun AppNavigationSuite(
-    currentTopLevel: Route.TopLevel,
-    onSelect: (Route) -> Unit,
-    content: @Composable () -> Unit,
-) {
-    val labels = TopLevelDestination.entries.associateWith { stringResource(it.label) }
-    val adaptiveInfo = currentWindowAdaptiveInfo()
-    val layoutType = if (currentSurferWindowSize() >= SurferWindowSize.Medium) {
-        NavigationSuiteScaffoldDefaults.calculateFromAdaptiveInfo(adaptiveInfo)
-    } else {
-        NavigationSuiteType.None
-    }
-    NavigationSuiteScaffold(
-        layoutType = layoutType,
-        navigationSuiteItems = {
-            TopLevelDestination.entries.forEach { destination ->
-                val label = labels.getValue(destination)
-                item(
-                    selected = destination.matches(currentTopLevel),
-                    onClick = { onSelect(destination.route) },
-                    icon = { Icon(imageVector = destination.icon, contentDescription = label) },
-                    label = { Text(label) },
-                )
-            }
-        },
-        containerColor = AppTheme.materialColors.background,
-        content = content,
-    )
 }
 
 @Suppress("SpreadOperator") // messageArgs holds 0-1 items; the array copy cost is negligible.

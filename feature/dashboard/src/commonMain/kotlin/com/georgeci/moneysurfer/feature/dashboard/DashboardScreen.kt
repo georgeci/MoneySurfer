@@ -105,6 +105,7 @@ object DashboardTestTags {
 
     /** The "Set a budget" link, shown only while the safe-to-spend widget has no budget to read. */
     const val SafeToSpendSetBudget = "dashboard:safeToSpendSetBudget"
+    const val BurnRate = "dashboard:burnRate"
 
     /** The whole spent-by-category card, whichever of its five treatments is selected. */
     const val SpentByCategory = "dashboard:spentByCategory"
@@ -280,6 +281,7 @@ private fun DashboardWidget(
         DashboardWidgetType.Balance -> BalanceWidget(state, variant)
         DashboardWidgetType.QuickActions -> QuickActionsWidget(state, onEvent)
         DashboardWidgetType.SafeToSpend -> SafeToSpendWidget(state, onEvent)
+        DashboardWidgetType.BurnRate -> BurnRateWidget(state)
         DashboardWidgetType.SpentByCategory -> SpentByCategoryWidget(state, variant)
         DashboardWidgetType.Accounts -> AccountsWidget(state, onEvent)
         DashboardWidgetType.Insights -> InsightsWidget(state, variant)
