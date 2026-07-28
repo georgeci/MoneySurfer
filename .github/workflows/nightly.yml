@@ -84,6 +84,8 @@ jobs:
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@3f131e8634966bd73d06cc69884922b02e6faf92 # v6.2.0
+        with:
+          cache-read-only: true
 
       - name: Compile offline Android debug
         run: ./gradlew :androidApp-offline:compileDebugSources --stacktrace
@@ -138,6 +140,8 @@ jobs:
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@3f131e8634966bd73d06cc69884922b02e6faf92 # v6.2.0
+        with:
+          cache-read-only: true
 
       - name: Assemble Android release (R8/minify, unsigned)
         run: ./gradlew :androidApp:assembleRelease --stacktrace
@@ -182,6 +186,8 @@ jobs:
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@3f131e8634966bd73d06cc69884922b02e6faf92 # v6.2.0
+        with:
+          cache-read-only: true
 
       # Cache the Kotlin/Native toolchain (~/.konan) — setup-gradle doesn't
       # cover it, so the K/N compiler + platform libs re-download every run.
@@ -295,6 +301,8 @@ jobs:
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@3f131e8634966bd73d06cc69884922b02e6faf92 # v6.2.0
+        with:
+          cache-read-only: true
 
       - name: Set up Maestro + Allure + e2e creds
         uses: ./.github/actions/maestro-setup
@@ -436,6 +444,8 @@ jobs:
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@3f131e8634966bd73d06cc69884922b02e6faf92 # v6.2.0
+        with:
+          cache-read-only: true
 
       # Cache the Kotlin/Native toolchain (~/.konan) that qaMaestroIos links —
       # setup-gradle doesn't cover it. macOS runner minutes.
@@ -551,6 +561,8 @@ jobs:
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@3f131e8634966bd73d06cc69884922b02e6faf92 # v6.2.0
+        with:
+          cache-read-only: true
 
       # Cache the Kotlin/Native toolchain (~/.konan) that the offline link step
       # below pulls — setup-gradle doesn't cover it. macOS runner minutes.
