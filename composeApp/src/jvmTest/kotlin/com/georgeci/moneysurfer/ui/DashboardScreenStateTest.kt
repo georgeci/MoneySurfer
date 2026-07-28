@@ -6,8 +6,10 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.v2.runComposeUiTest
+import com.georgeci.moneysurfer.domain.dashboard.DashboardCardStyle
 import com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutConfig
 import com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutItem
+import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetSize
 import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetType
 import com.georgeci.moneysurfer.domain.model.BudgetStatus
 import com.georgeci.moneysurfer.domain.primitives.AccountId
@@ -175,6 +177,24 @@ class DashboardScreenStateTest : StringSpec({
         }
     }
 
+    "a compact budgets card keeps only the most pressing budget" {
+        runComposeUiTest {
+            setContent {
+                DashboardContent(
+                    state = budgetsOnly(
+                        listOf(budgetUi(), budgetUi(id = "b-2", name = "Transport")),
+                        size = DashboardWidgetSize.Compact,
+                    ),
+                    onEvent = {},
+                )
+            }
+
+            // The card is one row tall at this size; the rest of the list is behind "See all".
+            onNodeWithText(BUDGET_NAME).assertIsDisplayed()
+            onNodeWithText("Transport").assertDoesNotExist()
+        }
+    }
+
     "an overspent budget row says how far over it is, not how much is left" {
         runComposeUiTest {
             setContent {
@@ -284,11 +304,17 @@ private fun budgetUi(
  * A dashboard showing nothing but the budgets card, so the assertions are about that card rather
  * than about how far down the column it lands in a desktop window.
  */
-private fun budgetsOnly(budgets: List<BudgetSummaryUi>) =
-    contentWith(accounts = 2, transferEnabled = true).copy(
-        budgets = budgets,
-        layout = DashboardLayoutConfig(items = listOf(DashboardLayoutItem(DashboardWidgetType.Budgets))),
-    )
+private fun budgetsOnly(
+    budgets: List<BudgetSummaryUi>,
+    size: DashboardWidgetSize = DashboardWidgetSize.Expanded,
+) = contentWith(accounts = 2, transferEnabled = true).copy(
+    budgets = budgets,
+    layout = DashboardLayoutConfig(
+        items = listOf(
+            DashboardLayoutItem(DashboardWidgetType.Budgets, cardStyle = DashboardCardStyle(size)),
+        ),
+    ),
+)
 
 private fun contentWith(accounts: Int, transferEnabled: Boolean) = DashboardState.Content(
     accounts = List(accounts) { index ->

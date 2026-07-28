@@ -174,7 +174,7 @@ private fun BudgetsPreview(modifier: Modifier) {
     SurferBudgetsWidget(
         items = listOf(
             SurferBudgetItem(
-                id = "preview-1",
+                id = previewId("groceries"),
                 name = stringResource(Res.string.dashboard_customize_preview_transaction_groceries),
                 statusLabel = stringResource(Res.string.dashboard_budgets_status_warn),
                 status = SurferBudgetStatus.Warn,
@@ -188,7 +188,7 @@ private fun BudgetsPreview(modifier: Modifier) {
                 alertFraction = SAMPLE_BUDGET_ALERT,
             ),
             SurferBudgetItem(
-                id = "preview-2",
+                id = previewId("rent"),
                 name = stringResource(Res.string.dashboard_customize_preview_transaction_rent),
                 statusLabel = stringResource(Res.string.dashboard_budgets_status_ok),
                 status = SurferBudgetStatus.Ok,
@@ -202,7 +202,7 @@ private fun BudgetsPreview(modifier: Modifier) {
                 alertFraction = SAMPLE_BUDGET_ALERT,
             ),
             SurferBudgetItem(
-                id = "preview-3",
+                id = previewId("coffee"),
                 name = stringResource(Res.string.dashboard_customize_preview_transaction_coffee),
                 statusLabel = stringResource(Res.string.dashboard_budgets_status_over),
                 status = SurferBudgetStatus.Over,
@@ -228,19 +228,19 @@ private fun AccountsPreview(modifier: Modifier) {
     SurferAccountsWidget(
         items = listOf(
             SurferAccountItem(
-                id = "preview-1",
+                id = previewId("everyday"),
                 name = stringResource(Res.string.dashboard_customize_preview_account_everyday),
                 subtitle = SAMPLE_CURRENCY,
                 balance = SAMPLE_ACCOUNT_ONE,
             ),
             SurferAccountItem(
-                id = "preview-2",
+                id = previewId("savings"),
                 name = stringResource(Res.string.dashboard_customize_preview_account_savings),
                 subtitle = SAMPLE_CURRENCY,
                 balance = SAMPLE_ACCOUNT_TWO,
             ),
             SurferAccountItem(
-                id = "preview-3",
+                id = previewId("cash"),
                 name = stringResource(Res.string.dashboard_customize_preview_account_cash),
                 subtitle = SAMPLE_CURRENCY,
                 balance = SAMPLE_ACCOUNT_THREE,
@@ -260,7 +260,7 @@ private fun GoalsPreview(modifier: Modifier) {
     SurferGoalsWidget(
         items = listOf(
             SurferGoalItem(
-                id = "preview-1",
+                id = previewId("laptop"),
                 name = stringResource(Res.string.dashboard_customize_preview_goal_laptop),
                 savedFormatted = SAMPLE_GOAL_SAVED,
                 targetFormatted = SAMPLE_GOAL_TARGET,
@@ -268,7 +268,7 @@ private fun GoalsPreview(modifier: Modifier) {
                 captionLine = "",
             ),
             SurferGoalItem(
-                id = "preview-2",
+                id = previewId("trip"),
                 name = stringResource(Res.string.dashboard_customize_preview_goal_trip),
                 savedFormatted = SAMPLE_TRIP_SAVED,
                 targetFormatted = SAMPLE_TRIP_TARGET,
@@ -313,6 +313,12 @@ private fun RecentTransactionsPreview(modifier: Modifier) {
         modifier = modifier,
     )
 }
+
+/**
+ * Row id for a sample item, named after the row it belongs to. The tiles are thumbnails, so
+ * nothing reads these back — the ids only have to be distinct within a widget.
+ */
+private fun previewId(row: String): String = "preview-$row"
 
 private const val SAMPLE_CURRENCY = "EUR"
 private const val SAMPLE_TOTAL = "€11,575.32"
