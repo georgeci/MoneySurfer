@@ -276,6 +276,7 @@ private fun AccountDetailsContent(
                         },
                         modifier = Modifier.padding(bottom = AppTheme.spacing.small),
                         isTransfer = transaction.isTransfer,
+                        isSplit = transaction.isSplitLeg,
                     ) {
                         SurferTransactionLine(
                             icon = if (transaction.isExpense) SurferIcons.Receipt else SurferIcons.Wallet,

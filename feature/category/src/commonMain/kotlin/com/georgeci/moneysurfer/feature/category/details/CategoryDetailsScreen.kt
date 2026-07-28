@@ -337,6 +337,7 @@ private fun CategoryDetailsContent(
                         transactionTitle = title,
                         onDelete = { onEvent(CategoryDetailsEvent.OnDeleteTransaction(txn.id)) },
                         isTransfer = txn.isTransfer,
+                        isSplit = txn.isSplitLeg,
                     ) {
                         SurferTransactionLine(
                             icon = visual.icon,

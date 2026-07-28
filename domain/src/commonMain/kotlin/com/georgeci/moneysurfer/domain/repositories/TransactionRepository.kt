@@ -4,6 +4,7 @@ import com.georgeci.moneysurfer.domain.model.CategorizedTransaction
 import com.georgeci.moneysurfer.domain.model.Transaction
 import com.georgeci.moneysurfer.domain.model.TransactionTotal
 import com.georgeci.moneysurfer.domain.primitives.AccountId
+import com.georgeci.moneysurfer.domain.primitives.SplitId
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.domain.primitives.TransferId
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
@@ -48,6 +49,14 @@ interface TransactionRepository {
      * deleted or never imported. Callers must not assume a pair exists.
      */
     suspend fun getByTransferId(transferId: TransferId): List<Transaction>
+
+    /**
+     * Every leg sharing [splitId], oldest first — the receipt the row belongs to.
+     *
+     * A one-element result is a legitimate state, not a broken group: a leg can arrive from sync or
+     * a CSV import before (or without) its siblings, and it is a complete transaction on its own.
+     */
+    suspend fun getBySplitId(splitId: SplitId): List<Transaction>
     suspend fun insert(transaction: Transaction)
     suspend fun update(transaction: Transaction)
     suspend fun delete(id: TransactionId)
