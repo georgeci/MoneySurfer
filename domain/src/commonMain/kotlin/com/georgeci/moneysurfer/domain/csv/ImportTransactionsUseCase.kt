@@ -13,6 +13,7 @@ import com.georgeci.moneysurfer.domain.repositories.AccountRepository
 import com.georgeci.moneysurfer.domain.repositories.CategoryRepository
 import com.georgeci.moneysurfer.domain.repositories.TransactionRepository
 import com.georgeci.moneysurfer.domain.repositories.WorkspaceRepository
+import com.georgeci.moneysurfer.domain.usecase.ApplyTransactionChangeUseCase
 import com.georgeci.moneysurfer.domain.usecase.CreateTransactionUseCase
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
@@ -43,6 +44,7 @@ class ImportTransactionsUseCase(
     private val categoryRepository: CategoryRepository,
     private val workspaceRepository: WorkspaceRepository,
     private val createTransaction: CreateTransactionUseCase,
+    private val applyTransactionChange: ApplyTransactionChangeUseCase,
 ) {
 
     suspend operator fun invoke(source: BufferedSource): Result<CsvImportReport> = try {
@@ -108,13 +110,28 @@ class ImportTransactionsUseCase(
                             CsvRowError(rowNumber, CsvRowIssue.UnpairedTransfer(transferId.value)),
                         )
                     } else {
-                        createTransaction(result.transaction)
+                        importRow(result.transaction)
                         imported++
                     }
                 }
             }
         }
         return CsvImportReport(imported = imported, skippedDuplicates = skipped, errors = errors)
+    }
+
+    /**
+     * Brings one importable row into the database — by lifting its tombstone if the id is still
+     * held by a deleted row, and by inserting it otherwise.
+     *
+     * The tombstone branch exists because a delete no longer frees the id (issue #346): a plain
+     * insert would hit the primary key and fail the whole import. Restoring is also what the user
+     * asked for — importing a backup that contains a row you deleted is a request to have it
+     * back — and it is the same row the export was taken from, so nothing of the CSV's content is
+     * lost by preferring the stored copy.
+     */
+    private suspend fun importRow(transaction: Transaction) {
+        if (applyTransactionChange.restore(transaction.id) != null) return
+        createTransaction(transaction)
     }
 
     /**

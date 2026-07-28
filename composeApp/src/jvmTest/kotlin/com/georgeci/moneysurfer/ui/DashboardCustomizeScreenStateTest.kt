@@ -1,10 +1,14 @@
 package com.georgeci.moneysurfer.ui
 
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.test.ComposeUiTest
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.hasScrollAction
+import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.v2.runComposeUiTest
 import com.georgeci.moneysurfer.domain.dashboard.DashboardCardStyle
@@ -42,6 +46,9 @@ class DashboardCustomizeScreenStateTest : StringSpec({
             onNodeWithTag(DashboardCustomizeTestTags.EnabledHeader).assertIsDisplayed()
             onNodeWithTag(DashboardCustomizeTestTags.AvailableHeader).assertIsDisplayed()
             onNodeWithTag(enabledRow(DashboardWidgetType.Balance)).assertIsDisplayed()
+            // The picker is a LazyColumn: with this many widgets the Available section starts below
+            // the fold, and a row that was never composed cannot be asserted on.
+            scrollToRow(availableRow(DashboardWidgetType.Goals))
             onNodeWithTag(availableRow(DashboardWidgetType.Goals)).assertIsDisplayed()
             // A switched-off widget is in exactly one section, not both.
             onNodeWithTag(enabledRow(DashboardWidgetType.Goals)).assertDoesNotExist()
@@ -106,6 +113,7 @@ class DashboardCustomizeScreenStateTest : StringSpec({
                 )
             }
 
+            scrollToRow(availableRow(DashboardWidgetType.Goals))
             onNodeWithTag(availableRow(DashboardWidgetType.Goals)).performClick()
             waitForIdle()
 
@@ -284,6 +292,14 @@ private fun styleOption(option: String) = DashboardCustomizeTestTags.styleOption
 private val ONLY_BALANCE = DashboardLayoutConfig.DEFAULT.items
     .filter { it.type == DashboardWidgetType.Balance }
     .let { DashboardLayoutConfig(items = it) }
+
+/**
+ * Brings a picker row into composition. The list is lazy, so a row far enough down the dashboard
+ * never reaches the semantics tree until it is scrolled to — and the list grows with every widget.
+ */
+@OptIn(ExperimentalTestApi::class)
+private fun ComposeUiTest.scrollToRow(tag: String) =
+    onNode(hasScrollAction()).performScrollToNode(hasTestTag(tag))
 
 private fun enabledRow(type: DashboardWidgetType) = DashboardCustomizeTestTags.enabledRow(type.name)
 

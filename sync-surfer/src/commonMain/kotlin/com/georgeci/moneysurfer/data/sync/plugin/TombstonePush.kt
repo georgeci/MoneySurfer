@@ -41,9 +41,11 @@ internal fun tombstonePatchFor(
 /**
  * Writes [patch] onto the remote doc, skipping docs that never reached
  * Firestore: an entity created and deleted between two drains leaves the
- * INSERT push a no-op (the Room row is already gone), and updating the
- * missing doc would raise NOT_FOUND on every retry, wedging the batch.
- * A doc that never existed remotely has nothing for peers to forget.
+ * INSERT push a no-op (its `getById` finds no live row — for transactions
+ * because the row is tombstoned, for the rest because it is gone), and
+ * updating the missing doc would raise NOT_FOUND on every retry, wedging
+ * the batch. A doc that never existed remotely has nothing for peers to
+ * forget.
  */
 internal suspend fun DocumentReference.pushTombstone(patch: TombstonePatch) {
     if (!get().exists) return

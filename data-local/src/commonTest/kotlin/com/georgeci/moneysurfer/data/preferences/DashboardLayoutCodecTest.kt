@@ -25,6 +25,7 @@ class DashboardLayoutCodecTest : StringSpec({
                 DashboardLayoutItem(DashboardWidgetType.QuickActions),
                 DashboardLayoutItem(DashboardWidgetType.SafeToSpend),
                 DashboardLayoutItem(DashboardWidgetType.Budgets),
+                DashboardLayoutItem(DashboardWidgetType.Insights),
                 DashboardLayoutItem(DashboardWidgetType.RecentTransactions),
             ),
         )
@@ -66,6 +67,7 @@ class DashboardLayoutCodecTest : StringSpec({
             DashboardWidgetType.SafeToSpend,
             DashboardWidgetType.Budgets,
             DashboardWidgetType.Accounts,
+            DashboardWidgetType.Insights,
             DashboardWidgetType.RecentTransactions,
         )
     }

@@ -44,13 +44,41 @@ class TransactionSyncPlugin(
         }
     }
 
+    /**
+     * A pulled tombstone marks the local row deleted instead of dropping it (issue #346), so a
+     * remote delete and a local one land in exactly the same state — which is what keeps an edit
+     * that was already in flight here from colliding with the surviving primary key.
+     *
+     * It does not follow that a peer's delete stays recoverable for the full retention window: the
+     * `deletedAt` written here is the deleting device's, so a delete that was made long before it
+     * reached us is purged sooner. `PurgeDeletedTransactionsUseCase` documents why that is fine.
+     *
+     * It is a targeted UPDATE rather than an upsert of the decoded doc: a tombstone patch carries
+     * only `deletedAt`, `updatedAt` and `clientVersionCode`, so upserting what it decodes to would
+     * write a row of defaults over real data — and would conjure one out of nothing, failing the
+     * account foreign key, on a device that never held the row. A device that never had it has
+     * nothing to forget, and `softDelete` no-ops there.
+     *
+     * The tombstone wins unconditionally, without consulting the resolver — as the hard delete it
+     * replaces did. The other direction still goes through last-writer-wins: a remote doc with no
+     * `deletedAt` and a newer `updatedAt` than the local delete clears the tombstone through the
+     * upsert below, which is a peer's edit legitimately outranking this device's delete.
+     *
+     * `softDelete` also copies the remote `deletedAt` onto `updatedAt` — the same value the
+     * tombstone patch wrote remotely — so re-pulling the doc is a tie, resolves to `TakeLocal` and
+     * changes nothing.
+     */
     override suspend fun applyDoc(doc: RemoteDocument, scopeKey: String): EntityApplyResult {
         val dto = doc.decodeOrNull(TransactionDoc.serializer()) ?: return SKIPPED_APPLY_RESULT
-        if (dto.deletedAt != null) {
-            transactionDao.delete(doc.id)
+        val remoteDeletedAt = dto.deletedAt
+        if (remoteDeletedAt != null) {
+            transactionDao.softDelete(doc.id, remoteDeletedAt)
             return EntityApplyResult(applied = true, wasConflict = false)
         }
-        val local = transactionDao.getById(doc.id)
+        // Includes tombstoned rows on purpose: a locally-deleted row that is invisible here reads
+        // as "no local copy", and the resolver would take an older remote doc as a fresh insert —
+        // resurrecting exactly what the user just deleted.
+        val local = transactionDao.getByIdIncludingDeleted(doc.id)
         val resolution = conflictResolver.resolve(
             local = local,
             remote = dto.toEntity(id = doc.id, workspaceId = scopeKey),
