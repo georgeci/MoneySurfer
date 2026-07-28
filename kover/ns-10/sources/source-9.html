@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SyncVersionGateImpl</title>
+  <title>MoneySurfer Coverage Report > TransactionSplitIdMigrationKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -19,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.georgeci.moneysurfer.data.sync</a>
+    <a href="../index.html">com.georgeci.moneysurfer.data.db.migration</a>
 </div>
 
-<h1>Coverage Summary for Class: SyncVersionGateImpl (com.georgeci.moneysurfer.data.sync)</h1>
+<h1>Coverage Summary for Class: TransactionSplitIdMigrationKt (com.georgeci.moneysurfer.data.db.migration)</h1>
 
 <table class="coverageStats">
 
@@ -46,76 +46,86 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SyncVersionGateImpl</td>
+  <td class="name">TransactionSplitIdMigrationKt</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/3)
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/4)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/8)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/46)
+    (6/6)
   </span>
 </td>
 </tr>
   <tr>
-    <td class="name">SyncVersionGateImpl$refresh$1</td>
+    <td class="name">TransactionSplitIdMigrationKt$MIGRATION_34_35$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
     <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (10/10)
+  </span>
+</td>
   </tr>
 <tr>
   <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/3)
+    (3/3)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/5)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/4)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/8)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/46)
+    (16/16)
   </span>
 </td>
 </tr>
@@ -126,31 +136,31 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.sync
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.db.migration
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.model.AppVersionStatus
-&nbsp;import com.georgeci.moneysurfer.domain.repositories.AppVersionGate
-&nbsp;import com.georgeci.moneysurfer.sync.version.SyncVersionGate
-&nbsp;import com.georgeci.moneysurfer.sync.version.SyncVersionStatus
-&nbsp;import org.koin.core.annotation.Single
+&nbsp;import androidx.room.migration.Migration
+&nbsp;import androidx.sqlite.SQLiteConnection
+&nbsp;import androidx.sqlite.execSQL
 &nbsp;
 &nbsp;/**
-&nbsp; * Adapter: maps [AppVersionGate] (domain) → [SyncVersionGate] (sync engine).
-&nbsp; * Lives in `:sync-impl` so the engine module stays domain-free.
+&nbsp; * v34 → v35: add `transactions.splitId`, the shared id of the sibling rows one receipt was split
+&nbsp; * across (issue #399).
+&nbsp; *
+&nbsp; * Pure addition, and nothing is backfilled: every existing row is a single-category transaction,
+&nbsp; * which is exactly what `NULL` means here.
+&nbsp; *
+&nbsp; * The index comes with the column rather than later. `getCategorizedWindow` correlates on
+&nbsp; * `splitId` per row to learn a group&#39;s size, and — more immediately — Room validates the schema at
+&nbsp; * open time, so a migrated database missing the index would fail to open where a freshly created
+&nbsp; * one succeeds.
 &nbsp; */
-<b class="nc">&nbsp;@Single(binds = [SyncVersionGate::class])</b>
-&nbsp;class SyncVersionGateImpl(
-<b class="nc">&nbsp;    private val appVersionGate: AppVersionGate,</b>
-&nbsp;) : SyncVersionGate {
-&nbsp;
-<b class="nc">&nbsp;    override suspend fun refresh(): SyncVersionStatus = when (val s = appVersionGate.refresh()) {</b>
-<b class="nc">&nbsp;        AppVersionStatus.Supported,</b>
-<b class="nc">&nbsp;        is AppVersionStatus.UpdateAvailable,</b>
-<b class="nc">&nbsp;        -&gt; SyncVersionStatus.Allowed</b>
-<b class="nc">&nbsp;        is AppVersionStatus.Unsupported -&gt; SyncVersionStatus.Blocked(s.message)</b>
+<b class="fc">&nbsp;val MIGRATION_34_35: Migration = object : Migration(34, 35) {</b>
+&nbsp;    override fun migrate(connection: SQLiteConnection) {
+<b class="fc">&nbsp;        connection.execSQL(&quot;ALTER TABLE `transactions` ADD COLUMN `splitId` TEXT DEFAULT NULL&quot;)</b>
+<b class="fc">&nbsp;        connection.execSQL(</b>
+<b class="fc">&nbsp;            &quot;CREATE INDEX IF NOT EXISTS `index_transactions_splitId` ON `transactions` (`splitId`)&quot;,</b>
+&nbsp;        )
 &nbsp;    }
-&nbsp;
-<b class="nc">&nbsp;    override fun isSyncAllowed(): Boolean = appVersionGate.isSyncAllowed()</b>
 &nbsp;}
 </code>
 </pre>
@@ -175,7 +185,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-23 23:54</div>
+    <div style="float:right;">generated on 2026-07-28 21:18</div>
 </div>
 </body>
 </html>

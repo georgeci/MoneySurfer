@@ -52,7 +52,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/5)
+    (0/6)
   </span>
 </td>
     <td class="coverageStat"/>
@@ -61,7 +61,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/20)
+    (0/23)
   </span>
 </td>
 <td class="coverageStat">
@@ -69,7 +69,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/96)
+    (0/116)
   </span>
 </td>
 </tr>
@@ -225,6 +225,41 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
   </tr>
   <tr>
+    <td class="name">AppLaunchViewModel$purgeExpiredTombstones$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/94)
+  </span>
+</td>
+  </tr>
+  <tr>
     <td class="name">AppLaunchViewModel$refreshRemoteConfig$1</td>
 <td class="coverageStat">
   <span class="percent">
@@ -357,7 +392,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/16)
+    (0/18)
   </span>
 </td>
 <td class="coverageStat">
@@ -365,7 +400,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/12)
+    (0/18)
   </span>
 </td>
 <td class="coverageStat">
@@ -373,7 +408,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/48)
+    (0/54)
   </span>
 </td>
 <td class="coverageStat">
@@ -381,7 +416,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/493)
+    (0/607)
   </span>
 </td>
 </tr>
@@ -407,6 +442,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.UserId
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 &nbsp;import com.georgeci.moneysurfer.domain.usecase.GetAccountsUseCase
+&nbsp;import com.georgeci.moneysurfer.domain.usecase.PurgeDeletedTransactionsUseCase
 &nbsp;import com.georgeci.moneysurfer.sync.api.SyncReason
 &nbsp;import com.georgeci.moneysurfer.sync.coordinator.SyncCoordinator
 &nbsp;import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -452,6 +488,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="nc">&nbsp;    private val getAccounts: GetAccountsUseCase,</b>
 <b class="nc">&nbsp;    private val configHydration: ConfigHydration,</b>
 <b class="nc">&nbsp;    private val remoteConfigRefresh: RemoteConfigRefresh,</b>
+<b class="nc">&nbsp;    private val purgeDeletedTransactions: PurgeDeletedTransactionsUseCase,</b>
 &nbsp;) : ViewModel() {
 &nbsp;
 <b class="nc">&nbsp;    private val log = Logger.withTag(TAG)</b>
@@ -501,7 +538,25 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;        }
 &nbsp;
 <b class="nc">&nbsp;        startPeriodicSyncTicker()</b>
+<b class="nc">&nbsp;        purgeExpiredTombstones()</b>
 <b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Drops transaction tombstones past their retention window (issue #346) — the &quot;who runs it&quot;
+&nbsp;     * half of the policy documented on [PurgeDeletedTransactionsUseCase].
+&nbsp;     *
+&nbsp;     * Its own coroutine, not a step in the startup chain above: nothing on the first screen reads
+&nbsp;     * the rows it removes, so making the splash wait on a DELETE would buy the user nothing.
+&nbsp;     * Failures are logged and swallowed for the same reason startup swallows a failed seed — a
+&nbsp;     * housekeeping hiccup must not be what keeps the app off its first screen.
+&nbsp;     */
+&nbsp;    private fun purgeExpiredTombstones() {
+<b class="nc">&nbsp;        viewModelScope.launch {</b>
+<b class="nc">&nbsp;            runCatching { purgeDeletedTransactions() }</b>
+<b class="nc">&nbsp;                .onSuccess { purged -&gt; if (purged &gt; 0) log.i { &quot;[retention] purged $purged deleted transaction(s)&quot; } }</b>
+<b class="nc">&nbsp;                .onFailure { log.w(it) { &quot;[retention] tombstone purge failed — retrying next launch&quot; } }</b>
+&nbsp;        }
+&nbsp;    }
 &nbsp;
 &nbsp;    /**
 &nbsp;     * Re-reads server-owned flags into the RemoteGlobal layer. Driven by the navigation host&#39;s
@@ -616,7 +671,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 20:33</div>
+    <div style="float:right;">generated on 2026-07-28 21:18</div>
 </div>
 </body>
 </html>

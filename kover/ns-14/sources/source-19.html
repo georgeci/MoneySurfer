@@ -222,26 +222,58 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;        enqueueUpsert(entity, MutationOperation.INSERT)
 &nbsp;    }
 &nbsp;
+&nbsp;    /**
+&nbsp;     * `@Update` rewrites the whole row, so every column the domain model does not carry has to be
+&nbsp;     * read back from storage first or it is silently reset. `createdAt` is one; `deletedAt` is the
+&nbsp;     * other, and it is read through [TransactionDao.getByIdIncludingDeleted] precisely because a
+&nbsp;     * tombstoned row is invisible to the ordinary lookup — writing `Transaction`&#39;s implicit &quot;live&quot;
+&nbsp;     * over it would undelete the row as a side effect of an unrelated edit. Lifting a tombstone is
+&nbsp;     * [restore]&#39;s job and nothing else&#39;s.
+&nbsp;     */
 &nbsp;    override suspend fun update(transaction: Transaction) {
-&nbsp;        val existingCreatedAt = dao.getById(transaction.id.value)?.createdAt
-&nbsp;        val entity = transaction.toEntity().copy(
-&nbsp;            createdAt = existingCreatedAt ?: transaction.toEntity().createdAt,
+&nbsp;        val stored = dao.getByIdIncludingDeleted(transaction.id.value)
+&nbsp;        val entity = transaction.toEntity()
+&nbsp;        val updated = entity.copy(
+&nbsp;            createdAt = stored?.createdAt ?: entity.createdAt,
 &nbsp;            updatedAt = clock.now().toEpochMilliseconds(),
+&nbsp;            deletedAt = stored?.deletedAt,
 &nbsp;        )
-&nbsp;        dao.update(entity)
-&nbsp;        enqueueUpsert(entity, MutationOperation.UPDATE)
+&nbsp;        dao.update(updated)
+&nbsp;        enqueueUpsert(updated, MutationOperation.UPDATE)
 &nbsp;    }
 &nbsp;
+&nbsp;    /**
+&nbsp;     * Writes a tombstone instead of dropping the row, then enqueues the same DELETE mutation the
+&nbsp;     * hard delete used to (issue #346) — the wire contract is unchanged, because Firestore has
+&nbsp;     * always taken deletes as a `deletedAt` patch rather than a document removal.
+&nbsp;     *
+&nbsp;     * The outbox entry is skipped when nothing was tombstoned. A second delete of the same id
+&nbsp;     * would otherwise push a second tombstone whose `deletedAt` is a later instant than the one
+&nbsp;     * peers already agreed on.
+&nbsp;     */
 &nbsp;    override suspend fun delete(id: TransactionId) {
-&nbsp;        val existing = dao.getById(id.value)
-&nbsp;        dao.delete(id.value)
-&nbsp;        if (existing != null) {
+&nbsp;        val existing = dao.getById(id.value) ?: return
+&nbsp;        val marked = dao.softDelete(id.value, clock.now().toEpochMilliseconds())
+&nbsp;        if (marked &gt; 0) {
 &nbsp;            outboxEnqueuer.enqueueDelete(
 &nbsp;                entityType = SyncEntityTypes.TRANSACTION,
 &nbsp;                entityId = existing.id,
 &nbsp;                scopeKey = existing.workspaceId,
 &nbsp;            )
 &nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Clears the tombstone in place — one UPDATE, no re-insert — and pushes the result as an
+&nbsp;     * ordinary upsert. That upsert is what lifts the tombstone remotely too: the doc is written
+&nbsp;     * whole, with `deletedAt` back to null, so peers see a restored row rather than a new one
+&nbsp;     * appearing beside the delete they already applied.
+&nbsp;     */
+&nbsp;    override suspend fun restore(id: TransactionId): Transaction? {
+&nbsp;        if (dao.restore(id.value, clock.now().toEpochMilliseconds()) == 0) return null
+&nbsp;        val restored = dao.getById(id.value) ?: return null
+&nbsp;        enqueueUpsert(restored, MutationOperation.UPDATE)
+&nbsp;        return restored.toDomain()
 &nbsp;    }
 &nbsp;
 &nbsp;    private suspend fun enqueueUpsert(entity: TransactionEntity, operation: MutationOperation) {
@@ -388,7 +420,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 20:33</div>
+    <div style="float:right;">generated on 2026-07-28 21:18</div>
 </div>
 </body>
 </html>

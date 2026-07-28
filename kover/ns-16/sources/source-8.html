@@ -193,9 +193,11 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;/**
 &nbsp; * Writes [patch] onto the remote doc, skipping docs that never reached
 &nbsp; * Firestore: an entity created and deleted between two drains leaves the
-&nbsp; * INSERT push a no-op (the Room row is already gone), and updating the
-&nbsp; * missing doc would raise NOT_FOUND on every retry, wedging the batch.
-&nbsp; * A doc that never existed remotely has nothing for peers to forget.
+&nbsp; * INSERT push a no-op (its `getById` finds no live row — for transactions
+&nbsp; * because the row is tombstoned, for the rest because it is gone), and
+&nbsp; * updating the missing doc would raise NOT_FOUND on every retry, wedging
+&nbsp; * the batch. A doc that never existed remotely has nothing for peers to
+&nbsp; * forget.
 &nbsp; */
 &nbsp;internal suspend fun DocumentReference.pushTombstone(patch: TombstonePatch) {
 &nbsp;    if (!get().exists) return
@@ -224,7 +226,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 20:33</div>
+    <div style="float:right;">generated on 2026-07-28 21:18</div>
 </div>
 </body>
 </html>

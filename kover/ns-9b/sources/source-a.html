@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > AccountRepository</title>
+  <title>MoneySurfer Coverage Report > UserRemoteRepository</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.repositories</a>
 </div>
 
-<h1>Coverage Summary for Class: AccountRepository (com.georgeci.moneysurfer.domain.repositories)</h1>
+<h1>Coverage Summary for Class: UserRemoteRepository (com.georgeci.moneysurfer.domain.repositories)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">AccountRepository</td>
+  <td class="name">UserRemoteRepository</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -46,55 +46,64 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.repositories
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.model.Account
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.AccountId
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
+&nbsp;import com.georgeci.moneysurfer.domain.model.User
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.UserId
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
-&nbsp;import kotlinx.coroutines.flow.Flow
 &nbsp;
-&nbsp;// Ten operations, and the tenth trips the interface threshold. Splitting them would only move the
-&nbsp;// line: every one is a single-column write on the same row, and the callers — use cases that own
-&nbsp;// one account action each — would then have to name two repositories to do one thing.
-&nbsp;@Suppress(&quot;TooManyFunctions&quot;)
-&nbsp;interface AccountRepository {
-&nbsp;    fun getAll(): Flow&lt;List&lt;Account&gt;&gt;
-&nbsp;    fun getByWorkspaceId(workspaceId: WorkspaceId): Flow&lt;List&lt;Account&gt;&gt;
-&nbsp;    suspend fun getById(id: AccountId): Account?
-&nbsp;    suspend fun insert(account: Account)
-&nbsp;    suspend fun update(account: Account)
-&nbsp;    suspend fun delete(id: AccountId)
+&nbsp;/**
+&nbsp; * Remote-backed user repository — reads/creates the `users/{uid}` document. Kept separate from
+&nbsp; * [UserRepository] (Room-backed local user table) because the lifecycles differ: the remote
+&nbsp; * record is the source of truth across devices, the local row is a cache + FK target.
+&nbsp; */
+&nbsp;interface UserRemoteRepository {
+&nbsp;    suspend fun fetch(uid: String): User?
 &nbsp;
-&nbsp;    /**
-&nbsp;     * Increment the cached `balance` of [accountId] by [delta]. Used by total-calc to keep
-&nbsp;     * `Account.balance` in sync with transaction changes without rewriting the whole row.
-&nbsp;     *
-&nbsp;     * Negative delta is allowed (subtracts). The repository writes the result and bumps
-&nbsp;     * `updatedAt`. Does NOT enqueue an outbox row — balance is a derived projection that
-&nbsp;     * Firestore recomputes server-side from its own tx state (see md/totatl_calc.md §6).
-&nbsp;     */
-&nbsp;    suspend fun applyDelta(accountId: AccountId, delta: Money)
+&nbsp;    suspend fun create(
+&nbsp;        uid: String,
+&nbsp;        displayName: String?,
+&nbsp;        email: String?,
+&nbsp;        isAnon: Boolean,
+&nbsp;        createdAt: Long,
+&nbsp;    )
 &nbsp;
 &nbsp;    /**
-&nbsp;     * Overwrite the cached balance with [balance]. Used by `RecalculateAccountBalanceUseCase`
-&nbsp;     * to repair the cache from authoritative transaction history. Like [applyDelta], does
-&nbsp;     * not enqueue an outbox row.
+&nbsp;     * Appends [workspaceId] to `users/{uid}.workspaceIds`. Idempotent — uses Firestore&#39;s
+&nbsp;     * `arrayUnion` so calling twice with the same id leaves the array unchanged.
 &nbsp;     */
-&nbsp;    suspend fun setBalance(accountId: AccountId, balance: Money)
+&nbsp;    suspend fun addWorkspaceRef(uid: String, workspaceId: WorkspaceId)
 &nbsp;
 &nbsp;    /**
-&nbsp;     * Toggle the archived flag on [accountId]. Bumps `updatedAt` and enqueues a sync update.
-&nbsp;     * Archived accounts keep their transactions but are hidden from active lists and excluded
-&nbsp;     * from total/budget rollups. No-op if [accountId] is unknown locally.
+&nbsp;     * Pins [workspaceId] as `users/{uid}.defaultWorkspaceId` so other devices land on the
+&nbsp;     * same workspace after login without re-prompting the selector.
 &nbsp;     */
-&nbsp;    suspend fun setArchived(accountId: AccountId, archived: Boolean)
+&nbsp;    suspend fun setDefaultWorkspace(uid: String, workspaceId: WorkspaceId)
 &nbsp;
 &nbsp;    /**
-&nbsp;     * Rewrite `sortOrder` so the accounts named in [orderedIds] sit in exactly that order,
-&nbsp;     * starting at 0. Ids the workspace does not know are ignored; accounts left out keep the
-&nbsp;     * value they had. Only the rows whose position actually changed are written and enqueued
-&nbsp;     * for sync, so dropping a row back where it started costs nothing.
+&nbsp;     * Resolves [email] to a [UserId] via the `userEmails/{email.lower()}` mapping. Returns
+&nbsp;     * null when no user has claimed that email (or when the mapping has not been backfilled
+&nbsp;     * for a legacy account). Best-effort — callers must tolerate null and keep email-based
+&nbsp;     * discovery as the fallback.
 &nbsp;     */
-&nbsp;    suspend fun reorder(orderedIds: List&lt;AccountId&gt;)
+&nbsp;    suspend fun findByEmail(email: String): UserId?
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Idempotent self-write of the email→uid mapping at `userEmails/{email.lower()}`. Called
+&nbsp;     * during post-auth bootstrap so future invites can resolve `targetUserId` for this user.
+&nbsp;     */
+&nbsp;    suspend fun upsertEmailMapping(email: String, uid: String)
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Appends [workspaceId] to `users/{uid}.invitedWorkspaceIds`. Called when sending
+&nbsp;     * an invite so the recipient&#39;s next syncAll() discovers the invite without a
+&nbsp;     * collectionGroup query. Idempotent via Firestore arrayUnion.
+&nbsp;     */
+&nbsp;    suspend fun addInvitedWorkspaceRef(uid: String, workspaceId: WorkspaceId)
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Removes [workspaceId] from `users/{uid}.invitedWorkspaceIds`. Called on accept/decline.
+&nbsp;     * Idempotent via Firestore arrayRemove.
+&nbsp;     */
+&nbsp;    suspend fun removeInvitedWorkspaceRef(uid: String, workspaceId: WorkspaceId)
 &nbsp;}
 </code>
 </pre>
@@ -119,7 +128,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 20:33</div>
+    <div style="float:right;">generated on 2026-07-28 21:18</div>
 </div>
 </body>
 </html>

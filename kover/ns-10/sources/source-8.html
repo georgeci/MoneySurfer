@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > TransactionSplitIdMigrationKt</title>
+  <title>MoneySurfer Coverage Report > TransactionSoftDeleteMigrationKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.data.db.migration</a>
 </div>
 
-<h1>Coverage Summary for Class: TransactionSplitIdMigrationKt (com.georgeci.moneysurfer.data.db.migration)</h1>
+<h1>Coverage Summary for Class: TransactionSoftDeleteMigrationKt (com.georgeci.moneysurfer.data.db.migration)</h1>
 
 <table class="coverageStats">
 
@@ -46,7 +46,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">TransactionSplitIdMigrationKt</td>
+  <td class="name">TransactionSoftDeleteMigrationKt</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -74,7 +74,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 </tr>
   <tr>
-    <td class="name">TransactionSplitIdMigrationKt$MIGRATION_34_35$1</td>
+    <td class="name">TransactionSoftDeleteMigrationKt$MIGRATION_35_36$1</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -89,7 +89,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (4/4)
+    (2/2)
   </span>
 </td>
 <td class="coverageStat">
@@ -97,7 +97,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (10/10)
+    (7/7)
   </span>
 </td>
   </tr>
@@ -117,7 +117,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (5/5)
+    (3/3)
   </span>
 </td>
 <td class="coverageStat">
@@ -125,7 +125,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (16/16)
+    (13/13)
   </span>
 </td>
 </tr>
@@ -143,23 +143,21 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import androidx.sqlite.execSQL
 &nbsp;
 &nbsp;/**
-&nbsp; * v34 → v35: add `transactions.splitId`, the shared id of the sibling rows one receipt was split
-&nbsp; * across (issue #399).
+&nbsp; * v35 → v36: add `transactions.deletedAt` so a delete becomes a tombstone instead of dropping the
+&nbsp; * row (issue #346).
 &nbsp; *
-&nbsp; * Pure addition, and nothing is backfilled: every existing row is a single-category transaction,
-&nbsp; * which is exactly what `NULL` means here.
+&nbsp; * Every existing row is live, and `NULL` is exactly that — so this is a pure addition with no
+&nbsp; * backfill. Rows deleted before this column existed are simply gone; there is nothing to recover
+&nbsp; * for them, which is the bug the column fixes going forward.
 &nbsp; *
-&nbsp; * The index comes with the column rather than later. `getCategorizedWindow` correlates on
-&nbsp; * `splitId` per row to learn a group&#39;s size, and — more immediately — Room validates the schema at
-&nbsp; * open time, so a migrated database missing the index would fail to open where a freshly created
-&nbsp; * one succeeds.
+&nbsp; * `transactions_fts` needs no attention: it is an external-content FTS4 table over `note` and
+&nbsp; * `merchant` only, so a new column on the content table changes neither its schema nor the
+&nbsp; * triggers Room generates for it. Soft-deleted rows stay in the index and are filtered out by the
+&nbsp; * `deletedAt IS NULL` term on the join in `TransactionDao.searchByText`.
 &nbsp; */
-<b class="fc">&nbsp;val MIGRATION_34_35: Migration = object : Migration(34, 35) {</b>
+<b class="fc">&nbsp;val MIGRATION_35_36: Migration = object : Migration(35, 36) {</b>
 &nbsp;    override fun migrate(connection: SQLiteConnection) {
-<b class="fc">&nbsp;        connection.execSQL(&quot;ALTER TABLE `transactions` ADD COLUMN `splitId` TEXT DEFAULT NULL&quot;)</b>
-<b class="fc">&nbsp;        connection.execSQL(</b>
-<b class="fc">&nbsp;            &quot;CREATE INDEX IF NOT EXISTS `index_transactions_splitId` ON `transactions` (`splitId`)&quot;,</b>
-&nbsp;        )
+<b class="fc">&nbsp;        connection.execSQL(&quot;ALTER TABLE `transactions` ADD COLUMN `deletedAt` INTEGER DEFAULT NULL&quot;)</b>
 &nbsp;    }
 &nbsp;}
 </code>
@@ -185,7 +183,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 20:33</div>
+    <div style="float:right;">generated on 2026-07-28 21:18</div>
 </div>
 </body>
 </html>

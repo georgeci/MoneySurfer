@@ -49,34 +49,34 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   <td class="name">TransactionDao_Impl</td>
 <td class="coverageStat">
   <span class="percent">
-    87.2%
+    88.7%
   </span>
   <span class="absValue">
-    (41/47)
+    (47/53)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    81.9%
+    82.3%
   </span>
   <span class="absValue">
-    (136/166)
+    (158/192)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    95.6%
+    95.8%
   </span>
   <span class="absValue">
-    (964/1008)
+    (1104/1152)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    94.7%
+    94.8%
   </span>
   <span class="absValue">
-    (3495/3689)
+    (3988/4206)
   </span>
 </td>
 </tr>
@@ -92,26 +92,26 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    90%
   </span>
   <span class="absValue">
-    (8/8)
+    (9/10)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    97.2%
   </span>
   <span class="absValue">
-    (32/32)
+    (35/36)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    96.4%
   </span>
   <span class="absValue">
-    (125/125)
+    (134/139)
   </span>
 </td>
   </tr>
@@ -127,26 +127,26 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    50%
+    70%
   </span>
   <span class="absValue">
-    (4/8)
+    (7/10)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    87.9%
+    91.9%
   </span>
   <span class="absValue">
-    (29/33)
+    (34/37)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    87.7%
+    91.7%
   </span>
   <span class="absValue">
-    (114/130)
+    (132/144)
   </span>
 </td>
   </tr>
@@ -165,23 +165,23 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/8)
+    (0/10)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    3.1%
+    2.8%
   </span>
   <span class="absValue">
-    (1/32)
+    (1/36)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    1.6%
+    1.4%
   </span>
   <span class="absValue">
-    (2/125)
+    (2/139)
   </span>
 </td>
   </tr>
@@ -200,23 +200,23 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/8)
+    (0/10)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    3%
+    2.7%
   </span>
   <span class="absValue">
-    (1/33)
+    (1/37)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    1.5%
+    1.4%
   </span>
   <span class="absValue">
-    (2/130)
+    (2/144)
   </span>
 </td>
   </tr>
@@ -252,34 +252,34 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
-    83.3%
+    84.8%
   </span>
   <span class="absValue">
-    (50/60)
+    (56/66)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    74.7%
+    75%
   </span>
   <span class="absValue">
-    (148/198)
+    (174/232)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    90.3%
+    90.5%
   </span>
   <span class="absValue">
-    (1028/1139)
+    (1176/1299)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    89%
+    89.2%
   </span>
   <span class="absValue">
-    (3739/4200)
+    (4259/4773)
   </span>
 </td>
 </tr>
@@ -299,6 +299,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import androidx.room.coroutines.createFlow
 &nbsp;import androidx.room.util.appendPlaceholders
 &nbsp;import androidx.room.util.getColumnIndexOrThrow
+&nbsp;import androidx.room.util.getTotalChangedRows
 &nbsp;import androidx.room.util.performSuspending
 &nbsp;import androidx.sqlite.SQLiteStatement
 &nbsp;import com.georgeci.moneysurfer.`data`.db.entity.CategorizedTransactionEntity
@@ -339,7 +340,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;  init {</b>
 <b class="fc">&nbsp;    this.__db = __db</b>
 <b class="fc">&nbsp;    this.__insertAdapterOfTransactionEntity = object : EntityInsertAdapter&lt;TransactionEntity&gt;() {</b>
-<b class="fc">&nbsp;      protected override fun createQuery(): String = &quot;INSERT OR ABORT INTO `transactions` (`id`,`workspaceId`,`accountId`,`amount`,`currencyCode`,`categoryId`,`note`,`merchant`,`tags`,`operationAt`,`operationDate`,`type`,`status`,`createdAt`,`updatedAt`,`transferId`,`splitId`,`recurringRuleId`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)&quot;</b>
+<b class="fc">&nbsp;      protected override fun createQuery(): String = &quot;INSERT OR ABORT INTO `transactions` (`id`,`workspaceId`,`accountId`,`amount`,`currencyCode`,`categoryId`,`note`,`merchant`,`tags`,`operationAt`,`operationDate`,`type`,`status`,`createdAt`,`updatedAt`,`transferId`,`splitId`,`recurringRuleId`,`deletedAt`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)&quot;</b>
 &nbsp;
 &nbsp;      protected override fun bind(statement: SQLiteStatement, entity: TransactionEntity) {
 <b class="fc">&nbsp;        statement.bindText(1, entity.id)</b>
@@ -380,10 +381,16 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;        } else {
 <b class="fc">&nbsp;          statement.bindText(18, _tmpRecurringRuleId)</b>
 &nbsp;        }
+<b class="fc">&nbsp;        val _tmpDeletedAt: Long? = entity.deletedAt</b>
+<b class="pc">&nbsp;        if (_tmpDeletedAt == null) {</b>
+<b class="fc">&nbsp;          statement.bindNull(19)</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;          statement.bindLong(19, _tmpDeletedAt)</b>
+&nbsp;        }
 &nbsp;      }
 &nbsp;    }
 <b class="fc">&nbsp;    this.__updateAdapterOfTransactionEntity = object : EntityDeleteOrUpdateAdapter&lt;TransactionEntity&gt;() {</b>
-<b class="fc">&nbsp;      protected override fun createQuery(): String = &quot;UPDATE OR ABORT `transactions` SET `id` = ?,`workspaceId` = ?,`accountId` = ?,`amount` = ?,`currencyCode` = ?,`categoryId` = ?,`note` = ?,`merchant` = ?,`tags` = ?,`operationAt` = ?,`operationDate` = ?,`type` = ?,`status` = ?,`createdAt` = ?,`updatedAt` = ?,`transferId` = ?,`splitId` = ?,`recurringRuleId` = ? WHERE `id` = ?&quot;</b>
+<b class="fc">&nbsp;      protected override fun createQuery(): String = &quot;UPDATE OR ABORT `transactions` SET `id` = ?,`workspaceId` = ?,`accountId` = ?,`amount` = ?,`currencyCode` = ?,`categoryId` = ?,`note` = ?,`merchant` = ?,`tags` = ?,`operationAt` = ?,`operationDate` = ?,`type` = ?,`status` = ?,`createdAt` = ?,`updatedAt` = ?,`transferId` = ?,`splitId` = ?,`recurringRuleId` = ?,`deletedAt` = ? WHERE `id` = ?&quot;</b>
 &nbsp;
 &nbsp;      protected override fun bind(statement: SQLiteStatement, entity: TransactionEntity) {
 <b class="fc">&nbsp;        statement.bindText(1, entity.id)</b>
@@ -392,10 +399,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;        statement.bindLong(4, entity.amount)</b>
 <b class="fc">&nbsp;        statement.bindText(5, entity.currencyCode)</b>
 <b class="fc">&nbsp;        val _tmpCategoryId: String? = entity.categoryId</b>
-<b class="pc">&nbsp;        if (_tmpCategoryId == null) {</b>
+<b class="fc">&nbsp;        if (_tmpCategoryId == null) {</b>
 <b class="fc">&nbsp;          statement.bindNull(6)</b>
 &nbsp;        } else {
-<b class="nc">&nbsp;          statement.bindText(6, _tmpCategoryId)</b>
+<b class="fc">&nbsp;          statement.bindText(6, _tmpCategoryId)</b>
 &nbsp;        }
 <b class="fc">&nbsp;        statement.bindText(7, entity.note)</b>
 <b class="fc">&nbsp;        statement.bindText(8, entity.merchant)</b>
@@ -424,11 +431,17 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;        } else {
 <b class="nc">&nbsp;          statement.bindText(18, _tmpRecurringRuleId)</b>
 &nbsp;        }
-<b class="fc">&nbsp;        statement.bindText(19, entity.id)</b>
+<b class="fc">&nbsp;        val _tmpDeletedAt: Long? = entity.deletedAt</b>
+<b class="fc">&nbsp;        if (_tmpDeletedAt == null) {</b>
+<b class="fc">&nbsp;          statement.bindNull(19)</b>
+&nbsp;        } else {
+<b class="fc">&nbsp;          statement.bindLong(19, _tmpDeletedAt)</b>
+&nbsp;        }
+<b class="fc">&nbsp;        statement.bindText(20, entity.id)</b>
 &nbsp;      }
 &nbsp;    }
 <b class="fc">&nbsp;    this.__upsertAdapterOfTransactionEntity = EntityUpsertAdapter&lt;TransactionEntity&gt;(object : EntityInsertAdapter&lt;TransactionEntity&gt;() {</b>
-<b class="nc">&nbsp;      protected override fun createQuery(): String = &quot;INSERT INTO `transactions` (`id`,`workspaceId`,`accountId`,`amount`,`currencyCode`,`categoryId`,`note`,`merchant`,`tags`,`operationAt`,`operationDate`,`type`,`status`,`createdAt`,`updatedAt`,`transferId`,`splitId`,`recurringRuleId`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)&quot;</b>
+<b class="nc">&nbsp;      protected override fun createQuery(): String = &quot;INSERT INTO `transactions` (`id`,`workspaceId`,`accountId`,`amount`,`currencyCode`,`categoryId`,`note`,`merchant`,`tags`,`operationAt`,`operationDate`,`type`,`status`,`createdAt`,`updatedAt`,`transferId`,`splitId`,`recurringRuleId`,`deletedAt`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)&quot;</b>
 &nbsp;
 &nbsp;      protected override fun bind(statement: SQLiteStatement, entity: TransactionEntity) {
 <b class="nc">&nbsp;        statement.bindText(1, entity.id)</b>
@@ -468,10 +481,16 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="nc">&nbsp;          statement.bindNull(18)</b>
 &nbsp;        } else {
 <b class="nc">&nbsp;          statement.bindText(18, _tmpRecurringRuleId)</b>
+&nbsp;        }
+<b class="nc">&nbsp;        val _tmpDeletedAt: Long? = entity.deletedAt</b>
+<b class="nc">&nbsp;        if (_tmpDeletedAt == null) {</b>
+<b class="nc">&nbsp;          statement.bindNull(19)</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;          statement.bindLong(19, _tmpDeletedAt)</b>
 &nbsp;        }
 &nbsp;      }
 <b class="fc">&nbsp;    }, object : EntityDeleteOrUpdateAdapter&lt;TransactionEntity&gt;() {</b>
-<b class="nc">&nbsp;      protected override fun createQuery(): String = &quot;UPDATE `transactions` SET `id` = ?,`workspaceId` = ?,`accountId` = ?,`amount` = ?,`currencyCode` = ?,`categoryId` = ?,`note` = ?,`merchant` = ?,`tags` = ?,`operationAt` = ?,`operationDate` = ?,`type` = ?,`status` = ?,`createdAt` = ?,`updatedAt` = ?,`transferId` = ?,`splitId` = ?,`recurringRuleId` = ? WHERE `id` = ?&quot;</b>
+<b class="nc">&nbsp;      protected override fun createQuery(): String = &quot;UPDATE `transactions` SET `id` = ?,`workspaceId` = ?,`accountId` = ?,`amount` = ?,`currencyCode` = ?,`categoryId` = ?,`note` = ?,`merchant` = ?,`tags` = ?,`operationAt` = ?,`operationDate` = ?,`type` = ?,`status` = ?,`createdAt` = ?,`updatedAt` = ?,`transferId` = ?,`splitId` = ?,`recurringRuleId` = ?,`deletedAt` = ? WHERE `id` = ?&quot;</b>
 &nbsp;
 &nbsp;      protected override fun bind(statement: SQLiteStatement, entity: TransactionEntity) {
 <b class="nc">&nbsp;        statement.bindText(1, entity.id)</b>
@@ -512,7 +531,13 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;        } else {
 <b class="nc">&nbsp;          statement.bindText(18, _tmpRecurringRuleId)</b>
 &nbsp;        }
-<b class="nc">&nbsp;        statement.bindText(19, entity.id)</b>
+<b class="nc">&nbsp;        val _tmpDeletedAt: Long? = entity.deletedAt</b>
+<b class="nc">&nbsp;        if (_tmpDeletedAt == null) {</b>
+<b class="nc">&nbsp;          statement.bindNull(19)</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;          statement.bindLong(19, _tmpDeletedAt)</b>
+&nbsp;        }
+<b class="nc">&nbsp;        statement.bindText(20, entity.id)</b>
 &nbsp;      }
 &nbsp;    })
 <b class="fc">&nbsp;  }</b>
@@ -534,7 +559,13 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;  }
 &nbsp;
 &nbsp;  public override fun getAll(): Flow&lt;List&lt;TransactionEntity&gt;&gt; {
-<b class="fc">&nbsp;    val _sql: String = &quot;SELECT * FROM transactions ORDER BY operationDate DESC, operationAt DESC, createdAt DESC&quot;</b>
+<b class="fc">&nbsp;    val _sql: String = &quot;&quot;&quot;</b>
+&nbsp;        |
+&nbsp;        |        SELECT * FROM transactions
+&nbsp;        |        WHERE deletedAt IS NULL
+&nbsp;        |        ORDER BY operationDate DESC, operationAt DESC, createdAt DESC
+&nbsp;        |        
+<b class="fc">&nbsp;        &quot;&quot;&quot;.trimMargin()</b>
 <b class="fc">&nbsp;    return createFlow(__db, false, arrayOf(&quot;transactions&quot;)) { _connection -&gt;</b>
 <b class="fc">&nbsp;      val _stmt: SQLiteStatement = _connection.prepare(_sql)</b>
 &nbsp;      try {
@@ -556,6 +587,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;        val _columnIndexOfTransferId: Int = getColumnIndexOrThrow(_stmt, &quot;transferId&quot;)</b>
 <b class="fc">&nbsp;        val _columnIndexOfSplitId: Int = getColumnIndexOrThrow(_stmt, &quot;splitId&quot;)</b>
 <b class="fc">&nbsp;        val _columnIndexOfRecurringRuleId: Int = getColumnIndexOrThrow(_stmt, &quot;recurringRuleId&quot;)</b>
+<b class="fc">&nbsp;        val _columnIndexOfDeletedAt: Int = getColumnIndexOrThrow(_stmt, &quot;deletedAt&quot;)</b>
 <b class="fc">&nbsp;        val _result: MutableList&lt;TransactionEntity&gt; = mutableListOf()</b>
 <b class="fc">&nbsp;        while (_stmt.step()) {</b>
 <b class="fc">&nbsp;          val _item: TransactionEntity</b>
@@ -570,8 +602,8 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;          val _tmpCurrencyCode: String</b>
 <b class="fc">&nbsp;          _tmpCurrencyCode = _stmt.getText(_columnIndexOfCurrencyCode)</b>
 <b class="fc">&nbsp;          val _tmpCategoryId: String?</b>
-<b class="pc">&nbsp;          if (_stmt.isNull(_columnIndexOfCategoryId)) {</b>
-<b class="nc">&nbsp;            _tmpCategoryId = null</b>
+<b class="fc">&nbsp;          if (_stmt.isNull(_columnIndexOfCategoryId)) {</b>
+<b class="fc">&nbsp;            _tmpCategoryId = null</b>
 &nbsp;          } else {
 <b class="fc">&nbsp;            _tmpCategoryId = _stmt.getText(_columnIndexOfCategoryId)</b>
 &nbsp;          }
@@ -611,7 +643,13 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;          } else {
 <b class="nc">&nbsp;            _tmpRecurringRuleId = _stmt.getText(_columnIndexOfRecurringRuleId)</b>
 &nbsp;          }
-<b class="fc">&nbsp;          _item = TransactionEntity(_tmpId,_tmpWorkspaceId,_tmpAccountId,_tmpAmount,_tmpCurrencyCode,_tmpCategoryId,_tmpNote,_tmpMerchant,_tmpTags,_tmpOperationAt,_tmpOperationDate,_tmpType,_tmpStatus,_tmpCreatedAt,_tmpUpdatedAt,_tmpTransferId,_tmpSplitId,_tmpRecurringRuleId)</b>
+<b class="fc">&nbsp;          val _tmpDeletedAt: Long?</b>
+<b class="pc">&nbsp;          if (_stmt.isNull(_columnIndexOfDeletedAt)) {</b>
+<b class="fc">&nbsp;            _tmpDeletedAt = null</b>
+&nbsp;          } else {
+<b class="nc">&nbsp;            _tmpDeletedAt = _stmt.getLong(_columnIndexOfDeletedAt)</b>
+&nbsp;          }
+<b class="fc">&nbsp;          _item = TransactionEntity(_tmpId,_tmpWorkspaceId,_tmpAccountId,_tmpAmount,_tmpCurrencyCode,_tmpCategoryId,_tmpNote,_tmpMerchant,_tmpTags,_tmpOperationAt,_tmpOperationDate,_tmpType,_tmpStatus,_tmpCreatedAt,_tmpUpdatedAt,_tmpTransferId,_tmpSplitId,_tmpRecurringRuleId,_tmpDeletedAt)</b>
 <b class="fc">&nbsp;          _result.add(_item)</b>
 &nbsp;        }
 <b class="fc">&nbsp;        _result</b>
@@ -622,7 +660,13 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;  }
 &nbsp;
 &nbsp;  public override fun getByAccountId(accountId: String): Flow&lt;List&lt;TransactionEntity&gt;&gt; {
-<b class="fc">&nbsp;    val _sql: String = &quot;SELECT * FROM transactions WHERE accountId = ? ORDER BY operationDate DESC, operationAt DESC, createdAt DESC&quot;</b>
+<b class="fc">&nbsp;    val _sql: String = &quot;&quot;&quot;</b>
+&nbsp;        |
+&nbsp;        |        SELECT * FROM transactions
+&nbsp;        |        WHERE accountId = ? AND deletedAt IS NULL
+&nbsp;        |        ORDER BY operationDate DESC, operationAt DESC, createdAt DESC
+&nbsp;        |        
+<b class="fc">&nbsp;        &quot;&quot;&quot;.trimMargin()</b>
 <b class="fc">&nbsp;    return createFlow(__db, false, arrayOf(&quot;transactions&quot;)) { _connection -&gt;</b>
 <b class="fc">&nbsp;      val _stmt: SQLiteStatement = _connection.prepare(_sql)</b>
 &nbsp;      try {
@@ -646,6 +690,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;        val _columnIndexOfTransferId: Int = getColumnIndexOrThrow(_stmt, &quot;transferId&quot;)</b>
 <b class="fc">&nbsp;        val _columnIndexOfSplitId: Int = getColumnIndexOrThrow(_stmt, &quot;splitId&quot;)</b>
 <b class="fc">&nbsp;        val _columnIndexOfRecurringRuleId: Int = getColumnIndexOrThrow(_stmt, &quot;recurringRuleId&quot;)</b>
+<b class="fc">&nbsp;        val _columnIndexOfDeletedAt: Int = getColumnIndexOrThrow(_stmt, &quot;deletedAt&quot;)</b>
 <b class="fc">&nbsp;        val _result: MutableList&lt;TransactionEntity&gt; = mutableListOf()</b>
 <b class="fc">&nbsp;        while (_stmt.step()) {</b>
 <b class="fc">&nbsp;          val _item: TransactionEntity</b>
@@ -701,7 +746,13 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;          } else {
 <b class="nc">&nbsp;            _tmpRecurringRuleId = _stmt.getText(_columnIndexOfRecurringRuleId)</b>
 &nbsp;          }
-<b class="fc">&nbsp;          _item = TransactionEntity(_tmpId,_tmpWorkspaceId,_tmpAccountId,_tmpAmount,_tmpCurrencyCode,_tmpCategoryId,_tmpNote,_tmpMerchant,_tmpTags,_tmpOperationAt,_tmpOperationDate,_tmpType,_tmpStatus,_tmpCreatedAt,_tmpUpdatedAt,_tmpTransferId,_tmpSplitId,_tmpRecurringRuleId)</b>
+<b class="fc">&nbsp;          val _tmpDeletedAt: Long?</b>
+<b class="pc">&nbsp;          if (_stmt.isNull(_columnIndexOfDeletedAt)) {</b>
+<b class="fc">&nbsp;            _tmpDeletedAt = null</b>
+&nbsp;          } else {
+<b class="nc">&nbsp;            _tmpDeletedAt = _stmt.getLong(_columnIndexOfDeletedAt)</b>
+&nbsp;          }
+<b class="fc">&nbsp;          _item = TransactionEntity(_tmpId,_tmpWorkspaceId,_tmpAccountId,_tmpAmount,_tmpCurrencyCode,_tmpCategoryId,_tmpNote,_tmpMerchant,_tmpTags,_tmpOperationAt,_tmpOperationDate,_tmpType,_tmpStatus,_tmpCreatedAt,_tmpUpdatedAt,_tmpTransferId,_tmpSplitId,_tmpRecurringRuleId,_tmpDeletedAt)</b>
 <b class="fc">&nbsp;          _result.add(_item)</b>
 &nbsp;        }
 <b class="fc">&nbsp;        _result</b>
@@ -741,6 +792,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;        |            (
 &nbsp;        |                SELECT COUNT(*) FROM transactions AS legs
 &nbsp;        |                WHERE legs.splitId = transactions.splitId
+&nbsp;        |                  AND legs.deletedAt IS NULL
 &nbsp;        |            ) AS splitLegCount,
 &nbsp;        |            transactions.recurringRuleId
 &nbsp;        |        FROM transactions
@@ -749,6 +801,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;        |          AND (? IS NULL OR transactions.operationDate &gt;= ?)
 &nbsp;        |          AND (? IS NULL OR transactions.operationDate &lt;= ?)
 &nbsp;        |          AND transactions.type NOT IN (&#39;OPENING_BALANCE&#39;, &#39;INITIAL_BALANCE&#39;)
+&nbsp;        |          AND transactions.deletedAt IS NULL
 &nbsp;        |        ORDER BY transactions.operationDate DESC, transactions.operationAt DESC, transactions.createdAt DESC
 &nbsp;        |        LIMIT ?
 &nbsp;        |        
@@ -828,16 +881,16 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;          val _tmpCurrencyCode: String</b>
 <b class="fc">&nbsp;          _tmpCurrencyCode = _stmt.getText(_columnIndexOfCurrencyCode)</b>
 <b class="fc">&nbsp;          val _tmpCategoryId: String?</b>
-<b class="pc">&nbsp;          if (_stmt.isNull(_columnIndexOfCategoryId)) {</b>
+<b class="fc">&nbsp;          if (_stmt.isNull(_columnIndexOfCategoryId)) {</b>
 <b class="fc">&nbsp;            _tmpCategoryId = null</b>
 &nbsp;          } else {
-<b class="nc">&nbsp;            _tmpCategoryId = _stmt.getText(_columnIndexOfCategoryId)</b>
+<b class="fc">&nbsp;            _tmpCategoryId = _stmt.getText(_columnIndexOfCategoryId)</b>
 &nbsp;          }
 <b class="fc">&nbsp;          val _tmpCategoryName: String?</b>
-<b class="pc">&nbsp;          if (_stmt.isNull(_columnIndexOfCategoryName)) {</b>
+<b class="fc">&nbsp;          if (_stmt.isNull(_columnIndexOfCategoryName)) {</b>
 <b class="fc">&nbsp;            _tmpCategoryName = null</b>
 &nbsp;          } else {
-<b class="nc">&nbsp;            _tmpCategoryName = _stmt.getText(_columnIndexOfCategoryName)</b>
+<b class="fc">&nbsp;            _tmpCategoryName = _stmt.getText(_columnIndexOfCategoryName)</b>
 &nbsp;          }
 <b class="fc">&nbsp;          val _tmpNote: String</b>
 <b class="fc">&nbsp;          _tmpNote = _stmt.getText(_columnIndexOfNote)</b>
@@ -904,6 +957,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;        |          AND (? IS NULL OR transactions.operationDate &gt;= ?)
 &nbsp;        |          AND (? IS NULL OR transactions.operationDate &lt;= ?)
 &nbsp;        |          AND transactions.type NOT IN (&#39;OPENING_BALANCE&#39;, &#39;INITIAL_BALANCE&#39;)
+&nbsp;        |          AND transactions.deletedAt IS NULL
 &nbsp;        |        GROUP BY transactions.type, transactions.currencyCode, isNegative
 &nbsp;        |        
 <b class="fc">&nbsp;        &quot;&quot;&quot;.trimMargin()</b>
@@ -974,7 +1028,13 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;  }
 &nbsp;
 &nbsp;  public override fun getByWorkspaceId(workspaceId: String): Flow&lt;List&lt;TransactionEntity&gt;&gt; {
-<b class="fc">&nbsp;    val _sql: String = &quot;SELECT * FROM transactions WHERE workspaceId = ? ORDER BY operationDate DESC, operationAt DESC, createdAt DESC&quot;</b>
+<b class="fc">&nbsp;    val _sql: String = &quot;&quot;&quot;</b>
+&nbsp;        |
+&nbsp;        |        SELECT * FROM transactions
+&nbsp;        |        WHERE workspaceId = ? AND deletedAt IS NULL
+&nbsp;        |        ORDER BY operationDate DESC, operationAt DESC, createdAt DESC
+&nbsp;        |        
+<b class="fc">&nbsp;        &quot;&quot;&quot;.trimMargin()</b>
 <b class="fc">&nbsp;    return createFlow(__db, false, arrayOf(&quot;transactions&quot;)) { _connection -&gt;</b>
 <b class="fc">&nbsp;      val _stmt: SQLiteStatement = _connection.prepare(_sql)</b>
 &nbsp;      try {
@@ -998,6 +1058,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;        val _columnIndexOfTransferId: Int = getColumnIndexOrThrow(_stmt, &quot;transferId&quot;)</b>
 <b class="fc">&nbsp;        val _columnIndexOfSplitId: Int = getColumnIndexOrThrow(_stmt, &quot;splitId&quot;)</b>
 <b class="fc">&nbsp;        val _columnIndexOfRecurringRuleId: Int = getColumnIndexOrThrow(_stmt, &quot;recurringRuleId&quot;)</b>
+<b class="fc">&nbsp;        val _columnIndexOfDeletedAt: Int = getColumnIndexOrThrow(_stmt, &quot;deletedAt&quot;)</b>
 <b class="fc">&nbsp;        val _result: MutableList&lt;TransactionEntity&gt; = mutableListOf()</b>
 <b class="fc">&nbsp;        while (_stmt.step()) {</b>
 <b class="fc">&nbsp;          val _item: TransactionEntity</b>
@@ -1053,7 +1114,13 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;          } else {
 <b class="nc">&nbsp;            _tmpRecurringRuleId = _stmt.getText(_columnIndexOfRecurringRuleId)</b>
 &nbsp;          }
-<b class="fc">&nbsp;          _item = TransactionEntity(_tmpId,_tmpWorkspaceId,_tmpAccountId,_tmpAmount,_tmpCurrencyCode,_tmpCategoryId,_tmpNote,_tmpMerchant,_tmpTags,_tmpOperationAt,_tmpOperationDate,_tmpType,_tmpStatus,_tmpCreatedAt,_tmpUpdatedAt,_tmpTransferId,_tmpSplitId,_tmpRecurringRuleId)</b>
+<b class="fc">&nbsp;          val _tmpDeletedAt: Long?</b>
+<b class="pc">&nbsp;          if (_stmt.isNull(_columnIndexOfDeletedAt)) {</b>
+<b class="fc">&nbsp;            _tmpDeletedAt = null</b>
+&nbsp;          } else {
+<b class="nc">&nbsp;            _tmpDeletedAt = _stmt.getLong(_columnIndexOfDeletedAt)</b>
+&nbsp;          }
+<b class="fc">&nbsp;          _item = TransactionEntity(_tmpId,_tmpWorkspaceId,_tmpAccountId,_tmpAmount,_tmpCurrencyCode,_tmpCategoryId,_tmpNote,_tmpMerchant,_tmpTags,_tmpOperationAt,_tmpOperationDate,_tmpType,_tmpStatus,_tmpCreatedAt,_tmpUpdatedAt,_tmpTransferId,_tmpSplitId,_tmpRecurringRuleId,_tmpDeletedAt)</b>
 <b class="fc">&nbsp;          _result.add(_item)</b>
 &nbsp;        }
 <b class="fc">&nbsp;        _result</b>
@@ -1064,7 +1131,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;  }
 &nbsp;
 &nbsp;  public override suspend fun getById(id: String): TransactionEntity? {
-<b class="fc">&nbsp;    val _sql: String = &quot;SELECT * FROM transactions WHERE id = ?&quot;</b>
+<b class="fc">&nbsp;    val _sql: String = &quot;SELECT * FROM transactions WHERE id = ? AND deletedAt IS NULL&quot;</b>
 <b class="fc">&nbsp;    return performSuspending(__db, true, false) { _connection -&gt;</b>
 <b class="fc">&nbsp;      val _stmt: SQLiteStatement = _connection.prepare(_sql)</b>
 &nbsp;      try {
@@ -1088,6 +1155,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;        val _columnIndexOfTransferId: Int = getColumnIndexOrThrow(_stmt, &quot;transferId&quot;)</b>
 <b class="fc">&nbsp;        val _columnIndexOfSplitId: Int = getColumnIndexOrThrow(_stmt, &quot;splitId&quot;)</b>
 <b class="fc">&nbsp;        val _columnIndexOfRecurringRuleId: Int = getColumnIndexOrThrow(_stmt, &quot;recurringRuleId&quot;)</b>
+<b class="fc">&nbsp;        val _columnIndexOfDeletedAt: Int = getColumnIndexOrThrow(_stmt, &quot;deletedAt&quot;)</b>
 <b class="fc">&nbsp;        val _result: TransactionEntity?</b>
 <b class="fc">&nbsp;        if (_stmt.step()) {</b>
 <b class="fc">&nbsp;          val _tmpId: String</b>
@@ -1131,10 +1199,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;            _tmpTransferId = _stmt.getText(_columnIndexOfTransferId)</b>
 &nbsp;          }
 <b class="fc">&nbsp;          val _tmpSplitId: String?</b>
-<b class="pc">&nbsp;          if (_stmt.isNull(_columnIndexOfSplitId)) {</b>
+<b class="fc">&nbsp;          if (_stmt.isNull(_columnIndexOfSplitId)) {</b>
 <b class="fc">&nbsp;            _tmpSplitId = null</b>
 &nbsp;          } else {
-<b class="nc">&nbsp;            _tmpSplitId = _stmt.getText(_columnIndexOfSplitId)</b>
+<b class="fc">&nbsp;            _tmpSplitId = _stmt.getText(_columnIndexOfSplitId)</b>
 &nbsp;          }
 <b class="fc">&nbsp;          val _tmpRecurringRuleId: String?</b>
 <b class="fc">&nbsp;          if (_stmt.isNull(_columnIndexOfRecurringRuleId)) {</b>
@@ -1142,7 +1210,110 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;          } else {
 <b class="fc">&nbsp;            _tmpRecurringRuleId = _stmt.getText(_columnIndexOfRecurringRuleId)</b>
 &nbsp;          }
-<b class="fc">&nbsp;          _result = TransactionEntity(_tmpId,_tmpWorkspaceId,_tmpAccountId,_tmpAmount,_tmpCurrencyCode,_tmpCategoryId,_tmpNote,_tmpMerchant,_tmpTags,_tmpOperationAt,_tmpOperationDate,_tmpType,_tmpStatus,_tmpCreatedAt,_tmpUpdatedAt,_tmpTransferId,_tmpSplitId,_tmpRecurringRuleId)</b>
+<b class="fc">&nbsp;          val _tmpDeletedAt: Long?</b>
+<b class="pc">&nbsp;          if (_stmt.isNull(_columnIndexOfDeletedAt)) {</b>
+<b class="fc">&nbsp;            _tmpDeletedAt = null</b>
+&nbsp;          } else {
+<b class="nc">&nbsp;            _tmpDeletedAt = _stmt.getLong(_columnIndexOfDeletedAt)</b>
+&nbsp;          }
+<b class="fc">&nbsp;          _result = TransactionEntity(_tmpId,_tmpWorkspaceId,_tmpAccountId,_tmpAmount,_tmpCurrencyCode,_tmpCategoryId,_tmpNote,_tmpMerchant,_tmpTags,_tmpOperationAt,_tmpOperationDate,_tmpType,_tmpStatus,_tmpCreatedAt,_tmpUpdatedAt,_tmpTransferId,_tmpSplitId,_tmpRecurringRuleId,_tmpDeletedAt)</b>
+&nbsp;        } else {
+<b class="fc">&nbsp;          _result = null</b>
+&nbsp;        }
+<b class="fc">&nbsp;        _result</b>
+&nbsp;      } finally {
+<b class="fc">&nbsp;        _stmt.close()</b>
+&nbsp;      }
+&nbsp;    }
+&nbsp;  }
+&nbsp;
+&nbsp;  public override suspend fun getByIdIncludingDeleted(id: String): TransactionEntity? {
+<b class="fc">&nbsp;    val _sql: String = &quot;SELECT * FROM transactions WHERE id = ?&quot;</b>
+<b class="fc">&nbsp;    return performSuspending(__db, true, false) { _connection -&gt;</b>
+<b class="fc">&nbsp;      val _stmt: SQLiteStatement = _connection.prepare(_sql)</b>
+&nbsp;      try {
+<b class="fc">&nbsp;        var _argIndex: Int = 1</b>
+<b class="fc">&nbsp;        _stmt.bindText(_argIndex, id)</b>
+<b class="fc">&nbsp;        val _columnIndexOfId: Int = getColumnIndexOrThrow(_stmt, &quot;id&quot;)</b>
+<b class="fc">&nbsp;        val _columnIndexOfWorkspaceId: Int = getColumnIndexOrThrow(_stmt, &quot;workspaceId&quot;)</b>
+<b class="fc">&nbsp;        val _columnIndexOfAccountId: Int = getColumnIndexOrThrow(_stmt, &quot;accountId&quot;)</b>
+<b class="fc">&nbsp;        val _columnIndexOfAmount: Int = getColumnIndexOrThrow(_stmt, &quot;amount&quot;)</b>
+<b class="fc">&nbsp;        val _columnIndexOfCurrencyCode: Int = getColumnIndexOrThrow(_stmt, &quot;currencyCode&quot;)</b>
+<b class="fc">&nbsp;        val _columnIndexOfCategoryId: Int = getColumnIndexOrThrow(_stmt, &quot;categoryId&quot;)</b>
+<b class="fc">&nbsp;        val _columnIndexOfNote: Int = getColumnIndexOrThrow(_stmt, &quot;note&quot;)</b>
+<b class="fc">&nbsp;        val _columnIndexOfMerchant: Int = getColumnIndexOrThrow(_stmt, &quot;merchant&quot;)</b>
+<b class="fc">&nbsp;        val _columnIndexOfTags: Int = getColumnIndexOrThrow(_stmt, &quot;tags&quot;)</b>
+<b class="fc">&nbsp;        val _columnIndexOfOperationAt: Int = getColumnIndexOrThrow(_stmt, &quot;operationAt&quot;)</b>
+<b class="fc">&nbsp;        val _columnIndexOfOperationDate: Int = getColumnIndexOrThrow(_stmt, &quot;operationDate&quot;)</b>
+<b class="fc">&nbsp;        val _columnIndexOfType: Int = getColumnIndexOrThrow(_stmt, &quot;type&quot;)</b>
+<b class="fc">&nbsp;        val _columnIndexOfStatus: Int = getColumnIndexOrThrow(_stmt, &quot;status&quot;)</b>
+<b class="fc">&nbsp;        val _columnIndexOfCreatedAt: Int = getColumnIndexOrThrow(_stmt, &quot;createdAt&quot;)</b>
+<b class="fc">&nbsp;        val _columnIndexOfUpdatedAt: Int = getColumnIndexOrThrow(_stmt, &quot;updatedAt&quot;)</b>
+<b class="fc">&nbsp;        val _columnIndexOfTransferId: Int = getColumnIndexOrThrow(_stmt, &quot;transferId&quot;)</b>
+<b class="fc">&nbsp;        val _columnIndexOfSplitId: Int = getColumnIndexOrThrow(_stmt, &quot;splitId&quot;)</b>
+<b class="fc">&nbsp;        val _columnIndexOfRecurringRuleId: Int = getColumnIndexOrThrow(_stmt, &quot;recurringRuleId&quot;)</b>
+<b class="fc">&nbsp;        val _columnIndexOfDeletedAt: Int = getColumnIndexOrThrow(_stmt, &quot;deletedAt&quot;)</b>
+<b class="fc">&nbsp;        val _result: TransactionEntity?</b>
+<b class="fc">&nbsp;        if (_stmt.step()) {</b>
+<b class="fc">&nbsp;          val _tmpId: String</b>
+<b class="fc">&nbsp;          _tmpId = _stmt.getText(_columnIndexOfId)</b>
+<b class="fc">&nbsp;          val _tmpWorkspaceId: String</b>
+<b class="fc">&nbsp;          _tmpWorkspaceId = _stmt.getText(_columnIndexOfWorkspaceId)</b>
+<b class="fc">&nbsp;          val _tmpAccountId: String</b>
+<b class="fc">&nbsp;          _tmpAccountId = _stmt.getText(_columnIndexOfAccountId)</b>
+<b class="fc">&nbsp;          val _tmpAmount: Long</b>
+<b class="fc">&nbsp;          _tmpAmount = _stmt.getLong(_columnIndexOfAmount)</b>
+<b class="fc">&nbsp;          val _tmpCurrencyCode: String</b>
+<b class="fc">&nbsp;          _tmpCurrencyCode = _stmt.getText(_columnIndexOfCurrencyCode)</b>
+<b class="fc">&nbsp;          val _tmpCategoryId: String?</b>
+<b class="fc">&nbsp;          if (_stmt.isNull(_columnIndexOfCategoryId)) {</b>
+<b class="fc">&nbsp;            _tmpCategoryId = null</b>
+&nbsp;          } else {
+<b class="fc">&nbsp;            _tmpCategoryId = _stmt.getText(_columnIndexOfCategoryId)</b>
+&nbsp;          }
+<b class="fc">&nbsp;          val _tmpNote: String</b>
+<b class="fc">&nbsp;          _tmpNote = _stmt.getText(_columnIndexOfNote)</b>
+<b class="fc">&nbsp;          val _tmpMerchant: String</b>
+<b class="fc">&nbsp;          _tmpMerchant = _stmt.getText(_columnIndexOfMerchant)</b>
+<b class="fc">&nbsp;          val _tmpTags: String</b>
+<b class="fc">&nbsp;          _tmpTags = _stmt.getText(_columnIndexOfTags)</b>
+<b class="fc">&nbsp;          val _tmpOperationAt: Long</b>
+<b class="fc">&nbsp;          _tmpOperationAt = _stmt.getLong(_columnIndexOfOperationAt)</b>
+<b class="fc">&nbsp;          val _tmpOperationDate: String</b>
+<b class="fc">&nbsp;          _tmpOperationDate = _stmt.getText(_columnIndexOfOperationDate)</b>
+<b class="fc">&nbsp;          val _tmpType: String</b>
+<b class="fc">&nbsp;          _tmpType = _stmt.getText(_columnIndexOfType)</b>
+<b class="fc">&nbsp;          val _tmpStatus: String</b>
+<b class="fc">&nbsp;          _tmpStatus = _stmt.getText(_columnIndexOfStatus)</b>
+<b class="fc">&nbsp;          val _tmpCreatedAt: Long</b>
+<b class="fc">&nbsp;          _tmpCreatedAt = _stmt.getLong(_columnIndexOfCreatedAt)</b>
+<b class="fc">&nbsp;          val _tmpUpdatedAt: Long</b>
+<b class="fc">&nbsp;          _tmpUpdatedAt = _stmt.getLong(_columnIndexOfUpdatedAt)</b>
+<b class="fc">&nbsp;          val _tmpTransferId: String?</b>
+<b class="pc">&nbsp;          if (_stmt.isNull(_columnIndexOfTransferId)) {</b>
+<b class="fc">&nbsp;            _tmpTransferId = null</b>
+&nbsp;          } else {
+<b class="nc">&nbsp;            _tmpTransferId = _stmt.getText(_columnIndexOfTransferId)</b>
+&nbsp;          }
+<b class="fc">&nbsp;          val _tmpSplitId: String?</b>
+<b class="pc">&nbsp;          if (_stmt.isNull(_columnIndexOfSplitId)) {</b>
+<b class="fc">&nbsp;            _tmpSplitId = null</b>
+&nbsp;          } else {
+<b class="nc">&nbsp;            _tmpSplitId = _stmt.getText(_columnIndexOfSplitId)</b>
+&nbsp;          }
+<b class="fc">&nbsp;          val _tmpRecurringRuleId: String?</b>
+<b class="pc">&nbsp;          if (_stmt.isNull(_columnIndexOfRecurringRuleId)) {</b>
+<b class="fc">&nbsp;            _tmpRecurringRuleId = null</b>
+&nbsp;          } else {
+<b class="nc">&nbsp;            _tmpRecurringRuleId = _stmt.getText(_columnIndexOfRecurringRuleId)</b>
+&nbsp;          }
+<b class="fc">&nbsp;          val _tmpDeletedAt: Long?</b>
+<b class="fc">&nbsp;          if (_stmt.isNull(_columnIndexOfDeletedAt)) {</b>
+<b class="fc">&nbsp;            _tmpDeletedAt = null</b>
+&nbsp;          } else {
+<b class="fc">&nbsp;            _tmpDeletedAt = _stmt.getLong(_columnIndexOfDeletedAt)</b>
+&nbsp;          }
+<b class="fc">&nbsp;          _result = TransactionEntity(_tmpId,_tmpWorkspaceId,_tmpAccountId,_tmpAmount,_tmpCurrencyCode,_tmpCategoryId,_tmpNote,_tmpMerchant,_tmpTags,_tmpOperationAt,_tmpOperationDate,_tmpType,_tmpStatus,_tmpCreatedAt,_tmpUpdatedAt,_tmpTransferId,_tmpSplitId,_tmpRecurringRuleId,_tmpDeletedAt)</b>
 &nbsp;        } else {
 <b class="fc">&nbsp;          _result = null</b>
 &nbsp;        }
@@ -1154,7 +1325,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;  }
 &nbsp;
 &nbsp;  public override suspend fun getByTransferId(transferId: String): List&lt;TransactionEntity&gt; {
-<b class="fc">&nbsp;    val _sql: String = &quot;SELECT * FROM transactions WHERE transferId = ? ORDER BY createdAt ASC&quot;</b>
+<b class="fc">&nbsp;    val _sql: String = &quot;SELECT * FROM transactions WHERE transferId = ? AND deletedAt IS NULL ORDER BY createdAt ASC&quot;</b>
 <b class="fc">&nbsp;    return performSuspending(__db, true, false) { _connection -&gt;</b>
 <b class="fc">&nbsp;      val _stmt: SQLiteStatement = _connection.prepare(_sql)</b>
 &nbsp;      try {
@@ -1178,6 +1349,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;        val _columnIndexOfTransferId: Int = getColumnIndexOrThrow(_stmt, &quot;transferId&quot;)</b>
 <b class="fc">&nbsp;        val _columnIndexOfSplitId: Int = getColumnIndexOrThrow(_stmt, &quot;splitId&quot;)</b>
 <b class="fc">&nbsp;        val _columnIndexOfRecurringRuleId: Int = getColumnIndexOrThrow(_stmt, &quot;recurringRuleId&quot;)</b>
+<b class="fc">&nbsp;        val _columnIndexOfDeletedAt: Int = getColumnIndexOrThrow(_stmt, &quot;deletedAt&quot;)</b>
 <b class="fc">&nbsp;        val _result: MutableList&lt;TransactionEntity&gt; = mutableListOf()</b>
 <b class="fc">&nbsp;        while (_stmt.step()) {</b>
 <b class="fc">&nbsp;          val _item: TransactionEntity</b>
@@ -1233,7 +1405,13 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;          } else {
 <b class="nc">&nbsp;            _tmpRecurringRuleId = _stmt.getText(_columnIndexOfRecurringRuleId)</b>
 &nbsp;          }
-<b class="fc">&nbsp;          _item = TransactionEntity(_tmpId,_tmpWorkspaceId,_tmpAccountId,_tmpAmount,_tmpCurrencyCode,_tmpCategoryId,_tmpNote,_tmpMerchant,_tmpTags,_tmpOperationAt,_tmpOperationDate,_tmpType,_tmpStatus,_tmpCreatedAt,_tmpUpdatedAt,_tmpTransferId,_tmpSplitId,_tmpRecurringRuleId)</b>
+<b class="fc">&nbsp;          val _tmpDeletedAt: Long?</b>
+<b class="pc">&nbsp;          if (_stmt.isNull(_columnIndexOfDeletedAt)) {</b>
+<b class="fc">&nbsp;            _tmpDeletedAt = null</b>
+&nbsp;          } else {
+<b class="nc">&nbsp;            _tmpDeletedAt = _stmt.getLong(_columnIndexOfDeletedAt)</b>
+&nbsp;          }
+<b class="fc">&nbsp;          _item = TransactionEntity(_tmpId,_tmpWorkspaceId,_tmpAccountId,_tmpAmount,_tmpCurrencyCode,_tmpCategoryId,_tmpNote,_tmpMerchant,_tmpTags,_tmpOperationAt,_tmpOperationDate,_tmpType,_tmpStatus,_tmpCreatedAt,_tmpUpdatedAt,_tmpTransferId,_tmpSplitId,_tmpRecurringRuleId,_tmpDeletedAt)</b>
 <b class="fc">&nbsp;          _result.add(_item)</b>
 &nbsp;        }
 <b class="fc">&nbsp;        _result</b>
@@ -1244,7 +1422,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;  }
 &nbsp;
 &nbsp;  public override suspend fun getBySplitId(splitId: String): List&lt;TransactionEntity&gt; {
-<b class="fc">&nbsp;    val _sql: String = &quot;SELECT * FROM transactions WHERE splitId = ? ORDER BY createdAt ASC&quot;</b>
+<b class="fc">&nbsp;    val _sql: String = &quot;SELECT * FROM transactions WHERE splitId = ? AND deletedAt IS NULL ORDER BY createdAt ASC&quot;</b>
 <b class="fc">&nbsp;    return performSuspending(__db, true, false) { _connection -&gt;</b>
 <b class="fc">&nbsp;      val _stmt: SQLiteStatement = _connection.prepare(_sql)</b>
 &nbsp;      try {
@@ -1268,6 +1446,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;        val _columnIndexOfTransferId: Int = getColumnIndexOrThrow(_stmt, &quot;transferId&quot;)</b>
 <b class="fc">&nbsp;        val _columnIndexOfSplitId: Int = getColumnIndexOrThrow(_stmt, &quot;splitId&quot;)</b>
 <b class="fc">&nbsp;        val _columnIndexOfRecurringRuleId: Int = getColumnIndexOrThrow(_stmt, &quot;recurringRuleId&quot;)</b>
+<b class="fc">&nbsp;        val _columnIndexOfDeletedAt: Int = getColumnIndexOrThrow(_stmt, &quot;deletedAt&quot;)</b>
 <b class="fc">&nbsp;        val _result: MutableList&lt;TransactionEntity&gt; = mutableListOf()</b>
 <b class="fc">&nbsp;        while (_stmt.step()) {</b>
 <b class="fc">&nbsp;          val _item: TransactionEntity</b>
@@ -1282,10 +1461,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;          val _tmpCurrencyCode: String</b>
 <b class="fc">&nbsp;          _tmpCurrencyCode = _stmt.getText(_columnIndexOfCurrencyCode)</b>
 <b class="fc">&nbsp;          val _tmpCategoryId: String?</b>
-<b class="pc">&nbsp;          if (_stmt.isNull(_columnIndexOfCategoryId)) {</b>
+<b class="fc">&nbsp;          if (_stmt.isNull(_columnIndexOfCategoryId)) {</b>
 <b class="fc">&nbsp;            _tmpCategoryId = null</b>
 &nbsp;          } else {
-<b class="nc">&nbsp;            _tmpCategoryId = _stmt.getText(_columnIndexOfCategoryId)</b>
+<b class="fc">&nbsp;            _tmpCategoryId = _stmt.getText(_columnIndexOfCategoryId)</b>
 &nbsp;          }
 <b class="fc">&nbsp;          val _tmpNote: String</b>
 <b class="fc">&nbsp;          _tmpNote = _stmt.getText(_columnIndexOfNote)</b>
@@ -1323,7 +1502,13 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;          } else {
 <b class="nc">&nbsp;            _tmpRecurringRuleId = _stmt.getText(_columnIndexOfRecurringRuleId)</b>
 &nbsp;          }
-<b class="fc">&nbsp;          _item = TransactionEntity(_tmpId,_tmpWorkspaceId,_tmpAccountId,_tmpAmount,_tmpCurrencyCode,_tmpCategoryId,_tmpNote,_tmpMerchant,_tmpTags,_tmpOperationAt,_tmpOperationDate,_tmpType,_tmpStatus,_tmpCreatedAt,_tmpUpdatedAt,_tmpTransferId,_tmpSplitId,_tmpRecurringRuleId)</b>
+<b class="fc">&nbsp;          val _tmpDeletedAt: Long?</b>
+<b class="pc">&nbsp;          if (_stmt.isNull(_columnIndexOfDeletedAt)) {</b>
+<b class="fc">&nbsp;            _tmpDeletedAt = null</b>
+&nbsp;          } else {
+<b class="nc">&nbsp;            _tmpDeletedAt = _stmt.getLong(_columnIndexOfDeletedAt)</b>
+&nbsp;          }
+<b class="fc">&nbsp;          _item = TransactionEntity(_tmpId,_tmpWorkspaceId,_tmpAccountId,_tmpAmount,_tmpCurrencyCode,_tmpCategoryId,_tmpNote,_tmpMerchant,_tmpTags,_tmpOperationAt,_tmpOperationDate,_tmpType,_tmpStatus,_tmpCreatedAt,_tmpUpdatedAt,_tmpTransferId,_tmpSplitId,_tmpRecurringRuleId,_tmpDeletedAt)</b>
 <b class="fc">&nbsp;          _result.add(_item)</b>
 &nbsp;        }
 <b class="fc">&nbsp;        _result</b>
@@ -1338,7 +1523,9 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;        |
 &nbsp;        |        SELECT transactions.* FROM transactions
 &nbsp;        |        JOIN transactions_fts ON transactions_fts.rowid = transactions.rowid
-&nbsp;        |        WHERE transactions.workspaceId = ? AND transactions_fts MATCH ?
+&nbsp;        |        WHERE transactions.workspaceId = ?
+&nbsp;        |          AND transactions.deletedAt IS NULL
+&nbsp;        |          AND transactions_fts MATCH ?
 &nbsp;        |        ORDER BY transactions.operationDate DESC, transactions.operationAt DESC, transactions.createdAt DESC
 &nbsp;        |        
 <b class="fc">&nbsp;        &quot;&quot;&quot;.trimMargin()</b>
@@ -1367,6 +1554,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;        val _columnIndexOfTransferId: Int = getColumnIndexOrThrow(_stmt, &quot;transferId&quot;)</b>
 <b class="fc">&nbsp;        val _columnIndexOfSplitId: Int = getColumnIndexOrThrow(_stmt, &quot;splitId&quot;)</b>
 <b class="fc">&nbsp;        val _columnIndexOfRecurringRuleId: Int = getColumnIndexOrThrow(_stmt, &quot;recurringRuleId&quot;)</b>
+<b class="fc">&nbsp;        val _columnIndexOfDeletedAt: Int = getColumnIndexOrThrow(_stmt, &quot;deletedAt&quot;)</b>
 <b class="fc">&nbsp;        val _result: MutableList&lt;TransactionEntity&gt; = mutableListOf()</b>
 <b class="fc">&nbsp;        while (_stmt.step()) {</b>
 <b class="fc">&nbsp;          val _item: TransactionEntity</b>
@@ -1381,10 +1569,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;          val _tmpCurrencyCode: String</b>
 <b class="fc">&nbsp;          _tmpCurrencyCode = _stmt.getText(_columnIndexOfCurrencyCode)</b>
 <b class="fc">&nbsp;          val _tmpCategoryId: String?</b>
-<b class="pc">&nbsp;          if (_stmt.isNull(_columnIndexOfCategoryId)) {</b>
+<b class="fc">&nbsp;          if (_stmt.isNull(_columnIndexOfCategoryId)) {</b>
 <b class="fc">&nbsp;            _tmpCategoryId = null</b>
 &nbsp;          } else {
-<b class="nc">&nbsp;            _tmpCategoryId = _stmt.getText(_columnIndexOfCategoryId)</b>
+<b class="fc">&nbsp;            _tmpCategoryId = _stmt.getText(_columnIndexOfCategoryId)</b>
 &nbsp;          }
 <b class="fc">&nbsp;          val _tmpNote: String</b>
 <b class="fc">&nbsp;          _tmpNote = _stmt.getText(_columnIndexOfNote)</b>
@@ -1422,7 +1610,13 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;          } else {
 <b class="nc">&nbsp;            _tmpRecurringRuleId = _stmt.getText(_columnIndexOfRecurringRuleId)</b>
 &nbsp;          }
-<b class="fc">&nbsp;          _item = TransactionEntity(_tmpId,_tmpWorkspaceId,_tmpAccountId,_tmpAmount,_tmpCurrencyCode,_tmpCategoryId,_tmpNote,_tmpMerchant,_tmpTags,_tmpOperationAt,_tmpOperationDate,_tmpType,_tmpStatus,_tmpCreatedAt,_tmpUpdatedAt,_tmpTransferId,_tmpSplitId,_tmpRecurringRuleId)</b>
+<b class="fc">&nbsp;          val _tmpDeletedAt: Long?</b>
+<b class="pc">&nbsp;          if (_stmt.isNull(_columnIndexOfDeletedAt)) {</b>
+<b class="fc">&nbsp;            _tmpDeletedAt = null</b>
+&nbsp;          } else {
+<b class="nc">&nbsp;            _tmpDeletedAt = _stmt.getLong(_columnIndexOfDeletedAt)</b>
+&nbsp;          }
+<b class="fc">&nbsp;          _item = TransactionEntity(_tmpId,_tmpWorkspaceId,_tmpAccountId,_tmpAmount,_tmpCurrencyCode,_tmpCategoryId,_tmpNote,_tmpMerchant,_tmpTags,_tmpOperationAt,_tmpOperationDate,_tmpType,_tmpStatus,_tmpCreatedAt,_tmpUpdatedAt,_tmpTransferId,_tmpSplitId,_tmpRecurringRuleId,_tmpDeletedAt)</b>
 <b class="fc">&nbsp;          _result.add(_item)</b>
 &nbsp;        }
 <b class="fc">&nbsp;        _result</b>
@@ -1512,6 +1706,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;    _stringBuilder.append(&quot;&quot;&quot;</b>
 &nbsp;        |
 <b class="fc">&nbsp;        |&quot;&quot;&quot;.trimMargin())</b>
+<b class="fc">&nbsp;    _stringBuilder.append(&quot;            AND transactions.deletedAt IS NULL&quot;)</b>
+<b class="fc">&nbsp;    _stringBuilder.append(&quot;&quot;&quot;</b>
+&nbsp;        |
+<b class="fc">&nbsp;        |&quot;&quot;&quot;.trimMargin())</b>
 <b class="fc">&nbsp;    _stringBuilder.append(&quot;        GROUP BY transactions.categoryId, month&quot;)</b>
 <b class="fc">&nbsp;    _stringBuilder.append(&quot;&quot;&quot;</b>
 &nbsp;        |
@@ -1586,6 +1784,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;        |            AND transactions.operationDate = date(transactions.operationDate)
 &nbsp;        |            AND (? IS NULL OR transactions.operationDate &gt;= ?)
 &nbsp;        |            AND (? IS NULL OR transactions.operationDate &lt; ?)
+&nbsp;        |            AND transactions.deletedAt IS NULL
 &nbsp;        |        GROUP BY transactions.categoryId
 &nbsp;        |        ORDER BY totalMinor DESC, transactions.categoryId ASC
 &nbsp;        |        
@@ -1668,6 +1867,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;        |            AND transactions.operationDate = date(transactions.operationDate)
 &nbsp;        |            AND (? IS NULL OR transactions.operationDate &gt;= ?)
 &nbsp;        |            AND (? IS NULL OR transactions.operationDate &lt; ?)
+&nbsp;        |            AND transactions.deletedAt IS NULL
 &nbsp;        |        GROUP BY month, transactions.type
 &nbsp;        |        ORDER BY month ASC
 &nbsp;        |        
@@ -1745,6 +1945,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;        |            AND transactions.operationDate = date(transactions.operationDate)
 &nbsp;        |            AND (? IS NULL OR transactions.operationDate &gt;= ?)
 &nbsp;        |            AND (? IS NULL OR transactions.operationDate &lt; ?)
+&nbsp;        |            AND transactions.deletedAt IS NULL
 &nbsp;        |        GROUP BY transactions.operationDate
 &nbsp;        |        ORDER BY transactions.operationDate ASC
 &nbsp;        |        
@@ -1822,6 +2023,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;        |            AND transactions.operationDate = date(transactions.operationDate)
 &nbsp;        |            AND (? IS NULL OR transactions.operationDate &gt;= ?)
 &nbsp;        |            AND (? IS NULL OR transactions.operationDate &lt; ?)
+&nbsp;        |            AND transactions.deletedAt IS NULL
 &nbsp;        |        GROUP BY transactions.merchant
 &nbsp;        |        ORDER BY totalMinor DESC, transactions.merchant ASC
 &nbsp;        |        LIMIT ?
@@ -1902,6 +2104,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;        |            AND transactions.operationDate = date(transactions.operationDate)
 &nbsp;        |            AND (? IS NULL OR transactions.operationDate &gt;= ?)
 &nbsp;        |            AND (? IS NULL OR transactions.operationDate &lt; ?)
+&nbsp;        |            AND transactions.deletedAt IS NULL
 &nbsp;        |        GROUP BY transactions.currencyCode
 &nbsp;        |        ORDER BY totalMinor DESC, transactions.currencyCode ASC
 &nbsp;        |        
@@ -1956,16 +2159,58 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    }
 &nbsp;  }
 &nbsp;
-&nbsp;  public override suspend fun delete(id: String) {
-<b class="fc">&nbsp;    val _sql: String = &quot;DELETE FROM transactions WHERE id = ?&quot;</b>
+&nbsp;  public override suspend fun softDelete(id: String, deletedAt: Long): Int {
+<b class="fc">&nbsp;    val _sql: String = &quot;&quot;&quot;</b>
+&nbsp;        |
+&nbsp;        |        UPDATE transactions SET deletedAt = ?, updatedAt = ?
+&nbsp;        |        WHERE id = ? AND deletedAt IS NULL
+&nbsp;        |        
+<b class="fc">&nbsp;        &quot;&quot;&quot;.trimMargin()</b>
 <b class="fc">&nbsp;    return performSuspending(__db, false, true) { _connection -&gt;</b>
 <b class="fc">&nbsp;      val _stmt: SQLiteStatement = _connection.prepare(_sql)</b>
 &nbsp;      try {
 <b class="fc">&nbsp;        var _argIndex: Int = 1</b>
+<b class="fc">&nbsp;        _stmt.bindLong(_argIndex, deletedAt)</b>
+<b class="fc">&nbsp;        _argIndex = 2</b>
+<b class="fc">&nbsp;        _stmt.bindLong(_argIndex, deletedAt)</b>
+<b class="fc">&nbsp;        _argIndex = 3</b>
 <b class="fc">&nbsp;        _stmt.bindText(_argIndex, id)</b>
 <b class="fc">&nbsp;        _stmt.step()</b>
+<b class="fc">&nbsp;        getTotalChangedRows(_connection)</b>
 &nbsp;      } finally {
-&nbsp;        _stmt.close()
+<b class="fc">&nbsp;        _stmt.close()</b>
+&nbsp;      }
+&nbsp;    }
+&nbsp;  }
+&nbsp;
+&nbsp;  public override suspend fun restore(id: String, updatedAt: Long): Int {
+<b class="fc">&nbsp;    val _sql: String = &quot;UPDATE transactions SET deletedAt = NULL, updatedAt = ? WHERE id = ? AND deletedAt IS NOT NULL&quot;</b>
+<b class="fc">&nbsp;    return performSuspending(__db, false, true) { _connection -&gt;</b>
+<b class="fc">&nbsp;      val _stmt: SQLiteStatement = _connection.prepare(_sql)</b>
+&nbsp;      try {
+<b class="fc">&nbsp;        var _argIndex: Int = 1</b>
+<b class="fc">&nbsp;        _stmt.bindLong(_argIndex, updatedAt)</b>
+<b class="fc">&nbsp;        _argIndex = 2</b>
+<b class="fc">&nbsp;        _stmt.bindText(_argIndex, id)</b>
+<b class="fc">&nbsp;        _stmt.step()</b>
+<b class="fc">&nbsp;        getTotalChangedRows(_connection)</b>
+&nbsp;      } finally {
+<b class="fc">&nbsp;        _stmt.close()</b>
+&nbsp;      }
+&nbsp;    }
+&nbsp;  }
+&nbsp;
+&nbsp;  public override suspend fun purgeDeletedBefore(threshold: Long): Int {
+<b class="fc">&nbsp;    val _sql: String = &quot;DELETE FROM transactions WHERE deletedAt IS NOT NULL AND deletedAt &lt; ?&quot;</b>
+<b class="fc">&nbsp;    return performSuspending(__db, false, true) { _connection -&gt;</b>
+<b class="fc">&nbsp;      val _stmt: SQLiteStatement = _connection.prepare(_sql)</b>
+&nbsp;      try {
+<b class="fc">&nbsp;        var _argIndex: Int = 1</b>
+<b class="fc">&nbsp;        _stmt.bindLong(_argIndex, threshold)</b>
+<b class="fc">&nbsp;        _stmt.step()</b>
+<b class="fc">&nbsp;        getTotalChangedRows(_connection)</b>
+&nbsp;      } finally {
+<b class="fc">&nbsp;        _stmt.close()</b>
 &nbsp;      }
 &nbsp;    }
 &nbsp;  }
@@ -2037,7 +2282,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 20:33</div>
+    <div style="float:right;">generated on 2026-07-28 21:18</div>
 </div>
 </body>
 </html>

@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > WorkspaceSyncer</title>
+  <title>MoneySurfer Coverage Report > TransactionRepository</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.repositories</a>
 </div>
 
-<h1>Coverage Summary for Class: WorkspaceSyncer (com.georgeci.moneysurfer.domain.repositories)</h1>
+<h1>Coverage Summary for Class: TransactionRepository (com.georgeci.moneysurfer.domain.repositories)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">WorkspaceSyncer</td>
+  <td class="name">TransactionRepository</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -46,38 +46,86 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.repositories
 &nbsp;
+&nbsp;import com.georgeci.moneysurfer.domain.model.CategorizedTransaction
+&nbsp;import com.georgeci.moneysurfer.domain.model.Transaction
+&nbsp;import com.georgeci.moneysurfer.domain.model.TransactionTotal
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.AccountId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.SplitId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransferId
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
+&nbsp;import com.georgeci.moneysurfer.domain.util.TransactionPeriodWindow
+&nbsp;import kotlinx.coroutines.flow.Flow
 &nbsp;
-&nbsp;/**
-&nbsp; * Triggers sync operations without exposing the sync infrastructure to domain use cases.
-&nbsp; *
-&nbsp; * [pushAll] drains the outbox (push-only, no remote discovery).
-&nbsp; * [syncAll] fetches the authoritative workspace list from the remote user doc and
-&nbsp; * runs a full cursor-based pull for every workspace — including ones not yet local.
-&nbsp; * [syncWorkspace] pulls a single specific workspace; used after accepting an invite so
-&nbsp; * only the newly joined workspace is hydrated without re-syncing everything.
-&nbsp; */
-&nbsp;interface WorkspaceSyncer {
+&nbsp;// Transactions are the app&#39;s central entity and every screen queries them along a different axis
+&nbsp;// (account, workspace, window, transfer pair). Splitting the interface to satisfy the threshold
+&nbsp;// would scatter one storage contract across several types without removing a single query.
+&nbsp;@Suppress(&quot;TooManyFunctions&quot;)
+&nbsp;interface TransactionRepository {
+&nbsp;    fun getAll(): Flow&lt;List&lt;Transaction&gt;&gt;
+&nbsp;    fun getByAccountId(accountId: AccountId): Flow&lt;List&lt;Transaction&gt;&gt;
+&nbsp;
 &nbsp;    /**
-&nbsp;     * Push all pending outbox mutations. Throws on error.
+&nbsp;     * Newest-first page of categorized transactions inside [window], for one account or — when
+&nbsp;     * [accountId] is `null` — every account.
 &nbsp;     *
-&nbsp;     * Returns `false` when sync is switched off and nothing was pushed, so a caller cannot mistake
-&nbsp;     * &quot;disabled&quot; for &quot;landed&quot; — the asymmetry that filled `users/{uid}.workspaceIds` with refs to
-&nbsp;     * documents that were never created (issue #342). Callers that write remote state on the
-&nbsp;     * strength of a successful push must branch on this instead of re-reading the setting
-&nbsp;     * themselves: two reads of a live setting can disagree.
+&nbsp;     * At most [limit] rows are returned: the caller grows the limit to page further rather than
+&nbsp;     * offsetting, so a row inserted while the user scrolls cannot shift the already-visible
+&nbsp;     * prefix. An unbounded [window] is still bounded by [limit].
 &nbsp;     */
-&nbsp;    suspend fun pushAll(): Boolean
-&nbsp;
-&nbsp;    /** Push outbox + pull all user workspaces (including undiscovered ones). Throws on error. */
-&nbsp;    suspend fun syncAll()
+&nbsp;    fun getCategorizedWindow(
+&nbsp;        accountId: AccountId?,
+&nbsp;        window: TransactionPeriodWindow,
+&nbsp;        limit: Int,
+&nbsp;    ): Flow&lt;List&lt;CategorizedTransaction&gt;&gt;
 &nbsp;
 &nbsp;    /**
-&nbsp;     * Push outbox + pull a single workspace by [workspaceId].
-&nbsp;     * Sets the active workspace to [workspaceId] for the duration of the sync so
-&nbsp;     * [SyncScope.ActiveWorkspace] targets the correct workspace.
+&nbsp;     * Per-type, per-currency sums over the *whole* [window] — unaffected by the paging applied to
+&nbsp;     * [getCategorizedWindow], so a summary built from these stays correct as pages load.
 &nbsp;     */
-&nbsp;    suspend fun syncWorkspace(workspaceId: WorkspaceId)
+&nbsp;    fun getTotals(
+&nbsp;        accountId: AccountId?,
+&nbsp;        window: TransactionPeriodWindow,
+&nbsp;    ): Flow&lt;List&lt;TransactionTotal&gt;&gt;
+&nbsp;    fun getByWorkspaceId(workspaceId: WorkspaceId): Flow&lt;List&lt;Transaction&gt;&gt;
+&nbsp;
+&nbsp;    /** The live transaction behind [id], or `null` when it does not exist or has been deleted. */
+&nbsp;    suspend fun getById(id: TransactionId): Transaction?
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Every leg sharing [transferId] — two for a healthy transfer, one for a leg whose pair was
+&nbsp;     * deleted or never imported. Callers must not assume a pair exists.
+&nbsp;     */
+&nbsp;    suspend fun getByTransferId(transferId: TransferId): List&lt;Transaction&gt;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Every leg sharing [splitId], oldest first — the receipt the row belongs to.
+&nbsp;     *
+&nbsp;     * A one-element result is a legitimate state, not a broken group: a leg can arrive from sync or
+&nbsp;     * a CSV import before (or without) its siblings, and it is a complete transaction on its own.
+&nbsp;     */
+&nbsp;    suspend fun getBySplitId(splitId: SplitId): List&lt;Transaction&gt;
+&nbsp;    suspend fun insert(transaction: Transaction)
+&nbsp;    suspend fun update(transaction: Transaction)
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Marks [id] deleted. The row survives as a tombstone — invisible to every query on this
+&nbsp;     * interface, but still there for [restore] to bring back (issue #346).
+&nbsp;     */
+&nbsp;    suspend fun delete(id: TransactionId)
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Lifts the tombstone from [id] and returns the transaction as it now stands, or `null` when
+&nbsp;     * there was nothing deleted to bring back.
+&nbsp;     *
+&nbsp;     * The Undo half of [delete], and deliberately keyed on the id alone: the row was never
+&nbsp;     * removed, so restoring it needs no copy of its fields to have survived alongside the
+&nbsp;     * request — which is what makes an Undo outlive the Snackbar that offered it.
+&nbsp;     *
+&nbsp;     * Returning `null` for an id that is missing or already live is what keeps a repeated Undo
+&nbsp;     * from refunding the same balance twice.
+&nbsp;     */
+&nbsp;    suspend fun restore(id: TransactionId): Transaction?
 &nbsp;}
 </code>
 </pre>
@@ -102,7 +150,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 20:33</div>
+    <div style="float:right;">generated on 2026-07-28 21:18</div>
 </div>
 </body>
 </html>

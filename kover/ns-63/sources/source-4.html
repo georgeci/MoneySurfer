@@ -185,6 +185,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.UserId
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 &nbsp;import com.georgeci.moneysurfer.domain.usecase.GetAccountsUseCase
+&nbsp;import com.georgeci.moneysurfer.domain.usecase.PurgeDeletedTransactionsUseCase
 &nbsp;import com.georgeci.moneysurfer.sync.api.SyncReason
 &nbsp;import com.georgeci.moneysurfer.sync.coordinator.SyncCoordinator
 &nbsp;import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -230,6 +231,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    private val getAccounts: GetAccountsUseCase,
 &nbsp;    private val configHydration: ConfigHydration,
 &nbsp;    private val remoteConfigRefresh: RemoteConfigRefresh,
+&nbsp;    private val purgeDeletedTransactions: PurgeDeletedTransactionsUseCase,
 &nbsp;) : ViewModel() {
 &nbsp;
 &nbsp;    private val log = Logger.withTag(TAG)
@@ -279,6 +281,24 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;        }
 &nbsp;
 &nbsp;        startPeriodicSyncTicker()
+&nbsp;        purgeExpiredTombstones()
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Drops transaction tombstones past their retention window (issue #346) — the &quot;who runs it&quot;
+&nbsp;     * half of the policy documented on [PurgeDeletedTransactionsUseCase].
+&nbsp;     *
+&nbsp;     * Its own coroutine, not a step in the startup chain above: nothing on the first screen reads
+&nbsp;     * the rows it removes, so making the splash wait on a DELETE would buy the user nothing.
+&nbsp;     * Failures are logged and swallowed for the same reason startup swallows a failed seed — a
+&nbsp;     * housekeeping hiccup must not be what keeps the app off its first screen.
+&nbsp;     */
+&nbsp;    private fun purgeExpiredTombstones() {
+&nbsp;        viewModelScope.launch {
+&nbsp;            runCatching { purgeDeletedTransactions() }
+&nbsp;                .onSuccess { purged -&gt; if (purged &gt; 0) log.i { &quot;[retention] purged $purged deleted transaction(s)&quot; } }
+&nbsp;                .onFailure { log.w(it) { &quot;[retention] tombstone purge failed — retrying next launch&quot; } }
+&nbsp;        }
 &nbsp;    }
 &nbsp;
 &nbsp;    /**
@@ -394,7 +414,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 20:33</div>
+    <div style="float:right;">generated on 2026-07-28 21:18</div>
 </div>
 </body>
 </html>

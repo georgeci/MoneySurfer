@@ -72,7 +72,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (20/20)
+    (21/21)
   </span>
 </td>
 <td class="coverageStat">
@@ -80,7 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (110/110)
+    (117/117)
   </span>
 </td>
 </tr>
@@ -172,6 +172,18 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    // row outright. An index would also be dead weight, since the &quot;Recurring only&quot; filter runs
 &nbsp;    // inside a workspace scan already served by the composite indices above.
 <b class="fc">&nbsp;    @ColumnInfo(name = &quot;recurringRuleId&quot;) val recurringRuleId: String? = null,</b>
+&nbsp;    // Tombstone: non-null means the user deleted this row (issue #346). Every read query in
+&nbsp;    // TransactionDao adds `deletedAt IS NULL`; the row itself survives so Undo is a single
+&nbsp;    // UPDATE rather than a re-insert, and survives process death rather than living in a
+&nbsp;    // Snackbar lambda. Mirrors `TransactionDoc.deletedAt` on the wire, so a pulled tombstone
+&nbsp;    // and a local delete are the same state. Purged after a retention window — see
+&nbsp;    // PurgeDeletedTransactionsUseCase.
+&nbsp;    //
+&nbsp;    // Deliberately unindexed. It is a low-cardinality column (almost every row is NULL) that
+&nbsp;    // never appears alone in a WHERE clause — it always rides along with a workspace or
+&nbsp;    // account filter already served by the composite indices above, so SQLite would ignore a
+&nbsp;    // separate index on it while every insert paid to maintain it.
+<b class="fc">&nbsp;    @ColumnInfo(name = &quot;deletedAt&quot;) val deletedAt: Long? = null,</b>
 &nbsp;)
 </code>
 </pre>
@@ -196,7 +208,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 20:33</div>
+    <div style="float:right;">generated on 2026-07-28 21:18</div>
 </div>
 </body>
 </html>

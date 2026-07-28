@@ -49,34 +49,34 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   <td class="name">TransactionRepositoryImpl</td>
 <td class="coverageStat">
   <span class="percent">
-    94.1%
+    100%
   </span>
   <span class="absValue">
-    (16/17)
+    (18/18)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    80.6%
+    88.1%
   </span>
   <span class="absValue">
-    (29/36)
+    (37/42)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    94.3%
+    100%
   </span>
   <span class="absValue">
-    (99/105)
+    (111/111)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    84.2%
+    98.9%
   </span>
   <span class="absValue">
-    (583/692)
+    (775/784)
   </span>
 </td>
 </tr>
@@ -261,6 +261,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <td class="coverageStat"/>
   </tr>
   <tr>
+    <td class="name">TransactionRepositoryImpl$restore$1</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
     <td class="name">TransactionRepositoryImpl$update$1</td>
     <td class="coverageStat"/>
   </tr>
@@ -268,34 +272,34 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
-    50%
+    54.5%
   </span>
   <span class="absValue">
-    (16/32)
+    (18/33)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    80.6%
+    88.1%
   </span>
   <span class="absValue">
-    (29/36)
+    (37/42)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    94.3%
+    100%
   </span>
   <span class="absValue">
-    (99/105)
+    (111/111)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    84.2%
+    98.9%
   </span>
   <span class="absValue">
-    (583/692)
+    (775/784)
   </span>
 </td>
 </tr>
@@ -394,26 +398,58 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;        enqueueUpsert(entity, MutationOperation.INSERT)</b>
 &nbsp;    }
 &nbsp;
+&nbsp;    /**
+&nbsp;     * `@Update` rewrites the whole row, so every column the domain model does not carry has to be
+&nbsp;     * read back from storage first or it is silently reset. `createdAt` is one; `deletedAt` is the
+&nbsp;     * other, and it is read through [TransactionDao.getByIdIncludingDeleted] precisely because a
+&nbsp;     * tombstoned row is invisible to the ordinary lookup — writing `Transaction`&#39;s implicit &quot;live&quot;
+&nbsp;     * over it would undelete the row as a side effect of an unrelated edit. Lifting a tombstone is
+&nbsp;     * [restore]&#39;s job and nothing else&#39;s.
+&nbsp;     */
 &nbsp;    override suspend fun update(transaction: Transaction) {
-<b class="nc">&nbsp;        val existingCreatedAt = dao.getById(transaction.id.value)?.createdAt</b>
-<b class="nc">&nbsp;        val entity = transaction.toEntity().copy(</b>
-<b class="nc">&nbsp;            createdAt = existingCreatedAt ?: transaction.toEntity().createdAt,</b>
-<b class="nc">&nbsp;            updatedAt = clock.now().toEpochMilliseconds(),</b>
+<b class="fc">&nbsp;        val stored = dao.getByIdIncludingDeleted(transaction.id.value)</b>
+<b class="fc">&nbsp;        val entity = transaction.toEntity()</b>
+<b class="fc">&nbsp;        val updated = entity.copy(</b>
+<b class="pc">&nbsp;            createdAt = stored?.createdAt ?: entity.createdAt,</b>
+<b class="fc">&nbsp;            updatedAt = clock.now().toEpochMilliseconds(),</b>
+<b class="pc">&nbsp;            deletedAt = stored?.deletedAt,</b>
 &nbsp;        )
-<b class="nc">&nbsp;        dao.update(entity)</b>
-<b class="nc">&nbsp;        enqueueUpsert(entity, MutationOperation.UPDATE)</b>
+<b class="fc">&nbsp;        dao.update(updated)</b>
+<b class="fc">&nbsp;        enqueueUpsert(updated, MutationOperation.UPDATE)</b>
 &nbsp;    }
 &nbsp;
+&nbsp;    /**
+&nbsp;     * Writes a tombstone instead of dropping the row, then enqueues the same DELETE mutation the
+&nbsp;     * hard delete used to (issue #346) — the wire contract is unchanged, because Firestore has
+&nbsp;     * always taken deletes as a `deletedAt` patch rather than a document removal.
+&nbsp;     *
+&nbsp;     * The outbox entry is skipped when nothing was tombstoned. A second delete of the same id
+&nbsp;     * would otherwise push a second tombstone whose `deletedAt` is a later instant than the one
+&nbsp;     * peers already agreed on.
+&nbsp;     */
 &nbsp;    override suspend fun delete(id: TransactionId) {
-<b class="fc">&nbsp;        val existing = dao.getById(id.value)</b>
-<b class="fc">&nbsp;        dao.delete(id.value)</b>
-<b class="pc">&nbsp;        if (existing != null) {</b>
+<b class="fc">&nbsp;        val existing = dao.getById(id.value) ?: return</b>
+<b class="fc">&nbsp;        val marked = dao.softDelete(id.value, clock.now().toEpochMilliseconds())</b>
+<b class="pc">&nbsp;        if (marked &gt; 0) {</b>
 <b class="fc">&nbsp;            outboxEnqueuer.enqueueDelete(</b>
 <b class="fc">&nbsp;                entityType = SyncEntityTypes.TRANSACTION,</b>
 <b class="fc">&nbsp;                entityId = existing.id,</b>
 <b class="fc">&nbsp;                scopeKey = existing.workspaceId,</b>
 &nbsp;            )
 &nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Clears the tombstone in place — one UPDATE, no re-insert — and pushes the result as an
+&nbsp;     * ordinary upsert. That upsert is what lifts the tombstone remotely too: the doc is written
+&nbsp;     * whole, with `deletedAt` back to null, so peers see a restored row rather than a new one
+&nbsp;     * appearing beside the delete they already applied.
+&nbsp;     */
+&nbsp;    override suspend fun restore(id: TransactionId): Transaction? {
+<b class="fc">&nbsp;        if (dao.restore(id.value, clock.now().toEpochMilliseconds()) == 0) return null</b>
+<b class="pc">&nbsp;        val restored = dao.getById(id.value) ?: return null</b>
+<b class="fc">&nbsp;        enqueueUpsert(restored, MutationOperation.UPDATE)</b>
+<b class="fc">&nbsp;        return restored.toDomain()</b>
 &nbsp;    }
 &nbsp;
 &nbsp;    private suspend fun enqueueUpsert(entity: TransactionEntity, operation: MutationOperation) {
@@ -495,7 +531,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;        createdAt = timeFormatter.formatInstant(createdAt),</b>
 <b class="fc">&nbsp;        updatedAt = timeFormatter.formatInstant(updatedAt),</b>
 <b class="fc">&nbsp;        transferId = transferId?.value,</b>
-<b class="pc">&nbsp;        splitId = splitId?.value,</b>
+<b class="fc">&nbsp;        splitId = splitId?.value,</b>
 <b class="fc">&nbsp;        recurringRuleId = recurringRuleId?.value,</b>
 &nbsp;    )
 &nbsp;}
@@ -560,7 +596,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 20:33</div>
+    <div style="float:right;">generated on 2026-07-28 21:18</div>
 </div>
 </body>
 </html>
