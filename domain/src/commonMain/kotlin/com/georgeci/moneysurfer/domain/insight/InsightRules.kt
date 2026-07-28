@@ -25,6 +25,11 @@ import kotlin.math.roundToLong
 data class InsightInput(
     /** Names the period the ids belong to, e.g. `2026-07`. See [Insight.id]. */
     val periodKey: String,
+    /**
+     * How many days [currentSpend] covers — and, by construction, how many [previousSpend] covers
+     * too. Below [MIN_COMPARISON_DAYS] the comparison rules stand down; see [generateInsights].
+     */
+    val elapsedDays: Int,
     val currency: CurrencyCode,
     val currentSpend: List<CategorySpendSlice>,
     val previousSpend: List<CategorySpendSlice>,
@@ -44,16 +49,26 @@ data class InsightInput(
  * Each rule returns at most one insight — the point of the widget is two or three sentences worth
  * reading, not a log. Warn comes before Good and Good before Neutral so the compact card, which
  * shows exactly one, shows the actionable one.
+ *
+ * The comparison rules wait for [MIN_COMPARISON_DAYS]; the subscription count does not, because it
+ * reads the schedules rather than the window and is just as true on the 1st as on the 30th.
  */
 fun generateInsights(input: InsightInput): List<Insight> {
+    val comparisons =
+        if (input.elapsedDays >= MIN_COMPARISON_DAYS) periodComparisons(input) else emptyList()
+    return (comparisons + listOfNotNull(activeSubscriptions(input)))
+        .sortedBy { TONE_PRIORITY.indexOf(it.tone) }
+}
+
+/** The rules that need a baseline: the two category movers, and the period total. */
+private fun periodComparisons(input: InsightInput): List<Insight> {
     val previousTotal = input.previousSpend.total()
     val changes = categoryChanges(input, floor = previousTotal.share(MIN_DELTA_SHARE))
     return listOfNotNull(
         changes.firstOrNull { it.isIncrease },
         changes.firstOrNull { !it.isIncrease },
         periodSpend(input, current = input.currentSpend.total(), previous = previousTotal),
-        activeSubscriptions(input),
-    ).sortedBy { TONE_PRIORITY.indexOf(it.tone) }
+    )
 }
 
 /** Every category that moved enough to be worth a sentence, biggest move in money first. */
@@ -168,6 +183,18 @@ private fun Double.toWholePercent(): Int = (abs(this) * PERCENT_SCALE).roundToIn
 
 /** Warn first: the compact card shows one insight, and it should be the one worth acting on. */
 private val TONE_PRIORITY = listOf(InsightTone.Warn, InsightTone.Good, InsightTone.Neutral)
+
+/**
+ * Days of the period that must have passed before the comparison rules say anything.
+ *
+ * A month-to-date window against the same stretch of last month is symmetric by construction, but
+ * on the 1st that stretch is a *single day*, and one bill landing a day either side of the
+ * boundary swings the answer by 100%. A user who pays rent on the 1st and has not been billed yet
+ * would be congratulated with "Rent is down 100%" every month. The relative floor cannot filter
+ * that — the floor is a share of the very same one-day baseline. A week is the shortest span over
+ * which a single charge's timing stops dominating the comparison.
+ */
+private const val MIN_COMPARISON_DAYS = 7
 
 /** A single category has to move by a fifth before the move is worth a sentence. */
 private const val CATEGORY_CHANGE_RATIO = 0.20

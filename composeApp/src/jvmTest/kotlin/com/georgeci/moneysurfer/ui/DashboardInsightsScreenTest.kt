@@ -41,7 +41,7 @@ class DashboardInsightsScreenTest : StringSpec({
         }
     }
 
-    "a compact card keeps only the first insight; an expanded one keeps three" {
+    "a compact card keeps only the first insight" {
         runComposeUiTest {
             setContent {
                 DashboardContent(
@@ -52,6 +52,17 @@ class DashboardInsightsScreenTest : StringSpec({
 
             onNodeWithText("Dining is up 28%").assertIsDisplayed()
             onNodeWithText("Spending is down 12%").assertDoesNotExist()
+        }
+    }
+
+    "an expanded card drops none of what the engine produced" {
+        runComposeUiTest {
+            setContent { DashboardContent(state = contentWith(SAMPLES), onEvent = {}) }
+
+            // The engine emits at most four and sorts the neutral ones last, so a three-row cap
+            // hid the subscription count in the default card style whenever the rest fired.
+            onNodeWithText("4 active subscriptions").assertIsDisplayed()
+            onNodeWithText("About €62.00 a month.").assertIsDisplayed()
         }
     }
 

@@ -137,9 +137,9 @@ private fun InsightList(
 /**
  * One card per page plus a dot row.
  *
- * Every page pins its body to [CAROUSEL_BODY_LINES] lines so the pager keeps one height across the
- * whole set: a lazy row of pages is measured from what is composed, so pages of different heights
- * make the card grow and shrink under the reader's thumb mid-swipe.
+ * Every page pins its title and body to a fixed number of lines so the pager keeps one height
+ * across the whole set: a lazy row of pages is measured from what is composed, so pages of
+ * different heights make the card grow and shrink under the reader's thumb mid-swipe.
  */
 @Composable
 private fun InsightCarousel(
@@ -156,7 +156,7 @@ private fun InsightCarousel(
         InsightCard(
             item = item,
             onClick = onItemClick?.let { handler -> { handler(item) } },
-            bodyLines = CAROUSEL_BODY_LINES,
+            pinHeight = true,
         )
     }
     if (items.size > 1) {
@@ -194,7 +194,12 @@ private fun PageDots(count: Int, selected: Int) {
 private fun InsightCard(
     item: SurferInsightItem,
     onClick: (() -> Unit)?,
-    bodyLines: Int? = null,
+    /**
+     * Pins the card to one height: a single title line and exactly [CAROUSEL_BODY_LINES] body
+     * lines. Both halves have to be pinned — capping only the body still lets a long category name
+     * wrap the title onto a second line, which is the resize this exists to prevent.
+     */
+    pinHeight: Boolean = false,
 ) {
     val (bg, fg) = when (item.tone) {
         SurferInsightTone.Good ->
@@ -239,14 +244,16 @@ private fun InsightCard(
                 text = item.title,
                 style = AppTheme.typography.titleSmall,
                 color = fg,
+                maxLines = if (pinHeight) 1 else Int.MAX_VALUE,
+                overflow = TextOverflow.Ellipsis,
             )
             Spacer(Modifier.height(2.dp))
             Text(
                 text = item.body,
                 style = AppTheme.typography.bodySmall,
                 color = fg.copy(alpha = 0.85f),
-                minLines = bodyLines ?: 1,
-                maxLines = bodyLines ?: Int.MAX_VALUE,
+                minLines = if (pinHeight) CAROUSEL_BODY_LINES else 1,
+                maxLines = if (pinHeight) CAROUSEL_BODY_LINES else Int.MAX_VALUE,
                 overflow = TextOverflow.Ellipsis,
             )
         }
@@ -256,7 +263,13 @@ private fun InsightCard(
 /** Side inset of the cards inside the widget — a touch tighter than the header's 16dp. */
 private val CARD_INSET = 14.dp
 
-private const val EXPANDED_ROWS = 3
+/**
+ * Four, not three: the dashboard's engine emits at most four insights and sorts the neutral ones
+ * last, so a three-row cap silently dropped the subscription count whenever the two category rules
+ * and the period rule all fired — which is most months. A cap that hides a whole rule in the
+ * default card style is worse than one more row on the hero card.
+ */
+private const val EXPANDED_ROWS = 4
 private const val COMPACT_ROWS = 1
 
 /** Two lines fit the generated copy; see [InsightCarousel] for why it is pinned rather than capped. */

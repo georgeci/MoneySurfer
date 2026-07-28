@@ -273,6 +273,17 @@ be persisted later. Rules are table-driven kotest specs in `domain`.
   same number of days, and the previous one is clamped to its own month's last day so a 31st
   compares against a whole 28-day February. `periodWindow(Month, ...)` is deliberately *not* used
   — it always spans a whole calendar month, and the point here is a matched pair of part-months.
+- **The comparison rules wait a week.** Matched windows remove the length bias but not
+  small-sample volatility: on the 1st the baseline is a *single day*, and one bill landing a day
+  either side of the boundary swings it 100% — a user who pays rent on the 1st and has not been
+  billed yet would be told "Rent is down 100%" every month. The relative floor cannot filter that,
+  because the floor is a share of the same one-day baseline. Below seven elapsed days the category
+  and period rules stand down; the subscription count still fires, since it reads the schedules
+  rather than the window.
+- **The date is a flow, not a value.** `clock.now()` read once would freeze both windows for the
+  life of the subscription — the workspace pointer does not re-emit at midnight, so a desktop app
+  left open would still be calling July "this month" on 2 August, with that day's transactions
+  outside every window. The use case sleeps to the next local midnight and re-derives.
 - **The floor is relative, not absolute.** A fixed "€20" means something different in every
   currency the app supports; the floor is 5% of the *previous period's total spend*, which reads
   the same everywhere and does the job the plan wanted it for (2 → 5 is filtered, 300 → 380 is

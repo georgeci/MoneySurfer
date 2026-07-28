@@ -12,8 +12,12 @@ import com.georgeci.moneysurfer.domain.primitives.Money
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldContainExactly
+import io.kotest.matchers.collections.shouldNotBeEmpty
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
+
+/** Far enough into the month that the comparison rules are allowed to speak. */
+private const val SETTLED_PERIOD_DAYS = 15
 
 private val DINING = categoryId("cat-dining")
 private val LEISURE = categoryId("cat-leisure")
@@ -194,6 +198,44 @@ class InsightRulesTest : StringSpec({
         generateInsights(input(schedules = emptyList())).subscriptions() shouldBe null
     }
 
+    "the first days of a month are too small a sample to compare" {
+        // A user who pays rent on the 1st and has not been billed yet must not be told they
+        // saved 100% — on day 1 the baseline is a single day of last month.
+        val insights = generateInsights(
+            input(
+                current = emptyList(),
+                previous = listOf(slice(DINING, 1_200.dollars)),
+                elapsedDays = 1,
+            ),
+        )
+
+        insights.shouldBeEmpty()
+    }
+
+    "the subscription count does not wait for the sample — it reads the schedules, not the window" {
+        val insights = generateInsights(
+            input(
+                previous = listOf(slice(DINING, 1_200.dollars)),
+                schedules = listOf(aRecurringRule()),
+                elapsedDays = 1,
+            ),
+        )
+
+        insights.map { it.id } shouldContainExactly listOf("active-subscriptions:$PERIOD")
+    }
+
+    "a week in, the comparison rules speak again" {
+        val insights = generateInsights(
+            input(
+                current = listOf(slice(DINING, 400.dollars)),
+                previous = listOf(slice(DINING, 300.dollars)),
+                elapsedDays = 7,
+            ),
+        )
+
+        insights.categoryChanges().shouldNotBeEmpty()
+    }
+
     "warnings come before wins, and both before the neutral facts" {
         val insights = generateInsights(
             input(
@@ -230,8 +272,10 @@ private fun input(
     current: List<CategorySpendSlice> = emptyList(),
     previous: List<CategorySpendSlice> = emptyList(),
     schedules: List<RecurringRule> = emptyList(),
+    elapsedDays: Int = SETTLED_PERIOD_DAYS,
 ) = InsightInput(
     periodKey = PERIOD,
+    elapsedDays = elapsedDays,
     currency = EUR,
     currentSpend = current,
     previousSpend = previous,

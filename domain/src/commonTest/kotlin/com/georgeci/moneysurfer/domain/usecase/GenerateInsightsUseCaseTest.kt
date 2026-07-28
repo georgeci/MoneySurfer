@@ -7,6 +7,7 @@ import com.georgeci.moneysurfer.domain.fixtures.FakeGoalWorkspaceRepository
 import com.georgeci.moneysurfer.domain.fixtures.FakeRecurringRuleRepository
 import com.georgeci.moneysurfer.domain.fixtures.FakeSpendAnalyticsRepository
 import com.georgeci.moneysurfer.domain.fixtures.FixedClock
+import com.georgeci.moneysurfer.domain.fixtures.MutableClock
 import com.georgeci.moneysurfer.domain.fixtures.aCategory
 import com.georgeci.moneysurfer.domain.fixtures.aRecurringRule
 import com.georgeci.moneysurfer.domain.fixtures.aWorkspace
@@ -23,10 +24,16 @@ import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.runCurrent
+import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
+import kotlin.time.Duration.Companion.days
 
 private val WS = workspaceId("ws-1")
 private val DINING = categoryId("cat-dining")
@@ -99,6 +106,33 @@ class GenerateInsightsUseCaseTest : StringSpec({
         change.id shouldBe "category-change:${DINING.value}:2026-07"
     }
 
+    "the windows follow the calendar instead of freezing at subscription time" {
+        runTest {
+            val clock = MutableClock(LocalDate(2026, 7, 31).atStartOfDayIn(TimeZone.UTC))
+            val analytics = FakeSpendAnalyticsRepository()
+            val useCase = newUseCase(
+                today = LocalDate(2026, 7, 31),
+                analytics = analytics,
+                clock = ClockUseCase(clock),
+            )
+
+            val collecting = launch { useCase(TimeZone.UTC).collect() }
+            runCurrent()
+            // Midnight arrives; a dashboard left open must not keep calling July "this month".
+            clock.instant = LocalDate(2026, 8, 1).atStartOfDayIn(TimeZone.UTC)
+            advanceTimeBy(1.days)
+            runCurrent()
+            collecting.cancel()
+
+            analytics.byCategoryScopes.map { it.window } shouldContainExactly listOf(
+                TransactionPeriodWindow(LocalDate(2026, 7, 1), LocalDate(2026, 7, 31)),
+                TransactionPeriodWindow(LocalDate(2026, 6, 1), LocalDate(2026, 6, 30)),
+                TransactionPeriodWindow(LocalDate(2026, 8, 1), LocalDate(2026, 8, 1)),
+                TransactionPeriodWindow(LocalDate(2026, 7, 1), LocalDate(2026, 7, 1)),
+            )
+        }
+    }
+
     "a salary paid in every month is a schedule, not a subscription" {
         val useCase = newUseCase(
             today = LocalDate(2026, 7, 10),
@@ -125,6 +159,7 @@ private fun newUseCase(
     currentWorkspaceId: WorkspaceId? = workspace,
     analytics: FakeSpendAnalyticsRepository = FakeSpendAnalyticsRepository(),
     rules: FakeRecurringRuleRepository = FakeRecurringRuleRepository(),
+    clock: ClockUseCase = ClockUseCase(FixedClock(today.atStartOfDayIn(TimeZone.UTC))),
 ) = GenerateInsightsUseCase(
     spendAnalytics = analytics,
     categoryRepository = FakeCategoryRepository(
@@ -138,5 +173,5 @@ private fun newUseCase(
         listOfNotNull(workspace?.let { aWorkspace(id = it, baseCurrency = EUR) }),
     ),
     session = InMemorySessionPointers(currentWorkspaceId = currentWorkspaceId),
-    clock = ClockUseCase(FixedClock(today.atStartOfDayIn(TimeZone.UTC))),
+    clock = clock,
 )
