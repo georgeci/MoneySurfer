@@ -212,13 +212,19 @@ class DebugConfigScreenStateTest : StringSpec({
     "an overridden row clears its override when tapped" {
         runComposeUiTest {
             val events = mutableListOf<DebugConfigEvent>()
-            setContent { Panel(PALETTE_ROW, onEvent = { events += it }) }
+            // A `Bool` row on purpose. `performClick` taps the centre of the node rather than
+            // invoking its click action, and a boolean row's only inner control is the switch at
+            // the far right — on a `Choice` row a long enough chip list reaches the centre and the
+            // tap would land on a chip instead.
+            setContent { Panel(OVERRIDDEN_FLAG_ROW, onEvent = { events += it }) }
 
-            onNodeWithTag(DebugConfigTestTags.row(PALETTE_ROW.name)).assertHasClickAction()
-            onNodeWithTag(DebugConfigTestTags.row(PALETTE_ROW.name)).performClick()
+            onNodeWithTag(DebugConfigTestTags.row(OVERRIDDEN_FLAG_ROW.name)).assertHasClickAction()
+            onNodeWithTag(DebugConfigTestTags.row(OVERRIDDEN_FLAG_ROW.name)).performClick()
             waitForIdle()
 
-            events shouldContainExactly listOf(DebugConfigEvent.OnClearOverride(PALETTE_ROW.name))
+            events shouldContainExactly listOf(
+                DebugConfigEvent.OnClearOverride(OVERRIDDEN_FLAG_ROW.name),
+            )
         }
     }
 
@@ -263,7 +269,18 @@ private val FLAG_ROW = ConfigDebugRow(
     layers = listOf(ConfigDebugLayerCell(layer = "Build", value = "true", undecodable = false)),
 )
 
-/** A closed set the tester picked from, so this row can also stand in for the clearable case. */
+/** [FLAG_ROW] after a tester flipped it: the Debug layer now holds the key and wins. */
+private val OVERRIDDEN_FLAG_ROW = FLAG_ROW.copy(
+    effectiveValue = "false",
+    winner = "Debug",
+    overridden = true,
+    layers = listOf(
+        ConfigDebugLayerCell(layer = "Debug", value = "false", undecodable = false),
+        ConfigDebugLayerCell(layer = "Build", value = "true", undecodable = false),
+    ),
+)
+
+/** A closed set the tester picked from. Overridden, so its chips also cover the clickable-row case. */
 private val PALETTE_ROW = ConfigDebugRow(
     name = "ui.palette",
     effectiveValue = PLUM,
