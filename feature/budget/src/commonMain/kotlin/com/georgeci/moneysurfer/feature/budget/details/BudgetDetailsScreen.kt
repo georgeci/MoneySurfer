@@ -92,8 +92,12 @@ fun BudgetDetailsScreen(
     BudgetDetailsContent(state = state, onEvent = viewModel::onEvent)
 }
 
+/**
+ * Stateless half of the screen — public so `:composeApp` desktop UI tests can mount it with an
+ * injected state, the way `DashboardContent` is used.
+ */
 @Composable
-private fun BudgetDetailsContent(
+fun BudgetDetailsContent(
     state: BudgetDetailsState,
     onEvent: (BudgetDetailsEvent) -> Unit,
 ) {
