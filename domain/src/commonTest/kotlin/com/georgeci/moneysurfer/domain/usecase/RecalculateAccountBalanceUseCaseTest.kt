@@ -106,6 +106,7 @@ private class RecalcEnv(rows: List<Transaction>) {
         override suspend fun insert(transaction: Transaction) {}
         override suspend fun update(transaction: Transaction) {}
         override suspend fun delete(id: TransactionId) {}
+        override suspend fun restore(id: TransactionId): Transaction? = null
     }
 
     private val accRepo = object : AccountRepository {

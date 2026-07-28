@@ -197,6 +197,9 @@ private class SingleAccountRepository(private val account: Account) : AccountRep
 private class FixedTransactionRepository(transactions: List<Transaction>) : TransactionRepository {
     private val all = MutableStateFlow(transactions)
 
+    /** Rows a delete tombstoned — out of every read, still there for a restore. */
+    private val tombstones = mutableMapOf<TransactionId, Transaction>()
+
     override fun getAll(): Flow<List<Transaction>> = all
     override fun getByAccountId(accountId: AccountId): Flow<List<Transaction>> = all
     override fun getByWorkspaceId(workspaceId: WorkspaceId): Flow<List<Transaction>> = all
@@ -223,6 +226,10 @@ private class FixedTransactionRepository(transactions: List<Transaction>) : Tran
     }
 
     override suspend fun delete(id: TransactionId) {
+        all.value.filter { it.id == id }.forEach { tombstones[id] = it }
         all.value = all.value.filterNot { it.id == id }
     }
+
+    override suspend fun restore(id: TransactionId): Transaction? =
+        tombstones.remove(id)?.also { all.value = all.value + it }
 }
