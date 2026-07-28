@@ -3,6 +3,7 @@ package com.georgeci.moneysurfer.feature.dashboard
 import arrow.optics.optics
 import com.georgeci.moneysurfer.domain.config.HostCapabilities
 import com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutConfig
+import com.georgeci.moneysurfer.domain.dashboard.DashboardPeriod
 import com.georgeci.moneysurfer.domain.formatter.MoneyFormatter
 import com.georgeci.moneysurfer.domain.model.Account
 import com.georgeci.moneysurfer.domain.model.BudgetStatus
@@ -23,6 +24,7 @@ import com.georgeci.moneysurfer.domain.usecase.GetGoalsUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetRecentTransactionsUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetSafeToSpendUseCase
 import com.georgeci.moneysurfer.utils.MviViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
@@ -58,51 +60,70 @@ class DashboardViewModel(
         .map { it.normalized() }
         .onStart { emit(DashboardLayoutConfig.DEFAULT) }
 
+    /**
+     * The span the spend-oriented widgets are read at. Device-local and not persisted, per
+     * `md/insights.md` decision 6 — the dashboard opens on [DashboardPeriod.DEFAULT] every launch.
+     */
+    private val period = MutableStateFlow(DashboardPeriod.DEFAULT)
+
     init {
         observeDashboard()
     }
 
     override fun onEvent(event: DashboardEvent) {
         when (event) {
-            is DashboardEvent.OnAccountClick -> postSideEffect(
-                DashboardEffect.NavigateToAccountDetails(event.accountId),
-            )
-            is DashboardEvent.OnTransactionClick -> postSideEffect(
-                DashboardEffect.NavigateToTransactionDetails(event.transactionId),
-            )
-            DashboardEvent.OnAddAccountClick -> postSideEffect(DashboardEffect.NavigateToAccountCreation)
-            DashboardEvent.OnSeeAllTransactionsClick ->
-                postSideEffect(DashboardEffect.NavigateToTransactionsList)
-            DashboardEvent.OnAddTransactionClick -> postSideEffect(
-                DashboardEffect.NavigateToTransactionCreation(accountId = null),
-            )
-            DashboardEvent.OnTransferClick -> postSideEffect(DashboardEffect.NavigateToTransferCreation)
-            is DashboardEvent.OnAddTransactionForAccountClick ->
-                postSideEffect(DashboardEffect.NavigateToTransactionCreation(accountId = event.accountId))
-            DashboardEvent.OnManageAccountsClick -> postSideEffect(DashboardEffect.NavigateToAccountsManage)
-            DashboardEvent.OnSettingsClick -> postSideEffect(DashboardEffect.NavigateToSettings)
-            DashboardEvent.OnCustomizeClick -> postSideEffect(DashboardEffect.NavigateToCustomize)
-            DashboardEvent.OnSeeAllGoalsClick -> postSideEffect(DashboardEffect.NavigateToGoals)
-            is DashboardEvent.OnGoalClick -> postSideEffect(DashboardEffect.NavigateToGoalDetails(event.goalId))
-            DashboardEvent.OnSetBudgetClick -> postSideEffect(DashboardEffect.NavigateToBudgetCreation)
+            is DashboardEvent.Navigate -> postSideEffect(event.destination())
+            is DashboardEvent.OnPeriodChange -> period.value = event.period
         }
     }
 
+    /**
+     * The navigation half of the contract as a table. Split out from [onEvent] because the
+     * dashboard is a hub — thirteen of its fourteen events do nothing but name a destination, and
+     * leaving them inline meant the one event that *changes this screen* was the fourteenth line
+     * of a list that reads as boilerplate.
+     */
+    private fun DashboardEvent.Navigate.destination(): DashboardEffect = when (this) {
+        is DashboardEvent.OnAccountClick -> DashboardEffect.NavigateToAccountDetails(accountId)
+        is DashboardEvent.OnTransactionClick -> DashboardEffect.NavigateToTransactionDetails(transactionId)
+        DashboardEvent.OnAddAccountClick -> DashboardEffect.NavigateToAccountCreation
+        DashboardEvent.OnSeeAllTransactionsClick -> DashboardEffect.NavigateToTransactionsList
+        DashboardEvent.OnAddTransactionClick -> DashboardEffect.NavigateToTransactionCreation(accountId = null)
+        DashboardEvent.OnTransferClick -> DashboardEffect.NavigateToTransferCreation
+        is DashboardEvent.OnAddTransactionForAccountClick ->
+            DashboardEffect.NavigateToTransactionCreation(accountId = accountId)
+        DashboardEvent.OnManageAccountsClick -> DashboardEffect.NavigateToAccountsManage
+        DashboardEvent.OnSettingsClick -> DashboardEffect.NavigateToSettings
+        DashboardEvent.OnCustomizeClick -> DashboardEffect.NavigateToCustomize
+        DashboardEvent.OnSeeAllGoalsClick -> DashboardEffect.NavigateToGoals
+        is DashboardEvent.OnGoalClick -> DashboardEffect.NavigateToGoalDetails(goalId)
+        DashboardEvent.OnSetBudgetClick -> DashboardEffect.NavigateToBudgetCreation
+    }
+
     private fun observeDashboard() {
-        // Layout and safe-to-spend are folded into one source because `combine` tops out at five
-        // typed flows, and these two are the pair that is never read apart.
-        val layoutAndSafeToSpend =
-            combine(layout, getSafeToSpend().onStart { emit(null) }) { layoutConfig, safeToSpend ->
-                layoutConfig to safeToSpend
-            }
+        // Layout, period and safe-to-spend are folded into one source because `combine` tops out
+        // at five typed flows, and these three are the group that is never read apart.
+        //
+        // The period reaches safe-to-spend as a flow, not as this combine's value: `getSafeToSpend`
+        // re-picks the budget in place that way, instead of restarting the workspace-wide
+        // transaction query on every tap of the switch. The cost is one intermediate emission on a
+        // change — the new period beside the previous budget's figures — which resolves on the next
+        // frame and only differs at all when the workspace runs budgets on both cadences.
+        val screenChrome = combine(
+            layout,
+            period,
+            getSafeToSpend(period.map { it.budgetPeriod }).onStart { emit(null) },
+        ) { layoutConfig, selectedPeriod, safeToSpend ->
+            Triple(layoutConfig, selectedPeriod, safeToSpend)
+        }
         launch {
             combine(
                 getAccounts().onStart { emit(emptyList()) },
                 getRecentTransactions(),
                 getGoals(),
                 getExchangeRates().onStart { emit(null) },
-                layoutAndSafeToSpend,
-            ) { accounts, transactions, goals, rates, (layoutConfig, safeToSpend) ->
+                screenChrome,
+            ) { accounts, transactions, goals, rates, (layoutConfig, selectedPeriod, safeToSpend) ->
                 val balance = accounts.convertedTotal(rates)?.toBalanceUi()
                 DashboardState.Content(
                     accounts = accounts.map { it.toUi() },
@@ -122,6 +143,7 @@ class DashboardViewModel(
                     isOffline = isOffline,
                     transferEnabled = transferEnabled,
                     layout = layoutConfig,
+                    period = selectedPeriod,
                 )
             }.collect { newContent -> updateState { newContent } }
         }
@@ -250,6 +272,11 @@ sealed interface DashboardState {
         val transferEnabled: Boolean = false,
         /** Which widgets the screen renders, in order. */
         val layout: DashboardLayoutConfig = DashboardLayoutConfig.DEFAULT,
+        /**
+         * The span every spend-oriented widget reads at once. One value for the whole screen, so
+         * two widgets can never disagree about which days they are summarising.
+         */
+        val period: DashboardPeriod = DashboardPeriod.DEFAULT,
     ) : DashboardState {
 
         /**
@@ -258,6 +285,10 @@ sealed interface DashboardState {
          */
         val recentTransactionsEmpty: Boolean
             get() = transactions.isEmpty()
+
+        /** Whether the period switch has anything under it to drive — see `hasPeriodScopedWidget`. */
+        val periodSwitchVisible: Boolean
+            get() = layout.hasPeriodScopedWidget
 
         companion object
     }
@@ -324,19 +355,31 @@ data class TransactionUi(
 )
 
 sealed interface DashboardEvent {
-    data class OnAccountClick(val accountId: AccountId) : DashboardEvent
-    data class OnTransactionClick(val transactionId: TransactionId) : DashboardEvent
-    data object OnAddAccountClick : DashboardEvent
-    data object OnAddTransactionClick : DashboardEvent
-    data object OnTransferClick : DashboardEvent
-    data object OnSeeAllTransactionsClick : DashboardEvent
-    data class OnAddTransactionForAccountClick(val accountId: AccountId) : DashboardEvent
-    data object OnManageAccountsClick : DashboardEvent
-    data object OnSettingsClick : DashboardEvent
-    data object OnCustomizeClick : DashboardEvent
-    data object OnSeeAllGoalsClick : DashboardEvent
-    data class OnGoalClick(val goalId: GoalId) : DashboardEvent
-    data object OnSetBudgetClick : DashboardEvent
+
+    /**
+     * An event whose whole answer is a destination — the dashboard is a hub, so nearly all of
+     * them are. Declaring that as a type rather than as a convention keeps the mapping in
+     * `destination()` exhaustive: an event added here without a branch there is a compile error,
+     * and one that belongs on this screen instead simply does not extend this.
+     */
+    sealed interface Navigate : DashboardEvent
+
+    data class OnAccountClick(val accountId: AccountId) : Navigate
+    data class OnTransactionClick(val transactionId: TransactionId) : Navigate
+    data object OnAddAccountClick : Navigate
+    data object OnAddTransactionClick : Navigate
+    data object OnTransferClick : Navigate
+    data object OnSeeAllTransactionsClick : Navigate
+    data class OnAddTransactionForAccountClick(val accountId: AccountId) : Navigate
+    data object OnManageAccountsClick : Navigate
+    data object OnSettingsClick : Navigate
+    data object OnCustomizeClick : Navigate
+    data object OnSeeAllGoalsClick : Navigate
+    data class OnGoalClick(val goalId: GoalId) : Navigate
+    data object OnSetBudgetClick : Navigate
+
+    /** The Week/Month switch. Affects the screen only — nothing about it is written to disk. */
+    data class OnPeriodChange(val period: DashboardPeriod) : DashboardEvent
 }
 
 sealed interface DashboardEffect {

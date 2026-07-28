@@ -3,6 +3,7 @@ package com.georgeci.moneysurfer.feature.dashboard
 import com.georgeci.moneysurfer.domain.auth.InMemorySessionPointers
 import com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutConfig
 import com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutItem
+import com.georgeci.moneysurfer.domain.dashboard.DashboardPeriod
 import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetType
 import com.georgeci.moneysurfer.domain.fixtures.EUR
 import com.georgeci.moneysurfer.domain.fixtures.FakeExchangeRateRepository
@@ -28,6 +29,7 @@ import com.georgeci.moneysurfer.domain.fixtures.workspaceId
 import com.georgeci.moneysurfer.domain.formatter.MoneyFormatter
 import com.georgeci.moneysurfer.domain.model.Account
 import com.georgeci.moneysurfer.domain.model.Budget
+import com.georgeci.moneysurfer.domain.model.BudgetPeriod
 import com.georgeci.moneysurfer.domain.model.BudgetStatus
 import com.georgeci.moneysurfer.domain.model.CategorizedTransaction
 import com.georgeci.moneysurfer.domain.model.Transaction
@@ -234,6 +236,72 @@ class DashboardViewModelTest : StringSpec({
         )
 
         viewModel.value.shouldBeInstanceOf<DashboardState.Content>().safeToSpend shouldBe null
+    }
+
+    "the dashboard opens on Month with the switch shown over the default layout" {
+        val ws = workspaceId("ws-1")
+        val viewModel = newViewModel(
+            ws = ws,
+            accounts = FakeAccountRepository(listOf(anAccount(id = accountId("a-1"), workspaceId = ws))),
+            transactions = FakeTransactionRepository(emptyList()),
+        )
+
+        val content = viewModel.value.shouldBeInstanceOf<DashboardState.Content>()
+        content.period shouldBe DashboardPeriod.Month
+        content.periodSwitchVisible shouldBe true
+    }
+
+    "picking a period re-picks the budget the headline speaks for" {
+        val ws = workspaceId("ws-1")
+        val viewModel = newViewModel(
+            ws = ws,
+            accounts = FakeAccountRepository(listOf(anAccount(id = accountId("a-1"), workspaceId = ws))),
+            transactions = FakeTransactionRepository(emptyList()),
+            budgets = listOf(
+                aBudget(
+                    id = budgetId("b-weekly"),
+                    workspaceId = ws,
+                    name = "This week",
+                    amount = 200.dollars,
+                    period = BudgetPeriod.WEEKLY,
+                    categoryIds = emptyList(),
+                    startDate = testDate,
+                ),
+                aBudget(
+                    id = budgetId("b-monthly"),
+                    workspaceId = ws,
+                    name = "This month",
+                    amount = 800.dollars,
+                    period = BudgetPeriod.MONTHLY,
+                    categoryIds = emptyList(),
+                    startDate = testDate,
+                ),
+            ),
+        )
+
+        viewModel.value.shouldBeInstanceOf<DashboardState.Content>()
+            .safeToSpend?.budgetName shouldBe "This month"
+
+        viewModel.onEvent(DashboardEvent.OnPeriodChange(DashboardPeriod.Week))
+
+        val content = viewModel.value.shouldBeInstanceOf<DashboardState.Content>()
+        content.period shouldBe DashboardPeriod.Week
+        content.safeToSpend?.budgetName shouldBe "This week"
+    }
+
+    "the period switch stands down when nothing on the layout reads it" {
+        val ws = workspaceId("ws-1")
+        val layout = DashboardWidgetType.entries
+            .filter { it.isPeriodScoped }
+            .fold(DashboardLayoutConfig.DEFAULT) { acc, type -> acc.withWidgetEnabled(type, enabled = false) }
+        val viewModel = newViewModel(
+            ws = ws,
+            accounts = FakeAccountRepository(listOf(anAccount(id = accountId("a-1"), workspaceId = ws))),
+            transactions = FakeTransactionRepository(emptyList()),
+            uiPreferences = FakeUiPreferences(dashboardLayout = layout),
+        )
+
+        viewModel.value.shouldBeInstanceOf<DashboardState.Content>().periodSwitchVisible shouldBe false
     }
 
     "an unset layout falls back to the default order" {

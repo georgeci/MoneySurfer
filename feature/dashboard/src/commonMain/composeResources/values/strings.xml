@@ -73,4 +73,7 @@
     <string name="dashboard_recurring_empty_subtitle">Subscriptions and recurring bills will appear here.</string>
     <string name="dashboard_insights_title">Insights</string>
     <string name="dashboard_insights_empty_text">Nothing notable this period.</string>
+    <!-- Segments of the dashboard period switch; both label a span, not a point in time -->
+    <string name="dashboard_period_week">Week</string>
+    <string name="dashboard_period_month">Month</string>
 </resources>

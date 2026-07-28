@@ -65,22 +65,38 @@ data class SafeToSpend(
  * left" with nothing to mean. The pick is therefore:
  *
  * 1. general budgets — no category filter, so they cover every expense — before category ones;
- * 2. within that tier, the largest limit, which is the cap the user framed the period with;
- * 3. ties broken by budget id, so the headline does not jump between two equal budgets on
+ * 2. within that tier, a budget whose cadence is [preferredPeriod] — the span the screen is being
+ *    read at — before one on any other;
+ * 3. then the largest limit, which is the cap the user framed the period with;
+ * 4. ties broken by budget id, so the headline does not jump between two equal budgets on
  *    recomposition.
+ *
+ * [preferredPeriod] is a tiebreak rather than a filter, and it sits *below* the general/category
+ * tier on purpose. A budget owns its own window, so a screen set to Week cannot reshape a monthly
+ * cap into a weekly one — all it can do is let a weekly budget speak where one exists. Demoting a
+ * €2,000 general cap behind a €20 weekly coffee budget would answer "what is safe to spend" with
+ * a number about coffee; passing null asks for the cap alone, which is what a caller with no
+ * period on screen wants.
  *
  * Also null when the winning progress carries no base currency — the workspace row is missing
  * behind budgets that reference it, which a pull can produce for a moment. Money the app cannot
  * name is worse than no money at all: `MoneyFormatter` is backed by `java.util.Currency`, which
  * rejects anything that is not a three-letter ISO code.
  */
-fun List<BudgetProgress>.safeToSpend(): SafeToSpend? = primaryProgress()?.toSafeToSpend()
+fun List<BudgetProgress>.safeToSpend(preferredPeriod: BudgetPeriod? = null): SafeToSpend? =
+    primaryProgress(preferredPeriod)?.toSafeToSpend()
 
-private fun List<BudgetProgress>.primaryProgress(): BudgetProgress? {
+private fun List<BudgetProgress>.primaryProgress(preferredPeriod: BudgetPeriod?): BudgetProgress? {
     val active = filter { it.budget.isActive }
     val general = active.filter { it.budget.categoryIds.isEmpty() }
     return general.ifEmpty { active }
-        .sortedWith(compareByDescending<BudgetProgress> { it.effectiveLimit.minor }.thenBy { it.budget.id.value })
+        .sortedWith(
+            // `preferredPeriod == null` makes every term of this comparison false, leaving the
+            // limit and the id to decide — the exact order this list had before periods existed.
+            compareByDescending<BudgetProgress> { it.budget.period == preferredPeriod }
+                .thenByDescending { it.effectiveLimit.minor }
+                .thenBy { it.budget.id.value },
+        )
         .firstOrNull()
 }
 

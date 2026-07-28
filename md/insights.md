@@ -219,6 +219,24 @@ spend widget through one `SpendScope`. Built on `periodWindow(mode, anchor)` and
 `shiftPeriod`, not a new type. Per decision 6 this is device-local UI state, not
 a preference — unless the user asks for it to stick.
 
+**Landed (issue #296)**, with the wiring bounded by what Phase 1 has actually shipped:
+
+- `DashboardPeriod` (Week / Month) in `domain/dashboard`, held in a `MutableStateFlow` on
+  `DashboardViewModel` and surfaced as `Content.period`. `window(today)` delegates to
+  `periodWindow`, so it is a closed set of what the dashboard offers rather than a second period
+  type. `AllTime` is unreachable: a spend figure with no window has no pace and no days left.
+- `SurferPeriodSwitch` in `uikit` — a content-width pill track with one raised thumb, kept apart
+  from `SurferSegmentedControl` (a full-width form field that states its selection twice).
+- Only SafeToSpend is on the dashboard so far, and a budget owns its own window, so the period
+  cannot reshape one. It instead re-picks *which* budget speaks: `safeToSpend(preferredPeriod)`
+  prefers a budget on the selected cadence, as a tiebreak inside the general/category tier rather
+  than as a filter across it. The remaining widgets (#287, #288, #290, #294) read `window(today)`
+  into a `SpendScope` when they land — that is what `DashboardWidgetType.isPeriodScoped` is for,
+  and it also decides whether the switch renders at all.
+- The `netByMonth` caveat above is untouched and still stands: nothing on the dashboard consumes
+  `SpendAnalyticsRepository` yet, so no month-shaped query is reachable from a Week selection
+  today. #287 is where that has to be honoured.
+
 ## Phase 3 — `feature/insights` module
 
 New module `feature/insights` (nothing exists under `feature/` for it today),

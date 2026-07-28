@@ -185,4 +185,88 @@ class SafeToSpendTest : StringSpec({
         listOf(progressOf(first), progressOf(second)).safeToSpend()?.budgetName shouldBe "First"
         listOf(progressOf(second), progressOf(first)).safeToSpend()?.budgetName shouldBe "First"
     }
+
+    "the period on screen picks between two general budgets on different cadences" {
+        val weekly = aBudget(
+            id = budgetId("b-weekly"),
+            name = "This week",
+            amount = 200.dollars,
+            period = BudgetPeriod.WEEKLY,
+            startDate = periodStart,
+            categoryIds = emptyList(),
+        )
+        val monthly = aBudget(
+            id = budgetId("b-monthly"),
+            name = "This month",
+            amount = 800.dollars,
+            period = BudgetPeriod.MONTHLY,
+            startDate = periodStart,
+            categoryIds = emptyList(),
+        )
+        val progresses = listOf(progressOf(weekly), progressOf(monthly))
+
+        progresses.safeToSpend(BudgetPeriod.WEEKLY)?.budgetName shouldBe "This week"
+        progresses.safeToSpend(BudgetPeriod.MONTHLY)?.budgetName shouldBe "This month"
+    }
+
+    "asking for no particular period leaves the pre-period order untouched" {
+        val weekly = aBudget(
+            id = budgetId("b-weekly"),
+            name = "This week",
+            amount = 200.dollars,
+            period = BudgetPeriod.WEEKLY,
+            startDate = periodStart,
+            categoryIds = emptyList(),
+        )
+        val monthly = aBudget(
+            id = budgetId("b-monthly"),
+            name = "This month",
+            amount = 800.dollars,
+            period = BudgetPeriod.MONTHLY,
+            startDate = periodStart,
+            categoryIds = emptyList(),
+        )
+
+        // The larger limit still wins, exactly as it did before the switch existed.
+        listOf(progressOf(weekly), progressOf(monthly)).safeToSpend()?.budgetName shouldBe "This month"
+    }
+
+    "a preferred period never promotes a category budget over a general one" {
+        val general = aBudget(
+            id = budgetId("b-general"),
+            name = "Everyday",
+            amount = 2000.dollars,
+            period = BudgetPeriod.MONTHLY,
+            startDate = periodStart,
+            categoryIds = emptyList(),
+        )
+        val weeklyCoffee = aBudget(
+            id = budgetId("b-coffee"),
+            name = "Coffee",
+            amount = 20.dollars,
+            period = BudgetPeriod.WEEKLY,
+            startDate = periodStart,
+            categoryIds = listOf(categoryId("coffee")),
+        )
+
+        // A screen set to Week must not answer "what is safe to spend" with a number about coffee:
+        // the switch is a tiebreak inside the general tier, not a filter across tiers.
+        listOf(progressOf(weeklyCoffee), progressOf(general))
+            .safeToSpend(BudgetPeriod.WEEKLY)?.budgetName shouldBe "Everyday"
+    }
+
+    "a period nothing is budgeted on leaves the largest limit speaking" {
+        val monthly = aBudget(
+            id = budgetId("b-monthly"),
+            name = "This month",
+            amount = 800.dollars,
+            period = BudgetPeriod.MONTHLY,
+            startDate = periodStart,
+            categoryIds = emptyList(),
+        )
+
+        // Week selected, no weekly budget in the workspace — the widget states the monthly cap
+        // rather than falling to its empty state, which would read as "no budget yet".
+        listOf(progressOf(monthly)).safeToSpend(BudgetPeriod.WEEKLY)?.budgetName shouldBe "This month"
+    }
 })

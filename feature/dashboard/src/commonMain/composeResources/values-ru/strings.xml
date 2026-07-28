@@ -73,4 +73,6 @@
     <string name="dashboard_recurring_empty_subtitle">Подписки и регулярные платежи появятся здесь.</string>
     <string name="dashboard_insights_title">Подсказки</string>
     <string name="dashboard_insights_empty_text">В этом периоде ничего особенного.</string>
+    <string name="dashboard_period_week">Неделя</string>
+    <string name="dashboard_period_month">Месяц</string>
 </resources>
