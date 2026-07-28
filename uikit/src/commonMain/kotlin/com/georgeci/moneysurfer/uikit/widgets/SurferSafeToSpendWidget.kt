@@ -12,8 +12,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.georgeci.moneysurfer.uikit.components.budget.SurferBudgetProgressBar
 import com.georgeci.moneysurfer.uikit.components.budget.SurferBudgetStatus
@@ -43,13 +45,27 @@ data class SurferSafeToSpendData(
 )
 
 /**
+ * The "no budget yet" half of the card: what it says, and the way out of it.
+ *
+ * Grouped rather than spread across the widget's parameter list, the way `SurferAddAccountCta`
+ * carries the accounts widget's empty-state call to action. [actionTestTag] tags the link; the host
+ * screen owns the value, since where it leads is a step in the host's flow.
+ */
+data class SurferSafeToSpendEmpty(
+    val title: String? = null,
+    val subtitle: String? = null,
+    val actionLabel: String? = null,
+    val onActionClick: (() -> Unit)? = null,
+    val actionTestTag: String? = null,
+)
+
+/**
  * Safe-to-spend widget for the dashboard column: one number, the pace it has to hold, and how long
  * it has to hold it.
  *
- * A null [data] is the "no budget yet" state — the card keeps its heading and offers the way out of
- * it ([emptyActionLabel]) rather than disappearing, because a widget the user switched on should
- * still say why it has nothing to show. [emptyActionTestTag] tags that link; the host screen owns
- * the value, since where it leads is a step in the host's flow.
+ * A null [data] draws [empty] instead — the card keeps its heading and offers the way out rather
+ * than disappearing, because a widget the user switched on should still say why it has nothing to
+ * show.
  */
 @Composable
 fun SurferSafeToSpendWidget(
@@ -57,66 +73,99 @@ fun SurferSafeToSpendWidget(
     data: SurferSafeToSpendData?,
     modifier: Modifier = Modifier,
     size: SurferWidgetSize = LocalSurferWidgetSize.current,
-    emptyTitle: String? = null,
-    emptySubtitle: String? = null,
-    emptyActionLabel: String? = null,
-    onEmptyActionClick: (() -> Unit)? = null,
-    emptyActionTestTag: String? = null,
+    empty: SurferSafeToSpendEmpty = SurferSafeToSpendEmpty(),
 ) {
     SurferWidgetCard(
         title = title,
         modifier = modifier,
-        trailing = {
-            if (data == null && emptyActionLabel != null && onEmptyActionClick != null) {
-                Text(
-                    text = emptyActionLabel,
-                    style = AppTheme.typography.labelMedium,
-                    color = AppTheme.materialColors.primary,
-                    modifier = Modifier
-                        .clickable(onClick = onEmptyActionClick)
-                        .then(emptyActionTestTag?.let { Modifier.testTag(it) } ?: Modifier),
-                )
-            }
-        },
+        trailing = { if (data == null) EmptyStateAction(empty) },
     ) {
         if (data == null) {
             SurferWidgetEmptyState(
                 icon = SurferIcons.Cash,
-                title = emptyTitle,
-                subtitle = emptySubtitle,
+                title = empty.title,
+                subtitle = empty.subtitle,
             )
             return@SurferWidgetCard
         }
-        SafeToSpendBody(data = data, hero = size == SurferWidgetSize.Expanded)
+        SafeToSpendBody(data = data, sizing = safeToSpendSizing(size == SurferWidgetSize.Expanded))
     }
 }
 
-/**
- * Compact drops the caption rather than shrinking every line: the headline, the pace bar and the
- * two figures under it are what the widget is for, and the limit is restated on the budget screen.
- */
 @Composable
-private fun SafeToSpendBody(data: SurferSafeToSpendData, hero: Boolean) {
-    val amountColor = if (data.status == SurferBudgetStatus.Over) {
-        AppTheme.materialColors.error
-    } else {
-        AppTheme.materialColors.onSurface
-    }
+private fun EmptyStateAction(empty: SurferSafeToSpendEmpty) {
+    val label = empty.actionLabel ?: return
+    val onClick = empty.onActionClick ?: return
+    Text(
+        text = label,
+        style = AppTheme.typography.labelMedium,
+        color = AppTheme.materialColors.primary,
+        modifier = Modifier
+            .clickable(onClick = onClick)
+            .then(empty.actionTestTag?.let { Modifier.testTag(it) } ?: Modifier),
+    )
+}
+
+/**
+ * Everything the Compact/Hero switch changes, resolved in one place so the body below reads as a
+ * single layout instead of a column of size ternaries.
+ */
+private data class SafeToSpendSizing(
+    val topPadding: Dp,
+    val gap: Dp,
+    val amountStyle: TextStyle,
+    val figureStyle: TextStyle,
+    val barHeight: Dp,
+    /**
+     * Compact drops the caption rather than shrinking every line: the headline, the pace bar and
+     * the two figures under it are what the widget is for, and the limit is restated on the budget
+     * screen.
+     */
+    val showsCaption: Boolean,
+)
+
+@Composable
+private fun safeToSpendSizing(hero: Boolean): SafeToSpendSizing = if (hero) {
+    SafeToSpendSizing(
+        topPadding = 10.dp,
+        gap = 10.dp,
+        amountStyle = AppTheme.typography.displaySmall,
+        figureStyle = AppTheme.typography.labelLarge,
+        barHeight = 10.dp,
+        showsCaption = true,
+    )
+} else {
+    SafeToSpendSizing(
+        topPadding = 6.dp,
+        gap = 6.dp,
+        amountStyle = AppTheme.typography.headlineSmall,
+        figureStyle = AppTheme.typography.labelSmall,
+        barHeight = 8.dp,
+        showsCaption = false,
+    )
+}
+
+@Composable
+private fun SafeToSpendBody(data: SurferSafeToSpendData, sizing: SafeToSpendSizing) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp)
-            .padding(top = if (hero) 10.dp else 6.dp),
-        verticalArrangement = Arrangement.spacedBy(if (hero) 10.dp else 6.dp),
+            .padding(top = sizing.topPadding),
+        verticalArrangement = Arrangement.spacedBy(sizing.gap),
     ) {
         Text(
             text = data.amount,
-            style = if (hero) AppTheme.typography.displaySmall else AppTheme.typography.headlineSmall,
-            color = amountColor,
+            style = sizing.amountStyle,
+            color = if (data.status == SurferBudgetStatus.Over) {
+                AppTheme.materialColors.error
+            } else {
+                AppTheme.materialColors.onSurface
+            },
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
         )
-        if (hero) {
+        if (sizing.showsCaption) {
             Text(
                 text = data.caption,
                 style = AppTheme.typography.bodySmall,
@@ -129,7 +178,7 @@ private fun SafeToSpendBody(data: SurferSafeToSpendData, hero: Boolean) {
             progress = data.progress,
             status = data.status,
             tickFraction = data.paceFraction,
-            height = if (hero) 10.dp else 8.dp,
+            height = sizing.barHeight,
             contentDescription = data.progressContentDescription,
         )
         Row(
@@ -138,17 +187,19 @@ private fun SafeToSpendBody(data: SurferSafeToSpendData, hero: Boolean) {
         ) {
             Text(
                 text = data.perDay,
-                style = if (hero) AppTheme.typography.labelLarge else AppTheme.typography.labelSmall,
+                style = sizing.figureStyle,
                 color = AppTheme.materialColors.onSurface,
             )
             Text(
                 text = data.daysLeft,
-                style = if (hero) AppTheme.typography.labelLarge else AppTheme.typography.labelSmall,
+                style = sizing.figureStyle,
                 color = AppTheme.materialColors.onSurfaceVariant,
             )
         }
     }
 }
+
+private const val PREVIEW_TITLE = "Safe to spend"
 
 private val previewData = SurferSafeToSpendData(
     amount = "€642.30",
@@ -166,7 +217,7 @@ private fun SurferSafeToSpendWidgetHeroPreview() {
     SurferComponentPreview {
         Box(modifier = Modifier.padding(16.dp)) {
             SurferSafeToSpendWidget(
-                title = "Safe to spend",
+                title = PREVIEW_TITLE,
                 data = previewData,
                 modifier = Modifier.fillMaxWidth(),
             )
@@ -180,7 +231,7 @@ private fun SurferSafeToSpendWidgetCompactPreview() {
     SurferComponentPreview {
         Box(modifier = Modifier.padding(16.dp)) {
             SurferSafeToSpendWidget(
-                title = "Safe to spend",
+                title = PREVIEW_TITLE,
                 data = previewData,
                 size = SurferWidgetSize.Compact,
                 modifier = Modifier.fillMaxWidth(),
@@ -195,7 +246,7 @@ private fun SurferSafeToSpendWidgetOverPreview() {
     SurferComponentPreview {
         Box(modifier = Modifier.padding(16.dp)) {
             SurferSafeToSpendWidget(
-                title = "Safe to spend",
+                title = PREVIEW_TITLE,
                 data = previewData.copy(
                     amount = "−€120.00",
                     perDay = "€0.00 a day",
@@ -216,12 +267,14 @@ private fun SurferSafeToSpendWidgetEmptyPreview() {
     SurferComponentPreview {
         Box(modifier = Modifier.padding(16.dp)) {
             SurferSafeToSpendWidget(
-                title = "Safe to spend",
+                title = PREVIEW_TITLE,
                 data = null,
-                emptyTitle = "No budget yet",
-                emptySubtitle = "Set a cap to see what is safe to spend.",
-                emptyActionLabel = "Set a budget",
-                onEmptyActionClick = {},
+                empty = SurferSafeToSpendEmpty(
+                    title = "No budget yet",
+                    subtitle = "Set a cap to see what is safe to spend.",
+                    actionLabel = "Set a budget",
+                    onActionClick = {},
+                ),
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(180.dp),

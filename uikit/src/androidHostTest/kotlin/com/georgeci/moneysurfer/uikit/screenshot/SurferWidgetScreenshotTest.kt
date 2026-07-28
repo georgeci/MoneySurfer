@@ -20,6 +20,7 @@ import com.georgeci.moneysurfer.uikit.widgets.SurferQuickActionsWidget
 import com.georgeci.moneysurfer.uikit.widgets.SurferRecentTransactionItem
 import com.georgeci.moneysurfer.uikit.widgets.SurferRecentTransactionsWidget
 import com.georgeci.moneysurfer.uikit.widgets.SurferSafeToSpendData
+import com.georgeci.moneysurfer.uikit.widgets.SurferSafeToSpendEmpty
 import com.georgeci.moneysurfer.uikit.widgets.SurferSafeToSpendWidget
 import com.georgeci.moneysurfer.uikit.widgets.SurferWidgetSize
 import org.junit.Test
@@ -181,10 +182,12 @@ class SurferWidgetScreenshotTest {
                 // The placeholder centres itself in whatever height it is given; the gallery has
                 // the whole page, so it is pinned to the dashboard's own minimum widget height.
                 modifier = Modifier.fillMaxWidth().height(SafeToSpendEmptyHeight),
-                emptyTitle = "No budget yet",
-                emptySubtitle = "Set a cap to see what is safe to spend.",
-                emptyActionLabel = "Set a budget",
-                onEmptyActionClick = {},
+                empty = SurferSafeToSpendEmpty(
+                    title = "No budget yet",
+                    subtitle = "Set a cap to see what is safe to spend.",
+                    actionLabel = "Set a budget",
+                    onActionClick = {},
+                ),
             )
         }
     }

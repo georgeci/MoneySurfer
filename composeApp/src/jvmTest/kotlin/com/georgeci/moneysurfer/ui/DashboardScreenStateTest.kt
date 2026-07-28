@@ -105,17 +105,7 @@ class DashboardScreenStateTest : StringSpec({
             setContent {
                 DashboardContent(
                     state = contentWith(accounts = 2, transferEnabled = true).copy(
-                        safeToSpend = SafeToSpendUi(
-                            budgetName = "Everyday",
-                            remainingFormatted = SAFE_TO_SPEND_REMAINDER,
-                            spentFormatted = "€1,157.70",
-                            limitFormatted = "€1,800.00",
-                            perDayFormatted = "€53.52",
-                            daysLeft = 12,
-                            progress = 0.64f,
-                            paceFraction = 0.6f,
-                            status = BudgetStatus.OK,
-                        ),
+                        safeToSpend = safeToSpendUi(),
                     ),
                     onEvent = {},
                 )
@@ -123,8 +113,45 @@ class DashboardScreenStateTest : StringSpec({
 
             onNodeWithText(SAFE_TO_SPEND_REMAINDER).assertIsDisplayed()
             onNodeWithText(SAFE_TO_SPEND_DAYS_LEFT).assertIsDisplayed()
+            onNodeWithText("of $SAFE_TO_SPEND_LIMIT · Everyday").assertIsDisplayed()
             // The link only belongs to the empty state — there is a budget to read now.
             onNodeWithTag(DashboardTestTags.SafeToSpendSetBudget).assertDoesNotExist()
+        }
+    }
+
+    "an overspent budget says so in the caption rather than reading as headroom" {
+        runComposeUiTest {
+            setContent {
+                DashboardContent(
+                    state = contentWith(accounts = 2, transferEnabled = true).copy(
+                        safeToSpend = safeToSpendUi(
+                            remaining = "−€120.00",
+                            status = BudgetStatus.OVER,
+                            progress = 1.07f,
+                        ),
+                    ),
+                    onEvent = {},
+                )
+            }
+
+            onNodeWithText("−€120.00").assertIsDisplayed()
+            // "of €1,800.00" would read as money still available.
+            onNodeWithText("over $SAFE_TO_SPEND_LIMIT · Everyday").assertIsDisplayed()
+        }
+    }
+
+    "a budget past its alert threshold is still headroom, not an overspend" {
+        runComposeUiTest {
+            setContent {
+                DashboardContent(
+                    state = contentWith(accounts = 2, transferEnabled = true).copy(
+                        safeToSpend = safeToSpendUi(status = BudgetStatus.WARN, progress = 0.88f),
+                    ),
+                    onEvent = {},
+                )
+            }
+
+            onNodeWithText("of $SAFE_TO_SPEND_LIMIT · Everyday").assertIsDisplayed()
         }
     }
 })
@@ -132,7 +159,24 @@ class DashboardScreenStateTest : StringSpec({
 private const val ADD_TRANSACTION = "Add transaction"
 private const val TRANSFER = "Transfer"
 private const val SAFE_TO_SPEND_REMAINDER = "€642.30"
+private const val SAFE_TO_SPEND_LIMIT = "€1,800.00"
 private const val SAFE_TO_SPEND_DAYS_LEFT = "12 days left"
+
+private fun safeToSpendUi(
+    remaining: String = SAFE_TO_SPEND_REMAINDER,
+    status: BudgetStatus = BudgetStatus.OK,
+    progress: Float = 0.64f,
+) = SafeToSpendUi(
+    budgetName = "Everyday",
+    remainingFormatted = remaining,
+    spentFormatted = "€1,157.70",
+    limitFormatted = SAFE_TO_SPEND_LIMIT,
+    perDayFormatted = "€53.52",
+    daysLeft = 12,
+    progress = progress,
+    paceFraction = 0.6f,
+    status = status,
+)
 
 private fun contentWith(accounts: Int, transferEnabled: Boolean) = DashboardState.Content(
     accounts = List(accounts) { index ->

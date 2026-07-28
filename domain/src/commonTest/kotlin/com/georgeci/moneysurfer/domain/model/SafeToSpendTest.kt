@@ -10,6 +10,7 @@ import com.georgeci.moneysurfer.domain.fixtures.transactionId
 import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
 import com.georgeci.moneysurfer.domain.primitives.Money
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
+import com.georgeci.moneysurfer.domain.util.BudgetPeriodWindow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.shouldBe
@@ -96,6 +97,29 @@ class SafeToSpendTest : StringSpec({
         listOf(progressOf(budget)).safeToSpend()?.elapsedFraction shouldBe 0.5f
         // The first day of the window has nothing behind it yet.
         listOf(progressOf(budget, today = periodStart)).safeToSpend()?.elapsedFraction shouldBe 0f
+    }
+
+    "a zero limit reads as no spend at all rather than dividing by it" {
+        val budget = aBudget(amount = Money.zero(), startDate = periodStart, categoryIds = emptyList())
+
+        listOf(progressOf(budget, spent = 40.dollars)).safeToSpend()?.spentFraction shouldBe 0f
+    }
+
+    "a window with no days in it reads as fully elapsed, never as a division by zero" {
+        val instant = LocalDate(2026, 4, 16)
+        val degenerate = SafeToSpend(
+            budgetName = "Broken",
+            remaining = Money.zero(),
+            perDay = Money.zero(),
+            daysLeft = 0,
+            spent = Money.zero(),
+            limit = 100.dollars,
+            window = BudgetPeriodWindow(instant, instant),
+            status = BudgetStatus.OK,
+            currency = USD,
+        )
+
+        degenerate.elapsedFraction shouldBe 1f
     }
 
     "spend past the limit reports a fraction over 1 — the bar caps it, the maths does not" {

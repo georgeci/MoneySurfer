@@ -27,36 +27,34 @@ data class DashboardNavigation(
 )
 
 /**
- * The screen's whole side-effect half: one branch per [DashboardEffect], nothing else. It lives
- * beside [DashboardNavigation] rather than inside `DashboardScreen` because a flat dispatch table
- * that grows with the destination list is what pushes the entry point over the complexity limit,
- * and there is nothing here to simplify — every branch is a distinct destination.
+ * The screen's whole side-effect half: one branch per [DashboardEffect], nothing else.
+ *
+ * A plain function rather than a lambda inside the composable, for two reasons. A flat dispatch
+ * table that grows with the destination list is what pushed `DashboardScreen` over the complexity
+ * limit; and a mis-wired branch here sends the user to the wrong screen, which is worth a test —
+ * one that needs no composition, no lifecycle and no view model to run.
  */
+internal fun DashboardNavigation.navigate(effect: DashboardEffect) {
+    when (effect) {
+        is DashboardEffect.NavigateToAccountDetails -> onNavigateToAccountDetails(effect.accountId)
+        is DashboardEffect.NavigateToTransactionDetails -> onNavigateToTransactionDetails(effect.transactionId)
+        DashboardEffect.NavigateToAccountCreation -> onNavigateToAccountCreation()
+        DashboardEffect.NavigateToAccountsManage -> onNavigateToAccountsManage()
+        is DashboardEffect.NavigateToTransactionCreation -> onNavigateToTransactionCreation(effect.accountId)
+        DashboardEffect.NavigateToTransferCreation -> onNavigateToTransferCreation()
+        DashboardEffect.NavigateToSettings -> onNavigateToSettings()
+        DashboardEffect.NavigateToCustomize -> onNavigateToCustomize()
+        DashboardEffect.NavigateToTransactionsList -> onNavigateToTransactionsList()
+        DashboardEffect.NavigateToGoals -> onNavigateToGoals()
+        is DashboardEffect.NavigateToGoalDetails -> onNavigateToGoalDetails(effect.goalId)
+        DashboardEffect.NavigateToBudgetCreation -> onNavigateToBudgetCreation()
+    }
+}
+
 @Composable
 internal fun HandleDashboardEffects(
     viewModel: DashboardViewModel,
     navigation: DashboardNavigation,
 ) {
-    viewModel.HandleSideEffect { effect ->
-        when (effect) {
-            is DashboardEffect.NavigateToAccountDetails ->
-                navigation.onNavigateToAccountDetails(effect.accountId)
-
-            is DashboardEffect.NavigateToTransactionDetails ->
-                navigation.onNavigateToTransactionDetails(effect.transactionId)
-
-            DashboardEffect.NavigateToAccountCreation -> navigation.onNavigateToAccountCreation()
-            DashboardEffect.NavigateToAccountsManage -> navigation.onNavigateToAccountsManage()
-            is DashboardEffect.NavigateToTransactionCreation ->
-                navigation.onNavigateToTransactionCreation(effect.accountId)
-
-            DashboardEffect.NavigateToTransferCreation -> navigation.onNavigateToTransferCreation()
-            DashboardEffect.NavigateToSettings -> navigation.onNavigateToSettings()
-            DashboardEffect.NavigateToCustomize -> navigation.onNavigateToCustomize()
-            DashboardEffect.NavigateToTransactionsList -> navigation.onNavigateToTransactionsList()
-            DashboardEffect.NavigateToGoals -> navigation.onNavigateToGoals()
-            is DashboardEffect.NavigateToGoalDetails -> navigation.onNavigateToGoalDetails(effect.goalId)
-            DashboardEffect.NavigateToBudgetCreation -> navigation.onNavigateToBudgetCreation()
-        }
-    }
+    viewModel.HandleSideEffect(navigation::navigate)
 }

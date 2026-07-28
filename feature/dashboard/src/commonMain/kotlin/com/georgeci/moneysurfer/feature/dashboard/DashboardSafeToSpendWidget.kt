@@ -9,6 +9,7 @@ import androidx.compose.ui.unit.dp
 import com.georgeci.moneysurfer.domain.model.BudgetStatus
 import com.georgeci.moneysurfer.uikit.components.budget.SurferBudgetStatus
 import com.georgeci.moneysurfer.uikit.widgets.SurferSafeToSpendData
+import com.georgeci.moneysurfer.uikit.widgets.SurferSafeToSpendEmpty
 import com.georgeci.moneysurfer.uikit.widgets.SurferSafeToSpendWidget
 import moneysurfer.feature.dashboard.generated.resources.Res
 import moneysurfer.feature.dashboard.generated.resources.dashboard_days_left
@@ -37,11 +38,13 @@ internal fun SafeToSpendWidget(
     SurferSafeToSpendWidget(
         title = stringResource(Res.string.dashboard_safe_to_spend_title),
         data = state.safeToSpend?.toWidgetData(),
-        emptyTitle = stringResource(Res.string.dashboard_safe_to_spend_empty_title),
-        emptySubtitle = stringResource(Res.string.dashboard_safe_to_spend_empty_subtitle),
-        emptyActionLabel = stringResource(Res.string.dashboard_safe_to_spend_set_budget),
-        onEmptyActionClick = { onEvent(DashboardEvent.OnSetBudgetClick) },
-        emptyActionTestTag = DashboardTestTags.SafeToSpendSetBudget,
+        empty = SurferSafeToSpendEmpty(
+            title = stringResource(Res.string.dashboard_safe_to_spend_empty_title),
+            subtitle = stringResource(Res.string.dashboard_safe_to_spend_empty_subtitle),
+            actionLabel = stringResource(Res.string.dashboard_safe_to_spend_set_budget),
+            onActionClick = { onEvent(DashboardEvent.OnSetBudgetClick) },
+            actionTestTag = DashboardTestTags.SafeToSpendSetBudget,
+        ),
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp)
