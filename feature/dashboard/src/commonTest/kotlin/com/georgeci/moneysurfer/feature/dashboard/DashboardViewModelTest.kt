@@ -1,8 +1,10 @@
 package com.georgeci.moneysurfer.feature.dashboard
 
+import app.cash.turbine.test
 import com.georgeci.moneysurfer.domain.auth.InMemorySessionPointers
 import com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutConfig
 import com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutItem
+import com.georgeci.moneysurfer.domain.dashboard.DashboardPeriod
 import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetType
 import com.georgeci.moneysurfer.domain.fixtures.EUR
 import com.georgeci.moneysurfer.domain.fixtures.FakeCategoryRepository
@@ -18,6 +20,7 @@ import com.georgeci.moneysurfer.domain.fixtures.FixedClock
 import com.georgeci.moneysurfer.domain.fixtures.USD
 import com.georgeci.moneysurfer.domain.fixtures.aBudget
 import com.georgeci.moneysurfer.domain.fixtures.aCategory
+import com.georgeci.moneysurfer.domain.fixtures.aGoal
 import com.georgeci.moneysurfer.domain.fixtures.aRecurringRule
 import com.georgeci.moneysurfer.domain.fixtures.aTransaction
 import com.georgeci.moneysurfer.domain.fixtures.aWorkspace
@@ -27,6 +30,7 @@ import com.georgeci.moneysurfer.domain.fixtures.anExchangeRateTable
 import com.georgeci.moneysurfer.domain.fixtures.budgetId
 import com.georgeci.moneysurfer.domain.fixtures.categoryId
 import com.georgeci.moneysurfer.domain.fixtures.dollars
+import com.georgeci.moneysurfer.domain.fixtures.goalId
 import com.georgeci.moneysurfer.domain.fixtures.testDate
 import com.georgeci.moneysurfer.domain.fixtures.testInstant
 import com.georgeci.moneysurfer.domain.fixtures.transactionId
@@ -35,6 +39,7 @@ import com.georgeci.moneysurfer.domain.formatter.MoneyFormatter
 import com.georgeci.moneysurfer.domain.insight.InsightTone
 import com.georgeci.moneysurfer.domain.model.Account
 import com.georgeci.moneysurfer.domain.model.Budget
+import com.georgeci.moneysurfer.domain.model.BudgetPeriod
 import com.georgeci.moneysurfer.domain.model.BudgetStatus
 import com.georgeci.moneysurfer.domain.model.BurnRatePace
 import com.georgeci.moneysurfer.domain.model.CategorizedTransaction
@@ -67,6 +72,7 @@ import com.georgeci.moneysurfer.domain.usecase.GetDailySpendSeriesUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetExchangeRatesUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetGoalsUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetRecentTransactionsUseCase
+import com.georgeci.moneysurfer.domain.usecase.GetSafeToSpendUseCase
 import com.georgeci.moneysurfer.domain.util.TransactionPeriodWindow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldBeEmpty
@@ -421,6 +427,72 @@ class DashboardViewModelTest : StringSpec({
             .burnRate?.pace shouldBe BurnRatePace.OffPace
     }
 
+    "the dashboard opens on Month with the switch shown over the default layout" {
+        val ws = workspaceId("ws-1")
+        val viewModel = newViewModel(
+            ws = ws,
+            accounts = FakeAccountRepository(listOf(anAccount(id = accountId("a-1"), workspaceId = ws))),
+            transactions = FakeTransactionRepository(emptyList()),
+        )
+
+        val content = viewModel.value.shouldBeInstanceOf<DashboardState.Content>()
+        content.period shouldBe DashboardPeriod.Month
+        content.periodSwitchVisible shouldBe true
+    }
+
+    "picking a period re-picks the budget the headline speaks for" {
+        val ws = workspaceId("ws-1")
+        val viewModel = newViewModel(
+            ws = ws,
+            accounts = FakeAccountRepository(listOf(anAccount(id = accountId("a-1"), workspaceId = ws))),
+            transactions = FakeTransactionRepository(emptyList()),
+            budgets = listOf(
+                aBudget(
+                    id = budgetId("b-weekly"),
+                    workspaceId = ws,
+                    name = "This week",
+                    amount = 200.dollars,
+                    period = BudgetPeriod.WEEKLY,
+                    categoryIds = emptyList(),
+                    startDate = testDate,
+                ),
+                aBudget(
+                    id = budgetId("b-monthly"),
+                    workspaceId = ws,
+                    name = "This month",
+                    amount = 800.dollars,
+                    period = BudgetPeriod.MONTHLY,
+                    categoryIds = emptyList(),
+                    startDate = testDate,
+                ),
+            ),
+        )
+
+        viewModel.value.shouldBeInstanceOf<DashboardState.Content>()
+            .safeToSpend?.budgetName shouldBe "This month"
+
+        viewModel.onEvent(DashboardEvent.OnPeriodChange(DashboardPeriod.Week))
+
+        val content = viewModel.value.shouldBeInstanceOf<DashboardState.Content>()
+        content.period shouldBe DashboardPeriod.Week
+        content.safeToSpend?.budgetName shouldBe "This week"
+    }
+
+    "the period switch stands down when nothing on the layout reads it" {
+        val ws = workspaceId("ws-1")
+        val layout = DashboardWidgetType.entries
+            .filter { it.isPeriodScoped }
+            .fold(DashboardLayoutConfig.DEFAULT) { acc, type -> acc.withWidgetEnabled(type, enabled = false) }
+        val viewModel = newViewModel(
+            ws = ws,
+            accounts = FakeAccountRepository(listOf(anAccount(id = accountId("a-1"), workspaceId = ws))),
+            transactions = FakeTransactionRepository(emptyList()),
+            uiPreferences = FakeUiPreferences(dashboardLayout = layout),
+        )
+
+        viewModel.value.shouldBeInstanceOf<DashboardState.Content>().periodSwitchVisible shouldBe false
+    }
+
     "an unset layout falls back to the default order" {
         val ws = workspaceId("ws-1")
         val viewModel = newViewModel(
@@ -559,6 +631,155 @@ class DashboardViewModelTest : StringSpec({
         content.formattedTotalBalance shouldBe MoneyFormatter.format(100.dollars, USD)
         content.otherCurrencyTotals.shouldBeEmpty()
     }
+
+    "every tap on the root screen maps to its own destination" {
+        val ws = workspaceId("ws-1")
+        val account = anAccount(id = accountId("a-1"), workspaceId = ws)
+        val viewModel = newViewModel(
+            ws = ws,
+            accounts = FakeAccountRepository(listOf(account)),
+            transactions = FakeTransactionRepository(emptyList()),
+        )
+
+        val expected = listOf<Pair<DashboardEvent, DashboardEffect>>(
+            DashboardEvent.OnAccountClick(account.id) to
+                DashboardEffect.NavigateToAccountDetails(account.id),
+            DashboardEvent.OnTransactionClick(transactionId("tx-1")) to
+                DashboardEffect.NavigateToTransactionDetails(transactionId("tx-1")),
+            DashboardEvent.OnAddAccountClick to DashboardEffect.NavigateToAccountCreation,
+            DashboardEvent.OnManageAccountsClick to DashboardEffect.NavigateToAccountsManage,
+            DashboardEvent.OnSeeAllTransactionsClick to DashboardEffect.NavigateToTransactionsList,
+            // The generic "add" has no account context; the per-account one carries it.
+            DashboardEvent.OnAddTransactionClick to
+                DashboardEffect.NavigateToTransactionCreation(accountId = null),
+            DashboardEvent.OnAddTransactionForAccountClick(account.id) to
+                DashboardEffect.NavigateToTransactionCreation(accountId = account.id),
+            DashboardEvent.OnSettingsClick to DashboardEffect.NavigateToSettings,
+            DashboardEvent.OnCustomizeClick to DashboardEffect.NavigateToCustomize,
+            DashboardEvent.OnSeeAllGoalsClick to DashboardEffect.NavigateToGoals,
+            DashboardEvent.OnGoalClick(goalId("g-1")) to
+                DashboardEffect.NavigateToGoalDetails(goalId("g-1")),
+            // The way out of the safe-to-spend widget's empty state.
+            DashboardEvent.OnSetBudgetClick to DashboardEffect.NavigateToBudgetCreation,
+        )
+
+        viewModel.sideEffects.effectFlow.test {
+            expected.forEach { (event, effect) ->
+                viewModel.onEvent(event)
+                awaitItem() shouldBe effect
+            }
+        }
+    }
+
+    "the recent list is capped at five rows" {
+        val ws = workspaceId("ws-1")
+        val account = anAccount(id = accountId("a-1"), workspaceId = ws)
+        val logged = (1..8).map {
+            aTransaction(
+                id = transactionId("tx-$it"),
+                workspaceId = ws,
+                accountId = account.id,
+                type = TransactionType.EXPENSE,
+            )
+        }
+        val viewModel = newViewModel(
+            ws = ws,
+            accounts = FakeAccountRepository(listOf(account)),
+            transactions = FakeTransactionRepository(logged),
+        )
+
+        val content = viewModel.value.shouldBeInstanceOf<DashboardState.Content>()
+        content.transactions.map { it.id } shouldContainExactly (1..5).map { transactionId("tx-$it") }
+    }
+
+    "opening balances are dropped before the cap, not counted against it" {
+        val ws = workspaceId("ws-1")
+        val account = anAccount(id = accountId("a-1"), workspaceId = ws)
+        val openings = (1..3).map {
+            aTransaction(
+                id = transactionId("ob-$it"),
+                workspaceId = ws,
+                accountId = account.id,
+                type = TransactionType.OPENING_BALANCE,
+            )
+        }
+        val expenses = (1..6).map {
+            aTransaction(
+                id = transactionId("tx-$it"),
+                workspaceId = ws,
+                accountId = account.id,
+                type = TransactionType.EXPENSE,
+            )
+        }
+        val viewModel = newViewModel(
+            ws = ws,
+            accounts = FakeAccountRepository(listOf(account)),
+            transactions = FakeTransactionRepository(openings + expenses),
+        )
+
+        // The openings sort first, so capping before filtering would spend three of the five slots
+        // on them and leave only tx-1 and tx-2 on screen.
+        val content = viewModel.value.shouldBeInstanceOf<DashboardState.Content>()
+        content.transactions.map { it.id } shouldContainExactly (1..5).map { transactionId("tx-$it") }
+    }
+
+    "a transaction with no note still has something to render as a title" {
+        val ws = workspaceId("ws-1")
+        val account = anAccount(id = accountId("a-1"), workspaceId = ws)
+        val viewModel = newViewModel(
+            ws = ws,
+            accounts = FakeAccountRepository(listOf(account)),
+            transactions = FakeTransactionRepository(
+                listOf(
+                    aTransaction(
+                        id = transactionId("tx-1"),
+                        workspaceId = ws,
+                        accountId = account.id,
+                        note = "   ",
+                        type = TransactionType.EXPENSE,
+                    ),
+                    aTransaction(
+                        id = transactionId("tx-2"),
+                        workspaceId = ws,
+                        accountId = account.id,
+                        note = "Coffee",
+                        type = TransactionType.INCOME,
+                    ),
+                ),
+            ),
+        )
+
+        val content = viewModel.value.shouldBeInstanceOf<DashboardState.Content>()
+        content.transactions.map { it.title } shouldContainExactly listOf("No description", "Coffee")
+        content.transactions.map { it.isExpense } shouldContainExactly listOf(true, false)
+    }
+
+    "the goals widget shows two rows at most" {
+        val ws = workspaceId("ws-1")
+        val account = anAccount(id = accountId("a-1"), workspaceId = ws)
+        val goals = (1..4).map { aGoal(id = goalId("g-$it"), workspaceId = ws, title = "Goal $it") }
+        val viewModel = newViewModel(
+            ws = ws,
+            accounts = FakeAccountRepository(listOf(account)),
+            transactions = FakeTransactionRepository(emptyList()),
+            goals = FakeSavingsGoalRepository(goals),
+        )
+
+        val content = viewModel.value.shouldBeInstanceOf<DashboardState.Content>()
+        content.goals.map { it.name } shouldContainExactly listOf("Goal 1", "Goal 2")
+    }
+
+    "the offline build carries its flag onto the dashboard" {
+        val ws = workspaceId("ws-1")
+        val viewModel = newViewModel(
+            ws = ws,
+            accounts = FakeAccountRepository(listOf(anAccount(id = accountId("a-1"), workspaceId = ws))),
+            transactions = FakeTransactionRepository(emptyList()),
+            hostCapabilities = FakeHostCapabilities.offline(),
+        )
+
+        viewModel.value.shouldBeInstanceOf<DashboardState.Content>().isOffline shouldBe true
+    }
 })
 
 /** A general budget — no category filter, so every expense in the workspace counts against it. */
@@ -594,6 +815,7 @@ private fun newViewModel(
     uiPreferences: UiPreferences = FakeUiPreferences(),
     baseCurrency: CurrencyCode = USD,
     rates: FakeExchangeRateRepository = FakeExchangeRateRepository(),
+    goals: FakeSavingsGoalRepository = FakeSavingsGoalRepository(),
     hostCapabilities: FakeHostCapabilities = FakeHostCapabilities(isOffline = false),
     budgets: List<Budget> = emptyList(),
     clock: ClockUseCase = ClockUseCase(FixedClock(testInstant)),
@@ -602,15 +824,18 @@ private fun newViewModel(
 ): DashboardViewModel {
     val session = InMemorySessionPointers(currentWorkspaceId = ws)
     val workspaces = FakeGoalWorkspaceRepository(listOf(aWorkspace(id = ws, baseCurrency = baseCurrency)))
+    // One instance for both readers: the headline is a projection of the rows' own progress list.
+    val activeBudgetProgress = GetActiveBudgetProgressUseCase(
+        getBudgets = GetBudgetsUseCase(FakeBudgetRepository(budgets), session),
+        getBudgetProgress = GetBudgetProgressUseCase(transactions, workspaces, clock),
+    )
     return DashboardViewModel(
         getAccounts = GetAccountsUseCase(accounts, session),
         getRecentTransactions = GetRecentTransactionsUseCase(transactions, session),
-        getGoals = GetGoalsUseCase(FakeSavingsGoalRepository(), FakeGoalContributionRepository(), session),
+        getGoals = GetGoalsUseCase(goals, FakeGoalContributionRepository(), session),
         getExchangeRates = GetExchangeRatesUseCase(session, workspaces, rates),
-        getActiveBudgetProgress = GetActiveBudgetProgressUseCase(
-            getBudgets = GetBudgetsUseCase(FakeBudgetRepository(budgets), session),
-            getBudgetProgress = GetBudgetProgressUseCase(transactions, workspaces, clock),
-        ),
+        getSafeToSpend = GetSafeToSpendUseCase(activeBudgetProgress),
+        getActiveBudgetProgress = activeBudgetProgress,
         getBurnRate = GetBurnRateUseCase(
             getDailySpendSeries = GetDailySpendSeriesUseCase(spendAnalytics, workspaces, session, clock),
             getBudgets = GetBudgetsUseCase(FakeBudgetRepository(budgets), session),

@@ -229,6 +229,38 @@ become a *share* of the period (a quarter of it, say) or a per-mode minimum befo
 the switch can reach that widget. #296's own scope does not list Insights, so this
 is a trap for whoever extends it later rather than a blocker for #296 itself.
 
+**Landed (issue #296)**, with the wiring bounded by what Phase 1 has actually shipped:
+
+- `DashboardPeriod` (Week / Month) in `domain/dashboard`, held in a `MutableStateFlow` on
+  `DashboardViewModel` and surfaced as `Content.period`. `window(today)` delegates to
+  `periodWindow`, so it is a closed set of what the dashboard offers rather than a second period
+  type. `AllTime` is unreachable: a spend figure with no window has no pace and no days left.
+- `SurferPeriodSwitch` in `uikit` — a content-width pill track with one raised thumb, kept apart
+  from `SurferSegmentedControl` (a full-width form field that states its selection twice).
+- SafeToSpend is the only widget wired to it. A budget owns its own window, so the period cannot
+  reshape one; it instead re-picks *which* budget speaks: `safeToSpend(preferredPeriod)` prefers a
+  budget on the selected cadence, as a tiebreak inside the general/category tier rather than as a
+  filter across it. The remaining widgets (#287, #288, #290, #294) read `window(today)` into a
+  `SpendScope` when they land — that is what `DashboardWidgetType.isPeriodScoped` is for, and it
+  also decides whether the switch renders at all.
+- **Insights (#295) landed first and is deliberately *not* period-scoped**, exactly per the warning
+  above. It builds its own month-to-date window rather than reading `DashboardPeriod`, so the
+  seven-day guard is never evaluated against a week and nothing here breaks it. That is a decision,
+  not an oversight: `DashboardWidgetType.Insights` says so at the constant. Whoever makes the guard
+  a share of the period is the one who gets to flip it.
+- **BurnRate (#294 / #413) landed during #296's review and is also left unwired**, for a related
+  reason. That card is two spans at once by design — a fixed `BURN_RATE_DAYS` chart of the last
+  week, and a projection of where the *month* lands — so `monthToDate`, `daysAheadInMonth` and
+  `monthlySpendCap` are all month-shaped. Pointing it at `DashboardPeriod` is not passing a window
+  down; it is deciding what the card projects to under Week, which cap judges it, and whether the
+  chart becomes the ISO week rather than a trailing seven days. Those are the widget's own design
+  questions, and answering them inside #296 would have redesigned a widget merged hours earlier.
+  Both remaining flips are the same shape of follow-up: make the span a parameter of the rule, then
+  set `isPeriodScoped`.
+- The `netByMonth` caveat above is untouched and still stands: no dashboard widget reaches
+  `SpendAnalyticsRepository` through a `DashboardPeriod`, so no month-shaped query is reachable
+  from a Week selection today. #287 is where that has to be honoured.
+
 ## Phase 3 — `feature/insights` module
 
 New module `feature/insights` (nothing exists under `feature/` for it today),

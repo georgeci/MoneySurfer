@@ -20,6 +20,14 @@ data class DashboardLayoutConfig(
         get() = items.filterNot { it.enabled }
 
     /**
+     * Whether anything on screen reads [DashboardPeriod]. The period switch is chrome for the
+     * widgets under it, so a layout that shows none of them shows no switch either — a Week/Month
+     * control that visibly changes nothing reads as a broken one.
+     */
+    val hasPeriodScopedWidget: Boolean
+        get() = enabledItems.any { it.type.isPeriodScoped }
+
+    /**
      * [type] switched on or off, keeping the item either way so its card style survives the round
      * trip. Switching on appends the widget after the last enabled one — it joins the bottom of the
      * dashboard, rather than reappearing in a middle slot the user cannot see from the toggle.
