@@ -37,6 +37,13 @@ import org.koin.core.annotation.KoinViewModel
 class TransactionCreationViewModel(
     private val seed: TransactionCreationSeed?,
     private val accountId: AccountId?,
+    /**
+     * Open on the Transfer tab, for a caller that already knows that is what the user asked for.
+     * Read once while loading rather than applied as an event from the screen: a route argument is
+     * true for the whole lifetime of the entry, so replaying it on every composition would undo a
+     * type the user has since changed by hand (after a rotation, say).
+     */
+    private val openAsTransfer: Boolean,
     private val getAccounts: GetAccountsUseCase,
     private val getCategories: GetCategoriesUseCase,
     private val getTransactionById: GetTransactionByIdUseCase,
@@ -177,9 +184,13 @@ class TransactionCreationViewModel(
             val categories = getCategories().first()
             val prefillAccount = accountId?.let { id -> accounts.find { it.id == id } }
 
-            val initialType = TransactionTypeUi.Expense
+            // Same three gates the type switch applies: a seeded screen is an edit or a duplicate
+            // of a single-leg row, and a build with transfers off has no Transfer tab to open on.
+            val openingTransfer = openAsTransfer && seed == null && hostCapabilities.transferEnabled
+            val initialType = if (openingTransfer) TransactionTypeUi.Transfer else TransactionTypeUi.Expense
             val initialCategoryType = initialType.categoryType()
             val initialSelected = pickDefaultCategory(categories, emptyMap(), initialCategoryType)
+            val initialAccount = prefillAccount ?: accounts.firstOrNull()
 
             val baseContent = TransactionCreationState.Content(
                 amount = "",
@@ -187,7 +198,11 @@ class TransactionCreationViewModel(
                 type = initialType,
                 accounts = accounts,
                 categories = categories,
-                selectedAccount = prefillAccount ?: accounts.firstOrNull(),
+                selectedAccount = initialAccount,
+                // Seeded the way [changeType] seeds them, so arriving on the Transfer tab by route
+                // and reaching it by tapping the segment leave the same two slots filled.
+                fromAccount = if (openingTransfer) initialAccount else null,
+                toAccount = if (openingTransfer) accounts.firstOrNull { it.id != initialAccount?.id } else null,
                 selectedCategory = initialSelected,
                 isEditMode = false,
                 editingTransactionId = null,

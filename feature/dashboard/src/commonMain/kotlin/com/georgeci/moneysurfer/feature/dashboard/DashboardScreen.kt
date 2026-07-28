@@ -164,9 +164,8 @@ private val DASHBOARD_WIDGET_MIN_HEIGHT = 180.dp
 /** Bottom scroll inset that keeps the last row clear of the extended "Add transaction" FAB. */
 private val DASHBOARD_FAB_CLEARANCE = 88.dp
 
-/** Button row heights, matching the two sizes `SurferQuickActionsWidget` is drawn at. */
-private val QUICK_ACTIONS_HERO_HEIGHT = 80.dp
-private val QUICK_ACTIONS_COMPACT_HEIGHT = 64.dp
+/** A transfer needs somewhere to send the money, so the quick-actions row waits for a second account. */
+private const val MIN_ACCOUNTS_FOR_TRANSFER = 2
 
 @Composable
 private fun DashboardLoading() {
@@ -314,19 +313,20 @@ private fun BalanceWidget(state: DashboardState.Content, variant: String?) {
  *
  * Stands down entirely rather than offering an action the screen would refuse:
  * - with `transferEnabled` off the creation screen ignores the type switch, so a Transfer button
- *   would silently land on an expense form — and this row is half Transfer button;
- * - with no accounts there is nothing to spend from or move between, which is why the FAB hides on
- *   the same condition. Showing "Add transaction" here would undo that.
+ *   would land on an expense form — and this row is half Transfer button;
+ * - below [MIN_ACCOUNTS_FOR_TRANSFER] there is nothing to move money between. The form would open
+ *   with an empty "To" slot whose picker excludes the only account there is, leaving Save disabled
+ *   with no way to enable it.
  *
- * Nothing is lost either way: the other half of this row is the FAB the screen already shows.
+ * All or nothing, because the widget draws both buttons or neither — and the half worth keeping is
+ * Transfer, since "Add transaction" is the FAB this screen already shows.
  */
 @Composable
 private fun QuickActionsWidget(
     state: DashboardState.Content,
     onEvent: (DashboardEvent) -> Unit,
 ) {
-    if (!state.transferEnabled || state.accounts.isEmpty()) return
-    val hero = LocalSurferWidgetSize.current == SurferWidgetSize.Expanded
+    if (!state.transferEnabled || state.accounts.size < MIN_ACCOUNTS_FOR_TRANSFER) return
     SurferQuickActionsWidget(
         primaryLabel = stringResource(Res.string.dashboard_add_transaction),
         primaryIcon = SurferIcons.Add,
@@ -334,11 +334,12 @@ private fun QuickActionsWidget(
         secondaryLabel = stringResource(Res.string.dashboard_quick_action_transfer),
         secondaryIcon = SurferIcons.SwapHoriz,
         onSecondaryClick = { onEvent(DashboardEvent.OnTransferClick) },
+        // No explicit height: SurferButton pins its own (52dp Biggest, 48dp Regular) and the row is
+        // top-aligned, so a taller box would just hang dead space under the buttons.
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp)
             .padding(vertical = 8.dp)
-            .height(if (hero) QUICK_ACTIONS_HERO_HEIGHT else QUICK_ACTIONS_COMPACT_HEIGHT)
             .testTag(DashboardTestTags.QuickActions),
     )
 }

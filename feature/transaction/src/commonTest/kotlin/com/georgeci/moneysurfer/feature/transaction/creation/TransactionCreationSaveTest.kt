@@ -335,6 +335,47 @@ class TransactionCreationSaveTest : StringSpec({
         }
     }
 
+    "opening as a transfer lands on the Transfer tab with both slots already seeded" {
+        runTest {
+            val fixture = TransactionCreationFixture(ws)
+            val from = anAccount(id = accountId("a-1"), workspaceId = ws)
+            val to = anAccount(id = accountId("a-2"), workspaceId = ws)
+            fixture.accountRepository.insert(from)
+            fixture.accountRepository.insert(to)
+            val vm = fixture.createViewModel(openAsTransfer = true)
+            try {
+                val state = vm.awaitContent()
+
+                state.type shouldBe TransactionTypeUi.Transfer
+                // Seeded like the type switch does it — an unfilled To slot would leave Save
+                // disabled with no obvious reason why.
+                state.fromAccount shouldBe from
+                state.toAccount shouldBe to
+            } finally {
+                vm.viewModelScope.cancel()
+            }
+        }
+    }
+
+    "opening as a transfer is ignored by a build that has no transfers" {
+        runTest {
+            val fixture = TransactionCreationFixture(ws)
+            fixture.accountRepository.insert(anAccount(id = accountId("a-1"), workspaceId = ws))
+            val vm = fixture.createViewModel(
+                openAsTransfer = true,
+                hostCapabilities = FakeHostCapabilities(transferEnabled = false),
+            )
+            try {
+                val state = vm.awaitContent()
+
+                state.type shouldBe TransactionTypeUi.Expense
+                state.isTransfer shouldBe false
+            } finally {
+                vm.viewModelScope.cancel()
+            }
+        }
+    }
+
     "Transfer is reachable when the host enables it" {
         runTest {
             val fixture = TransactionCreationFixture(ws)

@@ -1,7 +1,6 @@
 package com.georgeci.moneysurfer.feature.dashboard.customize
 
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
@@ -99,12 +98,13 @@ private fun BalancePreview(variant: String?, modifier: Modifier) {
 
 /**
  * The buttons are inert here — the tile is a thumbnail, not a second place to log a transaction.
- * Height rather than intrinsic sizing: the row is two buttons, so nothing inside it would make the
- * Compact and Expanded tiles differ in the picker otherwise.
+ *
+ * The two tiles come out nearly the same height, because all this widget's size setting changes is
+ * the button height (52dp against 48dp). That is the honest thumbnail: padding it out to make the
+ * choice look bigger than it is would promise a row the dashboard then does not draw.
  */
 @Composable
 private fun QuickActionsPreview(modifier: Modifier) {
-    val hero = LocalSurferWidgetSize.current == SurferWidgetSize.Expanded
     SurferQuickActionsWidget(
         primaryLabel = stringResource(Res.string.dashboard_add_transaction),
         primaryIcon = SurferIcons.Add,
@@ -112,7 +112,7 @@ private fun QuickActionsPreview(modifier: Modifier) {
         secondaryLabel = stringResource(Res.string.dashboard_quick_action_transfer),
         secondaryIcon = SurferIcons.SwapHoriz,
         onSecondaryClick = {},
-        modifier = modifier.height(if (hero) SAMPLE_ACTIONS_HERO else SAMPLE_ACTIONS_COMPACT),
+        modifier = modifier,
     )
 }
 
@@ -207,8 +207,6 @@ private fun RecentTransactionsPreview(modifier: Modifier) {
     )
 }
 
-private val SAMPLE_ACTIONS_HERO = 80.dp
-private val SAMPLE_ACTIONS_COMPACT = 64.dp
 private const val SAMPLE_CURRENCY = "EUR"
 private const val SAMPLE_TOTAL = "€11,575.32"
 private const val SAMPLE_TREND = "+€412"
