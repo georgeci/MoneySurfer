@@ -12,7 +12,6 @@ import com.georgeci.moneysurfer.domain.primitives.BudgetId
 import com.georgeci.moneysurfer.uikit.widgets.SurferBudgetItem
 import com.georgeci.moneysurfer.uikit.widgets.SurferBudgetsWidget
 import moneysurfer.feature.dashboard.generated.resources.Res
-import moneysurfer.feature.dashboard.generated.resources.dashboard_budgets_bar_a11y
 import moneysurfer.feature.dashboard.generated.resources.dashboard_budgets_empty_subtitle
 import moneysurfer.feature.dashboard.generated.resources.dashboard_budgets_empty_title
 import moneysurfer.feature.dashboard.generated.resources.dashboard_budgets_left
@@ -74,11 +73,6 @@ private fun BudgetSummaryUi.toWidgetItem(): SurferBudgetItem = SurferBudgetItem(
     },
     progress = progress,
     alertFraction = alertFraction,
-    progressContentDescription = stringResource(
-        Res.string.dashboard_budgets_bar_a11y,
-        spentFormatted,
-        limitFormatted,
-    ),
 )
 
 private fun BudgetStatus.labelResource() = when (this) {

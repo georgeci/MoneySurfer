@@ -214,8 +214,12 @@ class DashboardViewModel(
      */
     private fun List<BudgetProgress>.toBudgetsUi(): List<BudgetSummaryUi> =
         sortedWith(compareByDescending<BudgetProgress> { it.spentFraction }.thenBy { it.budget.id.value })
+            // Lazily, so a workspace with thirty budgets formats money for the three rows the card
+            // draws rather than for all thirty on every transaction change.
+            .asSequence()
             .mapNotNull { it.toUiOrNull() }
             .take(DASHBOARD_BUDGETS_LIMIT)
+            .toList()
 
     private fun BudgetProgress.toUiOrNull(): BudgetSummaryUi? {
         val currency = currency ?: return null

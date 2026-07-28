@@ -70,7 +70,6 @@
     <string name="dashboard_budgets_status_ok">В норме</string>
     <string name="dashboard_budgets_status_warn">Близко к лимиту</string>
     <string name="dashboard_budgets_status_over">Превышен</string>
-    <string name="dashboard_budgets_bar_a11y">потрачено %1$s из %2$s</string>
     <string name="dashboard_goals_title">Цели</string>
     <string name="dashboard_goals_see_all">Все</string>
     <string name="dashboard_goals_empty_title">Целей пока нет</string>

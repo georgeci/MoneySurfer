@@ -44,8 +44,6 @@ data class SurferBudgetItem(
     val progress: Float,
     /** Where the budget's alert threshold sits, drawn as the tick the fill is read against. */
     val alertFraction: Float? = null,
-    /** What a screen reader gets for the bar, which otherwise only restates the numbers above it. */
-    val progressContentDescription: String? = null,
 )
 
 /**
@@ -125,9 +123,10 @@ private fun BudgetRow(item: SurferBudgetItem, onClick: (() -> Unit)?) {
                 color = AppTheme.materialColors.onSurface,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.weight(1f, fill = false),
+                // Fills the space the pill leaves rather than half of it, so a long name
+                // ellipsizes only once it genuinely runs out of row.
+                modifier = Modifier.weight(1f),
             )
-            Spacer(Modifier.weight(1f))
             Spacer(Modifier.size(8.dp))
             SurferBudgetStatusPill(label = item.statusLabel, status = item.status)
         }
@@ -150,11 +149,12 @@ private fun BudgetRow(item: SurferBudgetItem, onClick: (() -> Unit)?) {
             )
         }
 
+        // No screen-reader line of its own: the row is one merged node, and the bar is a picture of
+        // the two figures printed right above it — describing it again would read them twice.
         SurferBudgetProgressBar(
             progress = item.progress,
             status = item.status,
             tickFraction = item.alertFraction,
-            contentDescription = item.progressContentDescription,
         )
     }
 }

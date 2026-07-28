@@ -70,7 +70,6 @@
     <string name="dashboard_budgets_status_ok">On track</string>
     <string name="dashboard_budgets_status_warn">Near limit</string>
     <string name="dashboard_budgets_status_over">Over</string>
-    <string name="dashboard_budgets_bar_a11y">%1$s of %2$s spent</string>
     <string name="dashboard_goals_title">Goals</string>
     <string name="dashboard_goals_see_all">See all</string>
     <string name="dashboard_goals_empty_title">No goals yet</string>
