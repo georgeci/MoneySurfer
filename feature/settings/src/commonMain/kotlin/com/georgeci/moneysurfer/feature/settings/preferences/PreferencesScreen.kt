@@ -33,6 +33,7 @@ import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsRow
 import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsSwitch
 import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsValuePill
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
 import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
@@ -129,6 +130,7 @@ fun PreferencesContent(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .surferContentContainer()
                 .padding(top = padding.calculateTopPadding())
                 .verticalScroll(rememberScrollState()),
         ) {

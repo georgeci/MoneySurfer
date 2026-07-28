@@ -36,6 +36,7 @@ import com.georgeci.moneysurfer.uikit.components.budget.SurferBudgetCard
 import com.georgeci.moneysurfer.uikit.components.budget.SurferBudgetCardMetrics
 import com.georgeci.moneysurfer.uikit.components.budget.SurferBudgetCategoryVisual
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
 import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
@@ -126,6 +127,7 @@ private fun BudgetsContent(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
+                    .surferContentContainer()
                     .padding(padding)
                     .padding(horizontal = AppTheme.spacing.large),
                 contentAlignment = Alignment.Center,
@@ -143,6 +145,7 @@ private fun BudgetsContent(
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
+                .surferContentContainer()
                 .padding(top = padding.calculateTopPadding())
                 .testTag(BudgetsTestTags.List),
             contentPadding = PaddingValues(

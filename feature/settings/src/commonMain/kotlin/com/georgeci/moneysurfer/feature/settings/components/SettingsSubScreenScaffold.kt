@@ -21,6 +21,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
+import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 
@@ -57,6 +58,7 @@ internal fun SettingsSubScreenScaffold(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
+                    .surferContentContainer()
                     .padding(top = padding.calculateTopPadding())
                     .verticalScroll(rememberScrollState()),
             ) {

@@ -34,6 +34,7 @@ import com.georgeci.moneysurfer.uikit.components.goal.SurferEmojiPicker
 import com.georgeci.moneysurfer.uikit.components.goal.SurferGoalHueRow
 import com.georgeci.moneysurfer.uikit.components.goal.SurferGoalIcon
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
 import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
 import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
@@ -114,6 +115,7 @@ private fun GoalEditContent(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .surferContentContainer()
                 .padding(padding)
                 .verticalScroll(rememberScrollState())
                 .padding(AppTheme.spacing.default),

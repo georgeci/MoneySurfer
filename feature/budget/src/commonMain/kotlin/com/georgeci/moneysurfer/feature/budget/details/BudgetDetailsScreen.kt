@@ -37,6 +37,7 @@ import com.georgeci.moneysurfer.uikit.components.budget.SurferBudgetRing
 import com.georgeci.moneysurfer.uikit.components.budget.SurferBudgetStatusPill
 import com.georgeci.moneysurfer.uikit.components.budget.SurferStatTile
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
 import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
@@ -123,7 +124,11 @@ private fun BudgetDetailsContent(
     ) { padding ->
         if (state is BudgetDetailsState.Missing) {
             Box(
-                modifier = Modifier.fillMaxSize().padding(padding).padding(AppTheme.spacing.large),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .surferContentContainer()
+                    .padding(padding)
+                    .padding(AppTheme.spacing.large),
                 contentAlignment = Alignment.Center,
             ) {
                 Text(
@@ -141,7 +146,7 @@ private fun BudgetDetailsContent(
         }
 
         LazyColumn(
-            modifier = Modifier.fillMaxSize().padding(top = padding.calculateTopPadding()),
+            modifier = Modifier.fillMaxSize().surferContentContainer().padding(top = padding.calculateTopPadding()),
             contentPadding = PaddingValues(
                 start = AppTheme.spacing.default,
                 end = AppTheme.spacing.default,

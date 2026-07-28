@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.georgeci.moneysurfer.uikit.atom.SurferCard
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
+import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.utils.HandleSideEffect
@@ -92,7 +93,7 @@ private fun LicensesLoading(padding: PaddingValues) {
 @Composable
 private fun LicensesError(padding: PaddingValues) {
     Box(
-        modifier = Modifier.fillMaxSize().padding(padding),
+        modifier = Modifier.fillMaxSize().surferContentContainer().padding(padding),
         contentAlignment = Alignment.Center,
     ) {
         Text(
@@ -112,7 +113,7 @@ private fun LicensesList(
     onEvent: (LicensesEvent) -> Unit,
 ) {
     LazyColumn(
-        modifier = Modifier.fillMaxSize().padding(top = padding.calculateTopPadding()),
+        modifier = Modifier.fillMaxSize().surferContentContainer().padding(top = padding.calculateTopPadding()),
         contentPadding = PaddingValues(
             start = 16.dp,
             end = 16.dp,

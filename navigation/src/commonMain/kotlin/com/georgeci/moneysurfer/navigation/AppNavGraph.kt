@@ -42,10 +42,11 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import androidx.savedstate.serialization.SavedStateConfiguration
-import androidx.window.core.layout.WindowSizeClass.Companion.WIDTH_DP_MEDIUM_LOWER_BOUND
 import com.georgeci.moneysurfer.navigation.util.rememberViewModelStoreNavEntryDecorator
 import com.georgeci.moneysurfer.uikit.components.SurferSplash
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
+import com.georgeci.moneysurfer.uikit.window.SurferWindowSize
+import com.georgeci.moneysurfer.uikit.window.currentSurferWindowSize
 import io.github.irgaly.navigation3.resultstate.rememberNavigationResultNavEntryDecorator
 import kotlinx.coroutines.launch
 import kotlinx.serialization.modules.SerializersModule
@@ -252,9 +253,7 @@ private fun AppNavigationSuite(
 ) {
     val labels = TopLevelDestination.entries.associateWith { stringResource(it.label) }
     val adaptiveInfo = currentWindowAdaptiveInfo()
-    val layoutType = if (
-        adaptiveInfo.windowSizeClass.isWidthAtLeastBreakpoint(WIDTH_DP_MEDIUM_LOWER_BOUND)
-    ) {
+    val layoutType = if (currentSurferWindowSize() >= SurferWindowSize.Medium) {
         NavigationSuiteScaffoldDefaults.calculateFromAdaptiveInfo(adaptiveInfo)
     } else {
         NavigationSuiteType.None

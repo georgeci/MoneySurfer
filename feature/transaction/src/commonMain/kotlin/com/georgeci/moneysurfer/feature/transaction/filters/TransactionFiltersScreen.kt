@@ -27,6 +27,7 @@ import com.georgeci.moneysurfer.feature.transaction.filter.TransactionFilters
 import com.georgeci.moneysurfer.uikit.components.SurferButton
 import com.georgeci.moneysurfer.uikit.components.SurferButtonStyle
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
+import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
 import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
@@ -110,6 +111,7 @@ private fun TransactionFiltersContent(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .surferContentContainer()
                 .padding(padding)
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 16.dp),
@@ -157,7 +159,9 @@ private fun FiltersFooter(
         stringResource(Res.string.transaction_filters_results, state.resultCount)
     }
     Surface(color = AppTheme.materialColors.surface) {
-        Column {
+        // The surface itself bleeds to the window edges; its contents take the same cap as the
+        // form above, so the divider terminates that column instead of overrunning it.
+        Column(modifier = Modifier.surferContentContainer()) {
             HorizontalDivider(color = AppTheme.materialColors.outlineVariant)
             Row(
                 modifier = Modifier

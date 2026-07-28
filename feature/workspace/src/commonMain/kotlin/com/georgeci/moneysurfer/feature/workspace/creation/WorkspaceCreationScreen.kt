@@ -52,6 +52,7 @@ import com.georgeci.moneysurfer.uikit.components.base.SurferSectionLabel
 import com.georgeci.moneysurfer.uikit.components.workspace.SurferInviteRow
 import com.georgeci.moneysurfer.uikit.components.workspace.SurferMemberRow
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
 import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
@@ -199,6 +200,7 @@ private fun WorkspaceCreationContent(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
+                    .surferContentContainer()
                     .padding(top = padding.calculateTopPadding())
                     .verticalScroll(rememberScrollState())
                     .padding(horizontal = 24.dp)

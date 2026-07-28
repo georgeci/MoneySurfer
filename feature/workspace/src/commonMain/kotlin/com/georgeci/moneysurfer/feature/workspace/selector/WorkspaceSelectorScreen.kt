@@ -31,6 +31,7 @@ import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
 import com.georgeci.moneysurfer.uikit.components.workspace.SurferCreateWorkspaceRow
 import com.georgeci.moneysurfer.uikit.components.workspace.SurferWorkspaceRow
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
 import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
@@ -174,6 +175,7 @@ private fun WorkspaceSelectorContent(
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
+                    .surferContentContainer()
                     .padding(top = padding.calculateTopPadding()),
                 verticalArrangement = Arrangement.spacedBy(AppTheme.spacing.small),
                 contentPadding = PaddingValues(
@@ -277,6 +279,9 @@ private fun ConfirmBar(
             .fillMaxWidth()
             .background(AppTheme.materialColors.surface)
             .navigationBarsPadding()
+            // Background and system insets stay full-bleed; only the button takes the content cap,
+            // so it lines up with the list above instead of stretching across the window.
+            .surferContentContainer()
             .padding(horizontal = AppTheme.spacing.default)
             .padding(top = AppTheme.spacing.medium, bottom = AppTheme.spacing.large),
     ) {

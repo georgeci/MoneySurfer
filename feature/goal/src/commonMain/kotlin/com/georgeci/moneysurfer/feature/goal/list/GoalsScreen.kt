@@ -24,6 +24,7 @@ import com.georgeci.moneysurfer.uikit.components.base.SurferAddFab
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
 import com.georgeci.moneysurfer.uikit.components.goal.SurferGoalCard
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
 import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
 import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
@@ -107,7 +108,7 @@ private fun GoalsContent(
         when {
             isLoading -> Box(modifier = Modifier.fillMaxSize().padding(padding))
             goals.isEmpty() -> Box(
-                modifier = Modifier.fillMaxSize().padding(padding),
+                modifier = Modifier.fillMaxSize().surferContentContainer().padding(padding),
                 contentAlignment = Alignment.Center,
             ) {
                 SurferEmptyState(
@@ -131,7 +132,7 @@ private fun GoalsList(
     onEvent: (GoalsEvent) -> Unit,
 ) {
     LazyColumn(
-        modifier = Modifier.fillMaxSize().padding(padding),
+        modifier = Modifier.fillMaxSize().surferContentContainer().padding(padding),
         contentPadding = PaddingValues(
             start = AppTheme.spacing.default,
             end = AppTheme.spacing.default,

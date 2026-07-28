@@ -56,6 +56,7 @@ import com.georgeci.moneysurfer.uikit.components.base.SurferToolbarAction
 import com.georgeci.moneysurfer.uikit.components.transaction.SurferSwipeToDeleteTransaction
 import com.georgeci.moneysurfer.uikit.components.transaction.SurferTransactionLine
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
 import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
@@ -119,6 +120,7 @@ private fun AccountDetailsLoading(onEvent: (AccountDetailsEvent) -> Unit) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .surferContentContainer()
                 .padding(padding)
                 .padding(horizontal = AppTheme.spacing.default, vertical = AppTheme.spacing.medium),
             verticalArrangement = Arrangement.spacedBy(AppTheme.spacing.medium),
@@ -179,6 +181,7 @@ private fun AccountDetailsContent(
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
+                .surferContentContainer()
                 .padding(top = padding.calculateTopPadding()),
             contentPadding = PaddingValues(bottom = padding.calculateBottomPadding()),
         ) {

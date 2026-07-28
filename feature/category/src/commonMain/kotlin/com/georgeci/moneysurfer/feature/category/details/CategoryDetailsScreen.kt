@@ -36,6 +36,7 @@ import com.georgeci.moneysurfer.uikit.components.category.SurferCategoryTrendCar
 import com.georgeci.moneysurfer.uikit.components.transaction.SurferSwipeToDeleteTransaction
 import com.georgeci.moneysurfer.uikit.components.transaction.SurferTransactionLine
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.utils.HandleSideEffect
@@ -130,6 +131,7 @@ private fun CategoryDetailsPlaceholder(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
+                    .surferContentContainer()
                     .padding(padding)
                     .padding(
                         horizontal = AppTheme.spacing.default,
@@ -142,7 +144,7 @@ private fun CategoryDetailsPlaceholder(
                 }
             }
         } else {
-            Box(modifier = Modifier.fillMaxSize().padding(padding)) {
+            Box(modifier = Modifier.fillMaxSize().surferContentContainer().padding(padding)) {
                 SurferDetailPlaceholder(text = message)
             }
         }
@@ -199,6 +201,7 @@ private fun CategoryDetailsContent(
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
+                .surferContentContainer()
                 .padding(top = padding.calculateTopPadding()),
             contentPadding = PaddingValues(
                 start = AppTheme.spacing.default,
