@@ -125,7 +125,7 @@ private fun LicensesList(
             Text(
                 text = stringResource(
                     Res.string.settings_licenses_summary_format,
-                    state.libraries.size,
+                    state.libraries.sumOf { it.artifacts.size },
                 ),
                 style = AppTheme.typography.bodySmall,
                 color = AppTheme.materialColors.onSurfaceVariant,
@@ -185,6 +185,12 @@ private fun LibraryRow(
             }
             AnimatedVisibility(visible = expanded) {
                 Column {
+                    Spacer(Modifier.height(10.dp))
+                    Text(
+                        text = library.artifacts.joinToString(separator = "\n"),
+                        style = AppTheme.typography.bodySmall,
+                        color = colors.onSurfaceVariant,
+                    )
                     library.licenses.forEach { license ->
                         license.content?.let { content ->
                             Spacer(Modifier.height(10.dp))

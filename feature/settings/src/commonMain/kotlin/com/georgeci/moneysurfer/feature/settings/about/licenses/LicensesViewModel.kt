@@ -50,11 +50,19 @@ data class LicensesState(
     val expandedLibraryId: String? = null,
 )
 
+/**
+ * One row of the screen: a library family (all artifacts published under the
+ * same project), not a single Maven coordinate — the raw export lists ~180
+ * artifacts, most of them per-platform slices of a handful of projects.
+ */
 data class OssLibrary(
     val id: String,
     val name: String,
+    /** Shared version of every artifact in the family, or `null` when they differ. */
     val version: String?,
     val author: String?,
+    /** `group:artifact version` for each bundled artifact, shown when the row is expanded. */
+    val artifacts: List<String>,
     val licenses: List<OssLicense>,
 )
 
@@ -72,26 +80,78 @@ sealed interface LicensesEffect {
     data object NavigateBack : LicensesEffect
 }
 
-/** Maps the AboutLibraries export JSON to the screen model. */
+/**
+ * Maps the AboutLibraries export JSON to the screen model, collapsing the flat
+ * artifact list into library families: `androidx.compose.ui:ui-android`,
+ * `androidx.compose.runtime:runtime-android` and their ~20 siblings are one
+ * "Jetpack Compose" row rather than 20 near-identical ones. BOM artifacts are
+ * dropped — they ship no code, only version constraints.
+ */
 internal fun parseOssLibraries(jsonText: String): List<OssLibrary> {
     val export = exportJson.decodeFromString<AboutLibrariesExport>(jsonText)
     return export.libraries
-        .map { library ->
-            OssLibrary(
-                id = library.uniqueId,
-                name = library.name ?: library.uniqueId,
-                version = library.artifactVersion,
-                author = library.organization?.name
-                    ?: library.developers.firstOrNull()?.name,
-                licenses = library.licenses.mapNotNull { licenseId ->
-                    export.licenses[licenseId]?.let { license ->
-                        OssLicense(name = license.name, content = license.content)
-                    }
-                },
-            )
-        }
+        .filterNot { it.artifactId.endsWith(BOM_ARTIFACT_SUFFIX) }
+        .groupBy { familyId(it.groupId) }
+        .map { (familyId, artifacts) -> artifacts.toOssLibrary(familyId, export.licenses) }
         .sortedBy { it.name.lowercase() }
 }
+
+private fun List<ExportedLibrary>.toOssLibrary(
+    familyId: String,
+    licenses: Map<String, ExportedLicense>,
+): OssLibrary = OssLibrary(
+    id = familyId,
+    name = FAMILY_NAMES[familyId] ?: mapNotNull { it.name }.distinct().joinToString().ifEmpty { familyId },
+    version = mapNotNull { it.artifactVersion }.distinct().singleOrNull(),
+    author = flatMap { it.authors }.distinct().joinToString().ifEmpty { null },
+    artifacts = map { library ->
+        listOfNotNull(library.uniqueId, library.artifactVersion).joinToString(" ")
+    }.sorted(),
+    licenses = flatMap { it.licenses }
+        .distinct()
+        .mapNotNull { licenseId ->
+            licenses[licenseId]?.let { license ->
+                OssLicense(name = license.name, content = license.content)
+            }
+        }
+        .sortedBy { it.name },
+)
+
+/**
+ * Display names for the library families, keyed by the Maven group prefix they
+ * cover. Longer prefixes win, so `androidx.compose.*` is Compose and every other
+ * `androidx.*` artifact falls into the shared Jetpack row. Groups missing here
+ * fall back to the names the export itself carries.
+ */
+private val FAMILY_NAMES = mapOf(
+    "androidx.compose" to "Jetpack Compose",
+    "androidx" to "AndroidX (Android Jetpack)",
+    "co.touchlab" to "Kermit & Stately",
+    "com.github.ajalt.colormath" to "Colormath",
+    "com.google.guava" to "Guava ListenableFuture",
+    "com.materialkolor" to "MaterialKolor",
+    "com.squareup.okio" to "Okio",
+    "dev.drewhamilton.poko" to "Poko",
+    "io.arrow-kt" to "Arrow",
+    "io.github.irgaly.navigation3.resultstate" to "Navigation3 ResultState",
+    "io.github.koalaplot" to "KoalaPlot",
+    "io.insert-koin" to "Koin",
+    "org.jetbrains" to "JetBrains Java Annotations",
+    "org.jetbrains.androidx" to "AndroidX for Compose Multiplatform",
+    "org.jetbrains.compose" to "Compose Multiplatform",
+    "org.jetbrains.kotlin" to "Kotlin",
+    "org.jetbrains.kotlinx" to "kotlinx libraries",
+    "org.jetbrains.runtime" to "JetBrains Runtime API",
+    "org.jetbrains.skiko" to "Skiko",
+    "org.jspecify" to "JSpecify",
+)
+
+private val FAMILY_PREFIXES = FAMILY_NAMES.keys.sortedByDescending { it.length }
+
+private const val BOM_ARTIFACT_SUFFIX = "-bom"
+
+private fun familyId(groupId: String): String =
+    FAMILY_PREFIXES.firstOrNull { groupId == it || groupId.startsWith("$it.") } ?: groupId
 
 private val exportJson = Json { ignoreUnknownKeys = true }
 
@@ -110,6 +170,14 @@ private data class ExportedLibrary(
     val organization: ExportedOrganization? = null,
     val licenses: List<String> = emptyList(),
 )
+
+private val ExportedLibrary.groupId: String get() = uniqueId.substringBefore(':')
+
+private val ExportedLibrary.artifactId: String get() = uniqueId.substringAfter(':', missingDelimiterValue = "")
+
+/** Organization first — for AndroidX artifacts it is the only field that is filled in consistently. */
+private val ExportedLibrary.authors: List<String>
+    get() = listOfNotNull(organization?.name).ifEmpty { developers.mapNotNull { it.name } }
 
 @Serializable
 private data class ExportedDeveloper(val name: String? = null)
