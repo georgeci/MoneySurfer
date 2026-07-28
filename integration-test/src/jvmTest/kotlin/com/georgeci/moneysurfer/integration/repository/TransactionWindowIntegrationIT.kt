@@ -11,6 +11,7 @@ import com.georgeci.moneysurfer.domain.preferences.TransactionPeriodMode
 import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
 import com.georgeci.moneysurfer.domain.primitives.Money
+import com.georgeci.moneysurfer.domain.primitives.SplitId
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
 import com.georgeci.moneysurfer.domain.util.TransactionPeriodWindow
 import com.georgeci.moneysurfer.domain.util.periodWindow
@@ -157,6 +158,51 @@ class TransactionWindowIntegrationIT : StringSpec({
     }
 
     /**
+     * `splitLegCount` is a correlated subquery, and the two things it must not do are count a
+     * non-split row (`splitId = NULL` matches nothing in SQL, so the count is 0) and leak across
+     * groups. Both are invisible to a fake repository, which is why they are pinned against real
+     * SQLite: the list decides whether to collapse a group from this number alone.
+     */
+    "the window reports each row's split group size, and zero for rows outside a split" {
+        harness.database.transactionDao().insertAll(
+            listOf(
+                row(id = "leg-a", date = "2025-03-10", splitId = "sp-1"),
+                row(id = "leg-b", date = "2025-03-10", splitId = "sp-1"),
+                row(id = "leg-c", date = "2025-03-10", splitId = "sp-1"),
+                row(id = "other-leg", date = "2025-03-11", splitId = "sp-2"),
+                row(id = "plain", date = "2025-03-12"),
+            ),
+        )
+
+        val counts = stack.transactionRepository
+            .getCategorizedWindow(accountId = ACCOUNT, window = TransactionPeriodWindow.Unbounded, limit = 100)
+            .first()
+            .associate { it.transaction.id.value to it.splitLegCount }
+
+        counts shouldBe mapOf(
+            "leg-a" to 3,
+            "leg-b" to 3,
+            "leg-c" to 3,
+            "other-leg" to 1,
+            "plain" to 0,
+        )
+    }
+
+    "getBySplitId returns only the legs of the requested receipt" {
+        harness.database.transactionDao().insertAll(
+            listOf(
+                row(id = "leg-a", date = "2025-03-10", splitId = "sp-1"),
+                row(id = "leg-b", date = "2025-03-10", splitId = "sp-1"),
+                row(id = "other-leg", date = "2025-03-10", splitId = "sp-2"),
+                row(id = "plain", date = "2025-03-10"),
+            ),
+        )
+
+        stack.transactionRepository.getBySplitId(SplitId("sp-1")).map { it.id.value } shouldBe
+            listOf("leg-a", "leg-b")
+    }
+
+    /**
      * The reason `MIGRATION_27_28` exists: a row whose `operationDate` was never written compares
      * false against every bound, so it would silently vanish from every date window. Simulated
      * here by writing the empty column value the old schema left behind.
@@ -218,6 +264,7 @@ private fun row(
     amount: Long = -10_00L,
     type: String = "EXPENSE",
     currency: String = "USD",
+    splitId: String? = null,
 ) = TransactionEntity(
     id = id,
     workspaceId = WORKSPACE_ID_VALUE,
@@ -232,4 +279,5 @@ private fun row(
     type = type,
     createdAt = FIXTURE_TIME,
     updatedAt = FIXTURE_TIME,
+    splitId = splitId,
 )

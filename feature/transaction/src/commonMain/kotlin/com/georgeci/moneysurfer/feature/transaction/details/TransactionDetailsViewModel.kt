@@ -3,14 +3,17 @@ package com.georgeci.moneysurfer.feature.transaction.details
 import arrow.optics.optics
 import com.georgeci.moneysurfer.domain.formatter.MoneyFormatter
 import com.georgeci.moneysurfer.domain.model.Account
+import com.georgeci.moneysurfer.domain.model.Category
 import com.georgeci.moneysurfer.domain.model.CategoryAppearance
 import com.georgeci.moneysurfer.domain.model.Transaction
 import com.georgeci.moneysurfer.domain.model.reference
+import com.georgeci.moneysurfer.domain.primitives.Money
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.domain.primitives.TransactionStatus
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
 import com.georgeci.moneysurfer.domain.usecase.GetAccountByIdUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetCategoriesUseCase
+import com.georgeci.moneysurfer.domain.usecase.GetSplitLegsUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetTransactionByIdUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetTransferCounterpartUseCase
 import com.georgeci.moneysurfer.navigation.DeleteTransactionWithUndo
@@ -30,6 +33,7 @@ class TransactionDetailsViewModel(
     private val getAccountById: GetAccountByIdUseCase,
     private val getCategories: GetCategoriesUseCase,
     private val getTransferCounterpart: GetTransferCounterpartUseCase,
+    private val getSplitLegs: GetSplitLegsUseCase,
     private val deleteWithUndo: DeleteTransactionWithUndo,
 ) : MviViewModel<TransactionDetailsState, TransactionDetailsEvent, TransactionDetailsEffect>(
     initialState = TransactionDetailsState.Loading(transactionId),
@@ -68,6 +72,7 @@ class TransactionDetailsViewModel(
             val category = categories.find { it.id == transaction.categoryId }
             val parentCategory = category?.parentId?.let { parentId -> categories.find { it.id == parentId } }
             val transfer = resolveTransferLeg(transaction, account)
+            val split = resolveSplit(transaction, categories)
 
             updateState {
                 TransactionDetailsState.Content(
@@ -75,6 +80,7 @@ class TransactionDetailsViewModel(
                     formattedAmount = formatAmount(transaction, isTransfer = transfer != null),
                     type = transaction.type,
                     transfer = transfer,
+                    split = split,
                     note = transaction.note,
                     merchant = transaction.merchant,
                     accountName = account?.name.orEmpty(),
@@ -115,6 +121,32 @@ class TransactionDetailsViewModel(
     }
 
     /**
+     * The receipt [transaction] is one leg of, or null when it is an ordinary single-category row.
+     *
+     * A group of one is treated as no split at all: a leg can reach this device from sync or a CSV
+     * import before (or without) its siblings, and there is nothing to break down until they land.
+     */
+    private suspend fun resolveSplit(
+        transaction: Transaction,
+        categories: List<Category>,
+    ): SplitBreakdown? {
+        val legs = getSplitLegs(transaction)
+        if (legs.size < MIN_SPLIT_LEGS) return null
+        val total = legs.fold(Money.zero()) { acc, leg -> acc + leg.money.abs() }
+        return SplitBreakdown(
+            formattedTotal = MoneyFormatter.format(total, transaction.currencyCode),
+            legs = legs.map { leg ->
+                SplitLegUi(
+                    transactionId = leg.id,
+                    categoryName = categories.find { it.id == leg.categoryId }?.name.orEmpty(),
+                    formattedAmount = MoneyFormatter.format(leg.money.abs(), leg.currencyCode),
+                    isCurrent = leg.id == transaction.id,
+                )
+            },
+        )
+    }
+
+    /**
      * Transfers stay unsigned — money moved sideways, it neither arrived nor left. Only the
      * income/expense variants carry a sign, matching the transaction list.
      */
@@ -144,7 +176,32 @@ class TransactionDetailsViewModel(
             postSideEffect(TransactionDetailsEffect.NavigateBack)
         }
     }
+
+    private companion object {
+        /** Below this a group is not a split — see [resolveSplit]. */
+        const val MIN_SPLIT_LEGS = 2
+    }
 }
+
+/**
+ * The legs one receipt was split across, as the details screen draws them under the amount.
+ *
+ * Present only when the group really has several legs; [SplitLegUi.isCurrent] marks the one the
+ * screen was opened on, so the reader can see which slice of the receipt they navigated to.
+ */
+data class SplitBreakdown(
+    val formattedTotal: String,
+    val legs: List<SplitLegUi>,
+)
+
+/** One leg of a split: where it was filed, how much of the receipt it took. */
+data class SplitLegUi(
+    val transactionId: TransactionId,
+    /** Blank when the leg is uncategorized — the screen substitutes its own label. */
+    val categoryName: String,
+    val formattedAmount: String,
+    val isCurrent: Boolean,
+)
 
 /**
  * The two accounts a transfer moves money between, already oriented for display: [fromAccountName]
@@ -176,6 +233,8 @@ sealed interface TransactionDetailsState {
         val type: TransactionType,
         /** Non-null when this transaction is one leg of a transfer. */
         val transfer: TransferLeg? = null,
+        /** Non-null when this transaction is one leg of a receipt split across categories. */
+        val split: SplitBreakdown? = null,
         val note: String,
         val merchant: String = "",
         val accountName: String,
@@ -199,12 +258,16 @@ sealed interface TransactionDetailsState {
 
         val isIncome: Boolean get() = !isTransfer && type == TransactionType.INCOME
 
+        val isSplit: Boolean get() = split != null
+
         /**
-         * Duplicating one leg of a transfer would produce a half-transfer, and an opening balance
-         * is an account artefact rather than something a user re-enters — neither offers the action.
+         * Duplicating one leg of a transfer would produce a half-transfer, duplicating one leg of a
+         * split would produce a fragment of a receipt with no group to belong to, and an opening
+         * balance is an account artefact rather than something a user re-enters — none of the three
+         * offers the action.
          */
         val canDuplicate: Boolean
-            get() = !isTransfer && type != TransactionType.OPENING_BALANCE
+            get() = !isTransfer && !isSplit && type != TransactionType.OPENING_BALANCE
 
         companion object
     }

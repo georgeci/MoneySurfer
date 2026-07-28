@@ -10,7 +10,7 @@ import com.georgeci.moneysurfer.domain.model.ConvertedTotal
 import com.georgeci.moneysurfer.domain.model.ExchangeRateSnapshot
 import com.georgeci.moneysurfer.domain.model.SafeToSpend
 import com.georgeci.moneysurfer.domain.model.SavingsGoalSummary
-import com.georgeci.moneysurfer.domain.model.Transaction
+import com.georgeci.moneysurfer.domain.model.TransactionSplitGroup
 import com.georgeci.moneysurfer.domain.preferences.UiPreferences
 import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.GoalId
@@ -107,7 +107,7 @@ class DashboardViewModel(
                 DashboardState.Content(
                     accounts = accounts.map { it.toUi() },
                     transactions = transactions
-                        .filter { it.type != TransactionType.OPENING_BALANCE }
+                        .filter { it.primary.type != TransactionType.OPENING_BALANCE }
                         .take(RECENT_TRANSACTIONS_LIMIT)
                         .map { it.toUi() },
                     formattedTotalBalance = balance?.headline,
@@ -195,12 +195,17 @@ class DashboardViewModel(
         progress = progress.percent.toFloat(),
     )
 
-    private fun Transaction.toUi() = TransactionUi(
-        id = id,
-        title = note.ifBlank { "No description" },
-        formattedAmount = MoneyFormatter.format(money.abs(), currencyCode),
-        isExpense = type == TransactionType.EXPENSE,
-        categoryHueSeed = categoryId?.value.orEmpty(),
+    /**
+     * One receipt as the widget draws it. A split shows the whole payment and how many categories
+     * it covers — its legs are separate rows only where a category is what the screen is about.
+     */
+    private fun TransactionSplitGroup.toUi() = TransactionUi(
+        id = primary.id,
+        title = primary.note.ifBlank { "No description" },
+        formattedAmount = MoneyFormatter.format(total, primary.currencyCode),
+        isExpense = primary.type == TransactionType.EXPENSE,
+        categoryHueSeed = primary.categoryId?.value.orEmpty(),
+        splitCategoryCount = if (isSplit) categoryCount else 0,
     )
 }
 
@@ -310,6 +315,12 @@ data class TransactionUi(
     val formattedAmount: String,
     val isExpense: Boolean,
     val categoryHueSeed: String,
+    /**
+     * How many categories a collapsed split covers, or `0` for an ordinary transaction. Non-zero
+     * makes [formattedAmount] the whole receipt and gives the row its "N categories" meta line;
+     * [id] is the leg tapping it opens.
+     */
+    val splitCategoryCount: Int = 0,
 )
 
 sealed interface DashboardEvent {

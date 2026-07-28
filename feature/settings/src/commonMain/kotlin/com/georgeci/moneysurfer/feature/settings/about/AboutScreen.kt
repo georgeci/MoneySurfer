@@ -31,7 +31,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
+import com.georgeci.moneysurfer.uikit.components.base.SurferPaneTopBar
 import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsChevron
 import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsGroup
 import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsRow
@@ -107,7 +107,7 @@ private fun AboutContent(
             .surferTestTagAsId(),
         containerColor = AppTheme.materialColors.surface,
         topBar = {
-            SurferToolbar(
+            SurferPaneTopBar(
                 title = stringResource(Res.string.settings_about_title),
                 onBack = { onEvent(AboutEvent.OnBackClick) },
                 colors = TopAppBarDefaults.topAppBarColors(

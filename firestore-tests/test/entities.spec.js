@@ -568,4 +568,31 @@ describe('entity write-shape validation (issue #156)', () => {
       ),
     );
   });
+
+  it('accepts a transaction carrying a splitId', async () => {
+    await assertSucceeds(
+      setDoc(
+        doc(asMember(), `workspaces/${WID}/transactions/tx-split-leg`),
+        transactionDoc({ splitId: 'split-1' }),
+      ),
+    );
+  });
+
+  it('accepts a null splitId', async () => {
+    await assertSucceeds(
+      setDoc(
+        doc(asMember(), `workspaces/${WID}/transactions/tx-not-split`),
+        transactionDoc({ splitId: null }),
+      ),
+    );
+  });
+
+  it('rejects a non-string transaction splitId', async () => {
+    await assertFails(
+      setDoc(
+        doc(asMember(), `workspaces/${WID}/transactions/tx-bad-split`),
+        transactionDoc({ splitId: 3 }),
+      ),
+    );
+  });
 });

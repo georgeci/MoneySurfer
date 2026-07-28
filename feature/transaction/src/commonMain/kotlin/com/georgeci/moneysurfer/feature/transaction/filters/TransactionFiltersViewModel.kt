@@ -17,6 +17,7 @@ import com.georgeci.moneysurfer.feature.transaction.filter.TransactionSort
 import com.georgeci.moneysurfer.feature.transaction.filter.TransactionTypeFilter
 import com.georgeci.moneysurfer.feature.transaction.filter.compile
 import com.georgeci.moneysurfer.feature.transaction.filter.resolveWindow
+import com.georgeci.moneysurfer.feature.transaction.list.collapseSplitLegs
 import com.georgeci.moneysurfer.utils.MviViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -159,7 +160,10 @@ class TransactionFiltersViewModel(
                     val window = resolveWindow(filters.dateRange, periodMode, anchor, today)
                     val matcher = filters.compile()
                     getTransactionsByAccount.window(accountId, window, COUNT_LIMIT + 1)
-                        .map { rows -> rows.count { matcher.matches(it) } }
+                        // Matched *then* collapsed, the same two steps in the same order the list
+                        // applies: the button promises how many rows the user is about to see, and
+                        // a receipt split across three categories is one of them, not three.
+                        .map { rows -> collapseSplitLegs(rows.filter { matcher.matches(it) }).size }
                 }
 
             combine(draft, counted, getAccounts(), getCategories()) { filters, count, accounts, categories ->

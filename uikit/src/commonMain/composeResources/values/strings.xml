@@ -31,6 +31,9 @@
     <string name="uikit_transaction_delete_message_generic">This transaction will be removed. You can undo this right after.</string>
     <string name="uikit_transaction_delete_title">Delete transaction?</string>
     <!-- A transfer is two rows, so its wording says both sides go — see DeleteTransactionUseCase. -->
+    <string name="uikit_transaction_delete_split_message">“%1$s” will be removed, with every category it was split across. You can undo this right after.</string>
+    <string name="uikit_transaction_delete_split_message_generic">This receipt will be removed, with every category it was split across. You can undo this right after.</string>
+    <string name="uikit_transaction_delete_split_title">Delete split transaction?</string>
     <string name="uikit_transaction_delete_transfer_message">“%1$s” will be removed from both accounts. You can undo this right after.</string>
     <string name="uikit_transaction_delete_transfer_message_generic">This transfer will be removed from both accounts. You can undo this right after.</string>
     <string name="uikit_transaction_delete_transfer_title">Delete transfer?</string>

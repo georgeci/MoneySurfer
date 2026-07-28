@@ -49,6 +49,8 @@
     <string name="dashboard_recent_see_all">See all</string>
     <string name="dashboard_recent_empty_title">No activity yet</string>
     <string name="dashboard_recent_empty_subtitle">Transactions you log will show up here.</string>
+    <!-- Meta line of a collapsed split row: how many categories the receipt covers -->
+    <string name="dashboard_recent_split_categories">%1$d categories</string>
     <string name="dashboard_safe_to_spend_title">Safe to spend</string>
     <string name="dashboard_safe_to_spend_caption">of %1$s · %2$s</string>
     <string name="dashboard_safe_to_spend_over_caption">over %1$s · %2$s</string>

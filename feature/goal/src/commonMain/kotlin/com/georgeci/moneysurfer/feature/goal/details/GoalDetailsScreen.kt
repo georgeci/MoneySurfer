@@ -17,7 +17,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -35,7 +34,7 @@ import com.georgeci.moneysurfer.feature.goal.formatGoalDate
 import com.georgeci.moneysurfer.feature.goal.labelRes
 import com.georgeci.moneysurfer.feature.goal.toUi
 import com.georgeci.moneysurfer.navigation.GoalContributionMode
-import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
+import com.georgeci.moneysurfer.uikit.components.base.SurferPaneScaffold
 import com.georgeci.moneysurfer.uikit.components.goal.SurferGoalContributionRow
 import com.georgeci.moneysurfer.uikit.components.goal.SurferGoalIcon
 import com.georgeci.moneysurfer.uikit.components.goal.SurferGoalProgressRing
@@ -43,7 +42,6 @@ import com.georgeci.moneysurfer.uikit.components.goal.SurferGoalStatusPill
 import com.georgeci.moneysurfer.uikit.components.goal.goalAccentColor
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
-import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
 import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
 import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
@@ -113,30 +111,24 @@ private fun GoalDetailsScaffold(
     content: GoalDetailsContent?,
     onEvent: (GoalDetailsEvent) -> Unit,
 ) {
-    Scaffold(
+    SurferPaneScaffold(
+        title = content?.title.orEmpty(),
         modifier = Modifier
-            .surferSafeInsets()
             .testTag(GoalDetailsTestTags.Root)
             .surferTestTagAsId(),
-        containerColor = AppTheme.materialColors.surface,
-        topBar = {
-            SurferToolbar(
-                title = content?.title.orEmpty(),
-                onBack = { onEvent(GoalDetailsEvent.OnBackClick) },
-                actions = {
-                    IconButton(onClick = { onEvent(GoalDetailsEvent.OnActionsClick) }) {
-                        Icon(
-                            imageVector = SurferIcons.MoreVert,
-                            contentDescription = stringResource(Res.string.goal_details_actions),
-                        )
-                    }
-                },
-            )
+        onBack = { onEvent(GoalDetailsEvent.OnBackClick) },
+        actions = {
+            IconButton(onClick = { onEvent(GoalDetailsEvent.OnActionsClick) }) {
+                Icon(
+                    imageVector = SurferIcons.MoreVert,
+                    contentDescription = stringResource(Res.string.goal_details_actions),
+                )
+            }
         },
     ) { padding ->
         if (content == null) {
             Box(modifier = Modifier.fillMaxSize().padding(padding))
-            return@Scaffold
+            return@SurferPaneScaffold
         }
         GoalDetailsBody(content = content, padding = padding, onEvent = onEvent)
 

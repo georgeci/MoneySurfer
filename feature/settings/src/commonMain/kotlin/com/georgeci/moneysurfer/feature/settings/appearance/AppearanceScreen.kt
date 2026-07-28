@@ -36,7 +36,7 @@ import com.georgeci.moneysurfer.domain.preferences.ContainerStyle
 import com.georgeci.moneysurfer.domain.preferences.PaletteSource
 import com.georgeci.moneysurfer.domain.preferences.ThemeMode
 import com.georgeci.moneysurfer.uikit.atom.SurferCard
-import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
+import com.georgeci.moneysurfer.uikit.components.base.SurferPaneTopBar
 import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsGroup
 import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsRadio
 import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsRow
@@ -148,7 +148,7 @@ private fun AppearanceContent(
             .surferTestTagAsId(),
         containerColor = AppTheme.materialColors.surface,
         topBar = {
-            SurferToolbar(
+            SurferPaneTopBar(
                 title = stringResource(Res.string.settings_appearance_title),
                 onBack = onNavigateBack,
                 colors = TopAppBarDefaults.topAppBarColors(
