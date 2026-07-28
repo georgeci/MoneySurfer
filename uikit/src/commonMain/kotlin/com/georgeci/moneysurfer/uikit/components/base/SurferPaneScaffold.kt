@@ -1,5 +1,6 @@
 package com.georgeci.moneysurfer.uikit.components.base
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarColors
@@ -65,6 +67,7 @@ data class SurferPaneAction(
  *   which shows it only while [SurferPane.hasPaneBackStack] says popping still lands inside the
  *   pane.
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SurferPaneScaffold(
     title: String,
@@ -83,6 +86,9 @@ fun SurferPaneScaffold(
             SurferPaneTopBar(
                 title = title,
                 onBack = onBack,
+                // The detail pane's header is content, not a bar, so it has to sit on the same
+                // colour the scaffold paints behind it.
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = containerColor),
                 actions = {
                     actions()
                     // The FAB slot is the list pane's; a detail pane keeps the action as a button.
@@ -134,6 +140,7 @@ fun SurferPaneTopBar(
             title = title,
             modifier = modifier,
             onBack = onBack.takeIf { pane.showsBackNavigation },
+            colors = colors,
             actions = actions,
         )
     }
@@ -156,17 +163,26 @@ private fun SurferPaneHeaderAction(action: SurferPaneAction) {
  * Deliberately not a `TopAppBar` — the whole point at Expanded width is that the section has one
  * top app bar, drawn by the list pane. This is part of the detail pane's content, so it also skips
  * the sync badge [SurferToolbar] adds.
+ *
+ * It still takes [TopAppBarColors] and honours the container, title, navigation-icon and
+ * action-icon roles, so a screen that colours its chrome gets the same treatment whichever pane it
+ * lands in — the scroll-dependent roles are the only ones with nothing to map onto. The defaults
+ * resolve to the same `surface` / `onSurface` pair the toolbar uses, so the branches match out of
+ * the box.
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SurferPaneHeader(
     title: String,
     modifier: Modifier = Modifier,
     onBack: (() -> Unit)? = null,
+    colors: TopAppBarColors = TopAppBarDefaults.topAppBarColors(),
     actions: @Composable RowScope.() -> Unit = {},
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth()
+            .background(colors.containerColor)
             .heightIn(min = PaneHeaderMinHeight)
             .padding(start = if (onBack == null) TitleInset else IconInset, end = IconInset),
         verticalAlignment = Alignment.CenterVertically,
@@ -176,18 +192,21 @@ fun SurferPaneHeader(
                 Icon(
                     imageVector = SurferIcons.Back,
                     contentDescription = stringResource(Res.string.uikit_back),
+                    tint = colors.navigationIconContentColor,
                 )
             }
         }
         Text(
             text = title,
             style = AppTheme.typography.titleLarge,
-            color = AppTheme.materialColors.onSurface,
+            color = colors.titleContentColor,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier.weight(1f),
         )
-        actions()
+        CompositionLocalProvider(LocalContentColor provides colors.actionIconContentColor) {
+            actions()
+        }
     }
 }
 

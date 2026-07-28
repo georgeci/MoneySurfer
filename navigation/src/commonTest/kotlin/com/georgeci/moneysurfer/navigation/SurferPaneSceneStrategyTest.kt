@@ -35,8 +35,24 @@ class SurferPaneSceneStrategyTest : StringSpec({
             detailEntry("licenses"),
         ).calculateSurferPanes()
 
-        panes["about"] shouldBe SurferPane(role = SurferPaneRole.Detail, hasPaneBackStack = false)
+        // Only `licenses` composes — popping it lands back on `about` rather than on the
+        // placeholder, so the arrow it draws goes somewhere.
         panes["licenses"] shouldBe SurferPane(role = SurferPaneRole.Detail, hasPaneBackStack = true)
+    }
+
+    "a list pushed on top of a detail leaves that detail its back affordance" {
+        // Accounts' "See all" pushes the transactions list from the account detail, so the detail
+        // pane ends up beside a list that is not its own and must stay dismissable.
+        val panes = listOf(
+            listEntry("accounts"),
+            detailEntry("account-1"),
+            listEntry("transactions"),
+        ).calculateSurferPanes()
+
+        panes["account-1"] shouldBe SurferPane(
+            role = SurferPaneRole.Detail,
+            hasPaneBackStack = true,
+        )
     }
 
     "a detail with no list beside it stays a full screen" {

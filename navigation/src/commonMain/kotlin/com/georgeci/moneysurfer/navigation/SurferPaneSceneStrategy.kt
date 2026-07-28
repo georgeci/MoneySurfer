@@ -104,12 +104,18 @@ internal fun <T : Any> List<NavEntry<T>>.calculateSurferPanes(): Map<Any, Surfer
     val group = takeLastWhile { it.declaredPaneRole() != null }
     if (group.none { it.declaredPaneRole() == SurferPaneRole.List }) return emptyMap()
     var detailSeen = false
-    return group.associate { entry ->
+    return group.mapIndexed { index, entry ->
         val role = requireNotNull(entry.declaredPaneRole())
-        val pane = SurferPane(role = role, hasPaneBackStack = detailSeen)
+        // Only a detail pane ever gives up its back affordance, and only when popping would do
+        // nothing but swap it for the placeholder. It keeps one if there is an earlier detail to
+        // return to, or *any* entry stacked above it — a list route can be pushed from a detail
+        // (Accounts' "See all" pushes the transactions list), which leaves the detail displayed
+        // beside a list that is not its own, and that still needs a way out.
+        val hasBackStack =
+            role == SurferPaneRole.Detail && (detailSeen || index < group.lastIndex)
         if (role == SurferPaneRole.Detail) detailSeen = true
-        entry.contentKey to pane
-    }
+        entry.contentKey to SurferPane(role = role, hasPaneBackStack = hasBackStack)
+    }.toMap()
 }
 
 private fun NavEntry<*>.declaredPaneRole(): SurferPaneRole? =

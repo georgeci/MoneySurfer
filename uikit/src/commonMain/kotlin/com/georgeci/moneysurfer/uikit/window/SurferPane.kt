@@ -31,10 +31,12 @@ enum class SurferPaneRole {
  * `SurferPaneSceneStrategy` in `:navigation` for where the value comes from.
  *
  * @param role which pane the screen occupies.
- * @param hasPaneBackStack whether an earlier entry of the same pane is still on the back stack, so
- *   popping this screen lands on a sibling inside the pane rather than on the detail placeholder.
- *   A settings sub-screen that opened another sub-screen (About → Licenses) needs its back
- *   affordance even though it is a detail pane; one opened straight from the list does not.
+ * @param hasPaneBackStack whether a back affordance on this screen still leads somewhere inside
+ *   the two-pane layout rather than merely swapping the detail pane for its placeholder — either
+ *   an earlier entry of the same pane to return to (a settings sub-screen that opened another,
+ *   About → Licenses) or an entry stacked above this one (a list route pushed from a detail, which
+ *   leaves the detail beside a list that is not its own). A detail opened straight from its list
+ *   has neither, and is the one case that drops the affordance.
  */
 @Immutable
 data class SurferPane(
