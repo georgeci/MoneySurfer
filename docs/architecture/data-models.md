@@ -18,6 +18,7 @@
   - [workspaces/{wid}/budgets/{bid} — Budget](#workspaceswidbudgetsbid--budget)
   - [workspaces/{wid}/recurringRules/{rid} — RecurringRule](#workspaceswidrecurringrulesrid--recurringrule)
   - [exchangerates — local-only FX cache](#exchangerates--local-only-fx-cache)
+  - [users/{uid}/config/{key} — synced setting](#usersuidconfigkey--synced-setting)
 - [Sync metadata fields](#sync-metadata-fields)
 - [Mappers](#mappers)
 <!-- DOCS:END -->
@@ -178,9 +179,15 @@ Field name unified: was `addedAt` in Firestore; now `createdAt` everywhere.
 | `currencyCode` | `CurrencyCode` | `String` (col `currency`) | `String` (col `currency`) |
 | `balance` | `Money` | `Long` (minor units) | `Long` |
 | `extraDetails` | `List<AccountExtraDetail>` | `String` (JSON array of `{key,value}`) | `List<Map>` |
+| `sortOrder` | `Int` | `Int` | `Int` |
 | `updatedAt` | `Instant` | `Long` | `Long` |
 | `deletedAt` | — | — | `Long?` |
 | `clientVersionCode` | — | — | `Int` |
+
+`sortOrder` is the position the user dragged the account to on the manage screen, ascending, and
+every read orders by it with `name` as the tiebreak. `AccountRepository.reorder` is the only writer
+— creation appends, and a reorder writes (and syncs) just the rows whose position changed. DB v33
+backfills it from insertion order so an upgrade does not silently re-sort anyone's list.
 
 `extraDetails` is an open key–value list, not a fixed set of columns: the creation screen offers
 six well-known keys (`IBAN`, `DESCRIPTION`, `BIC`, `CARD_LAST4`, `BANK_URL`, `BRANCH_PHONE`) plus a
@@ -231,6 +238,7 @@ live in `AccountExtraDetails.normalize` and are applied on every write, local or
 | `createdAt` | `Instant` | `Long` | `Long` |
 | `updatedAt` | `Instant` | `Long` | `Long` |
 | `transferId` | `TransferId?` | `String?` | `String?` |
+| `splitId` | `SplitId?` | `String?` (indexed) | `String?` |
 | `recurringRuleId` | `RecurringRuleId?` | `String?` | `String?` |
 | `deletedAt` | — | — | `Long?` |
 | `clientVersionCode` | — | — | `Int` |
@@ -257,6 +265,34 @@ Detail fields (issue #260):
   `TransactionReference.kt`. It is a display label, not a key. A
   bank-supplied reference surviving a statement import would be a separate,
   stored field.
+Split across categories (issue #399):
+
+- `splitId` — the shared id of the sibling rows one receipt was split across
+  (groceries + household chemicals in one supermarket payment), mirroring how
+  `transferId` groups the two legs of a transfer. A split is **N transactions**,
+  not one transaction with N allocations: sync is per-entity LWW with
+  tombstones, and a parent doc plus child allocation docs pulled independently
+  cannot be kept consistent, while a leg is self-contained and LWW is already
+  correct for it. Every category analytic — budgets, monthly totals, spend
+  history, the category filter, CSV — therefore keeps working unchanged on the
+  legs, and only the surfaces that show one line per payment (transaction list,
+  recent-activity widget, search) collapse a group back into one row.
+- The legs of a group share account, currency, business date, moment and type,
+  and differ only in category and amount. `CreateSplitTransactionUseCase`
+  establishes that; `UpdateTransactionUseCase` re-establishes it by propagating
+  those fields to the siblings when a single leg is edited through the ordinary
+  edit path. `DeleteTransactionUseCase` removes a group whole, as it does a
+  transfer.
+- Indexed, unlike `transferId`: the list window query counts a row's group size
+  per row (`splitLegCount`, not a stored column) so it can tell a group it holds
+  in full from one the paging limit or a filter cut in half — only the former
+  collapses. Deriving the count instead of storing it is what keeps it from
+  drifting under LWW.
+- A **transaction count** stops meaning a receipt count: a subtree swallowing
+  two legs of one receipt reports both. Money totals are unaffected, and
+  per-leaf-category counts stay right. Accepted as the defined semantics — see
+  `docs/plans/split-transaction-across-categories.md`.
+
 - Receipt attachments are **out of scope** for this model. Attachment storage
   is its own epic (blob storage, quotas, offline cache); no boolean stands in
   for it here.
@@ -319,6 +355,44 @@ workspace base currency.
 | `rate` | `Double` (units of `currency` per 1 `baseCurrency`) | `Double` | — |
 | `asOf` | `Instant` (provider publication time) | `Long` | — |
 | `fetchedAt` | — *(policy only)* | `Long` | — |
+
+### `users/{uid}/config/{key}` — synced setting
+
+The one collection that hangs off the *user* document rather than a workspace,
+and the one entity whose Room and Firestore shapes deliberately differ. One
+document per configuration key, **doc id = the key name** (`ui.theme_mode`), so
+there is no `key` field on the wire. Per-key documents are what buy per-key LWW
+from the shared resolver: two devices changing different settings touch
+different documents and both survive.
+
+Only `SettingKey`s declared `sync = true` live here. `sync = false` keys stay in
+DataStore, device-scoped and never wiped — `ui.onboarding_completed` (replicating
+it would replay onboarding), `ui.dashboard_layout` (a phone layout is wrong on a
+tablet) and `sync.user_enabled` (it gates its own replication, so `false` could
+never reach the server and a logout would silently default it back to `true`).
+
+There is no domain type: callers hold a `Pref<T>` from `Config.handle(key)` and
+never see the storage at all. `value` is always a string because that is what
+`ConfigCodec` emits, which is also what keeps the write-shape rule trivial.
+
+| Field | Domain | Room (`config_entry`) | Firestore |
+|---|---|---|---|
+| `key` | — *(the `ConfigKey.name`)* | PK `key: String` | doc id |
+| `value` | — *(codec-encoded `T`)* | `String` | `String` (≤ 1024 chars, rule-enforced) |
+| `updatedAt` | — | `Long` | `Long` |
+| `lastPushedAt` | — | `Long?` | — *(local only)* |
+| `clientVersionCode` | — | — | `Int` |
+
+`lastPushedAt` is the local-only column and the reason this table is Room rather
+than DataStore. It holds the `updatedAt` of the value last known to have reached
+Firestore, so `updatedAt > lastPushedAt OR lastPushedAt IS NULL` is exactly the
+set of settings the sign-in reconciliation re-queues — `OutboxEnqueuerImpl`
+silently drops writes made in demo or signed-out sessions and nothing else
+replays them. A pulled value is stamped as already-pushed so a pull never
+provokes an echo push.
+
+No `deletedAt`: a setting is overwritten, never deleted. The collection is
+purged wholesale by the account-deletion flow, before `users/{uid}` itself.
 
 ## Sync metadata fields
 

@@ -177,6 +177,9 @@ val coverageExcludedProjects = setOf(
     ":shared",
     ":sync:no-op",
     ":feature",
+    // Container project for `app-config:api` / `app-config:default` / `app-config:remote`;
+    // no sources of its own.
+    ":app-config",
     ":androidApp",
     ":androidApp-offline",
     ":sync-test-fixtures",
@@ -187,6 +190,15 @@ val coverageExcludedProjects = setOf(
     ":integration-test",
     // Build tooling: detekt rules run against the build, they are not shipped.
     ":detekt-rules",
+)
+
+// Modules that compile the shared Roborazzi harness from `gradle/screenshot-harness/` into their
+// host-test source set (see gradle/screenshot-tests.gradle.kts). That directory sits outside every
+// module's `src/`, so detekt has to be pointed at it explicitly — once per module that actually
+// compiles it, rather than for the whole build.
+val screenshotHarnessProjects = setOf(
+    ":uikit",
+    ":feature:login",
 )
 
 subprojects {
@@ -212,6 +224,9 @@ subprojects {
             "src/main/kotlin",
             "src/test/kotlin",
         )
+        if (path in screenshotHarnessProjects) {
+            source.from(rootProject.file("gradle/screenshot-harness/kotlin"))
+        }
     }
 
     dependencies {
@@ -293,6 +308,9 @@ dependencies {
     kover(projects.composeApp)
     kover(projects.composeAppOffline)
     kover(projects.domain)
+    kover(projects.appConfig.api)
+    kover(projects.appConfig.default)
+    kover(projects.appConfig.remote)
     kover(projects.dataLocal)
     kover(projects.dataRemote)
     kover(projects.syncSurfer)

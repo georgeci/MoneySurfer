@@ -71,6 +71,11 @@ kotlin {
             }
         }
 
+        // Shared Roborazzi capture harness — see gradle/screenshot-tests.gradle.kts.
+        getByName("androidHostTest") {
+            kotlin.srcDir(rootProject.file("gradle/screenshot-harness/kotlin"))
+        }
+
         iosMain {
             dependencies {
                 // Add iOS-specific dependencies here. This a source set created by Kotlin Gradle

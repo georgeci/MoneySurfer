@@ -29,6 +29,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
@@ -74,12 +75,33 @@ import com.georgeci.moneysurfer.uikit.components.base.SurferSegmentedControl
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbarButtonAction
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
+import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.utils.HandleSideEffect
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
+
+/** Stable selectors for the account creation screen — see docs/testing/testing-strategy.md. */
+object AccountCreationTestTags {
+    const val Root = "accountCreation:root"
+    const val Name = "accountCreation:name"
+    const val OpeningBalance = "accountCreation:openingBalance"
+    const val Iban = "accountCreation:iban"
+    const val Save = "accountCreation:save"
+
+    /**
+     * Chip that *adds* an extra-detail field, suffixed with the lowercased
+     * [AccountExtraDetailKey]. Distinct from the field it creates ([Iban]): both carry the same
+     * label, so a text selector cannot tell "add IBAN" from "type into IBAN".
+     */
+    const val AddExtraDetailPrefix = "accountCreation:addExtra:"
+
+    /** Account-type option, suffixed with the lowercased [AccountType]. */
+    const val TypePrefix = "accountCreation:type:"
+}
 
 @Composable
 fun AccountCreationScreen(
@@ -141,7 +163,10 @@ private fun AccountCreationContent(
     onEvent: (AccountCreationEvent) -> Unit,
 ) {
     Scaffold(
-        modifier = Modifier.surferSafeInsets(),
+        modifier = Modifier
+            .surferSafeInsets()
+            .testTag(AccountCreationTestTags.Root)
+            .surferTestTagAsId(),
         containerColor = AppTheme.materialColors.surface,
         topBar = {
             SurferToolbar(
@@ -153,6 +178,7 @@ private fun AccountCreationContent(
                         text = stringResource(Res.string.account_creation_save),
                         onClick = { onEvent(AccountCreationEvent.OnSaveClick) },
                         enabled = state.canSave,
+                        modifier = Modifier.testTag(AccountCreationTestTags.Save),
                     )
                 },
             )
@@ -161,6 +187,7 @@ private fun AccountCreationContent(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .surferContentContainer()
                 .padding(top = padding.calculateTopPadding())
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = AppTheme.spacing.large)
@@ -191,7 +218,9 @@ private fun AccountCreationContent(
                 } else {
                     null
                 },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag(AccountCreationTestTags.Name),
             )
 
             if (!state.isEditMode) {
@@ -221,7 +250,9 @@ private fun AccountCreationContent(
                     isError = balanceError != null,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     singleLine = true,
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag(AccountCreationTestTags.OpeningBalance),
                 )
             }
 
@@ -258,6 +289,7 @@ private fun TypePicker(
         selected = selected,
         label = { type -> stringResource(type.labelRes()) },
         onSelect = onSelect,
+        optionTestTag = { type -> AccountCreationTestTags.TypePrefix + type.name.lowercase() },
     )
 }
 
@@ -371,6 +403,9 @@ private fun ExtraDetailsSection(
                         label = stringResource(key.labelRes()),
                         icon = SurferIcons.Add,
                         onClick = { onAdd(key) },
+                        modifier = Modifier.testTag(
+                            AccountCreationTestTags.AddExtraDetailPrefix + key.name.lowercase(),
+                        ),
                     )
                 }
                 SurferOutlinedChip(
@@ -430,6 +465,13 @@ private fun ExtraFieldItem(
     onRemove: () -> Unit,
 ) {
     val label = extraDetailLabel(field.key)
+    // Only the well-known IBAN row gets a stable selector: every other row is either a different
+    // well-known key or a user-named custom field, neither of which the E2E flows target.
+    val fieldTag = if (field.wellKnownKey == AccountExtraDetailKey.IBAN) {
+        AccountCreationTestTags.Iban
+    } else {
+        null
+    }
     Column {
         Row(
             modifier = Modifier
@@ -465,7 +507,9 @@ private fun ExtraFieldItem(
             value = field.value,
             onValueChange = onValueChanged,
             label = { Text(label) },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .then(fieldTag?.let { Modifier.testTag(it) } ?: Modifier),
             singleLine = !field.isMultiline,
             minLines = if (field.isMultiline) 3 else 1,
             maxLines = if (field.isMultiline) 5 else 1,

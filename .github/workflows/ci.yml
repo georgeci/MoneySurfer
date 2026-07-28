@@ -32,7 +32,7 @@ jobs:
       docs: ${{ steps.gate.outputs.docs }}
     steps:
       - name: Checkout
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       # Path filter lives in .github/actions/paths-gate — shared with codeql.yml
       # and ios-offline.yml so the ignore list has one source of truth.
       - name: Filter paths
@@ -52,7 +52,7 @@ jobs:
     if: needs.changes.outputs.docs == 'true' || github.event_name == 'workflow_dispatch'
     steps:
       - name: Checkout
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Run docs_tool check
         run: python3 scripts/docs_tool.py check
@@ -72,7 +72,7 @@ jobs:
           egress-policy: audit
 
       - name: Checkout
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Decode Firebase config
         uses: ./.github/actions/firebase-config
@@ -237,9 +237,10 @@ jobs:
           if-no-files-found: warn
           retention-days: 14
 
-      # `qaAndroidHost` runs :uikit's Roborazzi screenshot tests, which fail the
-      # job on any visual diff against the references committed in
-      # `uikit/screenshots/`. The reference/actual/diff triptych is the only way
+      # `qaAndroidHost` runs the Roborazzi screenshot tests of every module that
+      # has them (:uikit, :feature:login), which fail the job on any visual diff
+      # against the references committed in `<module>/screenshots/`. The
+      # reference/actual/diff triptych is the only way
       # to triage such a failure from a CI log, so publish it whenever the job
       # goes red. See docs/testing/screenshot-tests.md.
       - name: Upload Roborazzi screenshot diffs
@@ -334,7 +335,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       # firebase-tools ≥14 requires JDK 21+ (the Firestore emulator JAR no
       # longer runs on 17). Other CI jobs stay on 17 — only this job needs 21.
@@ -464,10 +465,17 @@ jobs:
     needs: [changes, junit]
     # Skip on PRs from forks (no SONAR_TOKEN access from fork secrets) and
     # on doc-only changes (see `changes` job).
+    #
+    # The fork guard is written as `!= 'pull_request'` rather than comparing
+    # `head.repo.full_name` unconditionally: on a `push` there is no
+    # `github.event.pull_request`, so the comparison yields null != repo and
+    # silently skipped the job on every push to main. Main's analysis was frozen
+    # from 2026-05-06 to 2026-07-26 that way, which pins SonarCloud's New Code
+    # baseline and leaves findings visible only on PRs (issue #362).
     if: >-
       always() &&
       (needs.changes.outputs.code == 'true' || github.event_name == 'workflow_dispatch') &&
-      (github.event_name == 'workflow_dispatch' ||
+      (github.event_name != 'pull_request' ||
        github.event.pull_request.head.repo.full_name == github.repository)
 
     steps:
@@ -478,7 +486,7 @@ jobs:
           egress-policy: audit
 
       - name: Checkout
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           # Sonar needs full git history for blame/new-code detection.
           fetch-depth: 0
@@ -592,7 +600,7 @@ jobs:
     # blocks the PR the moment a violation lands.
     steps:
       - name: Checkout
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Set up JDK
         uses: actions/setup-java@03ad4de0992f5dab5e18fcb136590ce7c4a0ac95 # v5.6.0
@@ -638,14 +646,14 @@ jobs:
     # every PR via ios-offline.yml.
     if: >-
       (needs.changes.outputs.code == 'true' || github.event_name == 'workflow_dispatch') &&
-      (github.event_name == 'workflow_dispatch' ||
+      (github.event_name != 'pull_request' ||
        github.event.pull_request.head.repo.full_name == github.repository)
     permissions:
       contents: read
 
     steps:
       - name: Checkout
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       # Only the debug google-services.json is needed (processDebugGoogleServices
       # is debug-variant only) — don't decode the release JSON or iOS plist here.
@@ -671,11 +679,14 @@ jobs:
     name: Aggregate + publish to Pages
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    # Serialize every gh-pages writer (this job, nightly-publish, gh-pages-prune)
-    # on one group so pushes never race into a non-fast-forward. Job-level so it
-    # overrides the workflow's per-PR concurrency group.
+    # Only main pushes write gh-pages, so only those runs share the writer lock
+    # with nightly-publish and gh-pages-prune. PR and manual runs only upload an
+    # artifact; a run-specific group keeps them out of the shared queue, where
+    # GitHub would evict an older pending job when a third writer queued.
     concurrency:
-      group: gh-pages-write
+      group: >-
+        ${{ github.event_name == 'push' && github.ref == 'refs/heads/main'
+            && 'gh-pages-write' || format('publish-artifact-{0}', github.run_id) }}
       cancel-in-progress: false
     needs: [changes, junit, firestore-rules]
     # Skip on doc-only PRs — no fresh test results to aggregate, and we don't
@@ -745,7 +756,7 @@ jobs:
       # back to an empty history dir so the action still produces a report.
       - name: Checkout gh-pages
         if: steps.gate.outputs.publish == 'true'
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: gh-pages
           path: gh-pages
@@ -758,7 +769,7 @@ jobs:
 
       - name: Build Allure report (with history)
         if: steps.gate.outputs.publish == 'true'
-        uses: simple-elf/allure-report-action@e463a472d3b1d750f9544369d60589ff1964c820 # v1.14
+        uses: simple-elf/allure-report-action@385367cde61ac68c2568a117f7579f7f148dc459 # v1.15
         with:
           allure_results: allure-results
           gh_pages: gh-pages/allure

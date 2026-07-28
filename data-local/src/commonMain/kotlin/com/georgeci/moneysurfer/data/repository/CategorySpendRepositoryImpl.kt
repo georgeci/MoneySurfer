@@ -5,6 +5,7 @@ import com.georgeci.moneysurfer.data.db.entity.CategoryMonthlyTotalEntity
 import com.georgeci.moneysurfer.domain.model.CategoryMonthlyTotal
 import com.georgeci.moneysurfer.domain.model.next
 import com.georgeci.moneysurfer.domain.primitives.CategoryId
+import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
 import com.georgeci.moneysurfer.domain.primitives.Money
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
@@ -24,6 +25,7 @@ class CategorySpendRepositoryImpl(
         workspaceId: WorkspaceId,
         categoryIds: List<CategoryId>,
         type: TransactionType,
+        baseCurrency: CurrencyCode?,
         fromMonth: YearMonth,
         toMonth: YearMonth,
     ): Flow<List<CategoryMonthlyTotal>> {
@@ -35,6 +37,7 @@ class CategorySpendRepositoryImpl(
             workspaceId = workspaceId.value,
             categoryIds = categoryIds.map { it.value },
             type = type.name,
+            baseCurrency = baseCurrency?.value,
             fromDate = fromMonth.firstDay.toString(),
             toDateExclusive = toMonth.next().firstDay.toString(),
         ).map { rows -> rows.mapNotNull { it.toDomain() } }
@@ -42,8 +45,10 @@ class CategorySpendRepositoryImpl(
 
     /**
      * Null for a row whose `month` will not parse. `substr` cannot produce one from a valid
-     * `operationDate`, but the column is a plain string an older or foreign writer could have
-     * put anything in, and dropping one unreadable month beats failing the whole screen.
+     * `operationDate`, and since the query joined the shared spend predicate it cannot see an
+     * invalid one either — `operationDate = date(operationDate)` admits only canonical dates. Kept
+     * as a second line because the column is a plain string one predicate change away from letting
+     * something else through, and dropping one unreadable month beats failing the whole screen.
      */
     private fun CategoryMonthlyTotalEntity.toDomain(): CategoryMonthlyTotal? {
         val parsed = runCatching { YearMonth.parse(month) }.getOrNull() ?: return null

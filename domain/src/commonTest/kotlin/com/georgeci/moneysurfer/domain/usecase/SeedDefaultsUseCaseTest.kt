@@ -41,7 +41,7 @@ class SeedDefaultsUseCaseTest : StringSpec({
 
         env.workspaceRepo.inserted shouldHaveSize 0
         env.categoryRepo.inserted shouldHaveSize 0
-        env.session.currentWorkspaceId.flow.first() shouldBe PRE_PINNED
+        env.session.currentWorkspaceId.first() shouldBe PRE_PINNED
     }
 
     "repairs missing Cash account when workspace was pinned without one" {
@@ -78,7 +78,7 @@ class SeedDefaultsUseCaseTest : StringSpec({
         account.currencyCode shouldBe CurrencyCode("USD")
         account.balance shouldBe Money.zero()
 
-        env.session.currentWorkspaceId.flow.first() shouldBe ws.id
+        env.session.currentWorkspaceId.first() shouldBe ws.id
     }
 
     "is idempotent — second invocation does not duplicate workspace or Cash account" {
@@ -99,7 +99,7 @@ class SeedDefaultsUseCaseTest : StringSpec({
 
         env.workspaceRepo.inserted shouldHaveSize 0
         env.accountRepo.inserted shouldHaveSize 0
-        env.session.currentWorkspaceId.flow.first() shouldBe null
+        env.session.currentWorkspaceId.first() shouldBe null
     }
 })
 
@@ -126,6 +126,7 @@ private class SeedTestEnv(
         userRemoteRepository = SeedFakeUserRemoteRepo,
         workspaceSyncer = SeedFakeWorkspaceSyncer,
         session = session,
+        sessionMutator = session,
         getCurrentTime = getCurrentTime,
     )
     val useCase = SeedDefaultsUseCase(
@@ -192,6 +193,7 @@ private class FakeAccountRepo : AccountRepository {
     override suspend fun delete(id: AccountId) = error("not used")
     override suspend fun applyDelta(accountId: AccountId, delta: Money) = error("not used")
     override suspend fun setBalance(accountId: AccountId, balance: Money) = error("not used")
+    override suspend fun reorder(orderedIds: List<AccountId>) = error("not used")
     override suspend fun setArchived(accountId: AccountId, archived: Boolean) = error("not used")
 }
 
@@ -208,7 +210,7 @@ private object SeedFakeUserRemoteRepo : UserRemoteRepository {
 }
 
 private object SeedFakeWorkspaceSyncer : WorkspaceSyncer {
-    override suspend fun pushAll() = Unit
+    override suspend fun pushAll(): Boolean = true
     override suspend fun syncAll() = Unit
     override suspend fun syncWorkspace(workspaceId: WorkspaceId) = Unit
 }

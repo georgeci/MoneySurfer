@@ -56,7 +56,7 @@
     <string name="budget_edit_alert_decrease">Lower the alert threshold</string>
     <string name="budget_edit_alert_increase">Raise the alert threshold</string>
     <string name="budget_edit_rollover_label">Carry over what is left</string>
-    <string name="budget_edit_rollover_supporting">Unspent money is added to the next period\'s limit.</string>
+    <string name="budget_edit_rollover_supporting">Unspent money is added to the next period's limit.</string>
     <string name="budget_edit_save">Save</string>
     <string name="budget_edit_created_snackbar">"%1$s" created</string>
     <string name="budget_edit_updated_snackbar">"%1$s" updated</string>

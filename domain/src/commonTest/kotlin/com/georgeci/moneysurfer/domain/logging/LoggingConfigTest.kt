@@ -11,7 +11,19 @@ class LoggingConfigTest : StringSpec({
     // min-severity was before this spec ran and restore exactly that, so we don't
     // clobber a value another spec relies on.
     val originalMinSeverity = Logger.config.minSeverity
-    afterSpec { Logger.setMinSeverity(originalMinSeverity) }
+
+    // The writer list needs the same treatment, and `addLogWriter` has no counterpart
+    // that removes one. `configureLogging(isDebug = true)` installs DebugLogBuffer, and
+    // leaving it attached would funnel every later spec's Warn/Error line into a
+    // process-wide buffer that DebugLogBufferTest asserts the exact contents of.
+    val originalLogWriters = Logger.config.logWriterList
+
+    afterSpec {
+        Logger.setMinSeverity(originalMinSeverity)
+        Logger.mutableConfig.logWriterList = originalLogWriters
+        DebugLogBuffer.resetInstallLatchForTest()
+        DebugLogBuffer.clear()
+    }
 
     "release builds mute everything below Warn" {
         configureLogging(isDebug = false)

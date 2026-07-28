@@ -10,6 +10,7 @@ import com.georgeci.moneysurfer.sync.api.SyncCancelledException
 import com.georgeci.moneysurfer.sync.api.SyncError
 import com.georgeci.moneysurfer.sync.api.SyncScope
 import com.georgeci.moneysurfer.sync.plugin.EntityApplyResult
+import com.georgeci.moneysurfer.sync.plugin.PullScope
 import com.georgeci.moneysurfer.sync.plugin.RemoteDocument
 import com.georgeci.moneysurfer.sync.plugin.SyncEntityPlugin
 import com.georgeci.moneysurfer.sync.repository.PendingMutation
@@ -19,6 +20,8 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldContainExactly
+import io.kotest.matchers.collections.shouldHaveSize
+import io.kotest.matchers.collections.shouldNotContain
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
@@ -218,6 +221,112 @@ class PullRemoteChangesUseCaseImplSpec : StringSpec({
         env.accountsPlugin.applied.map { it.first } shouldContainExactly listOf("a-1")
     }
 
+    // -- Draining across batches (issue #342) ------------------------------------------------
+
+    "a collection larger than one batch is drained by a single pull" {
+        // Before this, one pull moved at most BATCH_SIZE docs and the rest trickled in through
+        // the 1-minute ticker — a real account showed wrong balances for tens of minutes.
+        val env = PullEnv(providerWorkspaceIds = listOf("ws-1"))
+        env.reader.collectionDocs["ws-1" to "accounts"] =
+            (1..250).map { doc("a-$it", updatedAt = it.toLong()) }
+
+        val result = env.pull(SyncScope.AllUserData)
+
+        result shouldBe Either.Right(PullSummary(downloadedCount = 250, conflictCount = 0))
+        env.accountsPlugin.applied shouldHaveSize 250
+        env.syncMeta.cursors["ws-1" to "accounts"] shouldBe Instant.fromEpochMilliseconds(250)
+        // 100 + 100 + 50: the short third batch ends the loop.
+        env.reader.fetchCalls.filter { it.collection == "accounts" }
+            .map { it.sinceMillis } shouldContainExactly listOf(0L, 100L, 200L)
+    }
+
+    "a full batch of same-timestamp documents terminates the loop rather than re-reading itself" {
+        // The query is a strict `updatedAt > cursor`, so once the cursor lands on the shared
+        // timestamp the follow-up query comes back empty and the loop ends. Whatever did not fit
+        // in the first batch stays invisible — a pre-existing consequence of the strict cursor,
+        // not something the drain loop introduced (see md/test_debt.md §6).
+        val env = PullEnv(providerWorkspaceIds = listOf("ws-1"))
+        env.reader.collectionDocs["ws-1" to "accounts"] =
+            (1..150).map { doc("a-$it", updatedAt = 7) }
+
+        val result = env.pull(SyncScope.AllUserData)
+
+        result shouldBe Either.Right(PullSummary(downloadedCount = 100, conflictCount = 0))
+        env.reader.fetchCalls.filter { it.collection == "accounts" }
+            .map { it.sinceMillis } shouldContainExactly listOf(0L, 7L)
+        env.syncMeta.cursors["ws-1" to "accounts"] shouldBe Instant.fromEpochMilliseconds(7)
+    }
+
+    "cancellation between batches aborts the pull" {
+        val env = PullEnv(providerWorkspaceIds = listOf("ws-1"))
+        val token = SimpleCancelToken()
+        env.reader.collectionDocs["ws-1" to "accounts"] =
+            (1..150).map { doc("a-$it", updatedAt = it.toLong()) }
+        env.accountsPlugin.onApply = { docId -> if (docId == "a-100") token.cancel() }
+
+        shouldThrow<SyncCancelledException> {
+            env.pull(SyncScope.AllUserData, cancelToken = token)
+        }
+
+        // The first batch completed and its cursor landed; the second was never requested.
+        env.reader.fetchCalls.filter { it.collection == "accounts" } shouldHaveSize 1
+    }
+
+    // -- Stale workspace refs (issue #342) ---------------------------------------------------
+
+    "an unreadable workspace is skipped instead of failing the whole pull" {
+        // A `users/{uid}.workspaceIds` entry whose workspaces/{wid} document was never created
+        // reads as PERMISSION_DENIED. Raising here used to make sign-in impossible for the
+        // entire account.
+        val env = PullEnv(providerWorkspaceIds = listOf("ws-stale", "ws-ok"))
+        env.reader.denyWorkspaces += "ws-stale"
+        env.reader.collectionDocs["ws-stale" to "accounts"] = listOf(doc("a-never", updatedAt = 1))
+        env.reader.collectionDocs["ws-ok" to "accounts"] = listOf(doc("a-1", updatedAt = 10))
+
+        val result = env.pull(SyncScope.AllUserData)
+
+        result shouldBe Either.Right(PullSummary(downloadedCount = 1, conflictCount = 0))
+        env.accountsPlugin.applied shouldContainExactly listOf("a-1" to "ws-ok")
+    }
+
+    "a denied subcollection query skips the rest of that workspace" {
+        // The other SDK shape: the root `get()` returns nothing rather than throwing, and the
+        // denial surfaces on the first subcollection query instead.
+        val env = PullEnv(providerWorkspaceIds = listOf("ws-stale"))
+        env.reader.denyCollections += "ws-stale" to "invites"
+        env.reader.collectionDocs["ws-stale" to "accounts"] = listOf(doc("a-1", updatedAt = 10))
+
+        val result = env.pull(SyncScope.AllUserData)
+
+        // invites (priority 5) is denied, so accounts (priority 10) is never reached.
+        result shouldBe Either.Right(PullSummary(downloadedCount = 0, conflictCount = 0))
+        env.accountsPlugin.applied.shouldBeEmpty()
+    }
+
+    "a network failure aborts the pull instead of passing as a stale ref" {
+        // Only a denial means "this workspace will never be readable". A dropped connection
+        // means the data is not here *yet* — swallowing it would report a successful sync that
+        // downloaded nothing, and the UI would claim the user is up to date.
+        val env = PullEnv(providerWorkspaceIds = listOf("ws-1"))
+        env.reader.failWorkspacesWith["ws-1"] = "UNAVAILABLE: backend unreachable"
+
+        val result = env.pull(SyncScope.AllUserData)
+
+        result.shouldBeInstanceOf<Either.Left<SyncError>>()
+    }
+
+    "a local apply failure still aborts the pull" {
+        // Tolerance is for unreadable *remote* workspaces only — a plugin that cannot write to
+        // Room is a real error and must not be swallowed as a stale ref.
+        val env = PullEnv(providerWorkspaceIds = listOf("ws-1", "ws-2"))
+        env.reader.collectionDocs["ws-1" to "accounts"] = listOf(doc("a-bad", updatedAt = 42))
+        env.accountsPlugin.failOnDocId = "a-bad"
+
+        val result = env.pull(SyncScope.AllUserData)
+
+        result.shouldBeInstanceOf<Either.Left<SyncError>>()
+    }
+
     "AllUserData additionally pulls invites from workspaces the user is invited to" {
         val env = PullEnv(
             firebaseUid = "uid-7",
@@ -258,6 +367,117 @@ class PullRemoteChangesUseCaseImplSpec : StringSpec({
         result shouldBe Either.Right(PullSummary(downloadedCount = 0, conflictCount = 0))
         env.reader.inviteFetchCalls.shouldBeEmpty()
     }
+
+    // ── Phase 3: user-scoped ──────────────────────────────────────────────────
+
+    "a user-scoped plugin is never run against a workspace" {
+        // The whole point of the discriminator: in the workspace loop this plugin would either be
+        // handed the workspace root document or query a path that does not exist, once per
+        // workspace.
+        val env = PullEnv(firebaseUid = "uid-7", providerWorkspaceIds = listOf("ws-1", "ws-2"))
+        env.reader.collectionDocs["ws-1" to "config"] = listOf(doc("ui.theme_mode", updatedAt = 10))
+        env.reader.rootDocs["ws-1"] = doc("ws-1", updatedAt = 1)
+        env.userReader.docs["uid-7" to "config"] = listOf(doc("ui.theme_mode", updatedAt = 10))
+
+        env.pull(SyncScope.AllUserData)
+
+        env.reader.fetchCalls.map { it.collection } shouldNotContain "config"
+        // It ran exactly once, against the uid — not once per workspace.
+        env.configPlugin.applied.map { it.second } shouldBe listOf("uid-7")
+    }
+
+    "the user-scoped phase reads the whole collection under the uid" {
+        val env = PullEnv(firebaseUid = "uid-7", providerWorkspaceIds = emptyList())
+        env.userReader.docs["uid-7" to "config"] = listOf(
+            doc("ui.theme_mode", updatedAt = 10),
+            doc("ui.container_style", updatedAt = 20),
+        )
+
+        val result = env.pull(SyncScope.AllUserData)
+
+        result shouldBe Either.Right(PullSummary(downloadedCount = 2, conflictCount = 0))
+        env.configPlugin.applied.map { it.first } shouldContainExactly
+            listOf("ui.theme_mode", "ui.container_style")
+    }
+
+    "the user-scoped phase runs for a workspace-scoped sync too" {
+        // There is no listener and no other channel: skipping it on the periodic scope would mean
+        // a setting changed on another device only lands on a full sign-in.
+        val env = PullEnv(firebaseUid = "uid-7", currentWorkspaceId = "ws-active")
+        env.userReader.docs["uid-7" to "config"] = listOf(doc("ui.theme_mode", updatedAt = 10))
+
+        env.pull(SyncScope.ActiveWorkspace)
+
+        env.configPlugin.applied.map { it.first } shouldContainExactly listOf("ui.theme_mode")
+    }
+
+    "UploadOnly skips the user-scoped phase" {
+        val env = PullEnv(firebaseUid = "uid-7")
+        env.userReader.docs["uid-7" to "config"] = listOf(doc("ui.theme_mode", updatedAt = 10))
+
+        env.pull(SyncScope.UploadOnly)
+
+        env.userReader.fetchCalls.shouldBeEmpty()
+    }
+
+    "the user-scoped phase is skipped without a Firebase uid" {
+        val env = PullEnv(firebaseUid = null)
+        env.userReader.docs["uid-7" to "config"] = listOf(doc("ui.theme_mode", updatedAt = 10))
+
+        env.pull(SyncScope.AllUserData)
+
+        env.userReader.fetchCalls.shouldBeEmpty()
+    }
+
+    "a denied user-scoped collection is skipped instead of failing the pull" {
+        // Rules for a new subcollection can lag a client release, and these documents hold nothing
+        // another device cannot re-derive — failing here would turn a rules gap into "nobody can
+        // sign in".
+        val env = PullEnv(firebaseUid = "uid-7", providerWorkspaceIds = listOf("ws-1"))
+        env.userReader.denyCollections += "uid-7" to "config"
+        env.reader.collectionDocs["ws-1" to "accounts"] = listOf(doc("a-1", updatedAt = 10))
+
+        val result = env.pull(SyncScope.AllUserData)
+
+        result shouldBe Either.Right(PullSummary(downloadedCount = 1, conflictCount = 0))
+        env.configPlugin.applied.shouldBeEmpty()
+    }
+
+    "a non-denial failure in the user-scoped phase still fails the pull" {
+        val env = PullEnv(firebaseUid = "uid-7")
+        env.userReader.failWith = "network is down"
+
+        val result = env.pull(SyncScope.AllUserData)
+
+        result.shouldBeInstanceOf<Either.Left<SyncError>>()
+    }
+
+    "the user-scoped read is capped, so a grown collection cannot be pulled whole" {
+        // Nothing prunes these documents — unknown keys are stored and none is ever deleted — so
+        // the collection drifts upward across releases. Uncapped, it would be materialised whole
+        // into memory and re-applied to Room on every foreground sync, on every device.
+        val env = PullEnv(firebaseUid = "uid-7")
+        env.userReader.docs["uid-7" to "config"] =
+            (1..600).map { doc("ui.key_$it", updatedAt = 10) }
+
+        val result = env.pull(SyncScope.AllUserData)
+
+        env.userReader.lastLimit shouldBe 500
+        env.configPlugin.applied shouldHaveSize 500
+        result shouldBe Either.Right(PullSummary(downloadedCount = 500, conflictCount = 0))
+    }
+
+    "a plugin failure in the user-scoped phase fails the pull" {
+        // Unlike a remote read, this is a local write: swallowing it would report a clean sync that
+        // stored nothing.
+        val env = PullEnv(firebaseUid = "uid-7")
+        env.userReader.docs["uid-7" to "config"] = listOf(doc("ui.theme_mode", updatedAt = 10))
+        env.configPlugin.failOnDocId = "ui.theme_mode"
+
+        val result = env.pull(SyncScope.AllUserData)
+
+        result.shouldBeInstanceOf<Either.Left<SyncError>>()
+    }
 })
 
 // ── Environment ──────────────────────────────────────────────────────────────
@@ -270,6 +490,7 @@ private class PullEnv(
 ) {
     val applyOrder = mutableListOf<String>()
     val reader = FakeCollectionReader()
+    val userReader = FakeUserCollectionReader()
     val syncMeta = FakeSyncMetaRepository()
 
     val rootPlugin = FakePlugin(
@@ -291,10 +512,24 @@ private class PullEnv(
         applyOrder = applyOrder,
     )
 
+    /** Stands in for `UserConfigSyncPlugin`: documents under `users/{uid}`, never under a workspace. */
+    val configPlugin = FakePlugin(
+        entityType = "USER_CONFIG",
+        collectionName = "config",
+        pullPriority = 100,
+        applyOrder = applyOrder,
+        pullScope = PullScope.User,
+    )
+
     private val useCase = PullRemoteChangesUseCaseImpl(
         collectionReader = reader,
+        userScopedPull = UserScopedPullPhase(
+            reader = userReader,
+            plugins = listOf(configPlugin),
+            session = InMemorySessionPointers(currentFirebaseUid = firebaseUid),
+        ),
         syncMeta = syncMeta,
-        plugins = listOf(accountsPlugin, invitesPlugin, rootPlugin),
+        plugins = listOf(accountsPlugin, invitesPlugin, rootPlugin, configPlugin),
         session = InMemorySessionPointers(
             currentWorkspaceId = currentWorkspaceId?.let(::WorkspaceId),
             currentFirebaseUid = firebaseUid,
@@ -331,11 +566,22 @@ private class FakeCollectionReader : WorkspaceCollectionReader {
     val collectionDocs = mutableMapOf<Pair<String, String>, List<RemoteDocument>>()
     val inviteDocs = mutableMapOf<Pair<String, String>, List<RemoteDocument>>()
 
+    /** Workspaces whose every read raises, as Firestore rules would for a non-member. */
+    val denyWorkspaces = mutableSetOf<String>()
+
+    /** `workspaceId to collection` pairs that raise while the rest of the workspace reads fine. */
+    val denyCollections = mutableSetOf<Pair<String, String>>()
+
+    /** Workspaces whose reads fail with something *other* than a denial, keyed by message. */
+    val failWorkspacesWith = mutableMapOf<String, String>()
+
     val fetchCalls = mutableListOf<FetchCall>()
     val inviteFetchCalls = mutableListOf<FetchCall>()
 
-    override suspend fun fetchWorkspaceDoc(workspaceId: String): RemoteDocument? =
-        rootDocs[workspaceId]
+    override suspend fun fetchWorkspaceDoc(workspaceId: String): RemoteDocument? {
+        denyIfBlocked(workspaceId, "root")
+        return rootDocs[workspaceId]
+    }
 
     override suspend fun fetchUpdatedSince(
         workspaceId: String,
@@ -343,10 +589,18 @@ private class FakeCollectionReader : WorkspaceCollectionReader {
         sinceMillis: Long,
         limit: Int,
     ): List<RemoteDocument> {
+        denyIfBlocked(workspaceId, collectionName)
         fetchCalls += FetchCall(workspaceId, collectionName, sinceMillis)
         return collectionDocs[workspaceId to collectionName].orEmpty()
             .filter { (it.getLong("updatedAt") ?: 0L) > sinceMillis }
             .take(limit)
+    }
+
+    private fun denyIfBlocked(workspaceId: String, collectionName: String) {
+        failWorkspacesWith[workspaceId]?.let { error(it) }
+        if (workspaceId in denyWorkspaces || (workspaceId to collectionName) in denyCollections) {
+            error("PERMISSION_DENIED: Missing or insufficient permissions")
+        }
     }
 
     override suspend fun fetchInvitesForUser(
@@ -397,11 +651,42 @@ private class FakeUserWorkspacesProvider(
     override suspend fun invitedWorkspaceIds(): List<String> = invitedIds
 }
 
+private class FakeUserCollectionReader : UserCollectionReader {
+    val docs = mutableMapOf<Pair<String, String>, List<RemoteDocument>>()
+
+    /** `uid to collection` pairs the rules refuse, as a missing rule would. */
+    val denyCollections = mutableSetOf<Pair<String, String>>()
+
+    /** Non-denial failure — a network drop, which must still abort the pull. */
+    var failWith: String? = null
+
+    val fetchCalls = mutableListOf<Pair<String, String>>()
+
+    /** The cap the phase asked for, so a test can assert the read is bounded at all. */
+    var lastLimit: Int? = null
+        private set
+
+    override suspend fun fetchAll(
+        uid: String,
+        collectionName: String,
+        limit: Int,
+    ): List<RemoteDocument> {
+        failWith?.let { error(it) }
+        if ((uid to collectionName) in denyCollections) {
+            error("PERMISSION_DENIED: Missing or insufficient permissions")
+        }
+        fetchCalls += uid to collectionName
+        lastLimit = limit
+        return docs[uid to collectionName].orEmpty().take(limit)
+    }
+}
+
 private class FakePlugin(
     override val entityType: String,
     private val collectionName: String?,
     override val pullPriority: Int,
     private val applyOrder: MutableList<String>,
+    override val pullScope: PullScope = PullScope.Workspace,
 ) : SyncEntityPlugin {
     override val firestoreCollectionName: String? get() = collectionName
 

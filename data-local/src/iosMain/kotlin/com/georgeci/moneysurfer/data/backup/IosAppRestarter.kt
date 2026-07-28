@@ -9,6 +9,8 @@ import platform.posix.exit
  * before this fires.
  */
 class IosAppRestarter : AppRestarter {
+    override val requiresManualRelaunch: Boolean = true
+
     override fun restart() {
         exit(0)
     }

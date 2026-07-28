@@ -19,8 +19,11 @@ enum class TransactionCsvFormat(val columns: List<TransactionCsvColumn>) {
     /** Pre-#260 exports: ends at `transfer_id`, before merchant/tags/recurring rule. */
     V1(V1_COLUMNS),
 
-    /** #260's fields appended — what [TransactionCsvCodec.encode] writes today. */
+    /** #260's fields appended: merchant, tags, recurring rule. */
     V2(V2_COLUMNS),
+
+    /** #399's `split_id` appended — what [TransactionCsvCodec.encode] writes today. */
+    V3(V3_COLUMNS),
     ;
 
     val header: List<String> = columns.map { it.header }
@@ -75,4 +78,8 @@ private val V2_COLUMNS: List<TransactionCsvColumn> = V1_COLUMNS + listOf(
     TransactionCsvColumn.Merchant,
     TransactionCsvColumn.Tags,
     TransactionCsvColumn.RecurringRuleId,
+)
+
+private val V3_COLUMNS: List<TransactionCsvColumn> = V2_COLUMNS + listOf(
+    TransactionCsvColumn.SplitId,
 )

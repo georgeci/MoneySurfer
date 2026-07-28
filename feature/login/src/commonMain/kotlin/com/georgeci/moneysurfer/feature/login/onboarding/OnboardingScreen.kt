@@ -110,8 +110,13 @@ fun OnboardingScreen(
     OnboardingContent(state = state, onEvent = viewModel::onEvent)
 }
 
+/**
+ * Stateless body of the onboarding flow. Internal rather than private so the screenshot captures
+ * can mount it with an injected [OnboardingState] instead of standing up a Koin-backed
+ * [OnboardingViewModel].
+ */
 @Composable
-private fun OnboardingContent(
+internal fun OnboardingContent(
     state: OnboardingState,
     onEvent: (OnboardingEvent) -> Unit,
 ) {

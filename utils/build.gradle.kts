@@ -58,12 +58,24 @@ tasks.withType<Test>().configureEach {
 tasks.named<Test>("jvmTest") {
     useJUnitPlatform()
 
-    // StringResourcePlaceholderTest scans every strings.xml in the repo at
-    // runtime; declare them as inputs so editing one re-runs the gate instead
-    // of hitting UP-TO-DATE.
+    // StringResourcePlaceholderTest, StringResourceParityTest and StringResourceEscapeTest scan
+    // every string resource in the repo at runtime; declare them as inputs so editing one re-runs
+    // the gates instead of hitting UP-TO-DATE. `plurals.xml` is in the set because the escape gate
+    // covers it too.
     inputs.files(
         fileTree(rootDir) {
-            include("**/strings.xml")
+            include("**/strings.xml", "**/plurals.xml")
+            exclude("**/build/**", "**/.git/**", "**/.gradle/**")
+        },
+    ).withPathSensitivity(PathSensitivity.RELATIVE)
+
+    // Same deal for MaestroFlowSelectorTest, which pairs the flows' `id:` selectors with the
+    // testTag constants declared in the screens. Both sides have to be inputs: renaming a tag
+    // breaks the gate just as surely as editing a flow does.
+    inputs.files(
+        fileTree(rootDir) {
+            include("scripts/maestro/**/*.yaml")
+            include("**/src/**/*.kt")
             exclude("**/build/**", "**/.git/**", "**/.gradle/**")
         },
     ).withPathSensitivity(PathSensitivity.RELATIVE)

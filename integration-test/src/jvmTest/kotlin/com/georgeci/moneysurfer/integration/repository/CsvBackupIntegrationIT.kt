@@ -46,6 +46,7 @@ class CsvBackupIntegrationIT : StringSpec({
             categoryRepository = stack.categoryRepository,
             workspaceRepository = stack.workspaceRepository,
             createTransaction = stack.createTransaction,
+            applyTransactionChange = stack.applyTransactionChange,
         )
         stack.accountRepository.insert(
             anAccount(

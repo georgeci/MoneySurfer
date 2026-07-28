@@ -2,6 +2,8 @@ package com.georgeci.moneysurfer.di
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import com.georgeci.moneysurfer.appconfig.DebugConfigSource
+import com.georgeci.moneysurfer.appconfig.RemoteConfigMirror
 import com.georgeci.moneysurfer.data.db.MoneySurferDatabase
 import com.georgeci.moneysurfer.domain.AppInfo
 import com.georgeci.moneysurfer.domain.backup.AppRestarter
@@ -20,6 +22,7 @@ import com.georgeci.moneysurfer.feature.category.picker.CategoryPickerVariant
 import com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationSeed
 import com.georgeci.moneysurfer.navigation.GoalContributionMode
 import com.georgeci.moneysurfer.sync.db.SyncDatabase
+import kotlinx.coroutines.CoroutineScope
 import org.koin.core.annotation.KoinExperimentalAPI
 import org.koin.dsl.module
 import org.koin.test.verify.verify
@@ -88,9 +91,17 @@ class KoinModuleVerificationTest {
  * checks the shape of the graph — it never calls these factories.
  */
 private val testPlatformModule = module {
+    // Mirrors `applicationScopeModule`: the store-backed configuration layers keep one shared
+    // collection on it. `verify()` only walks signatures, so the binding never has to produce one.
+    single<CoroutineScope> { error("verify() must not instantiate this") }
     single<MoneySurferDatabase> { error("verify() must not instantiate this") }
     single<SyncDatabase> { error("verify() must not instantiate this") }
     single<DataStore<Preferences>> { error("verify() must not instantiate this") }
+    // Real hosts bind this from `sharedPlatformModule` (release APKs get `Empty`).
+    single<DebugConfigSource> { DebugConfigSource.Empty }
+    // The online host binds this from its own per-platform `onlinePlatformModule`, which is not on
+    // the JVM test classpath — it builds a DataStore file the way the Room/DataStore stubs above do.
+    single<RemoteConfigMirror> { error("verify() must not instantiate this") }
     single { AppInfo(version = "test", versionCode = 1) }
     single<BackupStorageLocator> { error("verify() must not instantiate this") }
     single<AppRestarter> { error("verify() must not instantiate this") }

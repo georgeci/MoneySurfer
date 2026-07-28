@@ -7,6 +7,7 @@ import com.georgeci.moneysurfer.sync.repository.MutationOperation
 import com.georgeci.moneysurfer.sync.repository.PendingMutation
 import com.georgeci.moneysurfer.sync.repository.PendingMutationQueue
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import org.koin.core.annotation.Single
 import kotlin.time.Instant
 
@@ -15,8 +16,20 @@ class PendingMutationQueueImpl(
     private val dao: PendingMutationDao,
 ) : PendingMutationQueue {
 
+    /** Insert-if-absent — see [PendingMutationDao.insertIfAbsent] for why the dedup lives in SQL. */
     override suspend fun enqueue(mutation: PendingMutation) {
-        dao.insert(mutation.toEntity(status = PendingMutationEntity.STATUS_PENDING))
+        val entity = mutation.toEntity(status = PendingMutationEntity.STATUS_PENDING)
+        dao.insertIfAbsent(
+            id = entity.id,
+            entityType = entity.entityType,
+            entityId = entity.entityId,
+            operation = entity.operation,
+            workspaceId = entity.workspaceId,
+            createdAt = entity.createdAt,
+            attempts = entity.attempts,
+            status = entity.status,
+            lastError = entity.lastError,
+        )
     }
 
     override suspend fun pending(scope: SyncScope, limit: Int): List<PendingMutation> =
@@ -36,6 +49,9 @@ class PendingMutationQueueImpl(
     }
 
     override val pendingCount: Flow<Int> = dao.pendingCount()
+
+    override fun observeOutbox(limit: Int): Flow<List<PendingMutation>> =
+        dao.observeAll(limit).map { rows -> rows.map { it.toDomain() } }
 
     private fun workspaceFilterFor(scope: SyncScope): String? = when (scope) {
         SyncScope.UploadOnly,

@@ -35,6 +35,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -51,7 +52,9 @@ import com.georgeci.moneysurfer.uikit.components.base.SurferSectionLabel
 import com.georgeci.moneysurfer.uikit.components.workspace.SurferInviteRow
 import com.georgeci.moneysurfer.uikit.components.workspace.SurferMemberRow
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
+import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.utils.HandleSideEffect
 import moneysurfer.feature.workspace.generated.resources.Res
@@ -77,6 +80,13 @@ import moneysurfer.feature.workspace.generated.resources.workspace_members_role_
 import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
+
+/** Stable selectors for the workspace creation screen — see docs/testing/testing-strategy.md. */
+object WorkspaceCreationTestTags {
+    const val Root = "workspaceCreation:root"
+    const val Name = "workspaceCreation:name"
+    const val Save = "workspaceCreation:save"
+}
 
 @Composable
 fun WorkspaceCreationScreen(
@@ -149,7 +159,10 @@ private fun WorkspaceCreationContent(
     }
     Box(modifier = Modifier.fillMaxSize()) {
         Scaffold(
-            modifier = Modifier.surferSafeInsets(),
+            modifier = Modifier
+                .surferSafeInsets()
+                .testTag(WorkspaceCreationTestTags.Root)
+                .surferTestTagAsId(),
             topBar = {
                 TopAppBar(
                     title = {
@@ -171,6 +184,7 @@ private fun WorkspaceCreationContent(
                     actions = {
                         TextButton(
                             onClick = { onEvent(WorkspaceCreationEvent.OnSaveClick) },
+                            modifier = Modifier.testTag(WorkspaceCreationTestTags.Save),
                             enabled = state.name.isNotBlank() && !state.isSaving,
                         ) {
                             Text(
@@ -186,6 +200,7 @@ private fun WorkspaceCreationContent(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
+                    .surferContentContainer()
                     .padding(top = padding.calculateTopPadding())
                     .verticalScroll(rememberScrollState())
                     .padding(horizontal = 24.dp)
@@ -206,7 +221,9 @@ private fun WorkspaceCreationContent(
                     onValueChange = { onEvent(WorkspaceCreationEvent.OnNameChanged(it)) },
                     label = { Text(stringResource(Res.string.workspace_creation_name_label)) },
                     singleLine = true,
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag(WorkspaceCreationTestTags.Name),
                 )
 
                 if (state.currencies.isNotEmpty() && !(state.isEditing && state.isOffline)) {

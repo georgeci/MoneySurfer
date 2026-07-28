@@ -10,6 +10,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import com.georgeci.moneysurfer.uikit.components.SurferCategoryPalette
 import com.georgeci.moneysurfer.uikit.components.SurferEmptyState
+import com.georgeci.moneysurfer.uikit.components.transaction.SurferSwipeToDeleteTransaction
 import com.georgeci.moneysurfer.uikit.components.transaction.SurferTransactionLine
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
@@ -22,6 +23,7 @@ import moneysurfer.feature.transaction.generated.resources.transactions_list_emp
 import moneysurfer.feature.transaction.generated.resources.transactions_list_empty_search
 import moneysurfer.feature.transaction.generated.resources.transactions_list_empty_search_cta
 import moneysurfer.feature.transaction.generated.resources.transactions_list_empty_title
+import moneysurfer.feature.transaction.generated.resources.transactions_list_split_categories
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 
@@ -34,11 +36,16 @@ private const val INCOME_PILL_ALPHA = 0.14f
 private const val META_SEPARATOR = " · "
 
 /**
- * One transaction line, with the three variants the list can render.
+ * One transaction line, with the three variants the list can render, swipeable to delete.
  *
  * A transfer leg is deliberately neither of the other two: it carries the swap glyph on a neutral
  * transfer tint and no amount pill, because the money did not leave or arrive — it moved sideways,
  * and drawing it as a plain expense is exactly what made the two legs unreadable.
+ *
+ * The row's gap to the next one is on the swipe wrapper while its inset stays on the line: the
+ * Delete button is measured against the wrapper, so a bottom padding inside it would push the
+ * button off the line's centre, and a horizontal one would leave a dead 16dp strip at the edge
+ * where the swipe starts.
  */
 @Composable
 internal fun TransactionRow(
@@ -46,19 +53,58 @@ internal fun TransactionRow(
     showAccount: Boolean,
     untitled: String,
     onClick: () -> Unit,
+    onDelete: () -> Unit,
+) {
+    val title = row.title.ifBlank { untitled }
+    // Resolved here rather than in the mapping: only a composable can reach the string table, and
+    // a collapsed receipt's meta is a count, not the name of any one of its categories.
+    val subtitle = if (row.splitCategoryCount > 0) {
+        stringResource(Res.string.transactions_list_split_categories, row.splitCategoryCount)
+    } else {
+        row.subtitle
+    }
+    SurferSwipeToDeleteTransaction(
+        transactionTitle = title,
+        onDelete = onDelete,
+        modifier = Modifier.padding(bottom = 12.dp),
+        isTransfer = row.isTransfer,
+        // Any leg of a receipt, not just a collapsed row: the swipe takes the whole group either
+        // way, and a page holding part of a group renders its legs individually.
+        isSplit = row.isSplitLeg,
+    ) {
+        TransactionLine(
+            row = row,
+            showAccount = showAccount,
+            title = title,
+            subtitle = subtitle,
+            onClick = onClick,
+        )
+    }
+}
+
+@Composable
+private fun TransactionLine(
+    row: TransactionRowUi,
+    showAccount: Boolean,
+    title: String,
+    subtitle: String,
+    onClick: () -> Unit,
 ) {
     val transferTint = AppTheme.semanticColors.transfer
     SurferTransactionLine(
-        modifier = Modifier.padding(horizontal = 16.dp).padding(bottom = 12.dp),
+        modifier = Modifier.padding(horizontal = 16.dp),
         icon = when {
             row.isTransfer -> SurferCategoryPalette.TransferIcon
+            // A collapsed split is several categories at once, so the category glyph says more
+            // about it than the generic receipt every expense row carries.
+            row.splitCategoryCount > 0 -> SurferIcons.Category
             row.isExpense -> SurferIcons.Receipt
             else -> SurferIcons.Wallet
         },
-        title = row.title.ifBlank { untitled },
+        title = title,
         formattedAmount = row.formattedAmount,
         categoryHueSeed = row.categoryHueSeed,
-        meta = row.metaLine(showAccount),
+        meta = row.metaLine(subtitle, showAccount),
         iconTint = if (row.isTransfer) transferTint else AppTheme.materialColors.onSurfaceVariant,
         iconBackground = if (row.isTransfer) {
             transferTint.copy(alpha = TRANSFER_TILE_ALPHA)
@@ -84,7 +130,7 @@ internal fun TransactionRow(
  * scoped to one. Either half may be missing (an uncategorised row, a single-account list), so the
  * separator is joined in rather than baked into a string.
  */
-private fun TransactionRowUi.metaLine(showAccount: Boolean): String? = listOf(
+private fun TransactionRowUi.metaLine(subtitle: String, showAccount: Boolean): String? = listOf(
     subtitle,
     accountName.takeIf { showAccount }.orEmpty(),
 ).filter { it.isNotBlank() }

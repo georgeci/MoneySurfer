@@ -25,18 +25,26 @@
   `SyncFeatureFlag(enabled = false)` gates `WorkspaceSyncer` but **not** the direct
   `UserRemoteRepository` writes, so the shipped build writes `users/{uid}.workspaceIds`
   entries that point at Firestore documents which were never created.
-- The damage accumulates in production **today**, while the sync feature is dark, and
-  surfaces the day the flag is flipped.
-- Nothing in this document has been fixed. Read the [Remediation](#remediation) order
-  before touching any of it — R1 and R4 are coupled.
+- The damage accumulated in production while the sync feature was dark, and would have
+  surfaced the day the flag was flipped.
+- **R1–R5 have since landed** (issue #342), including the flag flip: sync is live in the
+  online build. The findings below are kept as the record of what the code used to do and
+  why the guards exist. Read [Remediation](#remediation) for the status of each item.
 
 READ WHEN:
-- changing `SyncFeatureFlag` or anything it gates
-- flipping the online build to `enabled = true`
+- changing `host.sync_enabled` / `SyncSettings` or anything they gate
 - touching `PostAuthBootstrapUseCase`, `CreateWorkspaceUseCase`, or the workspace selector
 - investigating "I signed in on my other phone and my data is gone"
 
-Audit date: 2026-07-25. Baseline: `main` @ `93880d1b0`. No code was changed.
+Audit date: 2026-07-25. Baseline: `main` @ `93880d1b0`.
+Fixed: 2026-07-25, issue #342 — R1–R5 landed; sync is on in the online build.
+
+**Naming note.** Everything below says `SyncFeatureFlag`, which is what the gate was called
+at audit time. Issue #332 replaced it with the `host.sync_enabled` Build-layer key behind the
+`SyncSettings` facade, and the flag's single boolean became the *build* term of a three-way and
+(build AND server kill switch AND user toggle) — see
+[ADR-004](../adr/ADR-004-configuration.md). The findings are quoted as they were written; the
+gate they describe is that build term.
 
 <!-- AI:SECTION id=cloud-login-verdict task=sync,auth,login,workspace,known-issues -->
 ## Verdict
@@ -105,6 +113,10 @@ Consequence chain for the audited scenario (device B, fresh install, same accoun
    Continue button is disabled because `activeWorkspace` resolves against that empty list;
    the only live control is "Create workspace".
 5. User creates a duplicate → `addWorkspaceRef` appends → `workspaceIds = [W, W2]`, both phantom.
+
+**Fixed (R1):** the remote block is entered only when `firebaseUid != null && syncFeatureFlag.enabled`.
+Refs already written by shipped builds stay on Firestore — F4's tolerance is what keeps them
+from blocking sign-in.
 <!-- AI:END -->
 
 <!-- AI:SECTION id=cloud-login-f2-pointer-seed task=auth,login,workspace,session -->
@@ -120,6 +132,10 @@ workspace. The selector is never shown, so the user has no way back to a valid w
 
 Independently: nothing guarantees `defaultWorkspaceId` is a member of `workspaceIds`. A
 server-side skew pins a workspace the pull never visits, even with sync fully enabled.
+
+**Fixed (R2):** both candidates are filtered through `WorkspaceRepository.getById` before
+anything is pinned; when nothing hydrated the use case returns `Result.CloudDataUnavailable`
+and the selector says so instead of showing an empty list.
 <!-- AI:END -->
 
 <!-- AI:SECTION id=cloud-login-f3-pull-pagination task=sync,pull,pagination -->
@@ -140,6 +156,10 @@ few thousand transactions shows wrong balances for tens of minutes of foreground
 
 Related: [`md/test_debt.md`](../../md/test_debt.md) §5 already flags that cursor paging is
 untested. That entry is about missing tests; this finding is that the loop is absent.
+
+**Fixed (R3):** `pullBatches` repeats until a batch comes back short of `BATCH_SIZE`, capped at
+`MAX_BATCHES_PER_COLLECTION = 50` (5 000 docs per collection per workspace per sync). The cursor
+is persisted every round, so hitting the ceiling just defers the tail to the next sync.
 <!-- AI:END -->
 
 <!-- AI:SECTION id=cloud-login-f4-bootstrap-abort task=sync,pull,auth,error-handling -->
@@ -154,19 +174,37 @@ Combined with F1 this is a latent kill switch: the moment `SyncFeatureFlag` is f
 `fetchWorkspaceDoc(W)` → `allow get: if isMember(wid)` → denied → sync error → **sign-in
 becomes impossible**, with `SignInError.PermissionDenied` shown on the form.
 
-Not yet verified empirically: whether the GitLive wrapper throws on a denied `get()` or
-returns `exists = false`. If it returns `exists = false`, the root-doc plugin skips and the
-failure instead surfaces on the first subcollection query. Either way the pull aborts;
-only the error shape differs. Prove it in [`firestore-tests/`](../../firestore-tests) before
-relying on either branch.
+**Verified** (2026-07-25) in
+[`firestore-tests/test/danglingWorkspaceRefs.spec.js`](../../firestore-tests/test/danglingWorkspaceRefs.spec.js).
+The rules layer answers the question the audit left open:
+
+| Read against a phantom `wid` | Result |
+| --- | --- |
+| `get workspaces/{wid}` | **`permission-denied`** — not an empty snapshot |
+| `get workspaces/{wid}` when the member row survives but the root doc is gone | succeeds, `exists() == false` |
+| any subcollection query (`accounts`, …) | `permission-denied` |
+| `invites` filtered by `targetUserId == uid` | **succeeds**, returns empty |
+| `invites` unfiltered | `permission-denied` |
+
+Two consequences. First, "workspace not found" and "workspace not yours" are genuinely
+different outcomes — the denial comes from `isMember`, not from the document's absence — so
+skipping on a denial does not also swallow an empty workspace. Second, `invites` is the one
+collection that does *not* fail on a phantom ref, because `allow read: if
+resource.data.targetUserId == request.auth.uid` admits the filtered query without a member
+row. That is why phase 2 uses `fetchInvitesForUser` and why it never trips over this.
+
+**Fixed (R4):** remote reads are wrapped so a raise is distinguishable from a local apply
+failure; a workspace that raises is logged and skipped, and the pull carries on with the rest.
+Both SDK shapes are covered because the tolerance is on *any* raising read, not on the root
+doc specifically — so the open [`firestore-tests/`](../../firestore-tests) question no longer
+gates anything.
 <!-- AI:END -->
 
 ## Minor
 
-- The `PostAuthBootstrapUseCase` KDoc claims the seeded default lets "a fresh device skip
-  the selector and land on Dashboard". `SignInViewModel` posts
-  `NavigateToWorkspaceSelector` unconditionally — the doc describes behaviour that does not
-  exist.
+- ~~The `PostAuthBootstrapUseCase` KDoc claims the seeded default lets "a fresh device skip
+  the selector and land on Dashboard".~~ Rewritten alongside R2; `SignInViewModel` still
+  posts `NavigateToWorkspaceSelector` unconditionally.
 
 ## What holds up
 
@@ -189,15 +227,46 @@ Worth stating explicitly so a fix does not churn code that is already correct:
 <!-- AI:SECTION id=cloud-login-remediation task=sync,auth,roadmap,known-issues -->
 ## Remediation
 
-Ordered; R1 and R4 must land together in any change that also flips the flag.
+| # | Change | Status |
+| --- | --- | --- |
+| R1 | `CreateWorkspaceUseCase` enters the remote block only when `firebaseUid != null && syncFeatureFlag.enabled` — same treatment the demo session already gets | **Done** |
+| R2 | `PostAuthBootstrapUseCase` verifies against `WorkspaceRepository` that the resolved workspace reached Room before pinning it, and returns `Result.CloudDataUnavailable` when the remote lists workspaces and none hydrated | **Done** |
+| R3 | `pullBatches` loops while `docs.size == BATCH_SIZE`, checking the cancel token each round, capped at `MAX_BATCHES_PER_COLLECTION` | **Done** |
+| R4 | A workspace whose *remote reads* raise is logged and skipped as a stale ref instead of aborting the pull; plugin (local write) failures still abort | **Done** |
+| R5 | `SyncFeatureFlag(enabled = true)` in the online build | **Done** — the owner's call, taken once R1–R4 landed |
 
-| # | Change | Rationale | Size |
-| --- | --- | --- | --- |
-| R1 | In `CreateWorkspaceUseCase`, enter the remote block only when `firebaseUid != null && syncFeatureFlag.enabled` — same treatment the demo session already gets | Stops writing dangling refs into production Firestore | S |
-| R2 | In `PostAuthBootstrapUseCase`, after `syncAll()` verify the resolved workspace exists in Room before pinning it; if the remote lists workspaces but none hydrated, return a distinct result the UI can render as "cloud data unavailable" | Kills both the silent drop into create-workspace and the Dashboard-over-empty-DB on next launch | S |
-| R3 | Loop `pullBatch` while `docs.size == BATCH_SIZE`, checking the cancel token each round, with an iteration ceiling | Full hydration before the first dashboard | M |
-| R4 | Treat a workspace whose root doc is unreadable as a stale ref: log, skip, optionally `arrayRemove` it; do not abort the bootstrap | Prevents flipping the flag from bricking sign-in for accounts damaged by F1 | M |
-| R5 | `SyncFeatureFlag(enabled = true)` in the online build | The only change that actually enables the scenario; a release decision, not a bug fix. R1–R4 are its preconditions | — |
+Four things fell out of the fix that the audit did not call for:
+
+- **Sign-in is now atomic.** The pointers pinned before the bootstrap
+  (`currentUserId`, `currentFirebaseUid`) cannot simply be deferred — the pull reads
+  `currentFirebaseUid` to discover the user's workspaces — so `AbandonAuthSessionUseCase`
+  rolls them back and signs out when the bootstrap returns `Left`. Without it a failed
+  bootstrap left a signed-in session with no workspace, and `resolveStartRoute` sent the
+  next cold start past sign-in into a selector with nothing in it and no retry path.
+- **`arrayRemove` for stale refs was not implemented.** Skipping is enough to unblock
+  sign-in, and pruning the remote list is a destructive write on data the client may be
+  misreading (an unreadable workspace is not provably a dead one). Left deliberate.
+- **The tolerance in R4 is scoped to denials only.** A first cut swallowed every remote
+  read failure, so a dropped connection produced `PullSummary(0, 0)` and the coordinator
+  recorded a successful sync — the UI would have claimed the user was up to date while
+  nothing arrived. `readRemote` now classifies: PERMISSION_DENIED skips the workspace,
+  everything else still aborts the pull.
+- **R1 needed a mirror on the push side.** Gating the remote block also removed the only
+  call that registers `users/{uid}.workspaceIds` for a workspace created while sync was
+  dark, and nothing else ever adds one — the workspace would have been pushed by the
+  outbox after the flip and stayed invisible to every other device. `WorkspaceRefRegistrar`
+  now registers the ref from `WorkspaceSyncPlugin.push`, where it belongs.
+
+Two smaller consequences, both user-facing:
+
+- **Anonymous sign-in must not be signed out on rollback.** `signInAnonymously()` reuses
+  `auth.currentUser` and mints a new uid when there is none, so signing out over a transient
+  bootstrap failure would orphan that account's cloud data permanently. The rollback clears
+  the local pointers and leaves the provider session alone.
+- **The selector needed an exit.** Signed in with no workspace has no back entry and no
+  route to Settings, so `Result.CloudDataUnavailable` would have been the same dead end
+  §2 set out to remove. The selector now carries a sign-out action whenever it is the root
+  of the stack.
 
 R2 does not violate layering: `WorkspaceRepository` is a domain interface, alongside the
 `UserRemoteRepository` and `WorkspaceSyncer` the use case already depends on.
@@ -211,17 +280,27 @@ Each finding was argued against before being kept. What the counter-arguments ch
 | --- | --- |
 | "F1 is harmless — `addWorkspaceRef` is best-effort anyway" | **Rejected.** The harm is the *success*, not the failure: the write lands and references a document that does not exist. |
 | "F3 is not a bug — the ticker catches up" | **Partially accepted.** Downgraded from critical to medium: convergence is real, data loss is not. The defect is a misleading first screen, not corruption. |
-| "F4 overstates it — sign-in would not actually block" | **Kept**, with a caveat: the abort path is confirmed in code, but the exact SDK error shape on a denied `get()` is unverified. Flagged as a test to write, not an assumption to build on. |
+| "F4 overstates it — sign-in would not actually block" | **Kept**, and since confirmed: the emulator test shows a denied `get()`, so the abort path is the one that ran. |
 | "None of this matters, sync is not shipped" | **Rejected, and it inverts the priority.** Because the feature is dark, the corrupting writes in F1 run unobserved in production and only surface at flip time. This is what makes R1 urgent rather than deferrable. |
 | "R2 puts a Room query in the domain layer" | **Rejected** — `WorkspaceRepository` is a domain interface. |
 
 ## Verification checklist
 
-Before closing any of R1–R4:
-
-- [ ] Emulator test in `firestore-tests/` for a `users/{uid}.workspaceIds` entry with no
-      matching `workspaces/{wid}` — assert the observed SDK error shape (F4).
-- [ ] Test that `CreateWorkspaceUseCase` performs **no** remote writes with the flag off (R1).
-- [ ] Test that bootstrap leaves `currentWorkspaceId` null when the pull hydrated nothing (R2).
-- [ ] Multi-batch pull test: >100 docs in one collection drained by a single sync (R3).
-- [ ] Bootstrap test: one unreadable workspace out of N does not fail the sign-in (R4).
+- [x] `CreateWorkspaceUseCase` performs **no** remote writes with the flag off (R1) —
+      `CreateWorkspaceUseCaseTest`.
+- [x] Bootstrap leaves `currentWorkspaceId` null when the pull hydrated nothing (R2) —
+      `PostAuthBootstrapUseCaseTest`.
+- [x] A failed bootstrap leaves no session pointers set — `AuthSessionRollbackTest`.
+- [x] Multi-batch pull: 250 docs in one collection drained by a single sync (R3) —
+      `PullRemoteChangesUseCaseImplSpec`.
+- [x] One unreadable workspace out of N does not fail the pull (R4), in both SDK shapes —
+      denied root `get()` and denied subcollection query —
+      `PullRemoteChangesUseCaseImplSpec`.
+- [x] A network failure aborts the pull instead of passing as a stale ref —
+      `PullRemoteChangesUseCaseImplSpec`.
+- [x] An anonymous rollback keeps the provider session — `AuthSessionRollbackTest`.
+- [x] A pushed workspace registers its own ref — `WorkspaceRefRegistrarSpec`.
+- [x] Emulator test for a `users/{uid}.workspaceIds` entry with no matching
+      `workspaces/{wid}` — `firestore-tests/test/danglingWorkspaceRefs.spec.js`, 7 cases.
+      The denial is real, and the phantom ref reads back from `users/{uid}` as if nothing
+      were wrong, which is why the bug stayed invisible.

@@ -37,7 +37,7 @@ class GetTransactionsByCategoryUseCase(
         categoryId: CategoryId,
         limit: Int = DEFAULT_LIMIT,
     ): Flow<List<Transaction>> =
-        session.currentWorkspaceId.flow.flatMapLatest { workspaceId ->
+        session.currentWorkspaceId.flatMapLatest { workspaceId ->
             workspaceId ?: return@flatMapLatest flowOf(emptyList())
 
             combine(

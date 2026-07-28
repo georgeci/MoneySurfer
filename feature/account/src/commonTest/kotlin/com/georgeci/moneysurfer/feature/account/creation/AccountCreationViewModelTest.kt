@@ -2,9 +2,9 @@ package com.georgeci.moneysurfer.feature.account.creation
 
 import androidx.lifecycle.viewModelScope
 import app.cash.turbine.test
-import com.georgeci.moneysurfer.domain.OfflineBuildFlags
 import com.georgeci.moneysurfer.domain.auth.InMemorySessionPointers
 import com.georgeci.moneysurfer.domain.fixtures.EUR
+import com.georgeci.moneysurfer.domain.fixtures.FakeHostCapabilities
 import com.georgeci.moneysurfer.domain.fixtures.RUB
 import com.georgeci.moneysurfer.domain.fixtures.USD
 import com.georgeci.moneysurfer.domain.fixtures.aWorkspace
@@ -19,6 +19,7 @@ import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.AccountType
 import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
 import com.georgeci.moneysurfer.domain.primitives.Money
+import com.georgeci.moneysurfer.domain.primitives.SplitId
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
 import com.georgeci.moneysurfer.domain.primitives.TransferId
@@ -560,7 +561,7 @@ private class Fixture(val workspaceId: WorkspaceId) {
         getCurrencies = GetCurrenciesUseCase(currencyRepository),
         updateWorkspaceCurrency = UpdateWorkspaceCurrencyUseCase(workspaceRepository, accountRepository),
         snackbar = snackbar,
-        offlineBuildFlags = OfflineBuildFlags(isOffline = offline),
+        hostCapabilities = FakeHostCapabilities(isOffline = offline),
     )
 }
 
@@ -595,6 +596,7 @@ private class FakeAccountRepository : AccountRepository {
         byId[accountId] = current.copy(balance = balance)
         byWorkspace.value = byId.values.toList()
     }
+    override suspend fun reorder(orderedIds: List<AccountId>) = Unit
     override suspend fun setArchived(accountId: AccountId, archived: Boolean) {
         val current = byId[accountId] ?: return
         byId[accountId] = current.copy(archived = archived)
@@ -606,6 +608,9 @@ private class FakeTransactionRepository : TransactionRepository {
     val inserted = mutableListOf<Transaction>()
     private val byId = mutableMapOf<TransactionId, Transaction>()
     private val all = MutableStateFlow<List<Transaction>>(emptyList())
+
+    /** Rows a delete tombstoned — out of every read, still there for a restore. */
+    private val tombstones = mutableMapOf<TransactionId, Transaction>()
 
     override fun getAll(): Flow<List<Transaction>> = all
     override fun getByAccountId(accountId: AccountId): Flow<List<Transaction>> = all
@@ -619,6 +624,8 @@ private class FakeTransactionRepository : TransactionRepository {
     override suspend fun getById(id: TransactionId): Transaction? = byId[id]
     override suspend fun getByTransferId(transferId: TransferId): List<Transaction> =
         byId.values.filter { it.transferId == transferId }
+    override suspend fun getBySplitId(splitId: SplitId): List<Transaction> =
+        byId.values.filter { it.splitId == splitId }
     override suspend fun insert(transaction: Transaction) {
         inserted += transaction
         byId[transaction.id] = transaction
@@ -629,9 +636,15 @@ private class FakeTransactionRepository : TransactionRepository {
         all.value = byId.values.toList()
     }
     override suspend fun delete(id: TransactionId) {
-        byId.remove(id)
+        byId.remove(id)?.let { tombstones[id] = it }
         all.value = byId.values.toList()
     }
+
+    override suspend fun restore(id: TransactionId): Transaction? =
+        tombstones.remove(id)?.also {
+            byId[id] = it
+            all.value = byId.values.toList()
+        }
 }
 
 private class FakeWorkspaceRepository(workspace: Workspace) : WorkspaceRepository {

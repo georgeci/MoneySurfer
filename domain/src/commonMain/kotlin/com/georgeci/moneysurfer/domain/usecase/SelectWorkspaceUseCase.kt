@@ -2,6 +2,7 @@ package com.georgeci.moneysurfer.domain.usecase
 
 import arrow.core.Either
 import co.touchlab.kermit.Logger
+import com.georgeci.moneysurfer.domain.auth.SessionMutator
 import com.georgeci.moneysurfer.domain.auth.SessionPointers
 import com.georgeci.moneysurfer.domain.logging.redactUid
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
@@ -22,14 +23,15 @@ import org.koin.core.annotation.Single
 @Single
 class SelectWorkspaceUseCase(
     private val session: SessionPointers,
+    private val sessionMutator: SessionMutator,
     private val userRemoteRepository: UserRemoteRepository,
 ) {
     private val log = Logger.withTag(TAG)
 
     suspend operator fun invoke(workspaceId: WorkspaceId) {
-        session.currentWorkspaceId.set(workspaceId)
+        sessionMutator.setCurrentWorkspace(workspaceId)
 
-        val firebaseUid = session.currentFirebaseUid.flow.first()
+        val firebaseUid = session.currentFirebaseUid.first()
         if (firebaseUid != null) {
             Either.catch { userRemoteRepository.setDefaultWorkspace(firebaseUid, workspaceId) }
                 .onLeft {

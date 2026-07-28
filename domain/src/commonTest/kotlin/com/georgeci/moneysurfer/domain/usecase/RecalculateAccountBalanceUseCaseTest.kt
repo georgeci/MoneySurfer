@@ -9,6 +9,7 @@ import com.georgeci.moneysurfer.domain.model.Transaction
 import com.georgeci.moneysurfer.domain.model.TransactionTotal
 import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.Money
+import com.georgeci.moneysurfer.domain.primitives.SplitId
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.domain.primitives.TransactionStatus
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
@@ -100,9 +101,12 @@ private class RecalcEnv(rows: List<Transaction>) {
         override suspend fun getById(id: TransactionId): Transaction? = rows.find { it.id == id }
         override suspend fun getByTransferId(transferId: TransferId): List<Transaction> =
             rows.filter { it.transferId == transferId }
+        override suspend fun getBySplitId(splitId: SplitId): List<Transaction> =
+            rows.filter { it.splitId == splitId }
         override suspend fun insert(transaction: Transaction) {}
         override suspend fun update(transaction: Transaction) {}
         override suspend fun delete(id: TransactionId) {}
+        override suspend fun restore(id: TransactionId): Transaction? = null
     }
 
     private val accRepo = object : AccountRepository {
@@ -118,6 +122,7 @@ private class RecalcEnv(rows: List<Transaction>) {
         override suspend fun setBalance(accountId: AccountId, balance: Money) {
             balances[accountId] = balance.minor
         }
+        override suspend fun reorder(orderedIds: List<AccountId>) = Unit
         override suspend fun setArchived(accountId: AccountId, archived: Boolean) = Unit
     }
 

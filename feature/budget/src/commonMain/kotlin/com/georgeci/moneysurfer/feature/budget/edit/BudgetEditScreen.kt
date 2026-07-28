@@ -34,6 +34,7 @@ import com.georgeci.moneysurfer.uikit.components.budget.SurferCategoryChip
 import com.georgeci.moneysurfer.uikit.components.budget.SurferCategoryChipGrid
 import com.georgeci.moneysurfer.uikit.components.budget.SurferPercentStepper
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
 import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
@@ -126,6 +127,7 @@ private fun BudgetEditContent(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .surferContentContainer()
                 .padding(padding)
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = AppTheme.spacing.default, vertical = AppTheme.spacing.medium),

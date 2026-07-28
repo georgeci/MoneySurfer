@@ -18,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -33,7 +34,9 @@ import com.georgeci.moneysurfer.uikit.components.goal.SurferEmojiPicker
 import com.georgeci.moneysurfer.uikit.components.goal.SurferGoalHueRow
 import com.georgeci.moneysurfer.uikit.components.goal.SurferGoalIcon
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
+import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
 import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.utils.HandleSideEffect
@@ -54,6 +57,14 @@ import moneysurfer.feature.goal.generated.resources.goal_edit_title_edit
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
+
+/** Stable selectors for the goal create/edit screen — see docs/testing/testing-strategy.md. */
+object GoalEditTestTags {
+    const val Root = "goalEdit:root"
+    const val TitleField = "goalEdit:title"
+    const val TargetField = "goalEdit:target"
+    const val SaveButton = "goalEdit:save"
+}
 
 @Composable
 fun GoalEditScreen(
@@ -78,7 +89,10 @@ private fun GoalEditContent(
     onEvent: (GoalEditEvent) -> Unit,
 ) {
     Scaffold(
-        modifier = Modifier.surferSafeInsets(),
+        modifier = Modifier
+            .surferSafeInsets()
+            .testTag(GoalEditTestTags.Root)
+            .surferTestTagAsId(),
         containerColor = AppTheme.materialColors.surface,
         topBar = {
             SurferToolbar(
@@ -92,6 +106,7 @@ private fun GoalEditContent(
                         text = stringResource(Res.string.goal_edit_save),
                         enabled = state.canSave,
                         onClick = { onEvent(GoalEditEvent.OnSaveClick) },
+                        modifier = Modifier.testTag(GoalEditTestTags.SaveButton),
                     )
                 },
             )
@@ -100,6 +115,7 @@ private fun GoalEditContent(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .surferContentContainer()
                 .padding(padding)
                 .verticalScroll(rememberScrollState())
                 .padding(AppTheme.spacing.default),
@@ -121,7 +137,9 @@ private fun GoalEditContent(
                         null
                     },
                     singleLine = true,
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier
+                        .weight(1f)
+                        .testTag(GoalEditTestTags.TitleField),
                 )
             }
 
@@ -137,7 +155,9 @@ private fun GoalEditContent(
                 },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 singleLine = true,
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag(GoalEditTestTags.TargetField),
             )
 
             GoalDateField(

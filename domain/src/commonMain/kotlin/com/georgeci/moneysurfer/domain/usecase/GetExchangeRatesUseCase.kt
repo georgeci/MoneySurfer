@@ -41,7 +41,7 @@ class GetExchangeRatesUseCase(
             }
 
     private fun baseCurrency(): Flow<CurrencyCode?> =
-        session.currentWorkspaceId.flow.flatMapLatest { workspaceId ->
+        session.currentWorkspaceId.flatMapLatest { workspaceId ->
             if (workspaceId == null) {
                 flowOf(null)
             } else {

@@ -18,6 +18,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -26,7 +27,9 @@ import com.georgeci.moneysurfer.feature.transaction.filter.TransactionFilters
 import com.georgeci.moneysurfer.uikit.components.SurferButton
 import com.georgeci.moneysurfer.uikit.components.SurferButtonStyle
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
+import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
+import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.utils.HandleSideEffect
 import moneysurfer.feature.transaction.generated.resources.Res
@@ -42,6 +45,19 @@ import org.koin.core.parameter.parametersOf
 
 /** Apply carries a counted label, so it needs more room than the bare "Cancel" beside it. */
 private const val APPLY_WEIGHT = 1.4f
+
+object TransactionFiltersTestTags {
+    const val Root = "transactionFilters:root"
+    const val Apply = "transactionFilters:apply"
+    const val Cancel = "transactionFilters:cancel"
+
+    /**
+     * Transaction-type option, suffixed with the lowercased
+     * [com.georgeci.moneysurfer.domain.model.TransactionTypeFilter]. The Apply label carries a
+     * live result count, so it can never be a stable text selector.
+     */
+    const val TypePrefix = "transactionFilters:type:"
+}
 
 @Composable
 fun TransactionFiltersScreen(
@@ -71,7 +87,10 @@ private fun TransactionFiltersContent(
     onEvent: (TransactionFiltersEvent) -> Unit,
 ) {
     Scaffold(
-        modifier = Modifier.surferSafeInsets(),
+        modifier = Modifier
+            .surferSafeInsets()
+            .testTag(TransactionFiltersTestTags.Root)
+            .surferTestTagAsId(),
         containerColor = AppTheme.materialColors.surface,
         topBar = {
             SurferToolbar(
@@ -92,6 +111,7 @@ private fun TransactionFiltersContent(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .surferContentContainer()
                 .padding(padding)
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 16.dp),
@@ -139,7 +159,9 @@ private fun FiltersFooter(
         stringResource(Res.string.transaction_filters_results, state.resultCount)
     }
     Surface(color = AppTheme.materialColors.surface) {
-        Column {
+        // The surface itself bleeds to the window edges; its contents take the same cap as the
+        // form above, so the divider terminates that column instead of overrunning it.
+        Column(modifier = Modifier.surferContentContainer()) {
             HorizontalDivider(color = AppTheme.materialColors.outlineVariant)
             Row(
                 modifier = Modifier
@@ -151,12 +173,16 @@ private fun FiltersFooter(
                     text = stringResource(Res.string.transaction_filters_cancel),
                     onClick = { onEvent(TransactionFiltersEvent.OnCancelClick) },
                     style = SurferButtonStyle.Outlined,
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier
+                        .weight(1f)
+                        .testTag(TransactionFiltersTestTags.Cancel),
                 )
                 SurferButton(
                     text = stringResource(Res.string.transaction_filters_apply, results),
                     onClick = { onEvent(TransactionFiltersEvent.OnApplyClick) },
-                    modifier = Modifier.weight(APPLY_WEIGHT),
+                    modifier = Modifier
+                        .weight(APPLY_WEIGHT)
+                        .testTag(TransactionFiltersTestTags.Apply),
                 )
             }
         }

@@ -17,6 +17,7 @@ import com.georgeci.moneysurfer.domain.model.Transaction
 import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.CategoryId
 import com.georgeci.moneysurfer.domain.primitives.Money
+import com.georgeci.moneysurfer.domain.primitives.SplitId
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
 import com.georgeci.moneysurfer.domain.primitives.TransferId
@@ -28,9 +29,12 @@ import com.georgeci.moneysurfer.domain.usecase.ApplyTransactionChangeUseCase
 import com.georgeci.moneysurfer.domain.usecase.DeleteTransactionUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetAccountByIdUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetCategoriesUseCase
+import com.georgeci.moneysurfer.domain.usecase.GetSplitLegsUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetTransactionByIdUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetTransferCounterpartUseCase
+import com.georgeci.moneysurfer.domain.usecase.RestoreTransactionsUseCase
 import com.georgeci.moneysurfer.domain.util.TransactionPeriodWindow
+import com.georgeci.moneysurfer.navigation.DeleteTransactionWithUndo
 import com.georgeci.moneysurfer.navigation.SnackbarController
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.nulls.shouldNotBeNull
@@ -274,6 +278,81 @@ class TransactionDetailsViewModelTest : StringSpec({
         }
     }
 
+    "a split leg breaks the receipt down and marks the leg being viewed" {
+        runTest {
+            val fixture = Fixture(ws)
+            fixture.seedAccounts(anAccount(id = accountId("a-1"), workspaceId = ws, name = "Everyday"))
+            fixture.seedCategories(
+                aCategory(id = categoryId("c-food"), workspaceId = ws, name = "Groceries"),
+                aCategory(id = categoryId("c-home"), workspaceId = ws, name = "Household"),
+            )
+            fixture.seedTransactions(
+                aTransaction(
+                    id = transactionId("leg-groceries"),
+                    workspaceId = ws,
+                    accountId = accountId("a-1"),
+                    money = 30.dollars,
+                    categoryId = categoryId("c-food"),
+                    splitId = SplitId("sp-1"),
+                ),
+                aTransaction(
+                    id = transactionId("leg-household"),
+                    workspaceId = ws,
+                    accountId = accountId("a-1"),
+                    money = 4.dollars,
+                    categoryId = categoryId("c-home"),
+                    splitId = SplitId("sp-1"),
+                ),
+            )
+            val vm = fixture.createViewModel(transactionId("leg-household"))
+            try {
+                val content = vm.awaitContent()
+
+                content.isSplit shouldBe true
+                // The hero keeps showing the leg that was opened — that is the row every category
+                // analytic counted — while the card carries the whole receipt.
+                content.formattedAmount shouldBe "−$4.00"
+                val split = content.split.shouldNotBeNull()
+                split.formattedTotal shouldBe "$34.00"
+                split.legs.map { it.categoryName } shouldBe listOf("Groceries", "Household")
+                split.legs.map { it.formattedAmount } shouldBe listOf("$30.00", "$4.00")
+                split.legs.map { it.isCurrent } shouldBe listOf(false, true)
+                // Duplicating one leg would produce a fragment of a receipt with no group.
+                content.canDuplicate shouldBe false
+            } finally {
+                vm.viewModelScope.cancel()
+            }
+        }
+    }
+
+    "a split leg whose siblings never arrived renders as an ordinary transaction" {
+        runTest {
+            val fixture = Fixture(ws)
+            fixture.seedAccounts(anAccount(id = accountId("a-1"), workspaceId = ws))
+            fixture.seedTransactions(
+                aTransaction(
+                    id = transactionId("leg-lonely"),
+                    workspaceId = ws,
+                    accountId = accountId("a-1"),
+                    money = 30.dollars,
+                    categoryId = null,
+                    splitId = SplitId("sp-orphan"),
+                ),
+            )
+            val vm = fixture.createViewModel(transactionId("leg-lonely"))
+            try {
+                val content = vm.awaitContent()
+
+                // A leg can reach this device before its siblings; there is nothing to break down
+                // yet, and inventing a one-line "split" would be noise.
+                content.isSplit shouldBe false
+                content.split shouldBe null
+            } finally {
+                vm.viewModelScope.cancel()
+            }
+        }
+    }
+
     "tapping Duplicate asks to open the creation screen for this transaction" {
         runTest {
             val fixture = Fixture(ws)
@@ -330,9 +409,12 @@ private class Fixture(workspaceId: WorkspaceId) {
         getAccountById = GetAccountByIdUseCase(accountRepository),
         getCategories = GetCategoriesUseCase(categoryRepository, session),
         getTransferCounterpart = GetTransferCounterpartUseCase(transactionRepository),
-        deleteTransaction = DeleteTransactionUseCase(transactionRepository, applyChange),
-        applyTransactionChange = applyChange,
-        snackbar = snackbar,
+        getSplitLegs = GetSplitLegsUseCase(transactionRepository),
+        deleteWithUndo = DeleteTransactionWithUndo(
+            deleteTransaction = DeleteTransactionUseCase(transactionRepository, applyChange),
+            restoreTransactions = RestoreTransactionsUseCase(applyChange),
+            snackbar = snackbar,
+        ),
     )
 }
 
@@ -365,6 +447,7 @@ private class FakeAccountRepository : AccountRepository {
         byId[accountId] = current.copy(balance = balance)
         byWorkspace.value = byId.values.toList()
     }
+    override suspend fun reorder(orderedIds: List<AccountId>) = Unit
     override suspend fun setArchived(accountId: AccountId, archived: Boolean) {
         val current = byId[accountId] ?: return
         byId[accountId] = current.copy(archived = archived)
@@ -375,6 +458,9 @@ private class FakeAccountRepository : AccountRepository {
 private class FakeTransactionRepository : TransactionRepository {
     private val byId = mutableMapOf<TransactionId, Transaction>()
     private val all = MutableStateFlow<List<Transaction>>(emptyList())
+
+    /** Rows a delete tombstoned — out of every read, still there for a restore. */
+    private val tombstones = mutableMapOf<TransactionId, Transaction>()
 
     override fun getAll(): Flow<List<Transaction>> = all
     override fun getByAccountId(accountId: AccountId): Flow<List<Transaction>> = all
@@ -388,6 +474,8 @@ private class FakeTransactionRepository : TransactionRepository {
     override suspend fun getById(id: TransactionId): Transaction? = byId[id]
     override suspend fun getByTransferId(transferId: TransferId): List<Transaction> =
         byId.values.filter { it.transferId == transferId }
+    override suspend fun getBySplitId(splitId: SplitId): List<Transaction> =
+        byId.values.filter { it.splitId == splitId }
     override suspend fun insert(transaction: Transaction) {
         byId[transaction.id] = transaction
         all.value = byId.values.toList()
@@ -397,9 +485,15 @@ private class FakeTransactionRepository : TransactionRepository {
         all.value = byId.values.toList()
     }
     override suspend fun delete(id: TransactionId) {
-        byId.remove(id)
+        byId.remove(id)?.let { tombstones[id] = it }
         all.value = byId.values.toList()
     }
+
+    override suspend fun restore(id: TransactionId): Transaction? =
+        tombstones.remove(id)?.also {
+            byId[id] = it
+            all.value = byId.values.toList()
+        }
 }
 
 private class FakeCategoryRepository : CategoryRepository {

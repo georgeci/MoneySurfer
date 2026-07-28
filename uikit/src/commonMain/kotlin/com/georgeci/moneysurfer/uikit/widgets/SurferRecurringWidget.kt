@@ -50,7 +50,7 @@ fun SurferRecurringWidget(
     emptyTitle: String? = null,
     emptySubtitle: String? = null,
 ) {
-    val hero = size == SurferWidgetSize.Hero
+    val hero = size == SurferWidgetSize.Expanded
     val visibleItems = if (hero) items.take(3) else items.take(2)
 
     Column(

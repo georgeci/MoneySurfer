@@ -25,6 +25,7 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.georgeci.moneysurfer.domain.model.WorkspaceRole
@@ -36,6 +37,7 @@ import com.georgeci.moneysurfer.uikit.components.workspace.SurferInvitePendingRo
 import com.georgeci.moneysurfer.uikit.components.workspace.SurferInviteRow
 import com.georgeci.moneysurfer.uikit.components.workspace.SurferMemberRow
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
 import com.georgeci.moneysurfer.uikit.preview.SurferBottomSheetPreview
 import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
@@ -65,6 +67,12 @@ import moneysurfer.feature.workspace.generated.resources.workspace_members_title
 import moneysurfer.feature.workspace.generated.resources.workspace_members_view_only_hint
 import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
+
+/** Stable selectors for the workspace members view — see docs/testing/testing-strategy.md. */
+object WorkspaceMembersTestTags {
+    const val Root = "workspaceMembers:root"
+    const val Invite = "workspaceMembers:invite"
+}
 
 /**
  * Pure content composable for the Members view. Renders header + Active/Invited tabs +
@@ -109,7 +117,12 @@ private fun WorkspaceMembersContent(
     headerNavigationIcon: ImageVector = SurferIcons.Close,
     showHeader: Boolean = true,
 ) {
-    Column(modifier = modifier.fillMaxWidth()) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .testTag(WorkspaceMembersTestTags.Root)
+            .surferTestTagAsId(),
+    ) {
         if (showHeader) {
             Header(
                 workspaceName = state.workspaceName,
@@ -126,6 +139,7 @@ private fun WorkspaceMembersContent(
                     title = stringResource(Res.string.workspace_members_invite_title),
                     subtitle = stringResource(Res.string.workspace_members_invite_subtitle),
                     onClick = { onEvent(WorkspaceMembersEvent.OnInviteClick) },
+                    modifier = Modifier.testTag(WorkspaceMembersTestTags.Invite),
                 )
             }
             Spacer(Modifier.height(AppTheme.spacing.medium))

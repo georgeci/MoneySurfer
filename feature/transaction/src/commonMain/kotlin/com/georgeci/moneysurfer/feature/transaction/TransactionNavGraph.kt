@@ -1,7 +1,6 @@
 package com.georgeci.moneysurfer.feature.transaction
 
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
-import androidx.compose.material3.adaptive.navigation3.ListDetailSceneStrategy
 import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationScreen
@@ -14,6 +13,7 @@ import com.georgeci.moneysurfer.navigation.CategoryPickerResultKey
 import com.georgeci.moneysurfer.navigation.FeatureNavGraph
 import com.georgeci.moneysurfer.navigation.NavDetailPlaceholder
 import com.georgeci.moneysurfer.navigation.Route
+import com.georgeci.moneysurfer.navigation.SurferPaneSceneStrategy
 import com.georgeci.moneysurfer.navigation.util.rememberNavigationResult
 import io.github.irgaly.navigation3.resultstate.NavigationResultMetadata
 import io.github.irgaly.navigation3.resultstate.resultConsumer
@@ -21,7 +21,7 @@ import io.github.irgaly.navigation3.resultstate.resultConsumer
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 val transactionNavGraph: FeatureNavGraph = { navigator ->
     entry<Route.TransactionsByAccount>(
-        metadata = ListDetailSceneStrategy.listPane(detailPlaceholder = { NavDetailPlaceholder() }),
+        metadata = SurferPaneSceneStrategy.listPane(detailPlaceholder = { NavDetailPlaceholder() }),
     ) { key ->
         TransactionsByAccountScreen(
             accountId = key.accountId?.let { AccountId(it) },
@@ -59,7 +59,7 @@ val transactionNavGraph: FeatureNavGraph = { navigator ->
                     AccountPickerResultKey,
                     AccountPickerTransferResultKey,
                 ),
-        ) + ListDetailSceneStrategy.detailPane(),
+        ) + SurferPaneSceneStrategy.detailPane(),
     ) { key ->
         val pickedCategoryId = rememberNavigationResult(CategoryPickerResultKey)
         val pickedAccountId = rememberNavigationResult(AccountPickerResultKey)
@@ -69,6 +69,7 @@ val transactionNavGraph: FeatureNavGraph = { navigator ->
             transactionId = key.transactionId?.let { TransactionId(it) },
             accountId = key.accountId?.let { AccountId(it) },
             duplicate = key.duplicate,
+            transfer = key.transfer,
             onNavigateBack = { navigator.pop() },
             // Edit is only ever pushed from the details of the row being edited, and that row is
             // now gone — returning to it would show a screen for a deleted transaction.
@@ -98,7 +99,7 @@ val transactionNavGraph: FeatureNavGraph = { navigator ->
     }
 
     entry<Route.TransactionDetails>(
-        metadata = ListDetailSceneStrategy.detailPane(),
+        metadata = SurferPaneSceneStrategy.detailPane(),
     ) { key ->
         TransactionDetailsScreen(
             transactionId = TransactionId(key.transactionId),

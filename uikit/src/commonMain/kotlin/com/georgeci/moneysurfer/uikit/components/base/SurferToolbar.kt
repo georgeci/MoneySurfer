@@ -24,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
@@ -48,7 +49,10 @@ fun SurferToolbar(
         modifier = modifier,
         navigationIcon = {
             when {
-                onBack != null -> IconButton(onClick = onBack) {
+                onBack != null -> IconButton(
+                    onClick = onBack,
+                    modifier = Modifier.testTag(SurferToolbarTestTags.Back),
+                ) {
                     Icon(
                         imageVector = SurferIcons.Back,
                         contentDescription = stringResource(Res.string.uikit_back),
@@ -61,6 +65,16 @@ fun SurferToolbar(
         actions = actions,
         title = { Text(title) },
     )
+}
+
+/**
+ * Stable selectors for [SurferToolbar] — see docs/testing/testing-strategy.md.
+ *
+ * [Back] is on the navigation [IconButton] every screen with an `onBack` gets, so an E2E flow
+ * can go back by id instead of matching the localized "Back" content description.
+ */
+object SurferToolbarTestTags {
+    const val Back = "toolbar:back"
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

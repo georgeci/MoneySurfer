@@ -27,6 +27,10 @@ import com.georgeci.moneysurfer.uikit.theme.AppTheme
  * Centered empty-state block: an icon medallion, a title, an optional subtitle and an
  * optional call-to-action. Use it when a list or screen has no content yet — the CTA is
  * what turns a dead end into the next step the user should take.
+ *
+ * To address the CTA from a UI test, tag the block through [modifier] at the call site — the
+ * host screen owns its own selectors, and a dedicated tag parameter here would be one more
+ * argument on an already wide signature.
  */
 @Composable
 fun SurferEmptyState(

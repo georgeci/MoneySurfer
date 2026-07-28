@@ -41,6 +41,11 @@ import androidx.room.PrimaryKey
             orders = [Index.Order.ASC, Index.Order.DESC, Index.Order.DESC, Index.Order.DESC],
         ),
         Index("categoryId"),
+        // Unlike `transferId`, which is read once when a details screen opens, `splitId` is
+        // correlated per row by the list window query (see TransactionDao.getCategorizedWindow)
+        // to learn how many legs a group has. That runs on every emission of the list Flow, so
+        // the index earns its write amplification.
+        Index("splitId"),
     ],
 )
 data class TransactionEntity(
@@ -64,9 +69,25 @@ data class TransactionEntity(
     @ColumnInfo(name = "createdAt", defaultValue = "0") val createdAt: Long = 0L,
     @ColumnInfo(name = "updatedAt", defaultValue = "0") val updatedAt: Long = 0L,
     @ColumnInfo(name = "transferId") val transferId: String? = null,
+    // Shared id of the sibling rows one receipt was split across. Null for the overwhelming
+    // majority of rows — see the domain model for why a split is N transactions rather than a
+    // child allocation table.
+    @ColumnInfo(name = "splitId") val splitId: String? = null,
     // No ForeignKey to recurring_rules and no index: the rules table is not synced yet, so a
     // pulled transaction can name a rule this device has never seen — an FK would reject the
     // row outright. An index would also be dead weight, since the "Recurring only" filter runs
     // inside a workspace scan already served by the composite indices above.
     @ColumnInfo(name = "recurringRuleId") val recurringRuleId: String? = null,
+    // Tombstone: non-null means the user deleted this row (issue #346). Every read query in
+    // TransactionDao adds `deletedAt IS NULL`; the row itself survives so Undo is a single
+    // UPDATE rather than a re-insert, and survives process death rather than living in a
+    // Snackbar lambda. Mirrors `TransactionDoc.deletedAt` on the wire, so a pulled tombstone
+    // and a local delete are the same state. Purged after a retention window — see
+    // PurgeDeletedTransactionsUseCase.
+    //
+    // Deliberately unindexed. It is a low-cardinality column (almost every row is NULL) that
+    // never appears alone in a WHERE clause — it always rides along with a workspace or
+    // account filter already served by the composite indices above, so SQLite would ignore a
+    // separate index on it while every insert paid to maintain it.
+    @ColumnInfo(name = "deletedAt") val deletedAt: Long? = null,
 )

@@ -45,7 +45,7 @@ class SendInviteUseCase(
     )
 
     suspend operator fun invoke(params: Params): Either<InviteError, WorkspaceInviteId> = either {
-        val callerId = session.currentUserId.flow.first()
+        val callerId = session.currentUserId.first()
             ?: raise(InviteError.NoCurrentUser)
 
         val normalizedEmail = params.email.trim().lowercase()
@@ -108,7 +108,7 @@ class SendInviteUseCase(
         // discovers the invite without a collectionGroup query.
         // Non-fatal: if this fails the invite still lands via the outbox; the
         // recipient can trigger a manual sync which will re-seed this field.
-        val firebaseUid = session.currentFirebaseUid.flow.first()
+        val firebaseUid = session.currentFirebaseUid.first()
         if (firebaseUid != null) {
             Either.catch {
                 userRemoteRepository.addInvitedWorkspaceRef(targetUserId.value, params.workspaceId)

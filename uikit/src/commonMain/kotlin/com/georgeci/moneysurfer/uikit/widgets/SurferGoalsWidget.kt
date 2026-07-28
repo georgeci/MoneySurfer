@@ -14,6 +14,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -33,6 +34,12 @@ data class SurferGoalItem(
     val captionLine: String,
 )
 
+/**
+ * Goals widget for the dashboard column.
+ *
+ * [seeAllTestTag] tags the "see all" link so a UI test can tap it without matching localized
+ * copy; the host screen owns the tag value because the link is a step in its flow.
+ */
 @Composable
 fun SurferGoalsWidget(
     items: List<SurferGoalItem>,
@@ -44,8 +51,9 @@ fun SurferGoalsWidget(
     onItemClick: ((SurferGoalItem) -> Unit)? = null,
     emptyTitle: String? = null,
     emptySubtitle: String? = null,
+    seeAllTestTag: String? = null,
 ) {
-    val hero = size == SurferWidgetSize.Hero
+    val hero = size == SurferWidgetSize.Expanded
     val visibleItems = if (hero) items.take(2) else items.take(1)
 
     SurferWidgetCard(
@@ -56,7 +64,9 @@ fun SurferGoalsWidget(
                 text = seeAllLabel,
                 style = AppTheme.typography.labelMedium,
                 color = AppTheme.materialColors.primary,
-                modifier = Modifier.clickable(onClick = onSeeAllClick),
+                modifier = Modifier
+                    .clickable(onClick = onSeeAllClick)
+                    .then(seeAllTestTag?.let { Modifier.testTag(it) } ?: Modifier),
             )
         },
     ) {

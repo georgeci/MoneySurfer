@@ -97,7 +97,7 @@ class DeleteUserAccountViewModelTest : StringSpec({
         env.viewModel.onEvent(DeleteUserAccountEvent.OnConfirmAccepted)
 
         // Navigation is driven by AppLaunchViewModel observing the cleared user pointer.
-        env.session.currentUserId.flow.first() shouldBe null
+        env.session.currentUserId.first() shouldBe null
         env.viewModel.currentState.isDeleting shouldBe true
         env.viewModel.currentState.showConfirmDialog shouldBe false
     }
@@ -140,7 +140,7 @@ private class VmEnv(
         remoteDataResetRepository = object : RemoteDataResetRepository {
             override suspend fun clearAll() = Unit
         },
-        session = session,
+        sessionMutator = session,
     )
 
     val viewModel = DeleteUserAccountViewModel(

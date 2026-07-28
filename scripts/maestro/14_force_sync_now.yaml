@@ -7,11 +7,12 @@ tags:
 # Settings → Sync → "Force sync now" → wait for the run to complete.
 #
 # EXCLUDED from the default online suite (tag `sync`). Sync has been gated off
-# since #110: `OnlineSignInModule` binds `SyncFeatureFlag(enabled = false)` and
-# `SettingsState.showSyncSection` hides the row, so there is no Sync hub to open
-# in the shipped online build and this flow cannot pass (issue #219). Re-include
-# it — drop the tag from `maestroSyncTags` in gradle/qa.gradle.kts — once the
-# flag is flipped on.
+# since #110: `SettingsState.showSyncSection` is `!isOffline && syncEnabled`, and
+# `syncEnabled` follows `SyncSettings.isEnabled` — build AND server kill switch
+# AND user toggle, since #345 folded the old `SyncFeatureFlag` binding into the
+# layered config engine. With it off there is no Sync hub to open in the shipped
+# online build and this flow cannot pass (issue #219). Re-include it — drop the
+# tag from `maestroSetupTags` in gradle/qa.gradle.kts — once sync is switched on.
 
 - runFlow: 03_dashboard_add_account.yaml
 
@@ -23,21 +24,26 @@ tags:
 - tapOn:
     id: "settings:syncRow"
 
-# Sync screen
+# Sync screen. The hero is the only thing above the fold — live state, last result, outbox and
+# pull cursors sit between it and the actions — so the action row has to be scrolled to, and is
+# addressed by testTag rather than by its label.
 - assertVisible:
-    text: "Sync"
-- assertVisible:
-    text: "Force sync now"
+    id: "sync:hero"
+- scrollUntilVisible:
+    element:
+      id: "sync:action:force"
+    direction: DOWN
 
 - tapOn:
-    text: "Force sync now"
+    id: "sync:action:force"
 
-# After triggering, the hero stays on screen and the action remains tappable.
+# After triggering, the action remains tappable.
 # Don't assert the in-progress label (race-y on emulator with seeded data).
 - assertVisible:
-    text: "Force sync now"
+    id: "sync:action:force"
 
+# The toolbar lives in the Scaffold's topBar, so it stays put however far the content scrolled.
 - tapOn:
-    text: "Back"
+    id: "toolbar:back"
 - assertVisible:
     id: "settings:root"

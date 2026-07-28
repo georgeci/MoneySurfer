@@ -1,7 +1,8 @@
 package com.georgeci.moneysurfer.offline.di
 
-import com.georgeci.moneysurfer.domain.OfflineBuildFlags
-import com.georgeci.moneysurfer.domain.SyncFeatureFlag
+import com.georgeci.moneysurfer.appconfig.BuildConfigSource
+import com.georgeci.moneysurfer.appconfig.HostConfigKeys
+import com.georgeci.moneysurfer.appconfig.RemoteGlobalConfigSource
 import com.georgeci.moneysurfer.domain.firstrun.FirstRunSeeder
 import com.georgeci.moneysurfer.domain.repositories.AppConfigRepository
 import com.georgeci.moneysurfer.domain.repositories.AppVersionGate
@@ -15,8 +16,6 @@ import com.georgeci.moneysurfer.domain.repositories.WorkspaceSyncer
 import com.georgeci.moneysurfer.domain.telemetry.CrashReporter
 import com.georgeci.moneysurfer.domain.usecase.DemoLoginUseCase
 import com.georgeci.moneysurfer.domain.usecase.SeedDefaultsUseCase
-import com.georgeci.moneysurfer.feature.login.SignInFeatureConfig
-import com.georgeci.moneysurfer.feature.transaction.creation.TransactionCreationFeatureConfig
 import com.georgeci.moneysurfer.offline.firstrun.OfflineFirstRunSeeder
 import com.georgeci.moneysurfer.offline.noop.NoOpAppConfigRepository
 import com.georgeci.moneysurfer.offline.noop.NoOpAppVersionGate
@@ -27,11 +26,13 @@ import com.georgeci.moneysurfer.offline.noop.NoOpOutboxEnqueuer
 import com.georgeci.moneysurfer.offline.noop.NoOpPendingMutationQueue
 import com.georgeci.moneysurfer.offline.noop.NoOpRemoteDataResetRepository
 import com.georgeci.moneysurfer.offline.noop.NoOpSessionShutdownGate
+import com.georgeci.moneysurfer.offline.noop.NoOpSyncMetaRepository
 import com.georgeci.moneysurfer.offline.noop.NoOpUserAccountDeletionRepository
 import com.georgeci.moneysurfer.offline.noop.NoOpUserRemoteRepository
 import com.georgeci.moneysurfer.offline.noop.NoOpWorkspaceSyncer
 import com.georgeci.moneysurfer.sync.repository.OutboxEnqueuer
 import com.georgeci.moneysurfer.sync.repository.PendingMutationQueue
+import com.georgeci.moneysurfer.sync.repository.SyncMetaRepository
 import org.koin.core.module.Module
 import org.koin.dsl.module
 
@@ -47,6 +48,7 @@ private val offlineNoOpModule: Module = module {
     single<UserAccountDeletionRepository> { NoOpUserAccountDeletionRepository() }
     single<SessionShutdownGate> { NoOpSessionShutdownGate() }
     single<PendingMutationQueue> { NoOpPendingMutationQueue() }
+    single<SyncMetaRepository> { NoOpSyncMetaRepository() }
     single<ExchangeRateRemoteSource> { NoOpExchangeRateRemoteSource() }
 }
 
@@ -66,36 +68,28 @@ private val offlineFirstRunModule: Module = module {
 }
 
 /**
- * Offline build shows a single "demo" entry on the sign-in screen — no
- * email/password or anonymous flows, since the offline build has no remote
- * auth backend wired up. This overrides the default registered by
- * `feature/login`'s `LoginModule`.
+ * The offline host's Build layer, replacing the four flag data classes it used to override
+ * individually.
+ *
+ * Sign-in is demo-only (no remote auth backend), the Transfer segment is out of the offline MVP
+ * scope, and sync has no Firestore-backed implementation here at all. Keeping these host-owned is
+ * what stops the offline build regressing to the online surface through Koin module load order.
+ *
+ * The RemoteGlobal layer binds `Empty`: the offline build has no Firestore, and `Empty` lives in
+ * `app-config/api` precisely so binding it needs no dependency on a remote implementation.
  */
-private val offlineSignInModule: Module = module {
-    single<SignInFeatureConfig> {
-        SignInFeatureConfig(
-            emailPassword = false,
-            anonymous = false,
-            demo = true,
-        )
+private val offlineConfigModule: Module = module {
+    single<BuildConfigSource> {
+        BuildConfigSource {
+            put(HostConfigKeys.isOffline, true)
+            put(HostConfigKeys.signInEmailPassword, false)
+            put(HostConfigKeys.signInAnonymous, false)
+            put(HostConfigKeys.signInDemo, true)
+            put(HostConfigKeys.transferEnabled, false)
+            put(HostConfigKeys.syncEnabled, false)
+        }
     }
-    single<OfflineBuildFlags> { OfflineBuildFlags(isOffline = true) }
-    // Offline build has no Firestore-backed sync implementation (no sync-surfer
-    // module); bind the flag for symmetry so feature code that injects it
-    // resolves cleanly in both builds.
-    single<SyncFeatureFlag> { SyncFeatureFlag(enabled = false) }
-}
-
-/**
- * Offline build hides the Transfer segment in transaction creation — multi-account
- * transfers are out of the offline MVP scope. Same host-owned binding pattern as
- * [offlineSignInModule] so the offline override can't regress through Koin module
- * load order.
- */
-private val offlineTransactionCreationModule: Module = module {
-    single<TransactionCreationFeatureConfig> {
-        TransactionCreationFeatureConfig(transferEnabled = false)
-    }
+    single<RemoteGlobalConfigSource> { RemoteGlobalConfigSource.Empty }
 }
 
 /**
@@ -105,8 +99,7 @@ private val offlineTransactionCreationModule: Module = module {
  */
 val offlineWiring: List<Module> = listOf(
     offlineNoOpModule,
-    offlineSignInModule,
-    offlineTransactionCreationModule,
+    offlineConfigModule,
     offlineFirstRunModule,
     OfflineKoinApp().module(),
 )

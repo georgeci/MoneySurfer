@@ -18,9 +18,15 @@ sealed interface Route : NavKey {
     @Serializable
     data object Legal : Route
 
+    /**
+     * [cloudDataUnavailable] marks the sign-in path where the account is known to own workspaces
+     * that never reached the local database — the selector says so instead of looking like a
+     * brand-new account with nothing in it (issue #342).
+     */
     @Serializable
     data class WorkspaceSelector(
         val showActions: Boolean = false,
+        val cloudDataUnavailable: Boolean = false,
     ) : Route
 
     @Serializable
@@ -143,6 +149,13 @@ sealed interface Route : NavKey {
          * way, and two nullable id fields could disagree about which.
          */
         val duplicate: Boolean = false,
+        /**
+         * Open the form already switched to Transfer. Same request the account picker's "transfer
+         * instead" footer makes once the screen is open — a caller that already knows the user
+         * wants a transfer (the dashboard's quick actions) says so up front instead. The screen
+         * still runs it through the type switch, so a build with transfers off ignores it.
+         */
+        val transfer: Boolean = false,
     ) : Route
 
     @Serializable
@@ -198,4 +211,18 @@ sealed interface Route : NavKey {
     /** Online-only user-account deletion flow (issue #213). */
     @Serializable
     data object SettingsDeleteAccount : Route
+
+    /**
+     * QA configuration panel. Registered in both builds, but Settings only surfaces a way here when
+     * a real debug-overrides layer is bound — release builds resolve `DebugConfigSource.Empty`.
+     */
+    @Serializable
+    data object SettingsDebugConfig : Route
+
+    /**
+     * The last Warn/Error log lines this process produced, reachable from [SettingsDebugConfig].
+     * Gated by the same debug-layer signal — the buffer behind it is only filled in debug builds.
+     */
+    @Serializable
+    data object SettingsDebugLog : Route
 }

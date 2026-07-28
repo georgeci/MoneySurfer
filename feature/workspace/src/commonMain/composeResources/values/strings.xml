@@ -5,6 +5,8 @@
     <string name="workspace_selector_heading_subtitle">Each workspace has its own budgets, accounts and members.</string>
     <string name="workspace_selector_heading_subtitle_offline">Each workspace has its own budgets and accounts.</string>
     <string name="workspace_selector_empty">No workspaces available for this user.</string>
+    <string name="workspace_selector_cloud_unavailable">Your workspaces could not be loaded from the cloud. Sign out and back in to retry — creating a workspace here starts a separate, empty one.</string>
+    <string name="workspace_selector_sign_out">Sign out</string>
     <string name="workspace_selector_create_title">New workspace</string>
     <string name="workspace_selector_create_subtitle">For a trip, side project, or anything</string>
     <string name="workspace_selector_edit_content_description">Edit workspace</string>

@@ -31,6 +31,7 @@ import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.Fingerprint
+import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.GridView
 import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.Info
@@ -77,6 +78,7 @@ object SurferIcons {
     val Savings: ImageVector get() = Icons.Filled.Savings
     val Cash: ImageVector get() = Icons.Filled.Payments
     val Fingerprint: ImageVector get() = Icons.Filled.Fingerprint
+    val Flag: ImageVector get() = Icons.Filled.Flag
     val Mail: ImageVector get() = Icons.Filled.Mail
     val People: ImageVector get() = Icons.Filled.Group
     val Sparkle: ImageVector get() = Icons.Filled.AutoAwesome

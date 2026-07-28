@@ -8,7 +8,7 @@
 | Тип | Когда использовать |
 |---|---|
 | `kotlin.time.Instant` | Технический момент: создание, изменение, удаление, синхронизация. Хорошо для сортировки, логов, sync/conflict resolution. Также «когда реально произошла бизнес-операция» (`Transaction.operationAt`). |
-| `kotlinx.datetime.LocalDate` | Календарная дата без времени: `Budget.startDate`, `RecurringRule.startDate`, период бюджета, фильтры по дню. |
+| `kotlinx.datetime.LocalDate` | Календарная дата без времени: `Transaction.operationDate`, `Budget.startDate`, `RecurringRule.startDate`, период бюджета, фильтры по дню. |
 | `kotlinx.datetime.YearMonth` | Месячные периоды: бюджеты, лимиты, отчёты, статистика. |
 | `kotlinx.datetime.LocalDateTime` | Только UI/input (date+time picker). Не основное поле в domain/db. |
 
@@ -33,7 +33,8 @@ Domain-модели объявляют богатые типы:
 - `WorkspaceInvite.createdAt / updatedAt / expiresAt: Instant`, `respondedAt: Instant?`
 - `Category.createdAt / updatedAt: Instant`
 - `Account.updatedAt: Instant`
-- `Transaction.operationAt: Instant` (момент операции), `createdAt: Instant`,
+- `Transaction.operationAt: Instant` (момент операции),
+  `operationDate: LocalDate` (бизнес-дата, см. ниже), `createdAt: Instant`,
   `updatedAt: Instant`
 - `Budget.startDate: LocalDate`, `createdAt / updatedAt: Instant`
 - `RecurringRule.startDate: LocalDate`, `nextRunAt: Instant?`,
@@ -71,6 +72,45 @@ internal fun YearMonth.toIso(): String = toString()
   конфликты станут заметны, добавить детерминированный `(updatedAt, deviceId,
   mutationId)` tie-breaker.
 
+## `operationAt` и `operationDate`
+
+У транзакции две даты, и это осознанно (коммит `9ae012224`, май 2026).
+
+| Поле | Тип | Отвечает на вопрос | Кто читает |
+|---|---|---|---|
+| `operationAt` | `Instant` | когда операция произошла | сортировка, аудит |
+| `operationDate` | `LocalDate` | к какому дню она отнесена | бюджеты, группировка списка, SQL-окна по датам |
+
+Зачем разделили: до этого календарный день выводился на каждом чтении как
+`operationAt.toLocalDateTime(zone).date`, и запись в 23:30 перепрыгивала
+границу суток при смене таймзоны. Раз окно бюджета — это диапазон дат,
+транзакция могла перескочить между бюджетными периодами просто потому, что
+телефон оказался в другом часовом поясе.
+
+Поэтому `operationDate` вычисляется **один раз при записи**, в зоне
+пользователя, и дальше не пересчитывается. При редактировании исходное
+значение сохраняется (`TransactionCreationState.pinnedOperationDate`) — иначе
+смена зоны между сохранением и правкой молча сдвинула бы дату.
+
+Правила:
+
+- Календарный день транзакции читать из `operationDate`. Не выводить его из
+  `operationAt` — это ровно тот баг, ради которого поле и завели.
+- Фильтры по диапазону дат — по `operationDate`. В Room это ISO-строка
+  `YYYY-MM-DD`, поэтому строковое сравнение корректно работает как сравнение
+  дат и покрыто индексом `(workspaceId, operationDate DESC, ...)`. Таймзонная
+  арифметика в SQL невозможна, так что альтернативы нет.
+- `createdAt` — это момент создания строки, не момент операции. Их нельзя
+  делать синонимами: у backdated-записей это ломает аудит и tiebreaker.
+
+Легаси-хвост: колонку добавили с дефолтом `''`, читатели прикрывались
+`resolveLegacyOperationDate` (выводит дату из `operationAt` в **UTC**, чтобы
+один документ Firestore дал одинаковую бизнес-дату на всех устройствах). Когда
+список начал фильтровать в SQL, выяснилось, что `'' >= '2026-07-01'` ложно и
+старые строки исчезали из любого окна — починено миграцией 27→28
+(`OperationDateBackfillMigration`), тоже через UTC, чтобы backfill не сдвинул
+дату на день.
+
 ## UI и группировка
 
 Никогда не группировать по `epochMillis / dayMs`. Всегда через `TimeZone`:
@@ -80,11 +120,15 @@ val zone = TimeZone.currentSystemDefault()
 val day: LocalDate = instant.toLocalDateTime(zone).date
 ```
 
-Список транзакций сортируется `(operationAt → LocalDate via zone) DESC,
-createdAt DESC`. `createdAt` — стабильный tiebreaker внутри одного дня.
+Это правило про `Instant`-поля. Список транзакций группируется по
+`operationDate` напрямую, без зонной арифметики, и сортируется
+`(operationDate, operationAt, createdAt) DESC`: день группирует, момент
+упорядочивает внутри дня, `createdAt` разводит строки с одинаковым
+`operationAt` — что регулярно бывает у импорта и backdated-пачек.
 
 Date/time picker отдаёт `LocalDateTime`, конвертим в `Instant` с
-`zone.toInstant()` перед записью в `operationAt`.
+`zone.toInstant()` перед записью в `operationAt`; `operationDate` берётся из
+той же зоны один раз при сохранении.
 
 Полезные фиксированные зоны для тестов:
 

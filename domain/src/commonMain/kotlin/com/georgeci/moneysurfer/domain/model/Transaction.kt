@@ -5,6 +5,7 @@ import com.georgeci.moneysurfer.domain.primitives.CategoryId
 import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
 import com.georgeci.moneysurfer.domain.primitives.Money
 import com.georgeci.moneysurfer.domain.primitives.RecurringRuleId
+import com.georgeci.moneysurfer.domain.primitives.SplitId
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.domain.primitives.TransactionStatus
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
@@ -39,7 +40,9 @@ data class Transaction(
      * Order is the user's; duplicates and commas are already gone.
      */
     val tags: List<String> = emptyList(),
+    /** Absolute moment. Sorting and audit only — never re-derive a calendar day from it. */
     val operationAt: Instant,
+    /** Business date. What budgets count against and what SQL date windows filter on. */
     val operationDate: LocalDate,
     val type: TransactionType,
     val status: TransactionStatus = TransactionStatus.ACTUAL,
@@ -50,6 +53,20 @@ data class Transaction(
     val createdAt: Instant,
     val updatedAt: Instant,
     val transferId: TransferId? = null,
+    /**
+     * Shared id of the legs one receipt was split across — groceries and household chemicals paid
+     * for in one go — or null for an ordinary single-category transaction.
+     *
+     * Every leg is a whole transaction: it carries its own category and its own amount, so budgets,
+     * monthly totals and the account balance need no knowledge of splits at all. Only the places
+     * that would otherwise show one receipt as N rows — the transaction list, the recent-activity
+     * widget, search results — collapse a group back into a single row.
+     *
+     * The legs of a group share account, currency, business date and type; that invariant is
+     * established by `CreateSplitTransactionUseCase` and re-established by `UpdateTransactionUseCase`
+     * whenever a single leg is edited through the ordinary edit path.
+     */
+    val splitId: SplitId? = null,
     /**
      * The rule that generated this row, or null for a manually entered one. A link rather
      * than an `isRecurring` boolean: the schedule already lives on [RecurringRule], and a

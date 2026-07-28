@@ -32,6 +32,7 @@ import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsChevron
 import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsGroup
 import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsRow
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
 import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
 import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
@@ -53,7 +54,11 @@ import moneysurfer.feature.settings.generated.resources.settings_change_workspac
 import moneysurfer.feature.settings.generated.resources.settings_change_workspace_supporting
 import moneysurfer.feature.settings.generated.resources.settings_csv_supporting
 import moneysurfer.feature.settings.generated.resources.settings_csv_title
+import moneysurfer.feature.settings.generated.resources.settings_debug_config
+import moneysurfer.feature.settings.generated.resources.settings_debug_config_supporting
 import moneysurfer.feature.settings.generated.resources.settings_delete_account
+import moneysurfer.feature.settings.generated.resources.settings_goals_supporting
+import moneysurfer.feature.settings.generated.resources.settings_goals_title
 import moneysurfer.feature.settings.generated.resources.settings_logout
 import moneysurfer.feature.settings.generated.resources.settings_logout_guest_warning_cancel
 import moneysurfer.feature.settings.generated.resources.settings_logout_guest_warning_confirm
@@ -84,13 +89,25 @@ import org.koin.compose.viewmodel.koinViewModel
  *
  * [SyncRow], [LogoutRow] and [DeleteAccountRow] are never composed in the offline build;
  * their absence is what the offline golden Maestro flow asserts via `notVisible`.
- * Everything else — including [PreferencesRow] and [BackupRow] — is composed in both
+ * Everything else — including [GoalsRow], [PreferencesRow] and [BackupRow] — is composed in both
  * variants, and the same flow asserts those positively.
+ *
+ * [ProfileName] and [MembersRow] are state-gated rather than build-gated: the first needs a
+ * profile to show, the second a workspace with members, so assert them only where the flow
+ * has put the app in that state.
+ *
+ * [DebugConfigRow] is the one tag that varies by *build type* rather than by host: it appears
+ * whenever a real debug-overrides layer is bound, and never in a release build. No Maestro flow
+ * asserts it either way, precisely so the golden path stays independent of build type.
  */
 object SettingsTestTags {
     const val Root = "settings:root"
+    const val ProfileName = "settings:profileName"
+    const val WorkspaceRow = "settings:workspaceRow"
+    const val MembersRow = "settings:membersRow"
     const val CategoriesRow = "settings:categoriesRow"
     const val BudgetsRow = "settings:budgetsRow"
+    const val GoalsRow = "settings:goalsRow"
     const val AppearanceRow = "settings:appearanceRow"
     const val PreferencesRow = "settings:preferencesRow"
     const val AboutRow = "settings:aboutRow"
@@ -99,6 +116,7 @@ object SettingsTestTags {
     const val CsvRow = "settings:csvRow"
     const val LogoutRow = "settings:logoutRow"
     const val DeleteAccountRow = "settings:deleteAccountRow"
+    const val DebugConfigRow = "settings:debugConfigRow"
 }
 
 // The effect dispatch below is one straight-line branch per destination — flat, exhaustive, and
@@ -112,6 +130,7 @@ fun SettingsScreen(
     onNavigateToMembers: (com.georgeci.moneysurfer.domain.primitives.WorkspaceId) -> Unit,
     onNavigateToCategories: () -> Unit,
     onNavigateToBudgets: () -> Unit,
+    onNavigateToGoals: () -> Unit,
     onNavigateToAppearance: () -> Unit,
     onNavigateToPreferences: () -> Unit,
     onNavigateToSync: () -> Unit,
@@ -119,6 +138,7 @@ fun SettingsScreen(
     onNavigateToCsvBackup: () -> Unit,
     onNavigateToAbout: () -> Unit,
     onNavigateToDeleteAccount: () -> Unit,
+    onNavigateToDebugConfig: () -> Unit,
     viewModel: SettingsViewModel = koinViewModel(),
 ) {
     val state by viewModel.collectAsStateWithLifecycle()
@@ -131,6 +151,7 @@ fun SettingsScreen(
             is SettingsEffect.NavigateToMembers -> onNavigateToMembers(effect.workspaceId)
             SettingsEffect.NavigateToCategories -> onNavigateToCategories()
             SettingsEffect.NavigateToBudgets -> onNavigateToBudgets()
+            SettingsEffect.NavigateToGoals -> onNavigateToGoals()
             SettingsEffect.NavigateToAppearance -> onNavigateToAppearance()
             SettingsEffect.NavigateToPreferences -> onNavigateToPreferences()
             SettingsEffect.NavigateToSync -> onNavigateToSync()
@@ -138,6 +159,7 @@ fun SettingsScreen(
             SettingsEffect.NavigateToCsvBackup -> onNavigateToCsvBackup()
             SettingsEffect.NavigateToAbout -> onNavigateToAbout()
             SettingsEffect.NavigateToDeleteAccount -> onNavigateToDeleteAccount()
+            SettingsEffect.NavigateToDebugConfig -> onNavigateToDebugConfig()
         }
     }
 
@@ -172,6 +194,7 @@ private fun SettingsContent(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .surferContentContainer()
                 .padding(top = padding.calculateTopPadding())
                 .verticalScroll(rememberScrollState()),
         ) {
@@ -181,6 +204,7 @@ private fun SettingsContent(
                         name = stringResource(Res.string.settings_user_name),
                         email = userEmailText(state),
                         trailing = null,
+                        nameTestTag = SettingsTestTags.ProfileName,
                     )
                 }
             }
@@ -192,6 +216,7 @@ private fun SettingsContent(
                     supportingText = stringResource(Res.string.settings_change_workspace_supporting),
                     onClick = { onEvent(SettingsEvent.OnChangeWorkspaceClick) },
                     trailing = { SurferSettingsChevron() },
+                    modifier = Modifier.testTag(SettingsTestTags.WorkspaceRow),
                 )
                 if (state.showWorkspaceMembers && state.currentWorkspaceId != null) {
                     SurferSettingsRow(
@@ -204,6 +229,7 @@ private fun SettingsContent(
                         ),
                         onClick = { onEvent(SettingsEvent.OnMembersClick) },
                         trailing = { SurferSettingsChevron() },
+                        modifier = Modifier.testTag(SettingsTestTags.MembersRow),
                     )
                 }
                 if (state.showPendingInvites) {
@@ -250,6 +276,14 @@ private fun SettingsContent(
                     onClick = { onEvent(SettingsEvent.OnBudgetsClick) },
                     trailing = { SurferSettingsChevron() },
                     modifier = Modifier.testTag(SettingsTestTags.BudgetsRow),
+                )
+                SurferSettingsRow(
+                    icon = SurferIcons.Flag,
+                    title = stringResource(Res.string.settings_goals_title),
+                    supportingText = stringResource(Res.string.settings_goals_supporting),
+                    onClick = { onEvent(SettingsEvent.OnGoalsClick) },
+                    trailing = { SurferSettingsChevron() },
+                    modifier = Modifier.testTag(SettingsTestTags.GoalsRow),
                 )
                 SurferSettingsRow(
                     icon = SurferIcons.Palette,
@@ -310,6 +344,16 @@ private fun SettingsContent(
                     trailing = { SurferSettingsChevron() },
                     modifier = Modifier.testTag(SettingsTestTags.AboutRow),
                 )
+                if (state.showDebugConfig) {
+                    SurferSettingsRow(
+                        icon = SurferIcons.Code,
+                        title = stringResource(Res.string.settings_debug_config),
+                        supportingText = stringResource(Res.string.settings_debug_config_supporting),
+                        onClick = { onEvent(SettingsEvent.OnDebugConfigClick) },
+                        trailing = { SurferSettingsChevron() },
+                        modifier = Modifier.testTag(SettingsTestTags.DebugConfigRow),
+                    )
+                }
             }
 
             if (state.showLogout) {

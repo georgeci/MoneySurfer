@@ -1,9 +1,9 @@
 package com.georgeci.moneysurfer.feature.settings.backup
 
-import com.georgeci.moneysurfer.domain.OfflineBuildFlags
 import com.georgeci.moneysurfer.domain.backup.BackupError
 import com.georgeci.moneysurfer.domain.backup.BackupExporter
 import com.georgeci.moneysurfer.domain.backup.BackupImporter
+import com.georgeci.moneysurfer.domain.config.HostCapabilities
 import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
 import com.georgeci.moneysurfer.utils.MviViewModel
 import kotlinx.coroutines.CancellationException
@@ -17,9 +17,9 @@ class BackupViewModel(
     private val exporter: BackupExporter,
     private val importer: BackupImporter,
     private val clock: ClockUseCase,
-    offlineBuildFlags: OfflineBuildFlags,
+    hostCapabilities: HostCapabilities,
 ) : MviViewModel<BackupState, BackupEvent, BackupEffect>(
-    initialState = BackupState(isOffline = offlineBuildFlags.isOffline),
+    initialState = BackupState(isOffline = hostCapabilities.isOffline),
 ) {
 
     /** Passphrase chosen in the export dialog, held until the save picker returns a sink. */
@@ -31,11 +31,6 @@ class BackupViewModel(
     override fun onEvent(event: BackupEvent) {
         when (event) {
             BackupEvent.OnBackClick -> postSideEffect(BackupEffect.NavigateBack)
-
-            BackupEvent.OnFrequencyClick -> postSideEffect(BackupEffect.OpenFrequencyPicker)
-            BackupEvent.OnLocationClick -> postSideEffect(BackupEffect.OpenLocationPicker)
-            BackupEvent.OnEncryptionClick -> postSideEffect(BackupEffect.OpenEncryptionScreen)
-            BackupEvent.OnBackUpNowClick -> postSideEffect(BackupEffect.NotImplemented)
 
             BackupEvent.OnDownloadClick,
             BackupEvent.OnExportOptionsDismissed,
@@ -52,11 +47,6 @@ class BackupViewModel(
             BackupEvent.OnRestoreDismissed,
             BackupEvent.OnRestoreConfirmed,
             -> onRestoreEvent(event)
-
-            BackupEvent.OnDeleteClick,
-            BackupEvent.OnDeleteDismissed,
-            BackupEvent.OnDeleteConfirmed,
-            -> onDeleteEvent(event)
         }
     }
 
@@ -109,20 +99,6 @@ class BackupViewModel(
             BackupEvent.OnRestoreConfirmed -> {
                 updateState { copy(showRestoreConfirmation = false) }
                 postSideEffect(BackupEffect.RequestOpenFile)
-            }
-            else -> Unit
-        }
-    }
-
-    private fun onDeleteEvent(event: BackupEvent) {
-        when (event) {
-            BackupEvent.OnDeleteClick ->
-                updateState { copy(showDeleteConfirmation = true) }
-            BackupEvent.OnDeleteDismissed ->
-                updateState { copy(showDeleteConfirmation = false) }
-            BackupEvent.OnDeleteConfirmed -> {
-                updateState { copy(showDeleteConfirmation = false) }
-                postSideEffect(BackupEffect.NotImplemented)
             }
             else -> Unit
         }
@@ -193,22 +169,26 @@ class BackupViewModel(
     }
 }
 
+/**
+ * State of the Backup screen.
+ *
+ * The screen is deliberately local-only: scheduled cloud backups, "Back up now"
+ * and "Delete cloud backup" used to render in the online build but had no
+ * backend behind them, so every tap — including a destructive confirmation —
+ * did nothing. They are gone until a real remote exists; what is left is the
+ * export/restore pair, which [BackupExporter] and [BackupImporter] serve
+ * entirely from the on-device database and which works in both build variants.
+ *
+ * [isOffline] therefore only picks the hero copy: the offline build can promise
+ * that nothing ever leaves the device, the online build cannot.
+ */
 data class BackupState(
-    val showDeleteConfirmation: Boolean = false,
     val showRestoreConfirmation: Boolean = false,
     val showExportOptions: Boolean = false,
     val showImportPassphrase: Boolean = false,
     val phase: BackupPhase = BackupPhase.Idle,
     val isOffline: Boolean = false,
-) {
-    /**
-     * Scheduled cloud backups, "Back up now" and "Delete cloud backup" all talk to a
-     * remote the offline build does not have. Hiding them leaves the local half —
-     * export an archive, restore from one — which [BackupExporter] and [BackupImporter]
-     * serve entirely from the on-device database.
-     */
-    val showCloudBackup: Boolean get() = !isOffline
-}
+)
 
 enum class BackupPhase { Idle, Exporting, Importing }
 
@@ -247,10 +227,6 @@ sealed interface BackupNotice {
 
 sealed interface BackupEvent {
     data object OnBackClick : BackupEvent
-    data object OnFrequencyClick : BackupEvent
-    data object OnLocationClick : BackupEvent
-    data object OnEncryptionClick : BackupEvent
-    data object OnBackUpNowClick : BackupEvent
     data object OnDownloadClick : BackupEvent
     data object OnExportOptionsDismissed : BackupEvent
     data class OnExportOptionsConfirmed(val passphrase: String?) : BackupEvent
@@ -261,19 +237,12 @@ sealed interface BackupEvent {
     data class OnOpenSourceChosen(val source: BufferedSource?) : BackupEvent
     data object OnImportPassphraseDismissed : BackupEvent
     data class OnImportPassphraseSubmitted(val passphrase: String) : BackupEvent
-    data object OnDeleteClick : BackupEvent
-    data object OnDeleteConfirmed : BackupEvent
-    data object OnDeleteDismissed : BackupEvent
 }
 
 sealed interface BackupEffect {
     data object NavigateBack : BackupEffect
-    data object OpenFrequencyPicker : BackupEffect
-    data object OpenLocationPicker : BackupEffect
-    data object OpenEncryptionScreen : BackupEffect
     data class RequestSaveFile(val suggestedName: String) : BackupEffect
     data object RequestOpenFile : BackupEffect
     data object RestartApp : BackupEffect
     data class Notify(val notice: BackupNotice) : BackupEffect
-    data object NotImplemented : BackupEffect
 }

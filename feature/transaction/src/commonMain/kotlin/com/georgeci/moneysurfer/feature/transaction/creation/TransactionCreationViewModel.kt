@@ -1,39 +1,31 @@
 package com.georgeci.moneysurfer.feature.transaction.creation
 
-import arrow.optics.optics
-import com.georgeci.moneysurfer.domain.formatter.MoneyFormatter
+import com.georgeci.moneysurfer.domain.config.HostCapabilities
 import com.georgeci.moneysurfer.domain.model.Account
-import com.georgeci.moneysurfer.domain.model.Category
-import com.georgeci.moneysurfer.domain.model.CategoryAppearance
 import com.georgeci.moneysurfer.domain.model.Transaction
-import com.georgeci.moneysurfer.domain.model.reference
 import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.CategoryId
-import com.georgeci.moneysurfer.domain.primitives.CategoryType
 import com.georgeci.moneysurfer.domain.primitives.Money
-import com.georgeci.moneysurfer.domain.primitives.RecurringRuleId
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
-import com.georgeci.moneysurfer.domain.primitives.TransactionStatus
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
-import com.georgeci.moneysurfer.domain.primitives.TransferId
 import com.georgeci.moneysurfer.domain.repositories.TransactionRepository
-import com.georgeci.moneysurfer.domain.usecase.ApplyTransactionChangeUseCase
+import com.georgeci.moneysurfer.domain.usecase.CreateSplitTransactionUseCase
 import com.georgeci.moneysurfer.domain.usecase.CreateTransactionUseCase
 import com.georgeci.moneysurfer.domain.usecase.CreateTransferUseCase
-import com.georgeci.moneysurfer.domain.usecase.DeleteTransactionUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetAccountsUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetCategoriesUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetCurrentTimeUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetTransactionByIdUseCase
 import com.georgeci.moneysurfer.domain.usecase.UpdateTransactionUseCase
+import com.georgeci.moneysurfer.navigation.DeleteTransactionWithUndo
 import com.georgeci.moneysurfer.navigation.SnackbarController
 import com.georgeci.moneysurfer.utils.MviViewModel
 import kotlinx.coroutines.flow.first
-import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import moneysurfer.feature.transaction.generated.resources.Res
 import moneysurfer.feature.transaction.generated.resources.transaction_creation_created_snackbar
+import moneysurfer.feature.transaction.generated.resources.transaction_creation_split_snackbar
 import moneysurfer.feature.transaction.generated.resources.transaction_creation_transfer_snackbar
 import moneysurfer.feature.transaction.generated.resources.transaction_creation_updated_snackbar
 import moneysurfer.feature.transaction.generated.resources.transaction_details_delete_undo
@@ -46,17 +38,24 @@ import org.koin.core.annotation.KoinViewModel
 class TransactionCreationViewModel(
     private val seed: TransactionCreationSeed?,
     private val accountId: AccountId?,
+    /**
+     * Open on the Transfer tab, for a caller that already knows that is what the user asked for.
+     * Read once while loading rather than applied as an event from the screen: a route argument is
+     * true for the whole lifetime of the entry, so replaying it on every composition would undo a
+     * type the user has since changed by hand (after a rotation, say).
+     */
+    private val openAsTransfer: Boolean,
     private val getAccounts: GetAccountsUseCase,
     private val getCategories: GetCategoriesUseCase,
     private val getTransactionById: GetTransactionByIdUseCase,
     private val createTransaction: CreateTransactionUseCase,
     private val updateTransaction: UpdateTransactionUseCase,
     private val createTransfer: CreateTransferUseCase,
-    private val deleteTransaction: DeleteTransactionUseCase,
-    private val applyTransactionChange: ApplyTransactionChangeUseCase,
+    private val createSplitTransaction: CreateSplitTransactionUseCase,
+    private val deleteWithUndo: DeleteTransactionWithUndo,
     private val getCurrentTime: GetCurrentTimeUseCase,
     private val transactionRepository: TransactionRepository,
-    private val featureConfig: TransactionCreationFeatureConfig,
+    private val hostCapabilities: HostCapabilities,
     private val snackbar: SnackbarController,
 ) : MviViewModel<TransactionCreationState, TransactionCreationEvent, TransactionCreationEffect>(
     initialState = TransactionCreationState.Loading,
@@ -68,6 +67,12 @@ class TransactionCreationViewModel(
     }
 
     private var pendingAccountSlot: AccountSlot = AccountSlot.Single
+
+    /** What the category chooser was last opened for — see [CategorySlot]. */
+    private var pendingCategorySlot: CategorySlot = CategorySlot.Single
+
+    /** Hands out the split lines' stable keys; never reused within one screen. */
+    private var splitLineKeys: Int = 0
 
     override fun onEvent(event: TransactionCreationEvent) {
         when (event) {
@@ -93,22 +98,31 @@ class TransactionCreationViewModel(
                     .set(this, getCurrentTime().toEpochMilliseconds())
                     .let { TransactionCreationState.content.pinnedOperationDate.set(it, null) }
             }
-            TransactionCreationEvent.OnOpenCategoryChooser -> openCategoryChooser()
+            TransactionCreationEvent.OnOpenCategoryChooser -> openCategoryChooser(CategorySlot.Single)
             TransactionCreationEvent.OnOpenCategoryCreation -> postSideEffect(
                 TransactionCreationEffect.NavigateToCategoryCreation,
             )
             TransactionCreationEvent.OnOpenAccountChooser -> openAccountChooser(AccountSlot.Single)
             TransactionCreationEvent.OnOpenFromAccountChooser -> openAccountChooser(AccountSlot.From)
             TransactionCreationEvent.OnOpenToAccountChooser -> openAccountChooser(AccountSlot.To)
-            TransactionCreationEvent.OnSwapAccountsClick -> updateState {
-                val c = this as? TransactionCreationState.Content ?: return@updateState this
-                c.copy(
-                    fromAccount = c.toAccount,
-                    toAccount = c.fromAccount,
-                    amount = c.toAmount,
-                    toAmount = c.amount,
+            TransactionCreationEvent.OnSwapAccountsClick -> updateContent { content ->
+                content.copy(
+                    fromAccount = content.toAccount,
+                    toAccount = content.fromAccount,
+                    amount = content.toAmount,
+                    toAmount = content.amount,
                 )
             }
+            TransactionCreationEvent.OnSplitToggled ->
+                updateContent { it.withSplitToggled { splitLineKeys++ } }
+            TransactionCreationEvent.OnSplitLineAdded ->
+                updateContent { it.withSplitLineAdded(key = splitLineKeys++) }
+            is TransactionCreationEvent.OnSplitLineRemoved ->
+                updateContent { it.withSplitLineRemoved(key = event.key) }
+            is TransactionCreationEvent.OnSplitLineAmountChanged ->
+                updateContent { it.withSplitLineAmount(key = event.key, amount = event.amount) }
+            is TransactionCreationEvent.OnOpenSplitLineCategoryChooser ->
+                openCategoryChooser(CategorySlot.SplitLine(event.key))
             TransactionCreationEvent.OnSaveClick -> saveTransaction()
             TransactionCreationEvent.OnDeleteClick -> updateState {
                 TransactionCreationState.content.showDeleteConfirmation.modify(this) { true }
@@ -121,13 +135,35 @@ class TransactionCreationViewModel(
         }
     }
 
-    private fun openCategoryChooser() {
+    /**
+     * Reduces the loaded form, leaving [TransactionCreationState.Loading] alone — an event that
+     * arrives before the screen has loaded has no form to change.
+     *
+     * A `when` over the sealed state rather than the `as?` this used to repeat at every call site:
+     * one place to state the rule, and no cast for a static analyser to squint at (SonarCloud reads
+     * `this` inside a `STATE.() -> STATE` reducer as the ViewModel and calls the cast impossible).
+     */
+    private fun updateContent(
+        block: (TransactionCreationState.Content) -> TransactionCreationState.Content,
+    ) = updateState {
+        when (this) {
+            is TransactionCreationState.Content -> block(this)
+            TransactionCreationState.Loading -> this
+        }
+    }
+
+    private fun openCategoryChooser(slot: CategorySlot) {
         val state = currentState as? TransactionCreationState.Content ?: return
-        val filter = if (state.type == TransactionTypeUi.Income) CategoryType.INCOME else CategoryType.EXPENSE
+        pendingCategorySlot = slot
+        val selected = when (slot) {
+            CategorySlot.Single -> state.selectedCategory?.id
+            is CategorySlot.SplitLine ->
+                state.splitLines.firstOrNull { it.key == slot.key }?.category?.id
+        }
         postSideEffect(
             TransactionCreationEffect.NavigateToCategoryChooser(
-                selectedCategoryId = state.selectedCategory?.id,
-                filterType = filter,
+                selectedCategoryId = selected,
+                filterType = state.type.categoryType(),
             ),
         )
     }
@@ -149,7 +185,7 @@ class TransactionCreationViewModel(
                 // somewhere [changeType] would refuse to go.
                 showTransferShortcut = slot == AccountSlot.Single &&
                     !state.isEditMode &&
-                    featureConfig.transferEnabled,
+                    state.transferEnabled,
             ),
         )
     }
@@ -158,14 +194,12 @@ class TransactionCreationViewModel(
         val content = this as? TransactionCreationState.Content ?: return@updateState this
         // Editing an existing single-leg transaction can't morph into a paired transfer in place;
         // ignore the switch so we don't desync the type with the row that's about to be updated.
-        if (nextType == TransactionTypeUi.Transfer && (content.isEditMode || !featureConfig.transferEnabled)) {
+        // `content.transferEnabled` rather than a fresh `hostCapabilities` read: a QA override landing
+        // mid-screen would otherwise leave a rendered Transfer segment that this guard refuses.
+        if (nextType == TransactionTypeUi.Transfer && (content.isEditMode || !content.transferEnabled)) {
             return@updateState content
         }
-        val nextCategoryType = if (nextType == TransactionTypeUi.Income) {
-            CategoryType.INCOME
-        } else {
-            CategoryType.EXPENSE
-        }
+        val nextCategoryType = nextType.categoryType()
         val nextSelected = pickDefaultCategory(content.categories, content.categoryUsageCounts, nextCategoryType)
         val seededFrom = content.fromAccount ?: content.selectedAccount
         val seededTo = content.toAccount
@@ -181,6 +215,15 @@ class TransactionCreationViewModel(
             ),
             fromAccount = if (nextType == TransactionTypeUi.Transfer) seededFrom else content.fromAccount,
             toAccount = if (nextType == TransactionTypeUi.Transfer) seededTo else content.toAccount,
+            // The split editor's lines carry categories of the *old* type, and every category
+            // belongs to one side. Keeping them would write income legs filed under expense
+            // categories — money the spend aggregates (which filter on `type = 'EXPENSE'`) would
+            // never see, under a category whose own screen would then list income. The lines and
+            // their amounts survive; only a category the new type cannot use is dropped, which
+            // leaves Save disabled until the user picks a replacement.
+            splitLines = content.splitLines.map { line ->
+                line.copy(category = line.category?.takeIf { it.type == nextCategoryType })
+            },
         )
     }
 
@@ -190,9 +233,13 @@ class TransactionCreationViewModel(
             val categories = getCategories().first()
             val prefillAccount = accountId?.let { id -> accounts.find { it.id == id } }
 
-            val initialType = TransactionTypeUi.Expense
-            val initialCategoryType = CategoryType.EXPENSE
+            // Same three gates the type switch applies: a seeded screen is an edit or a duplicate
+            // of a single-leg row, and a build with transfers off has no Transfer tab to open on.
+            val openingTransfer = openAsTransfer && seed == null && hostCapabilities.transferEnabled
+            val initialType = if (openingTransfer) TransactionTypeUi.Transfer else TransactionTypeUi.Expense
+            val initialCategoryType = initialType.categoryType()
             val initialSelected = pickDefaultCategory(categories, emptyMap(), initialCategoryType)
+            val initialAccount = prefillAccount ?: accounts.firstOrNull()
 
             val baseContent = TransactionCreationState.Content(
                 amount = "",
@@ -200,7 +247,11 @@ class TransactionCreationViewModel(
                 type = initialType,
                 accounts = accounts,
                 categories = categories,
-                selectedAccount = prefillAccount ?: accounts.firstOrNull(),
+                selectedAccount = initialAccount,
+                // Seeded the way [changeType] seeds them, so arriving on the Transfer tab by route
+                // and reaching it by tapping the segment leave the same two slots filled.
+                fromAccount = if (openingTransfer) initialAccount else null,
+                toAccount = if (openingTransfer) accounts.firstOrNull { it.id != initialAccount?.id } else null,
                 selectedCategory = initialSelected,
                 isEditMode = false,
                 editingTransactionId = null,
@@ -212,7 +263,7 @@ class TransactionCreationViewModel(
                     type = initialCategoryType,
                     selected = initialSelected,
                 ),
-                transferEnabled = featureConfig.transferEnabled,
+                transferEnabled = hostCapabilities.transferEnabled,
             )
 
             val existing = seed?.let { getTransactionById(it.transactionId) }
@@ -226,60 +277,6 @@ class TransactionCreationViewModel(
         }
     }
 
-    /**
-     * Fills the blank form from an existing transaction.
-     *
-     * In [TransactionCreationSeed.Mode.Edit] that means the row itself, identity and timestamps
-     * included. A duplicate copies only what the user typed — no id, no `createdAt`, and today's
-     * date rather than the original's: it is a new transaction that merely starts out looking
-     * like an old one.
-     */
-    private fun TransactionCreationState.Content.seededFrom(
-        seed: TransactionCreationSeed,
-        transaction: Transaction,
-    ): TransactionCreationState.Content {
-        val account = accounts.find { it.id == transaction.accountId }
-        val category = categories.find { it.id == transaction.categoryId }
-        val resolvedType = when (transaction.type) {
-            TransactionType.INCOME -> TransactionTypeUi.Income
-            else -> TransactionTypeUi.Expense
-        }
-        val activeCategoryType = if (resolvedType == TransactionTypeUi.Income) {
-            CategoryType.INCOME
-        } else {
-            CategoryType.EXPENSE
-        }
-        val resolvedSelected = category ?: selectedCategory
-        val editing = seed.mode == TransactionCreationSeed.Mode.Edit
-        return copy(
-            amount = transaction.money.toAmountInput(),
-            note = transaction.note,
-            type = resolvedType,
-            selectedAccount = account ?: selectedAccount,
-            selectedCategory = resolvedSelected,
-            timestamp = if (editing) transaction.operationAt.toEpochMilliseconds() else timestamp,
-            isEditMode = editing,
-            editingTransactionId = seed.transactionId.takeIf { editing },
-            editingCreatedAt = transaction.createdAt.takeIf { editing },
-            pinnedOperationDate = transaction.operationDate.takeIf { editing },
-            editIdentity = if (editing) identityOf(transaction, category) else null,
-            preserved = if (editing) {
-                PreservedTransactionFields.of(transaction)
-            } else {
-                // A duplicate keeps what the user typed about the counterparty, but is a fresh
-                // manual entry: it inherits neither the transfer pairing (a second leg would be
-                // missing), the recurring rule that generated the original, nor its planned state.
-                PreservedTransactionFields(merchant = transaction.merchant, tags = transaction.tags)
-            },
-            displayCategories = buildDisplayCategories(
-                categories = categories,
-                counts = categoryUsageCounts,
-                type = activeCategoryType,
-                selected = resolvedSelected,
-            ),
-        )
-    }
-
     private fun observeCategoryUsage() {
         launch {
             transactionRepository.getAll().collect { all ->
@@ -289,17 +286,12 @@ class TransactionCreationViewModel(
                     .eachCount()
                 updateState {
                     val content = this as? TransactionCreationState.Content ?: return@updateState this
-                    val activeCategoryType = if (content.type == TransactionTypeUi.Income) {
-                        CategoryType.INCOME
-                    } else {
-                        CategoryType.EXPENSE
-                    }
                     content.copy(
                         categoryUsageCounts = counts,
                         displayCategories = buildDisplayCategories(
                             categories = content.categories,
                             counts = counts,
-                            type = activeCategoryType,
+                            type = content.type.categoryType(),
                             selected = content.selectedCategory,
                         ),
                     )
@@ -315,7 +307,7 @@ class TransactionCreationViewModel(
         if (match != null) {
             updateState {
                 val c = this as? TransactionCreationState.Content ?: return@updateState this
-                applyAccountToSlot(c, match, slot)
+                c.withAccountInSlot(match, slot)
             }
             return
         }
@@ -325,41 +317,19 @@ class TransactionCreationViewModel(
             updateState {
                 val c = this as? TransactionCreationState.Content ?: return@updateState this
                 val withRefreshed = c.copy(accounts = refreshed)
-                if (newMatch != null) applyAccountToSlot(withRefreshed, newMatch, slot) else withRefreshed
+                if (newMatch != null) withRefreshed.withAccountInSlot(newMatch, slot) else withRefreshed
             }
         }
     }
 
-    private fun applyAccountToSlot(
-        content: TransactionCreationState.Content,
-        account: Account,
-        slot: AccountSlot,
-    ): TransactionCreationState.Content = when (slot) {
-        AccountSlot.Single -> content.copy(selectedAccount = account)
-        AccountSlot.From -> content.copy(fromAccount = account)
-        AccountSlot.To -> content.copy(toAccount = account)
-    }
-
     private fun applyPickedCategory(picked: CategoryId) {
         val content = currentState as? TransactionCreationState.Content ?: return
+        val slot = pendingCategorySlot
         val match = content.categories.find { it.id == picked }
         if (match != null) {
             updateState {
                 val c = this as? TransactionCreationState.Content ?: return@updateState this
-                val activeCategoryType = if (c.type == TransactionTypeUi.Income) {
-                    CategoryType.INCOME
-                } else {
-                    CategoryType.EXPENSE
-                }
-                c.copy(
-                    selectedCategory = match,
-                    displayCategories = buildDisplayCategories(
-                        categories = c.categories,
-                        counts = c.categoryUsageCounts,
-                        type = activeCategoryType,
-                        selected = match,
-                    ),
-                )
+                c.withPickedCategory(categories = c.categories, selected = match, slot = slot)
             }
             return
         }
@@ -369,21 +339,10 @@ class TransactionCreationViewModel(
             val newMatch = refreshed.find { it.id == picked }
             updateState {
                 val c = this as? TransactionCreationState.Content ?: return@updateState this
-                val activeCategoryType = if (c.type == TransactionTypeUi.Income) {
-                    CategoryType.INCOME
-                } else {
-                    CategoryType.EXPENSE
-                }
-                val resolvedSelected = newMatch ?: c.selectedCategory
-                c.copy(
+                c.withPickedCategory(
                     categories = refreshed,
-                    selectedCategory = resolvedSelected,
-                    displayCategories = buildDisplayCategories(
-                        categories = refreshed,
-                        counts = c.categoryUsageCounts,
-                        type = activeCategoryType,
-                        selected = resolvedSelected,
-                    ),
+                    selected = newMatch ?: c.categoryInSlot(slot),
+                    slot = slot,
                 )
             }
         }
@@ -393,6 +352,10 @@ class TransactionCreationViewModel(
         val state = currentState as? TransactionCreationState.Content ?: return
         if (state.isTransfer) {
             saveTransfer(state)
+            return
+        }
+        if (state.isSplit) {
+            saveSplit(state)
             return
         }
         val account = state.selectedAccount ?: return
@@ -426,6 +389,7 @@ class TransactionCreationViewModel(
                 createdAt = state.editingCreatedAt ?: now,
                 updatedAt = now,
                 transferId = state.preserved.transferId,
+                splitId = state.preserved.splitId,
                 recurringRuleId = state.preserved.recurringRuleId,
             )
 
@@ -437,6 +401,39 @@ class TransactionCreationViewModel(
                 snackbar.show(Res.string.transaction_creation_created_snackbar)
             }
 
+            postSideEffect(TransactionCreationEffect.NavigateBack)
+        }
+    }
+
+    /**
+     * Writes the split editor's lines as one receipt: N sibling rows sharing a split id, each with
+     * its own category and slice of the amount.
+     *
+     * Guarded twice on purpose — the Save button is disabled unless [isSplitComplete][
+     * TransactionCreationState.Content.isSplitComplete] holds, and the use case rejects a group it
+     * could not write. The state's own check is what keeps a half-filled editor from reaching a
+     * `require` and crashing the screen.
+     */
+    private fun saveSplit(state: TransactionCreationState.Content) {
+        val account = state.selectedAccount ?: return
+        if (!state.isSplitComplete) return
+        val legs = state.splitLegs()
+
+        launch {
+            val zone = TimeZone.currentSystemDefault()
+            val operationAt = kotlin.time.Instant.fromEpochMilliseconds(state.timestamp)
+            createSplitTransaction(
+                CreateSplitTransactionUseCase.Params(
+                    account = account,
+                    legs = legs,
+                    note = state.note,
+                    operationAt = operationAt,
+                    operationDate = state.pinnedOperationDate
+                        ?: operationAt.toLocalDateTime(zone).date,
+                    type = if (state.isExpense) TransactionType.EXPENSE else TransactionType.INCOME,
+                ),
+            )
+            snackbar.show(Res.string.transaction_creation_split_snackbar)
             postSideEffect(TransactionCreationEffect.NavigateBack)
         }
     }
@@ -464,8 +461,9 @@ class TransactionCreationViewModel(
     }
 
     /**
-     * Deletes the row being edited, exactly the way the details screen does — same undo snackbar,
-     * restoring through [applyTransactionChange] so the account balance comes back with it.
+     * Deletes the row being edited, exactly the way the details screen and the lists do — the same
+     * [DeleteTransactionWithUndo], so the undo snackbar and what a delete takes with it are one
+     * behaviour rather than a per-screen approximation of one.
      *
      * Guarded on [TransactionCreationState.Content.editingTransactionId]: there is nothing to
      * delete while creating or duplicating, and the screen hides the action there.
@@ -473,14 +471,11 @@ class TransactionCreationViewModel(
     private fun handleDelete() {
         val editingId = (currentState as? TransactionCreationState.Content)?.editingTransactionId ?: return
         launch {
-            val deleted = deleteTransaction(editingId)
-            if (deleted != null) {
-                snackbar.show(
-                    message = Res.string.transaction_details_deleted_snackbar,
-                    actionLabel = Res.string.transaction_details_delete_undo,
-                    onAction = { applyTransactionChange(old = null, new = deleted) },
-                )
-            }
+            deleteWithUndo(
+                transactionId = editingId,
+                message = Res.string.transaction_details_deleted_snackbar,
+                undoLabel = Res.string.transaction_details_delete_undo,
+            )
             postSideEffect(TransactionCreationEffect.NavigateBackAfterDelete)
         }
     }
@@ -506,260 +501,3 @@ class TransactionCreationViewModel(
         return TransferPlan(from, to, fromAmount, toAmount)
     }
 }
-
-/** Amount as the text field spells it — a whole number keeps no trailing `.0`. */
-private fun Money.toAmountInput(): String {
-    val major = minor / Money.MINOR_PER_MAJOR
-    return if (major == major.toLong().toDouble()) major.toLong().toString() else major.toString()
-}
-
-/**
- * The stored row, frozen for the identity band — the design's `04b · Edit transaction`.
- *
- * Read from [transaction] rather than from the live form on purpose: the band answers "which
- * transaction am I editing", so it has to keep saying what was opened even after the amount or
- * the note has been typed over. A transfer leg is labelled as a transfer and left unsigned,
- * matching the details screen.
- */
-private fun identityOf(transaction: Transaction, category: Category?): TransactionEditIdentity {
-    val formatted = MoneyFormatter.format(transaction.money.abs(), transaction.currencyCode)
-    return TransactionEditIdentity(
-        reference = transaction.id.reference,
-        type = when {
-            transaction.transferId != null -> TransactionTypeUi.Transfer
-            transaction.type == TransactionType.INCOME -> TransactionTypeUi.Income
-            else -> TransactionTypeUi.Expense
-        },
-        note = transaction.note.ifBlank { transaction.merchant },
-        formattedAmount = when {
-            transaction.transferId != null -> formatted
-            transaction.type == TransactionType.INCOME -> "+$formatted"
-            transaction.type == TransactionType.EXPENSE -> "−$formatted"
-            else -> formatted
-        },
-        categoryId = category?.id?.value.orEmpty(),
-        categoryIconKey = category?.iconKey.orEmpty(),
-        categoryHue = category?.hue ?: CategoryAppearance.UNSET_HUE,
-        categorySystemKind = category?.systemKind?.name,
-    )
-}
-
-private fun pickDefaultCategory(
-    categories: List<Category>,
-    counts: Map<CategoryId, Int>,
-    type: CategoryType,
-): Category? = categories
-    .filter { it.type == type }
-    .maxByOrNull { counts[it.id] ?: 0 }
-
-private fun buildDisplayCategories(
-    categories: List<Category>,
-    counts: Map<CategoryId, Int>,
-    type: CategoryType,
-    selected: Category?,
-): List<Category> {
-    val byUsage = categories
-        .filter { it.type == type }
-        .sortedByDescending { counts[it.id] ?: 0 }
-    val top = byUsage.take(CATEGORY_PREVIEW_SIZE)
-    val resolvedSelected = selected?.takeIf { it.type == type }
-    return if (resolvedSelected == null || top.any { it.id == resolvedSelected.id }) {
-        top
-    } else {
-        top.take(CATEGORY_PREVIEW_SIZE - 1) + resolvedSelected
-    }
-}
-
-private const val CATEGORY_PREVIEW_SIZE = 7
-
-/**
- * The existing transaction the creation screen opens on, and what it is there for.
- *
- * One nullable parameter rather than an id plus a flag: the screen loads exactly one transaction
- * in either mode, and two independent parameters could contradict each other (a duplicate flag
- * with no id, an id with no mode).
- */
-/**
- * Everything a stored transaction carries that this screen has no field for.
- *
- * `saveTransaction` builds a whole new [Transaction] instead of patching the stored row, so a
- * field that is not routed back through here is silently reset to its default on update — which
- * is how editing used to wipe a transaction's merchant and tags, downgrade a `PLANNED` row to
- * `ACTUAL`, and orphan the other leg of a transfer by dropping its `transferId`.
- *
- * The defaults are what a brand-new transaction should have, so a blank form needs no special case.
- */
-data class PreservedTransactionFields(
-    val merchant: String = "",
-    val tags: List<String> = emptyList(),
-    val status: TransactionStatus = TransactionStatus.ACTUAL,
-    val transferId: TransferId? = null,
-    val recurringRuleId: RecurringRuleId? = null,
-) {
-    companion object {
-        /** Everything [transaction] holds outside the form — what an edit must hand back untouched. */
-        fun of(transaction: Transaction): PreservedTransactionFields = PreservedTransactionFields(
-            merchant = transaction.merchant,
-            tags = transaction.tags,
-            status = transaction.status,
-            transferId = transaction.transferId,
-            recurringRuleId = transaction.recurringRuleId,
-        )
-    }
-}
-
-data class TransactionCreationSeed(
-    val transactionId: TransactionId,
-    val mode: Mode,
-) {
-    enum class Mode {
-        /** Update the transaction in place. */
-        Edit,
-
-        /** Use it as a template for a brand-new transaction. */
-        Duplicate,
-    }
-}
-
-enum class TransactionTypeUi { Expense, Income, Transfer }
-
-/**
- * The transaction being edited, as it was stored — what the edit screen's identity band renders so
- * the user can tell which row they opened without scrolling or going back.
- *
- * A snapshot, not a view of the form: it is taken once when the transaction is loaded and never
- * follows the fields the user is editing.
- */
-data class TransactionEditIdentity(
-    /** Short human-readable id, e.g. `TX-8213`. */
-    val reference: String,
-    val type: TransactionTypeUi,
-    /** The note, falling back to the merchant when there is none; may still be blank. */
-    val note: String,
-    /** Signed for income and expense, unsigned for a transfer leg. */
-    val formattedAmount: String,
-    /** The category's stored appearance, fed to the shared bubble resolver. */
-    val categoryId: String,
-    val categoryIconKey: String,
-    val categoryHue: Int,
-    val categorySystemKind: String?,
-)
-
-@optics
-sealed interface TransactionCreationState {
-    data object Loading : TransactionCreationState
-
-    @optics
-    data class Content(
-        val amount: String,
-        val note: String,
-        val type: TransactionTypeUi,
-        val accounts: List<Account>,
-        val categories: List<Category>,
-        val selectedAccount: Account?,
-        val selectedCategory: Category?,
-        val isEditMode: Boolean,
-        val editingTransactionId: TransactionId?,
-        /** Non-null only in edit mode: the stored row behind the identity band. */
-        val editIdentity: TransactionEditIdentity? = null,
-        /** Whether the delete confirmation is up — the same dialog the details screen shows. */
-        val showDeleteConfirmation: Boolean = false,
-        val editingCreatedAt: kotlin.time.Instant? = null,
-        // Original `operationDate` from the persisted transaction. Preserved across
-        // edits unless the user explicitly picks a new date — otherwise a timezone
-        // change between the original save and the edit would silently shift the
-        // stored business date.
-        val pinnedOperationDate: LocalDate? = null,
-        /**
-         * Fields of the transaction being edited that this form cannot change but must not
-         * destroy — see [PreservedTransactionFields].
-         */
-        val preserved: PreservedTransactionFields = PreservedTransactionFields(),
-        val timestamp: Long,
-        val categoryUsageCounts: Map<CategoryId, Int>,
-        val displayCategories: List<Category>,
-        val fromAccount: Account? = null,
-        val toAccount: Account? = null,
-        val toAmount: String = "",
-        val transferEnabled: Boolean = true,
-    ) : TransactionCreationState {
-        val isExpense: Boolean get() = type == TransactionTypeUi.Expense
-        val isTransfer: Boolean get() = type == TransactionTypeUi.Transfer
-        val crossCurrency: Boolean
-            get() = isTransfer &&
-                fromAccount != null &&
-                toAccount != null &&
-                fromAccount.currencyCode != toAccount.currencyCode
-
-        /** Inline validation error for the (from) amount field, or null when it is acceptable. */
-        val amountError: TransactionAmountError?
-            get() = TransactionAmountInput.errorFor(amount)
-
-        /** Inline validation error for the cross-currency "to" amount, or null when it is acceptable. */
-        val toAmountError: TransactionAmountError?
-            get() = if (crossCurrency) TransactionAmountInput.errorFor(toAmount) else null
-
-        val isSaveEnabled: Boolean
-            get() = if (isTransfer) {
-                TransactionAmountInput.isValid(amount) &&
-                    (!crossCurrency || TransactionAmountInput.isValid(toAmount)) &&
-                    fromAccount != null && toAccount != null &&
-                    fromAccount.id != toAccount.id
-            } else {
-                TransactionAmountInput.isValid(amount) &&
-                    selectedAccount != null &&
-                    selectedCategory != null
-            }
-
-        companion object
-    }
-
-    companion object
-}
-
-sealed interface TransactionCreationEvent {
-    data class OnAmountChanged(val amount: String) : TransactionCreationEvent
-    data class OnToAmountChanged(val amount: String) : TransactionCreationEvent
-    data class OnNoteChanged(val note: String) : TransactionCreationEvent
-    data class OnAccountSelected(val account: Account) : TransactionCreationEvent
-    data class OnCategorySelected(val category: Category) : TransactionCreationEvent
-    data class OnCategoryPicked(val id: CategoryId) : TransactionCreationEvent
-    data class OnAccountPicked(val id: AccountId) : TransactionCreationEvent
-    data class OnTypeChanged(val type: TransactionTypeUi) : TransactionCreationEvent
-    data class OnDateChanged(val timestamp: Long) : TransactionCreationEvent
-    data object OnTodayClick : TransactionCreationEvent
-    data object OnOpenCategoryChooser : TransactionCreationEvent
-    data object OnOpenCategoryCreation : TransactionCreationEvent
-    data object OnOpenAccountChooser : TransactionCreationEvent
-    data object OnOpenFromAccountChooser : TransactionCreationEvent
-    data object OnOpenToAccountChooser : TransactionCreationEvent
-    data object OnSwapAccountsClick : TransactionCreationEvent
-    data object OnSaveClick : TransactionCreationEvent
-    data object OnDeleteClick : TransactionCreationEvent
-    data object OnDeleteConfirmed : TransactionCreationEvent
-    data object OnDeleteDismissed : TransactionCreationEvent
-    data object OnBackClick : TransactionCreationEvent
-}
-
-sealed interface TransactionCreationEffect {
-    data object NavigateBack : TransactionCreationEffect
-
-    /**
-     * The edited transaction is gone, so the screen that opened this one — the details of that very
-     * row — must not be returned to. Distinct from [NavigateBack] because only the caller knows how
-     * far back that is.
-     */
-    data object NavigateBackAfterDelete : TransactionCreationEffect
-    data class NavigateToCategoryChooser(
-        val selectedCategoryId: CategoryId?,
-        val filterType: CategoryType,
-    ) : TransactionCreationEffect
-    data object NavigateToCategoryCreation : TransactionCreationEffect
-    data class NavigateToAccountChooser(
-        val selectedAccountId: AccountId?,
-        val excludeAccountId: AccountId? = null,
-        val showTransferShortcut: Boolean = false,
-    ) : TransactionCreationEffect
-}
-
-internal enum class AccountSlot { Single, From, To }

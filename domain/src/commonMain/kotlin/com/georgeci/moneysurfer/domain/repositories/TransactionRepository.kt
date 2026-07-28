@@ -4,6 +4,7 @@ import com.georgeci.moneysurfer.domain.model.CategorizedTransaction
 import com.georgeci.moneysurfer.domain.model.Transaction
 import com.georgeci.moneysurfer.domain.model.TransactionTotal
 import com.georgeci.moneysurfer.domain.primitives.AccountId
+import com.georgeci.moneysurfer.domain.primitives.SplitId
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.domain.primitives.TransferId
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
@@ -41,6 +42,8 @@ interface TransactionRepository {
         window: TransactionPeriodWindow,
     ): Flow<List<TransactionTotal>>
     fun getByWorkspaceId(workspaceId: WorkspaceId): Flow<List<Transaction>>
+
+    /** The live transaction behind [id], or `null` when it does not exist or has been deleted. */
     suspend fun getById(id: TransactionId): Transaction?
 
     /**
@@ -48,7 +51,33 @@ interface TransactionRepository {
      * deleted or never imported. Callers must not assume a pair exists.
      */
     suspend fun getByTransferId(transferId: TransferId): List<Transaction>
+
+    /**
+     * Every leg sharing [splitId], oldest first — the receipt the row belongs to.
+     *
+     * A one-element result is a legitimate state, not a broken group: a leg can arrive from sync or
+     * a CSV import before (or without) its siblings, and it is a complete transaction on its own.
+     */
+    suspend fun getBySplitId(splitId: SplitId): List<Transaction>
     suspend fun insert(transaction: Transaction)
     suspend fun update(transaction: Transaction)
+
+    /**
+     * Marks [id] deleted. The row survives as a tombstone — invisible to every query on this
+     * interface, but still there for [restore] to bring back (issue #346).
+     */
     suspend fun delete(id: TransactionId)
+
+    /**
+     * Lifts the tombstone from [id] and returns the transaction as it now stands, or `null` when
+     * there was nothing deleted to bring back.
+     *
+     * The Undo half of [delete], and deliberately keyed on the id alone: the row was never
+     * removed, so restoring it needs no copy of its fields to have survived alongside the
+     * request — which is what makes an Undo outlive the Snackbar that offered it.
+     *
+     * Returning `null` for an id that is missing or already live is what keeps a repeated Undo
+     * from refunding the same balance twice.
+     */
+    suspend fun restore(id: TransactionId): Transaction?
 }

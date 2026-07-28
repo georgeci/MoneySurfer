@@ -18,7 +18,7 @@ class FirebaseUserWorkspacesProvider(
 ) : UserWorkspacesProvider {
 
     private suspend fun userDoc(): UserDoc? {
-        val uid = session.currentFirebaseUid.flow.first() ?: return null
+        val uid = session.currentFirebaseUid.first() ?: return null
         val snap = firestore.collection("users").document(uid).get()
         if (!snap.exists) return null
         return snap.data(UserDoc.serializer())

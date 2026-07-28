@@ -14,15 +14,47 @@ import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.runTest
 import kotlin.time.Instant
 
 private class FakePendingMutationDao : PendingMutationDao {
     val rows: MutableList<PendingMutationEntity> = mutableListOf()
     private val countFlow = MutableStateFlow(0)
+    private val allFlow = MutableStateFlow<List<PendingMutationEntity>>(emptyList())
 
-    override suspend fun insert(entity: PendingMutationEntity) {
-        rows += entity
+    @Suppress("LongParameterList")
+    override suspend fun insertIfAbsent(
+        id: String,
+        entityType: String,
+        entityId: String,
+        operation: String,
+        workspaceId: String?,
+        createdAt: Long,
+        attempts: Int,
+        status: String,
+        lastError: String?,
+    ) {
+        val duplicate = rows.any {
+            it.entityType == entityType &&
+                it.entityId == entityId &&
+                it.operation == operation &&
+                // Part of the identity: `WORKSPACE_MEMBER` reuses one userId across workspaces.
+                it.workspaceId == workspaceId &&
+                it.status == PendingMutationEntity.STATUS_PENDING
+        }
+        if (duplicate) return
+        rows += PendingMutationEntity(
+            id = id,
+            entityType = entityType,
+            entityId = entityId,
+            operation = operation,
+            workspaceId = workspaceId,
+            createdAt = createdAt,
+            attempts = attempts,
+            status = status,
+            lastError = lastError,
+        )
         recomputeCount()
     }
 
@@ -34,14 +66,11 @@ private class FakePendingMutationDao : PendingMutationDao {
             .take(limit)
 
     override suspend fun markInFlight(ids: List<String>) {
-        rows.replaceAll { entity ->
-            if (entity.id in ids) {
-                entity.copy(status = PendingMutationEntity.STATUS_IN_FLIGHT)
-            } else {
-                entity
-            }
+        // `MutableList.replaceAll` is `@ExperimentalNativeApi` on Kotlin/Native, so it does not
+        // compile in `commonTest`; rewrite in place instead.
+        rewrite { entity ->
+            if (entity.id in ids) entity.copy(status = PendingMutationEntity.STATUS_IN_FLIGHT) else entity
         }
-        recomputeCount()
     }
 
     override suspend fun deleteByIds(ids: List<String>) {
@@ -50,7 +79,7 @@ private class FakePendingMutationDao : PendingMutationDao {
     }
 
     override suspend fun markFailed(id: String, error: String) {
-        rows.replaceAll { entity ->
+        rewrite { entity ->
             if (entity.id == id) {
                 entity.copy(
                     status = PendingMutationEntity.STATUS_PENDING,
@@ -61,10 +90,20 @@ private class FakePendingMutationDao : PendingMutationDao {
                 entity
             }
         }
+    }
+
+    /** In-place map over [rows], then republish the count. */
+    private fun rewrite(transform: (PendingMutationEntity) -> PendingMutationEntity) {
+        val updated = rows.map(transform)
+        rows.clear()
+        rows.addAll(updated)
         recomputeCount()
     }
 
     override fun pendingCount(): Flow<Int> = countFlow.asStateFlow()
+
+    override fun observeAll(limit: Int): Flow<List<PendingMutationEntity>> =
+        allFlow.map { rows -> rows.sortedBy { it.createdAt }.take(limit) }
 
     override suspend fun deleteAll() {
         rows.clear()
@@ -73,6 +112,7 @@ private class FakePendingMutationDao : PendingMutationDao {
 
     private fun recomputeCount() {
         countFlow.value = rows.count { it.status != PendingMutationEntity.STATUS_IN_FLIGHT }
+        allFlow.value = rows.toList()
     }
 }
 

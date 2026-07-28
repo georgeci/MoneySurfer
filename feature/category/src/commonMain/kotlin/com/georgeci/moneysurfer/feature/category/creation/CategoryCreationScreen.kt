@@ -25,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -41,7 +42,9 @@ import com.georgeci.moneysurfer.uikit.components.base.SurferToolbarButtonAction
 import com.georgeci.moneysurfer.uikit.components.category.SurferColorSwatchRow
 import com.georgeci.moneysurfer.uikit.components.category.SurferIconPickerGrid
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
+import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.utils.AmountInputTransformation
 import com.georgeci.moneysurfer.utils.HandleSideEffect
@@ -69,6 +72,13 @@ import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
 private val SectionSpacing = 24.dp
+
+/** Stable selectors for the category create/edit screen — see docs/testing/testing-strategy.md. */
+object CategoryCreationTestTags {
+    const val Root = "categoryCreation:root"
+    const val NameField = "categoryCreation:name"
+    const val SaveButton = "categoryCreation:save"
+}
 
 @Composable
 fun CategoryCreationScreen(
@@ -108,7 +118,10 @@ private fun CategoryCreationContent(
     )
 
     Scaffold(
-        modifier = Modifier.surferSafeInsets(),
+        modifier = Modifier
+            .surferSafeInsets()
+            .testTag(CategoryCreationTestTags.Root)
+            .surferTestTagAsId(),
         containerColor = AppTheme.materialColors.surface,
         topBar = {
             SurferToolbar(
@@ -126,6 +139,7 @@ private fun CategoryCreationContent(
                         text = stringResource(Res.string.category_creation_save),
                         onClick = { onEvent(CategoryCreationEvent.OnSaveClick) },
                         enabled = state.canSave,
+                        modifier = Modifier.testTag(CategoryCreationTestTags.SaveButton),
                     )
                 },
             )
@@ -134,6 +148,7 @@ private fun CategoryCreationContent(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .surferContentContainer()
                 .padding(top = padding.calculateTopPadding())
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = SectionSpacing)
@@ -181,7 +196,9 @@ private fun CategoryCreationContent(
                     }
                     else -> null
                 },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag(CategoryCreationTestTags.NameField),
             )
 
             Column {

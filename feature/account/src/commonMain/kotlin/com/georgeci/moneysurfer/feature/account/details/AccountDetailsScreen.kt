@@ -10,13 +10,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -48,18 +48,29 @@ import com.georgeci.moneysurfer.uikit.components.SurferSkeletonRow
 import com.georgeci.moneysurfer.uikit.components.account.SurferAccountDetailsHeroCard
 import com.georgeci.moneysurfer.uikit.components.account.SurferAccountStatCard
 import com.georgeci.moneysurfer.uikit.components.account.SurferBalanceChartCard
-import com.georgeci.moneysurfer.uikit.components.base.SurferAddFab
 import com.georgeci.moneysurfer.uikit.components.base.SurferFilterChipRow
-import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
+import com.georgeci.moneysurfer.uikit.components.base.SurferPaneAction
+import com.georgeci.moneysurfer.uikit.components.base.SurferPaneScaffold
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbarAction
+import com.georgeci.moneysurfer.uikit.components.transaction.SurferSwipeToDeleteTransaction
 import com.georgeci.moneysurfer.uikit.components.transaction.SurferTransactionLine
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
-import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
+import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
+import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.utils.HandleSideEffect
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
+
+/** Stable selectors for the account details screen — see docs/testing/testing-strategy.md. */
+object AccountDetailsTestTags {
+    const val Root = "accountDetails:root"
+    const val SeeAll = "accountDetails:seeAll"
+
+    /** Transaction-type filter chip, suffixed with the lowercased [TransactionFilter]. */
+    const val FilterPrefix = "accountDetails:filter:"
+}
 
 @Composable
 fun AccountDetailsScreen(
@@ -94,19 +105,14 @@ fun AccountDetailsScreen(
 
 @Composable
 private fun AccountDetailsLoading(onEvent: (AccountDetailsEvent) -> Unit) {
-    Scaffold(
-        modifier = Modifier.surferSafeInsets(),
-        containerColor = AppTheme.materialColors.surface,
-        topBar = {
-            SurferToolbar(
-                title = stringResource(Res.string.account_details_title),
-                onBack = { onEvent(AccountDetailsEvent.OnBackClick) },
-            )
-        },
+    SurferPaneScaffold(
+        title = stringResource(Res.string.account_details_title),
+        onBack = { onEvent(AccountDetailsEvent.OnBackClick) },
     ) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .surferContentContainer()
                 .padding(padding)
                 .padding(horizontal = AppTheme.spacing.default, vertical = AppTheme.spacing.medium),
             verticalArrangement = Arrangement.spacedBy(AppTheme.spacing.medium),
@@ -125,33 +131,28 @@ private fun AccountDetailsContent(
     state: AccountDetailsState.Content,
     onEvent: (AccountDetailsEvent) -> Unit,
 ) {
-    Scaffold(
-        modifier = Modifier.surferSafeInsets(),
-        containerColor = AppTheme.materialColors.surface,
-        topBar = {
-            SurferToolbar(
-                title = stringResource(Res.string.account_details_title),
-                onBack = { onEvent(AccountDetailsEvent.OnBackClick) },
-                actions = {
-                    SurferToolbarAction(
-                        icon = SurferIcons.Edit,
-                        contentDescription = stringResource(Res.string.account_details_edit_content_description),
-                        onClick = { onEvent(AccountDetailsEvent.OnEditClick) },
-                    )
-                    SurferToolbarAction(
-                        icon = SurferIcons.MoreVert,
-                        contentDescription = stringResource(Res.string.account_details_more_content_description),
-                        onClick = { /* overflow menu — wires later */ },
-                    )
-                },
+    SurferPaneScaffold(
+        title = stringResource(Res.string.account_details_title),
+        modifier = Modifier
+            .testTag(AccountDetailsTestTags.Root)
+            .surferTestTagAsId(),
+        onBack = { onEvent(AccountDetailsEvent.OnBackClick) },
+        actions = {
+            SurferToolbarAction(
+                icon = SurferIcons.Edit,
+                contentDescription = stringResource(Res.string.account_details_edit_content_description),
+                onClick = { onEvent(AccountDetailsEvent.OnEditClick) },
+            )
+            SurferToolbarAction(
+                icon = SurferIcons.MoreVert,
+                contentDescription = stringResource(Res.string.account_details_more_content_description),
+                onClick = { /* overflow menu — wires later */ },
             )
         },
-        floatingActionButton = {
-            SurferAddFab(
-                label = stringResource(Res.string.account_details_add_transaction),
-                onClick = { onEvent(AccountDetailsEvent.OnAddTransactionClick) },
-            )
-        },
+        primaryAction = SurferPaneAction(
+            label = stringResource(Res.string.account_details_add_transaction),
+            onClick = { onEvent(AccountDetailsEvent.OnAddTransactionClick) },
+        ),
     ) { padding ->
         val filtered = remember(state.filter, state.transactions) {
             when (state.filter) {
@@ -164,6 +165,7 @@ private fun AccountDetailsContent(
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
+                .surferContentContainer()
                 .padding(top = padding.calculateTopPadding()),
             contentPadding = PaddingValues(bottom = padding.calculateBottomPadding()),
         ) {
@@ -229,9 +231,11 @@ private fun AccountDetailsContent(
                         text = stringResource(Res.string.account_details_transactions_see_all),
                         style = AppTheme.typography.labelLarge,
                         color = AppTheme.materialColors.primary,
-                        modifier = Modifier.clickable {
-                            onEvent(AccountDetailsEvent.OnSeeAllTransactionsClick)
-                        },
+                        modifier = Modifier
+                            .testTag(AccountDetailsTestTags.SeeAll)
+                            .clickable {
+                                onEvent(AccountDetailsEvent.OnSeeAllTransactionsClick)
+                            },
                     )
                 }
             }
@@ -247,25 +251,36 @@ private fun AccountDetailsContent(
             } else {
                 items(filtered, key = { it.id.value }) { transaction ->
                     val incomeColor = AppTheme.semanticColors.income
-                    SurferTransactionLine(
-                        icon = if (transaction.isExpense) SurferIcons.Receipt else SurferIcons.Wallet,
-                        title = transaction.title,
-                        formattedAmount = transaction.formattedAmount,
-                        categoryHueSeed = transaction.categoryHueSeed,
-                        amountColor = if (transaction.isExpense) {
-                            AppTheme.materialColors.onSurface
-                        } else {
-                            incomeColor
+                    // The gap below the row belongs to the swipe wrapper and the inset to the line
+                    // — see TransactionRow in the transaction feature for why they cannot swap.
+                    SurferSwipeToDeleteTransaction(
+                        transactionTitle = transaction.title,
+                        onDelete = {
+                            onEvent(AccountDetailsEvent.OnDeleteTransaction(transaction.id))
                         },
-                        amountPillBackground = if (transaction.isExpense) {
-                            null
-                        } else {
-                            incomeColor.copy(alpha = 0.18f)
-                        },
-                        modifier = Modifier.padding(horizontal = AppTheme.spacing.default)
-                            .padding(bottom = AppTheme.spacing.small),
-                        onClick = { onEvent(AccountDetailsEvent.OnTransactionClick(transaction.id)) },
-                    )
+                        modifier = Modifier.padding(bottom = AppTheme.spacing.small),
+                        isTransfer = transaction.isTransfer,
+                        isSplit = transaction.isSplitLeg,
+                    ) {
+                        SurferTransactionLine(
+                            icon = if (transaction.isExpense) SurferIcons.Receipt else SurferIcons.Wallet,
+                            title = transaction.title,
+                            formattedAmount = transaction.formattedAmount,
+                            categoryHueSeed = transaction.categoryHueSeed,
+                            amountColor = if (transaction.isExpense) {
+                                AppTheme.materialColors.onSurface
+                            } else {
+                                incomeColor
+                            },
+                            amountPillBackground = if (transaction.isExpense) {
+                                null
+                            } else {
+                                incomeColor.copy(alpha = 0.18f)
+                            },
+                            modifier = Modifier.padding(horizontal = AppTheme.spacing.default),
+                            onClick = { onEvent(AccountDetailsEvent.OnTransactionClick(transaction.id)) },
+                        )
+                    }
                 }
             }
         }
@@ -356,6 +371,7 @@ private fun FilterChips(
             )
         },
         onSelect = onSelect,
+        optionTestTag = { filter -> AccountDetailsTestTags.FilterPrefix + filter.name.lowercase() },
     )
 }
 

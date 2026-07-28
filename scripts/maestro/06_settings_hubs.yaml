@@ -11,30 +11,36 @@ name: Settings — Open hub screens
 
 - assertVisible:
     id: "settings:root"
-# Online build shows the profile/Name section; the offline build hides it.
+# Online build shows the profile/Name section; the offline build hides it. Assert
+# the row, not the value: the previous `text: "Kasia Nowak"` pinned this flow to
+# a profile name that scripts/firebase/seed.sh never creates, so where it came
+# from — and what would happen to this flow if it changed — was anybody's guess
+# (#352).
 - assertVisible:
-    text: "Kasia Nowak"
+    id: "settings:profileName"
 - assertVisible:
-    text: "Workspace"
+    id: "settings:workspaceRow"
+- assertVisible:
+    id: "settings:membersRow"
 - assertVisible:
     id: "settings:categoriesRow"
 - assertVisible:
     id: "settings:appearanceRow"
-- assertVisible:
-    text: "Help & info"
 
-# The Sync hub is deliberately absent here: `OnlineSignInModule` binds
-# `SyncFeatureFlag(enabled = false)`, and `SettingsState.showSyncSection` gates
-# the row on it, so the online build composes no Sync row to open. Covered by
+# The Sync hub is deliberately absent here. `SettingsState.showSyncSection` is
+# `!isOffline && syncEnabled`, and `syncEnabled` comes from `SyncSettings.isEnabled`
+# — build AND server kill switch AND user toggle (#345 replaced the old
+# `SyncFeatureFlag` binding with this layered config). Sync has been off since
+# #110, so the online build composes no Sync row to open. Covered by
 # 14_force_sync_now.yaml, which is tagged `sync` and excluded from this suite
-# until the flag is flipped on.
+# until it is switched on.
 
 - tapOn:
     id: "settings:appearanceRow"
 - assertVisible:
-    text: "Theme"
+    id: "appearance:root"
 - tapOn:
-    text: "Back"
+    id: "toolbar:back"
 
 - scrollUntilVisible:
     element:
@@ -43,9 +49,9 @@ name: Settings — Open hub screens
 - tapOn:
     id: "settings:aboutRow"
 - assertVisible:
-    text: "MoneySurfer"
+    id: "about:root"
 - tapOn:
-    text: "Back"
+    id: "toolbar:back"
 
 - scrollUntilVisible:
     element:

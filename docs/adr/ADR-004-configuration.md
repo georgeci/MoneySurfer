@@ -220,8 +220,11 @@ ordered chain plus a free-form remote map lets the server override anything it n
 
 The opt-in flag restores the non-overridable guarantee that host-owned and user-owned keys
 had before the three-policy model collapsed into one chain. The pull/mirror side honours the
-same registry check: a key name in `appConfig/mobile` that is unknown or not
-`remoteOverridable` is ignored and logged, never mirrored.
+same registry check: a key name in `appConfig/flags` that is unknown or not
+`remoteOverridable` is ignored and logged, never mirrored. Filtering at the *write* side as
+well as at resolution is deliberate — a refused name that reached the mirror would sit in
+local storage being refused on every read, and would show up in the debug panel as a value
+the RemoteGlobal layer holds.
 
 A kill switch must not *replace* a user toggle, it must *zero* it. Boolean composition stays
 out of the KV layer — keep two keys and combine them in a use case:
@@ -243,9 +246,27 @@ internal class SyncSettingsImpl(private val config: Config) : SyncSettings {
 }
 ```
 
-Three terms, not two: today's `SyncFeatureFlag` is deliberately `false` in *both* hosts
-because the feature is not shipped, and a `remote && user` pair has no slot for that
-build-owned term — dropping it would silently enable sync at migration step 1.
+Three terms, not two: the offline host has no Firestore to sync against, so its build term is
+`false` while the online host's is `true` (issue #342). A `remote && user` pair has no slot for
+that build-owned term — dropping it would silently enable sync in the offline build.
+
+**What `true → false` does.** The flag is a flow, so a server kill switch can retract
+mid-session and the transition needs a defined shape. The policy is *start nothing new, finish
+what is running*:
+
+| | On `isEnabled` becoming `false` |
+| --- | --- |
+| Periodic ticker | stops — the uid flow is unsubscribed |
+| New sync requests (manual, use-case-driven) | no-op before reaching the coordinator |
+| Queued requests | left to the coordinator's own queue semantics |
+| In-flight sync | **not** cancelled — a half-applied pull is worse than a late one |
+| Manual sync UI | hidden; the route stays registered and the screen re-checks defensively |
+| Outbox `enqueue` | unaffected — local writes keep queueing |
+
+`enqueue` is deliberately outside the gate: `OutboxEnqueuerImpl` already no-ops without a
+Firebase uid, and the sign-in reconciliation in [Session lifecycle](#session-lifecycle) is what
+replays writes made while sync was unavailable. Gating enqueue too would drop those writes
+instead of deferring them.
 
 **Hydration.** Every backing store is suspend-only, so a synchronous `snapshot()` needs an
 in-memory map per source, warmed once. `Config.hydrate()` is a suspend call awaited by
@@ -482,21 +503,31 @@ is already taken by `config/detekt`.)
 ```text
 app-config/api      -> domain              # keys, codecs, Config, ConfigSource + per-layer types
 app-config/default  -> app-config/api      # LayeredConfig, ConfigRegistry, assembly module
-app-config/remote   -> app-config/api      # Firestore-bound RemoteGlobalConfigSource (step 4)
+app-config/remote   -> app-config/{api,default}  # Firestore-bound RemoteGlobalConfigSource (step 4)
 data-local          -> app-config/api      # implements Local + Debug sources, owns UiConfigKeys
 composeApp          -> app-config/{api,default,remote}
+composeApp          -> data-local            # flag-mirror factory, per platform (step 4)
 composeAppOffline   -> app-config/{api,default}
 feature/*           -> domain              # app-config is NOT on the classpath
 ```
 
 `api` must stay SDK-free (no Room, DataStore or Firebase), like `sync/api`. The per-layer
 types and their `Empty` objects live there, so `composeAppOffline` can bind
-`RemoteGlobalConfigSource.Empty` without depending on `app-config/remote`, and `composeApp`
+`RemoteGlobalConfigSource.Empty` without depending on `app-config/remote`, and either host
 can declare its Build layer without depending on `data-local`.
+
+Step 4 does add `composeApp -> data-local`, for one reason that is not the Build layer: the
+RemoteGlobal mirror is a DataStore file, its per-platform factory lives with the other
+DataStore-backed layers, and — unlike `DebugConfigSource`, which `shared` binds for both
+hosts — only the online build has a remote layer to mirror, so the binding is host-owned.
 
 `app-config/remote` mirrors `sync-surfer`: the only module that binds Firestore to
 configuration, absent from the offline build, and not needed until step 4 — steps 1-3 ship
-without it. No `no-op` module is required, since `Empty` already lives in `api`. The per-user
+without it. No `no-op` module is required, since `Empty` already lives in `api`. It reaches
+past `api` to `default` for one symbol, `ConfigRegistry`: keys are `internal` to the modules
+that own their facades, so the registry is the only thing that can answer "is this name a
+known key, and is it `remoteOverridable`?" — which is the question the whole layer turns on,
+and the consumer the registry's own KDoc was written for. The per-user
 `UserConfigSyncPlugin` is *not* placed here: it is one of thirteen sync plugins and belongs
 with them in `sync-surfer`, on the shared `PluginHelpers` / `SyncPullPriorities`
 infrastructure.
@@ -507,7 +538,8 @@ The only configuration types visible to features are domain facades:
 interface UiPreferences        // exists today, unchanged signature
 interface SyncSettings         // replaces SyncFeatureFlag
 interface HostCapabilities     // replaces OfflineBuildFlags + SignInFeatureConfig + TransactionCreationFeatureConfig
-interface AppVersionGate       // exists today, now reads keys instead of RemoteAppConfig
+interface AppVersionGate       // exists today, unchanged — keeps AppConfigRepository and
+                               // appConfig/mobile; see "Version gate stays as it is"
 interface DebugConfigInspector // debug panel only
 ```
 
@@ -535,7 +567,7 @@ class ConfigModule {
 Layer order is passed explicitly rather than collected via `getAll()` — precedence is a
 correctness property and must not depend on module load order.
 
-Three details the naive shape gets wrong:
+Four details the naive shape gets wrong:
 
 - **Key groups need distinct types.** Koin indexes definitions by primary type, so several
   modules each binding a bare `ConfigKeyGroup` overwrite one another and `getAll()` returns a
@@ -551,6 +583,20 @@ Three details the naive shape gets wrong:
   with the unqualified one already bound in each `SharedPlatformModule`, and both layers would
   end up reading the same file. `DebugConfigSource` creates its own through an `expect/actual`
   `createDebugOverridesDataStore()`; the raw store never enters the graph.
+
+- **The engine needs an application-scoped `CoroutineScope`.** Every DataStore-backed layer
+  collects its store exactly once, on `applicationScopeModule`'s unqualified `CoroutineScope`
+  binding — included by each `SharedPlatformModule` — and shares the result; `LayeredConfig`
+  shares its layer `combine` the same way. Unshared, every `Config.observe` collector
+  re-subscribed every layer, opening a fresh `dataStore.data` for each store-backed one; the
+  Settings screen alone puts roughly ten collectors on it. The mirror's
+  snapshot still has two writers — that collection and `edit` — but they are now ordered by a
+  write counter, so a value the store handed the collection before a write committed is dropped
+  rather than published over it. Ordering them rather than routing both through the collection is
+  forced by the Local layer sharing its file with the session pointers: an `edit` that waited for
+  its own value to come back could wait forever, because a session write in the same window makes
+  DataStore's conflating cache skip it. Added in #364; the four host test modules that stand in for
+  `sharedPlatformModule` mirror the binding.
 
 - **`ConfigCodec` and host keys are public API of `api`.** Kotlin rejects a public constructor
   taking an internal parameter type, so `data-local` could not pass `PaletteSourceCodec` to a
@@ -674,16 +720,121 @@ Revisit if a slider-backed key appears.
 - `sync = false` is required for demo/session/onboarding keys.
 - `sync = true` keys are stored in Room `config_entry` (account-scoped, wiped on account
   change); `sync = false` keys stay in DataStore and are never wiped.
+- **A key that gates sync is `sync = false`.** `sync.user_enabled` is the case: the syncer refuses
+  to push or pull while it is `false`, so the value `false` can never reach Firestore — only `true`
+  can. Account-scoped it would be wiped on logout and resolve back to its `true` default, with
+  nothing on the server able to restore the user's choice, so turning sync off and logging out
+  would silently turn it back on. The rule generalises: a setting cannot replicate through a
+  channel it is itself allowed to close.
 - Layer order is declared explicitly in one place.
+- **An unreadable store never fails a read.** Not just `hydrate()` — every path. `hydrate()` runs
+  before a start route exists and `Config.observe` is collected on the same startup coroutine, so a
+  throw from either kills the app before it has anywhere to fall back to. The rule therefore lives in
+  the source, not in the engine: a layer whose store cannot be read logs at Error severity, serves an
+  empty snapshot, and reports `ConfigSource.isDegraded`. `Config.degradedLayers` is derived from that
+  flag, so it clears by itself the moment the store becomes readable again — no retry logic, and no
+  stale red banner in the debug panel. A degraded layer resolves as absent, so values fall through and
+  stay usable; the panel says which layer is unreadable rather than presenting the fallback as current.
+  Stores whose contents are disposable (the debug-override file) additionally replace themselves on
+  corruption. The app's settings file deliberately does not — it holds the session pointers, and
+  silently replacing it would sign the user out.
+- **A read never writes.** Resolving to `key.default` does not create a Local entry, `hydrate()`
+  does not persist anything, and the fallback after a decode failure is not written back over the
+  value that failed. Otherwise a fresh device would upload its own defaults before the first
+  remote pull and win LWW against the user's real settings, and a corrupt value would be silently
+  destroyed instead of staying visible to the debug panel. Reconciliation therefore also sees only
+  keys the user actually wrote.
 - A layer returning `null` means absent, never a falsy value. Keys are `T : Any`; "empty" is a
   codec sentinel. An undecodable stored value is absent-in-that-layer, logged, not fatal.
 - `appConfig/flags` is world-readable: key names and values placed there are public, so
-  unannounced feature names do not belong in it.
+  unannounced feature names do not belong in it. `allow list: if false` stops the collection
+  being scanned, which narrows who can *discover* a flag name — it does not make one secret,
+  because any `get` of the exact document id returns the whole map to anyone, signed in or not.
 - Kill switches combine with user toggles in a use case, not in the KV layer.
 - Platform-unrepresentable values are clamped at the facade on read, never rewritten in a
   layer — layers must stay honest for `resolve()`.
 
 ## Migration
+
+**Status.** Steps 1-3 shipped together in issue #332; step 4 shipped in issue #333; step 5
+shipped in issue #334. The migration is complete.
+
+Step 5's deviations worth knowing:
+
+- `config_entry` carries a fourth column, `lastPushedAt`. The sign-in reconciliation is specified
+  as "every `sync = true` key whose `updatedAt` is newer than `lastPushedAt`", and there was
+  nowhere else for that timestamp to live; the push stamps it, scoped to the `updatedAt` it
+  actually sent, so a write that lands mid-push stays pending. A pulled value is stamped as
+  already-pushed, so a pull never provokes an echo push.
+- The in-memory overlay is a real layer, `ConfigLayer.Session`, ordered `Debug > Session > Local`.
+  Being a layer is what keeps `resolve()` honest for the debug panel. It also forced one engine
+  rule: `Config.handle(key).set` releases the overlay entry, because the overlay outranks the layer
+  being written to and the write would otherwise be stored and not shown. The release happens
+  *after* the write, not before: released first, a store that refused the write would leave the
+  value in neither place and snap the running UI to a default the user never chose.
+- The account wipe drops `config_entry` through `LocalConfigSource.clearSynced()`, not through the
+  reset repository's DAO fan-out. The layer keeps an in-memory snapshot behind the synchronous
+  `peek`, refreshed only by Room's invalidation through a cold flow with no collector of its own —
+  deleting the rows underneath it would leave the wiped account's settings resolving from Local
+  until something happened to observe a setting, and session start clears the overlay that was
+  legitimately masking them.
+- Session-boundary work is reached through a `SyncedSettingsSession` domain facade — same reason
+  as `ConfigHydration` and `RemoteConfigRefresh`: the callers are use cases in `domain`, which
+  must not see `app-config`. It runs at the top of `PostAuthBootstrapUseCase` (before the first
+  pull) and in `DemoLoginUseCase`.
+- The plugin's Firestore write goes through a `UserConfigRemoteSource` seam, mirroring
+  `AccountDeletionRemoteSource`: gitlive's JVM artefact cannot be instantiated off Android, so
+  without the seam none of the push decisions would be unit-testable.
+- **Pre-bump backups are unrestorable.** `BackupImporterImpl.validateVersions` compares
+  `moneySurferDbVersion` for strict equality, so an archive made at v33 now fails with
+  `BackupError.SchemaMismatch`. Accepted pre-release, and it is the same class of loss as the
+  skipped DataStore migration below. `config_entry` itself needs no export work — the backup
+  ships the whole database file.
+- The outbox dedup landed here rather than as its own issue (see
+  [Write volume](#write-volume)); it is a sync-wide behaviour change, covered against real SQLite
+  in `PendingMutationQueueIntegrationIT`.
+
+Step 4's deviations worth knowing:
+
+- `app-config/remote` depends on `app-config/default` as well as `api`, for `ConfigRegistry` —
+  see [Module boundaries](#module-boundaries).
+- The layer is refreshed through a `RemoteConfigRefresh` domain facade, for the same reason
+  hydration needed `ConfigHydration`: `navigation` must not see `app-config`. `AppNavGraph`
+  drives it from `repeatOnLifecycle(STARTED)`, which fires on first composition and on every
+  foreground return — one hook covering both halves of "on launch and on foreground return".
+  It is fire-and-forget: hydration is awaited before the start route, this is not, so a cold
+  start never waits on Firestore.
+- The mirror is a `RemoteConfigMirror` contract in `api`, implemented in `data-local` next to
+  the other DataStore-backed layers and bound by the **online host's** per-platform module
+  rather than `sharedPlatformModule` — unlike `DebugConfigSource`, it *is* host-specific.
+  Its own file, `moneysurfer_remote_flags.preferences_pb`, because server-owned disposable
+  values must not ride along in the user's settings file through backup and export; being
+  disposable is also what lets it replace itself on corruption.
+- Values are read as `Map<String, String>`. gitlive's decoder stringifies every field, so a
+  boolean typed into the Firebase Console arrives as `"true"` and `BooleanConfigCodec` takes
+  it — the owner does not have to remember to quote flag values.
+- Retraction is a **replace**, not a merge, and a document that does not exist clears the
+  mirror. A merge would pin a deleted flag at its last value on every device that ever saw it.
+  A *failed fetch* is the one case that leaves the mirror alone, which is what makes an
+  offline launch resolve the last values the server sent.
+
+Steps 1-3's deviations worth knowing:
+
+- No deprecated adapters. Every injection site migrated in the same change, so
+  `OfflineBuildFlags`, `SignInFeatureConfig`, `TransactionCreationFeatureConfig`,
+  `SyncFeatureFlag`, `UiSettingsDataSource` and `PrefAdapters` are gone rather than kept for a
+  release.
+- Hydration is reached through a `ConfigHydration` domain facade, because `AppLaunchViewModel`
+  lives in `navigation`, which must not see `app-config` any more than a feature may.
+- The conditional `DebugConfigSource` binding lives in `shared`'s per-platform module rather than
+  in each host. It is not host-specific (both builds want overrides in debug builds), and Android
+  needs the `Context` that module already resolves. `isDebugBuild()` is therefore not an
+  `expect`/`actual` pair: each platform's factory uses what it has — `FLAG_DEBUGGABLE`,
+  `Platform.isDebugBinary`, or `true` on the developer-only desktop build.
+- The Local layer stores values under a `config.` preference prefix. `ui.onboarding_completed` used
+  to be a `booleanPreferencesKey` in the same file and `Preferences.Key` equality is by name only,
+  so reusing the bare name would throw on every existing install. Key *names* are unprefixed
+  everywhere they are user- or wire-visible.
 
 1. `app-config/api` (`ConfigKey`, `SettingKey`, `ConfigCodec`, `Config`, `ConfigSource` and
    the per-layer types) plus `app-config/default` (`LayeredConfig`, `ConfigRegistry`, the

@@ -17,7 +17,7 @@
 ## adr-configuration
 - Title: Decision
 - File: docs/adr/ADR-004-configuration.md
-- Lines: 62-782
+- Lines: 62-933
 - Tasks: adr, config, flags, preferences
 
 ## adr-navigation
@@ -71,37 +71,37 @@
 ## cloud-login-f1-dangling-refs
 - Title: F1 — Asymmetric flag gating writes dangling workspace refs (critical)
 - File: docs/architecture/cloud-login-hydration.md
-- Lines: 65-108
+- Lines: 73-120
 - Tasks: sync, firestore, feature-flag, data-integrity
 
 ## cloud-login-f2-pointer-seed
 - Title: F2 — Bootstrap pins a workspace that does not exist locally
 - File: docs/architecture/cloud-login-hydration.md
-- Lines: 110-123
+- Lines: 122-139
 - Tasks: auth, login, workspace, session
 
 ## cloud-login-f3-pull-pagination
 - Title: F3 — The pull fetches one batch per collection, with no pagination loop
 - File: docs/architecture/cloud-login-hydration.md
-- Lines: 125-143
+- Lines: 141-163
 - Tasks: sync, pull, pagination
 
 ## cloud-login-f4-bootstrap-abort
 - Title: F4 — One unreadable workspace aborts the whole bootstrap, blocking sign-in
 - File: docs/architecture/cloud-login-hydration.md
-- Lines: 145-162
+- Lines: 165-201
 - Tasks: sync, pull, auth, error-handling
 
 ## cloud-login-remediation
 - Title: Remediation
 - File: docs/architecture/cloud-login-hydration.md
-- Lines: 189-204
+- Lines: 227-273
 - Tasks: sync, auth, roadmap, known-issues
 
 ## cloud-login-verdict
 - Title: Verdict
 - File: docs/architecture/cloud-login-hydration.md
-- Lines: 41-50
+- Lines: 49-58
 - Tasks: sync, auth, login, workspace, known-issues
 
 ## color-contrast
@@ -113,7 +113,7 @@
 ## context-packs
 - Title: Add Compose screen
 - File: docs/CONTEXT_PACKS.md
-- Lines: 26-59
+- Lines: 27-68
 - Tasks: context, docs, agent
 
 ## crash-reporting
@@ -200,6 +200,12 @@
 - Lines: 87-113
 - Tasks: invites, domain, kotlin
 
+## ios-testflight-distribution
+- Title: Scope and triggers
+- File: docs/ci/testflight.md
+- Lines: 29-172
+- Tasks: ios, testflight, ci, release
+
 ## markdown-rules
 - Title: Rules
 - File: ai/skills/markdown-rules.md
@@ -242,10 +248,28 @@
 - Lines: 23-29
 - Tasks: navigation, screen, summary
 
+## onboarding-flow
+- Title: Onboarding
+- File: docs/features/onboarding.md
+- Lines: 83-120
+- Tasks: onboarding, first-run, navigation
+
+## onboarding-splash
+- Title: Splash
+- File: docs/features/onboarding.md
+- Lines: 35-81
+- Tasks: splash, launch, navigation
+
+## onboarding-start-route
+- Title: Start route
+- File: docs/features/onboarding.md
+- Lines: 122-149
+- Tasks: first-run, navigation, offline
+
 ## persistence-rules
 - Title: Rules
 - File: docs/architecture/persistence.md
-- Lines: 26-40
+- Lines: 26-46
 - Tasks: persistence, room, firestore, datastore
 
 ## project-map
@@ -257,7 +281,7 @@
 ## qa-runbook
 - Title: Setup
 - File: docs/testing/qa-runbook.md
-- Lines: 47-338
+- Lines: 48-347
 - Tasks: testing, qa, reports, tooling
 
 ## rules-bug-1
@@ -321,9 +345,9 @@
 - Tasks: firestore-rules, members, invites, tenant-isolation
 
 ## screenshot-tests
-- Title: Where the reference images live
+- Title: Two kinds of capture
 - File: docs/testing/screenshot-tests.md
-- Lines: 29-135
+- Lines: 35-245
 - Tasks: testing, uikit, screenshot, roborazzi
 
 ## security-audit-2026-07
@@ -371,7 +395,7 @@
 ## sync-pull-lww-rules
 - Title: Rules
 - File: docs/architecture/sync-pull-lww.md
-- Lines: 36-51
+- Lines: 39-54
 - Tasks: sync, pull, lww, tombstones, cursor
 
 ## sync-rules
@@ -389,13 +413,13 @@
 ## testing-strategy
 - Title: Test layers
 - File: docs/testing/testing-strategy.md
-- Lines: 35-184
+- Lines: 36-194
 - Tasks: testing, qa, validation
 
 ## time-policy
 - Title: Time policy
 - File: docs/architecture/data-models.md
-- Lines: 46-69
+- Lines: 47-70
 - Tasks: time, persistence, domain
 
 ## transactions-feature

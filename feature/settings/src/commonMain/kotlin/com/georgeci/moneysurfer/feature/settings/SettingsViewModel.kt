@@ -1,9 +1,10 @@
 package com.georgeci.moneysurfer.feature.settings
 
 import com.georgeci.moneysurfer.domain.AppInfo
-import com.georgeci.moneysurfer.domain.OfflineBuildFlags
-import com.georgeci.moneysurfer.domain.SyncFeatureFlag
 import com.georgeci.moneysurfer.domain.auth.SessionPointers
+import com.georgeci.moneysurfer.domain.config.DebugConfigInspector
+import com.georgeci.moneysurfer.domain.config.HostCapabilities
+import com.georgeci.moneysurfer.domain.config.SyncSettings
 import com.georgeci.moneysurfer.domain.model.WorkspaceMemberStatus
 import com.georgeci.moneysurfer.domain.preferences.PaletteSource
 import com.georgeci.moneysurfer.domain.preferences.UiPreferences
@@ -24,7 +25,7 @@ import org.koin.core.annotation.KoinViewModel
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @KoinViewModel
-@Suppress("LongParameterList") // Aggregator ViewModel; offline-flag injection edges past the 10-arg threshold.
+@Suppress("LongParameterList") // Aggregator ViewModel; the host/sync/debug facades edge past the 10-arg threshold.
 class SettingsViewModel(
     private val session: SessionPointers,
     private val authRemoteRepository: AuthRemoteRepository,
@@ -34,19 +35,21 @@ class SettingsViewModel(
     private val refreshIncomingInvites: RefreshIncomingInvitesUseCase,
     private val memberRepository: WorkspaceMemberRepository,
     private val uiPreferences: UiPreferences,
-    private val syncFeatureFlag: SyncFeatureFlag,
+    private val syncSettings: SyncSettings,
     appInfo: AppInfo,
-    offlineBuildFlags: OfflineBuildFlags,
+    hostCapabilities: HostCapabilities,
+    debugConfigInspector: DebugConfigInspector,
 ) : MviViewModel<SettingsState, SettingsEvent, SettingsEffect>(
     initialState = SettingsState(
         appVersion = appInfo.version,
-        isOffline = offlineBuildFlags.isOffline,
-        syncEnabled = syncFeatureFlag.enabled,
+        isOffline = hostCapabilities.isOffline,
+        showDebugConfig = debugConfigInspector.isAvailable,
     ),
 ) {
 
     init {
         loadUserIdentity()
+        observeSyncEnabled()
         observePendingCount()
         observeIncomingInvites()
         observeActiveWorkspace()
@@ -69,13 +72,21 @@ class SettingsViewModel(
         }
     }
 
-    private fun observePendingCount() {
-        // Sync-feature flag off → outbox queue is irrelevant to the user (no UI surface
-        // can act on it). Skip the subscription so the badge stays at zero and we don't
-        // hold a Flow open for nothing.
-        if (!syncFeatureFlag.enabled) return
+    private fun observeSyncEnabled() {
         launch {
-            pendingMutationQueue.pendingCount
+            syncSettings.isEnabled
+                .onEach { enabled -> updateState { copy(syncEnabled = enabled) } }
+                .collect()
+        }
+    }
+
+    private fun observePendingCount() {
+        // Sync off → the outbox queue is irrelevant to the user (no UI surface can act on it), so
+        // don't hold the Flow open. `flatMapLatest` rather than an early return because the server
+        // kill switch can retract mid-session.
+        launch {
+            syncSettings.isEnabled
+                .flatMapLatest { enabled -> if (enabled) pendingMutationQueue.pendingCount else flowOf(0) }
                 .onEach { count -> updateState { copy(pendingMutationsCount = count) } }
                 .collect()
         }
@@ -91,7 +102,7 @@ class SettingsViewModel(
 
     private fun observeDynamicColor() {
         launch {
-            uiPreferences.paletteSource.flow
+            uiPreferences.effectivePaletteSource
                 .onEach { source ->
                     updateState { copy(isDynamicColorEnabled = source is PaletteSource.Dynamic) }
                 }
@@ -101,7 +112,7 @@ class SettingsViewModel(
 
     private fun observeActiveWorkspace() {
         launch {
-            session.currentWorkspaceId.flow
+            session.currentWorkspaceId
                 .onEach { workspaceId -> updateState { copy(currentWorkspaceId = workspaceId) } }
                 .flatMapLatest { workspaceId ->
                     if (workspaceId == null) flowOf(emptyList()) else memberRepository.getByWorkspaceId(workspaceId)
@@ -156,6 +167,7 @@ class SettingsViewModel(
         SettingsEvent.OnIncomingInvitesClick -> SettingsEffect.NavigateToIncomingInvites
         SettingsEvent.OnCategoriesClick -> SettingsEffect.NavigateToCategories
         SettingsEvent.OnBudgetsClick -> SettingsEffect.NavigateToBudgets
+        SettingsEvent.OnGoalsClick -> SettingsEffect.NavigateToGoals
         else -> null
     }
 
@@ -166,6 +178,7 @@ class SettingsViewModel(
         SettingsEvent.OnBackupClick -> SettingsEffect.NavigateToBackup
         SettingsEvent.OnCsvBackupClick -> SettingsEffect.NavigateToCsvBackup
         SettingsEvent.OnAboutClick -> SettingsEffect.NavigateToAbout
+        SettingsEvent.OnDebugConfigClick -> SettingsEffect.NavigateToDebugConfig
         SettingsEvent.OnDeleteAccountClick -> SettingsEffect.NavigateToDeleteAccount
         else -> null
     }
@@ -187,6 +200,8 @@ data class SettingsState(
     val isOffline: Boolean = false,
     val syncEnabled: Boolean = false,
     val showGuestLogoutWarning: Boolean = false,
+    /** Debug builds only — the QA configuration panel. */
+    val showDebugConfig: Boolean = false,
 ) {
     val showProfile: Boolean get() = !isOffline
     val showSyncSection: Boolean get() = !isOffline && syncEnabled
@@ -205,12 +220,14 @@ sealed interface SettingsEvent {
     data object OnMembersClick : SettingsEvent
     data object OnCategoriesClick : SettingsEvent
     data object OnBudgetsClick : SettingsEvent
+    data object OnGoalsClick : SettingsEvent
     data object OnAppearanceClick : SettingsEvent
     data object OnPreferencesClick : SettingsEvent
     data object OnSyncClick : SettingsEvent
     data object OnBackupClick : SettingsEvent
     data object OnCsvBackupClick : SettingsEvent
     data object OnAboutClick : SettingsEvent
+    data object OnDebugConfigClick : SettingsEvent
     data object OnLogoutClick : SettingsEvent
     data object OnGuestLogoutConfirmed : SettingsEvent
     data object OnGuestLogoutDismissed : SettingsEvent
@@ -224,11 +241,13 @@ sealed interface SettingsEffect {
     data class NavigateToMembers(val workspaceId: WorkspaceId) : SettingsEffect
     data object NavigateToCategories : SettingsEffect
     data object NavigateToBudgets : SettingsEffect
+    data object NavigateToGoals : SettingsEffect
     data object NavigateToAppearance : SettingsEffect
     data object NavigateToPreferences : SettingsEffect
     data object NavigateToSync : SettingsEffect
     data object NavigateToBackup : SettingsEffect
     data object NavigateToCsvBackup : SettingsEffect
     data object NavigateToAbout : SettingsEffect
+    data object NavigateToDebugConfig : SettingsEffect
     data object NavigateToDeleteAccount : SettingsEffect
 }

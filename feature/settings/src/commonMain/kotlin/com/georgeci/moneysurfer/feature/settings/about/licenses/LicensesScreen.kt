@@ -25,7 +25,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.georgeci.moneysurfer.uikit.atom.SurferCard
-import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
+import com.georgeci.moneysurfer.uikit.components.base.SurferPaneTopBar
+import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.utils.HandleSideEffect
@@ -61,7 +62,7 @@ private fun LicensesContent(
         modifier = Modifier.surferSafeInsets(),
         containerColor = AppTheme.materialColors.surface,
         topBar = {
-            SurferToolbar(
+            SurferPaneTopBar(
                 title = stringResource(Res.string.settings_licenses_title),
                 onBack = { onEvent(LicensesEvent.OnBackClick) },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -92,7 +93,7 @@ private fun LicensesLoading(padding: PaddingValues) {
 @Composable
 private fun LicensesError(padding: PaddingValues) {
     Box(
-        modifier = Modifier.fillMaxSize().padding(padding),
+        modifier = Modifier.fillMaxSize().surferContentContainer().padding(padding),
         contentAlignment = Alignment.Center,
     ) {
         Text(
@@ -112,7 +113,7 @@ private fun LicensesList(
     onEvent: (LicensesEvent) -> Unit,
 ) {
     LazyColumn(
-        modifier = Modifier.fillMaxSize().padding(top = padding.calculateTopPadding()),
+        modifier = Modifier.fillMaxSize().surferContentContainer().padding(top = padding.calculateTopPadding()),
         contentPadding = PaddingValues(
             start = 16.dp,
             end = 16.dp,
@@ -125,7 +126,7 @@ private fun LicensesList(
             Text(
                 text = stringResource(
                     Res.string.settings_licenses_summary_format,
-                    state.libraries.size,
+                    state.libraries.sumOf { it.artifacts.size },
                 ),
                 style = AppTheme.typography.bodySmall,
                 color = AppTheme.materialColors.onSurfaceVariant,
@@ -185,6 +186,12 @@ private fun LibraryRow(
             }
             AnimatedVisibility(visible = expanded) {
                 Column {
+                    Spacer(Modifier.height(10.dp))
+                    Text(
+                        text = library.artifacts.joinToString(separator = "\n"),
+                        style = AppTheme.typography.bodySmall,
+                        color = colors.onSurfaceVariant,
+                    )
                     library.licenses.forEach { license ->
                         license.content?.let { content ->
                             Spacer(Modifier.height(10.dp))

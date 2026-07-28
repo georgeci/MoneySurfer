@@ -10,12 +10,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -54,8 +56,13 @@ import com.georgeci.moneysurfer.uikit.components.base.SurferSwipeAction
 import com.georgeci.moneysurfer.uikit.components.base.SurferSwipeRevealRow
 import com.georgeci.moneysurfer.uikit.components.base.SurferToggleChipButton
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
+import com.georgeci.moneysurfer.uikit.components.base.rememberSurferReorderState
+import com.georgeci.moneysurfer.uikit.components.base.surferReorderHandle
+import com.georgeci.moneysurfer.uikit.components.base.surferReorderableItem
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
+import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.utils.HandleSideEffect
 import kotlinx.datetime.number
@@ -63,6 +70,16 @@ import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringArrayResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
+
+/**
+ * This screen owns the only add-account affordance that survives a non-empty list — the
+ * dashboard's own CTA is empty-state-only — so E2E flows that create a second account come
+ * through here.
+ */
+object AccountsManageTestTags {
+    const val Root = "accountsManage:root"
+    const val Add = "accountsManage:add"
+}
 
 @Composable
 fun AccountsManageScreen(
@@ -107,6 +124,7 @@ private fun AccountsManageLoading(onEvent: (AccountsManageEvent) -> Unit) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .surferContentContainer()
                 .padding(padding)
                 .padding(horizontal = AppTheme.spacing.default, vertical = AppTheme.spacing.medium),
             verticalArrangement = Arrangement.spacedBy(14.dp),
@@ -127,7 +145,10 @@ private fun AccountsManageContent(
 ) {
     val hasContent = state.activeAccounts.isNotEmpty() || state.archivedAccounts.isNotEmpty()
     Scaffold(
-        modifier = Modifier.surferSafeInsets(),
+        modifier = Modifier
+            .surferSafeInsets()
+            .testTag(AccountsManageTestTags.Root)
+            .surferTestTagAsId(),
         containerColor = AppTheme.materialColors.surface,
         topBar = {
             SurferToolbar(
@@ -154,12 +175,13 @@ private fun AccountsManageContent(
             SurferAddFab(
                 label = stringResource(Res.string.accounts_manage_add_account),
                 onClick = { onEvent(AccountsManageEvent.OnAddAccountClick) },
+                modifier = Modifier.testTag(AccountsManageTestTags.Add),
             )
         },
     ) { padding ->
         if (!hasContent) {
             Box(
-                modifier = Modifier.fillMaxSize().padding(padding),
+                modifier = Modifier.fillMaxSize().surferContentContainer().padding(padding),
                 contentAlignment = Alignment.Center,
             ) {
                 SurferEmptyState(
@@ -170,9 +192,25 @@ private fun AccountsManageContent(
             return@Scaffold
         }
 
+        val listState = rememberLazyListState()
+        val reorderState = rememberSurferReorderState(
+            listState = listState,
+            keys = state.activeAccounts.map { activeRowKey(it.id) },
+            onMove = { from, to ->
+                val fromId = state.activeAccounts.firstOrNull { activeRowKey(it.id) == from }?.id
+                val toId = state.activeAccounts.firstOrNull { activeRowKey(it.id) == to }?.id
+                if (fromId != null && toId != null) {
+                    onEvent(AccountsManageEvent.OnAccountMove(from = fromId, to = toId))
+                }
+            },
+            onMoveEnd = { onEvent(AccountsManageEvent.OnAccountMoveEnd) },
+        )
+
         LazyColumn(
+            state = listState,
             modifier = Modifier
                 .fillMaxSize()
+                .surferContentContainer()
                 .padding(top = padding.calculateTopPadding()),
             contentPadding = PaddingValues(
                 top = AppTheme.spacing.xSmall,
@@ -219,7 +257,8 @@ private fun AccountsManageContent(
                 )
             }
 
-            items(state.activeAccounts, key = { "active-${it.id.value}" }) { account ->
+            items(state.activeAccounts, key = { activeRowKey(it.id) }) { account ->
+                val rowKey = activeRowKey(account.id)
                 ActiveAccountRow(
                     account = account,
                     editing = state.isEditing,
@@ -228,7 +267,9 @@ private fun AccountsManageContent(
                     onClick = { onEvent(AccountsManageEvent.OnAccountClick(account.id)) },
                     onArchiveClick = { onEvent(AccountsManageEvent.OnArchiveAccountClick(account.id)) },
                     onRemoveClick = { onEvent(AccountsManageEvent.OnRemoveAccountClick(account.id)) },
-                    modifier = Modifier.padding(horizontal = AppTheme.spacing.default, vertical = 5.dp),
+                    handleModifier = Modifier.surferReorderHandle(reorderState, rowKey),
+                    modifier = surferReorderableItem(reorderState, rowKey)
+                        .padding(horizontal = AppTheme.spacing.default, vertical = 5.dp),
                 )
             }
 
@@ -292,6 +333,12 @@ private fun AccountsManageContent(
     }
 }
 
+/**
+ * Row key of an active account. Shared by the `LazyColumn` item and the reorder state — the
+ * drag reports moves as keys, and the two have to be the same string for a drop to land.
+ */
+private fun activeRowKey(id: AccountId): String = "active-${id.value}"
+
 @Composable
 private fun ActiveAccountRow(
     account: AccountManageUi,
@@ -301,6 +348,7 @@ private fun ActiveAccountRow(
     onClick: () -> Unit,
     onArchiveClick: () -> Unit,
     onRemoveClick: () -> Unit,
+    handleModifier: Modifier,
     modifier: Modifier = Modifier,
 ) {
     val typeLabel = stringResource(account.type.labelRes())
@@ -329,7 +377,7 @@ private fun ActiveAccountRow(
             formattedBalance = account.formattedBalance,
             onClick = if (editing) null else onClick,
             trailing = if (editing) {
-                { SurferDragHandle() }
+                { SurferDragHandle(modifier = handleModifier) }
             } else {
                 null
             },

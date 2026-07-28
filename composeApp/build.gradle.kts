@@ -69,8 +69,14 @@ kotlin {
         commonMain.dependencies {
             implementation(projects.shared)
             implementation(projects.domain)
+            implementation(projects.appConfig.api)
+            implementation(projects.appConfig.default)
+            implementation(projects.appConfig.remote)
             implementation(projects.feature.login)
             implementation(projects.feature.transaction)
+            // The RemoteGlobal layer's DataStore mirror is created by a per-platform factory here,
+            // not in `sharedPlatformModule`: only the online build has a remote layer to mirror.
+            implementation(projects.dataLocal)
             implementation(projects.dataRemote)
             implementation(projects.syncSurfer)
             implementation(projects.sync.default)
@@ -97,6 +103,10 @@ kotlin {
             implementation(projects.feature.login)
             // DashboardCustomizeScreenStateTest mounts the customize screen's stateless content.
             implementation(projects.feature.dashboard)
+            // DebugConfigScreenStateTest mounts the QA configuration panel's stateless content.
+            implementation(projects.feature.settings)
+            // SyncScreenStateTest feeds the sync panel real outbox rows and cursors.
+            implementation(projects.sync.api)
             // GlobalErrorBoundaryTest drives the real boundary component and the real
             // MviViewModel escalation path (issue #78).
             implementation(projects.uikit)

@@ -17,13 +17,13 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -34,14 +34,15 @@ import com.georgeci.moneysurfer.feature.goal.formatGoalDate
 import com.georgeci.moneysurfer.feature.goal.labelRes
 import com.georgeci.moneysurfer.feature.goal.toUi
 import com.georgeci.moneysurfer.navigation.GoalContributionMode
-import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
+import com.georgeci.moneysurfer.uikit.components.base.SurferPaneScaffold
 import com.georgeci.moneysurfer.uikit.components.goal.SurferGoalContributionRow
 import com.georgeci.moneysurfer.uikit.components.goal.SurferGoalIcon
 import com.georgeci.moneysurfer.uikit.components.goal.SurferGoalProgressRing
 import com.georgeci.moneysurfer.uikit.components.goal.SurferGoalStatusPill
 import com.georgeci.moneysurfer.uikit.components.goal.goalAccentColor
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
-import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
+import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
+import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
 import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.utils.AsyncState
@@ -73,6 +74,13 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
+/** Stable selectors for the Goal details screen — see docs/testing/testing-strategy.md. */
+object GoalDetailsTestTags {
+    const val Root = "goalDetails:root"
+    const val AddMoneyButton = "goalDetails:addMoney"
+    const val HistoryHeader = "goalDetails:history"
+}
+
 @Composable
 fun GoalDetailsScreen(
     goalId: GoalId,
@@ -103,27 +111,24 @@ private fun GoalDetailsScaffold(
     content: GoalDetailsContent?,
     onEvent: (GoalDetailsEvent) -> Unit,
 ) {
-    Scaffold(
-        modifier = Modifier.surferSafeInsets(),
-        containerColor = AppTheme.materialColors.surface,
-        topBar = {
-            SurferToolbar(
-                title = content?.title.orEmpty(),
-                onBack = { onEvent(GoalDetailsEvent.OnBackClick) },
-                actions = {
-                    IconButton(onClick = { onEvent(GoalDetailsEvent.OnActionsClick) }) {
-                        Icon(
-                            imageVector = SurferIcons.MoreVert,
-                            contentDescription = stringResource(Res.string.goal_details_actions),
-                        )
-                    }
-                },
-            )
+    SurferPaneScaffold(
+        title = content?.title.orEmpty(),
+        modifier = Modifier
+            .testTag(GoalDetailsTestTags.Root)
+            .surferTestTagAsId(),
+        onBack = { onEvent(GoalDetailsEvent.OnBackClick) },
+        actions = {
+            IconButton(onClick = { onEvent(GoalDetailsEvent.OnActionsClick) }) {
+                Icon(
+                    imageVector = SurferIcons.MoreVert,
+                    contentDescription = stringResource(Res.string.goal_details_actions),
+                )
+            }
         },
     ) { padding ->
         if (content == null) {
             Box(modifier = Modifier.fillMaxSize().padding(padding))
-            return@Scaffold
+            return@SurferPaneScaffold
         }
         GoalDetailsBody(content = content, padding = padding, onEvent = onEvent)
 
@@ -143,7 +148,7 @@ private fun GoalDetailsBody(
     onEvent: (GoalDetailsEvent) -> Unit,
 ) {
     LazyColumn(
-        modifier = Modifier.fillMaxSize().padding(padding),
+        modifier = Modifier.fillMaxSize().surferContentContainer().padding(padding),
         contentPadding = PaddingValues(
             horizontal = AppTheme.spacing.default,
             vertical = AppTheme.spacing.small,
@@ -160,6 +165,7 @@ private fun GoalDetailsBody(
                 text = stringResource(Res.string.goal_details_history),
                 style = AppTheme.typography.titleMedium,
                 color = AppTheme.materialColors.onSurface,
+                modifier = Modifier.testTag(GoalDetailsTestTags.HistoryHeader),
             )
         }
         if (content.contributions.isEmpty()) {
@@ -238,7 +244,9 @@ private fun GoalActionsRow(
         Button(
             onClick = { onEvent(GoalDetailsEvent.OnAddMoneyClick) },
             enabled = content.status == GoalStatus.ACTIVE || content.status == GoalStatus.COMPLETED,
-            modifier = Modifier.weight(1f),
+            modifier = Modifier
+                .weight(1f)
+                .testTag(GoalDetailsTestTags.AddMoneyButton),
         ) {
             Text(stringResource(Res.string.goal_details_add))
         }

@@ -20,6 +20,7 @@ import com.georgeci.moneysurfer.domain.primitives.CategoryType
 import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
 import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
 import com.georgeci.moneysurfer.domain.primitives.Money
+import com.georgeci.moneysurfer.domain.primitives.SplitId
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
 import com.georgeci.moneysurfer.domain.primitives.TransferId
@@ -131,6 +132,9 @@ class CreateTransferUseCaseTest : StringSpec({
 
 private class TransferEnv(seedCategories: List<Category>) {
     val txStore = mutableMapOf<TransactionId, Transaction>()
+
+    /** Rows a delete tombstoned — out of every read, still there for a restore. */
+    private val tombstones = mutableMapOf<TransactionId, Transaction>()
     val categoryStore = mutableMapOf<CategoryId, Category>().apply {
         seedCategories.forEach { put(it.id, it) }
     }
@@ -154,9 +158,15 @@ private class TransferEnv(seedCategories: List<Category>) {
         override suspend fun getById(id: TransactionId): Transaction? = txStore[id]
         override suspend fun getByTransferId(transferId: TransferId): List<Transaction> =
             txStore.values.filter { it.transferId == transferId }
+        override suspend fun getBySplitId(splitId: SplitId): List<Transaction> =
+            txStore.values.filter { it.splitId == splitId }
         override suspend fun insert(transaction: Transaction) { txStore[transaction.id] = transaction }
         override suspend fun update(transaction: Transaction) { txStore[transaction.id] = transaction }
-        override suspend fun delete(id: TransactionId) { txStore.remove(id) }
+        override suspend fun delete(id: TransactionId) {
+            txStore.remove(id)?.let { tombstones[id] = it }
+        }
+        override suspend fun restore(id: TransactionId): Transaction? =
+            tombstones.remove(id)?.also { txStore[id] = it }
     }
 
     private val accRepo = object : AccountRepository {
@@ -172,6 +182,7 @@ private class TransferEnv(seedCategories: List<Category>) {
         override suspend fun setBalance(accountId: AccountId, balance: Money) {
             balances[accountId] = balance.minor
         }
+        override suspend fun reorder(orderedIds: List<AccountId>) = Unit
         override suspend fun setArchived(accountId: AccountId, archived: Boolean) = Unit
     }
 

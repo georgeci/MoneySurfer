@@ -9,6 +9,8 @@ class DashboardLayoutConfigTest : StringSpec({
     "the default layout covers every widget type, enabled, in Variant A order" {
         DashboardLayoutConfig.DEFAULT.items.map { it.type } shouldContainExactly listOf(
             DashboardWidgetType.Balance,
+            DashboardWidgetType.QuickActions,
+            DashboardWidgetType.SafeToSpend,
             DashboardWidgetType.Accounts,
             DashboardWidgetType.Goals,
             DashboardWidgetType.RecentTransactions,
@@ -37,6 +39,8 @@ class DashboardLayoutConfigTest : StringSpec({
         stored.normalized().items.map { it.type } shouldContainExactly listOf(
             DashboardWidgetType.Goals,
             DashboardWidgetType.Balance,
+            DashboardWidgetType.QuickActions,
+            DashboardWidgetType.SafeToSpend,
             DashboardWidgetType.Accounts,
             DashboardWidgetType.RecentTransactions,
         )
@@ -120,6 +124,8 @@ class DashboardLayoutConfigTest : StringSpec({
         )
 
         moved.items.map { it.type } shouldContainExactly listOf(
+            DashboardWidgetType.QuickActions,
+            DashboardWidgetType.SafeToSpend,
             DashboardWidgetType.Accounts,
             DashboardWidgetType.Goals,
             DashboardWidgetType.Balance,
@@ -136,6 +142,8 @@ class DashboardLayoutConfigTest : StringSpec({
         moved.items.map { it.type } shouldContainExactly listOf(
             DashboardWidgetType.RecentTransactions,
             DashboardWidgetType.Balance,
+            DashboardWidgetType.QuickActions,
+            DashboardWidgetType.SafeToSpend,
             DashboardWidgetType.Accounts,
             DashboardWidgetType.Goals,
         )
@@ -169,6 +177,39 @@ class DashboardLayoutConfigTest : StringSpec({
 
         config.withWidgetMoved(DashboardWidgetType.Balance, DashboardWidgetType.Balance) shouldBe config
         config.withWidgetMoved(DashboardWidgetType.Balance, DashboardWidgetType.Accounts) shouldBe config
+    }
+
+    "restyling a widget leaves its slot and its neighbours alone" {
+        val config = DashboardLayoutConfig.DEFAULT
+            .withWidgetEnabled(DashboardWidgetType.Goals, enabled = false)
+
+        val restyled = config.withCardStyle(
+            DashboardWidgetType.Accounts,
+            DashboardCardStyle(DashboardWidgetSize.Compact, variant = "strip"),
+        )
+
+        restyled.items.map { it.type } shouldContainExactly config.items.map { it.type }
+        restyled.items.single { it.type == DashboardWidgetType.Accounts }.cardStyle shouldBe
+            DashboardCardStyle(DashboardWidgetSize.Compact, variant = "strip")
+        restyled.items.filterNot { it.type == DashboardWidgetType.Accounts } shouldContainExactly
+            config.items.filterNot { it.type == DashboardWidgetType.Accounts }
+    }
+
+    "a switched-off widget can be restyled too — it keeps the style when it comes back" {
+        val config = DashboardLayoutConfig.DEFAULT
+            .withWidgetEnabled(DashboardWidgetType.Goals, enabled = false)
+            .withCardStyle(DashboardWidgetType.Goals, DashboardCardStyle.COMPACT)
+
+        config.withWidgetEnabled(DashboardWidgetType.Goals, enabled = true)
+            .items.single { it.type == DashboardWidgetType.Goals }
+            .cardStyle shouldBe DashboardCardStyle.COMPACT
+    }
+
+    "restyling to the style a widget already has, or a widget the layout lacks, changes nothing" {
+        val config = DashboardLayoutConfig(items = listOf(DashboardLayoutItem(DashboardWidgetType.Balance)))
+
+        config.withCardStyle(DashboardWidgetType.Balance, DashboardCardStyle.EXPANDED) shouldBe config
+        config.withCardStyle(DashboardWidgetType.Goals, DashboardCardStyle.COMPACT) shouldBe config
     }
 
     "normalizing drops duplicate entries for the same widget, keeping the first" {

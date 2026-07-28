@@ -48,6 +48,9 @@ kotlin {
                 implementation(libs.gitlive.firebase.auth)
                 implementation(libs.gitlive.firebase.firestore)
                 implementation(projects.domain)
+                // `SyncCollection` only — the Firestore path segments this module writes to are the
+                // same ones the sync plugins read from, and two copies drift apart silently.
+                implementation(projects.sync.api)
                 implementation(project.dependencies.platform(libs.koin.bom))
                 implementation(libs.koin.core)
                 implementation(libs.koin.annotations)

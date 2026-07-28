@@ -14,33 +14,33 @@ class SelectWorkspaceUseCaseTest : StringSpec({
     "writes local pointer and skips remote when no Firebase uid" {
         val remote = RecordingUserRemoteRepository()
         val session = InMemorySessionPointers(currentFirebaseUid = null)
-        val useCase = SelectWorkspaceUseCase(session, remote)
+        val useCase = SelectWorkspaceUseCase(session, session, remote)
 
         useCase(WORKSPACE_ID)
 
-        session.currentWorkspaceId.flow.first() shouldBe WORKSPACE_ID
+        session.currentWorkspaceId.first() shouldBe WORKSPACE_ID
         remote.setDefaultCalls shouldHaveSize 0
     }
 
     "writes local pointer and pushes default when Firebase uid present" {
         val remote = RecordingUserRemoteRepository()
         val session = InMemorySessionPointers(currentFirebaseUid = FIREBASE_UID)
-        val useCase = SelectWorkspaceUseCase(session, remote)
+        val useCase = SelectWorkspaceUseCase(session, session, remote)
 
         useCase(WORKSPACE_ID)
 
-        session.currentWorkspaceId.flow.first() shouldBe WORKSPACE_ID
+        session.currentWorkspaceId.first() shouldBe WORKSPACE_ID
         remote.setDefaultCalls shouldBe listOf(FIREBASE_UID to WORKSPACE_ID)
     }
 
     "local pointer survives a remote failure" {
         val remote = RecordingUserRemoteRepository(failOnSetDefault = true)
         val session = InMemorySessionPointers(currentFirebaseUid = FIREBASE_UID)
-        val useCase = SelectWorkspaceUseCase(session, remote)
+        val useCase = SelectWorkspaceUseCase(session, session, remote)
 
         useCase(WORKSPACE_ID)
 
-        session.currentWorkspaceId.flow.first() shouldBe WORKSPACE_ID
+        session.currentWorkspaceId.first() shouldBe WORKSPACE_ID
         remote.setDefaultCalls shouldHaveSize 0
     }
 })

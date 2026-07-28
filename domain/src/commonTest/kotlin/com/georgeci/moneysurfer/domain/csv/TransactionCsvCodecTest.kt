@@ -6,6 +6,7 @@ import com.georgeci.moneysurfer.domain.fixtures.transactionId
 import com.georgeci.moneysurfer.domain.model.Transaction
 import com.georgeci.moneysurfer.domain.primitives.Money
 import com.georgeci.moneysurfer.domain.primitives.RecurringRuleId
+import com.georgeci.moneysurfer.domain.primitives.SplitId
 import com.georgeci.moneysurfer.domain.primitives.TransactionStatus
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
 import com.georgeci.moneysurfer.domain.primitives.TransferId
@@ -60,7 +61,7 @@ class TransactionCsvCodecTest : StringSpec({
             type = TransactionType.INCOME,
             status = TransactionStatus.PLANNED,
             recurringRuleId = RecurringRuleId("rr-1"),
-        ).copy(transferId = TransferId("tr-1"))
+        ).copy(transferId = TransferId("tr-1"), splitId = SplitId("sp-1"))
 
         decoded(TransactionCsvCodec.encode(transaction)) shouldBe transaction
     }
@@ -73,6 +74,7 @@ class TransactionCsvCodecTest : StringSpec({
         fields[TransactionCsvColumn.CategoryId.ordinal] shouldBe ""
         fields[TransactionCsvColumn.TransferId.ordinal] shouldBe ""
         fields[TransactionCsvColumn.RecurringRuleId.ordinal] shouldBe ""
+        fields[TransactionCsvColumn.SplitId.ordinal] shouldBe ""
         decoded(fields) shouldBe transaction
     }
 
@@ -224,6 +226,7 @@ class TransactionCsvCodecTest : StringSpec({
         decoded.merchant shouldBe ""
         decoded.tags shouldBe emptyList()
         decoded.recurringRuleId shouldBe null
+        decoded.splitId shouldBe null
     }
 
     "a pre-#260 record read as the current format is rejected as a short row" {
@@ -279,6 +282,25 @@ class TransactionCsvCodecTest : StringSpec({
 
         added.forEach { TransactionCsvFormat.V1.indexOf(it) shouldBe null }
         added.forEach { TransactionCsvFormat.Latest.indexOf(it) shouldBe it.ordinal }
+    }
+
+    "split_id is absent from every layout that predates splits" {
+        // A backup written before #399 decodes to a transaction with no split, rather than
+        // failing: the column is simply not in that file's layout.
+        TransactionCsvFormat.V1.indexOf(TransactionCsvColumn.SplitId) shouldBe null
+        TransactionCsvFormat.V2.indexOf(TransactionCsvColumn.SplitId) shouldBe null
+        TransactionCsvFormat.V2.columns.size shouldBe 17
+        TransactionCsvFormat.Latest.indexOf(TransactionCsvColumn.SplitId) shouldBe
+            TransactionCsvColumn.SplitId.ordinal
+    }
+
+    "a leg's split id survives a V2 file being re-imported into the current layout" {
+        val leg = aTransaction(id = transactionId("t-leg")).copy(splitId = SplitId("sp-1"))
+
+        val fields = TransactionCsvCodec.encode(leg)
+
+        fields[TransactionCsvColumn.SplitId.ordinal] shouldBe "sp-1"
+        decoded(fields).splitId shouldBe SplitId("sp-1")
     }
 
     "unparseable amount is rejected as invalid amount_minor" {

@@ -111,7 +111,7 @@ class GoalEditViewModel(
                 return@launch
             }
 
-            val workspaceId = session.currentWorkspaceId.flow.first()
+            val workspaceId = session.currentWorkspaceId.first()
             val workspace = workspaceId?.let { workspaceRepository.getById(it) }
             if (workspace == null) {
                 fail(GoalActionError.WorkspaceNotFound)

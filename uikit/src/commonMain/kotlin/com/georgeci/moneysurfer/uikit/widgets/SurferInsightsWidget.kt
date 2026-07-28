@@ -47,7 +47,7 @@ fun SurferInsightsWidget(
     badgeFormat: ((Int) -> String)? = null,
     emptyText: String? = null,
 ) {
-    val hero = size == SurferWidgetSize.Hero
+    val hero = size == SurferWidgetSize.Expanded
     val visibleItems = if (hero) items.take(3) else items.take(1)
 
     SurferWidgetCard(

@@ -7,6 +7,22 @@ status: design pass — round 2
 
 # Accounts — align mockups and implementation
 
+<!-- DOCS:TOC -->
+## Contents
+- [Accounts — align mockups and implementation](#accounts--align-mockups-and-implementation)
+- [Verdict](#verdict)
+- [Current model](#current-model)
+- [What shipped since the first review (PR #308)](#what-shipped-since-the-first-review-pr-308)
+- [Still open in code](#still-open-in-code)
+  - [A1. Persist "Extra details"](#a1-persist-extra-details)
+  - [A2. Sort order / drag-to-reorder](#a2-sort-order--drag-to-reorder)
+- [Contradiction ledger — mockups vs shipped model](#contradiction-ledger--mockups-vs-shipped-model)
+- [Frame inventory — what round 1 produced](#frame-inventory--what-round-1-produced)
+- [Decisions to make](#decisions-to-make)
+- [Design prompt — round 2](#design-prompt--round-2)
+- [Suggested order](#suggested-order)
+<!-- DOCS:END -->
+
 Review of the Account creation / edit / view / manage sections against the
 Claude Design project `MoneySurfer` (`Accounts.html`).
 

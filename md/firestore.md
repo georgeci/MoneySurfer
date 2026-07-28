@@ -18,7 +18,9 @@ nested under `workspaces/{wid}` and gated by membership in the security rules.
 ```
 users/{uid}                                # personal user doc + workspace pointers
 userEmails/{lowercased_email}              # email → uid lookup, single-doc reads only
-appConfig/{docId}                          # public read-only config (force-update gate)
+appConfig/{docId}                          # public read-only config, single-doc reads only
+                                           #   mobile -> force-update gate (typed)
+                                           #   flags  -> server-owned feature flags (free-form map)
 
 workspaces/{wid}                           # tenancy root
 workspaces/{wid}/members/{uid}             # membership row, doc id = userId

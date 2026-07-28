@@ -112,16 +112,22 @@
     <string name="transaction_creation_to_account">To account</string>
     <string name="transaction_creation_swap_content_description">Swap from and to accounts</string>
     <string name="transaction_creation_rate_hint">1 %1$s = %2$s %3$s</string>
+    <!-- Split editor: one payment filed under several categories -->
+    <string name="transaction_creation_split_title">Split across categories</string>
+    <string name="transaction_creation_split_enable">Split</string>
+    <string name="transaction_creation_split_add_line">Add category</string>
+    <string name="transaction_creation_split_remove_line">Remove this category</string>
+    <string name="transaction_creation_split_category_placeholder">Pick a category</string>
+    <!-- Running total of the split legs against the amount entered above -->
+    <string name="transaction_creation_split_total">%1$s of %2$s</string>
+    <string name="transaction_creation_split_remainder">%1$s left to assign</string>
+    <string name="transaction_creation_split_over">%1$s over the amount</string>
+    <string name="transaction_creation_split_snackbar">Split transaction added</string>
 
     <!-- Transaction details -->
     <string name="transaction_details_title">Transaction</string>
     <string name="transaction_details_edit_content_description">Edit</string>
     <string name="transaction_details_delete_content_description">Delete</string>
-    <string name="transaction_details_delete_title">Delete transaction?</string>
-    <string name="transaction_details_delete_message">“%1$s” will be removed. You can undo this right after.</string>
-    <string name="transaction_details_delete_message_generic">This transaction will be removed. You can undo this right after.</string>
-    <string name="transaction_details_delete_confirm">Delete</string>
-    <string name="transaction_details_delete_cancel">Cancel</string>
     <string name="transaction_details_type_expense">Expense</string>
     <string name="transaction_details_type_income">Income</string>
     <string name="transaction_details_type_transfer">Transfer</string>
@@ -138,6 +144,10 @@
     <string name="transaction_details_duplicate">Duplicate</string>
     <string name="transaction_details_status_posted">Posted</string>
     <string name="transaction_details_status_planned">Planned</string>
+    <!-- Breakdown of a receipt split across categories -->
+    <string name="transaction_details_split_title">Split across %1$d categories</string>
+    <string name="transaction_details_split_total">Receipt total</string>
+    <string name="transaction_details_split_uncategorized">Uncategorized</string>
 
     <!-- Action feedback snackbars -->
     <string name="transaction_creation_created_snackbar">Transaction added</string>
@@ -145,6 +155,12 @@
     <string name="transaction_creation_transfer_snackbar">Transfer added</string>
     <string name="transaction_details_deleted_snackbar">Transaction deleted</string>
     <string name="transaction_details_delete_undo">Undo</string>
+    <string name="transactions_list_deleted_snackbar">Transaction deleted</string>
+    <string name="transactions_list_delete_undo">Undo</string>
+
+    <!-- Transactions list — search and filter chip rail -->
+    <!-- Meta line of a collapsed split row: how many categories the receipt covers -->
+    <string name="transactions_list_split_categories">%1$d categories</string>
 
     <!-- Transactions list — search and filter chip rail -->
     <string name="transactions_list_search_placeholder">Search merchant, note, amount</string>

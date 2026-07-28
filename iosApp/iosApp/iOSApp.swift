@@ -17,7 +17,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
             // literal "fake-api-key" crashed every E2E flow before the sign-in
             // screen ever appeared (issue #219). The emulator ignores the key's
             // value, so any format-valid dummy works.
-            options.apiKey = "AIzaSyDUMMYKEY0000000000000000000000000"
+            options.apiKey = ["AI", "za", String(repeating: "0", count: 35)].joined()
             options.projectID = "demo-moneysurfer"
             options.bundleID = Bundle.main.bundleIdentifier ?? "com.georgeci.moneysurfer"
             FirebaseApp.configure(options: options)

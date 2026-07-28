@@ -1,6 +1,5 @@
 package com.georgeci.moneysurfer.feature.dashboard
 
-import com.georgeci.moneysurfer.domain.OfflineBuildFlags
 import com.georgeci.moneysurfer.domain.auth.InMemorySessionPointers
 import com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutConfig
 import com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutItem
@@ -9,37 +8,52 @@ import com.georgeci.moneysurfer.domain.fixtures.EUR
 import com.georgeci.moneysurfer.domain.fixtures.FakeExchangeRateRepository
 import com.georgeci.moneysurfer.domain.fixtures.FakeGoalContributionRepository
 import com.georgeci.moneysurfer.domain.fixtures.FakeGoalWorkspaceRepository
+import com.georgeci.moneysurfer.domain.fixtures.FakeHostCapabilities
 import com.georgeci.moneysurfer.domain.fixtures.FakeSavingsGoalRepository
 import com.georgeci.moneysurfer.domain.fixtures.FakeUiPreferences
+import com.georgeci.moneysurfer.domain.fixtures.FixedClock
 import com.georgeci.moneysurfer.domain.fixtures.USD
+import com.georgeci.moneysurfer.domain.fixtures.aBudget
 import com.georgeci.moneysurfer.domain.fixtures.aTransaction
 import com.georgeci.moneysurfer.domain.fixtures.aWorkspace
 import com.georgeci.moneysurfer.domain.fixtures.accountId
 import com.georgeci.moneysurfer.domain.fixtures.anAccount
 import com.georgeci.moneysurfer.domain.fixtures.anExchangeRateTable
+import com.georgeci.moneysurfer.domain.fixtures.budgetId
 import com.georgeci.moneysurfer.domain.fixtures.dollars
+import com.georgeci.moneysurfer.domain.fixtures.testDate
+import com.georgeci.moneysurfer.domain.fixtures.testInstant
 import com.georgeci.moneysurfer.domain.fixtures.transactionId
 import com.georgeci.moneysurfer.domain.fixtures.workspaceId
 import com.georgeci.moneysurfer.domain.formatter.MoneyFormatter
 import com.georgeci.moneysurfer.domain.model.Account
+import com.georgeci.moneysurfer.domain.model.Budget
+import com.georgeci.moneysurfer.domain.model.BudgetStatus
 import com.georgeci.moneysurfer.domain.model.CategorizedTransaction
 import com.georgeci.moneysurfer.domain.model.Transaction
 import com.georgeci.moneysurfer.domain.model.TransactionTotal
 import com.georgeci.moneysurfer.domain.preferences.UiPreferences
 import com.georgeci.moneysurfer.domain.primitives.AccountId
+import com.georgeci.moneysurfer.domain.primitives.BudgetId
+import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
 import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
 import com.georgeci.moneysurfer.domain.primitives.Money
+import com.georgeci.moneysurfer.domain.primitives.SplitId
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
 import com.georgeci.moneysurfer.domain.primitives.TransferId
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 import com.georgeci.moneysurfer.domain.repositories.AccountRepository
+import com.georgeci.moneysurfer.domain.repositories.BudgetRepository
 import com.georgeci.moneysurfer.domain.repositories.TransactionRepository
 import com.georgeci.moneysurfer.domain.usecase.ConvertAccountsTotalUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetAccountsUseCase
+import com.georgeci.moneysurfer.domain.usecase.GetBudgetProgressUseCase
+import com.georgeci.moneysurfer.domain.usecase.GetBudgetsUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetExchangeRatesUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetGoalsUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetRecentTransactionsUseCase
+import com.georgeci.moneysurfer.domain.usecase.GetSafeToSpendUseCase
 import com.georgeci.moneysurfer.domain.util.TransactionPeriodWindow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldBeEmpty
@@ -50,6 +64,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
@@ -131,9 +146,94 @@ class DashboardViewModelTest : StringSpec({
         content.layout.enabledItems.map { it.type } shouldContainExactly listOf(
             DashboardWidgetType.Goals,
             // widgets the stored layout never heard of are appended rather than dropped
+            DashboardWidgetType.QuickActions,
+            DashboardWidgetType.SafeToSpend,
             DashboardWidgetType.Accounts,
             DashboardWidgetType.RecentTransactions,
         )
+    }
+
+    "the quick-actions Transfer button asks for the transfer form, not the plain creation one" {
+        val ws = workspaceId("ws-1")
+        val viewModel = newViewModel(
+            ws = ws,
+            accounts = FakeAccountRepository(listOf(anAccount(id = accountId("a-1"), workspaceId = ws))),
+            transactions = FakeTransactionRepository(emptyList()),
+        )
+
+        viewModel.onEvent(DashboardEvent.OnTransferClick)
+
+        viewModel.sideEffects.effectFlow.first() shouldBe DashboardEffect.NavigateToTransferCreation
+    }
+
+    "a build with transfers switched off says so, so the quick-actions row can stand down" {
+        val ws = workspaceId("ws-1")
+        val viewModel = newViewModel(
+            ws = ws,
+            accounts = FakeAccountRepository(listOf(anAccount(id = accountId("a-1"), workspaceId = ws))),
+            transactions = FakeTransactionRepository(emptyList()),
+            hostCapabilities = FakeHostCapabilities(isOffline = true, transferEnabled = false),
+        )
+
+        val content = viewModel.value.shouldBeInstanceOf<DashboardState.Content>()
+        content.transferEnabled shouldBe false
+    }
+
+    "safe-to-spend stays null with no budget, so the widget can offer to set one" {
+        val ws = workspaceId("ws-1")
+        val viewModel = newViewModel(
+            ws = ws,
+            accounts = FakeAccountRepository(listOf(anAccount(id = accountId("a-1"), workspaceId = ws))),
+            transactions = FakeTransactionRepository(emptyList()),
+        )
+
+        viewModel.value.shouldBeInstanceOf<DashboardState.Content>().safeToSpend shouldBe null
+    }
+
+    "safe-to-spend reads the active budget's remainder, pace and days left" {
+        val ws = workspaceId("ws-1")
+        val account = anAccount(id = accountId("a-1"), workspaceId = ws)
+        val spend = aTransaction(
+            id = transactionId("tx-1"),
+            workspaceId = ws,
+            accountId = account.id,
+            type = TransactionType.EXPENSE,
+            money = 100.dollars,
+            currencyCode = USD,
+            operationDate = testDate,
+        )
+        val viewModel = newViewModel(
+            ws = ws,
+            accounts = FakeAccountRepository(listOf(account)),
+            transactions = FakeTransactionRepository(listOf(spend)),
+            // A January budget of 310 against 100 spent on its first day: 210 left over 31 days.
+            budgets = listOf(
+                aBudget(workspaceId = ws, amount = 310.dollars, categoryIds = emptyList(), startDate = testDate),
+            ),
+        )
+
+        val safeToSpend = viewModel.value.shouldBeInstanceOf<DashboardState.Content>().safeToSpend
+        safeToSpend?.remainingFormatted shouldBe MoneyFormatter.format(210.dollars, USD)
+        safeToSpend?.perDayFormatted shouldBe MoneyFormatter.format(Money(677), USD)
+        safeToSpend?.daysLeft shouldBe 31
+        // Day one of the window: none of it is behind us yet, so the pace tick sits at the start.
+        safeToSpend?.paceFraction shouldBe 0f
+        safeToSpend?.status shouldBe BudgetStatus.OK
+        safeToSpend?.isOver shouldBe false
+    }
+
+    "safe-to-spend ignores archived budgets" {
+        val ws = workspaceId("ws-1")
+        val viewModel = newViewModel(
+            ws = ws,
+            accounts = FakeAccountRepository(listOf(anAccount(id = accountId("a-1"), workspaceId = ws))),
+            transactions = FakeTransactionRepository(emptyList()),
+            budgets = listOf(
+                aBudget(id = budgetId("b-archived"), workspaceId = ws, isActive = false, startDate = testDate),
+            ),
+        )
+
+        viewModel.value.shouldBeInstanceOf<DashboardState.Content>().safeToSpend shouldBe null
     }
 
     "an unset layout falls back to the default order" {
@@ -212,6 +312,7 @@ class DashboardViewModelTest : StringSpec({
     }
 })
 
+@Suppress("LongParameterList")
 private fun newViewModel(
     ws: WorkspaceId,
     accounts: FakeAccountRepository,
@@ -219,6 +320,9 @@ private fun newViewModel(
     uiPreferences: UiPreferences = FakeUiPreferences(),
     baseCurrency: CurrencyCode = USD,
     rates: FakeExchangeRateRepository = FakeExchangeRateRepository(),
+    hostCapabilities: FakeHostCapabilities = FakeHostCapabilities(isOffline = false),
+    budgets: List<Budget> = emptyList(),
+    clock: ClockUseCase = ClockUseCase(FixedClock(testInstant)),
 ): DashboardViewModel {
     val session = InMemorySessionPointers(currentWorkspaceId = ws)
     val workspaces = FakeGoalWorkspaceRepository(listOf(aWorkspace(id = ws, baseCurrency = baseCurrency)))
@@ -227,10 +331,26 @@ private fun newViewModel(
         getRecentTransactions = GetRecentTransactionsUseCase(transactions, session),
         getGoals = GetGoalsUseCase(FakeSavingsGoalRepository(), FakeGoalContributionRepository(), session),
         getExchangeRates = GetExchangeRatesUseCase(session, workspaces, rates),
+        getSafeToSpend = GetSafeToSpendUseCase(
+            getBudgets = GetBudgetsUseCase(FakeBudgetRepository(budgets), session),
+            getBudgetProgress = GetBudgetProgressUseCase(transactions, workspaces, clock),
+        ),
         convertAccountsTotal = ConvertAccountsTotalUseCase(),
         uiPreferences = uiPreferences,
-        offlineBuildFlags = OfflineBuildFlags(isOffline = false),
+        hostCapabilities = hostCapabilities,
     )
+}
+
+private class FakeBudgetRepository(initial: List<Budget>) : BudgetRepository {
+    private val state = MutableStateFlow(initial)
+
+    override fun getAll(): Flow<List<Budget>> = state
+    override fun getByWorkspaceId(workspaceId: WorkspaceId): Flow<List<Budget>> = state
+    override suspend fun getById(id: BudgetId): Budget? = state.value.firstOrNull { it.id == id }
+    override suspend fun insert(budget: Budget) = Unit
+    override suspend fun update(budget: Budget) = Unit
+    override suspend fun setActive(id: BudgetId, isActive: Boolean) = Unit
+    override suspend fun delete(id: BudgetId) = Unit
 }
 
 private class FakeTransactionRepository(
@@ -254,9 +374,12 @@ private class FakeTransactionRepository(
         state.value.firstOrNull { it.id == id }
     override suspend fun getByTransferId(transferId: TransferId): List<Transaction> =
         state.value.filter { it.transferId == transferId }
+    override suspend fun getBySplitId(splitId: SplitId): List<Transaction> =
+        state.value.filter { it.splitId == splitId }
     override suspend fun insert(transaction: Transaction) = Unit
     override suspend fun update(transaction: Transaction) = Unit
     override suspend fun delete(id: TransactionId) = Unit
+    override suspend fun restore(id: TransactionId): Transaction? = null
 }
 
 private class FakeAccountRepository(
@@ -272,5 +395,6 @@ private class FakeAccountRepository(
     override suspend fun delete(id: AccountId) = Unit
     override suspend fun applyDelta(accountId: AccountId, delta: Money) = Unit
     override suspend fun setBalance(accountId: AccountId, balance: Money) = Unit
+    override suspend fun reorder(orderedIds: List<AccountId>) = Unit
     override suspend fun setArchived(accountId: AccountId, archived: Boolean) = Unit
 }

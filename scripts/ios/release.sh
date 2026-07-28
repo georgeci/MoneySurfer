@@ -19,11 +19,16 @@ set -euo pipefail
 #       ASC_API_KEY_PATH    path to AuthKey_<id>.p8 (relative to repo root or absolute).
 #                           Recommended: keystore/AuthKey_<id>.p8 (the keystore/ dir is gitignored).
 #       ASC_TEAM_ID         optional, default 92SLHZAN8L. Used to substitute into ExportOptions.plist.
-#       ASC_BUILD_NUMBER    optional. If set, passed as APP_VERSION_CODE=<n> build-setting
-#                           override to xcodebuild archive so CFBundleVersion is unique
-#                           (TestFlight rejects duplicates). Working tree is not modified —
-#                           the xcconfig variable resolves at build time. Recommended in
-#                           CI: ASC_BUILD_NUMBER=$(date +%s).
+#       ASC_BUILD_NUMBER    optional. If set, passed as APP_BUILD_NUMBER=<n>
+#                           and APP_VERSION_CODE=<n> build-setting overrides to
+#                           xcodebuild archive. This stamps both the last component
+#                           of major.minor.build and the unique CFBundleVersion
+#                           (TestFlight rejects duplicates). The working tree is not
+#                           modified. Recommended in CI: ASC_BUILD_NUMBER=$(date +%s).
+#       IOS_PROVISIONING_PROFILE_NAME
+#                           optional. When set, export uses manual signing with
+#                           this App Store profile and an installed Apple
+#                           Distribution identity instead of cloud signing.
 #     Env vars override local.properties. The .p8 is copied into
 #     ~/.appstoreconnect/private_keys/ with mode 0600 so altool can find it.
 
@@ -73,18 +78,21 @@ stage_api_key() {
   local dest="$keys_dir/AuthKey_${ASC_API_KEY_ID}.p8"
   cp -f "$ASC_API_KEY_PATH" "$dest"
   chmod 600 "$dest"
+  ASC_STAGED_API_KEY_PATH="$dest"
 }
 
 run_target() {
-  local t="$1" project scheme
+  local t="$1" project scheme bundle_id
   case "$t" in
     main)
       project="$REPO_ROOT/iosApp/iosApp.xcodeproj"
       scheme="iosApp"
+      bundle_id="com.georgeci.moneysurfer"
       ;;
     offline)
       project="$REPO_ROOT/iosAppOffline/iosAppOffline.xcodeproj"
       scheme="iosAppOffline"
+      bundle_id="com.georgeci.moneysurfer.offline"
       ;;
   esac
 
@@ -98,11 +106,30 @@ run_target() {
 
   mkdir -p "$build_dir"
   sed "s/__TEAM_ID__/$ASC_TEAM_ID/" "$export_options_template" > "$export_options"
+  if [[ -n "${IOS_PROVISIONING_PROFILE_NAME:-}" ]]; then
+    /usr/libexec/PlistBuddy -c "Set :signingStyle manual" "$export_options"
+    /usr/libexec/PlistBuddy -c "Add :signingCertificate string 'Apple Distribution'" "$export_options"
+    /usr/libexec/PlistBuddy -c "Add :provisioningProfiles dict" "$export_options"
+    /usr/libexec/PlistBuddy \
+      -c "Add :provisioningProfiles:$bundle_id string '$IOS_PROVISIONING_PROFILE_NAME'" \
+      "$export_options"
+  fi
 
   local -a version_override=()
   if [[ -n "${ASC_BUILD_NUMBER:-}" ]]; then
-    echo "▸ [$scheme] Overriding APP_VERSION_CODE → $ASC_BUILD_NUMBER (xcodebuild build-setting)…"
-    version_override=("APP_VERSION_CODE=$ASC_BUILD_NUMBER")
+    echo "▸ [$scheme] Overriding APP_BUILD_NUMBER + APP_VERSION_CODE → $ASC_BUILD_NUMBER…"
+    version_override=(
+      "APP_BUILD_NUMBER=$ASC_BUILD_NUMBER"
+      "APP_VERSION_CODE=$ASC_BUILD_NUMBER"
+    )
+  fi
+  local -a authentication_args=()
+  if [[ -n "${ASC_STAGED_API_KEY_PATH:-}" ]]; then
+    authentication_args=(
+      -authenticationKeyPath "$ASC_STAGED_API_KEY_PATH"
+      -authenticationKeyID "$ASC_API_KEY_ID"
+      -authenticationKeyIssuerID "$ASC_API_ISSUER_ID"
+    )
   fi
 
   echo "▸ [$scheme] Archiving (Release)…"
@@ -113,6 +140,7 @@ run_target() {
     -destination 'generic/platform=iOS' \
     -archivePath "$archive_path" \
     -allowProvisioningUpdates \
+    ${authentication_args[@]+"${authentication_args[@]}"} \
     ${version_override[@]+"${version_override[@]}"} \
     archive
 
@@ -122,7 +150,8 @@ run_target() {
     -archivePath "$archive_path" \
     -exportPath "$export_dir" \
     -exportOptionsPlist "$export_options" \
-    -allowProvisioningUpdates
+    -allowProvisioningUpdates \
+    ${authentication_args[@]+"${authentication_args[@]}"}
 
   local ipa_path
   ipa_path="$(ls "$export_dir"/*.ipa | head -n1)"

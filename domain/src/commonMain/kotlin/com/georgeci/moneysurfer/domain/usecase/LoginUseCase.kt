@@ -4,17 +4,19 @@ import arrow.core.Either
 import arrow.core.raise.either
 import com.georgeci.moneysurfer.domain.auth.AuthError
 import com.georgeci.moneysurfer.domain.auth.AuthLocalRepository
-import com.georgeci.moneysurfer.domain.auth.SessionPointers
+import com.georgeci.moneysurfer.domain.auth.SessionMutator
 import com.georgeci.moneysurfer.domain.repositories.AuthRemoteRepository
 import org.koin.core.annotation.Single
 
 @Single
+@Suppress("LongParameterList")
 class LoginUseCase(
     private val authRemoteRepository: AuthRemoteRepository,
     private val authLocalRepository: AuthLocalRepository,
-    private val session: SessionPointers,
+    private val sessionMutator: SessionMutator,
     private val wipeDemoDataUseCase: WipeDemoDataUseCase,
     private val postAuthBootstrap: PostAuthBootstrapUseCase,
+    private val abandonAuthSession: AbandonAuthSessionUseCase,
 ) {
     suspend operator fun invoke(
         email: String,
@@ -35,13 +37,18 @@ class LoginUseCase(
             displayName = displayName,
             isAnon = false,
         )
-        session.currentFirebaseUid.set(uid)
+        sessionMutator.setFirebaseUid(uid)
 
+        // The pointers have to be live *before* the bootstrap — the pull reads
+        // `currentFirebaseUid` to discover the user's workspaces — so atomicity is bought with a
+        // rollback rather than by deferring the writes. Without it a failed bootstrap leaves a
+        // signed-in session with no workspace, which the next launch routes past sign-in
+        // straight into the selector with no way back (issue #342).
         postAuthBootstrap(
             uid = uid,
             email = trimmed,
             displayName = displayName,
             isAnon = false,
-        ).bind()
+        ).onLeft { abandonAuthSession(isAnon = false) }.bind()
     }
 }

@@ -36,7 +36,12 @@ class AccountRepositoryImpl(
         dao.getById(id.value)?.toDomain()
 
     override suspend fun insert(account: Account) {
-        val entity = account.toEntity().copy(updatedAt = clock.now().toEpochMilliseconds())
+        val entity = account.toEntity().copy(
+            updatedAt = clock.now().toEpochMilliseconds(),
+            // A new account goes to the end of the list the user has arranged. Positions belong
+            // to [reorder]; nothing upstream of here knows what the rest of the workspace holds.
+            sortOrder = dao.nextSortOrder(account.workspaceId.value),
+        )
         dao.insert(entity)
         enqueueUpsert(entity, MutationOperation.INSERT)
     }
@@ -87,6 +92,17 @@ class AccountRepositoryImpl(
         )
     }
 
+    override suspend fun reorder(orderedIds: List<AccountId>) {
+        // Unknown ids drop out rather than leaving a hole in the numbering — a stale id from a
+        // list the user dragged just as a sync deleted a row must not push its neighbours apart.
+        val ordered = orderedIds.mapNotNull { dao.getById(it.value) }
+        val moved = ordered.withIndex().filter { (position, entity) -> entity.sortOrder != position }
+        if (moved.isEmpty()) return
+        val now = clock.now().toEpochMilliseconds()
+        dao.setSortOrders(moved.associate { (position, entity) -> entity.id to position }, now)
+        moved.forEach { (_, entity) -> enqueueUpsert(entity, MutationOperation.UPDATE) }
+    }
+
     private suspend fun enqueueUpsert(entity: AccountEntity, operation: MutationOperation) {
         outboxEnqueuer.enqueueUpsert(
             entityType = SyncEntityTypes.ACCOUNT,
@@ -107,6 +123,7 @@ class AccountRepositoryImpl(
         updatedAt = timeFormatter.parseInstant(updatedAt),
         archivedAt = timeFormatter.parseInstantOrNull(archivedAt),
         extraDetails = AccountExtraDetailsColumn.decode(extraDetails),
+        sortOrder = sortOrder,
     )
 
     private fun Account.toEntity() = AccountEntity(
@@ -120,5 +137,6 @@ class AccountRepositoryImpl(
         updatedAt = timeFormatter.formatInstant(updatedAt),
         archivedAt = timeFormatter.formatInstantOrNull(archivedAt),
         extraDetails = AccountExtraDetailsColumn.encode(extraDetails),
+        sortOrder = sortOrder,
     )
 }

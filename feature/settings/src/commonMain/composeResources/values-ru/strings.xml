@@ -72,24 +72,11 @@
     <string name="settings_section_cloud">Облако</string>
     <string name="settings_sync">Синхронизация с Firestore</string>
     <string name="settings_sync_idle">Загрузить локальное, затем подтянуть удалённое</string>
-    <string name="settings_sync_in_progress">Синхронизация…</string>
     <string name="settings_sync_in_progress_with_step">Синхронизация… %1$s</string>
     <string name="settings_sync_no_workspace">Нет активного workspace</string>
     <string name="settings_sync_done">Загружено %1$d, скачано %2$d</string>
     <string name="settings_sync_failed">Ошибка синхронизации: %1$s</string>
 
-    <string name="settings_sync_step_push_workspace">отправка workspace</string>
-    <string name="settings_sync_step_push_members">отправка участников</string>
-    <string name="settings_sync_step_push_invites">отправка приглашений</string>
-    <string name="settings_sync_step_push_accounts">отправка счетов</string>
-    <string name="settings_sync_step_push_categories">отправка категорий</string>
-    <string name="settings_sync_step_push_transactions">отправка транзакций</string>
-    <string name="settings_sync_step_pull_workspace">загрузка workspace</string>
-    <string name="settings_sync_step_pull_members">загрузка участников</string>
-    <string name="settings_sync_step_pull_invites">загрузка приглашений</string>
-    <string name="settings_sync_step_pull_accounts">загрузка счетов</string>
-    <string name="settings_sync_step_pull_categories">загрузка категорий</string>
-    <string name="settings_sync_step_pull_transactions">загрузка транзакций</string>
     <string name="settings_sync_step_clear_accounts">очистка счетов</string>
     <string name="settings_sync_step_clear_categories">очистка категорий</string>
     <string name="settings_sync_step_clear_transactions">очистка транзакций</string>
@@ -146,36 +133,46 @@
     <string name="settings_preferences_locale_footnote">Используется в меню, датах и форматах чисел.</string>
     <string name="settings_preferences_language_title">Язык приложения</string>
     <string name="settings_preferences_language_supporting">Переопределяет язык системы для приложения</string>
-    <string name="settings_preferences_language_pill">Русский</string>
     <string name="settings_preferences_region_title">Регион</string>
     <string name="settings_preferences_region_supporting">Влияет на валюту и формат дат</string>
-    <string name="settings_preferences_region_pill">Польша</string>
     <string name="settings_preferences_section_money">Деньги</string>
     <string name="settings_preferences_currency_title">Валюта по умолчанию</string>
     <string name="settings_preferences_currency_supporting">Для новых счетов и итогов</string>
-    <string name="settings_preferences_currency_pill">EUR · €</string>
     <string name="settings_preferences_number_format_title">Формат чисел</string>
-    <string name="settings_preferences_number_format_pill">1 234,56</string>
     <string name="settings_preferences_hide_title">Скрывать суммы на главном</string>
     <string name="settings_preferences_hide_supporting">Показывать ••• до тапа</string>
     <string name="settings_preferences_section_calendar">Календарь</string>
     <string name="settings_preferences_week_title">Начало недели</string>
-    <string name="settings_preferences_week_pill">Понедельник</string>
     <string name="settings_preferences_hour_title">Формат времени</string>
-    <string name="settings_preferences_hour_pill">24 часа</string>
     <string name="settings_preferences_section_behavior">Поведение</string>
     <string name="settings_preferences_behavior_footnote">Тонкая настройка ощущения от приложения.</string>
     <string name="settings_preferences_default_txn_title">Тип новой транзакции</string>
-    <string name="settings_preferences_default_txn_pill">Расход</string>
     <string name="settings_preferences_auto_categorize_title">Автокатегоризация</string>
     <string name="settings_preferences_auto_categorize_supporting">Подсказывать категорию по продавцу</string>
     <string name="settings_preferences_round_up_title">Копилка с округления</string>
     <string name="settings_preferences_round_up_supporting">Округлять покупки до ближайшего €1</string>
+    <!-- Preference option labels. Each names a stored value, never a fixed "current" one. -->
+    <string name="settings_preferences_value_system">Системный</string>
+    <string name="settings_preferences_region_germany">Германия</string>
+    <string name="settings_preferences_region_united_states">США</string>
+    <string name="settings_preferences_region_united_kingdom">Великобритания</string>
+    <string name="settings_preferences_region_poland">Польша</string>
+    <string name="settings_preferences_region_ukraine">Украина</string>
+    <string name="settings_preferences_region_georgia">Грузия</string>
+    <string name="settings_preferences_region_kazakhstan">Казахстан</string>
+    <string name="settings_preferences_region_russia">Россия</string>
+    <string name="settings_preferences_currency_search_placeholder">Поиск валюты</string>
+    <string name="settings_preferences_week_monday">Понедельник</string>
+    <string name="settings_preferences_week_saturday">Суббота</string>
+    <string name="settings_preferences_week_sunday">Воскресенье</string>
+    <string name="settings_preferences_hour_12">12 часов</string>
+    <string name="settings_preferences_hour_24">24 часа</string>
+    <string name="settings_preferences_txn_expense">Расход</string>
+    <string name="settings_preferences_txn_income">Доход</string>
 
     <!-- Sync -->
     <string name="settings_sync_title">Синхронизация</string>
     <string name="settings_sync_hero_idle_title">Всё актуально</string>
-    <string name="settings_sync_hero_idle_supporting">Последняя синхронизация: сегодня, 14:02</string>
     <string name="settings_sync_hero_progress_title">Синхронизация…</string>
     <string name="settings_sync_section_account">Облачный аккаунт</string>
     <string name="settings_sync_cloud_account_title">iCloud</string>
@@ -189,35 +186,105 @@
     <string name="settings_sync_background_title">В фоне</string>
     <string name="settings_sync_background_supporting">Передавать при закрытом приложении</string>
     <string name="settings_sync_action_force">Синхронизировать сейчас</string>
+    <!-- Синхронизация · текущее состояние -->
+    <string name="settings_sync_section_live">Текущее состояние</string>
+    <string name="settings_sync_live_idle_title">Простой</string>
+    <string name="settings_sync_live_idle_supporting">Синхронизация не выполняется</string>
+    <string name="settings_sync_live_queued_title">В очереди</string>
+    <string name="settings_sync_live_queued_supporting">Запросов в очереди: %1$d</string>
+    <string name="settings_sync_live_running_title">Выполняется</string>
+    <string name="settings_sync_live_request">запрос: %1$s</string>
+    <string name="settings_sync_live_reasons">причины: %1$s</string>
+    <string name="settings_sync_live_scope">область: %1$s</string>
+    <string name="settings_sync_live_step">шаг: %1$s</string>
+    <string name="settings_sync_workspace_scope">Workspace: %1$s</string>
+
+    <!-- Синхронизация · шаги координатора -->
+    <string name="settings_sync_step_waiting_network">ожидание сети</string>
+    <string name="settings_sync_step_started">запуск</string>
+    <string name="settings_sync_step_uploading">отправка изменений</string>
+    <string name="settings_sync_step_uploading_entity">отправка %1$s %2$d/%3$d</string>
+    <string name="settings_sync_step_pulling">загрузка изменений</string>
+    <string name="settings_sync_step_pulling_collection">загрузка %1$s</string>
+    <string name="settings_sync_step_recalculating">пересчёт балансов</string>
+    <string name="settings_sync_step_completed">завершено</string>
+    <string name="settings_sync_step_cancelled">отменено</string>
+    <string name="settings_sync_step_failed">ошибка</string>
+
+    <!-- Синхронизация · последний результат -->
+    <string name="settings_sync_section_last">Последний результат</string>
+    <string name="settings_sync_last_none_title">Синхронизаций ещё не было</string>
+    <string name="settings_sync_last_none_supporting">В этой сессии синхронизация не завершалась</string>
+    <string name="settings_sync_last_success_title">Успешно</string>
+    <string name="settings_sync_last_failed_title">Ошибка</string>
+    <string name="settings_sync_last_cancelled_title">Отменено</string>
+    <string name="settings_sync_last_counts">отправлено %1$d · получено %2$d · конфликтов %3$d · пересчитано %4$d</string>
+    <string name="settings_sync_last_at">в %1$s</string>
+
+    <!-- Синхронизация · ошибки -->
+    <string name="settings_sync_error_cancelled">Отменено</string>
+    <string name="settings_sync_error_network">Нет подключения к интернету</string>
+    <string name="settings_sync_error_auth">Требуется повторный вход</string>
+    <string name="settings_sync_error_permission">Нет доступа к этому workspace</string>
+    <string name="settings_sync_error_storage">Ошибка локального хранилища</string>
+    <string name="settings_sync_error_unknown">Сбой синхронизации</string>
+
+    <!-- Синхронизация · очередь отправки -->
+    <string name="settings_sync_section_outbox">Очередь отправки · %1$d</string>
+    <string name="settings_sync_section_outbox_unknown">Очередь отправки</string>
+    <string name="settings_sync_outbox_unknown_title">Не читается</string>
+    <string name="settings_sync_outbox_unknown_supporting">Синхронизация выключена, очередь не опрашивается — в ней могут ждать изменения.</string>
+    <string name="settings_sync_outbox_footnote">Строки уходят от старых к новым. Та, что падает, остаётся здесь со счётчиком попыток.</string>
+    <string name="settings_sync_outbox_empty_title">Очередь пуста</string>
+    <string name="settings_sync_outbox_empty_supporting">Все локальные изменения отправлены</string>
+    <string name="settings_sync_outbox_row_title">%1$s %2$s</string>
+    <string name="settings_sync_outbox_scope">область: %1$s</string>
+    <string name="settings_sync_outbox_scope_root">корневая коллекция</string>
+    <string name="settings_sync_outbox_attempts">попыток: %1$d</string>
+    <string name="settings_sync_outbox_error">последняя ошибка: %1$s</string>
+    <string name="settings_sync_outbox_truncated">Показаны первые %1$d строк.</string>
+
+    <!-- Синхронизация · курсоры pull -->
+    <string name="settings_sync_section_cursors">Курсоры pull</string>
+    <string name="settings_sync_cursors_footnote">Pull запрашивает у сервера строки новее lastPulledAt. Курсор впереди удалённого изменения — причина, по которой pull ничего не приносит.</string>
+    <string name="settings_sync_cursors_empty_title">Курсоров ещё нет</string>
+    <string name="settings_sync_cursors_empty_supporting">Для этого workspace ничего не загружалось</string>
+    <string name="settings_sync_cursor_pulled">lastPulledAt: %1$s</string>
+    <string name="settings_sync_cursor_success">успех: %1$s</string>
+    <string name="settings_sync_cursor_attempt">попытка: %1$s</string>
+    <string name="settings_sync_value_never">никогда</string>
+
+    <!-- Синхронизация · действия -->
+    <string name="settings_sync_section_actions">Действия</string>
+    <string name="settings_sync_action_force_supporting">Отправить очередь, затем загрузить все коллекции</string>
+    <string name="settings_sync_action_reset_cursors">Сбросить курсоры и перезагрузить</string>
+    <string name="settings_sync_action_reset_cursors_supporting">Очищает lastPulledAt для этого workspace и запускает полную синхронизацию</string>
+    <string name="settings_sync_actions_disabled_footnote">Синхронизация выключена — действия ничего не сделают.</string>
+    <string name="settings_sync_reset_cursors_confirm_title">Сбросить курсоры pull?</string>
+    <string name="settings_sync_reset_cursors_confirm_message">Следующая синхронизация перечитает с сервера все коллекции этого workspace.</string>
+    <string name="settings_sync_reset_cursors_confirm_detail">Локальные данные не удаляются — удалённые строки сливаются по last-write-wins.</string>
+    <string name="settings_sync_reset_cursors_confirm_confirm">Сбросить и синхронизировать</string>
+    <string name="settings_sync_reset_cursors_confirm_cancel">Отмена</string>
 
     <!-- Backup -->
     <string name="settings_backup_title">Резервная копия</string>
-    <string name="settings_backup_hero_title">Последний бэкап · сегодня</string>
-    <string name="settings_backup_hero_supporting">14:02 · 18 МБ · 2 341 транзакция</string>
+    <string name="settings_backup_hero_title">Резервная копия вручную</string>
+    <string name="settings_backup_hero_supporting">Облачные копии пока не работают. Сохраните архив в надёжном месте и восстановите его отсюда, когда понадобится.</string>
     <string name="settings_backup_local_hero_title">Локальная копия</string>
     <string name="settings_backup_local_hero_supporting">В этой сборке все данные хранятся на устройстве. Сохраните архив в надёжном месте и восстановите его отсюда, когда понадобится.</string>
-    <string name="settings_backup_section_schedule">Расписание</string>
-    <string name="settings_backup_schedule_footnote">Бэкапы шифруются end-to-end ключом аккаунта.</string>
-    <string name="settings_backup_frequency_title">Частота</string>
-    <string name="settings_backup_frequency_pill">Ежедневно</string>
-    <string name="settings_backup_encryption_title">Шифрование</string>
-    <string name="settings_backup_encryption_supporting">AES-256, end-to-end</string>
-    <string name="settings_backup_location_title">Место хранения</string>
-    <string name="settings_backup_location_pill">iCloud</string>
     <string name="settings_backup_section_manual">Вручную</string>
-    <string name="settings_backup_back_up_now_title">Создать сейчас</string>
-    <string name="settings_backup_back_up_now_supporting">Свежий снапшот вне расписания</string>
     <string name="settings_backup_download_title">Скачать копию</string>
     <string name="settings_backup_download_supporting">.zip архив · пароль по желанию</string>
     <string name="settings_backup_section_restore">Восстановление</string>
     <string name="settings_backup_restore_title">Восстановить из бэкапа</string>
     <string name="settings_backup_restore_supporting">Заменит текущие данные</string>
-    <string name="settings_backup_delete_title">Удалить облачный бэкап</string>
-    <string name="settings_backup_delete_supporting">Удалит все бэкапы из iCloud</string>
     <string name="settings_backup_cancel">Отмена</string>
     <string name="settings_backup_restore_confirm_title">Заменить текущие данные?</string>
     <string name="settings_backup_restore_confirm_body">Восстановление заменит все транзакции, счета и настройки на этом устройстве. После завершения приложение перезапустится.</string>
     <string name="settings_backup_restore_confirm_confirm">Восстановить</string>
+    <string name="settings_backup_relaunch_title">Восстановление завершено</string>
+    <string name="settings_backup_relaunch_body">Данные восстановлены. Чтобы завершить, MoneySurfer закроется — откройте его снова.</string>
+    <string name="settings_backup_relaunch_confirm">Закрыть MoneySurfer</string>
     <string name="settings_backup_export_success">Бэкап сохранён</string>
     <string name="settings_backup_notice_invalid_archive">Выбранный файл не является корректным бэкапом MoneySurfer</string>
     <string name="settings_backup_notice_corrupted">Файл бэкапа повреждён</string>
@@ -271,6 +338,8 @@
     <string name="settings_categories_supporting">Управление категориями расходов и доходов</string>
     <string name="settings_budgets_title">Бюджеты</string>
     <string name="settings_budgets_supporting">Лимиты трат и прогресс по ним</string>
+    <string name="settings_goals_title">Цели</string>
+    <string name="settings_goals_supporting">Копите на то, что для вас важно</string>
 
     <!-- Удаление аккаунта пользователя (issue #213) — формулировки синхронизированы со
          страницей georgeci.github.io/account-deletion.html. -->
@@ -300,4 +369,23 @@
     <string name="settings_delete_account_notice_cleanup_failed">Не удалось удалить облачные данные. Проверьте подключение и попробуйте ещё раз</string>
     <string name="settings_delete_account_notice_auth_failed">Данные удалены, но учётную запись не удалось удалить. Попробуйте ещё раз</string>
     <string name="settings_delete_account_notice_generic">Не удалось удалить аккаунт. Попробуйте ещё раз</string>
+    <string name="settings_debug_config">Конфигурация (debug)</string>
+    <string name="settings_debug_config_supporting">Просмотр и переопределение всех ключей конфигурации</string>
+    <string name="settings_debug_config_title">Конфигурация</string>
+    <string name="settings_debug_config_section_keys">Ключи</string>
+    <string name="settings_debug_config_footnote">Переопределения хранятся в отдельном debug-хранилище и не влияют на ваши настройки. Только для debug-сборок.</string>
+    <string name="settings_debug_config_reset_all">Сбросить все переопределения</string>
+    <string name="settings_debug_config_winner_format">из %1$s</string>
+    <string name="settings_debug_config_clear">Убрать переопределение</string>
+    <string name="settings_debug_config_invalid_format">%1$s — недопустимое значение для %2$s</string>
+    <string name="settings_debug_config_layer_absent">нет значения</string>
+    <string name="settings_debug_config_layer_undecodable_format">%1$s (не распознано)</string>
+    <string name="settings_debug_config_degraded_format">Не удалось прочитать: %1$s — значения ниже берутся из слоёв под ним</string>
+    <string name="settings_debug_config_unavailable">В этой сборке переопределения недоступны — debug-слой пуст, сохранять здесь нечего.</string>
+    <string name="settings_debug_config_host_owned">Идентичность сборки — переопределение не меняет уже скомпилированную сборку графа.</string>
+    <string name="settings_debug_log_title">Логи</string>
+    <string name="settings_debug_log_supporting">Недавние предупреждения и ошибки этой сессии</string>
+    <string name="settings_debug_log_footnote">Последние 100 строк уровня warning и error, новые сверху. Хранятся только в памяти — после перезапуска приложения их не будет.</string>
+    <string name="settings_debug_log_empty">С момента запуска приложения не было ни предупреждений, ни ошибок.</string>
+    <string name="settings_debug_log_clear">Очистить лог</string>
 </resources>

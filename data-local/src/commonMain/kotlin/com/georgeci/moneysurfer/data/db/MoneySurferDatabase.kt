@@ -7,6 +7,7 @@ import androidx.room.RoomDatabaseConstructor
 import com.georgeci.moneysurfer.data.db.dao.AccountDao
 import com.georgeci.moneysurfer.data.db.dao.BudgetDao
 import com.georgeci.moneysurfer.data.db.dao.CategoryDao
+import com.georgeci.moneysurfer.data.db.dao.ConfigEntryDao
 import com.georgeci.moneysurfer.data.db.dao.ExchangeRateDao
 import com.georgeci.moneysurfer.data.db.dao.GoalContributionDao
 import com.georgeci.moneysurfer.data.db.dao.GoalDao
@@ -19,6 +20,7 @@ import com.georgeci.moneysurfer.data.db.dao.WorkspaceMemberDao
 import com.georgeci.moneysurfer.data.db.entity.AccountEntity
 import com.georgeci.moneysurfer.data.db.entity.BudgetEntity
 import com.georgeci.moneysurfer.data.db.entity.CategoryEntity
+import com.georgeci.moneysurfer.data.db.entity.ConfigEntryEntity
 import com.georgeci.moneysurfer.data.db.entity.ExchangeRateEntity
 import com.georgeci.moneysurfer.data.db.entity.GoalContributionEntity
 import com.georgeci.moneysurfer.data.db.entity.GoalEntity
@@ -34,7 +36,7 @@ import com.georgeci.moneysurfer.data.db.entity.WorkspaceMemberEntity
  * Schema version of [MoneySurferDatabase]. Single source of truth so the
  * Room annotation, the backup manifest, and tests can never drift.
  */
-const val MONEY_SURFER_DB_VERSION: Int = 32
+const val MONEY_SURFER_DB_VERSION: Int = 36
 
 @Database(
     entities = [
@@ -51,6 +53,7 @@ const val MONEY_SURFER_DB_VERSION: Int = 32
         GoalEntity::class,
         GoalContributionEntity::class,
         ExchangeRateEntity::class,
+        ConfigEntryEntity::class,
     ],
     version = MONEY_SURFER_DB_VERSION,
 )
@@ -68,6 +71,7 @@ abstract class MoneySurferDatabase : RoomDatabase() {
     abstract fun goalDao(): GoalDao
     abstract fun goalContributionDao(): GoalContributionDao
     abstract fun exchangeRateDao(): ExchangeRateDao
+    abstract fun configEntryDao(): ConfigEntryDao
 }
 
 @Suppress("KotlinNoActualForExpect")

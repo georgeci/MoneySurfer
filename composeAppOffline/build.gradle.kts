@@ -39,6 +39,8 @@ kotlin {
             // can never end up on the offline classpath.
             implementation(projects.shared)
             implementation(projects.domain)
+            implementation(projects.appConfig.api)
+            implementation(projects.appConfig.default)
             implementation(projects.feature.login)
             implementation(projects.feature.transaction)
             implementation(projects.sync.api)
@@ -57,6 +59,7 @@ kotlin {
             implementation(libs.kotest.framework.engine)
             implementation(libs.kotest.assertions.core)
             implementation(libs.kotlinx.coroutines.test)
+            implementation(projects.domainTestFixtures)
         }
         jvmTest.dependencies {
             implementation(projects.dataLocal)

@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.georgeci.moneysurfer.domain.model.GoalStatus
@@ -23,7 +24,9 @@ import com.georgeci.moneysurfer.uikit.components.base.SurferAddFab
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
 import com.georgeci.moneysurfer.uikit.components.goal.SurferGoalCard
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
+import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
 import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.utils.AsyncState
@@ -37,6 +40,19 @@ import moneysurfer.feature.goal.generated.resources.goals_empty_title
 import moneysurfer.feature.goal.generated.resources.goals_title
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
+
+/**
+ * Stable selectors for the Goals list — see docs/testing/testing-strategy.md.
+ *
+ * The FAB is always composed, so on an empty list it sits alongside the empty-state CTA that
+ * fires the same event. [AddButton] names the FAB, which is the one reachable in both states;
+ * the empty-state CTA carries no tag because no flow needs to single it out. Add one — through
+ * `SurferEmptyState`'s `modifier` — if that changes.
+ */
+object GoalsTestTags {
+    const val Root = "goals:root"
+    const val AddButton = "goals:add"
+}
 
 @Composable
 fun GoalsScreen(
@@ -69,7 +85,10 @@ private fun GoalsContent(
     onEvent: (GoalsEvent) -> Unit,
 ) {
     Scaffold(
-        modifier = Modifier.surferSafeInsets(),
+        modifier = Modifier
+            .surferSafeInsets()
+            .testTag(GoalsTestTags.Root)
+            .surferTestTagAsId(),
         containerColor = AppTheme.materialColors.surface,
         topBar = {
             SurferToolbar(
@@ -82,13 +101,14 @@ private fun GoalsContent(
             SurferAddFab(
                 label = addLabel,
                 onClick = { onEvent(GoalsEvent.OnAddGoalClick) },
+                modifier = Modifier.testTag(GoalsTestTags.AddButton),
             )
         },
     ) { padding ->
         when {
             isLoading -> Box(modifier = Modifier.fillMaxSize().padding(padding))
             goals.isEmpty() -> Box(
-                modifier = Modifier.fillMaxSize().padding(padding),
+                modifier = Modifier.fillMaxSize().surferContentContainer().padding(padding),
                 contentAlignment = Alignment.Center,
             ) {
                 SurferEmptyState(
@@ -112,7 +132,7 @@ private fun GoalsList(
     onEvent: (GoalsEvent) -> Unit,
 ) {
     LazyColumn(
-        modifier = Modifier.fillMaxSize().padding(padding),
+        modifier = Modifier.fillMaxSize().surferContentContainer().padding(padding),
         contentPadding = PaddingValues(
             start = AppTheme.spacing.default,
             end = AppTheme.spacing.default,

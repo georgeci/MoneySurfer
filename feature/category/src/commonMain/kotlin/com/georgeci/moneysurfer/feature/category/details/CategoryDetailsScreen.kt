@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -25,17 +24,18 @@ import com.georgeci.moneysurfer.uikit.components.SurferCategoryPalette
 import com.georgeci.moneysurfer.uikit.components.SurferDetailPlaceholder
 import com.georgeci.moneysurfer.uikit.components.SurferSkeletonRow
 import com.georgeci.moneysurfer.uikit.components.account.SurferAccountStatCard
-import com.georgeci.moneysurfer.uikit.components.base.SurferAddFab
+import com.georgeci.moneysurfer.uikit.components.base.SurferPaneAction
+import com.georgeci.moneysurfer.uikit.components.base.SurferPaneScaffold
 import com.georgeci.moneysurfer.uikit.components.base.SurferSectionHeader
-import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbarAction
 import com.georgeci.moneysurfer.uikit.components.category.SurferCategoryBreakdownRow
 import com.georgeci.moneysurfer.uikit.components.category.SurferCategoryHeroCard
 import com.georgeci.moneysurfer.uikit.components.category.SurferCategoryTrendBar
 import com.georgeci.moneysurfer.uikit.components.category.SurferCategoryTrendCard
+import com.georgeci.moneysurfer.uikit.components.transaction.SurferSwipeToDeleteTransaction
 import com.georgeci.moneysurfer.uikit.components.transaction.SurferTransactionLine
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
-import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
+import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.utils.HandleSideEffect
 import kotlinx.datetime.Month
@@ -113,15 +113,9 @@ private fun CategoryDetailsPlaceholder(
     message: String?,
     onEvent: (CategoryDetailsEvent) -> Unit,
 ) {
-    Scaffold(
-        modifier = Modifier.surferSafeInsets(),
-        containerColor = AppTheme.materialColors.surface,
-        topBar = {
-            SurferToolbar(
-                title = stringResource(Res.string.category_details_title),
-                onBack = { onEvent(CategoryDetailsEvent.OnBackClick) },
-            )
-        },
+    SurferPaneScaffold(
+        title = stringResource(Res.string.category_details_title),
+        onBack = { onEvent(CategoryDetailsEvent.OnBackClick) },
     ) { padding ->
         // Loading passes no message and gets skeleton rows; a placeholder there would claim the
         // category is gone when it is merely still arriving.
@@ -129,6 +123,7 @@ private fun CategoryDetailsPlaceholder(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
+                    .surferContentContainer()
                     .padding(padding)
                     .padding(
                         horizontal = AppTheme.spacing.default,
@@ -141,7 +136,7 @@ private fun CategoryDetailsPlaceholder(
                 }
             }
         } else {
-            Box(modifier = Modifier.fillMaxSize().padding(padding)) {
+            Box(modifier = Modifier.fillMaxSize().surferContentContainer().padding(padding)) {
                 SurferDetailPlaceholder(text = message)
             }
         }
@@ -163,41 +158,33 @@ private fun CategoryDetailsContent(
     )
     val currentMonthLabel = state.months.lastOrNull()?.let { monthShortLabel(it.monthOfYear) }.orEmpty()
 
-    Scaffold(
-        modifier = Modifier.surferSafeInsets(),
-        containerColor = AppTheme.materialColors.surface,
-        topBar = {
-            SurferToolbar(
-                title = stringResource(Res.string.category_details_title),
-                onBack = { onEvent(CategoryDetailsEvent.OnBackClick) },
-                actions = {
-                    SurferToolbarAction(
-                        icon = SurferIcons.Edit,
-                        contentDescription = stringResource(
-                            Res.string.category_details_edit_content_description,
-                        ),
-                        onClick = { onEvent(CategoryDetailsEvent.OnEditClick) },
-                    )
-                },
+    SurferPaneScaffold(
+        title = stringResource(Res.string.category_details_title),
+        onBack = { onEvent(CategoryDetailsEvent.OnBackClick) },
+        actions = {
+            SurferToolbarAction(
+                icon = SurferIcons.Edit,
+                contentDescription = stringResource(
+                    Res.string.category_details_edit_content_description,
+                ),
+                onClick = { onEvent(CategoryDetailsEvent.OnEditClick) },
             )
         },
-        floatingActionButton = {
-            val label = stringResource(
+        primaryAction = SurferPaneAction(
+            label = stringResource(
                 if (state.type == CategoryType.INCOME) {
                     Res.string.category_details_log_income
                 } else {
                     Res.string.category_details_log_expense
                 },
-            )
-            SurferAddFab(
-                label = label,
-                onClick = { onEvent(CategoryDetailsEvent.OnAddTransactionClick) },
-            )
-        },
+            ),
+            onClick = { onEvent(CategoryDetailsEvent.OnAddTransactionClick) },
+        ),
     ) { padding ->
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
+                .surferContentContainer()
                 .padding(top = padding.calculateTopPadding()),
             contentPadding = PaddingValues(
                 start = AppTheme.spacing.default,
@@ -328,19 +315,27 @@ private fun CategoryDetailsContent(
             } else {
                 items(state.transactions, key = { it.id.value }) { txn ->
                     val untitled = stringResource(Res.string.category_details_transaction_untitled)
-                    SurferTransactionLine(
-                        icon = visual.icon,
-                        title = txn.title.ifBlank { untitled },
-                        formattedAmount = txn.formattedAmount,
-                        categoryHueSeed = txn.categoryHueSeed,
-                        amountColor = if (txn.isExpense) {
-                            AppTheme.materialColors.onSurface
-                        } else {
-                            AppTheme.semanticColors.income
-                        },
-                        onClick = { onEvent(CategoryDetailsEvent.OnTransactionClick(txn.id)) },
-                        modifier = Modifier.fillMaxWidth(),
-                    )
+                    val title = txn.title.ifBlank { untitled }
+                    SurferSwipeToDeleteTransaction(
+                        transactionTitle = title,
+                        onDelete = { onEvent(CategoryDetailsEvent.OnDeleteTransaction(txn.id)) },
+                        isTransfer = txn.isTransfer,
+                        isSplit = txn.isSplitLeg,
+                    ) {
+                        SurferTransactionLine(
+                            icon = visual.icon,
+                            title = title,
+                            formattedAmount = txn.formattedAmount,
+                            categoryHueSeed = txn.categoryHueSeed,
+                            amountColor = if (txn.isExpense) {
+                                AppTheme.materialColors.onSurface
+                            } else {
+                                AppTheme.semanticColors.income
+                            },
+                            onClick = { onEvent(CategoryDetailsEvent.OnTransactionClick(txn.id)) },
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    }
                 }
             }
         }

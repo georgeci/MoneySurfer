@@ -7,12 +7,14 @@
 - [Rules](#rules)
 - [Cursor-based incremental pull](#cursor-based-incremental-pull)
 - [Collections in scope](#collections-in-scope)
+  - [User-scoped collections (phase 3)](#user-scoped-collections-phase-3)
 - [Apply per doc](#apply-per-doc)
   - [Members — special-case userId stub](#members--special-case-userid-stub)
 - [LWW conflict resolver](#lww-conflict-resolver)
 - [Outbox bypass](#outbox-bypass)
 - [Cursor + apply atomicity](#cursor--apply-atomicity)
 - [Tombstones (soft delete)](#tombstones-soft-delete)
+  - [Local tombstone retention](#local-tombstone-retention)
 - [WorkspaceInvite](#workspaceinvite)
 - [SyncMetaRepository](#syncmetarepository)
 - [Recalc placeholder](#recalc-placeholder)
@@ -24,7 +26,8 @@
 - Pull is cursor-based on `updatedAt` per `(workspaceId, collection)`.
 - Conflict resolution is LWW; ties go to local (stable, idempotent re-pulls).
 - Pull writes go through DAOs directly — never through the outbox.
-- Tombstones land as hard local deletes; the cursor still advances past them.
+- Tombstones land as hard local deletes — except transactions, which keep a
+  local `deletedAt` row (issue #346). The cursor advances past them either way.
 - Collections are pulled in order: members → invites → accounts → categories → transactions.
 
 READ WHEN:
@@ -116,15 +119,45 @@ multi-workspace fan-out yet (still per-`currentWorkspaceId`).
 pipeline. The user / workspace docs are still written via
 `WorkspaceSyncRepositoryImpl` (v1) and `UserRemoteRepository` directly.
 
+### User-scoped collections (phase 3)
+
+`SyncEntityPlugin.pullScope` says which document tree a plugin's collection hangs
+off. The workspace loop above runs `PullScope.Workspace` plugins only; a separate
+phase runs the `PullScope.User` ones once, with `scopeKey = uid`.
+
+Today that is `users/{uid}/config` — one document per synced setting
+([ADR-004](../adr/ADR-004-configuration.md)). Without the discriminator a
+user-scoped plugin would be run per workspace and would either be handed the
+workspace root document or query a path that does not exist.
+
+The phase is **cursorless**: it reads the whole collection on every pull, because
+the synced set is around ten tiny documents and the alternative is cursor
+bookkeeping in a new scope plus a rule that has to permit a filtered, ordered
+query rather than a bare `list`. "Remote is not newer" is therefore the normal
+outcome, and the config plugin reports it as *skipped*, not as a conflict.
+
+A denial in this phase skips the collection and logs, rather than failing the
+pull: these documents are private to one user and hold nothing another device
+cannot re-derive, while a rules gap that failed the pull would read as "nobody can
+sign in".
+
 ## Apply per doc
 
 For each `DocumentSnapshot` in the batch:
 
-1. **Tombstone check.** If the DTO has `deletedAt != null`, hard-delete
-   the local row via the matching DAO (e.g. `accountDao.delete(id)`) and
+1. **Tombstone check.** If the DTO has `deletedAt != null`, remove the
+   local row via the matching DAO (e.g. `accountDao.delete(id)`) and
    record `applied = true, wasConflict = false`. The cursor still
    advances on tombstones — that is exactly how a delete propagates from
    one device to another.
+   Transactions are the exception: they *mark* the row instead, with
+   `transactionDao.softDelete(id, dto.deletedAt!!)` — a targeted UPDATE,
+   not an upsert of the decoded doc, since a tombstone patch carries no
+   real fields and a device that never held the row must not have one
+   conjured out of it (the `accountId` foreign key would reject it
+   anyway). The tombstone still wins unconditionally, without consulting
+   the resolver: a delete is not a field-level edit a newer local write
+   can outrank.
 2. **Conflict resolution.** Read the current local entity, build a
    `ConflictMetadata`, and ask the resolver:
    ```kotlin
@@ -244,6 +277,16 @@ has been deleted on a peer device". The current pull behaviour:
 - `deletedAt != null` ⇒ DAO `delete(id)` locally. **Hard delete** in
   Room, soft delete in Firestore — the doc is preserved as a tombstone
   so future pulls (with `cursor > deletedAt`) don't see it again.
+- **Transactions are soft-deleted in Room too** (issue #346):
+  `transactionDao.softDelete(id, deletedAt)` marks the row, every read
+  query in `TransactionDao` filters on `deletedAt IS NULL`, and
+  `TransactionRepository.restore(id)` lifts the tombstone in a single
+  UPDATE. That is what makes Undo survive process death, and it is also
+  what keeps an edit that was already open when a peer's delete arrived
+  from colliding with the surviving primary key
+  (`UpdateTransactionUseCase`). A restore pushes
+  an ordinary upsert whose `deletedAt` is null, which lifts the
+  tombstone remotely as well — no INSERT-after-DELETE flicker.
 - The cursor still advances past tombstones — the doc has a real
   `updatedAt`, just like any other update.
 
@@ -264,13 +307,49 @@ Push-side tombstone contract:
   `serverTimestamp()` — the clock-skew caveat in
   [sync-gaps.md](sync-gaps.md) applies to tombstones too.
 - A DELETE whose doc never reached Firestore (entity created and
-  deleted between two drains — the INSERT push no-ops once the Room row
-  is gone) is **skipped**: `pushTombstone` checks `get().exists` first.
-  Updating a missing doc would raise NOT_FOUND on every retry and wedge
-  the batch; a doc that never existed remotely has nothing for peers to
-  forget.
-- Tombstoned docs are never garbage-collected today — retention/GC is a
-  known gap, listed in [sync-gaps.md](sync-gaps.md).
+  deleted between two drains — the INSERT push no-ops because its
+  `getById` finds no live row) is **skipped**: `pushTombstone` checks
+  `get().exists` first. Updating a missing doc would raise NOT_FOUND on
+  every retry and wedge the batch; a doc that never existed remotely has
+  nothing for peers to forget.
+- A soft delete enqueues exactly one DELETE mutation. Deleting an
+  already-tombstoned row enqueues nothing: a second tombstone would
+  carry a later `deletedAt` than the one peers already agreed on.
+- Tombstoned **docs** are never garbage-collected today — remote
+  retention/GC is a known gap, listed in [sync-gaps.md](sync-gaps.md).
+  Local transaction tombstones *are* collected; see below.
+
+### Local tombstone retention
+
+`transactions.deletedAt` rows are purged by
+`PurgeDeletedTransactionsUseCase` (`:domain`), which drops every
+tombstone older than **30 days**.
+
+- **Who runs it:** the app, once per launch, from `AppLaunchViewModel`.
+  Not a background worker: it is a single indexed `DELETE` over rows
+  nobody reads, and scheduling it on two platforms would buy nothing.
+  It runs off the startup path and its failures are logged and
+  swallowed, so housekeeping can never keep the app off its first
+  screen.
+- **Why 30 days:** everything that reads a tombstone is local and
+  short-lived — the Undo Snackbar (seconds), an edit that was already
+  open when the row was deleted (`UpdateTransactionUseCase`), and a CSV
+  import, which has to find the tombstone rather than insert over a
+  surviving id. Thirty days is far past all three and short enough that
+  deleted rows do not accumulate.
+- **Measured from the delete's own timestamp**, which for a pulled
+  tombstone is the *deleting* device's clock, not the moment this one
+  heard about it. A delete pushed by a peer that had been offline longer
+  than the window therefore arrives already expired and is collected on
+  the next launch. Deliberate: none of the three readers above outlives
+  the trip, there is no UI for undoing another device's delete, and an
+  import that finds no tombstone just inserts the row — same end state.
+- **What it does not touch:** the remote doc keeps its `deletedAt`.
+  Purging here says nothing about any peer's copy; that tombstone stays
+  on the server for them to pull, and collecting it is the separate gap
+  above.
+- After the purge the row is gone for good: a restore finds nothing and
+  is a no-op, and a CSV import of the same id inserts it fresh.
 
 ## `WorkspaceInvite`
 
@@ -282,7 +361,10 @@ follow conflict resolution like the other entities. See
 
 ## `SyncMetaRepository`
 
-Source:
+Interface in
+[SyncMetaRepository.kt](../../sync/api/src/commonMain/kotlin/com/georgeci/moneysurfer/sync/repository/SyncMetaRepository.kt)
+(`:sync/api`, so feature modules can read the cursors without depending on the
+runtime), implementation in
 [SyncMetaRepositoryImpl.kt](../../sync/default/src/commonMain/kotlin/com/georgeci/moneysurfer/sync/internal/repository/SyncMetaRepositoryImpl.kt),
 schema in
 [SyncMetaEntity.kt](../../sync/default/src/commonMain/kotlin/com/georgeci/moneysurfer/sync/db/entity/SyncMetaEntity.kt).
@@ -292,11 +374,17 @@ timestamps:
 
 | Field                 | Set by | Read by |
 |------------------------|--------|---------|
-| `lastPulledAt`         | `setCursor` after a successful batch. | `cursor()` for the next pull's `WHERE updatedAt > ?`. |
+| `lastPulledAt`         | `setCursor` after a successful batch. | `cursor()` for the next pull's `WHERE updatedAt > ?`; rendered on Settings → Sync, where a cursor sitting ahead of a remote write is the answer to "why did the pull bring nothing". |
 | `lastSyncSuccessAt`    | `markSuccess` on every collection that finishes (even if empty). | UI badges. |
 | `lastSyncAttemptAt`    | `markAttempt` at the start of `pullCollection`. | UI badges, freshness signal. |
 
-`clearWorkspace(workspaceId)` is the per-workspace wipe. Full table
+`clearScope(scopeKey)` is the per-workspace wipe — also what Settings → Sync
+calls behind "Reset cursors & re-pull", which then requests a MANUAL sync so the
+re-pull actually happens instead of waiting for the next trigger. That screen
+cancels the coordinator and waits for it to go idle *before* clearing: a pull in
+flight writes `setCursor(now)` per collection as it finishes each one, and a new
+request queues behind it rather than merging into it, so wiping mid-run would be
+undone before the re-pull ever ran. Full table
 clear is `deleteAll()` from `SyncMetaDao`, called by
 `LocalDataResetRepositoryImpl.clearAll()` on logout.
 

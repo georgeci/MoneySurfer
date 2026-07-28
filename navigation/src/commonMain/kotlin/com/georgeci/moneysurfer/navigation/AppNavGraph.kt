@@ -18,7 +18,6 @@ import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
-import androidx.compose.material3.adaptive.navigation3.rememberListDetailSceneStrategy
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffoldDefaults
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
@@ -26,10 +25,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
@@ -37,10 +41,11 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import androidx.savedstate.serialization.SavedStateConfiguration
-import androidx.window.core.layout.WindowSizeClass.Companion.WIDTH_DP_MEDIUM_LOWER_BOUND
 import com.georgeci.moneysurfer.navigation.util.rememberViewModelStoreNavEntryDecorator
 import com.georgeci.moneysurfer.uikit.components.SurferSplash
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
+import com.georgeci.moneysurfer.uikit.window.SurferWindowSize
+import com.georgeci.moneysurfer.uikit.window.currentSurferWindowSize
 import io.github.irgaly.navigation3.resultstate.rememberNavigationResultNavEntryDecorator
 import kotlinx.coroutines.launch
 import kotlinx.serialization.modules.SerializersModule
@@ -99,6 +104,8 @@ internal val navKeySerializersModule = SerializersModule {
         subclass(Route.SettingsAbout::class, Route.SettingsAbout.serializer())
         subclass(Route.SettingsLicenses::class, Route.SettingsLicenses.serializer())
         subclass(Route.SettingsDeleteAccount::class, Route.SettingsDeleteAccount.serializer())
+        subclass(Route.SettingsDebugConfig::class, Route.SettingsDebugConfig.serializer())
+        subclass(Route.SettingsDebugLog::class, Route.SettingsDebugLog.serializer())
     }
 }
 
@@ -113,15 +120,30 @@ fun AppNavGraph(
 ) {
     val backStack = rememberNavBackStack(savedStateConfig, Route.SignIn)
     val bottomSheetStrategy = remember { BottomSheetSceneStrategy<NavKey>() }
-    val listDetailStrategy = rememberListDetailSceneStrategy<NavKey>()
+    val paneStrategy = rememberSurferPaneSceneStrategy<NavKey>()
     val navigator = remember(backStack) { AppNavigator(backStack) }
     val appLaunchViewModel: AppLaunchViewModel = koinViewModel()
     val targetRoute by appLaunchViewModel.targetRoute.collectAsStateWithLifecycle()
+    // The launch decision lands in a `LaunchedEffect`, i.e. one frame *after* the composition that
+    // first sees a non-null `targetRoute`. Without this flag that frame renders the back stack's
+    // bootstrap route (`Route.SignIn`) and `NavDisplay` then animates SignIn → Onboarding.
+    var launchRouteApplied by remember { mutableStateOf(false) }
     LaunchedEffect(targetRoute) {
         val route = targetRoute ?: return@LaunchedEffect
-        val current = backStack.lastOrNull()
-        if (current == route) return@LaunchedEffect
-        navigator.resetTo(route)
+        if (backStack.lastOrNull() != route) navigator.resetTo(route)
+        launchRouteApplied = true
+    }
+
+    // Server-owned flags, pulled here rather than from the view model's `init` because this is the
+    // only place in the app that has a lifecycle. `repeatOnLifecycle` runs the block on the first
+    // composition and again on every return to the foreground — which is the whole propagation
+    // model ADR-004 picked over a persistent snapshot listener. The refresh itself is fire-and-
+    // forget inside the view model, so nothing here waits on Firestore.
+    val lifecycleOwner = LocalLifecycleOwner.current
+    LaunchedEffect(lifecycleOwner) {
+        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            appLaunchViewModel.refreshRemoteConfig()
+        }
     }
 
     val entryProvider: (NavKey) -> NavEntry<NavKey> = entryProvider {
@@ -141,7 +163,7 @@ fun AppNavGraph(
             onBack = { navigator.pop() },
             sceneStrategies = listOf(
                 bottomSheetStrategy,
-                listDetailStrategy,
+                paneStrategy,
             ),
             transitionSpec = {
                 slideInHorizontally(tween(ANIMATION_DURATION)) { it } togetherWith
@@ -178,9 +200,9 @@ fun AppNavGraph(
             snackbarHost = { SnackbarHost(snackbarHostState) { data -> Snackbar(data) } },
         ) { _ ->
             val topLevel = currentTopLevel
-            if (targetRoute == null) {
-                // Launch decision still pending — hold on the splash instead of flashing the
-                // bootstrap route (`Route.SignIn`) at an already signed-in user.
+            if (!launchRouteApplied) {
+                // Launch decision still pending, or made but not yet on the back stack — hold on
+                // the splash instead of flashing the bootstrap route (`Route.SignIn`).
                 SurferSplash()
             } else if (topLevel == null) {
                 navDisplay()
@@ -230,9 +252,7 @@ private fun AppNavigationSuite(
 ) {
     val labels = TopLevelDestination.entries.associateWith { stringResource(it.label) }
     val adaptiveInfo = currentWindowAdaptiveInfo()
-    val layoutType = if (
-        adaptiveInfo.windowSizeClass.isWidthAtLeastBreakpoint(WIDTH_DP_MEDIUM_LOWER_BOUND)
-    ) {
+    val layoutType = if (currentSurferWindowSize() >= SurferWindowSize.Medium) {
         NavigationSuiteScaffoldDefaults.calculateFromAdaptiveInfo(adaptiveInfo)
     } else {
         NavigationSuiteType.None
