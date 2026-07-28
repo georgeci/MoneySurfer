@@ -1,7 +1,6 @@
 package com.georgeci.moneysurfer.uikit.components.base
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -22,12 +21,13 @@ import androidx.compose.ui.unit.dp
 import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 
-/** Track height; the thumb fills it minus [TrackInset] on every side. */
+/** Track height, and the height of each segment's tap target. */
 private val SwitchHeight = 32.dp
 
-/** Breathing room between the track edge and the thumb, and between two thumbs. */
+/** Margin the thumb is drawn inside its slot — visual only, the whole slot is tappable. */
 private val TrackInset = 3.dp
 
+/** Horizontal breathing room around a segment's label, inside the thumb. */
 private val OptionPadding = 14.dp
 
 /**
@@ -60,35 +60,46 @@ fun <T> SurferPeriodSwitch(
             .height(SwitchHeight)
             .clip(pill)
             .background(AppTheme.materialColors.surfaceContainerHighest)
-            .padding(TrackInset)
             .selectableGroup(),
-        horizontalArrangement = Arrangement.spacedBy(TrackInset),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         options.forEach { option ->
             val isSelected = option == selected
             Box(
+                // The tap target is the segment's whole slot, full track height — [TrackInset] is
+                // a margin the thumb is drawn inside, not a border around what responds. A control
+                // painted as a filled pill is aimed at as one, so an inset that ate the top and
+                // bottom of it would turn the obvious target into a near miss. `Modifier.selectable`
+                // is foundation, not Material, so nothing expands the target back out for us.
                 modifier = Modifier
                     .fillMaxHeight()
                     .clip(pill)
-                    .background(if (isSelected) AppTheme.materialColors.surface else Color.Transparent)
                     // `selectable` rather than `clickable`: it publishes the selected state and the
                     // radio-button role, which is what a screen reader needs to say "1 of 2" here.
                     .selectable(selected = isSelected, onClick = { onSelect(option) })
                     .then(optionTestTag?.let { Modifier.testTag(it(option)) } ?: Modifier)
-                    .padding(horizontal = OptionPadding),
+                    .padding(TrackInset),
                 contentAlignment = Alignment.Center,
             ) {
-                Text(
-                    text = label(option),
-                    style = AppTheme.typography.labelLarge,
-                    color = if (isSelected) {
-                        AppTheme.materialColors.onSurface
-                    } else {
-                        AppTheme.materialColors.onSurfaceVariant
-                    },
-                    maxLines = 1,
-                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .clip(pill)
+                        .background(if (isSelected) AppTheme.materialColors.surface else Color.Transparent)
+                        .padding(horizontal = OptionPadding),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text(
+                        text = label(option),
+                        style = AppTheme.typography.labelLarge,
+                        color = if (isSelected) {
+                            AppTheme.materialColors.onSurface
+                        } else {
+                            AppTheme.materialColors.onSurfaceVariant
+                        },
+                        maxLines = 1,
+                    )
+                }
             }
         }
     }
