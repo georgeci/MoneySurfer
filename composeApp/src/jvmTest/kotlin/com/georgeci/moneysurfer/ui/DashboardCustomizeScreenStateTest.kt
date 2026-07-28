@@ -44,14 +44,15 @@ class DashboardCustomizeScreenStateTest : StringSpec({
 
             onNodeWithTag(DashboardCustomizeTestTags.Root).assertIsDisplayed()
             onNodeWithTag(DashboardCustomizeTestTags.EnabledHeader).assertIsDisplayed()
-            onNodeWithTag(DashboardCustomizeTestTags.AvailableHeader).assertIsDisplayed()
             onNodeWithTag(enabledRow(DashboardWidgetType.Balance)).assertIsDisplayed()
-            // The picker is a LazyColumn: with this many widgets the Available section starts below
-            // the fold, and a row that was never composed cannot be asserted on.
-            scrollToRow(availableRow(DashboardWidgetType.Goals))
-            onNodeWithTag(availableRow(DashboardWidgetType.Goals)).assertIsDisplayed()
             // A switched-off widget is in exactly one section, not both.
             onNodeWithTag(enabledRow(DashboardWidgetType.Goals)).assertDoesNotExist()
+            // The Available section trails the whole enabled list, so its header needs the same
+            // scroll its rows do once the dashboard carries this many widgets.
+            scrollToRow(DashboardCustomizeTestTags.AvailableHeader)
+            onNodeWithTag(DashboardCustomizeTestTags.AvailableHeader).assertIsDisplayed()
+            scrollToRow(availableRow(DashboardWidgetType.Goals))
+            onNodeWithTag(availableRow(DashboardWidgetType.Goals)).assertIsDisplayed()
         }
     }
 
@@ -147,6 +148,7 @@ class DashboardCustomizeScreenStateTest : StringSpec({
 
             events shouldContain DashboardCustomizeEvent.OnWidgetMove(
                 from = DashboardWidgetType.Accounts,
+                // The row above Accounts in the default layout.
                 to = DashboardWidgetType.Budgets,
             )
         }
@@ -277,6 +279,20 @@ private const val DRAG_STEPS = 8
 /** Drag a little further than one row so touch slop cannot eat the whole travel. */
 private const val DRAG_OVERSHOOT = 1.5f
 
+/**
+ * Brings a row into the viewport before addressing it.
+ *
+ * The sections live in one `LazyColumn`, so a row far enough down is not composed at all and no
+ * selector can find it. That bit once by accident: the default layout grew past a screenful when
+ * the burn-rate and insights widgets landed, and two assertions on the switched-off row started
+ * failing for a reason that had nothing to do with what they test. Scrolling first keeps them
+ * independent of how many widgets the default layout happens to carry.
+ */
+@OptIn(ExperimentalTestApi::class)
+private fun ComposeUiTest.scrollToRow(tag: String) {
+    onNode(hasScrollAction()).performScrollToNode(hasTestTag(tag))
+}
+
 private val GOALS_OFF = DashboardLayoutConfig.DEFAULT
     .withWidgetEnabled(DashboardWidgetType.Goals, enabled = false)
 
@@ -292,14 +308,6 @@ private fun styleOption(option: String) = DashboardCustomizeTestTags.styleOption
 private val ONLY_BALANCE = DashboardLayoutConfig.DEFAULT.items
     .filter { it.type == DashboardWidgetType.Balance }
     .let { DashboardLayoutConfig(items = it) }
-
-/**
- * Brings a picker row into composition. The list is lazy, so a row far enough down the dashboard
- * never reaches the semantics tree until it is scrolled to — and the list grows with every widget.
- */
-@OptIn(ExperimentalTestApi::class)
-private fun ComposeUiTest.scrollToRow(tag: String) =
-    onNode(hasScrollAction()).performScrollToNode(hasTestTag(tag))
 
 private fun enabledRow(type: DashboardWidgetType) = DashboardCustomizeTestTags.enabledRow(type.name)
 

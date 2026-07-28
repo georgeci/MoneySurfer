@@ -10,6 +10,8 @@ import com.georgeci.moneysurfer.domain.insight.SpendTrend
 import com.georgeci.moneysurfer.domain.model.Account
 import com.georgeci.moneysurfer.domain.model.BudgetProgress
 import com.georgeci.moneysurfer.domain.model.BudgetStatus
+import com.georgeci.moneysurfer.domain.model.BurnRate
+import com.georgeci.moneysurfer.domain.model.BurnRatePace
 import com.georgeci.moneysurfer.domain.model.ConvertedTotal
 import com.georgeci.moneysurfer.domain.model.ExchangeRateSnapshot
 import com.georgeci.moneysurfer.domain.model.SafeToSpend
@@ -20,12 +22,14 @@ import com.georgeci.moneysurfer.domain.preferences.UiPreferences
 import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.BudgetId
 import com.georgeci.moneysurfer.domain.primitives.GoalId
+import com.georgeci.moneysurfer.domain.primitives.Money
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
 import com.georgeci.moneysurfer.domain.usecase.ConvertAccountsTotalUseCase
 import com.georgeci.moneysurfer.domain.usecase.GenerateInsightsUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetAccountsUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetActiveBudgetProgressUseCase
+import com.georgeci.moneysurfer.domain.usecase.GetBurnRateUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetExchangeRatesUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetGoalsUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetRecentTransactionsUseCase
@@ -39,12 +43,18 @@ import org.koin.core.annotation.KoinViewModel
 import kotlin.time.Instant
 
 @KoinViewModel
+// One injected collaborator per widget that reads its own data, which is what a dashboard is;
+// the tenth arrived when the burn-rate and insights widgets landed together. Bundling them into a
+// holder would buy a shorter signature and cost a layer of indirection through the Koin graph —
+// the same trade `AppLaunchViewModel` declined.
+@Suppress("LongParameterList")
 class DashboardViewModel(
     private val getAccounts: GetAccountsUseCase,
     private val getRecentTransactions: GetRecentTransactionsUseCase,
     private val getGoals: GetGoalsUseCase,
     private val getExchangeRates: GetExchangeRatesUseCase,
     private val getActiveBudgetProgress: GetActiveBudgetProgressUseCase,
+    private val getBurnRate: GetBurnRateUseCase,
     private val generateInsights: GenerateInsightsUseCase,
     private val convertAccountsTotal: ConvertAccountsTotalUseCase,
     uiPreferences: UiPreferences,
@@ -104,24 +114,26 @@ class DashboardViewModel(
     }
 
     private fun observeDashboard() {
-        // Layout and budget progress are folded into one source because `combine` tops out at five
-        // typed flows, and these two are the pair that is never read apart.
+        // The layout and the two budget-shaped widgets are folded into one source because `combine`
+        // tops out at five typed flows, and these are never read apart from each other.
         //
-        // One budget subscription feeds two widgets: safe-to-spend is a projection of the same
+        // One budget subscription feeds two of them: safe-to-spend is a projection of the same
         // progress list the budgets widget renders, so the headline and the rows can never disagree
         // about a budget — and reading them apart would compute every budget's progress twice.
-        val layoutAndBudgets =
-            combine(layout, getActiveBudgetProgress().onStart { emit(emptyList()) }) { layoutConfig, progress ->
-                layoutConfig to progress
-            }
+        val widgetSources = combine(
+            layout,
+            getActiveBudgetProgress().onStart { emit(emptyList()) },
+            getBurnRate().onStart { emit(null) },
+            ::WidgetSources,
+        )
         launch {
             combine(
                 getAccounts().onStart { emit(emptyList()) },
                 getRecentTransactions(),
                 getGoals(),
                 getExchangeRates().onStart { emit(null) },
-                layoutAndBudgets,
-            ) { accounts, transactions, goals, rates, (layoutConfig, budgetProgress) ->
+                widgetSources,
+            ) { accounts, transactions, goals, rates, (layoutConfig, budgetProgress, burnRate) ->
                 val balance = accounts.convertedTotal(rates)?.toBalanceUi()
                 DashboardState.Content(
                     accounts = accounts.map { it.toUi() },
@@ -139,6 +151,7 @@ class DashboardViewModel(
                     goals = goals.take(DASHBOARD_GOALS_LIMIT).map { it.toUi() },
                     safeToSpend = budgetProgress.safeToSpend()?.toUi(),
                     budgets = budgetProgress.toBudgetsUi(),
+                    burnRate = burnRate?.toUi(),
                     isOffline = isOffline,
                     transferEnabled = transferEnabled,
                     layout = layoutConfig,
@@ -247,6 +260,29 @@ class DashboardViewModel(
         )
     }
 
+    /**
+     * The chart's bars carry no money of their own: a currency printed seven times over a 64dp-tall
+     * column is unreadable, so the amounts live in the headline, the callout and the chart's
+     * screen-reader line, and each bar keeps only its height and its date.
+     */
+    private fun BurnRate.toUi(): BurnRateUi = BurnRateUi(
+        averageFormatted = MoneyFormatter.format(series.average, currency),
+        projectedFormatted = MoneyFormatter.format(projectedMonthTotal, currency),
+        weekTotalFormatted = MoneyFormatter.format(series.total, currency),
+        busiestDayFormatted = MoneyFormatter.format(
+            series.days.maxOfOrNull { it.total } ?: Money.zero(),
+            currency,
+        ),
+        days = series.days.zip(series.barFractions) { point, fraction ->
+            BurnRateDayUi(
+                dayOfMonth = point.date.day,
+                fraction = fraction,
+                isToday = point.date == series.today,
+            )
+        },
+        pace = pace,
+    )
+
     private fun SavingsGoalSummary.toUi() = GoalUi(
         id = goal.id,
         name = goal.title,
@@ -338,6 +374,12 @@ sealed interface DashboardState {
         val safeToSpend: SafeToSpendUi? = null,
         /** The active budgets worth a row, most pressing first — empty when none are tracked. */
         val budgets: List<BudgetSummaryUi> = emptyList(),
+        /**
+         * The week's spend pace and where the month lands at it, or null while no workspace backs a
+         * series. Unlike [safeToSpend] this one does not need a budget — a null pace inside it is
+         * the "no cap to miss" state, and the chart is drawn either way.
+         */
+        val burnRate: BurnRateUi? = null,
         /** Generated spending insights, most actionable first. Empty until the engine has run. */
         val insights: List<InsightUi> = emptyList(),
         val isOffline: Boolean = false,
@@ -363,6 +405,17 @@ sealed interface DashboardState {
 
     companion object
 }
+
+/**
+ * The three per-widget sources `combine` cannot take as separate arguments — it tops out at five
+ * typed flows and the screen already reads four others.
+ */
+private data class WidgetSources(
+    val layout: DashboardLayoutConfig,
+    /** Every active budget's progress — safe-to-spend and the budgets card are both read off it. */
+    val budgetProgress: List<BudgetProgress>,
+    val burnRate: BurnRate?,
+)
 
 /** The three strings the balance widget needs, already formatted. */
 private data class BalanceUi(
@@ -467,6 +520,39 @@ data class BudgetSummaryUi(
     /** Derived rather than stored, so the wording and the colour can never disagree. */
     val isOver: Boolean get() = status == BudgetStatus.OVER
 }
+
+/**
+ * The burn-rate widget's numbers. Money is formatted here; the sentences around it are built on the
+ * screen, which is where the string resources are.
+ */
+data class BurnRateUi(
+    /** Mean spend per day across the charted week. */
+    val averageFormatted: String,
+    /** Where the month's spend lands if the remaining days each cost the average. */
+    val projectedFormatted: String,
+    /** What the charted week cost in total — the chart's screen-reader line, not a printed figure. */
+    val weekTotalFormatted: String,
+    /** The busiest charted day, which is the bar the chart is scaled to. */
+    val busiestDayFormatted: String,
+    val days: List<BurnRateDayUi>,
+    /**
+     * The verdict on [projectedFormatted], or null when no monthly budget caps the month. Null is a
+     * normal state, not a loading one — see [com.georgeci.moneysurfer.domain.model.BurnRate].
+     */
+    val pace: BurnRatePace?,
+)
+
+/**
+ * One bar. [dayOfMonth] rather than a weekday name because the app ships no date locale rules, and
+ * a number needs none.
+ */
+data class BurnRateDayUi(
+    val dayOfMonth: Int,
+    /** Height against the busiest charted day, 0..1. */
+    val fraction: Float,
+    /** The last bar — a day still being spent, which the chart draws solid. */
+    val isToday: Boolean,
+)
 
 data class TransactionUi(
     val id: TransactionId,

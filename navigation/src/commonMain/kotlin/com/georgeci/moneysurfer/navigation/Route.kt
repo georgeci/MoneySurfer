@@ -91,7 +91,7 @@ sealed interface Route : NavKey {
     data object CategoriesManage : TopLevel
 
     @Serializable
-    data object Budgets : Route
+    data object Budgets : TopLevel
 
     @Serializable
     data class BudgetDetails(val budgetId: String) : Route
@@ -164,9 +164,9 @@ sealed interface Route : NavKey {
     @Serializable
     data class TransactionDetails(val transactionId: String) : Route
 
-    /** Savings goals list. Reached from the dashboard's goals widget, not from the nav suite. */
+    /** Savings goals list. Also reachable from the dashboard's goals widget. */
     @Serializable
-    data object Goals : Route
+    data object Goals : TopLevel
 
     @Serializable
     data class GoalDetails(val goalId: String) : Route

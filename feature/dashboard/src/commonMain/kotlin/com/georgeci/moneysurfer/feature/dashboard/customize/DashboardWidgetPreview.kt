@@ -21,6 +21,10 @@ import com.georgeci.moneysurfer.uikit.widgets.SurferBalanceVariant
 import com.georgeci.moneysurfer.uikit.widgets.SurferBalanceWidget
 import com.georgeci.moneysurfer.uikit.widgets.SurferBudgetItem
 import com.georgeci.moneysurfer.uikit.widgets.SurferBudgetsWidget
+import com.georgeci.moneysurfer.uikit.widgets.SurferBurnRateBar
+import com.georgeci.moneysurfer.uikit.widgets.SurferBurnRateData
+import com.georgeci.moneysurfer.uikit.widgets.SurferBurnRatePace
+import com.georgeci.moneysurfer.uikit.widgets.SurferBurnRateWidget
 import com.georgeci.moneysurfer.uikit.widgets.SurferGoalItem
 import com.georgeci.moneysurfer.uikit.widgets.SurferGoalsWidget
 import com.georgeci.moneysurfer.uikit.widgets.SurferInsightItem
@@ -46,6 +50,11 @@ import moneysurfer.feature.dashboard.generated.resources.dashboard_budgets_statu
 import moneysurfer.feature.dashboard.generated.resources.dashboard_budgets_status_over
 import moneysurfer.feature.dashboard.generated.resources.dashboard_budgets_status_warn
 import moneysurfer.feature.dashboard.generated.resources.dashboard_budgets_title
+import moneysurfer.feature.dashboard.generated.resources.dashboard_burn_rate_average
+import moneysurfer.feature.dashboard.generated.resources.dashboard_burn_rate_caption
+import moneysurfer.feature.dashboard.generated.resources.dashboard_burn_rate_on_track
+import moneysurfer.feature.dashboard.generated.resources.dashboard_burn_rate_projection
+import moneysurfer.feature.dashboard.generated.resources.dashboard_burn_rate_title
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_preview_account_cash
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_preview_account_everyday
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_preview_account_savings
@@ -108,6 +117,7 @@ internal fun DashboardWidgetPreview(
             DashboardWidgetType.Balance -> BalancePreview(cardStyle.variant, modifier.then(content))
             DashboardWidgetType.QuickActions -> QuickActionsPreview(modifier.then(content))
             DashboardWidgetType.SafeToSpend -> SafeToSpendPreview(modifier.then(content))
+            DashboardWidgetType.BurnRate -> BurnRatePreview(modifier.then(content))
             DashboardWidgetType.Budgets -> BudgetsPreview(modifier.then(content))
             DashboardWidgetType.Accounts -> AccountsPreview(modifier.then(content))
             DashboardWidgetType.Insights -> InsightsPreview(cardStyle.variant, modifier.then(content))
@@ -178,15 +188,46 @@ private fun SafeToSpendPreview(modifier: Modifier) {
 }
 
 /**
+ * Sample numbers again, for the same reason [SafeToSpendPreview] uses them: the tile is drawn for
+ * every widget in the picker, including the ones switched off, so it must not depend on there being
+ * a week of spend to read.
+ */
+@Composable
+private fun BurnRatePreview(modifier: Modifier) {
+    SurferBurnRateWidget(
+        title = stringResource(Res.string.dashboard_burn_rate_title),
+        data = SurferBurnRateData(
+            average = stringResource(Res.string.dashboard_burn_rate_average, SAMPLE_BURN_AVERAGE),
+            caption = stringResource(Res.string.dashboard_burn_rate_caption),
+            bars = SAMPLE_BURN_FRACTIONS.mapIndexed { index, fraction ->
+                SurferBurnRateBar(
+                    label = (SAMPLE_BURN_FIRST_DAY + index).toString(),
+                    fraction = fraction,
+                    isToday = index == SAMPLE_BURN_FRACTIONS.lastIndex,
+                )
+            },
+            projection = stringResource(Res.string.dashboard_burn_rate_projection, SAMPLE_BURN_PROJECTION),
+            pace = SurferBurnRatePace(
+                label = stringResource(Res.string.dashboard_burn_rate_on_track),
+                status = SurferBudgetStatus.Ok,
+            ),
+        ),
+        modifier = modifier,
+    )
+}
+
+/**
  * Sample budgets rather than the user's own, for the same reason the safe-to-spend tile uses them:
- * the picker draws every widget, including the ones with nothing behind them yet.
+ * the picker draws every widget, including the ones switched off, so it must not depend on there
+ * being a budget to read. The ids are named rather than numbered — nothing reads them back, and
+ * repeating "preview-1" across widgets is a duplicated literal for no gain.
  */
 @Composable
 private fun BudgetsPreview(modifier: Modifier) {
     SurferBudgetsWidget(
         items = listOf(
             SurferBudgetItem(
-                id = previewId("groceries"),
+                id = "preview-budget-groceries",
                 name = stringResource(Res.string.dashboard_customize_preview_transaction_groceries),
                 statusLabel = stringResource(Res.string.dashboard_budgets_status_warn),
                 status = SurferBudgetStatus.Warn,
@@ -200,7 +241,7 @@ private fun BudgetsPreview(modifier: Modifier) {
                 alertFraction = SAMPLE_BUDGET_ALERT,
             ),
             SurferBudgetItem(
-                id = previewId("rent"),
+                id = "preview-budget-rent",
                 name = stringResource(Res.string.dashboard_customize_preview_transaction_rent),
                 statusLabel = stringResource(Res.string.dashboard_budgets_status_ok),
                 status = SurferBudgetStatus.Ok,
@@ -214,7 +255,7 @@ private fun BudgetsPreview(modifier: Modifier) {
                 alertFraction = SAMPLE_BUDGET_ALERT,
             ),
             SurferBudgetItem(
-                id = previewId("coffee"),
+                id = "preview-budget-coffee",
                 name = stringResource(Res.string.dashboard_customize_preview_transaction_coffee),
                 statusLabel = stringResource(Res.string.dashboard_budgets_status_over),
                 status = SurferBudgetStatus.Over,
@@ -240,19 +281,19 @@ private fun AccountsPreview(modifier: Modifier) {
     SurferAccountsWidget(
         items = listOf(
             SurferAccountItem(
-                id = previewId("everyday"),
+                id = "preview-1",
                 name = stringResource(Res.string.dashboard_customize_preview_account_everyday),
                 subtitle = SAMPLE_CURRENCY,
                 balance = SAMPLE_ACCOUNT_ONE,
             ),
             SurferAccountItem(
-                id = previewId("savings"),
+                id = "preview-2",
                 name = stringResource(Res.string.dashboard_customize_preview_account_savings),
                 subtitle = SAMPLE_CURRENCY,
                 balance = SAMPLE_ACCOUNT_TWO,
             ),
             SurferAccountItem(
-                id = previewId("cash"),
+                id = "preview-3",
                 name = stringResource(Res.string.dashboard_customize_preview_account_cash),
                 subtitle = SAMPLE_CURRENCY,
                 balance = SAMPLE_ACCOUNT_THREE,
@@ -308,7 +349,7 @@ private fun GoalsPreview(modifier: Modifier) {
     SurferGoalsWidget(
         items = listOf(
             SurferGoalItem(
-                id = previewId("laptop"),
+                id = "preview-1",
                 name = stringResource(Res.string.dashboard_customize_preview_goal_laptop),
                 savedFormatted = SAMPLE_GOAL_SAVED,
                 targetFormatted = SAMPLE_GOAL_TARGET,
@@ -316,7 +357,7 @@ private fun GoalsPreview(modifier: Modifier) {
                 captionLine = "",
             ),
             SurferGoalItem(
-                id = previewId("trip"),
+                id = "preview-2",
                 name = stringResource(Res.string.dashboard_customize_preview_goal_trip),
                 savedFormatted = SAMPLE_TRIP_SAVED,
                 targetFormatted = SAMPLE_TRIP_TARGET,
@@ -362,12 +403,6 @@ private fun RecentTransactionsPreview(modifier: Modifier) {
     )
 }
 
-/**
- * Row id for a sample item, named after the row it belongs to. The tiles are thumbnails, so
- * nothing reads these back — the ids only have to be distinct within a widget.
- */
-private fun previewId(row: String): String = "preview-$row"
-
 private const val SAMPLE_CURRENCY = "EUR"
 private const val SAMPLE_TOTAL = "€11,575.32"
 private const val SAMPLE_TREND = "+€412"
@@ -390,6 +425,10 @@ private const val SAMPLE_SAFE_PER_DAY = "€53.52"
 private const val SAMPLE_DAYS_LEFT = 12
 private const val SAMPLE_SAFE_PROGRESS = 0.64f
 private const val SAMPLE_SAFE_PACE = 0.6f
+private const val SAMPLE_BURN_AVERAGE = "€42.10"
+private const val SAMPLE_BURN_PROJECTION = "€1,263"
+private const val SAMPLE_BURN_FIRST_DAY = 22
+private val SAMPLE_BURN_FRACTIONS = listOf(0.42f, 0.18f, 1f, 0f, 0.63f, 0.31f, 0.24f)
 private const val SAMPLE_BUDGET_SPENT = "€312.40"
 private const val SAMPLE_BUDGET_CAP = "€400.00"
 private const val SAMPLE_BUDGET_LEFT = "€87.60"
