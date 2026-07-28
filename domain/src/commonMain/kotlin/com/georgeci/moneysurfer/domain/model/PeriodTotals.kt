@@ -36,6 +36,10 @@ data class PeriodTotals(
  *
  * Period is computed from `transaction.operationAt` interpreted in [timeZone]. Inclusive on
  * both ends. Deleted transactions are absent from the local table — no extra filtering.
+ *
+ * Deriving the day here rather than reading `operationDate` disagrees with every other
+ * consumer: budgets and the DAO date windows filter on the stored business date, so a 23:30
+ * row can land in a different month depending on the caller's zone. See md/time.md.
  */
 fun calculatePeriodTotalsFromList(
     transactions: List<Transaction>,
