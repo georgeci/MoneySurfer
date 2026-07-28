@@ -14,3 +14,11 @@ val testDate: LocalDate = LocalDate(2024, 1, 1)
 class FixedClock(private val instant: Instant) : Clock {
     override fun now(): Instant = instant
 }
+
+/**
+ * A [Clock] the test moves by hand. For code that re-derives a date over time — pair it with
+ * `runTest`'s virtual clock so the delay and the reading advance together.
+ */
+class MutableClock(var instant: Instant) : Clock {
+    override fun now(): Instant = instant
+}
