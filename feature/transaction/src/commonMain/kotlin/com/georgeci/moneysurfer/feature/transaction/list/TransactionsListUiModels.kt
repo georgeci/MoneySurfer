@@ -67,6 +67,16 @@ data class TransactionRowUi(
      * carries the breakdown.
      */
     val splitCategoryCount: Int = 0,
+    /**
+     * Whether the row belongs to a receipt split across categories — true for a collapsed row and
+     * for a lone leg alike.
+     *
+     * Deliberately separate from [splitCategoryCount], which is only non-zero once a group is
+     * collapsed: a page that holds part of a group renders its legs individually, and deleting one
+     * of those still takes the whole receipt. The delete confirmation keys off this, so what the
+     * dialog promises matches what the delete does at every window size.
+     */
+    val isSplitLeg: Boolean = false,
 )
 
 data class TransactionSummaryUi(

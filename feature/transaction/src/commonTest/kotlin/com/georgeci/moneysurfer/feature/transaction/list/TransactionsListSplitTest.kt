@@ -86,6 +86,36 @@ class TransactionsListSplitTest : StringSpec({
         receipts.single().isSplit shouldBe false
     }
 
+    "a lone leg still declares itself part of a receipt, so the delete dialog can say so" {
+        runTest {
+            val env = Env(
+                transactions = listOf(
+                    leg(id = "leg-groceries", amount = 30, category = "c-food"),
+                    leg(id = "leg-chemicals", amount = 4, category = "c-home"),
+                    expense(id = "coffee", amount = 3),
+                ),
+            )
+            val viewModel = env.viewModel()
+            env.filterStore.commit(env.filterStore.filters.value.copy(minAmount = "10"))
+
+            val rows = viewModel.content().rows()
+
+            // Rendered as one leg because the page holds only one — but swiping it deletes the
+            // whole receipt, so the row has to admit it belongs to one.
+            val lone = rows.single { it.id.value == "leg-groceries" }
+            lone.splitCategoryCount shouldBe 0
+            lone.isSplitLeg shouldBe true
+        }
+    }
+
+    "an ordinary row is not a split leg" {
+        runTest {
+            val env = Env(transactions = listOf(expense(id = "coffee", amount = 3)))
+
+            env.viewModel().content().rows().single().isSplitLeg shouldBe false
+        }
+    }
+
     "a filter that matches one leg shows that leg, not the receipt" {
         runTest {
             val env = Env(

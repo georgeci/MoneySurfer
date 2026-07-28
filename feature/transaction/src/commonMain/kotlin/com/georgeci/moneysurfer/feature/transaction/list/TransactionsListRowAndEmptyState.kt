@@ -68,9 +68,9 @@ internal fun TransactionRow(
         onDelete = onDelete,
         modifier = Modifier.padding(bottom = 12.dp),
         isTransfer = row.isTransfer,
-        // A collapsed receipt is several transactions behind one row, and the swipe takes all of
-        // them — the dialog has to say that before the user agrees.
-        isSplit = row.splitCategoryCount > 0,
+        // Any leg of a receipt, not just a collapsed row: the swipe takes the whole group either
+        // way, and a page holding part of a group renders its legs individually.
+        isSplit = row.isSplitLeg,
     ) {
         TransactionLine(
             row = row,

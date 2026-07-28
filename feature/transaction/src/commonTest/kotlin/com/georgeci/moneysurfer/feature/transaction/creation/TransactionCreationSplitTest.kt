@@ -182,6 +182,83 @@ class TransactionCreationSplitTest : StringSpec({
         }
     }
 
+    "switching the type drops split categories the new type cannot use" {
+        runTest {
+            val fixture = fixture()
+            // An income category exists, so the type switch has somewhere to land.
+            fixture.categoryRepository.seed(
+                aCategory(id = categoryId("c-salary"), workspaceId = ws, type = CategoryType.INCOME),
+            )
+            val vm = fixture.createViewModel(prefillAccount = accountId("a-1"))
+            try {
+                vm.awaitContent()
+                vm.onEvent(TransactionCreationEvent.OnAmountChanged("34"))
+                vm.onEvent(TransactionCreationEvent.OnSplitToggled)
+                val first = vm.content().splitLines.first().key
+                vm.onEvent(TransactionCreationEvent.OnSplitLineAmountChanged(first, "30"))
+                vm.content().splitLines.first().category?.type shouldBe CategoryType.EXPENSE
+
+                vm.onEvent(TransactionCreationEvent.OnTypeChanged(TransactionTypeUi.Income))
+
+                // Keeping the expense category would file income under it — money the spend
+                // aggregates never see, on a category screen that would then list income.
+                vm.content().splitLines.map { it.category } shouldBe listOf(null, null)
+                // The lines and their amounts survive; only the categories are dropped.
+                vm.content().splitLines.first().amount shouldBe "30"
+                vm.content().isSaveEnabled shouldBe false
+            } finally {
+                vm.viewModelScope.cancel()
+            }
+        }
+    }
+
+    "adding a line keeps the amount the trailing line was showing" {
+        runTest {
+            val fixture = fixture()
+            val vm = fixture.createViewModel(prefillAccount = accountId("a-1"))
+            try {
+                vm.awaitContent()
+                vm.onEvent(TransactionCreationEvent.OnAmountChanged("34"))
+                vm.onEvent(TransactionCreationEvent.OnSplitToggled)
+                val first = vm.content().splitLines.first().key
+                vm.onEvent(TransactionCreationEvent.OnSplitLineAmountChanged(first, "30"))
+                // Line 2 is showing the remainder, 4.00, without storing it.
+                vm.content().splitRemainder shouldBe 4.dollars
+
+                vm.onEvent(TransactionCreationEvent.OnSplitLineAdded)
+
+                // It keeps the 4.00 the user could see rather than coming back blank and leaving a
+                // zero leg that only disables Save.
+                vm.content().splitLines[1].amount shouldBe "4"
+                vm.content().splitAmounts shouldBe listOf(30.dollars, 4.dollars, Money.zero())
+            } finally {
+                vm.viewModelScope.cancel()
+            }
+        }
+    }
+
+    "an over-assigned remainder is not pinned onto the line that loses its place" {
+        runTest {
+            val fixture = fixture()
+            val vm = fixture.createViewModel(prefillAccount = accountId("a-1"))
+            try {
+                vm.awaitContent()
+                vm.onEvent(TransactionCreationEvent.OnAmountChanged("10"))
+                vm.onEvent(TransactionCreationEvent.OnSplitToggled)
+                val first = vm.content().splitLines.first().key
+                vm.onEvent(TransactionCreationEvent.OnSplitLineAmountChanged(first, "12"))
+
+                vm.onEvent(TransactionCreationEvent.OnSplitLineAdded)
+
+                // Storing the negative remainder would come back through abs() as +2.00 — a figure
+                // the user never entered.
+                vm.content().splitLines[1].amount shouldBe ""
+            } finally {
+                vm.viewModelScope.cancel()
+            }
+        }
+    }
+
     "picking a category for a line leaves the form's own category alone" {
         runTest {
             val fixture = fixture()

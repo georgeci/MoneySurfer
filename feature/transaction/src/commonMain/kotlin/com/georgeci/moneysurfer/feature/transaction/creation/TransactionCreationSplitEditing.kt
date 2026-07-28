@@ -32,9 +32,28 @@ internal fun TransactionCreationState.Content.withSplitToggled(
     )
 }
 
+/**
+ * Appends a line, keeping the figure the previous last line was showing.
+ *
+ * The trailing line renders the remainder and is read-only, so it never stores what it displays.
+ * Without this the line demoted by the new one would come back blank — the amount the user could
+ * see a moment ago would silently move to the new line and leave a zero leg behind that only
+ * disables Save, with nothing on screen pointing at it. An over-assigned remainder is not pinned:
+ * it is negative, the editor is already reporting that, and storing it would flip its sign.
+ */
 internal fun TransactionCreationState.Content.withSplitLineAdded(
     key: Int,
-): TransactionCreationState.Content = copy(splitLines = splitLines + TransactionSplitLineUi(key = key))
+): TransactionCreationState.Content {
+    val remainder = splitRemainder
+    val pinned = splitLines.mapIndexed { index, line ->
+        if (index == splitLines.lastIndex && remainder.isPositive()) {
+            line.copy(amount = remainder.toAmountInput())
+        } else {
+            line
+        }
+    }
+    return copy(splitLines = pinned + TransactionSplitLineUi(key = key))
+}
 
 /**
  * Removes one line, and closes the editor when fewer than [MIN_SPLIT_LINES] are left: a single line

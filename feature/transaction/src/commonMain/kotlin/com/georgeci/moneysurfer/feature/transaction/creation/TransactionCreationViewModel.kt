@@ -207,6 +207,15 @@ class TransactionCreationViewModel(
             ),
             fromAccount = if (nextType == TransactionTypeUi.Transfer) seededFrom else content.fromAccount,
             toAccount = if (nextType == TransactionTypeUi.Transfer) seededTo else content.toAccount,
+            // The split editor's lines carry categories of the *old* type, and every category
+            // belongs to one side. Keeping them would write income legs filed under expense
+            // categories — money the spend aggregates (which filter on `type = 'EXPENSE'`) would
+            // never see, under a category whose own screen would then list income. The lines and
+            // their amounts survive; only a category the new type cannot use is dropped, which
+            // leaves Save disabled until the user picks a replacement.
+            splitLines = content.splitLines.map { line ->
+                line.copy(category = line.category?.takeIf { it.type == nextCategoryType })
+            },
         )
     }
 

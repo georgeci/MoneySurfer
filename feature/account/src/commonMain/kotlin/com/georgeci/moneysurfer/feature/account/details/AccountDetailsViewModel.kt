@@ -162,6 +162,7 @@ class AccountDetailsViewModel(
         isExpense = type == TransactionType.EXPENSE,
         categoryHueSeed = categoryId?.value.orEmpty(),
         isTransfer = transferId != null,
+        isSplitLeg = splitId != null,
     )
 }
 
@@ -215,6 +216,12 @@ data class AccountTransactionUi(
     val categoryHueSeed: String,
     /** One leg of a transfer, which deleting takes down together with its sibling. */
     val isTransfer: Boolean = false,
+    /**
+     * One leg of a receipt split across categories. This screen deliberately lists the legs
+     * separately — a leg is its own row under its own category here — but deleting one still takes
+     * the whole receipt, so the confirmation has to say so.
+     */
+    val isSplitLeg: Boolean = false,
 )
 
 sealed interface AccountDetailsEvent {

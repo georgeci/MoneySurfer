@@ -7,6 +7,7 @@ import com.georgeci.moneysurfer.domain.fixtures.aTransaction
 import com.georgeci.moneysurfer.domain.fixtures.accountId
 import com.georgeci.moneysurfer.domain.fixtures.anAccount
 import com.georgeci.moneysurfer.domain.fixtures.dollars
+import com.georgeci.moneysurfer.domain.fixtures.splitId
 import com.georgeci.moneysurfer.domain.fixtures.transactionId
 import com.georgeci.moneysurfer.domain.model.Account
 import com.georgeci.moneysurfer.domain.model.CategorizedTransaction
@@ -155,6 +156,22 @@ class TransactionFiltersViewModelTest : StringSpec({
         }
     }
 
+    "the result count promises rows the list will render, so a receipt counts once" {
+        runTest {
+            val receipt = splitId("sp-1")
+            val env = Env(
+                transactions = listOf(
+                    expense(id = "rent", amount = 900),
+                    expense(id = "leg-groceries", amount = 30).copy(splitId = receipt),
+                    expense(id = "leg-chemicals", amount = 4).copy(splitId = receipt),
+                ),
+            )
+
+            // Three rows in storage, two lines on the screen the button leads back to.
+            env.viewModel().currentState.resultCount shouldBe 2
+        }
+    }
+
     "an account-scoped screen hides the account picker" {
         runTest {
             val env = Env()
@@ -242,7 +259,15 @@ private class WindowedTransactions(transactions: List<Transaction>) : Transactio
         all.filter { it.operationDate in window }
             .filter { accountId == null || it.accountId == accountId }
             .take(limit)
-            .map { CategorizedTransaction(transaction = it, categoryName = "Groceries") }
+            .map { row ->
+                CategorizedTransaction(
+                    transaction = row,
+                    categoryName = "Groceries",
+                    // What the DAO's correlated subquery reports: the group's size in the whole
+                    // table, so a page holding part of a group can be told apart from a whole one.
+                    splitLegCount = all.count { it.splitId != null && it.splitId == row.splitId },
+                )
+            }
     }
 
     override fun getTotals(

@@ -140,6 +140,7 @@ class CategoryDetailsViewModel(
         isExpense = type == TransactionType.EXPENSE,
         categoryHueSeed = categoryId?.value.orEmpty(),
         isTransfer = transferId != null,
+        isSplitLeg = splitId != null,
     )
 
     private companion object {
@@ -221,6 +222,12 @@ data class CategoryTransactionUi(
     val categoryHueSeed: String,
     /** One leg of a transfer, which deleting takes down together with its sibling. */
     val isTransfer: Boolean = false,
+    /**
+     * One leg of a receipt split across categories. The legs are listed separately here — that is
+     * the point of a category screen — but deleting one takes the whole receipt, so the
+     * confirmation has to say so.
+     */
+    val isSplitLeg: Boolean = false,
 )
 
 sealed interface CategoryDetailsEvent {

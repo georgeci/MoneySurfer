@@ -199,6 +199,25 @@ class CategoryDetailsViewModelTest : StringSpec({
         content.transactions.map { it.title } shouldBe listOf("Market", "Bakery")
     }
 
+    "a leg of a split is flagged, because swiping it deletes the whole receipt" {
+        val food = aCategory(id = categoryId("food"), name = "Food")
+        val env = Env(
+            categories = listOf(food),
+            transactions = listOf(
+                aTransaction(id = transactionId("t-1"), categoryId = food.id, note = "Market")
+                    .copy(splitId = SplitId("sp-1")),
+                aTransaction(id = transactionId("t-2"), categoryId = food.id, note = "Bus"),
+            ),
+        )
+
+        val content = env.newViewModel(food.id).content()
+
+        // This screen lists the legs separately on purpose — a leg is its own row under its own
+        // category — but the delete is group-aware, so the confirmation has to be able to say so.
+        content.transactions.single { it.id == transactionId("t-1") }.isSplitLeg shouldBe true
+        content.transactions.single { it.id == transactionId("t-2") }.isSplitLeg shouldBe false
+    }
+
     "swiping a transaction away removes it, and the snackbar's Undo puts it back" {
         runTest {
             val food = aCategory(id = categoryId("food"), name = "Food")

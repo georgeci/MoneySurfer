@@ -112,6 +112,7 @@ private fun ListReceipt.toRow(accountNames: Map<AccountId, String>): Transaction
         // category count, which is the one thing the row can say truthfully about all of them.
         subtitle = primary.categoryName.orEmpty(),
         splitCategoryCount = if (isSplit) categoryCount else 0,
+        isSplitLeg = transaction.splitId != null,
         accountName = accountNames[transaction.accountId].orEmpty(),
         formattedAmount = MoneyFormatter.format(total, transaction.currencyCode),
         isExpense = transaction.type == TransactionType.EXPENSE,
