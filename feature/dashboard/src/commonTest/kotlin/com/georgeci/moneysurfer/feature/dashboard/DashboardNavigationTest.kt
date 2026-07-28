@@ -1,6 +1,7 @@
 package com.georgeci.moneysurfer.feature.dashboard
 
 import com.georgeci.moneysurfer.domain.fixtures.accountId
+import com.georgeci.moneysurfer.domain.fixtures.budgetId
 import com.georgeci.moneysurfer.domain.fixtures.goalId
 import com.georgeci.moneysurfer.domain.fixtures.transactionId
 import io.kotest.assertions.withClue
@@ -21,6 +22,7 @@ class DashboardNavigationTest : StringSpec({
         val account = accountId("a-1")
         val transaction = transactionId("t-1")
         val goal = goalId("g-1")
+        val budget = budgetId("b-1")
 
         val cases = listOf(
             DashboardEffect.NavigateToAccountDetails(account) to "accountDetails:${account.value}",
@@ -37,6 +39,8 @@ class DashboardNavigationTest : StringSpec({
             DashboardEffect.NavigateToGoals to "goals",
             DashboardEffect.NavigateToGoalDetails(goal) to "goalDetails:${goal.value}",
             DashboardEffect.NavigateToBudgetCreation to "budgetCreation",
+            DashboardEffect.NavigateToBudgets to "budgets",
+            DashboardEffect.NavigateToBudgetDetails(budget) to "budgetDetails:${budget.value}",
         )
 
         cases.forEach { (effect, expected) ->
@@ -61,4 +65,6 @@ private fun recordingNavigation(visited: MutableList<String>) = DashboardNavigat
     onNavigateToGoals = { visited += "goals" },
     onNavigateToGoalDetails = { id -> visited += "goalDetails:${id.value}" },
     onNavigateToBudgetCreation = { visited += "budgetCreation" },
+    onNavigateToBudgets = { visited += "budgets" },
+    onNavigateToBudgetDetails = { id -> visited += "budgetDetails:${id.value}" },
 )

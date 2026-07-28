@@ -64,6 +64,7 @@ import com.georgeci.moneysurfer.domain.repositories.TransactionRepository
 import com.georgeci.moneysurfer.domain.usecase.ConvertAccountsTotalUseCase
 import com.georgeci.moneysurfer.domain.usecase.GenerateInsightsUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetAccountsUseCase
+import com.georgeci.moneysurfer.domain.usecase.GetActiveBudgetProgressUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetBudgetProgressUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetBudgetsUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetBurnRateUseCase
@@ -170,6 +171,7 @@ class DashboardViewModelTest : StringSpec({
             DashboardWidgetType.QuickActions,
             DashboardWidgetType.SafeToSpend,
             DashboardWidgetType.BurnRate,
+            DashboardWidgetType.Budgets,
             DashboardWidgetType.Accounts,
             DashboardWidgetType.Insights,
             DashboardWidgetType.RecentTransactions,
@@ -257,6 +259,126 @@ class DashboardViewModelTest : StringSpec({
         )
 
         viewModel.value.shouldBeInstanceOf<DashboardState.Content>().safeToSpend shouldBe null
+    }
+
+    "the budgets widget reads spend, limit and remainder off the active budget" {
+        val ws = workspaceId("ws-1")
+        val account = anAccount(id = accountId("a-1"), workspaceId = ws)
+        val spend = aTransaction(
+            id = transactionId("tx-1"),
+            workspaceId = ws,
+            accountId = account.id,
+            type = TransactionType.EXPENSE,
+            money = 100.dollars,
+            currencyCode = USD,
+            operationDate = testDate,
+        )
+        val viewModel = newViewModel(
+            ws = ws,
+            accounts = FakeAccountRepository(listOf(account)),
+            transactions = FakeTransactionRepository(listOf(spend)),
+            budgets = listOf(
+                aBudget(workspaceId = ws, amount = 400.dollars, categoryIds = emptyList(), startDate = testDate),
+            ),
+        )
+
+        val budgets = viewModel.value.shouldBeInstanceOf<DashboardState.Content>().budgets
+        budgets.size shouldBe 1
+        budgets.first().name shouldBe "Groceries"
+        budgets.first().spentFormatted shouldBe MoneyFormatter.format(100.dollars, USD)
+        budgets.first().limitFormatted shouldBe MoneyFormatter.format(400.dollars, USD)
+        budgets.first().remainderFormatted shouldBe MoneyFormatter.format(300.dollars, USD)
+        budgets.first().progress shouldBe 0.25f
+        // The fixture alerts at 80 %, which is where the bar's tick belongs.
+        budgets.first().alertFraction shouldBe 0.8f
+        budgets.first().status shouldBe BudgetStatus.OK
+        budgets.first().isOver shouldBe false
+    }
+
+    "an overspent budget keeps a positive remainder and says it is over" {
+        val ws = workspaceId("ws-1")
+        val account = anAccount(id = accountId("a-1"), workspaceId = ws)
+        val spend = aTransaction(
+            id = transactionId("tx-1"),
+            workspaceId = ws,
+            accountId = account.id,
+            type = TransactionType.EXPENSE,
+            money = 120.dollars,
+            currencyCode = USD,
+            operationDate = testDate,
+        )
+        val viewModel = newViewModel(
+            ws = ws,
+            accounts = FakeAccountRepository(listOf(account)),
+            transactions = FakeTransactionRepository(listOf(spend)),
+            budgets = listOf(
+                aBudget(workspaceId = ws, amount = 100.dollars, categoryIds = emptyList(), startDate = testDate),
+            ),
+        )
+
+        val budget = viewModel.value.shouldBeInstanceOf<DashboardState.Content>().budgets.first()
+        // The sign lives in isOver — the row prints "20 over", never a negative remainder.
+        budget.remainderFormatted shouldBe MoneyFormatter.format(20.dollars, USD)
+        budget.isOver shouldBe true
+        budget.status shouldBe BudgetStatus.OVER
+        budget.progress shouldBe 1.2f
+    }
+
+    "the budgets widget lists the budgets nearest their limit first, capped at three" {
+        val ws = workspaceId("ws-1")
+        val account = anAccount(id = accountId("a-1"), workspaceId = ws)
+        val spend = aTransaction(
+            id = transactionId("tx-1"),
+            workspaceId = ws,
+            accountId = account.id,
+            type = TransactionType.EXPENSE,
+            money = 100.dollars,
+            currencyCode = USD,
+            operationDate = testDate,
+        )
+        // One spend of 100 against four general budgets: the smaller the cap, the tighter the budget.
+        val viewModel = newViewModel(
+            ws = ws,
+            accounts = FakeAccountRepository(listOf(account)),
+            transactions = FakeTransactionRepository(listOf(spend)),
+            budgets = listOf(
+                budgetOf(ws, "b-loose", "Loose", 1000.dollars),
+                budgetOf(ws, "b-tight", "Tight", 100.dollars),
+                budgetOf(ws, "b-roomy", "Roomy", 500.dollars),
+                budgetOf(ws, "b-snug", "Snug", 200.dollars),
+            ),
+        )
+
+        val budgets = viewModel.value.shouldBeInstanceOf<DashboardState.Content>().budgets
+        budgets.map { it.name } shouldContainExactly listOf("Tight", "Snug", "Roomy")
+    }
+
+    "archived budgets never reach the budgets widget" {
+        val ws = workspaceId("ws-1")
+        val viewModel = newViewModel(
+            ws = ws,
+            accounts = FakeAccountRepository(listOf(anAccount(id = accountId("a-1"), workspaceId = ws))),
+            transactions = FakeTransactionRepository(emptyList()),
+            budgets = listOf(
+                aBudget(id = budgetId("b-archived"), workspaceId = ws, isActive = false, startDate = testDate),
+            ),
+        )
+
+        viewModel.value.shouldBeInstanceOf<DashboardState.Content>().budgets.shouldBeEmpty()
+    }
+
+    "tapping a budget row opens that budget, not the list" {
+        val ws = workspaceId("ws-1")
+        val viewModel = newViewModel(
+            ws = ws,
+            accounts = FakeAccountRepository(listOf(anAccount(id = accountId("a-1"), workspaceId = ws))),
+            transactions = FakeTransactionRepository(emptyList()),
+        )
+
+        viewModel.onEvent(DashboardEvent.OnBudgetClick(budgetId("b-1")))
+
+        viewModel.sideEffects.effectFlow.first() shouldBe
+            DashboardEffect.NavigateToBudgetDetails(budgetId("b-1"))
     }
 
     "the burn rate formats the week's pace and the projection it implies" {
@@ -660,6 +782,16 @@ class DashboardViewModelTest : StringSpec({
     }
 })
 
+/** A general budget — no category filter, so every expense in the workspace counts against it. */
+private fun budgetOf(ws: WorkspaceId, id: String, name: String, amount: Money) = aBudget(
+    id = budgetId(id),
+    workspaceId = ws,
+    name = name,
+    amount = amount,
+    categoryIds = emptyList(),
+    startDate = testDate,
+)
+
 /** Mid-month, so the comparison rules are past their minimum-sample guard. */
 private val INSIGHTS_TODAY = LocalDate(2026, 7, 15)
 
@@ -692,15 +824,18 @@ private fun newViewModel(
 ): DashboardViewModel {
     val session = InMemorySessionPointers(currentWorkspaceId = ws)
     val workspaces = FakeGoalWorkspaceRepository(listOf(aWorkspace(id = ws, baseCurrency = baseCurrency)))
+    // One instance for both readers: the headline is a projection of the rows' own progress list.
+    val activeBudgetProgress = GetActiveBudgetProgressUseCase(
+        getBudgets = GetBudgetsUseCase(FakeBudgetRepository(budgets), session),
+        getBudgetProgress = GetBudgetProgressUseCase(transactions, workspaces, clock),
+    )
     return DashboardViewModel(
         getAccounts = GetAccountsUseCase(accounts, session),
         getRecentTransactions = GetRecentTransactionsUseCase(transactions, session),
         getGoals = GetGoalsUseCase(goals, FakeGoalContributionRepository(), session),
         getExchangeRates = GetExchangeRatesUseCase(session, workspaces, rates),
-        getSafeToSpend = GetSafeToSpendUseCase(
-            getBudgets = GetBudgetsUseCase(FakeBudgetRepository(budgets), session),
-            getBudgetProgress = GetBudgetProgressUseCase(transactions, workspaces, clock),
-        ),
+        getSafeToSpend = GetSafeToSpendUseCase(activeBudgetProgress),
+        getActiveBudgetProgress = activeBudgetProgress,
         getBurnRate = GetBurnRateUseCase(
             getDailySpendSeries = GetDailySpendSeriesUseCase(spendAnalytics, workspaces, session, clock),
             getBudgets = GetBudgetsUseCase(FakeBudgetRepository(budgets), session),

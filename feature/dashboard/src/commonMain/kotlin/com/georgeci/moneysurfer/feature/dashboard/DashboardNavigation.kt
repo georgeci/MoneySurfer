@@ -2,6 +2,7 @@ package com.georgeci.moneysurfer.feature.dashboard
 
 import androidx.compose.runtime.Composable
 import com.georgeci.moneysurfer.domain.primitives.AccountId
+import com.georgeci.moneysurfer.domain.primitives.BudgetId
 import com.georgeci.moneysurfer.domain.primitives.GoalId
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.utils.HandleSideEffect
@@ -24,6 +25,8 @@ data class DashboardNavigation(
     val onNavigateToGoals: () -> Unit,
     val onNavigateToGoalDetails: (GoalId) -> Unit,
     val onNavigateToBudgetCreation: () -> Unit,
+    val onNavigateToBudgets: () -> Unit,
+    val onNavigateToBudgetDetails: (BudgetId) -> Unit,
 )
 
 /**
@@ -34,6 +37,11 @@ data class DashboardNavigation(
  * limit; and a mis-wired branch here sends the user to the wrong screen, which is worth a test —
  * one that needs no composition, no lifecycle and no view model to run.
  */
+// One straight-line branch per destination — flat, exhaustive, and checked by the compiler. Its
+// "complexity" is the number of places the dashboard can reach, not tangled logic; grouping the
+// branches behind nested types to please the metric would cost exactly the readability the flat
+// table buys. Same call as `SettingsScreen`.
+@Suppress("CyclomaticComplexMethod")
 internal fun DashboardNavigation.navigate(effect: DashboardEffect) {
     when (effect) {
         is DashboardEffect.NavigateToAccountDetails -> onNavigateToAccountDetails(effect.accountId)
@@ -48,6 +56,8 @@ internal fun DashboardNavigation.navigate(effect: DashboardEffect) {
         DashboardEffect.NavigateToGoals -> onNavigateToGoals()
         is DashboardEffect.NavigateToGoalDetails -> onNavigateToGoalDetails(effect.goalId)
         DashboardEffect.NavigateToBudgetCreation -> onNavigateToBudgetCreation()
+        DashboardEffect.NavigateToBudgets -> onNavigateToBudgets()
+        is DashboardEffect.NavigateToBudgetDetails -> onNavigateToBudgetDetails(effect.budgetId)
     }
 }
 

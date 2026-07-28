@@ -28,6 +28,7 @@ enum class DashboardWidgetType(val isPeriodScoped: Boolean = false) {
      * See `md/insights.md` Phase 2.
      */
     BurnRate,
+    Budgets,
     Accounts,
 
     /**

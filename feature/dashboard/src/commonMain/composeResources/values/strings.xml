@@ -14,6 +14,7 @@
     <string name="dashboard_customize_widget_quick_actions">Quick actions</string>
     <string name="dashboard_customize_widget_safe_to_spend">Safe to spend</string>
     <string name="dashboard_customize_widget_burn_rate">Burn rate</string>
+    <string name="dashboard_customize_widget_budgets">Budgets</string>
     <string name="dashboard_customize_widget_accounts">Accounts</string>
     <string name="dashboard_customize_widget_goals">Goals</string>
     <string name="dashboard_customize_widget_recent">Recent transactions</string>
@@ -79,6 +80,12 @@
     <string name="dashboard_budgets_see_all">See all</string>
     <string name="dashboard_budgets_empty_title">No budgets yet</string>
     <string name="dashboard_budgets_empty_subtitle">Set a cap on a category to start tracking.</string>
+    <string name="dashboard_budgets_spent_of">%1$s of %2$s</string>
+    <string name="dashboard_budgets_left">%1$s left</string>
+    <string name="dashboard_budgets_over">%1$s over</string>
+    <string name="dashboard_budgets_status_ok">On track</string>
+    <string name="dashboard_budgets_status_warn">Near limit</string>
+    <string name="dashboard_budgets_status_over">Over</string>
     <string name="dashboard_goals_title">Goals</string>
     <string name="dashboard_goals_see_all">See all</string>
     <string name="dashboard_goals_empty_title">No goals yet</string>

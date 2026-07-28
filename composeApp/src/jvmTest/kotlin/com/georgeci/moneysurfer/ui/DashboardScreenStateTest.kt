@@ -8,13 +8,18 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.v2.runComposeUiTest
+import com.georgeci.moneysurfer.domain.dashboard.DashboardCardStyle
 import com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutConfig
+import com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutItem
 import com.georgeci.moneysurfer.domain.dashboard.DashboardPeriod
+import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetSize
 import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetType
 import com.georgeci.moneysurfer.domain.model.BudgetStatus
 import com.georgeci.moneysurfer.domain.model.BurnRatePace
 import com.georgeci.moneysurfer.domain.primitives.AccountId
+import com.georgeci.moneysurfer.domain.primitives.BudgetId
 import com.georgeci.moneysurfer.feature.dashboard.AccountUi
+import com.georgeci.moneysurfer.feature.dashboard.BudgetSummaryUi
 import com.georgeci.moneysurfer.feature.dashboard.BurnRateDayUi
 import com.georgeci.moneysurfer.feature.dashboard.BurnRateUi
 import com.georgeci.moneysurfer.feature.dashboard.DashboardContent
@@ -243,6 +248,96 @@ class DashboardScreenStateTest : StringSpec({
             onNodeWithText("Off pace").assertDoesNotExist()
         }
     }
+    "the budgets widget draws a row per budget, with its status and what is left" {
+        runComposeUiTest {
+            setContent {
+                DashboardContent(
+                    state = budgetsOnly(
+                        listOf(
+                            budgetUi(),
+                            budgetUi(
+                                id = "b-2",
+                                name = "Transport",
+                                status = BudgetStatus.OK,
+                                spent = "€120.00",
+                                limit = "€300.00",
+                                remainder = "€180.00",
+                            ),
+                        ),
+                    ),
+                    onEvent = {},
+                )
+            }
+
+            onNodeWithTag(DashboardTestTags.Budgets).assertIsDisplayed()
+            onNodeWithText(BUDGET_NAME).assertIsDisplayed()
+            onNodeWithText("Transport").assertIsDisplayed()
+            onNodeWithText("$BUDGET_SPENT of $BUDGET_LIMIT").assertIsDisplayed()
+            onNodeWithText("$BUDGET_REMAINDER left").assertIsDisplayed()
+            onNodeWithText("Near limit").assertIsDisplayed()
+        }
+    }
+
+    "a compact budgets card keeps only the most pressing budget" {
+        runComposeUiTest {
+            setContent {
+                DashboardContent(
+                    state = budgetsOnly(
+                        listOf(budgetUi(), budgetUi(id = "b-2", name = "Transport")),
+                        size = DashboardWidgetSize.Compact,
+                    ),
+                    onEvent = {},
+                )
+            }
+
+            // The card is one row tall at this size; the rest of the list is behind "See all".
+            onNodeWithText(BUDGET_NAME).assertIsDisplayed()
+            onNodeWithText("Transport").assertDoesNotExist()
+        }
+    }
+
+    "an overspent budget row says how far over it is, not how much is left" {
+        runComposeUiTest {
+            setContent {
+                DashboardContent(
+                    state = budgetsOnly(listOf(budgetUi(status = BudgetStatus.OVER, progress = 1.14f))),
+                    onEvent = {},
+                )
+            }
+
+            onNodeWithText("$BUDGET_REMAINDER over").assertIsDisplayed()
+            onNodeWithText("Over").assertIsDisplayed()
+        }
+    }
+
+    "with no budgets the card still draws, pointing at the budgets screen" {
+        runComposeUiTest {
+            val events = mutableListOf<DashboardEvent>()
+            setContent {
+                DashboardContent(state = budgetsOnly(emptyList()), onEvent = { events += it })
+            }
+
+            onNodeWithText("No budgets yet").assertIsDisplayed()
+            onNodeWithTag(DashboardTestTags.BudgetsSeeAll).performClick()
+            waitForIdle()
+
+            events shouldContainExactly listOf(DashboardEvent.OnSeeAllBudgetsClick)
+        }
+    }
+
+    "tapping a budget row asks for that budget" {
+        runComposeUiTest {
+            val events = mutableListOf<DashboardEvent>()
+            setContent {
+                DashboardContent(state = budgetsOnly(listOf(budgetUi())), onEvent = { events += it })
+            }
+
+            onNodeWithText(BUDGET_NAME).performClick()
+            waitForIdle()
+
+            events shouldContainExactly listOf(DashboardEvent.OnBudgetClick(BudgetId("b-1")))
+        }
+    }
 })
 
 private const val ADD_TRANSACTION = "Add transaction"
@@ -279,6 +374,46 @@ private fun burnRateUi(pace: BurnRatePace? = null) = BurnRateUi(
         BurnRateDayUi(dayOfMonth = 22 + index, fraction = index / 6f, isToday = index == 6)
     },
     pace = pace,
+)
+
+private const val BUDGET_NAME = "Groceries"
+private const val BUDGET_SPENT = "€312.40"
+private const val BUDGET_LIMIT = "€400.00"
+private const val BUDGET_REMAINDER = "€87.60"
+
+private fun budgetUi(
+    id: String = "b-1",
+    name: String = BUDGET_NAME,
+    status: BudgetStatus = BudgetStatus.WARN,
+    progress: Float = 0.78f,
+    spent: String = BUDGET_SPENT,
+    limit: String = BUDGET_LIMIT,
+    remainder: String = BUDGET_REMAINDER,
+) = BudgetSummaryUi(
+    id = BudgetId(id),
+    name = name,
+    spentFormatted = spent,
+    limitFormatted = limit,
+    remainderFormatted = remainder,
+    progress = progress,
+    alertFraction = 0.8f,
+    status = status,
+)
+
+/**
+ * A dashboard showing nothing but the budgets card, so the assertions are about that card rather
+ * than about how far down the column it lands in a desktop window.
+ */
+private fun budgetsOnly(
+    budgets: List<BudgetSummaryUi>,
+    size: DashboardWidgetSize = DashboardWidgetSize.Expanded,
+) = contentWith(accounts = 2, transferEnabled = true).copy(
+    budgets = budgets,
+    layout = DashboardLayoutConfig(
+        items = listOf(
+            DashboardLayoutItem(DashboardWidgetType.Budgets, cardStyle = DashboardCardStyle(size)),
+        ),
+    ),
 )
 
 private fun contentWith(accounts: Int, transferEnabled: Boolean) = DashboardState.Content(

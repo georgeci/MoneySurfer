@@ -351,6 +351,7 @@ private fun DashboardWidgetType.icon(): ImageVector = when (this) {
     DashboardWidgetType.QuickActions -> SurferIcons.Bolt
     DashboardWidgetType.SafeToSpend -> SurferIcons.Cash
     DashboardWidgetType.BurnRate -> SurferIcons.Clock
+    DashboardWidgetType.Budgets -> SurferIcons.Category
     DashboardWidgetType.Accounts -> SurferIcons.Bank
     DashboardWidgetType.Insights -> SurferIcons.Sparkle
     DashboardWidgetType.Goals -> SurferIcons.Savings

@@ -19,6 +19,8 @@ import com.georgeci.moneysurfer.uikit.widgets.SurferAddAccountCta
 import com.georgeci.moneysurfer.uikit.widgets.SurferBalanceFootnote
 import com.georgeci.moneysurfer.uikit.widgets.SurferBalanceVariant
 import com.georgeci.moneysurfer.uikit.widgets.SurferBalanceWidget
+import com.georgeci.moneysurfer.uikit.widgets.SurferBudgetItem
+import com.georgeci.moneysurfer.uikit.widgets.SurferBudgetsWidget
 import com.georgeci.moneysurfer.uikit.widgets.SurferBurnRateBar
 import com.georgeci.moneysurfer.uikit.widgets.SurferBurnRateData
 import com.georgeci.moneysurfer.uikit.widgets.SurferBurnRatePace
@@ -40,6 +42,14 @@ import moneysurfer.feature.dashboard.generated.resources.dashboard_accounts_mana
 import moneysurfer.feature.dashboard.generated.resources.dashboard_add_account
 import moneysurfer.feature.dashboard.generated.resources.dashboard_add_transaction
 import moneysurfer.feature.dashboard.generated.resources.dashboard_balance_title
+import moneysurfer.feature.dashboard.generated.resources.dashboard_budgets_left
+import moneysurfer.feature.dashboard.generated.resources.dashboard_budgets_over
+import moneysurfer.feature.dashboard.generated.resources.dashboard_budgets_see_all
+import moneysurfer.feature.dashboard.generated.resources.dashboard_budgets_spent_of
+import moneysurfer.feature.dashboard.generated.resources.dashboard_budgets_status_ok
+import moneysurfer.feature.dashboard.generated.resources.dashboard_budgets_status_over
+import moneysurfer.feature.dashboard.generated.resources.dashboard_budgets_status_warn
+import moneysurfer.feature.dashboard.generated.resources.dashboard_budgets_title
 import moneysurfer.feature.dashboard.generated.resources.dashboard_burn_rate_average
 import moneysurfer.feature.dashboard.generated.resources.dashboard_burn_rate_caption
 import moneysurfer.feature.dashboard.generated.resources.dashboard_burn_rate_on_track
@@ -108,6 +118,7 @@ internal fun DashboardWidgetPreview(
             DashboardWidgetType.QuickActions -> QuickActionsPreview(modifier.then(content))
             DashboardWidgetType.SafeToSpend -> SafeToSpendPreview(modifier.then(content))
             DashboardWidgetType.BurnRate -> BurnRatePreview(modifier.then(content))
+            DashboardWidgetType.Budgets -> BudgetsPreview(modifier.then(content))
             DashboardWidgetType.Accounts -> AccountsPreview(modifier.then(content))
             DashboardWidgetType.Insights -> InsightsPreview(cardStyle.variant, modifier.then(content))
             DashboardWidgetType.Goals -> GoalsPreview(modifier.then(content))
@@ -201,6 +212,66 @@ private fun BurnRatePreview(modifier: Modifier) {
                 status = SurferBudgetStatus.Ok,
             ),
         ),
+        modifier = modifier,
+    )
+}
+
+/**
+ * Sample budgets rather than the user's own, for the same reason the safe-to-spend tile uses them:
+ * the picker draws every widget, including the ones switched off, so it must not depend on there
+ * being a budget to read. The ids are named rather than numbered — nothing reads them back, and
+ * repeating "preview-1" across widgets is a duplicated literal for no gain.
+ */
+@Composable
+private fun BudgetsPreview(modifier: Modifier) {
+    SurferBudgetsWidget(
+        items = listOf(
+            SurferBudgetItem(
+                id = "preview-budget-groceries",
+                name = stringResource(Res.string.dashboard_customize_preview_transaction_groceries),
+                statusLabel = stringResource(Res.string.dashboard_budgets_status_warn),
+                status = SurferBudgetStatus.Warn,
+                spentOfLimit = stringResource(
+                    Res.string.dashboard_budgets_spent_of,
+                    SAMPLE_BUDGET_SPENT,
+                    SAMPLE_BUDGET_CAP,
+                ),
+                remaining = stringResource(Res.string.dashboard_budgets_left, SAMPLE_BUDGET_LEFT),
+                progress = SAMPLE_BUDGET_PROGRESS,
+                alertFraction = SAMPLE_BUDGET_ALERT,
+            ),
+            SurferBudgetItem(
+                id = "preview-budget-rent",
+                name = stringResource(Res.string.dashboard_customize_preview_transaction_rent),
+                statusLabel = stringResource(Res.string.dashboard_budgets_status_ok),
+                status = SurferBudgetStatus.Ok,
+                spentOfLimit = stringResource(
+                    Res.string.dashboard_budgets_spent_of,
+                    SAMPLE_RENT_SPENT,
+                    SAMPLE_RENT_CAP,
+                ),
+                remaining = stringResource(Res.string.dashboard_budgets_left, SAMPLE_RENT_LEFT),
+                progress = SAMPLE_RENT_PROGRESS,
+                alertFraction = SAMPLE_BUDGET_ALERT,
+            ),
+            SurferBudgetItem(
+                id = "preview-budget-coffee",
+                name = stringResource(Res.string.dashboard_customize_preview_transaction_coffee),
+                statusLabel = stringResource(Res.string.dashboard_budgets_status_over),
+                status = SurferBudgetStatus.Over,
+                spentOfLimit = stringResource(
+                    Res.string.dashboard_budgets_spent_of,
+                    SAMPLE_COFFEE_SPENT,
+                    SAMPLE_COFFEE_CAP,
+                ),
+                remaining = stringResource(Res.string.dashboard_budgets_over, SAMPLE_COFFEE_OVER),
+                progress = SAMPLE_COFFEE_PROGRESS,
+                alertFraction = SAMPLE_BUDGET_ALERT,
+            ),
+        ),
+        title = stringResource(Res.string.dashboard_budgets_title),
+        seeAllLabel = stringResource(Res.string.dashboard_budgets_see_all),
+        onSeeAllClick = {},
         modifier = modifier,
     )
 }
@@ -358,3 +429,16 @@ private const val SAMPLE_BURN_AVERAGE = "€42.10"
 private const val SAMPLE_BURN_PROJECTION = "€1,263"
 private const val SAMPLE_BURN_FIRST_DAY = 22
 private val SAMPLE_BURN_FRACTIONS = listOf(0.42f, 0.18f, 1f, 0f, 0.63f, 0.31f, 0.24f)
+private const val SAMPLE_BUDGET_SPENT = "€312.40"
+private const val SAMPLE_BUDGET_CAP = "€400.00"
+private const val SAMPLE_BUDGET_LEFT = "€87.60"
+private const val SAMPLE_BUDGET_PROGRESS = 0.78f
+private const val SAMPLE_BUDGET_ALERT = 0.8f
+private const val SAMPLE_RENT_SPENT = "€760.00"
+private const val SAMPLE_RENT_CAP = "€1,200.00"
+private const val SAMPLE_RENT_LEFT = "€440.00"
+private const val SAMPLE_RENT_PROGRESS = 0.63f
+private const val SAMPLE_COFFEE_SPENT = "€68.40"
+private const val SAMPLE_COFFEE_CAP = "€60.00"
+private const val SAMPLE_COFFEE_OVER = "€8.40"
+private const val SAMPLE_COFFEE_PROGRESS = 1.14f

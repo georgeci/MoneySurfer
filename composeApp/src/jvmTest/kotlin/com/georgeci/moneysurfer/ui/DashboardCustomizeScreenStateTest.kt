@@ -44,12 +44,15 @@ class DashboardCustomizeScreenStateTest : StringSpec({
 
             onNodeWithTag(DashboardCustomizeTestTags.Root).assertIsDisplayed()
             onNodeWithTag(DashboardCustomizeTestTags.EnabledHeader).assertIsDisplayed()
-            onNodeWithTag(DashboardCustomizeTestTags.AvailableHeader).assertIsDisplayed()
             onNodeWithTag(enabledRow(DashboardWidgetType.Balance)).assertIsDisplayed()
-            scrollToRow(availableRow(DashboardWidgetType.Goals))
-            onNodeWithTag(availableRow(DashboardWidgetType.Goals)).assertIsDisplayed()
             // A switched-off widget is in exactly one section, not both.
             onNodeWithTag(enabledRow(DashboardWidgetType.Goals)).assertDoesNotExist()
+            // The Available section trails the whole enabled list, so its header needs the same
+            // scroll its rows do once the dashboard carries this many widgets.
+            scrollToRow(DashboardCustomizeTestTags.AvailableHeader)
+            onNodeWithTag(DashboardCustomizeTestTags.AvailableHeader).assertIsDisplayed()
+            scrollToRow(availableRow(DashboardWidgetType.Goals))
+            onNodeWithTag(availableRow(DashboardWidgetType.Goals)).assertIsDisplayed()
         }
     }
 
@@ -146,7 +149,7 @@ class DashboardCustomizeScreenStateTest : StringSpec({
             events shouldContain DashboardCustomizeEvent.OnWidgetMove(
                 from = DashboardWidgetType.Accounts,
                 // The row above Accounts in the default layout.
-                to = DashboardWidgetType.BurnRate,
+                to = DashboardWidgetType.Budgets,
             )
         }
     }
