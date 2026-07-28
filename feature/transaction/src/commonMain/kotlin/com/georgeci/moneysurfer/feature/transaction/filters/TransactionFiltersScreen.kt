@@ -159,7 +159,9 @@ private fun FiltersFooter(
         stringResource(Res.string.transaction_filters_results, state.resultCount)
     }
     Surface(color = AppTheme.materialColors.surface) {
-        Column {
+        // The surface itself bleeds to the window edges; its contents take the same cap as the
+        // form above, so the divider terminates that column instead of overrunning it.
+        Column(modifier = Modifier.surferContentContainer()) {
             HorizontalDivider(color = AppTheme.materialColors.outlineVariant)
             Row(
                 modifier = Modifier

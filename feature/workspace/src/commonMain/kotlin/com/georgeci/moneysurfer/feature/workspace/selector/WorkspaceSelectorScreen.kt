@@ -279,6 +279,9 @@ private fun ConfirmBar(
             .fillMaxWidth()
             .background(AppTheme.materialColors.surface)
             .navigationBarsPadding()
+            // Background and system insets stay full-bleed; only the button takes the content cap,
+            // so it lines up with the list above instead of stretching across the window.
+            .surferContentContainer()
             .padding(horizontal = AppTheme.spacing.default)
             .padding(top = AppTheme.spacing.medium, bottom = AppTheme.spacing.large),
     ) {
