@@ -345,9 +345,9 @@
 - Tasks: firestore-rules, members, invites, tenant-isolation
 
 ## screenshot-tests
-- Title: Where the reference images live
+- Title: Two kinds of capture
 - File: docs/testing/screenshot-tests.md
-- Lines: 29-135
+- Lines: 35-245
 - Tasks: testing, uikit, screenshot, roborazzi
 
 ## security-audit-2026-07

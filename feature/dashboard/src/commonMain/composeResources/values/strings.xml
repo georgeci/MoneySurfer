@@ -48,6 +48,8 @@
     <string name="dashboard_recent_see_all">See all</string>
     <string name="dashboard_recent_empty_title">No activity yet</string>
     <string name="dashboard_recent_empty_subtitle">Transactions you log will show up here.</string>
+    <!-- Meta line of a collapsed split row: how many categories the receipt covers -->
+    <string name="dashboard_recent_split_categories">%1$d categories</string>
     <string name="dashboard_budgets_title">Budgets</string>
     <string name="dashboard_budgets_see_all">See all</string>
     <string name="dashboard_budgets_empty_title">No budgets yet</string>

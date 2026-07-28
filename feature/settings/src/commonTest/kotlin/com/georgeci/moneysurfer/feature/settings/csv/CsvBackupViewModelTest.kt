@@ -21,6 +21,7 @@ import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.CategoryId
 import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
 import com.georgeci.moneysurfer.domain.primitives.Money
+import com.georgeci.moneysurfer.domain.primitives.SplitId
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.domain.primitives.TransferId
 import com.georgeci.moneysurfer.domain.primitives.UserId
@@ -220,6 +221,8 @@ private class SimpleTransactionRepository(initial: List<Transaction>) : Transact
     override suspend fun getById(id: TransactionId): Transaction? = store[id]
     override suspend fun getByTransferId(transferId: TransferId): List<Transaction> =
         store.values.filter { it.transferId == transferId }
+    override suspend fun getBySplitId(splitId: SplitId): List<Transaction> =
+        store.values.filter { it.splitId == splitId }
     override suspend fun insert(transaction: Transaction) {
         store = store + (transaction.id to transaction)
     }

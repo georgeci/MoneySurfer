@@ -219,6 +219,7 @@ internal fun TransactionCreationContent(
             onConfirm = { onEvent(TransactionCreationEvent.OnDeleteConfirmed) },
             onDismiss = { onEvent(TransactionCreationEvent.OnDeleteDismissed) },
             isTransfer = state.isTransfer,
+            isSplit = state.isEditingSplitLeg,
         )
     }
 
@@ -285,13 +286,21 @@ internal fun TransactionCreationContent(
                         onClick = { onEvent(TransactionCreationEvent.OnOpenAccountChooser) },
                     )
 
-                    CategoryGridSection(
-                        categories = state.displayCategories,
-                        selected = state.selectedCategory,
-                        onSelect = { onEvent(TransactionCreationEvent.OnCategorySelected(it)) },
-                        onAllClick = { onEvent(TransactionCreationEvent.OnOpenCategoryChooser) },
-                        onMoreClick = { onEvent(TransactionCreationEvent.OnOpenCategoryCreation) },
-                    )
+                    // The grid picks the transaction's single category, so it has nothing to say
+                    // once the receipt is being split — each line picks its own instead.
+                    if (state.isSplit) {
+                        SplitLinesBlock(state = state, onEvent = onEvent)
+                    } else {
+                        CategoryGridSection(
+                            categories = state.displayCategories,
+                            selected = state.selectedCategory,
+                            onSelect = { onEvent(TransactionCreationEvent.OnCategorySelected(it)) },
+                            onAllClick = { onEvent(TransactionCreationEvent.OnOpenCategoryChooser) },
+                            onMoreClick = { onEvent(TransactionCreationEvent.OnOpenCategoryCreation) },
+                        )
+                    }
+
+                    SplitToggleRow(state = state, onEvent = onEvent)
                 }
 
                 OutlinedTextField(

@@ -112,6 +112,17 @@
     <string name="transaction_creation_to_account">На счёт</string>
     <string name="transaction_creation_swap_content_description">Поменять счета местами</string>
     <string name="transaction_creation_rate_hint">1 %1$s = %2$s %3$s</string>
+    <!-- Split editor: one payment filed under several categories -->
+    <string name="transaction_creation_split_title">Разделить по категориям</string>
+    <string name="transaction_creation_split_enable">Разделить</string>
+    <string name="transaction_creation_split_add_line">Добавить категорию</string>
+    <string name="transaction_creation_split_remove_line">Убрать эту категорию</string>
+    <string name="transaction_creation_split_category_placeholder">Выберите категорию</string>
+    <!-- Running total of the split legs against the amount entered above -->
+    <string name="transaction_creation_split_total">%1$s из %2$s</string>
+    <string name="transaction_creation_split_remainder">Осталось распределить: %1$s</string>
+    <string name="transaction_creation_split_over">Больше суммы на %1$s</string>
+    <string name="transaction_creation_split_snackbar">Разделённая операция добавлена</string>
 
     <!-- Transaction details -->
     <string name="transaction_details_title">Транзакция</string>
@@ -133,6 +144,10 @@
     <string name="transaction_details_duplicate">Дублировать</string>
     <string name="transaction_details_status_posted">Проведена</string>
     <string name="transaction_details_status_planned">Запланирована</string>
+    <!-- Breakdown of a receipt split across categories -->
+    <string name="transaction_details_split_title">Разделена по %1$d категориям</string>
+    <string name="transaction_details_split_total">Всего по чеку</string>
+    <string name="transaction_details_split_uncategorized">Без категории</string>
 
     <!-- Action feedback snackbars -->
     <string name="transaction_creation_created_snackbar">Транзакция добавлена</string>
@@ -144,6 +159,9 @@
     <string name="transactions_list_delete_undo">Отменить</string>
 
     <!-- Список транзакций — поиск и лента фильтров -->
+    <!-- Meta line of a collapsed split row: how many categories the receipt covers -->
+    <string name="transactions_list_split_categories">Категорий: %1$d</string>
+
     <string name="transactions_list_search_placeholder">Поиск по продавцу, заметке, сумме</string>
     <string name="transactions_list_search_content_description">Поиск транзакций</string>
     <string name="transactions_list_filters_content_description">Фильтры</string>

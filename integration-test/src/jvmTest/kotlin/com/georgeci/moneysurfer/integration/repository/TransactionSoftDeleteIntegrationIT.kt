@@ -12,14 +12,19 @@ import com.georgeci.moneysurfer.domain.fixtures.categoryId
 import com.georgeci.moneysurfer.domain.fixtures.dollars
 import com.georgeci.moneysurfer.domain.fixtures.transactionId
 import com.georgeci.moneysurfer.domain.preferences.TransactionPeriodMode
+import com.georgeci.moneysurfer.domain.primitives.SplitId
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
+import com.georgeci.moneysurfer.domain.usecase.CreateSplitTransactionUseCase
 import com.georgeci.moneysurfer.domain.usecase.DeleteTransactionUseCase
+import com.georgeci.moneysurfer.domain.usecase.GetCurrentTimeUseCase
 import com.georgeci.moneysurfer.domain.usecase.PurgeDeletedTransactionsUseCase
 import com.georgeci.moneysurfer.domain.usecase.UpdateTransactionUseCase
 import com.georgeci.moneysurfer.domain.util.periodWindow
 import com.georgeci.moneysurfer.integration.fixtures.IntegrationHarness
 import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldContainExactly
+import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.flow.first
@@ -31,6 +36,7 @@ private val OPERATION_DATE = LocalDate(2026, 3, 15)
 private val MONTH = periodWindow(TransactionPeriodMode.Month, OPERATION_DATE)
 private const val MONTH_START = "2026-03-01"
 private const val NEXT_MONTH_START = "2026-04-01"
+private const val MONTH_END = "2026-03-31"
 
 /**
  * A tombstoned transaction has to be invisible everywhere at once. The acceptance criterion of
@@ -88,6 +94,13 @@ class TransactionSoftDeleteIntegrationIT : StringSpec({
             )
             .first().map { "${it.month}:${it.totalMinor}" },
     )
+
+    /** The `splitLegCount` the list window reports for a group, read off any surviving leg. */
+    suspend fun legCountFor(split: SplitId): Int = dao
+        .getCategorizedWindow(accountId = null, from = MONTH_START, to = MONTH_END, limit = 100)
+        .first()
+        .first { it.splitId == split.value }
+        .splitLegCount
 
     suspend fun exportedIds(): List<String> {
         val buffer = Buffer()
@@ -286,6 +299,47 @@ class TransactionSoftDeleteIntegrationIT : StringSpec({
 
         stack.transactionRepository.getById(target).shouldNotBeNull().money shouldBe 10.dollars
         stack.accountRepository.getById(account)!!.balance shouldBe 450.dollars
+    }
+
+    // Splits (#399) landed alongside soft delete, and the two meet in two places: the group lookup
+    // that a delete fans out over, and the leg count the list uses to decide whether a group can be
+    // collapsed into one row. Both have to see live legs only, or the group's own delete leaves the
+    // list unable to draw what remains.
+    "deleting a split takes every leg out of the group lookup and the leg count" {
+        val createSplit = CreateSplitTransactionUseCase(
+            applyTransactionChange = stack.applyTransactionChange,
+            getCurrentTime = GetCurrentTimeUseCase(stack.clock),
+        )
+        val legs = createSplit(
+            CreateSplitTransactionUseCase.Params(
+                account = stack.accountRepository.getById(account).shouldNotBeNull(),
+                legs = listOf(
+                    CreateSplitTransactionUseCase.Leg(categoryId("c-1"), 30.dollars),
+                    CreateSplitTransactionUseCase.Leg(categoryId("c-1"), 20.dollars),
+                ),
+                note = "supermarket",
+                operationAt = stack.clock.now(),
+                operationDate = OPERATION_DATE,
+                type = TransactionType.EXPENSE,
+            ),
+        )
+        val split = legs.first().splitId.shouldNotBeNull()
+        dao.getBySplitId(split.value) shouldHaveSize 2
+        legCountFor(split) shouldBe 2
+
+        // One leg tombstoned on its own — a peer on an older build, or a pull that has applied only
+        // part of the group so far. The group has to read as the one leg that is still there.
+        dao.softDelete(legs.first().id.value, stack.clock.now().toEpochMilliseconds()) shouldBe 1
+
+        dao.getBySplitId(split.value).map { it.id } shouldContainExactly listOf(legs[1].id.value)
+        legCountFor(split) shouldBe 1
+
+        // And the whole group, the way the user's delete actually arrives.
+        deleteTransaction(legs[1].id)
+
+        dao.getBySplitId(split.value).shouldBeEmpty()
+        stack.transactionRepository.getAll().first().map { it.id } shouldContainExactly
+            listOf(target, survivor)
     }
 
     // `@Update` rewrites every column, and the domain model has no tombstone field — so without the

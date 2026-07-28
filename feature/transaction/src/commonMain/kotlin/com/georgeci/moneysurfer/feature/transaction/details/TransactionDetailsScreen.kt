@@ -15,7 +15,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -24,12 +23,11 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
-import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
+import com.georgeci.moneysurfer.uikit.components.base.SurferPaneScaffold
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbarAction
 import com.georgeci.moneysurfer.uikit.components.transaction.SurferDeleteTransactionDialog
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
-import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
 import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
 import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
@@ -88,15 +86,9 @@ fun TransactionDetailsScreen(
 
 @Composable
 private fun TransactionDetailsLoading(onEvent: (TransactionDetailsEvent) -> Unit) {
-    Scaffold(
-        modifier = Modifier.surferSafeInsets(),
-        containerColor = AppTheme.materialColors.surface,
-        topBar = {
-            SurferToolbar(
-                title = stringResource(Res.string.transaction_details_title),
-                onBack = { onEvent(TransactionDetailsEvent.OnBackClick) },
-            )
-        },
+    SurferPaneScaffold(
+        title = stringResource(Res.string.transaction_details_title),
+        onBack = { onEvent(TransactionDetailsEvent.OnBackClick) },
     ) { padding ->
         Box(modifier = Modifier.fillMaxSize().padding(padding))
     }
@@ -113,16 +105,17 @@ internal fun TransactionDetailsContent(
             onConfirm = { onEvent(TransactionDetailsEvent.OnDeleteConfirmed) },
             onDismiss = { onEvent(TransactionDetailsEvent.OnDeleteDismissed) },
             isTransfer = state.isTransfer,
+            isSplit = state.isSplit,
         )
     }
 
-    Scaffold(
+    SurferPaneScaffold(
+        title = stringResource(Res.string.transaction_details_title),
         modifier = Modifier
-            .surferSafeInsets()
             .testTag(TransactionDetailsTestTags.Root)
             .surferTestTagAsId(),
-        containerColor = AppTheme.materialColors.surface,
-        topBar = { DetailsTopBar(onEvent = onEvent) },
+        onBack = { onEvent(TransactionDetailsEvent.OnBackClick) },
+        actions = { DetailsActions(onEvent = onEvent) },
     ) { padding ->
         Column(
             modifier = Modifier
@@ -147,6 +140,8 @@ internal fun TransactionDetailsContent(
                     isPlanned = state.isPlanned,
                 )
 
+                state.split?.let { SplitCard(split = it) }
+
                 DetailsCard(state = state)
 
                 Spacer(Modifier.height(padding.calculateBottomPadding()))
@@ -160,25 +155,19 @@ internal fun TransactionDetailsContent(
 }
 
 @Composable
-private fun DetailsTopBar(onEvent: (TransactionDetailsEvent) -> Unit) {
-    SurferToolbar(
-        title = stringResource(Res.string.transaction_details_title),
-        onBack = { onEvent(TransactionDetailsEvent.OnBackClick) },
-        actions = {
-            SurferToolbarAction(
-                icon = SurferIcons.Edit,
-                contentDescription = stringResource(Res.string.transaction_details_edit_content_description),
-                onClick = { onEvent(TransactionDetailsEvent.OnEditClick) },
-                modifier = Modifier.testTag(TransactionDetailsTestTags.Edit),
-            )
-            SurferToolbarAction(
-                icon = SurferIcons.Delete,
-                contentDescription = stringResource(Res.string.transaction_details_delete_content_description),
-                onClick = { onEvent(TransactionDetailsEvent.OnDeleteClick) },
-                modifier = Modifier.testTag(TransactionDetailsTestTags.Delete),
-                tint = AppTheme.materialColors.error,
-            )
-        },
+private fun DetailsActions(onEvent: (TransactionDetailsEvent) -> Unit) {
+    SurferToolbarAction(
+        icon = SurferIcons.Edit,
+        contentDescription = stringResource(Res.string.transaction_details_edit_content_description),
+        onClick = { onEvent(TransactionDetailsEvent.OnEditClick) },
+        modifier = Modifier.testTag(TransactionDetailsTestTags.Edit),
+    )
+    SurferToolbarAction(
+        icon = SurferIcons.Delete,
+        contentDescription = stringResource(Res.string.transaction_details_delete_content_description),
+        onClick = { onEvent(TransactionDetailsEvent.OnDeleteClick) },
+        modifier = Modifier.testTag(TransactionDetailsTestTags.Delete),
+        tint = AppTheme.materialColors.error,
     )
 }
 

@@ -23,6 +23,15 @@ sealed interface TransactionCreationEvent {
     data object OnOpenFromAccountChooser : TransactionCreationEvent
     data object OnOpenToAccountChooser : TransactionCreationEvent
     data object OnSwapAccountsClick : TransactionCreationEvent
+
+    /** Turn the split editor on (seeded with two lines) or off, discarding its lines. */
+    data object OnSplitToggled : TransactionCreationEvent
+    data object OnSplitLineAdded : TransactionCreationEvent
+    data class OnSplitLineRemoved(val key: Int) : TransactionCreationEvent
+    data class OnSplitLineAmountChanged(val key: Int, val amount: String) : TransactionCreationEvent
+
+    /** Open the category chooser for one split line rather than for the transaction as a whole. */
+    data class OnOpenSplitLineCategoryChooser(val key: Int) : TransactionCreationEvent
     data object OnSaveClick : TransactionCreationEvent
     data object OnDeleteClick : TransactionCreationEvent
     data object OnDeleteConfirmed : TransactionCreationEvent
@@ -52,3 +61,13 @@ sealed interface TransactionCreationEffect {
 }
 
 internal enum class AccountSlot { Single, From, To }
+
+/**
+ * Where a category coming back from the chooser belongs: the transaction itself, or one line of the
+ * split editor. The chooser returns only an id, so the screen has to remember what it was opened
+ * for — the same shape [AccountSlot] serves for the account chooser's three slots.
+ */
+internal sealed interface CategorySlot {
+    data object Single : CategorySlot
+    data class SplitLine(val key: Int) : CategorySlot
+}

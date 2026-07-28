@@ -64,6 +64,17 @@ interface TransactionDao {
      *
      * [limit] is mandatory: paging grows the limit rather than offsetting, so rows inserted while
      * the user scrolls cannot shift the already-visible prefix.
+     *
+     * `splitLegCount` is how many legs the row's split group has in the whole table — `0` for an
+     * ordinary row, since `splitId = NULL` matches nothing in SQL. The list collapses a group into
+     * one row only when it holds every one of those legs, so a group cut by [limit] or thinned by a
+     * category filter renders as the individual legs it actually has rather than as a collapsed row
+     * with a total that is quietly missing money.
+     *
+     * The count skips tombstoned legs for that comparison to mean anything: the rows it is weighed
+     * against are live ones, so counting a deleted leg would keep a group from ever collapsing
+     * again. A split is deleted whole, but a half-deleted group is still reachable — a peer on an
+     * older build deleting one leg, or a pull that has applied only part of the group so far.
      */
     @Query(
         """
@@ -85,6 +96,12 @@ interface TransactionDao {
             transactions.status,
             transactions.updatedAt,
             transactions.transferId,
+            transactions.splitId,
+            (
+                SELECT COUNT(*) FROM transactions AS legs
+                WHERE legs.splitId = transactions.splitId
+                  AND legs.deletedAt IS NULL
+            ) AS splitLegCount,
             transactions.recurringRuleId
         FROM transactions
         LEFT JOIN categories ON categories.id = transactions.categoryId
@@ -174,6 +191,18 @@ interface TransactionDao {
         "SELECT * FROM transactions WHERE transferId = :transferId AND deletedAt IS NULL ORDER BY createdAt ASC",
     )
     suspend fun getByTransferId(transferId: String): List<TransactionEntity>
+
+    /**
+     * Every leg of one split, oldest first so the breakdown reads in the order the user entered
+     * the legs.
+     *
+     * Indexed, unlike [getByTransferId]: the list window query correlates on the same column on
+     * every emission, so the index exists anyway and this lookup is free to use it.
+     */
+    @Query(
+        "SELECT * FROM transactions WHERE splitId = :splitId AND deletedAt IS NULL ORDER BY createdAt ASC",
+    )
+    suspend fun getBySplitId(splitId: String): List<TransactionEntity>
 
     /**
      * Full-text search over notes and merchants within a workspace, newest first.

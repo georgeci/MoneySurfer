@@ -21,6 +21,7 @@ import com.georgeci.moneysurfer.domain.primitives.CategoryId
 import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
 import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
 import com.georgeci.moneysurfer.domain.primitives.Money
+import com.georgeci.moneysurfer.domain.primitives.SplitId
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
 import com.georgeci.moneysurfer.domain.primitives.TransferId
@@ -171,11 +172,20 @@ internal class WindowingTransactionRepository(
         limit: Int,
     ): Flow<List<CategorizedTransaction>> {
         lastWindow = window
-        return rows.map {
+        return rows.map { all ->
             inWindow(window)
                 .filter { row -> accountId == null || row.accountId == accountId }
                 .take(limit)
-                .map { row -> CategorizedTransaction(transaction = row, categoryName = "Category") }
+                .map { row ->
+                    CategorizedTransaction(
+                        transaction = row,
+                        categoryName = "Category",
+                        // Counted over the whole table, exactly as the DAO's correlated subquery
+                        // does — a group cut by the limit must still report its real size, or the
+                        // list could not tell a complete group from a truncated one.
+                        splitLegCount = all.count { it.splitId != null && it.splitId == row.splitId },
+                    )
+                }
         }
     }
 
@@ -201,6 +211,8 @@ internal class WindowingTransactionRepository(
     override suspend fun getById(id: TransactionId): Transaction? = rows.value.find { it.id == id }
     override suspend fun getByTransferId(transferId: TransferId): List<Transaction> =
         rows.value.filter { it.transferId == transferId }
+    override suspend fun getBySplitId(splitId: SplitId): List<Transaction> =
+        rows.value.filter { it.splitId == splitId }
 
     // Writing, not no-op: the list is fed by this flow, so a delete has to actually leave the
     // rows for the screen's reaction to it to be worth asserting.

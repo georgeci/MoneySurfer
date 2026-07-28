@@ -192,6 +192,15 @@ val coverageExcludedProjects = setOf(
     ":detekt-rules",
 )
 
+// Modules that compile the shared Roborazzi harness from `gradle/screenshot-harness/` into their
+// host-test source set (see gradle/screenshot-tests.gradle.kts). That directory sits outside every
+// module's `src/`, so detekt has to be pointed at it explicitly — once per module that actually
+// compiles it, rather than for the whole build.
+val screenshotHarnessProjects = setOf(
+    ":uikit",
+    ":feature:login",
+)
+
 subprojects {
     apply(plugin = "io.gitlab.arturbosch.detekt")
 
@@ -213,6 +222,9 @@ subprojects {
             "src/main/kotlin",
             "src/test/kotlin",
         )
+        if (path in screenshotHarnessProjects) {
+            source.from(rootProject.file("gradle/screenshot-harness/kotlin"))
+        }
     }
 
     dependencies {

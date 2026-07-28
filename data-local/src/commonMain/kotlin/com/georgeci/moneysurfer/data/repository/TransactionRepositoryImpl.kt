@@ -14,6 +14,7 @@ import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
 import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
 import com.georgeci.moneysurfer.domain.primitives.Money
 import com.georgeci.moneysurfer.domain.primitives.RecurringRuleId
+import com.georgeci.moneysurfer.domain.primitives.SplitId
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.domain.primitives.TransactionStatus
 import com.georgeci.moneysurfer.domain.primitives.TransactionType
@@ -75,6 +76,9 @@ class TransactionRepositoryImpl(
 
     override suspend fun getByTransferId(transferId: TransferId): List<Transaction> =
         dao.getByTransferId(transferId.value).map { it.toDomain() }
+
+    override suspend fun getBySplitId(splitId: SplitId): List<Transaction> =
+        dao.getBySplitId(splitId.value).map { it.toDomain() }
 
     override suspend fun insert(transaction: Transaction) {
         val entity = transaction.toEntity()
@@ -162,6 +166,7 @@ class TransactionRepositoryImpl(
         createdAt = timeFormatter.parseInstant(createdAt),
         updatedAt = timeFormatter.parseInstant(updatedAt),
         transferId = transferId?.let(::TransferId),
+        splitId = splitId?.let(::SplitId),
         recurringRuleId = recurringRuleId?.let(::RecurringRuleId),
     )
 
@@ -185,9 +190,11 @@ class TransactionRepositoryImpl(
             createdAt = createdAt,
             updatedAt = updatedAt,
             transferId = transferId,
+            splitId = splitId,
             recurringRuleId = recurringRuleId,
         ).toDomain(),
         categoryName = categoryName,
+        splitLegCount = splitLegCount,
     )
 
     private fun resolveOperationDate(stored: String, operationAt: Long) =
@@ -212,6 +219,7 @@ class TransactionRepositoryImpl(
         createdAt = timeFormatter.formatInstant(createdAt),
         updatedAt = timeFormatter.formatInstant(updatedAt),
         transferId = transferId?.value,
+        splitId = splitId?.value,
         recurringRuleId = recurringRuleId?.value,
     )
 }

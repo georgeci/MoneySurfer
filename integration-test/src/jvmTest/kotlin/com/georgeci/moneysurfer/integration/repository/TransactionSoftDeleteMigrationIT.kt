@@ -3,12 +3,12 @@ package com.georgeci.moneysurfer.integration.repository
 import androidx.sqlite.SQLiteConnection
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import androidx.sqlite.execSQL
-import com.georgeci.moneysurfer.data.db.migration.MIGRATION_34_35
+import com.georgeci.moneysurfer.data.db.migration.MIGRATION_35_36
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 
 /**
- * The v35 addition against a real SQLite.
+ * The v36 addition against a real SQLite.
  *
  * Worth pinning despite being a one-line `ALTER TABLE`: the builder ends in
  * `fallbackToDestructiveMigration(dropAllTables = true)`, so a migration that does not leave the
@@ -22,9 +22,9 @@ class TransactionSoftDeleteMigrationIT : StringSpec({
     "the migration adds a nullable deletedAt column to transactions" {
         val connection = BundledSQLiteDriver().open(":memory:")
         try {
-            connection.createV34Transactions()
+            connection.createV35Transactions()
 
-            MIGRATION_34_35.migrate(connection)
+            MIGRATION_35_36.migrate(connection)
 
             connection.deletedAtColumn() shouldBe DeletedAtColumn(type = "INTEGER", notNull = false)
         } finally {
@@ -35,10 +35,10 @@ class TransactionSoftDeleteMigrationIT : StringSpec({
     "rows that predate the column are live, not deleted" {
         val connection = BundledSQLiteDriver().open(":memory:")
         try {
-            connection.createV34Transactions()
+            connection.createV35Transactions()
             connection.execSQL("INSERT INTO `transactions` (`id`, `note`) VALUES ('t-1', 'rent')")
 
-            MIGRATION_34_35.migrate(connection)
+            MIGRATION_35_36.migrate(connection)
 
             connection.singleText("SELECT COUNT(*) FROM `transactions`") shouldBe "1"
             connection.singleText("SELECT COUNT(*) FROM `transactions` WHERE `deletedAt` IS NULL") shouldBe "1"
@@ -52,8 +52,8 @@ class TransactionSoftDeleteMigrationIT : StringSpec({
 
 private data class DeletedAtColumn(val type: String, val notNull: Boolean)
 
-/** Enough of the v34 table to add a column to; the rest of the schema is not what is under test. */
-private fun SQLiteConnection.createV34Transactions() =
+/** Enough of the v35 table to add a column to; the rest of the schema is not what is under test. */
+private fun SQLiteConnection.createV35Transactions() =
     execSQL("CREATE TABLE `transactions` (`id` TEXT NOT NULL PRIMARY KEY, `note` TEXT)")
 
 private fun SQLiteConnection.deletedAtColumn(): DeletedAtColumn? =

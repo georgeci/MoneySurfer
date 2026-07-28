@@ -1,6 +1,7 @@
 package com.georgeci.moneysurfer.feature.transaction.creation
 
 import com.georgeci.moneysurfer.domain.formatter.MoneyFormatter
+import com.georgeci.moneysurfer.domain.model.Account
 import com.georgeci.moneysurfer.domain.model.Category
 import com.georgeci.moneysurfer.domain.model.CategoryAppearance
 import com.georgeci.moneysurfer.domain.model.Transaction
@@ -49,7 +50,8 @@ internal fun TransactionCreationState.Content.seededFrom(
         } else {
             // A duplicate keeps what the user typed about the counterparty, but is a fresh
             // manual entry: it inherits neither the transfer pairing (a second leg would be
-            // missing), the recurring rule that generated the original, nor its planned state.
+            // missing), the split group (it would silently add a leg to someone else's receipt),
+            // the recurring rule that generated the original, nor its planned state.
             PreservedTransactionFields(merchant = transaction.merchant, tags = transaction.tags)
         },
         displayCategories = buildDisplayCategories(
@@ -59,6 +61,16 @@ internal fun TransactionCreationState.Content.seededFrom(
             selected = resolvedSelected,
         ),
     )
+}
+
+/** Puts a chosen account in the slot the chooser was opened for — see [AccountSlot]. */
+internal fun TransactionCreationState.Content.withAccountInSlot(
+    account: Account,
+    slot: AccountSlot,
+): TransactionCreationState.Content = when (slot) {
+    AccountSlot.Single -> copy(selectedAccount = account)
+    AccountSlot.From -> copy(fromAccount = account)
+    AccountSlot.To -> copy(toAccount = account)
 }
 
 /** Categories the type's picker offers: everything but income belongs to the expense side. */

@@ -10,6 +10,7 @@ import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.CategoryId
 import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
 import com.georgeci.moneysurfer.domain.primitives.Money
+import com.georgeci.moneysurfer.domain.primitives.SplitId
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
 import com.georgeci.moneysurfer.domain.primitives.TransferId
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
@@ -17,6 +18,7 @@ import com.georgeci.moneysurfer.domain.repositories.AccountRepository
 import com.georgeci.moneysurfer.domain.repositories.CategoryRepository
 import com.georgeci.moneysurfer.domain.repositories.TransactionRepository
 import com.georgeci.moneysurfer.domain.usecase.ApplyTransactionChangeUseCase
+import com.georgeci.moneysurfer.domain.usecase.CreateSplitTransactionUseCase
 import com.georgeci.moneysurfer.domain.usecase.CreateTransactionUseCase
 import com.georgeci.moneysurfer.domain.usecase.CreateTransferUseCase
 import com.georgeci.moneysurfer.domain.usecase.DeleteTransactionUseCase
@@ -74,6 +76,10 @@ internal class TransactionCreationFixture(workspaceId: WorkspaceId) {
         updateTransaction = UpdateTransactionUseCase(transactionRepository, applyChange),
         createTransfer = CreateTransferUseCase(
             categoryRepository = categoryRepository,
+            applyTransactionChange = applyChange,
+            getCurrentTime = GetCurrentTimeUseCase(clock),
+        ),
+        createSplitTransaction = CreateSplitTransactionUseCase(
             applyTransactionChange = applyChange,
             getCurrentTime = GetCurrentTimeUseCase(clock),
         ),
@@ -161,6 +167,8 @@ internal class FakeTransactionRepository : TransactionRepository {
     override suspend fun getById(id: TransactionId): Transaction? = byId[id]
     override suspend fun getByTransferId(transferId: TransferId): List<Transaction> =
         byId.values.filter { it.transferId == transferId }
+    override suspend fun getBySplitId(splitId: SplitId): List<Transaction> =
+        byId.values.filter { it.splitId == splitId }
     override suspend fun insert(transaction: Transaction) {
         inserted += transaction
         byId[transaction.id] = transaction

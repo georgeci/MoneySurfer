@@ -5,7 +5,7 @@ import androidx.sqlite.SQLiteConnection
 import androidx.sqlite.execSQL
 
 /**
- * v34 → v35: add `transactions.deletedAt` so a delete becomes a tombstone instead of dropping the
+ * v35 → v36: add `transactions.deletedAt` so a delete becomes a tombstone instead of dropping the
  * row (issue #346).
  *
  * Every existing row is live, and `NULL` is exactly that — so this is a pure addition with no
@@ -17,7 +17,7 @@ import androidx.sqlite.execSQL
  * triggers Room generates for it. Soft-deleted rows stay in the index and are filtered out by the
  * `deletedAt IS NULL` term on the join in `TransactionDao.searchByText`.
  */
-val MIGRATION_34_35: Migration = object : Migration(34, 35) {
+val MIGRATION_35_36: Migration = object : Migration(35, 36) {
     override fun migrate(connection: SQLiteConnection) {
         connection.execSQL("ALTER TABLE `transactions` ADD COLUMN `deletedAt` INTEGER DEFAULT NULL")
     }

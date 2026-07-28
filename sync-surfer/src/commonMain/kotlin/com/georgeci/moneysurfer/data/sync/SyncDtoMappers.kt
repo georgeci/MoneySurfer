@@ -169,6 +169,7 @@ fun TransactionEntity.toDoc(): TransactionDoc = TransactionDoc(
     // pushed while deleted stays deleted for peers.
     deletedAt = deletedAt,
     transferId = transferId,
+    splitId = splitId,
     recurringRuleId = recurringRuleId,
 )
 
@@ -210,6 +211,7 @@ fun TransactionDoc.toEntity(id: String, workspaceId: String): TransactionEntity 
         updatedAt = updatedAt,
         deletedAt = deletedAt,
         transferId = transferId,
+        splitId = splitId,
         recurringRuleId = recurringRuleId,
     )
 }
