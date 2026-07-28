@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > Currency</title>
+  <title>MoneySurfer Coverage Report > CategorySpendSlice</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.model</a>
 </div>
 
-<h1>Coverage Summary for Class: Currency (com.georgeci.moneysurfer.domain.model)</h1>
+<h1>Coverage Summary for Class: CategorySpendSlice (com.georgeci.moneysurfer.domain.model)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">Currency</td>
+  <td class="name">CategorySpendSlice</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -94,12 +94,71 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.model
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
+&nbsp;import kotlinx.datetime.LocalDate
+&nbsp;import kotlinx.datetime.YearMonth
 &nbsp;
-<b class="fc">&nbsp;data class Currency(</b>
-<b class="fc">&nbsp;    val code: CurrencyCode,</b>
-<b class="fc">&nbsp;    val symbol: String,</b>
-<b class="fc">&nbsp;    val displayName: String,</b>
+&nbsp;/*
+&nbsp; * Return shapes of SpendAnalyticsRepository.
+&nbsp; *
+&nbsp; * All of them are magnitudes in the workspace base currency: the queries behind them sum
+&nbsp; * `ABS(amount)`, so an expense reads as a positive number rather than a negative one. Nothing
+&nbsp; * here is persisted or pushed — a change to the maths never needs a migration.
+&nbsp; */
+&nbsp;
+&nbsp;/**
+&nbsp; * What one category booked inside a spend window.
+&nbsp; *
+&nbsp; * [categoryId] is `null` for the uncategorized bucket. That is a real slice, not a missing one:
+&nbsp; * `Transaction.categoryId` is nullable, and a workspace with half its rows uncategorized would
+&nbsp; * otherwise show a donut that does not add up to what was spent.
+&nbsp; */
+<b class="fc">&nbsp;data class CategorySpendSlice(</b>
+<b class="fc">&nbsp;    val categoryId: CategoryId?,</b>
+<b class="fc">&nbsp;    val total: Money,</b>
+<b class="fc">&nbsp;    val transactionCount: Int,</b>
+&nbsp;)
+&nbsp;
+&nbsp;/**
+&nbsp; * One month of the income-vs-expense trend. Both figures are magnitudes, so [net] is the
+&nbsp; * subtraction rather than a sum of signed rows.
+&nbsp; *
+&nbsp; * A month with income but no spend still produces a row — the query groups by month and type,
+&nbsp; * and the missing side folds to zero here rather than dropping the column from the chart.
+&nbsp; *
+&nbsp; * [month] names the calendar month the rows fell in; it does *not* promise the whole month was
+&nbsp; * counted. A query window that starts or ends mid-month yields a part-month row indistinguishable
+&nbsp; * from a full one — see
+&nbsp; * [com.georgeci.moneysurfer.domain.repositories.SpendAnalyticsRepository.netByMonth].
+&nbsp; */
+&nbsp;data class MonthlyNet(
+&nbsp;    val month: YearMonth,
+&nbsp;    val income: Money,
+&nbsp;    val expense: Money,
+&nbsp;) {
+&nbsp;    /** Negative once the month spent more than it earned. */
+&nbsp;    val net: Money get() = income - expense
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * One day of the spend series. Days with nothing booked are absent — the heatmap and the burn
+&nbsp; * rate both need to tell &quot;no spend&quot; from &quot;no data&quot;, and only the caller knows which window it
+&nbsp; * asked for.
+&nbsp; */
+&nbsp;data class DailySpendPoint(
+&nbsp;    val date: LocalDate,
+&nbsp;    val total: Money,
+&nbsp;)
+&nbsp;
+&nbsp;/**
+&nbsp; * What one merchant took inside a spend window. [merchant] is never blank — see
+&nbsp; * [com.georgeci.moneysurfer.domain.repositories.SpendAnalyticsRepository.topMerchants].
+&nbsp; */
+&nbsp;data class MerchantSpend(
+&nbsp;    val merchant: String,
+&nbsp;    val total: Money,
+&nbsp;    val transactionCount: Int,
 &nbsp;)
 </code>
 </pre>
@@ -124,7 +183,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 21:38</div>
+    <div style="float:right;">generated on 2026-07-28 22:10</div>
 </div>
 </body>
 </html>

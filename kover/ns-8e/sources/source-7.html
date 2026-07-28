@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SurferBalanceVariant</title>
+  <title>MoneySurfer Coverage Report > SurferBalanceFootnote</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.uikit.widgets</a>
 </div>
 
-<h1>Coverage Summary for Class: SurferBalanceVariant (com.georgeci.moneysurfer.uikit.widgets)</h1>
+<h1>Coverage Summary for Class: SurferBalanceFootnote (com.georgeci.moneysurfer.uikit.widgets)</h1>
 
 <table class="coverageStats">
 
@@ -45,8 +45,64 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   Instruction, %
 </th>
 </tr>
-<tr>
-  <td class="name">SurferBalanceVariant</td>
+  <tr>
+    <td class="name">SurferBalanceFootnote$Empty</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">SurferBalanceFootnote$Note</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">SurferBalanceFootnote$Trend</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -61,25 +117,6 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (4/4)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (35/35)
-  </span>
-</td>
-</tr>
-  <tr>
-    <td class="name">SurferBalanceVariant$Companion</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
     (1/1)
   </span>
 </td>
@@ -88,23 +125,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (2/2)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (14/14)
+    (7/7)
   </span>
 </td>
   </tr>
@@ -112,34 +133,27 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    33.3%
   </span>
   <span class="absValue">
-    (2/2)
+    (1/3)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    33.3%
+  </span>
+  <span class="absValue">
+    (1/3)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    33.3%
   </span>
   <span class="absValue">
-    (2/2)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (5/5)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (49/49)
+    (7/21)
   </span>
 </td>
 </tr>
@@ -188,19 +202,19 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;sealed interface SurferBalanceFootnote {
 &nbsp;
 &nbsp;    /** Period delta, rendered with a trending-up icon. */
-&nbsp;    data class Trend(val text: String) : SurferBalanceFootnote
+<b class="fc">&nbsp;    data class Trend(val text: String) : SurferBalanceFootnote</b>
 &nbsp;
 &nbsp;    /**
 &nbsp;     * Secondary line carrying what the single headline figure cannot say — e.g. the balances
 &nbsp;     * held in other currencies, which no rate-free sum may fold into it.
 &nbsp;     */
-&nbsp;    data class Note(val text: String) : SurferBalanceFootnote
+<b class="nc">&nbsp;    data class Note(val text: String) : SurferBalanceFootnote</b>
 &nbsp;
 &nbsp;    /**
 &nbsp;     * Nothing to total yet. Also switches the headline to plain text and drops the sparkline:
 &nbsp;     * there is no amount to split or trend to draw.
 &nbsp;     */
-&nbsp;    data class Empty(val text: String) : SurferBalanceFootnote
+<b class="nc">&nbsp;    data class Empty(val text: String) : SurferBalanceFootnote</b>
 &nbsp;}
 &nbsp;
 &nbsp;/**
@@ -215,21 +229,21 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;enum class SurferBalanceVariant {
 &nbsp;
 &nbsp;    /** Label above the amount — the dashboard default. */
-<b class="fc">&nbsp;    Classic,</b>
+&nbsp;    Classic,
 &nbsp;
 &nbsp;    /** Amount first, label demoted to a caption under it. */
-<b class="fc">&nbsp;    Stacked,</b>
+&nbsp;    Stacked,
 &nbsp;
 &nbsp;    /** Label and amount on one line, the amount a tier smaller so both fit. */
-<b class="fc">&nbsp;    Inline,</b>
+&nbsp;    Inline,
 &nbsp;
 &nbsp;    /** Amount alone; the card&#39;s position on the dashboard is the label. */
-<b class="fc">&nbsp;    Minimal,</b>
+&nbsp;    Minimal,
 &nbsp;
 &nbsp;    ;
 &nbsp;
 &nbsp;    companion object {
-<b class="fc">&nbsp;        fun fromKey(key: String?): SurferBalanceVariant = entries.firstOrNull { it.name == key } ?: Classic</b>
+&nbsp;        fun fromKey(key: String?): SurferBalanceVariant = entries.firstOrNull { it.name == key } ?: Classic
 &nbsp;    }
 &nbsp;}
 &nbsp;
@@ -480,7 +494,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 21:38</div>
+    <div style="float:right;">generated on 2026-07-28 22:10</div>
 </div>
 </body>
 </html>

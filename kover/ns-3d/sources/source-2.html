@@ -103,6 +103,8 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.domain.insight.SpendTrend
 &nbsp;import com.georgeci.moneysurfer.domain.model.Account
 &nbsp;import com.georgeci.moneysurfer.domain.model.BudgetStatus
+&nbsp;import com.georgeci.moneysurfer.domain.model.BurnRate
+&nbsp;import com.georgeci.moneysurfer.domain.model.BurnRatePace
 &nbsp;import com.georgeci.moneysurfer.domain.model.ConvertedTotal
 &nbsp;import com.georgeci.moneysurfer.domain.model.ExchangeRateSnapshot
 &nbsp;import com.georgeci.moneysurfer.domain.model.SafeToSpend
@@ -111,11 +113,13 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.domain.preferences.UiPreferences
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.AccountId
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.GoalId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionId
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionType
 &nbsp;import com.georgeci.moneysurfer.domain.usecase.ConvertAccountsTotalUseCase
 &nbsp;import com.georgeci.moneysurfer.domain.usecase.GenerateInsightsUseCase
 &nbsp;import com.georgeci.moneysurfer.domain.usecase.GetAccountsUseCase
+&nbsp;import com.georgeci.moneysurfer.domain.usecase.GetBurnRateUseCase
 &nbsp;import com.georgeci.moneysurfer.domain.usecase.GetExchangeRatesUseCase
 &nbsp;import com.georgeci.moneysurfer.domain.usecase.GetGoalsUseCase
 &nbsp;import com.georgeci.moneysurfer.domain.usecase.GetRecentTransactionsUseCase
@@ -130,12 +134,18 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import kotlin.time.Instant
 &nbsp;
 &nbsp;@KoinViewModel
+&nbsp;// One injected collaborator per widget that reads its own data, which is what a dashboard is;
+&nbsp;// the tenth arrived when the burn-rate and insights widgets landed together. Bundling them into a
+&nbsp;// holder would buy a shorter signature and cost a layer of indirection through the Koin graph —
+&nbsp;// the same trade `AppLaunchViewModel` declined.
+&nbsp;@Suppress(&quot;LongParameterList&quot;)
 &nbsp;class DashboardViewModel(
 &nbsp;    private val getAccounts: GetAccountsUseCase,
 &nbsp;    private val getRecentTransactions: GetRecentTransactionsUseCase,
 &nbsp;    private val getGoals: GetGoalsUseCase,
 &nbsp;    private val getExchangeRates: GetExchangeRatesUseCase,
 &nbsp;    private val getSafeToSpend: GetSafeToSpendUseCase,
+&nbsp;    private val getBurnRate: GetBurnRateUseCase,
 &nbsp;    private val generateInsights: GenerateInsightsUseCase,
 &nbsp;    private val convertAccountsTotal: ConvertAccountsTotalUseCase,
 &nbsp;    uiPreferences: UiPreferences,
@@ -188,20 +198,22 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    }
 &nbsp;
 &nbsp;    private fun observeDashboard() {
-&nbsp;        // Layout and safe-to-spend are folded into one source because `combine` tops out at five
-&nbsp;        // typed flows, and these two are the pair that is never read apart.
-&nbsp;        val layoutAndSafeToSpend =
-&nbsp;            combine(layout, getSafeToSpend().onStart { emit(null) }) { layoutConfig, safeToSpend -&gt;
-&nbsp;                layoutConfig to safeToSpend
-&nbsp;            }
+&nbsp;        // The layout and the two budget-shaped widgets are folded into one source because `combine`
+&nbsp;        // tops out at five typed flows, and these are never read apart from each other.
+&nbsp;        val widgetSources = combine(
+&nbsp;            layout,
+&nbsp;            getSafeToSpend().onStart { emit(null) },
+&nbsp;            getBurnRate().onStart { emit(null) },
+&nbsp;            ::WidgetSources,
+&nbsp;        )
 &nbsp;        launch {
 &nbsp;            combine(
 &nbsp;                getAccounts().onStart { emit(emptyList()) },
 &nbsp;                getRecentTransactions(),
 &nbsp;                getGoals(),
 &nbsp;                getExchangeRates().onStart { emit(null) },
-&nbsp;                layoutAndSafeToSpend,
-&nbsp;            ) { accounts, transactions, goals, rates, (layoutConfig, safeToSpend) -&gt;
+&nbsp;                widgetSources,
+&nbsp;            ) { accounts, transactions, goals, rates, (layoutConfig, safeToSpend, burnRate) -&gt;
 &nbsp;                val balance = accounts.convertedTotal(rates)?.toBalanceUi()
 &nbsp;                DashboardState.Content(
 &nbsp;                    accounts = accounts.map { it.toUi() },
@@ -218,6 +230,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;                    formattedTrendDelta = null,
 &nbsp;                    goals = goals.take(DASHBOARD_GOALS_LIMIT).map { it.toUi() },
 &nbsp;                    safeToSpend = safeToSpend?.toUi(),
+&nbsp;                    burnRate = burnRate?.toUi(),
 &nbsp;                    isOffline = isOffline,
 &nbsp;                    transferEnabled = transferEnabled,
 &nbsp;                    layout = layoutConfig,
@@ -291,6 +304,29 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;        progress = spentFraction,
 &nbsp;        paceFraction = elapsedFraction,
 &nbsp;        status = status,
+&nbsp;    )
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The chart&#39;s bars carry no money of their own: a currency printed seven times over a 64dp-tall
+&nbsp;     * column is unreadable, so the amounts live in the headline, the callout and the chart&#39;s
+&nbsp;     * screen-reader line, and each bar keeps only its height and its date.
+&nbsp;     */
+&nbsp;    private fun BurnRate.toUi(): BurnRateUi = BurnRateUi(
+&nbsp;        averageFormatted = MoneyFormatter.format(series.average, currency),
+&nbsp;        projectedFormatted = MoneyFormatter.format(projectedMonthTotal, currency),
+&nbsp;        weekTotalFormatted = MoneyFormatter.format(series.total, currency),
+&nbsp;        busiestDayFormatted = MoneyFormatter.format(
+&nbsp;            series.days.maxOfOrNull { it.total } ?: Money.zero(),
+&nbsp;            currency,
+&nbsp;        ),
+&nbsp;        days = series.days.zip(series.barFractions) { point, fraction -&gt;
+&nbsp;            BurnRateDayUi(
+&nbsp;                dayOfMonth = point.date.day,
+&nbsp;                fraction = fraction,
+&nbsp;                isToday = point.date == series.today,
+&nbsp;            )
+&nbsp;        },
+&nbsp;        pace = pace,
 &nbsp;    )
 &nbsp;
 &nbsp;    private fun SavingsGoalSummary.toUi() = GoalUi(
@@ -382,6 +418,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;        val goals: List&lt;GoalUi&gt; = emptyList(),
 &nbsp;        /** What is still safe to spend this period, or null while no active budget backs a number. */
 &nbsp;        val safeToSpend: SafeToSpendUi? = null,
+&nbsp;        /**
+&nbsp;         * The week&#39;s spend pace and where the month lands at it, or null while no workspace backs a
+&nbsp;         * series. Unlike [safeToSpend] this one does not need a budget — a null pace inside it is
+&nbsp;         * the &quot;no cap to miss&quot; state, and the chart is drawn either way.
+&nbsp;         */
+&nbsp;        val burnRate: BurnRateUi? = null,
 &nbsp;        /** Generated spending insights, most actionable first. Empty until the engine has run. */
 &nbsp;        val insights: List&lt;InsightUi&gt; = emptyList(),
 &nbsp;        val isOffline: Boolean = false,
@@ -407,6 +449,16 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;
 &nbsp;    companion object
 &nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * The three per-widget sources `combine` cannot take as separate arguments — it tops out at five
+&nbsp; * typed flows and the screen already reads four others.
+&nbsp; */
+&nbsp;private data class WidgetSources(
+&nbsp;    val layout: DashboardLayoutConfig,
+&nbsp;    val safeToSpend: SafeToSpend?,
+&nbsp;    val burnRate: BurnRate?,
+&nbsp;)
 &nbsp;
 &nbsp;/** The three strings the balance widget needs, already formatted. */
 <b class="fc">&nbsp;private data class BalanceUi(</b>
@@ -490,6 +542,39 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    val isOver: Boolean get() = status == BudgetStatus.OVER
 &nbsp;}
 &nbsp;
+&nbsp;/**
+&nbsp; * The burn-rate widget&#39;s numbers. Money is formatted here; the sentences around it are built on the
+&nbsp; * screen, which is where the string resources are.
+&nbsp; */
+&nbsp;data class BurnRateUi(
+&nbsp;    /** Mean spend per day across the charted week. */
+&nbsp;    val averageFormatted: String,
+&nbsp;    /** Where the month&#39;s spend lands if the remaining days each cost the average. */
+&nbsp;    val projectedFormatted: String,
+&nbsp;    /** What the charted week cost in total — the chart&#39;s screen-reader line, not a printed figure. */
+&nbsp;    val weekTotalFormatted: String,
+&nbsp;    /** The busiest charted day, which is the bar the chart is scaled to. */
+&nbsp;    val busiestDayFormatted: String,
+&nbsp;    val days: List&lt;BurnRateDayUi&gt;,
+&nbsp;    /**
+&nbsp;     * The verdict on [projectedFormatted], or null when no monthly budget caps the month. Null is a
+&nbsp;     * normal state, not a loading one — see [com.georgeci.moneysurfer.domain.model.BurnRate].
+&nbsp;     */
+&nbsp;    val pace: BurnRatePace?,
+&nbsp;)
+&nbsp;
+&nbsp;/**
+&nbsp; * One bar. [dayOfMonth] rather than a weekday name because the app ships no date locale rules, and
+&nbsp; * a number needs none.
+&nbsp; */
+&nbsp;data class BurnRateDayUi(
+&nbsp;    val dayOfMonth: Int,
+&nbsp;    /** Height against the busiest charted day, 0..1. */
+&nbsp;    val fraction: Float,
+&nbsp;    /** The last bar — a day still being spent, which the chart draws solid. */
+&nbsp;    val isToday: Boolean,
+&nbsp;)
+&nbsp;
 &nbsp;data class TransactionUi(
 &nbsp;    val id: TransactionId,
 &nbsp;    val title: String,
@@ -566,7 +651,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 21:38</div>
+    <div style="float:right;">generated on 2026-07-28 22:10</div>
 </div>
 </body>
 </html>

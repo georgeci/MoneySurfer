@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SurferSwipeAccessibilityAction</title>
+  <title>MoneySurfer Coverage Report > SurferSelectableChipKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.uikit.components.base</a>
 </div>
 
-<h1>Coverage Summary for Class: SurferSwipeAccessibilityAction (com.georgeci.moneysurfer.uikit.components.base)</h1>
+<h1>Coverage Summary for Class: SurferSelectableChipKt (com.georgeci.moneysurfer.uikit.components.base)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,38 +49,45 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SurferSwipeAccessibilityAction</td>
+  <td class="name">SurferSelectableChipKt</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/3)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    65%
   </span>
   <span class="absValue">
-    (0/12)
+    (13/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (35/35)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    98.5%
+  </span>
+  <span class="absValue">
+    (407/413)
   </span>
 </td>
 </tr>
@@ -94,239 +101,86 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.components.base
 &nbsp;
-&nbsp;import androidx.compose.animation.core.Animatable
 &nbsp;import androidx.compose.foundation.background
+&nbsp;import androidx.compose.foundation.border
 &nbsp;import androidx.compose.foundation.clickable
-&nbsp;import androidx.compose.foundation.gestures.Orientation
-&nbsp;import androidx.compose.foundation.gestures.draggable
-&nbsp;import androidx.compose.foundation.gestures.rememberDraggableState
 &nbsp;import androidx.compose.foundation.layout.Arrangement
-&nbsp;import androidx.compose.foundation.layout.Box
-&nbsp;import androidx.compose.foundation.layout.Column
 &nbsp;import androidx.compose.foundation.layout.Row
-&nbsp;import androidx.compose.foundation.layout.RowScope
-&nbsp;import androidx.compose.foundation.layout.fillMaxHeight
+&nbsp;import androidx.compose.foundation.layout.height
 &nbsp;import androidx.compose.foundation.layout.padding
 &nbsp;import androidx.compose.foundation.layout.size
-&nbsp;import androidx.compose.foundation.layout.width
 &nbsp;import androidx.compose.foundation.shape.RoundedCornerShape
 &nbsp;import androidx.compose.material3.Icon
 &nbsp;import androidx.compose.material3.Text
 &nbsp;import androidx.compose.runtime.Composable
-&nbsp;import androidx.compose.runtime.remember
-&nbsp;import androidx.compose.runtime.rememberCoroutineScope
 &nbsp;import androidx.compose.ui.Alignment
 &nbsp;import androidx.compose.ui.Modifier
 &nbsp;import androidx.compose.ui.draw.clip
 &nbsp;import androidx.compose.ui.graphics.Color
-&nbsp;import androidx.compose.ui.graphics.vector.ImageVector
-&nbsp;import androidx.compose.ui.layout.layout
-&nbsp;import androidx.compose.ui.platform.LocalDensity
-&nbsp;import androidx.compose.ui.semantics.CustomAccessibilityAction
-&nbsp;import androidx.compose.ui.semantics.clearAndSetSemantics
-&nbsp;import androidx.compose.ui.semantics.customActions
+&nbsp;import androidx.compose.ui.semantics.selected
 &nbsp;import androidx.compose.ui.semantics.semantics
-&nbsp;import androidx.compose.ui.tooling.preview.Preview
-&nbsp;import androidx.compose.ui.unit.Dp
 &nbsp;import androidx.compose.ui.unit.dp
 &nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
-&nbsp;import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
 &nbsp;import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 &nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
-&nbsp;import kotlinx.coroutines.launch
-&nbsp;import kotlin.math.roundToInt
 &nbsp;
 &nbsp;/**
-&nbsp; * One revealed action, restated for assistive technology.
+&nbsp; * A single 32dp pill chip with a 10dp corner: when [selected] it fills with `secondaryContainer`
+&nbsp; * (and optionally shows a leading check); otherwise it stays outline-only. The one shared shape
+&nbsp; * behind both the mutually-exclusive [SurferFilterChipRow] and the transactions filter rail, so a
+&nbsp; * tweak to the selected fill or corner lands in one place.
 &nbsp; *
-&nbsp; * A swipe is a gesture no screen reader user can perform, so anything hidden behind one is
-&nbsp; * unreachable unless it is also published as a semantic action. Pair each entry with the
-&nbsp; * [SurferSwipeAction] it mirrors.
-&nbsp; */
-<b class="nc">&nbsp;data class SurferSwipeAccessibilityAction(</b>
-<b class="nc">&nbsp;    val label: String,</b>
-<b class="nc">&nbsp;    val onAction: () -&gt; Unit,</b>
-&nbsp;)
-&nbsp;
-&nbsp;/**
-&nbsp; * Wraps a list-row style [content] with a horizontally-swipeable foreground that reveals an
-&nbsp; * [actions] layer pinned to the trailing edge. Used on the manage-accounts screen so each
-&nbsp; * account row can hide its destructive affordances behind a swipe.
-&nbsp; *
-&nbsp; * - [revealWidth] is the total horizontal travel — sized to fit the [actions] row&#39;s intrinsic
-&nbsp; *   width (e.g. two 72dp action buttons + 6dp gaps + 6dp padding ≈ 156dp).
-&nbsp; * - When [enabled] is false the wrapper short-circuits to plain [content] with no gesture and
-&nbsp; *   no action layer — useful while a list is in edit mode and swipe should be suppressed.
-&nbsp; * - [accessibilityActions] publishes the revealed actions as custom accessibility actions on the
-&nbsp; *   row. Supplying them also hides the action layer from the accessibility tree: it is composed
-&nbsp; *   whether or not the row is swiped open, so left alone a screen reader walks buttons the sighted
-&nbsp; *   user cannot see. Empty (the default) leaves existing callers exactly as they were.
+&nbsp; * [showCheck] draws the leading check on selection — on for a single-select row where the check is
+&nbsp; * the selection cue, off for a value-carrying chip whose fill alone signals it is set.
 &nbsp; */
 &nbsp;@Composable
-&nbsp;fun SurferSwipeRevealRow(
-&nbsp;    revealWidth: Dp,
-&nbsp;    modifier: Modifier = Modifier,
-&nbsp;    enabled: Boolean = true,
-&nbsp;    accessibilityActions: List&lt;SurferSwipeAccessibilityAction&gt; = emptyList(),
-&nbsp;    actions: @Composable RowScope.() -&gt; Unit,
-&nbsp;    content: @Composable () -&gt; Unit,
-&nbsp;) {
-&nbsp;    if (!enabled) {
-&nbsp;        Box(modifier = modifier) { content() }
-&nbsp;        return
-&nbsp;    }
-&nbsp;
-&nbsp;    val density = LocalDensity.current
-&nbsp;    val revealPx = with(density) { revealWidth.toPx() }
-&nbsp;    val offset = remember { Animatable(0f) }
-&nbsp;    val scope = rememberCoroutineScope()
-&nbsp;
-&nbsp;    Box(
-&nbsp;        modifier = modifier
-&nbsp;            .semanticActions(accessibilityActions)
-&nbsp;            .draggable(
-&nbsp;                orientation = Orientation.Horizontal,
-&nbsp;                state = rememberDraggableState { delta -&gt;
-&nbsp;                    scope.launch {
-&nbsp;                        offset.snapTo((offset.value + delta).coerceIn(-revealPx, 0f))
-&nbsp;                    }
-&nbsp;                },
-&nbsp;                onDragStopped = {
-&nbsp;                    val target = if (offset.value &lt; -revealPx / 2f) -revealPx else 0f
-&nbsp;                    offset.animateTo(target)
-&nbsp;                },
-&nbsp;            ),
-&nbsp;    ) {
-&nbsp;        Row(
-&nbsp;            modifier = Modifier
-&nbsp;                .matchParentSize()
-&nbsp;                .padding(6.dp)
-&nbsp;                // Already offered as custom actions above; leaving the buttons in the tree as well
-&nbsp;                // would make every row read twice.
-&nbsp;                .then(if (accessibilityActions.isEmpty()) Modifier else Modifier.clearAndSetSemantics {}),
-&nbsp;            horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.End),
-&nbsp;            verticalAlignment = Alignment.CenterVertically,
-&nbsp;            content = actions,
-&nbsp;        )
-&nbsp;        Box(
-&nbsp;            modifier = Modifier.layout { measurable, constraints -&gt;
-&nbsp;                val placeable = measurable.measure(constraints)
-&nbsp;                layout(placeable.width, placeable.height) {
-&nbsp;                    placeable.placeRelative(offset.value.roundToInt(), 0)
-&nbsp;                }
-&nbsp;            },
-&nbsp;        ) {
-&nbsp;            content()
-&nbsp;        }
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;/**
-&nbsp; * Merges the row into one accessibility node carrying [actions] as custom actions, so a screen
-&nbsp; * reader reaches them from the row itself. No-op when there are none, which keeps the semantics of
-&nbsp; * callers that have not opted in byte-for-byte unchanged.
-&nbsp; */
-&nbsp;private fun Modifier.semanticActions(actions: List&lt;SurferSwipeAccessibilityAction&gt;): Modifier =
-&nbsp;    if (actions.isEmpty()) {
-&nbsp;        this
-&nbsp;    } else {
-&nbsp;        semantics(mergeDescendants = true) {
-&nbsp;            customActions = actions.map { action -&gt;
-&nbsp;                // The `true` is the contract: it tells the accessibility framework the action was
-&nbsp;                // handled here rather than falling through.
-&nbsp;                CustomAccessibilityAction(action.label) {
-&nbsp;                    action.onAction()
-&nbsp;                    true
-&nbsp;                }
-&nbsp;            }
-&nbsp;        }
-&nbsp;    }
-&nbsp;
-&nbsp;/**
-&nbsp; * Standard trailing action used inside [SurferSwipeRevealRow.actions]. Stacks an icon over a
-&nbsp; * label, sized to the swipe-reveal track. Pass [destructive] = true for the delete-style action
-&nbsp; * (uses the error tonal pair).
-&nbsp; */
-&nbsp;@Composable
-&nbsp;fun SurferSwipeAction(
-&nbsp;    icon: ImageVector,
+&nbsp;fun SurferSelectableChip(
 &nbsp;    label: String,
+&nbsp;    selected: Boolean,
 &nbsp;    onClick: () -&gt; Unit,
-&nbsp;    modifier: Modifier = Modifier,
-&nbsp;    destructive: Boolean = false,
-&nbsp;    width: Dp = 72.dp,
-&nbsp;) {
-&nbsp;    val bg = if (destructive) {
-&nbsp;        AppTheme.materialColors.error
-&nbsp;    } else {
-&nbsp;        AppTheme.materialColors.surfaceContainerHighest
+<b class="fc">&nbsp;    modifier: Modifier = Modifier,</b>
+<b class="fc">&nbsp;    showCheck: Boolean = true,</b>
+<b class="pc">&nbsp;) {</b>
+<b class="fc">&nbsp;    val fg = if (selected) {</b>
+<b class="fc">&nbsp;        AppTheme.materialColors.onSecondaryContainer</b>
+<b class="fc">&nbsp;    } else {</b>
+<b class="fc">&nbsp;        AppTheme.materialColors.onSurface</b>
 &nbsp;    }
-&nbsp;    val fg = if (destructive) {
-&nbsp;        AppTheme.materialColors.onError
-&nbsp;    } else {
-&nbsp;        AppTheme.materialColors.onSurface
-&nbsp;    }
-&nbsp;    Column(
-&nbsp;        modifier = modifier
-&nbsp;            .width(width)
-&nbsp;            .fillMaxHeight()
-&nbsp;            .clip(RoundedCornerShape(12.dp))
-&nbsp;            .background(bg)
-&nbsp;            .clickable(onClick = onClick)
-&nbsp;            .padding(vertical = 8.dp),
-&nbsp;        horizontalAlignment = Alignment.CenterHorizontally,
-&nbsp;        verticalArrangement = Arrangement.Center,
+<b class="fc">&nbsp;    Row(</b>
+<b class="fc">&nbsp;        modifier = modifier</b>
+&nbsp;            // Without this, selection is a fill colour and a deliberately decorative check —
+&nbsp;            // nothing a screen reader, or a test, can read back. `this.` is load-bearing: the
+&nbsp;            // bare name inside `semantics {}` is the parameter, not the property.
+<b class="fc">&nbsp;            .semantics { this.selected = selected }</b>
+<b class="fc">&nbsp;            .height(32.dp)</b>
+<b class="fc">&nbsp;            .clip(RoundedCornerShape(10.dp))</b>
+<b class="fc">&nbsp;            .background(if (selected) AppTheme.materialColors.secondaryContainer else Color.Transparent)</b>
+<b class="fc">&nbsp;            .border(</b>
+<b class="fc">&nbsp;                width = 1.dp,</b>
+<b class="fc">&nbsp;                color = if (selected) Color.Transparent else AppTheme.materialColors.outline,</b>
+<b class="fc">&nbsp;                shape = RoundedCornerShape(10.dp),</b>
+&nbsp;            )
+<b class="fc">&nbsp;            .clickable(onClick = onClick)</b>
+<b class="fc">&nbsp;            .padding(horizontal = 12.dp),</b>
+<b class="fc">&nbsp;        verticalAlignment = Alignment.CenterVertically,</b>
+<b class="fc">&nbsp;        horizontalArrangement = Arrangement.spacedBy(4.dp),</b>
 &nbsp;    ) {
-&nbsp;        Icon(
-&nbsp;            imageVector = icon,
-&nbsp;            contentDescription = SurferSemantics.Decorative,
-&nbsp;            tint = fg,
-&nbsp;            modifier = Modifier.size(20.dp),
+<b class="pc">&nbsp;        if (selected &amp;&amp; showCheck) {</b>
+<b class="fc">&nbsp;            Icon(</b>
+<b class="fc">&nbsp;                imageVector = SurferIcons.Check,</b>
+<b class="fc">&nbsp;                contentDescription = SurferSemantics.Decorative,</b>
+<b class="fc">&nbsp;                tint = fg,</b>
+<b class="fc">&nbsp;                modifier = Modifier.size(14.dp),</b>
+&nbsp;            )
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;        Text(</b>
+<b class="fc">&nbsp;            text = label,</b>
+<b class="fc">&nbsp;            style = AppTheme.typography.labelLarge,</b>
+<b class="fc">&nbsp;            color = fg,</b>
+<b class="fc">&nbsp;            maxLines = 1,</b>
 &nbsp;        )
-&nbsp;        Text(
-&nbsp;            text = label,
-&nbsp;            style = AppTheme.typography.labelMedium,
-&nbsp;            color = fg,
-&nbsp;        )
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;@Preview
-&nbsp;@Composable
-&nbsp;private fun SurferSwipeRevealRowPreview() {
-&nbsp;    SurferComponentPreview {
-&nbsp;        SurferSwipeRevealRow(
-&nbsp;            revealWidth = 156.dp,
-&nbsp;            modifier = Modifier.padding(16.dp),
-&nbsp;            actions = {
-&nbsp;                SurferSwipeAction(
-&nbsp;                    icon = SurferIcons.Archive,
-&nbsp;                    label = &quot;Archive&quot;,
-&nbsp;                    onClick = {},
-&nbsp;                )
-&nbsp;                SurferSwipeAction(
-&nbsp;                    icon = SurferIcons.Delete,
-&nbsp;                    label = &quot;Delete&quot;,
-&nbsp;                    onClick = {},
-&nbsp;                    destructive = true,
-&nbsp;                )
-&nbsp;            },
-&nbsp;        ) {
-&nbsp;            Box(
-&nbsp;                modifier = Modifier
-&nbsp;                    .clip(RoundedCornerShape(18.dp))
-&nbsp;                    .background(AppTheme.materialColors.surfaceContainerLow)
-&nbsp;                    .padding(16.dp),
-&nbsp;            ) {
-&nbsp;                Text(
-&nbsp;                    text = &quot;Drag me left&quot;,
-&nbsp;                    style = AppTheme.typography.bodyLarge,
-&nbsp;                    color = Color.Unspecified,
-&nbsp;                )
-&nbsp;            }
-&nbsp;        }
-&nbsp;    }
-&nbsp;}
+<b class="fc">&nbsp;    }</b>
+<b class="fc">&nbsp;}</b>
 </code>
 </pre>
 </div>
@@ -350,7 +204,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 21:38</div>
+    <div style="float:right;">generated on 2026-07-28 22:10</div>
 </div>
 </body>
 </html>

@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > CategoryTree</title>
+  <title>MoneySurfer Coverage Report > CategorySpendHistoryKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.model</a>
 </div>
 
-<h1>Coverage Summary for Class: CategoryTree (com.georgeci.moneysurfer.domain.model)</h1>
+<h1>Coverage Summary for Class: CategorySpendHistoryKt (com.georgeci.moneysurfer.domain.model)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">CategoryTree</td>
+  <td class="name">CategorySpendHistoryKt</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -63,15 +63,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (5/5)
+    (4/4)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    85.2%
+    83.3%
   </span>
   <span class="absValue">
-    (46/54)
+    (5/6)
   </span>
 </td>
 <td class="coverageStat">
@@ -79,15 +79,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (48/48)
+    (27/27)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    93.1%
+    100%
   </span>
   <span class="absValue">
-    (377/405)
+    (179/179)
   </span>
 </td>
 </tr>
@@ -102,137 +102,128 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.model
 &nbsp;
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryId
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryType
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
+&nbsp;import kotlinx.datetime.DateTimeUnit
+&nbsp;import kotlinx.datetime.YearMonth
+&nbsp;import kotlinx.datetime.minus
+&nbsp;import kotlinx.datetime.plus
 &nbsp;
-&nbsp;/** A category placed in the tree, carrying how deep under a root it sits. */
-&nbsp;data class CategoryNode(
-&nbsp;    val category: Category,
-&nbsp;    val depth: Int,
+&nbsp;/** One column of the spend trend. [total] is zero for a month the category booked nothing in. */
+&nbsp;data class CategorySpendMonth(
+&nbsp;    val month: YearMonth,
+&nbsp;    val total: Money,
+&nbsp;)
+&nbsp;
+&nbsp;/** One row of the subcategory breakdown — a direct child, with its own subtree rolled in. */
+&nbsp;data class CategorySpendBreakdown(
+&nbsp;    val categoryId: CategoryId,
+&nbsp;    val total: Money,
+&nbsp;    val transactionCount: Int,
 &nbsp;)
 &nbsp;
 &nbsp;/**
-&nbsp; * Shapes a flat category list into the parent/child structure both the manage screen and the
-&nbsp; * parent picker need. Kept in the domain because the rule it encodes — a category may not
-&nbsp; * become its own ancestor — is a data-integrity rule, not a rendering detail.
+&nbsp; * Everything the category detail screen needs in numbers, for one category over a fixed window.
+&nbsp; *
+&nbsp; * Totals here are *rolled up*: a parent&#39;s figure includes its whole subtree, matching the
+&nbsp; * promise the manage screen makes (&quot;subcategories roll up into their parent&quot;). [subcategories]
+&nbsp; * is empty for a leaf, which is what drives the leaf empty state — a leaf is not an error case,
+&nbsp; * it is the common shape.
 &nbsp; */
-&nbsp;object CategoryTree {
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Deepest indent the UI draws. [eligibleParents] refuses to create anything deeper, but
-&nbsp;     * [flatten] still *renders* deeper rows — it just stops indenting them.
-&nbsp;     */
-&nbsp;    const val MAX_DEPTH: Int = 1
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Flattens to display order: every category, depth-first, each one immediately followed by
-&nbsp;     * its subtree.
-&nbsp;     *
-&nbsp;     * Every input category comes out exactly once. That is the whole contract, and it is worth
-&nbsp;     * stating because the shapes this has to survive are not the shapes the UI can create:
-&nbsp;     *
-&nbsp;     * - A child whose parent is not in [categories] is treated as a root — sync legitimately
-&nbsp;     *   delivers a child before its parent.
-&nbsp;     * - A subtree deeper than [MAX_DEPTH] is rendered in full, with the indent clamped. The UI
-&nbsp;     *   will not build one, but another client&#39;s write can.
-&nbsp;     * - A category caught in a parent cycle is reachable from no root at all. It is emitted at
-&nbsp;     *   the top level once the real roots are exhausted.
-&nbsp;     *
-&nbsp;     * In every one of those cases the alternative is a category that silently disappears from
-&nbsp;     * the manage screen, which is strictly worse than one drawn at the wrong indent.
-&nbsp;     */
-&nbsp;    fun flatten(categories: List&lt;Category&gt;): List&lt;CategoryNode&gt; {
-<b class="fc">&nbsp;        val present = categories.mapTo(mutableSetOf()) { it.id }</b>
-<b class="fc">&nbsp;        val childrenByParent = categories</b>
-<b class="pc">&nbsp;            .filter { it.parentId != null &amp;&amp; it.parentId in present }</b>
-<b class="pc">&nbsp;            .groupBy { requireNotNull(it.parentId) }</b>
-<b class="pc">&nbsp;        val (roots, nested) = categories.partition { it.parentId == null || it.parentId !in present }</b>
-&nbsp;
-<b class="fc">&nbsp;        val emitted = mutableSetOf&lt;CategoryId&gt;()</b>
-<b class="fc">&nbsp;        val result = mutableListOf&lt;CategoryNode&gt;()</b>
-<b class="fc">&nbsp;        val stack = ArrayDeque&lt;CategoryNode&gt;()</b>
-&nbsp;
-&nbsp;        // Real roots first; the nested pass then picks up only what no root reached, i.e. the
-&nbsp;        // members of a parent cycle. Everything else is already emitted and skipped.
-<b class="fc">&nbsp;        (roots + nested).forEach { seed -&gt;</b>
-<b class="fc">&nbsp;            if (seed.id in emitted) return@forEach</b>
-<b class="fc">&nbsp;            stack.addLast(CategoryNode(seed, depth = 0))</b>
-<b class="fc">&nbsp;            while (stack.isNotEmpty()) {</b>
-<b class="fc">&nbsp;                val node = stack.removeLast()</b>
-<b class="fc">&nbsp;                if (!emitted.add(node.category.id)) continue</b>
-<b class="fc">&nbsp;                result += node</b>
-<b class="fc">&nbsp;                val childDepth = (node.depth + 1).coerceAtMost(MAX_DEPTH)</b>
-<b class="fc">&nbsp;                childrenByParent[node.category.id].orEmpty().asReversed().forEach { child -&gt;</b>
-<b class="fc">&nbsp;                    stack.addLast(CategoryNode(child, childDepth))</b>
-<b class="fc">&nbsp;                }</b>
-&nbsp;            }
-<b class="fc">&nbsp;        }</b>
-<b class="fc">&nbsp;        return result</b>
-&nbsp;    }
-&nbsp;
-&nbsp;    /** Direct children of [parentId], in the order [categories] arrived. */
-&nbsp;    fun childrenOf(categories: List&lt;Category&gt;, parentId: CategoryId): List&lt;Category&gt; =
-<b class="fc">&nbsp;        categories.filter { it.parentId == parentId }</b>
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Every category reachable downwards from [rootId].
-&nbsp;     *
-&nbsp;     * [rootId] itself is in the result only when it is reachable from itself — i.e. it sits in a
-&nbsp;     * parent cycle, which sync can deliver even though the UI refuses to create one. That is the
-&nbsp;     * useful answer rather than an edge case to paper over: the one caller, [eligibleParents],
-&nbsp;     * uses this to decide what a category may *not* be parented to, and a category inside a
-&nbsp;     * cycle must not be offered as its own parent either.
-&nbsp;     *
-&nbsp;     * The walk is iterative and keeps a visited set, so a cycle terminates instead of hanging.
-&nbsp;     */
-&nbsp;    fun descendantsOf(categories: List&lt;Category&gt;, rootId: CategoryId): Set&lt;CategoryId&gt; {
-<b class="fc">&nbsp;        val childrenByParent = categories</b>
-<b class="fc">&nbsp;            .filter { it.parentId != null }</b>
-<b class="pc">&nbsp;            .groupBy { requireNotNull(it.parentId) }</b>
-<b class="fc">&nbsp;        val found = mutableSetOf&lt;CategoryId&gt;()</b>
-<b class="fc">&nbsp;        val queue = ArrayDeque(childrenByParent[rootId].orEmpty().map { it.id })</b>
-<b class="fc">&nbsp;        while (queue.isNotEmpty()) {</b>
-<b class="fc">&nbsp;            val next = queue.removeFirst()</b>
-<b class="fc">&nbsp;            if (!found.add(next)) continue</b>
-<b class="fc">&nbsp;            queue += childrenByParent[next].orEmpty().map { it.id }</b>
+&nbsp;data class CategorySpendHistory(
+&nbsp;    val months: List&lt;CategorySpendMonth&gt;,
+&nbsp;    val currentMonth: Money,
+&nbsp;    val transactionCount: Int,
+&nbsp;    val subcategories: List&lt;CategorySpendBreakdown&gt;,
+&nbsp;) {
+&nbsp;    /** Mean over the whole window, including months with nothing in them. */
+&nbsp;    val monthlyAverage: Money
+&nbsp;        get() = if (months.isEmpty()) {
+&nbsp;            Money.zero()
+&nbsp;        } else {
+&nbsp;            months.fold(Money.zero()) { acc, m -&gt;
+&nbsp;                acc + m.total
+&nbsp;            } / months.size
 &nbsp;        }
-<b class="fc">&nbsp;        return found</b>
-&nbsp;    }
 &nbsp;
-&nbsp;    /**
-&nbsp;     * Categories that may be picked as the parent of [categoryId] (null when creating).
-&nbsp;     *
-&nbsp;     * Excludes: a different type (an expense category under an income parent is meaningless),
-&nbsp;     * system categories, the category itself and everything below it (a category cannot be its
-&nbsp;     * own ancestor), and any category already nested [MAX_DEPTH] deep.
-&nbsp;     */
-&nbsp;    fun eligibleParents(
-&nbsp;        categories: List&lt;Category&gt;,
-&nbsp;        categoryId: CategoryId?,
-&nbsp;        type: CategoryType,
-&nbsp;    ): List&lt;Category&gt; {
-<b class="fc">&nbsp;        val excluded = categoryId</b>
-<b class="fc">&nbsp;            ?.let { descendantsOf(categories, it) + it }</b>
-<b class="fc">&nbsp;            .orEmpty()</b>
-<b class="fc">&nbsp;        val byId = categories.associateBy { it.id }</b>
-<b class="fc">&nbsp;        return categories.filter { candidate -&gt;</b>
-<b class="fc">&nbsp;            candidate.type == type &amp;&amp;</b>
-<b class="fc">&nbsp;                candidate.systemKind == null &amp;&amp;</b>
-<b class="fc">&nbsp;                candidate.id !in excluded &amp;&amp;</b>
-<b class="fc">&nbsp;                depthOf(candidate, byId) &lt; MAX_DEPTH</b>
-&nbsp;        }
-&nbsp;    }
+&nbsp;    /** Mean per transaction this month, or null when nothing was booked. */
+&nbsp;    val perTransaction: Money?
+&nbsp;        get() = if (transactionCount &lt;= 0) null else currentMonth / transactionCount
 &nbsp;
-&nbsp;    private fun depthOf(category: Category, byId: Map&lt;CategoryId, Category&gt;): Int {
-<b class="fc">&nbsp;        var depth = 0</b>
-<b class="fc">&nbsp;        var parentId = category.parentId</b>
-<b class="fc">&nbsp;        val seen = mutableSetOf(category.id)</b>
-<b class="pc">&nbsp;        while (parentId != null &amp;&amp; seen.add(parentId)) {</b>
-<b class="fc">&nbsp;            depth++</b>
-<b class="pc">&nbsp;            parentId = byId[parentId]?.parentId</b>
-&nbsp;        }
-<b class="fc">&nbsp;        return depth</b>
+&nbsp;    companion object {
+&nbsp;        /** Columns the trend draws. Six fits the mockup&#39;s bar row without crowding on a phone. */
+&nbsp;        const val TREND_MONTHS: Int = 6
+&nbsp;
+&nbsp;        val Empty = CategorySpendHistory(
+&nbsp;            months = emptyList(),
+&nbsp;            currentMonth = Money.zero(),
+&nbsp;            transactionCount = 0,
+&nbsp;            subcategories = emptyList(),
+&nbsp;        )
 &nbsp;    }
 &nbsp;}
+&nbsp;
+&nbsp;/** [count] months ending at [anchor] inclusive, oldest first. */
+&nbsp;fun trailingMonths(anchor: YearMonth, count: Int): List&lt;YearMonth&gt; =
+<b class="fc">&nbsp;    (count - 1 downTo 0).map { anchor.minus(it, DateTimeUnit.MONTH) }</b>
+&nbsp;
+&nbsp;/**
+&nbsp; * Folds raw per-category-per-month rows into the shape the detail screen renders.
+&nbsp; *
+&nbsp; * Pure, and deliberately tolerant of a sparse [totals]: the aggregate query only returns months
+&nbsp; * a category actually booked something in, so every month in [months] is emitted here whether or
+&nbsp; * not a row backs it. Without that the trend would silently shrink to however many months had
+&nbsp; * spend, and a quiet category would draw a two-bar chart labelled &quot;last 6 months&quot;.
+&nbsp; *
+&nbsp; * Rows for categories outside [rootId]&#39;s subtree are ignored rather than trusted, so a caller
+&nbsp; * passing a wider query result cannot inflate the total.
+&nbsp; */
+&nbsp;fun buildCategorySpendHistory(
+&nbsp;    categories: List&lt;Category&gt;,
+&nbsp;    rootId: CategoryId,
+&nbsp;    totals: List&lt;CategoryMonthlyTotal&gt;,
+&nbsp;    months: List&lt;YearMonth&gt;,
+&nbsp;): CategorySpendHistory {
+<b class="fc">&nbsp;    val subtree = CategoryTree.descendantsOf(categories, rootId) + rootId</b>
+<b class="fc">&nbsp;    val currentMonth = months.lastOrNull()</b>
+&nbsp;
+<b class="fc">&nbsp;    val byCategory = totals.groupBy { it.categoryId }</b>
+&nbsp;    fun rollUp(ids: Set&lt;CategoryId&gt;, month: YearMonth?): Pair&lt;Money, Int&gt; {
+<b class="fc">&nbsp;        var total = Money.zero()</b>
+<b class="fc">&nbsp;        var count = 0</b>
+<b class="fc">&nbsp;        ids.forEach { id -&gt;</b>
+<b class="fc">&nbsp;            byCategory[id].orEmpty().forEach { row -&gt;</b>
+<b class="pc">&nbsp;                if (month == null || row.month == month) {</b>
+<b class="fc">&nbsp;                    total += row.total</b>
+<b class="fc">&nbsp;                    count += row.transactionCount</b>
+&nbsp;                }
+<b class="fc">&nbsp;            }</b>
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;        return total to count</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    val trend = months.map { month -&gt;</b>
+<b class="fc">&nbsp;        CategorySpendMonth(month = month, total = rollUp(subtree, month).first)</b>
+&nbsp;    }
+<b class="fc">&nbsp;    val (thisMonth, thisMonthCount) = rollUp(subtree, currentMonth)</b>
+&nbsp;
+<b class="fc">&nbsp;    val breakdown = CategoryTree.childrenOf(categories, rootId).map { child -&gt;</b>
+&nbsp;        // A child may itself have children — the mockup shows one flat row per direct child, so
+&nbsp;        // a grandchild&#39;s spend belongs on its parent&#39;s row rather than vanishing from the split.
+<b class="fc">&nbsp;        val childSubtree = CategoryTree.descendantsOf(categories, child.id) + child.id</b>
+<b class="fc">&nbsp;        val (total, count) = rollUp(childSubtree, currentMonth)</b>
+<b class="fc">&nbsp;        CategorySpendBreakdown(categoryId = child.id, total = total, transactionCount = count)</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    return CategorySpendHistory(</b>
+<b class="fc">&nbsp;        months = trend,</b>
+<b class="fc">&nbsp;        currentMonth = thisMonth,</b>
+<b class="fc">&nbsp;        transactionCount = thisMonthCount,</b>
+<b class="fc">&nbsp;        subcategories = breakdown,</b>
+&nbsp;    )
+&nbsp;}
+&nbsp;
+&nbsp;/** The month after this one — the exclusive upper bound of a window ending at it. */
+<b class="fc">&nbsp;fun YearMonth.next(): YearMonth = plus(1, DateTimeUnit.MONTH)</b>
 </code>
 </pre>
 </div>
@@ -256,7 +247,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 21:38</div>
+    <div style="float:right;">generated on 2026-07-28 22:10</div>
 </div>
 </body>
 </html>

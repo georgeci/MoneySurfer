@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > RecurringSchedule</title>
+  <title>MoneySurfer Coverage Report > MissingDayPolicy</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.model</a>
 </div>
 
-<h1>Coverage Summary for Class: RecurringSchedule (com.georgeci.moneysurfer.domain.model)</h1>
+<h1>Coverage Summary for Class: MissingDayPolicy (com.georgeci.moneysurfer.domain.model)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">RecurringSchedule</td>
+  <td class="name">MissingDayPolicy</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -72,7 +72,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (5/5)
+    (2/2)
   </span>
 </td>
 <td class="coverageStat">
@@ -80,7 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (33/33)
+    (18/18)
   </span>
 </td>
 </tr>
@@ -123,11 +123,11 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;)
 &nbsp;
 &nbsp;data class RecurringSchedule(
-<b class="fc">&nbsp;    val frequency: RecurringFrequency,</b>
-<b class="fc">&nbsp;    val interval: Int = 1,</b>
-<b class="fc">&nbsp;    val daysOfWeek: Set&lt;DayOfWeek&gt; = emptySet(),</b>
-<b class="fc">&nbsp;    val daysOfMonth: Set&lt;Int&gt; = emptySet(),</b>
-<b class="fc">&nbsp;    val missingDayPolicy: MissingDayPolicy = MissingDayPolicy.LAST_DAY_OF_MONTH,</b>
+&nbsp;    val frequency: RecurringFrequency,
+&nbsp;    val interval: Int = 1,
+&nbsp;    val daysOfWeek: Set&lt;DayOfWeek&gt; = emptySet(),
+&nbsp;    val daysOfMonth: Set&lt;Int&gt; = emptySet(),
+&nbsp;    val missingDayPolicy: MissingDayPolicy = MissingDayPolicy.LAST_DAY_OF_MONTH,
 &nbsp;)
 &nbsp;
 &nbsp;enum class RecurringFrequency {
@@ -138,8 +138,8 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;}
 &nbsp;
 &nbsp;enum class MissingDayPolicy {
-&nbsp;    SKIP,
-&nbsp;    LAST_DAY_OF_MONTH,
+<b class="fc">&nbsp;    SKIP,</b>
+<b class="fc">&nbsp;    LAST_DAY_OF_MONTH,</b>
 &nbsp;}
 </code>
 </pre>
@@ -164,7 +164,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 21:38</div>
+    <div style="float:right;">generated on 2026-07-28 22:10</div>
 </div>
 </body>
 </html>
