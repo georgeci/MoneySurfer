@@ -155,6 +155,9 @@ internal class WindowingTransactionRepository(
 ) : TransactionRepository {
     private val rows = MutableStateFlow(transactions)
 
+    /** Rows a delete tombstoned — out of every read, still there for a restore. */
+    private val tombstones = mutableMapOf<TransactionId, Transaction>()
+
     var lastWindow: TransactionPeriodWindow? = null
         private set
 
@@ -210,8 +213,12 @@ internal class WindowingTransactionRepository(
     }
 
     override suspend fun delete(id: TransactionId) {
+        rows.value.filter { it.id == id }.forEach { tombstones[id] = it }
         rows.value = rows.value.filterNot { it.id == id }
     }
+
+    override suspend fun restore(id: TransactionId): Transaction? =
+        tombstones.remove(id)?.also { rows.value = rows.value + it }
 }
 
 internal object SingleAccountRepository : AccountRepository {

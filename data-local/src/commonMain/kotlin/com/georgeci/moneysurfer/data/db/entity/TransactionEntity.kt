@@ -69,4 +69,16 @@ data class TransactionEntity(
     // row outright. An index would also be dead weight, since the "Recurring only" filter runs
     // inside a workspace scan already served by the composite indices above.
     @ColumnInfo(name = "recurringRuleId") val recurringRuleId: String? = null,
+    // Tombstone: non-null means the user deleted this row (issue #346). Every read query in
+    // TransactionDao adds `deletedAt IS NULL`; the row itself survives so Undo is a single
+    // UPDATE rather than a re-insert, and survives process death rather than living in a
+    // Snackbar lambda. Mirrors `TransactionDoc.deletedAt` on the wire, so a pulled tombstone
+    // and a local delete are the same state. Purged after a retention window — see
+    // PurgeDeletedTransactionsUseCase.
+    //
+    // Deliberately unindexed. It is a low-cardinality column (almost every row is NULL) that
+    // never appears alone in a WHERE clause — it always rides along with a workspace or
+    // account filter already served by the composite indices above, so SQLite would ignore a
+    // separate index on it while every insert paid to maintain it.
+    @ColumnInfo(name = "deletedAt") val deletedAt: Long? = null,
 )

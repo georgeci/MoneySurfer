@@ -131,6 +131,9 @@ class CreateTransferUseCaseTest : StringSpec({
 
 private class TransferEnv(seedCategories: List<Category>) {
     val txStore = mutableMapOf<TransactionId, Transaction>()
+
+    /** Rows a delete tombstoned — out of every read, still there for a restore. */
+    private val tombstones = mutableMapOf<TransactionId, Transaction>()
     val categoryStore = mutableMapOf<CategoryId, Category>().apply {
         seedCategories.forEach { put(it.id, it) }
     }
@@ -156,7 +159,11 @@ private class TransferEnv(seedCategories: List<Category>) {
             txStore.values.filter { it.transferId == transferId }
         override suspend fun insert(transaction: Transaction) { txStore[transaction.id] = transaction }
         override suspend fun update(transaction: Transaction) { txStore[transaction.id] = transaction }
-        override suspend fun delete(id: TransactionId) { txStore.remove(id) }
+        override suspend fun delete(id: TransactionId) {
+            txStore.remove(id)?.let { tombstones[id] = it }
+        }
+        override suspend fun restore(id: TransactionId): Transaction? =
+            tombstones.remove(id)?.also { txStore[id] = it }
     }
 
     private val accRepo = object : AccountRepository {

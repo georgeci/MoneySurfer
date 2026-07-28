@@ -14,6 +14,7 @@
 - [Outbox bypass](#outbox-bypass)
 - [Cursor + apply atomicity](#cursor--apply-atomicity)
 - [Tombstones (soft delete)](#tombstones-soft-delete)
+  - [Local tombstone retention](#local-tombstone-retention)
 - [WorkspaceInvite](#workspaceinvite)
 - [SyncMetaRepository](#syncmetarepository)
 - [Recalc placeholder](#recalc-placeholder)
@@ -25,7 +26,8 @@
 - Pull is cursor-based on `updatedAt` per `(workspaceId, collection)`.
 - Conflict resolution is LWW; ties go to local (stable, idempotent re-pulls).
 - Pull writes go through DAOs directly — never through the outbox.
-- Tombstones land as hard local deletes; the cursor still advances past them.
+- Tombstones land as hard local deletes — except transactions, which keep a
+  local `deletedAt` row (issue #346). The cursor advances past them either way.
 - Collections are pulled in order: members → invites → accounts → categories → transactions.
 
 READ WHEN:
@@ -143,11 +145,19 @@ sign in".
 
 For each `DocumentSnapshot` in the batch:
 
-1. **Tombstone check.** If the DTO has `deletedAt != null`, hard-delete
-   the local row via the matching DAO (e.g. `accountDao.delete(id)`) and
+1. **Tombstone check.** If the DTO has `deletedAt != null`, remove the
+   local row via the matching DAO (e.g. `accountDao.delete(id)`) and
    record `applied = true, wasConflict = false`. The cursor still
    advances on tombstones — that is exactly how a delete propagates from
    one device to another.
+   Transactions are the exception: they *mark* the row instead, with
+   `transactionDao.softDelete(id, dto.deletedAt!!)` — a targeted UPDATE,
+   not an upsert of the decoded doc, since a tombstone patch carries no
+   real fields and a device that never held the row must not have one
+   conjured out of it (the `accountId` foreign key would reject it
+   anyway). The tombstone still wins unconditionally, without consulting
+   the resolver: a delete is not a field-level edit a newer local write
+   can outrank.
 2. **Conflict resolution.** Read the current local entity, build a
    `ConflictMetadata`, and ask the resolver:
    ```kotlin
@@ -267,6 +277,14 @@ has been deleted on a peer device". The current pull behaviour:
 - `deletedAt != null` ⇒ DAO `delete(id)` locally. **Hard delete** in
   Room, soft delete in Firestore — the doc is preserved as a tombstone
   so future pulls (with `cursor > deletedAt`) don't see it again.
+- **Transactions are soft-deleted in Room too** (issue #346):
+  `transactionDao.softDelete(id, deletedAt)` marks the row, every read
+  query in `TransactionDao` filters on `deletedAt IS NULL`, and
+  `TransactionRepository.restore(id)` lifts the tombstone in a single
+  UPDATE. That is what makes Undo survive process death, and it means a
+  peer's delete is as recoverable here as a local one. A restore pushes
+  an ordinary upsert whose `deletedAt` is null, which lifts the
+  tombstone remotely as well — no INSERT-after-DELETE flicker.
 - The cursor still advances past tombstones — the doc has a real
   `updatedAt`, just like any other update.
 
@@ -287,13 +305,41 @@ Push-side tombstone contract:
   `serverTimestamp()` — the clock-skew caveat in
   [sync-gaps.md](sync-gaps.md) applies to tombstones too.
 - A DELETE whose doc never reached Firestore (entity created and
-  deleted between two drains — the INSERT push no-ops once the Room row
-  is gone) is **skipped**: `pushTombstone` checks `get().exists` first.
-  Updating a missing doc would raise NOT_FOUND on every retry and wedge
-  the batch; a doc that never existed remotely has nothing for peers to
-  forget.
-- Tombstoned docs are never garbage-collected today — retention/GC is a
-  known gap, listed in [sync-gaps.md](sync-gaps.md).
+  deleted between two drains — the INSERT push no-ops because its
+  `getById` finds no live row) is **skipped**: `pushTombstone` checks
+  `get().exists` first. Updating a missing doc would raise NOT_FOUND on
+  every retry and wedge the batch; a doc that never existed remotely has
+  nothing for peers to forget.
+- A soft delete enqueues exactly one DELETE mutation. Deleting an
+  already-tombstoned row enqueues nothing: a second tombstone would
+  carry a later `deletedAt` than the one peers already agreed on.
+- Tombstoned **docs** are never garbage-collected today — remote
+  retention/GC is a known gap, listed in [sync-gaps.md](sync-gaps.md).
+  Local transaction tombstones *are* collected; see below.
+
+### Local tombstone retention
+
+`transactions.deletedAt` rows are purged by
+`PurgeDeletedTransactionsUseCase` (`:domain`), which drops every
+tombstone older than **30 days**.
+
+- **Who runs it:** the app, once per launch, from `AppLaunchViewModel`.
+  Not a background worker: it is a single indexed `DELETE` over rows
+  nobody reads, and scheduling it on two platforms would buy nothing.
+  It runs off the startup path and its failures are logged and
+  swallowed, so housekeeping can never keep the app off its first
+  screen.
+- **Why 30 days:** not for the Undo, which is a Snackbar and expires in
+  seconds — for the peers. A device that has been offline for a while
+  pulls the tombstone by `updatedAt`; purging before it syncs would
+  leave this device with no record either way. Thirty days is well past
+  the sync cadence and short enough that a deleted row does not sit in a
+  backup for a year.
+- **What it does not touch:** the remote doc keeps its `deletedAt`. That
+  tombstone is how peers learn about the delete at all, and collecting
+  it is the separate gap above.
+- After the purge the row is gone for good: a restore finds nothing and
+  is a no-op, and a CSV import of the same id inserts it fresh.
 
 ## `WorkspaceInvite`
 

@@ -44,13 +44,32 @@ class TransactionSyncPlugin(
         }
     }
 
+    /**
+     * A pulled tombstone marks the local row deleted instead of dropping it (issue #346), which
+     * makes a remote delete and a local one land in exactly the same state — and leaves the peer's
+     * delete just as recoverable as this device's own.
+     *
+     * It is a targeted UPDATE rather than an upsert of the decoded doc: a tombstone patch carries
+     * only `deletedAt`, `updatedAt` and `clientVersionCode`, so upserting what it decodes to would
+     * write a row of defaults over real data — and would conjure one out of nothing, failing the
+     * account foreign key, on a device that never held the row. A device that never had it has
+     * nothing to forget, and `softDelete` no-ops there.
+     *
+     * The tombstone wins unconditionally, without consulting the resolver — as the hard delete it
+     * replaces did. A delete is not a field-level edit that a newer local write can outrank; the
+     * user removed the row, and the way back is Undo on the device that deleted it.
+     */
     override suspend fun applyDoc(doc: RemoteDocument, scopeKey: String): EntityApplyResult {
         val dto = doc.decodeOrNull(TransactionDoc.serializer()) ?: return SKIPPED_APPLY_RESULT
-        if (dto.deletedAt != null) {
-            transactionDao.delete(doc.id)
+        val remoteDeletedAt = dto.deletedAt
+        if (remoteDeletedAt != null) {
+            transactionDao.softDelete(doc.id, remoteDeletedAt)
             return EntityApplyResult(applied = true, wasConflict = false)
         }
-        val local = transactionDao.getById(doc.id)
+        // Includes tombstoned rows on purpose: a locally-deleted row that is invisible here reads
+        // as "no local copy", and the resolver would take an older remote doc as a fresh insert —
+        // resurrecting exactly what the user just deleted.
+        val local = transactionDao.getByIdIncludingDeleted(doc.id)
         val resolution = conflictResolver.resolve(
             local = local,
             remote = dto.toEntity(id = doc.id, workspaceId = scopeKey),

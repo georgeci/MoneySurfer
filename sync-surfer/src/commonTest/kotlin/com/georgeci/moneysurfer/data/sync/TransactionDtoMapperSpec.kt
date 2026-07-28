@@ -81,4 +81,21 @@ class TransactionDtoMapperSpec : StringSpec({
         entity.recurringRuleId shouldBe null
         entity.toDoc().tags shouldBe emptyList()
     }
+
+    // Since issue #346 the Room column and the wire field are the same tombstone, so the mapping
+    // has to carry it both ways: a row pushed while deleted must stay deleted for peers, and a
+    // restored row must push `deletedAt = null` — which is what lifts the remote tombstone.
+    "the tombstone round-trips through the wire format" {
+        val deleted = transactionDoc().copy(deletedAt = 4_000)
+
+        val entity = deleted.toEntity(id = TX, workspaceId = WORKSPACE)
+
+        entity.deletedAt shouldBe 4_000
+        entity.toDoc().deletedAt shouldBe 4_000
+        entity.copy(deletedAt = null).toDoc().deletedAt shouldBe null
+    }
+
+    "a doc with no deletedAt decodes to a live row" {
+        transactionDoc().toEntity(id = TX, workspaceId = WORKSPACE).deletedAt shouldBe null
+    }
 })

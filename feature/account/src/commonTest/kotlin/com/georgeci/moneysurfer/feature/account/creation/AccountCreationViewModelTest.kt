@@ -608,6 +608,9 @@ private class FakeTransactionRepository : TransactionRepository {
     private val byId = mutableMapOf<TransactionId, Transaction>()
     private val all = MutableStateFlow<List<Transaction>>(emptyList())
 
+    /** Rows a delete tombstoned — out of every read, still there for a restore. */
+    private val tombstones = mutableMapOf<TransactionId, Transaction>()
+
     override fun getAll(): Flow<List<Transaction>> = all
     override fun getByAccountId(accountId: AccountId): Flow<List<Transaction>> = all
     override fun getCategorizedWindow(
@@ -630,9 +633,15 @@ private class FakeTransactionRepository : TransactionRepository {
         all.value = byId.values.toList()
     }
     override suspend fun delete(id: TransactionId) {
-        byId.remove(id)
+        byId.remove(id)?.let { tombstones[id] = it }
         all.value = byId.values.toList()
     }
+
+    override suspend fun restore(id: TransactionId): Transaction? =
+        tombstones.remove(id)?.also {
+            byId[id] = it
+            all.value = byId.values.toList()
+        }
 }
 
 private class FakeWorkspaceRepository(workspace: Workspace) : WorkspaceRepository {

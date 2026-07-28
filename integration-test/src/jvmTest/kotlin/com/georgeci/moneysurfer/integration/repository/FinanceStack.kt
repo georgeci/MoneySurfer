@@ -6,6 +6,7 @@ import com.georgeci.moneysurfer.data.repository.AccountRepositoryImpl
 import com.georgeci.moneysurfer.data.repository.CategoryRepositoryImpl
 import com.georgeci.moneysurfer.data.repository.TimeFormatter
 import com.georgeci.moneysurfer.data.repository.TransactionRepositoryImpl
+import com.georgeci.moneysurfer.data.repository.TransactionRetentionRepositoryImpl
 import com.georgeci.moneysurfer.data.repository.WorkspaceRepositoryImpl
 import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
@@ -40,6 +41,8 @@ internal class FinanceStack(harness: IntegrationHarness) {
         clock = clock,
         timeFormatter = timeFormatter,
     )
+    val retention = TransactionRetentionRepositoryImpl(dao = harness.database.transactionDao())
+
     val categoryRepository = CategoryRepositoryImpl(
         dao = harness.database.categoryDao(),
         outboxEnqueuer = outbox,
@@ -54,7 +57,7 @@ internal class FinanceStack(harness: IntegrationHarness) {
         timeFormatter = timeFormatter,
     )
 
-    private val applyTransactionChange = ApplyTransactionChangeUseCase(
+    val applyTransactionChange = ApplyTransactionChangeUseCase(
         transactionRepository = transactionRepository,
         accountRepository = accountRepository,
     )

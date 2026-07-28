@@ -114,6 +114,7 @@ private class BudgetTransactionsEnv(private val rows: List<Transaction>) {
         override suspend fun insert(transaction: Transaction) = Unit
         override suspend fun update(transaction: Transaction) = Unit
         override suspend fun delete(id: TransactionId) = Unit
+        override suspend fun restore(id: TransactionId): Transaction? = null
     }
 
     private val workspaceRepo = object : WorkspaceRepository {

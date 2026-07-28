@@ -79,7 +79,7 @@ a reviewer.
   because LWW tie-breaking is `TakeLocal`. If a future resolver introduces
   side effects, this contract has to tighten — see
   [sync-pull-lww.md](sync-pull-lww.md#cursor--apply-atomicity).
-- **Tombstone retention / GC not implemented.**
+- **Remote tombstone retention / GC not implemented.**
   Push-side soft delete shipped: `MutationOperation.DELETE` writes a
   `TombstonePatch` (`deletedAt` + `updatedAt` + `clientVersionCode`)
   via `update`, never `firestore.delete()` — see
@@ -89,6 +89,11 @@ a reviewer.
   (Cloud Function or owner-client sweep) is future work, and any
   retention window must stay longer than the longest plausible
   offline-device gap or trimmed tombstones resurrect stale rows.
+  *Local* transaction tombstones are collected — 30 days, on app
+  launch, see
+  [Local tombstone retention](sync-pull-lww.md#local-tombstone-retention).
+  That policy says nothing about the remote doc, which is why this gap
+  stays open.
 - **Tombstone `updatedAt` uses the client clock.** The tombstone stamps
   the mutation's enqueue time. A peer whose cursor already advanced past
   that value (possible only with clock skew between devices) misses the

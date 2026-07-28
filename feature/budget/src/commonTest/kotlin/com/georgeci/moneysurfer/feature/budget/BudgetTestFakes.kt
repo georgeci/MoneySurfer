@@ -59,6 +59,9 @@ internal class FakeBudgetRepository(initial: List<Budget> = emptyList()) : Budge
 internal class FakeTransactionRepository(initial: List<Transaction> = emptyList()) : TransactionRepository {
     private val flow = MutableStateFlow(initial)
 
+    /** Rows a delete tombstoned — out of [flow], so no read sees them, but restorable. */
+    private val tombstones = mutableListOf<Transaction>()
+
     fun emit(transactions: List<Transaction>) {
         flow.value = transactions
     }
@@ -127,8 +130,15 @@ internal class FakeTransactionRepository(initial: List<Transaction> = emptyList(
     }
 
     override suspend fun delete(id: TransactionId) {
+        tombstones += flow.value.filter { it.id == id }
         flow.value = flow.value.filterNot { it.id == id }
     }
+
+    override suspend fun restore(id: TransactionId): Transaction? =
+        tombstones.firstOrNull { it.id == id }?.also {
+            tombstones -= it
+            flow.value = flow.value + it
+        }
 }
 
 internal class FakeWorkspaceRepository(initial: List<Workspace> = emptyList()) : WorkspaceRepository {
