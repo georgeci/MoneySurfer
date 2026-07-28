@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > DashboardWidgetType</title>
+  <title>MoneySurfer Coverage Report > DashboardWidgetSize</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.dashboard</a>
 </div>
 
-<h1>Coverage Summary for Class: DashboardWidgetType (com.georgeci.moneysurfer.domain.dashboard)</h1>
+<h1>Coverage Summary for Class: DashboardWidgetSize (com.georgeci.moneysurfer.domain.dashboard)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">DashboardWidgetType</td>
+  <td class="name">DashboardWidgetSize</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -72,7 +72,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (8/8)
+    (2/2)
   </span>
 </td>
 <td class="coverageStat">
@@ -80,7 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (54/54)
+    (18/18)
   </span>
 </td>
 </tr>
@@ -95,20 +95,28 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.dashboard
 &nbsp;
 &nbsp;/**
-&nbsp; * Registry of the widgets the dashboard can render. The dashboard screen has a renderer for every
-&nbsp; * entry here, so adding a widget is a two-step change: add the constant, then handle it in the
-&nbsp; * screen&#39;s `when`. Entries are also the persistence keys of a saved layout — renaming one drops
-&nbsp; * that widget from layouts already stored on device, so prefer adding over renaming.
+&nbsp; * How much room a widget takes in the column. Maps 1:1 onto `uikit.widgets.SurferWidgetSize`;
+&nbsp; * declared in the domain so a layout can be persisted without leaking UI types into `data`.
 &nbsp; */
-&nbsp;enum class DashboardWidgetType {
-<b class="fc">&nbsp;    Balance,</b>
-<b class="fc">&nbsp;    QuickActions,</b>
-<b class="fc">&nbsp;    SafeToSpend,</b>
-<b class="fc">&nbsp;    BurnRate,</b>
-<b class="fc">&nbsp;    Accounts,</b>
-<b class="fc">&nbsp;    Insights,</b>
-<b class="fc">&nbsp;    Goals,</b>
-<b class="fc">&nbsp;    RecentTransactions,</b>
+&nbsp;enum class DashboardWidgetSize {
+<b class="fc">&nbsp;    Expanded,</b>
+<b class="fc">&nbsp;    Compact,</b>
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * Visual treatment of a single dashboard widget: its [size] plus an optional widget-specific
+&nbsp; * [variant] key (e.g. a chart flavour) that only the widget that defines it understands. The
+&nbsp; * variant is free-form on purpose — each widget task can introduce its own values without
+&nbsp; * touching this type or the persistence format.
+&nbsp; */
+&nbsp;data class DashboardCardStyle(
+&nbsp;    val size: DashboardWidgetSize = DashboardWidgetSize.Expanded,
+&nbsp;    val variant: String? = null,
+&nbsp;) {
+&nbsp;    companion object {
+&nbsp;        val EXPANDED = DashboardCardStyle(DashboardWidgetSize.Expanded)
+&nbsp;        val COMPACT = DashboardCardStyle(DashboardWidgetSize.Compact)
+&nbsp;    }
 &nbsp;}
 </code>
 </pre>
@@ -133,7 +141,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 22:19</div>
+    <div style="float:right;">generated on 2026-07-28 22:39</div>
 </div>
 </body>
 </html>

@@ -52,7 +52,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (8/8)
+    (9/9)
   </span>
 </td>
 <td class="coverageStat">
@@ -68,7 +68,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (39/39)
+    (40/40)
   </span>
 </td>
 <td class="coverageStat">
@@ -76,7 +76,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     99.2%
   </span>
   <span class="absValue">
-    (362/365)
+    (371/374)
   </span>
 </td>
 </tr>
@@ -115,7 +115,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (9/9)
+    (10/10)
   </span>
 </td>
 <td class="coverageStat">
@@ -131,7 +131,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (40/40)
+    (41/41)
   </span>
 </td>
 <td class="coverageStat">
@@ -139,7 +139,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     99.2%
   </span>
   <span class="absValue">
-    (363/366)
+    (372/375)
   </span>
 </td>
 </tr>
@@ -170,6 +170,14 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    /** The widgets the user switched off — the &quot;Available&quot; half of the customize screen. */
 &nbsp;    val disabledItems: List&lt;DashboardLayoutItem&gt;
 <b class="fc">&nbsp;        get() = items.filterNot { it.enabled }</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Whether anything on screen reads [DashboardPeriod]. The period switch is chrome for the
+&nbsp;     * widgets under it, so a layout that shows none of them shows no switch either — a Week/Month
+&nbsp;     * control that visibly changes nothing reads as a broken one.
+&nbsp;     */
+&nbsp;    val hasPeriodScopedWidget: Boolean
+<b class="fc">&nbsp;        get() = enabledItems.any { it.type.isPeriodScoped }</b>
 &nbsp;
 &nbsp;    /**
 &nbsp;     * [type] switched on or off, keeping the item either way so its card style survives the round
@@ -281,7 +289,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 22:19</div>
+    <div style="float:right;">generated on 2026-07-28 22:39</div>
 </div>
 </body>
 </html>

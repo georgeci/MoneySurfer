@@ -68,7 +68,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (14/14)
+    (15/15)
   </span>
 </td>
 <td class="coverageStat">
@@ -76,7 +76,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (30/30)
+    (23/23)
   </span>
 </td>
 </tr>
@@ -125,45 +125,41 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <td class="coverageStat"/>
   </tr>
   <tr>
-    <td class="name">GetSafeToSpendUseCase$invoke$lambda$1$$inlined$map$1</td>
+    <td class="name">GetSafeToSpendUseCase$invoke$2$1</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/2)
+    (1/1)
   </span>
 </td>
     <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">GetSafeToSpendUseCase$invoke$lambda$1$$inlined$map$1$1</td>
-    <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">GetSafeToSpendUseCase$invoke$lambda$1$$inlined$map$1$2</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
-    <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">GetSafeToSpendUseCase$invoke$lambda$1$$inlined$map$1$2$1</td>
-    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (8/8)
+  </span>
+</td>
   </tr>
 <tr>
   <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
-    36.4%
+    55.6%
   </span>
   <span class="absValue">
-    (4/11)
+    (5/9)
   </span>
 </td>
 <td class="coverageStat">
@@ -179,7 +175,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (14/14)
+    (16/16)
   </span>
 </td>
 <td class="coverageStat">
@@ -187,7 +183,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (30/30)
+    (31/31)
   </span>
 </td>
 </tr>
@@ -200,10 +196,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.usecase
 &nbsp;
+&nbsp;import com.georgeci.moneysurfer.domain.model.BudgetPeriod
 &nbsp;import com.georgeci.moneysurfer.domain.model.SafeToSpend
 &nbsp;import com.georgeci.moneysurfer.domain.model.safeToSpend
 &nbsp;import kotlinx.coroutines.ExperimentalCoroutinesApi
 &nbsp;import kotlinx.coroutines.flow.Flow
+&nbsp;import kotlinx.coroutines.flow.combine
 &nbsp;import kotlinx.coroutines.flow.distinctUntilChanged
 &nbsp;import kotlinx.coroutines.flow.flatMapLatest
 &nbsp;import kotlinx.coroutines.flow.flowOf
@@ -225,6 +223,14 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp; * budgets against the previous workspace&#39;s transactions, briefly reporting the full limit as unspent.
 &nbsp; * Reading both from one emission makes that pairing impossible; [GetBudgetsUseCase] already returns
 &nbsp; * an empty list when nobody is signed in, which is the same &quot;nothing backs it&quot; answer.
+&nbsp; *
+&nbsp; * [preferredPeriod] arrives as a flow rather than a value so that changing it re-picks the budget
+&nbsp; * without tearing down the subscription underneath. `progressOf` reads the workspace&#39;s whole
+&nbsp; * transaction list per emission, and re-running that every time the dashboard&#39;s Week/Month switch
+&nbsp; * is tapped would be the most expensive query in the app answering a question it already has the
+&nbsp; * data for. It is required rather than defaulted: this figure is about a period, so a caller has
+&nbsp; * to say which one it is answering for — `flowOf(null)` spells &quot;no period on screen, pick the
+&nbsp; * largest cap&quot;, which is a claim worth making out loud.
 &nbsp; */
 <b class="fc">&nbsp;@Single</b>
 &nbsp;@OptIn(ExperimentalCoroutinesApi::class)
@@ -233,7 +239,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;    private val getBudgetProgress: GetBudgetProgressUseCase,</b>
 &nbsp;) {
 &nbsp;
-<b class="fc">&nbsp;    operator fun invoke(timeZone: TimeZone = TimeZone.currentSystemDefault()): Flow&lt;SafeToSpend?&gt; =</b>
+&nbsp;    operator fun invoke(
+&nbsp;        preferredPeriod: Flow&lt;BudgetPeriod?&gt;,
+<b class="fc">&nbsp;        timeZone: TimeZone = TimeZone.currentSystemDefault(),</b>
+&nbsp;    ): Flow&lt;SafeToSpend?&gt; =
 <b class="fc">&nbsp;        getBudgets()</b>
 <b class="fc">&nbsp;            .map { budgets -&gt; budgets.filter { it.isActive } }</b>
 <b class="fc">&nbsp;            .distinctUntilChanged()</b>
@@ -242,8 +251,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;                if (workspaceId == null) {</b>
 <b class="fc">&nbsp;                    flowOf(null)</b>
 &nbsp;                } else {
-<b class="fc">&nbsp;                    getBudgetProgress.progressOf(workspaceId, budgets, timeZone)</b>
-<b class="fc">&nbsp;                        .map { progresses -&gt; progresses.safeToSpend() }</b>
+<b class="fc">&nbsp;                    combine(</b>
+<b class="fc">&nbsp;                        getBudgetProgress.progressOf(workspaceId, budgets, timeZone),</b>
+<b class="fc">&nbsp;                        preferredPeriod,</b>
+<b class="fc">&nbsp;                    ) { progresses, period -&gt; progresses.safeToSpend(period) }</b>
 <b class="fc">&nbsp;                }</b>
 &nbsp;            }
 &nbsp;}
@@ -270,7 +281,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 22:19</div>
+    <div style="float:right;">generated on 2026-07-28 22:39</div>
 </div>
 </body>
 </html>

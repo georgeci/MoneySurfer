@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SurferReorderableListKt</title>
+  <title>MoneySurfer Coverage Report > SurferReorderState</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,12 +22,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.uikit.components.base</a>
 </div>
 
-<h1>Coverage Summary for Class: SurferReorderableListKt (com.georgeci.moneysurfer.uikit.components.base)</h1>
+<h1>Coverage Summary for Class: SurferReorderState (com.georgeci.moneysurfer.uikit.components.base)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -46,13 +49,13 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SurferReorderableListKt</td>
+  <td class="name">SurferReorderState</td>
 <td class="coverageStat">
   <span class="percent">
     100%
   </span>
   <span class="absValue">
-    (3/3)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
@@ -60,7 +63,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     66.7%
   </span>
   <span class="absValue">
-    (4/6)
+    (8/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    85.7%
+  </span>
+  <span class="absValue">
+    (24/28)
   </span>
 </td>
 <td class="coverageStat">
@@ -68,81 +79,19 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (15/15)
+    (31/31)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    95.1%
+    98.9%
   </span>
   <span class="absValue">
-    (195/205)
+    (273/276)
   </span>
 </td>
 </tr>
-  <tr>
-    <td class="name">SurferReorderableListKt$surferReorderHandle$1</td>
-<td class="coverageStat">
-  <span class="percent">
-    80%
-  </span>
-  <span class="absValue">
-    (4/5)
-  </span>
-</td>
-    <td class="coverageStat"/>
-<td class="coverageStat">
-  <span class="percent">
-    83.3%
-  </span>
-  <span class="absValue">
-    (5/6)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    91.7%
-  </span>
-  <span class="absValue">
-    (33/36)
-  </span>
-</td>
-  </tr>
-<tr>
-  <td class="name"><strong>Total</strong></td>
-<td class="coverageStat">
-  <span class="percent">
-    87.5%
-  </span>
-  <span class="absValue">
-    (7/8)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    66.7%
-  </span>
-  <span class="absValue">
-    (4/6)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    95.2%
-  </span>
-  <span class="absValue">
-    (20/21)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    94.6%
-  </span>
-  <span class="absValue">
-    (228/241)
-  </span>
-</td>
-</tr>
+
 </table>
 
 <br/>
@@ -182,25 +131,25 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp; * Create it with [rememberSurferReorderState], then apply [surferReorderableItem] to every
 &nbsp; * reorderable row and [surferReorderHandle] to the [SurferDragHandle] inside it.
 &nbsp; */
-&nbsp;@Stable
+<b class="fc">&nbsp;@Stable</b>
 &nbsp;class SurferReorderState internal constructor(
-&nbsp;    private val listState: LazyListState,
-&nbsp;    private val reorderableKeys: State&lt;List&lt;Any&gt;&gt;,
-&nbsp;    private val onMove: State&lt;(from: Any, to: Any) -&gt; Unit&gt;,
-&nbsp;    private val onMoveEnd: State&lt;() -&gt; Unit&gt;,
+<b class="fc">&nbsp;    private val listState: LazyListState,</b>
+<b class="fc">&nbsp;    private val reorderableKeys: State&lt;List&lt;Any&gt;&gt;,</b>
+<b class="fc">&nbsp;    private val onMove: State&lt;(from: Any, to: Any) -&gt; Unit&gt;,</b>
+<b class="fc">&nbsp;    private val onMoveEnd: State&lt;() -&gt; Unit&gt;,</b>
 &nbsp;) {
 &nbsp;
 &nbsp;    /** Key of the row under the finger, or null when nothing is being dragged. */
-&nbsp;    var draggingKey: Any? by mutableStateOf(null)
+<b class="fc">&nbsp;    var draggingKey: Any? by mutableStateOf(null)</b>
 &nbsp;        private set
 &nbsp;
 &nbsp;    private var draggingIndex: Int? = null
 &nbsp;    private var dragStartOffset: Int = 0
-&nbsp;    private var draggedDistance by mutableFloatStateOf(0f)
+<b class="fc">&nbsp;    private var draggedDistance by mutableFloatStateOf(0f)</b>
 &nbsp;
 &nbsp;    private val draggingItem: LazyListItemInfo?
-&nbsp;        get() = draggingIndex?.let { index -&gt;
-&nbsp;            listState.layoutInfo.visibleItemsInfo.firstOrNull { it.index == index }
+<b class="fc">&nbsp;        get() = draggingIndex?.let { index -&gt;</b>
+<b class="fc">&nbsp;            listState.layoutInfo.visibleItemsInfo.firstOrNull { it.index == index }</b>
 &nbsp;        }
 &nbsp;
 &nbsp;    /**
@@ -209,28 +158,28 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;     * this correction it would jump a full row height on every swap.
 &nbsp;     */
 &nbsp;    val draggingItemOffset: Float
-&nbsp;        get() = draggingItem?.let { dragStartOffset + draggedDistance - it.offset } ?: 0f
+<b class="fc">&nbsp;        get() = draggingItem?.let { dragStartOffset + draggedDistance - it.offset } ?: 0f</b>
 &nbsp;
-&nbsp;    fun isDragging(key: Any): Boolean = draggingKey == key
+<b class="fc">&nbsp;    fun isDragging(key: Any): Boolean = draggingKey == key</b>
 &nbsp;
 &nbsp;    internal fun onDragStart(key: Any) {
-&nbsp;        val info = listState.layoutInfo.visibleItemsInfo.firstOrNull { it.key == key } ?: return
-&nbsp;        draggingKey = key
-&nbsp;        draggingIndex = info.index
-&nbsp;        dragStartOffset = info.offset
-&nbsp;        draggedDistance = 0f
+<b class="pc">&nbsp;        val info = listState.layoutInfo.visibleItemsInfo.firstOrNull { it.key == key } ?: return</b>
+<b class="fc">&nbsp;        draggingKey = key</b>
+<b class="fc">&nbsp;        draggingIndex = info.index</b>
+<b class="fc">&nbsp;        dragStartOffset = info.offset</b>
+<b class="fc">&nbsp;        draggedDistance = 0f</b>
 &nbsp;    }
 &nbsp;
 &nbsp;    internal fun onDrag(delta: Float) {
-&nbsp;        draggedDistance += delta
+<b class="fc">&nbsp;        draggedDistance += delta</b>
 &nbsp;        // A move updates draggingIndex straight away, but the list only re-lays-out on the next
 &nbsp;        // frame. Pointer events can arrive faster than that, and acting on the stale layout would
 &nbsp;        // read a neighbour&#39;s key as the dragged row and reorder the wrong widget. The key check
 &nbsp;        // skips those ticks until the two agree again; the distance above is banked either way.
-&nbsp;        val dragged = draggingItem?.takeIf { it.key == draggingKey } ?: return
-&nbsp;        val target = dropTargetFor(dragged) ?: return
-&nbsp;        onMove.value(dragged.key, target.key)
-&nbsp;        draggingIndex = target.index
+<b class="pc">&nbsp;        val dragged = draggingItem?.takeIf { it.key == draggingKey } ?: return</b>
+<b class="fc">&nbsp;        val target = dropTargetFor(dragged) ?: return</b>
+<b class="fc">&nbsp;        onMove.value(dragged.key, target.key)</b>
+<b class="fc">&nbsp;        draggingIndex = target.index</b>
 &nbsp;    }
 &nbsp;
 &nbsp;    /**
@@ -238,22 +187,22 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;     * contain the dragged row&#39;s midpoint — where the finger has put it, not where it is laid out.
 &nbsp;     */
 &nbsp;    private fun dropTargetFor(dragged: LazyListItemInfo): LazyListItemInfo? {
-&nbsp;        val center = (dragStartOffset + draggedDistance + dragged.size / 2f).toInt()
-&nbsp;        return listState.layoutInfo.visibleItemsInfo.firstOrNull { candidate -&gt;
-&nbsp;            candidate.index != dragged.index &amp;&amp;
-&nbsp;                candidate.key in reorderableKeys.value &amp;&amp;
-&nbsp;                center in candidate.offset..(candidate.offset + candidate.size)
+<b class="fc">&nbsp;        val center = (dragStartOffset + draggedDistance + dragged.size / 2f).toInt()</b>
+<b class="fc">&nbsp;        return listState.layoutInfo.visibleItemsInfo.firstOrNull { candidate -&gt;</b>
+<b class="fc">&nbsp;            candidate.index != dragged.index &amp;&amp;</b>
+<b class="fc">&nbsp;                candidate.key in reorderableKeys.value &amp;&amp;</b>
+<b class="fc">&nbsp;                center in candidate.offset..(candidate.offset + candidate.size)</b>
 &nbsp;        }
 &nbsp;    }
 &nbsp;
 &nbsp;    internal fun onDragStop() {
-&nbsp;        val wasDragging = draggingKey != null
-&nbsp;        draggingKey = null
-&nbsp;        draggingIndex = null
-&nbsp;        draggedDistance = 0f
+<b class="pc">&nbsp;        val wasDragging = draggingKey != null</b>
+<b class="fc">&nbsp;        draggingKey = null</b>
+<b class="fc">&nbsp;        draggingIndex = null</b>
+<b class="fc">&nbsp;        draggedDistance = 0f</b>
 &nbsp;        // Only after a real drag: the gesture detector also reports a stop for a touch that never
 &nbsp;        // moved, and a caller that persists on drop should not write on a plain tap of the grip.
-&nbsp;        if (wasDragging) onMoveEnd.value()
+<b class="pc">&nbsp;        if (wasDragging) onMoveEnd.value()</b>
 &nbsp;    }
 &nbsp;}
 &nbsp;
@@ -269,13 +218,13 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    listState: LazyListState,
 &nbsp;    keys: List&lt;Any&gt;,
 &nbsp;    onMove: (from: Any, to: Any) -&gt; Unit,
-<b class="fc">&nbsp;    onMoveEnd: () -&gt; Unit = {},</b>
-<b class="fc">&nbsp;): SurferReorderState {</b>
-<b class="fc">&nbsp;    val currentKeys = rememberUpdatedState(keys)</b>
-<b class="fc">&nbsp;    val currentOnMove = rememberUpdatedState(onMove)</b>
-<b class="fc">&nbsp;    val currentOnMoveEnd = rememberUpdatedState(onMoveEnd)</b>
-<b class="pc">&nbsp;    return remember(listState) {</b>
-<b class="fc">&nbsp;        SurferReorderState(listState, currentKeys, currentOnMove, currentOnMoveEnd)</b>
+&nbsp;    onMoveEnd: () -&gt; Unit = {},
+&nbsp;): SurferReorderState {
+&nbsp;    val currentKeys = rememberUpdatedState(keys)
+&nbsp;    val currentOnMove = rememberUpdatedState(onMove)
+&nbsp;    val currentOnMoveEnd = rememberUpdatedState(onMoveEnd)
+&nbsp;    return remember(listState) {
+&nbsp;        SurferReorderState(listState, currentKeys, currentOnMove, currentOnMoveEnd)
 &nbsp;    }
 &nbsp;}
 &nbsp;
@@ -285,28 +234,28 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp; */
 &nbsp;@Composable
 &nbsp;fun LazyItemScope.surferReorderableItem(state: SurferReorderState, key: Any): Modifier =
-<b class="fc">&nbsp;    if (state.isDragging(key)) {</b>
-<b class="fc">&nbsp;        Modifier</b>
-<b class="fc">&nbsp;            .zIndex(1f)</b>
-<b class="pc">&nbsp;            .graphicsLayer { translationY = state.draggingItemOffset }</b>
-<b class="fc">&nbsp;    } else {</b>
-<b class="fc">&nbsp;        Modifier.animateItem()</b>
-<b class="fc">&nbsp;    }</b>
+&nbsp;    if (state.isDragging(key)) {
+&nbsp;        Modifier
+&nbsp;            .zIndex(1f)
+&nbsp;            .graphicsLayer { translationY = state.draggingItemOffset }
+&nbsp;    } else {
+&nbsp;        Modifier.animateItem()
+&nbsp;    }
 &nbsp;
 &nbsp;/**
 &nbsp; * Modifier for the grip of the row identified by [key]. The handle is the only drag target, so the
 &nbsp; * list still scrolls when the user drags anywhere else on a row.
 &nbsp; */
 &nbsp;fun Modifier.surferReorderHandle(state: SurferReorderState, key: Any): Modifier =
-<b class="fc">&nbsp;    pointerInput(state, key) {</b>
-<b class="fc">&nbsp;        detectDragGestures(</b>
-<b class="fc">&nbsp;            onDragStart = { state.onDragStart(key) },</b>
+&nbsp;    pointerInput(state, key) {
+&nbsp;        detectDragGestures(
+&nbsp;            onDragStart = { state.onDragStart(key) },
 &nbsp;            onDrag = { change, dragAmount -&gt;
-<b class="fc">&nbsp;                change.consume()</b>
-<b class="fc">&nbsp;                state.onDrag(dragAmount.y)</b>
+&nbsp;                change.consume()
+&nbsp;                state.onDrag(dragAmount.y)
 &nbsp;            },
-<b class="fc">&nbsp;            onDragEnd = { state.onDragStop() },</b>
-<b class="nc">&nbsp;            onDragCancel = { state.onDragStop() },</b>
+&nbsp;            onDragEnd = { state.onDragStop() },
+&nbsp;            onDragCancel = { state.onDragStop() },
 &nbsp;        )
 &nbsp;    }
 </code>
@@ -332,7 +281,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 22:19</div>
+    <div style="float:right;">generated on 2026-07-28 22:39</div>
 </div>
 </body>
 </html>

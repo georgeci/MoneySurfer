@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > AppVersionGate</title>
+  <title>MoneySurfer Coverage Report > ExchangeRateRepository</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.repositories</a>
 </div>
 
-<h1>Coverage Summary for Class: AppVersionGate (com.georgeci.moneysurfer.domain.repositories)</h1>
+<h1>Coverage Summary for Class: ExchangeRateRepository (com.georgeci.moneysurfer.domain.repositories)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">AppVersionGate</td>
+  <td class="name">ExchangeRateRepository</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -46,29 +46,28 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.repositories
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.model.AppVersionStatus
-&nbsp;import kotlinx.coroutines.flow.StateFlow
+&nbsp;import com.georgeci.moneysurfer.domain.model.ExchangeRateTable
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
+&nbsp;import kotlinx.coroutines.flow.Flow
 &nbsp;
 &nbsp;/**
-&nbsp; * Cached snapshot of the remote app-version gate. Refreshed on demand by
-&nbsp; * [refresh] (typically called from `AppStartupCoordinator`); subsequent
-&nbsp; * read paths (sync coordinator, write-usecases) consult [status] without
-&nbsp; * blocking on the network.
-&nbsp; *
-&nbsp; * Treats `null` from [com.georgeci.moneysurfer.domain.repositories.AppConfigRepository]
-&nbsp; * (missing doc / fetch failure) as [AppVersionStatus.Supported] — fail-open
-&nbsp; * so the gate doesn&#39;t lock users out on a transient Firestore hiccup.
-&nbsp; *
-&nbsp; * See block.md.
+&nbsp; * Locally cached FX quotes. The cache is the read path — the network only ever refills it — so
+&nbsp; * the dashboard total renders offline from whatever was fetched last.
 &nbsp; */
-&nbsp;interface AppVersionGate {
-&nbsp;    /** `null` until the first successful [refresh]. */
-&nbsp;    val status: StateFlow&lt;AppVersionStatus?&gt;
+&nbsp;interface ExchangeRateRepository {
 &nbsp;
-&nbsp;    suspend fun refresh(): AppVersionStatus
+&nbsp;    /**
+&nbsp;     * Newest cached table quoted against [base], emitting again whenever a refresh lands.
+&nbsp;     * `null` until the first successful fetch for that base.
+&nbsp;     */
+&nbsp;    fun observe(base: CurrencyCode): Flow&lt;ExchangeRateTable?&gt;
 &nbsp;
-&nbsp;    /** Convenience read for write-paths — assumes [refresh] has run. */
-&nbsp;    fun isSyncAllowed(): Boolean
+&nbsp;    /**
+&nbsp;     * Refetches [base] when the cached copy is older than the staleness threshold, and does
+&nbsp;     * nothing otherwise. Never throws: a failed refresh leaves the cache — stale or empty —
+&nbsp;     * exactly as it was, because a total from yesterday&#39;s rates beats no total at all.
+&nbsp;     */
+&nbsp;    suspend fun refreshIfStale(base: CurrencyCode)
 &nbsp;}
 </code>
 </pre>
@@ -93,7 +92,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 22:19</div>
+    <div style="float:right;">generated on 2026-07-28 22:39</div>
 </div>
 </body>
 </html>

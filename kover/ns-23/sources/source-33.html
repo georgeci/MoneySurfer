@@ -166,22 +166,38 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp; * left&quot; with nothing to mean. The pick is therefore:
 &nbsp; *
 &nbsp; * 1. general budgets — no category filter, so they cover every expense — before category ones;
-&nbsp; * 2. within that tier, the largest limit, which is the cap the user framed the period with;
-&nbsp; * 3. ties broken by budget id, so the headline does not jump between two equal budgets on
+&nbsp; * 2. within that tier, a budget whose cadence is [preferredPeriod] — the span the screen is being
+&nbsp; *    read at — before one on any other;
+&nbsp; * 3. then the largest limit, which is the cap the user framed the period with;
+&nbsp; * 4. ties broken by budget id, so the headline does not jump between two equal budgets on
 &nbsp; *    recomposition.
+&nbsp; *
+&nbsp; * [preferredPeriod] is a tiebreak rather than a filter, and it sits *below* the general/category
+&nbsp; * tier on purpose. A budget owns its own window, so a screen set to Week cannot reshape a monthly
+&nbsp; * cap into a weekly one — all it can do is let a weekly budget speak where one exists. Demoting a
+&nbsp; * €2,000 general cap behind a €20 weekly coffee budget would answer &quot;what is safe to spend&quot; with
+&nbsp; * a number about coffee; passing null asks for the cap alone, which is what a caller with no
+&nbsp; * period on screen wants.
 &nbsp; *
 &nbsp; * Also null when the winning progress carries no base currency — the workspace row is missing
 &nbsp; * behind budgets that reference it, which a pull can produce for a moment. Money the app cannot
 &nbsp; * name is worse than no money at all: `MoneyFormatter` is backed by `java.util.Currency`, which
 &nbsp; * rejects anything that is not a three-letter ISO code.
 &nbsp; */
-&nbsp;fun List&lt;BudgetProgress&gt;.safeToSpend(): SafeToSpend? = primaryProgress()?.toSafeToSpend()
+&nbsp;fun List&lt;BudgetProgress&gt;.safeToSpend(preferredPeriod: BudgetPeriod? = null): SafeToSpend? =
+&nbsp;    primaryProgress(preferredPeriod)?.toSafeToSpend()
 &nbsp;
-&nbsp;private fun List&lt;BudgetProgress&gt;.primaryProgress(): BudgetProgress? {
+&nbsp;private fun List&lt;BudgetProgress&gt;.primaryProgress(preferredPeriod: BudgetPeriod?): BudgetProgress? {
 &nbsp;    val active = filter { it.budget.isActive }
 &nbsp;    val general = active.filter { it.budget.categoryIds.isEmpty() }
 &nbsp;    return general.ifEmpty { active }
-&nbsp;        .sortedWith(compareByDescending&lt;BudgetProgress&gt; { it.effectiveLimit.minor }.thenBy { it.budget.id.value })
+&nbsp;        .sortedWith(
+&nbsp;            // `preferredPeriod == null` makes every term of this comparison false, leaving the
+&nbsp;            // limit and the id to decide — the exact order this list had before periods existed.
+&nbsp;            compareByDescending&lt;BudgetProgress&gt; { it.budget.period == preferredPeriod }
+&nbsp;                .thenByDescending { it.effectiveLimit.minor }
+&nbsp;                .thenBy { it.budget.id.value },
+&nbsp;        )
 &nbsp;        .firstOrNull()
 &nbsp;}
 &nbsp;
@@ -222,7 +238,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 22:19</div>
+    <div style="float:right;">generated on 2026-07-28 22:39</div>
 </div>
 </body>
 </html>

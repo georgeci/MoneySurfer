@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > WorkspaceSyncer</title>
+  <title>MoneySurfer Coverage Report > TransactionRetentionRepository</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.repositories</a>
 </div>
 
-<h1>Coverage Summary for Class: WorkspaceSyncer (com.georgeci.moneysurfer.domain.repositories)</h1>
+<h1>Coverage Summary for Class: TransactionRetentionRepository (com.georgeci.moneysurfer.domain.repositories)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">WorkspaceSyncer</td>
+  <td class="name">TransactionRetentionRepository</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -46,38 +46,23 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.repositories
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
+&nbsp;import kotlin.time.Instant
 &nbsp;
 &nbsp;/**
-&nbsp; * Triggers sync operations without exposing the sync infrastructure to domain use cases.
+&nbsp; * Storage side of the tombstone retention policy (issue #346).
 &nbsp; *
-&nbsp; * [pushAll] drains the outbox (push-only, no remote discovery).
-&nbsp; * [syncAll] fetches the authoritative workspace list from the remote user doc and
-&nbsp; * runs a full cursor-based pull for every workspace — including ones not yet local.
-&nbsp; * [syncWorkspace] pulls a single specific workspace; used after accepting an invite so
-&nbsp; * only the newly joined workspace is hydrated without re-syncing everything.
+&nbsp; * Split off [TransactionRepository] rather than added to it because purging is maintenance, not
+&nbsp; * a transaction operation: it has no domain model to map, no caller on any screen, and every
+&nbsp; * test double of the transaction store would otherwise have to answer a question none of them
+&nbsp; * ask. See `PurgeDeletedTransactionsUseCase` for the policy that drives it.
 &nbsp; */
-&nbsp;interface WorkspaceSyncer {
-&nbsp;    /**
-&nbsp;     * Push all pending outbox mutations. Throws on error.
-&nbsp;     *
-&nbsp;     * Returns `false` when sync is switched off and nothing was pushed, so a caller cannot mistake
-&nbsp;     * &quot;disabled&quot; for &quot;landed&quot; — the asymmetry that filled `users/{uid}.workspaceIds` with refs to
-&nbsp;     * documents that were never created (issue #342). Callers that write remote state on the
-&nbsp;     * strength of a successful push must branch on this instead of re-reading the setting
-&nbsp;     * themselves: two reads of a live setting can disagree.
-&nbsp;     */
-&nbsp;    suspend fun pushAll(): Boolean
-&nbsp;
-&nbsp;    /** Push outbox + pull all user workspaces (including undiscovered ones). Throws on error. */
-&nbsp;    suspend fun syncAll()
+&nbsp;fun interface TransactionRetentionRepository {
 &nbsp;
 &nbsp;    /**
-&nbsp;     * Push outbox + pull a single workspace by [workspaceId].
-&nbsp;     * Sets the active workspace to [workspaceId] for the duration of the sync so
-&nbsp;     * [SyncScope.ActiveWorkspace] targets the correct workspace.
+&nbsp;     * Removes the rows tombstoned strictly before [threshold] for good, and returns how many
+&nbsp;     * went. Live rows are never touched.
 &nbsp;     */
-&nbsp;    suspend fun syncWorkspace(workspaceId: WorkspaceId)
+&nbsp;    suspend fun purgeDeletedBefore(threshold: Instant): Int
 &nbsp;}
 </code>
 </pre>
@@ -102,7 +87,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 22:19</div>
+    <div style="float:right;">generated on 2026-07-28 22:39</div>
 </div>
 </body>
 </html>

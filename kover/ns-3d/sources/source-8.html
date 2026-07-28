@@ -46,6 +46,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
   <tr>
+    <td class="name">DashboardEvent$Navigate</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
     <td class="name">DashboardEvent$OnAccountClick</td>
 <td class="coverageStat">
   <span class="percent">
@@ -242,6 +246,34 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
   </tr>
   <tr>
+    <td class="name">DashboardEvent$OnPeriodChange</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (7/7)
+  </span>
+</td>
+  </tr>
+  <tr>
     <td class="name">DashboardEvent$OnSeeAllGoalsClick</td>
 <td class="coverageStat">
   <span class="percent">
@@ -416,7 +448,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (13/13)
+    (14/14)
   </span>
 </td>
     <td class="coverageStat"/>
@@ -425,7 +457,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (13/13)
+    (14/14)
   </span>
 </td>
 <td class="coverageStat">
@@ -433,7 +465,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (46/46)
+    (53/53)
   </span>
 </td>
 </tr>
@@ -449,6 +481,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import arrow.optics.optics
 &nbsp;import com.georgeci.moneysurfer.domain.config.HostCapabilities
 &nbsp;import com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutConfig
+&nbsp;import com.georgeci.moneysurfer.domain.dashboard.DashboardPeriod
 &nbsp;import com.georgeci.moneysurfer.domain.formatter.MoneyFormatter
 &nbsp;import com.georgeci.moneysurfer.domain.insight.Insight
 &nbsp;import com.georgeci.moneysurfer.domain.insight.InsightTone
@@ -477,6 +510,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.domain.usecase.GetRecentTransactionsUseCase
 &nbsp;import com.georgeci.moneysurfer.domain.usecase.GetSafeToSpendUseCase
 &nbsp;import com.georgeci.moneysurfer.utils.MviViewModel
+&nbsp;import kotlinx.coroutines.flow.MutableStateFlow
 &nbsp;import kotlinx.coroutines.flow.combine
 &nbsp;import kotlinx.coroutines.flow.map
 &nbsp;import kotlinx.coroutines.flow.onStart
@@ -519,42 +553,38 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;        .map { it.normalized() }
 &nbsp;        .onStart { emit(DashboardLayoutConfig.DEFAULT) }
 &nbsp;
+&nbsp;    /**
+&nbsp;     * The span the spend-oriented widgets are read at. Device-local and not persisted, per
+&nbsp;     * `md/insights.md` decision 6 — the dashboard opens on [DashboardPeriod.DEFAULT] every launch.
+&nbsp;     */
+&nbsp;    private val period = MutableStateFlow(DashboardPeriod.DEFAULT)
+&nbsp;
 &nbsp;    init {
 &nbsp;        observeDashboard()
 &nbsp;    }
 &nbsp;
 &nbsp;    override fun onEvent(event: DashboardEvent) {
 &nbsp;        when (event) {
-&nbsp;            is DashboardEvent.OnAccountClick -&gt; postSideEffect(
-&nbsp;                DashboardEffect.NavigateToAccountDetails(event.accountId),
-&nbsp;            )
-&nbsp;            is DashboardEvent.OnTransactionClick -&gt; postSideEffect(
-&nbsp;                DashboardEffect.NavigateToTransactionDetails(event.transactionId),
-&nbsp;            )
-&nbsp;            DashboardEvent.OnAddAccountClick -&gt; postSideEffect(DashboardEffect.NavigateToAccountCreation)
-&nbsp;            DashboardEvent.OnSeeAllTransactionsClick -&gt;
-&nbsp;                postSideEffect(DashboardEffect.NavigateToTransactionsList)
-&nbsp;            DashboardEvent.OnAddTransactionClick -&gt; postSideEffect(
-&nbsp;                DashboardEffect.NavigateToTransactionCreation(accountId = null),
-&nbsp;            )
-&nbsp;            DashboardEvent.OnTransferClick -&gt; postSideEffect(DashboardEffect.NavigateToTransferCreation)
-&nbsp;            is DashboardEvent.OnAddTransactionForAccountClick -&gt;
-&nbsp;                postSideEffect(DashboardEffect.NavigateToTransactionCreation(accountId = event.accountId))
-&nbsp;            DashboardEvent.OnManageAccountsClick -&gt; postSideEffect(DashboardEffect.NavigateToAccountsManage)
-&nbsp;            DashboardEvent.OnSettingsClick -&gt; postSideEffect(DashboardEffect.NavigateToSettings)
-&nbsp;            DashboardEvent.OnCustomizeClick -&gt; postSideEffect(DashboardEffect.NavigateToCustomize)
-&nbsp;            DashboardEvent.OnSeeAllGoalsClick -&gt; postSideEffect(DashboardEffect.NavigateToGoals)
-&nbsp;            is DashboardEvent.OnGoalClick -&gt; postSideEffect(DashboardEffect.NavigateToGoalDetails(event.goalId))
-&nbsp;            DashboardEvent.OnSetBudgetClick -&gt; postSideEffect(DashboardEffect.NavigateToBudgetCreation)
+&nbsp;            is DashboardEvent.Navigate -&gt; postSideEffect(event.destination())
+&nbsp;            is DashboardEvent.OnPeriodChange -&gt; period.value = event.period
 &nbsp;        }
 &nbsp;    }
 &nbsp;
 &nbsp;    private fun observeDashboard() {
-&nbsp;        // The layout and the two budget-shaped widgets are folded into one source because `combine`
-&nbsp;        // tops out at five typed flows, and these are never read apart from each other.
+&nbsp;        // The layout, the period and the two budget-shaped widgets are folded into one source
+&nbsp;        // because `combine` tops out at five typed flows, and these are never read apart.
+&nbsp;        //
+&nbsp;        // The period reaches safe-to-spend as a flow, not as this combine&#39;s value: `getSafeToSpend`
+&nbsp;        // re-picks the budget in place that way, instead of restarting the workspace-wide
+&nbsp;        // transaction query on every tap of the switch. The cost is one intermediate emission on a
+&nbsp;        // change — the new period beside the previous budget&#39;s figures — which resolves on the next
+&nbsp;        // frame and only differs at all when the workspace runs budgets on both cadences.
 &nbsp;        val widgetSources = combine(
 &nbsp;            layout,
-&nbsp;            getSafeToSpend().onStart { emit(null) },
+&nbsp;            period,
+&nbsp;            getSafeToSpend(period.map { it.budgetPeriod }).onStart { emit(null) },
+&nbsp;            // Burn rate takes no period: it projects to month-end off a fixed seven-day chart.
+&nbsp;            // See `DashboardWidgetType.BurnRate` for why that is a scoping call, not an omission.
 &nbsp;            getBurnRate().onStart { emit(null) },
 &nbsp;            ::WidgetSources,
 &nbsp;        )
@@ -565,7 +595,9 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;                getGoals(),
 &nbsp;                getExchangeRates().onStart { emit(null) },
 &nbsp;                widgetSources,
-&nbsp;            ) { accounts, transactions, goals, rates, (layoutConfig, safeToSpend, burnRate) -&gt;
+&nbsp;                // Read by name rather than destructured: at four members the positional form is
+&nbsp;                // one reordered field away from a silent swap, and detekt caps it at three.
+&nbsp;            ) { accounts, transactions, goals, rates, widgets -&gt;
 &nbsp;                val balance = accounts.convertedTotal(rates)?.toBalanceUi()
 &nbsp;                DashboardState.Content(
 &nbsp;                    accounts = accounts.map { it.toUi() },
@@ -581,11 +613,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;                    greeting = null,
 &nbsp;                    formattedTrendDelta = null,
 &nbsp;                    goals = goals.take(DASHBOARD_GOALS_LIMIT).map { it.toUi() },
-&nbsp;                    safeToSpend = safeToSpend?.toUi(),
-&nbsp;                    burnRate = burnRate?.toUi(),
+&nbsp;                    safeToSpend = widgets.safeToSpend?.toUi(),
+&nbsp;                    burnRate = widgets.burnRate?.toUi(),
 &nbsp;                    isOffline = isOffline,
 &nbsp;                    transferEnabled = transferEnabled,
-&nbsp;                    layout = layoutConfig,
+&nbsp;                    layout = widgets.layout,
+&nbsp;                    period = widgets.period,
 &nbsp;                )
 &nbsp;            }
 &nbsp;                // Joined here rather than folded into a pair above: the insights are the slowest
@@ -787,6 +820,11 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;        val transferEnabled: Boolean = false,
 &nbsp;        /** Which widgets the screen renders, in order. */
 &nbsp;        val layout: DashboardLayoutConfig = DashboardLayoutConfig.DEFAULT,
+&nbsp;        /**
+&nbsp;         * The span every spend-oriented widget reads at once. One value for the whole screen, so
+&nbsp;         * two widgets can never disagree about which days they are summarising.
+&nbsp;         */
+&nbsp;        val period: DashboardPeriod = DashboardPeriod.DEFAULT,
 &nbsp;    ) : DashboardState {
 &nbsp;
 &nbsp;        /**
@@ -796,6 +834,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;        val recentTransactionsEmpty: Boolean
 &nbsp;            get() = transactions.isEmpty()
 &nbsp;
+&nbsp;        /** Whether the period switch has anything under it to drive — see `hasPeriodScopedWidget`. */
+&nbsp;        val periodSwitchVisible: Boolean
+&nbsp;            get() = layout.hasPeriodScopedWidget
+&nbsp;
 &nbsp;        companion object
 &nbsp;    }
 &nbsp;
@@ -803,11 +845,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;}
 &nbsp;
 &nbsp;/**
-&nbsp; * The three per-widget sources `combine` cannot take as separate arguments — it tops out at five
-&nbsp; * typed flows and the screen already reads four others.
+&nbsp; * The per-widget sources `combine` cannot take as separate arguments — it tops out at five typed
+&nbsp; * flows and the screen already reads four others.
 &nbsp; */
 &nbsp;private data class WidgetSources(
 &nbsp;    val layout: DashboardLayoutConfig,
+&nbsp;    val period: DashboardPeriod,
 &nbsp;    val safeToSpend: SafeToSpend?,
 &nbsp;    val burnRate: BurnRate?,
 &nbsp;)
@@ -941,20 +984,60 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    val splitCategoryCount: Int = 0,
 &nbsp;)
 &nbsp;
+&nbsp;/**
+&nbsp; * The navigation half of the dashboard&#39;s contract as a table. A file-level function rather than a
+&nbsp; * method on the view model for the same reason `DashboardNavigation.navigate` is one (issue #404):
+&nbsp; * it is a dozen one-line branches where swapping two lines still compiles, still passes every other
+&nbsp; * test, and lands the user on the wrong screen — so it has to be drivable by a plain spec with no
+&nbsp; * view model to build. Between the two tables, event → effect → destination is covered end to end.
+&nbsp; *
+&nbsp; * Split out of `onEvent` because the dashboard is a hub: thirteen of its fourteen events do nothing
+&nbsp; * but name a destination, and leaving them inline left the one event that *changes this screen* as
+&nbsp; * the fourteenth line of a list that reads as boilerplate.
+&nbsp; */
+&nbsp;internal fun DashboardEvent.Navigate.destination(): DashboardEffect = when (this) {
+&nbsp;    is DashboardEvent.OnAccountClick -&gt; DashboardEffect.NavigateToAccountDetails(accountId)
+&nbsp;    is DashboardEvent.OnTransactionClick -&gt; DashboardEffect.NavigateToTransactionDetails(transactionId)
+&nbsp;    DashboardEvent.OnAddAccountClick -&gt; DashboardEffect.NavigateToAccountCreation
+&nbsp;    DashboardEvent.OnSeeAllTransactionsClick -&gt; DashboardEffect.NavigateToTransactionsList
+&nbsp;    DashboardEvent.OnAddTransactionClick -&gt; DashboardEffect.NavigateToTransactionCreation(accountId = null)
+&nbsp;    DashboardEvent.OnTransferClick -&gt; DashboardEffect.NavigateToTransferCreation
+&nbsp;    is DashboardEvent.OnAddTransactionForAccountClick -&gt;
+&nbsp;        DashboardEffect.NavigateToTransactionCreation(accountId = accountId)
+&nbsp;    DashboardEvent.OnManageAccountsClick -&gt; DashboardEffect.NavigateToAccountsManage
+&nbsp;    DashboardEvent.OnSettingsClick -&gt; DashboardEffect.NavigateToSettings
+&nbsp;    DashboardEvent.OnCustomizeClick -&gt; DashboardEffect.NavigateToCustomize
+&nbsp;    DashboardEvent.OnSeeAllGoalsClick -&gt; DashboardEffect.NavigateToGoals
+&nbsp;    is DashboardEvent.OnGoalClick -&gt; DashboardEffect.NavigateToGoalDetails(goalId)
+&nbsp;    DashboardEvent.OnSetBudgetClick -&gt; DashboardEffect.NavigateToBudgetCreation
+&nbsp;}
+&nbsp;
 &nbsp;sealed interface DashboardEvent {
-<b class="fc">&nbsp;    data class OnAccountClick(val accountId: AccountId) : DashboardEvent</b>
-<b class="fc">&nbsp;    data class OnTransactionClick(val transactionId: TransactionId) : DashboardEvent</b>
-<b class="fc">&nbsp;    data object OnAddAccountClick : DashboardEvent</b>
-<b class="fc">&nbsp;    data object OnAddTransactionClick : DashboardEvent</b>
-<b class="fc">&nbsp;    data object OnTransferClick : DashboardEvent</b>
-<b class="fc">&nbsp;    data object OnSeeAllTransactionsClick : DashboardEvent</b>
-<b class="fc">&nbsp;    data class OnAddTransactionForAccountClick(val accountId: AccountId) : DashboardEvent</b>
-<b class="fc">&nbsp;    data object OnManageAccountsClick : DashboardEvent</b>
-<b class="fc">&nbsp;    data object OnSettingsClick : DashboardEvent</b>
-<b class="fc">&nbsp;    data object OnCustomizeClick : DashboardEvent</b>
-<b class="fc">&nbsp;    data object OnSeeAllGoalsClick : DashboardEvent</b>
-<b class="fc">&nbsp;    data class OnGoalClick(val goalId: GoalId) : DashboardEvent</b>
-<b class="fc">&nbsp;    data object OnSetBudgetClick : DashboardEvent</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * An event whose whole answer is a destination — the dashboard is a hub, so nearly all of
+&nbsp;     * them are. Declaring that as a type rather than as a convention keeps the mapping in
+&nbsp;     * `destination()` exhaustive: an event added here without a branch there is a compile error,
+&nbsp;     * and one that belongs on this screen instead simply does not extend this.
+&nbsp;     */
+&nbsp;    sealed interface Navigate : DashboardEvent
+&nbsp;
+<b class="fc">&nbsp;    data class OnAccountClick(val accountId: AccountId) : Navigate</b>
+<b class="fc">&nbsp;    data class OnTransactionClick(val transactionId: TransactionId) : Navigate</b>
+<b class="fc">&nbsp;    data object OnAddAccountClick : Navigate</b>
+<b class="fc">&nbsp;    data object OnAddTransactionClick : Navigate</b>
+<b class="fc">&nbsp;    data object OnTransferClick : Navigate</b>
+<b class="fc">&nbsp;    data object OnSeeAllTransactionsClick : Navigate</b>
+<b class="fc">&nbsp;    data class OnAddTransactionForAccountClick(val accountId: AccountId) : Navigate</b>
+<b class="fc">&nbsp;    data object OnManageAccountsClick : Navigate</b>
+<b class="fc">&nbsp;    data object OnSettingsClick : Navigate</b>
+<b class="fc">&nbsp;    data object OnCustomizeClick : Navigate</b>
+<b class="fc">&nbsp;    data object OnSeeAllGoalsClick : Navigate</b>
+<b class="fc">&nbsp;    data class OnGoalClick(val goalId: GoalId) : Navigate</b>
+<b class="fc">&nbsp;    data object OnSetBudgetClick : Navigate</b>
+&nbsp;
+&nbsp;    /** The Week/Month switch. Affects the screen only — nothing about it is written to disk. */
+<b class="fc">&nbsp;    data class OnPeriodChange(val period: DashboardPeriod) : DashboardEvent</b>
 &nbsp;}
 &nbsp;
 &nbsp;sealed interface DashboardEffect {
@@ -1003,7 +1086,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 22:19</div>
+    <div style="float:right;">generated on 2026-07-28 22:39</div>
 </div>
 </body>
 </html>
