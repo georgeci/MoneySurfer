@@ -139,7 +139,8 @@ class DashboardCustomizeScreenStateTest : StringSpec({
 
             events shouldContain DashboardCustomizeEvent.OnWidgetMove(
                 from = DashboardWidgetType.Accounts,
-                to = DashboardWidgetType.SafeToSpend,
+                // The row above Accounts in the default layout.
+                to = DashboardWidgetType.BurnRate,
             )
         }
     }

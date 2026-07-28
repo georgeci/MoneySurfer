@@ -19,6 +19,11 @@ import com.georgeci.moneysurfer.uikit.widgets.SurferAddAccountCta
 import com.georgeci.moneysurfer.uikit.widgets.SurferBalanceFootnote
 import com.georgeci.moneysurfer.uikit.widgets.SurferBalanceVariant
 import com.georgeci.moneysurfer.uikit.widgets.SurferBalanceWidget
+import com.georgeci.moneysurfer.uikit.widgets.SurferBurnRateBar
+import com.georgeci.moneysurfer.uikit.widgets.SurferBurnRateData
+import com.georgeci.moneysurfer.uikit.widgets.SurferBurnRateEmpty
+import com.georgeci.moneysurfer.uikit.widgets.SurferBurnRatePace
+import com.georgeci.moneysurfer.uikit.widgets.SurferBurnRateWidget
 import com.georgeci.moneysurfer.uikit.widgets.SurferQuickActionsWidget
 import com.georgeci.moneysurfer.uikit.widgets.SurferRecentTransactionItem
 import com.georgeci.moneysurfer.uikit.widgets.SurferRecentTransactionsWidget
@@ -33,7 +38,7 @@ import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 
 /** The dashboard's minimum widget height — see `DASHBOARD_WIDGET_MIN_HEIGHT` in `:feature:dashboard`. */
-private val SafeToSpendEmptyHeight = 180.dp
+private val WidgetEmptyStateHeight = 180.dp
 
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
@@ -184,7 +189,7 @@ class SurferWidgetScreenshotTest {
                 data = null,
                 // The placeholder centres itself in whatever height it is given; the gallery has
                 // the whole page, so it is pinned to the dashboard's own minimum widget height.
-                modifier = Modifier.fillMaxWidth().height(SafeToSpendEmptyHeight),
+                modifier = Modifier.fillMaxWidth().height(WidgetEmptyStateHeight),
                 empty = SurferSafeToSpendEmpty(
                     title = "No budget yet",
                     subtitle = "Set a cap to see what is safe to spend.",
@@ -215,4 +220,81 @@ class SurferWidgetScreenshotTest {
             )
         }
     }
+
+    @Test
+    fun surferBurnRateWidget() = captureLightAndDark("surfer_burn_rate_widget") {
+        val data = SurferBurnRateData(
+            average = "€42.10 a day",
+            caption = "over the last 7 days",
+            bars = burnRateBars,
+            projection = "€1,263 projected by month end",
+            pace = SurferBurnRatePace(label = "On track", status = SurferBudgetStatus.Ok),
+        )
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            SurferWidgetSize.entries.forEach { size ->
+                SurferBurnRateWidget(
+                    title = "Burn rate",
+                    data = data,
+                    modifier = Modifier.fillMaxWidth(),
+                    size = size,
+                )
+            }
+            SurferBurnRateWidget(
+                title = "Burn rate",
+                data = null,
+                modifier = Modifier.fillMaxWidth().height(WidgetEmptyStateHeight),
+                empty = SurferBurnRateEmpty(
+                    title = "Nothing to chart yet",
+                    subtitle = "Log a few expenses to see your pace.",
+                ),
+            )
+        }
+    }
+
+    /**
+     * The two states a budget puts the card in — off pace, and the workspace that set no cap at all
+     * and so gets the chart in the neutral accent with no pill over it.
+     */
+    @Test
+    fun surferBurnRateWidgetPace() = captureLightAndDark("surfer_burn_rate_widget_pace") {
+        val data = SurferBurnRateData(
+            average = "€78.40 a day",
+            caption = "over the last 7 days",
+            bars = burnRateBars,
+            projection = "€2,352 projected by month end",
+        )
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            SurferBurnRateWidget(
+                title = "Burn rate",
+                data = data.copy(
+                    pace = SurferBurnRatePace(label = "Off pace", status = SurferBudgetStatus.Over),
+                ),
+                modifier = Modifier.fillMaxWidth(),
+                size = SurferWidgetSize.Expanded,
+            )
+            SurferBurnRateWidget(
+                title = "Burn rate",
+                data = data,
+                modifier = Modifier.fillMaxWidth(),
+                size = SurferWidgetSize.Expanded,
+            )
+        }
+    }
 }
+
+/** A quiet day, a peak and a still-running today — the three cases the chart draws differently. */
+private val burnRateBars = listOf(
+    SurferBurnRateBar(label = "22", fraction = 0.42f),
+    SurferBurnRateBar(label = "23", fraction = 0.18f),
+    SurferBurnRateBar(label = "24", fraction = 1f),
+    SurferBurnRateBar(label = "25", fraction = 0f),
+    SurferBurnRateBar(label = "26", fraction = 0.63f),
+    SurferBurnRateBar(label = "27", fraction = 0.31f),
+    SurferBurnRateBar(label = "28", fraction = 0.24f, isToday = true),
+)
