@@ -32,7 +32,9 @@ import org.koin.core.annotation.Single
  * without tearing down the subscription underneath. `progressOf` reads the workspace's whole
  * transaction list per emission, and re-running that every time the dashboard's Week/Month switch
  * is tapped would be the most expensive query in the app answering a question it already has the
- * data for.
+ * data for. It is required rather than defaulted: this figure is about a period, so a caller has
+ * to say which one it is answering for — `flowOf(null)` spells "no period on screen, pick the
+ * largest cap", which is a claim worth making out loud.
  */
 @Single
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -42,7 +44,7 @@ class GetSafeToSpendUseCase(
 ) {
 
     operator fun invoke(
-        preferredPeriod: Flow<BudgetPeriod?> = flowOf(null),
+        preferredPeriod: Flow<BudgetPeriod?>,
         timeZone: TimeZone = TimeZone.currentSystemDefault(),
     ): Flow<SafeToSpend?> =
         getBudgets()

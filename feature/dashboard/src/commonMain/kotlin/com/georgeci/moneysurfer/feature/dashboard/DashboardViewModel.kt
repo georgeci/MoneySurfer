@@ -77,29 +77,6 @@ class DashboardViewModel(
         }
     }
 
-    /**
-     * The navigation half of the contract as a table. Split out from [onEvent] because the
-     * dashboard is a hub — thirteen of its fourteen events do nothing but name a destination, and
-     * leaving them inline meant the one event that *changes this screen* was the fourteenth line
-     * of a list that reads as boilerplate.
-     */
-    private fun DashboardEvent.Navigate.destination(): DashboardEffect = when (this) {
-        is DashboardEvent.OnAccountClick -> DashboardEffect.NavigateToAccountDetails(accountId)
-        is DashboardEvent.OnTransactionClick -> DashboardEffect.NavigateToTransactionDetails(transactionId)
-        DashboardEvent.OnAddAccountClick -> DashboardEffect.NavigateToAccountCreation
-        DashboardEvent.OnSeeAllTransactionsClick -> DashboardEffect.NavigateToTransactionsList
-        DashboardEvent.OnAddTransactionClick -> DashboardEffect.NavigateToTransactionCreation(accountId = null)
-        DashboardEvent.OnTransferClick -> DashboardEffect.NavigateToTransferCreation
-        is DashboardEvent.OnAddTransactionForAccountClick ->
-            DashboardEffect.NavigateToTransactionCreation(accountId = accountId)
-        DashboardEvent.OnManageAccountsClick -> DashboardEffect.NavigateToAccountsManage
-        DashboardEvent.OnSettingsClick -> DashboardEffect.NavigateToSettings
-        DashboardEvent.OnCustomizeClick -> DashboardEffect.NavigateToCustomize
-        DashboardEvent.OnSeeAllGoalsClick -> DashboardEffect.NavigateToGoals
-        is DashboardEvent.OnGoalClick -> DashboardEffect.NavigateToGoalDetails(goalId)
-        DashboardEvent.OnSetBudgetClick -> DashboardEffect.NavigateToBudgetCreation
-    }
-
     private fun observeDashboard() {
         // Layout, period and safe-to-spend are folded into one source because `combine` tops out
         // at five typed flows, and these three are the group that is never read apart.
@@ -353,6 +330,34 @@ data class TransactionUi(
      */
     val splitCategoryCount: Int = 0,
 )
+
+/**
+ * The navigation half of the dashboard's contract as a table. A file-level function rather than a
+ * method on the view model for the same reason `DashboardNavigation.navigate` is one (issue #404):
+ * it is a dozen one-line branches where swapping two lines still compiles, still passes every other
+ * test, and lands the user on the wrong screen — so it has to be drivable by a plain spec with no
+ * view model to build. Between the two tables, event → effect → destination is covered end to end.
+ *
+ * Split out of `onEvent` because the dashboard is a hub: thirteen of its fourteen events do nothing
+ * but name a destination, and leaving them inline left the one event that *changes this screen* as
+ * the fourteenth line of a list that reads as boilerplate.
+ */
+internal fun DashboardEvent.Navigate.destination(): DashboardEffect = when (this) {
+    is DashboardEvent.OnAccountClick -> DashboardEffect.NavigateToAccountDetails(accountId)
+    is DashboardEvent.OnTransactionClick -> DashboardEffect.NavigateToTransactionDetails(transactionId)
+    DashboardEvent.OnAddAccountClick -> DashboardEffect.NavigateToAccountCreation
+    DashboardEvent.OnSeeAllTransactionsClick -> DashboardEffect.NavigateToTransactionsList
+    DashboardEvent.OnAddTransactionClick -> DashboardEffect.NavigateToTransactionCreation(accountId = null)
+    DashboardEvent.OnTransferClick -> DashboardEffect.NavigateToTransferCreation
+    is DashboardEvent.OnAddTransactionForAccountClick ->
+        DashboardEffect.NavigateToTransactionCreation(accountId = accountId)
+    DashboardEvent.OnManageAccountsClick -> DashboardEffect.NavigateToAccountsManage
+    DashboardEvent.OnSettingsClick -> DashboardEffect.NavigateToSettings
+    DashboardEvent.OnCustomizeClick -> DashboardEffect.NavigateToCustomize
+    DashboardEvent.OnSeeAllGoalsClick -> DashboardEffect.NavigateToGoals
+    is DashboardEvent.OnGoalClick -> DashboardEffect.NavigateToGoalDetails(goalId)
+    DashboardEvent.OnSetBudgetClick -> DashboardEffect.NavigateToBudgetCreation
+}
 
 sealed interface DashboardEvent {
 
