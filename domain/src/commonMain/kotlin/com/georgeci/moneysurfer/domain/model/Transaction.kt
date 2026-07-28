@@ -39,7 +39,9 @@ data class Transaction(
      * Order is the user's; duplicates and commas are already gone.
      */
     val tags: List<String> = emptyList(),
+    /** Absolute moment. Sorting and audit only — never re-derive a calendar day from it. */
     val operationAt: Instant,
+    /** Business date. What budgets count against and what SQL date windows filter on. */
     val operationDate: LocalDate,
     val type: TransactionType,
     val status: TransactionStatus = TransactionStatus.ACTUAL,

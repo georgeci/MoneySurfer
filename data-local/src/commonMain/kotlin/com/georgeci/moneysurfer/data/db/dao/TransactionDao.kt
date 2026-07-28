@@ -11,6 +11,11 @@ import com.georgeci.moneysurfer.data.db.entity.TransactionEntity
 import com.georgeci.moneysurfer.data.db.entity.TransactionTotalEntity
 import kotlinx.coroutines.flow.Flow
 
+/**
+ * Ordering is always `(operationDate, operationAt, createdAt) DESC`: the business date groups the
+ * day, the instant orders within it, and `createdAt` breaks ties between rows sharing an instant —
+ * which backdated batches and CSV imports routinely do.
+ */
 @Dao
 interface TransactionDao {
 
