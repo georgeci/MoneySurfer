@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > TransactionRepository</title>
+  <title>MoneySurfer Coverage Report > SpendAnalyticsRepository</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.repositories</a>
 </div>
 
-<h1>Coverage Summary for Class: TransactionRepository (com.georgeci.moneysurfer.domain.repositories)</h1>
+<h1>Coverage Summary for Class: SpendAnalyticsRepository (com.georgeci.moneysurfer.domain.repositories)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">TransactionRepository</td>
+  <td class="name">SpendAnalyticsRepository</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -46,86 +46,102 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.repositories
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.model.CategorizedTransaction
-&nbsp;import com.georgeci.moneysurfer.domain.model.Transaction
-&nbsp;import com.georgeci.moneysurfer.domain.model.TransactionTotal
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.AccountId
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.SplitId
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionId
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransferId
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
-&nbsp;import com.georgeci.moneysurfer.domain.util.TransactionPeriodWindow
+&nbsp;import com.georgeci.moneysurfer.domain.model.CategorySpendSlice
+&nbsp;import com.georgeci.moneysurfer.domain.model.CurrencyTotal
+&nbsp;import com.georgeci.moneysurfer.domain.model.DailySpendPoint
+&nbsp;import com.georgeci.moneysurfer.domain.model.MerchantSpend
+&nbsp;import com.georgeci.moneysurfer.domain.model.MonthlyNet
+&nbsp;import com.georgeci.moneysurfer.domain.model.SpendScope
 &nbsp;import kotlinx.coroutines.flow.Flow
 &nbsp;
-&nbsp;// Transactions are the app&#39;s central entity and every screen queries them along a different axis
-&nbsp;// (account, workspace, window, transfer pair). Splitting the interface to satisfy the threshold
-&nbsp;// would scatter one storage contract across several types without removing a single query.
-&nbsp;@Suppress(&quot;TooManyFunctions&quot;)
-&nbsp;interface TransactionRepository {
-&nbsp;    fun getAll(): Flow&lt;List&lt;Transaction&gt;&gt;
-&nbsp;    fun getByAccountId(accountId: AccountId): Flow&lt;List&lt;Transaction&gt;&gt;
+&nbsp;/**
+&nbsp; * Read-only spend rollups over transactions, all answered by one `GROUP BY` in SQLite.
+&nbsp; *
+&nbsp; * Aggregation-only on purpose, following the [CategorySpendRepository] precedent: nothing here
+&nbsp; * hands back a transaction, so the amount of data crossing the boundary is tens of rows whatever
+&nbsp; * the workspace holds. Insights code must never reach for `TransactionRepository.getByWorkspaceId`
+&nbsp; * and fold — that is the pattern this interface exists to replace.
+&nbsp; *
+&nbsp; * ## What counts as spend
+&nbsp; *
+&nbsp; * Every query below shares one predicate, the one budgets already apply
+&nbsp; * ([com.georgeci.moneysurfer.domain.model.Budget.counts]):
+&nbsp; *
+&nbsp; * - `type = EXPENSE` — income is not spend, and an opening balance is an account artefact.
+&nbsp; * - `status = ACTUAL` — a planned transaction is not spend that happened.
+&nbsp; * - `transferId IS NULL` — moving money between the user&#39;s own accounts is not spending. The legs
+&nbsp; *   *do* carry a category (`CreateTransferUseCase` assigns a `CategoryType.TRANSFER` one), so
+&nbsp; *   filtering by category type would not catch them.
+&nbsp; * - `currencyCode = ` [SpendScope.baseCurrency] — see below.
+&nbsp; * - `operationDate` inside [SpendScope.window] — the business date the user assigned the row to,
+&nbsp; *   the same date budgets count it under, never a zone-dependent re-derivation of `operationAt`.
+&nbsp; *
+&nbsp; * [netByMonth] is the single exception: it needs income too, so it widens the type term to
+&nbsp; * `EXPENSE or INCOME` — still excluding opening balances — and keeps every other term.
+&nbsp; *
+&nbsp; * ## Why v1 converts nothing
+&nbsp; *
+&nbsp; * A historical series stays in the base currency. Only the latest FX table is cached
+&nbsp; * (`replaceForBase` wipes the previous one) and `Transaction` carries no rate snapshot, so
+&nbsp; * converting a twelve-month trend would silently reshape history every time a rate moved. What
+&nbsp; * the filter left out is reported by [excludedByCurrency] rather than dropped — the same contract
+&nbsp; * [com.georgeci.moneysurfer.domain.model.ConvertedTotal.unconverted] already uses. Balances still
+&nbsp; * convert at today&#39;s rate, because a balance is a present-day quantity.
+&nbsp; *
+&nbsp; * ## Collecting these flows
+&nbsp; *
+&nbsp; * Room&#39;s invalidation tracker fires per write, so a sync pull applying thousands of rows re-runs
+&nbsp; * every aggregate below once per batch. The implementation conflates for that reason; a collector
+&nbsp; * that adds its own buffering should not undo it.
+&nbsp; */
+&nbsp;interface SpendAnalyticsRepository {
 &nbsp;
 &nbsp;    /**
-&nbsp;     * Newest-first page of categorized transactions inside [window], for one account or — when
-&nbsp;     * [accountId] is `null` — every account.
+&nbsp;     * Spend per category inside the window, largest first.
 &nbsp;     *
-&nbsp;     * At most [limit] rows are returned: the caller grows the limit to page further rather than
-&nbsp;     * offsetting, so a row inserted while the user scrolls cannot shift the already-visible
-&nbsp;     * prefix. An unbounded [window] is still bounded by [limit].
+&nbsp;     * A row with no category lands in the [CategorySpendSlice.categoryId] `null` bucket rather
+&nbsp;     * than being skipped, so the slices still add up to the window&#39;s total spend.
 &nbsp;     */
-&nbsp;    fun getCategorizedWindow(
-&nbsp;        accountId: AccountId?,
-&nbsp;        window: TransactionPeriodWindow,
-&nbsp;        limit: Int,
-&nbsp;    ): Flow&lt;List&lt;CategorizedTransaction&gt;&gt;
+&nbsp;    fun byCategory(scope: SpendScope): Flow&lt;List&lt;CategorySpendSlice&gt;&gt;
 &nbsp;
 &nbsp;    /**
-&nbsp;     * Per-type, per-currency sums over the *whole* [window] — unaffected by the paging applied to
-&nbsp;     * [getCategorizedWindow], so a summary built from these stays correct as pages load.
-&nbsp;     */
-&nbsp;    fun getTotals(
-&nbsp;        accountId: AccountId?,
-&nbsp;        window: TransactionPeriodWindow,
-&nbsp;    ): Flow&lt;List&lt;TransactionTotal&gt;&gt;
-&nbsp;    fun getByWorkspaceId(workspaceId: WorkspaceId): Flow&lt;List&lt;Transaction&gt;&gt;
-&nbsp;
-&nbsp;    /** The live transaction behind [id], or `null` when it does not exist or has been deleted. */
-&nbsp;    suspend fun getById(id: TransactionId): Transaction?
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Every leg sharing [transferId] — two for a healthy transfer, one for a leg whose pair was
-&nbsp;     * deleted or never imported. Callers must not assume a pair exists.
-&nbsp;     */
-&nbsp;    suspend fun getByTransferId(transferId: TransferId): List&lt;Transaction&gt;
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Every leg sharing [splitId], oldest first — the receipt the row belongs to.
+&nbsp;     * Income and expense per calendar month inside the window, oldest first.
 &nbsp;     *
-&nbsp;     * A one-element result is a legitimate state, not a broken group: a leg can arrive from sync or
-&nbsp;     * a CSV import before (or without) its siblings, and it is a complete transaction on its own.
+&nbsp;     * The only query that looks past expenses. Months the workspace booked nothing in are absent
+&nbsp;     * — a chart that wants a fixed number of columns fills the gaps itself, the way
+&nbsp;     * `buildCategorySpendHistory` already does for the category trend.
+&nbsp;     *
+&nbsp;     * **The first and last rows are only whole months if the window&#39;s ends are.** Grouping happens
+&nbsp;     * inside the window, so a scope covering 10–16 March returns one row labelled `2025-03` holding
+&nbsp;     * that week alone, and a scope starting mid-month returns a part-month under a full month&#39;s
+&nbsp;     * name. `MonthlyNet.month` cannot express the difference. Call this with a window whose ends
+&nbsp;     * fall on month boundaries — `periodWindow(Month, ...)`, or a span built from
+&nbsp;     * `trailingMonths(...)` — unless a partial leading or trailing column is what the caller wants
+&nbsp;     * to draw. A week-scoped `SpendScope` (#296) belongs on [daily], not here.
 &nbsp;     */
-&nbsp;    suspend fun getBySplitId(splitId: SplitId): List&lt;Transaction&gt;
-&nbsp;    suspend fun insert(transaction: Transaction)
-&nbsp;    suspend fun update(transaction: Transaction)
+&nbsp;    fun netByMonth(scope: SpendScope): Flow&lt;List&lt;MonthlyNet&gt;&gt;
+&nbsp;
+&nbsp;    /** Spend per calendar day inside the window, oldest first. Days without spend are absent. */
+&nbsp;    fun daily(scope: SpendScope): Flow&lt;List&lt;DailySpendPoint&gt;&gt;
 &nbsp;
 &nbsp;    /**
-&nbsp;     * Marks [id] deleted. The row survives as a tombstone — invisible to every query on this
-&nbsp;     * interface, but still there for [restore] to bring back (issue #346).
+&nbsp;     * The [limit] merchants that took the most inside the window, largest first.
+&nbsp;     *
+&nbsp;     * Rows with no merchant are excluded: unlike a missing category, a blank merchant is not a
+&nbsp;     * counterparty the user could recognise, and it would otherwise be the biggest &quot;merchant&quot; in
+&nbsp;     * most workspaces.
 &nbsp;     */
-&nbsp;    suspend fun delete(id: TransactionId)
+&nbsp;    fun topMerchants(scope: SpendScope, limit: Int): Flow&lt;List&lt;MerchantSpend&gt;&gt;
 &nbsp;
 &nbsp;    /**
-&nbsp;     * Lifts the tombstone from [id] and returns the transaction as it now stands, or `null` when
-&nbsp;     * there was nothing deleted to bring back.
+&nbsp;     * Per-currency spend the [SpendScope.baseCurrency] filter left out, largest first — empty when
+&nbsp;     * the window holds nothing but base-currency expenses.
 &nbsp;     *
-&nbsp;     * The Undo half of [delete], and deliberately keyed on the id alone: the row was never
-&nbsp;     * removed, so restoring it needs no copy of its fields to have survived alongside the
-&nbsp;     * request — which is what makes an Undo outlive the Snackbar that offered it.
-&nbsp;     *
-&nbsp;     * Returning `null` for an id that is missing or already live is what keeps a repeated Undo
-&nbsp;     * from refunding the same balance twice.
+&nbsp;     * The invariant this preserves: an expense that clears every *other* term of the predicate is
+&nbsp;     * either inside the four results above or listed here, never neither. A number the UI cannot
+&nbsp;     * complete is a display problem, not a licence to drop money.
 &nbsp;     */
-&nbsp;    suspend fun restore(id: TransactionId): Transaction?
+&nbsp;    fun excludedByCurrency(scope: SpendScope): Flow&lt;List&lt;CurrencyTotal&gt;&gt;
 &nbsp;}
 </code>
 </pre>
@@ -150,7 +166,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 14:00</div>
+    <div style="float:right;">generated on 2026-07-29 15:47</div>
 </div>
 </body>
 </html>

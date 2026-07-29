@@ -57,26 +57,26 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    67.6%
+    68.2%
   </span>
   <span class="absValue">
-    (73/108)
+    (75/110)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    92.4%
+    92.9%
   </span>
   <span class="absValue">
-    (170/184)
+    (183/197)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    86%
+    86.4%
   </span>
   <span class="absValue">
-    (1741/2024)
+    (1803/2086)
   </span>
 </td>
 </tr>
@@ -220,26 +220,26 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    67.6%
+    68.2%
   </span>
   <span class="absValue">
-    (73/108)
+    (75/110)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    92.4%
+    92.9%
   </span>
   <span class="absValue">
-    (171/185)
+    (184/198)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    86.1%
+    86.5%
   </span>
   <span class="absValue">
-    (1748/2031)
+    (1810/2093)
   </span>
 </td>
 </tr>
@@ -297,6 +297,8 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
 &nbsp;import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
 &nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
+&nbsp;import com.georgeci.moneysurfer.uikit.window.SurferWindowSize
+&nbsp;import com.georgeci.moneysurfer.uikit.window.currentSurferWindowSize
 &nbsp;import com.georgeci.moneysurfer.utils.AsyncState
 &nbsp;import com.georgeci.moneysurfer.utils.HandleSideEffect
 &nbsp;import moneysurfer.feature.dashboard.generated.resources.Res
@@ -342,6 +344,13 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;
 &nbsp;    /** A preview tile in that sheet — [option] is a size name or a variant key. */
 &nbsp;    fun styleOption(widget: String, option: String): String = &quot;dashboardCustomize:style:$widget:$option&quot;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * A grid-width tile in that sheet. Kept out of [styleOption]&#39;s namespace on purpose: variant
+&nbsp;     * keys are free-form and widget-defined, so a widget that one day names a treatment &quot;Half&quot; would
+&nbsp;     * otherwise put two selectable nodes under one tag and make the selector ambiguous.
+&nbsp;     */
+&nbsp;    fun spanOption(widget: String, span: String): String = &quot;dashboardCustomize:span:$widget:$span&quot;
 &nbsp;}
 &nbsp;
 &nbsp;@Composable
@@ -426,6 +435,9 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="pc">&nbsp;) {</b>
 <b class="fc">&nbsp;    val enabled = layout.enabledItems</b>
 <b class="fc">&nbsp;    val available = layout.disabledItems</b>
+&nbsp;    // Grid widths are offered only where a grid exists to apply them: below expanded width the
+&nbsp;    // dashboard is one widget per row whatever the spans say.
+<b class="fc">&nbsp;    val spanEnabled = currentSurferWindowSize() &gt;= SurferWindowSize.Expanded</b>
 &nbsp;    // Which widget&#39;s style sheet is open, by type name — the type itself is not saveable. Held
 &nbsp;    // here rather than in the ViewModel because it is sheet chrome, not part of the layout.
 <b class="fc">&nbsp;    var styleTarget by rememberSaveable { mutableStateOf&lt;String?&gt;(null) }</b>
@@ -479,7 +491,21 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;                rowTestTag = DashboardCustomizeTestTags.enabledRow(item.type.name),</b>
 <b class="fc">&nbsp;                modifier = surferReorderableItem(reorderState, item.type.name),</b>
 <b class="fc">&nbsp;                handleModifier = Modifier.surferReorderHandle(reorderState, item.type.name),</b>
-<b class="fc">&nbsp;                onStyleClick = { styleTarget = item.type.name }.takeIf { widgetStyleEnabled },</b>
+&nbsp;                // Either half of the sheet is reason enough to offer the pill: the card-style
+&nbsp;                // picker ships behind a build key that is off, and the grid widths would be
+&nbsp;                // unreachable in every shipped build if they rode on it.
+<b class="fc">&nbsp;                pill = if (widgetStyleEnabled || spanEnabled) {</b>
+<b class="fc">&nbsp;                    WidgetRowPill(</b>
+<b class="fc">&nbsp;                        summary = cardStyleSummary(</b>
+<b class="fc">&nbsp;                            item,</b>
+<b class="fc">&nbsp;                            showStyle = widgetStyleEnabled,</b>
+<b class="fc">&nbsp;                            showSpan = spanEnabled,</b>
+&nbsp;                        ),
+<b class="fc">&nbsp;                        onClick = { styleTarget = item.type.name },</b>
+&nbsp;                    )
+<b class="fc">&nbsp;                } else {</b>
+<b class="fc">&nbsp;                    null</b>
+<b class="fc">&nbsp;                },</b>
 <b class="fc">&nbsp;                onEvent = onEvent,</b>
 <b class="fc">&nbsp;            )</b>
 <b class="fc">&nbsp;        }</b>
@@ -503,7 +529,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;                rowTestTag = DashboardCustomizeTestTags.availableRow(item.type.name),</b>
 <b class="fc">&nbsp;                modifier = surferReorderableItem(reorderState, item.type.name),</b>
 <b class="fc">&nbsp;                handleModifier = Modifier.surferReorderHandle(reorderState, item.type.name),</b>
-<b class="fc">&nbsp;                onStyleClick = null,</b>
+<b class="fc">&nbsp;                pill = null,</b>
 <b class="fc">&nbsp;                onEvent = onEvent,</b>
 <b class="fc">&nbsp;            )</b>
 <b class="fc">&nbsp;        }</b>
@@ -523,7 +549,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;        DashboardCardStyleSheet(</b>
 <b class="fc">&nbsp;            item = styled,</b>
 <b class="fc">&nbsp;            onSelect = { onEvent(DashboardCustomizeEvent.OnCardStyleChange(styled.type, it)) },</b>
+<b class="fc">&nbsp;            onSpanSelect = { onEvent(DashboardCustomizeEvent.OnSpanChange(styled.type, it)) },</b>
 <b class="fc">&nbsp;            onDismiss = { styleTarget = null },</b>
+<b class="fc">&nbsp;            styleEnabled = widgetStyleEnabled,</b>
+<b class="fc">&nbsp;            spanEnabled = spanEnabled,</b>
 &nbsp;        )
 <b class="fc">&nbsp;    }</b>
 <b class="fc">&nbsp;}</b>
@@ -559,6 +588,13 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;}</b>
 &nbsp;
 &nbsp;/**
+&nbsp; * The &quot;Hero · Classic&quot; pill under a widget&#39;s name: what it says, and the sheet it opens. One value
+&nbsp; * rather than a summary and a callback, because it is one affordance — a row either offers the
+&nbsp; * picker or it does not, and a label with nothing behind it would be a lie either way.
+&nbsp; */
+&nbsp;private data class WidgetRowPill(val summary: String, val onClick: () -&gt; Unit)
+&nbsp;
+&nbsp;/**
 &nbsp; * One widget, in whichever section it currently sits. The two used to be separate composables and
 &nbsp; * had drifted: only the enabled one could be dragged. They differ in exactly two things now — the
 &nbsp; * direction the round button moves the row, and whether [onStyleClick] is offered.
@@ -572,7 +608,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    rowTestTag: String,
 &nbsp;    modifier: Modifier,
 &nbsp;    handleModifier: Modifier,
-&nbsp;    onStyleClick: (() -&gt; Unit)?,
+&nbsp;    pill: WidgetRowPill?,
 &nbsp;    onEvent: (DashboardCustomizeEvent) -&gt; Unit,
 <b class="pc">&nbsp;) {</b>
 <b class="fc">&nbsp;    val widget = item.type.name</b>
@@ -582,13 +618,13 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;        title = title,</b>
 <b class="fc">&nbsp;        modifier = modifier.testTag(rowTestTag),</b>
 <b class="fc">&nbsp;        icon = item.type.icon(),</b>
-<b class="fc">&nbsp;        supporting = onStyleClick?.let {</b>
+<b class="fc">&nbsp;        supporting = pill?.let {</b>
 <b class="fc">&nbsp;            {</b>
 <b class="fc">&nbsp;                SurferSettingsValuePill(</b>
-<b class="fc">&nbsp;                    text = cardStyleSummary(item.type, item.cardStyle),</b>
+<b class="fc">&nbsp;                    text = it.summary,</b>
 <b class="fc">&nbsp;                    modifier = Modifier</b>
 <b class="fc">&nbsp;                        .clip(AppTheme.shapes.small)</b>
-<b class="fc">&nbsp;                        .clickable(onClick = it)</b>
+<b class="fc">&nbsp;                        .clickable(onClick = it.onClick)</b>
 <b class="fc">&nbsp;                        .padding(vertical = 4.dp, horizontal = 2.dp)</b>
 <b class="fc">&nbsp;                        .testTag(DashboardCustomizeTestTags.styleAction(widget)),</b>
 &nbsp;                )
@@ -679,7 +715,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 14:00</div>
+    <div style="float:right;">generated on 2026-07-29 15:47</div>
 </div>
 </body>
 </html>

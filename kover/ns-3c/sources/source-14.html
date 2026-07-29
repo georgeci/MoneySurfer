@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > DashboardSpentByCategoryWidgetKt</title>
+  <title>MoneySurfer Coverage Report > DashboardScreenKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.feature.dashboard</a>
 </div>
 
-<h1>Coverage Summary for Class: DashboardSpentByCategoryWidgetKt (com.georgeci.moneysurfer.feature.dashboard)</h1>
+<h1>Coverage Summary for Class: DashboardScreenKt (com.georgeci.moneysurfer.feature.dashboard)</h1>
 
 <table class="coverageStats">
 
@@ -46,76 +46,76 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">DashboardSpentByCategoryWidgetKt</td>
+  <td class="name">DashboardScreenKt</td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    66.7%
   </span>
   <span class="absValue">
-    (5/5)
+    (20/30)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    78.3%
+    38.6%
   </span>
   <span class="absValue">
-    (18/23)
+    (61/158)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    95.1%
+    78.9%
   </span>
   <span class="absValue">
-    (39/41)
+    (180/228)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    96.4%
+    77.9%
   </span>
   <span class="absValue">
-    (487/505)
+    (2303/2956)
   </span>
 </td>
 </tr>
   <tr>
-    <td class="name">DashboardSpentByCategoryWidgetKt$WhenMappings</td>
+    <td class="name">DashboardScreenKt$WhenMappings</td>
     <td class="coverageStat"/>
   </tr>
 <tr>
   <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    66.7%
   </span>
   <span class="absValue">
-    (5/5)
+    (20/30)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    78.3%
+    38.6%
   </span>
   <span class="absValue">
-    (18/23)
+    (61/158)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    95.1%
+    78.9%
   </span>
   <span class="absValue">
-    (39/41)
+    (180/228)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    96.4%
+    77.9%
   </span>
   <span class="absValue">
-    (487/505)
+    (2303/2956)
   </span>
 </td>
 </tr>
@@ -128,120 +128,593 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.dashboard
 &nbsp;
+&nbsp;import androidx.compose.foundation.clickable
+&nbsp;import androidx.compose.foundation.layout.Arrangement
+&nbsp;import androidx.compose.foundation.layout.Column
+&nbsp;import androidx.compose.foundation.layout.Row
+&nbsp;import androidx.compose.foundation.layout.defaultMinSize
+&nbsp;import androidx.compose.foundation.layout.fillMaxSize
 &nbsp;import androidx.compose.foundation.layout.fillMaxWidth
+&nbsp;import androidx.compose.foundation.layout.height
 &nbsp;import androidx.compose.foundation.layout.padding
+&nbsp;import androidx.compose.material3.Scaffold
+&nbsp;import androidx.compose.material3.Text
 &nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.runtime.getValue
+&nbsp;import androidx.compose.ui.Alignment
 &nbsp;import androidx.compose.ui.Modifier
+&nbsp;import androidx.compose.ui.graphics.Color
 &nbsp;import androidx.compose.ui.platform.testTag
+&nbsp;import androidx.compose.ui.tooling.preview.Preview
 &nbsp;import androidx.compose.ui.unit.dp
-&nbsp;import com.georgeci.moneysurfer.domain.model.BudgetStatus
-&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferCategoryPalette
-&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferCategorySpendCap
-&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferCategorySpendItem
-&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferSpentByCategoryEmpty
-&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferSpentByCategoryVariant
-&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferSpentByCategoryWidget
+&nbsp;import androidx.lifecycle.compose.collectAsStateWithLifecycle
+&nbsp;import com.georgeci.moneysurfer.domain.dashboard.DashboardPeriod
+&nbsp;import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetType
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.AccountId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.GoalId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionId
+&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferSkeleton
+&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferSkeletonRow
+&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferAddFab
+&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferDashboardToolbar
+&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferToolbarAction
+&nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
+&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
+&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
+&nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.LocalSurferWidgetSize
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferAccountItem
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferAccountsWidget
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferAddAccountCta
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferBalanceFootnote
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferBalanceVariant
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferBalanceWidget
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferGoalItem
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferGoalsWidget
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferQuickActionsWidget
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferRecentTransactionItem
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferRecentTransactionsWidget
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferWidgetSize
 &nbsp;import moneysurfer.feature.dashboard.generated.resources.Res
-&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_spent_by_category_empty_subtitle
-&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_spent_by_category_empty_title
-&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_spent_by_category_of_cap
-&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_spent_by_category_over_cap
-&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_spent_by_category_share
-&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_spent_by_category_status_over
-&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_spent_by_category_status_warn
-&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_spent_by_category_title
-&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_spent_by_category_uncategorized
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_accounts_manage
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_accounts_section_title
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_add_account
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_add_account_new
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_add_transaction
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_balance_empty_text
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_balance_other_currencies
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_balance_rates_as_of
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_balance_title
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_content_description
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_goals_empty_subtitle
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_goals_empty_title
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_goals_see_all
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_goals_title
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_quick_action_transfer
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_recent_empty_subtitle
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_recent_empty_title
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_recent_see_all
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_recent_split_categories
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_recent_title
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_settings_content_description
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_toolbar_greeting
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_toolbar_title
 &nbsp;import org.jetbrains.compose.resources.stringResource
+&nbsp;import org.koin.compose.viewmodel.koinViewModel
 &nbsp;
 &nbsp;/**
-&nbsp; * Where the selected period&#39;s money went, category by category, in whichever of the five
-&nbsp; * treatments the card style names.
+&nbsp; * Stable selectors for the Dashboard — see docs/testing/testing-strategy.md.
 &nbsp; *
-&nbsp; * Like safe-to-spend this one keeps drawing with nothing behind it: a period with no expenses yet
-&nbsp; * is a state the widget is *for*, not a reason to leave a gap in the column.
+&nbsp; * The widget tags name the section, not the composable: which widgets are present and in what
+&nbsp; * order is user configuration, so a flow asserts [Accounts], [Recent] or [Goals] instead of
+&nbsp; * an index into the column. [AddAccount], [RecentSeeAll], [GoalsSeeAll] and [RecentEmpty] sit
+&nbsp; * on nodes owned by shared `uikit` widgets, which take the tag as a parameter.
+&nbsp; */
+&nbsp;object DashboardTestTags {
+&nbsp;    const val Root = &quot;dashboard:root&quot;
+&nbsp;    const val Balance = &quot;dashboard:balance&quot;
+&nbsp;    const val Customize = &quot;dashboard:customize&quot;
+&nbsp;    const val Settings = &quot;dashboard:settings&quot;
+&nbsp;    const val AddTransaction = &quot;dashboard:addTransaction&quot;
+&nbsp;
+&nbsp;    /** The Week/Month switch itself; [periodOption] addresses either of its two segments. */
+&nbsp;    const val PeriodSwitch = &quot;dashboard:period&quot;
+&nbsp;
+&nbsp;    fun periodOption(period: DashboardPeriod): String = &quot;$PeriodSwitch:${period.name.lowercase()}&quot;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The quick-actions row, not either button inside it — `SurferQuickActionsWidget` takes no per
+&nbsp;     * button tag, and reusing [AddTransaction] for its primary action would put two nodes under one
+&nbsp;     * id, which is an ambiguous selector rather than a convenience. Its buttons are reachable by
+&nbsp;     * their labels, both of which this screen owns.
+&nbsp;     */
+&nbsp;    const val QuickActions = &quot;dashboard:quickActions&quot;
+&nbsp;    const val SafeToSpend = &quot;dashboard:safeToSpend&quot;
+&nbsp;
+&nbsp;    /** The &quot;Set a budget&quot; link, shown only while the safe-to-spend widget has no budget to read. */
+&nbsp;    const val SafeToSpendSetBudget = &quot;dashboard:safeToSpendSetBudget&quot;
+&nbsp;    const val BurnRate = &quot;dashboard:burnRate&quot;
+&nbsp;    const val Budgets = &quot;dashboard:budgets&quot;
+&nbsp;    const val BudgetsSeeAll = &quot;dashboard:budgetsSeeAll&quot;
+&nbsp;
+&nbsp;    /** The whole spent-by-category card, whichever of its five treatments is selected. */
+&nbsp;    const val SpentByCategory = &quot;dashboard:spentByCategory&quot;
+&nbsp;    const val Accounts = &quot;dashboard:accounts&quot;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Empty-state CTA only — `SurferAccountsWidget` composes it just while the account list is
+&nbsp;     * empty. Once an account exists, new ones are created from [AccountsManage].
+&nbsp;     */
+&nbsp;    const val AddAccount = &quot;dashboard:addAccount&quot;
+&nbsp;    const val AccountsManage = &quot;dashboard:accountsManage&quot;
+&nbsp;    const val Insights = &quot;dashboard:insights&quot;
+&nbsp;    const val Recent = &quot;dashboard:recent&quot;
+&nbsp;    const val RecentSeeAll = &quot;dashboard:recentSeeAll&quot;
+&nbsp;    const val RecentEmpty = &quot;dashboard:recentEmpty&quot;
+&nbsp;    const val Goals = &quot;dashboard:goals&quot;
+&nbsp;    const val GoalsSeeAll = &quot;dashboard:goalsSeeAll&quot;
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+<b class="nc">&nbsp;fun DashboardScreen(</b>
+&nbsp;    navigation: DashboardNavigation,
+<b class="nc">&nbsp;    viewModel: DashboardViewModel = koinViewModel(),</b>
+<b class="nc">&nbsp;) {</b>
+<b class="nc">&nbsp;    val state by viewModel.collectAsStateWithLifecycle()</b>
+&nbsp;
+<b class="nc">&nbsp;    HandleDashboardEffects(viewModel, navigation)</b>
+&nbsp;
+<b class="nc">&nbsp;    when (val current = state) {</b>
+<b class="nc">&nbsp;        DashboardState.Loading -&gt; DashboardLoading()</b>
+<b class="nc">&nbsp;        is DashboardState.Content -&gt; DashboardContent(</b>
+<b class="nc">&nbsp;            state = current,</b>
+<b class="nc">&nbsp;            onEvent = viewModel::onEvent,</b>
+&nbsp;        )
+<b class="nc">&nbsp;    }</b>
+<b class="nc">&nbsp;}</b>
+&nbsp;
+&nbsp;private const val DASHBOARD_SKELETON_ROWS = 4
+&nbsp;
+&nbsp;/** Floor the list-shaped cards share, so a short list does not collapse the column&#39;s rhythm. */
+<b class="fc">&nbsp;internal val DASHBOARD_WIDGET_MIN_HEIGHT = 180.dp</b>
+&nbsp;
+&nbsp;/** Bottom scroll inset that keeps the last row clear of the extended &quot;Add transaction&quot; FAB. */
+<b class="fc">&nbsp;private val DASHBOARD_FAB_CLEARANCE = 88.dp</b>
+&nbsp;
+&nbsp;/** A transfer needs somewhere to send the money, so the quick-actions row waits for a second account. */
+&nbsp;private const val MIN_ACCOUNTS_FOR_TRANSFER = 2
+&nbsp;
+&nbsp;@Composable
+<b class="nc">&nbsp;private fun DashboardLoading() {</b>
+<b class="nc">&nbsp;    Scaffold(</b>
+<b class="nc">&nbsp;        modifier = Modifier.surferSafeInsets(),</b>
+&nbsp;    ) { padding -&gt;
+&nbsp;        Column(
+&nbsp;            modifier = Modifier
+&nbsp;                .fillMaxSize()
+&nbsp;                .surferContentContainer()
+&nbsp;                .padding(padding)
+&nbsp;                .padding(horizontal = 16.dp),
+&nbsp;            verticalArrangement = Arrangement.spacedBy(16.dp),
+&nbsp;        ) {
+&nbsp;            SurferSkeleton(
+&nbsp;                modifier = Modifier
+&nbsp;                    .fillMaxWidth()
+&nbsp;                    .padding(top = 8.dp)
+&nbsp;                    .height(180.dp),
+&nbsp;            )
+&nbsp;            repeat(DASHBOARD_SKELETON_ROWS) {
+&nbsp;                SurferSkeletonRow()
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+<b class="nc">&nbsp;}</b>
+&nbsp;
+&nbsp;/**
+&nbsp; * Stateless half of the screen — public so `:composeApp` desktop UI tests can mount it with an
+&nbsp; * injected state, the way `DashboardCustomizeContent` is used.
 &nbsp; */
 &nbsp;@Composable
-<b class="pc">&nbsp;internal fun SpentByCategoryWidget(state: DashboardState.Content, variant: String?) {</b>
-<b class="fc">&nbsp;    SurferSpentByCategoryWidget(</b>
-<b class="fc">&nbsp;        title = stringResource(Res.string.dashboard_spent_by_category_title),</b>
-<b class="fc">&nbsp;        items = state.spentByCategory.map { it.toWidgetItem() },</b>
-<b class="fc">&nbsp;        variant = SurferSpentByCategoryVariant.fromKey(variant),</b>
-<b class="fc">&nbsp;        empty = SurferSpentByCategoryEmpty(</b>
-<b class="fc">&nbsp;            title = stringResource(Res.string.dashboard_spent_by_category_empty_title),</b>
-<b class="fc">&nbsp;            subtitle = stringResource(Res.string.dashboard_spent_by_category_empty_subtitle),</b>
-&nbsp;        ),
+&nbsp;fun DashboardContent(
+&nbsp;    state: DashboardState.Content,
+&nbsp;    onEvent: (DashboardEvent) -&gt; Unit,
+<b class="pc">&nbsp;) {</b>
+<b class="fc">&nbsp;    Scaffold(</b>
+<b class="fc">&nbsp;        modifier = Modifier</b>
+<b class="fc">&nbsp;            .surferSafeInsets()</b>
+<b class="fc">&nbsp;            .surferTestTagAsId()</b>
+<b class="fc">&nbsp;            .testTag(DashboardTestTags.Root),</b>
+<b class="fc">&nbsp;        topBar = {</b>
+<b class="fc">&nbsp;            val defaultTitle = stringResource(Res.string.dashboard_toolbar_title)</b>
+<b class="pc">&nbsp;            val workspaceName = state.workspaceName ?: defaultTitle</b>
+<b class="fc">&nbsp;            SurferDashboardToolbar(</b>
+<b class="pc">&nbsp;                letter = state.workspaceInitial</b>
+<b class="pc">&nbsp;                    ?: workspaceName.firstOrNull()?.uppercaseChar()?.toString().orEmpty(),</b>
+<b class="fc">&nbsp;                primaryText = workspaceName,</b>
+<b class="pc">&nbsp;                secondaryText = state.greeting ?: stringResource(Res.string.dashboard_toolbar_greeting),</b>
+<b class="fc">&nbsp;                actions = {</b>
+<b class="fc">&nbsp;                    SurferToolbarAction(</b>
+<b class="fc">&nbsp;                        icon = SurferIcons.Edit,</b>
+<b class="fc">&nbsp;                        contentDescription = stringResource(Res.string.dashboard_customize_content_description),</b>
+<b class="fc">&nbsp;                        onClick = { onEvent(DashboardEvent.OnCustomizeClick) },</b>
+<b class="fc">&nbsp;                        modifier = Modifier.testTag(DashboardTestTags.Customize),</b>
+&nbsp;                    )
+<b class="fc">&nbsp;                    SurferToolbarAction(</b>
+<b class="fc">&nbsp;                        icon = SurferIcons.Settings,</b>
+<b class="fc">&nbsp;                        contentDescription = stringResource(Res.string.dashboard_settings_content_description),</b>
+<b class="fc">&nbsp;                        onClick = { onEvent(DashboardEvent.OnSettingsClick) },</b>
+<b class="fc">&nbsp;                        modifier = Modifier.testTag(DashboardTestTags.Settings),</b>
+&nbsp;                    )
+&nbsp;                },
+&nbsp;            )
+&nbsp;        },
+<b class="fc">&nbsp;        floatingActionButton = {</b>
+<b class="fc">&nbsp;            if (state.accounts.isNotEmpty()) {</b>
+<b class="fc">&nbsp;                SurferAddFab(</b>
+<b class="fc">&nbsp;                    label = stringResource(Res.string.dashboard_add_transaction),</b>
+<b class="fc">&nbsp;                    onClick = { onEvent(DashboardEvent.OnAddTransactionClick) },</b>
+<b class="fc">&nbsp;                    modifier = Modifier.testTag(DashboardTestTags.AddTransaction),</b>
+&nbsp;                )
+<b class="fc">&nbsp;            }</b>
+&nbsp;        },
+<b class="fc">&nbsp;    ) { padding -&gt;</b>
+&nbsp;        // Clear the extended FAB so the last transactions can scroll above it instead of
+&nbsp;        // being hidden behind it; only reserve the space when the FAB is actually shown.
+<b class="fc">&nbsp;        val fabClearance = if (state.accounts.isNotEmpty()) DASHBOARD_FAB_CLEARANCE else 0.dp</b>
+<b class="fc">&nbsp;        DashboardWidgets(</b>
+<b class="fc">&nbsp;            state = state,</b>
+<b class="fc">&nbsp;            topInset = padding.calculateTopPadding(),</b>
+<b class="fc">&nbsp;            bottomInset = padding.calculateBottomPadding() + fabClearance,</b>
+<b class="fc">&nbsp;            onEvent = onEvent,</b>
+&nbsp;        )
+&nbsp;    }
+<b class="fc">&nbsp;}</b>
+&nbsp;
+&nbsp;/**
+&nbsp; * Whether [type] would draw anything at all for this state.
+&nbsp; *
+&nbsp; * A widget that stands itself down costs nothing in the single column — a zero-height row nobody
+&nbsp; * sees. In the grid it still claims the columns its span asked for, so the row it sits in gets a
+&nbsp; * hole. The layout therefore skips these before placing anything, and the widget itself keeps the
+&nbsp; * same guard so the two can never disagree about what is on screen.
+&nbsp; *
+&nbsp; * Only quick actions has such a state today; every other widget draws its own empty treatment.
+&nbsp; */
+<b class="fc">&nbsp;internal fun DashboardState.Content.rendersWidget(type: DashboardWidgetType): Boolean = when (type) {</b>
+<b class="fc">&nbsp;    DashboardWidgetType.QuickActions -&gt; transferEnabled &amp;&amp; accounts.size &gt;= MIN_ACCOUNTS_FOR_TRANSFER</b>
+<b class="fc">&nbsp;    else -&gt; true</b>
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * The registry&#39;s render half: every [DashboardWidgetType] resolves to exactly one widget here.
+&nbsp; * Adding a widget type without a branch is a compile error, which is the point.
+&nbsp; *
+&nbsp; * [variant] is the widget-specific half of the card style. It stays a raw key this far in: only
+&nbsp; * the widget that defines the treatments knows how to read it, and a widget with none ignores it.
+&nbsp; */
+&nbsp;@Composable
+&nbsp;internal fun DashboardWidget(
+&nbsp;    type: DashboardWidgetType,
+&nbsp;    variant: String?,
+&nbsp;    state: DashboardState.Content,
+&nbsp;    onEvent: (DashboardEvent) -&gt; Unit,
+<b class="pc">&nbsp;) {</b>
+<b class="pc">&nbsp;    when (type) {</b>
+<b class="fc">&nbsp;        DashboardWidgetType.Balance -&gt; BalanceWidget(state, variant)</b>
+<b class="fc">&nbsp;        DashboardWidgetType.QuickActions -&gt; QuickActionsWidget(state, onEvent)</b>
+<b class="fc">&nbsp;        DashboardWidgetType.SafeToSpend -&gt; SafeToSpendWidget(state, onEvent)</b>
+<b class="fc">&nbsp;        DashboardWidgetType.BurnRate -&gt; BurnRateWidget(state)</b>
+<b class="fc">&nbsp;        DashboardWidgetType.Budgets -&gt; BudgetsWidget(state, onEvent)</b>
+<b class="fc">&nbsp;        DashboardWidgetType.SpentByCategory -&gt; SpentByCategoryWidget(state, variant)</b>
+<b class="fc">&nbsp;        DashboardWidgetType.Accounts -&gt; AccountsWidget(state, onEvent)</b>
+<b class="fc">&nbsp;        DashboardWidgetType.Insights -&gt; InsightsWidget(state, variant)</b>
+<b class="fc">&nbsp;        DashboardWidgetType.Goals -&gt; GoalsWidget(state, onEvent)</b>
+<b class="fc">&nbsp;        DashboardWidgetType.RecentTransactions -&gt; RecentTransactionsWidget(state, onEvent)</b>
+<b class="nc">&nbsp;    }</b>
+<b class="fc">&nbsp;}</b>
+&nbsp;
+&nbsp;@Composable
+<b class="pc">&nbsp;private fun BalanceWidget(state: DashboardState.Content, variant: String?) {</b>
+<b class="fc">&nbsp;    SurferBalanceWidget(</b>
+<b class="fc">&nbsp;        title = stringResource(Res.string.dashboard_balance_title),</b>
+<b class="pc">&nbsp;        balance = state.formattedTotalBalance ?: &quot;—&quot;,</b>
+<b class="fc">&nbsp;        variant = SurferBalanceVariant.fromKey(variant),</b>
+<b class="fc">&nbsp;        footnote = balanceFootnote(state),</b>
+<b class="fc">&nbsp;        modifier = Modifier</b>
+<b class="fc">&nbsp;            .fillMaxWidth()</b>
+<b class="fc">&nbsp;            .padding(horizontal = 16.dp)</b>
+<b class="fc">&nbsp;            .testTag(DashboardTestTags.Balance),</b>
+&nbsp;    )
+<b class="fc">&nbsp;}</b>
+&nbsp;
+&nbsp;/**
+&nbsp; * The two shortcuts that skip the FAB: log a transaction, or move money between accounts.
+&nbsp; *
+&nbsp; * Stands down entirely rather than offering an action the screen would refuse:
+&nbsp; * - with `transferEnabled` off the creation screen ignores the type switch, so a Transfer button
+&nbsp; *   would land on an expense form — and this row is half Transfer button;
+&nbsp; * - below [MIN_ACCOUNTS_FOR_TRANSFER] there is nothing to move money between. The form would open
+&nbsp; *   with an empty &quot;To&quot; slot whose picker excludes the only account there is, leaving Save disabled
+&nbsp; *   with no way to enable it.
+&nbsp; *
+&nbsp; * All or nothing, because the widget draws both buttons or neither — and the half worth keeping is
+&nbsp; * Transfer, since &quot;Add transaction&quot; is the FAB this screen already shows.
+&nbsp; */
+&nbsp;@Composable
+&nbsp;private fun QuickActionsWidget(
+&nbsp;    state: DashboardState.Content,
+&nbsp;    onEvent: (DashboardEvent) -&gt; Unit,
+<b class="pc">&nbsp;) {</b>
+<b class="pc">&nbsp;    if (!state.rendersWidget(DashboardWidgetType.QuickActions)) return</b>
+<b class="fc">&nbsp;    SurferQuickActionsWidget(</b>
+<b class="fc">&nbsp;        primaryLabel = stringResource(Res.string.dashboard_add_transaction),</b>
+<b class="fc">&nbsp;        primaryIcon = SurferIcons.Add,</b>
+<b class="fc">&nbsp;        onPrimaryClick = { onEvent(DashboardEvent.OnAddTransactionClick) },</b>
+<b class="fc">&nbsp;        secondaryLabel = stringResource(Res.string.dashboard_quick_action_transfer),</b>
+<b class="fc">&nbsp;        secondaryIcon = SurferIcons.SwapHoriz,</b>
+<b class="fc">&nbsp;        onSecondaryClick = { onEvent(DashboardEvent.OnTransferClick) },</b>
+&nbsp;        // No explicit height: SurferButton pins its own (52dp Biggest, 48dp Regular) and the row is
+&nbsp;        // top-aligned, so a taller box would just hang dead space under the buttons.
 <b class="fc">&nbsp;        modifier = Modifier</b>
 <b class="fc">&nbsp;            .fillMaxWidth()</b>
 <b class="fc">&nbsp;            .padding(horizontal = 16.dp)</b>
 <b class="fc">&nbsp;            .padding(vertical = 8.dp)</b>
-<b class="fc">&nbsp;            .testTag(DashboardTestTags.SpentByCategory),</b>
+<b class="fc">&nbsp;            .testTag(DashboardTestTags.QuickActions),</b>
+&nbsp;    )
+<b class="fc">&nbsp;}</b>
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun AccountsWidget(
+&nbsp;    state: DashboardState.Content,
+&nbsp;    onEvent: (DashboardEvent) -&gt; Unit,
+<b class="pc">&nbsp;) {</b>
+<b class="fc">&nbsp;    val hero = LocalSurferWidgetSize.current == SurferWidgetSize.Expanded</b>
+<b class="fc">&nbsp;    Column(modifier = Modifier.testTag(DashboardTestTags.Accounts)) {</b>
+<b class="fc">&nbsp;        SectionHeader(</b>
+<b class="fc">&nbsp;            title = stringResource(Res.string.dashboard_accounts_section_title),</b>
+<b class="fc">&nbsp;            action = stringResource(Res.string.dashboard_accounts_manage),</b>
+<b class="fc">&nbsp;            onActionClick = { onEvent(DashboardEvent.OnManageAccountsClick) },</b>
+<b class="fc">&nbsp;            actionTestTag = DashboardTestTags.AccountsManage,</b>
+<b class="fc">&nbsp;            modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 8.dp),</b>
+&nbsp;        )
+<b class="fc">&nbsp;        SurferAccountsWidget(</b>
+<b class="fc">&nbsp;            items = state.accounts.map { it.toWidgetItem() },</b>
+<b class="fc">&nbsp;            addCta = SurferAddAccountCta(</b>
+<b class="fc">&nbsp;                label = stringResource(Res.string.dashboard_add_account),</b>
+<b class="fc">&nbsp;                onClick = { onEvent(DashboardEvent.OnAddAccountClick) },</b>
+<b class="fc">&nbsp;                trailingLabel = stringResource(Res.string.dashboard_add_account_new),</b>
+<b class="fc">&nbsp;                testTag = DashboardTestTags.AddAccount,</b>
+&nbsp;            ),
+<b class="fc">&nbsp;            onItemClick = { item -&gt;</b>
+<b class="nc">&nbsp;                item.accountId()?.let { onEvent(DashboardEvent.OnAccountClick(it)) }</b>
+&nbsp;            },
+<b class="fc">&nbsp;            modifier = Modifier</b>
+<b class="fc">&nbsp;                .fillMaxWidth()</b>
+<b class="fc">&nbsp;                .padding(horizontal = 16.dp)</b>
+<b class="fc">&nbsp;                .padding(vertical = if (hero) 8.dp else 6.dp),</b>
+&nbsp;        )
+<b class="fc">&nbsp;    }</b>
+<b class="fc">&nbsp;}</b>
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun GoalsWidget(
+&nbsp;    state: DashboardState.Content,
+&nbsp;    onEvent: (DashboardEvent) -&gt; Unit,
+<b class="pc">&nbsp;) {</b>
+<b class="fc">&nbsp;    SurferGoalsWidget(</b>
+<b class="fc">&nbsp;        items = state.goals.map { it.toWidgetItem() },</b>
+<b class="fc">&nbsp;        title = stringResource(Res.string.dashboard_goals_title),</b>
+<b class="fc">&nbsp;        seeAllLabel = stringResource(Res.string.dashboard_goals_see_all),</b>
+<b class="fc">&nbsp;        onSeeAllClick = { onEvent(DashboardEvent.OnSeeAllGoalsClick) },</b>
+<b class="fc">&nbsp;        onItemClick = { item -&gt; onEvent(DashboardEvent.OnGoalClick(GoalId(item.id))) },</b>
+<b class="fc">&nbsp;        emptyTitle = stringResource(Res.string.dashboard_goals_empty_title),</b>
+<b class="fc">&nbsp;        emptySubtitle = stringResource(Res.string.dashboard_goals_empty_subtitle),</b>
+<b class="fc">&nbsp;        modifier = Modifier</b>
+<b class="fc">&nbsp;            .fillMaxWidth()</b>
+<b class="fc">&nbsp;            .padding(horizontal = 16.dp)</b>
+<b class="fc">&nbsp;            .defaultMinSize(minHeight = DASHBOARD_WIDGET_MIN_HEIGHT)</b>
+<b class="fc">&nbsp;            .padding(vertical = 8.dp)</b>
+<b class="fc">&nbsp;            .testTag(DashboardTestTags.Goals),</b>
+<b class="fc">&nbsp;        seeAllTestTag = DashboardTestTags.GoalsSeeAll,</b>
+&nbsp;    )
+<b class="fc">&nbsp;}</b>
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun RecentTransactionsWidget(
+&nbsp;    state: DashboardState.Content,
+&nbsp;    onEvent: (DashboardEvent) -&gt; Unit,
+<b class="pc">&nbsp;) {</b>
+<b class="fc">&nbsp;    val modifier = Modifier</b>
+<b class="fc">&nbsp;        .fillMaxWidth()</b>
+<b class="fc">&nbsp;        .padding(horizontal = 16.dp)</b>
+<b class="fc">&nbsp;        .defaultMinSize(minHeight = DASHBOARD_WIDGET_MIN_HEIGHT)</b>
+<b class="fc">&nbsp;        .padding(vertical = 8.dp)</b>
+<b class="fc">&nbsp;        .testTag(DashboardTestTags.Recent)</b>
+&nbsp;
+<b class="fc">&nbsp;    val bubbleBg = AppTheme.materialColors.primaryContainer</b>
+<b class="fc">&nbsp;    val bubbleFg = AppTheme.materialColors.onPrimaryContainer</b>
+<b class="fc">&nbsp;    SurferRecentTransactionsWidget(</b>
+<b class="fc">&nbsp;        items = state.transactions.map { it.toWidgetItem(bubbleBg, bubbleFg) },</b>
+<b class="fc">&nbsp;        title = stringResource(Res.string.dashboard_recent_title),</b>
+<b class="fc">&nbsp;        seeAllLabel = stringResource(Res.string.dashboard_recent_see_all),</b>
+<b class="fc">&nbsp;        onSeeAllClick = { onEvent(DashboardEvent.OnSeeAllTransactionsClick) },</b>
+<b class="fc">&nbsp;        onItemClick = { item -&gt;</b>
+<b class="nc">&nbsp;            item.transactionId()?.let { onEvent(DashboardEvent.OnTransactionClick(it)) }</b>
+&nbsp;        },
+<b class="fc">&nbsp;        emptyTitle = stringResource(Res.string.dashboard_recent_empty_title),</b>
+<b class="fc">&nbsp;        emptySubtitle = stringResource(Res.string.dashboard_recent_empty_subtitle),</b>
+<b class="fc">&nbsp;        modifier = modifier,</b>
+<b class="fc">&nbsp;        seeAllTestTag = DashboardTestTags.RecentSeeAll,</b>
+<b class="fc">&nbsp;        emptyTestTag = DashboardTestTags.RecentEmpty,</b>
 &nbsp;    )
 <b class="fc">&nbsp;}</b>
 &nbsp;
 &nbsp;/**
-&nbsp; * The row as the card draws it. The tint comes from the category&#39;s stored hue through the one
-&nbsp; * resolver every category bubble goes through, so a category keeps the same colour here as on the
-&nbsp; * screens that own it.
-&nbsp; *
-&nbsp; * The uncategorized bucket has no stored appearance, so its tint is hashed from the fixed
-&nbsp; * [UNCATEGORIZED_ID] rather than from the label beside it — the label is translated, and a bucket
-&nbsp; * that changed colour when the user switched language would look like a different category.
+&nbsp; * Line under the headline balance. No total at all wins over everything; after that come the two
+&nbsp; * things that qualify the headline — balances no rate could absorb, then how old the rates that
+&nbsp; * built it are — because a figure the reader might misread outranks the decorative trend.
 &nbsp; */
 &nbsp;@Composable
-<b class="fc">&nbsp;private fun CategorySpendUi.toWidgetItem(): SurferCategorySpendItem {</b>
-<b class="fc">&nbsp;    val fallbackName = stringResource(Res.string.dashboard_spent_by_category_uncategorized)</b>
-<b class="fc">&nbsp;    val id = categoryId ?: UNCATEGORIZED_ID</b>
-<b class="fc">&nbsp;    return SurferCategorySpendItem(</b>
-<b class="fc">&nbsp;        id = id,</b>
-<b class="fc">&nbsp;        name = name ?: fallbackName,</b>
-<b class="fc">&nbsp;        amount = spentFormatted,</b>
-<b class="fc">&nbsp;        share = share,</b>
-<b class="fc">&nbsp;        caption = caption(),</b>
-&nbsp;        // The same resolver every category bubble goes through: the stored hue snapped to the
-&nbsp;        // palette, falling back to hashing the id for a row that stored none.
-<b class="fc">&nbsp;        tint = SurferCategoryPalette.tintForHue(hue ?: NO_STORED_HUE) ?: SurferCategoryPalette.tintFor(id),</b>
-<b class="fc">&nbsp;        cap = cap?.toWidgetCap(),</b>
+<b class="fc">&nbsp;private fun balanceFootnote(state: DashboardState.Content): SurferBalanceFootnote? = when {</b>
+<b class="pc">&nbsp;    state.formattedTotalBalance == null -&gt;</b>
+<b class="nc">&nbsp;        SurferBalanceFootnote.Empty(stringResource(Res.string.dashboard_balance_empty_text))</b>
+<b class="pc">&nbsp;    state.otherCurrencyTotals.isNotEmpty() -&gt; SurferBalanceFootnote.Note(</b>
+<b class="nc">&nbsp;        stringResource(</b>
+<b class="nc">&nbsp;            Res.string.dashboard_balance_other_currencies,</b>
+<b class="nc">&nbsp;            state.otherCurrencyTotals.joinToString(&quot; · &quot;),</b>
+&nbsp;        ),
 &nbsp;    )
+<b class="pc">&nbsp;    state.ratesAsOf != null -&gt; SurferBalanceFootnote.Note(</b>
+<b class="nc">&nbsp;        stringResource(Res.string.dashboard_balance_rates_as_of, state.ratesAsOf),</b>
+&nbsp;    )
+<b class="pc">&nbsp;    state.formattedTrendDelta != null -&gt; SurferBalanceFootnote.Trend(state.formattedTrendDelta)</b>
+<b class="fc">&nbsp;    else -&gt; null</b>
 &nbsp;}
 &nbsp;
-&nbsp;/**
-&nbsp; * The line that names what the row&#39;s meter measures. A capped category is measured against its cap,
-&nbsp; * so the caption states the cap; an uncapped one is measured against the period&#39;s spend, so it
-&nbsp; * states the share. The two must never be told apart by the shape alone.
-&nbsp; */
 &nbsp;@Composable
-<b class="fc">&nbsp;private fun CategorySpendUi.caption(): String {</b>
-<b class="fc">&nbsp;    val limit = cap ?: return stringResource(Res.string.dashboard_spent_by_category_share, sharePercent)</b>
-<b class="fc">&nbsp;    return if (limit.status == BudgetStatus.OVER) {</b>
-<b class="fc">&nbsp;        stringResource(Res.string.dashboard_spent_by_category_over_cap, limit.limitFormatted)</b>
-<b class="fc">&nbsp;    } else {</b>
-<b class="fc">&nbsp;        stringResource(Res.string.dashboard_spent_by_category_of_cap, spentFormatted, limit.limitFormatted)</b>
-&nbsp;    }
+&nbsp;private fun SectionHeader(
+&nbsp;    title: String,
+<b class="fc">&nbsp;    modifier: Modifier = Modifier,</b>
+<b class="fc">&nbsp;    action: String? = null,</b>
+<b class="fc">&nbsp;    onActionClick: (() -&gt; Unit)? = null,</b>
+<b class="fc">&nbsp;    actionTestTag: String? = null,</b>
+<b class="pc">&nbsp;) {</b>
+<b class="fc">&nbsp;    Row(</b>
+<b class="fc">&nbsp;        modifier = modifier.fillMaxWidth(),</b>
+<b class="fc">&nbsp;        verticalAlignment = Alignment.CenterVertically,</b>
+&nbsp;    ) {
+<b class="fc">&nbsp;        Text(</b>
+<b class="fc">&nbsp;            text = title,</b>
+<b class="fc">&nbsp;            style = AppTheme.typography.titleMedium,</b>
+<b class="fc">&nbsp;            color = AppTheme.materialColors.onSurface,</b>
+<b class="fc">&nbsp;            modifier = Modifier.weight(1f),</b>
+&nbsp;        )
+<b class="pc">&nbsp;        if (action != null) {</b>
+<b class="fc">&nbsp;            Text(</b>
+<b class="fc">&nbsp;                text = action,</b>
+<b class="fc">&nbsp;                style = AppTheme.typography.labelMedium,</b>
+<b class="fc">&nbsp;                color = AppTheme.materialColors.primary,</b>
+&nbsp;                modifier = (
+<b class="pc">&nbsp;                    if (onActionClick != null) {</b>
+<b class="fc">&nbsp;                        Modifier.clickable(onClick = onActionClick)</b>
+&nbsp;                    } else {
+<b class="nc">&nbsp;                        Modifier</b>
+&nbsp;                    }
+<b class="pc">&nbsp;                    ).then(actionTestTag?.let { Modifier.testTag(it) } ?: Modifier),</b>
+&nbsp;            )
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;    }</b>
 <b class="fc">&nbsp;}</b>
 &nbsp;
-&nbsp;@Composable
-<b class="fc">&nbsp;private fun CategoryCapUi.toWidgetCap(): SurferCategorySpendCap = SurferCategorySpendCap(</b>
-<b class="fc">&nbsp;    progress = progress,</b>
-<b class="fc">&nbsp;    status = status.toWidgetStatus(),</b>
-<b class="fc">&nbsp;    statusLabel = status.statusLabel(),</b>
+<b class="fc">&nbsp;private fun AccountUi.toWidgetItem(): SurferAccountItem = SurferAccountItem(</b>
+<b class="fc">&nbsp;    id = id.value,</b>
+<b class="fc">&nbsp;    name = name,</b>
+<b class="fc">&nbsp;    subtitle = currency,</b>
+<b class="fc">&nbsp;    balance = formattedBalance,</b>
 &nbsp;)
 &nbsp;
-&nbsp;/** Only the two states worth interrupting a row for carry a word; OK is the quiet default. */
+&nbsp;/** The widget&#39;s caption line stays empty in v1 — the ETA copy ships with the forecast work. */
+<b class="nc">&nbsp;private fun GoalUi.toWidgetItem(): SurferGoalItem = SurferGoalItem(</b>
+<b class="nc">&nbsp;    id = id.value,</b>
+<b class="nc">&nbsp;    name = name,</b>
+<b class="nc">&nbsp;    savedFormatted = formattedSaved,</b>
+<b class="nc">&nbsp;    targetFormatted = formattedTarget,</b>
+<b class="nc">&nbsp;    progress = progress,</b>
+<b class="nc">&nbsp;    captionLine = &quot;&quot;,</b>
+&nbsp;)
+&nbsp;
+&nbsp;private fun SurferAccountItem.accountId(): AccountId? =
+<b class="nc">&nbsp;    id.takeIf { it.isNotEmpty() }?.let(::AccountId)</b>
+&nbsp;
 &nbsp;@Composable
-<b class="pc">&nbsp;private fun BudgetStatus.statusLabel(): String? = when (this) {</b>
-<b class="nc">&nbsp;    BudgetStatus.OK -&gt; null</b>
-<b class="fc">&nbsp;    BudgetStatus.WARN -&gt; stringResource(Res.string.dashboard_spent_by_category_status_warn)</b>
-<b class="fc">&nbsp;    BudgetStatus.OVER -&gt; stringResource(Res.string.dashboard_spent_by_category_status_over)</b>
-<b class="nc">&nbsp;}</b>
+&nbsp;private fun TransactionUi.toWidgetItem(
+&nbsp;    iconBgColor: Color,
+&nbsp;    iconFgColor: Color,
+<b class="nc">&nbsp;): SurferRecentTransactionItem = SurferRecentTransactionItem(</b>
+<b class="nc">&nbsp;    id = id.value,</b>
+<b class="nc">&nbsp;    title = title,</b>
+&nbsp;    // A collapsed receipt says how many categories it covers; an ordinary row has nothing to add
+&nbsp;    // under its title here, and the list screen is where the category belongs.
+<b class="nc">&nbsp;    subtitle = if (splitCategoryCount &gt; 0) {</b>
+<b class="nc">&nbsp;        stringResource(Res.string.dashboard_recent_split_categories, splitCategoryCount)</b>
+<b class="nc">&nbsp;    } else {</b>
+<b class="nc">&nbsp;        &quot;&quot;</b>
+<b class="nc">&nbsp;    },</b>
+<b class="nc">&nbsp;    amount = formattedAmount,</b>
+<b class="nc">&nbsp;    isExpense = isExpense,</b>
+<b class="nc">&nbsp;    iconBgColor = iconBgColor,</b>
+<b class="nc">&nbsp;    iconFgColor = iconFgColor,</b>
+<b class="nc">&nbsp;    iconInitial = title.firstOrNull()?.uppercaseChar()?.toString().orEmpty(),</b>
+<b class="nc">&nbsp;    categoryHueSeed = categoryHueSeed,</b>
+&nbsp;)
 &nbsp;
-&nbsp;/** List key for the uncategorized bucket, which has no category id to be keyed by. */
-&nbsp;private const val UNCATEGORIZED_ID = &quot;uncategorized&quot;
+&nbsp;private fun SurferRecentTransactionItem.transactionId(): TransactionId? =
+<b class="nc">&nbsp;    id.takeIf { it.isNotEmpty() }?.let(::TransactionId)</b>
 &nbsp;
-&nbsp;/**
-&nbsp; * The &quot;never stored&quot; hue sentinel — `SurferCategoryPalette.tintForHue` reads anything off the
-&nbsp; * colour wheel as absent and falls back to hashing the id.
-&nbsp; */
-&nbsp;private const val NO_STORED_HUE = -1
+&nbsp;@Preview(heightDp = 1600)
+&nbsp;@Composable
+&nbsp;private fun DashboardScreenPreview() {
+&nbsp;    AppTheme {
+&nbsp;        DashboardContent(
+&nbsp;            state = DashboardState.Content(
+&nbsp;                accounts = listOf(
+&nbsp;                    AccountUi(AccountId(&quot;preview-acc-1&quot;), &quot;Everyday&quot;, &quot;€2,480.32&quot;, &quot;EUR&quot;),
+&nbsp;                    AccountUi(AccountId(&quot;preview-acc-2&quot;), &quot;Emergency Fund&quot;, &quot;€8,915.00&quot;, &quot;EUR&quot;),
+&nbsp;                ),
+&nbsp;                transactions = listOf(
+&nbsp;                    TransactionUi(
+&nbsp;                        id = TransactionId(&quot;preview-tx-1&quot;),
+&nbsp;                        title = &quot;Lidl — weekly shop&quot;,
+&nbsp;                        formattedAmount = &quot;−€48.20&quot;,
+&nbsp;                        isExpense = true,
+&nbsp;                        categoryHueSeed = &quot;preview-cat-1&quot;,
+&nbsp;                    ),
+&nbsp;                    TransactionUi(
+&nbsp;                        id = TransactionId(&quot;preview-tx-2&quot;),
+&nbsp;                        title = &quot;March payroll&quot;,
+&nbsp;                        formattedAmount = &quot;+€3,200.00&quot;,
+&nbsp;                        isExpense = false,
+&nbsp;                        categoryHueSeed = &quot;preview-cat-2&quot;,
+&nbsp;                    ),
+&nbsp;                    TransactionUi(
+&nbsp;                        id = TransactionId(&quot;preview-tx-3&quot;),
+&nbsp;                        title = &quot;Coffee&quot;,
+&nbsp;                        formattedAmount = &quot;−€9.99&quot;,
+&nbsp;                        isExpense = true,
+&nbsp;                        categoryHueSeed = &quot;preview-cat-3&quot;,
+&nbsp;                    ),
+&nbsp;                ),
+&nbsp;                formattedTotalBalance = &quot;€11,575.32&quot;,
+&nbsp;                workspaceName = null,
+&nbsp;                workspaceInitial = null,
+&nbsp;                greeting = null,
+&nbsp;                formattedTrendDelta = &quot;+€412 this month&quot;,
+&nbsp;                transferEnabled = true,
+&nbsp;            ),
+&nbsp;            onEvent = {},
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Preview
+&nbsp;@Composable
+&nbsp;private fun DashboardScreenEmptyPreview() {
+&nbsp;    AppTheme {
+&nbsp;        DashboardContent(
+&nbsp;            state = DashboardState.Content(
+&nbsp;                accounts = emptyList(),
+&nbsp;                transactions = emptyList(),
+&nbsp;                formattedTotalBalance = null,
+&nbsp;                workspaceName = null,
+&nbsp;                workspaceInitial = null,
+&nbsp;                greeting = null,
+&nbsp;                formattedTrendDelta = null,
+&nbsp;            ),
+&nbsp;            onEvent = {},
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
 </code>
 </pre>
 </div>
@@ -265,7 +738,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 14:00</div>
+    <div style="float:right;">generated on 2026-07-29 15:47</div>
 </div>
 </body>
 </html>

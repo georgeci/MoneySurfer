@@ -57,10 +57,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    78.6%
+    81.2%
   </span>
   <span class="absValue">
-    (11/14)
+    (13/16)
   </span>
 </td>
 <td class="coverageStat">
@@ -68,15 +68,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (23/23)
+    (25/25)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    98.7%
+    98.8%
   </span>
   <span class="absValue">
-    (147/149)
+    (163/165)
   </span>
 </td>
 </tr>
@@ -176,10 +176,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    78.6%
+    81.2%
   </span>
   <span class="absValue">
-    (11/14)
+    (13/16)
   </span>
 </td>
 <td class="coverageStat">
@@ -187,15 +187,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (27/27)
+    (29/29)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    99%
+    99.1%
   </span>
   <span class="absValue">
-    (204/206)
+    (220/222)
   </span>
 </td>
 </tr>
@@ -211,6 +211,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.domain.config.HostCapabilities
 &nbsp;import com.georgeci.moneysurfer.domain.dashboard.DashboardCardStyle
 &nbsp;import com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutConfig
+&nbsp;import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetSpan
 &nbsp;import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetType
 &nbsp;import com.georgeci.moneysurfer.domain.preferences.UiPreferences
 &nbsp;import com.georgeci.moneysurfer.utils.AsyncState
@@ -259,6 +260,8 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;                edit { it.withWidgetMoved(from = event.from, to = event.to) }</b>
 <b class="fc">&nbsp;            is DashboardCustomizeEvent.OnCardStyleChange -&gt;</b>
 <b class="fc">&nbsp;                edit { it.withCardStyle(event.type, event.cardStyle) }</b>
+<b class="fc">&nbsp;            is DashboardCustomizeEvent.OnSpanChange -&gt;</b>
+<b class="fc">&nbsp;                edit { it.withSpan(event.type, event.span) }</b>
 &nbsp;        }
 &nbsp;    }
 &nbsp;
@@ -299,6 +302,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;        val type: DashboardWidgetType,
 &nbsp;        val cardStyle: DashboardCardStyle,
 &nbsp;    ) : DashboardCustomizeEvent
+&nbsp;
+&nbsp;    /**
+&nbsp;     * A grid width was picked for [type]. Separate from [OnCardStyleChange] because a span is
+&nbsp;     * placement rather than styling — see [com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutItem].
+&nbsp;     */
+&nbsp;    data class OnSpanChange(
+&nbsp;        val type: DashboardWidgetType,
+&nbsp;        val span: DashboardWidgetSpan,
+&nbsp;    ) : DashboardCustomizeEvent
 &nbsp;}
 &nbsp;
 &nbsp;sealed interface DashboardCustomizeEffect {
@@ -327,7 +339,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 14:00</div>
+    <div style="float:right;">generated on 2026-07-29 15:47</div>
 </div>
 </body>
 </html>

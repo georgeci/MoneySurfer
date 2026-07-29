@@ -96,7 +96,9 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;
 &nbsp;import androidx.compose.runtime.Composable
 &nbsp;import com.georgeci.moneysurfer.domain.dashboard.DashboardCardStyle
+&nbsp;import com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutItem
 &nbsp;import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetSize
+&nbsp;import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetSpan
 &nbsp;import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetType
 &nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferBalanceVariant
 &nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferInsightsVariant
@@ -104,6 +106,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import moneysurfer.feature.dashboard.generated.resources.Res
 &nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_size_compact
 &nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_size_expanded
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_span_full
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_span_half
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_span_third
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_span_two_thirds
 &nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_style_summary
 &nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_variant_balance_classic
 &nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_variant_balance_inline
@@ -213,14 +219,42 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    DashboardWidgetSize.Compact -&gt; Res.string.dashboard_customize_size_compact
 &nbsp;}
 &nbsp;
+&nbsp;internal fun DashboardWidgetSpan.labelResource(): StringResource = when (this) {
+&nbsp;    DashboardWidgetSpan.Full -&gt; Res.string.dashboard_customize_span_full
+&nbsp;    DashboardWidgetSpan.TwoThirds -&gt; Res.string.dashboard_customize_span_two_thirds
+&nbsp;    DashboardWidgetSpan.Half -&gt; Res.string.dashboard_customize_span_half
+&nbsp;    DashboardWidgetSpan.Third -&gt; Res.string.dashboard_customize_span_third
+&nbsp;}
+&nbsp;
 &nbsp;/**
 &nbsp; * What the customize row says under a widget&#39;s name — &quot;Full&quot;, or &quot;Full · Classic&quot; once the widget
-&nbsp; * has variants to distinguish.
+&nbsp; * has variants to distinguish, or &quot;Full · Classic · Half&quot; once there is a grid too.
+&nbsp; *
+&nbsp; * The pill must name exactly what the sheet behind it can change, so it takes the same two gates the
+&nbsp; * sheet does: [showStyle] is the host&#39;s `dashboard_widget_style` build key, [showSpan] is whether the
+&nbsp; * window is wide enough for spans to mean anything. With both off the row draws no pill at all, so
+&nbsp; * this is never called for an empty summary.
 &nbsp; */
 &nbsp;@Composable
-&nbsp;internal fun cardStyleSummary(type: DashboardWidgetType, cardStyle: DashboardCardStyle): String {
-&nbsp;    val size = stringResource(cardStyle.size.labelResource())
-&nbsp;    val variant = type.selectedVariant(cardStyle) ?: return size
+&nbsp;internal fun cardStyleSummary(
+&nbsp;    item: DashboardLayoutItem,
+&nbsp;    showStyle: Boolean = true,
+&nbsp;    showSpan: Boolean = false,
+&nbsp;): String {
+&nbsp;    val style = if (showStyle) styleSummary(item) else null
+&nbsp;    val span = if (showSpan) stringResource(item.span.labelResource()) else null
+&nbsp;    return when {
+&nbsp;        style != null &amp;&amp; span != null -&gt;
+&nbsp;            stringResource(Res.string.dashboard_customize_style_summary, style, span)
+&nbsp;        else -&gt; style ?: span.orEmpty()
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;/** The size, plus the variant when the widget has any to tell apart. */
+&nbsp;@Composable
+&nbsp;private fun styleSummary(item: DashboardLayoutItem): String {
+&nbsp;    val size = stringResource(item.cardStyle.size.labelResource())
+&nbsp;    val variant = item.type.selectedVariant(item.cardStyle) ?: return size
 &nbsp;    return stringResource(Res.string.dashboard_customize_style_summary, size, stringResource(variant.label))
 &nbsp;}
 &nbsp;
@@ -264,7 +298,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 14:00</div>
+    <div style="float:right;">generated on 2026-07-29 15:47</div>
 </div>
 </body>
 </html>

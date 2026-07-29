@@ -113,6 +113,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.domain.config.HostCapabilities
 &nbsp;import com.georgeci.moneysurfer.domain.dashboard.DashboardCardStyle
 &nbsp;import com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutConfig
+&nbsp;import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetSpan
 &nbsp;import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetType
 &nbsp;import com.georgeci.moneysurfer.domain.preferences.UiPreferences
 &nbsp;import com.georgeci.moneysurfer.utils.AsyncState
@@ -161,6 +162,8 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;                edit { it.withWidgetMoved(from = event.from, to = event.to) }
 &nbsp;            is DashboardCustomizeEvent.OnCardStyleChange -&gt;
 &nbsp;                edit { it.withCardStyle(event.type, event.cardStyle) }
+&nbsp;            is DashboardCustomizeEvent.OnSpanChange -&gt;
+&nbsp;                edit { it.withSpan(event.type, event.span) }
 &nbsp;        }
 &nbsp;    }
 &nbsp;
@@ -201,6 +204,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;        val type: DashboardWidgetType,
 &nbsp;        val cardStyle: DashboardCardStyle,
 &nbsp;    ) : DashboardCustomizeEvent
+&nbsp;
+&nbsp;    /**
+&nbsp;     * A grid width was picked for [type]. Separate from [OnCardStyleChange] because a span is
+&nbsp;     * placement rather than styling — see [com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutItem].
+&nbsp;     */
+&nbsp;    data class OnSpanChange(
+&nbsp;        val type: DashboardWidgetType,
+&nbsp;        val span: DashboardWidgetSpan,
+&nbsp;    ) : DashboardCustomizeEvent
 &nbsp;}
 &nbsp;
 &nbsp;sealed interface DashboardCustomizeEffect {
@@ -229,7 +241,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 14:00</div>
+    <div style="float:right;">generated on 2026-07-29 15:47</div>
 </div>
 </body>
 </html>

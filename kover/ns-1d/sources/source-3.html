@@ -72,7 +72,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (3/3)
+    (4/4)
   </span>
 </td>
 <td class="coverageStat">
@@ -80,7 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (20/20)
+    (27/27)
   </span>
 </td>
 </tr>
@@ -95,14 +95,19 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.dashboard
 &nbsp;
 &nbsp;/**
-&nbsp; * One row of the dashboard layout: which widget, whether the user kept it, and how it is styled.
-&nbsp; * A disabled item is retained rather than removed so the widget keeps its position (and its card
-&nbsp; * style) if the user switches it back on.
+&nbsp; * One slot of the dashboard layout: which widget, whether the user kept it, how it is styled, and
+&nbsp; * how wide it sits once there is a grid to place it in. A disabled item is retained rather than
+&nbsp; * removed so the widget keeps its position (and its card style) if the user switches it back on.
+&nbsp; *
+&nbsp; * [span] is placement rather than styling, which is why it is a sibling of [cardStyle] and not a
+&nbsp; * field inside it: [cardStyle] says how the widget draws itself, [span] says how much room the
+&nbsp; * dashboard hands it. At compact width there is only one column, so [span] is not read at all.
 &nbsp; */
 &nbsp;data class DashboardLayoutItem(
 <b class="fc">&nbsp;    val type: DashboardWidgetType,</b>
 <b class="fc">&nbsp;    val enabled: Boolean = true,</b>
 <b class="fc">&nbsp;    val cardStyle: DashboardCardStyle = DashboardCardStyle.EXPANDED,</b>
+<b class="fc">&nbsp;    val span: DashboardWidgetSpan = DashboardWidgetSpan.Full,</b>
 &nbsp;)
 </code>
 </pre>
@@ -127,7 +132,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 14:00</div>
+    <div style="float:right;">generated on 2026-07-29 15:47</div>
 </div>
 </body>
 </html>

@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SafeToSpendUi</title>
+  <title>MoneySurfer Coverage Report > InsightUi</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.feature.dashboard</a>
 </div>
 
-<h1>Coverage Summary for Class: SafeToSpendUi (com.georgeci.moneysurfer.feature.dashboard)</h1>
+<h1>Coverage Summary for Class: InsightUi (com.georgeci.moneysurfer.feature.dashboard)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SafeToSpendUi</td>
+  <td class="name">InsightUi</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -63,7 +63,16 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (2/2)
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (8/8)
   </span>
 </td>
 <td class="coverageStat">
@@ -71,23 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (2/2)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (11/11)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (54/54)
+    (50/50)
   </span>
 </td>
 </tr>
@@ -621,41 +614,41 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp; * does not use keep their defaults and never reach its copy.
 &nbsp; */
 &nbsp;data class InsightUi(
-&nbsp;    val id: String,
-&nbsp;    val kind: InsightKind,
-&nbsp;    val tone: InsightTone,
+<b class="fc">&nbsp;    val id: String,</b>
+<b class="fc">&nbsp;    val kind: InsightKind,</b>
+<b class="fc">&nbsp;    val tone: InsightTone,</b>
 &nbsp;    /** Category name for the two category kinds; null for the uncategorized bucket. */
-&nbsp;    val label: String? = null,
+<b class="fc">&nbsp;    val label: String? = null,</b>
 &nbsp;    /** The headline amount — this period&#39;s spend, or the monthly subscription total. */
-&nbsp;    val amount: String = &quot;&quot;,
+<b class="fc">&nbsp;    val amount: String = &quot;&quot;,</b>
 &nbsp;    /** The same-stretch figure from the previous period. Unused by [InsightKind.Subscriptions]. */
-&nbsp;    val comparison: String = &quot;&quot;,
+<b class="fc">&nbsp;    val comparison: String = &quot;&quot;,</b>
 &nbsp;    /** Magnitude of the change in whole percent. Zero for the kinds that compare nothing. */
-&nbsp;    val percent: Int = 0,
+<b class="fc">&nbsp;    val percent: Int = 0,</b>
 &nbsp;    /** Active subscription count. Zero for every kind but [InsightKind.Subscriptions]. */
-&nbsp;    val count: Int = 0,
+<b class="fc">&nbsp;    val count: Int = 0,</b>
 &nbsp;)
 &nbsp;
 &nbsp;/**
 &nbsp; * The safe-to-spend widget&#39;s numbers. Money is formatted here; the sentences around it are built
 &nbsp; * on the screen, which is where the string resources are.
 &nbsp; */
-<b class="fc">&nbsp;data class SafeToSpendUi(</b>
-<b class="fc">&nbsp;    val budgetName: String,</b>
+&nbsp;data class SafeToSpendUi(
+&nbsp;    val budgetName: String,
 &nbsp;    /** Signed — negative once the budget is overspent. */
-<b class="fc">&nbsp;    val remainingFormatted: String,</b>
-<b class="fc">&nbsp;    val spentFormatted: String,</b>
-<b class="fc">&nbsp;    val limitFormatted: String,</b>
-<b class="fc">&nbsp;    val perDayFormatted: String,</b>
-<b class="fc">&nbsp;    val daysLeft: Int,</b>
+&nbsp;    val remainingFormatted: String,
+&nbsp;    val spentFormatted: String,
+&nbsp;    val limitFormatted: String,
+&nbsp;    val perDayFormatted: String,
+&nbsp;    val daysLeft: Int,
 &nbsp;    /** Spend against the limit; can exceed 1, which the bar caps rather than overdraws. */
-<b class="fc">&nbsp;    val progress: Float,</b>
+&nbsp;    val progress: Float,
 &nbsp;    /** How much of the period has gone — the tick [progress] is read against. */
-<b class="fc">&nbsp;    val paceFraction: Float,</b>
-<b class="fc">&nbsp;    val status: BudgetStatus,</b>
+&nbsp;    val paceFraction: Float,
+&nbsp;    val status: BudgetStatus,
 &nbsp;) {
 &nbsp;    /** Derived rather than stored, so the wording and the colour can never disagree. */
-<b class="fc">&nbsp;    val isOver: Boolean get() = status == BudgetStatus.OVER</b>
+&nbsp;    val isOver: Boolean get() = status == BudgetStatus.OVER
 &nbsp;}
 &nbsp;
 &nbsp;/**
@@ -877,7 +870,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 14:00</div>
+    <div style="float:right;">generated on 2026-07-29 15:47</div>
 </div>
 </body>
 </html>

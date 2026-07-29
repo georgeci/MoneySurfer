@@ -52,15 +52,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (9/9)
+    (10/10)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    90.6%
+    92.5%
   </span>
   <span class="absValue">
-    (29/32)
+    (37/40)
   </span>
 </td>
 <td class="coverageStat">
@@ -68,15 +68,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (43/43)
+    (47/47)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    99.3%
+    99.4%
   </span>
   <span class="absValue">
-    (406/409)
+    (470/473)
   </span>
 </td>
 </tr>
@@ -115,15 +115,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (10/10)
+    (11/11)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    90.6%
+    92.5%
   </span>
   <span class="absValue">
-    (29/32)
+    (37/40)
   </span>
 </td>
 <td class="coverageStat">
@@ -131,15 +131,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (44/44)
+    (48/48)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    99.3%
+    99.4%
   </span>
   <span class="absValue">
-    (407/410)
+    (471/474)
   </span>
 </td>
 </tr>
@@ -153,8 +153,13 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.dashboard
 &nbsp;
 &nbsp;/**
-&nbsp; * The dashboard layout: an ordered list of widgets, top to bottom, in a single vertical column.
-&nbsp; * Order in [items] *is* the render order; there are no rows or columns to reconcile.
+&nbsp; * The dashboard layout: an ordered list of widgets. Order in [items] *is* the render order.
+&nbsp; *
+&nbsp; * At compact width that order is the whole story — one widget per row, top to bottom. From expanded
+&nbsp; * width up the same order is packed into a [DashboardWidgetSpan.COLUMNS]-column grid, greedily: a
+&nbsp; * widget joins the current row if its [DashboardLayoutItem.span] still fits, and starts a new one if
+&nbsp; * it does not. There are still no rows to reconcile — a row is whatever the order and the spans add
+&nbsp; * up to, so reordering or resizing one widget can never orphan another.
 &nbsp; *
 &nbsp; * Stored per device (see `UiPreferences.dashboardLayout`), never synced — a layout is a property
 &nbsp; * of the screen the user is holding, not of the workspace.
@@ -239,6 +244,20 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    }
 &nbsp;
 &nbsp;    /**
+&nbsp;     * [type] rewidened or narrowed for the grid. Like [withCardStyle] this touches nothing else:
+&nbsp;     * a span is read only from expanded width up, and changing one widget&#39;s width there must not
+&nbsp;     * shuffle the order the compact dashboard renders. Naming a [type] the layout does not carry is
+&nbsp;     * a no-op.
+&nbsp;     */
+&nbsp;    fun withSpan(type: DashboardWidgetType, span: DashboardWidgetSpan): DashboardLayoutConfig {
+<b class="fc">&nbsp;        val target = items.firstOrNull { it.type == type } ?: return this</b>
+<b class="fc">&nbsp;        if (target.span == span) return this</b>
+<b class="fc">&nbsp;        return DashboardLayoutConfig(</b>
+<b class="fc">&nbsp;            items = items.map { if (it.type == type) it.copy(span = span) else it },</b>
+&nbsp;        )
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
 &nbsp;     * A layout safe to render: at most one entry per widget type, with any type missing from
 &nbsp;     * [items] appended in its [DEFAULT] position and style. Persisted layouts written by an older
 &nbsp;     * app version know nothing about widgets added since, and dropping those silently would make
@@ -258,18 +277,23 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;         * the period&#39;s money went, the accounts strip, the generated
 &nbsp;         * insights, goals, and the recent-transactions list. Every widget starts enabled and
 &nbsp;         * Hero-sized.
+&nbsp;         *
+&nbsp;         * The spans are that same order read as the desktop mock&#39;s three bands: a hero balance
+&nbsp;         * beside the shortcuts, a row of three stat cards, the spend chart with the accounts rail
+&nbsp;         * next to it, insights and goals paired, and the activity list full width at the bottom.
+&nbsp;         * Each row sums to [DashboardWidgetSpan.COLUMNS] exactly, so the default grid has no gaps.
 &nbsp;         */
 <b class="fc">&nbsp;        val DEFAULT = DashboardLayoutConfig(</b>
 <b class="fc">&nbsp;            items = listOf(</b>
-<b class="fc">&nbsp;                DashboardLayoutItem(DashboardWidgetType.Balance),</b>
-<b class="fc">&nbsp;                DashboardLayoutItem(DashboardWidgetType.QuickActions),</b>
-<b class="fc">&nbsp;                DashboardLayoutItem(DashboardWidgetType.SafeToSpend),</b>
-<b class="fc">&nbsp;                DashboardLayoutItem(DashboardWidgetType.BurnRate),</b>
-<b class="fc">&nbsp;                DashboardLayoutItem(DashboardWidgetType.Budgets),</b>
-<b class="fc">&nbsp;                DashboardLayoutItem(DashboardWidgetType.SpentByCategory),</b>
-<b class="fc">&nbsp;                DashboardLayoutItem(DashboardWidgetType.Accounts),</b>
-<b class="fc">&nbsp;                DashboardLayoutItem(DashboardWidgetType.Insights),</b>
-<b class="fc">&nbsp;                DashboardLayoutItem(DashboardWidgetType.Goals),</b>
+<b class="fc">&nbsp;                DashboardLayoutItem(DashboardWidgetType.Balance, span = DashboardWidgetSpan.TwoThirds),</b>
+<b class="fc">&nbsp;                DashboardLayoutItem(DashboardWidgetType.QuickActions, span = DashboardWidgetSpan.Third),</b>
+<b class="fc">&nbsp;                DashboardLayoutItem(DashboardWidgetType.SafeToSpend, span = DashboardWidgetSpan.Third),</b>
+<b class="fc">&nbsp;                DashboardLayoutItem(DashboardWidgetType.BurnRate, span = DashboardWidgetSpan.Third),</b>
+<b class="fc">&nbsp;                DashboardLayoutItem(DashboardWidgetType.Budgets, span = DashboardWidgetSpan.Third),</b>
+<b class="fc">&nbsp;                DashboardLayoutItem(DashboardWidgetType.SpentByCategory, span = DashboardWidgetSpan.TwoThirds),</b>
+<b class="fc">&nbsp;                DashboardLayoutItem(DashboardWidgetType.Accounts, span = DashboardWidgetSpan.Third),</b>
+<b class="fc">&nbsp;                DashboardLayoutItem(DashboardWidgetType.Insights, span = DashboardWidgetSpan.Half),</b>
+<b class="fc">&nbsp;                DashboardLayoutItem(DashboardWidgetType.Goals, span = DashboardWidgetSpan.Half),</b>
 <b class="fc">&nbsp;                DashboardLayoutItem(DashboardWidgetType.RecentTransactions),</b>
 &nbsp;            ),
 &nbsp;        )
@@ -298,7 +322,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 14:00</div>
+    <div style="float:right;">generated on 2026-07-29 15:47</div>
 </div>
 </body>
 </html>
