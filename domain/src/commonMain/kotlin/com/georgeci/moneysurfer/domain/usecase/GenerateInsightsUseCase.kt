@@ -113,10 +113,10 @@ class GenerateInsightsUseCase(
         currency: CurrencyCode,
         today: LocalDate,
     ): Flow<List<Insight>> {
-        val (current, previous) = monthToDateWindows(today)
+        val windows = monthToDateWindows(today)
         return combine(
-            spendAnalytics.byCategory(SpendScope(workspaceId, currency, current)),
-            spendAnalytics.byCategory(SpendScope(workspaceId, currency, previous)),
+            spendAnalytics.byCategory(SpendScope(workspaceId, currency, windows.current)),
+            spendAnalytics.byCategory(SpendScope(workspaceId, currency, windows.previous)),
             categoryRepository.getByWorkspaceId(workspaceId),
             recurringRuleRepository.getByWorkspaceId(workspaceId),
         ) { currentSpend, previousSpend, categories, rules ->
@@ -126,10 +126,8 @@ class GenerateInsightsUseCase(
             generateInsights(
                 InsightInput(
                     periodKey = today.yearMonth.toString(),
-                    // Both windows run from a 1st, so their lengths are their end days. They
-                    // differ only where the baseline clamped to a shorter month.
-                    elapsedDays = current.lengthInDays(),
-                    baselineDays = previous.lengthInDays(),
+                    elapsedDays = windows.currentDays,
+                    baselineDays = windows.previousDays,
                     currency = currency,
                     currentSpend = currentSpend,
                     previousSpend = previousSpend,
@@ -143,11 +141,19 @@ class GenerateInsightsUseCase(
 }
 
 /**
- * Days a closed window covers, both ends included. Only called with bounded windows — the insights
- * engine never asks for [TransactionPeriodWindow.Unbounded].
+ * The pair of windows a comparison reads, with the lengths that decide whether comparing them means
+ * anything.
+ *
+ * The lengths travel with the windows rather than being re-derived from them: they are known
+ * exactly where the windows are built, from dates that are non-null by construction, so nothing
+ * downstream has to cope with the unbounded window [TransactionPeriodWindow] also allows.
  */
-private fun TransactionPeriodWindow.lengthInDays(): Int =
-    ((to ?: return 0).toEpochDays() - (from ?: return 0).toEpochDays() + 1).toInt()
+private data class ComparisonWindows(
+    val current: TransactionPeriodWindow,
+    val previous: TransactionPeriodWindow,
+    val currentDays: Int,
+    val previousDays: Int,
+)
 
 /** See [GenerateInsightsUseCase.today] — the floor that keeps a backwards clock jump cheap. */
 private val MIN_ROLLOVER_SLEEP: Duration = 1.minutes
@@ -169,15 +175,21 @@ private val MIN_ROLLOVER_SLEEP: Duration = 1.minutes
  * Built directly rather than through `periodWindow(Month, ...)`, which always spans a whole
  * calendar month — the point here is a part-month window with a matching part-month baseline.
  */
-private fun monthToDateWindows(
-    today: LocalDate,
-): Pair<TransactionPeriodWindow, TransactionPeriodWindow> {
+private fun monthToDateWindows(today: LocalDate): ComparisonWindows {
     val currentStart = LocalDate(today.year, today.month, 1)
     val previousStart = currentStart.minus(1, DateTimeUnit.MONTH)
     val previousEnd = minOf(
         previousStart.plus(today.day - 1, DateTimeUnit.DAY),
         currentStart.minus(1, DateTimeUnit.DAY),
     )
-    return TransactionPeriodWindow(currentStart, today) to
-        TransactionPeriodWindow(previousStart, previousEnd)
+    return ComparisonWindows(
+        current = TransactionPeriodWindow(currentStart, today),
+        previous = TransactionPeriodWindow(previousStart, previousEnd),
+        currentDays = daysCovered(currentStart, today),
+        previousDays = daysCovered(previousStart, previousEnd),
+    )
 }
+
+/** Days a closed range covers, both ends included. */
+private fun daysCovered(from: LocalDate, to: LocalDate): Int =
+    (to.toEpochDays() - from.toEpochDays() + 1).toInt()
