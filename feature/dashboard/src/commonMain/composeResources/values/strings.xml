@@ -84,7 +84,7 @@
     <string name="dashboard_burn_rate_empty_subtitle">Log a few expenses to see your pace.</string>
     <string name="dashboard_spent_by_category_title">Spent by category</string>
     <string name="dashboard_spent_by_category_empty_title">Nothing spent yet</string>
-    <string name="dashboard_spent_by_category_empty_subtitle">Expenses you log this month break down here.</string>
+    <string name="dashboard_spent_by_category_empty_subtitle">Expenses you log in this period break down here.</string>
     <!-- The bucket every expense with no category lands in -->
     <string name="dashboard_spent_by_category_uncategorized">Uncategorized</string>
     <!-- Caption under a category with no cap: what the meter measures instead -->

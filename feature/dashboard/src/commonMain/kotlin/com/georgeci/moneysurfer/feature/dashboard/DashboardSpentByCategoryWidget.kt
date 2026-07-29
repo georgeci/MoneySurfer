@@ -26,11 +26,11 @@ import moneysurfer.feature.dashboard.generated.resources.dashboard_spent_by_cate
 import org.jetbrains.compose.resources.stringResource
 
 /**
- * Where this month's money went, category by category, in whichever of the five treatments the
- * card style names.
+ * Where the selected period's money went, category by category, in whichever of the five
+ * treatments the card style names.
  *
- * Like safe-to-spend this one keeps drawing with nothing behind it: a month with no expenses yet is
- * a state the widget is *for*, not a reason to leave a gap in the column.
+ * Like safe-to-spend this one keeps drawing with nothing behind it: a period with no expenses yet
+ * is a state the widget is *for*, not a reason to leave a gap in the column.
  */
 @Composable
 internal fun SpentByCategoryWidget(state: DashboardState.Content, variant: String?) {

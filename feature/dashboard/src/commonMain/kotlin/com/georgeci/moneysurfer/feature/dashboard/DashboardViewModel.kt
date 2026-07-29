@@ -386,7 +386,7 @@ sealed interface DashboardState {
         /** The active budgets worth a row, most pressing first — empty when none are tracked. */
         val budgets: List<BudgetSummaryUi> = emptyList(),
         /**
-         * Where this month's money went, largest spender first — empty while the month holds no
+         * Where the selected period's money went, largest spender first — empty while it holds no
          * spend, which is the spent-by-category widget's own empty state rather than a missing one.
          */
         val spentByCategory: List<CategorySpendUi> = emptyList(),
@@ -569,7 +569,7 @@ data class CategorySpendUi(
     /** The category's stored hue, or null for the bucket that has no stored appearance. */
     val hue: Int?,
     val spentFormatted: String,
-    /** Share of the month's total spend, `0f..1f`. */
+    /** Share of the selected period's total spend, `0f..1f`. */
     val share: Float,
     /** The cap on this category, or null while nothing caps it. */
     val cap: CategoryCapUi? = null,

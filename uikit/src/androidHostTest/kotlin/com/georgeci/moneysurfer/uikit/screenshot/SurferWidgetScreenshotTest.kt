@@ -323,7 +323,7 @@ class SurferWidgetScreenshotTest {
                     modifier = Modifier.fillMaxWidth().height(WidgetEmptyStateHeight),
                     empty = SurferSpentByCategoryEmpty(
                         title = "Nothing spent yet",
-                        subtitle = "Expenses you log this month break down here.",
+                        subtitle = "Expenses you log in this period break down here.",
                     ),
                 )
             }

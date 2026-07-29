@@ -26,6 +26,7 @@ private fun slice(categoryId: CategoryId?, total: Money) =
 private fun breakdown(
     slices: List<CategorySpendSlice>,
     budgets: List<Budget> = emptyList(),
+    capPeriod: BudgetPeriod = BudgetPeriod.MONTHLY,
 ): SpentByCategory = buildSpentByCategory(
     slices = slices,
     categories = listOf(
@@ -35,6 +36,7 @@ private fun breakdown(
     budgets = budgets,
     currency = USD,
     window = window,
+    capPeriod = capPeriod,
 )
 
 class SpentByCategoryTest : StringSpec({
@@ -148,7 +150,7 @@ class SpentByCategoryTest : StringSpec({
         result.entries.single().cap.shouldBeNull()
     }
 
-    "a weekly budget's amount is not a figure for this window, so it caps nothing here" {
+    "a budget on another cadence is not a figure for this window, so it caps nothing here" {
         val result = breakdown(
             slices = listOf(slice(groceries, 40.dollars)),
             budgets = listOf(
@@ -161,6 +163,20 @@ class SpentByCategoryTest : StringSpec({
         )
 
         result.entries.single().cap.shouldBeNull()
+    }
+
+    "under a weekly period it is the weekly cap that speaks, and the monthly one that does not" {
+        val weekly = aBudget(
+            categoryIds = listOf(groceries),
+            amount = 100.dollars,
+            period = BudgetPeriod.WEEKLY,
+        )
+
+        // The same spend, read at the two cadences: each may only be judged by its own.
+        breakdown(listOf(slice(groceries, 40.dollars)), listOf(weekly), BudgetPeriod.WEEKLY)
+            .entries.single().cap?.limit shouldBe 100.dollars
+        breakdown(listOf(slice(groceries, 40.dollars)), listOf(weekly), BudgetPeriod.MONTHLY)
+            .entries.single().cap.shouldBeNull()
     }
 
     "a zero cap reads as no progress rather than a divide by zero" {

@@ -12,7 +12,6 @@ import com.georgeci.moneysurfer.domain.repositories.BudgetRepository
 import com.georgeci.moneysurfer.domain.repositories.CategoryRepository
 import com.georgeci.moneysurfer.domain.repositories.SpendAnalyticsRepository
 import com.georgeci.moneysurfer.domain.repositories.WorkspaceRepository
-import com.georgeci.moneysurfer.domain.util.TransactionPeriodWindow
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -20,6 +19,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.koin.core.annotation.Single
@@ -74,7 +74,7 @@ class GetCategorySpendUseCase(
                     // Re-read on every emission rather than once per workspace: the window is the
                     // period's answer for *today*, and the period is the thing that changes.
                     val today = clock.now().toLocalDateTime(timeZone).date
-                    breakdownOf(workspaceId, currency, chosen.window(today))
+                    breakdownOf(workspaceId, currency, chosen, today)
                 }
         }
 
@@ -96,9 +96,10 @@ class GetCategorySpendUseCase(
     private fun breakdownOf(
         workspaceId: WorkspaceId,
         currency: CurrencyCode,
-        window: TransactionPeriodWindow,
+        period: DashboardPeriod,
+        today: LocalDate,
     ): Flow<SpentByCategory> = combine(
-        spendAnalytics.byCategory(SpendScope(workspaceId, currency, window)),
+        spendAnalytics.byCategory(SpendScope(workspaceId, currency, period.window(today))),
         categoryRepository.getByWorkspaceId(workspaceId),
         budgetRepository.getByWorkspaceId(workspaceId),
     ) { slices, categories, budgets ->
@@ -107,7 +108,10 @@ class GetCategorySpendUseCase(
             categories = categories,
             budgets = budgets,
             currency = currency,
-            window = window,
+            window = period.window(today),
+            // Only a cap on the selected cadence may speak: a monthly limit against a week of
+            // spend would read as headroom until the month is already blown.
+            capPeriod = period.budgetPeriod,
         )
     }
 }

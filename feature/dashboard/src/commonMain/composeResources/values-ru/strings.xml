@@ -81,7 +81,7 @@
     <string name="dashboard_burn_rate_empty_subtitle">Добавьте несколько расходов, чтобы увидеть темп.</string>
     <string name="dashboard_spent_by_category_title">Траты по категориям</string>
     <string name="dashboard_spent_by_category_empty_title">Трат пока нет</string>
-    <string name="dashboard_spent_by_category_empty_subtitle">Расходы за этот месяц появятся здесь по категориям.</string>
+    <string name="dashboard_spent_by_category_empty_subtitle">Расходы за этот период появятся здесь по категориям.</string>
     <!-- The bucket every expense with no category lands in -->
     <string name="dashboard_spent_by_category_uncategorized">Без категории</string>
     <!-- Caption under a category with no cap: what the meter measures instead -->
