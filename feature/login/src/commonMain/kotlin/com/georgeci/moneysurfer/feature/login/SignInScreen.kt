@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -40,8 +39,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
@@ -54,6 +51,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.georgeci.moneysurfer.uikit.components.SurferAppIcon
 import com.georgeci.moneysurfer.uikit.components.SurferAuthBackground
 import com.georgeci.moneysurfer.uikit.components.SurferFullScreenLoader
 import com.georgeci.moneysurfer.uikit.components.SurferPasswordField
@@ -123,8 +121,6 @@ object SignInTestTags {
 private val SheetCorner: Dp = 28.dp
 private val PrimaryButtonHeight: Dp = 52.dp
 private val BrandIconSize: Dp = 42.dp
-private const val BrandIconBgAlpha: Float = 0.18f
-private val BrandIconContentSize: Dp = 24.dp
 private val HeroTitleSize = 40.sp
 private val HeroTitleLineHeight = 44.sp
 private val HeroSubtitleMaxWidth: Dp = 320.dp
@@ -278,20 +274,7 @@ private fun SignInBrandHeader(modifier: Modifier = Modifier) {
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(AppTheme.spacing.medium),
     ) {
-        Box(
-            modifier = Modifier
-                .size(BrandIconSize)
-                .clip(CircleShape)
-                .background(Color.White.copy(alpha = BrandIconBgAlpha)),
-            contentAlignment = Alignment.Center,
-        ) {
-            Icon(
-                imageVector = SurferIcons.Wallet,
-                contentDescription = SurferSemantics.Decorative,
-                tint = AuthColors.OnBrand,
-                modifier = Modifier.size(BrandIconContentSize),
-            )
-        }
+        SurferAppIcon(size = BrandIconSize)
         Text(
             text = stringResource(Res.string.sign_in_brand),
             style = AppTheme.typography.titleLarge,
@@ -483,7 +466,7 @@ private fun EmailPasswordForm(
         colors = fieldColors,
         fieldTestTag = SignInTestTags.EmailField,
     )
-    Spacer(Modifier.height(AppTheme.spacing.small))
+    // No spacer: each field already reserves a message line under itself, which is the gap.
     SurferPasswordField(
         value = state.password,
         onValueChange = { onEvent(SignInEvent.OnPasswordChanged(it)) },

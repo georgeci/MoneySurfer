@@ -64,7 +64,6 @@
     <string name="account_details_transactions_section">Transactions</string>
     <string name="account_details_transactions_see_all">See all</string>
     <string name="account_details_edit_content_description">Edit account</string>
-    <string name="account_details_more_content_description">More</string>
     <string name="account_details_updated">Updated just now</string>
     <string name="account_details_kind_last4_format">%1$s · •• %2$s</string>
     <string name="account_details_in_this_month">In this month</string>

@@ -64,7 +64,6 @@
     <string name="account_details_transactions_section">Транзакции</string>
     <string name="account_details_transactions_see_all">Все</string>
     <string name="account_details_edit_content_description">Редактировать счёт</string>
-    <string name="account_details_more_content_description">Ещё</string>
     <string name="account_details_updated">Обновлено только что</string>
     <string name="account_details_kind_last4_format">%1$s · •• %2$s</string>
     <string name="account_details_in_this_month">Доходы за месяц</string>

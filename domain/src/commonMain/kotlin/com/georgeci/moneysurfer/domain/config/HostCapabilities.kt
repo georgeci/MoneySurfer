@@ -23,4 +23,7 @@ interface HostCapabilities {
 
     /** Multi-account transfers in transaction creation. */
     val transferEnabled: Boolean
+
+    /** The per-widget card-style picker on the dashboard customize screen. */
+    val dashboardWidgetStyle: Boolean
 }

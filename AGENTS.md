@@ -198,6 +198,7 @@ map, so it must be written down here.
 | Key | Declared in | Currently |
 | --- | --- | --- |
 | `host.sync_enabled` | [composeApp/.../di/OnlineHostConfigModule.kt](composeApp/src/commonMain/kotlin/com/georgeci/moneysurfer/di/OnlineHostConfigModule.kt) (online), [composeAppOffline/.../di/OfflineWiring.kt](composeAppOffline/src/commonMain/kotlin/com/georgeci/moneysurfer/offline/di/OfflineWiring.kt) (offline, always `false`) | online: **on** since issue #342; offline: off by design |
+| `host.dashboard_widget_style` | [composeApp/.../di/OnlineHostConfigModule.kt](composeApp/src/commonMain/kotlin/com/georgeci/moneysurfer/di/OnlineHostConfigModule.kt) (online), [composeAppOffline/.../di/OfflineWiring.kt](composeAppOffline/src/commonMain/kotlin/com/georgeci/moneysurfer/offline/di/OfflineWiring.kt) (offline) | **off** in both: the per-widget card-style picker on the dashboard customize screen is unfinished |
 
 Rules for this table:
 

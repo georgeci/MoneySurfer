@@ -86,6 +86,8 @@ private val offlineConfigModule: Module = module {
             put(HostConfigKeys.signInAnonymous, false)
             put(HostConfigKeys.signInDemo, true)
             put(HostConfigKeys.transferEnabled, false)
+            // Same dark flag as the online host — the picker is unfinished, not host-specific.
+            put(HostConfigKeys.dashboardWidgetStyle, false)
             put(HostConfigKeys.syncEnabled, false)
         }
     }

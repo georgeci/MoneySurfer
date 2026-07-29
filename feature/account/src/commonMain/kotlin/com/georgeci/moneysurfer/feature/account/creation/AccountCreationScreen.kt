@@ -69,8 +69,9 @@ import com.georgeci.moneysurfer.feature.account.labelRes
 import com.georgeci.moneysurfer.uikit.components.SurferCurrencyBottomSheet
 import com.georgeci.moneysurfer.uikit.components.SurferCurrencyOption
 import com.georgeci.moneysurfer.uikit.components.SurferCurrencyPickerField
+import com.georgeci.moneysurfer.uikit.components.SurferTextField
+import com.georgeci.moneysurfer.uikit.components.base.SurferFormSection
 import com.georgeci.moneysurfer.uikit.components.base.SurferOutlinedChip
-import com.georgeci.moneysurfer.uikit.components.base.SurferSectionLabel
 import com.georgeci.moneysurfer.uikit.components.base.SurferSegmentedControl
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbarButtonAction
@@ -207,20 +208,13 @@ private fun AccountCreationContent(
                 onSelect = { onEvent(AccountCreationEvent.OnTypeChanged(it)) },
             )
 
-            OutlinedTextField(
+            SurferTextField(
                 value = state.name,
                 onValueChange = { onEvent(AccountCreationEvent.OnNameChanged(it)) },
-                label = { Text(stringResource(Res.string.account_creation_name_label)) },
-                singleLine = true,
-                isError = state.nameMissing,
-                supportingText = if (state.nameMissing) {
-                    { Text(stringResource(Res.string.account_creation_name_error_required)) }
-                } else {
-                    null
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .testTag(AccountCreationTestTags.Name),
+                label = stringResource(Res.string.account_creation_name_label),
+                errorText = stringResource(Res.string.account_creation_name_error_required)
+                    .takeIf { state.nameMissing },
+                fieldTestTag = AccountCreationTestTags.Name,
             )
 
             if (!state.isEditMode) {
@@ -233,26 +227,15 @@ private fun AccountCreationContent(
                 }
 
                 val balanceError = state.balanceError
-                OutlinedTextField(
+                SurferTextField(
                     value = state.balance,
                     onValueChange = { onEvent(AccountCreationEvent.OnBalanceChanged(it)) },
-                    label = { Text(stringResource(Res.string.account_creation_balance_label)) },
-                    prefix = { Text(state.currencySymbol) },
-                    supportingText = {
-                        Text(
-                            if (balanceError == null) {
-                                stringResource(Res.string.account_creation_balance_helper)
-                            } else {
-                                stringResource(balanceError.messageRes())
-                            },
-                        )
-                    },
-                    isError = balanceError != null,
+                    label = stringResource(Res.string.account_creation_balance_label),
+                    errorText = balanceError?.let { stringResource(it.messageRes()) },
+                    helperText = stringResource(Res.string.account_creation_balance_helper),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                    singleLine = true,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .testTag(AccountCreationTestTags.OpeningBalance),
+                    prefix = { Text(state.currencySymbol) },
+                    fieldTestTag = AccountCreationTestTags.OpeningBalance,
                 )
             }
 
@@ -280,17 +263,15 @@ private fun TypePicker(
     selected: AccountType,
     onSelect: (AccountType) -> Unit,
 ) {
-    SurferSectionLabel(
-        text = stringResource(Res.string.account_creation_type_label),
-        modifier = Modifier.padding(bottom = AppTheme.spacing.small),
-    )
-    SurferSegmentedControl(
-        options = listOf(AccountType.CASH, AccountType.BANK, AccountType.CARD, AccountType.SAVINGS),
-        selected = selected,
-        label = { type -> stringResource(type.labelRes()) },
-        onSelect = onSelect,
-        optionTestTag = { type -> AccountCreationTestTags.TypePrefix + type.name.lowercase() },
-    )
+    SurferFormSection(label = stringResource(Res.string.account_creation_type_label)) {
+        SurferSegmentedControl(
+            options = listOf(AccountType.CASH, AccountType.BANK, AccountType.CARD, AccountType.SAVINGS),
+            selected = selected,
+            label = { type -> stringResource(type.labelRes()) },
+            onSelect = onSelect,
+            optionTestTag = { type -> AccountCreationTestTags.TypePrefix + type.name.lowercase() },
+        )
+    }
 }
 
 /**
@@ -306,17 +287,15 @@ private fun CurrencyPicker(
     val resolved = currencies.firstOrNull { it.code == selected } ?: currencies.first()
     var sheetOpen by rememberSaveable { mutableStateOf(false) }
 
-    SurferSectionLabel(
-        text = stringResource(Res.string.account_creation_currency_label),
-        modifier = Modifier.padding(bottom = AppTheme.spacing.small),
-    )
-    SurferCurrencyPickerField(
-        symbol = resolved.symbol,
-        code = resolved.code.value,
-        name = resolved.displayName,
-        onClick = { sheetOpen = true },
-        expanded = sheetOpen,
-    )
+    SurferFormSection(label = stringResource(Res.string.account_creation_currency_label)) {
+        SurferCurrencyPickerField(
+            symbol = resolved.symbol,
+            code = resolved.code.value,
+            name = resolved.displayName,
+            onClick = { sheetOpen = true },
+            expanded = sheetOpen,
+        )
+    }
 
     if (sheetOpen) {
         SurferCurrencyBottomSheet(

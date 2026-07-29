@@ -6,11 +6,13 @@ import com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutConfig
 import com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutItem
 import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetSize
 import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetType
+import com.georgeci.moneysurfer.domain.fixtures.FakeHostCapabilities
 import com.georgeci.moneysurfer.domain.fixtures.FakeUiPreferences
 import com.georgeci.moneysurfer.domain.preferences.Pref
 import com.georgeci.moneysurfer.domain.preferences.UiPreferences
 import com.georgeci.moneysurfer.utils.AsyncState
 import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
@@ -29,7 +31,7 @@ class DashboardCustomizeViewModelTest : StringSpec({
 
     "the screen opens on the stored layout, normalized" {
         val stored = DashboardLayoutConfig(items = listOf(DashboardLayoutItem(DashboardWidgetType.Goals)))
-        val viewModel = DashboardCustomizeViewModel(FakeUiPreferences(dashboardLayout = stored))
+        val viewModel = DashboardCustomizeViewModel(FakeUiPreferences(dashboardLayout = stored), FakeHostCapabilities())
 
         viewModel.layout().items.map { it.type } shouldContainExactly listOf(
             DashboardWidgetType.Goals,
@@ -46,7 +48,7 @@ class DashboardCustomizeViewModelTest : StringSpec({
 
     "switching a widget off drops it from the dashboard and persists the layout" {
         val preferences = FakeUiPreferences()
-        val viewModel = DashboardCustomizeViewModel(preferences)
+        val viewModel = DashboardCustomizeViewModel(preferences, FakeHostCapabilities())
 
         viewModel.onEvent(
             DashboardCustomizeEvent.OnWidgetEnabledChange(DashboardWidgetType.Goals, enabled = false),
@@ -71,7 +73,7 @@ class DashboardCustomizeViewModelTest : StringSpec({
             dashboardLayout = DashboardLayoutConfig.DEFAULT
                 .withWidgetEnabled(DashboardWidgetType.Balance, enabled = false),
         )
-        val viewModel = DashboardCustomizeViewModel(preferences)
+        val viewModel = DashboardCustomizeViewModel(preferences, FakeHostCapabilities())
 
         viewModel.onEvent(
             DashboardCustomizeEvent.OnWidgetEnabledChange(DashboardWidgetType.Balance, enabled = true),
@@ -93,7 +95,7 @@ class DashboardCustomizeViewModelTest : StringSpec({
 
     "dragging a widget onto another one persists the new order" {
         val preferences = FakeUiPreferences()
-        val viewModel = DashboardCustomizeViewModel(preferences)
+        val viewModel = DashboardCustomizeViewModel(preferences, FakeHostCapabilities())
 
         viewModel.onEvent(
             DashboardCustomizeEvent.OnWidgetMove(
@@ -118,7 +120,7 @@ class DashboardCustomizeViewModelTest : StringSpec({
 
     "a move that changes nothing is not written back" {
         val preferences = RecordingUiPreferences()
-        val viewModel = DashboardCustomizeViewModel(preferences)
+        val viewModel = DashboardCustomizeViewModel(preferences, FakeHostCapabilities())
 
         viewModel.onEvent(
             DashboardCustomizeEvent.OnWidgetMove(
@@ -133,7 +135,7 @@ class DashboardCustomizeViewModelTest : StringSpec({
 
     "a burst of moves persists the layout the last one produced" {
         val preferences = FakeUiPreferences()
-        val viewModel = DashboardCustomizeViewModel(preferences)
+        val viewModel = DashboardCustomizeViewModel(preferences, FakeHostCapabilities())
 
         viewModel.onEvent(
             DashboardCustomizeEvent.OnWidgetMove(DashboardWidgetType.Goals, DashboardWidgetType.Balance),
@@ -150,7 +152,7 @@ class DashboardCustomizeViewModelTest : StringSpec({
 
     "picking a card style persists it without moving the widget" {
         val preferences = FakeUiPreferences()
-        val viewModel = DashboardCustomizeViewModel(preferences)
+        val viewModel = DashboardCustomizeViewModel(preferences, FakeHostCapabilities())
 
         viewModel.onEvent(
             DashboardCustomizeEvent.OnCardStyleChange(
@@ -168,7 +170,7 @@ class DashboardCustomizeViewModelTest : StringSpec({
 
     "picking the style a widget already has is not written back" {
         val preferences = RecordingUiPreferences()
-        val viewModel = DashboardCustomizeViewModel(preferences)
+        val viewModel = DashboardCustomizeViewModel(preferences, FakeHostCapabilities())
 
         viewModel.onEvent(
             DashboardCustomizeEvent.OnCardStyleChange(DashboardWidgetType.Balance, DashboardCardStyle.EXPANDED),
@@ -177,8 +179,36 @@ class DashboardCustomizeViewModelTest : StringSpec({
         preferences.layoutWrites shouldBe 0
     }
 
+    "dragging a widget onto a row in the other section moves it there" {
+        val preferences = FakeUiPreferences(
+            dashboardLayout = DashboardLayoutConfig.DEFAULT
+                .withWidgetEnabled(DashboardWidgetType.Goals, enabled = false),
+        )
+        val viewModel = DashboardCustomizeViewModel(preferences, FakeHostCapabilities())
+
+        // Goals is the only switched-off widget; dropping it on Balance puts it back on the
+        // dashboard, first, rather than appending it the way the +/- button does.
+        viewModel.onEvent(
+            DashboardCustomizeEvent.OnWidgetMove(
+                from = DashboardWidgetType.Goals,
+                to = DashboardWidgetType.Balance,
+            ),
+        )
+
+        viewModel.layout().enabledItems.first().type shouldBe DashboardWidgetType.Goals
+        viewModel.layout().disabledItems.shouldBeEmpty()
+        preferences.dashboardLayout.flow.first() shouldBe viewModel.layout()
+    }
+
+    "the card-style picker follows the host's build flag" {
+        DashboardCustomizeViewModel(FakeUiPreferences(), FakeHostCapabilities())
+            .widgetStyleEnabled shouldBe false
+        DashboardCustomizeViewModel(FakeUiPreferences(), FakeHostCapabilities(dashboardWidgetStyle = true))
+            .widgetStyleEnabled shouldBe true
+    }
+
     "the back action leaves the screen" {
-        val viewModel = DashboardCustomizeViewModel(FakeUiPreferences())
+        val viewModel = DashboardCustomizeViewModel(FakeUiPreferences(), FakeHostCapabilities())
 
         viewModel.sideEffects.effectFlow.test {
             viewModel.onEvent(DashboardCustomizeEvent.OnBackClick)

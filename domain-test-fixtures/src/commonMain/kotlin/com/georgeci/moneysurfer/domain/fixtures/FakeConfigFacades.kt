@@ -10,7 +10,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 
 /**
- * [HostCapabilities] with the online defaults. Tests that exercise the offline surface pass
+ * [HostCapabilities] with the online defaults — `dashboardWidgetStyle` included, which ships off
+ * in both hosts, so a test that wants the picker asks for it explicitly. Tests that exercise the offline surface pass
  * `isOffline = true`; the rest of the switches keep their online values unless a test says
  * otherwise, which is what the offline host does too.
  */
@@ -20,6 +21,7 @@ data class FakeHostCapabilities(
     override val signInAnonymous: Boolean = true,
     override val signInDemo: Boolean = true,
     override val transferEnabled: Boolean = true,
+    override val dashboardWidgetStyle: Boolean = false,
 ) : HostCapabilities {
 
     companion object {

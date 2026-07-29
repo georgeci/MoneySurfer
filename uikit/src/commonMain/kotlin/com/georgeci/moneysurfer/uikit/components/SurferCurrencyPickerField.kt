@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -44,7 +43,8 @@ fun SurferCurrencyPickerField(
     expanded: Boolean = false,
 ) {
     val colors = AppTheme.materialColors
-    val shape = RoundedCornerShape(12.dp)
+    // Same corner as SurferCard and the text fields it sits next to in a form.
+    val shape = AppTheme.shapes.large
     Row(
         modifier = modifier
             .fillMaxWidth()

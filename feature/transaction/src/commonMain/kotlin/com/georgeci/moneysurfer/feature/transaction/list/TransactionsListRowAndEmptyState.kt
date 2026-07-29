@@ -146,6 +146,14 @@ private fun TransactionRowUi.metaLine(subtitle: String, showAccount: Boolean): S
  */
 private enum class EmptyReason { FirstRun, Search, Filtered }
 
+/**
+ * Whether the empty state on screen already offers "add a transaction". The FAB is the same
+ * action, and two add buttons a thumb apart is one too many — the screen hides the FAB while this
+ * is true. Filtered and search empties do not count: their CTA clears the filter, not adds a row.
+ */
+internal val TransactionsByAccountState.Content.showsAddCta: Boolean
+    get() = isEmpty && emptyReason() == EmptyReason.FirstRun
+
 private fun TransactionsByAccountState.Content.emptyReason(): EmptyReason = when {
     activeFilterCount > 0 -> EmptyReason.Filtered
     query.isNotBlank() -> EmptyReason.Search

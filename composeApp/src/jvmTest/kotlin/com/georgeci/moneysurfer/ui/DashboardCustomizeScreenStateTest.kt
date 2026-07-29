@@ -85,7 +85,7 @@ class DashboardCustomizeScreenStateTest : StringSpec({
         }
     }
 
-    "the switch on an on-dashboard row asks to turn that widget off" {
+    "the round button on an on-dashboard row asks to turn that widget off" {
         runComposeUiTest {
             val events = mutableListOf<DashboardCustomizeEvent>()
             setContent {
@@ -104,7 +104,7 @@ class DashboardCustomizeScreenStateTest : StringSpec({
         }
     }
 
-    "tapping an available row asks to turn that widget on" {
+    "the round button on an available row asks to turn that widget on" {
         runComposeUiTest {
             val events = mutableListOf<DashboardCustomizeEvent>()
             setContent {
@@ -115,12 +115,70 @@ class DashboardCustomizeScreenStateTest : StringSpec({
             }
 
             scrollToRow(availableRow(DashboardWidgetType.Goals))
-            onNodeWithTag(availableRow(DashboardWidgetType.Goals)).performClick()
+            onNodeWithTag(toggle(DashboardWidgetType.Goals)).performClick()
             waitForIdle()
 
             events shouldContainExactly listOf(
                 DashboardCustomizeEvent.OnWidgetEnabledChange(DashboardWidgetType.Goals, enabled = true),
             )
+        }
+    }
+
+    "an available row can be dragged too, and reports the row it lands on" {
+        runComposeUiTest {
+            val events = mutableListOf<DashboardCustomizeEvent>()
+            setContent {
+                DashboardCustomizeContent(
+                    // Two widgets only, so the available row and the enabled one above it are both
+                    // on screen without scrolling — the drag maths reads live viewport geometry.
+                    state = AsyncState.Content(BALANCE_ON_GOALS_OFF),
+                    onEvent = { events += it },
+                )
+            }
+
+            val rowHeight = onNodeWithTag(availableRow(DashboardWidgetType.Goals))
+                .fetchSemanticsNode().size.height
+            onNodeWithTag(dragHandle(DashboardWidgetType.Goals)).performTouchInput {
+                down(center)
+                // Far enough up to clear the "Available" header between the sections, which is not
+                // a drop target and must not swallow the drag.
+                repeat(DRAG_STEPS) { moveBy(Offset(0f, -rowHeight * CROSS_SECTION_OVERSHOOT / DRAG_STEPS)) }
+                up()
+            }
+            waitForIdle()
+
+            // The move alone: the section a widget ends up in follows from where it was dropped,
+            // which is `DashboardLayoutConfig.withWidgetMoved`'s job, not the screen's.
+            events shouldContain DashboardCustomizeEvent.OnWidgetMove(
+                from = DashboardWidgetType.Goals,
+                to = DashboardWidgetType.Balance,
+            )
+        }
+    }
+
+    "the card-style pill is there only when the host build enables it" {
+        runComposeUiTest {
+            setContent {
+                DashboardCustomizeContent(
+                    state = AsyncState.Content(DashboardLayoutConfig.DEFAULT),
+                    onEvent = {},
+                    widgetStyleEnabled = false,
+                )
+            }
+
+            onNodeWithTag(DashboardCustomizeTestTags.styleAction(BALANCE)).assertDoesNotExist()
+        }
+
+        runComposeUiTest {
+            setContent {
+                DashboardCustomizeContent(
+                    state = AsyncState.Content(DashboardLayoutConfig.DEFAULT),
+                    onEvent = {},
+                    widgetStyleEnabled = true,
+                )
+            }
+
+            onNodeWithTag(DashboardCustomizeTestTags.styleAction(BALANCE)).assertIsDisplayed()
         }
     }
 
@@ -163,6 +221,7 @@ class DashboardCustomizeScreenStateTest : StringSpec({
                             .withCardStyle(DashboardWidgetType.Balance, DashboardCardStyle(variant = INLINE)),
                     ),
                     onEvent = {},
+                    widgetStyleEnabled = true,
                 )
             }
 
@@ -279,6 +338,9 @@ private const val DRAG_STEPS = 8
 /** Drag a little further than one row so touch slop cannot eat the whole travel. */
 private const val DRAG_OVERSHOOT = 1.5f
 
+/** A cross-section drag also has to travel over the section header between the two lists. */
+private const val CROSS_SECTION_OVERSHOOT = 3f
+
 /**
  * Brings a row into the viewport before addressing it.
  *
@@ -304,6 +366,13 @@ private val BALANCE_ITEM = DashboardLayoutConfig.DEFAULT.items
     .first { it.type == DashboardWidgetType.Balance }
 
 private fun styleOption(option: String) = DashboardCustomizeTestTags.styleOption(BALANCE, option)
+
+/** Balance on the dashboard, Goals under "Available" — one row per section, both on screen. */
+private val BALANCE_ON_GOALS_OFF = DashboardLayoutConfig(
+    items = DashboardLayoutConfig.DEFAULT.items
+        .filter { it.type == DashboardWidgetType.Balance || it.type == DashboardWidgetType.Goals }
+        .map { if (it.type == DashboardWidgetType.Goals) it.copy(enabled = false) else it },
+)
 
 private val ONLY_BALANCE = DashboardLayoutConfig.DEFAULT.items
     .filter { it.type == DashboardWidgetType.Balance }

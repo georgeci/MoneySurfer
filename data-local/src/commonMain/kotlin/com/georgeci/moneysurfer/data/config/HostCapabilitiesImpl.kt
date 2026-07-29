@@ -24,4 +24,6 @@ class HostCapabilitiesImpl(private val config: Config) : HostCapabilities {
     override val signInDemo: Boolean get() = config.snapshot(HostConfigKeys.signInDemo)
 
     override val transferEnabled: Boolean get() = config.snapshot(HostConfigKeys.transferEnabled)
+
+    override val dashboardWidgetStyle: Boolean get() = config.snapshot(HostConfigKeys.dashboardWidgetStyle)
 }

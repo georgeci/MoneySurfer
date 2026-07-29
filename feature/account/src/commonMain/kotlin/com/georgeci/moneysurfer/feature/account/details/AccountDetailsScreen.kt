@@ -35,7 +35,6 @@ import com.georgeci.moneysurfer.feature.account.generated.resources.account_deta
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_filter_expenses
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_filter_income
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_in_this_month
-import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_more_content_description
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_out_this_month
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_title
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_details_transactions_empty
@@ -142,11 +141,6 @@ private fun AccountDetailsContent(
                 icon = SurferIcons.Edit,
                 contentDescription = stringResource(Res.string.account_details_edit_content_description),
                 onClick = { onEvent(AccountDetailsEvent.OnEditClick) },
-            )
-            SurferToolbarAction(
-                icon = SurferIcons.MoreVert,
-                contentDescription = stringResource(Res.string.account_details_more_content_description),
-                onClick = { /* overflow menu — wires later */ },
             )
         },
         primaryAction = SurferPaneAction(

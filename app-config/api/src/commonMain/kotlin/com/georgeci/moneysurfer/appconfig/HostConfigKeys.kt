@@ -33,6 +33,15 @@ object HostConfigKeys {
     val transferEnabled: ConfigKey<Boolean> = ConfigKey.bool("host.transfer_enabled", default = true)
 
     /**
+     * Per-widget card style on the dashboard customize screen — the size/variant picker each row
+     * opens. Shipped `false` while the picker is unfinished.
+     *
+     * Like [syncEnabled] and unlike the rest, its default is *not* the fuller surface: a host that
+     * forgets to declare it must land on "no picker" rather than expose a half-built one.
+     */
+    val dashboardWidgetStyle: ConfigKey<Boolean> = ConfigKey.bool("host.dashboard_widget_style", default = false)
+
+    /**
      * Build-owned term of `SyncSettings.isEnabled`: `true` in the online host since issue #342,
      * `false` in the offline one, which has no Firebase to sync against at all.
      *
@@ -48,6 +57,7 @@ object HostConfigKeys {
         signInAnonymous,
         signInDemo,
         transferEnabled,
+        dashboardWidgetStyle,
         syncEnabled,
     )
 }

@@ -193,6 +193,15 @@ class WorkspaceSelectorViewModelTest : StringSpec({
         content(viewModel).canSignOut shouldBe false
     }
 
+    "the toolbar back action pops the screen" {
+        val viewModel = newViewModel(showActions = true)
+
+        viewModel.sideEffects.effectFlow.test {
+            viewModel.onEvent(WorkspaceSelectorEvent.OnBackClick)
+            awaitItem() shouldBe WorkspaceSelectorEffect.NavigateBack
+        }
+    }
+
     "the offline build never offers sign-out — there is no account to sign out of" {
         val viewModel = newViewModel(showActions = false, hostCapabilities = FakeHostCapabilities.offline())
 

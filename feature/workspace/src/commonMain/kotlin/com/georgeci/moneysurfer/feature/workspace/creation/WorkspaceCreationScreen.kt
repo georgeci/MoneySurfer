@@ -23,7 +23,6 @@ import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -48,7 +47,8 @@ import com.georgeci.moneysurfer.uikit.components.SurferCurrencyBottomSheet
 import com.georgeci.moneysurfer.uikit.components.SurferCurrencyOption
 import com.georgeci.moneysurfer.uikit.components.SurferCurrencyPickerField
 import com.georgeci.moneysurfer.uikit.components.SurferFullScreenLoader
-import com.georgeci.moneysurfer.uikit.components.base.SurferSectionLabel
+import com.georgeci.moneysurfer.uikit.components.base.SurferFormSection
+import com.georgeci.moneysurfer.uikit.components.base.SurferToolbarButtonAction
 import com.georgeci.moneysurfer.uikit.components.workspace.SurferInviteRow
 import com.georgeci.moneysurfer.uikit.components.workspace.SurferMemberRow
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
@@ -182,16 +182,15 @@ private fun WorkspaceCreationContent(
                         }
                     },
                     actions = {
-                        TextButton(
+                        // The same pill every other create/edit toolbar uses ("Save", "Update") —
+                        // a bare text action here made the two flows look like different apps.
+                        SurferToolbarButtonAction(
+                            icon = SurferIcons.Check,
+                            text = stringResource(actionRes),
                             onClick = { onEvent(WorkspaceCreationEvent.OnSaveClick) },
-                            modifier = Modifier.testTag(WorkspaceCreationTestTags.Save),
                             enabled = state.name.isNotBlank() && !state.isSaving,
-                        ) {
-                            Text(
-                                text = stringResource(actionRes),
-                                style = AppTheme.typography.labelLarge,
-                            )
-                        }
+                            modifier = Modifier.testTag(WorkspaceCreationTestTags.Save),
+                        )
                     },
                     colors = TopAppBarDefaults.topAppBarColors(),
                 )
@@ -211,7 +210,9 @@ private fun WorkspaceCreationContent(
 
                 PreviewCard(
                     name = state.name,
-                    memberCount = state.members.size,
+                    // Null while creating: there is no membership to count yet, and "2 members"
+                    // under a workspace that does not exist reads as somebody else's data.
+                    memberCount = state.members.size.takeIf { state.isEditing },
                     currencyCode = state.currency,
                     isOffline = state.isOffline,
                 )
@@ -266,17 +267,15 @@ private fun CurrencyPicker(
     val resolved = currencies.firstOrNull { it.code.value == selected } ?: currencies.first()
     var sheetOpen by rememberSaveable { mutableStateOf(false) }
 
-    SurferSectionLabel(
-        text = stringResource(Res.string.workspace_creation_section_currency),
-        modifier = Modifier.padding(bottom = 10.dp),
-    )
-    SurferCurrencyPickerField(
-        symbol = resolved.symbol,
-        code = resolved.code.value,
-        name = resolved.displayName,
-        onClick = { sheetOpen = true },
-        expanded = sheetOpen,
-    )
+    SurferFormSection(label = stringResource(Res.string.workspace_creation_section_currency)) {
+        SurferCurrencyPickerField(
+            symbol = resolved.symbol,
+            code = resolved.code.value,
+            name = resolved.displayName,
+            onClick = { sheetOpen = true },
+            expanded = sheetOpen,
+        )
+    }
 
     if (sheetOpen) {
         SurferCurrencyBottomSheet(
@@ -298,7 +297,7 @@ private fun CurrencyPicker(
 @Composable
 private fun PreviewCard(
     name: String,
-    memberCount: Int,
+    memberCount: Int?,
     currencyCode: String,
     isOffline: Boolean,
 ) {
@@ -337,7 +336,7 @@ private fun PreviewCard(
                     style = AppTheme.typography.titleLarge,
                 )
                 Text(
-                    text = if (isOffline) {
+                    text = if (isOffline || memberCount == null) {
                         stringResource(
                             Res.string.workspace_creation_preview_subtitle_offline_format,
                             currencyCode.ifBlank { "—" },
@@ -383,29 +382,27 @@ private fun MembersSection(
     showInviteRow: Boolean,
     onInviteClick: () -> Unit,
 ) {
-    SurferSectionLabel(
-        text = stringResource(Res.string.workspace_creation_section_members),
-        modifier = Modifier.padding(bottom = 10.dp),
-    )
-    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-        if (showInviteRow) {
-            SurferInviteRow(
-                title = stringResource(Res.string.workspace_creation_invite_title),
-                subtitle = stringResource(Res.string.workspace_creation_invite_subtitle),
-                onClick = onInviteClick,
-            )
-        }
-        if (members.isNotEmpty()) {
-            OutlinedCard(
-                shape = RoundedCornerShape(16.dp),
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                members.forEach { member ->
-                    SurferMemberRow(
-                        name = member.name,
-                        initial = member.initial,
-                        roleLabel = roleLabel(member.role),
-                    )
+    SurferFormSection(label = stringResource(Res.string.workspace_creation_section_members)) {
+        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            if (showInviteRow) {
+                SurferInviteRow(
+                    title = stringResource(Res.string.workspace_creation_invite_title),
+                    subtitle = stringResource(Res.string.workspace_creation_invite_subtitle),
+                    onClick = onInviteClick,
+                )
+            }
+            if (members.isNotEmpty()) {
+                OutlinedCard(
+                    shape = RoundedCornerShape(16.dp),
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    members.forEach { member ->
+                        SurferMemberRow(
+                            name = member.name,
+                            initial = member.initial,
+                            roleLabel = roleLabel(member.role),
+                        )
+                    }
                 }
             }
         }

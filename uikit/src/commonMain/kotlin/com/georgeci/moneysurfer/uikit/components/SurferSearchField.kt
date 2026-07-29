@@ -3,7 +3,6 @@ package com.georgeci.moneysurfer.uikit.components
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -44,7 +43,9 @@ fun SurferSearchField(
             )
         },
         singleLine = true,
-        shape = RoundedCornerShape(22.dp),
+        // Same corner as SurferCard, like every other input in the app — a search field rounder
+        // than the rows under it reads as a control from a different screen.
+        shape = AppTheme.shapes.large,
         colors = TextFieldDefaults.colors(
             focusedContainerColor = containerColor,
             unfocusedContainerColor = containerColor,
