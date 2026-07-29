@@ -63,27 +63,35 @@ plus their `Test` counterparts) to whatever actually exists in that module.
 
 ## Coverage scope
 
-Aggregated by the root `kover` plugin in [`build.gradle.kts`](../../build.gradle.kts):
+Aggregated by the root `kover` plugin in [`build.gradle.kts`](../../build.gradle.kts)
+→ `dependencies { kover(projects.*) }`. Modules **not** in that list (`:shared`,
+`:sync:no-op`, `:detekt-rules`, the `*-test-fixtures`, the two Android app
+modules) contribute nothing to the published coverage; they are named in
+`coverageExcludedProjects` right above it, which also hands Sonar a whole-module
+`sonar.coverage.exclusions` so their absence reads as "excluded" rather than 0%.
+Adding a module takes three edits — see AGENTS.md → Testing Conventions.
 
-```kotlin
-dependencies {
-    kover(projects.composeApp)
-    kover(projects.domain)
-    kover(projects.dataLocal)
-    kover(projects.dataRemote)
-    kover(projects.syncSurfer)
-    kover(projects.sync.default)
-    kover(projects.uikit)
-}
+Two further filters narrow what is counted, and they sit on different sides:
+
+- **Kover report filters** (root `kover { reports { filters { excludes { … } } } }`)
+  drop code no test can execute from the merged `report.xml` itself, so Codecov,
+  the Pages HTML report and Sonar all see the same denominator: `@Preview`
+  composables, the Compose compiler's `ComposableSingletons*` lambda holders,
+  Room's `*_Impl` codegen, `BuildConfig`, and the desktop `main()`. Together
+  these are ~9k of ~46k measured lines (`LINE` went 48.1% → 52.1% when they were
+  introduced, with no test added).
+- **`sonar.coverage.exclusions`**, set per module in the `subprojects { }` block,
+  covers what never reaches the Kover report at all: `src/iosMain/**`. Kover
+  instruments JVM bytecode, so an iOS `actual` can hold no coverage data, while
+  `sonar.sources` does hand those files to Sonar — which then scores them 0% and
+  drags "Coverage on New Code" down on every iOS-side change.
+
+Verify a filter actually bit before trusting it — patterns are matched against
+bytecode names and fail silently:
+
+```bash
+./gradlew koverXmlReport && grep -c "ComposableSingletons" build/reports/kover/report.xml
 ```
-
-Modules **not** in this list (feature modules, `:integration-test`, `:utils`,
-`:navigation`, `:shared`, etc.) do not contribute to the published coverage.
-Add them to the `kover(projects.*)` list to widen the scope.
-
-`sonar.coverage.exclusions` strips Compose previews, DI modules, app entry
-points, and `iosApp/**` from the coverage denominator (see
-[`build.gradle.kts`](../../build.gradle.kts) → `sonar { properties { … } }`).
 
 ## Local reproduction
 

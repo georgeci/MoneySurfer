@@ -166,6 +166,23 @@ Hard rules:
   `component_id` is permanent — rename `name`, never the id. Statuses stay off
   per component on purpose; the only coverage gate is the informational
   project/patch pair.
+- What coverage **cannot** reach, so don't chase it: `src/iosMain` (Kover
+  instruments JVM bytecode — iOS `actual`s can never carry data, and they are
+  excluded from Sonar's denominator for that reason), and anything only
+  exercised by `androidDeviceTest` / `connectedAndroidTest` / Maestro, which
+  produce no coverage at all. To cover `androidMain` code, add an
+  `androidHostTest` (Robolectric, runs on the host JVM) — not an instrumented
+  test. Structurally dead weight (`@Preview`, Compose/Room codegen, `main()`)
+  is filtered out of the report in [build.gradle.kts](build.gradle.kts) →
+  `kover { reports { filters { … } } }`; when adding a pattern there, confirm
+  the class actually left `report.xml` instead of trusting the wildcard.
+- Composables *are* coverable, and the two mechanisms already in the repo both
+  run on the host JVM: `runComposeUiTest` specs in `:composeApp` `jvmTest`
+  (mount the stateless `*Content(state, onEvent)` and address `*TestTags`) and
+  the Roborazzi screenshot tests in `androidHostTest`. Most feature modules have
+  no jvm target of their own (`:feature:settings` is the exception), so their
+  screen tests live in `:composeApp` `jvmTest` — coverage is attributed to the
+  class, so it still lands on the feature module.
 
 ## UI Rules
 
