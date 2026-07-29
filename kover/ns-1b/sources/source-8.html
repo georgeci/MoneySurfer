@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > HostCapabilities</title>
+  <title>MoneySurfer Coverage Report > RemoteConfigRefresh</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.config</a>
 </div>
 
-<h1>Coverage Summary for Class: HostCapabilities (com.georgeci.moneysurfer.domain.config)</h1>
+<h1>Coverage Summary for Class: RemoteConfigRefresh (com.georgeci.moneysurfer.domain.config)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">HostCapabilities</td>
+  <td class="name">RemoteConfigRefresh</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -47,31 +47,22 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.config
 &nbsp;
 &nbsp;/**
-&nbsp; * What this build of the app can do — the facts the host decides at compile time.
+&nbsp; * Re-reads the server-owned flag document into the configuration engine&#39;s RemoteGlobal layer.
 &nbsp; *
-&nbsp; * Replaces `OfflineBuildFlags`, `SignInFeatureConfig` and `TransactionCreationFeatureConfig`: one
-&nbsp; * facade over the configuration engine&#39;s Build layer instead of three data classes with a Koin
-&nbsp; * binding each in every host.
+&nbsp; * Called on launch and on every foreground return, which is the whole propagation model: there is no
+&nbsp; * snapshot listener, so a flag flipped in the console reaches a running app the next time it comes
+&nbsp; * back to the front, and reaches a cold one on its next start.
 &nbsp; *
-&nbsp; * Reads are synchronous because the Build layer is an in-memory map, but they still go through
-&nbsp; * `Config`, so a QA override can shadow one locally. That makes them valid only **after**
-&nbsp; * [ConfigHydration.hydrate] has completed — which `AppLaunchViewModel` awaits before it resolves
-&nbsp; * the start route, i.e. before any screen that injects this facade can exist.
+&nbsp; * Deliberately separate from [ConfigHydration]. Hydration is local, fast and awaited before the start
+&nbsp; * route is resolved; this one reaches the network and must never be awaited there — its result lands
+&nbsp; * in the mirror and is picked up by `Config.observe`. Failures are swallowed by the layer, so callers
+&nbsp; * have nothing to handle: an unreachable server leaves the last mirrored values in place.
+&nbsp; *
+&nbsp; * A domain facade for the same reason [ConfigHydration] is one — `navigation` must not depend on
+&nbsp; * `app-config`. The offline build binds it over `RemoteGlobalConfigSource.Empty`, where it no-ops.
 &nbsp; */
-&nbsp;interface HostCapabilities {
-&nbsp;
-&nbsp;    /** Firebase-free build: no profile, sync, members, invites, logout or account deletion. */
-&nbsp;    val isOffline: Boolean
-&nbsp;
-&nbsp;    val signInEmailPassword: Boolean
-&nbsp;    val signInAnonymous: Boolean
-&nbsp;    val signInDemo: Boolean
-&nbsp;
-&nbsp;    /** Multi-account transfers in transaction creation. */
-&nbsp;    val transferEnabled: Boolean
-&nbsp;
-&nbsp;    /** The per-widget card-style picker on the dashboard customize screen. */
-&nbsp;    val dashboardWidgetStyle: Boolean
+&nbsp;fun interface RemoteConfigRefresh {
+&nbsp;    suspend fun refresh()
 &nbsp;}
 </code>
 </pre>
@@ -96,7 +87,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 12:48</div>
+    <div style="float:right;">generated on 2026-07-29 13:37</div>
 </div>
 </body>
 </html>

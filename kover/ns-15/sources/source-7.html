@@ -172,6 +172,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.sync
 &nbsp;
+&nbsp;import com.georgeci.moneysurfer.sync.api.SyncCollection
 &nbsp;import com.georgeci.moneysurfer.sync.plugin.RemoteDocument
 &nbsp;import dev.gitlive.firebase.firestore.FirebaseFirestore
 &nbsp;import org.koin.core.annotation.Single
@@ -182,7 +183,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;) : WorkspaceCollectionReader {
 &nbsp;
 &nbsp;    override suspend fun fetchWorkspaceDoc(workspaceId: String): RemoteDocument? {
-<b class="nc">&nbsp;        val snap = firestore.collection(&quot;workspaces&quot;).document(workspaceId).get()</b>
+<b class="nc">&nbsp;        val snap = firestore.collection(SyncCollection.WORKSPACES).document(workspaceId).get()</b>
 <b class="nc">&nbsp;        return if (snap.exists) FirebaseRemoteDocument(snap) else null</b>
 &nbsp;    }
 &nbsp;
@@ -193,7 +194,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;        limit: Int,
 &nbsp;    ): List&lt;RemoteDocument&gt; =
 <b class="nc">&nbsp;        firestore</b>
-<b class="nc">&nbsp;            .collection(&quot;workspaces&quot;)</b>
+<b class="nc">&nbsp;            .collection(SyncCollection.WORKSPACES)</b>
 <b class="nc">&nbsp;            .document(workspaceId)</b>
 <b class="nc">&nbsp;            .collection(collectionName)</b>
 <b class="nc">&nbsp;            .where { &quot;updatedAt&quot; greaterThan sinceMillis }</b>
@@ -210,9 +211,9 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;        limit: Int,
 &nbsp;    ): List&lt;RemoteDocument&gt; =
 <b class="nc">&nbsp;        firestore</b>
-<b class="nc">&nbsp;            .collection(&quot;workspaces&quot;)</b>
+<b class="nc">&nbsp;            .collection(SyncCollection.WORKSPACES)</b>
 <b class="nc">&nbsp;            .document(workspaceId)</b>
-<b class="nc">&nbsp;            .collection(&quot;invites&quot;)</b>
+<b class="nc">&nbsp;            .collection(SyncCollection.WORKSPACE_INVITES)</b>
 <b class="nc">&nbsp;            .where { &quot;targetUserId&quot; equalTo uid }</b>
 <b class="nc">&nbsp;            .where { &quot;updatedAt&quot; greaterThan sinceMillis }</b>
 <b class="nc">&nbsp;            .orderBy(field = &quot;updatedAt&quot;)</b>
@@ -244,7 +245,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 12:48</div>
+    <div style="float:right;">generated on 2026-07-29 13:37</div>
 </div>
 </body>
 </html>

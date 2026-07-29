@@ -1,0 +1,163 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>MoneySurfer Coverage Report > UserRemoteSource</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.georgeci.moneysurfer.data.remote</a>
+</div>
+
+<h1>Coverage Summary for Class: UserRemoteSource (com.georgeci.moneysurfer.data.remote)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+</tr>
+<tr>
+  <td class="name">UserRemoteSource</td>
+    <td class="coverageStat"/>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.remote
+&nbsp;
+&nbsp;import dev.gitlive.firebase.firestore.FieldValue
+&nbsp;import dev.gitlive.firebase.firestore.FirebaseFirestore
+&nbsp;import org.koin.core.annotation.Single
+&nbsp;
+&nbsp;/**
+&nbsp; * The `users/{uid}` and `userEmails/{emailKey}` documents, expressed without any Firebase type.
+&nbsp; *
+&nbsp; * Same seam as [AccountDeletionRemoteSource] and [AppConfigRemoteSource], for the same reason: the
+&nbsp; * parts of [UserRemoteRepositoryImpl][com.georgeci.moneysurfer.data.repository.UserRemoteRepositoryImpl]
+&nbsp; * worth testing are the email normalization, the blank-input guards and the doc→domain mapping,
+&nbsp; * and gitlive&#39;s client cannot be constructed off Android.
+&nbsp; *
+&nbsp; * The workspace-ref writers are field-level array mutations rather than whole-document writes: two
+&nbsp; * devices joining a workspace at once must not overwrite each other&#39;s entry.
+&nbsp; */
+&nbsp;interface UserRemoteSource {
+&nbsp;
+&nbsp;    /** `users/{uid}`, or null when the document does not exist. */
+&nbsp;    suspend fun fetchUser(uid: String): UserDoc?
+&nbsp;
+&nbsp;    suspend fun createUser(uid: String, doc: UserDoc)
+&nbsp;
+&nbsp;    suspend fun addWorkspaceRef(uid: String, workspaceId: String)
+&nbsp;
+&nbsp;    suspend fun setDefaultWorkspace(uid: String, workspaceId: String)
+&nbsp;
+&nbsp;    suspend fun addInvitedWorkspaceRef(uid: String, workspaceId: String)
+&nbsp;
+&nbsp;    suspend fun removeInvitedWorkspaceRef(uid: String, workspaceId: String)
+&nbsp;
+&nbsp;    /** `userEmails/{emailKey}`, or null when there is no mapping. */
+&nbsp;    suspend fun fetchEmailMapping(emailKey: String): UserEmailDoc?
+&nbsp;
+&nbsp;    suspend fun upsertEmailMapping(emailKey: String, doc: UserEmailDoc)
+&nbsp;}
+&nbsp;
+&nbsp;@Single(binds = [UserRemoteSource::class])
+&nbsp;class FirebaseUserRemoteSource(
+&nbsp;    private val firestore: FirebaseFirestore,
+&nbsp;) : UserRemoteSource {
+&nbsp;
+&nbsp;    override suspend fun fetchUser(uid: String): UserDoc? {
+&nbsp;        val snapshot = firestore.collection(USERS).document(uid).get()
+&nbsp;        return if (snapshot.exists) snapshot.data(UserDoc.serializer()) else null
+&nbsp;    }
+&nbsp;
+&nbsp;    override suspend fun createUser(uid: String, doc: UserDoc) {
+&nbsp;        firestore.collection(USERS).document(uid).set(UserDoc.serializer(), doc)
+&nbsp;    }
+&nbsp;
+&nbsp;    override suspend fun addWorkspaceRef(uid: String, workspaceId: String) {
+&nbsp;        firestore.collection(USERS).document(uid).update(
+&nbsp;            &quot;workspaceIds&quot; to FieldValue.arrayUnion(workspaceId),
+&nbsp;        )
+&nbsp;    }
+&nbsp;
+&nbsp;    override suspend fun setDefaultWorkspace(uid: String, workspaceId: String) {
+&nbsp;        firestore.collection(USERS).document(uid).update(
+&nbsp;            &quot;defaultWorkspaceId&quot; to workspaceId,
+&nbsp;        )
+&nbsp;    }
+&nbsp;
+&nbsp;    override suspend fun addInvitedWorkspaceRef(uid: String, workspaceId: String) {
+&nbsp;        firestore.collection(USERS).document(uid).update(
+&nbsp;            &quot;invitedWorkspaceIds&quot; to FieldValue.arrayUnion(workspaceId),
+&nbsp;        )
+&nbsp;    }
+&nbsp;
+&nbsp;    override suspend fun removeInvitedWorkspaceRef(uid: String, workspaceId: String) {
+&nbsp;        firestore.collection(USERS).document(uid).update(
+&nbsp;            &quot;invitedWorkspaceIds&quot; to FieldValue.arrayRemove(workspaceId),
+&nbsp;        )
+&nbsp;    }
+&nbsp;
+&nbsp;    override suspend fun fetchEmailMapping(emailKey: String): UserEmailDoc? {
+&nbsp;        val snapshot = firestore.collection(USER_EMAILS).document(emailKey).get()
+&nbsp;        return if (snapshot.exists) snapshot.data(UserEmailDoc.serializer()) else null
+&nbsp;    }
+&nbsp;
+&nbsp;    override suspend fun upsertEmailMapping(emailKey: String, doc: UserEmailDoc) {
+&nbsp;        firestore.collection(USER_EMAILS).document(emailKey).set(UserEmailDoc.serializer(), doc)
+&nbsp;    }
+&nbsp;
+&nbsp;    private companion object {
+&nbsp;        const val USERS = &quot;users&quot;
+&nbsp;        const val USER_EMAILS = &quot;userEmails&quot;
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-07-29 13:37</div>
+</div>
+</body>
+</html>

@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > WorkspaceRefRegistrar</title>
+  <title>MoneySurfer Coverage Report > UserScopedPullPhase</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.data.sync</a>
 </div>
 
-<h1>Coverage Summary for Class: WorkspaceRefRegistrar (com.georgeci.moneysurfer.data.sync)</h1>
+<h1>Coverage Summary for Class: UserScopedPullPhase (com.georgeci.moneysurfer.data.sync)</h1>
 
 <table class="coverageStats">
 
@@ -46,80 +46,124 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">WorkspaceRefRegistrar</td>
+  <td class="name">UserScopedPullPhase</td>
 <td class="coverageStat">
   <span class="percent">
     100%
   </span>
   <span class="absValue">
-    (2/2)
+    (6/6)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    80.8%
   </span>
   <span class="absValue">
-    (2/2)
+    (21/26)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    96.7%
   </span>
   <span class="absValue">
-    (9/9)
+    (59/61)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    96%
   </span>
   <span class="absValue">
-    (72/72)
+    (549/572)
   </span>
 </td>
 </tr>
   <tr>
-    <td class="name">WorkspaceRefRegistrar$Companion</td>
+    <td class="name">UserScopedPullPhase$applyAll$1</td>
     <td class="coverageStat"/>
   </tr>
   <tr>
-    <td class="name">WorkspaceRefRegistrar$register$1</td>
+    <td class="name">UserScopedPullPhase$Companion</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">UserScopedPullPhase$fetch$1</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">UserScopedPullPhase$invoke$1</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">UserScopedPullPhase$pluginsWithCollections$$inlined$sortedBy$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
     <td class="coverageStat"/>
   </tr>
 <tr>
   <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    75%
   </span>
   <span class="absValue">
-    (2/2)
+    (6/8)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    80.8%
   </span>
   <span class="absValue">
-    (2/2)
+    (21/26)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    95.2%
   </span>
   <span class="absValue">
-    (9/9)
+    (59/62)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    95.8%
   </span>
   <span class="absValue">
-    (72/72)
+    (549/573)
   </span>
 </td>
 </tr>
@@ -132,55 +176,168 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.sync
 &nbsp;
+&nbsp;import arrow.core.raise.either
 &nbsp;import co.touchlab.kermit.Logger
 &nbsp;import com.georgeci.moneysurfer.domain.auth.SessionPointers
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
-&nbsp;import com.georgeci.moneysurfer.domain.repositories.UserRemoteRepository
+&nbsp;import com.georgeci.moneysurfer.domain.sync.PullProgress
+&nbsp;import com.georgeci.moneysurfer.domain.sync.PullSummary
+&nbsp;import com.georgeci.moneysurfer.sync.api.SyncCancelToken
+&nbsp;import com.georgeci.moneysurfer.sync.api.SyncResult
+&nbsp;import com.georgeci.moneysurfer.sync.api.SyncScope
+&nbsp;import com.georgeci.moneysurfer.sync.plugin.PullScope
+&nbsp;import com.georgeci.moneysurfer.sync.plugin.RemoteDocument
+&nbsp;import com.georgeci.moneysurfer.sync.plugin.SyncEntityPlugin
 &nbsp;import kotlinx.coroutines.flow.first
 &nbsp;import org.koin.core.annotation.Single
+&nbsp;import kotlin.coroutines.cancellation.CancellationException
 &nbsp;
 &nbsp;/**
-&nbsp; * Keeps `users/{uid}.workspaceIds` in step with the workspace documents this device pushes.
+&nbsp; * Phase 3 of the pull: collections that hang off `users/{uid}` rather than off a workspace — today
+&nbsp; * only `config`, the per-user settings.
 &nbsp; *
-&nbsp; * `CreateWorkspaceUseCase` registers the ref at creation time, but only when sync is enabled —
-&nbsp; * otherwise it would write a ref to a `workspaces/{wid}` document the disabled syncer never
-&nbsp; * creates (issue #342). Workspaces created while sync was dark therefore sit in Room and in the
-&nbsp; * outbox with no remote ref, and nothing else ever adds one: `addWorkspaceRef` is called from
-&nbsp; * exactly two use cases, both at creation/join time.
+&nbsp; * Its own class rather than two more methods on [PullRemoteChangesUseCaseImpl], which is at the
+&nbsp; * size where every further branch makes the workspace loop harder to read. The split is also
+&nbsp; * honest: nothing here shares state with the workspace phases — no cursor, no `SyncMetaRepository`,
+&nbsp; * no per-workspace bookkeeping.
 &nbsp; *
-&nbsp; * The moment the flag is flipped, the outbox drains and those documents land on Firestore — so
-&nbsp; * this runs on the push, where the ref belongs. `SyncScope.AllUserData` resolves workspaces from
-&nbsp; * the remote user document, so without it a workspace is invisible on every other device and
-&nbsp; * after any reinstall, permanently.
-&nbsp; *
-&nbsp; * Idempotent: `addWorkspaceRef` is an `arrayUnion`, so re-registering an already-listed workspace
-&nbsp; * is a no-op. Members are registered too, not just owners — a member does belong to the
-&nbsp; * workspace, and rules would have rejected the push otherwise.
+&nbsp; * It runs for every scope that pulls at all, because this is the **only** channel by which a
+&nbsp; * setting changed on another device reaches this one: there is no listener, and one query returning
+&nbsp; * about ten tiny documents is not worth scoping down further.
 &nbsp; */
 <b class="fc">&nbsp;@Single</b>
-&nbsp;class WorkspaceRefRegistrar(
-<b class="fc">&nbsp;    private val userRemoteRepository: UserRemoteRepository,</b>
+&nbsp;class UserScopedPullPhase(
+<b class="fc">&nbsp;    private val reader: UserCollectionReader,</b>
+<b class="fc">&nbsp;    private val plugins: List&lt;SyncEntityPlugin&gt;,</b>
 <b class="fc">&nbsp;    private val session: SessionPointers,</b>
 &nbsp;) {
+&nbsp;
 <b class="fc">&nbsp;    private val log = Logger.withTag(TAG)</b>
 &nbsp;
-&nbsp;    /**
-&nbsp;     * Fail-loud on purpose: the caller is an outbox push, so a throw marks the mutation failed and
-&nbsp;     * the next drain retries both the document and the ref. Swallowing here would leave exactly
-&nbsp;     * the doc-without-ref state this class exists to prevent, with nothing to notice it.
-&nbsp;     */
-&nbsp;    suspend fun register(workspaceId: String) {
-<b class="fc">&nbsp;        val uid = session.currentFirebaseUid.first()</b>
-<b class="fc">&nbsp;        if (uid == null) {</b>
-<b class="fc">&nbsp;            log.d { &quot;[ref] skipped wid=$workspaceId — no Firebase session&quot; }</b>
-&nbsp;            return
+&nbsp;    suspend operator fun invoke(
+&nbsp;        scope: SyncScope,
+&nbsp;        onProgress: suspend (PullProgress) -&gt; Unit,
+&nbsp;        cancelToken: SyncCancelToken,
+<b class="fc">&nbsp;    ): SyncResult&lt;PullSummary&gt; = either {</b>
+<b class="fc">&nbsp;        if (scope == SyncScope.UploadOnly) return@either EMPTY_SUMMARY</b>
+<b class="fc">&nbsp;        val uid = session.currentFirebaseUid.first() ?: return@either EMPTY_SUMMARY</b>
+&nbsp;
+<b class="fc">&nbsp;        val appliedSummaries = mutableListOf&lt;PullSummary&gt;()</b>
+&nbsp;
+<b class="fc">&nbsp;        for ((plugin, collectionName) in pluginsWithCollections()) {</b>
+<b class="fc">&nbsp;            cancelToken.throwIfCancelled()</b>
+<b class="fc">&nbsp;            val applied = try {</b>
+<b class="pc">&nbsp;                fetch(uid, collectionName)?.let { docs -&gt;</b>
+<b class="fc">&nbsp;                    applyAll(</b>
+<b class="fc">&nbsp;                        plugin = plugin,</b>
+<b class="fc">&nbsp;                        collectionName = collectionName,</b>
+<b class="fc">&nbsp;                        docs = docs,</b>
+<b class="fc">&nbsp;                        scopeKey = uid,</b>
+<b class="fc">&nbsp;                        onProgress = onProgress,</b>
+<b class="fc">&nbsp;                        cancelToken = cancelToken,</b>
+<b class="fc">&nbsp;                    )</b>
+<b class="fc">&nbsp;                } ?: continue</b>
+&nbsp;            } catch (cancelled: CancellationException) {
+&nbsp;                throw cancelled
+&nbsp;            } catch (
+&nbsp;                @Suppress(&quot;TooGenericExceptionCaught&quot;)
+&nbsp;                failure: Throwable,
+&nbsp;            ) {
+&nbsp;                // Everything that reaches here is either a non-denial read failure or a local write
+&nbsp;                // that failed: both abort the pull rather than reporting a sync that stored nothing.
+<b class="fc">&nbsp;                log.e(throwable = failure) { &quot;[pull] failed (phase3) collection=$collectionName&quot; }</b>
+<b class="fc">&nbsp;                raise(failure.toSyncError())</b>
+&nbsp;            }
+<b class="fc">&nbsp;            appliedSummaries += applied</b>
 &nbsp;        }
-<b class="fc">&nbsp;        userRemoteRepository.addWorkspaceRef(uid, WorkspaceId(workspaceId))</b>
-<b class="fc">&nbsp;        log.d { &quot;[ref] users/{uid}.workspaceIds now covers wid=$workspaceId&quot; }</b>
+&nbsp;
+<b class="fc">&nbsp;        PullSummary(</b>
+<b class="fc">&nbsp;            downloadedCount = appliedSummaries.sumOf(PullSummary::downloadedCount),</b>
+<b class="fc">&nbsp;            conflictCount = appliedSummaries.sumOf(PullSummary::conflictCount),</b>
+<b class="fc">&nbsp;        )</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /** A user-scoped plugin without a collection has nothing to be pulled from; it is not fatal. */
+<b class="fc">&nbsp;    private fun pluginsWithCollections(): List&lt;Pair&lt;SyncEntityPlugin, String&gt;&gt; = plugins</b>
+<b class="pc">&nbsp;        .filter { it.pullScope == PullScope.User }</b>
+<b class="fc">&nbsp;        .sortedBy { it.pullPriority }</b>
+<b class="fc">&nbsp;        .mapNotNull { plugin -&gt;</b>
+<b class="fc">&nbsp;            val collectionName = plugin.firestoreCollectionName</b>
+<b class="pc">&nbsp;            if (collectionName == null) {</b>
+<b class="nc">&nbsp;                log.w { &quot;[pull] user-scoped plugin ${plugin.entityType} has no collection — skipping&quot; }</b>
+<b class="nc">&nbsp;                null</b>
+&nbsp;            } else {
+<b class="fc">&nbsp;                plugin to collectionName</b>
+<b class="fc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * `null` means &quot;skip this collection&quot;. A denial is the one failure treated that way: these
+&nbsp;     * documents are private to one user and hold nothing another device cannot re-derive, whereas
+&nbsp;     * the rules for a brand-new subcollection are exactly the kind of thing that can lag a client
+&nbsp;     * release — and failing the pull would turn that into &quot;nobody can sign in&quot;.
+&nbsp;     */
+&nbsp;    @Suppress(&quot;TooGenericExceptionCaught&quot;) // Classified below; anything but a denial is re-thrown.
+&nbsp;    private suspend fun fetch(uid: String, collectionName: String): List&lt;RemoteDocument&gt;? = try {
+<b class="fc">&nbsp;        reader.fetchAll(uid, collectionName, limit = MAX_DOCS_PER_COLLECTION).also { docs -&gt;</b>
+<b class="fc">&nbsp;            if (docs.size &gt;= MAX_DOCS_PER_COLLECTION) {</b>
+&nbsp;                // Truncation is a bug to report, not a page to fetch: this collection holds one
+&nbsp;                // document per settings key and cannot legitimately reach the cap. Applying the
+&nbsp;                // prefix is still strictly better than applying nothing.
+<b class="fc">&nbsp;                log.e {</b>
+<b class="fc">&nbsp;                    &quot;[pull] users/{uid}/$collectionName hit the $MAX_DOCS_PER_COLLECTION-document &quot; +</b>
+<b class="fc">&nbsp;                        &quot;cap — the rest of the collection is not being applied&quot;</b>
+&nbsp;                }
+&nbsp;            }
+<b class="fc">&nbsp;        }</b>
+&nbsp;    } catch (cancelled: CancellationException) {
+&nbsp;        throw cancelled
+&nbsp;    } catch (failure: Throwable) {
+<b class="fc">&nbsp;        if (!failure.isPermissionDenied()) throw failure</b>
+<b class="fc">&nbsp;        log.w(throwable = failure) {</b>
+<b class="fc">&nbsp;            &quot;[pull] users/{uid}/$collectionName is not readable — skipping the collection&quot;</b>
+&nbsp;        }
+<b class="fc">&nbsp;        null</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /** Plugin failures still propagate — those are local writes, and swallowing one would report a
+&nbsp;     * clean sync that stored nothing. */
+&nbsp;    @Suppress(&quot;LongParameterList&quot;)
+&nbsp;    private suspend fun applyAll(
+&nbsp;        plugin: SyncEntityPlugin,
+&nbsp;        collectionName: String,
+&nbsp;        docs: List&lt;RemoteDocument&gt;,
+&nbsp;        scopeKey: String,
+&nbsp;        onProgress: suspend (PullProgress) -&gt; Unit,
+&nbsp;        cancelToken: SyncCancelToken,
+&nbsp;    ): PullSummary {
+<b class="fc">&nbsp;        var downloaded = 0</b>
+<b class="fc">&nbsp;        var conflicts = 0</b>
+&nbsp;
+<b class="fc">&nbsp;        docs.forEachIndexed { index, doc -&gt;</b>
+<b class="fc">&nbsp;            cancelToken.throwIfCancelled()</b>
+<b class="fc">&nbsp;            val result = plugin.applyDoc(doc, scopeKey)</b>
+<b class="pc">&nbsp;            if (result.applied) downloaded++</b>
+<b class="pc">&nbsp;            if (result.wasConflict) conflicts++</b>
+<b class="fc">&nbsp;            onProgress(</b>
+<b class="fc">&nbsp;                PullProgress(collection = collectionName, current = index + 1, total = docs.size),</b>
+&nbsp;            )
+<b class="fc">&nbsp;        }</b>
+&nbsp;
+<b class="fc">&nbsp;        return PullSummary(downloadedCount = downloaded, conflictCount = conflicts)</b>
 &nbsp;    }
 &nbsp;
 &nbsp;    private companion object {
-&nbsp;        const val TAG = &quot;WorkspaceRefRegistrar&quot;
+&nbsp;        const val TAG = &quot;UserScopedPull&quot;
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Ceiling on one cursorless read. Two orders of magnitude above the roughly ten documents a
+&nbsp;         * healthy `config` collection holds, so it can only be reached by drift or by a bug —
+&nbsp;         * which is exactly when an uncapped read would hurt most, since it runs on every foreground
+&nbsp;         * sync on every device.
+&nbsp;         */
+&nbsp;        const val MAX_DOCS_PER_COLLECTION: Int = 500
+&nbsp;
+<b class="pc">&nbsp;        val EMPTY_SUMMARY = PullSummary(downloadedCount = 0, conflictCount = 0)</b>
 &nbsp;    }
 &nbsp;}
 </code>
@@ -206,7 +363,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 12:48</div>
+    <div style="float:right;">generated on 2026-07-29 13:37</div>
 </div>
 </body>
 </html>

@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > TransactionDao</title>
+  <title>MoneySurfer Coverage Report > WorkspaceInviteDao</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.data.db.dao</a>
 </div>
 
-<h1>Coverage Summary for Class: TransactionDao (com.georgeci.moneysurfer.data.db.dao)</h1>
+<h1>Coverage Summary for Class: WorkspaceInviteDao (com.georgeci.moneysurfer.data.db.dao)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">TransactionDao</td>
+  <td class="name">WorkspaceInviteDao</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -51,549 +51,65 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import androidx.room.Query
 &nbsp;import androidx.room.Update
 &nbsp;import androidx.room.Upsert
-&nbsp;import com.georgeci.moneysurfer.data.db.entity.CategorizedTransactionEntity
-&nbsp;import com.georgeci.moneysurfer.data.db.entity.CategoryMonthlyTotalEntity
-&nbsp;import com.georgeci.moneysurfer.data.db.entity.CategorySpendSliceEntity
-&nbsp;import com.georgeci.moneysurfer.data.db.entity.CurrencySpendEntity
-&nbsp;import com.georgeci.moneysurfer.data.db.entity.DailySpendEntity
-&nbsp;import com.georgeci.moneysurfer.data.db.entity.MerchantSpendEntity
-&nbsp;import com.georgeci.moneysurfer.data.db.entity.MonthlyTypeTotalEntity
-&nbsp;import com.georgeci.moneysurfer.data.db.entity.TransactionEntity
-&nbsp;import com.georgeci.moneysurfer.data.db.entity.TransactionTotalEntity
+&nbsp;import com.georgeci.moneysurfer.data.db.entity.WorkspaceInviteEntity
 &nbsp;import kotlinx.coroutines.flow.Flow
 &nbsp;
-&nbsp;/**
-&nbsp; * Ordering is always `(operationDate, operationAt, createdAt) DESC`: the business date groups the
-&nbsp; * day, the instant orders within it, and `createdAt` breaks ties between rows sharing an instant —
-&nbsp; * which backdated batches and CSV imports routinely do.
-&nbsp; *
-&nbsp; * Every read below carries `deletedAt IS NULL`. Deleting a transaction writes a tombstone rather
-&nbsp; * than dropping the row (issue #346), so the filter is what makes a deleted row *look* deleted to
-&nbsp; * the list, the totals, search, the CSV backup and the dashboard alike. The one deliberate
-&nbsp; * exception is [getByIdIncludingDeleted], which sync and Undo need precisely because they have to
-&nbsp; * see the tombstone.
-&nbsp; */
 &nbsp;@Dao
-&nbsp;interface TransactionDao {
+&nbsp;@Suppress(&quot;TooManyFunctions&quot;)
+&nbsp;interface WorkspaceInviteDao {
 &nbsp;
+&nbsp;    @Query(&quot;SELECT * FROM workspace_invites&quot;)
+&nbsp;    fun getAll(): Flow&lt;List&lt;WorkspaceInviteEntity&gt;&gt;
+&nbsp;
+&nbsp;    @Query(&quot;SELECT * FROM workspace_invites WHERE workspaceId = :workspaceId&quot;)
+&nbsp;    fun getByWorkspaceId(workspaceId: String): Flow&lt;List&lt;WorkspaceInviteEntity&gt;&gt;
+&nbsp;
+&nbsp;    @Query(&quot;SELECT * FROM workspace_invites WHERE email = :email&quot;)
+&nbsp;    fun getByEmail(email: String): Flow&lt;List&lt;WorkspaceInviteEntity&gt;&gt;
+&nbsp;
+&nbsp;    @Query(&quot;SELECT * FROM workspace_invites WHERE targetUserId = :userId&quot;)
+&nbsp;    fun getByTargetUserId(userId: String): Flow&lt;List&lt;WorkspaceInviteEntity&gt;&gt;
+&nbsp;
+&nbsp;    @Query(&quot;SELECT * FROM workspace_invites WHERE id = :id&quot;)
+&nbsp;    suspend fun getById(id: String): WorkspaceInviteEntity?
+&nbsp;
+&nbsp;    // Id of a still-joinable invite in [workspaceId] that admits the given member —
+&nbsp;    // matched by targetUserId or, for email-only invites, a case-insensitive email
+&nbsp;    // match. Stamped onto the pushed member doc so Firestore rules can verify the
+&nbsp;    // accept-invite self-create (issue #152). PENDING is preferred over ACCEPTED so a
+&nbsp;    // fresh invite wins over a stale terminal one; nulls when nothing admits the member.
 &nbsp;    @Query(
 &nbsp;        &quot;&quot;&quot;
-&nbsp;        SELECT * FROM transactions
-&nbsp;        WHERE deletedAt IS NULL
-&nbsp;        ORDER BY operationDate DESC, operationAt DESC, createdAt DESC
+&nbsp;        SELECT id FROM workspace_invites
+&nbsp;        WHERE workspaceId = :workspaceId
+&nbsp;          AND status IN (&#39;PENDING&#39;, &#39;ACCEPTED&#39;)
+&nbsp;          AND (targetUserId = :userId OR (:email IS NOT NULL AND lower(email) = lower(:email)))
+&nbsp;        ORDER BY CASE status WHEN &#39;PENDING&#39; THEN 0 ELSE 1 END, updatedAt DESC
+&nbsp;        LIMIT 1
 &nbsp;        &quot;&quot;&quot;,
 &nbsp;    )
-&nbsp;    fun getAll(): Flow&lt;List&lt;TransactionEntity&gt;&gt;
-&nbsp;
-&nbsp;    @Query(
-&nbsp;        &quot;&quot;&quot;
-&nbsp;        SELECT * FROM transactions
-&nbsp;        WHERE accountId = :accountId AND deletedAt IS NULL
-&nbsp;        ORDER BY operationDate DESC, operationAt DESC, createdAt DESC
-&nbsp;        &quot;&quot;&quot;,
-&nbsp;    )
-&nbsp;    fun getByAccountId(accountId: String): Flow&lt;List&lt;TransactionEntity&gt;&gt;
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Newest-first page of categorized rows inside an optional `[from, to]` date window, for one
-&nbsp;     * account or — when [accountId] is null — every account.
-&nbsp;     *
-&nbsp;     * One query covers all four combinations via nullable bounds, which keeps a single execution
-&nbsp;     * plan in Room&#39;s cache instead of four near-identical statements. `operationDate` is ISO
-&nbsp;     * `YYYY-MM-DD` text, so `&gt;=` / `&lt;=` compare correctly, and the composite
-&nbsp;     * `(accountId, operationDate DESC, ...)` index on [TransactionEntity] serves both the filter
-&nbsp;     * and the ORDER BY for the account-scoped case.
-&nbsp;     *
-&nbsp;     * Opening balances are excluded here rather than in the caller — they are an account
-&nbsp;     * artefact, never a list row. Both the current and the legacy spelling are named because
-&nbsp;     * `TransactionRepositoryImpl.parseType` still maps `INITIAL_BALANCE` onto the same type.
-&nbsp;     *
-&nbsp;     * [limit] is mandatory: paging grows the limit rather than offsetting, so rows inserted while
-&nbsp;     * the user scrolls cannot shift the already-visible prefix.
-&nbsp;     *
-&nbsp;     * `splitLegCount` is how many legs the row&#39;s split group has in the whole table — `0` for an
-&nbsp;     * ordinary row, since `splitId = NULL` matches nothing in SQL. The list collapses a group into
-&nbsp;     * one row only when it holds every one of those legs, so a group cut by [limit] or thinned by a
-&nbsp;     * category filter renders as the individual legs it actually has rather than as a collapsed row
-&nbsp;     * with a total that is quietly missing money.
-&nbsp;     *
-&nbsp;     * The count skips tombstoned legs for that comparison to mean anything: the rows it is weighed
-&nbsp;     * against are live ones, so counting a deleted leg would keep a group from ever collapsing
-&nbsp;     * again. A split is deleted whole, but a half-deleted group is still reachable — a peer on an
-&nbsp;     * older build deleting one leg, or a pull that has applied only part of the group so far.
-&nbsp;     */
-&nbsp;    @Query(
-&nbsp;        &quot;&quot;&quot;
-&nbsp;        SELECT
-&nbsp;            transactions.id,
-&nbsp;            transactions.workspaceId,
-&nbsp;            transactions.accountId,
-&nbsp;            transactions.amount,
-&nbsp;            transactions.currencyCode,
-&nbsp;            transactions.categoryId,
-&nbsp;            categories.name AS categoryName,
-&nbsp;            transactions.note,
-&nbsp;            transactions.merchant,
-&nbsp;            transactions.tags,
-&nbsp;            transactions.operationAt,
-&nbsp;            transactions.operationDate,
-&nbsp;            transactions.createdAt,
-&nbsp;            transactions.type,
-&nbsp;            transactions.status,
-&nbsp;            transactions.updatedAt,
-&nbsp;            transactions.transferId,
-&nbsp;            transactions.splitId,
-&nbsp;            (
-&nbsp;                SELECT COUNT(*) FROM transactions AS legs
-&nbsp;                WHERE legs.splitId = transactions.splitId
-&nbsp;                  AND legs.deletedAt IS NULL
-&nbsp;            ) AS splitLegCount,
-&nbsp;            transactions.recurringRuleId
-&nbsp;        FROM transactions
-&nbsp;        LEFT JOIN categories ON categories.id = transactions.categoryId
-&nbsp;        WHERE (:accountId IS NULL OR transactions.accountId = :accountId)
-&nbsp;          AND (:from IS NULL OR transactions.operationDate &gt;= :from)
-&nbsp;          AND (:to IS NULL OR transactions.operationDate &lt;= :to)
-&nbsp;          AND transactions.type NOT IN (&#39;OPENING_BALANCE&#39;, &#39;INITIAL_BALANCE&#39;)
-&nbsp;          AND transactions.deletedAt IS NULL
-&nbsp;        ORDER BY transactions.operationDate DESC, transactions.operationAt DESC, transactions.createdAt DESC
-&nbsp;        LIMIT :limit
-&nbsp;        &quot;&quot;&quot;,
-&nbsp;    )
-&nbsp;    fun getCategorizedWindow(
-&nbsp;        accountId: String?,
-&nbsp;        from: String?,
-&nbsp;        to: String?,
-&nbsp;        limit: Int,
-&nbsp;    ): Flow&lt;List&lt;CategorizedTransactionEntity&gt;&gt;
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Per-type, per-currency magnitude sums over the whole window described by
-&nbsp;     * [getCategorizedWindow] — unaffected by that query&#39;s `LIMIT`, so a summary built from these
-&nbsp;     * stays correct while pages load.
-&nbsp;     *
-&nbsp;     * Also grouped by the amount&#39;s sign: the legacy `REGULAR` type is resolved to income/expense
-&nbsp;     * from the sign (see `TransactionRepositoryImpl.parseType`), which is only possible if rows
-&nbsp;     * of either sign are not already summed together.
-&nbsp;     */
-&nbsp;    @Query(
-&nbsp;        &quot;&quot;&quot;
-&nbsp;        SELECT
-&nbsp;            transactions.type AS type,
-&nbsp;            transactions.currencyCode AS currencyCode,
-&nbsp;            (transactions.amount &lt; 0) AS isNegative,
-&nbsp;            SUM(ABS(transactions.amount)) AS total
-&nbsp;        FROM transactions
-&nbsp;        WHERE (:accountId IS NULL OR transactions.accountId = :accountId)
-&nbsp;          AND (:from IS NULL OR transactions.operationDate &gt;= :from)
-&nbsp;          AND (:to IS NULL OR transactions.operationDate &lt;= :to)
-&nbsp;          AND transactions.type NOT IN (&#39;OPENING_BALANCE&#39;, &#39;INITIAL_BALANCE&#39;)
-&nbsp;          AND transactions.deletedAt IS NULL
-&nbsp;        GROUP BY transactions.type, transactions.currencyCode, isNegative
-&nbsp;        &quot;&quot;&quot;,
-&nbsp;    )
-&nbsp;    fun getTotals(
-&nbsp;        accountId: String?,
-&nbsp;        from: String?,
-&nbsp;        to: String?,
-&nbsp;    ): Flow&lt;List&lt;TransactionTotalEntity&gt;&gt;
-&nbsp;
-&nbsp;    @Query(
-&nbsp;        &quot;&quot;&quot;
-&nbsp;        SELECT * FROM transactions
-&nbsp;        WHERE workspaceId = :workspaceId AND deletedAt IS NULL
-&nbsp;        ORDER BY operationDate DESC, operationAt DESC, createdAt DESC
-&nbsp;        &quot;&quot;&quot;,
-&nbsp;    )
-&nbsp;    fun getByWorkspaceId(workspaceId: String): Flow&lt;List&lt;TransactionEntity&gt;&gt;
-&nbsp;
-&nbsp;    @Query(&quot;SELECT * FROM transactions WHERE id = :id AND deletedAt IS NULL&quot;)
-&nbsp;    suspend fun getById(id: String): TransactionEntity?
-&nbsp;
-&nbsp;    /**
-&nbsp;     * The row behind [id] whether or not it carries a tombstone — the one read that deliberately
-&nbsp;     * sees deleted rows.
-&nbsp;     *
-&nbsp;     * It exists for the sync plugin&#39;s conflict resolution, which has to know that a locally-deleted
-&nbsp;     * row exists at all: were the tombstone invisible there, an older remote doc would arrive as a
-&nbsp;     * brand-new row and resurrect what the user just deleted, instead of losing the
-&nbsp;     * last-writer-wins comparison against the delete&#39;s `updatedAt`.
-&nbsp;     *
-&nbsp;     * Undo does not need it — [restore] lifts the tombstone first, after which the row answers to
-&nbsp;     * [getById] like any other.
-&nbsp;     */
-&nbsp;    @Query(&quot;SELECT * FROM transactions WHERE id = :id&quot;)
-&nbsp;    suspend fun getByIdIncludingDeleted(id: String): TransactionEntity?
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Both legs of one transfer, oldest first so the pair reads source-then-destination for
-&nbsp;     * legs saved in that order.
-&nbsp;     *
-&nbsp;     * Deliberately unindexed: `transferId` is null on the overwhelming majority of rows, this
-&nbsp;     * runs once when a transfer&#39;s details screen opens, and an index would cost a schema
-&nbsp;     * migration plus write amplification on every insert to serve that one lookup.
-&nbsp;     */
-&nbsp;    @Query(
-&nbsp;        &quot;SELECT * FROM transactions WHERE transferId = :transferId AND deletedAt IS NULL ORDER BY createdAt ASC&quot;,
-&nbsp;    )
-&nbsp;    suspend fun getByTransferId(transferId: String): List&lt;TransactionEntity&gt;
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Every leg of one split, oldest first so the breakdown reads in the order the user entered
-&nbsp;     * the legs.
-&nbsp;     *
-&nbsp;     * Indexed, unlike [getByTransferId]: the list window query correlates on the same column on
-&nbsp;     * every emission, so the index exists anyway and this lookup is free to use it.
-&nbsp;     */
-&nbsp;    @Query(
-&nbsp;        &quot;SELECT * FROM transactions WHERE splitId = :splitId AND deletedAt IS NULL ORDER BY createdAt ASC&quot;,
-&nbsp;    )
-&nbsp;    suspend fun getBySplitId(splitId: String): List&lt;TransactionEntity&gt;
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Full-text search over notes and merchants within a workspace, newest first.
-&nbsp;     *
-&nbsp;     * A bare `MATCH` against the virtual table spans both indexed columns, so this needs no
-&nbsp;     * per-column syntax — see [com.georgeci.moneysurfer.data.db.entity.TransactionFtsEntity].
-&nbsp;     *
-&nbsp;     * [query] is raw FTS4 MATCH syntax, never user input — build it with
-&nbsp;     * [com.georgeci.moneysurfer.data.db.FtsQuery.fromUserInput], which escapes
-&nbsp;     * operators and adds prefix wildcards.
-&nbsp;     */
-&nbsp;    @Query(
-&nbsp;        &quot;&quot;&quot;
-&nbsp;        SELECT transactions.* FROM transactions
-&nbsp;        JOIN transactions_fts ON transactions_fts.rowid = transactions.rowid
-&nbsp;        WHERE transactions.workspaceId = :workspaceId
-&nbsp;          AND transactions.deletedAt IS NULL
-&nbsp;          AND transactions_fts MATCH :query
-&nbsp;        ORDER BY transactions.operationDate DESC, transactions.operationAt DESC, transactions.createdAt DESC
-&nbsp;        &quot;&quot;&quot;,
-&nbsp;    )
-&nbsp;    fun searchByText(workspaceId: String, query: String): Flow&lt;List&lt;TransactionEntity&gt;&gt;
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Per-month totals for [categoryIds] within a workspace, for one transaction type.
-&nbsp;     *
-&nbsp;     * Grouped in SQLite rather than in memory: the category detail screen wants six months of
-&nbsp;     * history for a whole subtree, and streaming every matching row up to the domain just to sum
-&nbsp;     * it would scale with transaction volume instead of with the twenty-odd cells it draws.
-&nbsp;     *
-&nbsp;     * The window is compared against `operationDate`, an ISO `YYYY-MM-DD` string, so a plain
-&nbsp;     * string range is a correct date range. Rows predating the column carry `&#39;&#39;`, which sorts
-&nbsp;     * below every real date and is excluded by [fromDate] without a special case.
-&nbsp;     *
-&nbsp;     * [toDateExclusive] is the first day of the month *after* the last month wanted — half-open
-&nbsp;     * so the caller never has to know how long the final month is.
-&nbsp;     *
-&nbsp;     * The transfer, currency and canonical-date terms come from the shared spend predicate
-&nbsp;     * documented over [getSpendByCategory]. This query used to sum transfer legs and add minor
-&nbsp;     * units across currencies, which made the category trend disagree with both the budget screen
-&nbsp;     * and the Insights aggregates for the same month. A null [baseCurrency] — a workspace that
-&nbsp;     * could not be read — matches nothing, exactly as `Budget.counts` does.
-&nbsp;     */
-&nbsp;    @Query(
-&nbsp;        &quot;&quot;&quot;
-&nbsp;        SELECT
-&nbsp;            transactions.categoryId AS categoryId,
-&nbsp;            substr(transactions.operationDate, 1, 7) AS month,
-&nbsp;            SUM(ABS(transactions.amount)) AS totalMinor,
-&nbsp;            COUNT(*) AS transactionCount
-&nbsp;        FROM transactions
-&nbsp;        WHERE transactions.workspaceId = :workspaceId
-&nbsp;            AND transactions.categoryId IN (:categoryIds)
-&nbsp;            AND transactions.type = :type
-&nbsp;            AND transactions.status = &#39;ACTUAL&#39;
-&nbsp;            AND transactions.transferId IS NULL
-&nbsp;            AND transactions.currencyCode = :baseCurrency
-&nbsp;            AND transactions.operationDate = date(transactions.operationDate)
-&nbsp;            AND transactions.operationDate &gt;= :fromDate
-&nbsp;            AND transactions.operationDate &lt; :toDateExclusive
-&nbsp;            AND transactions.deletedAt IS NULL
-&nbsp;        GROUP BY transactions.categoryId, month
-&nbsp;        &quot;&quot;&quot;,
-&nbsp;    )
-&nbsp;    fun getMonthlyTotalsByCategory(
+&nbsp;    suspend fun findJoinableInviteId(
 &nbsp;        workspaceId: String,
-&nbsp;        categoryIds: List&lt;String&gt;,
-&nbsp;        type: String,
-&nbsp;        baseCurrency: String?,
-&nbsp;        fromDate: String,
-&nbsp;        toDateExclusive: String,
-&nbsp;    ): Flow&lt;List&lt;CategoryMonthlyTotalEntity&gt;&gt;
-&nbsp;
-&nbsp;    // region Spend aggregates
-&nbsp;    //
-&nbsp;    // The five queries below back SpendAnalyticsRepository, and all of them apply the same
-&nbsp;    // predicate — the one budgets already use. Written out once here so a sixth query cannot
-&nbsp;    // quietly drift from it; Room needs the SQL inline, so the copies are deliberate:
-&nbsp;    //
-&nbsp;    //   WHERE workspaceId = :workspaceId
-&nbsp;    //     AND type = &#39;EXPENSE&#39; AND status = &#39;ACTUAL&#39;
-&nbsp;    //     AND transferId IS NULL
-&nbsp;    //     AND currencyCode = :baseCurrency
-&nbsp;    //     AND operationDate = date(operationDate)
-&nbsp;    //     AND operationDate &gt;= :fromDate AND operationDate &lt; :toDateExclusive
-&nbsp;    //     AND deletedAt IS NULL
-&nbsp;    //
-&nbsp;    // Term by term:
-&nbsp;    //
-&nbsp;    // - `type = &#39;EXPENSE&#39;` — the stored spelling, not the parsed one. The legacy `REGULAR` type
-&nbsp;    //   that `TransactionRepositoryImpl.parseType` resolves by sign is not counted here, matching
-&nbsp;    //   getMonthlyTotalsByCategory; a device still holding such rows sees them nowhere in
-&nbsp;    //   Insights. getNetTotalsByMonth widens this term to `IN (&#39;EXPENSE&#39;, &#39;INCOME&#39;)` because it
-&nbsp;    //   needs both sides, and splits them again by grouping on the column.
-&nbsp;    // - `transferId IS NULL` — transfer legs carry a CategoryType.TRANSFER category, so filtering
-&nbsp;    //   by category type would not catch them.
-&nbsp;    // - `currencyCode = :baseCurrency` — v1 converts nothing; getSpendByExcludedCurrency reports
-&nbsp;    //   what this term left behind. A null base currency matches no row.
-&nbsp;    // - Bounds are nullable so an all-time window needs no second query shape, half-open at the
-&nbsp;    //   top so the caller never has to know how long the final month is.
-&nbsp;    // - `operationDate = date(operationDate)` admits only the canonical `YYYY-MM-DD` spelling.
-&nbsp;    //   SQLite&#39;s `date()` returns NULL for text it cannot read and a normalized date for text it
-&nbsp;    //   can, so the comparison rejects `&#39;&#39;`, `&#39;2025-3-5&#39;`, `&#39;2025-03-05T10:00&#39;` and a Julian day
-&nbsp;    //   number alike — every string `LocalDate.parse` would also refuse. Without it the month and
-&nbsp;    //   day series (which parse) and the category, merchant and currency rollups (which do not)
-&nbsp;    //   disagree by exactly those rows. `&#39;&#39;` is the only spelling seen in the wild, from before
-&nbsp;    //   the column existed, and MIGRATION_27_28 already backfilled it; the rest is a guard against
-&nbsp;    //   an older or foreign writer. A bounded window mostly excludes these by string comparison
-&nbsp;    //   anyway — this makes it true for every window, which is the point of one shared predicate.
-&nbsp;    // - `deletedAt IS NULL` — a tombstoned row is spent money the user took back; Insights must
-&nbsp;    //   agree with the list it was opened from (issue #346).
-&nbsp;    //
-&nbsp;    // The composite `(workspaceId, operationDate DESC, operationAt DESC, createdAt DESC)` index
-&nbsp;    // covers all five. `merchant` is unindexed, so getTopMerchants scans the window — acceptable
-&nbsp;    // while the window is bounded.
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Spend per category inside the window, largest first. `categoryId` comes back null for the
-&nbsp;     * uncategorized bucket, which is a slice of the result rather than a gap in it.
-&nbsp;     */
-&nbsp;    @Query(
-&nbsp;        &quot;&quot;&quot;
-&nbsp;        SELECT
-&nbsp;            transactions.categoryId AS categoryId,
-&nbsp;            SUM(ABS(transactions.amount)) AS totalMinor,
-&nbsp;            COUNT(*) AS transactionCount
-&nbsp;        FROM transactions
-&nbsp;        WHERE transactions.workspaceId = :workspaceId
-&nbsp;            AND transactions.type = &#39;EXPENSE&#39;
-&nbsp;            AND transactions.status = &#39;ACTUAL&#39;
-&nbsp;            AND transactions.transferId IS NULL
-&nbsp;            AND transactions.currencyCode = :baseCurrency
-&nbsp;            AND transactions.operationDate = date(transactions.operationDate)
-&nbsp;            AND (:fromDate IS NULL OR transactions.operationDate &gt;= :fromDate)
-&nbsp;            AND (:toDateExclusive IS NULL OR transactions.operationDate &lt; :toDateExclusive)
-&nbsp;            AND transactions.deletedAt IS NULL
-&nbsp;        GROUP BY transactions.categoryId
-&nbsp;        ORDER BY totalMinor DESC, transactions.categoryId ASC
-&nbsp;        &quot;&quot;&quot;,
-&nbsp;    )
-&nbsp;    fun getSpendByCategory(
-&nbsp;        workspaceId: String,
-&nbsp;        baseCurrency: String,
-&nbsp;        fromDate: String?,
-&nbsp;        toDateExclusive: String?,
-&nbsp;    ): Flow&lt;List&lt;CategorySpendSliceEntity&gt;&gt;
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Per-month, per-type magnitudes inside the window, oldest month first — the income-vs-expense
-&nbsp;     * trend.
-&nbsp;     *
-&nbsp;     * The one aggregate that widens the type term instead of dropping it: income belongs in the
-&nbsp;     * trend, an opening balance is an account artefact and would otherwise conjure up a month out
-&nbsp;     * of nothing but the day an account was opened. Grouping by type in SQL rather than summing
-&nbsp;     * signed amounts keeps both sides available — a month&#39;s net is a subtraction the caller can
-&nbsp;     * make, but a net stored as one number cannot be split back apart.
-&nbsp;     */
-&nbsp;    @Query(
-&nbsp;        &quot;&quot;&quot;
-&nbsp;        SELECT
-&nbsp;            substr(transactions.operationDate, 1, 7) AS month,
-&nbsp;            transactions.type AS type,
-&nbsp;            SUM(ABS(transactions.amount)) AS totalMinor
-&nbsp;        FROM transactions
-&nbsp;        WHERE transactions.workspaceId = :workspaceId
-&nbsp;            AND transactions.type IN (&#39;EXPENSE&#39;, &#39;INCOME&#39;)
-&nbsp;            AND transactions.status = &#39;ACTUAL&#39;
-&nbsp;            AND transactions.transferId IS NULL
-&nbsp;            AND transactions.currencyCode = :baseCurrency
-&nbsp;            AND transactions.operationDate = date(transactions.operationDate)
-&nbsp;            AND (:fromDate IS NULL OR transactions.operationDate &gt;= :fromDate)
-&nbsp;            AND (:toDateExclusive IS NULL OR transactions.operationDate &lt; :toDateExclusive)
-&nbsp;            AND transactions.deletedAt IS NULL
-&nbsp;        GROUP BY month, transactions.type
-&nbsp;        ORDER BY month ASC
-&nbsp;        &quot;&quot;&quot;,
-&nbsp;    )
-&nbsp;    fun getNetTotalsByMonth(
-&nbsp;        workspaceId: String,
-&nbsp;        baseCurrency: String,
-&nbsp;        fromDate: String?,
-&nbsp;        toDateExclusive: String?,
-&nbsp;    ): Flow&lt;List&lt;MonthlyTypeTotalEntity&gt;&gt;
-&nbsp;
-&nbsp;    /** Spend per business date inside the window, oldest first. Days without spend are absent. */
-&nbsp;    @Query(
-&nbsp;        &quot;&quot;&quot;
-&nbsp;        SELECT
-&nbsp;            transactions.operationDate AS operationDate,
-&nbsp;            SUM(ABS(transactions.amount)) AS totalMinor
-&nbsp;        FROM transactions
-&nbsp;        WHERE transactions.workspaceId = :workspaceId
-&nbsp;            AND transactions.type = &#39;EXPENSE&#39;
-&nbsp;            AND transactions.status = &#39;ACTUAL&#39;
-&nbsp;            AND transactions.transferId IS NULL
-&nbsp;            AND transactions.currencyCode = :baseCurrency
-&nbsp;            AND transactions.operationDate = date(transactions.operationDate)
-&nbsp;            AND (:fromDate IS NULL OR transactions.operationDate &gt;= :fromDate)
-&nbsp;            AND (:toDateExclusive IS NULL OR transactions.operationDate &lt; :toDateExclusive)
-&nbsp;            AND transactions.deletedAt IS NULL
-&nbsp;        GROUP BY transactions.operationDate
-&nbsp;        ORDER BY transactions.operationDate ASC
-&nbsp;        &quot;&quot;&quot;,
-&nbsp;    )
-&nbsp;    fun getDailySpend(
-&nbsp;        workspaceId: String,
-&nbsp;        baseCurrency: String,
-&nbsp;        fromDate: String?,
-&nbsp;        toDateExclusive: String?,
-&nbsp;    ): Flow&lt;List&lt;DailySpendEntity&gt;&gt;
-&nbsp;
-&nbsp;    /**
-&nbsp;     * The [limit] biggest merchants inside the window, largest first.
-&nbsp;     *
-&nbsp;     * Rows with no merchant are excluded rather than bucketed: the column defaults to `&#39;&#39;`, and an
-&nbsp;     * empty label is not a counterparty the user could act on — it would just be the largest bar
-&nbsp;     * in most workspaces. Uncategorized spend is still reachable through [getSpendByCategory].
-&nbsp;     */
-&nbsp;    @Query(
-&nbsp;        &quot;&quot;&quot;
-&nbsp;        SELECT
-&nbsp;            transactions.merchant AS merchant,
-&nbsp;            SUM(ABS(transactions.amount)) AS totalMinor,
-&nbsp;            COUNT(*) AS transactionCount
-&nbsp;        FROM transactions
-&nbsp;        WHERE transactions.workspaceId = :workspaceId
-&nbsp;            AND transactions.type = &#39;EXPENSE&#39;
-&nbsp;            AND transactions.status = &#39;ACTUAL&#39;
-&nbsp;            AND transactions.transferId IS NULL
-&nbsp;            AND transactions.currencyCode = :baseCurrency
-&nbsp;            AND transactions.merchant &lt;&gt; &#39;&#39;
-&nbsp;            AND transactions.operationDate = date(transactions.operationDate)
-&nbsp;            AND (:fromDate IS NULL OR transactions.operationDate &gt;= :fromDate)
-&nbsp;            AND (:toDateExclusive IS NULL OR transactions.operationDate &lt; :toDateExclusive)
-&nbsp;            AND transactions.deletedAt IS NULL
-&nbsp;        GROUP BY transactions.merchant
-&nbsp;        ORDER BY totalMinor DESC, transactions.merchant ASC
-&nbsp;        LIMIT :limit
-&nbsp;        &quot;&quot;&quot;,
-&nbsp;    )
-&nbsp;    fun getTopMerchants(
-&nbsp;        workspaceId: String,
-&nbsp;        baseCurrency: String,
-&nbsp;        fromDate: String?,
-&nbsp;        toDateExclusive: String?,
-&nbsp;        limit: Int,
-&nbsp;    ): Flow&lt;List&lt;MerchantSpendEntity&gt;&gt;
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Spend the base-currency term left out, per currency, largest first — the inverse of the
-&nbsp;     * other four, so no expense in the window goes unreported.
-&nbsp;     */
-&nbsp;    @Query(
-&nbsp;        &quot;&quot;&quot;
-&nbsp;        SELECT
-&nbsp;            transactions.currencyCode AS currencyCode,
-&nbsp;            SUM(ABS(transactions.amount)) AS totalMinor
-&nbsp;        FROM transactions
-&nbsp;        WHERE transactions.workspaceId = :workspaceId
-&nbsp;            AND transactions.type = &#39;EXPENSE&#39;
-&nbsp;            AND transactions.status = &#39;ACTUAL&#39;
-&nbsp;            AND transactions.transferId IS NULL
-&nbsp;            AND transactions.currencyCode &lt;&gt; :baseCurrency
-&nbsp;            AND transactions.operationDate = date(transactions.operationDate)
-&nbsp;            AND (:fromDate IS NULL OR transactions.operationDate &gt;= :fromDate)
-&nbsp;            AND (:toDateExclusive IS NULL OR transactions.operationDate &lt; :toDateExclusive)
-&nbsp;            AND transactions.deletedAt IS NULL
-&nbsp;        GROUP BY transactions.currencyCode
-&nbsp;        ORDER BY totalMinor DESC, transactions.currencyCode ASC
-&nbsp;        &quot;&quot;&quot;,
-&nbsp;    )
-&nbsp;    fun getSpendByExcludedCurrency(
-&nbsp;        workspaceId: String,
-&nbsp;        baseCurrency: String,
-&nbsp;        fromDate: String?,
-&nbsp;        toDateExclusive: String?,
-&nbsp;    ): Flow&lt;List&lt;CurrencySpendEntity&gt;&gt;
-&nbsp;    // endregion
+&nbsp;        userId: String,
+&nbsp;        email: String?,
+&nbsp;    ): String?
 &nbsp;
 &nbsp;    @Insert
-&nbsp;    suspend fun insert(entity: TransactionEntity)
+&nbsp;    suspend fun insert(entity: WorkspaceInviteEntity)
 &nbsp;
 &nbsp;    @Insert
-&nbsp;    suspend fun insertAll(entities: List&lt;TransactionEntity&gt;)
+&nbsp;    suspend fun insertAll(entities: List&lt;WorkspaceInviteEntity&gt;)
 &nbsp;
 &nbsp;    @Update
-&nbsp;    suspend fun update(entity: TransactionEntity)
+&nbsp;    suspend fun update(entity: WorkspaceInviteEntity)
 &nbsp;
 &nbsp;    @Upsert
-&nbsp;    suspend fun upsertAll(entities: List&lt;TransactionEntity&gt;)
+&nbsp;    suspend fun upsert(entity: WorkspaceInviteEntity)
 &nbsp;
-&nbsp;    /**
-&nbsp;     * Marks the row deleted, returning `1` when it did and `0` when it did not — the row is
-&nbsp;     * missing, or someone already tombstoned it.
-&nbsp;     *
-&nbsp;     * `deletedAt IS NULL` in the WHERE clause is what makes a second delete a no-op rather than a
-&nbsp;     * second outbox mutation and a second balance refund, and the returned count is how the caller
-&nbsp;     * tells the two apart.
-&nbsp;     *
-&nbsp;     * `updatedAt` moves with `deletedAt` deliberately: it is the field last-writer-wins compares,
-&nbsp;     * so a delete has to look newer than the edit it supersedes or a peer&#39;s older doc would
-&nbsp;     * resurrect the row on the next pull.
-&nbsp;     */
-&nbsp;    @Query(
-&nbsp;        &quot;&quot;&quot;
-&nbsp;        UPDATE transactions SET deletedAt = :deletedAt, updatedAt = :deletedAt
-&nbsp;        WHERE id = :id AND deletedAt IS NULL
-&nbsp;        &quot;&quot;&quot;,
-&nbsp;    )
-&nbsp;    suspend fun softDelete(id: String, deletedAt: Long): Int
+&nbsp;    @Query(&quot;DELETE FROM workspace_invites WHERE id = :id&quot;)
+&nbsp;    suspend fun delete(id: String)
 &nbsp;
-&nbsp;    /**
-&nbsp;     * Lifts the tombstone, returning `1` when it did and `0` when there was none to lift.
-&nbsp;     *
-&nbsp;     * This is the whole of Undo on the storage side: the row never left, so nothing is re-inserted
-&nbsp;     * and the id, the createdAt and every field the user typed come back exactly as they were. The
-&nbsp;     * `deletedAt IS NOT NULL` guard makes a repeated Undo — two Snackbars racing, a restore that
-&nbsp;     * crossed a pulled restore — refund the balance once rather than once per attempt.
-&nbsp;     */
-&nbsp;    @Query(&quot;UPDATE transactions SET deletedAt = NULL, updatedAt = :updatedAt WHERE id = :id AND deletedAt IS NOT NULL&quot;)
-&nbsp;    suspend fun restore(id: String, updatedAt: Long): Int
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Drops tombstones older than [threshold] for good, returning how many rows went. The
-&nbsp;     * retention policy that calls it lives in `PurgeDeletedTransactionsUseCase`.
-&nbsp;     */
-&nbsp;    @Query(&quot;DELETE FROM transactions WHERE deletedAt IS NOT NULL AND deletedAt &lt; :threshold&quot;)
-&nbsp;    suspend fun purgeDeletedBefore(threshold: Long): Int
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Hard-deletes every row of an account, tombstoned or not — the account-removal cascade, which
-&nbsp;     * is a different operation from a user deleting one transaction. Accounts still hard-delete
-&nbsp;     * (issue #346 converts transactions only), so keeping their transactions as tombstones would
-&nbsp;     * strand rows pointing at an account that no longer exists.
-&nbsp;     */
-&nbsp;    @Query(&quot;DELETE FROM transactions WHERE accountId = :accountId&quot;)
-&nbsp;    suspend fun deleteByAccountId(accountId: String)
-&nbsp;
-&nbsp;    // Tombstoned rows are included on purpose: the categories FK has no cascade, so a soft-deleted
-&nbsp;    // row still holding a deleted category&#39;s id would block that delete outright — and would come
-&nbsp;    // back from an Undo pointing at a category that no longer exists.
-&nbsp;    @Query(&quot;UPDATE transactions SET categoryId = NULL WHERE categoryId = :categoryId&quot;)
-&nbsp;    suspend fun nullifyCategoryId(categoryId: String)
-&nbsp;
-&nbsp;    @Query(&quot;DELETE FROM transactions&quot;)
+&nbsp;    @Query(&quot;DELETE FROM workspace_invites&quot;)
 &nbsp;    suspend fun deleteAll()
 &nbsp;}
 </code>
@@ -619,7 +135,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 12:48</div>
+    <div style="float:right;">generated on 2026-07-29 13:37</div>
 </div>
 </body>
 </html>

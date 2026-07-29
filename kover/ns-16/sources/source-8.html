@@ -152,9 +152,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.sync.plugin
 &nbsp;
+&nbsp;import com.georgeci.moneysurfer.data.sync.WorkspaceDocRef
+&nbsp;import com.georgeci.moneysurfer.data.sync.WorkspaceDocumentWriter
+&nbsp;import com.georgeci.moneysurfer.sync.repository.MutationOperation
 &nbsp;import com.georgeci.moneysurfer.sync.repository.PendingMutation
-&nbsp;import dev.gitlive.firebase.firestore.DocumentReference
 &nbsp;import kotlinx.serialization.Serializable
+&nbsp;import kotlinx.serialization.SerializationStrategy
 &nbsp;
 &nbsp;/**
 &nbsp; * Wire-format patch pushed for [com.georgeci.moneysurfer.sync.repository.MutationOperation.DELETE].
@@ -167,7 +170,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp; * (see sync-pull-lww.md → Tombstones).
 &nbsp; */
 <b class="pc">&nbsp;@Serializable</b>
-&nbsp;internal data class TombstonePatch(
+&nbsp;data class TombstonePatch(
 <b class="fc">&nbsp;    val deletedAt: Long,</b>
 <b class="fc">&nbsp;    val updatedAt: Long,</b>
 <b class="fc">&nbsp;    val clientVersionCode: Int,</b>
@@ -191,17 +194,36 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;}
 &nbsp;
 &nbsp;/**
-&nbsp; * Writes [patch] onto the remote doc, skipping docs that never reached
-&nbsp; * Firestore: an entity created and deleted between two drains leaves the
-&nbsp; * INSERT push a no-op (its `getById` finds no live row — for transactions
-&nbsp; * because the row is tombstoned, for the rest because it is gone), and
-&nbsp; * updating the missing doc would raise NOT_FOUND on every retry, wedging
-&nbsp; * the batch. A doc that never existed remotely has nothing for peers to
-&nbsp; * forget.
+&nbsp; * The push half every workspace sub-collection plugin shares: an upsert writes whatever [doc]
+&nbsp; * resolves to now, and a delete writes a tombstone patch instead — Firestore rules deny hard
+&nbsp; * deletes.
+&nbsp; *
+&nbsp; * [doc] returning null means the row is no longer there to push. That is the same &quot;created and
+&nbsp; * deleted between two drains&quot; case the tombstone skip covers from the other side, and it must
+&nbsp; * return normally: `UploadPendingChangesUseCaseImpl` treats a push that throws as undelivered and
+&nbsp; * requeues it, which for a row that will never come back is a queue entry that never drains.
 &nbsp; */
-&nbsp;internal suspend fun DocumentReference.pushTombstone(patch: TombstonePatch) {
-&nbsp;    if (!get().exists) return
-&nbsp;    update(patch)
+&nbsp;internal suspend fun &lt;T : Any&gt; WorkspaceDocumentWriter.pushToCollection(
+&nbsp;    mutation: PendingMutation,
+&nbsp;    collectionName: String,
+&nbsp;    clientVersionCode: Int,
+&nbsp;    strategy: SerializationStrategy&lt;T&gt;,
+&nbsp;    doc: suspend (WorkspaceDocRef) -&gt; T?,
+&nbsp;) {
+&nbsp;    val ref = WorkspaceDocRef.inCollection(
+&nbsp;        workspaceId = requireNotNull(mutation.scopeKey) {
+&nbsp;            &quot;$collectionName mutation ${mutation.entityId} has no workspace scope&quot;
+&nbsp;        },
+&nbsp;        collectionName = collectionName,
+&nbsp;        documentId = mutation.entityId,
+&nbsp;    )
+&nbsp;    when (mutation.operation) {
+&nbsp;        MutationOperation.INSERT,
+&nbsp;        MutationOperation.UPDATE,
+&nbsp;        -&gt; doc(ref)?.let { set(ref, strategy, it) }
+&nbsp;        MutationOperation.DELETE -&gt;
+&nbsp;            tombstone(ref, tombstonePatchFor(mutation, clientVersionCode))
+&nbsp;    }
 &nbsp;}
 </code>
 </pre>
@@ -226,7 +248,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 12:48</div>
+    <div style="float:right;">generated on 2026-07-29 13:37</div>
 </div>
 </body>
 </html>

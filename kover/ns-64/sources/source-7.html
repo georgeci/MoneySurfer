@@ -52,42 +52,42 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   <td class="name">AppNavigator</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/6)
+    (6/6)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/6)
+    (6/6)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/12)
+    (12/12)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/60)
+    (60/60)
   </span>
 </td>
 </tr>
@@ -104,15 +104,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import androidx.navigation3.runtime.NavBackStack
 &nbsp;import androidx.navigation3.runtime.NavKey
 &nbsp;
-<b class="nc">&nbsp;class AppNavigator internal constructor(</b>
-<b class="nc">&nbsp;    private val backStack: NavBackStack&lt;NavKey&gt;,</b>
+<b class="fc">&nbsp;class AppNavigator internal constructor(</b>
+<b class="fc">&nbsp;    private val backStack: NavBackStack&lt;NavKey&gt;,</b>
 &nbsp;) {
 &nbsp;    fun push(route: Route) {
-<b class="nc">&nbsp;        backStack.add(route)</b>
+<b class="fc">&nbsp;        backStack.add(route)</b>
 &nbsp;    }
 &nbsp;
 &nbsp;    fun pop() {
-<b class="nc">&nbsp;        backStack.removeLastOrNull()</b>
+<b class="fc">&nbsp;        backStack.removeLastOrNull()</b>
 &nbsp;    }
 &nbsp;
 &nbsp;    /**
@@ -123,22 +123,22 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;     * Never empties the stack: with nothing on it there is no destination left to render.
 &nbsp;     */
 &nbsp;    fun pop(count: Int) {
-<b class="nc">&nbsp;        repeat(count) {</b>
-<b class="nc">&nbsp;            if (backStack.size &lt;= 1) return</b>
-<b class="nc">&nbsp;            backStack.removeLastOrNull()</b>
-<b class="nc">&nbsp;        }</b>
+<b class="fc">&nbsp;        repeat(count) {</b>
+<b class="fc">&nbsp;            if (backStack.size &lt;= 1) return</b>
+<b class="fc">&nbsp;            backStack.removeLastOrNull()</b>
+<b class="fc">&nbsp;        }</b>
 &nbsp;    }
 &nbsp;
 &nbsp;    fun replaceTop(route: Route) {
-<b class="nc">&nbsp;        backStack.removeLastOrNull()</b>
-<b class="nc">&nbsp;        backStack.add(route)</b>
+<b class="fc">&nbsp;        backStack.removeLastOrNull()</b>
+<b class="fc">&nbsp;        backStack.add(route)</b>
 &nbsp;    }
 &nbsp;
 &nbsp;    fun resetTo(route: Route) {
-<b class="nc">&nbsp;        while (backStack.removeLastOrNull() != null) {</b>
+<b class="fc">&nbsp;        while (backStack.removeLastOrNull() != null) {</b>
 &nbsp;            // clear backstack before bootstrapping target route
 &nbsp;        }
-<b class="nc">&nbsp;        backStack.add(route)</b>
+<b class="fc">&nbsp;        backStack.add(route)</b>
 &nbsp;    }
 &nbsp;}
 </code>
@@ -164,7 +164,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 12:48</div>
+    <div style="float:right;">generated on 2026-07-29 13:37</div>
 </div>
 </body>
 </html>

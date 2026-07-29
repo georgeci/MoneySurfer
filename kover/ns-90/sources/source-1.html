@@ -60,34 +60,34 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    66.7%
+    100%
   </span>
   <span class="absValue">
-    (2/3)
+    (3/3)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    66.7%
+    100%
   </span>
   <span class="absValue">
-    (12/18)
+    (18/18)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    50%
+    100%
   </span>
   <span class="absValue">
-    (7/14)
+    (14/14)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    75.4%
+    100%
   </span>
   <span class="absValue">
-    (86/114)
+    (114/114)
   </span>
 </td>
 </tr>
@@ -107,18 +107,18 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;object AmountInputTransformation : InputTransformation {
 &nbsp;
 &nbsp;    override fun TextFieldBuffer.transformInput() {
-<b class="nc">&nbsp;        val text = asCharSequence().toString()</b>
+<b class="fc">&nbsp;        val text = asCharSequence().toString()</b>
 &nbsp;
-<b class="nc">&nbsp;        if (text.isEmpty()) return</b>
+<b class="fc">&nbsp;        if (text.isEmpty()) return</b>
 &nbsp;
-<b class="nc">&nbsp;        val result = validateAndNormalize(text)</b>
-<b class="nc">&nbsp;        if (result == null) {</b>
-<b class="nc">&nbsp;            revertAllChanges()</b>
+<b class="fc">&nbsp;        val result = validateAndNormalize(text)</b>
+<b class="fc">&nbsp;        if (result == null) {</b>
+<b class="fc">&nbsp;            revertAllChanges()</b>
 &nbsp;            return
 &nbsp;        }
 &nbsp;
-<b class="nc">&nbsp;        if (result != text) {</b>
-<b class="nc">&nbsp;            replace(0, length, result)</b>
+<b class="fc">&nbsp;        if (result != text) {</b>
+<b class="fc">&nbsp;            replace(0, length, result)</b>
 &nbsp;        }
 &nbsp;    }
 &nbsp;
@@ -168,7 +168,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 12:48</div>
+    <div style="float:right;">generated on 2026-07-29 13:37</div>
 </div>
 </body>
 </html>

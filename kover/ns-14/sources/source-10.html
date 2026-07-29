@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > LocalDataResetRepositoryImpl</title>
+  <title>MoneySurfer Coverage Report > NoOpCrashReporter</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,12 +22,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.data.repository</a>
 </div>
 
-<h1>Coverage Summary for Class: LocalDataResetRepositoryImpl (com.georgeci.moneysurfer.data.repository)</h1>
+<h1>Coverage Summary for Class: NoOpCrashReporter (com.georgeci.moneysurfer.data.repository)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -46,21 +49,13 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">LocalDataResetRepositoryImpl</td>
+  <td class="name">NoOpCrashReporter</td>
 <td class="coverageStat">
   <span class="percent">
     100%
   </span>
   <span class="absValue">
-    (4/4)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    87.5%
-  </span>
-  <span class="absValue">
-    (7/8)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
@@ -68,24 +63,18 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (25/25)
+    (7/7)
   </span>
 </td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (236/236)
-  </span>
-</td>
-</tr>
-  <tr>
-    <td class="name">LocalDataResetRepositoryImpl$clearAll$1</td>
     <td class="coverageStat"/>
-  </tr>
-<tr>
-  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (7/7)
+  </span>
+</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -94,31 +83,8 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     (4/4)
   </span>
 </td>
-<td class="coverageStat">
-  <span class="percent">
-    87.5%
-  </span>
-  <span class="absValue">
-    (7/8)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (25/25)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (236/236)
-  </span>
-</td>
 </tr>
+
 </table>
 
 <br/>
@@ -128,83 +94,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.repository
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.appconfig.ConfigKey
-&nbsp;import com.georgeci.moneysurfer.appconfig.ConfigKeyGroup
-&nbsp;import com.georgeci.moneysurfer.appconfig.LayerValue
-&nbsp;import com.georgeci.moneysurfer.appconfig.LocalConfigSource
-&nbsp;import com.georgeci.moneysurfer.appconfig.SessionConfigOverlay
-&nbsp;import com.georgeci.moneysurfer.appconfig.SettingKey
-&nbsp;import com.georgeci.moneysurfer.data.db.MoneySurferDatabase
-&nbsp;import com.georgeci.moneysurfer.domain.repositories.LocalDataResetRepository
-&nbsp;import org.koin.core.annotation.Single
+&nbsp;import com.georgeci.moneysurfer.domain.telemetry.CrashReporter
 &nbsp;
-&nbsp;/**
-&nbsp; * Takes the database rather than one DAO per table — the parameter list grew
-&nbsp; * with every new table and bought nothing, since this class only ever fans out
-&nbsp; * `deleteAll()`.
-&nbsp; *
-&nbsp; * The configuration arguments are the exception: synced settings are account data and are wiped
-&nbsp; * here with everything else, but the *running UI* must not notice, so their current values are
-&nbsp; * lifted into the in-memory overlay on the way out.
-&nbsp; */
-<b class="fc">&nbsp;@Single(binds = [LocalDataResetRepository::class])</b>
-&nbsp;class LocalDataResetRepositoryImpl(
-<b class="fc">&nbsp;    private val database: MoneySurferDatabase,</b>
-<b class="fc">&nbsp;    private val localConfig: LocalConfigSource,</b>
-<b class="fc">&nbsp;    private val overlay: SessionConfigOverlay,</b>
-<b class="fc">&nbsp;    private val keyGroups: List&lt;ConfigKeyGroup&gt;,</b>
-&nbsp;) : LocalDataResetRepository {
-&nbsp;
-&nbsp;    // FK-safe order: leaf tables first, then parents.
-&nbsp;    override suspend fun clearAll() {
-<b class="fc">&nbsp;        database.goalContributionDao().deleteAll()</b>
-<b class="fc">&nbsp;        database.goalDao().deleteAll()</b>
-<b class="fc">&nbsp;        database.recurringRuleDao().deleteAll()</b>
-<b class="fc">&nbsp;        database.budgetDao().deleteAll()</b>
-<b class="fc">&nbsp;        database.transactionDao().deleteAll()</b>
-<b class="fc">&nbsp;        database.accountDao().deleteAll()</b>
-<b class="fc">&nbsp;        database.categoryDao().deleteAll()</b>
-<b class="fc">&nbsp;        database.workspaceInviteDao().deleteAll()</b>
-<b class="fc">&nbsp;        database.workspaceMemberDao().deleteAll()</b>
-<b class="fc">&nbsp;        database.workspaceDao().deleteAll()</b>
-<b class="fc">&nbsp;        database.userDao().deleteAll()</b>
-&nbsp;        // Not user data — public FX quotes — but &quot;reset local data&quot; should leave no rows behind,
-&nbsp;        // and the cost of forgetting them is a single refetch on the next dashboard open.
-<b class="fc">&nbsp;        database.exchangeRateDao().deleteAll()</b>
-&nbsp;        // Synced settings are account data. Without this the next user on the device inherits the
-&nbsp;        // previous one&#39;s theme *and* wins every LWW comparison against their own remote documents
-&nbsp;        // (the local row is newer), so their real settings would never be pulled and never pushed.
-&nbsp;        //
-&nbsp;        // Through the config layer rather than `database.configEntryDao()`, unlike every line
-&nbsp;        // above: the layer keeps an in-memory snapshot behind its synchronous `peek`, refreshed
-&nbsp;        // only by Room&#39;s invalidation through a cold flow with no collector of its own. Deleting
-&nbsp;        // the rows underneath it would leave `peek` serving this account&#39;s values until something
-&nbsp;        // else happened to observe a setting — and the session overlay is cleared at the next
-&nbsp;        // sign-in, so the new user would then see them.
-<b class="fc">&nbsp;        holdSyncedSettingsInMemory()</b>
-<b class="fc">&nbsp;        localConfig.clearSynced()</b>
-&nbsp;    }
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Copies the values about to be deleted into the overlay, so the screen the user is looking at
-&nbsp;     * keeps its theme, palette and container style instead of flashing back to defaults the moment
-&nbsp;     * they tap &quot;log out&quot;. Nothing persists them, and `SyncedSettingsSession.onSessionStart()` drops
-&nbsp;     * them before the next session&#39;s pull.
-&nbsp;     *
-&nbsp;     * Reads through `peek`, so it holds exactly what the Local layer holds: a key the user never set
-&nbsp;     * is absent and stays absent, which keeps the overlay from materialising defaults that would
-&nbsp;     * then outrank the next user&#39;s pulled values.
-&nbsp;     */
-&nbsp;    private fun holdSyncedSettingsInMemory() {
-<b class="fc">&nbsp;        val held = keyGroups</b>
-<b class="fc">&nbsp;            .flatMap { it.keys }</b>
-<b class="pc">&nbsp;            .filter { it is SettingKey &amp;&amp; it.sync }</b>
-<b class="fc">&nbsp;            .mapNotNull { key -&gt; key.encodedLocalValue()?.let { key.name to it } }</b>
-<b class="fc">&nbsp;        overlay.hold(held.toMap())</b>
-&nbsp;    }
-&nbsp;
-&nbsp;    private fun &lt;T : Any&gt; ConfigKey&lt;T&gt;.encodedLocalValue(): String? =
-<b class="fc">&nbsp;        (localConfig.peek(this) as? LayerValue.Present)?.let { codec.encode(it.value) }</b>
+<b class="fc">&nbsp;class NoOpCrashReporter : CrashReporter {</b>
+<b class="fc">&nbsp;    override fun log(message: String) = Unit</b>
+<b class="fc">&nbsp;    override fun record(error: Throwable) = Unit</b>
+<b class="fc">&nbsp;    override fun setUserId(userId: String?) = Unit</b>
+<b class="fc">&nbsp;    override fun setKey(key: String, value: String) = Unit</b>
+<b class="fc">&nbsp;    override fun setKey(key: String, value: Boolean) = Unit</b>
+<b class="fc">&nbsp;    override fun setCollectionEnabled(enabled: Boolean) = Unit</b>
 &nbsp;}
 </code>
 </pre>
@@ -229,7 +127,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 12:48</div>
+    <div style="float:right;">generated on 2026-07-29 13:37</div>
 </div>
 </body>
 </html>

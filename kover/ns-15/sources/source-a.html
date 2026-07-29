@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SyncCoordinatorWorkspaceSyncer</title>
+  <title>MoneySurfer Coverage Report > RecurringRuleDtoMappersKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,12 +22,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.data.sync</a>
 </div>
 
-<h1>Coverage Summary for Class: SyncCoordinatorWorkspaceSyncer (com.georgeci.moneysurfer.data.sync)</h1>
+<h1>Coverage Summary for Class: RecurringRuleDtoMappersKt (com.georgeci.moneysurfer.data.sync)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -46,87 +49,49 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SyncCoordinatorWorkspaceSyncer</td>
+  <td class="name">RecurringRuleDtoMappersKt</td>
 <td class="coverageStat">
   <span class="percent">
-    80%
+    100%
   </span>
   <span class="absValue">
-    (4/5)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    25%
+    100%
   </span>
   <span class="absValue">
-    (5/20)
+    (5/5)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    46.2%
+    100%
   </span>
   <span class="absValue">
-    (12/26)
+    (14/14)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    45%
+    100%
   </span>
   <span class="absValue">
-    (103/229)
-  </span>
-</td>
-</tr>
-  <tr>
-    <td class="name">SyncCoordinatorWorkspaceSyncer$pushAll$1</td>
-    <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">SyncCoordinatorWorkspaceSyncer$syncAll$1</td>
-    <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">SyncCoordinatorWorkspaceSyncer$syncWorkspace$1</td>
-    <td class="coverageStat"/>
-  </tr>
-<tr>
-  <td class="name"><strong>Total</strong></td>
-<td class="coverageStat">
-  <span class="percent">
-    80%
-  </span>
-  <span class="absValue">
-    (4/5)
+    (40/40)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    25%
+    100%
   </span>
   <span class="absValue">
-    (5/20)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    46.2%
-  </span>
-  <span class="absValue">
-    (12/26)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    45%
-  </span>
-  <span class="absValue">
-    (103/229)
+    (290/290)
   </span>
 </td>
 </tr>
+
 </table>
 
 <br/>
@@ -136,79 +101,87 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.sync
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.auth.SessionMutator
-&nbsp;import com.georgeci.moneysurfer.domain.config.SyncSettings
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
-&nbsp;import com.georgeci.moneysurfer.domain.repositories.WorkspaceSyncer
-&nbsp;import com.georgeci.moneysurfer.sync.api.SyncError
-&nbsp;import com.georgeci.moneysurfer.sync.api.SyncReason
-&nbsp;import com.georgeci.moneysurfer.sync.coordinator.SyncCoordinator
-&nbsp;import kotlinx.coroutines.flow.first
-&nbsp;import org.koin.core.annotation.Single
+&nbsp;import com.georgeci.moneysurfer.data.db.entity.RecurringRuleEntity
+&nbsp;import com.georgeci.moneysurfer.data.remote.RecurringRuleDoc
+&nbsp;import com.georgeci.moneysurfer.domain.model.MissingDayPolicy
+&nbsp;import com.georgeci.moneysurfer.domain.model.RecurringFrequency
+&nbsp;import kotlinx.datetime.DayOfWeek
 &nbsp;
 &nbsp;/**
-&nbsp; * [WorkspaceSyncer] implementation that delegates to [SyncCoordinator].
+&nbsp; * Recurring-rule Room ↔ Firestore-DTO mappers. Same contract as the entity mappers in
+&nbsp; * `SyncDtoMappers.kt`, kept in their own file because that one is at its function ceiling.
 &nbsp; *
-&nbsp; * [pushAll] uses [SyncReason.LOCAL_CHANGE] → [SyncScope.UploadOnly]: drains the outbox
-&nbsp; * without a remote workspace-list fetch. Used post-create-workspace where the new workspace
-&nbsp; * and its member row need to land on Firestore before `addWorkspaceRef` is called.
+&nbsp; * The schedule day sets are CSV columns in Room and real lists on the wire — the same
+&nbsp; * conversion the budget mappers make for `categoryIds`. Blank segments are dropped so a
+&nbsp; * legacy `&quot;&quot;` or a trailing comma decodes to an empty list rather than a blank day name.
 &nbsp; *
-&nbsp; * [syncAll] uses [SyncReason.MANUAL] → [SyncScope.AllUserData]: fetches
-&nbsp; * `users/{uid}.workspaceIds` via [UserWorkspacesProvider] and runs a cursor-based pull for
-&nbsp; * every workspace, including ones not yet in the local database.
-&nbsp; *
-&nbsp; * [syncWorkspace] sets the session&#39;s current workspace to the target workspace and
-&nbsp; * uses [SyncReason.SWIPE_REFRESH] → [SyncScope.ActiveWorkspace]: pulls only that workspace.
-&nbsp; * Used after accepting an invite so only the newly joined workspace is hydrated.
+&nbsp; * Both directions normalize the day sets, because a remote doc is untrusted: the Firestore
+&nbsp; * rules gate membership and client version, not field shape, so any co-member&#39;s client can
+&nbsp; * write `&quot;MONDAY &quot;` or day `32`. Those survive the wire type check but not
+&nbsp; * [com.georgeci.moneysurfer.data.repository.RecurringRuleRepositoryImpl]&#39;s parse, which
+&nbsp; * matches exact enum names and would silently drop the day — a rule that renders with the
+&nbsp; * wrong cadence rather than failing visibly. Normalizing here keeps the bad segment out of
+&nbsp; * Room in the first place.
 &nbsp; */
-<b class="fc">&nbsp;@Single(binds = [WorkspaceSyncer::class])</b>
-&nbsp;class SyncCoordinatorWorkspaceSyncer(
-<b class="fc">&nbsp;    private val syncCoordinator: SyncCoordinator,</b>
-<b class="fc">&nbsp;    private val sessionMutator: SessionMutator,</b>
-<b class="fc">&nbsp;    private val syncSettings: SyncSettings,</b>
-&nbsp;) : WorkspaceSyncer {
+<b class="fc">&nbsp;fun RecurringRuleEntity.toDoc(): RecurringRuleDoc = RecurringRuleDoc(</b>
+<b class="fc">&nbsp;    title = title,</b>
+<b class="fc">&nbsp;    amount = amount,</b>
+<b class="fc">&nbsp;    categoryId = categoryId,</b>
+<b class="fc">&nbsp;    scheduleFrequency = scheduleFrequency,</b>
+<b class="fc">&nbsp;    scheduleInterval = scheduleInterval,</b>
+<b class="fc">&nbsp;    scheduleDaysOfWeek = scheduleDaysOfWeek.split(&#39;,&#39;).toDayOfWeekNames(),</b>
+<b class="fc">&nbsp;    scheduleDaysOfMonth = scheduleDaysOfMonth.split(&#39;,&#39;).toDaysOfMonth(),</b>
+<b class="fc">&nbsp;    scheduleMissingDayPolicy = scheduleMissingDayPolicy,</b>
+<b class="fc">&nbsp;    startDate = startDate,</b>
+<b class="fc">&nbsp;    nextRunAt = nextRunAt,</b>
+<b class="fc">&nbsp;    autoCreate = autoCreate,</b>
+<b class="fc">&nbsp;    isActive = isActive,</b>
+<b class="fc">&nbsp;    createdAt = createdAt,</b>
+<b class="fc">&nbsp;    updatedAt = updatedAt,</b>
+&nbsp;)
 &nbsp;
-&nbsp;    // When sync is off we want every use-case-driven trigger
-&nbsp;    // (PostAuthBootstrap, CreateWorkspace, AcceptInvite, RefreshIncomingInvites)
-&nbsp;    // to no-op instead of hitting Firestore. Gating at the syncer keeps the
-&nbsp;    // use cases agnostic of the setting.
+&nbsp;fun RecurringRuleDoc.toEntity(id: String, workspaceId: String): RecurringRuleEntity =
+<b class="fc">&nbsp;    RecurringRuleEntity(</b>
+<b class="fc">&nbsp;        id = id,</b>
+<b class="fc">&nbsp;        workspaceId = workspaceId,</b>
+<b class="fc">&nbsp;        title = title,</b>
+<b class="fc">&nbsp;        amount = amount,</b>
+<b class="fc">&nbsp;        categoryId = categoryId,</b>
+&nbsp;        // A legacy/partial doc may omit the enum names; blank stores an unparseable value,
+&nbsp;        // so fall back to the same defaults RecurringRuleRepositoryImpl parses to.
+<b class="fc">&nbsp;        scheduleFrequency = scheduleFrequency.ifBlank { RecurringFrequency.MONTHLY.name },</b>
+<b class="fc">&nbsp;        scheduleInterval = scheduleInterval,</b>
+<b class="fc">&nbsp;        scheduleDaysOfWeek = scheduleDaysOfWeek.toDayOfWeekNames().joinToString(&quot;,&quot;),</b>
+<b class="fc">&nbsp;        scheduleDaysOfMonth = scheduleDaysOfMonth</b>
+<b class="fc">&nbsp;            .filter { it in DAYS_OF_MONTH_RANGE }</b>
+<b class="fc">&nbsp;            .joinToString(&quot;,&quot;),</b>
+<b class="fc">&nbsp;        scheduleMissingDayPolicy = scheduleMissingDayPolicy.ifBlank {</b>
+<b class="fc">&nbsp;            MissingDayPolicy.LAST_DAY_OF_MONTH.name</b>
+&nbsp;        },
+<b class="fc">&nbsp;        startDate = startDate,</b>
+<b class="fc">&nbsp;        nextRunAt = nextRunAt,</b>
+<b class="fc">&nbsp;        autoCreate = autoCreate,</b>
+<b class="fc">&nbsp;        isActive = isActive,</b>
+<b class="fc">&nbsp;        createdAt = createdAt,</b>
+<b class="fc">&nbsp;        updatedAt = updatedAt,</b>
+&nbsp;    )
 &nbsp;
-&nbsp;    override suspend fun pushAll(): Boolean {
-<b class="fc">&nbsp;        if (!syncSettings.isEnabled.first()) return false</b>
-<b class="fc">&nbsp;        syncCoordinator.requestSync(SyncReason.LOCAL_CHANGE)</b>
-<b class="fc">&nbsp;            .result.await()</b>
-<b class="fc">&nbsp;            .fold(ifLeft = { throw it.toException() }, ifRight = { })</b>
-<b class="fc">&nbsp;        return true</b>
+&nbsp;/**
+&nbsp; * Trims each segment and keeps only real [kotlinx.datetime.DayOfWeek] names, so a padded
+&nbsp; * `&quot;MONDAY &quot;` normalizes rather than being dropped downstream and a junk name never reaches Room.
+&nbsp; */
+&nbsp;private fun List&lt;String&gt;.toDayOfWeekNames(): List&lt;String&gt; =
+<b class="fc">&nbsp;    mapNotNull { segment -&gt;</b>
+<b class="fc">&nbsp;        val trimmed = segment.trim()</b>
+<b class="fc">&nbsp;        DayOfWeek.entries.firstOrNull { it.name == trimmed }?.name</b>
 &nbsp;    }
 &nbsp;
-&nbsp;    override suspend fun syncAll() {
-<b class="pc">&nbsp;        if (!syncSettings.isEnabled.first()) return</b>
-<b class="nc">&nbsp;        syncCoordinator.requestSync(SyncReason.MANUAL)</b>
-<b class="nc">&nbsp;            .result.await()</b>
-<b class="nc">&nbsp;            .fold(ifLeft = { throw it.toException() }, ifRight = { })</b>
-&nbsp;    }
+&nbsp;/** Trims each segment and keeps only days that exist in some month. */
+&nbsp;private fun List&lt;String&gt;.toDaysOfMonth(): List&lt;Int&gt; =
+<b class="fc">&nbsp;    mapNotNull { it.trim().toIntOrNull() }.filter { it in DAYS_OF_MONTH_RANGE }</b>
 &nbsp;
-&nbsp;    override suspend fun syncWorkspace(workspaceId: WorkspaceId) {
-&nbsp;        // Switch the active workspace pointer even when sync is off — callers
-&nbsp;        // (e.g. AcceptInviteUseCase) rely on this to move the session to the
-&nbsp;        // newly joined workspace. Only skip the network round-trip.
-<b class="fc">&nbsp;        sessionMutator.setCurrentWorkspace(workspaceId)</b>
-<b class="pc">&nbsp;        if (!syncSettings.isEnabled.first()) return</b>
-<b class="nc">&nbsp;        syncCoordinator.requestSync(SyncReason.SWIPE_REFRESH)</b>
-<b class="nc">&nbsp;            .result.await()</b>
-<b class="nc">&nbsp;            .fold(ifLeft = { throw it.toException() }, ifRight = { })</b>
-&nbsp;    }
-&nbsp;
-<b class="nc">&nbsp;    private fun SyncError.toException(): RuntimeException = when (this) {</b>
-<b class="nc">&nbsp;        SyncError.Cancelled -&gt; RuntimeException(&quot;Sync cancelled&quot;)</b>
-<b class="nc">&nbsp;        SyncError.NetworkUnavailable -&gt; RuntimeException(&quot;Network unavailable&quot;)</b>
-<b class="nc">&nbsp;        SyncError.AuthRequired -&gt; RuntimeException(&quot;Auth required&quot;)</b>
-<b class="nc">&nbsp;        SyncError.PermissionDenied -&gt; RuntimeException(&quot;PERMISSION_DENIED: workspace access denied&quot;)</b>
-<b class="nc">&nbsp;        is SyncError.UnsupportedAppVersion -&gt; RuntimeException(message)</b>
-<b class="nc">&nbsp;        is SyncError.StorageError -&gt; RuntimeException(&quot;Storage error&quot;, cause)</b>
-<b class="nc">&nbsp;        is SyncError.Unknown -&gt; RuntimeException(cause.message ?: &quot;Sync failed&quot;, cause)</b>
-&nbsp;    }
-&nbsp;}
+&nbsp;/** Widest calendar month — February is clamped by `MissingDayPolicy`, not by this filter. */
+<b class="fc">&nbsp;private val DAYS_OF_MONTH_RANGE = 1..31</b>
 </code>
 </pre>
 </div>
@@ -232,7 +205,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 12:48</div>
+    <div style="float:right;">generated on 2026-07-29 13:37</div>
 </div>
 </body>
 </html>

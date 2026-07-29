@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SyncErrorClassifierKt</title>
+  <title>MoneySurfer Coverage Report > SyncDtoMappersKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.data.sync</a>
 </div>
 
-<h1>Coverage Summary for Class: SyncErrorClassifierKt (com.georgeci.moneysurfer.data.sync)</h1>
+<h1>Coverage Summary for Class: SyncDtoMappersKt (com.georgeci.moneysurfer.data.sync)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SyncErrorClassifierKt</td>
+  <td class="name">SyncDtoMappersKt</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -60,34 +60,34 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    66.7%
+    100%
   </span>
   <span class="absValue">
-    (2/3)
+    (18/18)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    26.7%
+    93.8%
   </span>
   <span class="absValue">
-    (8/30)
+    (15/16)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    43.8%
+    100%
   </span>
   <span class="absValue">
-    (7/16)
+    (220/220)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    32.9%
+    99.7%
   </span>
   <span class="absValue">
-    (52/158)
+    (953/956)
   </span>
 </td>
 </tr>
@@ -101,55 +101,331 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.sync
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.sync.api.SyncError
-&nbsp;import dev.gitlive.firebase.firestore.FirebaseFirestoreException
-&nbsp;import kotlinx.serialization.SerializationException
-&nbsp;import kotlin.coroutines.cancellation.CancellationException
+&nbsp;import com.georgeci.moneysurfer.data.db.entity.AccountEntity
+&nbsp;import com.georgeci.moneysurfer.data.db.entity.AccountExtraDetailsColumn
+&nbsp;import com.georgeci.moneysurfer.data.db.entity.BudgetEntity
+&nbsp;import com.georgeci.moneysurfer.data.db.entity.CategoryEntity
+&nbsp;import com.georgeci.moneysurfer.data.db.entity.GoalContributionEntity
+&nbsp;import com.georgeci.moneysurfer.data.db.entity.GoalEntity
+&nbsp;import com.georgeci.moneysurfer.data.db.entity.TransactionEntity
+&nbsp;import com.georgeci.moneysurfer.data.db.entity.WorkspaceEntity
+&nbsp;import com.georgeci.moneysurfer.data.db.entity.WorkspaceInviteEntity
+&nbsp;import com.georgeci.moneysurfer.data.db.entity.WorkspaceMemberEntity
+&nbsp;import com.georgeci.moneysurfer.data.remote.AccountDoc
+&nbsp;import com.georgeci.moneysurfer.data.remote.AccountExtraDetailDoc
+&nbsp;import com.georgeci.moneysurfer.data.remote.BudgetDoc
+&nbsp;import com.georgeci.moneysurfer.data.remote.CategoryDoc
+&nbsp;import com.georgeci.moneysurfer.data.remote.GoalContributionDoc
+&nbsp;import com.georgeci.moneysurfer.data.remote.GoalDoc
+&nbsp;import com.georgeci.moneysurfer.data.remote.TransactionDoc
+&nbsp;import com.georgeci.moneysurfer.data.remote.WorkspaceDoc
+&nbsp;import com.georgeci.moneysurfer.data.remote.WorkspaceInviteDoc
+&nbsp;import com.georgeci.moneysurfer.data.remote.WorkspaceMemberDoc
+&nbsp;import com.georgeci.moneysurfer.domain.model.AccountExtraDetail
+&nbsp;import com.georgeci.moneysurfer.domain.model.TransactionTags
+&nbsp;import kotlinx.datetime.TimeZone
+&nbsp;import kotlinx.datetime.toLocalDateTime
+&nbsp;import kotlin.time.Instant
 &nbsp;
 &nbsp;/**
-&nbsp; * Maps SDK / runtime exceptions into a typed [SyncError].
+&nbsp; * Shared Room ↔ Firestore-DTO mappers. Used by both the v1
+&nbsp; * [com.georgeci.moneysurfer.data.repository.WorkspaceSyncRepositoryImpl] and the
+&nbsp; * Phase-1 outbox path (repo dual-writes serialize the DTO into the queue payload).
 &nbsp; *
-&nbsp; * Lives in `:data` because only here do we see vendor-specific classes
-&nbsp; * (Firestore, Room). The coordinator and use case interfaces stay
-&nbsp; * vendor-neutral. See sync.md §4.2 «Конвенция error handling».
+&nbsp; * `clientVersionCode` is set via the DTO defaults (currently `1`) — the static
+&nbsp; * Firestore rule `hasValidClientVersion()` requires `&gt;= 1`. When real version
+&nbsp; * threading is wired (AppInfo.versionCode), bump the static default or move
+&nbsp; * to a per-call parameter.
 &nbsp; */
-<b class="fc">&nbsp;internal fun Throwable.toSyncError(): SyncError = when (this) {</b>
-<b class="fc">&nbsp;    is CancellationException -&gt; SyncError.Cancelled</b>
-<b class="pc">&nbsp;    is FirebaseFirestoreException -&gt; classifyFirestore(this)</b>
-<b class="fc">&nbsp;    is SerializationException -&gt; SyncError.Unknown(this)</b>
-<b class="fc">&nbsp;    else -&gt; SyncError.Unknown(this)</b>
-&nbsp;}
+&nbsp;
+<b class="fc">&nbsp;fun WorkspaceEntity.toDoc(): WorkspaceDoc = WorkspaceDoc(</b>
+<b class="fc">&nbsp;    name = name,</b>
+<b class="fc">&nbsp;    description = description,</b>
+<b class="fc">&nbsp;    baseCurrency = baseCurrency,</b>
+<b class="fc">&nbsp;    ownerId = ownerId,</b>
+<b class="fc">&nbsp;    archived = archived,</b>
+<b class="fc">&nbsp;    createdAt = createdAt,</b>
+<b class="fc">&nbsp;    updatedAt = updatedAt,</b>
+&nbsp;)
+&nbsp;
+<b class="fc">&nbsp;fun WorkspaceDoc.toEntity(id: String): WorkspaceEntity = WorkspaceEntity(</b>
+<b class="fc">&nbsp;    id = id,</b>
+<b class="fc">&nbsp;    name = name,</b>
+<b class="fc">&nbsp;    description = description,</b>
+<b class="fc">&nbsp;    baseCurrency = baseCurrency,</b>
+<b class="fc">&nbsp;    ownerId = ownerId,</b>
+<b class="fc">&nbsp;    createdAt = createdAt,</b>
+<b class="fc">&nbsp;    archived = archived,</b>
+<b class="fc">&nbsp;    updatedAt = updatedAt,</b>
+&nbsp;)
+&nbsp;
+<b class="fc">&nbsp;fun AccountEntity.toDoc(): AccountDoc = AccountDoc(</b>
+<b class="fc">&nbsp;    name = name,</b>
+<b class="fc">&nbsp;    type = type,</b>
+<b class="fc">&nbsp;    currency = currency,</b>
+<b class="fc">&nbsp;    balance = balance,</b>
+<b class="fc">&nbsp;    archived = archived,</b>
+<b class="fc">&nbsp;    updatedAt = updatedAt,</b>
+<b class="fc">&nbsp;    archivedAt = archivedAt,</b>
+&nbsp;    // Same stored-column↔wire-list conversion as TransactionEntity.tags below: the wire keeps
+&nbsp;    // structured entries, Room keeps one JSON column.
+<b class="fc">&nbsp;    extraDetails = AccountExtraDetailsColumn.decode(extraDetails)</b>
+<b class="fc">&nbsp;        .map { AccountExtraDetailDoc(key = it.key, value = it.value) },</b>
+<b class="fc">&nbsp;    sortOrder = sortOrder,</b>
+&nbsp;)
+&nbsp;
+<b class="fc">&nbsp;fun AccountDoc.toEntity(id: String, workspaceId: String): AccountEntity = AccountEntity(</b>
+<b class="fc">&nbsp;    id = id,</b>
+<b class="fc">&nbsp;    workspaceId = workspaceId,</b>
+<b class="fc">&nbsp;    name = name,</b>
+<b class="fc">&nbsp;    type = type,</b>
+<b class="fc">&nbsp;    currency = currency,</b>
+<b class="fc">&nbsp;    balance = balance,</b>
+<b class="fc">&nbsp;    archived = archived,</b>
+<b class="fc">&nbsp;    updatedAt = updatedAt,</b>
+<b class="fc">&nbsp;    archivedAt = archivedAt,</b>
+&nbsp;    // `encode` normalizes, so a doc from a client we do not control cannot seed the column with
+&nbsp;    // blank keys, duplicates or an unbounded list.
+<b class="fc">&nbsp;    extraDetails = AccountExtraDetailsColumn.encode(</b>
+<b class="fc">&nbsp;        extraDetails.map { AccountExtraDetail(key = it.key, value = it.value) },</b>
+&nbsp;    ),
+<b class="fc">&nbsp;    sortOrder = sortOrder,</b>
+&nbsp;)
+&nbsp;
+<b class="fc">&nbsp;fun CategoryEntity.toDoc(): CategoryDoc = CategoryDoc(</b>
+<b class="fc">&nbsp;    name = name,</b>
+<b class="fc">&nbsp;    type = type,</b>
+<b class="fc">&nbsp;    parentId = parentId,</b>
+<b class="fc">&nbsp;    createdAt = createdAt,</b>
+<b class="fc">&nbsp;    updatedAt = updatedAt,</b>
+<b class="fc">&nbsp;    systemKind = systemKind,</b>
+<b class="fc">&nbsp;    iconKey = iconKey,</b>
+<b class="fc">&nbsp;    hue = hue,</b>
+&nbsp;)
+&nbsp;
+<b class="fc">&nbsp;fun CategoryDoc.toEntity(id: String, workspaceId: String): CategoryEntity = CategoryEntity(</b>
+<b class="fc">&nbsp;    id = id,</b>
+<b class="fc">&nbsp;    workspaceId = workspaceId,</b>
+<b class="fc">&nbsp;    name = name,</b>
+<b class="fc">&nbsp;    type = type,</b>
+<b class="fc">&nbsp;    parentId = parentId,</b>
+<b class="fc">&nbsp;    createdAt = createdAt,</b>
+<b class="fc">&nbsp;    updatedAt = updatedAt,</b>
+<b class="fc">&nbsp;    systemKind = systemKind,</b>
+<b class="fc">&nbsp;    iconKey = iconKey,</b>
+<b class="fc">&nbsp;    hue = hue,</b>
+&nbsp;)
 &nbsp;
 &nbsp;/**
-&nbsp; * A denial, as opposed to &quot;not here *yet*&quot;. The distinction decides whether a caller may skip what
-&nbsp; * it was reading: a denied read will never succeed for this user, while a network drop or an
-&nbsp; * expired token would turn skipping into a sync that reports success and downloaded nothing.
-&nbsp; *
-&nbsp; * The gitlive wrapper does not surface a typed `FirebaseFirestoreException` uniformly across
-&nbsp; * platforms, so this falls back to the message the same way [toSyncError] does.
+&nbsp; * Room stores `categoryIds` as a CSV column while the wire DTO carries a real list, so these
+&nbsp; * mappers convert on the entity↔wire boundary. (`BudgetRepositoryImpl` does the same conversion
+&nbsp; * on the entity↔domain boundary — two boundaries, same CSV encoding.) Blank segments are dropped
+&nbsp; * so a legacy `&quot;&quot;` or a trailing comma decodes to an empty list rather than a blank id.
 &nbsp; */
-&nbsp;internal fun Throwable.isPermissionDenied(): Boolean =
-<b class="pc">&nbsp;    toSyncError() == SyncError.PermissionDenied ||</b>
-<b class="pc">&nbsp;        PERMISSION_DENIED_MARKER in message?.uppercase().orEmpty()</b>
+<b class="fc">&nbsp;fun BudgetEntity.toDoc(): BudgetDoc = BudgetDoc(</b>
+<b class="fc">&nbsp;    name = name,</b>
+<b class="fc">&nbsp;    categoryIds = categoryIds.split(&#39;,&#39;).filter { it.isNotBlank() },</b>
+<b class="fc">&nbsp;    amount = amount,</b>
+<b class="fc">&nbsp;    period = period,</b>
+<b class="fc">&nbsp;    startDate = startDate,</b>
+<b class="fc">&nbsp;    alertPercent = alertPercent,</b>
+<b class="fc">&nbsp;    isActive = isActive,</b>
+<b class="fc">&nbsp;    rollover = rollover,</b>
+<b class="fc">&nbsp;    createdAt = createdAt,</b>
+<b class="fc">&nbsp;    updatedAt = updatedAt,</b>
+&nbsp;)
 &nbsp;
-&nbsp;private const val PERMISSION_DENIED_MARKER: String = &quot;PERMISSION_DENIED&quot;
+<b class="fc">&nbsp;fun BudgetDoc.toEntity(id: String, workspaceId: String): BudgetEntity = BudgetEntity(</b>
+<b class="fc">&nbsp;    id = id,</b>
+<b class="fc">&nbsp;    workspaceId = workspaceId,</b>
+<b class="fc">&nbsp;    name = name,</b>
+<b class="fc">&nbsp;    categoryIds = categoryIds.filter { it.isNotBlank() }.joinToString(&quot;,&quot;),</b>
+<b class="fc">&nbsp;    amount = amount,</b>
+<b class="fc">&nbsp;    period = period,</b>
+<b class="fc">&nbsp;    startDate = startDate,</b>
+<b class="fc">&nbsp;    alertPercent = alertPercent,</b>
+<b class="fc">&nbsp;    isActive = isActive,</b>
+<b class="fc">&nbsp;    rollover = rollover,</b>
+<b class="fc">&nbsp;    createdAt = createdAt,</b>
+<b class="fc">&nbsp;    updatedAt = updatedAt,</b>
+&nbsp;)
 &nbsp;
-&nbsp;private fun classifyFirestore(error: FirebaseFirestoreException): SyncError {
-&nbsp;    // gitlive does not surface a typed Code enum across all platforms uniformly,
-&nbsp;    // so fall back to message inspection until we wire a dedicated mapper per
-&nbsp;    // platform. Expand this when Phase 2 adds richer Firestore exception
-&nbsp;    // handling (quota, server timestamps).
-<b class="nc">&nbsp;    val message = error.message?.lowercase() ?: return SyncError.Unknown(error)</b>
-<b class="nc">&nbsp;    return when {</b>
-<b class="nc">&nbsp;        &quot;unauthenticated&quot; in message || &quot;auth&quot; in message -&gt; SyncError.AuthRequired</b>
-<b class="nc">&nbsp;        &quot;permission&quot; in message -&gt; SyncError.PermissionDenied</b>
-<b class="nc">&nbsp;        &quot;unavailable&quot; in message ||</b>
-<b class="nc">&nbsp;            &quot;network&quot; in message ||</b>
-<b class="nc">&nbsp;            &quot;deadline&quot; in message ||</b>
-<b class="nc">&nbsp;            &quot;timeout&quot; in message -&gt; SyncError.NetworkUnavailable</b>
-<b class="nc">&nbsp;        else -&gt; SyncError.Unknown(error)</b>
+<b class="fc">&nbsp;fun TransactionEntity.toDoc(): TransactionDoc = TransactionDoc(</b>
+<b class="fc">&nbsp;    accountId = accountId,</b>
+<b class="fc">&nbsp;    categoryId = categoryId,</b>
+<b class="fc">&nbsp;    amount = amount,</b>
+<b class="fc">&nbsp;    currencyCode = currencyCode,</b>
+<b class="fc">&nbsp;    note = note,</b>
+<b class="fc">&nbsp;    merchant = merchant,</b>
+&nbsp;    // Same CSV-column↔wire-list conversion as BudgetEntity.categoryIds above.
+<b class="fc">&nbsp;    tags = tags.split(&#39;,&#39;).filter { it.isNotBlank() },</b>
+<b class="fc">&nbsp;    operationAt = operationAt,</b>
+<b class="fc">&nbsp;    operationDate = operationDate,</b>
+<b class="fc">&nbsp;    type = type,</b>
+<b class="fc">&nbsp;    status = status,</b>
+<b class="fc">&nbsp;    createdAt = createdAt,</b>
+<b class="fc">&nbsp;    updatedAt = updatedAt,</b>
+&nbsp;    // The Room column and the wire field are the same tombstone (issue #346), so an upsert push
+&nbsp;    // carries it either way: a restore writes `null` and lifts the remote tombstone, and a row
+&nbsp;    // pushed while deleted stays deleted for peers.
+<b class="fc">&nbsp;    deletedAt = deletedAt,</b>
+<b class="fc">&nbsp;    transferId = transferId,</b>
+<b class="fc">&nbsp;    splitId = splitId,</b>
+<b class="fc">&nbsp;    recurringRuleId = recurringRuleId,</b>
+&nbsp;)
+&nbsp;
+&nbsp;fun TransactionDoc.toEntity(id: String, workspaceId: String): TransactionEntity {
+&nbsp;    // Tolerate legacy/partial Firestore docs:
+&nbsp;    //  - operationDate may be &quot;&quot; (older schema): derive ISO date from operationAt.
+&nbsp;    //    Use UTC, not the device default, so the same Firestore doc resolves to the
+&nbsp;    //    same operationDate on every client (avoids cross-device divergence).
+&nbsp;    //  - createdAt may be 0L (older schema): fall back to operationAt or updatedAt
+&nbsp;    //    so audit ordering doesn&#39;t collapse to epoch zero.
+<b class="fc">&nbsp;    val resolvedOperationDate = operationDate.ifBlank {</b>
+<b class="fc">&nbsp;        Instant.fromEpochMilliseconds(operationAt)</b>
+<b class="fc">&nbsp;            .toLocalDateTime(TimeZone.UTC)</b>
+<b class="fc">&nbsp;            .date</b>
+<b class="fc">&nbsp;            .toString()</b>
 &nbsp;    }
+<b class="fc">&nbsp;    val resolvedCreatedAt = if (createdAt == 0L) {</b>
+<b class="pc">&nbsp;        if (operationAt != 0L) operationAt else updatedAt</b>
+&nbsp;    } else {
+<b class="fc">&nbsp;        createdAt</b>
+&nbsp;    }
+<b class="fc">&nbsp;    return TransactionEntity(</b>
+<b class="fc">&nbsp;        id = id,</b>
+<b class="fc">&nbsp;        workspaceId = workspaceId,</b>
+<b class="fc">&nbsp;        accountId = accountId,</b>
+<b class="fc">&nbsp;        amount = amount,</b>
+<b class="fc">&nbsp;        currencyCode = currencyCode,</b>
+<b class="fc">&nbsp;        categoryId = categoryId,</b>
+<b class="fc">&nbsp;        note = note,</b>
+<b class="fc">&nbsp;        merchant = merchant,</b>
+&nbsp;        // Normalized, not just joined: a remote tag carrying the CSV separator would come
+&nbsp;        // back from Room as two tags, and this doc may come from a client we do not control.
+<b class="fc">&nbsp;        tags = TransactionTags.normalize(tags).joinToString(&quot;,&quot;),</b>
+<b class="fc">&nbsp;        operationAt = operationAt,</b>
+<b class="fc">&nbsp;        operationDate = resolvedOperationDate,</b>
+<b class="fc">&nbsp;        type = type,</b>
+<b class="fc">&nbsp;        status = status,</b>
+<b class="fc">&nbsp;        createdAt = resolvedCreatedAt,</b>
+<b class="fc">&nbsp;        updatedAt = updatedAt,</b>
+<b class="fc">&nbsp;        deletedAt = deletedAt,</b>
+<b class="fc">&nbsp;        transferId = transferId,</b>
+<b class="fc">&nbsp;        splitId = splitId,</b>
+<b class="fc">&nbsp;        recurringRuleId = recurringRuleId,</b>
+&nbsp;    )
 &nbsp;}
+&nbsp;
+<b class="fc">&nbsp;fun GoalEntity.toDoc(): GoalDoc = GoalDoc(</b>
+<b class="fc">&nbsp;    title = title,</b>
+<b class="fc">&nbsp;    emoji = emoji,</b>
+<b class="fc">&nbsp;    hue = hue,</b>
+<b class="fc">&nbsp;    target = target,</b>
+<b class="fc">&nbsp;    currencyCode = currencyCode,</b>
+<b class="fc">&nbsp;    startDate = startDate,</b>
+<b class="fc">&nbsp;    targetDate = targetDate,</b>
+<b class="fc">&nbsp;    accountId = accountId,</b>
+<b class="fc">&nbsp;    status = status,</b>
+<b class="fc">&nbsp;    createdAt = createdAt,</b>
+<b class="fc">&nbsp;    updatedAt = updatedAt,</b>
+&nbsp;)
+&nbsp;
+<b class="fc">&nbsp;fun GoalDoc.toEntity(id: String, workspaceId: String): GoalEntity = GoalEntity(</b>
+<b class="fc">&nbsp;    id = id,</b>
+<b class="fc">&nbsp;    workspaceId = workspaceId,</b>
+<b class="fc">&nbsp;    title = title,</b>
+<b class="fc">&nbsp;    emoji = emoji,</b>
+<b class="fc">&nbsp;    hue = hue,</b>
+<b class="fc">&nbsp;    target = target,</b>
+<b class="fc">&nbsp;    currencyCode = currencyCode,</b>
+<b class="fc">&nbsp;    startDate = startDate,</b>
+<b class="fc">&nbsp;    targetDate = targetDate,</b>
+&nbsp;    // A blank accountId passes the rules&#39; nullable-string guard but is no account,
+&nbsp;    // and storing it would violate the Room FK. Absent means null.
+<b class="fc">&nbsp;    accountId = accountId?.takeIf { it.isNotBlank() },</b>
+&nbsp;    // Legacy/partial docs may omit `status`; the DTO default already lands on ACTIVE,
+&nbsp;    // but an explicitly-empty string would store an unparseable enum name.
+<b class="fc">&nbsp;    status = status.ifBlank { &quot;ACTIVE&quot; },</b>
+<b class="fc">&nbsp;    createdAt = createdAt,</b>
+<b class="fc">&nbsp;    updatedAt = updatedAt,</b>
+&nbsp;)
+&nbsp;
+<b class="fc">&nbsp;fun GoalContributionEntity.toDoc(): GoalContributionDoc = GoalContributionDoc(</b>
+<b class="fc">&nbsp;    goalId = goalId,</b>
+<b class="fc">&nbsp;    amount = amount,</b>
+<b class="fc">&nbsp;    occurredOn = occurredOn,</b>
+<b class="fc">&nbsp;    note = note,</b>
+<b class="fc">&nbsp;    transferId = transferId,</b>
+<b class="fc">&nbsp;    createdAt = createdAt,</b>
+<b class="fc">&nbsp;    updatedAt = updatedAt,</b>
+&nbsp;)
+&nbsp;
+&nbsp;fun GoalContributionDoc.toEntity(id: String, workspaceId: String): GoalContributionEntity =
+<b class="fc">&nbsp;    GoalContributionEntity(</b>
+<b class="fc">&nbsp;        id = id,</b>
+<b class="fc">&nbsp;        workspaceId = workspaceId,</b>
+<b class="fc">&nbsp;        goalId = goalId,</b>
+<b class="fc">&nbsp;        amount = amount,</b>
+<b class="fc">&nbsp;        occurredOn = occurredOn,</b>
+<b class="fc">&nbsp;        note = note,</b>
+<b class="fc">&nbsp;        transferId = transferId,</b>
+<b class="fc">&nbsp;        createdAt = createdAt,</b>
+<b class="fc">&nbsp;        updatedAt = updatedAt,</b>
+&nbsp;    )
+&nbsp;
+<b class="fc">&nbsp;fun WorkspaceMemberEntity.toDoc(): WorkspaceMemberDoc = WorkspaceMemberDoc(</b>
+<b class="fc">&nbsp;    userId = userId,</b>
+<b class="fc">&nbsp;    role = role,</b>
+<b class="fc">&nbsp;    status = status,</b>
+<b class="fc">&nbsp;    displayName = displayName,</b>
+<b class="fc">&nbsp;    email = email,</b>
+<b class="fc">&nbsp;    addedByUserId = addedByUserId,</b>
+<b class="fc">&nbsp;    createdAt = createdAt,</b>
+<b class="fc">&nbsp;    updatedAt = updatedAt,</b>
+<b class="fc">&nbsp;    leftAt = leftAt,</b>
+<b class="fc">&nbsp;    removedAt = removedAt,</b>
+&nbsp;)
+&nbsp;
+<b class="fc">&nbsp;fun WorkspaceMemberDoc.toEntity(workspaceId: String): WorkspaceMemberEntity = WorkspaceMemberEntity(</b>
+<b class="fc">&nbsp;    userId = userId,</b>
+<b class="fc">&nbsp;    workspaceId = workspaceId,</b>
+<b class="fc">&nbsp;    role = role,</b>
+<b class="fc">&nbsp;    status = status.ifEmpty { &quot;ACTIVE&quot; },</b>
+<b class="fc">&nbsp;    displayName = displayName,</b>
+<b class="fc">&nbsp;    email = email,</b>
+<b class="fc">&nbsp;    addedByUserId = addedByUserId,</b>
+<b class="fc">&nbsp;    createdAt = createdAt,</b>
+<b class="fc">&nbsp;    updatedAt = updatedAt,</b>
+<b class="fc">&nbsp;    leftAt = leftAt,</b>
+<b class="fc">&nbsp;    removedAt = removedAt,</b>
+&nbsp;)
+&nbsp;
+<b class="fc">&nbsp;fun WorkspaceInviteEntity.toDoc(): WorkspaceInviteDoc = WorkspaceInviteDoc(</b>
+<b class="fc">&nbsp;    email = email,</b>
+<b class="fc">&nbsp;    targetUserId = targetUserId,</b>
+<b class="fc">&nbsp;    role = role,</b>
+<b class="fc">&nbsp;    status = status,</b>
+<b class="fc">&nbsp;    invitedByUserId = invitedByUserId,</b>
+<b class="fc">&nbsp;    createdAt = createdAt,</b>
+<b class="fc">&nbsp;    updatedAt = updatedAt,</b>
+<b class="fc">&nbsp;    expiresAt = expiresAt,</b>
+<b class="fc">&nbsp;    respondedAt = respondedAt,</b>
+&nbsp;)
+&nbsp;
+<b class="fc">&nbsp;fun WorkspaceInviteDoc.toEntity(id: String, workspaceId: String): WorkspaceInviteEntity = WorkspaceInviteEntity(</b>
+<b class="fc">&nbsp;    id = id,</b>
+<b class="fc">&nbsp;    workspaceId = workspaceId,</b>
+<b class="fc">&nbsp;    email = email,</b>
+<b class="fc">&nbsp;    targetUserId = targetUserId,</b>
+<b class="fc">&nbsp;    role = role,</b>
+<b class="fc">&nbsp;    status = status.ifEmpty { &quot;PENDING&quot; },</b>
+<b class="fc">&nbsp;    invitedByUserId = invitedByUserId,</b>
+<b class="fc">&nbsp;    createdAt = createdAt,</b>
+<b class="fc">&nbsp;    updatedAt = updatedAt,</b>
+<b class="fc">&nbsp;    expiresAt = expiresAt,</b>
+<b class="fc">&nbsp;    respondedAt = respondedAt,</b>
+&nbsp;)
 </code>
 </pre>
 </div>
@@ -173,7 +449,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 12:48</div>
+    <div style="float:right;">generated on 2026-07-29 13:37</div>
 </div>
 </body>
 </html>

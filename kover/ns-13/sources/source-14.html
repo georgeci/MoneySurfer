@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > RemoteMemberRef</title>
+  <title>MoneySurfer Coverage Report > HttpTextClient_jvmAndroidKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,15 +22,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.data.remote</a>
 </div>
 
-<h1>Coverage Summary for Class: RemoteMemberRef (com.georgeci.moneysurfer.data.remote)</h1>
+<h1>Coverage Summary for Class: HttpTextClient_jvmAndroidKt (com.georgeci.moneysurfer.data.remote)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
-<th class="coverageStat 
-">
-  Class, %
-</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -49,24 +46,70 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">RemoteMemberRef</td>
+  <td class="name">HttpTextClient_jvmAndroidKt</td>
 <td class="coverageStat">
   <span class="percent">
     100%
   </span>
   <span class="absValue">
-    (1/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
+    (2/2)
   </span>
 </td>
     <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (16/16)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">HttpTextClient_jvmAndroidKt$httpGetText$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (6/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    85.7%
+  </span>
+  <span class="absValue">
+    (12/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    84.9%
+  </span>
+  <span class="absValue">
+    (129/152)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -77,14 +120,29 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    75%
   </span>
   <span class="absValue">
-    (12/12)
+    (6/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    87.5%
+  </span>
+  <span class="absValue">
+    (14/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    86.3%
+  </span>
+  <span class="absValue">
+    (145/168)
   </span>
 </td>
 </tr>
-
 </table>
 
 <br/>
@@ -94,81 +152,45 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.data.remote
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.model.WorkspaceMemberStatus
+&nbsp;import kotlinx.coroutines.Dispatchers
+&nbsp;import kotlinx.coroutines.IO
+&nbsp;import kotlinx.coroutines.withContext
+&nbsp;import java.io.IOException
+&nbsp;import java.net.HttpURLConnection
+&nbsp;import java.net.URI
+&nbsp;
+&nbsp;/** `HttpURLConnection` defaults to *no* timeout, so both halves have to be set explicitly. */
+&nbsp;private const val TIMEOUT_MILLIS = 15_000
+<b class="fc">&nbsp;private val HTTP_OK_RANGE = 200..299</b>
 &nbsp;
 &nbsp;/**
-&nbsp; * Remote primitives the account-deletion purge needs, expressed without any Firebase SDK type.
-&nbsp; * The Firestore-specific concerns each operation hides — document paths, wire DTOs, write-batch
-&nbsp; * chunking, exception classification — stay inside [FirebaseAccountDeletionRemoteSource]; the
-&nbsp; * purge/leave decision logic lives in
-&nbsp; * [UserAccountDeletionRepositoryImpl][com.georgeci.moneysurfer.data.repository.UserAccountDeletionRepositoryImpl]
-&nbsp; * and is unit-testable against a fake of this interface.
-&nbsp; *
-&nbsp; * Mirrors the seam already used for pulls
-&nbsp; * ([WorkspaceCollectionReader][com.georgeci.moneysurfer.data.sync.WorkspaceCollectionReader]).
-&nbsp; *
-&nbsp; * Reads return null / empty rather than throwing when a document is missing. When the caller
-&nbsp; * lacks access, implementations throw [RemoteAccessDeniedException] so the repository can skip a
-&nbsp; * stale workspace reference without aborting the whole deletion.
+&nbsp; * JVM and Android share the same `java.net` stack, so the actual lives once here rather than as
+&nbsp; * two byte-identical twins — the same reasoning as `data-local`&#39;s `BackupCrypto`.
 &nbsp; */
-&nbsp;// One flat list of purge primitives, deliberately over detekt&#39;s interface ceiling: every member is
-&nbsp;// a step of the same flow, and splitting them into workspace-side and user-side interfaces would
-&nbsp;// fragment a seam that has exactly one implementation and one caller.
-&nbsp;@Suppress(&quot;TooManyFunctions&quot;)
-&nbsp;interface AccountDeletionRemoteSource {
-&nbsp;
-&nbsp;    /** Workspace ids referenced by `users/{uid}`. Empty when the user doc is gone. */
-&nbsp;    suspend fun fetchWorkspaceIds(uid: String): List&lt;String&gt;
-&nbsp;
-&nbsp;    /** `ownerId` of the workspace root doc, or null when it does not exist. */
-&nbsp;    suspend fun fetchWorkspaceOwnerId(workspaceId: String): String?
-&nbsp;
-&nbsp;    /** Every member row of the workspace. Missing statuses on legacy docs read as ACTIVE. */
-&nbsp;    suspend fun fetchMembers(workspaceId: String): List&lt;RemoteMemberRef&gt;
-&nbsp;
-&nbsp;    /** Hard-deletes every document in the named workspace subcollection. */
-&nbsp;    suspend fun deleteWorkspaceCollection(workspaceId: String, collectionName: String)
-&nbsp;
-&nbsp;    /** Hard-deletes the workspace root document. */
-&nbsp;    suspend fun deleteWorkspace(workspaceId: String)
-&nbsp;
-&nbsp;    /** Soft-leaves the workspace: member row → LEFT, stamping `leftAt` / `updatedAt`. */
-&nbsp;    suspend fun markMemberLeft(workspaceId: String, uid: String, nowMillis: Long)
-&nbsp;
-&nbsp;    /** uid stored in `userEmails/{emailKey}`, or null when there is no such mapping. */
-&nbsp;    suspend fun fetchEmailMappingUid(emailKey: String): String?
-&nbsp;
-&nbsp;    /** Deletes `userEmails/{emailKey}`. */
-&nbsp;    suspend fun deleteEmailMapping(emailKey: String)
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Hard-deletes every document in a subcollection of `users/{uid}`.
-&nbsp;     *
-&nbsp;     * Firestore does not cascade a document delete into its subcollections, so this has to run
-&nbsp;     * *before* [deleteUserDoc]: once the Auth user is gone the documents are unreachable — no
-&nbsp;     * client can authenticate as that uid again — and the personal data they hold would be orphaned
-&nbsp;     * permanently.
-&nbsp;     */
-&nbsp;    suspend fun deleteUserCollection(uid: String, collectionName: String)
-&nbsp;
-&nbsp;    /** Deletes `users/{uid}` — the final remote write of the deletion flow. */
-&nbsp;    suspend fun deleteUserDoc(uid: String)
+<b class="fc">&nbsp;internal actual suspend fun httpGetText(url: String): String = withContext(Dispatchers.IO) {</b>
+<b class="fc">&nbsp;    val connection = try {</b>
+<b class="fc">&nbsp;        (URI(url).toURL().openConnection() as HttpURLConnection)</b>
+&nbsp;    } catch (error: IOException) {
+<b class="nc">&nbsp;        throw HttpRequestException(&quot;Cannot open $url&quot;, error)</b>
+&nbsp;    } catch (error: IllegalArgumentException) {
+<b class="nc">&nbsp;        throw HttpRequestException(&quot;Malformed URL: $url&quot;, error)</b>
+&nbsp;    }
+<b class="fc">&nbsp;    connection.requestMethod = &quot;GET&quot;</b>
+<b class="fc">&nbsp;    connection.connectTimeout = TIMEOUT_MILLIS</b>
+<b class="fc">&nbsp;    connection.readTimeout = TIMEOUT_MILLIS</b>
+<b class="fc">&nbsp;    connection.setRequestProperty(&quot;Accept&quot;, &quot;application/json&quot;)</b>
+&nbsp;    try {
+<b class="fc">&nbsp;        val status = connection.responseCode</b>
+<b class="pc">&nbsp;        if (status !in HTTP_OK_RANGE) {</b>
+<b class="fc">&nbsp;            throw HttpRequestException(&quot;HTTP $status from $url&quot;)</b>
+&nbsp;        }
+<b class="pc">&nbsp;        connection.inputStream.bufferedReader().use { it.readText() }</b>
+&nbsp;    } catch (error: IOException) {
+<b class="fc">&nbsp;        throw HttpRequestException(&quot;GET $url failed&quot;, error)</b>
+&nbsp;    } finally {
+<b class="fc">&nbsp;        connection.disconnect()</b>
+&nbsp;    }
 &nbsp;}
-&nbsp;
-&nbsp;/** Member row reduced to what the purge decision needs. */
-<b class="fc">&nbsp;data class RemoteMemberRef(</b>
-<b class="fc">&nbsp;    val uid: String,</b>
-<b class="fc">&nbsp;    val status: WorkspaceMemberStatus,</b>
-&nbsp;)
-&nbsp;
-&nbsp;/**
-&nbsp; * The backend refused the operation for the current user (Firestore PERMISSION_DENIED).
-&nbsp; * Raised by the remote source so the repository can react without importing an SDK type.
-&nbsp; */
-&nbsp;class RemoteAccessDeniedException(
-&nbsp;    message: String?,
-&nbsp;    cause: Throwable? = null,
-&nbsp;) : Exception(message, cause)
 </code>
 </pre>
 </div>
@@ -192,7 +214,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 12:48</div>
+    <div style="float:right;">generated on 2026-07-29 13:37</div>
 </div>
 </body>
 </html>

@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > WorkspaceInviteRepository</title>
+  <title>MoneySurfer Coverage Report > AccountRepository</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.repositories</a>
 </div>
 
-<h1>Coverage Summary for Class: WorkspaceInviteRepository (com.georgeci.moneysurfer.domain.repositories)</h1>
+<h1>Coverage Summary for Class: AccountRepository (com.georgeci.moneysurfer.domain.repositories)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">WorkspaceInviteRepository</td>
+  <td class="name">AccountRepository</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -46,29 +46,55 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.repositories
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.model.WorkspaceInvite
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.UserId
+&nbsp;import com.georgeci.moneysurfer.domain.model.Account
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.AccountId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceInviteId
 &nbsp;import kotlinx.coroutines.flow.Flow
 &nbsp;
-&nbsp;/**
-&nbsp; * Workspace invitation repository.
-&nbsp; *
-&nbsp; * Status transitions (`markAccepted` / `markDeclined` / `cancel`) are read-modify-upsert
-&nbsp; * to preserve dual-write to Firestore via the outbox; no hard delete — invites stay as
-&nbsp; * audit history of who was invited and how it resolved.
-&nbsp; */
-&nbsp;interface WorkspaceInviteRepository {
-&nbsp;    fun getAll(): Flow&lt;List&lt;WorkspaceInvite&gt;&gt;
-&nbsp;    fun getByWorkspaceId(workspaceId: WorkspaceId): Flow&lt;List&lt;WorkspaceInvite&gt;&gt;
-&nbsp;    fun getByEmail(email: String): Flow&lt;List&lt;WorkspaceInvite&gt;&gt;
-&nbsp;    fun getByTargetUserId(userId: UserId): Flow&lt;List&lt;WorkspaceInvite&gt;&gt;
-&nbsp;    suspend fun getById(id: WorkspaceInviteId): WorkspaceInvite?
-&nbsp;    suspend fun upsert(invite: WorkspaceInvite)
-&nbsp;    suspend fun cancel(id: WorkspaceInviteId)
-&nbsp;    suspend fun markAccepted(id: WorkspaceInviteId)
-&nbsp;    suspend fun markDeclined(id: WorkspaceInviteId)
+&nbsp;// Ten operations, and the tenth trips the interface threshold. Splitting them would only move the
+&nbsp;// line: every one is a single-column write on the same row, and the callers — use cases that own
+&nbsp;// one account action each — would then have to name two repositories to do one thing.
+&nbsp;@Suppress(&quot;TooManyFunctions&quot;)
+&nbsp;interface AccountRepository {
+&nbsp;    fun getAll(): Flow&lt;List&lt;Account&gt;&gt;
+&nbsp;    fun getByWorkspaceId(workspaceId: WorkspaceId): Flow&lt;List&lt;Account&gt;&gt;
+&nbsp;    suspend fun getById(id: AccountId): Account?
+&nbsp;    suspend fun insert(account: Account)
+&nbsp;    suspend fun update(account: Account)
+&nbsp;    suspend fun delete(id: AccountId)
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Increment the cached `balance` of [accountId] by [delta]. Used by total-calc to keep
+&nbsp;     * `Account.balance` in sync with transaction changes without rewriting the whole row.
+&nbsp;     *
+&nbsp;     * Negative delta is allowed (subtracts). The repository writes the result and bumps
+&nbsp;     * `updatedAt`. Does NOT enqueue an outbox row — balance is a derived projection that
+&nbsp;     * Firestore recomputes server-side from its own tx state (see md/totatl_calc.md §6).
+&nbsp;     */
+&nbsp;    suspend fun applyDelta(accountId: AccountId, delta: Money)
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Overwrite the cached balance with [balance]. Used by `RecalculateAccountBalanceUseCase`
+&nbsp;     * to repair the cache from authoritative transaction history. Like [applyDelta], does
+&nbsp;     * not enqueue an outbox row.
+&nbsp;     */
+&nbsp;    suspend fun setBalance(accountId: AccountId, balance: Money)
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Toggle the archived flag on [accountId]. Bumps `updatedAt` and enqueues a sync update.
+&nbsp;     * Archived accounts keep their transactions but are hidden from active lists and excluded
+&nbsp;     * from total/budget rollups. No-op if [accountId] is unknown locally.
+&nbsp;     */
+&nbsp;    suspend fun setArchived(accountId: AccountId, archived: Boolean)
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Rewrite `sortOrder` so the accounts named in [orderedIds] sit in exactly that order,
+&nbsp;     * starting at 0. Ids the workspace does not know are ignored; accounts left out keep the
+&nbsp;     * value they had. Only the rows whose position actually changed are written and enqueued
+&nbsp;     * for sync, so dropping a row back where it started costs nothing.
+&nbsp;     */
+&nbsp;    suspend fun reorder(orderedIds: List&lt;AccountId&gt;)
 &nbsp;}
 </code>
 </pre>
@@ -93,7 +119,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 12:48</div>
+    <div style="float:right;">generated on 2026-07-29 13:37</div>
 </div>
 </body>
 </html>

@@ -49,10 +49,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   <td class="name">AccountDao_Impl</td>
 <td class="coverageStat">
   <span class="percent">
-    80%
+    93.3%
   </span>
   <span class="absValue">
-    (24/30)
+    (28/30)
   </span>
 </td>
 <td class="coverageStat">
@@ -65,18 +65,18 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    94.3%
+    97.8%
   </span>
   <span class="absValue">
-    (216/229)
+    (224/229)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    91.6%
+    96.7%
   </span>
   <span class="absValue">
-    (885/966)
+    (934/966)
   </span>
 </td>
 </tr>
@@ -154,34 +154,34 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <td class="name">AccountDao_Impl$3</td>
 <td class="coverageStat">
   <span class="percent">
-    33.3%
+    100%
   </span>
   <span class="absValue">
-    (1/3)
+    (3/3)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    50%
   </span>
   <span class="absValue">
-    (0/2)
+    (1/2)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    5.9%
+    94.1%
   </span>
   <span class="absValue">
-    (1/17)
+    (16/17)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    2.8%
+    93.1%
   </span>
   <span class="absValue">
-    (2/72)
+    (67/72)
   </span>
 </td>
   </tr>
@@ -189,34 +189,34 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <td class="name">AccountDao_Impl$4</td>
 <td class="coverageStat">
   <span class="percent">
-    33.3%
+    100%
   </span>
   <span class="absValue">
-    (1/3)
+    (3/3)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    50%
   </span>
   <span class="absValue">
-    (0/2)
+    (1/2)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    5.6%
+    94.4%
   </span>
   <span class="absValue">
-    (1/18)
+    (17/18)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    2.6%
+    93.5%
   </span>
   <span class="absValue">
-    (2/77)
+    (72/77)
   </span>
 </td>
   </tr>
@@ -280,34 +280,34 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
-    77.3%
+    95.5%
   </span>
   <span class="absValue">
-    (34/44)
+    (42/44)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    62.5%
+    70.8%
   </span>
   <span class="absValue">
-    (15/24)
+    (17/24)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    84.1%
+    97%
   </span>
   <span class="absValue">
-    (253/301)
+    (292/301)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    81.6%
+    95.9%
   </span>
   <span class="absValue">
-    (1044/1280)
+    (1228/1280)
   </span>
 </td>
 </tr>
@@ -406,49 +406,49 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;      }
 &nbsp;    }
 <b class="fc">&nbsp;    this.__upsertAdapterOfAccountEntity = EntityUpsertAdapter&lt;AccountEntity&gt;(object : EntityInsertAdapter&lt;AccountEntity&gt;() {</b>
-<b class="nc">&nbsp;      protected override fun createQuery(): String = &quot;INSERT INTO `accounts` (`id`,`workspaceId`,`name`,`type`,`currency`,`balance`,`archived`,`updatedAt`,`archivedAt`,`extraDetails`,`sortOrder`) VALUES (?,?,?,?,?,?,?,?,?,?,?)&quot;</b>
+<b class="fc">&nbsp;      protected override fun createQuery(): String = &quot;INSERT INTO `accounts` (`id`,`workspaceId`,`name`,`type`,`currency`,`balance`,`archived`,`updatedAt`,`archivedAt`,`extraDetails`,`sortOrder`) VALUES (?,?,?,?,?,?,?,?,?,?,?)&quot;</b>
 &nbsp;
 &nbsp;      protected override fun bind(statement: SQLiteStatement, entity: AccountEntity) {
-<b class="nc">&nbsp;        statement.bindText(1, entity.id)</b>
-<b class="nc">&nbsp;        statement.bindText(2, entity.workspaceId)</b>
-<b class="nc">&nbsp;        statement.bindText(3, entity.name)</b>
-<b class="nc">&nbsp;        statement.bindText(4, entity.type)</b>
-<b class="nc">&nbsp;        statement.bindText(5, entity.currency)</b>
-<b class="nc">&nbsp;        statement.bindLong(6, entity.balance)</b>
-<b class="nc">&nbsp;        val _tmp: Int = if (entity.archived) 1 else 0</b>
-<b class="nc">&nbsp;        statement.bindLong(7, _tmp.toLong())</b>
-<b class="nc">&nbsp;        statement.bindLong(8, entity.updatedAt)</b>
-<b class="nc">&nbsp;        val _tmpArchivedAt: Long? = entity.archivedAt</b>
-<b class="nc">&nbsp;        if (_tmpArchivedAt == null) {</b>
-<b class="nc">&nbsp;          statement.bindNull(9)</b>
+<b class="fc">&nbsp;        statement.bindText(1, entity.id)</b>
+<b class="fc">&nbsp;        statement.bindText(2, entity.workspaceId)</b>
+<b class="fc">&nbsp;        statement.bindText(3, entity.name)</b>
+<b class="fc">&nbsp;        statement.bindText(4, entity.type)</b>
+<b class="fc">&nbsp;        statement.bindText(5, entity.currency)</b>
+<b class="fc">&nbsp;        statement.bindLong(6, entity.balance)</b>
+<b class="fc">&nbsp;        val _tmp: Int = if (entity.archived) 1 else 0</b>
+<b class="fc">&nbsp;        statement.bindLong(7, _tmp.toLong())</b>
+<b class="fc">&nbsp;        statement.bindLong(8, entity.updatedAt)</b>
+<b class="fc">&nbsp;        val _tmpArchivedAt: Long? = entity.archivedAt</b>
+<b class="pc">&nbsp;        if (_tmpArchivedAt == null) {</b>
+<b class="fc">&nbsp;          statement.bindNull(9)</b>
 &nbsp;        } else {
 <b class="nc">&nbsp;          statement.bindLong(9, _tmpArchivedAt)</b>
 &nbsp;        }
-<b class="nc">&nbsp;        statement.bindText(10, entity.extraDetails)</b>
-<b class="nc">&nbsp;        statement.bindLong(11, entity.sortOrder.toLong())</b>
+<b class="fc">&nbsp;        statement.bindText(10, entity.extraDetails)</b>
+<b class="fc">&nbsp;        statement.bindLong(11, entity.sortOrder.toLong())</b>
 &nbsp;      }
 <b class="fc">&nbsp;    }, object : EntityDeleteOrUpdateAdapter&lt;AccountEntity&gt;() {</b>
-<b class="nc">&nbsp;      protected override fun createQuery(): String = &quot;UPDATE `accounts` SET `id` = ?,`workspaceId` = ?,`name` = ?,`type` = ?,`currency` = ?,`balance` = ?,`archived` = ?,`updatedAt` = ?,`archivedAt` = ?,`extraDetails` = ?,`sortOrder` = ? WHERE `id` = ?&quot;</b>
+<b class="fc">&nbsp;      protected override fun createQuery(): String = &quot;UPDATE `accounts` SET `id` = ?,`workspaceId` = ?,`name` = ?,`type` = ?,`currency` = ?,`balance` = ?,`archived` = ?,`updatedAt` = ?,`archivedAt` = ?,`extraDetails` = ?,`sortOrder` = ? WHERE `id` = ?&quot;</b>
 &nbsp;
 &nbsp;      protected override fun bind(statement: SQLiteStatement, entity: AccountEntity) {
-<b class="nc">&nbsp;        statement.bindText(1, entity.id)</b>
-<b class="nc">&nbsp;        statement.bindText(2, entity.workspaceId)</b>
-<b class="nc">&nbsp;        statement.bindText(3, entity.name)</b>
-<b class="nc">&nbsp;        statement.bindText(4, entity.type)</b>
-<b class="nc">&nbsp;        statement.bindText(5, entity.currency)</b>
-<b class="nc">&nbsp;        statement.bindLong(6, entity.balance)</b>
-<b class="nc">&nbsp;        val _tmp: Int = if (entity.archived) 1 else 0</b>
-<b class="nc">&nbsp;        statement.bindLong(7, _tmp.toLong())</b>
-<b class="nc">&nbsp;        statement.bindLong(8, entity.updatedAt)</b>
-<b class="nc">&nbsp;        val _tmpArchivedAt: Long? = entity.archivedAt</b>
-<b class="nc">&nbsp;        if (_tmpArchivedAt == null) {</b>
-<b class="nc">&nbsp;          statement.bindNull(9)</b>
+<b class="fc">&nbsp;        statement.bindText(1, entity.id)</b>
+<b class="fc">&nbsp;        statement.bindText(2, entity.workspaceId)</b>
+<b class="fc">&nbsp;        statement.bindText(3, entity.name)</b>
+<b class="fc">&nbsp;        statement.bindText(4, entity.type)</b>
+<b class="fc">&nbsp;        statement.bindText(5, entity.currency)</b>
+<b class="fc">&nbsp;        statement.bindLong(6, entity.balance)</b>
+<b class="fc">&nbsp;        val _tmp: Int = if (entity.archived) 1 else 0</b>
+<b class="fc">&nbsp;        statement.bindLong(7, _tmp.toLong())</b>
+<b class="fc">&nbsp;        statement.bindLong(8, entity.updatedAt)</b>
+<b class="fc">&nbsp;        val _tmpArchivedAt: Long? = entity.archivedAt</b>
+<b class="pc">&nbsp;        if (_tmpArchivedAt == null) {</b>
+<b class="fc">&nbsp;          statement.bindNull(9)</b>
 &nbsp;        } else {
 <b class="nc">&nbsp;          statement.bindLong(9, _tmpArchivedAt)</b>
 &nbsp;        }
-<b class="nc">&nbsp;        statement.bindText(10, entity.extraDetails)</b>
-<b class="nc">&nbsp;        statement.bindLong(11, entity.sortOrder.toLong())</b>
-<b class="nc">&nbsp;        statement.bindText(12, entity.id)</b>
+<b class="fc">&nbsp;        statement.bindText(10, entity.extraDetails)</b>
+<b class="fc">&nbsp;        statement.bindLong(11, entity.sortOrder.toLong())</b>
+<b class="fc">&nbsp;        statement.bindText(12, entity.id)</b>
 &nbsp;      }
 &nbsp;    })
 <b class="fc">&nbsp;  }</b>
@@ -469,8 +469,8 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;    super@AccountDao_Impl.setSortOrders(sortOrders, updatedAt)</b>
 &nbsp;  }
 &nbsp;
-<b class="nc">&nbsp;  public override suspend fun upsertAll(entities: List&lt;AccountEntity&gt;): Unit = performSuspending(__db, false, true) { _connection -&gt;</b>
-<b class="nc">&nbsp;    __upsertAdapterOfAccountEntity.upsert(_connection, entities)</b>
+<b class="fc">&nbsp;  public override suspend fun upsertAll(entities: List&lt;AccountEntity&gt;): Unit = performSuspending(__db, false, true) { _connection -&gt;</b>
+<b class="fc">&nbsp;    __upsertAdapterOfAccountEntity.upsert(_connection, entities)</b>
 &nbsp;  }
 &nbsp;
 &nbsp;  public override fun getAll(): Flow&lt;List&lt;AccountEntity&gt;&gt; {
@@ -671,13 +671,13 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;  }
 &nbsp;
 &nbsp;  public override suspend fun delete(id: String) {
-<b class="nc">&nbsp;    val _sql: String = &quot;DELETE FROM accounts WHERE id = ?&quot;</b>
-<b class="nc">&nbsp;    return performSuspending(__db, false, true) { _connection -&gt;</b>
-<b class="nc">&nbsp;      val _stmt: SQLiteStatement = _connection.prepare(_sql)</b>
+<b class="fc">&nbsp;    val _sql: String = &quot;DELETE FROM accounts WHERE id = ?&quot;</b>
+<b class="fc">&nbsp;    return performSuspending(__db, false, true) { _connection -&gt;</b>
+<b class="fc">&nbsp;      val _stmt: SQLiteStatement = _connection.prepare(_sql)</b>
 &nbsp;      try {
-<b class="nc">&nbsp;        var _argIndex: Int = 1</b>
-<b class="nc">&nbsp;        _stmt.bindText(_argIndex, id)</b>
-<b class="nc">&nbsp;        _stmt.step()</b>
+<b class="fc">&nbsp;        var _argIndex: Int = 1</b>
+<b class="fc">&nbsp;        _stmt.bindText(_argIndex, id)</b>
+<b class="fc">&nbsp;        _stmt.step()</b>
 &nbsp;      } finally {
 &nbsp;        _stmt.close()
 &nbsp;      }
@@ -819,7 +819,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 12:48</div>
+    <div style="float:right;">generated on 2026-07-29 13:37</div>
 </div>
 </body>
 </html>

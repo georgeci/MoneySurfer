@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > TransactionRepository</title>
+  <title>MoneySurfer Coverage Report > ExchangeRateRepository</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.repositories</a>
 </div>
 
-<h1>Coverage Summary for Class: TransactionRepository (com.georgeci.moneysurfer.domain.repositories)</h1>
+<h1>Coverage Summary for Class: ExchangeRateRepository (com.georgeci.moneysurfer.domain.repositories)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">TransactionRepository</td>
+  <td class="name">ExchangeRateRepository</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -46,86 +46,28 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.repositories
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.model.CategorizedTransaction
-&nbsp;import com.georgeci.moneysurfer.domain.model.Transaction
-&nbsp;import com.georgeci.moneysurfer.domain.model.TransactionTotal
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.AccountId
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.SplitId
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionId
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransferId
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
-&nbsp;import com.georgeci.moneysurfer.domain.util.TransactionPeriodWindow
+&nbsp;import com.georgeci.moneysurfer.domain.model.ExchangeRateTable
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
 &nbsp;import kotlinx.coroutines.flow.Flow
 &nbsp;
-&nbsp;// Transactions are the app&#39;s central entity and every screen queries them along a different axis
-&nbsp;// (account, workspace, window, transfer pair). Splitting the interface to satisfy the threshold
-&nbsp;// would scatter one storage contract across several types without removing a single query.
-&nbsp;@Suppress(&quot;TooManyFunctions&quot;)
-&nbsp;interface TransactionRepository {
-&nbsp;    fun getAll(): Flow&lt;List&lt;Transaction&gt;&gt;
-&nbsp;    fun getByAccountId(accountId: AccountId): Flow&lt;List&lt;Transaction&gt;&gt;
+&nbsp;/**
+&nbsp; * Locally cached FX quotes. The cache is the read path — the network only ever refills it — so
+&nbsp; * the dashboard total renders offline from whatever was fetched last.
+&nbsp; */
+&nbsp;interface ExchangeRateRepository {
 &nbsp;
 &nbsp;    /**
-&nbsp;     * Newest-first page of categorized transactions inside [window], for one account or — when
-&nbsp;     * [accountId] is `null` — every account.
-&nbsp;     *
-&nbsp;     * At most [limit] rows are returned: the caller grows the limit to page further rather than
-&nbsp;     * offsetting, so a row inserted while the user scrolls cannot shift the already-visible
-&nbsp;     * prefix. An unbounded [window] is still bounded by [limit].
+&nbsp;     * Newest cached table quoted against [base], emitting again whenever a refresh lands.
+&nbsp;     * `null` until the first successful fetch for that base.
 &nbsp;     */
-&nbsp;    fun getCategorizedWindow(
-&nbsp;        accountId: AccountId?,
-&nbsp;        window: TransactionPeriodWindow,
-&nbsp;        limit: Int,
-&nbsp;    ): Flow&lt;List&lt;CategorizedTransaction&gt;&gt;
+&nbsp;    fun observe(base: CurrencyCode): Flow&lt;ExchangeRateTable?&gt;
 &nbsp;
 &nbsp;    /**
-&nbsp;     * Per-type, per-currency sums over the *whole* [window] — unaffected by the paging applied to
-&nbsp;     * [getCategorizedWindow], so a summary built from these stays correct as pages load.
+&nbsp;     * Refetches [base] when the cached copy is older than the staleness threshold, and does
+&nbsp;     * nothing otherwise. Never throws: a failed refresh leaves the cache — stale or empty —
+&nbsp;     * exactly as it was, because a total from yesterday&#39;s rates beats no total at all.
 &nbsp;     */
-&nbsp;    fun getTotals(
-&nbsp;        accountId: AccountId?,
-&nbsp;        window: TransactionPeriodWindow,
-&nbsp;    ): Flow&lt;List&lt;TransactionTotal&gt;&gt;
-&nbsp;    fun getByWorkspaceId(workspaceId: WorkspaceId): Flow&lt;List&lt;Transaction&gt;&gt;
-&nbsp;
-&nbsp;    /** The live transaction behind [id], or `null` when it does not exist or has been deleted. */
-&nbsp;    suspend fun getById(id: TransactionId): Transaction?
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Every leg sharing [transferId] — two for a healthy transfer, one for a leg whose pair was
-&nbsp;     * deleted or never imported. Callers must not assume a pair exists.
-&nbsp;     */
-&nbsp;    suspend fun getByTransferId(transferId: TransferId): List&lt;Transaction&gt;
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Every leg sharing [splitId], oldest first — the receipt the row belongs to.
-&nbsp;     *
-&nbsp;     * A one-element result is a legitimate state, not a broken group: a leg can arrive from sync or
-&nbsp;     * a CSV import before (or without) its siblings, and it is a complete transaction on its own.
-&nbsp;     */
-&nbsp;    suspend fun getBySplitId(splitId: SplitId): List&lt;Transaction&gt;
-&nbsp;    suspend fun insert(transaction: Transaction)
-&nbsp;    suspend fun update(transaction: Transaction)
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Marks [id] deleted. The row survives as a tombstone — invisible to every query on this
-&nbsp;     * interface, but still there for [restore] to bring back (issue #346).
-&nbsp;     */
-&nbsp;    suspend fun delete(id: TransactionId)
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Lifts the tombstone from [id] and returns the transaction as it now stands, or `null` when
-&nbsp;     * there was nothing deleted to bring back.
-&nbsp;     *
-&nbsp;     * The Undo half of [delete], and deliberately keyed on the id alone: the row was never
-&nbsp;     * removed, so restoring it needs no copy of its fields to have survived alongside the
-&nbsp;     * request — which is what makes an Undo outlive the Snackbar that offered it.
-&nbsp;     *
-&nbsp;     * Returning `null` for an id that is missing or already live is what keeps a repeated Undo
-&nbsp;     * from refunding the same balance twice.
-&nbsp;     */
-&nbsp;    suspend fun restore(id: TransactionId): Transaction?
+&nbsp;    suspend fun refreshIfStale(base: CurrencyCode)
 &nbsp;}
 </code>
 </pre>
@@ -150,7 +92,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 12:48</div>
+    <div style="float:right;">generated on 2026-07-29 13:37</div>
 </div>
 </body>
 </html>

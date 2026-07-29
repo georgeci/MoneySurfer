@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > WorkspaceMemberDoc</title>
+  <title>MoneySurfer Coverage Report > UserEmailDoc</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.data.remote</a>
 </div>
 
-<h1>Coverage Summary for Class: WorkspaceMemberDoc (com.georgeci.moneysurfer.data.remote)</h1>
+<h1>Coverage Summary for Class: UserEmailDoc (com.georgeci.moneysurfer.data.remote)</h1>
 
 <table class="coverageStats">
 
@@ -46,7 +46,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">WorkspaceMemberDoc</td>
+  <td class="name">UserEmailDoc</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -57,10 +57,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    42.6%
+    0%
   </span>
   <span class="absValue">
-    (40/94)
+    (0/14)
   </span>
 </td>
 <td class="coverageStat">
@@ -68,20 +68,20 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (14/14)
+    (3/3)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    74.5%
+    49.4%
   </span>
   <span class="absValue">
-    (383/514)
+    (43/87)
   </span>
 </td>
 </tr>
   <tr>
-    <td class="name">WorkspaceMemberDoc$Companion</td>
+    <td class="name">UserEmailDoc$Companion</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -120,10 +120,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    42.6%
+    0%
   </span>
   <span class="absValue">
-    (40/94)
+    (0/14)
   </span>
 </td>
 <td class="coverageStat">
@@ -131,15 +131,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (15/15)
+    (4/4)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    74.7%
+    51.6%
   </span>
   <span class="absValue">
-    (387/518)
+    (47/91)
   </span>
 </td>
 </tr>
@@ -192,10 +192,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp; * Kept as a separate collection (rather than exposing `users.email` via list rules) so the
 &nbsp; * security rule is a tight `signedIn()` read on a single field with no other PII leakage.
 &nbsp; */
-&nbsp;@Serializable
+<b class="pc">&nbsp;@Serializable</b>
 &nbsp;data class UserEmailDoc(
-&nbsp;    val uid: String = &quot;&quot;,
-&nbsp;    val updatedAt: Long = 0L,
+<b class="fc">&nbsp;    val uid: String = &quot;&quot;,</b>
+<b class="fc">&nbsp;    val updatedAt: Long = 0L,</b>
 &nbsp;)
 &nbsp;
 &nbsp;@Serializable
@@ -414,26 +414,26 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp; * Soft-delete via `status` (`ACTIVE` / `LEFT` / `REMOVED`) — `deletedAt` is kept for
 &nbsp; * back-compat with old docs and as a tombstone fallback for clients pulling members.
 &nbsp; */
-<b class="pc">&nbsp;@Serializable</b>
+&nbsp;@Serializable
 &nbsp;data class WorkspaceMemberDoc(
-<b class="fc">&nbsp;    val userId: String = &quot;&quot;,</b>
-<b class="fc">&nbsp;    val role: String = &quot;&quot;,</b>
-<b class="fc">&nbsp;    val status: String = &quot;ACTIVE&quot;,</b>
-<b class="fc">&nbsp;    val displayName: String = &quot;&quot;,</b>
-<b class="fc">&nbsp;    val email: String? = null,</b>
-<b class="fc">&nbsp;    val addedByUserId: String? = null,</b>
-<b class="fc">&nbsp;    val createdAt: Long = 0L,</b>
-<b class="fc">&nbsp;    val updatedAt: Long = 0L,</b>
-<b class="fc">&nbsp;    val leftAt: Long? = null,</b>
-<b class="fc">&nbsp;    val removedAt: Long? = null,</b>
-<b class="fc">&nbsp;    val deletedAt: Long? = null,</b>
-<b class="fc">&nbsp;    val clientVersionCode: Int = 1,</b>
+&nbsp;    val userId: String = &quot;&quot;,
+&nbsp;    val role: String = &quot;&quot;,
+&nbsp;    val status: String = &quot;ACTIVE&quot;,
+&nbsp;    val displayName: String = &quot;&quot;,
+&nbsp;    val email: String? = null,
+&nbsp;    val addedByUserId: String? = null,
+&nbsp;    val createdAt: Long = 0L,
+&nbsp;    val updatedAt: Long = 0L,
+&nbsp;    val leftAt: Long? = null,
+&nbsp;    val removedAt: Long? = null,
+&nbsp;    val deletedAt: Long? = null,
+&nbsp;    val clientVersionCode: Int = 1,
 &nbsp;    // Id of the owner-issued invite this member row was created from. Firestore rules
 &nbsp;    // require it on self-create so they can verify an invite in this workspace admits
 &nbsp;    // the caller (tenant-isolation gate, issue #152). Stamped by WorkspaceMemberSyncPlugin
 &nbsp;    // at push time from the local invite; null for owner-created rows (owner path in the
 &nbsp;    // rules does not need it) and absent on legacy docs.
-<b class="fc">&nbsp;    val inviteId: String? = null,</b>
+&nbsp;    val inviteId: String? = null,
 &nbsp;)
 &nbsp;
 &nbsp;/**
@@ -476,7 +476,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 12:48</div>
+    <div style="float:right;">generated on 2026-07-29 13:37</div>
 </div>
 </body>
 </html>

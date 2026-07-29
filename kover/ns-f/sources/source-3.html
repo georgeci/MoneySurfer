@@ -52,35 +52,35 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   <td class="name">BudgetEntity</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/2)
+    (2/2)
   </span>
 </td>
     <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/14)
+    (14/14)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/68)
+    (68/68)
   </span>
 </td>
 </tr>
@@ -100,7 +100,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import androidx.room.Index
 &nbsp;import androidx.room.PrimaryKey
 &nbsp;
-<b class="nc">&nbsp;@Entity(</b>
+<b class="fc">&nbsp;@Entity(</b>
 &nbsp;    tableName = &quot;budgets&quot;,
 &nbsp;    foreignKeys = [
 &nbsp;        ForeignKey(
@@ -112,20 +112,20 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    indices = [Index(&quot;workspaceId&quot;)],
 &nbsp;)
 &nbsp;data class BudgetEntity(
-<b class="nc">&nbsp;    @PrimaryKey</b>
-<b class="nc">&nbsp;    @ColumnInfo(name = &quot;id&quot;) val id: String,</b>
-<b class="nc">&nbsp;    @ColumnInfo(name = &quot;workspaceId&quot;, defaultValue = &quot;&quot;) val workspaceId: String,</b>
-<b class="nc">&nbsp;    @ColumnInfo(name = &quot;name&quot;) val name: String,</b>
+<b class="fc">&nbsp;    @PrimaryKey</b>
+<b class="fc">&nbsp;    @ColumnInfo(name = &quot;id&quot;) val id: String,</b>
+<b class="fc">&nbsp;    @ColumnInfo(name = &quot;workspaceId&quot;, defaultValue = &quot;&quot;) val workspaceId: String,</b>
+<b class="fc">&nbsp;    @ColumnInfo(name = &quot;name&quot;) val name: String,</b>
 &nbsp;    /** CSV of category ids. Empty = every expense category. */
-<b class="nc">&nbsp;    @ColumnInfo(name = &quot;categoryIds&quot;) val categoryIds: String,</b>
-<b class="nc">&nbsp;    @ColumnInfo(name = &quot;amount&quot;) val amount: Long,</b>
-<b class="nc">&nbsp;    @ColumnInfo(name = &quot;period&quot;) val period: String,</b>
-<b class="nc">&nbsp;    @ColumnInfo(name = &quot;startDate&quot;) val startDate: String,</b>
-<b class="nc">&nbsp;    @ColumnInfo(name = &quot;alertPercent&quot;) val alertPercent: Int,</b>
-<b class="nc">&nbsp;    @ColumnInfo(name = &quot;isActive&quot;) val isActive: Boolean,</b>
-<b class="nc">&nbsp;    @ColumnInfo(name = &quot;rollover&quot;, defaultValue = &quot;0&quot;) val rollover: Boolean = false,</b>
-<b class="nc">&nbsp;    @ColumnInfo(name = &quot;createdAt&quot;, defaultValue = &quot;0&quot;) val createdAt: Long = 0L,</b>
-<b class="nc">&nbsp;    @ColumnInfo(name = &quot;updatedAt&quot;, defaultValue = &quot;0&quot;) val updatedAt: Long = 0L,</b>
+<b class="fc">&nbsp;    @ColumnInfo(name = &quot;categoryIds&quot;) val categoryIds: String,</b>
+<b class="fc">&nbsp;    @ColumnInfo(name = &quot;amount&quot;) val amount: Long,</b>
+<b class="fc">&nbsp;    @ColumnInfo(name = &quot;period&quot;) val period: String,</b>
+<b class="fc">&nbsp;    @ColumnInfo(name = &quot;startDate&quot;) val startDate: String,</b>
+<b class="fc">&nbsp;    @ColumnInfo(name = &quot;alertPercent&quot;) val alertPercent: Int,</b>
+<b class="fc">&nbsp;    @ColumnInfo(name = &quot;isActive&quot;) val isActive: Boolean,</b>
+<b class="fc">&nbsp;    @ColumnInfo(name = &quot;rollover&quot;, defaultValue = &quot;0&quot;) val rollover: Boolean = false,</b>
+<b class="fc">&nbsp;    @ColumnInfo(name = &quot;createdAt&quot;, defaultValue = &quot;0&quot;) val createdAt: Long = 0L,</b>
+<b class="fc">&nbsp;    @ColumnInfo(name = &quot;updatedAt&quot;, defaultValue = &quot;0&quot;) val updatedAt: Long = 0L,</b>
 &nbsp;)
 </code>
 </pre>
@@ -150,7 +150,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 12:48</div>
+    <div style="float:right;">generated on 2026-07-29 13:37</div>
 </div>
 </body>
 </html>
