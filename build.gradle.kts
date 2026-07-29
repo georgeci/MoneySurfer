@@ -286,8 +286,24 @@ subprojects {
             if (testDirs.isNotEmpty()) {
                 property("sonar.tests", testDirs.joinToString(","))
             }
-            if (path in coverageExcludedProjects) {
-                property("sonar.coverage.exclusions", "**/*")
+            // Coverage exclusions, module-relative like `sonar.sources` above:
+            //  - whole module for the ones outside the Kover aggregation;
+            //  - every native source set everywhere else. Kover instruments JVM
+            //    bytecode, so an iOS `actual` can never carry coverage data, while
+            //    `sonar.sources` does hand those files to Sonar — which then scores
+            //    them 0% and drags "Coverage on New Code" down on every iOS-side
+            //    change (same failure shape as issue #272).
+            //
+            // Derived from `mainDirs` rather than hard-coding `src/iosMain`, so the
+            // per-target layouts already listed in `mainCandidates`
+            // (`iosArm64Main`, `iosX64Main`, `iosSimulatorArm64Main`) are covered
+            // the day a module starts using one.
+            val coverageExclusions = when {
+                path in coverageExcludedProjects -> listOf("**/*")
+                else -> mainDirs.filter { it.startsWith("src/ios") }.map { "$it/**/*" }
+            }
+            if (coverageExclusions.isNotEmpty()) {
+                property("sonar.coverage.exclusions", coverageExclusions.joinToString(","))
             }
         }
     }
@@ -330,6 +346,51 @@ dependencies {
     // integration tests exercise the modules above, so its coverage data must be
     // merged in or that exercise is invisible to the report.
     kover(projects.integrationTest)
+}
+
+// Report filters for the merged report — they live on the root project because that
+// is where `koverXmlReport` / `koverHtmlReport` run, so one block covers Codecov,
+// the Pages HTML report and Sonar's coverage import at once.
+//
+// Everything excluded here is code no test can execute, not code that is merely
+// untested: leaving it in reports a permanent, unfixable deficit and hides the
+// coverage that is actually movable. Untestable-by-platform code (`src/iosMain`) is
+// excluded on the Sonar side above instead — it never reaches the Kover report to
+// begin with.
+kover {
+    reports {
+        filters {
+            excludes {
+                // 235 `@Preview` composables across 134 files, all in `commonMain`, so they
+                // compile into the JVM target and count as uncovered forever. Nothing calls
+                // them: the Roborazzi harness in gradle/screenshot-harness/ mounts the
+                // component and `SurferComponentPreview`, never the `*Preview()` function.
+                // Wildcard covers both annotations in use — `androidx.compose.ui.tooling.
+                // preview.Preview` and the desktop `androidx.compose.desktop.…` one.
+                annotatedBy("*.Preview")
+                // Lambda holders synthesised by the Compose compiler — an artifact of
+                // compilation, with no source line a test could target.
+                classes("*ComposableSingletons*")
+                // Room codegen — `MoneySurferDatabase_Impl`, `SyncDatabase_Impl` and the
+                // `*Dao_Impl` classes, plus their `$1`/`$Companion` inner classes. No
+                // hand-written class in the repo ends in `_Impl`.
+                //
+                // The trailing `*` is load-bearing and was verified against the merged
+                // report: the tail-anchored `"*_Impl"` form left every one of these classes
+                // in report.xml, `"*_Impl*"` removes all 17. Same for the other patterns
+                // here — check the class is actually gone from report.xml after editing this
+                // list rather than trusting the pattern to read correctly.
+                classes("*_Impl*")
+                // AGP codegen. Not `androidGeneratedClasses()`: that shortcut also drops
+                // every `*Activity` / `*Fragment`, which would silently swallow real code
+                // the day a module gains one.
+                classes("*.BuildConfig")
+                // Desktop entry point: `fun main()` in composeApp/src/jvmMain — starts the
+                // real application window, so no test can call it.
+                classes("com.georgeci.moneysurfer.MainKt")
+            }
+        }
+    }
 }
 
 sonar {
