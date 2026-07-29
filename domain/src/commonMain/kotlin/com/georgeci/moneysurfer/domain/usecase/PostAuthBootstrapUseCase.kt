@@ -165,7 +165,7 @@ class PostAuthBootstrapUseCase(
         // `defaultWorkspaceId` is not guaranteed to be a member of `workspaceIds`
         // (server-side skew), and neither is guaranteed to have been hydrated by the pull.
         val preferred = existing.defaultWorkspaceId ?: existing.workspaceIds.firstOrNull()
-        val resolvedDefault = preferred?.takeIf { isHydrated(it) }
+        val resolvedDefault = preferred.takeIf { it != null && isHydrated(it) }
             ?: existing.workspaceIds.firstOrNull { isHydrated(it) }
 
         if (resolvedDefault == null) {

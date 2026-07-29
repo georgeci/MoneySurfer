@@ -11,7 +11,7 @@ import com.georgeci.moneysurfer.domain.auth.AccountDeletionError
  *
  * Implementation lives in `:data-remote` (online hosts only); the offline build binds a no-op.
  */
-interface UserAccountDeletionRepository {
+fun interface UserAccountDeletionRepository {
 
     /**
      * Idempotently deletes the remote footprint of [uid]:

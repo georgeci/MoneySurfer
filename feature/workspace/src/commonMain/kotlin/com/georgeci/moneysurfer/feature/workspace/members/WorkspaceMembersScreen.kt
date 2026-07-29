@@ -432,7 +432,7 @@ private fun roleLabel(role: WorkspaceRole): String = when (role) {
 
 @Preview
 @Composable
-private fun WorkspaceMembersScreenPreview_OwnerActive() {
+private fun WorkspaceMembersScreenPreviewOwnerActive() {
     SurferBottomSheetPreview {
         WorkspaceMembersScreen(state = previewState(WorkspaceRole.OWNER), onEvent = {})
     }
@@ -440,7 +440,7 @@ private fun WorkspaceMembersScreenPreview_OwnerActive() {
 
 @Preview
 @Composable
-private fun WorkspaceMembersScreenPreview_OwnerInvited() {
+private fun WorkspaceMembersScreenPreviewOwnerInvited() {
     SurferBottomSheetPreview {
         WorkspaceMembersScreen(
             state = previewState(WorkspaceRole.OWNER, tab = MembersTab.Invited),
@@ -451,7 +451,7 @@ private fun WorkspaceMembersScreenPreview_OwnerInvited() {
 
 @Preview
 @Composable
-private fun WorkspaceMembersScreenPreview_OwnerInvitedEmpty() {
+private fun WorkspaceMembersScreenPreviewOwnerInvitedEmpty() {
     SurferBottomSheetPreview {
         WorkspaceMembersScreen(
             state = previewState(WorkspaceRole.OWNER, tab = MembersTab.Invited, invites = emptyList()),
@@ -462,7 +462,7 @@ private fun WorkspaceMembersScreenPreview_OwnerInvitedEmpty() {
 
 @Preview
 @Composable
-private fun WorkspaceMembersScreenPreview_EditorActive() {
+private fun WorkspaceMembersScreenPreviewEditorActive() {
     SurferBottomSheetPreview {
         WorkspaceMembersScreen(state = previewState(WorkspaceRole.EDITOR), onEvent = {})
     }
@@ -470,7 +470,7 @@ private fun WorkspaceMembersScreenPreview_EditorActive() {
 
 @Preview
 @Composable
-private fun WorkspaceMembersScreenPreview_ViewerActive() {
+private fun WorkspaceMembersScreenPreviewViewerActive() {
     SurferBottomSheetPreview {
         WorkspaceMembersScreen(state = previewState(WorkspaceRole.VIEWER), onEvent = {})
     }
@@ -478,7 +478,7 @@ private fun WorkspaceMembersScreenPreview_ViewerActive() {
 
 @Preview
 @Composable
-private fun WorkspaceMembersScreenPreview_LeaveDialog() {
+private fun WorkspaceMembersScreenPreviewLeaveDialog() {
     SurferBottomSheetPreview {
         WorkspaceMembersScreen(
             state = previewState(WorkspaceRole.EDITOR, showLeaveDialog = true),
@@ -489,7 +489,7 @@ private fun WorkspaceMembersScreenPreview_LeaveDialog() {
 
 @Preview
 @Composable
-private fun WorkspaceMembersScreenPreview_Loading() {
+private fun WorkspaceMembersScreenPreviewLoading() {
     SurferBottomSheetPreview {
         WorkspaceMembersScreen(
             state = WorkspaceMembersState.Loading(WorkspaceId("preview-ws-1")),

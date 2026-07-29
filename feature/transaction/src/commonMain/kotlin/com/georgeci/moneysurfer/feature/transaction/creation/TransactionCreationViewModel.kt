@@ -284,8 +284,7 @@ class TransactionCreationViewModel(
                     .mapNotNull { it.categoryId }
                     .groupingBy { it }
                     .eachCount()
-                updateState {
-                    val content = this as? TransactionCreationState.Content ?: return@updateState this
+                updateContent { content ->
                     content.copy(
                         categoryUsageCounts = counts,
                         displayCategories = buildDisplayCategories(

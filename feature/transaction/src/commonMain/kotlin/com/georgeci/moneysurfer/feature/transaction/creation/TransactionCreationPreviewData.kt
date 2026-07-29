@@ -13,11 +13,12 @@ import kotlin.time.Instant
 
 /** Sample note shared by the `@Preview` states so they read as the same transaction. */
 internal const val PreviewNote = "Lidl — weekly shop"
+private const val PreviewWorkspaceId = "preview-ws-1"
 
 internal val PreviewAccounts = listOf(
     Account(
         id = AccountId("preview-acc-1"),
-        workspaceId = WorkspaceId("preview-ws-1"),
+        workspaceId = WorkspaceId(PreviewWorkspaceId),
         name = "Everyday",
         type = AccountType.CARD,
         currencyCode = CurrencyCode("EUR"),
@@ -25,7 +26,7 @@ internal val PreviewAccounts = listOf(
     ),
     Account(
         id = AccountId("preview-acc-2"),
-        workspaceId = WorkspaceId("preview-ws-1"),
+        workspaceId = WorkspaceId(PreviewWorkspaceId),
         name = "Savings",
         type = AccountType.SAVINGS,
         currencyCode = CurrencyCode("EUR"),
@@ -44,7 +45,7 @@ internal val PreviewCategories = listOf(
 ).mapIndexed { index, name ->
     Category(
         CategoryId("preview-cat-${index + 1}"),
-        WorkspaceId("preview-ws-1"),
+        WorkspaceId(PreviewWorkspaceId),
         name,
         CategoryType.EXPENSE,
         null,
