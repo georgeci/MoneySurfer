@@ -30,8 +30,7 @@
   - [Wiring through MoneySurferApplication](#wiring-through-moneysurferapplication)
   - [Gradle tasks](#gradle-tasks)
   - [Seed fixtures](#seed-fixtures)
-- [JVM Firebase gap](#jvm-firebase-gap)
-  - [JVM workaround (if absolutely needed)](#jvm-workaround-if-absolutely-needed)
+- [JVM Firebase bootstrap](#jvm-firebase-bootstrap)
 - [Troubleshooting](#troubleshooting)
   - [Port 8080 is not open on 0.0.0.0](#port-8080-is-not-open-on-0000)
   - [MSUSEEMULATOR=true does not work in Android Studio Run config](#msuseemulatortrue-does-not-work-in-android-studio-run-config)
@@ -49,14 +48,14 @@
 - Production builds never reach the emulator — switching is gated by the per-platform `MS_USE_EMULATOR` env / system property + `BuildConfig.USE_EMULATOR` flag.
 - Same `firestore.rules` are used in emulator and prod, so tests catch rules regressions alongside code regressions.
 - All emulator surfaces share `--project demo-moneysurfer` — no real GCP project, no auth checks.
-- JVM tests **cannot** drive the gitlive Firebase SDK directly (Android-only `Context` cast). REST against the emulator works; SDK-level coverage requires Maestro on Android or iOS.
+- JVM **can** drive the gitlive Firebase SDK, but only after `initializeDesktopFirebase()` builds the default `FirebaseApp` by hand — see [JVM Firebase bootstrap](#jvm-firebase-bootstrap). JVM test suites do not currently do this; they use REST.
 
 READ WHEN:
 - adding tests that need real Firestore protocol semantics
 - enabling the emulator on a new platform
 - editing `scripts/firebase/*`, `qaMaestroAndroid`, or `qaMaestroIos`
 - debugging emulator boot or test connectivity
-- reviewing the JVM Firebase limitation when planning new test suites
+- reviewing the JVM Firebase bootstrap when planning new test suites
 
 Related: [testing-strategy](testing-strategy.md), [persistence](../architecture/persistence.md), [app-version-gate](../architecture/app-version-gate.md), [firestore-rules-bugs](../architecture/firestore-rules-bugs.md).
 
@@ -148,6 +147,8 @@ A per-platform flag `MS_USE_EMULATOR` drives a single `FirebaseConfig.useEmulato
 ```bash
 MS_USE_EMULATOR=true ./gradlew :composeApp:run
 ```
+
+> This is the zero-setup desktop flow: the emulator branch supplies demo-project Firebase options, so no credentials are needed. Running desktop **without** `MS_USE_EMULATOR` requires `MS_FIREBASE_APP_ID`, `MS_FIREBASE_API_KEY` and `MS_FIREBASE_PROJECT_ID` in the environment — desktop has no `google-services.json`. See [JVM Firebase bootstrap](#jvm-firebase-bootstrap).
 
 ### Android (debug build from terminal)
 
@@ -259,7 +260,7 @@ JVM-only KMP module (`jvm()` only) for real-impl integration tests (Room + `:dat
 
 (Alias for `:integration-test:jvmTest`.)
 
-The emulator is not required for `:integration-test` — Phase 3 covers Room only, see the JVM Firebase gap below.
+The emulator is not required for `:integration-test` — Phase 3 covers Room only, see the JVM Firebase bootstrap below.
 <!-- AI:END -->
 
 <!-- AI:SECTION id=emulator-maestro task=testing,emulator,maestro,android,ios -->
@@ -343,35 +344,32 @@ firebase emulators:exec --project demo-moneysurfer --only auth,firestore '
 <!-- AI:END -->
 
 <!-- AI:SECTION id=emulator-jvm-gap task=testing,emulator,jvm,gitlive -->
-## JVM Firebase gap
+## JVM Firebase bootstrap
 
-**Problem:** gitlive's `firebase-app-jvm-2.4.0.jar` is Android source repackaged. The file `jvmMain/dev/gitlive/firebase/firebase.kt` literally imports `android.content.Context` and casts to it:
+gitlive's `firebase-*-jvm` artifacts are Android sources repackaged — they import `android.content.Context` and cast to it:
 
 ```kotlin
 public actual fun Firebase.initialize(context: Any?, options: FirebaseOptions): FirebaseApp =
     FirebaseApp(com.google.firebase.FirebaseApp.initializeApp(context as Context, options.toAndroid()))
 ```
 
-On plain JVM the `context as Context` cast crashes with `ClassCastException`. gitlive Firebase JVM only works on Android (where `android.content.Context` exists) — meaning KMP Android emulator, not JVM hosts.
+That works on the JVM because `dev.gitlive:firebase-java-sdk` (pulled in transitively on the `jvm` target) ships JVM stand-ins for `android.content.Context`, `android.app.Application`, and the `com.google.firebase.*` classes. What it does **not** ship is a default `FirebaseApp`: there is no `google-services.json` equivalent on desktop, so `Firebase.firestore` throws `Default FirebaseApp is not initialized in this process` until one is built by hand.
 
-**Implications:**
+`initializeDesktopFirebase()` in [FirebaseBootstrap.jvm.kt](../../data-remote/src/jvmMain/kotlin/com/georgeci/moneysurfer/data/remote/FirebaseBootstrap.jvm.kt) does that, and the desktop host calls it before `initKoin`. Three things have to be right:
 
-- Direct JVM tests of `UserRemoteRepositoryImpl` / `WorkspaceSyncRepositoryImpl` / `PullRemoteChangesUseCaseImpl` against the emulator are **impossible on JVM**.
-- `:integration-test` is limited to the Room layer (no Firestore/Auth).
-- Full SDK-level coverage requires:
-  - **Maestro on Android** — real APK on AVD/device with emulator config → end-to-end coverage of user flows.
-  - **Future:** an `androidDeviceTest` source set running the same `IntegrationHarness` shape on AVD with the real Android Firebase SDK.
-  - **Alternative:** bypass gitlive on JVM and call Firestore REST directly. Costs serializer ergonomics (`kotlinx.serialization`) but works.
+1. **`FirebasePlatform.initializeFirebasePlatform(...)` first.** The java-sdk routes all persistence (installation id, refresh tokens) and logging through this hook and has no default. MoneySurfer backs it with a properties file in the app-data directory.
+2. **Pass `android.app.Application`, not `android.content.Context`.** Firestore's `ComponentProvider` casts down to `Application` to register lifecycle callbacks; a plain `Context` panics its async queue with a `ClassCastException` on the first read.
+3. **`getDatabasePath(name)` must return a *file* path whose parent exists.** Creating the returned path as a directory makes SQLite fail with `SQLITE_CANTOPEN`, which also panics the async queue.
 
-### JVM workaround (if absolutely needed)
+Options come from the same switch as everything else: `MS_USE_EMULATOR=true` yields demo-project options (39-char dummy API key, same shape as the iOS host — see issue #219), with the project id following `FIREBASE_PROJECT_ID` when set so it tracks whatever `scripts/firebase/start.sh` booted; otherwise `MS_FIREBASE_APP_ID` / `MS_FIREBASE_API_KEY` / `MS_FIREBASE_PROJECT_ID` are read from the environment, since real credentials stay out of the repo.
 
-The emulator's REST endpoints are **fully functional** without any SDK:
+**Current state of JVM test suites:**
 
-- `POST /v1/projects/{pid}/databases/(default)/documents/{path}` for writes.
-- `GET /v1/projects/{pid}/databases/(default)/documents/{path}` for reads.
-- `POST /identitytoolkit.googleapis.com/v1/accounts:signInWithPassword` for Auth (port 9099).
-
-`EmulatorClient` in `:data-test-fixtures` already uses REST for reset / seed. It can be extended to a full client, but that becomes a de-facto JVM Firestore rewrite.
+- `:integration-test` is still limited to the Room layer — it has not been rewired onto this bootstrap.
+- `EmulatorClient` in `:data-test-fixtures` still uses the emulator's REST endpoints for reset / seed, which need no SDK at all:
+  - `POST|GET /v1/projects/{pid}/databases/(default)/documents/{path}` for writes / reads.
+  - `POST /identitytoolkit.googleapis.com/v1/accounts:signInWithPassword` for Auth (port 9099).
+- End-to-end user-flow coverage still comes from Maestro on Android/iOS. Driving the real SDK from `jvmTest` is now possible via `initializeDesktopFirebase()`, but no suite does it yet.
 <!-- AI:END -->
 
 <!-- AI:SECTION id=emulator-troubleshooting task=testing,emulator,troubleshooting -->

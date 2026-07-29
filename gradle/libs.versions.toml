@@ -47,6 +47,8 @@ google-services = "4.4.2"
 firebase-crashlytics-plugin = "3.0.7"
 firebase-bom = "33.14.0"
 gitlive-firebase = "2.4.0"
+# Tracks whatever the gitlive artifacts above resolve to on the jvm target.
+gitlive-firebase-java-sdk = "0.6.3"
 kover = "0.9.8"
 kotlinx-serialization = "1.11.0"
 kotlinx-datetime = "0.8.0"
@@ -139,6 +141,9 @@ gitlive-firebase-analytics = { module = "dev.gitlive:firebase-analytics", versio
 gitlive-firebase-auth = { module = "dev.gitlive:firebase-auth", version.ref = "gitlive-firebase" }
 gitlive-firebase-crashlytics = { module = "dev.gitlive:firebase-crashlytics", version.ref = "gitlive-firebase" }
 gitlive-firebase-firestore = { module = "dev.gitlive:firebase-firestore", version.ref = "gitlive-firebase" }
+# gitlive's JVM Firebase implementation. Pulled in transitively by the gitlive artifacts on the
+# jvm target; declared explicitly where JVM code touches FirebasePlatform / FirebaseApp directly.
+gitlive-firebase-java-sdk = { module = "dev.gitlive:firebase-java-sdk", version.ref = "gitlive-firebase-java-sdk" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 material-kolor = { module = "com.materialkolor:material-kolor", version.ref = "material-kolor" }
 koalaplot-core = { module = "io.github.koalaplot:koalaplot-core", version.ref = "koalaplot" }
