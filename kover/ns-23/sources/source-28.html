@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > GoalContribution</title>
+  <title>MoneySurfer Coverage Report > ExchangeRateSnapshot</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.model</a>
 </div>
 
-<h1>Coverage Summary for Class: GoalContribution (com.georgeci.moneysurfer.domain.model)</h1>
+<h1>Coverage Summary for Class: ExchangeRateSnapshot (com.georgeci.moneysurfer.domain.model)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">GoalContribution</td>
+  <td class="name">ExchangeRateSnapshot</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -72,7 +72,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (10/10)
+    (3/3)
   </span>
 </td>
 <td class="coverageStat">
@@ -80,7 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (84/84)
+    (12/12)
   </span>
 </td>
 </tr>
@@ -94,32 +94,70 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.model
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.GoalContributionId
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.GoalId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransferId
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
-&nbsp;import kotlinx.datetime.LocalDate
+&nbsp;import kotlin.math.abs
+&nbsp;import kotlin.math.roundToLong
 &nbsp;import kotlin.time.Instant
 &nbsp;
 &nbsp;/**
-&nbsp; * One movement against a [SavingsGoal]. [amount] is signed — a negative amount
-&nbsp; * is a withdrawal, not a separate entity and not a separate flag.
+&nbsp; * One FX quote table, all rates expressed against a single [baseCurrency].
 &nbsp; *
-&nbsp; * [transferId] is always `null` in v1: no money moves and `Transaction` is not
-&nbsp; * touched. It exists so the money-backed model can later store the id of a real
-&nbsp; * transfer here without a schema change on either side of the wire.
+&nbsp; * [rates] holds *units of the quoted currency per one unit of [baseCurrency]* — the shape every
+&nbsp; * mainstream provider publishes (`base=USD` → `{&quot;EUR&quot;: 0.92}` means 1 USD buys 0.92 EUR). Turning
+&nbsp; * a foreign balance into the base therefore divides rather than multiplies; see [convertToBase].
+&nbsp; *
+&nbsp; * [asOf] is the provider&#39;s own publication moment, not when the app fetched it — ECB-style feeds
+&nbsp; * only publish on business days, so a table fetched this morning can legitimately be two days old
+&nbsp; * and the UI has to be able to say so.
 &nbsp; */
-<b class="fc">&nbsp;data class GoalContribution(</b>
-<b class="fc">&nbsp;    val id: GoalContributionId = GoalContributionId.uuid(),</b>
-<b class="fc">&nbsp;    val workspaceId: WorkspaceId,</b>
-<b class="fc">&nbsp;    val goalId: GoalId,</b>
-<b class="fc">&nbsp;    val amount: Money,</b>
-<b class="fc">&nbsp;    val occurredOn: LocalDate,</b>
-<b class="fc">&nbsp;    val note: String = &quot;&quot;,</b>
-<b class="fc">&nbsp;    val transferId: TransferId? = null,</b>
-<b class="fc">&nbsp;    val createdAt: Instant,</b>
-<b class="fc">&nbsp;    val updatedAt: Instant = createdAt,</b>
+&nbsp;data class ExchangeRateTable(
+&nbsp;    val baseCurrency: CurrencyCode,
+&nbsp;    val rates: Map&lt;CurrencyCode, Double&gt;,
+&nbsp;    val asOf: Instant,
+&nbsp;) {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Quote for [currency], or `null` when this table cannot price it.
+&nbsp;     *
+&nbsp;     * The base currency always quotes at 1 even when the provider omits it from its own payload
+&nbsp;     * (most do), and non-positive or non-finite quotes are treated as absent rather than trusted
+&nbsp;     * into a division — a zero rate from a malformed payload would otherwise produce an infinite
+&nbsp;     * balance.
+&nbsp;     */
+&nbsp;    fun rateFor(currency: CurrencyCode): Double? {
+&nbsp;        if (currency == baseCurrency) return 1.0
+&nbsp;        val rate = rates[currency] ?: return null
+&nbsp;        return rate.takeIf { it.isFinite() &amp;&amp; it &gt; 0.0 }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * [money], denominated in [currency], expressed in [baseCurrency]; `null` when no rate covers
+&nbsp;     * [currency] and the caller has to surface the amount separately instead of dropping it.
+&nbsp;     *
+&nbsp;     * Rounds to the nearest minor unit (half away from zero). Money stays integral `Long` minor
+&nbsp;     * units — the `Double` only ever appears inside this one division, and balances are capped at
+&nbsp;     * [Money.MAX_MINOR], four orders of magnitude below the point where a `Double` stops
+&nbsp;     * representing whole minor units exactly.
+&nbsp;     *
+&nbsp;     * A quote small enough to push the quotient past [Long] also counts as &quot;cannot price it&quot;:
+&nbsp;     * `roundToLong` saturates rather than throwing, so an absurd rate from a malformed payload
+&nbsp;     * would otherwise turn into a silently clamped balance and then blow up the overflow-checked
+&nbsp;     * sum. Reporting it as unconverted keeps that amount visible and the total honest.
+&nbsp;     */
+&nbsp;    fun convertToBase(money: Money, currency: CurrencyCode): Money? {
+&nbsp;        val rate = rateFor(currency) ?: return null
+&nbsp;        if (rate == 1.0) return money
+&nbsp;        return (money.minor / rate)
+&nbsp;            .takeIf { it.isFinite() &amp;&amp; abs(it) &lt;= Money.MAX_MINOR }
+&nbsp;            ?.let { Money(it.roundToLong()) }
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;/** The base currency in force plus the newest rates cached for it, if any have been cached yet. */
+<b class="fc">&nbsp;data class ExchangeRateSnapshot(</b>
+<b class="fc">&nbsp;    val baseCurrency: CurrencyCode,</b>
+<b class="fc">&nbsp;    val rates: ExchangeRateTable?,</b>
 &nbsp;)
 </code>
 </pre>
@@ -144,7 +182,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 11:23</div>
+    <div style="float:right;">generated on 2026-07-29 12:08</div>
 </div>
 </body>
 </html>

@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > CurrencyTotal</title>
+  <title>MoneySurfer Coverage Report > ConvertedTotal</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.model</a>
 </div>
 
-<h1>Coverage Summary for Class: CurrencyTotal (com.georgeci.moneysurfer.domain.model)</h1>
+<h1>Coverage Summary for Class: ConvertedTotal (com.georgeci.moneysurfer.domain.model)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">CurrencyTotal</td>
+  <td class="name">ConvertedTotal</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -63,7 +63,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (1/1)
+    (2/2)
   </span>
 </td>
     <td class="coverageStat"/>
@@ -72,7 +72,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (3/3)
+    (6/6)
   </span>
 </td>
 <td class="coverageStat">
@@ -80,7 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (12/12)
+    (44/44)
   </span>
 </td>
 </tr>
@@ -94,52 +94,34 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.model
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.formatter.MoneyFormatter
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
-&nbsp;
-&nbsp;/** Sum of every account balance that shares [currencyCode]. */
-<b class="fc">&nbsp;data class CurrencyTotal(</b>
-<b class="fc">&nbsp;    val currencyCode: CurrencyCode,</b>
-<b class="fc">&nbsp;    val amount: Money,</b>
-&nbsp;)
+&nbsp;import kotlin.time.Instant
 &nbsp;
 &nbsp;/**
-&nbsp; * Balance totals per currency, most-used currency first (ties broken by currency code so the
-&nbsp; * order never depends on how the accounts happen to be sorted).
+&nbsp; * Every account balance folded into one figure in [baseCurrency], plus whatever could not get
+&nbsp; * there.
 &nbsp; *
-&nbsp; * Callers used to sum whatever matched the *first* account&#39;s currency and present that as &quot;the&quot;
-&nbsp; * total, which silently dropped every other currency. Adding across currencies is not possible
-&nbsp; * without FX rates, so the honest answer is one figure per currency: the head is the headline,
-&nbsp; * the tail has to be shown somewhere rather than swallowed.
+&nbsp; * The old dashboard total summed one currency and threw the rest away. The invariant that
+&nbsp; * replaces it: an account is either inside [total] or listed in [unconverted] — never neither.
+&nbsp; * A missing rate is a display problem, not a licence to drop money.
 &nbsp; */
-&nbsp;fun List&lt;Account&gt;.totalsByCurrency(): List&lt;CurrencyTotal&gt; =
-&nbsp;    groupBy { it.currencyCode }
-&nbsp;        .map { (currency, accounts) -&gt;
-&nbsp;            // Carry the bucket size through the sort — it is what &quot;most-used&quot; means, and
-&nbsp;            // re-deriving it per comparison would rescan the whole list for every currency.
-&nbsp;            CurrencyTotalWithCount(
-&nbsp;                total = CurrencyTotal(
-&nbsp;                    currencyCode = currency,
-&nbsp;                    amount = accounts.fold(Money.zero()) { acc, account -&gt; acc + account.balance },
-&nbsp;                ),
-&nbsp;                accountCount = accounts.size,
-&nbsp;            )
-&nbsp;        }
-&nbsp;        .sortedWith(
-&nbsp;            compareByDescending&lt;CurrencyTotalWithCount&gt; { it.accountCount }
-&nbsp;                .thenBy { it.total.currencyCode.value },
-&nbsp;        )
-&nbsp;        .map { it.total }
+<b class="fc">&nbsp;data class ConvertedTotal(</b>
+<b class="fc">&nbsp;    val baseCurrency: CurrencyCode,</b>
+&nbsp;    /** Converted sum, or `null` when not one account could be priced in [baseCurrency]. */
+<b class="fc">&nbsp;    val total: Money?,</b>
+&nbsp;    /** Per-currency totals for the accounts no rate covered, most-used currency first. */
+<b class="fc">&nbsp;    val unconverted: List&lt;CurrencyTotal&gt; = emptyList(),</b>
+&nbsp;    /**
+&nbsp;     * Publication moment of the rates the conversion used, or `null` when it needed none (every
+&nbsp;     * account was already in [baseCurrency]). Drives the &quot;as of …&quot; staleness signal.
+&nbsp;     */
+<b class="fc">&nbsp;    val asOf: Instant? = null,</b>
+&nbsp;) {
 &nbsp;
-&nbsp;private data class CurrencyTotalWithCount(
-&nbsp;    val total: CurrencyTotal,
-&nbsp;    val accountCount: Int,
-&nbsp;)
-&nbsp;
-&nbsp;/** [totalsByCurrency] rendered for display, same order — head first, everything else after it. */
-&nbsp;fun List&lt;Account&gt;.formattedTotalsByCurrency(): List&lt;String&gt; =
-&nbsp;    totalsByCurrency().map { MoneyFormatter.format(it.amount, it.currencyCode) }
+&nbsp;    /** True when the headline figure accounts for every balance in the workspace. */
+<b class="fc">&nbsp;    val isComplete: Boolean get() = unconverted.isEmpty()</b>
+&nbsp;}
 </code>
 </pre>
 </div>
@@ -163,7 +145,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 11:23</div>
+    <div style="float:right;">generated on 2026-07-29 12:08</div>
 </div>
 </body>
 </html>

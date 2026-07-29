@@ -138,8 +138,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    BudgetDetailsContent(state = state, onEvent = viewModel::onEvent)
 &nbsp;}
 &nbsp;
+&nbsp;/**
+&nbsp; * Stateless half of the screen — public so `:composeApp` desktop UI tests can mount it with an
+&nbsp; * injected state, the way `DashboardContent` is used.
+&nbsp; */
 &nbsp;@Composable
-&nbsp;private fun BudgetDetailsContent(
+&nbsp;fun BudgetDetailsContent(
 &nbsp;    state: BudgetDetailsState,
 &nbsp;    onEvent: (BudgetDetailsEvent) -&gt; Unit,
 &nbsp;) {
@@ -409,7 +413,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 11:23</div>
+    <div style="float:right;">generated on 2026-07-29 12:08</div>
 </div>
 </body>
 </html>

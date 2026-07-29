@@ -68,26 +68,26 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    41.4%
+    45.7%
   </span>
   <span class="absValue">
-    (29/70)
+    (32/70)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    86.7%
+    87.8%
   </span>
   <span class="absValue">
-    (85/98)
+    (86/98)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    81.6%
+    82.1%
   </span>
   <span class="absValue">
-    (1159/1421)
+    (1166/1421)
   </span>
 </td>
 </tr>
@@ -176,7 +176,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;    onBack: (() -&gt; Unit)? = null,</b>
 <b class="fc">&nbsp;    containerColor: Color = AppTheme.materialColors.surface,</b>
 &nbsp;    actions: @Composable RowScope.() -&gt; Unit = {},
-<b class="nc">&nbsp;    primaryAction: SurferPaneAction? = null,</b>
+<b class="fc">&nbsp;    primaryAction: SurferPaneAction? = null,</b>
 &nbsp;    content: @Composable (PaddingValues) -&gt; Unit,
 <b class="pc">&nbsp;) {</b>
 <b class="fc">&nbsp;    val pane = LocalSurferPane.current</b>
@@ -198,7 +198,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;            )
 &nbsp;        },
 <b class="fc">&nbsp;        floatingActionButton = {</b>
-<b class="pc">&nbsp;            if (pane.ownsSectionChrome &amp;&amp; primaryAction != null) {</b>
+<b class="fc">&nbsp;            if (pane.ownsSectionChrome &amp;&amp; primaryAction != null) {</b>
 <b class="fc">&nbsp;                SurferAddFab(</b>
 <b class="fc">&nbsp;                    label = primaryAction.label,</b>
 <b class="fc">&nbsp;                    onClick = primaryAction.onClick,</b>
@@ -382,7 +382,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 11:23</div>
+    <div style="float:right;">generated on 2026-07-29 12:08</div>
 </div>
 </body>
 </html>

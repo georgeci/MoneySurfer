@@ -52,31 +52,31 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (12/12)
+    (13/13)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    61.4%
+    61.3%
   </span>
   <span class="absValue">
-    (35/57)
+    (38/62)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    99.5%
+    99.6%
   </span>
   <span class="absValue">
-    (218/219)
+    (255/256)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    98.1%
+    98.2%
   </span>
   <span class="absValue">
-    (1835/1870)
+    (2082/2120)
   </span>
 </td>
 </tr>
@@ -91,31 +91,31 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (12/12)
+    (13/13)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    61.4%
+    61.3%
   </span>
   <span class="absValue">
-    (35/57)
+    (38/62)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    99.5%
+    99.6%
   </span>
   <span class="absValue">
-    (218/219)
+    (255/256)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    98.1%
+    98.2%
   </span>
   <span class="absValue">
-    (1835/1870)
+    (2082/2120)
   </span>
 </td>
 </tr>
@@ -136,6 +136,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.domain.dashboard.DashboardCardStyle
 &nbsp;import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetSize
 &nbsp;import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetType
+&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferCategoryPalette
 &nbsp;import com.georgeci.moneysurfer.uikit.components.budget.SurferBudgetStatus
 &nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 &nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferScaleToWidth
@@ -153,6 +154,8 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferBurnRateData
 &nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferBurnRatePace
 &nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferBurnRateWidget
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferCategorySpendCap
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferCategorySpendItem
 &nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferGoalItem
 &nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferGoalsWidget
 &nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferInsightItem
@@ -164,6 +167,8 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferRecentTransactionsWidget
 &nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferSafeToSpendData
 &nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferSafeToSpendWidget
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferSpentByCategoryVariant
+&nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferSpentByCategoryWidget
 &nbsp;import com.georgeci.moneysurfer.uikit.widgets.SurferWidgetSize
 &nbsp;import moneysurfer.feature.dashboard.generated.resources.Res
 &nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_accounts_manage
@@ -208,6 +213,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_safe_to_spend_caption
 &nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_safe_to_spend_per_day
 &nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_safe_to_spend_title
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_spent_by_category_of_cap
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_spent_by_category_share
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_spent_by_category_status_warn
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_spent_by_category_title
 &nbsp;import org.jetbrains.compose.resources.pluralStringResource
 &nbsp;import org.jetbrains.compose.resources.stringResource
 &nbsp;
@@ -247,6 +256,8 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;            DashboardWidgetType.SafeToSpend -&gt; SafeToSpendPreview(modifier.then(content))</b>
 <b class="fc">&nbsp;            DashboardWidgetType.BurnRate -&gt; BurnRatePreview(modifier.then(content))</b>
 <b class="fc">&nbsp;            DashboardWidgetType.Budgets -&gt; BudgetsPreview(modifier.then(content))</b>
+&nbsp;            DashboardWidgetType.SpentByCategory -&gt;
+<b class="fc">&nbsp;                SpentByCategoryPreview(cardStyle.variant, modifier.then(content))</b>
 <b class="fc">&nbsp;            DashboardWidgetType.Accounts -&gt; AccountsPreview(modifier.then(content))</b>
 <b class="fc">&nbsp;            DashboardWidgetType.Insights -&gt; InsightsPreview(cardStyle.variant, modifier.then(content))</b>
 <b class="fc">&nbsp;            DashboardWidgetType.Goals -&gt; GoalsPreview(modifier.then(content))</b>
@@ -311,6 +322,58 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;            paceFraction = SAMPLE_SAFE_PACE,</b>
 <b class="fc">&nbsp;            status = SurferBudgetStatus.Ok,</b>
 &nbsp;        ),
+<b class="fc">&nbsp;        modifier = modifier,</b>
+&nbsp;    )
+<b class="fc">&nbsp;}</b>
+&nbsp;
+&nbsp;/**
+&nbsp; * Sample rows, like [SafeToSpendPreview] — the tile is drawn for every widget in the picker,
+&nbsp; * including the ones switched off, so it must not depend on the month holding any spend.
+&nbsp; *
+&nbsp; * One of the three carries a cap, because the near-limit treatment is half of what distinguishes
+&nbsp; * the five variants from each other.
+&nbsp; */
+&nbsp;@Composable
+<b class="pc">&nbsp;private fun SpentByCategoryPreview(variant: String?, modifier: Modifier) {</b>
+<b class="fc">&nbsp;    val tints = SurferCategoryPalette.tints</b>
+<b class="fc">&nbsp;    SurferSpentByCategoryWidget(</b>
+<b class="fc">&nbsp;        title = stringResource(Res.string.dashboard_spent_by_category_title),</b>
+<b class="fc">&nbsp;        items = listOf(</b>
+<b class="fc">&nbsp;            SurferCategorySpendItem(</b>
+<b class="fc">&nbsp;                id = &quot;preview-rent&quot;,</b>
+<b class="fc">&nbsp;                name = stringResource(Res.string.dashboard_customize_preview_transaction_rent),</b>
+<b class="fc">&nbsp;                amount = SAMPLE_EXPENSE_THREE_MAGNITUDE,</b>
+<b class="fc">&nbsp;                share = SAMPLE_SHARE_RENT,</b>
+<b class="fc">&nbsp;                caption = stringResource(Res.string.dashboard_spent_by_category_share, SAMPLE_PERCENT_RENT),</b>
+<b class="fc">&nbsp;                tint = tints[0],</b>
+&nbsp;            ),
+<b class="fc">&nbsp;            SurferCategorySpendItem(</b>
+<b class="fc">&nbsp;                id = &quot;preview-groceries&quot;,</b>
+<b class="fc">&nbsp;                name = stringResource(Res.string.dashboard_customize_preview_transaction_groceries),</b>
+<b class="fc">&nbsp;                amount = SAMPLE_CATEGORY_GROCERIES,</b>
+<b class="fc">&nbsp;                share = SAMPLE_SHARE_GROCERIES,</b>
+<b class="fc">&nbsp;                caption = stringResource(</b>
+<b class="fc">&nbsp;                    Res.string.dashboard_spent_by_category_of_cap,</b>
+<b class="fc">&nbsp;                    SAMPLE_CATEGORY_GROCERIES,</b>
+<b class="fc">&nbsp;                    SAMPLE_CATEGORY_CAP,</b>
+&nbsp;                ),
+<b class="fc">&nbsp;                tint = tints[1],</b>
+<b class="fc">&nbsp;                cap = SurferCategorySpendCap(</b>
+<b class="fc">&nbsp;                    progress = SAMPLE_CAP_PROGRESS,</b>
+<b class="fc">&nbsp;                    status = SurferBudgetStatus.Warn,</b>
+<b class="fc">&nbsp;                    statusLabel = stringResource(Res.string.dashboard_spent_by_category_status_warn),</b>
+&nbsp;                ),
+&nbsp;            ),
+<b class="fc">&nbsp;            SurferCategorySpendItem(</b>
+<b class="fc">&nbsp;                id = &quot;preview-coffee&quot;,</b>
+<b class="fc">&nbsp;                name = stringResource(Res.string.dashboard_customize_preview_transaction_coffee),</b>
+<b class="fc">&nbsp;                amount = SAMPLE_CATEGORY_COFFEE,</b>
+<b class="fc">&nbsp;                share = SAMPLE_SHARE_COFFEE,</b>
+<b class="fc">&nbsp;                caption = stringResource(Res.string.dashboard_spent_by_category_share, SAMPLE_PERCENT_COFFEE),</b>
+<b class="fc">&nbsp;                tint = tints[2],</b>
+&nbsp;            ),
+&nbsp;        ),
+<b class="fc">&nbsp;        variant = SurferSpentByCategoryVariant.fromKey(variant),</b>
 <b class="fc">&nbsp;        modifier = modifier,</b>
 &nbsp;    )
 <b class="fc">&nbsp;}</b>
@@ -570,6 +633,16 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;private const val SAMPLE_COFFEE_CAP = &quot;€60.00&quot;
 &nbsp;private const val SAMPLE_COFFEE_OVER = &quot;€8.40&quot;
 &nbsp;private const val SAMPLE_COFFEE_PROGRESS = 1.14f
+&nbsp;private const val SAMPLE_EXPENSE_THREE_MAGNITUDE = &quot;€760.00&quot;
+&nbsp;private const val SAMPLE_CATEGORY_GROCERIES = &quot;€142.10&quot;
+&nbsp;private const val SAMPLE_CATEGORY_COFFEE = &quot;€38.20&quot;
+&nbsp;private const val SAMPLE_CATEGORY_CAP = &quot;€150&quot;
+&nbsp;private const val SAMPLE_SHARE_RENT = 0.62f
+&nbsp;private const val SAMPLE_SHARE_GROCERIES = 0.25f
+&nbsp;private const val SAMPLE_SHARE_COFFEE = 0.13f
+&nbsp;private const val SAMPLE_PERCENT_RENT = 62
+&nbsp;private const val SAMPLE_PERCENT_COFFEE = 13
+&nbsp;private const val SAMPLE_CAP_PROGRESS = 0.95f
 </code>
 </pre>
 </div>
@@ -593,7 +666,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 11:23</div>
+    <div style="float:right;">generated on 2026-07-29 12:08</div>
 </div>
 </body>
 </html>

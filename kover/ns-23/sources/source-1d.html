@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > CategorySpendMonth</title>
+  <title>MoneySurfer Coverage Report > CategorySpendHistory</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,15 +22,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.model</a>
 </div>
 
-<h1>Coverage Summary for Class: CategorySpendMonth (com.georgeci.moneysurfer.domain.model)</h1>
+<h1>Coverage Summary for Class: CategorySpendHistory (com.georgeci.moneysurfer.domain.model)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
-<th class="coverageStat 
-">
-  Class, %
-</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -49,15 +46,42 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">CategorySpendMonth</td>
+  <td class="name">CategorySpendHistory</td>
 <td class="coverageStat">
   <span class="percent">
     100%
   </span>
   <span class="absValue">
-    (1/1)
+    (4/4)
   </span>
 </td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (3/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    93.8%
+  </span>
+  <span class="absValue">
+    (15/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    95.5%
+  </span>
+  <span class="absValue">
+    (64/67)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">CategorySpendHistory$Companion</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -72,7 +96,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (3/3)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
@@ -80,11 +104,45 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (12/12)
+    (1/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (3/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    94.1%
+  </span>
+  <span class="absValue">
+    (16/17)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    95.6%
+  </span>
+  <span class="absValue">
+    (65/68)
   </span>
 </td>
 </tr>
-
 </table>
 
 <br/>
@@ -102,9 +160,9 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import kotlinx.datetime.plus
 &nbsp;
 &nbsp;/** One column of the spend trend. [total] is zero for a month the category booked nothing in. */
-<b class="fc">&nbsp;data class CategorySpendMonth(</b>
-<b class="fc">&nbsp;    val month: YearMonth,</b>
-<b class="fc">&nbsp;    val total: Money,</b>
+&nbsp;data class CategorySpendMonth(
+&nbsp;    val month: YearMonth,
+&nbsp;    val total: Money,
 &nbsp;)
 &nbsp;
 &nbsp;/** One row of the subcategory breakdown — a direct child, with its own subtree rolled in. */
@@ -122,35 +180,35 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp; * is empty for a leaf, which is what drives the leaf empty state — a leaf is not an error case,
 &nbsp; * it is the common shape.
 &nbsp; */
-&nbsp;data class CategorySpendHistory(
-&nbsp;    val months: List&lt;CategorySpendMonth&gt;,
-&nbsp;    val currentMonth: Money,
-&nbsp;    val transactionCount: Int,
-&nbsp;    val subcategories: List&lt;CategorySpendBreakdown&gt;,
+<b class="fc">&nbsp;data class CategorySpendHistory(</b>
+<b class="fc">&nbsp;    val months: List&lt;CategorySpendMonth&gt;,</b>
+<b class="fc">&nbsp;    val currentMonth: Money,</b>
+<b class="fc">&nbsp;    val transactionCount: Int,</b>
+<b class="fc">&nbsp;    val subcategories: List&lt;CategorySpendBreakdown&gt;,</b>
 &nbsp;) {
 &nbsp;    /** Mean over the whole window, including months with nothing in them. */
 &nbsp;    val monthlyAverage: Money
-&nbsp;        get() = if (months.isEmpty()) {
-&nbsp;            Money.zero()
+<b class="pc">&nbsp;        get() = if (months.isEmpty()) {</b>
+<b class="nc">&nbsp;            Money.zero()</b>
 &nbsp;        } else {
-&nbsp;            months.fold(Money.zero()) { acc, m -&gt;
-&nbsp;                acc + m.total
-&nbsp;            } / months.size
+<b class="fc">&nbsp;            months.fold(Money.zero()) { acc, m -&gt;</b>
+<b class="fc">&nbsp;                acc + m.total</b>
+<b class="fc">&nbsp;            } / months.size</b>
 &nbsp;        }
 &nbsp;
 &nbsp;    /** Mean per transaction this month, or null when nothing was booked. */
 &nbsp;    val perTransaction: Money?
-&nbsp;        get() = if (transactionCount &lt;= 0) null else currentMonth / transactionCount
+<b class="fc">&nbsp;        get() = if (transactionCount &lt;= 0) null else currentMonth / transactionCount</b>
 &nbsp;
 &nbsp;    companion object {
 &nbsp;        /** Columns the trend draws. Six fits the mockup&#39;s bar row without crowding on a phone. */
 &nbsp;        const val TREND_MONTHS: Int = 6
 &nbsp;
-&nbsp;        val Empty = CategorySpendHistory(
-&nbsp;            months = emptyList(),
-&nbsp;            currentMonth = Money.zero(),
-&nbsp;            transactionCount = 0,
-&nbsp;            subcategories = emptyList(),
+<b class="fc">&nbsp;        val Empty = CategorySpendHistory(</b>
+<b class="fc">&nbsp;            months = emptyList(),</b>
+<b class="fc">&nbsp;            currentMonth = Money.zero(),</b>
+<b class="fc">&nbsp;            transactionCount = 0,</b>
+<b class="fc">&nbsp;            subcategories = emptyList(),</b>
 &nbsp;        )
 &nbsp;    }
 &nbsp;}
@@ -240,7 +298,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 11:23</div>
+    <div style="float:right;">generated on 2026-07-29 12:08</div>
 </div>
 </body>
 </html>

@@ -282,7 +282,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;        rolloverCarry = carry,</b>
 <b class="fc">&nbsp;        remaining = remaining,</b>
 <b class="fc">&nbsp;        percent = percentOf(spent, effectiveLimit),</b>
-<b class="fc">&nbsp;        status = statusOf(spent, effectiveLimit, budget.alertPercent),</b>
+<b class="fc">&nbsp;        status = budgetStatusOf(spent, effectiveLimit, budget.alertPercent),</b>
 <b class="fc">&nbsp;        daysLeft = daysLeft,</b>
 <b class="fc">&nbsp;        dailyAverage = dailyAverage,</b>
 <b class="fc">&nbsp;        projectedTotal = dailyAverage * budget.period.forecastDays,</b>
@@ -317,7 +317,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;private fun percentOf(spent: Money, limit: Money): Int =
 <b class="fc">&nbsp;    if (limit.minor &lt;= 0L) 0 else (spent.minor * PERCENT / limit.minor).toInt()</b>
 &nbsp;
-&nbsp;private fun statusOf(spent: Money, limit: Money, alertPercent: Int): BudgetStatus {
+&nbsp;/**
+&nbsp; * The traffic light for [spent] against [limit], with [alertPercent] as the near-limit threshold.
+&nbsp; *
+&nbsp; * Public because [calculateBudgetProgress] is not the only place spend meets a cap: the dashboard&#39;s
+&nbsp; * per-category breakdown ([buildSpentByCategory]) measures a category against its own budget
+&nbsp; * without folding the transaction list, and a second set of thresholds there would let the same
+&nbsp; * budget read WARN on one screen and OK on another.
+&nbsp; */
+&nbsp;fun budgetStatusOf(spent: Money, limit: Money, alertPercent: Int): BudgetStatus {
 <b class="fc">&nbsp;    val percent = percentOf(spent, limit)</b>
 <b class="fc">&nbsp;    return when {</b>
 <b class="fc">&nbsp;        spent &gt; limit -&gt; BudgetStatus.OVER</b>
@@ -348,7 +356,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 11:23</div>
+    <div style="float:right;">generated on 2026-07-29 12:08</div>
 </div>
 </body>
 </html>

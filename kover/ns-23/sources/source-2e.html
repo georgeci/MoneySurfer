@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > MonthlyNet</title>
+  <title>MoneySurfer Coverage Report > MerchantSpend</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.model</a>
 </div>
 
-<h1>Coverage Summary for Class: MonthlyNet (com.georgeci.moneysurfer.domain.model)</h1>
+<h1>Coverage Summary for Class: MerchantSpend (com.georgeci.moneysurfer.domain.model)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">MonthlyNet</td>
+  <td class="name">MerchantSpend</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -63,7 +63,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (2/2)
+    (1/1)
   </span>
 </td>
     <td class="coverageStat"/>
@@ -72,7 +72,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (5/5)
+    (4/4)
   </span>
 </td>
 <td class="coverageStat">
@@ -80,7 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (22/22)
+    (17/17)
   </span>
 </td>
 </tr>
@@ -132,13 +132,13 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp; * from a full one — see
 &nbsp; * [com.georgeci.moneysurfer.domain.repositories.SpendAnalyticsRepository.netByMonth].
 &nbsp; */
-<b class="fc">&nbsp;data class MonthlyNet(</b>
-<b class="fc">&nbsp;    val month: YearMonth,</b>
-<b class="fc">&nbsp;    val income: Money,</b>
-<b class="fc">&nbsp;    val expense: Money,</b>
+&nbsp;data class MonthlyNet(
+&nbsp;    val month: YearMonth,
+&nbsp;    val income: Money,
+&nbsp;    val expense: Money,
 &nbsp;) {
 &nbsp;    /** Negative once the month spent more than it earned. */
-<b class="fc">&nbsp;    val net: Money get() = income - expense</b>
+&nbsp;    val net: Money get() = income - expense
 &nbsp;}
 &nbsp;
 &nbsp;/**
@@ -155,10 +155,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp; * What one merchant took inside a spend window. [merchant] is never blank — see
 &nbsp; * [com.georgeci.moneysurfer.domain.repositories.SpendAnalyticsRepository.topMerchants].
 &nbsp; */
-&nbsp;data class MerchantSpend(
-&nbsp;    val merchant: String,
-&nbsp;    val total: Money,
-&nbsp;    val transactionCount: Int,
+<b class="fc">&nbsp;data class MerchantSpend(</b>
+<b class="fc">&nbsp;    val merchant: String,</b>
+<b class="fc">&nbsp;    val total: Money,</b>
+<b class="fc">&nbsp;    val transactionCount: Int,</b>
 &nbsp;)
 </code>
 </pre>
@@ -183,7 +183,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 11:23</div>
+    <div style="float:right;">generated on 2026-07-29 12:08</div>
 </div>
 </body>
 </html>

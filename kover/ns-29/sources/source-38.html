@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > GetRecentTransactionsUseCase</title>
+  <title>MoneySurfer Coverage Report > GetGoalsUseCaseKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.usecase</a>
 </div>
 
-<h1>Coverage Summary for Class: GetRecentTransactionsUseCase (com.georgeci.moneysurfer.domain.usecase)</h1>
+<h1>Coverage Summary for Class: GetGoalsUseCaseKt (com.georgeci.moneysurfer.domain.usecase)</h1>
 
 <table class="coverageStats">
 
@@ -46,29 +46,29 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">GetRecentTransactionsUseCase</td>
+  <td class="name">GetGoalsUseCaseKt</td>
 <td class="coverageStat">
   <span class="percent">
     100%
   </span>
   <span class="absValue">
-    (4/4)
+    (2/2)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    50%
+    25%
   </span>
   <span class="absValue">
-    (2/4)
+    (2/8)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    88.9%
+    62.5%
   </span>
   <span class="absValue">
-    (8/9)
+    (5/8)
   </span>
 </td>
 <td class="coverageStat">
@@ -76,16 +76,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (23/23)
+    (11/11)
   </span>
 </td>
 </tr>
   <tr>
-    <td class="name">GetRecentTransactionsUseCase$Companion</td>
-    <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">GetRecentTransactionsUseCase$invoke$$inlined$flatMapLatest$1</td>
+    <td class="name">GetGoalsUseCaseKt$special$$inlined$compareBy$1</td>
 <td class="coverageStat">
   <span class="percent">
     0%
@@ -97,23 +93,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <td class="coverageStat"/>
   </tr>
   <tr>
-    <td class="name">GetRecentTransactionsUseCase$invoke$lambda$0$$inlined$map$1</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/2)
-  </span>
-</td>
-    <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">GetRecentTransactionsUseCase$invoke$lambda$0$$inlined$map$1$1</td>
-    <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">GetRecentTransactionsUseCase$invoke$lambda$0$$inlined$map$1$2</td>
+    <td class="name">GetGoalsUseCaseKt$special$$inlined$thenByDescending$1</td>
 <td class="coverageStat">
   <span class="percent">
     0%
@@ -125,7 +105,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <td class="coverageStat"/>
   </tr>
   <tr>
-    <td class="name">GetRecentTransactionsUseCase$invoke$lambda$0$$inlined$map$1$2$1</td>
+    <td class="name">GetGoalsUseCaseKt$WhenMappings</td>
     <td class="coverageStat"/>
   </tr>
 <tr>
@@ -135,23 +115,23 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     50%
   </span>
   <span class="absValue">
-    (4/8)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    50%
-  </span>
-  <span class="absValue">
     (2/4)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    88.9%
+    25%
   </span>
   <span class="absValue">
-    (8/9)
+    (2/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    62.5%
+  </span>
+  <span class="absValue">
+    (5/8)
   </span>
 </td>
 <td class="coverageStat">
@@ -159,7 +139,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (23/23)
+    (11/11)
   </span>
 </td>
 </tr>
@@ -173,46 +153,67 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.usecase
 &nbsp;
 &nbsp;import com.georgeci.moneysurfer.domain.auth.SessionPointers
-&nbsp;import com.georgeci.moneysurfer.domain.model.TransactionSplitGroup
-&nbsp;import com.georgeci.moneysurfer.domain.model.groupSplitLegs
-&nbsp;import com.georgeci.moneysurfer.domain.repositories.TransactionRepository
+&nbsp;import com.georgeci.moneysurfer.domain.model.GoalProgress
+&nbsp;import com.georgeci.moneysurfer.domain.model.GoalStatus
+&nbsp;import com.georgeci.moneysurfer.domain.model.SavingsGoal
+&nbsp;import com.georgeci.moneysurfer.domain.model.SavingsGoalSummary
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.GoalContributionRepository
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.SavingsGoalRepository
 &nbsp;import kotlinx.coroutines.ExperimentalCoroutinesApi
 &nbsp;import kotlinx.coroutines.flow.Flow
+&nbsp;import kotlinx.coroutines.flow.combine
 &nbsp;import kotlinx.coroutines.flow.flatMapLatest
 &nbsp;import kotlinx.coroutines.flow.flowOf
-&nbsp;import kotlinx.coroutines.flow.map
 &nbsp;import org.koin.core.annotation.Single
 &nbsp;
-<b class="fc">&nbsp;@Single</b>
+&nbsp;/**
+&nbsp; * Goals of the current workspace with their saved amounts folded in. Contributions are
+&nbsp; * read once per workspace rather than once per goal — the list would otherwise open a
+&nbsp; * `SUM` flow per row.
+&nbsp; *
+&nbsp; * ARCHIVED goals are hidden; v1 has no list filter to bring them back (md/goals.md).
+&nbsp; */
+&nbsp;@Single
 &nbsp;@OptIn(ExperimentalCoroutinesApi::class)
-&nbsp;class GetRecentTransactionsUseCase(
-<b class="fc">&nbsp;    private val transactionRepository: TransactionRepository,</b>
-<b class="fc">&nbsp;    private val session: SessionPointers,</b>
+&nbsp;class GetGoalsUseCase(
+&nbsp;    private val goalRepository: SavingsGoalRepository,
+&nbsp;    private val contributionRepository: GoalContributionRepository,
+&nbsp;    private val session: SessionPointers,
 &nbsp;) {
 &nbsp;
-&nbsp;    /**
-&nbsp;     * The newest [limit] *receipts* of the current workspace, newest first.
-&nbsp;     *
-&nbsp;     * Receipts, not rows: the legs of a split are collapsed into one group, so a supermarket run
-&nbsp;     * filed under three categories takes one line of the recent-activity widget rather than
-&nbsp;     * crowding out everything else that happened that day.
-&nbsp;     *
-&nbsp;     * Grouping happens before the limit is applied, over the workspace&#39;s whole list, so a group is
-&nbsp;     * always complete here — nothing can be cut in half by the cap the way a `take` on raw rows
-&nbsp;     * would do it.
-&nbsp;     */
-<b class="fc">&nbsp;    operator fun invoke(limit: Int = DEFAULT_LIMIT): Flow&lt;List&lt;TransactionSplitGroup&gt;&gt; =</b>
-<b class="fc">&nbsp;        session.currentWorkspaceId.flatMapLatest { workspaceId -&gt;</b>
-<b class="fc">&nbsp;            workspaceId</b>
-<b class="pc">&nbsp;                ?.let(transactionRepository::getByWorkspaceId)</b>
-<b class="pc">&nbsp;                ?.map { rows -&gt; rows.groupSplitLegs().take(limit) }</b>
-<b class="nc">&nbsp;                ?: flowOf(emptyList())</b>
+&nbsp;    operator fun invoke(includeArchived: Boolean = false): Flow&lt;List&lt;SavingsGoalSummary&gt;&gt; =
+&nbsp;        session.currentWorkspaceId.flatMapLatest { workspaceId -&gt;
+&nbsp;            workspaceId ?: return@flatMapLatest flowOf(emptyList())
+&nbsp;            combine(
+&nbsp;                goalRepository.getByWorkspaceId(workspaceId),
+&nbsp;                contributionRepository.getByWorkspaceId(workspaceId),
+&nbsp;            ) { goals, contributions -&gt;
+&nbsp;                val savedByGoal = contributions
+&nbsp;                    .groupBy { it.goalId }
+&nbsp;                    .mapValues { (_, rows) -&gt; rows.fold(Money.zero()) { acc, row -&gt; acc + row.amount } }
+&nbsp;                goals
+&nbsp;                    .filter { includeArchived || it.status != GoalStatus.ARCHIVED }
+&nbsp;                    .sortedWith(goalOrder)
+&nbsp;                    .map { goal -&gt;
+&nbsp;                        SavingsGoalSummary(
+&nbsp;                            goal = goal,
+&nbsp;                            progress = GoalProgress.of(goal, savedByGoal[goal.id] ?: Money.zero()),
+&nbsp;                        )
+&nbsp;                    }
+&nbsp;            }
 &nbsp;        }
-&nbsp;
-&nbsp;    companion object {
-&nbsp;        const val DEFAULT_LIMIT = 20
-&nbsp;    }
 &nbsp;}
+&nbsp;
+&nbsp;/** Goals you are still saving for float to the top; newest first inside a status. */
+<b class="fc">&nbsp;private val goalOrder = compareBy&lt;SavingsGoal&gt; { goal -&gt;</b>
+<b class="pc">&nbsp;    when (goal.status) {</b>
+<b class="fc">&nbsp;        GoalStatus.ACTIVE -&gt; 0</b>
+<b class="nc">&nbsp;        GoalStatus.COMPLETED -&gt; 1</b>
+<b class="nc">&nbsp;        GoalStatus.PAUSED -&gt; 2</b>
+<b class="nc">&nbsp;        GoalStatus.ARCHIVED -&gt; 3</b>
+<b class="fc">&nbsp;    }</b>
+<b class="fc">&nbsp;}.thenByDescending { it.createdAt }</b>
 </code>
 </pre>
 </div>
@@ -236,7 +237,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 11:23</div>
+    <div style="float:right;">generated on 2026-07-29 12:08</div>
 </div>
 </body>
 </html>
