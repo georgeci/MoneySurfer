@@ -3,15 +3,12 @@ package com.georgeci.moneysurfer.utils
 import java.io.File
 
 /**
- * Shared plumbing for the repo-wide textual gates ([StringResourcePlaceholderTest],
- * [StringResourceParityTest], [StringResourceEscapeTest], [MaestroFlowSelectorTest]).
- *
- * All four walk the checkout from the Gradle module dir up to the `settings.gradle.kts` root and
- * scan by file name, so they need the exact same idea of "which directories aren't source".
- */
-
-/**
  * Directories a repo-wide walk must not descend into.
+ *
+ * Shared by the repo-wide textual gates ([StringResourcePlaceholderTest], [StringResourceParityTest],
+ * [StringResourceEscapeTest], [MaestroFlowSelectorTest]). All four walk the checkout from the Gradle
+ * module dir up to the `settings.gradle.kts` root and scan by file name, so they need the exact same
+ * idea of "which directories aren't source".
  *
  * `.claude` is on the list because Claude Code keeps its worktrees under `.claude/worktrees/` —
  * *inside* the main checkout. Without it, a gate run from the main clone scans every other
