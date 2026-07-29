@@ -1,5 +1,6 @@
 package com.georgeci.moneysurfer.feature.dashboard.customize
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -34,6 +35,7 @@ import com.georgeci.moneysurfer.domain.dashboard.DashboardCardStyle
 import com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutConfig
 import com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutItem
 import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetSize
+import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetSpan
 import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetType
 import com.georgeci.moneysurfer.uikit.components.SurferBottomSheetContent
 import com.georgeci.moneysurfer.uikit.components.base.SurferSectionLabel
@@ -43,6 +45,7 @@ import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import moneysurfer.feature.dashboard.generated.resources.Res
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_style_size
+import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_style_span
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_style_subtitle
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_style_variant
 import org.jetbrains.compose.resources.stringResource
@@ -57,6 +60,12 @@ private val PREVIEW_HEIGHT = 104.dp
 /** Width of a variant tile. Fixed rather than shared evenly: the variant row scrolls. */
 private val VARIANT_TILE_WIDTH = 150.dp
 
+/** Width of a grid-width tile. Fixed for the same reason as [VARIANT_TILE_WIDTH]: the row scrolls. */
+private val SPAN_TILE_WIDTH = 124.dp
+
+/** Height of one cell in a grid-width tile's schematic row. */
+private val SPAN_SCHEMATIC_HEIGHT = 22.dp
+
 private val TILE_SHAPE = RoundedCornerShape(18.dp)
 
 private val SHEET_PADDING = 20.dp
@@ -70,7 +79,10 @@ private val SHEET_PADDING = 20.dp
 internal fun DashboardCardStyleSheet(
     item: DashboardLayoutItem,
     onSelect: (DashboardCardStyle) -> Unit,
+    onSpanSelect: (DashboardWidgetSpan) -> Unit,
     onDismiss: () -> Unit,
+    styleEnabled: Boolean = true,
+    spanEnabled: Boolean = false,
 ) {
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -78,7 +90,13 @@ internal fun DashboardCardStyleSheet(
         containerColor = AppTheme.materialColors.surfaceContainerLow,
         shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
     ) {
-        DashboardCardStyleSheetContent(item = item, onSelect = onSelect)
+        DashboardCardStyleSheetContent(
+            item = item,
+            onSelect = onSelect,
+            onSpanSelect = onSpanSelect,
+            styleEnabled = styleEnabled,
+            spanEnabled = spanEnabled,
+        )
     }
 }
 
@@ -86,14 +104,24 @@ internal fun DashboardCardStyleSheet(
  * Stateless half of the picker — public so `:composeApp` desktop UI tests can mount it directly,
  * the way [DashboardCustomizeContent] is mounted, without going through the modal's animation.
  *
- * Every tile is a real render of the widget at the style it offers, side by side, because the
+ * Every style tile is a real render of the widget at the style it offers, side by side, because the
  * choice is a visual one: "Compact" and "Inline" mean nothing as words in a list.
+ *
+ * The two halves are gated independently, because they are governed by different things.
+ * [styleEnabled] is the host's `dashboard_widget_style` build key — the card-style work is
+ * unfinished and ships off. [spanEnabled] is the window: the dashboard only lays widgets out in a
+ * grid from expanded width up, so on a phone a width control would change nothing visible, which
+ * reads as a broken one. The caller opens this sheet when *either* is on, and a sheet with both off
+ * has nothing to offer and is never opened.
  */
 @Composable
 fun DashboardCardStyleSheetContent(
     item: DashboardLayoutItem,
     onSelect: (DashboardCardStyle) -> Unit,
+    onSpanSelect: (DashboardWidgetSpan) -> Unit,
     modifier: Modifier = Modifier,
+    styleEnabled: Boolean = true,
+    spanEnabled: Boolean = false,
 ) {
     val variants = item.type.variantOptions()
     SurferBottomSheetContent(
@@ -101,31 +129,33 @@ fun DashboardCardStyleSheetContent(
         subtitle = stringResource(Res.string.dashboard_customize_style_subtitle),
         modifier = modifier.testTag(DashboardCustomizeTestTags.styleSheet(item.type.name)),
     ) {
-        SurferSectionLabel(
-            text = stringResource(Res.string.dashboard_customize_style_size),
-            modifier = Modifier.padding(horizontal = SHEET_PADDING),
-        )
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = SHEET_PADDING),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            DashboardWidgetSize.entries.forEach { size ->
-                val style = item.cardStyle.copy(size = size)
-                StyleOptionTile(
-                    label = stringResource(size.labelResource()),
-                    selected = item.cardStyle.size == size,
-                    tag = DashboardCustomizeTestTags.styleOption(item.type.name, size.name),
-                    onClick = { onSelect(style) },
-                    modifier = Modifier.weight(1f),
-                ) {
-                    DashboardWidgetPreview(type = item.type, cardStyle = style)
+        if (styleEnabled) {
+            SurferSectionLabel(
+                text = stringResource(Res.string.dashboard_customize_style_size),
+                modifier = Modifier.padding(horizontal = SHEET_PADDING),
+            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = SHEET_PADDING),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                DashboardWidgetSize.entries.forEach { size ->
+                    val style = item.cardStyle.copy(size = size)
+                    StyleOptionTile(
+                        label = stringResource(size.labelResource()),
+                        selected = item.cardStyle.size == size,
+                        tag = DashboardCustomizeTestTags.styleOption(item.type.name, size.name),
+                        onClick = { onSelect(style) },
+                        modifier = Modifier.weight(1f),
+                    ) {
+                        DashboardWidgetPreview(type = item.type, cardStyle = style)
+                    }
                 }
             }
         }
 
-        if (variants.isNotEmpty()) {
+        if (styleEnabled && variants.isNotEmpty()) {
             val selectedKey = item.type.selectedVariant(item.cardStyle)?.key
             SurferSectionLabel(
                 text = stringResource(Res.string.dashboard_customize_style_variant),
@@ -151,6 +181,95 @@ fun DashboardCardStyleSheetContent(
                 }
             }
         }
+
+        if (spanEnabled) {
+            SurferSectionLabel(
+                text = stringResource(Res.string.dashboard_customize_style_span),
+                modifier = Modifier.padding(top = 8.dp, start = SHEET_PADDING, end = SHEET_PADDING),
+            )
+            Row(
+                modifier = Modifier
+                    .horizontalScroll(rememberScrollState())
+                    .padding(horizontal = SHEET_PADDING),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                DashboardWidgetSpan.entries.forEach { span ->
+                    SpanOptionTile(
+                        span = span,
+                        selected = item.span == span,
+                        onClick = { onSpanSelect(span) },
+                        tag = DashboardCustomizeTestTags.spanOption(item.type.name, span.name),
+                    )
+                }
+            }
+        }
+    }
+}
+
+/**
+ * One grid width, drawn as the row it produces: [DashboardWidgetSpan.COLUMNS] cells with the ones
+ * this span claims filled in. A schematic rather than a real widget render, because what the choice
+ * changes is the *row* — the same card at a third of the width is a thumbnail of the neighbours it
+ * would have, which is exactly what the size tiles above already show.
+ */
+@Composable
+private fun SpanOptionTile(
+    span: DashboardWidgetSpan,
+    selected: Boolean,
+    onClick: () -> Unit,
+    tag: String,
+    modifier: Modifier = Modifier,
+) {
+    val colors = AppTheme.materialColors
+    val outline = if (selected) colors.primary else colors.outlineVariant
+    val label = stringResource(span.labelResource())
+    Box(
+        modifier = modifier
+            .width(SPAN_TILE_WIDTH)
+            .clip(TILE_SHAPE)
+            .border(if (selected) 2.dp else 1.dp, outline, TILE_SHAPE),
+    ) {
+        Column(
+            // Same reason as [StyleOptionTile]: the schematic is drawing, and the label below it is
+            // already the name of the tap target laid over everything.
+            modifier = Modifier
+                .padding(10.dp)
+                .clearAndSetSemantics {},
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(2.dp),
+            ) {
+                repeat(DashboardWidgetSpan.COLUMNS) { column ->
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(SPAN_SCHEMATIC_HEIGHT)
+                            .clip(AppTheme.shapes.extraSmall)
+                            .background(
+                                if (column < span.columns) {
+                                    if (selected) colors.primary else colors.onSurfaceVariant
+                                } else {
+                                    colors.surfaceContainerHighest
+                                },
+                            ),
+                    )
+                }
+            }
+            Text(
+                text = label,
+                style = AppTheme.typography.labelLarge,
+                color = if (selected) colors.onSurface else colors.onSurfaceVariant,
+            )
+        }
+        Box(
+            modifier = Modifier
+                .matchParentSize()
+                .selectable(selected = selected, onClick = onClick)
+                .semantics { contentDescription = label }
+                .testTag(tag),
+        )
     }
 }
 
@@ -227,6 +346,8 @@ private fun DashboardCardStyleSheetPreview() {
         DashboardCardStyleSheetContent(
             item = DashboardLayoutConfig.DEFAULT.items.first { it.type == DashboardWidgetType.Balance },
             onSelect = {},
+            onSpanSelect = {},
+            spanEnabled = true,
         )
     }
 }

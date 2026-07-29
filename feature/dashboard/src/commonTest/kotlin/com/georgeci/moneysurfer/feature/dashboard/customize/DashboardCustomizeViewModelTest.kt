@@ -5,6 +5,7 @@ import com.georgeci.moneysurfer.domain.dashboard.DashboardCardStyle
 import com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutConfig
 import com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutItem
 import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetSize
+import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetSpan
 import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetType
 import com.georgeci.moneysurfer.domain.fixtures.FakeHostCapabilities
 import com.georgeci.moneysurfer.domain.fixtures.FakeUiPreferences
@@ -179,6 +180,34 @@ class DashboardCustomizeViewModelTest : StringSpec({
         viewModel.onEvent(
             DashboardCustomizeEvent.OnCardStyleChange(DashboardWidgetType.Balance, DashboardCardStyle.EXPANDED),
         )
+
+        preferences.layoutWrites shouldBe 0
+    }
+
+    "picking a grid width persists it without touching the widget's card style or slot" {
+        val preferences = FakeUiPreferences()
+        val viewModel = DashboardCustomizeViewModel(preferences, FakeHostCapabilities())
+        val styleBefore = viewModel.layout().items.single { it.type == DashboardWidgetType.Balance }.cardStyle
+
+        viewModel.onEvent(
+            DashboardCustomizeEvent.OnSpanChange(DashboardWidgetType.Balance, DashboardWidgetSpan.Third),
+        )
+
+        viewModel.layout().items.map { it.type } shouldContainExactly
+            DashboardLayoutConfig.DEFAULT.items.map { it.type }
+        viewModel.layout().items.single { it.type == DashboardWidgetType.Balance }.let {
+            it.span shouldBe DashboardWidgetSpan.Third
+            it.cardStyle shouldBe styleBefore
+        }
+        preferences.dashboardLayout.flow.first() shouldBe viewModel.layout()
+    }
+
+    "picking the grid width a widget already has is not written back" {
+        val preferences = RecordingUiPreferences()
+        val viewModel = DashboardCustomizeViewModel(preferences, FakeHostCapabilities())
+        val current = viewModel.layout().items.single { it.type == DashboardWidgetType.Balance }.span
+
+        viewModel.onEvent(DashboardCustomizeEvent.OnSpanChange(DashboardWidgetType.Balance, current))
 
         preferences.layoutWrites shouldBe 0
     }

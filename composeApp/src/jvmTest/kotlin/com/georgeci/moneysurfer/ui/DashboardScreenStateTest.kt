@@ -1,6 +1,8 @@
 package com.georgeci.moneysurfer.ui
 
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.test.ExperimentalTestApi
+import androidx.compose.ui.test.SkikoComposeUiTest
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotSelected
 import androidx.compose.ui.test.assertIsSelected
@@ -9,7 +11,7 @@ import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.v2.runComposeUiTest
+import androidx.compose.ui.test.v2.runSkikoComposeUiTest
 import com.georgeci.moneysurfer.domain.dashboard.DashboardCardStyle
 import com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutConfig
 import com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutItem
@@ -48,7 +50,7 @@ import io.kotest.matchers.collections.shouldContainExactly
 class DashboardScreenStateTest : StringSpec({
 
     "the quick-actions row draws both shortcuts once a transfer is possible" {
-        runComposeUiTest {
+        runPhoneUiTest {
             setContent {
                 DashboardContent(state = contentWith(accounts = 2, transferEnabled = true), onEvent = {})
             }
@@ -60,7 +62,7 @@ class DashboardScreenStateTest : StringSpec({
     }
 
     "a build without transfers draws no quick-actions row" {
-        runComposeUiTest {
+        runPhoneUiTest {
             setContent {
                 DashboardContent(state = contentWith(accounts = 2, transferEnabled = false), onEvent = {})
             }
@@ -71,7 +73,7 @@ class DashboardScreenStateTest : StringSpec({
     }
 
     "a single account draws no quick-actions row — there is nowhere to transfer to" {
-        runComposeUiTest {
+        runPhoneUiTest {
             setContent {
                 DashboardContent(state = contentWith(accounts = 1, transferEnabled = true), onEvent = {})
             }
@@ -81,7 +83,7 @@ class DashboardScreenStateTest : StringSpec({
     }
 
     "the two shortcuts ask for the plain form and the transfer form respectively" {
-        runComposeUiTest {
+        runPhoneUiTest {
             val events = mutableListOf<DashboardEvent>()
             setContent {
                 DashboardContent(
@@ -102,7 +104,7 @@ class DashboardScreenStateTest : StringSpec({
     }
 
     "with no budget the safe-to-spend card still draws, offering the way out of its empty state" {
-        runComposeUiTest {
+        runPhoneUiTest {
             val events = mutableListOf<DashboardEvent>()
             setContent {
                 DashboardContent(
@@ -120,7 +122,7 @@ class DashboardScreenStateTest : StringSpec({
     }
 
     "with a budget the card shows the remainder and drops the set-a-budget link" {
-        runComposeUiTest {
+        runPhoneUiTest {
             setContent {
                 DashboardContent(
                     state = contentWith(accounts = 2, transferEnabled = true).copy(
@@ -139,7 +141,7 @@ class DashboardScreenStateTest : StringSpec({
     }
 
     "an overspent budget says so in the caption rather than reading as headroom" {
-        runComposeUiTest {
+        runPhoneUiTest {
             setContent {
                 DashboardContent(
                     state = contentWith(accounts = 2, transferEnabled = true).copy(
@@ -160,7 +162,7 @@ class DashboardScreenStateTest : StringSpec({
     }
 
     "a budget past its alert threshold is still headroom, not an overspend" {
-        runComposeUiTest {
+        runPhoneUiTest {
             setContent {
                 DashboardContent(
                     state = contentWith(accounts = 2, transferEnabled = true).copy(
@@ -175,7 +177,7 @@ class DashboardScreenStateTest : StringSpec({
     }
 
     "the period switch sits above the widgets with the current span selected" {
-        runComposeUiTest {
+        runPhoneUiTest {
             setContent {
                 DashboardContent(state = contentWith(accounts = 2, transferEnabled = true), onEvent = {})
             }
@@ -187,7 +189,7 @@ class DashboardScreenStateTest : StringSpec({
     }
 
     "picking the other span asks the view model for it rather than deciding on screen" {
-        runComposeUiTest {
+        runPhoneUiTest {
             val events = mutableListOf<DashboardEvent>()
             setContent {
                 DashboardContent(
@@ -204,7 +206,7 @@ class DashboardScreenStateTest : StringSpec({
     }
 
     "a layout with no period-scoped widget draws no period switch" {
-        runComposeUiTest {
+        runPhoneUiTest {
             val layout = DashboardWidgetType.entries
                 .filter { it.isPeriodScoped }
                 .fold(DashboardLayoutConfig.DEFAULT) { acc, type -> acc.withWidgetEnabled(type, enabled = false) }
@@ -221,7 +223,7 @@ class DashboardScreenStateTest : StringSpec({
     }
 
     "the burn-rate card draws its pace and projection, and says so when a budget judges them" {
-        runComposeUiTest {
+        runPhoneUiTest {
             setContent {
                 DashboardContent(
                     state = contentWith(accounts = 2, transferEnabled = true).copy(
@@ -239,7 +241,7 @@ class DashboardScreenStateTest : StringSpec({
     }
 
     "with no budget the burn-rate card still draws the projection, minus the verdict" {
-        runComposeUiTest {
+        runPhoneUiTest {
             setContent {
                 DashboardContent(
                     state = contentWith(accounts = 2, transferEnabled = true).copy(burnRate = burnRateUi()),
@@ -254,7 +256,7 @@ class DashboardScreenStateTest : StringSpec({
         }
     }
     "the budgets widget draws a row per budget, with its status and what is left" {
-        runComposeUiTest {
+        runPhoneUiTest {
             setContent {
                 DashboardContent(
                     state = budgetsOnly(
@@ -284,7 +286,7 @@ class DashboardScreenStateTest : StringSpec({
     }
 
     "a compact budgets card keeps only the most pressing budget" {
-        runComposeUiTest {
+        runPhoneUiTest {
             setContent {
                 DashboardContent(
                     state = budgetsOnly(
@@ -302,7 +304,7 @@ class DashboardScreenStateTest : StringSpec({
     }
 
     "an overspent budget row says how far over it is, not how much is left" {
-        runComposeUiTest {
+        runPhoneUiTest {
             setContent {
                 DashboardContent(
                     state = budgetsOnly(listOf(budgetUi(status = BudgetStatus.OVER, progress = 1.14f))),
@@ -316,7 +318,7 @@ class DashboardScreenStateTest : StringSpec({
     }
 
     "with no budgets the card still draws, pointing at the budgets screen" {
-        runComposeUiTest {
+        runPhoneUiTest {
             val events = mutableListOf<DashboardEvent>()
             setContent {
                 DashboardContent(state = budgetsOnly(emptyList()), onEvent = { events += it })
@@ -331,7 +333,7 @@ class DashboardScreenStateTest : StringSpec({
     }
 
     "tapping a budget row asks for that budget" {
-        runComposeUiTest {
+        runPhoneUiTest {
             val events = mutableListOf<DashboardEvent>()
             setContent {
                 DashboardContent(state = budgetsOnly(listOf(budgetUi())), onEvent = { events += it })
@@ -345,7 +347,7 @@ class DashboardScreenStateTest : StringSpec({
     }
     "every spent-by-category variant draws its rows rather than any of them measuring to nothing" {
         SurferSpentByCategoryVariant.entries.forEach { variant ->
-            runComposeUiTest {
+            runPhoneUiTest {
                 setContent {
                     DashboardContent(
                         state = spentByCategoryState(variant),
@@ -364,7 +366,7 @@ class DashboardScreenStateTest : StringSpec({
     }
 
     "a capped category says what its meter measures, and an uncapped one says the share instead" {
-        runComposeUiTest {
+        runPhoneUiTest {
             setContent {
                 DashboardContent(
                     state = spentByCategoryState(SurferSpentByCategoryVariant.Bar),
@@ -380,7 +382,7 @@ class DashboardScreenStateTest : StringSpec({
     }
 
     "an overspent category states the cap it passed rather than reading as headroom" {
-        runComposeUiTest {
+        runPhoneUiTest {
             setContent {
                 DashboardContent(
                     state = spentByCategoryState(SurferSpentByCategoryVariant.Bar).copy(
@@ -406,7 +408,7 @@ class DashboardScreenStateTest : StringSpec({
     }
 
     "a month with no spend keeps the card and says so, rather than leaving a gap" {
-        runComposeUiTest {
+        runPhoneUiTest {
             setContent {
                 // The card alone, like the variant cases: the default layout is long enough that
                 // this one would otherwise sit below the fold and never compose.
@@ -423,7 +425,7 @@ class DashboardScreenStateTest : StringSpec({
     }
 
     "a slice with no category is named on the screen, not left blank" {
-        runComposeUiTest {
+        runPhoneUiTest {
             setContent {
                 // The card alone: the default layout now carries ten widgets, so this one sits
                 // below the fold and never composes when the whole column is drawn.
@@ -441,6 +443,23 @@ class DashboardScreenStateTest : StringSpec({
         }
     }
 })
+
+/**
+ * Every case here mounts the dashboard in a phone-sized window.
+ *
+ * The default test surface is 1024 dp wide, which is expanded width — the dashboard lays out as a
+ * grid there, and a widget in a narrow cell draws its Compact treatment rather than its Expanded
+ * one. Nothing in this spec is about the grid, so pinning the window keeps these assertions about
+ * what a widget decides to draw instead of about how wide the test surface happens to be.
+ * `DashboardGridScreenTest` covers the layout itself.
+ */
+@OptIn(ExperimentalTestApi::class)
+private fun runPhoneUiTest(block: suspend SkikoComposeUiTest.() -> Unit) =
+    runSkikoComposeUiTest(size = Size(PHONE_WIDTH_PX, PHONE_HEIGHT_PX), block = block)
+
+/** A 411 × 891 phone at 1x — the artboard the widgets' Expanded treatments are drawn for. */
+private const val PHONE_WIDTH_PX = 411f
+private const val PHONE_HEIGHT_PX = 891f
 
 private const val ADD_TRANSACTION = "Add transaction"
 private const val TRANSFER = "Transfer"

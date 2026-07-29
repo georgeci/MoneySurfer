@@ -45,6 +45,8 @@ import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
 import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
 import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
+import com.georgeci.moneysurfer.uikit.window.SurferWindowSize
+import com.georgeci.moneysurfer.uikit.window.currentSurferWindowSize
 import com.georgeci.moneysurfer.utils.AsyncState
 import com.georgeci.moneysurfer.utils.HandleSideEffect
 import moneysurfer.feature.dashboard.generated.resources.Res
@@ -90,6 +92,13 @@ object DashboardCustomizeTestTags {
 
     /** A preview tile in that sheet — [option] is a size name or a variant key. */
     fun styleOption(widget: String, option: String): String = "dashboardCustomize:style:$widget:$option"
+
+    /**
+     * A grid-width tile in that sheet. Kept out of [styleOption]'s namespace on purpose: variant
+     * keys are free-form and widget-defined, so a widget that one day names a treatment "Half" would
+     * otherwise put two selectable nodes under one tag and make the selector ambiguous.
+     */
+    fun spanOption(widget: String, span: String): String = "dashboardCustomize:span:$widget:$span"
 }
 
 @Composable
@@ -174,6 +183,9 @@ private fun CustomizeList(
 ) {
     val enabled = layout.enabledItems
     val available = layout.disabledItems
+    // Grid widths are offered only where a grid exists to apply them: below expanded width the
+    // dashboard is one widget per row whatever the spans say.
+    val spanEnabled = currentSurferWindowSize() >= SurferWindowSize.Expanded
     // Which widget's style sheet is open, by type name — the type itself is not saveable. Held
     // here rather than in the ViewModel because it is sheet chrome, not part of the layout.
     var styleTarget by rememberSaveable { mutableStateOf<String?>(null) }
@@ -227,7 +239,13 @@ private fun CustomizeList(
                 rowTestTag = DashboardCustomizeTestTags.enabledRow(item.type.name),
                 modifier = surferReorderableItem(reorderState, item.type.name),
                 handleModifier = Modifier.surferReorderHandle(reorderState, item.type.name),
-                onStyleClick = { styleTarget = item.type.name }.takeIf { widgetStyleEnabled },
+                // Either half of the sheet is reason enough to offer the pill: the card-style
+                // picker ships behind a build key that is off, and the grid widths would be
+                // unreachable in every shipped build if they rode on it.
+                onStyleClick = { styleTarget = item.type.name }
+                    .takeIf { widgetStyleEnabled || spanEnabled },
+                showStyle = widgetStyleEnabled,
+                showSpan = spanEnabled,
                 onEvent = onEvent,
             )
         }
@@ -271,7 +289,10 @@ private fun CustomizeList(
         DashboardCardStyleSheet(
             item = styled,
             onSelect = { onEvent(DashboardCustomizeEvent.OnCardStyleChange(styled.type, it)) },
+            onSpanSelect = { onEvent(DashboardCustomizeEvent.OnSpanChange(styled.type, it)) },
             onDismiss = { styleTarget = null },
+            styleEnabled = widgetStyleEnabled,
+            spanEnabled = spanEnabled,
         )
     }
 }
@@ -322,6 +343,8 @@ private fun WidgetRow(
     handleModifier: Modifier,
     onStyleClick: (() -> Unit)?,
     onEvent: (DashboardCustomizeEvent) -> Unit,
+    showStyle: Boolean = true,
+    showSpan: Boolean = false,
 ) {
     val widget = item.type.name
     val title = stringResource(item.type.titleResource())
@@ -333,7 +356,7 @@ private fun WidgetRow(
         supporting = onStyleClick?.let {
             {
                 SurferSettingsValuePill(
-                    text = cardStyleSummary(item.type, item.cardStyle),
+                    text = cardStyleSummary(item, showStyle = showStyle, showSpan = showSpan),
                     modifier = Modifier
                         .clip(AppTheme.shapes.small)
                         .clickable(onClick = it)

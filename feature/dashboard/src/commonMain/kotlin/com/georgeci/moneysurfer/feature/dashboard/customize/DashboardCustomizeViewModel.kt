@@ -3,6 +3,7 @@ package com.georgeci.moneysurfer.feature.dashboard.customize
 import com.georgeci.moneysurfer.domain.config.HostCapabilities
 import com.georgeci.moneysurfer.domain.dashboard.DashboardCardStyle
 import com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutConfig
+import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetSpan
 import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetType
 import com.georgeci.moneysurfer.domain.preferences.UiPreferences
 import com.georgeci.moneysurfer.utils.AsyncState
@@ -51,6 +52,8 @@ class DashboardCustomizeViewModel(
                 edit { it.withWidgetMoved(from = event.from, to = event.to) }
             is DashboardCustomizeEvent.OnCardStyleChange ->
                 edit { it.withCardStyle(event.type, event.cardStyle) }
+            is DashboardCustomizeEvent.OnSpanChange ->
+                edit { it.withSpan(event.type, event.span) }
         }
     }
 
@@ -90,6 +93,15 @@ sealed interface DashboardCustomizeEvent {
     data class OnCardStyleChange(
         val type: DashboardWidgetType,
         val cardStyle: DashboardCardStyle,
+    ) : DashboardCustomizeEvent
+
+    /**
+     * A grid width was picked for [type]. Separate from [OnCardStyleChange] because a span is
+     * placement rather than styling — see [com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutItem].
+     */
+    data class OnSpanChange(
+        val type: DashboardWidgetType,
+        val span: DashboardWidgetSpan,
     ) : DashboardCustomizeEvent
 }
 

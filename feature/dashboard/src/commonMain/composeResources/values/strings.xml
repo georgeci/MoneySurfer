@@ -28,6 +28,11 @@
     <string name="dashboard_customize_style_summary">%1$s · %2$s</string>
     <string name="dashboard_customize_size_expanded">Full</string>
     <string name="dashboard_customize_size_compact">Compact</string>
+    <string name="dashboard_customize_style_span">Width</string>
+    <string name="dashboard_customize_span_full">Full width</string>
+    <string name="dashboard_customize_span_two_thirds">Two thirds</string>
+    <string name="dashboard_customize_span_half">Half</string>
+    <string name="dashboard_customize_span_third">One third</string>
     <string name="dashboard_customize_variant_balance_classic">Classic</string>
     <string name="dashboard_customize_variant_balance_stacked">Stacked</string>
     <string name="dashboard_customize_variant_balance_inline">Inline</string>

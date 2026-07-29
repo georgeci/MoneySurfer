@@ -3,19 +3,15 @@ package com.georgeci.moneysurfer.feature.dashboard
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,7 +21,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.georgeci.moneysurfer.domain.dashboard.DashboardPeriod
-import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetSize
 import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetType
 import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.GoalId
@@ -239,42 +234,28 @@ fun DashboardContent(
         // Clear the extended FAB so the last transactions can scroll above it instead of
         // being hidden behind it; only reserve the space when the FAB is actually shown.
         val fabClearance = if (state.accounts.isNotEmpty()) DASHBOARD_FAB_CLEARANCE else 0.dp
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .surferContentContainer()
-                .padding(top = padding.calculateTopPadding()),
-            contentPadding = PaddingValues(bottom = padding.calculateBottomPadding() + fabClearance),
-        ) {
-            if (state.periodSwitchVisible) {
-                item(key = DashboardTestTags.PeriodSwitch) {
-                    DashboardPeriodSwitch(selected = state.period, onEvent = onEvent)
-                }
-            }
-            items(
-                items = state.layout.enabledItems,
-                key = { it.type.name },
-            ) { layoutItem ->
-                // Per-widget size: the enclosing screen no longer dictates one size for the column,
-                // so the Compact branch inside each widget is reachable from the layout config.
-                CompositionLocalProvider(
-                    LocalSurferWidgetSize provides layoutItem.cardStyle.size.toWidgetSize(),
-                ) {
-                    DashboardWidget(
-                        type = layoutItem.type,
-                        variant = layoutItem.cardStyle.variant,
-                        state = state,
-                        onEvent = onEvent,
-                    )
-                }
-            }
-        }
+        DashboardWidgets(
+            state = state,
+            topInset = padding.calculateTopPadding(),
+            bottomInset = padding.calculateBottomPadding() + fabClearance,
+            onEvent = onEvent,
+        )
     }
 }
 
-private fun DashboardWidgetSize.toWidgetSize(): SurferWidgetSize = when (this) {
-    DashboardWidgetSize.Expanded -> SurferWidgetSize.Expanded
-    DashboardWidgetSize.Compact -> SurferWidgetSize.Compact
+/**
+ * Whether [type] would draw anything at all for this state.
+ *
+ * A widget that stands itself down costs nothing in the single column — a zero-height row nobody
+ * sees. In the grid it still claims the columns its span asked for, so the row it sits in gets a
+ * hole. The layout therefore skips these before placing anything, and the widget itself keeps the
+ * same guard so the two can never disagree about what is on screen.
+ *
+ * Only quick actions has such a state today; every other widget draws its own empty treatment.
+ */
+internal fun DashboardState.Content.rendersWidget(type: DashboardWidgetType): Boolean = when (type) {
+    DashboardWidgetType.QuickActions -> transferEnabled && accounts.size >= MIN_ACCOUNTS_FOR_TRANSFER
+    else -> true
 }
 
 /**
@@ -285,7 +266,7 @@ private fun DashboardWidgetSize.toWidgetSize(): SurferWidgetSize = when (this) {
  * the widget that defines the treatments knows how to read it, and a widget with none ignores it.
  */
 @Composable
-private fun DashboardWidget(
+internal fun DashboardWidget(
     type: DashboardWidgetType,
     variant: String?,
     state: DashboardState.Content,
@@ -337,7 +318,7 @@ private fun QuickActionsWidget(
     state: DashboardState.Content,
     onEvent: (DashboardEvent) -> Unit,
 ) {
-    if (!state.transferEnabled || state.accounts.size < MIN_ACCOUNTS_FOR_TRANSFER) return
+    if (!state.rendersWidget(DashboardWidgetType.QuickActions)) return
     SurferQuickActionsWidget(
         primaryLabel = stringResource(Res.string.dashboard_add_transaction),
         primaryIcon = SurferIcons.Add,
