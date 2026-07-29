@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > GetBudgetsUseCase</title>
+  <title>MoneySurfer Coverage Report > GetBudgetTransactionsUseCaseKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,12 +22,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.usecase</a>
 </div>
 
-<h1>Coverage Summary for Class: GetBudgetsUseCase (com.georgeci.moneysurfer.domain.usecase)</h1>
+<h1>Coverage Summary for Class: GetBudgetTransactionsUseCaseKt (com.georgeci.moneysurfer.domain.usecase)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -46,7 +49,24 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">GetBudgetsUseCase</td>
+  <td class="name">GetBudgetTransactionsUseCaseKt</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -57,76 +77,14 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    66.7%
-  </span>
-  <span class="absValue">
-    (4/6)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
     100%
   </span>
   <span class="absValue">
-    (5/5)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (14/14)
+    (12/12)
   </span>
 </td>
 </tr>
-  <tr>
-    <td class="name">GetBudgetsUseCase$invoke$$inlined$flatMapLatest$1</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/1)
-  </span>
-</td>
-    <td class="coverageStat"/>
-  </tr>
-<tr>
-  <td class="name"><strong>Total</strong></td>
-<td class="coverageStat">
-  <span class="percent">
-    75%
-  </span>
-  <span class="absValue">
-    (3/4)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    66.7%
-  </span>
-  <span class="absValue">
-    (4/6)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (5/5)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (14/14)
-  </span>
-</td>
-</tr>
+
 </table>
 
 <br/>
@@ -136,28 +94,76 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.usecase
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.auth.SessionPointers
 &nbsp;import com.georgeci.moneysurfer.domain.model.Budget
-&nbsp;import com.georgeci.moneysurfer.domain.repositories.BudgetRepository
-&nbsp;import kotlinx.coroutines.ExperimentalCoroutinesApi
+&nbsp;import com.georgeci.moneysurfer.domain.model.CategorizedTransaction
+&nbsp;import com.georgeci.moneysurfer.domain.model.transactionsIn
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.TransactionRepository
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.WorkspaceRepository
+&nbsp;import com.georgeci.moneysurfer.domain.util.BudgetPeriodWindow
+&nbsp;import com.georgeci.moneysurfer.domain.util.TransactionPeriodWindow
+&nbsp;import com.georgeci.moneysurfer.domain.util.windowContaining
 &nbsp;import kotlinx.coroutines.flow.Flow
-&nbsp;import kotlinx.coroutines.flow.flatMapLatest
-&nbsp;import kotlinx.coroutines.flow.flowOf
+&nbsp;import kotlinx.coroutines.flow.emitAll
+&nbsp;import kotlinx.coroutines.flow.flow
+&nbsp;import kotlinx.coroutines.flow.map
+&nbsp;import kotlinx.datetime.DateTimeUnit
+&nbsp;import kotlinx.datetime.TimeZone
+&nbsp;import kotlinx.datetime.minus
+&nbsp;import kotlinx.datetime.toLocalDateTime
 &nbsp;import org.koin.core.annotation.Single
 &nbsp;
-<b class="fc">&nbsp;@Single</b>
-&nbsp;@OptIn(ExperimentalCoroutinesApi::class)
-&nbsp;class GetBudgetsUseCase(
-<b class="fc">&nbsp;    private val budgetRepository: BudgetRepository,</b>
-<b class="fc">&nbsp;    private val session: SessionPointers,</b>
+&nbsp;/**
+&nbsp; * A budget window holds one period of spend, so this bound is far above any realistic count —
+&nbsp; * it exists only because the query is paged, and cuts off the oldest rows if it is ever hit.
+&nbsp; */
+&nbsp;private const val WINDOW_TRANSACTION_LIMIT = 1000
+&nbsp;
+&nbsp;/**
+&nbsp; * The transactions that make up a budget&#39;s spend in its current window — the same filter
+&nbsp; * [GetBudgetProgressUseCase] sums, so the list always adds up to the number above it.
+&nbsp; */
+&nbsp;@Single
+&nbsp;class GetBudgetTransactionsUseCase(
+&nbsp;    private val transactionRepository: TransactionRepository,
+&nbsp;    private val workspaceRepository: WorkspaceRepository,
+&nbsp;    private val clock: ClockUseCase,
 &nbsp;) {
 &nbsp;
-&nbsp;    /** Every budget of the active workspace, archived ones included — the caller splits them. */
-&nbsp;    operator fun invoke(): Flow&lt;List&lt;Budget&gt;&gt; =
-<b class="fc">&nbsp;        session.currentWorkspaceId.flatMapLatest { workspaceId -&gt;</b>
-<b class="pc">&nbsp;            workspaceId?.let(budgetRepository::getByWorkspaceId) ?: flowOf(emptyList())</b>
-&nbsp;        }
+&nbsp;    operator fun invoke(
+&nbsp;        budget: Budget,
+&nbsp;        timeZone: TimeZone = TimeZone.currentSystemDefault(),
+&nbsp;    ): Flow&lt;List&lt;CategorizedTransaction&gt;&gt; = flow {
+&nbsp;        val baseCurrency = workspaceRepository.getById(budget.workspaceId)?.baseCurrency
+&nbsp;        val window = budget.windowContaining(clock.now().toLocalDateTime(timeZone).date)
+&nbsp;        emitAll(
+&nbsp;            transactionRepository.getCategorizedWindow(
+&nbsp;                accountId = null,
+&nbsp;                window = window.asTransactionPeriod(),
+&nbsp;                limit = WINDOW_TRANSACTION_LIMIT,
+&nbsp;            ).map { categorized -&gt;
+&nbsp;                // The date range is already applied by the query; the rest of the budget filter
+&nbsp;                // (workspace, type, status, transfers, categories, currency) is not.
+&nbsp;                val matching = budget.transactionsIn(
+&nbsp;                    transactions = categorized.map { it.transaction },
+&nbsp;                    window = window,
+&nbsp;                    baseCurrency = baseCurrency,
+&nbsp;                ).map { it.id }.toSet()
+&nbsp;                categorized.filter { it.transaction.id in matching }
+&nbsp;            },
+&nbsp;        )
+&nbsp;    }
 &nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * The same span as a transaction-query window: a budget window is half-open, the query one is
+&nbsp; * closed, so the last day moves in by one.
+&nbsp; */
+&nbsp;private fun BudgetPeriodWindow.asTransactionPeriod(): TransactionPeriodWindow =
+<b class="fc">&nbsp;    TransactionPeriodWindow(</b>
+<b class="fc">&nbsp;        from = startInclusive,</b>
+<b class="fc">&nbsp;        to = endExclusive.minus(1, DateTimeUnit.DAY),</b>
+&nbsp;    )
 </code>
 </pre>
 </div>
@@ -181,7 +187,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 15:47</div>
+    <div style="float:right;">generated on 2026-07-29 20:34</div>
 </div>
 </body>
 </html>

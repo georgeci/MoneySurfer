@@ -72,7 +72,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (8/8)
+    (9/9)
   </span>
 </td>
 <td class="coverageStat">
@@ -80,7 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (37/37)
+    (42/42)
   </span>
 </td>
 </tr>
@@ -119,11 +119,13 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;data class InsightInput(</b>
 &nbsp;    /** Names the period the ids belong to, e.g. `2026-07`. See [Insight.id]. */
 <b class="fc">&nbsp;    val periodKey: String,</b>
-&nbsp;    /**
-&nbsp;     * How many days [currentSpend] covers — and, by construction, how many [previousSpend] covers
-&nbsp;     * too. Below [MIN_COMPARISON_DAYS] the comparison rules stand down; see [generateInsights].
-&nbsp;     */
+&nbsp;    /** How many days [currentSpend] covers. */
 <b class="fc">&nbsp;    val elapsedDays: Int,</b>
+&nbsp;    /**
+&nbsp;     * How many days [previousSpend] covers. Usually equal to [elapsedDays], but a baseline clamped
+&nbsp;     * to a shorter month is not — see [generateInsights] for why that silences the comparison.
+&nbsp;     */
+<b class="fc">&nbsp;    val baselineDays: Int,</b>
 <b class="fc">&nbsp;    val currency: CurrencyCode,</b>
 <b class="fc">&nbsp;    val currentSpend: List&lt;CategorySpendSlice&gt;,</b>
 <b class="fc">&nbsp;    val previousSpend: List&lt;CategorySpendSlice&gt;,</b>
@@ -144,15 +146,27 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp; * reading, not a log. Warn comes before Good and Good before Neutral so the compact card, which
 &nbsp; * shows exactly one, shows the actionable one.
 &nbsp; *
-&nbsp; * The comparison rules wait for [MIN_COMPARISON_DAYS]; the subscription count does not, because it
-&nbsp; * reads the schedules rather than the window and is just as true on the 1st as on the 30th.
+&nbsp; * The comparison rules wait for [MIN_COMPARISON_DAYS] and for two windows of equal length; the
+&nbsp; * subscription count waits for neither, because it reads the schedules rather than the window and
+&nbsp; * is just as true on the 1st as on the 30th.
 &nbsp; */
 &nbsp;fun generateInsights(input: InsightInput): List&lt;Insight&gt; {
-&nbsp;    val comparisons =
-&nbsp;        if (input.elapsedDays &gt;= MIN_COMPARISON_DAYS) periodComparisons(input) else emptyList()
+&nbsp;    val comparisons = if (input.canCompare) periodComparisons(input) else emptyList()
 &nbsp;    return (comparisons + listOfNotNull(activeSubscriptions(input)))
 &nbsp;        .sortedBy { TONE_PRIORITY.indexOf(it.tone) }
 &nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * Whether the two windows can be measured against each other at all.
+&nbsp; *
+&nbsp; * Two terms. A sample shorter than [MIN_COMPARISON_DAYS] is too small to read anything into. And
+&nbsp; * windows of *different* lengths are not comparable however long they are: on 31 March the
+&nbsp; * baseline clamps to a 28-day February, so a user who spent at exactly the same daily rate in both
+&nbsp; * months measures 31/28 — up 10.7%, enough on its own to trip the 10% period threshold and print
+&nbsp; * &quot;Spending is up 11%&quot; every non-leap year. Saying nothing beats inventing a warning.
+&nbsp; */
+&nbsp;private val InsightInput.canCompare: Boolean
+&nbsp;    get() = elapsedDays &gt;= MIN_COMPARISON_DAYS &amp;&amp; elapsedDays == baselineDays
 &nbsp;
 &nbsp;/** The rules that need a baseline: the two category movers, and the period total. */
 &nbsp;private fun periodComparisons(input: InsightInput): List&lt;Insight&gt; {
@@ -334,7 +348,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 15:47</div>
+    <div style="float:right;">generated on 2026-07-29 20:34</div>
 </div>
 </body>
 </html>

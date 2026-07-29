@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > ConfigHydration</title>
+  <title>MoneySurfer Coverage Report > SyncSettings</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.config</a>
 </div>
 
-<h1>Coverage Summary for Class: ConfigHydration (com.georgeci.moneysurfer.domain.config)</h1>
+<h1>Coverage Summary for Class: SyncSettings (com.georgeci.moneysurfer.domain.config)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">ConfigHydration</td>
+  <td class="name">SyncSettings</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -46,19 +46,23 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.config
 &nbsp;
+&nbsp;import kotlinx.coroutines.flow.Flow
+&nbsp;
 &nbsp;/**
-&nbsp; * Warms the configuration engine&#39;s in-memory mirrors.
+&nbsp; * Whether sync may run at all. Replaces `SyncFeatureFlag`.
 &nbsp; *
-&nbsp; * Every backing store is suspend-only, so the synchronous reads on [HostCapabilities] need each
-&nbsp; * layer loaded once first. `AppLaunchViewModel` awaits this alongside the startup work it already
-&nbsp; * performs, before it resolves the start route — so nothing renders against a half-loaded chain.
+&nbsp; * Gates the Settings → Sync screen, the manual &quot;Force sync&quot; action, the in-process periodic
+&nbsp; * ticker, and every use-case-driven trigger (post-auth bootstrap, create-workspace push,
+&nbsp; * accept-invite hydration, incoming-invite refresh).
 &nbsp; *
-&nbsp; * Exists as a domain facade because `navigation` (like feature modules) must not depend on
-&nbsp; * `app-config`. Idempotent; mirroring remote layers is what makes them survive a cold start
-&nbsp; * offline, not what makes reads synchronous.
+&nbsp; * [isEnabled] combines **three** terms — build AND server kill switch AND user toggle. The build
+&nbsp; * term matters: the offline host has no Firebase to sync against, and a server/user pair would
+&nbsp; * have no slot for that, so dropping it would switch sync on there.
+&nbsp; *
+&nbsp; * A flow rather than a `Boolean`, because a server-side kill switch can retract mid-session.
 &nbsp; */
-&nbsp;fun interface ConfigHydration {
-&nbsp;    suspend fun hydrate()
+&nbsp;interface SyncSettings {
+&nbsp;    val isEnabled: Flow&lt;Boolean&gt;
 &nbsp;}
 </code>
 </pre>
@@ -83,7 +87,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 15:47</div>
+    <div style="float:right;">generated on 2026-07-29 20:34</div>
 </div>
 </body>
 </html>

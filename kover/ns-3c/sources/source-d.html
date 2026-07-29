@@ -52,7 +52,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (5/5)
+    (4/4)
   </span>
 </td>
 <td class="coverageStat">
@@ -65,10 +65,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    95.1%
+    95%
   </span>
   <span class="absValue">
-    (39/41)
+    (38/40)
   </span>
 </td>
 <td class="coverageStat">
@@ -76,7 +76,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     97%
   </span>
   <span class="absValue">
-    (514/530)
+    (509/525)
   </span>
 </td>
 </tr>
@@ -91,7 +91,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (5/5)
+    (4/4)
   </span>
 </td>
 <td class="coverageStat">
@@ -104,10 +104,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    95.1%
+    95%
   </span>
   <span class="absValue">
-    (39/41)
+    (38/40)
   </span>
 </td>
 <td class="coverageStat">
@@ -115,7 +115,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     97%
   </span>
   <span class="absValue">
-    (514/530)
+    (509/525)
   </span>
 </td>
 </tr>
@@ -179,7 +179,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;            .padding(horizontal = 16.dp)</b>
 &nbsp;            // Only the empty state needs a floor to centre itself in; cards size themselves, and
 &nbsp;            // a compact carousel showing one of them would otherwise hang dead space underneath.
-<b class="fc">&nbsp;            .defaultMinSize(minHeight = if (state.insights.isEmpty()) INSIGHTS_EMPTY_HEIGHT else Dp.Unspecified)</b>
+<b class="fc">&nbsp;            .defaultMinSize(minHeight = if (state.insights.isEmpty()) DASHBOARD_WIDGET_MIN_HEIGHT else Dp.Unspecified)</b>
 <b class="fc">&nbsp;            .padding(vertical = 8.dp)</b>
 <b class="fc">&nbsp;            .testTag(DashboardTestTags.Insights),</b>
 &nbsp;    )
@@ -235,9 +235,6 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    InsightKind.Subscriptions -&gt;
 <b class="fc">&nbsp;        stringResource(Res.string.dashboard_insights_subscriptions_body, amount)</b>
 <b class="nc">&nbsp;}</b>
-&nbsp;
-&nbsp;/** Same floor the other dashboard cards use, so a quiet Insights card lines up with a quiet Goals one. */
-<b class="fc">&nbsp;private val INSIGHTS_EMPTY_HEIGHT = 180.dp</b>
 </code>
 </pre>
 </div>
@@ -261,7 +258,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 15:47</div>
+    <div style="float:right;">generated on 2026-07-29 20:34</div>
 </div>
 </body>
 </html>

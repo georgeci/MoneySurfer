@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > ConvertAccountsTotalUseCase</title>
+  <title>MoneySurfer Coverage Report > ComparisonWindows</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.usecase</a>
 </div>
 
-<h1>Coverage Summary for Class: ConvertAccountsTotalUseCase (com.georgeci.moneysurfer.domain.usecase)</h1>
+<h1>Coverage Summary for Class: ComparisonWindows (com.georgeci.moneysurfer.domain.usecase)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">ConvertAccountsTotalUseCase</td>
+  <td class="name">ComparisonWindows</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -63,15 +63,16 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (3/3)
+    (1/1)
   </span>
 </td>
+    <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    95%
+    100%
   </span>
   <span class="absValue">
-    (19/20)
+    (5/5)
   </span>
 </td>
 <td class="coverageStat">
@@ -79,15 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (19/19)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    98.5%
-  </span>
-  <span class="absValue">
-    (129/131)
+    (22/22)
   </span>
 </td>
 </tr>
@@ -101,70 +94,199 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.usecase
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.model.Account
-&nbsp;import com.georgeci.moneysurfer.domain.model.ConvertedTotal
-&nbsp;import com.georgeci.moneysurfer.domain.model.CurrencyTotal
-&nbsp;import com.georgeci.moneysurfer.domain.model.ExchangeRateTable
-&nbsp;import com.georgeci.moneysurfer.domain.model.totalsByCurrency
+&nbsp;import com.georgeci.moneysurfer.domain.auth.SessionPointers
+&nbsp;import com.georgeci.moneysurfer.domain.insight.Insight
+&nbsp;import com.georgeci.moneysurfer.domain.insight.InsightInput
+&nbsp;import com.georgeci.moneysurfer.domain.insight.generateInsights
+&nbsp;import com.georgeci.moneysurfer.domain.model.SpendScope
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryType
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.CategoryRepository
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.RecurringRuleRepository
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.SpendAnalyticsRepository
+&nbsp;import com.georgeci.moneysurfer.domain.repositories.WorkspaceRepository
+&nbsp;import com.georgeci.moneysurfer.domain.util.TransactionPeriodWindow
+&nbsp;import kotlinx.coroutines.ExperimentalCoroutinesApi
+&nbsp;import kotlinx.coroutines.delay
+&nbsp;import kotlinx.coroutines.flow.Flow
+&nbsp;import kotlinx.coroutines.flow.combine
+&nbsp;import kotlinx.coroutines.flow.distinctUntilChanged
+&nbsp;import kotlinx.coroutines.flow.flatMapLatest
+&nbsp;import kotlinx.coroutines.flow.flow
+&nbsp;import kotlinx.coroutines.flow.flowOf
+&nbsp;import kotlinx.coroutines.flow.map
+&nbsp;import kotlinx.datetime.DateTimeUnit
+&nbsp;import kotlinx.datetime.LocalDate
+&nbsp;import kotlinx.datetime.TimeZone
+&nbsp;import kotlinx.datetime.atStartOfDayIn
+&nbsp;import kotlinx.datetime.minus
+&nbsp;import kotlinx.datetime.plus
+&nbsp;import kotlinx.datetime.toLocalDateTime
+&nbsp;import kotlinx.datetime.yearMonth
 &nbsp;import org.koin.core.annotation.Single
+&nbsp;import kotlin.time.Duration
+&nbsp;import kotlin.time.Duration.Companion.minutes
 &nbsp;
 &nbsp;/**
-&nbsp; * Folds every account balance into one figure in the workspace base currency, using [rates].
+&nbsp; * The two or three sentences the dashboard&#39;s Insights widget shows: which category moved, whether
+&nbsp; * the month is running hot, and what the live subscriptions come to.
 &nbsp; *
-&nbsp; * Conversion happens per *currency total*, not per account: one rounding per currency instead of
-&nbsp; * one per row, so the headline does not drift by a cent for every extra account.
+&nbsp; * Reads only aggregates — two `GROUP BY` rollups, the category tree and the recurring rules — so
+&nbsp; * the amount of data crossing the boundary stays in the tens of rows whatever the workspace holds.
+&nbsp; * The rules themselves are a pure function; everything here is the plumbing that feeds them.
 &nbsp; *
-&nbsp; * Accounts in a currency [rates] cannot price are not dropped — they come back in
-&nbsp; * [ConvertedTotal.unconverted] for the caller to show beside the headline. With no rates cached
-&nbsp; * at all (offline first run, or the offline build, which has no provider) that degrades to
-&nbsp; * &quot;base-currency accounts sum, the rest listed&quot; rather than to a wrong number.
+&nbsp; * Re-emits when any input moves: logging a transaction changes the numbers, renaming a category
+&nbsp; * changes the sentence, pausing a subscription changes the count, and the workspace base currency
+&nbsp; * decides which rows are counted at all.
 &nbsp; */
-<b class="fc">&nbsp;@Single</b>
-&nbsp;class ConvertAccountsTotalUseCase {
+&nbsp;@Single
+&nbsp;@OptIn(ExperimentalCoroutinesApi::class)
+&nbsp;class GenerateInsightsUseCase(
+&nbsp;    private val spendAnalytics: SpendAnalyticsRepository,
+&nbsp;    private val categoryRepository: CategoryRepository,
+&nbsp;    private val recurringRuleRepository: RecurringRuleRepository,
+&nbsp;    private val workspaceRepository: WorkspaceRepository,
+&nbsp;    private val session: SessionPointers,
+&nbsp;    private val clock: ClockUseCase,
+&nbsp;) {
 &nbsp;
 &nbsp;    operator fun invoke(
-&nbsp;        accounts: List&lt;Account&gt;,
-&nbsp;        baseCurrency: CurrencyCode,
-&nbsp;        rates: ExchangeRateTable?,
-&nbsp;    ): ConvertedTotal {
-&nbsp;        // A table quoted against some other base cannot price this workspace: only the window
-&nbsp;        // between a base-currency change and the next refresh can produce one, and re-basing
-&nbsp;        // second-hand quotes is a worse answer than saying &quot;not converted&quot;.
-<b class="fc">&nbsp;        val usable = rates?.takeIf { it.baseCurrency == baseCurrency }</b>
-<b class="fc">&nbsp;        val byCurrency = accounts.totalsByCurrency()</b>
+&nbsp;        timeZone: TimeZone = TimeZone.currentSystemDefault(),
+&nbsp;    ): Flow&lt;List&lt;Insight&gt;&gt; =
+&nbsp;        session.currentWorkspaceId.flatMapLatest { workspaceId -&gt;
+&nbsp;            workspaceId ?: return@flatMapLatest flowOf(emptyList())
 &nbsp;
-<b class="fc">&nbsp;        var converted: Money? = null</b>
-<b class="fc">&nbsp;        var usedRates = false</b>
-<b class="fc">&nbsp;        val unconverted = mutableListOf&lt;CurrencyTotal&gt;()</b>
+&nbsp;            combine(baseCurrency(workspaceId), today(timeZone), ::Pair)
+&nbsp;                .flatMapLatest { (currency, today) -&gt;
+&nbsp;                    // The aggregates *filter* on the base currency, so a null one matches nothing.
+&nbsp;                    // Emitting empty rather than querying keeps a device that has not pulled the
+&nbsp;                    // workspace row yet from showing insights built from no rows at all.
+&nbsp;                    currency ?: return@flatMapLatest flowOf(emptyList())
+&nbsp;                    insights(workspaceId, currency, today)
+&nbsp;                }
+&nbsp;        }
 &nbsp;
-<b class="fc">&nbsp;        byCurrency.forEach { bucket -&gt;</b>
-<b class="fc">&nbsp;            val inBase: Money? = bucket.inBaseCurrency(baseCurrency, usable)</b>
-<b class="fc">&nbsp;            if (inBase == null) {</b>
-<b class="fc">&nbsp;                unconverted += bucket</b>
-&nbsp;            } else {
-&nbsp;                // A bucket already in the base needed no quote; anything else got here through
-&nbsp;                // one, and that is what earns the &quot;as of&quot; label below.
-<b class="fc">&nbsp;                if (bucket.currencyCode != baseCurrency) usedRates = true</b>
-<b class="fc">&nbsp;                converted = (converted ?: Money.zero()) + inBase</b>
-&nbsp;            }
-<b class="fc">&nbsp;        }</b>
-&nbsp;
-<b class="fc">&nbsp;        return ConvertedTotal(</b>
-<b class="fc">&nbsp;            baseCurrency = baseCurrency,</b>
-<b class="fc">&nbsp;            total = converted,</b>
-<b class="fc">&nbsp;            unconverted = unconverted,</b>
-&nbsp;            // Only claim an &quot;as of&quot; when a quote actually moved money — a single-currency
-&nbsp;            // workspace needs no rates and must not be labelled with yesterday&#39;s date.
-<b class="pc">&nbsp;            asOf = usable?.asOf?.takeIf { usedRates },</b>
-&nbsp;        )
+&nbsp;    /**
+&nbsp;     * Today&#39;s date, re-emitted when the calendar rolls over.
+&nbsp;     *
+&nbsp;     * Read once, both windows would freeze for the life of the subscription: the workspace pointer
+&nbsp;     * does not re-emit at midnight, so a desktop app left open on the dashboard would still be
+&nbsp;     * calling July &quot;this month&quot; on the 2nd of August — with that day&#39;s transactions falling
+&nbsp;     * outside every window and no way to self-correct short of a restart. Sleeping to the next
+&nbsp;     * local midnight costs one timer per subscriber and re-derives exactly when the answer changes.
+&nbsp;     */
+&nbsp;    private fun today(timeZone: TimeZone): Flow&lt;LocalDate&gt; = flow {
+&nbsp;        while (true) {
+&nbsp;            val now = clock.now()
+&nbsp;            val today = now.toLocalDateTime(timeZone).date
+&nbsp;            emit(today)
+&nbsp;            val nextMidnight = today.plus(1, DateTimeUnit.DAY).atStartOfDayIn(timeZone)
+&nbsp;            // Floored: a clock that jumps backwards must cost a minute of staleness, not a
+&nbsp;            // busy loop re-running every aggregate as fast as the dispatcher allows.
+&nbsp;            delay((nextMidnight - now).coerceAtLeast(MIN_ROLLOVER_SLEEP))
+&nbsp;        }
 &nbsp;    }
 &nbsp;
-&nbsp;    /** This bucket expressed in [base], or `null` when [rates] cannot price its currency. */
-&nbsp;    private fun CurrencyTotal.inBaseCurrency(base: CurrencyCode, rates: ExchangeRateTable?): Money? =
-<b class="fc">&nbsp;        if (currencyCode == base) amount else rates?.convertToBase(amount, currencyCode)</b>
+&nbsp;    /**
+&nbsp;     * The workspace base currency, live.
+&nbsp;     *
+&nbsp;     * Observed rather than read once, for the reason
+&nbsp;     * [GetCategorySpendHistoryUseCase] documents: the session pointer is restored independently of
+&nbsp;     * the `workspaces` row, so a latched `null` would leave an empty widget on screen for as long
+&nbsp;     * as the caller stayed subscribed.
+&nbsp;     */
+&nbsp;    private fun baseCurrency(workspaceId: WorkspaceId): Flow&lt;CurrencyCode?&gt; =
+&nbsp;        workspaceRepository.getAll()
+&nbsp;            .map { workspaces -&gt; workspaces.firstOrNull { it.id == workspaceId }?.baseCurrency }
+&nbsp;            .distinctUntilChanged()
+&nbsp;
+&nbsp;    private fun insights(
+&nbsp;        workspaceId: WorkspaceId,
+&nbsp;        currency: CurrencyCode,
+&nbsp;        today: LocalDate,
+&nbsp;    ): Flow&lt;List&lt;Insight&gt;&gt; {
+&nbsp;        val windows = monthToDateWindows(today)
+&nbsp;        return combine(
+&nbsp;            spendAnalytics.byCategory(SpendScope(workspaceId, currency, windows.current)),
+&nbsp;            spendAnalytics.byCategory(SpendScope(workspaceId, currency, windows.previous)),
+&nbsp;            categoryRepository.getByWorkspaceId(workspaceId),
+&nbsp;            recurringRuleRepository.getByWorkspaceId(workspaceId),
+&nbsp;        ) { currentSpend, previousSpend, categories, rules -&gt;
+&nbsp;            val expenseCategoryIds = categories
+&nbsp;                .filter { it.type == CategoryType.EXPENSE }
+&nbsp;                .mapTo(mutableSetOf()) { it.id }
+&nbsp;            generateInsights(
+&nbsp;                InsightInput(
+&nbsp;                    periodKey = today.yearMonth.toString(),
+&nbsp;                    elapsedDays = windows.currentDays,
+&nbsp;                    baselineDays = windows.previousDays,
+&nbsp;                    currency = currency,
+&nbsp;                    currentSpend = currentSpend,
+&nbsp;                    previousSpend = previousSpend,
+&nbsp;                    categoryNames = categories.associate { it.id to it.name },
+&nbsp;                    // A salary paid in every month is a schedule, not a subscription.
+&nbsp;                    expenseSchedules = rules.filter { it.categoryId in expenseCategoryIds },
+&nbsp;                ),
+&nbsp;            )
+&nbsp;        }
+&nbsp;    }
 &nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * The pair of windows a comparison reads, with the lengths that decide whether comparing them means
+&nbsp; * anything.
+&nbsp; *
+&nbsp; * The lengths travel with the windows rather than being re-derived from them: they are known
+&nbsp; * exactly where the windows are built, from dates that are non-null by construction, so nothing
+&nbsp; * downstream has to cope with the unbounded window [TransactionPeriodWindow] also allows.
+&nbsp; */
+<b class="fc">&nbsp;private data class ComparisonWindows(</b>
+<b class="fc">&nbsp;    val current: TransactionPeriodWindow,</b>
+<b class="fc">&nbsp;    val previous: TransactionPeriodWindow,</b>
+<b class="fc">&nbsp;    val currentDays: Int,</b>
+<b class="fc">&nbsp;    val previousDays: Int,</b>
+&nbsp;)
+&nbsp;
+&nbsp;/** See [GenerateInsightsUseCase.today] — the floor that keeps a backwards clock jump cheap. */
+&nbsp;private val MIN_ROLLOVER_SLEEP: Duration = 1.minutes
+&nbsp;
+&nbsp;/**
+&nbsp; * The two windows every comparison rule reads: this month so far, and the same stretch of the
+&nbsp; * month before it.
+&nbsp; *
+&nbsp; * Month-to-date against month-to-date, *not* against the whole of last month. Three days of July
+&nbsp; * measured against all of June reads as a 90% fall in every category, so an engine built that way
+&nbsp; * would spend the first week of every month congratulating the user for not having spent the money
+&nbsp; * yet. Both windows are the same number of days here, which removes that bias — though not the
+&nbsp; * small-sample volatility of the first few days, which the rules themselves stand down for.
+&nbsp; *
+&nbsp; * The previous window is clamped to its own month&#39;s last day rather than spilling into the current
+&nbsp; * one. That leaves the pair unequal in length on the 29th-31st after a shorter month, which is not
+&nbsp; * a comparison at all — `generateInsights` detects it from the two lengths and stays quiet.
+&nbsp; *
+&nbsp; * Built directly rather than through `periodWindow(Month, ...)`, which always spans a whole
+&nbsp; * calendar month — the point here is a part-month window with a matching part-month baseline.
+&nbsp; */
+&nbsp;private fun monthToDateWindows(today: LocalDate): ComparisonWindows {
+&nbsp;    val currentStart = LocalDate(today.year, today.month, 1)
+&nbsp;    val previousStart = currentStart.minus(1, DateTimeUnit.MONTH)
+&nbsp;    val previousEnd = minOf(
+&nbsp;        previousStart.plus(today.day - 1, DateTimeUnit.DAY),
+&nbsp;        currentStart.minus(1, DateTimeUnit.DAY),
+&nbsp;    )
+&nbsp;    return ComparisonWindows(
+&nbsp;        current = TransactionPeriodWindow(currentStart, today),
+&nbsp;        previous = TransactionPeriodWindow(previousStart, previousEnd),
+&nbsp;        currentDays = daysCovered(currentStart, today),
+&nbsp;        previousDays = daysCovered(previousStart, previousEnd),
+&nbsp;    )
+&nbsp;}
+&nbsp;
+&nbsp;/** Days a closed range covers, both ends included. */
+&nbsp;private fun daysCovered(from: LocalDate, to: LocalDate): Int =
+&nbsp;    (to.toEpochDays() - from.toEpochDays() + 1).toInt()
 </code>
 </pre>
 </div>
@@ -188,7 +310,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 15:47</div>
+    <div style="float:right;">generated on 2026-07-29 20:34</div>
 </div>
 </body>
 </html>
