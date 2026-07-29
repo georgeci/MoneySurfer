@@ -150,6 +150,22 @@ Hard rules:
   JUnit 4 (`@RunWith(AndroidJUnit4)`, `@Test`, `@Before`, `@After`) because
   the Android instrumentation runner doesn't host kotest specs. Assertions
   inside those tests still use kotest matchers — only the runner is JUnit.
+- Coverage lands in Codecov from a single Kover report under the `unittests`
+  flag. **A new production module needs three edits, in this order:**
+  1. [build.gradle.kts](build.gradle.kts) — add `kover(projects.x)` to the
+     aggregation and drop the module from `coverageExcludedProjects`. This is
+     the one that decides whether the module produces coverage *at all*; skip
+     it and the module is absent from `report.xml`, so the next two edits
+     silently resolve to zero files.
+  2. [codecov.yml](codecov.yml) — append it to `flags.unittests.paths`, or it
+     drops out of the flag.
+  3. [codecov.yml](codecov.yml) — give it a component under
+     `component_management.individual_components` (or fold it into an existing
+     one), or it never shows in the per-layer breakdown.
+
+  `component_id` is permanent — rename `name`, never the id. Statuses stay off
+  per component on purpose; the only coverage gate is the informational
+  project/patch pair.
 
 ## UI Rules
 

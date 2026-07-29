@@ -12,7 +12,7 @@ coverage:
         informational: true
 
 comment:
-  layout: "reach, diff, flags, files"
+  layout: "reach, diff, flags, components, files"
   behavior: default
   require_changes: true
 
@@ -37,8 +37,10 @@ flags:
   unittests:
     paths:
       - composeApp/
+      - composeAppOffline/
       - shared/
       - domain/
+      - app-config/
       - data-local/
       - data-remote/
       - sync/
@@ -48,3 +50,123 @@ flags:
       - navigation/
       - utils/
     carryforward: true
+
+# Components slice the same single `unittests` upload into virtual views that
+# follow the Module Map in AGENTS.md, so coverage can be read per layer and per
+# feature without splitting the Kover report into more flags.
+#
+# Deliberately no `statuses:` here — one informational project/patch pair
+# (see `coverage.status` above) is the whole gate for this repo; per-component
+# statuses would add ~20 extra checks to every PR for no added signal.
+# Components are for the UI filter and the `components` table in the PR comment.
+#
+# `component_id` is permanent — renaming one orphans its history in Codecov.
+# `name` is display-only and safe to change.
+#
+# No `flag_regexes` either: paths alone select the files. Adding a flag filter
+# would AND with the paths, so a future upload under a new flag (instrumented
+# tests, iOS) would silently drop out of every component instead of joining it.
+component_management:
+  individual_components:
+    # ---- layers -------------------------------------------------------
+    - component_id: layer_domain
+      name: domain
+      paths:
+        - domain/**
+
+    - component_id: layer_data
+      name: data
+      paths:
+        - data-local/**
+        - data-remote/**
+
+    - component_id: layer_sync
+      name: sync
+      paths:
+        - sync/**
+        - sync-surfer/**
+
+    - component_id: layer_config
+      name: app-config
+      paths:
+        - app-config/**
+
+    - component_id: layer_uikit
+      name: uikit
+      paths:
+        - uikit/**
+
+    - component_id: layer_navigation
+      name: navigation
+      paths:
+        - navigation/**
+
+    - component_id: layer_utils
+      name: utils
+      paths:
+        - utils/**
+
+    # `shared/**` is listed for the day `:shared` joins the Kover aggregation;
+    # today it sits in `coverageExcludedProjects` (build.gradle.kts) and has no
+    # `kover(projects.shared)` entry, so it contributes zero files and this
+    # percentage is composeApp + composeAppOffline only.
+    - component_id: layer_shell
+      name: app-shell
+      paths:
+        - composeApp/**
+        - composeAppOffline/**
+        - shared/**
+
+    # ---- features ------------------------------------------------------
+    # `feature_all` deliberately overlaps the per-feature components below:
+    # Codecov allows a file in many components, and the umbrella gives the
+    # whole-layer number next to the per-module breakdown.
+    - component_id: feature_all
+      name: feature (all)
+      paths:
+        - feature/**
+
+    - component_id: feature_account
+      name: feature:account
+      paths:
+        - feature/account/**
+
+    - component_id: feature_budget
+      name: feature:budget
+      paths:
+        - feature/budget/**
+
+    - component_id: feature_category
+      name: feature:category
+      paths:
+        - feature/category/**
+
+    - component_id: feature_dashboard
+      name: feature:dashboard
+      paths:
+        - feature/dashboard/**
+
+    - component_id: feature_goal
+      name: feature:goal
+      paths:
+        - feature/goal/**
+
+    - component_id: feature_login
+      name: feature:login
+      paths:
+        - feature/login/**
+
+    - component_id: feature_settings
+      name: feature:settings
+      paths:
+        - feature/settings/**
+
+    - component_id: feature_transaction
+      name: feature:transaction
+      paths:
+        - feature/transaction/**
+
+    - component_id: feature_workspace
+      name: feature:workspace
+      paths:
+        - feature/workspace/**
