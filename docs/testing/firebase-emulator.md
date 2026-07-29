@@ -343,7 +343,7 @@ firebase emulators:exec --project demo-moneysurfer --only auth,firestore '
 > `appConfig/mobile` is **not** seeded over REST — Firestore rules block client-side writes to that document. The current static `hasValidClientVersion() >= 1` rule does not depend on the doc (DTO defaults of 1 satisfy it), so seeding is unnecessary today. If the rule turns dynamic (reading `appConfig/mobile.minSupportedAppVersionCode` via `get()`), seed `appConfig` through Admin SDK or Firestore emulator startup data.
 <!-- AI:END -->
 
-<!-- AI:SECTION id=emulator-jvm-gap task=testing,emulator,jvm,gitlive -->
+<!-- AI:SECTION id=emulator-jvm-bootstrap task=testing,emulator,jvm,gitlive -->
 ## JVM Firebase bootstrap
 
 gitlive's `firebase-*-jvm` artifacts are Android sources repackaged — they import `android.content.Context` and cast to it:
