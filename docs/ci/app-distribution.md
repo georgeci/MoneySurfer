@@ -1,21 +1,27 @@
-# Firebase App Distribution (android-online)
+# Firebase App Distribution (Android)
 
 <!-- DOCS:TOC -->
 ## Contents
-- [Firebase App Distribution (android-online)](#firebase-app-distribution-android-online)
+- [Firebase App Distribution (Android)](#firebase-app-distribution-android)
 - [Triggers](#triggers)
 - [Required secrets](#required-secrets)
+- [Offline Firebase app registration](#offline-firebase-app-registration)
 - [Service account](#service-account)
 - [Testers](#testers)
 - [Notes on the build](#notes-on-the-build)
 <!-- DOCS:END -->
 
-[`.github/workflows/android-distribute.yml`](../../.github/workflows/android-distribute.yml)
-builds the signed release APK of `:androidApp` and uploads it to Firebase App
-Distribution.
+The distribution workflows build signed release APKs and upload them to
+Firebase App Distribution:
 
-Scope: **android-online only**. `:androidApp-offline` is Firebase-free by
-design, and iOS testers go through TestFlight
+- [`android-distribute.yml`](../../.github/workflows/android-distribute.yml):
+  `:androidApp` (online).
+- [`android-offline-distribute.yml`](../../.github/workflows/android-offline-distribute.yml):
+  `:androidApp-offline`.
+
+The offline app remains Firebase-free. Firebase App Distribution is an external
+delivery channel; the offline APK does not package Firebase SDKs or
+`google-services.json`. iOS testers go through TestFlight
 ([iOS TestFlight distribution](testflight.md)).
 
 ## Triggers
@@ -23,7 +29,7 @@ design, and iOS testers go through TestFlight
 | Trigger             | When                                                       |
 | ------------------- | ---------------------------------------------------------- |
 | `workflow_dispatch` | The "Run workflow" button. Inputs: `groups`, `notes`.       |
-| `schedule`          | 03:47 UTC daily — 30 min after `nightly.yml`'s 03:17 slot.  |
+| `schedule`          | Online: 03:47 UTC. Offline: 04:07 UTC.                      |
 
 The scheduled run is skipped when `main` hasn't moved since the last successful
 distribute run (same `gh run list` check `nightly.yml` uses), so an idle repo
@@ -41,6 +47,10 @@ The button only appears once the workflow file is on the default branch.
 | `ANDROID_RELEASE_KEY_ALIAS`      | key alias                                                     |
 | `ANDROID_RELEASE_KEY_PASSWORD`   | key password                                                  |
 | `FIREBASE_SERVICE_ACCOUNT_JSON`  | inline service-account JSON with **Firebase App Distribution Admin** |
+
+The offline workflow also requires the repository variable
+`FIREBASE_ANDROID_OFFLINE_APP_ID`, containing the Firebase Android app ID for
+package `com.georgeci.moneysurfer.offline`.
 
 The keystore secrets map 1:1 onto the `RELEASE_*` env vars
 [`KmpAppConventionPlugin`](../../build-logic/kmp/src/main/kotlin/com/georgeci/moneysurfer/buildlogic/KmpAppConventionPlugin.kt)
@@ -61,6 +71,20 @@ gh secret set FIREBASE_SERVICE_ACCOUNT_JSON < path/to/service-account.json
 The Firebase **app id** is not a secret: the workflow reads
 `mobilesdk_app_id` for `com.georgeci.moneysurfer` out of the decoded
 `google-services.json`.
+
+## Offline Firebase app registration
+
+In Firebase console, add a second Android app with package name
+`com.georgeci.moneysurfer.offline`. Copy its App ID (the
+`1:...:android:...` value) into the GitHub Actions repository variable:
+
+```bash
+gh variable set FIREBASE_ANDROID_OFFLINE_APP_ID --body '1:...:android:...'
+```
+
+Do not download or add its `google-services.json` to the repository. The
+offline workflow passes the App ID directly to Firebase CLI, preserving the
+offline binary's no-Firebase and no-network guarantees.
 
 ## Service account
 
@@ -94,23 +118,22 @@ working one, and testers would notice the gap long after the misconfiguration.
 ## Notes on the build
 
 - The version is `major.minor.build`. `major` / `minor` are edited by hand in
-  [`Version.xcconfig`](../../Version.xcconfig); `build` is this workflow's
-  `github.run_number`, passed to Gradle as `APP_BUILD_NUMBER`, so every
-  distributed build carries a distinct `0.1.<run>` and shows up as its own
-  version in App Distribution. Local builds fall back to `APP_BUILD_NUMBER`
-  from the file (`3`) — that default doubles as the local iOS
-  `CURRENT_PROJECT_VERSION`, so lowering it would block installing over an app
-  already on a device.
+  [`Version.xcconfig`](../../Version.xcconfig). Each workflow uses its own
+  independent `github.run_number` as `build`; online and offline are different
+  application IDs, so their sequences do not need to match. Local builds use
+  the resettable `APP_BUILD_NUMBER` default from the file (`0`).
 - `versionCode` is derived as `major * 100000 + minor * 1000 + build` — two
   digits for minor, three for the build. The build number is taken `mod 1000`
   so it can never carry into `minor`; the build fails only on a hand-edited
   `major > 20999` (Play's own ceiling), `minor > 99`, or an `APP_BUILD_NUMBER`
   override that isn't a number (a truncated CI value must not silently reuse
   the default and stamp two commits with the same version).
-- The wrap is worth knowing about: run 1000 comes back as build `0`, i.e. a
-  **lower** `versionCode` than run 999. App Distribution doesn't care, but Play
-  rejects a non-increasing code — bump `APP_VERSION_MINOR` before the counter
-  wraps if the same versioning ever feeds a Play upload.
+- The wrap is worth knowing about: when the supplied build number reaches a
+  multiple of 1000 it becomes build `0`, i.e. a **lower** `versionCode` than
+  the previous build. App Distribution doesn't care, but Play rejects a
+  non-increasing code — bump `APP_VERSION_MINOR` before the counter wraps if
+  the same versioning ever feeds a Play upload.
 - The release build is minified/shrunk (R8). Crashlytics mapping and native
   symbol uploads are separate Gradle tasks and are **not** run here.
-- The APK is also kept as a run artifact (`androidApp-release-apk`, 14 days).
+- APKs are also kept as run artifacts for 14 days:
+  `androidApp-release-apk` and `androidApp-offline-release-apk`.
