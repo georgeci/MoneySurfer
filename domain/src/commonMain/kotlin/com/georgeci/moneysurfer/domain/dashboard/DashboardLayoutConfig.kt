@@ -1,8 +1,13 @@
 package com.georgeci.moneysurfer.domain.dashboard
 
 /**
- * The dashboard layout: an ordered list of widgets, top to bottom, in a single vertical column.
- * Order in [items] *is* the render order; there are no rows or columns to reconcile.
+ * The dashboard layout: an ordered list of widgets. Order in [items] *is* the render order.
+ *
+ * At compact width that order is the whole story — one widget per row, top to bottom. From expanded
+ * width up the same order is packed into a [DashboardWidgetSpan.COLUMNS]-column grid, greedily: a
+ * widget joins the current row if its [DashboardLayoutItem.span] still fits, and starts a new one if
+ * it does not. There are still no rows to reconcile — a row is whatever the order and the spans add
+ * up to, so reordering or resizing one widget can never orphan another.
  *
  * Stored per device (see `UiPreferences.dashboardLayout`), never synced — a layout is a property
  * of the screen the user is holding, not of the workspace.
@@ -87,6 +92,20 @@ data class DashboardLayoutConfig(
     }
 
     /**
+     * [type] rewidened or narrowed for the grid. Like [withCardStyle] this touches nothing else:
+     * a span is read only from expanded width up, and changing one widget's width there must not
+     * shuffle the order the compact dashboard renders. Naming a [type] the layout does not carry is
+     * a no-op.
+     */
+    fun withSpan(type: DashboardWidgetType, span: DashboardWidgetSpan): DashboardLayoutConfig {
+        val target = items.firstOrNull { it.type == type } ?: return this
+        if (target.span == span) return this
+        return DashboardLayoutConfig(
+            items = items.map { if (it.type == type) it.copy(span = span) else it },
+        )
+    }
+
+    /**
      * A layout safe to render: at most one entry per widget type, with any type missing from
      * [items] appended in its [DEFAULT] position and style. Persisted layouts written by an older
      * app version know nothing about widgets added since, and dropping those silently would make
@@ -106,18 +125,23 @@ data class DashboardLayoutConfig(
          * the period's money went, the accounts strip, the generated
          * insights, goals, and the recent-transactions list. Every widget starts enabled and
          * Hero-sized.
+         *
+         * The spans are that same order read as the desktop mock's three bands: a hero balance
+         * beside the shortcuts, a row of three stat cards, the spend chart with the accounts rail
+         * next to it, insights and goals paired, and the activity list full width at the bottom.
+         * Each row sums to [DashboardWidgetSpan.COLUMNS] exactly, so the default grid has no gaps.
          */
         val DEFAULT = DashboardLayoutConfig(
             items = listOf(
-                DashboardLayoutItem(DashboardWidgetType.Balance),
-                DashboardLayoutItem(DashboardWidgetType.QuickActions),
-                DashboardLayoutItem(DashboardWidgetType.SafeToSpend),
-                DashboardLayoutItem(DashboardWidgetType.BurnRate),
-                DashboardLayoutItem(DashboardWidgetType.Budgets),
-                DashboardLayoutItem(DashboardWidgetType.SpentByCategory),
-                DashboardLayoutItem(DashboardWidgetType.Accounts),
-                DashboardLayoutItem(DashboardWidgetType.Insights),
-                DashboardLayoutItem(DashboardWidgetType.Goals),
+                DashboardLayoutItem(DashboardWidgetType.Balance, span = DashboardWidgetSpan.TwoThirds),
+                DashboardLayoutItem(DashboardWidgetType.QuickActions, span = DashboardWidgetSpan.Third),
+                DashboardLayoutItem(DashboardWidgetType.SafeToSpend, span = DashboardWidgetSpan.Third),
+                DashboardLayoutItem(DashboardWidgetType.BurnRate, span = DashboardWidgetSpan.Third),
+                DashboardLayoutItem(DashboardWidgetType.Budgets, span = DashboardWidgetSpan.Third),
+                DashboardLayoutItem(DashboardWidgetType.SpentByCategory, span = DashboardWidgetSpan.TwoThirds),
+                DashboardLayoutItem(DashboardWidgetType.Accounts, span = DashboardWidgetSpan.Third),
+                DashboardLayoutItem(DashboardWidgetType.Insights, span = DashboardWidgetSpan.Half),
+                DashboardLayoutItem(DashboardWidgetType.Goals, span = DashboardWidgetSpan.Half),
                 DashboardLayoutItem(DashboardWidgetType.RecentTransactions),
             ),
         )

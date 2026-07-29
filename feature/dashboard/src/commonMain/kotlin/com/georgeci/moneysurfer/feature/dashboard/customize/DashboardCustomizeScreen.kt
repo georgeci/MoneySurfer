@@ -45,6 +45,8 @@ import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
 import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
 import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
 import com.georgeci.moneysurfer.uikit.theme.AppTheme
+import com.georgeci.moneysurfer.uikit.window.SurferWindowSize
+import com.georgeci.moneysurfer.uikit.window.currentSurferWindowSize
 import com.georgeci.moneysurfer.utils.AsyncState
 import com.georgeci.moneysurfer.utils.HandleSideEffect
 import moneysurfer.feature.dashboard.generated.resources.Res
@@ -90,6 +92,13 @@ object DashboardCustomizeTestTags {
 
     /** A preview tile in that sheet — [option] is a size name or a variant key. */
     fun styleOption(widget: String, option: String): String = "dashboardCustomize:style:$widget:$option"
+
+    /**
+     * A grid-width tile in that sheet. Kept out of [styleOption]'s namespace on purpose: variant
+     * keys are free-form and widget-defined, so a widget that one day names a treatment "Half" would
+     * otherwise put two selectable nodes under one tag and make the selector ambiguous.
+     */
+    fun spanOption(widget: String, span: String): String = "dashboardCustomize:span:$widget:$span"
 }
 
 @Composable
@@ -174,6 +183,9 @@ private fun CustomizeList(
 ) {
     val enabled = layout.enabledItems
     val available = layout.disabledItems
+    // Grid widths are offered only where a grid exists to apply them: below expanded width the
+    // dashboard is one widget per row whatever the spans say.
+    val spanEnabled = currentSurferWindowSize() >= SurferWindowSize.Expanded
     // Which widget's style sheet is open, by type name — the type itself is not saveable. Held
     // here rather than in the ViewModel because it is sheet chrome, not part of the layout.
     var styleTarget by rememberSaveable { mutableStateOf<String?>(null) }
@@ -227,7 +239,21 @@ private fun CustomizeList(
                 rowTestTag = DashboardCustomizeTestTags.enabledRow(item.type.name),
                 modifier = surferReorderableItem(reorderState, item.type.name),
                 handleModifier = Modifier.surferReorderHandle(reorderState, item.type.name),
-                onStyleClick = { styleTarget = item.type.name }.takeIf { widgetStyleEnabled },
+                // Either half of the sheet is reason enough to offer the pill: the card-style
+                // picker ships behind a build key that is off, and the grid widths would be
+                // unreachable in every shipped build if they rode on it.
+                pill = if (widgetStyleEnabled || spanEnabled) {
+                    WidgetRowPill(
+                        summary = cardStyleSummary(
+                            item,
+                            showStyle = widgetStyleEnabled,
+                            showSpan = spanEnabled,
+                        ),
+                        onClick = { styleTarget = item.type.name },
+                    )
+                } else {
+                    null
+                },
                 onEvent = onEvent,
             )
         }
@@ -251,7 +277,7 @@ private fun CustomizeList(
                 rowTestTag = DashboardCustomizeTestTags.availableRow(item.type.name),
                 modifier = surferReorderableItem(reorderState, item.type.name),
                 handleModifier = Modifier.surferReorderHandle(reorderState, item.type.name),
-                onStyleClick = null,
+                pill = null,
                 onEvent = onEvent,
             )
         }
@@ -271,7 +297,10 @@ private fun CustomizeList(
         DashboardCardStyleSheet(
             item = styled,
             onSelect = { onEvent(DashboardCustomizeEvent.OnCardStyleChange(styled.type, it)) },
+            onSpanSelect = { onEvent(DashboardCustomizeEvent.OnSpanChange(styled.type, it)) },
             onDismiss = { styleTarget = null },
+            styleEnabled = widgetStyleEnabled,
+            spanEnabled = spanEnabled,
         )
     }
 }
@@ -307,6 +336,13 @@ private fun SectionNote(text: String, modifier: Modifier = Modifier) {
 }
 
 /**
+ * The "Hero · Classic" pill under a widget's name: what it says, and the sheet it opens. One value
+ * rather than a summary and a callback, because it is one affordance — a row either offers the
+ * picker or it does not, and a label with nothing behind it would be a lie either way.
+ */
+private data class WidgetRowPill(val summary: String, val onClick: () -> Unit)
+
+/**
  * One widget, in whichever section it currently sits. The two used to be separate composables and
  * had drifted: only the enabled one could be dragged. They differ in exactly two things now — the
  * direction the round button moves the row, and whether [onStyleClick] is offered.
@@ -320,7 +356,7 @@ private fun WidgetRow(
     rowTestTag: String,
     modifier: Modifier,
     handleModifier: Modifier,
-    onStyleClick: (() -> Unit)?,
+    pill: WidgetRowPill?,
     onEvent: (DashboardCustomizeEvent) -> Unit,
 ) {
     val widget = item.type.name
@@ -330,13 +366,13 @@ private fun WidgetRow(
         title = title,
         modifier = modifier.testTag(rowTestTag),
         icon = item.type.icon(),
-        supporting = onStyleClick?.let {
+        supporting = pill?.let {
             {
                 SurferSettingsValuePill(
-                    text = cardStyleSummary(item.type, item.cardStyle),
+                    text = it.summary,
                     modifier = Modifier
                         .clip(AppTheme.shapes.small)
-                        .clickable(onClick = it)
+                        .clickable(onClick = it.onClick)
                         .padding(vertical = 4.dp, horizontal = 2.dp)
                         .testTag(DashboardCustomizeTestTags.styleAction(widget)),
                 )

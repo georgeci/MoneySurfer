@@ -28,6 +28,11 @@
     <string name="dashboard_customize_style_summary">%1$s · %2$s</string>
     <string name="dashboard_customize_size_expanded">Крупный</string>
     <string name="dashboard_customize_size_compact">Компактный</string>
+    <string name="dashboard_customize_style_span">Ширина</string>
+    <string name="dashboard_customize_span_full">Вся ширина</string>
+    <string name="dashboard_customize_span_two_thirds">Две трети</string>
+    <string name="dashboard_customize_span_half">Половина</string>
+    <string name="dashboard_customize_span_third">Треть</string>
     <string name="dashboard_customize_variant_balance_classic">Классический</string>
     <string name="dashboard_customize_variant_balance_stacked">Стопкой</string>
     <string name="dashboard_customize_variant_balance_inline">В строку</string>

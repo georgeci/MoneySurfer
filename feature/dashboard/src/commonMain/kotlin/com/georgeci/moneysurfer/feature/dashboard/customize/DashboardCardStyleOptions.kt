@@ -2,7 +2,9 @@ package com.georgeci.moneysurfer.feature.dashboard.customize
 
 import androidx.compose.runtime.Composable
 import com.georgeci.moneysurfer.domain.dashboard.DashboardCardStyle
+import com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutItem
 import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetSize
+import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetSpan
 import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetType
 import com.georgeci.moneysurfer.uikit.widgets.SurferBalanceVariant
 import com.georgeci.moneysurfer.uikit.widgets.SurferInsightsVariant
@@ -10,6 +12,10 @@ import com.georgeci.moneysurfer.uikit.widgets.SurferSpentByCategoryVariant
 import moneysurfer.feature.dashboard.generated.resources.Res
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_size_compact
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_size_expanded
+import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_span_full
+import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_span_half
+import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_span_third
+import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_span_two_thirds
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_style_summary
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_variant_balance_classic
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_variant_balance_inline
@@ -119,14 +125,42 @@ internal fun DashboardWidgetSize.labelResource(): StringResource = when (this) {
     DashboardWidgetSize.Compact -> Res.string.dashboard_customize_size_compact
 }
 
+internal fun DashboardWidgetSpan.labelResource(): StringResource = when (this) {
+    DashboardWidgetSpan.Full -> Res.string.dashboard_customize_span_full
+    DashboardWidgetSpan.TwoThirds -> Res.string.dashboard_customize_span_two_thirds
+    DashboardWidgetSpan.Half -> Res.string.dashboard_customize_span_half
+    DashboardWidgetSpan.Third -> Res.string.dashboard_customize_span_third
+}
+
 /**
  * What the customize row says under a widget's name — "Full", or "Full · Classic" once the widget
- * has variants to distinguish.
+ * has variants to distinguish, or "Full · Classic · Half" once there is a grid too.
+ *
+ * The pill must name exactly what the sheet behind it can change, so it takes the same two gates the
+ * sheet does: [showStyle] is the host's `dashboard_widget_style` build key, [showSpan] is whether the
+ * window is wide enough for spans to mean anything. With both off the row draws no pill at all, so
+ * this is never called for an empty summary.
  */
 @Composable
-internal fun cardStyleSummary(type: DashboardWidgetType, cardStyle: DashboardCardStyle): String {
-    val size = stringResource(cardStyle.size.labelResource())
-    val variant = type.selectedVariant(cardStyle) ?: return size
+internal fun cardStyleSummary(
+    item: DashboardLayoutItem,
+    showStyle: Boolean = true,
+    showSpan: Boolean = false,
+): String {
+    val style = if (showStyle) styleSummary(item) else null
+    val span = if (showSpan) stringResource(item.span.labelResource()) else null
+    return when {
+        style != null && span != null ->
+            stringResource(Res.string.dashboard_customize_style_summary, style, span)
+        else -> style ?: span.orEmpty()
+    }
+}
+
+/** The size, plus the variant when the widget has any to tell apart. */
+@Composable
+private fun styleSummary(item: DashboardLayoutItem): String {
+    val size = stringResource(item.cardStyle.size.labelResource())
+    val variant = item.type.selectedVariant(item.cardStyle) ?: return size
     return stringResource(Res.string.dashboard_customize_style_summary, size, stringResource(variant.label))
 }
 

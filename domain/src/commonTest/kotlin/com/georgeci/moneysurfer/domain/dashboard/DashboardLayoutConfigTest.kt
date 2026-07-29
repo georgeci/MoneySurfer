@@ -293,6 +293,72 @@ class DashboardLayoutConfigTest : StringSpec({
         normalized.items shouldContainExactly DashboardLayoutConfig.DEFAULT.items
     }
 
+    "every row of the default grid is filled exactly, leaving no gap to pack around" {
+        val rows = mutableListOf(0)
+        DashboardLayoutConfig.DEFAULT.enabledItems.forEach { item ->
+            if (rows.last() + item.span.columns > DashboardWidgetSpan.COLUMNS) rows += 0
+            rows[rows.lastIndex] = rows.last() + item.span.columns
+        }
+
+        rows.all { it == DashboardWidgetSpan.COLUMNS } shouldBe true
+    }
+
+    "the widest span is the whole row, and it is what a widget gets by default" {
+        DashboardWidgetSpan.Full.columns shouldBe DashboardWidgetSpan.COLUMNS
+        DashboardLayoutItem(DashboardWidgetType.Balance).span shouldBe DashboardWidgetSpan.Full
+    }
+
+    "respanning a widget leaves its slot, its style and its neighbours alone" {
+        val config = DashboardLayoutConfig.DEFAULT
+            .withWidgetEnabled(DashboardWidgetType.Goals, enabled = false)
+            .withCardStyle(DashboardWidgetType.Accounts, DashboardCardStyle.COMPACT)
+
+        val respanned = config.withSpan(DashboardWidgetType.Accounts, DashboardWidgetSpan.Half)
+
+        respanned.items.map { it.type } shouldContainExactly config.items.map { it.type }
+        respanned.items.single { it.type == DashboardWidgetType.Accounts }.let {
+            it.span shouldBe DashboardWidgetSpan.Half
+            it.cardStyle shouldBe DashboardCardStyle.COMPACT
+        }
+        respanned.items.filterNot { it.type == DashboardWidgetType.Accounts } shouldContainExactly
+            config.items.filterNot { it.type == DashboardWidgetType.Accounts }
+    }
+
+    "a switched-off widget keeps its span for when it comes back" {
+        val config = DashboardLayoutConfig.DEFAULT
+            .withWidgetEnabled(DashboardWidgetType.Goals, enabled = false)
+            .withSpan(DashboardWidgetType.Goals, DashboardWidgetSpan.Third)
+
+        config.withWidgetEnabled(DashboardWidgetType.Goals, enabled = true)
+            .items.single { it.type == DashboardWidgetType.Goals }
+            .span shouldBe DashboardWidgetSpan.Third
+    }
+
+    "a widget dragged across sections keeps its span" {
+        val config = DashboardLayoutConfig(
+            items = listOf(
+                DashboardLayoutItem(DashboardWidgetType.Balance),
+                DashboardLayoutItem(
+                    DashboardWidgetType.Accounts,
+                    enabled = false,
+                    span = DashboardWidgetSpan.TwoThirds,
+                ),
+            ),
+        )
+
+        val moved = config.withWidgetMoved(DashboardWidgetType.Accounts, DashboardWidgetType.Balance)
+
+        moved.items.single { it.type == DashboardWidgetType.Accounts }.span shouldBe
+            DashboardWidgetSpan.TwoThirds
+    }
+
+    "respanning to the span a widget already has, or a widget the layout lacks, changes nothing" {
+        val config = DashboardLayoutConfig(items = listOf(DashboardLayoutItem(DashboardWidgetType.Balance)))
+
+        config.withSpan(DashboardWidgetType.Balance, DashboardWidgetSpan.Full) shouldBe config
+        config.withSpan(DashboardWidgetType.Goals, DashboardWidgetSpan.Half) shouldBe config
+    }
+
     "the default layout has something for the period switch to drive" {
         DashboardLayoutConfig.DEFAULT.hasPeriodScopedWidget shouldBe true
     }

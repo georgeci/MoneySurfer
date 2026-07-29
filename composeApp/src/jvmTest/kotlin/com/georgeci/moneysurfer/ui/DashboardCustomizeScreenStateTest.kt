@@ -1,9 +1,12 @@
 package com.georgeci.moneysurfer.ui
 
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.test.ComposeUiTest
 import androidx.compose.ui.test.ExperimentalTestApi
+import androidx.compose.ui.test.SkikoComposeUiTest
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.hasScrollAction
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.onNodeWithTag
@@ -11,9 +14,11 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.v2.runComposeUiTest
+import androidx.compose.ui.test.v2.runSkikoComposeUiTest
 import com.georgeci.moneysurfer.domain.dashboard.DashboardCardStyle
 import com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutConfig
 import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetSize
+import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetSpan
 import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetType
 import com.georgeci.moneysurfer.feature.dashboard.customize.DashboardCardStyleSheetContent
 import com.georgeci.moneysurfer.feature.dashboard.customize.DashboardCustomizeContent
@@ -158,8 +163,8 @@ class DashboardCustomizeScreenStateTest : StringSpec({
         }
     }
 
-    "the card-style pill is there only when the host build enables it" {
-        runComposeUiTest {
+    "on a phone the pill follows the host's card-style build key" {
+        runPhoneUiTest {
             setContent {
                 DashboardCustomizeContent(
                     state = AsyncState.Content(DashboardLayoutConfig.DEFAULT),
@@ -168,10 +173,11 @@ class DashboardCustomizeScreenStateTest : StringSpec({
                 )
             }
 
+            // Nothing to offer: card styles are switched off and a phone has no grid to widen into.
             onNodeWithTag(DashboardCustomizeTestTags.styleAction(BALANCE)).assertDoesNotExist()
         }
 
-        runComposeUiTest {
+        runPhoneUiTest {
             setContent {
                 DashboardCustomizeContent(
                     state = AsyncState.Content(DashboardLayoutConfig.DEFAULT),
@@ -181,6 +187,41 @@ class DashboardCustomizeScreenStateTest : StringSpec({
             }
 
             onNodeWithTag(DashboardCustomizeTestTags.styleAction(BALANCE)).assertIsDisplayed()
+        }
+    }
+
+    "at expanded width the pill is offered for the widths alone, card styles switched off or not" {
+        runComposeUiTest {
+            setContent {
+                DashboardCustomizeContent(
+                    state = AsyncState.Content(DashboardLayoutConfig.DEFAULT),
+                    onEvent = {},
+                    widgetStyleEnabled = false,
+                )
+            }
+
+            // `host.dashboard_widget_style` ships off in both hosts, and the pill is the only way
+            // into the sheet — riding the widths on that key would make them unreachable.
+            onNodeWithTag(DashboardCustomizeTestTags.styleAction(BALANCE)).assertIsDisplayed()
+        }
+    }
+
+    "with card styles switched off the sheet offers the widths and nothing else" {
+        runComposeUiTest {
+            setContent {
+                DashboardCardStyleSheetContent(
+                    item = BALANCE_ITEM,
+                    onSelect = {},
+                    onSpanSelect = {},
+                    styleEnabled = false,
+                    spanEnabled = true,
+                )
+            }
+
+            onNodeWithTag(spanOption(DashboardWidgetSpan.Half.name)).assertExists()
+            // No size tiles, and no variant tiles either — both are the card-style half.
+            onNodeWithTag(styleOption(DashboardWidgetSize.Compact.name)).assertDoesNotExist()
+            onNodeWithTag(styleOption(SurferBalanceVariant.Minimal.name)).assertDoesNotExist()
         }
     }
 
@@ -239,7 +280,7 @@ class DashboardCustomizeScreenStateTest : StringSpec({
     "the style sheet offers both sizes and, for the balance card, its variants" {
         runComposeUiTest {
             setContent {
-                DashboardCardStyleSheetContent(item = BALANCE_ITEM, onSelect = {})
+                DashboardCardStyleSheetContent(item = BALANCE_ITEM, onSelect = {}, onSpanSelect = {})
             }
 
             onNodeWithTag(DashboardCustomizeTestTags.styleSheet(BALANCE)).assertIsDisplayed()
@@ -256,6 +297,7 @@ class DashboardCustomizeScreenStateTest : StringSpec({
                     DashboardCardStyleSheetContent(
                         item = DashboardLayoutConfig.DEFAULT.items.first { it.type == type },
                         onSelect = {},
+                        onSpanSelect = {},
                     )
                 }
 
@@ -275,6 +317,7 @@ class DashboardCustomizeScreenStateTest : StringSpec({
                 DashboardCardStyleSheetContent(
                     item = DashboardLayoutConfig.DEFAULT.items.first { it.type == DashboardWidgetType.Goals },
                     onSelect = {},
+                    onSpanSelect = {},
                 )
             }
 
@@ -300,6 +343,7 @@ class DashboardCustomizeScreenStateTest : StringSpec({
                 DashboardCardStyleSheetContent(
                     item = BALANCE_ITEM.copy(cardStyle = DashboardCardStyle(variant = INLINE)),
                     onSelect = { picked += it },
+                    onSpanSelect = {},
                 )
             }
 
@@ -309,6 +353,63 @@ class DashboardCustomizeScreenStateTest : StringSpec({
             picked shouldContainExactly listOf(
                 DashboardCardStyle(size = DashboardWidgetSize.Compact, variant = INLINE),
             )
+        }
+    }
+
+    "the grid-width section is offered only where a grid exists to apply it" {
+        runComposeUiTest {
+            setContent {
+                DashboardCardStyleSheetContent(
+                    item = BALANCE_ITEM,
+                    onSelect = {},
+                    onSpanSelect = {},
+                    spanEnabled = false,
+                )
+            }
+
+            // Sizes are always offered; widths are not, because below expanded width every widget
+            // is full width whatever its span says.
+            onNodeWithTag(styleOption(DashboardWidgetSize.Compact.name)).assertIsDisplayed()
+            DashboardWidgetSpan.entries.forEach {
+                onNodeWithTag(spanOption(it.name)).assertDoesNotExist()
+            }
+        }
+    }
+
+    "the grid-width section offers every span, on the one the widget already has" {
+        runComposeUiTest {
+            setContent {
+                DashboardCardStyleSheetContent(
+                    item = BALANCE_ITEM,
+                    onSelect = {},
+                    onSpanSelect = {},
+                    spanEnabled = true,
+                )
+            }
+
+            DashboardWidgetSpan.entries.forEach {
+                onNodeWithTag(spanOption(it.name)).assertExists()
+            }
+            onNodeWithTag(spanOption(BALANCE_ITEM.span.name)).assertIsSelected()
+        }
+    }
+
+    "picking a width reports the span alone, leaving the card style to its own picker" {
+        runComposeUiTest {
+            val picked = mutableListOf<DashboardWidgetSpan>()
+            setContent {
+                DashboardCardStyleSheetContent(
+                    item = BALANCE_ITEM,
+                    onSelect = {},
+                    onSpanSelect = { picked += it },
+                    spanEnabled = true,
+                )
+            }
+
+            onNodeWithTag(spanOption(DashboardWidgetSpan.Half.name)).performClick()
+            waitForIdle()
+
+            picked shouldContainExactly listOf(DashboardWidgetSpan.Half)
         }
     }
 
@@ -368,6 +469,20 @@ private val BALANCE_ITEM = DashboardLayoutConfig.DEFAULT.items
     .first { it.type == DashboardWidgetType.Balance }
 
 private fun styleOption(option: String) = DashboardCustomizeTestTags.styleOption(BALANCE, option)
+
+private fun spanOption(span: String) = DashboardCustomizeTestTags.spanOption(BALANCE, span)
+
+/**
+ * A phone-sized window. The default test surface is 1024 dp — expanded width — where the screen
+ * offers grid widths; the cases that are about the card-style build key alone need a window with no
+ * grid in it.
+ */
+@OptIn(ExperimentalTestApi::class)
+private fun runPhoneUiTest(block: suspend SkikoComposeUiTest.() -> Unit) =
+    runSkikoComposeUiTest(size = Size(PHONE_WIDTH_PX, PHONE_HEIGHT_PX), block = block)
+
+private const val PHONE_WIDTH_PX = 411f
+private const val PHONE_HEIGHT_PX = 891f
 
 /** Balance on the dashboard, Goals under "Available" — one row per section, both on screen. */
 private val BALANCE_ON_GOALS_OFF = DashboardLayoutConfig(
