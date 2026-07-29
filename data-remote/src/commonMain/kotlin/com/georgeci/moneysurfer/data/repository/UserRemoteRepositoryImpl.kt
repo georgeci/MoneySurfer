@@ -3,28 +3,26 @@ package com.georgeci.moneysurfer.data.repository
 import co.touchlab.kermit.Logger
 import com.georgeci.moneysurfer.data.remote.UserDoc
 import com.georgeci.moneysurfer.data.remote.UserEmailDoc
+import com.georgeci.moneysurfer.data.remote.UserRemoteSource
 import com.georgeci.moneysurfer.domain.logging.redactEmail
 import com.georgeci.moneysurfer.domain.logging.redactUid
 import com.georgeci.moneysurfer.domain.model.User
+import com.georgeci.moneysurfer.domain.primitives.ClockUseCase
 import com.georgeci.moneysurfer.domain.primitives.UserId
 import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
 import com.georgeci.moneysurfer.domain.repositories.UserRemoteRepository
-import dev.gitlive.firebase.firestore.FieldValue
-import dev.gitlive.firebase.firestore.FirebaseFirestore
 import org.koin.core.annotation.Single
-import kotlin.time.Clock
 
 @Single(binds = [UserRemoteRepository::class])
 class UserRemoteRepositoryImpl(
-    private val firestore: FirebaseFirestore,
+    private val remoteSource: UserRemoteSource,
+    private val clock: ClockUseCase,
 ) : UserRemoteRepository {
 
     private val log = Logger.withTag(TAG)
 
     override suspend fun fetch(uid: String): User? {
-        val snap = firestore.collection("users").document(uid).get()
-        if (!snap.exists) return null
-        val doc = snap.data(UserDoc.serializer())
+        val doc = remoteSource.fetchUser(uid) ?: return null
         return User(
             id = UserId(uid),
             displayName = doc.displayName,
@@ -43,8 +41,9 @@ class UserRemoteRepositoryImpl(
         isAnon: Boolean,
         createdAt: Long,
     ) {
-        firestore.collection("users").document(uid).set(
-            UserDoc(
+        remoteSource.createUser(
+            uid = uid,
+            doc = UserDoc(
                 displayName = displayName,
                 email = email,
                 isAnon = isAnon,
@@ -56,59 +55,50 @@ class UserRemoteRepositoryImpl(
     }
 
     override suspend fun addWorkspaceRef(uid: String, workspaceId: WorkspaceId) {
-        firestore.collection("users").document(uid).update(
-            "workspaceIds" to FieldValue.arrayUnion(workspaceId.value),
-        )
+        remoteSource.addWorkspaceRef(uid, workspaceId.value)
     }
 
     override suspend fun setDefaultWorkspace(uid: String, workspaceId: WorkspaceId) {
-        firestore.collection("users").document(uid).update(
-            "defaultWorkspaceId" to workspaceId.value,
-        )
+        remoteSource.setDefaultWorkspace(uid, workspaceId.value)
     }
 
     override suspend fun findByEmail(email: String): UserId? {
-        val key = email.trim().lowercase()
+        val key = email.emailKey()
         if (key.isBlank()) return null
-        val snap = firestore.collection("userEmails").document(key).get()
-        if (!snap.exists) {
+        val doc = remoteSource.fetchEmailMapping(key)
+        if (doc == null) {
             log.d { "[findByEmail] miss email=${key.redactEmail()}" }
             return null
         }
-        val uid = snap.data(UserEmailDoc.serializer()).uid
         return when {
-            uid.isBlank() -> {
+            doc.uid.isBlank() -> {
                 log.w { "[findByEmail] mapping email=${key.redactEmail()} has empty uid — ignoring" }
                 null
             }
             else -> {
-                log.i { "[findByEmail] hit email=${key.redactEmail()} uid=${uid.redactUid()}" }
-                UserId(uid)
+                log.i { "[findByEmail] hit email=${key.redactEmail()} uid=${doc.uid.redactUid()}" }
+                UserId(doc.uid)
             }
         }
     }
 
     override suspend fun addInvitedWorkspaceRef(uid: String, workspaceId: WorkspaceId) {
-        firestore.collection("users").document(uid).update(
-            "invitedWorkspaceIds" to FieldValue.arrayUnion(workspaceId.value),
-        )
+        remoteSource.addInvitedWorkspaceRef(uid, workspaceId.value)
     }
 
     override suspend fun removeInvitedWorkspaceRef(uid: String, workspaceId: WorkspaceId) {
-        firestore.collection("users").document(uid).update(
-            "invitedWorkspaceIds" to FieldValue.arrayRemove(workspaceId.value),
-        )
+        remoteSource.removeInvitedWorkspaceRef(uid, workspaceId.value)
     }
 
     override suspend fun upsertEmailMapping(email: String, uid: String) {
-        val key = email.trim().lowercase()
+        val key = email.emailKey()
         if (key.isBlank() || uid.isBlank()) {
             log.w { "[email-map:skip] email='${email.redactEmail()}' uid='${uid.redactUid()}' — blank, skipping" }
             return
         }
-        val now = Clock.System.now().toEpochMilliseconds()
-        firestore.collection("userEmails").document(key).set(
-            UserEmailDoc(uid = uid, updatedAt = now),
+        remoteSource.upsertEmailMapping(
+            emailKey = key,
+            doc = UserEmailDoc(uid = uid, updatedAt = clock.now().toEpochMilliseconds()),
         )
         log.i { "[email-map:upsert] email=${key.redactEmail()} uid=${uid.redactUid()}" }
     }
@@ -117,3 +107,6 @@ class UserRemoteRepositoryImpl(
         const val TAG = "UserRemote"
     }
 }
+
+/** The document id an email maps to. Lower-cased and trimmed so a lookup and a write agree. */
+private fun String.emailKey(): String = trim().lowercase()

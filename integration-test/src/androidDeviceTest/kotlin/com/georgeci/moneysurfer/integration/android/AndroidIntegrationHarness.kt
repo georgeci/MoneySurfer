@@ -4,12 +4,14 @@ import androidx.room.Room
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import androidx.test.platform.app.InstrumentationRegistry
 import com.georgeci.moneysurfer.data.db.MoneySurferDatabase
+import com.georgeci.moneysurfer.data.remote.FirebaseUserRemoteSource
 import com.georgeci.moneysurfer.data.repository.UserRemoteRepositoryImpl
 import com.georgeci.moneysurfer.data.repository.WorkspaceInviteRepositoryImpl
 import com.georgeci.moneysurfer.data.repository.WorkspaceMemberRepositoryImpl
 import com.georgeci.moneysurfer.data.sync.FirebaseCurrentAuthInfo
 import com.georgeci.moneysurfer.data.sync.FirebaseUserWorkspacesProvider
 import com.georgeci.moneysurfer.data.sync.FirebaseWorkspaceCollectionReader
+import com.georgeci.moneysurfer.data.sync.FirebaseWorkspaceDocumentWriter
 import com.georgeci.moneysurfer.data.sync.PullRemoteChangesUseCaseImpl
 import com.georgeci.moneysurfer.data.sync.UploadPendingChangesUseCaseImpl
 import com.georgeci.moneysurfer.data.sync.WorkspaceRefRegistrar
@@ -111,7 +113,10 @@ class AndroidIntegrationHarness(appName: String? = null) {
         timeFormatter = com.georgeci.moneysurfer.data.repository.TimeFormatter(),
     )
 
-    val userRemoteRepository = UserRemoteRepositoryImpl(env.firestore)
+    val userRemoteRepository = UserRemoteRepositoryImpl(
+        remoteSource = FirebaseUserRemoteSource(env.firestore),
+        clock = com.georgeci.moneysurfer.domain.primitives.ClockUseCase(),
+    )
 
     val conflictResolver: ConflictResolver = LwwConflictResolver()
 
@@ -120,6 +125,8 @@ class AndroidIntegrationHarness(appName: String? = null) {
     private val appInfo = AppInfo(version = "test", versionCode = 1)
 
     private val collectionReader = FirebaseWorkspaceCollectionReader(env.firestore)
+
+    private val documentWriter = FirebaseWorkspaceDocumentWriter(env.firestore)
 
     private val userWorkspacesProvider = FirebaseUserWorkspacesProvider(
         firestore = env.firestore,
@@ -133,14 +140,14 @@ class AndroidIntegrationHarness(appName: String? = null) {
 
     val syncPlugins = listOf(
         WorkspaceSyncPlugin(
-            firestore = env.firestore,
+            writer = documentWriter,
             appInfo = appInfo,
             workspaceDao = database.workspaceDao(),
             userDao = database.userDao(),
             workspaceRefRegistrar = workspaceRefRegistrar,
         ),
         WorkspaceMemberSyncPlugin(
-            firestore = env.firestore,
+            writer = documentWriter,
             appInfo = appInfo,
             conflictResolver = conflictResolver,
             workspaceMemberDao = database.workspaceMemberDao(),
@@ -148,27 +155,27 @@ class AndroidIntegrationHarness(appName: String? = null) {
             userDao = database.userDao(),
         ),
         WorkspaceInviteSyncPlugin(
-            firestore = env.firestore,
+            writer = documentWriter,
             appInfo = appInfo,
             conflictResolver = conflictResolver,
             workspaceInviteDao = database.workspaceInviteDao(),
         ),
         AccountSyncPlugin(
-            firestore = env.firestore,
+            writer = documentWriter,
             appInfo = appInfo,
             conflictResolver = conflictResolver,
             accountDao = database.accountDao(),
             transactionDao = database.transactionDao(),
         ),
         CategorySyncPlugin(
-            firestore = env.firestore,
+            writer = documentWriter,
             appInfo = appInfo,
             conflictResolver = conflictResolver,
             categoryDao = database.categoryDao(),
             transactionDao = database.transactionDao(),
         ),
         TransactionSyncPlugin(
-            firestore = env.firestore,
+            writer = documentWriter,
             appInfo = appInfo,
             conflictResolver = conflictResolver,
             transactionDao = database.transactionDao(),

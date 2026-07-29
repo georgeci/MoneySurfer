@@ -19,6 +19,12 @@ object SyncCollection {
      */
     const val USERS = "users"
 
+    /**
+     * Root collection of workspace documents — the parent every constant below hangs off. Same
+     * reasoning as [USERS]: the reader and the writer both build paths from it.
+     */
+    const val WORKSPACES = "workspaces"
+
     const val WORKSPACE_MEMBERS = "members"
     const val WORKSPACE_INVITES = "invites"
     const val ACCOUNTS = "accounts"

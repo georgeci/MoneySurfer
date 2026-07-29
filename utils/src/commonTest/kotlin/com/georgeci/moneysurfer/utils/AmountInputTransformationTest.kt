@@ -1,5 +1,6 @@
 package com.georgeci.moneysurfer.utils
 
+import androidx.compose.foundation.text.input.TextFieldState
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.datatest.withData
 import io.kotest.matchers.nulls.shouldBeNull
@@ -58,4 +59,41 @@ class AmountInputTransformationTest : FunSpec({
             AmountInputTransformation.validateAndNormalize(input).shouldBeNull()
         }
     }
+
+    // The rules above are only half the contract: the field also has to *do* something with a
+    // rejected edit. Driving the real InputTransformation over a buffer is what shows the
+    // rejection puts the previous text back rather than leaving the bad keystroke in place.
+    context("applies the rules to the edit buffer") {
+        test("an accepted edit is left alone") {
+            edited(previous = "4", typed = "42") shouldBe "42"
+        }
+
+        test("clearing the field is always allowed") {
+            edited(previous = "42.50", typed = "") shouldBe ""
+        }
+
+        test("a comma is rewritten in place") {
+            edited(previous = "42", typed = "42,") shouldBe "42."
+        }
+
+        test("a rejected edit puts the previous text back") {
+            edited(previous = "42", typed = "42a") shouldBe "42"
+        }
+
+        test("a third decimal digit is rejected, keeping two") {
+            edited(previous = "42.50", typed = "42.501") shouldBe "42.50"
+        }
+    }
 })
+
+/** Applies the transformation to [typed] the way a keystroke reaches it, and reports what stuck. */
+private fun edited(previous: String, typed: String): String =
+    TextFieldState(previous)
+        .apply {
+            edit {
+                replace(0, length, typed)
+                with(AmountInputTransformation) { transformInput() }
+            }
+        }
+        .text
+        .toString()

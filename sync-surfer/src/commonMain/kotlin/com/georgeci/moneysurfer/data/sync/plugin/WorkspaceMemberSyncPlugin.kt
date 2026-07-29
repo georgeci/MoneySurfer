@@ -4,6 +4,7 @@ import com.georgeci.moneysurfer.data.db.dao.WorkspaceInviteDao
 import com.georgeci.moneysurfer.data.db.dao.WorkspaceMemberDao
 import com.georgeci.moneysurfer.data.db.entity.UserEntity
 import com.georgeci.moneysurfer.data.remote.WorkspaceMemberDoc
+import com.georgeci.moneysurfer.data.sync.WorkspaceDocumentWriter
 import com.georgeci.moneysurfer.data.sync.toDoc
 import com.georgeci.moneysurfer.data.sync.toEntity
 import com.georgeci.moneysurfer.domain.AppInfo
@@ -14,15 +15,13 @@ import com.georgeci.moneysurfer.sync.plugin.RemoteDocument
 import com.georgeci.moneysurfer.sync.plugin.SyncEntityPlugin
 import com.georgeci.moneysurfer.sync.repository.ConflictMetadata
 import com.georgeci.moneysurfer.sync.repository.ConflictResolver
-import com.georgeci.moneysurfer.sync.repository.MutationOperation
 import com.georgeci.moneysurfer.sync.repository.PendingMutation
-import dev.gitlive.firebase.firestore.FirebaseFirestore
 import org.koin.core.annotation.Single
 import kotlin.time.Instant
 
 @Single(binds = [SyncEntityPlugin::class])
 class WorkspaceMemberSyncPlugin(
-    private val firestore: FirebaseFirestore,
+    private val writer: WorkspaceDocumentWriter,
     private val appInfo: AppInfo,
     private val conflictResolver: ConflictResolver,
     private val workspaceMemberDao: WorkspaceMemberDao,
@@ -34,38 +33,30 @@ class WorkspaceMemberSyncPlugin(
     override val firestoreCollectionName: String = SyncCollection.WORKSPACE_MEMBERS
     override val pullPriority: Int = SyncPullPriorities.MEMBERS
 
-    override suspend fun push(mutation: PendingMutation) {
+    override suspend fun push(mutation: PendingMutation) = writer.pushToCollection(
+        mutation = mutation,
+        collectionName = SyncCollection.WORKSPACE_MEMBERS,
+        clientVersionCode = appInfo.versionCode,
+        strategy = WorkspaceMemberDoc.serializer(),
+    ) {
         val scopeKey = mutation.scopeKey!!
-        val docRef = workspaceCollection(scopeKey).document(mutation.entityId)
-        when (mutation.operation) {
-            MutationOperation.INSERT,
-            MutationOperation.UPDATE,
-            -> {
-                val entity = workspaceMemberDao.getById(
-                    userId = mutation.entityId,
-                    workspaceId = scopeKey,
-                ) ?: return
-                // Stamp the admitting invite so the rules can authorize the accept-invite
-                // self-create (issue #152). Usually null for owner-created rows and not
-                // required for owner writes (the rules' owner branch never consults it);
-                // it may still be non-null if a joinable invite happens to target the
-                // owner, which is harmless.
-                val inviteId = workspaceInviteDao.findJoinableInviteId(
-                    workspaceId = scopeKey,
-                    userId = entity.userId,
-                    email = entity.email,
-                )
-                docRef.set(
-                    entity.toDoc().copy(
-                        clientVersionCode = appInfo.versionCode,
-                        inviteId = inviteId,
-                    ),
-                )
-            }
-            MutationOperation.DELETE -> docRef.pushTombstone(
-                tombstonePatchFor(mutation, clientVersionCode = appInfo.versionCode),
-            )
-        }
+        val entity = workspaceMemberDao.getById(
+            userId = mutation.entityId,
+            workspaceId = scopeKey,
+        )
+        entity?.toDoc()?.copy(
+            clientVersionCode = appInfo.versionCode,
+            // Stamp the admitting invite so the rules can authorize the accept-invite
+            // self-create (issue #152). Usually null for owner-created rows and not
+            // required for owner writes (the rules' owner branch never consults it);
+            // it may still be non-null if a joinable invite happens to target the
+            // owner, which is harmless.
+            inviteId = workspaceInviteDao.findJoinableInviteId(
+                workspaceId = scopeKey,
+                userId = entity.userId,
+                email = entity.email,
+            ),
+        )
     }
 
     override suspend fun applyDoc(doc: RemoteDocument, scopeKey: String): EntityApplyResult {
@@ -94,7 +85,4 @@ class WorkspaceMemberSyncPlugin(
         )
         return applyResolution(resolution) { workspaceMemberDao.upsert(it) }
     }
-
-    private fun workspaceCollection(workspaceId: String) =
-        firestore.collection("workspaces").document(workspaceId).collection(SyncCollection.WORKSPACE_MEMBERS)
 }

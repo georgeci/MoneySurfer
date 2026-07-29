@@ -1,5 +1,6 @@
 package com.georgeci.moneysurfer.data.sync
 
+import com.georgeci.moneysurfer.sync.api.SyncCollection
 import com.georgeci.moneysurfer.sync.plugin.RemoteDocument
 import dev.gitlive.firebase.firestore.FirebaseFirestore
 import org.koin.core.annotation.Single
@@ -10,7 +11,7 @@ class FirebaseWorkspaceCollectionReader(
 ) : WorkspaceCollectionReader {
 
     override suspend fun fetchWorkspaceDoc(workspaceId: String): RemoteDocument? {
-        val snap = firestore.collection("workspaces").document(workspaceId).get()
+        val snap = firestore.collection(SyncCollection.WORKSPACES).document(workspaceId).get()
         return if (snap.exists) FirebaseRemoteDocument(snap) else null
     }
 
@@ -21,7 +22,7 @@ class FirebaseWorkspaceCollectionReader(
         limit: Int,
     ): List<RemoteDocument> =
         firestore
-            .collection("workspaces")
+            .collection(SyncCollection.WORKSPACES)
             .document(workspaceId)
             .collection(collectionName)
             .where { "updatedAt" greaterThan sinceMillis }
@@ -38,9 +39,9 @@ class FirebaseWorkspaceCollectionReader(
         limit: Int,
     ): List<RemoteDocument> =
         firestore
-            .collection("workspaces")
+            .collection(SyncCollection.WORKSPACES)
             .document(workspaceId)
-            .collection("invites")
+            .collection(SyncCollection.WORKSPACE_INVITES)
             .where { "targetUserId" equalTo uid }
             .where { "updatedAt" greaterThan sinceMillis }
             .orderBy(field = "updatedAt")

@@ -48,6 +48,7 @@ kotlin {
 
         commonTest {
             dependencies {
+                implementation(projects.domainTestFixtures)
                 implementation(libs.kotlin.test)
                 implementation(libs.kotest.framework.engine)
                 implementation(libs.kotest.assertions.core)
@@ -60,6 +61,9 @@ kotlin {
         jvmTest {
             dependencies {
                 implementation(libs.kotest.runner.junit5)
+                // RouteSerializationTest round-trips every route through `navKeySerializersModule`;
+                // JSON stands in for the saved-state format, which needs an Android runtime.
+                implementation(libs.kotlinx.serialization.json)
             }
         }
 
