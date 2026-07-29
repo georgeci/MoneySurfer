@@ -65,7 +65,10 @@ tasks.named<Test>("jvmTest") {
     inputs.files(
         fileTree(rootDir) {
             include("**/strings.xml", "**/plurals.xml")
-            exclude("**/build/**", "**/.git/**", "**/.gradle/**")
+            // `.claude/**` covers the Claude Code worktrees, which live inside the main checkout.
+            // The gates skip the same directories at runtime via `skippedDirs` in `RepoScan.kt`;
+            // keep the two lists in sync.
+            exclude("**/build/**", "**/.git/**", "**/.gradle/**", "**/.claude/**")
         },
     ).withPathSensitivity(PathSensitivity.RELATIVE)
 
@@ -76,7 +79,7 @@ tasks.named<Test>("jvmTest") {
         fileTree(rootDir) {
             include("scripts/maestro/**/*.yaml")
             include("**/src/**/*.kt")
-            exclude("**/build/**", "**/.git/**", "**/.gradle/**")
+            exclude("**/build/**", "**/.git/**", "**/.gradle/**", "**/.claude/**")
         },
     ).withPathSensitivity(PathSensitivity.RELATIVE)
 }

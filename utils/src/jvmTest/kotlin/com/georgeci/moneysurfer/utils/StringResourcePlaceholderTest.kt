@@ -20,17 +20,9 @@ class StringResourcePlaceholderTest : StringSpec({
     // because they aren't followed by a conversion letter.
     val barePlaceholder = Regex("""%[-#+0,(]*\d*(?:\.\d+)?[a-zA-Z]""")
 
-    fun repoRoot(): File {
-        var dir = File(System.getProperty("user.dir")).absoluteFile
-        while (!File(dir, "settings.gradle.kts").exists()) {
-            dir = dir.parentFile ?: error("settings.gradle.kts not found above ${System.getProperty("user.dir")}")
-        }
-        return dir
-    }
-
     fun stringResourceFiles(): List<File> = repoRoot()
         .walkTopDown()
-        .onEnter { it.name !in setOf("build", ".git", ".gradle") }
+        .onEnter { it.name !in skippedDirs }
         .filter { it.isFile && it.name == "strings.xml" }
         .toList()
 
