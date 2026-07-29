@@ -49,34 +49,34 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   <td class="name">PluginHelpersKt</td>
 <td class="coverageStat">
   <span class="percent">
-    75%
+    100%
   </span>
   <span class="absValue">
-    (3/4)
+    (4/4)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    25%
   </span>
   <span class="absValue">
-    (0/12)
+    (3/12)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    40%
+    100%
   </span>
   <span class="absValue">
-    (6/15)
+    (15/15)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    19.9%
+    92.3%
   </span>
   <span class="absValue">
-    (36/181)
+    (167/181)
   </span>
 </td>
 </tr>
@@ -88,34 +88,34 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
-    75%
+    100%
   </span>
   <span class="absValue">
-    (3/4)
+    (4/4)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    25%
   </span>
   <span class="absValue">
-    (0/12)
+    (3/12)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    40%
+    100%
   </span>
   <span class="absValue">
-    (6/15)
+    (15/15)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    19.9%
+    92.3%
   </span>
   <span class="absValue">
-    (36/181)
+    (167/181)
   </span>
 </td>
 </tr>
@@ -173,17 +173,17 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;internal suspend inline fun &lt;T : Any&gt; applyResolution(
 &nbsp;    resolution: ConflictResolution&lt;T&gt;,
 &nbsp;    crossinline write: suspend (T) -&gt; Unit,
-<b class="nc">&nbsp;): EntityApplyResult = when (resolution) {</b>
-<b class="nc">&nbsp;    is ConflictResolution.TakeRemote -&gt; {</b>
-<b class="nc">&nbsp;        write(resolution.value)</b>
-<b class="nc">&nbsp;        EntityApplyResult(applied = true, wasConflict = false)</b>
+<b class="fc">&nbsp;): EntityApplyResult = when (resolution) {</b>
+<b class="pc">&nbsp;    is ConflictResolution.TakeRemote -&gt; {</b>
+<b class="fc">&nbsp;        write(resolution.value)</b>
+<b class="fc">&nbsp;        EntityApplyResult(applied = true, wasConflict = false)</b>
 &nbsp;    }
-<b class="nc">&nbsp;    is ConflictResolution.Merged -&gt; {</b>
-<b class="nc">&nbsp;        write(resolution.value)</b>
-<b class="nc">&nbsp;        EntityApplyResult(applied = true, wasConflict = true)</b>
+<b class="pc">&nbsp;    is ConflictResolution.Merged -&gt; {</b>
+<b class="fc">&nbsp;        write(resolution.value)</b>
+<b class="fc">&nbsp;        EntityApplyResult(applied = true, wasConflict = true)</b>
 &nbsp;    }
-<b class="nc">&nbsp;    is ConflictResolution.TakeLocal -&gt; EntityApplyResult(applied = false, wasConflict = true)</b>
-<b class="nc">&nbsp;    ConflictResolution.Skip -&gt; EntityApplyResult(applied = false, wasConflict = true)</b>
+<b class="pc">&nbsp;    is ConflictResolution.TakeLocal -&gt; EntityApplyResult(applied = false, wasConflict = true)</b>
+<b class="fc">&nbsp;    ConflictResolution.Skip -&gt; EntityApplyResult(applied = false, wasConflict = true)</b>
 &nbsp;}
 </code>
 </pre>
@@ -208,7 +208,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 11:10</div>
+    <div style="float:right;">generated on 2026-07-29 11:23</div>
 </div>
 </body>
 </html>

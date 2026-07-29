@@ -68,10 +68,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    69.4%
+    82.3%
   </span>
   <span class="absValue">
-    (43/62)
+    (51/62)
   </span>
 </td>
 <td class="coverageStat">
@@ -84,10 +84,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    93.8%
+    95.7%
   </span>
   <span class="absValue">
-    (499/532)
+    (509/532)
   </span>
 </td>
 </tr>
@@ -127,10 +127,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;    dateRange = filters.dateRange,</b>
 <b class="fc">&nbsp;    type = filters.type,</b>
 <b class="fc">&nbsp;    accountCount = filters.accountIds.size,</b>
-<b class="pc">&nbsp;    accountName = filters.accountIds.singleOrNull()</b>
-<b class="pc">&nbsp;        ?.let { id -&gt; accounts.firstOrNull { it.id == id }?.name },</b>
+<b class="fc">&nbsp;    accountName = filters.accountIds.singleOrNull()</b>
+<b class="fc">&nbsp;        ?.let { id -&gt; accounts.firstOrNull { it.id == id }?.name },</b>
 <b class="fc">&nbsp;    categoryCount = filters.categoryIds.size,</b>
-<b class="pc">&nbsp;    categoryName = filters.categoryIds.singleOrNull()</b>
+<b class="fc">&nbsp;    categoryName = filters.categoryIds.singleOrNull()</b>
 <b class="pc">&nbsp;        ?.let { id -&gt; categories.firstOrNull { it.id == id }?.name },</b>
 <b class="fc">&nbsp;    sort = filters.sort,</b>
 &nbsp;)
@@ -247,7 +247,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp; */
 &nbsp;internal fun summaryCurrency(account: Account?, totals: List&lt;TransactionTotal&gt;): CurrencyCode =
 <b class="fc">&nbsp;    account?.currencyCode</b>
-<b class="pc">&nbsp;        ?: totals.maxByOrNull { it.total.minor }?.currencyCode</b>
+<b class="fc">&nbsp;        ?: totals.maxByOrNull { it.total.minor }?.currencyCode</b>
 <b class="fc">&nbsp;        ?: CurrencyCode(&quot;USD&quot;)</b>
 &nbsp;
 &nbsp;/**
@@ -303,7 +303,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 11:10</div>
+    <div style="float:right;">generated on 2026-07-29 11:23</div>
 </div>
 </body>
 </html>

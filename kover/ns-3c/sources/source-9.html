@@ -57,26 +57,26 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    79.4%
+    100%
   </span>
   <span class="absValue">
-    (27/34)
+    (34/34)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    95.8%
+    100%
   </span>
   <span class="absValue">
-    (46/48)
+    (48/48)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    95.1%
+    100%
   </span>
   <span class="absValue">
-    (351/369)
+    (369/369)
   </span>
 </td>
 </tr>
@@ -159,26 +159,26 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    80.6%
+    100%
   </span>
   <span class="absValue">
-    (29/36)
+    (36/36)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    96.4%
+    100%
   </span>
   <span class="absValue">
-    (53/55)
+    (55/55)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    95.7%
+    100%
   </span>
   <span class="absValue">
-    (398/416)
+    (416/416)
   </span>
 </td>
 </tr>
@@ -223,9 +223,9 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;        when (event) {</b>
 <b class="fc">&nbsp;            is CategoryChooserEvent.OnCategorySelected -&gt;</b>
 <b class="fc">&nbsp;                postSideEffect(CategoryChooserEffect.PublishResult(event.id))</b>
-<b class="pc">&nbsp;            CategoryChooserEvent.OnCreateNewCategoryClick -&gt;</b>
-<b class="nc">&nbsp;                postSideEffect(CategoryChooserEffect.NavigateToCategoryCreation)</b>
-<b class="pc">&nbsp;            CategoryChooserEvent.OnDismiss -&gt; postSideEffect(CategoryChooserEffect.Dismiss)</b>
+<b class="fc">&nbsp;            CategoryChooserEvent.OnCreateNewCategoryClick -&gt;</b>
+<b class="fc">&nbsp;                postSideEffect(CategoryChooserEffect.NavigateToCategoryCreation)</b>
+<b class="fc">&nbsp;            CategoryChooserEvent.OnDismiss -&gt; postSideEffect(CategoryChooserEffect.Dismiss)</b>
 <b class="fc">&nbsp;            is CategoryChooserEvent.OnTypeSelected -&gt; updateContent {</b>
 &nbsp;                // Expansion is per-parent and the parents differ per type, so a stale set would
 &nbsp;                // only ever open the wrong rows.
@@ -280,8 +280,8 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    }
 &nbsp;
 &nbsp;    private fun expandedFor(type: CategoryType): Set&lt;CategoryId&gt; {
-<b class="pc">&nbsp;        val selected = currentState.selectedId?.takeIf { id -&gt;</b>
-<b class="pc">&nbsp;            allCategories.firstOrNull { it.id == id }?.type == type</b>
+<b class="fc">&nbsp;        val selected = currentState.selectedId?.takeIf { id -&gt;</b>
+<b class="fc">&nbsp;            allCategories.firstOrNull { it.id == id }?.type == type</b>
 &nbsp;        }
 <b class="fc">&nbsp;        return CategoryPickerRows.expandedForSelection(allCategories, selected)</b>
 &nbsp;    }
@@ -290,8 +290,8 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    private fun updateContent(reducer: CategoryChooserState.Content.() -&gt; CategoryChooserState.Content) =
 <b class="fc">&nbsp;        updateState {</b>
 <b class="fc">&nbsp;            when (this) {</b>
-<b class="pc">&nbsp;                is CategoryChooserState.Content -&gt; reducer().rebuild()</b>
-<b class="nc">&nbsp;                is CategoryChooserState.Loading -&gt; this</b>
+<b class="fc">&nbsp;                is CategoryChooserState.Content -&gt; reducer().rebuild()</b>
+<b class="fc">&nbsp;                is CategoryChooserState.Loading -&gt; this</b>
 &nbsp;            }
 &nbsp;        }
 &nbsp;
@@ -370,7 +370,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 11:10</div>
+    <div style="float:right;">generated on 2026-07-29 11:23</div>
 </div>
 </body>
 </html>

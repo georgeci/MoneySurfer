@@ -49,34 +49,34 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   <td class="name">AccountChooserViewModel</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/3)
+    (3/3)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/6)
+    (6/6)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/16)
+    (16/16)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/68)
+    (68/68)
   </span>
 </td>
 </tr>
@@ -84,27 +84,27 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <td class="name">AccountChooserViewModel$observeAccounts$1</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
     <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/19)
+    (19/19)
   </span>
 </td>
   </tr>
@@ -112,34 +112,34 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <td class="name">AccountChooserViewModel$observeAccounts$1$1</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/2)
+    (2/2)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    75%
   </span>
   <span class="absValue">
-    (0/4)
+    (3/4)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/8)
+    (8/8)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    93%
   </span>
   <span class="absValue">
-    (0/43)
+    (40/43)
   </span>
 </td>
   </tr>
@@ -147,34 +147,34 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/6)
+    (6/6)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    90%
   </span>
   <span class="absValue">
-    (0/10)
+    (9/10)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/25)
+    (25/25)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    97.7%
   </span>
   <span class="absValue">
-    (0/130)
+    (127/130)
   </span>
 </td>
 </tr>
@@ -195,46 +195,46 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.utils.MviViewModel
 &nbsp;import org.koin.core.annotation.KoinViewModel
 &nbsp;
-<b class="nc">&nbsp;@KoinViewModel</b>
+<b class="fc">&nbsp;@KoinViewModel</b>
 &nbsp;class AccountChooserViewModel(
 &nbsp;    initialSelectedId: AccountId?,
-<b class="nc">&nbsp;    private val excludeAccountId: AccountId?,</b>
-<b class="nc">&nbsp;    private val getAccounts: GetAccountsUseCase,</b>
+<b class="fc">&nbsp;    private val excludeAccountId: AccountId?,</b>
+<b class="fc">&nbsp;    private val getAccounts: GetAccountsUseCase,</b>
 &nbsp;) : MviViewModel&lt;AccountChooserState, AccountChooserEvent, AccountChooserEffect&gt;(
-<b class="nc">&nbsp;    initialState = AccountChooserState.Loading(selectedId = initialSelectedId),</b>
+<b class="fc">&nbsp;    initialState = AccountChooserState.Loading(selectedId = initialSelectedId),</b>
 &nbsp;) {
 &nbsp;
-<b class="nc">&nbsp;    init {</b>
-<b class="nc">&nbsp;        observeAccounts()</b>
-<b class="nc">&nbsp;    }</b>
+<b class="fc">&nbsp;    init {</b>
+<b class="fc">&nbsp;        observeAccounts()</b>
+<b class="fc">&nbsp;    }</b>
 &nbsp;
 &nbsp;    override fun onEvent(event: AccountChooserEvent) {
-<b class="nc">&nbsp;        when (event) {</b>
-<b class="nc">&nbsp;            is AccountChooserEvent.OnAccountSelected -&gt;</b>
-<b class="nc">&nbsp;                postSideEffect(AccountChooserEffect.PublishResult(event.id))</b>
-<b class="nc">&nbsp;            AccountChooserEvent.OnAddNewAccountClick -&gt;</b>
-<b class="nc">&nbsp;                postSideEffect(AccountChooserEffect.NavigateToAccountCreation)</b>
-<b class="nc">&nbsp;            AccountChooserEvent.OnTransferInsteadClick -&gt;</b>
-<b class="nc">&nbsp;                postSideEffect(AccountChooserEffect.RequestTransfer)</b>
-<b class="nc">&nbsp;            AccountChooserEvent.OnDismiss -&gt; postSideEffect(AccountChooserEffect.Dismiss)</b>
+<b class="fc">&nbsp;        when (event) {</b>
+<b class="fc">&nbsp;            is AccountChooserEvent.OnAccountSelected -&gt;</b>
+<b class="fc">&nbsp;                postSideEffect(AccountChooserEffect.PublishResult(event.id))</b>
+<b class="fc">&nbsp;            AccountChooserEvent.OnAddNewAccountClick -&gt;</b>
+<b class="fc">&nbsp;                postSideEffect(AccountChooserEffect.NavigateToAccountCreation)</b>
+<b class="fc">&nbsp;            AccountChooserEvent.OnTransferInsteadClick -&gt;</b>
+<b class="fc">&nbsp;                postSideEffect(AccountChooserEffect.RequestTransfer)</b>
+<b class="fc">&nbsp;            AccountChooserEvent.OnDismiss -&gt; postSideEffect(AccountChooserEffect.Dismiss)</b>
 &nbsp;        }
 &nbsp;    }
 &nbsp;
 &nbsp;    private fun observeAccounts() {
-<b class="nc">&nbsp;        launch {</b>
-<b class="nc">&nbsp;            getAccounts().collect { all -&gt;</b>
-<b class="nc">&nbsp;                val accounts = if (excludeAccountId != null) {</b>
-<b class="nc">&nbsp;                    all.filter { it.id != excludeAccountId }</b>
+<b class="fc">&nbsp;        launch {</b>
+<b class="fc">&nbsp;            getAccounts().collect { all -&gt;</b>
+<b class="fc">&nbsp;                val accounts = if (excludeAccountId != null) {</b>
+<b class="pc">&nbsp;                    all.filter { it.id != excludeAccountId }</b>
 &nbsp;                } else {
-<b class="nc">&nbsp;                    all</b>
+<b class="fc">&nbsp;                    all</b>
 &nbsp;                }
-<b class="nc">&nbsp;                updateState {</b>
-<b class="nc">&nbsp;                    AccountChooserState.Content(</b>
-<b class="nc">&nbsp;                        accounts = accounts,</b>
-<b class="nc">&nbsp;                        selectedId = selectedId,</b>
+<b class="fc">&nbsp;                updateState {</b>
+<b class="fc">&nbsp;                    AccountChooserState.Content(</b>
+<b class="fc">&nbsp;                        accounts = accounts,</b>
+<b class="fc">&nbsp;                        selectedId = selectedId,</b>
 &nbsp;                        // One figure per currency — the old single sum added minor units across
 &nbsp;                        // currencies and labelled the result with whichever one came first.
-<b class="nc">&nbsp;                        totalsFormatted = accounts.formattedTotalsByCurrency(),</b>
+<b class="fc">&nbsp;                        totalsFormatted = accounts.formattedTotalsByCurrency(),</b>
 &nbsp;                    )
 &nbsp;                }
 &nbsp;            }
@@ -302,7 +302,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 11:10</div>
+    <div style="float:right;">generated on 2026-07-29 11:23</div>
 </div>
 </body>
 </html>

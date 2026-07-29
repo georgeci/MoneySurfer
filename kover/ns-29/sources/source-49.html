@@ -57,10 +57,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    86.4%
+    87.5%
   </span>
   <span class="absValue">
-    (38/44)
+    (42/48)
   </span>
 </td>
 <td class="coverageStat">
@@ -73,10 +73,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    98.2%
+    98.3%
   </span>
   <span class="absValue">
-    (945/962)
+    (956/973)
   </span>
 </td>
 </tr>
@@ -196,10 +196,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    86.4%
+    87.5%
   </span>
   <span class="absValue">
-    (38/44)
+    (42/48)
   </span>
 </td>
 <td class="coverageStat">
@@ -215,7 +215,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     98.3%
   </span>
   <span class="absValue">
-    (966/983)
+    (977/994)
   </span>
 </td>
 </tr>
@@ -393,7 +393,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;        // `defaultWorkspaceId` is not guaranteed to be a member of `workspaceIds`
 &nbsp;        // (server-side skew), and neither is guaranteed to have been hydrated by the pull.
 <b class="fc">&nbsp;        val preferred = existing.defaultWorkspaceId ?: existing.workspaceIds.firstOrNull()</b>
-<b class="fc">&nbsp;        val resolvedDefault = preferred?.takeIf { isHydrated(it) }</b>
+<b class="fc">&nbsp;        val resolvedDefault = preferred.takeIf { it != null &amp;&amp; isHydrated(it) }</b>
 <b class="fc">&nbsp;            ?: existing.workspaceIds.firstOrNull { isHydrated(it) }</b>
 &nbsp;
 <b class="fc">&nbsp;        if (resolvedDefault == null) {</b>
@@ -473,7 +473,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 11:10</div>
+    <div style="float:right;">generated on 2026-07-29 11:23</div>
 </div>
 </body>
 </html>

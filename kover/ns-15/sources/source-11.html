@@ -230,8 +230,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;        onProgress: suspend (PullProgress) -&gt; Unit,
 &nbsp;        cancelToken: SyncCancelToken,
 &nbsp;    ): PullSummary {
-&nbsp;        var downloadedCount = 0
-&nbsp;        var conflictCount = 0
+&nbsp;        val pluginSummaries = mutableListOf&lt;PullSummary&gt;()
 &nbsp;
 &nbsp;        for (plugin in pluginsInScope(scope)) {
 &nbsp;            cancelToken.throwIfCancelled()
@@ -263,11 +262,13 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;                }
 &nbsp;                raise(failure.toSyncError())
 &nbsp;            }
-&nbsp;            downloadedCount += downloaded
-&nbsp;            conflictCount += conflicts
+&nbsp;            pluginSummaries += PullSummary(downloadedCount = downloaded, conflictCount = conflicts)
 &nbsp;        }
 &nbsp;
-&nbsp;        return PullSummary(downloadedCount = downloadedCount, conflictCount = conflictCount)
+&nbsp;        return PullSummary(
+&nbsp;            downloadedCount = pluginSummaries.sumOf(PullSummary::downloadedCount),
+&nbsp;            conflictCount = pluginSummaries.sumOf(PullSummary::conflictCount),
+&nbsp;        )
 &nbsp;    }
 &nbsp;
 &nbsp;    /**
@@ -648,7 +649,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 11:10</div>
+    <div style="float:right;">generated on 2026-07-29 11:23</div>
 </div>
 </body>
 </html>

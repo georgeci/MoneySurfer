@@ -53,27 +53,27 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <td class="name">AccountChooserState$Content</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
     <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/4)
+    (4/4)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/17)
+    (17/17)
   </span>
 </td>
   </tr>
@@ -85,27 +85,27 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <td class="name">AccountChooserState$Loading</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
     <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/2)
+    (2/2)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/7)
+    (7/7)
   </span>
 </td>
   </tr>
@@ -117,27 +117,27 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/2)
+    (2/2)
   </span>
 </td>
     <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/6)
+    (6/6)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/24)
+    (24/24)
   </span>
 </td>
 </tr>
@@ -209,17 +209,17 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;sealed interface AccountChooserState {
 &nbsp;    val selectedId: AccountId?
 &nbsp;
-<b class="nc">&nbsp;    @optics</b>
-<b class="nc">&nbsp;    data class Loading(override val selectedId: AccountId?) : AccountChooserState {</b>
+<b class="fc">&nbsp;    @optics</b>
+<b class="fc">&nbsp;    data class Loading(override val selectedId: AccountId?) : AccountChooserState {</b>
 &nbsp;        companion object
 &nbsp;    }
 &nbsp;
-<b class="nc">&nbsp;    @optics</b>
+<b class="fc">&nbsp;    @optics</b>
 &nbsp;    data class Content(
-<b class="nc">&nbsp;        val accounts: List&lt;Account&gt;,</b>
-<b class="nc">&nbsp;        override val selectedId: AccountId?,</b>
+<b class="fc">&nbsp;        val accounts: List&lt;Account&gt;,</b>
+<b class="fc">&nbsp;        override val selectedId: AccountId?,</b>
 &nbsp;        /** One formatted total per currency, most-used currency first. Empty when there are none. */
-<b class="nc">&nbsp;        val totalsFormatted: List&lt;String&gt;,</b>
+<b class="fc">&nbsp;        val totalsFormatted: List&lt;String&gt;,</b>
 &nbsp;    ) : AccountChooserState {
 &nbsp;        companion object
 &nbsp;    }
@@ -265,7 +265,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 11:10</div>
+    <div style="float:right;">generated on 2026-07-29 11:23</div>
 </div>
 </body>
 </html>

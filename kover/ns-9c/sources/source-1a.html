@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > ExchangeRateRepository</title>
+  <title>MoneySurfer Coverage Report > TransactionRetentionRepository</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.repositories</a>
 </div>
 
-<h1>Coverage Summary for Class: ExchangeRateRepository (com.georgeci.moneysurfer.domain.repositories)</h1>
+<h1>Coverage Summary for Class: TransactionRetentionRepository (com.georgeci.moneysurfer.domain.repositories)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">ExchangeRateRepository</td>
+  <td class="name">TransactionRetentionRepository</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -46,28 +46,23 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.repositories
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.model.ExchangeRateTable
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
-&nbsp;import kotlinx.coroutines.flow.Flow
+&nbsp;import kotlin.time.Instant
 &nbsp;
 &nbsp;/**
-&nbsp; * Locally cached FX quotes. The cache is the read path — the network only ever refills it — so
-&nbsp; * the dashboard total renders offline from whatever was fetched last.
+&nbsp; * Storage side of the tombstone retention policy (issue #346).
+&nbsp; *
+&nbsp; * Split off [TransactionRepository] rather than added to it because purging is maintenance, not
+&nbsp; * a transaction operation: it has no domain model to map, no caller on any screen, and every
+&nbsp; * test double of the transaction store would otherwise have to answer a question none of them
+&nbsp; * ask. See `PurgeDeletedTransactionsUseCase` for the policy that drives it.
 &nbsp; */
-&nbsp;interface ExchangeRateRepository {
+&nbsp;fun interface TransactionRetentionRepository {
 &nbsp;
 &nbsp;    /**
-&nbsp;     * Newest cached table quoted against [base], emitting again whenever a refresh lands.
-&nbsp;     * `null` until the first successful fetch for that base.
+&nbsp;     * Removes the rows tombstoned strictly before [threshold] for good, and returns how many
+&nbsp;     * went. Live rows are never touched.
 &nbsp;     */
-&nbsp;    fun observe(base: CurrencyCode): Flow&lt;ExchangeRateTable?&gt;
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Refetches [base] when the cached copy is older than the staleness threshold, and does
-&nbsp;     * nothing otherwise. Never throws: a failed refresh leaves the cache — stale or empty —
-&nbsp;     * exactly as it was, because a total from yesterday&#39;s rates beats no total at all.
-&nbsp;     */
-&nbsp;    suspend fun refreshIfStale(base: CurrencyCode)
+&nbsp;    suspend fun purgeDeletedBefore(threshold: Instant): Int
 &nbsp;}
 </code>
 </pre>
@@ -92,7 +87,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 11:10</div>
+    <div style="float:right;">generated on 2026-07-29 11:23</div>
 </div>
 </body>
 </html>

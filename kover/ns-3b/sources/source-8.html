@@ -57,26 +57,26 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    60.7%
+    82.1%
   </span>
   <span class="absValue">
-    (17/28)
+    (23/28)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    93.3%
+    100%
   </span>
   <span class="absValue">
-    (42/45)
+    (45/45)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    87.5%
+    97.8%
   </span>
   <span class="absValue">
-    (239/273)
+    (267/273)
   </span>
 </td>
 </tr>
@@ -218,26 +218,26 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    62.5%
+    81.2%
   </span>
   <span class="absValue">
-    (20/32)
+    (26/32)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    94.8%
+    100%
   </span>
   <span class="absValue">
-    (55/58)
+    (58/58)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    91.6%
+    98.1%
   </span>
   <span class="absValue">
-    (395/431)
+    (423/431)
   </span>
 </td>
 </tr>
@@ -283,14 +283,14 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;
 &nbsp;    override fun onEvent(event: CategoriesManageEvent) {
 <b class="fc">&nbsp;        when (event) {</b>
-<b class="pc">&nbsp;            CategoriesManageEvent.OnBackClick -&gt; postSideEffect(CategoriesManageEffect.NavigateBack)</b>
-<b class="pc">&nbsp;            CategoriesManageEvent.OnAddCategoryClick -&gt; postSideEffect(</b>
-<b class="nc">&nbsp;                CategoriesManageEffect.NavigateToCategoryCreation,</b>
+<b class="fc">&nbsp;            CategoriesManageEvent.OnBackClick -&gt; postSideEffect(CategoriesManageEffect.NavigateBack)</b>
+<b class="fc">&nbsp;            CategoriesManageEvent.OnAddCategoryClick -&gt; postSideEffect(</b>
+<b class="fc">&nbsp;                CategoriesManageEffect.NavigateToCategoryCreation,</b>
 &nbsp;            )
-<b class="pc">&nbsp;            is CategoriesManageEvent.OnCategoryClick -&gt;</b>
-<b class="nc">&nbsp;                postSideEffect(CategoriesManageEffect.NavigateToCategoryDetails(event.categoryId))</b>
-<b class="pc">&nbsp;            is CategoriesManageEvent.OnEditCategoryClick -&gt;</b>
-<b class="nc">&nbsp;                postSideEffect(CategoriesManageEffect.NavigateToCategoryEdit(event.categoryId))</b>
+<b class="fc">&nbsp;            is CategoriesManageEvent.OnCategoryClick -&gt;</b>
+<b class="fc">&nbsp;                postSideEffect(CategoriesManageEffect.NavigateToCategoryDetails(event.categoryId))</b>
+<b class="fc">&nbsp;            is CategoriesManageEvent.OnEditCategoryClick -&gt;</b>
+<b class="fc">&nbsp;                postSideEffect(CategoriesManageEffect.NavigateToCategoryEdit(event.categoryId))</b>
 <b class="fc">&nbsp;            is CategoriesManageEvent.OnRemoveCategoryClick -&gt; requestDelete(event.categoryId)</b>
 <b class="fc">&nbsp;            CategoriesManageEvent.OnDeleteCancel -&gt; dismissDelete()</b>
 <b class="fc">&nbsp;            CategoriesManageEvent.OnDeleteConfirm -&gt; confirmDelete()</b>
@@ -299,7 +299,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;
 &nbsp;    private fun requestDelete(categoryId: CategoryId) {
 <b class="pc">&nbsp;        val content = currentState as? CategoriesManageState.Content ?: return</b>
-<b class="pc">&nbsp;        val target = content.categories.firstOrNull { it.id == categoryId } ?: return</b>
+<b class="fc">&nbsp;        val target = content.categories.firstOrNull { it.id == categoryId } ?: return</b>
 <b class="fc">&nbsp;        updateState {</b>
 <b class="fc">&nbsp;            CategoriesManageState.content.pendingDelete.modify(this) {</b>
 <b class="fc">&nbsp;                CategoriesManagePendingDelete(</b>
@@ -319,7 +319,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;
 &nbsp;    private fun confirmDelete() {
 <b class="pc">&nbsp;        val content = currentState as? CategoriesManageState.Content ?: return</b>
-<b class="pc">&nbsp;        val target = content.pendingDelete ?: return</b>
+<b class="fc">&nbsp;        val target = content.pendingDelete ?: return</b>
 <b class="fc">&nbsp;        updateState { CategoriesManageState.content.pendingDelete.modify(this) { null } }</b>
 <b class="fc">&nbsp;        launch {</b>
 <b class="pc">&nbsp;            val deletion = deleteCategory(target.id) ?: return@launch</b>
@@ -437,7 +437,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 11:10</div>
+    <div style="float:right;">generated on 2026-07-29 11:23</div>
 </div>
 </body>
 </html>

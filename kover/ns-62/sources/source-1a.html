@@ -478,7 +478,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;
 &nbsp;@Preview
 &nbsp;@Composable
-&nbsp;private fun WorkspaceMembersScreenPreview_OwnerActive() {
+&nbsp;private fun WorkspaceMembersScreenPreviewOwnerActive() {
 &nbsp;    SurferBottomSheetPreview {
 &nbsp;        WorkspaceMembersScreen(state = previewState(WorkspaceRole.OWNER), onEvent = {})
 &nbsp;    }
@@ -486,7 +486,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;
 &nbsp;@Preview
 &nbsp;@Composable
-&nbsp;private fun WorkspaceMembersScreenPreview_OwnerInvited() {
+&nbsp;private fun WorkspaceMembersScreenPreviewOwnerInvited() {
 &nbsp;    SurferBottomSheetPreview {
 &nbsp;        WorkspaceMembersScreen(
 &nbsp;            state = previewState(WorkspaceRole.OWNER, tab = MembersTab.Invited),
@@ -497,7 +497,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;
 &nbsp;@Preview
 &nbsp;@Composable
-&nbsp;private fun WorkspaceMembersScreenPreview_OwnerInvitedEmpty() {
+&nbsp;private fun WorkspaceMembersScreenPreviewOwnerInvitedEmpty() {
 &nbsp;    SurferBottomSheetPreview {
 &nbsp;        WorkspaceMembersScreen(
 &nbsp;            state = previewState(WorkspaceRole.OWNER, tab = MembersTab.Invited, invites = emptyList()),
@@ -508,7 +508,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;
 &nbsp;@Preview
 &nbsp;@Composable
-&nbsp;private fun WorkspaceMembersScreenPreview_EditorActive() {
+&nbsp;private fun WorkspaceMembersScreenPreviewEditorActive() {
 &nbsp;    SurferBottomSheetPreview {
 &nbsp;        WorkspaceMembersScreen(state = previewState(WorkspaceRole.EDITOR), onEvent = {})
 &nbsp;    }
@@ -516,7 +516,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;
 &nbsp;@Preview
 &nbsp;@Composable
-&nbsp;private fun WorkspaceMembersScreenPreview_ViewerActive() {
+&nbsp;private fun WorkspaceMembersScreenPreviewViewerActive() {
 &nbsp;    SurferBottomSheetPreview {
 &nbsp;        WorkspaceMembersScreen(state = previewState(WorkspaceRole.VIEWER), onEvent = {})
 &nbsp;    }
@@ -524,7 +524,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;
 &nbsp;@Preview
 &nbsp;@Composable
-&nbsp;private fun WorkspaceMembersScreenPreview_LeaveDialog() {
+&nbsp;private fun WorkspaceMembersScreenPreviewLeaveDialog() {
 &nbsp;    SurferBottomSheetPreview {
 &nbsp;        WorkspaceMembersScreen(
 &nbsp;            state = previewState(WorkspaceRole.EDITOR, showLeaveDialog = true),
@@ -535,7 +535,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;
 &nbsp;@Preview
 &nbsp;@Composable
-&nbsp;private fun WorkspaceMembersScreenPreview_Loading() {
+&nbsp;private fun WorkspaceMembersScreenPreviewLoading() {
 &nbsp;    SurferBottomSheetPreview {
 &nbsp;        WorkspaceMembersScreen(
 &nbsp;            state = WorkspaceMembersState.Loading(WorkspaceId(&quot;preview-ws-1&quot;)),
@@ -566,7 +566,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 11:10</div>
+    <div style="float:right;">generated on 2026-07-29 11:23</div>
 </div>
 </body>
 </html>

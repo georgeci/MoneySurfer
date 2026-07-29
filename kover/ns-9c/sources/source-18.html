@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > GoalContributionRepository</title>
+  <title>MoneySurfer Coverage Report > UserRemoteRepository</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.repositories</a>
 </div>
 
-<h1>Coverage Summary for Class: GoalContributionRepository (com.georgeci.moneysurfer.domain.repositories)</h1>
+<h1>Coverage Summary for Class: UserRemoteRepository (com.georgeci.moneysurfer.domain.repositories)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">GoalContributionRepository</td>
+  <td class="name">UserRemoteRepository</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -46,29 +46,64 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.repositories
 &nbsp;
-&nbsp;import com.georgeci.moneysurfer.domain.model.GoalContribution
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.GoalContributionId
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.GoalId
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.Money
+&nbsp;import com.georgeci.moneysurfer.domain.model.User
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.UserId
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.WorkspaceId
-&nbsp;import kotlinx.coroutines.flow.Flow
 &nbsp;
-&nbsp;interface GoalContributionRepository {
-&nbsp;    /** Newest first. */
-&nbsp;    fun getByGoalId(goalId: GoalId): Flow&lt;List&lt;GoalContribution&gt;&gt;
-&nbsp;    fun getByWorkspaceId(workspaceId: WorkspaceId): Flow&lt;List&lt;GoalContribution&gt;&gt;
+&nbsp;/**
+&nbsp; * Remote-backed user repository — reads/creates the `users/{uid}` document. Kept separate from
+&nbsp; * [UserRepository] (Room-backed local user table) because the lifecycles differ: the remote
+&nbsp; * record is the source of truth across devices, the local row is a cache + FK target.
+&nbsp; */
+&nbsp;interface UserRemoteRepository {
+&nbsp;    suspend fun fetch(uid: String): User?
+&nbsp;
+&nbsp;    suspend fun create(
+&nbsp;        uid: String,
+&nbsp;        displayName: String?,
+&nbsp;        email: String?,
+&nbsp;        isAnon: Boolean,
+&nbsp;        createdAt: Long,
+&nbsp;    )
 &nbsp;
 &nbsp;    /**
-&nbsp;     * `SUM(amount)` for the goal — the only source of a goal&#39;s `current` amount.
-&nbsp;     * Zero when the goal has no contributions.
+&nbsp;     * Appends [workspaceId] to `users/{uid}.workspaceIds`. Idempotent — uses Firestore&#39;s
+&nbsp;     * `arrayUnion` so calling twice with the same id leaves the array unchanged.
 &nbsp;     */
-&nbsp;    fun observeSavedAmount(goalId: GoalId): Flow&lt;Money&gt;
-&nbsp;    suspend fun savedAmount(goalId: GoalId): Money
+&nbsp;    suspend fun addWorkspaceRef(uid: String, workspaceId: WorkspaceId)
 &nbsp;
-&nbsp;    suspend fun getById(id: GoalContributionId): GoalContribution?
-&nbsp;    suspend fun insert(contribution: GoalContribution)
-&nbsp;    suspend fun update(contribution: GoalContribution)
-&nbsp;    suspend fun delete(id: GoalContributionId)
+&nbsp;    /**
+&nbsp;     * Pins [workspaceId] as `users/{uid}.defaultWorkspaceId` so other devices land on the
+&nbsp;     * same workspace after login without re-prompting the selector.
+&nbsp;     */
+&nbsp;    suspend fun setDefaultWorkspace(uid: String, workspaceId: WorkspaceId)
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Resolves [email] to a [UserId] via the `userEmails/{email.lower()}` mapping. Returns
+&nbsp;     * null when no user has claimed that email (or when the mapping has not been backfilled
+&nbsp;     * for a legacy account). Best-effort — callers must tolerate null and keep email-based
+&nbsp;     * discovery as the fallback.
+&nbsp;     */
+&nbsp;    suspend fun findByEmail(email: String): UserId?
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Idempotent self-write of the email→uid mapping at `userEmails/{email.lower()}`. Called
+&nbsp;     * during post-auth bootstrap so future invites can resolve `targetUserId` for this user.
+&nbsp;     */
+&nbsp;    suspend fun upsertEmailMapping(email: String, uid: String)
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Appends [workspaceId] to `users/{uid}.invitedWorkspaceIds`. Called when sending
+&nbsp;     * an invite so the recipient&#39;s next syncAll() discovers the invite without a
+&nbsp;     * collectionGroup query. Idempotent via Firestore arrayUnion.
+&nbsp;     */
+&nbsp;    suspend fun addInvitedWorkspaceRef(uid: String, workspaceId: WorkspaceId)
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Removes [workspaceId] from `users/{uid}.invitedWorkspaceIds`. Called on accept/decline.
+&nbsp;     * Idempotent via Firestore arrayRemove.
+&nbsp;     */
+&nbsp;    suspend fun removeInvitedWorkspaceRef(uid: String, workspaceId: WorkspaceId)
 &nbsp;}
 </code>
 </pre>
@@ -93,7 +128,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 11:10</div>
+    <div style="float:right;">generated on 2026-07-29 11:23</div>
 </div>
 </body>
 </html>

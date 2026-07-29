@@ -25,12 +25,9 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <h1>Coverage Summary for Class: NoOpAuthRemoteRepository (com.georgeci.moneysurfer.offline.noop)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
-<th class="coverageStat 
-">
-  Class, %
-</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -55,15 +52,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    0%
-  </span>
-  <span class="absValue">
-    (0/11)
+    (0/12)
   </span>
 </td>
     <td class="coverageStat"/>
@@ -72,7 +61,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/11)
+    (0/12)
   </span>
 </td>
 <td class="coverageStat">
@@ -80,11 +69,42 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     0%
   </span>
   <span class="absValue">
-    (0/47)
+    (0/31)
   </span>
 </td>
 </tr>
-
+  <tr>
+    <td class="name">NoOpAuthRemoteRepository$Companion</td>
+    <td class="coverageStat"/>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/31)
+  </span>
+</td>
+</tr>
 </table>
 
 <br/>
@@ -105,6 +125,9 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp; * a generic auth error rather than crashing on a missing definition.
 &nbsp; */
 <b class="nc">&nbsp;class NoOpAuthRemoteRepository : AuthRemoteRepository {</b>
+&nbsp;    private val authDisabledError: AuthError
+<b class="nc">&nbsp;        get() = AuthError(AuthError.Type.Unknown, AUTH_DISABLED_MESSAGE)</b>
+&nbsp;
 <b class="nc">&nbsp;    override fun currentUid(): String? = null</b>
 <b class="nc">&nbsp;    override fun currentEmail(): String? = null</b>
 <b class="nc">&nbsp;    override fun isCurrentUserAnonymous(): Boolean = false</b>
@@ -118,16 +141,20 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="nc">&nbsp;    override suspend fun signInAnonymously(): Either&lt;AuthError, String&gt; = unsupported()</b>
 &nbsp;
 &nbsp;    override suspend fun signOut(): Either&lt;AuthError, Unit&gt; =
-<b class="nc">&nbsp;        AuthError(AuthError.Type.Unknown, &quot;Auth disabled in offline build&quot;).left()</b>
+<b class="nc">&nbsp;        authDisabledError.left()</b>
 &nbsp;
 &nbsp;    override suspend fun reauthenticateWithEmail(email: String, password: String): Either&lt;AuthError, Unit&gt; =
-<b class="nc">&nbsp;        AuthError(AuthError.Type.Unknown, &quot;Auth disabled in offline build&quot;).left()</b>
+<b class="nc">&nbsp;        authDisabledError.left()</b>
 &nbsp;
 &nbsp;    override suspend fun deleteCurrentUser(): Either&lt;AuthError, Unit&gt; =
-<b class="nc">&nbsp;        AuthError(AuthError.Type.Unknown, &quot;Auth disabled in offline build&quot;).left()</b>
+<b class="nc">&nbsp;        authDisabledError.left()</b>
 &nbsp;
 &nbsp;    private fun unsupported(): Either&lt;AuthError, String&gt; =
-<b class="nc">&nbsp;        AuthError(AuthError.Type.Unknown, &quot;Auth disabled in offline build&quot;).left()</b>
+<b class="nc">&nbsp;        authDisabledError.left()</b>
+&nbsp;
+&nbsp;    private companion object {
+&nbsp;        const val AUTH_DISABLED_MESSAGE = &quot;Auth disabled in offline build&quot;
+&nbsp;    }
 &nbsp;}
 </code>
 </pre>
@@ -152,7 +179,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 11:10</div>
+    <div style="float:right;">generated on 2026-07-29 11:23</div>
 </div>
 </body>
 </html>

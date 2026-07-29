@@ -107,11 +107,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;
 &nbsp;/** Sample note shared by the `@Preview` states so they read as the same transaction. */
 &nbsp;internal const val PreviewNote = &quot;Lidl — weekly shop&quot;
+&nbsp;private const val PreviewWorkspaceId = &quot;preview-ws-1&quot;
 &nbsp;
 <b class="nc">&nbsp;internal val PreviewAccounts = listOf(</b>
 <b class="nc">&nbsp;    Account(</b>
 <b class="nc">&nbsp;        id = AccountId(&quot;preview-acc-1&quot;),</b>
-<b class="nc">&nbsp;        workspaceId = WorkspaceId(&quot;preview-ws-1&quot;),</b>
+<b class="nc">&nbsp;        workspaceId = WorkspaceId(PreviewWorkspaceId),</b>
 <b class="nc">&nbsp;        name = &quot;Everyday&quot;,</b>
 <b class="nc">&nbsp;        type = AccountType.CARD,</b>
 <b class="nc">&nbsp;        currencyCode = CurrencyCode(&quot;EUR&quot;),</b>
@@ -119,7 +120,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    ),
 <b class="nc">&nbsp;    Account(</b>
 <b class="nc">&nbsp;        id = AccountId(&quot;preview-acc-2&quot;),</b>
-<b class="nc">&nbsp;        workspaceId = WorkspaceId(&quot;preview-ws-1&quot;),</b>
+<b class="nc">&nbsp;        workspaceId = WorkspaceId(PreviewWorkspaceId),</b>
 <b class="nc">&nbsp;        name = &quot;Savings&quot;,</b>
 <b class="nc">&nbsp;        type = AccountType.SAVINGS,</b>
 <b class="nc">&nbsp;        currencyCode = CurrencyCode(&quot;EUR&quot;),</b>
@@ -138,7 +139,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="nc">&nbsp;).mapIndexed { index, name -&gt;</b>
 <b class="nc">&nbsp;    Category(</b>
 <b class="nc">&nbsp;        CategoryId(&quot;preview-cat-${index + 1}&quot;),</b>
-<b class="nc">&nbsp;        WorkspaceId(&quot;preview-ws-1&quot;),</b>
+<b class="nc">&nbsp;        WorkspaceId(PreviewWorkspaceId),</b>
 <b class="nc">&nbsp;        name,</b>
 <b class="nc">&nbsp;        CategoryType.EXPENSE,</b>
 <b class="nc">&nbsp;        null,</b>
@@ -168,7 +169,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 11:10</div>
+    <div style="float:right;">generated on 2026-07-29 11:23</div>
 </div>
 </body>
 </html>
