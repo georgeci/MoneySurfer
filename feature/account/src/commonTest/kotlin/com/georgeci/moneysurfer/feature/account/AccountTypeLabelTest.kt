@@ -6,6 +6,7 @@ import com.georgeci.moneysurfer.feature.account.generated.resources.account_type
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_type_card
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_type_cash
 import com.georgeci.moneysurfer.feature.account.generated.resources.account_type_savings
+import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 
@@ -21,5 +22,12 @@ class AccountTypeLabelTest : StringSpec({
     "all account types resolve to distinct resources" {
         val resources = AccountType.entries.map { it.labelRes() }
         resources.toSet().size shouldBe AccountType.entries.size
+    }
+
+    "each account type maps to its semantic icon" {
+        AccountType.CASH.icon() shouldBe SurferIcons.Cash
+        AccountType.BANK.icon() shouldBe SurferIcons.Bank
+        AccountType.CARD.icon() shouldBe SurferIcons.CreditCard
+        AccountType.SAVINGS.icon() shouldBe SurferIcons.Savings
     }
 })

@@ -218,6 +218,38 @@ class CategoriesManageViewModelTest : StringSpec({
         val content = viewModel.value.shouldBeInstanceOf<CategoriesManageState.Content>()
         content.categories.map { it.name to it.depth } shouldBe listOf("Food" to 0, "Groceries" to 1)
     }
+
+    "navigation effects carry the selected category id" {
+        val ws = workspaceId("ws-1")
+        val category = aCategory(id = categoryId("food"), workspaceId = ws, name = "Food")
+        val viewModel = newViewModel(FakeCategoryRepository(listOf(category)), ws)
+
+        viewModel.sideEffects.effectFlow.test {
+            viewModel.onEvent(CategoriesManageEvent.OnBackClick)
+            awaitItem() shouldBe CategoriesManageEffect.NavigateBack
+            viewModel.onEvent(CategoriesManageEvent.OnAddCategoryClick)
+            awaitItem() shouldBe CategoriesManageEffect.NavigateToCategoryCreation
+            viewModel.onEvent(CategoriesManageEvent.OnCategoryClick(category.id))
+            awaitItem() shouldBe CategoriesManageEffect.NavigateToCategoryDetails(category.id)
+            viewModel.onEvent(CategoriesManageEvent.OnEditCategoryClick(category.id))
+            awaitItem() shouldBe CategoriesManageEffect.NavigateToCategoryEdit(category.id)
+        }
+    }
+
+    "unknown delete targets and confirm without pending are safe no-ops" {
+        val ws = workspaceId("ws-1")
+        val category = aCategory(id = categoryId("food"), workspaceId = ws, name = "Food")
+        val repo = FakeCategoryRepository(listOf(category))
+        val viewModel = newViewModel(repo, ws)
+
+        viewModel.onEvent(CategoriesManageEvent.OnRemoveCategoryClick(categoryId("missing")))
+        viewModel.onEvent(CategoriesManageEvent.OnDeleteConfirm)
+
+        val content = viewModel.value.shouldBeInstanceOf<CategoriesManageState.Content>()
+        content.pendingDelete shouldBe null
+        content.categories.map { it.id } shouldBe listOf(category.id)
+        repo.deleted shouldBe emptyList()
+    }
 })
 
 private fun newViewModel(

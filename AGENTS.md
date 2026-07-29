@@ -434,9 +434,12 @@ scripts/ios/release.sh main --no-upload   # archive + export only
 ## Android tester builds / Firebase App Distribution
 
 [.github/workflows/android-distribute.yml](.github/workflows/android-distribute.yml)
-builds the signed release APK of `:androidApp` (online only) and uploads it to
-Firebase App Distribution — on the `workflow_dispatch` button and nightly at
-03:47 UTC. Secrets, service-account setup and tester groups:
+and
+[.github/workflows/android-offline-distribute.yml](.github/workflows/android-offline-distribute.yml)
+build signed release APKs of `:androidApp` and `:androidApp-offline` and upload
+them to Firebase App Distribution — on `workflow_dispatch` and nightly at
+03:47 / 04:07 UTC. Secrets, offline app registration, service-account setup,
+and tester groups:
 [docs/ci/app-distribution.md](docs/ci/app-distribution.md).
 
 ## Sub-Agents

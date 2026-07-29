@@ -1,6 +1,7 @@
 package com.georgeci.moneysurfer.feature.account.details
 
 import androidx.lifecycle.viewModelScope
+import app.cash.turbine.test
 import com.georgeci.moneysurfer.domain.fixtures.FakeHostCapabilities
 import com.georgeci.moneysurfer.domain.fixtures.USD
 import com.georgeci.moneysurfer.domain.fixtures.aTransaction
@@ -143,6 +144,76 @@ class AccountDetailsViewModelTest : StringSpec({
             val vm = viewModelFor(anAccount(), offline = false)
             try {
                 vm.awaitContent().extraDetails shouldBe emptyList()
+            } finally {
+                vm.viewModelScope.cancel()
+            }
+        }
+    }
+
+    "filter changes are retained in content state" {
+        runTest {
+            val vm = viewModelFor(anAccount(), offline = false)
+            try {
+                vm.awaitContent()
+                vm.onEvent(AccountDetailsEvent.OnFilterChanged(TransactionFilter.Expenses))
+                vm.awaitContent().filter shouldBe TransactionFilter.Expenses
+            } finally {
+                vm.viewModelScope.cancel()
+            }
+        }
+    }
+
+    "navigation events publish destinations with the current account id" {
+        runTest {
+            val account = anAccount()
+            val transaction = transactionId("txn-1")
+            val vm = viewModelFor(account, offline = false)
+            try {
+                vm.awaitContent()
+                vm.sideEffects.effectFlow.test {
+                    vm.onEvent(AccountDetailsEvent.OnBackClick)
+                    awaitItem() shouldBe AccountDetailsEffect.NavigateBack
+                    vm.onEvent(AccountDetailsEvent.OnAddTransactionClick)
+                    awaitItem() shouldBe AccountDetailsEffect.NavigateToTransactionCreation
+                    vm.onEvent(AccountDetailsEvent.OnEditClick)
+                    awaitItem() shouldBe AccountDetailsEffect.NavigateToAccountEdit(account.id)
+                    vm.onEvent(AccountDetailsEvent.OnSeeAllTransactionsClick)
+                    awaitItem() shouldBe AccountDetailsEffect.NavigateToTransactionsList(account.id)
+                    vm.onEvent(AccountDetailsEvent.OnTransactionClick(transaction))
+                    awaitItem() shouldBe AccountDetailsEffect.NavigateToTransactionDetails(transaction)
+                }
+            } finally {
+                vm.viewModelScope.cancel()
+            }
+        }
+    }
+
+    "transaction rows expose fallback titles transfer and split identity" {
+        runTest {
+            val account = anAccount(currencyCode = USD)
+            val plain = aTransaction(
+                id = transactionId("plain"),
+                accountId = account.id,
+                note = "",
+            )
+            val transfer = aTransaction(
+                id = transactionId("transfer"),
+                accountId = account.id,
+            ).copy(transferId = TransferId("transfer-group"))
+            val split = aTransaction(
+                id = transactionId("split"),
+                accountId = account.id,
+            ).copy(splitId = SplitId("split-group"))
+            val vm = viewModelFor(
+                account = account,
+                offline = false,
+                transactions = listOf(plain, transfer, split),
+            )
+            try {
+                val rows = vm.awaitContent().transactions
+                rows.first { it.id == plain.id }.title shouldBe "No description"
+                rows.first { it.id == transfer.id }.isTransfer shouldBe true
+                rows.first { it.id == split.id }.isSplitLeg shouldBe true
             } finally {
                 vm.viewModelScope.cancel()
             }

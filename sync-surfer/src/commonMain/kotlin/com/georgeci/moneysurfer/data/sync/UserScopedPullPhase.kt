@@ -45,8 +45,7 @@ class UserScopedPullPhase(
         if (scope == SyncScope.UploadOnly) return@either EMPTY_SUMMARY
         val uid = session.currentFirebaseUid.first() ?: return@either EMPTY_SUMMARY
 
-        var downloaded = 0
-        var conflicts = 0
+        val appliedSummaries = mutableListOf<PullSummary>()
 
         for ((plugin, collectionName) in pluginsWithCollections()) {
             cancelToken.throwIfCancelled()
@@ -72,11 +71,13 @@ class UserScopedPullPhase(
                 log.e(throwable = failure) { "[pull] failed (phase3) collection=$collectionName" }
                 raise(failure.toSyncError())
             }
-            downloaded += applied.downloadedCount
-            conflicts += applied.conflictCount
+            appliedSummaries += applied
         }
 
-        PullSummary(downloadedCount = downloaded, conflictCount = conflicts)
+        PullSummary(
+            downloadedCount = appliedSummaries.sumOf(PullSummary::downloadedCount),
+            conflictCount = appliedSummaries.sumOf(PullSummary::conflictCount),
+        )
     }
 
     /** A user-scoped plugin without a collection has nothing to be pulled from; it is not fatal. */

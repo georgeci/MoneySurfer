@@ -11,6 +11,9 @@ import com.georgeci.moneysurfer.domain.repositories.AuthRemoteRepository
  * a generic auth error rather than crashing on a missing definition.
  */
 class NoOpAuthRemoteRepository : AuthRemoteRepository {
+    private val authDisabledError: AuthError
+        get() = AuthError(AuthError.Type.Unknown, AUTH_DISABLED_MESSAGE)
+
     override fun currentUid(): String? = null
     override fun currentEmail(): String? = null
     override fun isCurrentUserAnonymous(): Boolean = false
@@ -24,14 +27,18 @@ class NoOpAuthRemoteRepository : AuthRemoteRepository {
     override suspend fun signInAnonymously(): Either<AuthError, String> = unsupported()
 
     override suspend fun signOut(): Either<AuthError, Unit> =
-        AuthError(AuthError.Type.Unknown, "Auth disabled in offline build").left()
+        authDisabledError.left()
 
     override suspend fun reauthenticateWithEmail(email: String, password: String): Either<AuthError, Unit> =
-        AuthError(AuthError.Type.Unknown, "Auth disabled in offline build").left()
+        authDisabledError.left()
 
     override suspend fun deleteCurrentUser(): Either<AuthError, Unit> =
-        AuthError(AuthError.Type.Unknown, "Auth disabled in offline build").left()
+        authDisabledError.left()
 
     private fun unsupported(): Either<AuthError, String> =
-        AuthError(AuthError.Type.Unknown, "Auth disabled in offline build").left()
+        authDisabledError.left()
+
+    private companion object {
+        const val AUTH_DISABLED_MESSAGE = "Auth disabled in offline build"
+    }
 }

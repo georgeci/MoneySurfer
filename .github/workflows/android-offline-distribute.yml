@@ -1,26 +1,8 @@
-name: Android distribute
+name: Android offline distribute
 
-# Builds the signed release APK of :androidApp (online variant) and uploads it
-# to Firebase App Distribution.
-#
-# Triggers:
-#   - workflow_dispatch — "Run workflow" button, with tester group / release
-#     notes overrides.
-#   - schedule — nightly, ~30 min after nightly.yml so the two don't fight over
-#     the Gradle cache. Skipped when the default branch hasn't moved since the
-#     last successful distribute run.
-#
-# Scope: android-online only. The offline variant (:androidApp-offline) and iOS
-# (TestFlight, scripts/ios/release.sh) are deliberately not handled here.
-#
-# Required repo secrets (see docs/ci/app-distribution.md):
-#   GOOGLE_SERVICES_JSON_RELEASE       base64, already used by nightly.yml
-#   ANDROID_RELEASE_KEYSTORE_BASE64    base64 of the release .jks
-#   ANDROID_RELEASE_STORE_PASSWORD
-#   ANDROID_RELEASE_KEY_ALIAS
-#   ANDROID_RELEASE_KEY_PASSWORD
-#   FIREBASE_SERVICE_ACCOUNT_JSON      inline JSON, role "Firebase App
-#                                      Distribution Admin" on the Firebase project
+# Builds the signed release APK of :androidApp-offline and uploads it to
+# Firebase App Distribution. Firebase is only the delivery channel: no Firebase
+# SDK or google-services.json is packaged in the offline app.
 
 on:
   workflow_dispatch:
@@ -34,11 +16,11 @@ on:
         required: false
         default: ""
   schedule:
-    # 03:47 UTC — after nightly.yml's 03:17 slot.
-    - cron: "47 3 * * *"
+    # 04:07 UTC — after the online Android distribution slot.
+    - cron: "7 4 * * *"
 
 concurrency:
-  group: android-distribute
+  group: android-offline-distribute
   cancel-in-progress: false
 
 permissions:
@@ -46,54 +28,49 @@ permissions:
 
 jobs:
   distribute:
-    name: Build + upload release APK
+    name: Build + upload offline release APK
     runs-on: ubuntu-latest
     timeout-minutes: 45
     permissions:
-      actions: read # `gh run list` for the no-new-commits check
+      actions: read
       contents: read
 
     steps:
-      # Egress audit — see docs/security/ci-egress-hardening.md (issue #180).
       - name: Harden the runner (egress audit)
         uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920 # v2.20.0
         with:
           egress-policy: audit
 
-      # Missing secrets are a hard error on a manual run (the user asked for an
-      # upload and deserves to know why it didn't happen), but only a notice on
-      # the cron path — otherwise every night is red until the secrets land.
-      - name: Check required secrets
+      - name: Check required configuration
         id: preflight
         env:
-          RELEASE_JSON: ${{ secrets.GOOGLE_SERVICES_JSON_RELEASE }}
           KEYSTORE_B64: ${{ secrets.ANDROID_RELEASE_KEYSTORE_BASE64 }}
           STORE_PASSWORD: ${{ secrets.ANDROID_RELEASE_STORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.ANDROID_RELEASE_KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.ANDROID_RELEASE_KEY_PASSWORD }}
           SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
+          FIREBASE_APP_ID: ${{ vars.FIREBASE_ANDROID_OFFLINE_APP_ID }}
         shell: bash
         run: |
           set -euo pipefail
           missing=()
-          [ -n "$RELEASE_JSON" ]   || missing+=(GOOGLE_SERVICES_JSON_RELEASE)
-          [ -n "$KEYSTORE_B64" ]   || missing+=(ANDROID_RELEASE_KEYSTORE_BASE64)
+          [ -n "$KEYSTORE_B64" ] || missing+=(ANDROID_RELEASE_KEYSTORE_BASE64)
           [ -n "$STORE_PASSWORD" ] || missing+=(ANDROID_RELEASE_STORE_PASSWORD)
-          [ -n "$KEY_ALIAS" ]      || missing+=(ANDROID_RELEASE_KEY_ALIAS)
-          [ -n "$KEY_PASSWORD" ]   || missing+=(ANDROID_RELEASE_KEY_PASSWORD)
+          [ -n "$KEY_ALIAS" ] || missing+=(ANDROID_RELEASE_KEY_ALIAS)
+          [ -n "$KEY_PASSWORD" ] || missing+=(ANDROID_RELEASE_KEY_PASSWORD)
           [ -n "$SERVICE_ACCOUNT" ] || missing+=(FIREBASE_SERVICE_ACCOUNT_JSON)
+          [ -n "$FIREBASE_APP_ID" ] || missing+=(FIREBASE_ANDROID_OFFLINE_APP_ID)
           if [ ${#missing[@]} -eq 0 ]; then
             echo "ready=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
           echo "ready=false" >> "$GITHUB_OUTPUT"
           if [ "${GITHUB_EVENT_NAME}" = "workflow_dispatch" ]; then
-            echo "::error::Missing secrets: ${missing[*]} — see docs/ci/app-distribution.md"
+            echo "::error::Missing secrets/variables: ${missing[*]} — see docs/ci/app-distribution.md"
             exit 1
           fi
-          echo "::notice::Missing secrets: ${missing[*]} — skipping scheduled distribute."
+          echo "::notice::Missing secrets/variables: ${missing[*]} — skipping scheduled distribute."
 
-      # Nightly-only: don't rebuild and re-upload an identical commit.
       - name: Skip if no new commits since last successful run
         id: check
         if: steps.preflight.outputs.ready == 'true' && github.event_name == 'schedule'
@@ -103,7 +80,7 @@ jobs:
         run: |
           set -euo pipefail
           last_sha=$(gh run list \
-            --workflow=android-distribute.yml \
+            --workflow=android-offline-distribute.yml \
             --branch=main \
             --status=success \
             --limit=2 \
@@ -122,16 +99,6 @@ jobs:
         if: steps.preflight.outputs.ready == 'true' && steps.check.outputs.skip != 'true'
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      # Only the release google-services.json — the release build type is the
-      # only thing packaged here.
-      - name: Decode Firebase config
-        if: steps.preflight.outputs.ready == 'true' && steps.check.outputs.skip != 'true'
-        uses: ./.github/actions/firebase-config
-        with:
-          release-json: ${{ secrets.GOOGLE_SERVICES_JSON_RELEASE }}
-
-      # Decoded outside the workspace so it can never be picked up by an
-      # artifact upload or left behind in a Gradle cache entry.
       - name: Decode release keystore
         id: keystore
         if: steps.preflight.outputs.ready == 'true' && steps.check.outputs.skip != 'true'
@@ -159,22 +126,16 @@ jobs:
       - name: Set up Gradle
         if: steps.preflight.outputs.ready == 'true' && steps.check.outputs.skip != 'true'
         uses: gradle/actions/setup-gradle@3f131e8634966bd73d06cc69884922b02e6faf92 # v6.2.0
-        with:
-          cache-read-only: true
 
-      # KmpAppConventionPlugin reads these from env (falling back to
-      # local.properties) and only then wires the `release` signingConfig.
-      - name: Assemble signed release APK
+      - name: Assemble signed offline release APK
         if: steps.preflight.outputs.ready == 'true' && steps.check.outputs.skip != 'true'
         env:
           RELEASE_STORE_FILE: ${{ steps.keystore.outputs.path }}
           RELEASE_STORE_PASSWORD: ${{ secrets.ANDROID_RELEASE_STORE_PASSWORD }}
           RELEASE_KEY_ALIAS: ${{ secrets.ANDROID_RELEASE_KEY_ALIAS }}
           RELEASE_KEY_PASSWORD: ${{ secrets.ANDROID_RELEASE_KEY_PASSWORD }}
-          # Build number of `major.minor.build` — see Version.xcconfig. Scoped
-          # to this workflow's own counter, so it only ever grows.
           APP_BUILD_NUMBER: ${{ github.run_number }}
-        run: ./gradlew :androidApp:assembleRelease --stacktrace
+        run: ./gradlew :androidApp-offline:assembleRelease --stacktrace
 
       - name: Locate and verify the APK
         id: apk
@@ -182,16 +143,11 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          apk=$(find androidApp/build/outputs/apk/release -name '*.apk' -type f | head -1)
+          apk=$(find androidApp-offline/build/outputs/apk/release -name '*.apk' -type f | head -1)
           if [ -z "$apk" ]; then
-            echo "::error::No APK produced by :androidApp:assembleRelease."
+            echo "::error::No APK produced by :androidApp-offline:assembleRelease."
             exit 1
           fi
-          # Guard against a silently unsigned build: the convention plugin drops
-          # the `release` signingConfig when any RELEASE_* value is missing, and
-          # App Distribution rejects unsigned APKs with an opaque error. A
-          # missing apksigner is itself a failure — shipping an unverified
-          # artifact to testers is exactly what this step exists to prevent.
           apksigner=$(find "${ANDROID_HOME:-/usr/local/lib/android/sdk}/build-tools" -name apksigner -type f | sort -V | tail -1)
           if [ -z "$apksigner" ]; then
             echo "::error::apksigner not found under ANDROID_HOME — cannot verify the signature."
@@ -202,29 +158,6 @@ jobs:
           echo "path=$apk" >> "$GITHUB_OUTPUT"
           echo "APK: $apk ($(du -h "$apk" | cut -f1))"
 
-      # The App Distribution app id lives in the release google-services.json,
-      # so it doesn't need a secret of its own.
-      - name: Resolve Firebase app id
-        id: appid
-        if: steps.preflight.outputs.ready == 'true' && steps.check.outputs.skip != 'true'
-        shell: bash
-        run: |
-          set -euo pipefail
-          app_id=$(python3 - <<'PY'
-          import json
-          d = json.load(open("androidApp/src/release/google-services.json"))
-          pkg = "com.georgeci.moneysurfer"
-          for c in d["client"]:
-              if c["client_info"]["android_client_info"]["package_name"] == pkg:
-                  print(c["client_info"]["mobilesdk_app_id"])
-                  break
-          else:
-              raise SystemExit(f"no client for {pkg} in google-services.json")
-          PY
-          )
-          echo "id=$app_id" >> "$GITHUB_OUTPUT"
-          echo "Firebase app id: $app_id"
-
       - name: Install Firebase CLI
         if: steps.preflight.outputs.ready == 'true' && steps.check.outputs.skip != 'true'
         uses: ./.github/actions/firebase-tools
@@ -234,12 +167,7 @@ jobs:
         env:
           SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
           APK: ${{ steps.apk.outputs.path }}
-          APP_ID: ${{ steps.appid.outputs.id }}
-          # Not `inputs.groups || 'testers'`: an intentionally cleared input is
-          # an empty string, which is falsy in GitHub expressions and would
-          # silently fall back to the default. Resolve the default in bash
-          # instead, where "unset" (schedule) and "empty" (cleared by hand) are
-          # distinguishable.
+          APP_ID: ${{ vars.FIREBASE_ANDROID_OFFLINE_APP_ID }}
           GROUPS_INPUT: ${{ inputs.groups }}
           NOTES_INPUT: ${{ inputs.notes }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
@@ -255,23 +183,18 @@ jobs:
           if [ -z "$notes" ]; then
             notes="$(git log -1 --pretty=%s)"
           fi
-          notes="${notes}"$'\n\n'"build ${GITHUB_RUN_NUMBER}"$'\n'"commit ${GITHUB_SHA}"$'\n'"${RUN_URL}"
+          notes="${notes}"$'\n\n'"offline build ${GITHUB_RUN_NUMBER}"$'\n'"commit ${GITHUB_SHA}"$'\n'"${RUN_URL}"
 
-          # Scheduled runs carry no inputs, so they take the default group. A
-          # manually cleared `groups` input uploads the release without handing
-          # it to anyone — the bootstrap path for a project where App
-          # Distribution has no tester groups yet (`--groups <missing alias>`
-          # is a hard error, and passing an empty --groups fails too).
           if [ "${GITHUB_EVENT_NAME}" = "workflow_dispatch" ]; then
-            TESTER_GROUPS="$GROUPS_INPUT"
+            tester_groups="$GROUPS_INPUT"
           else
-            TESTER_GROUPS="testers"
+            tester_groups="testers"
           fi
           group_args=()
-          if [ -n "$TESTER_GROUPS" ]; then
-            group_args=(--groups "$TESTER_GROUPS")
+          if [ -n "$tester_groups" ]; then
+            group_args=(--groups "$tester_groups")
           else
-            echo "::notice::No tester group given — uploading the release without distributing it."
+            echo "::notice::No tester group given — uploading without distributing."
           fi
 
           firebase appdistribution:distribute "$APK" \
@@ -280,10 +203,10 @@ jobs:
             --release-notes "$notes"
 
           {
-            echo "### Firebase App Distribution"
+            echo "### Firebase App Distribution — Android offline"
             echo
             echo "- APK: \`$(basename "$APK")\`"
-            echo "- Groups: \`${TESTER_GROUPS:-<none>}\`"
+            echo "- Groups: \`${tester_groups:-<none>}\`"
             echo "- Commit: \`${GITHUB_SHA}\`"
           } >> "$GITHUB_STEP_SUMMARY"
 
@@ -296,7 +219,7 @@ jobs:
         if: steps.apk.outputs.path != ''
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: androidApp-release-apk
+          name: androidApp-offline-release-apk
           path: ${{ steps.apk.outputs.path }}
           retention-days: 14
           if-no-files-found: error

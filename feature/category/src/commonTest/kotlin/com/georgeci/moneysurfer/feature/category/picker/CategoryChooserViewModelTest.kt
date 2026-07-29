@@ -91,6 +91,28 @@ class CategoryChooserViewModelTest : StringSpec({
         }
     }
 
+    "create and dismiss actions publish their host effects" {
+        val viewModel = newViewModel(FakeCategoryRepository())
+
+        viewModel.sideEffects.effectFlow.test {
+            viewModel.onEvent(CategoryChooserEvent.OnCreateNewCategoryClick)
+            awaitItem() shouldBe CategoryChooserEffect.NavigateToCategoryCreation
+            viewModel.onEvent(CategoryChooserEvent.OnDismiss)
+            awaitItem() shouldBe CategoryChooserEffect.Dismiss
+        }
+    }
+
+    "content-editing events received while loading are harmless no-ops" {
+        val viewModel = newViewModel(FakeCategoryRepository())
+
+        viewModel.onEvent(CategoryChooserEvent.OnQueryChange("food"))
+        viewModel.onEvent(CategoryChooserEvent.OnTypeSelected(CategoryType.INCOME))
+        viewModel.onEvent(CategoryChooserEvent.OnParentExpandToggle(categoryId("food")))
+        viewModel.onEvent(CategoryChooserEvent.OnVariantToggle)
+
+        viewModel.value shouldBe CategoryChooserState.Loading(selectedId = null)
+    }
+
     // ── variant A: grid ──────────────────────────────────────────────────────────────────
 
     "the grid flattens parents and children of the selected type into one list" {
@@ -219,6 +241,18 @@ class CategoryChooserViewModelTest : StringSpec({
         content.query shouldBe "o"
         content.expandedIds shouldBe setOf(categoryId("food"))
         content.gridItems.map { it.name } shouldBe listOf("Food", "Groceries", "Transport")
+    }
+
+    "a re-emission resolves a previously stale selected category name" {
+        val repo = FakeCategoryRepository()
+        val selected = categoryId("late")
+        val viewModel = newViewModel(repo, selectedId = selected)
+        repo.emit(sampleExpenses())
+        viewModel.content().selectedName shouldBe null
+
+        repo.emit(sampleExpenses() + aCategory(id = selected, name = "Late arrival"))
+
+        viewModel.content().selectedName shouldBe "Late arrival"
     }
 })
 
