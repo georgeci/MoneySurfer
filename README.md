@@ -149,7 +149,7 @@ Every push to `main` republishes the aggregated CI reports to GitHub Pages
 - [Allure](https://georgeci.github.io/MoneySurfer/allure/) — common + Firestore rules tests, with history
 - [Kover coverage](https://georgeci.github.io/MoneySurfer/kover/) — HTML report, common scope
 - [Allure (nightly)](https://georgeci.github.io/MoneySurfer/nightly/allure/) — all five nightly scopes
-- [Codecov](https://codecov.io/gh/georgeci/MoneySurfer) — coverage trend and PR diff
+- [Codecov](https://codecov.io/gh/georgeci/MoneySurfer) — coverage trend, PR diff, and per-layer / per-feature components
 - [SonarCloud](https://sonarcloud.io/summary/new_code?id=georgeci_MoneySurfer) — quality gate, detekt findings, duplication
 
 ## Documentation
