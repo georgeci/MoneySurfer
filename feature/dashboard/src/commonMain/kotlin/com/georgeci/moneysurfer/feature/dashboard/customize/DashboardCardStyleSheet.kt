@@ -25,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
@@ -237,26 +238,11 @@ private fun SpanOptionTile(
                 .clearAndSetSemantics {},
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(2.dp),
-            ) {
-                repeat(DashboardWidgetSpan.COLUMNS) { column ->
-                    Box(
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(SPAN_SCHEMATIC_HEIGHT)
-                            .clip(AppTheme.shapes.extraSmall)
-                            .background(
-                                if (column < span.columns) {
-                                    if (selected) colors.primary else colors.onSurfaceVariant
-                                } else {
-                                    colors.surfaceContainerHighest
-                                },
-                            ),
-                    )
-                }
-            }
+            SpanSchematic(
+                claimedColumns = span.columns,
+                claimed = if (selected) colors.primary else colors.onSurfaceVariant,
+                free = colors.surfaceContainerHighest,
+            )
             Text(
                 text = label,
                 style = AppTheme.typography.labelLarge,
@@ -270,6 +256,29 @@ private fun SpanOptionTile(
                 .semantics { contentDescription = label }
                 .testTag(tag),
         )
+    }
+}
+
+/**
+ * A dashboard row in miniature: the first [claimedColumns] of [DashboardWidgetSpan.COLUMNS] cells
+ * drawn in [claimed], the rest left [free]. Which cells are claimed is the whole of what a width
+ * choice changes, so the tile shows the row rather than the card.
+ */
+@Composable
+private fun SpanSchematic(claimedColumns: Int, claimed: Color, free: Color) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(2.dp),
+    ) {
+        repeat(DashboardWidgetSpan.COLUMNS) { column ->
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .height(SPAN_SCHEMATIC_HEIGHT)
+                    .clip(AppTheme.shapes.extraSmall)
+                    .background(if (column < claimedColumns) claimed else free),
+            )
+        }
     }
 }
 

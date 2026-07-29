@@ -242,10 +242,18 @@ private fun CustomizeList(
                 // Either half of the sheet is reason enough to offer the pill: the card-style
                 // picker ships behind a build key that is off, and the grid widths would be
                 // unreachable in every shipped build if they rode on it.
-                onStyleClick = { styleTarget = item.type.name }
-                    .takeIf { widgetStyleEnabled || spanEnabled },
-                showStyle = widgetStyleEnabled,
-                showSpan = spanEnabled,
+                pill = if (widgetStyleEnabled || spanEnabled) {
+                    WidgetRowPill(
+                        summary = cardStyleSummary(
+                            item,
+                            showStyle = widgetStyleEnabled,
+                            showSpan = spanEnabled,
+                        ),
+                        onClick = { styleTarget = item.type.name },
+                    )
+                } else {
+                    null
+                },
                 onEvent = onEvent,
             )
         }
@@ -269,7 +277,7 @@ private fun CustomizeList(
                 rowTestTag = DashboardCustomizeTestTags.availableRow(item.type.name),
                 modifier = surferReorderableItem(reorderState, item.type.name),
                 handleModifier = Modifier.surferReorderHandle(reorderState, item.type.name),
-                onStyleClick = null,
+                pill = null,
                 onEvent = onEvent,
             )
         }
@@ -328,6 +336,13 @@ private fun SectionNote(text: String, modifier: Modifier = Modifier) {
 }
 
 /**
+ * The "Hero · Classic" pill under a widget's name: what it says, and the sheet it opens. One value
+ * rather than a summary and a callback, because it is one affordance — a row either offers the
+ * picker or it does not, and a label with nothing behind it would be a lie either way.
+ */
+private data class WidgetRowPill(val summary: String, val onClick: () -> Unit)
+
+/**
  * One widget, in whichever section it currently sits. The two used to be separate composables and
  * had drifted: only the enabled one could be dragged. They differ in exactly two things now — the
  * direction the round button moves the row, and whether [onStyleClick] is offered.
@@ -341,10 +356,8 @@ private fun WidgetRow(
     rowTestTag: String,
     modifier: Modifier,
     handleModifier: Modifier,
-    onStyleClick: (() -> Unit)?,
+    pill: WidgetRowPill?,
     onEvent: (DashboardCustomizeEvent) -> Unit,
-    showStyle: Boolean = true,
-    showSpan: Boolean = false,
 ) {
     val widget = item.type.name
     val title = stringResource(item.type.titleResource())
@@ -353,13 +366,13 @@ private fun WidgetRow(
         title = title,
         modifier = modifier.testTag(rowTestTag),
         icon = item.type.icon(),
-        supporting = onStyleClick?.let {
+        supporting = pill?.let {
             {
                 SurferSettingsValuePill(
-                    text = cardStyleSummary(item, showStyle = showStyle, showSpan = showSpan),
+                    text = it.summary,
                     modifier = Modifier
                         .clip(AppTheme.shapes.small)
-                        .clickable(onClick = it)
+                        .clickable(onClick = it.onClick)
                         .padding(vertical = 4.dp, horizontal = 2.dp)
                         .testTag(DashboardCustomizeTestTags.styleAction(widget)),
                 )
