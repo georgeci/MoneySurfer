@@ -95,7 +95,7 @@ private fun requiredEnv(name: String): String =
  * the installation id and refresh tokens survive a restart, exactly as they do
  * on Android.
  */
-private class DesktopFirebasePlatform(private val storeFile: File) : FirebasePlatform() {
+internal class DesktopFirebasePlatform(private val storeFile: File) : FirebasePlatform() {
 
     private val log = Logger.withTag(TAG)
 
