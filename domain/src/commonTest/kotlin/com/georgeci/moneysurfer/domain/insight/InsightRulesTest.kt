@@ -224,6 +224,23 @@ class InsightRulesTest : StringSpec({
         insights.map { it.id } shouldContainExactly listOf("active-subscriptions:$PERIOD")
     }
 
+    "a baseline shorter than the window is not a comparison" {
+        // 31 March against a 28-day February: identical daily spend still measures +10.7%, which
+        // would clear the period threshold on its own.
+        val insights = generateInsights(
+            input(
+                current = listOf(slice(DINING, 310.dollars)),
+                previous = listOf(slice(DINING, 280.dollars)),
+                schedules = listOf(aRecurringRule()),
+                elapsedDays = 31,
+                baselineDays = 28,
+            ),
+        )
+
+        // The subscription count still stands — it reads the schedules, not the window.
+        insights.map { it.id } shouldContainExactly listOf("active-subscriptions:$PERIOD")
+    }
+
     "a week in, the comparison rules speak again" {
         val insights = generateInsights(
             input(
@@ -273,9 +290,11 @@ private fun input(
     previous: List<CategorySpendSlice> = emptyList(),
     schedules: List<RecurringRule> = emptyList(),
     elapsedDays: Int = SETTLED_PERIOD_DAYS,
+    baselineDays: Int = elapsedDays,
 ) = InsightInput(
     periodKey = PERIOD,
     elapsedDays = elapsedDays,
+    baselineDays = baselineDays,
     currency = EUR,
     currentSpend = current,
     previousSpend = previous,

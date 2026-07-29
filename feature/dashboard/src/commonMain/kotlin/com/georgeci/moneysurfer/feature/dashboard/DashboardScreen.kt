@@ -141,7 +141,8 @@ fun DashboardScreen(
 
 private const val DASHBOARD_SKELETON_ROWS = 4
 
-private val DASHBOARD_WIDGET_MIN_HEIGHT = 180.dp
+/** Floor for a card whose empty state has to centre itself in something. Shared across widgets. */
+internal val DASHBOARD_WIDGET_MIN_HEIGHT = 180.dp
 
 /** Bottom scroll inset that keeps the last row clear of the extended "Add transaction" FAB. */
 private val DASHBOARD_FAB_CLEARANCE = 88.dp

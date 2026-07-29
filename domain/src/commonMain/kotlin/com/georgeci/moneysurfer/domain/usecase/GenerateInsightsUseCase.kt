@@ -126,8 +126,10 @@ class GenerateInsightsUseCase(
             generateInsights(
                 InsightInput(
                     periodKey = today.yearMonth.toString(),
-                    // The current window runs from the 1st to today inclusive.
-                    elapsedDays = today.day,
+                    // Both windows run from a 1st, so their lengths are their end days. They
+                    // differ only where the baseline clamped to a shorter month.
+                    elapsedDays = current.lengthInDays(),
+                    baselineDays = previous.lengthInDays(),
                     currency = currency,
                     currentSpend = currentSpend,
                     previousSpend = previousSpend,
@@ -139,6 +141,13 @@ class GenerateInsightsUseCase(
         }
     }
 }
+
+/**
+ * Days a closed window covers, both ends included. Only called with bounded windows — the insights
+ * engine never asks for [TransactionPeriodWindow.Unbounded].
+ */
+private fun TransactionPeriodWindow.lengthInDays(): Int =
+    ((to ?: return 0).toEpochDays() - (from ?: return 0).toEpochDays() + 1).toInt()
 
 /** See [GenerateInsightsUseCase.today] — the floor that keeps a backwards clock jump cheap. */
 private val MIN_ROLLOVER_SLEEP: Duration = 1.minutes
@@ -153,8 +162,9 @@ private val MIN_ROLLOVER_SLEEP: Duration = 1.minutes
  * yet. Both windows are the same number of days here, which removes that bias — though not the
  * small-sample volatility of the first few days, which the rules themselves stand down for.
  *
- * The previous window is clamped to its own month's last day, so the 31st compares against the
- * whole of a 28-day February rather than spilling into March.
+ * The previous window is clamped to its own month's last day rather than spilling into the current
+ * one. That leaves the pair unequal in length on the 29th-31st after a shorter month, which is not
+ * a comparison at all — `generateInsights` detects it from the two lengths and stays quiet.
  *
  * Built directly rather than through `periodWindow(Month, ...)`, which always spans a whole
  * calendar month — the point here is a part-month window with a matching part-month baseline.

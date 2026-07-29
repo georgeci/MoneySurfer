@@ -51,7 +51,7 @@ internal fun InsightsWidget(state: DashboardState.Content, variant: String?) {
             .padding(horizontal = 16.dp)
             // Only the empty state needs a floor to centre itself in; cards size themselves, and
             // a compact carousel showing one of them would otherwise hang dead space underneath.
-            .defaultMinSize(minHeight = if (state.insights.isEmpty()) INSIGHTS_EMPTY_HEIGHT else Dp.Unspecified)
+            .defaultMinSize(minHeight = if (state.insights.isEmpty()) DASHBOARD_WIDGET_MIN_HEIGHT else Dp.Unspecified)
             .padding(vertical = 8.dp)
             .testTag(DashboardTestTags.Insights),
     )
@@ -107,6 +107,3 @@ private fun InsightUi.insightBody(): String = when (kind) {
     InsightKind.Subscriptions ->
         stringResource(Res.string.dashboard_insights_subscriptions_body, amount)
 }
-
-/** Same floor the other dashboard cards use, so a quiet Insights card lines up with a quiet Goals one. */
-private val INSIGHTS_EMPTY_HEIGHT = 180.dp
