@@ -1,8 +1,11 @@
 package com.georgeci.moneysurfer.data.sync.plugin
 
+import com.georgeci.moneysurfer.data.sync.WorkspaceDocRef
+import com.georgeci.moneysurfer.data.sync.WorkspaceDocumentWriter
+import com.georgeci.moneysurfer.sync.repository.MutationOperation
 import com.georgeci.moneysurfer.sync.repository.PendingMutation
-import dev.gitlive.firebase.firestore.DocumentReference
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.SerializationStrategy
 
 /**
  * Wire-format patch pushed for [com.georgeci.moneysurfer.sync.repository.MutationOperation.DELETE].
@@ -15,7 +18,7 @@ import kotlinx.serialization.Serializable
  * (see sync-pull-lww.md → Tombstones).
  */
 @Serializable
-internal data class TombstonePatch(
+data class TombstonePatch(
     val deletedAt: Long,
     val updatedAt: Long,
     val clientVersionCode: Int,
@@ -39,15 +42,34 @@ internal fun tombstonePatchFor(
 }
 
 /**
- * Writes [patch] onto the remote doc, skipping docs that never reached
- * Firestore: an entity created and deleted between two drains leaves the
- * INSERT push a no-op (its `getById` finds no live row — for transactions
- * because the row is tombstoned, for the rest because it is gone), and
- * updating the missing doc would raise NOT_FOUND on every retry, wedging
- * the batch. A doc that never existed remotely has nothing for peers to
- * forget.
+ * The push half every workspace sub-collection plugin shares: an upsert writes whatever [doc]
+ * resolves to now, and a delete writes a tombstone patch instead — Firestore rules deny hard
+ * deletes.
+ *
+ * [doc] returning null means the row is no longer there to push. That is the same "created and
+ * deleted between two drains" case the tombstone skip covers from the other side, and it must
+ * return normally: `UploadPendingChangesUseCaseImpl` treats a push that throws as undelivered and
+ * requeues it, which for a row that will never come back is a queue entry that never drains.
  */
-internal suspend fun DocumentReference.pushTombstone(patch: TombstonePatch) {
-    if (!get().exists) return
-    update(patch)
+internal suspend fun <T : Any> WorkspaceDocumentWriter.pushToCollection(
+    mutation: PendingMutation,
+    collectionName: String,
+    clientVersionCode: Int,
+    strategy: SerializationStrategy<T>,
+    doc: suspend (WorkspaceDocRef) -> T?,
+) {
+    val ref = WorkspaceDocRef.inCollection(
+        workspaceId = requireNotNull(mutation.scopeKey) {
+            "$collectionName mutation ${mutation.entityId} has no workspace scope"
+        },
+        collectionName = collectionName,
+        documentId = mutation.entityId,
+    )
+    when (mutation.operation) {
+        MutationOperation.INSERT,
+        MutationOperation.UPDATE,
+        -> doc(ref)?.let { set(ref, strategy, it) }
+        MutationOperation.DELETE ->
+            tombstone(ref, tombstonePatchFor(mutation, clientVersionCode))
+    }
 }

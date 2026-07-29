@@ -4,6 +4,8 @@ import com.georgeci.moneysurfer.data.db.dao.UserDao
 import com.georgeci.moneysurfer.data.db.dao.WorkspaceDao
 import com.georgeci.moneysurfer.data.db.entity.UserEntity
 import com.georgeci.moneysurfer.data.remote.WorkspaceDoc
+import com.georgeci.moneysurfer.data.sync.WorkspaceDocRef
+import com.georgeci.moneysurfer.data.sync.WorkspaceDocumentWriter
 import com.georgeci.moneysurfer.data.sync.WorkspaceRefRegistrar
 import com.georgeci.moneysurfer.data.sync.toDoc
 import com.georgeci.moneysurfer.data.sync.toEntity
@@ -14,7 +16,6 @@ import com.georgeci.moneysurfer.sync.plugin.RemoteDocument
 import com.georgeci.moneysurfer.sync.plugin.SyncEntityPlugin
 import com.georgeci.moneysurfer.sync.repository.MutationOperation
 import com.georgeci.moneysurfer.sync.repository.PendingMutation
-import dev.gitlive.firebase.firestore.FirebaseFirestore
 import org.koin.core.annotation.Single
 
 /**
@@ -34,7 +35,7 @@ import org.koin.core.annotation.Single
  */
 @Single(binds = [SyncEntityPlugin::class])
 class WorkspaceSyncPlugin(
-    private val firestore: FirebaseFirestore,
+    private val writer: WorkspaceDocumentWriter,
     private val appInfo: AppInfo,
     private val workspaceDao: WorkspaceDao,
     private val userDao: UserDao,
@@ -46,19 +47,24 @@ class WorkspaceSyncPlugin(
     override val pullPriority: Int = SyncPullPriorities.WORKSPACE
 
     override suspend fun push(mutation: PendingMutation) {
-        val docRef = firestore.collection("workspaces").document(mutation.entityId)
+        val ref = WorkspaceDocRef.root(mutation.entityId)
         when (mutation.operation) {
             MutationOperation.INSERT,
             MutationOperation.UPDATE,
             -> {
                 val entity = workspaceDao.getById(mutation.entityId) ?: return
-                docRef.set(entity.toDoc().copy(clientVersionCode = appInfo.versionCode))
+                writer.set(
+                    ref = ref,
+                    strategy = WorkspaceDoc.serializer(),
+                    value = entity.toDoc().copy(clientVersionCode = appInfo.versionCode),
+                )
                 // The ref travels with the document. A workspace created while sync was
                 // disabled has no `users/{uid}.workspaceIds` entry and nothing else would ever
                 // add one, leaving it invisible to every other device (issue #342).
                 workspaceRefRegistrar.register(mutation.entityId)
             }
-            MutationOperation.DELETE -> docRef.pushTombstone(
+            MutationOperation.DELETE -> writer.tombstone(
+                ref,
                 tombstonePatchFor(mutation, clientVersionCode = appInfo.versionCode),
             )
         }

@@ -107,7 +107,7 @@ class FirebaseAccountDeletionRemoteSource(
     private companion object {
         const val USERS = SyncCollection.USERS
         const val USER_EMAILS = "userEmails"
-        const val WORKSPACES = "workspaces"
+        const val WORKSPACES = SyncCollection.WORKSPACES
         const val MEMBERS = SyncCollection.WORKSPACE_MEMBERS
         const val CLIENT_VERSION_CODE = 1
         const val MAX_BATCH_SIZE = 400
