@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > ConfigKeyGroup</title>
+  <title>MoneySurfer Coverage Report > ConfigCodec</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.appconfig</a>
 </div>
 
-<h1>Coverage Summary for Class: ConfigKeyGroup (com.georgeci.moneysurfer.appconfig)</h1>
+<h1>Coverage Summary for Class: ConfigCodec (com.georgeci.moneysurfer.appconfig)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">ConfigKeyGroup</td>
+  <td class="name">ConfigCodec</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -47,104 +47,73 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.appconfig
 &nbsp;
 &nbsp;/**
-&nbsp; * One configuration value: a compile-time constant, never a DI participant. The number of Koin
-&nbsp; * bindings therefore does not grow with the number of flags.
+&nbsp; * String ↔ value bridge for one configuration key.
 &nbsp; *
-&nbsp; * [T] is `Any`-bounded because the engine already spends `null` on &quot;absent in this layer&quot; — an
-&nbsp; * &quot;empty&quot; value has to be a sentinel inside the codec instead.
+&nbsp; * A string is the common denominator of every backing store — a DataStore preference, a
+&nbsp; * `config_entry.value` column, a Firestore field — so every layer except the in-memory Build
+&nbsp; * map holds encoded strings and the codec is what makes them typed again.
 &nbsp; *
-&nbsp; * Plain `ConfigKey` is **read-only**: host-owned facts and server-owned flags. Only [SettingKey]
-&nbsp; * can be written, so `Config.handle` on a server flag fails to compile.
+&nbsp; * Public API of `app-config/api` on purpose: key objects are `internal` to the module that owns
+&nbsp; * their facade, but a public key constructor cannot take an internal parameter type, so the
+&nbsp; * codecs those keys are built from have to be visible.
 &nbsp; */
-&nbsp;open class ConfigKey&lt;T : Any&gt;(
-&nbsp;    val name: String,
-&nbsp;    val default: T,
-&nbsp;    val codec: ConfigCodec&lt;T&gt;,
+&nbsp;interface ConfigCodec&lt;T : Any&gt; {
+&nbsp;
+&nbsp;    fun encode(value: T): String
+&nbsp;
 &nbsp;    /**
-&nbsp;     * Opt-in: only these keys are served (or mirrored) by the RemoteGlobal layer. Without the
-&nbsp;     * opt-in a free-form remote map could override anything it names — `host.is_offline` would
-&nbsp;     * flip the online build onto the offline start route while its DI graph stays online, and any
-&nbsp;     * `SettingKey` the user never wrote has an absent Local layer, so a remote
-&nbsp;     * `ui.onboarding_completed` would skip onboarding on every fresh install.
+&nbsp;     * `null` means &quot;undecodable&quot;. The engine then treats the layer as **not holding this key**
+&nbsp;     * and resolution continues downwards — see [Config].
 &nbsp;     */
-&nbsp;    val remoteOverridable: Boolean = false,
-&nbsp;) {
-&nbsp;    override fun toString(): String = &quot;ConfigKey($name)&quot;
+&nbsp;    fun decode(raw: String): T?
 &nbsp;
-&nbsp;    companion object {
-&nbsp;        fun bool(
-&nbsp;            name: String,
-&nbsp;            default: Boolean,
-&nbsp;            remoteOverridable: Boolean = false,
-&nbsp;        ): ConfigKey&lt;Boolean&gt; = ConfigKey(name, default, BooleanConfigCodec, remoteOverridable)
+&nbsp;    /**
+&nbsp;     * Shape of the value, so the debug panel can render a real control instead of a free-text
+&nbsp;     * field. `PaletteSource`&#39;s `PRESET:&lt;seed&gt;` format makes typing raw strings a routine way to
+&nbsp;     * fail, which is what this hint exists to avoid.
+&nbsp;     */
+&nbsp;    val valueKind: ConfigValueKind
+&nbsp;}
 &nbsp;
-&nbsp;        fun string(
-&nbsp;            name: String,
-&nbsp;            default: String,
-&nbsp;            remoteOverridable: Boolean = false,
-&nbsp;        ): ConfigKey&lt;String&gt; = ConfigKey(name, default, StringConfigCodec, remoteOverridable)
+&nbsp;/** What kind of control can edit a key — derived from its codec, never from its name. */
+&nbsp;sealed interface ConfigValueKind {
+&nbsp;    data object Bool : ConfigValueKind
 &nbsp;
-&nbsp;        inline fun &lt;reified E : Enum&lt;E&gt;&gt; enum(
-&nbsp;            name: String,
-&nbsp;            default: E,
-&nbsp;            remoteOverridable: Boolean = false,
-&nbsp;        ): ConfigKey&lt;E&gt; = ConfigKey(name, default, EnumConfigCodec(enumValues&lt;E&gt;().toList()), remoteOverridable)
+&nbsp;    /** Closed set of accepted encodings, in declaration order. */
+&nbsp;    data class Choice(val choices: List&lt;String&gt;) : ConfigValueKind
+&nbsp;
+&nbsp;    data object FreeText : ConfigValueKind
+&nbsp;}
+&nbsp;
+&nbsp;/** Accepts `true`/`false` case-insensitively; anything else is undecodable, not `false`. */
+&nbsp;object BooleanConfigCodec : ConfigCodec&lt;Boolean&gt; {
+&nbsp;    override fun encode(value: Boolean): String = value.toString()
+&nbsp;
+&nbsp;    override fun decode(raw: String): Boolean? = when (raw.lowercase()) {
+&nbsp;        &quot;true&quot; -&gt; true
+&nbsp;        &quot;false&quot; -&gt; false
+&nbsp;        else -&gt; null
 &nbsp;    }
+&nbsp;
+&nbsp;    override val valueKind: ConfigValueKind = ConfigValueKind.Bool
+&nbsp;}
+&nbsp;
+&nbsp;object StringConfigCodec : ConfigCodec&lt;String&gt; {
+&nbsp;    override fun encode(value: String): String = value
+&nbsp;    override fun decode(raw: String): String = raw
+&nbsp;    override val valueKind: ConfigValueKind = ConfigValueKind.FreeText
 &nbsp;}
 &nbsp;
 &nbsp;/**
-&nbsp; * Writable key — a user setting. Only settings get a setter, so a server- or host-owned flag
-&nbsp; * cannot be written by mistake.
-&nbsp; *
-&nbsp; * [sync] `true` marks the value for per-user replication; `false` keeps it device-scoped.
-&nbsp; * Device-scoped is mandatory for onboarding and demo state — replicating those would replay
-&nbsp; * onboarding across devices and let demo data leak into a real account.
-&nbsp; *
-&nbsp; * [sync] also decides where the value is *stored*: `true` routes it into the account-scoped Room
-&nbsp; * `config_entry` table, which is wiped on account change and pushed through the outbox, while
-&nbsp; * `false` keeps it in DataStore, where nothing wipes it. `LocalConfigSource` owns that routing, so
-&nbsp; * no caller sees the split.
-&nbsp; *
-&nbsp; * `remoteOverridable` is hard-coded `false` and not exposed as a parameter, so a user setting
-&nbsp; * cannot become server-controlled by oversight.
+&nbsp; * Enum name ↔ entry. Replaces the hand-rolled
+&nbsp; * `runCatching { Enum.valueOf(stored) }.getOrDefault(default)` blocks that were repeated per
+&nbsp; * field in `UiPreferencesImpl` — an unknown name now falls through to the layer below instead of
+&nbsp; * silently becoming the default.
 &nbsp; */
-&nbsp;class SettingKey&lt;T : Any&gt;(
-&nbsp;    name: String,
-&nbsp;    default: T,
-&nbsp;    codec: ConfigCodec&lt;T&gt;,
-&nbsp;    val sync: Boolean,
-&nbsp;) : ConfigKey&lt;T&gt;(name, default, codec, remoteOverridable = false) {
-&nbsp;
-&nbsp;    companion object {
-&nbsp;        fun bool(name: String, default: Boolean, sync: Boolean): SettingKey&lt;Boolean&gt; =
-&nbsp;            SettingKey(name, default, BooleanConfigCodec, sync)
-&nbsp;
-&nbsp;        fun string(name: String, default: String, sync: Boolean): SettingKey&lt;String&gt; =
-&nbsp;            SettingKey(name, default, StringConfigCodec, sync)
-&nbsp;
-&nbsp;        inline fun &lt;reified E : Enum&lt;E&gt;&gt; enum(name: String, default: E, sync: Boolean): SettingKey&lt;E&gt; =
-&nbsp;            SettingKey(name, default, EnumConfigCodec(enumValues&lt;E&gt;().toList()), sync)
-&nbsp;
-&nbsp;        fun &lt;T : Any&gt; custom(
-&nbsp;            name: String,
-&nbsp;            default: T,
-&nbsp;            codec: ConfigCodec&lt;T&gt;,
-&nbsp;            sync: Boolean,
-&nbsp;        ): SettingKey&lt;T&gt; = SettingKey(name, default, codec, sync)
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;/**
-&nbsp; * Every key a module owns, contributed to a runtime registry. The debug panel and the
-&nbsp; * remote-config pull both need *all* keys, and keys are `internal` to their owning module, so
-&nbsp; * they cannot see the symbols — they read the registry instead.
-&nbsp; *
-&nbsp; * Bind one class per group to this shared interface (the `SyncEntityPlugin` precedent). Several
-&nbsp; * modules binding a bare `ConfigKeyGroup` would overwrite one another in Koin&#39;s definition index
-&nbsp; * and `getAll()` would return a single surviving group.
-&nbsp; */
-&nbsp;interface ConfigKeyGroup {
-&nbsp;    val keys: List&lt;ConfigKey&lt;*&gt;&gt;
+&nbsp;class EnumConfigCodec&lt;E : Enum&lt;E&gt;&gt;(private val entries: List&lt;E&gt;) : ConfigCodec&lt;E&gt; {
+&nbsp;    override fun encode(value: E): String = value.name
+&nbsp;    override fun decode(raw: String): E? = entries.firstOrNull { it.name == raw }
+&nbsp;    override val valueKind: ConfigValueKind = ConfigValueKind.Choice(entries.map { it.name })
 &nbsp;}
 </code>
 </pre>
@@ -169,7 +138,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 23:01</div>
+    <div style="float:right;">generated on 2026-07-29 11:10</div>
 </div>
 </body>
 </html>

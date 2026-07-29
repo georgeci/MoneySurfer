@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > DebugConfigInspector</title>
+  <title>MoneySurfer Coverage Report > SyncedSettingsSession</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.config</a>
 </div>
 
-<h1>Coverage Summary for Class: DebugConfigInspector (com.georgeci.moneysurfer.domain.config)</h1>
+<h1>Coverage Summary for Class: SyncedSettingsSession (com.georgeci.moneysurfer.domain.config)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">DebugConfigInspector</td>
+  <td class="name">SyncedSettingsSession</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -46,81 +46,32 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.config
 &nbsp;
-&nbsp;import kotlinx.coroutines.flow.Flow
-&nbsp;
 &nbsp;/**
-&nbsp; * Read/write view of every configuration key, for the QA panel in debug builds.
+&nbsp; * Session-boundary maintenance for the settings that replicate per user.
 &nbsp; *
-&nbsp; * Everything is pre-rendered as strings and the write path is keyed by name, so no `ConfigKey&lt;*&gt;`
-&nbsp; * — and no `app-config` dependency — reaches `feature/settings`.
+&nbsp; * A domain facade for the same reason `ConfigHydration` and `RemoteConfigRefresh` are: the callers
+&nbsp; * are session-lifecycle use cases in `domain`, which must not see `app-config` any more than a
+&nbsp; * feature may.
 &nbsp; */
-&nbsp;interface DebugConfigInspector {
+&nbsp;fun interface SyncedSettingsSession {
 &nbsp;
 &nbsp;    /**
-&nbsp;     * `false` in release builds, where the Debug layer is empty. The panel and its entry point are
-&nbsp;     * hidden rather than shown broken.
-&nbsp;     */
-&nbsp;    val isAvailable: Boolean
-&nbsp;
-&nbsp;    val rows: Flow&lt;List&lt;ConfigDebugRow&gt;&gt;
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Names of layers whose store could not be read at startup, pre-rendered. Empty on the happy
-&nbsp;     * path.
+&nbsp;     * Run at the start of every session, before its first pull. Two jobs, both of which have to
+&nbsp;     * happen there and nowhere else:
 &nbsp;     *
-&nbsp;     * Their rows resolve as if the layer were empty, so without this the panel would report a stale
-&nbsp;     * fallback as the real answer. Recovery is automatic once the store is readable again.
+&nbsp;     * - **Drop the logout overlay.** The previous user&#39;s theme is held in memory so the UI does not
+&nbsp;     *   snap to defaults mid-session; left in place it would shadow whatever this user&#39;s pull writes
+&nbsp;     *   into local storage, which is the leak the account wipe exists to prevent.
+&nbsp;     * - **Re-enqueue writes the outbox refused.** `OutboxEnqueuerImpl` silently no-ops for demo and
+&nbsp;     *   signed-out sessions and nothing else replays those writes, so every setting whose stored
+&nbsp;     *   value never reached the server is queued now. This also closes the window between a local
+&nbsp;     *   write and its enqueue, which no shared transaction can protect — the two stores are
+&nbsp;     *   different databases.
+&nbsp;     *
+&nbsp;     * Idempotent, and safe without a Firebase session: the enqueue itself no-ops there.
 &nbsp;     */
-&nbsp;    val degradedLayers: List&lt;String&gt;
-&nbsp;
-&nbsp;    /** Fails when [raw] does not decode through the key&#39;s codec, or when the key is unknown. */
-&nbsp;    suspend fun override(name: String, raw: String): Result&lt;Unit&gt;
-&nbsp;
-&nbsp;    suspend fun clearOverride(name: String)
-&nbsp;
-&nbsp;    suspend fun resetAll()
+&nbsp;    suspend fun onSessionStart()
 &nbsp;}
-&nbsp;
-&nbsp;/**
-&nbsp; * One key as the panel sees it.
-&nbsp; *
-&nbsp; * @param effectiveValue the resolved value, encoded.
-&nbsp; * @param winner name of the layer that won, or `&quot;default&quot;` when no layer holds the key.
-&nbsp; * @param kind which control to render — a text field for `PaletteSource`&#39;s `PRESET:&lt;seed&gt;` format
-&nbsp; *   is a routine way to fail.
-&nbsp; * @param overridden `true` when the Debug layer holds anything for this key, i.e. this row can be
-&nbsp; *   cleared. Deliberately not &quot;the Debug layer won&quot;: an override the codec can no longer read does
-&nbsp; *   not win, and it is exactly the one a tester needs to remove.
-&nbsp; * @param hostOwned `true` for a key that describes the build itself (`host.*`). Overriding one of
-&nbsp; *   these changes what the app believes it is while its DI graph stays as compiled — useful for QA,
-&nbsp; *   but not the same kind of switch as a feature flag, so the panel says so.
-&nbsp; */
-&nbsp;data class ConfigDebugRow(
-&nbsp;    val name: String,
-&nbsp;    val effectiveValue: String,
-&nbsp;    val winner: String,
-&nbsp;    val kind: ConfigDebugRowKind,
-&nbsp;    val overridden: Boolean,
-&nbsp;    val hostOwned: Boolean = false,
-&nbsp;    val layers: List&lt;ConfigDebugLayerCell&gt;,
-&nbsp;)
-&nbsp;
-&nbsp;sealed interface ConfigDebugRowKind {
-&nbsp;    data object Bool : ConfigDebugRowKind
-&nbsp;    data class Choice(val choices: List&lt;String&gt;) : ConfigDebugRowKind
-&nbsp;    data object FreeText : ConfigDebugRowKind
-&nbsp;}
-&nbsp;
-&nbsp;/**
-&nbsp; * One layer&#39;s contribution. [value] is `null` when the layer does not hold the key; [undecodable]
-&nbsp; * distinguishes &quot;stored but rejected by the codec&quot; from that, which is the whole reason the panel
-&nbsp; * shows per-layer cells at all.
-&nbsp; */
-&nbsp;data class ConfigDebugLayerCell(
-&nbsp;    val layer: String,
-&nbsp;    val value: String?,
-&nbsp;    val undecodable: Boolean,
-&nbsp;)
 </code>
 </pre>
 </div>
@@ -144,7 +95,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 23:01</div>
+    <div style="float:right;">generated on 2026-07-29 11:10</div>
 </div>
 </body>
 </html>

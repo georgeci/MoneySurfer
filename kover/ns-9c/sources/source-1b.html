@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > TransactionRetentionRepository</title>
+  <title>MoneySurfer Coverage Report > RemoteDataResetRepository</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.domain.repositories</a>
 </div>
 
-<h1>Coverage Summary for Class: TransactionRetentionRepository (com.georgeci.moneysurfer.domain.repositories)</h1>
+<h1>Coverage Summary for Class: RemoteDataResetRepository (com.georgeci.moneysurfer.domain.repositories)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">TransactionRetentionRepository</td>
+  <td class="name">RemoteDataResetRepository</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -46,23 +46,17 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.domain.repositories
 &nbsp;
-&nbsp;import kotlin.time.Instant
-&nbsp;
 &nbsp;/**
-&nbsp; * Storage side of the tombstone retention policy (issue #346).
+&nbsp; * Wipes the sync-side ledgers (pending_mutations, sync_meta) so a fresh
+&nbsp; * post-logout session doesn&#39;t reattempt the previous user&#39;s outbox or
+&nbsp; * resume from their cursor positions.
 &nbsp; *
-&nbsp; * Split off [TransactionRepository] rather than added to it because purging is maintenance, not
-&nbsp; * a transaction operation: it has no domain model to map, no caller on any screen, and every
-&nbsp; * test double of the transaction store would otherwise have to answer a question none of them
-&nbsp; * ask. See `PurgeDeletedTransactionsUseCase` for the policy that drives it.
+&nbsp; * Lives separately from [LocalDataResetRepository] so the offline build
+&nbsp; * can stay unaware of the sync database — it provides a no-op binding
+&nbsp; * while still satisfying [LogoutUseCase]&#39;s contract.
 &nbsp; */
-&nbsp;fun interface TransactionRetentionRepository {
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Removes the rows tombstoned strictly before [threshold] for good, and returns how many
-&nbsp;     * went. Live rows are never touched.
-&nbsp;     */
-&nbsp;    suspend fun purgeDeletedBefore(threshold: Instant): Int
+&nbsp;interface RemoteDataResetRepository {
+&nbsp;    suspend fun clearAll()
 &nbsp;}
 </code>
 </pre>
@@ -87,7 +81,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 23:01</div>
+    <div style="float:right;">generated on 2026-07-29 11:10</div>
 </div>
 </body>
 </html>

@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > TransactionSplitTestTags</title>
+  <title>MoneySurfer Coverage Report > TransactionCreationTestTags</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.feature.transaction.creation</a>
 </div>
 
-<h1>Coverage Summary for Class: TransactionSplitTestTags (com.georgeci.moneysurfer.feature.transaction.creation)</h1>
+<h1>Coverage Summary for Class: TransactionCreationTestTags (com.georgeci.moneysurfer.feature.transaction.creation)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">TransactionSplitTestTags</td>
+  <td class="name">TransactionCreationTestTags</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -46,207 +46,431 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.transaction.creation
 &nbsp;
+&nbsp;import androidx.compose.foundation.clickable
 &nbsp;import androidx.compose.foundation.layout.Arrangement
+&nbsp;import androidx.compose.foundation.layout.Box
 &nbsp;import androidx.compose.foundation.layout.Column
 &nbsp;import androidx.compose.foundation.layout.Row
+&nbsp;import androidx.compose.foundation.layout.Spacer
+&nbsp;import androidx.compose.foundation.layout.fillMaxSize
 &nbsp;import androidx.compose.foundation.layout.fillMaxWidth
-&nbsp;import androidx.compose.foundation.layout.width
-&nbsp;import androidx.compose.foundation.text.KeyboardOptions
+&nbsp;import androidx.compose.foundation.layout.height
+&nbsp;import androidx.compose.foundation.layout.padding
+&nbsp;import androidx.compose.foundation.layout.size
+&nbsp;import androidx.compose.foundation.rememberScrollState
+&nbsp;import androidx.compose.foundation.text.input.TextFieldState
+&nbsp;import androidx.compose.foundation.text.input.rememberTextFieldState
+&nbsp;import androidx.compose.foundation.verticalScroll
+&nbsp;import androidx.compose.material3.ExperimentalMaterial3Api
 &nbsp;import androidx.compose.material3.Icon
-&nbsp;import androidx.compose.material3.IconButton
 &nbsp;import androidx.compose.material3.OutlinedTextField
+&nbsp;import androidx.compose.material3.Scaffold
 &nbsp;import androidx.compose.material3.Text
+&nbsp;import androidx.compose.material3.TopAppBar
+&nbsp;import androidx.compose.material3.TopAppBarDefaults
 &nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.runtime.LaunchedEffect
+&nbsp;import androidx.compose.runtime.getValue
+&nbsp;import androidx.compose.runtime.mutableStateOf
+&nbsp;import androidx.compose.runtime.remember
+&nbsp;import androidx.compose.runtime.setValue
+&nbsp;import androidx.compose.runtime.snapshotFlow
 &nbsp;import androidx.compose.ui.Alignment
 &nbsp;import androidx.compose.ui.Modifier
 &nbsp;import androidx.compose.ui.platform.testTag
-&nbsp;import androidx.compose.ui.text.input.KeyboardType
 &nbsp;import androidx.compose.ui.unit.dp
-&nbsp;import com.georgeci.moneysurfer.domain.formatter.MoneyFormatter
-&nbsp;import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
+&nbsp;import androidx.lifecycle.compose.collectAsStateWithLifecycle
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.AccountId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryId
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.CategoryType
+&nbsp;import com.georgeci.moneysurfer.domain.primitives.TransactionId
 &nbsp;import com.georgeci.moneysurfer.uikit.components.SurferButton
 &nbsp;import com.georgeci.moneysurfer.uikit.components.SurferButtonSize
 &nbsp;import com.georgeci.moneysurfer.uikit.components.SurferButtonStyle
 &nbsp;import com.georgeci.moneysurfer.uikit.components.SurferPickerRow
+&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferSegmentedControl
+&nbsp;import com.georgeci.moneysurfer.uikit.components.transaction.SurferDeleteTransactionDialog
 &nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
+&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
+&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
+&nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferTestTagAsId
 &nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
+&nbsp;import com.georgeci.moneysurfer.utils.HandleSideEffect
 &nbsp;import moneysurfer.feature.transaction.generated.resources.Res
-&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_creation_amount_label
-&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_creation_category_label
-&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_creation_split_add_line
-&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_creation_split_category_placeholder
-&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_creation_split_enable
-&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_creation_split_over
-&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_creation_split_remainder
-&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_creation_split_remove_line
-&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_creation_split_title
-&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_creation_split_total
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_creation_account_empty
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_creation_account_label
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_creation_close_content_description
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_creation_expense
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_creation_income
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_creation_note_label
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_creation_title_create
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_creation_today
+&nbsp;import moneysurfer.feature.transaction.generated.resources.transaction_creation_transfer
 &nbsp;import org.jetbrains.compose.resources.stringResource
+&nbsp;import org.koin.compose.viewmodel.koinViewModel
+&nbsp;import org.koin.core.parameter.parametersOf
 &nbsp;
-&nbsp;/** Stable selectors for the split editor — see docs/testing/testing-strategy.md. */
-&nbsp;object TransactionSplitTestTags {
-&nbsp;    const val Toggle = &quot;transactionCreation:split:toggle&quot;
-&nbsp;    const val AddLine = &quot;transactionCreation:split:addLine&quot;
+&nbsp;/** Stable selectors for the transaction creation screen — see docs/testing/testing-strategy.md. */
+&nbsp;object TransactionCreationTestTags {
+&nbsp;    const val Root = &quot;transactionCreation:root&quot;
+&nbsp;    const val Amount = &quot;transactionCreation:amount&quot;
+&nbsp;    const val Note = &quot;transactionCreation:note&quot;
+&nbsp;    const val Save = &quot;transactionCreation:save&quot;
+&nbsp;    const val Close = &quot;transactionCreation:close&quot;
+&nbsp;    const val Delete = &quot;transactionCreation:delete&quot;
 &nbsp;
-&nbsp;    /** One line&#39;s amount field, suffixed with the line&#39;s index. */
-&nbsp;    const val LineAmountPrefix = &quot;transactionCreation:split:amount:&quot;
+&nbsp;    /**
+&nbsp;     * Transaction-type option, suffixed with the lowercased [TransactionTypeUi]. `transfer` is
+&nbsp;     * only composed outside edit mode and with the transfer flag on.
+&nbsp;     */
+&nbsp;    const val TypePrefix = &quot;transactionCreation:type:&quot;
 &nbsp;}
 &nbsp;
-&nbsp;/**
-&nbsp; * Turns the single-category form into a receipt filed under several categories, and back.
-&nbsp; *
-&nbsp; * Offered on creation only. Converting a stored transaction into a group would mean deleting the
-&nbsp; * row and writing N in its place — new ids, a different thing to sync — which is a larger change
-&nbsp; * than an edit screen should make behind one toggle.
-&nbsp; */
-&nbsp;@Composable
-&nbsp;internal fun SplitToggleRow(
-&nbsp;    state: TransactionCreationState.Content,
-&nbsp;    onEvent: (TransactionCreationEvent) -&gt; Unit,
-&nbsp;) {
-&nbsp;    if (state.isEditMode) return
-&nbsp;    Row(
-&nbsp;        modifier = Modifier.fillMaxWidth(),
-&nbsp;        horizontalArrangement = Arrangement.End,
-&nbsp;    ) {
-&nbsp;        SurferButton(
-&nbsp;            text = stringResource(Res.string.transaction_creation_split_enable),
-&nbsp;            onClick = { onEvent(TransactionCreationEvent.OnSplitToggled) },
-&nbsp;            style = if (state.isSplit) SurferButtonStyle.Tonal else SurferButtonStyle.Text,
-&nbsp;            // Deliberately the smallest size: this row sits between the category grid and the note
-&nbsp;            // field on a scrolling form, and every dp it adds pushes the note (and the Save button
-&nbsp;            // the flows tap) further under the keyboard on a short screen.
-&nbsp;            size = SurferButtonSize.Small,
-&nbsp;            startIcon = SurferIcons.Category,
-&nbsp;            modifier = Modifier.testTag(TransactionSplitTestTags.Toggle),
-&nbsp;        )
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;/**
-&nbsp; * The lines a split will be written as: a category and a slice of the amount each.
-&nbsp; *
-&nbsp; * The **last** line is not editable — it always carries whatever is left of the amount above. That
-&nbsp; * is what makes the legs add up by construction: there is no way to save a receipt whose parts do
-&nbsp; * not sum to the payment, and no arithmetic for the user to redo when they change one line.
-&nbsp; */
-&nbsp;@Composable
-&nbsp;internal fun SplitLinesBlock(
-&nbsp;    state: TransactionCreationState.Content,
-&nbsp;    onEvent: (TransactionCreationEvent) -&gt; Unit,
-&nbsp;) {
-&nbsp;    val currency = state.selectedAccount?.currencyCode ?: CurrencyCode(&quot;USD&quot;)
-&nbsp;    Column(verticalArrangement = Arrangement.spacedBy(AppTheme.spacing.small)) {
-&nbsp;        Text(
-&nbsp;            text = stringResource(Res.string.transaction_creation_split_title),
-&nbsp;            style = AppTheme.typography.titleSmall,
-&nbsp;            color = AppTheme.materialColors.onSurface,
-&nbsp;        )
-&nbsp;        state.splitLines.forEachIndexed { index, line -&gt;
-&nbsp;            SplitLineRow(
-&nbsp;                line = line,
-&nbsp;                index = index,
-&nbsp;                // Only the trailing line is derived; every line above it is the user&#39;s to type.
-&nbsp;                remainderFormatted = if (index == state.splitLines.lastIndex) {
-&nbsp;                    MoneyFormatter.format(state.splitRemainder, currency)
-&nbsp;                } else {
-&nbsp;                    null
-&nbsp;                },
-&nbsp;                onEvent = onEvent,
-&nbsp;            )
-&nbsp;        }
-&nbsp;        SurferButton(
-&nbsp;            text = stringResource(Res.string.transaction_creation_split_add_line),
-&nbsp;            onClick = { onEvent(TransactionCreationEvent.OnSplitLineAdded) },
-&nbsp;            style = SurferButtonStyle.Text,
-&nbsp;            size = SurferButtonSize.Biggest,
-&nbsp;            startIcon = SurferIcons.Add,
-&nbsp;            modifier = Modifier.testTag(TransactionSplitTestTags.AddLine),
-&nbsp;        )
-&nbsp;        SplitStatusLine(state = state, currency = currency)
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;@Composable
-&nbsp;private fun SplitLineRow(
-&nbsp;    line: TransactionSplitLineUi,
-&nbsp;    index: Int,
-&nbsp;    remainderFormatted: String?,
-&nbsp;    onEvent: (TransactionCreationEvent) -&gt; Unit,
-&nbsp;) {
-&nbsp;    Row(
-&nbsp;        modifier = Modifier.fillMaxWidth(),
-&nbsp;        horizontalArrangement = Arrangement.spacedBy(AppTheme.spacing.small),
-&nbsp;        verticalAlignment = Alignment.CenterVertically,
-&nbsp;    ) {
-&nbsp;        SurferPickerRow(
-&nbsp;            label = stringResource(Res.string.transaction_creation_category_label),
-&nbsp;            value = line.category?.name
-&nbsp;                ?: stringResource(Res.string.transaction_creation_split_category_placeholder),
-&nbsp;            icon = SurferIcons.Category,
-&nbsp;            onClick = { onEvent(TransactionCreationEvent.OnOpenSplitLineCategoryChooser(line.key)) },
-&nbsp;            modifier = Modifier.weight(1f),
-&nbsp;        )
-&nbsp;        OutlinedTextField(
-&nbsp;            value = remainderFormatted ?: line.amount,
-&nbsp;            onValueChange = { typed -&gt;
-&nbsp;                onEvent(TransactionCreationEvent.OnSplitLineAmountChanged(line.key, typed))
-&nbsp;            },
-&nbsp;            label = { Text(stringResource(Res.string.transaction_creation_amount_label)) },
-&nbsp;            singleLine = true,
-&nbsp;            readOnly = remainderFormatted != null,
-&nbsp;            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-&nbsp;            shape = AppTheme.shapes.extraSmall,
-&nbsp;            modifier = Modifier
-&nbsp;                .width(SPLIT_AMOUNT_FIELD_WIDTH)
-&nbsp;                .testTag(TransactionSplitTestTags.LineAmountPrefix + index),
-&nbsp;        )
-&nbsp;        IconButton(onClick = { onEvent(TransactionCreationEvent.OnSplitLineRemoved(line.key)) }) {
-&nbsp;            Icon(
-&nbsp;                imageVector = SurferIcons.Close,
-&nbsp;                contentDescription = stringResource(Res.string.transaction_creation_split_remove_line),
-&nbsp;                tint = AppTheme.materialColors.onSurfaceVariant,
-&nbsp;            )
-&nbsp;        }
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;/**
-&nbsp; * How the lines stand against the amount. Over-assigning is the only state the editor calls out in
-&nbsp; * error colour — a positive remainder is simply a line the user has not filled in yet.
-&nbsp; */
-&nbsp;@Composable
-&nbsp;private fun SplitStatusLine(state: TransactionCreationState.Content, currency: CurrencyCode) {
-&nbsp;    val remainder = state.splitRemainder
-&nbsp;    val overAssigned = remainder.isNegative()
-&nbsp;    val text = when {
-&nbsp;        overAssigned -&gt; stringResource(
-&nbsp;            Res.string.transaction_creation_split_over,
-&nbsp;            MoneyFormatter.format(remainder.abs(), currency),
-&nbsp;        )
-&nbsp;        remainder.isZero() -&gt; stringResource(
-&nbsp;            Res.string.transaction_creation_split_total,
-&nbsp;            MoneyFormatter.format(state.splitTotal, currency),
-&nbsp;            MoneyFormatter.format(state.splitTotal, currency),
-&nbsp;        )
-&nbsp;        else -&gt; stringResource(
-&nbsp;            Res.string.transaction_creation_split_remainder,
-&nbsp;            MoneyFormatter.format(remainder, currency),
-&nbsp;        )
-&nbsp;    }
-&nbsp;    Text(
-&nbsp;        text = text,
-&nbsp;        style = AppTheme.typography.bodySmall,
-&nbsp;        color = if (overAssigned) {
-&nbsp;            AppTheme.materialColors.error
+&nbsp;private fun transactionCreationSeed(
+&nbsp;    transactionId: TransactionId?,
+&nbsp;    duplicate: Boolean,
+&nbsp;): TransactionCreationSeed? = transactionId?.let {
+&nbsp;    TransactionCreationSeed(
+&nbsp;        transactionId = it,
+&nbsp;        mode = if (duplicate) {
+&nbsp;            TransactionCreationSeed.Mode.Duplicate
 &nbsp;        } else {
-&nbsp;            AppTheme.materialColors.onSurfaceVariant
+&nbsp;            TransactionCreationSeed.Mode.Edit
 &nbsp;        },
 &nbsp;    )
 &nbsp;}
 &nbsp;
-&nbsp;/** Wide enough for a five-figure amount without stealing the category picker&#39;s room. */
-&nbsp;private val SPLIT_AMOUNT_FIELD_WIDTH = 132.dp
+&nbsp;@Composable
+&nbsp;fun TransactionCreationScreen(
+&nbsp;    transactionId: TransactionId? = null,
+&nbsp;    accountId: AccountId? = null,
+&nbsp;    /** Treat [transactionId] as a template for a new transaction rather than the row to edit. */
+&nbsp;    duplicate: Boolean = false,
+&nbsp;    /**
+&nbsp;     * Open already switched to Transfer, for a caller that knows that is what the user asked for.
+&nbsp;     * Applied once, when the ViewModel loads — not re-applied on later compositions, so the user
+&nbsp;     * stays wherever they moved the type segment to afterwards.
+&nbsp;     */
+&nbsp;    transfer: Boolean = false,
+&nbsp;    onNavigateBack: () -&gt; Unit,
+&nbsp;    /**
+&nbsp;     * Leaving after the edited transaction was deleted. Defaults to [onNavigateBack]; the nav graph
+&nbsp;     * overrides it to also drop the details screen of the row that no longer exists.
+&nbsp;     */
+&nbsp;    onNavigateBackAfterDelete: () -&gt; Unit = onNavigateBack,
+&nbsp;    onNavigateToCategoryChooser: (CategoryId?, CategoryType) -&gt; Unit,
+&nbsp;    onNavigateToCategoryCreation: () -&gt; Unit,
+&nbsp;    onNavigateToAccountChooser: (AccountId?, AccountId?, Boolean) -&gt; Unit,
+&nbsp;    pickedCategoryId: CategoryId? = null,
+&nbsp;    pickedAccountId: AccountId? = null,
+&nbsp;    transferRequested: Boolean? = null,
+&nbsp;    viewModel: TransactionCreationViewModel = koinViewModel(
+&nbsp;        key = &quot;$transactionId:$accountId:$duplicate:$transfer&quot;,
+&nbsp;    ) { parametersOf(transactionCreationSeed(transactionId, duplicate), accountId, transfer) },
+&nbsp;) {
+&nbsp;    val state by viewModel.collectAsStateWithLifecycle()
+&nbsp;
+&nbsp;    viewModel.HandleSideEffect { effect -&gt;
+&nbsp;        when (effect) {
+&nbsp;            TransactionCreationEffect.NavigateBack -&gt; onNavigateBack()
+&nbsp;            TransactionCreationEffect.NavigateBackAfterDelete -&gt; onNavigateBackAfterDelete()
+&nbsp;            is TransactionCreationEffect.NavigateToCategoryChooser -&gt; onNavigateToCategoryChooser(
+&nbsp;                effect.selectedCategoryId,
+&nbsp;                effect.filterType,
+&nbsp;            )
+&nbsp;            TransactionCreationEffect.NavigateToCategoryCreation -&gt; onNavigateToCategoryCreation()
+&nbsp;            is TransactionCreationEffect.NavigateToAccountChooser -&gt; onNavigateToAccountChooser(
+&nbsp;                effect.selectedAccountId,
+&nbsp;                effect.excludeAccountId,
+&nbsp;                effect.showTransferShortcut,
+&nbsp;            )
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    LaunchedEffect(pickedCategoryId) {
+&nbsp;        val id = pickedCategoryId ?: return@LaunchedEffect
+&nbsp;        viewModel.onEvent(TransactionCreationEvent.OnCategoryPicked(id))
+&nbsp;    }
+&nbsp;
+&nbsp;    LaunchedEffect(pickedAccountId) {
+&nbsp;        val id = pickedAccountId ?: return@LaunchedEffect
+&nbsp;        viewModel.onEvent(TransactionCreationEvent.OnAccountPicked(id))
+&nbsp;    }
+&nbsp;
+&nbsp;    // [transfer] is deliberately absent here — it is a route argument, true for as long as this
+&nbsp;    // entry lives, so replaying it on every composition would drag the user back to the Transfer
+&nbsp;    // tab after they had switched away. It seeds the ViewModel&#39;s initial state instead.
+&nbsp;    LaunchedEffect(transferRequested) {
+&nbsp;        if (transferRequested != true) return@LaunchedEffect
+&nbsp;        viewModel.onEvent(TransactionCreationEvent.OnTypeChanged(TransactionTypeUi.Transfer))
+&nbsp;    }
+&nbsp;
+&nbsp;    when (val current = state) {
+&nbsp;        TransactionCreationState.Loading -&gt; TransactionCreationLoading(onEvent = viewModel::onEvent)
+&nbsp;        is TransactionCreationState.Content -&gt; TransactionCreationContent(
+&nbsp;            state = current,
+&nbsp;            onEvent = viewModel::onEvent,
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@OptIn(ExperimentalMaterial3Api::class)
+&nbsp;@Composable
+&nbsp;private fun TransactionCreationLoading(onEvent: (TransactionCreationEvent) -&gt; Unit) {
+&nbsp;    Scaffold(
+&nbsp;        modifier = Modifier.surferSafeInsets(),
+&nbsp;        containerColor = AppTheme.materialColors.surface,
+&nbsp;        topBar = {
+&nbsp;            TopAppBar(
+&nbsp;                title = { Text(stringResource(Res.string.transaction_creation_title_create)) },
+&nbsp;                navigationIcon = {
+&nbsp;                    Box(
+&nbsp;                        modifier = Modifier
+&nbsp;                            .padding(start = 4.dp)
+&nbsp;                            .size(48.dp)
+&nbsp;                            .clickable { onEvent(TransactionCreationEvent.OnBackClick) },
+&nbsp;                        contentAlignment = Alignment.Center,
+&nbsp;                    ) {
+&nbsp;                        Icon(
+&nbsp;                            imageVector = SurferIcons.Close,
+&nbsp;                            contentDescription = stringResource(
+&nbsp;                                Res.string.transaction_creation_close_content_description,
+&nbsp;                            ),
+&nbsp;                        )
+&nbsp;                    }
+&nbsp;                },
+&nbsp;                colors = TopAppBarDefaults.topAppBarColors(
+&nbsp;                    containerColor = AppTheme.materialColors.surface,
+&nbsp;                ),
+&nbsp;            )
+&nbsp;        },
+&nbsp;    ) { padding -&gt;
+&nbsp;        Box(modifier = Modifier.fillMaxSize().padding(padding))
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@OptIn(ExperimentalMaterial3Api::class)
+&nbsp;@Composable
+&nbsp;internal fun TransactionCreationContent(
+&nbsp;    state: TransactionCreationState.Content,
+&nbsp;    onEvent: (TransactionCreationEvent) -&gt; Unit,
+&nbsp;    amountState: TextFieldState = rememberTextFieldState(state.amount),
+&nbsp;    toAmountState: TextFieldState = rememberTextFieldState(state.toAmount),
+&nbsp;) {
+&nbsp;    SyncAmountFields(state = state, amountState = amountState, toAmountState = toAmountState, onEvent = onEvent)
+&nbsp;
+&nbsp;    if (state.showDeleteConfirmation) {
+&nbsp;        SurferDeleteTransactionDialog(
+&nbsp;            titleOrNull = state.note.ifBlank { null },
+&nbsp;            onConfirm = { onEvent(TransactionCreationEvent.OnDeleteConfirmed) },
+&nbsp;            onDismiss = { onEvent(TransactionCreationEvent.OnDeleteDismissed) },
+&nbsp;            isTransfer = state.isTransfer,
+&nbsp;            isSplit = state.isEditingSplitLeg,
+&nbsp;        )
+&nbsp;    }
+&nbsp;
+&nbsp;    Scaffold(
+&nbsp;        modifier = Modifier
+&nbsp;            .surferSafeInsets()
+&nbsp;            .surferTestTagAsId()
+&nbsp;            .testTag(TransactionCreationTestTags.Root),
+&nbsp;        containerColor = AppTheme.materialColors.surface,
+&nbsp;        topBar = { CreationTopBar(state = state, onEvent = onEvent) },
+&nbsp;    ) { padding -&gt;
+&nbsp;        Column(
+&nbsp;            modifier = Modifier
+&nbsp;                .fillMaxSize()
+&nbsp;                .surferContentContainer()
+&nbsp;                .padding(top = padding.calculateTopPadding())
+&nbsp;                .verticalScroll(rememberScrollState()),
+&nbsp;        ) {
+&nbsp;            state.editIdentity?.let { identity -&gt;
+&nbsp;                EditIdentityBand(
+&nbsp;                    identity = identity,
+&nbsp;                    modifier = Modifier
+&nbsp;                        .fillMaxWidth()
+&nbsp;                        .padding(horizontal = 16.dp)
+&nbsp;                        .padding(bottom = AppTheme.spacing.default),
+&nbsp;                )
+&nbsp;            }
+&nbsp;
+&nbsp;            TypeSegments(state = state, onEvent = onEvent)
+&nbsp;
+&nbsp;            Spacer(Modifier.height(AppTheme.spacing.large))
+&nbsp;
+&nbsp;            if (state.isTransfer) {
+&nbsp;                TransferAccountsBlock(
+&nbsp;                    state = state,
+&nbsp;                    fromAmountState = amountState,
+&nbsp;                    toAmountState = toAmountState,
+&nbsp;                    onEvent = onEvent,
+&nbsp;                )
+&nbsp;            } else {
+&nbsp;                AmountHero(
+&nbsp;                    type = state.type,
+&nbsp;                    currencySymbol = currencySymbol(state.selectedAccount?.currencyCode),
+&nbsp;                    amountState = amountState,
+&nbsp;                    error = state.amountError,
+&nbsp;                )
+&nbsp;            }
+&nbsp;
+&nbsp;            Spacer(Modifier.height(AppTheme.spacing.default))
+&nbsp;
+&nbsp;            Column(
+&nbsp;                modifier = Modifier
+&nbsp;                    .fillMaxSize()
+&nbsp;                    .padding(horizontal = 16.dp)
+&nbsp;                    .padding(bottom = padding.calculateBottomPadding() + AppTheme.spacing.large),
+&nbsp;                verticalArrangement = Arrangement.spacedBy(AppTheme.spacing.medium),
+&nbsp;            ) {
+&nbsp;                if (!state.isTransfer) {
+&nbsp;                    SurferPickerRow(
+&nbsp;                        label = stringResource(Res.string.transaction_creation_account_label),
+&nbsp;                        value = state.selectedAccount?.name
+&nbsp;                            ?: stringResource(Res.string.transaction_creation_account_empty),
+&nbsp;                        icon = SurferIcons.CreditCard,
+&nbsp;                        onClick = { onEvent(TransactionCreationEvent.OnOpenAccountChooser) },
+&nbsp;                    )
+&nbsp;
+&nbsp;                    // The grid picks the transaction&#39;s single category, so it has nothing to say
+&nbsp;                    // once the receipt is being split — each line picks its own instead.
+&nbsp;                    if (state.isSplit) {
+&nbsp;                        SplitLinesBlock(state = state, onEvent = onEvent)
+&nbsp;                    } else {
+&nbsp;                        CategoryGridSection(
+&nbsp;                            categories = state.displayCategories,
+&nbsp;                            selected = state.selectedCategory,
+&nbsp;                            onSelect = { onEvent(TransactionCreationEvent.OnCategorySelected(it)) },
+&nbsp;                            onAllClick = { onEvent(TransactionCreationEvent.OnOpenCategoryChooser) },
+&nbsp;                            onMoreClick = { onEvent(TransactionCreationEvent.OnOpenCategoryCreation) },
+&nbsp;                        )
+&nbsp;                    }
+&nbsp;
+&nbsp;                    SplitToggleRow(state = state, onEvent = onEvent)
+&nbsp;                }
+&nbsp;
+&nbsp;                OutlinedTextField(
+&nbsp;                    value = state.note,
+&nbsp;                    onValueChange = { onEvent(TransactionCreationEvent.OnNoteChanged(it)) },
+&nbsp;                    label = { Text(stringResource(Res.string.transaction_creation_note_label)) },
+&nbsp;                    shape = AppTheme.shapes.extraSmall,
+&nbsp;                    modifier = Modifier
+&nbsp;                        .fillMaxWidth()
+&nbsp;                        .testTag(TransactionCreationTestTags.Note),
+&nbsp;                    minLines = 2,
+&nbsp;                    maxLines = 4,
+&nbsp;                )
+&nbsp;
+&nbsp;                DateRow(state = state, onEvent = onEvent)
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;/** Keeps the two text-field buffers and the ViewModel&#39;s amounts in step, in both directions. */
+&nbsp;@Composable
+&nbsp;private fun SyncAmountFields(
+&nbsp;    state: TransactionCreationState.Content,
+&nbsp;    amountState: TextFieldState,
+&nbsp;    toAmountState: TextFieldState,
+&nbsp;    onEvent: (TransactionCreationEvent) -&gt; Unit,
+&nbsp;) {
+&nbsp;    LaunchedEffect(amountState) {
+&nbsp;        snapshotFlow { amountState.text.toString() }
+&nbsp;            .collect { onEvent(TransactionCreationEvent.OnAmountChanged(it)) }
+&nbsp;    }
+&nbsp;    LaunchedEffect(state.amount) {
+&nbsp;        if (amountState.text.toString() != state.amount) {
+&nbsp;            amountState.edit { replace(0, length, state.amount) }
+&nbsp;        }
+&nbsp;    }
+&nbsp;    LaunchedEffect(toAmountState) {
+&nbsp;        snapshotFlow { toAmountState.text.toString() }
+&nbsp;            .collect { onEvent(TransactionCreationEvent.OnToAmountChanged(it)) }
+&nbsp;    }
+&nbsp;    LaunchedEffect(state.toAmount) {
+&nbsp;        if (toAmountState.text.toString() != state.toAmount) {
+&nbsp;            toAmountState.edit { replace(0, length, state.toAmount) }
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun TypeSegments(
+&nbsp;    state: TransactionCreationState.Content,
+&nbsp;    onEvent: (TransactionCreationEvent) -&gt; Unit,
+&nbsp;) {
+&nbsp;    // Editing an existing single-leg transaction can&#39;t morph into a paired transfer in place —
+&nbsp;    // hide the Transfer segment to avoid silently creating a new transfer pair alongside the
+&nbsp;    // original row. The offline build also hides Transfer entirely (multi-account transfers are
+&nbsp;    // out of MVP scope) via `transferEnabled`.
+&nbsp;    val transferVisible = !state.isEditMode &amp;&amp; state.transferEnabled
+&nbsp;    val typeOptions = remember(transferVisible) {
+&nbsp;        if (transferVisible) {
+&nbsp;            listOf(TransactionTypeUi.Expense, TransactionTypeUi.Income, TransactionTypeUi.Transfer)
+&nbsp;        } else {
+&nbsp;            listOf(TransactionTypeUi.Expense, TransactionTypeUi.Income)
+&nbsp;        }
+&nbsp;    }
+&nbsp;    val expenseLabel = stringResource(Res.string.transaction_creation_expense)
+&nbsp;    val incomeLabel = stringResource(Res.string.transaction_creation_income)
+&nbsp;    val transferLabel = stringResource(Res.string.transaction_creation_transfer)
+&nbsp;    SurferSegmentedControl(
+&nbsp;        options = typeOptions,
+&nbsp;        selected = state.type,
+&nbsp;        label = {
+&nbsp;            when (it) {
+&nbsp;                TransactionTypeUi.Expense -&gt; expenseLabel
+&nbsp;                TransactionTypeUi.Income -&gt; incomeLabel
+&nbsp;                TransactionTypeUi.Transfer -&gt; transferLabel
+&nbsp;            }
+&nbsp;        },
+&nbsp;        onSelect = { onEvent(TransactionCreationEvent.OnTypeChanged(it)) },
+&nbsp;        modifier = Modifier
+&nbsp;            .fillMaxWidth()
+&nbsp;            .padding(horizontal = 16.dp),
+&nbsp;        optionTestTag = { type -&gt;
+&nbsp;            TransactionCreationTestTags.TypePrefix + type.name.lowercase()
+&nbsp;        },
+&nbsp;    )
+&nbsp;}
+&nbsp;
+&nbsp;@Composable
+&nbsp;private fun DateRow(
+&nbsp;    state: TransactionCreationState.Content,
+&nbsp;    onEvent: (TransactionCreationEvent) -&gt; Unit,
+&nbsp;) {
+&nbsp;    var showDatePicker by remember { mutableStateOf(false) }
+&nbsp;    Row(
+&nbsp;        modifier = Modifier.fillMaxWidth(),
+&nbsp;        horizontalArrangement = Arrangement.spacedBy(8.dp),
+&nbsp;        verticalAlignment = Alignment.CenterVertically,
+&nbsp;    ) {
+&nbsp;        DateTimeField(
+&nbsp;            timestamp = state.timestamp,
+&nbsp;            onClick = { showDatePicker = true },
+&nbsp;            modifier = Modifier.weight(1f),
+&nbsp;        )
+&nbsp;        SurferButton(
+&nbsp;            text = stringResource(Res.string.transaction_creation_today),
+&nbsp;            onClick = { onEvent(TransactionCreationEvent.OnTodayClick) },
+&nbsp;            style = SurferButtonStyle.Tonal,
+&nbsp;            size = SurferButtonSize.Biggest,
+&nbsp;            startIcon = SurferIcons.Event,
+&nbsp;        )
+&nbsp;    }
+&nbsp;
+&nbsp;    if (showDatePicker) {
+&nbsp;        TransactionDatePickerDialog(
+&nbsp;            initialTimestamp = state.timestamp,
+&nbsp;            onDismiss = { showDatePicker = false },
+&nbsp;            onConfirm = { picked -&gt;
+&nbsp;                onEvent(TransactionCreationEvent.OnDateChanged(picked))
+&nbsp;                showDatePicker = false
+&nbsp;            },
+&nbsp;        )
+&nbsp;    }
+&nbsp;}
 </code>
 </pre>
 </div>
@@ -270,7 +494,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-28 23:01</div>
+    <div style="float:right;">generated on 2026-07-29 11:10</div>
 </div>
 </body>
 </html>
