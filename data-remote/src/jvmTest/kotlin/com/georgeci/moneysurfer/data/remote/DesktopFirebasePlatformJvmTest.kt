@@ -1,5 +1,6 @@
 package com.georgeci.moneysurfer.data.remote
 
+import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.booleans.shouldBeFalse
 import io.kotest.matchers.booleans.shouldBeTrue
@@ -121,6 +122,13 @@ class DesktopFirebasePlatformJvmTest : StringSpec({
         readerDone.await(JOIN_TIMEOUT_SECONDS, TimeUnit.SECONDS).shouldBeTrue()
 
         partialReads.get() shouldBe 0
+    }
+
+    // Every diagnostic the java-sdk emits goes through this sink. It has no return value,
+    // so the only contract is that it never throws — an exception here would surface
+    // inside SDK internals, on whichever executor happened to be logging.
+    "the logging sink accepts a message without throwing" {
+        shouldNotThrowAny { DesktopFirebasePlatform(storeFile()).log("Firestore: watch stream open") }
     }
 
     "the database path is a file whose parent exists, not a directory" {

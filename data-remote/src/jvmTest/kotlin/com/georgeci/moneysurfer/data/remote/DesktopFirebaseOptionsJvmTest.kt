@@ -80,4 +80,18 @@ class DesktopFirebaseOptionsJvmTest : StringSpec({
         failure.message.orEmpty() shouldContain "MS_FIREBASE_APP_ID"
         failure.message.orEmpty() shouldContain "MS_USE_EMULATOR=true"
     }
+
+    // `export MS_FIREBASE_API_KEY=` leaves the variable set but empty. Passing that
+    // through would defer the failure to Firebase itself, which reports it as an opaque
+    // auth error long after startup rather than as the missing configuration it is.
+    "a blank variable is treated as missing rather than passed through" {
+        val failure = shouldThrow<IllegalStateException> {
+            desktopFirebaseOptions(
+                useEmulator = false,
+                env = { name -> if (name == "MS_FIREBASE_API_KEY") "  " else "set" },
+            )
+        }
+
+        failure.message.orEmpty() shouldContain "MS_FIREBASE_API_KEY"
+    }
 })
