@@ -329,6 +329,16 @@ changes. Never skip this — it's the only way to tell which rules are deployed.
 Device integration tests need Firebase Emulator Suite and an Android
 emulator/device. See [docs/testing/qa-runbook.md](docs/testing/qa-runbook.md).
 
+On the PR side, each workflow decides what to run from one shared filter,
+[.github/actions/paths-gate](.github/actions/paths-gate/action.yml), which
+exposes one output per build target (`kotlin`, `android`, `ios`, `rules`, `js`,
+`docs`). A Firestore-rules PR does not link the iOS framework; a Kotlin PR does
+not boot the Firestore emulator. **Patterns in that file must be positive** —
+`dorny/paths-filter` OR-s its matchers, so a `'!'` pattern adds rather than
+subtracts (`actionlint.yml` fails the build if one reappears). Which job each
+target gates, and how to add a new one:
+[docs/ci/pr-checks.md](docs/ci/pr-checks.md).
+
 ## Git Conventions
 
 Branch names use a type prefix and a short kebab-case slug describing the

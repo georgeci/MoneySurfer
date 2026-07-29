@@ -18,15 +18,31 @@ permissions:
   contents: read
 
 jobs:
-  # Same fan-out gate as ci.yml: skip CodeQL on doc-only / AI-tooling changes
-  # via job-level `if:` instead of top-level `paths-ignore`, so required
-  # status checks still report. Schedule-triggered runs always proceed.
+  # Same fan-out gate as ci.yml, via job-level `if:` instead of top-level
+  # `paths-ignore` so required status checks still report.
+  #
+  # The gate also composes the analysis matrix, because the two legs have
+  # nothing to do with each other: all JavaScript in this repo lives under
+  # firestore-tests/, so a Kotlin PR used to spin up a second 40-minute-budget
+  # runner to analyse an unchanged Mocha suite, and vice versa. A job-level
+  # `if:` cannot read the `matrix` context, so the legs are selected here and
+  # fed to `strategy.matrix` via fromJSON. Schedule and manual runs take both.
+  #
+  # CAVEAT — this is the one gate in the repo that does not preserve "a skipped
+  # job still reports". A job skipped by its `if:` reports as skipped and
+  # satisfies a required status check; a matrix leg that is absent from the
+  # matrix produces no check run at all. `main` currently has no required
+  # status checks, so nothing is blocked today. If `Analyze (java-kotlin)` or
+  # `Analyze (javascript-typescript)` is ever made required, this must go back
+  # to a static two-leg matrix with the per-leg gate moved onto the steps —
+  # otherwise a Kotlin-only PR waits forever for a check that never appears.
   changes:
     name: Detect relevant changes
     runs-on: ubuntu-latest
     timeout-minutes: 2
     outputs:
-      code: ${{ steps.gate.outputs.code }}
+      matrix: ${{ steps.matrix.outputs.legs }}
+      any: ${{ steps.matrix.outputs.any }}
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -35,15 +51,43 @@ jobs:
         id: gate
         uses: ./.github/actions/paths-gate
 
+      - name: Compose analysis matrix
+        id: matrix
+        shell: bash
+        env:
+          # On a schedule the filter can only see the last commit on main (no
+          # base ref to diff against), which says nothing about what the weekly
+          # scan should cover — so force both legs, as before.
+          FORCE_ALL: ${{ github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' }}
+          ANDROID: ${{ steps.gate.outputs.android }}
+          JS: ${{ steps.gate.outputs.js }}
+        run: |
+          set -euo pipefail
+          legs=()
+          if [[ "$FORCE_ALL" == "true" || "$ANDROID" == "true" ]]; then
+            legs+=('{"language":"java-kotlin","build-mode":"manual"}')
+          fi
+          if [[ "$FORCE_ALL" == "true" || "$JS" == "true" ]]; then
+            legs+=('{"language":"javascript-typescript","build-mode":"none"}')
+          fi
+          if [[ ${#legs[@]} -eq 0 ]]; then
+            echo "legs={\"include\":[]}" >> "$GITHUB_OUTPUT"
+            echo "any=false" >> "$GITHUB_OUTPUT"
+            echo "No CodeQL-relevant changes — analysis skipped."
+            exit 0
+          fi
+          printf -v joined '%s,' "${legs[@]}"
+          echo "legs={\"include\":[${joined%,}]}" >> "$GITHUB_OUTPUT"
+          echo "any=true" >> "$GITHUB_OUTPUT"
+          echo "Analysing: ${joined%,}"
+
   analyze:
     name: Analyze (${{ matrix.language }})
     runs-on: ubuntu-latest
     timeout-minutes: 40
     needs: changes
-    # Run on schedule unconditionally; otherwise only when code paths changed.
-    if: >-
-      github.event_name == 'schedule' ||
-      needs.changes.outputs.code == 'true'
+    # An empty matrix is a hard error, so gate on the gate's own verdict.
+    if: needs.changes.outputs.any == 'true'
     permissions:
       security-events: write
       actions: read
@@ -54,12 +98,7 @@ jobs:
 
     strategy:
       fail-fast: false
-      matrix:
-        include:
-          - language: java-kotlin
-            build-mode: manual
-          - language: javascript-typescript
-            build-mode: none
+      matrix: ${{ fromJSON(needs.changes.outputs.matrix) }}
 
     steps:
       # Egress audit — see docs/security/ci-egress-hardening.md (issue #180).

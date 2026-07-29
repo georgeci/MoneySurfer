@@ -32,3 +32,23 @@ jobs:
         uses: docker://rhysd/actionlint:1.7.7
         with:
           args: -color
+
+      # dorny/paths-filter compiles each pattern into its own picomatch matcher
+      # and OR-s them (`predicate-quantifier` defaults to `some`), so a `!`
+      # pattern does not subtract — picomatch inverts it and the OR swallows the
+      # result. The original gate was written as `'**'` minus a list of `'!'`
+      # doc patterns and was therefore unconditionally true: every doc-only PR
+      # ran the whole pipeline, macos-15 lane included, for as long as it stood.
+      # Nothing in actionlint can see that, so assert it here.
+      - name: Reject negated patterns in the paths gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          gate=.github/actions/paths-gate/action.yml
+          # Both quote styles: `- "!docs/**"` is just as valid YAML as the
+          # single-quoted form the original gate used, and just as broken.
+          if grep -nE "^[[:space:]]*-[[:space:]]*[\"']!" "$gate"; then
+            echo "::error file=$gate::Negated patterns don't subtract in dorny/paths-filter — scope a target by listing what it consumes instead. See the action's description."
+            exit 1
+          fi
+          echo "Paths gate uses positive patterns only."

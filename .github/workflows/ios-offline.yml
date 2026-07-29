@@ -25,17 +25,20 @@ permissions:
   contents: read
 
 jobs:
-  # Same fan-out gate as ci.yml: skip the expensive macOS job on doc-only /
-  # AI-tooling PRs via job-level `if:` instead of top-level `paths-ignore`,
-  # so a required status check still reports. Push-to-main and manual runs
-  # build unconditionally (the gate job doesn't even start for them).
+  # Same fan-out gate as ci.yml, via job-level `if:` instead of top-level
+  # `paths-ignore` so a required status check still reports. Push-to-main and
+  # manual runs build unconditionally (the gate job doesn't even start).
+  #
+  # macos-15 minutes cost roughly ten times ubuntu's, so this is the lane that
+  # most wants a precise filter: a Firestore-rules, JavaScript or documentation
+  # PR cannot move the Kotlin/Native framework and no longer links it.
   changes:
     name: Detect relevant changes
     runs-on: ubuntu-latest
     timeout-minutes: 2
     if: github.event_name == 'pull_request'
     outputs:
-      code: ${{ steps.gate.outputs.code }}
+      ios: ${{ steps.gate.outputs.ios }}
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -54,7 +57,7 @@ jobs:
     # then gates PR runs on the paths filter.
     if: >-
       !cancelled() &&
-      (github.event_name != 'pull_request' || needs.changes.outputs.code == 'true')
+      (github.event_name != 'pull_request' || needs.changes.outputs.ios == 'true')
 
     steps:
       - name: Checkout

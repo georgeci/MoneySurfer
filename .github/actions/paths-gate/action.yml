@@ -1,23 +1,92 @@
 name: Paths gate
 description: >-
-  Single source of truth for the doc-only / AI-tooling path filter shared by
-  ci.yml, codeql.yml and ios-offline.yml. Runs dorny/paths-filter and exposes
-  `code` = true iff at least one non-doc / non-AI-tooling file changed.
+  Single source of truth for the per-target path filters shared by ci.yml,
+  codeql.yml and ios-offline.yml. Each output answers exactly one question —
+  "can this change possibly break <target>?" — so a caller gates one expensive
+  job on one output and nothing else.
+
+  This used to expose a single `code` output, written as `'**'` minus a list of
+  `'!'` doc patterns. That never worked: dorny compiles each pattern into its
+  own picomatch matcher and OR-s them (`predicate-quantifier` defaults to
+  `some`), so `'**'` alone matched every file and `code` was unconditionally
+  true — the advertised doc-only skip never fired once, and a README-only PR
+  paid for the JVM suite, Sonar, the Firestore emulator and a macos-15
+  framework link.
+
+  Hence the rule for editing this file: **positive patterns only**. A `'!'`
+  pattern here does not subtract, it adds (picomatch inverts it, and the OR
+  swallows the result). Scope a target by listing what it consumes, never by
+  excluding what it doesn't.
+
+  Every code target folds in `plumbing` (toolchain, lockfiles, CI wiring) via a
+  YAML anchor — a version bump or a workflow edit can break any target, so it
+  must never be filtered out. Callers therefore need a single output token per
+  job.
 
   The caller job must check out the repo first (local composite action) and
-  wire `outputs.code` to this action's `code` output.
+  wire the outputs it needs. `workflow_dispatch` has no base ref to diff
+  against, so callers keep gating manual runs with an explicit
+  `|| github.event_name == 'workflow_dispatch'`.
+
+  Known blind spot: `iosApp/**` (the *online* iOS app) is Swift-only and no PR
+  job compiles it — ios-offline.yml builds `iosAppOffline`, android-compile and
+  CodeQL build `:androidApp`. A Swift-only change there now skips every PR job
+  instead of running all of them against unrelated targets; it never had a PR
+  build signal, only the illusion of one. That signal lives in nightly.yml and
+  ios-distribute.yml, unchanged.
 
 outputs:
-  code:
-    description: "true iff at least one non-doc / non-AI-tooling file changed."
-    value: ${{ steps.filter.outputs.code }}
   docs:
     description: >-
       true iff a file covered by `scripts/docs_tool.py check` changed (docs/,
-      ai/, the link-checked root docs, or the tool itself). Independent of
-      `code` — the doc paths excluded there are exactly the ones that matter
-      here, so gating a docs check on `code` would never run it.
+      ai/, the link-checked root docs, or the tool itself). Deliberately
+      independent of every code target — a docs-only PR is exactly the one
+      those exclude, so gating the docs check on them would never run it.
     value: ${{ steps.filter.outputs.docs }}
+  plumbing:
+    description: >-
+      true iff the build toolchain or CI wiring changed (gradle/, build-logic/,
+      lockfiles, .github/). Already OR-ed into every other code output — exposed
+      on its own only for the gate summary.
+    value: ${{ steps.filter.outputs.plumbing }}
+  kotlin:
+    description: >-
+      true iff Kotlin sources, Gradle scripts or the detekt config changed.
+      Gates the JVM-scope jobs: junit, detekt, sonar.
+    value: ${{ steps.filter.outputs.kotlin }}
+  android:
+    description: >-
+      true iff anything the Android debug compile consumes changed — Kotlin
+      plus Android resources, manifests and proguard rules. Gates
+      android-compile and the CodeQL java-kotlin leg.
+    value: ${{ steps.filter.outputs.android }}
+  ios:
+    description: >-
+      true iff anything the offline iOS framework link consumes changed:
+      shared Kotlin (every library module is KMP with iOS targets via the
+      kmp.lib convention plugin), the offline Xcode project, or the iOS build
+      scripts. Gates the priciest lane in CI (macos-15), so the win here is
+      the PR that touches no Kotlin at all: rules-only, JS-only, docs-only.
+    value: ${{ steps.filter.outputs.ios }}
+  rules:
+    description: >-
+      true iff the Firestore security rules or their Mocha suite changed.
+      Gates firestore-rules, which boots the Firestore emulator on JDK 21 and
+      is otherwise unrelated to Kotlin — no Kotlin change can alter the rules.
+    value: ${{ steps.filter.outputs.rules }}
+  js:
+    description: >-
+      true iff JavaScript changed (all of it lives under firestore-tests/).
+      Gates the CodeQL javascript-typescript leg, which previously ran on every
+      Kotlin-only PR.
+    value: ${{ steps.filter.outputs.js }}
+  any:
+    description: >-
+      true iff any code target above is true — i.e. the change is not pure
+      prose. Callers use it to force a full run at an integration point (a push
+      to main) where two PRs that each skipped a different lane could only
+      break in combination, while still letting a docs-only push through.
+    value: ${{ steps.any.outputs.value }}
 
 runs:
   using: composite
@@ -26,19 +95,82 @@ runs:
       id: filter
       uses: dorny/paths-filter@7b450fff21473bca461d4b92ce414b9d0420d706 # v4.0.2
       with:
-        # `**` matches everything; subsequent `!`-patterns subtract docs and
-        # AI-tooling. `code` is true iff at least one changed file remains.
+        # `*plumbing` splices the shared list in — dorny flattens YAML anchors
+        # (Filter.parseFilterItemYaml recurses into arrays). Positive patterns
+        # only; see the `!`-is-not-subtraction note in the description above.
+        #
+        # The unlisted-source risk cuts the safe way: `md/` and `.claude/` hold
+        # fetched bundles that can contain a stray .js or .kt, so those PRs may
+        # over-trigger a lane. Over-triggering wastes minutes; under-triggering
+        # ships a break. Never trade one for the other here.
         filters: |
-          code:
-            - '**'
-            - '!**/*.md'
-            - '!.claude/**'
-            - '!.agents/**'
-            - '!ai/**'
-            - '!md/**'
-            - '!docs/**'
-            - '!.github/copilot-instructions.md'
-            - '!LICENSE'
+          plumbing: &plumbing
+            - 'gradle/**'
+            - 'build-logic/**'
+            - 'build.gradle.kts'
+            - 'settings.gradle.kts'
+            - 'gradle.properties'
+            - 'gradlew'
+            - 'gradlew.bat'
+            - '**/*.lockfile'
+            - '.github/actions/**'
+            - '.github/workflows/**'
+          # composeResources/ is a source root, not a resource bundle: Compose
+          # generates typed `Res` accessors from it, so deleting or renaming an
+          # entry is a compile break, and editing a string moves the Roborazzi
+          # references under <module>/screenshots/ that `qaAndroidHost` asserts
+          # against. Both of those live in the `junit` job — omit either path
+          # and a strings-only PR merges green while main goes red.
+          kotlin:
+            - *plumbing
+            - '**/*.kt'
+            - '**/*.kts'
+            - 'config/detekt/**'
+            - '**/src/**/resources/**'
+            - '**/src/**/composeResources/**'
+            - '**/screenshots/**'
+          android:
+            - *plumbing
+            - '**/*.kt'
+            - '**/*.kts'
+            - '**/src/**/resources/**'
+            - '**/src/**/composeResources/**'
+            - '**/src/**/res/**'
+            - '**/AndroidManifest.xml'
+            - 'androidApp/**'
+            - 'androidApp-offline/**'
+            - 'proguard/**'
+            # Module-local rules too (feature/settings/proguard-rules.pro,
+            # consumer-rules.pro) — `proguard/**` only covers the root set.
+            - '**/*.pro'
+          # Every library module is KMP with iOS targets (kmp.lib convention
+          # plugin), so any .kt can move the framework — the filter can't be
+          # narrowed to a module list without going stale on the next module.
+          ios:
+            - *plumbing
+            - '**/*.kt'
+            - '**/*.kts'
+            - '**/src/**/resources/**'
+            - '**/src/**/composeResources/**'
+            - 'composeAppOffline/**'
+            - 'iosAppOffline/**'
+            - 'Version.xcconfig'
+            - 'scripts/ios/**'
+          rules:
+            - *plumbing
+            - 'firestore.rules'
+            - 'firestore.indexes.json'
+            - 'firebase.json'
+            - 'firestore-tests/**'
+            - 'scripts/firebase/**'
+            - 'scripts/deploy-firestore-rules.sh'
+          js:
+            - *plumbing
+            - '**/*.js'
+            - '**/*.ts'
+            - '**/*.mjs'
+            - '**/*.cjs'
+            - 'firestore-tests/**'
           # Inputs of `scripts/docs_tool.py check`: docs/ + ai/ markdown, the
           # extra root files it link-checks, and the tool itself.
           docs:
@@ -48,3 +180,51 @@ runs:
             - '.claude/CLAUDE.md'
             - '.github/copilot-instructions.md'
             - 'scripts/docs_tool.py'
+
+    - name: Combine code targets
+      id: any
+      shell: bash
+      env:
+        GATE_KOTLIN: ${{ steps.filter.outputs.kotlin }}
+        GATE_ANDROID: ${{ steps.filter.outputs.android }}
+        GATE_IOS: ${{ steps.filter.outputs.ios }}
+        GATE_RULES: ${{ steps.filter.outputs.rules }}
+        GATE_JS: ${{ steps.filter.outputs.js }}
+      run: |
+        set -euo pipefail
+        if [[ "$GATE_KOTLIN" == "true" || "$GATE_ANDROID" == "true" || "$GATE_IOS" == "true" ||
+              "$GATE_RULES" == "true" || "$GATE_JS" == "true" ]]; then
+          echo "value=true" >> "$GITHUB_OUTPUT"
+        else
+          echo "value=false" >> "$GITHUB_OUTPUT"
+        fi
+
+    # A job that reports "skipped" is indistinguishable from a job that was
+    # never wired up. Print the verdict so a reviewer wondering why the iOS
+    # lane didn't run can read the answer off the run summary.
+    - name: Write gate summary
+      shell: bash
+      env:
+        GATE_PLUMBING: ${{ steps.filter.outputs.plumbing }}
+        GATE_KOTLIN: ${{ steps.filter.outputs.kotlin }}
+        GATE_ANDROID: ${{ steps.filter.outputs.android }}
+        GATE_IOS: ${{ steps.filter.outputs.ios }}
+        GATE_RULES: ${{ steps.filter.outputs.rules }}
+        GATE_JS: ${{ steps.filter.outputs.js }}
+        GATE_DOCS: ${{ steps.filter.outputs.docs }}
+      run: |
+        set -euo pipefail
+        mark() { if [[ "$1" == "true" ]]; then echo "✅ runs"; else echo "⏭️ skipped"; fi; }
+        {
+          echo "## Paths gate"
+          echo
+          echo "| Target | Verdict | Gated jobs |"
+          echo "|---|---|---|"
+          echo "| plumbing | $(mark "$GATE_PLUMBING") | folded into every target below |"
+          echo "| kotlin | $(mark "$GATE_KOTLIN") | junit, detekt, sonar |"
+          echo "| android | $(mark "$GATE_ANDROID") | android-compile, CodeQL java-kotlin |"
+          echo "| ios | $(mark "$GATE_IOS") | ios-offline (macos-15) |"
+          echo "| rules | $(mark "$GATE_RULES") | firestore-rules |"
+          echo "| js | $(mark "$GATE_JS") | CodeQL javascript-typescript |"
+          echo "| docs | $(mark "$GATE_DOCS") | docs-check |"
+        } >> "$GITHUB_STEP_SUMMARY"

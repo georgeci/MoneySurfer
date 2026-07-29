@@ -18,32 +18,60 @@ permissions:
   contents: read
 
 jobs:
-  # Cheap fan-out gate so doc-only / AI-tooling PRs don't pay for a full
-  # Gradle compile while still reporting status checks (top-level
-  # `paths-ignore` would skip the workflow entirely and stall any required
-  # check in branch protection). The ignore list lives here — single source
-  # of truth for PR and manual runs.
+  # Cheap fan-out gate so a PR only pays for the lanes it can actually break,
+  # while every status check still reports (top-level `paths-ignore` would skip
+  # the workflow entirely and stall a required check in branch protection).
+  # One output per target — see .github/actions/paths-gate, shared with
+  # codeql.yml and ios-offline.yml so the path lists have one source of truth.
   changes:
     name: Detect relevant changes
     runs-on: ubuntu-latest
     timeout-minutes: 2
     outputs:
-      code: ${{ steps.gate.outputs.code }}
+      kotlin: ${{ steps.gate.outputs.kotlin }}
+      android: ${{ steps.gate.outputs.android }}
+      rules: ${{ steps.gate.outputs.rules }}
       docs: ${{ steps.gate.outputs.docs }}
+      full: ${{ steps.full.outputs.value }}
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      # Path filter lives in .github/actions/paths-gate — shared with codeql.yml
-      # and ios-offline.yml so the ignore list has one source of truth.
       - name: Filter paths
         id: gate
         uses: ./.github/actions/paths-gate
 
+      # Every job below reads `<its target> || full`. `full` covers the two
+      # cases where a per-target filter is the wrong tool:
+      #
+      #   workflow_dispatch — no base ref to diff against, so the filter only
+      #     sees the last commit and means nothing; a manual run should do
+      #     everything anyway.
+      #   push to main — the integration point. Two PRs that each legitimately
+      #     skipped a different lane can only break in combination here, and
+      #     the Allure/Kover/Sonar artifacts published from main have to be
+      #     complete rather than reflect whatever the last merge happened to
+      #     touch. Still gated on `any`, so a docs-only push stays cheap —
+      #     which is what the old `code` gate promised and never delivered.
+      - name: Decide whether this is a full run
+        id: full
+        shell: bash
+        env:
+          EVENT: ${{ github.event_name }}
+          ANY: ${{ steps.gate.outputs.any }}
+        run: |
+          set -euo pipefail
+          if [[ "$EVENT" == "workflow_dispatch" || ( "$EVENT" == "push" && "$ANY" == "true" ) ]]; then
+            echo "value=true" >> "$GITHUB_OUTPUT"
+            echo "Full run: every lane, regardless of the per-target filters."
+          else
+            echo "value=false" >> "$GITHUB_OUTPUT"
+          fi
+
   # Validates AI:SECTION markers, the generated docs/AI_INDEX.md, TOC anchors,
   # and local markdown links (issue #193 — `main` went red with nothing in CI
-  # noticing). Deliberately gated on the `docs` filter, NOT on `code`: docs-only
-  # PRs are exactly the ones `code` excludes, so this check must not hide
-  # behind it. Stdlib-only Python, runs in about a second.
+  # noticing). Gated on `docs` alone, never on `full`: a docs-only PR is exactly
+  # the one every code target excludes, so this check has to stand on its own.
+  # Stdlib-only Python, runs in about a second.
   docs-check:
     name: Docs check (docs_tool)
     runs-on: ubuntu-latest
@@ -62,7 +90,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     needs: changes
-    if: needs.changes.outputs.code == 'true' || github.event_name == 'workflow_dispatch'
+    if: needs.changes.outputs.kotlin == 'true' || needs.changes.outputs.full == 'true'
 
     steps:
       # Egress audit — see docs/security/ci-egress-hardening.md (issue #180).
@@ -333,7 +361,12 @@ jobs:
     needs: changes
     # Standalone: uses fake `demo-moneysurfer` project against the local
     # Firestore emulator, so no Firebase secrets needed (runs on fork PRs too).
-    if: needs.changes.outputs.code == 'true' || github.event_name == 'workflow_dispatch'
+    #
+    # Gated on `rules`, not on Kotlin: the suite exercises firestore.rules
+    # through the emulator and never loads a line of app code, so a Kotlin-only
+    # PR cannot change its outcome. That is 20 minutes of emulator boot the
+    # typical PR no longer pays for.
+    if: needs.changes.outputs.rules == 'true' || needs.changes.outputs.full == 'true'
 
     steps:
       - name: Checkout
@@ -468,9 +501,14 @@ jobs:
     # dependency is for the artifact only, so `always()` below keeps the previous
     # behaviour of publishing analysis even when tests go red; the download step is
     # tolerant and the job continues without coverage in that case.
-    needs: [changes, junit]
+    # `detekt` is here for its XML artifact, not for ordering: Sonar imports the
+    # findings via `sonar.kotlin.detekt.reportPaths` and this job used to
+    # regenerate them with a second `./gradlew detekt` run, doubling the work on
+    # every PR. `always()` below keeps analysis publishing when detekt goes red,
+    # and the download step is tolerant.
+    needs: [changes, junit, detekt]
     # Skip on PRs from forks (no SONAR_TOKEN access from fork secrets) and
-    # on doc-only changes (see `changes` job).
+    # on changes that touch no Kotlin (see `changes` job).
     #
     # The fork guard is written as `!= 'pull_request'` rather than comparing
     # `head.repo.full_name` unconditionally: on a `push` there is no
@@ -480,7 +518,7 @@ jobs:
     # baseline and leaves findings visible only on PRs (issue #362).
     if: >-
       always() &&
-      (needs.changes.outputs.code == 'true' || github.event_name == 'workflow_dispatch') &&
+      (needs.changes.outputs.kotlin == 'true' || needs.changes.outputs.full == 'true') &&
       (github.event_name != 'pull_request' ||
        github.event.pull_request.head.repo.full_name == github.repository)
 
@@ -522,12 +560,18 @@ jobs:
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
 
-      # detekt may fail (violations beyond baseline) but we still want its XML
-      # reports for Sonar to ingest, and we don't want it to block analysis
-      # publication. Quality-gate enforcement lives on the SonarCloud side.
-      - name: Run detekt
+      # detekt XML comes from the `detekt` job's artifact rather than a second
+      # `./gradlew detekt` here — same reasoning as the Kover XML below: the
+      # analysis runs exactly once per PR. Restored at the repo root so the
+      # per-module `<module>/build/reports/detekt/detekt.xml` paths that
+      # `sonar.kotlin.detekt.reportPaths` points at line up again. Tolerant of a
+      # missing artifact so a red or skipped detekt still gets Sonar analysis.
+      - name: Download detekt XML reports
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: detekt-xml
+          path: .
         continue-on-error: true
-        run: ./gradlew detekt --stacktrace --continue
 
       # Coverage comes from the `junit` job's merged Kover XML (issue #272). The
       # download target must be exactly build/reports/kover/ — that is the absolute
@@ -562,50 +606,32 @@ jobs:
             echo "::warning::Kover XML has no <sourcefile> elements — Sonar will import nothing."
           fi
 
+      # The issue #272 verification harness that used to wrap this step (`--info`
+      # piped through six greps, plus a full-log artifact) was marked "reverted
+      # before merge" and never was. The coverage regression it chased is now
+      # guarded by the "Check coverage report" step above, which is cheap and
+      # runs every time.
       - name: Run Sonar
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        # TEMPORARY (issue #272 verification, reverted before merge): --info surfaces
-        # the JaCoCo importer sensor, which is the only direct proof that Sonar
-        # actually read the coverage report. Sensor messages are INFO-level, so the
-        # default lifecycle log says nothing either way.
-        run: |
-          set -euo pipefail
-          ./gradlew sonar --stacktrace --info 2>&1 | tee /tmp/sonar-info.log | grep -vE "^\s*$" | tail -5 || true
-          echo "=== JaCoCo import evidence (3 lines of context per sensor) ==="
-          grep -A3 "JaCoCo XML Report Importer \[jacoco\]$" /tmp/sonar-info.log | head -40 || true
-          echo "=== import / no-import verdict lines ==="
-          grep -iE "Importing .*report|No report imported|Coverage report|cannot be found|No coverage" /tmp/sonar-info.log | sort | uniq -c | head -20 || echo "NONE FOUND"
-          echo "=== SyncCoordinatorImpl (the probe file) ==="
-          grep -n "SyncCoordinatorImpl" /tmp/sonar-info.log | head -20 || echo "NOT MENTIONED AT ALL"
-          echo "=== indexed file counts ==="
-          grep -iE "[0-9]+ files indexed|Indexing files|Sensor JaCoCo XML Report Importer \[jacoco\]$|^Project [a-z]|Base dir:|Source paths:" /tmp/sonar-info.log | head -60 || true
-
-      # TEMPORARY (issue #272 verification, reverted before merge): the full --info
-      # log is the only place that says which files the coverage importer matched.
-      - name: Upload Sonar info log
-        if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-        with:
-          name: sonar-info-log
-          path: /tmp/sonar-info.log
-          if-no-files-found: warn
-          retention-days: 3
+        run: ./gradlew sonar --stacktrace
 
   detekt:
     name: detekt (blocking)
     runs-on: ubuntu-latest
     timeout-minutes: 20
     needs: changes
-    if: needs.changes.outputs.code == 'true' || github.event_name == 'workflow_dispatch'
-    # The `sonar` job also runs detekt, but with continue-on-error so its XML
-    # still reaches SonarCloud even on violations — enforcement is delegated to
-    # the Sonar quality gate. A contributor on plain git (not the Claude
-    # /detekt workflow) can push violations that only surface at the Sonar gate
-    # (issue #172 §3). This job is the hard gate: plain `./gradlew detekt`
+    if: needs.changes.outputs.kotlin == 'true' || needs.changes.outputs.full == 'true'
+    # The hard gate. A contributor on plain git (not the Claude /detekt
+    # workflow) can push violations that would otherwise only surface at the
+    # Sonar quality gate (issue #172 §3); plain `./gradlew detekt`
     # (source-only, no type-resolution classpath, so no SDK/compile needed)
-    # blocks the PR the moment a violation lands.
+    # blocks the PR the moment one lands.
+    #
+    # This job is also the sole producer of the detekt XML that SonarCloud
+    # imports — the `sonar` job downloads the artifact below instead of running
+    # detekt a second time.
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -621,16 +647,37 @@ jobs:
         with:
           cache-read-only: true
 
+      # `--continue`: the job still fails on the first violation, but every
+      # module gets its report written first. Without it a violation in an
+      # early module truncates the XML set that Sonar imports downstream.
       - name: Run detekt
-        run: ./gradlew detekt --stacktrace
+        run: ./gradlew detekt --stacktrace --continue
 
-      - name: Upload detekt reports
-        if: failure()
+      # Staged into a directory rather than uploaded straight from the glob:
+      # actions/upload-artifact roots an artifact at the least common ancestor
+      # of the matched files, so a run that produced a single XML would flatten
+      # away the `<module>/build/reports/detekt/` prefix that Sonar's
+      # `reportPaths` needs. Copying under a fixed root pins the layout.
+      - name: Stage detekt XML reports
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          find . -path './detekt-xml' -prune -o \
+                 -path '*/build/reports/detekt/detekt.xml' -print | while read -r f; do
+            dest="detekt-xml/${f#./}"
+            mkdir -p "$(dirname "$dest")"
+            cp "$f" "$dest"
+          done
+          echo "Staged $(find detekt-xml -type f 2>/dev/null | wc -l) detekt XML report(s)."
+
+      - name: Upload detekt XML reports
+        if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: detekt-reports
-          path: "**/build/reports/detekt/*.xml"
-          if-no-files-found: ignore
+          name: detekt-xml
+          path: detekt-xml/
+          if-no-files-found: warn
           retention-days: 14
 
   android-compile:
@@ -655,7 +702,7 @@ jobs:
     # in nightly (issue #170 §2). The offline iOS framework already links on
     # every PR via ios-offline.yml.
     if: >-
-      (needs.changes.outputs.code == 'true' || github.event_name == 'workflow_dispatch') &&
+      (needs.changes.outputs.android == 'true' || needs.changes.outputs.full == 'true') &&
       (github.event_name != 'pull_request' ||
        github.event.pull_request.head.repo.full_name == github.repository)
     permissions:
@@ -701,12 +748,16 @@ jobs:
             && 'gh-pages-write' || format('publish-artifact-{0}', github.run_id) }}
       cancel-in-progress: false
     needs: [changes, junit, firestore-rules]
-    # Skip on doc-only PRs — no fresh test results to aggregate, and we don't
-    # want to overwrite gh-pages with an empty Allure for a docs change.
-    # `always()` so we still publish when individual test jobs go red.
+    # Runs when either producer did, read off the producers themselves rather
+    # than re-deriving their gates here — one less place to update when a lane
+    # moves. There is nothing to aggregate otherwise, and we don't want to
+    # overwrite gh-pages with an empty Allure. `always()` so a red test job
+    # still publishes, and so a skipped producer doesn't cancel this job by way
+    # of `needs`. Bracket syntax because `firestore-rules` has a hyphen in it.
     if: >-
       always() &&
-      (needs.changes.outputs.code == 'true' || github.event_name == 'workflow_dispatch')
+      (needs.junit.result != 'skipped' ||
+       needs['firestore-rules'].result != 'skipped')
     permissions:
       contents: write
 
