@@ -206,6 +206,45 @@ class AccountsManageViewModelTest : StringSpec({
         val content = viewModel.value.shouldBeInstanceOf<AccountsManageState.Content>()
         content.activeAccounts.map { it.id } shouldBe listOf(third.id, first.id, second.id)
     }
+
+    "navigation follows edit mode and carries the clicked account id" {
+        val ws = workspaceId("ws-1")
+        val account = anAccount(id = accountId("a-1"), workspaceId = ws)
+        val viewModel = newViewModel(FakeAccountRepository(listOf(account), ws), ws)
+
+        viewModel.sideEffects.effectFlow.test {
+            viewModel.onEvent(AccountsManageEvent.OnBackClick)
+            awaitItem() shouldBe AccountsManageEffect.NavigateBack
+            viewModel.onEvent(AccountsManageEvent.OnAddAccountClick)
+            awaitItem() shouldBe AccountsManageEffect.NavigateToAccountCreation
+            viewModel.onEvent(AccountsManageEvent.OnAccountClick(account.id))
+            awaitItem() shouldBe AccountsManageEffect.NavigateToAccountDetails(account.id)
+            viewModel.onEvent(AccountsManageEvent.OnToggleEditMode)
+            viewModel.onEvent(AccountsManageEvent.OnAccountClick(account.id))
+            awaitItem() shouldBe AccountsManageEffect.NavigateToAccountEdit(account.id)
+        }
+    }
+
+    "invalid drag and destructive events are safe no-ops" {
+        val ws = workspaceId("ws-1")
+        val account = anAccount(id = accountId("a-1"), workspaceId = ws)
+        val repo = FakeAccountRepository(listOf(account), ws)
+        val viewModel = newViewModel(repo, ws)
+        val missing = accountId("missing")
+
+        viewModel.onEvent(AccountsManageEvent.OnAccountMove(account.id, account.id))
+        viewModel.onEvent(AccountsManageEvent.OnAccountMove(account.id, missing))
+        viewModel.onEvent(AccountsManageEvent.OnArchiveAccountClick(missing))
+        viewModel.onEvent(AccountsManageEvent.OnRemoveAccountClick(missing))
+        viewModel.onEvent(AccountsManageEvent.OnArchiveConfirm)
+        viewModel.onEvent(AccountsManageEvent.OnDeleteConfirm)
+
+        val content = viewModel.value.shouldBeInstanceOf<AccountsManageState.Content>()
+        content.activeAccounts.map { it.id } shouldBe listOf(account.id)
+        content.pendingArchive shouldBe null
+        content.pendingDelete shouldBe null
+        repo.snapshot().map { it.id } shouldBe listOf(account.id)
+    }
 })
 
 private fun threeAccounts(ws: WorkspaceId): Triple<Account, Account, Account> = Triple(
