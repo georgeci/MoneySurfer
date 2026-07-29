@@ -8,7 +8,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.georgeci.moneysurfer.domain.model.BudgetStatus
 import com.georgeci.moneysurfer.uikit.components.SurferCategoryPalette
-import com.georgeci.moneysurfer.uikit.components.budget.SurferBudgetStatus
 import com.georgeci.moneysurfer.uikit.widgets.SurferCategorySpendCap
 import com.georgeci.moneysurfer.uikit.widgets.SurferCategorySpendItem
 import com.georgeci.moneysurfer.uikit.widgets.SurferSpentByCategoryEmpty
@@ -105,13 +104,6 @@ private fun BudgetStatus.statusLabel(): String? = when (this) {
     BudgetStatus.OK -> null
     BudgetStatus.WARN -> stringResource(Res.string.dashboard_spent_by_category_status_warn)
     BudgetStatus.OVER -> stringResource(Res.string.dashboard_spent_by_category_status_over)
-}
-
-/** `uikit` does not depend on `domain`, so the status word crosses over here. */
-private fun BudgetStatus.toWidgetStatus(): SurferBudgetStatus = when (this) {
-    BudgetStatus.OK -> SurferBudgetStatus.Ok
-    BudgetStatus.WARN -> SurferBudgetStatus.Warn
-    BudgetStatus.OVER -> SurferBudgetStatus.Over
 }
 
 /** List key for the uncategorized bucket, which has no category id to be keyed by. */

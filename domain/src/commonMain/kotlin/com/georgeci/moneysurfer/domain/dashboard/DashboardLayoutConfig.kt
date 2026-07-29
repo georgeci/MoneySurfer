@@ -96,8 +96,8 @@ data class DashboardLayoutConfig(
     companion object {
         /**
          * Variant A from the design: the balance headline first, the quick actions under it, then
-         * safe-to-spend, the burn rate that explains it, the accounts strip, the generated
-         * safe-to-spend, where the period's money went, the accounts strip, the generated
+         * safe-to-spend, the burn rate that explains it, the budgets both are read off, where
+         * the period's money went, the accounts strip, the generated
          * insights, goals, and the recent-transactions list. Every widget starts enabled and
          * Hero-sized.
          */
@@ -107,6 +107,7 @@ data class DashboardLayoutConfig(
                 DashboardLayoutItem(DashboardWidgetType.QuickActions),
                 DashboardLayoutItem(DashboardWidgetType.SafeToSpend),
                 DashboardLayoutItem(DashboardWidgetType.BurnRate),
+                DashboardLayoutItem(DashboardWidgetType.Budgets),
                 DashboardLayoutItem(DashboardWidgetType.SpentByCategory),
                 DashboardLayoutItem(DashboardWidgetType.Accounts),
                 DashboardLayoutItem(DashboardWidgetType.Insights),

@@ -26,6 +26,8 @@ val dashboardNavGraph: FeatureNavGraph = { navigator ->
                 onNavigateToGoals = { navigator.push(Route.Goals) },
                 onNavigateToGoalDetails = { goalId -> navigator.push(Route.GoalDetails(goalId.value)) },
                 onNavigateToBudgetCreation = { navigator.push(Route.BudgetCreation()) },
+                onNavigateToBudgets = { navigator.push(Route.Budgets) },
+                onNavigateToBudgetDetails = { budgetId -> navigator.push(Route.BudgetDetails(budgetId.value)) },
             ),
         )
     }

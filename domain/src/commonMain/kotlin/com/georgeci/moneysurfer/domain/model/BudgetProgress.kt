@@ -47,7 +47,15 @@ data class BudgetProgress(
     val hasMixedCurrency: Boolean,
     /** Workspace base currency, carried along so callers can format without a second lookup. */
     val currency: CurrencyCode?,
-)
+) {
+
+    /**
+     * Spend as a fraction of [effectiveLimit] — what a progress bar is drawn from. Can exceed 1,
+     * which is the overspend; a zero limit reads as 0, never as a NaN.
+     */
+    val spentFraction: Float
+        get() = if (effectiveLimit.minor <= 0L) 0f else spent.minor.toFloat() / effectiveLimit.minor.toFloat()
+}
 
 private const val PERCENT = 100
 private const val WEEKLY_DAYS = 7

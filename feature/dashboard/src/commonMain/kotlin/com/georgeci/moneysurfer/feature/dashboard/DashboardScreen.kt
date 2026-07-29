@@ -112,6 +112,8 @@ object DashboardTestTags {
     /** The "Set a budget" link, shown only while the safe-to-spend widget has no budget to read. */
     const val SafeToSpendSetBudget = "dashboard:safeToSpendSetBudget"
     const val BurnRate = "dashboard:burnRate"
+    const val Budgets = "dashboard:budgets"
+    const val BudgetsSeeAll = "dashboard:budgetsSeeAll"
 
     /** The whole spent-by-category card, whichever of its five treatments is selected. */
     const val SpentByCategory = "dashboard:spentByCategory"
@@ -151,7 +153,8 @@ fun DashboardScreen(
 
 private const val DASHBOARD_SKELETON_ROWS = 4
 
-private val DASHBOARD_WIDGET_MIN_HEIGHT = 180.dp
+/** Floor the list-shaped cards share, so a short list does not collapse the column's rhythm. */
+internal val DASHBOARD_WIDGET_MIN_HEIGHT = 180.dp
 
 /** Bottom scroll inset that keeps the last row clear of the extended "Add transaction" FAB. */
 private val DASHBOARD_FAB_CLEARANCE = 88.dp
@@ -293,6 +296,7 @@ private fun DashboardWidget(
         DashboardWidgetType.QuickActions -> QuickActionsWidget(state, onEvent)
         DashboardWidgetType.SafeToSpend -> SafeToSpendWidget(state, onEvent)
         DashboardWidgetType.BurnRate -> BurnRateWidget(state)
+        DashboardWidgetType.Budgets -> BudgetsWidget(state, onEvent)
         DashboardWidgetType.SpentByCategory -> SpentByCategoryWidget(state, variant)
         DashboardWidgetType.Accounts -> AccountsWidget(state, onEvent)
         DashboardWidgetType.Insights -> InsightsWidget(state, variant)
