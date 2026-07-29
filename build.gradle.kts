@@ -71,6 +71,9 @@ tasks.named<de.aaschmid.gradle.plugins.cpd.Cpd>("cpdCheck") {
             "iosAppOffline/**",
             "**/.gradle/**",
             "**/.idea/**",
+            // Claude Code keeps its worktrees under `.claude/worktrees/`, inside the main
+            // checkout: without this every file is its own duplicate, once per live worktree.
+            "**/.claude/**",
             // Platform `actual`-style twins: the android and ios FirebaseCrashReporter
             // are byte-identical because they compile against the same GitLive
             // multiplatform API. Sharing them needs an android+ios intermediate source

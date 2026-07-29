@@ -24,14 +24,6 @@ class StringResourceParityTest : StringSpec({
 
     val keyPattern = Regex("""\bname="([^"]+)"""")
 
-    fun repoRoot(): File {
-        var dir = File(System.getProperty("user.dir")).absoluteFile
-        while (!File(dir, "settings.gradle.kts").exists()) {
-            dir = dir.parentFile ?: error("settings.gradle.kts not found above ${System.getProperty("user.dir")}")
-        }
-        return dir
-    }
-
     /**
      * Each `composeResources` directory that carries a localized `strings.xml`,
      * paired with its EN (base `values/`) and RU (`values-ru/`) files. Either
@@ -40,7 +32,7 @@ class StringResourceParityTest : StringSpec({
      */
     fun resourceBases(root: File): List<Triple<File, File, File>> = root
         .walkTopDown()
-        .onEnter { it.name !in setOf("build", ".git", ".gradle", "node_modules") }
+        .onEnter { it.name !in skippedDirs }
         .filter { it.isDirectory && it.name == "composeResources" }
         .filter { base ->
             File(File(base, "values"), "strings.xml").isFile ||

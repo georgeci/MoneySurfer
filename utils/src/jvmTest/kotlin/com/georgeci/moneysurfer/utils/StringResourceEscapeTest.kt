@@ -28,17 +28,9 @@ class StringResourceEscapeTest : StringSpec({
     // are the ones aapt would have consumed and compose-resources keeps.
     val quoteEscape = Regex("""\\['"]""")
 
-    fun repoRoot(): File {
-        var dir = File(System.getProperty("user.dir")).absoluteFile
-        while (!File(dir, "settings.gradle.kts").exists()) {
-            dir = dir.parentFile ?: error("settings.gradle.kts not found above ${System.getProperty("user.dir")}")
-        }
-        return dir
-    }
-
     fun resourceFiles(): List<File> = repoRoot()
         .walkTopDown()
-        .onEnter { it.name !in setOf("build", ".git", ".gradle", "node_modules") }
+        .onEnter { it.name !in skippedDirs }
         .filter { it.isFile && it.name in setOf("strings.xml", "plurals.xml") }
         .toList()
 
