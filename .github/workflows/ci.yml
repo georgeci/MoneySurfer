@@ -728,13 +728,16 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p allure-results
-          # find returns 0 even with no matches — let the loop body simply not
-          # execute. Avoids relying on `shopt -s globstar` for `**` glob support.
-          find allure-input -type f -name '*.xml' 2>/dev/null | while read -r f; do
+          # Process substitution keeps an empty/missing input from failing under
+          # pipefail and preserves filenames containing whitespace.
+          mapfile -d '' files < <(
+            find allure-input -type f -name '*.xml' -print0 2>/dev/null || true
+          )
+          for f in "${files[@]}"; do
             dest="allure-results/$(echo "${f#allure-input/}" | tr '/' '__')"
             cp "$f" "$dest"
           done
-          echo "Staged $(find allure-results -type f 2>/dev/null | wc -l) XML(s)."
+          echo "Staged ${#files[@]} XML(s)."
 
       # Decide whether this run publishes to Pages. PRs (especially from forks)
       # don't get write access to gh-pages, and the branch protection on main is
