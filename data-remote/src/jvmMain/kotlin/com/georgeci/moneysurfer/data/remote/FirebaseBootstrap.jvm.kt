@@ -59,8 +59,16 @@ fun initializeDesktopFirebase() {
 @Volatile
 private var initialized = false
 
-private fun desktopFirebaseOptions(): FirebaseOptions =
-    if (defaultUseEmulator()) emulatorOptions() else configuredOptions()
+/**
+ * Which Firebase project this host talks to. [useEmulator] and [env] are parameters
+ * rather than direct reads so the branching — in particular the `FIREBASE_PROJECT_ID`
+ * override, which is what keeps the desktop host on the same namespace the emulator
+ * was booted with — is reachable from tests. Production always takes the defaults.
+ */
+internal fun desktopFirebaseOptions(
+    useEmulator: Boolean = defaultUseEmulator(),
+    env: (String) -> String? = System::getenv,
+): FirebaseOptions = if (useEmulator) emulatorOptions(env) else configuredOptions(env)
 
 /**
  * Demo-project options for emulator runs. The emulator ignores the values, but
@@ -68,22 +76,22 @@ private fun desktopFirebaseOptions(): FirebaseOptions =
  * characters starting with "AI", or launch dies on an installations exception.
  * Same dummy shape as the iOS host (issue #219).
  */
-private fun emulatorOptions(): FirebaseOptions = FirebaseOptions(
+private fun emulatorOptions(env: (String) -> String?): FirebaseOptions = FirebaseOptions(
     applicationId = "1:000000000000:android:0000000000000000",
     apiKey = "AIza" + "0".repeat(API_KEY_LENGTH - "AIza".length),
-    projectId = System.getenv(ENV_EMULATOR_PROJECT_ID)?.takeIf { it.isNotBlank() }
+    projectId = env(ENV_EMULATOR_PROJECT_ID)?.takeIf { it.isNotBlank() }
         ?: EMULATOR_PROJECT_ID,
     gcmSenderId = "000000000000",
 )
 
-private fun configuredOptions(): FirebaseOptions = FirebaseOptions(
-    applicationId = requiredEnv(ENV_APP_ID),
-    apiKey = requiredEnv(ENV_API_KEY),
-    projectId = requiredEnv(ENV_PROJECT_ID),
+private fun configuredOptions(env: (String) -> String?): FirebaseOptions = FirebaseOptions(
+    applicationId = requiredEnv(ENV_APP_ID, env),
+    apiKey = requiredEnv(ENV_API_KEY, env),
+    projectId = requiredEnv(ENV_PROJECT_ID, env),
 )
 
-private fun requiredEnv(name: String): String =
-    System.getenv(name)?.takeIf { it.isNotBlank() } ?: error(
+private fun requiredEnv(name: String, env: (String) -> String?): String =
+    env(name)?.takeIf { it.isNotBlank() } ?: error(
         "Desktop Firebase is not configured: set $ENV_APP_ID, $ENV_API_KEY and $ENV_PROJECT_ID " +
             "(values from the Firebase console), or run against the emulator with " +
             "MS_USE_EMULATOR=true. Missing: $name.",
