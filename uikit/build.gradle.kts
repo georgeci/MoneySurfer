@@ -25,7 +25,10 @@ kotlin {
                 implementation(libs.compose.ui)
                 implementation(libs.compose.components.resources)
                 implementation(libs.compose.uiToolingPreview)
-                implementation(compose.materialIconsExtended)
+                // Compose deprecated the generated accessor because this artifact
+                // is frozen at 1.7.3; pin it explicitly until icons migrate to
+                // Material Symbols resources.
+                implementation(libs.compose.materialIconsExtended)
                 implementation(libs.material.kolor)
                 implementation(libs.koalaplot.core)
             }

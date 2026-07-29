@@ -84,6 +84,20 @@ fun loadMaestroTestUser(rootDir: File): Map<String, String> =
     loadKeyValueFile(rootDir.resolve("scripts/e2e-test-user.properties"))
         .filterKeys { it in setOf("TEST_EMAIL", "TEST_PASSWORD") }
 
+/** Quotes one argument for the POSIX shell used by `firebase emulators:exec`. */
+fun shellQuote(value: String): String = "'${value.replace("'", "'\"'\"'")}'"
+
+/**
+ * Builds Maestro `--env` arguments without putting secret values in the
+ * `firebase emulators:exec` command line. The shell expands the inherited
+ * environment only after Firebase starts the child command.
+ */
+fun maestroShellEnvironmentArgs(environment: Map<String, String>): String =
+    environment.keys.joinToString(" ") { key ->
+        require(key.matches(Regex("[A-Z][A-Z0-9_]*"))) { "Unsafe environment variable name: $key" }
+        "--env ${shellQuote("$key=")}\"\$$key\""
+    }
+
 val androidMaestroAppId = "com.georgeci.moneysurfer.dev"
 // iOS Debug mirrors the Android `.dev` flavor (project.pbxproj sets
 // PRODUCT_BUNDLE_IDENTIFIER=com.georgeci.moneysurfer.dev for the Debug config),
@@ -956,7 +970,8 @@ tasks.register<Exec>("qaMaestroAndroid") {
     val reportPath = maestroAllFlowsJunit.absolutePath
     val debugOutputPath = maestroDebugDir.absolutePath
     val testOutputPath = maestroArtifactsDir.absolutePath
-    val envArgs = maestroEmulatorEnv.flatMap { (k, v) -> listOf("--env", "$k=$v") }
+    val envArgs = maestroShellEnvironmentArgs(maestroEmulatorEnv)
+    environment(maestroEmulatorEnv)
     doFirst {
         maestroReportsDir.mkdirs()
         maestroDebugDir.mkdirs()
@@ -968,18 +983,26 @@ tasks.register<Exec>("qaMaestroAndroid") {
             "--project", "demo-moneysurfer",
             "--only", "auth,firestore",
         ) + listOf(
-            (listOf("scripts/firebase/seed.sh", "&&", maestroBin, "test") + envArgs +
-                listOf(
-                    "--format", "junit",
-                    "--output", reportPath,
-                    "--debug-output", debugOutputPath,
-                    "--test-output-dir", testOutputPath,
-                    "--flatten-debug-output",
-                ) + maestroSetupTags.flatMap { listOf("--exclude-tags", it) } +
-                listOf(
-                    flowsDir,
-                ))
-                .joinToString(" "),
+            buildString {
+                append(shellQuote("scripts/firebase/seed.sh"))
+                append(" && ")
+                append(shellQuote(maestroBin))
+                append(" test ")
+                append(envArgs)
+                append(" --format junit --output ")
+                append(shellQuote(reportPath))
+                append(" --debug-output ")
+                append(shellQuote(debugOutputPath))
+                append(" --test-output-dir ")
+                append(shellQuote(testOutputPath))
+                append(" --flatten-debug-output")
+                maestroSetupTags.forEach {
+                    append(" --exclude-tags ")
+                    append(shellQuote(it))
+                }
+                append(' ')
+                append(shellQuote(flowsDir))
+            },
         ),
     )
     doLast {
@@ -1033,7 +1056,8 @@ tasks.register<Exec>("qaMaestroIos") {
     val reportPath = maestroIosAllFlowsJunit.absolutePath
     val debugOutputPath = maestroIosDebugDir.absolutePath
     val testOutputPath = maestroIosArtifactsDir.absolutePath
-    val envArgs = maestroIosEmulatorEnv.flatMap { (k, v) -> listOf("--env", "$k=$v") }
+    val envArgs = maestroShellEnvironmentArgs(maestroIosEmulatorEnv)
+    environment(maestroIosEmulatorEnv)
     doFirst {
         maestroIosReportsDir.mkdirs()
         maestroIosDebugDir.mkdirs()
@@ -1045,23 +1069,28 @@ tasks.register<Exec>("qaMaestroIos") {
             "--project", "demo-moneysurfer",
             "--only", "auth,firestore",
         ) + listOf(
-            (listOf("scripts/firebase/seed.sh", "&&", maestroBin, "test") + envArgs +
-                listOf(
-                    "--platform", "ios",
-                ) + iosMaestroDeviceId?.let { listOf("--device", it) }.orEmpty() +
-                listOf(
-                    "--format", "junit",
-                    "--output", reportPath,
-                    "--debug-output", debugOutputPath,
-                    "--test-output-dir", testOutputPath,
-                    "--flatten-debug-output",
-                ) +
+            buildString {
+                append(shellQuote("scripts/firebase/seed.sh"))
+                append(" && ")
+                append(shellQuote(maestroBin))
+                append(" test ")
+                append(envArgs)
+                append(" --platform ios")
+                iosMaestroDeviceId?.let {
+                    append(" --device ")
+                    append(shellQuote(it))
+                }
+                append(" --format junit --output ")
+                append(shellQuote(reportPath))
+                append(" --debug-output ")
+                append(shellQuote(debugOutputPath))
+                append(" --test-output-dir ")
+                append(shellQuote(testOutputPath))
+                append(" --flatten-debug-output ")
                 // No `--exclude-tags`: the target is a single flow file rather
                 // than the suite directory, so there is nothing to filter out.
-                listOf(
-                    flowTarget,
-                ))
-                .joinToString(" "),
+                append(shellQuote(flowTarget))
+            },
         ),
     )
     doLast {

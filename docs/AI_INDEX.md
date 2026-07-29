@@ -365,7 +365,7 @@
 ## supply-chain
 - Title: What is enforced now
 - File: docs/security/supply-chain.md
-- Lines: 19-185
+- Lines: 19-179
 - Tasks: build, security, supply-chain
 
 ## sync-architecture-rules

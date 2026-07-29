@@ -208,7 +208,9 @@ subprojects {
         config.setFrom(rootProject.files("config/detekt/detekt.yml"))
         baseline = file("$projectDir/config/detekt/baseline.xml")
         buildUponDefaultConfig = true
-        autoCorrect = true
+        // Verification must never mutate the source tree. Formatting belongs in
+        // an explicitly invoked formatter task, not in the CI quality gate.
+        autoCorrect = false
         parallel = true
         source.setFrom(
             "src/commonMain/kotlin",

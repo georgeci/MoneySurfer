@@ -19,11 +19,12 @@ holds the Firebase config secrets and `SONAR_TOKEN`).
 <!-- AI:SECTION id=supply-chain task=build,security,supply-chain -->
 ## What is enforced now
 
-1. **`repositoriesMode = FAIL_ON_PROJECT_REPOS`** ([`settings.gradle.kts`](../../settings.gradle.kts)).
-   No subproject (or a plugin acting on one) can add its own repository. Every
-   dependency must resolve through the curated, group-scoped repositories in
-   `dependencyResolutionManagement` — a rogue `repositories { }` block fails the
-   build instead of widening the trusted source set.
+1. **`repositoriesMode = FAIL_ON_PROJECT_REPOS`** in both
+   [`settings.gradle.kts`](../../settings.gradle.kts) and the
+   [`build-logic`](../../build-logic/settings.gradle.kts) included build. No
+   subproject (or a plugin acting on one) can add its own repository. Every
+   dependency resolves through curated repositories; Google Maven is restricted
+   to Android/Google groups.
 
 2. **Dependency locking** ([`build.gradle.kts`](../../build.gradle.kts), the
    `allprojects { dependencyLocking { … } }` block). `lockAllConfigurations()`
@@ -49,12 +50,18 @@ holds the Firebase config secrets and `SONAR_TOKEN`).
      has already resolved, so the shared plugins (AGP, KGP, Compose, detekt) would
      otherwise stay unpinned.
 
-   Still open: the `build-logic` included build and the settings-level plugin
-   resolution — see [future work](#known-gaps--future-work).
+   The separate `build-logic` build applies the same controls and commits its own
+   `kmp/gradle.lockfile`, `kmp/buildscript-gradle.lockfile`, and
+   `settings-gradle.lockfile`.
 
-Locking also pins **versions**, not artifact **content**: a republish under the
-same coordinate + version is not detected yet. That is what checksum verification
-(see [future work](#known-gaps--future-work)) adds on top.
+4. **SHA-256 dependency verification.** The root
+   [`verification-metadata.xml`](../../gradle/verification-metadata.xml) and the
+   included build's
+   [`verification-metadata.xml`](../../build-logic/gradle/verification-metadata.xml)
+   verify artifact content, so a republish under an already locked coordinate and
+   version fails. Host-specific Compose Desktop/Skiko modules are the only trusted
+   artifact families because their module names differ between macOS and Linux;
+   their versions remain constrained by Compose and dependency locking.
 
 ## Regenerating the lockfiles
 
@@ -63,13 +70,21 @@ Any change to [`gradle/libs.versions.toml`](../../gradle/libs.versions.toml) or 
 lockfiles must be regenerated in the same commit:
 
 ```bash
-./gradlew resolveAndLockAll --write-locks --no-configuration-cache
+./gradlew resolveAndLockAll \
+  --write-locks \
+  --write-verification-metadata sha256 \
+  --no-configuration-cache
+./gradlew -p build-logic :kmp:dependencies \
+  --write-locks \
+  --write-verification-metadata sha256 \
+  --no-configuration-cache
 ```
 
 `resolveAndLockAll` (registered on every project) resolves all resolvable
 configurations in one pass. Run it on a **macOS host** so the iOS/native
 configurations are covered — a Linux-only run omits the `ios*` klib entries.
-Review the diff and commit every touched `*.lockfile`.
+Review and commit every touched `*.lockfile` and
+`gradle/verification-metadata.xml`.
 
 If CI ever fails on a lock mismatch after a legitimate upgrade, that is the
 control working: regenerate, commit, and the diff shows exactly which transitive
@@ -150,36 +165,15 @@ transitive through `-impl` and follows it back down to the same version.
 
 ## Known gaps / future work
 
-These were scoped out of #158's first pass and should each land as follow-ups:
+1. **PGP signature verification** (`verify-signatures=true`). Stronger than
+   checksums but higher maintenance: trusted-key management and explicit
+   exceptions for unsigned artifacts.
 
-1. **Checksum verification (`gradle/verification-metadata.xml`, sha256).** The
-   strongest control — detects a tampered/republished artifact for a fixed
-   coordinate, which locking alone does not. Deferred because a correct file
-   must aggregate the artifacts resolved on **every** runner: `ubuntu-latest`
-   pulls `skiko-awt-runtime-linux-x64`, `macos-15` pulls `…-macos-arm64` plus
-   the iOS klibs. Generating on a single host and committing it breaks the other
-   runner. Rollout:
-   - `./gradlew --write-verification-metadata sha256 help` on macOS, then again
-     on Linux (or in a one-off CI job), and **merge** the two files (Gradle
-     appends to an existing `verification-metadata.xml`).
-   - Start with `<verify-metadata>true</verify-metadata>` +
-     `<verify-signatures>false</verify-signatures>` (checksums only).
-   - Keep the file green in CI on both runners before enabling.
+2. **Host-specific desktop artifacts.** Their artifact contents are trusted
+   rather than checksummed because macOS and Linux resolve different module
+   names. A future two-host metadata merge could remove this narrow exception.
 
-2. **PGP signature verification** (`verify-signatures=true`). Stronger than
-   checksums but higher maintenance (trusted-key management, many unsigned
-   artifacts need `<trusted-artifacts>` entries). Layer on after (1) is stable.
-
-3. **`build-logic` included build + settings plugin resolution.** Project
-   buildscript classpaths are locked (see above), but two plugin-resolution paths
-   are not yet covered: the `build-logic` convention-plugin build (a separate
-   Gradle build, so root `allprojects` / root `buildscript` locking does not
-   reach it — enable `dependencyLocking` inside
-   [`build-logic`](../../build-logic) and commit its lockfiles), and the
-   settings-level `pluginManagement` resolution (`foojay-resolver`), which the
-   root `buildscript { }` block does not lock.
-
-4. **Gradle wrapper + GitHub Actions pinning** is tracked separately in
+3. **Gradle wrapper + GitHub Actions pinning** is tracked separately in
    [#164](https://github.com/georgeci/MoneySurfer/issues/164) (wrapper sha256,
    Allure download, action tags → SHAs, firebase-tools).
 <!-- AI:END -->
