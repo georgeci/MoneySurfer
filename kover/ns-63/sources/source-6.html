@@ -224,6 +224,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;                postSideEffect(WorkspaceSelectorEffect.NavigateToWorkspaceCreation)
 &nbsp;            WorkspaceSelectorEvent.OnConfirmClick -&gt; confirmSelection()
 &nbsp;            WorkspaceSelectorEvent.OnSignOutClick -&gt; signOut()
+&nbsp;            WorkspaceSelectorEvent.OnBackClick -&gt; postSideEffect(WorkspaceSelectorEffect.NavigateBack)
 &nbsp;        }
 &nbsp;    }
 &nbsp;
@@ -366,9 +367,13 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    data object OnCreateWorkspaceClick : WorkspaceSelectorEvent
 &nbsp;    data object OnConfirmClick : WorkspaceSelectorEvent
 &nbsp;    data object OnSignOutClick : WorkspaceSelectorEvent
+&nbsp;
+&nbsp;    /** Toolbar back — only reachable when the selector was pushed onto a stack, i.e. from Settings. */
+&nbsp;    data object OnBackClick : WorkspaceSelectorEvent
 &nbsp;}
 &nbsp;
 &nbsp;sealed interface WorkspaceSelectorEffect {
+&nbsp;    data object NavigateBack : WorkspaceSelectorEffect
 &nbsp;    data object NavigateToDashboard : WorkspaceSelectorEffect
 &nbsp;    data object NavigateToSignIn : WorkspaceSelectorEffect
 &nbsp;    data object NavigateToWorkspaceCreation : WorkspaceSelectorEffect
@@ -398,7 +403,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 12:08</div>
+    <div style="float:right;">generated on 2026-07-29 12:48</div>
 </div>
 </body>
 </html>

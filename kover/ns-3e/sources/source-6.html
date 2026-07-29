@@ -49,34 +49,34 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   <td class="name">DashboardCustomizeScreenKt</td>
 <td class="coverageStat">
   <span class="percent">
-    79.3%
+    76.9%
   </span>
   <span class="absValue">
-    (23/29)
+    (20/26)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    63.3%
+    67.6%
   </span>
   <span class="absValue">
-    (62/98)
+    (73/108)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    91.9%
+    90.9%
   </span>
   <span class="absValue">
-    (158/172)
+    (170/187)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    84.7%
+    84%
   </span>
   <span class="absValue">
-    (1767/2085)
+    (1741/2072)
   </span>
 </td>
 </tr>
@@ -212,34 +212,34 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
-    63.2%
+    60%
   </span>
   <span class="absValue">
-    (24/38)
+    (21/35)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    63.3%
+    67.6%
   </span>
   <span class="absValue">
-    (62/98)
+    (73/108)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    91.9%
+    91%
   </span>
   <span class="absValue">
-    (159/173)
+    (171/188)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    84.8%
+    84.1%
   </span>
   <span class="absValue">
-    (1774/2092)
+    (1748/2079)
   </span>
 </td>
 </tr>
@@ -282,6 +282,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetType
 &nbsp;import com.georgeci.moneysurfer.uikit.components.SurferSkeletonRow
 &nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferDragHandle
+&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferRoundIconButton
 &nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferSectionHeader
 &nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferSectionHeaderHint
 &nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
@@ -289,7 +290,6 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.uikit.components.base.surferReorderHandle
 &nbsp;import com.georgeci.moneysurfer.uikit.components.base.surferReorderableItem
 &nbsp;import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsRow
-&nbsp;import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsSwitch
 &nbsp;import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsValuePill
 &nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 &nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
@@ -300,9 +300,11 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.utils.AsyncState
 &nbsp;import com.georgeci.moneysurfer.utils.HandleSideEffect
 &nbsp;import moneysurfer.feature.dashboard.generated.resources.Res
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_add_content_description
 &nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_available_empty
 &nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_enabled_empty
 &nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_footnote
+&nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_remove_content_description
 &nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_reorder_hint
 &nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_section_available
 &nbsp;import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_section_enabled
@@ -323,10 +325,13 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    /** Row in the &quot;Available&quot; section. */
 &nbsp;    fun availableRow(widget: String): String = &quot;dashboardCustomize:available:$widget&quot;
 &nbsp;
-&nbsp;    /** Visibility switch inside a row of either section; a widget appears in exactly one. */
+&nbsp;    /**
+&nbsp;     * The round +/− button inside a row of either section; a widget appears in exactly one, so the
+&nbsp;     * tag says nothing about which way this particular button moves it.
+&nbsp;     */
 &nbsp;    fun toggle(widget: String): String = &quot;dashboardCustomize:toggle:$widget&quot;
 &nbsp;
-&nbsp;    /** Reorder grip, present only on rows in the &quot;On dashboard&quot; section. */
+&nbsp;    /** Reorder grip. Every row has one — rows drag within a section and across the two. */
 &nbsp;    fun dragHandle(widget: String): String = &quot;dashboardCustomize:drag:$widget&quot;
 &nbsp;
 &nbsp;    /** The &quot;Hero · Classic&quot; pill on an on-dashboard row; opens the card-style sheet. */
@@ -352,7 +357,11 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;        }
 &nbsp;    }
 &nbsp;
-<b class="nc">&nbsp;    DashboardCustomizeContent(state = state, onEvent = viewModel::onEvent)</b>
+<b class="nc">&nbsp;    DashboardCustomizeContent(</b>
+<b class="nc">&nbsp;        state = state,</b>
+<b class="nc">&nbsp;        widgetStyleEnabled = viewModel.widgetStyleEnabled,</b>
+<b class="nc">&nbsp;        onEvent = viewModel::onEvent,</b>
+&nbsp;    )
 <b class="nc">&nbsp;}</b>
 &nbsp;
 &nbsp;private const val CUSTOMIZE_SKELETON_ROWS = 4
@@ -360,11 +369,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;/**
 &nbsp; * Stateless half of the screen — public so `:composeApp` desktop UI tests can mount it with an
 &nbsp; * injected state, the way `SignInContent` is used.
+&nbsp; *
+&nbsp; * [widgetStyleEnabled] is the host&#39;s `dashboard_widget_style` build key: off, the rows carry no
+&nbsp; * card-style pill and the picker sheet is unreachable.
 &nbsp; */
 &nbsp;@Composable
 &nbsp;fun DashboardCustomizeContent(
 &nbsp;    state: AsyncState&lt;DashboardLayoutConfig&gt;,
 &nbsp;    onEvent: (DashboardCustomizeEvent) -&gt; Unit,
+<b class="fc">&nbsp;    widgetStyleEnabled: Boolean = false,</b>
 <b class="pc">&nbsp;) {</b>
 <b class="fc">&nbsp;    Scaffold(</b>
 <b class="fc">&nbsp;        modifier = Modifier</b>
@@ -383,6 +396,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;            is AsyncState.Content -&gt; CustomizeList(</b>
 <b class="fc">&nbsp;                layout = state.value,</b>
 <b class="fc">&nbsp;                padding = padding,</b>
+<b class="fc">&nbsp;                widgetStyleEnabled = widgetStyleEnabled,</b>
 <b class="fc">&nbsp;                onEvent = onEvent,</b>
 &nbsp;            )
 <b class="nc">&nbsp;        }</b>
@@ -407,6 +421,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;private fun CustomizeList(
 &nbsp;    layout: DashboardLayoutConfig,
 &nbsp;    padding: PaddingValues,
+&nbsp;    widgetStyleEnabled: Boolean,
 &nbsp;    onEvent: (DashboardCustomizeEvent) -&gt; Unit,
 <b class="pc">&nbsp;) {</b>
 <b class="fc">&nbsp;    val enabled = layout.enabledItems</b>
@@ -415,12 +430,16 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    // here rather than in the ViewModel because it is sheet chrome, not part of the layout.
 <b class="fc">&nbsp;    var styleTarget by rememberSaveable { mutableStateOf&lt;String?&gt;(null) }</b>
 <b class="fc">&nbsp;    val listState = rememberLazyListState()</b>
+&nbsp;    // Both sections are drop targets: a row dragged across the &quot;Available&quot; header changes section,
+&nbsp;    // which is the same edit its +/− button makes. A widget is in exactly one section, so its type
+&nbsp;    // name is a unique key across the whole list.
+<b class="fc">&nbsp;    val rows = enabled + available</b>
 <b class="fc">&nbsp;    val reorderState = rememberSurferReorderState(</b>
 <b class="fc">&nbsp;        listState = listState,</b>
-<b class="fc">&nbsp;        keys = enabled.map { it.type.name },</b>
+<b class="fc">&nbsp;        keys = rows.map { it.type.name },</b>
 <b class="fc">&nbsp;        onMove = { from, to -&gt;</b>
-<b class="pc">&nbsp;            val fromType = enabled.firstOrNull { it.type.name == from }?.type</b>
-<b class="pc">&nbsp;            val toType = enabled.firstOrNull { it.type.name == to }?.type</b>
+<b class="pc">&nbsp;            val fromType = rows.firstOrNull { it.type.name == from }?.type</b>
+<b class="pc">&nbsp;            val toType = rows.firstOrNull { it.type.name == to }?.type</b>
 <b class="pc">&nbsp;            if (fromType != null &amp;&amp; toType != null) {</b>
 <b class="fc">&nbsp;                onEvent(DashboardCustomizeEvent.OnWidgetMove(from = fromType, to = toType))</b>
 &nbsp;            }
@@ -455,11 +474,12 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;            }
 &nbsp;        }
 <b class="fc">&nbsp;        items(items = enabled, key = { it.type.name }) { item -&gt;</b>
-<b class="fc">&nbsp;            EnabledWidgetRow(</b>
+<b class="fc">&nbsp;            WidgetRow(</b>
 <b class="fc">&nbsp;                item = item,</b>
+<b class="fc">&nbsp;                rowTestTag = DashboardCustomizeTestTags.enabledRow(item.type.name),</b>
 <b class="fc">&nbsp;                modifier = surferReorderableItem(reorderState, item.type.name),</b>
 <b class="fc">&nbsp;                handleModifier = Modifier.surferReorderHandle(reorderState, item.type.name),</b>
-<b class="fc">&nbsp;                onStyleClick = { styleTarget = item.type.name },</b>
+<b class="fc">&nbsp;                onStyleClick = { styleTarget = item.type.name }.takeIf { widgetStyleEnabled },</b>
 <b class="fc">&nbsp;                onEvent = onEvent,</b>
 <b class="fc">&nbsp;            )</b>
 <b class="fc">&nbsp;        }</b>
@@ -477,8 +497,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;                SectionNote(text = stringResource(Res.string.dashboard_customize_available_empty))
 &nbsp;            }
 &nbsp;        }
-<b class="fc">&nbsp;        items(items = available, key = { &quot;available-${it.type.name}&quot; }) { item -&gt;</b>
-<b class="fc">&nbsp;            AvailableWidgetRow(item = item, onEvent = onEvent)</b>
+<b class="fc">&nbsp;        items(items = available, key = { it.type.name }) { item -&gt;</b>
+<b class="fc">&nbsp;            WidgetRow(</b>
+<b class="fc">&nbsp;                item = item,</b>
+<b class="fc">&nbsp;                rowTestTag = DashboardCustomizeTestTags.availableRow(item.type.name),</b>
+<b class="fc">&nbsp;                modifier = surferReorderableItem(reorderState, item.type.name),</b>
+<b class="fc">&nbsp;                handleModifier = Modifier.surferReorderHandle(reorderState, item.type.name),</b>
+<b class="fc">&nbsp;                onStyleClick = null,</b>
+<b class="fc">&nbsp;                onEvent = onEvent,</b>
+<b class="fc">&nbsp;            )</b>
 <b class="fc">&nbsp;        }</b>
 &nbsp;
 <b class="fc">&nbsp;        item(key = &quot;footnote&quot;) {</b>
@@ -531,41 +558,68 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    )
 <b class="fc">&nbsp;}</b>
 &nbsp;
+&nbsp;/**
+&nbsp; * One widget, in whichever section it currently sits. The two used to be separate composables and
+&nbsp; * had drifted: only the enabled one could be dragged. They differ in exactly two things now — the
+&nbsp; * direction the round button moves the row, and whether [onStyleClick] is offered.
+&nbsp; *
+&nbsp; * Nothing here is clickable at row level: a clickable row merges its subtree semantics, which
+&nbsp; * would swallow the grip and the button as addressable nodes.
+&nbsp; */
 &nbsp;@Composable
-&nbsp;private fun EnabledWidgetRow(
+&nbsp;private fun WidgetRow(
 &nbsp;    item: DashboardLayoutItem,
+&nbsp;    rowTestTag: String,
 &nbsp;    modifier: Modifier,
 &nbsp;    handleModifier: Modifier,
-&nbsp;    onStyleClick: () -&gt; Unit,
+&nbsp;    onStyleClick: (() -&gt; Unit)?,
 &nbsp;    onEvent: (DashboardCustomizeEvent) -&gt; Unit,
 <b class="pc">&nbsp;) {</b>
 <b class="fc">&nbsp;    val widget = item.type.name</b>
+<b class="fc">&nbsp;    val title = stringResource(item.type.titleResource())</b>
+<b class="fc">&nbsp;    val colors = AppTheme.materialColors</b>
 <b class="fc">&nbsp;    SurferSettingsRow(</b>
-<b class="fc">&nbsp;        title = stringResource(item.type.titleResource()),</b>
-<b class="fc">&nbsp;        modifier = modifier.testTag(DashboardCustomizeTestTags.enabledRow(widget)),</b>
+<b class="fc">&nbsp;        title = title,</b>
+<b class="fc">&nbsp;        modifier = modifier.testTag(rowTestTag),</b>
 <b class="fc">&nbsp;        icon = item.type.icon(),</b>
-&nbsp;        // The pill carries the click, not the whole row: a clickable row merges its subtree
-&nbsp;        // semantics, which would swallow the drag grip and the switch as addressable nodes.
-<b class="fc">&nbsp;        supporting = {</b>
-<b class="fc">&nbsp;            SurferSettingsValuePill(</b>
-<b class="fc">&nbsp;                text = cardStyleSummary(item.type, item.cardStyle),</b>
-<b class="fc">&nbsp;                modifier = Modifier</b>
-<b class="fc">&nbsp;                    .clip(AppTheme.shapes.small)</b>
-<b class="fc">&nbsp;                    .clickable(onClick = onStyleClick)</b>
-<b class="fc">&nbsp;                    .padding(vertical = 4.dp, horizontal = 2.dp)</b>
-<b class="fc">&nbsp;                    .testTag(DashboardCustomizeTestTags.styleAction(widget)),</b>
-&nbsp;            )
-&nbsp;        },
+<b class="fc">&nbsp;        supporting = onStyleClick?.let {</b>
+<b class="fc">&nbsp;            {</b>
+<b class="fc">&nbsp;                SurferSettingsValuePill(</b>
+<b class="fc">&nbsp;                    text = cardStyleSummary(item.type, item.cardStyle),</b>
+<b class="fc">&nbsp;                    modifier = Modifier</b>
+<b class="fc">&nbsp;                        .clip(AppTheme.shapes.small)</b>
+<b class="fc">&nbsp;                        .clickable(onClick = it)</b>
+<b class="fc">&nbsp;                        .padding(vertical = 4.dp, horizontal = 2.dp)</b>
+<b class="fc">&nbsp;                        .testTag(DashboardCustomizeTestTags.styleAction(widget)),</b>
+&nbsp;                )
+<b class="fc">&nbsp;            }</b>
+<b class="fc">&nbsp;        },</b>
 <b class="fc">&nbsp;        trailing = {</b>
 <b class="fc">&nbsp;            Row(</b>
 <b class="fc">&nbsp;                verticalAlignment = Alignment.CenterVertically,</b>
 <b class="fc">&nbsp;                horizontalArrangement = Arrangement.spacedBy(4.dp),</b>
 &nbsp;            ) {
-<b class="fc">&nbsp;                SurferSettingsSwitch(</b>
-<b class="fc">&nbsp;                    checked = true,</b>
-<b class="fc">&nbsp;                    onCheckedChange = {</b>
-<b class="fc">&nbsp;                        onEvent(DashboardCustomizeEvent.OnWidgetEnabledChange(item.type, enabled = false))</b>
+<b class="fc">&nbsp;                SurferRoundIconButton(</b>
+<b class="fc">&nbsp;                    icon = if (item.enabled) SurferIcons.Remove else SurferIcons.Add,</b>
+<b class="fc">&nbsp;                    contentDescription = stringResource(</b>
+<b class="fc">&nbsp;                        if (item.enabled) {</b>
+<b class="fc">&nbsp;                            Res.string.dashboard_customize_remove_content_description</b>
+&nbsp;                        } else {
+<b class="fc">&nbsp;                            Res.string.dashboard_customize_add_content_description</b>
+&nbsp;                        },
+<b class="fc">&nbsp;                        title,</b>
+&nbsp;                    ),
+<b class="fc">&nbsp;                    onClick = {</b>
+<b class="fc">&nbsp;                        onEvent(</b>
+<b class="fc">&nbsp;                            DashboardCustomizeEvent.OnWidgetEnabledChange(item.type, enabled = !item.enabled),</b>
+&nbsp;                        )
 &nbsp;                    },
+<b class="fc">&nbsp;                    containerColor = if (item.enabled) {</b>
+<b class="fc">&nbsp;                        colors.surfaceContainerHighest</b>
+&nbsp;                    } else {
+<b class="fc">&nbsp;                        colors.primaryContainer</b>
+&nbsp;                    },
+<b class="fc">&nbsp;                    contentColor = if (item.enabled) colors.onSurface else colors.onPrimaryContainer,</b>
 <b class="fc">&nbsp;                    modifier = Modifier.testTag(DashboardCustomizeTestTags.toggle(widget)),</b>
 &nbsp;                )
 <b class="fc">&nbsp;                SurferDragHandle(</b>
@@ -573,28 +627,6 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;                )
 <b class="fc">&nbsp;            }</b>
 &nbsp;        },
-&nbsp;    )
-<b class="fc">&nbsp;}</b>
-&nbsp;
-&nbsp;@Composable
-&nbsp;private fun AvailableWidgetRow(
-&nbsp;    item: DashboardLayoutItem,
-&nbsp;    onEvent: (DashboardCustomizeEvent) -&gt; Unit,
-<b class="pc">&nbsp;) {</b>
-<b class="fc">&nbsp;    val widget = item.type.name</b>
-<b class="fc">&nbsp;    val turnOn = { onEvent(DashboardCustomizeEvent.OnWidgetEnabledChange(item.type, enabled = true)) }</b>
-<b class="fc">&nbsp;    SurferSettingsRow(</b>
-<b class="fc">&nbsp;        title = stringResource(item.type.titleResource()),</b>
-<b class="fc">&nbsp;        modifier = Modifier.testTag(DashboardCustomizeTestTags.availableRow(widget)),</b>
-<b class="fc">&nbsp;        icon = item.type.icon(),</b>
-<b class="fc">&nbsp;        trailing = {</b>
-<b class="fc">&nbsp;            SurferSettingsSwitch(</b>
-<b class="fc">&nbsp;                checked = false,</b>
-<b class="fc">&nbsp;                onCheckedChange = { turnOn() },</b>
-<b class="fc">&nbsp;                modifier = Modifier.testTag(DashboardCustomizeTestTags.toggle(widget)),</b>
-&nbsp;            )
-&nbsp;        },
-<b class="fc">&nbsp;        onClick = turnOn,</b>
 &nbsp;    )
 <b class="fc">&nbsp;}</b>
 &nbsp;
@@ -620,6 +652,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;                DashboardLayoutConfig.DEFAULT.withWidgetEnabled(DashboardWidgetType.Goals, enabled = false),
 &nbsp;            ),
 &nbsp;            onEvent = {},
+&nbsp;            widgetStyleEnabled = true,
 &nbsp;        )
 &nbsp;    }
 <b class="nc">&nbsp;}</b>
@@ -646,7 +679,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 12:08</div>
+    <div style="float:right;">generated on 2026-07-29 12:48</div>
 </div>
 </body>
 </html>

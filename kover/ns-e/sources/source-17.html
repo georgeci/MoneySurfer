@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > WorkspaceMemberDao</title>
+  <title>MoneySurfer Coverage Report > WorkspaceDao</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.data.db.dao</a>
 </div>
 
-<h1>Coverage Summary for Class: WorkspaceMemberDao (com.georgeci.moneysurfer.data.db.dao)</h1>
+<h1>Coverage Summary for Class: WorkspaceDao (com.georgeci.moneysurfer.data.db.dao)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">WorkspaceMemberDao</td>
+  <td class="name">WorkspaceDao</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -51,41 +51,44 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import androidx.room.Query
 &nbsp;import androidx.room.Update
 &nbsp;import androidx.room.Upsert
-&nbsp;import com.georgeci.moneysurfer.data.db.entity.WorkspaceMemberEntity
+&nbsp;import com.georgeci.moneysurfer.data.db.entity.WorkspaceEntity
 &nbsp;import kotlinx.coroutines.flow.Flow
 &nbsp;
 &nbsp;@Dao
-&nbsp;@Suppress(&quot;TooManyFunctions&quot;)
-&nbsp;interface WorkspaceMemberDao {
+&nbsp;interface WorkspaceDao {
 &nbsp;
-&nbsp;    @Query(&quot;SELECT * FROM workspace_members&quot;)
-&nbsp;    fun getAll(): Flow&lt;List&lt;WorkspaceMemberEntity&gt;&gt;
+&nbsp;    @Query(&quot;SELECT * FROM workspaces&quot;)
+&nbsp;    fun getAll(): Flow&lt;List&lt;WorkspaceEntity&gt;&gt;
 &nbsp;
-&nbsp;    @Query(&quot;SELECT * FROM workspace_members WHERE workspaceId = :workspaceId&quot;)
-&nbsp;    fun getByWorkspaceId(workspaceId: String): Flow&lt;List&lt;WorkspaceMemberEntity&gt;&gt;
+&nbsp;    @Query(
+&nbsp;        &quot;&quot;&quot;
+&nbsp;        SELECT w.*
+&nbsp;        FROM workspaces w
+&nbsp;        INNER JOIN workspace_members wm ON wm.workspaceId = w.id
+&nbsp;        WHERE wm.userId = :userId
+&nbsp;        &quot;&quot;&quot;,
+&nbsp;    )
+&nbsp;    fun getByUserId(userId: String): Flow&lt;List&lt;WorkspaceEntity&gt;&gt;
 &nbsp;
-&nbsp;    @Query(&quot;SELECT * FROM workspace_members WHERE userId = :userId&quot;)
-&nbsp;    fun getByUserId(userId: String): Flow&lt;List&lt;WorkspaceMemberEntity&gt;&gt;
-&nbsp;
-&nbsp;    @Query(&quot;SELECT * FROM workspace_members WHERE userId = :userId AND workspaceId = :workspaceId&quot;)
-&nbsp;    suspend fun getById(userId: String, workspaceId: String): WorkspaceMemberEntity?
+&nbsp;    @Query(&quot;SELECT * FROM workspaces WHERE id = :id&quot;)
+&nbsp;    suspend fun getById(id: String): WorkspaceEntity?
 &nbsp;
 &nbsp;    @Insert
-&nbsp;    suspend fun insert(entity: WorkspaceMemberEntity)
+&nbsp;    suspend fun insert(entity: WorkspaceEntity)
 &nbsp;
 &nbsp;    @Insert
-&nbsp;    suspend fun insertAll(entities: List&lt;WorkspaceMemberEntity&gt;)
+&nbsp;    suspend fun insertAll(entities: List&lt;WorkspaceEntity&gt;)
 &nbsp;
 &nbsp;    @Update
-&nbsp;    suspend fun update(entity: WorkspaceMemberEntity)
+&nbsp;    suspend fun update(entity: WorkspaceEntity)
 &nbsp;
 &nbsp;    @Upsert
-&nbsp;    suspend fun upsert(entity: WorkspaceMemberEntity)
+&nbsp;    suspend fun upsertAll(entities: List&lt;WorkspaceEntity&gt;)
 &nbsp;
-&nbsp;    @Query(&quot;DELETE FROM workspace_members WHERE userId = :userId AND workspaceId = :workspaceId&quot;)
-&nbsp;    suspend fun delete(userId: String, workspaceId: String)
+&nbsp;    @Query(&quot;DELETE FROM workspaces WHERE id = :id&quot;)
+&nbsp;    suspend fun delete(id: String)
 &nbsp;
-&nbsp;    @Query(&quot;DELETE FROM workspace_members&quot;)
+&nbsp;    @Query(&quot;DELETE FROM workspaces&quot;)
 &nbsp;    suspend fun deleteAll()
 &nbsp;}
 </code>
@@ -111,7 +114,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 12:08</div>
+    <div style="float:right;">generated on 2026-07-29 12:48</div>
 </div>
 </body>
 </html>

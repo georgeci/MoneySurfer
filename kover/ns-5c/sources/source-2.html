@@ -52,35 +52,35 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   <td class="name">EmptyReason</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
     <td class="coverageStat"/>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/24)
+    (24/24)
   </span>
 </td>
 </tr>
@@ -238,7 +238,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp; * `isFiltered`: the latter already counts a non-blank query, so it cannot tell [Search] from
 &nbsp; * [Filtered] — and only a real filter may be offered for clearing.
 &nbsp; */
-<b class="nc">&nbsp;private enum class EmptyReason { FirstRun, Search, Filtered }</b>
+<b class="fc">&nbsp;private enum class EmptyReason { FirstRun, Search, Filtered }</b>
+&nbsp;
+&nbsp;/**
+&nbsp; * Whether the empty state on screen already offers &quot;add a transaction&quot;. The FAB is the same
+&nbsp; * action, and two add buttons a thumb apart is one too many — the screen hides the FAB while this
+&nbsp; * is true. Filtered and search empties do not count: their CTA clears the filter, not adds a row.
+&nbsp; */
+&nbsp;internal val TransactionsByAccountState.Content.showsAddCta: Boolean
+&nbsp;    get() = isEmpty &amp;&amp; emptyReason() == EmptyReason.FirstRun
 &nbsp;
 &nbsp;private fun TransactionsByAccountState.Content.emptyReason(): EmptyReason = when {
 &nbsp;    activeFilterCount &gt; 0 -&gt; EmptyReason.Filtered
@@ -330,7 +338,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 12:08</div>
+    <div style="float:right;">generated on 2026-07-29 12:48</div>
 </div>
 </body>
 </html>

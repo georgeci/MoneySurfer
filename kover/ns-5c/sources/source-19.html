@@ -49,34 +49,34 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   <td class="name">TransactionsListRowAndEmptyStateKt</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    25%
   </span>
   <span class="absValue">
-    (0/7)
+    (2/8)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    10.1%
   </span>
   <span class="absValue">
-    (0/65)
+    (7/69)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    5.2%
   </span>
   <span class="absValue">
-    (0/95)
+    (5/96)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0.4%
+    3%
   </span>
   <span class="absValue">
-    (4/892)
+    (27/902)
   </span>
 </td>
 </tr>
@@ -88,34 +88,34 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
   <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    25%
   </span>
   <span class="absValue">
-    (0/7)
+    (2/8)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    10.1%
   </span>
   <span class="absValue">
-    (0/65)
+    (7/69)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    5.2%
   </span>
   <span class="absValue">
-    (0/95)
+    (5/96)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0.4%
+    3%
   </span>
   <span class="absValue">
-    (4/892)
+    (27/902)
   </span>
 </td>
 </tr>
@@ -274,10 +274,18 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp; */
 &nbsp;private enum class EmptyReason { FirstRun, Search, Filtered }
 &nbsp;
-<b class="nc">&nbsp;private fun TransactionsByAccountState.Content.emptyReason(): EmptyReason = when {</b>
-<b class="nc">&nbsp;    activeFilterCount &gt; 0 -&gt; EmptyReason.Filtered</b>
-<b class="nc">&nbsp;    query.isNotBlank() -&gt; EmptyReason.Search</b>
-<b class="nc">&nbsp;    else -&gt; EmptyReason.FirstRun</b>
+&nbsp;/**
+&nbsp; * Whether the empty state on screen already offers &quot;add a transaction&quot;. The FAB is the same
+&nbsp; * action, and two add buttons a thumb apart is one too many — the screen hides the FAB while this
+&nbsp; * is true. Filtered and search empties do not count: their CTA clears the filter, not adds a row.
+&nbsp; */
+&nbsp;internal val TransactionsByAccountState.Content.showsAddCta: Boolean
+<b class="fc">&nbsp;    get() = isEmpty &amp;&amp; emptyReason() == EmptyReason.FirstRun</b>
+&nbsp;
+<b class="fc">&nbsp;private fun TransactionsByAccountState.Content.emptyReason(): EmptyReason = when {</b>
+<b class="pc">&nbsp;    activeFilterCount &gt; 0 -&gt; EmptyReason.Filtered</b>
+<b class="fc">&nbsp;    query.isNotBlank() -&gt; EmptyReason.Search</b>
+<b class="fc">&nbsp;    else -&gt; EmptyReason.FirstRun</b>
 &nbsp;}
 &nbsp;
 &nbsp;/** Everything the empty state renders, so each reason names its copy in one place. */
@@ -364,7 +372,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 12:08</div>
+    <div style="float:right;">generated on 2026-07-29 12:48</div>
 </div>
 </body>
 </html>

@@ -57,10 +57,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    87.5%
+    88.5%
   </span>
   <span class="absValue">
-    (21/24)
+    (23/26)
   </span>
 </td>
 <td class="coverageStat">
@@ -68,15 +68,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (47/47)
+    (48/48)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    99.1%
+    99.2%
   </span>
   <span class="absValue">
-    (233/235)
+    (240/242)
   </span>
 </td>
 </tr>
@@ -281,26 +281,26 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    88.9%
+    89.5%
   </span>
   <span class="absValue">
-    (32/36)
+    (34/38)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    91.2%
+    91.4%
   </span>
   <span class="absValue">
-    (73/80)
+    (74/81)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    96.5%
+    96.6%
   </span>
   <span class="absValue">
-    (500/518)
+    (507/525)
   </span>
 </td>
 </tr>
@@ -373,6 +373,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;                postSideEffect(WorkspaceSelectorEffect.NavigateToWorkspaceCreation)</b>
 <b class="fc">&nbsp;            WorkspaceSelectorEvent.OnConfirmClick -&gt; confirmSelection()</b>
 <b class="fc">&nbsp;            WorkspaceSelectorEvent.OnSignOutClick -&gt; signOut()</b>
+<b class="fc">&nbsp;            WorkspaceSelectorEvent.OnBackClick -&gt; postSideEffect(WorkspaceSelectorEffect.NavigateBack)</b>
 &nbsp;        }
 &nbsp;    }
 &nbsp;
@@ -515,9 +516,13 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    data object OnCreateWorkspaceClick : WorkspaceSelectorEvent
 &nbsp;    data object OnConfirmClick : WorkspaceSelectorEvent
 &nbsp;    data object OnSignOutClick : WorkspaceSelectorEvent
+&nbsp;
+&nbsp;    /** Toolbar back — only reachable when the selector was pushed onto a stack, i.e. from Settings. */
+&nbsp;    data object OnBackClick : WorkspaceSelectorEvent
 &nbsp;}
 &nbsp;
 &nbsp;sealed interface WorkspaceSelectorEffect {
+&nbsp;    data object NavigateBack : WorkspaceSelectorEffect
 &nbsp;    data object NavigateToDashboard : WorkspaceSelectorEffect
 &nbsp;    data object NavigateToSignIn : WorkspaceSelectorEffect
 &nbsp;    data object NavigateToWorkspaceCreation : WorkspaceSelectorEffect
@@ -547,7 +552,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 12:08</div>
+    <div style="float:right;">generated on 2026-07-29 12:48</div>
 </div>
 </body>
 </html>

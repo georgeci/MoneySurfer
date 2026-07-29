@@ -173,10 +173,14 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;            )
 &nbsp;        },
 &nbsp;        floatingActionButton = {
-&nbsp;            SurferAddFab(
-&nbsp;                label = stringResource(Res.string.transactions_list_new),
-&nbsp;                onClick = { onEvent(TransactionsByAccountEvent.OnAddTransactionClick) },
-&nbsp;            )
+&nbsp;            // Not while the empty state is showing its own &quot;Add transaction&quot; CTA — see
+&nbsp;            // `showsAddCta`.
+&nbsp;            if (!state.showsAddCta) {
+&nbsp;                SurferAddFab(
+&nbsp;                    label = stringResource(Res.string.transactions_list_new),
+&nbsp;                    onClick = { onEvent(TransactionsByAccountEvent.OnAddTransactionClick) },
+&nbsp;                )
+&nbsp;            }
 &nbsp;        },
 &nbsp;    ) { padding -&gt;
 &nbsp;        Column(
@@ -322,7 +326,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 12:08</div>
+    <div style="float:right;">generated on 2026-07-29 12:48</div>
 </div>
 </body>
 </html>

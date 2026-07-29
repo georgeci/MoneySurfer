@@ -99,12 +99,14 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import androidx.compose.ui.unit.dp
 &nbsp;
 <b class="fc">&nbsp;val AppShapes = Shapes(</b>
-&nbsp;    // 12.dp matches the design tokens for input fields (OutlinedTextField pulls its default shape
-&nbsp;    // from `extraSmall`); aligning the slot keeps every input rounded the same without per-call
-&nbsp;    // overrides.
-<b class="fc">&nbsp;    extraSmall = RoundedCornerShape(12.dp),</b>
+&nbsp;    // `OutlinedTextField` pulls its default shape from `extraSmall`, so this slot is what every
+&nbsp;    // input that is not a `SurferTextField` gets. It carries the same 16.dp as `large` on purpose:
+&nbsp;    // fields sit in lists and forms next to `SurferCard`s, and a field rounded differently from
+&nbsp;    // the card above it reads as a control borrowed from another screen.
+<b class="fc">&nbsp;    extraSmall = RoundedCornerShape(16.dp),</b>
 <b class="fc">&nbsp;    small = RoundedCornerShape(8.dp),</b>
 <b class="fc">&nbsp;    medium = RoundedCornerShape(12.dp),</b>
+&nbsp;    /** The container corner: `SurferCard`, and every form field, follow this one. */
 <b class="fc">&nbsp;    large = RoundedCornerShape(16.dp),</b>
 <b class="fc">&nbsp;    extraLarge = RoundedCornerShape(28.dp),</b>
 &nbsp;)
@@ -131,7 +133,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 12:08</div>
+    <div style="float:right;">generated on 2026-07-29 12:48</div>
 </div>
 </body>
 </html>

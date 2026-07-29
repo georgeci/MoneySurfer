@@ -69,7 +69,6 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import androidx.compose.material3.OutlinedTextField
 &nbsp;import androidx.compose.material3.Scaffold
 &nbsp;import androidx.compose.material3.Text
-&nbsp;import androidx.compose.material3.TextButton
 &nbsp;import androidx.compose.material3.TopAppBar
 &nbsp;import androidx.compose.material3.TopAppBarDefaults
 &nbsp;import androidx.compose.runtime.Composable
@@ -94,7 +93,8 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.uikit.components.SurferCurrencyOption
 &nbsp;import com.georgeci.moneysurfer.uikit.components.SurferCurrencyPickerField
 &nbsp;import com.georgeci.moneysurfer.uikit.components.SurferFullScreenLoader
-&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferSectionLabel
+&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferFormSection
+&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferToolbarButtonAction
 &nbsp;import com.georgeci.moneysurfer.uikit.components.workspace.SurferInviteRow
 &nbsp;import com.georgeci.moneysurfer.uikit.components.workspace.SurferMemberRow
 &nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
@@ -228,16 +228,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;                        }
 &nbsp;                    },
 &nbsp;                    actions = {
-&nbsp;                        TextButton(
+&nbsp;                        // The same pill every other create/edit toolbar uses (&quot;Save&quot;, &quot;Update&quot;) —
+&nbsp;                        // a bare text action here made the two flows look like different apps.
+&nbsp;                        SurferToolbarButtonAction(
+&nbsp;                            icon = SurferIcons.Check,
+&nbsp;                            text = stringResource(actionRes),
 &nbsp;                            onClick = { onEvent(WorkspaceCreationEvent.OnSaveClick) },
-&nbsp;                            modifier = Modifier.testTag(WorkspaceCreationTestTags.Save),
 &nbsp;                            enabled = state.name.isNotBlank() &amp;&amp; !state.isSaving,
-&nbsp;                        ) {
-&nbsp;                            Text(
-&nbsp;                                text = stringResource(actionRes),
-&nbsp;                                style = AppTheme.typography.labelLarge,
-&nbsp;                            )
-&nbsp;                        }
+&nbsp;                            modifier = Modifier.testTag(WorkspaceCreationTestTags.Save),
+&nbsp;                        )
 &nbsp;                    },
 &nbsp;                    colors = TopAppBarDefaults.topAppBarColors(),
 &nbsp;                )
@@ -257,7 +256,9 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;
 &nbsp;                PreviewCard(
 &nbsp;                    name = state.name,
-&nbsp;                    memberCount = state.members.size,
+&nbsp;                    // Null while creating: there is no membership to count yet, and &quot;2 members&quot;
+&nbsp;                    // under a workspace that does not exist reads as somebody else&#39;s data.
+&nbsp;                    memberCount = state.members.size.takeIf { state.isEditing },
 &nbsp;                    currencyCode = state.currency,
 &nbsp;                    isOffline = state.isOffline,
 &nbsp;                )
@@ -312,17 +313,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    val resolved = currencies.firstOrNull { it.code.value == selected } ?: currencies.first()
 &nbsp;    var sheetOpen by rememberSaveable { mutableStateOf(false) }
 &nbsp;
-&nbsp;    SurferSectionLabel(
-&nbsp;        text = stringResource(Res.string.workspace_creation_section_currency),
-&nbsp;        modifier = Modifier.padding(bottom = 10.dp),
-&nbsp;    )
-&nbsp;    SurferCurrencyPickerField(
-&nbsp;        symbol = resolved.symbol,
-&nbsp;        code = resolved.code.value,
-&nbsp;        name = resolved.displayName,
-&nbsp;        onClick = { sheetOpen = true },
-&nbsp;        expanded = sheetOpen,
-&nbsp;    )
+&nbsp;    SurferFormSection(label = stringResource(Res.string.workspace_creation_section_currency)) {
+&nbsp;        SurferCurrencyPickerField(
+&nbsp;            symbol = resolved.symbol,
+&nbsp;            code = resolved.code.value,
+&nbsp;            name = resolved.displayName,
+&nbsp;            onClick = { sheetOpen = true },
+&nbsp;            expanded = sheetOpen,
+&nbsp;        )
+&nbsp;    }
 &nbsp;
 &nbsp;    if (sheetOpen) {
 &nbsp;        SurferCurrencyBottomSheet(
@@ -344,7 +343,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;@Composable
 &nbsp;private fun PreviewCard(
 &nbsp;    name: String,
-&nbsp;    memberCount: Int,
+&nbsp;    memberCount: Int?,
 &nbsp;    currencyCode: String,
 &nbsp;    isOffline: Boolean,
 &nbsp;) {
@@ -383,7 +382,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;                    style = AppTheme.typography.titleLarge,
 &nbsp;                )
 &nbsp;                Text(
-&nbsp;                    text = if (isOffline) {
+&nbsp;                    text = if (isOffline || memberCount == null) {
 &nbsp;                        stringResource(
 &nbsp;                            Res.string.workspace_creation_preview_subtitle_offline_format,
 &nbsp;                            currencyCode.ifBlank { &quot;—&quot; },
@@ -429,29 +428,27 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    showInviteRow: Boolean,
 &nbsp;    onInviteClick: () -&gt; Unit,
 &nbsp;) {
-&nbsp;    SurferSectionLabel(
-&nbsp;        text = stringResource(Res.string.workspace_creation_section_members),
-&nbsp;        modifier = Modifier.padding(bottom = 10.dp),
-&nbsp;    )
-&nbsp;    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-&nbsp;        if (showInviteRow) {
-&nbsp;            SurferInviteRow(
-&nbsp;                title = stringResource(Res.string.workspace_creation_invite_title),
-&nbsp;                subtitle = stringResource(Res.string.workspace_creation_invite_subtitle),
-&nbsp;                onClick = onInviteClick,
-&nbsp;            )
-&nbsp;        }
-&nbsp;        if (members.isNotEmpty()) {
-&nbsp;            OutlinedCard(
-&nbsp;                shape = RoundedCornerShape(16.dp),
-&nbsp;                modifier = Modifier.fillMaxWidth(),
-&nbsp;            ) {
-&nbsp;                members.forEach { member -&gt;
-&nbsp;                    SurferMemberRow(
-&nbsp;                        name = member.name,
-&nbsp;                        initial = member.initial,
-&nbsp;                        roleLabel = roleLabel(member.role),
-&nbsp;                    )
+&nbsp;    SurferFormSection(label = stringResource(Res.string.workspace_creation_section_members)) {
+&nbsp;        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+&nbsp;            if (showInviteRow) {
+&nbsp;                SurferInviteRow(
+&nbsp;                    title = stringResource(Res.string.workspace_creation_invite_title),
+&nbsp;                    subtitle = stringResource(Res.string.workspace_creation_invite_subtitle),
+&nbsp;                    onClick = onInviteClick,
+&nbsp;                )
+&nbsp;            }
+&nbsp;            if (members.isNotEmpty()) {
+&nbsp;                OutlinedCard(
+&nbsp;                    shape = RoundedCornerShape(16.dp),
+&nbsp;                    modifier = Modifier.fillMaxWidth(),
+&nbsp;                ) {
+&nbsp;                    members.forEach { member -&gt;
+&nbsp;                        SurferMemberRow(
+&nbsp;                            name = member.name,
+&nbsp;                            initial = member.initial,
+&nbsp;                            roleLabel = roleLabel(member.role),
+&nbsp;                        )
+&nbsp;                    }
 &nbsp;                }
 &nbsp;            }
 &nbsp;        }
@@ -537,7 +534,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 12:08</div>
+    <div style="float:right;">generated on 2026-07-29 12:48</div>
 </div>
 </body>
 </html>

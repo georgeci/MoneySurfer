@@ -63,7 +63,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (8/8)
+    (9/9)
   </span>
 </td>
     <td class="coverageStat"/>
@@ -72,7 +72,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (13/13)
+    (15/15)
   </span>
 </td>
 <td class="coverageStat">
@@ -80,7 +80,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     100%
   </span>
   <span class="absValue">
-    (97/97)
+    (112/112)
   </span>
 </td>
 </tr>
@@ -127,6 +127,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;    val transferEnabled: ConfigKey&lt;Boolean&gt; = ConfigKey.bool(&quot;host.transfer_enabled&quot;, default = true)</b>
 &nbsp;
 &nbsp;    /**
+&nbsp;     * Per-widget card style on the dashboard customize screen — the size/variant picker each row
+&nbsp;     * opens. Shipped `false` while the picker is unfinished.
+&nbsp;     *
+&nbsp;     * Like [syncEnabled] and unlike the rest, its default is *not* the fuller surface: a host that
+&nbsp;     * forgets to declare it must land on &quot;no picker&quot; rather than expose a half-built one.
+&nbsp;     */
+<b class="fc">&nbsp;    val dashboardWidgetStyle: ConfigKey&lt;Boolean&gt; = ConfigKey.bool(&quot;host.dashboard_widget_style&quot;, default = false)</b>
+&nbsp;
+&nbsp;    /**
 &nbsp;     * Build-owned term of `SyncSettings.isEnabled`: `true` in the online host since issue #342,
 &nbsp;     * `false` in the offline one, which has no Firebase to sync against at all.
 &nbsp;     *
@@ -142,6 +151,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <b class="fc">&nbsp;        signInAnonymous,</b>
 <b class="fc">&nbsp;        signInDemo,</b>
 <b class="fc">&nbsp;        transferEnabled,</b>
+<b class="fc">&nbsp;        dashboardWidgetStyle,</b>
 <b class="fc">&nbsp;        syncEnabled,</b>
 &nbsp;    )
 &nbsp;}
@@ -168,7 +178,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 12:08</div>
+    <div style="float:right;">generated on 2026-07-29 12:48</div>
 </div>
 </body>
 </html>

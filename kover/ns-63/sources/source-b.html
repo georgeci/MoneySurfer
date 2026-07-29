@@ -113,6 +113,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp; * AGENTS.md → UI Rules.
 &nbsp; */
 &nbsp;data class WorkspaceSelectorNavigation(
+&nbsp;    val onNavigateBack: () -&gt; Unit,
 &nbsp;    val onNavigateToDashboard: () -&gt; Unit,
 &nbsp;    val onNavigateToSignIn: () -&gt; Unit,
 &nbsp;    val onNavigateToWorkspaceCreation: () -&gt; Unit,
@@ -138,6 +139,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;
 &nbsp;    viewModel.HandleSideEffect { effect -&gt;
 &nbsp;        when (effect) {
+&nbsp;            WorkspaceSelectorEffect.NavigateBack -&gt; navigation.onNavigateBack()
 &nbsp;            WorkspaceSelectorEffect.NavigateToDashboard -&gt; navigation.onNavigateToDashboard()
 &nbsp;            WorkspaceSelectorEffect.NavigateToSignIn -&gt; navigation.onNavigateToSignIn()
 &nbsp;            WorkspaceSelectorEffect.NavigateToWorkspaceCreation -&gt; navigation.onNavigateToWorkspaceCreation()
@@ -150,7 +152,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    }
 &nbsp;
 &nbsp;    when (val current = state) {
-&nbsp;        is WorkspaceSelectorState.Loading -&gt; WorkspaceSelectorLoading()
+&nbsp;        is WorkspaceSelectorState.Loading -&gt; WorkspaceSelectorLoading(
+&nbsp;            state = current,
+&nbsp;            onEvent = viewModel::onEvent,
+&nbsp;        )
 &nbsp;        is WorkspaceSelectorState.Content -&gt; WorkspaceSelectorContent(
 &nbsp;            state = current,
 &nbsp;            cloudDataUnavailable = cloudDataUnavailable,
@@ -160,13 +165,21 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;}
 &nbsp;
 &nbsp;@Composable
-&nbsp;private fun WorkspaceSelectorLoading() {
+&nbsp;private fun WorkspaceSelectorLoading(
+&nbsp;    state: WorkspaceSelectorState.Loading,
+&nbsp;    onEvent: (WorkspaceSelectorEvent) -&gt; Unit,
+&nbsp;) {
 &nbsp;    Box(modifier = Modifier.fillMaxSize()) {
 &nbsp;        Scaffold(
 &nbsp;            modifier = Modifier.surferSafeInsets(),
 &nbsp;            containerColor = AppTheme.materialColors.surface,
 &nbsp;            topBar = {
-&nbsp;                SurferToolbar(title = stringResource(Res.string.workspace_selector_heading_title))
+&nbsp;                SurferToolbar(
+&nbsp;                    title = stringResource(Res.string.workspace_selector_heading_title),
+&nbsp;                    // Same rule as the loaded screen, so the arrow does not pop in once the
+&nbsp;                    // workspaces arrive — and so a slow load is not a dead end either.
+&nbsp;                    onBack = backAction(state.showActions, onEvent),
+&nbsp;                )
 &nbsp;            },
 &nbsp;        ) { padding -&gt;
 &nbsp;            Box(modifier = Modifier.fillMaxSize().padding(padding))
@@ -174,6 +187,20 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;
 &nbsp;        SurferFullScreenLoader(modifier = Modifier.fillMaxSize())
 &nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * The toolbar&#39;s back action, or null. Only the pushed-from-Settings selector (`showActions`) has
+&nbsp; * somewhere to go back to; as a start route it is the bottom of the stack, and the sign-out action
+&nbsp; * is the way out instead.
+&nbsp; */
+&nbsp;private fun backAction(
+&nbsp;    showActions: Boolean,
+&nbsp;    onEvent: (WorkspaceSelectorEvent) -&gt; Unit,
+&nbsp;): (() -&gt; Unit)? = if (showActions) {
+&nbsp;    { onEvent(WorkspaceSelectorEvent.OnBackClick) }
+&nbsp;} else {
+&nbsp;    null
 &nbsp;}
 &nbsp;
 &nbsp;@Composable
@@ -194,6 +221,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;            topBar = {
 &nbsp;                SurferToolbar(
 &nbsp;                    title = stringResource(Res.string.workspace_selector_heading_title),
+&nbsp;                    onBack = backAction(state.showActions, onEvent),
 &nbsp;                    actions = {
 &nbsp;                        // The only exit when the selector is the root of the stack: no back
 &nbsp;                        // entry, and Settings sits behind Dashboard, which needs a workspace.
@@ -462,7 +490,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 12:08</div>
+    <div style="float:right;">generated on 2026-07-29 12:48</div>
 </div>
 </body>
 </html>

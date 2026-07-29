@@ -240,6 +240,14 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp; */
 &nbsp;private enum class EmptyReason { FirstRun, Search, Filtered }
 &nbsp;
+&nbsp;/**
+&nbsp; * Whether the empty state on screen already offers &quot;add a transaction&quot;. The FAB is the same
+&nbsp; * action, and two add buttons a thumb apart is one too many — the screen hides the FAB while this
+&nbsp; * is true. Filtered and search empties do not count: their CTA clears the filter, not adds a row.
+&nbsp; */
+&nbsp;internal val TransactionsByAccountState.Content.showsAddCta: Boolean
+&nbsp;    get() = isEmpty &amp;&amp; emptyReason() == EmptyReason.FirstRun
+&nbsp;
 &nbsp;private fun TransactionsByAccountState.Content.emptyReason(): EmptyReason = when {
 &nbsp;    activeFilterCount &gt; 0 -&gt; EmptyReason.Filtered
 &nbsp;    query.isNotBlank() -&gt; EmptyReason.Search
@@ -330,7 +338,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 12:08</div>
+    <div style="float:right;">generated on 2026-07-29 12:48</div>
 </div>
 </body>
 </html>

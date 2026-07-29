@@ -115,8 +115,9 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import com.georgeci.moneysurfer.uikit.components.SurferCurrencyBottomSheet
 &nbsp;import com.georgeci.moneysurfer.uikit.components.SurferCurrencyOption
 &nbsp;import com.georgeci.moneysurfer.uikit.components.SurferCurrencyPickerField
+&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferTextField
+&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferFormSection
 &nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferOutlinedChip
-&nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferSectionLabel
 &nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferSegmentedControl
 &nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
 &nbsp;import com.georgeci.moneysurfer.uikit.components.base.SurferToolbarButtonAction
@@ -253,20 +254,13 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;                onSelect = { onEvent(AccountCreationEvent.OnTypeChanged(it)) },
 &nbsp;            )
 &nbsp;
-&nbsp;            OutlinedTextField(
+&nbsp;            SurferTextField(
 &nbsp;                value = state.name,
 &nbsp;                onValueChange = { onEvent(AccountCreationEvent.OnNameChanged(it)) },
-&nbsp;                label = { Text(stringResource(Res.string.account_creation_name_label)) },
-&nbsp;                singleLine = true,
-&nbsp;                isError = state.nameMissing,
-&nbsp;                supportingText = if (state.nameMissing) {
-&nbsp;                    { Text(stringResource(Res.string.account_creation_name_error_required)) }
-&nbsp;                } else {
-&nbsp;                    null
-&nbsp;                },
-&nbsp;                modifier = Modifier
-&nbsp;                    .fillMaxWidth()
-&nbsp;                    .testTag(AccountCreationTestTags.Name),
+&nbsp;                label = stringResource(Res.string.account_creation_name_label),
+&nbsp;                errorText = stringResource(Res.string.account_creation_name_error_required)
+&nbsp;                    .takeIf { state.nameMissing },
+&nbsp;                fieldTestTag = AccountCreationTestTags.Name,
 &nbsp;            )
 &nbsp;
 &nbsp;            if (!state.isEditMode) {
@@ -279,26 +273,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;                }
 &nbsp;
 &nbsp;                val balanceError = state.balanceError
-&nbsp;                OutlinedTextField(
+&nbsp;                SurferTextField(
 &nbsp;                    value = state.balance,
 &nbsp;                    onValueChange = { onEvent(AccountCreationEvent.OnBalanceChanged(it)) },
-&nbsp;                    label = { Text(stringResource(Res.string.account_creation_balance_label)) },
-&nbsp;                    prefix = { Text(state.currencySymbol) },
-&nbsp;                    supportingText = {
-&nbsp;                        Text(
-&nbsp;                            if (balanceError == null) {
-&nbsp;                                stringResource(Res.string.account_creation_balance_helper)
-&nbsp;                            } else {
-&nbsp;                                stringResource(balanceError.messageRes())
-&nbsp;                            },
-&nbsp;                        )
-&nbsp;                    },
-&nbsp;                    isError = balanceError != null,
+&nbsp;                    label = stringResource(Res.string.account_creation_balance_label),
+&nbsp;                    errorText = balanceError?.let { stringResource(it.messageRes()) },
+&nbsp;                    helperText = stringResource(Res.string.account_creation_balance_helper),
 &nbsp;                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-&nbsp;                    singleLine = true,
-&nbsp;                    modifier = Modifier
-&nbsp;                        .fillMaxWidth()
-&nbsp;                        .testTag(AccountCreationTestTags.OpeningBalance),
+&nbsp;                    prefix = { Text(state.currencySymbol) },
+&nbsp;                    fieldTestTag = AccountCreationTestTags.OpeningBalance,
 &nbsp;                )
 &nbsp;            }
 &nbsp;
@@ -326,17 +309,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    selected: AccountType,
 &nbsp;    onSelect: (AccountType) -&gt; Unit,
 &nbsp;) {
-&nbsp;    SurferSectionLabel(
-&nbsp;        text = stringResource(Res.string.account_creation_type_label),
-&nbsp;        modifier = Modifier.padding(bottom = AppTheme.spacing.small),
-&nbsp;    )
-&nbsp;    SurferSegmentedControl(
-&nbsp;        options = listOf(AccountType.CASH, AccountType.BANK, AccountType.CARD, AccountType.SAVINGS),
-&nbsp;        selected = selected,
-&nbsp;        label = { type -&gt; stringResource(type.labelRes()) },
-&nbsp;        onSelect = onSelect,
-&nbsp;        optionTestTag = { type -&gt; AccountCreationTestTags.TypePrefix + type.name.lowercase() },
-&nbsp;    )
+&nbsp;    SurferFormSection(label = stringResource(Res.string.account_creation_type_label)) {
+&nbsp;        SurferSegmentedControl(
+&nbsp;            options = listOf(AccountType.CASH, AccountType.BANK, AccountType.CARD, AccountType.SAVINGS),
+&nbsp;            selected = selected,
+&nbsp;            label = { type -&gt; stringResource(type.labelRes()) },
+&nbsp;            onSelect = onSelect,
+&nbsp;            optionTestTag = { type -&gt; AccountCreationTestTags.TypePrefix + type.name.lowercase() },
+&nbsp;        )
+&nbsp;    }
 &nbsp;}
 &nbsp;
 &nbsp;/**
@@ -352,17 +333,15 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    val resolved = currencies.firstOrNull { it.code == selected } ?: currencies.first()
 &nbsp;    var sheetOpen by rememberSaveable { mutableStateOf(false) }
 &nbsp;
-&nbsp;    SurferSectionLabel(
-&nbsp;        text = stringResource(Res.string.account_creation_currency_label),
-&nbsp;        modifier = Modifier.padding(bottom = AppTheme.spacing.small),
-&nbsp;    )
-&nbsp;    SurferCurrencyPickerField(
-&nbsp;        symbol = resolved.symbol,
-&nbsp;        code = resolved.code.value,
-&nbsp;        name = resolved.displayName,
-&nbsp;        onClick = { sheetOpen = true },
-&nbsp;        expanded = sheetOpen,
-&nbsp;    )
+&nbsp;    SurferFormSection(label = stringResource(Res.string.account_creation_currency_label)) {
+&nbsp;        SurferCurrencyPickerField(
+&nbsp;            symbol = resolved.symbol,
+&nbsp;            code = resolved.code.value,
+&nbsp;            name = resolved.displayName,
+&nbsp;            onClick = { sheetOpen = true },
+&nbsp;            expanded = sheetOpen,
+&nbsp;        )
+&nbsp;    }
 &nbsp;
 &nbsp;    if (sheetOpen) {
 &nbsp;        SurferCurrencyBottomSheet(
@@ -636,7 +615,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 12:08</div>
+    <div style="float:right;">generated on 2026-07-29 12:48</div>
 </div>
 </body>
 </html>

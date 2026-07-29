@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>MoneySurfer Coverage Report > SurferErrorBoundaryKt</title>
+  <title>MoneySurfer Coverage Report > SurferEmptyStateKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     <a href="../index.html">com.georgeci.moneysurfer.uikit.components</a>
 </div>
 
-<h1>Coverage Summary for Class: SurferErrorBoundaryKt (com.georgeci.moneysurfer.uikit.components)</h1>
+<h1>Coverage Summary for Class: SurferEmptyStateKt (com.georgeci.moneysurfer.uikit.components)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -49,7 +49,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </th>
 </tr>
 <tr>
-  <td class="name">SurferErrorBoundaryKt</td>
+  <td class="name">SurferEmptyStateKt</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -60,10 +60,10 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 </td>
 <td class="coverageStat">
   <span class="percent">
-    66.7%
+    33.3%
   </span>
   <span class="absValue">
-    (2/3)
+    (1/3)
   </span>
 </td>
 <td class="coverageStat">
@@ -71,23 +71,23 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
     41.7%
   </span>
   <span class="absValue">
-    (5/12)
+    (10/24)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    87.5%
+    83.3%
   </span>
   <span class="absValue">
-    (21/24)
+    (45/54)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    79.9%
+    76.3%
   </span>
   <span class="absValue">
-    (223/279)
+    (493/646)
   </span>
 </td>
 </tr>
@@ -101,70 +101,119 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.uikit.components
 &nbsp;
+&nbsp;import androidx.compose.foundation.background
+&nbsp;import androidx.compose.foundation.layout.Arrangement
 &nbsp;import androidx.compose.foundation.layout.Box
-&nbsp;import androidx.compose.foundation.layout.fillMaxSize
-&nbsp;import androidx.compose.material3.Surface
+&nbsp;import androidx.compose.foundation.layout.Column
+&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
+&nbsp;import androidx.compose.foundation.layout.padding
+&nbsp;import androidx.compose.foundation.layout.size
+&nbsp;import androidx.compose.foundation.shape.CircleShape
+&nbsp;import androidx.compose.material3.Icon
+&nbsp;import androidx.compose.material3.Text
 &nbsp;import androidx.compose.runtime.Composable
 &nbsp;import androidx.compose.ui.Alignment
 &nbsp;import androidx.compose.ui.Modifier
-&nbsp;import androidx.compose.ui.platform.testTag
+&nbsp;import androidx.compose.ui.draw.clip
+&nbsp;import androidx.compose.ui.graphics.vector.ImageVector
+&nbsp;import androidx.compose.ui.text.style.TextAlign
 &nbsp;import androidx.compose.ui.tooling.preview.Preview
+&nbsp;import androidx.compose.ui.unit.dp
+&nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 &nbsp;import com.georgeci.moneysurfer.uikit.preview.SurferComponentPreview
+&nbsp;import com.georgeci.moneysurfer.uikit.semantics.SurferSemantics
 &nbsp;import com.georgeci.moneysurfer.uikit.theme.AppTheme
-&nbsp;import moneysurfer.uikit.generated.resources.Res
-&nbsp;import moneysurfer.uikit.generated.resources.uikit_error_boundary_subtitle
-&nbsp;import moneysurfer.uikit.generated.resources.uikit_error_boundary_title
-&nbsp;import moneysurfer.uikit.generated.resources.uikit_retry
-&nbsp;import org.jetbrains.compose.resources.stringResource
 &nbsp;
 &nbsp;/**
-&nbsp; * App-level fallback for failures no screen handled itself: while [hasError] is true a
-&nbsp; * full-bleed [SurferErrorState] with a retry action covers [content] (issue #78).
+&nbsp; * Centered empty-state block: an icon medallion, a title, an optional subtitle and an
+&nbsp; * optional call-to-action. Use it when a list or screen has no content yet — the CTA is
+&nbsp; * what turns a dead end into the next step the user should take.
 &nbsp; *
-&nbsp; * The content stays composed underneath rather than being torn down and rebuilt, so a
-&nbsp; * transient failure does not cost the user their navigation back stack — dismissing via
-&nbsp; * [onRetry] returns them exactly where they were, and the screen&#39;s own reload runs on the
-&nbsp; * data it already observes.
+&nbsp; * To address the CTA from a UI test, tag the block through [modifier] at the call site — the
+&nbsp; * host screen owns its own selectors, and a dedicated tag parameter here would be one more
+&nbsp; * argument on an already wide signature.
 &nbsp; */
 &nbsp;@Composable
-&nbsp;fun SurferErrorBoundary(
-&nbsp;    hasError: Boolean,
-&nbsp;    onRetry: () -&gt; Unit,
+<b class="nc">&nbsp;fun SurferEmptyState(</b>
+&nbsp;    title: String,
 <b class="fc">&nbsp;    modifier: Modifier = Modifier,</b>
-&nbsp;    content: @Composable () -&gt; Unit,
+<b class="fc">&nbsp;    subtitle: String? = null,</b>
+<b class="fc">&nbsp;    icon: ImageVector = SurferIcons.Info,</b>
+<b class="fc">&nbsp;    actionLabel: String? = null,</b>
+&nbsp;    /** Leading glyph of the CTA. Defaults to `Add` — the common &quot;create the first one&quot; case. */
+<b class="fc">&nbsp;    actionIcon: ImageVector = SurferIcons.Add,</b>
+<b class="nc">&nbsp;    onActionClick: (() -&gt; Unit)? = null,</b>
 <b class="pc">&nbsp;) {</b>
-<b class="fc">&nbsp;    Box(modifier = modifier.fillMaxSize()) {</b>
-<b class="fc">&nbsp;        content()</b>
-&nbsp;
-<b class="fc">&nbsp;        if (hasError) {</b>
-<b class="fc">&nbsp;            Surface(</b>
-<b class="fc">&nbsp;                modifier = Modifier</b>
-<b class="fc">&nbsp;                    .fillMaxSize()</b>
-<b class="fc">&nbsp;                    .testTag(SurferErrorBoundaryTestTags.Fallback),</b>
-<b class="fc">&nbsp;                color = AppTheme.materialColors.surface,</b>
-<b class="fc">&nbsp;            ) {</b>
-<b class="fc">&nbsp;                Box(contentAlignment = Alignment.Center) {</b>
-<b class="fc">&nbsp;                    SurferErrorState(</b>
-<b class="fc">&nbsp;                        title = stringResource(Res.string.uikit_error_boundary_title),</b>
-<b class="fc">&nbsp;                        subtitle = stringResource(Res.string.uikit_error_boundary_subtitle),</b>
-<b class="fc">&nbsp;                        retryLabel = stringResource(Res.string.uikit_retry),</b>
-<b class="fc">&nbsp;                        onRetry = onRetry,</b>
-&nbsp;                    )
-<b class="fc">&nbsp;                }</b>
-&nbsp;            }
+<b class="fc">&nbsp;    Column(</b>
+<b class="fc">&nbsp;        modifier = modifier</b>
+<b class="fc">&nbsp;            .fillMaxWidth()</b>
+<b class="fc">&nbsp;            .padding(AppTheme.spacing.large),</b>
+<b class="fc">&nbsp;        horizontalAlignment = Alignment.CenterHorizontally,</b>
+<b class="fc">&nbsp;        verticalArrangement = Arrangement.spacedBy(AppTheme.spacing.small),</b>
+&nbsp;    ) {
+<b class="fc">&nbsp;        Box(</b>
+<b class="fc">&nbsp;            modifier = Modifier</b>
+<b class="fc">&nbsp;                .size(64.dp)</b>
+<b class="fc">&nbsp;                .clip(CircleShape)</b>
+<b class="fc">&nbsp;                .background(AppTheme.materialColors.surfaceContainerHighest),</b>
+<b class="fc">&nbsp;            contentAlignment = Alignment.Center,</b>
+&nbsp;        ) {
+<b class="fc">&nbsp;            Icon(</b>
+<b class="fc">&nbsp;                imageVector = icon,</b>
+<b class="fc">&nbsp;                contentDescription = SurferSemantics.Decorative,</b>
+<b class="fc">&nbsp;                tint = AppTheme.materialColors.onSurfaceVariant,</b>
+<b class="fc">&nbsp;                modifier = Modifier.size(28.dp),</b>
+&nbsp;            )
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;        Text(</b>
+<b class="fc">&nbsp;            text = title,</b>
+<b class="fc">&nbsp;            style = AppTheme.typography.titleMedium,</b>
+<b class="fc">&nbsp;            color = AppTheme.materialColors.onSurface,</b>
+<b class="fc">&nbsp;            textAlign = TextAlign.Center,</b>
+&nbsp;        )
+<b class="pc">&nbsp;        if (subtitle != null) {</b>
+<b class="fc">&nbsp;            Text(</b>
+<b class="fc">&nbsp;                text = subtitle,</b>
+<b class="fc">&nbsp;                style = AppTheme.typography.bodyMedium,</b>
+<b class="fc">&nbsp;                color = AppTheme.materialColors.onSurfaceVariant,</b>
+<b class="fc">&nbsp;                textAlign = TextAlign.Center,</b>
+&nbsp;            )
+<b class="nc">&nbsp;        }</b>
+<b class="pc">&nbsp;        if (actionLabel != null &amp;&amp; onActionClick != null) {</b>
+<b class="fc">&nbsp;            SurferButton(</b>
+<b class="fc">&nbsp;                text = actionLabel,</b>
+<b class="fc">&nbsp;                onClick = onActionClick,</b>
+<b class="fc">&nbsp;                style = SurferButtonStyle.Tonal,</b>
+<b class="fc">&nbsp;                startIcon = actionIcon,</b>
+<b class="fc">&nbsp;                modifier = Modifier.padding(top = AppTheme.spacing.xSmall),</b>
+&nbsp;            )
 <b class="fc">&nbsp;        }</b>
 <b class="fc">&nbsp;    }</b>
 <b class="fc">&nbsp;}</b>
 &nbsp;
-&nbsp;object SurferErrorBoundaryTestTags {
-&nbsp;    const val Fallback = &quot;errorBoundary:fallback&quot;
-&nbsp;}
+&nbsp;@Preview
+&nbsp;@Composable
+<b class="nc">&nbsp;private fun SurferEmptyStatePreview() {</b>
+<b class="nc">&nbsp;    SurferComponentPreview {</b>
+&nbsp;        SurferEmptyState(
+&nbsp;            title = &quot;No activity yet&quot;,
+&nbsp;            subtitle = &quot;Transactions you log will show up here.&quot;,
+&nbsp;            icon = SurferIcons.Receipt,
+&nbsp;            actionLabel = &quot;Add transaction&quot;,
+&nbsp;            onActionClick = {},
+&nbsp;        )
+&nbsp;    }
+<b class="nc">&nbsp;}</b>
 &nbsp;
 &nbsp;@Preview
 &nbsp;@Composable
-<b class="nc">&nbsp;private fun SurferErrorBoundaryPreview() {</b>
+<b class="nc">&nbsp;private fun SurferEmptyStateNoActionPreview() {</b>
 <b class="nc">&nbsp;    SurferComponentPreview {</b>
-&nbsp;        SurferErrorBoundary(hasError = true, onRetry = {}) {}
+&nbsp;        SurferEmptyState(
+&nbsp;            title = &quot;Nothing scheduled&quot;,
+&nbsp;            subtitle = &quot;Subscriptions and recurring bills will appear here.&quot;,
+&nbsp;            icon = SurferIcons.Event,
+&nbsp;        )
 &nbsp;    }
 <b class="nc">&nbsp;}</b>
 </code>
@@ -190,7 +239,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 12:08</div>
+    <div style="float:right;">generated on 2026-07-29 12:48</div>
 </div>
 </body>
 </html>

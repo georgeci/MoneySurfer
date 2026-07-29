@@ -110,6 +110,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.georgeci.moneysurfer.feature.dashboard.customize
 &nbsp;
+&nbsp;import com.georgeci.moneysurfer.domain.config.HostCapabilities
 &nbsp;import com.georgeci.moneysurfer.domain.dashboard.DashboardCardStyle
 &nbsp;import com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutConfig
 &nbsp;import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetType
@@ -124,9 +125,17 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;@KoinViewModel
 &nbsp;class DashboardCustomizeViewModel(
 &nbsp;    private val uiPreferences: UiPreferences,
+&nbsp;    hostCapabilities: HostCapabilities,
 &nbsp;) : MviViewModel&lt;AsyncState&lt;DashboardLayoutConfig&gt;, DashboardCustomizeEvent, DashboardCustomizeEffect&gt;(
 &nbsp;    initialState = AsyncState.Loading,
 &nbsp;) {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Whether the rows offer the per-widget card-style picker. Not part of the state: it is a
+&nbsp;     * build-time fact that cannot change while the screen is open, and the state here is the
+&nbsp;     * layout being edited.
+&nbsp;     */
+&nbsp;    val widgetStyleEnabled: Boolean = hostCapabilities.dashboardWidgetStyle
 &nbsp;
 &nbsp;    /**
 &nbsp;     * The layout waiting to be written, or null while nothing has been edited. A drag produces a
@@ -220,7 +229,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 12:08</div>
+    <div style="float:right;">generated on 2026-07-29 12:48</div>
 </div>
 </body>
 </html>

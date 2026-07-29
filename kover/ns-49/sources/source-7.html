@@ -140,6 +140,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;import androidx.compose.ui.unit.sp
 &nbsp;import androidx.lifecycle.compose.collectAsStateWithLifecycle
 &nbsp;import com.georgeci.moneysurfer.domain.primitives.AccountType
+&nbsp;import com.georgeci.moneysurfer.uikit.components.SurferAppIcon
 &nbsp;import com.georgeci.moneysurfer.uikit.components.SurferAuthBackground
 &nbsp;import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 &nbsp;import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
@@ -317,20 +318,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 &nbsp;    Spacer(Modifier.height(ValueTopGap))
 &nbsp;
 &nbsp;    Row(verticalAlignment = Alignment.CenterVertically) {
-&nbsp;        Box(
-&nbsp;            modifier = Modifier
-&nbsp;                .size(BrandTileSize)
-&nbsp;                .clip(RoundedCornerShape(BrandTileCorner))
-&nbsp;                .background(AuthColors.BrandTile),
-&nbsp;            contentAlignment = Alignment.Center,
-&nbsp;        ) {
-&nbsp;            Icon(
-&nbsp;                imageVector = SurferIcons.Wallet,
-&nbsp;                contentDescription = SurferSemantics.Decorative,
-&nbsp;                tint = AuthColors.OnBrand,
-&nbsp;                modifier = Modifier.size(BrandIconSize),
-&nbsp;            )
-&nbsp;        }
+&nbsp;        SurferAppIcon(size = BrandTileSize)
 &nbsp;        Spacer(Modifier.size(GapSmall))
 &nbsp;        Text(
 &nbsp;            text = stringResource(Res.string.sign_in_brand),
@@ -723,7 +711,7 @@ Current scope: MoneySurfer<span class="separator">|</span>    <a href="../../ind
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-07-29 12:08</div>
+    <div style="float:right;">generated on 2026-07-29 12:48</div>
 </div>
 </body>
 </html>
