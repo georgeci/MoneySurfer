@@ -25,11 +25,13 @@ import kotlin.math.roundToLong
 data class InsightInput(
     /** Names the period the ids belong to, e.g. `2026-07`. See [Insight.id]. */
     val periodKey: String,
-    /**
-     * How many days [currentSpend] covers — and, by construction, how many [previousSpend] covers
-     * too. Below [MIN_COMPARISON_DAYS] the comparison rules stand down; see [generateInsights].
-     */
+    /** How many days [currentSpend] covers. */
     val elapsedDays: Int,
+    /**
+     * How many days [previousSpend] covers. Usually equal to [elapsedDays], but a baseline clamped
+     * to a shorter month is not — see [generateInsights] for why that silences the comparison.
+     */
+    val baselineDays: Int,
     val currency: CurrencyCode,
     val currentSpend: List<CategorySpendSlice>,
     val previousSpend: List<CategorySpendSlice>,
@@ -50,15 +52,27 @@ data class InsightInput(
  * reading, not a log. Warn comes before Good and Good before Neutral so the compact card, which
  * shows exactly one, shows the actionable one.
  *
- * The comparison rules wait for [MIN_COMPARISON_DAYS]; the subscription count does not, because it
- * reads the schedules rather than the window and is just as true on the 1st as on the 30th.
+ * The comparison rules wait for [MIN_COMPARISON_DAYS] and for two windows of equal length; the
+ * subscription count waits for neither, because it reads the schedules rather than the window and
+ * is just as true on the 1st as on the 30th.
  */
 fun generateInsights(input: InsightInput): List<Insight> {
-    val comparisons =
-        if (input.elapsedDays >= MIN_COMPARISON_DAYS) periodComparisons(input) else emptyList()
+    val comparisons = if (input.canCompare) periodComparisons(input) else emptyList()
     return (comparisons + listOfNotNull(activeSubscriptions(input)))
         .sortedBy { TONE_PRIORITY.indexOf(it.tone) }
 }
+
+/**
+ * Whether the two windows can be measured against each other at all.
+ *
+ * Two terms. A sample shorter than [MIN_COMPARISON_DAYS] is too small to read anything into. And
+ * windows of *different* lengths are not comparable however long they are: on 31 March the
+ * baseline clamps to a 28-day February, so a user who spent at exactly the same daily rate in both
+ * months measures 31/28 — up 10.7%, enough on its own to trip the 10% period threshold and print
+ * "Spending is up 11%" every non-leap year. Saying nothing beats inventing a warning.
+ */
+private val InsightInput.canCompare: Boolean
+    get() = elapsedDays >= MIN_COMPARISON_DAYS && elapsedDays == baselineDays
 
 /** The rules that need a baseline: the two category movers, and the period total. */
 private fun periodComparisons(input: InsightInput): List<Insight> {
