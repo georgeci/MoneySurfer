@@ -84,6 +84,8 @@ jobs:
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@3f131e8634966bd73d06cc69884922b02e6faf92 # v6.2.0
+        with:
+          cache-read-only: true
 
       # resolveAndLockAll touches the native configurations, so the Kotlin/Native
       # toolchain gets pulled here the same way the iOS lane pulls it.

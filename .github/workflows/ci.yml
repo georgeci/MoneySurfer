@@ -87,6 +87,8 @@ jobs:
           distribution: temurin
           java-version: "17"
 
+      # Canonical Ubuntu Gradle cache writer. setup-gradle writes only on the
+      # default branch by default; other Ubuntu jobs are explicitly read-only.
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@3f131e8634966bd73d06cc69884922b02e6faf92 # v6.2.0
 
@@ -347,6 +349,10 @@ jobs:
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@3f131e8634966bd73d06cc69884922b02e6faf92 # v6.2.0
+        with:
+          # The junit job is the canonical Ubuntu cache writer. Fan-out jobs
+          # restore its cache without creating near-duplicate entries.
+          cache-read-only: true
 
       - name: Set up Node.js
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
@@ -506,6 +512,8 @@ jobs:
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@3f131e8634966bd73d06cc69884922b02e6faf92 # v6.2.0
+        with:
+          cache-read-only: true
 
       - name: Cache SonarCloud packages
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
@@ -610,6 +618,8 @@ jobs:
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@3f131e8634966bd73d06cc69884922b02e6faf92 # v6.2.0
+        with:
+          cache-read-only: true
 
       - name: Run detekt
         run: ./gradlew detekt --stacktrace
@@ -670,6 +680,8 @@ jobs:
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@3f131e8634966bd73d06cc69884922b02e6faf92 # v6.2.0
+        with:
+          cache-read-only: true
 
       - name: Compile Android debug
         run: ./gradlew :androidApp:processDebugGoogleServices :androidApp:compileDebugSources --stacktrace
