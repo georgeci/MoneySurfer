@@ -113,10 +113,10 @@ class GenerateInsightsUseCase(
         currency: CurrencyCode,
         today: LocalDate,
     ): Flow<List<Insight>> {
-        val (current, previous) = monthToDateWindows(today)
+        val windows = monthToDateWindows(today)
         return combine(
-            spendAnalytics.byCategory(SpendScope(workspaceId, currency, current)),
-            spendAnalytics.byCategory(SpendScope(workspaceId, currency, previous)),
+            spendAnalytics.byCategory(SpendScope(workspaceId, currency, windows.current)),
+            spendAnalytics.byCategory(SpendScope(workspaceId, currency, windows.previous)),
             categoryRepository.getByWorkspaceId(workspaceId),
             recurringRuleRepository.getByWorkspaceId(workspaceId),
         ) { currentSpend, previousSpend, categories, rules ->
@@ -126,8 +126,8 @@ class GenerateInsightsUseCase(
             generateInsights(
                 InsightInput(
                     periodKey = today.yearMonth.toString(),
-                    // The current window runs from the 1st to today inclusive.
-                    elapsedDays = today.day,
+                    elapsedDays = windows.currentDays,
+                    baselineDays = windows.previousDays,
                     currency = currency,
                     currentSpend = currentSpend,
                     previousSpend = previousSpend,
@@ -139,6 +139,21 @@ class GenerateInsightsUseCase(
         }
     }
 }
+
+/**
+ * The pair of windows a comparison reads, with the lengths that decide whether comparing them means
+ * anything.
+ *
+ * The lengths travel with the windows rather than being re-derived from them: they are known
+ * exactly where the windows are built, from dates that are non-null by construction, so nothing
+ * downstream has to cope with the unbounded window [TransactionPeriodWindow] also allows.
+ */
+private data class ComparisonWindows(
+    val current: TransactionPeriodWindow,
+    val previous: TransactionPeriodWindow,
+    val currentDays: Int,
+    val previousDays: Int,
+)
 
 /** See [GenerateInsightsUseCase.today] — the floor that keeps a backwards clock jump cheap. */
 private val MIN_ROLLOVER_SLEEP: Duration = 1.minutes
@@ -153,21 +168,28 @@ private val MIN_ROLLOVER_SLEEP: Duration = 1.minutes
  * yet. Both windows are the same number of days here, which removes that bias — though not the
  * small-sample volatility of the first few days, which the rules themselves stand down for.
  *
- * The previous window is clamped to its own month's last day, so the 31st compares against the
- * whole of a 28-day February rather than spilling into March.
+ * The previous window is clamped to its own month's last day rather than spilling into the current
+ * one. That leaves the pair unequal in length on the 29th-31st after a shorter month, which is not
+ * a comparison at all — `generateInsights` detects it from the two lengths and stays quiet.
  *
  * Built directly rather than through `periodWindow(Month, ...)`, which always spans a whole
  * calendar month — the point here is a part-month window with a matching part-month baseline.
  */
-private fun monthToDateWindows(
-    today: LocalDate,
-): Pair<TransactionPeriodWindow, TransactionPeriodWindow> {
+private fun monthToDateWindows(today: LocalDate): ComparisonWindows {
     val currentStart = LocalDate(today.year, today.month, 1)
     val previousStart = currentStart.minus(1, DateTimeUnit.MONTH)
     val previousEnd = minOf(
         previousStart.plus(today.day - 1, DateTimeUnit.DAY),
         currentStart.minus(1, DateTimeUnit.DAY),
     )
-    return TransactionPeriodWindow(currentStart, today) to
-        TransactionPeriodWindow(previousStart, previousEnd)
+    return ComparisonWindows(
+        current = TransactionPeriodWindow(currentStart, today),
+        previous = TransactionPeriodWindow(previousStart, previousEnd),
+        currentDays = daysCovered(currentStart, today),
+        previousDays = daysCovered(previousStart, previousEnd),
+    )
 }
+
+/** Days a closed range covers, both ends included. */
+private fun daysCovered(from: LocalDate, to: LocalDate): Int =
+    (to.toEpochDays() - from.toEpochDays() + 1).toInt()
