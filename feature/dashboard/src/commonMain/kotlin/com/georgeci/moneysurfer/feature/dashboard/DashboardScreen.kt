@@ -114,6 +114,9 @@ object DashboardTestTags {
     const val BurnRate = "dashboard:burnRate"
     const val Budgets = "dashboard:budgets"
     const val BudgetsSeeAll = "dashboard:budgetsSeeAll"
+
+    /** The whole spent-by-category card, whichever of its five treatments is selected. */
+    const val SpentByCategory = "dashboard:spentByCategory"
     const val Accounts = "dashboard:accounts"
 
     /**
@@ -294,6 +297,7 @@ private fun DashboardWidget(
         DashboardWidgetType.SafeToSpend -> SafeToSpendWidget(state, onEvent)
         DashboardWidgetType.BurnRate -> BurnRateWidget(state)
         DashboardWidgetType.Budgets -> BudgetsWidget(state, onEvent)
+        DashboardWidgetType.SpentByCategory -> SpentByCategoryWidget(state, variant)
         DashboardWidgetType.Accounts -> AccountsWidget(state, onEvent)
         DashboardWidgetType.Insights -> InsightsWidget(state, variant)
         DashboardWidgetType.Goals -> GoalsWidget(state, onEvent)

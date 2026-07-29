@@ -62,7 +62,7 @@
     <string name="category_details_trend_title">Last 6 months</string>
     <string name="category_details_subcategories">Subcategories</string>
     <string name="category_details_subcategories_empty">No subcategories. Everything here is booked straight to this category.</string>
-    <string name="category_details_share_percent">%1$d%%</string>
+    <string name="category_details_share_percent">%1$d%</string>
     <string name="category_details_recent">Recent</string>
     <string name="category_details_recent_empty">No transactions in this category yet.</string>
     <string name="category_details_transaction_deleted_snackbar">Transaction deleted</string>

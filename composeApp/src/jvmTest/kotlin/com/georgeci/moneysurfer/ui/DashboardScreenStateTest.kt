@@ -4,6 +4,8 @@ import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotSelected
 import androidx.compose.ui.test.assertIsSelected
+import androidx.compose.ui.test.onAllNodesWithText
+import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -22,11 +24,14 @@ import com.georgeci.moneysurfer.feature.dashboard.AccountUi
 import com.georgeci.moneysurfer.feature.dashboard.BudgetSummaryUi
 import com.georgeci.moneysurfer.feature.dashboard.BurnRateDayUi
 import com.georgeci.moneysurfer.feature.dashboard.BurnRateUi
+import com.georgeci.moneysurfer.feature.dashboard.CategoryCapUi
+import com.georgeci.moneysurfer.feature.dashboard.CategorySpendUi
 import com.georgeci.moneysurfer.feature.dashboard.DashboardContent
 import com.georgeci.moneysurfer.feature.dashboard.DashboardEvent
 import com.georgeci.moneysurfer.feature.dashboard.DashboardState
 import com.georgeci.moneysurfer.feature.dashboard.DashboardTestTags
 import com.georgeci.moneysurfer.feature.dashboard.SafeToSpendUi
+import com.georgeci.moneysurfer.uikit.widgets.SurferSpentByCategoryVariant
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly
 
@@ -338,6 +343,103 @@ class DashboardScreenStateTest : StringSpec({
             events shouldContainExactly listOf(DashboardEvent.OnBudgetClick(BudgetId("b-1")))
         }
     }
+    "every spent-by-category variant draws its rows rather than any of them measuring to nothing" {
+        SurferSpentByCategoryVariant.entries.forEach { variant ->
+            runComposeUiTest {
+                setContent {
+                    DashboardContent(
+                        state = spentByCategoryState(variant),
+                        onEvent = {},
+                    )
+                }
+
+                // Five layouts over one list: a branch that crashes or collapses shows up here
+                // and nowhere else, because none of it is visible to a ViewModel test.
+                onNodeWithTag(DashboardTestTags.SpentByCategory).assertIsDisplayed()
+                // All-nodes rather than one: Ring prints the top amount in the hole and again on
+                // the legend row that carries that category's status word.
+                onAllNodesWithText(GROCERIES_SPEND).onFirst().assertIsDisplayed()
+            }
+        }
+    }
+
+    "a capped category says what its meter measures, and an uncapped one says the share instead" {
+        runComposeUiTest {
+            setContent {
+                DashboardContent(
+                    state = spentByCategoryState(SurferSpentByCategoryVariant.Bar),
+                    onEvent = {},
+                )
+            }
+
+            // The captions are what keep a cap meter and a share meter from looking alike.
+            onNodeWithText("$GROCERIES_SPEND of $GROCERIES_CAP").assertIsDisplayed()
+            onNodeWithText("Near limit").assertIsDisplayed()
+            onNodeWithText("60% of spending").assertIsDisplayed()
+        }
+    }
+
+    "an overspent category states the cap it passed rather than reading as headroom" {
+        runComposeUiTest {
+            setContent {
+                DashboardContent(
+                    state = spentByCategoryState(SurferSpentByCategoryVariant.Bar).copy(
+                        spentByCategory = listOf(
+                            categorySpendUi(
+                                name = "Groceries",
+                                cap = CategoryCapUi(
+                                    limitFormatted = GROCERIES_CAP,
+                                    status = BudgetStatus.OVER,
+                                    progress = 1.2f,
+                                ),
+                            ),
+                        ),
+                    ),
+                    onEvent = {},
+                )
+            }
+
+            // "€142.10 of €150" would read as money still available.
+            onNodeWithText("over $GROCERIES_CAP").assertIsDisplayed()
+            onNodeWithText("Over").assertIsDisplayed()
+        }
+    }
+
+    "a month with no spend keeps the card and says so, rather than leaving a gap" {
+        runComposeUiTest {
+            setContent {
+                // The card alone, like the variant cases: the default layout is long enough that
+                // this one would otherwise sit below the fold and never compose.
+                DashboardContent(
+                    state = spentByCategoryState(SurferSpentByCategoryVariant.Bar)
+                        .copy(spentByCategory = emptyList()),
+                    onEvent = {},
+                )
+            }
+
+            onNodeWithTag(DashboardTestTags.SpentByCategory).assertIsDisplayed()
+            onNodeWithText("Nothing spent yet").assertIsDisplayed()
+        }
+    }
+
+    "a slice with no category is named on the screen, not left blank" {
+        runComposeUiTest {
+            setContent {
+                // The card alone: the default layout now carries ten widgets, so this one sits
+                // below the fold and never composes when the whole column is drawn.
+                DashboardContent(
+                    state = spentByCategoryState(SurferSpentByCategoryVariant.Bar).copy(
+                        spentByCategory = listOf(
+                            categorySpendUi(categoryId = null, name = null, hue = null, share = 1f),
+                        ),
+                    ),
+                    onEvent = {},
+                )
+            }
+
+            onNodeWithText("Uncategorized").assertIsDisplayed()
+        }
+    }
 })
 
 private const val ADD_TRANSACTION = "Add transaction"
@@ -415,6 +517,62 @@ private fun budgetsOnly(
         ),
     ),
 )
+
+private const val GROCERIES_SPEND = "€142.10"
+private const val GROCERIES_CAP = "€150.00"
+private const val RENT_SPEND = "€760.00"
+
+private fun categorySpendUi(
+    categoryId: String? = "c-1",
+    name: String? = "Groceries",
+    hue: Int? = 35,
+    spent: String = GROCERIES_SPEND,
+    share: Float = 0.4f,
+    cap: CategoryCapUi? = null,
+) = CategorySpendUi(
+    categoryId = categoryId,
+    name = name,
+    hue = hue,
+    spentFormatted = spent,
+    share = share,
+    cap = cap,
+)
+
+/**
+ * One capped category and one uncapped one — the pair is what makes the two captions, and the two
+ * meter colours, distinguishable in a single render.
+ */
+private fun spentByCategoryState(variant: SurferSpentByCategoryVariant) =
+    contentWith(accounts = 2, transferEnabled = true).copy(
+        spentByCategory = listOf(
+            categorySpendUi(
+                categoryId = "c-groceries",
+                name = "Groceries",
+                cap = CategoryCapUi(
+                    limitFormatted = GROCERIES_CAP,
+                    status = BudgetStatus.WARN,
+                    progress = 0.95f,
+                ),
+            ),
+            categorySpendUi(
+                categoryId = "c-rent",
+                name = "Rent",
+                hue = 258,
+                spent = RENT_SPEND,
+                share = 0.6f,
+            ),
+        ),
+        // The card alone, so its lower rows are composed rather than scrolled off the bottom of
+        // the dashboard column — the captions are the point of these assertions.
+        layout = DashboardLayoutConfig(
+            items = listOf(
+                DashboardLayoutItem(
+                    type = DashboardWidgetType.SpentByCategory,
+                    cardStyle = DashboardCardStyle(variant = variant.name),
+                ),
+            ),
+        ),
+    )
 
 private fun contentWith(accounts: Int, transferEnabled: Boolean) = DashboardState.Content(
     accounts = List(accounts) { index ->

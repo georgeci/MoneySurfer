@@ -62,7 +62,7 @@
     <string name="category_details_trend_title">Последние 6 месяцев</string>
     <string name="category_details_subcategories">Подкатегории</string>
     <string name="category_details_subcategories_empty">Подкатегорий нет. Всё учитывается прямо в этой категории.</string>
-    <string name="category_details_share_percent">%1$d%%</string>
+    <string name="category_details_share_percent">%1$d%</string>
     <string name="category_details_recent">Недавние</string>
     <string name="category_details_recent_empty">В этой категории пока нет операций.</string>
     <string name="category_details_transaction_deleted_snackbar">Транзакция удалена</string>

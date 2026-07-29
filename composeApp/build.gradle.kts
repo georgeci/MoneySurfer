@@ -82,6 +82,9 @@ kotlin {
             implementation(projects.feature.login)
             // DashboardCustomizeScreenStateTest mounts the customize screen's stateless content.
             implementation(projects.feature.dashboard)
+            // PercentFormattingTest mounts the budget details content to assert what Compose
+            // actually renders for a `%`-carrying format string.
+            implementation(projects.feature.budget)
             // DebugConfigScreenStateTest mounts the QA configuration panel's stateless content.
             implementation(projects.feature.settings)
             // SyncScreenStateTest feeds the sync panel real outbox rows and cursors.

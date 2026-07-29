@@ -29,6 +29,7 @@ enum class DashboardWidgetType(val isPeriodScoped: Boolean = false) {
      */
     BurnRate,
     Budgets,
+    SpentByCategory(isPeriodScoped = true),
     Accounts,
 
     /**

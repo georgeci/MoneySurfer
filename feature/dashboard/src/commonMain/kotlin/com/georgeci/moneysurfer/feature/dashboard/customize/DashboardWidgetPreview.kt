@@ -8,6 +8,7 @@ import androidx.compose.ui.unit.dp
 import com.georgeci.moneysurfer.domain.dashboard.DashboardCardStyle
 import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetSize
 import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetType
+import com.georgeci.moneysurfer.uikit.components.SurferCategoryPalette
 import com.georgeci.moneysurfer.uikit.components.budget.SurferBudgetStatus
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.modifier.surferScaleToWidth
@@ -25,6 +26,8 @@ import com.georgeci.moneysurfer.uikit.widgets.SurferBurnRateBar
 import com.georgeci.moneysurfer.uikit.widgets.SurferBurnRateData
 import com.georgeci.moneysurfer.uikit.widgets.SurferBurnRatePace
 import com.georgeci.moneysurfer.uikit.widgets.SurferBurnRateWidget
+import com.georgeci.moneysurfer.uikit.widgets.SurferCategorySpendCap
+import com.georgeci.moneysurfer.uikit.widgets.SurferCategorySpendItem
 import com.georgeci.moneysurfer.uikit.widgets.SurferGoalItem
 import com.georgeci.moneysurfer.uikit.widgets.SurferGoalsWidget
 import com.georgeci.moneysurfer.uikit.widgets.SurferInsightItem
@@ -36,6 +39,8 @@ import com.georgeci.moneysurfer.uikit.widgets.SurferRecentTransactionItem
 import com.georgeci.moneysurfer.uikit.widgets.SurferRecentTransactionsWidget
 import com.georgeci.moneysurfer.uikit.widgets.SurferSafeToSpendData
 import com.georgeci.moneysurfer.uikit.widgets.SurferSafeToSpendWidget
+import com.georgeci.moneysurfer.uikit.widgets.SurferSpentByCategoryVariant
+import com.georgeci.moneysurfer.uikit.widgets.SurferSpentByCategoryWidget
 import com.georgeci.moneysurfer.uikit.widgets.SurferWidgetSize
 import moneysurfer.feature.dashboard.generated.resources.Res
 import moneysurfer.feature.dashboard.generated.resources.dashboard_accounts_manage
@@ -80,6 +85,10 @@ import moneysurfer.feature.dashboard.generated.resources.dashboard_recent_title
 import moneysurfer.feature.dashboard.generated.resources.dashboard_safe_to_spend_caption
 import moneysurfer.feature.dashboard.generated.resources.dashboard_safe_to_spend_per_day
 import moneysurfer.feature.dashboard.generated.resources.dashboard_safe_to_spend_title
+import moneysurfer.feature.dashboard.generated.resources.dashboard_spent_by_category_of_cap
+import moneysurfer.feature.dashboard.generated.resources.dashboard_spent_by_category_share
+import moneysurfer.feature.dashboard.generated.resources.dashboard_spent_by_category_status_warn
+import moneysurfer.feature.dashboard.generated.resources.dashboard_spent_by_category_title
 import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
 
@@ -119,6 +128,8 @@ internal fun DashboardWidgetPreview(
             DashboardWidgetType.SafeToSpend -> SafeToSpendPreview(modifier.then(content))
             DashboardWidgetType.BurnRate -> BurnRatePreview(modifier.then(content))
             DashboardWidgetType.Budgets -> BudgetsPreview(modifier.then(content))
+            DashboardWidgetType.SpentByCategory ->
+                SpentByCategoryPreview(cardStyle.variant, modifier.then(content))
             DashboardWidgetType.Accounts -> AccountsPreview(modifier.then(content))
             DashboardWidgetType.Insights -> InsightsPreview(cardStyle.variant, modifier.then(content))
             DashboardWidgetType.Goals -> GoalsPreview(modifier.then(content))
@@ -183,6 +194,58 @@ private fun SafeToSpendPreview(modifier: Modifier) {
             paceFraction = SAMPLE_SAFE_PACE,
             status = SurferBudgetStatus.Ok,
         ),
+        modifier = modifier,
+    )
+}
+
+/**
+ * Sample rows, like [SafeToSpendPreview] — the tile is drawn for every widget in the picker,
+ * including the ones switched off, so it must not depend on the month holding any spend.
+ *
+ * One of the three carries a cap, because the near-limit treatment is half of what distinguishes
+ * the five variants from each other.
+ */
+@Composable
+private fun SpentByCategoryPreview(variant: String?, modifier: Modifier) {
+    val tints = SurferCategoryPalette.tints
+    SurferSpentByCategoryWidget(
+        title = stringResource(Res.string.dashboard_spent_by_category_title),
+        items = listOf(
+            SurferCategorySpendItem(
+                id = "preview-rent",
+                name = stringResource(Res.string.dashboard_customize_preview_transaction_rent),
+                amount = SAMPLE_EXPENSE_THREE_MAGNITUDE,
+                share = SAMPLE_SHARE_RENT,
+                caption = stringResource(Res.string.dashboard_spent_by_category_share, SAMPLE_PERCENT_RENT),
+                tint = tints[0],
+            ),
+            SurferCategorySpendItem(
+                id = "preview-groceries",
+                name = stringResource(Res.string.dashboard_customize_preview_transaction_groceries),
+                amount = SAMPLE_CATEGORY_GROCERIES,
+                share = SAMPLE_SHARE_GROCERIES,
+                caption = stringResource(
+                    Res.string.dashboard_spent_by_category_of_cap,
+                    SAMPLE_CATEGORY_GROCERIES,
+                    SAMPLE_CATEGORY_CAP,
+                ),
+                tint = tints[1],
+                cap = SurferCategorySpendCap(
+                    progress = SAMPLE_CAP_PROGRESS,
+                    status = SurferBudgetStatus.Warn,
+                    statusLabel = stringResource(Res.string.dashboard_spent_by_category_status_warn),
+                ),
+            ),
+            SurferCategorySpendItem(
+                id = "preview-coffee",
+                name = stringResource(Res.string.dashboard_customize_preview_transaction_coffee),
+                amount = SAMPLE_CATEGORY_COFFEE,
+                share = SAMPLE_SHARE_COFFEE,
+                caption = stringResource(Res.string.dashboard_spent_by_category_share, SAMPLE_PERCENT_COFFEE),
+                tint = tints[2],
+            ),
+        ),
+        variant = SurferSpentByCategoryVariant.fromKey(variant),
         modifier = modifier,
     )
 }
@@ -442,3 +505,13 @@ private const val SAMPLE_COFFEE_SPENT = "€68.40"
 private const val SAMPLE_COFFEE_CAP = "€60.00"
 private const val SAMPLE_COFFEE_OVER = "€8.40"
 private const val SAMPLE_COFFEE_PROGRESS = 1.14f
+private const val SAMPLE_EXPENSE_THREE_MAGNITUDE = "€760.00"
+private const val SAMPLE_CATEGORY_GROCERIES = "€142.10"
+private const val SAMPLE_CATEGORY_COFFEE = "€38.20"
+private const val SAMPLE_CATEGORY_CAP = "€150"
+private const val SAMPLE_SHARE_RENT = 0.62f
+private const val SAMPLE_SHARE_GROCERIES = 0.25f
+private const val SAMPLE_SHARE_COFFEE = 0.13f
+private const val SAMPLE_PERCENT_RENT = 62
+private const val SAMPLE_PERCENT_COFFEE = 13
+private const val SAMPLE_CAP_PROGRESS = 0.95f

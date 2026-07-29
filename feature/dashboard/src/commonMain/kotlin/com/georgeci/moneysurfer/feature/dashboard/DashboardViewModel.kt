@@ -13,15 +13,18 @@ import com.georgeci.moneysurfer.domain.model.BudgetProgress
 import com.georgeci.moneysurfer.domain.model.BudgetStatus
 import com.georgeci.moneysurfer.domain.model.BurnRate
 import com.georgeci.moneysurfer.domain.model.BurnRatePace
+import com.georgeci.moneysurfer.domain.model.CategorySpend
 import com.georgeci.moneysurfer.domain.model.ConvertedTotal
 import com.georgeci.moneysurfer.domain.model.ExchangeRateSnapshot
 import com.georgeci.moneysurfer.domain.model.SafeToSpend
 import com.georgeci.moneysurfer.domain.model.SavingsGoalSummary
+import com.georgeci.moneysurfer.domain.model.SpentByCategory
 import com.georgeci.moneysurfer.domain.model.TransactionSplitGroup
 import com.georgeci.moneysurfer.domain.model.safeToSpend
 import com.georgeci.moneysurfer.domain.preferences.UiPreferences
 import com.georgeci.moneysurfer.domain.primitives.AccountId
 import com.georgeci.moneysurfer.domain.primitives.BudgetId
+import com.georgeci.moneysurfer.domain.primitives.CurrencyCode
 import com.georgeci.moneysurfer.domain.primitives.GoalId
 import com.georgeci.moneysurfer.domain.primitives.Money
 import com.georgeci.moneysurfer.domain.primitives.TransactionId
@@ -31,6 +34,7 @@ import com.georgeci.moneysurfer.domain.usecase.GenerateInsightsUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetAccountsUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetActiveBudgetProgressUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetBurnRateUseCase
+import com.georgeci.moneysurfer.domain.usecase.GetCategorySpendUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetExchangeRatesUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetGoalsUseCase
 import com.georgeci.moneysurfer.domain.usecase.GetRecentTransactionsUseCase
@@ -43,13 +47,16 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.koin.core.annotation.KoinViewModel
+import kotlin.math.roundToInt
 import kotlin.time.Instant
 
+/**
+ * One reader per widget: the dashboard is the one screen that composes every other feature's
+ * numbers, so its dependency list grows by one each time a widget is wired. Grouping them would
+ * only move the list somewhere else — see `observeDashboard`, where the flows themselves *are*
+ * folded, because there `combine`'s five-flow ceiling forces it.
+ */
 @KoinViewModel
-// One injected collaborator per widget that reads its own data, which is what a dashboard is;
-// the tenth arrived when the burn-rate and insights widgets landed together. Bundling them into a
-// holder would buy a shorter signature and cost a layer of indirection through the Koin graph —
-// the same trade `AppLaunchViewModel` declined.
 @Suppress("LongParameterList")
 class DashboardViewModel(
     private val getAccounts: GetAccountsUseCase,
@@ -57,6 +64,7 @@ class DashboardViewModel(
     private val getGoals: GetGoalsUseCase,
     private val getExchangeRates: GetExchangeRatesUseCase,
     private val getSafeToSpend: GetSafeToSpendUseCase,
+    private val getCategorySpend: GetCategorySpendUseCase,
     private val getActiveBudgetProgress: GetActiveBudgetProgressUseCase,
     private val getBurnRate: GetBurnRateUseCase,
     private val generateInsights: GenerateInsightsUseCase,
@@ -98,17 +106,22 @@ class DashboardViewModel(
     }
 
     private fun observeDashboard() {
-        // The layout, the period and the three budget-shaped widgets are folded into one source
-        // because `combine` tops out at five typed flows, and these are never read apart.
+        // The chrome and the four widget readers are folded into one source because `combine`
+        // tops out at five typed flows, and these are never read apart.
         //
         // The period reaches safe-to-spend as a flow, not as this combine's value: `getSafeToSpend`
         // re-picks the budget in place that way, instead of restarting the workspace-wide
         // transaction query on every tap of the switch. The cost is one intermediate emission on a
         // change — the new period beside the previous budget's figures — which resolves on the next
         // frame and only differs at all when the workspace runs budgets on both cadences.
+        //
+        // The sixth source arrived with the budgets card, so the two the screen draws *around* the
+        // widgets — which layout, which span — ride together in [DashboardChrome] and free a slot.
+        // They are the pair to fold: both are local UI state that is always present, so neither can
+        // be the one a widget is waiting on.
+        val chrome = combine(layout, period, ::DashboardChrome)
         val widgetSources = combine(
-            layout,
-            period,
+            chrome,
             getSafeToSpend(period.map { it.budgetPeriod }).onStart { emit(null) },
             // The budgets card lists what safe-to-spend picks one of. It reads the progress list
             // itself rather than the headline, and takes no period: a budget owns its own window,
@@ -117,6 +130,7 @@ class DashboardViewModel(
             // Burn rate takes no period: it projects to month-end off a fixed seven-day chart.
             // See `DashboardWidgetType.BurnRate` for why that is a scoping call, not an omission.
             getBurnRate().onStart { emit(null) },
+            getCategorySpend(period).onStart { emit(null) },
             ::WidgetSources,
         )
         launch {
@@ -145,12 +159,13 @@ class DashboardViewModel(
                     formattedTrendDelta = null,
                     goals = goals.take(DASHBOARD_GOALS_LIMIT).map { it.toUi() },
                     safeToSpend = widgets.safeToSpend?.toUi(),
+                    spentByCategory = widgets.categorySpend?.toUi().orEmpty(),
                     budgets = widgets.budgetProgress.toBudgetsUi(),
                     burnRate = widgets.burnRate?.toUi(),
                     isOffline = isOffline,
                     transferEnabled = transferEnabled,
-                    layout = widgets.layout,
-                    period = widgets.period,
+                    layout = widgets.chrome.layout,
+                    period = widgets.chrome.period,
                 )
             }
                 // Joined here rather than folded into a pair above: the insights are the slowest
@@ -371,6 +386,11 @@ sealed interface DashboardState {
         /** The active budgets worth a row, most pressing first — empty when none are tracked. */
         val budgets: List<BudgetSummaryUi> = emptyList(),
         /**
+         * Where the selected period's money went, largest spender first — empty while it holds no
+         * spend, which is the spent-by-category widget's own empty state rather than a missing one.
+         */
+        val spentByCategory: List<CategorySpendUi> = emptyList(),
+        /**
          * The week's spend pace and where the month lands at it, or null while no workspace backs a
          * series. Unlike [safeToSpend] this one does not need a budget — a null pace inside it is
          * the "no cap to miss" state, and the chart is drawn either way.
@@ -416,12 +436,43 @@ sealed interface DashboardState {
  * flows and the screen already reads four others.
  */
 private data class WidgetSources(
-    val layout: DashboardLayoutConfig,
-    val period: DashboardPeriod,
+    val chrome: DashboardChrome,
     val safeToSpend: SafeToSpend?,
     /** Every active budget's progress — the rows the budgets card draws. */
     val budgetProgress: List<BudgetProgress>,
     val burnRate: BurnRate?,
+    val categorySpend: SpentByCategory?,
+)
+
+/**
+ * The breakdown's rows, largest spender first. Money is formatted here against the breakdown's
+ * own currency — non-null by construction, so nothing has to invent one.
+ */
+private fun SpentByCategory.toUi(): List<CategorySpendUi> = entries.map { it.toUi(currency) }
+
+private fun CategorySpend.toUi(currency: CurrencyCode) = CategorySpendUi(
+    categoryId = category?.id?.value,
+    name = category?.name,
+    hue = category?.hue,
+    spentFormatted = MoneyFormatter.format(spent, currency),
+    share = share,
+    cap = cap?.let {
+        CategoryCapUi(
+            limitFormatted = MoneyFormatter.format(it.limit, currency),
+            status = it.status,
+            // Non-null whenever `cap` is — the two come off the same entry.
+            progress = capFraction ?: 0f,
+        )
+    },
+)
+
+/**
+ * What the screen draws around the widgets: which cards, in what order, and the span they are all
+ * read at. Folded into one flow so the five `combine` takes can cover six sources.
+ */
+private data class DashboardChrome(
+    val layout: DashboardLayoutConfig,
+    val period: DashboardPeriod,
 )
 
 /** The three strings the balance widget needs, already formatted. */
@@ -505,6 +556,36 @@ data class SafeToSpendUi(
     /** Derived rather than stored, so the wording and the colour can never disagree. */
     val isOver: Boolean get() = status == BudgetStatus.OVER
 }
+
+/**
+ * One row of the spent-by-category widget. The label for the uncategorized bucket and the sentences
+ * around the numbers are built on the screen, which is where the string resources are.
+ */
+data class CategorySpendUi(
+    /** Null for the uncategorized bucket, which is a real slice with no category behind it. */
+    val categoryId: String?,
+    /** Null for the uncategorized bucket — the screen owns that label. */
+    val name: String?,
+    /** The category's stored hue, or null for the bucket that has no stored appearance. */
+    val hue: Int?,
+    val spentFormatted: String,
+    /** Share of the selected period's total spend, `0f..1f`. */
+    val share: Float,
+    /** The cap on this category, or null while nothing caps it. */
+    val cap: CategoryCapUi? = null,
+) {
+
+    /** [share] as whole percent, for the caption of a row that has no cap to state instead. */
+    val sharePercent: Int get() = (share * PERCENT).roundToInt()
+}
+
+/** The cap a single-category budget puts on one row, already formatted. */
+data class CategoryCapUi(
+    val limitFormatted: String,
+    val status: BudgetStatus,
+    /** Spend against the cap; can exceed 1, which the meter caps rather than overdrawing. */
+    val progress: Float,
+)
 
 /**
  * One budget row of the budgets widget. Money is formatted here; the sentences around it — the
@@ -667,5 +748,8 @@ private const val DASHBOARD_GOALS_LIMIT = 2
 /** Three rows is what the full-size budgets card draws; the compact one keeps the first. */
 private const val DASHBOARD_BUDGETS_LIMIT = 3
 
-/** Alert thresholds are stored as whole percents; the bar wants a fraction. */
+/**
+ * Alert thresholds are stored as whole percents and the bar wants a fraction; a share is a fraction
+ * and its caption wants a whole percent. One constant serves both directions.
+ */
 private const val PERCENT = 100f

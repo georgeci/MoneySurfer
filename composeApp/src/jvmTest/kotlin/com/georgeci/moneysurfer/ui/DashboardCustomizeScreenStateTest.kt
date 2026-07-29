@@ -42,6 +42,8 @@ class DashboardCustomizeScreenStateTest : StringSpec({
                 DashboardCustomizeContent(state = AsyncState.Content(GOALS_OFF), onEvent = {})
             }
 
+            // Top of the list first, then scroll: the assertions below move the viewport, and
+            // the enabled section's first row leaves it as soon as they do.
             onNodeWithTag(DashboardCustomizeTestTags.Root).assertIsDisplayed()
             onNodeWithTag(DashboardCustomizeTestTags.EnabledHeader).assertIsDisplayed()
             onNodeWithTag(enabledRow(DashboardWidgetType.Balance)).assertIsDisplayed()
@@ -149,7 +151,7 @@ class DashboardCustomizeScreenStateTest : StringSpec({
             events shouldContain DashboardCustomizeEvent.OnWidgetMove(
                 from = DashboardWidgetType.Accounts,
                 // The row above Accounts in the default layout.
-                to = DashboardWidgetType.Budgets,
+                to = DashboardWidgetType.SpentByCategory,
             )
         }
     }

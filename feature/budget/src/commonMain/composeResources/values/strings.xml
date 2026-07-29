@@ -36,8 +36,8 @@
     <string name="budget_details_rollover_carry_format">Includes %1$s carried over</string>
     <string name="budget_details_transactions_header">Transactions in this period</string>
     <string name="budget_details_transactions_empty">Nothing spent in this period yet.</string>
-    <string name="budget_details_alert_warn_format">%1$d%% of the limit spent</string>
-    <string name="budget_details_alert_warn_message_format">Your alert is set at %1$d%%.</string>
+    <string name="budget_details_alert_warn_format">%1$d% of the limit spent</string>
+    <string name="budget_details_alert_warn_message_format">Your alert is set at %1$d%.</string>
     <string name="budget_details_alert_over_format">Over budget by %1$s</string>
     <string name="budget_details_alert_over_message">Spending has passed the limit for this period.</string>
     <string name="budget_details_not_found">This budget no longer exists.</string>

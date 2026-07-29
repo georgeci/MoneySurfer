@@ -6,6 +6,7 @@ import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetSize
 import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetType
 import com.georgeci.moneysurfer.uikit.widgets.SurferBalanceVariant
 import com.georgeci.moneysurfer.uikit.widgets.SurferInsightsVariant
+import com.georgeci.moneysurfer.uikit.widgets.SurferSpentByCategoryVariant
 import moneysurfer.feature.dashboard.generated.resources.Res
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_size_compact
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_size_expanded
@@ -16,6 +17,11 @@ import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_var
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_variant_balance_stacked
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_variant_insights_carousel
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_variant_insights_list
+import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_variant_spent_bar
+import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_variant_spent_chips
+import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_variant_spent_gauge
+import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_variant_spent_multi
+import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_variant_spent_ring
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_widget_accounts
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_widget_balance
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_widget_budgets
@@ -25,6 +31,7 @@ import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_wid
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_widget_quick_actions
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_widget_recent
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_widget_safe_to_spend
+import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_widget_spent_by_category
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 
@@ -45,6 +52,7 @@ internal data class DashboardVariantOption(
  */
 internal fun DashboardWidgetType.variantOptions(): List<DashboardVariantOption> = when (this) {
     DashboardWidgetType.Balance -> BALANCE_VARIANTS
+    DashboardWidgetType.SpentByCategory -> SPENT_BY_CATEGORY_VARIANTS
     DashboardWidgetType.Insights -> INSIGHTS_VARIANTS
     DashboardWidgetType.QuickActions,
     DashboardWidgetType.SafeToSpend,
@@ -80,6 +88,19 @@ private fun SurferBalanceVariant.labelResource(): StringResource = when (this) {
     SurferBalanceVariant.Stacked -> Res.string.dashboard_customize_variant_balance_stacked
     SurferBalanceVariant.Inline -> Res.string.dashboard_customize_variant_balance_inline
     SurferBalanceVariant.Minimal -> Res.string.dashboard_customize_variant_balance_minimal
+}
+
+/** Same deal as [BALANCE_VARIANTS]: built from the enum the widget itself switches on. */
+private val SPENT_BY_CATEGORY_VARIANTS = SurferSpentByCategoryVariant.entries.map {
+    DashboardVariantOption(key = it.name, label = it.labelResource())
+}
+
+private fun SurferSpentByCategoryVariant.labelResource(): StringResource = when (this) {
+    SurferSpentByCategoryVariant.Bar -> Res.string.dashboard_customize_variant_spent_bar
+    SurferSpentByCategoryVariant.Ring -> Res.string.dashboard_customize_variant_spent_ring
+    SurferSpentByCategoryVariant.Gauge -> Res.string.dashboard_customize_variant_spent_gauge
+    SurferSpentByCategoryVariant.Chips -> Res.string.dashboard_customize_variant_spent_chips
+    SurferSpentByCategoryVariant.Multi -> Res.string.dashboard_customize_variant_spent_multi
 }
 
 /**
@@ -120,6 +141,7 @@ internal fun DashboardWidgetType.titleResource(): StringResource = when (this) {
     DashboardWidgetType.SafeToSpend -> Res.string.dashboard_customize_widget_safe_to_spend
     DashboardWidgetType.BurnRate -> Res.string.dashboard_customize_widget_burn_rate
     DashboardWidgetType.Budgets -> Res.string.dashboard_customize_widget_budgets
+    DashboardWidgetType.SpentByCategory -> Res.string.dashboard_customize_widget_spent_by_category
     DashboardWidgetType.Accounts -> Res.string.dashboard_customize_widget_accounts
     DashboardWidgetType.Insights -> Res.string.dashboard_customize_widget_insights
     DashboardWidgetType.Goals -> Res.string.dashboard_customize_widget_goals

@@ -207,6 +207,12 @@ in the `when` in `DashboardScreen.kt`, plus its use case.
 - #290 SpentByCategory — same query, five variants (bar/ring/gauge/chips/multi);
   the over/near-limit states come from `GetBudgetProgressUseCase`, so this one
   genuinely depends on budgets.
+  **As built, the caps do not go through `GetBudgetProgressUseCase`.** That use
+  case folds the whole workspace transaction list per emission, which is the
+  pattern this repository exists to replace, so `buildSpentByCategory` measures a
+  category against its budget's own `amount` using the shared `budgetStatusOf`
+  thresholds. The cost is a rollover carry the widget does not see, and a budget
+  anchored off the 1st whose status can differ from the Budgets screen's.
 
 `Content` already carries `layout: DashboardLayoutConfig`; the new data joins the
 existing `combine` in `DashboardViewModel.observeDashboard()`. Watch the arity —

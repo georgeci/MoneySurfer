@@ -142,7 +142,7 @@ fun calculateBudgetProgress(
         rolloverCarry = carry,
         remaining = remaining,
         percent = percentOf(spent, effectiveLimit),
-        status = statusOf(spent, effectiveLimit, budget.alertPercent),
+        status = budgetStatusOf(spent, effectiveLimit, budget.alertPercent),
         daysLeft = daysLeft,
         dailyAverage = dailyAverage,
         projectedTotal = dailyAverage * budget.period.forecastDays,
@@ -177,7 +177,15 @@ private fun Budget.rolloverCarry(
 private fun percentOf(spent: Money, limit: Money): Int =
     if (limit.minor <= 0L) 0 else (spent.minor * PERCENT / limit.minor).toInt()
 
-private fun statusOf(spent: Money, limit: Money, alertPercent: Int): BudgetStatus {
+/**
+ * The traffic light for [spent] against [limit], with [alertPercent] as the near-limit threshold.
+ *
+ * Public because [calculateBudgetProgress] is not the only place spend meets a cap: the dashboard's
+ * per-category breakdown ([buildSpentByCategory]) measures a category against its own budget
+ * without folding the transaction list, and a second set of thresholds there would let the same
+ * budget read WARN on one screen and OK on another.
+ */
+fun budgetStatusOf(spent: Money, limit: Money, alertPercent: Int): BudgetStatus {
     val percent = percentOf(spent, limit)
     return when {
         spent > limit -> BudgetStatus.OVER
