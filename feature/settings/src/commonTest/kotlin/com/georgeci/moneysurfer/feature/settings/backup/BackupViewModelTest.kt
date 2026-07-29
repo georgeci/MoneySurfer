@@ -127,4 +127,5 @@ private class FakeHostCapabilities(override val isOffline: Boolean) : HostCapabi
     override val signInAnonymous: Boolean = !isOffline
     override val signInDemo: Boolean = false
     override val transferEnabled: Boolean = true
+    override val dashboardWidgetStyle: Boolean = false
 }

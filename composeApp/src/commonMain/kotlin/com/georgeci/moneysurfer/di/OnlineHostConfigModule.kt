@@ -24,6 +24,10 @@ class OnlineHostConfigModule {
         put(HostConfigKeys.signInAnonymous, true)
         put(HostConfigKeys.signInDemo, true)
         put(HostConfigKeys.transferEnabled, true)
+        // Dark until the per-widget size/variant picker is finished — the rows on the customize
+        // screen render without their style pill. Flipping it is a release decision; see
+        // AGENTS.md -> "Feature flags shipped switched off".
+        put(HostConfigKeys.dashboardWidgetStyle, false)
         // Sync is live in the online build since issue #342: Settings → Sync, the periodic
         // in-process ticker, and the use-case-driven triggers (PostAuthBootstrap, CreateWorkspace,
         // AcceptInvite, RefreshIncomingInvites). This is the build-owned term of

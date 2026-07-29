@@ -24,6 +24,7 @@ val workspaceNavGraph: FeatureNavGraph = { navigator ->
         WorkspaceSelectorScreen(
             showActions = key.showActions,
             navigation = WorkspaceSelectorNavigation(
+                onNavigateBack = { navigator.pop() },
                 onNavigateToDashboard = {
                     navigator.replaceTop(Route.Dashboard)
                 },

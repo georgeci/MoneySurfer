@@ -46,6 +46,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.georgeci.moneysurfer.domain.primitives.AccountType
+import com.georgeci.moneysurfer.uikit.components.SurferAppIcon
 import com.georgeci.moneysurfer.uikit.components.SurferAuthBackground
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.modifier.surferSafeInsets
@@ -223,20 +224,7 @@ private fun ValueStep(isOffline: Boolean) {
     Spacer(Modifier.height(ValueTopGap))
 
     Row(verticalAlignment = Alignment.CenterVertically) {
-        Box(
-            modifier = Modifier
-                .size(BrandTileSize)
-                .clip(RoundedCornerShape(BrandTileCorner))
-                .background(AuthColors.BrandTile),
-            contentAlignment = Alignment.Center,
-        ) {
-            Icon(
-                imageVector = SurferIcons.Wallet,
-                contentDescription = SurferSemantics.Decorative,
-                tint = AuthColors.OnBrand,
-                modifier = Modifier.size(BrandIconSize),
-            )
-        }
+        SurferAppIcon(size = BrandTileSize)
         Spacer(Modifier.size(GapSmall))
         Text(
             text = stringResource(Res.string.sign_in_brand),

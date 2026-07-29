@@ -52,19 +52,25 @@ data class DashboardLayoutConfig(
     }
 
     /**
-     * [from] dragged onto the slot [to] currently occupies, within [enabledItems]. Positions are
-     * expressed as widget types rather than indices because the customize screen drags rows out of
-     * a list that also holds headers and the switched-off section — indices there are not layout
-     * positions. Switched-off widgets have no slot to trade, so naming one is a no-op.
+     * [from] dragged onto the slot [to] currently occupies. Positions are expressed as widget types
+     * rather than indices because the customize screen drags rows out of a list that also holds
+     * headers and the switched-off section — indices there are not layout positions.
+     *
+     * The two sections are one draggable list: dropping a widget onto a slot in the *other* section
+     * moves it there, which is the same edit the +/− button makes. So a drop adopts the target's
+     * [DashboardLayoutItem.enabled], and the enabled block stays contiguous either way — the row
+     * lands where the finger left it, on the side of the boundary it was dropped.
      */
     fun withWidgetMoved(from: DashboardWidgetType, to: DashboardWidgetType): DashboardLayoutConfig {
         if (from == to) return this
-        val reordered = enabledItems.toMutableList()
-        val fromIndex = reordered.indexOfFirst { it.type == from }
-        val toIndex = reordered.indexOfFirst { it.type == to }
+        // Rendered order, not storage order: enabled first, switched-off under them.
+        val ordered = (enabledItems + disabledItems).toMutableList()
+        val fromIndex = ordered.indexOfFirst { it.type == from }
+        val toIndex = ordered.indexOfFirst { it.type == to }
         if (fromIndex < 0 || toIndex < 0) return this
-        reordered.add(toIndex, reordered.removeAt(fromIndex))
-        return DashboardLayoutConfig(items = reordered + disabledItems)
+        val landsEnabled = ordered[toIndex].enabled
+        ordered.add(toIndex, ordered.removeAt(fromIndex).copy(enabled = landsEnabled))
+        return DashboardLayoutConfig(items = ordered)
     }
 
     /**

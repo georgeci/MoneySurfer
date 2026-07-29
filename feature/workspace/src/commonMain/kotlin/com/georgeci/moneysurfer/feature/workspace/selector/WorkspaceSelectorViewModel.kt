@@ -60,6 +60,7 @@ class WorkspaceSelectorViewModel(
                 postSideEffect(WorkspaceSelectorEffect.NavigateToWorkspaceCreation)
             WorkspaceSelectorEvent.OnConfirmClick -> confirmSelection()
             WorkspaceSelectorEvent.OnSignOutClick -> signOut()
+            WorkspaceSelectorEvent.OnBackClick -> postSideEffect(WorkspaceSelectorEffect.NavigateBack)
         }
     }
 
@@ -202,9 +203,13 @@ sealed interface WorkspaceSelectorEvent {
     data object OnCreateWorkspaceClick : WorkspaceSelectorEvent
     data object OnConfirmClick : WorkspaceSelectorEvent
     data object OnSignOutClick : WorkspaceSelectorEvent
+
+    /** Toolbar back — only reachable when the selector was pushed onto a stack, i.e. from Settings. */
+    data object OnBackClick : WorkspaceSelectorEvent
 }
 
 sealed interface WorkspaceSelectorEffect {
+    data object NavigateBack : WorkspaceSelectorEffect
     data object NavigateToDashboard : WorkspaceSelectorEffect
     data object NavigateToSignIn : WorkspaceSelectorEffect
     data object NavigateToWorkspaceCreation : WorkspaceSelectorEffect

@@ -1,5 +1,6 @@
 package com.georgeci.moneysurfer.feature.dashboard.customize
 
+import com.georgeci.moneysurfer.domain.config.HostCapabilities
 import com.georgeci.moneysurfer.domain.dashboard.DashboardCardStyle
 import com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutConfig
 import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetType
@@ -14,9 +15,17 @@ import org.koin.core.annotation.KoinViewModel
 @KoinViewModel
 class DashboardCustomizeViewModel(
     private val uiPreferences: UiPreferences,
+    hostCapabilities: HostCapabilities,
 ) : MviViewModel<AsyncState<DashboardLayoutConfig>, DashboardCustomizeEvent, DashboardCustomizeEffect>(
     initialState = AsyncState.Loading,
 ) {
+
+    /**
+     * Whether the rows offer the per-widget card-style picker. Not part of the state: it is a
+     * build-time fact that cannot change while the screen is open, and the state here is the
+     * layout being edited.
+     */
+    val widgetStyleEnabled: Boolean = hostCapabilities.dashboardWidgetStyle
 
     /**
      * The layout waiting to be written, or null while nothing has been edited. A drag produces a

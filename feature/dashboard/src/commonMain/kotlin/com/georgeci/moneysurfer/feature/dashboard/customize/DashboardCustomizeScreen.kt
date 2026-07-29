@@ -30,6 +30,7 @@ import com.georgeci.moneysurfer.domain.dashboard.DashboardLayoutItem
 import com.georgeci.moneysurfer.domain.dashboard.DashboardWidgetType
 import com.georgeci.moneysurfer.uikit.components.SurferSkeletonRow
 import com.georgeci.moneysurfer.uikit.components.base.SurferDragHandle
+import com.georgeci.moneysurfer.uikit.components.base.SurferRoundIconButton
 import com.georgeci.moneysurfer.uikit.components.base.SurferSectionHeader
 import com.georgeci.moneysurfer.uikit.components.base.SurferSectionHeaderHint
 import com.georgeci.moneysurfer.uikit.components.base.SurferToolbar
@@ -37,7 +38,6 @@ import com.georgeci.moneysurfer.uikit.components.base.rememberSurferReorderState
 import com.georgeci.moneysurfer.uikit.components.base.surferReorderHandle
 import com.georgeci.moneysurfer.uikit.components.base.surferReorderableItem
 import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsRow
-import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsSwitch
 import com.georgeci.moneysurfer.uikit.components.settings.SurferSettingsValuePill
 import com.georgeci.moneysurfer.uikit.icons.SurferIcons
 import com.georgeci.moneysurfer.uikit.modifier.surferContentContainer
@@ -48,9 +48,11 @@ import com.georgeci.moneysurfer.uikit.theme.AppTheme
 import com.georgeci.moneysurfer.utils.AsyncState
 import com.georgeci.moneysurfer.utils.HandleSideEffect
 import moneysurfer.feature.dashboard.generated.resources.Res
+import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_add_content_description
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_available_empty
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_enabled_empty
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_footnote
+import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_remove_content_description
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_reorder_hint
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_section_available
 import moneysurfer.feature.dashboard.generated.resources.dashboard_customize_section_enabled
@@ -71,10 +73,13 @@ object DashboardCustomizeTestTags {
     /** Row in the "Available" section. */
     fun availableRow(widget: String): String = "dashboardCustomize:available:$widget"
 
-    /** Visibility switch inside a row of either section; a widget appears in exactly one. */
+    /**
+     * The round +/− button inside a row of either section; a widget appears in exactly one, so the
+     * tag says nothing about which way this particular button moves it.
+     */
     fun toggle(widget: String): String = "dashboardCustomize:toggle:$widget"
 
-    /** Reorder grip, present only on rows in the "On dashboard" section. */
+    /** Reorder grip. Every row has one — rows drag within a section and across the two. */
     fun dragHandle(widget: String): String = "dashboardCustomize:drag:$widget"
 
     /** The "Hero · Classic" pill on an on-dashboard row; opens the card-style sheet. */
@@ -100,7 +105,11 @@ fun DashboardCustomizeScreen(
         }
     }
 
-    DashboardCustomizeContent(state = state, onEvent = viewModel::onEvent)
+    DashboardCustomizeContent(
+        state = state,
+        widgetStyleEnabled = viewModel.widgetStyleEnabled,
+        onEvent = viewModel::onEvent,
+    )
 }
 
 private const val CUSTOMIZE_SKELETON_ROWS = 4
@@ -108,11 +117,15 @@ private const val CUSTOMIZE_SKELETON_ROWS = 4
 /**
  * Stateless half of the screen — public so `:composeApp` desktop UI tests can mount it with an
  * injected state, the way `SignInContent` is used.
+ *
+ * [widgetStyleEnabled] is the host's `dashboard_widget_style` build key: off, the rows carry no
+ * card-style pill and the picker sheet is unreachable.
  */
 @Composable
 fun DashboardCustomizeContent(
     state: AsyncState<DashboardLayoutConfig>,
     onEvent: (DashboardCustomizeEvent) -> Unit,
+    widgetStyleEnabled: Boolean = false,
 ) {
     Scaffold(
         modifier = Modifier
@@ -131,6 +144,7 @@ fun DashboardCustomizeContent(
             is AsyncState.Content -> CustomizeList(
                 layout = state.value,
                 padding = padding,
+                widgetStyleEnabled = widgetStyleEnabled,
                 onEvent = onEvent,
             )
         }
@@ -155,6 +169,7 @@ private fun CustomizeSkeleton(padding: PaddingValues) {
 private fun CustomizeList(
     layout: DashboardLayoutConfig,
     padding: PaddingValues,
+    widgetStyleEnabled: Boolean,
     onEvent: (DashboardCustomizeEvent) -> Unit,
 ) {
     val enabled = layout.enabledItems
@@ -163,12 +178,16 @@ private fun CustomizeList(
     // here rather than in the ViewModel because it is sheet chrome, not part of the layout.
     var styleTarget by rememberSaveable { mutableStateOf<String?>(null) }
     val listState = rememberLazyListState()
+    // Both sections are drop targets: a row dragged across the "Available" header changes section,
+    // which is the same edit its +/− button makes. A widget is in exactly one section, so its type
+    // name is a unique key across the whole list.
+    val rows = enabled + available
     val reorderState = rememberSurferReorderState(
         listState = listState,
-        keys = enabled.map { it.type.name },
+        keys = rows.map { it.type.name },
         onMove = { from, to ->
-            val fromType = enabled.firstOrNull { it.type.name == from }?.type
-            val toType = enabled.firstOrNull { it.type.name == to }?.type
+            val fromType = rows.firstOrNull { it.type.name == from }?.type
+            val toType = rows.firstOrNull { it.type.name == to }?.type
             if (fromType != null && toType != null) {
                 onEvent(DashboardCustomizeEvent.OnWidgetMove(from = fromType, to = toType))
             }
@@ -203,11 +222,12 @@ private fun CustomizeList(
             }
         }
         items(items = enabled, key = { it.type.name }) { item ->
-            EnabledWidgetRow(
+            WidgetRow(
                 item = item,
+                rowTestTag = DashboardCustomizeTestTags.enabledRow(item.type.name),
                 modifier = surferReorderableItem(reorderState, item.type.name),
                 handleModifier = Modifier.surferReorderHandle(reorderState, item.type.name),
-                onStyleClick = { styleTarget = item.type.name },
+                onStyleClick = { styleTarget = item.type.name }.takeIf { widgetStyleEnabled },
                 onEvent = onEvent,
             )
         }
@@ -225,8 +245,15 @@ private fun CustomizeList(
                 SectionNote(text = stringResource(Res.string.dashboard_customize_available_empty))
             }
         }
-        items(items = available, key = { "available-${it.type.name}" }) { item ->
-            AvailableWidgetRow(item = item, onEvent = onEvent)
+        items(items = available, key = { it.type.name }) { item ->
+            WidgetRow(
+                item = item,
+                rowTestTag = DashboardCustomizeTestTags.availableRow(item.type.name),
+                modifier = surferReorderableItem(reorderState, item.type.name),
+                handleModifier = Modifier.surferReorderHandle(reorderState, item.type.name),
+                onStyleClick = null,
+                onEvent = onEvent,
+            )
         }
 
         item(key = "footnote") {
@@ -279,41 +306,68 @@ private fun SectionNote(text: String, modifier: Modifier = Modifier) {
     )
 }
 
+/**
+ * One widget, in whichever section it currently sits. The two used to be separate composables and
+ * had drifted: only the enabled one could be dragged. They differ in exactly two things now — the
+ * direction the round button moves the row, and whether [onStyleClick] is offered.
+ *
+ * Nothing here is clickable at row level: a clickable row merges its subtree semantics, which
+ * would swallow the grip and the button as addressable nodes.
+ */
 @Composable
-private fun EnabledWidgetRow(
+private fun WidgetRow(
     item: DashboardLayoutItem,
+    rowTestTag: String,
     modifier: Modifier,
     handleModifier: Modifier,
-    onStyleClick: () -> Unit,
+    onStyleClick: (() -> Unit)?,
     onEvent: (DashboardCustomizeEvent) -> Unit,
 ) {
     val widget = item.type.name
+    val title = stringResource(item.type.titleResource())
+    val colors = AppTheme.materialColors
     SurferSettingsRow(
-        title = stringResource(item.type.titleResource()),
-        modifier = modifier.testTag(DashboardCustomizeTestTags.enabledRow(widget)),
+        title = title,
+        modifier = modifier.testTag(rowTestTag),
         icon = item.type.icon(),
-        // The pill carries the click, not the whole row: a clickable row merges its subtree
-        // semantics, which would swallow the drag grip and the switch as addressable nodes.
-        supporting = {
-            SurferSettingsValuePill(
-                text = cardStyleSummary(item.type, item.cardStyle),
-                modifier = Modifier
-                    .clip(AppTheme.shapes.small)
-                    .clickable(onClick = onStyleClick)
-                    .padding(vertical = 4.dp, horizontal = 2.dp)
-                    .testTag(DashboardCustomizeTestTags.styleAction(widget)),
-            )
+        supporting = onStyleClick?.let {
+            {
+                SurferSettingsValuePill(
+                    text = cardStyleSummary(item.type, item.cardStyle),
+                    modifier = Modifier
+                        .clip(AppTheme.shapes.small)
+                        .clickable(onClick = it)
+                        .padding(vertical = 4.dp, horizontal = 2.dp)
+                        .testTag(DashboardCustomizeTestTags.styleAction(widget)),
+                )
+            }
         },
         trailing = {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(4.dp),
             ) {
-                SurferSettingsSwitch(
-                    checked = true,
-                    onCheckedChange = {
-                        onEvent(DashboardCustomizeEvent.OnWidgetEnabledChange(item.type, enabled = false))
+                SurferRoundIconButton(
+                    icon = if (item.enabled) SurferIcons.Remove else SurferIcons.Add,
+                    contentDescription = stringResource(
+                        if (item.enabled) {
+                            Res.string.dashboard_customize_remove_content_description
+                        } else {
+                            Res.string.dashboard_customize_add_content_description
+                        },
+                        title,
+                    ),
+                    onClick = {
+                        onEvent(
+                            DashboardCustomizeEvent.OnWidgetEnabledChange(item.type, enabled = !item.enabled),
+                        )
                     },
+                    containerColor = if (item.enabled) {
+                        colors.surfaceContainerHighest
+                    } else {
+                        colors.primaryContainer
+                    },
+                    contentColor = if (item.enabled) colors.onSurface else colors.onPrimaryContainer,
                     modifier = Modifier.testTag(DashboardCustomizeTestTags.toggle(widget)),
                 )
                 SurferDragHandle(
@@ -321,28 +375,6 @@ private fun EnabledWidgetRow(
                 )
             }
         },
-    )
-}
-
-@Composable
-private fun AvailableWidgetRow(
-    item: DashboardLayoutItem,
-    onEvent: (DashboardCustomizeEvent) -> Unit,
-) {
-    val widget = item.type.name
-    val turnOn = { onEvent(DashboardCustomizeEvent.OnWidgetEnabledChange(item.type, enabled = true)) }
-    SurferSettingsRow(
-        title = stringResource(item.type.titleResource()),
-        modifier = Modifier.testTag(DashboardCustomizeTestTags.availableRow(widget)),
-        icon = item.type.icon(),
-        trailing = {
-            SurferSettingsSwitch(
-                checked = false,
-                onCheckedChange = { turnOn() },
-                modifier = Modifier.testTag(DashboardCustomizeTestTags.toggle(widget)),
-            )
-        },
-        onClick = turnOn,
     )
 }
 
@@ -368,6 +400,7 @@ private fun DashboardCustomizePreview() {
                 DashboardLayoutConfig.DEFAULT.withWidgetEnabled(DashboardWidgetType.Goals, enabled = false),
             ),
             onEvent = {},
+            widgetStyleEnabled = true,
         )
     }
 }

@@ -127,10 +127,14 @@ internal fun TransactionsByAccountContent(
             )
         },
         floatingActionButton = {
-            SurferAddFab(
-                label = stringResource(Res.string.transactions_list_new),
-                onClick = { onEvent(TransactionsByAccountEvent.OnAddTransactionClick) },
-            )
+            // Not while the empty state is showing its own "Add transaction" CTA — see
+            // `showsAddCta`.
+            if (!state.showsAddCta) {
+                SurferAddFab(
+                    label = stringResource(Res.string.transactions_list_new),
+                    onClick = { onEvent(TransactionsByAccountEvent.OnAddTransactionClick) },
+                )
+            }
         },
     ) { padding ->
         Column(

@@ -255,6 +255,27 @@ class TransactionsByAccountFilteringTest : StringSpec({
         }
     }
 
+    "only the nothing-logged-yet empty state carries an add CTA, so only then is the FAB dropped" {
+        runTest {
+            val empty = Env().viewModel()
+            // Nothing logged at all: the empty state offers "Add transaction", and the screen
+            // hides the FAB rather than show the same action twice.
+            empty.content().showsAddCta shouldBe true
+
+            val env = Env(transactions = listOf(expense(id = "rent", amount = 40)))
+            val viewModel = env.viewModel()
+            // Rows exist and are hidden: the CTA clears the filter, so the FAB is still the only
+            // way to add one.
+            viewModel.onEvent(TransactionsByAccountEvent.OnSearchQueryChanged("coffee"))
+            viewModel.content().isEmpty shouldBe true
+            viewModel.content().showsAddCta shouldBe false
+
+            // A list with rows in it has no empty state at all.
+            viewModel.onEvent(TransactionsByAccountEvent.OnSearchQueryChanged(""))
+            viewModel.content().showsAddCta shouldBe false
+        }
+    }
+
     "clearing from the empty state drops the filters and the search text together" {
         runTest {
             val env = Env(transactions = listOf(expense(id = "rent", amount = 40)))

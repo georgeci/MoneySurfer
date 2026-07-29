@@ -7,6 +7,8 @@
     <string name="dashboard_customize_section_enabled">On dashboard</string>
     <string name="dashboard_customize_section_available">Available</string>
     <string name="dashboard_customize_reorder_hint">Drag to reorder</string>
+    <string name="dashboard_customize_add_content_description">Add %1$s to the dashboard</string>
+    <string name="dashboard_customize_remove_content_description">Remove %1$s from the dashboard</string>
     <string name="dashboard_customize_enabled_empty">Your dashboard is empty. Turn a widget on below.</string>
     <string name="dashboard_customize_available_empty">Every widget is already on your dashboard.</string>
     <string name="dashboard_customize_footnote">The layout is saved on this device only.</string>

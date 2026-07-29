@@ -44,6 +44,7 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Payments
+import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.Restore
 import androidx.compose.material.icons.filled.Savings
 import androidx.compose.material.icons.filled.Schedule
@@ -64,6 +65,7 @@ object SurferIcons {
     val Close: ImageVector get() = Icons.Filled.Close
     val Settings: ImageVector get() = Icons.Filled.Settings
     val Add: ImageVector get() = Icons.Filled.Add
+    val Remove: ImageVector get() = Icons.Filled.Remove
     val Check: ImageVector get() = Icons.Filled.Check
     val Delete: ImageVector get() = Icons.Filled.Delete
     val Edit: ImageVector get() = Icons.Filled.Edit

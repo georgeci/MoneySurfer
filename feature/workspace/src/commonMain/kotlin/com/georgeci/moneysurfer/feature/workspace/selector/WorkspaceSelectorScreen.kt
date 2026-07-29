@@ -67,6 +67,7 @@ object WorkspaceSelectorTestTags {
  * AGENTS.md → UI Rules.
  */
 data class WorkspaceSelectorNavigation(
+    val onNavigateBack: () -> Unit,
     val onNavigateToDashboard: () -> Unit,
     val onNavigateToSignIn: () -> Unit,
     val onNavigateToWorkspaceCreation: () -> Unit,
@@ -92,6 +93,7 @@ fun WorkspaceSelectorScreen(
 
     viewModel.HandleSideEffect { effect ->
         when (effect) {
+            WorkspaceSelectorEffect.NavigateBack -> navigation.onNavigateBack()
             WorkspaceSelectorEffect.NavigateToDashboard -> navigation.onNavigateToDashboard()
             WorkspaceSelectorEffect.NavigateToSignIn -> navigation.onNavigateToSignIn()
             WorkspaceSelectorEffect.NavigateToWorkspaceCreation -> navigation.onNavigateToWorkspaceCreation()
@@ -104,7 +106,10 @@ fun WorkspaceSelectorScreen(
     }
 
     when (val current = state) {
-        is WorkspaceSelectorState.Loading -> WorkspaceSelectorLoading()
+        is WorkspaceSelectorState.Loading -> WorkspaceSelectorLoading(
+            state = current,
+            onEvent = viewModel::onEvent,
+        )
         is WorkspaceSelectorState.Content -> WorkspaceSelectorContent(
             state = current,
             cloudDataUnavailable = cloudDataUnavailable,
@@ -114,13 +119,21 @@ fun WorkspaceSelectorScreen(
 }
 
 @Composable
-private fun WorkspaceSelectorLoading() {
+private fun WorkspaceSelectorLoading(
+    state: WorkspaceSelectorState.Loading,
+    onEvent: (WorkspaceSelectorEvent) -> Unit,
+) {
     Box(modifier = Modifier.fillMaxSize()) {
         Scaffold(
             modifier = Modifier.surferSafeInsets(),
             containerColor = AppTheme.materialColors.surface,
             topBar = {
-                SurferToolbar(title = stringResource(Res.string.workspace_selector_heading_title))
+                SurferToolbar(
+                    title = stringResource(Res.string.workspace_selector_heading_title),
+                    // Same rule as the loaded screen, so the arrow does not pop in once the
+                    // workspaces arrive — and so a slow load is not a dead end either.
+                    onBack = backAction(state.showActions, onEvent),
+                )
             },
         ) { padding ->
             Box(modifier = Modifier.fillMaxSize().padding(padding))
@@ -128,6 +141,20 @@ private fun WorkspaceSelectorLoading() {
 
         SurferFullScreenLoader(modifier = Modifier.fillMaxSize())
     }
+}
+
+/**
+ * The toolbar's back action, or null. Only the pushed-from-Settings selector (`showActions`) has
+ * somewhere to go back to; as a start route it is the bottom of the stack, and the sign-out action
+ * is the way out instead.
+ */
+private fun backAction(
+    showActions: Boolean,
+    onEvent: (WorkspaceSelectorEvent) -> Unit,
+): (() -> Unit)? = if (showActions) {
+    { onEvent(WorkspaceSelectorEvent.OnBackClick) }
+} else {
+    null
 }
 
 @Composable
@@ -148,6 +175,7 @@ private fun WorkspaceSelectorContent(
             topBar = {
                 SurferToolbar(
                     title = stringResource(Res.string.workspace_selector_heading_title),
+                    onBack = backAction(state.showActions, onEvent),
                     actions = {
                         // The only exit when the selector is the root of the stack: no back
                         // entry, and Settings sits behind Dashboard, which needs a workspace.

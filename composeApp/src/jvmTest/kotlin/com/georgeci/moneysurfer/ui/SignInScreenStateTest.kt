@@ -1,10 +1,12 @@
 package com.georgeci.moneysurfer.ui
 
 import androidx.compose.ui.test.ExperimentalTestApi
+import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.assertTextEquals
+import androidx.compose.ui.test.onChildren
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.v2.runComposeUiTest
@@ -152,9 +154,20 @@ class SignInScreenStateTest : StringSpec({
             }
 
             onNodeWithTag(SignInTestTags.ErrorText).assertDoesNotExist()
-            onNodeWithTag(SignInTestTags.EmailError, useUnmergedTree = true).assertDoesNotExist()
-            onNodeWithTag(SignInTestTags.PasswordError, useUnmergedTree = true).assertDoesNotExist()
+            // The message line under each field is always laid out (see the layout test below),
+            // so what "no error" means here is that it carries no text.
+            onNodeWithTag(SignInTestTags.EmailError, useUnmergedTree = true).onChildren().assertCountEquals(0)
+            onNodeWithTag(SignInTestTags.PasswordError, useUnmergedTree = true).onChildren().assertCountEquals(0)
         }
+    }
+
+    "a field error does not move the rest of the form" {
+        val clean = submitButtonTop(SignInState())
+        val failed = submitButtonTop(SignInState(email = "surfer@example", error = SignInError.EmailInvalid))
+
+        // The message line under a field is reserved whether or not there is a message, so the
+        // button under it stays put instead of jumping the moment validation fails.
+        failed shouldBe clean
     }
 
     "clicking submit and toggle emits the matching events" {
@@ -191,3 +204,14 @@ class SignInScreenStateTest : StringSpec({
         }
     }
 })
+
+/** Where the submit button sits, so two states can be compared for layout shift. */
+@OptIn(ExperimentalTestApi::class)
+private fun submitButtonTop(state: SignInState): Float {
+    var top = Float.NaN
+    runComposeUiTest {
+        setContent { SignInContent(state = state, onEvent = {}) }
+        top = onNodeWithTag(SignInTestTags.SubmitButton).fetchSemanticsNode().positionInRoot.y
+    }
+    return top
+}

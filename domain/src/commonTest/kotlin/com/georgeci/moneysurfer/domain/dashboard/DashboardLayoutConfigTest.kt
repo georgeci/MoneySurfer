@@ -1,6 +1,7 @@
 package com.georgeci.moneysurfer.domain.dashboard
 
 import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldContainAll
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.shouldBe
@@ -184,7 +185,7 @@ class DashboardLayoutConfigTest : StringSpec({
         )
     }
 
-    "moving a widget onto itself, or onto a switched-off one, changes nothing" {
+    "moving a widget onto itself changes nothing" {
         val config = DashboardLayoutConfig(
             items = listOf(
                 DashboardLayoutItem(DashboardWidgetType.Balance),
@@ -193,7 +194,59 @@ class DashboardLayoutConfigTest : StringSpec({
         )
 
         config.withWidgetMoved(DashboardWidgetType.Balance, DashboardWidgetType.Balance) shouldBe config
-        config.withWidgetMoved(DashboardWidgetType.Balance, DashboardWidgetType.Accounts) shouldBe config
+    }
+
+    "moving a widget onto a switched-off one switches it off, in that slot" {
+        val config = DashboardLayoutConfig(
+            items = listOf(
+                DashboardLayoutItem(DashboardWidgetType.Balance),
+                DashboardLayoutItem(DashboardWidgetType.Goals),
+                DashboardLayoutItem(DashboardWidgetType.Accounts, enabled = false),
+            ),
+        )
+
+        val moved = config.withWidgetMoved(DashboardWidgetType.Balance, DashboardWidgetType.Accounts)
+
+        moved.enabledItems.map { it.type } shouldContainExactly listOf(DashboardWidgetType.Goals)
+        moved.disabledItems.map { it.type } shouldContainExactly listOf(
+            DashboardWidgetType.Accounts,
+            DashboardWidgetType.Balance,
+        )
+    }
+
+    "moving a switched-off widget onto an enabled one switches it on, in that slot" {
+        val config = DashboardLayoutConfig(
+            items = listOf(
+                DashboardLayoutItem(DashboardWidgetType.Balance),
+                DashboardLayoutItem(DashboardWidgetType.Goals),
+                DashboardLayoutItem(DashboardWidgetType.Accounts, enabled = false),
+            ),
+        )
+
+        val moved = config.withWidgetMoved(DashboardWidgetType.Accounts, DashboardWidgetType.Goals)
+
+        // Second, where it was dropped — not appended after the last enabled widget the way
+        // `withWidgetEnabled` does it.
+        moved.enabledItems.map { it.type } shouldContainExactly listOf(
+            DashboardWidgetType.Balance,
+            DashboardWidgetType.Accounts,
+            DashboardWidgetType.Goals,
+        )
+        moved.disabledItems.shouldBeEmpty()
+    }
+
+    "a widget dragged across sections keeps its card style" {
+        val styled = DashboardCardStyle(DashboardWidgetSize.Compact, variant = "strip")
+        val config = DashboardLayoutConfig(
+            items = listOf(
+                DashboardLayoutItem(DashboardWidgetType.Balance),
+                DashboardLayoutItem(DashboardWidgetType.Accounts, enabled = false, cardStyle = styled),
+            ),
+        )
+
+        val moved = config.withWidgetMoved(DashboardWidgetType.Accounts, DashboardWidgetType.Balance)
+
+        moved.items.single { it.type == DashboardWidgetType.Accounts }.cardStyle shouldBe styled
     }
 
     "restyling a widget leaves its slot and its neighbours alone" {

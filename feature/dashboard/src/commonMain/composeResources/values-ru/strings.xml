@@ -7,6 +7,8 @@
     <string name="dashboard_customize_section_enabled">На дашборде</string>
     <string name="dashboard_customize_section_available">Доступные</string>
     <string name="dashboard_customize_reorder_hint">Перетащите, чтобы изменить порядок</string>
+    <string name="dashboard_customize_add_content_description">Добавить «%1$s» на дашборд</string>
+    <string name="dashboard_customize_remove_content_description">Убрать «%1$s» с дашборда</string>
     <string name="dashboard_customize_enabled_empty">Дашборд пуст. Включите виджет ниже.</string>
     <string name="dashboard_customize_available_empty">Все виджеты уже на дашборде.</string>
     <string name="dashboard_customize_footnote">Расположение сохраняется только на этом устройстве.</string>
