@@ -50,7 +50,7 @@ which waits on a new background asset — each one names what changed.
 6. **Input fields must use the same corner radius as `SurferCard`.** Applies everywhere,
    not just where it was spotted (the "Search currency" field in the currency picker —
    its corners are rounder than the currency rows below it). `SurferCard` draws with
-   `AppTheme.shapes.large` (see [SurferContainer.kt](uikit/src/commonMain/kotlin/com/georgeci/moneysurfer/uikit/atom/SurferContainer.kt));
+   `AppTheme.shapes.large` (see [SurferContainer.kt](../../uikit/src/commonMain/kotlin/com/georgeci/moneysurfer/uikit/atom/SurferContainer.kt));
    every text field / search field should take the same shape token.
 
    *Done:* `AppShapes.extraSmall` — the slot `OutlinedTextField` defaults to — is now 16.dp,
@@ -96,7 +96,7 @@ which waits on a new background asset — each one names what changed.
     configuration rows ("Full · Classic ›", "Full · List ›") ship disabled until they are
     ready. Use a local build key (not a user setting, not remote-overridable) and add the
     row to the "Feature flags shipped switched off" table in
-    [AGENTS.md](AGENTS.md) in the same PR, as the rules there require.
+    [AGENTS.md](../../AGENTS.md) in the same PR, as the rules there require.
 
     *Done:* `host.dashboard_widget_style`, `false` in both hosts, read through
     `HostCapabilities`; row added to the AGENTS.md table.
