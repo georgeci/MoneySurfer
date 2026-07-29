@@ -272,6 +272,12 @@
 - Lines: 26-46
 - Tasks: persistence, room, firestore, datastore
 
+## pr-check-fan-out
+- Title: The gate
+- File: docs/ci/pr-checks.md
+- Lines: 19-115
+- Tasks: ci, paths-filter, workflows
+
 ## project-map
 - Title: Module Map
 - File: docs/PROJECT_MAP.md
